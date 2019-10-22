@@ -1,0 +1,53 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+@charset "utf-8";
+
+$sans-serif: 'IBM Plex Sans', sans-serif !default;
+$monospace: 'IBM Plex Mono', monospace !default;
+$sans-serif-condensed: 'IBM Plex Sans Condensed', sans-serif;
+
+
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
+@import "minimal-mistakes"; // main partials
+
+.site-title {
+    font-family: $sans-serif-condensed;
+    font-weight: 900;
+}
+
+.layout--splash .page__title {
+    font-family: $sans-serif-condensed;
+    font-weight: 900;
+
+    font-size: 1rem;
+    color: #ccc;
+}
+
+.layout--splash .page__lead {
+    margin-top: 0;
+
+    font-family: $sans-serif-condensed;
+    font-weight: 900;
+
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.05ex;
+}
+
+.layout--splash .archive__item-title {
+    font-family: $sans-serif-condensed;
+    font-weight: 900;
+
+    font-size: 3rem;
+    line-height: .8;
+    letter-spacing: -0.025ex;
+}
+
+.layout--splash .archive__item-title b {
+    font-size: 1rem;
+    color: #999;
+    font-weight: 600;
+}

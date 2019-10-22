@@ -1,0 +1,37 @@
+main:
+  - title: "Guides"
+    url: /guides/
+  - title: "Docs"
+    url: /docs/
+  - title: "GitHub"
+    url: https://github.com/cortexjs
+
+docs:
+  - title: "Getting Started"
+    children:
+      - title: "Quick-Start Guide"
+        url: "/docs/quick-start-guide"
+      - title: "Installation"
+        url: /docs/installation/
+  - title: "Mathfield"
+    children:
+      - title: "Quick-Start Guide"
+        url: "/docs/mathfield/quick-start-guide"
+      - title: "APIs"
+        url: /docs/mathfield/api/
+  - title: "Compute Engine"
+    children:
+      - title: "Quick-Start Guide"
+        url: "/docs/compute_engine/quick-start-guide"
+      - title: "APIs"
+        url: /docs/compute_engine/api/
+  - title: "Visual"
+    children:
+      - title: "Quick-Start Guide"
+        url: "/docs/visual/quick-start-guide"
+      - title: "APIs"
+        url: /docs/visual/api/
+  - title: "Contributing"
+    children:
+      - title: "How to contribute"
+        url: "/docs/contributing"
