@@ -155,6 +155,7 @@ exclude:
   - log
   - node_modules
   - package.json
+  - package-lock.json
   - Rakefile
   - README
   - tmp
@@ -179,12 +180,13 @@ incremental: false
 kramdown:
   input: GFM
   hard_wrap: false
-  auto_ids: true
+  auto_ids: false
   footnote_nr: 1
   entity_output: as_char
   toc_levels: 1..6
-  smart_quotes: lsquo,rsquo,ldquo,rdquo
   enable_coderay: false
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  # smart_quotes: ["apos", "apos", "quot", "quot"]
 
 
 # Sass/SCSS
@@ -194,7 +196,7 @@ sass:
 
 
 # Outputting
-permalink: /:categories/:title/
+# permalink: /:categories/:title/
 # paginate: 5 # amount of posts to show
 # paginate_path: /page:num/
 timezone: America/Los_Angeles # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -272,6 +274,8 @@ defaults:
       path: "docs"
       type: pages
     values:
-      layout: single
+      layout: typescript_doc
+      read_time: false
+      related: false
       sidebar:
         nav: "docs"

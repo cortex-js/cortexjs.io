@@ -1,0 +1,5824 @@
+{
+	"id": 0,
+	"name": "mathlive",
+	"kind": 0,
+	"flags": {},
+	"children": [
+		{
+			"id": 1,
+			"name": "\"mathlive.d\"",
+			"kind": 1,
+			"kindString": "External module",
+			"flags": {
+				"isExported": true
+			},
+			"originalName": "C:/Users/arno/Documents/GitHub/cortexjs.io/node_modules/mathlive/dist/mathlive.d.ts",
+			"comment": {
+				"tags": [
+					{
+						"tag": "copyright",
+						"text": "2020"
+					},
+					{
+						"tag": "remarks",
+						"text": "\nThis is the top level documentation for the package.\n"
+					},
+					{
+						"tag": "deprecated",
+						"text": "This package will be renamed in version 2.0"
+					},
+					{
+						"tag": "experimental",
+						"text": ""
+					},
+					{
+						"tag": "packagedocumentation",
+						"text": "Mathlive API Reference\n"
+					}
+				]
+			},
+			"children": [
+				{
+					"id": 188,
+					"name": "\"mathlive\"",
+					"kind": 2,
+					"kindString": "Module",
+					"flags": {},
+					"comment": {
+						"shortText": "To \"invoke\" the ''functions'' in this it's easy module, import the MathLive module.\nThis modules exports the MathLive entry points.",
+						"tags": [
+							{
+								"tag": "module",
+								"text": "mathlive"
+							},
+							{
+								"tag": "example",
+								"text": "\n// To invoke the ''functions'' in this it's easy module, import the MathLive module.\n\nimport MathLive from 'dist/mathlive.mjs';\n\nconst markup = MathLive.latexToMarkup('e^{i\\\\pi}+1=0');\n\n"
+							}
+						]
+					},
+					"children": [
+						{
+							"id": 210,
+							"name": "astToLatex",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 211,
+									"name": "astToLatex",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Convert an Abstract Syntax Tree to a LaTeX string.",
+										"text": "**See:** {@tutorial MASTON}\n",
+										"returns": "The LaTeX representation of the Abstract Syntax Tree, if valid.",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#astToLatex\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 212,
+											"name": "ast",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "The Abstract Syntax Tree as a JavaScript object."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										},
+										{
+											"id": 213,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 214,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 222,
+															"name": "beginRepeatingDigits",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 625,
+																	"character": 28
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 216,
+															"name": "decimalMarker",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 619,
+																	"character": 21
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 223,
+															"name": "endRepeatingDigits",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 626,
+																	"character": 26
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 220,
+															"name": "exponentMarker",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 623,
+																	"character": 22
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 219,
+															"name": "exponentProduct",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 622,
+																	"character": 23
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 217,
+															"name": "groupSeparator",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 620,
+																	"character": 22
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 215,
+															"name": "precision",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"comment": {
+																"text": "Number of digits used in the representation of numbers. **Default=** 14."
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 618,
+																	"character": 17
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "number"
+															}
+														},
+														{
+															"id": 218,
+															"name": "product",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 621,
+																	"character": 15
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 221,
+															"name": "scientificNotation",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 624,
+																	"character": 26
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																222,
+																216,
+																223,
+																220,
+																219,
+																217,
+																215,
+																218,
+																221
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 617,
+															"character": 42
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 617,
+									"character": 23
+								}
+							]
+						},
+						{
+							"id": 286,
+							"name": "getOriginalContent",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 287,
+									"name": "getOriginalContent",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "After calling {@linkcode module:mathlive#renderMathInElement renderMathInElement}\nor {@linkcode module:mathlive#makeMathField makeMathField} the original content\ncan be retrived by calling this function.",
+										"text": "Given the following markup:\n```html\n<span id='equation'>$$f(x)=sin(x)$$</span>\n```\nThe following code:\n```javascript\nMathLive.renderMathInElement('equation');\nconsole.log(MathLive.getOriginalContent('equation'));\n```\nwill output:\n```\n$$f(x)=sin(x)$$\n```",
+										"returns": "the original content of the element.",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#getOriginalContent\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 288,
+											"name": "element",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A DOM element ID, a DOM\nelement or a MathField."
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "string"
+													},
+													{
+														"type": "reference",
+														"name": "HTMLElement"
+													},
+													{
+														"type": "reference",
+														"name": "MathField",
+														"id": 2
+													}
+												]
+											}
+										},
+										{
+											"id": 289,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 290,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 291,
+															"name": "namespace",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 869,
+																	"character": 17
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																291
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 868,
+															"character": 84
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 868,
+									"character": 31
+								}
+							]
+						},
+						{
+							"id": 235,
+							"name": "highlightAtomID",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 236,
+									"name": "highlightAtomID",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Highlight the span corresponding to the specified atomID\nThis is used for TTS with synchronized highlighting (read aloud)"
+									},
+									"parameters": [
+										{
+											"id": 237,
+											"name": "atomID",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "\n\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 677,
+									"character": 28
+								}
+							]
+						},
+						{
+							"id": 204,
+							"name": "latexToAST",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 205,
+									"name": "latexToAST",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Convert a LaTeX string to an Abstract Syntax Tree",
+										"text": "**See:** {@tutorial MASTON}\n",
+										"returns": "The Abstract Syntax Tree as a JavaScript object.",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#latexToAST\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 206,
+											"name": "latex",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A string of valid LaTeX. It does not have to start\nwith a mode token such as a `$$` or `\\(`."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 207,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 208,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 209,
+															"name": "macros",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 595,
+																	"character": 14
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "any"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																209
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 594,
+															"character": 47
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 594,
+									"character": 23
+								}
+							]
+						},
+						{
+							"id": 189,
+							"name": "latexToMarkup",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 190,
+									"name": "latexToMarkup",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Convert a ''LaTeX'' string to a string of HTML markup. It's easy.",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#latexToMarkup\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 191,
+											"name": "text",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A string of valid LaTeX. It does not have to start\nwith a mode token such as `$$` or `\\(`.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 192,
+											"name": "mathstyle",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "If `'displaystyle'` the \"display\" mode of TeX\nis used to typeset the formula, which is most appropriate for formulas that are\ndisplayed in a standalone block. If `'textstyle'` is used, the \"text\" mode\nof TeX is used, which is most appropriate when displaying math \"inline\"\nwith other text (on the same line).\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 193,
+											"name": "format",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 538,
+									"character": 26
+								}
+							]
+						},
+						{
+							"id": 198,
+							"name": "latexToMathML",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 199,
+									"name": "latexToMathML",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Convert a LaTeX string to a string of MathML markup.",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#latexToMathML\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 200,
+											"name": "latex",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A string of valid LaTeX. It does not have to start\nwith a mode token such as a `$$` or `\\(`."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 201,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 202,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 203,
+															"name": "generateID",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 579,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																203
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 578,
+															"character": 50
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 578,
+									"character": 26
+								}
+							]
+						},
+						{
+							"id": 224,
+							"name": "latexToSpeakableText",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 225,
+									"name": "latexToSpeakableText",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Convert a LaTeX string to a textual representation ready to be spoken",
+										"returns": "The spoken representation of the input LaTeX.",
+										"tags": [
+											{
+												"tag": "example",
+												"text": "\nconsole.log(MathLive.latexToSpeakableText('\\\\frac{1}{2}'));\n// ➡︎'half'"
+											},
+											{
+												"tag": "function",
+												"text": "module:mathlive#latexToSpeakableText\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 226,
+											"name": "latex",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A string of valid LaTeX. It does not have to start\nwith a mode token such as a `$$` or `\\(`.\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 227,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "-\n"
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 228,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 230,
+															"name": "textToSpeechMarkup",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 665,
+																	"character": 26
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 229,
+															"name": "textToSpeechRules",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 664,
+																	"character": 25
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 231,
+															"name": "textToSpeechRulesOptions",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 666,
+																	"character": 32
+																}
+															],
+															"type": {
+																"type": "reflection",
+																"declaration": {
+																	"id": 232,
+																	"name": "__type",
+																	"kind": 65536,
+																	"kindString": "Type literal",
+																	"flags": {},
+																	"indexSignature": [
+																		{
+																			"id": 233,
+																			"name": "__index",
+																			"kind": 8192,
+																			"kindString": "Index signature",
+																			"flags": {},
+																			"parameters": [
+																				{
+																					"id": 234,
+																					"name": "key",
+																					"kind": 32768,
+																					"kindString": "Parameter",
+																					"flags": {},
+																					"type": {
+																						"type": "intrinsic",
+																						"name": "string"
+																					}
+																				}
+																			],
+																			"type": {
+																				"type": "intrinsic",
+																				"name": "any"
+																			}
+																		}
+																	],
+																	"sources": [
+																		{
+																			"fileName": "mathlive.d.ts",
+																			"line": 666,
+																			"character": 34
+																		}
+																	]
+																}
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																230,
+																229,
+																231
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 663,
+															"character": 57
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 663,
+									"character": 33
+								}
+							]
+						},
+						{
+							"id": 194,
+							"name": "makeMathField",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 195,
+									"name": "makeMathField",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Convert a DOM element into an editable math field.",
+										"text": "After the DOM element has been created, the value `element.mathfield` will\nreturn a reference to the mathfield object. This value is also returned\nby `makeMathField`\n",
+										"returns": "\n\nGiven the HTML markup:\n```html\n<span id='equation'>$f(x)=sin(x)$</span>\n```\nThe following code will turn the span into an editable mathfield.\n```\nimport MathLive from 'dist/mathlive.mjs';\nMathLive.makeMathField('equation');\n```\n",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#makeMathField\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 196,
+											"name": "element",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A DOM element, for example as obtained\nby `document.getElementById()`, or the ID of a DOM element as a string.\n"
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"name": "HTMLElement"
+													},
+													{
+														"type": "intrinsic",
+														"name": "string"
+													}
+												]
+											}
+										},
+										{
+											"id": 197,
+											"name": "config",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "MathFieldConfig",
+												"id": 82
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathField",
+										"id": 2
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 566,
+									"character": 26
+								}
+							]
+						},
+						{
+							"id": 240,
+							"name": "pauseReadAloud",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 241,
+									"name": "pauseReadAloud",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "If a Read Aloud operation is in progress, stop it.",
+										"text": "**See** {@linkcode module:editor/mathfield#speak speak}",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#pauseReadAloud\n"
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 699,
+									"character": 27
+								}
+							]
+						},
+						{
+							"id": 244,
+							"name": "playReadAloud",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 245,
+									"name": "playReadAloud",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "If a Read Aloud operation is in progress, read from a specified token",
+										"text": "**See** {@linkcode module:editor-mathfield#speak speak}\n",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#playReadAloud\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 246,
+											"name": "token",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 247,
+											"name": "count",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 716,
+									"character": 26
+								}
+							]
+						},
+						{
+							"id": 238,
+							"name": "readAloudStatus",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 239,
+									"name": "readAloudStatus",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Return the status of a Read Aloud operation (reading with synchronized\nhighlighting).",
+										"text": "Possible values include:\n- `ready`\n- `playing`\n- `paused`\n- `unavailable`\n\n**See** {@linkcode module:editor-mathfield#speak speak}",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#readAloudStatus\n"
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 692,
+									"character": 28
+								}
+							]
+						},
+						{
+							"id": 248,
+							"name": "renderMathInDocument",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 249,
+									"name": "renderMathInDocument",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Transform all the elements in the document body that contain LaTeX code\ninto typeset math.",
+										"text": "**Note:** This is a very expensive call, as it needs to parse the entire\nDOM tree to determine which elements need to be processed. In most cases\nthis should only be called once per document, once the DOM has been loaded.\nTo render a specific element, use {@linkcode module:mathlive#renderMathInElement renderMathInElement()}\n\n**See:** {@tutorial USAGE_GUIDE}\n",
+										"tags": [
+											{
+												"tag": "example",
+												"text": "\nimport MathLive from 'dist/mathlive.mjs';\ndocument.addEventListener(\"load\", () => {\n    MathLive.renderMathInDocument();\n});\n\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 250,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 251,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"indexSignature": [
+														{
+															"id": 252,
+															"name": "__index",
+															"kind": 8192,
+															"kindString": "Index signature",
+															"flags": {},
+															"parameters": [
+																{
+																	"id": 253,
+																	"name": "key",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {},
+																	"type": {
+																		"type": "intrinsic",
+																		"name": "string"
+																	}
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "any"
+															}
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 737,
+															"character": 43
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 737,
+									"character": 33
+								}
+							]
+						},
+						{
+							"id": 254,
+							"name": "renderMathInElement",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 255,
+									"name": "renderMathInElement",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Transform all the children of `element`, recursively, that contain LaTeX code\ninto typeset math.",
+										"text": "**See:** {@tutorial USAGE_GUIDE Usage Guide}\n",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#renderMathInElement\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 256,
+											"name": "element",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "An HTML DOM element, or a string containing\nthe ID of an element."
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"name": "HTMLElement"
+													},
+													{
+														"type": "intrinsic",
+														"name": "string"
+													}
+												]
+											}
+										},
+										{
+											"id": 257,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 258,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 262,
+															"name": "ignoreClass",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 821,
+																	"character": 19
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 260,
+															"name": "macros",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 819,
+																	"character": 14
+																}
+															],
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "object"
+																}
+															}
+														},
+														{
+															"id": 259,
+															"name": "namespace",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 818,
+																	"character": 17
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 266,
+															"name": "preserveOriginalContent",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 825,
+																	"character": 31
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															}
+														},
+														{
+															"id": 263,
+															"name": "processClass",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 822,
+																	"character": 20
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 264,
+															"name": "processScriptType",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 823,
+																	"character": 25
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 267,
+															"name": "readAloud",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 826,
+																	"character": 17
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															}
+														},
+														{
+															"id": 265,
+															"name": "renderAccessibleContent",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 824,
+																	"character": 31
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 261,
+															"name": "skipTags",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 820,
+																	"character": 16
+																}
+															],
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "string"
+																}
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																262,
+																260,
+																259,
+																266,
+																263,
+																264,
+																267,
+																265,
+																261
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 817,
+															"character": 73
+														}
+													]
+												}
+											}
+										},
+										{
+											"id": 268,
+											"name": "renderToMarkup",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 269,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"signatures": [
+														{
+															"id": 270,
+															"name": "__call",
+															"kind": 4096,
+															"kindString": "Call signature",
+															"flags": {},
+															"parameters": [
+																{
+																	"id": 271,
+																	"name": "params",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isRest": true
+																	},
+																	"type": {
+																		"type": "array",
+																		"elementType": {
+																			"type": "intrinsic",
+																			"name": "any"
+																		}
+																	}
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "any"
+															}
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 827,
+															"character": 23
+														}
+													]
+												}
+											}
+										},
+										{
+											"id": 272,
+											"name": "renderToMathML",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 273,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"signatures": [
+														{
+															"id": 274,
+															"name": "__call",
+															"kind": 4096,
+															"kindString": "Call signature",
+															"flags": {},
+															"parameters": [
+																{
+																	"id": 275,
+																	"name": "params",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isRest": true
+																	},
+																	"type": {
+																		"type": "array",
+																		"elementType": {
+																			"type": "intrinsic",
+																			"name": "any"
+																		}
+																	}
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "any"
+															}
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 827,
+															"character": 67
+														}
+													]
+												}
+											}
+										},
+										{
+											"id": 276,
+											"name": "renderToSpeakableText",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 277,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"signatures": [
+														{
+															"id": 278,
+															"name": "__call",
+															"kind": 4096,
+															"kindString": "Call signature",
+															"flags": {},
+															"parameters": [
+																{
+																	"id": 279,
+																	"name": "params",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isRest": true
+																	},
+																	"type": {
+																		"type": "array",
+																		"elementType": {
+																			"type": "intrinsic",
+																			"name": "any"
+																		}
+																	}
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "any"
+															}
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 827,
+															"character": 118
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 817,
+									"character": 32
+								}
+							]
+						},
+						{
+							"id": 242,
+							"name": "resumeReadAloud",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 243,
+									"name": "resumeReadAloud",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "If a Read Aloud operation is paused, resume it",
+										"text": "**See** {@linkcode module:editor-mathfield#speak speak}",
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#resumeReadAloud\n"
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 706,
+									"character": 28
+								}
+							]
+						},
+						{
+							"id": 280,
+							"name": "revertToOriginalContent",
+							"kind": 64,
+							"kindString": "Function",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 281,
+									"name": "revertToOriginalContent",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"tags": [
+											{
+												"tag": "function",
+												"text": "module:mathlive#revertToOriginalContent\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 282,
+											"name": "element",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "string"
+													},
+													{
+														"type": "reference",
+														"name": "HTMLElement"
+													},
+													{
+														"type": "reference",
+														"name": "MathField",
+														"id": 2
+													}
+												]
+											}
+										},
+										{
+											"id": 283,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 284,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 285,
+															"name": "namespace",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "The namespace used for the `data-`\nattributes. If you used a namespace with `renderMathInElement`, you must\nuse the same namespace here."
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 838,
+																	"character": 17
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																285
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 837,
+															"character": 89
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 837,
+									"character": 36
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Functions",
+							"kind": 64,
+							"children": [
+								210,
+								286,
+								235,
+								204,
+								189,
+								198,
+								224,
+								194,
+								240,
+								244,
+								238,
+								248,
+								254,
+								242,
+								280
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "mathlive.d.ts",
+							"line": 518,
+							"character": 25
+						}
+					]
+				},
+				{
+					"id": 2,
+					"name": "MathField",
+					"kind": 128,
+					"kindString": "Class",
+					"flags": {},
+					"comment": {
+						"tags": [
+							{
+								"tag": "property",
+								"text": "{HTMLElement} element - The DOM element this mathfield is attached to."
+							},
+							{
+								"tag": "property",
+								"text": "{Object.<string, any>} config - A set of key/value pairs that can\nbe used to customize the behavior of the mathfield"
+							},
+							{
+								"tag": "property",
+								"text": "{string} id - A unique ID identifying this mathfield"
+							},
+							{
+								"tag": "property",
+								"text": "{boolean} keystrokeCaptionVisible - True if the keystroke caption\npanel is visible"
+							},
+							{
+								"tag": "property",
+								"text": "{boolean} virtualKeyboardVisible - True if the virtual keyboard is\nvisible"
+							},
+							{
+								"tag": "property",
+								"text": "{string} keystrokeBuffer The last few keystrokes, to look out\nfor inline shortcuts"
+							},
+							{
+								"tag": "property",
+								"text": "{object[]} keystrokeBufferStates The saved state for each of the\npast keystrokes"
+							},
+							{
+								"tag": "class",
+								"text": "MathField"
+							},
+							{
+								"tag": "global",
+								"text": "\n"
+							}
+						]
+					},
+					"children": [
+						{
+							"id": 69,
+							"name": "config",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "A set of key/value pairs that can\nbe used to customize the behavior of the mathfield"
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 459,
+									"character": 10
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 70,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {},
+									"indexSignature": [
+										{
+											"id": 71,
+											"name": "__index",
+											"kind": 8192,
+											"kindString": "Index signature",
+											"flags": {},
+											"parameters": [
+												{
+													"id": 72,
+													"name": "key",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {},
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "any"
+											}
+										}
+									],
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 459,
+											"character": 11
+										}
+									]
+								}
+							}
+						},
+						{
+							"id": 68,
+							"name": "element",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "The DOM element this mathfield is attached to."
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 454,
+									"character": 11
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "HTMLElement"
+							}
+						},
+						{
+							"id": 73,
+							"name": "id",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "A unique ID identifying this mathfield"
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 465,
+									"character": 6
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 76,
+							"name": "keystrokeBuffer",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "The last few keystrokes, to look out\nfor inline shortcuts"
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 480,
+									"character": 19
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "string"
+							}
+						},
+						{
+							"id": 77,
+							"name": "keystrokeBufferStates",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "The saved state for each of the\npast keystrokes"
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 485,
+									"character": 25
+								}
+							],
+							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "intrinsic",
+									"name": "object"
+								}
+							}
+						},
+						{
+							"id": 74,
+							"name": "keystrokeCaptionVisible",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "True if the keystroke caption\npanel is visible"
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 470,
+									"character": 27
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						},
+						{
+							"id": 75,
+							"name": "virtualKeyboardVisible",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "True if the virtual keyboard is\nvisible"
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 475,
+									"character": 26
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "boolean"
+							}
+						},
+						{
+							"id": 41,
+							"name": "$applyStyle",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 42,
+									"name": "$applyStyle",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Apply a style (color, bold, italic, etc...).",
+										"text": "If there is a selection, the style is applied to the selection\n\nIf the selection already has this style, remove it. If the selection\nhas the style partially applied (i.e. only some sections), remove it from\nthose sections, and apply it to the entire selection.\n\nIf there is no selection, the style will apply to the next character typed.\n",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$applyStyle\n\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 43,
+											"name": "style",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "an object with the following properties. All the\nproperties are optional, but they can be combined.\n"
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 44,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 47,
+															"name": "backgroundColor",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 406,
+																	"character": 23
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 46,
+															"name": "color",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 405,
+																	"character": 13
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 48,
+															"name": "fontFamily",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 407,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 45,
+															"name": "mode",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"comment": {
+																"text": "Either `'math'`, `'text'` or '`command`'"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 404,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 49,
+															"name": "series",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 408,
+																	"character": 14
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 50,
+															"name": "shape",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 409,
+																	"character": 13
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														},
+														{
+															"id": 51,
+															"name": "size",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {
+																"isOptional": true
+															},
+															"comment": {
+																"text": "The font size:  'size1'...'size10'\n'size5' is the default size"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 410,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																47,
+																46,
+																48,
+																45,
+																49,
+																50,
+																51
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 403,
+															"character": 22
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 403,
+									"character": 15
+								}
+							]
+						},
+						{
+							"id": 28,
+							"name": "$el",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 29,
+									"name": "$el",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Return the DOM element associated with this mathfield.",
+										"text": "Note that `this.$el().mathfield = this`",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$el\n"
+											}
+										]
+									},
+									"type": {
+										"type": "reference",
+										"name": "HTMLElement"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 285,
+									"character": 7
+								}
+							]
+						},
+						{
+							"id": 30,
+							"name": "$insert",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 31,
+									"name": "$insert",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "This method can be invoked as a selector with {@linkcode MathField#$perform $perform(\"insert\")}\nor called explicitly.",
+										"tags": [
+											{
+												"tag": "remarks",
+												"text": "\nIt will insert the specified block of text at the current insertion point,\naccording to the insertion mode specified.\n\nAfter the insertion, the selection will be set according to the `selectionMode`."
+											},
+											{
+												"tag": "method",
+												"text": "MathField#$insert\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 32,
+											"name": "s",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "The text to be inserted\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 33,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 34,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 38,
+															"name": "feedback",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "If true, provide audio and haptic feedback\n"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 330,
+																	"character": 16
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															}
+														},
+														{
+															"id": 37,
+															"name": "focus",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "If true, the mathfield will be focused after\nthe insertion\n"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 329,
+																	"character": 13
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															}
+														},
+														{
+															"id": 36,
+															"name": "format",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "The format of the string `s`:\n* `'auto'`: the string is interpreted as a latex fragment or command)\n(default)\n* `'latex'`: the string is interpreted strictly as a latex fragment\n"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 328,
+																	"character": 14
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "stringLiteral",
+																		"value": "auto"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "latex"
+																	}
+																]
+															}
+														},
+														{
+															"id": 39,
+															"name": "mode",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "'text' or 'math'. If empty, the current mode\nis used (default)\n"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 331,
+																	"character": 12
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "stringLiteral",
+																		"value": "text"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "math"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": ""
+																	}
+																]
+															}
+														},
+														{
+															"id": 40,
+															"name": "resetStyle",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "If true, the style after the insertion\nis the same as the style before (if false, the style after the\ninsertion is the style of the last inserted atom).\n"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 332,
+																	"character": 18
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															}
+														},
+														{
+															"id": 35,
+															"name": "selectionMode",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "Describes where the selection\nwill be after the insertion:\n\n|`'placeholder'`| the selection will be the first available placeholder in the item that has been inserted (default)|\n|`'after'`| the selection will be an insertion point after the item that has been inserted|\n|`'before'`| the selection will be an insertion point before the item that has been inserted|\n|`'item'`| the item that was inserted will be selected|\n"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 327,
+																	"character": 21
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "stringLiteral",
+																		"value": "placeholder"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "after"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "before"
+																	},
+																	{
+																		"type": "stringLiteral",
+																		"value": "item"
+																	}
+																]
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																38,
+																37,
+																36,
+																39,
+																40,
+																35
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 326,
+															"character": 32
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 326,
+									"character": 11
+								}
+							]
+						},
+						{
+							"id": 52,
+							"name": "$keystroke",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 53,
+									"name": "$keystroke",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$keystroke\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 54,
+											"name": "keys",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A string representation of a key combination.\n\nFor example `'Alt-KeyU'`.\n\nSee [W3C UIEvents](https://www.w3.org/TR/uievents/#code-virtual-keyboards)"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 55,
+											"name": "evt",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {},
+											"type": {
+												"type": "reference",
+												"name": "Event"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 422,
+									"character": 14
+								}
+							]
+						},
+						{
+							"id": 22,
+							"name": "$latex",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 23,
+									"name": "$latex",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "If `text` is not empty, sets the content of the mathfield to the\ntext interpreted as a LaTeX expression.\nIf `text` is empty (or omitted), return the content of the mahtfield as a\nLaTeX expression.",
+										"tags": [
+											{
+												"tag": "category",
+												"text": "Selection"
+											},
+											{
+												"tag": "method",
+												"text": "MathField#$latex\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 24,
+											"name": "text",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "\n"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 25,
+											"name": "options",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 26,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 27,
+															"name": "suppressChangeNotifications",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "If true, the\nhandlers for the contentWillChange and contentDidChange notifications will\nnot be invoked. Default `false`.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 276,
+																	"character": 35
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																27
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 275,
+															"character": 33
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 275,
+									"character": 10
+								}
+							]
+						},
+						{
+							"id": 5,
+							"name": "$perform",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 6,
+									"name": "$perform",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$perform"
+											},
+											{
+												"tag": "deprecated",
+												"text": "Will be removed in next major release\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 7,
+											"name": "command",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A selector, or an array whose first element\nis a selector, and whose subsequent elements are arguments to the selector.\nNote that selectors do not include a final \"_\". They can be passed either\nin camelCase or kebab-case. So:\n```javascript\nmf.$perform('selectAll');\nmf.$perform('select-all');\n```\nboth calls are valid and invoke the same selector.\n"
+											},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "intrinsic",
+														"name": "string"
+													},
+													{
+														"type": "array",
+														"elementType": {
+															"type": "intrinsic",
+															"name": "string"
+														}
+													}
+												]
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 188,
+									"character": 12
+								}
+							]
+						},
+						{
+							"id": 11,
+							"name": "$selectedText",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 12,
+									"name": "$selectedText",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Return a textual representation of the selection in the mathfield.",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$selectedText"
+											},
+											{
+												"tag": "throws",
+												"text": "{@link Error} if something goes wrong\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 13,
+											"name": "format",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 220,
+									"character": 17
+								}
+							]
+						},
+						{
+							"id": 20,
+							"name": "$selectionAtEnd",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 21,
+									"name": "$selectionAtEnd",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Return true if the selection extends to the end of the selection group.",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$selectionAtEnd"
+											},
+											{
+												"tag": "internal",
+												"text": "\n"
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 257,
+									"character": 19
+								}
+							]
+						},
+						{
+							"id": 18,
+							"name": "$selectionAtStart",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 19,
+									"name": "$selectionAtStart",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Return true if the selection starts at the beginning of the selection group.",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$selectionAtStart"
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 249,
+									"character": 21
+								}
+							]
+						},
+						{
+							"id": 16,
+							"name": "$selectionDepth",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 17,
+									"name": "$selectionDepth",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Return the depth of the selection group. If the selection is at the root level,\nreturns 0. If the selection is a portion of the numerator of a fraction\nwhich is at the root level, return 1. Note that in that case, the numerator\nwould be the \"selection group\".",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$selectionDepth"
+											},
+											{
+												"tag": "alpha",
+												"text": ""
+											},
+											{
+												"tag": "beta",
+												"text": ""
+											},
+											{
+												"tag": "sealed",
+												"text": "blah blah"
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 242,
+									"character": 19
+								}
+							]
+						},
+						{
+							"id": 14,
+							"name": "$selectionIsCollapsed",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 15,
+									"name": "$selectionIsCollapsed",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Return true if the length of the selection is 0, that is, if it is a single\ninsertion point.",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$selectionIsCollapsed"
+											},
+											{
+												"tag": "see",
+												"text": "{@link $selectionIsCollapsed} and {@link MathField#$selectionDepth} for more details."
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 229,
+									"character": 25
+								}
+							]
+						},
+						{
+							"id": 59,
+							"name": "$setConfig",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 60,
+									"name": "$setConfig",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Update the configuration options for this mathfield.",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$setConfig\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 61,
+											"name": "config",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {
+												"isOptional": true
+											},
+											"type": {
+												"type": "reference",
+												"name": "MathFieldConfig",
+												"id": 82
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 437,
+									"character": 14
+								}
+							]
+						},
+						{
+							"id": 56,
+							"name": "$typedText",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 57,
+									"name": "$typedText",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Simulate a user typing the keys indicated by text.",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#$typedText\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 58,
+											"name": "text",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "A sequence of one or more characters."
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 428,
+									"character": 14
+								}
+							]
+						},
+						{
+							"id": 62,
+							"name": "speak_",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 63,
+									"name": "speak_",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Speak some part of the expression, either with or without synchronized highlighting.",
+										"tags": [
+											{
+												"tag": "method",
+												"text": "MathField#speak_\n"
+											}
+										]
+									},
+									"parameters": [
+										{
+											"id": 64,
+											"name": "amount",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {
+												"text": "(all, selection, left, right, group, parent)"
+											},
+											"type": {
+												"type": "intrinsic",
+												"name": "string"
+											}
+										},
+										{
+											"id": 65,
+											"name": "speakOptions",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"comment": {},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 66,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"children": [
+														{
+															"id": 67,
+															"name": "withHighlighting",
+															"kind": 32,
+															"kindString": "Variable",
+															"flags": {},
+															"comment": {
+																"text": "If true, synchronized highlighting of speech will happen (if possible). Default is false.\n"
+															},
+															"sources": [
+																{
+																	"fileName": "mathlive.d.ts",
+																	"line": 449,
+																	"character": 24
+																}
+															],
+															"type": {
+																"type": "intrinsic",
+																"name": "boolean"
+															}
+														}
+													],
+													"groups": [
+														{
+															"title": "Variables",
+															"kind": 32,
+															"children": [
+																67
+															]
+														}
+													],
+													"sources": [
+														{
+															"fileName": "mathlive.d.ts",
+															"line": 448,
+															"character": 40
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 448,
+									"character": 10
+								}
+							]
+						},
+						{
+							"id": 3,
+							"name": "$revertToOriginalContent",
+							"kind": 2048,
+							"kindString": "Method",
+							"flags": {
+								"isStatic": true
+							},
+							"signatures": [
+								{
+									"id": 4,
+									"name": "$revertToOriginalContent",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Revert this math field to its original content. After this method has been\ncalled, no other methods can be called on the MathField object. To turn the\nelement back into a MathField, call `MathLive.makeMathField()` on the\nelement again to get a new math field object.",
+										"tags": [
+											{
+												"tag": "privateremarks",
+												"text": "This is dope!\n\nAnd there's more I'd like to say...\n\nLike this...\n"
+											},
+											{
+												"tag": "method",
+												"text": "MathField#$revertToOriginalContent\n"
+											}
+										]
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 173,
+									"character": 35
+								}
+							]
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								69,
+								68,
+								73,
+								76,
+								77,
+								74,
+								75
+							]
+						},
+						{
+							"title": "Methods",
+							"kind": 2048,
+							"children": [
+								41,
+								28,
+								30,
+								52,
+								22,
+								5,
+								11,
+								20,
+								18,
+								16,
+								14,
+								59,
+								56,
+								62,
+								3
+							],
+							"categories": [
+								{
+									"title": "Other",
+									"children": [
+										41,
+										28,
+										30,
+										52,
+										5,
+										11,
+										59,
+										56,
+										62,
+										3
+									]
+								},
+								{
+									"title": "Selection",
+									"children": [
+										22,
+										20,
+										18,
+										16,
+										14
+									]
+								}
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "mathlive.d.ts",
+							"line": 158,
+							"character": 23
+						}
+					]
+				},
+				{
+					"id": 78,
+					"name": "MathFieldCallback",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"comment": {
+						"shortText": "This callback is used frequently.",
+						"text": "Don't abuse it.\n",
+						"tags": [
+							{
+								"tag": "typedef",
+								"text": "{function} MathFieldCallback"
+							},
+							{
+								"tag": "param",
+								"text": "",
+								"param": "mf"
+							},
+							{
+								"tag": "returns",
+								"text": ""
+							},
+							{
+								"tag": "global",
+								"text": "\n"
+							}
+						]
+					},
+					"sources": [
+						{
+							"fileName": "mathlive.d.ts",
+							"line": 22,
+							"character": 30
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 79,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 80,
+									"name": "__call",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 81,
+											"name": "mf",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"name": "MathField",
+												"id": 2
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "void"
+									}
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 22,
+									"character": 32
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 82,
+					"name": "MathFieldConfig",
+					"kind": 4194304,
+					"kindString": "Type alias",
+					"flags": {},
+					"comment": {
+						"tags": [
+							{
+								"tag": "typedef",
+								"text": "MathFieldConfig"
+							},
+							{
+								"tag": "type",
+								"text": "{Object}"
+							},
+							{
+								"tag": "param",
+								"text": "which locale is this in?",
+								"param": "locale?"
+							},
+							{
+								"tag": "property",
+								"text": "{object<string, string>} strings?"
+							},
+							{
+								"tag": "property",
+								"text": "{number} horizontalSpacingScale? - how much to extend the spacing by.\nThis can be indicated in different ways.\n\nFor example with a string or a number.\n\n*Default Value** = 0"
+							},
+							{
+								"tag": "property",
+								"text": "{string} namespace?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} substituteTextArea?"
+							},
+							{
+								"tag": "property",
+								"text": "{\"math\" | \"text\"} defaultMode?"
+							},
+							{
+								"tag": "property",
+								"text": "{MathFieldCallback} onFocus?"
+							},
+							{
+								"tag": "property",
+								"text": "{MathFieldCallback} onBlur?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onKeystroke?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onAnnounce?"
+							},
+							{
+								"tag": "property",
+								"text": "{boolean} overrideDefaultInlineShortcuts?"
+							},
+							{
+								"tag": "property",
+								"text": "{object<string, string>} inlineShortcuts?"
+							},
+							{
+								"tag": "property",
+								"text": "{number} inlineShortcutTimeout?"
+							},
+							{
+								"tag": "property",
+								"text": "{boolean} smartFence?"
+							},
+							{
+								"tag": "property",
+								"text": "{boolean} smartSuperscript?"
+							},
+							{
+								"tag": "property",
+								"text": "{number} scriptDepth?"
+							},
+							{
+								"tag": "property",
+								"text": "{boolean} removeExtraneousParentheses?"
+							},
+							{
+								"tag": "property",
+								"text": "{boolean} ignoreSpacebarInMathMode?"
+							},
+							{
+								"tag": "property",
+								"text": "{string} virtualKeyboardToggleGlyph?"
+							},
+							{
+								"tag": "property",
+								"text": "{\"manual\" | \"onfocus\" | \"off\" } virtualKeyboardMode?"
+							},
+							{
+								"tag": "property",
+								"text": "{\"all\" | \"numeric\" | \"roman\" | \"greek\" | \"functions\" | \"command\" | string} virtualKeyboards?"
+							},
+							{
+								"tag": "property",
+								"text": "{\"qwerty\" | \"azerty\" | \"qwertz\" | \"dvorak\" | \"colemak\"} virtualKeyboardRomanLayout?"
+							},
+							{
+								"tag": "property",
+								"text": "{object<string, string>} customVirtualKeyboardLayers?"
+							},
+							{
+								"tag": "property",
+								"text": "{object<string, object>} customVirtualKeyboards?"
+							},
+							{
+								"tag": "property",
+								"text": "{\"material\" | \"apple\" | \"\"} virtualKeyboardTheme?"
+							},
+							{
+								"tag": "property",
+								"text": "{boolean} keypressVibration?"
+							},
+							{
+								"tag": "property",
+								"text": "{string} keypressSound?"
+							},
+							{
+								"tag": "property",
+								"text": "{string} plonkSound?"
+							},
+							{
+								"tag": "property",
+								"text": "{\"mathlive\" | \"sre\"} textToSpeechRules?"
+							},
+							{
+								"tag": "property",
+								"text": "{\"ssml\" | \"mac\"} textToSpeechMarkup?"
+							},
+							{
+								"tag": "property",
+								"text": "{object} textToSpeechRulesOptions?"
+							},
+							{
+								"tag": "property",
+								"text": "{\"local\" | \"amazon\"} speechEngine?"
+							},
+							{
+								"tag": "property",
+								"text": "{string} speechEngineVoice?"
+							},
+							{
+								"tag": "property",
+								"text": "{string} speechEngineRate?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onMoveOutOf?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onTabOutOf?"
+							},
+							{
+								"tag": "property",
+								"text": "{MathFieldCallback} onContentWillChange?"
+							},
+							{
+								"tag": "property",
+								"text": "{MathFieldCallback} onContentDidChange?"
+							},
+							{
+								"tag": "property",
+								"text": "{MathFieldCallback} onSelectionWillChange?"
+							},
+							{
+								"tag": "property",
+								"text": "{MathFieldCallback} onSelectionDidChange?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onUndoStateWillChange?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onUndoStateDidChange?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onModeChange?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onVirtualKeyboardToggle?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} onReadAloudStatus?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} handleSpeak?"
+							},
+							{
+								"tag": "property",
+								"text": "{function} handleReadAloud?"
+							},
+							{
+								"tag": "global",
+								"text": "\n"
+							}
+						]
+					},
+					"sources": [
+						{
+							"fileName": "mathlive.d.ts",
+							"line": 81,
+							"character": 28
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 83,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"children": [
+								{
+									"id": 121,
+									"name": "customVirtualKeyboardLayers",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 110,
+											"character": 31
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 122,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"indexSignature": [
+												{
+													"id": 123,
+													"name": "__index",
+													"kind": 8192,
+													"kindString": "Index signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 124,
+															"name": "key",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 110,
+													"character": 33
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 125,
+									"name": "customVirtualKeyboards",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 113,
+											"character": 26
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 126,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"indexSignature": [
+												{
+													"id": 127,
+													"name": "__index",
+													"kind": 8192,
+													"kindString": "Index signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 128,
+															"name": "key",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "object"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 113,
+													"character": 28
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 95,
+									"name": "defaultMode",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 91,
+											"character": 15
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "math"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "text"
+											}
+										]
+									}
+								},
+								{
+									"id": 175,
+									"name": "handleReadAloud",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 138,
+											"character": 19
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 176,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 177,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 178,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 138,
+													"character": 21
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 171,
+									"name": "handleSpeak",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 137,
+											"character": 15
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 172,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 173,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 174,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 137,
+													"character": 17
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 89,
+									"name": "horizontalSpacingScale",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"comment": {
+										"shortText": "asldkjf lkj asdlkjh"
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 88,
+											"character": 26
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 116,
+									"name": "ignoreSpacebarInMathMode",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 105,
+											"character": 28
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								},
+								{
+									"id": 111,
+									"name": "inlineShortcutTimeout",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 100,
+											"character": 25
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 107,
+									"name": "inlineShortcuts",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 97,
+											"character": 19
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 108,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"indexSignature": [
+												{
+													"id": 109,
+													"name": "__index",
+													"kind": 8192,
+													"kindString": "Index signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 110,
+															"name": "key",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 97,
+													"character": 21
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 131,
+									"name": "keypressSound",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 118,
+											"character": 17
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 130,
+									"name": "keypressVibration",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 117,
+											"character": 21
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								},
+								{
+									"id": 84,
+									"name": "locale",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 82,
+											"character": 10
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 90,
+									"name": "namespace",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 89,
+											"character": 13
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 102,
+									"name": "onAnnounce",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 95,
+											"character": 14
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 103,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 104,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 105,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 95,
+													"character": 16
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 97,
+									"name": "onBlur",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 93,
+											"character": 10
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 78
+									}
+								},
+								{
+									"id": 148,
+									"name": "onContentDidChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 129,
+											"character": 22
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 78
+									}
+								},
+								{
+									"id": 147,
+									"name": "onContentWillChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 128,
+											"character": 23
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 78
+									}
+								},
+								{
+									"id": 96,
+									"name": "onFocus",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 92,
+											"character": 11
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 78
+									}
+								},
+								{
+									"id": 98,
+									"name": "onKeystroke",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 94,
+											"character": 15
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 99,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 100,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 101,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 94,
+													"character": 17
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 159,
+									"name": "onModeChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 134,
+											"character": 16
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 160,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 161,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 162,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 134,
+													"character": 18
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 139,
+									"name": "onMoveOutOf",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 126,
+											"character": 15
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 140,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 141,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 142,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 126,
+													"character": 17
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 167,
+									"name": "onReadAloudStatus",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 136,
+											"character": 21
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 168,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 169,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 170,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 136,
+													"character": 23
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 150,
+									"name": "onSelectionDidChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 131,
+											"character": 24
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 78
+									}
+								},
+								{
+									"id": 149,
+									"name": "onSelectionWillChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 130,
+											"character": 25
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 78
+									}
+								},
+								{
+									"id": 143,
+									"name": "onTabOutOf",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 127,
+											"character": 14
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 144,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 145,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 146,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 127,
+													"character": 16
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 155,
+									"name": "onUndoStateDidChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 133,
+											"character": 24
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 156,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 157,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 158,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 133,
+													"character": 26
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 151,
+									"name": "onUndoStateWillChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 132,
+											"character": 25
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 152,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 153,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 154,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 132,
+													"character": 27
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 163,
+									"name": "onVirtualKeyboardToggle",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 135,
+											"character": 27
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 164,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 165,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 166,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 135,
+													"character": 29
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 106,
+									"name": "overrideDefaultInlineShortcuts",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 96,
+											"character": 34
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								},
+								{
+									"id": 132,
+									"name": "plonkSound",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 119,
+											"character": 14
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 115,
+									"name": "removeExtraneousParentheses",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 104,
+											"character": 31
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								},
+								{
+									"id": 114,
+									"name": "scriptDepth",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 103,
+											"character": 15
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 112,
+									"name": "smartFence",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 101,
+											"character": 14
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								},
+								{
+									"id": 113,
+									"name": "smartSuperscript",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 102,
+											"character": 20
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								},
+								{
+									"id": 136,
+									"name": "speechEngine",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 123,
+											"character": 16
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "local"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "amazon"
+											}
+										]
+									}
+								},
+								{
+									"id": 138,
+									"name": "speechEngineRate",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 125,
+											"character": 20
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 137,
+									"name": "speechEngineVoice",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 124,
+											"character": 21
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 85,
+									"name": "strings",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 83,
+											"character": 11
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 86,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"indexSignature": [
+												{
+													"id": 87,
+													"name": "__index",
+													"kind": 8192,
+													"kindString": "Index signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 88,
+															"name": "key",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "intrinsic",
+																"name": "string"
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "string"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 83,
+													"character": 13
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 91,
+									"name": "substituteTextArea",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 90,
+											"character": 22
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 92,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 93,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 94,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 90,
+													"character": 24
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 134,
+									"name": "textToSpeechMarkup",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 121,
+											"character": 22
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "ssml"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "mac"
+											}
+										]
+									}
+								},
+								{
+									"id": 133,
+									"name": "textToSpeechRules",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 120,
+											"character": 21
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "mathlive"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "sre"
+											}
+										]
+									}
+								},
+								{
+									"id": 135,
+									"name": "textToSpeechRulesOptions",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 122,
+											"character": 28
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								},
+								{
+									"id": 118,
+									"name": "virtualKeyboardMode",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 107,
+											"character": 23
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "manual"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "onfocus"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "off"
+											}
+										]
+									}
+								},
+								{
+									"id": 120,
+									"name": "virtualKeyboardRomanLayout",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 109,
+											"character": 30
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "qwerty"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "azerty"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "qwertz"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "dvorak"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "colemak"
+											}
+										]
+									}
+								},
+								{
+									"id": 129,
+									"name": "virtualKeyboardTheme",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 116,
+											"character": 24
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "material"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "apple"
+											},
+											{
+												"type": "stringLiteral",
+												"value": ""
+											}
+										]
+									}
+								},
+								{
+									"id": 117,
+									"name": "virtualKeyboardToggleGlyph",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 106,
+											"character": 30
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 119,
+									"name": "virtualKeyboards",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 108,
+											"character": 20
+										}
+									],
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "stringLiteral",
+												"value": "all"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "numeric"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "roman"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "greek"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "functions"
+											},
+											{
+												"type": "stringLiteral",
+												"value": "command"
+											},
+											{
+												"type": "intrinsic",
+												"name": "string"
+											}
+										]
+									}
+								}
+							],
+							"groups": [
+								{
+									"title": "Variables",
+									"kind": 32,
+									"children": [
+										121,
+										125,
+										95,
+										175,
+										171,
+										89,
+										116,
+										111,
+										107,
+										131,
+										130,
+										84,
+										90,
+										102,
+										97,
+										148,
+										147,
+										96,
+										98,
+										159,
+										139,
+										167,
+										150,
+										149,
+										143,
+										155,
+										151,
+										163,
+										106,
+										132,
+										115,
+										114,
+										112,
+										113,
+										136,
+										138,
+										137,
+										85,
+										91,
+										134,
+										133,
+										135,
+										118,
+										120,
+										129,
+										117,
+										119
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 81,
+									"character": 30
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 179,
+					"name": "startsWithString",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {},
+					"signatures": [
+						{
+							"id": 180,
+							"name": "startsWithString",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"comment": {
+								"shortText": "Return an array of potential shortcuts",
+								"returns": "\n"
+							},
+							"parameters": [
+								{
+									"id": 181,
+									"name": "s",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"comment": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 182,
+									"name": "config",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"comment": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								}
+							],
+							"type": {
+								"type": "array",
+								"elementType": {
+									"type": "intrinsic",
+									"name": "string"
+								}
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "mathlive.d.ts",
+							"line": 494,
+							"character": 33
+						}
+					]
+				},
+				{
+					"id": 183,
+					"name": "validateShortcut",
+					"kind": 64,
+					"kindString": "Function",
+					"flags": {},
+					"signatures": [
+						{
+							"id": 184,
+							"name": "validateShortcut",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"comment": {},
+							"parameters": [
+								{
+									"id": 185,
+									"name": "mode",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"comment": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								},
+								{
+									"id": 186,
+									"name": "siblings",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"comment": {
+										"text": "atoms preceding this potential shortcut"
+									},
+									"type": {
+										"type": "array",
+										"elementType": {
+											"type": "intrinsic",
+											"name": "object"
+										}
+									}
+								},
+								{
+									"id": 187,
+									"name": "shortcut",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"comment": {
+										"text": "\n"
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "string"
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "void"
+							}
+						}
+					],
+					"sources": [
+						{
+							"fileName": "mathlive.d.ts",
+							"line": 502,
+							"character": 33
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Modules",
+					"kind": 2,
+					"children": [
+						188
+					]
+				},
+				{
+					"title": "Classes",
+					"kind": 128,
+					"children": [
+						2
+					]
+				},
+				{
+					"title": "Type aliases",
+					"kind": 4194304,
+					"children": [
+						78,
+						82
+					]
+				},
+				{
+					"title": "Functions",
+					"kind": 64,
+					"children": [
+						179,
+						183
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "mathlive.d.ts",
+					"line": 1,
+					"character": 0
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "External modules",
+			"kind": 1,
+			"children": [
+				1
+			]
+		}
+	]
+}

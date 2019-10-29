@@ -38,7 +38,7 @@ feature_mathfield:
     # alt: "placeholder image 2"
     title: "<b>Mathfield</b><br>Math Input Made Easy"
     excerpt: 'Beautifully typeset math as easy to enter as text'
-    url: "mathfield"
+    url: "docs/mathlive"
     btn_label: "Learn More"
     btn_class: "btn--inverse"
 feature_compute_engine:
@@ -46,7 +46,7 @@ feature_compute_engine:
     # alt: "placeholder image 2"
     title: "Compute Engine"
     excerpt: '**Coming Soon**'
-    url: "compute_engine"
+    # url: "compute_engine"
     btn_label: "Read More"
     btn_class: "btn--inverse"
 feature_visual:
@@ -54,7 +54,7 @@ feature_visual:
     # alt: "placeholder image 2"
     title: "Visual"
     excerpt: '**Coming Soon**'
-    url: "visual"
+    # url: "visual"
     btn_label: "Read More"
     btn_class: "btn--inverse"
 ---

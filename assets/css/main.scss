@@ -1,13 +1,14 @@
 ---
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
-
 @charset "utf-8";
 
+
 $sans-serif: 'IBM Plex Sans', sans-serif !default;
-$monospace: 'IBM Plex Mono', monospace !default;
+$monospace: 'Fira Code', 'IBM Plex Mono', monospace !default;
 $sans-serif-condensed: 'IBM Plex Sans Condensed', sans-serif;
 
+@import "code_theme";
 
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials

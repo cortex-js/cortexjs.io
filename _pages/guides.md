@@ -1,21 +1,28 @@
 ---
 title: Guides
 permalink: /guides/
-layout: splash
 read_time: false
 header:
-  overlay_image: /assets/images/unsplash-image-1.jpg
+  overlay_image: /assets/bg/black-on-white.jpg
   overlay_color: "#0066ce"
-  caption: "Photo credit: [**Unsplash**](https://unsplash.com)"
-  actions:
-    - label: "More Info"
-      url: "https://unsplash.com"
+feature_row:
+  - image_path: /assets/bg/yellow-on-blue.jpg
+    alt: "Getting Started"
+    title: "Getting Started"
+    excerpt: ""
+    url: "/"
+    btn_label: "Get Started"
+    btn_class: "btn--primary"
 ---
 
-# Introduction to Cortex
+{% include feature_row type="center" %}
+
+
+
+<!-- # Introduction to Cortex
 
 ## Before We Start
 
 ## Setup
 
-## Overview
+## Overview -->

@@ -49,15 +49,25 @@ In addition, the DNS entries for `cortexjs.io` must include the following:
 
 ## Content
 
-The documentation for the APIs is generated automatically from the source 
-code using `tsdoc`. This repo has dependencies on the repos whose API it 
-documents, then runs `tsdoc` on them. 
+The `npm run build` command generates the documentation for the APIs 
+from the TypeScript `.d.ts` files with .
 
-The output is produced in the `_api` directory as Markdown files that are 
-then further processed by Jekyll. 
+The build process uses the `typedoc` tool to parse the API header files and 
+output a `json` files in `_data/mathfield.json`.
+
+The script then converts the `json` file into markdown in the `docs` folder,
+which can then be processed by Jekyll with `script/cibuild` or `script/server`.
+
+To output the appropriately formatted Markdown content, a custom theme for 
+`typedoc` is used. This theme is defined in the `_typedoc_theme` directory.
+
+The CSS styling information is defined in `_sass/typescript_doc.scss`.
 
 
-
+The API documentation should follow the Google Documentation Style Guide
+(https://developers.google.com/style/api-reference-comments)
+ and https://developers.google.com/style
+ 
 ## Setup and scripts
 
 Run 

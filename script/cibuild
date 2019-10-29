@@ -9,6 +9,10 @@ cd "$(dirname "$0")/.."
 
 echo "Building..."
 bundle exec jekyll build
+# Add the .nojekyll file to prevent GH Pages from processing the content
+touch _site/.nojekyll
+# Add CNAME file
+echo "cortexjs.io" >_site/CNAME
 
 echo "Tests started at…"
 date "+%H:%M:%S"

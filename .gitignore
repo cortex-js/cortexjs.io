@@ -2,3 +2,5 @@
 .jekyll-metadata
 .jekyll-cache
 vendor
+node_modules
+docs

@@ -1,0 +1,33 @@
+{
+  "name": "cortexjs.io",
+  "version": "1.0.0",
+  "description": "cortexjs.io website source",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cortex-js/cortexjs.io.git"
+  },
+  "keywords": [],
+  "main": "root/index.html",
+  "scripts": {
+    "build": "typedoc --mode modules --includeDeclarations --excludeExternals --excludePrivate --excludeProtected --hideGenerator --readme none --json _data/mathfield.json node_modules/mathlive/dist/mathlive.d.ts && node script/makedoc.js _data/mathfield.json",
+    "clean": "",
+    "deploy": "",
+    "test": ""
+  },
+  "engines": {
+    "node": ">=8.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+  "author": "Arno Gourdol <arno@arno.org>",
+  "contributors": [],
+  "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
+  "devDependencies": {},
+  "dependencies": {
+    "mathlive": "^0.32.2",
+    "typedoc": "^0.15.0"
+  }
+}
