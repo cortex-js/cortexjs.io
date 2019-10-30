@@ -38,7 +38,7 @@ feature_mathfield:
     # alt: "placeholder image 2"
     title: "<b>Mathfield</b><br>Math Input Made Easy"
     excerpt: 'Beautifully typeset math as easy to enter as text'
-    url: "docs#mathlive"
+    url: "/mathfield/"
     btn_label: "Learn More"
     btn_class: "btn--inverse"
 feature_compute_engine:

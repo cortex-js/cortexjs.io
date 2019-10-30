@@ -16,7 +16,7 @@ docs:
       # - title: "Quick-Start Guide"
       #   url: "/docs/mathfield-quick-start-guide"
       - title: "API Reference"
-        url: /docs/mathlive/
+        url: /docs/mathlive
       # - title: "MathLive module"
       #   url: /docs/mathlive/#mathlive.module
       # - title: "MathField class"

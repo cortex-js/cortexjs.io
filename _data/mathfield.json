@@ -15,7 +15,7 @@
 			"originalName": "C:/Users/arno/Documents/GitHub/cortexjs.io/node_modules/mathlive/dist/mathlive.d.ts",
 			"children": [
 				{
-					"id": 170,
+					"id": 185,
 					"name": "\"mathlive\"",
 					"kind": 2,
 					"kindString": "Module",
@@ -40,14 +40,14 @@
 					},
 					"children": [
 						{
-							"id": 192,
+							"id": 207,
 							"name": "astToLatex",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 193,
+									"id": 208,
 									"name": "astToLatex",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -65,7 +65,7 @@
 									},
 									"parameters": [
 										{
-											"id": 194,
+											"id": 209,
 											"name": "ast",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -79,7 +79,7 @@
 											}
 										},
 										{
-											"id": 195,
+											"id": 210,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -88,14 +88,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 196,
+													"id": 211,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 204,
+															"id": 219,
 															"name": "beginRepeatingDigits",
 															"kind": 32,
 															"kindString": "Variable",
@@ -108,7 +108,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 740,
+																	"line": 764,
 																	"character": 28
 																}
 															],
@@ -118,7 +118,7 @@
 															}
 														},
 														{
-															"id": 198,
+															"id": 213,
 															"name": "decimalMarker",
 															"kind": 32,
 															"kindString": "Variable",
@@ -131,7 +131,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 734,
+																	"line": 758,
 																	"character": 21
 																}
 															],
@@ -141,7 +141,7 @@
 															}
 														},
 														{
-															"id": 205,
+															"id": 220,
 															"name": "endRepeatingDigits",
 															"kind": 32,
 															"kindString": "Variable",
@@ -154,7 +154,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 741,
+																	"line": 765,
 																	"character": 26
 																}
 															],
@@ -164,7 +164,7 @@
 															}
 														},
 														{
-															"id": 202,
+															"id": 217,
 															"name": "exponentMarker",
 															"kind": 32,
 															"kindString": "Variable",
@@ -177,7 +177,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 738,
+																	"line": 762,
 																	"character": 22
 																}
 															],
@@ -187,7 +187,7 @@
 															}
 														},
 														{
-															"id": 201,
+															"id": 216,
 															"name": "exponentProduct",
 															"kind": 32,
 															"kindString": "Variable",
@@ -200,7 +200,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 737,
+																	"line": 761,
 																	"character": 23
 																}
 															],
@@ -210,7 +210,7 @@
 															}
 														},
 														{
-															"id": 199,
+															"id": 214,
 															"name": "groupSeparator",
 															"kind": 32,
 															"kindString": "Variable",
@@ -223,7 +223,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 735,
+																	"line": 759,
 																	"character": 22
 																}
 															],
@@ -233,7 +233,7 @@
 															}
 														},
 														{
-															"id": 197,
+															"id": 212,
 															"name": "precision",
 															"kind": 32,
 															"kindString": "Variable",
@@ -246,7 +246,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 733,
+																	"line": 757,
 																	"character": 17
 																}
 															],
@@ -256,7 +256,7 @@
 															}
 														},
 														{
-															"id": 200,
+															"id": 215,
 															"name": "product",
 															"kind": 32,
 															"kindString": "Variable",
@@ -269,7 +269,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 736,
+																	"line": 760,
 																	"character": 15
 																}
 															],
@@ -279,7 +279,7 @@
 															}
 														},
 														{
-															"id": 203,
+															"id": 218,
 															"name": "scientificNotation",
 															"kind": 32,
 															"kindString": "Variable",
@@ -292,7 +292,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 739,
+																	"line": 763,
 																	"character": 26
 																}
 															],
@@ -320,22 +320,22 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																204,
-																198,
-																205,
-																202,
-																201,
-																199,
-																197,
-																200,
-																203
+																219,
+																213,
+																220,
+																217,
+																216,
+																214,
+																212,
+																215,
+																218
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 732,
+															"line": 756,
 															"character": 42
 														}
 													]
@@ -352,20 +352,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 732,
+									"line": 756,
 									"character": 23
 								}
 							]
 						},
 						{
-							"id": 268,
+							"id": 283,
 							"name": "getOriginalContent",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 269,
+									"id": 284,
 									"name": "getOriginalContent",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -383,7 +383,7 @@
 									},
 									"parameters": [
 										{
-											"id": 270,
+											"id": 285,
 											"name": "element",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -405,13 +405,13 @@
 													{
 														"type": "reference",
 														"name": "MathField",
-														"id": 2
+														"id": 17
 													}
 												]
 											}
 										},
 										{
-											"id": 271,
+											"id": 286,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -422,14 +422,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 272,
+													"id": 287,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 273,
+															"id": 288,
 															"name": "namespace",
 															"kind": 32,
 															"kindString": "Variable",
@@ -442,7 +442,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 993,
+																	"line": 1017,
 																	"character": 17
 																}
 															],
@@ -457,14 +457,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																273
+																288
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 992,
+															"line": 1016,
 															"character": 84
 														}
 													]
@@ -481,20 +481,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 992,
+									"line": 1016,
 									"character": 31
 								}
 							]
 						},
 						{
-							"id": 217,
+							"id": 232,
 							"name": "highlightAtomID",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 218,
+									"id": 233,
 									"name": "highlightAtomID",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -505,7 +505,7 @@
 									},
 									"parameters": [
 										{
-											"id": 219,
+											"id": 234,
 											"name": "atomID",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -528,20 +528,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 797,
+									"line": 821,
 									"character": 28
 								}
 							]
 						},
 						{
-							"id": 186,
+							"id": 201,
 							"name": "latexToAST",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 187,
+									"id": 202,
 									"name": "latexToAST",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -559,7 +559,7 @@
 									},
 									"parameters": [
 										{
-											"id": 188,
+											"id": 203,
 											"name": "latex",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -573,7 +573,7 @@
 											}
 										},
 										{
-											"id": 189,
+											"id": 204,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -582,14 +582,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 190,
+													"id": 205,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 191,
+															"id": 206,
 															"name": "macros",
 															"kind": 32,
 															"kindString": "Variable",
@@ -602,7 +602,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 702,
+																	"line": 726,
 																	"character": 14
 																}
 															],
@@ -617,14 +617,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																191
+																206
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 701,
+															"line": 725,
 															"character": 47
 														}
 													]
@@ -641,20 +641,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 701,
+									"line": 725,
 									"character": 23
 								}
 							]
 						},
 						{
-							"id": 171,
+							"id": 186,
 							"name": "latexToMarkup",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 172,
+									"id": 187,
 									"name": "latexToMarkup",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -670,7 +670,7 @@
 									},
 									"parameters": [
 										{
-											"id": 173,
+											"id": 188,
 											"name": "text",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -684,7 +684,7 @@
 											}
 										},
 										{
-											"id": 174,
+											"id": 189,
 											"name": "mathstyle",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -707,7 +707,7 @@
 											}
 										},
 										{
-											"id": 175,
+											"id": 190,
 											"name": "format",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -745,20 +745,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 642,
+									"line": 666,
 									"character": 26
 								}
 							]
 						},
 						{
-							"id": 180,
+							"id": 195,
 							"name": "latexToMathML",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 181,
+									"id": 196,
 									"name": "latexToMathML",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -774,7 +774,7 @@
 									},
 									"parameters": [
 										{
-											"id": 182,
+											"id": 197,
 											"name": "latex",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -788,7 +788,7 @@
 											}
 										},
 										{
-											"id": 183,
+											"id": 198,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -797,14 +797,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 184,
+													"id": 199,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 185,
+															"id": 200,
 															"name": "generateID",
 															"kind": 32,
 															"kindString": "Variable",
@@ -817,7 +817,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 685,
+																	"line": 709,
 																	"character": 18
 																}
 															],
@@ -832,14 +832,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																185
+																200
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 684,
+															"line": 708,
 															"character": 50
 														}
 													]
@@ -856,20 +856,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 684,
+									"line": 708,
 									"character": 26
 								}
 							]
 						},
 						{
-							"id": 206,
+							"id": 221,
 							"name": "latexToSpeakableText",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 207,
+									"id": 222,
 									"name": "latexToSpeakableText",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -890,7 +890,7 @@
 									},
 									"parameters": [
 										{
-											"id": 208,
+											"id": 223,
 											"name": "latex",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -904,7 +904,7 @@
 											}
 										},
 										{
-											"id": 209,
+											"id": 224,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -915,14 +915,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 210,
+													"id": 225,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 212,
+															"id": 227,
 															"name": "textToSpeechMarkup",
 															"kind": 32,
 															"kindString": "Variable",
@@ -935,7 +935,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 783,
+																	"line": 807,
 																	"character": 26
 																}
 															],
@@ -945,7 +945,7 @@
 															}
 														},
 														{
-															"id": 211,
+															"id": 226,
 															"name": "textToSpeechRules",
 															"kind": 32,
 															"kindString": "Variable",
@@ -958,7 +958,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 782,
+																	"line": 806,
 																	"character": 25
 																}
 															],
@@ -977,7 +977,7 @@
 															}
 														},
 														{
-															"id": 213,
+															"id": 228,
 															"name": "textToSpeechRulesOptions",
 															"kind": 32,
 															"kindString": "Variable",
@@ -990,28 +990,28 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 784,
+																	"line": 808,
 																	"character": 32
 																}
 															],
 															"type": {
 																"type": "reflection",
 																"declaration": {
-																	"id": 214,
+																	"id": 229,
 																	"name": "__type",
 																	"kind": 65536,
 																	"kindString": "Type literal",
 																	"flags": {},
 																	"indexSignature": [
 																		{
-																			"id": 215,
+																			"id": 230,
 																			"name": "__index",
 																			"kind": 8192,
 																			"kindString": "Index signature",
 																			"flags": {},
 																			"parameters": [
 																				{
-																					"id": 216,
+																					"id": 231,
 																					"name": "key",
 																					"kind": 32768,
 																					"kindString": "Parameter",
@@ -1031,7 +1031,7 @@
 																	"sources": [
 																		{
 																			"fileName": "mathlive.d.ts",
-																			"line": 784,
+																			"line": 808,
 																			"character": 34
 																		}
 																	]
@@ -1044,16 +1044,16 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																212,
-																211,
-																213
+																227,
+																226,
+																228
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 781,
+															"line": 805,
 															"character": 57
 														}
 													]
@@ -1070,20 +1070,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 781,
+									"line": 805,
 									"character": 33
 								}
 							]
 						},
 						{
-							"id": 176,
+							"id": 191,
 							"name": "makeMathField",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 177,
+									"id": 192,
 									"name": "makeMathField",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1101,7 +1101,7 @@
 									},
 									"parameters": [
 										{
-											"id": 178,
+											"id": 193,
 											"name": "element",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1124,7 +1124,7 @@
 											}
 										},
 										{
-											"id": 179,
+											"id": 194,
 											"name": "config",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1137,34 +1137,34 @@
 											"type": {
 												"type": "reference",
 												"name": "MathFieldConfig",
-												"id": 73
+												"id": 88
 											}
 										}
 									],
 									"type": {
 										"type": "reference",
 										"name": "MathField",
-										"id": 2
+										"id": 17
 									}
 								}
 							],
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 670,
+									"line": 694,
 									"character": 26
 								}
 							]
 						},
 						{
-							"id": 222,
+							"id": 237,
 							"name": "pauseReadAloud",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 223,
+									"id": 238,
 									"name": "pauseReadAloud",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1188,20 +1188,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 821,
+									"line": 845,
 									"character": 27
 								}
 							]
 						},
 						{
-							"id": 226,
+							"id": 241,
 							"name": "playReadAloud",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 227,
+									"id": 242,
 									"name": "playReadAloud",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1218,7 +1218,7 @@
 									},
 									"parameters": [
 										{
-											"id": 228,
+											"id": 243,
 											"name": "token",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1232,7 +1232,7 @@
 											}
 										},
 										{
-											"id": 229,
+											"id": 244,
 											"name": "count",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1257,20 +1257,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 840,
+									"line": 864,
 									"character": 26
 								}
 							]
 						},
 						{
-							"id": 220,
+							"id": 235,
 							"name": "readAloudStatus",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 221,
+									"id": 236,
 									"name": "readAloudStatus",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1311,20 +1311,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 813,
+									"line": 837,
 									"character": 28
 								}
 							]
 						},
 						{
-							"id": 230,
+							"id": 245,
 							"name": "renderMathInDocument",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 231,
+									"id": 246,
 									"name": "renderMathInDocument",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1341,7 +1341,7 @@
 									},
 									"parameters": [
 										{
-											"id": 232,
+											"id": 247,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1354,21 +1354,21 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 233,
+													"id": 248,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"indexSignature": [
 														{
-															"id": 234,
+															"id": 249,
 															"name": "__index",
 															"kind": 8192,
 															"kindString": "Index signature",
 															"flags": {},
 															"parameters": [
 																{
-																	"id": 235,
+																	"id": 250,
 																	"name": "key",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -1388,7 +1388,7 @@
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 861,
+															"line": 885,
 															"character": 43
 														}
 													]
@@ -1405,20 +1405,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 861,
+									"line": 885,
 									"character": 33
 								}
 							]
 						},
 						{
-							"id": 236,
+							"id": 251,
 							"name": "renderMathInElement",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 237,
+									"id": 252,
 									"name": "renderMathInElement",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1435,7 +1435,7 @@
 									},
 									"parameters": [
 										{
-											"id": 238,
+											"id": 253,
 											"name": "element",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1458,7 +1458,7 @@
 											}
 										},
 										{
-											"id": 239,
+											"id": 254,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1471,14 +1471,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 240,
+													"id": 255,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 244,
+															"id": 259,
 															"name": "ignoreClass",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1491,7 +1491,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 945,
+																	"line": 969,
 																	"character": 19
 																}
 															],
@@ -1501,7 +1501,7 @@
 															}
 														},
 														{
-															"id": 242,
+															"id": 257,
 															"name": "macros",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1514,7 +1514,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 943,
+																	"line": 967,
 																	"character": 14
 																}
 															],
@@ -1527,7 +1527,7 @@
 															}
 														},
 														{
-															"id": 241,
+															"id": 256,
 															"name": "namespace",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1540,7 +1540,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 942,
+																	"line": 966,
 																	"character": 17
 																}
 															],
@@ -1550,7 +1550,7 @@
 															}
 														},
 														{
-															"id": 248,
+															"id": 263,
 															"name": "preserveOriginalContent",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1563,7 +1563,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 949,
+																	"line": 973,
 																	"character": 31
 																}
 															],
@@ -1573,7 +1573,7 @@
 															}
 														},
 														{
-															"id": 245,
+															"id": 260,
 															"name": "processClass",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1586,7 +1586,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 946,
+																	"line": 970,
 																	"character": 20
 																}
 															],
@@ -1596,7 +1596,7 @@
 															}
 														},
 														{
-															"id": 246,
+															"id": 261,
 															"name": "processScriptType",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1609,7 +1609,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 947,
+																	"line": 971,
 																	"character": 25
 																}
 															],
@@ -1619,7 +1619,7 @@
 															}
 														},
 														{
-															"id": 249,
+															"id": 264,
 															"name": "readAloud",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1632,7 +1632,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 950,
+																	"line": 974,
 																	"character": 17
 																}
 															],
@@ -1642,7 +1642,7 @@
 															}
 														},
 														{
-															"id": 247,
+															"id": 262,
 															"name": "renderAccessibleContent",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1655,7 +1655,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 948,
+																	"line": 972,
 																	"character": 31
 																}
 															],
@@ -1665,7 +1665,7 @@
 															}
 														},
 														{
-															"id": 243,
+															"id": 258,
 															"name": "skipTags",
 															"kind": 32,
 															"kindString": "Variable",
@@ -1678,7 +1678,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 944,
+																	"line": 968,
 																	"character": 16
 																}
 															],
@@ -1696,22 +1696,22 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																244,
-																242,
-																241,
-																248,
-																245,
-																246,
-																249,
-																247,
-																243
+																259,
+																257,
+																256,
+																263,
+																260,
+																261,
+																264,
+																262,
+																258
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 941,
+															"line": 965,
 															"character": 73
 														}
 													]
@@ -1719,7 +1719,7 @@
 											}
 										},
 										{
-											"id": 250,
+											"id": 265,
 											"name": "renderToMarkup",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1732,21 +1732,21 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 251,
+													"id": 266,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"signatures": [
 														{
-															"id": 252,
+															"id": 267,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
 															"flags": {},
 															"parameters": [
 																{
-																	"id": 253,
+																	"id": 268,
 																	"name": "params",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -1771,7 +1771,7 @@
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 951,
+															"line": 975,
 															"character": 23
 														}
 													]
@@ -1779,7 +1779,7 @@
 											}
 										},
 										{
-											"id": 254,
+											"id": 269,
 											"name": "renderToMathML",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1792,21 +1792,21 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 255,
+													"id": 270,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"signatures": [
 														{
-															"id": 256,
+															"id": 271,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
 															"flags": {},
 															"parameters": [
 																{
-																	"id": 257,
+																	"id": 272,
 																	"name": "params",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -1831,7 +1831,7 @@
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 951,
+															"line": 975,
 															"character": 67
 														}
 													]
@@ -1839,7 +1839,7 @@
 											}
 										},
 										{
-											"id": 258,
+											"id": 273,
 											"name": "renderToSpeakableText",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1852,21 +1852,21 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 259,
+													"id": 274,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"signatures": [
 														{
-															"id": 260,
+															"id": 275,
 															"name": "__call",
 															"kind": 4096,
 															"kindString": "Call signature",
 															"flags": {},
 															"parameters": [
 																{
-																	"id": 261,
+																	"id": 276,
 																	"name": "params",
 																	"kind": 32768,
 																	"kindString": "Parameter",
@@ -1891,7 +1891,7 @@
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 951,
+															"line": 975,
 															"character": 118
 														}
 													]
@@ -1908,20 +1908,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 941,
+									"line": 965,
 									"character": 32
 								}
 							]
 						},
 						{
-							"id": 224,
+							"id": 239,
 							"name": "resumeReadAloud",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 225,
+									"id": 240,
 									"name": "resumeReadAloud",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1945,20 +1945,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 829,
+									"line": 853,
 									"character": 28
 								}
 							]
 						},
 						{
-							"id": 262,
+							"id": 277,
 							"name": "revertToOriginalContent",
 							"kind": 64,
 							"kindString": "Function",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 263,
+									"id": 278,
 									"name": "revertToOriginalContent",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -1973,7 +1973,7 @@
 									},
 									"parameters": [
 										{
-											"id": 264,
+											"id": 279,
 											"name": "element",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -1993,13 +1993,13 @@
 													{
 														"type": "reference",
 														"name": "MathField",
-														"id": 2
+														"id": 17
 													}
 												]
 											}
 										},
 										{
-											"id": 265,
+											"id": 280,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2010,14 +2010,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 266,
+													"id": 281,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 267,
+															"id": 282,
 															"name": "namespace",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2028,7 +2028,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 962,
+																	"line": 986,
 																	"character": 17
 																}
 															],
@@ -2043,14 +2043,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																267
+																282
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 961,
+															"line": 985,
 															"character": 89
 														}
 													]
@@ -2067,7 +2067,7 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 961,
+									"line": 985,
 									"character": 36
 								}
 							]
@@ -2078,51 +2078,51 @@
 							"title": "Functions",
 							"kind": 64,
 							"children": [
-								192,
-								268,
-								217,
+								207,
+								283,
+								232,
+								201,
 								186,
-								171,
-								180,
-								206,
-								176,
-								222,
-								226,
-								220,
-								230,
-								236,
-								224,
-								262
+								195,
+								221,
+								191,
+								237,
+								241,
+								235,
+								245,
+								251,
+								239,
+								277
 							],
 							"categories": [
 								{
 									"title": "Converting",
 									"children": [
-										192,
+										207,
+										201,
 										186,
-										171,
-										180,
-										206
+										195,
+										221
 									]
 								},
 								{
 									"title": "Other",
 									"children": [
-										268,
-										176,
-										230,
-										236,
-										262
+										283,
+										191,
+										245,
+										251,
+										277
 									]
 								},
 								{
 									"title": "Read Aloud",
 									"children": [
-										217,
-										222,
-										226,
-										220,
-										224
+										232,
+										237,
+										241,
+										235,
+										239
 									]
 								}
 							]
@@ -2131,13 +2131,255 @@
 					"sources": [
 						{
 							"fileName": "mathlive.d.ts",
-							"line": 619,
+							"line": 643,
 							"character": 25
 						}
 					]
 				},
 				{
 					"id": 2,
+					"name": "PackagingTypeEnum",
+					"kind": 4,
+					"kindString": "Enumeration",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 8,
+							"name": "EXPRESS_BOX",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 7,
+									"character": 13
+								}
+							],
+							"defaultValue": "\"21\""
+						},
+						{
+							"id": 14,
+							"name": "LARGE_EXPRESS_BOX",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 13,
+									"character": 19
+								}
+							],
+							"defaultValue": "\"2c\""
+						},
+						{
+							"id": 4,
+							"name": "LETTER",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 3,
+									"character": 8
+								}
+							],
+							"defaultValue": "\"01\""
+						},
+						{
+							"id": 13,
+							"name": "MEDIUM_EXPRESS_BOX",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 12,
+									"character": 20
+								}
+							],
+							"defaultValue": "\"2b\""
+						},
+						{
+							"id": 5,
+							"name": "PACKAGE",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 4,
+									"character": 9
+								}
+							],
+							"defaultValue": "\"02\""
+						},
+						{
+							"id": 7,
+							"name": "PAK",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 6,
+									"character": 5
+								}
+							],
+							"defaultValue": "\"04\""
+						},
+						{
+							"id": 11,
+							"name": "PALLET",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 10,
+									"character": 8
+								}
+							],
+							"defaultValue": "\"30\""
+						},
+						{
+							"id": 12,
+							"name": "SMALL_EXPRESS_BOX",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 11,
+									"character": 19
+								}
+							],
+							"defaultValue": "\"2a\""
+						},
+						{
+							"id": 10,
+							"name": "TEN_KG_BOX",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 9,
+									"character": 12
+								}
+							],
+							"defaultValue": "\"25\""
+						},
+						{
+							"id": 6,
+							"name": "TUBE",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 5,
+									"character": 6
+								}
+							],
+							"defaultValue": "\"03\""
+						},
+						{
+							"id": 9,
+							"name": "TWENTY_FIVE_KG_BOX",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 8,
+									"character": 20
+								}
+							],
+							"defaultValue": "\"24\""
+						},
+						{
+							"id": 3,
+							"name": "UNKNOWN",
+							"kind": 16,
+							"kindString": "Enumeration member",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 2,
+									"character": 9
+								}
+							],
+							"defaultValue": "\"00\""
+						}
+					],
+					"groups": [
+						{
+							"title": "Enumeration members",
+							"kind": 16,
+							"children": [
+								8,
+								14,
+								4,
+								13,
+								5,
+								7,
+								11,
+								12,
+								10,
+								6,
+								9,
+								3
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "mathlive.d.ts",
+							"line": 1,
+							"character": 29
+						}
+					]
+				},
+				{
+					"id": 17,
 					"name": "MathField",
 					"kind": 128,
 					"kindString": "Class",
@@ -2184,14 +2426,14 @@
 					},
 					"children": [
 						{
-							"id": 42,
+							"id": 57,
 							"name": "$applyStyle",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 43,
+									"id": 58,
 									"name": "$applyStyle",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2208,7 +2450,7 @@
 									},
 									"parameters": [
 										{
-											"id": 44,
+											"id": 59,
 											"name": "style",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2219,14 +2461,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 45,
+													"id": 60,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 48,
+															"id": 63,
 															"name": "backgroundColor",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2239,7 +2481,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 543,
+																	"line": 567,
 																	"character": 23
 																}
 															],
@@ -2249,7 +2491,7 @@
 															}
 														},
 														{
-															"id": 47,
+															"id": 62,
 															"name": "color",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2262,7 +2504,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 542,
+																	"line": 566,
 																	"character": 13
 																}
 															],
@@ -2272,7 +2514,7 @@
 															}
 														},
 														{
-															"id": 49,
+															"id": 64,
 															"name": "fontFamily",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2285,7 +2527,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 544,
+																	"line": 568,
 																	"character": 18
 																}
 															],
@@ -2295,7 +2537,7 @@
 															}
 														},
 														{
-															"id": 46,
+															"id": 61,
 															"name": "mode",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2308,7 +2550,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 541,
+																	"line": 565,
 																	"character": 12
 																}
 															],
@@ -2318,7 +2560,7 @@
 															}
 														},
 														{
-															"id": 50,
+															"id": 65,
 															"name": "series",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2331,7 +2573,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 545,
+																	"line": 569,
 																	"character": 14
 																}
 															],
@@ -2341,7 +2583,7 @@
 															}
 														},
 														{
-															"id": 51,
+															"id": 66,
 															"name": "shape",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2354,7 +2596,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 546,
+																	"line": 570,
 																	"character": 13
 																}
 															],
@@ -2364,7 +2606,7 @@
 															}
 														},
 														{
-															"id": 52,
+															"id": 67,
 															"name": "size",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2377,7 +2619,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 547,
+																	"line": 571,
 																	"character": 12
 																}
 															],
@@ -2392,20 +2634,20 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																48,
-																47,
-																49,
-																46,
-																50,
-																51,
-																52
+																63,
+																62,
+																64,
+																61,
+																65,
+																66,
+																67
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 540,
+															"line": 564,
 															"character": 22
 														}
 													]
@@ -2422,20 +2664,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 540,
+									"line": 564,
 									"character": 15
 								}
 							]
 						},
 						{
-							"id": 28,
+							"id": 43,
 							"name": "$el",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 29,
+									"id": 44,
 									"name": "$el",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2459,20 +2701,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 404,
+									"line": 428,
 									"character": 7
 								}
 							]
 						},
 						{
-							"id": 30,
+							"id": 45,
 							"name": "$insert",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 31,
+									"id": 46,
 									"name": "$insert",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2489,7 +2731,7 @@
 									},
 									"parameters": [
 										{
-											"id": 32,
+											"id": 47,
 											"name": "s",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2503,7 +2745,7 @@
 											}
 										},
 										{
-											"id": 33,
+											"id": 48,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2516,14 +2758,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 34,
+													"id": 49,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 39,
+															"id": 54,
 															"name": "feedback",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2534,7 +2776,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 457,
+																	"line": 481,
 																	"character": 16
 																}
 															],
@@ -2544,7 +2786,7 @@
 															}
 														},
 														{
-															"id": 38,
+															"id": 53,
 															"name": "focus",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2555,7 +2797,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 456,
+																	"line": 480,
 																	"character": 13
 																}
 															],
@@ -2565,7 +2807,7 @@
 															}
 														},
 														{
-															"id": 37,
+															"id": 52,
 															"name": "format",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2576,7 +2818,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 455,
+																	"line": 479,
 																	"character": 14
 																}
 															],
@@ -2595,7 +2837,7 @@
 															}
 														},
 														{
-															"id": 35,
+															"id": 50,
 															"name": "insertionMode",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2606,7 +2848,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 453,
+																	"line": 477,
 																	"character": 21
 																}
 															],
@@ -2633,7 +2875,7 @@
 															}
 														},
 														{
-															"id": 40,
+															"id": 55,
 															"name": "mode",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2644,7 +2886,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 458,
+																	"line": 482,
 																	"character": 12
 																}
 															],
@@ -2667,7 +2909,7 @@
 															}
 														},
 														{
-															"id": 41,
+															"id": 56,
 															"name": "resetStyle",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2678,7 +2920,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 459,
+																	"line": 483,
 																	"character": 18
 																}
 															],
@@ -2688,7 +2930,7 @@
 															}
 														},
 														{
-															"id": 36,
+															"id": 51,
 															"name": "selectionMode",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2699,7 +2941,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 454,
+																	"line": 478,
 																	"character": 21
 																}
 															],
@@ -2731,20 +2973,20 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																39,
-																38,
-																37,
-																35,
-																40,
-																41,
-																36
+																54,
+																53,
+																52,
+																50,
+																55,
+																56,
+																51
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 452,
+															"line": 476,
 															"character": 32
 														}
 													]
@@ -2761,20 +3003,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 452,
+									"line": 476,
 									"character": 11
 								}
 							]
 						},
 						{
-							"id": 53,
+							"id": 68,
 							"name": "$keystroke",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 54,
+									"id": 69,
 									"name": "$keystroke",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2789,7 +3031,7 @@
 									},
 									"parameters": [
 										{
-											"id": 55,
+											"id": 70,
 											"name": "keys",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2803,7 +3045,7 @@
 											}
 										},
 										{
-											"id": 56,
+											"id": 71,
 											"name": "evt",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2828,20 +3070,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 565,
+									"line": 589,
 									"character": 14
 								}
 							]
 						},
 						{
-							"id": 22,
+							"id": 37,
 							"name": "$latex",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 23,
+									"id": 38,
 									"name": "$latex",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2858,7 +3100,7 @@
 									},
 									"parameters": [
 										{
-											"id": 24,
+											"id": 39,
 											"name": "text",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2874,7 +3116,7 @@
 											}
 										},
 										{
-											"id": 25,
+											"id": 40,
 											"name": "options",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -2885,14 +3127,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 26,
+													"id": 41,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 27,
+															"id": 42,
 															"name": "suppressChangeNotifications",
 															"kind": 32,
 															"kindString": "Variable",
@@ -2905,7 +3147,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 394,
+																	"line": 418,
 																	"character": 35
 																}
 															],
@@ -2920,14 +3162,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																27
+																42
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 393,
+															"line": 417,
 															"character": 35
 														}
 													]
@@ -2944,20 +3186,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 393,
+									"line": 417,
 									"character": 10
 								}
 							]
 						},
 						{
-							"id": 5,
+							"id": 20,
 							"name": "$perform",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 6,
+									"id": 21,
 									"name": "$perform",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -2974,7 +3216,7 @@
 									},
 									"parameters": [
 										{
-											"id": 7,
+											"id": 22,
 											"name": "command",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3009,20 +3251,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 294,
+									"line": 318,
 									"character": 12
 								}
 							]
 						},
 						{
-							"id": 3,
+							"id": 18,
 							"name": "$revertToOriginalContent",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 4,
+									"id": 19,
 									"name": "$revertToOriginalContent",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3046,20 +3288,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 149,
+									"line": 173,
 									"character": 28
 								}
 							]
 						},
 						{
-							"id": 11,
+							"id": 26,
 							"name": "$selectedText",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 12,
+									"id": 27,
 									"name": "$selectedText",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3075,7 +3317,7 @@
 									},
 									"parameters": [
 										{
-											"id": 13,
+											"id": 28,
 											"name": "format",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3100,20 +3342,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 334,
+									"line": 358,
 									"character": 17
 								}
 							]
 						},
 						{
-							"id": 20,
+							"id": 35,
 							"name": "$selectionAtEnd",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 21,
+									"id": 36,
 									"name": "$selectionAtEnd",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3136,20 +3378,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 373,
+									"line": 397,
 									"character": 19
 								}
 							]
 						},
 						{
-							"id": 18,
+							"id": 33,
 							"name": "$selectionAtStart",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 19,
+									"id": 34,
 									"name": "$selectionAtStart",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3172,20 +3414,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 365,
+									"line": 389,
 									"character": 21
 								}
 							]
 						},
 						{
-							"id": 16,
+							"id": 31,
 							"name": "$selectionDepth",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 17,
+									"id": 32,
 									"name": "$selectionDepth",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3209,20 +3451,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 357,
+									"line": 381,
 									"character": 19
 								}
 							]
 						},
 						{
-							"id": 14,
+							"id": 29,
 							"name": "$selectionIsCollapsed",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 15,
+									"id": 30,
 									"name": "$selectionIsCollapsed",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3246,20 +3488,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 343,
+									"line": 367,
 									"character": 25
 								}
 							]
 						},
 						{
-							"id": 60,
+							"id": 75,
 							"name": "$setConfig",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 61,
+									"id": 76,
 									"name": "$setConfig",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3275,7 +3517,7 @@
 									},
 									"parameters": [
 										{
-											"id": 62,
+											"id": 77,
 											"name": "config",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3286,7 +3528,7 @@
 											"type": {
 												"type": "reference",
 												"name": "MathFieldConfig",
-												"id": 73
+												"id": 88
 											}
 										}
 									],
@@ -3299,20 +3541,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 582,
+									"line": 606,
 									"character": 14
 								}
 							]
 						},
 						{
-							"id": 8,
+							"id": 23,
 							"name": "$text",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 9,
+									"id": 24,
 									"name": "$text",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3328,7 +3570,7 @@
 									},
 									"parameters": [
 										{
-											"id": 10,
+											"id": 25,
 											"name": "format",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3353,20 +3595,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 314,
+									"line": 338,
 									"character": 9
 								}
 							]
 						},
 						{
-							"id": 57,
+							"id": 72,
 							"name": "$typedText",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 58,
+									"id": 73,
 									"name": "$typedText",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3382,7 +3624,7 @@
 									},
 									"parameters": [
 										{
-											"id": 59,
+											"id": 74,
 											"name": "text",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3405,20 +3647,20 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 573,
+									"line": 597,
 									"character": 14
 								}
 							]
 						},
 						{
-							"id": 63,
+							"id": 78,
 							"name": "speak_",
 							"kind": 2048,
 							"kindString": "Method",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 64,
+									"id": 79,
 									"name": "speak_",
 									"kind": 4096,
 									"kindString": "Call signature",
@@ -3434,7 +3676,7 @@
 									},
 									"parameters": [
 										{
-											"id": 65,
+											"id": 80,
 											"name": "amount",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3448,7 +3690,7 @@
 											}
 										},
 										{
-											"id": 66,
+											"id": 81,
 											"name": "speakOptions",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3457,14 +3699,14 @@
 											"type": {
 												"type": "reflection",
 												"declaration": {
-													"id": 67,
+													"id": 82,
 													"name": "__type",
 													"kind": 65536,
 													"kindString": "Type literal",
 													"flags": {},
 													"children": [
 														{
-															"id": 68,
+															"id": 83,
 															"name": "withHighlighting",
 															"kind": 32,
 															"kindString": "Variable",
@@ -3475,7 +3717,7 @@
 															"sources": [
 																{
 																	"fileName": "mathlive.d.ts",
-																	"line": 595,
+																	"line": 619,
 																	"character": 24
 																}
 															],
@@ -3490,14 +3732,14 @@
 															"title": "Variables",
 															"kind": 32,
 															"children": [
-																68
+																83
 															]
 														}
 													],
 													"sources": [
 														{
 															"fileName": "mathlive.d.ts",
-															"line": 594,
+															"line": 618,
 															"character": 40
 														}
 													]
@@ -3514,7 +3756,7 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 594,
+									"line": 618,
 									"character": 10
 								}
 							]
@@ -3525,58 +3767,58 @@
 							"title": "Methods",
 							"kind": 2048,
 							"children": [
-								42,
-								28,
-								30,
-								53,
-								22,
-								5,
-								3,
-								11,
+								57,
+								43,
+								45,
+								68,
+								37,
 								20,
 								18,
-								16,
-								14,
-								60,
-								8,
-								57,
-								63
+								26,
+								35,
+								33,
+								31,
+								29,
+								75,
+								23,
+								72,
+								78
 							],
 							"categories": [
 								{
 									"title": "Accessing the Content",
 									"children": [
-										22,
-										11,
-										8
+										37,
+										26,
+										23
 									]
 								},
 								{
 									"title": "Changing the Content",
 									"children": [
-										42,
-										30,
-										53,
-										57
+										57,
+										45,
+										68,
+										72
 									]
 								},
 								{
 									"title": "Other",
 									"children": [
-										28,
-										5,
-										3,
-										60,
-										63
+										43,
+										20,
+										18,
+										75,
+										78
 									]
 								},
 								{
 									"title": "Selection",
 									"children": [
-										20,
-										18,
-										16,
-										14
+										35,
+										33,
+										31,
+										29
 									]
 								}
 							]
@@ -3585,13 +3827,61 @@
 					"sources": [
 						{
 							"fileName": "mathlive.d.ts",
-							"line": 136,
+							"line": 160,
 							"character": 23
 						}
 					]
 				},
 				{
-					"id": 69,
+					"id": 15,
+					"name": "Package",
+					"kind": 256,
+					"kindString": "Interface",
+					"flags": {
+						"isExported": true
+					},
+					"children": [
+						{
+							"id": 16,
+							"name": "PackagingType",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isExported": true
+							},
+							"sources": [
+								{
+									"fileName": "mathlive.d.ts",
+									"line": 16,
+									"character": 15
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "PackagingTypeEnum",
+								"id": 2
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								16
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "mathlive.d.ts",
+							"line": 15,
+							"character": 24
+						}
+					]
+				},
+				{
+					"id": 84,
 					"name": "MathFieldCallback",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -3620,28 +3910,28 @@
 					"sources": [
 						{
 							"fileName": "mathlive.d.ts",
-							"line": 7,
+							"line": 31,
 							"character": 30
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 70,
+							"id": 85,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"signatures": [
 								{
-									"id": 71,
+									"id": 86,
 									"name": "__call",
 									"kind": 4096,
 									"kindString": "Call signature",
 									"flags": {},
 									"parameters": [
 										{
-											"id": 72,
+											"id": 87,
 											"name": "mathfield",
 											"kind": 32768,
 											"kindString": "Parameter",
@@ -3649,7 +3939,7 @@
 											"type": {
 												"type": "reference",
 												"name": "MathField",
-												"id": 2
+												"id": 17
 											}
 										}
 									],
@@ -3662,7 +3952,7 @@
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 7,
+									"line": 31,
 									"character": 32
 								}
 							]
@@ -3670,7 +3960,7 @@
 					}
 				},
 				{
-					"id": 73,
+					"id": 88,
 					"name": "MathFieldConfig",
 					"kind": 4194304,
 					"kindString": "Type alias",
@@ -3882,21 +4172,21 @@
 					"sources": [
 						{
 							"fileName": "mathlive.d.ts",
-							"line": 61,
+							"line": 85,
 							"character": 28
 						}
 					],
 					"type": {
 						"type": "reflection",
 						"declaration": {
-							"id": 74,
+							"id": 89,
 							"name": "__type",
 							"kind": 65536,
 							"kindString": "Type literal",
 							"flags": {},
 							"children": [
 								{
-									"id": 112,
+									"id": 127,
 									"name": "customVirtualKeyboardLayers",
 									"kind": 32,
 									"kindString": "Variable",
@@ -3906,28 +4196,28 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 88,
+											"line": 112,
 											"character": 31
 										}
 									],
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 113,
+											"id": 128,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"indexSignature": [
 												{
-													"id": 114,
+													"id": 129,
 													"name": "__index",
 													"kind": 8192,
 													"kindString": "Index signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 115,
+															"id": 130,
 															"name": "key",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -3947,7 +4237,7 @@
 											"sources": [
 												{
 													"fileName": "mathlive.d.ts",
-													"line": 88,
+													"line": 112,
 													"character": 33
 												}
 											]
@@ -3955,7 +4245,7 @@
 									}
 								},
 								{
-									"id": 116,
+									"id": 131,
 									"name": "customVirtualKeyboards",
 									"kind": 32,
 									"kindString": "Variable",
@@ -3965,28 +4255,28 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 91,
+											"line": 115,
 											"character": 26
 										}
 									],
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 117,
+											"id": 132,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"indexSignature": [
 												{
-													"id": 118,
+													"id": 133,
 													"name": "__index",
 													"kind": 8192,
 													"kindString": "Index signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 119,
+															"id": 134,
 															"name": "key",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -4006,7 +4296,7 @@
 											"sources": [
 												{
 													"fileName": "mathlive.d.ts",
-													"line": 91,
+													"line": 115,
 													"character": 28
 												}
 											]
@@ -4014,7 +4304,7 @@
 									}
 								},
 								{
-									"id": 86,
+									"id": 101,
 									"name": "defaultMode",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4024,7 +4314,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 69,
+											"line": 93,
 											"character": 15
 										}
 									],
@@ -4043,7 +4333,7 @@
 									}
 								},
 								{
-									"id": 166,
+									"id": 181,
 									"name": "handleReadAloud",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4053,28 +4343,28 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 116,
+											"line": 140,
 											"character": 19
 										}
 									],
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 167,
+											"id": 182,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"signatures": [
 												{
-													"id": 168,
+													"id": 183,
 													"name": "__call",
 													"kind": 4096,
 													"kindString": "Call signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 169,
+															"id": 184,
 															"name": "params",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -4099,7 +4389,7 @@
 											"sources": [
 												{
 													"fileName": "mathlive.d.ts",
-													"line": 116,
+													"line": 140,
 													"character": 21
 												}
 											]
@@ -4107,7 +4397,7 @@
 									}
 								},
 								{
-									"id": 162,
+									"id": 177,
 									"name": "handleSpeak",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4117,28 +4407,28 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 115,
+											"line": 139,
 											"character": 15
 										}
 									],
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 163,
+											"id": 178,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"signatures": [
 												{
-													"id": 164,
+													"id": 179,
 													"name": "__call",
 													"kind": 4096,
 													"kindString": "Call signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 165,
+															"id": 180,
 															"name": "params",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -4163,7 +4453,7 @@
 											"sources": [
 												{
 													"fileName": "mathlive.d.ts",
-													"line": 115,
+													"line": 139,
 													"character": 17
 												}
 											]
@@ -4171,7 +4461,7 @@
 									}
 								},
 								{
-									"id": 80,
+									"id": 95,
 									"name": "horizontalSpacingScale",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4181,7 +4471,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 66,
+											"line": 90,
 											"character": 26
 										}
 									],
@@ -4191,7 +4481,7 @@
 									}
 								},
 								{
-									"id": 107,
+									"id": 122,
 									"name": "ignoreSpacebarInMathMode",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4201,7 +4491,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 83,
+											"line": 107,
 											"character": 28
 										}
 									],
@@ -4211,7 +4501,7 @@
 									}
 								},
 								{
-									"id": 102,
+									"id": 117,
 									"name": "inlineShortcutTimeout",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4221,7 +4511,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 78,
+											"line": 102,
 											"character": 25
 										}
 									],
@@ -4231,7 +4521,7 @@
 									}
 								},
 								{
-									"id": 98,
+									"id": 113,
 									"name": "inlineShortcuts",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4241,28 +4531,28 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 75,
+											"line": 99,
 											"character": 19
 										}
 									],
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 99,
+											"id": 114,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"indexSignature": [
 												{
-													"id": 100,
+													"id": 115,
 													"name": "__index",
 													"kind": 8192,
 													"kindString": "Index signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 101,
+															"id": 116,
 															"name": "key",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -4282,7 +4572,7 @@
 											"sources": [
 												{
 													"fileName": "mathlive.d.ts",
-													"line": 75,
+													"line": 99,
 													"character": 21
 												}
 											]
@@ -4290,7 +4580,7 @@
 									}
 								},
 								{
-									"id": 122,
+									"id": 137,
 									"name": "keypressSound",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4300,7 +4590,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 96,
+											"line": 120,
 											"character": 17
 										}
 									],
@@ -4310,7 +4600,7 @@
 									}
 								},
 								{
-									"id": 121,
+									"id": 136,
 									"name": "keypressVibration",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4320,7 +4610,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 95,
+											"line": 119,
 											"character": 21
 										}
 									],
@@ -4330,7 +4620,7 @@
 									}
 								},
 								{
-									"id": 75,
+									"id": 90,
 									"name": "locale",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4340,7 +4630,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 62,
+											"line": 86,
 											"character": 10
 										}
 									],
@@ -4350,7 +4640,7 @@
 									}
 								},
 								{
-									"id": 81,
+									"id": 96,
 									"name": "namespace",
 									"kind": 32,
 									"kindString": "Variable",
@@ -4360,7 +4650,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 67,
+											"line": 91,
 											"character": 13
 										}
 									],
@@ -4370,730 +4660,8 @@
 									}
 								},
 								{
-									"id": 93,
+									"id": 108,
 									"name": "onAnnounce",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 73,
-											"character": 14
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 94,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 95,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 96,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 73,
-													"character": 16
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 88,
-									"name": "onBlur",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 71,
-											"character": 10
-										}
-									],
-									"type": {
-										"type": "reference",
-										"name": "MathFieldCallback",
-										"id": 69
-									}
-								},
-								{
-									"id": 139,
-									"name": "onContentDidChange",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 107,
-											"character": 22
-										}
-									],
-									"type": {
-										"type": "reference",
-										"name": "MathFieldCallback",
-										"id": 69
-									}
-								},
-								{
-									"id": 138,
-									"name": "onContentWillChange",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 106,
-											"character": 23
-										}
-									],
-									"type": {
-										"type": "reference",
-										"name": "MathFieldCallback",
-										"id": 69
-									}
-								},
-								{
-									"id": 87,
-									"name": "onFocus",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 70,
-											"character": 11
-										}
-									],
-									"type": {
-										"type": "reference",
-										"name": "MathFieldCallback",
-										"id": 69
-									}
-								},
-								{
-									"id": 89,
-									"name": "onKeystroke",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 72,
-											"character": 15
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 90,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 91,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 92,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 72,
-													"character": 17
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 150,
-									"name": "onModeChange",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 112,
-											"character": 16
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 151,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 152,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 153,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 112,
-													"character": 18
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 130,
-									"name": "onMoveOutOf",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 104,
-											"character": 15
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 131,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 132,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 133,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 104,
-													"character": 17
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 158,
-									"name": "onReadAloudStatus",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 114,
-											"character": 21
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 159,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 160,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 161,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 114,
-													"character": 23
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 141,
-									"name": "onSelectionDidChange",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 109,
-											"character": 24
-										}
-									],
-									"type": {
-										"type": "reference",
-										"name": "MathFieldCallback",
-										"id": 69
-									}
-								},
-								{
-									"id": 140,
-									"name": "onSelectionWillChange",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 108,
-											"character": 25
-										}
-									],
-									"type": {
-										"type": "reference",
-										"name": "MathFieldCallback",
-										"id": 69
-									}
-								},
-								{
-									"id": 134,
-									"name": "onTabOutOf",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 105,
-											"character": 14
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 135,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 136,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 137,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 105,
-													"character": 16
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 146,
-									"name": "onUndoStateDidChange",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 111,
-											"character": 24
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 147,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 148,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 149,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 111,
-													"character": 26
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 142,
-									"name": "onUndoStateWillChange",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 110,
-											"character": 25
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 143,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 144,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 145,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 110,
-													"character": 27
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 154,
-									"name": "onVirtualKeyboardToggle",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 113,
-											"character": 27
-										}
-									],
-									"type": {
-										"type": "reflection",
-										"declaration": {
-											"id": 155,
-											"name": "__type",
-											"kind": 65536,
-											"kindString": "Type literal",
-											"flags": {},
-											"signatures": [
-												{
-													"id": 156,
-													"name": "__call",
-													"kind": 4096,
-													"kindString": "Call signature",
-													"flags": {},
-													"parameters": [
-														{
-															"id": 157,
-															"name": "params",
-															"kind": 32768,
-															"kindString": "Parameter",
-															"flags": {
-																"isRest": true
-															},
-															"type": {
-																"type": "array",
-																"elementType": {
-																	"type": "intrinsic",
-																	"name": "any"
-																}
-															}
-														}
-													],
-													"type": {
-														"type": "intrinsic",
-														"name": "any"
-													}
-												}
-											],
-											"sources": [
-												{
-													"fileName": "mathlive.d.ts",
-													"line": 113,
-													"character": 29
-												}
-											]
-										}
-									}
-								},
-								{
-									"id": 97,
-									"name": "overrideDefaultInlineShortcuts",
-									"kind": 32,
-									"kindString": "Variable",
-									"flags": {
-										"isOptional": true
-									},
-									"sources": [
-										{
-											"fileName": "mathlive.d.ts",
-											"line": 74,
-											"character": 34
-										}
-									],
-									"type": {
-										"type": "intrinsic",
-										"name": "boolean"
-									}
-								},
-								{
-									"id": 123,
-									"name": "plonkSound",
 									"kind": 32,
 									"kindString": "Variable",
 									"flags": {
@@ -5107,12 +4675,734 @@
 										}
 									],
 									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 109,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 110,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 111,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 97,
+													"character": 16
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 103,
+									"name": "onBlur",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 95,
+											"character": 10
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 84
+									}
+								},
+								{
+									"id": 154,
+									"name": "onContentDidChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 131,
+											"character": 22
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 84
+									}
+								},
+								{
+									"id": 153,
+									"name": "onContentWillChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 130,
+											"character": 23
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 84
+									}
+								},
+								{
+									"id": 102,
+									"name": "onFocus",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 94,
+											"character": 11
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 84
+									}
+								},
+								{
+									"id": 104,
+									"name": "onKeystroke",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 96,
+											"character": 15
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 105,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 106,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 107,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 96,
+													"character": 17
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 165,
+									"name": "onModeChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 136,
+											"character": 16
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 166,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 167,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 168,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 136,
+													"character": 18
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 145,
+									"name": "onMoveOutOf",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 128,
+											"character": 15
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 146,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 147,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 148,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 128,
+													"character": 17
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 173,
+									"name": "onReadAloudStatus",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 138,
+											"character": 21
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 174,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 175,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 176,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 138,
+													"character": 23
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 156,
+									"name": "onSelectionDidChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 133,
+											"character": 24
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 84
+									}
+								},
+								{
+									"id": 155,
+									"name": "onSelectionWillChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 132,
+											"character": 25
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "MathFieldCallback",
+										"id": 84
+									}
+								},
+								{
+									"id": 149,
+									"name": "onTabOutOf",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 129,
+											"character": 14
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 150,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 151,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 152,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 129,
+													"character": 16
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 161,
+									"name": "onUndoStateDidChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 135,
+											"character": 24
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 162,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 163,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 164,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 135,
+													"character": 26
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 157,
+									"name": "onUndoStateWillChange",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 134,
+											"character": 25
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 158,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 159,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 160,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 134,
+													"character": 27
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 169,
+									"name": "onVirtualKeyboardToggle",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 137,
+											"character": 27
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 170,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 171,
+													"name": "__call",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 172,
+															"name": "params",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "array",
+																"elementType": {
+																	"type": "intrinsic",
+																	"name": "any"
+																}
+															}
+														}
+													],
+													"type": {
+														"type": "intrinsic",
+														"name": "any"
+													}
+												}
+											],
+											"sources": [
+												{
+													"fileName": "mathlive.d.ts",
+													"line": 137,
+													"character": 29
+												}
+											]
+										}
+									}
+								},
+								{
+									"id": 112,
+									"name": "overrideDefaultInlineShortcuts",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 98,
+											"character": 34
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "boolean"
+									}
+								},
+								{
+									"id": 138,
+									"name": "plonkSound",
+									"kind": 32,
+									"kindString": "Variable",
+									"flags": {
+										"isOptional": true
+									},
+									"sources": [
+										{
+											"fileName": "mathlive.d.ts",
+											"line": 121,
+											"character": 14
+										}
+									],
+									"type": {
 										"type": "intrinsic",
 										"name": "string"
 									}
 								},
 								{
-									"id": 106,
+									"id": 121,
 									"name": "removeExtraneousParentheses",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5122,7 +5412,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 82,
+											"line": 106,
 											"character": 31
 										}
 									],
@@ -5132,7 +5422,7 @@
 									}
 								},
 								{
-									"id": 105,
+									"id": 120,
 									"name": "scriptDepth",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5142,7 +5432,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 81,
+											"line": 105,
 											"character": 15
 										}
 									],
@@ -5152,7 +5442,7 @@
 									}
 								},
 								{
-									"id": 103,
+									"id": 118,
 									"name": "smartFence",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5162,7 +5452,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 79,
+											"line": 103,
 											"character": 14
 										}
 									],
@@ -5172,7 +5462,7 @@
 									}
 								},
 								{
-									"id": 104,
+									"id": 119,
 									"name": "smartSuperscript",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5182,7 +5472,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 80,
+											"line": 104,
 											"character": 20
 										}
 									],
@@ -5192,7 +5482,7 @@
 									}
 								},
 								{
-									"id": 127,
+									"id": 142,
 									"name": "speechEngine",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5202,7 +5492,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 101,
+											"line": 125,
 											"character": 16
 										}
 									],
@@ -5221,7 +5511,7 @@
 									}
 								},
 								{
-									"id": 129,
+									"id": 144,
 									"name": "speechEngineRate",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5231,7 +5521,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 103,
+											"line": 127,
 											"character": 20
 										}
 									],
@@ -5241,7 +5531,7 @@
 									}
 								},
 								{
-									"id": 128,
+									"id": 143,
 									"name": "speechEngineVoice",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5251,7 +5541,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 102,
+											"line": 126,
 											"character": 21
 										}
 									],
@@ -5261,7 +5551,7 @@
 									}
 								},
 								{
-									"id": 76,
+									"id": 91,
 									"name": "strings",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5271,28 +5561,28 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 63,
+											"line": 87,
 											"character": 11
 										}
 									],
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 77,
+											"id": 92,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"indexSignature": [
 												{
-													"id": 78,
+													"id": 93,
 													"name": "__index",
 													"kind": 8192,
 													"kindString": "Index signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 79,
+															"id": 94,
 															"name": "key",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -5312,7 +5602,7 @@
 											"sources": [
 												{
 													"fileName": "mathlive.d.ts",
-													"line": 63,
+													"line": 87,
 													"character": 13
 												}
 											]
@@ -5320,7 +5610,7 @@
 									}
 								},
 								{
-									"id": 82,
+									"id": 97,
 									"name": "substituteTextArea",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5330,28 +5620,28 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 68,
+											"line": 92,
 											"character": 22
 										}
 									],
 									"type": {
 										"type": "reflection",
 										"declaration": {
-											"id": 83,
+											"id": 98,
 											"name": "__type",
 											"kind": 65536,
 											"kindString": "Type literal",
 											"flags": {},
 											"signatures": [
 												{
-													"id": 84,
+													"id": 99,
 													"name": "__call",
 													"kind": 4096,
 													"kindString": "Call signature",
 													"flags": {},
 													"parameters": [
 														{
-															"id": 85,
+															"id": 100,
 															"name": "params",
 															"kind": 32768,
 															"kindString": "Parameter",
@@ -5376,7 +5666,7 @@
 											"sources": [
 												{
 													"fileName": "mathlive.d.ts",
-													"line": 68,
+													"line": 92,
 													"character": 24
 												}
 											]
@@ -5384,7 +5674,7 @@
 									}
 								},
 								{
-									"id": 125,
+									"id": 140,
 									"name": "textToSpeechMarkup",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5394,7 +5684,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 99,
+											"line": 123,
 											"character": 22
 										}
 									],
@@ -5413,7 +5703,7 @@
 									}
 								},
 								{
-									"id": 124,
+									"id": 139,
 									"name": "textToSpeechRules",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5423,7 +5713,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 98,
+											"line": 122,
 											"character": 21
 										}
 									],
@@ -5442,7 +5732,7 @@
 									}
 								},
 								{
-									"id": 126,
+									"id": 141,
 									"name": "textToSpeechRulesOptions",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5452,7 +5742,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 100,
+											"line": 124,
 											"character": 28
 										}
 									],
@@ -5462,7 +5752,7 @@
 									}
 								},
 								{
-									"id": 109,
+									"id": 124,
 									"name": "virtualKeyboardMode",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5472,7 +5762,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 85,
+											"line": 109,
 											"character": 23
 										}
 									],
@@ -5495,7 +5785,7 @@
 									}
 								},
 								{
-									"id": 111,
+									"id": 126,
 									"name": "virtualKeyboardRomanLayout",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5505,7 +5795,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 87,
+											"line": 111,
 											"character": 30
 										}
 									],
@@ -5536,7 +5826,7 @@
 									}
 								},
 								{
-									"id": 120,
+									"id": 135,
 									"name": "virtualKeyboardTheme",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5546,7 +5836,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 94,
+											"line": 118,
 											"character": 24
 										}
 									],
@@ -5569,7 +5859,7 @@
 									}
 								},
 								{
-									"id": 108,
+									"id": 123,
 									"name": "virtualKeyboardToggleGlyph",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5579,7 +5869,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 84,
+											"line": 108,
 											"character": 30
 										}
 									],
@@ -5589,7 +5879,7 @@
 									}
 								},
 								{
-									"id": 110,
+									"id": 125,
 									"name": "virtualKeyboards",
 									"kind": 32,
 									"kindString": "Variable",
@@ -5599,7 +5889,7 @@
 									"sources": [
 										{
 											"fileName": "mathlive.d.ts",
-											"line": 86,
+											"line": 110,
 											"character": 20
 										}
 									],
@@ -5643,60 +5933,60 @@
 									"title": "Variables",
 									"kind": 32,
 									"children": [
-										112,
-										116,
-										86,
-										166,
-										162,
-										80,
-										107,
-										102,
-										98,
-										122,
-										121,
-										75,
-										81,
-										93,
-										88,
-										139,
-										138,
-										87,
-										89,
-										150,
-										130,
-										158,
-										141,
-										140,
-										134,
-										146,
-										142,
-										154,
-										97,
-										123,
-										106,
-										105,
-										103,
-										104,
 										127,
-										129,
-										128,
-										76,
-										82,
-										125,
+										131,
+										101,
+										181,
+										177,
+										95,
+										122,
+										117,
+										113,
+										137,
+										136,
+										90,
+										96,
+										108,
+										103,
+										154,
+										153,
+										102,
+										104,
+										165,
+										145,
+										173,
+										156,
+										155,
+										149,
+										161,
+										157,
+										169,
+										112,
+										138,
+										121,
+										120,
+										118,
+										119,
+										142,
+										144,
+										143,
+										91,
+										97,
+										140,
+										139,
+										141,
 										124,
 										126,
-										109,
-										111,
-										120,
-										108,
-										110
+										135,
+										123,
+										125
 									]
 								}
 							],
 							"sources": [
 								{
 									"fileName": "mathlive.d.ts",
-									"line": 61,
+									"line": 85,
 									"character": 30
 								}
 							]
@@ -5709,22 +5999,36 @@
 					"title": "Modules",
 					"kind": 2,
 					"children": [
-						170
+						185
+					]
+				},
+				{
+					"title": "Enumerations",
+					"kind": 4,
+					"children": [
+						2
 					]
 				},
 				{
 					"title": "Classes",
 					"kind": 128,
 					"children": [
-						2
+						17
+					]
+				},
+				{
+					"title": "Interfaces",
+					"kind": 256,
+					"children": [
+						15
 					]
 				},
 				{
 					"title": "Type aliases",
 					"kind": 4194304,
 					"children": [
-						69,
-						73
+						84,
+						88
 					]
 				}
 			],

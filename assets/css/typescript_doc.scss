@@ -139,6 +139,9 @@ dd div.highlight {
 
 
 .card {
+    flex-flow: column;
+    align-items: start;
+    
     font-size: $body-font-size;
 	margin-top: 30px;
 	margin-bottom: 40px;

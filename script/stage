@@ -1,0 +1,23 @@
+#!/bin/sh
+
+set -e  # exit immediately on error
+
+cd "$(dirname "$0")/.."
+
+echo "Staging started at" `date "+%H:%M:%S"`
+
+# Get the latest submodule (_site)
+git submodule sync --recursive
+git submodule update --init --recursive
+
+# Make a build
+
+./script/build
+./script/test
+
+# Add the .nojekyll file to prevent GH Pages from processing the content
+touch _site/.nojekyll
+
+# Add CNAME file
+echo "cortexjs.io" >_site/CNAME
+

@@ -1,0 +1,31 @@
+set -e  # exit immediately on error
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+# set -x    # for debuging, trace what is being executed.
+
+cd "$(dirname "$0")/.."
+
+tput sc # save cursor
+
+echo "Deploying..."
+
+if [ ! -d "_site" ]; then
+    echo "Execute \"npm run stage\" first"
+    exit 1
+fi
+
+
+if ! test -f "./_site/CNAME"; then
+    echo "Execute \"npm run stage\" first"
+    exit 1
+fi
+
+
+cd "_site"
+git add .
+git commit -a -m "`date +\"%Y-%m-%d\"`"
+git push origin master:master
+
+tput rc;tput el # rc = restore cursor, el = erase to end of line
+
+echo "Deployed."
