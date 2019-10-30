@@ -3,15 +3,18 @@
 ---
 @charset "utf-8";
 
+// $sans-serif: 'IBM Plex Sans', sans-serif !default;
+// $monospace: 'Fira Code', 'IBM Plex Mono', monospace !default;
+// $sans-serif-condensed: 'IBM Plex Sans Condensed', sans-serif;
 
-$sans-serif: 'IBM Plex Sans', sans-serif !default;
-$monospace: 'Fira Code', 'IBM Plex Mono', monospace !default;
-$sans-serif-condensed: 'IBM Plex Sans Condensed', sans-serif;
+// $primary-color: #0066ce !default;
 
-$primary-color: #0066ce !default;
+$intro-transition  : none;
+$global-transition : none;
 
 
 @import "code_theme";
+@import "common";
 
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
@@ -54,4 +57,94 @@ $primary-color: #0066ce !default;
     font-size: 1rem;
     color: #999;
     font-weight: 600;
+}
+
+.cards {
+    display: flex;
+}
+
+.card {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    flex: 0 1 45%;
+    margin: 1rem;
+    padding: 1.5rem;
+
+    font-weight: normal;
+
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: -2px 2px 8px 0 rgba(0,0,0,.23);
+}
+.card:hover {
+    background: #fafafa;
+}
+
+.card .fad {
+    // --fa-primary-opacity: 1.0; 
+    // --fa-secondary-opacity: 1.00; 
+    --fa-primary-color: #{$primary-color}; 
+    --fa-secondary-color: #{$primary-color};
+}
+
+.card.primary {
+    background: $primary-color;
+    color: #fff;
+}
+
+.card.primary:hover {
+    background: $primary-color-dark;
+    color: #fff;
+}
+
+.card.red {
+    background: $red-400;
+    color: #fff;
+}
+
+.card.red:hover {
+    background: $red-700;
+    color: #fff;
+}
+
+
+.card.primary .fad, .card.red .fad {
+    --fa-primary-color: #fff;
+    --fa-secondary-color: #fff;
+}
+
+
+.page__content .card h2 {
+    font-size: $h2-font-size;
+    border: none;
+    margin-top: 1em;
+}
+
+.page__content a.btn {
+    width: 100%;
+    color: $body-color;
+    text-decoration: none;
+}
+
+.card .block {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 100%;
+    padding-left: 20px;
+}
+
+.block h2 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.card .navigation {
+    color: $primary-color;
+}
+
+
+.card.primary .navigation, .card.red .navigation {
+    color: #fff;
 }

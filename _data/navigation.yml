@@ -1,6 +1,4 @@
 main:
-  - title: "Guides"
-    url: /guides/
   - title: "Docs"
     url: /docs/
   - title: "GitHub"
@@ -23,6 +21,8 @@ docs:
       #   url: /docs/mathlive/#mathlive.module
       # - title: "MathField class"
       #   url: /docs/mathlive#mathlive.playReadAloud
+      - title: "Getting Started"
+        url: "/guides/getting-started/"
 
   # - title: "Compute Engine"
   #   children:

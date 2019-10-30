@@ -23,7 +23,7 @@ function makedoc(doc) {
 permalink: /docs/${escapeYAMLString(trimNewline(api.name))}
 title: ${escapeYAMLString(packageName)}
 read_time: false
-#toc: true
+# toc: true
 ---
 `
 

@@ -14,7 +14,7 @@
     "clean": "",
     "deploy": "",
     "test": "",
-    "server": "bash script/server"
+    "start": "bash script/server"
   },
   "engines": {
     "node": ">=8.0"
@@ -28,7 +28,7 @@
   "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
   "devDependencies": {},
   "dependencies": {
-    "mathlive": "^0.32.2",
+    "mathlive": "^0.32.3",
     "typedoc": "^0.15.0"
   }
 }

@@ -14,7 +14,21 @@ feature_row:
     btn_label: "Get Started"
     btn_class: "btn--primary"
 ---
-<div class="fa-4x">
+
+<section class="cards">
+
+<div class="card" >
+<a class="btn" href="/docs/mathlive">
+<i class="fa-4x fad fa-pencil"></i>
+<h2>Getting Started with MathLive</h2>
+<p>Render and edit mathematical formulas in your browser.</p>
+</a>
+</div>
+
+</section>
+
+
+<div class="fa-3x">
 
 <i class="fad fa-compass" style="--fa-primary-opacity: 1.0; --fa-secondary-opacity: 1.00; --fa-primary-color: #ce3333; --fa-secondary-color: #0066ce"></i>	
 

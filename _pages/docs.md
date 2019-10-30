@@ -5,19 +5,42 @@ read_time: false
 header:
   overlay_image: /assets/bg/black-on-white.jpg
   overlay_color: "#0066ce"
-feature_row:
-  - image_path: /assets/bg/blue-on-light.jpg
-    alt: "Mathlive"
-    title: "Mathlive"
-    excerpt: "The easiest way to edit math."
-    url: "/docs/mathlive"
-    btn_label: "API Reference"
-    btn_class: "btn--inverse"
 ---
 
-{% include feature_row type="center" %}
+# MathLive
+{:#mathlive}
 
+Render and edit mathematical formulas in your browser.
 
+<section class="cards">
+
+<a class="btn" href="/docs/mathlive">
+  <div class="card primary" >
+    <i class="fa-4x fad fa-pencil"></i>
+    <div class="block">
+      <h2>Mathlive API</h2>
+      <p>Reference documentation of the Mathlive API</p>
+    </div>
+    <i class="fa-3x fal fa-chevron-right navigation"></i>
+  </div>
+</a>
+
+</section>
+
+<section class="cards">
+
+<a class="btn" href="/docs/mathlive">
+  <div class="card" >
+    <i class="fa-4x fad fa-rocket"></i>
+    <div class="block">
+      <h2>Getting Started</h2>
+      <p>Get started.</p>
+    </div>
+    <i class="fa-3x fal fa-chevron-right navigation"></i>
+  </div>
+</a>
+
+</section>
 
 <!-- 
 ## Getting Started

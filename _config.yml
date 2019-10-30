@@ -133,6 +133,8 @@ include:
 keep_files:
   - CNAME
   - .nojekyll
+  - .git
+  - .svn
 exclude:
   - "*.sublime-project"
   - "*.sublime-workspace"
@@ -161,9 +163,6 @@ exclude:
   - tmp
   - script
   - /test # ignore Minimal Mistakes /test
-keep_files:
-  - .git
-  - .svn
 encoding: "utf-8"
 markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 
@@ -183,7 +182,7 @@ kramdown:
   auto_ids: false
   footnote_nr: 1
   entity_output: as_char
-  toc_levels: 1..6
+  toc_levels: 1..2
   enable_coderay: false
   smart_quotes: lsquo,rsquo,ldquo,rdquo
   # smart_quotes: ["apos", "apos", "quot", "quot"]
