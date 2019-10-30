@@ -4,7 +4,7 @@ main:
   - title: "Docs"
     url: /docs/
   - title: "GitHub"
-    url: https://github.com/cortexjs
+    url: https://github.com/cortex-js
 
 docs:
   # - title: "Getting Started"
@@ -19,6 +19,11 @@ docs:
       #   url: "/docs/mathfield-quick-start-guide"
       - title: "API Reference"
         url: /docs/mathlive/
+      # - title: "MathLive module"
+      #   url: /docs/mathlive/#mathlive.module
+      # - title: "MathField class"
+      #   url: /docs/mathlive#mathlive.playReadAloud
+
   # - title: "Compute Engine"
   #   children:
   #     - title: "Quick-Start Guide"

@@ -10,10 +10,11 @@
   "keywords": [],
   "main": "root/index.html",
   "scripts": {
-    "build": "typedoc --mode modules --includeDeclarations --excludeExternals --excludePrivate --excludeProtected --hideGenerator --readme none --json _data/mathfield.json node_modules/mathlive/dist/mathlive.d.ts && node script/makedoc.js _data/mathfield.json",
+    "build": "bash script/build",
     "clean": "",
     "deploy": "",
-    "test": ""
+    "test": "",
+    "server": "bash script/server"
   },
   "engines": {
     "node": ">=8.0"

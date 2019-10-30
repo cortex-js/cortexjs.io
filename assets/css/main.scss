@@ -8,6 +8,9 @@ $sans-serif: 'IBM Plex Sans', sans-serif !default;
 $monospace: 'Fira Code', 'IBM Plex Mono', monospace !default;
 $sans-serif-condensed: 'IBM Plex Sans Condensed', sans-serif;
 
+$primary-color: #0066ce !default;
+
+
 @import "code_theme";
 
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin

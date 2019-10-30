@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# script/cibuild: Setup environment for CI to run tests. This is primarily
+#                 designed to run on the continuous integration server.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "Building started at…"
+date "+%H:%M:%S"
+
+# GC customizations
+export RUBY_GC_MALLOC_LIMIT=79000000
+export RUBY_HEAP_MIN_SLOTS=800000
+export RUBY_HEAP_FREE_MIN=100000
+export RUBY_HEAP_SLOTS_INCREMENT=400000
+export RUBY_HEAP_SLOTS_GROWTH_FACTOR=1
+
+# setup environment
+RAILS_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
+export RAILS_ROOT
+export RAILS_ENV="test"
+export RACK_ROOT="$RAILS_ROOT"
+export RACK_ENV="$RAILS_ENV"
+
+test -d "/usr/share/rbenv/shims" && {
+  export PATH=/usr/share/rbenv/shims:$PATH
+}
+export RBENV_VERSION="2.1.6"
+
+export PATH="$RACK_ROOT/bin:$PATH"
+
+# make build
+
+## Preprocess
+## Typedoc doesn't handle optional parameters in JSDOC, so strip them
+## See https://github.com/TypeStrong/typedoc/issues/567
+
+sed -i node_modules/mathlive/dist/mathlive.d.ts -E -e 's/@param(.*)\[([^=]+)=(.+)\]/@param\1\2/g'   
+sed -i node_modules/mathlive/dist/mathlive.d.ts -E -e 's/@param(.*)\[(.+)\]/@param\1\2/g'   
+
+## Typedoc (.d.ts -> .json)
+npx typedoc --mode modules --includeDeclarations --excludeExternals --excludePrivate --excludeProtected --hideGenerator --readme none --json _data/mathfield.json node_modules/mathlive/dist/mathlive.d.ts
+
+## Makedoc (.json -> .md)
+./script/makedoc _data/mathfield.json
+
+## Build (.md -> .html)
+bundle exec jekyll build
+
+# Add the .nojekyll file to prevent GH Pages from processing the content
+touch _site/.nojekyll
+
+# Add CNAME file
+echo "cortexjs.io" >_site/CNAME
+
+

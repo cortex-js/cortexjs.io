@@ -55,6 +55,9 @@ from the TypeScript `.d.ts` files with .
 The build process uses the `typedoc` tool to parse the API header files and 
 output a `json` files in `_data/mathfield.json`.
 
+**Note:** To debug the converter, use the VSCode debugger. Select Debug > 
+Start Debugging to start a debugging session right in VSCode.
+
 The script then converts the `json` file into markdown in the `docs` folder,
 which can then be processed by Jekyll with `script/cibuild` or `script/server`.
 
@@ -68,6 +71,9 @@ The API documentation should follow the Google Documentation Style Guide
 (https://developers.google.com/style/api-reference-comments)
  and https://developers.google.com/style
  
+In addition, the Typescript code should follow the Google Style Guide:
+https://google.github.io/styleguide/jsguide.html#naming
+
 ## Setup and scripts
 
 Run 

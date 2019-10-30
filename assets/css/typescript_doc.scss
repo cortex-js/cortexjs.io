@@ -73,6 +73,10 @@ h3 {
     border-bottom: 1px solid #e7e7e7
 }
 
+h4 {
+    font-size: $h4-font-size;
+}
+
 /* Categories */
 .tsd-index-list h3 {
     font-family: $sans-serif;
@@ -110,7 +114,7 @@ body.layout--typescript_doc .page__content dd ul {
 
 body.layout--typescript_doc .page__content p,
 body.layout--typescript_doc .page__content li {
-    font-size: $body-font-size;
+    font-size: $body-font-size !important;
     line-height: 1.52;
 
     margin-top: 1em;
@@ -119,7 +123,8 @@ body.layout--typescript_doc .page__content li {
 }
 
 a, a:visited, a:hover {
-    color: $body-color;
+    color: $primary;
+    text-decoration: none;
 }
 
 body.layout--typescript_doc .page__content dt {
@@ -140,6 +145,8 @@ body.layout--typescript_doc .page__content dt em {
 body.layout--typescript_doc .page__content dd {
     font-size: $body-font-size;
     color: $body-color;
+
+    margin-bottom: 20px;
 }
 
 body.layout--typescript_doc table {
@@ -156,6 +163,7 @@ dd div.highlight {
 
 
 .card {
+    font-size: $body-font-size;
 	margin-top: 30px;
 	margin-bottom: 40px;
 	overflow: hidden;
@@ -183,7 +191,7 @@ ul.tsd-index-list  {
 
 body.layout--typescript_doc  .tsd-index-list li {
     font-family: $monospace;
-    font-size: $code-font-size;
+    font-size: $code-font-size !important;
     margin: 0;
     box-sizing: content-box;
     break-inside: avoid-column;
@@ -280,9 +288,15 @@ div.highlighter-rouge, figure.highlight {
     border-radius: 8px;
 }
 
-p>code, a>code, li>code, figcaption>code, td>code {
+p>code, a>code, li>code, figcaption>code, td>code, dd>code{
     font-size: $code-font-size;
     border: 1px solid #ddd;
+    background: #fefefe;
+    border-radius: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    padding-top: 2px;
 }
 
 

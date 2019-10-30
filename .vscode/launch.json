@@ -7,8 +7,10 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${file}",
+            "name": "Launch makedoc mathfield",
+            "program": "${workspaceFolder}/script/makedoc.js",
+            "args": ["_data/mathfield.json"],
+            "cwd": "${workspaceFolder}",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]

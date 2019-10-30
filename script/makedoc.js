@@ -15,7 +15,7 @@ function makedoc(doc) {
   
         const packages = api.groups.filter(x => x.kind === 1);
         const mainPackage = packages && packages[0] && packages[0].children[0] && getReflectionByID(api, packages[0].children[0]);
-        const mainPackagedocumentation = mainPackage && getTag(mainPackage.comment.tags, 'packagedocumentation');
+        const mainPackagedocumentation = mainPackage && mainPackage.comment && getTag(mainPackage.comment.tags, 'packagedocumentation');
         const packageName = (mainPackagedocumentation && mainPackagedocumentation.text) || api.name;
 
         let result = 
@@ -23,6 +23,7 @@ function makedoc(doc) {
 permalink: /docs/${escapeYAMLString(trimNewline(api.name))}
 title: ${escapeYAMLString(packageName)}
 read_time: false
+#toc: true
 ---
 `
 
@@ -263,7 +264,8 @@ function renderFunction(json, parent) {
 }
 
 function renderClass(json) {
-    let result = '\n## _Class_ **' + json.name + '**';
+    let result = '\n<h2 id="' + encodeURIComponent('class:' + json.name) + '" markdown="1">';
+    result += '_Class_ **' + json.name + '**</h2>';
     // json.comment.tags: properties of the class
     // json.children (kind === 1024): properties
 
@@ -327,7 +329,10 @@ function getCategories(json, kind) {
     let result = [];
     let children = json.groups && json.groups.filter(x => x.kind === kind);
     if (!children || children.length !== 1) {
-        // No groups, return the children of the specified kind.
+        // No groups. Are there categories?
+        if (json.categories) {
+            return sortOtherCategoryAtEnd(json.categories);
+        }
         return json.children.filter(x => x.kind === kind);
     }
     if (children[0].categories) {
@@ -373,7 +378,8 @@ function renderTypeAliases(json) {
 }
 
 function renderModule(json) {
-    let result = '\n## _Module_ **' + trimQuotes(json.name) + '**\n';
+     let result = '\n<h2 id="' + encodeURIComponent('module:' + trimQuotes(json.name)) + '" markdown="1">';
+    result += '_Module_ **' + trimQuotes(json.name) + '**</h2>\n';
 
     result += renderComment(json.comment) + '\n';
 
@@ -426,11 +432,29 @@ function renderGroup(group, parent) {
             break;
 
         case 64:        // Functions
-            result += '\n## ' + (parent ? `_module ${parent}_ ` : '_Global_ ');
-            result += 'Functions \n';
-            const children = group.children.map(x => getReflectionByID(api, x));
-            result += renderIndex(children, parent) + '\n{:.tsd-index-list}\n';
-            result += children.map(x => renderFunction(x, parent)).join(''); 
+            result += '\n<h2 id="' + encodeURIComponent('functions:' + (parent || 'global')) + '" markdown="1">';
+            result += parent ? `_module ${parent}_ ` : '_Global_ ';
+            result += 'Functions</h2>';
+            const categories = getCategories(group, 64);
+
+            result += '\n<section class="tsd-index-list" markdown="1">';
+            result += categories.map(category => {
+                const children = category.children.map(x => getReflectionByID(api, x));
+                return '\n\n### ' + category.title + '\n\n' + 
+                    renderIndex(children, parent);
+            }).filter(x => !!x).join('\n');
+            result += '\n</section>\n';
+
+            result += categories.map(category => {
+                let r = '';
+                if (category.title) r += `\n## ${category.title} \n{:.category-title}`;
+                const children = category.children.map(x => getReflectionByID(api, x));
+                r += children.map(x => renderFunction(x, parent)).filter(x => !!x).join('\n');
+                return r;
+            }).join('');
+
+
+            // result += children.map(x => renderFunction(x, parent)).join(''); 
             break;
 
         case 128:       // Classes
@@ -455,8 +479,9 @@ function renderGroup(group, parent) {
 
 
         case 4194304:   // Type Aliases
-            result += '\n## ' + (parent ? `_module ${parent}_ ` : '_Global_ ');
-            result += 'Types \n';
+            result += '\n<h2 id="' + encodeURIComponent('typealias:' + (parent || 'global')) + '" markdown="1">';
+            result += parent ? `_module ${parent}_ ` : '_Global_ ';
+            result += 'Types</h2>\n';
             result += group.children.map(x => renderTypeAliases(getReflectionByID(api, x))).join(''); 
             break;
         
