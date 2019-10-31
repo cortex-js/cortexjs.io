@@ -4,8 +4,6 @@ set -e  # exit immediately on error
 
 cd "$(dirname "$0")/.."
 
-echo "Building started at" `date "+%H:%M:%S"`
-
 # GC customizations
 export RUBY_GC_MALLOC_LIMIT=79000000
 export RUBY_HEAP_MIN_SLOTS=800000
@@ -32,4 +30,4 @@ npx typedoc --mode modules --includeDeclarations --excludeExternals --excludePri
 ./script/makedoc _data/mathfield.json
 
 ## Build (.md -> .html)
-bundle exec jekyll build
+bundle exec jekyll build -q

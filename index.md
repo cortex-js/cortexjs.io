@@ -53,7 +53,15 @@ feature_visual:
   - image_path: /assets/bg/blue-red-on-light.jpg
     # alt: "placeholder image 2"
     title: "Visual"
-    excerpt: '**Coming Soon**'
+    excerpt: 'Data visualization toolbox<br>**Coming Soon**'
+    # url: "visual"
+    btn_label: "Read More"
+    btn_class: "btn--inverse"
+feature_math-json:
+  - image_path: /assets/bg/blue-on-pink.jpg
+    # alt: "placeholder image 2"
+    title: "MathJSON"
+    excerpt: 'A web-friendly format for formulas<br>**Coming Soon**'
     # url: "visual"
     btn_label: "Read More"
     btn_class: "btn--inverse"
@@ -66,3 +74,4 @@ feature_visual:
 
 {% include feature_row id="feature_visual" type="left" %}
 
+{% include feature_row id="feature_math-json" type="right" %}

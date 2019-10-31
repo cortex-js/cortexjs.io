@@ -20,7 +20,8 @@ if ! test -f "./_site/CNAME"; then
     exit 1
 fi
 
-
+# Push the content of the _site directory, which is mapped to 
+# cortex-js.github.io as a submodule.
 cd "_site"
 git add .
 git commit -a -m "`date +\"%Y-%m-%d\"`"

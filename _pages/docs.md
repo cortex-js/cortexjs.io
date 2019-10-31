@@ -7,12 +7,10 @@ header:
   overlay_color: "#0066ce"
 ---
 
-# MathLive
-{:#mathlive}
+<section class="cards single-column">
+<h1 class="hero xl">MathLive</h1>
 
-Render and edit mathematical formulas in your browser.
-
-<section class="cards">
+<p>Render and edit mathematical formulas in your browser.</p>
 
 <a class="btn" href="/docs/mathlive">
   <div class="card primary" >
@@ -34,7 +32,7 @@ Render and edit mathematical formulas in your browser.
     <i class="fa-4x fad fa-rocket"></i>
     <div class="block">
       <h2>Getting Started</h2>
-      <p>Get started.</p>
+      <p>Everything you need to know to add a mathfield to your project.</p>
     </div>
     <i class="fa-3x fal fa-chevron-right navigation"></i>
   </div>

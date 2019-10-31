@@ -29,8 +29,6 @@ else
   script/update
 fi
 
-echo "Running tests…"
-
 # **NOTE**: If getting an error while attempting
 # to run htmlproofer on Windows, you may need to manually
 # install the libcurl library.
