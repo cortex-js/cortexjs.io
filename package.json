@@ -10,12 +10,13 @@
   "keywords": [],
   "main": "root/index.html",
   "scripts": {
-    "build": "bash script/build",
-    "clean": "bash script/clean",
-    "deploy": "bash script/deploy",
-    "stage": "bash script/stage",
-    "start": "bash script/server",
-    "test": "bash script/test"
+    "build": "bash scripts/build",
+    "clean": "bash scripts/clean",
+    "deploy": "bash scripts/deploy",
+    "restart": "bash scripts/restart",
+    "stage": "bash scripts/stage",
+    "start": "bash scripts/server",
+    "test": "bash scripts/test"
   },
   "engines": {
     "node": ">=8.0"

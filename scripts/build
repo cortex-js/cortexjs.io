@@ -1,8 +1,15 @@
 #!/bin/bash
 
 set -e  # exit immediately on error
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+# set -x    # for debuging, trace what is being executed.
 
 cd "$(dirname "$0")/.."
+
+# Remove the CNAME file, which is used
+# to indicate if this is a production or development build
+[ -f "_site/CNAME" ] && rm "_site/CNAME"
 
 # GC customizations
 export RUBY_GC_MALLOC_LIMIT=79000000
@@ -11,23 +18,22 @@ export RUBY_HEAP_FREE_MIN=100000
 export RUBY_HEAP_SLOTS_INCREMENT=400000
 export RUBY_HEAP_SLOTS_GROWTH_FACTOR=1
 
-# make build
-
 ## Preprocess
-## Typedoc doesn't handle optional parameters in JSDOC, so strip them
-## See https://github.com/TypeStrong/typedoc/issues/567
+
+# Typedoc doesn't handle optional parameters in JSDOC, so strip them
+# See https://github.com/TypeStrong/typedoc/issues/567
 
 # **NOTE**: the .d.ts file is modified in place. Would be better to use pipelining
 # or perhaps the <() bash operator.
 
-sed -i node_modules/mathlive/dist/mathlive.d.ts -E -e 's/@param(.*)\[([^=]+)=(.+)\]/@param\1\2/g'   
-sed -i node_modules/mathlive/dist/mathlive.d.ts -E -e 's/@param(.*)\[(.+)\]/@param\1\2/g'   
+sed -i -r 's/@param\(.*\)\[\([^=]+\)=\(.+\)\]/@param\1\2/g' node_modules/mathlive/dist/mathlive.d.ts
+sed -i -r 's/@param\(.*\)\[\(.+\)\]/@param\1\2/g' node_modules/mathlive/dist/mathlive.d.ts   
 
 ## Typedoc (.d.ts -> .json)
 npx typedoc --mode modules --includeDeclarations --excludeExternals --excludePrivate --excludeProtected --hideGenerator --readme none --json _data/mathfield.json node_modules/mathlive/dist/mathlive.d.ts
 
 ## Makedoc (.json -> .md)
-./script/makedoc _data/mathfield.json
+./scripts/makedoc _data/mathfield.json
 
 ## Build (.md -> .html)
 bundle exec jekyll build -q

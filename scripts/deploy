@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e  # exit immediately on error
 set -o nounset   # abort on unbound variable
 set -o pipefail  # don't hide errors within pipes
@@ -14,11 +16,11 @@ if [ ! -d "_site" ]; then
     exit 1
 fi
 
-
-if ! test -f "./_site/CNAME"; then
+if [ ! -f "./_site/CNAME" ]; then
     echo "Execute \"npm run stage\" first"
     exit 1
 fi
+
 
 # Push the content of the _site directory, which is mapped to 
 # cortex-js.github.io as a submodule.

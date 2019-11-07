@@ -1,19 +1,23 @@
+[![Gitter](https://badges.gitter.im/cortex-js/community.svg)](https://gitter.im/cortex-js/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 ## TL;DR
 
 ### To update docs after a new release
 ```shell
 npm update          
 # This will pick-up changes in the dependent modules
-npm run build
 npm run server
 ```
 
 ### To stage and deploy an update
 ```shell
 npm run stage       
-# output goes inside _site
+# Output goes inside _site/ directory. 
+npm run restart
+# Validate that everything works well in the browser then...
 npm run deploy
 # _site (a git submodule) gets pushed to cortex-js.github.io
+# The updated site is now deployed at cortexjs.io
 ```
 
 
@@ -67,7 +71,7 @@ output a `json` files in `_data/mathfield.json`.
 Start Debugging to start a debugging session right in VSCode.
 
 The `makdeoc` script then converts the `json` file into markdown in the `docs` folder,
-which can then be processed by Jekyll with `script/cibuild` or `script/server`.
+which can then be processed by Jekyll with `scripts/cibuild` or `scripts/server`.
 
 The CSS styling information is defined in `_sass/typescript_doc.scss`.
 
@@ -86,12 +90,12 @@ The project follows the [GitHub standard](https://github.com/github/scripts-to-r
 Run 
 
 ```shell
-script/bootstrap
+scripts/bootstrap
 ```
 
 On Windows (using PowerShell 7):
 ```shell
-bash script/bootstrap
+bash scripts/bootstrap
 ```
 
 If getting network timeout errors:
@@ -102,12 +106,12 @@ bundle install
 
 To do a local build:
 ```shell
-script/server
+scripts/server
 ```
 
 To do a build ready to be staged:
 ```shell
-script/stage
+scripts/stage
 ```
 
 ### Test
