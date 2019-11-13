@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e  # exit immediately on error
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+# set -x    # for debuging, trace what is being executed.
 
 cd "$(dirname "$0")/.."
 
@@ -10,8 +13,8 @@ git submodule update --init --recursive
 
 # Make a build
 
-./script/build
-./script/test
+./scripts/build
+./scripts/test
 
 # Add the .nojekyll file to prevent GH Pages from processing the content
 touch submodules/cortex-js.github.io/.nojekyll

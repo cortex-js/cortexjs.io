@@ -14,6 +14,7 @@
         "clean": "bash script/clean",
         "deploy": "bash script/deploy",
         "lint": "prettier --ignore-path ./.prettierignore --write \"**/*.{ts,js,css,md,yml,json}\" \"!vendor/**\"",
+        "restart": "bash scripts/restart",
         "stage": "bash script/stage",
         "start": "bash script/server",
         "test": "bash script/test"

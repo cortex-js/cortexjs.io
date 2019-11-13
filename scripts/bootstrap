@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
-# script/bootstrap: Resolve all dependencies that the application requires to
-#                   run.
+# scripts/bootstrap: 
+# Resolve all dependencies that the application requires to run.
 
 set -e
 
@@ -14,6 +14,7 @@ if [ -f "Brewfile" ] && [ "$(uname -s)" = "Darwin" ]; then
 fi
 
 if [ -f ".ruby-version" ] && [ -z "$(rbenv version-name 2>/dev/null)" ]; then
+  # curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-installer | bash
   rbenv install --skip-existing
   which bundle >/dev/null 2>&1  || {
     gem install bundler
@@ -25,4 +26,8 @@ if [ -f "Gemfile" ]; then
   bundle check --path vendor/gems >/dev/null 2>&1  || {
     bundle install --path vendor/gems --quiet --without production
   }
+fi
+
+if [ ! -d node_modules ]; then
+  npm run install
 fi

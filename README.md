@@ -1,3 +1,5 @@
+[![Gitter](https://badges.gitter.im/cortex-js/community.svg)](https://gitter.im/cortex-js/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 This repo contains the source files for the "cortexjs.io" website.
 
 ## TL;DR
@@ -17,6 +19,8 @@ npm start
 ```shell
 npm run stage
 # output goes inside submodules/cortex-js.github.io
+npm run restart
+# Validate that everything works well in the browser then...
 npm run deploy
 # submodules/cortex-js.github.io (a git submodule) gets pushed to cortex-js.github.io
 ```
@@ -89,13 +93,13 @@ The project follows the [GitHub standard](https://github.com/github/scripts-to-r
 Run
 
 ```shell
-script/bootstrap
+scripts/bootstrap
 ```
 
 On Windows (using PowerShell 7):
 
 ```shell
-bash script/bootstrap
+bash scripts/bootstrap
 ```
 
 If getting network timeout errors:
@@ -108,13 +112,13 @@ bundle install
 To do a local build:
 
 ```shell
-script/server
+scripts/server
 ```
 
 To do a build ready to be staged:
 
 ```shell
-script/stage
+scripts/stage
 ```
 
 ### Test

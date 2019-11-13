@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e  # exit immediately on error
 set -o nounset   # abort on unbound variable
 set -o pipefail  # don't hide errors within pipes
@@ -14,8 +16,7 @@ if [ ! -d "submodules/cortex-js.github.io" ]; then
     exit 1
 fi
 
-
-if ! test -f "./submodules/cortex-js.github.io/CNAME"; then
+if [ ! -f "./submodules/cortex-js.github.io/CNAME" ]; then
     echo "Execute \"npm run stage\" first"
     exit 1
 fi
