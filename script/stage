@@ -4,7 +4,7 @@ set -e  # exit immediately on error
 
 cd "$(dirname "$0")/.."
 
-# Get the latest submodule (_site)
+# Get the latest submodule (submodules/cortex-js.github.io)
 git submodule sync --recursive
 git submodule update --init --recursive
 
@@ -14,8 +14,8 @@ git submodule update --init --recursive
 ./script/test
 
 # Add the .nojekyll file to prevent GH Pages from processing the content
-touch _site/.nojekyll
+touch submodules/cortex-js.github.io/.nojekyll
 
 # Add CNAME file
-echo "cortexjs.io" >_site/CNAME
+printf "cortexjs.io" >submodules/cortex-js.github.io/CNAME
 

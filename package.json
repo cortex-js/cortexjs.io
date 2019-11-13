@@ -1,35 +1,53 @@
 {
-  "name": "cortexjs.io",
-  "version": "1.0.0",
-  "description": "cortexjs.io website source",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cortex-js/cortexjs.io.git"
-  },
-  "keywords": [],
-  "main": "root/index.html",
-  "scripts": {
-    "build": "bash script/build",
-    "clean": "bash script/clean",
-    "deploy": "bash script/deploy",
-    "stage": "bash script/stage",
-    "start": "bash script/server",
-    "test": "bash script/test"
-  },
-  "engines": {
-    "node": ">=8.0"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
-  ],
-  "author": "Arno Gourdol <arno@arno.org>",
-  "contributors": [],
-  "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
-  "devDependencies": {},
-  "dependencies": {
-    "mathlive": "^0.32.3",
-    "typedoc": "^0.15.0"
-  }
+    "name": "cortexjs.io",
+    "version": "1.0.0",
+    "description": "cortexjs.io website source",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cortex-js/cortexjs.io.git"
+    },
+    "keywords": [],
+    "main": "root/index.html",
+    "scripts": {
+        "build": "bash script/build",
+        "clean": "bash script/clean",
+        "deploy": "bash script/deploy",
+        "lint": "prettier --ignore-path ./.prettierignore --write \"**/*.{ts,js,css,md,yml,json}\" \"!vendor/**\"",
+        "stage": "bash script/stage",
+        "start": "bash script/server",
+        "test": "bash script/test"
+    },
+    "engines": {
+        "node": ">=8.0"
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions"
+    ],
+    "author": "Arno Gourdol <arno@arno.org>",
+    "contributors": [],
+    "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
+    "devDependencies": {
+        "@cortex-js/prettier-config": "^1.0.0",
+        "husky": "^3.0.9",
+        "lint-staged": "^9.4.3",
+        "prettier": "^1.19.1"
+    },
+    "dependencies": {
+        "mathlive": "^0.32.3",
+        "typedoc": "^0.15.0"
+    },
+    "prettier": "@cortex-js/prettier-config",
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,css,json,md}": [
+            "prettier --write",
+            "git add"
+        ]
+    }
 }

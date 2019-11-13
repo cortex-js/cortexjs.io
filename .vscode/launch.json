@@ -11,9 +11,7 @@
             "program": "${workspaceFolder}/script/makedoc.js",
             "args": ["_data/mathfield.json"],
             "cwd": "${workspaceFolder}",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ]
+            "outFiles": ["${workspaceFolder}/**/*.js"]
         }
     ]
 }

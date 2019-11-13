@@ -7,6 +7,6 @@ set -o pipefail  # don't hide errors within pipes
 
 cd "$(dirname "$0")/.."
 
-rm -rf "./_site"
+rm -rf "./submodules/cortex-js.github.io"
 rm -rf "./.jekyll-cache"
-rm -rf "./docs"
+rm -rf "./api-docs"

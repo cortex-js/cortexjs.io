@@ -38,7 +38,7 @@ fi
 # 4. Rename it to libcurl.dll
 
 # Options for htmlproofer: https://github.com/gjtorikian/html-proofer
-bundle exec htmlproofer ./_site \
+bundle exec htmlproofer ./submodules/cortex-js.github.io \
   --assume_extension \
   --allow-hash-href \
   --only_4xx \
