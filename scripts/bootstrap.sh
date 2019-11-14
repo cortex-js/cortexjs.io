@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# scripts/bootstrap: 
-# Resolve all dependencies that the application requires to run.
+# scripts/bootstrap.sh 
+# Resolve all dependencies that the project requires to run.
 
 set -e
 
@@ -17,18 +17,21 @@ fi
 # If Ruby is required, 
 if [ -f ".ruby-version" ]; then
   # Check if "rbenv" is installed, if not install it with brew
-  if [! "$(hash rbenv 2>/dev/null)" && "$(hash brew 2>/dev/null)"]; then
+  if [[ -z "$(hash rbenv 2>/dev/null)" && -n "$(hash brew 2>/dev/null)" ]]
+  then
+    # rbenv is not installed, but brew is. Use brew to install rbenv
     brew update
     brew install rbenv --without-ruby-build
   fi
 
-  if [[ "$(hash rbenv 2>/dev/null)" && "$(rbenv version-name 2>/dev/null)" ]]; then
+  if [[ -n "$(hash rbenv 2>/dev/null)" && -z "$(rbenv version-name 2>/dev/null)" ]]; then
     rbenv install --skip-existing
     which bundle >/dev/null 2>&1  || {
       gem install bundler
       rbenv rehash
     }
-  elif [ -n "$(ruby -v 2>/dev/null)"]; then
+  elif [ -z "$(ruby -v 2>/dev/null)" ]
+  then
     echo "Ruby is not installed. See https://rubyinstaller.org/downloads/"
     exit 1;
   fi

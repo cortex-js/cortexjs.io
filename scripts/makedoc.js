@@ -1,6 +1,9 @@
+// Converts a JSON file describing Typescript types into a Markdown file
+
 const argv = process.argv.slice(2);
 // @todo: use yargs for argument parsing...
 const fs = require('fs');
+const path = require('path');
 
 const default_language = 'typescript';
 let api = {};
@@ -8,7 +11,6 @@ let api = {};
 argv.forEach(makedoc);
 
 function makedoc(doc) {
-    console.log('Making doc from ' + doc);
     try {
         api = JSON.parse(fs.readFileSync(doc));
 
@@ -50,8 +52,12 @@ read_time: false
 
         if (!fs.existsSync('api-docs')) fs.mkdirSync('api-docs');
 
-        fs.writeFileSync(`api-docs/${api.name}.md`, result);
-        console.log(`Markdown file created at api-docs/${api.name}.md`);
+        const outputFile = path.format({
+            dir: path.dirname(doc),
+            name: api.name,
+            ext: '.md',
+        });
+        fs.writeFileSync(outputFile, result);
     } catch (err) {
         console.log(err);
     }

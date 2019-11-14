@@ -7,6 +7,9 @@ set -o pipefail  # don't hide errors within pipes
 
 cd "$(dirname "$0")/.."
 
+# Read the first argument, set it to "dev" if not set
+ENVIRONMENT="${1-dev}"
+
 # Remove the CNAME file, which is used
 # to indicate if this is a production or development build
 [ -f "./submodules/cortex-js.github.io/CNAME" ] && rm "./submodules/cortex-js.github.io/CNAME"
@@ -29,11 +32,24 @@ npx typedoc --mode modules \
     --excludeProtected \
     --hideGenerator \
     --readme none \
-    --json _data/mathfield.json \
+    --json api-docs/_mathfield.json \
     node_modules/mathlive/dist/mathlive.proc.d.ts
 
 ## Makedoc (.json -> .md)
-./scripts/makedoc _data/mathfield.json
+./scripts/makedoc.sh api-docs/_mathfield.json
 
 ## Build (.md -> .html)
 bundle exec jekyll build -q
+
+if [ "$ENVIRONMENT" == "production" ]
+then
+    echo "Making a prod build"
+    sync
+    npx html-minifier-terser \
+        --config-file "./config/html-minifier.json" \
+        --file-ext html \
+        --input-dir "./submodules/cortex-js.github.io/" \
+        --output-dir "./submodules/cortex-js.github.io/"
+    postcss --config "./config" --replace "./submodules/cortex-js.github.io/**/*.css"
+
+fi

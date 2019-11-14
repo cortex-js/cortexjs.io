@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Launch makedoc mathfield",
             "program": "${workspaceFolder}/script/makedoc.js",
-            "args": ["_data/mathfield.json"],
+            "args": ["api-docs/_mathfield.json"],
             "cwd": "${workspaceFolder}",
             "outFiles": ["${workspaceFolder}/**/*.js"]
         }

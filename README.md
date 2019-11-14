@@ -1,31 +1,42 @@
 [![Gitter](https://badges.gitter.im/cortex-js/community.svg)](https://gitter.im/cortex-js/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+![Maintenance](https://img.shields.io/maintenance/yes/2019)
 
 This repo contains the source files for the "cortexjs.io" website.
 
-## TL;DR
+# TL;DR
 
-### To update docs after a new release
+## First time after cloning the project or after making some source changes
 
-```shell
-# Pick-up changes in the dependent modules
-npm update
-# Generate .md files for API
-npm run build
+```bash
+# Setup, make a dev build and start a server
 npm start
 ```
 
-### To stage and deploy an update
+## To update the documentation after a new release
 
-```shell
+```bash
+# Pick-up changes in the dependent modules
+npm run update
+
+# Generate .md files for API and launch local server
+npm start
+```
+
+## To stage and deploy an update
+
+```bash
 npm run stage
-# output goes inside submodules/cortex-js.github.io
+# Make a clean production build.
+# Output goes inside submodules/cortex-js.github.io
+
 npm run restart
 # Validate that everything works well in the browser then...
+
 npm run deploy
 # submodules/cortex-js.github.io (a git submodule) gets pushed to cortex-js.github.io
 ```
 
-## Architecture
+# Architecture
 
 The site is published using GitHub Pages. The main benefit of using GH Pages
 is the workflow integration (pubshing to GH triggers an automatic update of the
@@ -63,13 +74,13 @@ In addition, the DNS entries for `cortexjs.io` must include the following:
     -   185.199.110.153
     -   185.199.111.153
 
-## Content
+# Content
 
 The `npm run build` command generates the documentation for the APIs
 from the TypeScript `.d.ts` file.
 
 The build process uses the `typedoc` tool to parse the API header files and
-output a `json` files in `_data/mathfield.json`.
+output a `json` files in `api-docs/_mathfield.json`.
 
 **Note:** To debug the converter, use the VSCode debugger. Select Debug >
 Start Debugging to start a debugging session right in VSCode.
@@ -90,38 +101,26 @@ https://google.github.io/styleguide/jsguide.html#naming
 
 The project follows the [GitHub standard](https://github.com/github/scripts-to-rule-them-all) for naming project scripts.
 
-Run
-
-```shell
-scripts/bootstrap
-```
-
-On Windows (using PowerShell 7):
-
-```shell
-bash scripts/bootstrap
-```
-
-If getting network timeout errors:
-
-```shell
-gem install "jekyll" "minimal-mistakes-jekyll"  "jekyll-feed" "jekyll-include-cache"
-bundle install
-```
-
 To do a local build:
 
-```shell
-scripts/server
+```bash
+npm start
 ```
 
 To do a build ready to be staged:
 
-```shell
-scripts/stage
+```bash
+npm run stage
 ```
 
-### Test
+If getting network timeout errors:
+
+```bash
+gem install "jekyll" "minimal-mistakes-jekyll"  "jekyll-feed" "jekyll-include-cache"
+bundle install
+```
+
+## Test
 
 The "testing" of the generated site consist of checking links, and that the
 generated HTML is valid, using the `html-proofer` gem.
@@ -181,13 +180,8 @@ gem "github-pages", group: :jekyll_plugins
 
 # TODO
 
--   Add a CI/CD for the documentation. See https://jekyllrb.com/docs/continuous-integration/travis-ci/
--   use htmlproofer gem link checking
-
-```
-
-- https://trianglify.io/p/w:1440!h:900!x:Blues!v:0.99!c:0.05!s:gluuoa
-- https://trianglify.io/p/w:1440!h:900!x:random!v:0.99!c:0.06!s:gluuoa
+-   https://trianglify.io/p/w:1440!h:900!x:Blues!v:0.99!c:0.05!s:gluuoa
+-   https://trianglify.io/p/w:1440!h:900!x:random!v:0.99!c:0.06!s:gluuoa
 
 ## Splash Page Copy
 
@@ -208,4 +202,3 @@ Scientific Computing. Understand and solve complex problems.
 Numerical analysis, modeling,
 
 Informatics & Data Science.
-```

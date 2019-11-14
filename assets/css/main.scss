@@ -222,6 +222,15 @@ a .card:hover {
     color: #fff;
 }
 
+.card.primary .fad,
+.card.primary svg[data-prefix='fad'] {
+    // --fa-primary-opacity: 1.0;
+    // --fa-secondary-opacity: 1.00;
+    color: #fff;
+    --fa-primary-color: #fff;
+    --fa-secondary-color: #fff;
+}
+
 a .card.primary:hover {
     background: $primary-color-dark;
     color: #fff;

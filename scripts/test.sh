@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# scripts/test: Run test suite for application. Optionally pass in a path to an
-#              individual test file to run a single test.
+# scripts/test.sh
+# Run test suite for application. Optionally pass in a path to an
+# individual test file to run a single test.
 
 
 set -e
@@ -17,7 +18,7 @@ if [ "$RAILS_ENV" = "test" ] || [ "$RACK_ENV" = "test" ]; then
   # if executed and the environment is already set to `test`, then we want a
   # clean from scratch application. This almost always means a ci environment,
   # since we set the environment to `test` directly in `scripts/cibuild`.
-  scripts/setup
+  scripts/setup.sh
 else
   # if the environment isn't set to `test`, set it to `test` and update the
   # application to ensure all dependencies are met as well as any other things
@@ -26,7 +27,7 @@ else
   # own from a `development` environment.
   export RAILS_ENV="test" RACK_ENV="test"
 
-  scripts/update
+  scripts/update.sh
 fi
 
 # **NOTE**: If getting an error while attempting
@@ -43,7 +44,8 @@ bundle exec htmlproofer ./submodules/cortex-js.github.io \
   --allow-hash-href \
   --only_4xx \
   --check_html \
-  --url-ignore "#" \
+  --url-ignore "/*/" \
+  --checks_to_ignore \
   --directory_index_file index.html \
   --internal-domains localhost:4000 \
   --assume-extension \

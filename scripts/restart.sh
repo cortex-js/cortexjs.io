@@ -1,14 +1,11 @@
 #!/bin/bash
 
-# scripts/restart 
+# scripts/restart.sh
 # Restart the server, without doing a build
 
 set -e
 
 cd "$(dirname "$0")/.."
-
-test -z "$RACK_ENV" &&
-  RACK_ENV='development'
 
 # boot the app and any other necessary processes.
 # foreman start -p 9393
