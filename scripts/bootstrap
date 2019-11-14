@@ -7,27 +7,41 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+# If some Homebrew packages are requied, install them (on macOS)
 if [ -f "Brewfile" ] && [ "$(uname -s)" = "Darwin" ]; then
   brew bundle check >/dev/null 2>&1  || {
     brew bundle
   }
 fi
 
-if [ -f ".ruby-version" ] && [ -z "$(rbenv version-name 2>/dev/null)" ]; then
-  # curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-installer | bash
-  rbenv install --skip-existing
-  which bundle >/dev/null 2>&1  || {
-    gem install bundler
-    rbenv rehash
-  }
+# If Ruby is required, 
+if [ -f ".ruby-version" ]; then
+  # Check if "rbenv" is installed, if not install it with brew
+  if [! "$(hash rbenv 2>/dev/null)" && "$(hash brew 2>/dev/null)"]; then
+    brew update
+    brew install rbenv --without-ruby-build
+  fi
+
+  if [[ "$(hash rbenv 2>/dev/null)" && "$(rbenv version-name 2>/dev/null)" ]]; then
+    rbenv install --skip-existing
+    which bundle >/dev/null 2>&1  || {
+      gem install bundler
+      rbenv rehash
+    }
+  elif [ -n "$(ruby -v 2>/dev/null)"]; then
+    echo "Ruby is not installed. See https://rubyinstaller.org/downloads/"
+    exit 1;
+  fi
 fi
 
+# If some Ruby gems are required, make sure they are installed
 if [ -f "Gemfile" ]; then
   bundle check --path vendor/gems >/dev/null 2>&1  || {
     bundle install --path vendor/gems --quiet --without production
   }
 fi
 
+# If the node_modules have not been installed yet, install them now.
 if [ ! -d node_modules ]; then
   npm run install
 fi

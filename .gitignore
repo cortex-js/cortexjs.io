@@ -3,6 +3,6 @@
 .jekyll-cache
 vendor
 node_modules
-docs
+api-docs
 
 .DS_Store
