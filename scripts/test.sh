@@ -38,17 +38,17 @@ fi
 # 3. Copy bin/libcurl-x64.dll to C:\Ruby26-x64\bin
 # 4. Rename it to libcurl.dll
 
-# Options for htmlproofer: https://github.com/gjtorikian/html-proofer
-bundle exec htmlproofer ./submodules/cortex-js.github.io \
-  --assume_extension \
-  --allow-hash-href \
-  --only_4xx \
-  --check_html \
-  --url-ignore "/*/" \
-  --checks_to_ignore \
-  --directory_index_file index.html \
-  --internal-domains localhost:4000 \
-  --assume-extension \
-  --empty-alt-ignore \
-  --disable-external || true
+# # Options for htmlproofer: https://github.com/gjtorikian/html-proofer
+# bundle exec htmlproofer ./submodules/cortex-js.github.io \
+#   --assume_extension \
+#   --allow-hash-href \
+#   --only_4xx \
+#   --check_html \
+#   --url-ignore "/*/" \
+#   --checks_to_ignore \
+#   --directory_index_file index.html \
+#   --internal-domains localhost:4000 \
+#   --assume-extension \
+#   --empty-alt-ignore \
+#   --disable-external || true
 

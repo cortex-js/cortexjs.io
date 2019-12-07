@@ -1,0 +1,132 @@
+
+
+.card {
+  position: relative;
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-top: 2em;
+  padding-bottom: 2em;
+}
+
+.card.single {
+    flex: 0 1 45%;
+    margin: 0;
+    padding: 20px;
+    min-width: 300px;
+    max-width: 960px;
+
+    font-weight: normal;
+
+    background: $card-background-color;
+    border-radius: 8px;
+    box-shadow: -2px 2px 8px 0 rgba(0, 0, 0, 0.23);
+}
+
+
+.card.alternate {
+  background: darken($card-background-color, 5%);
+}
+
+.card.primary {
+  background: $primary-color;
+  color: #fff;
+}
+
+.card.reverse {
+    flex-flow: row-reverse;
+}
+
+.card .copy {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  flex-basis: 0;
+  flex-grow: 1;
+  max-width: 640px;
+  width: 100%;
+}
+
+
+.card .figure {
+  padding: 1em;
+  flex-basis: 0;
+  flex-grow: 2;
+  // max-width: 640px;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.card h2 {
+  color: $text-color;
+  font: 700 56px/50px $sans-serif;
+  margin: 0;
+  padding: 0;
+  padding-bottom: .5em;
+  letter-spacing: 0.576px;
+  border: none;
+  & .eyebrow {
+    display: block;
+    font: 400 32px/36px $sans-serif;
+    margin: 0;
+    padding: 0;
+    opacity: .4;
+    margin-bottom: .5em;
+    letter-spacing: -0.2px;
+  }
+}
+
+.card.primary h2, .card.primary h3 {
+  color: #fff;
+}
+
+.card h3 {
+  color: $text-color;
+  font: 700 36px/40px $sans-serif;
+  margin: 0;
+  padding: 0;
+  padding-bottom: .5em;
+  letter-spacing: 0.3px;
+}
+
+.card p {
+  font: 400 21px/29px $sans-serif;
+  margin: 0;
+  padding:0;
+}
+
+
+.cards.secondary {
+  width: 100%;
+  & .card {
+    max-width: 256px;
+    flex-flow: column;
+    border: none;
+    background: transparent;
+    color: $text-color;
+  }
+  & .card h2 {
+      font: 700 24px/24px $sans-serif;
+      padding-top: .5em;
+  }
+  & .card .copy {
+      margin: 0;
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      padding-top: 1em;
+
+      font: 500 16px/20px $sans-serif;
+  }
+  & .card .copy p {
+      text-align: center;
+      margin-bottom: 1em;
+      text-align: center;
+
+      font: 500 16px/20px $sans-serif;
+  }
+}
+

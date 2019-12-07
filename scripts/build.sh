@@ -14,6 +14,9 @@ ENVIRONMENT="${1-dev}"
 # to indicate if this is a production or development build
 [ -f "./submodules/cortex-js.github.io/CNAME" ] && rm "./submodules/cortex-js.github.io/CNAME"
 
+mkdir -p ./build
+mkdir -p ./src/build
+
 ## Preprocess
 
 # Typedoc doesn't handle optional parameters in JSDOC, so strip them
@@ -22,7 +25,7 @@ ENVIRONMENT="${1-dev}"
 sed -E -e 's/@param(.*)\[([^=]+)=(.+)\]/@param\1\2/g' \
     node_modules/mathlive/dist/mathlive.d.ts | \
 sed -E -e 's/@param(.*)\[(.+)\]/@param\1\2/g' > \
-    node_modules/mathlive/dist/mathlive.proc.d.ts 
+    build/mathlive.proc.d.ts 
 
 ## Typedoc (.d.ts -> .json)
 npx typedoc --mode modules \
@@ -32,14 +35,16 @@ npx typedoc --mode modules \
     --excludeProtected \
     --hideGenerator \
     --readme none \
-    --json api-docs/_mathfield.json \
-    node_modules/mathlive/dist/mathlive.proc.d.ts
+    --json ./build/mathlive.json \
+    build/mathlive.proc.d.ts
 
 ## Makedoc (.json -> .md)
-./scripts/makedoc.sh api-docs/_mathfield.json
+./scripts/makedoc.sh ./build/mathlive.json ./src/build/mathlive.md mathlive
+
 
 ## Build (.md -> .html)
-bundle exec jekyll build -q
+# DEBUG=Eleventy* npx eleventy --config ./config/eleventy.js
+npx eleventy --config ./config/eleventy.js
 
 if [ "$ENVIRONMENT" == "production" ]
 then

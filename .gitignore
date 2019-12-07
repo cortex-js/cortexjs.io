@@ -3,6 +3,7 @@
 .jekyll-cache
 vendor
 node_modules
-api-docs
 
 .DS_Store
+/build
+/src/build

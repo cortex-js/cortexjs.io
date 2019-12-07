@@ -1,0 +1,37 @@
+
+// Overrides
+
+.site-title {
+    font-family: $sans-serif-condensed;
+    font-weight: 900;
+}
+
+.site-title em {
+    font-weight: 100;
+    font-style: normal;
+}
+
+.greedy-nav .visible-links a:before {
+    background: none;
+}
+
+.greedy-nav a:hover {
+    color: $primary;
+}
+
+.masthead__menu-item {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+pre {
+    margin-bottom: 1em;
+    padding: 1em;
+    background: #35434e;
+    color: #c5c8c6;
+    font-family: $monospace;
+    font-size: .75em;
+    line-height: 1.8;
+    border-radius: 8px;
+}
