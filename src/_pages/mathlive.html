@@ -1,8 +1,12 @@
 ---
-layout: wide
+layout: wide-live
 title: MathLive
 permalink: /mathlive/
 read_time: false
+head:
+  stylesheets:
+    - https://unpkg.com/mathlive/dist/mathlive.core.css
+    - https://unpkg.com/mathlive/dist/mathlive.css
 ---
 
 <section class="hero-section">
@@ -11,8 +15,39 @@ read_time: false
   <p>Math input made easy</p>
 </section>
 
-<hr>
-  <img src='/assets/images/mathfield/screenshot.jpg'>
+<h2>Try it now</h2>
+<section class='live-code mb-xl bg-alternate'>
+  <div class='source'>
+    <div class='tabs'>
+      <div class='tab'>
+       <input type="radio" id="example1-js" name="example-1" checked>
+       <label for="example1-js">Javascript</label>
+       <pre id='example1-js-content' class="content"></pre> 
+      </div>
+      <div class='tab'>
+       <input type="radio" id="example1-html" name="example-1">
+       <label for="example1-html">HTML</label>
+       <pre id='example1-html-content' class="content"></pre> 
+      </div>
+    </div>
+  </div>
+  <div id='example1-output' class='output'>
+<div id='mathfield' class='mathfield'>
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+</div>
+  </div>
+</section>
+<script id='example-script' type='module'>
+import MathLive from 
+  'https://unpkg.com/mathlive/dist/mathlive.mjs';
+MathLive.makeMathField('mathfield');
+</script>
+<script>
+  document.getElementById('example1-js-content').textContent = document.getElementById('example-script').innerHTML.replace(/^\n*/, '');
+  document.getElementById('example1-html-content').textContent = document.getElementById('example1-output').innerHTML.replace(/^\n*/, '');
+</script>
+
+<img src='/assets/images/mathfield/screenshot.jpg'>
 
 <section>
     <section class="fullwidth">

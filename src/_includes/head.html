@@ -5,6 +5,7 @@
 <link href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ '/feed.xml' | relative_url }}{% endif %}" type="application/atom+xml" rel="alternate" title="{{ site.title }} Feed">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin" />
 
 <script>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
@@ -12,6 +13,17 @@
 
 <!-- For all browsers -->
 <link rel="stylesheet" href="{{ stylesheet | default: '/assets/css/main.css' | relative_url }}">
+
+{% if head.stylesheets %}
+  {% for x in head.stylesheets %}
+    {% if x contains "://" %}
+      {% capture stylesheet_path %}{{ x }}{% endcapture %}
+    {% else %}
+      {% capture stylesheet_path %}{{ x | relative_url }}{% endcapture %}
+    {% endif %}
+    <link rel="stylesheet" href="{{ stylesheet_path }}">
+  {% endfor %}
+{% endif %}
 
 <!--[if IE]>
   <style>

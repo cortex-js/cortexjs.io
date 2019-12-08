@@ -25,7 +25,7 @@ fi
 # cortex-js.github.io as a submodule.
 cd "./submodules/cortex-js.github.io"
 git fetch
-# git checkout master
+git checkout master
 git add .
 git commit -a -m "`date +\"%Y-%m-%d\"`"
 git push origin master:master

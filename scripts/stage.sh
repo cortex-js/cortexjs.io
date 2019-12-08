@@ -7,10 +7,6 @@ set -o pipefail  # don't hide errors within pipes
 
 cd "$(dirname "$0")/.."
 
-# Get the latest submodule (submodules/cortex-js.github.io)
-git submodule sync --recursive
-git submodule update --init --recursive
-
 # Make a build
 
 ./scripts/setup.sh
