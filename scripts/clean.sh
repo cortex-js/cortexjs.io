@@ -7,6 +7,6 @@ set -o pipefail  # don't hide errors within pipes
 
 cd "$(dirname "$0")/.."
 
-rm -rf "./submodules/cortex-js.github.io/"
+rm -rf "./submodules/cortex-js.github.io/{*,.*}"
 rm -rf "./build"
 rm -rf "./src/build"

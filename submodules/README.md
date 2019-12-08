@@ -1,11 +1,11 @@
 ## To create a submodule:
 
 ```bash
-git submodule add -b master git@github.com:cortex-js/<PROJECT>.git submodules/<DIRECTORY>
+git submodule add -b master https://github.com/cortex-js/<PROJECT>.git submodules/<PROJECT>
 git submodule init
 ```
 
-**Note**: git tracks the submodules in a `./.gitmodules` files
+**Note**: git tracks the submodules in a `.gitmodules` file.
 
 ## To get submodule
 
