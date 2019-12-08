@@ -1,0 +1,36 @@
+
+.buttons {
+  display: flex;
+  flex-flow: row;
+  justify-content: flex-end;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.button {
+  /* default */
+  display: inline-block;
+  margin-bottom: 0.25em;
+  padding: 0.5em 1em;
+  font-family: $sans-serif;
+  font-size: $type-size-6;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border-width: 0;
+  border-radius: $border-radius;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.button:hover {
+  background: #f5f5f5;
+}
+
+.button:active {
+    background: $primary;
+    border: 1px solid darken($primary, 20%);
+    color: white;
+}
