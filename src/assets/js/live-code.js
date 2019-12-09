@@ -96,6 +96,10 @@ function setupLiveCodeSection(sectionId) {
 
     // Setup the editors
     section.querySelectorAll('.tab .content textarea').forEach( x => {
+        // Remove XML comments (including the <!-- htmlmin:ignore --> use to 
+        // indicate to terser to skip sections, so as to preserve the formatting.
+        x.value = x.value.replace(/<!--.*-->\n?/g, '');
+
         const lang = {
             javascript: 'javascript', 
             css: 'css',
@@ -105,6 +109,7 @@ function setupLiveCodeSection(sectionId) {
         x,
         {
             lineNumbers: false,
+            lineWrapping: true,
             mode: lang,
             theme: 'tomorrow-night'
         }

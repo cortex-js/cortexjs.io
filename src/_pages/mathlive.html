@@ -25,16 +25,20 @@ head:
 <section class='mb-xl bg-alternate w-full'>
   {% live-code %}
   {% code-tab "Javascript" %}
+<!-- htmlmin:ignore -->
 import MathLive from 
   'https://unpkg.com/mathlive/dist/mathlive.mjs';
 MathLive.makeMathField(
   document.querySelector('.mathfield')
 );
+<!-- htmlmin:ignore -->
   {% endcode-tab %}
   {% code-tab "HTML" %}
-<div class='mathfield'>
+<!-- htmlmin:ignore -->
+<div class="mathfield">
   x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 </div>
+<!-- htmlmin:ignore -->
   {% endcode-tab %}
   {% endlive-code %}
 </section>
