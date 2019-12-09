@@ -7,4 +7,5 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+# DEBUG=Eleventy* npx eleventy --config ./config/eleventy.js --serve
 npx eleventy --config ./config/eleventy.js --serve

@@ -50,7 +50,7 @@
     },
     "dependencies": {
         "mathlive": "^0.32.8",
-        "typedoc": "^0.15.3"
+        "typedoc": "^0.15.4"
     },
     "prettier": "@cortex-js/prettier-config",
     "husky": {

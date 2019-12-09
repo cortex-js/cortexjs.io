@@ -1,5 +1,5 @@
 ---
-layout: wide-live
+layout: wide
 title: MathLive
 permalink: /mathlive/
 read_time: false
@@ -8,104 +8,37 @@ head:
     - https://unpkg.com/mathlive/dist/mathlive.core.css
     - https://unpkg.com/mathlive/dist/mathlive.css
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/theme/tomorrow-night-eighties.css
+    - ../assets/css/live-code.css
   scripts:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
+    - ../assets/js/live-code.js
 ---
-<script>
-  function setupExample(example) {
-    // Setup the initial values of the editors
-    document.getElementById(example + '--js-content').value = document.getElementById(example + '--script').innerHTML.replace(/^\n*/, '');
-    document.getElementById(example +'--html-content').value = document.getElementById(example + '--output').innerHTML.replace(/^\n*/, '');
-
-    // Setup the editors
-    const jsEditor = CodeMirror.fromTextArea(
-      document.getElementById(example + '--js-content'),
-      {
-        lineNumbers: false,
-        mode: "javascript",
-        theme: "tomorrow-night-eighties"
-      }
-    );
-    jsEditor.setSize("100%", "100%");
-    const htmlEditor = CodeMirror.fromTextArea(
-      document.getElementById(example + '--html-content'),
-      {
-        lineNumbers: false,
-        mode: "xml",
-        theme: "tomorrow-night-eighties"
-      }
-    );
-    htmlEditor.setSize("100%", "100%");
-
-  }
-  function runExample(example) {
-    if (document.getElementById('mathfield')) {
-      if (document.getElementById('mathfield').mathfield) {
-        document.getElementById('mathfield').mathfield.$revertToOriginalContent()
-      }
-    }
-    const jsEditor = document.querySelector('#' + example + '--js-content + .CodeMirror').CodeMirror;
-    const htmlEditor = document.querySelector('#' + example + '--html-content + .CodeMirror').CodeMirror;
-
-    document.getElementById(example + '--output').innerHTML = htmlEditor.getValue();
-    const previousScript = document.getElementById(example + '--script');
-    const parentNode = previousScript.parentNode;
-    parentNode.removeChild(previousScript);
-    const newScript = document.createElement('script');
-    newScript.type = "module";
-    newScript.id = example + '--script';
-    newScript.appendChild(document.createTextNode(jsEditor.getValue()));
-    parentNode.appendChild(newScript);
-  }
-</script>
-
-
 <section class="hero-section">
   <a class="section-link" href="/mathlive/" target="_self" rel="follow" aria-hidden="true" tabindex="-1">&nbsp;</a>
   <h1>MathLive</h1>
   <p>Math input made easy</p>
 </section>
 
-<h2>Try it now</h2>
-<section class='live-code mb-xl bg-alternate'>
-  <div class='source'>
-    <div class='tabs'>
-      <div class='tab'>
-       <input type="radio" id="example1--js" name="example1" checked>
-       <label for="example1--js">Javascript</label>
-       <div class="content">
-         <textarea id='example1--js-content'></textarea> 
-       </div>
-      </div>
-      <div class='tab'>
-       <input type="radio" id="example1--html" name="example1">
-       <label for="example1--html">HTML</label>
-       <div class="content">
-         <textarea id='example1--html-content'></textarea>
-       </div>
-      </div>
-    </div>
-    <div class='buttons'>
-      <button id='example1--run' class='button' onclick='runExample("example1")'>Run</button>
-    </div>
-  </div>
-  <div id='example1--output' class='output'>
-<div id='mathfield' class='mathfield'>
-  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-</div>
-  </div>
-</section>
-<script id='example1--script' type='module'>
+<h2 class='font-size-2xl'>Try it now</h2>
+<section class='mb-xl bg-alternate w-full'>
+  {% live-code %}
+  {% code-tab "Javascript" %}
 import MathLive from 
   'https://unpkg.com/mathlive/dist/mathlive.mjs';
-MathLive.makeMathField('mathfield');
-</script>
-<script>
-  setupExample('example1');
-</script>
+MathLive.makeMathField(
+  document.querySelector('.mathfield')
+);
+  {% endcode-tab %}
+  {% code-tab "HTML" %}
+<div class='mathfield'>
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+</div>
+  {% endcode-tab %}
+  {% endlive-code %}
+</section>
+
 
 <img src='/assets/images/mathfield/screenshot.jpg'>
 

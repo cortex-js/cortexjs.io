@@ -1,3 +1,5 @@
+@import "common.scss";
+@import "minimal-mistakes/_variables.scss";
 
 .buttons {
   display: flex;
@@ -22,6 +24,7 @@
   border: 1px solid #ddd;
   background: #fff;
   cursor: pointer;
+  user-select: none;
   text-transform: uppercase;
 }
 
