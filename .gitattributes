@@ -1,27 +1,39 @@
+#
 # Normalize text files line ending to LF in the repository
+#
 * text=auto
 
+#
 # Text files
+#
+
 *.css      text
-*.hbs      text             # Handlebars template
+# Handlebars template
+*.hbs      text             
 *.htm      text diff=html
 *.html     text diff=html
 *.js       text
 *.json     text
 *.jsx      text
-*.liquid   text             # Liquid template
+# Liquid template
+*.liquid   text             
 *.map      text -diff
-*.md       text             # Markdown
+# Markdown
+*.md       text             
 *.sass     text diff=css
 *.scss     text diff=css
-*.sh       text eol=lf      # shell script, always LF
+# shell script, always LF
+*.sh       text eol=lf      
 *.svg      text
 *.ts       text
 *.tsx      text
 *.yaml     text
 *.yml      text
 
+#
 # Text files without extension
+#
+
 AUTHORS*          text
 CHANGELOG*        text
 CHANGES           text
@@ -37,7 +49,10 @@ readme            text
 *README*          text
 TODO              text
 
+#
 # Configuration files
+#
+
 *.bowerrc         text
 *.cnf             text
 *.conf            text
@@ -59,7 +74,10 @@ Makefile          text
 makefile          text
 
 
-# Configuration files without extensions
+#
+# Configuration files without extension
+#
+
 .csslintrc        text
 .eleventyignore   text
 .editorconfig     text
@@ -74,14 +92,20 @@ makefile          text
 .stylelintrc      text
 
 
+#
 # Graphics
+#
+
 *.gif             binary
 *.ico             binary
 *.jpg             binary
 *.jpeg            binary
 *.png             binary
 
+#
 # Video
+#
+
 *.3gpp            binary
 *.3gp             binary
 *.as              binary
@@ -100,7 +124,10 @@ makefile          text
 *.swf             binary
 *.webm            binary
 
+#
 # Fonts
+#
+
 *.ttf             binary
 *.eot             binary
 *.otf             binary
