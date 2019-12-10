@@ -1,0 +1,36 @@
+// A "section link" is a <a> tag :
+//
+//   <a class="section-link" href="#" target="_self" rel="follow" aria-hidden="true" tabindex="-1">&nbsp;</a>
+//
+// placed inside a div/section that will capture all the clicks inside the div
+// The enclosing div/section should have a position: relative
+
+a.section-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+#main a:not(.section-link), 
+#main a:not(.section-link):hover,
+#main a:not(.section-link):active,
+#main a:not(.section-link):visited {
+  color: $link-color;
+  text-decoration: none;
+  cursor: pointer;
+  // These 3 properties are necessary so that <a> links are 
+  // displayed "above" the "a.section-link", so they can react to :hover events
+  position: relative;
+  z-index: 4;
+  pointer-events: all;
+}
+
+#main a:not(.section-link):hover {
+  text-decoration: underline;
+}

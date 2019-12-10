@@ -1,39 +1,51 @@
 [![Gitter](https://badges.gitter.im/cortex-js/community.svg)](https://gitter.im/cortex-js/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+![Maintenance](https://img.shields.io/maintenance/yes/2019)
 
 This repo contains the source files for the "cortexjs.io" website.
 
-## TL;DR
+# TL;DR
 
-### To update docs after a new release
+## First time after cloning the project or after making some source changes
 
-```shell
-# Pick-up changes in the dependent modules
-npm update
-# Generate .md files for API
-npm run build
+```bash
+# Setup, make a dev build and start a server
 npm start
 ```
 
-### To stage and deploy an update
+## To update the documentation after a new release
 
-```shell
+```bash
+# Pick-up changes in the dependent modules
+npm run update
+
+# Generate .md files for API and launch local server
+npm start
+```
+
+## To stage and deploy an update
+
+```bash
 npm run stage
-# output goes inside submodules/cortex-js.github.io
+# Make a clean production build.
+# Output goes inside submodules/cortex-js.github.io
+
 npm run restart
 # Validate that everything works well in the browser then...
+
 npm run deploy
 # submodules/cortex-js.github.io (a git submodule) gets pushed to cortex-js.github.io
 ```
 
-## Architecture
+# Architecture
 
 The site is published using GitHub Pages. The main benefit of using GH Pages
 is the workflow integration (pubshing to GH triggers an automatic update of the
 site being served)
 
 The content of the sites are authored primarily as Markdown files, processed
-with Jekyll to turn them into HTML/CSS. The main Jekyll configuration is in the
-`_config.yml` file.
+with eleventy to turn them into HTML/CSS.
+
+The main Jekyll configuration is in the `config/eleventy.js` file.
 
 The output is in the `submodules/cortex-js.github.io` directory. That directory
 is a Git **submodule** which is linked to the `cortex-js.github.io` repo. That
@@ -63,21 +75,21 @@ In addition, the DNS entries for `cortexjs.io` must include the following:
     -   185.199.110.153
     -   185.199.111.153
 
-## Content
+# Content
 
 The `npm run build` command generates the documentation for the APIs
-from the TypeScript `.d.ts` file.
+from the TypeScript `.d.ts` file into the `build/` directory.
 
 The build process uses the `typedoc` tool to parse the API header files and
-output a `json` files in `_data/mathfield.json`.
+output a `json` files in the `build/` directory.
 
 **Note:** To debug the converter, use the VSCode debugger. Select Debug >
 Start Debugging to start a debugging session right in VSCode.
 
-The `makdeoc` script then converts the `json` file into markdown in the `api-docs` folder,
-which can then be processed by Jekyll with `script/cibuild` or `script/server`.
+The `makdeoc` script then converts the `json` file into markdown in the `./src/build` directory,
+which can then be processed by eleventy with `npm run build` or `npm start`.
 
-The CSS styling information is defined in `_sass/typescript_doc.scss`.
+The CSS styling information is defined in `src/_sass/`.
 
 The API documentation should follow the Google Documentation Style Guide
 (https://developers.google.com/style/api-reference-comments)
@@ -90,122 +102,19 @@ https://google.github.io/styleguide/jsguide.html#naming
 
 The project follows the [GitHub standard](https://github.com/github/scripts-to-rule-them-all) for naming project scripts.
 
-Run
-
-```shell
-scripts/bootstrap
-```
-
-On Windows (using PowerShell 7):
-
-```shell
-bash scripts/bootstrap
-```
-
-If getting network timeout errors:
-
-```shell
-gem install "jekyll" "minimal-mistakes-jekyll"  "jekyll-feed" "jekyll-include-cache"
-bundle install
-```
-
 To do a local build:
 
-```shell
-scripts/server
+```bash
+npm start
 ```
 
 To do a build ready to be staged:
 
-```shell
-scripts/stage
+```bash
+npm run stage
 ```
 
-### Test
+## Test
 
 The "testing" of the generated site consist of checking links, and that the
-generated HTML is valid, using the `html-proofer` gem.
-
-This require `libcurl`to be installed. Follow these steps:
-
-1. Download curl from here: https://curl.haxx.se/windows/
-2. Expand the zip package
-3. Copy bin/libcurl-x64.dll to C:\Ruby26-x64\bin
-4. Rename it to libcurl.dll
-
-Or use a Mac.
-
-# ARCHIVES
-
-## Setup
-
-1. Install Ruby (https://www.ruby-lang.org/en/documentation/installation/#rubyinstaller)
-2. Relaunch Terminal (to get the correct PATH variable)
-3. Install Bundler
-
-```bash
-$ gem install bundler
-$ gem install jekyll -v 3.8.5 # See https://pages.github.com/versions/ for correct version
-$ gem update
-```
-
-If necessary, try:
-
-```bash
-$ gem install jekyll bundler
-```
-
-```bash
-$ bundle install
-$ bundle exec jekyll serve --incremental
-```
-
-## Updating
-
-To stay up to date with GitHub:
-
-```
-$ bundle update github-pages
-```
-
-Also, check https://pages.github.com/versions for updated version of Jekyll, etc..
-
-## Initial creation
-
-Apparently a Gemfile is necessary for jekyll init to work. Try one with this
-
-```
-source "https://rubygems.org"
-gem "github-pages", group: :jekyll_plugins
-```
-
-# TODO
-
--   Add a CI/CD for the documentation. See https://jekyllrb.com/docs/continuous-integration/travis-ci/
--   use htmlproofer gem link checking
-
-```
-
-- https://trianglify.io/p/w:1440!h:900!x:Blues!v:0.99!c:0.05!s:gluuoa
-- https://trianglify.io/p/w:1440!h:900!x:random!v:0.99!c:0.06!s:gluuoa
-
-## Splash Page Copy
-
-Web Components for scientific exploration.
-
-Math. Graphics. Programming.
-
-A desktop environments tuned for iterative analysis, exploration.
-
-Data visualization, modeling and simulation.
-
-Computational intelligence.
-
-Computational thinking.
-
-Scientific Computing. Understand and solve complex problems.
-
-Numerical analysis, modeling,
-
-Informatics & Data Science.
-```
+generated HTML is valid.

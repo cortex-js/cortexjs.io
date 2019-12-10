@@ -1,0 +1,62 @@
+{
+	"main": [
+		{
+			"title": "MathLive",
+			"url": "/mathlive/"
+		},
+		{
+			"title": "Docs",
+			"url": "/docs/"
+		},
+		{
+			"title": "Funding",
+			"url": "/funding/"
+		},
+		{
+			"description": "Chat on Gitter",
+			"title": "<i class=\"fab fa-gitter\"></i>",
+			"url": "https://gitter.im/cortex-js"
+		},
+		{
+			"title": "<i class=\"fab fa-github\"></i>",
+			"url": "https://github.com/cortex-js",
+			"description": "Get source code on GitHub"
+		}
+	],
+	"mathlive": [
+		{
+			"title": "Mathlive",
+			"children": [
+				{
+					"title": "API Reference",
+					"url": "/docs/mathlive/"
+				},
+				{
+					"title": "Getting Started",
+					"url": "/guides/mathfield-getting-started/"
+				}
+			]
+		},
+		{
+			"title": "Contributing",
+			"children": [
+				{
+					"title": "Reporting Issues",
+					"url": "/docs/reporting-issues/"
+				},
+				{
+					"title": "Funding",
+					"url": "/funding/"
+				},
+				{
+					"title": "Code of Conduct",
+					"url": "/docs/code-of-conduct/"
+				},
+				{
+					"title": "License",
+					"url": "/docs/license/"
+				}
+			]
+		}
+	]
+}

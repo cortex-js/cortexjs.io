@@ -1,8 +1,6 @@
 .sass-cache
-.jekyll-metadata
-.jekyll-cache
-vendor
 node_modules
-api-docs
 
 .DS_Store
+/build
+/src/build

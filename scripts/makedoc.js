@@ -1,61 +1,10 @@
-const argv = process.argv.slice(2);
-// @todo: use yargs for argument parsing...
+// Converts a JSON file describing Typescript types into a Markdown file
+
 const fs = require('fs');
+const path = require('path');
 
 const default_language = 'typescript';
 let api = {};
-
-argv.forEach(makedoc);
-
-function makedoc(doc) {
-    console.log('Making doc from ' + doc);
-    try {
-        api = JSON.parse(fs.readFileSync(doc));
-
-        const packages = api.groups.filter(x => x.kind === 1);
-        const mainPackage =
-            packages &&
-            packages[0] &&
-            packages[0].children[0] &&
-            getReflectionByID(api, packages[0].children[0]);
-        const mainPackagedocumentation =
-            mainPackage &&
-            mainPackage.comment &&
-            getTag(mainPackage.comment.tags, 'packagedocumentation');
-        const packageName =
-            (mainPackagedocumentation && mainPackagedocumentation.text) ||
-            api.name;
-
-        let result = `---
-permalink: /docs/${escapeYAMLString(trimNewline(api.name))}
-title: ${escapeYAMLString(packageName)}
-read_time: false
-# toc: true
----
-`;
-
-        if (api.groups) {
-            result += api.groups
-                .map(x => renderGroup(x, ''))
-                .filter(x => !!x)
-                .join('\n\n');
-        } else {
-            // No groups: render all the modules
-            result += api.children
-                .filter(x => x.kind === 1)
-                .map(renderModule)
-                .filter(x => !!x)
-                .join('\n\n');
-        }
-
-        if (!fs.existsSync('api-docs')) fs.mkdirSync('api-docs');
-
-        fs.writeFileSync(`api-docs/${api.name}.md`, result);
-        console.log(`Markdown file created at api-docs/${api.name}.md`);
-    } catch (err) {
-        console.log(err);
-    }
-}
 
 function getReflectionByID(from, id) {
     if (from.id === id) return from;
@@ -67,6 +16,10 @@ function getReflectionByID(from, id) {
         });
     }
     return result;
+}
+
+function renderPermalink(link) {
+    return `<a class="header-link" href="#${link}" title="Permalink"><span class="sr-only">Permalink</span><svg class="svg-inline--fa fa-link fa-w-16" aria-hidden="true" focusable="false" data-prefix="fa" data-icon="link" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"></path></svg></a>`;
 }
 
 function renderIndex(xs, parent = '') {
@@ -226,7 +179,7 @@ function renderLongParameter(json, prefix = '') {
     }
     const longType = renderLongType(json.type);
     if (longType) result += ': ' + longType;
-    result += '\n: ';
+    result += '\n:  ';
     result += renderComment(json.comment, 2);
     result += '\n\n';
     if (json.type.declaration && json.type.declaration.getSignature) {
@@ -259,11 +212,12 @@ function renderLongParameter(json, prefix = '') {
 function renderFunctionSignature(s, parent = '') {
     if (parent) parent += '.';
     let result = '\n<h3 ';
-    result += `id="${encodeURIComponent(parent + s.name)}" `;
+    const permalink = encodeURIComponent(parent + s.name);
+    result += `id="${permalink}" `;
     if (typeof getTag(s.comment.tags, 'deprecated') !== 'undefined')
         result += 'class="deprecated" ';
-    result += 'markdown="1">function ';
-    result += parent + '**' + s.name + '**(';
+    result += `>function `;
+    result += parent + '<strong>' + s.name + '</strong>(';
     if (s.parameters) {
         result += s.parameters
             .map(renderShortParameter)
@@ -276,7 +230,7 @@ function renderFunctionSignature(s, parent = '') {
     const resultType = renderShortType(s.type);
     if (resultType) result += ': ' + resultType;
 
-    result += '</h3>\n';
+    result += `${renderPermalink(permalink)}</h3>\n`;
 
     result += renderComment(s.comment) + '\n';
 
@@ -288,11 +242,12 @@ function renderFunctionSignature(s, parent = '') {
     }
 
     if (s.type) {
-        result += '\n→: ' + resultType;
+        result += '\n\n→ ' + resultType;
         result += '\n:  ';
         if (s.comment && s.comment.returns) {
             result += trimNewline(s.comment.returns.trim()) || '';
         }
+        result += '\n';
     }
 
     return result;
@@ -312,7 +267,7 @@ function renderFlags(json) {
 }
 
 function renderFunction(json, parent) {
-    let result = '\n<section class="card" markdown="1">\n';
+    let result = '\n<section class="card">\n';
     result += renderFlags(json.flags);
 
     result += json.signatures
@@ -325,11 +280,12 @@ function renderFunction(json, parent) {
 }
 
 function renderClass(json) {
-    let result =
-        '\n<h2 id="' +
-        encodeURIComponent('class:' + json.name) +
-        '" markdown="1">';
-    result += '_Class_ **' + json.name + '**</h2>';
+    const permalink = encodeURIComponent('class:' + json.name);
+    let result = `\n<h2 id="${permalink}">`;
+    result +=
+        '<em>Class</em> <strong>' +
+        json.name +
+        `</strong>${renderPermalink(permalink)}</h2>\n`;
     // json.comment.tags: properties of the class
     // json.children (kind === 1024): properties
 
@@ -368,14 +324,12 @@ function renderClass(json) {
     // Look for all the methods (kind = 2048) in the class, grouped by categories
     const categories = getCategories(json, 2048);
 
-    result += '\n<section class="tsd-index-list" markdown="1">';
+    result += '\n<section class="tsd-index-list">';
     // Generate index of the methods, grouped by categories
     result += categories
         .map(category => {
             return (
-                '\n\n### ' +
-                category.title +
-                '\n\n' +
+                `\n\n<h3>${category.title}</h3>\n\n` +
                 renderIndex(category.children, json.name)
             );
         })
@@ -388,8 +342,7 @@ function renderClass(json) {
         .map(category => {
             let r = '';
             if (category.title) {
-                r += `\n## _class ${json.name}_ `;
-                r += category.title + '\n{:.category-title}';
+                r += `\n<h2 class='category-title'><em>class ${json.name}</em>${category.title}</h2>\n`;
             }
             r += category.children
                 .map(x => renderFunction(x, json.name))
@@ -449,8 +402,8 @@ function getChildrenByID(json, children) {
 }
 
 function renderTypeAliases(json) {
-    let result = '\n<section class="card" markdown="1">\n';
-    result += '\n### declare type **' + json.name + '**';
+    let result = '\n<section class="card">\n';
+    result += '\n<h3> declare type <strong>' + json.name + '</strong></h3>';
     const type = renderLongType(json.type);
     if (type) result += ' = ' + type;
     result += '\n\n';
@@ -470,11 +423,11 @@ function renderTypeAliases(json) {
 }
 
 function renderModule(json) {
-    let result =
-        '\n<h2 id="' +
-        encodeURIComponent('module:' + trimQuotes(json.name)) +
-        '" markdown="1">';
-    result += '_Module_ **' + trimQuotes(json.name) + '**</h2>\n';
+    const permalink = encodeURIComponent('module:' + trimQuotes(json.name));
+    let result = `\n<h2 id="${permalink}">`;
+    result += `<em>Module</em> <strong>${trimQuotes(
+        json.name
+    )}</strong>${renderPermalink(permalink)}</h2>\n`;
 
     result += renderComment(json.comment) + '\n';
 
@@ -523,6 +476,7 @@ function renderGroup(group, parent) {
     // See https://github.com/TypeStrong/typedoc/blob/master/src/lib/models/reflections/abstract.ts
     // for a list of the possible group kinds
     let result = '';
+    let permalink = '';
 
     switch (group.kind) {
         case 0: // Global
@@ -548,24 +502,22 @@ function renderGroup(group, parent) {
             break;
 
         case 64: // Functions
-            result +=
-                '\n<h2 id="' +
-                encodeURIComponent('functions:' + (parent || 'global')) +
-                '" markdown="1">';
-            result += parent ? `_module ${parent}_ ` : '_Global_ ';
-            result += 'Functions</h2>';
+            permalink = encodeURIComponent('functions:' + (parent || 'global'));
+            result += `\n<h2 id="${permalink}">`;
+            result += parent
+                ? `<em>module ${parent}</em> `
+                : '<em>Global</em> ';
+            result += `Functions${renderPermalink(permalink)}</h2>\n`;
             const categories = getCategories(group, 64);
 
-            result += '\n<section class="tsd-index-list" markdown="1">';
+            result += '\n<section class="tsd-index-list">';
             result += categories
                 .map(category => {
                     const children = category.children.map(x =>
                         getReflectionByID(api, x)
                     );
                     return (
-                        '\n\n### ' +
-                        category.title +
-                        '\n\n' +
+                        `\n\n<h3>${category.title}</h3>\n\n` +
                         renderIndex(children, parent)
                     );
                 })
@@ -577,7 +529,7 @@ function renderGroup(group, parent) {
                 .map(category => {
                     let r = '';
                     if (category.title)
-                        r += `\n## ${category.title} \n{:.category-title}`;
+                        r += `\n<h2 class='category-title'>${category.title}</h2>`;
                     const children = category.children.map(x =>
                         getReflectionByID(api, x)
                     );
@@ -615,12 +567,12 @@ function renderGroup(group, parent) {
             break;
 
         case 4194304: // Type Aliases
-            result +=
-                '\n<h2 id="' +
-                encodeURIComponent('typealias:' + (parent || 'global')) +
-                '" markdown="1">';
-            result += parent ? `_module ${parent}_ ` : '_Global_ ';
-            result += 'Types</h2>\n';
+            permalink = encodeURIComponent('typealias:' + (parent || 'global'));
+            result += `\n<h2 id="${permalink}">`;
+            result += parent
+                ? `<em>module ${parent}</em> `
+                : '<em>Global</em> ';
+            result += `Types${renderPermalink(permalink)}</h2>\n`;
             result += group.children
                 .map(x => renderTypeAliases(getReflectionByID(api, x)))
                 .join('');
@@ -753,19 +705,18 @@ function renderTag(tag) {
                     )
                 ) {
                     // Add a notice style
-                    result += '<section class="notice--info" markdown="1">\n';
-                    result += '#### ' + tag.tag + '\n\n' + text;
+                    result += '<section class="notice--info">\n';
+                    result += '<h4>' + tag.tag + '</h4>\n\n' + text;
                     result += '\n</section>';
                 } else if (/^(alpha|beta|experimental)$/i.test(tag.tag)) {
                     // Add a notice style
-                    result +=
-                        '<section class="notice--warning" markdown="1">\n';
-                    result += '#### ' + tag.tag + '\n\n' + text;
+                    result += '<section class="notice--warning">\n';
+                    result += '<h4>' + tag.tag + '</h4>\n\n' + text;
                     result += '\n</section>';
                 } else if (/^(deprecated|internal)$/i.test(tag.tag)) {
                     // Add a notice style
-                    result += '<section class="notice--danger" markdown="1">\n';
-                    result += '#### ' + tag.tag + '\n\n' + text;
+                    result += '<section class="notice--danger">\n';
+                    result += '<h4> ' + tag.tag + '</h4>\n\n' + text;
                     result += '\n</section>';
                 } else {
                     result +=
@@ -891,3 +842,60 @@ function trimQuotes(str) {
 function trimNewline(str) {
     return str.replace(/(\n+)$/g, '');
 }
+
+/**
+ *  Main entry point
+ *
+ */
+function makedoc(src, dest, apiName) {
+    try {
+        api = JSON.parse(fs.readFileSync(src));
+
+        const packages = api.groups.filter(x => x.kind === 1);
+        const mainPackage =
+            packages &&
+            packages[0] &&
+            packages[0].children[0] &&
+            getReflectionByID(api, packages[0].children[0]);
+        const mainPackagedocumentation =
+            mainPackage &&
+            mainPackage.comment &&
+            getTag(mainPackage.comment.tags, 'packagedocumentation');
+        const packageName =
+            (mainPackagedocumentation && mainPackagedocumentation.text) ||
+            apiName ||
+            api.name;
+
+        let result = `---
+permalink: "/docs/${escapeYAMLString(trimNewline(apiName))}/"
+title: "${escapeYAMLString(packageName)}"
+read_time: false
+layout: "api-layout"
+sidebar:
+    - nav: "${escapeYAMLString(trimNewline(apiName))}"
+# toc: true
+---
+`;
+
+        if (api.groups) {
+            result += api.groups
+                .map(x => renderGroup(x, ''))
+                .filter(x => !!x)
+                .join('\n\n');
+        } else {
+            // No groups: render all the modules
+            result += api.children
+                .filter(x => x.kind === 1)
+                .map(renderModule)
+                .filter(x => !!x)
+                .join('\n\n');
+        }
+
+        fs.writeFileSync(dest, result);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+const argv = process.argv.slice(2); // @todo: use yargs for argument parsing...
+makedoc(argv[0], argv[1], argv[2]);

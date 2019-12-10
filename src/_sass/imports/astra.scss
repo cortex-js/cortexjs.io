@@ -1,0 +1,82 @@
+$intro-transition: none;
+$global-transition: none;
+$theme: "light" !default;
+
+@import 'code-theme';
+@import 'common';
+
+$primary-color: #0066ce !default !global;
+
+@if ($theme == "dark") {
+  $background-color: #252a34 !default !global;
+  $card-background-color: #112 !default !global;
+  $text-color: #eaeaea !default !global;
+  $border-color: mix(#000, $background-color, 20%) !default !global;
+  // $code-background-color: mix(#000, $background-color, 15%) !default !global;
+  // $code-background-color-dark: mix(#000, $background-color, 20%) !default !global;
+  // $form-background-color: mix(#000, $background-color, 15%) !default !global;
+  $footer-background-color: mix(#000, $background-color, 30%) !default !global;
+  $link-color: lighten($primary-color, 20%) !default !global;
+  $masthead-link-color: $text-color !default !global;
+  $masthead-link-color-hover: mix(#000, $text-color, 20%) !default !global;
+  $navicon-link-color-hover: mix(#000, $background-color, 30%) !default !global;
+  $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
+
+  .author__urls.social-icons .svg-inline--fa,
+  .page__footer-follow .social-icons .svg-inline--fa {
+      color: inherit;
+  }
+} @else {
+  /* Colors */
+  $card-background-color: #f9f9f9 !default !global;
+  $text-color: #000 !default !global;
+  $muted-text-color: $text-color !default !global;
+  $border-color: mix(#fff, $text-color, 85%) !default !global;
+  $footer-background-color: #000 !default !global;
+  $link-color: $primary-color !default !global;
+  $masthead-link-color: $text-color !default !global;
+  $masthead-link-color-hover: $text-color !default !global;
+  $navicon-link-color-hover: mix(#fff, $text-color, 80%) !default !global;
+  $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
+}
+
+$link-color-hover: mix(#fff, $link-color, 25%) !default;
+$link-color-visited: mix(#000, $link-color, 25%) !default;
+
+
+/* contrast syntax highlighting (base16) */
+// $base00: #000000 !default !global;
+// $base01: #242422 !default !global;
+// $base02: #484844 !default !global;
+// $base03: #6c6c66 !default !global;
+// $base04: #918f88 !default !global;
+// $base05: #b5b3aa !default !global;
+// $base06: #d9d7cc !default !global;
+// $base07: #fdfbee !default !global;
+// $base08: #ff6c60 !default !global;
+// $base09: #e9c062 !default !global;
+// $base0a: #ffffb6 !default !global;
+// $base0b: #a8ff60 !default !global;
+// $base0c: #c6c5fe !default !global;
+// $base0d: #96cbfe !default !global;
+// $base0e: #ff73fd !default !global;
+// $base0f: #b18a3d !default !global;
+
+.page__content {
+  .notice,
+  .notice--primary,
+  .notice--info,
+  .notice--warning,
+  .notice--success,
+  .notice--danger {
+    color: $text-color;
+  }
+}
+
+.page__footer {
+  color: #fff !important; // override
+}
+
+.page__footer-follow .social-icons .svg-inline--fa {
+  color: inherit;
+}

@@ -1,4 +1,4 @@
 [submodule "submodules/cortex-js.github.io"]
 	path = submodules/cortex-js.github.io
-	url = git@github.com:cortex-js/cortex-js.github.io.git
+	url = https://github.com/cortex-js/cortex-js.github.io
 	branch = master

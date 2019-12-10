@@ -1,0 +1,102 @@
+---
+---
+<!doctype html>
+<html lang="{{ site.locale | slice: 0,2 | default: "en" }}" class="no-js">
+  <head>
+    {% include head.html %}
+    <link rel="stylesheet" href="{{ '/assets/css/api-layout.css' | relative_url }}">
+    {% include head/custom.html %}
+  </head>
+
+  <body class="layout--{{ layout }}{% if classes or layout.classes %}{{ classes | default: layout.classes | join: ' ' | prepend: ' ' }}{% endif %}">
+    {% include skip-links.html %}
+    {% include browser-upgrade.html %}
+    {% include masthead.html %}
+
+    <div class="initial-content">
+{% if header.overlay_color or header.overlay_image or header.image %}
+  {% include page__hero.html %}
+{% elsif header.video.id and header.video.provider %}
+  {% include page__hero_video.html %}
+{% endif %}
+
+{% if url != "/" and site.breadcrumbs %}
+  {% unless paginator %}
+    {% include breadcrumbs.html %}
+  {% endunless %}
+{% endif %}
+
+<div id="main" role="main">
+  {% include sidebar.html %}
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    {% if title %}<meta itemprop="headline" content="{{ title | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
+    {% if excerpt %}<meta itemprop="description" content="{{ excerpt | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
+    {% if date %}<meta itemprop="datePublished" content="{{ date | date: "%B %d, %Y" }}">{% endif %}
+    {% if last_modified_at %}<meta itemprop="dateModified" content="{{ last_modified_at | date: "%B %d, %Y" }}">{% endif %}
+
+    <div class="page__inner-wrap">
+      {% unless header.overlay_color or header.overlay_image %}
+        <header>
+          {% if title %}<h1 id="page-title" class="page__title" itemprop="headline">{{ title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
+          {% if read_time %}
+            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> {% include read-time.html %}</p>
+          {% endif %}
+        </header>
+      {% endunless %}
+
+      <section class="page__content" itemprop="text">
+        {% if toc %}
+          <aside class="sidebar__right {% if toc_sticky %}sticky{% endif %}">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-{{ toc_icon | default: 'file-alt' }}"></i> {{ toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On this page" }}</h4></header>
+              {% include toc.html sanitize=true html=content h_min=1 h_max=6 class="toc__menu" %}
+            </nav>
+          </aside>
+        {% endif %}
+        {{ content }}
+        {% if link %}<div><a href="{{ link }}" class="btn btn--primary">{{ site.data.ui-text[site.locale].ext_link_label | default: "Direct Link" }}</a></div>{% endif %}
+      </section>
+
+      <footer class="page__meta">
+        {% if site.data.ui-text[site.locale].meta_label %}
+          <h4 class="page__meta-title">{{ site.data.ui-text[site.locale].meta_label }}</h4>
+        {% endif %}
+        {% include page__taxonomy.html %}
+        {% if last_modified_at %}
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</strong> <time datetime="{{ last_modified_at | date: "%Y-%m-%d" }}">{{ last_modified_at | date: "%B %d, %Y" }}</time></p>
+        {% elsif date %}
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</strong> <time datetime="{{ date | date_to_xmlschema }}">{{ date | date: "%B %d, %Y" }}</time></p>
+        {% endif %}
+      </footer>
+
+      {% if share %}{% include social-share.html %}{% endif %}
+
+      {% include post_pagination.html %}
+    </div>
+
+  </article>
+
+
+</div>
+    </div>
+
+    {% if site.search == true %}
+      <div class="search-content">
+        {% include search/search_form.html %}
+      </div>
+    {% endif %}
+
+    <div id="footer" class="page__footer">
+      <footer>
+        {% include footer/custom.html %}
+        {% include footer.html %}
+      </footer>
+    </div>
+
+    {% include scripts.html %}
+
+  </body>
+</html>
+
+

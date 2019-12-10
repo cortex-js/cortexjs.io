@@ -1,0 +1,38 @@
+@charset "utf-8";
+
+@import 'imports/astra';
+@import 'imports/minimal-mistakes'; // main partials
+@import 'imports/minimal-mistakes-overrides'; 
+@import 'imports/utilities';
+@import 'imports/cards';
+
+@import 'imports/section-link';
+
+
+// Space and align the chevron icon
+#main a svg {
+  margin-left: 1ex;
+  vertical-align: -.2em;
+}
+
+.avatar-md {
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  border: 2px solid white;
+}
+
+
+.avatar-lg {
+  border-radius: 50%;
+  width: 128px;
+  height: 128px;
+  border: 2px solid white;
+}
+
+a.chevron::after {
+  width: calc((2/9)*3em);
+  height: 3em;
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 9'%3E%3Cpath d='M-.1 0L2 4.5L-.1 9Z' fill='currentcolor'/%3E%3C/svg%3E");
+}
+

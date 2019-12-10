@@ -1,0 +1,42 @@
+<div class="page__footer-follow">
+    <ul class="social-icons">
+        {% if site.data.ui-text[site.locale].follow_label %}
+        <li>
+            <strong>{{ site.data.ui-text[site.locale].follow_label }}</strong>
+        </li>
+        {% endif %} 
+        {% if site.footer.links %} 
+        {% for link in site.footer.links %} 
+        {% if link.label and link.url %}
+        <li>
+            <a href="{{ link.url }}" rel="nofollow noopener noreferrer"
+                ><i
+                    class="{{ link.icon | default: 'fas fa-link' }}"
+                    aria-hidden="true"
+                ></i>{{ link.label }}</a
+            >
+        </li>
+        {% endif %} 
+        {% endfor %} 
+        {% endif %}
+
+    </ul>
+</div>
+<div class="page__footer-pages">
+            {% if site.footer.pages %} 
+    <ul>
+        {% for p in site.footer.pages %} 
+        {% if p.label and p.url %}
+        <li>
+            <a href="{{ p.url }}" rel="nofollow noopener noreferrer">{% if p.icon %}<i
+                    class="{{ link.icon | default: 'fas fa-link' }}"
+                    aria-hidden="true"
+                ></i>{% endif %}{{ p.label }}</a
+            >
+        </li>
+        {% endif %} 
+        {% endfor %} 
+    </ul>
+        {% endif %}
+
+</div>
