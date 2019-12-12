@@ -49,7 +49,7 @@
         "prettier": "^1.19.1"
     },
     "dependencies": {
-        "mathlive": "^0.32.8",
+        "mathlive": "^0.32.9",
         "typedoc": "^0.15.4"
     },
     "prettier": "@cortex-js/prettier-config",
