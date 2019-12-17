@@ -1,7 +1,25 @@
-// Converts a JSON file describing Typescript types into a Markdown file
-
+// Converts a JSON file describing Typescript types into a HTML fragment
+// with frontmatter
 const fs = require('fs');
-const path = require('path');
+const markdownIt = require('markdown-it');
+const hljs = require('highlight.js'); // https://highlightjs.org/
+
+const md = new markdownIt({
+    // See https://markdown-it.github.io/markdown-it/
+    html: true,
+    typographer: true,
+    highlight: function(str, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+            try {
+                return hljs.highlight(lang, str).value;
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        return ''; // use external default escaping
+    },
+});
 
 const default_language = 'typescript';
 let api = {};
@@ -25,13 +43,19 @@ function renderPermalink(link) {
 function renderIndex(xs, parent = '') {
     if (xs.length <= 1) return '';
     if (parent) parent += '.';
-    return xs
-        .map(
-            x =>
-                ` * [${x.name}()](${'#' + encodeURIComponent(parent + x.name)})`
-        )
-        .filter(x => !!x)
-        .join('\n');
+    return (
+        '<ul>' +
+        xs
+            .map(
+                x =>
+                    `<li><a href="#${encodeURIComponent(parent + x.name)}">${
+                        x.name
+                    }()</a></li>`
+            )
+            .filter(x => !!x)
+            .join('\n') +
+        '</ul>'
+    );
 }
 
 function renderShortType(t) {
@@ -111,7 +135,7 @@ function renderShortParameter(json) {
         result += '...';
     }
 
-    result += '_' + json.name + '_';
+    result += '<em>' + json.name + '</em>';
     if (json.flags && json.flags.isOptional) {
         result += '?';
     }
@@ -128,7 +152,7 @@ function renderShortParameter(json) {
  */
 function renderSignature(json, parent = '') {
     let result = '';
-    if (parent) result += '_' + parent + '._.';
+    if (parent) result += '<em>' + parent + '.</em>.';
 
     result +=
         '(' +
@@ -148,7 +172,7 @@ function renderSignature(json, parent = '') {
 function renderIndexSignature(json, parent = '') {
     let result = '';
 
-    if (parent) result += '_' + parent + '._.';
+    if (parent) result += '<em>' + parent + '.</em>.';
 
     result += '\\[';
     result += json.parameters
@@ -167,36 +191,37 @@ function renderIndexSignature(json, parent = '') {
  *
  */
 function renderLongParameter(json, prefix = '') {
-    let result = '';
+    let result = '<dt>';
     if (prefix === '[arguments]') {
-        result += '_**' + json.name + '**_';
+        result += '<em><strong>' + json.name + '</strong></em>';
     } else {
-        if (prefix) result += '_' + prefix + '_.';
-        result += '**' + json.name + '**';
+        if (prefix) result += '<em>' + prefix + '</em>.';
+        result += '<strong>' + json.name + '</strong>';
     }
     if (json.flags && json.flags.isOptional) {
         result += '?';
     }
     const longType = renderLongType(json.type);
-    if (longType) result += ': ' + longType;
-    result += '\n:  ';
-    result += renderComment(json.comment, 2);
-    result += '\n\n';
     if (json.type.declaration && json.type.declaration.getSignature) {
         result += 'getter'; // @todo something better
     }
     if (json.type.declaration && json.type.declaration.setSignature) {
         result += 'setter'; // @todo something better
     }
+    if (longType) result += ': ' + longType;
+    result += '</dt>\n<dd>\n';
+    result += renderComment(json.comment, 0);
 
     if (json.type.type === 'reflection') {
         // A complex type with "subtypes", e.g. an object literal
         // with multiple properties.
         if (json.type.declaration.children) {
+            result += '\n<dl>\n';
             result += json.type.declaration.children
                 .map(x => renderLongParameter(x, json.name))
                 .filter(x => !!x)
                 .join('\n');
+            result += '\n</dl>\n';
         }
         if (json.type.declaration.indexSignature) {
             result += json.type.declaration.indexSignature
@@ -205,6 +230,7 @@ function renderLongParameter(json, prefix = '') {
                 .join('\n');
         }
     }
+    result += '\n</dd>\n';
 
     return result;
 }
@@ -235,10 +261,12 @@ function renderFunctionSignature(s, parent = '') {
     result += renderComment(s.comment) + '\n';
 
     if (s.parameters) {
+        result += '\n<dl>\n';
         result += s.parameters
             .map(x => renderLongParameter(x, '[arguments]'))
             .filter(x => !!x)
             .join('\n');
+        result += '\n</dl>\n';
     }
 
     if (s.type) {
@@ -411,10 +439,12 @@ function renderTypeAliases(json) {
     result += renderComment(json.comment);
 
     if (!type && json.type.declaration.children) {
+        result += '\n<dl>\n';
         result += json.type.declaration.children
             .map(x => renderLongParameter(x, ''))
             .filter(x => !!x)
             .join('\n');
+        result += '\n</dl>\n';
         // result += renderLongType(json.type);
     }
 
@@ -441,9 +471,9 @@ function renderModule(json) {
         const entries = json.children.filter(x => x.kind === 64);
 
         result +=
-            '\n' +
+            '\n<div class="tsd-index-list">' +
             renderIndex(entries, trimQuotes(json.name) + '.') +
-            '\n{:.tsd-index-list}\n';
+            '\n</div>\n';
 
         result += entries
             .map(x =>
@@ -597,16 +627,16 @@ function renderGroup(group, parent) {
     return result + '\n';
 }
 
-function renderComment(comment, indent = 0) {
+function renderComment(comment) {
     if (!comment) return '';
     let result = '';
-    let newLine = '\n' + ' '.repeat(indent);
+    let newLine = '\n';
 
     const modifierTags = renderModifierTags(comment.tags);
     if (modifierTags) result += newLine + modifierTags + newLine + newLine;
 
     if (comment.shortText) {
-        result += renderLinks(comment.shortText) + newLine + newLine;
+        result += renderLinks(md.render(comment.shortText)) + newLine + newLine;
     }
     if (comment.text) {
         result +=
@@ -661,18 +691,19 @@ function renderTag(tag) {
     text = renderLinks(text);
     switch (tag.tag) {
         case 'method':
-            result += '**Method:** ' + text;
+            result += '<strong>Method:</strong> ' + text;
             break;
         case 'module':
-            result += '**Module:** ' + text;
+            result += '<strong>Module:</strong> ' + text;
             break;
         case 'function':
-            result += '**Function:** ' + text;
+            result += '<strong>Function:</strong> ' + text;
             break;
         case 'example':
             result +=
-                `\`\`\`${default_language || 'typescript'}\n${text}` +
-                '\n```\n';
+                '\n<pre><code>' +
+                hljs.highlight(default_language || 'typescript', text).value +
+                '</pre></code>\n';
             break;
         case 'typedef':
         case 'type':
@@ -731,7 +762,7 @@ function renderTag(tag) {
                     tag.tag
                 )
             ) {
-                result += '**' + tag.tag + '**';
+                result += '<strong>' + tag.tag + '</strong>';
 
                 if (!/^()$/i.test(tag.tag)) {
                     console.log('Unexpected tag ' + tag.tag);
@@ -765,11 +796,13 @@ function renderModifierTag(json) {
     }[json.tag];
 
     if (modifierTag) {
-        result += '*' + modifierTag + '*{: .modifier-tag}';
+        result += '<span class=".modifier-tag">' + modifierTag + '</span>';
     } else if (redModifierTag) {
-        result += '*' + redModifierTag + '*{: .red.modifier-tag}';
+        result +=
+            '<span class="red.modifier-tag">' + redModifierTag + '</span>';
     } else if (orangeModifierTag) {
-        result += '*' + orangeModifierTag + '*{: .orange.modifier-tag}';
+        result +=
+            '<span class="orange.modifier-tag"' + orangeModifierTag + '</span>';
     }
     return result;
 }
@@ -793,39 +826,46 @@ function convertJSDocPath(path) {
 }
 
 function renderLinks(str) {
-    str = str.replace(/{@tutorial\s+(\S+?)[ \|]+(.+?)}/g, '[$2]($1)');
-    str = str.replace(/{@tutorial\s+(\S+?)}/g, '[$1]($1)');
+    str = str.replace(
+        /{@tutorial\s+(\S+?)[ \|]+(.+?)}/g,
+        '<a href="$1">$2</a>'
+    );
+    str = str.replace(/{@tutorial\s+(\S+?)}/g, '<a href="$1">$1</a>');
 
     // Link with title
     str = str.replace(
         /{@link\s+(\S+?)[ \|]+(.+?)}/g,
-        (match, p1, p2) => `[${p2}](${p1})`
+        (match, p1, p2) => `<a href="${p1}">${p2}</a>`
     );
     // Link without title
-    str = str.replace(/{@link\s+(\S+?)}/g, (match, p1) => `[${p1}](${p1})`);
+    str = str.replace(
+        /{@link\s+(\S+?)}/g,
+        (match, p1) => `<a href="${p1}">${p1}</a>`
+    );
 
     // @linkcode (JSCode compatible path)
     str = str.replace(
         /{@linkcode\s+(\S+?)[ \|]+(.+?)}/g,
-        (match, p1, p2) => `[\`${p2}\`](${convertJSDocPath(p1)})`
+        (_match, p1, p2) =>
+            `<a href="${convertJSDocPath(p1)}"><code>${p2}</code></a>`
     );
 
     return str;
 }
 
 function renderNotices(str) {
-    str = renderLinks(str);
+    const content = renderLinks(md.render(str));
 
     if (/^\*\*(note):?\s*\*\*/i.test(str)) {
-        return str + '\n{: .notice--info}';
+        return '\n<div class=".notice--info">' + content + '</div>\n';
     }
     if (/^\*\*(warning):?\s*\*\*/i.test(str)) {
-        return str + '\n{: .notice--warning}';
+        return '\n<div class=".notice--warning">' + content + '</div>\n';
     }
     if (/^\*\*(danger):?\s*\*\*/i.test(str)) {
-        return str + '\n{: .notice--danger}';
+        return '\n<div class=".notice--danger">' + content + '</div>\n';
     }
-    return str;
+    return content;
 }
 
 function escapeYAMLString(str) {

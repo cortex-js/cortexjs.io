@@ -70,7 +70,7 @@ function buildSass(srcDir, destDir) {
 module.exports = function(eleventyConfig) {
     buildSass('./src/_sass/', './src/build/css');
 
-    let markdownIt = require('markdown-it');
+    const markdownIt = require('markdown-it');
     // let markdownItEmoji = require('markdown-it-emoji');
     let options = {
         // See https://markdown-it.github.io/markdown-it/

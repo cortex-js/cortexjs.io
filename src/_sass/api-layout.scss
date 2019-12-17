@@ -131,10 +131,23 @@ body.layout--api-layout #main a:hover {
 
 table {
     font-size: 1em;
+    width: 100%;
+    table-layout: fixed;
 }
 
+thead {
+    background-color: transparent;
+    border-bottom: 1px solid #333;
+}
+tr {
+    width: 100%;
+}
 td {
     border-bottom-color: #ddd;
+}
+
+td:last-of-type() {
+    width: 100%;
 }
 
 dd div.highlight {

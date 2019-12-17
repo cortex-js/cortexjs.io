@@ -15,7 +15,7 @@
   vertical-align: -.2em;
 }
 
-.avatar-md {
+.vatar-md {
   border-radius: 50%;
   width: 64px;
   height: 64px;
@@ -28,6 +28,26 @@
   width: 128px;
   height: 128px;
   border: 2px solid white;
+}
+
+.hero-container {
+  position: relative;
+}
+
+.hero-container h2 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  text-align: right;
+  margin: 0;
+  padding-top: 20%;
+  border: none;
+  font-size: 3em;
+  line-height: .8;
+  background: #fff;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 80%)  66%, white 100%)
 }
 
 a.chevron::after {

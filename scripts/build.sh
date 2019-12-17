@@ -39,7 +39,7 @@ npx typedoc --mode modules \
     build/mathlive.proc.d.ts
 
 ## Makedoc (.json -> .md)
-./scripts/makedoc.sh ./build/mathlive.json ./src/build/mathlive.md mathlive
+./scripts/makedoc.sh ./build/mathlive.json ./src/build/mathlive.html mathlive
 
 
 ## Build (.md -> .html)
