@@ -2,7 +2,3 @@
 	path = submodules/cortex-js.github.io
 	url = https://github.com/cortex-js/cortex-js.github.io
 	branch = master
-[submodule "submodules/grok"]
-	path = submodules/grok
-	url = https://github.com/ui-js/grok
-	branch = master
