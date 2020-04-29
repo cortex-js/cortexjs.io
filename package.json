@@ -21,6 +21,7 @@
         "clean": "bash scripts/clean.sh",
         "coverage": "bash scripts/test.sh --coverage",
         "deploy": "bash scripts/deploy.sh",
+        "install": "npm install --production=false submodules/grok",
         "lint": "prettier --config .config/prettierrc.yaml--ignore-path ./.prettierignore --write \"**/*.{ts,js,css,md,yml,json}\" \"!vendor/**\"",
         "restart": "bash scripts/restart.sh",
         "stage": "bash scripts/stage.sh",
