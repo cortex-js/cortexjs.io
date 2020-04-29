@@ -27,8 +27,9 @@ $primary-color: #0066ce !default !global;
       color: inherit;
   }
 } @else {
+  $background-color: #fff !default !global;
   /* Colors */
-  $card-background-color: #f9f9f9 !default !global;
+  $card-background-color: #fafafa !default !global;
   $text-color: #000 !default !global;
   $muted-text-color: $text-color !default !global;
   $border-color: mix(#fff, $text-color, 85%) !default !global;

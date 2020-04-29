@@ -7,15 +7,6 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch makedoc mathfield",
-            "program": "${workspaceFolder}/script/makedoc.js",
-            "args": ["src/api-docs/_mathfield.json"],
-            "cwd": "${workspaceFolder}",
-            "outFiles": ["${workspaceFolder}/**/*.js"]
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "Launch eleventy",
             "program": "${workspaceFolder}/node_modules/@11ty/eleventy/cmd.js",
             "args": ["--config", "./config/eleventy.js"],

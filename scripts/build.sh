@@ -17,29 +17,8 @@ ENVIRONMENT="${1-dev}"
 mkdir -p ./build
 mkdir -p ./src/build
 
-## Preprocess
-
-# Typedoc doesn't handle optional parameters in JSDOC, so strip them
-# See https://github.com/TypeStrong/typedoc/issues/567
-
-sed -E -e 's/@param(.*)\[([^=]+)=(.+)\]/@param\1\2/g' \
-    node_modules/mathlive/dist/mathlive.d.ts | \
-sed -E -e 's/@param(.*)\[(.+)\]/@param\1\2/g' > \
-    build/mathlive.proc.d.ts 
-
-## Typedoc (.d.ts -> .json)
-npx typedoc --mode modules \
-    --includeDeclarations \
-    --excludeExternals \
-    --excludePrivate \
-    --excludeProtected \
-    --hideGenerator \
-    --readme none \
-    --json ./build/mathlive.json \
-    build/mathlive.proc.d.ts
-
-## Makedoc (.json -> .md)
-./scripts/makedoc.sh ./build/mathlive.json ./src/build/mathlive.html mathlive
+## Grok (.d.ts -> .html with frontmatter)
+node ./submodules/grok/bin/grok-cli  ./node_modules/mathlive/dist/mathlive.d.ts --apiName mathlive --outDir ./src/build/ --outFile mathlive.html
 
 
 ## Build (.md -> .html)

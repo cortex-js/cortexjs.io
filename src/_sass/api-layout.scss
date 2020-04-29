@@ -1,15 +1,12 @@
 // Stylesheet for the typescript_doc layout.
 @charset "utf-8";
 @import 'imports/astra';
-@import 'imports/minimal-mistakes'; // main partials
+// @import 'imports/minimal-mistakes'; // main partials
 @import 'imports/minimal-mistakes-overrides'; 
 
-
 code {
-    font-size: $code-font-size;
-}
-
-h2 {
+    // font-size: $code-font-size;
+    display: inline;
 }
 
 h2 em {
@@ -26,35 +23,35 @@ h2 strong {
     font-weight: bold;
 }
 
-.card h3, h3 {
-    width: calc(100% + 40px);
-    margin-top: -25px;
-    margin-bottom: 10px;
-    margin-left: -20px;
-    margin-right: -20px;
-    padding: 20px;
-    padding-bottom: 10px;
-
-    font-family: $monospace;
-    font-size: $code-font-size;
+h3 {
+    position: sticky;
+    top: -2px; // Needed for sticky
+    width: calc(100%);
+    font-size: $h3-font-size;
     font-feature-settings: normal;
     line-height: 1.5;
-    font-weight: normal;
-
-    white-space: pre-wrap;
-
-    color: $body-color;
-    // letter-spacing: .25px;
-
+    border: 10px solid $background-color;
     border-bottom: 1px solid #e7e7e7;
+    color: $body-color;
+    z-index: 6;  // For sticky header to float above
+    background: $background-color;
+    transform: translateX(-10px);
+    box-sizing: content-box;
+    
 }
 
-h4 {
-    font-size: $h4-font-size;
+/* Subheading above */
+h3 em {
+    display: block;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-style: normal;
+    color: #aaa;
 }
 
 /* Categories */
-.tsd-index-list h3 {
+.index h3 {
     font-family: $sans-serif;
     font-size: $h3-font-size;
     background: transparent;
@@ -64,14 +61,72 @@ h4 {
     padding: 0;
 }
 
-// h3 code {
-//     font-size: $body-font-size;
-// }
 
-/* Function names */
-h3 strong {
+.card {
+    display: block;
+
+    // font-size: $body-font-size;
+    margin-top: 30px;
+    margin-bottom: 40px;
+    overflow: hidden;
+    padding: 20px 17px;
+    border-radius: 4px;
+    border: 1px solid $border-color;
+    background-color: $card-background-color;
+    color: $body-color;
+    max-width: 820px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+
+.card h3 {
+    position: relative;  // Override sticky h3
+    top: auto;      // Override sticky h3
+    z-index: 5;  // Override sticky h3
+    width: calc(100% + 40px);
+    margin-top: -25px;
+    margin-bottom: 10px;
+    margin-left: -10px;
+    margin-right: -20px;
+    padding: 20px;
+    padding-bottom: 10px;
+
+    font-family: $monospace;
+    font-size: 18px;
+    font-feature-settings: normal;
+    line-height: 1.5;
+    font-weight: normal;
+
+    white-space: nowrap;
+
+    color: $body-color;
+    // letter-spacing: .25px;
+    border: none;
+    border-bottom: 1px solid #e7e7e7;
+    box-sizing: border-box;
+    display: flex; // To accommodate the anchor
+}
+
+/* Card header name */
+.card h3 strong {
     color: $primary;
 }
+
+
+
+  
+.card h3 > span {
+    display: block;
+    width: 100%;
+    // Leave room for the anchor tag
+    max-width: calc(100% - 24px);
+    white-space: normal;
+}
+
+h4 {
+    font-size: $h4-font-size;
+}
+
 
 ul {
     line-height: 1.333;
@@ -79,6 +134,9 @@ ul {
     padding-left: 0;
 }
 
+.page__content dl.inset {
+    margin-left: 1em;
+}
 .page__content dd {
     font-size: 1em;
 }
@@ -89,6 +147,8 @@ ul {
     padding-left: 10px;
 }
 
+
+
 .page__content p,
 .page__content li {
     font-size: $body-font-size !important;
@@ -97,6 +157,10 @@ ul {
     margin-top: 1em;
     margin-bottom: 1em;
     color: $body-color;
+}
+
+html {
+    scroll-behavior: smooth
 }
 
 body.layout--api-layout #main a,
@@ -109,9 +173,17 @@ body.layout--api-layout #main a:hover {
 
 .page__content dt {
     font-family: $monospace;
-    font-size: $code-font-size;
+    // font-size: $code-font-size;
+    font-size: $body-font-size;
     color: $secondary;
     font-weight: normal;
+    padding: 8px;
+    margin: -8px;
+    border-radius: 8px;
+}
+
+.page__content dt[id]:hover {
+    background: #f0f0f0;
 }
 
 .page__content dt strong {
@@ -130,9 +202,9 @@ body.layout--api-layout #main a:hover {
 }
 
 table {
-    font-size: 1em;
+    font-size: 1em; // .main.sccs has it at .75em
     width: 100%;
-    table-layout: fixed;
+    display: table;
 }
 
 thead {
@@ -154,29 +226,13 @@ dd div.highlight {
     margin-top: 1.5em;
 }
 
-.card {
-    flex-flow: column;
-    align-items: start;
-
-    font-size: $body-font-size;
-    margin-top: 30px;
-    margin-bottom: 40px;
-    overflow: hidden;
-    padding: 20px 17px;
-    border-radius: 4px;
-    border: 1px solid $card-border;
-    background-color: $card-background;
-    color: $body-color;
-    max-width: 820px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-}
 
 .page__content .card p:nth-child(1) {
     margin-top: 0;
 }
 
-.tsd-index-list ul,
-ul.tsd-index-list {
+.index ul,
+ul.index {
     column-width: 20ex;
     column-gap: 20px;
     padding: 0;
@@ -184,7 +240,8 @@ ul.tsd-index-list {
     line-height: 1.333;
 }
 
-.tsd-index-list li {
+.index li {
+    display: flex;
     font-family: $monospace;
     font-size: $code-font-size !important;
     margin: 0;
@@ -192,27 +249,91 @@ ul.tsd-index-list {
     break-inside: avoid-column;
 }
 
-.tsd-index-list li a,
-.tsd-index-list li a:visited {
+.index li a,
+.index li a:visited {
     text-decoration: none;
 }
 
-.tsd-index-list li a:hover,
-.tsd-index-list li a:active {
+.index li a:hover,
+.index li a:active {
     color: $primary;
 }
 
 /* Anchor icon */
-.page__content h1 .header-link,
-.page__content h2 .header-link,
-.page__content h3 .header-link,
-.page__content h4 .header-link,
-.page__content h5 .header-link,
-.page__content h6 .header-link {
-    font-size: 1em;
+.permalink { 
+    float: right;
 }
 
-.modifier-tag {
+.permalink svg {
+   display: inline-block;
+   font-size: inherit;
+   width: 1em;
+   height: 1em;
+   overflow: visible;
+   vertical-align: -.2em;
+}
+
+#main a.externallink svg {
+    width: .8em;
+    height: .8em;
+    vertical-align: 0;
+    margin-left: .5ex;
+    margin-right: .5ex
+}
+
+.page__content h1 .permalink,
+.page__content h2 .permalink,
+.page__content h3 .permalink,
+.page__content h4 .permalink,
+.page__content h5 .permalink,
+.page__content h6 .permalink {
+    font-size: 1em;
+    left: -.5em;
+}
+.page__content section {
+	scroll-margin-top: 5em; // Would be nice, but can't get it to work
+} 
+  
+.page__content section:target h3 span strong, 
+.page__content h2:target span strong  {
+    position: relative;
+    z-index: 0;
+}
+.page__content dt:target strong::after,
+.page__content section:target h3 span strong::after,
+.page__content h2:target span strong::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    border-radius: 8px;
+    width: calc(100% + 16px);
+    height: calc(100% + 16px);
+    background: hsla(49, 100%, 63%, 0.56); // hsla(58, 100%, 50%, 0.56);
+    z-index: -1;
+}
+
+
+.page__content dt strong {
+    // To support target highliting for dt/dd
+    // This is used when we have a 'short' interface/class
+    // displayed in a card.
+    position: relative;
+    z-index : 0;
+}
+
+// Show the anchor when it is the target
+.page__content dt .permalink {
+    opacity: 0;
+}
+.page__content section:target h3 .permalink, 
+.page__content dt:target .permalink ,
+.page__content dt:hover .permalink {
+    opacity: 1;
+}
+
+
+.modifier-tag, .tag-name {
     display: inline-block;
     white-space: nowrap;
     font-size: 12px;
@@ -225,7 +346,7 @@ ul.tsd-index-list {
     height: 22px;
 
     margin-left: 0;
-    margin-right: 32px;
+    margin-right: 16px;
 
     padding-left: 10px;
     padding-right: 10px;
@@ -240,6 +361,24 @@ ul.tsd-index-list {
     border-radius: 3px;
 
     background: transparent;
+
+    min-width: 90px;
+    text-align: center;
+
+    vertical-align: bottom;
+}
+
+// Used for "Implemented by:", "Extends:", etc...
+.tag-name {
+    text-align: right;
+    color: $body-color;
+    border-color: $background-color;
+    margin-right: 0;
+    font-weight: bold;
+}
+
+.modifier-tag + .modifier-tag {
+    margin-left: 16px;
 }
 
 .red.modifier-tag {
@@ -247,18 +386,19 @@ ul.tsd-index-list {
     border-color: $semantic-red;
 }
 
+
 .orange.modifier-tag {
     color: $semantic-orange;
     border-color: $semantic-orange;
 }
-
-.tag-name {
-    font-family: $sans-serif;
-    font-size: $body-font-size;
-    font-weight: bold;
-    color: $body-color;
-    text-transform: capitalize;
+// A block above a method or property name, at the very 
+// top of a card section, that groups a series of flags
+// such as "exported", "protected", "private", etc...
+// (can also be displayed inline as span.flags for classCard)
+div.flags {
+    margin-bottom: 10px;
 }
+
 .page__content .notice--info h4,
 .page__content .notice--warning h4,
 .page__content .notice--danger h4 {
@@ -267,12 +407,76 @@ ul.tsd-index-list {
     text-transform: uppercase;
 }
 
+.page__content .notice--info code, 
+.page__content .notice--warning code, 
+.page__content .notice--danger code {
+    background: inherit;
+}
+
 .page__content .notice--danger h4 {
     color: $semantic-red;
 }
 
 .deprecated {
     text-decoration: line-through;
+}
+
+
+
+// Arguments, e.g. "a" in 'f(a:T)'
+// Can also be used standalone, e.g. in markup
+var, .var {
+    font-family: $monospace;
+    // font-size: $code-font-size;
+    font-style: italic;
+    font-weight: 400;
+}
+
+strong var {
+    font-weight: 700;
+}
+
+
+
+// The name of a referenced type, e.g.
+// `Bar` in `type Foo = Bar`
+.reference, .typeParameter {
+    font-weight: bold;
+}
+
+// For a string, in quotes
+.stringLiteral {
+    color: $gray-400;
+}
+
+// Punctuation signs, "=", "|", ":". 
+// For example "type foo = number"
+.punct {
+    color: $indigo-400;
+    font-weight: bold;
+}
+
+// For "string", "number", "void", "typeof", etc...
+.keyword {
+    color: $purple-400;
+    font-weight: 400;
+}
+
+// The "?" symbol to indicate optional arguments
+// The '...' string to indicate 'rest' arguments
+.modifier {
+    color: $magenta-400;
+    font-weight: bold;
+}
+
+
+// For {...} blocks (unions, intersections)
+ul.type-block {
+    margin: 0;
+}
+ul.type-block li {
+    margin: 0;
+    margin-left: 1em;
 }
 
 div.highlighter-rouge,
@@ -286,7 +490,7 @@ li > code,
 figcaption > code,
 td > code,
 dd > code {
-    font-size: $code-font-size;
+    // font-size: $code-font-size;
     border: 1px solid #ddd;
     background: #fefefe;
     border-radius: 4px;
@@ -294,6 +498,7 @@ dd > code {
     padding-right: 4px;
     padding-bottom: 2px;
     padding-top: 2px;
+    vertical-align: 1px;
 }
 
 @media (min-width: 80em) {
