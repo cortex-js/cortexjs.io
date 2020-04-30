@@ -1,26 +1,130 @@
 // Stylesheet for the typescript_doc layout.
 @charset "utf-8";
+// $h4-font-size:  1rem !default;
+// $primary: #0066ce !default;
+// $secondary: #999 !default;
+// $theme: 'light' !default;
+$monospace: 'IBM Plex Mono', 'Fira Code', monospace !default;
+$sans-serif: 'IBM Plex Sans', 'Source Sans Pro', sans-serif !default;
+
 @import 'imports/astra';
-// @import 'imports/minimal-mistakes'; // main partials
+@import 'imports/minimal-mistakes'; // main partials
 @import 'imports/minimal-mistakes-overrides'; 
 
-code {
-    // font-size: $code-font-size;
-    display: inline;
+@media (min-width: 64em) {
+    .page { padding-right: 0; }
 }
 
+$subheading-font-size: 0.7rem;
+$h3-font-size: 1.25rem;
+$h4-font-size:  1.17rem;
+$code-font-size: 1rem;
+
+
+// $semantic-blue: #0066ce;
+// $semantic-red: #e34850;
+// $semantic-orange: #e68619;
+
+// $celery-400: rgb(68, 181, 86);
+// $celery-500: rgb(75, 195, 95);
+// $celery-600: rgb(81, 210, 103);
+// $celery-700: rgb(88, 224, 111);
+// $chartreuse-400: rgb(133, 208, 68);
+// $chartreuse-500: rgb(142, 222, 73);
+// $chartreuse-600: rgb(155, 236, 84);
+// $chartreuse-700: rgb(163, 248, 88);
+// $yellow-400: rgb(223, 191, 0);
+// $yellow-500: rgb(237, 204, 0);
+// $yellow-600: rgb(250, 217, 0);
+// $yellow-700: rgb(255, 226, 46);
+// $magenta-400: rgb(216, 55, 144);
+// $magenta-500: rgb(226, 73, 157);
+// $magenta-600: rgb(236, 90, 170);
+// $magenta-700: rgb(245, 107, 183);
+// $fuchsia-400: rgb(192, 56, 204);
+// $fuchsia-500: rgb(207, 62, 220);
+// $fuchsia-600: rgb(217, 81, 229);
+// $fuchsia-700: rgb(227, 102, 239);
+// $purple-400: rgb(146, 86, 217);
+// $purple-500: rgb(157, 100, 225);
+// $purple-600: rgb(168, 115, 233);
+// $purple-700: rgb(180, 131, 240);
+// $indigo-400: rgb(103, 103, 236);
+// $indigo-500: rgb(117, 117, 241);
+// $indigo-600: rgb(130, 130, 246);
+// $indigo-700: rgb(144, 144, 250);
+// $seafoam-400: rgb(27, 149, 154);
+// $seafoam-500: rgb(32, 163, 168);
+// $seafoam-600: rgb(35, 178, 184);
+// $seafoam-700: rgb(38, 192, 199);
+// $red-400: rgb(227, 72, 80);
+// $red-500: rgb(236, 91, 98);
+// $red-600: rgb(247, 109, 116);
+// $red-700: rgb(255, 123, 130);
+// $orange-400: rgb(230, 134, 25);
+// $orange-500: rgb(242, 148, 35);
+// $orange-600: rgb(249, 164, 63);
+// $orange-700: rgb(255, 181, 91);
+// $green-400: rgb(45, 157, 120);
+// $green-500: rgb(51, 171, 132);
+// $green-600: rgb(57, 185, 144);
+// $green-700: rgb(63, 200, 156);
+// $blue-400: rgb(38, 128, 235);
+// $blue-500: rgb(55, 142, 240);
+// $blue-600: rgb(75, 156, 245);
+// $blue-700: rgb(90, 169, 250);
+// $gray-50: rgb(37, 37, 37);
+// $gray-75: rgb(47, 47, 47);
+// $gray-100: rgb(50, 50, 50);
+// $gray-200: rgb(62, 62, 62);
+// $gray-300: rgb(74, 74, 74);
+// $gray-400: rgb(90, 90, 90);
+// $gray-500: rgb(110, 110, 110);
+// $gray-600: rgb(144, 144, 144);
+// $gray-700: rgb(185, 185, 185);
+// $gray-800: rgb(227, 227, 227);
+// $gray-900: rgb(255, 255, 255);
+
+@if ($theme == "dark") {
+    $background-color: #252a34 !default !global;
+    $text-color: #eaeaea !default !global;
+    $border-color: mix(#000, $background-color, 20%) !default !global;
+    $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
+} @else {
+    $background-color: #fff !default !global;
+    $text-color: #223 !default !global;
+    $border-color: mix(#fff, $text-color, 85%) !default !global;
+    $card-background-color: #fafafa !default !global;
+    $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
+}
+
+section.page__content {
+    font-family: $sans-serif;
+    line-height: 1.5;
+    color: $text-color;
+}
+
+section.page__content h1,
+section.page__content h2,
+section.page__content h3,
+section.page__content h4,
+section.page__content h5 {
+    font-family: $sans-serif;
+}
+
+// For the sub-heading
 h2 em {
     display: block;
     font-size: $subheading-font-size;
-    font-weight: 900;
+    line-height: .8;
     text-transform: uppercase;
     font-style: normal;
-    color: $secondary;
 }
 
+// For the "main" symbol in the heading
 h2 strong {
     color: $primary;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 h3 {
@@ -32,7 +136,7 @@ h3 {
     line-height: 1.5;
     border: 10px solid $background-color;
     border-bottom: 1px solid #e7e7e7;
-    color: $body-color;
+    color: $text-color;
     z-index: 6;  // For sticky header to float above
     background: $background-color;
     transform: translateX(-10px);
@@ -43,11 +147,12 @@ h3 {
 /* Subheading above */
 h3 em {
     display: block;
-    font-size: 11px;
-    font-weight: 900;
+    font-size: $subheading-font-size;
+    line-height:.8;
+    font-weight: 700;
     text-transform: uppercase;
     font-style: normal;
-    color: #aaa;
+    opacity: .4;
 }
 
 /* Categories */
@@ -56,16 +161,52 @@ h3 em {
     font-size: $h3-font-size;
     background: transparent;
     border: none;
-    font-weight: 900;
+    font-weight: 700;
     margin: 0;
     padding: 0;
+}
+
+code {
+    font-family: $monospace;
+    display: inline;
+    overflow-wrap: break-word;
+}
+
+p > code,
+a > code,
+li > code,
+figcaption > code,
+td > code,
+dd > code {
+    // font-size: $code-font-size;
+    border: 1px solid #ddd;
+    background: #fefefe;
+    border-radius: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    padding-top: 2px;
+    vertical-align: 1px;
+    white-space: pre-wrap;
+}
+
+// Arguments, e.g. "a" in 'f(a:T)'
+// Can also be used standalone, e.g. in markup
+var, .var {
+    font-family: $monospace;
+    // font-size: $code-font-size;
+    font-style: italic;
+    font-weight: 400;
+}
+
+strong var {
+    font-weight: 700;
 }
 
 
 .card {
     display: block;
 
-    // font-size: $body-font-size;
     margin-top: 30px;
     margin-bottom: 40px;
     overflow: hidden;
@@ -73,7 +214,7 @@ h3 em {
     border-radius: 4px;
     border: 1px solid $border-color;
     background-color: $card-background-color;
-    color: $body-color;
+    color: $text-color;
     max-width: 820px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
@@ -92,14 +233,14 @@ h3 em {
     padding-bottom: 10px;
 
     font-family: $monospace;
-    font-size: 18px;
+    font-size: 1.2rem;
     font-feature-settings: normal;
     line-height: 1.5;
-    font-weight: normal;
+    font-weight: 400;
 
     white-space: nowrap;
 
-    color: $body-color;
+    color: $text-color;
     // letter-spacing: .25px;
     border: none;
     border-bottom: 1px solid #e7e7e7;
@@ -125,6 +266,7 @@ h3 em {
 
 h4 {
     font-size: $h4-font-size;
+    font-weight: 700;
 }
 
 
@@ -135,10 +277,11 @@ ul {
 }
 
 .page__content dl.inset {
-    margin-left: 1em;
+    margin-left: 1rem;
 }
 .page__content dd {
-    font-size: 1em;
+    font-family: $sans-serif;
+    font-size: 1rem;
 }
 
 .page__content dd ul {
@@ -151,12 +294,12 @@ ul {
 
 .page__content p,
 .page__content li {
-    font-size: $body-font-size !important;
+    font-size: 1rem !important;
     line-height: 1.52;
 
-    margin-top: 1em;
-    margin-bottom: 1em;
-    color: $body-color;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    color: $text-color;
 }
 
 html {
@@ -174,12 +317,30 @@ body.layout--api-layout #main a:hover {
 .page__content dt {
     font-family: $monospace;
     // font-size: $code-font-size;
-    font-size: $body-font-size;
-    color: $secondary;
-    font-weight: normal;
+    font-size: 1rem;
+    font-weight: 400;
     padding: 8px;
     margin: -8px;
     border-radius: 8px;
+}
+
+
+.page__content dt strong {
+    // To support target highliting for dt/dd
+    // This is used when we have a 'short' interface/class
+    // displayed in a card.
+    position: relative;
+    z-index : 0;
+}
+
+// Show the anchor when it is the target
+.page__content dt .permalink {
+    opacity: 0;
+}
+.page__content section:target h3 .permalink, 
+.page__content dt:target .permalink ,
+.page__content dt:hover .permalink {
+    opacity: 1;
 }
 
 .page__content dt[id]:hover {
@@ -187,7 +348,7 @@ body.layout--api-layout #main a:hover {
 }
 
 .page__content dt strong {
-    color: $body-color;
+    color: $text-color;
 }
 
 .page__content dt em {
@@ -195,14 +356,14 @@ body.layout--api-layout #main a:hover {
 }
 
 .page__content dd {
-    font-size: $body-font-size;
-    color: $body-color;
+    font-size: 1rem;
+    color: $text-color;
 
     margin-bottom: 20px;
 }
 
 table {
-    font-size: 1em; // .main.sccs has it at .75em
+    font-size: 1rem; // .main.sccs has it at .75em
     width: 100%;
     display: table;
 }
@@ -218,9 +379,9 @@ td {
     border-bottom-color: #ddd;
 }
 
-td:last-of-type() {
-    width: 100%;
-}
+// td:last-of-type() {
+//     width: 100%;
+// }
 
 dd div.highlight {
     margin-top: 1.5em;
@@ -233,7 +394,7 @@ dd div.highlight {
 
 .index ul,
 ul.index {
-    column-width: 20ex;
+    column-width: 28ex; // Approx. maximum length of a symbol (in char)
     column-gap: 20px;
     padding: 0;
     list-style: none;
@@ -314,29 +475,11 @@ ul.index {
 }
 
 
-.page__content dt strong {
-    // To support target highliting for dt/dd
-    // This is used when we have a 'short' interface/class
-    // displayed in a card.
-    position: relative;
-    z-index : 0;
-}
-
-// Show the anchor when it is the target
-.page__content dt .permalink {
-    opacity: 0;
-}
-.page__content section:target h3 .permalink, 
-.page__content dt:target .permalink ,
-.page__content dt:hover .permalink {
-    opacity: 1;
-}
-
 
 .modifier-tag, .tag-name {
     display: inline-block;
     white-space: nowrap;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 18px;
     font-weight: 400;
     font-variant: normal;
@@ -365,16 +508,16 @@ ul.index {
     min-width: 90px;
     text-align: center;
 
-    vertical-align: bottom;
+    vertical-align: middle;
 }
 
 // Used for "Implemented by:", "Extends:", etc...
 .tag-name {
     text-align: right;
-    color: $body-color;
+    color: $text-color;
     border-color: $background-color;
     margin-right: 0;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 .modifier-tag + .modifier-tag {
@@ -423,25 +566,13 @@ div.flags {
 
 
 
-// Arguments, e.g. "a" in 'f(a:T)'
-// Can also be used standalone, e.g. in markup
-var, .var {
-    font-family: $monospace;
-    // font-size: $code-font-size;
-    font-style: italic;
-    font-weight: 400;
-}
-
-strong var {
-    font-weight: 700;
-}
 
 
 
 // The name of a referenced type, e.g.
 // `Bar` in `type Foo = Bar`
 .reference, .typeParameter {
-    font-weight: bold;
+    font-weight: 700;
 }
 
 // For a string, in quotes
@@ -453,20 +584,20 @@ strong var {
 // For example "type foo = number"
 .punct {
     color: $indigo-400;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 // For "string", "number", "void", "typeof", etc...
 .keyword {
     color: $purple-400;
-    font-weight: 400;
+    // font-weight: inherit;
 }
 
 // The "?" symbol to indicate optional arguments
 // The '...' string to indicate 'rest' arguments
 .modifier {
     color: $magenta-400;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 
@@ -484,22 +615,6 @@ figure.highlight {
     border-radius: 8px;
 }
 
-p > code,
-a > code,
-li > code,
-figcaption > code,
-td > code,
-dd > code {
-    // font-size: $code-font-size;
-    border: 1px solid #ddd;
-    background: #fefefe;
-    border-radius: 4px;
-    padding-left: 4px;
-    padding-right: 4px;
-    padding-bottom: 2px;
-    padding-top: 2px;
-    vertical-align: 1px;
-}
 
 @media (min-width: 80em) {
     .sidebar {

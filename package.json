@@ -18,6 +18,7 @@
     "main": "root/index.html",
     "scripts": {
         "build": "bash scripts/build.sh",
+        "build:grok": "npm --prefix node_modules/@ui-js/grok run build",
         "clean": "bash scripts/clean.sh",
         "coverage": "bash scripts/test.sh --coverage",
         "deploy": "bash scripts/deploy.sh",

@@ -12,6 +12,22 @@
             "args": ["--config", "./config/eleventy.js"],
             "cwd": "${workspaceFolder}",
             "outFiles": ["${workspaceFolder}/**/*.js"]
+        },
+        {
+            "name": "Run Grok",
+            "request": "launch",
+            "type": "node",
+            "skipFiles": ["<node_internals>/**"],
+            "program": "${workspaceFolder}/submodules/grok/bin/grok-cli",
+            "outFiles": ["${workspaceFolder}/**/*.js"],
+            "preLaunchTask": "npm: build:grok",
+            "args": [
+                "../mathlive/mathlive/dist/mathlive.d.ts",
+                "--outDir",
+                "build",
+                "--verbose",
+                "--ignore-errors"
+            ]
         }
     ]
 }

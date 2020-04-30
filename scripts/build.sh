@@ -18,7 +18,8 @@ mkdir -p ./build
 mkdir -p ./src/build
 
 ## Grok (.d.ts -> .html with frontmatter)
-node ./submodules/grok/bin/grok-cli  ./node_modules/mathlive/dist/mathlive.d.ts --apiName mathlive --outDir ./src/build/ --outFile mathlive.html
+# Uses grok.config.js for additional config option
+node ./submodules/grok/bin/grok-cli  ./node_modules/mathlive/dist/mathlive.d.ts --outDir ./src/build/ --outFile mathlive.html
 
 
 ## Build (.md -> .html)
