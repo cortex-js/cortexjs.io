@@ -112,14 +112,6 @@ section.page__content h5 {
     font-family: $sans-serif;
 }
 
-// For the sub-heading
-h2 em {
-    display: block;
-    font-size: $subheading-font-size;
-    line-height: .8;
-    text-transform: uppercase;
-    font-style: normal;
-}
 
 // For the "main" symbol in the heading
 h2 strong {
@@ -141,18 +133,16 @@ h3 {
     background: $background-color;
     transform: translateX(-10px);
     box-sizing: content-box;
-    
 }
 
+
 /* Subheading above */
-h3 em {
+h2 span.subhead, h3 span.subhead {
     display: block;
     font-size: $subheading-font-size;
     line-height:.8;
-    font-weight: 700;
-    text-transform: uppercase;
+    font-weight: 400;
     font-style: normal;
-    opacity: .4;
 }
 
 /* Categories */
@@ -337,7 +327,7 @@ body.layout--api-layout #main a:hover {
 .page__content dt .permalink {
     opacity: 0;
 }
-.page__content section:target h3 .permalink, 
+.page__content section:target > h3 .permalink, 
 .page__content dt:target .permalink ,
 .page__content dt:hover .permalink {
     opacity: 1;
@@ -452,17 +442,14 @@ ul.index {
     left: -.5em;
 }
 .page__content section {
-	scroll-margin-top: 5em; // Would be nice, but can't get it to work
+    scroll-margin-top: 5em; // Would be nice, but can't get it to work (for cards, works for section)
+    position: relative; // So that the highlight for :target contains only the section
 } 
   
-.page__content section:target h3 span strong, 
-.page__content h2:target span strong  {
-    position: relative;
-    z-index: 0;
-}
 .page__content dt:target strong::after,
-.page__content section:target h3 span strong::after,
-.page__content h2:target span strong::after {
+.page__content section[id]:target > h3::after,
+ .page__content section[id]:target::after 
+{
     content: '';
     position: absolute;
     top: -8px;

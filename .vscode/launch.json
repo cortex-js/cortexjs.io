@@ -22,7 +22,7 @@
             "outFiles": ["${workspaceFolder}/**/*.js"],
             "preLaunchTask": "npm: build:grok",
             "args": [
-                "../mathlive/mathlive/dist/mathlive.d.ts",
+                "${workspaceFolder}/node_modules/mathlive/dist/",
                 "--outDir",
                 "build",
                 "--verbose",
