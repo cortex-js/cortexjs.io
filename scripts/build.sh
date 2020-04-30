@@ -19,7 +19,7 @@ mkdir -p ./src/build
 
 ## Grok (.d.ts -> .html with frontmatter)
 # Uses grok.config.js for additional config option
-node ./submodules/grok/bin/grok-cli  ./node_modules/mathlive/dist/mathlive.d.ts --outDir ./src/build/ --outFile mathlive.html
+node ./submodules/grok/bin/grok-cli  --config ./grok.config.js ./node_modules/mathlive/dist/mathlive.d.ts --outDir ./src/build/ --outFile mathlive.html
 
 
 ## Build (.md -> .html)

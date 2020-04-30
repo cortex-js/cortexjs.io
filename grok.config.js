@@ -9,7 +9,7 @@ permalink: "/docs/{{sdkName}}/"
 title: "{{packageName}}"
 read_time: false
 layout: "api-layout"
-stylesheet: 
+stylesheets: 
     - https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap
 sidebar:
     - nav: "{{sdkName}}"

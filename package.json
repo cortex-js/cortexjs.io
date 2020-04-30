@@ -44,7 +44,7 @@
         "@cortex-js/prettier-config": "^1.0.0",
         "cssnano": "^4.1.10",
         "husky": "^4.2.5",
-        "lint-staged": "^10.2.0",
+        "lint-staged": "^10.2.1",
         "markdown-it-deflist": "^2.0.3",
         "node-sass": "^4.14.0",
         "postcss-cli": "^7.1.1",
