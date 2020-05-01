@@ -11,23 +11,22 @@
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
 
-{% if head.scripts %}
-  {% for x in head.scripts %}
+{% if scripts %}
+  {% for x in scripts %}
     {% if x contains "://" %}
-      {% capture stylesheet_path %}{{ x }}{% endcapture %}
+      {% capture script_path %}{{ x }}{% endcapture %}
     {% else %}
-      {% capture stylesheet_path %}{{ x | relative_url }}{% endcapture %}
+      {% capture script_path %}{{ x | relative_url }}{% endcapture %}
     {% endif %}
-    <script src="{{ stylesheet_path }}" crossorigin='anonymous'></script>
+    <script src="{{ script_path }}" crossorigin='anonymous'></script>
   {% endfor %}
 {% endif %}
 
 
 <!-- For all browsers -->
 <link rel="stylesheet" href="{{ stylesheet | default: '/assets/css/main.css' | relative_url }}">
-
-{% if head.stylesheets %}
-  {% for x in head.stylesheets %}
+{% if stylesheets %}
+  {% for x in stylesheets %}
     {% if x contains "://" %}
       {% capture stylesheet_path %}{{ x }}{% endcapture %}
     {% else %}

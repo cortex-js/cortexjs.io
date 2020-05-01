@@ -112,6 +112,11 @@ section.page__content h5 {
     font-family: $sans-serif;
 }
 
+.stack {
+    display: flex;
+    flex-flow: column;
+}
+
 
 // For the "main" symbol in the heading
 h2 strong {
@@ -119,11 +124,10 @@ h2 strong {
     font-weight: 700;
 }
 
-h3 {
+h2, h3 {
     position: sticky;
     top: -2px; // Needed for sticky
     width: calc(100%);
-    font-size: $h3-font-size;
     font-feature-settings: normal;
     line-height: 1.5;
     border: 10px solid $background-color;
@@ -133,8 +137,14 @@ h3 {
     background: $background-color;
     transform: translateX(-10px);
     box-sizing: content-box;
+
+    display: flex;
+    justify-content: space-between;
 }
 
+h3 {
+    font-size: $h3-font-size;
+}
 
 /* Subheading above */
 h2 span.subhead, h3 span.subhead {
@@ -143,6 +153,10 @@ h2 span.subhead, h3 span.subhead {
     line-height:.8;
     font-weight: 400;
     font-style: normal;
+}
+
+.highlighting-mark-container {
+    position: relative; // To position the highlighting mark
 }
 
 /* Categories */
@@ -156,7 +170,7 @@ h2 span.subhead, h3 span.subhead {
     padding: 0;
 }
 
-code {
+code, .code {
     font-family: $monospace;
     display: inline;
     overflow-wrap: break-word;
@@ -199,7 +213,6 @@ strong var {
 
     margin-top: 30px;
     margin-bottom: 40px;
-    overflow: hidden;
     padding: 20px 17px;
     border-radius: 4px;
     border: 1px solid $border-color;
@@ -211,13 +224,15 @@ strong var {
 
 
 .card h3 {
+    // display: flex;
+    // justify-content: space-between;
     position: relative;  // Override sticky h3
     top: auto;      // Override sticky h3
     z-index: 5;  // Override sticky h3
-    width: calc(100% + 40px);
-    margin-top: -25px;
+    width: calc(100% + 34px);
+    margin-top: -20px;
     margin-bottom: 10px;
-    margin-left: -10px;
+    margin-left: -7px;
     margin-right: -20px;
     padding: 20px;
     padding-bottom: 10px;
@@ -235,7 +250,7 @@ strong var {
     border: none;
     border-bottom: 1px solid #e7e7e7;
     box-sizing: border-box;
-    display: flex; // To accommodate the anchor
+    border-radius: 4px 4px 0 0;
 }
 
 /* Card header name */
@@ -296,10 +311,10 @@ html {
     scroll-behavior: smooth
 }
 
-body.layout--api-layout #main a,
-body.layout--api-layout #main a:active,
-body.layout--api-layout #main a:visited,
-body.layout--api-layout #main a:hover {
+body.layout--sdk-documentation-layout #main a,
+body.layout--sdk-documentation-layout #main a:active,
+body.layout--sdk-documentation-layout #main a:visited,
+body.layout--sdk-documentation-layout #main a:hover {
     color: $primary;
     text-decoration: none;
 }
@@ -445,21 +460,52 @@ ul.index {
     scroll-margin-top: 5em; // Would be nice, but can't get it to work (for cards, works for section)
     position: relative; // So that the highlight for :target contains only the section
 } 
-  
-.page__content dt:target strong::after,
-.page__content section[id]:target > h3::after,
- .page__content section[id]:target::after 
+
+svg.highlighting-mark {
+    position: absolute;
+    top: -1.5em;
+    left: -1.5em;
+    height: calc(100% + 3em);
+    color: hsla(49, 100%, 63%, 0.56); // hsla(58, 100%, 50%, 0.56);
+    z-index: -1;
+
+    width: 0;
+    transition: width 0.5s;
+}
+.page__content section[id]:target > h3 .highlighting-mark-container > svg.highlighting-mark, 
+.page__content section[id]:target > h2 .highlighting-mark-container > svg.highlighting-mark, 
+.page__content dt:target .highlighting-mark-container > svg.highlighting-mark {
+    width: calc(100% + 3em);
+}
+// .page__content dt:target strong::after
+// // .page__content section[id]:target > h3::after
+// {
+//     content: '<svg><use xlink:href="#external-link"></use></svg>';
+//     position: absolute;
+//     top: -8px;
+//     left: -8px;
+//     border-radius: 8px;
+//     width: calc(100% + 16px);
+//     height: calc(100% + 16px);
+//     color: hsla(49, 100%, 63%, 0.56); // hsla(58, 100%, 50%, 0.56);
+//     // '<svg><use xlink:href="#external-link"></use></svg>'
+//     background: url(#marker-1);
+//     z-index: -1;
+// }
+
+.page__content section[id]:target::after 
 {
     content: '';
     position: absolute;
     top: -8px;
-    left: -8px;
+    left: -18px;
     border-radius: 8px;
-    width: calc(100% + 16px);
     height: calc(100% + 16px);
     background: hsla(49, 100%, 63%, 0.56); // hsla(58, 100%, 50%, 0.56);
     z-index: -1;
+    width: 8px;
 }
+
 
 
 
@@ -563,13 +609,13 @@ div.flags {
 }
 
 // For a string, in quotes
-.stringLiteral {
+.string-literal {
     color: $gray-400;
 }
 
 // Punctuation signs, "=", "|", ":". 
 // For example "type foo = number"
-.punct {
+.punctuation {
     color: $indigo-400;
     font-weight: 700;
 }
