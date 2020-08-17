@@ -35,6 +35,26 @@ const searchPlugin = function () {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
 
+    function termsToRegExp(terms) {
+        return new RegExp(
+            '(' +
+                terms
+                    .map((x) => {
+                        if (/^".*"$/.test(x)) {
+                            return (
+                                '\\b' +
+                                escapeRegExp(x).substring(1, x.length - 1) +
+                                '\\b'
+                            );
+                        }
+                        return escapeRegExp(x);
+                    })
+                    .join('|') +
+                ')',
+            'gi'
+        );
+    }
+
     function findInElementRecursive(el, termsRE) {
         if (el.nodeType === 1) {
             // Element
@@ -64,11 +84,7 @@ const searchPlugin = function () {
         if (!terms || terms.length === 0) {
             return false;
         }
-        const termsRE = new RegExp(
-            '(' + terms.map(escapeRegExp).join('|') + ')',
-            'gi'
-        );
-        return findInElementRecursive(el, termsRE);
+        return findInElementRecursive(el, termsToRegExp(terms));
     }
 
     // Recursively search el for terms.
@@ -131,11 +147,10 @@ const searchPlugin = function () {
     }
 
     function markInElement(el, terms) {
-        const termsRE = new RegExp(
-            '(' + terms.map(escapeRegExp).join('|') + ')',
-            'gi'
+        const [count, result] = markInElementRecursive(
+            el,
+            termsToRegExp(terms)
         );
-        const [count, result] = markInElementRecursive(el, termsRE);
         if (count > 0) return result;
         return '';
     }
@@ -253,7 +268,7 @@ const searchPlugin = function () {
                                     });
                                     hasPartialMatch =
                                         hasPartialMatch ||
-                                        markInElement(el, optional);
+                                        findInElement(el, optional);
                                 });
                                 if (hasInitialMatch) score += 5;
                                 if (hasPartialMatch) score += 2;
@@ -405,28 +420,22 @@ const searchPlugin = function () {
 
 module.exports = {
     sdkName: 'mathlive',
-    modules: [
-        'mathlive',
-        'mathfield',
-        'config',
-        'commands',
-        'shortcuts',
-        'core',
-        'model',
-    ],
+    modules: ['mathlive', 'mathfield', 'config', 'commands', 'core'],
+    tutorialPath: '../../guides/',
     // verbose: false,
     keywordSynonyms: {
         convert: ['converts', 'converted', 'converting', 'conversion'],
         render: ['renders', 'rendered', 'rendering'],
         create: ['creates', 'created', 'creating', 'creation'],
     },
+    // head:
+    // stylesheets:
+    //     - https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap
     documentTemplate: `---
 permalink: "/docs/{{sdkName}}/"
 title: "{{packageName}}"
 read_time: false
 layout: "sdk-documentation-layout"
-stylesheets: 
-    - https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap
 sidebar:
     - nav: "{{sdkName}}"
 # toc: true
@@ -478,5 +487,6 @@ sidebar:
 </div>
 <section id="search-result" class="hidden"></section>
 <section id="search-result-none" class="hidden">No results found.</section>
-<section id="all-content">{{content}}</section>`,
+<section id="all-content">{{content}}</section>
+<div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>`,
 };

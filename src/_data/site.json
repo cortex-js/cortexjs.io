@@ -99,7 +99,7 @@
             },
             {
                 "label": "GitHub",
-                "icon": "fab fa-fw fa-github",
+                "icon": "<svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>",
                 "url": "https://github.com/cortex-js"
             },
             {
@@ -116,7 +116,7 @@
             },
             {
                 "label": "Gitter",
-                "icon": "fab fa-fw fa-gitter",
+                "icon": "<svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>",
                 "url": "https://gitter.im/cortex-js"
             }
         ],

@@ -5,9 +5,8 @@ const hljs = require('highlight.js'); // https://highlightjs.org/
 
 function randomId() {
     return (
-        Date.now()
-            .toString(36)
-            .slice(-2) + Math.floor(Math.random() * 0x186a0).toString(36)
+        Date.now().toString(36).slice(-2) +
+        Math.floor(Math.random() * 0x186a0).toString(36)
     );
 }
 
@@ -43,7 +42,7 @@ function buildSass(srcDir, destDir) {
 
     // Compile all the .scss files in ./src/_sass
     fs.readdir(srcDir, (_err, files) => {
-        files.forEach(file => {
+        files.forEach((file) => {
             if (path.extname(file) == '.scss') {
                 const p = path.parse(path.join(destDir, file));
                 p.base = undefined;
@@ -61,13 +60,13 @@ function buildSass(srcDir, destDir) {
                 fs.writeFile(
                     path.format(p),
                     result.css.toString()
-                ).catch(error => console.error(error));
+                ).catch((error) => console.error(error));
             }
         });
     });
 }
 
-module.exports = function(eleventyConfig) {
+module.exports = function (eleventyConfig) {
     buildSass('./src/_sass/', './src/build/css');
 
     const markdownIt = require('markdown-it');
@@ -76,7 +75,7 @@ module.exports = function(eleventyConfig) {
         // See https://markdown-it.github.io/markdown-it/
         html: true,
         typographer: true,
-        highlight: function(str, lang) {
+        highlight: function (str, lang) {
             if (lang && hljs.getLanguage(lang)) {
                 try {
                     return hljs.highlight(lang, str).value;
@@ -96,8 +95,10 @@ module.exports = function(eleventyConfig) {
 
     eleventyConfig.setUseGitIgnore(false);
 
+    eleventyConfig.setQuietMode(true);
+
     // {{ variable | jsonify }}
-    eleventyConfig.addFilter('jsonify', function(variable) {
+    eleventyConfig.addFilter('jsonify', function (variable) {
         return JSON.stringify(variable);
     });
 
@@ -115,8 +116,7 @@ module.exports = function(eleventyConfig) {
 
     eleventyConfig.setDataDeepMerge(true);
 
-    // @todo Available in 0.10 (which is not yet released)
-    // eleventyConfig.addWatchTarget('./_sass/');
+    eleventyConfig.addWatchTarget('./_sass/');
 
     return {
         passtroughFileCopy: true,

@@ -6,7 +6,7 @@
 
 /* Mixins and functions */
 @import "imports/minimal-mistakes/vendor/breakpoint/breakpoint";
-@include breakpoint-set("to ems", true);
+// @include breakpoint-set("to ems", true);
 @import "imports/minimal-mistakes/vendor/susy/susy";
 @import "imports/minimal-mistakes/mixins";
 
@@ -309,28 +309,29 @@ section.fullwidth p {
 
 
 
-@media (max-width: 1024px) { 
-  section.fullwidth, section.fullwidth.reverse {
-    flex-flow: column;
-  }
-  .card.reverse {
-    flex-flow: column-reverse;
-  }
-  .card {
-    flex-flow: column;
-  }
-  .cards {
-    flex-flow: column;
-    align-items: center;
-  }
-  .cards.col2 .card, .cards.col3 .card{
-    width: calc(100% - 2em);
-    margin-bottom: 2em;
-  }
-}
-@media (max-width: 640px) { 
-  .card .copy {
-    margin-left: 1em;
-    margin-right: 1em;
-  }
-}
+// @media (max-width: $large) { 
+//   section.fullwidth, section.fullwidth.reverse {
+//     flex-flow: column;
+//   }
+//   .card.reverse {
+//     flex-flow: column-reverse;
+//   }
+//   .card {
+//     flex-flow: column;
+//   }
+//   .cards {
+//     flex-flow: column;
+//     align-items: center;
+//   }
+//   .cards.col2 .card, .cards.col3 .card{
+//     width: calc(100% - 2em);
+//     margin-bottom: 2em;
+//   }
+// }
+
+// @media (max-width: $small) { 
+//   .card .copy {
+//     margin-left: 1em;
+//     margin-right: 1em;
+//   }
+// }

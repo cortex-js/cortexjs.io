@@ -9,7 +9,7 @@
 
 /* Mixins and functions */
 @import "minimal-mistakes/vendor/breakpoint/breakpoint";
-@include breakpoint-set("to ems", true);
+// @include breakpoint-set("to ems", true);
 @import "minimal-mistakes/vendor/susy/susy";
 @import "minimal-mistakes/mixins";
 

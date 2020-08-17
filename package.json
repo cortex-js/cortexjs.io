@@ -18,8 +18,8 @@
     "main": "root/index.html",
     "scripts": {
         "build": "bash scripts/build.sh",
-        "build:grok": "npm --prefix node_modules/@ui-js/grok run build",
-        "install:grok": "npm --prefix node_modules/@ui-js/grok install",
+        "build:grok": "npm --prefix submodules/grok run build",
+        "install:grok": "npm --prefix submodules/grok install",
         "clean": "bash scripts/clean.sh",
         "coverage": "bash scripts/test.sh --coverage",
         "deploy": "bash scripts/deploy.sh",
@@ -41,21 +41,21 @@
     "contributors": [],
     "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
     "devDependencies": {
-        "@11ty/eleventy": "^0.10.0",
+        "@11ty/eleventy": "^0.11.0",
         "@cortex-js/prettier-config": "^1.0.0",
         "cssnano": "^4.1.10",
         "husky": "^4.2.5",
-        "lint-staged": "^10.2.2",
+        "lint-staged": "^10.2.11",
         "markdown-it-deflist": "^2.0.3",
-        "node-sass": "^4.14.0",
+        "node-sass": "^4.14.1",
         "postcss-cli": "^7.1.1",
         "prettier": "^2.0.5",
-        "typedoc": "^0.17.6",
-        "typescript": "^3.8.3"
+        "typedoc": "^0.18.0",
+        "typescript": "^3.9.7"
     },
     "dependencies": {
         "@ui-js/grok": "file:submodules/grok",
-        "mathlive": "^0.35.1"
+        "mathlive": "^0.54.1"
     },
     "prettier": "@cortex-js/prettier-config",
     "husky": {

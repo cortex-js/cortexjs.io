@@ -14,7 +14,7 @@
   -webkit-animation-delay: 0.15s;
   animation-delay: 0.15s;
 
-  @include breakpoint($x-large) {
+  @include breakpoint($max-width) {
     max-width: $max-width;
   }
 }
@@ -42,10 +42,10 @@ body {
     padding-right: $right-sidebar-width-narrow;
   }
 
-  @include breakpoint($x-large) {
-    width: calc(100% - #{$right-sidebar-width});
-    padding-right: $right-sidebar-width;
-  }
+  // @include breakpoint($x-large) {
+  //   width: calc(100% - #{$right-sidebar-width});
+  //   padding-right: $right-sidebar-width;
+  // }
 
   .page__inner-wrap {
     float: left;
@@ -143,11 +143,11 @@ body {
   dd {
     margin-left: 1em;
     font-family: $sans-serif;
-    font-size: $type-size-6;
+    font-size: $type-size-5;
   }
 
   .small {
-    font-size: $type-size-6;
+    font-size: $type-size-6
   }
 
   /* blockquote citations */
@@ -187,8 +187,8 @@ body {
       padding-left: 1em;
       padding-right: 1em;
 
-      @include breakpoint($x-large) {
-        max-width: $x-large;
+      @include breakpoint($max-width) {
+        max-width: $max-width;
       }
     }
 
@@ -378,9 +378,9 @@ body {
       padding-right: 0;
     }
 
-    @include breakpoint($x-large) {
-      padding-right: 0;
-    }
+    // @include breakpoint($x-large) {
+    //   padding-right: 0;
+    // }
   }
 
   .page__related {
@@ -388,8 +388,8 @@ body {
       padding-right: 0;
     }
 
-    @include breakpoint($x-large) {
-      padding-right: 0;
-    }
+    // @include breakpoint($x-large) {
+    //   padding-right: 0;
+    // }
   }
 }

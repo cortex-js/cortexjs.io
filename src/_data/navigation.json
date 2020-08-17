@@ -14,28 +14,32 @@
 		},
 		{
 			"description": "Chat on Gitter",
-			"title": "<i class=\"fab fa-gitter\"></i>",
+			"title": "<svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>",
 			"url": "https://gitter.im/cortex-js"
 		},
 		{
-			"title": "<i class=\"fab fa-github\"></i>",
+			"title": "<svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>",
 			"url": "https://github.com/cortex-js",
 			"description": "Get source code on GitHub"
 		}
 	],
 	"mathlive": [
 		{
-			"title": "Mathlive",
+			"title": "MathLive",
 			"children": [
-				{
-					"title": "API Reference",
-					"url": "/docs/mathlive/"
-				},
 				{
 					"title": "Getting Started",
 					"url": "/guides/mathfield-getting-started/"
+				},
+				{
+					"title": "SDK Reference",
+					"url": "/docs/mathlive/"
+				},
+				{
+					"title": "Math JSON",
+					"url": "/guides/math-json/"
 				}
-			]
+]
 		},
 		{
 			"title": "Contributing",

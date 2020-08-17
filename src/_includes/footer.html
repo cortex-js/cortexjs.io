@@ -10,10 +10,7 @@
         {% if link.label and link.url %}
         <li>
             <a href="{{ link.url }}" rel="nofollow noopener noreferrer"
-                ><i
-                    class="{{ link.icon | default: 'fas fa-link' }}"
-                    aria-hidden="true"
-                ></i>{{ link.label }}</a
+                >{{ link.icon }}{{ link.label }}</a
             >
         </li>
         {% endif %} 
@@ -28,10 +25,7 @@
         {% for p in site.footer.pages %} 
         {% if p.label and p.url %}
         <li>
-            <a href="{{ p.url }}" rel="nofollow noopener noreferrer">{% if p.icon %}<i
-                    class="{{ link.icon | default: 'fas fa-link' }}"
-                    aria-hidden="true"
-                ></i>{% endif %}{{ p.label }}</a
+            <a href="{{ p.url }}" rel="nofollow noopener noreferrer">{% if p.icon %}{{ p.icon }}{% endif %}{{ p.label }}</a
             >
         </li>
         {% endif %} 

@@ -104,15 +104,20 @@
 }
 
 .icon-primary {
-    --fa-primary-color: $primary;
-    --fa-secondary-color: $primary;
-    color: $primary;
+    --fa-primary-color: $primary-color;
+    --fa-secondary-color: $primary-color;
+    color: $primary-color;
 }
 
 .icon-secondary {
     --fa-primary-color: #777;
     --fa-secondary-color: #777;
     color: #777;
+}
+
+.icon1em {
+  width: 1em;
+  height: 1em;
 }
 
 .bg-alternate {

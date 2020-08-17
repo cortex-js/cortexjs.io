@@ -14,7 +14,7 @@
             "outFiles": ["${workspaceFolder}/**/*.js"]
         },
         {
-            "name": "Run Grok",
+            "name": "Build and Run Grok",
             "request": "launch",
             "type": "node",
             "skipFiles": ["<node_internals>/**"],
@@ -22,10 +22,10 @@
             "outFiles": ["${workspaceFolder}/**/*.js"],
             "preLaunchTask": "npm: build:grok",
             "args": [
-                // "${workspaceFolder}/node_modules/mathlive/dist/",
+                // "../mathlive/mathlive/dist/",
                 "${workspaceFolder}/test.d.ts/",
                 "--outDir",
-                "build",
+                "./build",
                 "--verbose",
                 "--ignore-errors"
             ]

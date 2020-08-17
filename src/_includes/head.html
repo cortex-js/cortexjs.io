@@ -11,8 +11,8 @@
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
 
-{% if scripts %}
-  {% for x in scripts %}
+{% if head.scripts %}
+  {% for x in head.scripts %}
     {% if x contains "://" %}
       {% capture script_path %}{{ x }}{% endcapture %}
     {% else %}
@@ -23,10 +23,9 @@
 {% endif %}
 
 
-<!-- For all browsers -->
 <link rel="stylesheet" href="{{ stylesheet | default: '/assets/css/main.css' | relative_url }}">
-{% if stylesheets %}
-  {% for x in stylesheets %}
+{% if head.stylesheets %}
+  {% for x in head.stylesheets %}
     {% if x contains "://" %}
       {% capture stylesheet_path %}{{ x }}{% endcapture %}
     {% else %}
@@ -35,21 +34,6 @@
     <link rel="stylesheet" href="{{ stylesheet_path }}">
   {% endfor %}
 {% endif %}
-
-<!--[if IE]>
-  <style>
-    /* old IE unsupported flexbox fixes */
-    .greedy-nav .site-title {
-      padding-right: 3em;
-    }
-    .greedy-nav button {
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 100%;
-    }
-  </style>
-<![endif]-->
 
 {% if site.head_scripts %}
   {% for script in site.head_scripts %}

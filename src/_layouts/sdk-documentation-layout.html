@@ -3,8 +3,9 @@
 <!doctype html>
 <html lang="{{ site.locale | slice: 0,2 | default: "en" }}" class="no-js">
   <head>
+    {% assign stylesheet = "/assets/css/sdk-documentation-layout.css" %}
     {% include head.html %}
-    <link rel="stylesheet" href="{{ '/assets/css/sdk-documentation-layout.css' | relative_url }}">
+    <!-- <link rel="stylesheet" href="{{ '/assets/css/sdk-documentation-layout.css' | relative_url }}"> -->
     {% include head/custom.html %}
   </head>
 

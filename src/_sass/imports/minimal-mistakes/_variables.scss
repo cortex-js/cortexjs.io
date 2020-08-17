@@ -13,35 +13,36 @@ $paragraph-indent: false !default; // true, false (default)
 $indent-var: 1.3em !default;
 
 /* system typefaces */
-$serif: Georgia, Times, serif !default;
-$sans-serif: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI",
+$system: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI",
   "Helvetica Neue", "Lucida Grande", Arial, sans-serif !default;
-$monospace: Monaco, Consolas, "Lucida Console", monospace !default;
+$monospace: 'IBM Plex Mono', Monaco, Consolas, "Lucida Console", monospace !default;
+$sans-serif:  $system !default;
+$serif: Georgia, Times, serif !default;
 
 /* sans serif typefaces */
 $sans-serif-narrow: $sans-serif !default;
-$helvetica: Helvetica, "Helvetica Neue", Arial, sans-serif !default;
+// $helvetica: Helvetica, "Helvetica Neue", Arial, sans-serif !default;
 
 /* serif typefaces */
-$georgia: Georgia, serif !default;
-$times: Times, serif !default;
-$bodoni: "Bodoni MT", serif !default;
-$calisto: "Calisto MT", serif !default;
-$garamond: Garamond, serif !default;
+// $georgia: Georgia, serif !default;
+// $times: Times, serif !default;
+// $bodoni: "Bodoni MT", serif !default;
+// $calisto: "Calisto MT", serif !default;
+// $garamond: Garamond, serif !default;
 
 $global-font-family: $sans-serif !default;
 $header-font-family: $sans-serif !default;
 $caption-font-family: $serif !default;
 
 /* type scale */
-$type-size-1: 2.441em !default; // ~39.056px
-$type-size-2: 1.953em !default; // ~31.248px
-$type-size-3: 1.563em !default; // ~25.008px
-$type-size-4: 1.25em !default; // ~20px
-$type-size-5: 1em !default; // ~16px
-$type-size-6: 0.75em !default; // ~12px
-$type-size-7: 0.6875em !default; // ~11px
-$type-size-8: 0.625em !default; // ~10px
+$type-size-1: 2.441rem !default; // ~39.056px
+$type-size-2: 1.953rem !default; // ~31.248px
+$type-size-3: 1.563rem !default; // ~25.008px
+$type-size-4: 1.25rem !default; // ~20px
+$type-size-5: 1rem !default; // ~16px
+$type-size-6: 0.75rem !default; // ~12px
+$type-size-7: 0.6875rem !default; // ~11px
+$type-size-8: 0.625rem !default; // ~10px
 
 /*
    Colors
@@ -131,20 +132,20 @@ $navicon-link-color-hover: mix(#fff, $primary-color, 75%) !default;
    Breakpoints
    ========================================================================== */
 
-$small: 600px !default;
-$medium: 768px !default;
-$medium-wide: 900px !default;
-$large: 1024px !default;
-$x-large: 1280px !default;
-$max-width: $x-large !default;
+$small: 768px !default;
+$medium: 992px !default;
+// $medium-wide: 900px !default;
+$large: 1200px !default;
+// $x-large: 1440px !default;
+$max-width: $large !default;
 
 /*
    Grid
    ========================================================================== */
 
 $right-sidebar-width-narrow: 200px !default;
-$right-sidebar-width: 300px !default;
-$right-sidebar-width-wide: 400px !default;
+$right-sidebar-width: 200px !default;
+$right-sidebar-width-wide: 200px !default;
 
 /*
    Other

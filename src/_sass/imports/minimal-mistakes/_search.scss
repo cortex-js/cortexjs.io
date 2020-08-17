@@ -47,7 +47,7 @@
     -webkit-animation-delay: 0.15s;
     animation-delay: 0.15s;
 
-    @include breakpoint($x-large) {
+    @include breakpoint($large) {
       max-width: $max-width;
     }
 
@@ -71,9 +71,9 @@
       font-size: $type-size-2;
     }
 
-    @include breakpoint($x-large) {
-      font-size: $type-size-1;
-    }
+    // @include breakpoint($x-large) {
+    //   font-size: $type-size-1;
+    // }
   }
 
   &.is--visible {
@@ -98,9 +98,9 @@
       width: 75%;
     }
 
-    @include breakpoint($x-large) {
-      width: 50%;
-    }
+    // @include breakpoint($x-large) {
+    //   width: 50%;
+    // }
   }
 
   .archive__item-title {
