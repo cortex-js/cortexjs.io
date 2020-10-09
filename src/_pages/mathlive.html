@@ -4,14 +4,14 @@ title: MathLive
 permalink: /mathlive/
 read_time: false
 head:
-stylesheets:
-- https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
-- ../assets/css/live-code.css
-scripts:
-- https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js
-- https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
-- https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
-- ../assets/js/live-code.js
+  modules:
+    - ../assets/js/code-playground.js
+  stylesheets:
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
+  scripts:
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
 ---
 <section class="hero-section">
   <a class="section-link" href="/mathlive/" target="_self" rel="follow" aria-hidden="true" tabindex="-1">&nbsp;</a>
@@ -20,29 +20,39 @@ scripts:
 </section>
 
 <h2 class='font-size-2xl'>Try it now</h2>
-<section class='mb-xl bg-alternate w-full'>
-  {% live-code %}
-  {% code-tab "Javascript" %}
-  <!-- htmlmin:ignore -->
-  import MathLive from
-  'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
-  MathLive.makeMathField(
-  document.querySelector('.mathfield')
-  );
-  <!-- htmlmin:ignore -->
-  {% endcode-tab %}
-  {% code-tab "HTML" %}
-  <!-- htmlmin:ignore -->
-  <div class="mathfield">
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+<section class='m-lg mb-xl w-full-lg max-w-2xl'>
+  <code-playground layout="stack" class="m-lg w-full-lg">
+    <script>
+        moduleMap = {
+            mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
+        };
+    </script>
+    <div slot="javascript">import MathLive from 'mathlive';
+MathLive.makeMathField(document.getElementById('mathfield'));
+</div>
+    <div slot="html">&lt;div id="mathfield"&gt;
+x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/div&gt;</div>
+</code-playground>
+
+  <div class='font-size-xl'>
+    <h2 class="font-size-xl">View More Examples</h2>
+    <ul>
+      <li><a href="/mathlive-examples-introduction">Introduction<span class='ml-xs'><i class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
+      <li><a href="/mathlive-examples-interacting">Interact with a mathfield<span class='ml-xs'><i class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
+      <li><a href="/mathlive-examples-customizing">Customize a mathfield<span class='ml-xs'><i class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
+      <li><a href="/mathlive-examples-macros">Define custom Latex macros<span class='ml-xs'><i class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
+      <li><a href="/mathlive-examples-shortcuts">Manage inline and keyboard shortcuts<span class='ml-xs'><i class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
+      <li><a href="/mathlive-examples-speech">Control speech output<span class='ml-xs'><i class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
+      <li><a href="/mathlive-examples-static">Display static math formulas<span class='ml-xs'><i class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
+      <li><a href="/mathlive-examples-virtual-keyboards">Define custom virtual keyboards<span class='ml-xs'><i class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
+    </ul>
+      
   </div>
-  <!-- htmlmin:ignore -->
-  {% endcode-tab %}
-  {% endlive-code %}
 </section>
 
 
-<img src='/assets/images/mathfield/screenshot.jpg'>
+<h2><img src='/assets/images/mathfield/screenshot.jpg'></h2>
 
 <section>
   <section class="fullwidth">

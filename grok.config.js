@@ -420,7 +420,7 @@ const searchPlugin = function () {
 
 module.exports = {
     sdkName: 'mathlive',
-    modules: ['mathlive', 'mathfield', 'config', 'commands', 'core'],
+    // modules: ['mathlive', 'mathfield', 'config', 'commands', 'core', 'mathfield-element'],
     tutorialPath: '../../guides/',
     // verbose: false,
     keywordSynonyms: {

@@ -6,3 +6,7 @@
 	path = submodules/grok
 	url = https://github.com/ui-js/grok.git
 	branch = master
+[submodule "submodules/code-playground"]
+	path = submodules/code-playground
+	url = https://github.com/ui-js/code-playground.git
+	branch = master

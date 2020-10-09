@@ -89,3 +89,11 @@ $semantic-blue: #0066ce;
 $semantic-red: #e34850;
 $semantic-orange: #e68619;
 $semantic-green: #2d9d78;
+
+:host {
+    --primary-color: $primary-color;
+    --primary-color-dark: $primary-color-dark;
+    --primary-color-light: $primary-color-light;
+    --secondary: $seconday;
+    --primary: $primary-color;
+}

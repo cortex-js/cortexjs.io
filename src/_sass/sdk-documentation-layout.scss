@@ -459,7 +459,7 @@ tr {
 
 tr code { 
     // Avoid breaking code in tables (often used as first column index)
-    white-space: nowrap;
+    white-space: break-spaces;
 }
 
 td {
@@ -637,12 +637,10 @@ svg.highlighting-mark {
 }
 
 // Used for "Implemented by:", "Extends:", etc...
-.tag-name {
-    text-align: right;
+.class-label {
     color: $text-color;
-    border-color: $background-color;
-    margin-right: 0;
     font-weight: 700;
+    margin-right: .25em;
 }
 
 .modifier-tag + .modifier-tag {

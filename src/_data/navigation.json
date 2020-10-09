@@ -34,13 +34,22 @@
 				{
 					"title": "SDK Reference",
 					"url": "/docs/mathlive/"
-				},
+				}
+			]
+		},
+		{
+			"title": "MathJSON",
+			"children": [
 				{
-					"title": "Math JSON",
+					"title": "Introduction",
 					"url": "/guides/math-json/"
 				}
-]
+			]
 		},
+
+
+
+
 		{
 			"title": "Contributing",
 			"children": [

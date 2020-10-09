@@ -3,39 +3,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const hljs = require('highlight.js'); // https://highlightjs.org/
 
-function randomId() {
-    return (
-        Date.now().toString(36).slice(-2) +
-        Math.floor(Math.random() * 0x186a0).toString(36)
-    );
-}
-
-function liveCode(content) {
-    const id = randomId();
-    return `<div id="${id}" class="live-code"><div class='source'><div class='tabs'>${content.replace(
-        /\[\[ID\]\]/g,
-        id
-    )}</div>
-    <div class='buttons'>
-      <button class='button' onclick='runLiveCodeSection("${id}")'><i class="fas fa-play"></i>&nbsp;&nbsp;Run</button>
-    </div></div>
-    <div class='result'>
-        <div class='output'></div>
-    </div></div><script>setupLiveCodeSection("${id}");</script>
-`;
-}
-
-function codeTab(content, language = 'Javascript') {
-    const id = randomId();
-
-    return `<div class='tab'>
-    <input type="radio" id="${id}" name="[[ID]]">
-    <label for="${id}">${language}</label>
-    <div class="content ${language.toLowerCase()}">
-        <textarea data-language="${language.toLowerCase()}">${content}</textarea> 
-    </div>
-</div>`;
-}
 
 function buildSass(srcDir, destDir) {
     fs.mkdir(destDir, { recursive: true });
@@ -70,6 +37,7 @@ module.exports = function (eleventyConfig) {
     buildSass('./src/_sass/', './src/build/css');
 
     const markdownIt = require('markdown-it');
+    const markdownItAttrs = require('markdown-it-attrs');
     // let markdownItEmoji = require('markdown-it-emoji');
     let options = {
         // See https://markdown-it.github.io/markdown-it/
@@ -88,10 +56,15 @@ module.exports = function (eleventyConfig) {
         },
     };
 
-    eleventyConfig.setLibrary(
-        'md',
-        markdownIt(options).use(require('markdown-it-deflist'))
-    );
+    const md = markdownIt(options).use(require('markdown-it-deflist'));
+    md.use(markdownItAttrs, {
+        // optional, these are default options
+        leftDelimiter: '{',
+        rightDelimiter: '}',
+        allowedAttributes: []  // empty array = all attributes are allowed
+      });
+
+    eleventyConfig.setLibrary('md', md);
 
     eleventyConfig.setUseGitIgnore(false);
 
@@ -101,9 +74,6 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addFilter('jsonify', function (variable) {
         return JSON.stringify(variable);
     });
-
-    eleventyConfig.addPairedShortcode('live-code', liveCode);
-    eleventyConfig.addPairedShortcode('code-tab', codeTab);
 
     eleventyConfig.setLiquidOptions({
         dynamicPartials: false,

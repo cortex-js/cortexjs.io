@@ -22,6 +22,17 @@
   {% endfor %}
 {% endif %}
 
+{% if head.modules %}
+  {% for x in head.modules %}
+    {% if x contains "://" %}
+      {% capture script_path %}{{ x }}{% endcapture %}
+    {% else %}
+      {% capture script_path %}{{ x | relative_url }}{% endcapture %}
+    {% endif %}
+    <script type="module" src="{{ script_path }}" crossorigin='anonymous'></script>
+  {% endfor %}
+{% endif %}
+
 
 <link rel="stylesheet" href="{{ stylesheet | default: '/assets/css/main.css' | relative_url }}">
 {% if head.stylesheets %}
@@ -45,3 +56,4 @@
     <script src="{{ script_path }}"></script>
   {% endfor %}
 {% endif %}
+
