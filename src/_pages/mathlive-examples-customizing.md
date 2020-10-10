@@ -1,8 +1,11 @@
 ---
 layout: single
+date: Last Modified
 title: MathLive Examples - Customizing
-permalink: /mathlive-examples-customizing/
+permalink: /mathlive/examples/customizing/
 read_time: false
+sidebar:
+    - nav: "mathlive"
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
@@ -11,7 +14,7 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
-    - ../assets/js/code-playground.js
+    - /assets/js/code-playground.js
 ---
 <script>
     moduleMap = {
@@ -26,24 +29,21 @@ The appearance and behavior of the mathfield is highly customizable. Here are a 
 
 ## Styling
 
-The mathfield can be styled by applying some CSS styles to the template `<div>`,
+The mathfield can be styled using the `style` attribute on the `<math-field>` tag,
 for example to change the base font size or add a border.
 
  Change line 2-6 of the HTML in the playground below with `color: white;background: #256291;` and press the **Run** button.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'));
-</div>
-    <div slot="html">&lt;div id="mathfield" style="
-        font-size: 32px; 
-        margin: 3em;
-        padding: 8px; 
-        border-radius: 8px;
-        border: 1px solid rgba(0, 0, 0, .3); 
-        box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
+    <div slot="html">&lt;math-field style="
+    font-size: 32px; 
+    margin: 3em;
+    padding: 8px; 
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, .3); 
+    box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
 &gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
+&lt;/math-field&gt;
 </div>
 </code-playground>
 
@@ -52,22 +52,19 @@ fonts based on the original Computer Modern font from TeX. The mathfield
 will not display correctly using another font. By default, the directory containing
 the fonts is located next to the file containing the mathlive library.
 If your bundler or asset management system require a different configuration
-you can specify where the fonts can be located using the [`fontsDirectory`](http://cortexjs.io/docs/mathlive/?q=fontsDirectory) config option.
+you can specify where the fonts can be located using the [`fontsDirectory`](http://cortexjs.io/docs/mathlive/?q=fontsDirectory) option or the `fonts-directory` attribute.
+
+<code-playground layout="stack" class="m-lg w-full-lg">
+<div slot="html">&lt;math-field fonts-directory="//unpkg.com/mathlive/dist/fonts/"&gt;
+x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
+</code-playground>
 
 Note that changing the fonts directory for one mathfield will change the fonts 
 used by all the mathfields in the page. {.notice--warning}
 
-
-<code-playground layout="stack" class="m-lg w-full-lg">
-<div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'), {
-    fontsDirectory: '//unpkg.com/mathlive/dist/fonts/'
-});
-</div>
-<div slot="html">&lt;div id="mathfield"&gt;
-x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;</div>
-</code-playground>
+Learn more about configuring the MathLive library to your environment, 
+including using custom asset pipelines and bundlers in the [Getting Started Guide](/guides/mathfield-getting-started/). {.notice--info}
 
 
 ## CSS variables
@@ -82,44 +79,16 @@ mathfield is active
 * `--caret`: color of the caret (insertion point)
 * `--primary`: accent color for some UI elements, such as the virtual keyboard toggle
 
-Make sure the rule has sufficient CSS specificity to be applied. Add a `!important`
-directive or prefix it with the id of your mathfield. {.notice--warning}
 
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-<div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'));
+    <div slot="html">&lt;math-field style="
+    --hue: 53 !important;
+    --caret: red !important;
+"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
 </div>
-<div slot="html">&lt;style&gt;
-    .ML__fieldcontainer {
-        --hue: 53 !important;
-        --caret: red !important;
-    }
-&lt;/style&gt;
-&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/div&gt;</div>
 </code-playground>
-
-
-## Localization
-
-The user interface of the mathfield is provided in english, arabic, german, 
-greek, spanish, farsi, french, italian, japanese, polish and russian.
-
-The language to use is detected automatically, but it can be overriden by
-using the `locale` configuration property.
-
-<code-playground layout="stack" class="m-lg w-full-lg">
-<div slot="javascript">import MathLive from 'mathlive';
-const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
-    virtualKeyboardMode: 'manual',
-    locale: 'fr'
-});
-console.log(mf.getConfig().strings);
-</div>
-<div slot="html">
-&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/div&gt;</div>
-</code-playground>
-
 
 ## Editing options
 
@@ -162,5 +131,24 @@ details about these and other available options.
 
 
 
+## Localization
+
+The user interface of the mathfield is provided in english, arabic, german, 
+greek, spanish, farsi, french, italian, japanese, polish and russian.
+
+The language to use is detected automatically, but it can be overriden by
+using the `locale` option or the `locale` attribute.
+
+<code-playground layout="stack" class="m-lg w-full-lg">
+<div slot="javascript">console.log(document.getElementById('formula'));</div>
+<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual" locale="fr"
+&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
+</code-playground>
+
+
+
 ## Next
-* <a href="/mathlive-examples-interacting">Interacting with a mathfield<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a>
+
+<a href="/mathlive/examples/macros">Macros<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+:    How to define new Latex commands

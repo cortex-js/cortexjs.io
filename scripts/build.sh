@@ -23,7 +23,7 @@ mkdir -p ./src/build
 node ./submodules/grok/bin/grok-cli  ../mathlive/dist/public/ --outDir ./src/build/ --outFile mathlive.html
 
 ## Copy submodules
-cp ./submodules/code-playground/dist/code-playground.js ./submodules/cortex-js.github.io/assets/js/code-playground.js
+cp ./submodules/code-playground/build/code-playground.js ./submodules/cortex-js.github.io/assets/js/code-playground.js
 
 
 ## Build (.md -> .html)

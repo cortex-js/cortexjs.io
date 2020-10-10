@@ -19,6 +19,7 @@
     "scripts": {
         "build": "bash scripts/build.sh",
         "build:grok": "npm --prefix submodules/grok run build",
+        "build:code-playground": "npm --prefix submodules/code-playground run dist",
         "install:grok": "npm --prefix submodules/grok install",
         "clean": "bash scripts/clean.sh",
         "coverage": "bash scripts/test.sh --coverage",

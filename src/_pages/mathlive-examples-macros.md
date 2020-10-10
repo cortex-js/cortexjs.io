@@ -1,8 +1,11 @@
 ---
 layout: single
+date: Last Modified
 title: MathLive Examples - Macros
-permalink: /mathlive-examples-macros/
+permalink: /mathlive/examples/macros/
 read_time: false
+sidebar:
+    - nav: "mathlive"
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
@@ -11,7 +14,7 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
-    - ../assets/js/code-playground.js
+    - /assets/js/code-playground.js
 ---
 <script>
     moduleMap = {
@@ -58,5 +61,7 @@ The macro definition can contain up to eight arguments, represented by `#1` to `
 
 
 
-## See Also
-* <a href="/mathlive-examples-interacting">Interacting with a mathfield<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a>
+## Next
+
+<a href="/mathlive/examples/shortcuts">Shortcuts<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+:    Manage inline shortcuts and keyboard shortcuts

@@ -453,6 +453,10 @@ thead {
     background-color: transparent;
     border-bottom: 1px solid #333;
 }
+th:empty { 
+    display: none
+}
+
 tr {
     width: 100%;
 }

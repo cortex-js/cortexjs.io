@@ -1,8 +1,11 @@
 ---
 layout: single
+date: Last Modified
 title: MathLive Examples - Static
-permalink: /mathlive-examples-static/
+permalink: /mathlive/examples/static/
 read_time: false
+sidebar:
+    - nav: "mathlive"
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
@@ -11,7 +14,7 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
-    - ../assets/js/code-playground.js
+    - /assets/js/code-playground.js
 ---
 <script>
     moduleMap = {
@@ -42,8 +45,11 @@ MathLive.makeMathField(document.getElementById('mathfield'));
 </code-playground>
 
 
-## See Also
-* <a href="/mathlive-examples-interacting">Interacting with a mathfield<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a>
+
+## Next
+
+<a href="/mathlive/examples/virtual-keyboards">Virtual Keyboards<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+:    Define custom virtual keyboards
 
 
 <!-- Equation rendering -->

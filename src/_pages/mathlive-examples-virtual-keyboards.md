@@ -1,8 +1,11 @@
 ---
 layout: single
+date: Last Modified
 title: MathLive Examples - Virtual Keyboards
-permalink: /mathlive-examples-virtual-keyboards/
+permalink: /mathlive/examples/virtual-keyboards/
 read_time: false
+sidebar:
+    - nav: "mathlive"
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
@@ -11,7 +14,7 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
-    - ../assets/js/code-playground.js
+    - /assets/js/code-playground.js
 ---
 <script>
     moduleMap = {
@@ -23,7 +26,7 @@ head:
 # Virtual Keyboards
 
 Typing math formulas require access to many special symbols. While [keyboard 
-shortcuts and inline shortcuts](/mathlive-examples-shortcuts) can help, mobile devices require another 
+shortcuts and inline shortcuts](/mathlive/examples/shortcuts) can help, mobile devices require another 
 solution. A virtual keyboard is a keyboard displayed on screen that can be 
 customized with specialized symbols for math input.
 
@@ -236,4 +239,4 @@ MathLive.makeMathField(document.getElementById('mathfield'));
 
 
 ## See Also
-* <a href="/mathlive-examples-interacting">Interacting with a mathfield<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a>
+* <a href="/docs/mathlive/">MathLive SDK<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a>

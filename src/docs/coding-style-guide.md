@@ -3,6 +3,7 @@ title: Style Guide
 permalink: /docs/coding-style-guide/
 read_time: true
 layout: single
+date: Last Modified
 ---
 # Coding Style Guide
 
@@ -25,7 +26,12 @@ these guiding principles:
     you do, be liberal in what you accept from others". For example, functions that
     are invoked internally do not need to check that the input parameters are valid.
     However, public APIs should check the validity of parameters, and behave
-    reasonably when they aren't.
+    reasonably when they are invalid. See [this plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for Visual Studio Code.
+
+The project is setup to use [`prettier`](https://prettier.io/) an opinionated
+code formatter. Formatting will be applied before pushing to the repo. You can 
+also configure your editor to apply the formatting automatically on save, for 
+example.
 
 In general:
 
@@ -42,12 +48,12 @@ In general:
 | **File**                 | `json-parser.ts`                                                            |
 | **Module**               | `jsonParser`                                                                |
 | **Class, Enum**          | `ComplexNumber`, `JsonParser`                                               |
-| **Method, Function**     | `readFile` use an action verb<br>`isDirty` or `hasFinished` for boolean<br> |
-| **Private Method**       | `resetBuffer_`                                                              |
+| **Method, Function**     | `readFile()`<br>Use an action verb<br>`isDirty` or `hasFinished` for boolean<br> |
+| **Private Method**       | `private resetBuffer()`                                                              |
 | **Private Function**     | Like function, marked `@private` and not exported                           |
 | **Parameter**            | `initialPosition`                                                           |
 | **Unused parameter**     | `_initialPosition` or `_`                                                   |
-| **Accessor**             | `getContent` (avoid getters/setter)                                         |
+| **Accessor**             | `getContent` or `get content`                                         |
 | **Constant, Enum Value** | `HTTP_HEADER_SIZE`                                                          |
 | **Template parameter**   | `T`, `TYPE`                                                                 |
 

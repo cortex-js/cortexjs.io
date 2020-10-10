@@ -38,6 +38,43 @@
 			]
 		},
 		{
+			"title": "MathLive Examples",
+			"children": [
+				{
+					"title": "Introduction",
+					"url": "/mathlive/examples/introduction"
+				},
+				{
+					"title": "Interacting",
+					"url": "/mathlive/examples/interacting"
+				},
+				{
+					"title": "Customize",
+					"url": "/mathlive/examples/customizing"
+				},
+				{
+					"title": "Macros",
+					"url": "/mathlive/examples/macros"
+				},
+				{
+					"title": "Shortcuts",
+					"url": "/mathlive/examples/shortcuts"
+				},
+				{
+					"title": "Speech",
+					"url": "/mathlive/examples/speech"
+				},
+				{
+					"title": "Static",
+					"url": "/mathlive/examples/static"
+				},
+				{
+					"title": "Virtual Keyboards",
+					"url": "/mathlive/examples/virtual-keyboards"
+				}
+			]
+		},
+		{
 			"title": "MathJSON",
 			"children": [
 				{
@@ -46,9 +83,6 @@
 				}
 			]
 		},
-
-
-
 
 		{
 			"title": "Contributing",
@@ -71,5 +105,41 @@
 				}
 			]
 		}
-	]
-}
+	],
+	"mathjson": [
+		{
+			"title": "MathLive",
+			"url": "/guides/mathfield-getting-started/"
+		},
+		{
+			"title": "MathJSON",
+			"children": [
+				{
+					"title": "Introduction",
+					"url": "/guides/math-json/"
+				}
+			]
+		},
+
+		{
+			"title": "Contributing",
+			"children": [
+				{
+					"title": "Reporting Issues",
+					"url": "/docs/reporting-issues/"
+				},
+				{
+					"title": "Funding",
+					"url": "/funding/"
+				},
+				{
+					"title": "Code of Conduct",
+					"url": "/docs/code-of-conduct/"
+				},
+				{
+					"title": "License",
+					"url": "/docs/license/"
+				}
+			]
+		}
+	]}

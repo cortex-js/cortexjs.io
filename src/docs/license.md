@@ -3,6 +3,7 @@ title: License
 permalink: /docs/license/
 read_time: true
 layout: single
+date: Last Modified
 ---
 
 The components of CortexJS are licensed under the MIT license below.

@@ -3,6 +3,7 @@ title: Reporting Issues
 permalink: /docs/reporting-issues/
 read_time: true
 layout: single
+date: Last Modified
 sidebar:
     nav: 'docs'
 ---

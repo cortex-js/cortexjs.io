@@ -1,8 +1,11 @@
 ---
 layout: single
+date: Last Modified
 title: MathLive Examples - Interacting
-permalink: /mathlive-examples-interacting/
+permalink: /mathlive/examples/interacting/
 read_time: false
+sidebar:
+    - nav: "mathlive"
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
@@ -11,7 +14,7 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
-    - ../assets/js/code-playground.js
+    - /assets/js/code-playground.js
 ---
 <script>
     moduleMap = {
@@ -25,71 +28,71 @@ head:
 
 ## Reading the content of a mathfield
 
-Once you've created a mathfield you'll want to be notified when its content is modified. You can do this by providing a `onContentDidChange`
-handler when you create the mathfield.
+The content of a mathfield is available with the `value` property, just like 
+with a `<textarea>`.
+
+To be notified when the content of the mathfield is modified listen for a `'change'`
+event.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'), {
-    onContentDidChange: (mf) => {
-        console.log(mf.$text());
-    }
-});
-</div>
-    <div slot="html">&lt;div id="mathfield"&gt;
-x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;</div>
+    <div slot="javascript">document.getElementById('formula').addEventListener('change',(ev) => {
+    // `ev.target` is an instance of `MathfieldElement`
+    console.log(ev.target.value);
+});</div>
+    <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
+&lt;math-field id="formula"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
 </code-playground>
 
-In addition to Latex, you can also get the content in MathASCII or MathJSON formats.
+The `value` property is equivalent to calling the `getValue()` method with 
+no argument. You can control how result is formatted by passing options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
+For example to get the content as an ASCIIMath string, use `getValue('ASCIIMath)`.
 
+**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'ASCIIMath'` to `'spoken-text'`.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-<div slot="javascript">import MathLive from 'mathlive';
-const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
-onContentDidChange: (mf) => {
-    console.log(MathLive.latexToAST(mf.$text()));
-}
-});
-console.log(MathLive.latexToAST(mf.$text()));
-</div>
-<div slot="html">&lt;div id="mathfield"&gt;
-x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;</div>
+    <div slot="javascript">document.getElementById('formula').addEventListener('change',(ev) => {
+    // `ev.target` is an instance of `MathfieldElement`
+    console.log(ev.target.getValue('ASCIIMath'));
+});</div>
+    <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
+&lt;math-field id="formula"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
 </code-playground>
+
 
 ## Changing the content of a mathfield
 
-You can also change the value of the mathfield programatically by passing
-Latex, MathASCII or MathJSON. In the example below, the Latex input
-field is editable and is reflected in the Mathfield (and vice-versa).
+You can change the value of the mathfield programatically. In the example 
+below, the **Latex** input field is editable and is reflected in the mathfield 
+(and vice-versa).
 
 Note that we use the `suppressChangeNotifications` option when
-changing the content of the mathfield, to prevent the `onContentDidChange`
-notification from being triggered.
+changing the content of the mathfield, to prevent a `'change'` event from being 
+triggered and creating an infinite loop.{.notice--info}
 
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
-const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
-    onContentDidChange: (mf) => {
-        // Set the value of the text field to the latex from the mathfield
-        document.getElementById('latex').value = mf.$text();
-    }
+const mf = document.getElementById('formula');
+mf.addEventListener('change',(ev) => {
+    document.getElementById('latex').value = mf.value;
 });
 //
-document.getElementById('latex').value = mf.$text();
+document.getElementById('latex').value = mf.value;
 //
 // Listen for changes in the latex text field, and reflect its value in 
 // the mathfield.
 document.getElementById('latex').addEventListener('input', (ev) => {
-    mf.$latex(ev.target.value, {suppressChangeNotifications: true});
+    mf.setValue(ev.target.value, {suppressChangeNotifications: true});
 });
 </div>
 <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
-&lt;div id="mathfield"&gt;
+&lt;math-field id="formula"&gt;
 x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;                
+&lt;/math-field&gt;                
 &lt;label&gt;Latex&lt;/label&gt;
 <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
 autocorrect="off" spellcheck="false"></textarea></textarea>
@@ -109,12 +112,13 @@ autocorrect="off" spellcheck="false"></textarea></textarea>
 <!-- $insert() -->
 
 
-## Applying styling
+<!-- ## Applying styling -->
 <!-- applyStyle -->
 
-## Performing editing commands
+<!-- ## Performing editing commands -->
 
-<!-- $perform() --> 
 
 ## Next
-* <a href="/mathlive-examples-customizing">Customizing a mathfield<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a>
+
+<a href="/mathlive/examples/customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+:    How to customize the behavior and appearance of a mathfield.

@@ -2,8 +2,9 @@
 title: MathJSON
 permalink: /guides/math-json/
 layout: single
+date: Last Modified
 sidebar:
-    - nav: "mathlive"
+    - nav: "mathjson"
 ---
 # MathJson
 

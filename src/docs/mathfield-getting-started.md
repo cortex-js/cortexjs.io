@@ -2,6 +2,7 @@
 title: Getting Started with Mathfield
 permalink: /guides/mathfield-getting-started/
 layout: single
+date: Last Modified
 sidebar:
     - nav: "mathlive"
 ---
@@ -12,14 +13,61 @@ In this section we'll look into how to load the Mathlive SDK in your
 project in order to use a mathfield in a page.
 
 We'll start with a step-by-step guide using a CDN, which is the simplest 
-approach. The Advanced Setup section below will cover other options.
+approach. The Advanced Setup section will discuss other options.
 
-## Using JavaScript Modules
+## Mathfield Web Component
 
-JavaScript modules are broadly supported by modern browsers and offer several
-benefits (asynchronous, deterministics loading, no pollution of the global 
-namespace, etc...). They are the recommended approach to use MathLive in your
-project.
+1. Load the MathLive library
+2. Use the `<math-field>` tag to create a mathfield
+3. Use properties and methods of the mathfield element to interact with it
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+    <math-field>f(x)</math-field>
+    <script src='https://unpkg.com/mathlive/dist/mathlive.min.js'></script>
+    <script>
+        document.querySelector('math-field').addEventListener('change', (ev) => {
+            console.log(ev.target.value):
+        });
+    </script>
+</body>
+</html>
+```
+
+You can also programmaticaly create mathfield elements:
+```javascript
+const mfe = new MathfieldElement();
+mfe.value = '\\frac{\\pi}{2}';
+document.body.appendChild(mfe);
+```
+
+See the [MathfieldElement](http://localhost:8080/docs/mathlive/#(%22mathfield-element%22%3Amodule))
+documentation in the [SDK Reference](/docs/mathlive/) for more details about the attributes, properties, methods and 
+events supported.
+
+
+
+***
+
+# Advanced Setup
+
+The instructions above are sufficient in many cases. They allow you to create
+mathfield elements using markup or programmatically and to interact 
+with them.
+
+Howeve more complex configurations are supported as well.
+
+## Using MathLive API with JavaScript Modules
+
+In addition to `MathfieldElement`, the MathLive library provide some functions
+such as `renderMathInDocument()`. To access those functions you will need
+to import the MathLive module.
+
+JavaScript modules offer several benefits (asynchronous, deterministics loading, 
+no pollution of the global namespace, etc...). They are the recommended approach 
+to use MathLive APIS in your project.
 
 To use MathLive as a JavaScript module:
 
@@ -35,10 +83,10 @@ also dynamically download the required fonts from the CDN as well.
 <!DOCTYPE html>
 <html>
 <body>
-    <div id="formula">f(x)</div>
+    <p>$$\frac{\pi}{2}</p>
     <script type="module">
-        import MathLive from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
-        const mathfield = MathLive.makeMathField('formula');
+        import { renderMathInDocument } from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
+        renderMathInDocument();
     </script>
 </body>
 </html>
@@ -71,20 +119,16 @@ when required.
 <!DOCTYPE html>
 <html>
 <body>
-    <div id="formula">f(x)</div>
+    <p>$$\frac{\pi}{2}</p>
     <script src="https://unpkg.com/mathlive/dist/mathlive.min.js"></script>
     <script>
-        const mathfield = MathLive.makeMathField('formula');
+        MathLive.renderMathInDocument();
     </script>
 </body>
 </html>
 ```
 
 
-# Advanced Setup
-
-While the instructions above are sufficient to get you started in many cases,
-more complex configurations are supported as well.
 
 ## Using NPM
 
@@ -112,8 +156,8 @@ After you've completed this step, you can use MathLive as any other modules
 in your project: 
 
 ```javascript
-import MathLive from 'mathlive';
-const mathfield = MathLive.makeMathField('formula');
+import { MathfieldElement} from 'mathlive';
+const mfe = new MathfieldElement();
 ```
 
 Your bundler/transpiler (for example `Rollup`, `WebPack`, `Babel`, `TypeScript`)
@@ -134,8 +178,9 @@ JavaScript code in a `/js/` directory, you can specify where those assets can
 be found using the `fontsDirectory` configutation option.
 
 ```javascript
-import MathLive from 'mathlive';
-const mathfield = MathLive.makeMathField('formula', {
+import { MathfieldElement} from 'mathlive';
+const mfe = new MathfieldElement();
+mfe.setOptions({
     fontsDirectory: '../assets/mathlive-fonts'
 });
 ```
@@ -145,6 +190,10 @@ location of the directory containting the MathLive library. So in the example
 above, if the MathLive library is in a `/js/` directory and the MathLive fonts
 are in a `/assets/mathlive-fonts/` directory, then the relative path from 
 the JavaScript directory to the fonts directory is `../assets/mathlive-fonts`
+
+The `fontsDirectory` option affects all the mathfield on the page. It is 
+not necessary to apply it to all mathfields, although it's not harmful. Once 
+the fonts have been loaded once, they will not get loaded again. {.notice--info}
 
 ## Integrating with an Asset Pipeline
 
@@ -176,11 +225,8 @@ font loading.
 </head>
 <html>
 <body>
-    <div id="formula">f(x)</div>
-    <script type="module">
-        import MathLive from 'mathlive';
-        const mathfield = MathLive.makeMathField('formula');
-    </script>
+    <math-field>\tan(x) = \frac{\sin \tetha}{\cos \tetha}</math-field>
+    <script src='./vendor/mathlive.min.js'></script>
 </body>
 </html>
 ```
@@ -214,9 +260,9 @@ which can be found in the `/dist/` directory on GitHub or in the
 <body>
     <div id="formula"></div>
     <script type="module">
-        import MathLive from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
+        import {convertLatexToMarkup} from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
         window.onload = function() {
-            document.getElementById("formula").innerHTML = MathLive.latexToMarkup(
+            document.getElementById("formula").innerHTML = convertLatexToMarkup(
             `\\xrightarrow[\\Delta]{\\text{abcd}}`
             );
         };

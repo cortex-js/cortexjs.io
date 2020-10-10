@@ -3,6 +3,7 @@ title: Contributing Code
 permalink: /docs/contributing-code/
 read_time: true
 layout: single
+date: Last Modified
 ---
 
 ## Can I help fix a bug?

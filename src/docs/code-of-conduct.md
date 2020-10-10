@@ -3,6 +3,7 @@ title: Code of Conduct
 permalink: /docs/code-of-conduct/
 read_time: true
 layout: single
+date: Last Modified
 ---
 
 # Contributor Covenant Code of Conduct
