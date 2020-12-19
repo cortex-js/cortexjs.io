@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Examples
-permalink: /mathlive/examples/introduction/
+title: MathLive Guide
+permalink: /mathlive/guides//introduction/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -26,26 +26,25 @@ head:
 # Mathfield Introduction
 Let's add an editable mathfield to a web page.
 
-**1.** Add a `<math-field>`. The content of the this tag is the initial value 
-of the mathfield, as a Latex expression.
-
-**2.** Load  the MathLive library with a `<script>` tag.
+**1. Load  the MathLive library with a `<script>` tag.**
 
 <p class="notice--info">You can read more about options to integrate MathLive in your project in the 
     <a href="/guides/mathfield-getting-started/">Getting Started Guide</a>.
 </p>
 
 
-The quadratic equation is now displayed as a math formula. 
+**2. Add a `<math-field>` tag.** The content of the this tag is the initial value 
+of the mathfield, as a Latex expression.
 
-**3.** Edit the equation in the code playground below.
+**3. Edit the equation in the code playground below.**
 
-Note that you can modify the HTML or JavaScript code, then press the **Run** 
-button to try your changes. Pressing the **Reset** button will bring back the 
-playground to its original content. {.notice--info}
+The code playgrounds are live: when you modify the HTML or JavaScript code the
+ output will update to reflect your changes. Press **Reset** to bring back
+the playground to its original state. {.notice--info}
 
-**4.** Change line 3 of the HTML to another Latex expression, for example `f(x) = \sin(x)`, 
-then press the **Run** button
+**4. Change line 3 of the HTML to another Latex expression.** 
+For example `f(x) = \sin(x)`, 
+
 
 
 <code-playground layout="stack" class="m-lg w-full-lg">
@@ -58,5 +57,5 @@ then press the **Run** button
 
 ## Next
 
-<a href="/mathlive/examples/interacting">Interacting with a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides//interacting">Interacting with a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    How to read, write the content of a mathfield

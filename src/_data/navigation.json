@@ -38,39 +38,43 @@
 			]
 		},
 		{
-			"title": "MathLive Examples",
+			"title": "MathLive Guides",
 			"children": [
 				{
 					"title": "Introduction",
-					"url": "/mathlive/examples/introduction"
+					"url": "/mathlive/guides/introduction"
 				},
 				{
 					"title": "Interacting",
-					"url": "/mathlive/examples/interacting"
+					"url": "/mathlive/guides/interacting"
 				},
 				{
 					"title": "Customize",
-					"url": "/mathlive/examples/customizing"
+					"url": "/mathlive/guides/customizing"
 				},
 				{
 					"title": "Macros",
-					"url": "/mathlive/examples/macros"
+					"url": "/mathlive/guides/macros"
 				},
 				{
 					"title": "Shortcuts",
-					"url": "/mathlive/examples/shortcuts"
+					"url": "/mathlive/guides/shortcuts"
 				},
 				{
 					"title": "Speech",
-					"url": "/mathlive/examples/speech"
+					"url": "/mathlive/guides/speech"
 				},
 				{
 					"title": "Static",
-					"url": "/mathlive/examples/static"
+					"url": "/mathlive/guides/static"
 				},
 				{
 					"title": "Virtual Keyboards",
-					"url": "/mathlive/examples/virtual-keyboards"
+					"url": "/mathlive/guides/virtual-keyboards"
+				},
+				{
+					"title": "Lifecycle",
+					"url": "/mathlive/guides/lifecycle"
 				}
 			]
 		},

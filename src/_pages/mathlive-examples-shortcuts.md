@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Examples - Shortcuts
-permalink: /mathlive/examples/shortcuts/
+title: MathLive Guide - Shortcuts
+permalink: /mathlive/guides//shortcuts/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -247,5 +247,5 @@ MathLive.makeMathField(document.getElementById('mathfield'));
 
 ## Next
 
-<a href="/mathlive/examples/speech">Speech<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides//speech">Speech<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    Control speech output

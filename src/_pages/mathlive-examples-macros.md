@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Examples - Macros
-permalink: /mathlive/examples/macros/
+title: MathLive Guide - Macros
+permalink: /mathlive/guides//macros/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -34,26 +34,26 @@ config object:
     <div slot="javascript">import MathLive from 'mathlive';
 const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
 });
-console.log(mf.getConfig().macros);
+console.log(mf.getOption('macros'));
 </div>
     <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/div&gt;
 </div>
 </code-playground>
 
-You can add (or remove) macros by using `setConfig({macros: ...})`.
+You can add (or remove) macros by using `setOptions({macros: ...})`.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
 const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
 });
-mf.$setConfig({
+mf.setOptions({
     macros: {
-        ...mf.getConfig('macros'),
+        ...mf.getOptions('macros'),
         smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
     },
 });
 </div>
-    <div slot="html">&lt;div id="mathfield"&gt;\scriptCapitalK=\smallfrac{5}{7}+\frac{5}{7}&lt;/div&gt;
+    <div slot="html">&lt;div id="mathfield"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/div&gt;
 </div>
 </code-playground>
 
@@ -63,5 +63,5 @@ The macro definition can contain up to eight arguments, represented by `#1` to `
 
 ## Next
 
-<a href="/mathlive/examples/shortcuts">Shortcuts<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides//shortcuts">Shortcuts<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    Manage inline shortcuts and keyboard shortcuts

@@ -10,8 +10,8 @@ cd "$(dirname "$0")/.."
 # ensure the project is setup (node packages, etc...)
 ./scripts/setup.sh
 
-# Make a dev build
-./scripts/build.sh dev
+# Make a watch build
+./scripts/build.sh watch
 
 # boot the project and any other necessary processes.
 # bundle exec jekyll serve

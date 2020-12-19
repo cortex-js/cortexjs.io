@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Examples - Speech
-permalink: /mathlive/examples/speech/
+title: MathLive Guide - Speech
+permalink: /mathlive/guides//speech/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -150,5 +150,5 @@ MathLive.makeMathField(document.getElementById('mathfield'));
 
 ## Next
 
-<a href="/mathlive/examples/static">Static Math<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides//static">Static Math<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    Display static math formulas

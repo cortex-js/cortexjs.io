@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Examples - Static
-permalink: /mathlive/examples/static/
+title: MathLive Guide - Static
+permalink: /mathlive/guides//static/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -48,7 +48,7 @@ MathLive.makeMathField(document.getElementById('mathfield'));
 
 ## Next
 
-<a href="/mathlive/examples/virtual-keyboards">Virtual Keyboards<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides//virtual-keyboards">Virtual Keyboards<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    Define custom virtual keyboards
 
 

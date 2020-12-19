@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Examples - Virtual Keyboards
-permalink: /mathlive/examples/virtual-keyboards/
+title: MathLive Guide - Virtual Keyboards
+permalink: /mathlive/guides//virtual-keyboards/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -26,7 +26,7 @@ head:
 # Virtual Keyboards
 
 Typing math formulas require access to many special symbols. While [keyboard 
-shortcuts and inline shortcuts](/mathlive/examples/shortcuts) can help, mobile devices require another 
+shortcuts and inline shortcuts](/mathlive/guides//shortcuts) can help, mobile devices require another 
 solution. A virtual keyboard is a keyboard displayed on screen that can be 
 customized with specialized symbols for math input.
 

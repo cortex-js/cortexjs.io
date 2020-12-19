@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Examples - Interacting
-permalink: /mathlive/examples/interacting/
+title: MathLive Guide - Interacting
+permalink: /mathlive/guides//interacting/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -31,11 +31,15 @@ head:
 The content of a mathfield is available with the `value` property, just like 
 with a `<textarea>`.
 
-To be notified when the content of the mathfield is modified listen for a `'change'`
-event.
+To be notified as soon as the content of the mathfield is modified listen for 
+an `'input'` event.
+
+**Try**: modify the `'input'` event to a `'change'` event. Notice how this event
+is only sent if you press the **Return** or **Enter** key, or when the mathfield
+loses focus and the content has been modified{.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">document.getElementById('formula').addEventListener('change',(ev) => {
+    <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
     // `ev.target` is an instance of `MathfieldElement`
     console.log(ev.target.value);
 });</div>
@@ -46,13 +50,13 @@ event.
 </code-playground>
 
 The `value` property is equivalent to calling the `getValue()` method with 
-no argument. You can control how result is formatted by passing options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
+no argument. You can control how the result is formatted by passing options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
 For example to get the content as an ASCIIMath string, use `getValue('ASCIIMath)`.
 
-**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'ASCIIMath'` to `'spoken-text'`.
+**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'ASCIIMath'` to `'spoken-text'`.{.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">document.getElementById('formula').addEventListener('change',(ev) => {
+    <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
     // `ev.target` is an instance of `MathfieldElement`
     console.log(ev.target.getValue('ASCIIMath'));
 });</div>
@@ -70,14 +74,14 @@ below, the **Latex** input field is editable and is reflected in the mathfield
 (and vice-versa).
 
 Note that we use the `suppressChangeNotifications` option when
-changing the content of the mathfield, to prevent a `'change'` event from being 
+changing the content of the mathfield, to prevent a `'input'` event from being 
 triggered and creating an infinite loop.{.notice--info}
 
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
 const mf = document.getElementById('formula');
-mf.addEventListener('change',(ev) => {
+mf.addEventListener('input',(ev) => {
     document.getElementById('latex').value = mf.value;
 });
 //
@@ -120,5 +124,9 @@ autocorrect="off" spellcheck="false"></textarea></textarea>
 
 ## Next
 
-<a href="/mathlive/examples/customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides/customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    How to customize the behavior and appearance of a mathfield.
+
+<a href="/mathlive/guides/lifecycle">Web Component Lifecycle<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+:    Understand in depth the lifecycle of a MathfieldElement: construction, 
+interaction with the DOM and when can you communicate with it.

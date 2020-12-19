@@ -28,7 +28,7 @@ approach. The Advanced Setup section will discuss other options.
     <math-field>f(x)</math-field>
     <script src='https://unpkg.com/mathlive/dist/mathlive.min.js'></script>
     <script>
-        document.querySelector('math-field').addEventListener('change', (ev) => {
+        document.querySelector('math-field').addEventListener('input', (ev) => {
             console.log(ev.target.value):
         });
     </script>
