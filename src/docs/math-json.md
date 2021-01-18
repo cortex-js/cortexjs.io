@@ -8,6 +8,9 @@ sidebar:
 ---
 # MathJson
 
+<img src='/assets/MathJSON-1.png' style='margin-bottom:2em;  border-radius:8px; border:1px solid #203346'>
+
+
 The MathJSON format is a lightweight data interchange format for mathematical notation.
 
 It is human-readable, while being easy for machines to generate and parse.
