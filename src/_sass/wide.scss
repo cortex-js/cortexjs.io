@@ -2,17 +2,17 @@
 
 @import 'imports/astra';
 /* Variables */
-@import "imports/minimal-mistakes/variables";
+@import 'imports/minimal-mistakes/variables';
 
 /* Mixins and functions */
-@import "imports/minimal-mistakes/vendor/breakpoint/breakpoint";
+@import 'imports/minimal-mistakes/vendor/breakpoint/breakpoint';
 // @include breakpoint-set("to ems", true);
-@import "imports/minimal-mistakes/vendor/susy/susy";
-@import "imports/minimal-mistakes/mixins";
+@import 'imports/minimal-mistakes/vendor/susy/susy';
+@import 'imports/minimal-mistakes/mixins';
 
 /* Core CSS */
-@import "imports/minimal-mistakes/reset";
-@import "imports/minimal-mistakes/base";
+@import 'imports/minimal-mistakes/reset';
+@import 'imports/minimal-mistakes/base';
 // @import "imports/minimal-mistakes/forms";
 // @import "imports/minimal-mistakes/tables";
 // @import "imports/minimal-mistakes/animations";
@@ -20,72 +20,74 @@
 /* Components */
 // @import "imports/minimal-mistakes/buttons";
 // @import "imports/minimal-mistakes/notices";
-@import "imports/minimal-mistakes/masthead";
-@import "imports/minimal-mistakes/navigation";
-@import "imports/minimal-mistakes/footer";
+@import 'imports/minimal-mistakes/masthead';
+@import 'imports/minimal-mistakes/navigation';
+@import 'imports/minimal-mistakes/footer';
 // @import "imports/minimal-mistakes/search";
 // @import "imports/minimal-mistakes/syntax";
 
 /* Utility classes */
-@import "imports/minimal-mistakes/utilities";
+@import 'imports/minimal-mistakes/utilities';
 
 /* Layout specific */
-@import "imports/minimal-mistakes/page";
+@import 'imports/minimal-mistakes/page';
 
-@import "imports/minimal-mistakes/print";
+@import 'imports/minimal-mistakes/print';
 
-
-
-
-@import 'imports/minimal-mistakes-overrides'; 
+@import 'imports/minimal-mistakes-overrides';
 @import 'imports/utilities';
 @import 'imports/cards';
 
 @import 'imports/section-link';
 
 #main {
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  padding: 0;
-  width: 100%;
-  max-width: 100vw;
+    position: relative;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+    max-width: 100vw;
 }
 
 .hero-section {
-  position: relative;
-  width: 100%;
-  padding-top: 5em;
-  padding-bottom: 5em;
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  color: #f1f1f1;
-  background: rgb(2,0,36);
-  background: linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(21,59,97,1)100%);
+    position: relative;
+    width: 100%;
+    padding-top: 5em;
+    padding-bottom: 5em;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    color: #f1f1f1;
+    background: rgb(2, 0, 36);
+    background: linear-gradient(
+        180deg,
+        rgba(2, 0, 36, 1) 0%,
+        rgba(21, 59, 97, 1) 100%
+    );
 }
 
 .hero-section h1 {
-  font: 900 96px/104px $sans-serif;
-  margin: 0;
-  padding: 0;
+    font: 900 96px/104px $sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 .hero-section h1 em {
-  font-weight: 100;
-  font-style: normal;
+    font-weight: 100;
+    font-style: normal;
 }
 
 .hero-section p {
-  max-width: 653px;
-  font: 400 48px/52px $sans-serif;
-  letter-spacing: -0.05ex;
-  margin: 0;
-  padding: 0;
-  padding-left: 1em;
-  padding-right: 1em;
-  text-align: center;
-  color: #ddd;
+    max-width: 653px;
+    font: 400 48px/52px $sans-serif;
+    letter-spacing: -0.05ex;
+    margin: 0;
+    padding: 0;
+    padding-left: 1em;
+    padding-right: 1em;
+    text-align: center;
+    color: #ddd;
 }
 
 //
@@ -95,210 +97,200 @@
 // Above and below when narrow.
 //
 section.fullwidth {
-  position: relative;
-  display: flex;
-  flex-flow: row;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding-top: 2em;
-  padding-bottom: 2em;
+    position: relative;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-top: 2em;
+    padding-bottom: 2em;
 }
 
 section.fullwidth.reverse {
-  flex-flow: row-reverse;
+    flex-flow: row-reverse;
 }
 
 section.fullwidth.stacked {
-  flex-flow: column;
+    flex-flow: column;
 }
 
 section.fullwidth .copy {
-  margin-top: 1em;
-  margin-bottom: 1em;
-  flex-basis: 0;
-  flex-grow: 1;
-  max-width: 640px;
-  width: 100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 640px;
+    width: 100%;
 }
 
 section.fullwidth .figure {
-  padding: 1em;
-  flex-basis: 0;
-  flex-grow: 2;
+    padding: 1em;
+    flex-basis: 0;
+    flex-grow: 2;
 
-  display: flex;
-  justify-content: center;
-  align-content: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
 }
 
 section.fullwidth .copy {
-  margin-left: 5em;
+    margin-left: 5em;
 }
 
 div.figure + div.copy {
-  margin-left: 0;
-  margin-right: 2em;
+    margin-left: 0;
+    margin-right: 2em;
 }
 
 section.fullwidth h2 {
-  color: $text-color;
-  font: 700 56px/50px $sans-serif;
-  margin: 0;
-  padding: 0;
-  padding-bottom: .5em;
-  letter-spacing: 0.576px;
-  border: none;
-  & .eyebrow {
-    display: block;
-    font: 400 32px/36px $sans-serif;
+    color: $text-color;
+    font: 700 56px/50px $sans-serif;
     margin: 0;
     padding: 0;
-    opacity: .4;
-    margin-bottom: .5em;
-    letter-spacing: -0.2px;
-  }
+    padding-bottom: 0.5em;
+    letter-spacing: 0.576px;
+    border: none;
+    & .eyebrow {
+        display: block;
+        font: 400 32px/36px $sans-serif;
+        margin: 0;
+        padding: 0;
+        opacity: 0.4;
+        margin-bottom: 0.5em;
+        letter-spacing: -0.2px;
+    }
 }
 
 section.fullwidth p {
-  font: 400 21px/29px $sans-serif;
-  margin: 0;
-  padding:0;
+    font: 400 21px/29px $sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-
 .cards {
-  display: flex;
-  flex-flow: row;
-  margin-top: 2em;
-  padding-left: 1em;
-  padding-right: 1em;
-  justify-content: space-around;
+    display: flex;
+    flex-flow: row;
+    margin-top: 2em;
+    padding-left: 1em;
+    padding-right: 1em;
+    justify-content: space-around;
 }
 
 .cards h2 {
-  margin: 0;
-  margin-bottom: .5em;
-  text-align: center;
+    margin: 0;
+    margin-bottom: 0.5em;
+    text-align: center;
 }
 
-
-
 .cards .card {
-  background: $card-background-color;
-  color: $text-color;
-  border: 1px solid $border-color;
+    background: $card-background-color;
+    color: $text-color;
+    border: 1px solid $border-color;
 }
 
 .cards.wrap-vertical {
-  flex-flow: row;
-  flex-wrap: wrap;
-  width: 100%
+    flex-flow: row;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .cards.wrap-vertical .card {
-  margin-right: 2em;
-  margin-bottom: 2em;
-  flex-flow: column;
-  padding: 1em;
-  width: 300px;
-  border-radius: 8px;
-  background: $card-background-color;
-  box-shadow: $card-shadow;
+    margin-right: 2em;
+    margin-bottom: 2em;
+    flex-flow: column;
+    padding: 1em;
+    width: 300px;
+    border-radius: 8px;
+    background: $card-background-color;
+    box-shadow: $card-shadow;
 }
 .cards.wrap-vertical .card .copy {
-  margin-left: 0;
+    margin-left: 0;
 }
 .cards.wrap-vertical .card .copy h3 {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 32px;
-  letter-spacing: -0.1px;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 32px;
+    letter-spacing: -0.1px;
 }
 
 .cards.col1 {
-  flex-flow: column;
-  padding-bottom: 3em;
-  padding-top: 1em;
+    flex-flow: column;
+    padding-bottom: 3em;
+    padding-top: 1em;
 }
 
 .cards.col1 .card {
-  margin-top: 1em;
-  margin-bottom: 1em;
-  padding: 1em;
-  width: calc(100% - 2em);
-  border-radius: 8px;
-  background: $card-background-color;
-  box-shadow: $card-shadow;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 1em;
+    width: calc(100% - 2em);
+    border-radius: 8px;
+    background: $card-background-color;
+    box-shadow: $card-shadow;
 }
 
-
 .cards.col2 .card {
-  flex-flow: column-reverse;
-  padding: 1em;
-  width: calc(50% - 2em);
-  border-radius: 8px;
-  background: $card-background-color;
-  box-shadow: $card-shadow;
+    flex-flow: column-reverse;
+    padding: 1em;
+    width: calc(50% - 2em);
+    border-radius: 8px;
+    background: $card-background-color;
+    box-shadow: $card-shadow;
 }
 
 .cards.col3 .card {
-  flex-flow: column-reverse;
-  justify-content: flex-end;
-  padding: 0;
-  width: calc(33% - 3em);
-  border-radius: 8px;
-  background:$card-background-color;
-  box-shadow: $card-shadow;
+    flex-flow: column-reverse;
+    justify-content: flex-end;
+    padding: 0;
+    width: calc(33% - 3em);
+    border-radius: 8px;
+    background: $card-background-color;
+    box-shadow: $card-shadow;
 }
 
-
-.cards.col1 .card.primary, 
-.cards.col2 .card.primary, 
-.cards.col3 .card.primary, 
+.cards.col1 .card.primary,
+.cards.col2 .card.primary,
+.cards.col3 .card.primary,
 .cards .card.primary {
-  background: $primary-color;
-  color: #fff;
-  border: 1px solid darken($primary-color, 20%);
+    background: $primary-color;
+    color: #fff;
+    border: 1px solid darken($primary-color, 20%);
 }
 
 .cards.col2 .copy,
 .cards.col3 .copy {
-  margin-left: 1.5em;
-  margin-right: 1.5em;
-  padding: 1em 1.5em;
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+    padding: 1em 1.5em;
 }
 
-
-
-.cards.col2 .figure, 
+.cards.col2 .figure,
 .cards.col3 .figure {
-  flex-grow: 0;
-  padding: 0;
-  border-radius: 8px;
-  & img {
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-  }
+    flex-grow: 0;
+    padding: 0;
+    border-radius: 8px;
+    & img {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
 }
 
-
-
-.cards.col2  h2, 
-.cards.col3  h2 {
-  font: 700 48px/40px "Source Sans Pro", sans-serif
+.cards.col2 h2,
+.cards.col3 h2 {
+    font: 700 48px/40px 'Source Sans Pro', sans-serif;
 }
-.cards.col2  h2 .eyebrow, 
-.cards.col3  h2 .eyebrow {
-  font: 400 24px/24px "Source Sans Pro", sans-serif
+.cards.col2 h2 .eyebrow,
+.cards.col3 h2 .eyebrow {
+    font: 400 24px/24px 'Source Sans Pro', sans-serif;
 }
 
-.cards.col2  h3, 
-.cards.col3  h3 {
-  font: 400 24px/32px "Source Sans Pro", sans-serif;
-  margin-bottom: 1em;
+.cards.col2 h3,
+.cards.col3 h3 {
+    font: 400 24px/32px 'Source Sans Pro', sans-serif;
+    margin-bottom: 1em;
 }
-
 
 .single-column {
     flex-flow: column;
@@ -307,9 +299,7 @@ section.fullwidth p {
     max-width: 960px;
 }
 
-
-
-// @media (max-width: $large) { 
+// @media (max-width: $large) {
 //   section.fullwidth, section.fullwidth.reverse {
 //     flex-flow: column;
 //   }
@@ -329,7 +319,7 @@ section.fullwidth p {
 //   }
 // }
 
-// @media (max-width: $small) { 
+// @media (max-width: $small) {
 //   .card .copy {
 //     margin-left: 1em;
 //     margin-right: 1em;

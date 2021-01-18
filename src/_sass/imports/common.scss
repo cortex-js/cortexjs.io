@@ -11,7 +11,6 @@ $h4-font-size: 18px;
 $h5-font-size: 16px;
 $subheading-font-size: 11px;
 
-
 $primary-color: #0066ce;
 $primary-color-dark: hsl(210, 100%, 30%);
 $primary-color-light: hsl(210, 100%, 60%);
@@ -79,18 +78,16 @@ $gray-700: rgb(185, 185, 185);
 $gray-800: rgb(227, 227, 227);
 $gray-900: rgb(255, 255, 255);
 
-
-
 $card-border: #fff;
 $card-background: #fafafa;
-$body-color: #333;  // 5c5050
+$body-color: #333; // 5c5050
 
 $semantic-blue: #0066ce;
 $semantic-red: #e34850;
 $semantic-orange: #e68619;
 $semantic-green: #2d9d78;
 
-:host {
+:root {
     --primary-color: $primary-color;
     --primary-color-dark: $primary-color-dark;
     --primary-color-light: $primary-color-light;

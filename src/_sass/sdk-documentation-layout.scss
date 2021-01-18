@@ -14,13 +14,12 @@ $sans-serif: 'IBM Plex Sans', 'Source Sans Pro', sans-serif !default;
 
 @import 'imports/astra';
 @import 'imports/minimal-mistakes'; // main partials
-@import 'imports/minimal-mistakes-overrides'; 
+@import 'imports/minimal-mistakes-overrides';
 
 $subheading-font-size: 0.7rem;
 $h3-font-size: 1.25rem;
-$h4-font-size:  1.17rem;
+$h4-font-size: 1.17rem;
 $code-font-size: 1rem;
-
 
 // $semantic-blue: #0066ce;
 // $semantic-red: #e34850;
@@ -86,17 +85,17 @@ $code-font-size: 1rem;
 // $gray-800: rgb(227, 227, 227);
 // $gray-900: rgb(255, 255, 255);
 
-@if ($theme == "dark") {
+@if ($theme == 'dark') {
     $background-color: #252a34 !default !global;
     $text-color: #eaeaea !default !global;
     $border-color: mix(#000, $background-color, 20%) !default !global;
-    $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
+    $card-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23) !default !global;
 } @else {
     $background-color: #fff !default !global;
     $text-color: #223 !default !global;
     $border-color: mix(#fff, $text-color, 85%) !default !global;
     $card-background-color: #fafafa !default !global;
-    $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
+    $card-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23) !default !global;
 }
 
 mark {
@@ -138,9 +137,11 @@ section.page__content h5 {
     border: solid 1px #dfe1e5;
 }
 
-.search-box-container:focus-within, .search-box-container:hover {
+.search-box-container:focus-within,
+.search-box-container:hover {
     border: solid 1px #fafafa;
-    box-shadow: 0 1px 2px 0 rgba(60,64,67,.302), 0 2px 6px 2px rgba(60,64,67,.149);
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302),
+        0 2px 6px 2px rgba(60, 64, 67, 0.149);
 }
 
 .search-box-container .icon {
@@ -204,7 +205,8 @@ h2 strong {
     font-weight: 700;
 }
 
-h2, h3 {
+h2,
+h3 {
     position: sticky;
     top: -2px; // Needed for sticky
     width: calc(100%);
@@ -213,7 +215,7 @@ h2, h3 {
     border: 10px solid $background-color;
     border-bottom: 1px solid #e7e7e7;
     color: $text-color;
-    z-index: 6;  // For sticky header to float above
+    z-index: 6; // For sticky header to float above
     background: $background-color;
     transform: translateX(-10px);
     box-sizing: content-box;
@@ -227,10 +229,11 @@ h3 {
 }
 
 /* Subheading above */
-h2 span.subhead, h3 span.subhead {
+h2 span.subhead,
+h3 span.subhead {
     display: block;
     font-size: $subheading-font-size;
-    line-height:.8;
+    line-height: 0.8;
     font-weight: 400;
     font-style: normal;
 }
@@ -239,8 +242,8 @@ h2 span.subhead, h3 span.subhead {
     position: relative; // To position the highlighting mark
 }
 
-
-code, .code {
+code,
+.code {
     font-family: $monospace;
     display: inline;
     overflow-wrap: break-word;
@@ -266,7 +269,8 @@ dd > code {
 
 // Arguments, e.g. "a" in 'f(a:T)'
 // Can also be used standalone, e.g. in markup
-var, .var {
+var,
+.var {
     font-family: $monospace;
     // font-size: $code-font-size;
     font-style: italic;
@@ -276,7 +280,6 @@ var, .var {
 strong var {
     font-weight: 700;
 }
-
 
 .card {
     display: block;
@@ -292,13 +295,17 @@ strong var {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
+.card[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
 .card h3 {
     // display: flex;
     // justify-content: space-between;
-    position: relative;  // Override sticky h3
-    top: auto;      // Override sticky h3
-    z-index: 5;  // Override sticky h3
+    position: relative; // Override sticky h3
+    top: auto; // Override sticky h3
+    z-index: 5; // Override sticky h3
     width: calc(100% + 34px);
     margin-top: -20px;
     margin-bottom: 10px;
@@ -328,9 +335,6 @@ strong var {
     color: $primary-color;
 }
 
-
-
-  
 .card h3 > span {
     display: block;
     width: 100%;
@@ -339,11 +343,13 @@ strong var {
     white-space: normal;
 }
 
+.page__content .card:hover > a:not(.btn) img {
+    box-shadow: none;
+}
 h4 {
     font-size: $h4-font-size;
     font-weight: 700;
 }
-
 
 ul {
     line-height: 1.333;
@@ -366,8 +372,6 @@ ul {
     padding-left: 0;
 }
 
-
-
 .page__content p,
 .page__content li {
     font-size: 1rem !important;
@@ -379,12 +383,12 @@ ul {
 }
 
 html {
-    scroll-behavior: smooth
+    scroll-behavior: smooth;
 }
 @media screen and (prefers-reduced-motion: reduce) {
-	html {
-		scroll-behavior: auto;
-	}
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 body.layout--sdk-documentation-layout #main a,
@@ -405,21 +409,20 @@ body.layout--sdk-documentation-layout #main a:hover {
     border-radius: 8px;
 }
 
-
 .page__content dt strong {
     // To support target highliting for dt/dd
     // This is used when we have a 'short' interface/class
     // displayed in a card.
     position: relative;
-    z-index : 0;
+    z-index: 0;
 }
 
 // Show the anchor when it is the target
 .page__content dt .permalink {
     opacity: 0;
 }
-.page__content section:target > h3 .permalink, 
-.page__content dt:target .permalink ,
+.page__content section:target > h3 .permalink,
+.page__content dt:target .permalink,
 .page__content dt:hover .permalink {
     opacity: 1;
 }
@@ -453,15 +456,15 @@ thead {
     background-color: transparent;
     border-bottom: 1px solid #333;
 }
-th:empty { 
-    display: none
+th:empty {
+    display: none;
 }
 
 tr {
     width: 100%;
 }
 
-tr code { 
+tr code {
     // Avoid breaking code in tables (often used as first column index)
     white-space: break-spaces;
 }
@@ -477,7 +480,6 @@ td {
 dd div.highlight {
     margin-top: 1.5em;
 }
-
 
 .page__content .card p:nth-child(1) {
     margin-top: 0;
@@ -522,25 +524,25 @@ ul.index {
 }
 
 /* Anchor icon */
-.permalink { 
+.permalink {
     float: right;
 }
 
 .permalink svg {
-   display: inline-block;
-   font-size: inherit;
-   width: 1em;
-   height: 1em;
-   overflow: visible;
-   vertical-align: -.2em;
+    display: inline-block;
+    font-size: inherit;
+    width: 1em;
+    height: 1em;
+    overflow: visible;
+    vertical-align: -0.2em;
 }
 
 #main a.externallink svg {
-    width: .8em;
-    height: .8em;
+    width: 0.8em;
+    height: 0.8em;
     vertical-align: 0;
-    margin-left: .5ex;
-    margin-right: .5ex
+    margin-left: 0.5ex;
+    margin-right: 0.5ex;
 }
 
 .page__content h1 .permalink,
@@ -550,12 +552,12 @@ ul.index {
 .page__content h5 .permalink,
 .page__content h6 .permalink {
     font-size: 1em;
-    left: -.5em;
+    left: -0.5em;
 }
 .page__content section {
     scroll-margin-top: 5em; // Would be nice, but can't get it to work (for cards, works for section)
     position: relative; // So that the highlight for :target contains only the section
-} 
+}
 
 svg.highlighting-mark {
     position: absolute;
@@ -568,8 +570,16 @@ svg.highlighting-mark {
     width: 0;
     transition: width 0.5s;
 }
-.page__content section[id]:target > h3 .highlighting-mark-container > svg.highlighting-mark, 
-.page__content section[id]:target > h2 .highlighting-mark-container > svg.highlighting-mark, 
+.page__content
+    section[id]:target
+    > h3
+    .highlighting-mark-container
+    > svg.highlighting-mark,
+.page__content
+    section[id]:target
+    > h2
+    .highlighting-mark-container
+    > svg.highlighting-mark,
 .page__content dt:target .highlighting-mark-container > svg.highlighting-mark {
     width: calc(100% + 3em);
 }
@@ -589,8 +599,7 @@ svg.highlighting-mark {
 //     z-index: -1;
 // }
 
-.page__content section[id]:target::after 
-{
+.page__content section[id]:target::after {
     content: '';
     position: absolute;
     top: -8px;
@@ -602,10 +611,8 @@ svg.highlighting-mark {
     width: 8px;
 }
 
-
-
-
-.modifier-tag, .tag-name {
+.modifier-tag,
+.tag-name {
     display: inline-block;
     white-space: nowrap;
     font-size: 13px;
@@ -644,7 +651,7 @@ svg.highlighting-mark {
 .class-label {
     color: $text-color;
     font-weight: 700;
-    margin-right: .25em;
+    margin-right: 0.25em;
 }
 
 .modifier-tag + .modifier-tag {
@@ -656,12 +663,11 @@ svg.highlighting-mark {
     border-color: $semantic-red;
 }
 
-
 .orange.modifier-tag {
     color: $semantic-orange;
     border-color: $semantic-orange;
 }
-// A block above a method or property name, at the very 
+// A block above a method or property name, at the very
 // top of a card section, that groups a series of flags
 // such as "exported", "protected", "private", etc...
 // (can also be displayed inline as span.flags for classCard)
@@ -677,8 +683,8 @@ div.flags {
     text-transform: uppercase;
 }
 
-.page__content .notice--info code, 
-.page__content .notice--warning code, 
+.page__content .notice--info code,
+.page__content .notice--warning code,
 .page__content .notice--danger code {
     background: inherit;
 }
@@ -691,14 +697,10 @@ div.flags {
     text-decoration: line-through;
 }
 
-
-
-
-
-
 // The name of a referenced type, e.g.
 // `Bar` in `type Foo = Bar`
-.reference, .typeParameter {
+.reference,
+.typeParameter {
     font-weight: 700;
 }
 
@@ -707,7 +709,7 @@ div.flags {
     color: $gray-400;
 }
 
-// Punctuation signs, "=", "|", ":". 
+// Punctuation signs, "=", "|", ":".
 // For example "type foo = number"
 .punctuation {
     color: $indigo-400;
@@ -726,7 +728,6 @@ div.flags {
     color: $magenta-400;
     font-weight: 700;
 }
-
 
 // For {...} blocks (unions, intersections)
 ul.type-block {
@@ -760,9 +761,10 @@ figure.highlight {
 //     }
 // }
 
-
 @media (min-width: $medium) {
-    .page { padding-right: 0; }
+    .page {
+        padding-right: 0;
+    }
 }
 
 // @media (min-width: $large) {
@@ -774,3 +776,17 @@ figure.highlight {
 //         padding-right: 0;
 //     }
 // }
+
+.card.list h3 {
+    font-weight: 900;
+}
+
+.card.list ul {
+    column-count: 2;
+    padding: 18px 0 18px 18px;
+    margin: 0;
+}
+
+.card.list ul li {
+    margin-top: 0;
+}

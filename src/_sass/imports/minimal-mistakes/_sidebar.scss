@@ -7,135 +7,149 @@
    ========================================================================== */
 
 .sidebar {
-  @include clearfix();
-  @include breakpoint(max-width $medium) {
-    /* fix z-index order of follow links */
-    position: relative;
-    z-index: 10;
-    transform: translate3d(0, 0, 0);
-  }
-
-  width: 100%;
-
-  @include breakpoint($large) {
-    // if >1200px...
-    float: left;
-    width: calc(#{$right-sidebar-width-narrow} - 1em);
-    opacity: 0.75;
-    transition: opacity 0.2s ease-in-out;
-
-    &:hover {
-      opacity: 1;
+    @include clearfix();
+    @include breakpoint(max-width $medium) {
+        /* fix z-index order of follow links */
+        position: relative;
+        z-index: 10;
+        transform: translate3d(0, 0, 0);
     }
 
-    &.sticky {
-      overflow-y: auto;
-      /* calculate height of nav list
+    width: 100%;
+
+    @include breakpoint($large) {
+        // if >1200px...
+        float: left;
+        width: calc(#{$right-sidebar-width-narrow} - 1em);
+        opacity: 0.75;
+        transition: opacity 0.2s ease-in-out;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        &.sticky {
+            overflow-y: auto;
+            /* calculate height of nav list
          viewport height - nav height - masthead x-padding
       */
-      height: calc(100vh - #{$nav-height} - 2em);
+            height: calc(100vh - #{$nav-height} - 2em);
+        }
     }
-  }
 
-  @include breakpoint($large) {
-    width: calc(#{$right-sidebar-width} - 1em);
-  }
-
-  > * {
-    margin-top: 1em;
-    margin-bottom: 1em;
-  }
-
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    margin-bottom: 0;
-    font-family: $sans-serif-narrow;
-  }
-
-  p,
-  li {
-    font-family: $sans-serif;
-    font-size: $type-size-5;
-    line-height: 1.5;
-  }
-
-  img {
-    width: 100%;
-    
-    &.emoji {
-      width: 20px;
-      height: 20px;
+    @include breakpoint($large) {
+        width: calc(#{$right-sidebar-width} - 1em);
     }
-  }
+
+    > * {
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-bottom: 0;
+        font-family: $sans-serif-narrow;
+    }
+
+    p,
+    li {
+        font-family: $sans-serif;
+        font-size: $type-size-5;
+        line-height: 1.5;
+        padding: 4px;
+        padding-left: 8px;
+        border-radius: 4px;
+
+        a {
+            display: block;
+            border-radius: 4px;
+            &.active {
+                color: white !important;
+                background: $primary;
+            }
+        }
+    }
+
+    img {
+        width: 100%;
+
+        &.emoji {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+.sidebar ul:not(.nav__items) li:hover {
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .sidebar__right {
-  margin-bottom: 1em;
+    margin-bottom: 1em;
 
-  @include breakpoint($large) {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: $right-sidebar-width-narrow;
-    margin-right: -1 * $right-sidebar-width-narrow;
-    padding-left: 1em;
-    z-index: 10;
+    @include breakpoint($large) {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: $right-sidebar-width-narrow;
+        margin-right: -1 * $right-sidebar-width-narrow;
+        padding-left: 1em;
+        z-index: 10;
 
-    &.sticky {
-      @include clearfix();
-      position: -webkit-sticky;
-      position: sticky;
-      top: 2em;
-      float: right;
+        &.sticky {
+            @include clearfix();
+            position: -webkit-sticky;
+            position: sticky;
+            top: 2em;
+            float: right;
+        }
     }
-  }
 
-  // @include breakpoint($x-large) {
-  //   width: $right-sidebar-width;
-  //   margin-right: -1 * $right-sidebar-width;
-  // }
+    // @include breakpoint($x-large) {
+    //   width: $right-sidebar-width;
+    //   margin-right: -1 * $right-sidebar-width;
+    // }
 }
 
 .splash .sidebar__right {
-  @include breakpoint($large) {
-    position: relative;
-    float: right;
-    margin-right: 0;
-  }
+    @include breakpoint($large) {
+        position: relative;
+        float: right;
+        margin-right: 0;
+    }
 
-  // @include breakpoint($x-large) {
-  //   margin-right: 0;
-  // }
+    // @include breakpoint($x-large) {
+    //   margin-right: 0;
+    // }
 }
-
 
 /*
    Wide Pages
    ========================================================================== */
 
 .wide .sidebar__right {
-  margin-bottom: 1em;
+    margin-bottom: 1em;
 
-  @include breakpoint($large) {
-    position: initial;
-    top: initial;
-    right: initial;
-    width: initial;
-    margin-right: initial;
-    padding-left: initial;
-    z-index: initial;
+    @include breakpoint($large) {
+        position: initial;
+        top: initial;
+        right: initial;
+        width: initial;
+        margin-right: initial;
+        padding-left: initial;
+        z-index: initial;
 
-    &.sticky {
-      float: none;
+        &.sticky {
+            float: none;
+        }
     }
-  }
 
-  // @include breakpoint($x-large) {
-  //   width: initial;
-  //   margin-right: initial;
-  // }
+    // @include breakpoint($x-large) {
+    //   width: initial;
+    //   margin-right: initial;
+    // }
 }
-

@@ -1,92 +1,95 @@
+// Stylesheet for the typescript_doc layout.
+@charset "utf-8";
+
+@import 'minimal-mistakes/vendor/breakpoint/breakpoint';
+@import 'minimal-mistakes/variables';
 
 .ml-xs {
-  margin-left: .25em !important;
+    margin-left: 0.25em !important;
 }
 
 .ml-sm {
-  margin-left: .5em !important;
+    margin-left: 0.5em !important;
 }
 
 .ml-md {
-  margin-left: 1em !important;
+    margin-left: 1em !important;
 }
 
 .ml-lg {
-  margin-left: 2em !important;
+    margin-left: 2em !important;
 }
 
 .ml-xl {
-  margin-left: 3em !important;
+    margin-left: 3em !important;
 }
 
 .mr-xs {
-  margin-right: .25em !important;
+    margin-right: 0.25em !important;
 }
 
 .mr-sm {
-  margin-right: .5em !important;
+    margin-right: 0.5em !important;
 }
 
 .mr-md {
-  margin-right: 1em !important;
+    margin-right: 1em !important;
 }
 
 .mr-lg {
-  margin-right: 2em !important;
+    margin-right: 2em !important;
 }
 
 .mr-xl {
-  margin-right: 3em !important;
+    margin-right: 3em !important;
 }
 
 .mb-lg {
-  margin-bottom: 2em !important;
+    margin-bottom: 2em !important;
 }
 
 .mb-xl {
-  margin-bottom: 3em !important;
+    margin-bottom: 3em !important;
 }
 
 .mt-sm {
-  margin-top: .5em !important;
+    margin-top: 0.5em !important;
 }
 
 .mt-md {
-  margin-top: 1em !important;
+    margin-top: 1em !important;
 }
 
 .mt-lg {
-  margin-top: 2em !important;
+    margin-top: 2em !important;
 }
 
 .mt-xl {
-  margin-top: 3em !important;
+    margin-top: 3em !important;
 }
 
 .m-sm {
-  margin: .25em !important;
+    margin: 0.25em !important;
 }
 
 .m-md {
-  margin: .5em !important;
+    margin: 0.5em !important;
 }
 
 .m-md {
-  margin: 1em !important;
+    margin: 1em !important;
 }
 
 .m-lg {
-  margin: 2em !important;
+    margin: 2em !important;
 }
 
 .m-xl {
-  margin: 3em !important;
+    margin: 3em !important;
 }
 
-
-
-.m-auto { 
-  margin: auto !important;
+.m-auto {
+    margin: auto !important;
 }
 
 .font-size-sm {
@@ -112,24 +115,49 @@
     font-size: 64px !important;
 }
 
+.max-w-xs {
+    max-width: 20rem !important;
+}
+.max-w-sm {
+    max-width: 24rem !important;
+}
+.max-w-md {
+    max-width: 28rem !important;
+}
+.max-w-lg {
+    max-width: 32rem !important;
+}
+.max-w-xl {
+    max-width: 36rem !important;
+}
+.max-w-2xl {
+    max-width: 42rem !important;
+}
+.max-w-3xl {
+    max-width: 48rem !important;
+}
+.max-w-4xl {
+    max-width: 56rem !important;
+}
+.max-w-5xl {
+    max-width: 64rem !important;
+}
+.max-w-6xl {
+    max-width: 72rem !important;
+}
+.max-w-full {
+    max-width: 100% !important;
+}
 
-.max-w-xs	{ max-width: 20rem !important; }
-.max-w-sm	{ max-width: 24rem !important; }
-.max-w-md	{ max-width: 28rem !important; }
-.max-w-lg	{ max-width: 32rem !important; }
-.max-w-xl	{ max-width: 36rem !important; }
-.max-w-2xl	{ max-width: 42rem !important; }
-.max-w-3xl	{ max-width: 48rem !important; }
-.max-w-4xl	{ max-width: 56rem !important; }
-.max-w-5xl	{ max-width: 64rem !important; }
-.max-w-6xl	{ max-width: 72rem !important; }
-.max-w-full	{ max-width: 100% !important; }
-
-.w-full	{ width: 100% !important; }
-.w-full-lg { width: calc(100% - 4em) !important; }
+.w-full {
+    width: 100% !important;
+}
+.w-full-lg {
+    width: calc(100% - 4em) !important;
+}
 
 .text-center {
-  text-align: center !important;
+    text-align: center !important;
 }
 
 .icon-primary {
@@ -145,18 +173,69 @@
 }
 
 .icon1em {
-  width: 1em;
-  height: 1em;
+    width: 1em;
+    height: 1em;
 }
 
 .bg-alternate {
-  background: #f1f1f1 !important;
+    background: #f1f1f1 !important;
 }
 
 .bg-black {
-  background: #000 !important;
+    background: #000 !important;
 }
 
 .bg-white {
-  background: #fff !important;
+    background: #fff !important;
+}
+
+.cards {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    align-items: center;
+    flex-flow: column;
+    @include breakpoint($medium) {
+        flex-flow: row wrap;
+        align-items: flex-start;
+        &.two .card {
+            width: calc(50% - 12px);
+            min-width: calc(50% - 12px);
+        }
+
+        &.three .card {
+            width: calc(33% - 24px);
+            min-width: calc(33% - 24px);
+        }
+        &.four .card {
+            width: calc(25% - 36px);
+            min-width: calc(25% - 36px);
+        }
+    }
+}
+
+.cards .card {
+    margin: 0;
+    margin-bottom: 2em;
+    max-width: 400px;
+    @include breakpoint($medium) {
+        margin-left: 12px;
+        margin-right: 12px;
+        max-width: max-content;
+    }
+}
+
+.card .copy h3 {
+    background: transparent;
+    margin-top: 0;
+    font-weight: 700;
+    color: $primary;
+    border: none;
+    white-space: normal;
+    line-height: 1;
+}
+
+.card .copy p {
+    margin-top: 0;
+    line-height: 1.2;
 }
