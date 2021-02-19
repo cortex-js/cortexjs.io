@@ -50,14 +50,19 @@
 
 
 .card .figure {
-  padding: 1em;
-  flex-basis: 0;
-  flex-grow: 2;
+  display: block;
+  // padding: 1em;
+  // flex-basis: 0;
+  // flex-grow: 2;
   // max-width: 640px;
 
-  display: flex;
-  justify-content: center;
-  align-content: center;
+  // display: flex;
+  // justify-content: center;
+  // align-content: center;
+}
+
+.card .navigation {
+  margin-left: .5em;
 }
 
 .card h2 {

@@ -2,8 +2,8 @@
 // the tool that generates the documentation from TypeScript declaration files
 
 const searchPlugin = function () {
-    // prettier-ignore
-    const STOP_WORDS = [
+  // prettier-ignore
+  const STOP_WORDS = [
         "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your",
         "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", 
         "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", 
@@ -20,420 +20,388 @@ const searchPlugin = function () {
         "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"   
     ];
 
-    function debounce(fn, wait) {
-        let timeout;
-        return () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                timeout = null;
-                fn();
-            }, wait);
-        };
-    }
-
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-    }
-
-    function termsToRegExp(terms) {
-        return new RegExp(
-            '(' +
-                terms
-                    .map((x) => {
-                        if (/^".*"$/.test(x)) {
-                            return (
-                                '\\b' +
-                                escapeRegExp(x).substring(1, x.length - 1) +
-                                '\\b'
-                            );
-                        }
-                        return escapeRegExp(x);
-                    })
-                    .join('|') +
-                ')',
-            'gi'
-        );
-    }
-
-    function findInElementRecursive(el, termsRE) {
-        if (el.nodeType === 1) {
-            // Element
-            const tag = el.nodeName.toLowerCase();
-            if (
-                !/^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
-                    tag
-                ) &&
-                !el.classList.contains('sr-only')
-            ) {
-                let result = false;
-                for (const child of el.childNodes) {
-                    result = findInElementRecursive(child, termsRE);
-                    if (result) break;
-                }
-
-                return result;
-            }
-        } else if (el.nodeType === 3) {
-            // Text
-            return termsRE.test(el.textContent);
-        }
-        return false;
-    }
-
-    function findInElement(el, terms) {
-        if (!terms || terms.length === 0) {
-            return false;
-        }
-        return findInElementRecursive(el, termsToRegExp(terms));
-    }
-
-    // Recursively search el for terms.
-    // Return a tuple
-    // [
-    //      count of terms found,
-    //      markup with <mark> inserted for matching terms
-    // ]
-    function markInElementRecursive(el, termsRE) {
-        if (el.nodeType === 1) {
-            // Element
-            const tag = el.nodeName.toLowerCase();
-            if (
-                !/^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
-                    tag
-                ) &&
-                !el.classList.contains('sr-only')
-            ) {
-                let score = 0;
-                let result = '';
-                for (const child of el.childNodes) {
-                    const [childScore, childContent] = markInElementRecursive(
-                        child,
-                        termsRE
-                    );
-                    score += childScore;
-                    result += childContent;
-                }
-
-                let outerHtml = '<' + tag + ' ';
-                for (const attr of el.attributes) {
-                    if (attr.localName !== 'id') {
-                        outerHtml += attr.localName + '="' + attr.value + '"  ';
-                    }
-                }
-                outerHtml += '>' + result + '</' + tag + '>';
-
-                return [score, outerHtml];
-            }
-        } else if (el.nodeType === 3) {
-            // Text
-            let matchCount = 0;
-            let result = el.textContent;
-            // termsRE.forEach((term) => {
-            result = result.replace(termsRE, (match) => {
-                matchCount += 1;
-                return '<mark>' + match + '</mark>';
-            });
-            // });
-            result = result.replace(/<mark>|<\/mark>|\<|\>|&/gi, (match) => {
-                if (match === '<') return '&lt;';
-                if (match === '>') return '&gt;';
-                if (match === '&') return '&amp;';
-                return match;
-            });
-
-            return [matchCount, result];
-        }
-        return [0, el.outerHTML];
-    }
-
-    function markInElement(el, terms) {
-        const [count, result] = markInElementRecursive(
-            el,
-            termsToRegExp(terms)
-        );
-        if (count > 0) return result;
-        return '';
-    }
-
-    const NO_MATCH = 0;
-    const PARTIAL_MATCH = 1; // Match a substring of target
-    const INITIAL_MATCH = 2; // Match the start of target
-    const FULL_MATCH = 3; // Completely match target
-
-    // Return how closely 'str' matches 'target'.
-    // If 'target' is in quotes, the match is either full or none.
-    function match(str, target) {
-        if (/^".*"$/.test(target)) {
-            if (target.substring(1, target.length - 1) === str) {
-                return FULL_MATCH;
-            } else {
-                return NO_MATCH;
-            }
-        }
-        if (str === target) {
-            return FULL_MATCH;
-        }
-        if (str.startsWith(target)) {
-            return INITIAL_MATCH;
-        }
-        if (str.indexOf(target) >= 0) {
-            return PARTIAL_MATCH;
-        }
-        return NO_MATCH;
-    }
-
-    const updateResults = debounce(() => {
-        const text = document.getElementById('search-box').value.trim();
-        if (!text) {
-            document.getElementById('all-content').classList.remove('hidden');
-            document
-                .getElementById('search-result-none')
-                .classList.add('hidden');
-            document.getElementById('search-result').classList.add('hidden');
-            document.getElementById('search-result').innerHTML = '';
-
-            // Drop the anchor/query (if any)
-            window.history.replaceState(
-                null,
-                null,
-                window.location.origin + window.location.pathname
-            );
-        } else {
-            window.history.replaceState(
-                null,
-                null,
-                window.location.origin +
-                    window.location.pathname +
-                    '?q=' +
-                    encodeURIComponent(text)
-            );
-
-            document.getElementById('all-content').classList.add('hidden');
-
-            let query = text.split(' ').map((x) => x.trim().toLowerCase());
-            query = [...new Set(query)];
-            query = query.filter((x) => !STOP_WORDS.includes(x));
-
-            const mandatory = query
-                .filter((x) => /^[+]+/.test(x))
-                .map((x) => x.slice(1))
-                .filter((x) => !!x);
-            const prohibited = query
-                .filter((x) => /^[-]+/.test(x))
-                .map((x) => x.slice(1))
-                .filter((x) => !!x);
-            const optional = query.filter((x) => /^[^-+]/.test(x));
-
-            let searchResults = [];
-            document
-                .getElementById('all-content')
-                .querySelectorAll('[data-keywords]')
-                .forEach((el) => {
-                    const keywords = el
-                        .getAttribute('data-keywords')
-                        .split(',')
-                        .map((x) => x.trim());
-
-                    const hasProhibitedMatches = prohibited.some(
-                        (q) =>
-                            keywords.some((keyword) => match(keyword, q) > 0) ||
-                            findInElement(el, prohibited)
-                    );
-
-                    if (!hasProhibitedMatches) {
-                        const hasMandatoryMatches = mandatory.every(
-                            (q) =>
-                                keywords.some(
-                                    (keyword) => match(keyword, q) > 0
-                                ) || findInElement(el, mandatory)
-                        );
-
-                        if (hasMandatoryMatches) {
-                            let score = mandatory.length;
-                            if (optional.length === 0) {
-                                score = 1;
-                            } else {
-                                let hasInitialMatch = false;
-                                let hasPartialMatch = false;
-                                optional.forEach((q) => {
-                                    keywords.forEach((keyword) => {
-                                        let m = match(keyword, q);
-                                        if (m === FULL_MATCH) {
-                                            score += 10;
-                                        } else if (m === INITIAL_MATCH) {
-                                            hasInitialMatch = true;
-                                        } else if (m === PARTIAL_MATCH) {
-                                            hasPartialMatch = true;
-                                        }
-                                    });
-                                    hasPartialMatch =
-                                        hasPartialMatch ||
-                                        findInElement(el, optional);
-                                });
-                                if (hasInitialMatch) score += 5;
-                                if (hasPartialMatch) score += 2;
-                            }
-                            if (score > 0) {
-                                searchResults.push([
-                                    score,
-                                    markInElement(el, [
-                                        ...optional,
-                                        ...mandatory,
-                                    ]),
-                                ]);
-                            }
-                        }
-                    }
-                });
-
-            if (searchResults.length === 0) {
-                noResultsFound();
-            } else {
-                document
-                    .getElementById('search-result-none')
-                    .classList.add('hidden');
-                document.getElementById(
-                    'search-result'
-                ).innerHTML = searchResults
-                    .sort((a, b) => b[0] - a[0])
-                    .map((x) => x[1])
-                    .join('');
-                document
-                    .getElementById('search-result')
-                    .classList.remove('hidden');
-            }
-        }
-    }, 500);
-
-    function noResultsFound() {
-        document.getElementById('all-content').classList.remove('hidden');
-        document.getElementById('search-result').classList.add('hidden');
-        document.getElementById('search-result').innerHTML = '';
-        document
-            .getElementById('search-result-none')
-            .classList.remove('hidden');
-    }
-
-    function search() {
-        const empty =
-            document.getElementById('search-box').value.trim().length === 0;
-        if (empty) {
-            document.getElementById('clear-button').classList.add('hidden');
-        } else {
-            document.getElementById('clear-button').classList.remove('hidden');
-        }
-        updateResults();
-    }
-
-    window.addEventListener('load', () => {
-        document
-            .getElementById('clear-button')
-            .addEventListener('click', () => {
-                document.getElementById('search-box').value = '';
-                document.getElementById('clear-button').classList.add('hidden');
-                document
-                    .getElementById('all-content')
-                    .classList.remove('hidden');
-                document
-                    .getElementById('search-result')
-                    .classList.add('hidden');
-                document.getElementById('search-result').innerHTML = '';
-                document
-                    .getElementById('search-result-none')
-                    .classList.add('hidden');
-                document.getElementById('search-box').focus();
-            });
-
-        if (window.location.search) {
-            const params = new URLSearchParams(window.location.search);
-            document.getElementById('search-box').value = params.get('q') || '';
-            search();
-        }
-    });
-
-    window.addEventListener(
-        'hashchange',
-        () => {
-            document.getElementById('all-content').classList.remove('hidden');
-            document.getElementById('search-result').classList.add('hidden');
-            document.getElementById('search-result').innerHTML = '';
-            document.getElementById('search-box').value = '';
-            document.getElementById('clear-button').classList.add('hidden');
-            const hash = window.location.hash;
-            const anchor = document.getElementById(hash.slice(1));
-            if (anchor) {
-                setTimeout(() => {
-                    let motionPref = matchMedia('(prefers-reduced-motion)');
-                    if (motionPref.matches) {
-                        anchor.scrollIntoView({
-                            block: 'start',
-                            behavior: 'auto',
-                        });
-                    } else {
-                        anchor.scrollIntoView({
-                            block: 'start',
-                            behavior: 'smooth',
-                        });
-                    }
-                }, 100);
-            }
-            window.history.replaceState(
-                null,
-                null,
-                window.location.origin + window.location.pathname + hash
-            );
-        },
-        false
-    );
-
-    window.addEventListener('keydown', (evt) => {
-        const isMac = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
-        let isFindShortcut = false;
-        if (isMac) {
-            isFindShortcut =
-                evt.which == 70 &&
-                evt.metaKey &&
-                !evt.ctrlKey &&
-                !evt.altKey &&
-                !evt.shiftKey;
-        } else {
-            isFindShortcut =
-                evt.which == 70 &&
-                !evt.metaKey &&
-                evt.ctrlKey &&
-                !evt.altKey &&
-                !evt.shiftKey;
-        }
-        if (
-            isFindShortcut &&
-            document.activeElement !== document.getElementById('search-box')
-        ) {
-            document.getElementById('search-box').focus();
-            evt.preventDefault();
-        }
-    });
-
-    return {
-        search: search,
+  function debounce(fn, wait) {
+    let timeout;
+    return () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        timeout = null;
+        fn();
+      }, wait);
     };
+  }
+
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+  }
+
+  function termsToRegExp(terms) {
+    return new RegExp(
+      '(' +
+        terms
+          .map((x) => {
+            if (/^".*"$/.test(x)) {
+              return '\\b' + escapeRegExp(x).substring(1, x.length - 1) + '\\b';
+            }
+            return escapeRegExp(x);
+          })
+          .join('|') +
+        ')',
+      'gi'
+    );
+  }
+
+  function findInElementRecursive(el, termsRE) {
+    if (el.nodeType === 1) {
+      // Element
+      const tag = el.nodeName.toLowerCase();
+      if (
+        !/^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
+          tag
+        ) &&
+        !el.classList.contains('sr-only')
+      ) {
+        let result = false;
+        for (const child of el.childNodes) {
+          result = findInElementRecursive(child, termsRE);
+          if (result) break;
+        }
+
+        return result;
+      }
+    } else if (el.nodeType === 3) {
+      // Text
+      return termsRE.test(el.textContent);
+    }
+    return false;
+  }
+
+  function findInElement(el, terms) {
+    if (!terms || terms.length === 0) {
+      return false;
+    }
+    return findInElementRecursive(el, termsToRegExp(terms));
+  }
+
+  // Recursively search el for terms.
+  // Return a tuple
+  // [
+  //      count of terms found,
+  //      markup with <mark> inserted for matching terms
+  // ]
+  function markInElementRecursive(el, termsRE) {
+    if (el.nodeType === 1) {
+      // Element
+      const tag = el.nodeName.toLowerCase();
+      if (
+        !/^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
+          tag
+        ) &&
+        !el.classList.contains('sr-only')
+      ) {
+        let score = 0;
+        let result = '';
+        for (const child of el.childNodes) {
+          const [childScore, childContent] = markInElementRecursive(
+            child,
+            termsRE
+          );
+          score += childScore;
+          result += childContent;
+        }
+
+        let outerHtml = '<' + tag + ' ';
+        for (const attr of el.attributes) {
+          if (attr.localName !== 'id') {
+            outerHtml += attr.localName + '="' + attr.value + '"  ';
+          }
+        }
+        outerHtml += '>' + result + '</' + tag + '>';
+
+        return [score, outerHtml];
+      }
+    } else if (el.nodeType === 3) {
+      // Text
+      let matchCount = 0;
+      let result = el.textContent;
+      // termsRE.forEach((term) => {
+      result = result.replace(termsRE, (match) => {
+        matchCount += 1;
+        return '<mark>' + match + '</mark>';
+      });
+      // });
+      result = result.replace(/<mark>|<\/mark>|\<|\>|&/gi, (match) => {
+        if (match === '<') return '&lt;';
+        if (match === '>') return '&gt;';
+        if (match === '&') return '&amp;';
+        return match;
+      });
+
+      return [matchCount, result];
+    }
+    return [0, el.outerHTML];
+  }
+
+  function markInElement(el, terms) {
+    const [count, result] = markInElementRecursive(el, termsToRegExp(terms));
+    if (count > 0) return result;
+    return '';
+  }
+
+  const NO_MATCH = 0;
+  const PARTIAL_MATCH = 1; // Match a substring of target
+  const INITIAL_MATCH = 2; // Match the start of target
+  const FULL_MATCH = 3; // Completely match target
+
+  // Return how closely 'str' matches 'target'.
+  // If 'target' is in quotes, the match is either full or none.
+  function match(str, target) {
+    if (/^".*"$/.test(target)) {
+      if (target.substring(1, target.length - 1) === str) {
+        return FULL_MATCH;
+      } else {
+        return NO_MATCH;
+      }
+    }
+    if (str === target) {
+      return FULL_MATCH;
+    }
+    if (str.startsWith(target)) {
+      return INITIAL_MATCH;
+    }
+    if (str.indexOf(target) >= 0) {
+      return PARTIAL_MATCH;
+    }
+    return NO_MATCH;
+  }
+
+  const updateResults = debounce(() => {
+    const text = document.getElementById('search-box').value.trim();
+    if (!text) {
+      document.getElementById('all-content').classList.remove('hidden');
+      document.getElementById('search-result-none').classList.add('hidden');
+      document.getElementById('search-result').classList.add('hidden');
+      document.getElementById('search-result').innerHTML = '';
+
+      // Drop the anchor/query (if any)
+      window.history.replaceState(
+        null,
+        null,
+        window.location.origin + window.location.pathname
+      );
+    } else {
+      window.history.replaceState(
+        null,
+        null,
+        window.location.origin +
+          window.location.pathname +
+          '?q=' +
+          encodeURIComponent(text)
+      );
+
+      document.getElementById('all-content').classList.add('hidden');
+
+      let query = text.split(' ').map((x) => x.trim().toLowerCase());
+      query = [...new Set(query)];
+      query = query.filter((x) => !STOP_WORDS.includes(x));
+
+      const mandatory = query
+        .filter((x) => /^[+]+/.test(x))
+        .map((x) => x.slice(1))
+        .filter((x) => !!x);
+      const prohibited = query
+        .filter((x) => /^[-]+/.test(x))
+        .map((x) => x.slice(1))
+        .filter((x) => !!x);
+      const optional = query.filter((x) => /^[^-+]/.test(x));
+
+      let searchResults = [];
+      document
+        .getElementById('all-content')
+        .querySelectorAll('[data-keywords]')
+        .forEach((el) => {
+          const keywords = el
+            .getAttribute('data-keywords')
+            .split(',')
+            .map((x) => x.trim());
+
+          const hasProhibitedMatches = prohibited.some(
+            (q) =>
+              keywords.some((keyword) => match(keyword, q) > 0) ||
+              findInElement(el, prohibited)
+          );
+
+          if (!hasProhibitedMatches) {
+            const hasMandatoryMatches = mandatory.every(
+              (q) =>
+                keywords.some((keyword) => match(keyword, q) > 0) ||
+                findInElement(el, mandatory)
+            );
+
+            if (hasMandatoryMatches) {
+              let score = mandatory.length;
+              if (optional.length === 0) {
+                score = 1;
+              } else {
+                let hasInitialMatch = false;
+                let hasPartialMatch = false;
+                optional.forEach((q) => {
+                  keywords.forEach((keyword) => {
+                    let m = match(keyword, q);
+                    if (m === FULL_MATCH) {
+                      score += 10;
+                    } else if (m === INITIAL_MATCH) {
+                      hasInitialMatch = true;
+                    } else if (m === PARTIAL_MATCH) {
+                      hasPartialMatch = true;
+                    }
+                  });
+                  hasPartialMatch =
+                    hasPartialMatch || findInElement(el, optional);
+                });
+                if (hasInitialMatch) score += 5;
+                if (hasPartialMatch) score += 2;
+              }
+              if (score > 0) {
+                searchResults.push([
+                  score,
+                  markInElement(el, [...optional, ...mandatory]),
+                ]);
+              }
+            }
+          }
+        });
+
+      if (searchResults.length === 0) {
+        noResultsFound();
+      } else {
+        document.getElementById('search-result-none').classList.add('hidden');
+        document.getElementById('search-result').innerHTML = searchResults
+          .sort((a, b) => b[0] - a[0])
+          .map((x) => x[1])
+          .join('');
+        document.getElementById('search-result').classList.remove('hidden');
+      }
+    }
+  }, 500);
+
+  function noResultsFound() {
+    document.getElementById('all-content').classList.remove('hidden');
+    document.getElementById('search-result').classList.add('hidden');
+    document.getElementById('search-result').innerHTML = '';
+    document.getElementById('search-result-none').classList.remove('hidden');
+  }
+
+  function search() {
+    const empty =
+      document.getElementById('search-box').value.trim().length === 0;
+    if (empty) {
+      document.getElementById('clear-button').classList.add('hidden');
+    } else {
+      document.getElementById('clear-button').classList.remove('hidden');
+    }
+    updateResults();
+  }
+
+  window.addEventListener('load', () => {
+    document.getElementById('clear-button').addEventListener('click', () => {
+      document.getElementById('search-box').value = '';
+      document.getElementById('clear-button').classList.add('hidden');
+      document.getElementById('all-content').classList.remove('hidden');
+      document.getElementById('search-result').classList.add('hidden');
+      document.getElementById('search-result').innerHTML = '';
+      document.getElementById('search-result-none').classList.add('hidden');
+      document.getElementById('search-box').focus();
+    });
+
+    if (window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      document.getElementById('search-box').value = params.get('q') || '';
+      search();
+    }
+  });
+
+  window.addEventListener(
+    'hashchange',
+    () => {
+      document.getElementById('all-content').classList.remove('hidden');
+      document.getElementById('search-result').classList.add('hidden');
+      document.getElementById('search-result').innerHTML = '';
+      document.getElementById('search-box').value = '';
+      document.getElementById('clear-button').classList.add('hidden');
+      const hash = window.location.hash;
+      const anchor = document.getElementById(hash.slice(1));
+      if (anchor) {
+        setTimeout(() => {
+          let motionPref = matchMedia('(prefers-reduced-motion)');
+          if (motionPref.matches) {
+            anchor.scrollIntoView({
+              block: 'start',
+              behavior: 'auto',
+            });
+          } else {
+            anchor.scrollIntoView({
+              block: 'start',
+              behavior: 'smooth',
+            });
+          }
+        }, 100);
+      }
+      window.history.replaceState(
+        null,
+        null,
+        window.location.origin + window.location.pathname + hash
+      );
+    },
+    false
+  );
+
+  window.addEventListener('keydown', (evt) => {
+    const isMac = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+    let isFindShortcut = false;
+    if (isMac) {
+      isFindShortcut =
+        evt.which == 70 &&
+        evt.metaKey &&
+        !evt.ctrlKey &&
+        !evt.altKey &&
+        !evt.shiftKey;
+    } else {
+      isFindShortcut =
+        evt.which == 70 &&
+        !evt.metaKey &&
+        evt.ctrlKey &&
+        !evt.altKey &&
+        !evt.shiftKey;
+    }
+    if (
+      isFindShortcut &&
+      document.activeElement !== document.getElementById('search-box')
+    ) {
+      document.getElementById('search-box').focus();
+      evt.preventDefault();
+    }
+  });
+
+  return {
+    search: search,
+  };
 };
 
 module.exports = {
-    sdkName: 'mathlive',
-    modules: ['mathfield-element', 'options', 'mathlive', 'mathfield', 'commands', 'core'],
-    tutorialPath: '../../guides/',
-    // verbose: false,
-    keywordSynonyms: {
-        convert: ['converts', 'converted', 'converting', 'conversion'],
-        render: ['renders', 'rendered', 'rendering'],
-        create: ['creates', 'created', 'creating', 'creation'],
-    },
-    // head:
-    // stylesheets:
-    //     - https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap
-    documentTemplate: `---
+  tutorialPath: '../../guides/',
+  // verbose: false,
+  keywordSynonyms: {
+    convert: ['converts', 'converted', 'converting', 'conversion'],
+    render: ['renders', 'rendered', 'rendering'],
+    create: ['creates', 'created', 'creating', 'creation'],
+  },
+  // head:
+  // stylesheets:
+  //     - https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap
+  documentTemplate: `---
 permalink: "/docs/{{sdkName}}/"
-title: "{{packageName}}"
+title: "{{sdkName}}"
 read_time: false
 layout: "sdk-documentation-layout"
 sidebar:

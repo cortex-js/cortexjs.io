@@ -17,14 +17,22 @@ ENVIRONMENT="${1-dev}"
 mkdir -p ./build
 mkdir -p ./src/build
 
+## Copy submodules
+mkdir -p ./submodules/cortex-js.github.io/assets/js/
+cp ./submodules/code-playground/dist/code-playground.js ./submodules/cortex-js.github.io/assets/js/code-playground.js
+
+
 ## Grok (.d.ts -> .html with frontmatter)
 # Uses grok.config.js for additional config option
 # node ./submodules/grok/bin/grok-cli  ./node_modules/mathlive/dist/ --outDir ./src/build/ --outFile mathlive.html
-node ./submodules/grok/bin/grok-cli  ../mathlive/dist/public/ --outDir ./src/build/ --outFile mathlive.html
+node ./submodules/grok/bin/grok-cli  ../mathlive/dist/public/ --sdkName mathlive --modules mathfield-element options mathlive mathfield commands core --outDir ./src/build/ --outFile mathlive.html
+# node ./submodules/grok/bin/grok-cli  ./submodules/math-json/src/public.ts --sdkName mathjson --outDir ./src/build/ --outFile math-json.html
+node ./submodules/grok/bin/grok-cli  ./submodules/math-json/src/latex-syntax/public.ts --sdkName mathjson --outDir ./src/build/ --outFile math-json.html
+node ./submodules/grok/bin/grok-cli  ./submodules/math-json/src/compute-engine/public.ts --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
 
-## Copy submodules
-cp ./submodules/code-playground/dist/code-playground.js ./submodules/cortex-js.github.io/assets/js/code-playground.js
 
+## Collect all the guides in the src/ directory
+node ./scripts/build-guides.js
 
 ## Build (.md -> .html)
 # DEBUG=Eleventy* npx eleventy --config ./config/eleventy.js

@@ -1,34 +1,39 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch eleventy",
-            "program": "${workspaceFolder}/node_modules/@11ty/eleventy/cmd.js",
-            "args": ["--config", "./config/eleventy.js"],
-            "cwd": "${workspaceFolder}",
-            "outFiles": ["${workspaceFolder}/**/*.js"]
-        },
-        {
-            "name": "Build and Run Grok",
-            "request": "launch",
-            "type": "node",
-            "skipFiles": ["<node_internals>/**"],
-            "program": "${workspaceFolder}/submodules/grok/bin/grok-cli",
-            "outFiles": ["${workspaceFolder}/submodules/grok/bin/*.js"],
-            "preLaunchTask": "npm: build:grok",
-            "args": [
-                "../mathlive/dist/public/",
-                // "${workspaceFolder}/test.d.ts/",
-                "--outDir",
-                "./build",
-                "--verbose",
-                "--ignore-errors"
-            ]
-        }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch eleventy",
+      "program": "${workspaceFolder}/node_modules/@11ty/eleventy/cmd.js",
+      "args": ["--config", "./config/eleventy.js"],
+      "cwd": "${workspaceFolder}",
+      "outFiles": ["${workspaceFolder}/**/*.js"]
+    },
+    {
+      "name": "Build and Run Grok",
+      "request": "launch",
+      "type": "node",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/submodules/grok/bin/grok-cli",
+      "outFiles": ["${workspaceFolder}/submodules/grok/bin/*.js"],
+      "preLaunchTask": "npm: build:grok",
+      "args": [
+        "./submodules/math-json/src/public.ts",
+        "--sdkName",
+        "math-json",
+        // "--modules",
+        // "public",
+        //                "../mathlive/dist/public/",
+        // "${workspaceFolder}/test.d.ts/",
+        "--outDir",
+        "./build",
+        "--verbose",
+        "--ignore-errors"
+      ]
+    }
+  ]
 }

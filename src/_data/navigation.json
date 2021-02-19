@@ -121,6 +121,66 @@
 				{
 					"title": "Introduction",
 					"url": "/guides/math-json/"
+				},
+				{
+					"title": "MathJSON Format",
+					"url": "/guides/math-json-format/"
+				},
+				{
+					"title": "Dictionary",
+					"url": "/guides/math-json-dictionary/"
+				}
+			]
+		},
+		{
+			"title": "Compute Engine",
+			"children": [
+				{
+					"title": "Introduction",
+					"url": "/guides/compute-engine/"
+				},				{
+					"title": "SDK Reference",
+					"url": "/docs/compute-engine/"
+				}
+
+			]
+			
+		},
+		{
+			"title": "Dictionary",
+			"children": [
+				{
+					"title": "Arithmetic",
+					"url": "/guides/compute-engine-arithmetic/"
+				},
+				{
+					"title": "Calculus",
+					"url": "/guides/compute-engine-calculus/"
+				},
+				{
+					"title": "Core",
+					"url": "/guides/compute-engine-core/"
+				},
+				{
+					"title": "Domains",
+					"url": "/guides/compute-engine-domains/"
+				},
+				
+				{
+					"title": "Forms",
+					"url": "/guides/compute-engine-forms/"
+				},
+				{
+					"title": "Logic",
+					"url": "/guides/compute-engine-logic/"
+				},
+				{
+					"title": "Sets",
+					"url": "/guides/compute-engine-sets/"
+				},
+				{
+					"title": "Trigonometry",
+					"url": "/guides/compute-engine-trigonometry/"
 				}
 			]
 		},
