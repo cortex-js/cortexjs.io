@@ -80,12 +80,7 @@
 		},
 		{
 			"title": "MathJSON",
-			"children": [
-				{
-					"title": "Introduction",
-					"url": "/guides/math-json/"
-				}
-			]
+			"url": "/guides/math-json/"
 		},
 
 		{

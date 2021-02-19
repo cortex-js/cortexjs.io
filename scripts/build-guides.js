@@ -25,10 +25,13 @@ const INJECTED_STYLESHEET = `
 
 /** Walk all the files and directory in `dir` */
 async function* walk(dir) {
-  for await (const d of await fs.promises.opendir(dir)) {
-    const entry = path.join(dir, d.name);
-    if (d.isDirectory()) yield* await walk(entry);
-    else if (d.isFile()) yield entry;
+  if (fs.lstatSync(dir).isFile()) yield dir;
+  if (fs.lstatSync(dir).isDirectory()) {
+    for await (const d of await fs.promises.opendir(dir)) {
+      const entry = path.join(dir, d.name);
+      if (d.isDirectory()) yield* await walk(entry);
+      else if (d.isFile()) yield entry;
+    }
   }
 }
 
@@ -45,12 +48,13 @@ function escapeHTML(s) {
 /** Parse a single ``` block */
 function parseCodeFence(lines, index) {
   if (index >= lines.length) return undefined;
-  if (lines[index][0] !== '`' && lines[index][0] !== '~') return undefined;
-  let fence = lines[index][0];
-  for (let i = 1; i < lines[index].length; i++) {
-    if (lines[index][i] === lines[index][0]) {
-      fence += lines[index][i];
-    }
+  const fenceChar = lines[index][0];
+  if (fenceChar !== '`' && fenceChar !== '~') return undefined;
+  let fence = fenceChar;
+  let i = 1;
+  while (i < lines[index].length && lines[index][i] === fenceChar) {
+    fence += fenceChar;
+    i += 1;
   }
   if (fence.length < 3) return undefined;
 
@@ -179,6 +183,7 @@ const run = async (dir, sidebar) => {
     if (x.endsWith('.png') || x.endsWith('.jpeg') || x.endsWith('.jpg')) {
       fs.copy(x, path.resolve('./src/build/assets', path.basename(x)));
     } else if (x.endsWith('.md')) {
+      console.log(x);
       fs.readFile(x, 'utf8', (err, file) => {
         const graymatter = matter(file);
         const frontmatter = graymatter.data;
@@ -216,7 +221,7 @@ const run = async (dir, sidebar) => {
             ...(frontmatter.modules ?? []),
             '/assets/js/code-playground.js',
           ];
-          console.log('Generating guide for', dest);
+          //          console.log('Generating guide for', dest);
           fs.writeFile(
             dest + '.md',
             matter.stringify(upgradeCodeFences(graymatter.content), frontmatter)
@@ -227,4 +232,4 @@ const run = async (dir, sidebar) => {
   }
 };
 
-run('./submodules/math-json/src/', 'math-json-sidebar');
+run(process.argv[2], process.argv[3]);

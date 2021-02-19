@@ -28,9 +28,9 @@ evaluated numerically, the expression will be a symbolic expression.
 import { evaluate } from 'compute-engine';
 
 console.log(evaluate(["Add", 2, 3]);
-// -> 5
+// ➔ 5
 console.log(evaluate(["Add", 2, "x", 3]);
-// -> ["Add", 5, x]
+// ➔ ["Add", 5, x]
 ```
 
 ## Formating
@@ -47,10 +47,10 @@ To transform an expression using the rules for a particular form, use the
 import { format } from 'compute-engine';
 
 console.log(format(["Add", 2, +Infinity], 'full');
-// -> ["Add", 2, "+Infinity"]
+// ➔ ["Add", 2, "+Infinity"]
 
 console.log(format(["Add", 2, "x", 3], 'canonical');
-// -> ["Add", 2, 3, "x"]
+// ➔ ["Add", 2, 3, "x"]
 ```
 
 See [Compute Engine Forms](/guides/compute-engine-forms/) for more info.
@@ -61,35 +61,41 @@ Use the `ComputeEngine.same()` function to compare two expressions.
 
 The comparison between expressions is structural so that $$x + 1$$ is not equal
 to $$1 + x$$. To obtain the desired result, you may need to apply a canonical
-form to the expressions using `ComputeEngine.canonical()`, or evaluate them using `ComputeEngine.evalute()`.
+form to the expressions using `ComputeEngine.canonical()`, or evaluate them using `ComputeEngine.evaluate()`.
 
 ```js
 const engine = new ComputeEngine();
 
 const variable = 'x';
-console.log(engine.same(['Add', 'x', 1], ['Add', variable, 1]));
-// -> true: the two expressions are the same
+console.log(engine.same(
+  ['Add', 'x', 1], 
+  ['Add', variable, 1]
+));
+// ➔ true: the two expressions are the same
 
-console.log(engine.same(['Add', 'x', 1], ['Add', 1, 'x']));
-// -> false: the two expressions are **not** the same
+console.log(engine.same(
+  ['Add', 'x', 1], 
+  ['Add', 1, 'x']
+));
+// ➔ false: the two expressions are **not** the same
 
 console.log(engine.same(
   engine.canonical(['Add', 'x', 1]),
   engine.canonical(['Add', 1, 'x'])
-);
-// -> true: the two expressions are the same in canonical form
+));
+// ➔ true: the two expressions are the same in canonical form
 
 console.log(engine.same(
   ['Add', 2, 2],
   ['Add', 3, 1]
-);
-// -> false: the two expressions are **not** the same
+));
+// ➔ false: the two expressions are **not** the same
 
 console.log(engine.same(
   engine.evaluate(['Add', 2, 2]),
   engine.evaluate(['Add', 3, 1])
-);
-// -> true: the two expressions are the same once evaluated
+));
+// ➔ true: the two expressions are the same once evaluated
 ```
 
 

@@ -34,6 +34,14 @@
         "--verbose",
         "--ignore-errors"
       ]
+    },
+    {
+      "name": "Building guides",
+      "request": "launch",
+      "type": "node",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/scripts/build-guides.js",
+      "args": ["./submodules/math-json/src/docs/logic.md", "math-json-sidebar"]
     }
   ]
 }

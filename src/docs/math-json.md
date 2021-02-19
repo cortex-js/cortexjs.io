@@ -32,10 +32,10 @@ MathJSON expressions.
 import { parse, serialize } from 'math-json';
 
 console.log(parse('\\frac{\\pi}{2}'));
-// -> ["Divide", "Pi", 2]
+// ➔ ["Divide", "Pi", 2]
 
 console.log(serialize([["InverseFunction", "Sin"], "x"));
-// -> \sin^{-1}x
+// ➔ \sin^{-1}x
 
 ```
 

@@ -399,13 +399,18 @@ module.exports = {
   // head:
   // stylesheets:
   //     - https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap
-  documentTemplate: `---
-permalink: "/docs/{{sdkName}}/"
-title: "{{sdkName}}"
+  documentTemplate: (substitutions) => `---
+permalink: "/docs/${substitutions.sdkName}/"
+title: "${substitutions.sdkName}"
 read_time: false
 layout: "sdk-documentation-layout"
 sidebar:
-    - nav: "{{sdkName}}"
+    - nav: "${
+      substitutions.sdkName === 'compute-engine' ||
+      substitutions.sdkName === 'math-json'
+        ? 'mathjson'
+        : substitutions.sdkName
+    }"
 # toc: true
 ---
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
@@ -455,6 +460,6 @@ sidebar:
 </div>
 <section id="search-result" class="hidden"></section>
 <section id="search-result-none" class="hidden">No results found.</section>
-<section id="all-content">{{content}}</section>
+<section id="all-content">${substitutions.content}</section>
 <div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>`,
 };
