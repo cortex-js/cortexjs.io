@@ -1,6 +1,6 @@
 ---
 title: CortexJS Compute Engine
-permalink: /guides/compute-engine/
+permalink: /compute-engine/
 layout: single
 date: Last Modified
 sidebar:

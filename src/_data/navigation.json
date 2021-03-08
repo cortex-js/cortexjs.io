@@ -25,6 +25,10 @@
 	],
 	"mathlive": [
 		{
+			"title": "Cortex",
+			"url": "/cortex/"
+		},
+		{
 			"title": "MathLive",
 			"children": [
 				{
@@ -80,7 +84,7 @@
 		},
 		{
 			"title": "MathJSON",
-			"url": "/guides/math-json/"
+			"url": "/math-json/"
 		},
 
 		{
@@ -107,6 +111,10 @@
 	],
 	"mathjson": [
 		{
+			"title": "Cortex",
+			"url": "/cortex/"
+		},
+		{
 			"title": "MathLive",
 			"url": "/guides/mathfield-getting-started/"
 		},
@@ -115,11 +123,15 @@
 			"children": [
 				{
 					"title": "Introduction",
-					"url": "/guides/math-json/"
+					"url": "/math-json/"
 				},
 				{
 					"title": "MathJSON Format",
 					"url": "/guides/math-json-format/"
+				},
+				{
+					"title": "SDK Reference",
+					"url": "/docs/mathjson/"
 				},
 				{
 					"title": "Dictionary",
@@ -132,8 +144,9 @@
 			"children": [
 				{
 					"title": "Introduction",
-					"url": "/guides/compute-engine/"
-				},				{
+					"url": "/compute-engine/"
+				},				
+				{
 					"title": "SDK Reference",
 					"url": "/docs/compute-engine/"
 				}
@@ -201,4 +214,25 @@
 				}
 			]
 		}
-	]}
+	],
+	"cortex": [
+		{
+			"title": "Cortex",
+			"children": [
+				{
+					"title": "Reference",
+					"url": "/cortex/"
+				}
+			]
+		},
+		{
+			"title": "MathLive",
+			"url": "/guides/mathfield-getting-started/"
+		},
+		{
+			"title": "MathJSON",
+			"url": "/math-json/"
+		}
+
+	]
+}

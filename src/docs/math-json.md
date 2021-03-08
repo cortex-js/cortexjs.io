@@ -1,6 +1,6 @@
 ---
 title: MathJSON
-permalink: /guides/math-json/
+permalink: /math-json/
 layout: single
 date: Last Modified
 sidebar:
