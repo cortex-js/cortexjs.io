@@ -1,75 +1,75 @@
 {
-    "name": "cortexjs.io",
-    "version": "1.0.0",
-    "description": "cortexjs.io website source",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/cortex-js/cortexjs.io.git"
-    },
-    "keywords": [
-        "web components",
-        "scientific computing",
-        "math editor",
-        "data science",
-        "visualization",
-        "compute engine"
-    ],
-    "main": "root/index.html",
-    "scripts": {
-        "build": "bash scripts/build.sh",
-        "build:grok": "npm --prefix submodules/grok run build",
-        "build:code-playground": "npm --prefix submodules/code-playground run dist",
-        "install:grok": "npm --prefix submodules/grok install",
-        "clean": "bash scripts/clean.sh",
-        "coverage": "bash scripts/test.sh --coverage",
-        "deploy": "bash scripts/deploy.sh",
-        "install": "npm install --production=false submodules/grok",
-        "lint": "prettier --config .config/prettierrc.yaml--ignore-path ./.prettierignore --write \"**/*.{ts,js,css,md,yml,json}\" \"!vendor/**\"",
-        "restart": "bash scripts/restart.sh",
-        "stage": "bash scripts/stage.sh",
-        "start": "bash scripts/server.sh",
-        "test": "bash scripts/test.sh"
-    },
-    "engines": {
-        "node": ">=11.0"
-    },
-    "browserslist": [
-        "> 1%",
-        "last 2 versions"
-    ],
-    "author": "Arno Gourdol <arno@arno.org>",
-    "contributors": [],
-    "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
-    "devDependencies": {
-        "@11ty/eleventy": "^0.11.1",
-        "@cortex-js/prettier-config": "^1.1.0",
-        "@ui-js/grok": "file:submodules/grok",
-        "cssnano": "^4.1.10",
-        "highlight.js": "^10.5.0",
-        "husky": "^4.3.8",
-        "lint-staged": "^10.5.3",
-        "markdown-it": "^12.0.4",
-        "markdown-it-attrs": "^4.0.0",
-        "markdown-it-deflist": "^2.1.0",
-        "node-sass": "^5.0.0",
-        "postcss": "^8.2.4",
-        "postcss-cli": "^8.3.1",
-        "prettier": "^2.2.1",
-        "typedoc": "^0.20.20",
-        "typescript": "^4.1.3",
-        "update-notifier": "^5.1.0"
-    },
-    "prettier": "@cortex-js/prettier-config",
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "*.{js,css,json,md}": [
-            "prettier --write",
-            "git add"
-        ]
+  "name": "cortexjs.io",
+  "version": "1.0.0",
+  "description": "cortexjs.io website source",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cortex-js/cortexjs.io.git"
+  },
+  "keywords": [
+    "web components",
+    "scientific computing",
+    "math editor",
+    "data science",
+    "visualization",
+    "compute engine"
+  ],
+  "main": "root/index.html",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "build:grok": "npm --prefix submodules/grok run build",
+    "build:code-playground": "npm --prefix submodules/code-playground run dist",
+    "install:grok": "npm --prefix submodules/grok install",
+    "clean": "bash scripts/clean.sh",
+    "coverage": "bash scripts/test.sh --coverage",
+    "deploy": "bash scripts/deploy.sh",
+    "//install": "npm install --production=false submodules/grok",
+    "lint": "prettier --config .config/prettierrc.yaml--ignore-path ./.prettierignore --write \"**/*.{ts,js,css,md,yml,json}\" \"!vendor/**\"",
+    "restart": "bash scripts/restart.sh",
+    "stage": "bash scripts/stage.sh",
+    "start": "bash scripts/server.sh",
+    "test": "bash scripts/test.sh"
+  },
+  "engines": {
+    "node": ">=11.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+  "author": "Arno Gourdol <arno@arno.org>",
+  "contributors": [],
+  "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
+  "devDependencies": {
+    "@11ty/eleventy": "^0.12.1",
+    "@cortex-js/prettier-config": "^1.1.0",
+    "@ui-js/grok": "file:submodules/grok",
+    "cssnano": "^4.1.10",
+    "highlight.js": "^10.7.1",
+    "husky": "<5.0.0",
+    "lint-staged": "^10.5.3",
+    "markdown-it": "^12.0.4",
+    "markdown-it-attrs": "^4.0.0",
+    "markdown-it-deflist": "^2.1.0",
+    "node-sass": "^5.0.0",
+    "postcss": "^8.2.8",
+    "postcss-cli": "^8.3.1",
+    "prettier": "^2.2.1",
+    "typedoc": "^0.20.34",
+    "typescript": "^4.1.3",
+    "update-notifier": "^5.1.0"
+  },
+  "prettier": "@cortex-js/prettier-config",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "*.{js,css,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
 }
