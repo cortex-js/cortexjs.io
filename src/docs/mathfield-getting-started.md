@@ -36,7 +36,13 @@ approach. The Advanced Setup section will discuss other options.
 </html>
 ```
 
-You can also programmaticaly create mathfield elements:
+Note that the HTML quirks mode is not supported. This means that the host page
+must use the strict mode, indicated by a `<!DOCTYPE html>` directive at the top
+of the page.{.notice--warning}
+
+
+You can also programmatically create mathfield elements:
+
 ```javascript
 const mfe = new MathfieldElement();
 mfe.value = '\\frac{\\pi}{2}';

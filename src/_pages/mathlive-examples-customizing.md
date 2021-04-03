@@ -2,7 +2,7 @@
 layout: single
 date: Last Modified
 title: MathLive Guide - Customizing
-permalink: /mathlive/guides//customizing/
+permalink: /mathlive/guides/customizing/
 read_time: false
 sidebar:
     - nav: "mathlive"

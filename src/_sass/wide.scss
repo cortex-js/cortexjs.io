@@ -181,6 +181,7 @@ section.fullwidth p {
     margin: 0;
     margin-bottom: 0.5em;
     text-align: center;
+    line-height: 1;
 }
 
 .cards .card {
@@ -216,7 +217,7 @@ section.fullwidth p {
 }
 
 .cards.col1 {
-    flex-flow: column;
+    flex-flow: wrap;
     padding-bottom: 3em;
     padding-top: 1em;
 }
@@ -226,6 +227,7 @@ section.fullwidth p {
     margin-bottom: 1em;
     padding: 1em;
     width: calc(100% - 2em);
+    max-width: calc(100% - 2em);
     border-radius: 8px;
     background: $card-background-color;
     box-shadow: $card-shadow;
@@ -298,6 +300,31 @@ section.fullwidth p {
     align-items: center;
     max-width: 960px;
 }
+
+dl {
+  margin-left: 1em;
+}
+dl hr {
+  margin: 2em  0 2em 0
+}
+dt {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1em;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+dt:hover {
+  background: rgba(0, 0, 0, 0.05)
+}
+
+dd {
+  font-style: italic;
+  line-height: 1.1;
+  opacity: .6;
+}
+
 
 // @media (max-width: $large) {
 //   section.fullwidth, section.fullwidth.reverse {

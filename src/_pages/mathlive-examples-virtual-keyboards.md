@@ -2,7 +2,7 @@
 layout: single
 date: Last Modified
 title: MathLive Guide - Virtual Keyboards
-permalink: /mathlive/guides//virtual-keyboards/
+permalink: /mathlive/guides/virtual-keyboards/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -26,14 +26,14 @@ head:
 # Virtual Keyboards
 
 Typing math formulas require access to many special symbols. While [keyboard 
-shortcuts and inline shortcuts](/mathlive/guides//shortcuts) can help, mobile devices require another 
+shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help, mobile devices require another 
 solution. A virtual keyboard is a keyboard displayed on screen that can be 
 customized with specialized symbols for math input.
 
 ![](/assets/images/mathfield/virtual-keyboard.png)
 
 The mathfield virtual keyboard panel can display multiple keyboards. 
-The default keyboards are **numerics**, **functions**, **symbols**, 
+The default keyboards are **numeric**, **functions**, **symbols**, 
 **roman letters** and **greek letters**.
 
 These keyboards  include the most common math symbols and 
@@ -64,7 +64,7 @@ This behavior can be changed with the `virtualKeyboardMode` configuration proper
 virtual keyboard panel when the mathfield is focused, otherwise, don't show it.
 - `"manual"`: a toggle button to control the virtual keyboard panel is displayed in the
 mathfield
-- `"onfocus"`: the virtual keyboard panel is displayed when the mathdield is focused
+- `"onfocus"`: the virtual keyboard panel is displayed when the mathfield is focused
 - `"off"`: never show the virtual keyboard panel
 
 There is only one virtual keyboard panel displayed at a time, but each mathfield
@@ -125,8 +125,10 @@ MathLive.makeMathField(document.getElementById('mathfield'),  {
 
 By default, the layout of the alphabetic virtual keyboard is determined based
 on the locale (QWERTY for english speaking countries, AZERTY for french speaking
-countries, etc..). It is possible to override this default, and to select
-alternate keyboard layouts, such as DVORAK and COLEMAK.
+countries, etc..). 
+
+To select a different alphabetic keyboard layouts, such as DVORAK and COLEMAK, 
+use the `virtualKeyboardLayout` configuration property.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
@@ -144,11 +146,12 @@ MathLive.makeMathField(document.getElementById('mathfield'),  {
 ## Controling which keyboards are displayed
 
 The virtual keyboard panel displays multiple keyboards which can be 
-toggled using the keyboard switcher: numerics, functions, symbols, roman
-letters and greek letters.
+toggled using the keyboard switcher: `numeric`, `functions`, `symbols`, `roman` 
+and `greek`.
 
-You can control which keyboards are available using the `virtualKeyboards` 
-configuration property.
+To choose which keyboards are available, use the `virtualKeyboards` 
+configuration property. The value of this property is a space-separated string 
+of the name of the keyboards that should be displayed.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
@@ -165,60 +168,175 @@ MathLive.makeMathField(document.getElementById('mathfield'),  {
 
 ## Defining custom keyboards
 
-New 
-
+A keyboard is made up of one or more "layers". A keyboard layer is a set of 
+keys that can be toggled using another key. For example, the `roman` keyboard
+has a regular layer and a layer for symbols. Most keyboards have a single layer.
 ## JSON keyboard layout
 
-Virtual Keyboards can be defined with a JSON structure:
+Virtual Keyboards can be defined with a JSON structure.
 
-```json
-{
-    "virtualKeyboardMode": "manual",
-    "customVirtualKeyboardLayers": {
-        "layer-name": {
-            "styles": "",
-            "rows": [
-                [
-                    {
-                        "class": "keycap",
-                        "latex": "\\frac{x}{y}"
-                    }
-                ]
-            ]
-        }
-    },
-    "customVirtualKeyboards": {
-        "keyboard-name": {
-            "label": "Json",
-            "tooltip": "Json keyboard",
-            "layer": "layer-name"
-        }
-    },
-    "virtualKeyboards": "keyboard-name"
+First, let's define a layer, which we'll call `"college-layer"`.
+
+A layer is an array of rows, a row is an array of keycaps. Each keycap
+can have the following properties:
+
+- `class`: the CSS classes to style this keycap. The classes can be custom 
+defined (see below about the `styles` layer property), or be one of the default
+ones:
+    - `keycap`: a standard-width keycap, using the system font for its label
+    - `keycap tex`: a standard-width keycap, using the TeX font for its label
+    - `modifier`: a modifier (shift/option, etc...) keycap
+    - `keycap small`: display the label in a smaller size
+    - `action`: an "action" keycap (for arrows, return, etc...)
+    - `separator w5`: a half-width blank used as a separator. Other widths
+    include `w15` (1.5 width), `w20` (double width) and `w50` (five-wide, used 
+    for the space bar).
+    - `bottom`, `left`, `right`: alignment of the label
+- `label`: the HTML markup displayed for the keycap. If no `label` is provided,
+the `latex` 
+- `latex`: a Latex fragment used as a label
+- `key`: a key, such as "9"
+- `aside`: an optional small label displayed below the keycap. This label
+may not be displayed if the space available is too small.
+
+- `insert`: a Latex fragment to insert when the keycap is pressed
+- `altKeys`: the name of a set of alternate keys to display when the keycap is
+long-pressed.
+- `command`: the command to perform when the keycap is pressed.
+- `shifted`: the HTML markup to display as the label of the keycap when the
+shift key is pressed
+- `shiftedCommand`: the command to perform when the keycap is pressed with
+the shift key.
+
+The following properties, in order, are used to determine how to display 
+they keycap: `latex`, `label`, `insert`.
+
+When the keycap is pressed, the following properties are used, in order, to 
+determine the action to perform: `command`, `insert`, `latex`, `key`.
+
+To associate a CSS stylesheet with this layer, use the `styles` property of the
+layer.
+
+The appearance of the layer can be further customized by providing a CSS class 
+name for the `backdrop` and `container` properties of the layer.
+
+```js
+    const COLLEGE_KEYBOARD_LAYER = {
+      "college-layer": {
+        rows: [
+          [
+            { class: "keycap tex", label: "<i>a</i>" },
+            { class: "keycap tex", label: "<i>x</i>" },
+            { class: "separator w5" },
+            { class: "keycap", key: "7" },
+            { class: "keycap", latex: "8" },
+            { class: "keycap", latex: "9" },
+            { class: "keycap", latex: "\\div" },
+            { class: "separator w5" },
+            {
+              class: "keycap tex",
+              insert: "$$#@^{2}$$",
+              label: "<span><i>x</i>&thinsp;²</span>"
+            },
+            {
+              class: "keycap tex",
+              insert: "$$#@^{}$$",
+              label: "<span><i>x</i><sup>&thinsp;<i>n</i></sup></span>"
+            },
+            {
+              class: "keycap tex",
+              insert: "$$\\sqrt{#0}$$",
+              latex: "\\sqrt{#0}"
+            }
+          ],
+          [
+            { class: "keycap tex", label: "<i>b</i>" },
+            { class: "keycap tex", label: "<i>y</i>" },
+            { class: "separator w5" },
+            { class: "keycap", latex: "4" },
+            { class: "keycap", latex: "5" },
+            { class: "keycap", latex: "6" },
+            { class: "keycap", latex: "\\times" },
+            { class: "separator w5" },
+            { class: "keycap", latex: "\\frac{#0}{#0}" },
+            { class: "separator w6" },
+            { class: "separator w6" }
+          ],
+          [
+            { class: "keycap tex", label: "<i>c</i>" },
+            { class: "keycap tex", label: "<i>z</i>" },
+            { class: "separator w5" },
+            { class: "keycap", latex: "1" },
+            { class: "keycap", latex: "2" },
+            { class: "keycap", latex: "3" },
+            { class: "keycap", latex: "-" },
+            { class: "separator w5" },
+            { class: "separator w6" },
+            { class: "separator w6" },
+            { class: "separator w6" }
+          ],
+          [
+            { class: "keycap tex", label: "(" },
+            { class: "keycap tex", label: ")" },
+
+            { class: "separator w5" },
+            { class: "keycap", latex: "0" },
+            { class: "keycap", latex: "," },
+            { class: "keycap tex", latex: "\\pi" },
+            { class: "keycap", latex: "+" },
+            { class: "separator w5" },
+            {
+              class: "action",
+              command: ["performWithFeedback", "moveToPreviousChar"],
+              label: "<svg><use xlink:href='#svg-arrow-left' /></svg>"
+            },
+            {
+              class: "action",
+              command: ["performWithFeedback", "moveToNextChar"],
+              label: "<svg><use xlink:href='#svg-arrow-right' /></svg>"
+            },
+            {
+              class: "action font-glyph bottom right",
+              command: ["performWithFeedback", "deleteBackward"],
+              label: "&#x232b;"
+            }
+          ]
+        ]
+      }
+    };
+    
+```
+
+```js
+  "customVirtualKeyboards": {
+  "keyboard-name": {
+    "label": "College", // Label displayed in the Virtual Keyboard Switcher
+    "tooltip": "College Level", // Tooltip when hovering over the label
+    "layer": "layer-name"
+  }
 }
 ```
 
-Full button JSON example:
+```js
+const COLLEGE_KEYBOARD = {
+  "college": {
+    "label": "College", // Label displayed in the Virtual Keyboard Switcher
+    "tooltip": "College Level", // Tooltip when hovering over the label
+    "layer": "layer-name"
+  }
+}
+```
 
-```json
-{
-    "class": "",
-    "insert": "",
-    "key": "",
-    "latex": "",
-    "aside": "",
-    "altKeys": "",
-    "shifted": "",
-    "shiftedCommand": "",
-    "command": "",
-    "label": ""
+
+```js
+  "customVirtualKeyboardLayers": COLLEGE_KEYBOARD_LAYER
+  "customVirtualKeyboards": COLLEGE_KEYBOARD,
+  "virtualKeyboards": "college"
 }
 ```
 
 
 
-<!-- Virtual keyboards and customizations -->
-<!-- https://github.com/arnog/mathlive/issues/518 -->
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';

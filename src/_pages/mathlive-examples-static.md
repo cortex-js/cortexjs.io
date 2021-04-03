@@ -2,7 +2,7 @@
 layout: single
 date: Last Modified
 title: MathLive Guide - Static
-permalink: /mathlive/guides//static/
+permalink: /mathlive/guides/static/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -27,6 +27,101 @@ head:
 
 ## Static math formulas
 
+To render math contained in a document as a static (non-editable) formula, 
+call `renderMathInDocument()` at the end of your document, or in a `onload`
+handler .
+
+```html
+<script type="module">
+  import { renderMathInDocument } from 'mathlive';
+  renderMathInDocument();
+</script>
+```
+
+By default, any LaTeX code that is enclosed with the following delimiters will
+be rendered as math:
+
+- `$$`...`$$`
+- `\[`...`\]`
+- `\(`...`\)`
+
+```html
+<h1>Taxicab Number</h1>
+<p>The second taxicab number is $$1729 = 10^3 + 9^3 = 12^3 + 1^3$$</p>
+```
+
+You can also wrap more complex expressions in a `<script>` tag with a type of
+`math/tex`. This is the recommended approach for stand-alone formulas. One of
+the benefits of this approach is that the browser will not attempt to display
+the content of the `<script>` tag before it is typeset, avoiding an unsightly
+flash of LaTeX code on screen. If the type is `"math/tex; mode=text"` the inline
+text style will be used, otherwise if the type is `"math/tex; mode=display"`,
+the display style will be used. If no mode is provided, the display style is
+used.
+
+```html
+<h1>Quadratic roots</h1>
+<script type="math/tex">
+  ax^2+bx+c =
+  a
+  \left( x - \frac{-b + \sqrt {b^2-4ac}}{2a} \right)
+  \left( x - \frac{-b - \sqrt {b^2-4ac}}{2a} \right)
+</script>
+```
+
+Elements with the following tags will be ignored for conversion: `noscript`,
+`style`, `textarea`, `pre`, `code`, `annotation` and `annotation-xml`.
+
+If you dynamically generate content, call {@linkcode
+module:MathLive#renderMathInElement MathLive.renderMathInElement(element)} to
+render your element after the page has been loaded. This is a recursive call
+that will be applied to `element` and all its children.
+
+It is possible to call `MathLive.renderMathInElement()` and
+`MathLive.renderMathInDocument` on elements and documents that have already been
+rendered, in which case they will be rendered again. This is useful if something
+in the environment changes that could require the layout to be updated.
+
+The {@linkcode module:mathlive#renderMathInElement |
+MathLive.renderMathInElement()} and {@linkcode
+module:mathlive#renderMathInDocument | MathLive.renderMathInDocument()}
+functions take an optional `options` object which can be used to customize their
+behavior:
+
+- `skipTags`: an array of tag names whose content will not be scanned for
+  delimiters
+- `processScriptType`: `<script>` tags of the indicated type will be processed
+  while others will be ignored. Default: "math/tex".
+- `ignoreClass`: a string used as a regular expression of class names of
+  elements whose content will not be scanned for delimiters (`'tex2jax_ignore'`
+  by default)
+- `processClass`: a string used as a regular expression of class names of
+  elements whose content **will** be scanned for delimiters, even if their tag
+  name or parent class name would have prevented them from doing so.
+  (`'tex2jax_process'` by default)
+- `TeX.processEnvironments`: if false, math expression that start with `\begin{`
+  will not automatically be rendered. (true by default)
+- `TeX.delimiters.inline` and `TeX.delimiters.display` arrays of delimiters that
+  will trigger a render of the content in 'textstyle' or 'displaystyle' style,
+  respectively.
+
+```javascript
+MathLive.renderMathInElement(document.getElementById('formulas'), {
+  // Elements with a class of "instruction" or "source will be skipped
+  ignoreClass: 'instruction|source',
+  TeX: {
+    delimiters: {
+      // Allow math formulas surround by $...$ or \(...\)
+      // to be rendered as textstyle content.
+      inline: [
+        ['$', '$'],
+        ['\\(', '\\)'],
+      ],
+      display: [],
+    },
+  },
+});
+```
 ## Read-only Mathfield
 
 <code-playground layout="stack" class="m-lg w-full-lg">

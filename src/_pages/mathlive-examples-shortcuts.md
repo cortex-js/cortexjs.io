@@ -2,7 +2,7 @@
 layout: single
 date: Last Modified
 title: MathLive Guide - Shortcuts
-permalink: /mathlive/guides//shortcuts/
+permalink: /mathlive/guides/shortcuts/
 read_time: false
 sidebar:
     - nav: "mathlive"

@@ -15,11 +15,21 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
 ---
-<section class="hero-section">
-  <a class="section-link" href="/mathlive/" target="_self" rel="follow" aria-hidden="true" tabindex="-1">&nbsp;</a>
-  <h1>MathLive</h1>
-  <p>A Web Component that Makes Math Input Easy</p>
+<section class="hero-section" style="padding:0">
+    <img src='/assets/mathlive-1.png' style='width: 100vw;height: 640px;object-fit: cover'>
 </section>
+
+<section class='m-lg mb-xl w-full-lg max-w-2xl'>
+  <h1 style='font-size: 4rem; line-height: 3.5rem'><span style='display: block;
+    font-size: 32px;
+    margin: 0;
+    padding: 0;
+    opacity: 0.4;
+    line-height: 1;
+    letter-spacing: -0.2px;
+'>MathLive</span>A Web Component that Makes Math Input Easy</h1>
+</section>
+
 
 <section class='m-lg mb-xl w-full-lg max-w-2xl'>
   <code-playground layout="stack" class="m-lg w-full-lg">
@@ -33,33 +43,10 @@ head:
   x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
   </code-playground>
-
-  <div class='font-size-xl'>
-    <h2 class="font-size-xl">View More Examples</h2>
-    <ul>
-      <li><a href="/mathlive/guides//introduction">Introduction<span class='ml-xs'><i
-              class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
-      <li><a href="/mathlive/guides//interacting">Interact with a mathfield<span class='ml-xs'><i
-              class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
-      <li><a href="/mathlive/guides//customizing">Customize a mathfield<span class='ml-xs'><i
-              class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
-      <li><a href="/mathlive/guides//macros">Define custom Latex macros<span class='ml-xs'><i
-              class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
-      <li><a href="/mathlive/guides//shortcuts">Manage inline and keyboard shortcuts<span class='ml-xs'><i
-              class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
-      <li><a href="/mathlive/guides//speech">Control speech output<span class='ml-xs'><i
-              class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
-      <li><a href="/mathlive/guides//static">Display static math formulas<span class='ml-xs'><i
-              class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
-      <li><a href="/mathlive/guides//virtual-keyboards">Define custom virtual keyboards<span class='ml-xs'><i
-              class="class='ml-xs fas fa-chevron-right navigation"></i></span></a></li>
-    </ul>
-
-  </div>
 </section>
 
 
-<h2><img src='/assets/images/mathfield/screenshot.jpg'></h2>
+<!-- <h2><img src='/assets/images/mathfield/screenshot.jpg'></h2> -->
 
 <section>
   <section class="fullwidth">
@@ -126,32 +113,42 @@ head:
 
 </section>
 
-<section class='cards secondary'>
-  <div class="card">
-    <a class="section-link" href="/guides/mathfield-getting-started/" target="_self" rel="follow" aria-hidden="true"
-      tabindex="-1">&nbsp;</a>
-    <div class="icon-secondary">
-      <i class="fa-2x fad fa-rocket"></i>
-    </div>
-    <div class="copy">
-      <h3>Getting Started</h3>
-      <p>Everything you need to know to add a mathfield to your project</p>
-      <a href="/guides/mathfield-getting-started/">Read Documentation<i
-          class="fa fal fa-chevron-right navigation"></i></a>
-    </div>
-  </div>
+<section class='cards col1'>
+  <div class='card'>
+    <div class='copy'>
+      <div class="icon-secondary text-center">
+        <i class="fa-4x fal fa-file-alt"></i>
+      </div>
+      <h3 class='text-center'>Guides</h3>
+      <dl>
+        <dt><a href="/mathlive/guides/introduction">Quick Start</a></dt>
+        <dd>Quick introduction to using MathLive in your project</dd>  
+        <dt><a href="/mathlive/guides/interacting">Interact with a mathfield</a></dt>
+        <dd>Receiving input and changing the value of a mathfield</dd>
+        <dt><a href="/mathlive/guides/customizing">Customize a mathfield</a></dt>
+        <dd>Adapting the behavior and appearance of a mathfield to your needs</dd>
+        <dt><a href="/mathlive/guides/commands">Executing commands</a></dt>
+        <dd>Sending editing commands to a mathfield</dd>
+        <dt><a href="/mathlive/guides/macros">Define custom Latex macros</a></dt>
+        <dd>Extending the Latex commands supported</dd>
+        <dt><a href="/mathlive/guides/shortcuts">Manage inline and keyboard shortcuts</a></dt>
+        <dd>Add or modify editing keyboard shortcuts</dd>
+        <dt><a href="/mathlive/guides/speech">Control speech output</a></dt>
+        <dd>A mathfield can provide speech feedback to interact with it.</dd>
+        <dt><a href="/mathlive/guides/static">Display static math formulas</a></dt>
+        <dd>Display non-editable math formulas in a page</dd>
+        <dt><a href="/mathlive/guides/virtual-keyboards">Define custom virtual keyboards</a></dt>
+        <dd>Virtual (on-screen) keyboards can be customized to your needs</dd>
+        <hr>
+        <dt><a href="/mathlive/guides/mathfield-getting-started">Getting Started</a></dt>
+        <dd>Everything you need to know to add a mathfield to your project</dd>  
+        <dt><a href="/docs/mathlive">MathLive SDK</a></dt>
+        <dd>Reference documentation of the MathLive API</dd>  
 
-  <div class="card">
-    <a class="section-link" href="/docs/mathlive/" target="_self" rel="follow" aria-hidden="true"
-      tabindex="-1">&nbsp;</a>
-    <div class="icon-secondary">
-      <i class="fa-2x fad fa-pencil"></i>
-    </div>
-    <div class="copy">
-      <h3>MathLive SDK</h3>
-      <p>Reference documentation of the MathLive API</p>
-      <a href="/docs/mathlive/">Read Documentation<i class="fa fal fa-chevron-right navigation"></i></a>
-    </div>
+      </dl>
+    </div>      
   </div>
 
 </section>
+</section>
+

@@ -2,7 +2,7 @@
 layout: single
 date: Last Modified
 title: MathLive Guide - Interacting
-permalink: /mathlive/guides//interacting/
+permalink: /mathlive/guides/interacting/
 read_time: false
 sidebar:
     - nav: "mathlive"

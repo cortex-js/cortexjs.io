@@ -57,6 +57,10 @@
 					"url": "/mathlive/guides/customizing"
 				},
 				{
+					"title": "Commands",
+					"url": "/mathlive/guides/commands"
+				},
+				{
 					"title": "Macros",
 					"url": "/mathlive/guides/macros"
 				},

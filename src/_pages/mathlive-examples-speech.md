@@ -2,7 +2,7 @@
 layout: single
 date: Last Modified
 title: MathLive Guide - Speech
-permalink: /mathlive/guides//speech/
+permalink: /mathlive/guides/speech/
 read_time: false
 sidebar:
     - nav: "mathlive"

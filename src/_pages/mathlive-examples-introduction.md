@@ -2,7 +2,7 @@
 layout: single
 date: Last Modified
 title: MathLive Guide
-permalink: /mathlive/guides//introduction/
+permalink: /mathlive/guides/introduction/
 read_time: false
 sidebar:
     - nav: "mathlive"

@@ -2,7 +2,7 @@
 layout: single
 date: Last Modified
 title: MathLive Guide - Macros
-permalink: /mathlive/guides//macros/
+permalink: /mathlive/guides/macros/
 read_time: false
 sidebar:
     - nav: "mathlive"
