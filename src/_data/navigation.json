@@ -1,6 +1,14 @@
 {
 	"main": [
 		{
+			"title": "MathJSON",
+			"url": "/math-json/"
+		},
+		{
+			"title": "Cortex",
+			"url": "/cortex/"
+		},
+		{
 			"title": "MathLive",
 			"url": "/mathlive/"
 		},

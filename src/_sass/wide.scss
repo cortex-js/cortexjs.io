@@ -50,6 +50,31 @@
     max-width: 100vw;
 }
 
+// "Floating" hero section (used on main landing page)
+.hero {
+  & > div {
+    position: relative;
+    & > img {
+      width: 100vw;
+      height: 512px;
+      object-fit: cover;
+    }
+    & > p {
+      font-size: 36px;
+      font-weight: 900; 
+      color: white;
+      text-align: center; 
+      width: 50%; 
+      left: 25%;
+      position: absolute;
+      bottom:.5em;
+      margin:auto;
+      line-height: .92;
+    }
+  }
+}
+
+// "Standard hero section with background
 .hero-section {
     position: relative;
     width: 100%;
@@ -149,17 +174,25 @@ section.fullwidth h2 {
     margin: 0;
     padding: 0;
     padding-bottom: 0.5em;
-    letter-spacing: 0.576px;
+    letter-spacing: -0.005em;
     border: none;
     & .eyebrow {
         display: block;
-        font: 400 32px/36px $sans-serif;
+        font: 700 21px/1.14048 $sans-serif;
         margin: 0;
         padding: 0;
-        opacity: 0.4;
+        opacity: 1;
         margin-bottom: 0.5em;
-        letter-spacing: -0.2px;
+        letter-spacing: 0.011em;
     }
+    & .subhead {
+      display: block;
+      font: 700 28px/1.14286 $sans-serif;
+      margin: 0;
+      padding: 0;
+      margin-bottom: 0.5em;
+      letter-spacing: 0.007em;
+  }
 }
 
 section.fullwidth p {
@@ -167,6 +200,20 @@ section.fullwidth p {
     margin: 0;
     padding: 0;
 }
+
+// A lightweight card with a simple border
+.light-card {
+  border: 1px solid rgba(0, 0, 0, .1);
+  border-radius: 8px;
+}
+
+
+section.fullwidth.light-card {
+  margin: 2em;
+  padding: 0;
+  width: calc(100% - 2em);
+}
+
 
 .cards {
     display: flex;
@@ -182,6 +229,15 @@ section.fullwidth p {
     margin-bottom: 0.5em;
     text-align: center;
     line-height: 1;
+    & .subhead {
+      display: block;
+      font: 600 28px/1 $sans-serif;
+      margin: 0;
+      padding: 0;
+      opacity: .5;
+      margin-bottom: 0.5em;
+      letter-spacing: 0.007em;
+  }
 }
 
 .cards .card {
@@ -346,9 +402,47 @@ dd {
 //   }
 // }
 
-// @media (max-width: $small) {
-//   .card .copy {
-//     margin-left: 1em;
-//     margin-right: 1em;
-//   }
-// }
+@media (max-width: $small) {
+  .greedy-nav .visible-links {
+    display: none;
+  }
+  .cards {
+    flex-flow: column;
+    margin: 0;
+    padding: 0;
+    padding-left: .5em;
+    padding-right: .5em;
+  }
+  .cards.col3 .card {
+    width: calc(100% - 1em);
+  }
+  section.fullwidth {
+    flex-flow: column;
+    & .figure {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+  .max-w-lg {
+    max-width: 100% !important;
+  }
+
+  div.figure + div.copy {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .hero {
+    & > div {
+      & > img {
+        height: 256px;
+      }
+      & > p {
+        font-size: 24px;
+        width: 100%; 
+        left: 0;
+      }
+    }
+  }
+  
+}

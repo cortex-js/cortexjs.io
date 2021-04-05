@@ -62,11 +62,11 @@ if [ "$ENVIRONMENT" == "production" ]
 then
     printf "$BASENAME$DOT Making a production build"
     sync
-    npx html-minifier-terser \
-        --config-file "./config/html-minifier.json" \
-        --file-ext html \
-        --input-dir "./submodules/cortex-js.github.io/" \
-        --output-dir "./submodules/cortex-js.github.io/"
+    # npx html-minifier-terser \
+    #     --config-file "./config/html-minifier.json" \
+    #     --file-ext html \
+    #     --input-dir "./submodules/cortex-js.github.io/" \
+    #     --output-dir "./submodules/cortex-js.github.io/"
     postcss --config "./config" --replace "./submodules/cortex-js.github.io/**/*.css"
     echo -e "$LINECLEAR$BASENAME$CHECK Completed build"
 
