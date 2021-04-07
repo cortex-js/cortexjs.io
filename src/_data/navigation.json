@@ -17,10 +17,6 @@
 			"url": "/docs/"
 		},
 		{
-			"title": "Funding",
-			"url": "/funding/"
-		},
-		{
 			"description": "Chat on Gitter",
 			"title": "<svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>",
 			"url": "https://gitter.im/cortex-js"

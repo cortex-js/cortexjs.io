@@ -121,7 +121,11 @@
             }
         ],
         "pages": [
-            {
+          {
+            "label": "Funding",
+            "url": "/funding"
+          },
+          {
                 "label": "About Us",
                 "url": "/about"
             }

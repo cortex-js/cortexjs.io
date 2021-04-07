@@ -357,6 +357,32 @@ section.fullwidth.light-card {
     max-width: 960px;
 }
 
+// A list of documentation links
+#main .link-list {
+  & a {
+    display: block;
+    margin-bottom: 1em;
+    padding: .5em;
+  }
+  & a:hover, & a:active {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  & a h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  & a p {
+    color: $text-color;
+    padding-left: 1em;
+    text-decoration: none;
+  }  
+}
+
+
+
 dl {
   margin-left: 1em;
 }
@@ -413,7 +439,7 @@ dd {
     padding-left: .5em;
     padding-right: .5em;
   }
-  .cards.col3 .card {
+  .cards.col3 .card, .cards.col2 .card {
     width: calc(100% - 1em);
   }
   section.fullwidth {

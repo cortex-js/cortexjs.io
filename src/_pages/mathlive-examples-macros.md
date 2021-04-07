@@ -32,11 +32,11 @@ config object:
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
-const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
+const mf = document.getElementById('mf'), {
 });
 console.log(mf.getOption('macros'));
 </div>
-    <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/div&gt;
+    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
 </div>
 </code-playground>
 
@@ -44,8 +44,7 @@ You can add (or remove) macros by using `setOptions({macros: ...})`.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
-const mf = MathLive.makeMathField(document.getElementById('mathfield'), {
-});
+const mf = document.getElementById('mf');
 mf.setOptions({
     macros: {
         ...mf.getOptions('macros'),
@@ -53,7 +52,7 @@ mf.setOptions({
     },
 });
 </div>
-    <div slot="html">&lt;div id="mathfield"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/div&gt;
+    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
 </code-playground>
 

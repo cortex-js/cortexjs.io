@@ -79,7 +79,7 @@ To use MathLive as a JavaScript module:
 
 1. Include a `<script>` tag, with a `type="module"` attribute
 2. In the body of this `<script>` tag, use an `import` directive pointing to a CDN URL for Mathlive
-3. Invoke a MathLive API, such as `makeMathField()` to create a mathfield
+3. Invoke a MathLive API, such as `renderMathInDocument()`.
 
 With this setup, MathLive will dynamically insert one or more stylesheets in 
 the page, as needed, for example when the mathfield is created. MathLive will 

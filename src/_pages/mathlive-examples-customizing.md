@@ -166,5 +166,5 @@ console.log(mf.getOptions().strings[locale]);
 
 ## Next
 
-<a href="/mathlive/guides//macros">Macros<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    How to define new Latex commands
+<a href="/mathlive/guides/commands">Executing commands<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+:    Send editing commands to a mathfield

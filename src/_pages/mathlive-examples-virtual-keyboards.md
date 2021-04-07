@@ -143,6 +143,49 @@ MathLive.makeMathField(document.getElementById('mathfield'),  {
 </code-playground>
 
 
+## Customizing the appearance of the virtual keyboard keycaps
+
+The appearance of keycaps can be controlled with the following CSS variables:
+  - `--keycap-height`
+  - `--keycap-font-size`
+  - `--keycap-small-font-size` (only if needed)
+  - `--keycap-extra-small-font-size` (only if needed)
+  - `--keycap-tt-font-size` (only if needed)
+
+
+## Sharing virtual keyboards amongst multiple instances
+
+When there are multiple mathfield elements in a page, they usually each have
+their own virtual keyboard.
+
+However, in some cases it might be desirable to have the virtual keyboard
+instance "detached" from the mathfield, and potentially shared by multiple 
+mathfield elements. 
+
+That's the case for example when mathfield elements are displayed in an 
+_iframe_. Since an _iframe_ is essentially a mini embedded document, the 
+default virtual keyboard will not display correctly when use in an _iframe_, 
+as it will be attached to the _iframe_ instead of being attached to the 
+main document.
+
+This can be solved by using a "shared" virtual keyboard.
+
+To use a shared virtual keyboard, call the `makeSharedVirtualKeyboard()` 
+function in the context of the main document.
+
+```javascript
+makeSharedVirtualKeyboard({
+  virtualKeyboardLayout: 'dvorak',
+});
+```
+
+In the _iframe_ elements, use the `use-shared-virtual-keyboard` attribute on 
+the `math-field` elements.
+
+```html
+<math-field use-shared-virtual-keyboard></math-field>
+```
+
 ## Controling which keyboards are displayed
 
 The virtual keyboard panel displays multiple keyboards which can be 
@@ -166,25 +209,28 @@ MathLive.makeMathField(document.getElementById('mathfield'),  {
 </code-playground>
 
 
-## Defining custom keyboards
+## Defining custom virtual keyboards
 
-A keyboard is made up of one or more "layers". A keyboard layer is a set of 
-keys that can be toggled using another key. For example, the `roman` keyboard
-has a regular layer and a layer for symbols. Most keyboards have a single layer.
-## JSON keyboard layout
+A virtual keyboard is made up of one or more "layers". A keyboard layer is a 
+set of keys that can be toggled using another key. For example, the `roman` keyboard has a regular layer and a layer for symbols. Most keyboards have a single layer.
 
-Virtual Keyboards can be defined with a JSON structure.
+Custom virtual keyboard layouts can be defined with an object literal.
+
+### Defining a layer
 
 First, let's define a layer, which we'll call `"college-layer"`.
 
-A layer is an array of rows, a row is an array of keycaps. Each keycap
-can have the following properties:
+A layer is an array of rows, a row is an array of keycaps. 
+
+Each keycap can have the following properties:
 
 - `class`: the CSS classes to style this keycap. The classes can be custom 
 defined (see below about the `styles` layer property), or be one of the default
 ones:
     - `keycap`: a standard-width keycap, using the system font for its label
-    - `keycap tex`: a standard-width keycap, using the TeX font for its label
+    - `keycap tex`: a standard-width keycap, using the TeX font for its label.
+      Using the `tex` class is not necessary if using the `latex` property to 
+      define the label.
     - `modifier`: a modifier (shift/option, etc...) keycap
     - `keycap small`: display the label in a smaller size
     - `action`: an "action" keycap (for arrows, return, etc...)
@@ -193,13 +239,17 @@ ones:
     for the space bar).
     - `bottom`, `left`, `right`: alignment of the label
 - `label`: the HTML markup displayed for the keycap. If no `label` is provided,
-the `latex` 
-- `latex`: a Latex fragment used as a label
-- `key`: a key, such as "9"
+  the `latex` value is used. If no `key`, `command` or `insert` property is 
+  provided, the label (stripped of any HTML markup) is what will be inserted
+  when the keycap is pressed.
+- `latex`: a Latex fragment used as a label and as the content to insert when 
+  the keycap is pressed.
+- `key`: the keypress to emulate when the keycap is pressed, for example `"5"`.
 - `aside`: an optional small label displayed below the keycap. This label
 may not be displayed if the space available is too small.
 
-- `insert`: a Latex fragment to insert when the keycap is pressed
+- `insert`: a Latex fragment to insert when the keycap is pressed. The `latex`
+property is usually sufficient, 
 - `altKeys`: the name of a set of alternate keys to display when the keycap is
 long-pressed.
 - `command`: the command to perform when the keycap is pressed.
@@ -223,65 +273,71 @@ name for the `backdrop` and `container` properties of the layer.
 ```js
     const COLLEGE_KEYBOARD_LAYER = {
       "college-layer": {
+        styles: "",
         rows: [
           [
-            { class: "keycap tex", label: "<i>a</i>" },
-            { class: "keycap tex", label: "<i>x</i>" },
+            { class: "keycap tex", latex: "a" },
+            { class: "keycap tex", latex: "x" },
             { class: "separator w5" },
-            { class: "keycap", key: "7" },
-            { class: "keycap", latex: "8" },
-            { class: "keycap", latex: "9" },
+            { class: "keycap", label: "7", key: "7" },
+            // Will display the label using the system font. To display 
+            // with the TeX font, use:
+            // { class: "keycap tex", label: "7", key: "7" },
+            // or 
+            // { class: "keycap", latex: "7"},
+            { class: "keycap", label: "8", key: "8" },
+            { class: "keycap", label: "9", key: "9" },
             { class: "keycap", latex: "\\div" },
             { class: "separator w5" },
             {
-              class: "keycap tex",
+              class: "keycap tex small",
               insert: "$$#@^{2}$$",
               label: "<span><i>x</i>&thinsp;²</span>"
             },
             {
-              class: "keycap tex",
+              class: "keycap tex small",
               insert: "$$#@^{}$$",
               label: "<span><i>x</i><sup>&thinsp;<i>n</i></sup></span>"
             },
             {
-              class: "keycap tex",
+              class: "keycap small",
               insert: "$$\\sqrt{#0}$$",
               latex: "\\sqrt{#0}"
             }
           ],
           [
-            { class: "keycap tex", label: "<i>b</i>" },
-            { class: "keycap tex", label: "<i>y</i>" },
+            { class: "keycap tex", latex: "b" },
+            { class: "keycap tex", latex: "y" },
             { class: "separator w5" },
-            { class: "keycap", latex: "4" },
-            { class: "keycap", latex: "5" },
-            { class: "keycap", latex: "6" },
+            { class: "keycap", label: "4", latex:"4" },
+            { class: "keycap", label: "5", key: "5" },
+            { class: "keycap", label: "6", key: "6" },
             { class: "keycap", latex: "\\times" },
             { class: "separator w5" },
-            { class: "keycap", latex: "\\frac{#0}{#0}" },
-            { class: "separator w6" },
-            { class: "separator w6" }
+            { class: "keycap small", latex: "\\frac{#0}{#0}" },
+            { class: "separator" },
+            { class: "separator" }
           ],
           [
             { class: "keycap tex", label: "<i>c</i>" },
             { class: "keycap tex", label: "<i>z</i>" },
             { class: "separator w5" },
-            { class: "keycap", latex: "1" },
-            { class: "keycap", latex: "2" },
-            { class: "keycap", latex: "3" },
+            { class: "keycap", label: "1", key: "1" },
+            { class: "keycap", label: "2", key: "2" },
+            { class: "keycap", label: "3", key: "3" },
             { class: "keycap", latex: "-" },
             { class: "separator w5" },
-            { class: "separator w6" },
-            { class: "separator w6" },
-            { class: "separator w6" }
+            { class: "separator" },
+            { class: "separator" },
+            { class: "separator" }
           ],
           [
-            { class: "keycap tex", label: "(" },
-            { class: "keycap tex", label: ")" },
+            { class: "keycap", latex: "(" },
+            { class: "keycap", latex: ")" },
 
             { class: "separator w5" },
-            { class: "keycap", latex: "0" },
-            { class: "keycap", latex: "," },
+            { class: "keycap", label: "0", key: "0" },
+            { class: "keycap", latex: "." },
             { class: "keycap tex", latex: "\\pi" },
             { class: "keycap", latex: "+" },
             { class: "separator w5" },
@@ -304,57 +360,63 @@ name for the `backdrop` and `container` properties of the layer.
         ]
       }
     };
-    
 ```
 
-```js
-  "customVirtualKeyboards": {
-  "keyboard-name": {
-    "label": "College", // Label displayed in the Virtual Keyboard Switcher
-    "tooltip": "College Level", // Tooltip when hovering over the label
-    "layer": "layer-name"
-  }
-}
-```
+### Defining a keyboard
 
-```js
-const COLLEGE_KEYBOARD = {
-  "college": {
-    "label": "College", // Label displayed in the Virtual Keyboard Switcher
-    "tooltip": "College Level", // Tooltip when hovering over the label
-    "layer": "layer-name"
-  }
-}
-```
+Now, let's define a new keyboard called `"college-keyboard"`.
+
+The keyboard has a `label` which is displayed in the keyboard selector area
+of the virtual keyboard. When hovering on this label, a `tooltip` can be 
+displayed to further explain what the keyboard is about.
+
+Finally, we must provide the layers that make up this keyboard. 
+
+In this example we have a single layer, so we can set the value of the 
+`layer` property to the name of the layer.
+
+If we had several layers, we could set the property `layers` to an 
+array of their names.
 
 
 ```js
-  "customVirtualKeyboardLayers": COLLEGE_KEYBOARD_LAYER
-  "customVirtualKeyboards": COLLEGE_KEYBOARD,
-  "virtualKeyboards": "college"
+    const COLLEGE_KEYBOARD = {
+      "college-keyboard": {
+        "label": "College", // Label displayed in the Virtual Keyboard Switcher
+        "tooltip": "College Level", // Tooltip when hovering over the label
+        "layer": "college-layer"
+      }
+    };
+```
+
+### Adding the layers and keyboards
+
+Now, we just have to call `setOptions()` with our custom layer and custom
+keyboard.
+
+The `virtualKeyboards` option indicate which keyboards we want to be available.
+Here we only want our keyboard, so we'll just pass its name.
+
+If we wanted multiple keyboards, we could provide a space-separated list, for
+example `"numeric college-keyboard symbols"`. If we wanted all the default
+keyboards, plus ours, we could have used the `"all"` shortcut: 
+`"all college-keyboard"`.
+
+
+```js
+  mf.setOptions({
+    "customVirtualKeyboardLayers": COLLEGE_KEYBOARD_LAYER
+    "customVirtualKeyboards": COLLEGE_KEYBOARD,
+    "virtualKeyboards": "college-keyboard"
+  });
 }
 ```
 
+## Next
 
-
-
-<code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'));
-</div>
-    <div slot="html">&lt;div id="mathfield" style="
-        font-size: 32px; 
-        padding: 8px; 
-        border-radius: 8px;
-        border: 1px solid rgba(0, 0, 0, .3); 
-        box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
-&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
-</div>
-</code-playground>
-
-
-
+<a href="/mathlive/guides/lifecycle">Web Component Lifecycle<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+:    Understand in depth the lifecycle of a MathfieldElement: construction, 
+interaction with the DOM and when can you communicate with it.
 
 ## See Also
 * <a href="/docs/mathlive/">MathLive SDK<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a>

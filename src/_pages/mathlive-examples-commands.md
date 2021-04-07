@@ -26,9 +26,17 @@ head:
 # Commands
 
 User initiated commands that control the mathfield can be dispatched using
-[`executeCommand()`](///docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)). Commands are
-identified by a string called the **selector**. Most commands take no
-parameters. When a command does have a parameter, an array made up of the
+[`executeCommand()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)). 
+
+Commands are
+identified by a string called the **selector**. 
+
+```js
+mf.executeCommand('deleteBackward');
+```
+
+
+Most commands take no parameters. When a command does have a parameter, a tuple with the
 selector and the commands arguments can be passed to
 `executeCommand()`. For example:
 
@@ -36,7 +44,7 @@ selector and the commands arguments can be passed to
 mf.executeCommand(['insert', '(#0)']);
 ```
 
-will insert an open and close parenthesis around the selection (the `#0`
+The command above will insert an open and close parenthesis around the selection (the `#0`
 sequence is replaced with the current selection).
 
 ## Editing
@@ -124,3 +132,7 @@ sequence is replaced with the current selection).
     be highlighted. It is an object: `{withHighlighting: boolean}` (default is
     false). Note: highlighting currently only works when connected to Amazon's
     AWS speech synthesizer.
+## Next
+
+<a href="/mathlive/guides/macros">Macros<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+:    Extend the Latex commands supported

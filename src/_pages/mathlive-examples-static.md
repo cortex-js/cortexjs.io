@@ -28,7 +28,7 @@ head:
 ## Static math formulas
 
 To render math contained in a document as a static (non-editable) formula, 
-call `renderMathInDocument()` at the end of your document, or in a `onload`
+call [`renderMathInDocument()`](/docs/mathlive/?q=renderMathInDocument) at the end of your document, or in a `onload`
 handler .
 
 ```html
@@ -72,19 +72,16 @@ used.
 Elements with the following tags will be ignored for conversion: `noscript`,
 `style`, `textarea`, `pre`, `code`, `annotation` and `annotation-xml`.
 
-If you dynamically generate content, call {@linkcode
-module:MathLive#renderMathInElement MathLive.renderMathInElement(element)} to
+If you dynamically generate content, call [`renderMathInElement(element)`](/docs/mathlive/?q=renderMathInElement) to
 render your element after the page has been loaded. This is a recursive call
 that will be applied to `element` and all its children.
 
-It is possible to call `MathLive.renderMathInElement()` and
-`MathLive.renderMathInDocument` on elements and documents that have already been
+It is possible to call `renderMathInElement()` and
+`renderMathInDocument` on elements and documents that have already been
 rendered, in which case they will be rendered again. This is useful if something
 in the environment changes that could require the layout to be updated.
 
-The {@linkcode module:mathlive#renderMathInElement |
-MathLive.renderMathInElement()} and {@linkcode
-module:mathlive#renderMathInDocument | MathLive.renderMathInDocument()}
+The `renderMathInElement()` and `renderMathInDocument()`
 functions take an optional `options` object which can be used to customize their
 behavior:
 
@@ -124,18 +121,27 @@ MathLive.renderMathInElement(document.getElementById('formulas'), {
 ```
 ## Read-only Mathfield
 
+When a math formula is displayed as a static element using 
+`renderMathInDocument()`, the formula is transformed into some static markup.
+As a result, only the markup content can be selected, not the underlying
+LaTex formula. Selection of a portion of the formula may also lead to 
+unexpected results.
+
+If preserving the ability to select a formula is important, consider
+using a read-only mathfield.
+
+To create a read-only mathfield, add the `read-only` attribute to a `<mathfield>`
+element.
+
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'));
-</div>
-    <div slot="html">&lt;div id="mathfield" style="
+    <div slot="html">&lt;math-field read-only style="
         font-size: 32px; 
         padding: 8px; 
         border-radius: 8px;
         border: 1px solid rgba(0, 0, 0, .3); 
         box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
 &gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
+&lt;/math-field&gt;
 </div>
 </code-playground>
 
