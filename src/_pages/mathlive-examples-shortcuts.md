@@ -23,9 +23,6 @@ head:
     };
 </script>
 
-# Shortcuts
-
-## Inline shortcuts
 # Key Bindings and Inline Shortcuts
 
 Input using a physical keyboard can be sped using two methods:
@@ -35,22 +32,44 @@ Input using a physical keyboard can be sped using two methods:
 
 ## Key bindings
 
-Key bindings are a combination of keys pressed simultaneously that
+A key binding is a combination of keys pressed simultaneously that
 triggers a command.
 
 For example, pressing `alt/option` and the `V` key at the same time will insert
 a square root. Pressing `ctrl/cmd` and the `Z` key at the same time will undo
 the last command.
 
-MathLive has an extensive set of default key bindings. To override,
-customize or add to the list of supported key bindings, provide an
-appropriate handler as part of the mathfield's configuration:
+MathLive has an extensive set of [default key bindings](https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts). 
 
-### **config.onKeystroke**: function(mathfield, keystroke: string, ev:Event)
+To override, customize or add to the list of supported key bindings, provide a
+`onKeystroke` handler.
 
-Invoked when a keystroke is about to be processed.
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+const mf = document.getElementById('mf');
+mf.setOptions({
+  onKeystroke: (mathfield, keystroke, ev) => {
+    if (keystroke === 'alt+[KeyS]') {
+      mf.insert('\\sum^\\infty_{n=0}');
+      return false;
+    } else if (keystroke === 'meta+[KeyK]') {
+      mf.executeCommand('toggleVirtualKeyboard');
+      return false;
+    }
+    // Keystroke not handled, return true for default handling to proceed.
+    return true;
+  }
+});
+</div>
+    <div slot="html">&lt;math-field id="mf"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
+</div>
+</code-playground>
 
--   `keystroke` is a string describing the keystroke, for example `Ctrl-KeyA`
+The `onKeystroke` handler is invoked when a keystroke is about to be processed.
+
+-   `keystroke` is a string describing the keystroke, for example `alt-[KeyS]`
 -   `ev` is the native JavaScript keyboard event.
 
 Return `false` to stop handling of the event, otherwise the default command
@@ -66,33 +85,43 @@ For example, typing the `p` key followed by the `i` key will result in the _π_ 
 
 If a substitution was undesirable, use **undo** to revert to the raw input.
 
-MathLive has some built-in inline shortcuts defined, but they can be replaced or
+MathLive has some [built-in inline shortcuts]([default key bindings](https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts) defined, but they can be replaced or
 enhanced with new shortcuts.
 
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+const mf = document.getElementById('mf');
+mf.setOptions({
+  inlineShortcuts: {
+    "infty": { mode: 'math', value: '\\infty' },
+  }
+});
+</div>
+    <div slot="html">&lt;math-field id="mf"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
+</div>
+</code-playground>
 
-### **config.inlineShortcuts**: Object.<string, string>
+The `mode` key, if present, indicate the mode in which this shortcut should apply, either `'math'` or `'text'`. If the key is not present the shortcut apply in both modes.
 
-A map of shortcuts → replacement value.
 
-For example `{ 'pi': '\\pi'}`.
-
-A shortcut can also be specified with additional options:
+To constraint the context in which a shortcut should apply, use the `after` 
+key:
 
 ```javascript
-config.inlineShortcuts = {
+mf.setOptions({
+  inlineShortcuts: {
     in: {
         mode: 'math',
-        after: 'space+letter+digit+symbol+fence',
+        after: 'space | letter | digit | symbol | fence',
         value: '\\in',
     },
-};
+  }
+});
 ```
 
-The `value` key is required an indicate the shortcut substitution.
-
-The `mode` key, if present, indicate in which mode this shortcut should apply, either `'math'` or `'text'`. If the key is not present the shortcut apply in both modes.
-
-The `'after'` key, if present, indicate in what context the shortcut should apply. One or more values can be specified, separated by a '+' sign. If any of the values match, the shortcut will be applicable. Possible values are:
+The `'after'` key indicate in what context the shortcut should apply. One or more values can be specified, separated by a '|' sign. If any of the values match, the shortcut will be applicable. Possible values are:
 
 -   `'space'` A spacing command, such as `\quad`
 -   `'nothing'` The begining of a group
@@ -109,9 +138,12 @@ The `'after'` key, if present, indicate in what context the shortcut should appl
 -   `'closefence'` A closing fence such as `}`
 -   `'text'` Some plain text
 
-### **config.inlineShortcutTimeout**: number = 0
+### Customizing the Inline Shortcut Sensitivity
 
-Maximum time, in milliseconds, between consecutive characters for them to be
+To change how quickly a set of keys must be typed to be considered a shortcut
+set the  `inlineShortcutTimeout` option.
+
+It represents the maximum amount of time, in milliseconds, between consecutive characters for them to be
 considered part of the same shortcut sequence.
 
 A value of 0 is the same as infinity: any consecutive
@@ -140,8 +172,9 @@ The most common ASCIIMath shortcuts are part of the default inline shortcuts.
 To support additional ASCIIMath shortcuts, add them to the `inlineShortcuts`
 setting.
 
-```javascript
-inlineShortcuts: {
+```js
+mf.setOptions({
+  inlineShortcuts: {
     //
     // ASCIIIMath
     //
@@ -173,9 +206,9 @@ inlineShortcuts: {
     // Binary relation symbols
     '-=': '\\equiv',
     '~=': '\\cong',
-    'lt':                   '<',
+    'lt': '<',
     'lt=': '\\leq',
-    'gt':                   '>',
+    'gt': '>',
     'gt=': '\\geq',
     '-<': '\\prec',
     '-lt': '\\prec',
@@ -221,27 +254,10 @@ inlineShortcuts: {
     '>->': '\\rightarrowtail',
     '->>': '\\twoheadrightarrow',
     '>->>': '\\twoheadrightarrowtail'
-    },
+  }
+});
 ```
 
-## Keyboard shorcuts
-
-## Keyboard interception
-
-<code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'));
-</div>
-    <div slot="html">&lt;div id="mathfield" style="
-        font-size: 32px; 
-        padding: 8px; 
-        border-radius: 8px;
-        border: 1px solid rgba(0, 0, 0, .3); 
-        box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
-&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
-</div>
-</code-playground>
 
 
 
