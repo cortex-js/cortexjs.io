@@ -41,6 +41,20 @@ some limitations. The `value`, `selection`, `options` and `disabled` properties
 and related attributes are safe to set, but the values you read back may be 
 different than once the component is mounted.
 
+## Before Initialization
+
+When the page is loaded, before any code is loaded or executed, elements with a
+`<math-field>` tag will be laid out and rendered by the browser as if they were
+a `<div>`. To prevent this from happening, you can use the `not(:defined)` CSS 
+selector and set the `display` CSS property to `none`. This will prevent 
+some potentially undesirable flash of content when the page is loaded.
+
+```css
+math-field:not(:defined) {
+  display: none;
+}
+```
+
 ## Initialization
 
 The element has been created from markup, but the code registering
@@ -142,7 +156,7 @@ the element:
 md.addEventListener('unmount')((ev) => {
   console.log('mf is about to be unmounted');
   // Last change to interact with the mathfield
-  console.log(ev.target.getValue('ASCIIMath'));
+  console.log(ev.target.getValue('ascii-math'));
 });
 ```
 

@@ -102,13 +102,16 @@ mathfield is active
 ## Editing options
 
 Some configuration options can be specified when creating a mathfield as 
-the second argument of [`makeMathField()`](http://cortexjs.io/docs/mathlive/?q=%22makeMathField%22)
+the argument of [`new MathfieldElement()`](https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor) or as an attribute to the `&lt;math-field&gt;` element.
 as we've see above with the `fontsDirectory` option.
 
 The configuration options can also be changed programmatically using the [`setOptions()`](http://cortexjs.io/docs/mathlive/?q=%22setOptions%22) method.
 
 Several of these configuration options affect the behavior while editing a 
 formula:
+* `defaultMode`: if `inline-math` the math field is using inline math mode
+by default. If set to `math`, it will use the display math mode. If set to 
+`text` it will use the text mode.
 * `ignoreSpaceabrInMathMode`: if false, insert a space when the spacebar is 
 pressed, even in math mode (spaces are usually ignored in math mode)
 * `removeExtraneousParentheses`: automatically remove extra parentheses around

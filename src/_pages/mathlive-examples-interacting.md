@@ -51,14 +51,14 @@ loses focus and the content has been modified{.notice--info}
 
 The `value` property is equivalent to calling the `getValue()` method with 
 no argument. You can control how the result is formatted by passing options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
-For example to get the content as an ASCIIMath string, use `getValue('ASCIIMath)`.
+For example to get the content as an ASCIIMath string, use `getValue('ascii-math)`.
 
-**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'ASCIIMath'` to `'spoken-text'`.{.notice--info}
+**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'ascii-math'` to `'spoken-text'`.{.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
     // `ev.target` is an instance of `MathfieldElement`
-    console.log(ev.target.getValue('ASCIIMath'));
+    console.log(ev.target.getValue('ascii-math'));
 });</div>
     <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;

@@ -136,7 +136,7 @@ when required.
 
 
 
-## Using NPM
+<h2 id='npm'>Using NPM</h2>
 
 If you need:
 - to use MathLive with TypeScript
@@ -171,7 +171,7 @@ will locate the MathLive library in the `node_modules` directory and apply
 the necessary transformations to it, as per the settings in your project.
 
 
-## Controlling the location of the `fonts` folder
+<h2 id='fonts-folder'> Controlling the location of the `fonts` folder</h2>
 
 In order to display formulas correctly MathLive needs access to specialized 
 math fonts. Those fonts are provided as part of the MathLive SDK and they are
@@ -201,7 +201,7 @@ The `fontsDirectory` option affects all the mathfield on the page. It is
 not necessary to apply it to all mathfields, although it's not harmful. Once 
 the fonts have been loaded once, they will not get loaded again. {.notice--info}
 
-## Integrating with an Asset Pipeline
+<h2 id='asset-pipeline'>Integrating with an Asset Pipeline</h2>
 
 In some cases, simply pointing MathLive to the directory where the fonts can 
 be located might not be enough. For example, some bundlers, such as WebPack, 
@@ -237,7 +237,7 @@ font loading.
 </html>
 ```
 
-## Displaying Formulas Without JavaScript
+<h2 id='static-render'>Displaying Formulas Without JavaScript</h2>
 
 While MathLive is primarily an editor for formulas, it can also be used
 to render "static" formulas in a web page, along the lines of what MathJax or 
