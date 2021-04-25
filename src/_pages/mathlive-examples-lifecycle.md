@@ -18,7 +18,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
+        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
@@ -162,5 +162,5 @@ md.addEventListener('unmount')((ev) => {
 
 ## Next
 
-<a href="/mathlive/guides//customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides/customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    How to customize the behavior and appearance of a mathfield.

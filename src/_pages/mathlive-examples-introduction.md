@@ -57,5 +57,5 @@ For example `f(x) = \sin(x)`,
 
 ## Next
 
-<a href="/mathlive/guides//interacting">Interacting with a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides/interacting">Interacting with a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    How to read, write the content of a mathfield

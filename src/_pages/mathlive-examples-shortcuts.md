@@ -18,7 +18,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
+        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
@@ -263,5 +263,5 @@ mf.setOptions({
 
 ## Next
 
-<a href="/mathlive/guides//speech">Speech<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides/speech">Speech<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    Control speech output

@@ -15,17 +15,15 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.js
+    - //unpkg.com/mathlive/dist/mathlive.min.mjs
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
-        "html-to-image": "///assets/js/html-to-image.js",
+        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
     };
 </script>
 
-# Static Mathfield
-
-## Static math formulas
+# Static Math Formulas
 
 To render math contained in a document as a static (non-editable) formula, 
 call [`renderMathInDocument()`](/docs/mathlive/?q=renderMathInDocument) at the end of your document, or in a `onload`
@@ -149,7 +147,7 @@ element.
 
 ## Next
 
-<a href="/mathlive/guides//virtual-keyboards">Virtual Keyboards<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides/virtual-keyboards">Virtual Keyboards<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    Define custom virtual keyboards
 
 

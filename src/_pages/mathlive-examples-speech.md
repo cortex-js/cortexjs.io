@@ -18,7 +18,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
+        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
@@ -150,5 +150,5 @@ MathLive.makeMathField(document.getElementById('mathfield'));
 
 ## Next
 
-<a href="/mathlive/guides//static">Static Math<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides/static">Static Math<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    Display static math formulas

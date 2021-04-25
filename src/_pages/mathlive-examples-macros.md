@@ -18,7 +18,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.mjs",
+        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
     };
 </script>
 
@@ -62,5 +62,5 @@ The macro definition can contain up to eight arguments, represented by `#1` to `
 
 ## Next
 
-<a href="/mathlive/guides//shortcuts">Shortcuts<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<a href="/mathlive/guides/shortcuts">Shortcuts<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
 :    Manage inline shortcuts and keyboard shortcuts
