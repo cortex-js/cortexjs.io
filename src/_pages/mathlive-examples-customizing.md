@@ -110,29 +110,33 @@ representation, can be controlled with some of the following options:
 
 ### Color
 
-To change the foreground ("ink") of a formula, use the `\textcolor{}{}` 
-command. To change the background ("paper"), use the `\colorbox{}{}` command.
+To change the foreground ("ink") and background ("paper") colors of a formula 
+programmatically, use the `applyStyle()` function.
+
+To modify the foreground color you can also use the `\textcolor{}{}` command.
+To change the background, use the `\colorbox{}{}` command.
+
   
-  The first argument is a color specified as:
+The first argument of these commands is a color specified as:
   - a RGB color using the standard CSS format (`#d7170b`)
   - a [CSS color name](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) (`goldenrod`)
   - one of the 68 colors from [dvips color name](https://ctan.org/pkg/colordvi) (`cadetblue`)
   - one of the 10 Mathematica color from `ColorData[97, "ColorList"]` (`m0` to `m9`)
   - a color defined using the syntax from the [`xcolor` package](http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf), for example: `blue!20!black!30!green`
 
-The following color names are recommended. They will map to these color values, 
-which are different from the `dvips` values. They can be applied using the color keys in the virtual keyboard:
+The following color names are recommended. They can be applied using the color 
+keys in the virtual keyboard:
 
 ![](/assets/images/mathfield/colors.png)
 
 These colors have been carefully selected for a balanced representation of the range of 
-hues on the color circle and to have similar lightness and intensity.{.notice--info}
+hues on the color circle, with similar lightness and intensity. They will map to  different color values than the `dvips` colors of the same name.{.notice--info}
 
-To have proper visibility based on usage, these color names will map to 
+To have proper legibility based on usage, these color names will map to 
 different values when used as a foreground color
-and a background color. To ensure a precise color value, use a RGB color instead.{.notice--info}
+and a background color. To use a specific color value, use a RGB color instead.{.notice--info}
 
-How the color names are interpreted can be customized by providing a `colorMap`
+To customize how the color names are interpreted provide a `colorMap`
 or `backgroundColorMap` function.{.notice--info}
 
 
