@@ -73,7 +73,7 @@ Learn more about configuring the MathLive library to your environment,
 including using custom asset pipelines and bundlers in the [Getting Started Guide](/guides/mathfield-getting-started/). {.notice--info}
 
 
-## CSS variables
+## CSS Variables
 
 Some CSS variables can be used to modify the appearance of the mathfield:
 
@@ -84,6 +84,9 @@ mathfield is active
 * `--highlight-inactive`: selection color when the mathfield is not focused
 * `--caret`: color of the caret (insertion point)
 * `--primary`: accent color for some UI elements, such as the virtual keyboard toggle
+* `--smart-fence-opacity`: opacity of a smart gence (default is 50%)
+* `--smart-fence-color`: color of a smart fence (default is current color)
+* `--text-font-family`: the font stack used in text mode
 
 
 
@@ -99,7 +102,63 @@ mathfield is active
 </code-playground>
 <!-- htmlmin:ignore -->
 
-## Editing options
+
+## Display Options
+
+The appearance of a formula, in an editable mathfield or as a static
+representation, can be controlled with some of the following options:
+
+### Color
+
+To change the foreground ("ink") of a formula, use the `\textcolor{}{}` 
+command. To change the background ("paper"), use the `\colorbox{}{}` command.
+  
+  The first argument is a color specified as:
+  - a RGB color using the standard CSS format (`#d7170b`)
+  - a [CSS color name](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) (`goldenrod`)
+  - one of the 68 colors from [dvips color name](https://ctan.org/pkg/colordvi) (`cadetblue`)
+  - one of the 10 Mathematica color from `ColorData[97, "ColorList"]` (`m0` to `m9`)
+  - a color defined using the syntax from the [`xcolor` package](http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf), for example: `blue!20!black!30!green`
+
+The following color names are recommended. They will map to these color values, 
+which are different from the `dvips` values. They can be applied using the color keys in the virtual keyboard:
+
+![](/assets/images/mathfield/colors.png)
+
+These colors have been carefully selected for a balanced representation of the range of 
+hues on the color circle and to have similar lightness and intensity.{.notice--info}
+
+To have proper visibility based on usage, these color names will map to 
+different values when used as a foreground color
+and a background color. To ensure a precise color value, use a RGB color instead.{.notice--info}
+
+How the color names are interpreted can be customized by providing a `colorMap`
+or `backgroundColorMap` function.{.notice--info}
+
+
+### Size
+
+To change the base font size, set the `font-size` CSS property to the desired
+value on the `mathfield` or static element.
+
+Within a formula, the size can be specified from a font scale with 10 values, where 1 em is the base font size.
+
+| `fontSize`| | command | 
+|------:|:------|:----|
+| 1 | 0.5 em | `\tiny` | 
+| 2 | 0.7 em | `\tiny` | 
+| 3 | 0.8 em | `\footnotesize` | 
+| 4 | 0.9 em | `\small` | 
+| 5 | 1.0 em | `\normalsize` or `\normal` | 
+| 6 | 1.2 em | `\large` | 
+| 7 | 1.44 em | `\Large` | 
+| 8 | 1.728 em | `\LARGE` | 
+| 9 | 2.074 em | `\huge` | 
+| 10 | 2.488 em | `\Huge` | 
+
+In TeX, the sizing commands behave inconsistently when applied to math. Other implementations of TeX may also interpret the sizing commands differently. {.notice--warning}
+
+## Editing Options
 
 Some configuration options can be specified when creating a mathfield as 
 the argument of [`new MathfieldElement()`](https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor) or as an attribute to the `&lt;math-field&gt;` element.
