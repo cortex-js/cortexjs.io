@@ -145,7 +145,8 @@ or `backgroundColorMap` function.{.notice--info}
 To change the base font size, set the `font-size` CSS property to the desired
 value on the `mathfield` or static element.
 
-Within a formula, the size can be specified from a font scale with 10 values, where 1 em is the base font size.
+Within a formula, the size can be specified from a font scale with 10 values, 
+where 1 em is the base font size of the mathfield or static element.
 
 | `fontSize`| | command | 
 |------:|:------|:----|
@@ -160,7 +161,74 @@ Within a formula, the size can be specified from a font scale with 10 values, wh
 | 9 | 2.074 em | `\huge` | 
 | 10 | 2.488 em | `\Huge` | 
 
-In TeX, the sizing commands behave inconsistently when applied to math. Other implementations of TeX may also interpret the sizing commands differently. {.notice--warning}
+In TeX, the sizing commands behave inconsistently when applied to math. 
+Other implementations of TeX may also interpret the sizing commands 
+differently. {.notice--warning}
+
+### Math Layout
+
+To control some aspects of the math typesetting, change the mathstyle with 
+the commands `\displaystyle`, `\textstyle`, `\scriptstyle`, `\scriptscriptstyle`.
+
+![](/assets/images/mathfield/mathstyles.png)
+
+The `displaystyle` style is most appropriate when there is plenty of space around
+the  formula. Limits over large operators, such as `\sum` are displayed above 
+and below the operator. There is a generous amount of space below the numerator 
+and above the denominator of fractions, and around relational (`=`) and binary
+(`+`) operators.
+
+The `textstyle` style is useful when space is constrained or when displaying
+a formula with some regular text around it. The limits of large operators 
+are displayed after the operator. The numerator and denominator of fractions is
+displayed using a smaller font size. However, the font-size for other characters
+is not affected.
+
+The `scriptstyle` and `scriptscriptstyle` are rarely needed explicitly. The 
+content is laid out using a smaller font-size (70% and 50% of the base font-size,
+respectively) and the spacing between operators is minimized. Note however
+that these styles are used automatically in some situations. For example,
+when using the `displaystyle` or `textstyle`, the limits of a large operator
+or the superscript or subscript of a symbol are displayed using these styles.
+Notice for example that `n=0` in `displaystyle` does not include space around
+the `=` sign because the limit is displayed in `scriptstyle`.
+
+
+To set the default mathstyle of a mathfield, use the `defaultMode` option 
+(or the `default-mode` attribute).
+Set it to `inline-math` to use `textstyle` or `math` to use `displaystyle`.
+
+
+To increase the default spacing between items, use the `horizontalSpacingScale`
+option (or the `horizontal-spacing-scale` attribute). Setting to a value of 
+`1.5` will increase the spacing by 50%. A value of `1.1` is generally 
+sufficient. This might be useful to make the formulas easier to read.
+
+
+### Letter Shape Style
+
+To control which letters are automatically italicized, use the `letterShapeStyle` configuration option.
+
+
+| `letterShapeStyle` | xyz    | ABC    | αβɣ    | ΓΔΘ   |
+| -----------------: | ---    | ---    | ---    | ---   |
+|              `iso` | _xyz_  | _ABC_  | _αβɣ_  | _ΓΔΘ_ |
+|              `tex` | _xyz_  | _ABC_  | _αβɣ_  | ΓΔΘ   |
+|           `french` | _xyz_  | ABC    | αβɣ    | ΓΔΘ   |
+|          `upright` | xyz    | ABC    | αβɣ    | ΓΔΘ   |
+
+In the [ISO](https://www.nist.gov/pml/special-publication-811) style, lower and
+uppercase roman letter and lower and upper case greek letters are italicized 
+when used as a variable. Mathematical constants such as $$e$$ are written upright.
+
+TeX has traditionally implemented a layout option that italicizes romman 
+letters and lowercase greek letters, but not uppercase greek letters.
+
+The French typographical convention is to only italicize lowercase roman letters.
+
+The default letter shape style is `auto`: if the system locale is "french",
+the `french` style is used, `tex` otherwise.
+
 
 ## Editing Options
 
