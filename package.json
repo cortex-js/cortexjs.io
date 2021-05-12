@@ -53,7 +53,7 @@
     "markdown-it-attrs": "^4.0.0",
     "markdown-it-deflist": "^2.1.0",
     "node-sass": "^5.0.0",
-    "postcss": "^8.2.8",
+    "postcss": "^8.2.10",
     "postcss-cli": "^8.3.1",
     "prettier": "^2.2.1",
     "typedoc": "^0.20.34",
