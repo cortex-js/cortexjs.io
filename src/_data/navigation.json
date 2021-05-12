@@ -42,7 +42,15 @@
 				{
 					"title": "SDK Reference",
 					"url": "/docs/mathlive/"
-				}
+				},
+        {
+					"title": "Supported Commands",
+					"url": "/mathlive/reference/commands/"
+        },
+        {
+					"title": "Keyboard Shortcuts",
+					"url": "/mathlive/reference/keybindings/"
+        }
 			]
 		},
 		{
