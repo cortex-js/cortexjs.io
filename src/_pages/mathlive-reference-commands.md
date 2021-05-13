@@ -30,6 +30,13 @@ sidebar:
 * $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$ `\frac{}{}`
 * $$\dfrac{\unicode{"2B1A}}{\unicode{"2B1A}}$$ `\dfrac{}{}`
 * $$\tfrac{\unicode{"2B1A}}{\unicode{"2B1A}}$$ `\tfrac{}{}`
+
+The `\dfrac` command display in Display style even when it is in a context
+that would normally use a different style, such as in a superscript.
+
+The `\tfrac` command display in Text style (inline) even in a context 
+that would  normally use Display style.
+
 * $$\cfrac{\unicode{"2B1A}}{\unicode{"2B1A}}$$ `\cfrac{}{}`
 * $$\binom{\unicode{"2B1A}}{\unicode{"2B1A}}$$ `\binom{}{}`
 * $$\dbinom{\unicode{"2B1A}}{\unicode{"2B1A}}$$ `\dbinom{}{}`
@@ -59,6 +66,8 @@ when creating modern LaTeX content.
 * $$\div$$   `\div`
 * $$\divides$$   `\divides`
 * $$\cdot$$   `\cdot`
+* $$\sqrt[\unicode{"2B1A}]{\unicode{"2B1A}}$$ `\sqrt[]{}`
+* $$\surd$$   `\surd{}` 
 * $$\ltimes$$   `\ltimes`
 * $$\rtimes$$   `\rtimes`
 * $$\leftthreetimes$$   `\leftthreetimes`
@@ -68,10 +77,10 @@ when creating modern LaTeX content.
 * $$\doublebarwedge$$   `\doublebarwedge`
 * $$\divideontimes$$   `\divideontimes`
 * $$\centerdot$$   `\centerdot`
-* $$\surd$$   `\surd` * $$\sqrt{\unicode{"2B1A}}$$ `\sqrt[]{}`
 {.command-list}
 
 ## Functions
+
 * $$\deg$$ `\deg`
 * $$\dim$$ `\dim`
 * $$\exp$$ `\exp`
@@ -80,14 +89,21 @@ when creating modern LaTeX content.
 * $$\ln$$ `\ln`
 * $$\log$$ `\log`
 * $$\lim$$ `\lim`
-* $$\mod$$ `\mod`
 * $$\det$$ `\det`
 * $$\max$$ `\max`
 * $$\min$$ `\min`
 {.command-list}
 
 
-## Trigonometry
+### Modulo
+
+* $$n \pmod{3}$$	`n \pmod{3}`
+* $$n \mod{3}$$	`n \mod{3}`
+* $$n \bmod 3$$	`n \bmod 3`
+
+
+### Trigonometry
+
 * $$\arccos$$ `\arccos`
 * $$\arcsin$$ `\arcsin`
 * $$\arctan$$ `\arctan`
@@ -117,7 +133,21 @@ when creating modern LaTeX content.
 {.command-list}
 
 
+## Unicode
+
+* `\unicode{}` - The argument is a Unicode codepoint expressed as a number. To use a hexadecimal number, start the argument with `x` or `"` and use uppercase `A`-`F` for hexadecimal digits.
+  * $$\unicode{10775}$$ `\unicode{10775}` 
+  * $$\unicode{"2A17}$$ `\unicode{"2A17}` 
+  * $$\unicode{x2A17}$$ `\unicode{x2A17}`
+* `\char` - The argument is also Unicode codepoint, but the `{`...`}` delimiters are optional when using `"`
+  * $$\char"2A17$$ `\char"2A17`  
+* `^^` and `^^^^` - Followed by 2 or 4 hexadecimal digits with **lowercase** `a`-`f` to specify a Unicode codepoint
+  * $$^^4a$$ `^^4a`
+  * $$^^^^2a17$$ `^^^^2a17`
+
+
 ## Extensible Operators
+
 * $$\sum$$ `\sum`
 * $$\prod$$ `\prod`
 * $$\bigcup$$ `\bigcup`
@@ -156,6 +186,9 @@ when creating modern LaTeX content.
 
 ## Logic
 
+* $$\forall$$   `\forall`
+* $$\exists$$   `\exists`
+* $$\nexists$$   `\nexists`
 * $$\to$$   `\to`
 * $$\gets$$   `\gets`
 * $$\implies$$   `\implies`
@@ -396,7 +429,8 @@ when creating modern LaTeX content.
 * $$\asymp$$   `\asymp`
 * $$\approx$$   `\approx`
 * $$\parallel$$   `\parallel`
-* $$\simeq$$   `\simeq` * $$\ne$$ `\ne`
+* $$\simeq$$   `\simeq` 
+* $$\ne$$ `\ne`
 * $$\neq$$ `\neq`
 {.command-list}
 
@@ -481,7 +515,8 @@ when creating modern LaTeX content.
 * $$\nsubseteq$$   `\nsubseteq`
 * $$\nsupseteq$$   `\nsupseteq`
 * $$\varnothing$$   `\varnothing`
-* $$\complement$$   `\complement` * $$\not$$ `\not{}`
+* $$\complement$$   `\complement` 
+* $$\not$$ `\not{}`
 {.command-list}
 
 
@@ -538,17 +573,14 @@ when creating modern LaTeX content.
 
 * $$\aleph$$   `\aleph`
 * $$\beth$$   `\beth`
-* $$\daleth$$   `\daleth`
 * $$\gimel$$   `\gimel`
+* $$\daleth$$   `\daleth`
 {.command-list}
 
 
 ## Letterlike Symbols
 
 * $$@$$   `@`
-* $$\forall$$   `\forall`
-* $$\exists$$   `\exists`
-* $$\nexists$$   `\nexists`
 * $$\mid$$   `\mid`
 * $$\top$$   `\top`
 * $$\bot$$   `\bot`
@@ -578,7 +610,8 @@ when creating modern LaTeX content.
 * $$\yen$$   `\yen`
 * $$\imath$$   `\imath`
 * $$\jmath$$   `\jmath`
-* $$\degree$$   `\degree` * $$\Re$$ `\Re`
+* $$\degree$$   `\degree` 
+* $$\Re$$ `\Re`
 * $$\Im$$ `\Im`
 {.command-list}
 
@@ -586,6 +619,8 @@ when creating modern LaTeX content.
 
 ## Delimiters
 
+* $$\lparen$$   `\lparen`
+* $$\rparen$$   `\rparen`
 * $$\lbrace$$   `\lbrace`
 * $$\rbrace$$   `\rbrace`
 * $$\langle$$   `\langle`
@@ -723,7 +758,8 @@ when creating modern LaTeX content.
 
 ## Accents
 
-* $$\~{n}$$   `\~` * $$\acute{\unicode{"2B1A}}$$ `\acute{}`
+* $$\~{n}$$   `\~` 
+* $$\acute{\unicode{"2B1A}}$$ `\acute{}`
 * $$\grave{\unicode{"2B1A}}$$ `\grave{}`
 * $$\dot{\unicode{"2B1A}}$$ `\dot{}`
 * $$\ddot{\unicode{"2B1A}}$$ `\ddot{}`
@@ -742,6 +778,7 @@ when creating modern LaTeX content.
 {.command-list}
 
 ## Layout
+
 * $$x=\mathop{arg}=0$$ `\mathop{}`
 * $$x=\mathbin{arg}=0$$ `\mathbin{}`
 * $$x=\mathrel{arg}=0$$ `\mathrel{}`
@@ -764,6 +801,7 @@ when creating modern LaTeX content.
 {.command-list}
 
 ## Spacing
+
 * $$\unicode{"203A}\hspace{1em}\unicode{"2039}$$ `\hspace{}`
 * $$\unicode{"203A}\hspace*{1em}\unicode{"2039}$$ `\hspace*{}`
 * $$\unicode{"203A}\!\unicode{"2039}$$ `\!`
@@ -860,17 +898,32 @@ when creating modern LaTeX content.
 ---
 
 * $$\bigl($$ `\bigl{}`
-* $$\Bigl($$ `\Bigl{}`
-* $$\biggl($$ `\biggl{}`
-* $$\Biggl($$ `\Biggl{}`
 * $$\bigr)$$ `\bigr{}`
-* $$\Bigr)$$ `\Bigr{}`
-* $$\biggr)$$ `\biggr{}`
-* $$\Biggr)$$ `\Biggr{}`
 * $$\bigm|$$ `\bigm{}`
+{.command-list}
+
+
+
+* $$\Bigl($$ `\Bigl{}`
+* $$\Bigr)$$ `\Bigr{}`
 * $$\Bigm|$$ `\Bigm{}`
+{.command-list}
+
+
+* $$\biggl($$ `\biggl{}`
+* $$\biggr)$$ `\biggr{}`
 * $$\biggm|$$ `\biggm{}`
+{.command-list}
+
+
+
+* $$\Biggl($$ `\Biggl{}`
+* $$\Biggr)$$ `\Biggr{}`
 * $$\Biggm|$$ `\Biggm{}`
+{.command-list}
+
+
+
 * $$\big(\big)$$ `\big{}`
 * $$\Big(\Big)$$ `\Big{}`
 * $$\bigg(\bigg)$$ `\bigg{}`
@@ -905,13 +958,11 @@ when creating modern LaTeX content.
 * $$\backdoubleprime$$   `\backdoubleprime`
 * $$\/$$   `\/`
 * $$|$$   `|`
-* $$'$$   `'` * $$\unicode{"2B1A}$$ `\unicode{}`
+* $$'$$   `'` 
 * $$\originalof$$   `\originalof`
 * $$\laplace$$   `\laplace`
 * $$\imageof$$   `\imageof`
 * $$\Laplace$$   `\Laplace`
-* $$\lparen$$   `\lparen`
-* $$\rparen$$   `\rparen`
 * $$−$$   `−`
 * $$`$$   ```
 * $$\ $$   `\ `
@@ -1000,9 +1051,6 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 * $$\Ket{ab}$$	`\Ket{}`
 * $$\Braket{ab}$$	`\Braket{}`
 * $$\Set{ x\in\mathbf{R}^2 | 0<{|x|}<5 } $$	`\Set{ x\in\mathbf{R}^2 | 0<{|x|}<5 } `
-* $$n \pmod{3}$$	`n \pmod{3}`
-* $$n \mod{3}$$	`n \mod{3}`
-* $$n \bmod 3$$	`n \bmod 3`
 * $$\rd$$	`\rd`
 * $$\rD$$	`\rD`
 * $$\doubleStruckCapitalN$$	`\doubleStruckCapitalN`
@@ -1088,3 +1136,15 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 * $$\begin{rcases}a & b \\c & \frac{1}{d}\end{rcases}$$`\​begin{rcases}...\end{rcases}`
 
 * `$$\begin{center}\text{first}\end{center}$$`
+
+
+
+## TeX Internals
+
+* `\limits` and `\nolimits`
+* `\relax`
+* `\noexpand`
+* `\obeyspaces`
+* `\bgroup` and `\egroup`
+* `\string`
+* `\csname` and `\endcsname`
