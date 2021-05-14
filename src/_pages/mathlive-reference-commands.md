@@ -11,11 +11,11 @@ sidebar:
     import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
     renderMathInDocument({ 
       renderAccessibleContent: false,
-      // TeX: { 
-      //   delimiters: { display: [ ['$$', '$$'] ] },
-      //   processEnvironments : false 
-      // },
-      // asciiMath: null,
+      TeX: { 
+        delimiters: { display: [ ['$$', '$$'] ] },
+        processEnvironments : false 
+      },
+      asciiMath: null,
     });
     document.body.classList.add('ready');
 </script>
