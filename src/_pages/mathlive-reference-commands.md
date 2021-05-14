@@ -65,8 +65,8 @@ The `\tfrac` command uses Text style (inline) even in a context that would  norm
 The following commands are supported but their usage is generally discouraged
 when creating modern LaTeX content.
 
-* <span class='math'>$${\unicode{"2B1A} \overwithdelims{\lbrace}{\rbrace} \unicode{"2B1A}} $$</span> `\overwithdelims{\lbrace}{\rbrace}`
-* <span class='math'>$${\unicode{"2B1A} \atopwithdelims{\lbrace}{\rbrace} \unicode{"2B1A}} $$</span> `\atopwithdelims{\lbrace}{\rbrace}`
+* <span class='math'>$${\unicode{"2B1A} \overwithdelims\lbrace\rbrace \unicode{"2B1A}} $$</span> `\overwithdelims\lbrace\rbrace`
+* <span class='math'>$${\unicode{"2B1A} \atopwithdelims\lbrace\rbrace \unicode{"2B1A}} $$</span> `\atopwithdelims\lbrace\rbrace`
 * <span class='math'>$$\unicode{"2B1A} \over \unicode{"2B1A} $$</span> `\over `
 * <span class='math'>$$\unicode{"2B1A} \atop \unicode{"2B1A} $$</span> `\atop `
 * <span class='math'>$$\unicode{"2B1A} \choose \unicode{"2B1A} $$</span> `\choose `
@@ -167,6 +167,14 @@ when creating modern LaTeX content.
 
 
 ## Extensible Operators
+
+To force the display of the limits above and below the operator, use `\limits`. To force the display of the limits to be adjacent to the operator, use `\nolimits`.
+
+`\sum_{n=0}^\infty\nolimits`
+
+<span class='math'>$$\sum_{n=0}^\infty\nolimits</span> 
+  
+  
 
 * <span class='math'>$$\sum $$</span> `\sum`
 * <span class='math'>$$\prod $$</span> `\prod`
@@ -342,11 +350,9 @@ and
 ## Extensible Symbols
 
 * <span class='math'>$$\overline{\unicode{"2B1A}} $$</span> `\overline{}`
-* <span class='math'>$$\underline{\unicode{"2B1A}} $$</span> `\underline{}`
 * <span class='math'>$$\widehat{ABC} $$</span> `\widehat{}`
 * <span class='math'>$$\widecheck{ABC} $$</span> `\widecheck{}`
 * <span class='math'>$$\widetilde{ABC} $$</span> `\widetilde{}`
-* <span class='math'>$$\utilde{ABC} $$</span> `\utilde{}`
 * <span class='math'>$$\overrightarrow{ABC} $$</span> `\overrightarrow{}`
 * <span class='math'>$$\overleftarrow{ABC} $$</span> `\overleftarrow{}`
 * <span class='math'>$$\Overrightarrow{ABC} $$</span> `\Overrightarrow{}`
@@ -361,6 +367,8 @@ and
 ---
 
 
+* <span class='math'>$$\underline{\unicode{"2B1A}} $$</span> `\underline{}`
+* <span class='math'>$$\utilde{ABC} $$</span> `\utilde{}`
 * <span class='math'>$$\underrightarrow{ABC} $$</span> `\underrightarrow{}`
 * <span class='math'>$$\underleftarrow{ABC} $$</span> `\underleftarrow{}`
 * <span class='math'>$$\underleftrightarrow{ABC} $$</span> `\underleftrightarrow{}`
@@ -685,6 +693,16 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 
 ## Delimiters
 
+* <span class='math'>$$\left\{x\middle|\fracx2 > 0\right\} $$</span> \left\{x\middle|\fracx2 > 0\right\}`
+{.command-list}
+
+---
+
+The argument to `\left`, `\right` and `\middle` can be one of the 
+following symbols. 
+
+To omit the delimiter, use `.`, <span class='math'>$$\left\lparen \frac1x \right.$$</span> `\left\lparen \frac1x \right.`
+
 * <span class='math'>$$\lparen $$</span>   `\lparen`
 * <span class='math'>$$\rparen $$</span>   `\rparen`
 * <span class='math'>$$\lbrace $$</span>   `\lbrace`
@@ -705,7 +723,7 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\rVert $$</span>   `\rVert`
 * <span class='math'>$$\lbrack $$</span>   `\lbrack`
 * <span class='math'>$$\rbrack $$</span>   `\rbrack`
-* <span class='math'> $$</span> \{ <span class='math'> $$</span>   `\{`
+* <span class='math'>$$\{ $$</span>   `\{`
 * <span class='math'>$$\} $$</span>   `\}`
 * <span class='math'>$$( $$</span>   `(`
 * <span class='math'>$$) $$</span>   `)`
@@ -824,26 +842,37 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 
 ## Layout
 
-* <span class='math'>$$x=\mathop{arg}=0 $$</span> `\mathop{}`
+These commands change the amount of space around a symbol: `\mathop{}`
+treats its argument as if it was a large operator, `\mathrel{}` a 
+relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclose{}` an opening and closing delimiter, respectively, `\mathpunct{}` a punctuation, `\mathinner{}` a fraction, and `\mathord{}` an ordinary symbol
+
+* <span class='math'>$$x\mathop{+}0+1 $$</span> `x\mathop{+}0+1`
 * <span class='math'>$$x=\mathbin{arg}=0 $$</span> `\mathbin{}`
 * <span class='math'>$$x=\mathrel{arg}=0 $$</span> `\mathrel{}`
 * <span class='math'>$$x=\mathopen{arg}=0 $$</span> `\mathopen{}`
 * <span class='math'>$$x=\mathclose{arg}=0 $$</span> `\mathclose{}`
 * <span class='math'>$$x=\mathpunct{arg}=0 $$</span> `\mathpunct{}`
-* <span class='math'>$$x=\mathord{arg}=0 $$</span> `\mathord{}`
 * <span class='math'>$$x=\mathinner{arg}=0 $$</span> `\mathinner{}`
-* <span class='math'>$$x=\operatorname{arg}=0 $$</span> `\operatorname{}`
-* <span class='math'>$$x=\operatorname*{arg}=0 $$</span> `\operatorname*{}`
+* <span class='math'>$$x=\mathord{arg}=0 $$</span> `\mathord{}`
+{.command-list}
+
+---
+
+* <span class='math'>$$x=\operatorname{lim}=0 $$</span> `\operatorname{lim}`
+* <span class='math'>$$x=\operatorname*{lim}=0 $$</span> `\operatorname*{lim}`
+{.command-list}
+
+---
+
 * <span class='math'>$$\overset{arg}{x=0} $$</span> `\overset{}{}`
 * <span class='math'>$$\underset{arg}{x=0} $$</span> `\underset{}{}`
+* <span class='math'>$$\overunderset{arg}{x=0}{y=1} $$</span> `\overunderset{arg}{x=0}{y=1}`
 * <span class='math'>$$\stackrel{arg}{x=0} $$</span> `\stackrel[]{}{}`
 * <span class='math'>$$\stackbin{arg}{x=0} $$</span> `\stackbin[]{}{}`
 * <span class='math'>$$\rlap{/}0 $$</span> `\rlap{}`
 * <span class='math'>$$o\llap{/} $$</span> `\llap{}`
 * <span class='math'>$$o\mathllap{/} $$</span> `\mathllap{}`
 * <span class='math'>$$\mathrlap{/}0 $$</span> `\mathrlap{}`
-* <span class='math'>$$\left\{x\middle|x>0\right\} $$</span> `\middle{}`
-{.command-list}
 
 ## Spacing
 
@@ -860,25 +889,122 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 
 
 
+## Decorations
 
-
-## Decoration
-
-* <span class='math'>$${\color{m0}A}{\color{m1}B}{\color{m2}C }{\color{m3}a}{\color{m4}b}{\color{m5}c}{\color{m6}8} $$</span> `\color{}`
-* <span class='math'>$${\textcolor{m0}A}{\textcolor{m1}B}{\textcolor{m2}C }{\textcolor{m3}a}{\textcolor{m4}b}{\textcolor{m5}c}{\textcolor{m6}8} $$</span> `\textcolor{}{}`
-* <span class='math'>$$\boxed{\unicode{"2B1A}} $$</span> `\boxed{}`
+* <span class='math'>$${\color{blue}x+1=0}} $$</span> `{\color{blue} x+1=0}}`
+* <span class='math'>$$\textcolor{blue}{x+1=0}$$</span> `\textcolor{blue}{x+1=0}`
 * <span class='math'>$$\colorbox{#fbc0bd}{\unicode{"2B1A}} $$</span> `\colorbox{}{}`
 * <span class='math'>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{"2B1A}} $$</span> `\fcolorbox{}{}{}`
+* <span class='math'>$$\boxed{\unicode{"2B1A}} $$</span> `\boxed{}`
 * <span class='math'>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{"2B1A}} $$</span> `\bbox[]{}`
 * <span class='math'>$$\rule{2em}{1em} $$</span> `\rule[]{}{}`
-* <span class='math'>$$\enclose{updiagonalstrike,roundedbox}[1px solid red, mathbackground="#fbc0bd"]{x=0} $$</span> `\enclose{}[]{}`
+{.command-list}
+
+
+### Notations
+
+#### `\enclose`
+
+* <span class='math'>$$\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground="#fbc0bd"]{x=0} $$</span> `\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground="#fbc0bd"]{x=0}`
+* <span class='math'>$$\enclose{circle}[mathbackground="#fbc0bd"]{\frac1x}$$</span> `\enclose{circle}[mathbackground="#fbc0bd"]{\frac1x}`
+* <span class='math'>$$\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}$$</span> `\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}`
+
+
+The `\enclose` command is very flexible. It accepts three arguments, two of
+which are required:
+
+```tex
+    \enclose{notation:text}[style:text]{body:math}
+```
+
+- `notation` a list of whitespace-delimited values:
+  - `box`
+  - `roundedbox`
+  - `circle`
+  - `top`, `left`, `right` and `bottom`
+  - `horizontalstrike`, `verticalstrike`
+  - `updiagonalstrike`, `downdiagonalstrike`
+  - `updiagonalarrow`
+  - `phasorangle`
+  - `radical`
+  - `longdiv`
+  - `actuarial`
+  - `madruwb`
+- `style` an optional list of comma separated attributes including:
+  - `mathbackground="<color>"` background color of the expression
+  - `mathcolor="<color>"` color of the notation, for example `red` or `#cd0030`
+    or `rgba(205, 0, 11, .4)`.
+  - `padding="<dimension>"` `"auto"` or an amount of padding around the content
+  - `shadow="<shadow>"`: `"auto"` or `"none"` or a CSS `box-shadow` expression
+    for example, `"0 0 2px rgba(0, 0, 0, 0.5)"`.
+  - in addition the style property can include a stroke style expression that
+    follows the shorthand syntax of the CSS `border` property, for example
+    `"2px solid red"`.
+- `body` a math expression that is "enclosed" by the specified notations
+
+
+
+`\enclose` is an extension to LaTeX that follows the `<menclose>`
+definition of [MathML]() and the LaTeX flavor defined by MathJax.{.notice--info}
+
+#### `\cancel`, `\bcancel` and `\xcancel`
+
 * <span class='math'>$$\cancel{\unicode{"2B1A}} $$</span> `\cancel{}`
 * <span class='math'>$$\bcancel{\unicode{"2B1A}} $$</span> `\bcancel{}`
 * <span class='math'>$$\xcancel{\unicode{"2B1A}} $$</span> `\xcancel{}`
 {.command-list}
 
+| Command...       | is a shorthand for...                                 |
+| :--------------- | :---------------------------------------------------- |
+| `\cancel{body}`  | `\enclose{updiagonalstrike}{body}`                    |
+| `\bcancel{body}` | `\enclose{downdiagonalstrike}{body}`                  |
+| `\xcancel{body}` | `\enclose{updiagonalstrike downdiagonalstrike}{body}` |
 
-## Styling
+
+The `\cancel`, `\bcancel` and `\xcancel` commands are part of the
+["cancel"](https://www.ctan.org/pkg/cancel) LaTeX package.{.notice--info}
+
+### Colors
+
+To modify the foreground color you use the `\textcolor{}{}` command.
+
+To change the background, use the `\colorbox{}{}` command.
+
+  
+The first argument of these commands is a color specified as:
+  - a RGB color using the standard CSS format (`#d7170b`)
+  - a [CSS color name](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) (`goldenrod`)
+  - one of the 68 colors from [dvips color name](https://ctan.org/pkg/colordvi) (`cadetblue`)
+  - one of the 10 Mathematica color from `ColorData[97, "ColorList"]` (`m0` to `m9`)
+  - a color defined using the syntax from the [`xcolor` package](http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf), for example: `blue!20!black!30!green`
+
+The following color names are recommended. They can be applied using the color 
+keys in the virtual keyboard:
+
+![](/assets/images/mathfield/colors.png)
+
+These colors have been carefully selected for a balanced representation of the range of 
+hues on the color circle, with similar lightness and intensity. They will map to  different color values than the `dvips` colors of the same name.{.notice--info}
+
+To have proper legibility based on usage, these color names will map to 
+different values when used as a foreground color
+and a background color. To use a specific color value, use a RGB color instead.{.notice--info}
+
+To customize how the color names are interpreted provide a `colorMap`
+or `backgroundColorMap` function.{.notice--info}
+
+
+
+
+
+## Font Styling
+
+* <span class='math'>$$\ensuremath $$</span> `\ensuremath{}`
+* <span class='math'>$$\displaystyle $$</span> `\displaystyle{}`
+* <span class='math'>$$\textstyle $$</span> `\textstyle{}`
+* <span class='math'>$$\scriptstyle $$</span> `\scriptstyle{}`
+* <span class='math'>$$\scriptscriptstyle $$</span> `\scriptscriptstyle{}`
+
 
 * <span class='math'>$$\text{\fontseries{b}Don Knuth} $$</span> `\fontseries{}`
 * <span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> `\fontshape{}`
@@ -918,7 +1044,7 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\mathfrak{Don Knuth} $$</span> `\mathfrak{}`
 * <span class='math'>$$\mathcal{Don Knuth} $$</span> `\mathcal{}`
 * <span class='math'>$$\mathscr{Don Knuth} $$</span> `\mathscr{}`
-* <span class='math'>$$\mbox{Don Knuth} $$</span> `\mbox{}`
+* <span class='math'>$$\mathbfit $$</span> `\mathbfit{}`
 * <span class='math'>$$\text{Don Knuth} $$</span> `\text{}`
 * <span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span> `\class{}{}`
 * <span class='math'>$$\cssId{testIdentifier}{Don Knuth} $$</span> `\cssId{}{}`
@@ -1017,13 +1143,6 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 {.command-list}
 
 
-* <span class='math'>$$\ensuremath $$</span> `\ensuremath{}`
-* <span class='math'>$$\displaystyle $$</span> `\displaystyle{}`
-* <span class='math'>$$\textstyle $$</span> `\textstyle{}`
-* <span class='math'>$$\scriptstyle $$</span> `\scriptstyle{}`
-* <span class='math'>$$\scriptscriptstyle $$</span> `\scriptscriptstyle{}`
-* <span class='math'>$$\mathbfit $$</span> `\mathbfit{}`
-* <span class='math'>$$\overunderset $$</span> `\overunderset{}{}{}`
 * <span class='math'>$$\smash $$</span> `\smash[]{}`
 * <span class='math'>$$\vphantom $$</span> `\vphantom{}`
 * <span class='math'>$$\hphantom $$</span> `\hphantom{}`
@@ -1401,3 +1520,4 @@ $$
 * `\bgroup` and `\egroup`
 * `\string`
 * `\csname` and `\endcsname`
+* <span class='math'>$$\mbox{Don Knuth} $$</span> `\mbox{}`
