@@ -48,7 +48,7 @@ be rendered as math:
 <p>The second taxicab number is $$1729 = 10^3 + 9^3 = 12^3 + 1^3$$</p>
 ```
 
-You can also wrap more complex expressions in a `<script>` tag with a type of
+You can wrap more complex expressions in a `<script>` tag with a type of
 `math/tex`. This is the recommended approach for stand-alone formulas. One of
 the benefits of this approach is that the browser will not attempt to display
 the content of the `<script>` tag before it is typeset, avoiding an unsightly

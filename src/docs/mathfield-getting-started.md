@@ -243,8 +243,8 @@ While MathLive is primarily an editor for formulas, it can also be used
 to render "static" formulas in a web page, along the lines of what MathJax or 
 KaTeX provide.
 
-You can render a non-editable formula using `MathLive.renderMathInDocument()` or
-generate markup for a formula using `MathLive.latexToMarkup()`. In the later
+To render a non-editable formula use `MathLive.renderMathInDocument()` or
+to generate markup for a formula use `MathLive.latexToMarkup()`. In the later
 case, you may save the output or return it from a server-side process.
 
 To correctly display this markup, you will need an appropriate stylesheet.
@@ -253,7 +253,7 @@ If you have some editable mathfield in that page, the stylesheet for the editabl
 mathfield will be sufficient to correctly render the static formulas.
 
 However, if you need to render the markup for a static formula without the
-MathLive library being loaded, you can use the `mathlive-static.css` stylesheet
+MathLive library being loaded, use the `mathlive-static.css` stylesheet
 which can be found in the `/dist/` directory on GitHub or in the 
 `node_modules/mathlive` directory via NPM.
 

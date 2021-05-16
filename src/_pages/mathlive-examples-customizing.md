@@ -113,8 +113,8 @@ representation, can be controlled with some of the following options:
 To change the foreground ("ink") and background ("paper") colors of a formula 
 programmatically, use the `applyStyle()` function.
 
-To modify the foreground color you can also use the `\textcolor{}{}` command.
-To change the background, use the `\colorbox{}{}` command.
+To change the foreground color, use the `\textcolor{}{}` command.
+To change the background color, use the `\colorbox{}{}` command.
 
   
 The first argument of these commands is a color specified as:

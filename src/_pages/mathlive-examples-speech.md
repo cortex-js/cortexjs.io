@@ -48,7 +48,7 @@ To use Volker Sorge's SRE:
 1. Include the browser version of the SRE JavaScript file in your project. You can download it on [GitHub](https://github.com/zorkow/speech-rule-engine)
 2. Set the `textToSpeechRules` configuration key to `'sre'`.
 
-You can configure SRE by setting the `textToSpeechRulesOptions` configuration key. For example:
+To configure SRE, set the `textToSpeechRulesOptions` configuration key. For example:
 
 ```javascript
 textToSpeechRulesOptions: {

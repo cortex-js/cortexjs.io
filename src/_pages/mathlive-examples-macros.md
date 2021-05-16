@@ -27,8 +27,7 @@ head:
 MathLive has over [800 Latex commands](https://mathlive.io/reference.html) predefined. Some are primitives but others
 are macros, that is commands defined with a Latex expression.
 
-You can view the default macros by inspecting the `macros` property of the 
-config object:
+To view the default macros, inspect the `macros` option:
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
@@ -40,7 +39,7 @@ console.log(mf.getOption('macros'));
 </div>
 </code-playground>
 
-You can add (or remove) macros by using `setOptions({macros: ...})`.
+To add (or remove) macros use `setOptions({macros: ...})`.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';

@@ -37,11 +37,19 @@ sidebar:
   body.ready .math {
     display: inline;
   }
+  .deprecated {
+    background: #fafafa;
+    padding: 1em;
+    border-left: 4px solid rgb(230,134,25);
+  }
+  .deprecated h3 {
+    margin: 0 0 0.5em 0;
+  }
   
 </style>
 
-To find the name of a LaTeX command if you can draw the shape you are looking 
-for, use [Detexify](http://detexify.kirelabs.org/classify.html).
+To find the name of a LaTeX command maching a shape you can draw, use 
+[Detexify](http://detexify.kirelabs.org/classify.html).
 
 ## Fractions and Binomials
 
@@ -53,37 +61,48 @@ for, use [Detexify](http://detexify.kirelabs.org/classify.html).
 The `\dfrac` command typesets its content in Display style even when it is in a context
 that would normally use a different style, such as in a superscript.
 
-The `\tfrac` command uses Text style (inline) even in a context that would  normally use Display style.
+The `\tfrac` command uses Text style (inline) even in a context that would  
+normally use Display style.
 
 * <span class='math'>$$\cfrac{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\cfrac{}{}`
-* <span class='math'>$$\binom{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\binom{}{}`
-* <span class='math'>$$\dbinom{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\dbinom{}{}`
-* <span class='math'>$$\tbinom{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\tbinom{}{}`
 * <span class='math'>$$\pdiff{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\pdiff{}{}`
 {.command-list}
 
+---
+
+* <span class='math'>$$\binom{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\binom{}{}`
+* <span class='math'>$$\dbinom{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\dbinom{}{}`
+* <span class='math'>$$\tbinom{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\tbinom{}{}`
+{.command-list}
+
+<section class='deprecated'>
 The following commands are supported but their usage is generally discouraged
 when creating modern LaTeX content.
 
+* <span class='math'>$$a \over b $$</span> `a \over b`
+* <span class='math'>$$a \atop b $$</span> `a \atop b`
+* <span class='math'>$$n \choose k $$</span> `n \choose k`
 * <span class='math'>$${\unicode{"2B1A} \overwithdelims\lbrace\rbrace \unicode{"2B1A}} $$</span> `\overwithdelims\lbrace\rbrace`
 * <span class='math'>$${\unicode{"2B1A} \atopwithdelims\lbrace\rbrace \unicode{"2B1A}} $$</span> `\atopwithdelims\lbrace\rbrace`
-* <span class='math'>$$\unicode{"2B1A} \over \unicode{"2B1A} $$</span> `\over `
-* <span class='math'>$$\unicode{"2B1A} \atop \unicode{"2B1A} $$</span> `\atop `
-* <span class='math'>$$\unicode{"2B1A} \choose \unicode{"2B1A} $$</span> `\choose `
 {.command-list}
 
+</section>
 
-## Operators
+## Binary Operators
+
+Some operators (`+`, `-`, etc...) can also be used as a unary operator, and
+their spacing will be adjusted accordingly. For example in $$-1-2$$ (`-1-2`)
+there is less space between `-` and `1` then there is between `-` and `2`.
 
 * <span class='math'>$$+ $$</span>   `+`
 * <span class='math'>$$- $$</span>   `-`
 * <span class='math'>$$\pm $$</span>   `\pm`
 * <span class='math'>$$\mp $$</span>   `\mp`
 * <span class='math'>$$* $$</span>   `*`
+* <span class='math'>$$\cdot $$</span>   `\cdot`
 * <span class='math'>$$\times $$</span>   `\times`
 * <span class='math'>$$\div $$</span>   `\div`
 * <span class='math'>$$\divides $$</span>   `\divides`
-* <span class='math'>$$\cdot $$</span>   `\cdot`
 * <span class='math'>$$\sqrt{\unicode{"2B1A}} $$</span> `\sqrt{}`
 * <span class='math'>$$\sqrt[\unicode{"2B1A}]{\unicode{"2B1A}} $$</span> `\sqrt[]{}`
 * <span class='math'>$$\surd $$</span>   `\surd{}` 
@@ -166,21 +185,32 @@ when creating modern LaTeX content.
 
 
 
-## Extensible Operators
+## Prefix Operators
 
-To force the display of the limits above and below the operator, use `\limits`. To force the display of the limits to be adjacent to the operator, use `\nolimits`.
+Operators display their limits above and below or adjacent to the operator, 
+depending on the math style (Display or Inline).
 
-`\sum_{n=0}^\infty\nolimits`
+To force the display of the limits above and below the operator, use `\limits`. 
 
-<span class='math'>$$\sum_{n=0}^\infty\nolimits</span> 
+To force the display of the limits to be adjacent to the operator, use `\nolimits`.
+
+The `\intop` and `\ointop` commands display their limits above and below.
+
+
+<span class='math'>$$\sum_{n=0}^\infty\nolimits$$</span> `\sum_{n=0}^\infty\nolimits` 
   
   
-
-* <span class='math'>$$\sum $$</span> `\sum`
-* <span class='math'>$$\prod $$</span> `\prod`
+* <span class='math'>$$\sum_{n=0}^\infty $$</span> `\sum`
+* <span class='math'>$$\prod_{n=0}^\infty $$</span> `\prod`
+* <span class='math'>$$\coprod_{n=0}^\infty $$</span> `\coprod`
+* <span class='math'>$$\int_0^\infty $$</span> `\int`
+* <span class='math'>$$\intop_0^\infty $$</span> `\intop`
+* <span class='math'>$$\iint_0^\infty $$</span> `\iint` -- Double integral
+* <span class='math'>$$\iiint_0^\infty $$</span> `\iiint` -- Tripe integral
+* <span class='math'>$$\oint_C $$</span> `\oint` -- Contour integral
+* <span class='math'>$$\smallint $$</span> `\smallint` -- Always displayed small
 * <span class='math'>$$\bigcup $$</span> `\bigcup`
 * <span class='math'>$$\bigcap $$</span> `\bigcap`
-* <span class='math'>$$\coprod $$</span> `\coprod`
 * <span class='math'>$$\bigvee $$</span> `\bigvee`
 * <span class='math'>$$\bigwedge $$</span> `\bigwedge`
 * <span class='math'>$$\biguplus $$</span> `\biguplus`
@@ -188,42 +218,39 @@ To force the display of the limits above and below the operator, use `\limits`. 
 * <span class='math'>$$\bigoplus $$</span> `\bigoplus`
 * <span class='math'>$$\bigodot $$</span> `\bigodot`
 * <span class='math'>$$\bigsqcup $$</span> `\bigsqcup`
-* <span class='math'>$$\smallint $$</span> `\smallint`
-* <span class='math'>$$\intop $$</span> `\intop`
-* <span class='math'>$$\int $$</span> `\int`
-* <span class='math'>$$\iint $$</span> `\iint`
-* <span class='math'>$$\iiint $$</span> `\iiint`
-* <span class='math'>$$\oint $$</span> `\oint`
-* <span class='math'>$$\oiint $$</span> `\oiint`
-* <span class='math'>$$\oiiint $$</span> `\oiiint`
+{.command-list}
+
+----
+
+* <span class='math'>$$\oiint $$</span> `\oiint` -- Surface integral
+* <span class='math'>$$\oiiint $$</span> `\oiiint` -- Volume integral
 * <span class='math'>$$\intclockwise $$</span> `\intclockwise`
 * <span class='math'>$$\varointclockwise $$</span> `\varointclockwise`
 * <span class='math'>$$\ointctrclockwise $$</span> `\ointctrclockwise`
 * <span class='math'>$$\intctrclockwise $$</span> `\intctrclockwise`
+* <span class='math'>$$\Cap $$</span> `\Cap`
+* <span class='math'>$$\Cup $$</span> `\Cup`
+* <span class='math'>$$\doublecap $$</span> `\doublecap`
+* <span class='math'>$$\doublecup $$</span> `\doublecup`
 * <span class='math'>$$\sqcup $$</span> `\sqcup`
 * <span class='math'>$$\sqcap $$</span> `\sqcap`
 * <span class='math'>$$\uplus $$</span> `\uplus`
 * <span class='math'>$$\wr $$</span> `\wr`
 * <span class='math'>$$\amalg $$</span> `\amalg`
-* <span class='math'>$$\Cap $$</span> `\Cap`
-* <span class='math'>$$\Cup $$</span> `\Cup`
-* <span class='math'>$$\doublecap $$</span> `\doublecap`
-* <span class='math'>$$\doublecup $$</span> `\doublecup`
 {.command-list}
 
 
 ## Logic
 
+### Quantifiers
+
 * <span class='math'>$$\forall $$</span>   `\forall`
 * <span class='math'>$$\exists $$</span>   `\exists`
 * <span class='math'>$$\nexists $$</span>   `\nexists`
-* <span class='math'>$$\to $$</span>   `\to`
-* <span class='math'>$$\gets $$</span>   `\gets`
-* <span class='math'>$$\implies $$</span>   `\implies`
-* <span class='math'>$$\impliedby $$</span>   `\impliedby`
-* <span class='math'>$$\biconditional $$</span>   `\biconditional`
-* <span class='math'>$$\therefore $$</span>   `\therefore`
-* <span class='math'>$$\because $$</span>   `\because`
+{.command-list}
+
+### Unary/Binary Operators
+
 * <span class='math'>$$\land $$</span>   `\land`
 * <span class='math'>$$\wedge $$</span>   `\wedge`
 * <span class='math'>$$\lor $$</span>   `\lor`
@@ -233,15 +260,27 @@ To force the display of the limits above and below the operator, use `\limits`. 
 * <span class='math'>$$\nor $$</span>   `\nor`
 * <span class='math'>$$\curlywedge $$</span>   `\curlywedge`
 * <span class='math'>$$\curlyvee $$</span>   `\curlyvee`
-* <span class='math'>$$\leftrightarrow $$</span>   `\leftrightarrow`
-* <span class='math'>$$\Leftrightarrow $$</span>   `\Leftrightarrow`
-* <span class='math'>$$\models $$</span>   `\models`
-* <span class='math'>$$\vdash $$</span>   `\vdash`
-* <span class='math'>$$\dashv $$</span>   `\dashv`
-* <span class='math'>$$\roundimplies $$</span>   `\roundimplies`
 * <span class='math'>$$\lnot $$</span>   `\lnot`
 * <span class='math'>$$\neg $$</span>   `\neg`
 {.command-list}
+
+### Relational Operators
+
+* <span class='math'>$$\to $$</span>   `\to`
+* <span class='math'>$$\gets $$</span>   `\gets`
+* <span class='math'>$$\implies $$</span>   `\implies`
+* <span class='math'>$$\impliedby $$</span>   `\impliedby`
+* <span class='math'>$$\biconditional $$</span>   `\biconditional`
+* <span class='math'>$$\therefore $$</span>   `\therefore`
+* <span class='math'>$$\because $$</span>   `\because`
+* <span class='math'>$$\leftrightarrow $$</span>   `\leftrightarrow`
+* <span class='math'>$$\Leftrightarrow $$</span>   `\Leftrightarrow`
+* <span class='math'>$$\roundimplies $$</span>   `\roundimplies`
+* <span class='math'>$$\models $$</span>   `\models`
+* <span class='math'>$$\vdash $$</span>   `\vdash`
+* <span class='math'>$$\dashv $$</span>   `\dashv`
+{.command-list}
+
 
 ## Arrows
 
@@ -308,7 +347,7 @@ To force the display of the limits above and below the operator, use `\limits`. 
 * <span class='math'>$$\multimap $$</span>   `\multimap`
 {.command-list}
 
-## Negated Arrows
+### Negated Arrows
 
 * <span class='math'>$$\nrightarrow $$</span>   `\nrightarrow`
 * <span class='math'>$$\nleftarrow $$</span>   `\nleftarrow`
@@ -320,6 +359,25 @@ To force the display of the limits above and below the operator, use `\limits`. 
 
 
 ## Accents
+
+Accents have a fixed width and do not stretch. For example, compare:
+
+* <span class='math'>$$\vec{ABC}$$</span> `\vec{ABC}` 
+
+and 
+
+* <span class='math'>$$\overrightarrow{ABC}$$</span> `\overrightarrow{ABC}`.
+
+<section class='deprecated'>
+The following commands are supported for compatibility with existing content,
+but their use is generally discouraged when creating new LaTeX content
+if there is an equivalent Unicode character available.
+
+For example use $$é$$ (`é`) rather than $$\\'{e}$$ (`\'{e}`).
+
+</section>
+
+---
 
 * <span class='math'>$$\acute{\unicode{"2B1A}} $$</span> `\acute{}`
 * <span class='math'>$$\grave{\unicode{"2B1A}} $$</span> `\grave{}`
@@ -333,19 +391,12 @@ To force the display of the limits above and below the operator, use `\limits`. 
 * <span class='math'>$$\hat{\unicode{"2B1A}} $$</span> `\hat{}`
 * <span class='math'>$$\vec{\unicode{"2B1A}} $$</span> `\vec{}`
 * <span class='math'>$$\\^{e} $$</span> `\^{e}`
-* <span class='math'>$$\`{e} $$</span> `\`{e}`
+* <span class='math'>$$\\`{e} $$</span> <code>\`{e}</code>
 * <span class='math'>$$\\'{e} $$</span> `\'{e}`
 * <span class='math'>$$\c{c} $$</span> `\c{c}`
 * <span class='math'>$$\\~{n} $$</span>   `\~{n}` 
 {.command-list}
 
-Accents have a fixed width and do not stretch. For example, compare:
-
-* <span class='math'>$$\vec{ABC}$$</span> `\vec{ABC}` 
-
-and 
-
-* <span class='math'>$$\overrightarrow{ABC}$$</span> `\overrightarrow{ABC}`.
 
 ## Extensible Symbols
 
@@ -379,32 +430,32 @@ and
 
 ---
 
-* <span class='math'>$$\xrightarrow[below]{above}=0 $$</span> `\xrightarrow[]{}`
-* <span class='math'>$$\xleftarrow[below]{above}=0 $$</span> `\xleftarrow[]{}`
-* <span class='math'>$$\xRightarrow[below]{above}=0 $$</span> `\xRightarrow[]{}`
-* <span class='math'>$$\xLeftarrow[below]{above}=0 $$</span> `\xLeftarrow[]{}`
-* <span class='math'>$$\xleftharpoonup[below]{above}=0 $$</span> `\xleftharpoonup[]{}`
-* <span class='math'>$$\xleftharpoondown[below]{above}=0 $$</span> `\xleftharpoondown[]{}`
-* <span class='math'>$$\xrightharpoonup[below]{above}=0 $$</span> `\xrightharpoonup[]{}`
-* <span class='math'>$$\xrightharpoondown[below]{above}=0 $$</span> `\xrightharpoondown[]{}`
-* <span class='math'>$$\xlongequal[below]{above}=0 $$</span> `\xlongequal[]{}`
-* <span class='math'>$$\xtwoheadleftarrow[below]{above}=0 $$</span> `\xtwoheadleftarrow[]{}`
-* <span class='math'>$$\xtwoheadrightarrow[below]{above}=0 $$</span> `\xtwoheadrightarrow[]{}`
-* <span class='math'>$$\xleftrightarrow[below]{above}=0 $$</span> `\xleftrightarrow[]{}`
-* <span class='math'>$$\xLeftrightarrow[below]{above}=0 $$</span> `\xLeftrightarrow[]{}`
-* <span class='math'>$$\xrightleftharpoons[below]{above}=0 $$</span> `\xrightleftharpoons[]{}`
-* <span class='math'>$$\xleftrightharpoons[below]{above}=0 $$</span> `\xleftrightharpoons[]{}`
-* <span class='math'>$$\xhookleftarrow[below]{above}=0 $$</span> `\xhookleftarrow[]{}`
-* <span class='math'>$$\xhookrightarrow[below]{above}=0 $$</span> `\xhookrightarrow[]{}`
-* <span class='math'>$$\xmapsto[below]{above}=0 $$</span> `\xmapsto[]{}`
-* <span class='math'>$$\xtofrom[below]{above}=0 $$</span> `\xtofrom[]{}`
-* <span class='math'>$$\xrightleftarrows[below]{above}=0 $$</span> `\xrightleftarrows[]{}`
-* <span class='math'>$$\xrightequilibrium[below]{above}=0 $$</span> `\xrightequilibrium[]{}`
-* <span class='math'>$$\xleftequilibrium[below]{above}=0 $$</span> `\xleftequilibrium[]{}`
+* <span class='math'>$$\xrightarrow[below]{above} $$</span> `\xrightarrow[]{}`
+* <span class='math'>$$\xleftarrow[below]{above} $$</span> `\xleftarrow[]{}`
+* <span class='math'>$$\xRightarrow[below]{above} $$</span> `\xRightarrow[]{}`
+* <span class='math'>$$\xLeftarrow[below]{above} $$</span> `\xLeftarrow[]{}`
+* <span class='math'>$$\xleftharpoonup[below]{above} $$</span> `\xleftharpoonup[]{}`
+* <span class='math'>$$\xleftharpoondown[below]{above} $$</span> `\xleftharpoondown[]{}`
+* <span class='math'>$$\xrightharpoonup[below]{above} $$</span> `\xrightharpoonup[]{}`
+* <span class='math'>$$\xrightharpoondown[below]{above} $$</span> `\xrightharpoondown[]{}`
+* <span class='math'>$$\xlongequal[below]{above} $$</span> `\xlongequal[]{}`
+* <span class='math'>$$\xtwoheadleftarrow[below]{above} $$</span> `\xtwoheadleftarrow[]{}`
+* <span class='math'>$$\xtwoheadrightarrow[below]{above} $$</span> `\xtwoheadrightarrow[]{}`
+* <span class='math'>$$\xleftrightarrow[below]{above} $$</span> `\xleftrightarrow[]{}`
+* <span class='math'>$$\xLeftrightarrow[below]{above} $$</span> `\xLeftrightarrow[]{}`
+* <span class='math'>$$\xrightleftharpoons[below]{above} $$</span> `\xrightleftharpoons[]{}`
+* <span class='math'>$$\xleftrightharpoons[below]{above} $$</span> `\xleftrightharpoons[]{}`
+* <span class='math'>$$\xhookleftarrow[below]{above} $$</span> `\xhookleftarrow[]{}`
+* <span class='math'>$$\xhookrightarrow[below]{above} $$</span> `\xhookrightarrow[]{}`
+* <span class='math'>$$\xmapsto[below]{above} $$</span> `\xmapsto[]{}`
+* <span class='math'>$$\xtofrom[below]{above} $$</span> `\xtofrom[]{}`
+* <span class='math'>$$\xrightleftarrows[below]{above} $$</span> `\xrightleftarrows[]{}`
+* <span class='math'>$$\xrightequilibrium[below]{above} $$</span> `\xrightequilibrium[]{}`
+* <span class='math'>$$\xleftequilibrium[below]{above} $$</span> `\xleftequilibrium[]{}`
 {.command-list}
 
 
-## Relations
+## Relational Operators
 
 To display a vertical "stack" of two symbols as a relation, use the `\stackrel`
 command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
@@ -419,6 +470,8 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\ge $$</span>   `\ge`
 * <span class='math'>$$\geq $$</span>   `\geq`
 {.command-list}
+
+---
 
 * <span class='math'>$$\shortparallel $$</span>   `\shortparallel`
 * <span class='math'>$$\leqslant $$</span>   `\leqslant`
@@ -508,7 +561,7 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 {.command-list}
 
 
-## Negated Relations
+### Negated Relations
 
 * <span class='math'>$$\not{=} $$</span> `\not=`
 * <span class='math'>$$\not $$</span> `\not{}`
@@ -554,6 +607,28 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 
 ## Sets
 
+
+* <span class='math'>$$\emptyset $$</span>   `\emptyset`
+* <span class='math'>$$\varnothing $$</span>   `\varnothing`
+* <span class='math'>$$\N $$</span>   `\N`
+* <span class='math'>$$\R $$</span>   `\R`
+* <span class='math'>$$\Q $$</span>   `\Q`
+* <span class='math'>$$\C $$</span>   `\C`
+* <span class='math'>$$\Z $$</span>   `\Z`
+* <span class='math'>$$\P $$</span>   `\P`
+{.command-list}
+
+### Unary/Binary Operators
+
+* <span class='math'>$$\cap $$</span>   `\cap`
+* <span class='math'>$$\cup $$</span>   `\cup`
+* <span class='math'>$$\setminus $$</span>   `\setminus`
+* <span class='math'>$$\smallsetminus $$</span>   `\smallsetminus`
+* <span class='math'>$$\complement $$</span>   `\complement` 
+{.command-list}
+
+### Relational Operators
+
 * <span class='math'>$$\nsupseteqq $$</span>   `\nsupseteqq`
 * <span class='math'>$$\supsetneq $$</span>   `\supsetneq`
 * <span class='math'>$$\varsupsetneq $$</span>   `\varsupsetneq`
@@ -566,11 +641,6 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\supseteqq $$</span>   `\supseteqq`
 * <span class='math'>$$\Supset $$</span>   `\Supset`
 * <span class='math'>$$\sqsupset $$</span>   `\sqsupset`
-* <span class='math'>$$\cap $$</span>   `\cap`
-* <span class='math'>$$\cup $$</span>   `\cup`
-* <span class='math'>$$\setminus $$</span>   `\setminus`
-* <span class='math'>$$\smallsetminus $$</span>   `\smallsetminus`
-* <span class='math'>$$\emptyset $$</span>   `\emptyset`
 * <span class='math'>$$\sqsubseteq $$</span>   `\sqsubseteq`
 * <span class='math'>$$\sqsupseteq $$</span>   `\sqsupseteq`
 * <span class='math'>$$\in $$</span>   `\in`
@@ -589,8 +659,6 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\nsupset $$</span>   `\nsupset`
 * <span class='math'>$$\nsubseteq $$</span>   `\nsubseteq`
 * <span class='math'>$$\nsupseteq $$</span>   `\nsupseteq`
-* <span class='math'>$$\varnothing $$</span>   `\varnothing`
-* <span class='math'>$$\complement $$</span>   `\complement` 
 {.command-list}
 
 
@@ -662,12 +730,6 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\partial $$</span>   `\partial`
 * <span class='math'>$$\ell $$</span>   `\ell`
 * <span class='math'>$$\hbar $$</span>   `\hbar`
-* <span class='math'>$$\N $$</span>   `\N`
-* <span class='math'>$$\R $$</span>   `\R`
-* <span class='math'>$$\Q $$</span>   `\Q`
-* <span class='math'>$$\C $$</span>   `\C`
-* <span class='math'>$$\Z $$</span>   `\Z`
-* <span class='math'>$$\P $$</span>   `\P`
 * <span class='math'>$$\pounds $$</span>   `\pounds`
 * <span class='math'>$$\euro $$</span>   `\euro`
 * <span class='math'>$$\And $$</span>   `\And`
@@ -693,15 +755,23 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 
 ## Delimiters
 
-* <span class='math'>$$\left\{x\middle|\fracx2 > 0\right\} $$</span> \left\{x\middle|\fracx2 > 0\right\}`
-{.command-list}
+To grow delimiters based on their content, use `\left...\right`.
+
+Compare
+
+* <span class='math'>$$\lbrace x | \frac{x}{2} > 0\rbrace $$</span> `\lbrace x | \frac{x}{2} > 0\rbrace`
+
+and 
+
+* <span class='math'>$$\left\lbrace x \middle| \frac{x}{2} > 0\right\rbrace $$</span> `\left\lbrace x \middle| \frac{x}{2} > 0\right\rbrace`
+
+To omit the delimiter, use `.`, <span class='math'>$$\left\lparen \frac1x \right.$$</span> `\left\lparen \frac1x \right.`
+
 
 ---
 
 The argument to `\left`, `\right` and `\middle` can be one of the 
-following symbols. 
-
-To omit the delimiter, use `.`, <span class='math'>$$\left\lparen \frac1x \right.$$</span> `\left\lparen \frac1x \right.`
+following commands. 
 
 * <span class='math'>$$\lparen $$</span>   `\lparen`
 * <span class='math'>$$\rparen $$</span>   `\rparen`
@@ -750,16 +820,19 @@ To omit the delimiter, use `.`, <span class='math'>$$\left\lparen \frac1x \right
 * <span class='math'>$$: $$</span>   `:`
 * <span class='math'>$$\Colon $$</span>   `\Colon`
 * <span class='math'>$$\colon $$</span>   `\colon`
-* <span class='math'>$$\cdotp $$</span>   `\cdotp`
-* <span class='math'>$$\vdots $$</span>   `\vdots`
-* <span class='math'>$$\ldotp $$</span>   `\ldotp`
 * <span class='math'>$$, $$</span>   `,`
 * <span class='math'>$$; $$</span>   `;`
+* <span class='math'>$$" $$</span>   `"`
+{.command-list}
+
+### Dots
+* <span class='math'>$$\cdotp $$</span>   `\cdotp`
+* <span class='math'>$$\ldotp $$</span>   `\ldotp`
+* <span class='math'>$$\vdots $$</span>   `\vdots`
 * <span class='math'>$$\cdots $$</span>   `\cdots`
 * <span class='math'>$$\ddots $$</span>   `\ddots`
 * <span class='math'>$$\ldots $$</span>   `\ldots`
 * <span class='math'>$$\mathellipsis $$</span>   `\mathellipsis`
-* <span class='math'>$$" $$</span>   `"`
 {.command-list}
 
 
@@ -873,6 +946,7 @@ relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclo
 * <span class='math'>$$o\llap{/} $$</span> `\llap{}`
 * <span class='math'>$$o\mathllap{/} $$</span> `\mathllap{}`
 * <span class='math'>$$\mathrlap{/}0 $$</span> `\mathrlap{}`
+{.command-list}
 
 ## Spacing
 
@@ -905,19 +979,14 @@ relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclo
 
 #### `\enclose`
 
-* <span class='math'>$$\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground="#fbc0bd"]{x=0} $$</span> `\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground="#fbc0bd"]{x=0}`
-* <span class='math'>$$\enclose{circle}[mathbackground="#fbc0bd"]{\frac1x}$$</span> `\enclose{circle}[mathbackground="#fbc0bd"]{\frac1x}`
-* <span class='math'>$$\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}$$</span> `\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}`
-
-
 The `\enclose` command is very flexible. It accepts three arguments, two of
 which are required:
 
 ```tex
-    \enclose{notation:text}[style:text]{body:math}
+    \enclose{<notation>}[<style>]{<body>}
 ```
 
-- `notation` a list of whitespace-delimited values:
+- `<notation>` a list of whitespace-delimited values:
   - `box`
   - `roundedbox`
   - `circle`
@@ -930,7 +999,7 @@ which are required:
   - `longdiv`
   - `actuarial`
   - `madruwb`
-- `style` an optional list of comma separated attributes including:
+- `<style>` an optional list of comma separated attributes including:
   - `mathbackground="<color>"` background color of the expression
   - `mathcolor="<color>"` color of the notation, for example `red` or `#cd0030`
     or `rgba(205, 0, 11, .4)`.
@@ -940,19 +1009,19 @@ which are required:
   - in addition the style property can include a stroke style expression that
     follows the shorthand syntax of the CSS `border` property, for example
     `"2px solid red"`.
-- `body` a math expression that is "enclosed" by the specified notations
-
-
+- `<body>` a math expression that is "enclosed" by the specified notations
 
 `\enclose` is an extension to LaTeX that follows the `<menclose>`
 definition of [MathML]() and the LaTeX flavor defined by MathJax.{.notice--info}
 
-#### `\cancel`, `\bcancel` and `\xcancel`
+* <span class='math'>$$\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground="#fbc0bd"]{x=0} $$</span> `\enclose{updiagonalstrike roundedbox}[1px solid red, mathbackground="#fbc0bd"]{x=0}`
+* <span class='math'>$$\enclose{circle}[mathbackground="#fbc0bd"]{\frac1x}$$</span> `\enclose{circle}[mathbackground="#fbc0bd"]{\frac1x}`
+* <span class='math'>$$\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}$$</span> `\enclose{roundedbox}[1px dotted #cd0030]{\frac{x^2+y^2}{\sqrt{x^2+y^2}}}`
 
-* <span class='math'>$$\cancel{\unicode{"2B1A}} $$</span> `\cancel{}`
-* <span class='math'>$$\bcancel{\unicode{"2B1A}} $$</span> `\bcancel{}`
-* <span class='math'>$$\xcancel{\unicode{"2B1A}} $$</span> `\xcancel{}`
-{.command-list}
+
+
+
+#### `\cancel`, `\bcancel` and `\xcancel`
 
 | Command...       | is a shorthand for...                                 |
 | :--------------- | :---------------------------------------------------- |
@@ -961,12 +1030,18 @@ definition of [MathML]() and the LaTeX flavor defined by MathJax.{.notice--info}
 | `\xcancel{body}` | `\enclose{updiagonalstrike downdiagonalstrike}{body}` |
 
 
+* <span class='math'>$$\cancel{\unicode{"2B1A}} $$</span> `\cancel{}`
+* <span class='math'>$$\bcancel{\unicode{"2B1A}} $$</span> `\bcancel{}`
+* <span class='math'>$$\xcancel{\unicode{"2B1A}} $$</span> `\xcancel{}`
+{.command-list}
+
 The `\cancel`, `\bcancel` and `\xcancel` commands are part of the
 ["cancel"](https://www.ctan.org/pkg/cancel) LaTeX package.{.notice--info}
 
+
 ### Colors
 
-To modify the foreground color you use the `\textcolor{}{}` command.
+To change the foreground color, use the `\textcolor{}{}` command.
 
 To change the background, use the `\colorbox{}{}` command.
 
@@ -978,20 +1053,24 @@ The first argument of these commands is a color specified as:
   - one of the 10 Mathematica color from `ColorData[97, "ColorList"]` (`m0` to `m9`)
   - a color defined using the syntax from the [`xcolor` package](http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf), for example: `blue!20!black!30!green`
 
-The following color names are recommended. They can be applied using the color 
-keys in the virtual keyboard:
+The following color names are recommended:
 
 ![](/assets/images/mathfield/colors.png)
 
+
 These colors have been carefully selected for a balanced representation of the range of 
-hues on the color circle, with similar lightness and intensity. They will map to  different color values than the `dvips` colors of the same name.{.notice--info}
+hues on the color circle, with similar lightness and intensity. They will map 
+to  different color values than the `dvips` colors of the same name.{.notice--info}
 
 To have proper legibility based on usage, these color names will map to 
 different values when used as a foreground color
 and a background color. To use a specific color value, use a RGB color instead.{.notice--info}
 
-To customize how the color names are interpreted provide a `colorMap`
-or `backgroundColorMap` function.{.notice--info}
+For best portability between versions of TeX, limit yourself to this subset of DVIPS colors: `White`, `Black`,
+`Gray`, `Red`, `Orange`, `Yellow`, `LimeGreen`, `Green`, `TealBlue`, `Blue`,
+`Violet`, `Purple`
+and `Magenta`. Those names are case-sensitive. {.notice--info}
+
 
 
 
@@ -999,59 +1078,103 @@ or `backgroundColorMap` function.{.notice--info}
 
 ## Font Styling
 
+* <span class='math'>$$\text{Don Knuth} $$</span> `\text{}` -- Regular text
+* <span class='math'>$$\mbox{Some text} $$</span> `\mbox{}` -- Alternative to `\text{}`
 * <span class='math'>$$\ensuremath $$</span> `\ensuremath{}`
 * <span class='math'>$$\displaystyle $$</span> `\displaystyle{}`
 * <span class='math'>$$\textstyle $$</span> `\textstyle{}`
 * <span class='math'>$$\scriptstyle $$</span> `\scriptstyle{}`
 * <span class='math'>$$\scriptscriptstyle $$</span> `\scriptscriptstyle{}`
+{.command-list}
 
+---
+* <span class='math'>$$\text{\selectfont} $$</span> `\selectfont`
+{.command-list}
+
+---
+
+### Bold
 
 * <span class='math'>$$\text{\fontseries{b}Don Knuth} $$</span> `\fontseries{}`
-* <span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> `\fontshape{}`
-* <span class='math'>$$\text{\fontfamily{cmtt}Don Knuth} $$</span> `\fontfamily{}`
-* <span class='math'>$$\text{\selectfont} $$</span> `\selectfont`
-* <span class='math'>$${\bf Don Knuth} $$</span> `\bf`
+{.command-list}
 * <span class='math'>$$\boldsymbol{Don Knuth} $$</span> `\boldsymbol{}`
-* <span class='math'>$$\bm{Don Knuth} $$</span> `\bm{}`
-* <span class='math'>$$\bold{Don Knuth} $$</span> `\bold{}`
 * <span class='math'>$$\text{\bfseries Don Knuth} $$</span> `\bfseries`
 * <span class='math'>$$\text{\mdseries Don Knuth} $$</span> `\mdseries`
-* <span class='math'>$$\text{\upshape Don Knuth} $$</span> `\upshape`
-* <span class='math'>$$\text{\slshape Don Knuth} $$</span> `\slshape`
-* <span class='math'>$$\text{\scshape Don Knuth} $$</span> `\scshape`
+* <span class='math'>$$\bm{Don Knuth} $$</span> `\bm{}`
+* <span class='math'>$$\bold{Don Knuth} $$</span> `\bold{}`
 * <span class='math'>$$\textbf{Don Knuth} $$</span> `\textbf{}`
 * <span class='math'>$$\textmd{Don Knuth} $$</span> `\textmd{}`
+* <span class='math'>$$\mathbf{Don Knuth} $$</span> `\mathbf{}`
+* <span class='math'>$$\mathbfit $$</span> `\mathbfit{}`
+{.command-list}
+
+### Italic
+* <span class='math'>$$\text{\upshape Don Knuth} $$</span> `\upshape`
+* <span class='math'>$$\text{\slshape Don Knuth} $$</span> `\slshape`
+{.command-list}
 * <span class='math'>$$\textup{Don Knuth} $$</span> `\textup{}`
 * <span class='math'>$$\textnormal{Don Knuth} $$</span> `\textnormal{}`
 * <span class='math'>$$\textsl{Don Knuth} $$</span> `\textsl{}`
 * <span class='math'>$$\textit{Don Knuth} $$</span> `\textit{}`
+* <span class='math'>$$\mathit{Don Knuth} $$</span> `\mathit{}`
+{.command-list}
+
+### Font Family
+
+#### Typewriter / Monospace
+* <span class='math'>$$\text{\fontfamily{cmtt}Don Knuth} $$</span> `\fontfamily{}`
+* <span class='math'>$$\texttt{Don Knuth} $$</span> `\texttt{}`
+* <span class='math'>$$\mathtt{Don Knuth} $$</span> `\mathtt{}`
+* <span class='math'>$${\ttfamily Don Knuth} $$</span> `\ttfamily`
+{.command-list}
+
+#### Sans-Serif
+* <span class='math'>$$\textsf{Don Knuth} $$</span> `\textsf{}`
+* <span class='math'>$$\mathsf{Don Knuth} $$</span> `\mathsf{}`
+* <span class='math'>$${\sffamily Don Knuth} $$</span> `\sffamily`
+{.command-list}
+
+#### Math Variants
+* <span class='math'>$$\mathfrak{ABCdef} $$</span> 
+  `\mathfrak{ABCdef}` -- Fraktur
+* <span class='math'>$$\mathcal{ABC} $$</span> 
+  `\mathcal{ABCdef}` -- Caligraphic
+* <span class='math'>$$\mathscr{ABCdef} $$</span> 
+  `\mathscr{ABCdef}` -- Script
+* <span class='math'>$$\mathbb{Don Knuth} $$</span> `\mathbb{}` -- Blackboard
+* <span class='math'>$$\Bbb{ABCdef} $$</span> `\Bbb{}` 
+{.command-list} 
+* <span class='math'>$${\rmfamily Don Knuth} $$</span> `\rmfamily`
+* <span class='math'>$${\frak Don Knuth} $$</span> `\frak{}`
+{.command-list}
+
+### Others
+
+* <span class='math'>$$\text{\fontshape{sc}Don Knuth} $$</span> `\fontshape{}` Small Caps
+* <span class='math'>$$\text{\scshape Don Knuth} $$</span> `\scshape`
 * <span class='math'>$$\textsc{Don Knuth} $$</span> `\textsc{}`
 * <span class='math'>$$\textrm{Don Knuth} $$</span> `\textrm{}`
-* <span class='math'>$$\textsf{Don Knuth} $$</span> `\textsf{}`
-* <span class='math'>$$\texttt{Don Knuth} $$</span> `\texttt{}`
-* <span class='math'>$$\mathbf{Don Knuth} $$</span> `\mathbf{}`
-* <span class='math'>$$\mathit{Don Knuth} $$</span> `\mathit{}`
 * <span class='math'>$$\mathrm{Don Knuth} $$</span> `\mathrm{}`
-* <span class='math'>$$\mathsf{Don Knuth} $$</span> `\mathsf{}`
-* <span class='math'>$$\mathtt{Don Knuth} $$</span> `\mathtt{}`
-* <span class='math'>$${\it Don Knuth} $$</span> `\it`
-* <span class='math'>$${\rmfamily Don Knuth} $$</span> `\rmfamily`
-* <span class='math'>$${\sffamily Don Knuth} $$</span> `\sffamily`
-* <span class='math'>$${\ttfamily Don Knuth} $$</span> `\ttfamily`
-* <span class='math'>$$\Bbb{Don Knuth} $$</span> `\Bbb{}`
-* <span class='math'>$$\mathbb{Don Knuth} $$</span> `\mathbb{}`
-* <span class='math'>$${\frak Don Knuth} $$</span> `\frak{}`
-* <span class='math'>$$\mathfrak{Don Knuth} $$</span> `\mathfrak{}`
-* <span class='math'>$$\mathcal{Don Knuth} $$</span> `\mathcal{}`
-* <span class='math'>$$\mathscr{Don Knuth} $$</span> `\mathscr{}`
-* <span class='math'>$$\mathbfit $$</span> `\mathbfit{}`
-* <span class='math'>$$\text{Don Knuth} $$</span> `\text{}`
 * <span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span> `\class{}{}`
 * <span class='math'>$$\cssId{testIdentifier}{Don Knuth} $$</span> `\cssId{}{}`
 * <span class='math'>$${\htmlData Don Knuth} $$</span> `\htmlData{}{}`
-* <span class='math'>$$Don{\em Knuth} $$</span> `\em{}`
-* <span class='math'>$$Don\emph{Knuth} $$</span> `\emph{}`
+* <span class='math'>$$\text{Don {\em{Knuth}}} $$</span> `\em{}` -- Emphasis
+* <span class='math'>$$\text{Don \emph{Knuth} }$$</span> `\emph{}` -- Emphasis
 {.command-list}
+
+
+<section class='deprecated'>
+<h3>Deprecated</h3>
+
+The following commands are supported for compatibility with existing content,
+but their use is generally discouraged when creating new LaTeX content
+
+* <span class='math'>$${\bf Don Knuth} $$</span> `\bf` -- Use `\textbf{}` or `\bfseries` instead.
+* <span class='math'>$${\it Don Knuth} $$</span> `\it` -- Use `\textit{}` or `\itshape` instead.
+{.command-list}
+
+
+</section>
 
 
 ## Sizing
@@ -1162,8 +1285,9 @@ or `backgroundColorMap` function.{.notice--info}
 MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhchem/).
 
 ### Chemical Formulae
-* <span class='math'>$$\ce{H2O} $$</span> `\ce{H2O}$`
+* <span class='math'>$$\ce{H2O} $$</span> `\ce{H2O}`
 * <span class='math'>$$\ce{Sb2O3} $$</span> `\ce{Sb2O3}`
+{.command-list}
 
 
 
@@ -1173,6 +1297,7 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 * <span class='math'>$$\ce{Y^{99+}} $$</span> `\ce{Y^{99+}}`
 * <span class='math'>$$\ce{H+} $$</span> `\ce{H+}`
 * <span class='math'>$$\ce{CrO4^2-} $$</span> `\ce{CrO4^2-}`
+{.command-list}
 
 
 ### Stoichiometric numbers
@@ -1182,6 +1307,7 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 * <span class='math'>$$\ce{1/2 H2O} $$</span> `\ce{1/2 H2O}`
 * <span class='math'>$$\ce{(1/2) H2O} $$</span> `\ce{(1/2) H2O}`
 * <span class='math'>$$\ce{$n$ H2O} $$</span> `\ce{$n$ H2O}`
+{.command-list}
 
 ### Isotopes
 
@@ -1192,6 +1318,7 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 * <span class='math'>$$\ce{^0_-1n-} $$</span> `\ce{^0_-1n-}`
 * <span class='math'>$$\ce{H{}^3HO} $$</span> `\ce{H{}^3HO}`
 * <span class='math'>$$\ce{H^3HO} $$</span> `\ce{H^3HO}`
+{.command-list}
 
 ### Complex Examples
 
@@ -1416,7 +1543,9 @@ A matrix with **double bars** as delimiters.
 
 ### Other Environments
 
-#### `cases`
+#### `cases`, `dcases` and `rcases
+
+Use these environments to write piecewise functions:
 
 ```tex
 f(n) = \begin{cases}
@@ -1432,9 +1561,7 @@ $$f(n) = \begin{cases}
 \end{cases}
 $$
 
-#### `dcases`
-
-Like `cases` but the content is typeset in `displaystyle`.
+To typeset the content in Display style, use `dcases` instead:
 
 ```tex
 f(n) = \begin{dcases}
@@ -1450,9 +1577,8 @@ $$f(n) = \begin{dcases}
 \end{dcases}
 $$
 
-#### `rcases`
 
-Like `cases` but with the brace delimiter on the right.
+To display the brace on the right, use `rcases`.
 
 ```tex
 \begin{rcases}
@@ -1468,20 +1594,46 @@ $$\begin{rcases}
 \end{rcases} = f(n) 
 $$
 
+#### `gather`
+
+Consecutive equations without alignment
+
+```tex
+  \​begin{gather}
+    3(a-x) = 3.5x + a - 1 \\
+    3a - 3x = 3.5x + a - 1 \\
+    a = \frac{13}{4}x - \frac{1}{2}
+  \end{gather}
+```
+
+<span class='math'>$$\begin{gather}
+  3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}
+\end{gather} $$</span>  
+
 
 #### `multline`
 
+The first line is left aligned, the last line is right aligned.
+
 ```tex
   \​begin{multline}
-    x + \frac12 \\ 
-    y - \frac34 
+    3(a-x) = 3.5x + a - 1 \\
+    3a - 3x = 3.5x + a - 1 \\
+    a = \frac{13}{4}x - \frac{1}{2}
   \end{multline}
 ```
 
-<span class='math'>$$\begin{multline}x+\frac12 \\\\ y - \frac34 \end{multline} $$</span>  
+<span class='math'>$$\begin{multline}
+  3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}
+\end{multline} $$</span>  
 
 
 #### Others
+
 
 * <span class='math'>$$\begin{math}x+\frac12\end{math}$$</span> `$$\begin{math}x+\frac12\end{math}$$`
 
@@ -1497,21 +1649,35 @@ $$
 
 * <span class='math'>$$\begin{align*}a & b \\ c & \frac{1}{d}\end{align*} $$</span>  `\​begin{align*}...\end{align*}`
 
-* <span class='math'>$$\begin{aligned}a & b \\ c & \frac{1}{d}\end{aligned} $$</span>  `\​begin{aligned}...\end{aligned}`
 
-* <span class='math'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</span>  `\​begin{eqnarray}...\end{eqnarray}`
+* <span class='math'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</span>  `\​begin{eqnarray}...\end{eqnarray}` -- Avoid, use `align` instead
 
-* <span class='math'>$$\begin{split}a & b \\ c & \frac{1}{d}\end{split} $$</span>  `\​begin{split}...\end{split}`
 
-* <span class='math'>$$\begin{gather}a & b \\ c & \frac{1}{d}\end{gather} $$</span>  `\​begin{gather}...\end{gather}`
 
-* <span class='math'>$$\begin{gathered}a & b \\ c & \frac{1}{d}\end{gathered} $$</span>  `\​begin{gathered}...\end{gathered}`
 
 * <span class='math'>$$\begin{center}\text{first}\end{center}$$</span> `$$\begin{center}\text{first}\end{center} $$</span>  `
+
+---
+
+These environments do not form a math environment by themselves but can 
+can be used as building blocks for more elaborate structures: 
+
+* <span class='math'>$$\begin{gathered}3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}\end{gathered} $$</span>  `\​begin{gathered}...\end{gathered}`
+* <span class='math'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</span>  `\​begin{split}...\end{split}`
+* <span class='math'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</span>  `\​begin{aligned}...\end{aligned}`
 
 
 
 ## TeX Internals
+
+The commands are TeX primitive commands. Most are only useful when writing
+TeX packages or macros.
 
 * `\limits` and `\nolimits`
 * `\relax`
@@ -1520,4 +1686,3 @@ $$
 * `\bgroup` and `\egroup`
 * `\string`
 * `\csname` and `\endcsname`
-* <span class='math'>$$\mbox{Don Knuth} $$</span> `\mbox{}`

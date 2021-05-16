@@ -28,8 +28,9 @@ Let's add an editable mathfield to a web page.
 
 **1. Load  the MathLive library with a `<script>` tag.**
 
-<p class="notice--info">You can read more about options to integrate MathLive in your project in the 
-    <a href="/guides/mathfield-getting-started/">Getting Started Guide</a>.
+<p class="notice--info">Read more about options to integrate MathLive in your 
+  project in the 
+  <a href="/guides/mathfield-getting-started/">Getting Started Guide</a>.
 </p>
 
 
