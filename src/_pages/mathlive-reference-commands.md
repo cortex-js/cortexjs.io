@@ -114,30 +114,49 @@ there is less space between `-` and `1` then there is between `-` and `2`.
 * <span class='math'>$$\dotplus $$</span>   `\dotplus`
 * <span class='math'>$$\doublebarwedge $$</span>   `\doublebarwedge`
 * <span class='math'>$$\divideontimes $$</span>   `\divideontimes`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\boxminus $$</span>   `\boxminus`
+* <span class='math'>$$\boxplus $$</span>   `\boxplus`
+* <span class='math'>$$\boxtimes $$</span>   `\boxtimes`
+* <span class='math'>$$\boxdot $$</span>   `\boxdot`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\circ $$</span>   `\circ`
 * <span class='math'>$$\centerdot $$</span>   `\centerdot`
+* <span class='math'>$$\bullet $$</span>   `\bullet`
+* <span class='math'>$$\circleddash $$</span>   `\circleddash`
+* <span class='math'>$$\circledast $$</span>   `\circledast`
+* <span class='math'>$$\circledcirc $$</span>   `\circledcirc`
+* <span class='math'>$$\oplus $$</span>   `\oplus`
+* <span class='math'>$$\ominus $$</span>   `\ominus`
+* <span class='math'>$$\otimes $$</span>   `\otimes`
+* <span class='math'>$$\odot $$</span>   `\odot`
+* <span class='math'>$$\oslash $$</span>   `\oslash`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\ast $$</span>   `\ast`
+* <span class='math'>$$\star $$</span>   `\star`
 {.command-list}
 
 ## Functions
 
 * <span class='math'>$$\deg $$</span> `\deg`
-* <span class='math'>$$\dim $$</span> `\dim`
 * <span class='math'>$$\exp $$</span> `\exp`
-* <span class='math'>$$\hom $$</span> `\hom`
 * <span class='math'>$$\ker $$</span> `\ker`
 * <span class='math'>$$\ln $$</span> `\ln`
 * <span class='math'>$$\log $$</span> `\log`
 * <span class='math'>$$\lim $$</span> `\lim`
 * <span class='math'>$$\det $$</span> `\det`
-* <span class='math'>$$\max $$</span> `\max`
-* <span class='math'>$$\min $$</span> `\min`
 {.command-list}
 
 
-### Modulo
-
-* <span class='math'>$$n \pmod{3} $$</span> `n \pmod{3}`
-* <span class='math'>$$n \mod{3} $$</span> `n \mod{3}`
-* <span class='math'>$$n \bmod 3 $$</span> `n \bmod 3`
 
 
 ### Trigonometry
@@ -147,7 +166,6 @@ there is less space between `-` and `1` then there is between `-` and `2`.
 * <span class='math'>$$\arctan $$</span> `\arctan`
 * <span class='math'>$$\arctg $$</span> `\arctg`
 * <span class='math'>$$\arcctg $$</span> `\arcctg`
-* <span class='math'>$$\arg $$</span> `\arg`
 * <span class='math'>$$\ch $$</span> `\ch`
 * <span class='math'>$$\cos $$</span> `\cos`
 * <span class='math'>$$\cosh $$</span> `\cosh`
@@ -169,6 +187,34 @@ there is less space between `-` and `1` then there is between `-` and `2`.
 * <span class='math'>$$\tg $$</span> `\tg`
 * <span class='math'>$$\th $$</span> `\th`
 {.command-list}
+
+
+### Bounds
+* <span class='math'>$$\max $$</span> `\max`
+* <span class='math'>$$\min $$</span> `\min`
+* <span class='math'>$$\dim $$</span> `\dim`
+* <span class='math'>$$\sup $$</span> `\sup`
+* <span class='math'>$$\liminf $$</span> `\liminf`
+* <span class='math'>$$\inf $$</span> `\inf`
+* <span class='math'>$$\limsup $$</span> `\limsup`
+{.command-list}
+
+### Projections
+* <span class='math'>$$\Pr $$</span> `\Pr`
+* <span class='math'>$$\hom $$</span> `\hom`
+* <span class='math'>$$\arg $$</span> `\arg`
+{.command-list}
+
+### Modulo
+
+* <span class='math'>$$n \pmod{3} $$</span> `n \pmod{3}`
+* <span class='math'>$$n \mod{3} $$</span> `n \mod{3}`
+* <span class='math'>$$n \bmod 3 $$</span> `n \bmod 3`
+
+### Custom Functions
+
+* <span class='math'>$$\operatorname{argth}(\theta) $$</span> `\operatorname{argth}(\theta)`
+
 
 
 ## Unicode
@@ -264,6 +310,7 @@ The `\intop` and `\ointop` commands display their limits above and below.
 * <span class='math'>$$\neg $$</span>   `\neg`
 {.command-list}
 
+
 ### Relational Operators
 
 * <span class='math'>$$\to $$</span>   `\to`
@@ -286,74 +333,176 @@ The `\intop` and `\ointop` commands display their limits above and below.
 
 * <span class='math'>$$\rightarrow $$</span>   `\rightarrow`
 * <span class='math'>$$\leftarrow $$</span>   `\leftarrow`
-* <span class='math'>$$\Rightarrow $$</span>   `\Rightarrow`
-* <span class='math'>$$\Leftarrow $$</span>   `\Leftarrow`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\twoheadrightarrow $$</span>   `\twoheadrightarrow`
+* <span class='math'>$$\twoheadleftarrow $$</span>   `\twoheadleftarrow`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\rightarrowtail $$</span>   `\rightarrowtail`
+* <span class='math'>$$\leftarrowtail $$</span>   `\leftarrowtail`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\dashrightarrow $$</span>   `\dashrightarrow`
+* <span class='math'>$$\dashleftarrow $$</span>   `\dashleftarrow`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\longrightarrow $$</span>   `\longrightarrow`
 * <span class='math'>$$\longleftarrow $$</span>   `\longleftarrow`
+* <span class='math'>$$\longleftrightarrow $$</span>   `\longleftrightarrow`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\Rightarrow $$</span>   `\Rightarrow`
+* <span class='math'>$$\Leftarrow $$</span>   `\Leftarrow`
+{.command-list}
+  
+<br>
+
 * <span class='math'>$$\Longrightarrow $$</span>   `\Longrightarrow`
 * <span class='math'>$$\Longleftarrow $$</span>   `\Longleftarrow`
-* <span class='math'>$$\longleftrightarrow $$</span>   `\longleftrightarrow`
 * <span class='math'>$$\Longleftrightarrow $$</span>   `\Longleftrightarrow`
+{.command-list}
+
+<br>
+
+
 * <span class='math'>$$\mapsto $$</span>   `\mapsto`
 * <span class='math'>$$\longmapsto $$</span>   `\longmapsto`
+* <span class='math'>$$\multimap $$</span>   `\multimap`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\uparrow $$</span>   `\uparrow`
 * <span class='math'>$$\downarrow $$</span>   `\downarrow`
+* <span class='math'>$$\updownarrow $$</span>   `\updownarrow`
+{.command-list}
+
+<br>
+
+
 * <span class='math'>$$\Uparrow $$</span>   `\Uparrow`
 * <span class='math'>$$\Downarrow $$</span>   `\Downarrow`
-* <span class='math'>$$\updownarrow $$</span>   `\updownarrow`
 * <span class='math'>$$\Updownarrow $$</span>   `\Updownarrow`
-* <span class='math'>$$\hookrightarrow $$</span>   `\hookrightarrow`
-* <span class='math'>$$\hookleftarrow $$</span>   `\hookleftarrow`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\rightharpoonup $$</span>   `\rightharpoonup`
 * <span class='math'>$$\leftharpoonup $$</span>   `\leftharpoonup`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\rightharpoondown $$</span>   `\rightharpoondown`
 * <span class='math'>$$\leftharpoondown $$</span>   `\leftharpoondown`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\rightleftharpoons $$</span>   `\rightleftharpoons`
+* <span class='math'>$$\leftrightharpoons $$</span>   `\leftrightharpoons`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\searrow $$</span>   `\searrow`
 * <span class='math'>$$\nearrow $$</span>   `\nearrow`
 * <span class='math'>$$\swarrow $$</span>   `\swarrow`
 * <span class='math'>$$\nwarrow $$</span>   `\nwarrow`
-* <span class='math'>$$\dashrightarrow $$</span>   `\dashrightarrow`
-* <span class='math'>$$\dashleftarrow $$</span>   `\dashleftarrow`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\Rrightarrow $$</span>   `\Rrightarrow`
 * <span class='math'>$$\Lleftarrow $$</span>   `\Lleftarrow`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\leftrightarrows $$</span>   `\leftrightarrows`
 * <span class='math'>$$\rightleftarrows $$</span>   `\rightleftarrows`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\curvearrowright $$</span>   `\curvearrowright`
 * <span class='math'>$$\curvearrowleft $$</span>   `\curvearrowleft`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\hookrightarrow $$</span>   `\hookrightarrow`
+* <span class='math'>$$\hookleftarrow $$</span>   `\hookleftarrow`
+{.command-list}
+
+
+<br>
+
+* <span class='math'>$$\looparrowright $$</span>   `\looparrowright`
+* <span class='math'>$$\looparrowleft $$</span>   `\looparrowleft`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\circlearrowright $$</span>   `\circlearrowright`
+* <span class='math'>$$\circlearrowleft $$</span>   `\circlearrowleft`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\rightrightarrows $$</span>   `\rightrightarrows`
 * <span class='math'>$$\leftleftarrows $$</span>   `\leftleftarrows`
 * <span class='math'>$$\upuparrows $$</span>   `\upuparrows`
 * <span class='math'>$$\downdownarrows $$</span>   `\downdownarrows`
-* <span class='math'>$$\leftarrowtail $$</span>   `\leftarrowtail`
-* <span class='math'>$$\rightarrowtail $$</span>   `\rightarrowtail`
-* <span class='math'>$$\looparrowright $$</span>   `\looparrowright`
-* <span class='math'>$$\looparrowleft $$</span>   `\looparrowleft`
-* <span class='math'>$$\twoheadleftarrow $$</span>   `\twoheadleftarrow`
-* <span class='math'>$$\twoheadrightarrow $$</span>   `\twoheadrightarrow`
-* <span class='math'>$$\rightleftharpoons $$</span>   `\rightleftharpoons`
-* <span class='math'>$$\leftrightharpoons $$</span>   `\leftrightharpoons`
+{.command-list}
+
+<br>
+
+
 * <span class='math'>$$\Rsh $$</span>   `\Rsh`
 * <span class='math'>$$\Lsh $$</span>   `\Lsh`
-* <span class='math'>$$\circlearrowright $$</span>   `\circlearrowright`
-* <span class='math'>$$\circlearrowleft $$</span>   `\circlearrowleft`
+{.command-list}
+
+<br>
+
+
 * <span class='math'>$$\restriction $$</span>   `\restriction`
 * <span class='math'>$$\upharpoonright $$</span>   `\upharpoonright`
 * <span class='math'>$$\upharpoonleft $$</span>   `\upharpoonleft`
 * <span class='math'>$$\downharpoonright $$</span>   `\downharpoonright`
 * <span class='math'>$$\downharpoonleft $$</span>   `\downharpoonleft`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\rightsquigarrow $$</span>   `\rightsquigarrow`
 * <span class='math'>$$\leadsto $$</span>   `\leadsto`
 * <span class='math'>$$\leftrightsquigarrow $$</span>   `\leftrightsquigarrow`
-* <span class='math'>$$\multimap $$</span>   `\multimap`
 {.command-list}
+
 
 ### Negated Arrows
 
 * <span class='math'>$$\nrightarrow $$</span>   `\nrightarrow`
 * <span class='math'>$$\nleftarrow $$</span>   `\nleftarrow`
+* <span class='math'>$$\nleftrightarrow $$</span>   `\nleftrightarrow`
+{.command-list}
+
+<br>
+
 * <span class='math'>$$\nRightarrow $$</span>   `\nRightarrow`
 * <span class='math'>$$\nLeftarrow $$</span>   `\nLeftarrow`
-* <span class='math'>$$\nleftrightarrow $$</span>   `\nleftrightarrow`
 * <span class='math'>$$\nLeftrightarrow $$</span>   `\nLeftrightarrow`
 {.command-list}
 
@@ -561,7 +710,7 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 {.command-list}
 
 
-### Negated Relations
+### Negated Relational Operators
 
 * <span class='math'>$$\not{=} $$</span> `\not=`
 * <span class='math'>$$\not $$</span> `\not{}`
@@ -836,74 +985,75 @@ following commands.
 {.command-list}
 
 
-
-## Boxes
-
-* <span class='math'>$$\boxminus $$</span>   `\boxminus`
-* <span class='math'>$$\boxplus $$</span>   `\boxplus`
-* <span class='math'>$$\boxtimes $$</span>   `\boxtimes`
-* <span class='math'>$$\boxdot $$</span>   `\boxdot`
-* <span class='math'>$$\square $$</span>   `\square`
-* <span class='math'>$$\Box $$</span>   `\Box`
-* <span class='math'>$$\blacksquare $$</span>   `\blacksquare`
-{.command-list}
-
-
-## Circles
-
-* <span class='math'>$$\circ $$</span>   `\circ`
-* <span class='math'>$$\bigcirc $$</span>   `\bigcirc`
-* <span class='math'>$$\bullet $$</span>   `\bullet`
-* <span class='math'>$$\oplus $$</span>   `\oplus`
-* <span class='math'>$$\ominus $$</span>   `\ominus`
-* <span class='math'>$$\otimes $$</span>   `\otimes`
-* <span class='math'>$$\odot $$</span>   `\odot`
-* <span class='math'>$$\oslash $$</span>   `\oslash`
-* <span class='math'>$$\circleddash $$</span>   `\circleddash`
-* <span class='math'>$$\circledast $$</span>   `\circledast`
-* <span class='math'>$$\circledcirc $$</span>   `\circledcirc`
-* <span class='math'>$$\circledS $$</span>   `\circledS`
-* <span class='math'>$$\circledR $$</span>   `\circledR`
-{.command-list}
-
-
-## Triangles
-
-* <span class='math'>$$\vartriangle $$</span>   `\vartriangle`
-* <span class='math'>$$\triangleq $$</span>   `\triangleq`
-* <span class='math'>$$\vartriangleleft $$</span>   `\vartriangleleft`
-* <span class='math'>$$\trianglelefteq $$</span>   `\trianglelefteq`
-* <span class='math'>$$\ntriangleleft $$</span>   `\ntriangleleft`
-* <span class='math'>$$\ntrianglelefteq $$</span>   `\ntrianglelefteq`
-* <span class='math'>$$\vartriangleright $$</span>   `\vartriangleright`
-* <span class='math'>$$\trianglerighteq $$</span>   `\trianglerighteq`
-* <span class='math'>$$\ntriangleright $$</span>   `\ntriangleright`
-* <span class='math'>$$\ntrianglerighteq $$</span>   `\ntrianglerighteq`
-* <span class='math'>$$\blacktriangleleft $$</span>   `\blacktriangleleft`
-* <span class='math'>$$\blacktriangleright $$</span>   `\blacktriangleright`
-* <span class='math'>$$\bigtriangleup $$</span>   `\bigtriangleup`
-* <span class='math'>$$\bigtriangledown $$</span>   `\bigtriangledown`
-* <span class='math'>$$\triangleleft $$</span>   `\triangleleft`
-* <span class='math'>$$\triangleright $$</span>   `\triangleright`
-* <span class='math'>$$\triangle $$</span>   `\triangle`
-* <span class='math'>$$\blacktriangle $$</span>   `\blacktriangle`
-* <span class='math'>$$\triangledown $$</span>   `\triangledown`
-* <span class='math'>$$\blacktriangledown $$</span>   `\blacktriangledown`
-{.command-list}
-
-
 ## Shapes
 
-* <span class='math'>$$\ast $$</span>   `\ast`
-* <span class='math'>$$\star $$</span>   `\star`
 * <span class='math'>$$\diamond $$</span>   `\diamond`
 * <span class='math'>$$\Diamond $$</span>   `\Diamond`
 * <span class='math'>$$\lozenge $$</span>   `\lozenge`
 * <span class='math'>$$\blacklozenge $$</span>   `\blacklozenge`
 {.command-list}
 
+### Boxes
 
-## Crosses
+* <span class='math'>$$\square $$</span>   `\square`
+* <span class='math'>$$\Box $$</span>   `\Box`
+* <span class='math'>$$\blacksquare $$</span>   `\blacksquare`
+{.command-list}
+
+
+### Circles
+
+* <span class='math'>$$\bigcirc $$</span>   `\bigcirc`
+* <span class='math'>$$\circledS $$</span>   `\circledS`
+* <span class='math'>$$\circledR $$</span>   `\circledR`
+{.command-list}
+
+
+### Triangles
+
+* <span class='math'>$$\triangleleft $$</span>   `\triangleleft`
+* <span class='math'>$$\triangleright $$</span>   `\triangleright`
+* <span class='math'>$$\triangle $$</span>   `\triangle`
+* <span class='math'>$$\triangledown $$</span>   `\triangledown`
+
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\blacktriangleleft $$</span>   `\blacktriangleleft`
+* <span class='math'>$$\blacktriangleright $$</span>   `\blacktriangleright`
+* <span class='math'>$$\blacktriangle $$</span>   `\blacktriangle`
+* <span class='math'>$$\blacktriangledown $$</span>   `\blacktriangledown`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\vartriangle $$</span>   `\vartriangle`
+* <span class='math'>$$\vartriangleleft $$</span>   `\vartriangleleft`
+* <span class='math'>$$\vartriangleright $$</span>   `\vartriangleright`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\triangleq $$</span>   `\triangleq`
+* <span class='math'>$$\trianglelefteq $$</span>   `\trianglelefteq`
+* <span class='math'>$$\trianglerighteq $$</span>   `\trianglerighteq`
+* <span class='math'>$$\ntriangleleft $$</span>   `\ntriangleleft`
+* <span class='math'>$$\ntriangleright $$</span>   `\ntriangleright`
+* <span class='math'>$$\ntrianglelefteq $$</span>   `\ntrianglelefteq`
+* <span class='math'>$$\ntrianglerighteq $$</span>   `\ntrianglerighteq`
+{.command-list}
+
+<br>
+
+* <span class='math'>$$\bigtriangleup $$</span>   `\bigtriangleup`
+* <span class='math'>$$\bigtriangledown $$</span>   `\bigtriangledown`
+{.command-list}
+
+
+
+
+### Crosses
 
 * <span class='math'>$$\dagger $$</span>   `\dagger`
 * <span class='math'>$$\dag $$</span>   `\dag`
@@ -931,11 +1081,6 @@ relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclo
 
 ---
 
-* <span class='math'>$$x=\operatorname{lim}=0 $$</span> `\operatorname{lim}`
-* <span class='math'>$$x=\operatorname*{lim}=0 $$</span> `\operatorname*{lim}`
-{.command-list}
-
----
 
 * <span class='math'>$$\overset{arg}{x=0} $$</span> `\overset{}{}`
 * <span class='math'>$$\underset{arg}{x=0} $$</span> `\underset{}{}`
@@ -958,6 +1103,7 @@ relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclo
 * <span class='math'>$$\unicode{"203A}\;\unicode{"2039} $$</span> `\;`
 * <span class='math'>$$\unicode{"203A}\enskip\unicode{"2039} $$</span> `\enskip`
 * <span class='math'>$$\unicode{"203A}\enspace\unicode{"2039} $$</span> `\enspace`
+* <span class='math'>$$\unicode{"203A}\quad\unicode{"2039} $$</span> `\quad`
 * <span class='math'>$$\unicode{"203A}\qquad\unicode{"2039} $$</span> `\qquad`
 {.command-list}
 
@@ -1270,19 +1416,81 @@ but their use is generally discouraged when creating new LaTeX content
 * <span class='math'>$$\vphantom $$</span> `\vphantom{}`
 * <span class='math'>$$\hphantom $$</span> `\hphantom{}`
 * <span class='math'>$$\phantom $$</span> `\phantom{}`
-* <span class='math'>$$\inf $$</span> `\inf`
-* <span class='math'>$$\Pr $$</span> `\Pr`
-* <span class='math'>$$\sup $$</span> `\sup`
-* <span class='math'>$$\liminf $$</span> `\liminf`
-* <span class='math'>$$\limsup $$</span> `\limsup`
-* <span class='math'>$$\ce $$</span> `\ce{}`
-* <span class='math'>$$\pu $$</span> `\pu{}`
-* <span class='math'>$$\quad $$</span> `\quad`
 {.command-list}
+
+
+## MediaWiki Package (`texvc.sty`)
+
+MathLive supports the commands used by [MediaWiki](https://en.wikipedia.org/wiki/Help:Displaying_a_formula) pages, except for the deprecated ones.
+
+* <span class='math'>$$ \darr $$</span> `\darr`
+* <span class='math'>$$ \dArr $$</span> `\dArr`
+* <span class='math'>$$ \Darr $$</span> `\Darr`
+* <span class='math'>$$ \lang $$</span> `\lang`
+* <span class='math'>$$ \rang $$</span> `\rang`
+* <span class='math'>$$ \uarr $$</span> `\uarr`
+* <span class='math'>$$ \uArr $$</span> `\uArr`
+* <span class='math'>$$ \Uarr $$</span> `\Uarr`
+* <span class='math'>$$ \N $$</span> `\N`
+* <span class='math'>$$ \R $$</span> `\R`
+* <span class='math'>$$ \Z $$</span> `\Z`
+* <span class='math'>$$ \alef $$</span> `\alef`
+* <span class='math'>$$ \alefsym $$</span> `\alefsym`
+* <span class='math'>$$ \Alpha $$</span> `\Alpha`
+* <span class='math'>$$ \Beta $$</span> `\Beta`
+* <span class='math'>$$ \bull $$</span> `\bull`
+* <span class='math'>$$ \Chi $$</span> `\Chi`
+* <span class='math'>$$ \clubs $$</span> `\clubs`
+* <span class='math'>$$ \cnums $$</span> `\cnums`
+* <span class='math'>$$ \Complex $$</span> `\Complex`
+* <span class='math'>$$ \Dagger $$</span> `\Dagger`
+* <span class='math'>$$ \diamonds $$</span> `\diamonds`
+* <span class='math'>$$ \empty $$</span> `\empty`
+* <span class='math'>$$ \Epsilon $$</span> `\Epsilon`
+* <span class='math'>$$ \Eta $$</span> `\Eta`
+* <span class='math'>$$ \exist $$</span> `\exist`
+* <span class='math'>$$ \harr $$</span> `\harr`
+* <span class='math'>$$ \hArr $$</span> `\hArr`
+* <span class='math'>$$ \Harr $$</span> `\Harr`
+* <span class='math'>$$ \hearts $$</span> `\hearts`
+* <span class='math'>$$ \image $$</span> `\image`
+* <span class='math'>$$ \infin $$</span> `\infin`
+* <span class='math'>$$ \Iota $$</span> `\Iota`
+* <span class='math'>$$ \isin $$</span> `\isin`
+* <span class='math'>$$ \Kappa $$</span> `\Kappa`
+* <span class='math'>$$ \larr $$</span> `\larr`
+* <span class='math'>$$ \lArr $$</span> `\lArr`
+* <span class='math'>$$ \Larr $$</span> `\Larr`
+* <span class='math'>$$ \lrarr $$</span> `\lrarr`
+* <span class='math'>$$ \lrArr $$</span> `\lrArr`
+* <span class='math'>$$ \Lrarr $$</span> `\Lrarr`
+* <span class='math'>$$ \Mu $$</span> `\Mu`
+* <span class='math'>$$ \natnums $$</span> `\natnums`
+* <span class='math'>$$ \Nu $$</span> `\Nu`
+* <span class='math'>$$ \Omicron $$</span> `\Omicron`
+* <span class='math'>$$ \plusmn $$</span> `\plusmn`
+* <span class='math'>$$ \rarr $$</span> `\rarr`
+* <span class='math'>$$ \rArr $$</span> `\rArr`
+* <span class='math'>$$ \Rarr $$</span> `\Rarr`
+* <span class='math'>$$ \real $$</span> `\real`
+* <span class='math'>$$ \reals $$</span> `\reals`
+* <span class='math'>$$ \Reals $$</span> `\Reals`
+* <span class='math'>$$ \Rho $$</span> `\Rho`
+* <span class='math'>$$ \sdot $$</span> `\sdot`
+* <span class='math'>$$ \sect $$</span> `\sect`
+* <span class='math'>$$ \spades $$</span> `\spades`
+* <span class='math'>$$ \sub $$</span> `\sub`
+* <span class='math'>$$ \sube $$</span> `\sube`
+* <span class='math'>$$ \supe $$</span> `\supe`
+* <span class='math'>$$ \Tau $$</span> `\Tau`
+* <span class='math'>$$ \thetasym $$</span> `\thetasym`
+* <span class='math'>$$ \weierp $$</span> `\weierp`
+* <span class='math'>$$ \Zeta $$</span> `\Zeta`
 
 ## Chemistry
 
 MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhchem/).
+
 
 ### Chemical Formulae
 * <span class='math'>$$\ce{H2O} $$</span> `\ce{H2O}`
@@ -1543,7 +1751,7 @@ A matrix with **double bars** as delimiters.
 
 ### Other Environments
 
-#### `cases`, `dcases` and `rcases
+#### `cases`, `dcases` and `rcases`
 
 Use these environments to write piecewise functions:
 
@@ -1632,6 +1840,21 @@ The first line is left aligned, the last line is right aligned.
 \end{multline} $$</span>  
 
 
+#### `align`
+
+```tex
+\begin{align}
+  f(x)  & = (a+b)^2 \\
+        & = a^2+2ab+b^2 \\
+\end{align}
+```
+
+
+<span class='math'>$$\begin{align}
+f(x) & = (a+b)^2 \\
+& = a^2+2ab+b^2 \\
+\end{align}$$</span>  
+
 #### Others
 
 
@@ -1645,14 +1868,7 @@ The first line is left aligned, the last line is right aligned.
 * <span class='math'>$$\begin{subequations}x+\frac12\end{subequations} $$</span>  `\​begin{subequations}x+\frac12\end{subequations}`
 
 
-* <span class='math'>$$\begin{align}a & b \\ c & \frac{1}{d}\end{align} $$</span>  `\​begin{align}...\end{align}`
-
-* <span class='math'>$$\begin{align*}a & b \\ c & \frac{1}{d}\end{align*} $$</span>  `\​begin{align*}...\end{align*}`
-
-
 * <span class='math'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</span>  `\​begin{eqnarray}...\end{eqnarray}` -- Avoid, use `align` instead
-
-
 
 
 * <span class='math'>$$\begin{center}\text{first}\end{center}$$</span> `$$\begin{center}\text{first}\end{center} $$</span>  `
@@ -1676,7 +1892,7 @@ can be used as building blocks for more elaborate structures:
 
 ## TeX Internals
 
-The commands are TeX primitive commands. Most are only useful when writing
+The commands are TeX primitives. Most are only useful when writing
 TeX packages or macros.
 
 * `\limits` and `\nolimits`
