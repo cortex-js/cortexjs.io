@@ -845,18 +845,45 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\chi $$</span>   `\chi`
 * <span class='math'>$$\psi $$</span>   `\psi`
 * <span class='math'>$$\omega $$</span>   `\omega`
-* <span class='math'>$$\Gamma $$</span>   `\Gamma`
-* <span class='math'>$$\Delta $$</span>   `\Delta`
-* <span class='math'>$$\Theta $$</span>   `\Theta`
-* <span class='math'>$$\Lambda $$</span>   `\Lambda`
-* <span class='math'>$$\Xi $$</span>   `\Xi`
-* <span class='math'>$$\Pi $$</span>   `\Pi`
-* <span class='math'>$$\Sigma $$</span>   `\Sigma`
-* <span class='math'>$$\Upsilon $$</span>   `\Upsilon`
-* <span class='math'>$$\Phi $$</span>   `\Phi`
-* <span class='math'>$$\Psi $$</span>   `\Psi`
-* <span class='math'>$$\Omega $$</span>   `\Omega`
 * <span class='math'>$$\digamma $$</span>   `\digamma`
+{.command-list}
+
+---
+* <span class='math'>$$ \Alpha $$</span> `\Alpha`
+* <span class='math'>$$ \Beta $$</span> `\Beta`
+* <span class='math'>$$ \Gamma $$</span>   `\Gamma`
+* <span class='math'>$$\varGamma $$</span>   `\varGamma`
+* <span class='math'>$$\Delta $$</span>   `\Delta`
+* <span class='math'>$$\varDelta $$</span>   `\varDelta`
+* <span class='math'>$$\Epsilon $$</span>   `\Epsilon`
+* <span class='math'>$$\Zeta $$</span>   `\Zeta`
+* <span class='math'>$$\Eta $$</span>   `\Eta`
+* <span class='math'>$$\Theta $$</span>   `\Theta`
+* <span class='math'>$$\varTheta $$</span>   `\varTheta`
+* <span class='math'>$$\Iota $$</span>   `\Iota`
+* <span class='math'>$$\Kappa $$</span>   `\Kappa`
+* <span class='math'>$$\Lambda $$</span>   `\Lambda`
+* <span class='math'>$$\varLambda $$</span>   `\varLambda`
+* <span class='math'>$$\Mu $$</span>   `\Mu`
+* <span class='math'>$$\Nu $$</span>   `\Nu`
+* <span class='math'>$$\Xi $$</span>   `\Xi`
+* <span class='math'>$$\varXi $$</span>   `\varXi`
+* <span class='math'>$$\Omicron $$</span>   `\Omicron`
+* <span class='math'>$$\Pi $$</span>   `\Pi`
+* <span class='math'>$$\varPi $$</span>   `\varPi`
+* <span class='math'>$$\Rho $$</span>   `\rho`
+* <span class='math'>$$\Sigma $$</span>   `\Sigma`
+* <span class='math'>$$\varSigma $$</span>   `\varSigma`
+* <span class='math'>$$\Tau $$</span>   `\Tau`
+* <span class='math'>$$\Phi $$</span>   `\Phi`
+* <span class='math'>$$\varPhi $$</span>   `\varPhi`
+* <span class='math'>$$\Upsilon $$</span>   `\Upsilon`
+* <span class='math'>$$\varUpsilon $$</span>   `\varUpsilon`
+* <span class='math'>$$\Chi $$</span>   `\Chi`
+* <span class='math'>$$\Psi $$</span>   `\Psi`
+* <span class='math'>$$\varPsi $$</span>   `\varPsi`
+* <span class='math'>$$\Omega $$</span>   `\Omega`
+* <span class='math'>$$\varOmega $$</span>   `\varOmega`
 {.command-list}
 
 
