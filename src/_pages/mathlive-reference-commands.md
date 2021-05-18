@@ -23,13 +23,18 @@ sidebar:
 <style>
   ul.command-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   }
   ul.command-list,
   .command-list li {
     margin: 0;
     padding: 10px;
     list-style: none;
+  }
+
+  .command-list li span.math {
+    display: inline-block;
+    width: 80px;
   }
 
   .math {
@@ -65,10 +70,37 @@ sidebar:
     width: auto;
   }
 
+  .full-width table {
+    display: inline-table;
+    width: 100%;
+  }
+
   .center {
     display: flex;
     justify-content: center;
   }
+
+  .no-line td {
+    border: none;
+  }
+  .thin-line td {
+    border-top: 0.5px solid rgba(0, 0, 0, .07);
+    border-bottom: 0.5px solid rgba(0, 0, 0, .07);
+  }
+  .thin-line td:not(:last-child) {
+    border-right: 0.5px solid rgba(0, 0, 0, .07);
+  }
+  .two-col td {
+    width: 50%;
+  }
+  .three-col td {
+    width: 33%;
+  }
+  .math-80px span.math {
+    display: inline-block;
+    width: 80px;
+  }
+
   
 </style>
 
@@ -77,7 +109,7 @@ sidebar:
 To find the name of a LaTeX command matching a shape you can draw, use 
 [Detexify](http://detexify.kirelabs.org/classify.html).
 
-## Math Styles and Text Mode
+## Text Mode, Math Mode and Math Style
 
 ### Math Mode
 
@@ -93,25 +125,69 @@ displayed in a smaller font.
 The appropriate _math style_ is selected automatically, but it can be overridden
 with the following commands:
 - `\displaystyle`: **Display Style** for standalone equations
-- `\textstyle`: **Text Style** for inline math
+- `\textstyle`: **Text Style** is the confusing name for inline math, not for text mode.
 - `\scriptstyle`: **Script Style** for subscripts and superscripts
 - `\scriptscriptstyle`: **Scriptscript Style** for subscripts and superscripts
   of subscripts and superscripts
+
+<div class='no-line two-col'>
 
 | Display Style | Text Style (inline math) | 
 | :---- | :---- |
 | <span class='math'>$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | <span class='math'>$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | 
 | `\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}` | `\textstyle \sum_{i=0}^n \frac{a_i}{1+x}` | 
 
+
+
+| Script Style | Scriptscript Style | 
+| :---- | :---- |
+| <span class='math'>$$\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | <span class='math'>$$\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | 
+| `\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x}` | `\scriptscripstyle \sum_{i=0}^n \frac{a_i}{1+x}` | 
+
+</div>
+
 ### Text Mode
 
 To include some textual comments, switch to **Text Mode** using the 
 `\text{}` command.
 
+<div class='no-line two-col'>
+
 | Math Mode | Text Mode | 
 | :---- | :---- |
 | <span class='math'>$$if and only if x > 0$$</span> | <span class='math'>$$\text{if and only if } x > 0$$</span> | 
 | `if and only if x > 0` | `\text{if and only if } x > 0` | 
+
+</div>
+
+The `\text{}` command will use the font defined by the `font-family` attribute
+of the enclosing mathfield. The size of the text will adjust depending on 
+the current math style (smaller in superscript/subscript).
+
+---
+
+The `\textrm{}` command works like `\text{}` but will use a serif (roman) font.
+
+`\textrm{Don Knuth}_\textrm{Don Knuth}`
+
+<div class='math frame'>$$\textrm{Don Knuth}_\textrm{Don Knuth} $$</div>
+
+---
+
+The `\mbox{}` command uses the same font as `\text` but its size does not 
+account for the current math style.
+
+`\mbox{Don Knuth}_\mbox{Don Knuth}`
+<div class='math frame'>$$\mbox{Don Knuth}_\mbox{Don Knuth} $$</div>
+
+---
+
+The `\textnormal{}` command works like `\text{}`. But it's longer to type.
+
+`\textnormal{Don Knuth}_\textnormal{Don Knuth} `
+
+<div class='math frame'>$$\textnormal{Don Knuth}_\textnormal{Don Knuth} $$</div>
+
 
 When in Text Mode, use `$...$` to switch back to Math Mode, Text Style (inline math) or `\\[...\\]` to switch
 to Math Mode, Display Style.
@@ -126,7 +202,7 @@ to Math Mode, Display Style.
 {.command-list}
 
 The `\dfrac` command typesets its numerator and denominator in Display Style. 
-The `\tfrac` command uses Text Style (inline).
+The `\tfrac` command uses Text Style (inline math).
 
 * <span class='math'>$$\cfrac[l]{1}{x+1} $$</span> `\cfrac[l]{1}{x+1}`
 * <span class='math'>$$\cfrac[r]{1}{x+1} $$</span> `\cfrac[r]{1}{x+1}`
@@ -413,7 +489,7 @@ The `\intop` and `\ointop` commands display their limits above and below by defa
 
 ## Arrows
 
-<section class='no-header center'>
+<section class='full-width no-header center thin-line three-col math-80px'>
 
 | | | |
 |:--- | :--- | :--- |
@@ -451,7 +527,7 @@ The `\intop` and `\ointop` commands display their limits above and below by defa
 
 ### Negated Arrows
 
-<section class='no-header center'>
+<section class='full-width no-header center thin-line two-col math-80px'>
 
 | | | |
 |:--- | :--- | :--- |
@@ -466,13 +542,21 @@ The width of the arrow commands above is fixed. The width of the commands
 below is determined by the length of the content above and below 
 the arrows, which is specified as an argument (and optional argument):
 
-* $$\xrightarrow[\text{long text below}]{}$$ `\xrightarrow[\text{long text below}]{}`
-* $$\xrightarrow{\text{long text above}}$$ `\xrightarrow{\text{long text above}}`
-* $$\xrightarrow[\text{and below}]{\text{long text above}}$$ `\xrightarrow[\text{and below}]{\text{long text above}}`
-{.command-list}
+`\xrightarrow[\text{long text below}]{}`
+
+ <span class='math frame'>$$\xrightarrow[\text{long text below}]{}$$</span> 
 
 
-<section class='no-header center'>
+ `\xrightarrow{\text{long text above}}`
+ 
+ <span class='math frame'>$$\xrightarrow{\text{long text above}}$$</span>
+
+`\xrightarrow[\text{and below}]{\text{long text above}}`
+  
+<span class='math frame'>$$\xrightarrow[\text{and below}]{\text{long text above}}$$</span>
+
+
+<section class='full-width no-header center thin-line two-col math-80px'>
 
 | | |
 |:--- | :--- |
@@ -902,10 +986,14 @@ To negate other relational operators, use the `\not` command, e.g.
 
 To grow delimiters based on their content, use `\left...\right`.
 
+<div class='no-line two-col'>
+
 | Regular delimiters | `\left...\right` | 
 | :---- | :---- |
 | <span class='math'>$$\lbrace x \| \frac{x}{2} > 0\rbrace $$</span>  | <span class='math'>$$\left\lbrace x \middle\| \frac{x}{2} > 0\right\rbrace $$</span> |
 | `\lbrace x \| \frac{x}{2} > 0\rbrace` | `\left\lbrace x \middle\| \frac{x}{2} > 0\right\rbrace` |
+
+</div>
 
 The left and right delimiters do not have to match:
 
@@ -921,6 +1009,7 @@ To omit a delimiter, use `.`:
 
 The argument to `\left`, `\right` and `\middle` can be one of the 
 following commands. 
+
 
 * <span class='math'>$$\lparen $$</span>   `\lparen`
 * <span class='math'>$$\rparen $$</span>   `\rparen`
@@ -1106,7 +1195,7 @@ relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclo
 
 ## Decorations
 
-<section class='no-header center'>
+<section class='no-header thin-line center'>
 
 | |  |  | 
 | :---- | :---- | :---- |
@@ -1134,7 +1223,7 @@ which are required:
 
 - `<notation>` a list of whitespace-delimited values:
 
-<section class='no-header center'>
+<section class='no-header thin-line center'>
 
 | |  | 
 | :---- | :---- | 
@@ -1184,17 +1273,17 @@ They can be combined:
 
 #### `\cancel`, `\bcancel` and `\xcancel`
 
+
+<div class='thin-line two-col'>
+
 | Command...       | is a shorthand for...                                 |
 | :--------------- | :---------------------------------------------------- |
-| `\cancel{body}`  | `\enclose{updiagonalstrike}{body}`                    |
-| `\bcancel{body}` | `\enclose{downdiagonalstrike}{body}`                  |
-| `\xcancel{body}` | `\enclose{updiagonalstrike downdiagonalstrike}{body}` |
+| <span class='math'>$$\cancel{\unicode{"2B1A}} $$</span> `\cancel{body}`  | `\enclose{updiagonalstrike}{body}`                    |
+| <span class='math'>$$\bcancel{\unicode{"2B1A}} $$</span> `\bcancel{body}` | `\enclose{downdiagonalstrike}{body}`                  |
+| <span class='math'>$$\xcancel{\unicode{"2B1A}} $$</span> `\xcancel{body}` | `\enclose{updiagonalstrike downdiagonalstrike}{body}` |
 
+</div>
 
-* <span class='math'>$$\cancel{\unicode{"2B1A}} $$</span> `\cancel{}`
-* <span class='math'>$$\bcancel{\unicode{"2B1A}} $$</span> `\bcancel{}`
-* <span class='math'>$$\xcancel{\unicode{"2B1A}} $$</span> `\xcancel{}`
-{.command-list}
 
 The `\cancel`, `\bcancel` and `\xcancel` commands are part of the
 ["cancel"](https://www.ctan.org/pkg/cancel) LaTeX package.{.notice--info}
@@ -1239,16 +1328,6 @@ and `Magenta`. Those names are case-sensitive. {.notice--info}
 
 ## Font Styling
 
-* <span class='math'>$$\text{Don Knuth} $$</span> `\text{}` -- Regular text
-* <span class='math'>$$\mbox{Some text} $$</span> `\mbox{}` -- Alternative to `\text{}`
-* <span class='math'>$$\ensuremath $$</span> `\ensuremath{}`
-* <span class='math'>$$\displaystyle $$</span> `\displaystyle{}`
-* <span class='math'>$$\textstyle $$</span> `\textstyle{}`
-* <span class='math'>$$\scriptstyle $$</span> `\scriptstyle{}`
-* <span class='math'>$$\scriptscriptstyle $$</span> `\scriptscriptstyle{}`
-{.command-list}
-
----
 * <span class='math'>$$\text{\selectfont} $$</span> `\selectfont`
 {.command-list}
 
@@ -1274,7 +1353,6 @@ and `Magenta`. Those names are case-sensitive. {.notice--info}
 * <span class='math'>$$\text{\slshape Don Knuth} $$</span> `\slshape`
 {.command-list}
 * <span class='math'>$$\textup{Don Knuth} $$</span> `\textup{}`
-* <span class='math'>$$\textnormal{Don Knuth} $$</span> `\textnormal{}`
 * <span class='math'>$$\textsl{Don Knuth} $$</span> `\textsl{}`
 * <span class='math'>$$\textit{Don Knuth} $$</span> `\textit{}`
 * <span class='math'>$$\mathit{Don Knuth} $$</span> `\mathit{}`
@@ -1306,8 +1384,53 @@ and `Magenta`. Those names are case-sensitive. {.notice--info}
 * <span class='math'>$$\Bbb{ABCdef} $$</span> `\Bbb{}` 
 {.command-list} 
 * <span class='math'>$${\rmfamily Don Knuth} $$</span> `\rmfamily`
-* <span class='math'>$${\frak Don Knuth} $$</span> `\frak{}`
+* <span class='math'>$${\frak Don Knuth} $$</span> `{\frak}`
 {.command-list}
+
+
+### MathJax HTML Extension
+
+MathLive support some commands from the [MathJax HTML extension](http://docs.mathjax.org/en/latest/input/tex/extensions/html.html).
+
+`\class{custom-class}{x+1}`
+
+<span class='math frame'>$$\class{custom-class}{x+1} $$</span>
+
+When used in a `<math-field>` component, the class names should refer to a 
+stylesheet defined with a `<style>` tag inside the `<math-field>` element.
+The stylesheet can also be specified by setting ther `innerHTML` property of 
+the `MathFieldElement`.
+
+```html
+<math-field>
+  <style>
+    .custom-class { box-shadow: 2px 2px 2px #000 };
+  </style>
+
+  \class{custom-class}{\frac{1}{x+1}}
+
+</math-field>
+
+```
+---
+
+`\cssId{}{}`
+
+<span class='math frame'>$$\cssId{test-dentifier}{Don Knuth} $$</span> 
+
+---
+
+`\htmlData{}{}`
+ 
+The argument of this command is a comma-delimited list of key/value pairs, e.g. 
+`\htmlData{foo=green,bar=blue}{x=0}`. A corresponding
+  `data-foo` and `data-bar` DOM attribute is generated to the rendered DOM.
+
+`$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} }`
+
+<span class='math frame'>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} } $$</span> 
+ 
+ 
 
 ### Others
 
@@ -1316,9 +1439,6 @@ and `Magenta`. Those names are case-sensitive. {.notice--info}
 * <span class='math'>$$\textsc{Don Knuth} $$</span> `\textsc{}`
 * <span class='math'>$$\textrm{Don Knuth} $$</span> `\textrm{}`
 * <span class='math'>$$\mathrm{Don Knuth} $$</span> `\mathrm{}`
-* <span class='math'>$$\class{testIdentifier}{Don Knuth} $$</span> `\class{}{}`
-* <span class='math'>$$\cssId{testIdentifier}{Don Knuth} $$</span> `\cssId{}{}`
-* <span class='math'>$${\htmlData Don Knuth} $$</span> `\htmlData{}{}`
 * <span class='math'>$$\text{Don {\em{Knuth}}} $$</span> `\em{}` -- Emphasis
 * <span class='math'>$$\text{Don \emph{Knuth} }$$</span> `\emph{}` -- Emphasis
 {.command-list}
@@ -1606,7 +1726,7 @@ Each column is separated by a `&`.
 
 #### `array`
 
-A simple matrix with no delimiters. 
+A simple table with no delimiters. 
 
 ```tex
 \begin{array}{lc}
@@ -1616,7 +1736,6 @@ A simple matrix with no delimiters.
 ```
 
 <div class="math frame">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
-
 
 
 The `{lc}` argument specifies how many columns there are and how they should be 
@@ -1903,7 +2022,7 @@ f(x) & = (a+b)^2 \\
  <div class='math frame'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</div> 
 
 
- `$$\begin{center}\text{first}\end{center} $$`
+ `\begin{center}\text{first}\end{center}`
  
  <div class='math frame'>$$\begin{center}\text{first}\end{center}$$</div>
 
@@ -1934,16 +2053,19 @@ can be used as building blocks for more elaborate structures:
 
 
 
-## TeX Internals
+## TeX Primitive
 
 The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.
 
-* `%`: anything after a `%` character and an end of line character is interpreted as a comment and ignored
+* `%`: anything after a `%` character and an end of line character is 
+interpreted as a comment and ignored
 * `\limits` and `\nolimits`
 * `\relax`
 * `\noexpand`
-* `\obeyspaces`
+* `\obeyspaces` -- In Math Mode, spaces are normally ignored. Using this 
+command spaces will be preserved in Math Mode.
 * `\bgroup` and `\egroup`
 * `\string`
 * `\csname` and `\endcsname`
+* `\ensuremath{}` -- If in Math Mode, does nothing. Otherwise, switch to Math Mode.
