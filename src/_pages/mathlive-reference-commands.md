@@ -31,12 +31,24 @@ sidebar:
     padding: 10px;
     list-style: none;
   }
+
   .math {
-    display: none;
+    visibility: hidden;
   }
+
+  .math.frame {
+    display: flex;
+    justify-content: center;
+    padding: 1em;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+
+
   body.ready .math {
-    display: inline;
+    visibility: visible;
   }
+
   .deprecated {
     background: #fafafa;
     padding: 1em;
@@ -47,6 +59,15 @@ sidebar:
   }
   .no-header thead {
     display: none;
+  }
+
+  table {
+    width: auto;
+  }
+
+  .center {
+    display: flex;
+    justify-content: center;
   }
   
 </style>
@@ -79,7 +100,7 @@ with the following commands:
 
 | Display Style | Text Style (inline math) | 
 | :---- | :---- |
-| $$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$ | $$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$ | 
+| <span class='math'>$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | <span class='math'>$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | 
 | `\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}` | `\textstyle \sum_{i=0}^n \frac{a_i}{1+x}` | 
 
 ### Text Mode
@@ -89,7 +110,7 @@ To include some textual comments, switch to **Text Mode** using the
 
 | Math Mode | Text Mode | 
 | :---- | :---- |
-| $$if and only if x > 0$$ | $$\text{if and only if } x > 0$$ | 
+| <span class='math'>$$if and only if x > 0$$</span> | <span class='math'>$$\text{if and only if } x > 0$$</span> | 
 | `if and only if x > 0` | `\text{if and only if } x > 0` | 
 
 When in Text Mode, use `$...$` to switch back to Math Mode, Text Style (inline math) or `\\[...\\]` to switch
@@ -392,7 +413,7 @@ The `\intop` and `\ointop` commands display their limits above and below by defa
 
 ## Arrows
 
-<section class='no-header'>
+<section class='no-header center'>
 
 | | | |
 |:--- | :--- | :--- |
@@ -424,18 +445,18 @@ The `\intop` and `\ointop` commands display their limits above and below by defa
 | <span class='math'>$$\downharpoonright $$</span>   `\downharpoonright` | <span class='math'>$$\downharpoonleft $$</span>   `\downharpoonleft`  |
 | <span class='math'>$$\restriction $$</span>   `\restriction` |
 | <span class='math'>$$\rightsquigarrow $$</span>   `\rightsquigarrow` | <span class='math'>$$\leftrightsquigarrow $$</span>   `\leftrightsquigarrow` |
-| <span class='math'>$$\leadsto $$</span>   `\leadsto` |{.no-header}
+| <span class='math'>$$\leadsto $$</span>   `\leadsto` |
 
 </section>
 
 ### Negated Arrows
 
-<section class='no-header'>
+<section class='no-header center'>
 
 | | | |
 |:--- | :--- | :--- |
 | <span class='math'>$$\nrightarrow $$</span>   `\nrightarrow` | <span class='math'>$$\nleftarrow $$</span>   `\nleftarrow` | <span class='math'>$$\nleftrightarrow $$</span>   `\nleftrightarrow` |
-| <span class='math'>$$\nRightarrow $$</span>   `\nRightarrow` | <span class='math'>$$\nLeftarrow $$</span>   `\nLeftarrow` | <span class='math'>$$\nLeftrightarrow $$</span>   `\nLeftrightarrow` |{.no-header}
+| <span class='math'>$$\nRightarrow $$</span>   `\nRightarrow` | <span class='math'>$$\nLeftarrow $$</span>   `\nLeftarrow` | <span class='math'>$$\nLeftrightarrow $$</span>   `\nLeftrightarrow` |
 
 </section>
 
@@ -451,7 +472,7 @@ the arrows, which is specified as an argument (and optional argument):
 {.command-list}
 
 
-<section class='no-header'>
+<section class='no-header center'>
 
 | | |
 |:--- | :--- |
@@ -1085,7 +1106,7 @@ relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclo
 
 ## Decorations
 
-<section class='no-header'>
+<section class='no-header center'>
 
 | |  |  | 
 | :---- | :---- | :---- |
@@ -1113,7 +1134,7 @@ which are required:
 
 - `<notation>` a list of whitespace-delimited values:
 
-<section class='no-header'>
+<section class='no-header center'>
 
 | |  | 
 | :---- | :---- | 
@@ -1309,7 +1330,7 @@ and `Magenta`. Those names are case-sensitive. {.notice--info}
 The following commands are supported for compatibility with existing content,
 but their use is generally discouraged when creating new LaTeX content
 
-<section class="no-header">
+<section class="no-header center">
 
 | | | |
 | :---- | :---- |  :---- |
@@ -1329,7 +1350,7 @@ In LaTeX using the sizing commands below may not always achieve the expected res
 
 These size are relative to the `font-size` property of the mathfield.
 
-<section class="no-header">
+<section class="no-header center">
 
 | | | |
 | :---- | :---- |  :---- |
@@ -1348,7 +1369,7 @@ These size are relative to the `font-size` property of the mathfield.
 The size of delimiters can be controlled manually with the commands below. The `\left...\right...` commands calculate automatically the size of the
 delimiters based on the content.
 
-<section class="no-header">
+<section class="no-header center">
 
 | | | |
 | :---- | :---- |  :---- |
@@ -1585,6 +1606,7 @@ Each column is separated by a `&`.
 
 #### `array`
 
+A simple matrix with no delimiters. 
 
 ```tex
 \begin{array}{lc}
@@ -1593,10 +1615,9 @@ Each column is separated by a `&`.
 \end{array}
 ```
 
-<span class="math">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
+<div class="math frame">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 
 
-A simple matrix with no delimiters. 
 
 The `{lc}` argument specifies how many columns there are and how they should be 
 formated:
@@ -1606,7 +1627,7 @@ formated:
 
 To add a vertical line separating columns, add `|` character in the column format:
 
-<span class="math">$$\begin{array}{l|c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
+<div class="math frame">$$\begin{array}{l|c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 
 ```tex
 \begin{array}{l|c}
@@ -1618,7 +1639,7 @@ To add a vertical line separating columns, add `|` character in the column forma
 To add a double vertical line separating columns, add two `|` characters in the 
 column format:
 
-$$\begin{array}{l||c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
+<div class="math frame">$$\begin{array}{l||c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 
 ```tex
 \begin{array}{l||c}
@@ -1629,7 +1650,7 @@ $$\begin{array}{l||c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span>
 
 To add a dashed vertical line between two columns, use `:`:
 
-<span class="math">$$\begin{array}{l:c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
+<div class="math frame">$$\begin{array}{l:c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 
 ```tex
 \begin{array}{l:c}
@@ -1651,7 +1672,7 @@ argument to specify the format of the columns.
 \end{matrix}
 ```
 
-<span class="math">$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$</span>
+<div class="math frame">$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$</div>
 
 
 To specify the format of the columns, use the starred version and an optional
@@ -1664,7 +1685,7 @@ argument. This applies to all the other `matrix` environments.
 \end{matrix*}
 ```
 
-<span class="math">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</span>
+<div class="math frame">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</div>
 
 
 #### `pmatrix`
@@ -1678,7 +1699,7 @@ A matrix with **parentheses** as delimiters.
 \end{pmatrix}
 ```
 
-<span class='math'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</span>
+<div class='math frame'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</div>
 
 #### `bmatrix`
 
@@ -1691,7 +1712,7 @@ A matrix with **square brackets** as delimiters.
 \end{bmatrix}
 ```
 
-<span class='math'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</span>
+<div class='math frame'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</div>
 
 #### `Bmatrix`
 
@@ -1704,7 +1725,7 @@ A matrix with **braces** (curly brackets) as delimiters.
 \end{Bmatrix}
 ```
 
-<span class='math'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</span>
+<div class='math frame'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</div>
 
 #### `vmatrix`
 
@@ -1716,7 +1737,7 @@ A matrix with **single bars** as delimiters.
   c       &   \frac{1}{d}
 \end{vmatrix}
 ```
- <span class='math'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</span>
+ <div class='math frame'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</div>
 
 #### `Vmatrix`
 
@@ -1730,7 +1751,7 @@ A matrix with **double bars** as delimiters.
 ```
 
 
-<span class='math'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</span>
+<div class='math frame'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</div>
 
 #### `matrix*`
 
@@ -1741,14 +1762,14 @@ A matrix with **double bars** as delimiters.
 \end{matrix*}
 ```
 
-<span class='math'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</span>
+<div class='math frame'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</div>
 
 #### `smallmatrix`
 
 ```tex
 \begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}
 ```
-<span class='math'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</span>
+<div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
 
 
 ### Other Environments
@@ -1765,11 +1786,11 @@ f(n) = \begin{cases}
 
 ```
 
-<span class='math'>$$f(n) = \begin{cases}
+<div class='math frame'>$$f(n) = \begin{cases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{cases}
-$$</span>
+$$</div>
 
 To typeset the content in Display style, use `dcases` instead:
 
@@ -1781,11 +1802,11 @@ f(n) = \begin{dcases}
 
 ```
 
-<span class='math'>$$f(n) = \begin{dcases}
+<div class='math frame'>$$f(n) = \begin{dcases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{dcases}
-$$</span>
+$$</div>
 
 
 To display the brace on the right, use `rcases`.
@@ -1798,11 +1819,11 @@ To display the brace on the right, use `rcases`.
 
 ```
 
-<span class='math'>$$\begin{rcases}
+<div class='math frame'>$$\begin{rcases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{rcases} = f(n) 
-$$</span>
+$$</div>
 
 #### `gather`
 
@@ -1816,11 +1837,11 @@ Consecutive equations without alignment
   \end{gather}
 ```
 
-<span class='math'>$$\begin{gather}
+<div class='math frame'>$$\begin{gather}
   3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
     a = \frac{13}{4}x - \frac{1}{2}
-\end{gather} $$</span>  
+\end{gather} $$</div>  
 
 
 #### `multline`
@@ -1835,11 +1856,11 @@ The first line is left aligned, the last line is right aligned.
   \end{multline}
 ```
 
-<span class='math'>$$\begin{multline}
+<div class='math frame'>$$\begin{multline}
   3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
     a = \frac{13}{4}x - \frac{1}{2}
-\end{multline} $$</span>  
+\end{multline} $$</div>  
 
 
 #### `align`
@@ -1852,43 +1873,64 @@ The first line is left aligned, the last line is right aligned.
 ```
 
 
-<span class='math'>$$\begin{align}
+<div class='math frame'>$$\begin{align}
 f(x) & = (a+b)^2 \\
 & = a^2+2ab+b^2 \\
-\end{align}$$</span>  
+\end{align}$$</div>  
 
 #### Others
 
 
-* <span class='math'>$$\begin{math}x+\frac12\end{math}$$</span> `$$\begin{math}x+\frac12\end{math}$$`
+`$$\begin{math}x+\frac12\end{math}$$`
 
-* <span class='math'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</span> `$$\begin{displaymath}x+\frac12\end{displaymath}$$`
-
-
-* <span class='math'>$$\begin{equation}x+\frac12\end{equation} $$</span>  `\​begin{equation}x+\frac12\end{equation}`
-
-* <span class='math'>$$\begin{subequations}x+\frac12\end{subequations} $$</span>  `\​begin{subequations}x+\frac12\end{subequations}`
+<div class='math frame'>$$\begin{math}x+\frac12\end{math}$$</div> 
 
 
-* <span class='math'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</span>  `\​begin{eqnarray}...\end{eqnarray}` -- Avoid, use `align` instead
+`$$\begin{displaymath}x+\frac12\end{displaymath}$$`
+
+<div class='math frame'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</div> 
+
+`\​begin{equation}x+\frac12\end{equation}`
+
+<span class='math frame'>$$\begin{equation}x+\frac12\end{equation} $$</div>  
+
+`\​begin{subequations}x+\frac12\end{subequations}`
+
+<div class='math frame'>$$\begin{subequations}x+\frac12\end{subequations} $$</div> 
+
+ `\​begin{eqnarray}...\end{eqnarray}` -- Avoid, use `align` instead
+ 
+ <div class='math frame'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</div> 
 
 
-* <span class='math'>$$\begin{center}\text{first}\end{center}$$</span> `$$\begin{center}\text{first}\end{center} $$</span>  `
+ `$$\begin{center}\text{first}\end{center} $$`
+ 
+ <div class='math frame'>$$\begin{center}\text{first}\end{center}$$</div>
 
 ---
 
 These environments do not form a math environment by themselves but 
 can be used as building blocks for more elaborate structures: 
 
-* <span class='math'>$$\begin{gathered}3(a-x) = 3.5x + a - 1 \\\\
+`\​begin{gathered}...\end{gathered}`
+
+<div class='math frame'>$$\begin{gathered}3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}\end{gathered} $$</span>  `\​begin{gathered}...\end{gathered}`
-* <span class='math'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}\end{gathered} $$</div>  
+
+
+`\​begin{split}...\end{split}`
+
+<div class='math frame'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</span>  `\​begin{split}...\end{split}`
-* <span class='math'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</div>  
+
+
+`\​begin{aligned}...\end{aligned}`
+
+<div class='math frame'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</span>  `\​begin{aligned}...\end{aligned}`
+    a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</div>  
 
 
 
