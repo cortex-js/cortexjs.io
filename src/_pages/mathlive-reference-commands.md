@@ -51,14 +51,38 @@ sidebar:
   
 </style>
 
-To find the name of a LaTeX command maching a shape you can draw, use 
+# Supported TeX/LaTeX Commands
+
+To find the name of a LaTeX command matching a shape you can draw, use 
 [Detexify](http://detexify.kirelabs.org/classify.html).
 
 ## Math Styles and Text Mode
 
-When in **Math Mode**, the content is laid out using typesetting rules
-specific to math. For example, variables are displayed in italics,
-an appropriate amount of space is inserted around some letters such as "f" to improve their legibility and white spaces are ignored.
+### Math Mode
+
+When in **Math Mode**, the content is laid out using typesetting rules specific
+to math. For example, variables are displayed in italics, an appropriate amount
+of space is inserted around some letters such as "f" to improve their legibility
+and white spaces are ignored.
+
+In Math Mode, the layout and size of some math elements is adjusted based on the
+context in which they are used. For example, superscripts and subscripts are
+displayed in a smaller font.
+
+The appropriate _math style_ is selected automatically, but it can be overridden
+with the following commands:
+- `\displaystyle`: **Display Style** for standalone equations
+- `\textstyle`: **Text Style** for inline math
+- `\scriptstyle`: **Script Style** for subscripts and superscripts
+- `\scriptscriptstyle`: **Scriptscript Style** for subscripts and superscripts
+  of subscripts and superscripts
+
+| Display Style | Text Style (inline math) | 
+| :---- | :---- |
+| $$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$ | $$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$ | 
+| `\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}` | `\textstyle \sum_{i=0}^n \frac{a_i}{1+x}` | 
+
+### Text Mode
 
 To include some textual comments, switch to **Text Mode** using the 
 `\text{}` command.
@@ -68,22 +92,8 @@ To include some textual comments, switch to **Text Mode** using the
 | $$if and only if x > 0$$ | $$\text{if and only if } x > 0$$ | 
 | `if and only if x > 0` | `\text{if and only if } x > 0` | 
 
-
-In Math Mode, the layout and size of some math elements is adjusted based on the context in 
-which they are used. For example, superscripts and subscripts are displayed
-in a smaller font.
-
-The appropriate _math style_ is selected automatically, but it can be overridden with the following commands:
-- `\displaystyle`: **Display Style** for standalone equations
-- `\textstyle`: **Text Style** for inline math
-- `\scriptstyle`: **Script Style** for subscripts and superscripts
-- `\scriptscriptstyle`: **Scriptscript Style** for subscripts and superscripts of subscripts and 
-  superscripts
-
-| Display Style | Text Style (inline math) | 
-| :---- | :---- |
-| $$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$ | $$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$ | 
-| `\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}` | `\textstyle \sum_{i=0}^n \frac{a_i}{1+x}` | 
+When in Text Mode, use `$...$` to switch back to Math Mode, Text Style (inline math) or `\\[...\\]` to switch
+to Math Mode, Display Style.
 
 
 
@@ -94,16 +104,15 @@ The appropriate _math style_ is selected automatically, but it can be overridden
 * <span class='math'>$$\tfrac{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\tfrac{}{}`
 {.command-list}
 
-The `\dfrac` command typesets its content in Display Style.
-
+The `\dfrac` command typesets its numerator and denominator in Display Style. 
 The `\tfrac` command uses Text Style (inline).
 
 * <span class='math'>$$\cfrac[l]{1}{x+1} $$</span> `\cfrac[l]{1}{x+1}`
 * <span class='math'>$$\cfrac[r]{1}{x+1} $$</span> `\cfrac[r]{1}{x+1}`
 {.command-list}
 
-The `\cfrac` (continuous fraction) command has an optional argument, `[l]` or `[r]`, that controls
-if the numerator is left-aligned or right-aligned.
+The `\cfrac` (continuous fraction) command has an optional argument, `[l]` or 
+`[r]`, that controls if the numerator is left-aligned or right-aligned.
 
 
 * <span class='math'>$$\pdiff{\unicode{"2B1A}}{\unicode{"2B1A}} $$</span> `\pdiff{}{}`
@@ -191,11 +200,11 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 ## Functions
 
 * <span class='math'>$$\deg $$</span> `\deg`
+* <span class='math'>$$\det $$</span> `\det`
 * <span class='math'>$$\exp $$</span> `\exp`
 * <span class='math'>$$\ker $$</span> `\ker`
 * <span class='math'>$$\ln $$</span> `\ln`
 * <span class='math'>$$\log $$</span> `\log`
-* <span class='math'>$$\det $$</span> `\det`
 {.command-list}
 
 
@@ -232,6 +241,7 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 
 ### Bounds
+
 * <span class='math'>$$\max $$</span> `\max`
 * <span class='math'>$$\min $$</span> `\min`
 * <span class='math'>$$\sup $$</span> `\sup`
@@ -243,6 +253,7 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 {.command-list}
 
 ### Projections
+
 * <span class='math'>$$\Pr $$</span> `\Pr`
 * <span class='math'>$$\hom $$</span> `\hom`
 * <span class='math'>$$\arg $$</span> `\arg`
@@ -262,6 +273,7 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 ## Unicode
 
+
 * `\unicode{}` - The argument is a Unicode codepoint expressed as a number. To 
 use a hexadecimal number, start the argument with `x` or `"` and use 
 **uppercase** `A`-`F` for hexadecimal digits.
@@ -275,6 +287,9 @@ delimiters are optional when using `"`
 `a`-`f` to specify a Unicode codepoint
   * <span class='math'>$$^^4a $$</span> `^^4a`
   * <span class='math'>$$^^^^2a17 $$</span> `^^^^2a17`
+
+
+The codepoint of the Unicode character &#x2A17; **U+2A17 INTEGRAL WITH LEFTWARDS ARROW WITH HOOK** is 10775 in decimal, 2A17<sub>16</sub> in hexadecimal. The codepoint of the letter J is 004A<sub>16</sub> in hexadecimal{.notice--info}
 
 
 
@@ -470,13 +485,12 @@ and
 <section class='deprecated'>
 The following commands are supported for compatibility with existing content,
 but their use is generally discouraged when creating new LaTeX content
-when there is an equivalent Unicode character available.
+if there is an equivalent Unicode character available.
 
 For example use `é` rather than `\'{e}`.
 
 </section>
 
----
 
 * <span class='math'>$$\acute{\unicode{"2B1A}} $$</span> `\acute{}`
 * <span class='math'>$$\grave{\unicode{"2B1A}} $$</span> `\grave{}`
@@ -490,7 +504,7 @@ For example use `é` rather than `\'{e}`.
 * <span class='math'>$$\hat{\unicode{"2B1A}} $$</span> `\hat{}`
 * <span class='math'>$$\vec{\unicode{"2B1A}} $$</span> `\vec{}`
 * <span class='math'>$$\\^{e} $$</span> `\^{e}`
-* <span class='math'>$$\\`{e} $$</span> <code>\`{e}</code>
+* <span class='math'>$$\\\`{e} $$</span> <code>\`{e}</code>
 * <span class='math'>$$\\'{e} $$</span> `\'{e}`
 * <span class='math'>$$\c{c} $$</span> `\c{c}`
 * <span class='math'>$$\\~{n} $$</span>   `\~{n}` 
@@ -500,31 +514,31 @@ For example use `é` rather than `\'{e}`.
 ### Extensible Accents
 
 * <span class='math'>$$\overline{ABC} $$</span> `\overline{}`
-* <span class='math'>$$\widehat{ABC} $$</span> `\widehat{}`
-* <span class='math'>$$\widecheck{ABC} $$</span> `\widecheck{}`
-* <span class='math'>$$\widetilde{ABC} $$</span> `\widetilde{}`
+* <span class='math'>$$\overgroup{ABC} $$</span> `\overgroup{}`
+* <span class='math'>$$\overbrace{ABC} $$</span> `\overbrace{}`
+* <span class='math'>$$\overlinesegment{ABC} $$</span> `\overlinesegment{}`
 * <span class='math'>$$\overrightarrow{ABC} $$</span> `\overrightarrow{}`
 * <span class='math'>$$\overleftarrow{ABC} $$</span> `\overleftarrow{}`
+* <span class='math'>$$\overleftrightarrow{ABC} $$</span> `\overleftrightarrow{}`
+* <span class='math'>$$\widetilde{ABC} $$</span> `\widetilde{}`
+* <span class='math'>$$\widehat{ABC} $$</span> `\widehat{}`
+* <span class='math'>$$\widecheck{ABC} $$</span> `\widecheck{}`
 * <span class='math'>$$\Overrightarrow{ABC} $$</span> `\Overrightarrow{}`
 * <span class='math'>$$\overleftharpoon{ABC} $$</span> `\overleftharpoon{}`
 * <span class='math'>$$\overrightharpoon{ABC} $$</span> `\overrightharpoon{}`
-* <span class='math'>$$\overleftrightarrow{ABC} $$</span> `\overleftrightarrow{}`
-* <span class='math'>$$\overlinesegment{ABC} $$</span> `\overlinesegment{}`
-* <span class='math'>$$\overgroup{ABC} $$</span> `\overgroup{}`
-* <span class='math'>$$\overbrace{ABC} $$</span> `\overbrace{}`
 {.command-list}
 
 ---
 
 
 * <span class='math'>$$\underline{ABC} $$</span> `\underline{}`
-* <span class='math'>$$\utilde{ABC} $$</span> `\utilde{}`
+* <span class='math'>$$\undergroup{ABC} $$</span> `\undergroup{}`
+* <span class='math'>$$\underbrace{ABC} $$</span> `\underbrace{}`
+* <span class='math'>$$\underlinesegment{ABC} $$</span> `\underlinesegment{}`
 * <span class='math'>$$\underrightarrow{ABC} $$</span> `\underrightarrow{}`
 * <span class='math'>$$\underleftarrow{ABC} $$</span> `\underleftarrow{}`
 * <span class='math'>$$\underleftrightarrow{ABC} $$</span> `\underleftrightarrow{}`
-* <span class='math'>$$\underlinesegment{ABC} $$</span> `\underlinesegment{}`
-* <span class='math'>$$\undergroup{ABC} $$</span> `\undergroup{}`
-* <span class='math'>$$\underbrace{ABC} $$</span> `\underbrace{}`
+* <span class='math'>$$\utilde{ABC} $$</span> `\utilde{}`
 {.command-list}
 
 
@@ -532,8 +546,8 @@ For example use `é` rather than `\'{e}`.
 
 ## Relational Operators
 
-To display a vertical "stack" of two symbols as a relation, use the `\stackrel`
-command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
+To display a vertical "stack" of two symbols as a relational operator, use the 
+`\stackrel` command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 
 * <span class='math'>$$= $$</span>   `=`
 * <span class='math'>$$< $$</span>   `<`
@@ -565,8 +579,6 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\eqsim $$</span>   `\eqsim`
 * <span class='math'>$$\backsimeq $$</span>   `\backsimeq`
 * <span class='math'>$$\lesssim $$</span>   `\lesssim`
-* <span class='math'>$$\nleq $$</span>   `\nleq`
-* <span class='math'>$$\ngeq $$</span>   `\ngeq`
 * <span class='math'>$$\smallsmile $$</span>   `\smallsmile`
 * <span class='math'>$$\smallfrown $$</span>   `\smallfrown`
 * <span class='math'>$$\leqq $$</span>   `\leqq`
@@ -596,7 +608,6 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\between $$</span>   `\between`
 * <span class='math'>$$\pitchfork $$</span>   `\pitchfork`
 * <span class='math'>$$\varpropto $$</span>   `\varpropto`
-* <span class='math'>$$\backepsilon $$</span>   `\backepsilon`
 * <span class='math'>$$\llless $$</span>   `\llless`
 * <span class='math'>$$\gggtr $$</span>   `\gggtr`
 * <span class='math'>$$\doteqdot $$</span>   `\doteqdot`
@@ -631,20 +642,25 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\approx $$</span>   `\approx`
 * <span class='math'>$$\parallel $$</span>   `\parallel`
 * <span class='math'>$$\simeq $$</span>   `\simeq` 
-* <span class='math'>$$\ne $$</span> `\ne`
-* <span class='math'>$$\neq $$</span> `\neq`
 {.command-list}
 
 
 ### Negated Relational Operators
 
+To negate other relational operators, use the `\not` command, e.g. 
+<span class='math'>$$\not\equiv$$</span> `\not\equiv`.
+
+* <span class='math'>$$\ne $$</span> `\ne`
+* <span class='math'>$$\neq $$</span> `\neq`
 * <span class='math'>$$\not{=} $$</span> `\not=`
 * <span class='math'>$$\not $$</span> `\not{}`
 * <span class='math'>$$\nless $$</span>   `\nless`
-* <span class='math'>$$\nleqslant $$</span>   `\nleqslant`
+* <span class='math'>$$\nleq $$</span>   `\nleq`
 * <span class='math'>$$\lneq $$</span>   `\lneq`
 * <span class='math'>$$\lneqq $$</span>   `\lneqq`
 * <span class='math'>$$\nleqq $$</span>   `\nleqq`
+* <span class='math'>$$\nleqslant $$</span>   `\nleqslant`
+* <span class='math'>$$\ngeq $$</span>   `\ngeq`
 * <span class='math'>$$\lvertneqq $$</span>   `\lvertneqq`
 * <span class='math'>$$\lnsim $$</span>   `\lnsim`
 * <span class='math'>$$\lnapprox $$</span>   `\lnapprox`
@@ -727,6 +743,7 @@ command: <span class='math'>$$a\stackrel{?}{=}b $$</span> `a\stackrel{?}{=}b`.
 * <span class='math'>$$\notin $$</span>   `\notin`
 * <span class='math'>$$\ni $$</span>   `\ni`
 * <span class='math'>$$\owns $$</span>   `\owns`
+* <span class='math'>$$\backepsilon $$</span>   `\backepsilon`
 * <span class='math'>$$\subset $$</span>   `\subset`
 * <span class='math'>$$\supset $$</span>   `\supset`
 * <span class='math'>$$\subseteq $$</span>   `\subseteq`
@@ -1077,7 +1094,7 @@ relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclo
 | <span class='math'>$$\colorbox{yellow}{\\[ax^2+bx+c\\]} $$</span> | `\colorbox{yellow}{\[ax^2+bx+c\]}`| The argument is in Text Mode. Use `\[...\]` to switch to math mode.
 | <span class='math'>$$\fcolorbox{#cd0030}{#ffd400}{\unicode{"2B1A}} $$</span> | `\fcolorbox{}{}{}` | 
 | <span class='math'>$$\boxed{1+\frac{1}{x}} $$</span> | `\boxed{1+\frac{1}{x}}` |  
-| <span class='math'>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{"2B1A}} $$</span> | `\bbox[]{}` | 
+| <span class='math'>$$\bbox[#ffd400, solid 2px #ffd400]{\unicode{"2B1A}} $$</span> | `\bbox[]{}` | See [MathJax BBox documentation](http://docs.mathjax.org/en/latest/input/tex/extensions/bbox.html)| 
 | <span class='math'>$$\rule{2em}{1em} $$</span> | `\rule[]{2em}{1em}` | The arguments are the width and height. The optional argument is an offset from the baseline. |
 
 </section>
@@ -1316,16 +1333,16 @@ These size are relative to the `font-size` property of the mathfield.
 
 | | | |
 | :---- | :---- |  :---- |
-| <span class='math'>$$\tiny{e^{i\pi}=0} $$</span> | `\tiny` | 
-| <span class='math'>$$\scriptsize{e^{i\pi}=0} $$</span> | `\scriptsize` | 
-| <span class='math'>$$\footnotesize{e^{i\pi}=0} $$</span> | `\footnotesize` | 
-| <span class='math'>$$\small{e^{i\pi}=0} $$</span> | `\small` |
-| <span class='math'>$$\normalsize{e^{i\pi}=0} $$</span> | `\normalsize` | 
-| <span class='math'>$$\large{e^{i\pi}=0} $$</span> | `\large` | 
-| <span class='math'>$$\Large{e^{i\pi}=0} $$</span> | `\Large` | 
-| <span class='math'>$$\LARGE{e^{i\pi}=0} $$</span> | `\LARGE` | 
-| <span class='math'>$$\huge{e^{i\pi}=0} $$</span> | `\huge` |
-| <span class='math'>$$\Huge{e^{i\pi}=0} $$</span> | `\Huge` | 
+| <span class='math'>$$\tiny{e^{i\pi}+1=0} $$</span> | `\tiny` | 
+| <span class='math'>$$\scriptsize{e^{i\pi}+1=0} $$</span> | `\scriptsize` | 
+| <span class='math'>$$\footnotesize{e^{i\pi}+1=0} $$</span> | `\footnotesize` | 
+| <span class='math'>$$\small{e^{i\pi}+1=0} $$</span> | `\small` |
+| <span class='math'>$$\normalsize{e^{i\pi}+1=0} $$</span> | `\normalsize` | 
+| <span class='math'>$$\large{e^{i\pi}+1=0} $$</span> | `\large` | 
+| <span class='math'>$$\Large{e^{i\pi}+1=0} $$</span> | `\Large` | 
+| <span class='math'>$$\LARGE{e^{i\pi}+1=0} $$</span> | `\LARGE` | 
+| <span class='math'>$$\huge{e^{i\pi}+1=0} $$</span> | `\huge` |
+| <span class='math'>$$\Huge{e^{i\pi}+1=0} $$</span> | `\Huge` | 
 </section>
 
 The size of delimiters can be controlled manually with the commands below. The `\left...\right...` commands calculate automatically the size of the
@@ -1462,6 +1479,24 @@ MathLive supports the commands used by [MediaWiki](https://en.wikipedia.org/wiki
 * <span class='math'>$$ \thetasym $$</span> `\thetasym`
 * <span class='math'>$$ \weierp $$</span> `\weierp`
 * <span class='math'>$$ \Zeta $$</span> `\Zeta`
+{.command-list}
+
+## Physics
+
+
+### Braket Notation 
+
+MathLive supports the [`braket` package](https://ctan.org/pkg/braket)
+
+* <span class='math'>$$\bra{\Psi} $$</span> `\bra{\Psi}` (macro)
+* <span class='math'>$$\ket{\Psi} $$</span> `\ket{\Psi}`	(macro)
+* <span class='math'>$$\braket{ab} $$</span> `\braket{}` (macro)
+* <span class='math'>$$\Bra{ab} $$</span> `\Bra{}` (macro)
+* <span class='math'>$$\Ket{ab} $$</span> `\Ket{}` (macro)
+* <span class='math'>$$\Braket{ab} $$</span> `\Braket{}` (macro)
+{.command-list}
+
+
 
 ## Chemistry (`mhchem` package)
 
@@ -1518,13 +1553,7 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 ## Macros
 
 * <span class='math'>$$\iff $$</span> `\iff`
-* <span class='math'>$$\bra{\Psi} $$</span> `\bra{\Psi}`
-* <span class='math'>$$\ket{\Psi} $$</span> `\ket{\Psi}`	
-* <span class='math'>$$\braket{ab} $$</span> `\braket{}`
 * <span class='math'>$$\set{ab} $$</span> `\set{}`
-* <span class='math'>$$\Bra{ab} $$</span> `\Bra{}`
-* <span class='math'>$$\Ket{ab} $$</span> `\Ket{}`
-* <span class='math'>$$\Braket{ab} $$</span> `\Braket{}`
 * <span class='math'>$$\Set{ x\in\mathbf{R}^2 | 0<{|x|}<5 } $$</span> `\Set{ x\in\mathbf{R}^2 | 0<{|x|}<5 }`
 * <span class='math'>$$\rd $$</span> `\rd`
 * <span class='math'>$$\rD $$</span> `\rD`
@@ -1564,7 +1593,7 @@ Each column is separated by a `&`.
 \end{array}
 ```
 
-$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
+<span class="math">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
 
 
 A simple matrix with no delimiters. 
@@ -1577,7 +1606,7 @@ formated:
 
 To add a vertical line separating columns, add `|` character in the column format:
 
-$$\begin{array}{l|c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
+<span class="math">$$\begin{array}{l|c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
 
 ```tex
 \begin{array}{l|c}
@@ -1600,7 +1629,7 @@ $$\begin{array}{l||c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span>
 
 To add a dashed vertical line between two columns, use `:`:
 
-$$\begin{array}{l:c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
+<span class="math">$$\begin{array}{l:c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</span> 
 
 ```tex
 \begin{array}{l:c}
@@ -1622,7 +1651,7 @@ argument to specify the format of the columns.
 \end{matrix}
 ```
 
-$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$
+<span class="math">$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$</span>
 
 
 To specify the format of the columns, use the starred version and an optional
@@ -1635,7 +1664,7 @@ argument. This applies to all the other `matrix` environments.
 \end{matrix*}
 ```
 
-$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$
+<span class="math">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</span>
 
 
 #### `pmatrix`
@@ -1649,7 +1678,7 @@ A matrix with **parentheses** as delimiters.
 \end{pmatrix}
 ```
 
-<span class='math'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$
+<span class='math'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</span>
 
 #### `bmatrix`
 
@@ -1662,7 +1691,7 @@ A matrix with **square brackets** as delimiters.
 \end{bmatrix}
 ```
 
-<span class='math'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$
+<span class='math'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</span>
 
 #### `Bmatrix`
 
@@ -1675,7 +1704,7 @@ A matrix with **braces** (curly brackets) as delimiters.
 \end{Bmatrix}
 ```
 
-<span class='math'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$
+<span class='math'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</span>
 
 #### `vmatrix`
 
@@ -1687,7 +1716,7 @@ A matrix with **single bars** as delimiters.
   c       &   \frac{1}{d}
 \end{vmatrix}
 ```
- <span class='math'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$
+ <span class='math'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</span>
 
 #### `Vmatrix`
 
@@ -1701,7 +1730,7 @@ A matrix with **double bars** as delimiters.
 ```
 
 
-<span class='math'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$
+<span class='math'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</span>
 
 #### `matrix*`
 
@@ -1712,11 +1741,14 @@ A matrix with **double bars** as delimiters.
 \end{matrix*}
 ```
 
-<span class='math'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$
+<span class='math'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</span>
 
 #### `smallmatrix`
 
-* <span class='math'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$
+```tex
+\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}
+```
+<span class='math'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</span>
 
 
 ### Other Environments
@@ -1733,11 +1765,11 @@ f(n) = \begin{cases}
 
 ```
 
-$$f(n) = \begin{cases}
+<span class='math'>$$f(n) = \begin{cases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{cases}
-$$
+$$</span>
 
 To typeset the content in Display style, use `dcases` instead:
 
@@ -1749,11 +1781,11 @@ f(n) = \begin{dcases}
 
 ```
 
-$$f(n) = \begin{dcases}
+<span class='math'>$$f(n) = \begin{dcases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{dcases}
-$$
+$$</span>
 
 
 To display the brace on the right, use `rcases`.
@@ -1766,11 +1798,11 @@ To display the brace on the right, use `rcases`.
 
 ```
 
-$$\begin{rcases}
+<span class='math'>$$\begin{rcases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{rcases} = f(n) 
-$$
+$$</span>
 
 #### `gather`
 
@@ -1865,6 +1897,7 @@ can be used as building blocks for more elaborate structures:
 The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.
 
+* `%`: anything after a `%` character and an end of line character is interpreted as a comment and ignored
 * `\limits` and `\nolimits`
 * `\relax`
 * `\noexpand`
