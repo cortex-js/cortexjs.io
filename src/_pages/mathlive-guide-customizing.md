@@ -196,13 +196,31 @@ the `=` sign because the limit is displayed in `scriptstyle`.
 
 To set the default mathstyle of a mathfield, use the `defaultMode` option 
 (or the `default-mode` attribute).
+
 Set it to `inline-math` to use `textstyle` or `math` to use `displaystyle`.
 
+By default, the mathfield element behaves as if it had a `display: block`
+CSS property. To get it to behave as a inline element, set 
+`display: inline-block` on the mathfield. This is particularly useful when 
+used in conjunction with `default-mode="inline-math"`.
 
-To increase the default spacing between items, use the `horizontalSpacingScale`
-option (or the `horizontal-spacing-scale` attribute). Setting to a value of 
-`1.5` will increase the spacing by 50%. A value of `1.1` is generally 
-sufficient. This might be useful to make the formulas easier to read.
+
+<!-- htmlmin:ignore -->
+<code-playground layout="stack" class="m-lg w-full-lg">
+  <div slot="html">The answer is &lt;math-field 
+  default-mode="inline-math"
+  style="
+    display: inline-block;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, .3); 
+  "&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+  &lt;/math-field&gt;.
+</div>
+</code-playground>
+<!-- htmlmin:ignore -->
+
+
 
 
 ### Letter Shape Style

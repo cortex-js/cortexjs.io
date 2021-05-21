@@ -101,6 +101,29 @@ sidebar:
     width: 80px;
   }
 
+  .side-by-side {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .side-by-side > * {
+    flex: 1 1 0;
+  }
+  .side-by-side > div.math {
+    display: flex;
+    justify-content: center;
+    padding: 1em;
+    border-right: 1px solid #ddd;
+    margin: .5em;
+  }
+  .side-by-side > pre {
+    background: #f0f0f0;
+    color: #35324e;
+    font-size: .9em;
+    white-space: break-spaces;
+  }
+
+
   
 </style>
 
@@ -168,26 +191,39 @@ the current math style (smaller in superscript/subscript).
 
 The `\textrm{}` command works like `\text{}` but will use a serif (roman) font.
 
-`\textrm{Don Knuth}_\textrm{Don Knuth}`
+<div class="side-by-side">
 
-<div class='math frame'>$$\textrm{Don Knuth}_\textrm{Don Knuth} $$</div>
+  <div class='math frame'>$$\textrm{Don Knuth}_\textrm{Don Knuth} $$</div>
+
+  ```tex
+    \textrm{Don Knuth}_\textrm{Don Knuth}
+  ```
+</div>
 
 ---
 
 The `\mbox{}` command uses the same font as `\text` but its size does not 
 account for the current math style.
 
-`\mbox{Don Knuth}_\mbox{Don Knuth}`
-<div class='math frame'>$$\mbox{Don Knuth}_\mbox{Don Knuth} $$</div>
+<div class="side-by-side">
+  <div class='math frame'>$$\mbox{Don Knuth}_\mbox{Don Knuth} $$</div>
+
+  ```tex
+    \mbox{Don Knuth}_\mbox{Don Knuth}
+  ```
+</div>
 
 ---
 
 The `\textnormal{}` command works like `\text{}`. But it's longer to type.
 
-`\textnormal{Don Knuth}_\textnormal{Don Knuth} `
-
-<div class='math frame'>$$\textnormal{Don Knuth}_\textnormal{Don Knuth} $$</div>
-
+<div class="side-by-side">
+  <div class='math frame'>$$\textnormal{Don Knuth}_\textnormal{Don Knuth} $$</div>
+  
+  ```tex
+    \textnormal{Don Knuth}_\textnormal{Don Knuth}
+  ```
+</div>
 
 When in Text Mode, use `$...$` to switch back to Math Mode, Text Style (inline math) or `\\[...\\]` to switch
 to Math Mode, Display Style.
@@ -393,13 +429,30 @@ The codepoint of the Unicode character &#x2A17; **U+2A17 INTEGRAL WITH LEFTWARDS
 ## Large Operators
 
 Large operators display their limits above and below or adjacent to the operator, 
-depending on the math style (**Display Style** or **Text Style**).
+depending on the math style (**Display Style** or **Text Style**) and on the 
+operator.
 
-To force the display of the limits above and below the operator, use the `\limits` command after the operator.
+The position of the limits can be controlled with `\limits`, `\nolimits` or 
+`\displaylimits` after the operator. The `\limits` command forces the display
+of the limits above and below the operator, `\nolimits` forces the display
+of the limits adjavent to the operator, and `\displaylimits` uses an 
+automatic position, based on the operator and current math style.
 
-To force the display of the limits to be adjacent to the operator, use the `\nolimits` command after the operator.
+<div class='no-line three-col'>
 
-The `\intop` and `\ointop` commands display their limits above and below by default.
+| `\limits` | `\nolimits` | `\displaylimits` |  
+| :---- | :---- |  :---- |
+| <span class='math'>$$\sum_{i=0}^n\limits $$</span> | <span class='math'>$$\sum_{i=0}^n\nolimits $$</span> | <span class='math'>$$\sum_{i=0}^n\displaylimits $$</span> |
+| `\sum_{i=0}^n\limits` | `\sum_{i=0}^n\nolimits` | `\sum_{i=0}^n\displaylimits` |
+| <span class='math'>$$\int_0^\infty\limits $$</span> | <span class='math'>$$\int_0^\infty\nolimits $$</span> | <span class='math'>$$\int_0^\infty\displaylimits $$</span> |
+| `\int_0^\infty\limits` | `\int_0^\infty\nolimits` | `\int_0^\infty\displaylimits` |
+
+</div>
+
+
+
+In Display Style, the `\intop` and `\ointop` commands display their limits 
+above and below by default, while the `\int` command display its limit adjacent.
 
 <span class='math'>$$\sum_{n=0}^\infty\nolimits$$</span> `\sum_{n=0}^\infty\nolimits` 
   
@@ -542,18 +595,30 @@ The width of the arrow commands above is fixed. The width of the commands
 below is determined by the length of the content above and below 
 the arrows, which is specified as an argument (and optional argument):
 
-`\xrightarrow[\text{long text below}]{}`
 
- <span class='math frame'>$$\xrightarrow[\text{long text below}]{}$$</span> 
+<div class="side-by-side">
+ <div class='math frame'>$$\xrightarrow[\text{long text below}]{}$$</div> 
 
+  ```tex
+  \xrightarrow[\text{long text below}]{}
+  ```
+</div>
 
- `\xrightarrow{\text{long text above}}`
- 
- <span class='math frame'>$$\xrightarrow{\text{long text above}}$$</span>
+<div class="side-by-side">
+  <div class='math frame'>$$\xrightarrow{\text{long text above}}$$</div>
 
-`\xrightarrow[\text{and below}]{\text{long text above}}`
-  
-<span class='math frame'>$$\xrightarrow[\text{and below}]{\text{long text above}}$$</span>
+  ```tex
+    \xrightarrow{\text{long text above}}
+  ```
+</div>
+
+<div class="side-by-side">
+  <div class='math frame'>$$\xrightarrow[\text{and below}]{\text{long text above}}$$</div>
+
+  ```tex
+    \xrightarrow[\text{and below}]{\text{long text above}}
+  ```  
+</div>
 
 
 <section class='full-width no-header center thin-line two-col math-80px'>
@@ -1297,11 +1362,14 @@ To change the background, use the `\colorbox{}{}` command.
 
   
 The first argument of these commands is a color specified as:
-  - a RGB color using the standard CSS format (`#d7170b`)
-  - a [CSS color name](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) (`goldenrod`)
-  - one of the 68 colors from [dvips color name](https://ctan.org/pkg/colordvi) (`cadetblue`)
-  - one of the 10 Mathematica color from `ColorData[97, "ColorList"]` (`m0` to `m9`)
-  - a color defined using the syntax from the [`xcolor` package](http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf), for example: `blue!20!black!30!green`
+  - one of `red`, `orange`, `yellow`, `lime`, `green`, `teal`, `blue`, `indigo`,
+   * `purple`, `magenta`, `black`, `dark-grey`, `grey`, `light-grey`, `white.
+  - a RGB color using the standard CSS format (`#d7170b` or `rgb(240, 20, 10)`)
+  - one of the 68 colors from [dvips color name](https://ctan.org/pkg/colordvi)
+   (`CadetBlue`). Note that these names are case-sensitive.
+  - one of the 10 Mathematica color from `ColorData[97, "ColorList"]` (`M0` to `M9`)
+  - a color defined using the syntax from the [`xcolor` package](http://mirror.jmu.edu/pub/CTAN/macros/latex/contrib/xcolor/xcolor.pdf), for example: `Blue!20!Black!30!Green`
+  - if the color is prefixed with a `-`, the complementary color is used
 
 The following color names are recommended:
 
@@ -1316,7 +1384,8 @@ To have proper legibility based on usage, these color names will map to
 different values when used as a foreground color
 and a background color. To use a specific color value, use a RGB color instead.{.notice--info}
 
-For best portability between versions of TeX, limit yourself to this subset of DVIPS colors: `White`, `Black`,
+For best portability between versions of TeX, limit yourself to this subset of 
+DVIPS colors: `White`, `Black`,
 `Gray`, `Red`, `Orange`, `Yellow`, `LimeGreen`, `Green`, `TealBlue`, `Blue`,
 `Violet`, `Purple`
 and `Magenta`. Those names are case-sensitive. {.notice--info}
@@ -1392,9 +1461,14 @@ and `Magenta`. Those names are case-sensitive. {.notice--info}
 
 MathLive support some commands from the [MathJax HTML extension](http://docs.mathjax.org/en/latest/input/tex/extensions/html.html).
 
-`\class{custom-class}{x+1}`
+<div class="side-by-side">
+  <div class='math frame'>$$\class{custom-class}{x+1} $$</div>
 
-<span class='math frame'>$$\class{custom-class}{x+1} $$</span>
+  ```tex
+    \class{custom-class}{x+1}
+  ```
+</div>
+
 
 When used in a `<math-field>` component, the class names should refer to a 
 stylesheet defined with a `<style>` tag inside the `<math-field>` element.
@@ -1410,26 +1484,38 @@ the `MathFieldElement`.
   \class{custom-class}{\frac{1}{x+1}}
 
 </math-field>
-
 ```
----
-
-`\cssId{}{}`
-
-<span class='math frame'>$$\cssId{test-dentifier}{Don Knuth} $$</span> 
 
 ---
 
-`\htmlData{}{}`
- 
+<div class="side-by-side">
+  <div class='math frame'>$$\cssId{test-dentifier}{Don Knuth} $$</div> 
+
+  ```tex
+    \cssId{}{}
+  ```
+</div>
+
+---
+
+<div class="side-by-side">
+
+  ```tex
+    \htmlData{}{}
+  ```
+</div>
+
 The argument of this command is a comma-delimited list of key/value pairs, e.g. 
 `\htmlData{foo=green,bar=blue}{x=0}`. A corresponding
   `data-foo` and `data-bar` DOM attribute is generated to the rendered DOM.
 
-`$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} }`
-
-<span class='math frame'>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} } $$</span> 
- 
+<div class="side-by-side">
+  <div class='math frame'>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} } $$</div> 
+  
+  ```tex
+    \htmlData{foo=green,bar=blue}{ \text{Don Knuth} }
+  ```
+</div>
  
 
 ### Others
@@ -1728,6 +1814,10 @@ Each column is separated by a `&`.
 
 A simple table with no delimiters. 
 
+<div class='side-by-side'>
+
+<div class="math frame">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
+
 ```tex
 \begin{array}{lc}
   a + 1   &   b  + 1 \\
@@ -1735,7 +1825,8 @@ A simple table with no delimiters.
 \end{array}
 ```
 
-<div class="math frame">$$\begin{array}{lc}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
+</div>
+
 
 
 The `{lc}` argument specifies how many columns there are and how they should be 
@@ -1746,6 +1837,9 @@ formated:
 
 To add a vertical line separating columns, add `|` character in the column format:
 
+
+<div class='side-by-side'>
+
 <div class="math frame">$$\begin{array}{l|c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 
 ```tex
@@ -1755,8 +1849,12 @@ To add a vertical line separating columns, add `|` character in the column forma
 \end{array}
 ```
 
+</div>
+
 To add a double vertical line separating columns, add two `|` characters in the 
 column format:
+
+<div class='side-by-side'>
 
 <div class="math frame">$$\begin{array}{l||c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 
@@ -1766,8 +1864,11 @@ column format:
   c       &   \frac{1}{d}
 \end{array}
 ```
+</div>
 
 To add a dashed vertical line between two columns, use `:`:
+
+<div class='side-by-side'>
 
 <div class="math frame">$$\begin{array}{l:c}a + 1 & b  + 1 \\\\ c & \frac{1}{d}\end{array} $$</div> 
 
@@ -1777,12 +1878,16 @@ To add a dashed vertical line between two columns, use `:`:
   c       &   \frac{1}{d}
 \end{array}
 ```
-
+</div>
 
 #### `matrix`
 
 The `matrix` environment is very similar to `array`, but it does not have an
 argument to specify the format of the columns.
+
+<div class='side-by-side'>
+
+<div class="math frame">$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$</div>
 
 ```tex
 \begin{matrix}
@@ -1790,12 +1895,15 @@ argument to specify the format of the columns.
   c       &   \frac{1}{d}
 \end{matrix}
 ```
-
-<div class="math frame">$$\begin{matrix}a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix}$$</div>
+</div>
 
 
 To specify the format of the columns, use the starred version and an optional
 argument. This applies to all the other `matrix` environments.
+
+<div class='side-by-side'>
+
+<div class="math frame">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</div>
 
 ```tex
 \begin{matrix*}[l|r]
@@ -1803,13 +1911,16 @@ argument. This applies to all the other `matrix` environments.
   c       &   \frac{1}{d}
 \end{matrix*}
 ```
-
-<div class="math frame">$$\begin{matrix*}[l|r]a + 1   &   b  + 1 \\\\ c       &   \frac{1}{d} \end{matrix*}$$</div>
+</div>
 
 
 #### `pmatrix`
 
 A matrix with **parentheses** as delimiters.
+
+<div class='side-by-side'>
+
+<div class='math frame'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</div>
 
 ```tex
 \begin{pmatrix}
@@ -1817,12 +1928,14 @@ A matrix with **parentheses** as delimiters.
   c       &   \frac{1}{d}
 \end{pmatrix}
 ```
-
-<div class='math frame'>$$\begin{pmatrix}a & b \\\\ c & \frac{1}{d}\end{pmatrix}$$</div>
+</div>
 
 #### `bmatrix`
 
 A matrix with **square brackets** as delimiters.
+
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</div>
 
 ```tex
 \begin{bmatrix}
@@ -1830,12 +1943,15 @@ A matrix with **square brackets** as delimiters.
   c       &   \frac{1}{d}
 \end{bmatrix}
 ```
-
-<div class='math frame'>$$\begin{bmatrix}a & b \\\\ c & \frac{1}{d}\end{bmatrix}$$</div>
+</div>
 
 #### `Bmatrix`
 
 A matrix with **braces** (curly brackets) as delimiters.
+
+<div class='side-by-side'>
+
+<div class='math frame'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</div>
 
 ```tex
 \begin{Bmatrix}
@@ -1844,11 +1960,14 @@ A matrix with **braces** (curly brackets) as delimiters.
 \end{Bmatrix}
 ```
 
-<div class='math frame'>$$\begin{Bmatrix}a & b \\\\ c & \frac{1}{d}\end{Bmatrix}$$</div>
+</div>
 
 #### `vmatrix`
 
 A matrix with **single bars** as delimiters.
+
+<div class='side-by-side'>
+ <div class='math frame'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</div>
 
 ```tex
 \begin{vmatrix}
@@ -1856,11 +1975,14 @@ A matrix with **single bars** as delimiters.
   c       &   \frac{1}{d}
 \end{vmatrix}
 ```
- <div class='math frame'>$$\begin{vmatrix}a & b \\\\ c & \frac{1}{d}\end{vmatrix}$$</div>
+</div>
 
 #### `Vmatrix`
 
 A matrix with **double bars** as delimiters.
+
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</div>
 
 ```tex
 \begin{Vmatrix}
@@ -1868,11 +1990,14 @@ A matrix with **double bars** as delimiters.
   c       &   \frac{1}{d}
 \end{Vmatrix}
 ```
+</div>
 
-
-<div class='math frame'>$$\begin{Vmatrix}a & b \\\\ c & \frac{1}{d}\end{Vmatrix}$$</div>
 
 #### `matrix*`
+
+<div class='side-by-side'>
+
+<div class='math frame'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</div>
 
 ```tex
 \begin{matrix*}
@@ -1880,16 +2005,19 @@ A matrix with **double bars** as delimiters.
   c       &   \frac{1}{d}
 \end{matrix*}
 ```
-
-<div class='math frame'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</div>
+</div>
 
 #### `smallmatrix`
+
+<div class='side-by-side'>
+
+<div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
 
 ```tex
 \begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}
 ```
-<div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
 
+</div>
 
 ### Other Environments
 
@@ -1897,21 +2025,29 @@ A matrix with **double bars** as delimiters.
 
 Use these environments to write piecewise functions:
 
-```tex
-f(n) = \begin{cases}
-  1 & \text{if } n = 0  \\ 
-  f(n-1) + f(n-2) & \text{if } n \ge 2
-\end{cases}
-
-```
-
+<div class='side-by-side'>
 <div class='math frame'>$$f(n) = \begin{cases}
   1 & \text{if } n = 0  \\\\ 
   f(n-1) + f(n-2) & \text{if } n \ge 2
 \end{cases}
 $$</div>
 
+```tex
+f(n) = \begin{cases}
+  1 & \text{if } n = 0  \\ 
+  f(n-1) + f(n-2) & \text{if } n \ge 2
+\end{cases}
+```
+</div>
+
 To typeset the content in Display style, use `dcases` instead:
+
+<div class='side-by-side'>
+<div class='math frame'>$$f(n) = \begin{dcases}
+  1 & \text{if } n = 0  \\\\ 
+  f(n-1) + f(n-2) & \text{if } n \ge 2
+\end{dcases}
+$$</div>
 
 ```tex
 f(n) = \begin{dcases}
@@ -1920,15 +2056,16 @@ f(n) = \begin{dcases}
 \end{dcases}
 
 ```
-
-<div class='math frame'>$$f(n) = \begin{dcases}
-  1 & \text{if } n = 0  \\\\ 
-  f(n-1) + f(n-2) & \text{if } n \ge 2
-\end{dcases}
-$$</div>
-
+</div>
 
 To display the brace on the right, use `rcases`.
+
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{rcases}
+  1 & \text{if } n = 0  \\\\ 
+  f(n-1) + f(n-2) & \text{if } n \ge 2
+\end{rcases} = f(n) 
+$$</div>
 
 ```tex
 \begin{rcases}
@@ -1937,16 +2074,19 @@ To display the brace on the right, use `rcases`.
 \end{rcases} = f(n)
 
 ```
-
-<div class='math frame'>$$\begin{rcases}
-  1 & \text{if } n = 0  \\\\ 
-  f(n-1) + f(n-2) & \text{if } n \ge 2
-\end{rcases} = f(n) 
-$$</div>
+</div>
 
 #### `gather`
 
 Consecutive equations without alignment
+
+<div class='side-by-side'>
+
+<div class='math frame'>$$\begin{gather}
+  3(a-x) = 3.5x + a - 1 \\\\
+    3a - 3x = 3.5x + a - 1 \\\\
+    a = \frac{13}{4}x - \frac{1}{2}
+\end{gather} $$</div>  
 
 ```tex
   \​begin{gather}
@@ -1955,25 +2095,13 @@ Consecutive equations without alignment
     a = \frac{13}{4}x - \frac{1}{2}
   \end{gather}
 ```
-
-<div class='math frame'>$$\begin{gather}
-  3(a-x) = 3.5x + a - 1 \\\\
-    3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}
-\end{gather} $$</div>  
-
+</div>
 
 #### `multline`
 
 The first line is left aligned, the last line is right aligned.
 
-```tex
-  \​begin{multline}
-    3(a-x) = 3.5x + a - 1 \\
-    3a - 3x = 3.5x + a - 1 \\
-    a = \frac{13}{4}x - \frac{1}{2}
-  \end{multline}
-```
+<div class='side-by-side'>
 
 <div class='math frame'>$$\begin{multline}
   3(a-x) = 3.5x + a - 1 \\\\
@@ -1982,7 +2110,22 @@ The first line is left aligned, the last line is right aligned.
 \end{multline} $$</div>  
 
 
+```tex
+  \​begin{multline}
+    3(a-x) = 3.5x + a - 1 \\
+    3a - 3x = 3.5x + a - 1 \\
+    a = \frac{13}{4}x - \frac{1}{2}
+  \end{multline}
+```
+</div>
+
 #### `align`
+
+<div class='side-by-side'>
+<div class='math frame'>$$\begin{align}
+f(x) & = (a+b)^2 \\
+& = a^2+2ab+b^2 \\
+\end{align}$$</div>  
 
 ```tex
 \begin{align}
@@ -1991,69 +2134,140 @@ The first line is left aligned, the last line is right aligned.
 \end{align}
 ```
 
-
-<div class='math frame'>$$\begin{align}
-f(x) & = (a+b)^2 \\
-& = a^2+2ab+b^2 \\
-\end{align}$$</div>  
+</div>
 
 #### Others
 
+<div class='side-by-side'>
 
-`$$\begin{math}x+\frac12\end{math}$$`
+  <div class='math frame'>$$\begin{math}x+\frac12\end{math}$$</div> 
 
-<div class='math frame'>$$\begin{math}x+\frac12\end{math}$$</div> 
+  ```tex
+  \begin{math}
+    x+\frac12
+  \end{math}
+  ```
+
+</div>
 
 
-`$$\begin{displaymath}x+\frac12\end{displaymath}$$`
+<div class='side-by-side'>
+  <div class='math frame'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</div> 
 
-<div class='math frame'>$$\begin{displaymath}x+\frac12\end{displaymath}$$</div> 
+  ```tex
+  \begin{displaymath}
+    x+\frac12
+  \end{displaymath}
+  ```
+</div>
 
-`\​begin{equation}x+\frac12\end{equation}`
 
-<span class='math frame'>$$\begin{equation}x+\frac12\end{equation} $$</div>  
+<div class='side-by-side'>
 
-`\​begin{subequations}x+\frac12\end{subequations}`
+  <div class='math frame'>$$\begin{equation}x+\frac12\end{equation} $$</div>  
 
-<div class='math frame'>$$\begin{subequations}x+\frac12\end{subequations} $$</div> 
+  ```tex
+  \​begin{equation}
+    x+\frac12
+  \end{equation}
+  ```
+</div>
 
- `\​begin{eqnarray}...\end{eqnarray}` -- Avoid, use `align` instead
- 
+
+<div class='side-by-side'>
+  <div class='math frame'>$$\begin{subequations}x+\frac12\end{subequations} $$</div> 
+
+  ```tex
+  \​begin{subequations}
+    x+\frac12
+  \end{subequations}
+  ```
+</div>
+
+<div class='side-by-side'>
  <div class='math frame'>$$\begin{eqnarray}a & b \\ c & \frac{1}{d}\end{eqnarray} $$</div> 
-
-
- `\begin{center}\text{first}\end{center}`
  
+ ```tex
+  \​begin{eqnarray}...\end{eqnarray}
+```
+ 
+</div>
+ -- Avoid, use `align` instead
+
+<div class='side-by-side'>
+
  <div class='math frame'>$$\begin{center}\text{first}\end{center}$$</div>
+
+ ```tex
+  \begin{center}
+    \text{first}
+  \end{center}
+ ``` 
+</div>
 
 ---
 
 These environments do not form a math environment by themselves but 
 can be used as building blocks for more elaborate structures: 
 
-`\​begin{gathered}...\end{gathered}`
+<div class='side-by-side'>
 
 <div class='math frame'>$$\begin{gathered}3(a-x) = 3.5x + a - 1 \\\\
     3a - 3x = 3.5x + a - 1 \\\\
     a = \frac{13}{4}x - \frac{1}{2}\end{gathered} $$</div>  
 
+```tex
+  \​begin{gathered}...\end{gathered}
+```
 
-`\​begin{split}...\end{split}`
+</div>
 
-<div class='math frame'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\\\
-    3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</div>  
+<div class='side-by-side'>
+
+  <div class='math frame'>$$\begin{split}3(a-x) = 3.5x + a - 1 \\\\
+      3a - 3x = 3.5x + a - 1 \\\\
+      a = \frac{13}{4}x - \frac{1}{2}\end{split} $$</div>  
+
+  ```tex
+    \​begin{split}...\end{split}
+  ```
+</div>
+
+<div class='side-by-side'>
+
+  <div class='math frame'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
+      3a - 3x = 3.5x + a - 1 \\\\
+      a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</div>  
+
+  ```tex
+    \​begin{aligned}...\end{aligned}
+  ```
+
+</div>
 
 
-`\​begin{aligned}...\end{aligned}`
+## TeX Registers
 
-<div class='math frame'>$$\begin{aligned}3(a-x) = 3.5x + a - 1 \\\\
-    3a - 3x = 3.5x + a - 1 \\\\
-    a = \frac{13}{4}x - \frac{1}{2}\end{aligned} $$</div>  
+The math typesetting is influenced by some "constants" that are stored 
+in "registers". Those registers can be set globally on a mathfield using 
+the `registers` option.
 
+| Register | Purpose |
+| :--- |  :--- |
+| `arrayrulewidth` | Width of separator lines in array environments |
+| `arraycolsep` | Amount of space between separator lines |
+| `delimitershortfall` | |
+| `doublerulesep` | Amount of space between adjacent separator lines |
+| `jot` | Vertical space between the lines for all math expressions which
+  // allow multiple lines |
+| `fboxrule` | Default width of the border with commands such as `\boxed` or `\fbox` |
+| `fboxsep` | Default padding between a box and its content |
+| `medmuskip` | Amount of space around a binary operator. See also `thinmuskip`, `thickmuskip`.  |
+| `nulldelimiterspace` | Horizontal space of an empty delimiter |
+| `thickmuskip` | Amount of space around a relational operator. See also `medmuskip`, `thinmuskip`.  |
+| `thinmuskip` | Amount of space around math punctuation. See also `medmuskip`, `thickmuskip`. |
 
-
-## TeX Primitive
+## TeX Primitives
 
 The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.

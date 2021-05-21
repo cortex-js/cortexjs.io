@@ -30,16 +30,18 @@ A mathfield web component goes through various stages during its lifecycle.
 
 In most cases, this is something you don't have to pay much attention to. Just 
 remember these guidelines:
-* Once a component is attached to the DOM attributes (key/value pairs 
+* Once a component is attached to the DOM, attributes (key/value pairs 
 attached to the `<math-field>` tag and properties (key/value pairs attached
 to a `MathfieldElement` object) are kept in sync, or _reflected_. You can also
-call the methods of `MathfieldElement` without limitations. You can be notified
-of this state by listening for a `mount` event on the element.
+call the methods of `MathfieldElement` without limitations. 
+* To be notified when the component is attached to the DOM, listen for a `mount`
+ event on the element.
 * Before the component is attached to the DOM or even before the `MathfieldElement`
-class has been registered, you can still interact with the element, but with
-some limitations. The `value`, `selection`, `options` and `disabled` properties
+class has been registered, you can interact with the element, but with
+some limitations. The `value`, `selection`, `options`, `disabled` properties
+and the properties matching an attribute (`readOnly` for `read-only`, etc...)
 and related attributes are safe to set, but the values you read back may be 
-different than once the component is mounted.
+different once the component is mounted.
 
 ## Before Initialization
 
@@ -99,11 +101,13 @@ interact with the object, but its operations are limited.
 
 At this stage:
 * you can read and change the properties as before. However, doing so will
-be reflected on attributes as well. That is calling `mf.setOptions({ virtualKeyboardMode: "manual"})`
+be reflected on attributes as well. That is calling `mf.virtualKeyboardMode = "manual"` or
+`mf.setOptions({ virtualKeyboardMode: "manual"})`
 will result in `mf.getAttribute('virtual-keyboard-mode')` to return `"manual"`.
 * you can read and change the attributes as before, however they will now 
 be reflected on properties as well, that is calling `mf.setAttribute('virtual-keyboard-mode', 'manual')`
-will result in `mf.getOption('virtualKeyboardMode')` to return `"manual"`.
+will result in `mf.virtualKeyboardMode` and `mf.getOption('virtualKeyboardMode')` 
+to return `"manual"`.
 * you can change/add/remove attributes on the element
 * you can invoke all methods specific to `MathfieldElement`, however some may
 have some limitations. For example `setValue()` will ignore any options provided
@@ -113,7 +117,7 @@ These commands required the element to be attached to the DOM to function proper
 
 ## Attached/Mounted
 
-This stage occurs after the previous one. The transition to this stage happens
+This stage occurs next. The transition to this stage happens
 automatically for elements created from markup after the `MathfieldElement`
 class has been registered to handle the `<math-field>` tag. If the element
 was created programatically, this stage is reached when the element is explicitly

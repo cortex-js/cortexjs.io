@@ -19,7 +19,6 @@ head:
 <script>
     moduleMap = {
         mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
-        "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
 
@@ -77,35 +76,74 @@ Note that we use the `suppressChangeNotifications` option when
 changing the content of the mathfield, to prevent a `'input'` event from being 
 triggered and creating an infinite loop.{.notice--info}
 
+<code-playground layout="stack" class="m-lg w-full-lg">
+  <div slot="javascript">import MathLive from 'mathlive';
+    const mf = document.getElementById('formula');
+    mf.addEventListener('input',(ev) => {
+        document.getElementById('latex').value = mf.value;
+    });
+    //
+    document.getElementById('latex').value = mf.value;
+    //
+    // Listen for changes in the latex text field, and reflect its value in 
+    // the mathfield.
+    document.getElementById('latex').addEventListener('input', (ev) => {
+        mf.setValue(ev.target.value, {suppressChangeNotifications: true});
+    });
+  </div>
+  <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
+  &lt;math-field id="formula"&gt;
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+  &lt;/math-field&gt;                
+  &lt;label&gt;Latex&lt;/label&gt;
+  <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
+  autocorrect="off" spellcheck="false"></textarea></textarea>
+  </div>
+</code-playground>
+
+
+</section>
+
+
+## Applying style to a mathfield
+
+The text color ("ink") and background color ("paper"), as well as other 
+stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
+using `applyStyle()`.
+
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <div slot="javascript">import MathLive from 'mathlive';
 const mf = document.getElementById('formula');
-mf.addEventListener('input',(ev) => {
-    document.getElementById('latex').value = mf.value;
-});
-//
-document.getElementById('latex').value = mf.value;
-//
-// Listen for changes in the latex text field, and reflect its value in 
-// the mathfield.
-document.getElementById('latex').addEventListener('input', (ev) => {
-    mf.setValue(ev.target.value, {suppressChangeNotifications: true});
-});
+// Change the background color of the entire mathfield
+mf.applyStyle({backgroundColor: "yellow" });
 </div>
-<div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
+<div slot="html">
 &lt;math-field id="formula"&gt;
 x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;                
-&lt;label&gt;Latex&lt;/label&gt;
-<textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
-autocorrect="off" spellcheck="false"></textarea></textarea>
 </div>
 </code-playground>
 
 
+To change the style of a portion of the mathfield, specify a selection range
+to `applyStyle()`.
 
-</section>
+
+<code-playground layout="stack" class="m-lg w-full-lg">
+    <div slot="javascript">import MathLive from 'mathlive';
+const mf = document.getElementById('formula');
+// Change the color and size of the first two characters of the mathfield
+mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
+</div>
+<div slot="html">
+&lt;math-field id="formula"&gt;
+x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;                
+</div>
+</code-playground>
+
+
 
 
 
@@ -115,9 +153,6 @@ autocorrect="off" spellcheck="false"></textarea></textarea>
 
 <!-- $insert() -->
 
-
-<!-- ## Applying styling -->
-<!-- applyStyle -->
 
 <!-- ## Performing editing commands -->
 
