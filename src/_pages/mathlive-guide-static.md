@@ -39,13 +39,13 @@ handler .
 By default, any LaTeX code that is enclosed with the following delimiters will
 be rendered as math:
 
-- `$$`...`$$`
-- `\[`...`\]`
-- `\(`...`\)`
+- `$$`...`$$` -- rendered in Display Style (CSS display block)
+- `\[`...`\]` -- rendered in Display Style (CSS display block)
+- `\(`...`\)` -- rendered in Text Style (CSS display inline)
 
 ```html
 <h1>Taxicab Number</h1>
-<p>The second taxicab number is $$1729 = 10^3 + 9^3 = 12^3 + 1^3$$</p>
+<p>The second taxicab number is \\(1729 = 10^3 + 9^3 = 12^3 + 1^3\\)</p>
 ```
 
 You can wrap more complex expressions in a `<script>` tag with a type of

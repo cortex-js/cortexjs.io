@@ -8,7 +8,7 @@ sidebar:
     - nav: "mathlive"
 ---
 <script type='module'>
-    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    import {renderMathInDocument, version} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
     renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
@@ -18,6 +18,7 @@ sidebar:
       asciiMath: null,
     });
     document.body.classList.add('ready');
+    document.getElementById('version').innerHTML = version;
 </script>
 
 <style>
@@ -114,7 +115,7 @@ sidebar:
     justify-content: center;
     padding: 1em;
     border-right: 1px solid #ddd;
-    margin: .5em;
+    margin: 0 0.5em 0.5em 0.5em;
   }
   .side-by-side > pre {
     background: #f0f0f0;
@@ -124,10 +125,14 @@ sidebar:
   }
 
 
+  .footer-version {
+
+  }
   
 </style>
 
 # Supported TeX/LaTeX Commands
+
 
 To find the name of a LaTeX command matching a shape you can draw, use 
 [Detexify](http://detexify.kirelabs.org/classify.html).
@@ -449,12 +454,9 @@ automatic position, based on the operator and current math style.
 
 </div>
 
-
-
 In Display Style, the `\intop` and `\ointop` commands display their limits 
 above and below by default, while the `\int` command display its limit adjacent.
 
-<span class='math'>$$\sum_{n=0}^\infty\nolimits$$</span> `\sum_{n=0}^\infty\nolimits` 
   
   
 * <span class='math'>$$\sum_{n=0}^\infty $$</span> `\sum`
@@ -690,6 +692,9 @@ For example use `é` rather than `\'{e}`.
 * <span class='math'>$$\overrightarrow{ABC} $$</span> `\overrightarrow{}`
 * <span class='math'>$$\overleftarrow{ABC} $$</span> `\overleftarrow{}`
 * <span class='math'>$$\overleftrightarrow{ABC} $$</span> `\overleftrightarrow{}`
+* <span class='math'>$$\overarc{ABC} $$</span> `\overarc{}`
+* <span class='math'>$$\overparen{ABC} $$</span> `\overparen{}`
+* <span class='math'>$$\wideparen{ABC} $$</span> `\wideparen{}`
 * <span class='math'>$$\widetilde{ABC} $$</span> `\widetilde{}`
 * <span class='math'>$$\widehat{ABC} $$</span> `\widehat{}`
 * <span class='math'>$$\widecheck{ABC} $$</span> `\widecheck{}`
@@ -708,6 +713,8 @@ For example use `é` rather than `\'{e}`.
 * <span class='math'>$$\underrightarrow{ABC} $$</span> `\underrightarrow{}`
 * <span class='math'>$$\underleftarrow{ABC} $$</span> `\underleftarrow{}`
 * <span class='math'>$$\underleftrightarrow{ABC} $$</span> `\underleftrightarrow{}`
+* <span class='math'>$$\underarc{ABC} $$</span> `\underarc{}`
+* <span class='math'>$$\underparen{ABC} $$</span> `\underparen{}`
 * <span class='math'>$$\utilde{ABC} $$</span> `\utilde{}`
 {.command-list}
 
@@ -2014,7 +2021,7 @@ A matrix with **double bars** as delimiters.
 <div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
 
 ```tex
-\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}
+\begin{smallmatrix}a & b \\ c & \frac{1}{d}\end{smallmatrix}
 ```
 
 </div>
@@ -2258,8 +2265,7 @@ the `registers` option.
 | `arraycolsep` | Amount of space between separator lines |
 | `delimitershortfall` | |
 | `doublerulesep` | Amount of space between adjacent separator lines |
-| `jot` | Vertical space between the lines for all math expressions which
-  // allow multiple lines |
+| `jot` | Vertical space between the lines for all math expressions which allow multiple lines |
 | `fboxrule` | Default width of the border with commands such as `\boxed` or `\fbox` |
 | `fboxsep` | Default padding between a box and its content |
 | `medmuskip` | Amount of space around a binary operator. See also `thinmuskip`, `thickmuskip`.  |
@@ -2283,3 +2289,6 @@ command spaces will be preserved in Math Mode.
 * `\string`
 * `\csname` and `\endcsname`
 * `\ensuremath{}` -- If in Math Mode, does nothing. Otherwise, switch to Math Mode.
+
+
+<footer class="page__meta"><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version: </strong> <span id='version'></span></footer>

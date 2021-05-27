@@ -109,9 +109,9 @@ A layer is an array of rows, a row is an array of keycaps.
 
 Each keycap can have the following properties:
 
-- `class`: the CSS classes to style this keycap. The classes can be custom 
-defined (see below about the `styles` layer property), or be one of the default
-ones:
+- `class`: a set of CSS classes to style this keycap. The classes can be custom 
+defined (see below about the `styles` layer property), or be one or more of the
+ standard ones:
     - `tex`: use the TeX font for its label.
       Using the `tex` class is not necessary if using the `latex` property to 
       define the label.
@@ -131,7 +131,6 @@ ones:
 - `key`: the keypress to emulate when the keycap is pressed, for example `"5"`.
 - `aside`: an optional small label displayed below the keycap. This label
 may not be displayed if the space available is too small.
-
 - `insert`: a Latex fragment to insert when the keycap is pressed. The `latex`
 property is usually sufficient, 
 - `altKeys`: the name of a set of alternate keys to display when the keycap is
@@ -153,6 +152,30 @@ layer.
 
 The appearance of the layer can be further customized by providing a CSS class 
 name for the `backdrop` and `container` properties of the layer.
+
+
+### Keycap Variants
+
+The default keyboard include **variants** for many of its keycaps. These
+variants are accessed with a long press on the keycap. The variants are 
+typically related, but less frequently used version of the main keycap.
+
+You can define variants for a custom keyboard by specifying a `variants` 
+property with the definition of a keycap. The value of the `variants` property
+is an array of `VirtualKeyboardKeycap`. As a shortcut, a string can also be 
+used, which is equivalent to a `VirtualKeyboardKeycap` with a `latex` property
+equal to the string, that is, it will display the latex string as the keycap
+label and insert it when the key is pressed.
+
+```js
+rows: [
+  [
+    { latex: "a", variants: ["A", "\\alpha", "\\Alpha"] }
+    ...
+  ]
+]
+```
+
 
 ### Keycap Examples
 
@@ -336,7 +359,7 @@ keyboards, plus ours, we could have used the `"all"` shortcut:
 
 ```js
   mf.setOptions({
-    "customVirtualKeyboardLayers": HIGH_SCHOOL_KEYBOARD_LAYER
+    "customVirtualKeyboardLayers": HIGH_SCHOOL_KEYBOARD_LAYER,
     "customVirtualKeyboards": HIGH_SCHOOL_KEYBOARD,
     "virtualKeyboards": "high-school-keyboard"
   });

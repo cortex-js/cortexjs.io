@@ -29,21 +29,25 @@ This example shows how to configure the MathLive text-to-speech features.
 
 There are two aspects that can be configured independently:
 
-1. Speech Rules: the set of rules use to produce readable text from a math expression. MathLive has a built-in set of speech rules, but it can also be configured to use Volker Sorge's Speech Rule Engine.
+1. Speech Rules: the set of rules use to produce readable text from a math expression. 
 
 2. Text-to-Speech engine: the software used to transform the readable text produced by the speech rules into sound. By default, the TTS engine provide by the operating system will be used, but MathLive can be configured to use the Amazon Cloud TTS engine as well.
 
+The speech commands can be access using a keyboard shortcut:
+
+- **alt/option + ctrl + up**: speak the current group
+- **alt/option + ctrl + down**: speak the entire formula
+
 ## Speech Rules
 
-The format of the output can be configured using the `textToSpeechMarkup` configuration option. Set it to:
+A set of **speech rules** define how a math formula is transformed to speakable
+text.
 
--   `'ssml'` to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.
--   `'mac'` to request an output using Mac OS speech markup, e.g. '[[slc 150]]'. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.
--   `''` (empty string) to request no markup.
+To use the MathLive built-in speech rules, set `textToSpeechRules` to `mathlive`.
 
-The Amazon TTS engine supports SSML, and it is recommended to use this option for the highest quality.
+Another set of speech rules supported are the SRE speech rules from Volker Sorge
 
-To use Volker Sorge's SRE:
+To use the SRE speech rules.
 
 1. Include the browser version of the SRE JavaScript file in your project. You can download it on [GitHub](https://github.com/zorkow/speech-rule-engine)
 2. Set the `textToSpeechRules` configuration key to `'sre'`.
@@ -94,6 +98,17 @@ See [npm](https://www.npmjs.com/package/aws-sdk) for the latest version.
     2.4 At the end of the creation, you will be provided by the access key and the secret access key.
 
 Carefully consider what you do with the access and secret access keys. Although with the setup above you have somewhat restricted them to a domain, they could be abused if accessed by an unauthorized user. To prevent this, you could require users to authenticate and use AWS Cognito.
+
+
+### Speech Output Format
+
+To configure the format of the speech output engine use the `textToSpeechMarkup` configuration option. Set it to:
+
+-   `'ssml'` to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.
+-   `'mac'` to request an output using Mac OS speech markup, e.g. '[[slc 150]]'. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.
+-   `''` (empty string) to request no markup.
+
+The Amazon TTS engine supports SSML, and it is recommended to use this option for the highest quality.
 
 ### Using the Google Cloud TTS Engine
 

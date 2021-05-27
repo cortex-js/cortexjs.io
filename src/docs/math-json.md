@@ -11,7 +11,13 @@ sidebar:
     renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
-        delimiters: { display: [ ['$$', '$$'] ] },
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [
+            ['$$', '$$'],
+            ['\\[', '\\]'],
+          ],
+        },
         processEnvironments : false 
       },
       asciiMath: null,
@@ -26,9 +32,9 @@ notation.
 
 | Math                      | MathJSON                                                                  |
 | :------------------------- | :------------------------------------------------------------------------ |
-| <math>$$\frac{n}{1+n}$$</math>            | `["Divide", "n", ["Add", 1, "n"]]`                                        |
-| $$e^{\imaginaryI \pi }+1=0$$ | `["Equal",  ["Add", ["Power", "ExponentialE", ["Multiply", "Pi", "ImaginaryI"], 1]], 0]` |
-| $$\sin^{-1}^\prime(x)$$      | `[["Derivative", 1, ["InverseFunction", "Sin"]], "x"]`                    |
+| \\[\frac{n}{1+n}\\]            | `["Divide", "n", ["Add", 1, "n"]]`                                        |
+| \\[e^{\imaginaryI \pi }+1=0\\] | `["Equal",  ["Add", ["Power", "ExponentialE", ["Multiply", "Pi", "ImaginaryI"], 1]], 0]` |
+| \\[\sin^{-1}^\prime(x)\\]      | `[["Derivative", 1, ["InverseFunction", "Sin"]], "x"]`                    |
 
 
 

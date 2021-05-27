@@ -11,7 +11,13 @@ sidebar:
     renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
-        delimiters: { display: [ ['$$', '$$'] ] },
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [
+            ['$$', '$$'],
+            ['\\[', '\\]'],
+          ],
+        },
         processEnvironments : false 
       },
       asciiMath: null,
@@ -66,8 +72,8 @@ See [Compute Engine Forms](/guides/compute-engine-forms/) for more info.
 
 Use the `ComputeEngine.same()` function to compare two expressions.
 
-The comparison between expressions is structural so that $$x + 1$$ is not equal
-to $$1 + x$$. To obtain the desired result, you may need to apply a canonical
+The comparison between expressions is structural so that \\(x + 1\\) is not equal
+to \\(1 + x\\). To obtain the desired result, you may need to apply a canonical
 form to the expressions using `ComputeEngine.canonical()`, or evaluate them using `ComputeEngine.evaluate()`.
 
 ```js
