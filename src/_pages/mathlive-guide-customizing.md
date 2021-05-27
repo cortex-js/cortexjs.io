@@ -237,7 +237,7 @@ To control which letters are automatically italicized, use the `letterShapeStyle
 
 In the [ISO](https://www.nist.gov/pml/special-publication-811) style, lower and
 uppercase roman letter and lower and upper case greek letters are italicized 
-when used as a variable. Mathematical constants such as $$e$$ are written upright.
+when used as a variable. Mathematical constants such as \\(e\\) are written upright.
 
 TeX has traditionally implemented a layout option that italicizes romman 
 letters and lowercase greek letters, but not uppercase greek letters.
