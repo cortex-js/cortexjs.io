@@ -53,7 +53,7 @@ keyboards, or create new ones.
 
 The default behavior of the virtual keyboard panel is to only be displayed on 
 touch-enabled devices (mobile phones, tablets, laptops with a touch-screen) when
-a matfield is focused.
+a mathfield is focused.
 
 ![](/assets/images/mathfield/mobile-virtual-keyboard.png){.max-w-md}
 
