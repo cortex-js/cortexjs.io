@@ -23,9 +23,9 @@ head:
 </script>
 
 
-# Interacting with a mathfield
+# Interacting with a Mathfield
 
-## Reading the content of a mathfield
+## Reading the Content of a Mathfield
 
 The content of a mathfield is available with the `value` property, just like 
 with a `<textarea>`.
@@ -38,6 +38,15 @@ is only sent if you press the **Return** or **Enter** key, or when the mathfield
 loses focus and the content has been modified{.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
     <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
     // `ev.target` is an instance of `MathfieldElement`
     console.log(ev.target.value);
@@ -50,23 +59,26 @@ loses focus and the content has been modified{.notice--info}
 
 The `value` property is equivalent to calling the `getValue()` method with 
 no argument. To control how the result is formatted, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
-For example to get the content as an ASCIIMath string, use `getValue('ascii-math)`.
+For example to get the content as a MathJSON expression, use `getValue('math-json')`.
 
-**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'ascii-math'` to `'spoken-text'`.{.notice--info}
+The MathJSON format is a lightweight data interchange format for mathematical notation. [Learn more about MathJSON](/math-json/).{.notice--info}
+
+**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'math-json'` to `'spoken-text'`.{.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
-    // `ev.target` is an instance of `MathfieldElement`
-    console.log(ev.target.getValue('ascii-math'));
-});</div>
     <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
+    <div slot="javascript">const mf = document.getElementById('formula');
+mf.addEventListener('input',(ev) => {
+    // `ev.target` is an instance of `MathfieldElement`
+    console.log(ev.target.getValue('math-json'));
+});</div>
 </code-playground>
 
 
-## Changing the content of a mathfield
+## Changing the Content of a Mathfield
 
 You can change the value of the mathfield programatically. In the example 
 below, the **Latex** input field is editable and is reflected in the mathfield 
@@ -77,7 +89,7 @@ changing the content of the mathfield, to prevent a `'input'` event from being
 triggered and creating an infinite loop.{.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-  <div slot="javascript">import MathLive from 'mathlive';
+  <div slot="javascript">import 'mathlive';
     const mf = document.getElementById('formula');
     mf.addEventListener('input',(ev) => {
         document.getElementById('latex').value = mf.value;
@@ -105,7 +117,7 @@ triggered and creating an infinite loop.{.notice--info}
 </section>
 
 
-## Applying style to a mathfield
+## Applying Style to a Mathfield
 
 The text color ("ink") and background color ("paper"), as well as other 
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
@@ -113,7 +125,16 @@ using `applyStyle()`.
 
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('formula');
 // Change the background color of the entire mathfield
 mf.applyStyle({backgroundColor: "yellow" });
@@ -131,7 +152,16 @@ to `applyStyle()`.
 
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('formula');
 // Change the color and size of the first two characters of the mathfield
 mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
@@ -144,7 +174,7 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 </code-playground>
 
 
-## Detecting a click on a mathfield
+## Detecting a Click on a Mathfield
 
 In most cases Mathlive will respond to mouse and keyboard interactions with 
 the mathfield. However, in some cases it might be useful to detect when a 
@@ -190,7 +220,7 @@ event or a `pointerdown` event. The `focus` event has the benefit of working
 with both mouse and keyboard, which makes this solution more accessible.
 
 
-## Detecting when the user has finished editing a mathfield
+## Detecting When the user has Finished Editing a Mathfield
 
 To detect when the user presses the **Return** or **Enter** key in a mathfield,
 listen for the `change` event. Note that this event is not fired when in Latex

@@ -45,7 +45,16 @@ To override, customize or add to the list of supported key bindings, provide a
 `onKeystroke` handler.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
 mf.setOptions({
   onKeystroke: (mathfield, keystroke, ev) => {
@@ -89,7 +98,16 @@ MathLive has some [built-in inline shortcuts](https://github.com/arnog/mathlive/
 enhanced with new shortcuts.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
 mf.setOptions({
   inlineShortcuts: {

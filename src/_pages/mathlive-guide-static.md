@@ -132,6 +132,11 @@ To create a read-only mathfield, add the `read-only` attribute to a `<mathfield>
 element.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
+    <style slot="style">
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
     <div slot="html">&lt;math-field read-only style="
         font-size: 32px; 
         padding: 8px; 

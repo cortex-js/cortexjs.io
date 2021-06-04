@@ -30,9 +30,17 @@ are macros, that is commands defined with a Latex expression.
 To view the default macros, inspect the `macros` option:
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-const mf = document.getElementById('mf'), {
-});
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+const mf = document.getElementById('mf');
 console.log(mf.getOption('macros'));
 </div>
     <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
@@ -42,13 +50,22 @@ console.log(mf.getOption('macros'));
 To add (or remove) macros use `setOptions({macros: ...})`.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
 mf.setOptions({
     macros: {
         ...mf.getOptions('macros'),
         smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
-    },
+    }
 });
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;

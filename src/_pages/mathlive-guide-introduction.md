@@ -26,9 +26,9 @@ head:
 # Mathfield Introduction
 Let's add an editable mathfield to a web page.
 
-**1. Load  the MathLive library with a `<script>` tag.**
+**1. Load the MathLive library from a CDN with a `<script>` tag.**
 
-<p class="notice--info">Read more about options to integrate MathLive in your 
+<p class="notice--info">Read about other options to integrate MathLive in your 
   project in the 
   <a href="/guides/mathfield-getting-started/">Getting Started Guide</a>.
 </p>
@@ -49,6 +49,15 @@ For example `f(x) = \sin(x)`,
 
 
 <code-playground layout="stack" class="m-lg w-full-lg">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
     <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}

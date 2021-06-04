@@ -49,7 +49,7 @@ customized to fit your specific needs. For example you can remove some
 keyboards, or create new ones.
 
 
-## Controlling when the virtual keyboard panel is displayed
+## Controlling when the Virtual Keyboard Panel is Displayed
 
 The default behavior of the virtual keyboard panel is to only be displayed on 
 touch-enabled devices (mobile phones, tablets, laptops with a touch-screen) when
@@ -69,7 +69,7 @@ mathfield
 There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations. {.notice--info}
 
-## Controling which keyboards are displayed
+## Controling Which Keyboards Are Displayed
 
 The virtual keyboard panel displays multiple keyboards which can be 
 toggled using the keyboard switcher: `numeric`, `functions`, `symbols`, `roman` 
@@ -80,28 +80,36 @@ configuration property. The value of this property is a space-separated string
 of the name of the keyboards that should be displayed.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'),  {
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+<div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
+<div slot="javascript">import 'mathlive';
+document.getElementById('mf').setOptions({
   virtualKeyboardMode: "manual",
   virtualKeyboards: 'numeric symbols'
-});
-</div>
-    <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
-</div>
+});</div>
 </code-playground>
 
 
-## Defining custom virtual keyboards
+## Defining Custom Virtual Keyboards
 
 A virtual keyboard is made up of one or more "layers". A keyboard layer is a 
 set of keys that can be toggled using another key. For example, the `roman` 
 keyboard has a regular layer and a layer for symbols. Most keyboards have a 
 single layer.
 
-Custom virtual keyboard layouts can be defined with an object literal.
+To define a custom virtual keyboard layout, use an object literal as described
+below.
 
-### Defining a layer
+### Defining a Layer
 
 First, let's define a layer, which we'll call `"high-school-layer"`.
 
@@ -316,7 +324,7 @@ property:
     };
 ```
 
-### Defining a keyboard
+### Defining a Keyboard
 
 Now, let's define a new keyboard called `"high-school-keyboard"`.
 
@@ -343,7 +351,7 @@ array of their names.
     };
 ```
 
-### Adding the layers and keyboards
+### Adding the Layers and Keyboards
 
 Now, we just have to call `setOptions()` with our custom layer and custom
 keyboard.
@@ -367,90 +375,88 @@ keyboards, plus ours, we could have used the `"all"` shortcut:
 ```
 
 
-## Customizing the appearance of the virtual keyboard toggle
+## Customizing the Appearance of the Virtual Keyboard Toggle
 
-By specifying a CSS rule for the `.ML__virtual-keyboard-toggle` selector the 
-appearance of the virtual keyboard toggle can be modified.
+To apply a CSS rule to the virtual keyboard toggle, use
+the `math-field::part(virtual-keyboard-toggle)` CSS selector.
 
-Make sure the rule has sufficient CSS specificity to be applied. Add a `!important`
-directive or prefix the selector with the id of your mathfield. {.notice--warning}
-
-<code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'),  {
-  virtualKeyboardMode: 'manual'
-});
-</div>
-    <div slot="html">&lt;style&gt;
-  .ML__virtual-keyboard-toggle {
-    color: red !important;
-  }
-&lt;/style&gt;
-&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
-</div>
-</code-playground>
-
-
-The icon of the virtual keyboard toggle can be changed using the `virtualKeyboardToggleGlyph`
+To change the icon of the virtual keyboard toggle use the 
+`virtualKeyboardToggleGlyph`
 configuration property.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'),  {
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+document.getElementById('mf').setOptions({
   virtualKeyboardMode: "manual",
   virtualKeyboardToggleGlyph: `&lt;span style="width: 21px;">&lt;svg style="width: 21px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"&gt;&lt;path fill="currentColor" d="M192 288H32c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V320c0-18-14-32-32-32zm-29 140c3 3 3 8 0 12l-11 11c-4 3-9 3-12 0l-28-28-28 28c-3 3-8 3-12 0l-11-11c-3-4-3-9 0-12l28-28-28-28c-3-3-3-8 0-12l11-11c4-3 9-3 12 0l28 28 28-28c3-3 8-3 12 0l11 11c3 4 3 9 0 12l-28 28 28 28zM480 0H320c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V32c0-18-14-32-32-32zm-16 120c0 4-4 8-8 8h-40v40c0 4-4 8-8 8h-16c-4 0-8-4-8-8v-40h-40c-4 0-8-4-8-8v-16c0-4 4-8 8-8h40V56c0-4 4-8 8-8h16c4 0 8 4 8 8v40h40c4 0 8 4 8 8v16zm16 168H320c-18 0-32 14-32 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V320c0-18-14-32-32-32zm-16 152c0 4-4 8-8 8H344c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16zm0-64c0 4-4 8-8 8H344c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16zM192 0H32C14 0 0 14 0 32v160c0 18 14 32 32 32h160c18 0 32-14 32-32V32c0-18-14-32-32-32zm-16 120c0 4-4 8-8 8H56c-4 0-8-4-8-8v-16c0-4 4-8 8-8h112c4 0 8 4 8 8v16z"/&gt;&lt;/svg&gt&lt;/span>`
 });
 </div>
     <div slot="html">&lt;style&gt;
-  div.ML__virtual-keyboard-toggle{
-    color: #555;
-  }
-  div.ML__virtual-keyboard-toggle:hover {
-    background: transparent;
-    color: var(--primary);
-    box-shadow:  none;
-  }
+math-field::part(virtual-keyboard-toggle) {
+  color: red;
+  background: #ddd;
+}
 &lt;/style&gt;
-&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
+&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
 </div>
 </code-playground>
 
 
-## Changing the arrangement of alphabetical keys
+## Changing the Alphabetical Keyboard Layout
 
 By default, the layout of the alphabetic virtual keyboard is determined based
 on the locale (QWERTY for english speaking countries, AZERTY for french speaking
 countries, etc..). 
 
-To select a different alphabetic keyboard layouts, such as DVORAK and COLEMAK, 
+To select a different alphabetic keyboard layouts, such as DVORAK or COLEMAK, 
 use the `virtualKeyboardLayout` configuration property.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
-    <div slot="javascript">import MathLive from 'mathlive';
-MathLive.makeMathField(document.getElementById('mathfield'),  {
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+document.getElementById('mf').setOptions({
   virtualKeyboardMode: "manual",
   virtualKeyboardLayout: 'dvorak'
 });
 </div>
-    <div slot="html">&lt;div id="mathfield"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/div&gt;
+    <div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
 </div>
 </code-playground>
 
 
-## Customizing the appearance of the virtual keyboard keycaps
+## Customizing the Appearance of the Virtual Keyboard Keycaps
 
-The appearance of keycaps can be controlled with the following CSS variables:
+To control the appearance of keycaps use the following CSS variables.
   - `--keycap-height`
   - `--keycap-font-size`
   - `--keycap-small-font-size` (only if needed)
   - `--keycap-extra-small-font-size` (only if needed)
   - `--keycap-tt-font-size` (only if needed)
 
+Set these CSS variables on any selector inherited by the
+`math-field` tag, for example, `body`: although CSS styles are "invisible" to custom components, CSS variables
+are "passed through" and will affect the content of the `<math-field>` custom component. {.notice--info}
 
-## Sharing virtual keyboards amongst multiple instances
+## Sharing Virtual Keyboards Amongst Multiple Instances
 
 When there are multiple mathfield elements in a page, they usually each have
 their own virtual keyboard.

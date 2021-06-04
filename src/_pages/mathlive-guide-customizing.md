@@ -60,6 +60,15 @@ you can specify where the fonts can be located using the [`fontsDirectory`](http
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" class="m-lg w-full-lg">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
 <div slot="html">&lt;math-field fonts-directory="//unpkg.com/mathlive/dist/fonts/"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -67,7 +76,7 @@ you can specify where the fonts can be located using the [`fontsDirectory`](http
 <!-- htmlmin:ignore -->
 
 Note that changing the fonts directory for one mathfield will change the fonts 
-used by all the mathfields in the page. {.notice--warning}
+used by all the other mathfield elements in the page. {.notice--warning}
 
 Learn more about configuring the MathLive library to your environment, 
 including using custom asset pipelines and bundlers in the [Getting Started Guide](/guides/mathfield-getting-started/). {.notice--info}
@@ -75,7 +84,8 @@ including using custom asset pipelines and bundlers in the [Getting Started Guid
 
 ## CSS Variables
 
-Some CSS variables can be used to modify the appearance of the mathfield:
+Some CSS variables (custom properties) can be used to modify the appearance of 
+the mathfield:
 
 * `--hue`: (0...360) default is 212 (light blue). The default colors below are derived
 from this variable
@@ -88,10 +98,23 @@ mathfield is active
 * `--smart-fence-color`: color of a smart fence (default is current color)
 * `--text-font-family`: the font stack used in text mode
 
+Set these CSS variables on any selector inherited by the
+`math-field` tag, for example, `body`: although CSS styles are "invisible" to 
+custom components, CSS variables are "passed through" and will affect the 
+content of the `<math-field>` custom component. {.notice--info}
 
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" class="m-lg w-full-lg">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
     <div slot="html">&lt;math-field style="
     --hue: 53 !important;
     --caret: red !important;
@@ -210,6 +233,7 @@ used in conjunction with `default-mode="inline-math"`.
   <div slot="html">The answer is &lt;math-field 
   default-mode="inline-math"
   style="
+    padding-left: 5px; padding-right: 5px;
     display: inline-block;
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, .3); 
@@ -277,7 +301,16 @@ line 3 to `scriptDepth: 0`, then try to type "x^2" in the mathfield.
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" class="m-lg w-full-lg">
-<div slot="html">&lt;math-field smart-mode &gt;
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+<div slot="html">&lt;math-field smart-mode&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -301,6 +334,15 @@ invoking the `getOptions()` method, otherwise it would not be found. {.notice--i
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" class="m-lg w-full-lg">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
 <div slot="javascript">
 await window.customElements.whenDefined('math-field');
 const mf = document.getElementById('formula');

@@ -5,6 +5,14 @@ const matter = require('gray-matter');
 const CODE_MIRROR_VERSION = '5.59.1'; // 2020-12-31
 
 const INJECTED_STYLESHEET = `
+.output:focus-within {
+  outline: Highlight auto 1px;
+  outline: -webkit-focus-ring-color auto 1px
+}
+.output math-field:focus, .output math-field:focus-within {
+  outline: none;
+}
+
 .zebra-zone {
     display: flex;
     align-items: center;
