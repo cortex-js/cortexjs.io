@@ -121,16 +121,18 @@ sequence is replaced with the current selection).
 
 ## Speech
 
-- `speak` This selector takes two arguments. The first argument is a string that
+- `speak` This selector takes two optional arguments. The first argument is a string that
   determines what should be spoken. The valid values are:
   - `all`
   - `left`
   - `right`
   - `selection`
   - `parent`
-  - `group` The second parameter determines whether what is being spoken should
+  - `group` 
+  
+  The second parameter determines whether what is being spoken should
     be highlighted. It is an object: `{withHighlighting: boolean}` (default is
-    false). Note: highlighting currently only works when connected to Amazon's
+    false). Note: highlighting currently only works when using Amazon's
     AWS speech synthesizer.
 ## Next
 

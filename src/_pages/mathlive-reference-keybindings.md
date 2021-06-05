@@ -30,6 +30,10 @@ sidebar:
     padding: 10px;
     list-style: none;
   }
+  td code {
+    font-size: 32px;
+    font-weight:normal;
+  }
 </style>
 
 ## Keybindings
@@ -82,18 +86,15 @@ The shortcuts apply in all modes.
 | `⇥` | move to next placeholder | |
 | `⇧⇥` | move to previous placeholder | |
 | `esc` | switchMode("latex") | |
-| `esc` | 〃 | |
 | `\` | 〃 | |
-| `[INTLBACKSLASH]` | 〃 | |
+| `Intl Backslash` | 〃 | |
 | `⌥=` | applyStyle({"mode":"text"}) | |
 | `⌥=` | 〃 | |
 | `esc` | complete("complete") | |
-| `⇥` | complete("accept-suggestion") | |
+| `⇥` | In Latex mode: accept-suggestion | |
 | `⏎` | complete | |
 | `⌤` | 〃 | |
 | `⇧esc` | complete("reject") | |
-| `⇣` | next suggestion | |
-| `⇡` | previous suggestion | |
 | `⌃A` | select all | |
 | `⌘A` | 〃 | |
 | `[CUT]` | cut to clipboard | |
@@ -130,55 +131,12 @@ The shortcuts apply in all modes.
 | `⌃L` | scroll into view | |
 | `⇧[QUOTE]` | switchMode("text") | |
 | `⇧[QUOTE]` | switchMode("math") | |
-| `⌃2` | $$\sqrt{#0}$$  —`$$\sqrt{#0}$$` | |
-| `⌃5` | move to opposite | |
-| `⌃6` | move to superscript | |
-| `⌃-` | move to subscript | |
-| `⌥[` | $$\left\lbrack #0 \right\rbrack$$  —`$$\left\lbrack #0 \right\rbrack$$` | |
-| `⇧⌥[` | $$\left\lbrace #0 \right\rbrace$$  —`$$\left\lbrace #0 \right\rbrace$$` | |
-| `⌃⏎` | add row after | |
-| `⌃⌤` | 〃 | |
-| `⌘⏎` | 〃 | |
-| `⌘⌤` | 〃 | |
-| `⌃;` | 〃 | |
-| `⌘;` | 〃 | |
-| `⇧⌃;` | add row before | |
-| `⇧⌘;` | 〃 | |
-| `⌃,` | add column after | |
-| `⌘,` | 〃 | |
-| `⇧⌃,` | 〃 | |
-| `⇧⌘,` | 〃 | |
-| `⌥P` | $$\pi$$  —`$$\pi$$` | |
-| `⌥V` | $$\sqrt{#0}$$  —`$$\sqrt{#0}$$` | |
-| `⌥W` | $$\sum_{i=#?}^{#?}$$  —`$$\sum_{i=#?}^{#?}$$` | |
-| `⌥B` | $$\int_{#?}^{#?}$$  —`$$\int_{#?}^{#?}$$` | |
-| `⌥U` | $$\cup$$  —`$$\cup$$` | |
-| `⌥N` | $$\cap$$  —`$$\cap$$` | |
-| `⌥O` | $$\emptyset$$  —`$$\emptyset$$` | |
-| `⌥D` | $$\differentialD$$  —`$$\differentialD$$` | |
-| `⇧⌥O` | $$\varnothing$$  —`$$\varnothing$$` | |
-| `⇧⌥D` | $$\partial$$  —`$$\partial$$` | |
-| `⇧⌥P` | $$\prod_{i=#?}^{#?}$$  —`$$\prod_{i=#?}^{#?}$$` | |
-| `⇧⌥U` | $$\bigcup$$  —`$$\bigcup$$` | |
-| `⇧⌥N` | $$\bigcap$$  —`$$\bigcap$$` | |
-| `⇧⌥A` | $$\forall$$  —`$$\forall$$` | |
-| `⇧⌥E` | $$\exists$$  —`$$\exists$$` | |
-| `⌥5` | $$$\infty$$  —`$\infty$$` | |
-| `⌥6` | $$\wedge$$  —`$$\wedge$$` | |
-| `⇧⌥6` | $$\vee$$  —`$$\vee$$` | |
-| `⌥9` | $$($$  —`(` | |
-| `⌥0` | $$)$$  —`)` | |
-| `⌥|` | $$|$$  —`|` | |
-| `⌥\` | $$\backslash$$  —`$$\backslash$$` | |
-| `/` | $$\frac{\unicode{"2B1A}}{#?}$$  —`$$\frac{#@}{#?}$$` | |
-| `⌥/` | $$\/$$  —`$$\/$$` | |
-| `[NUMPADDIVIDE]` | $$\frac{\unicode{"2B1A}}{#?}$$  —`$$\frac{#@}{#?}$$` | |
-| `⌥[NUMPADDIVIDE]` | $$\frac{#?}{\unicode{"2B1A}}$$  —`\frac{#?}{#@}` | |
-| `⇧[BACKQUOTE]` | $$\~$$  —`$$\~$$` | |
+| `⌥B` | $$\int_{\unicode{"2B1A}}^{\unicode{"2B1A}}$$   | |
+
 | `⇧⌥K` | toggle keystroke caption | |
 | `⌥space` | toggle virtual keyboard | |
 | `⌥⌃⇡` | speak("parent") | |
-| `⌥⌃⇣` | speak("all") | ||
+| `⌥⌃⇣` | speak("all") | |
 
 
 ### Math Mode Only
@@ -194,12 +152,12 @@ The shortcuts apply in all modes.
 | `[INTLBACKSLASH]` | 〃 | |
 | `⌥=` | applyStyle({"mode":"text"}) | |
 | `⇧[QUOTE]` | switchMode("text") | |
-| `⌃2` | $$\sqrt{#0}$$  —`$$\sqrt{#0}$$` | |
+| `⌃2` | $$\sqrt{\unicode{"2B1A}}$$ | |
 | `⌃5` | move to opposite | |
 | `⌃6` | move to superscript | |
 | `⌃-` | move to subscript | |
-| `⌥[` | $$\left\lbrack #0 \right\rbrack$$  —`$$\left\lbrack #0 \right\rbrack$$` | |
-| `⇧⌥[` | $$\left\lbrace #0 \right\rbrace$$  —`$$\left\lbrace #0 \right\rbrace$$` | |
+| `⌥[` | $$\left\lbrack \unicode{"2B1A}\right\rbrack$$  | |
+| `⇧⌥[` | $$\left\lbrace \unicode{"2B1A} \right\rbrace$$  | |
 | `⌃⏎` | add row after | |
 | `⌃⌤` | 〃 | |
 | `⌘⏎` | 〃 | |
@@ -213,15 +171,15 @@ The shortcuts apply in all modes.
 | `⇧⌃,` | 〃 | |
 | `⇧⌘,` | 〃 | |
 | `⌥P` | $$\pi$$  —`$$\pi$$` | |
-| `⌥V` | $$\sqrt{#0}$$  —`$$\sqrt{#0}$$` | |
-| `⌥W` | $$\sum_{i=#?}^{#?}$$  —`$$\sum_{i=#?}^{#?}$$` | |
+| `⌥V` | $$\sqrt{\unicode{"2B1A}}$$  | |
+| `⌥W` | $$\sum_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$  | |
 | `⌥U` | $$\cup$$  —`$$\cup$$` | |
 | `⌥N` | $$\cap$$  —`$$\cap$$` | |
 | `⌥O` | $$\emptyset$$  —`$$\emptyset$$` | |
 | `⌥D` | $$\differentialD$$  —`$$\differentialD$$` | |
 | `⇧⌥O` | $$\varnothing$$  —`$$\varnothing$$` | |
 | `⇧⌥D` | $$\partial$$  —`$$\partial$$` | |
-| `⇧⌥P` | $$\prod_{i=#?}^{#?}$$  —`$$\prod_{i=#?}^{#?}$$` | |
+| `⇧⌥P` | $$\prod_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$   | |
 | `⇧⌥U` | $$\bigcup$$  —`$$\bigcup$$` | |
 | `⇧⌥N` | $$\bigcap$$  —`$$\bigcap$$` | |
 | `⇧⌥A` | $$\forall$$  —`$$\forall$$` | |
@@ -233,11 +191,10 @@ The shortcuts apply in all modes.
 | `⌥0` | $$)$$  —`)` | |
 | `⌥|` | $$|$$  —`|` | |
 | `⌥\` | $$\backslash$$  —`$$\backslash$$` | |
-| `/` | $$\frac{\unicode{"2B1A}}{#?}$$  —`$$\frac{#@}{#?}$$` | |
-| `⌥/` | $$\/$$  —`$$\/$$` | |
-| `[NUMPADDIVIDE]` | $$\frac{\unicode{"2B1A}}{#?}$$  —`$$\frac{#@}{#?}$$` | |
-| `⌥[NUMPADDIVIDE]` | $$\frac{#?}{\unicode{"2B1A}}$$  —`\frac{#?}{#@}` | |
-| `⇧[BACKQUOTE]` | $$\~$$  —`$$\~$$` | ||
+| `/` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
+| `[NUMPADDIVIDE]` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
+| `⌥[NUMPADDIVIDE]` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
+| `⇧[BACKQUOTE]` | `\~`  | ||
 
 
 ## Inline Shortcuts
@@ -253,25 +210,25 @@ If the conversion was not desired, for example you actually meant "pi", type ctr
 | `alpha` | $$\alpha$$ `\alpha` |
 | `delta` | $$\delta$$ `\delta` |
 | `Delta` | $$\Delta$$ `\Delta` |
-| `pi` | $$\pi$$ `\pi` |
-| `pi ` | $$\pi $$ `\pi ` |
-| `Pi` | $$\Pi$$ `\Pi` |
-| `theta` | $$\theta$$ `\theta` |
-| `Theta` | $$\Theta$$ `\Theta` |
-| `ii` | $$\imaginaryI$$ `\imaginaryI` |
-| `jj` | $$\imaginaryJ$$ `\imaginaryJ` |
-| `ee` | $$\exponentialE$$ `\exponentialE` |
-| `nabla` | $$\nabla$$ `\nabla` |
-| `grad` | $$\nabla$$ `\nabla` |
-| `del` | $$\partial$$ `\partial` |
-| `infty` | $$\infty$$ `\infty` |
-| `∞` | $$\infty$$ `\infty` |
-| `oo` | $$\infty$$ `\infty` |
-| `∑` | $$\sum$$ `\sum` |
-| `sum` | $$\sum_{#?}^{#?}$$ `\sum_{#?}^{#?}` |
-| `int` | $$\int_{#?}^{#?}$$ `\int_{#?}^{#?}` |
-| `prod` | $$\prod_{#?}^{#?}$$ `\prod_{#?}^{#?}` |
-| `sqrt` | $$\sqrt{#?}$$ `\sqrt{#?}` |
+| `pi` | $$\pi$$  |
+| `pi ` | $$\pi $$  |
+| `Pi` | $$\Pi$$  |
+| `theta` | $$\theta$$  |
+| `Theta` | $$\Theta$$  |
+| `ii` | $$\imaginaryI$$  |
+| `jj` | $$\imaginaryJ$$  |
+| `ee` | $$\exponentialE$$  |
+| `nabla` | $$\nabla$$  |
+| `grad` | $$\nabla$$  |
+| `del` | $$\partial$$  |
+| `infty` | $$\infty$$  |
+| `∞` | $$\infty$$  |
+| `oo` | $$\infty$$  |
+| `∑` | $$\sum$$  |
+| `sum` | $$\sum_{\unicode{"2B1A}}^{\unicode{"2B1A}}$$ `\sum_{\unicode{"2B1A}}^{\unicode{"2B1A}}` |
+| `int` | $$\int_{\unicode{"2B1A}}^{\unicode{"2B1A}}$$ `\int_{\unicode{"2B1A}}^{\unicode{"2B1A}}` |
+| `prod` | $$\prod_{\unicode{"2B1A}}^{\unicode{"2B1A}}$$ `\prod_{\unicode{"2B1A}}^{\unicode{"2B1A}}` |
+| `sqrt` | $$\sqrt{\unicode{"2B1A}}$$ `\sqrt{\unicode{"2B1A}}` |
 | `∆` | $$\differentialD$$ `\differentialD` |
 | `∂` | $$\differentialD$$ `\differentialD` |
 | `arcsin` | $$\arcsin$$ `\arcsin` |
@@ -289,7 +246,7 @@ If the conversion was not desired, for example you actually meant "pi", type ctr
 | `log` | $$\log$$ `\log` |
 | `ln` | $$\ln$$ `\ln` |
 | `exp` | $$\exp$$ `\exp` |
-| `lim` | $$\lim_{#?}$$ `\lim_{#?}` |
+| `lim` | $$\lim_{\unicode{"2B1A}}$$ `\lim_{\unicode{"2B1A}}` |
 | `dx` | $$\differentialD x$$ `\differentialD x` |
 | `dy` | $$\differentialD y$$ `\differentialD y` |
 | `dt` | $$\differentialD t$$ `\differentialD t` |
@@ -360,10 +317,10 @@ If the conversion was not desired, for example you actually meant "pi", type ctr
 | `exists` | $$\exists$$ `\exists` |
 | `!exists` | $$\nexists$$ `\nexists` |
 | `:.` | $$\therefore$$ `\therefore` |
-| `liminf` | $$\operatorname*{lim~inf}_{#?}$$ `\operatorname*{lim~inf}_{#?}` |
-| `limsup` | $$\operatorname*{lim~sup}_{#?}$$ `\operatorname*{lim~sup}_{#?}` |
-| `argmin` | $$\operatorname*{arg~min}_{#?}$$ `\operatorname*{arg~min}_{#?}` |
-| `argmax` | $$\operatorname*{arg~max}_{#?}$$ `\operatorname*{arg~max}_{#?}` |
+| `liminf` | $$\operatorname*{lim~inf}_{\unicode{"2B1A}}$$ `\operatorname*{lim~inf}_{\unicode{"2B1A}}` |
+| `limsup` | $$\operatorname*{lim~sup}_{\unicode{"2B1A}}$$ `\operatorname*{lim~sup}_{\unicode{"2B1A}}` |
+| `argmin` | $$\operatorname*{arg~min}_{\unicode{"2B1A}}$$ `\operatorname*{arg~min}_{\unicode{"2B1A}}` |
+| `argmax` | $$\operatorname*{arg~max}_{\unicode{"2B1A}}$$ `\operatorname*{arg~max}_{\unicode{"2B1A}}` |
 | `det` | $$\det$$ `\det` |
 | `mod` | $$\mod$$ `\mod` |
 | `max` | $$\max$$ `\max` |
@@ -390,21 +347,21 @@ If the conversion was not desired, for example you actually meant "pi", type ctr
 | `->...` | $$\to\cdots$$ `\to\cdots` |
 | `->` | $$\to$$ `\to` |
 | `|->` | $$\mapsto$$ `\mapsto` |
-| `-->` | $$\longrightarrow$$ `\longrightarrow` |
-| `<--` | $$\longleftarrow$$ `\longleftarrow` |
-| `=>` | $$\Rightarrow$$ `\Rightarrow` |
-| `==>` | $$\Longrightarrow$$ `\Longrightarrow` |
-| `<=>` | $$\Leftrightarrow$$ `\Leftrightarrow` |
-| `<->` | $$\leftrightarrow$$ `\leftrightarrow` |
-| `(.)` | $$\odot$$ `\odot` |
-| `(+)` | $$\oplus$$ `\oplus` |
-| `(/)` | $$\oslash$$ `\oslash` |
-| `(*)` | $$\otimes$$ `\otimes` |
-| `(-)` | $$\ominus$$ `\ominus` |
-| `||` | $$\Vert$$ `\Vert` |
+| `-->` | $$\longrightarrow$$  |
+| `<--` | $$\longleftarrow$$  |
+| `=>` | $$\Rightarrow$$  |
+| `==>` | $$\Longrightarrow$$  |
+| `<=>` | $$\Leftrightarrow$$  |
+| `<->` | $$\leftrightarrow$$  |
+| `(.)` | $$\odot$$  |
+| `(+)` | $$\oplus$$  |
+| `(/)` | $$\oslash$$  |
+| `(*)` | $$\otimes$$  |
+| `(-)` | $$\ominus$$  |
+| `||` | $$\Vert$$  |
 | `{` | $$\{$$ `\{` |
 | `}` | $$\}$$ `\}` |
-| `*` | $$\cdot$$ `\cdot` |
+| `*` | $$\cdot$$  |
 
 
 
@@ -416,10 +373,10 @@ If the conversion was not desired, for example you actually meant "pi", type ctr
 | `$` | $$\$$$ `\$` |
 | `%` | $$\%$$ `\%` |
 | `#` | $$\#$$ `\#` |
-| `*` | $$\cdot$$ `\cdot` |
-| `**` | $$\ast$$ `\ast` |
-| `***` | $$\star$$ `\star` |
-| `//` | $$\slash$$ `\slash` |
+| `*` | $$\cdot$$  |
+| `**` | $$\ast$$  |
+| `***` | $$\star$$  |
+| `//` | $$\slash$$  |
 | `\\` | $$\backslash$$ `\backslash` |
 | `setminus` | $$\backslash$$ `\backslash` |
 | `|><` | $$\ltimes$$ `\ltimes` |

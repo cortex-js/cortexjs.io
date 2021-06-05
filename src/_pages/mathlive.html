@@ -32,7 +32,17 @@ head:
 
 
 <section class='m-lg mb-xl w-full-lg max-w-2xl'>
-  <code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack" class="m-lg w-full-lg">
+  <style slot="style">
+    .output:focus-within {
+      outline: Highlight auto 1px;
+      outline: -webkit-focus-ring-color auto 1px
+    }
+    .output math-field:focus, .output math-field:focus-within {
+      outline: none;
+    }
+    math-field { font-size: 32px; }
+  </style>
     <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
 &lt;math-field virtual-keyboard-mode=manual&gt;
   x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
@@ -47,9 +57,10 @@ head:
   <section class="fullwidth">
     <div class='copy'>
       <h2>TeX Quality Typesetting</h2>
-      <p>TeX is the gold standard for typesetting of mathematical content. </p>
-      <p>
-        MathLive provides a Javascript implementation that faithfully reproduces the output of TeX.</p>
+      <p>TeX is the gold standard for typesetting of mathematical content.</p>
+      <p>MathLive provides a Javascript implementation that faithfully 
+        reproduces the output of TeX.</p>
+      <p>MathLive supports over <a href="/mathlive/reference/commands/">800 TeX commands</a>.</p>
     </div>
     <div class="figure">
       <img src='/assets/images/mathfield/loop-eqn.png'>
@@ -62,17 +73,18 @@ head:
     </div>
     <div class='copy'>
       <h2>Anywhere. For Anyone.</h2>
-      <p>MathLive works with screenreaders and include a custom text to speech engine.</p>
-      <p>On screen virtual keyboards are also available to make input easy, even on mobile devices.</p>
+      <p>MathLive works with screenreaders and include a <a href="/mathlive/guides/speech/">custom text to speech engine</a>.</p>
+      <p>On screen, customizable, <a href="/mathlive/guides/virtual-keyboards/">virtual keyboards</a> are also available to make input easy, even on mobile devices.</p>
     </div>
   </section>
 
   <section class="fullwidth">
     <div class='copy'>
       <h2>Customizable</h2>
-      <p>You can paste in MathASCII or Latex, and get back those formats or an easy to parse MathJSON object
-        representing an Abstract Syntax Tree of the formula.</p>
-      <p>A comprehensive API is available and many options are customizable, from you own dictionary of Latex macros,
+      <p>You can paste in MathASCII or Latex, and get back those formats or an 
+        easy to parse <a href="/math-json">MathJSON object</a> representing an Abstract Syntax Tree of 
+        the formula.</p>
+      <p>A <a href="/docs/mathlive/">comprehensive API</a> is available and many options are customizable, from you own dictionary of Latex macros,
         custom inline shortcuts, custom virtual keyboards and more.</p>
     </div>
     <div class="figure">
@@ -86,7 +98,7 @@ head:
   <section class="card">
     <div class='copy'>
       <h2>Intuitive Editing</h2>
-      <p>Type an equation: use the keyboard to type symbols, arrow keys to navigate.
+      <p>Type an equation: use the <a href="/mathlive/reference/keybindings/">keyboard</a> to type symbols, arrow keys to navigate.
       <p>
       <p>When done, select the equation, and copy the LaTeX code to another app.</p>
     </div>

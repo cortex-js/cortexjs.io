@@ -39,9 +39,8 @@ of the mathfield, as a Latex expression.
 
 **3. Edit the equation in the code playground below.**
 
-The code playgrounds are live: when you modify the HTML or JavaScript code the
- output will update to reflect your changes. Press **Reset** to bring back
-the playground to its original state. {.notice--info}
+The code playground below and in the rest of the documentation are live: when you modify the HTML or JavaScript code the output will update to reflect your changes.
+Press **Reset** to bring back the playground to its original state. {.notice--info}
 
 **4. Change line 3 of the HTML to another Latex expression.** 
 For example `f(x) = \sin(x)`, 

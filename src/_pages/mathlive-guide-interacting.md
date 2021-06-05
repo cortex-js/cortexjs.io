@@ -27,15 +27,15 @@ head:
 
 ## Reading the Content of a Mathfield
 
-The content of a mathfield is available with the `value` property, just like 
-with a `<textarea>`.
+The content of a mathfield is available by reading the `value`
+property of the mathfield element, just like with a `<textarea>`.
 
 To be notified as soon as the content of the mathfield is modified listen for 
 an `'input'` event.
 
-**Try**: modify the `'input'` event to a `'change'` event. Notice how this event
+**Try**: modify the `'input'` event below to a `'change'` event. Notice how the `'change'` event
 is only sent if you press the **Return** or **Enter** key, or when the mathfield
-loses focus and the content has been modified{.notice--info}
+loses focus and the content has been modified. {.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <style slot="style">
@@ -57,8 +57,10 @@ loses focus and the content has been modified{.notice--info}
 &lt;/math-field&gt;</div>
 </code-playground>
 
-The `value` property is equivalent to calling the `getValue()` method with 
-no argument. To control how the result is formatted, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
+Reading the `value` property is equivalent to calling the `getValue()` method with 
+no argument. 
+
+To control how the result is formatted, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
 For example to get the content as a MathJSON expression, use `getValue('math-json')`.
 
 The MathJSON format is a lightweight data interchange format for mathematical notation. [Learn more about MathJSON](/math-json/).{.notice--info}
@@ -94,13 +96,18 @@ triggered and creating an infinite loop.{.notice--info}
     mf.addEventListener('input',(ev) => {
         document.getElementById('latex').value = mf.value;
     });
-    //
+//
     document.getElementById('latex').value = mf.value;
-    //
+//
     // Listen for changes in the latex text field, and reflect its value in 
     // the mathfield.
-    document.getElementById('latex').addEventListener('input', (ev) => {
-        mf.setValue(ev.target.value, {suppressChangeNotifications: true});
+//
+    document.getElementById('latex').
+      addEventListener('input', (ev) => {
+        mf.setValue(
+          ev.target.value, 
+          {suppressChangeNotifications: true}
+        );
     });
   </div>
   <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
@@ -123,6 +130,8 @@ The text color ("ink") and background color ("paper"), as well as other
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
 using `applyStyle()`.
 
+This style applies to the content of the formula and will be reflected in the Latex output. To change the appearance of the mathfield but not
+the content of the formula, see [Customizing](mathlive/guides/customizing/). {.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
     <style slot="style">
@@ -137,7 +146,10 @@ using `applyStyle()`.
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('formula');
 // Change the background color of the entire mathfield
-mf.applyStyle({backgroundColor: "yellow" });
+mf.applyStyle(
+  {backgroundColor: 'yellow' }, 
+  {range: [0, -1]}
+);
 </div>
 <div slot="html">
 &lt;math-field id="formula"&gt;
@@ -220,7 +232,7 @@ event or a `pointerdown` event. The `focus` event has the benefit of working
 with both mouse and keyboard, which makes this solution more accessible.
 
 
-## Detecting When the user has Finished Editing a Mathfield
+## Detecting When the User has Finished Editing a Mathfield
 
 To detect when the user presses the **Return** or **Enter** key in a mathfield,
 listen for the `change` event. Note that this event is not fired when in Latex
