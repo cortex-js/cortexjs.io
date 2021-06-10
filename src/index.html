@@ -30,8 +30,8 @@ read_time: false
   </div>
 </section>
 
-<div class='cards col3'>
-  <section id="mathjson" class="card">
+<div class='cards col2'>
+  <!-- <section id="mathjson" class="card">
     <div class="copy">
       <h2>MathJSON<span class='subhead'>The Web Native Format for Math</span></h2>
       <h3>A JSON schema to represent math expressions.</h3>
@@ -42,12 +42,14 @@ read_time: false
     <div class="figure">
       <img src="/assets/MathJSON-1.png">
     </div>
-  </section>
+  </section> -->
 
-  <section id="mathjson" class="card">
+  <section id="compute-engine" class="card">
     <div class="copy">
-      <h2>Compute Engine<span class='subhead'>Turbo Math Evaluator</span></h2>
-      <h3>The Compute Engine uses an optimizing compiler to quickly evaluate math expressions.</h3>
+      <h2>Compute Engine<span class='subhead'>Simplify, Solve, Evaluate</span></h2>
+      <h3>Manipulate <a href='/math-json/'>MathJSON</a> expressions symbolically
+         and numerically, from checking if \(x + x = 2x\) or if 
+         \(2^{11} - 1 \in \mathbb{P}\) to calculating \(e^{i\pi} \).</h3>
       <p><a href='/compute-engine/'>Learn More<span class='ml-sm'><i
               class="fas fa-chevron-right navigation"></i><span></a></p>
     </div>
@@ -56,11 +58,10 @@ read_time: false
     </div>
   </section>
 
-  <section id="mathjson" class="card">
+  <section id="visual-toolkit" class="card">
     <div class="copy">
       <h2>Visual Toolkit<span class='subhead'>Make Scientific Data Visible</span></h2>
-      <h3>Visual representations of data can help understanding. The Visual Toolkit helps plot data sets to reveal
-        insights hidden in data.</h3>
+      <h3>Discover insights hidden in complex data.</h3>
       <p><strong>Coming soon.</strong></p>
     </div>
     <div class="figure">
@@ -70,3 +71,21 @@ read_time: false
 
 
 </div>
+
+<script type='module'>
+    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+    renderMathInDocument({ 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [
+            ['$$', '$$'],
+            ['\\[', '\\]'],
+          ],
+        },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
+</script>

@@ -238,7 +238,48 @@ To detect when the user presses the **Return** or **Enter** key in a mathfield,
 listen for the `change` event. Note that this event is not fired when in Latex
 editing mode, where **Return** or **Enter** is used to exit the mode.
 
+## Interacting with the Clipboard
 
+Users can export the content of the mathfield by using standard **Copy**/**Cut**
+commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>C</kbd>).
+
+Multiple flavors are put on the clipboard, and the recipient of the **Paste** operation can pick whichever is most appropriate:
+
+| | |
+|:-- | :-- |
+| `text/plain` | Latex wrapped with a `\begin{equation*}` and `\end{equation*}`.|
+| `application/x-latex` | Raw Latex |
+| `application/json`| A MathJSON representation of the formula. |
+| `application/mathml+xml` | A MathML representation of the formula. |
+
+The Latex in the `text/plain` flavor is "wrapped" to make it easier for the recipient of the paste to recognize that this content is in Latex format. There isn't really a standard format for this, but testing of several Latex-capable editors has shown that `\begin{equation*}` was the most commonly recognized.
+
+For improved interoperability, the exported Latex uses the `latex-expanded` format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the `\differentialD` command is used in the formula, it is exported as its corresponding definition, `\mathrm{d}`. .{.notice--info}
+
+To customize the content of the `text/plain` flavor, use the `onExport()` hook. 
+
+For example, to wrap the exported latex with `<math>...</math>` instead:
+
+```js
+mf.setOptions({onExport: (mf, latex) => `<math>${latex}</math>`});
+```
+
+To export the "raw" (not expanded) Latex), use:
+
+```js
+mf.setOptions({onExport: (mf, latex, range) => 
+  `\\(${mg.getValue(range, 'latex')}\\)`
+});
+```
+
+The exported format doesn't have to be Latex. To export ASCIIMath instead:
+
+```js
+mf.setOptions({onExport: (mf, latex, range) => 
+  "`" + mg.getValue(range, 'ascii-math') + "`".
+});
+```
+The standard delimiter for AsciiMath is the <kbd>&#96;</kbd> (backtick) character .{.notice--info}
 
 <!-- Intercepting navigate out of and multiple fields -->
 

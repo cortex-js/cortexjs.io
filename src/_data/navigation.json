@@ -1,16 +1,16 @@
 {
 	"main": [
 		{
-			"title": "MathJSON",
-			"url": "/math-json/"
+			"title": "MathLive",
+			"url": "/mathlive/"
+		},
+		{
+			"title": "Compute Engine",
+			"url": "/compute-engine/"
 		},
 		{
 			"title": "Cortex",
 			"url": "/cortex/"
-		},
-		{
-			"title": "MathLive",
-			"url": "/mathlive/"
 		},
 		{
 			"title": "Docs",
@@ -28,10 +28,6 @@
 		}
 	],
 	"mathlive": [
-		{
-			"title": "Cortex",
-			"url": "/cortex/"
-		},
 		{
 			"title": "MathLive",
 			"children": [
@@ -99,8 +95,12 @@
 			]
 		},
 		{
-			"title": "MathJSON",
-			"url": "/math-json/"
+			"title": "Cortex",
+			"url": "/cortex/"
+		},
+		{
+			"title": "Compute Engine",
+			"url": "/compute-engine/"
 		},
 
 		{
@@ -125,15 +125,79 @@
 			]
 		}
 	],
-	"mathjson": [
-		{
-			"title": "Cortex",
-			"url": "/cortex/"
+	"compute-engine": [
+    {
+			"title": "Compute Engine",
+			"children": [
+				{
+					"title": "Introduction",
+					"url": "/compute-engine/"
+				},
+				{
+					"title": "Latex Syntax",
+					"url": "/guides/math-json/latex-syntax/"
+				},
+				{
+					"title": "Transforming an Expression",
+					"url": "/guides/compute-engine/transforming/"
+				},
+        
+				{
+					"title": "Assumptions",
+					"url": "/guides/compute-engine/assumptions/"
+				},
+				{
+					"title": "Domains",
+					"url": "/guides/compute-engine/domains/"
+				},
+				
+				{
+					"title": "Canonical Forms",
+					"url": "/guides/compute-engine/forms/"
+				},
+				{
+					"title": "SDK Reference",
+					"url": "/docs/compute-engine/"
+				}
+      ]
 		},
-		{
-			"title": "MathLive",
-			"url": "/guides/mathfield-getting-started/"
-		},
+    {
+			"title": "Dictionary",
+			"children": [
+        {
+          "title": "Introduction",
+          "url": "/guides/math-json-dictionary/"
+        },
+        {
+          "title": "Arithmetic",
+          "url": "/guides/compute-engine/arithmetic/"
+        },
+        {
+          "title": "Calculus",
+          "url": "/guides/compute-engine/calculus/"
+        },
+        {
+          "title": "Collections",
+          "url": "/guides/compute-engine/collections/"
+        },
+        {
+          "title": "Core",
+          "url": "/guides/compute-engine/core/"
+        },
+        {
+          "title": "Logic",
+          "url": "/guides/compute-engine/logic/"
+        },
+        {
+          "title": "Sets",
+          "url": "/guides/compute-engine/sets/"
+        },
+        {
+          "title": "Trigonometry",
+          "url": "/guides/compute-engine/trigonometry/"
+        }
+      ]
+    },
 		{
 			"title": "MathJSON",
 			"children": [
@@ -148,65 +212,17 @@
 				{
 					"title": "SDK Reference",
 					"url": "/docs/mathjson/"
-				},
-				{
-					"title": "Dictionary",
-					"url": "/guides/math-json-dictionary/"
 				}
 			]
 		},
-		{
-			"title": "Compute Engine",
-			"children": [
-				{
-					"title": "Introduction",
-					"url": "/compute-engine/"
-				},				
-				{
-					"title": "SDK Reference",
-					"url": "/docs/compute-engine/"
-				}
 
-			]
-			
+    {
+			"title": "MathLive",
+			"url": "/mathlive/"
 		},
 		{
-			"title": "Dictionary",
-			"children": [
-				{
-					"title": "Arithmetic",
-					"url": "/guides/compute-engine-arithmetic/"
-				},
-				{
-					"title": "Calculus",
-					"url": "/guides/compute-engine-calculus/"
-				},
-				{
-					"title": "Core",
-					"url": "/guides/compute-engine-core/"
-				},
-				{
-					"title": "Domains",
-					"url": "/guides/compute-engine-domains/"
-				},
-				
-				{
-					"title": "Forms",
-					"url": "/guides/compute-engine-forms/"
-				},
-				{
-					"title": "Logic",
-					"url": "/guides/compute-engine-logic/"
-				},
-				{
-					"title": "Sets",
-					"url": "/guides/compute-engine-sets/"
-				},
-				{
-					"title": "Trigonometry",
-					"url": "/guides/compute-engine-trigonometry/"
-				}
-			]
+			"title": "Cortex",
+			"url": "/cortex/"
 		},
 
 		{
@@ -243,11 +259,11 @@
 		},
 		{
 			"title": "MathLive",
-			"url": "/guides/mathfield-getting-started/"
+			"url": "/mathlive/"
 		},
 		{
-			"title": "MathJSON",
-			"url": "/math-json/"
+			"title": "Compute Engine",
+			"url": "/compute-engine/"
 		}
 
 	]

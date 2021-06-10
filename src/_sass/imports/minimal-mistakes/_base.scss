@@ -156,6 +156,17 @@ pre {
   font-family: $monospace;
 }
 
+kbd {
+  padding: 2px 5px 2px;
+  margin-left: 2px;
+  margin-right: 2px;
+  border: 1px solid #ddd;
+  border-radius: $border-radius;
+  background: $code-background-color;
+  font-size: 0.8em;
+}
+
+
 pre {
   overflow-x: auto; /* add scrollbars to wide code blocks*/
 }
@@ -168,6 +179,7 @@ td > code {
   padding-top: 0.1rem;
   padding-bottom: 0.1rem;
   font-size: 0.8em;
+  border: 1px solid $border-color;
   background: $code-background-color;
   border-radius: $border-radius;
 

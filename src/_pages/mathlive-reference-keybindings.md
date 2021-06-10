@@ -30,7 +30,7 @@ sidebar:
     padding: 10px;
     list-style: none;
   }
-  td code {
+  td:nth-child(1) code {
     font-size: 32px;
     font-weight:normal;
   }
@@ -42,10 +42,27 @@ Commands to edit and modify a formula can be invoked by pressing some key
 combinations.
 
 
+### Special Keys
+
+|  | |
+| :--- | :--- |
+| `⇧` | `Shift` | 
+| `⌃` | `Ctrl` or `Control` |
+| `⌥` | `Option` or `Alt` |
+| `⌫` | `Del` |
+| `⌦` | `Backspace` |
+| `⌘` | `Command` (macOS) or `Ctrl` (Windows) |
+| `⤒` | `Home` | 
+| `⤓` | `End` | 
+| `⇞` | `Page Up` |
+| `⇟` | `Page Down` |
+| `⏎` | `Return` |
+| `⌤` | `Enter` |
+| `⇥` | `Tab` |
 
 ### All Modes
 
-The shortcuts apply in all modes.
+The shortcuts in this section apply in all modes.
 
 | Keybinding | Result | OS |
 | :--- | :--- | ---: |
@@ -53,148 +70,148 @@ The shortcuts apply in all modes.
 | `⇢` | move to next char | |
 | `⇡` | move up | |
 | `⇣` | move down | |
-| `⇧⇠` | extend selection backward | |
-| `⇧⇢` | extend selection forward | |
-| `⇧⇡` | extend selection upward | |
-| `⇧⇣` | extend selection downward | |
+| `⇧` `⇠` | extend selection backward | |
+| `⇧` `⇢` | extend selection forward | |
+| `⇧` `⇡` | extend selection upward | |
+| `⇧` `⇣` | extend selection downward | |
 | `⌫` | delete backward | |
-| `⌥⌦` | 〃 | |
+| `⌥` `⌦` | 〃 | |
 | `⌦` | delete forward | |
-| `⌥⌫` | 〃 | |
-| `⌥⇠` | move to previous word | |
-| `⌥⇢` | move to next word | |
-| `⇧⌥⇠` | extend to previous word | |
-| `⇧⌥⇢` | extend to next word | |
-| `⌃⇠` | move to group start | |
-| `⌃⇢` | move to group end | |
-| `⇧⌃⇠` | extend to group start | |
-| `⇧⌃⇢` | extend to group end | |
+| `⌥` `⌫` | 〃 | |
+| `⌥` `⇠` | move to previous word | |
+| `⌥` `⇢` | move to next word | |
+| `⇧` `⌥` `⇠` | extend to previous word | |
+| `⇧` `⌥` `⇢` | extend to next word | |
+| `⌃` `⇠` | move to group start | |
+| `⌃` `⇢` | move to group end | |
+| `⇧` `⌃` `⇠` | extend to group start | |
+| `⇧` `⌃` `⇢` | extend to group end | |
 | `space` | move after parent | |
-| `⇧space` | move before parent | |
+| `⇧` `space` | move before parent | |
 | `⤒` | move to math field start | |
-| `⌘⇠` | 〃 | |
-| `⇧⤒` | extend to math field start | |
-| `⇧⌘⇠` | 〃 | |
+| `⌘` `⇠` | 〃 | |
+| `⇧` `⤒` | extend to math field start | |
+| `⇧` `⌘` `⇠` | 〃 | |
 | `⤓` | move to math field end | |
-| `⌘⇢` | 〃 | |
-| `⇧⤓` | extend to math field end | |
-| `⇧⌘⇢` | 〃 | |
+| `⌘` `⇢` | 〃 | |
+| `⇧` `⤓` | extend to math field end | |
+| `⇧` `⌘` `⇢` | 〃 | |
 | `⇞` | move to group start | |
 | `⇟` | move to group end | |
 | `⇥` | move to next placeholder | |
-| `⇧⇥` | move to previous placeholder | |
+| `⇧` `⇥` | move to previous placeholder | |
 | `⇥` | move to next placeholder | |
-| `⇧⇥` | move to previous placeholder | |
+| `⇧` `⇥` | move to previous placeholder | |
 | `esc` | switchMode("latex") | |
 | `\` | 〃 | |
 | `Intl Backslash` | 〃 | |
-| `⌥=` | applyStyle({"mode":"text"}) | |
-| `⌥=` | 〃 | |
+| `⌥` `=` | applyStyle({"mode":"text"}) | |
+| `⌥` `=` | 〃 | |
 | `esc` | complete("complete") | |
 | `⇥` | In Latex mode: accept-suggestion | |
 | `⏎` | complete | |
 | `⌤` | 〃 | |
 | `⇧esc` | complete("reject") | |
-| `⌃A` | select all | |
-| `⌘A` | 〃 | |
-| `[CUT]` | cut to clipboard | |
-| `[COPY]` | copy to clipboard | |
-| `[PASTE]` | paste from clipboard | |
-| `[CLEAR]` | delete backward | |
-| `⌃Z` | undo | |
-| `⌘Z` | 〃 | |
-| `[UNDO]` | 〃 | |
-| `⌃Y` | redo | |
-| `⇧⌘Y` | 〃 | |
-| `⇧⌃Z` | 〃 | |
-| `⇧⌘Z` | 〃 | |
-| `[REDO]` | 〃 | |
-| `[ERASEEOF]` | delete to group end | |
-| `⌃B` | move to previous char | |
-| `⌃F` | move to next char | |
-| `⌃P` | move up | |
-| `⌃N` | move down | |
-| `⌃A` | move to math field start | |
-| `⌃E` | move to math field end | |
-| `⇧⌃B` | extend selection backward | |
-| `⇧⌃F` | extend selection forward | |
-| `⇧⌃P` | extend selection upward | |
-| `⇧⌃N` | extend selection downward | |
-| `⇧⌃A` | extend to math field start | |
-| `⇧⌃E` | extend to math field end | |
-| `⌥⌃B` | move to previous word | |
-| `⌥⌃F` | move to next word | |
-| `⇧⌥⌃B` | extend to previous word | |
-| `⇧⌥⌃F` | extend to next word | |
-| `⌃H` | delete backward | |
-| `⌃D` | delete forward | |
-| `⌃L` | scroll into view | |
-| `⇧[QUOTE]` | switchMode("text") | |
-| `⇧[QUOTE]` | switchMode("math") | |
-| `⌥B` | $$\int_{\unicode{"2B1A}}^{\unicode{"2B1A}}$$   | |
-
-| `⇧⌥K` | toggle keystroke caption | |
-| `⌥space` | toggle virtual keyboard | |
-| `⌥⌃⇡` | speak("parent") | |
-| `⌥⌃⇣` | speak("all") | |
+| `⌃` `A` | select all | |
+| `⌘` `A` | 〃 | |
+| `Cut` | cut to clipboard | |
+| `Copy` | copy to clipboard | |
+| `Paste` | paste from clipboard | |
+| `Clear` | delete backward | |
+| `⌃` `Z` | undo | |
+| `⌘` `Z` | 〃 | |
+| `Undo` | 〃 | |
+| `⌃` `Y` | redo | |
+| `⇧` `⌘` `Y` | 〃 | |
+| `⇧` `⌃` `Z` | 〃 | |
+| `⇧` `⌘` `Z` | 〃 | |
+| `Redo` | 〃 | |
+| `Erase EOF` | delete to group end | |
+| `⌃` `B` | move to previous char | |
+| `⌃` `F` | move to next char | |
+| `⌃` `P` | move up | |
+| `⌃` `N` | move down | |
+| `⌃` `A` | move to math field start | |
+| `⌃` `E` | move to math field end | |
+| `⇧` `⌃` `B` | extend selection backward | |
+| `⇧` `⌃` `F` | extend selection forward | |
+| `⇧` `⌃` `P` | extend selection upward | |
+| `⇧` `⌃` `N` | extend selection downward | |
+| `⇧` `⌃` `A` | extend to math field start | |
+| `⇧` `⌃` `E` | extend to math field end | |
+| `⌥` `⌃` B` | move to previous word | |
+| `⌥` `⌃` F` | move to next word | |
+| `⇧` `⌥` `⌃` `B` | extend to previous word | |
+| `⇧` `⌥` `⌃` `F` | extend to next word | |
+| `⌃` `H` | delete backward | |
+| `⌃` `D` | delete forward | |
+| `⌃` `L` | scroll into view | |
+| `⇧` `'` | toggle math/text mode | |
+| `⌥` `B` | $$\int_{\unicode{"2B1A}}^{\unicode{"2B1A}}$$   | |
+| `⇧` `⌥` `K` | toggle keystroke caption | |
+| `⌥` `space` | toggle virtual keyboard | |
+| `⌥` `⌃` `⇡` | speak("parent") | |
+| `⌥` `⌃` `⇣` | speak("all") | |
 
 
 ### Math Mode Only
 
+The shortcuts in this section apply in math mode only.
+
 | Keybinding | Result | OS |
 | :--- | :--- | ---: |
 | `space` | move after parent | |
-| `⇧space` | move before parent | |
+| `⇧` `space` | move before parent | |
 | `⇥` | move to next placeholder | |
-| `⇧⇥` | move to previous placeholder | |
+| `⇧` `⇥` | move to previous placeholder | |
 | `esc` | switchMode("latex") | |
 | `\` | 〃 | |
-| `[INTLBACKSLASH]` | 〃 | |
-| `⌥=` | applyStyle({"mode":"text"}) | |
-| `⇧[QUOTE]` | switchMode("text") | |
-| `⌃2` | $$\sqrt{\unicode{"2B1A}}$$ | |
-| `⌃5` | move to opposite | |
-| `⌃6` | move to superscript | |
-| `⌃-` | move to subscript | |
-| `⌥[` | $$\left\lbrack \unicode{"2B1A}\right\rbrack$$  | |
-| `⇧⌥[` | $$\left\lbrace \unicode{"2B1A} \right\rbrace$$  | |
-| `⌃⏎` | add row after | |
-| `⌃⌤` | 〃 | |
-| `⌘⏎` | 〃 | |
-| `⌘⌤` | 〃 | |
-| `⌃;` | 〃 | |
-| `⌘;` | 〃 | |
-| `⇧⌃;` | add row before | |
-| `⇧⌘;` | 〃 | |
-| `⌃,` | add column after | |
+| `Intl Backslash` | 〃 | |
+| `⌥` `=` | applyStyle({"mode":"text"}) | |
+| `⇧` `'` | switchMode("text") | |
+| `⌃` `2` | $$\sqrt{\unicode{"2B1A}}$$ | |
+| `⌃` `5` | move to opposite | |
+| `⌃` `6` | move to superscript | |
+| `⌃` `-` | move to subscript | |
+| `⌥` `[` | $$\left\lbrack \unicode{"2B1A}\right\rbrack$$  | |
+| `⇧` `⌥` `[` | $$\left\lbrace \unicode{"2B1A} \right\rbrace$$  | |
+| `⌃` `⏎` | add row after | |
+| `⌃` `⌤` | 〃 | |
+| `⌘` `⏎` | 〃 | |
+| `⌘` `⌤` | 〃 | |
+| `⌃` `;` | 〃 | |
+| `⌘`  `;` | 〃 | |
+| `⇧` `⌃` `;` | add row before | |
+| `⇧` `⌘` `;` | 〃 | |
+| `⌃` `,` | add column after | |
 | `⌘,` | 〃 | |
-| `⇧⌃,` | 〃 | |
+| `⇧` `⌃` `,` | 〃 | |
 | `⇧⌘,` | 〃 | |
-| `⌥P` | $$\pi$$  —`$$\pi$$` | |
-| `⌥V` | $$\sqrt{\unicode{"2B1A}}$$  | |
-| `⌥W` | $$\sum_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$  | |
-| `⌥U` | $$\cup$$  —`$$\cup$$` | |
-| `⌥N` | $$\cap$$  —`$$\cap$$` | |
-| `⌥O` | $$\emptyset$$  —`$$\emptyset$$` | |
-| `⌥D` | $$\differentialD$$  —`$$\differentialD$$` | |
-| `⇧⌥O` | $$\varnothing$$  —`$$\varnothing$$` | |
-| `⇧⌥D` | $$\partial$$  —`$$\partial$$` | |
-| `⇧⌥P` | $$\prod_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$   | |
-| `⇧⌥U` | $$\bigcup$$  —`$$\bigcup$$` | |
-| `⇧⌥N` | $$\bigcap$$  —`$$\bigcap$$` | |
-| `⇧⌥A` | $$\forall$$  —`$$\forall$$` | |
-| `⇧⌥E` | $$\exists$$  —`$$\exists$$` | |
-| `⌥5` | $$$\infty$$  —`$\infty$$` | |
-| `⌥6` | $$\wedge$$  —`$$\wedge$$` | |
-| `⇧⌥6` | $$\vee$$  —`$$\vee$$` | |
-| `⌥9` | $$($$  —`(` | |
-| `⌥0` | $$)$$  —`)` | |
-| `⌥|` | $$|$$  —`|` | |
-| `⌥\` | $$\backslash$$  —`$$\backslash$$` | |
+| `⌥` `P` | $$\pi$$ | |
+| `⌥` `V` | $$\sqrt{\unicode{"2B1A}}$$  | |
+| `⌥` `W` | $$\sum_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$  | |
+| `⌥` `U` | $$\cup$$ | |
+| `⌥` `N` | $$\cap$$ | |
+| `⌥` `O` | $$\emptyset$$ | |
+| `⌥` `D` | $$\differentialD$$ | |
+| `⇧` `⌥` `O` | $$\varnothing$$ | |
+| `⇧` `⌥` `D` | $$\partial$$ | |
+| `⇧` `⌥` `P` | $$\prod_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$   | |
+| `⇧` `⌥` `U` | $$\bigcup$$ | |
+| `⇧` `⌥` `N` | $$\bigcap$$ | |
+| `⇧` `⌥` `A` | $$\forall$$ | |
+| `⇧` `⌥` `E` | $$\exists$$ | |
+| `⌥` `5` | $$$\infty$$ | |
+| `⌥` `6` | $$\wedge$$ | |
+| `⇧` `⌥` `6` | $$\vee$$ | |
+| `⌥` `9` | $$($$ | |
+| `⌥` `0` | $$)$$ | |
+| `⌥` `\|` | $$\|$$ | |
+| `⌥` `\` | $$\backslash$$ | |
 | `/` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
-| `[NUMPADDIVIDE]` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
-| `⌥[NUMPADDIVIDE]` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
-| `⇧[BACKQUOTE]` | `\~`  | ||
+| `Numpad /` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
+| `⌥` `Numpad /` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
+| `⇧` <kbd>&#96;</kbd> | `\~`  | ||
 
 
 ## Inline Shortcuts
@@ -358,9 +375,9 @@ If the conversion was not desired, for example you actually meant "pi", type ctr
 | `(/)` | $$\oslash$$  |
 | `(*)` | $$\otimes$$  |
 | `(-)` | $$\ominus$$  |
-| `||` | $$\Vert$$  |
-| `{` | $$\{$$ `\{` |
-| `}` | $$\}$$ `\}` |
+| `\|\|` | $$\Vert$$  |
+| `{` | $$\\{$$  |
+| `}` | $$\\}$$  |
 | `*` | $$\cdot$$  |
 
 

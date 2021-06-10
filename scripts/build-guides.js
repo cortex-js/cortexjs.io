@@ -191,49 +191,51 @@ const run = async (dir, sidebar) => {
     if (x.endsWith('.png') || x.endsWith('.jpeg') || x.endsWith('.jpg')) {
       fs.copy(x, path.resolve('./src/build/assets', path.basename(x)));
     } else if (x.endsWith('.md')) {
-      console.log(x);
       fs.readFile(x, 'utf8', (err, file) => {
         const graymatter = matter(file);
         const frontmatter = graymatter.data;
         if (!frontmatter || !frontmatter.permalink) {
-          console.error('Skipping ' + x + ': no frontmatter permalink.');
+          console.warn('Skipping ' + x + ': no frontmatter permalink.');
         } else {
-          let permalink = frontmatter.permalink.slice(1);
-          if (permalink.length === 0) permalink = 'index';
-          const dest = path.resolve('./src/build/', permalink);
-          fs.mkdirSync(path.parse(dest).dir, { recursive: true });
-          if (!frontmatter.head) {
-            frontmatter.head = {};
-          }
-          if (!frontmatter.layout) {
-            frontmatter.layout = 'sdk-documentation-layout';
-          }
-          if (!frontmatter.sidebar) {
-            frontmatter.sidebar = [];
-          }
-          frontmatter.sidebar.push({ nav: sidebar });
+          try {
+            let permalink = frontmatter.permalink.slice(1);
+            if (permalink.length === 0) permalink = 'index';
+            const dest = path.resolve('./src/build/', permalink);
+            fs.mkdirSync(path.parse(dest).dir, { recursive: true });
 
-          frontmatter.head.stylesheets = [
-            ...(frontmatter.stylesheets ?? []),
-            `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/codemirror.min.css`,
-            '/assets/js/ui.css',
-          ];
-          frontmatter.head.scripts = [
-            ...(frontmatter.scripts ?? []),
-            `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/codemirror.min.js`,
-            `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/javascript/javascript.min.js`,
-            `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/xml/xml.min.js`,
-          ];
+            if (!frontmatter.head) {
+              frontmatter.head = {};
+            }
+            if (!frontmatter.layout) {
+              frontmatter.layout = 'sdk-documentation-layout';
+            }
+            if (!frontmatter.sidebar) {
+              frontmatter.sidebar = [];
+            }
+            frontmatter.sidebar.push({ nav: sidebar });
 
-          frontmatter.head.modules = [
-            ...(frontmatter.modules ?? []),
-            '/assets/js/code-playground.js',
-          ];
-          //          console.log('Generating guide for', dest);
-          fs.writeFile(
-            dest + '.md',
-            matter.stringify(upgradeCodeFences(graymatter.content), frontmatter)
-          );
+            frontmatter.head.stylesheets = [
+              ...(frontmatter.stylesheets ?? []),
+              `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/codemirror.min.css`,
+              '/assets/js/ui.css',
+            ];
+            frontmatter.head.scripts = [
+              ...(frontmatter.scripts ?? []),
+              `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/codemirror.min.js`,
+              `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/javascript/javascript.min.js`,
+              `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/xml/xml.min.js`,
+            ];
+
+            frontmatter.head.modules = [
+              ...(frontmatter.modules ?? []),
+              '/assets/js/code-playground.js',
+            ];
+
+            const content = upgradeCodeFences(graymatter.content);
+            fs.writeFile(dest + '.md', matter.stringify(content, frontmatter));
+          } catch (e) {
+            console.error('Error parsing', x, e);
+          }
         }
       });
     }

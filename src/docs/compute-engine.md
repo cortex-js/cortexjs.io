@@ -4,7 +4,7 @@ permalink: /compute-engine/
 layout: single
 date: Last Modified
 sidebar:
-    - nav: "mathjson"
+    - nav: "compute-engine"
 ---
 <script type='module'>
     import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
@@ -66,7 +66,7 @@ console.log(format(["Add", 2, "x", 3], 'canonical');
 // ➔ ["Add", 2, 3, "x"]
 ```
 
-See [Compute Engine Forms](/guides/compute-engine-forms/) for more info.
+See [Compute Engine Forms](/guides/compute-engine/forms/) for more info.
 
 ## Comparing
 

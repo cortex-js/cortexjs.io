@@ -285,8 +285,6 @@ formula:
 * `defaultMode`: if `inline-math` the math field is using inline math mode
 by default. If set to `math`, it will use the display math mode. If set to 
 `text` it will use the text mode.
-* `ignoreSpaceabrInMathMode`: if false, insert a space when the spacebar is 
-pressed, even in math mode (spaces are usually ignored in math mode)
 * `removeExtraneousParentheses`: automatically remove extra parentheses around
 a numerator or denominator
 * `scriptDepth`: maximum levels of subscript or superscript. Set it to 0 to 
@@ -319,6 +317,24 @@ line 3 to `scriptDepth: 0`, then try to type "x^2" in the mathfield.
 See [EditingOptions](http://cortexjs.io/docs/mathlive/?q=EditingOptions) for more
 details about these and other available options.
 
+
+## Handling the Space bar
+
+In traditional math typesetting, spaces have no effect: the spacing of elements
+in a formula is determined by the nature of the elements: numbers, punctuation,
+relational, binary or unary operators, etc...
+
+To control spacing in a formula, use some of the Latex spacing commands: `\quad`,
+`\qquad`, `\!`, `\,` (thin space), `\:` (medium space), `\;` (thick space), `\enskip` or `\enspace`.
+
+By default, pressing the spacebar when in math mode does not insert anything.
+To insert a Latex command when the spacebar is pressed, set the value of the 
+`mathModeSpace` option to that command:
+
+```js
+md.setOptions({mathModeSpace: '\\:'});
+
+```
 
 
 ## Localization

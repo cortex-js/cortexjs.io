@@ -187,11 +187,12 @@ section.fullwidth h2 {
     }
     & .subhead {
       display: block;
-      font: 700 28px/1.14286 $sans-serif;
+      font: 500 24px/1 $sans-serif;
       margin: 0;
       padding: 0;
       margin-bottom: 0.5em;
-      letter-spacing: 0.007em;
+      letter-spacing: -0.2px;
+      opacity: .5;
   }
 }
 
@@ -226,8 +227,7 @@ section.fullwidth.light-card {
 
 .cards h2 {
     margin: 0;
-    margin-bottom: 0.5em;
-    text-align: center;
+    text-align: left;
     line-height: 1;
     & .subhead {
       display: block;
@@ -289,8 +289,10 @@ section.fullwidth.light-card {
     box-shadow: $card-shadow;
 }
 
-.cards.col2 .card {
+.cards.col2 .card, 
+.cards.col3 .card {
     flex-flow: column-reverse;
+    justify-content: flex-end;
     padding: 1em;
     width: calc(50% - 2em);
     border-radius: 8px;
@@ -299,13 +301,8 @@ section.fullwidth.light-card {
 }
 
 .cards.col3 .card {
-    flex-flow: column-reverse;
-    justify-content: flex-end;
     padding: 0;
     width: calc(33% - 3em);
-    border-radius: 8px;
-    background: $card-background-color;
-    box-shadow: $card-shadow;
 }
 
 .cards.col1 .card.primary,
@@ -319,9 +316,7 @@ section.fullwidth.light-card {
 
 .cards.col2 .copy,
 .cards.col3 .copy {
-    margin-left: 1.5em;
-    margin-right: 1.5em;
-    padding: 1em 1.5em;
+  padding: 0.5em 1em;
 }
 
 .cards.col2 .figure,
@@ -337,8 +332,16 @@ section.fullwidth.light-card {
 
 .cards.col2 h2,
 .cards.col3 h2 {
-    font: 700 48px/40px 'Source Sans Pro', sans-serif;
+    font: 700 48px/38px 'Source Sans Pro', sans-serif;
+    letter-spacing: -0.7px;
 }
+.cards.col2 h2 .subhead,
+.cards.col3 h2 .subhead {
+  margin-top: .5em;
+  font: 500 24px/1 "Source Sans Pro", sans-serif;
+  letter-spacing: -0.2px;
+}
+
 .cards.col2 h2 .eyebrow,
 .cards.col3 h2 .eyebrow {
     font: 400 24px/24px 'Source Sans Pro', sans-serif;
@@ -346,8 +349,9 @@ section.fullwidth.light-card {
 
 .cards.col2 h3,
 .cards.col3 h3 {
-    font: 400 24px/32px 'Source Sans Pro', sans-serif;
+    font: 400 24px/1.1 'Source Sans Pro', sans-serif;
     margin-bottom: 1em;
+    color: $text-color;
 }
 
 .single-column {
