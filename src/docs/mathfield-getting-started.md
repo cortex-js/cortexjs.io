@@ -75,7 +75,7 @@ JavaScript modules offer several benefits (asynchronous, deterministics loading,
 no pollution of the global namespace, etc...). They are the recommended approach 
 to use MathLive APIS in your project.
 
-To use MathLive as a JavaScript module:
+**To use MathLive as a JavaScript module**:
 
 1. Include a `<script>` tag, with a `type="module"` attribute
 2. In the body of this `<script>` tag, use an `import` directive pointing to a CDN URL for Mathlive
@@ -148,7 +148,7 @@ If you need:
 then you should use a version of MathLive installed from NPM instead of from 
 a CDN.
 
-To add a local version of MathLive to your project, use the following command:
+**To add a local version of MathLive to your project**, use the following command:
 
 ```bash
 $ npm install --save mathlive
@@ -243,7 +243,7 @@ While MathLive is primarily an editor for formulas, it can also be used
 to render "static" formulas in a web page, along the lines of what MathJax or 
 KaTeX provide.
 
-To render a non-editable formula use `MathLive.renderMathInDocument()` or
+**To render a non-editable formula** use `MathLive.renderMathInDocument()` or
 to generate markup for a formula use `MathLive.latexToMarkup()`. In the later
 case, you may save the output or return it from a server-side process.
 

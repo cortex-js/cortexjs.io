@@ -41,7 +41,7 @@ the last command.
 
 MathLive has an extensive set of [default key bindings](https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts). 
 
-To override, customize or add to the list of supported key bindings, provide a
+**To override, customize or add to the list of supported key bindings**, provide a
 `onKeystroke` handler.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
@@ -124,7 +124,7 @@ mf.setOptions({
 The `mode` key, if present, indicate the mode in which this shortcut should apply, either `'math'` or `'text'`. If the key is not present the shortcut apply in both modes.
 
 
-To constraint the context in which a shortcut should apply, use the `after` 
+**To constraint the context in which a shortcut should apply**, use the `after` 
 key:
 
 ```javascript
@@ -158,8 +158,8 @@ The `'after'` key indicate in what context the shortcut should apply. One or mor
 
 ### Customizing the Inline Shortcut Sensitivity
 
-To change how quickly a set of keys must be typed to be considered a shortcut
-set the  `inlineShortcutTimeout` option.
+**To change how quickly a set of keys must be typed to be considered a shortcut**
+set the `inlineShortcutTimeout` option.
 
 It represents the maximum amount of time, in milliseconds, between consecutive characters for them to be
 considered part of the same shortcut sequence.
@@ -187,7 +187,8 @@ the focus on the mathfield, will automatically timeout the shortcuts.
 represent mathematical symbols and expressions.
 
 The most common ASCIIMath shortcuts are part of the default inline shortcuts.
-To support additional ASCIIMath shortcuts, add them to the `inlineShortcuts`
+
+**To support additional ASCIIMath shortcuts**, add them to the `inlineShortcuts`
 setting.
 
 ```js

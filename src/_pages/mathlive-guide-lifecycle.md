@@ -81,7 +81,7 @@ attributes and the properties are independent, so if you set for example the
 * the only methods on the element that can be invoked are those of `HTMLElement` 
 since the element has not been upgraded yet. 
 
-To be notified when the registration takes place, use the `whenDefined()` method.
+**To be notified when the registration takes place**, use the `whenDefined()` method.
 
 ```javascript
 customElements.whenDefined('math-field').then(() => {
@@ -129,7 +129,7 @@ each other (changing an attribute will update the corresponding property and
 vice versa).
 * you can invoke all properties of `MathfieldElement` without limitations
 
-To be notified when this stage is reached, listen for the `mount` event on 
+**To be notified when this stage is reached**, listen for the `mount` event on 
 the element:
 ```javascript
 md.addEventListener('mount')((ev) => {
@@ -154,7 +154,7 @@ apply.
 Note that the next stage could be either for element to be disposed of 
 or to be re-attached.
 
-To be notified when this stage is reached, listen for the `unmount` event on 
+**To be notified when this stage is reached**, listen for the `unmount` event on 
 the element:
 ```javascript
 md.addEventListener('unmount')((ev) => {

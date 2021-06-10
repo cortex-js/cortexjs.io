@@ -30,7 +30,7 @@ head:
 The content of a mathfield is available by reading the `value`
 property of the mathfield element, just like with a `<textarea>`.
 
-To be notified as soon as the content of the mathfield is modified listen for 
+**To be notified as soon as the content of the mathfield is modified** listen for 
 an `'input'` event.
 
 **Try**: modify the `'input'` event below to a `'change'` event. Notice how the `'change'` event
@@ -60,7 +60,7 @@ loses focus and the content has been modified. {.notice--info}
 Reading the `value` property is equivalent to calling the `getValue()` method with 
 no argument. 
 
-To control how the result is formatted, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
+**To control how the result is formatted**, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
 For example to get the content as a MathJSON expression, use `getValue('math-json')`.
 
 The MathJSON format is a lightweight data interchange format for mathematical notation. [Learn more about MathJSON](/math-json/).{.notice--info}
@@ -159,7 +159,7 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 </code-playground>
 
 
-To change the style of a portion of the mathfield, specify a selection range
+**To change the style of a portion of the mathfield**, specify a selection range
 to `applyStyle()`.
 
 
@@ -234,7 +234,7 @@ with both mouse and keyboard, which makes this solution more accessible.
 
 ## Detecting When the User has Finished Editing a Mathfield
 
-To detect when the user presses the **Return** or **Enter** key in a mathfield,
+**To detect when the user presses the **Return** or **Enter** key in a mathfield**,
 listen for the `change` event. Note that this event is not fired when in Latex
 editing mode, where **Return** or **Enter** is used to exit the mode.
 
@@ -256,7 +256,7 @@ The Latex in the `text/plain` flavor is "wrapped" to make it easier for the reci
 
 For improved interoperability, the exported Latex uses the `latex-expanded` format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the `\differentialD` command is used in the formula, it is exported as its corresponding definition, `\mathrm{d}`. .{.notice--info}
 
-To customize the content of the `text/plain` flavor, use the `onExport()` hook. 
+**To customize the content of the `text/plain` flavor**, use the `onExport()` hook. 
 
 For example, to wrap the exported latex with `<math>...</math>` instead:
 
@@ -264,7 +264,7 @@ For example, to wrap the exported latex with `<math>...</math>` instead:
 mf.setOptions({onExport: (mf, latex) => `<math>${latex}</math>`});
 ```
 
-To export the "raw" (not expanded) Latex), use:
+**To export the "raw" (not expanded) Latex)**, use:
 
 ```js
 mf.setOptions({onExport: (mf, latex, range) => 

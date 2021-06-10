@@ -33,7 +33,7 @@ on screen that can be customized with specialized symbols for math input.
 ![](/assets/images/mathfield/virtual-keyboard.png)
 
 
-To display variants related to a key, press and hold it. Not all keys have
+**To display variants related to a key**, press and hold it. Not all keys have
 variants, though.
 
 ![](/assets/images/mathfield/alt-keys.png){.max-w-md}
@@ -75,7 +75,7 @@ The virtual keyboard panel displays multiple keyboards which can be
 toggled using the keyboard switcher: `numeric`, `functions`, `symbols`, `roman` 
 and `greek`.
 
-To choose which keyboards are available, use the `virtualKeyboards` 
+**To choose which keyboards are available**, use the `virtualKeyboards` 
 configuration property. The value of this property is a space-separated string 
 of the name of the keyboards that should be displayed.
 
@@ -106,7 +106,7 @@ set of keys that can be toggled using another key. For example, the `roman`
 keyboard has a regular layer and a layer for symbols. Most keyboards have a 
 single layer.
 
-To define a custom virtual keyboard layout, use an object literal as described
+**To define a custom virtual keyboard layout**, use an object literal as described
 below.
 
 ### Defining a Layer
@@ -155,7 +155,7 @@ they keycap: `latex`, `label`, `insert`.
 When the keycap is pressed, the following properties are used, in order, to 
 determine the action to perform: `command`, `insert`, `latex`, `key`.
 
-To associate a CSS stylesheet with this layer, use the `styles` property of the
+**To associate a CSS stylesheet with this layer**, use the `styles` property of the
 layer.
 
 The appearance of the layer can be further customized by providing a CSS class 
@@ -204,7 +204,7 @@ key (`action`).
   { latex: "\\frac{1}{2}" },
 ```
 
-To display the key label as a some HTML markup instead, use the `label` 
+**To display the key label as some HTML markup instead**, use the `label` 
 property:
 
 ```js
@@ -219,7 +219,7 @@ The keycap label is displayed using the system font when the `label` property
 is used. To display it using the TeX fonts instead, set the value of the `class`
 property to `tex`.
 
-To perform a command other than inserting some Latex, use the `command`
+**To perform a command other than inserting some Latex**, use the `command`
 property:
 
 ```js
@@ -377,10 +377,10 @@ keyboards, plus ours, we could have used the `"all"` shortcut:
 
 ## Customizing the Appearance of the Virtual Keyboard Toggle
 
-To apply a CSS rule to the virtual keyboard toggle, use
+**To apply a CSS rule to the virtual keyboard toggle**, use
 the `math-field::part(virtual-keyboard-toggle)` CSS selector.
 
-To change the icon of the virtual keyboard toggle use the 
+**To change the icon of the virtual keyboard toggle**, use the 
 `virtualKeyboardToggleGlyph`
 configuration property.
 
@@ -418,7 +418,7 @@ By default, the layout of the alphabetic virtual keyboard is determined based
 on the locale (QWERTY for english speaking countries, AZERTY for french speaking
 countries, etc..). 
 
-To select a different alphabetic keyboard layouts, such as DVORAK or COLEMAK, 
+**To select a different alphabetic keyboard layout**, such as DVORAK or COLEMAK, 
 use the `virtualKeyboardLayout` configuration property.
 
 <code-playground layout="stack" class="m-lg w-full-lg">
@@ -445,7 +445,7 @@ document.getElementById('mf').setOptions({
 
 ## Customizing the Appearance of the Virtual Keyboard Keycaps
 
-To control the appearance of keycaps use the following CSS variables.
+**To control the appearance of keycaps**, use the following CSS variables.
   - `--keycap-height`
   - `--keycap-font-size`
   - `--keycap-small-font-size` (only if needed)
@@ -473,7 +473,7 @@ main document.
 
 This can be solved by using a "shared" virtual keyboard.
 
-To use a shared virtual keyboard, call the `makeSharedVirtualKeyboard()` 
+**To use a shared virtual keyboard**, call the `makeSharedVirtualKeyboard()` 
 function in the context of the main document.
 
 ```javascript

@@ -52,7 +52,7 @@ A given mathematical expression can be represented in multiple equivalent ways
 as a MathJSON expression. A **form** is used to specify a representation. The most common forms are `"full"` where only transformations necessary to make the expression a valid JSON expression are applied and `"canonical"` that applies rules to perform some basic simplifications and ordering of the
 elements of the expression.
 
-To transform an expression using the rules for a particular form, use the
+**To transform an expression using the rules for a particular form**, use the
 `format()` function.
 
 
@@ -114,7 +114,7 @@ console.log(engine.same(
 
 ## Advanced Usage
 
-To improve performance, particularly when calling `format()`/`evaluate()`
+**To improve performance**, particularly when calling `format()`/`evaluate()`
 repeatedly, use an instance of the `ComputeEngine` class. When the instance is
 constructed, the dictionaries defining the symbols are compiled, and subsequent
 invocations of the `format()` and `evaluate()` methods can skip that step.

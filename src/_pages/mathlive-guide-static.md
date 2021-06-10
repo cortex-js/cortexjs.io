@@ -25,7 +25,7 @@ head:
 
 # Static Math Formulas
 
-To render math contained in a document as a static (non-editable) formula, 
+**To render math contained in a document as a static (non-editable) formula**, 
 call [`renderMathInDocument()`](/docs/mathlive/?q=renderMathInDocument) at the end of your document, or in a `onload`
 handler .
 
@@ -128,7 +128,7 @@ unexpected results.
 If preserving the ability to select a formula is important, consider
 using a read-only mathfield.
 
-To create a read-only mathfield, add the `read-only` attribute to a `<mathfield>`
+**To create a read-only mathfield**, add the `read-only` attribute to a `<mathfield>`
 element.
 
 <code-playground layout="stack" class="m-lg w-full-lg">

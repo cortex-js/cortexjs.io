@@ -1842,7 +1842,7 @@ formated:
   * `c`: centered
   * `r`: right-aligned
 
-To add a vertical line separating columns, add `|` character in the column format:
+**To add a vertical line separating columns**, add `|` character in the column format:
 
 
 <div class='side-by-side'>
@@ -1858,7 +1858,7 @@ To add a vertical line separating columns, add `|` character in the column forma
 
 </div>
 
-To add a double vertical line separating columns, add two `|` characters in the 
+**To add a double vertical line separating columns**, add two `|` characters in the 
 column format:
 
 <div class='side-by-side'>
@@ -1873,7 +1873,7 @@ column format:
 ```
 </div>
 
-To add a dashed vertical line between two columns, use `:`:
+**To add a dashed vertical line between two columns**, use `:`:
 
 <div class='side-by-side'>
 
@@ -1905,7 +1905,7 @@ argument to specify the format of the columns.
 </div>
 
 
-To specify the format of the columns, use the starred version and an optional
+**To specify the format of the columns**, use the starred version and an optional
 argument. This applies to all the other `matrix` environments.
 
 <div class='side-by-side'>
@@ -2047,7 +2047,7 @@ f(n) = \begin{cases}
 ```
 </div>
 
-To typeset the content in Display style, use `dcases` instead:
+**To typeset the content in Display style**, use `dcases` instead:
 
 <div class='side-by-side'>
 <div class='math frame'>$$f(n) = \begin{dcases}
@@ -2065,7 +2065,7 @@ f(n) = \begin{dcases}
 ```
 </div>
 
-To display the brace on the right, use `rcases`.
+**To display the brace on the right**, use `rcases`.
 
 <div class='side-by-side'>
 <div class='math frame'>$$\begin{rcases}

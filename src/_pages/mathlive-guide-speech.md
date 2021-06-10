@@ -27,12 +27,12 @@ head:
 
 ## Using Speech Output in MathLive
 
-To speak the formula or a portion of it, use these keyboard shortcuts:
+**To speak the formula or a portion of it**, use these keyboard shortcuts:
 
 - **alt/⌥ + ctrl + ⇡**: speak the entire formula
 - **alt/⌥ + ctrl + ⇣**: speak the selection
 
-To programatically trigger speech output, use:
+**To programatically trigger speech output**, use:
 
 ```js
 mf.executeCommand('speak');
@@ -55,7 +55,7 @@ The options to specify the speech "scope" are:
 | `group` | the group (numerator, root, etc..) the selection is in |
 | `parent` | the parent of the selection |
 
-To get a textual representation of a spoken description of the formula, use
+**To get a textual representation of a spoken description of the formula**, use
 the `spoken-text` format:
 
 ```js
@@ -76,16 +76,16 @@ There are two aspects that can be configured independently:
 A set of **speech rules** define how a math formula is transformed to speakable
 text.
 
-To use the MathLive built-in speech rules, set `textToSpeechRules` to `mathlive`.
+**To use the MathLive built-in speech rules**, set `textToSpeechRules` to `mathlive`.
 
 Another set of speech rules supported are the SRE speech rules from Volker Sorge
 
-To use the SRE speech rules.
+**To use the SRE speech rules**:
 
 1. Include the browser version of the SRE JavaScript file in your project. You can download it on [GitHub](https://github.com/zorkow/speech-rule-engine)
 2. Set the `textToSpeechRules` configuration key to `'sre'`.
 
-To configure SRE, set the `textToSpeechRulesOptions` configuration key. For example:
+**To configure SRE**, set the `textToSpeechRulesOptions` configuration key. For example:
 
 ```javascript
 textToSpeechRulesOptions: {
@@ -98,7 +98,7 @@ textToSpeechRulesOptions: {
 
 #### Using the Local TTS Engine
 
-To use the local (built-in, OS specific) TTS engine, set the `speechEngine` configuration key to `'local'`.
+**To use the local (built-in, OS specific) TTS engine**, set the `speechEngine` configuration key to `'local'`.
 
 There is great variation between platforms (and browsers) on the quality of the TTS engine. However, it can be used even when offline, while the Amazon TTS engine offers higher quality and better consistency, but it does require a network connection.
 
@@ -135,7 +135,7 @@ Carefully consider how to handle the access and secret access keys. With the set
 
 #### Speech Output Format
 
-To configure the format of the speech output engine use the `textToSpeechMarkup` configuration option. Set it to:
+**To configure the format of the speech output engine**, use the `textToSpeechMarkup` configuration option. Set it to:
 
 -   `'ssml'` to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.
 -   `'mac'` to request an output using Mac OS speech markup, e.g. '[[slc 150]]'. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.

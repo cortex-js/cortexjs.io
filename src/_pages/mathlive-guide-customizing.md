@@ -133,11 +133,11 @@ representation, can be controlled with some of the following options:
 
 ### Color
 
-To change the foreground ("ink") and background ("paper") colors of a formula 
-programmatically, use the `applyStyle()` function.
+**To change the foreground ("ink") and background ("paper") colors of a formula 
+programmatically**, use the `applyStyle()` function.
 
-To change the foreground color, use the `\textcolor{}{}` command.
-To change the background color, use the `\colorbox{}{}` command.
+**To change the foreground color**, use the `\textcolor{}{}` command.
+**To change the background color**, use the `\colorbox{}{}` command.
 
   
 The first argument of these commands is a color specified as:
@@ -159,13 +159,13 @@ To have proper legibility based on usage, these color names will map to
 different values when used as a foreground color
 and a background color. To use a specific color value, use a RGB color instead.{.notice--info}
 
-To customize how the color names are interpreted provide a `colorMap`
+**To customize how the color names are interpreted** provide a `colorMap`
 or `backgroundColorMap` function.{.notice--info}
 
 
 ### Size
 
-To change the base font size, set the `font-size` CSS property to the desired
+**To change the base font size**, set the `font-size` CSS property to the desired
 value on the `mathfield` or static element.
 
 Within a formula, the size can be specified from a font scale with 10 values, 
@@ -190,7 +190,7 @@ differently. {.notice--warning}
 
 ### Math Layout
 
-To control some aspects of the math typesetting, change the mathstyle with 
+**To control some aspects of the math typesetting**, change the mathstyle with 
 the commands `\displaystyle`, `\textstyle`, `\scriptstyle`, `\scriptscriptstyle`.
 
 ![](/assets/images/mathfield/mathstyles.png)
@@ -217,7 +217,7 @@ Notice for example that `n=0` in `displaystyle` does not include space around
 the `=` sign because the limit is displayed in `scriptstyle`.
 
 
-To set the default mathstyle of a mathfield, use the `defaultMode` option 
+**To set the default mathstyle of a mathfield**, use the `defaultMode` option 
 (or the `default-mode` attribute).
 
 Set it to `inline-math` to use `textstyle` or `math` to use `displaystyle`.
@@ -249,7 +249,7 @@ used in conjunction with `default-mode="inline-math"`.
 
 ### Letter Shape Style
 
-To control which letters are automatically italicized, use the `letterShapeStyle` configuration option.
+**To control which letters are automatically italicized**, use the `letterShapeStyle` configuration option.
 
 
 | `letterShapeStyle` | xyz    | ABC    | αβɣ    | ΓΔΘ   |
@@ -324,11 +324,12 @@ In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,
 relational, binary or unary operators, etc...
 
-To control spacing in a formula, use some of the Latex spacing commands: `\quad`,
+**To control spacing in a formula**, use some of the Latex spacing commands: `\quad`,
 `\qquad`, `\!`, `\,` (thin space), `\:` (medium space), `\;` (thick space), `\enskip` or `\enspace`.
 
 By default, pressing the spacebar when in math mode does not insert anything.
-To insert a Latex command when the spacebar is pressed, set the value of the 
+
+**To insert a Latex command when the spacebar is pressed**, set the value of the 
 `mathModeSpace` option to that command:
 
 ```js
