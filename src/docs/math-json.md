@@ -13,10 +13,7 @@ sidebar:
       TeX: { 
         delimiters: {
           inline: [['\\(', '\\)']],
-          display: [
-            ['$$', '$$'],
-            ['\\[', '\\]'],
-          ],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
         },
         processEnvironments : false 
       },
@@ -54,6 +51,5 @@ console.log(serialize([["InverseFunction", "Sin"], "x"));
 
 ## Next
 
-- [MathJSON format](/guides/math-json-format)
+- [MathJSON format](/guides/math-json/format)
 - [MathJSON API](/docs/mathjson)
-- [MathJSON Default Dictionary](/guides/math-json-dictionary)

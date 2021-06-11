@@ -13,10 +13,7 @@ sidebar:
       TeX: { 
         delimiters: {
           inline: [['\\(', '\\)']],
-          display: [
-            ['$$', '$$'],
-            ['\\[', '\\]'],
-          ],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
         },
         processEnvironments : false 
       },
@@ -27,15 +24,23 @@ sidebar:
 
 <img src='/assets/Compute-Engine-2.png' style='margin-bottom:2em;  border-radius:8px; border:1px solid #203346'>
 
-The **CortexJS Compute Engine** performs calculations on MathJSON expressions.
+The **CortexJS Compute Engine** is a software environment for educators, students, scientists and engineers to perform manipulation of mathematical expressions.
+
+The CortexJS Compute Engine is built for the web platform and is available 
+as a JavaScript library that can be used in the browser or in server-side
+environments such as Node.
+
+The Compute Engine can be used to simplify, solve and evaluate expressions
+expressed in the <a href ="/guides/math-json/format/">MathJSON format</a>, and to <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from
+and to Latex.
 
 ## Evaluating
 
-Use the `ComputeEngine.evaluate()` function to evaluate an expression.
+**To evaluate an expression**, use the `evaluate()` function.
 
 The result of `evaluate()` is an expression. If the expression can 
 be evaluated numerically, the expression is a number. If it can't be
-evaluated numerically, the expression will be a symbolic expression.
+evaluated numerically, the expression is a symbolic expression.
 
 ```js
 import { evaluate } from 'compute-engine';
@@ -48,8 +53,10 @@ console.log(evaluate(["Add", 2, "x", 3]);
 
 ## Formating
 
-A given mathematical expression can be represented in multiple equivalent ways
-as a MathJSON expression. A **form** is used to specify a representation. The most common forms are `"full"` where only transformations necessary to make the expression a valid JSON expression are applied and `"canonical"` that applies rules to perform some basic simplifications and ordering of the
+A mathematical expression can be represented in multiple equivalent ways
+as a MathJSON expression. A **form** is used to specify a representation. 
+
+The most common forms are `"full"` where only transformations necessary to make the expression a valid JSON expression are applied and `"canonical"` that applies rules to perform some basic simplifications and ordering of the
 elements of the expression.
 
 **To transform an expression using the rules for a particular form**, use the
@@ -70,7 +77,7 @@ See [Compute Engine Forms](/guides/compute-engine/forms/) for more info.
 
 ## Comparing
 
-Use the `ComputeEngine.same()` function to compare two expressions.
+**To compare two expressions**, use the `ComputeEngine.same()` function.
 
 The comparison between expressions is structural so that \\(x + 1\\) is not equal
 to \\(1 + x\\). To obtain the desired result, you may need to apply a canonical
@@ -114,10 +121,12 @@ console.log(engine.same(
 
 ## Advanced Usage
 
-**To improve performance**, particularly when calling `format()`/`evaluate()`
-repeatedly, use an instance of the `ComputeEngine` class. When the instance is
-constructed, the dictionaries defining the symbols are compiled, and subsequent
-invocations of the `format()` and `evaluate()` methods can skip that step.
+For improved performance, particularly when calling `format()`/`evaluate()`
+repeatedly, use an instance of the `ComputeEngine` class. 
+
+When the instance is constructed, the dictionaries defining the symbols are 
+compiled, and subsequent invocations of the `format()` and `evaluate()` methods 
+can skip that step.
 
 Using a compute engine instance, it is possible to customize which symbol
 dictionaries are used.
