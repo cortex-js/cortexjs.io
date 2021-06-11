@@ -10,7 +10,4 @@
 	path = submodules/code-playground
 	url = https://github.com/ui-js/code-playground.git
 	branch = master
-[submodule "submodules/math-json"]
-	path = submodules/math-json
-	url = https://github.com/cortex-js/math-json.git
-	branch = master
+

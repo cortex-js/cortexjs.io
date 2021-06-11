@@ -35,17 +35,17 @@ echo -e "$BASENAME$DOT Groking mathlive"
 # Uses grok.config.js for additional config option
 # node ./submodules/grok/bin/grok-cli  ./node_modules/mathlive/dist/ --outDir ./src/build/ --outFile mathlive.html
 node ./submodules/grok/bin/grok-cli  ../mathlive/dist/public/ --sdkName mathlive --modules mathfield-element options mathlive mathfield commands core --outDir ./src/build/ --outFile mathlive.html
-# node ./submodules/grok/bin/grok-cli  ./submodules/math-json/src/public.ts --sdkName mathjson --outDir ./src/build/ --outFile math-json.html
+# node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/public.ts --sdkName mathjson --outDir ./src/build/ --outFile math-json.html
 echo -e "$BASENAME$DOT Groking MathJSON"
-node ./submodules/grok/bin/grok-cli  ./submodules/math-json/src/latex-syntax/public.ts --sdkName mathjson --outDir ./src/build/ --outFile math-json.html
+node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName mathjson --outDir ./src/build/ --outFile math-json.html
 echo -e "$BASENAME$DOT Groking Compute Engine"
-node ./submodules/grok/bin/grok-cli  ./submodules/math-json/src/compute-engine/public.ts --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
+node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/compute-engine/public.ts --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
 echo -e "$BASENAME$CHECK Groked"
 
 
 ## Build the guides from the source directories
 echo -e "$BASENAME$DOT Building guides"
-node ./scripts/build-guides.js  "./submodules/math-json/src/" "compute-engine-sidebar"
+node ./scripts/build-guides.js  "./submodules/compute-engine/src/" "compute-engine-sidebar"
 echo -e "$BASENAME$CHECK Guides built"
 
 ## Build (.md -> .html)
