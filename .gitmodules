@@ -11,3 +11,7 @@
 	url = https://github.com/ui-js/code-playground.git
 	branch = master
 
+[submodule "submodules/compute-engine"]
+	path = submodules/compute-engine
+	url = https://github.com/cortex-js/compute-engine
+	branch = main
