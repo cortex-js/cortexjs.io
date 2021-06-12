@@ -209,10 +209,12 @@ const run = async (dir, sidebar) => {
             if (!frontmatter.layout) {
               frontmatter.layout = 'sdk-documentation-layout';
             }
-            if (!frontmatter.sidebar) {
-              frontmatter.sidebar = [];
+            if (sidebar) {
+              if (!frontmatter.sidebar) {
+                frontmatter.sidebar = [];
+              }
+              frontmatter.sidebar.push({ nav: sidebar });
             }
-            frontmatter.sidebar.push({ nav: sidebar });
 
             frontmatter.head.stylesheets = [
               ...(frontmatter.stylesheets ?? []),

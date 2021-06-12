@@ -45,7 +45,7 @@ echo -e "$BASENAME$CHECK Groked"
 
 ## Build the guides from the source directories
 echo -e "$BASENAME$DOT Building guides"
-node ./scripts/build-guides.js  "./submodules/compute-engine/src/" "compute-engine-sidebar"
+node ./scripts/build-guides.js  "./submodules/compute-engine/src/" ""
 echo -e "$BASENAME$CHECK Guides built"
 
 ## Build (.md -> .html)
