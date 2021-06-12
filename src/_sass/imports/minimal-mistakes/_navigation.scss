@@ -224,6 +224,10 @@
             -ms-flex: none;
             flex: none;
         }
+        li:hover {
+          background: #eee;
+          border-radius: 5px;
+        }
 
         a {
             position: relative;

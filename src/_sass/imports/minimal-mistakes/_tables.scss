@@ -2,38 +2,49 @@
    TABLES
    ========================================================================== */
 
+
 table {
-  display: block;
-  margin-bottom: 1em;
   width: 100%;
+  margin-bottom: 3em;
+  word-wrap: normal;
+  table-layout: fixed;
+  display: table;
+  overflow: hidden;
+  overflow-x: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  line-height: 1.47059;
   font-family: $global-font-family;
   font-size: $type-size-5;
-  border-collapse: collapse;
-  overflow-x: auto;
 
   & + table {
     margin-top: 1em;
   }
-}
 
-thead {
-  background-color: $border-color;
-  border-bottom: 2px solid mix(#000, $border-color, 25%);
-}
+  thead {
+    tr {
+      border-bottom: 1px solid #333;
+      th {
+        font-weight: 600;
+        // color: #333;
+        padding: 3px 1em 3px 0;
+        vertical-align: bottom;
+        text-align: left;
+      }
+    }
+  }
+  
+  tr {
+    border-bottom: 1px solid mix(#fff, $border-color, 25%);
+    
+    td:first-child { 
+      width: 100%; 
+    }
 
-th {
-  padding: 0.5em;
-  font-weight: bold;
-  text-align: left;
-}
-
-td {
-  padding: 0.5em;
-  border-bottom: 1px solid mix(#000, $border-color, 25%);
-}
-
-tr,
-td,
-th {
-  vertical-align: middle;
+    td {
+      line-height: 1.5em;
+      padding: .5em 1em .5em 0;
+      vertical-align: top;
+    }
+  }
 }

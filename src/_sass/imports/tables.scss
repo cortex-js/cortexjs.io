@@ -1,0 +1,49 @@
+
+// .pill-list {
+// }
+
+
+// table {
+//   width: 100;
+//   margin-bottom: 3em;
+//   font-size: 14px;
+//   word-wrap: normal;
+//   table-layout: fixed;
+//   display: table;
+//   overflow: hidden;
+//   overflow-x: auto;
+//   border-collapse: collapse;
+//   border-spacing: 0;
+//   line-height: 1.47059;
+
+//   thead {
+//     tr {
+//       border-bottom: 1px solid #333;
+//       th {
+//         font-weight: 600;
+//         color: #333;
+//         padding: 3px 1em 3px 0;
+//         vertical-align: bottom;
+//         text-align: left;
+//       }
+//     }
+//   }
+  
+//   tr {
+//     border-bottom: 1px solid #e6e6e6;
+//     td {
+//       color: #666;
+//       line-height: 1.5em;
+//       padding: .5em 1em .5em 0;
+//       vertical-align: top;
+//     }
+//   }
+// }
+
+// List of symbols: Narrow first column
+.symbols-table table {
+  table-layout: auto;
+  tr td:first-child {
+    width: 16ex;
+  }
+}
