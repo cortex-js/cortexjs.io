@@ -12,6 +12,7 @@
 			"title": "Cortex",
 			"url": "/cortex/"
 		},
+    { "separator": true },
 		{
 			"title": "Docs",
 			"url": "/docs/"
@@ -35,10 +36,6 @@
 					"title": "Getting Started",
 					"url": "/guides/mathfield-getting-started/"
 				},
-				{
-					"title": "SDK Reference",
-					"url": "/docs/mathlive/"
-				},
         {
 					"title": "Supported Commands",
 					"url": "/mathlive/reference/commands/"
@@ -50,7 +47,12 @@
         {
 					"title": "Example",
 					"url": "/mathlive/playground/"
-        }
+        },
+        { "separator": true },
+				{
+					"title": "SDK Reference",
+					"url": "/docs/mathlive/"
+				}
 			]
 		},
 		{
@@ -137,15 +139,19 @@
 					"title": "Introduction",
 					"url": "/compute-engine/"
 				},
+        { "separator": true },
 				{
 					"title": "Latex Syntax",
 					"url": "/guides/math-json/latex-syntax/"
 				},
 				{
-					"title": "Transforming an Expression",
-					"url": "/guides/compute-engine/transforming/"
+					"title": "Symbolic Computing",
+					"url": "/guides/compute-engine/symbolic-computing/"
 				},
-        
+				{
+					"title": "Numerical Evaluation",
+					"url": "/guides/compute-engine/numerical-evaluation/"
+				},        
 				{
 					"title": "Assumptions",
 					"url": "/guides/compute-engine/assumptions/"
@@ -154,11 +160,15 @@
 					"title": "Domains",
 					"url": "/guides/compute-engine/domains/"
 				},
-				
+				{
+					"title": "Patterns",
+					"url": "/guides/compute-engine/patterns/"
+				},
 				{
 					"title": "Canonical Forms",
 					"url": "/guides/compute-engine/forms/"
 				},
+        { "separator": true },
 				{
 					"title": "SDK Reference",
 					"url": "/docs/compute-engine/"
@@ -172,6 +182,7 @@
           "title": "Introduction",
           "url": "/guides/math-json-dictionary/"
         },
+        { "separator": true },
         {
           "title": "Arithmetic",
           "url": "/guides/compute-engine/arithmetic/"
@@ -213,6 +224,7 @@
 					"title": "MathJSON Format",
 					"url": "/guides/math-json/format/"
 				},
+        { "separator": true },
 				{
 					"title": "SDK Reference",
 					"url": "/docs/mathjson/"

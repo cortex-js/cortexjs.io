@@ -24,6 +24,16 @@
     font-weight: 700;
     font-size: 20px;
 }
+.masthead__menu-item.separator {
+  width: 1em;
+  border-right: 1px solid #ddd;
+  margin-right: 1em;
+}
+
+.greedy-nav .visible-links li.separator:hover {
+  background: transparent;
+  cursor: default;
+}
 
 pre {
     margin-bottom: 1em;

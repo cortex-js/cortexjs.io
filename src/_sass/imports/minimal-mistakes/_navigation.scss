@@ -428,14 +428,19 @@
 .nav__list .nav__items {
     margin: 0;
 
+    .separator {
+      border-top: 1px solid #ddd;
+      height: .75em;
+      margin-top: .75em;
+      margin-left: 8px;
+    }
     a {
-        color: inherit;
+      color: inherit;
     }
 
     .active {
-        padding: 4px 4px 4px 8px;
-        margin-left: -8px;
-        font-weight: bold;
+      padding: 4px 4px 4px 8px;
+      margin-left: -8px;
     }
 
     @include breakpoint(max-width $large - 1px) {
