@@ -24,115 +24,81 @@ sidebar:
 
 <img src='/assets/Compute-Engine-2.png' style='margin-bottom:2em;  border-radius:8px; border:1px solid #203346'>
 
-The **CortexJS Compute Engine** is a software environment for educators, students, scientists and engineers to perform manipulation of mathematical expressions.
+The **CortexJS Compute Engine** is a JavaScript library to manipulate 
+mathematical expressions.
 
-The CortexJS Compute Engine is built for the web platform and is available 
-as a JavaScript library that can be used in the browser or in server-side
+The Compute Engine is built for educators, students, scientists and engineers
+who want to make technical computing applications in the browser or in server-side
 environments such as Node.
 
-The Compute Engine can be used to simplify, solve and evaluate expressions
-expressed in the <a href ="/guides/math-json/format/">MathJSON format</a>, and to <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from
-and to Latex.
+The Compute Engine can simplify, solve and evaluate math expressions expressed 
+in the <a href ="/guides/math-json/format/">MathJSON format</a>, and <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex.
 
-## Evaluating
+## Parse and Serialize Latex
 
-**To evaluate an expression**, use the `evaluate()` function.
+**To parse and serialize an expression**, use `parse()` and `serialize().
+
+```js
+import { parse, serialize } from 'compute-engine';
+
+console.log(parse('5x + 1'));
+// ->  ["Add", ["Multiply", 5, "x"], 1]
+
+console.log(serialize(["Add", ["Power", "x", 3], 2]));
+// ->  x^3 + 2
+
+```
+
+**To provide an interactive mathfield**, use [MathLive](/mathlive/).
+
+A MathLive mathfield can provide its content either as Latex or as a MathJSON
+expression.
+
+Read more about [Parsing and Serializing the Latex Syntax](/guides/math-json/latex-syntax/).
+
+
+## Symbolic Computing
+
+**To evaluate a symbolic expression**, use the `evaluate()` function.
 
 The result of `evaluate()` is an expression. If the expression can 
 be evaluated numerically, the expression is a number. If it can't be
 evaluated numerically, the expression is a symbolic expression.
 
 ```js
-import { evaluate } from 'compute-engine';
+import { evaluate, parse, serialize } from 'compute-engine';
 
 console.log(evaluate(["Add", 2, 3]);
 // ➔ 5
-console.log(evaluate(["Add", 2, "x", 3]);
-// ➔ ["Add", 5, x]
+
+console.log(serialize(evaluate(parse('2x + 3x')));
+// ➔ 5x
+
+console.log(evaluate(parse('\\frac{\\sqrt{5}}{3}'));
+// ➔ 0.7453559925
 ```
 
-## Formating
+The Compute Engine can also simplify, find patterns, substitute terms, compare and format
+expressions.
 
-A mathematical expression can be represented in multiple equivalent ways
-as a MathJSON expression. A **form** is used to specify a representation. 
+Read more about [Symbolic Computing](/guides/compute-engine/symbolic-computing/).
 
-The most common forms are `"full"` where only transformations necessary to make the expression a valid JSON expression are applied and `"canonical"` that applies rules to perform some basic simplifications and ordering of the
-elements of the expression.
-
-**To transform an expression using the rules for a particular form**, use the
-`format()` function.
+Read more about [Numerical Evaluation](/guides/compute-engine/numerical-evaluation/).
 
 
-```js
-import { format } from 'compute-engine';
+## Customization
 
-console.log(format(["Add", 2, +Infinity], 'full');
-// ➔ ["Add", 2, "+Infinity"]
+The Compute Engine includes a robust library of mathematical functions. 
+The dictionaries that define these functions, and how they are parsed and
+serialized to Latex can be customized by creating a `ComputeEngine` instance.
 
-console.log(format(["Add", 2, "x", 3], 'canonical');
-// ➔ ["Add", 2, 3, "x"]
-```
-
-See [Compute Engine Forms](/guides/compute-engine/forms/) for more info.
-
-## Comparing
-
-**To compare two expressions**, use the `ComputeEngine.same()` function.
-
-The comparison between expressions is structural so that \\(x + 1\\) is not equal
-to \\(1 + x\\). To obtain the desired result, you may need to apply a canonical
-form to the expressions using `ComputeEngine.canonical()`, or evaluate them using `ComputeEngine.evaluate()`.
-
-```js
-const engine = new ComputeEngine();
-
-const variable = 'x';
-console.log(engine.same(
-  ['Add', 'x', 1], 
-  ['Add', variable, 1]
-));
-// ➔ true: the two expressions are the same
-
-console.log(engine.same(
-  ['Add', 'x', 1], 
-  ['Add', 1, 'x']
-));
-// ➔ false: the two expressions are **not** the same
-
-console.log(engine.same(
-  engine.canonical(['Add', 'x', 1]),
-  engine.canonical(['Add', 1, 'x'])
-));
-// ➔ true: the two expressions are the same in canonical form
-
-console.log(engine.same(
-  ['Add', 2, 2],
-  ['Add', 3, 1]
-));
-// ➔ false: the two expressions are **not** the same
-
-console.log(engine.same(
-  engine.evaluate(['Add', 2, 2]),
-  engine.evaluate(['Add', 3, 1])
-));
-// ➔ true: the two expressions are the same once evaluated
-```
-
-
-## Advanced Usage
-
-For improved performance, particularly when calling `format()`/`evaluate()`
-repeatedly, use an instance of the `ComputeEngine` class. 
-
-When the instance is constructed, the dictionaries defining the symbols are 
-compiled, and subsequent invocations of the `format()` and `evaluate()` methods 
-can skip that step.
-
-Using a compute engine instance, it is possible to customize which symbol
-dictionaries are used.
+The `ComputeEngine` instance also provides access to additional features
+such as defining [assumptions](/guides/compute-engine/assumptions/) about 
+symbols (e.g. `x is a positive number, n is an integer`).
 
 ```js
 const engine = new ComputeEngine(ComputeEngine.getDictionary('arithmetic'));
 engine.evaluate(['Add', 5, 2]);
 ```
+Read more about [Dictionaries](/guides/compute-engine/numerical-evaluation/).
 
