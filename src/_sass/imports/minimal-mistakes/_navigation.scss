@@ -454,6 +454,7 @@
     }
 }
 
+
 @include breakpoint(max-width $large - 1px) {
     .nav__list input:checked ~ .nav__items {
         // transition: 0.5s ease-in-out;
@@ -469,8 +470,39 @@
         border-radius: 8px;
         border: 1px solid #ddd;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        column-count: 3;
+        padding: 1em;
+        // .separator {
+        //   margin-left: 0;
+        // }
+        li {
+          font-size: 1.5rem;
+          padding: 0 0 .25em 8px;
+          display: block; // prevent breaking inside multicol
+          break-inside: avoid;
+          .nav__sub-title {
+            font-size: 1.5rem;
+            padding-left: 0;
+          }
+        }
     }
 }
+
+@include breakpoint(max-width $medium - 1px) {
+  .nav__list input:checked ~ .nav__items {
+    column-count: 2;
+    // .separator {
+    //   margin-left: 0;
+    // }
+    li {
+      font-size: 1rem;
+      .nav__sub-title {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
 
 .nav__title {
     margin: 0;
