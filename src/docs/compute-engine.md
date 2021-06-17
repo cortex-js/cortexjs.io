@@ -28,15 +28,16 @@ The **CortexJS Compute Engine** is a JavaScript library to manipulate
 mathematical expressions.
 
 The Compute Engine is built for educators, students, scientists and engineers
-who want to make technical computing applications in the browser or in server-side
+who want to make technical computing apps in the browser or in server-side
 environments such as Node.
 
-The Compute Engine can simplify, solve and evaluate math expressions expressed 
-in the <a href ="/guides/math-json/format/">MathJSON format</a>, and <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex.
+You can use the Compute Engine to simplify, solve and evaluate math expressions 
+expressed in the <a href ="/guides/math-json/format/">MathJSON format</a>, and <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex.
 
 ## Parse and Serialize Latex
 
-**To parse and serialize an expression**, use `parse()` and `serialize().
+**To parse and serialize an expression**, use the `parse()` and `serialize()` 
+functions.
 
 ```js
 import { parse, serialize } from 'compute-engine';
@@ -49,12 +50,13 @@ console.log(serialize(["Add", ["Power", "x", 3], 2]));
 
 ```
 
-**To provide an interactive mathfield**, use [MathLive](/mathlive/).
+**To input math using an interactive mathfield**, use [MathLive](/mathlive/).
 
-A MathLive mathfield can provide its content either as Latex or as a MathJSON
-expression.
+A MathLive mathfield works like a textarea, but for math, and it can provide 
+its content as a Latex string or a MathJSON expression.
 
-Read more about [Parsing and Serializing the Latex Syntax](/guides/math-json/latex-syntax/).
+
+<div class='read-more'><a href="/guides/math-json/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 ## Symbolic Computing
@@ -81,24 +83,27 @@ console.log(evaluate(parse('\\frac{\\sqrt{5}}{3}'));
 The Compute Engine can also simplify, find patterns, substitute terms, compare and format
 expressions.
 
-Read more about [Symbolic Computing](/guides/compute-engine/symbolic-computing/).
 
-Read more about [Numerical Evaluation](/guides/compute-engine/numerical-evaluation/).
+
+
+<div class='read-more'><a href="/guides/compute-engine/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
+<div class='read-more'><a href="/guides/compute-engine/numerical-evaluation/">Read more about <strong>Numerical Evaluation</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 ## Customization
 
 The Compute Engine includes a robust library of mathematical functions. 
+
 The dictionaries that define these functions, and how they are parsed and
-serialized to Latex can be customized by creating a `ComputeEngine` instance.
+serialized to Latex, can be customized by creating a `ComputeEngine` instance.
 
 The `ComputeEngine` instance also provides access to additional features
 such as defining [assumptions](/guides/compute-engine/assumptions/) about 
-symbols (e.g. `x is a positive number, n is an integer`).
+symbols: _x is a positive Real number, n is an Integer_.
 
 ```js
-const engine = new ComputeEngine(ComputeEngine.getDictionary('arithmetic'));
-engine.evaluate(['Add', 5, 2]);
+const ce = new ComputeEngine(ComputeEngine.getDictionary('arithmetic'));
+ce.evaluate(['Add', 5, 2]);
 ```
-Read more about [Dictionaries](/guides/compute-engine/numerical-evaluation/).
-
+<div class='read-more'><a href="/guides/compute-engine/dictionaries/">Read more about <strong>Dictionaries</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>

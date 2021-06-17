@@ -208,6 +208,10 @@
           "url": "/guides/compute-engine/sets/"
         },
         {
+          "title": "Special Functions",
+          "url": "/guides/compute-engine/special-functions/"
+        },
+        {
           "title": "Trigonometry",
           "url": "/guides/compute-engine/trigonometry/"
         }

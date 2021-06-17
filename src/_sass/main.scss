@@ -59,3 +59,46 @@ a.chevron::after {
     height: 3em;
     content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 9'%3E%3Cpath d='M-.1 0L2 4.5L-.1 9Z' fill='currentcolor'/%3E%3C/svg%3E");
 }
+
+.svg-chevron {
+  width: 14px;
+  height: 14px;
+  color: currentColor;
+}
+
+#main a svg.svg-chevron {
+  padding: 0;
+  margin: 0;
+  vertical-align: -3px;
+}
+
+.page__content .read-more {
+  color:#000;
+  margin: 2em 0 !important;
+  /* override*/
+  color: #494e52;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 1rem !important;
+  text-indent: initial;
+  /* override*/
+  background-color: #e6f0fa;
+  border-radius: 4px;
+  box-shadow: 0 1px 1px rgba(0, 102, 206, 0.25);
+  width: 100%; 
+  border: 1px solid rgba(0, 102, 206, 0.25);
+  transition: box-shadow,transform .16s ease-out,-webkit-transform .16s ease-out;
+  will-change: box-shadow,transform;
+}
+.page__content .read-more a{
+  padding: 1em;
+  display: block;
+  color: #0066ce; 
+  font-size: 1.1em;
+}
+
+.page__content .read-more:hover{
+  color: #0066ce; 
+  border: 1px solid #0066ce;
+  transform: scale(1.007);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.04);
+}
