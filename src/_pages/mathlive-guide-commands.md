@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Commands
+title: Commands - MathLive Guide
 permalink: /mathlive/guides/commands/
 read_time: false
 sidebar:
@@ -134,7 +134,6 @@ sequence is replaced with the current selection).
     be highlighted. It is an object: `{withHighlighting: boolean}` (default is
     false). Note: highlighting currently only works when using Amazon's
     AWS speech synthesizer.
-## Next
 
-<a href="/mathlive/guides/macros">Macros<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    Extend the Latex commands supported
+<div class='read-more'><a href="/mathlive/guides/macros/">Next: Extending the supported Latex commands with <strong>Macros</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+

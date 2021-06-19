@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Shortcuts
+title: Shortcuts - MathLive Guide
 permalink: /mathlive/guides/shortcuts/
 read_time: false
 sidebar:
@@ -280,7 +280,4 @@ mf.setOptions({
 
 
 
-## Next
-
-<a href="/mathlive/guides/speech">Speech<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    Control speech output
+<div class='read-more'><a href="/mathlive/guides/speech/">Next: Control <strong>Speech</strong> output<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>

@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Static
+title: Static - MathLive Guide
 permalink: /mathlive/guides/static/
 read_time: false
 sidebar:
@@ -150,10 +150,9 @@ element.
 
 
 
-## Next
+<div class='read-more'><a href="/mathlive/guides/virtual-keyboards/">Next: Define custom <strong>Virtual Keyboards</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-<a href="/mathlive/guides/virtual-keyboards">Virtual Keyboards<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    Define custom virtual keyboards
+
 
 
 <!-- Equation rendering -->

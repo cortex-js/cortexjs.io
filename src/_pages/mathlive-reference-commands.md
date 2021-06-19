@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Reference - Commands
+title: Commands - MathLive Reference
 permalink: /mathlive/reference/commands/
 read_time: false
 sidebar:
@@ -21,7 +21,10 @@ sidebar:
       asciiMath: null,
     });
     document.body.classList.add('ready');
-    document.getElementById('version').innerHTML = version;
+
+    document.getElementById('mathlive-version').innerHTML = version.mathlive;
+    document.getElementById('mathjson-version').innerHTML = version.mathJson;
+
 </script>
 
 <style>
@@ -94,11 +97,19 @@ sidebar:
   .thin-line td:not(:last-child) {
     border-right: 0.5px solid rgba(0, 0, 0, .07);
   }
-  .two-col td {
+  .two-col table tr td, 
+  .two-col table tr td:first-child {
     width: 50%;
   }
-  .three-col td {
+  .two-col table tr td .math {
+    text-align: center;
+  }
+  .three-col table tr td, 
+  .three-col table tr td:first-child {
     width: 33%;
+  }
+  .three-col table tr td .math {
+    text-align: center;
   }
   .math-80px span.math {
     display: inline-block;
@@ -293,7 +304,7 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 * <span class='math'>$$\cdot $$</span>   `\cdot`
 * <span class='math'>$$\times $$</span>   `\times`
 * <span class='math'>$$a / b $$</span>   `a / b`
-* <span class='math'>$$\nicefrac{3}{4}$$</span>   `nicefrac{3}{4}` (macro)
+* <span class='math'>$$\nicefrac{3}{4}$$</span>   `\nicefrac{3}{4}` (macro)
 * <span class='math'>$$\div $$</span>   `\div`
 * <span class='math'>$$\divides $$</span>   `\divides`
 * <span class='math'>$$\sqrt{\unicode{"2B1A}} $$</span> `\sqrt{}`
@@ -414,23 +425,19 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 ## Unicode
 
+<div class=symbols-table>
 
-* `\unicode{}` - The argument is a Unicode codepoint expressed as a number. To 
-use a hexadecimal number, start the argument with `x` or `"` and use 
-**uppercase** `A`-`F` for hexadecimal digits.
-  * <span class='math'>$$\unicode{10775} $$</span> `\unicode{10775}` 
-  * <span class='math'>$$\unicode{"2A17} $$</span> `\unicode{"2A17}` 
-  * <span class='math'>$$\unicode{x2A17} $$</span> `\unicode{x2A17}`
-* `\char` - The argument is also a Unicode codepoint, but the `{`...`}` 
-delimiters are optional when using `"`
-  * <span class='math'>$$\char"2A17 $$</span> `\char"2A17`  
-* `^^` and `^^^^` - Followed by 2 or 4 hexadecimal digits with **lowercase** 
-`a`-`f` to specify a Unicode codepoint
-  * <span class='math'>$$^^4a $$</span> `^^4a`
-  * <span class='math'>$$^^^^2a17 $$</span> `^^^^2a17`
+| Command | | 
+| :--- | :--- | 
+| `\unicode{}` | The argument is a Unicode codepoint expressed as a number. To use a hexadecimal number, start the argument with `x` or `"` and use **uppercase** `A`-`F` for hexadecimal digits.<br><ul><li><span class='math'>\\(\unicode{10775} \\)</span> `\unicode{10775}`</li><li><span class='math'>\\(\unicode{"2A17} \\)</span> `\unicode{"2A17}`</li><li><span class='math'>\\(\unicode{x2A17} \\)</span> `\unicode{x2A17}`</li></ul> |
+| `\char` | The argument is also a Unicode codepoint, but the `{`...`}` delimiters are optional when using `"`. <br> <ul><li><span class='math'>\\(\char"2A17 \\)</span> `\char"2A17`  </li></ul> |
+| `^^` <br> `^^^^` | Followed by 2 or 4 hexadecimal digits with **lowercase** `a`-`f` to specify a Unicode codepoint.<br><ul><li><span class='math'>\\(^^4a \\)</span> `^^4a`</li><li><span class='math'>\\(^^^^2a17 \\)</span> `^^^^2a17`</li></ul> | 
+
+</div>
 
 
-The codepoint of the Unicode character &#x2A17; **U+2A17 INTEGRAL WITH LEFTWARDS ARROW WITH HOOK** is 10775 in decimal, 2A17<sub>16</sub> in hexadecimal. The codepoint of the letter J is 004A<sub>16</sub> in hexadecimal{.notice--info}
+
+The codepoint of the Unicode character &#x2A17; **U+2A17 INTEGRAL WITH LEFTWARDS ARROW WITH HOOK** is 10775 in decimal, 2A17<sub>16</sub> in hexadecimal. The codepoint of the letter `J` is 004A<sub>16</sub> in hexadecimal. Learn more about [Mathematical Operators and Symbols in Unicode on Wikipedia](https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode).{.notice--info}
 
 
 
@@ -585,7 +592,7 @@ above and below by default, while the `\int` command display its limit adjacent.
 
 ### Negated Arrows
 
-<section class='full-width no-header center thin-line two-col math-80px'>
+<section class='full-width no-header center thin-line three-col math-80px'>
 
 | | | |
 |:--- | :--- | :--- |
@@ -828,7 +835,7 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 ### Negated Relational Operators
 
 To negate other relational operators, use the `\not` command, e.g. 
-<span class='math'>$$\not\equiv$$</span> `\not\equiv`.
+<span class='math'>\\( \not\equiv \\)</span> `\not\equiv`.
 
 * <span class='math'>$$\ne $$</span> `\ne`
 * <span class='math'>$$\neq $$</span> `\neq`
@@ -1059,6 +1066,8 @@ To negate other relational operators, use the `\not` command, e.g.
 
 ## Delimiters
 
+A delimiter, also called a **fence**, is a symbol used to group some symbols, for example parentheses, brackets, braces, etc...
+
 To grow delimiters based on their content, use `\left...\right`.
 
 <div class='no-line two-col'>
@@ -1070,14 +1079,17 @@ To grow delimiters based on their content, use `\left...\right`.
 
 </div>
 
+
+Internally, Mathlive uses the non-standard `\mleft` and `\mright` command. These commands are use to indicate some delimiters that have been automatically converted to "smart" delimiters when the `smartFence` option is on. However, because they are not standard Latex commands, they may not be recognized by other Latex-compatible software. When exporting using the `latex-expanded` format, or when using the clipboard, those commands are automatically removed.{.notice--warning}
+
 The left and right delimiters do not have to match:
 
-<span class='math'>$$\left\lparen \frac1x \right\rbrack$$</span> `\left\lparen \frac1x \right\rbrack`
+<span class='math'>\\(\displaystyle \left\lparen \frac1x \right\rbrack\\)</span> `\left\lparen \frac1x \right\rbrack`
 
 
 To omit a delimiter, use `.`:
 
-<span class='math'>$$\left\lparen \frac1x \right.$$</span> `\left\lparen \frac1x \right.`
+<span class='math'>\\(\displaystyle \left\lparen \frac1x \right.\\)</span> `\left\lparen \frac1x \right.`
 
 
 ---
@@ -1323,7 +1335,7 @@ which are required:
 
 They can be combined:
 
-<span class='math'>$$\enclose{roundedbox updiagonalstrike}{x=0} $$</span>  `roundedbox, updiagonalstrike` 
+<span class='math'>\\( \displaystyle \enclose{roundedbox updiagonalstrike}{x=0} \\)</span>  `roundedbox, updiagonalstrike` 
 
 - `<style>` an optional list of comma separated key-value pairs including:
   - `mathbackground="<color>"` background color of the expression
@@ -1585,22 +1597,19 @@ These size are relative to the `font-size` property of the mathfield.
 The size of delimiters can be controlled manually with the commands below. The `\left...\right...` commands calculate automatically the size of the
 delimiters based on the content.
 
+**The command must be followed by a delimiter**, for example `(` or `\lbrace` or `\lbrack`. If the command is used on its own, nothing is displayed.{.notice--warning}
+
 <section class="no-header center">
 
 | | | |
 | :---- | :---- |  :---- |
-| <span class='math'>$$\bigl( \bigm\| \bigr) $$</span> | `\bigl( \bigm\| \bigr)` |
-| <span class='math'>$$\Bigl( \Bigm\| \Bigr) $$</span> | `\Bigl( \Bigm\| \Bigr)` |
-| <span class='math'>$$\biggl( \biggm\| \biggr) $$</span> | `\biggl( \biggm\| \biggr)` |
-| <span class='math'>$$\Biggl( \Biggm\| \Biggr) $$</span> | `\Biggl( \Biggm\| \Biggr)` |
+| <span class='math'>$$\bigl( \bigm\| \bigr) $$</span> | `\bigl(` `\bigm\|` `\bigr)` |
+| <span class='math'>$$\Bigl( \Bigm\| \Bigr) $$</span> | `\Bigl(` `\Bigm\|` `\Bigr)` |
+| <span class='math'>$$\biggl( \biggm\| \biggr) $$</span> | `\biggl(` `\biggm\|` `\biggr)` |
+| <span class='math'>$$\Biggl( \Biggm\| \Biggr) $$</span> | `\Biggl(` `\Biggm\|` `\Biggr)` |
 </section>
 
 
-* <span class='math'>$$\big(\big) $$</span> `\big{}`
-* <span class='math'>$$\Big(\Big) $$</span> `\Big{}`
-* <span class='math'>$$\bigg(\bigg) $$</span> `\bigg{}`
-* <span class='math'>$$\Bigg(\Bigg) $$</span> `\Bigg{}`
-{.command-list}
 
 
 
@@ -2262,6 +2271,8 @@ The math typesetting is influenced by some "constants" that are stored
 in "registers". Those registers can be set globally on a mathfield using 
 the `registers` option.
 
+<div class=symbols-table>
+
 | Register | Purpose |
 | :--- |  :--- |
 | `arrayrulewidth` | Width of separator lines in array environments |
@@ -2276,22 +2287,38 @@ the `registers` option.
 | `thickmuskip` | Amount of space around a relational operator. See also `medmuskip`, `thinmuskip`.  |
 | `thinmuskip` | Amount of space around math punctuation. See also `medmuskip`, `thickmuskip`. |
 
+</div>
+
+
 ## TeX Primitives
 
 The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.
 
-* `%`: anything after a `%` character and an end of line character is 
-interpreted as a comment and ignored
-* `\limits` and `\nolimits`
-* `\relax`
-* `\noexpand`
-* `\obeyspaces` -- In Math Mode, spaces are normally ignored. Using this 
-command spaces will be preserved in Math Mode.
-* `\bgroup` and `\egroup`
-* `\string`
-* `\csname` and `\endcsname`
-* `\ensuremath{}` -- If in Math Mode, does nothing. Otherwise, switch to Math Mode.
+<div class=symbols-table>
+
+| Command |  |
+| :--- |  :--- |
+| `%`  | Anything after a `%` character and an end of line character is interpreted as a comment and ignored|
+| `\limits` <br> `\nolimits` |  | 
+| `\relax` | | 
+| `\noexpand` | | 
+| `\obeyspaces` | In Math Mode, spaces are normally ignored. Using this command spaces will be preserved even in Math Mode. |
+| `\bgroup` <br> `\egroup` | |
+| `\string` | | 
+| `\csname` <br> `\endcsname` | | 
+| `\ensuremath{}` | If in Math Mode, does nothing. Otherwise, switch to Math Mode. |
+
+</div>
 
 
-<footer class="page__meta"><strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version: </strong> <span id='version'></span></footer>
+<footer class="page__meta">
+
+<strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version: </strong> <span id='mathlive-version'></span>
+
+</footer>
+<footer class="page__meta">
+
+<strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version: </strong> <span id='mathjson-version'></span>
+
+</footer>

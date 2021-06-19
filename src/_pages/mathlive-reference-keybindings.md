@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Reference - Keyboard Shortcuts
+title: Keyboard Shortcuts - MathLive Reference
 permalink: /mathlive/reference/keybindings/
 read_time: false
 sidebar:
@@ -20,19 +20,19 @@ sidebar:
 </script>
 
 <style>
-  ul.command-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-  ul.command-list,
-  .command-list li {
-    margin: 0;
-    padding: 10px;
-    list-style: none;
-  }
   td:nth-child(1) code {
-    font-size: 32px;
+    font-size: 24px;
     font-weight:normal;
+    margin: 8px;
+    line-height: 1.5
+  }
+  table {
+    table-layout: auto;
+  }
+  table tr td:first-child {
+    min-width: 15ex;
+    width: 1ex;
+    white-space: nowrap;  
   }
 </style>
 
@@ -43,6 +43,7 @@ combinations.
 
 
 ### Special Keys
+
 
 |  | |
 | :--- | :--- |

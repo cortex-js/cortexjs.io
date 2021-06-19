@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Web Component Lifecycle
+title: Web Component Lifecycle - MathLive Guide
 permalink: /mathlive/guides/lifecycle/
 read_time: false
 sidebar:
@@ -164,7 +164,5 @@ md.addEventListener('unmount')((ev) => {
 });
 ```
 
-## Next
 
-<a href="/mathlive/guides/customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    How to customize the behavior and appearance of a mathfield.
+<div class='read-more'><a href="/mathlive/guides/customizing/">Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>

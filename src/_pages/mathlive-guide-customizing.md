@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Customizing
+title: Customizing - MathLive Guide
 permalink: /mathlive/guides/customizing/
 read_time: false
 sidebar:
@@ -374,8 +374,5 @@ console.log(mf.getOptions().strings[locale]);
 <!-- htmlmin:ignore -->
 
 
+<div class='read-more'><a href="/mathlive/guides/commands/">Next: <strong>Executing Commands</strong>: send editing commands to a mathfield<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-## Next
-
-<a href="/mathlive/guides/commands">Executing commands<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    Send editing commands to a mathfield

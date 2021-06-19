@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide
+title: Introduction - MathLive Guide
 permalink: /mathlive/guides/introduction/
 read_time: false
 sidebar:
@@ -24,6 +24,7 @@ head:
 </script>
 
 # Mathfield Introduction
+
 Let's add an editable mathfield to a web page.
 
 **1. Load the MathLive library from a CDN with a `<script>` tag.**
@@ -64,7 +65,5 @@ For example `f(x) = \sin(x)`,
 </code-playground>
 
 
-## Next
+<div class='read-more'><a href="/mathlive/guides/interacting/">Next: <strong>Interacting with a Mathfield</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-<a href="/mathlive/guides/interacting">Interacting with a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    How to read, write the content of a mathfield

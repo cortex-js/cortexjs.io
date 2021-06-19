@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Interacting
+title: Interacting - MathLive Guide
 permalink: /mathlive/guides/interacting/
 read_time: false
 sidebar:
@@ -121,7 +121,6 @@ triggered and creating an infinite loop.{.notice--info}
 </code-playground>
 
 
-</section>
 
 
 ## Applying Style to a Mathfield
@@ -245,12 +244,16 @@ commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<k
 
 Multiple flavors are put on the clipboard, and the recipient of the **Paste** operation can pick whichever is most appropriate:
 
+<div class='symbols-table'>
+
 | | |
 |:-- | :-- |
 | `text/plain` | Latex wrapped with a `\begin{equation*}` and `\end{equation*}`.|
 | `application/x-latex` | Raw Latex |
 | `application/json`| A MathJSON representation of the formula. |
 | `application/mathml+xml` | A MathML representation of the formula. |
+
+</div>
 
 The Latex in the `text/plain` flavor is "wrapped" to make it easier for the recipient of the paste to recognize that this content is in Latex format. There isn't really a standard format for this, but testing of several Latex-capable editors has shown that `\begin{equation*}` was the most commonly recognized.
 
@@ -291,11 +294,7 @@ The standard delimiter for AsciiMath is the <kbd>&#96;</kbd> (backtick) characte
 <!-- ## Performing editing commands -->
 
 
-## Next
+<div class='read-more'><a href="/mathlive/guides/customizing/">Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-<a href="/mathlive/guides/customizing">Customizing a mathfield<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    How to customize the behavior and appearance of a mathfield.
+<div class='read-more'><a href="/mathlive/guides/lifecycle/">Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-<a href="/mathlive/guides/lifecycle">Web Component Lifecycle<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    Understand in depth the lifecycle of a MathfieldElement: construction, 
-interaction with the DOM and when can you communicate with it.

@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Speech
+title: Speech - MathLive Guide
 permalink: /mathlive/guides/speech/
 read_time: false
 sidebar:
@@ -46,6 +46,8 @@ mf.executeCommand(['speak', 'selection');
 ```
 The options to specify the speech "scope" are:
 
+<div class='symbols-table'>
+
 | | |
 |---:|:---|
 | `all` | the entire formula |
@@ -54,6 +56,8 @@ The options to specify the speech "scope" are:
 | `right` | the element to the right of the selection |
 | `group` | the group (numerator, root, etc..) the selection is in |
 | `parent` | the parent of the selection |
+
+</div>
 
 **To get a textual representation of a spoken description of the formula**, use
 the `spoken-text` format:
@@ -145,7 +149,7 @@ The Amazon TTS engine supports SSML, and it is recommended to use this option fo
 
 
 
-## Next
 
-<a href="/mathlive/guides/static">Static Math<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    Display static math formulas
+
+<div class='read-more'><a href="/mathlive/guides/static/">Next: Display <strong>Static Math</strong> formulas<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+

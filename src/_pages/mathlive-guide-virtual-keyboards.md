@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Virtual Keyboards
+title: Virtual Keyboards - MathLive Guide
 permalink: /mathlive/guides/virtual-keyboards/
 read_time: false
 sidebar:
@@ -490,11 +490,9 @@ the `math-field` elements.
 ```
 
 
-## Next
 
-<a href="/mathlive/guides/lifecycle">Web Component Lifecycle<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    Understand in depth the lifecycle of a MathfieldElement: construction, 
-interaction with the DOM and when can you communicate with it.
 
-## See Also
-* <a href="/docs/mathlive/">MathLive SDK<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></span></a>
+<div class='read-more'><a href="/mathlive/guides/lifecycle/">Advanced topic: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
+
+<div class='read-more'><a href="/docs/mathlive/">Next: Reference documentation of the MathLive API <strong>MathLive SDK</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>

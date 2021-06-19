@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Guide - Macros
+title: Macros - MathLive Guide
 permalink: /mathlive/guides/macros/
 read_time: false
 sidebar:
@@ -75,8 +75,4 @@ mf.setOptions({
 The macro definition can contain up to eight arguments, represented by `#1` to `#9`.
 
 
-
-## Next
-
-<a href="/mathlive/guides/shortcuts">Shortcuts<span><i class="fas fa-chevron-right navigation"></i><span></span></a>
-:    Manage inline shortcuts and keyboard shortcuts
+<div class='read-more'><a href="/mathlive/guides/shortcuts/">Next: Manage <strong>Key bindings and Inline Shortcuts</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
