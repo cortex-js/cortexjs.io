@@ -27,16 +27,22 @@ The **CortexJS Compute Engine** is a JavaScript library for symbolic
 computing and numerical evaluation of mathematical expressions.
 
 The Compute Engine is for anyone who wants to make technical computing apps 
-in the browser or in server-side environments such as NodeL: educators, students, scientists and engineers.
+in the browser or in server-side environments such as Node: educators, students, scientists and engineers.
 
 
 The Compute Engine can:
-- <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Late
+- <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex
 - simplify, solve and evaluate math expressions expressed in the <a href ="/guides/math-json/format/">MathJSON format</a>
 
 ## Parse and Serialize Latex
 
-**To parse and serialize an expression**, use the `parse()` and `serialize()` 
+Internally, the Compute Engine manipulates expressions represented with the MathJSON format. It's a JSON representation of an Abstract Syntax Tree
+of the expression. It is easy to manipulate programatically and can be
+written by hand. However, you might prefer to use a more concise and
+familiar syntax, such as Latex. The Compute Engine includes utilities
+to convert to and from Latex strings.
+
+**To parse a Latex string and serialize to a Latex string**, use the `parse()` and `serialize()` 
 functions.
 
 ```js
@@ -50,22 +56,25 @@ console.log(serialize(["Add", ["Power", "x", 3], 2]));
 
 ```
 
+<div class='read-more'><a href="/guides/math-json/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
 **To input math using an interactive mathfield**, use [MathLive](/mathlive/).
 
-A MathLive mathfield works like a textarea, but for math, and it can provide 
-its content as a Latex string or a MathJSON expression.
+A MathLive mathfield works like a textarea in HTML, but for math. It provide 
+its content as a Latex string or a MathJSON expression, ready to be used with the Compute Engine.
 
+<div class='read-more'><a href="/mathlive/">Read more about <strong>MathLive</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-<div class='read-more'><a href="/guides/math-json/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 ## Symbolic Computing and Numerical Evaluation
 
 **To evaluate a symbolic expression**, use the `evaluate()` function.
 
-The result of `evaluate()` is an expression. If the expression can 
-be evaluated numerically, the expression is a number. If it can't be
-evaluated numerically, the expression is a symbolic expression.
+The result of `evaluate()` is an expression:
+
+- If the expression can be evaluated numerically, the result is a number
+- If it can't be evaluated numerically, the result is a symbolic expression.
 
 ```js
 import { evaluate, parse, serialize } from 'compute-engine';
@@ -80,10 +89,10 @@ console.log(serialize(evaluate(parse('2x + 3x')));
 // ➔ 5x
 ```
 
-The Compute Engine supports arbitrary precision floating points and complex
-numbers.
+The Compute Engine supports **arbitrary precision floating points** and **complex
+numbers**.
 
-The Compute Engine can also simplify, find patterns, substitute terms, 
+The Compute Engine can also simplify, find patterns, substitute terms, apply rewrite rules,
 compare and format expressions.
 
 
@@ -92,14 +101,14 @@ compare and format expressions.
 
 <div class='read-more'><a href="/guides/compute-engine/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-<div class='read-more'><a href="/guides/compute-engine/patterns/">Read more about <strong>Patterns</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/guides/compute-engine/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 ## Customization
 
 The Compute Engine includes a robust library of mathematical functions. 
 
-The dictionaries that define these functions can be customized by creating a `ComputeEngine` instance.
+**To customize the dictionaries that define the math functions**, create and configure a `ComputeEngine` instance.
 
 The `ComputeEngine` instance also provides access to additional features
 such as defining [assumptions](/guides/compute-engine/assumptions/) about 

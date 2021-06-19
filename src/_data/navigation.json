@@ -161,8 +161,12 @@
 					"url": "/guides/compute-engine/domains/"
 				},
 				{
-					"title": "Patterns",
-					"url": "/guides/compute-engine/patterns/"
+					"title": "Execution Constraints",
+					"url": "/guides/compute-engine/execution-constraints/"
+				},
+				{
+					"title": "Patterns and Rules",
+					"url": "/guides/compute-engine/patterns-and-rules/"
 				},
 				{
 					"title": "Canonical Forms",
