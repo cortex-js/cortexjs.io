@@ -401,16 +401,15 @@ module.exports = {
   //     - https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap
   documentTemplate: (substitutions) => `---
 permalink: "/docs/${substitutions.sdkName}/"
-title: "${substitutions.sdkName}"
+title: "${
+    { 'mathlive': 'MathLive', 'compute-engine': 'Compute Engine' }[
+      substitutions.sdkName
+    ] ?? substitutions.sdkName
+  }"
 read_time: false
 layout: "sdk-documentation-layout"
 sidebar:
-    - nav: "${
-      substitutions.sdkName === 'compute-engine' ||
-      substitutions.sdkName === 'math-json'
-        ? 'mathjson'
-        : substitutions.sdkName
-    }"
+    - nav: "${substitutions.sdkName}"
 # toc: true
 ---
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">

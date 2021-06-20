@@ -36,10 +36,10 @@ echo -e "$BASENAME$DOT Groking mathlive"
 # node ./submodules/grok/bin/grok-cli  ./node_modules/mathlive/dist/ --outDir ./src/build/ --outFile mathlive.html
 node ./submodules/grok/bin/grok-cli  ../mathlive/dist/public/ --sdkName mathlive --modules mathfield-element options mathlive mathfield commands core --outDir ./src/build/ --outFile mathlive.html
 # node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/public.ts --sdkName mathjson --outDir ./src/build/ --outFile math-json.html
-echo -e "$BASENAME$DOT Groking MathJSON"
-node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName mathjson --outDir ./src/build/ --outFile math-json.html
+# echo -e "$BASENAME$DOT Groking MathJSON"
+# node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName math-json --outDir ./src/build/ --outFile math-json.html
 echo -e "$BASENAME$DOT Groking Compute Engine"
-node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/compute-engine/public.ts --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
+node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/public.ts --sdkName compute-engine --outDir ./src/build/ --ignore-errors --outFile compute-engine.html
 echo -e "$BASENAME$CHECK Groked"
 
 

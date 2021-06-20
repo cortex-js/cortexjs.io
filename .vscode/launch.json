@@ -22,16 +22,15 @@
       "outFiles": ["${workspaceFolder}/submodules/grok/bin/*.js"],
       "preLaunchTask": "npm: build:grok",
       "args": [
-        "./submodules/math-json/src/public.ts",
+        "./submodules/compute-engine/src/public.ts",
         "--sdkName",
-        "math-json",
+        "compute-engine",
         // "--modules",
         // "public",
         //                "../mathlive/dist/public/",
         // "${workspaceFolder}/test.d.ts/",
         "--outDir",
         "./build",
-        "--verbose",
         "--ignore-errors"
       ]
     },

@@ -173,6 +173,15 @@
 					"url": "/guides/compute-engine/forms/"
 				},
         { "separator": true },
+        {
+					"title": "Introduction to MathJSON",
+					"url": "/math-json/"
+				},
+				{
+					"title": "MathJSON Format",
+					"url": "/guides/math-json/format/"
+				},
+        { "separator": true },
 				{
 					"title": "SDK Reference",
 					"url": "/docs/compute-engine/"
@@ -180,7 +189,7 @@
       ]
 		},
     {
-			"title": "Dictionary",
+			"title": "Dictionaries",
 			"children": [
         {
           "title": "Introduction",
@@ -219,26 +228,9 @@
           "title": "Trigonometry",
           "url": "/guides/compute-engine/trigonometry/"
         }
+
       ]
     },
-		{
-			"title": "MathJSON",
-			"children": [
-				{
-					"title": "Introduction",
-					"url": "/math-json/"
-				},
-				{
-					"title": "MathJSON Format",
-					"url": "/guides/math-json/format/"
-				},
-        { "separator": true },
-				{
-					"title": "SDK Reference",
-					"url": "/docs/mathjson/"
-				}
-			]
-		},
 
     {
 			"title": "MathLive",
