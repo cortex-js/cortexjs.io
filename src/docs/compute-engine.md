@@ -1,5 +1,5 @@
 ---
-title: CortexJS Compute Engine
+title: Introduction - CortexJS Compute Engine
 permalink: /compute-engine/
 layout: single
 date: Last Modified
@@ -32,7 +32,9 @@ in the browser or in server-side environments such as Node: educators, students,
 
 The Compute Engine can:
 - <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex
-- simplify, solve and evaluate math expressions expressed in the <a href ="/guides/math-json/format/">MathJSON format</a>
+- simplify and evaluate math expressions expressed in the <a href ="/math-json/">MathJSON format</a>
+
+<div class='read-more'><a href="/compute-engine/demo/">Try it now with an <strong>interactive demo</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 ## Parse and Serialize Latex
 
@@ -46,7 +48,7 @@ to convert to and from Latex strings.
 functions.
 
 ```js
-import { parse, serialize } from 'compute-engine';
+import { parse, serialize } from '@cortex-js/compute-engine';
 
 console.log(parse('5x + 1'));
 // ->  ["Add", ["Multiply", 5, "x"], 1]
@@ -77,7 +79,7 @@ The result of `evaluate()` is an expression:
 - If it can't be evaluated numerically, the result is a symbolic expression.
 
 ```js
-import { evaluate, parse, serialize } from 'compute-engine';
+import { evaluate, parse, serialize } from '@cortex-js/compute-engine';
 
 console.log(evaluate(["Add", 2, 3]);
 // ➔ 5
@@ -102,6 +104,7 @@ compare and format expressions.
 <div class='read-more'><a href="/guides/compute-engine/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 <div class='read-more'><a href="/guides/compute-engine/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
 
 
 ## Customization

@@ -139,6 +139,10 @@
 					"title": "Introduction",
 					"url": "/compute-engine/"
 				},
+				{
+					"title": "Demo",
+					"url": "/compute-engine/demo/"
+				},
         { "separator": true },
 				{
 					"title": "Latex Syntax",
@@ -174,12 +178,8 @@
 				},
         { "separator": true },
         {
-					"title": "Introduction to MathJSON",
+					"title": "The MathJSON Format",
 					"url": "/math-json/"
-				},
-				{
-					"title": "MathJSON Format",
-					"url": "/guides/math-json/format/"
 				},
         { "separator": true },
 				{
