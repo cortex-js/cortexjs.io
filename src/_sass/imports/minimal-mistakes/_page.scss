@@ -40,7 +40,11 @@ body {
 
 .page {
     max-width: 760px;
-    margin: auto;
+    width: 100%;
+    margin: 0;
+    margin-left: auto;
+    margin-right: auto;
+    
     // @include breakpoint($large) {
     //   float: right;
     //   width: calc(100% - #{$right-sidebar-width-narrow});
