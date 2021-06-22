@@ -268,8 +268,16 @@
 			"title": "Cortex",
 			"children": [
 				{
-					"title": "Reference",
+					"title": "Introduction",
 					"url": "/cortex/"
+				},
+				{
+					"title": "Syntax",
+					"url": "/cortex/syntax/"
+				},
+				{
+					"title": "Implementation",
+					"url": "/cortex/implementation/"
 				}
 			]
 		},
