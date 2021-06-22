@@ -4,6 +4,8 @@ permalink: /docs/code-of-conduct/
 read_time: true
 layout: single
 date: Last Modified
+sidebar:
+  - nav: 'contributing'
 ---
 
 # Contributor Covenant Code of Conduct

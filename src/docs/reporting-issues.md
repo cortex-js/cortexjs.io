@@ -5,7 +5,7 @@ read_time: true
 layout: single
 date: Last Modified
 sidebar:
-    nav: 'docs'
+  - nav: 'contributing'
 ---
 # Reporting Issues
 
@@ -17,12 +17,11 @@ and if you don't see anything that matches, write up a new issue.
 
 If you do see something similar to your idea, comment on it or add a 👍.
 
-## Contributing Issues
+## How to report an issue?
 
-If you're running into some problems using MathLive or something doesn't
-behave the way you think it should, please file an issue in GitHub.
+If you're running into some problems or something doesn't behave the way you think it should, please file an issue in GitHub.
 
-Before filing something, at the existing issues. Avoid filing duplicates, but you can
+Before filing something, have a look at the existing issues. Avoid filing duplicates, but you can
 add a comment to an existing issue if you'd like.
 
 ### What happens after I file an issue?

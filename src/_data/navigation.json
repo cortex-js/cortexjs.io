@@ -117,6 +117,10 @@
 					"url": "/docs/reporting-issues/"
 				},
 				{
+					"title": "Contributing Code",
+					"url": "/docs/contributing-code/"
+				},
+				{
 					"title": "Funding",
 					"url": "/funding/"
 				},
@@ -249,6 +253,10 @@
 					"url": "/docs/reporting-issues/"
 				},
 				{
+					"title": "Contributing Code",
+					"url": "/docs/contributing-code/"
+				},
+				{
 					"title": "Funding",
 					"url": "/funding/"
 				},
@@ -290,5 +298,44 @@
 			"url": "/compute-engine/"
 		}
 
+	],
+	"contributing": [
+    {
+			"title": "Contributing",
+			"children": [
+				{
+					"title": "Reporting Issues",
+					"url": "/docs/reporting-issues/"
+				},
+				{
+					"title": "Contributing Code",
+					"url": "/docs/contributing-code/"
+				},
+        {
+          "title": "Funding",
+          "url": "/funding/"
+        },
+        {
+          "title": "Code of Conduct",
+          "url": "/docs/code-of-conduct/"
+        },
+        {
+          "title": "License",
+          "url": "/docs/license/"
+        }
+      ]
+    },
+		{
+			"title": "MathLive",
+			"url": "/mathlive/"
+		},
+		{
+			"title": "Compute Engine",
+			"url": "/compute-engine/"
+		},
+		{
+			"title": "Cortex",
+			"url": "/cortex/"
+		}
 	]
 }

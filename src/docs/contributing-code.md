@@ -4,20 +4,26 @@ permalink: /docs/contributing-code/
 read_time: true
 layout: single
 date: Last Modified
+sidebar:
+  - nav: 'contributing'
 ---
-
+# Contributing Code
 ## Can I help fix a bug?
 
-Sure! Have a look at the issue report: if the issue is assigned to someone,
-they're on it! Otherwise, add a comment in the issue indicating you'd like to
+Sure! 
+
+Have a look at the issue report: if the issue is assigned to someone,
+they're on it! Maybe you can find something else to work on, or you can contact the person its assigned to to see if they need a hand.
+
+Otherwise, add a comment in the issue indicating you'd like to
 work on resolving the issue and go for it!
 
-## Contributing Code
+## How to submit some code?
 
 Whether you have a fix for an issue, some improved test cases, or a brand
 new feature, we welcome your contributions in the form of pull requests.
 
-**NOTE:** Your contributions are governed by the [GitHub TOS section 6](https://help.github.com/en/github/site-policy/github-terms-of-service#6-contributions-under-repository-license) which indicate that your contributions are made under the same license as the project. Furthermore, by making a contribution to the project, you certify that you have the right to submit to the project as detailed in the [Developer Certificate of Origin](https://developercertificate.org/).
+Your contributions are governed by the [GitHub TOS section 6](https://help.github.com/en/github/site-policy/github-terms-of-service#6-contributions-under-repository-license) which indicate that your contributions are made under the same license as the project.<br><br>Furthermore, by making a contribution to the project, you certify that you have the right to submit to the project as detailed in the [Developer Certificate of Origin](https://developercertificate.org/).{.notice--info}
 
 Follow this process if you'd like your work considered for inclusion in the project:
 
@@ -76,5 +82,6 @@ some feedback to make sure that your pull request fits in with:
 -   the architecture of the project
 -   the coding [Style Guide](/docs/style-guide/) of the project
 
-Once your pull request has been accepted, it will be merged
-into the master branch.
+Once your pull request has been accepted, it will be merged into the master branch.
+
+Thank you for your contribution!
