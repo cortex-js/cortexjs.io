@@ -39,7 +39,7 @@ node ./submodules/grok/bin/grok-cli  ../mathlive/dist/public/ --sdkName mathlive
 # echo -e "$BASENAME$DOT Groking MathJSON"
 # node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName math-json --outDir ./src/build/ --outFile math-json.html
 echo -e "$BASENAME$DOT Groking Compute Engine"
-node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/public.ts --sdkName compute-engine --outDir ./src/build/ --ignore-errors --outFile compute-engine.html
+node ./submodules/grok/bin/grok-cli  ./submodules/compute-engine/src/compute-engine.ts --sdkName compute-engine --outDir ./src/build/ --ignore-errors --outFile compute-engine.html
 echo -e "$BASENAME$CHECK Groked"
 
 

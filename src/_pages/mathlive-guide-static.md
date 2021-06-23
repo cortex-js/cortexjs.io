@@ -30,7 +30,7 @@ call [`renderMathInDocument()`](/docs/mathlive/?q=renderMathInDocument) at the e
 handler .
 
 ```html
-<script type="module">
+<script defer type="module">
   import { renderMathInDocument } from 'mathlive';
   renderMathInDocument();
 </script>

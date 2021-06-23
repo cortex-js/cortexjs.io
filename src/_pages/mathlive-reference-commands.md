@@ -7,7 +7,7 @@ read_time: false
 sidebar:
     - nav: "mathlive"
 ---
-<script type='module'>
+<script defer type='module'>
     import {renderMathInDocument, version} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
     renderMathInDocument({ 
       renderAccessibleContent: false,

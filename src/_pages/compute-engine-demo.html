@@ -264,10 +264,10 @@ head:
 
   <main id="main" class="container">
     <div class='row'>
-      <div id='input-label'>f = </div>
+      <div id='input-label'><code>f = </code></div>
       <math-field id="mf" class="mathfield" tabindex="0" virtual-keyboard-mode="manual">
         <!-- 2+3.001 -->
-        x e^{i\pi}
+        e^{i\pi}
         <!-- 1 + 2 + 3.001 -->
         <!-- \frac{5+3i}{2} -->
         <!-- \frac{6}{2}+\frac{3i}{2} -->
@@ -422,12 +422,20 @@ head:
 
   </main>
 
+
+  <footer class="page__meta">
+    <strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version: </strong> <span id='compute-engine-version'></span>
+  </footer>
+
+
   <script type="module">
     import { convertLatexToMarkup } from 
       'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
     import {
-      LatexSyntax, parse, serialize, ComputeEngine, match 
+      LatexSyntax, parse, serialize, ComputeEngine, match, version
     } from 'https://unpkg.com/@cortex-js/compute-engine/dist/compute-engine.esm.js';
+
+    document.getElementById('compute-engine-version').innerText = version;
 
     const MAX_LINE_LENGTH = 64;
 

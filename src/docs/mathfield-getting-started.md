@@ -90,7 +90,7 @@ also dynamically download the required fonts from the CDN as well.
 <html>
 <body>
     <p>$$\frac{\pi}{2}</p>
-    <script type="module">
+    <script defer type="module">
         import { renderMathInDocument } from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
         renderMathInDocument();
     </script>

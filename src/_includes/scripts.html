@@ -5,10 +5,10 @@
     {% else %}
       {% capture script_path %}{{ script | relative_url }}{% endcapture %}
     {% endif %}
-    <script src="{{ script_path }}"></script>
+    <script defer src="{{ script_path }}"></script>
   {% endfor %}
 {% else %}
-  <!-- <script src="{{ '/assets/js/main.min.js' | relative_url }}"></script> -->
+  <!-- <script defer src="{{ '/assets/js/main.min.js' | relative_url }}"></script> -->
 {% endif %}
 
 {% if site.search == true or page.layout == "search" %}
@@ -32,6 +32,6 @@
     {% else %}
       {% capture script_path %}{{ script | relative_url }}{% endcapture %}
     {% endif %}
-    <script src="{{ script_path }}"></script>
+    <script defer src="{{ script_path }}"></script>
   {% endfor %}
 {% endif %}
