@@ -252,12 +252,16 @@ used in conjunction with `default-mode="inline-math"`.
 **To control which letters are automatically italicized**, use the `letterShapeStyle` configuration option.
 
 
+<div class='symbols-table'>
+
 | `letterShapeStyle` | xyz    | ABC    | αβɣ    | ΓΔΘ   |
-| -----------------: | ---    | ---    | ---    | ---   |
+| :----------------- | ---    | ---    | ---    | ---   |
 |              `iso` | _xyz_  | _ABC_  | _αβɣ_  | _ΓΔΘ_ |
 |              `tex` | _xyz_  | _ABC_  | _αβɣ_  | ΓΔΘ   |
 |           `french` | _xyz_  | ABC    | αβɣ    | ΓΔΘ   |
 |          `upright` | xyz    | ABC    | αβɣ    | ΓΔΘ   |
+
+</div>
 
 In the [ISO](https://www.nist.gov/pml/special-publication-811) style, lower and
 uppercase roman letter and lower and upper case greek letters are italicized 
@@ -318,7 +322,7 @@ See [EditingOptions](http://cortexjs.io/docs/mathlive/?q=EditingOptions) for mor
 details about these and other available options.
 
 
-## Handling the Space bar
+## Handling the Space Bar
 
 In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,

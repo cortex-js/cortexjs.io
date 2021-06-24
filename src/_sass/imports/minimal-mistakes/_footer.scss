@@ -58,13 +58,14 @@
   width: 50%;
   display: flex;
   ul {
+    display: flex;
     margin: 0;
     padding: 0;
     list-style-type: none;
   }
 
   li {
-    display: inline-block;
+    display: flex;
     padding-top: 5px;
     padding-bottom: 5px;
     font-family: $sans-serif-narrow;
@@ -74,16 +75,19 @@
 
   li + li:before {
     content: "";
-    padding-right: 5px;
+    padding-right: 1em;
   }
 
   a {
-    padding-right: 10px;
+    padding-right: 1.5em;
     font-weight: bold;
   }
 
   .social-icons {
     a {
+      svg {
+        margin-right: .5em;
+      }
       white-space: nowrap;
     }
   }

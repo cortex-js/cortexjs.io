@@ -60,17 +60,22 @@
         font-family: $sans-serif;
         font-size: $type-size-5;
         line-height: 1;
-        padding: 8px 4px 8px 8px;
+        // padding: 8px 4px 8px 8px;
+        padding-right: 8px;
         border-radius: 4px;
 
         a {
             display: block;
             border-radius: 4px;
+            padding: 8px 4px 8px 8px;
+            &:hover {
+              background: rgba(0, 0, 0, 0.05);
+            }
             &.active {
               color: white !important;
               background: $primary;
             }
-        }
+          }
     }
 
     img {
@@ -82,14 +87,16 @@
         }
     }
 }
+
+
 #main .sidebar a:not(.section-link):hover {
   text-decoration: none;
 
 }
 
-.sidebar ul:not(.nav__items) li:hover {
-    background: rgba(0, 0, 0, 0.05);
-}
+// .sidebar ul:not(.nav__items) li:hover {
+//     background: rgba(0, 0, 0, 0.05);
+// }
 
 .sidebar ul:not(.nav__items) li.separator:hover {
   background: none;

@@ -147,9 +147,10 @@ sidebar:
 
 # Supported TeX/LaTeX Commands
 
+MathLive supports over 800 LaTeX commands.
 
-To find the name of a LaTeX command matching a shape you can draw, use 
-[Detexify](http://detexify.kirelabs.org/classify.html).
+<div class='read-more'><a href="http://detexify.kirelabs.org/classify.html">If you can draw a shape but don't know the name of the corresponding LaTeX, use <strong>Detexify</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
 
 ## Text Mode, Math Mode and Math Style
 

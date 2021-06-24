@@ -8,7 +8,7 @@ sidebar:
   - nav: 'contributing'
 ---
 # Contributing Code
-## Can I help fix a bug?
+## Can I Help Fix a Bug?
 
 Sure! 
 
@@ -18,7 +18,7 @@ they're on it! Maybe you can find something else to work on, or you can contact 
 Otherwise, add a comment in the issue indicating you'd like to
 work on resolving the issue and go for it!
 
-## How to submit some code?
+## How to Submit Some Code?
 
 Whether you have a fix for an issue, some improved test cases, or a brand
 new feature, we welcome your contributions in the form of pull requests.
@@ -75,13 +75,13 @@ Follow this process if you'd like your work considered for inclusion in the proj
 7. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/)
    with a clear title and description.
 
-Once submitted, your pull request will be reviewed and you will receive
-some feedback to make sure that your pull request fits in with:
+Once submitted, your Pull Request is reviewed and you will receive
+some feedback to make sure that it fits in with:
 
 -   the roadmap for the project
 -   the architecture of the project
--   the coding [Style Guide](/docs/style-guide/) of the project
+-   the coding [Style Guide](https://google.github.io/styleguide/jsguide.html) used by the project
 
-Once your pull request has been accepted, it will be merged into the master branch.
+After it has has been accepted, you Pull Request will be merged into the main branch.
 
 Thank you for your contribution!

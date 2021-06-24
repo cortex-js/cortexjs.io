@@ -440,7 +440,8 @@
 
     .active {
       padding: 4px 4px 4px 8px;
-      margin-left: -8px;
+      margin-left: 0;
+      margin-right: 0;
     }
 
     @include breakpoint(max-width $large - 1px) {
