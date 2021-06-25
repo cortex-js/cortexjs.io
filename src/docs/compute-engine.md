@@ -34,7 +34,7 @@ The Compute Engine can:
 - <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex
 - simplify and evaluate math expressions expressed in the <a href ="/math-json/">MathJSON format</a>
 
-<div class='read-more'><a href="/compute-engine/demo/">Try it now with an <strong>interactive demo</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/demo/">Try the <strong>interactive demo</strong> now<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 ## Parse and Serialize Latex
 

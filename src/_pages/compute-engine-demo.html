@@ -131,9 +131,11 @@ head:
 
   .latex {
     padding: 10px;
+    padding-top: 1px;
+    padding-bottom: 1px;
     border-radius: 5px;
-    border: 1px solid #ddd;
-    background: #fdfdfd;
+    border: 1px solid #f0f0f0;
+    background: #f8f8f8;
     width: 100%;
     overflow-x: auto;
     overflow-x: overlay;
@@ -249,6 +251,20 @@ head:
     width: 270px;
   }
 
+  h1 {
+    line-height: .8
+  }
+
+  h1 span {
+    display: block;
+    line-height: 1;
+    margin-left: 3px;   /* Optical alignment */
+    padding:0;
+    margin: 0;
+    font-size: 16px;
+    color: #aaa;
+  }
+
 </style>
 
   <svg xmlns="http://www.w3.org/2000/svg" style='display:none'>
@@ -258,7 +274,7 @@ head:
     </defs>
   </svg>
 
-  <h1>CortexJS Compute Engine Demo</h1>
+  <h1><span>CortexJS Compute Engine</span>Demo</h1>
 
   <main id="main" class="container">
 
@@ -366,7 +382,7 @@ head:
     <div class="output-section" id="canonical-form">
       <div class='row'>
         <code class="label">canonical(f)&nbsp;=&nbsp;</code>
-        <div class="latex"></div>
+        <math-field class="latex" read-only></math-field>
         <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
       </div>
       <div class="output mathjson toggle-field"></div>
@@ -375,7 +391,7 @@ head:
     <div class="output-section" id="domain">
       <div class='row'>
         <code class="label">domain(f)&nbsp;=&nbsp;</code>
-        <div class="latex"></div>
+        <math-field class="latex" read-only></math-field>
         <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
       </div>
       <div class="output mathjson toggle-field"></div>
@@ -385,7 +401,7 @@ head:
     <div class="output-section" id="simplify">
       <div class='row'>
         <code class="label">simplify(f)&nbsp;=&nbsp;</code>
-        <div class="latex"></div>
+        <math-field class="latex" read-only></math-field>
         <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
       </div>
       <div class="output mathjson toggle-field"></div>
@@ -395,7 +411,7 @@ head:
     <div class="output-section" id="evaluate-numerically">
       <div class='row'>
         <code class="label">N(f)&nbsp;=&nbsp;</code>
-        <div class="latex"></div>
+        <math-field class="latex" read-only></math-field>
         <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
       </div>
       <div class='row'>
@@ -416,7 +432,7 @@ head:
     <div class="output-section" id="evaluate">
       <div class='row'>
         <code class="label">evaluate(f)&nbsp;=&nbsp;</code>
-        <div class="latex"></div>
+        <math-field class="latex" read-only></math-field>
         <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
       </div>
       <div class="output mathjson toggle-field"></div>
@@ -615,8 +631,7 @@ head:
       }
       const latexEl = el.querySelector('.latex');
       if (latexEl) {
-        latexEl.innerHTML =
-          convertLatexToMarkup(defaultLatex.serialize(expr));
+        latexEl.value =defaultLatex.serialize(expr);
       }
 
       errors = [];

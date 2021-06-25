@@ -59,8 +59,8 @@ a.chevron::after {
 }
 
 .svg-chevron {
-  width: 14px;
-  height: 14px;
+  width: 1em;
+  height: 1em;
   color: currentColor;
 }
 
@@ -68,6 +68,7 @@ a.chevron::after {
   padding: 0;
   margin: 0;
   vertical-align: -3px;
+  margin-left: 6px;
 }
 
 .page__content .read-more {
