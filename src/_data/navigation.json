@@ -12,11 +12,6 @@
 			"title": "Cortex",
 			"url": "/cortex/"
 		},
-    { "separator": true },
-		{
-			"title": "Docs",
-			"url": "/docs/"
-		},
 		{
 			"description": "Chat on Gitter",
 			"title": "<svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>",
@@ -33,70 +28,86 @@
 			"title": "MathLive",
 			"children": [
 				{
-					"title": "Getting Started",
-					"url": "/guides/mathfield-getting-started/"
+					"title": "Introduction",
+					"url": "/mathlive/",
+          "icon": "intro"
 				},
         {
-					"title": "Supported Commands",
-					"url": "/mathlive/reference/commands/"
-        },
-        {
-					"title": "Keyboard Shortcuts",
-					"url": "/mathlive/reference/keybindings/"
-        },
-        {
-					"title": "Example",
-					"url": "/mathlive/playground/"
+					"title": "Demo",
+					"url": "/mathlive/demo/",
+          "icon": "demo"
         },
         { "separator": true },
 				{
-					"title": "SDK Reference",
-					"url": "/docs/mathlive/"
-				}
-			]
-		},
-		{
-			"title": "MathLive Guides",
-			"children": [
+					"title": "Getting Started",
+					"url": "/mathlive/guides/getting-started/",
+          "icon": "checklist"
+				},
 				{
-					"title": "Introduction",
-					"url": "/mathlive/guides/introduction"
+					"title": "Add MathLive to your Project",
+					"url": "/mathlive/guides/integration/",
+          "icon": "guide"
 				},
 				{
 					"title": "Interacting",
-					"url": "/mathlive/guides/interacting"
+					"url": "/mathlive/guides/interacting/",
+          "icon": "guide"
 				},
 				{
 					"title": "Customize",
-					"url": "/mathlive/guides/customizing"
+					"url": "/mathlive/guides/customizing/",
+          "icon": "guide"
 				},
 				{
 					"title": "Commands",
-					"url": "/mathlive/guides/commands"
+					"url": "/mathlive/guides/commands/",
+          "icon": "guide"
 				},
 				{
 					"title": "Macros",
-					"url": "/mathlive/guides/macros"
+					"url": "/mathlive/guides/macros/",
+          "icon": "guide"
 				},
 				{
 					"title": "Shortcuts",
-					"url": "/mathlive/guides/shortcuts"
+					"url": "/mathlive/guides/shortcuts/",
+          "icon": "guide"
 				},
 				{
 					"title": "Speech",
-					"url": "/mathlive/guides/speech"
+					"url": "/mathlive/guides/speech/",
+          "icon": "guide"
 				},
 				{
 					"title": "Static",
-					"url": "/mathlive/guides/static"
+					"url": "/mathlive/guides/static/",
+          "icon": "guide"
 				},
 				{
 					"title": "Virtual Keyboards",
-					"url": "/mathlive/guides/virtual-keyboards"
+					"url": "/mathlive/guides/virtual-keyboards/",
+          "icon": "guide"
 				},
 				{
 					"title": "Lifecycle",
-					"url": "/mathlive/guides/lifecycle"
+					"url": "/mathlive/guides/lifecycle/",
+          "icon": "guide"
+				},
+        { "separator": true },
+        {
+					"title": "Supported Commands",
+					"url": "/mathlive/reference/commands/",
+          "icon": "reference"
+        },
+        {
+					"title": "Keyboard Shortcuts",
+					"url": "/mathlive/reference/keybindings/",
+          "icon": "reference"
+        },
+				{
+					"title": "SDK Reference",
+					"url": "/docs/mathlive/",
+          "icon": "sdk"
 				}
 			]
 		},
@@ -114,23 +125,28 @@
 			"children": [
 				{
 					"title": "Reporting Issues",
-					"url": "/docs/reporting-issues/"
+					"url": "/docs/reporting-issues/",
+          "icon": "checklist"
 				},
 				{
 					"title": "Contributing Code",
-					"url": "/docs/contributing-code/"
+					"url": "/docs/contributing-code/",
+          "icon": "checklist"
 				},
 				{
 					"title": "Funding",
-					"url": "/funding/"
+					"url": "/funding/",
+          "icon": "guide"
 				},
 				{
 					"title": "Code of Conduct",
-					"url": "/docs/code-of-conduct/"
+					"url": "/docs/code-of-conduct/",
+          "icon": "guide"
 				},
 				{
 					"title": "License",
-					"url": "/docs/license/"
+					"url": "/docs/license/",
+          "icon": "guide"
 				}
 			]
 		}
@@ -141,96 +157,111 @@
 			"children": [
 				{
 					"title": "Introduction",
-					"url": "/compute-engine/"
+					"url": "/compute-engine/",
+          "icon": "intro"
 				},
 				{
 					"title": "Demo",
-					"url": "/compute-engine/demo/"
+					"url": "/compute-engine/demo/",
+          "icon": "demo"
 				},
         { "separator": true },
 				{
 					"title": "Latex Syntax",
-					"url": "/guides/math-json/latex-syntax/"
+					"url": "/guides/math-json/latex-syntax/",
+          "icon": "guide"
 				},
 				{
 					"title": "Symbolic Computing",
-					"url": "/guides/compute-engine/symbolic-computing/"
+					"url": "/guides/compute-engine/symbolic-computing/",
+          "icon": "guide"
 				},
 				{
 					"title": "Numerical Evaluation",
-					"url": "/guides/compute-engine/numerical-evaluation/"
+					"url": "/guides/compute-engine/numerical-evaluation/",
+          "icon": "guide"
 				},        
 				{
 					"title": "Assumptions",
-					"url": "/guides/compute-engine/assumptions/"
+					"url": "/guides/compute-engine/assumptions/",
+          "icon": "guide"
 				},
 				{
 					"title": "Domains",
-					"url": "/guides/compute-engine/domains/"
+					"url": "/guides/compute-engine/domains/",
+          "icon": "guide"
 				},
 				{
 					"title": "Execution Constraints",
-					"url": "/guides/compute-engine/execution-constraints/"
+					"url": "/guides/compute-engine/execution-constraints/",
+          "icon": "guide"
 				},
 				{
 					"title": "Patterns and Rules",
-					"url": "/guides/compute-engine/patterns-and-rules/"
+					"url": "/guides/compute-engine/patterns-and-rules/",
+          "icon": "guide"
 				},
 				{
 					"title": "Canonical Forms",
-					"url": "/guides/compute-engine/forms/"
-				},
-        { "separator": true },
-        {
-					"title": "The MathJSON Format",
-					"url": "/math-json/"
+					"url": "/guides/compute-engine/forms/",
+          "icon": "guide"
 				},
         { "separator": true },
 				{
 					"title": "SDK Reference",
-					"url": "/docs/compute-engine/"
-				}
-      ]
-		},
-    {
-			"title": "Dictionaries",
-			"children": [
+					"url": "/docs/compute-engine/",
+          "icon": "sdk"
+				},
         {
-          "title": "Introduction",
-          "url": "/guides/compute-engine/dictionaries/"
-        },
+					"title": "The MathJSON Format",
+					"url": "/math-json/",
+          "icon": "reference"
+				},
         { "separator": true },
         {
+          "title": "Dictionaries",
+          "url": "/guides/compute-engine/dictionaries/",
+          "icon": "intro"
+        },
+        {
           "title": "Arithmetic",
-          "url": "/guides/compute-engine/arithmetic/"
+          "url": "/guides/compute-engine/arithmetic/",
+          "icon": "reference"
         },
         {
           "title": "Calculus",
-          "url": "/guides/compute-engine/calculus/"
+          "url": "/guides/compute-engine/calculus/",
+          "icon": "reference"
         },
         {
           "title": "Collections",
-          "url": "/guides/compute-engine/collections/"
+          "url": "/guides/compute-engine/collections/",
+          "icon": "reference"
         },
         {
           "title": "Core",
-          "url": "/guides/compute-engine/core/"
+          "url": "/guides/compute-engine/core/",
+          "icon": "reference"
         },
         {
           "title": "Logic",
-          "url": "/guides/compute-engine/logic/"
+          "url": "/guides/compute-engine/logic/",
+          "icon": "reference"
         },
         {
           "title": "Sets",
-          "url": "/guides/compute-engine/sets/"
+          "url": "/guides/compute-engine/sets/",
+          "icon": "reference"
         },
         {
           "title": "Special Functions",
-          "url": "/guides/compute-engine/special-functions/"
+          "url": "/guides/compute-engine/special-functions/",
+          "icon": "reference"
         },
         {
           "title": "Trigonometry",
-          "url": "/guides/compute-engine/trigonometry/"
+          "url": "/guides/compute-engine/trigonometry/",
+          "icon": "reference"
         }
 
       ]
@@ -250,26 +281,32 @@
 			"children": [
 				{
 					"title": "Reporting Issues",
-					"url": "/docs/reporting-issues/"
+					"url": "/docs/reporting-issues/",
+          "icon": "checklist"
 				},
 				{
 					"title": "Contributing Code",
-					"url": "/docs/contributing-code/"
+					"url": "/docs/contributing-code/",
+          "icon": "checklist"
 				},
 				{
 					"title": "Funding",
-					"url": "/funding/"
+					"url": "/funding/",
+          "icon": "guide"
 				},
 				{
 					"title": "Code of Conduct",
-					"url": "/docs/code-of-conduct/"
+					"url": "/docs/code-of-conduct/",
+          "icon": "guide"
 				},
 				{
 					"title": "License",
-					"url": "/docs/license/"
+					"url": "/docs/license/",
+          "icon": "guide"
 				}
 			]
 		}
+
 	],
 	"cortex": [
 		{
@@ -300,31 +337,36 @@
 
 	],
 	"contributing": [
-    {
+		{
 			"title": "Contributing",
 			"children": [
 				{
 					"title": "Reporting Issues",
-					"url": "/docs/reporting-issues/"
+					"url": "/docs/reporting-issues/",
+          "icon": "checklist"
 				},
 				{
 					"title": "Contributing Code",
-					"url": "/docs/contributing-code/"
+					"url": "/docs/contributing-code/",
+          "icon": "checklist"
 				},
-        {
-          "title": "Funding",
-          "url": "/funding/"
-        },
-        {
-          "title": "Code of Conduct",
-          "url": "/docs/code-of-conduct/"
-        },
-        {
-          "title": "License",
-          "url": "/docs/license/"
-        }
-      ]
-    },
+				{
+					"title": "Funding",
+					"url": "/funding/",
+          "icon": "guide"
+				},
+				{
+					"title": "Code of Conduct",
+					"url": "/docs/code-of-conduct/",
+          "icon": "guide"
+				},
+				{
+					"title": "License",
+					"url": "/docs/license/",
+          "icon": "guide"
+				}
+			]
+		},
 		{
 			"title": "MathLive",
 			"url": "/mathlive/"

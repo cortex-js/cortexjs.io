@@ -78,8 +78,8 @@ you can specify where the fonts can be located using the [`fontsDirectory`](http
 Note that changing the fonts directory for one mathfield will change the fonts 
 used by all the other mathfield elements in the page. {.notice--warning}
 
-Learn more about configuring the MathLive library to your environment, 
-including using custom asset pipelines and bundlers in the [Getting Started Guide](/guides/mathfield-getting-started/). {.notice--info}
+<div class='read-more'><a href="/mathlive/guides/integration/">Learn more about configuring the MathLive library to your environment, including using custom asset pipelines and bundlers, in the <strong>integration guide</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
 
 
 ## CSS Variables

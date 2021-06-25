@@ -2315,11 +2315,11 @@ TeX packages or macros.
 
 <footer class="page__meta">
 
-<strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version: </strong> <span id='mathlive-version'></span>
+<strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version </strong> <span id='mathlive-version'></span>
 
 </footer>
 <footer class="page__meta">
 
-<strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version: </strong> <span id='mathjson-version'></span>
+<strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version </strong> <span id='mathjson-version'></span>
 
 </footer>

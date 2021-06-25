@@ -1,5 +1,5 @@
 ---
-layout: wide
+layout: single
 title: MathLive
 permalink: /mathlive/
 read_time: false
@@ -15,20 +15,28 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
 ---
-<section class="hero-section" style="padding:0">
-    <img src='/assets/mathlive-1.png' style='width: 100vw;height: 640px;object-fit: cover'>
-</section>
+<style>
+.fullwidth {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
 
-<section class='m-lg mb-xl w-full-lg max-w-2xl'>
-  <h1 style="font-size: 4rem; line-height: 3.5rem; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"><span style='display: block;
-    font-size: 32px;
-    margin: 0;
-    padding: 0;
-    opacity: 0.4;
-    line-height: 1;
-    letter-spacing: -0.2px;
-'>MathLive</span>A Web Component for Math Input</h1>
-</section>
+.fullwidth .copy {
+}
+
+.fullwidth .copy h2 {
+  margin: 0;
+}
+.fullwidth .figure {
+  margin-left: 24px;
+}
+</style>
+
+<img alt="MathLive" src='/assets/mathlive-1.png' style='margin-bottom:2em; border-radius:8px; border:1px solid #203346'>
+
+
+<h1>A Web Component for Math Input</h1>
 
 
 <section class='m-lg mb-xl w-full-lg max-w-2xl'>
@@ -54,33 +62,36 @@ head:
 <!-- <h2><img src='/assets/images/mathfield/screenshot.jpg'></h2> -->
 
 <section>
+  <h2>TeX Quality Typesetting</h2>
   <section class="fullwidth">
     <div class='copy'>
-      <h2>TeX Quality Typesetting</h2>
       <p>TeX is the gold standard for typesetting of mathematical content.</p>
       <p>MathLive provides a Javascript implementation that faithfully 
         reproduces the output of TeX.</p>
-      <p>MathLive supports over <a href="/mathlive/reference/commands/">800 TeX commands</a>.</p>
+      <p>MathLive supports over 800 TeX commands.</p>
     </div>
     <div class="figure">
       <img src='/assets/images/mathfield/loop-eqn.png'>
     </div>
   </section>
+  <div class='read-more'><a href="/mathlive/reference/commands/">Read more about the <strong>LaTeX commands</strong> supported by MathLive<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-  <section class="fullwidth bg-alternate">
+  <h2>For Anyone. Anywhere.</h2>
+  <section class="fullwidth">
+    <div class='copy'>
+        <p>MathLive works with screenreaders and include a custom text to speech engine.</p>
+      <p>On screen, customizable, <a href="/mathlive/guides/virtual-keyboards/">virtual keyboards</a> are also available to make input easy, even on mobile devices.</p>
+    </div>
     <div class='figure'>
       <i class="fa-10x fad fa-universal-access"></i>
     </div>
-    <div class='copy'>
-      <h2>Anywhere. For Anyone.</h2>
-      <p>MathLive works with screenreaders and include a <a href="/mathlive/guides/speech/">custom text to speech engine</a>.</p>
-      <p>On screen, customizable, <a href="/mathlive/guides/virtual-keyboards/">virtual keyboards</a> are also available to make input easy, even on mobile devices.</p>
-    </div>
   </section>
 
+  <div class='read-more'><a href="/mathlive/guides/speech/">Read more about the <strong>text to speech engine</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
+  <h2>Customizable</h2>
   <section class="fullwidth">
     <div class='copy'>
-      <h2>Customizable</h2>
       <p>You can paste in MathASCII or Latex, and get back those formats or an 
         easy to parse <a href="/math-json">MathJSON object</a> representing an Abstract Syntax Tree of 
         the formula.</p>
@@ -92,12 +103,11 @@ head:
     </div>
   </section>
 
-</section>
+  <div class='read-more'><a href="/mathlive/guides/customizing/">Read more about  <strong>customizing a mathfield</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-<section class='cards col2'>
-  <section class="card">
+  <h2>Intuitive Editing</h2>
+  <section class="fullwidth">
     <div class='copy'>
-      <h2>Intuitive Editing</h2>
       <p>Type an equation: use the <a href="/mathlive/reference/keybindings/">keyboard</a> to type symbols, arrow keys to navigate.
       <p>
       <p>When done, select the equation, and copy the LaTeX code to another app.</p>
@@ -107,9 +117,11 @@ head:
     </div>
   </section>
 
-  <section class="card">
+  <div class='read-more'><a href="/mathlive/guides/virtual-keyboards/">Read more about the <strong>virtual keyboard</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
+  <h2>Easy as π</h2>
+  <section class="fullwidth">
     <div class='copy'>
-      <h2>Inline Shortcuts</h2>
       <p>Some symbols get converted automatically. Type <kbd>p</kbd><kbd>i</kbd> and it becomes π.</p>
     </div>
     <div class="figure">
@@ -117,81 +129,9 @@ head:
     </div>
   </section>
 
+  <div class='read-more'><a href="/mathlive/reference/keybindings/">Read more about <strong>keybindings and inline shortcuts</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
 
 </section>
 
-<section class='cards col1'>
-  <div class='card'>
-    <div class='copy'>
-
-      <div class="icon-secondary text-center">
-        <i class="fa-4x fal fa-file-alt"></i>
-      </div>
-      <h3 class='text-center'>MathLive Guides</h3>
-
-      <div class="link-list">
-
-        <a href="/mathlive/guides/introduction">
-          <h4>Quick Start</h4>
-          <p>Quick introduction to using MathLive in your project</p>
-        </a>
-
-        <a href="/mathlive/guides/interacting">
-          <h4>Interact with a mathfield</h4>
-          <p>Receive input and change the value of a mathfield</p>
-        </a>
-
-        <a href="/mathlive/guides/customizing">
-          <h4>Customize a mathfield</h4>
-          <p>Adapt the behavior and appearance of a mathfield to your needs</p>
-        </a>
-
-        <a href="/mathlive/guides/lifecycle">
-          <h4>Web Component Lifecycle</h4>
-          <p>Understand in depth the lifecycle of a MathfieldElement: 
-            construction, interaction with the DOM and when can you communicate 
-            with it</p>
-        </a>
-
-        <a href="/mathlive/guides/commands">
-          <h4>Executing commands</h4>
-          <p>Send editing commands to a mathfield</p>
-        </a>
-        <a href="/mathlive/guides/macros">
-          <h4>Define custom Latex macros</h4>
-          <p>Extend the Latex commands supported</p>
-        </a>
-        <a href="/mathlive/guides/shortcuts">
-          <h4>Manage inline and keyboard shortcuts</h4>
-          <p>Add or modify editing keyboard shortcuts</p>
-        </a>
-        <a href="/mathlive/guides/speech">
-          <h4>Control speech output</h4>
-          <p>A mathfield can provide speech feedback to interact with it</p>
-        </a>
-        <a href="/mathlive/guides/static">
-          <h4>Render static math formulas</h4>
-          <p>Render non-interactive or read-only formulas in a page</p>
-        </a>
-        <a href="/mathlive/guides/virtual-keyboards">
-          <h4>Define custom virtual keyboards</h4>
-          <p>Customize or create new virtual (on-screen) keyboards</p>
-        </a>
-
-        <hr>
-
-        <a href="/mathlive/guides/mathfield-getting-started">
-          <h4>Getting Started</h4>
-          <p>Everything you need to know to add a mathfield to your project</p>
-        </a>
-        <a href="/docs/mathlive">
-          <h4>MathLive SDK</h4>
-          <p>Reference documentation of the MathLive API</p>
-        </a>
-      </div>
-    </div>      
-  </div>
-
-</section>
-</section>
 

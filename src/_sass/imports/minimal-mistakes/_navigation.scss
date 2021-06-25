@@ -430,16 +430,16 @@
 
     .separator {
       border-top: 1px solid #ddd;
-      height: .75em;
-      margin-top: .75em;
+      height: .6em;
+      margin-top: .6em;
       margin-left: 8px;
+      margin-right: 8px;
     }
     a {
       color: inherit;
     }
 
     .active {
-      padding: 4px 4px 4px 8px;
       margin-left: 0;
       margin-right: 0;
     }
@@ -517,13 +517,31 @@
     display: block;
     margin: 0.5rem 0;
     padding: 0.25rem 0;
-    padding-left: 8px;
+    padding-left: 0;
     font-family: $sans-serif-narrow;
     font-size: $type-size-5;
     line-height: 1;
     letter-spacing: -0.05ex;
     font-weight: bold;
     text-transform: uppercase;
+}
+
+.sidebar li .nav__sub-title a {
+  padding-left: 0;
+}
+
+#main a svg.nav__icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 6px;
+  margin-left: 0;
+}
+
+.nav__no-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
 }
 
 /*

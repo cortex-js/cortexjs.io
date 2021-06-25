@@ -14,7 +14,7 @@
             {% assign nav_url = nav.url | relative_url %}
           {% endif %}
 
-          <a href="{{ nav_url }}"><span class="nav__sub-title">{{ nav.title }}</span></a>
+          <span class="nav__sub-title"><a href="{{ nav_url }}">{{ nav.title }}</a></span>
         {% else %}
           <span class="nav__sub-title">{{ nav.title }}</span>
         {% endif %}
@@ -30,14 +30,22 @@
                 {% assign child_url = child.url | relative_url %}
               {% endif %}
 
-              {% comment %} set "active" class on current page {% endcomment %}
+              {% comment %} set "active" class on current page {% endcomment %}              
               {% if child.url == page.url %}
                 {% assign active = "active" %}
               {% else %}
                 {% assign active = "" %}
               {% endif %}
 
-              <li><a href="{{ child_url }}" class="{{ active }}">{{ child.title }}</a></li>
+              <li>              
+                <a href="{{ child_url }}" data-url={{page.url}} class="{{ active }}">
+                  {% if child.icon %}
+                    <svg class="nav__icon" ><use xlink:href="/assets/icons.svg#{{child.icon}}"></use></svg>
+                  {% else %}
+                    <span class="nav__no-icon"></span>
+                  {% endif %}
+                  {{ child.title }}
+                </a></li>
             {% elsif child.separator %}
               <li class="separator"></li>
             {% elsif child.title %}

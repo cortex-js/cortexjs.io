@@ -1,47 +1,23 @@
 ---
-title: Getting Started with Mathfield
-permalink: /guides/mathfield-getting-started/
+title: Add MathLive to Your Project
+permalink: /mathlive/guides/integration/
 layout: single
 date: Last Modified
 sidebar:
     - nav: "mathlive"
 ---
 
-# Let's Get Started
+# Add MathLive to Your Project
 
-In this section we'll look into how to load the Mathlive SDK in your
-project in order to use a mathfield in a page.
+As discussed in [Getting Started](/mathlive/guides/getting-started/) the 
+simplest way to use MathLive in your page is by loading it from a CDN.
 
-We'll start with a step-by-step guide using a CDN, which is the simplest 
-approach. The Advanced Setup section will discuss other options.
-
-## Mathfield Web Component
-
-1. Load the MathLive library
-2. Use the `<math-field>` tag to create a mathfield
-3. Use properties and methods of the mathfield element to interact with it
-
-```html
-<!DOCTYPE html>
-<html>
-<body>
-  <math-field>f(x)</math-field>
-  <script src='https://unpkg.com/mathlive/dist/mathlive.min.js'></script>
-  <script>
-    document.querySelector('math-field').addEventListener('input', (ev) => {
-      console.log(ev.target.value);
-    });
-  </script>
-</body>
-</html>
-```
-
-Note that the HTML quirks mode is not supported. This means that the host page
-must use the strict mode, indicated by a `<!DOCTYPE html>` directive at the top
-of the page.{.notice--warning}
+In this section we'll discuss other options for adding a mathfield in a web page.
 
 
-You can also programmatically create mathfield elements:
+## Creating Mathfield Elements Programmatically
+
+**To create a Mathfield DOM element**, use `new MathfieldElement()`.
 
 ```javascript
 const mfe = new MathfieldElement();
@@ -49,23 +25,13 @@ mfe.value = '\\frac{\\pi}{2}';
 document.body.appendChild(mfe);
 ```
 
-See the [MathfieldElement](http://localhost:8080/docs/mathlive/#(%22mathfield-element%22%3Amodule))
-documentation in the [SDK Reference](/docs/mathlive/) for more details about the attributes, properties, methods and 
-events supported.
+<div class='read-more'><a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule)">See the <strong><kbd>MathfieldElement</kbd></strong> documentation for more details about the attributes, properties, methods and events supported.<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
+<div class='read-more'><a href="/mathlive/guides/lifecycle/">Learn more about the <strong>Lifecycle</strong> of the mathfield web component.<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-***
 
-# Advanced Setup
-
-The instructions above are sufficient in many cases. They allow you to create
-mathfield elements using markup or programmatically and to interact 
-with them.
-
-Howeve more complex configurations are supported as well.
-
-## Using MathLive API with JavaScript Modules
+## Using MathLive with JavaScript Modules
 
 In addition to `MathfieldElement`, the MathLive library provide some functions
 such as `renderMathInDocument()`. To access those functions you will need
@@ -171,7 +137,7 @@ will locate the MathLive library in the `node_modules` directory and apply
 the necessary transformations to it, as per the settings in your project.
 
 
-<h2 id='fonts-folder'> Controlling the location of the `fonts` folder</h2>
+<h2 id='fonts-folder'> Controlling the Location of the <kbd>fonts</kbd> Folder</h2>
 
 In order to display formulas correctly MathLive needs access to specialized 
 math fonts. Those fonts are provided as part of the MathLive SDK and they are

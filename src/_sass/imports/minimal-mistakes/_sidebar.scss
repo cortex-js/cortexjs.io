@@ -65,9 +65,10 @@
         border-radius: 4px;
 
         a {
-            display: block;
+            display: flex;
             border-radius: 4px;
             padding: 8px 4px 8px 8px;
+          
             &:hover {
               background: rgba(0, 0, 0, 0.05);
             }

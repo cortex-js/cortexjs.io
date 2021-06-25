@@ -1,6 +1,6 @@
 ---
 title: Mathfield Example
-permalink: /mathlive/playground/
+permalink: /mathlive/demo/
 layout: single
 date: Last Modified
 sidebar:

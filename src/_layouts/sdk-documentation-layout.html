@@ -65,9 +65,9 @@
         {% endif %}
         {% include page__taxonomy.html %}
         {% if last_modified_at %}
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</strong> <time datetime="{{ last_modified_at | date: "%Y-%m-%d" }}">{{ last_modified_at | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ last_modified_at | date: "%Y-%m-%d" }}">{{ last_modified_at | date: "%B %d, %Y" }}</time></p>
         {% elsif date %}
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</strong> <time datetime="{{ date | date_to_xmlschema }}">{{ date | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ date | date_to_xmlschema }}">{{ date | date: "%B %d, %Y" }}</time></p>
         {% endif %}
       </footer>
 

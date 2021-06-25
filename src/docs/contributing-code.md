@@ -80,7 +80,7 @@ some feedback to make sure that it fits in with:
 
 -   the roadmap for the project
 -   the architecture of the project
--   the coding [Style Guide](https://google.github.io/styleguide/jsguide.html) used by the project
+-   the coding [Style Guide](/docs/coding-style-guide/) used by the project
 
 After it has has been accepted, you Pull Request will be merged into the main branch.
 

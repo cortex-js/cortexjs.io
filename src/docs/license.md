@@ -3,7 +3,7 @@ title: License
 permalink: /docs/license/
 read_time: true
 layout: single
-date: Last Modified
+date: 2021-06-25
 sidebar:
   - nav: 'contributing'
 ---

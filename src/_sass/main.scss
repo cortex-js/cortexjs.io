@@ -7,8 +7,6 @@
 @import 'imports/cards';
 @import 'imports/tables';
 
-@import 'imports/section-link';
-
 // Space and align the chevron icon
 #main a svg {
     margin-left: 1ex;
@@ -86,19 +84,25 @@ a.chevron::after {
   box-shadow: 0 1px 1px rgba(0, 102, 206, 0.25);
   width: 100%; 
   border: 1px solid rgba(0, 102, 206, 0.25);
-  transition: box-shadow,transform .16s ease-out,-webkit-transform .16s ease-out;
-  will-change: box-shadow,transform;
+  transition: box-shadow,transform,border .16s ease-out,-webkit-transform .16s ease-out;
+  will-change: box-shadow,transform,border;
 }
 .page__content .read-more a{
   padding: 1em;
   display: block;
   color: #0066ce; 
   font-size: 1.1em;
+  text-decoration: none;
 }
 
-.page__content .read-more:hover{
-  color: #0066ce; 
+.page__content .read-more:hover {
   border: 1px solid #0066ce;
   transform: scale(1.007);
   box-shadow: 0 5px 10px rgba(0,0,0,0.04);
 }
+
+.page__content .read-more:hover a{
+  text-decoration: none;
+}
+
+// .page__content a:not( .btn):not( #goog-wm-sb):hover

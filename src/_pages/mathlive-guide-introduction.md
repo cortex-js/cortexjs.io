@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: Introduction - MathLive Guide
-permalink: /mathlive/guides/introduction/
+title: Getting Started - MathLive Guide
+permalink: /mathlive/guides/getting-started/
 read_time: false
 sidebar:
     - nav: "mathlive"
@@ -23,29 +23,32 @@ head:
     };
 </script>
 
-# Mathfield Introduction
+# Getting Started
 
 Let's add an editable mathfield to a web page.
 
 **1. Load the MathLive library from a CDN with a `<script>` tag.**
 
-<p class="notice--info">Read about other options to integrate MathLive in your 
-  project in the 
-  <a href="/guides/mathfield-getting-started/">Getting Started Guide</a>.
-</p>
-
+```html
+<script defer src="//unpkg.com/mathlive/dist/mathlive.min.js"></script>
+```
 
 **2. Add a `<math-field>` tag.** The content of the this tag is the initial value 
-of the mathfield, as a Latex expression.
+of the mathfield, as a LaTeX expression.
 
-**3. Edit the equation in the code playground below.**
+```html
+<math-field>f(x) = x + 1</math-field>
+```
 
-The code playground below and in the rest of the documentation are live: when you modify the HTML or JavaScript code the output will update to reflect your changes.
+<a href="https://en.wikipedia.org/wiki/LaTeX">Latex</a> is a plain text markup language for structured documents. Most LaTeX commands start with a `\`, for example `\sqrt`, `\frac` and `\sin`. Read more about the <a href="/mathlive/reference/commands/">available commands</a>{.notice--info}
+
+
+## Try it out
+
+**In the code playground below, change line 3 of the HTML to another LaTeX expression.**<br>For example `f(x) = \sin(x)`.
+
+The code playground here and in the rest of the documentation are live: when you modify the HTML or JavaScript code the output will update to reflect your changes.
 Press **Reset** to bring back the playground to its original state. {.notice--info}
-
-**4. Change line 3 of the HTML to another Latex expression.** 
-For example `f(x) = \sin(x)`, 
-
 
 
 <code-playground layout="stack" class="m-lg w-full-lg">
@@ -65,5 +68,13 @@ For example `f(x) = \sin(x)`,
 </code-playground>
 
 
+Note that the HTML quirks mode is not supported. This means that the host page
+must use the strict mode, indicated by a `<!DOCTYPE html>` directive at the top
+of the page.{.notice--warning}
+
+
 <div class='read-more'><a href="/mathlive/guides/interacting/">Next: <strong>Interacting with a Mathfield</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+
+
+<div class='read-more'><a href="/mathlive/guides/integration/">Learn more about other options to <strong>add MathLive to your project</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
