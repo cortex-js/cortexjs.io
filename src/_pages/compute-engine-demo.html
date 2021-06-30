@@ -308,7 +308,10 @@ head:
       </math-field>
       <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
     </div>
-    <div id='mathfield-latex' class="output toggle-field"></div>
+    <div class = 'toggle-field'>
+      <div id='mathfield-latex' class="output"></div>
+      <div id='mathfield-math-json' class="output mathjson"></div>
+    </div>
   </div>
 
   <!-- 2{xy}     1+|a+|2|+b| -->
@@ -438,6 +441,15 @@ head:
       <div class="output mathjson toggle-field"></div>
     </div>
 
+    <div class="output-section" id="solve">
+      <div class='row'>
+        <code class="label">solve(f, ["x"]))&nbsp;=&nbsp;</code>
+        <math-field class="latex" read-only></math-field>
+        <button class='toggle'><svg><use xlink:href='#info-circle' /></svg></button>
+      </div>
+      <div class="output mathjson toggle-field"></div>
+    </div>
+
   </main>
 
 
@@ -554,6 +566,16 @@ head:
         errors = [];
 
         expr = defaultLatex.parse(latex);
+
+        const mathJsonEl = document.getElementById('mathfield-math-json')
+        if (mathJsonEl) {
+          mathJsonEl.innerHTML =
+            exprToString(expr) +
+            '<br><div style="font-weight: bold; color: hsl(4deg, 90%, 50%)">' +
+            errors.join('<br>') + '</div>';
+        }
+
+
       } catch (e) {
         console.error("parse(%c " + latex + '%c) ' +
           e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
@@ -610,6 +632,12 @@ head:
           e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
       }
 
+      // try {
+      //   updateExpr(await ce.solve(expr, ['x']), 'solve');
+      // } catch (e) {
+      //   console.error("solve(%c " + latex + '%c, ["x"]) ' +
+      //     e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
+      // }
     }
 
     function updateExpr(expr, id) {
@@ -672,7 +700,8 @@ head:
       'domain', 
       'simplify', 
       'evaluate-numerically', 
-      'evaluate'].forEach(id => {
+      'evaluate', 
+      'solve'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         const toggle = el.querySelector('.toggle');

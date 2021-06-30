@@ -168,42 +168,42 @@
         { "separator": true },
 				{
 					"title": "Latex Syntax",
-					"url": "/guides/math-json/latex-syntax/",
+					"url": "/compute-engine/guides/latex-syntax/",
           "icon": "guide"
 				},
 				{
 					"title": "Symbolic Computing",
-					"url": "/guides/compute-engine/symbolic-computing/",
+					"url": "/compute-engine/guides/symbolic-computing/",
           "icon": "guide"
 				},
 				{
 					"title": "Numerical Evaluation",
-					"url": "/guides/compute-engine/numerical-evaluation/",
+					"url": "/compute-engine/guides/numerical-evaluation/",
           "icon": "guide"
 				},        
 				{
 					"title": "Assumptions",
-					"url": "/guides/compute-engine/assumptions/",
+					"url": "/compute-engine/guides/assumptions/",
           "icon": "guide"
 				},
 				{
 					"title": "Domains",
-					"url": "/guides/compute-engine/domains/",
+					"url": "/compute-engine/guides/domains/",
           "icon": "guide"
 				},
 				{
 					"title": "Execution Constraints",
-					"url": "/guides/compute-engine/execution-constraints/",
+					"url": "/compute-engine/guides/execution-constraints/",
           "icon": "guide"
 				},
 				{
 					"title": "Patterns and Rules",
-					"url": "/guides/compute-engine/patterns-and-rules/",
+					"url": "/compute-engine/guides/patterns-and-rules/",
           "icon": "guide"
 				},
 				{
 					"title": "Canonical Forms",
-					"url": "/guides/compute-engine/forms/",
+					"url": "/compute-engine/guides/forms/",
           "icon": "guide"
 				},
         { "separator": true },
@@ -220,47 +220,52 @@
         { "separator": true },
         {
           "title": "Dictionaries",
-          "url": "/guides/compute-engine/dictionaries/",
+          "url": "/compute-engine/guides/dictionaries/",
           "icon": "intro"
         },
         {
           "title": "Arithmetic",
-          "url": "/guides/compute-engine/arithmetic/",
+          "url": "/compute-engine/reference/arithmetic/",
           "icon": "reference"
         },
         {
           "title": "Calculus",
-          "url": "/guides/compute-engine/calculus/",
+          "url": "/compute-engine/reference/calculus/",
           "icon": "reference"
         },
         {
           "title": "Collections",
-          "url": "/guides/compute-engine/collections/",
+          "url": "/compute-engine/reference/collections/",
           "icon": "reference"
         },
         {
           "title": "Core",
-          "url": "/guides/compute-engine/core/",
+          "url": "/compute-engine/reference/core/",
           "icon": "reference"
         },
+				{
+					"title": "Domains",
+					"url": "/compute-engine/reference/domains/",
+          "icon": "reference"
+				},
         {
           "title": "Logic",
-          "url": "/guides/compute-engine/logic/",
+          "url": "/compute-engine/reference/logic/",
           "icon": "reference"
         },
         {
           "title": "Sets",
-          "url": "/guides/compute-engine/sets/",
+          "url": "/compute-engine/reference/sets/",
           "icon": "reference"
         },
         {
           "title": "Special Functions",
-          "url": "/guides/compute-engine/special-functions/",
+          "url": "/compute-engine/reference/special-functions/",
           "icon": "reference"
         },
         {
           "title": "Trigonometry",
-          "url": "/guides/compute-engine/trigonometry/",
+          "url": "/compute-engine/reference/trigonometry/",
           "icon": "reference"
         }
 

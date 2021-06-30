@@ -6,20 +6,6 @@ date: Last Modified
 sidebar:
     - nav: "compute-engine"
 ---
-<script defer type='module'>
-    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument({ 
-      renderAccessibleContent: false,
-      TeX: { 
-        delimiters: {
-          inline: [['\\(', '\\)']],
-          display: [ ['$$', '$$'], ['\\[', '\\]']],
-        },
-        processEnvironments : false 
-      },
-      asciiMath: null,
-    });
-</script>
 
 <img alt="Compute Engine" src='/assets/Compute-Engine-2.png' style='margin-bottom:2em; border-radius:8px; border:1px solid #203346'>
 
@@ -31,7 +17,7 @@ in the browser or in server-side environments such as Node: educators, students,
 
 
 The Compute Engine can:
-- <a href="/guides/math-json/latex-syntax/">parse and serialize</a> expressions from and to Latex
+- <a href="/compute-engine/guides/latex-syntax/">parse and serialize</a> expressions from and to Latex
 - simplify and evaluate math expressions expressed in the <a href ="/math-json/">MathJSON format</a>
 
 <div class='read-more'><a href="/compute-engine/demo/">Try the <strong>interactive demo</strong> now<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
@@ -58,7 +44,7 @@ console.log(serialize(["Add", ["Power", "x", 3], 2]));
 
 ```
 
-<div class='read-more'><a href="/guides/math-json/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 **To input math using an interactive mathfield**, use [MathLive](/mathlive/).
 
@@ -98,12 +84,12 @@ The Compute Engine can also simplify, find patterns, substitute terms, apply rew
 compare and format expressions.
 
 
-<div class='read-more'><a href="/guides/compute-engine/numerical-evaluation/">Read more about <strong>Numerical Evaluation</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/numerical-evaluation/">Read more about <strong>Numerical Evaluation</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
-<div class='read-more'><a href="/guides/compute-engine/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/symbolic-computing/">Read more about <strong>Symbolic Computing</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-<div class='read-more'><a href="/guides/compute-engine/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/patterns-and-rules/">Read more about <strong>Patterns and Rules</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 
 
@@ -114,7 +100,7 @@ The Compute Engine includes a robust library of mathematical functions.
 **To customize the dictionaries that define the math functions**, create and configure a `ComputeEngine` instance.
 
 The `ComputeEngine` instance also provides access to additional features
-such as defining [assumptions](/guides/compute-engine/assumptions/) about 
+such as defining [assumptions](/compute-engine/guides/assumptions/) about 
 symbols: _x is a positive Real number, n is an Integer_.
 
 ```js
@@ -126,15 +112,15 @@ ce.evaluate(['Add', 5, 2]);
 
 | Dictionary |  |
 |:---|:---|
-| [Arithmetic](/guides/compute-engine/arithmetic/) | `Add` `Multiply`...|
-| [Calculus](/guides/compute-engine/calculus/) | `Derive` `Integrate`...|
-| [Collections](/guides/compute-engine/collections/)| `Sequence` `List` `Dictionary` `Set`... |
-| [Core](/guides/compute-engine/core/) | `Missing` `Nothing` `None` `All`  `Identity` `InverseFunction` `LatexTokens`... |
-| [Logic](/guides/compute-engine/logic/) |`And` `Or` `Not`...|
-| [Sets](/guides/compute-engine/sets/) | `Union` `Intersection`...|
-| [Special Functions](/guides/compute-engine/special-functions/) | `Erf` `Gamma` `Factorial`...|
-| [Trigonometry](/guides/compute-engine/trigonometry/)  | `Cos` `Sin` `Tan`...| 
+| [Arithmetic](/compute-engine/reference/arithmetic/) | `Add` `Multiply`...|
+| [Calculus](/compute-engine/reference/calculus/) | `Derive` `Integrate`...|
+| [Collections](/compute-engine/reference/collections/)| `Sequence` `List` `Dictionary` `Set`... |
+| [Core](/compute-engine/reference/core/) | `Missing` `Nothing` `None` `All`  `Identity` `InverseFunction` `LatexTokens`... |
+| [Logic](/compute-engine/reference/logic/) |`And` `Or` `Not`...|
+| [Sets](/compute-engine/reference/sets/) | `Union` `Intersection`...|
+| [Special Functions](/compute-engine/reference/special-functions/) | `Erf` `Gamma` `Factorial`...|
+| [Trigonometry](/compute-engine/reference/trigonometry/)  | `Cos` `Sin` `Tan`...| 
 
 </div>
 
-<div class='read-more'><a href="/guides/compute-engine/dictionaries/">Read more about <strong>Dictionaries</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guide/dictionaries/">Read more about <strong>Dictionaries</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>

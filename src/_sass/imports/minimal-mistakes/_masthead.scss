@@ -17,11 +17,7 @@
     margin-right: auto;
     padding: 1em;
     max-width: 100%;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-pack: justify;
-    -ms-flex-pack: justify;
     justify-content: space-between;
     font-family: $sans-serif-narrow;
 
@@ -43,14 +39,20 @@
   max-height: 2rem;
 }
 
-.site-title {
-  display: -webkit-box;
-  display: -ms-flexbox;
+.greedy-nav a.site-title {
   display: flex;
-  -ms-flex-item-align: center;
   align-self: center;
+  align-items: center;
+  min-height: 30px;
   font-weight: bold;
   z-index: 20;
+  border-radius: 5px;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.site-title:hover {
+  background: #eee;
 }
 
 .site-subtitle {
@@ -58,28 +60,87 @@
   font-size: $type-size-8;
 }
 
+/* Narrow layout */
 .masthead__menu {
   float: left;
   margin-left: 0;
   margin-right: 0;
   width: 100%;
   clear: both;
+  position: relative;
 
-  .site-nav {
+  #site-nav {
+    display: flex;
+    align-items: center;
     margin-left: 0;
 
-    @include breakpoint($small) {
-      float: right;
+    input {
+      display: none;
+    }
+    ul {
+      display: none;
+      position: absolute;
+      margin: 0;
+      padding: 0;
+      clear: both;
+      list-style-type: none;
+    }
+    & input:checked ~ .visible-links {
+      display: block;
+      top: 42px;
+      background: white;
+      width: 100%;
+      border: 1px solid #ddd;          
+      border-radius:4px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, .3);
     }
   }
+}
 
-  ul {
-    margin: 0;
-    padding: 0;
+/* Wide layout */
+@include breakpoint($small) {
+  #site-toc {
+    display: none;
+  }
+  label[for='site-toc'] {
+    display: none;
+  }
+  .masthead__menu {
+    float: left;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
     clear: both;
-    list-style-type: none;
+
+    #site-nav {
+      background: transparent;
+      float: left;
+      margin-left: 0;
+      margin-right: 0;
+      width: 100%;
+      clear: both;
+
+      ul {
+        display: inherit;
+        position: relative;
+        margin: 0;
+        padding: 0;
+        clear: both;
+        list-style-type: none;
+      }
+      &:hover {
+        ul {
+          display: inherit;
+          top: auto;
+        }
+      }
+    }
   }
 }
+
+
+
+
 
 .masthead__menu-item {
   display: block;

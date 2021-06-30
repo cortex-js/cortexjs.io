@@ -7,7 +7,7 @@ read_time: false
 <section class="hero">
   <!-- <a class="section-link" href="/mathlive/" target="_self" rel="follow" aria-hidden="true" tabindex="-1"> -->
   <div>
-    <img src='assets/cortex-hero.jpg'>
+    <img src='assets/cortex-hero.jpg' alt="Cortex Logo">
     <p style='max-width:480px'>Web Components for Scientific Computing</p>
   </div>
   <!-- </a> -->
@@ -19,14 +19,14 @@ read_time: false
     <video autoplay loop muted playinline class='max-w-lg'>
       <source src="/assets/videos/mathlive-demo.webm" type="video/webm">
       <source src="/assets/videos/mathlive-demo.mp4" type="video/mp4">
-      <img src="assets/images/mathfield/mathlive-demo.png">
+      <img src="assets/images/mathfield/mathlive-demo.png" alt="Screen capture of interaction with mathfield element">
     </video>
   </div>
   <div class="copy">
     <!-- <h2><span class='eyebrow'>MathLive</span>Math Input Made Easy</h2> -->
     <h2>MathLive<span class='subhead'>Math Input Made Easy</span></h2>
     <p>Beautifully typeset math as easy to enter as text</p>
-    <p><a href='/mathlive/'>Learn More<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></a></p>
+    <p><a href='/mathlive/'>Learn More<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i></span></a></p>
   </div>
 </section>
 
@@ -36,7 +36,7 @@ read_time: false
       <h2>MathJSON<span class='subhead'>The Web Native Format for Math</span></h2>
       <h3>A JSON schema to represent math expressions.</h3>
 
-      <p><a href='/math-json/'>Learn More<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i><span></a>
+      <p><a href='/math-json/'>Learn More<span class='ml-sm'><i class="fas fa-chevron-right navigation"></i></span></a>
       </p>
     </div>
     <div class="figure">
@@ -51,10 +51,10 @@ read_time: false
          and numerically, from checking if \(x + x = 2x\) or if 
          \(2^{11} - 1 \in \mathbb{P}\) to calculating \(e^{i\pi} \).</h3>
       <p><a href='/compute-engine/'>Learn More<span class='ml-sm'><i
-              class="fas fa-chevron-right navigation"></i><span></a></p>
+              class="fas fa-chevron-right navigation"></i></span></a></p>
     </div>
     <div class="figure">
-      <img src="/assets/Compute-Engine-2.png">
+      <img alt="Compute Engine Logo" src="/assets/Compute-Engine-2.png">
     </div>
   </section>
 
@@ -65,27 +65,26 @@ read_time: false
       <p><strong>Coming soon.</strong></p>
     </div>
     <div class="figure">
-      <img src="/assets/visual-toolkit-1.png">
+      <img alt="Visual Toolkit Logo" src="/assets/visual-toolkit-1.png">
     </div>
   </section>
 
 
 </div>
 
-<script defer type='module'>
-    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument({ 
+<script type='module'>
+  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+  window.addEventListener('DOMContentLoaded', (event) => {
+      renderMathInDocument({ 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {
           inline: [['\\(', '\\)']],
-          display: [
-            ['$$', '$$'],
-            ['\\[', '\\]'],
-          ],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
         },
         processEnvironments : false 
       },
       asciiMath: null,
     });
+  });
 </script>

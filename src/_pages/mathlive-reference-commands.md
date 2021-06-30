@@ -7,25 +7,6 @@ read_time: false
 sidebar:
     - nav: "mathlive"
 ---
-<script defer type='module'>
-    import {renderMathInDocument, version} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument({ 
-      renderAccessibleContent: false,
-      TeX: { 
-        delimiters: {
-          inline: [['\\(', '\\)']],
-          display: [ ['$$', '$$'], ['\\[', '\\]']],
-        },
-        processEnvironments : false 
-      },
-      asciiMath: null,
-    });
-    document.body.classList.add('ready');
-
-    document.getElementById('mathlive-version').innerHTML = version.mathlive;
-    document.getElementById('mathjson-version').innerHTML = version.mathJson;
-
-</script>
 
 <style>
   ul.command-list {
@@ -2323,3 +2304,12 @@ TeX packages or macros.
 <strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version </strong> <span id='mathjson-version'></span>
 
 </footer>
+
+
+<script type='module'>
+    document.body.classList.add('ready');
+
+    document.getElementById('mathlive-version').innerHTML = version.mathlive;
+    document.getElementById('mathjson-version').innerHTML = version.mathJson;
+
+</script>

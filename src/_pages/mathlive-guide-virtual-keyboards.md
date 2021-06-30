@@ -22,7 +22,6 @@ head:
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-
 # Virtual Keyboards
 
 Typing math formulas require access to many special symbols. While [keyboard 

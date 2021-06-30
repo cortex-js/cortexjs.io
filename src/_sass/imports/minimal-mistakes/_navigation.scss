@@ -168,11 +168,7 @@
 
 .greedy-nav {
     position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
     align-items: center;
     min-height: $nav-height;
     background: $background-color;
@@ -208,25 +204,17 @@
     }
 
     .visible-links {
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-box-pack: end;
-        -ms-flex-pack: end;
         justify-content: flex-end;
-        -webkit-box-flex: 1;
-        -ms-flex: 1;
         flex: 1;
         overflow: hidden;
 
         li {
-            -webkit-box-flex: 0;
-            -ms-flex: none;
-            flex: none;
+          flex: none;
+          border-radius: 5px;
         }
         li:hover {
           background: #eee;
-          border-radius: 5px;
         }
 
         a {
@@ -333,76 +321,46 @@
     margin-bottom: 1.5em;
 
     input[type='checkbox'],
+    /* Don't display the label until below the $large breakpoint */
     label {
         display: none;
     }
 
     @include breakpoint(max-width $large - 1px) {
         label {
-            position: relative;
-            width: 42px;
-            height: 42px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: $gray;
-            border: 1px solid $light-gray;
-            border-radius: 50%;
-            z-index: 20;
-            // transition: 0.2s ease-out;
-            cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
 
-            // &:before,
-            // &:after {
-            //   content: "";
-            //   position: absolute;
-            //   right: 1em;
-            //   top: 1.25em;
-            //   width: 0.75em;
-            //   height: 0.125em;
-            //   line-height: 1;
-            //   background-color: $gray;
-            //   // transition: 0.2s ease-out;
-            // }
+          padding: 1em;
 
-            // &:after {
-            //   transform: rotate(90deg);
-            // }
+          color: $text-color;
+          border: 1px solid $light-gray;
+          border-radius: 4px;
+          line-height: .9;
+          z-index: 20;
+          cursor: pointer;
+          transition: transform,border .16s ease-out,-webkit-transform .16s ease-out;
+          will-change: transform,border;
 
-            &:hover {
-                color: #fff;
-                border-color: $gray;
-                background-color: mix(white, #000, 20%);
+          svg {
+            height: 1em;
+            width: 1em;
+            margin-right: .5em;
+          }
 
-                // &:before,
-                // &:after {
-                //   background-color: #fff;
-                // }
-            }
+          &:hover {
+            color: #fff;
+            border-color: darken($primary-color, 20%);
+            background-color: $primary-color;
+            transform: scale(1.05);              
+          }
         }
 
         /* selected*/
         input:checked + label {
             color: white;
-            background-color: mix(white, #000, 20%);
-
-            &:before,
-            &:after {
-                background-color: #fff;
-            }
-        }
-
-        /* on hover show expand*/
-        label:hover:after {
-            -webkit-transform: rotate(90deg);
-            -ms-transform: rotate(90deg);
-            transform: rotate(90deg);
-        }
-
-        input:checked + label:hover:after {
-            -webkit-transform: rotate(0);
-            -ms-transform: rotate(0);
-            transform: rotate(0);
+            background-color: $primary-color;
         }
 
         ul {
@@ -429,7 +387,8 @@
     margin: 0;
 
     .separator {
-      border-top: 1px solid #ddd;
+      border-radius: 0;
+      border-top: .5px solid #3334;
       height: .6em;
       margin-top: .6em;
       margin-left: 8px;

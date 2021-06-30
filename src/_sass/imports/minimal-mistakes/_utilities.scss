@@ -381,19 +381,6 @@ body:hover .visually-hidden button {
   }
 }
 
-.greedy-nav__toggle:hover {
-  .navicon,
-  .navicon:before,
-  .navicon:after {
-    background: mix(#000, $primary-color, 25%);
-  }
-
-  &.close {
-    .navicon {
-      background: transparent;
-    }
-  }
-}
 
 /*
    Sticky, fixed to top content

@@ -7,17 +7,6 @@ read_time: false
 sidebar:
     - nav: "mathlive"
 ---
-<script defer type='module'>
-    import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
-    renderMathInDocument({ 
-      renderAccessibleContent: false,
-      TeX: { 
-        delimiters: { display: [ ['$$', '$$'] ] },
-        processEnvironments : false 
-      },
-      asciiMath: null,
-    });
-</script>
 
 <style>
   td:nth-child(1) code {

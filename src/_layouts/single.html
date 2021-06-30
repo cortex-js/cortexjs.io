@@ -20,20 +20,14 @@ layout: default
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-      {% unless page.header.overlay_color or page.header.overlay_image %}
-        <header>
-          {% if page.read_time %}
-            <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> {% include read-time.html %}</p>
-          {% endif %}
-        </header>
-      {% endunless %}
 
       <section class="page__content" itemprop="text">
-        {% if page.toc %}
-          <aside class="sidebar__right {% if page.toc_sticky %}sticky{% endif %}">
+        {% if toc %}
+          <aside class="sidebar__right {% if toc_sticky %}sticky{% endif %}">
             <nav class="toc">
-              <header><h4 class="nav__title"><i class="fas fa-{{ page.toc_icon | default: 'file-alt' }}"></i> {{ page.toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On this page" }}</h4></header>
-              {% include toc.html sanitize=true html=content h_min=1 h_max=6 class="toc__menu" %}
+              <header><h4 class="nav__title"><i class="fas fa-{{ toc_icon | default: 'file-alt' }}"></i> {{ toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On this page" }}</h4></header>
+              
+              {% include toc.html sanitize=true html=content h_min=2 h_max=3 class="toc__menu" %}
             </nav>
           </aside>
         {% endif %}
@@ -63,3 +57,20 @@ layout: default
 
   </article>
 </div>
+
+<script type='module'>
+  import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+  window.addEventListener('DOMContentLoaded', (event) => {
+      renderMathInDocument({ 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
+        },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
+  });
+</script>

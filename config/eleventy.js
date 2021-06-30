@@ -2,6 +2,7 @@ const sass = require('node-sass');
 const fs = require('fs-extra');
 const path = require('path');
 const hljs = require('highlight.js'); // https://highlightjs.org/
+// const eleventyToc = require('./eleventy-toc.js');
 
 function buildSass(srcDir, destDir) {
   fs.mkdir(destDir, { recursive: true });
@@ -13,7 +14,7 @@ function buildSass(srcDir, destDir) {
         const p = path.parse(path.join(destDir, file));
         p.base = undefined;
         p.ext = '.css';
-        console.log('Compiling "' + srcDir + file + '" to "' + path.format(p));
+        // console.log('Compiling "' + srcDir + file + '" to "' + path.format(p));
 
         //Encapsulate rendered css from scssPath into result variable
         const result = sass.renderSync({
@@ -59,6 +60,8 @@ module.exports = function (eleventyConfig) {
     rightDelimiter: '}',
     allowedAttributes: [], // empty array = all attributes are allowed
   });
+
+  // eleventyConfig.addPlugin(eleventyToc);
 
   eleventyConfig.setLibrary('md', md);
 
