@@ -7,7 +7,7 @@ sidebar:
     - nav: "compute-engine"
 ---
 
-<img alt="Compute Engine" src='/assets/Compute-Engine-2.png' style='margin-bottom:2em; border-radius:8px; border:1px solid #203346'>
+<img alt="Compute Engine" src='/assets/Compute-Engine-2.jpg' style='margin-bottom:2em; border-radius:8px; border:1px solid #203346'>
 
 The **CortexJS Compute Engine** is a JavaScript library for symbolic
 computing and numerical evaluation of mathematical expressions.
