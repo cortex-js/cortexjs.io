@@ -11,6 +11,8 @@
 // $theme: 'light' !default;
 $monospace: 'IBM Plex Mono', 'Fira Code', monospace !default;
 $sans-serif: 'IBM Plex Sans', 'Source Sans Pro', sans-serif !default;
+$body-font:  $sans-serif;
+$display-font:  $sans-serif;
 
 @import 'imports/astra';
 @import 'imports/minimal-mistakes'; // main partials
@@ -103,7 +105,7 @@ mark {
 }
 
 section.page__content {
-    font-family: $sans-serif;
+    font-family: $body-font;
     line-height: 1.5;
     color: $text-color;
 }
@@ -113,7 +115,7 @@ section.page__content h2,
 section.page__content h3,
 section.page__content h4,
 section.page__content h5 {
-    font-family: $sans-serif;
+    font-family: $display-font;
 }
 
 .stack {
@@ -362,7 +364,7 @@ ul {
     margin-left: 1rem;
 }
 .page__content dd {
-    font-family: $sans-serif;
+    font-family: $body-font;
     font-size: 1rem;
 }
 
@@ -514,7 +516,7 @@ ul.index {
 }
 /* Categories */
 .index h3 {
-    font-family: $sans-serif;
+    font-family: $display-font;
     font-size: $h3-font-size;
     background: transparent;
     border: none;

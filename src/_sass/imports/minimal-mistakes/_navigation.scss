@@ -12,7 +12,7 @@
     max-width: 100%;
     padding-left: 1em;
     padding-right: 1em;
-    font-family: $sans-serif;
+    font-family: $display-font;
     // animation: $intro-transition;
     animation-delay: 0.3s;
 
@@ -59,7 +59,7 @@
         margin: 0;
         padding: 0;
         list-style-type: none;
-        font-family: $sans-serif;
+        font-family: $display-font;
     }
 
     li {
@@ -71,7 +71,7 @@
             display: block;
             margin-bottom: 0.25em;
             padding: 0.5em 1em;
-            font-family: $sans-serif;
+            font-family: $display-font;
             font-size: 14px;
             font-weight: bold;
             line-height: 1.5;
@@ -121,7 +121,7 @@
         padding: 1em 2em;
         float: left;
         width: 50%;
-        font-family: $sans-serif;
+        font-family: $display-font;
         font-size: $type-size-5;
         font-weight: bold;
         text-align: center;
@@ -467,7 +467,7 @@
 .nav__title {
     margin: 0;
     padding: 0.5rem 0.75rem;
-    font-family: $sans-serif-narrow;
+    font-family: $display-font;
     font-size: $type-size-5;
     font-weight: bold;
 }
@@ -477,7 +477,7 @@
     margin: 0.5rem 0;
     padding: 0.25rem 0;
     padding-left: 0;
-    font-family: $sans-serif-narrow;
+    font-family: $display-font;
     font-size: $type-size-5;
     line-height: 1;
     letter-spacing: -0.05ex;
@@ -508,7 +508,7 @@
      ========================================================================== */
 
 .toc {
-    font-family: $sans-serif-narrow;
+    font-family: $display-font;
     color: $gray;
     background-color: $background-color;
     border: 1px solid $border-color;

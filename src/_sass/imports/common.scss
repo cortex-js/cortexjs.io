@@ -1,6 +1,8 @@
 $monospace: 'IBM Plex Mono', 'Fira Code', monospace !default;
-$sans-serif: 'Source Sans Pro', sans-serif !default;
-$sans-serif-condensed: 'Source Sans Pro', sans-serif !default;
+$sans-serif: 'IBM Plex Sans', 'Source Sans Pro', sans-serif !default;
+$body-font:  $sans-serif;
+$display-font:  $sans-serif;
+
 
 $body-font-size: 16px;
 $code-font-size: 13px;

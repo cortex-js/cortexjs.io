@@ -76,7 +76,7 @@ a.chevron::after {
   margin: 2em 0 !important;
   /* override*/
   color: #494e52;
-  font-family: "Source Sans Pro", sans-serif;
+  font-family: $body-font;
   font-size: 1rem !important;
   text-indent: initial;
   /* override*/

@@ -14,7 +14,7 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
-    - /assets/js/code-playground.js
+    - /assets/js/code-playground.min.js
 ---
 <script>
     moduleMap = {

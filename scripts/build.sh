@@ -26,7 +26,7 @@ mkdir -p ./src/build
 ## Copy submodules
 printf "$BASENAME$DOT Copying submodules"
 mkdir -p ./submodules/cortex-js.github.io/assets/js/
-cp ./submodules/code-playground/dist/code-playground.js ./submodules/cortex-js.github.io/assets/js/code-playground.js
+cp ./submodules/code-playground/dist/code-playground.min.js ./submodules/cortex-js.github.io/assets/js/code-playground.min.js
 echo -e "$LINECLEAR$BASENAME$CHECK Submodules copied"
 
 

@@ -94,7 +94,7 @@
 }
 
 .hero-section h1 {
-    font: 900 96px/104px $sans-serif;
+    font: 900 96px/104px $display-font;
     margin: 0;
     padding: 0;
 }
@@ -106,7 +106,7 @@
 
 .hero-section p {
     max-width: 653px;
-    font: 400 48px/52px $sans-serif;
+    font: 400 48px/52px $body-font;
     letter-spacing: -0.05ex;
     margin: 0;
     padding: 0;
@@ -171,7 +171,7 @@ div.figure + div.copy {
 
 section.fullwidth h2 {
     color: $text-color;
-    font: 700 56px/50px $sans-serif;
+    font: 700 56px/50px $display-font;
     margin: 0;
     padding: 0;
     padding-bottom: 0.5em;
@@ -179,7 +179,7 @@ section.fullwidth h2 {
     border: none;
     & .eyebrow {
         display: block;
-        font: 700 21px/1.14048 $sans-serif;
+        font: 700 21px/1.14048 $display-font;
         margin: 0;
         padding: 0;
         opacity: 1;
@@ -188,7 +188,7 @@ section.fullwidth h2 {
     }
     & .subhead {
       display: block;
-      font: 500 24px/1 $sans-serif;
+      font: 500 24px/1 $display-font;
       margin: 0;
       padding: 0;
       margin-bottom: 0.5em;
@@ -198,7 +198,7 @@ section.fullwidth h2 {
 }
 
 section.fullwidth p {
-    font: 400 21px/29px $sans-serif;
+    font: 400 21px/29px $body-font;
     margin: 0;
     padding: 0;
 }
@@ -232,7 +232,7 @@ section.fullwidth.light-card {
     line-height: 1;
     & .subhead {
       display: block;
-      font: 600 28px/1 $sans-serif;
+      font: 600 28px/1 $display-font;
       margin: 0;
       padding: 0;
       opacity: .5;
@@ -333,24 +333,24 @@ section.fullwidth.light-card {
 
 .cards.col2 h2,
 .cards.col3 h2 {
-    font: 700 48px/38px 'Source Sans Pro', sans-serif;
+    font: 700 48px/38px $display-font;
     letter-spacing: -0.7px;
 }
 .cards.col2 h2 .subhead,
 .cards.col3 h2 .subhead {
   margin-top: .5em;
-  font: 500 24px/1 "Source Sans Pro", sans-serif;
+  font: 500 24px/1 $display-font;
   letter-spacing: -0.2px;
 }
 
 .cards.col2 h2 .eyebrow,
 .cards.col3 h2 .eyebrow {
-    font: 400 24px/24px 'Source Sans Pro', sans-serif;
+    font: 400 24px/24px $display-font;
 }
 
 .cards.col2 h3,
 .cards.col3 h3 {
-    font: 400 24px/1.1 'Source Sans Pro', sans-serif;
+    font: 400 24px/1.1 $display-font;
     margin-bottom: 1em;
     color: $text-color;
 }

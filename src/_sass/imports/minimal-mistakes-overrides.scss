@@ -2,7 +2,7 @@
 // Overrides
 
 .site-title {
-    font-family: $sans-serif-condensed;
+    font-family: $display-font;
     font-weight: 900;
 }
 
@@ -38,10 +38,8 @@
 pre {
     margin-bottom: 1em;
     padding: 1em;
+    font-size: .8em;
+    border-radius: 8px;
     background: #35434e;
     color: #dadada;
-    font-family: $monospace;
-    font-size: .75em;
-    line-height: 1.3;
-    border-radius: 8px;
 }

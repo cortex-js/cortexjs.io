@@ -67,7 +67,7 @@
 
 .card h2 {
   color: $text-color;
-  font: 700 56px/50px $sans-serif;
+  font: 700 56px/50px $display-font;
   margin: 0;
   padding: 0;
   padding-bottom: .5em;
@@ -75,7 +75,7 @@
   border: none;
   & .eyebrow {
     display: block;
-    font: 400 32px/36px $sans-serif;
+    font: 400 32px/36px $display-font;
     margin: 0;
     padding: 0;
     opacity: .4;
@@ -90,14 +90,14 @@
 
 .card h3 {
   color: $text-color;
-  font: 700 36px/40px $sans-serif;
+  font: 700 36px/40px $display-font;
   margin: 0;
   padding: 0;
   padding-bottom: .5em;
 }
 
 .card p {
-  font: 400 21px/29px $sans-serif;
+  font: 400 21px/29px $body-font;
   margin: 0;
   padding:0;
 }
@@ -113,7 +113,7 @@
     color: $text-color;
   }
   & .card h2 {
-      font: 700 24px/24px $sans-serif;
+      font: 700 24px/24px $display-font;
       padding-top: .5em;
   }
   & .card .copy {
@@ -123,14 +123,14 @@
       align-items: center;
       padding-top: 1em;
 
-      font: 500 16px/20px $sans-serif;
+      font: 500 16px/20px $body-font;
   }
   & .card .copy p {
       text-align: center;
       margin-bottom: 1em;
       text-align: center;
 
-      font: 500 16px/20px $sans-serif;
+      font: 500 16px/20px $body-font;
   }
 }
 

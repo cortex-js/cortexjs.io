@@ -19,7 +19,7 @@
     max-width: 100%;
     display: flex;
     justify-content: space-between;
-    font-family: $sans-serif-narrow;
+    font-family: $display-font;
 
     @include breakpoint($large) {
       max-width: $max-width;

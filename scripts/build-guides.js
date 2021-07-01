@@ -228,10 +228,10 @@ const run = async (dir, sidebar) => {
               `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/xml/xml.min.js`,
             ];
 
-            frontmatter.head.modules = [
-              ...(frontmatter.modules ?? []),
-              '/assets/js/code-playground.js',
-            ];
+            // frontmatter.head.modules = [
+            //   ...(frontmatter.modules ?? []),
+            //   '/assets/js/code-playground.min.js',
+            // ];
 
             const content = upgradeCodeFences(graymatter.content);
             fs.writeFile(dest + '.md', matter.stringify(content, frontmatter));

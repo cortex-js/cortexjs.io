@@ -14,7 +14,7 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
-    - /assets/js/code-playground.js
+    - /assets/js/code-playground.min.js
 ---
 <script>
     moduleMap = {
@@ -24,7 +24,7 @@ head:
 
 # Macros
 
-MathLive has over [800 Latex commands](https://mathlive.io/reference.html) predefined. Some are primitives but others
+MathLive has over [800 Latex commands](/mathlive/reference/commands/) predefined. Some are primitives but others
 are macros, that is commands defined with a Latex expression.
 
 **To view the default macros**, inspect the `macros` option:
