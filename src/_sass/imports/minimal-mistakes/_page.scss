@@ -10,10 +10,8 @@
     margin-right: auto;
     padding-left: 1em;
     padding-right: 1em;
-    -webkit-animation: $intro-transition;
     animation: $intro-transition;
     max-width: 100%;
-    -webkit-animation-delay: 0.15s;
     animation-delay: 0.15s;
 
     @include breakpoint($max-width) {
@@ -23,27 +21,22 @@
 }
 
 body {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     min-height: 100vh;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
     flex-direction: column;
 }
 
 .initial-content,
 .search-content {
+    display: flex;
     flex: 1 0 auto;
 }
 
 .page {
+    display: flex;
     max-width: 760px;
     width: 100%;
     margin: 0;
-    margin-left: auto;
-    margin-right: auto;
     
     // @include breakpoint($large) {
     //   float: right;
@@ -63,6 +56,11 @@ body {
         margin-right: 0;
         width: 100%;
         clear: both;
+
+        flex: 1 0 auto;
+        display: flex;
+        flex-flow: column;
+        justify-content: space-between;
 
         .page__content,
         .page__meta,
@@ -108,9 +106,6 @@ body {
             left: 0.5em;
             opacity: 0;
             font-size: 0.8em;
-            -webkit-transition: opacity 0.2s ease-in-out 0.1s;
-            -moz-transition: opacity 0.2s ease-in-out 0.1s;
-            -o-transition: opacity 0.2s ease-in-out 0.1s;
             transition: opacity 0.2s ease-in-out 0.1s;
         }
 
@@ -175,9 +170,7 @@ body {
     position: relative;
     margin-bottom: 2em;
     @include clearfix;
-    -webkit-animation: $intro-transition;
     animation: $intro-transition;
-    -webkit-animation-delay: 0.25s;
     animation-delay: 0.25s;
 
     &--overlay {
@@ -188,9 +181,7 @@ body {
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
-        -webkit-animation: $intro-transition;
         animation: $intro-transition;
-        -webkit-animation-delay: 0.25s;
         animation-delay: 0.25s;
 
         a {
@@ -363,12 +354,8 @@ body {
     }
 
     a {
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
         padding: 0.25em 0;
-        -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
         justify-content: space-between;
         color: inherit;
         text-decoration: none;

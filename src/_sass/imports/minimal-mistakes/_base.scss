@@ -219,11 +219,8 @@ li ol {
 /* Figures and images */
 
 figure {
-  display: -webkit-box;
   display: flex;
-  -webkit-box-pack: justify;
   justify-content: space-between;
-  -webkit-box-align: start;
   align-items: flex-start;
   flex-wrap: wrap;
   margin: 2em 0;
@@ -237,7 +234,6 @@ figure {
   img {
     width: 100%;
     border-radius: $border-radius;
-    -webkit-transition: $global-transition;
     transition: $global-transition;
   }
 
@@ -281,7 +277,6 @@ figcaption {
   font-size: $type-size-6;
 
   a {
-    -webkit-transition: $global-transition;
     transition: $global-transition;
 
     &:hover {
@@ -365,6 +360,5 @@ input[type="submit"],
 .btn,
 .highlight,
 .archive__item-teaser {
-  -webkit-transition: $global-transition;
   transition: $global-transition;
 }

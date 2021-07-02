@@ -247,8 +247,6 @@
         border: 1px solid $border-color;
         border-radius: $border-radius;
         background: $background-color;
-        -webkit-box-shadow: 0 2px 4px 0 rgba(#000, 0.16),
-            0 2px 10px 0 rgba(#000, 0.12);
         box-shadow: 0 2px 4px 0 rgba(#000, 0.16), 0 2px 10px 0 rgba(#000, 0.12);
 
         &.hidden {
@@ -513,7 +511,6 @@
     background-color: $background-color;
     border: 1px solid $border-color;
     border-radius: $border-radius;
-    -webkit-box-shadow: $box-shadow;
     box-shadow: $box-shadow;
 
     .nav__title {

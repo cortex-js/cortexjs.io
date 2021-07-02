@@ -4,6 +4,7 @@ date: Last Modified
 title: Commands - MathLive Reference
 permalink: /mathlive/reference/commands/
 read_time: false
+version: Version
 sidebar:
     - nav: "mathlive"
 ---
@@ -118,12 +119,6 @@ sidebar:
     font-size: .9em;
     white-space: break-spaces;
   }
-
-
-  .footer-version {
-
-  }
-  
 </style>
 
 # Supported TeX/LaTeX Commands
@@ -146,34 +141,24 @@ In Math Mode, the layout and size of some math elements is adjusted based on the
 context in which they are used. For example, superscripts and subscripts are
 displayed in a smaller font.
 
-The appropriate _math style_ is selected automatically, but it can be overridden
-with the following commands:
-- `\displaystyle`: **Display Style** for standalone equations
-- `\textstyle`: **Text Style** is the confusing name for inline math, not for text mode.
-- `\scriptstyle`: **Script Style** for subscripts and superscripts
-- `\scriptscriptstyle`: **Scriptscript Style** for subscripts and superscripts
-  of subscripts and superscripts
 
-<div class='no-line two-col'>
+**To override the default <strong><em>math style</em></strong>**, use the following commands:
 
-| Display Style | Text Style (inline math) | 
-| :---- | :---- |
-| <span class='math'>$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | <span class='math'>$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | 
-| `\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}` | `\textstyle \sum_{i=0}^n \frac{a_i}{1+x}` | 
+<div class='symbols-table'>
 
-
-
-| Script Style | Scriptscript Style | 
-| :---- | :---- |
-| <span class='math'>$$\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | <span class='math'>$$\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | 
-| `\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x}` | `\scriptscripstyle \sum_{i=0}^n \frac{a_i}{1+x}` | 
+| Math Style |  |  | | 
+| :---- | :---- | :--- | :--- |
+| `\displaystyle` | `\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}`<br><span class='math'>$$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> |  For equations in their own paragraph |
+| `\textstyle` | `\textstyle \sum_{i=0}^n \frac{a_i}{1+x}`<br><span class='math'>$$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> | Confusingly, for **inline math**, not for text mode |
+| `\scriptstyle` | `\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x}`<br><span class='math'>$$\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> |  For subscripts and superscripts |
+| `\scriptscriptstyle` | `\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x}`<br><span class='math'>$$\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$</span> |  For subscripts and superscripts of subscripts and superscripts |
 
 </div>
 
 ### Text Mode
 
-To include some textual comments, switch to **Text Mode** using the 
-`\text{}` command.
+**To include some textual comments**, use the `\text{}` command to switch 
+to **Text Mode**.
 
 <div class='no-line two-col'>
 
@@ -2294,22 +2279,12 @@ TeX packages or macros.
 </div>
 
 
-<footer class="page__meta">
-
-<strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>MathLive version </strong> <span id='mathlive-version'></span>
-
-</footer>
-<footer class="page__meta">
-
-<strong><i class="fas fa-fw fa-code-branch" aria-hidden="true"></i>Compute Engine version </strong> <span id='mathjson-version'></span>
-
-</footer>
-
-
 <script type='module'>
-    document.body.classList.add('ready');
+import { version } from "https://unpkg.com/mathlive/dist/mathlive.min.mjs";
+document.body.classList.add('ready');
 
-    document.getElementById('mathlive-version').innerHTML = version.mathlive;
-    document.getElementById('mathjson-version').innerHTML = version.mathJson;
+
+
+    document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / Cortex Compute Engine ${ version.computeEngine }`;
 
 </script>
