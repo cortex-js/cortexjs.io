@@ -34,8 +34,8 @@ document.body.appendChild(mfe);
 ## Using MathLive with JavaScript Modules
 
 In addition to `MathfieldElement`, the MathLive library provide some functions
-such as `renderMathInDocument()`. To access those functions you will need
-to import the MathLive module.
+such as `renderMathInDocument()`. To access those functions, import the 
+MathLive module.
 
 JavaScript modules offer several benefits (asynchronous, deterministics loading, 
 no pollution of the global namespace, etc...). They are the recommended approach 
@@ -44,22 +44,27 @@ to use MathLive APIS in your project.
 **To use MathLive as a JavaScript module**:
 
 1. Include a `<script>` tag, with a `type="module"` attribute
-2. In the body of this `<script>` tag, use an `import` directive pointing to a CDN URL for Mathlive
+2. In the body of this `<script>` tag, use an `import` directive pointing to a 
+CDN URL for MathLive, such as `https://unpkg.com/mathlive/dist/mathlive.min.mjs`
 3. Invoke a MathLive API, such as `renderMathInDocument()`.
 
 With this setup, MathLive will dynamically insert one or more stylesheets in 
-the page, as needed, for example when the mathfield is created. MathLive will 
-also dynamically download the required fonts from the CDN as well.
+the page, as needed, for example when a mathfield is created. MathLive will 
+ dynamically download the required fonts from the CDN as well.
 
 ```html
 <!DOCTYPE html>
 <html>
 <body>
-    <p>$$\frac{\pi}{2}</p>
-    <script defer type="module">
-        import { renderMathInDocument } from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
-        renderMathInDocument();
-    </script>
+  <p>$$\frac{\pi}{2}$$</p>
+  <script type="module">
+    import { renderMathInDocument } 
+    from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
+
+    window.addEventListener('DOMContentLoaded', 
+      () => renderMathInDocument()
+    );
+  </script>
 </body>
 </html>
 ```
@@ -94,7 +99,9 @@ when required.
     <p>$$\frac{\pi}{2}$$</p>
     <script src="https://unpkg.com/mathlive/dist/mathlive.min.js"></script>
     <script>
-        MathLive.renderMathInDocument();
+      window.addEventListener('DOMContentLoaded', 
+        () => MathLive.renderMathInDocument()
+      );
     </script>
 </body>
 </html>
@@ -153,7 +160,7 @@ be found using the `fontsDirectory` configutation option.
 import { MathfieldElement} from 'mathlive';
 const mfe = new MathfieldElement();
 mfe.setOptions({
-    fontsDirectory: '../assets/mathlive-fonts'
+  fontsDirectory: '../assets/mathlive-fonts'
 });
 ```
 
@@ -203,42 +210,46 @@ font loading.
 </html>
 ```
 
-<h2 id='static-render'>Displaying Formulas Without JavaScript</h2>
+<h2 id='static-render'>Displaying Non-Editable Formulas</h2>
 
-While MathLive is primarily an editor for formulas, it can also be used
-to render "static" formulas in a web page, along the lines of what MathJax or 
-KaTeX provide.
+While MathLive is primarily a math editor, the same  engine that renders
+an interactive math formula can also render "static" formulas in a web page, 
+along the lines of what the MathJax or KaTeX libraries provide.
 
-**To render a non-editable formula** use `MathLive.renderMathInDocument()` or
-to generate markup for a formula use `MathLive.latexToMarkup()`. In the later
-case, you may save the output or return it from a server-side process.
+**To render a non-editable formula**, use `MathLive.renderMathInDocument()` 
 
-To correctly display this markup, you will need an appropriate stylesheet.
+The `renderMathInDocument()` will parse the DOM and converts LaTeX or MathASCII
+strings it finds into corresponding HTML markup. The options argument of 
+`renderMathInDocument()` can control the delimiters it considers, as well
+as which DOM elements to consider or skip. The necessary stylesheet and
+fonts will be injected in the current page.
 
-If you have some editable mathfield in that page, the stylesheet for the editable
-mathfield will be sufficient to correctly render the static formulas.
+**To generate markup for a formula**, use `MathLive.latexToMarkup()`. You may 
+save the output or return it from a server-side process.
 
-However, if you need to render the markup for a static formula without the
-MathLive library being loaded, use the `mathlive-static.css` stylesheet
-which can be found in the `/dist/` directory on GitHub or in the 
-`node_modules/mathlive` directory via NPM.
+To correctly display this markup, use the `mathlive-static.css` stylesheet, 
+which can be found in the `/dist/` directory. When using this method, the
+MathLive library is not necessary to render the formula.
 
 ```html
 <!DOCTYPE html>
 <head>
-    <link rel="stylesheet" href="https://unpkg.com/mathlive/dist/mathlive-static.css" />
+    <link 
+      rel="stylesheet" 
+      href="https://unpkg.com/mathlive/dist/mathlive-static.css" 
+    />
 </head>
 <html>
 <body>
-    <div id="formula"></div>
-    <script type="module">
-        import {convertLatexToMarkup} from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
-        window.onload = function() {
-            document.getElementById("formula").innerHTML = convertLatexToMarkup(
-            `\\xrightarrow[\\Delta]{\\text{abcd}}`
-            );
-        };
-    </script>
+  <div id="formula"></div>
+  <script type="module">
+    import {convertLatexToMarkup} 
+    from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("formula").innerHTML = 
+        convertLatexToMarkup(`\\xrightarrow[\\Delta]{\\text{abcd}}`)
+    });
+  </script>
 </body>
 </html>
 ```
