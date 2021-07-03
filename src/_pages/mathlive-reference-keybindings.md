@@ -98,7 +98,7 @@ The shortcuts in this section apply in all modes.
 | `⌥` `=` | applyStyle({"mode":"text"}) | |
 | `⌥` `=` | 〃 | |
 | `esc` | complete("complete") | |
-| `⇥` | In Latex mode: accept-suggestion | |
+| `⇥` | In LaTeX mode: accept-suggestion | |
 | `⏎` | complete | |
 | `⌤` | 〃 | |
 | `⇧esc` | complete("reject") | |

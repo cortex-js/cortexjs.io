@@ -328,12 +328,12 @@ In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,
 relational, binary or unary operators, etc...
 
-**To control spacing in a formula**, use some of the Latex spacing commands: `\quad`,
+**To control spacing in a formula**, use some of the LaTeX spacing commands: `\quad`,
 `\qquad`, `\!`, `\,` (thin space), `\:` (medium space), `\;` (thick space), `\enskip` or `\enspace`.
 
 By default, pressing the spacebar when in math mode does not insert anything.
 
-**To insert a Latex command when the spacebar is pressed**, set the value of the 
+**To insert a LaTeX command when the spacebar is pressed**, set the value of the 
 `mathModeSpace` option to that command:
 
 ```js

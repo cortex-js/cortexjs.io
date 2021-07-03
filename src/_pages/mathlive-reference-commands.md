@@ -1047,7 +1047,7 @@ To grow delimiters based on their content, use `\left...\right`.
 </div>
 
 
-Internally, Mathlive uses the non-standard `\mleft` and `\mright` command. These commands are use to indicate some delimiters that have been automatically converted to "smart" delimiters when the `smartFence` option is on. However, because they are not standard Latex commands, they may not be recognized by other Latex-compatible software. When exporting using the `latex-expanded` format, or when using the clipboard, those commands are automatically removed.{.notice--warning}
+Internally, MathLive uses the non-standard `\mleft` and `\mright` command. These commands are use to indicate some delimiters that have been automatically converted to "smart" delimiters when the `smartFence` option is on. However, because they are not standard LaTeX commands, they may not be recognized by other LaTeX-compatible software. When exporting using the `latex-expanded` format, or when using the clipboard, those commands are automatically removed.{.notice--warning}
 
 The left and right delimiters do not have to match:
 

@@ -167,7 +167,7 @@
 				},
         { "separator": true },
 				{
-					"title": "Latex Syntax",
+					"title": "LaTeX Syntax",
 					"url": "/compute-engine/guides/latex-syntax/",
           "icon": "guide"
 				},

@@ -67,7 +67,7 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.setUseGitIgnore(false);
 
-  eleventyConfig.setQuietMode(true);
+  eleventyConfig.setQuietMode(false);
 
   // {{ variable | jsonify }}
   eleventyConfig.addFilter('jsonify', function (variable) {
@@ -78,15 +78,20 @@ module.exports = function (eleventyConfig) {
     dynamicPartials: false,
     root: ['./src/_includes', './src'],
   });
+
   // Copy the `assets` directory to the compiled site folder
   eleventyConfig.addPassthroughCopy('src/assets');
   eleventyConfig.addPassthroughCopy({ 'src/build/assets': 'assets' });
+
   // Copy the `src/build` directory to the compiled site folder
   eleventyConfig.addPassthroughCopy({ 'src/build/css': 'assets/css' });
 
   eleventyConfig.setDataDeepMerge(true);
 
-  eleventyConfig.addWatchTarget('./_sass/');
+  eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
+  eleventyConfig.addWatchTarget(
+    '../submodules/compute-engine/src/docs/**/*.{md,html}'
+  );
 
   return {
     passtroughFileCopy: true,

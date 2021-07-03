@@ -88,7 +88,7 @@ Return `false` to stop handling of the event, otherwise the default command
 
 An inline shortcut is a sequence of keystrokes typed on the keyboard that get
 replaced with another symbol. Unlike keystroke shortcuts they cannot be used to
-trigger a command, but only to insert a Latex fragment.
+trigger a command, but only to insert a LaTeX fragment.
 
 For example, typing the `p` key followed by the `i` key will result in the _π_ (`\pi`) symbol being inserted.
 

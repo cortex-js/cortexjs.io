@@ -40,7 +40,7 @@ of the mathfield, as a LaTeX expression.
 <math-field>f(x) = x + 1</math-field>
 ```
 
-<a href="https://en.wikipedia.org/wiki/LaTeX">Latex</a> is a plain text markup language for structured documents. Most LaTeX commands start with a `\`, for example `\sqrt`, `\frac` and `\sin`. Read more about the <a href="/mathlive/reference/commands/">available commands</a>{.notice--info}
+<a href="https://en.wikipedia.org/wiki/LaTeX">LaTeX</a> is a plain text markup language for structured documents. Most LaTeX commands start with a `\`, for example `\sqrt`, `\frac` and `\sin`. Read more about the <a href="/mathlive/reference/commands/">available commands</a>{.notice--info}
 
 
 ## Try it out

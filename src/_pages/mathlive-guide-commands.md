@@ -133,5 +133,5 @@ sequence is replaced with the current selection).
     false). Note: highlighting currently only works when using Amazon's
     AWS speech synthesizer.
 
-<div class='read-more'><a href="/mathlive/guides/macros/">Next: Extending the supported Latex commands with <strong>Macros</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/mathlive/guides/macros/">Next: Extending the supported LaTeX commands with <strong>Macros</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 

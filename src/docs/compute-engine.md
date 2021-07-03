@@ -17,20 +17,20 @@ in the browser or in server-side environments such as Node: educators, students,
 
 
 The Compute Engine can:
-- <a href="/compute-engine/guides/latex-syntax/">parse and serialize</a> expressions from and to Latex
+- <a href="/compute-engine/guides/latex-syntax/">parse and serialize</a> expressions from and to LaTeX
 - simplify and evaluate math expressions expressed in the <a href ="/math-json/">MathJSON format</a>
 
 <div class='read-more'><a href="/compute-engine/demo/">Try the <strong>interactive demo</strong> now<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
-## Parse and Serialize Latex
+## Parse and Serialize LaTeX
 
 Internally, the Compute Engine manipulates expressions represented with the MathJSON format. It's a JSON representation of an Abstract Syntax Tree
 of the expression. It is easy to manipulate programatically and can be
 written by hand. However, you might prefer to use a more concise and
-familiar syntax, such as Latex. The Compute Engine includes utilities
-to convert to and from Latex strings.
+familiar syntax, such as LaTeX. The Compute Engine includes utilities
+to convert to and from LaTeX strings.
 
-**To parse a Latex string and serialize to a Latex string**, use the `parse()` and `serialize()` 
+**To parse a LaTeX string and serialize to a LaTeX string**, use the `parse()` and `serialize()` 
 functions.
 
 ```js
@@ -44,12 +44,12 @@ console.log(serialize(["Add", ["Power", "x", 3], 2]));
 
 ```
 
-<div class='read-more'><a href="/compute-engine/guides/latex-syntax/">Read more about <strong>Parsing and Serializing the Latex Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+<div class='read-more'><a href="/compute-engine/guides/latex-syntax/">Read more about <strong>Parsing and Serializing the LaTeX Syntax</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 
 **To input math using an interactive mathfield**, use [MathLive](/mathlive/).
 
 A MathLive mathfield works like a textarea in HTML, but for math. It provide 
-its content as a Latex string or a MathJSON expression, ready to be used with the Compute Engine.
+its content as a LaTeX string or a MathJSON expression, ready to be used with the Compute Engine.
 
 <div class='read-more'><a href="/mathlive/">Read more about <strong>MathLive</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
 

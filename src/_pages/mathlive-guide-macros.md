@@ -24,8 +24,8 @@ head:
 
 # Macros
 
-MathLive has over [800 Latex commands](/mathlive/reference/commands/) predefined. Some are primitives but others
-are macros, that is commands defined with a Latex expression.
+MathLive has over [800 LaTeX commands](/mathlive/reference/commands/) predefined. Some are primitives but others
+are macros, that is commands defined with a LaTeX expression.
 
 **To view the default macros**, inspect the `macros` option:
 

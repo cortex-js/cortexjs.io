@@ -129,7 +129,7 @@ The text color ("ink") and background color ("paper"), as well as other
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
 using `applyStyle()`.
 
-This style applies to the content of the formula and will be reflected in the Latex output. To change the appearance of the mathfield but not
+This style applies to the content of the formula and will be reflected in the LaTeX output. To change the appearance of the mathfield but not
 the content of the formula, see [Customizing](mathlive/guides/customizing/). {.notice--info}
 
 <code-playground layout="stack" class="m-lg w-full-lg">
@@ -187,7 +187,7 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 
 ## Detecting a Click on a Mathfield
 
-In most cases Mathlive will respond to mouse and keyboard interactions with 
+In most cases MathLive will respond to mouse and keyboard interactions with 
 the mathfield. However, in some cases it might be useful to detect when a 
 mathfield is clicked on. For example, you could display one or more read-only
 mathfields in a list and prompt the user to pick one by clicking on it.
@@ -234,7 +234,7 @@ with both mouse and keyboard, which makes this solution more accessible.
 ## Detecting When the User has Finished Editing a Mathfield
 
 **To detect when the user presses the **Return** or **Enter** key in a mathfield**,
-listen for the `change` event. Note that this event is not fired when in Latex
+listen for the `change` event. Note that this event is not fired when in LaTeX
 editing mode, where **Return** or **Enter** is used to exit the mode.
 
 ## Interacting with the Clipboard
@@ -248,16 +248,16 @@ Multiple flavors are put on the clipboard, and the recipient of the **Paste** op
 
 | | |
 |:-- | :-- |
-| `text/plain` | Latex wrapped with a `\begin{equation*}` and `\end{equation*}`.|
-| `application/x-latex` | Raw Latex |
+| `text/plain` | LaTeX wrapped with a `\begin{equation*}` and `\end{equation*}`.|
+| `application/x-latex` | Raw LaTeX |
 | `application/json`| A MathJSON representation of the formula. |
 | `application/mathml+xml` | A MathML representation of the formula. |
 
 </div>
 
-The Latex in the `text/plain` flavor is "wrapped" to make it easier for the recipient of the paste to recognize that this content is in Latex format. There isn't really a standard format for this, but testing of several Latex-capable editors has shown that `\begin{equation*}` was the most commonly recognized.
+The LaTeX in the `text/plain` flavor is "wrapped" to make it easier for the recipient of the paste to recognize that this content is in LaTeX format. There isn't really a standard format for this, but testing of several LaTeX-capable editors has shown that `\begin{equation*}` was the most commonly recognized.
 
-For improved interoperability, the exported Latex uses the `latex-expanded` format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the `\differentialD` command is used in the formula, it is exported as its corresponding definition, `\mathrm{d}`. .{.notice--info}
+For improved interoperability, the exported LaTeX uses the `latex-expanded` format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the `\differentialD` command is used in the formula, it is exported as its corresponding definition, `\mathrm{d}`. .{.notice--info}
 
 **To customize the content of the `text/plain` flavor**, use the `onExport()` hook. 
 
@@ -267,7 +267,7 @@ For example, to wrap the exported latex with `<math>...</math>` instead:
 mf.setOptions({onExport: (mf, latex) => `<math>${latex}</math>`});
 ```
 
-**To export the "raw" (not expanded) Latex)**, use:
+**To export the "raw" (not expanded) LaTeX)**, use:
 
 ```js
 mf.setOptions({onExport: (mf, latex, range) => 
@@ -275,7 +275,7 @@ mf.setOptions({onExport: (mf, latex, range) =>
 });
 ```
 
-The exported format doesn't have to be Latex. To export ASCIIMath instead:
+The exported format doesn't have to be LaTeX. To export ASCIIMath instead:
 
 ```js
 mf.setOptions({onExport: (mf, latex, range) => 

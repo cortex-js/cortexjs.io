@@ -109,7 +109,7 @@ to return `"manual"`.
 * you can change/add/remove attributes on the element
 * you can invoke all methods specific to `MathfieldElement`, however some may
 have some limitations. For example `setValue()` will ignore any options provided
-including formats other than Latex, `executeCommand()` will do nothing, etc... 
+including formats other than LaTeX, `executeCommand()` will do nothing, etc... 
 These commands required the element to be attached to the DOM to function properly.
 
 
@@ -133,7 +133,7 @@ the element:
 md.addEventListener('mount')((ev) => {
   console.log('mf is mounted');
   // You can now read default options value for example, or 
-  //call `setValue()` with format options other than Latex.
+  //call `setValue()` with format options other than LaTeX.
   console.log(ev.target.getOption('macros'));
 });
 ```

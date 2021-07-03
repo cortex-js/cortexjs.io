@@ -133,12 +133,12 @@ defined (see below about the `styles` layer property), or be one or more of the
   the `latex` value is used. If no `key`, `command` or `insert` property is 
   provided, the label (stripped of any HTML markup) is what will be inserted
   when the keycap is pressed.
-- `latex`: a Latex fragment used as a label and as the content to insert when 
+- `latex`: a LaTeX fragment used as a label and as the content to insert when 
   the keycap is pressed.
 - `key`: the keypress to emulate when the keycap is pressed, for example `"5"`.
 - `aside`: an optional small label displayed below the keycap. This label
 may not be displayed if the space available is too small.
-- `insert`: a Latex fragment to insert when the keycap is pressed. The `latex`
+- `insert`: a LaTeX fragment to insert when the keycap is pressed. The `latex`
 property is usually sufficient, 
 - `altKeys`: the name of a set of alternate keys to display when the keycap is
 long-pressed.
@@ -189,7 +189,7 @@ rows: [
 Each keycap must define its label and what happens when the keycap is pressed.
 There are many different ways of doing this using the properties above.
 
-The simplest case is when pressing a key insert some Latex and its label
+The simplest case is when pressing a key insert some LaTeX and its label
 is the fragment to be inserted. In that case, the `latex` property can be 
 used to specify both the label and what happens when the key is pressed.
 
@@ -218,7 +218,7 @@ The keycap label is displayed using the system font when the `label` property
 is used. To display it using the TeX fonts instead, set the value of the `class`
 property to `tex`.
 
-**To perform a command other than inserting some Latex**, use the `command`
+**To perform a command other than inserting a LaTeX string**, use the `command`
 property:
 
 ```js

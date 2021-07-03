@@ -21,6 +21,7 @@
         // if >1200px...
         float: left;
         width: calc(#{$right-sidebar-width-narrow} - 1em);
+        margin-right: 1em;
 
         &.sticky {
             overflow-y: auto;
@@ -33,6 +34,7 @@
 
     @include breakpoint($large) {
         width: calc(#{$right-sidebar-width} - 1em);
+        margin-right: 1em;
     }
 
     > * {
