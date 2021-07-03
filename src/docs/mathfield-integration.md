@@ -91,7 +91,7 @@ when required.
 <!DOCTYPE html>
 <html>
 <body>
-    <p>$$\frac{\pi}{2}</p>
+    <p>$$\frac{\pi}{2}$$</p>
     <script src="https://unpkg.com/mathlive/dist/mathlive.min.js"></script>
     <script>
         MathLive.renderMathInDocument();
