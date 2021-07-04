@@ -75,4 +75,6 @@ mf.setOptions({
 The macro definition can contain up to eight arguments, represented by `#1` to `#9`.
 
 
-<div class='read-more'><a href="/mathlive/guides/shortcuts/">Next: Manage <strong>Key bindings and Inline Shortcuts</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/shortcuts/" %}
+Next: Manage <strong>Key bindings and Inline Shortcuts</strong>
+{% endreadmore %}

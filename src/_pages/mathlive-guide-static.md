@@ -150,7 +150,9 @@ element.
 
 
 
-<div class='read-more'><a href="/mathlive/guides/virtual-keyboards/">Next: Define custom <strong>Virtual Keyboards</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/virtual-keyboards/" %}
+Next: Define custom <strong>Virtual Keyboards</strong>
+{% endreadmore %}
 
 
 

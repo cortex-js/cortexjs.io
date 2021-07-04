@@ -107,3 +107,63 @@ a.chevron::after {
 }
 
 // .page__content a:not( .btn):not( #goog-wm-sb):hover
+
+code + .tags {
+  margin-left: 1em;
+}
+
+.tags {
+  display: inline-flex;
+  font-size: .6em;
+  line-height: 1.4;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  vertical-align: middle;
+
+  .tag-inert:first-of-type, 
+  .tag-numeric:first-of-type, 
+  .tag-constructor:first-of-type, 
+  .tag-predicate:first-of-type {
+    margin-left: 0;
+  }
+  
+  .tag {
+    min-width: 60px;
+    border: 1px solid currentColor;
+    border-radius: 8px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left:.5em;
+    padding-right: .5em;
+    margin-left: 1em;
+    color: #333;
+    background: #eee;
+    }
+  .tag.inert {
+    color: #666;
+    background: #d4d5d2;
+  }
+  .tag.constructor {
+    color: #ff810a; // Yellow-900;
+    background: #fff1c2; // Yellow-100;
+  }
+  .tag.numeric {
+    color: #0b5c9c; // Blue-800
+    background: #b6d9fb;  // Blue-100
+  }
+  .tag.predicate {
+    color: #4a890b;   // Lime-800
+    background: #d0e8b9; // Lime-100
+  }
+}
+
+
+// Indigo-800 #422581
+// Indigo-100 #d1c2f0
+
+// Red-800 #c6130a
+// Red-100 #fbbbb6
+
+// Teal-800 #0e7f7f
+// Teal-100 #b9f1f1

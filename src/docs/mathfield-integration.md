@@ -25,10 +25,14 @@ mfe.value = '\\frac{\\pi}{2}';
 document.body.appendChild(mfe);
 ```
 
-<div class='read-more'><a href="/docs/mathlive/#(%22mathfield-element%22%3Amodule)">See the <strong><kbd>MathfieldElement</kbd></strong> documentation for more details about the attributes, properties, methods and events supported.<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/docs/mathlive/#(%22mathfield-element%22%3Amodule)" %}
+See the <strong><kbd>MathfieldElement</kbd></strong> documentation for more details about the attributes, properties, methods and events supported.
+{% endreadmore %}
 
 
-<div class='read-more'><a href="/mathlive/guides/lifecycle/">Learn more about the <strong>Lifecycle</strong> of the mathfield web component.<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/lifecycle/" %}
+Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
+{% endreadmore %}
 
 
 ## Using MathLive with JavaScript Modules

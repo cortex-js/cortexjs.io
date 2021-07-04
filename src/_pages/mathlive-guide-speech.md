@@ -149,5 +149,7 @@ The Amazon TTS engine supports SSML, and it is recommended to use this option fo
 
 
 
-<div class='read-more'><a href="/mathlive/guides/static/">Next: Display <strong>Static Math</strong> formulas<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/static/" %}
+Next: Display <strong>Static Math</strong> formulas
+{% endreadmore %}
 

@@ -125,7 +125,9 @@ sidebar:
 
 MathLive supports over 800 LaTeX commands.
 
-<div class='read-more'><a href="http://detexify.kirelabs.org/classify.html">If you can draw a shape but don't know the name of the corresponding LaTeX, use <strong>Detexify</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "http://detexify.kirelabs.org/classify.html" %}
+If you can draw a shape but don't know the name of the corresponding LaTeX, use <strong>Detexify</strong>
+{% endreadmore %}
 
 
 ## Text Mode, Math Mode and Math Style

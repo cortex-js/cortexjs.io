@@ -280,4 +280,6 @@ mf.setOptions({
 
 
 
-<div class='read-more'><a href="/mathlive/guides/speech/">Next: Control <strong>Speech</strong> output<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/speech/" %}
+Next: Control <strong>Speech</strong> output
+{% endreadmore %}

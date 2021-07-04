@@ -73,8 +73,12 @@ must use the strict mode, indicated by a `<!DOCTYPE html>` directive at the top
 of the page.{.notice--warning}
 
 
-<div class='read-more'><a href="/mathlive/guides/interacting/">Next: <strong>Interacting with a Mathfield</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/interacting/" %}
+Next: <strong>Interacting with a Mathfield</strong>
+{% endreadmore %}
 
 
-<div class='read-more'><a href="/mathlive/guides/integration/">Learn more about other options to <strong>add MathLive to your project</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/integration/" %}
+Learn more about other options to <strong>add MathLive to your project</strong>
+{% endreadmore %}
 

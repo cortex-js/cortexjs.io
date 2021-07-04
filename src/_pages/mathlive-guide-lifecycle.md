@@ -163,4 +163,6 @@ md.addEventListener('unmount')((ev) => {
 ```
 
 
-<div class='read-more'><a href="/mathlive/guides/customizing/">Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/customizing/" %}
+Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
+{% endreadmore %}

@@ -294,7 +294,11 @@ The standard delimiter for AsciiMath is the <kbd>&#96;</kbd> (backtick) characte
 <!-- ## Performing editing commands -->
 
 
-<div class='read-more'><a href="/mathlive/guides/customizing/">Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/customizing/" %}
+Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
+{% endreadmore %}
 
-<div class='read-more'><a href="/mathlive/guides/lifecycle/">Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it<svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/lifecycle/" %}
+Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it
+{% endreadmore %}
 

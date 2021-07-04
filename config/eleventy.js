@@ -74,6 +74,25 @@ module.exports = function (eleventyConfig) {
     return JSON.stringify(variable);
   });
 
+  eleventyConfig.addShortcode('tags', function (...names) {
+    const cls = {
+      numeric: 'numeric',
+      constructor: 'constructor',
+      logical: 'predicate',
+      predicate: 'predicate',
+      inert: 'inert',
+    };
+    return `<span class='tags'>${names
+      .map((x) => `<span class='tag ${cls[x] ?? ''}'>${x}</span>`)
+      .join('')}</span>`;
+  });
+
+  eleventyConfig.addPairedLiquidShortcode('readmore', (content, url) => {
+    return `<div class='read-more'><a href="${url}">${md.renderInline(
+      content
+    )}<svg class="svg-chevron"><use xlink:href="#svg-chevron"></use></svg></a></div>`;
+  });
+
   eleventyConfig.setLiquidOptions({
     dynamicPartials: false,
     root: ['./src/_includes', './src'],

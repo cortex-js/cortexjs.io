@@ -491,7 +491,11 @@ the `math-field` elements.
 
 
 
-<div class='read-more'><a href="/mathlive/guides/lifecycle/">Advanced topic: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/mathlive/guides/lifecycle/" %}
+Advanced topic: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it</strong>
+{% endreadmore %}
 
 
-<div class='read-more'><a href="/docs/mathlive/">Next: Reference documentation of the MathLive API <strong>MathLive SDK</strong><svg class="svg-chevron" ><use xlink:href="#svg-chevron"></use></svg></a></div>
+{% readmore "/docs/mathlive/" %}
+Next: Reference documentation of the MathLive API <strong>MathLive SDK</strong>
+{% endreadmore %}
