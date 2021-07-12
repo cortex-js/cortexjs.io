@@ -120,7 +120,7 @@ function parseCodeFences(lines, i) {
       ...result,
       '\n',
       '\n',
-      '<code-playground layout="stack" class="m-lg w-full-lg" output-stylesheets="/assets/js/ui.css">',
+      '<code-playground layout="stack" output-stylesheets="/assets/js/ui.css">',
       '<style slot="style">' + INJECTED_STYLESHEET + '</style>',
     ];
 

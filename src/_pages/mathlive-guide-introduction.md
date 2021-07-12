@@ -51,7 +51,7 @@ The code playground here and in the rest of the documentation are live: when you
 Press **Reset** to bring back the playground to its original state. {.notice--info}
 
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;

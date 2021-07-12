@@ -78,7 +78,7 @@ and `greek`.
 configuration property. The value of this property is a space-separated string 
 of the name of the keyboards that should be displayed.
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -383,7 +383,7 @@ the `math-field::part(virtual-keyboard-toggle)` CSS selector.
 `virtualKeyboardToggleGlyph`
 configuration property.
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -420,7 +420,7 @@ countries, etc..).
 **To select a different alphabetic keyboard layout**, such as DVORAK or COLEMAK, 
 use the `virtualKeyboardLayout` configuration property.
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;

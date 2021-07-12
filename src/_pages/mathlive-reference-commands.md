@@ -59,6 +59,7 @@ sidebar:
     width: auto;
   }
 
+
   .full-width table {
     display: inline-table;
     width: 100%;
@@ -93,6 +94,36 @@ sidebar:
   .three-col table tr td .math {
     text-align: center;
   }
+
+
+@media (max-width: 768px) {
+  .two-col table tr, .three-col table tr {
+    display: flex;
+    flex-flow: column;
+    margin-top: 1em;
+  }
+  .two-col table tr td, 
+  .three-col table tr td, 
+  .three-col table tr td:first-child {
+    width: 100%
+  }
+  .three-col.thin-line td:not(:last-child) {
+    border-right: none;
+  }
+
+  .symbols-table table tr {
+    display: flex;
+    flex-flow: column;
+    margin-bottom: 2em;
+  }
+
+  ul.command-list, .command-list li {
+    display: flex;
+    flex-flow: column;
+  }
+
+}
+
   .math-80px span.math {
     display: inline-block;
     width: 80px;
@@ -1758,8 +1789,8 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 
 * <span class='math'>$$\ce{CO2 + C -> 2 CO} $$</span> <br>  `\ce{CO2 + C -> 2 CO}`
 * <span class='math'>$$\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-} $$</span> <br>   `\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}`
-* <span class='math'>$$C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K} $$</span> <br>   `C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K}`
-* <span class='math'>$$\ce{Zn^2+  <=>[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  <=>[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$} $$</span> <br>  `\ce{Zn^2+  <=>[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  <=>[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$}`
+<!-- * <span class='math'>$$C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K} $$</span> <br>   `C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K}` -->
+<!-- * <span class='math'>$$\ce{Zn^2+  <=>[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  <=>[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$} $$</span> <br>  `\ce{Zn^2+  <=>[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  <=>[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$}` -->
 * <span class='math'>$$\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$} $$</span>  <br>  `\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$}`
 * <span class='math'>$$\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$} $$</span> <br>  `\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}`
 * <span class='math'>$$\ce{Hg^2+ ->[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  ->[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$} $$</span> <br>   `\ce{Hg^2+ ->[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  ->[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$}`

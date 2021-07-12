@@ -5,6 +5,29 @@ read_time: false
 layout: single
 date: 2021-06-24
 ---
+<style>
+  .signature {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+  }
+  .signature li {
+    padding-left: 2ex;
+  }
+  .signature li:first-of-type{
+    padding-left: 0;
+  }
+  .signature li:first-of-type::before {
+    content: '— '
+  }
+
+  #main .signature a svg {
+    margin-left: 0;
+    margin-right: 1ex;
+  }
+
+</style>
 <section>
 <h1 class="font-size-2xl">Hello!</h1>
 <div class='hero-container' style='float:right'>
@@ -32,14 +55,15 @@ date: 2021-06-24
 
   <p>All the Cortex components are available under an Open Source license.</p>
 
-  <p>I can’t wait to see what you will do with them. Enjoy!</p>
+  <p>I can’t wait to see what you do with them. Enjoy!</p>
 
-  <p>—Arno Gourdol<br>
-  <a href='https://www.linkedin.com/in/arnog'><i class="fab fa-linkedin"></i></a>
-  <a href='https://www.instagram.com/arnog'><i class="fab fa-instagram"></i></a>
-  <a href='mailto:arno@arno.org'><i class="far fa-envelope"></i></i></a>
-  </p>
-  <p>My Erdős number is 4.</p>
+  <ul class='signature'><li>Arno Gourdol</li>
+    <li style='opacity:.6'><i>My Erdős number is 4</i></li>
+    <li><a href='https://www.linkedin.com/in/arnog'><i class="fab fa-linkedin"></i></a>
+    <a href='https://www.instagram.com/arnog'><i class="fab fa-instagram"></i></a>
+    <a href='mailto:arno@arno.org'><i class="far fa-envelope"></i></i></a></li>
+  </ul>
+
 
 </div>
 

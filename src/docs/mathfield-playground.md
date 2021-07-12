@@ -28,7 +28,7 @@ Experiment with the options available to setup and customize a
 mathfield with the Playground below. Edit the HTML and JavaScript section for the interactive result to update right away.
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output {
         background: #f9f9f9;

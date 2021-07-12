@@ -131,7 +131,7 @@ using a read-only mathfield.
 **To create a read-only mathfield**, add the `read-only` attribute to a `<mathfield>`
 element.
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output math-field:focus, .output math-field:focus-within {
         outline: none;

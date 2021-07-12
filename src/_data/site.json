@@ -125,7 +125,7 @@
         "pages": [
           {
                 "label": "About Us",
-                "url": "/about"
+                "url": "/about/"
             }
         ]
     }

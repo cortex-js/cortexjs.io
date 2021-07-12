@@ -7,50 +7,52 @@
 @import 'imports/cards';
 @import 'imports/tables';
 
+
+.avatar-md {
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  border: 2px solid white;
+}
+
+.avatar-lg {
+  border-radius: 50%;
+  width: 128px;
+  height: 128px;
+  border: 2px solid white;
+}
+
+.hero-container {
+  position: relative;
+}
+
+.hero-container h2 {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  text-align: right;
+  margin: 0;
+  padding-top: 20%;
+  border: none;
+  font-size: 3em;
+  line-height: 0.8;
+  background: #fff;
+  background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 80%) 66%,
+      white 100%
+  );
+}
+
 // Space and align the chevron icon
-#main a svg {
+#main a .fa-chevron-right svg {
     margin-left: 1ex;
     vertical-align: -0.2em;
 }
 
-.avatar-md {
-    border-radius: 50%;
-    width: 64px;
-    height: 64px;
-    border: 2px solid white;
-}
-
-.avatar-lg {
-    border-radius: 50%;
-    width: 128px;
-    height: 128px;
-    border: 2px solid white;
-}
-
-.hero-container {
-    position: relative;
-}
-
-.hero-container h2 {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 50%;
-    height: 100%;
-    text-align: right;
-    margin: 0;
-    padding-top: 20%;
-    border: none;
-    font-size: 3em;
-    line-height: 0.8;
-    background: #fff;
-    background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 80%) 66%,
-        white 100%
-    );
-}
 
 a.chevron::after {
     width: calc((2 / 9) * 3em);
@@ -70,6 +72,11 @@ a.chevron::after {
   vertical-align: -3px;
   margin-left: 6px;
 }
+
+/*
+ * Read More
+ * 
+ */
 
 .page__content .read-more {
   color:#000;

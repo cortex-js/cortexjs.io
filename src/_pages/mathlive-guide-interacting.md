@@ -37,7 +37,7 @@ an `'input'` event.
 is only sent if you press the **Return** or **Enter** key, or when the mathfield
 loses focus and the content has been modified. {.notice--info}
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -67,7 +67,7 @@ The MathJSON format is a lightweight data interchange format for mathematical no
 
 **Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'math-json'` to `'spoken-text'`.{.notice--info}
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
@@ -90,7 +90,7 @@ Note that we use the `suppressChangeNotifications` option when
 changing the content of the mathfield, to prevent a `'input'` event from being 
 triggered and creating an infinite loop.{.notice--info}
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
   <div slot="javascript">import 'mathlive';
     const mf = document.getElementById('formula');
     mf.addEventListener('input',(ev) => {
@@ -132,7 +132,7 @@ using `applyStyle()`.
 This style applies to the content of the formula and will be reflected in the LaTeX output. To change the appearance of the mathfield but not
 the content of the formula, see [Customizing](mathlive/guides/customizing/). {.notice--info}
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -162,7 +162,7 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 to `applyStyle()`.
 
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;

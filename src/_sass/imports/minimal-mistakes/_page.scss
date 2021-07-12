@@ -3,104 +3,113 @@
    ========================================================================== */
 
 #main {
-    position: relative;
-    display: block;
-    @include clearfix;
-    margin-left: auto;
-    margin-right: auto;
+  position: relative;
+  display: block;
+  @include clearfix;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  animation: $intro-transition;
+  max-width: 100%;
+  animation-delay: 0.15s;
+
+  @include breakpoint($max-width) {
+    max-width: $max-width;
+    display: flex;
+  }
+  @include breakpoint($small) {
     padding-left: 1em;
     padding-right: 1em;
-    animation: $intro-transition;
-    max-width: 100%;
-    animation-delay: 0.15s;
-
-    @include breakpoint($max-width) {
-        max-width: $max-width;
-        display: flex;
-    }
+  }
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .initial-content,
 .search-content {
-    display: flex;
-    flex: 1 0 auto;
-    justify-content: center;
-    background: var(--page-background, #f5f5f7);
+  display: flex;
+  flex: 1 0 auto;
+  justify-content: center;
+  background: var(--page-background, #f5f5f7);
 }
 
 /** `.page` is the main content, does not include `.sidebar` */
 .page {
-    display: flex;
-    max-width: 840px;
-    width: 100%;
-    margin: 0;
-    
-    // @include breakpoint($large) {
-    //   float: right;
-    //   width: calc(100% - #{$right-sidebar-width-narrow});
-    //   padding-right: $right-sidebar-width-narrow;
-    // }
+  display: flex;
+  max-width: 840px;
+  width: 100%;
+  margin: 0;
+  
+  // @include breakpoint($large) {
+  //   float: right;
+  //   width: calc(100% - #{$right-sidebar-width-narrow});
+  //   padding-right: $right-sidebar-width-narrow;
+  // }
 
-    // @include breakpoint($x-large) {
-    //   width: calc(100% - #{$right-sidebar-width});
-    //   padding-right: $right-sidebar-width;
-    // }
+  // @include breakpoint($x-large) {
+  //   width: calc(100% - #{$right-sidebar-width});
+  //   padding-right: $right-sidebar-width;
+  // }
 
-    .page__inner-wrap {
+  .page__inner-wrap {
+      float: left;
+      margin: 0;
+      width: 100%;
+      clear: both;
+
+      flex: 1 0 auto;
+      display: flex;
+      flex-flow: column;
+      justify-content: space-between;
+
+      .page__meta,
+      .page__share {
+          position: relative;
+          float: left;
+          margin-left: 4em;
+          margin-right: 0;
+          margin-bottom: 2em;
+          width: 100%;
+          clear: both;
+      }
+
+      .page__content {
+        position: relative;
         float: left;
-        margin: 0;
         width: 100%;
         clear: both;
 
-        flex: 1 0 auto;
-        display: flex;
-        flex-flow: column;
-        justify-content: space-between;
-
-        .page__content,
-        .page__meta,
-        .page__share {
-            position: relative;
-            float: left;
-            margin-left: 4em;
-            margin-right: 0;
-            margin-bottom: 2em;
-            width: 100%;
-            clear: both;
-        }
-
-        .page__content {
-          background: #fff;
-          border-radius: 8px;
-          padding: 8px;
-          padding-left: 2em;
-          padding-right: 2em;
-          margin-top: 1em;
-          margin-bottom: 1em;
+        background: #fff;
+        border-radius: 8px;
+        padding: 8px;
+        padding-left: 2em;
+        padding-right: 2em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        @include breakpoint($small) {
           margin-left: 1em;
           margin-right: 1em;
         }
-    }
+      }
+  }
 }
 
 .page__title {
-    margin-top: 0;
-    line-height: 1;
+  margin-top: 0;
+  line-height: 1;
 
-    & + .page__meta {
-        margin-top: -0.5em;
-    }
+  & + .page__meta {
+      margin-top: -0.5em;
+  }
 }
 
 .page__lead {
-    font-family: $global-font-family;
-    font-size: $type-size-4;
+  font-family: $global-font-family;
+  font-size: $type-size-4;
 }
 
 .page__content {

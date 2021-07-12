@@ -29,7 +29,7 @@ are macros, that is commands defined with a LaTeX expression.
 
 **To view the default macros**, inspect the `macros` option:
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack" >
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -49,7 +49,7 @@ console.log(mf.getOption('macros'));
 
 **To add or remove macros** use `setOptions({macros: ...})`.
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;

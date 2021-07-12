@@ -36,7 +36,7 @@ for example to change the base font size or add a border.
  Change line 2-6 of the HTML in the playground below with `color: #dde; background: #256291;`.
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack" >
     <div slot="html">&lt;math-field style="
     font-size: 32px; 
     margin: 3em;
@@ -59,7 +59,7 @@ If your bundler or asset management system require a different configuration
 you can specify where the fonts can be located using the [`fontsDirectory`](http://cortexjs.io/docs/mathlive/?q=fontsDirectory) option or the `fonts-directory` attribute.
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -107,7 +107,7 @@ content of the `<math-field>` custom component. {.notice--info}
 
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack" >
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -231,7 +231,7 @@ used in conjunction with `default-mode="inline-math"`.
 
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack" >
   <div slot="html">The answer is &lt;math-field 
   default-mode="inline-math"
   style="
@@ -304,7 +304,7 @@ In the code playground below, try some of these options. For example, change
 line 3 to `scriptDepth: 0`, then try to type "x^2" in the mathfield.
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack" >
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -356,7 +356,7 @@ Note: we `await` for the `<math-field>` definition to be loaded before
 invoking the `getOptions()` method, otherwise it would not be found. {.notice--info}
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;

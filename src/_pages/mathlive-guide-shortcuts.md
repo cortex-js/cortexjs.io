@@ -44,7 +44,7 @@ MathLive has an extensive set of [default key bindings](https://github.com/arnog
 **To override, customize or add to the list of supported key bindings**, provide a
 `onKeystroke` handler.
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -97,7 +97,7 @@ If a substitution was undesirable, use **undo** to revert to the raw input.
 MathLive has some [built-in inline shortcuts](https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts) defined, but they can be replaced or
 enhanced with new shortcuts.
 
-<code-playground layout="stack" class="m-lg w-full-lg">
+<code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
