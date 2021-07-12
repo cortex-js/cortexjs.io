@@ -45,8 +45,5 @@
   table-layout: auto;
   tr td:first-child {
     min-width: 15ex;
-    // Insane trick to make sure the column is no wider than it needs to.
-    width: 1ex;
-    white-space: nowrap;  
   }
 }

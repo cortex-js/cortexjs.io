@@ -7,7 +7,8 @@ table {
   width: 100%;
   margin-bottom: 3em;
   word-wrap: normal;
-  table-layout: fixed;
+  // table-layout: fixed;
+  table-layout: auto;
   display: table;
   overflow: hidden;
   overflow-x: auto;
@@ -38,7 +39,9 @@ table {
     border-bottom: 1px solid mix(#fff, $border-color, 25%);
     
     td:first-child { 
-      width: 100%; 
+      // Insane trick to make sure the column is no wider than it needs to.
+      width: 1ex;
+      white-space: nowrap;  
     }
 
     td {
@@ -47,4 +50,8 @@ table {
       vertical-align: top;
     }
   }
+}
+
+.page__content table p {
+  margin: 0;
 }

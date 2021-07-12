@@ -180,7 +180,12 @@
 					"title": "Numerical Evaluation",
 					"url": "/compute-engine/guides/numerical-evaluation/",
           "icon": "guide"
-				},        
+				},
+				{
+					"title": "Simplify",
+					"url": "/compute-engine/guides/simplify/",
+          "icon": "guide"
+				},
 				{
 					"title": "Assumptions",
 					"url": "/compute-engine/guides/assumptions/",

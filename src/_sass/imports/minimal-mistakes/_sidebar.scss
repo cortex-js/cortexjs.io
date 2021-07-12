@@ -15,27 +15,24 @@
         transform: translate3d(0, 0, 0);
     }
 
+    /** When displayed as a menu (width < $large) take the whole width */
     width: 100%;
 
     @include breakpoint($large) {
         // if >1200px...
         float: left;
-        width: calc(#{$right-sidebar-width-narrow} - 1em);
-        margin-right: 1em;
+        width: calc(#{$left-sidebar-width-wide} - 1em);
+        margin-right: .5em;
 
         &.sticky {
             overflow-y: auto;
             /* calculate height of nav list
-         viewport height - nav height - masthead x-padding
-      */
+              viewport height - nav height - masthead x-padding
+            */
             height: calc(100vh - #{$nav-height} - 2em);
         }
     }
 
-    @include breakpoint($large) {
-        width: calc(#{$right-sidebar-width} - 1em);
-        margin-right: 1em;
-    }
 
     > * {
         margin-top: 1em;

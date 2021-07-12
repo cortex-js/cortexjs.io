@@ -334,6 +334,7 @@
 
           color: $text-color;
           border: 1px solid $light-gray;
+          background: #fff;
           border-radius: 4px;
           line-height: .9;
           z-index: 20;
@@ -449,6 +450,8 @@
 @include breakpoint(max-width $medium - 1px) {
   .nav__list input:checked ~ .nav__items {
     column-count: 2;
+    margin:0;
+    margin-top: 50px;
     // .separator {
     //   margin-left: 0;
     // }

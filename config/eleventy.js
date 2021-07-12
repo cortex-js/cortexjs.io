@@ -34,12 +34,13 @@ module.exports = function (eleventyConfig) {
   buildSass('./src/_sass/', './src/build/css');
 
   const markdownIt = require('markdown-it');
-  const markdownItAttrs = require('markdown-it-attrs');
+  // const markdownItAttrs = require('markdown-it-attrs');
   // let markdownItEmoji = require('markdown-it-emoji');
   let options = {
     // See https://markdown-it.github.io/markdown-it/
     html: true,
     typographer: true,
+    quotes: '""‘’',
     highlight: function (str, lang) {
       if (lang && hljs.getLanguage(lang)) {
         try {
@@ -54,11 +55,17 @@ module.exports = function (eleventyConfig) {
   };
 
   const md = markdownIt(options).use(require('markdown-it-deflist'));
-  md.use(markdownItAttrs, {
+  md.use(require('markdown-it-attrs'), {
     // optional, these are default options
     leftDelimiter: '{',
     rightDelimiter: '}',
     allowedAttributes: [], // empty array = all attributes are allowed
+  });
+
+  md.use(require('markdown-it-multimd-table'), {
+    multiline: true,
+    rowspan: true,
+    headerless: true,
   });
 
   // eleventyConfig.addPlugin(eleventyToc);
@@ -82,9 +89,24 @@ module.exports = function (eleventyConfig) {
       predicate: 'predicate',
       inert: 'inert',
     };
-    return `<span class='tags'>${names
+    let wrapClass = 'tags';
+    if (names.includes('float-right')) wrapClass += ' float-right';
+    return `<span class='${wrapClass}'>${names
+      .filter((x) => x !== 'float-right')
       .map((x) => `<span class='tag ${cls[x] ?? ''}'>${x}</span>`)
       .join('')}</span>`;
+  });
+
+  eleventyConfig.addPairedLiquidShortcode('def', (content, name) => {
+    return `<tr><td><code>${name}</code></td><td>
+    ${md.renderInline(content)}</td></tr>`;
+  });
+
+  eleventyConfig.addPairedLiquidShortcode('defs', (content, col1, col2) => {
+    return `<table><thead><tr><th>${col1 ?? ''}</th><th>${
+      col2 ?? ''
+    }</th></tr></thead><tbody>
+    ${md.renderInline(content)}</tbody></table>`;
   });
 
   eleventyConfig.addPairedLiquidShortcode('readmore', (content, url) => {
