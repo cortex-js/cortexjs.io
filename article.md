@@ -26,8 +26,8 @@ So what are web components? The web components specifications provide a
 low-level set of APIs that let you extend the browser's built-in set of HTML
 tags. Web components provide:
 
--   A common method for creating a component (using standard DOM APIs).
--   A common way of receiving and sending data (using properties/events).
+- A common method for creating a component (using standard DOM APIs).
+- A common way of receiving and sending data (using properties/events).
 
 First things first: Web components are a set of standards that allow us to write
 modular, reusable and encapsulated HTML elements. And the best thing about them:
@@ -58,20 +58,20 @@ that is propagating changes from your internal model to the UI elements.
 
 ##
 
--   Shadow Dom: a way to encapsulate the styling and markup of our components.
-    It's a sub DOM tree attached to a DOM element, to make sure none of our
-    styling leaks out, or gets overwritten by any external styles. This makes it
-    great for modularity.
--   HTML Templates: The HTML <template> tag allows us to write reusable chunks
-    of DOM. Inside a template, scripts don't run, images don't load, and
-    styling/mark up is not rendered. A template tag itself is not even
-    considered to be in the document, until it's activated. HTML templates are
-    great, because for every instance of our element, only 1 template is used.
--   Custom Elements: The Custom Elements api allows us to author our own DOM
-    elements. Using the api, we can define a custom element, and inform the
-    parser how to properly construct that element and how elements of that class
-    should react to changes. Have you ever wanted your own HTML element, like
-    <my-cool-element>? Now you can
+- Shadow Dom: a way to encapsulate the styling and markup of our components.
+  It's a sub DOM tree attached to a DOM element, to make sure none of our
+  styling leaks out, or gets overwritten by any external styles. This makes it
+  great for modularity.
+- HTML Templates: The HTML <template> tag allows us to write reusable chunks of
+  DOM. Inside a template, scripts don't run, images don't load, and styling/mark
+  up is not rendered. A template tag itself is not even considered to be in the
+  document, until it's activated. HTML templates are great, because for every
+  instance of our element, only 1 template is used.
+- Custom Elements: The Custom Elements api allows us to author our own DOM
+  elements. Using the api, we can define a custom element, and inform the parser
+  how to properly construct that element and how elements of that class should
+  react to changes. Have you ever wanted your own HTML element, like
+  <my-cool-element>? Now you can
 
 ## A component's lifecycle
 
@@ -95,11 +95,9 @@ listeners, or cancel intervals.
 attributeChangedCallback(name, oldValue, newValue) The attributeChangedCallback
 is called any time your element's observed attributes change. We can observe an
 element's attributes by implementing a static observedAttributes getter, like
-so: static get observedAttributes() {return ['my-attr'];
-}
-In this case, any time the my-attr attribute is changed, the
-attributeChangedCallback will run. We'll go more in-depth on this later this
-blog post.
+so: static get observedAttributes() {return ['my-attr']; } In this case, any
+time the my-attr attribute is changed, the attributeChangedCallback will run.
+We'll go more in-depth on this later this blog post.
 
 Only attributes listed in the observedAttributes getter are affected in the
 attributeChangedCallback.
@@ -118,18 +116,17 @@ adoptedCallback (with ownerDocument set from new document) > connectedCallback.
 
 The Shadow DOM allows a component author to create a sub-DOM tree.
 
--   Light DOM: The light DOM lives outside the component's shadow DOM, and is
-    basically anything that is not shadow DOM. For example, the <h1>Hello
-    world</h1> up there lives in the light DOM. The term light DOM is used to
-    distinguish it from the Shadow DOM. It's perfectly fine to make web
-    components using light DOM, but you miss out on the great features of shadow
-    DOM.
--   Open shadow DOM: Open shadow DOM allows us to create a sub DOM tree next to
-    the light DOM to provide encapsulation for our components. Our shadow DOM
-    can still be pierced by javascript like so:
-    document.querySelector('our-element').shadowRoot. One of the downsides of
-    shadow DOM is that web components are still relatively young, and many
-    external libraries don't account for it.
+- Light DOM: The light DOM lives outside the component's shadow DOM, and is
+  basically anything that is not shadow DOM. For example, the <h1>Hello
+  world</h1> up there lives in the light DOM. The term light DOM is used to
+  distinguish it from the Shadow DOM. It's perfectly fine to make web components
+  using light DOM, but you miss out on the great features of shadow DOM.
+- Open shadow DOM: Open shadow DOM allows us to create a sub DOM tree next to
+  the light DOM to provide encapsulation for our components. Our shadow DOM can
+  still be pierced by javascript like so:
+  document.querySelector('our-element').shadowRoot. One of the downsides of
+  shadow DOM is that web components are still relatively young, and many
+  external libraries don't account for it.
 
 The closed mode of Shadow DOM provides the same encapsulation as the open mode
 but additionally allows the component author to hide access to the ShadowRoot,
@@ -177,24 +174,22 @@ getter/setter
 
 ## More Resources
 
--   [open-wc.org](https://open-wc.org/) features great getting started
-    information, as well as tips and default configurations for build and
-    development tooling.
--   [Web
-    Fundamentals](https://developers.google.com/web/fundamentals/web-components/)
-    provides primers on the basic web components APIs, and best practices for
-    designing web components.
--   [MDN](https://developer.mozilla.org/en-US/docs/Web/Web_Components) provides
-    reference docs for the web components APIs, plus some tutorials.
+- [open-wc.org](https://open-wc.org/) features great getting started
+  information, as well as tips and default configurations for build and
+  development tooling.
+- [Web Fundamentals](https://developers.google.com/web/fundamentals/web-components/)
+  provides primers on the basic web components APIs, and best practices for
+  designing web components.
+- [MDN](https://developer.mozilla.org/en-US/docs/Web/Web_Components) provides
+  reference docs for the web components APIs, plus some tutorials.
 
 ## Events
 
 Events for data out: Use custom events to pass information out of components
 unless the information to pass is large or changes extremely often.
-this.dispatchEvent(new CustomEvent("clicked", {detail: this.\_timesClicked
-}));
+this.dispatchEvent(new CustomEvent("clicked", {detail: this.\_timesClicked }));
 
--   cancellable and bubble
+- cancellable and bubble
 
 ### Custom Events
 
@@ -204,15 +199,15 @@ this.dispatchEvent(new CustomEvent("clicked", {detail: this.\_timesClicked
 
 ## PUBLISHED ON
 
--   linked in
--   medium
--   cortexjs.io (uijs?)
--   dev.to
--   web.dev
--   css-tricks.com tweet https://twitter.com/chriscoyier to see if he's
-    interested in publishing
+- linked in
+- medium
+- cortexjs.io (uijs?)
+- dev.to
+- web.dev
+- css-tricks.com tweet https://twitter.com/chriscoyier to see if he's interested
+  in publishing
 
 ## PUBLICIZE ON
 
--   hacker news
--   reddit
+- hacker news
+- reddit
