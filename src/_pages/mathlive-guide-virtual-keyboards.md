@@ -48,6 +48,9 @@ customized to fit your specific needs. For example you can remove some
 keyboards, or create new ones.
 
 
+
+<section id='controlling-when-the-virtual-keyboard-panel-is-displayed'>
+
 ## Controlling when the Virtual Keyboard Panel is Displayed
 
 The default behavior of the virtual keyboard panel is to only be displayed on 
@@ -68,7 +71,11 @@ mathfield
 There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations. {.notice--info}
 
-## Controling Which Keyboards Are Displayed
+</section>
+
+<section id='controlling-which-keyboards-are-displayed'>
+
+## Controlling Which Keyboards Are Displayed
 
 The virtual keyboard panel displays multiple keyboards which can be 
 toggled using the keyboard switcher: `numeric`, `functions`, `symbols`, `roman` 
@@ -97,6 +104,9 @@ document.getElementById('mf').setOptions({
 });</div>
 </code-playground>
 
+</section>
+
+<section id='defining-custom-virtual-keyboards'>
 
 ## Defining Custom Virtual Keyboards
 
@@ -350,6 +360,7 @@ array of their names.
     };
 ```
 
+
 ### Adding the Layers and Keyboards
 
 Now, we just have to call `setOptions()` with our custom layer and custom
@@ -372,7 +383,9 @@ keyboards, plus ours, we could have used the `"all"` shortcut:
   });
 }
 ```
+</section>
 
+<section id='customizing-the-appearance-of-the-virtual-keyboard-toggle'>
 
 ## Customizing the Appearance of the Virtual Keyboard Toggle
 
@@ -410,6 +423,9 @@ math-field::part(virtual-keyboard-toggle) {
 </div>
 </code-playground>
 
+</section>
+
+<section id='changing-the-alphabetical-keyboard-layout'>
 
 ## Changing the Alphabetical Keyboard Layout
 
@@ -441,6 +457,9 @@ document.getElementById('mf').setOptions({
 </div>
 </code-playground>
 
+</section>
+
+<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
 
 ## Customizing the Appearance of the Virtual Keyboard Keycaps
 
@@ -455,6 +474,9 @@ Set these CSS variables on any selector inherited by the
 `math-field` tag, for example, `body`: although CSS styles are "invisible" to custom components, CSS variables
 are "passed through" and will affect the content of the `<math-field>` custom component. {.notice--info}
 
+</section>
+
+<section id='sharing-virtual-keyboards-amongts-multiple-instances'>
 ## Sharing Virtual Keyboards Amongst Multiple Instances
 
 When there are multiple mathfield elements in a page, they usually each have
@@ -488,6 +510,7 @@ the `math-field` elements.
 <math-field use-shared-virtual-keyboard></math-field>
 ```
 
+</section>
 
 
 
