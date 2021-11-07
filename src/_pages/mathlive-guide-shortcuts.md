@@ -84,6 +84,66 @@ The `onKeystroke` handler is invoked when a keystroke is about to be processed.
 Return `false` to stop handling of the event, otherwise the default command
 (if any) associated with this keystroke will be processed.
 
+### International Keyboards
+
+Correctly handling keyboard shortcuts while accounting for international 
+keyboard layout is surprisingly difficult. MathLive uses some heuristics that
+may occasionally result in a surprising result.
+
+This section details how MathLive uses keyboard events to determine which
+keyboard shortcut to activate.
+
+
+Let's consider the keyboard shortcut `Ctrl+Alt/Option-A`.
+
+When the user presses this key combination on a keyboard with a US keyboard 
+layout, the event received will have the properties `code = "KeyA"` and  `key = "\u00e5"`.
+
+On a French AZERTY keyboard layout, the event received will have `code =
+"KeyQ"` and  `key = "\u00e6"`.
+
+Why is the code `KeyQ` even though the user pressed the key labeled `A` on their
+AZERTY keyboard? On this keyboard layout, the Q and A keys are swapped compared
+to the US layout and the `code` property reflects the "physical" key pressed.
+
+This is not unusual. While some keys retain their positions, many keys are
+swapped around or altogether unique in some layouts, particularly for
+punctuations and symbols. The code property of the event does not
+represent the label of the key, but indicates the physical position of the key
+as if it was on a US keyboard, in this case "the key immediately to the right of
+the caps lock key, which is labeled Q on a US keyboard (but is labeled A on a
+French keyboard".
+
+What we want to know is that the user pressed a key labeled "A". But none of the
+information in the event record tells us that. The value of the key field varies
+depending on the keyboard layout and the modifiers pressed.
+
+However, if we know the keyboard layout, we can use a table that maps the value
+of the key field to infer the label of the key  the user pressed, i.e. what the
+user sees printed on the top of the key cap, regardless of its physical location
+on the keyboard. Once we have the label, we can figure out that the user pressed
+`Ctrl+Alt+A` using the modifier fields of the event.
+
+But how do we know what is the current keyboard layout? There is unfortunately
+no web platform API (broadly supported) to obtain that information. 
+So one approach is to indicate programmatically to MathLive which keyboard 
+layout the user is using. Otherwise, MathLive will use the user locale to 
+guess the keyboard (for example, guessing to use the French AZERTY keyboard 
+if the user locale is France).
+
+Finally, MathLive uses a heuristic to refine its guess: with each keyboard
+event, MathLive checks that the info in the event record (specifically the code
+and key fields) is consistent with the current keyboard layout. If not, it
+finds a better matching keyboard layout, and will switch to that keyboard layout
+if it is confident enough of that guess.
+
+MathLive currently has a limited set of "known" keyboard layouts. If you happen
+to use a keyboard layout MathLive doesn't know, it will guess the wrong keyboard
+layout. As a result some keyboard shortcuts may produce unexpected results.
+
+
+
+
 ## Inline Shortcuts
 
 An inline shortcut is a sequence of keystrokes typed on the keyboard that get
@@ -113,12 +173,9 @@ mf.setOptions({
   inlineShortcuts: {
     "infty": { mode: 'math', value: '\\infty' },
   }
-});
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;
+});</div><div slot="html">&lt;math-field id="mf"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 
 The `mode` key, if present, indicate the mode in which this shortcut should apply, either `'math'` or `'text'`. If the key is not present the shortcut apply in both modes.
@@ -276,6 +333,7 @@ mf.setOptions({
   }
 });
 ```
+
 
 
 
