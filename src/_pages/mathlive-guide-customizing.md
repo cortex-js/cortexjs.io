@@ -30,8 +30,10 @@ The appearance and behavior of the mathfield is highly customizable. Here are a 
 
 ## Styling
 
-The mathfield can be styled using the `style` attribute on the `<math-field>` tag,
-for example to change the base font size or add a border.
+The mathfield can be styled using the `style` attribute on the `<math-field>` 
+tag or by defining a CSS rule targeting the mathfield.
+
+This can be used to change the base font size or add a border.
 
  Change line 2-6 of the HTML in the playground below with `color: #dde; background: #256291;`.
 
@@ -51,38 +53,37 @@ for example to change the base font size or add a border.
 </code-playground>
 <!-- htmlmin:ignore -->
 
-The content of the mathfield is displayed using a family of high-quality 
-fonts based on the original Computer Modern font from TeX. The mathfield
-will not display correctly using another font. By default, the directory containing
-the fonts is located next to the file containing the mathlive library.
-If your bundler or asset management system require a different configuration
-you can specify where the fonts can be located using the [`fontsDirectory`](http://cortexjs.io/docs/mathlive/?q=fontsDirectory) option or the `fonts-directory` attribute.
+<section id='focus-ring'>
+
+### Focus Ring
+
+To change the appearance of the focus ring, use the `:focus-within` pseudo-element.
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-<div slot="html">&lt;math-field fonts-directory="//unpkg.com/mathlive/dist/fonts/"&gt;
+<code-playground layout="stack" >
+    <div slot="html">&lt;style&gt;
+  math-field:focus-within {
+    outline: 4px solid #d7170b;
+    border-radius: 4px;
+    background: rgba(251,	187,	182, .1);
+  }
+&lt;/style&gt;
+&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;
+</div>
 </code-playground>
 <!-- htmlmin:ignore -->
 
-Note that changing the fonts directory for one mathfield will change the fonts 
-used by all the other mathfield elements in the page. {.notice--warning}
+Removing outlines in CSS creates issues for people navigating the web 
+with  a keyboard. However, you can change the appearance of the outline,
+for example to indicate an error condition. If you remove the outline on the
+mathfield, make sure to replace it with another indicator, for example
+by displaying an outline on an enclosing element.  {.notice--warning}
 
-{% readmore "/mathlive/guides/integration/" %}
-Learn more about configuring the MathLive library to your environment, including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
-{% endreadmore %}
+</section>
 
-
+<section id='css-variable'>
 
 ## CSS Variables
 
@@ -127,6 +128,9 @@ content of the `<math-field>` custom component. {.notice--info}
 </code-playground>
 <!-- htmlmin:ignore -->
 
+</section>
+
+<section id='display-options'>
 
 ## Display Options
 
@@ -277,6 +281,11 @@ The French typographical convention is to only italicize lowercase roman letters
 The default letter shape style is `auto`: if the system locale is "french",
 the `french` style is used, `tex` otherwise.
 
+</section>
+
+
+<section id='editing-options'>
+
 
 ## Editing Options
 
@@ -323,6 +332,10 @@ line 3 to `scriptDepth: 0`, then try to type "x^2" in the mathfield.
 See [EditingOptions](http://cortexjs.io/docs/mathlive/?q=EditingOptions) for more
 details about these and other available options.
 
+</section>
+
+
+<section id='space-bar'>
 
 ## Handling the Space Bar
 
@@ -343,6 +356,9 @@ md.setOptions({mathModeSpace: '\\:'});
 
 ```
 
+</section>
+
+<section id='localization'>
 
 ## Localization
 
@@ -378,6 +394,43 @@ console.log(mf.getOptions().strings[locale]);
 &lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
+
+</section>
+
+## Fonts
+
+The content of the mathfield is displayed using a family of high-quality 
+fonts based on the original Computer Modern font from TeX. The mathfield
+will not display correctly using another font. By default, the directory containing
+the fonts is located next to the file containing the mathlive library.
+If your bundler or asset management system require a different configuration
+you can specify where the fonts can be located using the [`fontsDirectory`](http://cortexjs.io/docs/mathlive/?q=fontsDirectory) option or the `fonts-directory` attribute.
+
+<!-- htmlmin:ignore -->
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+<div slot="html">&lt;math-field fonts-directory="//unpkg.com/mathlive/dist/fonts/"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
+</code-playground>
+<!-- htmlmin:ignore -->
+
+Note that changing the fonts directory for one mathfield will change the fonts 
+used by all the other mathfield elements in the page. {.notice--warning}
+
+{% readmore "/mathlive/guides/integration/" %}
+Learn more about configuring the MathLive library to your environment, including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
+{% endreadmore %}
+
+
 
 
 {% readmore "/mathlive/guides/commands/" %}
