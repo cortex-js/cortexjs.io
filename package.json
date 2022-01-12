@@ -49,7 +49,7 @@
     "highlight.js": "^11.3.1",
     "husky": "^7.0.4",
     "lint-staged": "^11.2.6",
-    "markdown-it": "^12.2.0",
+    "markdown-it": "^12.3.2",
     "markdown-it-attrs": "^4.1.0",
     "markdown-it-deflist": "^2.1.0",
     "node-sass": "^6.0.1",
