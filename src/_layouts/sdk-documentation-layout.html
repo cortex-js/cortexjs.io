@@ -5,7 +5,7 @@
   <head>
     {% assign stylesheet = "/assets/css/sdk-documentation-layout.css" %}
     {% include head.html %}
-    <!-- <link rel="stylesheet" href="{{ '/assets/css/sdk-documentation-layout.css' | relative_url }}"> -->
+    <!-- <link rel="stylesheet" href="{{ '/assets/css/sdk-documentation-layout.css' | url }}"> -->
     {% include head/custom.html %}
   </head>
 
@@ -31,15 +31,15 @@
   {% include sidebar.html %}
 
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
-    {% if title %}<meta itemprop="headline" content="{{ title | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
-    {% if excerpt %}<meta itemprop="description" content="{{ excerpt | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
+    {% if title %}<meta itemprop="headline" content="{{ title  | strip_html | strip_newlines | escape_once }}">{% endif %}
+    {% if excerpt %}<meta itemprop="description" content="{{ excerpt  | strip_html | strip_newlines | escape_once }}">{% endif %}
     {% if date %}<meta itemprop="datePublished" content="{{ date | date: "%B %d, %Y" }}">{% endif %}
     {% if last_modified_at %}<meta itemprop="dateModified" content="{{ last_modified_at | date: "%B %d, %Y" }}">{% endif %}
 
     <div class="page__inner-wrap">
       {% unless header.overlay_color or header.overlay_image %}
         <header>
-          {% if title %}<h1 id="page-title" class="page__title" itemprop="headline">{{ title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
+          {% if title %}<h1 id="page-title" class="page__title" itemprop="headline">{{ title  | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
           {% if read_time %}
             <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> {% include read-time.html %}</p>
           {% endif %}
@@ -65,9 +65,9 @@
         {% endif %}
         {% include page__taxonomy.html %}
         {% if last_modified_at %}
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ last_modified_at | date: "%Y-%m-%d" }}">{{ last_modified_at | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ last_modified_at | date: '%Y-%m-%d' }}">{{ last_modified_at | date: "%B %d, %Y" }}</time></p>
         {% elsif date %}
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ date | date_to_xmlschema }}">{{ date | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ date | '%Y-%m-%d' }}">{{ date | date: "%B %d, %Y" }}</time></p>
         {% endif %}
       </footer>
 

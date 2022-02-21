@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# scripts/server.sh: 
+# scripts/start.sh: 
 # Launch the project and any extra required processes locally.
 
 set -e
@@ -14,5 +14,4 @@ cd "$(dirname "$0")/.."
 ./scripts/build.sh watch
 
 # boot the project and any other necessary processes.
-# bundle exec jekyll serve
 npx eleventy --config ./config/eleventy.js --serve

@@ -35,7 +35,7 @@
         {
 					"title": "Demo",
 					"url": "/mathlive/demo/",
-          "icon": "demo"
+          "icon": "flask"
         },
         { "separator": true },
 				{
@@ -95,7 +95,7 @@
 				},
         { "separator": true },
         {
-					"title": "Supported Commands",
+					"title": "LaTeX Commands",
 					"url": "/mathlive/reference/commands/",
           "icon": "reference"
         },
@@ -126,27 +126,27 @@
 				{
 					"title": "Reporting Issues",
 					"url": "/docs/reporting-issues/",
-          "icon": "checklist"
+          "icon": "bug"
 				},
 				{
 					"title": "Contributing Code",
 					"url": "/docs/contributing-code/",
-          "icon": "checklist"
+          "icon": "code-branch"
 				},
 				{
 					"title": "Funding",
 					"url": "/funding/",
-          "icon": "guide"
+          "icon": "seedling"
 				},
 				{
 					"title": "Code of Conduct",
 					"url": "/docs/code-of-conduct/",
-          "icon": "guide"
+          "icon": "handshake"
 				},
 				{
 					"title": "License",
 					"url": "/docs/license/",
-          "icon": "guide"
+          "icon": "handshake"
 				}
 			]
 		}
@@ -163,12 +163,22 @@
 				{
 					"title": "Demo",
 					"url": "/compute-engine/demo/",
-          "icon": "demo"
+          "icon": "flask"
 				},
         { "separator": true },
 				{
+					"title": "Expressions",
+					"url": "/compute-engine/guides/expressions/",
+          "icon": "guide"
+				},
+				{
 					"title": "LaTeX Syntax",
 					"url": "/compute-engine/guides/latex-syntax/",
+          "icon": "guide"
+				},
+				{
+					"title": "Evaluate",
+					"url": "/compute-engine/guides/evaluate/",
           "icon": "guide"
 				},
 				{
@@ -207,8 +217,8 @@
           "icon": "guide"
 				},
 				{
-					"title": "Canonical Forms",
-					"url": "/compute-engine/guides/forms/",
+					"title": "Canonical Expressions",
+					"url": "/compute-engine/guides/canonical-expressions/",
           "icon": "guide"
 				},
         { "separator": true },
@@ -292,27 +302,27 @@
 				{
 					"title": "Reporting Issues",
 					"url": "/docs/reporting-issues/",
-          "icon": "checklist"
+          "icon": "bug"
 				},
 				{
 					"title": "Contributing Code",
 					"url": "/docs/contributing-code/",
-          "icon": "checklist"
+          "icon": "code-branch"
 				},
 				{
 					"title": "Funding",
 					"url": "/funding/",
-          "icon": "guide"
+          "icon": "seedling"
 				},
 				{
 					"title": "Code of Conduct",
 					"url": "/docs/code-of-conduct/",
-          "icon": "guide"
+          "icon": "handshake"
 				},
 				{
 					"title": "License",
 					"url": "/docs/license/",
-          "icon": "guide"
+          "icon": "handshake"
 				}
 			]
 		}
@@ -356,27 +366,27 @@
 				{
 					"title": "Reporting Issues",
 					"url": "/docs/reporting-issues/",
-          "icon": "checklist"
+          "icon": "bug"
 				},
 				{
 					"title": "Contributing Code",
 					"url": "/docs/contributing-code/",
-          "icon": "checklist"
+          "icon": "code-branch"
 				},
 				{
 					"title": "Funding",
 					"url": "/funding/",
-          "icon": "guide"
+          "icon": "seedling"
 				},
 				{
 					"title": "Code of Conduct",
 					"url": "/docs/code-of-conduct/",
-          "icon": "guide"
+          "icon": "handshake"
 				},
 				{
 					"title": "License",
 					"url": "/docs/license/",
-          "icon": "guide"
+          "icon": "handshake"
 				}
 			]
 		},

@@ -1084,12 +1084,12 @@ Internally, MathLive uses the non-standard `\mleft` and `\mright` command. These
 
 The left and right delimiters do not have to match:
 
-<span class='math'>\\(\displaystyle \left\lparen \frac1x \right\rbrack\\)</span> `\left\lparen \frac1x \right\rbrack`
+* <span class='math'>\\(\displaystyle \left\lparen \frac1x \right\rbrack\\)</span> `\left\lparen \frac1x \right\rbrack`
 
 
 To omit a delimiter, use `.`:
 
-<span class='math'>\\(\displaystyle \left\lparen \frac1x \right.\\)</span> `\left\lparen \frac1x \right.`
+* <span class='math'>\\(\displaystyle \left\lparen \frac1x \right.\\)</span> `\left\lparen \frac1x \right.`
 
 
 ---
@@ -1331,11 +1331,12 @@ which are required:
 | <span class='math'>$$\enclose{longdiv}{x=0} $$</span> | `longdiv` |
 | <span class='math'>$$\enclose{actuarial}{x=0} $$</span> | `actuarial` |
 | <span class='math'>$$\enclose{madruwb}{x=0} $$</span> | `madruwb` |
+
 </section>
 
 They can be combined:
 
-<span class='math'>\\( \displaystyle \enclose{roundedbox updiagonalstrike}{x=0} \\)</span>  `roundedbox, updiagonalstrike` 
+* <span class='math'>\\( \displaystyle \enclose{roundedbox updiagonalstrike}{x=0} \\)</span>  `roundedbox, updiagonalstrike` 
 
 - `<style>` an optional list of comma separated key-value pairs including:
   - `mathbackground="<color>"` background color of the expression

@@ -6,7 +6,7 @@
 
 {% include seo.html %}
 
-<link href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ '/feed.xml' | relative_url }}{% endif %}" type="application/atom+xml" rel="alternate" title="{{ site.title }} Feed">
+<link href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ '/feed.xml' | url }}{% endif %}" type="application/atom+xml" rel="alternate" title="{{ site.title }} Feed">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
@@ -20,7 +20,7 @@
     {% if x contains "://" %}
       {% capture script_path %}{{ x }}{% endcapture %}
     {% else %}
-      {% capture script_path %}{{ x | relative_url }}{% endcapture %}
+      {% capture script_path %}{{ x | url }}{% endcapture %}
     {% endif %}
     <script defer src="{{ script_path }}" crossorigin='anonymous'></script>
   {% endfor %}
@@ -31,20 +31,20 @@
     {% if x contains "://" %}
       {% capture script_path %}{{ x }}{% endcapture %}
     {% else %}
-      {% capture script_path %}{{ x | relative_url }}{% endcapture %}
+      {% capture script_path %}{{ x | url }}{% endcapture %}
     {% endif %}
     <script defer type="module" src="{{ script_path }}" crossorigin='anonymous'></script>
   {% endfor %}
 {% endif %}
 
 
-<link rel="stylesheet" href="{{ stylesheet | default: '/assets/css/main.css' | relative_url }}">
+<link rel="stylesheet" href="{{ stylesheet | default: '/assets/css/main.css' | url }}">
 {% if head.stylesheets %}
   {% for x in head.stylesheets %}
     {% if x contains "://" %}
       {% capture stylesheet_path %}{{ x }}{% endcapture %}
     {% else %}
-      {% capture stylesheet_path %}{{ x | relative_url }}{% endcapture %}
+      {% capture stylesheet_path %}{{ x | url }}{% endcapture %}
     {% endif %}
     <link rel="stylesheet" href="{{ stylesheet_path }}">
   {% endfor %}
@@ -55,7 +55,7 @@
     {% if script contains "://" %}
       {% capture script_path %}{{ script }}{% endcapture %}
     {% else %}
-      {% capture script_path %}{{ script | relative_url }}{% endcapture %}
+      {% capture script_path %}{{ script | url }}{% endcapture %}
     {% endif %}
     <script defer src="{{ script_path }}"></script>
   {% endfor %}

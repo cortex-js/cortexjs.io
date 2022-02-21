@@ -13,7 +13,7 @@ Table of Content</label>
           {% if nav.url contains "://" %}
             {% assign nav_url = nav.url %}
           {% else %}
-            {% assign nav_url = nav.url | relative_url %}
+            {% assign nav_url = nav.url | url %}
           {% endif %}
 
           <span class="nav__sub-title"><a href="{{ nav_url }}">{{ nav.title }}</a></span>
@@ -29,7 +29,7 @@ Table of Content</label>
               {% if child.url contains "://" %}
                 {% assign child_url = child.url %}
               {% else %}
-                {% assign child_url = child.url | relative_url %}
+                {% assign child_url = child.url | url %}
               {% endif %}
 
               {% comment %} set "active" class on current page {% endcomment %}              

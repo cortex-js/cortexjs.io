@@ -60,10 +60,10 @@ loses focus and the content has been modified. {.notice--info}
 Reading the `value` property is equivalent to calling the `getValue()` method with 
 no argument. 
 
-**To control how the result is formatted**, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
+**To control the format of the result**, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
 For example to get the content as a MathJSON expression, use `getValue('math-json')`.
 
-The MathJSON format is a lightweight data interchange format for mathematical notation. [Learn more about MathJSON](/math-json/).{.notice--info}
+The MathJSON format is a lightweight mathematical notation interchange format. [Learn more about MathJSON](/math-json/).{.notice--info}
 
 **Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'math-json'` to `'spoken-text'`.{.notice--info}
 

@@ -75,7 +75,7 @@ To change the appearance of the focus ring, use the `:focus-within` pseudo-eleme
 </code-playground>
 <!-- htmlmin:ignore -->
 
-Removing outlines in CSS creates issues for people navigating the web 
+**Caution** Removing outlines in CSS creates issues for people navigating the web 
 with  a keyboard. However, you can change the appearance of the outline,
 for example to indicate an error condition. If you remove the outline on the
 mathfield, make sure to replace it with another indicator, for example

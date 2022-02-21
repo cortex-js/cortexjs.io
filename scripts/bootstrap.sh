@@ -13,5 +13,3 @@ if [ ! -d node_modules ]; then
 fi
 
 npm --prefix submodules/code-playground run dist
-
-npm --prefix submodules/grok run build

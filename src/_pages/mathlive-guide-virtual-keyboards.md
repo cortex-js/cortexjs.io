@@ -476,7 +476,8 @@ are "passed through" and will affect the content of the `<math-field>` custom co
 
 </section>
 
-<section id='sharing-virtual-keyboards-amongts-multiple-instances'>
+<section id='sharing-virtual-keyboards-amongst-multiple-instances'>
+
 ## Sharing Virtual Keyboards Amongst Multiple Instances
 
 When there are multiple mathfield elements in a page, they usually each have
