@@ -4,7 +4,9 @@
   {% capture logo_path %}{{ site.logo }}{% endcapture %}
 {% endif %}
 
-<div class="masthead">
+
+
+<div class="masthead {{ crumbs[1] }}">
   <div class="masthead__inner-wrap">
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
@@ -25,7 +27,9 @@
               {%- else -%}
                 {%- assign url = link.url | url -%}
               {%- endif -%}
-              <li class="masthead__menu-item">
+              {% assign rootUrl = link.url | slice: 0, -1 | split: '/' %}
+              {% assign crumbs = page.url | slice: 0, -1 | split: '/' %}
+              <li class="masthead__menu-item {% if rootUrl[1] == crumbs[1] %} active {% endif %}">
                 <a href="{{ url }}" {% if link.description %}title="{{ link.description }}"{% endif %}>{{ link.title }}</a>
               </li>
             {%- elsif link.separator -%}

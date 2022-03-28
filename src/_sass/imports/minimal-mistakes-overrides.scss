@@ -24,6 +24,11 @@
     font-weight: 700;
     font-size: 20px;
 }
+
+.masthead__menu-item.active a {
+  color: $primary;
+}
+
 .masthead__menu-item.separator {
   width: 1em;
   border-right: 1px solid #ddd;

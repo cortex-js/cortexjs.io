@@ -20,7 +20,7 @@ console.log(ce.parse("e^{i\\pi}").N().latex);
 
 
 const expr = ce.parse("(a+b)^2");
-console.log(ce.box("Expand", [expr]).evaluate().latex);
+console.log(ce.box(["Expand", expr]).evaluate().latex);
 // ➔ "a^2 + 2ab + b^2"
 
 ```
