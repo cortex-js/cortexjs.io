@@ -228,10 +228,12 @@ the `=` sign because the limit is displayed in `scriptstyle`.
 
 Set it to `inline-math` to use `textstyle` or `math` to use `displaystyle`.
 
-By default, the mathfield element behaves as if it had a `display: block`
-CSS property. To get it to behave as a inline element, set 
-`display: inline-block` on the mathfield. This is particularly useful when 
-used in conjunction with `default-mode="inline-math"`.
+By default, the mathfield element is laid out on the page as a block,
+that is with a `display: block` CSS property. To get it laid out as an inline 
+element, set `display: inline-block` on the mathfield. To set a minimum width
+for the mathfield, use the `min-width` CSS property. 
+
+Using `inline-block` is particularly useful when used in conjunction with `default-mode="inline-math"`.
 
 
 <!-- htmlmin:ignore -->
@@ -241,6 +243,7 @@ used in conjunction with `default-mode="inline-math"`.
   style="
     padding-left: 5px; padding-right: 5px;
     display: inline-block;
+    mind-width: 100px;
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, .3); 
   "&gt;

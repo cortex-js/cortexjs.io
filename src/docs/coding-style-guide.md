@@ -36,7 +36,7 @@ example.
 In general:
 
 1. Follow the conventions already in use in the codebase
-2. Follow the [Google Javascript Style Guide](https://google.github.io/styleguide/jsguide.html),
+2. Follow the [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html),
    with the exception of the indentation with 4-spaces instead of 2-spaces.
 
 ## Summary of Naming Conventions

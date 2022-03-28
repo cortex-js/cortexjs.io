@@ -9,136 +9,122 @@ sidebar:
 
 <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>
 
-The **CortexJS Compute Engine** is a JavaScript library for symbolic
+The **CortexJS Compute Engine** is a JavaScript/TypeScript library for symbolic
 computing and numerical evaluation of mathematical expressions.
+
+{% readmore "/compute-engine/changelog" %}
+The API in version `0.4.3` has changed. The **CHANGELOG** includes a migration 
+guide to help you update your code from previous version to `0.4.3`
+{% endreadmore %}
+
 
 The Compute Engine is for anyone who wants to make technical computing apps 
 in the browser or in server-side environments such as Node: educators, 
 students, scientists and engineers.
 
+The CortexJS Compute Engine manipulates math expressions represented with the <a href ="/math-json/">MathJSON format</a>.
+
 
 The Compute Engine can:
-- <a href="/compute-engine/guides/latex-syntax/">parse and serialize</a> expressions from and to LaTeX
-- simplify and evaluate math expressions expressed in the <a href ="/math-json/">MathJSON format</a>
+- <a href="/compute-engine/guides/latex-syntax/">**parse** and **serialize**</a> expressions from and to LaTeX
+- <a href="/compute-engine/guides/simplify/">**simplify**</a> expressions
+- <a href="/compute-engine/guides/evaluate/">**evaluate symbolically**</a> and <a href="/compute-engine/guides/numerical-evaluation/">**evaluate numerically**</a> expressions
 
 {% readmore "/compute-engine/demo/" %}
 Try the **interactive demo** now
 {% endreadmore %}
 
-## Parse and Serialize LaTeX
 
-Internally, the Compute Engine manipulates expressions represented with the 
-MathJSON format. It's a JSON representation of the Abstract Syntax Tree
-of the expression. It is easy to manipulate programatically and can be
-written by hand. However, you might prefer to use a more concise and
-familiar syntax, such as LaTeX. The Compute Engine includes utilities
-to convert to and from LaTeX strings.
+## Getting Started
 
-**To parse a LaTeX string and serialize to a LaTeX string**, use the `ce.parse()` 
-and `ce.serialize()`  functions.
+The Compute Engine library is available in two flavors:
 
-```js
-import { ComputeEngine } from '@cortex-js/compute-engine';
+* A **JavaScript module** (ESM): `compute-engine.min.esm.js` 
+* A **UMD library**, for CJS or AMD imports: `compute-engine.min.js` 
 
-const ce = new ComputeEngine();
+If you are using a modern environment, use the ESM version. The ESM version 
+does make use of modern JavaScript features such as optional chaining and more.
 
-console.log(ce.parse('5x + 1'));
-// ->  ["Add", ["Multiply", 5, "x"], 1]
+If you are using a vintage environment, or if your toolchain does not support
+modern JavaScript features, use the UMD version. For example, WebPack 4 does 
+not support the optional chaining operator, so use the UMD version in this case,
+which will make use of polyfills as necessary.
 
-console.log(ce.serialize(["Add", ["Power", "x", 3], 2]));
-// ->  x^3 + 2
+A non-minified module, `compute-engine.esm.js`, is also available, which may 
+be useful for debugging.
+
+### Using JavaScript Modules
+
+```html
+<script type="module">
+  import { ComputeEngine } from 
+    'https://unpkg.com/@cortex-js/compute-engine?module';
+
+  const ce = new ComputeEngine();
+  console.log(ce.parse("e^{i\\pi}").N().latex);
+  // ➔ "-1"
+</script>
 
 ```
 
-{% readmore "/compute-engine/guides/latex-syntax/" %}
-Read more about <strong>Parsing and Serializing the LaTeX Syntax</strong>
-{% endreadmore %}
+## Using Vintage JavaScript
 
-**To input math using an interactive mathfield**, use [MathLive](/mathlive/).
-
-A MathLive mathfield works like a textarea in HTML, but for math. It provide 
-its content as a LaTeX string or a MathJSON expression, ready to be used with the Compute Engine.
-
-{% readmore "/mathlive/" %}
-Read more about <strong>MathLive</strong>
-{% endreadmore %}
-
-
-
-## Symbolic Computing and Numerical Evaluation
-
-**To evaluate a symbolic expression**, use the `evaluate()` function.
-
-The result of `evaluate()` is an expression:
-
-- If the expression can be evaluated numerically, the result is a number
-- If it can't be evaluated numerically, the result is a symbolic expression.
-
-```js
-import { evaluate, parse, serialize } from '@cortex-js/compute-engine';
-
-console.log(evaluate(["Add", 2, 3]);
-// ➔ 5
-
-console.log(evaluate(parse('\\frac{\\sqrt{5}}{3}'));
-// ➔ 0.7453559925
-
-console.log(serialize(evaluate(parse('2x + 3x')));
-// ➔ 5x
+```html
+<script src="//unpkg.com/@cortex-js/compute-engine"></script>
+<script>
+  window.onload = function() {
+    const ce = new ComputeEngine.ComputeEngine();
+    console.log(ce.parse("e^{i\\pi}").N().latex);
+    // ➔ "-1"
+  }
+</script>
 ```
 
-The Compute Engine supports **arbitrary precision floating points** and **complex
-numbers**.
-
-The Compute Engine can also simplify, find patterns, substitute terms, apply rewrite rules,
-compare and format expressions.
 
 
-{% readmore "/compute-engine/guides/numerical-evaluation/" %}
-Read more about <strong>Numerical Evaluation</strong>
-{% endreadmore %}
+## Dictionaries
 
+Expressions reference symbols and functions that are defined in dictionaries.
 
-{% readmore "/compute-engine/guides/symbolic-computing/" %}
-Read more about <strong>Symbolic Computing</strong>
-{% endreadmore %}
-
-{% readmore "/compute-engine/guides/patterns-and-rules/" %}
-Read more about <strong>Patterns and Rules</strong>
-{% endreadmore %}
-
-
-
-## Customization
-
-The Compute Engine includes a robust library of mathematical functions. 
-
-**To customize the dictionaries that define the math functions**, create and configure a `ComputeEngine` instance.
-
-The `ComputeEngine` instance also provides access to additional features
-such as defining [assumptions](/compute-engine/guides/assumptions/) about 
-symbols: _x is a positive Real number, n is an Integer_.
-
-```js
-const ce = new ComputeEngine(ComputeEngine.getDictionary('arithmetic'));
-ce.evaluate(['Add', 5, 2]);
-```
+By default, new instances of the Compute Engine include a robust set of
+functions and symbols, grouped in several dictionaries.
 
 <div class=symbols-table>
 
-| Dictionary |  |
+| Dictionary | Symbols/Functions |
 |:---|:---|
-| [Arithmetic](/compute-engine/reference/arithmetic/) | `Add` `Multiply`...|
+| [Arithmetic](/compute-engine/reference/arithmetic/) | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`...|
 | [Calculus](/compute-engine/reference/calculus/) | `Derive` `Integrate`...|
 | [Collections](/compute-engine/reference/collections/)| `Sequence` `List` `Dictionary` `Set`... |
 | [Core](/compute-engine/reference/core/) | `Missing` `Nothing` `None` `All`  `Identity` `InverseFunction` `LatexTokens`... |
-| [Logic](/compute-engine/reference/logic/) |`And` `Or` `Not`...|
-| [Sets](/compute-engine/reference/sets/) | `Union` `Intersection`...|
+| [Logic](/compute-engine/reference/logic/) |`And` `Or` `Not` `True` `False` `Maybe` ...|
+| [Sets](/compute-engine/reference/sets/) | `Union` `Intersection` `EmptySet` ...|
 | [Special Functions](/compute-engine/reference/special-functions/) | `Erf` `Gamma` `Factorial`...|
-| [Trigonometry](/compute-engine/reference/trigonometry/)  | `Cos` `Sin` `Tan`...| 
+| [Trigonometry](/compute-engine/reference/trigonometry/)  | `Pi` `Cos` `Sin` `Tan`...| 
 
 </div>
+
+
+**To customize the dictionaries that define the math functions and symbols**, 
+use the constructor of the Compute Engine instance to define the dictionaries
+to use.
+
+In addition to the built-in dictionaries, you can define your own.
+
+```js
+const ce = new ComputeEngine(ComputeEngine.getDictionary('arithmetic'));
+console.log(ce.box(['Add', 5, 2]).evaluate().json);
+```
+
+Each entry in a dictionary define the properties of that function or
+symbols, as well as how to put expression in canonical form, simplify,
+and evaluate expressions using that function.
+
+There are separate dictionaries that define the LaTeX syntax, that is
+how to parse and serialize LaTeX to MathJSON. You can also customize these
+dictionaries.
 
 {% readmore "/compute-engine/guides/dictionaries/" %}
 Read more about <strong>Dictionaries</strong>
 {% endreadmore %}
+

@@ -459,9 +459,43 @@ document.getElementById('mf').setOptions({
 
 </section>
 
+
+## Displaying the Virtual Keyboard in a Custom Container
+
+By default when a virtual keyboard is created, it is attached at the end of the
+document's `body` element.
+
+In some cases you may want to display the virtual keyboard in some other 
+container.
+
+**To select which DOM element the virtual keyboard is created into**, set the
+`virtualKeyboardContainer` option to the desired DOM element.
+
+The `position` attribute of this container element should be `relative` so that the virtual keyboard can correctly be placed relative to this element.
+
+For example when using [full screen elements](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API) that contain mathfield, set this property to the full screen element to ensure the virtual keyboard will be visible.
+
+
+
+## Customizing the Appearance of the Virtual Keyboard
+
 <section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
 
-## Customizing the Appearance of the Virtual Keyboard Keycaps
+### Customizing the Virtual Keyboard
+
+**To control the appearance of the virtual keyboard background**, use the 
+following CSS variable:
+- `--keyboard-background`, a color
+- `--keyboard-text`, a color
+- `--keyboard-text-active`, a color
+- `--keyboard-background-border`, a color
+
+
+</section
+
+<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
+
+### Customizing the keycaps
 
 **To control the appearance of keycaps**, use the following CSS variables.
   - `--keycap-height`
@@ -469,6 +503,17 @@ document.getElementById('mf').setOptions({
   - `--keycap-small-font-size` (only if needed)
   - `--keycap-extra-small-font-size` (only if needed)
   - `--keycap-tt-font-size` (only if needed)
+  - `--keycap-background`, a color
+  - `--keycap-background-active`, a color
+  - `--keycap-background-border`, a color
+  - `--keycap-background-border-bottom`, a color
+  - `--keycap-text`, a color
+  - `--keycap-text-active`, a color
+  - `--keycap-secondary-text`, a color
+  - `--keycap-modifier-background, a color
+  - `--keycap-modifier-border, a color
+  - `--keycap-modifier-border-bottom, a color
+
 
 Set these CSS variables on any selector inherited by the
 `math-field` tag, for example, `body`: although CSS styles are "invisible" to custom components, CSS variables

@@ -13,10 +13,11 @@ sidebar:
 Sure! 
 
 Have a look at the issue report: if the issue is assigned to someone,
-they're on it! Maybe you can find something else to work on, or you can contact the person its assigned to to see if they need a hand.
+they're on it! Maybe you can find something else to work on, or you can contact 
+the person it's assigned to to see if they need a hand.
 
-Otherwise, add a comment in the issue indicating you'd like to
-work on resolving the issue and go for it!
+If the issue is not assigned to anyone, add a comment in the issue indicating 
+you'd like to work on resolving the issue and go for it!
 
 ## How to Submit Some Code?
 
