@@ -32,14 +32,27 @@ echo -e "$LINECLEAR$BASENAME$CHECK Submodules copied"
 
 
 ## Grok (.d.ts -> .html with frontmatter)
-echo -e "$BASENAME$DOT Groking mathlive"
 # Uses grok.config.js for additional config option
-npx grok build ../mathlive/dist/public/ --sdkName mathlive --outDir ./src/build/ --outFile mathlive.html --modules mathfield-element options mathlive mathfield commands core
+
+echo -e "$BASENAME$DOT Groking mathlive"
+cd ../mathlive
+#npx grok build ./src/mathlive.ts --config ../cortexjs.io/grok.config.js --sdkName mathlive --outDir ../cortexjs.io/src/build/ --outFile mathlive.html --modules mathfield-element options mathlive mathfield commands core
+cd ../cortexjs.io/
+
 # echo -e "$BASENAME$DOT Groking MathJSON"
 # npx grok  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName math-json --outDir ./src/build/ --outFile math-json.html
+
 echo -e "$BASENAME$DOT Groking Compute Engine"
-npx grok build ./submodules/compute-engine/src/compute-engine.ts --sdkName compute-engine --outDir ./src/build/ --ignore-errors --outFile compute-engine.html
+cd ../compute-engine/
+#npx grok build ./src/compute-engine.ts --config ../cortexjs.io/grok.config.js --sdkName compute-engine --outDir ../cortexjs.io/src/build/ --outFile compute-engine.html
+cd ../cortexjs.io/
+
 echo -e "$BASENAME$CHECK Groked"
+
+# Copy the ChangeLog
+mkdir -p ./src/build/compute-engine/
+cp ./src/_data/_compute-engine-changelog.md ./src/build/compute-engine/changelog.md
+cat ./submodules/compute-engine/CHANGELOG.md >> ./src/build/compute-engine/changeLog.md
 
 
 ## Build the guides from the source directories

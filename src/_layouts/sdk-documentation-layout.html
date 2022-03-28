@@ -1,20 +1,19 @@
 ---
 ---
 <!doctype html>
-<html lang="{{ site.locale | slice: 0,2 | default: "en" }}" class="no-js">
-  <head>
-    {% assign stylesheet = "/assets/css/sdk-documentation-layout.css" %}
-    {% include head.html %}
-    <!-- <link rel="stylesheet" href="{{ '/assets/css/sdk-documentation-layout.css' | url }}"> -->
-    {% include head/custom.html %}
-  </head>
+<html lang='{{ site.locale | slice: 0,2 | default: "en" }}' class="no-js">
+<head>
+  {% assign stylesheet = "/assets/css/sdk-documentation-layout.css" %}
+  {% include head.html %}
+  {% include head/custom.html %}
+</head>
 
-  <body class="layout--{{ layout }}{% if classes or layout.classes %}{{ classes | default: layout.classes | join: ' ' | prepend: ' ' }}{% endif %}">
-    {% include skip-links.html %}
-    {% include browser-upgrade.html %}
-    {% include masthead.html %}
+<body class="layout--{{ layout }}{% if classes or layout.classes %}{{ classes | default: layout.classes | join: ' ' | prepend: ' ' }}{% endif %}">
+  {% include skip-links.html %}
+  {% include browser-upgrade.html %}
+  {% include masthead.html %}
 
-    <div class="initial-content">
+<div class="initial-content">
 {% if header.overlay_color or header.overlay_image or header.image %}
   {% include page__hero.html %}
 {% elsif header.video.id and header.video.provider %}
@@ -33,8 +32,8 @@
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
     {% if title %}<meta itemprop="headline" content="{{ title  | strip_html | strip_newlines | escape_once }}">{% endif %}
     {% if excerpt %}<meta itemprop="description" content="{{ excerpt  | strip_html | strip_newlines | escape_once }}">{% endif %}
-    {% if date %}<meta itemprop="datePublished" content="{{ date | date: "%B %d, %Y" }}">{% endif %}
-    {% if last_modified_at %}<meta itemprop="dateModified" content="{{ last_modified_at | date: "%B %d, %Y" }}">{% endif %}
+    {% if date %}<meta itemprop="datePublished" content='{{ date | date: "%B %d, %Y" }}'>{% endif %}
+    {% if last_modified_at %}<meta itemprop="dateModified" content='{{ last_modified_at | date: "%B %d, %Y" }}'>{% endif %}
 
     <div class="page__inner-wrap">
       {% unless header.overlay_color or header.overlay_image %}
@@ -65,9 +64,9 @@
         {% endif %}
         {% include page__taxonomy.html %}
         {% if last_modified_at %}
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ last_modified_at | date: '%Y-%m-%d' }}">{{ last_modified_at | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong>{{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ last_modified_at | date: '%Y-%m-%d' }}">{{ last_modified_at | date: "%B %d, %Y" }}</time></p>
         {% elsif date %}
-          <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ date | '%Y-%m-%d' }}">{{ date | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ date | '%Y-%m-%d' }}">{{ date | date: "%B %d, %Y" }}</time></p>
         {% endif %}
       </footer>
 
@@ -80,24 +79,17 @@
 
 
 </div>
-    </div>
+</div>
 
-    {% if site.search == true %}
-      <div class="search-content">
-        {% include search/search_form.html %}
-      </div>
-    {% endif %}
+{% if site.search == true %}
+<div class="search-content">{% include search/search_form.html %}</div>
+{% endif %}
 
-    <div id="footer" class="page__footer">
-      <footer>
-        {% include footer/custom.html %}
-        {% include footer.html %}
-      </footer>
-    </div>
+<div id="footer" class="page__footer"><footer>{% include footer/custom.html %}{% include footer.html %}</footer></div>
 
-    {% include scripts.html %}
+{% include scripts.html %}
 
-  </body>
+</body>
 </html>
 
 

@@ -112,7 +112,7 @@ The API documentation should follow the Google Documentation Style Guide
 (https://developers.google.com/style/api-reference-comments) and
 https://developers.google.com/style
 
-In addition, the Typescript code should follow the Google Style Guide:
+In addition, the TypeScript code should follow the Google Style Guide:
 https://google.github.io/styleguide/jsguide.html#naming
 
 ## Setup and scripts

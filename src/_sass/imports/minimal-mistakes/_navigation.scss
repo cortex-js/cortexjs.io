@@ -329,6 +329,7 @@
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          font-weight: 900;
 
           padding: 1em;
 
@@ -363,17 +364,14 @@
         }
 
         ul {
-            margin-bottom: 1em;
+            // margin-bottom: 1em;
         }
 
         a {
             display: block;
             padding: 0.25em 0;
-
-            @include breakpoint($large) {
-                padding-top: 0.125em;
-                padding-bottom: 0.125em;
-            }
+            padding-top: 0.125em;
+            padding-bottom: 0.125em;
 
             &:hover {
                 text-decoration: underline;
@@ -420,7 +418,7 @@
         position: absolute;
         max-height: max-content;
         opacity: 1;
-        margin-top: 50px; // Height of the circular menu
+        margin-top: 73px; // Height of the circular menu
         transform: translate(0, 0);
         top: 0;
         left: 0;
@@ -429,14 +427,15 @@
         border-radius: 8px;
         border: 1px solid #ddd;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-        column-count: 3;
+        column-count: 2;
+        column-fill: auto;
         padding: 1em;
         // .separator {
         //   margin-left: 0;
         // }
         li {
           font-size: 1.5rem;
-          padding: 0 0 .25em 8px;
+          padding: 0 0 .25em 0;
           display: block; // prevent breaking inside multicol
           break-inside: avoid;
           .nav__sub-title {
@@ -449,7 +448,7 @@
 
 @include breakpoint(max-width $medium - 1px) {
   .nav__list input:checked ~ .nav__items {
-    column-count: 2;
+    column-count: 1;
     margin:0;
     margin-top: 50px;
     // .separator {
@@ -457,6 +456,7 @@
     // }
     li {
       font-size: 1rem;
+      padding: 0 0 0.25em 0;
       .nav__sub-title {
         font-size: 1rem;
       }
@@ -495,7 +495,10 @@
   width: 1em;
   height: 1em;
   margin-right: 6px;
-  margin-left: 0;
+  @include breakpoint(max-width $large - 1px) {
+    margin-right: 12px;
+  }
+    margin-left: 0;
 }
 
 .nav__no-icon {

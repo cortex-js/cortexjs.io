@@ -40,7 +40,7 @@ module.exports = function (eleventyConfig) {
     // See https://markdown-it.github.io/markdown-it/
     html: true,
     typographer: true,
-    quotes: '""‘’',
+    quotes: '“”‘’',
     highlight: function (str, lang) {
       if (lang && hljs.getLanguage(lang)) {
         try {

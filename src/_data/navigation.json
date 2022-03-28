@@ -14,11 +14,11 @@
 		},
 		{
 			"description": "Chat on Gitter",
-			"title": "<svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>",
+			"title": "<svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>",
 			"url": "https://gitter.im/cortex-js"
 		},
 		{
-			"title": "<svg class='icon1em'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>",
+			"title": "<svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>",
 			"url": "https://github.com/cortex-js",
 			"description": "Get source code on GitHub"
 		}
@@ -167,6 +167,12 @@
 				},
         { "separator": true },
 				{
+					"title": "Changelog",
+					"url": "/compute-engine/changelog/",
+          "icon": "log"
+				},
+        { "separator": true },
+				{
 					"title": "Expressions",
 					"url": "/compute-engine/guides/expressions/",
           "icon": "guide"
@@ -177,23 +183,28 @@
           "icon": "guide"
 				},
 				{
-					"title": "Evaluate",
-					"url": "/compute-engine/guides/evaluate/",
-          "icon": "guide"
-				},
-				{
 					"title": "Symbolic Computing",
 					"url": "/compute-engine/guides/symbolic-computing/",
           "icon": "guide"
 				},
 				{
-					"title": "Numerical Evaluation",
-					"url": "/compute-engine/guides/numerical-evaluation/",
+					"title": "Canonical Form",
+					"url": "/compute-engine/guides/canonical-form/",
           "icon": "guide"
 				},
 				{
 					"title": "Simplify",
 					"url": "/compute-engine/guides/simplify/",
+          "icon": "guide"
+				},
+				{
+					"title": "Evaluation",
+					"url": "/compute-engine/guides/evaluate/",
+          "icon": "guide"
+				},
+				{
+					"title": "Numerical Evaluation",
+					"url": "/compute-engine/guides/numerical-evaluation/",
           "icon": "guide"
 				},
 				{
@@ -207,18 +218,8 @@
           "icon": "guide"
 				},
 				{
-					"title": "Execution Constraints",
-					"url": "/compute-engine/guides/execution-constraints/",
-          "icon": "guide"
-				},
-				{
 					"title": "Patterns and Rules",
 					"url": "/compute-engine/guides/patterns-and-rules/",
-          "icon": "guide"
-				},
-				{
-					"title": "Canonical Expressions",
-					"url": "/compute-engine/guides/canonical-expressions/",
           "icon": "guide"
 				},
         { "separator": true },

@@ -47,3 +47,10 @@
     min-width: 15ex;
   }
 }
+
+.equal-width-columns table {
+  table-layout: fixed;
+  th {
+    width: 1%;
+  }
+}

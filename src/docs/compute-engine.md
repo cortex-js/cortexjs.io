@@ -12,6 +12,20 @@ sidebar:
 The **CortexJS Compute Engine** is a JavaScript/TypeScript library for symbolic
 computing and numerical evaluation of mathematical expressions.
 
+```ts
+const ce = new ComputeEngine();
+
+console.log(ce.parse("e^{i\\pi}").N().latex);
+// ➔ "-1"
+
+
+const expr = ce.parse("(a+b)^2");
+console.log(ce.box("Expand", [expr]).evaluate().latex);
+// ➔ "a^2 + 2ab + b^2"
+
+```
+
+
 {% readmore "/compute-engine/changelog" %}
 The API in version `0.4.3` has changed. The **CHANGELOG** includes a migration 
 guide to help you update your code from previous version to `0.4.3`
