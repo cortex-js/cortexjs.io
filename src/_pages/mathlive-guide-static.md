@@ -15,11 +15,11 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
-    - //unpkg.com/mathlive/dist/mathlive.min.mjs
+    - //unpkg.com/mathlive?module
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
+        mathlive: "//unpkg.com/mathlive?module",
     };
 </script>
 

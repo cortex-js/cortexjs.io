@@ -18,7 +18,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
+        mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
@@ -97,10 +97,10 @@ of the name of the keyboards that should be displayed.
     </style>
 <div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
-<div slot="javascript">import 'mathlive';
-document.getElementById('mf').setOptions({
+<div slot="javascript">import "mathlive";
+document.getElementById("mf").setOptions({
   virtualKeyboardMode: "manual",
-  virtualKeyboards: 'numeric symbols'
+  virtualKeyboards: "numeric symbols"
 });</div>
 </code-playground>
 
@@ -491,7 +491,7 @@ following CSS variable:
 - `--keyboard-background-border`, a color
 
 
-</section
+</section>
 
 <section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
 
@@ -510,9 +510,9 @@ following CSS variable:
   - `--keycap-text`, a color
   - `--keycap-text-active`, a color
   - `--keycap-secondary-text`, a color
-  - `--keycap-modifier-background, a color
-  - `--keycap-modifier-border, a color
-  - `--keycap-modifier-border-bottom, a color
+  - `--keycap-modifier-background`, a color
+  - `--keycap-modifier-border`, a color
+  - `--keycap-modifier-border-bottom`, a color
 
 
 Set these CSS variables on any selector inherited by the

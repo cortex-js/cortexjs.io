@@ -19,7 +19,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
+        mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>

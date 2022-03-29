@@ -18,7 +18,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
+        mathlive: "//unpkg.com/mathlive?module",
     };
 </script>
 
@@ -51,7 +51,7 @@ loses focus and the content has been modified. {.notice--info}
     // `ev.target` is an instance of `MathfieldElement`
     console.log(ev.target.value);
 });</div>
-    <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
+    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -68,7 +68,7 @@ The MathJSON format is a lightweight mathematical notation interchange format. [
 **Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'math-json'` to `'spoken-text'`.{.notice--info}
 
 <code-playground layout="stack">
-    <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
+    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>

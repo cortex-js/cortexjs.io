@@ -2314,11 +2314,7 @@ TeX packages or macros.
 
 
 <script type='module'>
-import { version } from "https://unpkg.com/mathlive/dist/mathlive.min.mjs";
+import { version } from "https://unpkg.com/mathlive?module";
 document.body.classList.add('ready');
-
-
-
-    document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / Cortex Compute Engine ${ version.computeEngine }`;
-
+document.getElementById('version').innerHTML = `MathLive ${version.mathlive} / Cortex Compute Engine ${ version.computeEngine }`;
 </script>

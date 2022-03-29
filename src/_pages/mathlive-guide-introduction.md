@@ -18,7 +18,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
+        mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
@@ -30,7 +30,7 @@ Let's add an editable mathfield to a web page.
 **1. Load the MathLive library from a CDN with a `<script>` tag.**
 
 ```html
-<script defer src="//unpkg.com/mathlive/dist/mathlive.min.js"></script>
+<script defer src="//unpkg.com/mathlive"></script>
 ```
 
 **2. Add a `<math-field>` tag.** The content of the this tag is the initial value 
@@ -61,7 +61,7 @@ Press **Reset** to bring back the playground to its original state. {.notice--in
         outline: none;
       }
     </style>
-    <div slot="html">&lt;script src="//unpkg.com/mathlive/dist/mathlive.min.js"&gt;&lt;/script&gt;
+    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>

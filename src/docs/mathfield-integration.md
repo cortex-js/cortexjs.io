@@ -17,6 +17,14 @@ In this section we'll discuss other options for adding a mathfield in a web page
 
 ## Creating Mathfield Elements Programmatically
 
+In most cases you can simply use a `<mathfield>` tag:
+
+```html
+<mathfield>e^{i\\pi}</mathfield>
+```
+If you need to add a mathfield to your DOM dynamically, you can create 
+new Mathfield DOM elements and add them to the DOM.
+
 **To create a Mathfield DOM element**, use `new MathfieldElement()`.
 
 ```javascript
@@ -38,23 +46,26 @@ Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
 ## Using MathLive with JavaScript Modules
 
 In addition to `MathfieldElement`, the MathLive library provide some functions
-such as `renderMathInDocument()`. To access those functions, import the 
-MathLive module.
+such as `renderMathInDocument()`. 
+
+**To access those functions**, import the MathLive module.
 
 JavaScript modules offer several benefits (asynchronous, deterministics loading, 
 no pollution of the global namespace, etc...). They are the recommended approach 
-to use MathLive APIS in your project.
+to use MathLive APIs in your project.
 
 **To use MathLive as a JavaScript module**:
 
 1. Include a `<script>` tag, with a `type="module"` attribute
 2. In the body of this `<script>` tag, use an `import` directive pointing to a 
-CDN URL for MathLive, such as `https://unpkg.com/mathlive/dist/mathlive.min.mjs`
+CDN URL for MathLive, such as `https://unpkg.com/mathlive?module`. 
+
+    Note the `?module` suffix which indicate to the CDN we need the ESM version of MathLive.
 3. Invoke a MathLive API, such as `renderMathInDocument()`.
 
 With this setup, MathLive will dynamically insert one or more stylesheets in 
 the page, as needed, for example when a mathfield is created. MathLive will 
- dynamically download the required fonts from the CDN as well.
+dynamically download the required fonts from the CDN as well.
 
 ```html
 <!DOCTYPE html>
@@ -62,8 +73,7 @@ the page, as needed, for example when a mathfield is created. MathLive will
 <body>
   <p>$$\frac{\pi}{2}$$</p>
   <script type="module">
-    import { renderMathInDocument } 
-    from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
+    import { renderMathInDocument } from 'https://unpkg.com/mathlive?module';
 
     window.addEventListener('DOMContentLoaded', 
       () => renderMathInDocument()
@@ -87,21 +97,24 @@ can use a `<script>` tag to load the MathLive library.
 
 A few things to note:
 
-1. Use the `.min.js` version, not the `.min.mjs` one. The later one only works 
-with modules.
-2. After loading the script, the global `MathLive` object will provide access 
+1. After loading the script, the global `MathLive` object will provide access 
 to the MathLive API. Unlike with modules, you may run into situations where the
 scripts are loaded out of order therefore the `MathLive` global may be 
 `undefined` by the time your script is run.
-3. Just like with modules, the necessary stylesheets and fonts will be loaded
+2. Just like with modules, the necessary stylesheets and fonts will be loaded
 when required.
+3. The `/dist` folder inside MathLive contains the various flavors of libraries. 
+  The `.mjs` suffix indicates ESM/module versions. The `.min` tag
+  indicates a "minified" version. The ones without `.min` are more legible
+  and may be useful for debugging.
+
 
 ```html
 <!DOCTYPE html>
 <html>
 <body>
     <p>$$\frac{\pi}{2}$$</p>
-    <script src="https://unpkg.com/mathlive/dist/mathlive.min.js"></script>
+    <script src="https://unpkg.com/mathlive"></script>
     <script>
       window.addEventListener('DOMContentLoaded', 
         () => MathLive.renderMathInDocument()
@@ -248,7 +261,7 @@ MathLive library is not necessary to render the formula.
   <div id="formula"></div>
   <script type="module">
     import {convertLatexToMarkup} 
-    from 'https://unpkg.com/mathlive/dist/mathlive.min.mjs';
+    from 'https://unpkg.com/mathlive?module';
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById("formula").innerHTML = 
         convertLatexToMarkup(`\\xrightarrow[\\Delta]{\\text{abcd}}`)

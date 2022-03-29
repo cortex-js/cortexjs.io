@@ -17,7 +17,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive/dist/mathlive.min.mjs",
+        mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
@@ -65,7 +65,7 @@ function updateLatex() {
 mf.addEventListener('input', updateLatex);
 updateLatex();</div>
     <div slot="html">
-&lt;math-field id="formula" virtual-keyboard-mode=manual&gt;
+&lt;math-field id="formula" virtual-keyboard-mode="manual"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
 &lt;textarea id="latex"&gt;&lt;/textarea&gt;</div>
