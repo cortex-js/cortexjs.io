@@ -291,10 +291,10 @@ strong var {
     padding: 20px 17px;
     border-radius: 4px;
     border: 1px solid $border-color;
-    background-color: $card-background-color;
+    // background-color: $card-background-color;
     color: $text-color;
     max-width: 820px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    // box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
 .card[disabled] {
@@ -302,7 +302,7 @@ strong var {
     pointer-events: none;
 }
 
-.card h3 {
+section.page__content .card h3 {
     // display: flex;
     // justify-content: space-between;
     position: relative; // Override sticky h3
@@ -325,6 +325,7 @@ strong var {
     white-space: nowrap;
 
     color: $text-color;
+    background-color: $card-background-color;
     // letter-spacing: .25px;
     border: none;
     border-bottom: 1px solid #e7e7e7;
@@ -393,23 +394,30 @@ html {
     }
 }
 
-body.layout--sdk-documentation-layout #main a,
-body.layout--sdk-documentation-layout #main a:active,
-body.layout--sdk-documentation-layout #main a:visited,
-body.layout--sdk-documentation-layout #main a:hover {
+body.layout--sdk-documentation-layout article.page a,
+body.layout--sdk-documentation-layout article.page a:active,
+body.layout--sdk-documentation-layout article.page a:visited,
+body.layout--sdk-documentation-layout article.page a:hover {
     color: $primary-color;
     text-decoration: none;
 }
 
+// For list of arguments in function signatures
 .page__content dt {
-    font-family: $monospace;
-    // font-size: $code-font-size;
-    font-size: 1rem;
-    font-weight: 400;
-    padding: 8px;
-    margin: -8px;
-    border-radius: 8px;
+  display: list-item;
+  list-style: square;
+  font-family: $monospace;
+  // font-size: $code-font-size;
+  font-size: 1rem;
+  font-weight: 400;
+  padding: 0;
+  margin: 0 0 0 18px;
 }
+
+.page__content dt::marker {
+  opacity: .5;
+}
+
 
 .page__content dt strong {
     // To support target highliting for dt/dd

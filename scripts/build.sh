@@ -35,17 +35,13 @@ echo -e "$LINECLEAR$BASENAME$CHECK Submodules copied"
 # Uses grok.config.js for additional config option
 
 echo -e "$BASENAME$DOT Groking mathlive"
-cd ../mathlive
-#npx grok build ./src/mathlive.ts --config ../cortexjs.io/grok.config.js --sdkName mathlive --outDir ../cortexjs.io/src/build/ --outFile mathlive.html --modules mathfield-element options mathlive mathfield commands core
-cd ../cortexjs.io/
+npx grok build ../mathlive --inFile ./src/mathlive.ts --config ./grok.config.js --sdkName mathlive --outDir ./src/build/ --outFile mathlive.html --modules mathfield-element options mathlive mathfield commands core
 
 # echo -e "$BASENAME$DOT Groking MathJSON"
 # npx grok  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName math-json --outDir ./src/build/ --outFile math-json.html
 
 echo -e "$BASENAME$DOT Groking Compute Engine"
-cd ../compute-engine/
-#npx grok build ./src/compute-engine.ts --config ../cortexjs.io/grok.config.js --sdkName compute-engine --outDir ../cortexjs.io/src/build/ --outFile compute-engine.html
-cd ../cortexjs.io/
+npx grok build ../compute-engine/ --inFile ./src/compute-engine.ts --config ./grok.config.js --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
 
 echo -e "$BASENAME$CHECK Groked"
 

@@ -36,16 +36,15 @@
     {% if last_modified_at %}<meta itemprop="dateModified" content='{{ last_modified_at | date: "%B %d, %Y" }}'>{% endif %}
 
     <div class="page__inner-wrap">
-      {% unless header.overlay_color or header.overlay_image %}
+      <section class="page__content" itemprop="text">
+        {% unless header.overlay_color or header.overlay_image %}
         <header>
           {% if title %}<h1 id="page-title" class="page__title" itemprop="headline">{{ title  | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
           {% if read_time %}
             <p class="page__meta"><i class="far fa-clock" aria-hidden="true"></i> {% include read-time.html %}</p>
           {% endif %}
         </header>
-      {% endunless %}
-
-      <section class="page__content" itemprop="text">
+        {% endunless %}
         {% if toc %}
           <aside class="sidebar__right {% if toc_sticky %}sticky{% endif %}">
             <nav class="toc">

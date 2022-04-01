@@ -10,7 +10,7 @@ sidebar:
 <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>
 
 The **CortexJS Compute Engine** is a JavaScript/TypeScript library for symbolic
-computing and numerical evaluation of mathematical expressions.
+computing and numeric evaluation of mathematical expressions.
 
 ```ts
 const ce = new ComputeEngine();
@@ -42,7 +42,7 @@ The CortexJS Compute Engine manipulates math expressions represented with the <a
 The Compute Engine can:
 - <a href="/compute-engine/guides/latex-syntax/">**parse** and **serialize**</a> expressions from and to LaTeX
 - <a href="/compute-engine/guides/simplify/">**simplify**</a> expressions
-- <a href="/compute-engine/guides/evaluate/">**evaluate symbolically**</a> and <a href="/compute-engine/guides/numerical-evaluation/">**evaluate numerically**</a> expressions
+- <a href="/compute-engine/guides/evaluate/">**evaluate symbolically**</a> and <a href="/compute-engine/guides/numeric-evaluation/">**evaluate numerically**</a> expressions
 
 {% readmore "/compute-engine/demo/" %}
 Try the **interactive demo** now
