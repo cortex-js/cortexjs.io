@@ -8,6 +8,10 @@ This repo contains the source files for the "cortexjs.io" website.
 ## First time after cloning the project or after making some source changes
 
 ```bash
+git submodule init
+
+git submodule update
+
 # Setup, make a dev build and start a server
 npm start
 ```
