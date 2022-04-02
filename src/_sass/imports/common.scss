@@ -13,9 +13,9 @@ $h4-font-size: 18px;
 $h5-font-size: 16px;
 $subheading-font-size: 11px;
 
-$primary-color: #0066ce;
+$primary-color: #0066ce !default !global;
 $primary-color-dark: hsl(210, 100%, 30%);
-$primary-color-light: hsl(210, 100%, 60%);
+$primary-color-light: hsl(210, 66%, 55%);
 $secondary: #999;
 $primary: $primary-color;
 // $body-color: #5c5050;
@@ -90,9 +90,27 @@ $semantic-orange: #e68619;
 $semantic-green: #2d9d78;
 
 :root {
-    --primary-color: $primary-color;
-    --primary-color-dark: $primary-color-dark;
-    --primary-color-light: $primary-color-light;
-    --secondary: $seconday;
-    --primary: $primary-color;
+  --primary-color: #{$primary-color};
+  --link-color: #{$primary-color};
+  --primary-color-dark: #{$primary-color-dark};
+  --primary-color-light: #{$primary-color-light};
+  --secondary: #{$secondary};
+  --primary: #{$primary-color};
+
+  // Callout boxes are used for "Read More"
+  --callout-background: #e6f0fa;
+  --callout-shadow: 0 1px 1px rgba(0, 102, 206, 0.25);
+  --callout-border-color: rgba(0, 102, 206, 0.25);
+  --callout-border-color-hover: #{$primary};
+
+  --highlight-color: hsla(49, 100%, 63%, 0.56);
+
+  --text-color: #333;
+  --text-color-dimmed: #666;
+
+  --table-thin-line-color: #ddd;
+  --table-thick-line-color: #333;
+
+  --placeholder-color: #9aa0a6;
+
 }

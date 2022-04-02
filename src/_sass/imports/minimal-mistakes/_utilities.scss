@@ -208,7 +208,7 @@ body:hover .visually-hidden button {
   .fab,
   .far,
   .fal {
-    color: $text-color;
+    color: var(--text-color);
   }
 
   .fa-behance,

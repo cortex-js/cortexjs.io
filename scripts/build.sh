@@ -41,7 +41,8 @@ npx grok build ../mathlive --inFile ./src/mathlive.ts --config ./grok.config.js 
 # npx grok  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName math-json --outDir ./src/build/ --outFile math-json.html
 
 echo -e "$BASENAME$DOT Groking Compute Engine"
-npx grok build ../compute-engine/ --inFile ./src/compute-engine.ts --config ./grok.config.js --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
+npm --prefix ./submodules/compute-engine run build
+npx grok build ./submodules/compute-engine/ --inFile ./src/compute-engine.ts --config ./grok.config.js --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
 
 echo -e "$BASENAME$CHECK Groked"
 

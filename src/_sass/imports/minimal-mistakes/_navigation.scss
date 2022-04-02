@@ -333,7 +333,7 @@
 
           padding: 1em;
 
-          color: $text-color;
+          color: var(--text-color);
           border: 1px solid $light-gray;
           background: #fff;
           border-radius: 4px;
@@ -553,7 +553,7 @@
         border-bottom: 1px solid $border-color;
 
         &:hover {
-            color: $text-color;
+            color: var(--text-color);
         }
     }
 

@@ -16,7 +16,7 @@
 }
 
 .greedy-nav a:hover {
-    color: $primary;
+    color: var(--primary-color);
 }
 
 .masthead__menu-item {
@@ -26,7 +26,7 @@
 }
 
 .masthead__menu-item.active a {
-  color: $primary;
+  color: var(--primary-color);
 }
 
 .masthead__menu-item.separator {

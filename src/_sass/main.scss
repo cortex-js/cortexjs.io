@@ -78,38 +78,41 @@ a.chevron::after {
  * 
  */
 
-.page__content .read-more {
-  color:#000;
+.read-more {
   margin: 2em 0 !important;
+  width: 100%; 
+
   /* override*/
-  color: #494e52;
+  color: #494e52;   /* This color is not currently used, as the read-more content is a <a> tag. See ".read-more a" below */
   font-family: $body-font;
   font-size: 1rem !important;
   text-indent: initial;
   /* override*/
-  background-color: #e6f0fa;
+  background: var(--callout-background);
   border-radius: 4px;
-  box-shadow: 0 1px 1px rgba(0, 102, 206, 0.25);
-  width: 100%; 
-  border: 1px solid rgba(0, 102, 206, 0.25);
+  box-shadow: var(--callout-shadow);
+  border: 1px solid var(--callout-border-color);
   transition: box-shadow,transform,border .16s ease-out,-webkit-transform .16s ease-out;
   will-change: box-shadow,transform,border;
 }
-.page__content .read-more a{
+
+/* The body of a read-more is a <a> tag */
+.read-more a{
   padding: 1em;
   display: block;
-  color: #0066ce; 
+  color: var(--primary-color); 
   font-size: 1.1em;
   text-decoration: none;
 }
 
-.page__content .read-more:hover {
-  border: 1px solid #0066ce;
+.read-more:hover {
+  border: 1px solid var(--callout-border-color-hover);
   transform: scale(1.007);
   box-shadow: 0 5px 10px rgba(0,0,0,0.04);
 }
 
-.page__content .read-more:hover a{
+// Need the .page__content to have sufficient specificity 
+.page__content .read-more:hover a {
   text-decoration: none;
 }
 
@@ -144,11 +147,11 @@ code + .tags {
     padding-left:.5em;
     padding-right: .5em;
     margin-left: 1em;
-    color: #333;
+    color: var(--text-color);
     background: #eee;
     }
   .tag.inert {
-    color: #666;
+    color: var(--text-color-dimmed);
     background: #d4d5d2;
   }
   .tag.constructor {

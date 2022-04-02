@@ -170,7 +170,7 @@ div.figure + div.copy {
 }
 
 section.fullwidth h2 {
-    color: $text-color;
+    color: var(--text-color);
     font: 700 56px/50px $display-font;
     margin: 0;
     padding: 0;
@@ -244,7 +244,7 @@ section.fullwidth.light-card {
 
 .cards .card {
     background: $card-background-color;
-    color: $text-color;
+    color: var(--text-color);
     border: 1px solid $border-color;
 }
 
@@ -353,7 +353,7 @@ section.fullwidth.light-card {
 .cards.col3 h3 {
     font: 400 24px/1.1 $display-font;
     margin-bottom: 1em;
-    color: $text-color;
+    color: var(--text-color);
 }
 
 .single-column {
@@ -381,7 +381,7 @@ section.fullwidth.light-card {
     margin: 0;
   }
   & a p {
-    color: $text-color;
+    color: var(--text-color);
     padding-left: 1em;
     text-decoration: none;
   }  
