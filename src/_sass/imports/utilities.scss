@@ -161,9 +161,9 @@
 }
 
 .icon-primary {
-    --fa-primary-color: $primary-color;
-    --fa-secondary-color: $primary-color;
-    color: $primary-color;
+    --fa-primary-color: var(--primary-color);
+    --fa-secondary-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .icon-secondary {
@@ -236,7 +236,7 @@
     background: transparent;
     margin-top: 0;
     font-weight: 700;
-    color: $primary;
+    color: var(--primary-color);
     border: none;
     white-space: normal;
     line-height: 1;

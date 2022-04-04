@@ -12,7 +12,7 @@ body {
   margin: 0;
   padding: 0;
   color: var(--text-color);
-  font-family: $global-font-family;
+  font-family: var(--body-font);
   line-height: 1.5;
 
   &.overflow--hidden {
@@ -29,7 +29,7 @@ h5,
 h6 {
   margin: 2em 0 0.5em;
   line-height: 1.2;
-  font-family: $header-font-family;
+  font-family: var(--display-font);
   font-weight: bold;
 }
 
@@ -111,7 +111,7 @@ blockquote {
   padding-left: 1em;
   padding-right: 1em;
   font-style: italic;
-  border-left: 0.25em solid $primary-color;
+  border-left: 0.25em solid var(--primary-color);
 
   cite {
     font-style: italic;
@@ -131,11 +131,11 @@ a {
   }
 
   &:visited {
-    color: $link-color-visited;
+    color: var(--link-color-visited);
   }
 
   &:hover {
-    color: $link-color-hover;
+    color: var(--link-color-hover);
     outline: 0;
   }
 }
@@ -153,16 +153,16 @@ code,
 kbd,
 samp,
 pre {
-  font-family: $monospace;
+  font-family: var(--monospace-font);
 }
 
 kbd {
   padding: 2px 5px 2px;
   margin-left: 2px;
   margin-right: 2px;
-  border: 1px solid #ddd;
+  border: var(--code-border);
   border-radius: $border-radius;
-  background: $code-background-color;
+  background: var(--code-background);
   font-size: 0.8em;
 }
 
@@ -179,8 +179,8 @@ td > code {
   padding-top: 0.1rem;
   padding-bottom: 0.1rem;
   font-size: 0.8em;
-  border: 1px solid $border-color;
-  background: $code-background-color;
+  border: var(--code-border);
+  background: var(--code-background);
   border-radius: $border-radius;
 
   &:before,
@@ -196,7 +196,7 @@ hr {
   display: block;
   margin: 1em 0;
   border: 0;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--border-color);
   width: 100%;
 }
 
@@ -272,7 +272,7 @@ figure {
 
 figcaption {
   margin-bottom: 0.5em;
-  color: $muted-text-color;
+  color: var(--muted-text-color);
   font-family: $caption-font-family;
   font-size: $type-size-6;
 
@@ -280,7 +280,7 @@ figcaption {
     transition: $global-transition;
 
     &:hover {
-      color: $link-color-hover;
+      color: var(--link-color-hover);
     }
   }
 }

@@ -1,8 +1,8 @@
-$monospace: 'IBM Plex Mono', 'Fira Code', monospace !default;
-$sans-serif: 'IBM Plex Sans', 'Source Sans Pro', sans-serif !default;
-$body-font:  $sans-serif;
-$display-font:  $sans-serif;
+// $sans-serif: 'IBM Plex Sans', 'Source Sans Pro', sans-serif !default;
+// $body-font:  $sans-serif;
+// $display-font:  $sans-serif;
 
+@import 'code-theme';
 
 $body-font-size: 16px;
 $code-font-size: 13px;
@@ -13,76 +13,163 @@ $h4-font-size: 18px;
 $h5-font-size: 16px;
 $subheading-font-size: 11px;
 
-$primary-color: #0066ce !default !global;
-$primary-color-dark: hsl(210, 100%, 30%);
-$primary-color-light: hsl(210, 66%, 55%);
-$secondary: #999;
-$primary: $primary-color;
-// $body-color: #5c5050;
 
-$celery-400: rgb(68, 181, 86);
-$celery-500: rgb(75, 195, 95);
-$celery-600: rgb(81, 210, 103);
-$celery-700: rgb(88, 224, 111);
-$chartreuse-400: rgb(133, 208, 68);
-$chartreuse-500: rgb(142, 222, 73);
-$chartreuse-600: rgb(155, 236, 84);
-$chartreuse-700: rgb(163, 248, 88);
-$yellow-400: rgb(223, 191, 0);
-$yellow-500: rgb(237, 204, 0);
-$yellow-600: rgb(250, 217, 0);
-$yellow-700: rgb(255, 226, 46);
-$magenta-400: rgb(216, 55, 144);
-$magenta-500: rgb(226, 73, 157);
-$magenta-600: rgb(236, 90, 170);
-$magenta-700: rgb(245, 107, 183);
-$fuchsia-400: rgb(192, 56, 204);
-$fuchsia-500: rgb(207, 62, 220);
-$fuchsia-600: rgb(217, 81, 229);
-$fuchsia-700: rgb(227, 102, 239);
-$purple-400: rgb(146, 86, 217);
-$purple-500: rgb(157, 100, 225);
-$purple-600: rgb(168, 115, 233);
-$purple-700: rgb(180, 131, 240);
-$indigo-400: rgb(103, 103, 236);
-$indigo-500: rgb(117, 117, 241);
-$indigo-600: rgb(130, 130, 246);
-$indigo-700: rgb(144, 144, 250);
-$seafoam-400: rgb(27, 149, 154);
-$seafoam-500: rgb(32, 163, 168);
-$seafoam-600: rgb(35, 178, 184);
-$seafoam-700: rgb(38, 192, 199);
-$red-400: rgb(227, 72, 80);
-$red-500: rgb(236, 91, 98);
-$red-600: rgb(247, 109, 116);
-$red-700: rgb(255, 123, 130);
-$orange-400: rgb(230, 134, 25);
-$orange-500: rgb(242, 148, 35);
-$orange-600: rgb(249, 164, 63);
-$orange-700: rgb(255, 181, 91);
-$green-400: rgb(45, 157, 120);
-$green-500: rgb(51, 171, 132);
-$green-600: rgb(57, 185, 144);
-$green-700: rgb(63, 200, 156);
-$blue-400: rgb(38, 128, 235);
-$blue-500: rgb(55, 142, 240);
-$blue-600: rgb(75, 156, 245);
-$blue-700: rgb(90, 169, 250);
-$gray-50: rgb(37, 37, 37);
-$gray-75: rgb(47, 47, 47);
-$gray-100: rgb(50, 50, 50);
-$gray-200: rgb(62, 62, 62);
-$gray-300: rgb(74, 74, 74);
-$gray-400: rgb(90, 90, 90);
-$gray-500: rgb(110, 110, 110);
-$gray-600: rgb(144, 144, 144);
-$gray-700: rgb(185, 185, 185);
-$gray-800: rgb(227, 227, 227);
-$gray-900: rgb(255, 255, 255);
+
+$gray-25: #131416;  
+$gray-50: #262627;      // hsl(240, 1%, 15%)
+$gray-75: #2d2d2e;    //hsl(264, 5%,  18%)
+$gray-100: #302e33;   // hsl(264, 5%, 19%)
+$gray-200: #3b3a3f; //hsl(252, 4%, 24%)
+$gray-300: hsl(255,3%, 30%);
+$gray-400: #5d5c60; // hsl(255,  2%, 37%)
+$gray-500: #818384;  // hsl(200,1%,51%)
+$gray-600: hsl(240,6%,  72%);
+$gray-700: hsl(240, 12%, 85%);
+$gray-800: hsl(225, 18%, 92%);
+$gray-900: hsl(225, 18%, 97%);
+
+
+$red: (#fde4e2, #fbbbb6, #f98e86, #f66056, #f43e31, #f21c0d, #e5190c, #d7170b, #c6130a, #ab0e08) !default;
+$red-50: #fde4e2 !default;
+$red-100: #fbbbb6 !default;
+$red-200: #f98e86 !default;
+$red-300: #f66056 !default;
+$red-400: #f43e31 !default;
+$red-500: #f21c0d !default;
+$red-600: #e5190c !default;
+$red-700: #d7170b !default;
+$red-800: #c6130a !default;
+$red-900: #ab0e08 !default;
+$orange: (#fff3e7, #ffe0c2, #fc9, #ffb870, #ffa852, #f93, #fe8a2b, #fd7b24, #fc671a, #f9480a) !default;
+$orange-50: #fff3e7 !default;
+$orange-100: #ffe0c2 !default;
+$orange-200: #fc9 !default;
+$orange-300: #ffb870 !default;
+$orange-400: #ffa852 !default;
+$orange-500: #f93 !default;
+$orange-600: #fe8a2b !default;
+$orange-700: #fd7b24 !default;
+$orange-800: #fc671a !default;
+$orange-900: #f9480a !default;
+$brown: (#f0ede9, #dad2c8, #c2b5a3, #aa977e, #978063, #856a47, #816343, #7d5c3f, #78533a, #6f4431) !default;
+$brown-50: #f0ede9 !default;
+$brown-100: #dad2c8 !default;
+$brown-200: #c2b5a3 !default;
+$brown-300: #aa977e !default;
+$brown-400: #978063 !default;
+$brown-500: #856a47 !default;
+$brown-600: #816343 !default;
+$brown-700: #7d5c3f !default;
+$brown-800: #78533a !default;
+$brown-900: #6f4431 !default;
+$yellow: (#fff9e7, #fff1c2, #ffe799, #ffdd70, #ffd652, #ffcf33, #ffc02b, #ffb224, #ff9f1a, #ff810a) !default;
+$yellow-50: #fff9e7 !default;
+$yellow-100: #fff1c2 !default;
+$yellow-200: #ffe799 !default;
+$yellow-300: #ffdd70 !default;
+$yellow-400: #ffd652 !default;
+$yellow-500: #ffcf33 !default;
+$yellow-600: #ffc02b !default;
+$yellow-700: #ffb224 !default;
+$yellow-800: #ff9f1a !default;
+$yellow-900: #ff810a !default;
+$lime: (#ecf6e3, #d0e8b9, #b1d98a, #92c95b, #7abe38, #63b215, #5ba612, #54990f, #4a890b, #3a7005) !default;
+$lime-50: #ecf6e3 !default;
+$lime-100: #d0e8b9 !default;
+$lime-200: #b1d98a !default;
+$lime-300: #92c95b !default;
+$lime-400: #7abe38 !default;
+$lime-500: #63b215 !default;
+$lime-600: #5ba612 !default;
+$lime-700: #54990f !default;
+$lime-800: #4a890b !default;
+$lime-900: #3a7005 !default;
+$green: (#e4f7e7, #bceac4, #90dd9d, #64cf75, #42c458, #21ba3a, #1da736, #199533, #137c2e, #0b5726) !default;
+$green-50: #e4f7e7 !default;
+$green-100: #bceac4 !default;
+$green-200: #90dd9d !default;
+$green-300: #64cf75 !default;
+$green-400: #42c458 !default;
+$green-500: #21ba3a !default;
+$green-600: #1da736 !default;
+$green-700: #199533 !default;
+$green-800: #137c2e !default;
+$green-900: #0b5726 !default;
+$teal: (#e3f9f9, #b9f1f1, #8be7e7, #5ddddd, #3ad6d6, #17cfcf, #14b7b7, #129f9f, #0e7f7f, #094e4e) !default;
+$teal-50: #e3f9f9 !default;
+$teal-100: #b9f1f1 !default;
+$teal-200: #8be7e7 !default;
+$teal-300: #5ddddd !default;
+$teal-400: #3ad6d6 !default;
+$teal-500: #17cfcf !default;
+$teal-600: #14b7b7 !default;
+$teal-700: #129f9f !default;
+$teal-800: #0e7f7f !default;
+$teal-900: #094e4e !default;
+$cyan: (#e3f4fd, #b8e5f9, #89d3f6, #5ac1f2, #36b4ef, #13a7ec, #1197d3, #1088ba, #0e7398, #0a5366) !default;
+$cyan-50: #e3f4fd !default;
+$cyan-100: #b8e5f9 !default;
+$cyan-200: #89d3f6 !default;
+$cyan-300: #5ac1f2 !default;
+$cyan-400: #36b4ef !default;
+$cyan-500: #13a7ec !default;
+$cyan-600: #1197d3 !default;
+$cyan-700: #1088ba !default;
+$cyan-800: #0e7398 !default;
+$cyan-900: #0a5366 !default;
+$blue: (#e2f0fd, #b6d9fb, #86c0f9, #56a6f6, #3193f4, #0d80f2, #0c75d8, #0c6abe, #0b5c9c, #094668) !default;
+$blue-50: #e2f0fd !default;
+$blue-100: #b6d9fb !default;
+$blue-200: #86c0f9 !default;
+$blue-300: #56a6f6 !default;
+$blue-400: #3193f4 !default;
+$blue-500: #0d80f2 !default;
+$blue-600: #0c75d8 !default;
+$blue-700: #0c6abe !default;
+$blue-800: #0b5c9c !default;
+$blue-900: #094668 !default;
+$indigo: (#ede7f9, #d1c2f0, #b399e6, #9470db, #7d52d4, #63c, #5b2fb6, #502b9f, #422581, #2c1d54) !default;
+$indigo-50: #ede7f9 !default;
+$indigo-100: #d1c2f0 !default;
+$indigo-200: #b399e6 !default;
+$indigo-300: #9470db !default;
+$indigo-400: #7d52d4 !default;
+$indigo-500: #63c !default;
+$indigo-600: #5b2fb6 !default;
+$indigo-700: #502b9f !default;
+$indigo-800: #422581 !default;
+$indigo-900: #2c1d54 !default;
+$purple: (#f4e3fc, #e3baf8, #d18cf3, #be5eee, #b03cea, #a219e6, #9118cd, #8116b3, #6b1492, #49115f) !default;
+$purple-50: #f4e3fc !default;
+$purple-100: #e3baf8 !default;
+$purple-200: #d18cf3 !default;
+$purple-300: #be5eee !default;
+$purple-400: #b03cea !default;
+$purple-500: #a219e6 !default;
+$purple-600: #9118cd !default;
+$purple-700: #8116b3 !default;
+$purple-800: #6b1492 !default;
+$purple-900: #49115f !default;
+$magenta: (#fde9f3, #f9c8e0, #f5a3cc, #f17eb8, #ee63a8, #eb4799, #d83f88, #c53777, #ac2d60, #861d3d) !default;
+$magenta-50: #fde9f3 !default;
+$magenta-100: #f9c8e0 !default;
+$magenta-200: #f5a3cc !default;
+$magenta-300: #f17eb8 !default;
+$magenta-400: #ee63a8 !default;
+$magenta-500: #eb4799 !default;
+$magenta-600: #d83f88 !default;
+$magenta-700: #c53777 !default;
+$magenta-800: #ac2d60 !default;
+$magenta-900: #861d3d !default;
+
+$primary-color: $blue-700 !default !global;
+$primary-color-dark: $blue-800 !default !global;
+$primary-color-light: $blue-500;
+// $primary: $primary-color;
+
 
 $card-border: #fff;
 $card-background: #fafafa;
-$body-color: #333; // 5c5050
 
 $semantic-blue: #0066ce;
 $semantic-red: #e34850;
@@ -90,27 +177,137 @@ $semantic-orange: #e68619;
 $semantic-green: #2d9d78;
 
 :root {
+  --monospace-font: 'IBM Plex Mono', 'Fira Code', monospace;
+  --sans-serif-font: 'IBM Plex Sans', 'Source Sans Pro', sans-serif;
+  --body-font: 'IBM Plex Sans', 'Source Sans Pro', sans-serif;
+  --display-font: 'IBM Plex Sans', 'Source Sans Pro', sans-serif;
+  --ui-font: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI",
+  "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+
+
   --primary-color: #{$primary-color};
-  --link-color: #{$primary-color};
   --primary-color-dark: #{$primary-color-dark};
   --primary-color-light: #{$primary-color-light};
-  --secondary: #{$secondary};
-  --primary: #{$primary-color};
+
+  --link-color: #{$primary-color};
+  --link-color-hover: #{$primary-color-light};
+  --link-color-visited: #{$primary-color-dark};
 
   // Callout boxes are used for "Read More"
   --callout-background: #e6f0fa;
   --callout-shadow: 0 1px 1px rgba(0, 102, 206, 0.25);
   --callout-border-color: rgba(0, 102, 206, 0.25);
-  --callout-border-color-hover: #{$primary};
+  --callout-border-color-hover: #{$primary-color};
 
   --highlight-color: hsla(49, 100%, 63%, 0.56);
 
-  --text-color: #333;
-  --text-color-dimmed: #666;
+  --text-color: #{$gray-100}; // hsl(0,0,20);
+  --strong-color:  #{$primary-color};
+  --muted-text-color: #{rgba($gray-200,.5)}; // hsla(52, 4%, 24%, .5);  // gray-200, 50%
 
-  --table-thin-line-color: #ddd;
-  --table-thick-line-color: #333;
+  --table-thin-line-color: #{$gray-800};  // #ddd;
+  --table-thick-line-color: #{$gray-200}; // #333;
+
+  --placeholder-color: #{$gray-700}; // #9aa0a6;
+
+  --card-background: #{$gray-900}; // #fafafa;
+  --card-background-alternate: #{$gray-600}; //  #a0a0a0;
+  --card-shadow:  0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+
+  --page-background: #{$gray-900}; // #f5f5f7;
+  --content-background: #fff;
+
+  --ui-background: #fff;    
+  --ui-background-hover: #{rgba($gray-800, .7)}; // hsla(225, 18%, 87%, .7);  //#gray-800, 70%
+  --ui-border: 1px solid #{$gray-700};  
+  --ui-border-focus: solid 1px #{$gray-900};
+  --ui-focus-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302),
+             0 2px 6px 2px rgba(60, 64, 67, 0.149);
+  --ui-divider: .5px solid #3334;
+  // --ui-elevated-shadow:0px 0px 10px rgba(0, 0, 0, 0.3);
+
+  --border-color: #{$gray-800}; // #e7e7e7;
+
+  --code-background: #{rgba($gray-800, .2)};
+  --code-border:  1px solid #{$gray-700};
+
+  --masthead-background: #fff;
+  --masthead-border: 1px solid #{$gray-800}; // #e0e0e0;
+  --masthead-text-color: #{$gray-200};
+  --masthead-link-color: #{$gray-200};
+  --masthead-link-color-hover: var(--link-color-hover);
+  --masthead-link-color-active: var(--primary-color);
+
+  --semantic-blue: #{$blue-700};
+  --semantic-red: #{$red-400};
+  --semantic-orange: #{$orange-400};
+  --semantic-green: #{$green-700};
+
+  --console-background: #35434e;
+  --console-color: #dadadf;
+
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+  --primary-color: hsl(210, 80%, 40%);
+  --primary-color-dark: hsl(210, 80%, 30%);;
+  --primary-color-light: hsl(210, 80%, 60%);;
+
+  --link-color: #{$blue-200}; 
+  --link-color-hover: #{$blue-100};
+  --link-color-visited: #{$blue-400};
+
+
+  // Callout boxes are used for "Read More"
+  --callout-background: #{$blue-900};
+  --callout-shadow: 0 1px 1px rgba(25, 50, 50, 0.25);
+  --callout-border-color: rgba(0, 102, 206, 0.25);
+  --callout-border-color-hover: hsl(210, 80%, 40%);
+
+  --highlight-color: hsla(49, 100%, 63%, 0.7);
+
+  --text-color: #{$gray-800};
+  --strong-color:  #{$blue-200};
+  --muted-text-color: #{rgba($gray-900,.5)};
+  --text-color-dimmed: #999;
+
+  --table-thin-line-color: #444;
+  --table-thick-line-color: #555;
 
   --placeholder-color: #9aa0a6;
+  
+  --page-background: #{$gray-25};
+  --content-background: #{$gray-50};
+  --card-background: #{rgba($gray-200, .5)};
+  --card-background--alternate: #{$gray-100};
 
+  --ui-background: #{$gray-50};
+  --ui-background-hover: #{rgba($gray-300, .7)};  //#gray-100, 70%
+  --ui-border: 1px solid #{$gray-100};  
+  --ui-border-focus: solid 1px #{$gray-200};
+  // Used for hover state of masthead and nav links
+  --ui-focus-shadow: 0 2px 10px 0px rgb(12 17 16 / 70%), 0 2px 13px 0px rgb(13 12 16 / 85%);
+
+
+  --border-color: #{$gray-200};
+
+  --code-background: #{rgba($gray-100, .25)};
+  --code-border:  1px solid #{$gray-200};
+
+  --masthead-background: #{$gray-100};
+  --masthead-border: 1px solid #{$gray-50};
+  --masthead-text-color: #{$gray-700};
+  --masthead-link-color: #{$gray-700};
+  --masthead-link-color-hover: var(--link-color-hover);
+  --masthead-link-color-active: var(--primary-color);
+
+  --semantic-blue: #{$blue-700};
+  --semantic-red: #{$red-400};
+  --semantic-orange: #{$orange-400};
+  --semantic-green: #{$green-700};
+
+  --console-background: #101417;
+  --console-color: #b9b9b9;
+
+}
 }

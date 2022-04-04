@@ -2,7 +2,7 @@
 // Overrides
 
 .site-title {
-    font-family: $display-font;
+    font-family: var(--display-font);
     font-weight: 900;
 }
 
@@ -16,7 +16,7 @@
 }
 
 .greedy-nav a:hover {
-    color: var(--primary-color);
+    color: var(--masthead-link-color-hover);
 }
 
 .masthead__menu-item {
@@ -26,12 +26,12 @@
 }
 
 .masthead__menu-item.active a {
-  color: var(--primary-color);
+  color: var(--masthead-link-color-active);
 }
 
 .masthead__menu-item.separator {
   width: 1em;
-  border-right: 1px solid #ddd;
+  border-right: var(--ui-divider);
   margin-right: 1em;
 }
 
@@ -45,6 +45,6 @@ pre {
     padding: 1em;
     font-size: .8em;
     border-radius: 8px;
-    background: #35434e;
-    color: #dadada;
+    background: var(--console-background);
+    color: var(--console-color);
 }

@@ -82,7 +82,7 @@ body {
         width: 100%;
         clear: both;
 
-        background: #fff;
+        background: var(--content-background);
         border-radius: 8px;
         padding: 8px;
         padding-left: 2em;
@@ -107,7 +107,7 @@ body {
 }
 
 .page__lead {
-  font-family: $global-font-family;
+  font-family: var(--body-font);
   font-size: $type-size-4;
 }
 
@@ -167,13 +167,13 @@ body {
 
     dt {
         margin-top: 1em;
-        font-family: $body-font;
+        font-family: var(--body-font);
         font-weight: bold;
     }
 
     dd {
         margin-left: 1em;
-        font-family: $body-font;
+        font-family: var(--body-font);
         font-size: $type-size-5;
     }
 
@@ -287,7 +287,7 @@ body {
 .page__meta {
     margin-top: 2em;
     color: $muted-text-color;
-    font-family: $display-font;
+    font-family: var(--display-font);
     font-size: $type-size-6;
 
     p {
@@ -335,7 +335,7 @@ body {
 
     &:hover {
         text-decoration: none;
-        color: $link-color-hover;
+        color: var(--link-color-hover);
     }
 }
 

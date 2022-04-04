@@ -13,13 +13,7 @@ $paragraph-indent: false !default; // true, false (default)
 $indent-var: 1.3em !default;
 
 /* system typefaces */
-$system-font: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI",
-  "Helvetica Neue", "Lucida Grande", Arial, sans-serif !default;
-
-
-$global-font-family: $body-font !default;
-$header-font-family: $display-font !default;
-$caption-font-family: $display-font !default;
+$caption-font-family: var(--body-font) !default;
 
 /* type scale */
 $type-size-1: 2.441rem !default; // ~39.056px

@@ -19,6 +19,7 @@
   "scripts": {
     "build": "bash scripts/build.sh",
     "build:code-playground": "npm --prefix submodules/code-playground run dist",
+    "build-guides": "node ./scripts/build-guides.js  \"./submodules/compute-engine/src/\" \"\"",
     "clean": "bash scripts/clean.sh",
     "coverage": "bash scripts/test.sh --coverage",
     "deploy": "bash scripts/deploy.sh",
@@ -41,7 +42,7 @@
   "devDependencies": {
     "@11ty/eleventy": "^1.0.0",
     "@cortex-js/prettier-config": "^1.1.1",
-    "@ui-js/grok": "^1.4.2",
+    "@ui-js/grok": "^1.6.2",
     "cssnano": "^5.1.5",
     "highlight.js": "^11.5.0",
     "husky": "^7.0.4",

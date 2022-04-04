@@ -4,7 +4,8 @@
 
 .masthead {
   position: relative;
-  border-bottom: 1px solid $border-color;
+  border-bottom: var(--masthead-border);
+  background: var(--masthead-background);
   animation: $intro-transition;
   animation-delay: 0.15s;
   z-index: 20;
@@ -17,7 +18,7 @@
     max-width: 100%;
     display: flex;
     justify-content: space-between;
-    font-family: $display-font;
+    font-family: var(--display-font);
 
     @include breakpoint($large) {
       max-width: $max-width;
@@ -50,7 +51,7 @@
 }
 
 .site-title:hover {
-  background: #eee;
+  background: var(--ui-background-hover);
 }
 
 .site-subtitle {
@@ -87,9 +88,9 @@
     & input:checked ~ .visible-links {
       display: block;
       top: 42px;
-      background: white;
+      background: var(--ui-background);
       width: 100%;
-      border: 1px solid #ddd;          
+      box-shadow: var(--ui-focus-shadow);
       border-radius:4px;
       box-shadow: 0px 0px 10px rgba(0, 0, 0, .3);
     }

@@ -16,12 +16,12 @@ function buildSass(srcDir, destDir) {
         p.ext = '.css';
         // console.log('Compiling "' + srcDir + file + '" to "' + path.format(p));
 
-        //Encapsulate rendered css from scssPath into result variable
+        // Encapsulate rendered css from scssPath into result variable
         const result = sass.renderSync({
           file: path.join(srcDir, file),
         });
-        //Create cssPath directory recursively
-        //Then write result css string to cssPath file
+        // Create cssPath directory recursively
+        // Then write result css string to cssPath file
         fs.writeFile(path.format(p), result.css.toString()).catch((error) =>
           console.error(error)
         );
@@ -31,6 +31,34 @@ function buildSass(srcDir, destDir) {
 }
 
 module.exports = function (eleventyConfig) {
+  // add as a valid template language to process, e.g. this adds to --formats
+  // eleventyConfig.addTemplateFormats('scss');
+
+  // eleventyConfig.addExtension('scss', {
+  //   outputFileExtension: 'css', // optional, default: "html"
+
+  //   // can be an async function
+  //   compile: function (inputContent, inputPath) {
+  //     let parsed = path.parse(inputPath);
+  //     if (parsed.base.startsWith('_')) {
+  //       return (data) => {
+  //         return '';
+  //       };
+  //     }
+  //     // let result = sass.compileString(inputContent, {
+  //     //   loadPaths: [parsed.dir ?? '.', this.config.dir.includes],
+  //     // });
+  //     const result = sass.renderSync({
+  //       file: inputPath,
+  //       includePaths: ['./src/_sass/imports'],
+  //     });
+
+  //     return (data) => {
+  //       return result.css.toString();
+  //     };
+  //   },
+  // });
+
   buildSass('./src/_sass/', './src/build/css');
 
   const markdownIt = require('markdown-it');
@@ -74,7 +102,7 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.setUseGitIgnore(false);
 
-  eleventyConfig.setQuietMode(false);
+  eleventyConfig.setQuietMode(true);
 
   // {{ variable | jsonify }}
   eleventyConfig.addFilter('jsonify', function (variable) {
@@ -130,9 +158,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.setDataDeepMerge(true);
 
   eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
-  eleventyConfig.addWatchTarget(
-    '../submodules/compute-engine/src/docs/**/*.{md,html}'
-  );
+  eleventyConfig.addWatchTarget('./src/build/**/*.{css,md,html}');
 
   return {
     passtroughFileCopy: true,

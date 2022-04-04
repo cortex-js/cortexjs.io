@@ -15,7 +15,7 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
   line-height: 1.47059;
-  font-family: $global-font-family;
+  font-family: var(--body-font);
   font-size: $type-size-5;
 
   & + table {
@@ -24,10 +24,9 @@ table {
 
   thead {
     tr {
-      border-bottom: 1px solid #333;
+      border-bottom: 1px solid var(--table-thick-line-color);
       th {
         font-weight: 600;
-        // color: #333;
         padding: 3px 1em 3px 0;
         vertical-align: bottom;
         text-align: left;
@@ -36,7 +35,7 @@ table {
   }
   
   tr {
-    border-bottom: 1px solid mix(#fff, $border-color, 25%);
+    border-bottom: 1px solid var(--table-thin-line-color);
     
     td:first-child { 
       // Insane trick to make sure the column is no wider than it needs to.

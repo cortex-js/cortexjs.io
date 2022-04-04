@@ -45,7 +45,7 @@
     h5,
     h6 {
         margin-bottom: 0;
-        font-family: $display-font;
+        font-family: var(--display-font);
     }
 
     p,
@@ -62,11 +62,11 @@
             padding: 8px 4px 8px 8px;
           
             &:hover {
-              background: rgba(0, 0, 0, 0.05);
+              background: var(--ui-background-hover);
             }
             &.active {
               color: white !important;
-              background: $primary;
+              background: var(--primary-color);
             }
           }
     }

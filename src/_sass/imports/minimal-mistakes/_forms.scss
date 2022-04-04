@@ -51,7 +51,7 @@ button,
 select,
 textarea {
   box-sizing: border-box;
-  font-family: $body-font;
+  font-family: var(--ui-font);
 }
 
 label {
@@ -79,8 +79,8 @@ select {
   padding: 0.25em;
   margin-bottom: 0.5em;
   color: var(--text-color);
-  background-color: $background-color;
-  border: $border-color;
+  background-color: var(--ui-background);
+  border: var(--ui-border);
   border-radius: $border-radius;
   box-shadow: $box-shadow;
 }
@@ -214,11 +214,11 @@ textarea[readonly] {
 
 input:focus,
 textarea:focus {
-  border-color: $primary-color;
+  border-color: var(--primary-color);
   outline: 0;
   outline: thin dotted \9;
   box-shadow: inset 0 1px 3px rgba(var(--text-color), 0.06),
-    0 0 5px rgba($primary-color, 0.7);
+    0 0 5px rgba(var(--primary-color), 0.7);
 }
 
 input[type="file"]:focus,

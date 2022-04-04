@@ -21,7 +21,7 @@ a.section-link {
 #main a:not(.section-link):hover,
 #main a:not(.section-link):active,
 #main a:not(.section-link):visited {
-  color: $link-color;
+  color: var(--link-color);
   text-decoration: none;
   cursor: pointer;
   // These 3 properties are necessary so that <a> links are 

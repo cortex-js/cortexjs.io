@@ -402,7 +402,7 @@ module.exports = {
   documentTemplate: (substitutions) => `---
 permalink: "/docs/${substitutions.sdkName}/"
 title: "${
-    { mathlive: 'MathLive', 'compute-engine': 'Compute Engine' }[
+    { 'mathlive': 'MathLive', 'compute-engine': 'Compute Engine' }[
       substitutions.sdkName
     ] ?? substitutions.sdkName
   }"
@@ -442,7 +442,7 @@ sidebar:
     <span class="icon" style="margin-top:4px;">
         <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
     </span>
-    <input type='text' 
+    <input type="text"
         autofocus="" 
         id="search-box" 
         aria-label="Search" 
@@ -453,12 +453,29 @@ sidebar:
         autocorrect="off" 
         oninput="search()" 
         placeholder="Search" >
-    <span class="icon hidden" id='clear-button'>
+    <span class="icon hidden" id="clear-button">
         <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
     </span>        
 </div>
 <section id="search-result" class="hidden"></section>
-<section id="search-result-none" class="hidden">No results found.</section>
+<section id="search-result-none" class="hidden"><span class='icon'>😔</span> Sorry, no matches were found</section>
 <section id="all-content">${substitutions.content}</section>
-<div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>`,
+<div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>
+<script type="module">
+  import { renderMathInElement } from '//unpkg.com/mathlive/dist/mathlive.mjs';
+  window.addEventListener('DOMContentLoaded', (event) => {
+    renderMathInElement(document.getElementsByClassName('page__content')[0], { 
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\\\(', '\\\\)']],
+          display: [ ['$$', '$$'], ['\\\\[', '\\\\]']],
+        },
+        processEnvironments : false 
+      },
+      asciiMath: null,
+    });
+  });
+</script>
+`,
 };

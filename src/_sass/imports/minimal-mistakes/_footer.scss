@@ -47,7 +47,7 @@
 }
 
 .page__footer-copyright {
-  font-family: $global-font-family;
+  font-family: var(--body-font);
   font-size: $type-size-7;
 }
 
@@ -65,7 +65,7 @@
     display: flex;
     padding-top: 5px;
     padding-bottom: 5px;
-    font-family: $display-font;
+    font-family: var(--display-font);
     font-size: $type-size-6;
     text-transform: uppercase;
   }

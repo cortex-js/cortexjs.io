@@ -69,7 +69,7 @@ body:hover .visually-hidden button {
   position: fixed;
   z-index: 20;
   margin: 0;
-  font-family: $system-font;
+  font-family: var(--ui-font);
   white-space: nowrap;
 }
 
@@ -330,7 +330,7 @@ body:hover .visually-hidden button {
   position: relative;
   width: $navicon-width;
   height: $navicon-height;
-  background: $primary-color;
+  background: var(--primary-color);
   margin: auto;
   transition: 0.3s;
 
@@ -341,7 +341,7 @@ body:hover .visually-hidden button {
     left: 0;
     width: $navicon-width;
     height: $navicon-height;
-    background: $primary-color;
+    background: var(--primary-color);
     transition: 0.3s;
   }
 

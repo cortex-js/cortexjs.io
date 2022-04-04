@@ -1,6 +1,7 @@
 @charset "utf-8";
 
 @import 'imports/astra';
+@import 'imports/common';
 /* Variables */
 @import 'imports/minimal-mistakes/variables';
 
@@ -94,7 +95,7 @@
 }
 
 .hero-section h1 {
-    font: 900 96px/104px $display-font;
+    font: 900 96px/104px var(--display-font);
     margin: 0;
     padding: 0;
 }
@@ -106,7 +107,7 @@
 
 .hero-section p {
     max-width: 653px;
-    font: 400 48px/52px $body-font;
+    font: 400 48px/52px var(--body-font);
     letter-spacing: -0.05ex;
     margin: 0;
     padding: 0;
@@ -171,7 +172,7 @@ div.figure + div.copy {
 
 section.fullwidth h2 {
     color: var(--text-color);
-    font: 700 56px/50px $display-font;
+    font: 700 56px/50px var(--display-font);
     margin: 0;
     padding: 0;
     padding-bottom: 0.5em;
@@ -179,7 +180,7 @@ section.fullwidth h2 {
     border: none;
     & .eyebrow {
         display: block;
-        font: 700 21px/1.14048 $display-font;
+        font: 700 21px/1.14048 var(--display-font);
         margin: 0;
         padding: 0;
         opacity: 1;
@@ -188,7 +189,7 @@ section.fullwidth h2 {
     }
     & .subhead {
       display: block;
-      font: 500 24px/1 $display-font;
+      font: 500 24px/1 var(--display-font);
       margin: 0;
       padding: 0;
       margin-bottom: 0.5em;
@@ -198,7 +199,7 @@ section.fullwidth h2 {
 }
 
 section.fullwidth p {
-    font: 400 21px/29px $body-font;
+    font: 400 21px/29px var(--body-font);
     margin: 0;
     padding: 0;
 }
@@ -207,7 +208,7 @@ section.fullwidth p {
 .light-card {
   border: 1px solid rgba(0, 0, 0, .1);
   border-radius: 8px;
-  background:#fff;
+  background: var(--card-background);
 }
 
 
@@ -233,7 +234,7 @@ section.fullwidth.light-card {
     line-height: 1;
     & .subhead {
       display: block;
-      font: 600 28px/1 $display-font;
+      font: 600 28px/1 var(--display-font);
       margin: 0;
       padding: 0;
       opacity: .5;
@@ -243,9 +244,9 @@ section.fullwidth.light-card {
 }
 
 .cards .card {
-    background: $card-background-color;
+    background: var(--card-background);
     color: var(--text-color);
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
 }
 
 .cards.wrap-vertical {
@@ -261,8 +262,8 @@ section.fullwidth.light-card {
     padding: 1em;
     width: 300px;
     border-radius: 8px;
-    background: $card-background-color;
-    box-shadow: $card-shadow;
+    background: var(--card-background);
+    box-shadow: var(--card-shadow);
 }
 .cards.wrap-vertical .card .copy {
     margin-left: 0;
@@ -287,8 +288,8 @@ section.fullwidth.light-card {
     width: calc(100% - 2em);
     max-width: calc(100% - 2em);
     border-radius: 8px;
-    background: $card-background-color;
-    box-shadow: $card-shadow;
+    background: var(--card-background);
+    box-shadow: var(--card-shadow);
 }
 
 .cards.col2 .card, 
@@ -298,8 +299,8 @@ section.fullwidth.light-card {
     padding: 1em;
     width: calc(50% - 2em);
     border-radius: 8px;
-    background: $card-background-color;
-    box-shadow: $card-shadow;
+    background: var(--card-background);
+    box-shadow: var(--card-shadow);
 }
 
 .cards.col3 .card {
@@ -311,9 +312,9 @@ section.fullwidth.light-card {
 .cards.col2 .card.primary,
 .cards.col3 .card.primary,
 .cards .card.primary {
-    background: $primary-color;
+    background: var(--primary-color);
     color: #fff;
-    border: 1px solid darken($primary-color, 20%);
+    border: 1px solid var(--primary-color-dark)
 }
 
 .cards.col2 .copy,
@@ -334,24 +335,24 @@ section.fullwidth.light-card {
 
 .cards.col2 h2,
 .cards.col3 h2 {
-    font: 700 48px/38px $display-font;
+    font: 700 48px/38px var(--display-font);
     letter-spacing: -0.7px;
 }
 .cards.col2 h2 .subhead,
 .cards.col3 h2 .subhead {
   margin-top: .5em;
-  font: 500 24px/1 $display-font;
+  font: 500 24px/1 var(--display-font);
   letter-spacing: -0.2px;
 }
 
 .cards.col2 h2 .eyebrow,
 .cards.col3 h2 .eyebrow {
-    font: 400 24px/24px $display-font;
+    font: 400 24px/24px var(--display-font);
 }
 
 .cards.col2 h3,
 .cards.col3 h3 {
-    font: 400 24px/1.1 $display-font;
+    font: 400 24px/1.1 var(--display-font);
     margin-bottom: 1em;
     color: var(--text-color);
 }

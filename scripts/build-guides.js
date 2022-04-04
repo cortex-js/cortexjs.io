@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const matter = require('gray-matter');
 
-const CODE_MIRROR_VERSION = '5.59.1'; // 2020-12-31
+const CODE_MIRROR_VERSION = '5.65.2'; // 2022-04-01
 
 const INJECTED_STYLESHEET = `
 .output:focus-within {

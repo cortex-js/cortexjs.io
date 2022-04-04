@@ -13,8 +13,8 @@
 @mixin notice($notice-color) {
   margin: 2em 0 !important;  /* override*/
   padding: 1em;
-  color: $dark-gray;
-  font-family: $global-font-family;
+  color: var(--text-color);
+  font-family: var(--body-font);
   font-size: $type-size-5 !important;
   text-indent: initial; /* override*/
   background-color: mix(#fff, $notice-color, 90%);

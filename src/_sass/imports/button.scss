@@ -14,7 +14,7 @@
   display: inline-block;
   margin-bottom: 0.25em;
   padding: 0.5em 1em;
-  font-family: $system-font;
+  font-family: var(--ui-font);
   font-size: $type-size-5;
   font-weight: bold;
   text-align: center;
@@ -33,7 +33,7 @@
 }
 
 .button:active {
-    background: $primary;
-    border: 1px solid darken($primary, 20%);
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color-dark);
     color: white;
 }

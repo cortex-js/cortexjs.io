@@ -20,18 +20,18 @@
 
     font-weight: normal;
 
-    background: $card-background-color;
+    background: var(--card-background);
     border-radius: 8px;
     box-shadow: -2px 2px 8px 0 rgba(0, 0, 0, 0.23);
 }
 
 
 .card.alternate {
-  background: darken($card-background-color, 5%);
+  background: var(--card-background-alternate);
 }
 
 .card.primary {
-  background: $primary-color;
+  background: var(--primary-color);
   color: #fff;
 }
 
@@ -67,7 +67,7 @@
 
 .card h2 {
   color: var(--text-color);
-  font: 700 56px/50px $display-font;
+  font: 700 56px/50px var(--display-font);
   margin: 0;
   padding: 0;
   padding-bottom: .5em;
@@ -75,7 +75,7 @@
   border: none;
   & .eyebrow {
     display: block;
-    font: 400 32px/36px $display-font;
+    font: 400 32px/36px var(--display-font);
     margin: 0;
     padding: 0;
     opacity: .4;
@@ -90,14 +90,14 @@
 
 .card h3 {
   color: var(--text-color);
-  font: 700 36px/40px $display-font;
+  font: 700 36px/40px var(--display-font);
   margin: 0;
   padding: 0;
   padding-bottom: .5em;
 }
 
 .card p {
-  font: 400 21px/29px $body-font;
+  font: 400 21px/29px var(--body-font);
   margin: 0;
   padding:0;
 }
@@ -113,7 +113,7 @@
     color: var(--text-color);
   }
   & .card h2 {
-      font: 700 24px/24px $display-font;
+      font: 700 24px/24px var(--display-font);
       padding-top: .5em;
   }
   & .card .copy {
@@ -123,14 +123,14 @@
       align-items: center;
       padding-top: 1em;
 
-      font: 500 16px/20px $body-font;
+      font: 500 16px/20px var(--body-font);
   }
   & .card .copy p {
       text-align: center;
       margin-bottom: 1em;
       text-align: center;
 
-      font: 500 16px/20px $body-font;
+      font: 500 16px/20px var(--body-font);
   }
 }
 

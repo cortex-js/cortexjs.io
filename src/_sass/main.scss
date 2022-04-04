@@ -1,6 +1,8 @@
 @charset "utf-8";
 
 @import 'imports/astra';
+
+@import 'imports/common';
 @import 'imports/minimal-mistakes'; // main partials
 @import 'imports/minimal-mistakes-overrides';
 @import 'imports/utilities';
@@ -84,7 +86,7 @@ a.chevron::after {
 
   /* override*/
   color: #494e52;   /* This color is not currently used, as the read-more content is a <a> tag. See ".read-more a" below */
-  font-family: $body-font;
+  font-family: var(--body-font);
   font-size: 1rem !important;
   text-indent: initial;
   /* override*/
@@ -100,7 +102,7 @@ a.chevron::after {
 .read-more a{
   padding: 1em;
   display: block;
-  color: var(--primary-color); 
+  color: var(--link-color); 
   font-size: 1.1em;
   text-decoration: none;
 }
@@ -148,23 +150,23 @@ code + .tags {
     padding-right: .5em;
     margin-left: 1em;
     color: var(--text-color);
-    background: #eee;
+    background: var(--card-background);
     }
   .tag.inert {
-    color: var(--text-color-dimmed);
-    background: #d4d5d2;
+    color: $gray-400;
+    background: $gray-800;
   }
   .tag.constructor {
-    color: #ff810a; // Yellow-900;
-    background: #fff1c2; // Yellow-100;
+    color: $yellow-900; // #ff810a; // Yellow-900;
+    background: $yellow-100; // #fff1c2; // Yellow-100;
   }
   .tag.numeric {
-    color: #0b5c9c; // Blue-800
-    background: #b6d9fb;  // Blue-100
+    color: $blue-800; //  #0b5c9c; // Blue-800
+    background: $blue-100; //  #b6d9fb;  // Blue-100
   }
   .tag.predicate {
-    color: #4a890b;   // Lime-800
-    background: #d0e8b9; // Lime-100
+    color: $lime-800; // #4a890b;   // Lime-800
+    background: $lime-100; // #d0e8b9; // Lime-100
   }
 }
 
