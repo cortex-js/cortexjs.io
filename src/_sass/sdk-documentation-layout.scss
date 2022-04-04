@@ -642,31 +642,39 @@ div.flags {
 .reference,
 .typeParameter {
     font-weight: 700;
+    color: var(--base-02);  // base-05 on dark
 }
 
 // For a string, in quotes
 .string-literal {
-    color: $gray-400;
+    color: $lime-600;
 }
 
 // Punctuation signs, "=", "|", ":".
 // For example "type foo = number"
 .punctuation {
-    color: $indigo-400;
+    color: var(--base-02); // $indigo-400;
     font-weight: 700;
 }
 
 // For "string", "number", "void", "typeof", etc...
 .keyword {
-    color: $purple-500;
-    // font-weight: inherit;
+    color: $indigo-400; // $purple-500;
 }
 
 // The "?" symbol to indicate optional arguments
 // The '...' string to indicate 'rest' arguments
 .modifier {
-    color: $magenta-400;
+    color: var(--base-0c);// $magenta-400;
     font-weight: 700;
+}
+
+ 
+// Name of properties, member functions
+.card h3 strong, var {
+  color: var(--base-02);
+  font-weight: 400;
+  font-style: italic;
 }
 
 // For {...} blocks (unions, intersections)
@@ -733,16 +741,25 @@ figure.highlight {
 
 
 @media (prefers-color-scheme: dark) {
-.string-literal {
-    color: $gray-700;
+  .card h3 strong, var {
+    color: var(--base-05);
+  }  
+
+  .reference,
+  .typeParameter {
+      color: var(--base-05);
+  }
+
+  .punctuation {
+    color: var(--base-05); // $indigo-400;
 }
-.punctuation {
-    color: $indigo-200;
-}
+
+
 .keyword {
-  color: $purple-200; // #a16cd2
+  color: var(--base-0e); // $purple-500;
 }
-.modifier {
-  color: $magenta-200;
+
+.string-literal {
+  color: var(--base-0b);// $gray-400;
 }
 }

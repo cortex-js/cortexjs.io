@@ -53,9 +53,9 @@
     }
   }
 
-  code {
-    background-color: mix(#fff, $notice-color, 95%)
-  }
+  // code {
+  //   background-color: mix(#fff, $notice-color, 95%)
+  // }
 
   ul {
     &:last-child {
@@ -99,3 +99,37 @@
 .notice--danger {
   @include notice($danger-color);
 }
+
+@media (prefers-color-scheme: dark) {
+  .page__content .notice {
+    color: var(--text-color);
+    background-color: mix(#000, $light-gray, 90%);
+    box-shadow: 0 1px 1px rgba($light-gray, 0.75);
+  }
+
+  .page__content .notice--info {
+    color: var(--text-color);
+    background-color: #{rgba($blue-900, .5)};
+    box-shadow: 0 1px 1px $blue-900;
+  }
+
+  .page__content .notice--warning {
+    color: $warning-color;
+    background-color: #{rgba($yellow-700, .15)};
+    box-shadow: 0 1px 1px $yellow-700;
+  }
+
+  .page__content .notice--success {
+    color: $success-color;
+    background-color: #{rgba($green-700, .15)};
+    box-shadow: 0 1px 1px $green-700;
+  }
+
+  .page__content .notice--danger {
+    color: $danger-color;
+    background-color: #{rgba($red-700, .15)};
+    box-shadow: 0 1px 1px $red-700
+  }
+
+}
+

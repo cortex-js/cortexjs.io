@@ -243,7 +243,7 @@ $semantic-green: #2d9d78;
   --semantic-orange: #{$orange-400};
   --semantic-green: #{$green-700};
 
-  --base-00: #35434e; // was #1d1f21;
+  --base-00: #35434e; // was #1d1f21;   // Darker variant: #212a30
   --base-01: #282a2e;
   --base-02: #373b41;
   --base-03: #969896;
@@ -281,7 +281,7 @@ $semantic-green: #2d9d78;
 
 
   // Callout boxes are used for "Read More"
-  --callout-background: #{$blue-900};
+  --callout-background: #183854;  // #{$blue-900};
   --callout-shadow: 0 1px 1px rgba(25, 50, 50, 0.25);
   --callout-border-color: rgba(0, 102, 206, 0.25);
   --callout-border-color-hover: hsl(210, 80%, 40%);
