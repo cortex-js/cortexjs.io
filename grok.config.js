@@ -40,10 +40,8 @@ const searchPlugin = function () {
       '(' +
         terms
           .map((x) => {
-            if (/^".*"$/.test(x)) {
-              return '\\b' + escapeRegExp(x).substring(1, x.length - 1) + '\\b';
-            }
-            return escapeRegExp(x);
+            if (!/^".*"$/.test(x)) return escapeRegExp(x);
+            return '\\b' + escapeRegExp(x).substring(1, x.length - 1) + '\\b';
           })
           .join('|') +
         ')',
@@ -52,34 +50,27 @@ const searchPlugin = function () {
   }
 
   function findInElementRecursive(el, termsRE) {
+    // Text node
+    if (el.nodeType === 3) return termsRE.test(el.textContent);
+
     if (el.nodeType === 1) {
       // Element
-      const tag = el.nodeName.toLowerCase();
       if (
-        !/^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
-          tag
-        ) &&
-        !el.classList.contains('sr-only')
-      ) {
-        let result = false;
-        for (const child of el.childNodes) {
-          result = findInElementRecursive(child, termsRE);
-          if (result) break;
-        }
+        /^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
+          el.nodeName.toLowerCase()
+        )
+      )
+        return false;
+      if (el.classList.contains('sr-only')) return false;
 
-        return result;
-      }
-    } else if (el.nodeType === 3) {
-      // Text
-      return termsRE.test(el.textContent);
+      for (const child of el.childNodes)
+        if (findInElementRecursive(child, termsRE)) return true;
     }
     return false;
   }
 
   function findInElement(el, terms) {
-    if (!terms || terms.length === 0) {
-      return false;
-    }
+    if (!terms || terms.length === 0) return false;
     return findInElementRecursive(el, termsToRegExp(terms));
   }
 
@@ -163,15 +154,10 @@ const searchPlugin = function () {
         return NO_MATCH;
       }
     }
-    if (str === target) {
-      return FULL_MATCH;
-    }
-    if (str.startsWith(target)) {
-      return INITIAL_MATCH;
-    }
-    if (str.indexOf(target) >= 0) {
-      return PARTIAL_MATCH;
-    }
+    if (str === target) return FULL_MATCH;
+    if (str.startsWith(target)) return INITIAL_MATCH;
+    if (str.indexOf(target) >= 0) return PARTIAL_MATCH;
+
     return NO_MATCH;
   }
 
@@ -276,19 +262,21 @@ const searchPlugin = function () {
         noResultsFound();
       } else {
         document.getElementById('search-result-none').classList.add('hidden');
-        document.getElementById('search-result').innerHTML = searchResults
+        const results = document.getElementById('search-result');
+        results.innerHTML = searchResults
           .sort((a, b) => b[0] - a[0])
           .map((x) => x[1])
           .join('');
-        document.getElementById('search-result').classList.remove('hidden');
+        results.classList.remove('hidden');
       }
     }
   }, 500);
 
   function noResultsFound() {
     document.getElementById('all-content').classList.remove('hidden');
-    document.getElementById('search-result').classList.add('hidden');
-    document.getElementById('search-result').innerHTML = '';
+    const results = document.getElementById('search-result');
+    results.classList.add('hidden');
+    results.innerHTML = '';
     document.getElementById('search-result-none').classList.remove('hidden');
   }
 
@@ -357,35 +345,16 @@ const searchPlugin = function () {
   );
 
   window.addEventListener('keydown', (evt) => {
-    const isMac = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
-    let isFindShortcut = false;
-    if (isMac) {
-      isFindShortcut =
-        evt.which == 70 &&
-        evt.metaKey &&
-        !evt.ctrlKey &&
-        !evt.altKey &&
-        !evt.shiftKey;
-    } else {
-      isFindShortcut =
-        evt.which == 70 &&
-        !evt.metaKey &&
-        evt.ctrlKey &&
-        !evt.altKey &&
-        !evt.shiftKey;
-    }
-    if (
-      isFindShortcut &&
-      document.activeElement !== document.getElementById('search-box')
-    ) {
+    if (document.activeElement === document.getElementById('search-box'))
+      return;
+
+    if ((evt.metaKey || evt.ctrlKey) && !evt.shiftKey && evt.code === 'KeyF') {
       document.getElementById('search-box').focus();
       evt.preventDefault();
     }
   });
 
-  return {
-    search: search,
-  };
+  return { search };
 };
 
 module.exports = {
@@ -434,7 +403,6 @@ sidebar:
     <symbol id='highlighting-mark-3' viewBox="0 0 1100 767" preserveAspectRatio="none">
         <path fill="currentColor" d="M311 516l-1-1-1-2-2-2s-1 0 0 0v-3-1l-1-1h1l1-1v-2-1c-1-1-2 0-2 1h-1v-1l-2-1h2l2-2h1l2-1 4-3h4l7-2h3l2-1 4-2 5-1 1-1v-3l3-1h7l5-1 7-2a383 383 0 00-42 0 48 48 0 00-4-2h-3-16a200 200 0 00-63 9l-6 1-4 1-2 1c1 1 0 1-10 2h-1l-1 1-2 2-8 1h-7l-3 1h-4l-2-1c-3-1-17 0-18 2v2h-1-1 5l4-1a239 239 0 004 0l3 1h1l-1 1-8 1h-6-4l-1-1-5 1a1080 1080 0 00-25-4l-2-2 3-1 6-1h1-2c-2-2-5-2-9-3l-9-1a65 65 0 00-22 0H87l-7 1-15 1c-4 1-6 0-8-1-1 0-1-1 1-2l7-2 14-2 2-2h-1l-1-1h1v-1-1l2-2 2-1h-5a141 141 0 00-12-1l1-1 1-1h1l6-2 6-1 4-1 9-2h-2a225 225 0 00-2-2l3-2 2-1 2-1-2-1-5-1H79l-7 1 1-1 1-2h-2-1l1-1c2-1 2-1-2-2-3-1-3-2-1-3l19-2h8l-2-2-2-1c-2 0-2-1-1-2 0-2 5-4 7-4l1-1h-1l-2-3c0-1-9 0-9 2l-16 2-2-1h2l10-2c9-2 11-3 5-3l-4-1h-6a162 162 0 00-15 2c0-1 2-3 4-3a490 490 0 01-7 0h-2l2-2 2-3h-3c-5-1-7-2-7-4l7-2 7-1 8-1 7-1 15-3-2-1-3-1 11-4 5-2 4-1c4-1 4-2-1-4l-1-1 4-2 1-1h-5l-3-1H94c-5 1-8 1-8-1l5-4 5-3c-1-1 0-1 4-3 5-1 9-4 9-6-1-1 1-1 10-3l9-1 4-2 14-3 2-1h3c1-1 1-1-1-1l-8-1-2-1c-1 1-1 0 0 0l2-1h4l2 1 1-1 4 1 4 1h2l-1-1-1-1-1-1 11-2 9-1-1-1-1-1 1-1c2 0 2-1 1-1h-6c-9 1-12 0-14-1h-2v-2c0-1-1-2-6-2-4 0-4 0-3-1l14-2 5-1c1-2 2-2 3-1l3 1 22-2c2 0 2-1 1-2v-3-1c-1-2 1-2 9-2h9l12-2 4-1h2l-2-1h-9a250 250 0 01-24 1 180 180 0 01-21 2l-2 1-1 1h-2c-1-1-1-1 0 0 1 0 1 0 0 0l-1 1h-2l-1-1-1 1h-1l-2-1-2 1h-2l-5-2c0-1 0-1 0 0l-1-1 2-4h1v-1l5-1h3c0 1 0 1 0 0l-2 1v1c1-1 1-1 0 0l1 2c1 0 2 0 1-1h7l1-2c-1 0 0 0 0 0l1-1 2-1 2-1h1v-1h4c0 1 0 1 0 0v-1l-2-2c1-1 2-2 5-2l4-2h2l7-1v-1h-19l-1-1-1-1-1-2v-1h2c-2-1-1-2 1-2l2 1h4l3-1c3 0 3-1 1-1l-2-1 1-1 1-1c1-1 3-2 4-1l1-1h2l4-1 2-1-10-1h-10-1a77 77 0 01-19 0l-1 1h-2-2l1-1 1-1h-2 9l4-1 4 1v-1l6-1 8-1 5-1 5-1h-5a845 845 0 01-37 3h-4c1 1 0 1-2 1l-7 1-14 1v-1l1-1 4-1 3-1a511 511 0 01106-13 141 141 0 0022-3h8c7-1 9-2 10-1s2 0 7-1a17080 17080 0 0194-16h9l1 2h2l1 1c-1 1 0 2 1 1l-1 2-3 1-2 2c1 1 0 1 36-4a169 169 0 0121-1 376 376 0 0136-3 170 170 0 0120 0l16 1 13-1 16-1h55a247 247 0 0025-1l5-1a1007 1007 0 0065 5 892 892 0 0094 4 223 223 0 0132 2l16 1a280 280 0 0141 3 42 42 0 018 2h4l6 1 7 1 1 1v-1h3l1 1c0 1 0 2-1 0-1-1-2-1-2 1h-5l-16-1a733 733 0 00-72-2h5a208 208 0 0029 3 189 189 0 0023 2 524 524 0 00-6 0 69 69 0 01-22-1h-1l-2 1h-20c3 1-1 2-8 1h-13a162 162 0 00-28-2 218 218 0 00-24-2 616 616 0 00-33 0l-9 1h-2l4 1h6l9 1a444 444 0 0042 3 1141 1141 0 01130 12 705 705 0 0144 5 559 559 0 00-60 2 505 505 0 0162 9h-4c-7 0-5 1 2 2a251 251 0 0030 3l7 1 5 1 4 1 5 1 5 1 6 1c8 0 13 1 13 2h-5v1h2c2 1 2 1 0 2-1 1 1 2 7 3 5 1 8 2 5 2l5 1 4 1 4 1c6 1 6 2 0 2l-4 1-6 1c-7-1-8-1-9 1l-1 1 4 1 4 1 4 1c3 0 3 1-2 1h-4l-6 1-4 1h1l4 1 7 1h5l1 1h2l-3 1-9 2 7 1 5 2h8l-3 3v-1l-2 1h-6c-7 0-9 0-8 2 2 2 11 5 17 5 4 0 5 1 5 2l-4 1-6-1a105 105 0 00-24 0l2 2a604 604 0 0129 4c7 1 10 1 9 3h-1l-1 1h-1l-1 1c-2 0-3 1-2 3v2l2 1 1 1v1h-14l-1 2c-1 0 0 3 2 4v1c-1 0-1 0 0 0 1 1-1 1-6 1-3 0-5 1-5 2l-1 1h-3v1l2 1 5 2 6 2 8 1h1l1 1c0 1-3 3-5 3h-1l-9 1a105 105 0 00-22 0 214 214 0 0114 4c-2 1-2 2 2 4l4 2 1 1-1 2h-1l-1 1-4 2h-2-5l-6 1-9 1h-3-1c-2 0-3 1-3 2h1l1 1 5 2c7 1 12 3 11 4l-1 1c0-1-1-1 0 0l-2 2c-1 1-1 2-2 1h-1l-2 1-5 1-4 1 1 1 2 2 2 1c2 0 2 0 1 2v2h-1-1l-2 1-1 1h1c2 0 3 2 2 2h-1l-2 1-4 2-3 1c-1 1-1 1-7-1-4-1-6-1-7 1h-15l4 1c6 1 6 2 5 2-1 1 6 4 13 4l4 1-1 2v4l-12-2c-4-1-13-2-14-1v1l9 3 3 2h-4l-4 1c-1 0-1 0 0 0l-9-1-10-2-1 1v1c-1 1 6 2 18 4l5 1 4 1c2 0 6 1 5 2h-7l-7 1 3 1c2 1 2 1 1 2h-8 2c3 1 2 2-1 2l-6 1h-3a252 252 0 00-40 0 214 214 0 00-42-4 330 330 0 00-31-4 430 430 0 00-54-2 396 396 0 01-36-1h-14-1-4l-3-1h-3c-3-1-6-2-8-1-1 0-4 0-3-1h-6l-11-2-1 1-1 1-2-1h-1l-1-1-1 1c1 0 1 0 0 0h-6l-34-1a494 494 0 01-29 0l-25 1c-4 0-9 3-6 3l-1 1-2 2h-13a1630 1630 0 01-52 2c-1 1-6 2-7 1l-5 1a13 13 0 01-5 0h-6l-8 1h-3l-2 1h-2l-4-1a213 213 0 01-25 2h-3v1l3 1h2v1h-5l-1 1a575 575 0 00-38 2l-24 2c-14 1-25 3-27 5l-3 2a252 252 0 00-38 3v-1zm0-5h-1l-1 1h1l1-1zm93-8c2-1 2-1-3-1l-13 2 16-1zm-257-7h-1l1 1v-1zm40-2h-1-1l1 1 1-1zm-26-3h-2c-1 1-1 1 1 1l1-1zm313 0c2 0 2 0 1-1l-29 2a247 247 0 0028-1zm19-1l-3-1-3 1h6zm-353 0c2 0 2 0 0-1l-2 1h2zm361-1h-5l2 1 3-1zm432-6l-3-1c-2 0-2 0-1 1h4zm-851-8h-1 1zm6-1l1-1-3 1h2zm8 0l1-1-3-1-2 1 2 1h2zm897-10h-1c-1 0-1 0 0 0h1zm-884-22h-1 1c1 0 1 0 0 0zm-4-2h-4c-2 1-1 2 1 1l3-1zm10 1h-2 2zm-4-1h-3 3zm920-64v-1l-1 1h1zm4-11h-1l1 1v-1zm-8-6h-1 1zm-25-5l-5-1-6-1h-1l5 1a96 96 0 017 1zm-806-5c1 0 1 0 0 0h-2 2zm802-3l-6-1h-7l6 1a155 155 0 017 0zm-833-7h-1l1 1v-1zm74-1h-1l1 1v-1zm-85-1h-2 2zm2 0l-1-1v1h1zm31-4l5-1a45 45 0 008-2l6-1c3-2 3-3 0-3h-2c0-1 3-2 7-1l8-2-6-1-6 1-5 2c-1 0-1 0 0 0l1 1c0-1 0 0 0 0l-5 1-2 1-2 1c0-1 0-1 0 0h-1l-3 1h-3c0-1 0-1 0 0l-6 2-1 1h7zm23-20h-1c-1 1-1 1 0 0h1zm667-2l-2-1h-1l3 1zm-666-4h2-5 3zm661 0h-1l1 1v-1zm3 0h-1v1l1-1zm-654-1h-1l1 1v-1zm-62-1h-1v1l1-1zm14-1l-1 1h1v-1zm6 0v-1l-1 1v1l1-1zm723-19h-1v1l1-1zm-509-11v-1l-1 1h1zM131 511v-1c1 0 0 0 0 0-2-1 0-2 2-2s2 0 1 1v1l2-1h7l1 3-1-1c1-1 0-1 0 0l-6 1-6-1zm-7-1v-2l1 2h-1zm11-5l1-1h2c2 0 2 0 1 1-1 2-3 2-4 0zm335-4h0zm6 0l1-1v1h-1zm-296-2l1-1h1v1h-2zm623-5h2l-1 1-1-1zm-9 0h1-1zm-548-1c0-1 1-2 3-1l1 1h-4zm478-1v-1l1 1h-1zm-8-1v-1l1 1h-1zm2 0v-1l1 1h-1zm265-3v-1l1 1h-1zm-686-3l1-1 1 1h-2zm5-1l2-1h5v1l-4 1-3-1zm-225-1l1-1v1h-1zm5-15h1c0-1 0 0 0 0h-1zm4 0h0zm962-72v-1l2 1v1l-2-1zm-907-41h3l-2 1-1-1zm24-8l-2-1 4-1h9l3 1h-4l-5 1-3 1-2-1zm-7 0h0s-1 0 0 0zm-11-8h1v1l-1-1zm16-4l-1-2c-1-1-1-1 2-2l4-1-1 1v1h2l1 1h-5v1c1 0 1 0 0 0l-1 1h-1s-1 0 0 0zm7-5v-1l1 1h-1zm-20-23h2v1l-2-1zm12-2l1-1-1 1c-1 0-1 0 0 0zm780-9l5-1v1h-5zm-3-1h0zm-14-1l-19-1-8-1h-11l3-2v1h3l1-1v1l2-1a203 203 0 0010 1l5 1h1v-1l6 1a86 86 0 0112 1l-3 2-2-1zm-23-2l-1-1-1 1h2zm30-2h-1-1c0-2 1-2 2-1v1zm-12-2l-1-1h-3c-3 1-6 0-5-1h12l-1 3-2-1zm6 0c-1 0-1 0 0 0h0zm-646-4h1c1 0 0 0 0 0h-1zm111-16h1v1l-1-1zm13 1c-1-1 0-2 1-2h1a403 403 0 011-3h1a605 605 0 0115-2l2 1c1-1 1-2-1-2-1 0-1 0 0 0l3-1h6a365 365 0 0171-2l-4 1-2 1 4 1c4 0 6 0 5 1h-7-17l-4 1-2-1h-6l-5-1h-1l-3 1h-2l-4 1h-7-2l-1 1-1-1-5 1-12 1s-1 0 0 0l-2 1h-1-3l-2 1-3-1-1-1-1 1v1h-1-2l-8 2zm-8-3h1v1l-1-1zm3-1h0c-1 1-1 0 0 0zm190-1l-2-1h3v1h-1zm-12-2h2l-2 1v-1zm4 0c-1 0 0 0 0 0l1 1-1-1zm-71-1c-1-1-1-1 6-1a102 102 0 0010 0l2 1c2-1 2 0 0 0h-2l-1 1h-4-1c-2 1-3 0-2-1h-1l-4 1-3-1zm44 1v-1l1 1h-1zm-22-1v-1l1 1h-1zm215 0c1-1-1-1-2-1h-3-4l-6-1h-1 1l1-1 1-1v1h5l1-1 1 1 1 1 2-1 4 1h4l2 1c1 0 1 0 0 0l-7 1zm9 0l1-1h2c2 0 3 1 1 1h-4zm-39-2l-2-1-3 1h-4a63 63 0 00-14-2h-7l-7 1-1-1v1h-11a1066 1066 0 00-67-2 4427 4427 0 00-55-2v-1l2-1 1-1h2s1 0 0 0v-1l1 1v2l2-2h3l20-1a1147 1147 0 01140 7l2-1c-1 0 0 0 0 0l4 1h4l2 1c2 0 2 0 0 0v1h-12zm-161-5l-1-1 1 2v-1zm-32 2v-1l-1-1 1-1 1 1c0 1 1 2 2 0l-1-1 3-1h3l2-1 1 1h2l-1 1v1l1-2 2-1 1 2v2h1l-3 1c-3 0-4 0-4-2-1-1-3-2-3 0h1l-1 1h-1c1 1-1 1-3 1h-3c-1 1-1 1 0 0zm15-2v-1l-1 1h1zm-22 2v-1l1-1v-1 3h-1zm3-2h1l-1 1v-1zm2-1l2-1 2 1h-1-3zm-7 0h0zm29-1c-1 0-1 0 0 0h0zm-3 0l1-1v1h-1z"/>
     </symbol>
-
 </defs>
 </svg>
 <script>search = (${searchPlugin.toString()})().search;</script>
@@ -462,7 +430,7 @@ sidebar:
 <section id="all-content">${substitutions.content}</section>
 <div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>
 <script type="module">
-  import { renderMathInElement } from '//unpkg.com/mathlive/dist/mathlive.mjs';
+  import { renderMathInElement } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
     renderMathInElement(document.getElementsByClassName('page__content')[0], { 
       renderAccessibleContent: false,
