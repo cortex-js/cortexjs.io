@@ -70,7 +70,7 @@ $base-green: $base0b;
 /* Tomorrow Comment */
 .hljs-comment,
 .hljs-title {
-    color: $base04;
+    color: var(--base-04, $base04);
     font-style: italic;
 }
 
@@ -87,7 +87,7 @@ $base-green: $base0b;
 .css .hljs-id,
 .css .hljs-class,
 .css .hljs-pseudo {
-    color: $base0c;
+    color: var(--base-0c, $base0c);
 }
 
 /* Tomorrow Orange */
@@ -97,14 +97,14 @@ $base-green: $base0b;
 .hljs-literal,
 .hljs-params,
 .hljs-constant {
-    color: $base09;
+    color: var(--base-09, $base09);
     font-weight: normal;
 }
 
 /* Tomorrow Yellow */
 .ruby .hljs-class .hljs-title,
 .css .hljs-rules .hljs-attribute {
-    color: $base0a;
+    color: var(--base-0a, $base0a);
 }
 
 /* Tomorrow Green */
@@ -114,12 +114,12 @@ $base-green: $base0b;
 .hljs-header,
 .ruby .hljs-symbol,
 .xml .hljs-cdata {
-    color: $base0b;
+    color: var(--base-0b, $base0b);
 }
 
 /* Tomorrow Aqua */
 .css .hljs-hexcolor {
-    color: $base08;
+    color: var(--base-08, $base08);
 }
 
 /* Tomorrow Blue */
@@ -131,21 +131,21 @@ $base-green: $base0b;
 .perl .hljs-sub,
 .javascript .hljs-title,
 .coffeescript .hljs-title {
-    color: $base0d;
+    color: var(--base-0d, $base0d);
     font-weight: bold;
 }
 
 /* Tomorrow Purple */
 .hljs-keyword,
 .javascript .hljs-function {
-    color: $base0e;
+    color: var(--base-0e, $base0e);
     font-weight: bold;
 }
 
 .hljs {
     display: block;
-    background: $base00;
-    color: $base05;
+    background: var(--base-00, $base00);
+    color: var(--base-05, $base05);
     padding: 0.5em;
 }
 
@@ -181,31 +181,31 @@ $base-green: $base0b;
 }
 
 
-.cm-s-tomorrow-night.CodeMirror { background: $base00; color: $base05; }
-.cm-s-tomorrow-night div.CodeMirror-selected { background: $base01; }
+.cm-s-tomorrow-night.CodeMirror { background: var(--base-00, $base00); color: var(--base-05, $base05); }
+.cm-s-tomorrow-night div.CodeMirror-selected { background: var(--base-01, $base01); }
 .cm-s-tomorrow-night .CodeMirror-line::selection, .cm-s-tomorrow-night .CodeMirror-line > span::selection, .cm-s-tomorrow-night .CodeMirror-line > span > span::selection { background: rgba(45, 45, 45, 0.99); }
 .cm-s-tomorrow-night .CodeMirror-line::-moz-selection, .cm-s-tomorrow-night .CodeMirror-line > span::-moz-selection, .cm-s-tomorrow-night .CodeMirror-line > span > span::-moz-selection { background: rgba(45, 45, 45, 0.99); }
-.cm-s-tomorrow-night .CodeMirror-gutters { background: $base00; border-right: 0px; }
-.cm-s-tomorrow-night .CodeMirror-guttermarker { color: $base0c; }
-.cm-s-tomorrow-night .CodeMirror-guttermarker-subtle { color: $base03; }
-.cm-s-tomorrow-night .CodeMirror-linenumber { color: $base04; }
-.cm-s-tomorrow-night .CodeMirror-cursor { border-left: 1px solid $base0d; }
+.cm-s-tomorrow-night .CodeMirror-gutters { background: var(--base-00, $base00); border-right: 0px; }
+.cm-s-tomorrow-night .CodeMirror-guttermarker { color: var(--base-0c, $base0c); }
+.cm-s-tomorrow-night .CodeMirror-guttermarker-subtle { color: var(--base-03, $base03); }
+.cm-s-tomorrow-night .CodeMirror-linenumber { color: var(--base-04, $base04); }
+.cm-s-tomorrow-night .CodeMirror-cursor { border-left: 1px solid var(--base-0d, $base0d); }
 
-.cm-s-tomorrow-night span.cm-comment { color: $base09; }
-.cm-s-tomorrow-night span.cm-atom { color: $base0e; }
-.cm-s-tomorrow-night span.cm-number { color: $base0e; }
+.cm-s-tomorrow-night span.cm-comment { color: var(--base-09, $base09); }
+.cm-s-tomorrow-night span.cm-atom { color: var(--base-0e, $base0e); }
+.cm-s-tomorrow-night span.cm-number { color: var(--base-0e, $base0e); }
 
-.cm-s-tomorrow-night span.cm-property, .cm-s-tomorrow-night span.cm-attribute { color: $base0b; }
-.cm-s-tomorrow-night span.cm-keyword { color: $base0c; }
-.cm-s-tomorrow-night span.cm-string { color: $base0a; }
+.cm-s-tomorrow-night span.cm-property, .cm-s-tomorrow-night span.cm-attribute { color: var(--base-0b, $base0b); }
+.cm-s-tomorrow-night span.cm-keyword { color: var(--base-0c, $base0c); }
+.cm-s-tomorrow-night span.cm-string { color: var(--base-0a, $base0a); }
 
-.cm-s-tomorrow-night span.cm-variable { color: $base0b; }
-.cm-s-tomorrow-night span.cm-variable-2 { color: $base0d; }
-.cm-s-tomorrow-night span.cm-def { color: $base09; }
-.cm-s-tomorrow-night span.cm-bracket { color: $base05; }
-.cm-s-tomorrow-night span.cm-tag { color: $base0c; }
-.cm-s-tomorrow-night span.cm-link { color: $base0e; }
-.cm-s-tomorrow-night span.cm-error { background: $base0c; color: $base03; }
+.cm-s-tomorrow-night span.cm-variable { color: var(--base-0b, $base0b); }
+.cm-s-tomorrow-night span.cm-variable-2 { color: var(--base-0d, $base0d); }
+.cm-s-tomorrow-night span.cm-def { color: var(--base-09, $base09); }
+.cm-s-tomorrow-night span.cm-bracket { color: var(--base-05, $base05); }
+.cm-s-tomorrow-night span.cm-tag { color: var(--base-0c, $base0c); }
+.cm-s-tomorrow-night span.cm-link { color: var(--base-0e, $base0e); }
+.cm-s-tomorrow-night span.cm-error { background: var(--base-0c, $base0c); color: var(--base-03, $base03); }
 
-.cm-s-tomorrow-night .CodeMirror-activeline-background { background: $base02; }
+.cm-s-tomorrow-night .CodeMirror-activeline-background { background: var(--base-02, $base02); }
 .cm-s-tomorrow-night .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
