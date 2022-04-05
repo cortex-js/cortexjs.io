@@ -478,9 +478,9 @@ ul.index {
 }
 
 #main a.externallink svg {
-    width: 0.8em;
-    height: 0.8em;
-    vertical-align: 0;
+    width: 0.7em;
+    height: 0.7em;
+    vertical-align: 6px;
     margin-left: 0.5ex;
     margin-right: 0.5ex;
 }
@@ -633,6 +633,7 @@ div.flags {
     color: var(--semantic-red);
 }
 
+
 .deprecated {
     text-decoration: line-through;
 }
@@ -667,6 +668,31 @@ div.flags {
 .modifier {
     color: var(--base-0c);// $magenta-400;
     font-weight: 700;
+}
+
+.numeric-literal {
+  color: var(--base-09);
+}
+
+.variable {
+  color: var(--base-08);
+}
+
+.function {
+  color: var(--base-0d);
+}
+
+.type {
+  color: var(--base-0a);
+}
+
+//  Yellow on yellow -> switch to black on yellow
+.type mark {
+  color:  #334;
+}
+
+.constant {
+  color: var(--base-09);
 }
 
  
@@ -747,19 +773,21 @@ figure.highlight {
 
   .reference,
   .typeParameter {
-      color: var(--base-05);
+    color: var(--base-05);
   }
 
   .punctuation {
     color: var(--base-05); // $indigo-400;
-}
+  }
 
 
-.keyword {
-  color: var(--base-0e); // $purple-500;
-}
+  .keyword {
+    color: var(--base-0e); // $purple-500;
+  }
 
-.string-literal {
-  color: var(--base-0b);// $gray-400;
-}
+  .string-literal {
+    color: var(--base-0b);// $gray-400;
+  }
+
+
 }

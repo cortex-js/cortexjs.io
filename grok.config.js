@@ -49,28 +49,37 @@ const searchPlugin = function () {
     );
   }
 
+  // Return a score: 0 if no match, >0 if a match anywhere in element, >>0
+  // if a match in header, >>>0 if a complete match in header
   function findInElementRecursive(el, termsRE) {
     // Text node
-    if (el.nodeType === 3) return termsRE.test(el.textContent);
+    if (el.nodeType === 3) return termsRE.test(el.textContent) ? 1 : 0;
 
     if (el.nodeType === 1) {
       // Element
+      const tag = el.nodeName.toLowerCase();
       if (
-        /^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(
-          el.nodeName.toLowerCase()
-        )
-      )
-        return false;
-      if (el.classList.contains('sr-only')) return false;
+        /^(script|noscript|style|textarea|annotation|annotation-xml)$/.test(tag)
+      ) {
+        return 0;
+      }
 
-      for (const child of el.childNodes)
-        if (findInElementRecursive(child, termsRE)) return true;
+      if (el.classList.contains('sr-only')) return 0;
+
+      let score = 0;
+      for (const child of el.childNodes) {
+        score = Math.max(score, findInElementRecursive(child, termsRE));
+      }
+      if (el.classList.contains('head')) {
+        score *= 20;
+      }
+      return score;
     }
-    return false;
+    return 0;
   }
 
   function findInElement(el, terms) {
-    if (!terms || terms.length === 0) return false;
+    if (!terms || terms.length === 0) return 0;
     return findInElementRecursive(el, termsToRegExp(terms));
   }
 
@@ -214,21 +223,20 @@ const searchPlugin = function () {
           const hasProhibitedMatches = prohibited.some(
             (q) =>
               keywords.some((keyword) => match(keyword, q) > 0) ||
-              findInElement(el, prohibited)
+              findInElement(el, prohibited) > 0
           );
 
           if (!hasProhibitedMatches) {
-            const hasMandatoryMatches = mandatory.every(
-              (q) =>
-                keywords.some((keyword) => match(keyword, q) > 0) ||
-                findInElement(el, mandatory)
-            );
-
-            if (hasMandatoryMatches) {
-              let score = mandatory.length;
-              if (optional.length === 0) {
-                score = 1;
-              } else {
+            let score = findInElement(el, mandatory);
+            if (
+              mandatory.every((q) =>
+                keywords.some((keyword) => match(keyword, q) > 0)
+              )
+            ) {
+              score += mandatory.length;
+            }
+            if (score > 0 || mandatory.length === 0) {
+              if (optional.length > 0) {
                 let hasInitialMatch = false;
                 let hasPartialMatch = false;
                 optional.forEach((q) => {
@@ -237,16 +245,13 @@ const searchPlugin = function () {
                     if (m === FULL_MATCH) {
                       score += 10;
                     } else if (m === INITIAL_MATCH) {
-                      hasInitialMatch = true;
+                      score += 5;
                     } else if (m === PARTIAL_MATCH) {
-                      hasPartialMatch = true;
+                      score += 2;
                     }
                   });
-                  hasPartialMatch =
-                    hasPartialMatch || findInElement(el, optional);
+                  score += findInElement(el, optional);
                 });
-                if (hasInitialMatch) score += 5;
-                if (hasPartialMatch) score += 2;
               }
               if (score > 0) {
                 searchResults.push([
@@ -388,8 +393,7 @@ sidebar:
         </path>
     </symbol>
     <symbol id='external-link' viewBox="0 0 512 512">
-        <path fill="currentColor" d="M432,320H400a16,16,0,0,0-16,16V448H64V128H208a16,16,0,0,0,16-16V80a16,16,0,0,0-16-16H48A48,48,0,0,0,0,112V464a48,48,0,0,0,48,48H400a48,48,0,0,0,48-48V336A16,16,0,0,0,432,320ZM474.67,0H316a28,28,0,0,0-28,28V46.71A28,28,0,0,0,316.79,73.9L384,72,135.06,319.09l-.06.06a24,24,0,0,0,0,33.94l23.94,23.85.06.06a24,24,0,0,0,33.91-.09L440,128l-1.88,67.22V196a28,28,0,0,0,28,28H484a28,28,0,0,0,28-28V37.33h0A37.33,37.33,0,0,0,474.67,0Z">
-        </path>
+      <path fill="currentColor" d="M384 320c-17.67 0-32 14.33-32 32v96H64V160h96c17.67 0 32-14.32 32-32s-14.33-32-32-32L64 96c-35.35 0-64 28.65-64 64V448c0 35.34 28.65 64 64 64h288c35.35 0 64-28.66 64-64v-96C416 334.3 401.7 320 384 320zM488 0H352c-12.94 0-24.62 7.797-29.56 19.75c-4.969 11.97-2.219 25.72 6.938 34.88L370.8 96L169.4 297.4c-12.5 12.5-12.5 32.75 0 45.25C175.6 348.9 183.8 352 192 352s16.38-3.125 22.62-9.375L416 141.3l41.38 41.38c9.156 9.141 22.88 11.84 34.88 6.938C504.2 184.6 512 172.9 512 160V24C512 10.74 501.3 0 488 0z"/>
     </symbol>
 
     <symbol  id='highlighting-mark-1' viewBox="0 0 1300 369" preserveAspectRatio="none">
