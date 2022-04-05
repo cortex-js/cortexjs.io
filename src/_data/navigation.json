@@ -39,6 +39,12 @@
         },
         { "separator": true },
 				{
+					"title": "Changelog",
+					"url": "/mathlive/changelog/",
+          "icon": "log"
+				},
+        { "separator": true },
+				{
 					"title": "Getting Started",
 					"url": "/mathlive/guides/getting-started/",
           "icon": "checklist"
