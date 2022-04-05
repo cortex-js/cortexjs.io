@@ -157,16 +157,16 @@ code + .tags {
     background: $gray-800;
   }
   .tag.constructor {
-    color: $yellow-900; // #ff810a; // Yellow-900;
-    background: $yellow-100; // #fff1c2; // Yellow-100;
+    color: var(--yellow-900); // #ff810a; // Yellow-900;
+    background: var(--yellow-100); // #fff1c2; // Yellow-100;
   }
   .tag.numeric {
-    color: $blue-800; //  #0b5c9c; // Blue-800
-    background: $blue-100; //  #b6d9fb;  // Blue-100
+    color: var(--blue-800); //  #0b5c9c; // Blue-800
+    background: var(--blue-100); //  #b6d9fb;  // Blue-100
   }
   .tag.predicate {
-    color: $lime-800; // #4a890b;   // Lime-800
-    background: $lime-100; // #d0e8b9; // Lime-100
+    color: var(--lime-800); // #4a890b;   // Lime-800
+    background: var(--lime-100); // #d0e8b9; // Lime-100
   }
 }
 

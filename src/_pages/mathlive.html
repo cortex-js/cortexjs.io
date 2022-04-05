@@ -22,9 +22,6 @@ head:
   margin-bottom: 24px;
 }
 
-.fullwidth .copy {
-}
-
 .fullwidth .copy h2 {
   margin: 0;
 }
@@ -33,14 +30,14 @@ head:
 }
 </style>
 
-<img alt="MathLive" class='full-width' src='/assets/mathlive-1.png' 
-style='margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346'>
+<img alt="MathLive" class="full-width" src="/assets/mathlive-1.png" 
+style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
 
 
 <h1>A Web Component for Math Input</h1>
 
 
-<section class='m-lg mb-xl max-w-2xl'>
+<section class="m-lg mb-xl max-w-2xl">
 <code-playground layout="stack">
   <style slot="style">
     .output:focus-within {
@@ -72,20 +69,59 @@ style='margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346'>
       <p>MathLive supports over 800 TeX commands.</p>
     </div>
     <div class="figure">
-      <img src='/assets/images/mathfield/loop-eqn.png'>
+      <img src="/assets/images/mathfield/loop-eqn.png">
     </div>
   </section>
   {% readmore "/mathlive/reference/commands/" %}
 Read more about the <strong>LaTeX commands</strong> supported by MathLive
 {% endreadmore %}
 
+<h2>Customizable</h2>
+<section class="fullwidth">
+  <div class="copy">
+    <p>You can paste in MathASCII or LaTeX, and get back those formats or an 
+      easy to parse <a href="/math-json">MathJSON object</a> representing an Abstract Syntax Tree of 
+      the formula.</p>
+    <p>A <a href="/docs/mathlive/">comprehensive API</a> is available and many options are customizable, from you own dictionary of LaTeX macros,
+      custom inline shortcuts, custom virtual keyboards and more.</p>
+  </div>
+  <div class="figure">
+    <img src="/assets/images/mathfield/virtualKeyboard.png">
+  </div>
+</section>
+
+{% readmore "/mathlive/guides/customizing/" %}
+Read more about  <strong>customizing a mathfield</strong>
+{% endreadmore %}
+
+{% readmore "/mathlive/guides/virtual-keyboards/" %}
+Read more about the <strong>virtual keyboard</strong>
+{% endreadmore %}
+
+
+<h2>Intuitive Editing</h2>
+<section class="fullwidth">
+  <div class="copy">
+    <p>Type an equation: use the <a href="/mathlive/reference/keybindings/">keyboard</a> to type symbols, arrow keys to navigate.</p>
+    <p>When done, select the equation, and copy the LaTeX code to another app.</p>
+  </div>
+  <div class="figure">
+    <img src="/assets/images/mathfield/quadratic.gif">
+  </div>
+</section>
+
+{% readmore "/mathlive/reference/keybindings/" %}
+Read more about the <strong>key bindings</strong>
+{% endreadmore %}
+
+
   <h2>For Anyone. Anywhere.</h2>
   <section class="fullwidth">
-    <div class='copy'>
+    <div class="copy">
         <p>MathLive works with screenreaders and include a custom text to speech engine.</p>
       <p>On screen, customizable, <a href="/mathlive/guides/virtual-keyboards/">virtual keyboards</a> are also available to make input easy, even on mobile devices.</p>
     </div>
-    <div class='figure'>
+    <div class="figure">
       <i class="fa-10x fad fa-universal-access"></i>
     </div>
   </section>
@@ -94,47 +130,14 @@ Read more about the <strong>LaTeX commands</strong> supported by MathLive
 Read more about the <strong>text to speech engine</strong>
 {% endreadmore %}
 
-  <h2>Customizable</h2>
-  <section class="fullwidth">
-    <div class='copy'>
-      <p>You can paste in MathASCII or LaTeX, and get back those formats or an 
-        easy to parse <a href="/math-json">MathJSON object</a> representing an Abstract Syntax Tree of 
-        the formula.</p>
-      <p>A <a href="/docs/mathlive/">comprehensive API</a> is available and many options are customizable, from you own dictionary of LaTeX macros,
-        custom inline shortcuts, custom virtual keyboards and more.</p>
-    </div>
-    <div class="figure">
-      <img src='/assets/images/mathfield/virtualKeyboard.png'>
-    </div>
-  </section>
-
-  {% readmore "/mathlive/guides/customizing/" %}
-Read more about  <strong>customizing a mathfield</strong>
-{% endreadmore %}
-
-  <h2>Intuitive Editing</h2>
-  <section class="fullwidth">
-    <div class='copy'>
-      <p>Type an equation: use the <a href="/mathlive/reference/keybindings/">keyboard</a> to type symbols, arrow keys to navigate.
-      <p>
-      <p>When done, select the equation, and copy the LaTeX code to another app.</p>
-    </div>
-    <div class="figure">
-      <img src='/assets/images/mathfield/quadratic.gif'>
-    </div>
-  </section>
-
-  {% readmore "/mathlive/guides/virtual-keyboards/" %}
-Read more about the <strong>virtual keyboard</strong>
-{% endreadmore %}
 
   <h2>Easy as π</h2>
   <section class="fullwidth">
-    <div class='copy'>
+    <div class="copy">
       <p>Some symbols get converted automatically. Type <kbd>p</kbd><kbd>i</kbd> and it becomes π.</p>
     </div>
     <div class="figure">
-      <img src='/assets/images/mathfield/euler.gif'>
+      <img src="/assets/images/mathfield/euler.gif">
     </div>
   </section>
 

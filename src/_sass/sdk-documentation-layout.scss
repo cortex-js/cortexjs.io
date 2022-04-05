@@ -648,7 +648,7 @@ div.flags {
 
 // For a string, in quotes
 .string-literal {
-    color: $lime-600;
+    color: var(--lime-600);
 }
 
 // Punctuation signs, "=", "|", ":".
@@ -660,7 +660,7 @@ div.flags {
 
 // For "string", "number", "void", "typeof", etc...
 .keyword {
-    color: $indigo-400; // $purple-500;
+    color: var(--indigo-400); // $purple-500;
 }
 
 // The "?" symbol to indicate optional arguments
