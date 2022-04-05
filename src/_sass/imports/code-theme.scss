@@ -209,3 +209,8 @@ $base-green: $base0b;
 
 .cm-s-tomorrow-night .CodeMirror-activeline-background { background: var(--base-02, $base02); }
 .cm-s-tomorrow-night .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
+
+
+code-playground {
+  font-size: 16px;
+}

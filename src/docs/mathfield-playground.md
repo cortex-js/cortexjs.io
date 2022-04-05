@@ -31,16 +31,18 @@ mathfield with the Playground below. Edit the HTML and JavaScript section for th
 <code-playground layout="stack">
     <style slot="style">
       .output {
-        background: #f9f9f9;
         padding: 16px;
+      }
+      .output textarea {
+        color: var(--ui-color);
+        background: var(--ui-background);
       }
       .output:focus-within {
         outline: none;
       }
       .output math-field, #latex {
-        background: #fff;
         border-radius: 4px;
-        border: 1px solid #ddd;
+        border: var(--ui-border);
         padding: 8px;
       }
       .output math-field { font-size: 24px; } 

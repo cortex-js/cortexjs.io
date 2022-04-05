@@ -427,8 +427,8 @@ $semantic-green: #2d9d78;
 
   --ui-background: #{$gray-50};
   --ui-background-hover: #{rgba($gray-300, .7)};  //#gray-100, 70%
-  --ui-border: 1px solid #{$gray-100};  
-  --ui-border-focus: solid 1px #{$gray-200};
+  --ui-border: 1px solid #{$gray-200};  
+  --ui-border-focus: solid 1px #{$gray-600};
   // Used for hover state of masthead and nav links
   --ui-focus-shadow: 0 2px 10px 0px rgb(12 17 16 / 70%), 0 2px 13px 0px rgb(13 12 16 / 85%);
 

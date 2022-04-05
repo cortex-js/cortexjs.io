@@ -42,7 +42,7 @@
   "devDependencies": {
     "@11ty/eleventy": "^1.0.0",
     "@cortex-js/prettier-config": "^1.1.1",
-    "@ui-js/grok": "^1.6.2",
+    "@ui-js/grok": "^1.7.1",
     "cssnano": "^5.1.5",
     "highlight.js": "^11.5.0",
     "husky": "^7.0.4",
