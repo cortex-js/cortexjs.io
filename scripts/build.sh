@@ -38,7 +38,7 @@ then
   # Uses grok.config.js for additional config option
 
   echo -e "$BASENAME$DOT Groking mathlive"
-  npx grok build ../mathlive --inFile ./src/mathlive.ts --config ./grok.config.js --sdkName mathlive --outDir ./src/build/ --outFile mathlive.html --modules mathfield-element options mathlive mathfield commands core
+  npx grok build ../mathlive --inFile ./src/mathlive.ts --config ./grok.config.js --sdkName mathlive --outDir ./src/build/ --outFile mathlive.html
 
   # echo -e "$BASENAME$DOT Groking MathJSON"
   # npx grok  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName math-json --outDir ./src/build/ --outFile math-json.html

@@ -675,15 +675,15 @@ div.flags {
 }
 
 .variable {
-  color: var(--base-08);
+  color: hsl(0, 90%, 46%)
 }
 
 .function {
-  color: var(--base-0d);
+  color: hsl(208, 82%, 51%); 
 }
 
 .type {
-  color: var(--base-0a);
+  color: hsl(40, 95%, 48%);
 }
 
 //  Yellow on yellow -> switch to black on yellow
@@ -771,6 +771,17 @@ figure.highlight {
     color: var(--base-05);
   }  
 
+  .type {
+    color: hsl(40, 81%, 70%);
+  }
+  .function {
+    color: var(--base-0d);
+  }
+  
+  .variable {
+    color: var(--base-08);
+  }
+  
   .reference,
   .typeParameter {
     color: var(--base-05);

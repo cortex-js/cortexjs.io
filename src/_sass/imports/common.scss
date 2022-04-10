@@ -190,8 +190,8 @@ $semantic-green: #2d9d78;
   --primary-color-light: #{$primary-color-light};
 
   --link-color: #{$primary-color};
-  --link-color-hover: #{$primary-color-light};
   --link-color-visited: #{$primary-color-dark};
+  --link-color-hover: #{$primary-color-light};
 
   // Callout boxes are used for "Read More"
   --callout-background: #e6f0fa;
@@ -266,7 +266,7 @@ $semantic-green: #2d9d78;
   --base-green: var(--base-0b);
 
   --console-background: var(--base-00);
-  --console-color: var(--base-06);
+  --console-color: var(--base-04);
 
   --red-50: #{$red-50};
   --red-100: #{$red-100};
@@ -450,8 +450,8 @@ $semantic-green: #2d9d78;
   --semantic-orange: #{$orange-400};
   --semantic-green: #{$green-700};
 
-  --base-00: #101417;
-  --base-06: #b9b9b9;
+  // --base-00: #101417;
+  // --base-06: #b9b9b9;
 
 }
 }

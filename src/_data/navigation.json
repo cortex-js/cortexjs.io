@@ -286,6 +286,11 @@
           "icon": "reference"
         },
         {
+          "title": "Styling",
+          "url": "/compute-engine/reference/styling/",
+          "icon": "reference"
+        },
+        {
           "title": "Trigonometry",
           "url": "/compute-engine/reference/trigonometry/",
           "icon": "reference"
