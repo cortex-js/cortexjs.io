@@ -89,7 +89,9 @@ body {
         padding-right: 2em;
         margin-top: 1em;
         margin-bottom: 1em;
-        @include breakpoint($small) {
+        margin-left: 0;
+        margin-right: 0;
+      @include breakpoint($large) {
           margin-left: 1em;
           margin-right: 1em;
         }

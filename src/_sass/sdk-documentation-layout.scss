@@ -1,14 +1,13 @@
 // Stylesheet for the typescript_doc layout.
 @charset "utf-8";
 
-@import 'imports/astra';
+// @import 'imports/astra';
 
 @import 'imports/common';
 
 @import 'imports/utilities';
 
 // @import 'imports/astra';
-@import 'imports/astra';
 @import 'imports/minimal-mistakes'; // main partials
 @import 'imports/minimal-mistakes-overrides';
 
@@ -19,13 +18,13 @@ $code-font-size: 1rem;
 
 
 mark {
-    background: var(--highlight-color);
+  background: var(--highlight-color);
 }
 
 section.page__content {
-    font-family: vat(--body-font);
-    line-height: 1.5;
-    color: var(--text-color);
+  font-family: var(--body-font);
+  line-height: 1.5;
+  color: var(--text-color);
 }
 
 section.page__content h1,
