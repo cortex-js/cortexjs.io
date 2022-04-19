@@ -144,6 +144,8 @@ layout. As a result some keyboard shortcuts may produce unexpected results.
 
 
 
+<section id='inline-shortcuts'>
+
 ## Inline Shortcuts
 
 An inline shortcut is a sequence of keystrokes typed on the keyboard that get
@@ -171,6 +173,7 @@ enhanced with new shortcuts.
 const mf = document.getElementById('mf');
 mf.setOptions({
   inlineShortcuts: {
+    ...mf.getOptions('inlineShortcuts'),    // Preserve default shortcuts
     "infty": { mode: 'math', value: '\\infty' },
   }
 });</div><div slot="html">&lt;math-field id="mf"&gt;
@@ -187,6 +190,7 @@ key:
 ```javascript
 mf.setOptions({
   inlineShortcuts: {
+    ...mf.getOptions('inlineShortcuts'),    // Preserve default shortcuts
     in: {
         mode: 'math',
         after: 'space | letter | digit | symbol | fence',
@@ -213,6 +217,9 @@ The `'after'` key indicate in what context the shortcut should apply. One or mor
 -   `'closefence'` A closing fence such as `}`
 -   `'text'` Some plain text
 
+</section>
+
+
 ### Customizing the Inline Shortcut Sensitivity
 
 **To change how quickly a set of keys must be typed to be considered a shortcut**
@@ -237,6 +244,8 @@ second character if this option is set to a value of 250 or so.
 
 Note that some operations, such as clicking to change the selection, or losing
 the focus on the mathfield, will automatically timeout the shortcuts.
+
+<section id='ascii-math'>
 
 ### ASCIIMath Inline Shortcuts
 
@@ -334,8 +343,7 @@ mf.setOptions({
 });
 ```
 
-
-
+</section>
 
 
 {% readmore "/mathlive/guides/speech/" %}
