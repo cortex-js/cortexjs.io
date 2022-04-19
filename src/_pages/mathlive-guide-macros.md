@@ -72,6 +72,10 @@ mf.setOptions({
 </div>
 </code-playground>
 
+
+**To turn off all macros**, use  `setOptions({macros: {}})`.
+
+
 The macro definition can contain up to eight arguments, represented by `#1` to `#9`.
 
 
