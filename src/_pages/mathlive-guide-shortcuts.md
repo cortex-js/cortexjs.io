@@ -8,11 +8,11 @@ sidebar:
     - nav: "mathlive"
 head:
   stylesheets:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
   scripts:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
 ---
@@ -152,12 +152,13 @@ An inline shortcut is a sequence of keystrokes typed on the keyboard that get
 replaced with another symbol. Unlike keystroke shortcuts they cannot be used to
 trigger a command, but only to insert a LaTeX fragment.
 
-For example, typing the `p` key followed by the `i` key will result in the _π_ (`\pi`) symbol being inserted.
+For example, typing the `p` key followed by the `i` key will result in the 
+`\pi` \\[ \pi \\] command being inserted, and not the `pi` characters.
 
 If a substitution was undesirable, use **undo** to revert to the raw input.
 
-MathLive has some [built-in inline shortcuts](https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts) defined, but they can be replaced or
-enhanced with new shortcuts.
+MathLive has some [built-in inline shortcuts](https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts) 
+defined, but they can be replaced or enhanced with additional shortcuts.
 
 <code-playground layout="stack">
     <style slot="style">
@@ -181,7 +182,9 @@ mf.setOptions({
 &lt;/math-field&gt;</div>
 </code-playground>
 
-The `mode` key, if present, indicate the mode in which this shortcut should apply, either `'math'` or `'text'`. If the key is not present the shortcut apply in both modes.
+The `mode` key, if present, indicate the mode in which this shortcut should 
+apply, either `'math'` or `'text'`. If the key is not present the shortcut 
+apply in both modes.
 
 
 **To constraint the context in which a shortcut should apply**, use the `after` 
@@ -200,7 +203,11 @@ mf.setOptions({
 });
 ```
 
-The `'after'` key indicate in what context the shortcut should apply. One or more values can be specified, separated by a '|' sign. If any of the values match, the shortcut will be applicable. Possible values are:
+The `'after'` key indicate in what context the shortcut should apply. One or 
+more values can be specified, separated by a '|' sign. If any of the values 
+match, the shortcut will be applicable. 
+
+Possible values are:
 
 -   `'space'` A spacing command, such as `\quad`
 -   `'nothing'` The begining of a group
@@ -219,6 +226,33 @@ The `'after'` key indicate in what context the shortcut should apply. One or mor
 
 </section>
 
+
+## Multicharacter Symbol
+
+In some cases it may not be possible to define in advance all the possible 
+combinations of keystrokes that should be interpreted as an inline shortcut. 
+For example, it might be desirable to recognize multi-character symbols, e.g. 
+\\[ \mathrm{speed} = \frac{\mathrm{distance}}{\mathrm{time}}\\]
+
+There are several ways to represent multicharacter symbols in LaTeX. 
+Conventionally, the `\mathit{}` command is used to represent variables and the 
+`\mathrm{}` for function names. You may prefer to use `\mathrm{}` in both cases.
+The command `\operatorname{}` may also be used for this purpose.
+
+**To recognize multicharacter symbols,** provide a `onMultichar()` handler.
+If the handler recognize the input as a valid multichar symbol, it 
+should return a command representing this symbol.
+
+```ts
+mf.setOptions({
+  onMulticharSymbol: (_mf, s) => {
+    if (/^[A-Z][a-z]+$/.test(s)) return `\\mathrm{${s}}`;
+    if (/^[a-z][a-z]+$/.test(s)) return `\\mathit{${s}}`;
+    return '';
+  },
+});
+
+```
 
 ### Customizing the Inline Shortcut Sensitivity
 

@@ -8,11 +8,11 @@ sidebar:
     - nav: "mathlive"
 head:
   stylesheets:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.css
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
   scripts:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/codemirror.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/javascript/javascript.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.0/mode/xml/xml.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
 ---
@@ -257,7 +257,7 @@ Multiple flavors are put on the clipboard, and the recipient of the **Paste** op
 
 The LaTeX in the `text/plain` flavor is "wrapped" to make it easier for the recipient of the paste to recognize that this content is in LaTeX format. There isn't really a standard format for this, but testing of several LaTeX-capable editors has shown that `\begin{equation*}` was the most commonly recognized.
 
-For improved interoperability, the exported LaTeX uses the `latex-expanded` format. In this format, macros that may be used in the formula are expanded to their definition. For example, if the `\differentialD` command is used in the formula, it is exported as its corresponding definition, `\mathrm{d}`. .{.notice--info}
+For improved interoperability, the exported LaTeX uses the `latex-expanded` format. In this format, any macros in the formula are expanded to their definition. For example, the `\differentialD` command is exported as its corresponding definition, `\mathrm{d}`. {.notice--info}
 
 **To customize the content of the `text/plain` flavor**, use the `onExport()` hook. 
 
@@ -271,7 +271,7 @@ mf.setOptions({onExport: (mf, latex) => `<math>${latex}</math>`});
 
 ```js
 mf.setOptions({onExport: (mf, latex, range) => 
-  `\\(${mg.getValue(range, 'latex')}\\)`
+  `\\(${mf.getValue(range, 'latex')}\\)`
 });
 ```
 
@@ -279,7 +279,7 @@ The exported format doesn't have to be LaTeX. To export ASCIIMath instead:
 
 ```js
 mf.setOptions({onExport: (mf, latex, range) => 
-  "`" + mg.getValue(range, 'ascii-math') + "`".
+  "`" + mf.getValue(range, 'ascii-math') + "`"
 });
 ```
 The standard delimiter for AsciiMath is the <kbd>&#96;</kbd> (backtick) character .{.notice--info}
