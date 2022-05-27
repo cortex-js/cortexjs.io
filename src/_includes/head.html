@@ -11,6 +11,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="strict-origin" />
 
+{% comment %}
+{% Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=39402 %}
+{% Replace if an actual favicon file is available %}
+{% endcomment %}
+<link rel="icon" href="data:," />
+
 <script>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
