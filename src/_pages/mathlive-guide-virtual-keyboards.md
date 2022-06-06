@@ -26,8 +26,9 @@ head:
 
 Typing math formulas require access to many special symbols. While [keyboard 
 shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help, mobile 
-devices require another solution. A virtual keyboard is a keyboard displayed 
-on screen that can be customized with specialized symbols for math input.
+devices require another solution. 
+
+A **virtual keyboard** is a keyboard displayed on screen that can be customized with specialized symbols for math input.
 
 ![](/assets/images/mathfield/virtual-keyboard.png)
 
@@ -54,24 +55,57 @@ keyboards, or create new ones.
 ## Controlling when the Virtual Keyboard Panel is Displayed
 
 The default behavior of the virtual keyboard panel is to only be displayed on 
-touch-enabled devices (mobile phones, tablets, laptops with a touch-screen) when
-a mathfield is focused.
+touch-enabled devices (mobile phones, tablets and laptops with a touch-screen) when a mathfield is focused.
 
 ![](/assets/images/mathfield/mobile-virtual-keyboard.png){.max-w-md}
 
 
-This behavior can be changed with the `virtualKeyboardMode` configuration property:
-- `"auto"`:  this is the default behavior: on touch-enabled devices, show the 
-virtual keyboard panel when the mathfield is focused, otherwise, don't show it.
+This behavior can be changed with the `virtualKeyboardMode` option (or the 
+equivalent `virtual-keyboard-mode` attribute):
+- `"auto"`:  on touch-enabled devices, show the virtual keyboard panel when 
+the mathfield is focused, otherwise, don't show it. This is the default behavior.
 - `"manual"`: a toggle button to control the virtual keyboard panel is displayed in the
 mathfield
 - `"onfocus"`: the virtual keyboard panel is displayed when the mathfield is focused
-- `"off"`: never show the virtual keyboard panel
+- `"off"`: never show the virtual keyboard panel. The visibility of the virtual
+keyboard panel can still be controlled programatically by setting the 
+`virtualKeyboardState` property of the Mathfield element to `visible` or `hidden`.
 
 There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations. {.notice--info}
 
 </section>
+
+<section id='virtual-keyboard-panel-with-multiple-mathfields'>
+
+## Virtual Keyboard Panel with Multiple Mathfields
+
+If you have multiple mathfields on a page, you might want to coordinate their
+use of the virtual keyboard panel.
+
+By default, each mathfield has its own instance of a virtual keyboard panel, which will become visible or hide as a mathfield gains or loses focus. However, this can result in a virtual keyboard panel hiding briefly before showing again, when 
+changing the focus from one mathfield to another.
+
+In some cases, you may need to have mathfields displayed in iframes, but
+would still want the virtual keyboard panel displayed as an element of the document, not attached to each iframe.
+
+For both of those situations, use a **shared virtual keyboard**.
+
+A shared virtual keyboard is a single instance of the virtual keyboard panel per 
+document, which is shared by all mathfield instances, regardless of whether
+they are in the main document or in an iframe.
+
+**To use a shared virtual keyboard** call the `makeSharedVirtualKeyboard()` 
+function from a script executing in the main document.
+
+If you are using iframes, add the `use-shared-virtual-keyboard` attribute to
+each mathfield in an iframe.
+
+You can set the `virtual-keyboard-mode` attribute of each mathfield to control
+when the shared virtual keyboard will be visible.
+
+</section>
+
 
 <section id='controlling-which-keyboards-are-displayed'>
 
@@ -473,7 +507,7 @@ container.
 
 The `position` attribute of this container element should be `relative` so that the virtual keyboard can correctly be placed relative to this element.
 
-For example when using [full screen elements](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API) that contain mathfield, set this property to the full screen element to ensure the virtual keyboard will be visible.
+For example when using [full screen elements](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API) that contain a mathfield, set this property to the full screen element to ensure the virtual keyboard will be visible.
 
 
 
@@ -483,12 +517,12 @@ For example when using [full screen elements](https://developer.mozilla.org/en-U
 
 ### Customizing the Virtual Keyboard
 
-**To control the appearance of the virtual keyboard background**, use the 
-following CSS variable:
-- `--keyboard-background`, a color
-- `--keyboard-text`, a color
-- `--keyboard-text-active`, a color
-- `--keyboard-background-border`, a color
+**To control the appearance of the virtual keyboard background**, set the 
+value of the following CSS variables to a CSS color:
+- `--keyboard-background`
+- `--keyboard-text`
+- `--keyboard-text-active`
+- `--keyboard-background-border`
 
 
 </section>
