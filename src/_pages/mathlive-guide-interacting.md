@@ -248,14 +248,13 @@ Multiple flavors are put on the clipboard, and the recipient of the **Paste** op
 
 | | |
 |:-- | :-- |
-| `text/plain` | LaTeX wrapped with a `\begin{equation*}` and `\end{equation*}`.|
+| `text/plain` | LaTeX wrapped with a `$$`.|
 | `application/x-latex` | Raw LaTeX |
 | `application/json`| A MathJSON representation of the formula. |
-| `application/mathml+xml` | A MathML representation of the formula. |
 
 </div>
 
-The LaTeX in the `text/plain` flavor is "wrapped" to make it easier for the recipient of the paste to recognize that this content is in LaTeX format. There isn't really a standard format for this, but testing of several LaTeX-capable editors has shown that `\begin{equation*}` was the most commonly recognized.
+The LaTeX in the `text/plain` flavor is "wrapped" to make it easier for the recipient of the paste to recognize that this content is in LaTeX format.
 
 For improved interoperability, the exported LaTeX uses the `latex-expanded` format. In this format, any macros in the formula are expanded to their definition. For example, the `\differentialD` command is exported as its corresponding definition, `\mathrm{d}`. {.notice--info}
 
