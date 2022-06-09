@@ -237,12 +237,14 @@ with both mouse and keyboard, which makes this solution more accessible.
 listen for the `change` event. Note that this event is not fired when in LaTeX
 editing mode, where **Return** or **Enter** is used to exit the mode.
 
+<section id='clipboard'>
+
 ## Interacting with the Clipboard
 
 Users can export the content of the mathfield by using standard **Copy**/**Cut**
-commands (<kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>X</kbd> and <kbd>ctrl</kbd>/<kbd>command</kbd>+<kbd>C</kbd>).
+commands (<kbd>Control/⌘</kbd> <kbd>X</kbd> and <kbd>Control/⌘</kbd> <kbd>C</kbd>).
 
-Multiple flavors are put on the clipboard, and the recipient of the **Paste** operation can pick whichever is most appropriate:
+Multiple flavors are put on the clipboard:
 
 <div class='symbols-table'>
 
@@ -254,9 +256,19 @@ Multiple flavors are put on the clipboard, and the recipient of the **Paste** op
 
 </div>
 
-The LaTeX in the `text/plain` flavor is "wrapped" to make it easier for the recipient of the paste to recognize that this content is in LaTeX format.
+The recipient of the **Paste** operation can pick whichever is most appropriate.
+If the recipient is a web app, the specific flavor can be accessed using
+the `event.clipboardData.getData()` API. If the recipient is a native app,
+the most popular browsers currently only make accessible the text flavor,
+with a LaTeX representation of the formula.
 
-For improved interoperability, the exported LaTeX uses the `latex-expanded` format. In this format, any macros in the formula are expanded to their definition. For example, the `\differentialD` command is exported as its corresponding definition, `\mathrm{d}`. {.notice--info}
+The LaTeX in the `text/plain` flavor is "wrapped" to make it easier for the 
+recipient of the paste to recognize that this content is in LaTeX format.
+
+For improved interoperability, the exported LaTeX uses the `latex-expanded` 
+format. In this format, any macros in the formula are expanded to their 
+definition. For example, the `\differentialD` command is exported as its 
+corresponding definition, `\mathrm{d}`. {.notice--info}
 
 **To customize the content of the `text/plain` flavor**, use the `onExport()` hook. 
 
@@ -270,7 +282,7 @@ mf.setOptions({onExport: (mf, latex) => `<math>${latex}</math>`});
 
 ```js
 mf.setOptions({onExport: (mf, latex, range) => 
-  `\\(${mf.getValue(range, 'latex')}\\)`
+  `$$${mf.getValue(range, 'latex')}$$`
 });
 ```
 
@@ -292,6 +304,7 @@ The standard delimiter for AsciiMath is the <kbd>&#96;</kbd> (backtick) characte
 
 <!-- ## Performing editing commands -->
 
+</section>
 
 {% readmore "/mathlive/guides/customizing/" %}
 Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
