@@ -27,8 +27,8 @@ head:
 
 ## Reading the Content of a Mathfield
 
-The content of a mathfield is available by reading the `value`
-property of the mathfield element, just like with a `<textarea>`.
+The content of a `<mathfield>` element is available by reading its `value`
+property, just like with a `<textarea>`.
 
 **To be notified as soon as the content of the mathfield is modified** listen for 
 an `'input'` event.
@@ -80,6 +80,51 @@ mf.addEventListener('input',(ev) => {
 </code-playground>
 
 
+## Listening for Changes to a Mathfield
+
+The Mathfield implements the [Input Events](https://www.w3.org/TR/input-events-1/), `beforeinput` and `input`, which 
+are also implemented by `<textarea>` and similar elements.
+
+The `beforeinput` and `input` events implement the `InputEvent` interface.
+
+These events are sent before (`beforeinput` event) and after (`input` event) a user attempts to edit the mathfield. This includes insertion and deletion of content, and formatting changes.
+
+The events include an `inputType` property that describe what caused the event to be dispatched.
+
+<div class='symbols-table'>
+
+| `inputType` | |
+|:-- | :-- |
+| `insertText` | Some content was added. It could be math content, plain text or raw latex. It could also be a row or column in matrix that was added. |
+| `insertLineBreak` | The **Enter** or **Return** key was pressed. Note that the actual content of the mathfield may not have changed. |
+| `insertFromPaste`| The content of the mathfield was changed because of a paste operation |
+| `deleteWordBackward`|  |
+| `deleteWordForward`|  |
+| `deleteWordForward`|  |
+| `deleteSoftLineBackward`|  |
+| `deleteSoftLineForward`|  |
+| `deleteHardLineBackward`|  |
+| `deleteHardLineForward`|  |
+| `deleteByCut`| The content was changed because of a cut operation |
+| `deleteContent`| Some content was deleted, but no particular direction applied |
+| `deleteContentBackward`|  |
+| `deleteContentForward`|  |
+| `historyUndo`| The content was changed because of an undo command |
+| `historyRedo`| The content was changed because of a redo command |
+
+
+</div>
+
+The event may also include a `data` property which is a
+string representing the content being modified.
+
+The `beforeinput` event is dispatched before any modifications to the mathfield have been done. The event
+is cancelable. Calling `preventDefault()` on the event will cause the modification to be prevented.
+
+If the `beforeinput` event is not canceled, the mathfield
+content is modified and a `input` event is dispatched.
+The `input` event is not cancelable.
+
 ## Changing the Content of a Mathfield
 
 You can change the value of the mathfield programatically. In the example 
@@ -129,7 +174,8 @@ The text color ("ink") and background color ("paper"), as well as other
 stylistic attributes, can be changed on a mathfield, or a portion of a mathfield
 using `applyStyle()`.
 
-This style applies to the content of the formula and will be reflected in the LaTeX output. To change the appearance of the mathfield but not
+This style applies to the content of the formula and will be reflected in the 
+LaTeX output. To change the appearance of the mathfield but not
 the content of the formula, see [Customizing](mathlive/guides/customizing/). {.notice--info}
 
 <code-playground layout="stack">
@@ -184,6 +230,10 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 </div>
 </code-playground>
 
+
+**To remove a style**, set the value of the `fontFamily, `color` or `backgroundColor` 
+property to `"none"`, or the value of the `fontShape`, `fontSeries` or `fontSize`
+property to `"auto"`.
 
 ## Detecting a Click on a Mathfield
 
