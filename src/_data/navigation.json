@@ -184,6 +184,11 @@
           "icon": "guide"
 				},
 				{
+					"title": "Symbols",
+					"url": "/compute-engine/guides/symbols/",
+          "icon": "guide"
+				},
+				{
 					"title": "LaTeX Syntax",
 					"url": "/compute-engine/guides/latex-syntax/",
           "icon": "guide"
