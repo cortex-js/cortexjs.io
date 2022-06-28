@@ -6,9 +6,6 @@ date: Last Modified
 sidebar:
     - nav: "compute-engine"
 version: Compute Engine version
-head:
-  stylesheets:
-    - https://unpkg.com/mathlive/dist/mathlive-static.css
 
 ---
 
@@ -470,11 +467,11 @@ head:
   </main>
   
   <script type="module">
-    import { convertLatexToMarkup } from 
+    import { convertLatexToMarkup, ComputeEngine, version } from 
       'https://unpkg.com/mathlive?module';
-    import {
-      ComputeEngine, version
-    } from 'https://unpkg.com/@cortex-js/compute-engine?module';
+    // import { convertLatexToMarkup } from 'https://unpkg.com/mathlive?module';
+    // import { ComputeEngine, version } from 'https://unpkg.com/@cortex-js/compute-engine?module';
+
 
 
     document.getElementById('version').innerText = version;
