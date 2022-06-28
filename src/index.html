@@ -7,8 +7,8 @@ read_time: false
 <section class="hero">
   <!-- <a class="section-link" href="/mathlive/" target="_self" rel="follow" aria-hidden="true" tabindex="-1"> -->
   <div>
-    <img src='assets/cortex-hero.jpg' alt="Cortex Logo">
-    <p style='max-width:480px'>Web Components for Scientific Computing</p>
+    <img src="assets/cortex-hero.jpg" alt="Cortex Logo">
+    <p style="max-width:480px">Web Components for Scientific Computing</p>
   </div>
   <!-- </a> -->
 </section>
@@ -73,18 +73,19 @@ read_time: false
 </div>
 
 <script type="module">
-  import {renderMathInDocument} from '//unpkg.com/mathlive?module';
-  window.addEventListener('DOMContentLoaded', (event) => {
-      renderMathInDocument({ 
-      renderAccessibleContent: false,
-      TeX: { 
-        delimiters: {
-          inline: [['\\(', '\\)']],
-          display: [ ['$$', '$$'], ['\\[', '\\]']],
+  window.addEventListener('DOMContentLoaded', (event) => 
+    import('//unpkg.com/mathlive?module').then((mathlive) => 
+      mathlive.renderMathInDocument({ 
+        renderAccessibleContent: false,
+        TeX: { 
+          delimiters: {
+            inline: [['\\(', '\\)']],
+            display: [ ['$$', '$$'], ['\\[', '\\]']],
+          },
+          processEnvironments : false 
         },
-        processEnvironments : false 
-      },
-      asciiMath: null,
-    });
-  });
+        asciiMath: null,
+      })
+    )
+  );
 </script>

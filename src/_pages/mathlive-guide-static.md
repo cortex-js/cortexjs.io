@@ -26,21 +26,23 @@ head:
 # Static Math Formulas
 
 **To render math contained in a document as a static (non-editable) formula**, 
-call [`renderMathInDocument()`](/docs/mathlive/?q=renderMathInDocument) at the end of your document, or in a `onload`
-handler .
+call [`renderMathInDocument()`](/docs/mathlive/?q=renderMathInDocument) at the 
+end of your document, or in a `DOMContentLoaded` event handler.
 
 ```html
 <script defer type="module">
-  import { renderMathInDocument } from 'mathlive';
-  renderMathInDocument();
+  window.addEventListener('DOMContentLoaded', () => 
+    import('//unpkg.com/mathlive?module').then((mathlive) => 
+      mathlive.renderMathInDocument()
+    )
+  );
 </script>
 ```
 
 By default, any LaTeX code that is enclosed with the following delimiters will
 be rendered as math:
 
-- `$$`...`$$` -- rendered in Display Style (CSS display block)
-- `\[`...`\]` -- rendered in Display Style (CSS display block)
+- `\[`...`\]` or `$$`...`$$` -- rendered in Display Style (CSS display block)
 - `\(`...`\)` -- rendered in Text Style (CSS display inline)
 
 ```html
@@ -74,14 +76,13 @@ If you dynamically generate content, call [`renderMathInElement(element)`](/docs
 render your element after the page has been loaded. This is a recursive call
 that will be applied to `element` and all its children.
 
-It is possible to call `renderMathInElement()` and
-`renderMathInDocument` on elements and documents that have already been
-rendered, in which case they will be rendered again. This is useful if something
-in the environment changes that could require the layout to be updated.
 
-The `renderMathInElement()` and `renderMathInDocument()`
-functions take an optional `options` object which can be used to customize their
-behavior:
+To render again elements or a whole document that has already been rendered,
+call  `renderMathInElement()` and `renderMathInDocument()` again. This is 
+useful when a change in the environment requires the layout to be updated.
+
+To customize the behavior of the `renderMathInElement()` and `renderMathInDocument()`
+functions pass an optional `options` object literal:
 
 - `skipTags`: an array of tag names whose content will not be scanned for
   delimiters
@@ -101,7 +102,7 @@ behavior:
   respectively.
 
 ```javascript
-MathLive.renderMathInElement(document.getElementById('formulas'), {
+renderMathInElement(document.getElementById('formulas'), {
   // Elements with a class of "instruction" or "source will be skipped
   ignoreClass: 'instruction|source',
   TeX: {
@@ -122,11 +123,11 @@ MathLive.renderMathInElement(document.getElementById('formulas'), {
 When a math formula is displayed as a static element using 
 `renderMathInDocument()`, the formula is transformed into some static markup.
 As a result, only the markup content can be selected, not the underlying
-LaTex formula. Selection of a portion of the formula may also lead to 
+LaTeX formula. Selection of a portion of the formula may also lead to 
 unexpected results.
 
 If preserving the ability to select a formula is important, consider
-using a read-only mathfield.
+using a read-only mathfield instead.
 
 **To create a read-only mathfield**, add the `read-only` attribute to a `<mathfield>`
 element.

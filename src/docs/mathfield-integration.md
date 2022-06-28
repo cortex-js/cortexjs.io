@@ -73,10 +73,10 @@ dynamically download the required fonts from the CDN as well.
 <body>
   <p>$$\frac{\pi}{2}$$</p>
   <script type="module">
-    import { renderMathInDocument } from 'https://unpkg.com/mathlive?module';
-
-    window.addEventListener('DOMContentLoaded', 
-      () => renderMathInDocument()
+    window.addEventListener('DOMContentLoaded', () => 
+      import('//unpkg.com/mathlive?module').then((mathlive) => 
+        mathlive.renderMathInDocument()
+      )
     );
   </script>
 </body>
