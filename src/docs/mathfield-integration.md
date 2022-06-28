@@ -233,7 +233,7 @@ While MathLive is primarily a math editor, the same  engine that renders
 an interactive math formula can also render "static" formulas in a web page, 
 along the lines of what the MathJax or KaTeX libraries provide.
 
-**To render a non-editable formula**, use `MathLive.renderMathInDocument()` 
+**To render a non-editable formula**, use `renderMathInDocument()` 
 
 The `renderMathInDocument()` will parse the DOM and converts LaTeX or MathASCII
 strings it finds into corresponding HTML markup. The options argument of 
@@ -241,12 +241,13 @@ strings it finds into corresponding HTML markup. The options argument of
 as which DOM elements to consider or skip. The necessary stylesheet and
 fonts will be injected in the current page.
 
-**To generate markup for a formula**, use `MathLive.latexToMarkup()`. You may 
+**To generate markup for a formula**, use `convertLatexToMarkup()`. You may 
 save the output or return it from a server-side process.
 
 To correctly display this markup, use the `mathlive-static.css` stylesheet, 
 which can be found in the `/dist/` directory. When using this method, the
-MathLive library is not necessary to render the formula.
+MathLive library is not necessary to render the formula once the markup 
+has been generated.
 
 ```html
 <!DOCTYPE html>
@@ -260,13 +261,17 @@ MathLive library is not necessary to render the formula.
 <body>
   <div id="formula"></div>
   <script type="module">
-    import {convertLatexToMarkup} 
-    from 'https://unpkg.com/mathlive?module';
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById("formula").innerHTML = 
-        convertLatexToMarkup(`\\xrightarrow[\\Delta]{\\text{abcd}}`)
-    });
+    window.addEventListener('DOMContentLoaded', () => 
+      import('https://unpkg.com/mathlive?module').then((mathlive) => {
+        document.getElementById("formula").innerHTML = 
+          mathlive.convertLatexToMarkup(`\\xrightarrow[\\Delta]{\\text{abcd}}`)
+      })
+    );
   </script>
 </body>
 </html>
 ```
+
+{% readmore "/mathlive/guides/static/" %}
+Learn more about the rendering <strong>static</strong> math content.
+{% endreadmore %}

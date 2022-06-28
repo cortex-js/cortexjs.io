@@ -134,17 +134,18 @@ element.
 
 <code-playground layout="stack">
     <style slot="style">
+      .output {
+        display: flex;
+        align-items: baseline
+      }
+      math-field { padding: 1px; font-size: 1.2em;}
       .output math-field:focus, .output math-field:focus-within {
         outline: none;
       }
     </style>
-    <div slot="html">&lt;math-field read-only style="
-        font-size: 32px; 
-        padding: 8px; 
-        border-radius: 8px;
-        border: 1px solid rgba(0, 0, 0, .3); 
-        box-shadow: 0 0 8px rgba(0, 0, 0, .2)"
-&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+    <div slot="html">The solution of the equation is&amp;nbsp;
+&lt;math-field read-only style="display:inline-block"&gt;
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
 </div>
 </code-playground>
