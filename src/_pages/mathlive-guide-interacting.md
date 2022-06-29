@@ -27,7 +27,7 @@ head:
 
 ## Reading the Content of a Mathfield
 
-The content of a `<mathfield>` element is available by reading its `value`
+**To read the content of a `<math-field>` element** use its `value`
 property, just like with a `<textarea>`.
 
 **To be notified as soon as the content of the mathfield is modified** listen for 
@@ -38,18 +38,18 @@ is only sent if you press the **Return** or **Enter** key, or when the mathfield
 loses focus and the content has been modified. {.notice--info}
 
 <code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
-    // `ev.target` is an instance of `MathfieldElement`
-    console.log(ev.target.value);
+  <style slot="style">
+    .output:focus-within {
+      outline: Highlight auto 1px;
+      outline: -webkit-focus-ring-color auto 1px
+    }
+    .output math-field:focus, .output math-field:focus-within {
+      outline: none;
+    }
+  </style>
+  <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
+  // `ev.target` is an instance of `MathfieldElement`
+  console.log(ev.target.value);
 });</div>
     <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
 &lt;math-field id="formula"&gt;
@@ -82,14 +82,17 @@ mf.addEventListener('input',(ev) => {
 
 ## Listening for Changes to a Mathfield
 
-The Mathfield implements the [Input Events](https://www.w3.org/TR/input-events-1/), `beforeinput` and `input`, which 
+The mathfield element dispatches the `beforeinput` and `input` [Input Events](https://www.w3.org/TR/input-events-1/), which 
 are also implemented by `<textarea>` and similar elements.
 
 The `beforeinput` and `input` events implement the `InputEvent` interface.
 
-These events are sent before (`beforeinput` event) and after (`input` event) a user attempts to edit the mathfield. This includes insertion and deletion of content, and formatting changes.
+These events are sent before (`beforeinput` event) and after (`input` event) a 
+user attempts to edit the mathfield. This includes insertion and deletion of 
+content, and formatting changes.
 
-The events include an `inputType` property that describe what caused the event to be dispatched.
+The events include an `inputType` property that describe what caused the event 
+to be dispatched.
 
 <div class='symbols-table'>
 
@@ -118,17 +121,17 @@ The events include an `inputType` property that describe what caused the event t
 The event may also include a `data` property which is a
 string representing the content being modified.
 
-The `beforeinput` event is dispatched before any modifications to the mathfield have been done. The event
-is cancelable. Calling `preventDefault()` on the event will cause the modification to be prevented.
+The `beforeinput` event is dispatched before any modifications to the mathfield 
+have been done. This event is cancelable. Calling `preventDefault()` on the 
+event will cause the modification to be prevented.
 
-If the `beforeinput` event is not canceled, the mathfield
-content is modified and a `input` event is dispatched.
-The `input` event is not cancelable.
+If the `beforeinput` event is not canceled, the mathfield content is modified 
+and a `input` event is dispatched. The `input` event is not cancelable.
 
 ## Changing the Content of a Mathfield
 
 You can change the value of the mathfield programatically. In the example 
-below, the **Latex** input field is editable and is reflected in the mathfield 
+below, the **LaTeX** input field is editable and is reflected in the mathfield 
 (and vice-versa).
 
 Note that we use the `suppressChangeNotifications` option when
@@ -235,6 +238,9 @@ x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 property to `"none"`, or the value of the `fontShape`, `fontSeries` or `fontSize`
 property to `"auto"`.
 
+You can ignore styles applied to a formula by using `mf.getValue('latex-unstyled')` {.notice--info}
+
+
 ## Detecting a Click on a Mathfield
 
 In most cases MathLive will respond to mouse and keyboard interactions with 
@@ -243,14 +249,14 @@ mathfield is clicked on. For example, you could display one or more read-only
 mathfields in a list and prompt the user to pick one by clicking on it.
 
 In general, to be notified of an event, use `mf.addEventListener()`. This 
-include some generic events, as well as some that are specific to mathfields.
+includes some generic events, as well as some that are specific to mathfields.
 Events that target a DOM element inside the mathfield (inside the shadow DOM)
 will bubble and be retargeted to appear as if they had targeted the
 mathfield (that is, the `evt.target` will be the mathfield itself).
 
 This include the following standard events:
 
-- `change`: *Return* or *Enter* key was pressed
+- `change`: **Return** or **Enter** key was pressed
 - `blur`, `focus`, `focusin`, `focusout`
 - `mousedown`, `mouseup`, `mousemove`, `mouseout, `mouseover`
 - `wheel`
@@ -276,7 +282,7 @@ based on some heuristic that tries to detect a `pointerdown` followed by a
 change its DOM elements (to display the selection for example) and the browser 
 may not be able to reliably trigger this event.
 
-Instead, to detect when a mathfield is being clicked on, listern for a `focus`
+Instead, to detect when a mathfield is being clicked on, listen for a `focus`
 event or a `pointerdown` event. The `focus` event has the benefit of working
 with both mouse and keyboard, which makes this solution more accessible.
 
@@ -284,9 +290,12 @@ with both mouse and keyboard, which makes this solution more accessible.
 ## Detecting When the User has Finished Editing a Mathfield
 
 **To detect when the user presses the **Return** or **Enter** key in a mathfield**,
-listen for the `change` event. Note that this event is not fired when in LaTeX
-editing mode, where **Return** or **Enter** is used to exit the mode. This
-event is also fired if the mathfield loses focus, even if the user did not 
+listen for the `change` event. 
+
+Note that this event is not fired when in LaTeX editing mode, where **Return** 
+or **Enter** is used to exit the mode. 
+
+This event is also fired if the mathfield loses focus, even if the user did not 
 use the keyboard. This behavior matches the `<textarea>` element.
 
 **To listen specifically for a press of the **Return** or **Enter** key on the 
@@ -348,7 +357,7 @@ mf.setOptions({onExport: (mf, latex, range) =>
   "`" + mf.getValue(range, 'ascii-math') + "`"
 });
 ```
-The standard delimiter for AsciiMath is the <kbd>&#96;</kbd> (backtick) character .{.notice--info}
+The standard delimiter for ASCIIMath is the <kbd>&#96;</kbd> (backtick) character .{.notice--info}
 
 <!-- Intercepting navigate out of and multiple fields -->
 

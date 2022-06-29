@@ -17,15 +17,15 @@ In this section we'll discuss other options for adding a mathfield in a web page
 
 ## Creating Mathfield Elements Programmatically
 
-In most cases you can simply use a `<mathfield>` tag:
+In most cases you can simply use a `<math-field>` tag:
 
 ```html
-<mathfield>e^{i\\pi}</mathfield>
+<math-field>e^{i\\pi}</math-field>
 ```
 If you need to add a mathfield to your DOM dynamically, you can create 
-new Mathfield DOM elements and add them to the DOM.
+new mathfield DOM elements and add them to the DOM.
 
-**To create a Mathfield DOM element**, use `new MathfieldElement()`.
+**To create a mathfield DOM element**, use `new MathfieldElement()`.
 
 ```javascript
 const mfe = new MathfieldElement();

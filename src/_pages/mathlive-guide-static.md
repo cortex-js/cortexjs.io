@@ -129,7 +129,7 @@ unexpected results.
 If preserving the ability to select a formula is important, consider
 using a read-only mathfield instead.
 
-**To create a read-only mathfield**, add the `read-only` attribute to a `<mathfield>`
+**To create a read-only mathfield**, add the `read-only` attribute to a `<math-field>`
 element.
 
 <code-playground layout="stack">

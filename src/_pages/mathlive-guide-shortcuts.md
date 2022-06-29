@@ -35,8 +35,8 @@ Input using a physical keyboard can be sped using two methods:
 A key binding is a combination of keys pressed simultaneously that
 triggers a command.
 
-For example, pressing `alt/option` and the `V` key at the same time will insert
-a square root. Pressing `ctrl/cmd` and the `Z` key at the same time will undo
+For example, pressing <kbd>Alt/Options</kbd> and the <kbd>V</kbd> key at the same time will insert
+a square root. Pressing <kbd>Control/⌘</kbd> and the <kbd>Z</kbd> key at the same time will undo
 the last command.
 
 MathLive has an extensive set of [default key bindings](https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts). 
@@ -94,7 +94,7 @@ This section details how MathLive uses keyboard events to determine which
 keyboard shortcut to activate.
 
 
-Let's consider the keyboard shortcut `Ctrl+Alt/Option-A`.
+Let's consider the keyboard shortcut <kbd>Control/⌘</kbd>+<kbd>Alt/Option</kbd>+<kbd>A</kbd>
 
 When the user presses this key combination on a keyboard with a US keyboard 
 layout, the event received will have the properties `code = "KeyA"` and  `key = "\u00e5"`.
@@ -114,7 +114,7 @@ as if it was on a US keyboard, in this case "the key immediately to the right of
 the caps lock key, which is labeled Q on a US keyboard (but is labeled A on a
 French keyboard".
 
-What we want to know is that the user pressed a key labeled "A". But none of the
+What we want to know is that the user pressed a key labeled <kbd>A</kbd>. But none of the
 information in the event record tells us that. The value of the key field varies
 depending on the keyboard layout and the modifiers pressed.
 
@@ -122,7 +122,7 @@ However, if we know the keyboard layout, we can use a table that maps the value
 of the key field to infer the label of the key  the user pressed, i.e. what the
 user sees printed on the top of the key cap, regardless of its physical location
 on the keyboard. Once we have the label, we can figure out that the user pressed
-`Ctrl+Alt+A` using the modifier fields of the event.
+<kbd>Control/⌘</kbd> + <kbd>A</kbd> using the modifier fields of the event.
 
 But how do we know what is the current keyboard layout? There is unfortunately
 no web platform API (broadly supported) to obtain that information. 
@@ -152,10 +152,10 @@ An inline shortcut is a sequence of keystrokes typed on the keyboard that get
 replaced with another symbol. Unlike keystroke shortcuts they cannot be used to
 trigger a command, but only to insert a LaTeX fragment.
 
-For example, typing the `p` key followed by the `i` key will result in the 
+For example, typing the <kbd>P</kbd> key followed by the <kbd>I</kbd> key will result in the 
 `\pi` \\[ \pi \\] command being inserted, and not the `pi` characters.
 
-If a substitution was undesirable, use **undo** to revert to the raw input.
+If a substitution was undesirable, use **Undo** to revert to the raw input.
 
 MathLive has some [built-in inline shortcuts](https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts) 
 defined, but they can be replaced or enhanced with additional shortcuts.
@@ -182,13 +182,13 @@ mf.setOptions({
 &lt;/math-field&gt;</div>
 </code-playground>
 
-The `mode` key, if present, indicate the mode in which this shortcut should 
-apply, either `'math'` or `'text'`. If the key is not present the shortcut 
+The `mode` property, if present, indicate the mode in which this shortcut should 
+apply, either `"math"` or `"text"`. If the property is not present the shortcut 
 apply in both modes.
 
 
 **To constraint the context in which a shortcut should apply**, use the `after` 
-key:
+property:
 
 ```javascript
 mf.setOptions({
@@ -203,8 +203,8 @@ mf.setOptions({
 });
 ```
 
-The `'after'` key indicate in what context the shortcut should apply. One or 
-more values can be specified, separated by a '|' sign. If any of the values 
+The `after` property indicate in what context the shortcut should apply. One or 
+more values can be specified, separated by a `|` sign. If any of the values 
 match, the shortcut will be applicable. 
 
 Possible values are:
@@ -270,8 +270,8 @@ A value of 750 will indicate that the maximum interval between two
 characters to be considered part of the same inline shortcut sequence is
 3/4 of a second.
 
-This is useful to enter "+-" as a sequence of two characters, while also
-supporting the "±" shortcut with the same sequence.
+This is useful to enter `+-` as a sequence of two characters, while also
+supporting the `±` shortcut with the same sequence.
 
 The first result can be entered by pausing slightly between the first and
 second character if this option is set to a value of 250 or so.
