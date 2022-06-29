@@ -124,7 +124,7 @@ See [npm](https://www.npmjs.com/package/aws-sdk) for the latest version.
 
 2. To get the necessary keys, follow [these instructions](https://docs.aws.amazon.com/polly/latest/dg/setting-up.html)
 
-    2.1 Create a custom policy in your [AWS console](https://console.aws.amazon.com/iam/home) with action: Read SynthesizeSpeech and a request condition of a referer with a StringEquals to your domain, e.g. 'https://example.com/*'
+    2.1 Create a custom policy in your [AWS console](https://console.aws.amazon.com/iam/home) with action: Read SynthesizeSpeech and a request condition of a referrer with a StringEquals to your domain, e.g. 'https://example.com/*'
 
     2.2 Create a group, and associated it with the policy above
 

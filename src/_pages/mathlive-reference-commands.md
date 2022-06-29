@@ -449,7 +449,7 @@ operator.
 The position of the limits can be controlled with `\limits`, `\nolimits` or 
 `\displaylimits` after the operator. The `\limits` command forces the display
 of the limits above and below the operator, `\nolimits` forces the display
-of the limits adjavent to the operator, and `\displaylimits` uses an 
+of the limits adjacent to the operator, and `\displaylimits` uses an 
 automatic position, based on the operator and current math style.
 
 <div class='no-line three-col'>

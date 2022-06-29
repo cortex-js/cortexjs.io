@@ -17,7 +17,7 @@ In this section we'll discuss other options for adding a mathfield in a web page
 
 ## Creating Mathfield Elements Programmatically
 
-In most cases you can simply use a `<math-field>` tag:
+**To add an editable mathfield to a document** use a `<math-field>` tag:
 
 ```html
 <math-field>e^{i\\pi}</math-field>
@@ -25,7 +25,7 @@ In most cases you can simply use a `<math-field>` tag:
 If you need to add a mathfield to your DOM dynamically, you can create 
 new mathfield DOM elements and add them to the DOM.
 
-**To create a mathfield DOM element**, use `new MathfieldElement()`.
+**To programatically create a mathfield element**, use `new MathfieldElement()`.
 
 ```javascript
 const mfe = new MathfieldElement();
@@ -48,7 +48,7 @@ Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
 In addition to `MathfieldElement`, the MathLive library provide some functions
 such as `renderMathInDocument()`. 
 
-**To access those functions**, import the MathLive module.
+**To access those functions**, import them from the MathLive module.
 
 JavaScript modules offer several benefits (asynchronous, deterministics loading, 
 no pollution of the global namespace, etc...). They are the recommended approach 
@@ -87,7 +87,7 @@ If this option works for you, you can move on to the MathLive SDK reference
 to find out how to customize mathfields, receive change notifications, define
 keyboard shortcuts, use custom macros and more.
 
-The section below discuss aditional options to load MathLive for more complex
+The section below discuss additional options to load MathLive for more complex
 configurations.
 
 ## Using `<script>` tags
@@ -171,7 +171,7 @@ library.
 If the global setup of your project requires a different organization, 
 for example locating all the static assets in a `/assets/` directory and all the
 JavaScript code in a `/js/` directory, you can specify where those assets can
-be found using the `fontsDirectory` configutation option.
+be found using the `fontsDirectory` configuration option.
 
 ```javascript
 import { MathfieldElement} from 'mathlive';
@@ -221,7 +221,7 @@ font loading.
 </head>
 <html>
 <body>
-    <math-field>\tan(x) = \frac{\sin \tetha}{\cos \tetha}</math-field>
+    <math-field>\tan(x) = \frac{\sin \theta}{\cos \theta}</math-field>
     <script src='./vendor/mathlive.min.js'></script>
 </body>
 </html>
