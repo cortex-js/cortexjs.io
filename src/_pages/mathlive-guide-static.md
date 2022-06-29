@@ -138,7 +138,7 @@ element.
         display: flex;
         align-items: baseline
       }
-      math-field { padding: 1px; font-size: 1.2em;}
+      math-field { font-size: 1.2em;}
       .output math-field:focus, .output math-field:focus-within {
         outline: none;
       }
