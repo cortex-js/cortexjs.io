@@ -44,7 +44,7 @@
 .symbols-table table {
   table-layout: auto;
   tr td:first-child {
-    min-width: 15ex;
+    min-width: var(--first-col-width, 15ex);
   }
 }
 

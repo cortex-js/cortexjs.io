@@ -765,6 +765,14 @@ figure.highlight {
 }
 
 
+.symbols-table table {
+  table-layout: auto;
+  tr td:first-child {
+    min-width: var(--first-col-width, 15ex);
+  }
+}
+
+
 @media (prefers-color-scheme: dark) {
   .card h3 strong, var {
     color: var(--base-05);

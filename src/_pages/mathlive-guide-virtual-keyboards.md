@@ -18,7 +18,7 @@ head:
 ---
 <script>
     moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
+        "mathlive": "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
@@ -60,51 +60,170 @@ touch-enabled devices (mobile phones, tablets and laptops with a touch-screen) w
 ![](/assets/images/mathfield/mobile-virtual-keyboard.png){.max-w-md}
 
 
-This behavior can be changed with the `virtualKeyboardMode` option (or the 
-equivalent `virtual-keyboard-mode` attribute):
-- `"auto"`:  on touch-enabled devices, show the virtual keyboard panel when 
-the mathfield is focused, otherwise, don't show it. This is the default behavior.
-- `"manual"`: a toggle button to control the virtual keyboard panel is displayed in the
-mathfield
-- `"onfocus"`: the virtual keyboard panel is displayed when the mathfield is focused
-- `"off"`: never show the virtual keyboard panel. The visibility of the virtual
-keyboard panel can still be controlled programatically by setting the 
-`virtualKeyboardState` property of the Mathfield element to `visible` or `hidden`.
+This behavior can be changed with the `virtualKeyboardMode` option or the 
+equivalent `virtual-keyboard-mode` attribute:
+
+<div class='symbols-table'>
+
+| `virtualKeyboardMode` | |
+|:-- | :-- |
+| `"auto"` |  On touch-enabled devices, show the virtual keyboard panel when the mathfield is focused, otherwise, don't show it. This is the default behavior. |
+| `"manual"` | A virtualk keyboard toggle button is displayed in the mathfield. With this button the user controls when the keyboard is displayed. |
+| `"onfocus"`| The virtual keyboard panel is displayed when the mathfield is focused |
+| `"off"` | Do not show the virtual keyboard panel automatically. The visibility of the virtual keyboard panel can be controlled programatically by setting the  `virtualKeyboardState` property of the mathfield element to `visible` or `hidden` |
+
+</div>
 
 There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations. {.notice--info}
 
 </section>
 
-<section id='virtual-keyboard-panel-with-multiple-mathfields'>
+## Displaying the Virtual Keyboard in a Custom Container
 
-## Virtual Keyboard Panel with Multiple Mathfields
+By default when a virtual keyboard is created, it is attached at the end of the
+document's `body` element.
 
-If you have multiple mathfields on a page, you might want to coordinate their
-use of the virtual keyboard panel.
+In some cases you may want to display the virtual keyboard in some other 
+container.
 
-By default, each mathfield has its own instance of a virtual keyboard panel, which will become visible or hide as a mathfield gains or loses focus. However, this can result in a virtual keyboard panel hiding briefly before showing again, when 
-changing the focus from one mathfield to another.
+For example when using [full screen elements](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API) that contain a mathfield, you want to make sure the virtual
+keyboard panel is visible by attaching it to the full screen element.
 
-In some cases, you may need to have mathfields displayed in iframes, but
-would still want the virtual keyboard panel displayed as an element of the document, not attached to each iframe.
+**To select which DOM element the virtual keyboard is created into**, set the
+`virtualKeyboardContainer` option to the desired DOM element.
 
-For both of those situations, use a **shared virtual keyboard**.
+The `position` attribute of this container element should be `relative` so that the virtual keyboard can correctly be placed relative to this element, and the container element should 
+be at least 365px wide to ensure that the virtual keyboard can fit.  {.notice--warning}
+
+<section id='custom-appearance'>
+
+## Customizing the Appearance of the Virtual Keyboard
+
+**To customize the appearance of the virtual keyboard panel** set the following CSS variables on a selector that applies to the container of the virtual 
+keyboard panel, which is the `<body>` element by default: 
+
+```css
+body {
+  --keyboard-zindex: 3000;
+}
+```
+
+Alternatively, you can set these CSS variables programmatically:
+
+```js
+document.body.style.setProperty("--keyboard-zindex", "3000");
+```
+
+
+<section id='zindex'>
+
+### Customizing the Virtual Keyboard Stack Order
+
+**To specify the stack order of the virtual keyboard panel relative to 
+other DOM elements** set the `--keyboard-zindex` CSS variable. 
+
+The default `zindex` of the virtual keyboard panel is `105`.
+
+</section>
+
+<section id='customizing-the-virtual-keyboard'>
+
+### Customizing the Virtual Keyboard Colors
+
+**To control the appearance of the virtual keyboard text and background colors**, set the 
+value of the following CSS variables to a CSS color:
+- `--keyboard-background`
+- `--keyboard-text`
+- `--keyboard-text-active`
+- `--keyboard-background-border`
+
+
+</section>
+
+<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
+
+### Customizing the Keycaps
+
+**To control the appearance of keycaps**, use the following CSS variables:
+  - `--keycap-height`
+  - `--keycap-font-size`
+  - `--keycap-small-font-size` (only if needed)
+  - `--keycap-extra-small-font-size` (only if needed)
+  - `--keycap-tt-font-size` (only if needed)
+  - `--keycap-background`, a color
+  - `--keycap-background-active`, a color
+  - `--keycap-background-border`, a color
+  - `--keycap-background-border-bottom`, a color
+  - `--keycap-text`, a color
+  - `--keycap-text-active`, a color
+  - `--keycap-secondary-text`, a color
+  - `--keycap-modifier-background`, a color
+  - `--keycap-modifier-border`, a color
+  - `--keycap-modifier-border-bottom`, a color
+
+</section>
+
+</section>
+
+
+<section id='shared-virtual-keyboard'>
+
+## Sharing Virtual Keyboards Amongst Multiple Mathfields
+
+When there are multiple mathfield elements in a page, they usually each have
+their own virtual keyboard.
+
+However, in some cases it might be desirable to have the virtual keyboard
+instance "detached" from the mathfield, and potentially shared by multiple 
+mathfield elements. 
+
+That's the case for example when mathfield elements are displayed in an 
+_iframe_. Since an _iframe_ is essentially a mini embedded document, the 
+default virtual keyboard will not display correctly when use in an _iframe_, 
+as it will be attached to the _iframe_ instead of being attached to the 
+main document.
+
+This can be solved by using a "shared" virtual keyboard.
 
 A shared virtual keyboard is a single instance of the virtual keyboard panel per 
 document, which is shared by all mathfield instances, regardless of whether
-they are in the main document or in an iframe.
+they are in the main document or in an _iframe_.
 
-**To use a shared virtual keyboard** call the `makeSharedVirtualKeyboard()` 
-function from a script executing in the main document.
+Even when not using _iframes_, having a shared virtual keyboard will result in 
+a better user experience when changing focus from mathfield to mathfield.
+With a shared virtual keyboard, the keyboard will remain visible while changing
+focus. Otherwise the virtual keyboard associated with one mathfield will hide, then
+the virtual keyboard keyboard associated with the newly focused mathfield
+will be displayed, resulting in a distracting animation.
 
-If you are using iframes, add the `use-shared-virtual-keyboard` attribute to
-each mathfield in an iframe.
+
+**To use a shared virtual keyboard**, call the `makeSharedVirtualKeyboard()` 
+function in the context of the main document.
+
+You should make that call as early as possible, before changing the options
+of any mathfield or adding mathfields to the DOM.
+
+```javascript
+makeSharedVirtualKeyboard({
+  virtualKeyboardLayout: 'dvorak',
+});
+```
+
+In the _iframe_ sub-documents, use the `use-shared-virtual-keyboard` attribute on 
+the `math-field` elements.
 
 You can set the `virtual-keyboard-mode` attribute of each mathfield to control
 when the shared virtual keyboard will be visible.
 
+
+```html
+<math-field use-shared-virtual-keyboard></math-field>
+```
+
 </section>
+
+
 
 
 <section id='controlling-which-keyboards-are-displayed'>
@@ -419,6 +538,44 @@ keyboards, plus ours, we could have used the `"all"` shortcut:
 ```
 </section>
 
+
+<section id='changing-the-alphabetical-keyboard-layout'>
+
+## Changing the Alphabetical Keyboard Layout
+
+By default, the layout of the alphabetic virtual keyboard is determined based
+on the locale (QWERTY for english speaking countries, AZERTY for french speaking
+countries, etc..). 
+
+**To select a different alphabetic keyboard layout**, such as DVORAK or COLEMAK, 
+use the `virtualKeyboardLayout` configuration property.
+
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+    <div slot="javascript">import 'mathlive';
+document.getElementById('mf').setOptions({
+  virtualKeyboardMode: "manual",
+  virtualKeyboardLayout: 'dvorak'
+});
+</div>
+    <div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
+</div>
+</code-playground>
+
+</section>
+
+
+
+
 <section id='customizing-the-appearance-of-the-virtual-keyboard-toggle'>
 
 ## Customizing the Appearance of the Virtual Keyboard Toggle
@@ -456,139 +613,6 @@ math-field::part(virtual-keyboard-toggle) {
 &lt;/math-field&gt;
 </div>
 </code-playground>
-
-</section>
-
-<section id='changing-the-alphabetical-keyboard-layout'>
-
-## Changing the Alphabetical Keyboard Layout
-
-By default, the layout of the alphabetic virtual keyboard is determined based
-on the locale (QWERTY for english speaking countries, AZERTY for french speaking
-countries, etc..). 
-
-**To select a different alphabetic keyboard layout**, such as DVORAK or COLEMAK, 
-use the `virtualKeyboardLayout` configuration property.
-
-<code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="javascript">import 'mathlive';
-document.getElementById('mf').setOptions({
-  virtualKeyboardMode: "manual",
-  virtualKeyboardLayout: 'dvorak'
-});
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
-</code-playground>
-
-</section>
-
-
-## Displaying the Virtual Keyboard in a Custom Container
-
-By default when a virtual keyboard is created, it is attached at the end of the
-document's `body` element.
-
-In some cases you may want to display the virtual keyboard in some other 
-container.
-
-**To select which DOM element the virtual keyboard is created into**, set the
-`virtualKeyboardContainer` option to the desired DOM element.
-
-The `position` attribute of this container element should be `relative` so that the virtual keyboard can correctly be placed relative to this element.
-
-For example when using [full screen elements](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API) that contain a mathfield, set this property to the full screen element to ensure the virtual keyboard will be visible.
-
-
-
-## Customizing the Appearance of the Virtual Keyboard
-
-<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
-
-### Customizing the Virtual Keyboard
-
-**To control the appearance of the virtual keyboard background**, set the 
-value of the following CSS variables to a CSS color:
-- `--keyboard-background`
-- `--keyboard-text`
-- `--keyboard-text-active`
-- `--keyboard-background-border`
-
-
-</section>
-
-<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
-
-### Customizing the keycaps
-
-**To control the appearance of keycaps**, use the following CSS variables.
-  - `--keycap-height`
-  - `--keycap-font-size`
-  - `--keycap-small-font-size` (only if needed)
-  - `--keycap-extra-small-font-size` (only if needed)
-  - `--keycap-tt-font-size` (only if needed)
-  - `--keycap-background`, a color
-  - `--keycap-background-active`, a color
-  - `--keycap-background-border`, a color
-  - `--keycap-background-border-bottom`, a color
-  - `--keycap-text`, a color
-  - `--keycap-text-active`, a color
-  - `--keycap-secondary-text`, a color
-  - `--keycap-modifier-background`, a color
-  - `--keycap-modifier-border`, a color
-  - `--keycap-modifier-border-bottom`, a color
-
-
-Set these CSS variables on any selector inherited by the
-`math-field` tag, for example, `body`: although CSS styles are "invisible" to custom components, CSS variables
-are "passed through" and will affect the content of the `<math-field>` custom component. {.notice--info}
-
-</section>
-
-<section id='sharing-virtual-keyboards-amongst-multiple-instances'>
-
-## Sharing Virtual Keyboards Amongst Multiple Instances
-
-When there are multiple mathfield elements in a page, they usually each have
-their own virtual keyboard.
-
-However, in some cases it might be desirable to have the virtual keyboard
-instance "detached" from the mathfield, and potentially shared by multiple 
-mathfield elements. 
-
-That's the case for example when mathfield elements are displayed in an 
-_iframe_. Since an _iframe_ is essentially a mini embedded document, the 
-default virtual keyboard will not display correctly when use in an _iframe_, 
-as it will be attached to the _iframe_ instead of being attached to the 
-main document.
-
-This can be solved by using a "shared" virtual keyboard.
-
-**To use a shared virtual keyboard**, call the `makeSharedVirtualKeyboard()` 
-function in the context of the main document.
-
-```javascript
-makeSharedVirtualKeyboard({
-  virtualKeyboardLayout: 'dvorak',
-});
-```
-
-In the _iframe_ sub-documents, use the `use-shared-virtual-keyboard` attribute on 
-the `math-field` elements.
-
-```html
-<math-field use-shared-virtual-keyboard></math-field>
-```
 
 </section>
 
