@@ -376,7 +376,7 @@ module.exports = {
   documentTemplate: (substitutions) => `---
 permalink: "/docs/${substitutions.sdkName}/"
 title: "${
-    { 'mathlive': 'MathLive', 'compute-engine': 'Compute Engine' }[
+    { mathlive: 'MathLive', 'compute-engine': 'Compute Engine' }[
       substitutions.sdkName
     ] ?? substitutions.sdkName
   }"
