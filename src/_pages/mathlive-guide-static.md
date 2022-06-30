@@ -89,12 +89,12 @@ functions pass an optional `options` object literal:
 - `processScriptType`: `<script>` tags of the indicated type will be processed
   while others will be ignored. Default: "math/tex".
 - `ignoreClass`: a string used as a regular expression of class names of
-  elements whose content will not be scanned for delimiters (`'tex2jax_ignore'`
+  elements whose content will not be scanned for delimiters (`"tex2jax_ignore"`
   by default)
 - `processClass`: a string used as a regular expression of class names of
   elements whose content **will** be scanned for delimiters, even if their tag
   name or parent class name would have prevented them from doing so.
-  (`'tex2jax_process'` by default)
+  (`"tex2jax_process"` by default)
 - `TeX.processEnvironments`: if false, math expression that start with `\begin{`
   will not automatically be rendered. (true by default)
 - `TeX.delimiters.inline` and `TeX.delimiters.display` arrays of delimiters that
@@ -153,7 +153,7 @@ element.
 
 
 {% readmore "/mathlive/guides/virtual-keyboards/" %}
-Next: Define custom <strong>Virtual Keyboards</strong>
+**Next:** Define custom <strong>Virtual Keyboards</strong>
 {% endreadmore %}
 
 

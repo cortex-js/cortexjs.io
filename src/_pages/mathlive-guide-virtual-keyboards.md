@@ -619,10 +619,10 @@ math-field::part(virtual-keyboard-toggle) {
 
 
 {% readmore "/mathlive/guides/lifecycle/" %}
-Advanced topic: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it</strong>
+**Advanced topic:** Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it
 {% endreadmore %}
 
 
 {% readmore "/docs/mathlive/" %}
-Next: Reference documentation of the MathLive API <strong>MathLive SDK</strong>
+**Next:** Reference documentation of the <strong>MathLive API</strong>
 {% endreadmore %}

@@ -85,7 +85,7 @@ Another set of speech rules supported are the SRE speech rules from Volker Sorge
 **To use the SRE speech rules**:
 
 1. Include the browser version of the SRE JavaScript file in your project. You can download it on [GitHub](https://github.com/zorkow/speech-rule-engine)
-2. Set the `textToSpeechRules` configuration key to `'sre'`.
+2. Set the `textToSpeechRules` configuration key to `"sre"`.
 
 **To configure SRE**, set the `textToSpeechRulesOptions` configuration key. For example:
 
@@ -100,7 +100,7 @@ textToSpeechRulesOptions: {
 
 #### Using the Local TTS Engine
 
-**To use the local (built-in, OS specific) TTS engine**, set the `speechEngine` configuration key to `'local'`.
+**To use the local (built-in, OS specific) TTS engine**, set the `speechEngine` configuration key to `"local"`.
 
 There is great variation between platforms (and browsers) on the quality of the TTS engine. However, it can be used even when offline, while the Amazon TTS engine offers higher quality and better consistency, but it does require a network connection.
 
@@ -139,9 +139,9 @@ Carefully consider how to handle the access and secret access keys. With the set
 
 **To configure the format of the speech output engine**, use the `textToSpeechMarkup` configuration option. Set it to:
 
--   `'ssml'` to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.
--   `'mac'` to request an output using Mac OS speech markup, e.g. '[[slc 150]]'. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.
--   `''` (empty string) to request no markup.
+-   `"ssml"` to request an output using the SSML markup language. Both SRE and the MathLive rules can produce this format.
+-   `"mac"` to request an output using Mac OS speech markup, e.g. '[[slc 150]]'. This format can only be used on Mac OS (and may not work will all browsers). On platforms other than Mac OS, this option does nothing.
+-   `""` (empty string) to request no markup.
 
 The Amazon TTS engine supports SSML, and it is recommended to use this option for the highest quality.
 
@@ -150,6 +150,6 @@ The Amazon TTS engine supports SSML, and it is recommended to use this option fo
 
 
 {% readmore "/mathlive/guides/static/" %}
-Next: Display <strong>Static Math</strong> formulas
+**Next:** Display <strong>Static Math</strong> formulas
 {% endreadmore %}
 

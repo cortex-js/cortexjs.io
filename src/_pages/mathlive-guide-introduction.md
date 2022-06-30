@@ -37,18 +37,18 @@ Let's add an editable mathfield to a web page.
 of the mathfield, as a LaTeX expression.
 
 ```html
-<math-field>f(x) = x + 1</math-field>
+<math-field>f(x) = \sin(x+\pi)</math-field>
 ```
 
-<a href="https://en.wikipedia.org/wiki/LaTeX">LaTeX</a> is a plain text markup language for structured documents. Most LaTeX commands start with a `\`, for example `\sqrt`, `\frac` and `\sin`. Read more about the <a href="/mathlive/reference/commands/">available commands</a>{.notice--info}
+<a href="https://en.wikipedia.org/wiki/LaTeX">LaTeX</a> is a plain text markup language for structured documents. Most LaTeX commands start with a `\`, for example `\sqrt`, `\frac` and `\sin`. Read more about the <a href="/mathlive/reference/commands/">LaTeX commands available in a mathfield</a>{.notice--info}
 
 
 ## Try it out
 
-**In the code playground below, change line 3 of the HTML to another LaTeX expression.**<br>For example `f(x) = \sin(x)`.
+**In the code playground below, change line 3 of the HTML to another LaTeX expression.**<br>For example `f(x) = \frac{x}{2}`.
 
-The code playground here and in the rest of the documentation are live: when you modify the HTML or JavaScript code the output will update to reflect your changes.
-Press **Reset** to bring back the playground to its original state. {.notice--info}
+**Note:** The code playground here and in the rest of the documentation are live: when you modify the HTML or JavaScript code the output will update to reflect your changes.
+<br>Press **Reset** to bring back the playground to its original state. {.notice--info}
 
 
 <code-playground layout="stack">
@@ -68,13 +68,13 @@ Press **Reset** to bring back the playground to its original state. {.notice--in
 </code-playground>
 
 
-Note that the HTML quirks mode is not supported. This means that the host page
+**Caution** The HTML quirks mode is not supported. This means that the host page
 must use the strict mode, indicated by a `<!DOCTYPE html>` directive at the top
-of the page.{.notice--warning}
+of the page. Without it, the layout of the equations inside the mathfield may be incorrect.{.notice--warning}
 
 
 {% readmore "/mathlive/guides/interacting/" %}
-Next: <strong>Interacting with a Mathfield</strong>
+**Next:** <strong>Interacting with a Mathfield</strong>
 {% endreadmore %}
 
 

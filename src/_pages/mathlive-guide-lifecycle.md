@@ -164,5 +164,5 @@ md.addEventListener('unmount')((ev) => {
 
 
 {% readmore "/mathlive/guides/customizing/" %}
-Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
+**Next:** <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
 {% endreadmore %}

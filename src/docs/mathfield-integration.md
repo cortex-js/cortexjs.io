@@ -20,7 +20,7 @@ In this section we'll discuss other options for adding a mathfield in a web page
 **To add an editable mathfield to a document** use a `<math-field>` tag:
 
 ```html
-<math-field>e^{i\\pi}</math-field>
+<math-field>e^{i\pi}</math-field>
 ```
 If you need to add a mathfield to your DOM dynamically, you can create 
 new mathfield DOM elements and add them to the DOM.
@@ -32,6 +32,9 @@ const mfe = new MathfieldElement();
 mfe.value = '\\frac{\\pi}{2}';
 document.body.appendChild(mfe);
 ```
+
+In Javascript, the `\` in a string must be escaped and the escape character is also `\`. So, in Javascript strings LaTeX commands start with a `\\`.{.notice--info}
+
 
 {% readmore "/docs/mathlive/#(%22mathfield-element%22%3Amodule)" %}
 See the <strong><kbd>MathfieldElement</kbd></strong> documentation for more details about the attributes, properties, methods and events supported.
@@ -58,9 +61,10 @@ to use MathLive APIs in your project.
 
 1. Include a `<script>` tag, with a `type="module"` attribute
 2. In the body of this `<script>` tag, use an `import` directive pointing to a 
-CDN URL for MathLive, such as `https://unpkg.com/mathlive?module`. 
+CDN URL for MathLive, such as `https://unpkg.com/mathlive?module`. If your target browser supports it, you can also use the `import()` function for a dynamic import.
 
-    Note the `?module` suffix which indicate to the CDN we need the ESM version of MathLive.
+**Note:** The `?module` suffix indicates to the CDN we need the ESM (module) version of MathLive.{.notice--info}
+
 3. Invoke a MathLive API, such as `renderMathInDocument()`.
 
 With this setup, MathLive will dynamically insert one or more stylesheets in 
@@ -143,10 +147,6 @@ a CDN.
 ```bash
 $ npm install --save mathlive
 ```
-
-The version of MathLive installed in the `node_modules` directory essentially
-corresponds to the content of the `/dist/` directory in the MathLive project
-on GitHub.
 
 After you've completed this step, you can use MathLive as any other modules
 in your project: 

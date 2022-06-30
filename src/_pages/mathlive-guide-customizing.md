@@ -26,16 +26,21 @@ head:
 
 # Customizing a mathfield
 
-The appearance and behavior of the mathfield is highly customizable. Here are a few common examples.
+The appearance and behavior of the mathfield is highly customizable. Here are a 
+few common examples.
 
 ## Styling
 
-The mathfield can be styled using the `style` attribute on the `<math-field>` 
-tag or by defining a CSS rule targeting the mathfield.
+**To style the mathfield use the `style` attribute on the `<math-field>` 
+tag or define a CSS rule targeting the mathfield.**
 
-This can be used to change the base font size or add a border.
+This can be used to modify the appearance of the mathfield in many ways, for 
+example changing the base font size or adding a border around it.
 
- Change line 2-6 of the HTML in the playground below with `color: #dde; background: #256291;`.
+**To display the mathfield as an inline element**, rather than a block element, 
+use `style="display: inline-block"`
+
+Change the style attribute in the playground below to `color: #dde; background: #256291;`.
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
@@ -57,7 +62,7 @@ This can be used to change the base font size or add a border.
 
 ### Focus Ring
 
-To change the appearance of the focus ring, use the `:focus-within` pseudo-element.
+**To change the appearance of the focus ring**, use the `:focus-within` pseudo-element.
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
@@ -76,35 +81,52 @@ To change the appearance of the focus ring, use the `:focus-within` pseudo-eleme
 <!-- htmlmin:ignore -->
 
 **Caution** Removing outlines in CSS creates issues for people navigating the web 
-with  a keyboard. However, you can change the appearance of the outline,
+with a keyboard. However, you can change the appearance of the outline,
 for example to indicate an error condition. If you remove the outline on the
 mathfield, make sure to replace it with another indicator, for example
 by displaying an outline on an enclosing element.  {.notice--warning}
 
 </section>
 
-<section id='css-variable'>
+<section id='css-variables'>
 
 ## CSS Variables
 
-Some CSS variables (custom properties) can be used to modify the appearance of 
-the mathfield:
+**To customize the appearance of the mathfield**, use the following CSS
+variables (custom properties) in a ruleset that applies to the mathfield element.
 
-* `--hue`: (0...360) default is 212 (light blue). The default colors below are derived
-from this variable
-* `--highlight`: color of the selected fragment of the expression, when the 
-mathfield is active
-* `--highlight-inactive`: selection color when the mathfield is not focused
-* `--caret`: color of the caret (insertion point)
-* `--primary`: accent color for some UI elements, such as the virtual keyboard toggle
-* `--smart-fence-opacity`: opacity of a smart gence (default is 50%)
-* `--smart-fence-color`: color of a smart fence (default is current color)
-* `--text-font-family`: the font stack used in text mode
+```css
+math-field {
+ --hue: 10       /* Set the highlight color and caret to a reddish hue */
+}
+```
 
-Set these CSS variables on any selector inherited by the
-`math-field` tag, for example, `body`: although CSS styles are "invisible" to 
-custom components, CSS variables are "passed through" and will affect the 
-content of the `<math-field>` custom component. {.notice--info}
+Alternatively you can set these CSS variables programatically:
+
+```js
+  document.body.style.setProperty("--hue", "10");
+```
+<div class='symbols-table' style='--first-col-width:25ex'>
+
+| CSS Variable | Usage |
+|:---|:---|
+| `--caret` | Color of the caret/insertion point |
+| `--contains-highlight` | Backround property for items that contain the caret |
+| `--highlight` | Color of the selection |
+| `--highlight-inactive` | Color of the selection, when the mathfield is not focused |
+| `--hue` | Hue of the highlight color and the caret |
+| `--primary` | Primary accent color, used for example in the virtual keyboard |
+| `--smart-fence-color` | Color of a smart fence (default is current color) |
+| `--smart-fence-opacity` | Opacity of a smart fence (default is 50%) |
+| `--text-font-family` | The font stack used in text mode |
+
+</div>
+ 
+Set these CSS variables on any selector that applies to the
+`<math-field>` element you want to customize, for example, `body`. 
+Although CSS styles are "invisible" to custom components, CSS variables are 
+"passed through" and will affect the content of the `<math-field>` custom component. {.notice--info}
+
 
 
 <!-- htmlmin:ignore -->
@@ -119,14 +141,23 @@ content of the `<math-field>` custom component. {.notice--info}
       }
     </style>
     <div slot="html">&lt;math-field style="
-    --hue: 53 !important;
-    --caret: red !important;
+  --hue: 53;
+  --caret: red;
 "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
+
+<br>
+
+ You can customize the appearance and zindex of the virtual keyboard panel
+ with some CSS variables associated with a selector that applies to the
+virtual keyboard panel container.
+
+Read more about [customizing the virtual keyboard appearance](https://cortexjs.io/mathlive/guides/virtual-keyboards/#custom-appearance)
+
 
 </section>
 
@@ -177,7 +208,7 @@ value on the `mathfield` or static element.
 Within a formula, the size can be specified from a font scale with 10 values, 
 where 1 em is the base font size of the mathfield or static element.
 
-| `fontSize`| | command | 
+| `fontSize`| | LaTeX command | 
 |------:|:------|:----|
 | 1 | 0.5 em | `\tiny` | 
 | 2 | 0.7 em | `\tiny` | 
@@ -241,11 +272,12 @@ Using `inline-block` is particularly useful when used in conjunction with `defau
   <div slot="html">The answer is &lt;math-field 
   default-mode="inline-math"
   style="
-    padding-left: 5px; padding-right: 5px;
     display: inline-block;
-    mind-width: 100px;
+    vertical-align: middle;
     border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, .3); 
+    border: 1px solid rgba(0, 0, 0, .3);
+    padding-left: 5px; padding-right: 5px;
+    min-width: 100px;
   "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
   &lt;/math-field&gt;.
@@ -332,8 +364,13 @@ line 3 to `scriptDepth: 0`, then try to type "x^2" in the mathfield.
 </code-playground>
 <!-- htmlmin:ignore -->
 
-See [EditingOptions](http://cortexjs.io/docs/mathlive/?q=EditingOptions) for more
-details about these and other available options.
+<br>
+
+{% readmore "/docs/mathlive/?q=EditingOptions" %}
+See `EditionOptions` for more
+details about these and other available options
+{% endreadmore %}
+
 
 </section>
 
@@ -371,7 +408,7 @@ greek, spanish, farsi, french, italian, japanese, polish and russian.
 The language to use is detected automatically, but it can be overridden by
 using the `locale` option or the `locale` attribute.
 
-Note: we `await` for the `<math-field>` definition to be loaded before
+**Note:** we `await` for the `<math-field>` definition to be loaded before
 invoking the `getOptions()` method, otherwise it would not be found. {.notice--info}
 
 <!-- htmlmin:ignore -->
@@ -404,7 +441,9 @@ console.log(mf.getOptions().strings[locale]);
 
 The content of the mathfield is displayed using a family of high-quality 
 fonts based on the original Computer Modern font from TeX. The mathfield
-will not display correctly using another font. By default, the directory containing
+will not display correctly using another font. 
+
+By default, the directory containing
 the fonts is located next to the file containing the mathlive library.
 If your bundler or asset management system require a different configuration
 you can specify where the fonts can be located using the [`fontsDirectory`](http://cortexjs.io/docs/mathlive/?q=fontsDirectory) option or the `fonts-directory` attribute.
@@ -426,7 +465,7 @@ you can specify where the fonts can be located using the [`fontsDirectory`](http
 </code-playground>
 <!-- htmlmin:ignore -->
 
-Note that changing the fonts directory for one mathfield will change the fonts 
+**Note:** changing the fonts directory for one mathfield will change the fonts 
 used by all the other mathfield elements in the page. {.notice--warning}
 
 {% readmore "/mathlive/guides/integration/" %}
@@ -437,6 +476,6 @@ Learn more about configuring the MathLive library to your environment, including
 
 
 {% readmore "/mathlive/guides/commands/" %}
-Next: <strong>Executing Commands</strong>: send editing commands to a mathfield
+**Next:** <strong>Executing Commands</strong>: send editing commands to a mathfield
 {% endreadmore %}
 

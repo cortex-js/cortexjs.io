@@ -80,5 +80,5 @@ The macro definition can contain up to eight arguments, represented by `#1` to `
 
 
 {% readmore "/mathlive/guides/shortcuts/" %}
-Next: Manage <strong>Key bindings and Inline Shortcuts</strong>
+**Next:** Manage <strong>Key bindings and Inline Shortcuts</strong>
 {% endreadmore %}

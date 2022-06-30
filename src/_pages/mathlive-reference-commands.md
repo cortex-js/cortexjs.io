@@ -156,7 +156,7 @@ sidebar:
 MathLive supports over 800 LaTeX commands.
 
 {% readmore "http://detexify.kirelabs.org/classify.html" %}
-If you can draw a shape but don't know the name of the corresponding LaTeX, use <strong>Detexify</strong>
+If you know the shape of a symbol use <strong>Detexify</strong> to find the name of the corresponding LaTeX command.
 {% endreadmore %}
 
 

@@ -31,9 +31,9 @@ head:
 property, just like with a `<textarea>`.
 
 **To be notified as soon as the content of the mathfield is modified** listen for 
-an `'input'` event.
+an `"input"` event.
 
-**Try**: modify the `'input'` event below to a `'change'` event. Notice how the `'change'` event
+**Try**: modify the `"input"` event below to a `"change"` event. Notice how the `"change"` event
 is only sent if you press the **Return** or **Enter** key, or when the mathfield
 loses focus and the content has been modified. {.notice--info}
 
@@ -65,7 +65,7 @@ For example to get the content as a MathJSON expression, use `getValue('math-jso
 
 The MathJSON format is a lightweight mathematical notation interchange format. [Learn more about MathJSON](/math-json/).{.notice--info}
 
-**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `'math-json'` to `'spoken-text'`.{.notice--info}
+**Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `"math-json"` to `"spoken-text"`.{.notice--info}
 
 <code-playground layout="stack">
     <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
@@ -135,7 +135,7 @@ below, the **LaTeX** input field is editable and is reflected in the mathfield
 (and vice-versa).
 
 Note that we use the `suppressChangeNotifications` option when
-changing the content of the mathfield, to prevent a `'input'` event from being 
+changing the content of the mathfield, to prevent a `"input"` event from being 
 triggered and creating an infinite loop.{.notice--info}
 
 <code-playground layout="stack">
@@ -371,10 +371,10 @@ The standard delimiter for ASCIIMath is the <kbd>&#96;</kbd> (backtick) characte
 </section>
 
 {% readmore "/mathlive/guides/customizing/" %}
-Next: <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
+**Next:** <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
 {% endreadmore %}
 
 {% readmore "/mathlive/guides/lifecycle/" %}
-Next: Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it
+**Next:** Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it
 {% endreadmore %}
 

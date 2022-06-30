@@ -134,5 +134,5 @@ sequence is replaced with the current selection).
     AWS speech synthesizer.
 
 {% readmore "/mathlive/guides/macros/" %}
-Next: Extending the supported LaTeX commands with **Macros**
+**Next:** Extending the supported LaTeX commands with **Macros**
 {% endreadmore %}
