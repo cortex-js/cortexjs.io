@@ -5,6 +5,7 @@ layout: single
 date: Last Modified
 sidebar:
     - nav: "mathlive"
+version: MathLive version
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
@@ -20,9 +21,12 @@ head:
         mathlive: "//unpkg.com/mathlive?module",
         "html-to-image": "///assets/js/html-to-image.js",
     };
+  window.addEventListener('DOMContentLoaded', (event) => 
+      import('//unpkg.com/mathlive?module').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive
+  ));
 </script>
 
-# MathLive Example
+# Demo
 
 Experiment with the options available to setup and customize a 
 mathfield with the Playground below. Edit the HTML and JavaScript section for the interactive result to update right away.
@@ -58,9 +62,7 @@ mathfield with the Playground below. Edit the HTML and JavaScript section for th
     <div slot="javascript">import 'mathlive';
 const mf = document.querySelector('#formula');
 const latexField = document.querySelector('#latex');
-latexField.addEventListener('input', () => 
-  mf.setValue(latexField.value)
-);
+latexField.addEventListener('input', () => mf.setValue(latexField.value));
 function updateLatex() {
   document.querySelector('#latex').value = mf.value;
 }
