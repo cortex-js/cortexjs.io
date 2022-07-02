@@ -127,7 +127,7 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.addPairedLiquidShortcode('def', (content, name) => {
     return `<tr><td><code>${name}</code></td><td>
-    ${md.renderInline(content)}</td></tr>`;
+    ${md.render(content)}</td></tr>`;
   });
 
   eleventyConfig.addPairedLiquidShortcode('defs', (content, col1, col2) => {

@@ -26,12 +26,6 @@ console.log(ce.box(["Expand", expr]).evaluate().latex);
 ```
 
 
-{% readmore "/compute-engine/changelog" %}
-The API in version `0.4.3` has changed. The **CHANGELOG** includes a migration 
-guide to help you update your code from previous version to `0.4.3`
-{% endreadmore %}
-
-
 The Compute Engine is for anyone who wants to make technical computing apps 
 in the browser or in server-side environments such as Node: educators, 
 students, scientists and engineers.
