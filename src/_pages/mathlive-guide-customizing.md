@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: Customizing - MathLive Guide
+title: Customizing a Mathfield
 permalink: /mathlive/guides/customizing/
 read_time: false
 sidebar:
@@ -24,8 +24,6 @@ head:
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-
-# Customizing a mathfield
 
 The appearance and behavior of the mathfield is highly customizable. Here are a 
 few common examples.
@@ -59,37 +57,6 @@ Change the style attribute in the playground below to `color: #dde; background: 
 </code-playground>
 <!-- htmlmin:ignore -->
 
-<section id='focus-ring'>
-
-### Focus Ring
-
-**To change the appearance of the focus ring**, use the `:focus-within` pseudo-element.
-
-<!-- htmlmin:ignore -->
-<code-playground layout="stack" >
-    <div slot="html">&lt;style&gt;
-  math-field:focus-within {
-    outline: 4px solid #d7170b;
-    border-radius: 4px;
-    background: rgba(251,	187,	182, .1);
-  }
-&lt;/style&gt;
-&lt;math-field&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
-</code-playground>
-<!-- htmlmin:ignore -->
-
-**Caution** Removing outlines in CSS creates issues for people navigating the web 
-with a keyboard. However, you can change the appearance of the outline,
-for example to indicate an error condition. If you remove the outline on the
-mathfield, make sure to replace it with another indicator, for example
-by displaying an outline on an enclosing element.  {.notice--warning}
-
-</section>
-
-<section id='css-variables'>
 
 ## CSS Variables
 
@@ -160,9 +127,35 @@ virtual keyboard panel container.
 Read more about [customizing the virtual keyboard appearance](https://cortexjs.io/mathlive/guides/virtual-keyboards/#custom-appearance)
 
 
-</section>
 
-<section id='display-options'>
+## Focus Ring
+
+**To change the appearance of the focus ring**, use the `:focus-within` pseudo-element.
+
+<!-- htmlmin:ignore -->
+<code-playground layout="stack" >
+    <div slot="html">&lt;style&gt;
+  math-field:focus-within {
+    outline: 4px solid #d7170b;
+    border-radius: 4px;
+    background: rgba(251,	187,	182, .1);
+  }
+&lt;/style&gt;
+&lt;math-field&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;
+</div>
+</code-playground>
+<!-- htmlmin:ignore -->
+
+**Caution** Removing outlines in CSS creates issues for people navigating the web 
+with a keyboard. However, you can change the appearance of the outline,
+for example to indicate an error condition. If you remove the outline on the
+mathfield, make sure to replace it with another indicator, for example
+by displaying an outline on an enclosing element.  {.notice--warning}
+
+
+
 
 ## Display Options
 
@@ -317,7 +310,6 @@ The French typographical convention is to only italicize lowercase roman letters
 The default letter shape style is `auto`: if the system locale is "french",
 the `french` style is used, `tex` otherwise.
 
-</section>
 
 
 <section id='editing-options'>

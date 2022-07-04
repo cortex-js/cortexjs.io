@@ -23,12 +23,60 @@ head:
     };
 </script>
 
+## Changing the Content of a Mathfield
+
+**To change the value of a `<math-field>` element programatically** set its `value` 
+property.
+
+In the playground below, the **LaTeX** input field is editable and is reflected 
+in the mathfield (and vice-versa).
+
+Note that we use the `suppressChangeNotifications` option when
+changing the content of the mathfield, to prevent an `"input"` event from being 
+triggered and creating an infinite loop.{.notice--info}
+
+<code-playground layout="stack">
+  <div slot="javascript">import 'mathlive';
+    const mf = document.getElementById('formula');
+    mf.addEventListener('input',(ev) => {
+        document.getElementById('latex').value = mf.value;
+    });
+//
+    document.getElementById('latex').value = mf.value;
+//
+    // Listen for changes in the latex text field, and reflect its value in 
+    // the mathfield.
+//
+    document.getElementById('latex').
+      addEventListener('input', (ev) => {
+        mf.setValue(
+          ev.target.value, 
+          {suppressChangeNotifications: true}
+        );
+    });
+  </div>
+  <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
+  &lt;math-field id="formula"&gt;
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+  &lt;/math-field&gt;                
+  &lt;label&gt;Latex&lt;/label&gt;
+  <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
+  autocorrect="off" spellcheck="false"></textarea></textarea>
+  </div>
+</code-playground>
+
+
+
 ## Reading the Content of a Mathfield
 
-**To read the content of a `<math-field>` element** use its `value`
-property, just like with a `<textarea>`.
+**To read the content of a `<math-field>` element** use its `value` property, 
+just like with a `<textarea>`.
 
-**To be notified as soon as the content of the mathfield is modified** listen for 
+The `expression` property of a mathfield contains a MathJSON representation
+of its content. The [MathJSON](/math-json) format is a lightweight 
+mathematical notation interchange format.{.notice--info}
+
+**To be notified when the content of the mathfield is modified** listen for 
 an `"input"` event.
 
 **Try**: modify the `"input"` event below to a `"change"` event. Notice how the `"change"` event
@@ -61,7 +109,6 @@ no argument.
 **To control the format of the result**, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
 For example to get the content as a MathJSON expression, use `getValue('math-json')`.
 
-The MathJSON format is a lightweight mathematical notation interchange format. [Learn more about MathJSON](/math-json/).{.notice--info}
 
 **Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `"math-json"` to `"spoken-text"`.{.notice--info}
 
@@ -80,8 +127,9 @@ mf.addEventListener('input',(ev) => {
 
 ## Listening for Changes to a Mathfield
 
-The mathfield element dispatches the `beforeinput` and `input` [Input Events](https://www.w3.org/TR/input-events-1/), which 
-are also implemented by `<textarea>` and similar elements.
+The mathfield element dispatches the `beforeinput` and `input` 
+[Input Events](https://www.w3.org/TR/input-events-1/), which are also 
+implemented by `<textarea>` and similar elements.
 
 The `beforeinput` and `input` events implement the `InputEvent` interface.
 
@@ -126,48 +174,129 @@ event will cause the modification to be prevented.
 If the `beforeinput` event is not canceled, the mathfield content is modified 
 and a `input` event is dispatched. The `input` event is not cancelable.
 
-## Changing the Content of a Mathfield
+## Detecting When the User has Finished Editing a Mathfield
 
-You can change the value of the mathfield programatically. In the example 
-below, the **LaTeX** input field is editable and is reflected in the mathfield 
-(and vice-versa).
+**To detect when the user presses the **Return** or **Enter** key in a mathfield**,
+listen for the `change` event. 
 
-Note that we use the `suppressChangeNotifications` option when
-changing the content of the mathfield, to prevent a `"input"` event from being 
-triggered and creating an infinite loop.{.notice--info}
+Note that this event is not fired when in LaTeX editing mode, where **Return** 
+or **Enter** is used to exit the mode. 
 
-<code-playground layout="stack">
-  <div slot="javascript">import 'mathlive';
-    const mf = document.getElementById('formula');
-    mf.addEventListener('input',(ev) => {
-        document.getElementById('latex').value = mf.value;
-    });
-//
-    document.getElementById('latex').value = mf.value;
-//
-    // Listen for changes in the latex text field, and reflect its value in 
-    // the mathfield.
-//
-    document.getElementById('latex').
-      addEventListener('input', (ev) => {
-        mf.setValue(
-          ev.target.value, 
-          {suppressChangeNotifications: true}
-        );
-    });
-  </div>
-  <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
-  &lt;math-field id="formula"&gt;
-  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-  &lt;/math-field&gt;                
-  &lt;label&gt;Latex&lt;/label&gt;
-  <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
-  autocorrect="off" spellcheck="false"></textarea></textarea>
-  </div>
-</code-playground>
+This event is also fired if the mathfield loses focus, even if the user did not 
+use the keyboard. This behavior matches the `<textarea>` element.
+
+**To listen specifically for a press of the **Return** or **Enter** key on the 
+keyboard** listen for an `input` event with an `inputType` property of `"insertLineBreak"`.
 
 
 
+
+
+## Detecting a Click on a Mathfield
+
+In most cases MathLive will respond to mouse and keyboard interactions with 
+the mathfield. However, in some cases it might be useful to detect when a 
+mathfield is clicked on. For example, you could display one or more read-only
+mathfields in a list and prompt the user to pick one by clicking on it.
+
+In general, to be notified of an event, use `mf.addEventListener()`. This 
+includes some generic events, as well as some that are specific to mathfields.
+Events that target a DOM element inside the mathfield (inside the shadow DOM)
+will bubble and be retargeted to appear as if they had targeted the
+mathfield (that is, the `evt.target` will be the mathfield itself).
+
+This include the following standard events:
+
+- `change`: **Return** or **Enter** key was pressed
+- `blur`, `focus`, `focusin`, `focusout`
+- `mousedown`, `mouseup`, `mousemove`, `mouseout, `mouseover`
+- `wheel`
+- `beforeinput`, `input`, `keydown`, `keyup`
+- all the [pointer events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events) such as `pointerdown`, `pointerup`, etc... and all the touch events
+
+As well as these mathfield specific events:
+- `mount`: the mathfield has been connected to the DOM
+- `unmount`: the mathfield is no longer connected to the DOM
+- `math-error`: syntax and other errors
+- `keystroke`: general keyboard interactions
+- `focus-out`: tab key interactions
+- `move-out`: arrow key interactions
+- `mode-change`: change to `math`, `text` or `latex` mode
+- `read-aloud-status-change`
+- `selection-change`
+- `undo-state-change`
+
+The `click` event may be dispatched in some cases. However, this event should
+be avoided. It is a synthetic event, meaning it's generated by the browser
+based on some heuristic that tries to detect a `pointerdown` followed by a 
+`pointerup` on the same DOM element. However, interacting with a mathfield may 
+change its DOM elements (to display the selection for example) and the browser 
+may not be able to reliably trigger this event.
+
+Instead, to detect when a mathfield is being clicked on, listen for a `focus`
+event or a `pointerdown` event. The `focus` event has the benefit of working
+with both mouse and keyboard, which makes this solution more accessible.
+
+
+
+
+<section id='clipboard'>
+
+## Interacting with the Clipboard
+
+Users can export the content of the mathfield by using standard **Copy**/**Cut**
+commands (<kbd>Control/⌘</kbd> <kbd>X</kbd> and <kbd>Control/⌘</kbd> <kbd>C</kbd>).
+
+Multiple flavors are put on the clipboard:
+
+<div class='symbols-table'>
+
+| | |
+|:-- | :-- |
+| `text/plain` | LaTeX wrapped with a `$$`.|
+| `application/x-latex` | Raw LaTeX |
+| `application/json`| A MathJSON representation of the formula. |
+
+</div>
+
+The recipient of the **Paste** operation can pick whichever is most appropriate.
+If the recipient is a web app, the specific flavor can be accessed using
+the `event.clipboardData.getData()` API. If the recipient is a native app,
+the most popular browsers currently only make accessible the text flavor,
+with a LaTeX representation of the formula.
+
+The LaTeX in the `text/plain` flavor is "wrapped" to make it easier for the 
+recipient of the paste to recognize that this content is in LaTeX format.
+
+For improved interoperability, the exported LaTeX uses the `latex-expanded` 
+format. In this format, any macros in the formula are expanded to their 
+definition. For example, the `\differentialD` command is exported as its 
+corresponding definition, `\mathrm{d}`. {.notice--info}
+
+**To customize the content of the `text/plain` flavor**, use the `onExport()` hook. 
+
+For example, to wrap the exported latex with `<math>...</math>` instead:
+
+```js
+mf.setOptions({onExport: (mf, latex) => `<math>${latex}</math>`});
+```
+
+**To export the "raw" (not expanded) LaTeX)**, use:
+
+```js
+mf.setOptions({onExport: (mf, latex, range) => 
+  `$$${mf.getValue(range, 'latex')}$$`
+});
+```
+
+The exported format doesn't have to be LaTeX. To export ASCIIMath instead:
+
+```js
+mf.setOptions({onExport: (mf, latex, range) => 
+  "`" + mf.getValue(range, 'ascii-math') + "`"
+});
+```
+The standard delimiter for ASCIIMath is the <kbd>&#96;</kbd> (backtick) character .{.notice--info}
 
 ## Applying Style to a Mathfield
 
@@ -239,134 +368,18 @@ property to `"auto"`.
 You can ignore styles applied to a formula by using `mf.getValue('latex-unstyled')` {.notice--info}
 
 
-## Detecting a Click on a Mathfield
-
-In most cases MathLive will respond to mouse and keyboard interactions with 
-the mathfield. However, in some cases it might be useful to detect when a 
-mathfield is clicked on. For example, you could display one or more read-only
-mathfields in a list and prompt the user to pick one by clicking on it.
-
-In general, to be notified of an event, use `mf.addEventListener()`. This 
-includes some generic events, as well as some that are specific to mathfields.
-Events that target a DOM element inside the mathfield (inside the shadow DOM)
-will bubble and be retargeted to appear as if they had targeted the
-mathfield (that is, the `evt.target` will be the mathfield itself).
-
-This include the following standard events:
-
-- `change`: **Return** or **Enter** key was pressed
-- `blur`, `focus`, `focusin`, `focusout`
-- `mousedown`, `mouseup`, `mousemove`, `mouseout, `mouseover`
-- `wheel`
-- `beforeinput`, `input`, `keydown`, `keyup`
-- all the [pointer events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events) such as `pointerdown`, `pointerup`, etc... and all the touch events
-
-As well as these mathfield specific events:
-- `mount`: the mathfield has been connected to the DOM
-- `unmount`: the mathfield is no longer connected to the DOM
-- `math-error`: syntax and other errors
-- `keystroke`: general keyboard interactions
-- `focus-out`: tab key interactions
-- `move-out`: arrow key interactions
-- `mode-change`: change to `math`, `text` or `latex` mode
-- `read-aloud-status-change`
-- `selection-change`
-- `undo-state-change`
-
-The `click` event may be dispatched in some cases. However, this event should
-be avoided. It is a synthetic event, meaning it's generated by the browser
-based on some heuristic that tries to detect a `pointerdown` followed by a 
-`pointerup` on the same DOM element. However, interacting with a mathfield may 
-change its DOM elements (to display the selection for example) and the browser 
-may not be able to reliably trigger this event.
-
-Instead, to detect when a mathfield is being clicked on, listen for a `focus`
-event or a `pointerdown` event. The `focus` event has the benefit of working
-with both mouse and keyboard, which makes this solution more accessible.
-
-
-## Detecting When the User has Finished Editing a Mathfield
-
-**To detect when the user presses the **Return** or **Enter** key in a mathfield**,
-listen for the `change` event. 
-
-Note that this event is not fired when in LaTeX editing mode, where **Return** 
-or **Enter** is used to exit the mode. 
-
-This event is also fired if the mathfield loses focus, even if the user did not 
-use the keyboard. This behavior matches the `<textarea>` element.
-
-**To listen specifically for a press of the **Return** or **Enter** key on the 
-keyboard** listen for an `input` event with an `inputType` property of `"insertLineBreak"`.
-
-<section id='clipboard'>
-
-## Interacting with the Clipboard
-
-Users can export the content of the mathfield by using standard **Copy**/**Cut**
-commands (<kbd>Control/⌘</kbd> <kbd>X</kbd> and <kbd>Control/⌘</kbd> <kbd>C</kbd>).
-
-Multiple flavors are put on the clipboard:
-
-<div class='symbols-table'>
-
-| | |
-|:-- | :-- |
-| `text/plain` | LaTeX wrapped with a `$$`.|
-| `application/x-latex` | Raw LaTeX |
-| `application/json`| A MathJSON representation of the formula. |
-
-</div>
-
-The recipient of the **Paste** operation can pick whichever is most appropriate.
-If the recipient is a web app, the specific flavor can be accessed using
-the `event.clipboardData.getData()` API. If the recipient is a native app,
-the most popular browsers currently only make accessible the text flavor,
-with a LaTeX representation of the formula.
-
-The LaTeX in the `text/plain` flavor is "wrapped" to make it easier for the 
-recipient of the paste to recognize that this content is in LaTeX format.
-
-For improved interoperability, the exported LaTeX uses the `latex-expanded` 
-format. In this format, any macros in the formula are expanded to their 
-definition. For example, the `\differentialD` command is exported as its 
-corresponding definition, `\mathrm{d}`. {.notice--info}
-
-**To customize the content of the `text/plain` flavor**, use the `onExport()` hook. 
-
-For example, to wrap the exported latex with `<math>...</math>` instead:
-
-```js
-mf.setOptions({onExport: (mf, latex) => `<math>${latex}</math>`});
-```
-
-**To export the "raw" (not expanded) LaTeX)**, use:
-
-```js
-mf.setOptions({onExport: (mf, latex, range) => 
-  `$$${mf.getValue(range, 'latex')}$$`
-});
-```
-
-The exported format doesn't have to be LaTeX. To export ASCIIMath instead:
-
-```js
-mf.setOptions({onExport: (mf, latex, range) => 
-  "`" + mf.getValue(range, 'ascii-math') + "`"
-});
-```
-The standard delimiter for ASCIIMath is the <kbd>&#96;</kbd> (backtick) character .{.notice--info}
 
 <!-- Intercepting navigate out of and multiple fields -->
-
-<!-- MathfieldListeners --> 
-
-<!-- $insert() -->
 
 
 <!-- ## Performing editing commands -->
 
 </section>
+
+{% readmore "/mathlive/guides/commands/" %}
+**Next:** Interacting with a mathfield with <strong>editing commands</strong>
+{% endreadmore %}
+
 
 {% readmore "/mathlive/guides/customizing/" %}
 **Next:** <strong>Customizing a Mathfield</strong>: controlling its appearance and behavior
