@@ -25,16 +25,15 @@ head:
 User initiated commands that control the mathfield can be dispatched using
 [`executeCommand()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)). 
 
-Commands are
-identified by a string called the **selector**. 
+Commands are identified by a string called the **selector**. 
 
 ```js
 mf.executeCommand('deleteBackward');
 ```
 
 
-Most commands take no parameters. When a command does have a parameter, a tuple with the
-selector and the commands arguments can be passed to
+Most commands take no parameters. When a command does have a parameter, a tuple 
+with the selector and the commands arguments can be passed to
 `executeCommand()`. For example:
 
 ```js
@@ -44,9 +43,14 @@ mf.executeCommand(['insert', '(#0)']);
 The command above will insert an open and close parenthesis around the selection (the `#0`
 sequence is replaced with the current selection).
 
+Commands can also be associated with virtual keyboard keycaps.
+
+```json
+{ class: "action", label: "Next", command: ["performWithFeedback", "commit"] }
+```
 ## Editing
 
-- `insert`. This selector takes two arguments. The first one is required and is
+- `insert` This selector takes two arguments. The first one is required and is
   the content to be inserted, as a string. The second one is an optional set of
   key value pairs:
   - `insertionMode`: one of `"replaceSelection"`, `"replaceAll"`,
@@ -57,10 +61,10 @@ sequence is replaced with the current selection).
     `"before"` (the selection will be an insertion point before the item that
     has been inserted) or `"item"` (the item that was inserted will be
     selected).
-- `delete` synonym for `deleteNextChar`
-- `deleteBackward`, `deleteForward`
-- `deleteNextWord`, `deletePreviousWord`
-- `deleteToGroupStart`, `deleteToGroupEnd`
+- `delete` Synonym for `deleteNextChar`
+- `deleteBackward` `deleteForward`
+- `deleteNextWord` `deletePreviousWord`
+- `deleteToGroupStart` `deleteToGroupEnd`
 - `deleteToMathFieldEnd`
 - `transpose`
 
@@ -74,13 +78,15 @@ sequence is replaced with the current selection).
 
 ## User Interface
 
+- `commit` The user has completed input. Triggered when pressing the **Return**
+or **Enter** key.
 - `switchMode`
-- `complete` exit command mode and insert result
+- `complete` Exit command mode and insert result
 - `nextSuggestion` and `previousSuggestion` when the popover panel is selected,
   display the next/previous suggestion
-- `toggleKeystrokeCaption` show/hide the keystroke caption panel. This panel
+- `toggleKeystrokeCaption` Show/hide the keystroke caption panel. This panel
   displays the keys being typed, including the shortcuts. Great for demos!
-- `toggleVirtualKeyboard` show/hide the virtual keyboard
+- `toggleVirtualKeyboard` Show/hide the virtual keyboard
 
 ## Scrolling
 
@@ -90,31 +96,31 @@ sequence is replaced with the current selection).
 
 ## Navigating
 
-- `moveToNextChar`, `moveToPreviousChar`
-- `moveToNextPlaceholder`, `moveToPreviousPlaceholder`
-- `moveToNextWord`, `moveToPreviousWord`
-- `moveToGroupStart`, `moveToGroupEnd`
-- `moveToMathFieldStart`, `moveToMathFieldEnd`
-- `moveUp`, `moveDown`
-- `moveToSuperscript`, `moveToSubscript`
+- `moveToNextChar` `moveToPreviousChar`
+- `moveToNextPlaceholder` `moveToPreviousPlaceholder`
+- `moveToNextWord` `moveToPreviousWord`
+- `moveToGroupStart` `moveToGroupEnd`
+- `moveToMathFieldStart` `moveToMathFieldEnd`
+- `moveUp` `moveDown`
+- `moveToSuperscript` `moveToSubscript`
 - `moveToOpposite`
-- `moveBeforeParent`, `moveAfterParent`
+- `moveBeforeParent` `moveAfterParent`
 
 ## Extending the Selection
 
 - `selectGroup`
 - `selectAll`
-- `extendToNextChar`, `extendToPreviousChar`
-- `extendToNextWord`, `extendToPreviousWord`
-- `extendUp`, `extendDown`
-- `extendToNextBoundary`, `extendToPreviousBoundary`
-- `extendToGroupStart`, `extendToGroupEnd`
-- `extendToMathFieldStart`, `extendToMathFieldEnd`
+- `extendToNextChar` `extendToPreviousChar`
+- `extendToNextWord` `extendToPreviousWord`
+- `extendUp` `extendDown`
+- `extendToNextBoundary` `extendToPreviousBoundary`
+- `extendToGroupStart` `extendToGroupEnd`
+- `extendToMathFieldStart` `extendToMathFieldEnd`
 
 ## Arrays
 
-- `addRowAfter`, `addRowBefore`
-- `addColumnAfter`, `addColumnBefore`
+- `addRowAfter` `addRowBefore`
+- `addColumnAfter` `addColumnBefore`
 
 ## Speech
 

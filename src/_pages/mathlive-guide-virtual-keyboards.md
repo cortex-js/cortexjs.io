@@ -307,7 +307,7 @@ used, which is equivalent to a `VirtualKeyboardKeycap` with a `latex` property
 equal to the string, that is, it will display the latex string as the keycap
 label and insert it when the key is pressed.
 
-```js
+```json
 rows: [
   [
     { latex: "a", variants: ["A", "\\alpha", "\\Alpha"] }
@@ -330,7 +330,7 @@ They `keycap` class indicates that the appearance of the key should be
 of a regular keycap, as opposed to a modified key (`modifier`) or an action 
 key (`action`).
 
-```js
+```json
   { latex: "\\beta" },
   { latex: "\\mu_0" },
   { latex: "\\frac{1}{2}" },
@@ -339,7 +339,7 @@ key (`action`).
 **To display the key label as some HTML markup instead**, use the `label` 
 property:
 
-```js
+```json
   { label: "8", latex: "8" },
   { class: "tex", 
     latex: "<span><i>x</i>&thinsp;²</span>", 
@@ -351,16 +351,24 @@ The keycap label is displayed using the system font when the `label` property
 is used. To display it using the TeX fonts instead, set the value of the `class`
 property to `tex`.
 
-**To perform a command other than inserting a LaTeX string**, use the `command`
+**To perform a command other than inserting a LaTeX string** use the `command`
 property:
 
-```js
+```json
   {
     class: "action",
-    label: "<svg><use xlink:href='#svg-arrow-left' /></svg>",
-    command: ["performWithFeedback", "moveToPreviousChar"]
+    label: "<svg><use xlink:href='#svg-commit' /></svg>",
+    command: ["performWithFeedback", "commit"]
   },
 ```
+
+The `commit` command is triggered when the user presses the **Return** or
+**Enter** key on the physical keyboard and will cause a `change` event to 
+be dispatched.
+
+{% readmore "/mathlive/guides/commands/" %}
+Find out more about the available commands
+{% endreadmore %}
 
 
 
