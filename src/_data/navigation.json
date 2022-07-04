@@ -266,6 +266,11 @@
           "icon": "reference"
         },
         {
+          "title": "Control Structures",
+          "url": "/compute-engine/reference/control-structures/",
+          "icon": "reference"
+        },
+        {
           "title": "Core",
           "url": "/compute-engine/reference/core/",
           "icon": "reference"
@@ -273,6 +278,11 @@
 				{
 					"title": "Domains",
 					"url": "/compute-engine/reference/domains/",
+          "icon": "reference"
+				},
+				{
+					"title": "Functions",
+					"url": "/compute-engine/reference/functions/",
           "icon": "reference"
 				},
         {

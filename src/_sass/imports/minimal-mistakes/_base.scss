@@ -95,6 +95,14 @@ fieldset {
   widows: 3;
 }
 
+ol li::marker {
+  font-weight: 900;
+}
+
+ul li {
+  list-style-type: square;
+}
+
 /* abbreviations */
 
 abbr[title],

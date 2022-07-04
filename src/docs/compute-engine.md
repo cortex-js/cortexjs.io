@@ -104,7 +104,8 @@ functions and symbols, grouped in several dictionaries.
 | [Arithmetic](/compute-engine/reference/arithmetic/) | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`...|
 | [Calculus](/compute-engine/reference/calculus/) | `Derive` `Integrate`...|
 | [Collections](/compute-engine/reference/collections/)| `Sequence` `List` `Dictionary` `Set`... |
-| [Core](/compute-engine/reference/core/) | `Missing` `If` `Sum` `Block` `InverseFunction` `LatexTokens`... |
+| [Control Structures](/compute-engine/reference/control-structures/) | `If` `Loop` `Sum` `Block` ... |
+| [Core](/compute-engine/reference/core/) | `Missing` `Block` `InverseFunction` `LatexTokens`... |
 | [Logic](/compute-engine/reference/logic/) |`And` `Or` `Not` `True` `False` `Maybe` ...|
 | [Sets](/compute-engine/reference/sets/) | `Union` `Intersection` `EmptySet` ...|
 | [Special Functions](/compute-engine/reference/special-functions/) | `Erf` `Gamma` `Factorial`...|
