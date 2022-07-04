@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Keyboard Shortcuts - MathLive Reference
+title: Keyboard Shortcuts
 permalink: /mathlive/reference/keybindings/
 read_time: false
 sidebar:
     - nav: "mathlive"
+toc: true
 ---
 
 <style>
@@ -24,8 +25,6 @@ sidebar:
     white-space: nowrap;  
   }
 </style>
-
-# Keyboard Sortcuts
 
 ## Keybindings
 

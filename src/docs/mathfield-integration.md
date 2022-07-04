@@ -5,9 +5,8 @@ layout: single
 date: Last Modified
 sidebar:
     - nav: "mathlive"
+toc: true
 ---
-
-# Add MathLive to Your Project
 
 As discussed in [Getting Started](/mathlive/guides/getting-started/) the 
 simplest way to use MathLive in your page is by loading it from a CDN.

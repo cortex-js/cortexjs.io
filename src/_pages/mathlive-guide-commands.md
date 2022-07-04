@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Commands - MathLive Guide
+title: Commands
 permalink: /mathlive/guides/commands/
 read_time: false
 sidebar:
     - nav: "mathlive"
+toc: true
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
@@ -20,8 +21,6 @@ head:
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-
-# Commands
 
 User initiated commands that control the mathfield can be dispatched using
 [`executeCommand()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)). 

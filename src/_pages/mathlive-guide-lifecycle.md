@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Web Component Lifecycle - MathLive Guide
+title: Web Component Lifecycle
 permalink: /mathlive/guides/lifecycle/
 read_time: false
 sidebar:
     - nav: "mathlive"
+toc: true
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
@@ -21,8 +22,6 @@ head:
     };
 </script>
 
-
-# Web Component Lifecycle
 
 A mathfield web component goes through various stages during its lifecycle.
 

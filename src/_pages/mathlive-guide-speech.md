@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Speech - MathLive Guide
+title: Speech
 permalink: /mathlive/guides/speech/
 read_time: false
 sidebar:
     - nav: "mathlive"
+toc: true
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
@@ -20,9 +21,6 @@ head:
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-
-# Speech
-
 ## Using Speech Output in MathLive
 
 **To speak the formula or a portion of it**, use these keyboard shortcuts:
@@ -135,7 +133,7 @@ See [npm](https://www.npmjs.com/package/aws-sdk) for the latest version.
 Carefully consider how to handle the access and secret access keys. With the setup above they are somewhat restricted to a domain, however, they could be abused if accessed by an unauthorized user. To prevent this, you could require users to authenticate and use AWS Cognito.
 
 
-#### Speech Output Format
+### Speech Output Format
 
 **To configure the format of the speech output engine**, use the `textToSpeechMarkup` configuration option. Set it to:
 

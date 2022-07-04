@@ -1,12 +1,13 @@
 ---
 layout: single
 date: Last Modified
-title: Commands - MathLive Reference
+title: Supported TeX/LaTeX Commands
 permalink: /mathlive/reference/commands/
 read_time: false
 version: Version
 sidebar:
     - nav: "mathlive"
+toc: true
 ---
 
 <style>
@@ -151,7 +152,6 @@ sidebar:
   }
 </style>
 
-# Supported TeX/LaTeX Commands
 
 MathLive supports over 800 LaTeX commands.
 

@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const hljs = require('highlight.js'); // https://highlightjs.org/
 // const eleventyToc = require('./eleventy-toc.js');
+const pluginTOC = require('eleventy-plugin-toc');
 
 function buildSass(srcDir, destDir) {
   fs.mkdir(destDir, { recursive: true });
@@ -83,6 +84,7 @@ module.exports = function (eleventyConfig) {
   };
 
   const md = markdownIt(options).use(require('markdown-it-deflist'));
+
   md.use(require('markdown-it-attrs'), {
     // optional, these are default options
     leftDelimiter: '{',
@@ -90,13 +92,19 @@ module.exports = function (eleventyConfig) {
     allowedAttributes: [], // empty array = all attributes are allowed
   });
 
+  // See https://github.com/valeriangalliat/markdown-it-anchor
+  md.use(require('markdown-it-anchor'));
+
   md.use(require('markdown-it-multimd-table'), {
     multiline: true,
     rowspan: true,
     headerless: true,
   });
 
-  // eleventyConfig.addPlugin(eleventyToc);
+  eleventyConfig.addPlugin(pluginTOC, {
+    wrapper: 'div',
+    wrapperClass: 'toc__menu',
+  });
 
   eleventyConfig.setLibrary('md', md);
 
@@ -131,7 +139,7 @@ module.exports = function (eleventyConfig) {
   });
 
   eleventyConfig.addPairedLiquidShortcode('defs', (content, col1, col2) => {
-    return `<table><thead><tr><th>${col1 ?? ''}</th><th>${
+    return `<table class="defs"><thead><tr><th>${col1 ?? ''}</th><th>${
       col2 ?? ''
     }</th></tr></thead><tbody>
     ${md.renderInline(content)}</tbody></table>`;
@@ -158,7 +166,10 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.setDataDeepMerge(true);
 
   eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
-  eleventyConfig.addWatchTarget('./src/build/**/*.{css,md,html}');
+  eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
+  // eleventyConfig.addWatchTarget(
+  //   './submodules/compute-engine/src/docs/**/*.{css,md,html}'
+  // );
 
   return {
     passtroughFileCopy: true,

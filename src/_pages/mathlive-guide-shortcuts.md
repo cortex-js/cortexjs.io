@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Shortcuts - MathLive Guide
+title: Key Bindings and Inline Shortcuts
 permalink: /mathlive/guides/shortcuts/
 read_time: false
 sidebar:
     - nav: "mathlive"
+toc: true
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
@@ -23,14 +24,12 @@ head:
     };
 </script>
 
-# Key Bindings and Inline Shortcuts
-
 Input using a physical keyboard can be sped using two methods:
 
--   key bindings
--   inline shortcuts
+-   **key bindings**
+-   **inline shortcuts**
 
-## Key bindings
+## Key Bindings
 
 A key binding is a combination of keys pressed simultaneously that
 triggers a command.
@@ -254,7 +253,7 @@ mf.setOptions({
 
 ```
 
-### Customizing the Inline Shortcut Sensitivity
+## Customizing the Inline Shortcut Sensitivity
 
 **To change how quickly a set of keys must be typed to be considered a shortcut**
 set the `inlineShortcutTimeout` option.
@@ -281,7 +280,7 @@ the focus on the mathfield, will automatically timeout the shortcuts.
 
 <section id='ascii-math'>
 
-### ASCIIMath Inline Shortcuts
+## ASCIIMath Inline Shortcuts
 
 [ASCIIMath](https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js) defines a series of shortcuts that can be typed with ASCII characters to
 represent mathematical symbols and expressions.

@@ -504,15 +504,17 @@
 
 /*
      Table of contents navigation
-     ========================================================================== */
+  ========================================================================== 
+*/
 
 .toc {
-    font-family: var(--ui-font);
-    color: $gray;
-    background-color: $background-color;
+  margin: 2em 0 2em 0;
+  font-family: var(--ui-font);
+    // color: $gray;
+    // background-color: $background-color;
     border: 1px solid var(--border-color);
     border-radius: $border-radius;
-    box-shadow: $box-shadow;
+    // box-shadow: $box-shadow;
 
     .nav__title {
         color: #fff;
@@ -520,6 +522,9 @@
         background: var(--primary-color);
         border-top-left-radius: $border-radius;
         border-top-right-radius: $border-radius;
+        svg {
+          margin-right: .5em;
+        }
     }
 
     // Scrollspy marks toc items as .active when they are in focus
@@ -529,47 +534,57 @@
 }
 
 .toc__menu {
-    margin: 0;
+  margin: 0;
     padding: 0;
     width: 100%;
     list-style: none;
     font-size: $type-size-5;
 
-    @include breakpoint($large) {
-        font-size: $type-size-7;
-    }
+    // @include breakpoint($large) {
+    //     font-size: $type-size-7;
+    // }
 
     a {
         display: block;
         padding: 0.25rem 0.75rem;
-        color: $muted-text-color;
-        font-weight: bold;
+        // color: $muted-text-color;
+        font-weight: 600;
         line-height: 1.5;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: .5px solid var(--border-color);
 
         &:hover {
             color: var(--text-color);
         }
     }
 
-    li ul > li a {
-        padding-left: 1.25rem;
+    li:last-of-type a {
+      border-bottom: none;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding: 0;
+    }
+
+    li ul > li a, li ol > li a {
+        padding-left: 2rem;
         font-weight: normal;
     }
 
-    li ul li ul > li a {
-        padding-left: 1.75rem;
+    li ul li ul > li a, li ol li ol > li a {
+        padding-left: 3rem;
     }
 
-    li ul li ul li ul > li a {
-        padding-left: 2.25rem;
+    li ul li ul li ul > li a, li ol li ol li ol > li a {
+        padding-left: 4rem;
     }
 
-    li ul li ul li ul li ul > li a {
-        padding-left: 2.75rem;
+    li ul li ul li ul li ul > li a, li ol li ol li ol li ol > li a {
+        padding-left: 5rem;
     }
 
-    li ul li ul li ul li ul li ul > li a {
-        padding-left: 3.25rem;
+    li ul li ul li ul li ul li ul > li a,
+    li ol li ol li ol li ol li ol > li a {
+        padding-left: 6rem;
     }
 }

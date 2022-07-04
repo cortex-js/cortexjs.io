@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Interacting - MathLive Guide
+title: Interacting with a Mathfield
 permalink: /mathlive/guides/interacting/
 read_time: false
 sidebar:
     - nav: "mathlive"
+toc: true
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
@@ -21,9 +22,6 @@ head:
         mathlive: "//unpkg.com/mathlive?module",
     };
 </script>
-
-
-# Interacting with a Mathfield
 
 ## Reading the Content of a Mathfield
 

@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Virtual Keyboards - MathLive Guide
+title: Virtual Keyboards
 permalink: /mathlive/guides/virtual-keyboards/
 read_time: false
 sidebar:
     - nav: "mathlive"
+toc: true
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
@@ -22,8 +23,6 @@ head:
         "html-to-image": "///assets/js/html-to-image.js",
     };
 </script>
-# Virtual Keyboards
-
 Typing math formulas require access to many special symbols. While [keyboard 
 shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help, mobile 
 devices require another solution. 
@@ -50,8 +49,6 @@ keyboards, or create new ones.
 
 
 
-<section id='controlling-when-the-virtual-keyboard-panel-is-displayed'>
-
 ## Controlling when the Virtual Keyboard Panel is Displayed
 
 The default behavior of the virtual keyboard panel is to only be displayed on 
@@ -77,7 +74,6 @@ equivalent `virtual-keyboard-mode` attribute:
 There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations. {.notice--info}
 
-</section>
 
 ## Displaying the Virtual Keyboard in a Custom Container
 
@@ -96,7 +92,6 @@ keyboard panel is visible by attaching it to the full screen element.
 The `position` attribute of this container element should be `relative` so that the virtual keyboard can correctly be placed relative to this element, and the container element should 
 be at least 365px wide to ensure that the virtual keyboard can fit.  {.notice--warning}
 
-<section id='custom-appearance'>
 
 ## Customizing the Appearance of the Virtual Keyboard
 
@@ -116,8 +111,6 @@ document.body.style.setProperty("--keyboard-zindex", "3000");
 ```
 
 
-<section id='zindex'>
-
 ### Customizing the Virtual Keyboard Stack Order
 
 **To specify the stack order of the virtual keyboard panel relative to 
@@ -125,9 +118,6 @@ other DOM elements** set the `--keyboard-zindex` CSS variable.
 
 The default `zindex` of the virtual keyboard panel is `105`.
 
-</section>
-
-<section id='customizing-the-virtual-keyboard'>
 
 ### Customizing the Virtual Keyboard Colors
 
@@ -138,10 +128,6 @@ value of the following CSS variables to a CSS color:
 - `--keyboard-text-active`
 - `--keyboard-background-border`
 
-
-</section>
-
-<section id='customizing-the-appearance-of-the-virtual-keyboard-keycaps'>
 
 ### Customizing the Keycaps
 
@@ -162,12 +148,6 @@ value of the following CSS variables to a CSS color:
   - `--keycap-modifier-border`, a color
   - `--keycap-modifier-border-bottom`, a color
 
-</section>
-
-</section>
-
-
-<section id='shared-virtual-keyboard'>
 
 ## Sharing Virtual Keyboards Amongst Multiple Mathfields
 
@@ -221,12 +201,6 @@ when the shared virtual keyboard will be visible.
 <math-field use-shared-virtual-keyboard></math-field>
 ```
 
-</section>
-
-
-
-
-<section id='controlling-which-keyboards-are-displayed'>
 
 ## Controlling Which Keyboards Are Displayed
 
@@ -256,10 +230,6 @@ document.getElementById("mf").setOptions({
   virtualKeyboards: "numeric symbols"
 });</div>
 </code-playground>
-
-</section>
-
-<section id='defining-custom-virtual-keyboards'>
 
 ## Defining Custom Virtual Keyboards
 
@@ -536,10 +506,6 @@ keyboards, plus ours, we could have used the `"all"` shortcut:
   });
 }
 ```
-</section>
-
-
-<section id='changing-the-alphabetical-keyboard-layout'>
 
 ## Changing the Alphabetical Keyboard Layout
 
@@ -571,12 +537,6 @@ document.getElementById('mf').setOptions({
 </div>
 </code-playground>
 
-</section>
-
-
-
-
-<section id='customizing-the-appearance-of-the-virtual-keyboard-toggle'>
 
 ## Customizing the Appearance of the Virtual Keyboard Toggle
 
@@ -614,7 +574,6 @@ math-field::part(virtual-keyboard-toggle) {
 </div>
 </code-playground>
 
-</section>
 
 
 

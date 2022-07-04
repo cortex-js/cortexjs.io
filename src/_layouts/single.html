@@ -20,18 +20,22 @@ layout: default
   <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
 
     <div class="page__inner-wrap">
-
+    
+    
       <section class="page__content" itemprop="text">
-        {% if toc %}
-          <aside class="sidebar__right {% if toc_sticky %}sticky{% endif %}">
-            <nav class="toc">
-              <header><h4 class="nav__title"><i class="fas fa-{{ toc_icon | default: 'file-alt' }}"></i> {{ toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On this page" }}</h4></header>
-              
-              {% include toc.html sanitize=true html=content h_min=2 h_max=3 class="toc__menu" %}
-            </nav>
-          </aside>
-        {% endif %}
-        {{ content }}
+{% if toc %}
+<h1>{{ title}}</h1>
+{% if content | toc %}
+
+          <nav class="toc">
+          <header><h4 class="nav__title"><i class="fas fa-{{ toc_icon | default: 'file-alt' }}"></i> {{ toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On This Page" }}</h4></header>
+    
+          {{ content | toc: '{"tags":["h2","h3"]}' }}
+                        
+        </nav>
+{% endif %}
+{% endif %}
+          {{ content }}
         {% if page.link %}<div><a href="{{ page.link }}" class="btn btn--primary">{{ site.data.ui-text[site.locale].ext_link_label | default: "Direct Link" }}</a></div>{% endif %}
       </section>
 

@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Static - MathLive Guide
+title: Static Math Formulas
 permalink: /mathlive/guides/static/
 read_time: false
 sidebar:
     - nav: "mathlive"
+toc: false
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
