@@ -56,7 +56,7 @@ mathfield with the Playground below. Edit the HTML and JavaScript section for th
       }
       #latex {
         margin-top: 1em;
-        font-family: 'IBM Plex Mono', 'Fira Code', 'Source Code Pro',   monospace;
+        font-family: var(--monospace-font), 'IBM Plex Mono', 'Fira Code', 'Source Code Pro',   monospace;
       }
     </style>
     <div slot="javascript">import 'mathlive';

@@ -19,7 +19,7 @@ const INJECTED_STYLESHEET = `
     justify-content: center;
     height: 6em;
     font-size: 1.5em;
-    font-weight: 700;
+    font-weight: 600;
     color: #999;
     background: repeating-linear-gradient(
         -45deg,
