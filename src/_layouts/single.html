@@ -24,15 +24,28 @@ layout: default
     
       <section class="page__content" itemprop="text">
 {% if toc %}
-<h1>{{ title}}</h1>
+  {% if preamble %}
+    {{ preamble }}
+  {% else %}
+    <h1>{{ title }}</h1>
+  {% endif %}
+
 {% if content | toc %}
 
           <nav class="toc">
           <header><h4 class="nav__title"><i class="fas fa-{{ toc_icon | default: 'file-alt' }}"></i> {{ toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On This Page" }}</h4></header>
-    
-          {{ content | toc: '{"tags":["h2","h3"]}' }}
-                        
+
+          {% if toc-options %}
+            {{ content | toc: toc-options }}
+          {% else %}
+            {{ content | toc: '{"tags":["h2","h3"]}' }}
+          {% endif %}
+                                  
         </nav>
+{% endif %}
+{% else %}
+{% if preamble %}
+{{ preamble }}
 {% endif %}
 {% endif %}
           {{ content }}
