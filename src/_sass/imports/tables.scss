@@ -46,6 +46,24 @@
   tr td:first-child {
     min-width: var(--first-col-width, 15ex);
   }
+  // Used by the list of dictionaries table (in the intro page and elsewhere)
+  tr td:first-child a {
+    display: block;
+    text-decoration: none;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    padding: 0 8px 0 8px;
+    margin: 0 8px 0 8px;
+
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: none;
+      background: var(--link-color);
+      color: #fff;
+    }
+
+  }
 }
 
 .equal-width-columns table {

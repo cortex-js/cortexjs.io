@@ -10,7 +10,7 @@ sidebar:
 <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>
 
 The **CortexJS Compute Engine** is a JavaScript/TypeScript library for symbolic
-computing and numeric evaluation of mathematical expressions.
+computing and numeric evaluation of mathematical expressions.{.xl}
 
 ```ts
 const ce = new ComputeEngine();
@@ -24,7 +24,6 @@ console.log(ce.box(["Expand", expr]).evaluate().latex);
 // ➔ "a^2 + 2ab + b^2"
 
 ```
-
 
 The Compute Engine is for anyone who wants to make technical computing apps 
 in the browser or in server-side environments such as Node: educators, 
@@ -45,21 +44,9 @@ Try the **interactive demo** now
 
 ## Getting Started
 
-The Compute Engine library is available in two flavors:
+The easiest way to get started it to load the Compute Engine JavaScript module
+from a CDN.
 
-* A **JavaScript module** (ESM): `compute-engine.min.esm.js` 
-* A **UMD library**, for CJS or AMD imports: `compute-engine.min.js` 
-
-If you are using a modern environment, use the ESM version. The ESM version 
-does make use of modern JavaScript features such as optional chaining and more.
-
-If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version. For example, WebPack 4 does 
-not support the optional chaining operator, so use the UMD version in this case,
-which will make use of polyfills as necessary.
-
-A non-minified module, `compute-engine.esm.js`, is also available, which may 
-be useful for debugging.
 
 ### Using JavaScript Modules
 
@@ -75,7 +62,16 @@ be useful for debugging.
 
 ```
 
-## Using Vintage JavaScript
+The ESM (module) version is also available as `dist/compute-engine.min.esm.js` 
+
+
+### Using Vintage JavaScript
+
+If you are using a vintage environment, or if your toolchain does not support
+modern JavaScript features, use the UMD version. For example, WebPack 4 does 
+not support the optional chaining operator, so use the UMD version in this case,
+which will make use of polyfills as necessary.
+
 
 ```html
 <script src="//unpkg.com/@cortex-js/compute-engine"></script>
@@ -87,14 +83,18 @@ be useful for debugging.
   }
 </script>
 ```
+The UMD version is also available as `dist/compute-engine.min.js` 
 
+### Other Versions
 
+A non-minified module, `compute-engine.esm.js`, is also available, which may 
+be useful for debugging.
 
 ## Dictionaries
 
 Expressions reference symbols and functions that are defined in dictionaries.
 
-By default, new instances of the Compute Engine include a robust set of
+By default, new `ComputeEngine` instances include a robust set of
 functions and symbols, grouped in several dictionaries.
 
 <div class=symbols-table>
@@ -104,18 +104,21 @@ functions and symbols, grouped in several dictionaries.
 | [Arithmetic](/compute-engine/reference/arithmetic/) | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`...|
 | [Calculus](/compute-engine/reference/calculus/) | `Derive` `Integrate`...|
 | [Collections](/compute-engine/reference/collections/)| `Sequence` `List` `Dictionary` `Set`... |
-| [Control Structures](/compute-engine/reference/control-structures/) | `If` `Loop` `Sum` `Block` ... |
-| [Core](/compute-engine/reference/core/) | `Missing` `Block` `InverseFunction` `LatexTokens`... |
+| [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` `Sum`  ... |
+| [Core](/compute-engine/reference/core/) | `Missing` `InverseFunction` `LatexTokens`... |
+| [Domains](/compute-engine/reference/domains/) | `Anything` `Nothing` `Number` `Integer` ... |
+| [Functions](/compute-engine/reference/functions/) | `Function` `Apply` `Return`  ... |
 | [Logic](/compute-engine/reference/logic/) |`And` `Or` `Not` `True` `False` `Maybe` ...|
 | [Sets](/compute-engine/reference/sets/) | `Union` `Intersection` `EmptySet` ...|
 | [Special Functions](/compute-engine/reference/special-functions/) | `Erf` `Gamma` `Factorial`...|
+| [Styling](/compute-engine/reference/styling/) | `Delimiter` `Style`...|
 | [Trigonometry](/compute-engine/reference/trigonometry/)  | `Pi` `Cos` `Sin` `Tan`...| 
 
 </div>
 
 
-**To customize the dictionaries that define the math functions and symbols**, 
-use the constructor of the Compute Engine instance to define the dictionaries
+**To customize the dictionaries that define the functions and symbols**, 
+use the `ComputeEngine` constructor to define the dictionaries
 to use.
 
 In addition to the built-in dictionaries, you can define your own.

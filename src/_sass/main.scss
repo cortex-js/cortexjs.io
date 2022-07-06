@@ -118,6 +118,11 @@ a.chevron::after {
   text-decoration: none;
 }
 
+.page__content p.xl {
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+
 // .page__content a:not( .btn):not( #goog-wm-sb):hover
 
 code + .tags {
@@ -142,8 +147,8 @@ code + .tags {
   
   .tag {
     min-width: 60px;
-    border: 1px solid currentColor;
-    border-radius: 8px;
+    border: .5px solid currentColor;
+    border-radius: 1em;
     padding-top: 2px;
     padding-bottom: 2px;
     padding-left:.5em;

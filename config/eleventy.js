@@ -142,7 +142,7 @@ module.exports = function (eleventyConfig) {
     return `<table class="defs"><thead><tr><th>${col1 ?? ''}</th><th>${
       col2 ?? ''
     }</th></tr></thead><tbody>
-    ${md.renderInline(content)}</tbody></table>`;
+    ${content}</tbody></table>`;
   });
 
   eleventyConfig.addPairedLiquidShortcode('readmore', (content, url) => {

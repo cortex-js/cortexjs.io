@@ -25,7 +25,7 @@ head:
 </script>
 Typing math formulas require access to many special symbols. While [keyboard 
 shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help, mobile 
-devices require another solution. 
+devices require another solution.{.xl}
 
 A **virtual keyboard** is a keyboard displayed on screen that can be customized with specialized symbols for math input.
 

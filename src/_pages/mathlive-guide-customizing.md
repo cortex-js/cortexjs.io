@@ -25,8 +25,9 @@ head:
     };
 </script>
 
-The appearance and behavior of the mathfield is highly customizable. Here are a 
-few common examples.
+The appearance and behavior of the mathfield is highly customizable.{.xl}
+
+Here are a few common examples.
 
 ## Styling
 
