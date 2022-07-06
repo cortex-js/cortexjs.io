@@ -367,7 +367,7 @@ The `commit` command is triggered when the user presses the **Return** or
 be dispatched.
 
 {% readmore "/mathlive/guides/commands/" %}
-Find out more about the available commands
+Learn more about the available commands
 {% endreadmore %}
 
 
@@ -586,7 +586,7 @@ math-field::part(virtual-keyboard-toggle) {
 
 
 {% readmore "/mathlive/guides/lifecycle/" %}
-**Advanced topic:** Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it
+**Advanced Topic:** Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when can you communicate with it
 {% endreadmore %}
 
 

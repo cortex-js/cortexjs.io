@@ -156,7 +156,8 @@ toc: true
 MathLive supports over 800 LaTeX commands.{.xl}
 
 {% readmore "http://detexify.kirelabs.org/classify.html" %}
-If you know the shape of a symbol use <strong>Detexify</strong> to find the name of the corresponding LaTeX command.
+If you know the shape of a symbol, use <strong>Detexify</strong> to find the 
+name of the corresponding LaTeX command
 {% endreadmore %}
 
 

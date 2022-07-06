@@ -36,7 +36,7 @@ In Javascript, the `\` in a string must be escaped and the escape character is a
 
 
 {% readmore "/docs/mathlive/#(%22mathfield-element%22%3Amodule)" %}
-See the <strong><kbd>MathfieldElement</kbd></strong> documentation for more details about the attributes, properties, methods and events supported.
+Learn more details about the attributes, properties, methods and events supported in the <strong><kbd>MathfieldElement</kbd></strong> documentation.
 {% endreadmore %}
 
 
@@ -272,5 +272,5 @@ has been generated.
 ```
 
 {% readmore "/mathlive/guides/static/" %}
-Learn more about the rendering <strong>static</strong> math content.
+Learn more about rendering <strong>static</strong> math content.
 {% endreadmore %}
