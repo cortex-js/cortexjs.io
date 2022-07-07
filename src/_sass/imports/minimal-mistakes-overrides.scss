@@ -1,10 +1,15 @@
 
 // Overrides
 
-.site-title {
+.greedy-nav a.site-title {
     font-family: var(--display-font);
     font-weight: 900;
-}
+    font-size: 20px;
+    color: var(--blue-800);
+    @media (prefers-color-scheme: dark) {
+      color: var(--blue-50);
+    }
+  }
 
 .site-title em {
     font-weight: 200;

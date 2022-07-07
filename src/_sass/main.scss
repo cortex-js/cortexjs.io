@@ -121,6 +121,19 @@ a.chevron::after {
 .page__content p.xl {
   font-size: 1.6rem;
   line-height: 1.1;
+  font-weight: 900;
+  padding: 1em;
+  color: var(--blue-900);
+  border-left: 4px solid var(--blue-900);
+  border-right: 4px solid var(--blue-900);
+}
+
+@media (prefers-color-scheme: dark) {
+  .page__content p.xl {
+    color: var(--blue-50);
+    border-left-color: var(--blue-400);
+    border-right-color: var(--blue-400);
+  }
 }
 
 // .page__content a:not( .btn):not( #goog-wm-sb):hover

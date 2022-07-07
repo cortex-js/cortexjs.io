@@ -120,7 +120,7 @@ function parseCodeFences(lines, i) {
       ...result,
       '\n',
       '\n',
-      '<code-playground layout="stack" output-stylesheets="/assets/js/ui.css">',
+      '<code-playground layout="stack">',
       '<style slot="style">' + INJECTED_STYLESHEET + '</style>',
     ];
 
@@ -174,16 +174,18 @@ function parseCodeFences(lines, i) {
 function upgradeCodeFences(content) {
   const lines = content.split('\n');
   let result = [];
+  let usesCodeMirror = false;
   for (let i = 0; i < lines.length; i++) {
     const fence = parseCodeFences(lines, i);
     if (!fence) {
       result.push(lines[i]);
     } else {
+      hasFences = true;
       i = fence.index;
-      result = [...result, ...fence.content];
+      result.push(...fence.content);
     }
   }
-  return result.join('\n');
+  return [usesCodeMirror, result.join('\n')];
 }
 
 const run = async (dir, sidebar) => {
@@ -198,6 +200,10 @@ const run = async (dir, sidebar) => {
           console.warn('Skipping ' + x + ': no frontmatter permalink.');
         } else {
           try {
+            const [usesCodeMirror, content] = upgradeCodeFences(
+              graymatter.content
+            );
+
             let permalink = frontmatter.permalink.slice(1);
             if (permalink.length === 0) permalink = 'index';
             const dest = path.resolve('./src/build/', permalink);
@@ -216,24 +222,23 @@ const run = async (dir, sidebar) => {
               frontmatter.sidebar.push({ nav: sidebar });
             }
 
-            frontmatter.head.stylesheets = [
-              ...(frontmatter.stylesheets ?? []),
-              `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/codemirror.min.css`,
-              '/assets/js/ui.css',
-            ];
-            frontmatter.head.scripts = [
-              ...(frontmatter.scripts ?? []),
-              `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/codemirror.min.js`,
-              `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/javascript/javascript.min.js`,
-              `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/xml/xml.min.js`,
-            ];
-
+            if (usesCodeMirror) {
+              frontmatter.head.stylesheets = [
+                ...(frontmatter.stylesheets ?? []),
+                `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/codemirror.min.css`,
+              ];
+              frontmatter.head.scripts = [
+                ...(frontmatter.scripts ?? []),
+                `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/codemirror.min.js`,
+                `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/javascript/javascript.min.js`,
+                `https://cdnjs.cloudflare.com/ajax/libs/codemirror/${CODE_MIRROR_VERSION}/mode/xml/xml.min.js`,
+              ];
+            }
             // frontmatter.head.modules = [
             //   ...(frontmatter.modules ?? []),
             //   '/assets/js/code-playground.min.js',
             // ];
 
-            const content = upgradeCodeFences(graymatter.content);
             fs.writeFile(dest + '.md', matter.stringify(content, frontmatter));
           } catch (e) {
             console.error('Error parsing', x, e);

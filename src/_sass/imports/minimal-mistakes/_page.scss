@@ -58,6 +58,7 @@ body {
   .page__inner-wrap {
       float: left;
       margin: 0;
+      max-width: 840px;
       width: 100%;
       clear: both;
 
@@ -79,7 +80,14 @@ body {
       .page__content {
         position: relative;
         float: left;
+        max-width: 840px;
+        min-width: 100%;
         width: 100%;
+        @include breakpoint($medium) {
+          min-width: 840px;
+          width: 840px;
+  
+        }
         clear: both;
 
         background: var(--content-background);
@@ -189,7 +197,8 @@ body {
         padding-left: 1.25rem;
     }
 
-    img.full-width {
+    picture.full-width, img.full-width {
+      display: block;
       max-width: 100vw;
       width: calc(100% + 4em);
       margin-left: -2em;
@@ -288,9 +297,12 @@ body {
 
 .page__meta {
     margin-top: 2em;
-    color: $muted-text-color;
+    color: #707070;
     font-family: var(--display-font);
     font-size: $type-size-6;
+    @media (prefers-color-scheme: dark) {
+      color: #d0d0d0;
+    }
 
     p {
         margin: 0;
