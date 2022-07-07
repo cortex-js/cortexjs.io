@@ -1,11 +1,14 @@
 @charset "utf-8";
 
-@import 'imports/astra';
+// @import 'imports/astra';
 
 @import 'imports/common';
+
+@import 'imports/utilities';
+
 @import 'imports/minimal-mistakes'; // main partials
 @import 'imports/minimal-mistakes-overrides';
-@import 'imports/utilities';
+
 @import 'imports/cards';
 @import 'imports/tables';
 
@@ -136,8 +139,6 @@ a.chevron::after {
   }
 }
 
-// .page__content a:not( .btn):not( #goog-wm-sb):hover
-
 code + .tags {
   margin-left: 1em;
 }
@@ -191,12 +192,3 @@ code + .tags {
 .float-right {
   float: right;
 }
-
-// Indigo-800 #422581
-// Indigo-100 #d1c2f0
-
-// Red-800 #c6130a
-// Red-100 #fbbbb6
-
-// Teal-800 #0e7f7f
-// Teal-100 #b9f1f1

@@ -1,13 +1,10 @@
 // Stylesheet for the typescript_doc layout.
 @charset "utf-8";
 
-// @import 'imports/astra';
-
 @import 'imports/common';
 
 @import 'imports/utilities';
 
-// @import 'imports/astra';
 @import 'imports/minimal-mistakes'; // main partials
 @import 'imports/minimal-mistakes-overrides';
 
@@ -522,21 +519,6 @@ svg.highlighting-mark {
 .page__content dt:target .highlighting-mark-container > svg.highlighting-mark {
     width: calc(100% + 3em);
 }
-// .page__content dt:target strong::after
-// // .page__content section[id]:target > h3::after
-// {
-//     content: '<svg><use xlink:href="#external-link"></use></svg>';
-//     position: absolute;
-//     top: -8px;
-//     left: -8px;
-//     border-radius: 8px;
-//     width: calc(100% + 16px);
-//     height: calc(100% + 16px);
-//     color: hsla(49, 100%, 63%, 0.56); // hsla(58, 100%, 50%, 0.56);
-//     // '<svg><use xlink:href="#external-link"></use></svg>'
-//     background: url(#marker-1);
-//     z-index: -1;
-// }
 
 .page__content section[id]:target::after {
     content: '';
@@ -717,51 +699,26 @@ figure.highlight {
     border-radius: 8px;
 }
 
-// @media (min-width: $small) {
-//     body {
-//         background: rgb(255, 223, 211);
-//     }
-// }
-// @media (min-width: $medium) {
-//     body {
-//         background: rgb(254, 200, 216);
-//     }
-// }
-
-// @media (min-width: $large) {
-//     body {
-//         background: rgb(224, 187, 228);
-//     }
-// }
 
 @media (min-width: $medium) {
-    .page {
-        padding-right: 0;
-    }
+  .page {
+      padding-right: 0;
+  }
 }
 
-// @media (min-width: $large) {
-//     .sidebar {
-//         width: #{$right-sidebar-width};
-//     }
-//     .page {
-//         width: calc(100% - #{$right-sidebar-width});
-//         padding-right: 0;
-//     }
-// }
 
 .card.list h3 {
-    font-weight: 900;
+  font-weight: 900;
 }
 
 .card.list ul {
-    column-count: 2;
-    padding: 18px 0 18px 18px;
-    margin: 0;
+  column-count: 2;
+  padding: 18px 0 18px 18px;
+  margin: 0;
 }
 
 .card.list ul li {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 
