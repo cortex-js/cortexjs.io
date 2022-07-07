@@ -7,6 +7,14 @@
    ========================================================================== */
 
 .sidebar {
+    display: flex;
+    justify-content: center;
+    padding-left: 3rem;
+    padding-right: 1rem;
+
+    /** When displayed as a menu (width < $large) take the whole width */
+    width: 100%;
+
     @include clearfix();
     @include breakpoint(max-width $medium) {
         /* fix z-index order of follow links */
@@ -15,13 +23,11 @@
         transform: translate3d(0, 0, 0);
     }
 
-    /** When displayed as a menu (width < $large) take the whole width */
-    width: 100%;
 
     @include breakpoint($large) {
         // if >1200px...
         float: left;
-        width: calc(#{$left-sidebar-width-wide} - 1em);
+        // width: calc(#{$left-sidebar-width-wide} - 1em);
         margin-right: .5em;
 
         &.sticky {

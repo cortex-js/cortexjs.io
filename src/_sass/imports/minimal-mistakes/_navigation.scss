@@ -312,69 +312,69 @@
      ========================================================================== */
 
 .nav__list {
-    margin-bottom: 1.5em;
+  width: 100%;
+  @include breakpoint(max-width $large - 1px) {
+    width: auto;
+  }
+  margin-bottom: 1.5em;
 
-    input[type='checkbox'],
-    /* Don't display the label until below the $large breakpoint */
+  input[type='checkbox'],
+  /* Don't display the label until below the $large breakpoint */
+  label {
+    display: none;
+  }
+
+  @include breakpoint(max-width $large - 1px) {
     label {
-        display: none;
+      display: block;
+
+      padding: 1em;
+
+      font-family: var(--ui-font);
+      font-weight: 700;
+      color: var(--text-color);
+      border: var(--ui-border);
+      background: var(--ui-background);
+      border-radius: 4px;
+      line-height: .9;
+      z-index: 20;
+      cursor: pointer;
+      user-select: none;
+
+      transition: transform,border .16s ease-out,-webkit-transform .16s ease-out;
+      will-change: transform,border;
+
+      svg {
+        height: 20px;
+        width: 20px;
+        margin-left: .5em;
+      }
+
+      &:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color-dark);
+        color: #fafafa;
+        transform: scale(1.05);              
+      }
     }
 
-    @include breakpoint(max-width $large - 1px) {
-        label {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
+    /* selected*/
+    input:checked + label {
+        color: white;
+        background-color: var(--primary-color);
+    }
 
-          padding: 1em;
+    a {
+        display: block;
+        padding: 0.25em 0;
+        padding-top: 0.125em;
+        padding-bottom: 0.125em;
 
-          font-family: var(--ui-font);
-          font-weight: 700;
-          color: var(--text-color);
-          border: var(--ui-border);
-          background: var(--ui-background);
-          border-radius: 4px;
-          line-height: .9;
-          z-index: 20;
-          cursor: pointer;
-          transition: transform,border .16s ease-out,-webkit-transform .16s ease-out;
-          will-change: transform,border;
-
-          svg {
-            height: 1em;
-            width: 1em;
-            margin-right: .5em;
-          }
-
-          &:hover {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color-dark);
-            color: #fafafa;
-            transform: scale(1.05);              
-          }
-        }
-
-        /* selected*/
-        input:checked + label {
-            color: white;
-            background-color: var(--primary-color);
-        }
-
-        ul {
-            // margin-bottom: 1em;
-        }
-
-        a {
-            display: block;
-            padding: 0.25em 0;
-            padding-top: 0.125em;
-            padding-bottom: 0.125em;
-
-            &:hover {
-                text-decoration: underline;
-            }
+        &:hover {
+            text-decoration: underline;
         }
     }
+  }
 }
 
 .nav__list .nav__items {
@@ -398,59 +398,50 @@
     }
 
     @include breakpoint(max-width $large - 1px) {
-        position: relative;
-        max-height: 0;
-        opacity: 0%;
-        overflow: hidden;
-        z-index: 10;
-        // transition: 0.3s ease-in-out;
-        transform: translate(0, 10%);
+      display: none;
+      position: relative;
+      overflow: hidden;
+      z-index: 10;
     }
 }
 
 
 @include breakpoint(max-width $large - 1px) {
-    .nav__list input:checked ~ .nav__items {
-        // transition: 0.5s ease-in-out;
-        position: absolute;
-        max-height: max-content;
-        opacity: 1;
-        margin-top: 73px; // Height of the circular menu
-        transform: translate(0, 0);
-        top: 0;
-        left: 0;
-        right: 0;
-        background: var(--ui-background);
-        border-radius: 8px;
-        border: var(--ui-border);
-        box-shadow: var(--ui-focus-shadow);
-        column-count: 2;
-        column-fill: auto;
-        padding: 1em;
-        li {
-          font-size: 1.3rem;
-          padding: 0 0 .1em 0;
-          display: block; // prevent breaking inside multicol
-          break-inside: avoid;
-          .nav__sub-title {
-            font-size: 1.5rem;
-            padding-left: 0;
-          }
-        }
+  .nav__list input:checked ~ .nav__items {
+    display: block;
+    position: absolute;
+    max-height: max-content;
+    margin-top: 68px; // Height of the circular menu
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--ui-background);
+    border-radius: 8px;
+    border: var(--ui-border);
+    box-shadow: var(--ui-focus-shadow);
+    column-count: 2;
+    column-fill: auto;
+    padding: 1em;
+    li {
+      font-size: 1.3rem;
+      padding: 0 0 .1em 0;
+      display: block; // prevent breaking inside multicol
+      break-inside: avoid;
+      .nav__sub-title {
+        font-size: 1.5rem;
+        padding-left: 0;
+      }
     }
+  }
 }
 
 @include breakpoint(max-width $medium - 1px) {
   .nav__list input:checked ~ .nav__items {
     column-count: 1;
-    margin:0;
-    margin-top: 50px;
+    margin: 0;
+    margin-top: 68px; // Height of the circular menu
     li {
-      font-size: 1rem;
       padding: 0 0 0.25em 0;
-      .nav__sub-title {
-        font-size: 1rem;
-      }
     }
   }
 }

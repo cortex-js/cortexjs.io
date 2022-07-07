@@ -6,20 +6,19 @@
   position: relative;
   display: block;
   @include clearfix;
-  margin-left: auto;
-  margin-right: auto;
   padding: 0;
+  padding-left: 1em;
+  padding-right: 1em;
   animation: $intro-transition;
   max-width: 100%;
   animation-delay: 0.15s;
 
   @include breakpoint($max-width) {
+    padding: 0;
     max-width: $max-width;
+    width: $max-width;
     display: flex;
-  }
-  @include breakpoint($small) {
-    padding-left: 1em;
-    padding-right: 1em;
+    justify-content: center;
   }
 }
 
