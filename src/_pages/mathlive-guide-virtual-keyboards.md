@@ -372,6 +372,27 @@ Learn more about the available commands
 
 
 
+**To use a SVG glyph on the keycaps**, use some SVG markup in the `label` 
+property and set the `class` attribute to `svg-glyph`
+
+To reference the built-in SVG glyphs, use the `<use>` SVG command:
+- `svg-commit`
+- `svg-tab`
+- `svg-arrow-left`
+- `svg-arrow-right`
+- `svg-angle-double-left`
+- `svg-angle-double-right`
+- `svg-shift`
+- `svg-command`
+- `svg-delete-backward`
+- `svg-copy`
+- `svg-undo`
+- `svg-redo`
+- `svg-trash`
+
+
+
+
 ```js
     const HIGH_SCHOOL_KEYBOARD_LAYER = {
       "high-school-layer": {
@@ -544,6 +565,7 @@ document.getElementById('mf').setOptions({
 &lt;/math-field&gt;
 </div>
 </code-playground>
+
 
 
 ## Customizing the Appearance of the Virtual Keyboard Toggle
