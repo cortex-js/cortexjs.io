@@ -127,8 +127,8 @@ a.chevron::after {
   font-weight: 900;
   padding: 1em;
   color: var(--blue-900);
-  border-left: 4px solid var(--blue-900);
-  border-right: 4px solid var(--blue-900);
+  background: #f0f0f0;
+  border-radius: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -136,6 +136,7 @@ a.chevron::after {
     color: var(--blue-50);
     border-left-color: var(--blue-400);
     border-right-color: var(--blue-400);
+    background: #333;
   }
 }
 

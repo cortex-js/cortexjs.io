@@ -211,8 +211,11 @@
         }
         li:hover {
           background: var(--ui-background-hover);
+          color: var(--masthead-link-color-hover);
         }
-
+        li:hover a {
+          color: var(--masthead-link-color-hover);
+        }
         a {
             position: relative;
 

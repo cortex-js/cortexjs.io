@@ -9,8 +9,8 @@
 .sidebar {
     display: flex;
     justify-content: center;
-    padding-left: 3rem;
-    padding-right: 1rem;
+    padding-left: 8px;
+    padding-right: 0;
 
     /** When displayed as a menu (width < $large) take the whole width */
     width: 100%;
