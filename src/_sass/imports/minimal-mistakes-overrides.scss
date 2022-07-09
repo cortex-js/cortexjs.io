@@ -2,17 +2,18 @@
 // Overrides
 
 .greedy-nav a.site-title {
-    font-family: var(--display-font);
-    font-weight: 900;
-    font-size: 32px;
-    line-height: 1;
-    margin-left: 0;
-    margin-right: 0;
-    color: var(--blue-800);
-    @media (prefers-color-scheme: dark) {
-      color: var(--blue-50);
-    }
+  padding: 0 8px;
+  font-size: 32px;
+  line-height: 1;
+  margin-left: 0;
+  margin-right: 0;
+  font-family: var(--display-font);
+  font-weight: 900;
+  color: var(--blue-800);
+  @media (prefers-color-scheme: dark) {
+    color: var(--blue-50);
   }
+}
 
 .site-title em {
     font-weight: 200;
@@ -23,9 +24,6 @@
     background: none;
 }
 
-.greedy-nav a:hover {
-    color: var(--masthead-link-color-hover);
-}
 
 .masthead__menu-item {
     text-transform: uppercase;
