@@ -180,7 +180,7 @@ function upgradeCodeFences(content) {
     if (!fence) {
       result.push(lines[i]);
     } else {
-      hasFences = true;
+      usesCodeMirror = true;
       i = fence.index;
       result.push(...fence.content);
     }
