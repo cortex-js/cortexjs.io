@@ -120,7 +120,7 @@ function parseCodeFences(lines, i) {
       ...result,
       '\n',
       '\n',
-      '<code-playground layout="stack">',
+      '<code-playground layout="stack" show-line-numbers>',
       '<style slot="style">' + INJECTED_STYLESHEET + '</style>',
     ];
 

@@ -1,6 +1,7 @@
 .sass-cache
 /node_modules/
-/submodules/
+/submodules/compute-engine/
+/submodules/cortex-js.github.io/
 /src/
 
 # Ignore all HTML files
