@@ -214,3 +214,18 @@ $base-green: $base0b;
 code-playground {
   font-size: 14px;
 }
+
+code-playground::part(editor):hover {
+  transform: scale(1.007)
+}
+
+code-playground::part(editor):focus-within {
+  transform: scale(1.007);
+  border-color: #fff;
+  outline: -webkit-focus-ring-color solid 2px;
+}
+
+code-playground::part(editor) {
+  border: 3px solid transparent;
+  --base-00: #1e4380;
+}

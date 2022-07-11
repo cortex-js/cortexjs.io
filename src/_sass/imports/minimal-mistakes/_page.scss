@@ -15,8 +15,6 @@
 
   @include breakpoint($max-width) {
     padding: 0;
-    max-width: $max-width;
-    width: $max-width;
     display: flex;
     justify-content: center;
   }
