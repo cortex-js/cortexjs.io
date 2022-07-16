@@ -29,6 +29,7 @@
         float: left;
         // width: calc(#{$left-sidebar-width-wide} - 1em);
         margin-right: .5em;
+        width: 344px;
 
         &.sticky {
             overflow-y: auto;

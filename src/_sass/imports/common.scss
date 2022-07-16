@@ -216,7 +216,8 @@ $semantic-green: #2d9d78;
   --card-shadow:  0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 
   --page-background: #{$gray-900}; // #f5f5f7;
-  --content-background: #fff;
+  --content-background: #fcfcfc;
+  --content-border-color: #e9e9f9;
 
   --ui-background: #fff;    
   --ui-background-hover: #{rgba($gray-800, .7)}; // hsla(225, 18%, 87%, .7);  //#gray-800, 70%
@@ -423,15 +424,16 @@ $semantic-green: #2d9d78;
   
   --page-background: #{$gray-25};
   --content-background: #{$gray-50};
+  --content-border-color: #393939;
   --card-background: #{rgba($gray-200, .5)};
   --card-background--alternate: #{$gray-100};
 
-  --ui-background: #{$gray-50};
-  --ui-background-hover: #{rgba($gray-300, .7)};  //#gray-100, 70%
-  --ui-border: 1px solid #{$gray-200};  
-  --ui-border-focus: solid 1px #{$gray-600};
+  --ui-background: #{rgba($gray-200, .7)};
+  --ui-background-hover: #{$gray-200}; 
+  --ui-border: .5px solid #{$gray-300};  
+  --ui-border-focus: .5px solid #{$gray-500};
   // Used for hover state of masthead and nav links
-  --ui-focus-shadow: 0 2px 10px 0px rgb(12 17 16 / 70%), 0 2px 13px 0px rgb(13 12 16 / 85%);
+  --ui-focus-shadow: none;
 
 
   --border-color: #{$gray-200};
@@ -444,7 +446,7 @@ $semantic-green: #2d9d78;
   --masthead-text-color: #{$gray-700};
   --masthead-link-color: #{$gray-700};
   --masthead-link-color-hover: var(--link-color-hover);
-  --masthead-link-color-active: var(--primary-color);
+  --masthead-link-color-active: hsl(210, 80%, 55%);
 
   --semantic-blue: #{$blue-700};
   --semantic-red: #{$red-400};

@@ -503,16 +503,14 @@
   min-width: 40ex;
   max-width: 60ex;
   font-family: var(--ui-font);
-  // color: $gray;
   background-color: var(--ui-background);
-  border: 1px solid var(--primary-color);
   border-radius: $border-radius;
-  // box-shadow: $box-shadow;
 
   .nav__title {
     color: #fff;
     font-size: $type-size-5;
     background: var(--primary-color);
+    border: none;
     border-top-left-radius: $border-radius;
     border-top-right-radius: $border-radius;
     svg {
@@ -535,56 +533,58 @@
 
 .toc__menu {
   margin: 0;
+  padding: 0;
+  border: 1px solid var(--primary-color-dark);
+  border-top: none;
+  width: 100%;
+  list-style: none;
+  font-size: $type-size-5;
+
+  // @include breakpoint($large) {
+  //     font-size: $type-size-7;
+  // }
+
+  a {
+      display: block;
+      padding: 0.25rem 0.75rem;
+      // color: $muted-text-color;
+      font-weight: 600;
+      line-height: 1.5;
+      border-bottom: .5px solid var(--border-color);
+
+      &:hover {
+          color: var(--text-color);
+      }
+  }
+
+  li:last-of-type a {
+    border-bottom: none;
+  }
+
+  ul, ol {
+    margin: 0;
     padding: 0;
-    width: 100%;
-    list-style: none;
-    font-size: $type-size-5;
+  }
 
-    // @include breakpoint($large) {
-    //     font-size: $type-size-7;
-    // }
+  li ul > li a, li ol > li a {
+      padding-left: 2rem;
+      font-weight: normal;
+  }
 
-    a {
-        display: block;
-        padding: 0.25rem 0.75rem;
-        // color: $muted-text-color;
-        font-weight: 600;
-        line-height: 1.5;
-        border-bottom: .5px solid var(--border-color);
+  li ul li ul > li a, li ol li ol > li a {
+      padding-left: 3rem;
+  }
 
-        &:hover {
-            color: var(--text-color);
-        }
-    }
+  li ul li ul li ul > li a, li ol li ol li ol > li a {
+      padding-left: 4rem;
+  }
 
-    li:last-of-type a {
-      border-bottom: none;
-    }
+  li ul li ul li ul li ul > li a, li ol li ol li ol li ol > li a {
+      padding-left: 5rem;
+  }
 
-    ul, ol {
-      margin: 0;
-      padding: 0;
-    }
-
-    li ul > li a, li ol > li a {
-        padding-left: 2rem;
-        font-weight: normal;
-    }
-
-    li ul li ul > li a, li ol li ol > li a {
-        padding-left: 3rem;
-    }
-
-    li ul li ul li ul > li a, li ol li ol li ol > li a {
-        padding-left: 4rem;
-    }
-
-    li ul li ul li ul li ul > li a, li ol li ol li ol li ol > li a {
-        padding-left: 5rem;
-    }
-
-    li ul li ul li ul li ul li ul > li a,
-    li ol li ol li ol li ol li ol > li a {
-        padding-left: 6rem;
-    }
+  li ul li ul li ul li ul li ul > li a,
+  li ol li ol li ol li ol li ol > li a {
+      padding-left: 6rem;
+  }
 }

@@ -376,10 +376,11 @@ module.exports = {
   documentTemplate: (substitutions) => `---
 permalink: "/docs/${substitutions.sdkName}/"
 title: "${
-    { mathlive: 'MathLive', 'compute-engine': 'Compute Engine' }[
+    { 'mathlive': 'MathLive', 'compute-engine': 'Compute Engine' }[
       substitutions.sdkName
     ] ?? substitutions.sdkName
   }"
+chapter: ${substitutions.sdkName}
 read_time: false
 layout: "sdk-documentation-layout"
 sidebar:
@@ -434,9 +435,9 @@ sidebar:
 <section id="all-content">${substitutions.content}</section>
 <div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>
 <script type="module">
-  import { renderMathInElement } from '//unpkg.com/mathlive?module';
   window.addEventListener('DOMContentLoaded', (event) => {
-    renderMathInElement(document.getElementsByClassName('page__content')[0], { 
+    import('https://unpkg.com/mathlive?module').then((mathlive) => {  
+      mathlive.renderMathInDocument(document.getElementsByClassName('page__content')[0], { 
       renderAccessibleContent: false,
       TeX: { 
         delimiters: {

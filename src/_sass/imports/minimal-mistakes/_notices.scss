@@ -103,32 +103,37 @@
 @media (prefers-color-scheme: dark) {
   .page__content .notice {
     color: var(--text-color);
-    background-color: mix(#000, $light-gray, 90%);
-    box-shadow: 0 1px 1px rgba($light-gray, 0.75);
+    background-color: mix(#000, $light-gray, 75%);
+    border: .5px solid mix(#000, $light-gray, 50%);
+    box-shadow: none;
   }
 
   .page__content .notice--info {
     color: var(--text-color);
-    background-color: #{rgba($blue-900, .5)};
-    box-shadow: 0 1px 1px $blue-900;
+    background-color: mix(#000, $blue-700, 80%);
+    border: .5px solid mix(#000, $blue-700, 50%);
+    box-shadow: none;
   }
 
   .page__content .notice--warning {
-    color: $warning-color;
-    background-color: #{rgba($yellow-700, .15)};
-    box-shadow: 0 1px 1px $yellow-700;
+    color: var(--semantic-orange, $warning-color);
+    background-color: mix(#000, $warning-color, 75%);
+    border: .5px solid mix(#000, $warning-color, 50%);
+    box-shadow: none;
   }
 
   .page__content .notice--success {
-    color: $success-color;
-    background-color: #{rgba($green-700, .15)};
-    box-shadow: 0 1px 1px $green-700;
+    color: var(--semantic-green, $success-color);
+    background-color: mix(#000, $green-900, 75%);
+    border: .5px solid mix(#000, $green-700, 50%);
+    box-shadow: none;
   }
 
   .page__content .notice--danger {
-    color: $danger-color;
-    background-color: #{rgba($red-700, .15)};
-    box-shadow: 0 1px 1px $red-700
+    color: var(--semantic-red, $danger-color);
+    background-color: mix(#000, $red-700, 75%);
+    border: .5px solid mix(#000, $red-700, 50%);
+    box-shadow: none;
   }
 
 }

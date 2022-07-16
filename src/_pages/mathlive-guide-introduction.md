@@ -44,7 +44,7 @@ of the mathfield, as a LaTeX expression.
 <a href="https://en.wikipedia.org/wiki/LaTeX">LaTeX</a> is a plain text markup language for structured documents. Most LaTeX commands start with a `\`, for example `\sqrt`, `\frac` and `\sin`. Read more about the <a href="/mathlive/reference/commands/">LaTeX commands available in a mathfield</a>{.notice--info}
 
 
-## Try it out
+## Try it Out
 
 **In the code playground below, change line 3 of the HTML to another LaTeX expression.**<br>For example `f(x) = \frac{x}{2}`.
 
@@ -52,7 +52,7 @@ of the mathfield, as a LaTeX expression.
 <br>Press **Reset** to bring back the playground to its original state. {.notice--info}
 
 
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers mark-html-line="3">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -69,9 +69,17 @@ of the mathfield, as a LaTeX expression.
 </code-playground>
 
 
-**Caution** The HTML quirks mode is not supported. This means that the host page
+
+ <div class="notice--warning" markdown="1">
+
+#### Caution
+The HTML quirks mode is not supported. This means that the host page
 must use the strict mode, indicated by a `<!DOCTYPE html>` directive at the top
-of the page. Without it, the layout of the equations inside the mathfield may be incorrect.{.notice--warning}
+of the page. Without it, the layout of the equations inside the mathfield may be incorrect.
+
+</div>
+
+
 
 
 {% readmore "/mathlive/guides/interacting/" %}
