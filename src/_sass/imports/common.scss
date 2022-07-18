@@ -178,12 +178,10 @@ $semantic-orange: #e68619;
 $semantic-green: #2d9d78;
 
 :root {
-  --monospace-font: 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', monospace;
-  --sans-serif-font: 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
-  --body-font: 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
-  --display-font: 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
-  --ui-font: -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI",
-  "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+  --monospace-font-family: 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', monospace;
+  --body-font-family: 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
+  --display-font-family: 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
+  --ui-font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 
 
   --primary-color: #{$primary-color};
@@ -390,9 +388,9 @@ $semantic-green: #2d9d78;
   --magenta-700: #{$magenta-700};
   --magenta-800: #{$magenta-800};
   --magenta-900: #{$magenta-900};
-  
-
 }
+
+
 @media (prefers-color-scheme: dark) {
   :root {
   --primary-color: hsl(210, 80%, 40%);

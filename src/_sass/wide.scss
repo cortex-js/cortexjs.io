@@ -95,7 +95,7 @@
 }
 
 .hero-section h1 {
-    font: 900 96px/104px var(--display-font);
+    font: 900 96px/104px var(--display-font-family);
     margin: 0;
     padding: 0;
 }
@@ -107,7 +107,7 @@
 
 .hero-section p {
     max-width: 653px;
-    font: 400 48px/52px var(--body-font);
+    font: 400 48px/52px var(--body-font-family);
     letter-spacing: -0.05ex;
     margin: 0;
     padding: 0;
@@ -172,7 +172,7 @@ div.figure + div.copy {
 
 section.fullwidth h2 {
     color: var(--text-color);
-    font: 700 56px/50px var(--display-font);
+    font: 700 56px/50px var(--display-font-family);
     margin: 0;
     padding: 0;
     padding-bottom: 0.5em;
@@ -180,7 +180,7 @@ section.fullwidth h2 {
     border: none;
     & .eyebrow {
         display: block;
-        font: 700 21px/1.14048 var(--display-font);
+        font: 700 21px/1.14048 var(--display-font-family);
         margin: 0;
         padding: 0;
         opacity: 1;
@@ -189,7 +189,7 @@ section.fullwidth h2 {
     }
     & .subhead {
       display: block;
-      font: 500 24px/1 var(--display-font);
+      font: 500 24px/1 var(--display-font-family);
       margin: 0;
       padding: 0;
       margin-bottom: 0.5em;
@@ -199,7 +199,7 @@ section.fullwidth h2 {
 }
 
 section.fullwidth p {
-    font: 400 21px/29px var(--body-font);
+    font: 400 21px/29px var(--body-font-family);
     margin: 0;
     padding: 0;
 }
@@ -234,7 +234,7 @@ section.fullwidth.light-card {
     line-height: 1;
     & .subhead {
       display: block;
-      font: 600 28px/1 var(--display-font);
+      font: 600 28px/1 var(--display-font-family);
       margin: 0;
       padding: 0;
       opacity: .5;
@@ -335,24 +335,24 @@ section.fullwidth.light-card {
 
 .cards.col2 h2,
 .cards.col3 h2 {
-    font: 700 48px/38px var(--display-font);
+    font: 700 48px/38px var(--display-font-family);
     letter-spacing: -0.7px;
 }
 .cards.col2 h2 .subhead,
 .cards.col3 h2 .subhead {
   margin-top: .5em;
-  font: 500 24px/1 var(--display-font);
+  font: 500 24px/1 var(--display-font-family);
   letter-spacing: -0.2px;
 }
 
 .cards.col2 h2 .eyebrow,
 .cards.col3 h2 .eyebrow {
-    font: 400 24px/24px var(--display-font);
+    font: 400 24px/24px var(--display-font-family);
 }
 
 .cards.col2 h3,
 .cards.col3 h3 {
-    font: 400 24px/1.1 var(--display-font);
+    font: 400 24px/1.1 var(--display-font-family);
     margin-bottom: 1em;
     color: var(--text-color);
 }

@@ -113,8 +113,15 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.setQuietMode(true);
 
   // {{ variable | jsonify }}
-  eleventyConfig.addFilter('jsonify', function (variable) {
-    return JSON.stringify(variable);
+  eleventyConfig.addFilter('jsonify', (variable) => JSON.stringify(variable));
+
+  eleventyConfig.addShortcode('icon', function (name, colorName) {
+    let color = '';
+    if (colorName) {
+      if (colorName.startsWith('#')) color = ` style="color:${colorName})"`;
+      else color = ` style="color:var(--${colorName})"`;
+    }
+    return `<svg class="svg-icon"${color}><use xlink:href="/assets/icons.svg#${name}"></use></svg>`;
   });
 
   eleventyConfig.addShortcode('tags', function (...names) {

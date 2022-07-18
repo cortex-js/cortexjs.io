@@ -10,7 +10,7 @@ html {
     /* apply a natural box layout model to all elements */
     box-sizing: border-box;
 
-    background-color: var(--page-background);
+    background: var(--page-background, #f5f5f7);
     font-size: 16px;
 
     // @include breakpoint($medium) {

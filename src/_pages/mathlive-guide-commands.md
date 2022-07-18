@@ -5,7 +5,7 @@ title: Commands
 permalink: /mathlive/guides/commands/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 head:
   stylesheets:

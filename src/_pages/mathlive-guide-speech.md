@@ -5,7 +5,7 @@ title: Speech
 permalink: /mathlive/guides/speech/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 head:
   stylesheets:

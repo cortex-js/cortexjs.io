@@ -5,7 +5,7 @@ title: Keyboard Shortcuts
 permalink: /mathlive/reference/keybindings/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 ---
 

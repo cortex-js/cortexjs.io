@@ -5,7 +5,7 @@ title: Key Bindings and Inline Shortcuts
 permalink: /mathlive/guides/shortcuts/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 head:
   stylesheets:

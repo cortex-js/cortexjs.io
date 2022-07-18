@@ -5,7 +5,7 @@ title: Virtual Keyboards
 permalink: /mathlive/guides/virtual-keyboards/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 head:
   stylesheets:

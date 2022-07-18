@@ -5,7 +5,7 @@ title: Getting Started - MathLive Guide
 permalink: /mathlive/guides/getting-started/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: false
 head:
   stylesheets:

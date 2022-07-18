@@ -4,7 +4,7 @@ permalink: /mathlive/changelog/
 layout: single
 date: Last Modified
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 ---
 # MathLive Changelog
 

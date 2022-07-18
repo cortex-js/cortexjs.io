@@ -88,6 +88,7 @@
   
           background: var(--content-background);
           border-radius: 8px;
+          border: .5px solid var(--border-color);
           padding: 8px;
           padding-left: 2rem;
           padding-right: 2rem;
@@ -109,7 +110,7 @@
   }
   
   .page__lead {
-    font-family: var(--body-font);
+    font-family: var(--body-font-family);
     font-size: $type-size-4;
   }
   
@@ -169,13 +170,13 @@
   
       dt {
           margin-top: 1em;
-          font-family: var(--body-font);
+          font-family: var(--body-font-family);
           font-weight: bold;
       }
   
       dd {
           margin-left: 1em;
-          font-family: var(--body-font);
+          font-family: var(--body-font-family);
           font-size: $type-size-5;
       }
   
@@ -290,7 +291,7 @@
   .page__meta {
       margin-top: 2em;
       color: #707070;
-      font-family: var(--display-font);
+      font-family: var(--display-font-family);
       font-size: $type-size-6;
       @media (prefers-color-scheme: dark) {
         color: #d0d0d0;

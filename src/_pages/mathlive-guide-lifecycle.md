@@ -5,7 +5,7 @@ title: Web Component Lifecycle
 permalink: /mathlive/guides/lifecycle/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 head:
   stylesheets:

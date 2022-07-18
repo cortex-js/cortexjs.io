@@ -4,7 +4,7 @@ permalink: /compute-engine/
 layout: single
 date: Last Modified
 sidebar:
-    - nav: "compute-engine"
+    - nav: "universal"
 ---
 
 <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>

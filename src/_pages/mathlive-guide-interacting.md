@@ -5,7 +5,7 @@ title: Interacting with a Mathfield
 permalink: /mathlive/guides/interacting/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 head:
   stylesheets:

@@ -71,6 +71,7 @@ a.chevron::after {
   color: currentColor;
 }
 
+
 #main a svg.svg-chevron {
   padding: 0;
   margin: 0;
@@ -89,7 +90,7 @@ a.chevron::after {
 
   /* override*/
   color: #494e52;   /* This color is not currently used, as the read-more content is a <a> tag. See ".read-more a" below */
-  font-family: var(--body-font);
+  font-family: var(--body-font-family);
   font-size: 1rem !important;
   text-indent: initial;
   /* override*/
@@ -192,4 +193,10 @@ code + .tags {
 
 .float-right {
   float: right;
+}
+
+
+.svg-icon {
+  width: 1em;
+  height: 1em;
 }

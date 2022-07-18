@@ -19,7 +19,7 @@ mark {
 }
 
 section.page__content {
-  font-family: var(--body-font);
+  font-family: var(--body-font-family);
   line-height: 1.5;
   color: var(--text-color);
 }
@@ -29,7 +29,7 @@ section.page__content h2,
 section.page__content h3,
 section.page__content h4,
 section.page__content h5 {
-    font-family: var(--display-font);
+    font-family: var(--display-font-family);
 }
 
 .stack {
@@ -175,7 +175,7 @@ h3 span.subhead {
 
 code,
 .code {
-    font-family: var(--monospace-font);
+    font-family: var(--monospace-font-family);
     display: inline;
     overflow-wrap: break-word;
 }
@@ -202,7 +202,7 @@ dd > code {
 // Can also be used standalone, e.g. in markup
 var,
 .var {
-    font-family: var(--monospace-font);
+    font-family: var(--monospace-font-family);
     // font-size: $code-font-size;
     font-style: italic;
     font-weight: 400;
@@ -245,7 +245,7 @@ section.page__content .card h3 {
     padding: 20px;
     padding-bottom: 10px;
 
-    font-family: var(--monospace-font);
+    font-family: var(--monospace-font-family);
     font-size: 1.2rem;
     font-feature-settings: normal;
     line-height: 1.5;
@@ -294,7 +294,7 @@ ul {
     margin-left: 1rem;
 }
 .page__content dd {
-    font-family: var(--body-font);
+    font-family: var(--body-font-family);
     font-size: 1rem;
 }
 
@@ -335,7 +335,7 @@ body.layout--sdk-documentation-layout article.page a:hover {
 .page__content dt {
   display: list-item;
   list-style: square;
-  font-family: var(--monospace-font);
+  font-family: var(--monospace-font-family);
   // font-size: $code-font-size;
   font-size: 1rem;
   font-weight: 400;
@@ -435,7 +435,7 @@ ul.index {
 
 .index li {
     display: flex;
-    font-family: var(--monospace-font);
+    font-family: var(--monospace-font-family);
     font-size: $code-font-size !important;
     margin: 0;
     box-sizing: content-box;
@@ -453,7 +453,7 @@ ul.index {
 }
 /* Categories */
 .index h3 {
-    font-family: var(--display-font);
+    font-family: var(--display-font-family);
     font-size: $h3-font-size;
     background: transparent;
     border: none;

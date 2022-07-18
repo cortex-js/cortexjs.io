@@ -23,7 +23,7 @@
 			"description": "Get source code on GitHub"
 		}
 	],
-	"mathlive": [
+  "universal": [
 		{
 			"title": "MathLive",
 			"children": [
@@ -117,47 +117,7 @@
 				}
 			]
 		},
-		{
-			"title": "Cortex",
-			"url": "/cortex/"
-		},
-		{
-			"title": "Compute Engine",
-			"url": "/compute-engine/"
-		},
 
-		{
-			"title": "Contributing",
-			"children": [
-				{
-					"title": "Reporting Issues",
-					"url": "/docs/reporting-issues/",
-          "icon": "bug"
-				},
-				{
-					"title": "Contributing Code",
-					"url": "/docs/contributing-code/",
-          "icon": "code-branch"
-				},
-				{
-					"title": "Funding",
-					"url": "/funding/",
-          "icon": "seedling"
-				},
-				{
-					"title": "Code of Conduct",
-					"url": "/docs/code-of-conduct/",
-          "icon": "handshake"
-				},
-				{
-					"title": "License",
-					"url": "/docs/license/",
-          "icon": "handshake"
-				}
-			]
-		}
-	],
-	"compute-engine": [
     {
 			"title": "Compute Engine",
 			"children": [
@@ -315,48 +275,6 @@
     },
 
     {
-			"title": "MathLive",
-			"url": "/mathlive/"
-		},
-		{
-			"title": "Cortex",
-			"url": "/cortex/"
-		},
-
-		{
-			"title": "Contributing",
-			"children": [
-				{
-					"title": "Reporting Issues",
-					"url": "/docs/reporting-issues/",
-          "icon": "bug"
-				},
-				{
-					"title": "Contributing Code",
-					"url": "/docs/contributing-code/",
-          "icon": "code-branch"
-				},
-				{
-					"title": "Funding",
-					"url": "/funding/",
-          "icon": "seedling"
-				},
-				{
-					"title": "Code of Conduct",
-					"url": "/docs/code-of-conduct/",
-          "icon": "handshake"
-				},
-				{
-					"title": "License",
-					"url": "/docs/license/",
-          "icon": "handshake"
-				}
-			]
-		}
-
-	],
-	"cortex": [
-		{
 			"title": "Cortex",
 			"children": [
 				{
@@ -376,18 +294,8 @@
 				}
 			]
 		},
-		{
-			"title": "MathLive",
-			"url": "/mathlive/"
-		},
-		{
-			"title": "Compute Engine",
-			"url": "/compute-engine/"
-		}
 
-	],
-	"contributing": [
-		{
+    {
 			"title": "Contributing",
 			"children": [
 				{
@@ -416,18 +324,7 @@
           "icon": "handshake"
 				}
 			]
-		},
-		{
-			"title": "MathLive",
-			"url": "/mathlive/"
-		},
-		{
-			"title": "Compute Engine",
-			"url": "/compute-engine/"
-		},
-		{
-			"title": "Cortex",
-			"url": "/cortex/"
 		}
-	]
+
+  ]
 }

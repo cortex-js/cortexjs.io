@@ -5,7 +5,7 @@ read_time: true
 layout: single
 date: Last Modified
 sidebar:
-  - nav: 'contributing'
+  - nav: "universal"
 ---
 
 # Code of Conduct

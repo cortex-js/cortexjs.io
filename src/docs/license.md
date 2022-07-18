@@ -5,7 +5,7 @@ read_time: true
 layout: single
 date: 2021-06-25
 sidebar:
-  - nav: 'contributing'
+  - nav: "universal"
 ---
 
 # License

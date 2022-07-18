@@ -5,7 +5,7 @@ title: Macros - MathLive Guide
 permalink: /mathlive/guides/macros/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css

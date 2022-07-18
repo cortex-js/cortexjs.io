@@ -5,7 +5,7 @@ title: Static Math Formulas
 permalink: /mathlive/guides/static/
 read_time: false
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: false
 head:
   stylesheets:

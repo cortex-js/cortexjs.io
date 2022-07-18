@@ -16,10 +16,4 @@
       {% if s.nav %}{% include nav_list, nav: s["nav"] %}{% endif %}
     {% endfor %}
   </div>
-  <script defer>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sidebar = document.querySelector('.sidebar');
-sidebar.scrollTo(0, document.querySelector('.nav__items .active').offsetTop - sidebar.clientHeight + 100)
-    });
-  </script>
 {% endif %}

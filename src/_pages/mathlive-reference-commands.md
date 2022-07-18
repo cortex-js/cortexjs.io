@@ -6,7 +6,7 @@ permalink: /mathlive/reference/commands/
 read_time: false
 version: Version
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 ---
 

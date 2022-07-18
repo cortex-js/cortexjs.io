@@ -4,7 +4,7 @@ permalink: /mathlive/guides/integration/
 layout: single
 date: Last Modified
 sidebar:
-    - nav: "mathlive"
+    - nav: "universal"
 toc: true
 ---
 
