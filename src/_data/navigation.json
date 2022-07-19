@@ -296,8 +296,13 @@
 		},
 
     {
-			"title": "Contributing",
+			"title": "Additional Resources",
 			"children": [
+				{
+					"title": "About Us",
+					"url": "/about/",
+          "icon": "person"
+				},
 				{
 					"title": "Reporting Issues",
 					"url": "/docs/reporting-issues/",

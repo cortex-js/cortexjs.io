@@ -72,28 +72,30 @@
 </nav>
 
 <script>
-  function findSection(el) {
-    while (el && !el.classList.contains('nav__section')) el = el.parentElement;
-    return el;
-  }
-  window.addEventListener('DOMContentLoaded', (event) => {
-    const sidebar = document.querySelector('.sidebar');
+  (function(){
+    function findSection(el) {
+      while (el && !el.classList.contains('nav__section')) el = el.parentElement;
+      return el;
+    }
+    // window.addEventListener('DOMContentLoaded', (event) => {
+      const sidebar = document.querySelector('.sidebar');
 
-    const activeItem = sidebar.querySelector('.nav__items a.active');
+      const activeItem = sidebar.querySelector('.nav__items a.active');
 
-    findSection(activeItem).classList.add('active');
+      findSection(activeItem).classList.add('active');
 
-    sidebar.scrollTo(0, activeItem.offsetTop - sidebar.clientHeight + 100)
+      sidebar.scrollTo(0, activeItem.offsetTop - sidebar.clientHeight + 100)
 
 
-    for (const el of [...sidebar.getElementsByClassName('nav__sub-title_toggle')??[]]) 
-      el.addEventListener('click', (ev) => {
-        const section = findSection(ev.target);
-        if (section.classList.contains('active')) 
-          section.classList.remove('active')        
-        else    
-          section.classList.add('active')
-      }
-    )
-  });
+      for (const el of [...sidebar.getElementsByClassName('nav__sub-title_toggle')??[]]) 
+        el.addEventListener('click', (ev) => {
+          const section = findSection(ev.target);
+          if (section.classList.contains('active')) 
+            section.classList.remove('active')        
+          else    
+            section.classList.add('active')
+        }
+      )
+    // });
+  })();
 </script>

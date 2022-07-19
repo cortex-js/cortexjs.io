@@ -109,10 +109,10 @@
     }
   }
   
-  .page__lead {
-    font-family: var(--body-font-family);
-    font-size: $type-size-4;
-  }
+  // .page__lead {
+  //   font-family: var(--body-font-family);
+  //   font-size: $type-size-4;
+  // }
   
   .page__content {
       h2 {
@@ -200,89 +200,89 @@
       }
   }
   
-  .page__hero {
-      position: relative;
-      margin-bottom: 2em;
-      @include clearfix;
-      animation: $intro-transition;
-      animation-delay: 0.25s;
+  // .page__hero {
+  //     position: relative;
+  //     margin-bottom: 2em;
+  //     @include clearfix;
+  //     animation: $intro-transition;
+  //     animation-delay: 0.25s;
   
-      &--overlay {
-          position: relative;
-          margin-bottom: 2em;
-          padding: 3em 0;
-          @include clearfix;
-          background-size: cover;
-          background-repeat: no-repeat;
-          background-position: center;
-          animation: $intro-transition;
-          animation-delay: 0.25s;
+  //     &--overlay {
+  //         position: relative;
+  //         margin-bottom: 2em;
+  //         padding: 3em 0;
+  //         @include clearfix;
+  //         background-size: cover;
+  //         background-repeat: no-repeat;
+  //         background-position: center;
+  //         animation: $intro-transition;
+  //         animation-delay: 0.25s;
   
-          a {
-              color: #fff;
-          }
+  //         a {
+  //             color: #fff;
+  //         }
   
-          .wrapper {
-              padding-left: 1em;
-              padding-right: 1em;
+  //         .wrapper {
+  //             padding-left: 1em;
+  //             padding-right: 1em;
   
-              @include breakpoint($max-width) {
-                  max-width: $max-width;
-              }
-          }
+  //             @include breakpoint($max-width) {
+  //                 max-width: $max-width;
+  //             }
+  //         }
   
-          .page__title,
-          .page__meta,
-          .page__lead,
-          .btn {
-              color: #fff;
-              text-shadow: 1px 1px 4px rgba(#000, 0.5);
-          }
+  //         .page__title,
+  //         .page__meta,
+  //         .page__lead,
+  //         .btn {
+  //             color: #fff;
+  //             text-shadow: 1px 1px 4px rgba(#000, 0.5);
+  //         }
   
-          .page__lead {
-              max-width: $medium;
-          }
+  //         .page__lead {
+  //             max-width: $medium;
+  //         }
   
-          .page__title {
-              font-size: $type-size-2;
+  //         .page__title {
+  //             font-size: $type-size-2;
   
-              @include breakpoint($small) {
-                  font-size: $type-size-1;
-              }
-          }
-      }
-  }
+  //             @include breakpoint($small) {
+  //                 font-size: $type-size-1;
+  //             }
+  //         }
+  //     }
+  // }
   
-  .page__hero-image {
-      width: 100%;
-      height: auto;
-      -ms-interpolation-mode: bicubic;
-  }
+  // .page__hero-image {
+  //     width: 100%;
+  //     height: auto;
+  //     -ms-interpolation-mode: bicubic;
+  // }
   
-  .page__hero-caption {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      margin: 0 auto;
-      padding: 2px 5px;
-      color: #fff;
-      font-family: $caption-font-family;
-      font-size: $type-size-7;
-      background: #000;
-      text-align: right;
-      z-index: 5;
-      opacity: 0.5;
-      border-radius: $border-radius 0 0 0;
+  // .page__hero-caption {
+  //     position: absolute;
+  //     bottom: 0;
+  //     right: 0;
+  //     margin: 0 auto;
+  //     padding: 2px 5px;
+  //     color: #fff;
+  //     font-family: $caption-font-family;
+  //     font-size: $type-size-7;
+  //     background: #000;
+  //     text-align: right;
+  //     z-index: 5;
+  //     opacity: 0.5;
+  //     border-radius: $border-radius 0 0 0;
   
-      @include breakpoint($large) {
-          padding: 5px 10px;
-      }
+  //     @include breakpoint($large) {
+  //         padding: 5px 10px;
+  //     }
   
-      a {
-          color: #fff;
-          text-decoration: none;
-      }
-  }
+  //     a {
+  //         color: #fff;
+  //         text-decoration: none;
+  //     }
+  // }
   
   /*
      Page meta
@@ -321,94 +321,94 @@
      Page taxonomy
      ========================================================================== */
   
-  .page__taxonomy {
-      .sep {
-          display: none;
-      }
+  // .page__taxonomy {
+  //     .sep {
+  //         display: none;
+  //     }
   
-      strong {
-          margin-right: 10px;
-      }
-  }
+  //     strong {
+  //         margin-right: 10px;
+  //     }
+  // }
   
-  .page__taxonomy-item {
-      display: inline-block;
-      margin-right: 5px;
-      margin-bottom: 8px;
-      padding: 5px 10px;
-      text-decoration: none;
-      border: 1px solid mix(#000, $border-color, 25%);
-      border-radius: $border-radius;
+  // .page__taxonomy-item {
+  //     display: inline-block;
+  //     margin-right: 5px;
+  //     margin-bottom: 8px;
+  //     padding: 5px 10px;
+  //     text-decoration: none;
+  //     border: 1px solid mix(#000, $border-color, 25%);
+  //     border-radius: $border-radius;
   
-      &:hover {
-          text-decoration: none;
-          color: var(--link-color-hover);
-      }
-  }
+  //     &:hover {
+  //         text-decoration: none;
+  //         color: var(--link-color-hover);
+  //     }
+  // }
   
-  .taxonomy__section {
-      margin-bottom: 2em;
-      padding-bottom: 1em;
+  // .taxonomy__section {
+  //     margin-bottom: 2em;
+  //     padding-bottom: 1em;
   
-      &:not(:last-child) {
-          border-bottom: solid 1px $border-color;
-      }
+  //     &:not(:last-child) {
+  //         border-bottom: solid 1px $border-color;
+  //     }
   
-      .archive__item-title {
-          margin-top: 0;
-      }
+  //     .archive__item-title {
+  //         margin-top: 0;
+  //     }
   
-      .archive__subtitle {
-          clear: both;
-          border: 0;
-      }
+  //     .archive__subtitle {
+  //         clear: both;
+  //         border: 0;
+  //     }
   
-      + .taxonomy__section {
-          margin-top: 2em;
-      }
-  }
+  //     + .taxonomy__section {
+  //         margin-top: 2em;
+  //     }
+  // }
   
-  .taxonomy__title {
-      margin-bottom: 0.5em;
-      color: lighten($text-color, 60%);
-  }
+  // .taxonomy__title {
+  //     margin-bottom: 0.5em;
+  //     color: lighten($text-color, 60%);
+  // }
   
-  .taxonomy__count {
-      color: lighten($text-color, 50%);
-  }
+  // .taxonomy__count {
+  //     color: lighten($text-color, 50%);
+  // }
   
-  .taxonomy__index {
-      display: grid;
-      grid-column-gap: 2em;
-      grid-template-columns: repeat(2, 1fr);
-      margin: 1.414em 0;
-      padding: 0;
-      font-size: 0.75em;
-      list-style: none;
+  // .taxonomy__index {
+  //     display: grid;
+  //     grid-column-gap: 2em;
+  //     grid-template-columns: repeat(2, 1fr);
+  //     margin: 1.414em 0;
+  //     padding: 0;
+  //     font-size: 0.75em;
+  //     list-style: none;
   
-      @include breakpoint($large) {
-          grid-template-columns: repeat(3, 1fr);
-      }
+  //     @include breakpoint($large) {
+  //         grid-template-columns: repeat(3, 1fr);
+  //     }
   
-      a {
-          display: flex;
-          padding: 0.25em 0;
-          justify-content: space-between;
-          color: inherit;
-          text-decoration: none;
-          border-bottom: 1px solid $border-color;
-      }
-  }
+  //     a {
+  //         display: flex;
+  //         padding: 0.25em 0;
+  //         justify-content: space-between;
+  //         color: inherit;
+  //         text-decoration: none;
+  //         border-bottom: 1px solid $border-color;
+  //     }
+  // }
   
-  .back-to-top {
-      display: block;
-      clear: both;
-      color: lighten($text-color, 50%);
-      font-size: 0.6em;
-      text-transform: uppercase;
-      text-align: right;
-      text-decoration: none;
-  }
+  // .back-to-top {
+  //     display: block;
+  //     clear: both;
+  //     color: lighten($text-color, 50%);
+  //     font-size: 0.6em;
+  //     text-transform: uppercase;
+  //     text-align: right;
+  //     text-decoration: none;
+  // }
   
   /*
      Wide Pages

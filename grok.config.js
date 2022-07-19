@@ -384,7 +384,7 @@ chapter: ${substitutions.sdkName}
 read_time: false
 layout: "sdk-documentation-layout"
 sidebar:
-    - nav: "${substitutions.sdkName}"
+    - nav: "universal"
 # toc: true
 ---
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
