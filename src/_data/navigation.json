@@ -304,6 +304,11 @@
           "icon": "person"
 				},
 				{
+					"title": "Questions and Feedback on Gitter",
+					"url": "https://gitter.im/cortex-js",
+          "icon": "gitter"
+				},
+				{
 					"title": "Reporting Issues",
 					"url": "/docs/reporting-issues/",
           "icon": "bug"

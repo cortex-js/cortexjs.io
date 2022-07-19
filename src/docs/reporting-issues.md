@@ -11,25 +11,28 @@ sidebar:
 
 ## Contributing Ideas and Feature Requests
 
-Use the [issue tracker](https://github.com/arnog/mathlive/issues) to submit
-requests for new features. First, have a look at what might already be there,
-and if you don't see anything that matches, write up a new issue.
+**To request new features** use the GitHub issue tracker:
 
-If you do see something similar to your idea, comment on it or add a 👍.
+* for [MathLive](https://github.com/arnog/mathlive/issues)
+* for the [Compute Engine](https://github.com/cortex-js/compute-engine)
+* for [this website](https://github.com/cortex-js/cortexjs.io)
 
-## How to report an issue?
+If you do see an existing issue similar to your idea, comment on it or add a 👍.
 
-If you're running into some problems or something doesn't behave the way you think it should, please file an issue in GitHub.
+## How to Report an Issue?
 
-Before filing something, have a look at the existing issues. Avoid filing duplicates, but you can
-add a comment to an existing issue if you'd like.
+**To report a problem or something that doesn't behave the way you think it
+ should**, please file an issue in GitHub.
 
-### What happens after I file an issue?
+Avoid filing duplicates, but you can add a comment to an existing issue if you'd like.
 
--   Once a developer has started working on the bug, the bug will be assigned to someone.
--   Once a bug has been resolved, it is closed. You can still comment on closed bugs, or re-open them if necessary.
+## What Happens After I File an Issue?
 
-In addition, issues can be tagged with the following:
+-   Once a developer has started working on the bug, the bug will be assigned to them.
+-   Once a bug has been resolved, it is closed. You can still comment on 
+  closed bugs, or re-open them if necessary.
+
+Issues may be tagged with the following:
 
 -   _high priority_: Catastrophic issue that impacts many users
 -   _medium priority_: Regression or issues that impact a significant number of users
