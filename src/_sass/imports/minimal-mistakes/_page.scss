@@ -73,7 +73,20 @@
             margin-bottom: 2em;
             clear: both;
         }
+
+        .page__meta > p {
+          display: flex;
+          align-items: center;
+        }
   
+        .page__meta > p svg {
+          margin-right: .5em;
+        }
+
+        .page__meta > p strong {
+          margin-right: .5em;
+        }
+
         .page__content {
           position: relative;
           float: left;

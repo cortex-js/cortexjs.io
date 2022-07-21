@@ -72,7 +72,7 @@ triggered and creating an infinite loop.{.notice--info}
 **To read the content of a `<math-field>` element** use its `value` property, 
 just like with a `<textarea>`.
 
-The `expression` property of a mathfield contains a MathJSON representation
+The `expression.json` property of a mathfield contains a MathJSON representation
 of its content. The [MathJSON](/math-json) format is a lightweight 
 mathematical notation interchange format.{.notice--info}
 

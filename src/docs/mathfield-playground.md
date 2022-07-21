@@ -26,10 +26,20 @@ head:
   ));
 </script>
 
-# Demo
+# MathLive Demo
 
-Experiment with the options available to setup and customize a 
-mathfield with the Playground below. Edit the HTML and JavaScript section for the interactive result to update right away.
+In the demo below, a mathfield and a LaTeX textfield reflect their content. The
+MathJSON representation of the expression is also dispalyed in the console.
+
+The HTML and JavaScript playgrounds below are interactive.
+
+Modify the code to experiment with the options available.
+
+{% readmore "/compute-engine/demo/" %}
+Try a demo of the **Compute Engine**.
+{% endreadmore %}
+
+
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack">
@@ -62,12 +72,19 @@ mathfield with the Playground below. Edit the HTML and JavaScript section for th
     <div slot="javascript">import 'mathlive';
 const mf = document.querySelector('#formula');
 const latexField = document.querySelector('#latex');
+//
 latexField.addEventListener('input', () => mf.setValue(latexField.value));
-function updateLatex() {
-  document.querySelector('#latex').value = mf.value;
+//
+function onMathfieldInput() {
+    // Output MathJSON representation of the expression
+    console.clear();
+    console.log('MathJSON expression', mf.expression.json);  
+    // Update raw LaTeX value
+    latexField.value = mf.value;
 }
-mf.addEventListener('input', updateLatex);
-updateLatex();</div>
+//
+mf.addEventListener('input', onMathfieldInput);
+onMathfieldInput();</div>
     <div slot="html">
 &lt;math-field id="formula" virtual-keyboard-mode="manual"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
