@@ -121,7 +121,7 @@ module.exports = function (eleventyConfig) {
       if (colorName.startsWith('#')) color = ` style="color:${colorName})"`;
       else color = ` style="color:var(--${colorName})"`;
     }
-    return `<svg class="svg-icon"${color}><use xlink:href="/assets/icons.svg#${name}"></use></svg>`;
+    return `<svg class="icon1em"${color}><use xlink:href="/assets/icons.svg#${name}"></use></svg>`;
   });
 
   eleventyConfig.addShortcode('tags', function (...names) {
