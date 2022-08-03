@@ -27,7 +27,8 @@ Typing math formulas require access to many special symbols. While [keyboard
 shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help, mobile 
 devices require another solution.{.xl}
 
-A **virtual keyboard** is a keyboard displayed on screen that can be customized with specialized symbols for math input.
+A **virtual keyboard** is a keyboard displayed on screen that can be customized 
+with specialized symbols for math input.
 
 ![](/assets/images/mathfield/virtual-keyboard.png)
 
@@ -73,6 +74,17 @@ equivalent `virtual-keyboard-mode` attribute:
 
 There is only one virtual keyboard panel displayed at a time, but each mathfield
 can specify different virtual keyboard panel configurations. {.notice--info}
+
+
+## Preventing Input from the Physical Keyboard
+
+**To require the virtual keyboard to be used for input and ignore 
+keys pressed on the physical keyboard** listen and `preventDefault()` on `"keydown"`
+events
+
+```ts
+mf.addEventListener('keydown',(evt) =>  evt.preventDefault());
+```
 
 
 ## Displaying the Virtual Keyboard in a Custom Container

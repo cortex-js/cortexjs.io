@@ -283,6 +283,48 @@
           "icon": "intro"
 				},
 				{
+					"title": "Goals",
+					"url": "/cortex/goals/",
+          "icon": "intro"
+				},
+				{
+					"title": "Principles",
+					"url": "/cortex/principles/",
+          "icon": "intro"
+				},
+        { "separator": true },
+				{
+					"title": "Source Code",
+					"url": "/cortex/source-code/",
+          "icon": "reference"
+				},
+				{
+					"title": "Comments",
+					"url": "/cortex/comments/",
+          "icon": "reference"
+				},
+				{
+					"title": "Literals",
+					"url": "/cortex/literals/",
+          "icon": "reference"
+				},
+				{
+					"title": "Naming",
+					"url": "/cortex/naming/",
+          "icon": "reference"
+				},
+				{
+					"title": "Operators",
+					"url": "/cortex/operators/",
+          "icon": "reference"
+				},
+				{
+					"title": "Pragmas",
+					"url": "/cortex/pragmas/",
+          "icon": "reference"
+				},
+        { "separator": true },
+				{
 					"title": "Syntax",
 					"url": "/cortex/syntax/",
           "icon": "reference"

@@ -31,14 +31,34 @@ Here are a few common examples.
 
 ## Styling
 
-**To style the mathfield use the `style` attribute on the `<math-field>` 
-tag or define a CSS rule targeting the mathfield.**
+**To style the mathfield** define a CSS rule targeting the mathfield or use the 
+`style` attribute on the `<math-field>` element.
 
 This can be used to modify the appearance of the mathfield in many ways, for 
 example changing the base font size or adding a border around it.
 
 **To display the mathfield as an inline element**, rather than a block element, 
 use `style="display: inline-block"`
+
+
+**To change the color of the caret (insertion point)** set the value of the 
+`caret-color` CSS property.
+
+**To change the background color and ink color of the math content when 
+selected** set the value of the `color` and `background-color` CSS properties
+with a rule targeting the `::selection` pseudo-element.
+
+```css
+math-field {
+  caret-color: darkblue;
+}
+math-field::selection {
+ background-color: darkblue;
+ color: white;
+}
+```
+
+
 
 Change the style attribute in the playground below to `color: #dde; background: #256291;`.
 
@@ -79,15 +99,26 @@ Alternatively you can set these CSS variables programatically:
 
 | CSS Variable | Usage |
 |:---|:---|
-| `--caret` | Color of the caret/insertion point |
-| `--contains-highlight` | Backround property for items that contain the caret |
-| `--highlight` | Color of the selection |
-| `--highlight-inactive` | Color of the selection, when the mathfield is not focused |
+| `--contains-highlight-backround-color` | Backround color for items that contain the caret |
 | `--hue` | Hue of the highlight color and the caret |
 | `--primary` | Primary accent color, used for example in the virtual keyboard |
 | `--smart-fence-color` | Color of a smart fence (default is current color) |
 | `--smart-fence-opacity` | Opacity of a smart fence (default is 50%) |
 | `--text-font-family` | The font stack used in text mode |
+| `--placeholder-color` | Color of the placeholder symbol |
+| `--placeholder-opacity` | Opacity (0-1) of the placeholder symbol |
+| `--selection-background-color-focused`| Background color of the selection, when the mathfield is focused. By default, same as `--selection-background-color` | 
+| `--selection-color-focused`| Color of the content in the selection, when the mathfield is focused. By default, same as `--selection-color` | 
+| `--selection-background-color`| Background color of the selection | 
+| `--selection-color`| Color of the content in the selection | 
+
+**Note** To change the placeholder symbol, set the option `placeholderSymbol`.
+
+**To change the appearance of the selection** set the `--selection-background-color` and
+`--selection-color` CSS variables. To have a difference appearance when focused or
+not, set the `--selection-background-color-focused` and `--selection-color-focused`
+CSS variables.
+
 
 </div>
  
@@ -428,6 +459,83 @@ console.log(mf.getOptions().strings[locale]);
 &lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
+
+### Decimal Marker
+
+The world is
+[about evenly split](https://en.wikipedia.org/wiki/Decimal_separator#/media/File:DecimalSeparator.svg)
+between using a dot `.` or a comma `,` as a decimal marker.
+
+**To change the marker used with decimal numbers** set the `decimalSeparator` 
+option to `","` or `"."`.
+
+When set to `","`, pressing the `,` key on a physical keyboard will insert a 
+`{,}` LaTeX string, if in math mode and if before a digit. 
+
+The LaTeX sequence `{,}` is traditionally used to correctly typeset the comma 
+and ensure the correct amount of space around it. Without the `{}`, the `,` 
+is interpreted as a delimiter and has excessive amount of space around it.
+
+When set to `","`, the virtual keyboard is also changed so that the `.` 
+keycap is  labeled `,` instead and contextually inserts a `{,}` when appropriate.
+
+<!-- htmlmin:ignore -->
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+<div slot="javascript">
+await window.customElements.whenDefined('math-field');
+document.getElementById('formula').setOptions({
+  decimalSeparator: ","
+});
+</div>
+<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
+</code-playground>
+<!-- htmlmin:ignore -->
+
+
+
+### Fraction Navigation Order
+
+In some East Asian cultures the denominator of fractions is read/written
+before the numerator.
+
+**To change the keyboard navigation order of fractions** set the 
+`fractionNavigationOrder` option.
+
+<!-- htmlmin:ignore -->
+<code-playground layout="stack">
+    <style slot="style">
+      .output:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      .output math-field:focus, .output math-field:focus-within {
+        outline: none;
+      }
+    </style>
+<div slot="javascript">
+await window.customElements.whenDefined('math-field');
+document.getElementById('formula').setOptions({
+  fractionNavigationOrder: "denominator-numerator"
+});
+</div>
+<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</div>
+</code-playground>
+<!-- htmlmin:ignore -->
+
+
 
 </section>
 
