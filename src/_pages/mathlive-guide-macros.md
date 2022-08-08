@@ -41,7 +41,7 @@ are macros, that is commands defined with a LaTeX expression.{.xl}
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-console.log(mf.getOption('macros'));
+console.log(mf.getOptions('macros'));
 </div>
     <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
 </div>

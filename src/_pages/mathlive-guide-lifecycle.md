@@ -99,11 +99,11 @@ interact with the object, but its operations are limited.
 At this stage:
 * you can read and change the properties as before. However, doing so will
 be reflected on attributes as well. That is calling `mf.virtualKeyboardMode = "manual"` or
-`mf.setOptions({ virtualKeyboardMode: "manual"})`
+`mf.setOptions({ virtualKeyboardMode: "manual" })`
 will result in `mf.getAttribute('virtual-keyboard-mode')` to return `"manual"`.
 * you can read and change the attributes as before, however they will now 
 be reflected on properties as well, that is calling `mf.setAttribute('virtual-keyboard-mode', 'manual')`
-will result in `mf.virtualKeyboardMode` and `mf.getOption('virtualKeyboardMode')` 
+will result in `mf.virtualKeyboardMode` and `mf.getOptions('virtualKeyboardMode')` 
 to return `"manual"`.
 * you can change/add/remove attributes on the element
 * you can invoke all methods specific to `MathfieldElement`, however some may
@@ -129,11 +129,11 @@ vice versa).
 **To be notified when this stage is reached**, listen for the `mount` event on 
 the element:
 ```javascript
-md.addEventListener('mount')((ev) => {
+md.addEventListener('mount', (ev) => {
   console.log('mf is mounted');
   // You can now read default options value for example, or 
-  //call `setValue()` with format options other than LaTeX.
-  console.log(ev.target.getOption('macros'));
+  // call `setValue()` with format options other than LaTeX.
+  console.log(ev.target.getOptions('macros'));
 });
 ```
 
