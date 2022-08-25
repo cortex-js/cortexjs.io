@@ -206,8 +206,8 @@
 				},
         { "separator": true },
         {
-          "title": "Dictionaries",
-          "url": "/compute-engine/guides/dictionaries/",
+          "title": "Standard Library",
+          "url": "/compute-engine/guides/standard-library/",
           "icon": "intro"
         },
         {

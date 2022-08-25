@@ -217,7 +217,6 @@ This include the following standard events:
 As well as these mathfield specific events:
 - `mount`: the mathfield has been connected to the DOM
 - `unmount`: the mathfield is no longer connected to the DOM
-- `math-error`: syntax and other errors
 - `keystroke`: general keyboard interactions
 - `focus-out`: tab key interactions
 - `move-out`: arrow key interactions

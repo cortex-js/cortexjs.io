@@ -35,7 +35,8 @@ The CortexJS Compute Engine manipulates math expressions represented with the <a
 The Compute Engine can:
 - <a href="/compute-engine/guides/latex-syntax/">**parse** and **serialize**</a> expressions from and to LaTeX
 - <a href="/compute-engine/guides/simplify/">**simplify**</a> expressions
-- <a href="/compute-engine/guides/evaluate/">**evaluate symbolically**</a> and <a href="/compute-engine/guides/numeric-evaluation/">**evaluate numerically**</a> expressions
+- <a href="/compute-engine/guides/evaluate/">**evaluate symbolically**</a> expressions
+- <a href="/compute-engine/guides/numeric-evaluation/">**evaluate numerically**</a> expressions
 
 {% readmore "/compute-engine/demo/" %}
 Try the **interactive demo** now
@@ -87,15 +88,15 @@ The UMD version is also available as `dist/compute-engine.min.js`
 
 ### Other Versions
 
-A non-minified module, `compute-engine.esm.js`, is also available, which may 
-be useful for debugging.
+A non-minified module which may  be useful for debugging is available as
+`dist/compute-engine.esm.js`.
 
-## Dictionaries
+## Standard Library
 
-Expressions reference symbols and functions that are defined in dictionaries.
+Expressions reference symbols and functions that are defined in libraries.
 
 By default, new `ComputeEngine` instances include a robust set of
-functions and symbols, grouped in several dictionaries.
+functions and symbols, the standard library, grouped in several sub-libraries.
 
 <div class=symbols-table>
 
@@ -117,26 +118,29 @@ functions and symbols, grouped in several dictionaries.
 </div>
 
 
-**To customize the dictionaries that define the functions and symbols**, 
-use the `ComputeEngine` constructor to define the dictionaries
-to use.
-
-In addition to the built-in dictionaries, you can define your own.
+In addition to the symbol table from the standard library, you can define your 
+own symbols and functions.
 
 ```js
-const ce = new ComputeEngine(ComputeEngine.getDictionary('arithmetic'));
+const ce = new ComputeEngine({
+  symbolTables: ComputeEngine.getSymbolTable('arithmetic')
+});
 console.log(ce.box(['Add', 5, 2]).evaluate().json);
 ```
 
-Each entry in a dictionary define the properties of that function or
+Each entry in a symbol table defines the properties of that function or
 symbols, as well as how to put expression in canonical form, simplify,
 and evaluate expressions using that function.
 
-There are separate dictionaries that define the LaTeX syntax, that is
-how to parse and serialize LaTeX to MathJSON. You can also customize these
-dictionaries.
-
-{% readmore "/compute-engine/guides/dictionaries/" %}
-Read more about <strong>Dictionaries</strong>
+{% readmore "/compute-engine/guides/standard-library/" %}
+Read more about <strong>Standard Library</strong>
 {% endreadmore %}
 
+
+
+You can also customize the LaTeX syntax, that is how to parse and serialize 
+LaTeX to MathJSON.
+
+{% readmore "/compute-engine/guides/latex-syntax/" %}
+Read more about the <strong>LaTeX Syntax</strong>
+{% endreadmore %}

@@ -24,24 +24,19 @@ head:
     };
 </script>
 
-Input using a physical keyboard can be sped using two methods:
-
--   **key bindings**
--   **inline shortcuts**
-
 ## Key Bindings
 
-A key binding is a combination of keys pressed simultaneously that
-triggers a command.
+A **key binding** is a combination of keys pressed simultaneously on a physical 
+keyboard that triggers a command.
 
-For example, pressing <kbd>Alt/Options</kbd> and the <kbd>V</kbd> key at the same time will insert
-a square root. Pressing <kbd>Control/⌘</kbd> and the <kbd>Z</kbd> key at the same time will undo
-the last command.
+For example, pressing <kbd>Alt/Option/⌥</kbd> and the <kbd>V</kbd> key at the 
+same time will insert a square root. Pressing <kbd>Control/Command/⌘</kbd> and the 
+<kbd>Z</kbd> key at the same time will undo the last command.
 
 MathLive has an extensive set of [default key bindings](https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts). 
 
-**To override, customize or add to the list of supported key bindings**, provide a
-`onKeystroke` handler.
+**To override, customize or add to the list of supported key bindings**, listen 
+for a `keydown` event.
 
 <code-playground layout="stack">
     <style slot="style">
@@ -55,17 +50,10 @@ MathLive has an extensive set of [default key bindings](https://github.com/arnog
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-  onKeystroke: (mathfield, keystroke, ev) => {
-    if (keystroke === 'alt+[KeyS]') {
-      mf.insert('\\sum^\\infty_{n=0}');
-      return false;
-    } else if (keystroke === 'meta+[KeyK]') {
-      mf.executeCommand('toggleVirtualKeyboard');
-      return false;
-    }
-    // Keystroke not handled, return true for default handling to proceed.
-    return true;
+mf.addEventListener('keydown', (ev) => {
+  if (ev.altKey === true && ev.code === 'KeyS') {
+    mf.insert('\\sum^\\infty_{n=0}');
+    ev.preventDefault();
   }
 });
 </div>
@@ -75,13 +63,8 @@ mf.setOptions({
 </div>
 </code-playground>
 
-The `onKeystroke` handler is invoked when a keystroke is about to be processed.
-
--   `keystroke` is a string describing the keystroke, for example `alt-[KeyS]`
--   `ev` is the native JavaScript keyboard event.
-
-Return `false` to stop handling of the event, otherwise the default command
-(if any) associated with this keystroke will be processed.
+Call `ev.preventDefault()` to stop handling of the event, otherwise the default 
+command (if any) associated with this keystroke will be processed.
 
 ### International Keyboards
 
@@ -121,7 +104,7 @@ However, if we know the keyboard layout, we can use a table that maps the value
 of the key field to infer the label of the key  the user pressed, i.e. what the
 user sees printed on the top of the key cap, regardless of its physical location
 on the keyboard. Once we have the label, we can figure out that the user pressed
-<kbd>Control/⌘</kbd> + <kbd>A</kbd> using the modifier fields of the event.
+<kbd>Control/Command/⌘</kbd> + <kbd>A</kbd> using the modifier fields of the event.
 
 But how do we know what is the current keyboard layout? There is unfortunately
 no web platform API (broadly supported) to obtain that information. 
@@ -147,14 +130,23 @@ layout. As a result some keyboard shortcuts may produce unexpected results.
 
 ## Inline Shortcuts
 
-An inline shortcut is a sequence of keystrokes typed on the keyboard that get
-replaced with another symbol. Unlike keystroke shortcuts they cannot be used to
-trigger a command, but only to insert a LaTeX fragment.
+An **inline shortcut** is a sequence of keystrokes typed on the keyboard that get
+replaced with another symbol. Unlike key bindings they cannot be used to
+trigger a command, only to insert a LaTeX fragment.
 
-For example, typing the <kbd>P</kbd> key followed by the <kbd>I</kbd> key will result in the 
-`\pi` \\[ \pi \\] command being inserted, and not the `pi` characters.
+For example, typing the <kbd>P</kbd> key followed by the <kbd>I</kbd> key will 
+result in the `\pi` \\[ \pi \\] LaTeX fragment being inserted, and not the `pi` 
+characters.
 
-If a substitution was undesirable, use **Undo** to revert to the raw input.
+Inline shortcuts can be typed either using a physical keyboard or the 
+virtual keyboard. 
+
+If a substitution was undesirable, use **Undo** (<kbd>Control/Command/⌘</kbd> + 
+<kbd>Z</kbd>) to revert to the raw input.
+
+To prevent two consecutive characters to be recognized as part of a shortcut
+sequence, press the **Space** bar between them.
+
 
 MathLive has some [built-in inline shortcuts](https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts) 
 defined, but they can be replaced or enhanced with additional shortcuts.
@@ -174,16 +166,12 @@ const mf = document.getElementById('mf');
 mf.setOptions({
   inlineShortcuts: {
     ...mf.getOptions('inlineShortcuts'),    // Preserve default shortcuts
-    "infty": { mode: 'math', value: '\\infty' },
+    "infty": '\\infty',
   }
 });</div><div slot="html">&lt;math-field id="mf"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
-
-The `mode` property, if present, indicate the mode in which this shortcut should 
-apply, either `"math"` or `"text"`. If the property is not present the shortcut 
-apply in both modes.
 
 
 **To constraint the context in which a shortcut should apply**, use the `after` 
@@ -194,7 +182,6 @@ mf.setOptions({
   inlineShortcuts: {
     ...mf.getOptions('inlineShortcuts'),    // Preserve default shortcuts
     in: {
-        mode: 'math',
         after: 'space | letter | digit | symbol | fence',
         value: '\\in',
     },
@@ -238,28 +225,52 @@ Conventionally, the `\mathit{}` command is used to represent variables and the
 `\mathrm{}` for function names. You may prefer to use `\mathrm{}` in both cases.
 The command `\operatorname{}` may also be used for this purpose.
 
-**To recognize multicharacter symbols,** provide a `onMultichar()` handler.
+**To recognize multicharacter symbols,** provide a `onInlineShortcut()` handler.
 If the handler recognize the input as a valid multichar symbol, it 
 should return a command representing this symbol.
 
+The string passed to the `onInlineShortcut` handler is a raw sequence of 
+characters the user typed on the keyboard.
+
 ```ts
 mf.setOptions({
-  onMulticharSymbol: (_mf, s) => {
+  onInlineShortcut: (_mf, s) => {
     if (/^[A-Z][a-z]+$/.test(s)) return `\\mathrm{${s}}`;
     if (/^[a-z][a-z]+$/.test(s)) return `\\mathit{${s}}`;
     return '';
   },
 });
-
 ```
+
+You can use the `onInlineShortcut` handler to recognize arbitrary patterns.
+For example:
+
+```ts
+mf.setOptions({
+  onInlineShortcut: (_mf, s) => {
+    if (/^[a-zA-Z][a-zA-Z0-9]*'?(_[a-zA-Z0-9]+'?)?$/.test(s)) {
+      const m = s.match(/^([a-zA-Z]+)([0-9]+)$/);
+      if (m) {
+        if (['alpha', 'beta', 'gamma'].includes(m[1]))
+          return `\\${m[1]}_{${m[2]}}`;
+        return `\\mathrm{${m[1]}}_{${m[2]}}`;
+      }
+      return '\\mathrm{' + s + '}';
+    }
+    return '';
+  },
+});
+```
+This will recognize "alpha34" -> `\alpha_{34}` or "speed" -> `\mathrm{speed}`.
+
 
 ## Customizing the Inline Shortcut Sensitivity
 
 **To change how quickly a set of keys must be typed to be considered a shortcut**
 set the `inlineShortcutTimeout` option.
 
-It represents the maximum amount of time, in milliseconds, between consecutive characters for them to be
-considered part of the same shortcut sequence.
+It represents the maximum amount of time, in milliseconds, between consecutive 
+characters for them to be considered part of the same shortcut sequence.
 
 A value of 0 is the same as infinity: any consecutive
 character will be candidate for an inline shortcut, regardless of the
