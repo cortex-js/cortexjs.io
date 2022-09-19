@@ -7,8 +7,6 @@
     display: block;
     @include clearfix;
     padding: 0;
-    padding-left: 1em;
-    padding-right: 1em;
     animation: $intro-transition;
     max-width: 100%;
     animation-delay: 0.15s;
@@ -18,6 +16,10 @@
       display: flex;
       justify-content: center;
     }
+    @include breakpoint($small) {
+      padding-left: 1em;
+      padding-right: 1em;
+      }
   }
   
   body {

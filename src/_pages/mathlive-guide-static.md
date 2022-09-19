@@ -9,11 +9,11 @@ sidebar:
 toc: false
 head:
   stylesheets:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.css
   scripts:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/javascript/javascript.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
     - //unpkg.com/mathlive?module

@@ -96,17 +96,17 @@ A non-minified module which may  be useful for debugging is available as
 Expressions reference symbols and functions that are defined in libraries.
 
 By default, new `ComputeEngine` instances include a robust set of
-functions and symbols, the standard library, grouped in several sub-libraries.
+functions and symbols, the standard library, grouped in several categories.
 
 <div class=symbols-table>
 
-| Dictionary | Symbols/Functions |
+| Category | Symbols/Functions |
 |:---|:---|
 | [Arithmetic](/compute-engine/reference/arithmetic/) | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`...|
 | [Calculus](/compute-engine/reference/calculus/) | `Derive` `Integrate`...|
 | [Collections](/compute-engine/reference/collections/)| `Sequence` `List` `Dictionary` `Set`... |
 | [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` `Sum`  ... |
-| [Core](/compute-engine/reference/core/) | `Missing` `InverseFunction` `LatexTokens`... |
+| [Core](/compute-engine/reference/core/) |`InverseFunction` `LatexTokens`... |
 | [Domains](/compute-engine/reference/domains/) | `Anything` `Nothing` `Number` `Integer` ... |
 | [Functions](/compute-engine/reference/functions/) | `Function` `Apply` `Return`  ... |
 | [Logic](/compute-engine/reference/logic/) |`And` `Or` `Not` `True` `False` `Maybe` ...|
@@ -118,7 +118,7 @@ functions and symbols, the standard library, grouped in several sub-libraries.
 </div>
 
 
-In addition to the symbol table from the standard library, you can define your 
+In addition to definitions from the standard library, you can define your 
 own symbols and functions.
 
 ```js
@@ -129,8 +129,8 @@ console.log(ce.box(['Add', 5, 2]).evaluate().json);
 ```
 
 Each entry in a symbol table defines the properties of that function or
-symbols, as well as how to put expression in canonical form, simplify,
-and evaluate expressions using that function.
+symbol, as well as how to put expressions using that function in canonical form 
+and how to simplify and evaluate it.
 
 {% readmore "/compute-engine/guides/standard-library/" %}
 Read more about <strong>Standard Library</strong>

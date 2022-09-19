@@ -8,11 +8,11 @@ sidebar:
 version: MathLive version
 head:
   stylesheets:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.css
   scripts:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/javascript/javascript.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
 ---
@@ -29,11 +29,9 @@ head:
 # MathLive Demo
 
 In the demo below, a mathfield and a LaTeX textfield reflect their content. The
-MathJSON representation of the expression is also dispalyed in the console.
+MathJSON representation of the expression is also displayed in the console.
 
-The HTML and JavaScript playgrounds below are interactive.
-
-Modify the code to experiment with the options available.
+Modify the JavaScript and HTML below to experiment with the options available.
 
 {% readmore "/compute-engine/demo/" %}
 Try a demo of the **Compute Engine**.

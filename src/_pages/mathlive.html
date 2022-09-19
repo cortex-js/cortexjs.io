@@ -9,33 +9,157 @@ head:
   modules:
     - /assets/js/code-playground.min.js
   stylesheets:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.css
   scripts:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/xml/xml.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/javascript/javascript.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/xml/xml.min.js
 ---
 <style>
+.pod {
+  margin-bottom: 6rem;
+  border-radius: 8px;
+  background:  #fff;
+  padding: 16px 32px 8px 32px;
+}
+
 .fullwidth {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  justify-content: space-evenly;
+  gap: 2rem;
 }
-
+.fullwidth .copy {
+  max-width: 50%;
+}
 .fullwidth .copy h2 {
   margin: 0;
 }
+
 .fullwidth .figure {
-  margin-left: 24px;
+  min-width: 50%;
+  text-align: center;
 }
+
+
+h1 {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  font-size: 6rem;
+  letter-spacing: -0.04em;
+  line-height: .9;
+  font-weight: 700;
+  text-fill-color: transparent;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  background-image: linear-gradient(0deg, #2f475e, #cc6666);
+}
+h1::selection {
+  -webkit-text-fill-color: #000;
+  background: #abd;
+  background-clip:inherit;
+  -webkit-background-clip: inherit;
+  -moz-background-clip: inherit;
+}
+.page__content .pod h2 {
+  font-size: 5rem;
+  line-height: 4.5rem;
+  max-width: 75%;
+  border: none;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 2rem;
+}
+
+.page__content p {
+    margin: 0 0 1em;
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.1em;
+    letter-spacing: 0.006em;
+    color: #999;
+}
+
+.copy strong {
+  color: #000;
+}
+
+div.figure {
+  background: #fff;
+  box-shadow: 0 20px 40px #ccc;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (prefers-color-scheme: dark) {
+.pod {
+  background:  #111;
+}
+
+.page__content p {
+  color: #bbb
+}
+
+.copy strong {
+  color: #fff;
+}
+
+div.figure {
+  box-shadow: 0 20px 40px #000;
+}
+
+}
+
+@media only screen and (max-width: 767px) {
+  #main {
+    padding-left:0;
+    padding-right: 0;    
+  }
+  .page .page__inner-wrap .page__content {
+    padding-left:0;
+    padding-right: 0;    
+    }
+  .page__content picture.full-width, .page__content img.full-width {
+    width: 100%;
+    padding-left:0; 
+    padding-right: 0;
+    margin-left:0;
+    margin-right:0;
+  }
+  h1 {
+    font-size: 3rem;
+  }
+  .page__content .pod h2 {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .fullwidth {
+    flex-flow: column;
+  }
+
+  .fullwidth .copy {
+    max-width: 75%;
+  }
+}
+
 </style>
 
 <img alt="MathLive" class="full-width" src="/assets/mathlive-1.jpg" 
 style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
 
 
-<h1>A Web Component for Math Input</h1>
+<h1>A WEB COMPONENT FOR MATH INPUT</h1>
 
+<p style="text-align:center">Introducing  <kbd>&lt;math-field&gt;</kbd>: works just like <kbd>&lt;textarea&gt;</kbd>, but for math.</p>
 
 <section class="m-lg mb-xl max-w-2xl">
 <code-playground layout="stack">
@@ -60,33 +184,31 @@ style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
 <!-- <h2><img src='/assets/images/mathfield/screenshot.jpg'></h2> -->
 
 <section>
-  <h2>TeX Quality Typesetting</h2>
-  <section class="fullwidth">
-    <div class="copy">
-      <p>TeX is the gold standard for typesetting of mathematical content.</p>
-      <p>MathLive provides a JavaScript implementation that faithfully 
-        reproduces the output of TeX.</p>
-      <p>MathLive supports over 800 TeX commands.</p>
-    </div>
+  <div class="pod">
+  <h2>TeX quality typesetting</h2>
+  <div class="copy">
+    <p>MathLive is a faithful JavaScript implementation of the <strong>TeX layout algorithms</strong>, the gold standard for typesetting of mathematical content.</p>
     <div class="figure">
       <img src="/assets/images/mathfield/loop-eqn.png">
     </div>
-  </section>
+    <p style="margin-top: 2rem">MathLive supports over <strong>800 TeX commands</strong>, including mathematical symbols, matrices, chemical equations, styling, macros and complex layouts.</p>
+  </div>
 {% readmore "/mathlive/reference/commands/" %}
 Read more about the <strong>LaTeX commands</strong> supported by MathLive
 {% endreadmore %}
+</div>
 
-<h2>Customizable</h2>
+<div class="pod">
+<h2>Perfectly suited... to you</h2>
 <section class="fullwidth">
-  <div class="copy">
-    <p>You can paste in MathASCII or LaTeX, and get back those formats or an 
-      easy to parse <a href="/math-json">MathJSON object</a> representing an Abstract Syntax Tree of 
-      the formula.</p>
-    <p>A <a href="/docs/mathlive/">comprehensive API</a> is available and many options are customizable, from you own dictionary of LaTeX macros,
-      custom inline shortcuts, custom virtual keyboards and more.</p>
-  </div>
   <div class="figure">
     <img src="/assets/images/mathfield/virtualKeyboard.png">
+  </div>
+  <div class="copy">
+    <p>Many options are customizable with a <a href="/docs/mathlive/">comprehensive API</a>, from you own dictionary of LaTeX macros,
+      your own inline shortcuts, your own virtual keyboards and more.</p>
+    <p>Paste in MathASCII or LaTeX, and read the content in the format you need, including an 
+      easy to parse <a href="/math-json">MathJSON object</a> representing an Abstract Syntax Tree of the formula.</p>
   </div>
 </section>
 
@@ -97,53 +219,54 @@ Read more about <strong>customizing a mathfield</strong>
 {% readmore "/mathlive/guides/virtual-keyboards/" %}
 Read more about the <strong>virtual keyboard</strong>
 {% endreadmore %}
+</div>
 
+<div class="pod">
+  <h2>Easy as π</h2>
+  <section class="fullwidth">
+    <div class="figure">
+      <img src="/assets/images/mathfield/quadratic.gif">
+    </div>
+    <div class="copy">
+      <p>Use the <a href="/mathlive/reference/keybindings/">keyboard</a> to type symbols, arrow keys to navigate.</p>
+    </div>
+  </section>
+  
+  {% readmore "/mathlive/reference/keybindings/" %}
+  Read more about <strong>keybindings and inline shortcuts</strong>
+  {% endreadmore %}
+  
 
-<h2>Intuitive Editing</h2>
-<section class="fullwidth">
+  <section class="fullwidth">
   <div class="copy">
-    <p>Type an equation: use the <a href="/mathlive/reference/keybindings/">keyboard</a> to type symbols, arrow keys to navigate.</p>
-    <p>When done, select the equation, and copy the LaTeX code to another app.</p>
+    <p>Type <kbd>p</kbd><kbd>i</kbd> and it becomes π.</p>
   </div>
   <div class="figure">
-    <img src="/assets/images/mathfield/quadratic.gif">
+    <img src="/assets/images/mathfield/euler.gif">
   </div>
 </section>
 
-{% readmore "/mathlive/reference/keybindings/" %}
-Read more about the <strong>key bindings</strong>
-{% endreadmore %}
 
 
-  <h2>For Anyone. Anywhere.</h2>
-  <section class="fullwidth">
-    <div class="copy">
-        <p>MathLive works with screenreaders and include a custom text to speech engine.</p>
-      <p>On screen, customizable, <a href="/mathlive/guides/virtual-keyboards/">virtual keyboards</a> are also available to make input easy, even on mobile devices.</p>
-    </div>
-    <div class="figure">
-      <i class="fa-10x fad fa-universal-access"></i>
-    </div>
-  </section>
+</div>
+
+<div class="pod">
+  <h2>For anyone. Anywhere.</h2>
+<section class="fullwidth">
+  <div class="copy">
+      <p>MathLive is accessible and works with screenreaders. A custom text-to-speech engine helps navigate equations.</p>
+    <p>On screen, customizable, <a href="/mathlive/guides/virtual-keyboards/">virtual keyboards</a> make input easy, even on mobile devices.</p>
+  </div>
+  <div class="figure" style="box-shadow: none; border:none;background: transparent">
+    <i class="fa-10x fad fa-universal-access"></i>
+  </div>
+</section>
 
   {% readmore "/mathlive/guides/speech/" %}
 Read more about the <strong>text to speech engine</strong>
 {% endreadmore %}
+</div>
 
-
-  <h2>Easy as π</h2>
-  <section class="fullwidth">
-    <div class="copy">
-      <p>Some symbols get converted automatically. Type <kbd>p</kbd><kbd>i</kbd> and it becomes π.</p>
-    </div>
-    <div class="figure">
-      <img src="/assets/images/mathfield/euler.gif">
-    </div>
-  </section>
-
-  {% readmore "/mathlive/reference/keybindings/" %}
-Read more about <strong>keybindings and inline shortcuts</strong>
-{% endreadmore %}
 
 
 </section>
