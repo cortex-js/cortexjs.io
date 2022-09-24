@@ -123,21 +123,22 @@ a.chevron::after {
 }
 
 .page__content p.xl {
-  font-size: 1.6rem;
+  font-size: 2rem;
   line-height: 1.1;
-  font-weight: 900;
-  padding: 1em;
+  font-weight: 600;
+  padding-top: 1em;
+  padding-bottom: 1em;
   color: var(--blue-900);
-  background: #f0f0f0;
+  // background: #f0f0f0;
   border-radius: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
   .page__content p.xl {
     color: var(--blue-50);
-    border-left-color: var(--blue-400);
-    border-right-color: var(--blue-400);
-    background: #333;
+    // border-left-color: var(--blue-400);
+    // border-right-color: var(--blue-400);
+    // background: #333;
   }
 }
 
