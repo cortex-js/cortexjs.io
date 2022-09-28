@@ -189,6 +189,30 @@ use the keyboard. This behavior matches the `<textarea>` element.
 keyboard** listen for an `input` event with an `inputType` property of `"insertLineBreak"`.
 
 
+## Fill in the Blank
+
+To have one or more portions of a mathfield editable, while the rest is 
+read-only, use a `readonly` mathfield, and the `\placeholder[]{}` command.
+
+This can used to prompt an answer to a quiz with a partially provided
+formula and with some portions that the student has to provide.
+
+The optional argument of the `\placeholder` command, i.e. the one provided
+in `[]` is a string identifier made of letters and digits. The main argument
+of the `\placeholder` comman, i.e. the one in `{}` is the default value of the
+field. You can leave it blank.
+
+When using the `\placeholder[]{}` command in a readonly mathfield, some 
+additional mathfields are created automatically, one for each `\placeholder`
+command. To access these mathfields, use the `mf.placeholders` property.
+
+<code-playground layout="stack">
+  <div slot="javascript">
+const blank1 = document.getElementById('mf').placeholders['blank1'];
+blank1.addEventListener('input', (ev) => console.log(blank1.value));
+  </div>
+  <div slot="html">&lt;math-field id="mf" readonly style="font-size:3em"&gt;f(x)= \placeholder[blank1]{x}&lt;/math-field&gt;</div>
+</code-playground>
 
 
 
