@@ -16,7 +16,7 @@
       display: flex;
       justify-content: center;
     }
-    @include breakpoint($small) {
+    @include breakpoint($x-large) {
       padding-left: 1em;
       padding-right: 1em;
       }

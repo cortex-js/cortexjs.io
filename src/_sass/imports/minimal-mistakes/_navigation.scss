@@ -492,6 +492,7 @@
   letter-spacing: -0.05ex;
   font-weight: bold;
   text-transform: uppercase;
+  text-align: left;
 }
 
 
@@ -506,7 +507,9 @@ button.nav__sub-title_collapse  {
   line-height: .7;
 
   height: 1.5em;
+  min-height: 1.5em;
   width: 1.5em;
+  min-width: 1.5em;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -529,7 +532,9 @@ span.nav__sub-title_collapse {
   line-height: .7;
 
   height: 1.5em;
+  min-height: 1.5em;
   width: 1.5em;
+  min-width: 1.5em;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -577,6 +582,8 @@ button.nav__sub-title_toggle:hover {
   display: inline-block;
   width: 1em;
   height: 1em;
+  min-width: 1em;
+  min-height: 1em;
   margin-right: 6px;
   @include breakpoint(max-width $large - 1px) {
     margin-right: 12px;
