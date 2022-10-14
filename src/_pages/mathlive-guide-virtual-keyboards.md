@@ -80,10 +80,10 @@ can specify different virtual keyboard panel configurations. {.notice--info}
 
 **To require the virtual keyboard to be used for input and ignore 
 keys pressed on the physical keyboard** listen and `preventDefault()` on `"keydown"`
-events
+events during the capture phase.
 
-```ts
-mf.addEventListener('keydown',(evt) =>  evt.preventDefault());
+```js
+mf.addEventListener("keydown", (evt) =>  evt.preventDefault(), {capture: true});
 ```
 
 
