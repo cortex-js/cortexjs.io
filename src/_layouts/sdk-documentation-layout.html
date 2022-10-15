@@ -84,7 +84,11 @@
 <div class="search-content">{% include search/search_form.html %}</div>
 {% endif %}
 
-<div id="footer" class="page__footer"><footer>{% include footer/custom.html %}{% include footer.html %}</footer></div>
+<footer id="footer" class="page__footer" role="contentinfo">
+  {% include footer/custom.html %}
+  {% include footer.html %}
+</footer>
+
 
 {% include scripts.html %}
 

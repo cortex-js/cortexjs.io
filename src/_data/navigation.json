@@ -14,11 +14,11 @@
 		},
 		{
 			"description": "Chat on Gitter",
-			"title": "<svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>",
+			"title": "<svg class='icon1quarterem' role='img'><title>Gitter</title><use xlink:href='/assets/icons.svg#gitter'></use></svg>",
 			"url": "https://gitter.im/cortex-js"
 		},
 		{
-			"title": "<svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#github'></use></svg>",
+			"title": "<svg class='icon1quarterem' role='img'><title>GitHub</title><use xlink:href='/assets/icons.svg#github'></use></svg>",
 			"url": "https://github.com/cortex-js",
 			"description": "Get source code on GitHub"
 		}
@@ -144,8 +144,8 @@
           "icon": "guide"
 				},
 				{
-					"title": "Symbols",
-					"url": "/compute-engine/guides/symbols/",
+					"title": "Canonical Form",
+					"url": "/compute-engine/guides/canonical-form/",
           "icon": "guide"
 				},
 				{
@@ -154,23 +154,28 @@
           "icon": "guide"
 				},
 				{
+					"title": "Symbols",
+					"url": "/compute-engine/guides/symbols/",
+          "icon": "guide"
+				},
+				{
+					"title": "Domains",
+					"url": "/compute-engine/guides/domains/",
+          "icon": "guide"
+				},
+				{
 					"title": "Symbolic Computing",
 					"url": "/compute-engine/guides/symbolic-computing/",
           "icon": "guide"
 				},
 				{
-					"title": "Canonical Form",
-					"url": "/compute-engine/guides/canonical-form/",
+					"title": "Evaluation",
+					"url": "/compute-engine/guides/evaluate/",
           "icon": "guide"
 				},
 				{
 					"title": "Simplify",
 					"url": "/compute-engine/guides/simplify/",
-          "icon": "guide"
-				},
-				{
-					"title": "Evaluation",
-					"url": "/compute-engine/guides/evaluate/",
           "icon": "guide"
 				},
 				{
@@ -181,11 +186,6 @@
 				{
 					"title": "Assumptions",
 					"url": "/compute-engine/guides/assumptions/",
-          "icon": "guide"
-				},
-				{
-					"title": "Domains",
-					"url": "/compute-engine/guides/domains/",
           "icon": "guide"
 				},
 				{
