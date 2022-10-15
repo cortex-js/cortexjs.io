@@ -48,7 +48,6 @@ Try the **interactive demo** now
 The easiest way to get started it to load the Compute Engine JavaScript module
 from a CDN.
 
-
 ### Using JavaScript Modules
 
 ```html
@@ -63,15 +62,18 @@ from a CDN.
 
 ```
 
-The ESM (module) version is also available as `dist/compute-engine.min.esm.js` 
+The ESM (module) version is also available in the npm package in `dist/compute-engine.min.esm.js` 
 
 
 ### Using Vintage JavaScript
 
 If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version. For example, WebPack 4 does 
-not support the optional chaining operator, so use the UMD version in this case,
-which will make use of polyfills as necessary.
+modern JavaScript features, use the UMD version. 
+
+For example, WebPack 4 does not support the optional chaining operator, using 
+the UMD version will make use of polyfills as necessary.
+
+The UMD version is also available in the npm package in `dist/compute-engine.min.js` 
 
 
 ```html
@@ -84,23 +86,22 @@ which will make use of polyfills as necessary.
   }
 </script>
 ```
-The UMD version is also available as `dist/compute-engine.min.js` 
 
 ### Other Versions
 
-A non-minified module which may  be useful for debugging is available as
-`dist/compute-engine.esm.js`.
+A non-minified module which may be useful for debugging is available in
+the npm package as `dist/compute-engine.esm.js`.
 
 ## Standard Library
 
-Expressions reference symbols and functions that are defined in libraries.
+Expressions reference identifiers that are defined in libraries.
 
-By default, new `ComputeEngine` instances include a robust set of
+By default, a `ComputeEngine` instance includes a robust set of
 functions and symbols, the standard library, grouped in several categories.
 
 <div class=symbols-table>
 
-| Category | Symbols/Functions |
+| Category | Identifiers |
 |:---|:---|
 | [Arithmetic](/compute-engine/reference/arithmetic/) | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`...|
 | [Calculus](/compute-engine/reference/calculus/) | `Derive` `Integrate`...|
@@ -118,8 +119,8 @@ functions and symbols, the standard library, grouped in several categories.
 </div>
 
 
-In addition to definitions from the standard library, you can define your 
-own symbols and functions.
+You can define your own identifiers to complement or replace the standard 
+library.
 
 ```js
 const ce = new ComputeEngine({
