@@ -40,8 +40,8 @@ end of your document, or in a `DOMContentLoaded` event handler.
 </script>
 ```
 
-By default, any LaTeX code that is enclosed with the following delimiters will
-be rendered as math:
+By default, any LaTeX code in the text element of a DOM element that is 
+enclosed with the following delimiters will be rendered as math:
 
 - `\[`...`\]` or `$$`...`$$` -- rendered in Display Style (CSS display block)
 - `\(`...`\)` -- rendered in Text Style (CSS display inline)
@@ -51,27 +51,37 @@ be rendered as math:
 <p>The second taxicab number is \\(1729 = 10^3 + 9^3 = 12^3 + 1^3\\)</p>
 ```
 
-You can wrap more complex expressions in a `<script>` tag with a type of
-`math/tex`. This is the recommended approach for stand-alone formulas. One of
-the benefits of this approach is that the browser will not attempt to display
-the content of the `<script>` tag before it is typeset, avoiding an unsightly
-flash of LaTeX code on screen. If the type is `"math/tex; mode=text"` the inline
-text style will be used, otherwise if the type is `"math/tex; mode=display"`,
-the display style will be used. If no mode is provided, the display style is
+More complex expressions can be wrapped in a `<script>` tag. One of the 
+benefits of this approach is that the browser will not attempt to display the 
+content of the `<script>` tag before it is typeset, avoiding an unsightly flash
+of code on screen.
+
+**To render LaTeX code, use `<script type="math/tex">`**
+
+**To render MathJSON, use `<script type="math/json">`**
+
+**To render the formula inline, append** `; mode=text` **to the type**.
+If no mode is provided, or `mode=display`, the display (block) style is
 used.
+
 
 ```html
 <h1>Quadratic roots</h1>
-<script type="math/tex">
-  ax^2+bx+c =
-  a
+<script type="math/json"> ["Add", 
+    ["Multiply", "a", ["Square", "x"]]], 
+    ["Multiply", "b", "x"], 
+    "c"
+  ]
+</script>
+<script type="math/tex; mode=text">
+  =  a
   \left( x - \frac{-b + \sqrt {b^2-4ac}}{2a} \right)
   \left( x - \frac{-b - \sqrt {b^2-4ac}}{2a} \right)
 </script>
 ```
 
-Elements with the following tags will be ignored for conversion: `noscript`,
-`style`, `textarea`, `pre`, `code`, `annotation` and `annotation-xml`.
+The following DOM elements are ignored for conversion: `<noscript>`,
+`<style>`, `<textarea>`, `<pre>`, `<code>`, `<annotation>` and `<annotation-xml>`.
 
 If you dynamically generate content, call [`renderMathInElement(element)`](/docs/mathlive/?q=renderMathInElement) to
 render your element after the page has been loaded. This is a recursive call
