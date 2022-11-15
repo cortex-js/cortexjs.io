@@ -111,6 +111,34 @@ version: Compute Engine version
     white-space: pre-wrap;
   }
 
+.samples {
+    margin-bottom: 1em;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: .5em;
+}
+  .sample {
+    padding: 6px 1em 6px 1em;
+    border-radius: .5em;
+    color: var(--primary-color-dark);
+    background: var(--callout-background);
+    border: 1px solid var(--callout-border-color);
+  }
+
+  .sample:hover {
+    background: var(--callout-background-hover);
+  }
+
+  .sample:active {
+    color: white;
+    background: var(--primary-color-dark);
+  }
+
+
   .page__content h2 {
     font-size: 1em;
     padding: 0;
@@ -242,6 +270,14 @@ version: Compute Engine version
     background: var(--ui-background-hover);
   }
 
+  #numeric-mode {
+    display: none;
+  }
+
+  #numeric-mode.is-visible {
+    display: block;
+  }
+
   code.label {
     width: 270px;
   }
@@ -253,11 +289,13 @@ version: Compute Engine version
   h1 span {
     display: block;
     line-height: 1;
-    margin-left: 3px;   /* Optical alignment */
-    padding:0;
-    margin: 0;
+    margin: 0 0 0 6px;   /* Optical alignment */
+    padding: 0;
     font-size: 16px;
-    color: #aaa;
+    color: #888;
+    letter-spacing: 0;
+    font-weight: 400;
+    text-transform: uppercase;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -292,6 +330,19 @@ version: Compute Engine version
 
   <main id="main" class="container">
 
+    <div class="samples">
+      <span class="sample" data-sample="e^{i\pi}"></span>
+      <span class="sample" data-sample="\sum_{n=1}^5 n^2"></span>
+      <span class="sample" data-sample="\mathrm{Expand}(a+b)^6"></span>
+      <span class="sample" data-sample="\mathrm{Rational}(\pi)"></span>
+      <span class="sample" data-sample="\cos(\frac{\pi}{6})"></span>
+      <span class="sample" data-sample="\sin(30\degree)"></span>
+      <span class="sample" data-sample="\begin{cases}
+      0 & n =  0\\
+      1 & n =  1\\
+      n^2+1 & n \geq 2   \end{cases}">Piecewise</span>
+
+    </div>
     <div id="input">
       <code class="label">expr = </code>
       <div class="row">
@@ -397,12 +448,7 @@ version: Compute Engine version
     </div>
 
     <div class="output-section" id="canonical-form">
-      <code class="label">expr.canonical&nbsp;=&nbsp;</code>
-      <div class="row">
-        <math-field class="latex" read-only></math-field>
-        <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
-      </div>
-      <div class="output mathjson toggle-field"></div>
+      <div class="output mathjson"></div>
     </div>
 
     <div class="output-section" id="domain">
@@ -424,6 +470,19 @@ version: Compute Engine version
       <div class="output mathjson toggle-field"></div>
     </div>
 
+    <div id="numeric-mode" class="row" style="margin-bottom:.5em">
+      <div class="segmented-control" style="--segments: 4">
+        <input type="radio" name="numeric-format" value="auto" id="numeric-format-auto" checked />
+        <label for="numeric-format-auto">auto</label>
+        <input type="radio" name="numeric-format" value="machine" id="numeric-format-machine" />
+        <label for="numeric-format-machine">machine</label>
+        <input type="radio" name="numeric-format" value="decimal" id="numeric-format-decimal" />
+        <label for="numeric-format-decimal">bignum</label>
+        <input type="radio" name="numeric-format" value="complex" id="numeric-format-complex" />
+        <label for="numeric-format-complex">complex</label>
+      </div>
+    </div>
+
     <div class="output-section" id="evaluate">
       <code class="label">expr.evaluate()&nbsp;=&nbsp;</code>
       <div class="row">
@@ -438,18 +497,6 @@ version: Compute Engine version
       <div class="row">
         <math-field class="latex" read-only></math-field>
         <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
-      </div>
-      <div class="row">
-        <div class="segmented-control" style="--segments: 4">
-          <input type="radio" name="numeric-format" value="auto" id="numeric-format-auto" checked />
-          <label for="numeric-format-auto">auto</label>
-          <input type="radio" name="numeric-format" value="machine" id="numeric-format-machine" />
-          <label for="numeric-format-machine">machine</label>
-          <input type="radio" name="numeric-format" value="decimal" id="numeric-format-decimal" />
-          <label for="numeric-format-decimal">decimal</label>
-          <input type="radio" name="numeric-format" value="complex" id="numeric-format-complex" />
-          <label for="numeric-format-complex">complex</label>
-        </div>
       </div>
       <div class="output mathjson toggle-field"></div>
     </div>
@@ -484,31 +531,154 @@ version: Compute Engine version
     document.querySelectorAll('input[name=numeric-format]').forEach(x => {
       x.addEventListener('click', (evt) => {
         if (evt.target.id === 'numeric-format-auto') {
-          ce.numericFormat = 'auto';
+          ce.numericMode = 'auto';
         } else if (evt.target.id === 'numeric-format-machine') {
-          ce.numericFormat = 'machine';
+          ce.numericMode = 'machine';
           ce.precision = 10;
         } else if (evt.target.id === 'numeric-format-decimal') {
-          ce.numericFormat = 'decimal';
+          ce.numericMode = 'bignum';
           ce.precision = 1000;
         } else if (evt.target.id === 'numeric-format-complex') {
-          ce.numericFormat = 'complex';
+          ce.numericMode = 'complex';
         }
         updateContent(mf);
       });
     });
-    let errors = [];
+
+    // 
+    // Samples
+    // 
+    document.querySelectorAll('.sample').forEach(x => {
+      if (x.textContent.trim().length === 0) {
+        x.textContent = `\\(  ${x.dataset.sample} \\)`
+      }
+      x.addEventListener('click', (evt) => {
+          mf.value = x.dataset.sample;
+          updateContent(mf);
+      })
+    });
+
 
     const ce = new ComputeEngine();
 
     updateAssumptions();
 
     const mf = document.getElementById('mf');
-    mf.addEventListener('input', (ev) => updateContent(mf));
+    mf.setOptions({
+        onInlineShortcut: (_mf, s) => {
+          if (/^(ln|log|lb|lg)/.test(s)) return '\\' + s;
+          if (/^[a-zA-Z][a-zA-Z0-9]*'?(_[a-zA-Z0-9]+'?)?$/.test(s)) {
+            const m = s.match(/^([a-zA-Z]+)([0-9]+)$/);
+            if (m) {
+              if (
+                [
+                  'alpha',
+                  'beta',
+                  'gamma',
+                  'delta',
+                  'epsilon',
+                  'varepsilon',
+                  'zeta',
+                  'eta',
+                  'theta',
+                  'vartheta',
+                  'iota',
+                  'kappa',
+                  'varkappa',
+                  'lambda',
+                  'mu',
+                  'nu',
+                  'xi',
+                  'pi',
+                  'varpi',
+                  'rho',
+                  'varrho',
+                  'sigma',
+                  'varsigma',
+                  'tau',
+                  'phi',
+                  'varphi',
+                  'upsilon',
+                  'chi',
+                  'psi',
+                  'omega',
+                  'Gamma',
+                  'Delta',
+                  'Theta',
+                  'Lambda',
+                  'Xi',
+                  'Pi',
+                  'Sigma',
+                  'Upsilon',
+                  'Phi',
+                  'Psi',
+                  'Omega',
+                  'digamma',
+                  'omicron',
+                ].includes(m[1])
+              )
+                return `\\${m[1]}_{${m[2]}}`;
+              if (
+                [
+                  'cos',
+                  'sin',
+                  'tan',
+                  'arcsin',
+                  'arccos',
+                  'arctan',
+                  'arctg',
+                  'arcctg',
+                  'arcsec',
+                  'arccsc',
+                  'arsinh',
+                  'arcosh',
+                  'artanh',
+                  'arcsech',
+                  'arccsch',
+                  'arg',
+                  'ch',
+                  'cosec',
+                  'cosh',
+                  'cot',
+                  'cotg',
+                  'coth',
+                  'csc',
+                  'ctg',
+                  'cth',
+                  'log',
+                  'ln',
+                  'lg',
+                  'lb',
+                  'sec',
+                  'sinh',
+                  'sh',
+                  'tanh',
+                  'tg',
+                  'th',
+                ].includes(m[1])
+              ) {
+                return `\\${m[1]} ${m[2]}`;
+              }
+              return `\\mathrm{${m[1]}}_{${m[2]}}`;
+            }
+            if (s.includes('_')) debugger;
+            return '\\mathrm{' + s + '}';
+          }
+          return '';
+        },
+      });    mf.addEventListener('input', (ev) => updateContent(mf));
     updateContent(mf);
 
     async function updateContent(mf) {
       const latex = mf.getValue('latex-expanded');
+
+      document.getElementById('numeric-mode').classList.remove('is-visible');
+      updateExpr(null, 'canonical-form');
+      updateExpr(null, 'json-form');
+      updateExpr(null, 'simplify');
+      updateExpr(null, 'evaluate');
+      updateExpr(null, 'evaluate-numerically');
+
 
       let expr;
       try {
@@ -524,12 +694,8 @@ version: Compute Engine version
         expr = ce.parse(latex);
 
         const mathJsonEl = document.getElementById('mathfield-math-json')
-        if (mathJsonEl) {
-          mathJsonEl.innerHTML =
-            exprToString(expr.json) +
-            '<br><div style="font-weight: bold; color: hsl(4deg, 90%, 50%)">' +
-            errors.join('<br>') + '</div>';
-        }
+        if (mathJsonEl)  mathJsonEl.innerHTML = exprToString(expr.json);
+        
 
 
       } catch (e) {
@@ -553,33 +719,41 @@ version: Compute Engine version
       // }
 
 
-      try {
-        updateExpr(expr.domain, 'domain');
-      } catch (e) {
-        console.error("domain(%c " + latex + '%c) ' +
-          e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
-      }
+      // try {
+      //   updateExpr(expr.domain, 'domain');
+      // } catch (e) {
+      //   console.error("domain(%c " + latex + '%c) ' +
+      //     e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
+      // }
 
-      try {
-        updateExpr(expr.simplify(), 'simplify');
-      } catch (e) {
-        console.error("simplify(%c " + latex + '%c) ' +
-          e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
-      }
+      const exprSimplify = expr.simplify();
+      if (!exprSimplify.isSame(expr))
+        try {
+          updateExpr(exprSimplify, 'simplify');
+        } catch (e) {
+          console.error("simplify(%c " + latex + '%c) ' +
+            e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
+        }
 
-      try {
-        updateExpr(expr.N(), 'evaluate-numerically');
-      } catch (e) {
-        console.error("N(%c " + latex + '%c) ' +
-          e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
-      }
+      const exprEvaluate = expr.evaluate();
+      if (!exprEvaluate.isSame(exprSimplify))
+        try {
+          updateExpr(exprEvaluate, 'evaluate');
+        } catch (e) {
+          console.error("evaluate(%c " + latex + '%c) ' +
+            e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
+        }
 
-      try {
-        updateExpr(expr.evaluate(), 'evaluate');
-      } catch (e) {
-        console.error("evaluate(%c " + latex + '%c) ' +
-          e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
-      }
+
+      const exprN = expr.N();
+      if (!exprN.isSame(exprEvaluate))
+        try {
+          updateExpr(exprN, 'evaluate-numerically');
+        } catch (e) {
+          console.error("N(%c " + latex + '%c) ' +
+            e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
+        }
+
 
       // try {
       //   updateExpr(await ce.solve(expr, ['x']), 'solve');
@@ -595,24 +769,21 @@ version: Compute Engine version
 
       if (expr === null) {
         el.classList.remove('is-visible');
-      } else {
-        el.classList.add('is-visible');
-      }
+        return
+      };
+      
+      el.classList.add('is-visible');
+      if  (id === 'evaluate' || id === 'evaluate-numerically')  
+       document.getElementById('numeric-mode').classList.add('is-visible');
 
+    
       const mathJsonEl = el.querySelector('.mathjson');
-      if (mathJsonEl) {
-        mathJsonEl.innerHTML =
-          exprToString(expr.json) +
-          '<br><div style="font-weight: bold; color: hsl(4deg, 90%, 50%)">' +
-          errors.join('<br>') + '</div>';
-      }
+      if (mathJsonEl) mathJsonEl.innerHTML = exprToString(expr.json);
+      
       const latexEl = el.querySelector('.latex');
-      if (latexEl) {
-        latexEl.value = expr.latex
-      }
-
-      errors = [];
+      if (latexEl) latexEl.value = expr.latex
     }
+
 
     function escapeHtml(string) {
       return String(string).replace(/[&<>"'`=/\u200b]/g, function (s) {
@@ -654,9 +825,10 @@ version: Compute Engine version
       const el = document.getElementById(id);
       if (el) {
         const toggle = el.querySelector('.toggle');
-        toggle.addEventListener('click', () => {
-          toggle.classList.toggle('is-on');
-          toggleVisibility(el.querySelector('.toggle-field'));
+        if (toggle)
+          toggle.addEventListener('click', () => {
+            toggle.classList.toggle('is-on');
+            toggleVisibility(el.querySelector('.toggle-field'));
         });
       }
     });
