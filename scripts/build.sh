@@ -46,7 +46,7 @@ then
 
   echo -e "$BASENAME$DOT Groking Compute Engine"
   # npm --prefix ./submodules/compute-engine run build
-  # npx grok build ./submodules/compute-engine/ --inFile ./src/compute-engine.ts --config ./grok.config.js --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
+  npx grok build ./submodules/compute-engine/ --inFile ./src/compute-engine.ts --config ./grok.config.js --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
 
   echo -e "$BASENAME$CHECK Groked"
 
