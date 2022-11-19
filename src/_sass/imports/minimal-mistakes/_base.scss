@@ -186,12 +186,14 @@ a > code,
 li > code,
 figcaption > code,
 td > code {
-  padding-top: 0.1rem;
-  padding-bottom: 0.1rem;
+  padding-top: 2px;
+  padding-bottom: 2px;
   font-size: 0.8em;
   border: var(--code-border);
   background: var(--code-background);
   border-radius: $border-radius;
+  color: var(--primary-color-dark);
+  font-weight: 900;
 
   &:before,
   &:after {

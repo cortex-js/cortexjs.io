@@ -6,15 +6,15 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "incremental": true,
-    "module": "ESNext",
     "moduleResolution": "node",
     // "newLine": "lf",
     "noImplicitAny": false,
     "noLib": false,
     "removeComments": true,
     "sourceMap": true,
-    // "strictNullChecks": true,
-    "target": "es2020",
+    "strictNullChecks": false,
+    "target": "es2019",
+    "module": "es2020", // es2020 includes support for dynamic imports, and import.meta
 
     "lib": ["es2020", "dom", "dom.iterable", "scripthost"]
     // "lib": ["es2020", "scripthost"]

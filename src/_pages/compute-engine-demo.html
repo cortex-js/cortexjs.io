@@ -183,6 +183,14 @@ version: Compute Engine version
     margin-bottom: 1em;
   }
 
+  #canonical-form .latex {
+    display: none;
+  }
+
+  #canonical-form .latex.is-visible {
+    display: inherit;
+  }
+
   button.toggle {
     display: flex;
     align-items: center;
@@ -333,7 +341,7 @@ version: Compute Engine version
     <div class="samples">
       <span class="sample" data-sample="e^{i\pi}"></span>
       <span class="sample" data-sample="\sum_{n=1}^5 n^2"></span>
-      <span class="sample" data-sample="\mathrm{Expand}(a+b)^6"></span>
+      <span class="sample" data-sample="\mathrm{Expand}((a+b)^6)"></span>
       <span class="sample" data-sample="\mathrm{Rational}(\pi)"></span>
       <span class="sample" data-sample="\cos(\frac{\pi}{6})"></span>
       <span class="sample" data-sample="\sin(30\degree)"></span>
@@ -375,7 +383,6 @@ version: Compute Engine version
     </div>
     <div class="toggle-field">
       <div id="mathfield-latex" class="output"></div>
-      <div id="mathfield-math-json" class="output mathjson"></div>
     </div>
   </div>
 
@@ -444,10 +451,10 @@ version: Compute Engine version
         <div class="latex"></div>
         <button class="toggle"><svg><use xlink:href="#info-circle" /></svg></button>
       </div>
-      <div class="output mathjson toggle-field"></div>
     </div>
 
     <div class="output-section" id="canonical-form">
+      <math-field class="latex" read-only></math-field>
       <div class="output mathjson"></div>
     </div>
 
@@ -679,6 +686,9 @@ version: Compute Engine version
       updateExpr(null, 'evaluate');
       updateExpr(null, 'evaluate-numerically');
 
+      // document.getElementById('output-latex').innerText = '';
+
+
 
       let expr;
       try {
@@ -706,6 +716,11 @@ version: Compute Engine version
         const canonicalExpr = expr.canonical;
 
         updateExpr(canonicalExpr, 'canonical-form');
+
+        if (canonicalExpr.isValid) 
+          document.querySelector('#canonical-form .latex').classList.remove('is-visible')
+        else 
+          document.querySelector('#canonical-form .latex').classList.add('is-visible')
       } catch (e) {
         console.error("canonical(%c " + latex + '%c) ' +
           e.toString(), 'color: red;  background: hsla(0, 60%, 90%)', 'background: transparent');
