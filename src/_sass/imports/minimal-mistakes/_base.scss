@@ -202,6 +202,17 @@ td > code {
   }
 }
 
+@media (prefers-color-scheme: dark) {
+  p > code,
+  a > code,
+  li > code,
+  figcaption > code,
+  td > code {
+    color: var(--blue-100);
+  }
+
+}
+
 /* horizontal rule */
 
 hr {

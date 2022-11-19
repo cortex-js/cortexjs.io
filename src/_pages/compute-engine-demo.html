@@ -136,8 +136,19 @@ version: Compute Engine version
   .sample:active {
     color: white;
     background: var(--primary-color-dark);
+    border-color: var(--primary-color-light);
   }
 
+  @media (prefers-color-scheme: dark) {
+    .sample {
+      color: var(--surface-color);
+      background-color: var(--surface);
+    }
+    .sample:hover {
+      background-color: var(--blue-800);
+    }
+
+  }
 
   .page__content h2 {
     font-size: 1em;
@@ -540,14 +551,20 @@ version: Compute Engine version
       x.addEventListener('click', (evt) => {
         if (evt.target.id === 'numeric-format-auto') {
           ce.numericMode = 'auto';
+          ce.precision = 200;
+          ce.latexOptions.precision = 7;
         } else if (evt.target.id === 'numeric-format-machine') {
           ce.numericMode = 'machine';
-          ce.precision = 10;
+          ce.precision = 15;
+          ce.latexOptions.precision = 15;
         } else if (evt.target.id === 'numeric-format-decimal') {
           ce.numericMode = 'bignum';
-          ce.precision = 1000;
+            ce.precision = 200;
+            ce.latexOptions.precision = 50;
         } else if (evt.target.id === 'numeric-format-complex') {
           ce.numericMode = 'complex';
+          ce.precision = 15;
+          ce.latexOptions.precision = 16;
         }
         updateContent(mf);
       });
@@ -568,6 +585,9 @@ version: Compute Engine version
 
 
     const ce = new ComputeEngine();
+    ce.numericMode = 'auto';
+    ce.precision = 200;
+    ce.latexOptions.precision = 7;
 
     updateAssumptions();
 
