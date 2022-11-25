@@ -211,7 +211,7 @@ command. To access these mathfields, use the `mf.placeholders` property.
 const blank1 = document.getElementById('mf').placeholders['blank1'];
 blank1.addEventListener('input', (ev) => console.log(blank1.value));
   </div>
-  <div slot="html">&lt;math-field id="mf" readonly style="font-size:3em"&gt;f(x)= \placeholder[blank1]{x}&lt;/math-field&gt;</div>
+  <div slot="html">&lt;math-field id="mf" readonly style="font-size:3em"&gt;f(x)= \placeholder[blank1][x]{}&lt;/math-field&gt;</div>
 </code-playground>
 
 
