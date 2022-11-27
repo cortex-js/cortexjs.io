@@ -533,14 +533,14 @@ version: Compute Engine version
   </main>
   
   <script type="module">
-    import { convertLatexToMarkup, ComputeEngine, version } from 
+    import { convertLatexToMarkup } from 
       'https://unpkg.com/mathlive?module';
     // import { convertLatexToMarkup } from 'https://unpkg.com/mathlive?module';
-    // import { ComputeEngine, version } from 'https://unpkg.com/@cortex-js/compute-engine?module';
+    import { ComputeEngine, version } from 'https://unpkg.com/@cortex-js/compute-engine@latest/dist/compute-engine.min.esm.js';
 
 
 
-    document.getElementById('version').innerText = version.computeEngine;
+    document.getElementById('version').innerText = version.computeEngine ?? version;
 
     const MAX_LINE_LENGTH = 64;
 
