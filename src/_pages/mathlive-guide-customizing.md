@@ -392,7 +392,7 @@ line 3 to `scriptDepth: 0`, then try to type "x^2" in the mathfield.
 <br>
 
 {% readmore "/docs/mathlive/?q=EditingOptions" %}
-See `EditionOptions` for more
+See `EditingOptions` for more
 details about these and other available options
 {% endreadmore %}
 
