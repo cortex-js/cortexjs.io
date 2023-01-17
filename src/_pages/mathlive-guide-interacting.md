@@ -253,7 +253,43 @@ As well as these mathfield specific events:
 - `selection-change`
 - `undo-state-change`
 
+## Detecting Navigation out of a Mathfield
 
+A user may navigate outside of a mathfield by pressing the arrow keys, or the tab, home and end keys.
+
+By default, the mathfield reacts as a standard textarea field: moving to the next focusable element when the tab (or shift-tab) key is pressed, and
+doing nothing when reaching the start or end of the mathfield when navigation with the arrow keys.
+
+In some cases, you may want to implement a different behavior. For example if a mathfield is embedded inside an editable paragraph, you may want the arrow keys to exit the mathfield when reaching the end/start. Or you may want the tab key to simply move the caret to the end/start of the mathfield.
+
+**To change the behavior of a mathfield when navigation out of a mathfield** listen
+for the `focus-out` and `move-out` events.
+
+The `detail` property of those events indicate the direction of navigation.
+To cancel the default behavior, use `ev.preventDefault()`.
+
+
+```js
+
+mf.addEventListener('move-out', (ev) => {
+ev.preventDefault();
+  // Remove focus from mathfield
+  mf.blur();
+  // Focus some other element, use ev.detail.direction to detect if 
+  // navigating backward, forward, upward or downward
+  // ...
+});
+
+mf.addEventListener('focus-out', (ev) => {
+  ev.preventDefault();
+  // Move the cursor to the start/end of the mathfield on tab
+  if (ev.detail.direction === 'forward')
+    mf.executeCommand('moveToMathfieldEnd');
+  else if (ev.detail.direction === 'backward')
+    mf.executeCommand('moveToMathfieldStart');
+});
+
+```
 
 <section id='clipboard'>
 

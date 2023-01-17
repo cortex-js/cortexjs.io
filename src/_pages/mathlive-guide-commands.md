@@ -100,7 +100,7 @@ or **Enter** key.
 - `moveToNextPlaceholder` `moveToPreviousPlaceholder`
 - `moveToNextWord` `moveToPreviousWord`
 - `moveToGroupStart` `moveToGroupEnd`
-- `moveToMathFieldStart` `moveToMathFieldEnd`
+- `moveToMathfieldStart` `moveToMathfieldEnd`
 - `moveUp` `moveDown`
 - `moveToSuperscript` `moveToSubscript`
 - `moveToOpposite`
