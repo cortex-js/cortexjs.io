@@ -17,10 +17,11 @@ head:
     - /assets/js/code-playground.min.js
 ---
 <script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-        "html-to-image": "///assets/js/html-to-image.js",
-    };
+  moduleMap = {
+    mathlive: "//unpkg.com/mathlive?module",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "https://unpkg.com/@cortex-js/compute-engine?module"
+  };
   window.addEventListener('DOMContentLoaded', (event) => 
       import('//unpkg.com/mathlive?module').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive
   ));
@@ -68,6 +69,7 @@ Try a demo of the **Compute Engine**.
       }
     </style>
     <div slot="javascript">import 'mathlive';
+import  'compute-engine';
 const mf = document.querySelector('#formula');
 const latexField = document.querySelector('#latex');
 //

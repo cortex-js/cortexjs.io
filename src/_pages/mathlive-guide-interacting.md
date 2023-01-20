@@ -18,9 +18,11 @@ head:
     - /assets/js/code-playground.min.js
 ---
 <script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-    };
+  moduleMap = {
+    mathlive: "//unpkg.com/mathlive?module",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "https://unpkg.com/@cortex-js/compute-engine?module"
+  };
 </script>
 
 ## Changing the Content of a Mathfield
@@ -74,7 +76,9 @@ just like with a `<textarea>`.
 
 The `expression.json` property of a mathfield contains a MathJSON representation
 of its content. The [MathJSON](/math-json) format is a lightweight 
-mathematical notation interchange format.{.notice--info}
+mathematical notation interchange format. 
+
+To use MathJSON, import the compute-engine library, e.g. `import "https://unpkg.com/@cortex-js/compute-engine?module"` {.notice--info}
 
 **To be notified when the content of the mathfield is modified** listen for 
 an `"input"` event.
@@ -103,6 +107,8 @@ loses focus and the content has been modified. {.notice--info}
 &lt;/math-field&gt;</div>
 </code-playground>
 
+<hr>
+
 Reading the `value` property is equivalent to calling the `getValue()` method with 
 no argument. 
 
@@ -117,7 +123,8 @@ For example to get the content as a MathJSON expression, use `getValue('math-jso
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
-    <div slot="javascript">const mf = document.getElementById('formula');
+    <div slot="javascript">import 'compute-engine';
+    const mf = document.getElementById('formula');
 mf.addEventListener('input',(ev) => {
     // `ev.target` is an instance of `MathfieldElement`
     console.log(ev.target.getValue('math-json'));

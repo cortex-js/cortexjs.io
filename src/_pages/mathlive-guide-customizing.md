@@ -16,13 +16,14 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
-    - //unpkg.com/mathlive/dist/mathlive.min.mjs
+    - //unpkg.com/mathlive/dist/mathlive.min.js
 ---
 <script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-        "html-to-image": "///assets/js/html-to-image.js",
-    };
+  moduleMap = {
+    mathlive: "//unpkg.com/mathlive?module",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "https://unpkg.com/@cortex-js/compute-engine?module"
+  };
 </script>
 
 The appearance and behavior of the mathfield is highly customizable.{.xl}
