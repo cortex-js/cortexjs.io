@@ -418,11 +418,35 @@ By default, pressing the spacebar when in math mode does not insert anything.
 `mathModeSpace` option to that command:
 
 ```js
-md.setOptions({mathModeSpace: '\\:'});
+mf.setOptions({mathModeSpace: '\\:'});
 
 ```
 
 </section>
+
+
+## Turning off the LaTeX mode
+
+Pressing the `\` (backslash) or `ESC` key switches to the LaTeX mode where it 
+is possible to enter raw LaTeX command. For users familiar with LaTeX, it is
+a powerful way to enter or edit LaTeX in an expression. However, users
+unfamiliar with LaTeX may be confused if they accidentally press those keys.
+
+**To prevent the LaTeX mode from being enabled** intercept the trigger keys
+and handle them as desired.
+
+```ts
+mf.addEventListener(
+  'keydown',
+  (ev) => {
+    if (ev.key === '\\') {
+      ev.preventDefault();
+      mf.executeCommand(['insert', '\\backslash']);
+    } else if (ev.key === 'Escape') ev.preventDefault();
+  },
+  { capture: true }
+);
+```
 
 <section id='localization'>
 
