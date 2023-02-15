@@ -24,8 +24,8 @@ head:
     };
 </script>
 Typing math formulas require access to many special symbols. While [keyboard 
-shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help, mobile 
-devices require another solution.{.xl}
+shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help when a 
+physical keyboard is available, touch-enabled devices require another solution.{.xl}
 
 A **virtual keyboard** is a keyboard displayed on screen that can be customized 
 with specialized symbols for math input.
@@ -101,13 +101,16 @@ keyboard panel is visible by attaching it to the full screen element.
 **To select which DOM element the virtual keyboard is created into**, set the
 `virtualKeyboardContainer` option to the desired DOM element.
 
-The `position` attribute of this container element should be `relative` so that the virtual keyboard can correctly be placed relative to this element, and the container element should 
-be at least 365px wide to ensure that the virtual keyboard can fit.  {.notice--warning}
+The `position` attribute of this container element should be `relative` so that 
+the virtual keyboard can correctly be placed relative to this element, and the 
+container element should be at least 365px wide to ensure that the virtual 
+keyboard can fit.  {.notice--warning}
 
 
 ## Customizing the Appearance of the Virtual Keyboard
 
-**To customize the appearance of the virtual keyboard panel** set the following CSS variables on a selector that applies to the container of the virtual 
+**To customize the appearance of the virtual keyboard panel** set the following 
+CSS variables on a selector that applies to the container of the virtual 
 keyboard panel, which is the `<body>` element by default: 
 
 ```css
@@ -279,7 +282,7 @@ defined (see below about the `styles` layer property), or be one or more of the
   provided, the label (stripped of any HTML markup) is what will be inserted
   when the keycap is pressed.
 - `latex`: a LaTeX fragment used as a label and as the content to insert when 
-  the keycap is pressed.
+  the keycap is pressed. The LaTeX fragment can contain [Placeholder Tokens](#placeholder-tokens).
 - `key`: the keypress to emulate when the keycap is pressed, for example `"5"`.
 - `aside`: an optional small label displayed below the keycap. This label
 may not be displayed if the space available is too small.
@@ -304,6 +307,17 @@ layer.
 
 The appearance of the layer can be further customized by providing a CSS class 
 name for the `backdrop` and `container` properties of the layer.
+
+
+### Placeholder Tokens
+
+The LaTeX fragment that defines what gets inserted when a virtual keyboard key 
+is pressed can contain one of the following special placeholder tokens:
+
+- `#@`: replaced with the selection, if there is one. If there is no selection,
+  replaced with an implicit argument to the left of the caret. For example, for
+  `12+34`, if the caret is at the end, `#@` would be replaced with `34`.
+- `#?`: replaced with a `\placeholder{}` expression
 
 
 ### Keycap Variants

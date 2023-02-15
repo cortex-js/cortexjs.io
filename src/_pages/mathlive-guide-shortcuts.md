@@ -66,6 +66,15 @@ mf.addEventListener('keydown', (ev) => {
 Call `ev.preventDefault()` to stop handling of the event, otherwise the default 
 command (if any) associated with this keystroke will be processed.
 
+When using `insert()`, the LaTeX fragment argument of the function can include
+one of the following special placeholder tokens:
+
+- `#@`: replaced with the selection, if there is one. If there is no selection,
+  replaced with an implicit argument to the left of the caret. For example, for
+  `12+34`, if the caret is at the end, `#@` would be replaced with `34`.
+- `#?`: replaced with a `\placeholder{}` expression
+
+
 ### International Keyboards
 
 Correctly handling keyboard shortcuts while accounting for international 
