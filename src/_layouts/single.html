@@ -81,20 +81,26 @@ layout: default
   </article>
 </div>
 
+{% if render_math_in_document %}
 <script type="module">
-  window.addEventListener('DOMContentLoaded', (event) => {
-    import('https://unpkg.com/mathlive?module').then((mathlive) => {
-      mathlive.renderMathInDocument({ 
-        renderAccessibleContent: false,
-        TeX: { 
-          delimiters: {
-            inline: [['\\(', '\\)']],
-            display: [ ['$$', '$$'], ['\\[', '\\]']],
-          },
-          processEnvironments : false 
+function whenReady(fn) {
+  if (document.readyState !== 'loading')  fn();
+  else document.addEventListener('DOMContentLoaded', fn);
+}
+
+whenReady(() => import('//unpkg.com/mathlive?module').then((mathlive) =>
+    mathlive.renderMathInDocument({
+      renderAccessibleContent: false,
+      TeX: { 
+        delimiters: {
+          inline: [['\\(', '\\)']],
+          display: [ ['$$', '$$'], ['\\[', '\\]']],
         },
-        asciiMath: null,
-      })
+        processEnvironments : false 
+      },
+      asciiMath: null,
     })
-  });
+  )
+)
 </script>
+{% endif %}

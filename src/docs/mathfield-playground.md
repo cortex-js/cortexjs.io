@@ -8,22 +8,21 @@ sidebar:
 version: MathLive version
 head:
   stylesheets:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.css
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css
   scripts:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/codemirror.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/javascript/javascript.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.8/mode/xml/xml.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
 ---
 <script>
   moduleMap = {
-    mathlive: "//unpkg.com/mathlive?module",
-    "html-to-image": "///assets/js/html-to-image.js",
-    "compute-engine": "https://unpkg.com/@cortex-js/compute-engine?module"
+    "mathlive": "//unpkg.com/mathlive/dist/mathlive.mjs",
+    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
   };
   window.addEventListener('DOMContentLoaded', (event) => 
-      import('//unpkg.com/mathlive?module').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive
+      import('//unpkg.com/mathlive/dist/mathlive.mjs').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive + ' (debug)'
   ));
 </script>
 

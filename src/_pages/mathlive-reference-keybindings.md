@@ -7,6 +7,7 @@ read_time: false
 sidebar:
     - nav: "universal"
 toc: true
+render_math_in_document: true
 ---
 
 <style>
