@@ -1,5 +1,5 @@
-[![Gitter](https://badges.gitter.im/cortex-js/community.svg)](https://matrix.to/#/#cortex-js_community:gitter.im)
-![Maintenance](https://img.shields.io/maintenance/yes/2022)
+[![Gitter](https://badges.gitter.im/cortex-js/community.svg)](https://cortexjs.io/gitter)
+![Maintenance](https://img.shields.io/maintenance/yes/2023)
 
 This repo contains the source files for the "cortexjs.io" website.
 
