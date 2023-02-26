@@ -73,7 +73,7 @@
             {
                 "label": "Gitter",
                 "icon": "<svg class='icon1quarterem'><use role='none' xlink:href='/assets/icons.svg#gitter'></use></svg>",
-                "url": "https://gitter.im/cortex-js"
+                "url": "https://matrix.to/#/#cortex-js_community:gitter.im"
             }
         ],
         "pages": [

@@ -15,7 +15,7 @@
 		{
 			"description": "Chat on Gitter",
 			"title": "<svg class='icon1quarterem' role='img'><title>Gitter</title><use xlink:href='/assets/icons.svg#gitter'></use></svg>",
-			"url": "https://gitter.im/cortex-js"
+			"url": "https://matrix.to/#/#cortex-js_community:gitter.im"
 		},
 		{
 			"title": "<svg class='icon1quarterem' role='img'><title>GitHub</title><use xlink:href='/assets/icons.svg#github'></use></svg>",
@@ -347,7 +347,7 @@
 				},
 				{
 					"title": "Questions and Feedback on Gitter",
-					"url": "https://gitter.im/cortex-js",
+					"url": "https://matrix.to/#/#cortex-js_community:gitter.im",
           "icon": "gitter"
 				},
 				{
