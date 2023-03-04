@@ -34,3 +34,27 @@ a.section-link {
 #main a:not(.section-link):hover {
   text-decoration: underline;
 }
+
+#main a.cta {
+  display: block;
+  padding: 12px;
+  min-width: 100px;
+  margin-top:  1em;
+
+  text-align: center;
+  text-decoration: none;
+  border: 3px solid var(--link-color);
+  border-radius: 8px;
+  font-size:  32px;
+  font-weight: 600;
+
+  background: var(--link-color);
+  color: white !important;
+}
+
+#main a:hover.cta {
+  text-decoration: none;
+
+  background: transparent;
+  color: var(--link-color) !important;
+}
