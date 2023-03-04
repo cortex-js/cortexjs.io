@@ -36,15 +36,16 @@ a.section-link {
 }
 
 #main a.cta {
-  display: block;
+  display: inline-block;
   padding: 12px;
-  min-width: 100px;
+  min-width: 200px;
   margin-top:  1em;
+
+  border: 3px solid var(--link-color);
+  border-radius: 8px;
 
   text-align: center;
   text-decoration: none;
-  border: 3px solid var(--link-color);
-  border-radius: 8px;
   font-size:  32px;
   font-weight: 600;
 
@@ -54,6 +55,7 @@ a.section-link {
 
 #main a:hover.cta {
   text-decoration: none;
+  font-weight: 900;
 
   background: transparent;
   color: var(--link-color) !important;

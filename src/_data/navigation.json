@@ -13,14 +13,12 @@
 			"url": "/cortex/"
 		},
 		{
-			"description": "Chat on Gitter",
-			"title": "<svg class='icon1quarterem' role='img'><title>Gitter</title><use xlink:href='/assets/icons.svg#gitter'></use></svg>",
+			"title": "<svg class='icon1quarterem' role='img'><title>Gitter Forum</title><use xlink:href='/assets/icons.svg#gitter'></use></svg>",
 			"url": "/gitter/"
 		},
 		{
 			"title": "<svg class='icon1quarterem' role='img'><title>GitHub</title><use xlink:href='/assets/icons.svg#github'></use></svg>",
-			"url": "https://github.com/cortex-js",
-			"description": "Get source code on GitHub"
+			"url": "https://github.com/cortex-js"
 		}
 	],
   "universal": [
@@ -346,7 +344,7 @@
           "icon": "person"
 				},
 				{
-					"title": "Questions and Feedback on Gitter",
+					"title": "Discuss in Gitter Forum",
 					"url": "/gitter/",
           "icon": "gitter"
 				},
