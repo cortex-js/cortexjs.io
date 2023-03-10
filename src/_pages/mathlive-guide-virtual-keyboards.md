@@ -101,10 +101,9 @@ keyboard panel is visible by attaching it to the full screen element.
 **To select which DOM element the virtual keyboard is created into**, set the
 `virtualKeyboardContainer` option to the desired DOM element.
 
-The `position` attribute of this container element should be `relative` so that 
-the virtual keyboard can correctly be placed relative to this element, and the 
-container element should be at least 365px wide to ensure that the virtual 
-keyboard can fit.  {.notice--warning}
+The container element should be at least 365px wide to ensure that the virtual 
+keyboard can fit. The height of the container element will be adjusted so
+that the virtual keyboard can fit. {.notice--warning}
 
 
 ## Customizing the Appearance of the Virtual Keyboard

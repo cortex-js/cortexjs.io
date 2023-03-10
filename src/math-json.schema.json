@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/product.schema.json",
+  "title": "MathJSON",
+  "description": "A mathematical expression. See https://json-schema.org/understanding-json-schema/",
+  "oneOf": [
+    {
+      "type": "number"
+    },
+    {
+      "type": "string"
+    },
+    {
+      "type": "array"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "fn": {
+          "type": "array"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/metadata"
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "num": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/metadata"
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "sym": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/metadata"
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "str": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/metadata"
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "dict": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/metadata"
+      }
+    }
+  ],
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "wikidata": "string",
+        "comment": "string",
+        "documentation": "string",
+        "latex": "string",
+        "sourceUrl": "url",
+        "sourceContent": "string",
+        "sourceOffsets": "array",
+        "hash": "string"
+      }
+    }
+  }
+}

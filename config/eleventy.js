@@ -108,6 +108,8 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.setLibrary('md', md);
 
+  eleventyConfig.setTemplateFormats(['json']);
+
   eleventyConfig.setUseGitIgnore(false);
 
   eleventyConfig.setQuietMode(true);
