@@ -40,7 +40,7 @@
   "contributors": [],
   "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
   "devDependencies": {
-    "@11ty/eleventy": "^1.0.1",
+    "@11ty/eleventy": "^2.0.0",
     "@cortex-js/prettier-config": "^1.1.1",
     "@ui-js/grok": "^1.8.0",
     "cssnano": "^5.1.7",
