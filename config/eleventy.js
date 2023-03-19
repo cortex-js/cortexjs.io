@@ -108,7 +108,7 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.setLibrary('md', md);
 
-  eleventyConfig.setTemplateFormats(['json']);
+  eleventyConfig.setTemplateFormats(['json', 'html', 'md']);
 
   eleventyConfig.setUseGitIgnore(false);
 
@@ -169,7 +169,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy('src/assets');
   eleventyConfig.addPassthroughCopy({ 'src/build/assets': 'assets' });
 
-  // Copy the `src/build` directory to the compiled site folder
+  // // Copy the `src/build` directory to the compiled site folder
   eleventyConfig.addPassthroughCopy({ 'src/build/css': 'assets/css' });
 
   eleventyConfig.setDataDeepMerge(true);

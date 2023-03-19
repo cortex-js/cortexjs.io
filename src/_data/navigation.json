@@ -53,8 +53,18 @@
           "icon": "guide"
 				},
 				{
-					"title": "Interacting",
+					"title": "Using MathLive with React",
+					"url": "/mathlive/guides/react/",
+          "icon": "guide"
+				},
+				{
+					"title": "Interact",
 					"url": "/mathlive/guides/interacting/",
+          "icon": "guide"
+				},
+				{
+					"title": "Fill in the blank",
+					"url": "/mathlive/guides/fill-in-the-blank/",
           "icon": "guide"
 				},
 				{
@@ -88,7 +98,7 @@
           "icon": "guide"
 				},
 				{
-					"title": "Virtual Keyboards",
+					"title": "Virtual Keyboard",
 					"url": "/mathlive/guides/virtual-keyboards/",
           "icon": "guide"
 				},

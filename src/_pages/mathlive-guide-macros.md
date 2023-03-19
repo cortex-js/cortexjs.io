@@ -31,10 +31,10 @@ with a LaTeX expression. You can extend MathLive with your own macros.{.xl}
 
 ## Adding/Removing Macros
 
-**To add a macro** use `setOptions({macros: {...getOptions('macros'), ...}})`.
+**To add a macro** use `mf.macros = {...mf.macros, ...}`.
 
-If you do not include the `...getOptions('macros')` call, all the standard
-macros will be turned off.
+If you do not include the `...mf.macros` call, all the standard macros will be
+turned off.
 
 <code-playground layout="stack">
     <style slot="style">
@@ -48,13 +48,10 @@ macros will be turned off.
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        minutes: '\\,{}^\\prime\\;',
-        seconds: '\\,\\doubleprime\\;',
-    }
-});
+mf.macros = { ...mf.macros,
+    minutes: '\\,{}^\\prime\\;',
+    seconds: '\\,\\doubleprime\\;',
+};
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
 </div>
@@ -76,12 +73,9 @@ The macro definition can contain up to eight arguments, represented by `#1` to `
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
-    }
-});
+mf.macros = {...mf.macros, 
+  smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
+};
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
@@ -108,16 +102,13 @@ in the expanded definition of a macro.
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        smallfrac: {
-          args: 2,
-          def: '{}^{#1}\\!\\!/\\!{}_{#2}',
-          captureSelection: false,
-        },
-    }
-});
+mf.macros = {...mf.macros,
+  smallfrac: {
+    args: 2,
+    def: '{}^{#1}\\!\\!/\\!{}_{#2}',
+    captureSelection: false,
+  },
+};
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
@@ -139,11 +130,7 @@ mf.setOptions({
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        diamonds: undefined
-    }
+mf.macros = {...mf.macros, diamonds: undefined };
 });
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;
@@ -178,18 +165,14 @@ editing mode.
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-    macros: {
-        ...mf.getOptions('macros'),
-        minutes: '\\,{}^\\prime\\;',
-        seconds: '\\,\\doubleprime\\;',
-    },
-    inlineShortcuts: {
-        ...mf.getOptions('inlineShortcuts'),
-        minutes: '\\minutes',
-        seconds: '\\seconds',
-    }
-});
+mf.macros = {...mf.macros,
+    minutes: '\\,{}^\\prime\\;',
+    seconds: '\\,\\doubleprime\\;',
+};
+mf.inlineShortcuts = {...mf.inlineShortcuts,
+    minutes: '\\minutes',
+    seconds: '\\seconds',
+};
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
 </div>
@@ -204,7 +187,7 @@ mf.setOptions({
 
 ## Inspecting Available Macros
 
-**To view the available macros**, inspect the `macros` option:
+**To view the available macros**, inspect the `macros` property:
 
 <code-playground layout="stack" >
     <style slot="style">
@@ -218,7 +201,7 @@ mf.setOptions({
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-console.log(mf.getOptions('macros'));
+console.log(mf.macros);
 </div>
     <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
 </div>
@@ -227,7 +210,7 @@ console.log(mf.getOptions('macros'));
 
 ## Disabling Macros
 
-**To turn off all macros**, use  `setOptions({macros: {}})`.
+**To turn off all macros**, use  `mf.macros = {}`.
 
 
 

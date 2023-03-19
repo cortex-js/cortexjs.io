@@ -38,40 +38,49 @@ Here are a few common examples.
 This can be used to modify the appearance of the mathfield in many ways, for 
 example changing the base font size or adding a border around it.
 
-**To display the mathfield as an inline element**, rather than a block element, 
-use `style="display: inline-block"`
+**To display the mathfield as a block element**, rather than an inline element, 
+add an attribute `style="display: block"`
+
+```html
+<p>Answer: <math-field></math-field>.</p>
+<p>Answer: <math-field style="display: block"></math-field>.</p>
+```
 
 
 **To change the color of the caret (insertion point)** set the value of the 
-`caret-color` CSS property.
+`--caret-color` CSS custom property.
 
 **To change the background color and ink color of the math content when 
-selected** set the value of the `color` and `background-color` CSS properties
-with a rule targeting the `::selection` pseudo-element.
+selected** set the value of the `--selection-color` and 
+`--selection-background-color` CSS properties with a rule targeting the 
+elements you want to customize.
 
 ```css
 math-field {
-  caret-color: darkblue;
-}
-math-field::selection {
- background-color: darkblue;
- color: white;
+  --caret-color: red;
+  --selection-background-color: lightgoldenrodyellow;
+  --selection-color: darkblue;
 }
 ```
 
 
+You can also use the `style` attribute of a `<math-field>` tag.
 
 Change the style attribute in the playground below to `color: #dde; background: #256291;`.
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <div slot="html">&lt;math-field style="
+    <div slot="html">
+    &lt;math-field style="
     font-size: 32px; 
     margin: 3em;
     padding: 8px; 
     border-radius: 8px;
     border: 1px solid rgba(0, 0, 0, .3); 
     box-shadow: 0 0 8px rgba(0, 0, 0, .2);
+    --caret-color: red;
+    --selection-background-color: lightgoldenrodyellow;
+    --selection-color: darkblue;
 "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
@@ -87,21 +96,21 @@ variables (custom properties) in a ruleset that applies to the mathfield element
 
 ```css
 math-field {
- --hue: 10       /* Set the highlight color and caret to a reddish hue */
+ --smart-fence-color: red ;
 }
 ```
 
 Alternatively you can set these CSS variables programatically:
 
 ```js
-  document.body.style.setProperty("--hue", "10");
+  document.body.style.setProperty("--smart-fence-color", "red");
 ```
+
 <div class='symbols-table' style='--first-col-width:25ex'>
 
 | CSS Variable | Usage |
 |:---|:---|
 | `--contains-highlight-backround-color` | Backround color for items that contain the caret |
-| `--hue` | Hue of the highlight color and the caret |
 | `--primary` | Primary accent color, used for example in the virtual keyboard |
 | `--smart-fence-color` | Color of a smart fence (default is current color) |
 | `--smart-fence-opacity` | Opacity of a smart fence (default is 50%) |
@@ -111,14 +120,10 @@ Alternatively you can set these CSS variables programatically:
 | `--selection-background-color-focused`| Background color of the selection, when the mathfield is focused. By default, same as `--selection-background-color` | 
 | `--selection-color-focused`| Color of the content in the selection, when the mathfield is focused. By default, same as `--selection-color` | 
 | `--selection-background-color`| Background color of the selection | 
-| `--selection-color`| Color of the content in the selection | 
+| `--correct-color`| Highlight color of a prompt inside a mathfield when in the `"correct"` state| 
+| `--incorrect-color`| Highlight color of a prompt inside a mathfield when in the `"incorrect"` state | 
 
 **Note** To change the placeholder symbol, set the option `placeholderSymbol`.
-
-**To change the appearance of the selection** set the `--selection-background-color` and
-`--selection-color` CSS variables. To have a difference appearance when focused or
-not, set the `--selection-background-color-focused` and `--selection-color-focused`
-CSS variables.
 
 
 </div>
@@ -142,8 +147,7 @@ Although CSS styles are "invisible" to custom components, CSS variables are
       }
     </style>
     <div slot="html">&lt;math-field style="
-  --hue: 53;
-  --caret: red;
+  --caret-color: red;
 "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
@@ -198,7 +202,7 @@ representation, can be controlled with some of the following options:
 ### Color
 
 **To change the foreground ("ink") and background ("paper") colors of a formula 
-programmatically**, use the `applyStyle()` function.
+programmatically**, use the `mf.applyStyle()` function.
 
 **To change the foreground color**, use the `\textcolor{}{}` command.
 **To change the background color**, use the `\colorbox{}{}` command.
@@ -281,25 +285,19 @@ Notice for example that `n=0` in `displaystyle` does not include space around
 the `=` sign because the limit is displayed in `scriptstyle`.
 
 
-**To set the default mathstyle of a mathfield**, use the `defaultMode` option 
-(or the `default-mode` attribute).
+**To set the default mathstyle of a mathfield**, set the `mf.defaultMode`
+property or the `default-mode` attribute.
 
-Set it to `inline-math` to use `textstyle` or `math` to use `displaystyle`.
+Set it to `"inline-math"` to use `textstyle` or `"math"` to use `displaystyle`.
 
-By default, the mathfield element is laid out on the page as a block,
-that is with a `display: block` CSS property. To get it laid out as an inline 
-element, set `display: inline-block` on the mathfield. To set a minimum width
-for the mathfield, use the `min-width` CSS property. 
-
-Using `inline-block` is particularly useful when used in conjunction with `default-mode="inline-math"`.
+By default, the mathfield element is laid out on the page as an inline element.
+To get it laid out as a block element, set `display: inline-block` on the mathfield. 
 
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
   <div slot="html">The answer is &lt;math-field 
-  default-mode="inline-math"
   style="
-    display: inline-block;
     vertical-align: middle;
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, .3);
@@ -317,7 +315,7 @@ Using `inline-block` is particularly useful when used in conjunction with `defau
 
 ### Letter Shape Style
 
-**To control which letters are automatically italicized**, use the `letterShapeStyle` configuration option.
+**To control which letters are automatically italicized**, set the `letterShapeStyle` property or `letter-shape-style` attribute.
 
 
 <div class='symbols-table'>
@@ -341,7 +339,7 @@ letters and lowercase greek letters, but not uppercase greek letters.
 The French typographical convention is to only italicize lowercase roman letters.
 
 The default letter shape style is `auto`: if the system locale is "french",
-the `french` style is used, `tex` otherwise.
+the `french` style is used, otherwise `tex` is used.
 
 
 
@@ -350,17 +348,14 @@ the `french` style is used, `tex` otherwise.
 
 ## Editing Options
 
-Some configuration options can be specified when creating a mathfield as 
-the argument of [`new MathfieldElement()`](https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor) or as an attribute to the `&lt;math-field&gt;` element.
-as we've see above with the `fontsDirectory` option.
+The editing behavior of a mathfield can be customized by setting some 
+properties on the mathfield, or the equivalent attributes on the 
+`<math-field>` tag.
 
-The configuration options can also be changed programmatically using the [`setOptions()`](http://cortexjs.io/docs/mathlive/?q=%22setOptions%22) method.
-
-Several of these configuration options affect the behavior while editing a 
-formula:
-* `defaultMode`: if `inline-math` the math field is using inline math mode
-by default. If set to `math`, it will use the display math mode. If set to 
-`text` it will use the text mode.
+* `defaultMode`: 
+  * `"inline-math"`: use inline math mode
+  * `"math"`: use the display math mode
+  * `"text"`: use the text mode  | 
 * `removeExtraneousParentheses`: automatically remove extra parentheses around
 a numerator or denominator
 * `scriptDepth`: maximum levels of subscript or superscript. Set it to 0 to 
@@ -369,6 +364,8 @@ prevent the input of superscript and subscripts
 * `smartMode`: switch to text mode when text input is detected, for example 
 when typing "if x > 0"
 * `smartSuperscript`: automatically move out of a superscript when a digit is typed
+
+These properties can also be passed as an argument to [`new MathfieldElement()`](https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor) when programmatically creating mathfield elements.
 
 In the code playground below, try some of these options. For example, change
 line 3 to `scriptDepth: 0`, then try to type "x^2" in the mathfield.
@@ -415,11 +412,10 @@ relational, binary or unary operators, etc...
 By default, pressing the spacebar when in math mode does not insert anything.
 
 **To insert a LaTeX command when the spacebar is pressed**, set the value of the 
-`mathModeSpace` option to that command:
+`mathModeSpace` property to that command:
 
 ```js
-mf.setOptions({mathModeSpace: '\\:'});
-
+mf.mathModeSpace = '\\:';
 ```
 
 </section>
@@ -433,7 +429,7 @@ a powerful way to enter or edit LaTeX in an expression. However, users
 unfamiliar with LaTeX may be confused if they accidentally press those keys.
 
 **To prevent the LaTeX mode from being enabled** intercept the trigger keys
-and handle them as desired.
+and call `preventDefault().
 
 ```ts
 mf.addEventListener(
@@ -456,10 +452,8 @@ The user interface of the mathfield is provided in english, arabic, german,
 greek, spanish, farsi, french, italian, japanese, polish and russian.
 
 The language to use is detected automatically, but it can be overridden by
-using the `locale` option or the `locale` attribute.
-
-**Note:** we `await` for the `<math-field>` definition to be loaded before
-invoking the `getOptions()` method, otherwise it would not be found. {.notice--info}
+using the `MathfieldElement.locale` static property. Setting this property
+will affect all mathfield elements on the page.
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack">
@@ -473,13 +467,12 @@ invoking the `getOptions()` method, otherwise it would not be found. {.notice--i
       }
     </style>
 <div slot="javascript">
-await window.customElements.whenDefined('math-field');
-const mf = document.getElementById('formula');
-const locale = mf.getOptions('locale');
+await customElements.whenDefined('math-field');
+const locale = MathfieldElement.locale;
 console.log("Locale:", locale);
-console.log(mf.getOptions().strings[locale]);
+console.log(MathfieldElement.strings[locale]);
 </div>
-<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual" locale="fr"&gt;
+<div slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -491,8 +484,8 @@ The world is
 [about evenly split](https://en.wikipedia.org/wiki/Decimal_separator#/media/File:DecimalSeparator.svg)
 between using a dot `.` or a comma `,` as a decimal marker.
 
-**To change the marker used with decimal numbers** set the `decimalSeparator` 
-option to `","` or `"."`.
+**To change the marker used with decimal numbers** set the 
+`MathfieldElement.decimalSeparator` property to `","` or `"."`.
 
 When set to `","`, pressing the `,` key on a physical keyboard will insert a 
 `{,}` LaTeX string, if in math mode and if before a digit. 
@@ -516,12 +509,10 @@ keycap is  labeled `,` instead and contextually inserts a `{,}` when appropriate
       }
     </style>
 <div slot="javascript">
-await window.customElements.whenDefined('math-field');
-document.getElementById('formula').setOptions({
-  decimalSeparator: ","
-});
+await customElements.whenDefined('math-field');
+MathfieldElement.decimalSeparator = ",";
 </div>
-<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual"&gt;
+<div slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -550,11 +541,9 @@ before the numerator.
     </style>
 <div slot="javascript">
 await window.customElements.whenDefined('math-field');
-document.getElementById('formula').setOptions({
-  fractionNavigationOrder: "denominator-numerator"
-});
+MathfieldElement.fractionNavigationOrder = "denominator-numerator";
 </div>
-<div slot="html">&lt;math-field id='formula' virtual-keyboard-mode="manual"&gt;
+<div slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -570,10 +559,11 @@ The content of the mathfield is displayed using a family of high-quality
 fonts based on the original Computer Modern font from TeX. The mathfield
 will not display correctly using another font. 
 
-By default, the directory containing
-the fonts is located next to the file containing the mathlive library.
-If your bundler or asset management system require a different configuration
-you can specify where the fonts can be located using the [`fontsDirectory`](http://cortexjs.io/docs/mathlive/?q=fontsDirectory) option or the `fonts-directory` attribute.
+By default, the directory containing the fonts is located next to the file 
+containing the mathlive library. If your bundler or asset management system 
+require a different configuration you can specify where the fonts can be 
+located using the [`MathfieldElement.fontsDirectory`](http://cortexjs.io/docs/mathlive/?q=fontsDirectory) 
+property.
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack">
@@ -586,17 +576,19 @@ you can specify where the fonts can be located using the [`fontsDirectory`](http
         outline: none;
       }
     </style>
-<div slot="html">&lt;math-field fonts-directory="//unpkg.com/mathlive/dist/fonts/"&gt;
+<div slot="javascript">
+await window.customElements.whenDefined("math-field");
+MathfieldElement.fontsDirectory="//unpkg.com/mathlive/dist/fonts/";
+</div>
+<div slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
 
-**Note:** changing the fonts directory for one mathfield will change the fonts 
-used by all the other mathfield elements in the page. {.notice--warning}
-
 {% readmore "/mathlive/guides/integration/" %}
-Learn more about configuring the MathLive library to your environment, including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
+Learn more about configuring the MathLive library to your environment, 
+including using custom asset pipelines and bundlers, in the <strong>integration guide</strong>
 {% endreadmore %}
 
 

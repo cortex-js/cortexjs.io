@@ -9,9 +9,9 @@ toc: true
 ---
 
 As discussed in [Getting Started](/mathlive/guides/getting-started/) the 
-simplest way to use MathLive in your page is by loading it from a CDN.
+simplest way to use MathLive is by loading it from a CDN.
 
-In this section we'll discuss other options for adding a mathfield in a web page.
+In this section we'll discuss other options for adding a mathfield to a web page.
 
 
 ## Creating Mathfield Elements Programmatically
@@ -60,11 +60,14 @@ to use MathLive APIs in your project.
 
 1. Include a `<script>` tag, with a `type="module"` attribute
 2. In the body of this `<script>` tag, use an `import` directive pointing to a 
-CDN URL for MathLive, such as `https://unpkg.com/mathlive?module`. If your target browser supports it, you can also use the `import()` function for a dynamic import.
+CDN URL for MathLive, such as `//unpkg.com/mathlive?module`. If your 
+target browser supports it, you can also use the `import()` function for a 
+dynamic import.
 
-**Note:** The `?module` suffix indicates to the CDN we need the ESM (module) version of MathLive.{.notice--info}
+**Note:** The `?module` suffix indicates to the CDN we need the ESM (module) 
+version of MathLive, not the UMD version.{.notice--info}
 
-3. Invoke a MathLive API, such as `renderMathInDocument()`.
+1. Invoke a MathLive API, such as `renderMathInDocument()`.
 
 With this setup, MathLive will dynamically insert one or more stylesheets in 
 the page, as needed, for example when a mathfield is created. MathLive will 
@@ -76,8 +79,8 @@ dynamically download the required fonts from the CDN as well.
 <body>
   <p>$$\frac{\pi}{2}$$</p>
   <script type="module">
-    window.addEventListener('DOMContentLoaded', () => 
-      import('//unpkg.com/mathlive?module').then((mathlive) => 
+    window.addEventListener("DOMContentLoaded", () => 
+      import("//unpkg.com/mathlive?module").then((mathlive) => 
         mathlive.renderMathInDocument()
       )
     );
@@ -96,7 +99,7 @@ configurations.
 ## Using `<script>` tags
 
 If you need to support browsers that don't support JavaScript modules, you
-can use a `<script>` tag to load the MathLive library.
+can use a `<script>` tag to load a UMD version of the MathLive library.
 
 A few things to note:
 
@@ -131,14 +134,14 @@ when required.
 
 <h2 id='npm'>Using NPM</h2>
 
-If you need:
+If you need...
 - to use MathLive with TypeScript
 - to bundle MathLive with other code
 - to integrate MathLive with your asset pipeline
 - to support older browsers
 - more control over network caching of the MathLive library and its assets
 
-then you should use a version of MathLive installed from NPM instead of from 
+...then you should use a version of MathLive installed from NPM instead of from 
 a CDN.
 
 **To add a local version of MathLive to your project**, use the following command:
@@ -151,44 +154,47 @@ After you've completed this step, you can use MathLive as any other modules
 in your project: 
 
 ```javascript
-import { MathfieldElement} from 'mathlive';
+import { MathfieldElement } from 'mathlive';
 const mfe = new MathfieldElement();
 ```
 
-Your bundler/transpiler (for example `Rollup`, `WebPack`, `Babel`, `TypeScript`)
-will locate the MathLive library in the `node_modules` directory and apply 
-the necessary transformations to it, as per the settings in your project.
+Your bundler/transpiler (for example `esbuild`, `Rollup`, `WebPack`, `Babel`, 
+`TypeScript`) will locate the MathLive library in the `node_modules` directory 
+and apply the necessary transformations to it, as per the settings in your project.
+
+Make sure the contents of the `/fonts/` and `/sounds/` folder are copied to
+your build output directory.
 
 
 <h2 id='fonts-folder'> Controlling the Location of the <kbd>fonts</kbd> Folder</h2>
 
-In order to display formulas correctly MathLive needs access to specialized 
-math fonts. Those fonts are provided as part of the MathLive SDK and they are
-located in a folder called `fonts` which is located next to the MathLive 
-library.
+In order to display mathfields correctly a set of specialized math fonts must 
+be available. These fonts are provided as part of the MathLive SDK and they are
+located in a directory called `fonts` located next to the MathLive library.
 
 If the global setup of your project requires a different organization, 
-for example locating all the static assets in a `/assets/` directory and all the
+for example locating all the static assets in an `/assets/` directory and all the
 JavaScript code in a `/js/` directory, you can specify where those assets can
-be found using the `fontsDirectory` configuration option.
+be found using the `fontsDirectory` static property.
 
-```javascript
-import { MathfieldElement} from 'mathlive';
-const mfe = new MathfieldElement();
-mfe.setOptions({
-  fontsDirectory: '../assets/mathlive-fonts'
-});
+```js
+  MathfieldElement.fontsDirectory = "../assets/mathlive-fonts";
 ```
 
-The path used by `fontsDirectory` is a path relative to the bundled runtime
-location of the directory containting the MathLive library. So in the example
-above, if the MathLive library is in a `/js/` directory and the MathLive fonts
-are in a `/assets/mathlive-fonts/` directory, then the relative path from 
-the JavaScript directory to the fonts directory is `../assets/mathlive-fonts`
+The `MathfieldElement` variable is a global variable available after the 
+MathLive library has been loaded. It is attached to `globalThis`, that is the 
+`window` object, and does not need to be imported explicitly {.notice--info}
 
-The `fontsDirectory` option affects all the mathfield on the page. It is 
-not necessary to apply it to all mathfields, although it's not harmful. Once 
-the fonts have been loaded once, they will not get loaded again. {.notice--info}
+
+The path used by `fontsDirectory` is a path relative to the bundled runtime
+location of the directory containting the MathLive library. 
+
+In the example above, if the MathLive library is in a `/js/` directory and the 
+MathLive fonts are in a `/assets/mathlive-fonts/` directory, then the relative 
+path from the JavaScript directory to the fonts directory is `../assets/mathlive-fonts`.
+
+The `MathfieldElement.soundsDirectory` property can similarly be set to point 
+to the sound file assets.
 
 <h2 id='asset-pipeline'>Integrating with an Asset Pipeline</h2>
 
@@ -224,6 +230,96 @@ font loading.
     <script src='./vendor/mathlive.min.js'></script>
 </body>
 </html>
+```
+
+## Optimizing Load Performance
+
+Loading a page with web components involve a complex set of steps.  If there
+are many mathfields in a page, this may result in visible layout shifts as
+the components and their dependencies, the fonts required in particular, get 
+fully loaded. 
+
+In most cases, the impact on loading performance is minimal and it is not
+worth taking steps to reduce it. However, follow the steps below for the 
+smoothest loading experience.
+
+First, provide a hint to the browser that a set of fonts will be needed.
+This helps prioritize the order in which they are loaded so that they are ready
+and available by the time the mathfield component is rendered. 
+
+**To preload the fonts**, include a series of `<link>` tags in the page 
+`<header>` section. The `href` attributes should be modified to point to where 
+the fonts are located. You can also use the fonts from a CDN.
+
+Second, include the `"mathlive-fonts.css"` stylesheet. This will instruct the 
+browser to make the fonts available for use in the page. Use another `<link>`
+tag in the `<head>` section to do so.
+
+Finally, set the visibility of the `<body>` of the page to `"hidden"` until
+the mathfield custom elements have been connected to the page.
+
+The code snippets below demonstrate how to do this.
+
+
+```html
+<!-- Before </body> -->
+<script type="module">
+  customElements.whenDefined('math-field').then(() => 
+    document.body.classList.add('ready'))
+</script>
+```
+
+```html
+<!-- In the <head> section -->
+<style>
+  body {
+    visibility: hidden;
+  }
+  body.ready {
+    visibility: visible;
+  }
+</style>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_AMS-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Caligraphic-Bold.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Caligraphic-Regular.woff2" />
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Fraktur-Bold.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Fraktur-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Main-BoldItalic.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Main-Bold.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Main-Italic.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Main-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Math-BoldItalic.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Math-Italic.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_SansSerif-Bold.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_SansSerif-Italic.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_SansSerif-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Script-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Size1-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Size2-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Size3-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Size4-Regular.woff2"/>
+<link rel="preload" as="font" crossorigin
+  href="../fonts/KaTeX_Typewriter-Regular.woff2"/>
+<link rel="stylesheet" href="../mathlive-fonts.css" />
 ```
 
 <h2 id='static-render'>Displaying Non-Editable Formulas</h2>

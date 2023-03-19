@@ -196,32 +196,6 @@ use the keyboard. This behavior matches the `<textarea>` element.
 keyboard** listen for an `input` event with an `inputType` property of `"insertLineBreak"`.
 
 
-## Fill in the Blank
-
-To have one or more portions of a mathfield editable, while the rest is 
-read-only, use a `readonly` mathfield, and the `\placeholder[]{}` command.
-
-This can used to prompt an answer to a quiz with a partially provided
-formula and with some portions that the student has to provide.
-
-The optional argument of the `\placeholder` command, i.e. the one provided
-in `[]` is a string identifier made of letters and digits. The main argument
-of the `\placeholder` comman, i.e. the one in `{}` is the default value of the
-field. You can leave it blank.
-
-When using the `\placeholder[]{}` command in a readonly mathfield, some 
-additional mathfields are created automatically, one for each `\placeholder`
-command. To access these mathfields, use the `mf.placeholders` property.
-
-<code-playground layout="stack">
-  <div slot="javascript">
-const blank1 = document.getElementById('mf').placeholders['blank1'];
-blank1.addEventListener('input', (ev) => console.log(blank1.value));
-  </div>
-  <div slot="html">&lt;math-field id="mf" readonly style="font-size:3em"&gt;f(x)= \placeholder[blank1][x]{}&lt;/math-field&gt;</div>
-</code-playground>
-
-
 
 ## Detecting a Click on a Mathfield
 
@@ -239,11 +213,11 @@ mathfield (that is, the `evt.target` will be the mathfield itself).
 
 This include the following standard events:
 
-- `change`: **Return** or **Enter** key was pressed
+- `change`: **Return** or **Enter** key was pressed, or the field lost focus.
 - `blur`, `focus`, `focusin`, `focusout`
 - `click`
 - `mousedown`, `mouseup`, `mousemove`, `mouseout, `mouseover`
-- `beforeinput`, `input`
+- `beforeinput`, `input`. If the `inputType` property of the event is `"insertLineBreak"` the **Return** or **Enter** key was pressed
 - `keydown`, `keypress`, `keyup`
 - `wheel`
 - all the [pointer events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events) such as `pointerdown`, `pointerup`, etc... and all the touch events
@@ -254,8 +228,6 @@ As well as these mathfield specific events:
 - `focus-out`: tab key interactions
 - `move-out`: arrow key interactions
 - `mode-change`: change to `math`, `text` or `latex` mode
-- `placeholder-change`: an editable placeholder inside a read-only mathfield 
-  has been modified
 - `read-aloud-status-change`
 - `selection-change`
 - `undo-state-change`

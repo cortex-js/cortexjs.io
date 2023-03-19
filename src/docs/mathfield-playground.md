@@ -85,7 +85,7 @@ function onMathfieldInput() {
 mf.addEventListener('input', onMathfieldInput);
 onMathfieldInput();</div>
     <div slot="html">
-&lt;math-field id="formula" virtual-keyboard-mode="manual"&gt;
+&lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
 &lt;textarea id="latex"&gt;&lt;/textarea&gt;</div>

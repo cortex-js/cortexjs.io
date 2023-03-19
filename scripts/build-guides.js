@@ -198,7 +198,7 @@ const run = async (dir, sidebar) => {
         const graymatter = matter(file);
         const frontmatter = graymatter.data;
         if (!frontmatter || !frontmatter.permalink) {
-          console.warn('Skipping ' + x + ': no frontmatter permalink.');
+          // console.warn('Skipping ' + x + ': no frontmatter permalink.');
         } else {
           try {
             const [usesCodeMirror, content] = upgradeCodeFences(
@@ -239,7 +239,6 @@ const run = async (dir, sidebar) => {
             //   ...(frontmatter.modules ?? []),
             //   '/assets/js/code-playground.min.js',
             // ];
-
             fs.writeFile(dest + '.md', matter.stringify(content, frontmatter));
           } catch (e) {
             console.error('Error parsing', x, e);

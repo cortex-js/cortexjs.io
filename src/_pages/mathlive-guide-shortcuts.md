@@ -172,12 +172,11 @@ defined, but they can be replaced or enhanced with additional shortcuts.
     </style>
     <div slot="javascript">import 'mathlive';
 const mf = document.getElementById('mf');
-mf.setOptions({
-  inlineShortcuts: {
-    ...mf.getOptions('inlineShortcuts'),    // Preserve default shortcuts
-    "infty": '\\infty',
-  }
-});</div><div slot="html">&lt;math-field id="mf"&gt;
+mf.inlineShortcuts = 
+  ...mf.inlineShortcuts,    // Preserve default shortcuts
+  "infty": '\\infty'
+};
+</div><div slot="html">&lt;math-field id="mf"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -187,15 +186,13 @@ mf.setOptions({
 property:
 
 ```javascript
-mf.setOptions({
-  inlineShortcuts: {
-    ...mf.getOptions('inlineShortcuts'),    // Preserve default shortcuts
-    in: {
-        after: 'space | letter | digit | symbol | fence',
-        value: '\\in',
-    },
-  }
-});
+mf.inlineShortcuts =
+...mf.inlineShortcuts,    // Preserve default shortcuts
+  in: {
+      after: 'space | letter | digit | symbol | fence',
+      value: '\\in',
+  },
+};
 ```
 
 The `after` property indicate in what context the shortcut should apply. One or 
@@ -242,33 +239,29 @@ The string passed to the `onInlineShortcut` handler is a raw sequence of
 characters the user typed on the keyboard.
 
 ```ts
-mf.setOptions({
-  onInlineShortcut: (_mf, s) => {
-    if (/^[A-Z][a-z]+$/.test(s)) return `\\mathrm{${s}}`;
-    if (/^[a-z][a-z]+$/.test(s)) return `\\mathit{${s}}`;
-    return '';
-  },
-});
+mf.onInlineShortcut = (_mf, s) => {
+  if (/^[A-Z][a-z]+$/.test(s)) return `\\mathrm{${s}}`;
+  if (/^[a-z][a-z]+$/.test(s)) return `\\mathit{${s}}`;
+  return '';
+};
 ```
 
 You can use the `onInlineShortcut` handler to recognize arbitrary patterns.
 For example:
 
 ```ts
-mf.setOptions({
-  onInlineShortcut: (_mf, s) => {
-    if (/^[a-zA-Z][a-zA-Z0-9]*'?(_[a-zA-Z0-9]+'?)?$/.test(s)) {
-      const m = s.match(/^([a-zA-Z]+)([0-9]+)$/);
-      if (m) {
-        if (['alpha', 'beta', 'gamma'].includes(m[1]))
-          return `\\${m[1]}_{${m[2]}}`;
-        return `\\mathrm{${m[1]}}_{${m[2]}}`;
-      }
-      return '\\mathrm{' + s + '}';
+mf.onInlineShortcut = (_mf, s) => {
+  if (/^[a-zA-Z][a-zA-Z0-9]*'?(_[a-zA-Z0-9]+'?)?$/.test(s)) {
+    const m = s.match(/^([a-zA-Z]+)([0-9]+)$/);
+    if (m) {
+      if (['alpha', 'beta', 'gamma'].includes(m[1]))
+        return `\\${m[1]}_{${m[2]}}`;
+      return `\\mathrm{${m[1]}}_{${m[2]}}`;
     }
-    return '';
-  },
-});
+    return '\\mathrm{' + s + '}';
+  }
+  return '';
+};
 ```
 This will recognize "alpha34" -> `\alpha_{34}` or "speed" -> `\mathrm{speed}`.
 
@@ -276,7 +269,7 @@ This will recognize "alpha34" -> `\alpha_{34}` or "speed" -> `\mathrm{speed}`.
 ## Customizing the Inline Shortcut Sensitivity
 
 **To change how quickly a set of keys must be typed to be considered a shortcut**
-set the `inlineShortcutTimeout` option.
+set the `inlineShortcutTimeout` property.
 
 It represents the maximum amount of time, in milliseconds, between consecutive 
 characters for them to be considered part of the same shortcut sequence.
@@ -311,89 +304,88 @@ The most common ASCIIMath shortcuts are part of the default inline shortcuts.
 setting.
 
 ```js
-mf.setOptions({
-  inlineShortcuts: {
-    //
-    // ASCIIIMath
-    //
-   // Binary operation symbols
-    '*': '\\cdot',
-    '**': '\\ast',
-    '***': '\\star',
-    '//': '\\slash',
-    '\\\\\': '\\backslash',
-    'setminus': '\\backslash',
-    '|><': '\\ltimes',
-    '><|': '\\rtimes',
-    '|><|': '\\bowtie',
-    '-:': '\\div',
-    'divide': '\\div',
-    '@': '\\circ',
-    'o+': '\\oplus',
-    'ox': '\\otimes',
-    'o.': '\\odot',
-    '^^': '\\wedge',
-    '^^^': '\\bigwedge',
-    'vv': '\\vee',
-    'vvv': '\\bigvee',
-    'nn': '\\cap',
-    'nnn': '\\bigcap',
-    'uu': '\\cup',
-    'uuu': '\\bigcup',
+mf.inlineShortcuts = {
+  ...mf.inlineShortcuts,
+  //
+  // ASCIIIMath
+  //
+  // Binary operation symbols
+  '*': '\\cdot',
+  '**': '\\ast',
+  '***': '\\star',
+  '//': '\\slash',
+  '\\\\\': '\\backslash',
+  'setminus': '\\backslash',
+  '|><': '\\ltimes',
+  '><|': '\\rtimes',
+  '|><|': '\\bowtie',
+  '-:': '\\div',
+  'divide': '\\div',
+  '@': '\\circ',
+  'o+': '\\oplus',
+  'ox': '\\otimes',
+  'o.': '\\odot',
+  '^^': '\\wedge',
+  '^^^': '\\bigwedge',
+  'vv': '\\vee',
+  'vvv': '\\bigvee',
+  'nn': '\\cap',
+  'nnn': '\\bigcap',
+  'uu': '\\cup',
+  'uuu': '\\bigcup',
 
-    // Binary relation symbols
-    '-=': '\\equiv',
-    '~=': '\\cong',
-    'lt': '<',
-    'lt=': '\\leq',
-    'gt': '>',
-    'gt=': '\\geq',
-    '-<': '\\prec',
-    '-lt': '\\prec',
-    '-<=': '\\preceq',
-    // '>-': '\\succ',
-    '>-=': '\\succeq',
-    'prop': '\\propto',
-    'diamond': '\\diamond',
-    'square': '\\square',
-    'iff': '\\iff',
+  // Binary relation symbols
+  '-=': '\\equiv',
+  '~=': '\\cong',
+  'lt': '<',
+  'lt=': '\\leq',
+  'gt': '>',
+  'gt=': '\\geq',
+  '-<': '\\prec',
+  '-lt': '\\prec',
+  '-<=': '\\preceq',
+  // '>-': '\\succ',
+  '>-=': '\\succeq',
+  'prop': '\\propto',
+  'diamond': '\\diamond',
+  'square': '\\square',
+  'iff': '\\iff',
 
-    'sub': '\\subset',
-    'sup': '\\supset',
-    'sube': '\\subseteq',
-    'supe': '\\supseteq',
-    'uarr': '\\uparrow',
-    'darr': '\\downarrow',
-    'rarr': '\\rightarrow',
-    'rArr': '\\Rightarrow',
-    'larr': '\\leftarrow',
-    'lArr': '\\Leftarrow',
-    'harr': '\\leftrightarrow',
-    'hArr': '\\Leftrightarrow',
-    'aleph': '\\aleph',
+  'sub': '\\subset',
+  'sup': '\\supset',
+  'sube': '\\subseteq',
+  'supe': '\\supseteq',
+  'uarr': '\\uparrow',
+  'darr': '\\downarrow',
+  'rarr': '\\rightarrow',
+  'rArr': '\\Rightarrow',
+  'larr': '\\leftarrow',
+  'lArr': '\\Leftarrow',
+  'harr': '\\leftrightarrow',
+  'hArr': '\\Leftrightarrow',
+  'aleph': '\\aleph',
 
-    // Logic
-    'and': '\\land',
-    'or': '\\lor',
-    'not': '\\neg',
-    '_|_': '\\bot',
-    'TT': '\\top',
-    '|--': '\\vdash',
-    '|==': '\\models',
+  // Logic
+  'and': '\\land',
+  'or': '\\lor',
+  'not': '\\neg',
+  '_|_': '\\bot',
+  'TT': '\\top',
+  '|--': '\\vdash',
+  '|==': '\\models',
 
-    // Other functions
-    '|__': '\\lfloor',
-    '__|': '\\rfloor',
+  // Other functions
+  '|__': '\\lfloor',
+  '__|': '\\rfloor',
 
-    '|~': '\\lceiling',
-    '~|': '\\rceiling',
+  '|~': '\\lceiling',
+  '~|': '\\rceiling',
 
-    // Arrows
-    '>->': '\\rightarrowtail',
-    '->>': '\\twoheadrightarrow',
-    '>->>': '\\twoheadrightarrowtail'
-  }
-});
+  // Arrows
+  '>->': '\\rightarrowtail',
+  '->>': '\\twoheadrightarrow',
+  '>->>': '\\twoheadrightarrowtail'
+};
 ```
 
 </section>

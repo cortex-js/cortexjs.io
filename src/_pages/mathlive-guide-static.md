@@ -164,7 +164,7 @@ element.
 
 
 {% readmore "/mathlive/guides/virtual-keyboards/" %}
-**Next:** Define custom <strong>Virtual Keyboards</strong>
+**Next:** Define custom layouts for the <strong>Virtual Keyboard</strong>
 {% endreadmore %}
 
 
