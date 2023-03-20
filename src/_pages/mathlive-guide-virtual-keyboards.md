@@ -119,8 +119,8 @@ keyboard panel is visible by attaching it to the full screen element.
 **To select which DOM element the virtual keyboard is attached to**, set the
 `mathVirtualKeyboard.container` property to the desired DOM element.
 
-The container element should be at least 365px wide to ensure that the 
-default virtual layouts can fit. The height of the container element will be 
+The container element should be at least 320px wide to ensure that the 
+default layouts can fit. The height of the container element will be 
 adjusted so that the virtual keyboard can fit. {.notice--warning}
 
 
@@ -130,8 +130,8 @@ The virtual keyboard panel displays multiple layouts which can be
 toggled using the layout switcher: `numeric`, `functions`, `symbols`, `alphabetic` 
 and `greek`.
 
-**To choose which layouts are available**, use the `mathVirtualKeyboard.layouts` 
-property.
+**To choose which layouts are listed in the layout switcher**, use the 
+`mathVirtualKeyboard.layouts` property.
 
 For example, to only show the numeric and symbols layouts, use:
 
@@ -160,10 +160,10 @@ mathVirtualKeyboard.layouts = 'default';
 
 ## Defining Custom Layouts
 
-In addition to the built-in layouts, you can use layouts that you define.
+In addition to the built-in layouts, you can define your own layouts.
 
-**To use a custom layout** set the layout to an object literal with a `rows`
-property, an array of keycaps.
+**To use a custom layout** set `mathVirtualKeyboard.layouts` to an object 
+literal with a `rows` property, an array of keycaps.
 
 
 <code-playground layout="stack">
@@ -180,10 +180,10 @@ property, an array of keycaps.
 <div slot="javascript">mathVirtualKeyboard.layouts = {
   rows: [
     [
-      '+', '-', '\\times', '\\frac{#@}{#?}', '=', '.',
-      '(', ')', '\\sqrt{#0}', '#@^{#?}',
+      "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
+      "(", ")", "\\sqrt{#0}", "#@^{#?}",
     ],
-    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
   ]
 };</div>
 </code-playground>
@@ -192,11 +192,11 @@ property, an array of keycaps.
 ![](/assets/images/mathfield/custom-layout.png)
 
 Each keycap is a LaTeX string which is used both as the label of the keycap,
-and as the content to insert when the keycap is pressed.
+and as the content inserted when the keycap is pressed.
 
 
 You can also mix default layouts with your own. For example, to add the
-alphabetic layout after our own:
+alphabetic layout after your own:
 
 ```js
 mathVirtualKeyboard.layouts = [
@@ -205,22 +205,23 @@ mathVirtualKeyboard.layouts = [
     toolip: "Only the essential",
     rows: [
       [
-        '+', '-', '\\times', '\\frac{#@}{#?}', '=', '.',
-        '(', ')', '\\sqrt{#0}', '#@^{#?}',
+        "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
+        "(", ")", "\\sqrt{#0}", "#@^{#?}",
       ],
-      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+      ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
     ]
   }, 
-  'alphabetic'
+  "alphabetic"
 ];
 ```
 
-If you include more than one layout, it's a good idea to include a label
+If you include more than one layout, it's a good idea to provide a label
 and tooltip so they get propertly displayed in the layout switcher.
 
 ### Placeholder Tokens
 
-You'll notice that the LaTeX fragment can contain one of the following special placeholder tokens:
+You'll notice from the example above that the LaTeX fragments defining the 
+keycap can contain the following special placeholder tokens:
 
 <div class='symbols-table'>
 
@@ -228,7 +229,7 @@ You'll notice that the LaTeX fragment can contain one of the following special p
 |:-- | :-- |
 | `#@` |  Replaced with the selection, if there is one. If there is no selection, replaced with an implicit argument to the left of the caret. For example, for `12+34`, if the caret is at the end, `#@` would be replaced with `34`. |
 | `#0` |  replaced with the selection if there is one, a `\placeholder{}` command otherwise |
-| `#?` |  replaced a `\placeholder{}` command |
+| `#?` |  replaced with a `\placeholder{}` command |
 
 </div>
 
@@ -334,7 +335,7 @@ mathVirtualKeyboard.layouts = [
     toolip: "Only the essential",
     markup: "<ul><li>...</li></ul>"
   }, 
-  'alphabetic'
+  "alphabetic"
 ];
 
 ```
@@ -349,27 +350,27 @@ mathVirtualKeyboard.layouts = [
   {
     label: "minimal",
     toolip: "Only the essential",
-    styles: ".digit{ background: blue; color: white }",
+    styles: ".digit { background: blue; color: white }",
     rows: [
       [
-        '+', '-', '\\times', '\\frac{#@}{#?}', '=', '.',
-        '(', ')', '\\sqrt{#0}', '#@^{#?}',
+        "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
+        "(", ")", "\\sqrt{#0}", "#@^{#?}",
       ],
       [
-        {class: "digit", latex: '1'},
-        {class: "digit", latex: '2'},
-        {class: "digit", latex: '3'},
-        {class: "digit", latex: '4'},
-        {class: "digit", latex: '5'},
-        {class: "digit", latex: '6'},
-        {class: "digit", latex: '7'},
-        {class: "digit", latex: '8'},
-        {class: "digit", latex: '9'},
-        {class: "digit", latex: '0'},
+        {class: "digit", latex: "1"},
+        {class: "digit", latex: "2"},
+        {class: "digit", latex: "3"},
+        {class: "digit", latex: "4"},
+        {class: "digit", latex: "5"},
+        {class: "digit", latex: "6"},
+        {class: "digit", latex: "7"},
+        {class: "digit", latex: "8"},
+        {class: "digit", latex: "9"},
+        {class: "digit", latex: "0"},
       ],
     ]
   }, 
-  'alphabetic'
+  "alphabetic"
 ];
 
 ```
@@ -378,7 +379,7 @@ mathVirtualKeyboard.layouts = [
 ### Multiple Layers
 
 Most keyboard layouts are made of a single layer. However, if your layout 
-includes multiple layers (for example a layer accessible with a shifted key),
+includes multiple layers, for example a layer accessible with a shifted key,
 use the `layers` property to provide an array of layers.
 
 
@@ -388,14 +389,14 @@ mathVirtualKeyboard.layouts = {
     {
       rows: [
         [
-          '+', '-', '\\times', '\\frac{#@}{#?}', '=', '.',
-          '(', ')', '\\sqrt{#0}', '#@^{#?}',
+          "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
+          "(", ")", "\\sqrt{#0}", "#@^{#?}",
         ],
       ]
     },
     {
       rows: [
-        ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
       ]
     }
 
@@ -416,7 +417,7 @@ body {
 }
 ```
 
-Alternatively, you can set these CSS variables programmatically:
+You can also set these CSS variables programmatically:
 
 ```js
 document.body.style.setProperty("--keyboard-zindex", "3000");
@@ -481,7 +482,7 @@ use the `mathVirtualKeyboard.alphabeticLayout` property.
       outline: none;
     }
   </style>
-  <div slot="javascript">import 'mathlive';
+  <div slot="javascript">import "mathlive";
 mathVirtualKeyboard.alphabeticLayout = "dvorak";
 </div>
     <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
