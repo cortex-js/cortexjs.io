@@ -15,14 +15,6 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
 ---
-<script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-        "html-to-image": "///assets/js/html-to-image.js",
-    };
-</script>
-
-
 A mathfield web component goes through various stages during its lifecycle.
 
 In most cases, this is something you don't have to pay much attention to. Just 

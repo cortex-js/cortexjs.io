@@ -16,54 +16,51 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
----
-<script>
-  moduleMap = {
-    mathlive: "//unpkg.com/mathlive?module",
+    - //unpkg.com/mathlive?module
+  moduleMap: |
+    window.moduleMap = {
+    "mathlive": "//unpkg.com/mathlive?module",
+    // "mathlive": "/js/mathlive.mjs",
     "html-to-image": "///assets/js/html-to-image.js",
-    "compute-engine": "https://unpkg.com/@cortex-js/compute-engine?module"
-  };
-</script>
+    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
+    };
 
+---
 ## Changing the Content of a Mathfield
 
 **To change the value of a `<math-field>` element programatically** set its `value` 
 property.
 
 In the playground below, the **LaTeX** input field is editable and is reflected 
-in the mathfield (and vice-versa).
+in the mathfield, and vice-versa.
 
 Note that we use the `suppressChangeNotifications` option when
 changing the content of the mathfield, to prevent an `"input"` event from being 
 triggered and creating an infinite loop.{.notice--info}
 
 <code-playground layout="stack">
-  <div slot="javascript">import 'mathlive';
-    const mf = document.getElementById('formula');
-    mf.addEventListener('input',(ev) => {
-        document.getElementById('latex').value = mf.value;
-    });
+  <div slot="javascript">
+const mf = document.getElementById("formula");
+const latex = document.getElementById("latex");
 //
-    document.getElementById('latex').value = mf.value;
+mf.addEventListener("input",(ev) => latex.value = mf.value);
 //
-    // Listen for changes in the latex text field, and reflect its value in 
-    // the mathfield.
+latex.value = mf.value;
 //
-    document.getElementById('latex').
-      addEventListener('input', (ev) => {
-        mf.setValue(
-          ev.target.value, 
-          {suppressChangeNotifications: true}
-        );
-    });
+// Listen for changes in the "latex" text field, and reflect its value in 
+// the mathfield.
+//
+latex.addEventListener("input", (ev) => 
+    mf.setValue( ev.target.value, {suppressChangeNotifications: true})
+);
   </div>
   <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
   &lt;math-field id="formula"&gt;
-  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+      x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
   &lt;/math-field&gt;                
   &lt;label&gt;Latex&lt;/label&gt;
   <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
-  autocorrect="off" spellcheck="false"></textarea></textarea>
+  autocorrect="off" spellcheck="false"></textarea>
   </div>
 </code-playground>
 
@@ -101,7 +98,7 @@ loses focus and the content has been modified. {.notice--info}
   // `ev.target` is an instance of `MathfieldElement`
   console.log(ev.target.value);
 });</div>
-    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
+    <div slot="html">
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -119,7 +116,7 @@ For example to get the content as a MathJSON expression, use `getValue('math-jso
 **Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `"math-json"` to `"spoken-text"`.{.notice--info}
 
 <code-playground layout="stack">
-    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
+    <div slot="html">
 &lt;math-field id="formula"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -348,7 +345,7 @@ the content of the formula, see [Customizing](mathlive/guides/customizing/). {.n
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
+    <div slot="javascript">
 const mf = document.getElementById('formula');
 // Change the background color of the entire mathfield
 mf.applyStyle(
@@ -378,7 +375,7 @@ to `applyStyle()`.
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
+    <div slot="javascript">
 const mf = document.getElementById('formula');
 // Change the color and size of the first two characters of the mathfield
 mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
@@ -418,4 +415,5 @@ You can ignore styles applied to a formula by using `mf.getValue('latex-unstyled
 {% readmore "/mathlive/guides/lifecycle/" %}
 **Next:** Understand in depth the <strong>Lifecycle of a MathfieldElement</strong>: construction, interaction with the DOM and when you can communicate with it
 {% endreadmore %}
+
 

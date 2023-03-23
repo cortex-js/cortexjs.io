@@ -16,14 +16,15 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
----
-<script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-        "html-to-image": "///assets/js/html-to-image.js",
+    - //unpkg.com/mathlive?module
+  moduleMap: |
+    window.moduleMap = {
+    "mathlive": "//unpkg.com/mathlive?module",
+    // "mathlive": "/js/mathlive.mjs",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
     };
-</script>
-
+---
 # Getting Started
 
 Let's add an editable mathfield to a web page.

@@ -16,14 +16,15 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
----
-<script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-        "html-to-image": "///assets/js/html-to-image.js",
+    - //unpkg.com/mathlive?module
+  moduleMap: |
+    window.moduleMap = {
+    "mathlive": "//unpkg.com/mathlive?module",
+    // "mathlive": "/js/mathlive.mjs",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
     };
-</script>
-
+---
 ## Key Bindings
 
 A **key binding** is a combination of keys pressed simultaneously on a physical 
@@ -48,8 +49,7 @@ for a `keydown` event.
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.addEventListener('keydown', (ev) => {
   if (ev.altKey === true && ev.code === 'KeyS') {
     mf.insert('\\sum^\\infty_{n=0}');
@@ -170,8 +170,7 @@ defined, but they can be replaced or enhanced with additional shortcuts.
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.inlineShortcuts = 
   ...mf.inlineShortcuts,    // Preserve default shortcuts
   "infty": '\\infty'

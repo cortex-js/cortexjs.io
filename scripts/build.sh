@@ -60,6 +60,12 @@ then
   cat ../mathlive/CHANGELOG.md >> ./src/build/mathlive/changelog.md
 fi
 
+## Copy MathLive library
+# echo "Copying MathLive Library"
+# mkdir ./src/build/js/
+# cp ../mathlive/dist/mathlive.mjs ./src/build/js/
+
+
 
 ## Build the guides from the source directories
 echo -e "$BASENAME$DOT Building guides"

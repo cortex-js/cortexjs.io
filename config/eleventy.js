@@ -172,6 +172,8 @@ module.exports = function (eleventyConfig) {
   // // Copy the `src/build` directory to the compiled site folder
   eleventyConfig.addPassthroughCopy({ 'src/build/css': 'assets/css' });
 
+  eleventyConfig.addPassthroughCopy({ 'src/build/js': 'js' });
+
   eleventyConfig.setDataDeepMerge(true);
 
   eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');

@@ -18,8 +18,16 @@
 <link rel="icon" href="data:," />
 
 <script>
-  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+  document.documentElement.classList.remove("no-js");
+  document.documentElement.classList.add("js");
 </script>
+
+{% if head.moduleMap %}
+<script>
+  {{ head.moduleMap }}
+</script>
+{% endif %}
+
 
 {% if head.scripts %}
   {% for x in head.scripts %}
@@ -28,7 +36,7 @@
     {% else %}
       {% capture script_path %}{{ x | url }}{% endcapture %}
     {% endif %}
-    <script defer src="{{ script_path }}" crossorigin='anonymous'></script>
+    <script defer src="{{ script_path }}" crossorigin="anonymous"></script>
   {% endfor %}
 {% endif %}
 
@@ -39,7 +47,7 @@
     {% else %}
       {% capture script_path %}{{ x | url }}{% endcapture %}
     {% endif %}
-    <script defer type="module" src="{{ script_path }}" crossorigin='anonymous'></script>
+    <script defer type="module" src="{{ script_path }}" crossorigin="anonymous"></script>
   {% endfor %}
 {% endif %}
 

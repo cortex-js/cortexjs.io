@@ -15,12 +15,6 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
 ---
-<script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-        "html-to-image": "///assets/js/html-to-image.js",
-    };
-</script>
 ## Using Speech Output in MathLive
 
 **To speak the formula or a portion of it**, use these keyboard shortcuts:

@@ -15,13 +15,8 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
+    - //unpkg.com/mathlive?module
 ---
-<script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
-    };
-</script>
-
 # Macros
 
 MathLive has over [800 LaTeX commands](/mathlive/reference/commands/) 
@@ -46,8 +41,7 @@ turned off.
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
     minutes: '\\,{}^\\prime\\;',
     seconds: '\\,\\doubleprime\\;',
@@ -71,8 +65,7 @@ The macro definition can contain up to eight arguments, represented by `#1` to `
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros, 
   smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
 };
@@ -100,8 +93,7 @@ in the expanded definition of a macro.
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros,
   smallfrac: {
     args: 2,
@@ -128,8 +120,7 @@ mf.macros = {...mf.macros,
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros, diamonds: undefined };
 });
 </div>
@@ -163,8 +154,7 @@ editing mode.
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros,
     minutes: '\\,{}^\\prime\\;',
     seconds: '\\,\\doubleprime\\;',
@@ -199,8 +189,7 @@ mf.inlineShortcuts = {...mf.inlineShortcuts,
         outline: none;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-const mf = document.getElementById('mf');
+    <div slot="javascript">const mf = document.getElementById('mf');
 console.log(mf.macros);
 </div>
     <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;

@@ -16,13 +16,15 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
----
-<script>
-    moduleMap = {
-        "mathlive": "//unpkg.com/mathlive?module",
-        "html-to-image": "///assets/js/html-to-image.js",
+    - //unpkg.com/mathlive?module
+  moduleMap: |
+    window.moduleMap = {
+    "mathlive": "//unpkg.com/mathlive?module",
+    // "mathlive": "/js/mathlive.mjs",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
     };
-</script>
+---
 Typing math formulas require access to many special symbols. While [keyboard 
 shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help when a 
 physical keyboard is available, touch-enabled devices without a physical 
@@ -482,8 +484,7 @@ use the `mathVirtualKeyboard.alphabeticLayout` property.
       outline: none;
     }
   </style>
-  <div slot="javascript">import "mathlive";
-mathVirtualKeyboard.alphabeticLayout = "dvorak";
+  <div slot="javascript">mathVirtualKeyboard.alphabeticLayout = "dvorak";
 </div>
     <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;

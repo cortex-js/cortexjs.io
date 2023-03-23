@@ -15,12 +15,17 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
+    - //unpkg.com/mathlive?module
+    - //unpkg.com/@cortex-js/compute-engine?module
+  moduleMap: |
+    window.moduleMap = {
+    "mathlive": "//unpkg.com/mathlive?module",
+    // "mathlive": "/js/mathlive.mjs",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
+    };
 ---
 <script>
-  moduleMap = {
-    "mathlive": "//unpkg.com/mathlive/dist/mathlive.mjs",
-    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
-  };
   window.addEventListener('DOMContentLoaded', (event) => 
       import('//unpkg.com/mathlive/dist/mathlive.mjs').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive + ' (debug)'
   ));
@@ -57,7 +62,7 @@ Try a demo of the **Compute Engine**.
         border: var(--ui-border);
         padding: 8px;
       }
-      .output math-field { font-size: 24px; } 
+      .output math-field { font-size: 24px; border-radius: 8px; } 
       .output math-field:focus-within {
         outline: Highlight auto 1px;
         outline: -webkit-focus-ring-color auto 1px
@@ -67,9 +72,7 @@ Try a demo of the **Compute Engine**.
         font-family: var(--monospace-font-family), 'IBM Plex Mono', 'Fira Code', 'Source Code Pro',   monospace;
       }
     </style>
-    <div slot="javascript">import 'mathlive';
-import  'compute-engine';
-const mf = document.querySelector('#formula');
+    <div slot="javascript">const mf = document.querySelector('#formula');
 const latexField = document.querySelector('#latex');
 //
 latexField.addEventListener('input', () => mf.setValue(latexField.value));

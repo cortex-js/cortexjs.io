@@ -17,13 +17,14 @@ head:
   modules:
     - /assets/js/code-playground.min.js
     - //unpkg.com/mathlive?module
----
-<script>
-    moduleMap = {
-        mathlive: "//unpkg.com/mathlive?module",
+  moduleMap: |
+    window.moduleMap = {
+    "mathlive": "//unpkg.com/mathlive?module",
+    // "mathlive": "/js/mathlive.mjs",
+    "html-to-image": "///assets/js/html-to-image.js",
+    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
     };
-</script>
-
+---
 # Static Math Formulas
 
 **To render math contained in a document as a static (non-editable) formula**, 
