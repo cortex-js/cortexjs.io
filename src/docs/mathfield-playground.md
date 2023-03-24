@@ -524,6 +524,8 @@ Learn more about MathJSON and try a demo of the **Compute Engine**.
 
   <tr><td><kbd>p</kbd><kbd>i</kbd></td><td>$$\pi$$</td><td>Pi</td></tr>
 
+  <tr><td><kbd>o</kbd><kbd>o</kbd></td><td>$$\infty$$</td><td>Infinity</td></tr>
+
   <tr><td><kbd>x</kbd><kbd>x</kbd></td><td>$$\times$$</td><td>Times</td></tr>
 
 
