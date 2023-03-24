@@ -47,7 +47,9 @@ of the mathfield, as a LaTeX expression.
 
 ## Try it Out
 
-**In the code playground below, change line 3 of the HTML to another LaTeX expression.**<br>For example `f(x) = \frac{x}{2}`.
+**In the code playground below, change the content inside the `<math-field>` tag.**
+
+For example change it to `f(x) = \frac{x}{2}`.
 
 **Note:** The code playground here and in the rest of the documentation are live: when you modify the HTML or JavaScript code the output will update to reflect your changes.
 <br>Press **Reset** to bring back the playground to its original state. {.notice--info}
@@ -63,15 +65,12 @@ of the mathfield, as a LaTeX expression.
         outline: none;
       }
     </style>
-    <div slot="html">&lt;script src="//unpkg.com/mathlive"&gt;&lt;/script&gt;
-&lt;math-field&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+    <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
 </code-playground>
 
 
 
- <div class="notice--warning" markdown="1">
+<div class="notice--warning" markdown="1">
 
 #### Caution
 The HTML quirks mode is not supported. This means that the host page
@@ -80,6 +79,21 @@ of the page. Without it, the layout of the equations inside the mathfield may be
 
 </div>
 
+Here's a complete web page:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>untitled</title>
+    <script defer src="//unpkg.com/mathlive"></script>
+  </head>
+  <body>
+    <math-field>x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}</math-field>
+  </body>
+</html>
+```
 
 
 
