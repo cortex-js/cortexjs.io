@@ -131,8 +131,8 @@ The shortcuts in this section apply in all modes.
 | `⇧` `⌃` `N` | extend selection downward | |
 | `⇧` `⌃` `A` | extend to math field start | |
 | `⇧` `⌃` `E` | extend to math field end | |
-| `⌥` `⌃` B` | move to previous word | |
-| `⌥` `⌃` F` | move to next word | |
+| `⌥` `⌃` `B` | move to previous word | |
+| `⌥` `⌃` `F` | move to next word | |
 | `⇧` `⌥` `⌃` `B` | extend to previous word | |
 | `⇧` `⌥` `⌃` `F` | extend to next word | |
 | `⌃` `H` | delete backward | |

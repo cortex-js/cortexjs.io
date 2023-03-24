@@ -171,7 +171,7 @@ defined, but they can be replaced or enhanced with additional shortcuts.
       }
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
-mf.inlineShortcuts = 
+mf.inlineShortcuts = {
   ...mf.inlineShortcuts,    // Preserve default shortcuts
   "infty": '\\infty'
 };
@@ -185,7 +185,7 @@ mf.inlineShortcuts =
 property:
 
 ```javascript
-mf.inlineShortcuts =
+mf.inlineShortcuts = {
 ...mf.inlineShortcuts,    // Preserve default shortcuts
   in: {
       after: 'space | letter | digit | symbol | fence',
