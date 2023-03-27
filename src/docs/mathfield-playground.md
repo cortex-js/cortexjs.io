@@ -47,10 +47,10 @@ head:
     font-size: 24px; border-radius: 8px; 
     width: 100%;
   } 
-  math-field:focus-within {
+  /* math-field:focus-within {
     outline: Highlight auto 1px;
     outline: -webkit-focus-ring-color auto 1px
-  }
+  } */
   #latex {
     margin-top: 1em;
     font-family: var(--monospace-font-family), 'IBM Plex Mono', 'Fira Code', 'Source Code Pro',   monospace;

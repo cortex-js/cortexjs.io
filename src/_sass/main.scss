@@ -133,6 +133,31 @@ a.chevron::after {
   border-radius: 8px;
 }
 
+code-playground math-field {
+  background-color: field;
+}
+
+math-field {
+  border-radius: 8px;
+  color: var(--text-color);
+  background: var(--ui-background);
+}
+
+
+
+@media (prefers-color-scheme: dark) {
+    :root {
+    --selection-background-color: var(--primary-color);
+    --selection-color: #fff;
+  }
+
+  math-field:focus-within {
+    outline: var(--primary-color) solid 2px;
+  }
+
+}
+
+
 @media (prefers-color-scheme: dark) {
   .page__content p.xl {
     color: var(--blue-50);
