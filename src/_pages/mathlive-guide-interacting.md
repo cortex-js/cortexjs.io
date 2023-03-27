@@ -193,6 +193,15 @@ use the keyboard. This behavior matches the `<textarea>` element.
 keyboard** listen for an `input` event with an `inputType` property of `"insertLineBreak"`.
 
 
+```js
+mf.addEventListener('beforeinput', (ev) => {
+  if (ev.inputType === 'insertLineBreak') {
+    mf.executeCommand("moveToNextPlaceholder");
+    ev.preventDefault();
+  };
+});
+```
+
 
 ## Detecting a Click on a Mathfield
 
