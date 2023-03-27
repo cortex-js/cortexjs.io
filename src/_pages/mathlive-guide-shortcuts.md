@@ -30,43 +30,34 @@ head:
 A **key binding** is a combination of keys pressed simultaneously on a physical 
 keyboard that triggers a command.
 
-For example, pressing <kbd>Alt/Option/⌥</kbd> and the <kbd>V</kbd> key at the 
-same time will insert a square root. Pressing <kbd>Control/Command/⌘</kbd> and the 
-<kbd>Z</kbd> key at the same time will undo the last command.
+For example, pressing the <kbd>Alt/Option/⌥</kbd> key and the <kbd>V</kbd> key at the 
+same time will insert a square root. Pressing the <kbd>Control/Command/⌘</kbd> 
+key and the <kbd>Z</kbd> key at the same time will undo the last command.
 
 MathLive has an extensive set of [default key bindings](https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts). 
 
-**To override, customize or add to the list of supported key bindings**, listen 
-for a `keydown` event.
+**To override, customize or add to the list of supported key bindings**, set
+the `keybindings` property on a mathfield element.
 
-<code-playground layout="stack">
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="javascript">const mf = document.getElementById('mf');
-mf.addEventListener('keydown', (ev) => {
-  if (ev.altKey === true && ev.code === 'KeyS') {
-    mf.insert('\\sum^\\infty_{n=0}');
-    ev.preventDefault();
-  }
-});
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
-</code-playground>
+```js
+const mf = document.getElementById('mf');
+mf.keybindings = [
+  ...mf.keybindings,  // preserve existing keybindings
+  {
+    key: 'ctrl+alt+shift+[KeyT]',
+    ifMode: 'math',
+    command: ['switchMode', 'text'],
+  },
+  {
+    key: 'ctrl+alt+shift+[KeyT]',
+    ifMode: 'text',
+    command: ['switchMode', 'math'],
+  },
+];
+```
 
-Call `ev.preventDefault()` to stop handling of the event, otherwise the default 
-command (if any) associated with this keystroke will be processed.
 
-When using `insert()`, the LaTeX fragment argument of the function can include
+If using an `insert` command, the LaTeX fragment argument of the function can include
 one of the following special placeholder tokens:
 
 - `#@`: replaced with the selection, if there is one. If there is no selection,

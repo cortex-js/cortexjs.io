@@ -7,28 +7,17 @@ sidebar:
     - nav: "universal"
 version: MathLive version
 head:
-  stylesheets:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css
-  scripts:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
-    - /assets/js/code-playground.min.js
-    - //unpkg.com/mathlive?module
     - //unpkg.com/@cortex-js/compute-engine?module
-  moduleMap: |
-    window.moduleMap = {
-    "mathlive": "//unpkg.com/mathlive?module",
-    // "mathlive": "/js/mathlive.mjs",
-    "html-to-image": "///assets/js/html-to-image.js",
-    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
-    };
+  # preloadMathliveFonts: true
 ---
 <script>
   window.addEventListener('DOMContentLoaded', (event) => 
-      import('//unpkg.com/mathlive/dist/mathlive.mjs').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive + ' (debug)'
+      import('//unpkg.com/mathlive/dist/mathlive.min.mjs').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive
   ));
+  customElements.whenDefined('math-field').then(() =>   
+      document.body.classList.add('ready')
+  )
 </script>
 
 # MathLive Demo
@@ -36,6 +25,15 @@ head:
 
 
 <style>
+  body {
+    visibility: hidden;
+  }
+  body.ready {
+    visibility: visible;
+  }
+  body.font-loading {
+    visibility: visible;
+  }
   textarea {
     color: var(--ui-color);
     background: var(--ui-background);
@@ -129,9 +127,70 @@ head:
     font-weight: bold;
   }
 
-  table.shortcuts {
+  div.shortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em;
+    font-size: 1.5rem;
+    gap: .5em;
 
   }
+
+.shortcuts .cell {
+  display: flex;
+  flex-flow: column;
+  width: 180px;
+  height: 180px;
+  font-size: 16px;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+  border: 1px solid var(--table-thin-line-color);
+  background: var(--card-background--alternate); // #f5f5f5;
+}
+
+.shortcuts .label {
+  padding-top: .25em;
+  padding-bottom: .5em;
+  /* opacity: 0.7; */
+  color: var(--text-color-dimmed);
+}
+  .shortcuts .result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    min-height:70px;
+    color: var(--text-color);
+  }
+  .shortcuts .shortcut {
+    display: flex;
+    flex-flow: row;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .shortcuts .shortcut kbd {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    font-family: var(--ui-font-family);
+    font-variant-ligatures: none;
+  }
+
+  .shortcuts .shortcut.small {
+    font-size: 12px;
+    }
+
+  .shortcuts .shortcut.small kbd {
+    min-width: 24px;
+  }
+
+  .shortcuts .shortcut + .shortcut {
+    padding-top: 8px;
+  }
+
 
 </style>
 <script type="module">
@@ -139,7 +198,7 @@ head:
 
 await customElements.whenDefined('math-field');
 
-import {renderMathInDocument} from '//unpkg.com/mathlive?module';
+import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
 
 
 const INDENT = '  ';
@@ -502,47 +561,98 @@ Learn more about MathJSON and try a demo of the **Compute Engine**.
 
 <h2 id="shortcuts">Keyboard Shortcuts</h2>
 
-<table class='shortcuts'>
-<thead>
-<tr><th>Shortcut</th><th>Result</th><th></th></tr>
-</thead>
-<tbody>
 
-  <tr><td><kbd>/</kbd></td><td>$$ \frac{\blacksquare}{\blacksquare}$$</td><td>Fraction</td></tr>
+<div class="shortcuts">
 
-  <tr><td><kbd>^</kbd></td><td>$$ \square^\blacksquare$$</td><td>Superscript, Power</td></tr>
+  <div class="cell">
+  <div class="result">$$ \frac{\blacksquare}{\blacksquare}$$</div>
+  <div class="label">Fraction</div>
+  <div class="shortcut"><kbd>/</kbd></div>
+  </div>
 
-  <tr><td><kbd>_</kbd></td><td>$$ \square_\blacksquare$$</td><td>Subscript</td></tr>
+  <div class="cell">
+  <div class="result">$$ \square^\blacksquare$$</div>
+  <div class="label">Superscript, Power</div>
+  <div class="shortcut"><kbd>^</kbd></div>
+  <div class="shortcut small">(<kbd>⇧</kbd>+<kbd>6</kbd>)</div>
+  </div>
 
-  <tr><td><kbd>alt/option</kbd> + <kbd>V</kbd></td><td>$$\sqrt{\blacksquare}$$</td><td>Square root</td></tr>
-  
-  <tr><td><kbd>alt/option</kbd> + <kbd>B</kbd></td><td>$$\int^{\blacksquare}_{\blacksquare}$$</td><td>Integral</td></tr>
+  <div class="cell">
+  <div class="result">$$\square_\blacksquare$$</div>
+  <div class="label">Subscript</div>
+  <div class="shortcut"><kbd>_</kbd></div>
+  </div>
 
-  <tr><td><kbd>alt/option</kbd> + <kbd>W</kbd></td><td>$$\sum$$</td><td>Sum</td></tr>
+  <div class="cell">
+  <div class="result">$$\sqrt{\blacksquare}$$</div>
+  <div class="label">Square root</div>
+  <div class="shortcut"><kbd>⌥</kbd> + <kbd>V</kbd></div>
+  </div>
 
-  <tr><td><kbd>alt/option</kbd> + <kbd>shift</kbd> + <kbd>P</kbd></td><td>$$\prod^\blacksquare_\blacksquare$$</td><td>Product</td></tr>
+  <div class="cell">
+  <div class="result">$$\int^{\blacksquare}_{\blacksquare}$$</div>
+  <div class="label">Integral</div>
+  <div class="shortcut"><kbd>⌥</kbd> + <kbd>B</kbd></div>
+  </div>
 
-  <tr><td><kbd>p</kbd><kbd>i</kbd></td><td>$$\pi$$</td><td>Pi</td></tr>
+  <div class="cell">
+  <div class="result">$$\sum$$</div>
+  <div class="label">Sum</div>
+  <div class="shortcut"><kbd>⌥</kbd> + <kbd>W</kbd></div>
+  </div>
 
-  <tr><td><kbd>o</kbd><kbd>o</kbd></td><td>$$\infty$$</td><td>Infinity</td></tr>
+  <div class="cell">
+  <div class="result">$$\prod^\blacksquare_\blacksquare$$</div>
+  <div class="label">Product</div>
+  <div class="shortcut"><kbd>⌥</kbd> + <kbd>⇧</kbd> + <kbd>P</kbd></div>
+  </div>
 
-  <tr><td><kbd>x</kbd><kbd>x</kbd></td><td>$$\times$$</td><td>Times</td></tr>
+  <div class="cell">
+  <div class="result">$$ \pi$$</div>
+  <div class="label">Pi</div>
+  <div class="shortcut"><kbd>P</kbd><kbd>I</kbd></div>
+  </div>
+
+  <div class="cell">
+  <div class="result">$$ \infty$$</div>
+  <div class="label">Infinity</div>
+  <div class="shortcut"><kbd>O</kbd><kbd>O</kbd></div>
+  </div>
+
+  <div class="cell">
+  <div class="result">$$ \pm$$</div>
+  <div class="label">Plus or minus</div>
+  <div class="shortcut"><kbd>+</kbd><kbd>-</kbd></td></div>
+  </div>
+
+  <div class="cell">
+  <div class="result">$$ \mathbb{R}$$</div>
+  <div class="label">Blakckboard R</div>
+  <div class="shortcut"><kbd>⇧</kbd>+<kbd>R</kbd><kbd>⇧</kbd>+<kbd>R</kbd></div>
+  </div>
+
+</div>
+
+<div class="shortcuts" style="margin-top: 1em">
+  <div class="cell">
+  <div class="label">Enter/exit LaTeX mode</div>
+  <div class="shortcut"><kbd>ESC</kbd></div>
+  </div>
+
+  <div class="cell">
+  <div class="label">Enter/exit text mode</div>
+  <div class="shortcut"><kbd>"</kbd></div>
+  <div class="shortcut small">(<kbd>⇧</kbd>+<kbd>'</kbd>)</div>
+  </div>
 
 
-  <tr><td><kbd>+</kbd><kbd>-</kbd></td><td>$$\pm$$</td><td>Plus or minus</td></tr>
 
-  <tr><td><kbd>R</kbd><kbd>R</kbd></td><td>$$\mathbb{R}$$</td><td>Blakckboard R</td></tr>
-
-  <tr><td><kbd>ESC</kbd></td><td></td><td>Enter/exit LaTeX mode</td></tr>
-
-  <tr><td><kbd>"</kbd></td><td>$$ \text{text}$$</td><td>Enter/exit text mode</td></tr>
+</div>
 
 
-</tbody>
-</table>
 
 {% readmore "/mathlive/reference/keybindings/" %}
-Read more about all the available **shortcuts**.
+Read more about all the available **key bindings** and **shortcuts**.
 {% endreadmore %}
 
 

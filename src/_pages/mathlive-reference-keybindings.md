@@ -11,20 +11,94 @@ render_math_in_document: true
 ---
 
 <style>
-  td:nth-child(1) code {
+  td:nth-child(1) code, td:nth-child(1) kbd {
+    display: inline-block;
+    min-width: 42px;
+    text-align: center;
     font-size: 24px;
     font-weight:normal;
     margin: 8px;
-    line-height: 1.5
+    line-height: 1.5;
+    font-variant-ligatures: none;
   }
   table {
     table-layout: auto;
   }
+  table tr td {
+    vertical-align: middle;
+  }
   table tr td:first-child {
     min-width: 15ex;
     width: 1ex;
-    white-space: nowrap;  
+    white-space: nowrap;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--primary-color-dark);
   }
+
+  kbd {
+    font-family: var(--ui-font-family);
+    padding-left: 4px;
+    padding-right: 4px;
+  
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 0.8em;
+    border: var(--code-border);
+    background: var(--code-background);
+    border-radius: 4px;
+    color: var(--primary-color-dark);
+  }
+
+  table td code {
+    border: none;
+    background: none;
+  }
+
+  #special-keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em;
+    font-size: 1.5rem;
+  }
+
+  #special-keys > div {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    width: 8em;
+    height: 8em;
+    font-size: 1rem;
+  }
+
+  #special-keys > div > kbd:first-child {
+    display: flex;
+    width: 96px;
+    height: 64px;
+    
+    font-size: 32px;
+    justify-content: center;
+    align-items: center;
+  }
+
+    #special-keys > div > span, 
+    #special-keys > div > kbd:nth-child(2) {
+      width: 100%;
+      text-align: center;
+      padding: 0;
+      border: none;
+      background: none;
+    }
+    #special-keys .label {
+      font-size: 16px;
+    }
+    #special-keys  .label kbd {
+      padding: 0;
+      border: none;
+      background: none;
+      font-weight: 600;
+    }
+
 </style>
 
 ## Keybindings
@@ -32,185 +106,183 @@ render_math_in_document: true
 Commands to edit and modify a formula can be invoked by pressing some key 
 combinations.
 
+The keybinding below are applicable to a US QWERTY keyboard. Some of the
+keybindings may not be available with other keyboard layouts.{.notice--info}
+
+{% readmore "/mathlive/reference/shortcuts/" %}
+Read more about definining your own **keybindings** and **shortcuts**.
+{% endreadmore %}
+
+
+
 
 ### Special Keys
 
 
-|  | |
-| :--- | :--- |
-| `⇧` | `Shift` | 
-| `⌃` | `Ctrl` or `Control` |
-| `⌥` | `Option` or `Alt` |
-| `⌫` | `Del` |
-| `⌦` | `Backspace` |
-| `⌘` | `Command` (macOS) or `Ctrl` (Windows) |
-| `⤒` | `Home` | 
-| `⤓` | `End` | 
-| `⇞` | `Page Up` |
-| `⇟` | `Page Down` |
-| `⏎` | `Return` |
-| `⌤` | `Enter` |
-| `⇥` | `Tab` |
+<div id='special-keys'>
+  <div> <kbd>⇧</kbd><span class="label"><kbd>Shift</kbd></div> 
+   <div> <kbd>⌃</kbd><span class="label"><kbd>Ctrl</kbd> or <kbd>Control</kbd></span></div>
+   <div> <kbd>⌥</kbd><span class="label"><kbd>Option</kbd> or <kbd>Alt</kbd></span></div>
+   <div> <kbd>⌫</kbd><span class="label"><kbd>Backspace</kbd></span></div>
+   <div> <kbd>⌦</kbd><span class="label"><kbd>Del</kbd></span></div>
+   <div> <kbd>⌘</kbd><span class="label"><kbd>Command</kbd> (macOS) or<br><kbd>Ctrl</kbd> (Windows)</span></div>
+   <div> <kbd>⤒</kbd><span class="label"><kbd>Home</kbd></span></div> 
+   <div> <kbd>⤓</kbd><span class="label"><kbd>End</kbd></span></div> 
+   <div> <kbd>⇞</kbd><span class="label"><kbd>Page Up</kbd></span></div>
+   <div> <kbd>⇟</kbd><span class="label"><kbd>Page Down</kbd></span></div>
+   <div> <kbd>⏎</kbd><span class="label"><kbd>Return</kbd></span></div>
+   <div> <kbd>⌤</kbd><span class="label"><kbd>Enter</kbd></span></div>
+   <div> <kbd>⇥</kbd><span class="label"><kbd>Tab</kbd></span></div>
+</div>
+
 
 ### All Modes
 
-The shortcuts in this section apply in all modes.
+The keybindings in this section apply in all modes (math, text and LaTeX).
 
-| Keybinding | Result | OS |
-| :--- | :--- | ---: |
-| `⇠` | move to previous char | |
-| `⇢` | move to next char | |
-| `⇡` | move up | |
-| `⇣` | move down | |
-| `⇧` `⇠` | extend selection backward | |
-| `⇧` `⇢` | extend selection forward | |
-| `⇧` `⇡` | extend selection upward | |
-| `⇧` `⇣` | extend selection downward | |
-| `⌫` | delete backward | |
-| `⌥` `⌦` | 〃 | |
-| `⌦` | delete forward | |
-| `⌥` `⌫` | 〃 | |
-| `⌥` `⇠` | move to previous word | |
-| `⌥` `⇢` | move to next word | |
-| `⇧` `⌥` `⇠` | extend to previous word | |
-| `⇧` `⌥` `⇢` | extend to next word | |
-| `⌃` `⇠` | move to group start | |
-| `⌃` `⇢` | move to group end | |
-| `⇧` `⌃` `⇠` | extend to group start | |
-| `⇧` `⌃` `⇢` | extend to group end | |
-| `space` | move after parent | |
-| `⇧` `space` | move before parent | |
-| `⤒` | move to math field start | |
-| `⌘` `⇠` | 〃 | |
-| `⇧` `⤒` | extend to math field start | |
-| `⇧` `⌘` `⇠` | 〃 | |
-| `⤓` | move to math field end | |
-| `⌘` `⇢` | 〃 | |
-| `⇧` `⤓` | extend to math field end | |
-| `⇧` `⌘` `⇢` | 〃 | |
-| `⇞` | move to group start | |
-| `⇟` | move to group end | |
-| `⇥` | move to next placeholder | |
-| `⇧` `⇥` | move to previous placeholder | |
-| `⇥` | move to next placeholder | |
-| `⇧` `⇥` | move to previous placeholder | |
-| `esc` | switchMode("latex") | |
-| `\` | 〃 | |
-| `Intl Backslash` | 〃 | |
-| `⌥` `=` | applyStyle({"mode":"text"}) | |
-| `⌥` `=` | 〃 | |
-| `esc` | complete("complete") | |
-| `⇥` | In LaTeX mode: accept-suggestion | |
-| `⏎` | complete | |
-| `⌤` | 〃 | |
-| `⇧esc` | complete("reject") | |
-| `⌃` `A` | select all | |
-| `⌘` `A` | 〃 | |
-| `Cut` | cut to clipboard | |
-| `Copy` | copy to clipboard | |
-| `Paste` | paste from clipboard | |
-| `Clear` | delete backward | |
-| `⌃` `Z` | undo | |
-| `⌘` `Z` | 〃 | |
-| `Undo` | 〃 | |
-| `⌃` `Y` | redo | |
-| `⇧` `⌘` `Y` | 〃 | |
-| `⇧` `⌃` `Z` | 〃 | |
-| `⇧` `⌘` `Z` | 〃 | |
-| `Redo` | 〃 | |
-| `Erase EOF` | delete to group end | |
-| `⌃` `B` | move to previous char | |
-| `⌃` `F` | move to next char | |
-| `⌃` `P` | move up | |
-| `⌃` `N` | move down | |
-| `⌃` `A` | move to math field start | |
-| `⌃` `E` | move to math field end | |
-| `⇧` `⌃` `B` | extend selection backward | |
-| `⇧` `⌃` `F` | extend selection forward | |
-| `⇧` `⌃` `P` | extend selection upward | |
-| `⇧` `⌃` `N` | extend selection downward | |
-| `⇧` `⌃` `A` | extend to math field start | |
-| `⇧` `⌃` `E` | extend to math field end | |
-| `⌥` `⌃` `B` | move to previous word | |
-| `⌥` `⌃` `F` | move to next word | |
-| `⇧` `⌥` `⌃` `B` | extend to previous word | |
-| `⇧` `⌥` `⌃` `F` | extend to next word | |
-| `⌃` `H` | delete backward | |
-| `⌃` `D` | delete forward | |
-| `⌃` `L` | scroll into view | |
-| `⇧` `'` | toggle math/text mode | |
-| `⌥` `B` | $$\int_{\unicode{"2B1A}}^{\unicode{"2B1A}}$$   | |
-| `⇧` `⌥` `K` | toggle keystroke caption | |
-| `⌥` `space` | toggle virtual keyboard | |
-| `⌥` `⌃` `⇡` | speak("parent") | |
-| `⌥` `⌃` `⇣` | speak("all") | |
+| Keybinding | Result | 
+| :--- | :--- |
+| <kbd>⇠</kbd> | move to previous char |
+| <kbd>⌃</kbd>+<kbd>B</kbd> | move to previous char |
+| <kbd>⇢</kbd> | move to next char |
+| <kbd>⌃</kbd>+<kbd>F</kbd> | move to next char |
+| <kbd>⇡</kbd> | move up |
+| <kbd>⌃</kbd>+<kbd>P</kbd> | move up |
+| <kbd>⇣</kbd> | move down |
+| <kbd>⌃</kbd>+<kbd>N</kbd> | move down |
+| <kbd>⇧</kbd>+<kbd>⇠</kbd> | extend selection backward |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd> | extend selection backward |
+| <kbd>⇧</kbd>+<kbd>⇢</kbd> | extend selection forward |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd> | extend selection forward |
+| <kbd>⇧</kbd>+<kbd>⇡</kbd> | extend selection upward |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>P</kbd> | extend selection upward |
+| <kbd>⇧</kbd>+<kbd>⇣</kbd> | extend selection downward |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>N</kbd> | extend selection downward |
+| <kbd>⌫</kbd> | delete backward |
+| <kbd>⌥</kbd>+<kbd>⌦</kbd> | 〃 |
+| <kbd>⌦</kbd> | delete forward |
+| <kbd>⌥</kbd>+<kbd>⌫</kbd> | 〃 |
+| <kbd>⌥</kbd>+<kbd>⇠</kbd> | move to previous word |
+| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd> | move to previous word |
+| <kbd>⌥</kbd>+<kbd>⇢</kbd> | move to next word |
+| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd> | move to next word |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⇠</kbd> | extend selection to previous word |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⇢</kbd> | extend selection to next word |
+| <kbd>⌃</kbd>+<kbd>⇠</kbd> | move to group start |
+| <kbd>⌃</kbd>+<kbd>⇢</kbd> | move to group end |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>⇠</kbd> | extend selection to group start |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>⇢</kbd> | extend selection to group end |
+| <kbd>space</kbd> | move after parent |
+| <kbd>⇧</kbd>+<kbd>space</kbd> | move before parent |
+| <kbd>⤒</kbd> | move to mathfield start |
+| <kbd>⌘</kbd>+<kbd>⇠</kbd> | 〃 |
+| <kbd>⇧</kbd>+<kbd>⤒</kbd> | extend selection to mathfield start |
+| <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇠</kbd> | 〃 |
+| <kbd>⤓</kbd> | move to mathfield end |
+| <kbd>⌘</kbd>+<kbd>⇢</kbd> | 〃 |
+| <kbd>⇧</kbd>+<kbd>⤓</kbd> | extend selection to mathfield end |
+| <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇢</kbd> | 〃 |
+| <kbd>⇞</kbd> | move to group start |
+| <kbd>⇟</kbd> | move to group end |
+| <kbd>⇥</kbd> | move to next placeholder |
+| <kbd>⇧</kbd>+<kbd>⇥</kbd> | move to previous placeholder |
+| <kbd>⇥</kbd> | move to next placeholder |
+| <kbd>⇧</kbd>+<kbd>⇥</kbd> | move to previous placeholder |
+| <kbd>Intl Backslash</kbd> | 〃 |
+| <kbd>⌥</kbd>+<kbd>=</kbd> | applyStyle({"mode":"text"}) |
+| <kbd>esc</kbd> | complete("complete") |
+| <kbd>⇥</kbd> | In LaTeX mode: accept-suggestion |
+| <kbd>⏎</kbd> | complete |
+| <kbd>⌤</kbd> | 〃 |
+| <kbd>⇧</kbd>+<kbd>esc</kbd> | complete("reject") |
+| <kbd>⌃</kbd>+<kbd>A</kbd> | select all |
+| <kbd>⌘</kbd>+<kbd>A</kbd> | 〃 |
+| <kbd>⌃</kbd>+<kbd>Z</kbd> | undo |
+| <kbd>⌘</kbd>+<kbd>Z</kbd> | 〃 |
+| <kbd>⌃</kbd>+<kbd>Y</kbd> | redo |
+| <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Y</kbd> | 〃 |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>Z</kbd> | 〃 |
+| <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Z</kbd> | 〃 |
+| <kbd>⌃</kbd>+<kbd>A</kbd> | move to mathfield start |
+| <kbd>⌃</kbd>+<kbd>E</kbd> | move to mathfield end |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>A</kbd> | extend selection to mathfield start |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>E</kbd> | extend selection to mathfield end |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd> | extend selection to previous word |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd> | extend selection to next word |
+| <kbd>⌃</kbd>+<kbd>H</kbd> | delete backward |
+| <kbd>⌃</kbd>+<kbd>D</kbd> | delete forward |
+| <kbd>⌃</kbd>+<kbd>L</kbd> | scroll into view |
+| <kbd>⇧</kbd>+<kbd>'</kbd> | toggle math/text mode (may not work in non-US QWERTY layout) |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>T</kbd> | toggle math/text mode |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>K</kbd> | toggle keystroke caption |
+| <kbd>⌥</kbd>+<kbd>space</kbd> | toggle virtual keyboard |
+| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇡</kbd> | speak("parent") |
+| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇣</kbd> | speak("all") |
 
 
 ### Math Mode Only
 
-The shortcuts in this section apply in math mode only.
+The keybindings in this section apply in math mode only.
 
-| Keybinding | Result | OS |
-| :--- | :--- | ---: |
-| `space` | move after parent | |
-| `⇧` `space` | move before parent | |
-| `⇥` | move to next placeholder | |
-| `⇧` `⇥` | move to previous placeholder | |
-| `esc` | switchMode("latex") | |
-| `\` | 〃 | |
-| `Intl Backslash` | 〃 | |
-| `⌥` `=` | applyStyle({"mode":"text"}) | |
-| `⇧` `'` | switchMode("text") | |
-| `⌃` `2` | $$\sqrt{\unicode{"2B1A}}$$ | |
-| `⌃` `5` | move to opposite | |
-| `⌃` `6` | move to superscript | |
-| `⌃` `-` | move to subscript | |
-| `⌥` `[` | $$\left\lbrack \unicode{"2B1A}\right\rbrack$$  | |
-| `⇧` `⌥` `[` | $$\left\lbrace \unicode{"2B1A} \right\rbrace$$  | |
-| `⌃` `⏎` | add row after | |
-| `⌃` `⌤` | 〃 | |
-| `⌘` `⏎` | 〃 | |
-| `⌘` `⌤` | 〃 | |
-| `⌃` `;` | 〃 | |
-| `⌘`  `;` | 〃 | |
-| `⇧` `⌃` `;` | add row before | |
-| `⇧` `⌘` `;` | 〃 | |
-| `⌃` `,` | add column after | |
-| `⌘,` | 〃 | |
-| `⇧` `⌃` `,` | 〃 | |
-| `⇧⌘,` | 〃 | |
-| `⌥` `P` | $$\pi$$ | |
-| `⌥` `V` | $$\sqrt{\unicode{"2B1A}}$$  | |
-| `⌥` `W` | $$\sum_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$  | |
-| `⌥` `U` | $$\cup$$ | |
-| `⌥` `N` | $$\cap$$ | |
-| `⌥` `O` | $$\emptyset$$ | |
-| `⌥` `D` | $$\differentialD$$ | |
-| `⇧` `⌥` `O` | $$\varnothing$$ | |
-| `⇧` `⌥` `D` | $$\partial$$ | |
-| `⇧` `⌥` `P` | $$\prod_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$   | |
-| `⇧` `⌥` `U` | $$\bigcup$$ | |
-| `⇧` `⌥` `N` | $$\bigcap$$ | |
-| `⇧` `⌥` `A` | $$\forall$$ | |
-| `⇧` `⌥` `E` | $$\exists$$ | |
-| `⌥` `5` | $$$\infty$$ | |
-| `⌥` `6` | $$\wedge$$ | |
-| `⇧` `⌥` `6` | $$\vee$$ | |
-| `⌥` `9` | $$($$ | |
-| `⌥` `0` | $$)$$ | |
-| `⌥` `\|` | $$\|$$ | |
-| `⌥` `\` | $$\backslash$$ | |
-| `/` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
-| `Numpad /` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
-| `⌥` `Numpad /` | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   | |
-| `⇧` <kbd>&#96;</kbd> | `\~`  | ||
+| Keybinding | Result |
+| :--- | :--- | 
+| <kbd>space</kbd> | move after parent |
+| <kbd>⇧</kbd>+<kbd>space</kbd> | move before parent |
+| <kbd>⇥</kbd> | move to next placeholder |
+| <kbd>⇧</kbd>+<kbd>⇥</kbd> | move to previous placeholder |
+| <kbd>esc</kbd> | enter/exit LaTeX mode |
+| <kbd>\\</kbd> | enter LaTeX mode |
+| <kbd>Intl Backslash</kbd> | 〃 |
+| <kbd>⌥</kbd>+<kbd>=</kbd> | applyStyle({"mode":"text"}) |
+| <kbd>⌃</kbd>+<kbd>2</kbd> | $$\sqrt{\unicode{"2B1A}}$$ |
+| <kbd>⌃</kbd>+<kbd>5</kbd> | move to opposite (superscript/subscript, upper/lower) |
+| <kbd>⌃</kbd>+<kbd>6</kbd> | move to superscript/upper |
+| <kbd>⌃</kbd>+<kbd>-</kbd> | move to subscript/lower |
+| <kbd>⌥</kbd>+<kbd>[</kbd> | $$\left\lbrack \unicode{"2B1A}\right\rbrack$$  |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>[</kbd> | $$\left\lbrace \unicode{"2B1A} \right\rbrace$$  |
+| <kbd>⌃</kbd>+<kbd>⏎</kbd> | add row after |
+| <kbd>⌃</kbd>+<kbd>⌤</kbd> | 〃 |
+| <kbd>⌘</kbd>+<kbd>⏎</kbd> | 〃 |
+| <kbd>⌘</kbd>+<kbd>⌤</kbd> | 〃 |
+| <kbd>⌃</kbd>+<kbd>;</kbd> | 〃 |
+| <kbd>⌘</kbd>  <kbd>;</kbd> | 〃 |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>;</kbd> | add row before |
+| <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>;</kbd> | 〃 |
+| <kbd>⌃</kbd>+<kbd>,</kbd> | add column after |
+| <kbd>⌘</kbd>+<kbd>,</kbd> | 〃 |
+| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>,</kbd> | 〃 |
+| <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>,</kbd> | 〃 |
+| <kbd>⌥</kbd>+<kbd>P</kbd> | $$\pi$$ |
+| <kbd>⌥</kbd>+<kbd>V</kbd> | $$\sqrt{\unicode{"2B1A}}$$  |
+| <kbd>⌥</kbd>+<kbd>W</kbd> | $$\sum_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$  |
+| <kbd>⌥</kbd>+<kbd>U</kbd> | $$\cup$$ |
+| <kbd>⌥</kbd>+<kbd>N</kbd> | $$\cap$$ |
+| <kbd>⌥</kbd>+<kbd>O</kbd> | $$\emptyset$$ |
+| <kbd>⌥</kbd>+<kbd>D</kbd> | $$\differentialD$$ |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>O</kbd> | $$\varnothing$$ |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>D</kbd> | $$\partial$$ |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>P</kbd> | $$\prod_{i=\unicode{"2B1A}}^{\unicode{"2B1A}}$$   |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>U</kbd> | $$\bigcup$$ |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>N</kbd> | $$\bigcap$$ |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>A</kbd> | $$\forall$$ |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>E</kbd> | $$\exists$$ |
+| <kbd>⌥</kbd>+<kbd>B</kbd> | $$\int_{\unicode{"2B1A}}^{\unicode{"2B1A}}$$   |
+| <kbd>⌥</kbd>+<kbd>5</kbd> | $$$\infty$$ |
+| <kbd>⌥</kbd>+<kbd>6</kbd> | $$\wedge$$ |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>6</kbd> | $$\vee$$ |
+| <kbd>⌥</kbd>+<kbd>9</kbd> | $$($$ |
+| <kbd>⌥</kbd>+<kbd>0</kbd> | $$)$$ |
+| <kbd>⌥</kbd>+<kbd>\|</kbd> | $$\|$$ |
+| <kbd>⌥</kbd>+<kbd>\\</kbd> | $$\backslash$$ |
+| <kbd>/</kbd> | $$\frac{\unicode{"2B1A}}{\unicode{"2B1A}}$$   |
+| <kbd>⇧</kbd>+<kbd>&#96;</kbd> | `\~`  ||
 
 
 ## Inline Shortcuts
 
-Some sequence of characters can be automatically translated to symbols. For example, typing p followed by i will result in "π".
+Some sequence of characters are automatically translated to symbols. For example, typing `P` followed by `I` will result in "π".
 
-If the conversion was not desired, for example you actually meant "pi", type ctrl/⌘ Z to undo it.
+If the conversion was not desired, for example you actually meant "pi", type <kbd>ctrl/⌘</kbd>+<kbd>Z</kbd> to undo it.
 
 | Trigger | Result |
 | :--- | :--- |
