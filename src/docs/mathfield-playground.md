@@ -191,14 +191,26 @@ head:
     padding-top: 8px;
   }
 
+  #result-section {
+    display: none;
+  }
+
+  #result-section.is-visible {
+    display: block;
+  }
+
+  #result {
+    margin-left: 8px;
+    font-size: 24px;
+    overflow-x: auto;
+  }
 
 </style>
+
 <script type="module">
-
-
 await customElements.whenDefined('math-field');
 
-import {renderMathInDocument} from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
+import { renderMathInDocument, convertLatexToMarkup } from '//unpkg.com/mathlive/dist/mathlive.min.mjs';
 
 
 const INDENT = '  ';
@@ -209,10 +221,42 @@ const latexField = document.getElementById('latex');
 latexField.addEventListener('input', () => mf.setValue(latexField.value));
 
 function onMathfieldInput() {
-    // Output MathJSON representation of the expression
-    document.getElementById('math-json').innerHTML = asString(0, mf.expression.json).text;  
-    // Update raw LaTeX value
-    latexField.value = mf.value;
+  // Update raw LaTeX value
+  latexField.value = mf.value;
+
+  const expr = mf.expression;
+  
+  // Output MathJSON representation of the expression
+  document.getElementById('math-json').innerHTML = asString(0, expr.json).text;
+
+  let result = '';
+
+  MathfieldElement.computeEngine.precision = 7;
+
+  if (expr.head !== 'Equal') {
+    const exprN = expr.N();
+
+    if (!exprN.isSame(expr)) result = exprN.latex;
+  }
+
+  if (!result) {
+    const exprSimplify = expr.simplify();
+    if (!exprSimplify.isSame(expr)) result = exprSimplify.latex;
+  }
+
+  if (expr.head !== 'Equal') {
+    if (!result) {
+      const exprEval = expr.evaluate();
+      if (!exprEval.isSame(expr)) result = exprEval.latex;
+    }
+  }
+
+  if (result) {
+    document.getElementById('result').innerHTML = convertLatexToMarkup('= ' + result);
+    document.getElementById('result-section').classList.add('is-visible');
+  } else document.getElementById('result-section').classList.remove('is-visible');
+
+
 }
 //
 mf.addEventListener('input', onMathfieldInput);
@@ -542,6 +586,17 @@ renderMathInDocument();
 </math-field>
 
 <div style="margin-left: auto;padding-top: .5em; text-align: right"><a href="#shortcuts">Keyboard Shortcuts</a></div>
+
+<section id='result-section'>
+<div id='result'></div>
+
+
+{% readmore "/compute-engine/" %}
+Read more about using the **Compute Engine** to evaluate and simplify expression.
+{% endreadmore %}
+
+
+</section>
 
 <h4>LaTeX</h4>
 <textarea id="latex"></textarea>
