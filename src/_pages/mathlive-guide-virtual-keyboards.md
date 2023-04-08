@@ -77,7 +77,7 @@ or the equivalent `math-virtual-keyboard-policy` attribute.
 
 </div>
 
-The virtual keyboard toggle is displayed by default when the when the mathfield 
+The virtual keyboard toggle is displayed by default when the mathfield
 can be modified, that is when it's not read-only or disabled.
 
 ## Controlling the Virtual Toggle Visibility
