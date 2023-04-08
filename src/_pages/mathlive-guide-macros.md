@@ -1,11 +1,12 @@
 ---
 layout: single
 date: Last Modified
-title: Macros - MathLive Guide
+title: Macros
 permalink: /mathlive/guides/macros/
 read_time: false
 sidebar:
     - nav: "universal"
+toc: true
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css
@@ -17,7 +18,6 @@ head:
     - /assets/js/code-playground.min.js
     - //unpkg.com/mathlive?module
 ---
-# Macros
 
 MathLive has over [800 LaTeX commands](/mathlive/reference/commands/) 
 predefined. Some are primitives but others are macros, that is commands defined 
@@ -122,7 +122,6 @@ mf.macros = {...mf.macros,
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros, diamonds: undefined };
-});
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;
 </div>

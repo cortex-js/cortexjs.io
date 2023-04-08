@@ -35,9 +35,16 @@ h6 {
 
 h1 {
   margin-top: 0;
-  font-size: 5rem;
-  line-height: 1;
-  letter-spacing: -.03em;
+  font-size: 3rem;
+  line-height: .85;
+  letter-spacing: -.02em;
+}
+
+@include breakpoint($small) {
+  h1 {
+    font-size: 5rem;
+  }
+
 }
 
 h2 {

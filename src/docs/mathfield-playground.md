@@ -139,7 +139,7 @@ head:
 .shortcuts .cell {
   display: flex;
   flex-flow: column;
-  width: 180px;
+  width: 150px;
   height: 180px;
   font-size: 16px;
   align-items: center;
@@ -147,7 +147,7 @@ head:
 
   border-radius: 8px;
   border: 1px solid var(--table-thin-line-color);
-  background: var(--card-background--alternate); // #f5f5f5;
+  background: var(--card-background--alternate); 
 }
 
 .shortcuts .label {
@@ -155,6 +155,7 @@ head:
   padding-bottom: .5em;
   /* opacity: 0.7; */
   color: var(--text-color-dimmed);
+  text-align: center;
 }
   .shortcuts .result {
     display: flex;
@@ -174,9 +175,12 @@ head:
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 32px;
+    min-width: 28px;
     font-family: var(--ui-font-family);
     font-variant-ligatures: none;
+    margin-left: 1px;
+    margin-right: 1px;
+    font-weight: 600;
   }
 
   .shortcuts .shortcut.small {

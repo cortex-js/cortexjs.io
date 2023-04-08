@@ -79,6 +79,7 @@
         .page__meta > p {
           display: flex;
           align-items: center;
+          flex-wrap: wrap;
         }
   
         .page__meta > p svg {

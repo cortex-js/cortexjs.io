@@ -7,92 +7,88 @@
    ========================================================================== */
 
 .sidebar {
-    display: flex;
-    justify-content: center;
-    padding-left: 8px;
-    padding-right: 0;
+  display: flex;
+  justify-content: center;
+  padding-left: 8px;
+  padding-right: 0;
 
-    /** When displayed as a menu (width < $large) take the whole width */
-    width: 100%;
+  /** When displayed as a menu (width < $large) take the whole width */
+  width: 100%;
 
-    @include clearfix();
-    @include breakpoint(max-width $medium) {
-        /* fix z-index order of follow links */
-        position: relative;
-        z-index: 10;
-        transform: translate3d(0, 0, 0);
-    }
+  @include clearfix();
+  @include breakpoint(max-width $medium) {
+    /* fix z-index order of follow links */
+    position: relative;
+    z-index: 10;
+    transform: translate3d(0, 0, 0);
+  }
 
+  @include breakpoint($large) {
+    // if >1200px...
+    float: left;
+    // width: calc(#{$left-sidebar-width-wide} - 1em);
+    margin-right: 0.5em;
+    width: 344px;
 
-    @include breakpoint($large) {
-        // if >1200px...
-        float: left;
-        // width: calc(#{$left-sidebar-width-wide} - 1em);
-        margin-right: .5em;
-        width: 344px;
-
-        &.sticky {
-            overflow-y: auto;
-            /* calculate height of nav list
+    &.sticky {
+      overflow-y: auto;
+      /* calculate height of nav list
               viewport height - nav height - masthead x-padding
             */
-            height: calc(100vh - #{$nav-height});
-        }
+      height: calc(100vh - #{$nav-height});
     }
+  }
 
+  > * {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
 
-    > * {
-        margin-top: 1em;
-        margin-bottom: 1em;
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 0;
+    font-family: var(--display-font-family);
+  }
+
+  p,
+  li {
+    font-size: $type-size-5;
+    line-height: 1;
+    // padding: 8px 4px 8px 8px;
+    padding-right: 8px;
+    border-radius: 4px;
+
+    a {
+      display: flex;
+      align-items: center;
+      border-radius: 4px;
+      padding: 8px 4px 8px 8px;
+
+      &:hover {
+        background: var(--ui-background-hover);
+      }
+      &.active {
+        color: white !important;
+        background: var(--primary-color);
+      }
     }
+  }
 
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        margin-bottom: 0;
-        font-family: var(--display-font-family);
+  img {
+    width: 100%;
+
+    &.emoji {
+      width: 20px;
+      height: 20px;
     }
-
-    p,
-    li {
-        font-size: $type-size-5;
-        line-height: 1;
-        // padding: 8px 4px 8px 8px;
-        padding-right: 8px;
-        border-radius: 4px;
-
-        a {
-            display: flex;
-            align-items:  center;
-            border-radius: 4px;
-            padding: 8px 4px 8px 8px;
-          
-            &:hover {
-              background: var(--ui-background-hover);
-            }
-            &.active {
-              color: white !important;
-              background: var(--primary-color);
-            }
-          }
-    }
-
-    img {
-        width: 100%;
-
-        &.emoji {
-            width: 20px;
-            height: 20px;
-        }
-    }
+  }
 }
-
 
 #main .sidebar a:not(.section-link):hover {
   text-decoration: none;
-
 }
 
 // .sidebar ul:not(.nav__items) li:hover {
@@ -104,41 +100,42 @@
 }
 
 .sidebar__right {
-    margin-bottom: 1em;
+  display: none;
+}
 
-    @include breakpoint($large) {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: $right-sidebar-width-narrow;
-        margin-right: -1 * $right-sidebar-width-narrow;
-        padding-left: 1em;
-        z-index: 10;
+@include breakpoint($x-large) {
+  .page__content .toc {
+      display: none;
+  }
 
-        &.sticky {
-            @include clearfix();
-            position: sticky;
-            top: 0;
-            float: right;
-        }
+  .sidebar__right {
+    .toc {
+      float: left;
+      max-width: 100%;
     }
 
-    // @include breakpoint($x-large) {
-    //   width: $right-sidebar-width;
-    //   margin-right: -1 * $right-sidebar-width;
-    // }
+    display: block;
+    @include clearfix();
+    position: sticky;
+    top: 1rem;
+    margin-top: 1rem;
+
+    overflow-y: auto;
+    width: 380px;
+    height: calc(100vh - 2em);
+    }  
 }
 
 .splash .sidebar__right {
-    @include breakpoint($large) {
-        position: relative;
-        float: right;
-        margin-right: 0;
-    }
+  @include breakpoint($large) {
+    position: relative;
+    float: right;
+    margin-right: 0;
+  }
 
-    // @include breakpoint($x-large) {
-    //   margin-right: 0;
-    // }
+  // @include breakpoint($x-large) {
+  //   margin-right: 0;
+  // }
 }
 
 /*
@@ -146,24 +143,24 @@
    ========================================================================== */
 
 .wide .sidebar__right {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 
-    @include breakpoint($large) {
-        position: initial;
-        top: initial;
-        right: initial;
-        width: initial;
-        margin-right: initial;
-        padding-left: initial;
-        z-index: initial;
+  @include breakpoint($large) {
+    position: initial;
+    top: initial;
+    right: initial;
+    width: initial;
+    margin-right: initial;
+    padding-left: initial;
+    z-index: initial;
 
-        &.sticky {
-            float: none;
-        }
+    &.sticky {
+      float: none;
     }
+  }
 
-    // @include breakpoint($x-large) {
-    //   width: initial;
-    //   margin-right: initial;
-    // }
+  // @include breakpoint($x-large) {
+  //   width: initial;
+  //   margin-right: initial;
+  // }
 }

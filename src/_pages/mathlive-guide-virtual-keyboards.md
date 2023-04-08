@@ -25,35 +25,10 @@ head:
     "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
     };
 ---
-Typing math formulas require access to many special symbols. While [keyboard 
-shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help when a 
-physical keyboard is available, touch-enabled devices without a physical 
-keyboard attached require another solution.{.xl}
 
-A **virtual keyboard** is a keyboard displayed on screen that contains 
- specialized symbols for math input.
-
-![](/assets/images/mathfield/virtual-keyboard.png)
-
-A keyboard may have multiple **layouts** which you can select with the 
-layout selector.
-
-The virtual keyboard can display multiple layouts. 
-The default layouts are **numeric**, **functions**, **symbols**, 
-**alphabetic** and **greek letters**.
-
-These layouts  include the most common math symbols. You can 
-customize them to fit your specific needs. For example you can remove some 
-layouts, or create new ones.
-
-
-**To display variants related to a key**, press and hold it. Most keys have
-variants, but a few don't.
-
-![](/assets/images/mathfield/alt-keys.png)
-
-
-
+{% readmore "/mathlive/virtual-keyboard/" %}
+Learn more about using the math virtual keyboard
+{% endreadmore %}
 
 
 ## Controlling when the Virtual Keyboard is Displayed
@@ -61,8 +36,6 @@ variants, but a few don't.
 The default behavior is to display the virtual keyboard when a mathfield is
 focused on a touch-enabled devices (mobile phones, tablets and laptops with 
 a touch-screen).
-
-![](/assets/images/mathfield/mobile-virtual-keyboard.png)
 
 
 This behavior can be changed with the `mf.mathVirtualKeyboardPolicy` property 
@@ -77,10 +50,12 @@ or the equivalent `math-virtual-keyboard-policy` attribute.
 
 </div>
 
+
+## Controlling the Virtual Toggle Visibility
+
 The virtual keyboard toggle is displayed by default when the when the mathfield 
 can be modified, that is when it's not read-only or disabled.
 
-## Controlling the Virtual Toggle Visibility
 
 **To control the visibility of the virtual keyboard toggle**, use CSS. 
 
@@ -129,7 +104,7 @@ adjusted so that the virtual keyboard can fit. {.notice--warning}
 ## Customizing the Layouts
 
 The virtual keyboard panel displays multiple layouts which can be 
-toggled using the layout switcher: `numeric`, `functions`, `symbols`, `alphabetic` 
+toggled using the layout switcher: `numeric`, `symbols`, `alphabetic` 
 and `greek`.
 
 **To choose which layouts are listed in the layout switcher**, use the 
@@ -148,7 +123,12 @@ For example, to only show the numeric and symbols layouts, use:
       }
     </style>
 <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
-<div slot="javascript">mathVirtualKeyboard.layouts = ["numeric", "symbols"];</div>
+<div slot="javascript">
+document.querySelector('math-field').addEventListener('focus', () => { 
+  mathVirtualKeyboard.layouts = ["numeric", "symbols"];
+  mathVirtualKeyboard.visible = true;
+});
+</div>
 </code-playground>
 
 <hr>
@@ -156,17 +136,59 @@ For example, to only show the numeric and symbols layouts, use:
 To revert to the default layouts, use: 
 
 ```js
-mathVirtualKeyboard.layouts = 'default';
+mathVirtualKeyboard.layouts = "default";
 ```
+
+## Additional Layouts
+
+In addition to `numeric`, `symbols`, `alphabetic` and `greek`, the 
+following layouts are available:
+
+### Minimalist Layout
+
+The `"minimalist"` layout is focused on entry of simple expressions.
+
+```js
+mathVirtualKeyboard.layouts = ["minimalist"];
+```
+
+
+![](/assets/images/mathfield/virtual-keyboard-ipad/ipad-minimalist.webp)
+
+### Compact Layout
+
+The `"compact"` layout is similar to `"minimalist"` but the keycaps include variants.
+
+```js
+mathVirtualKeyboard.layouts = ["compact"];
+```
+
+
+![](/assets/images/mathfield/virtual-keyboard-ipad/ipad-compact.webp)
+
+
+### Numeric Only Layout
+
+The `"numeric-only"` layout is suitable for input that is purely numeric.
+
+```js
+mathVirtualKeyboard.layouts = ["numeric-only"];
+```
+
+
+![](/assets/images/mathfield/virtual-keyboard-ipad/ipad-numeric-only.webp)
+
+
 
 
 ## Defining Custom Layouts
 
 In addition to the built-in layouts, you can define your own layouts.
 
-**To use a custom layout** set `mathVirtualKeyboard.layouts` to an object 
+**The simplest way to define a custom layout** is to set `mathVirtualKeyboard.layouts` to an object 
 literal with a `rows` property, an array of keycaps.
 
+For best result, you should make sure the rows have no more than 10 keycaps.
 
 <code-playground layout="stack">
     <style slot="style">
@@ -179,15 +201,19 @@ literal with a `rows` property, an array of keycaps.
       }
     </style>
 <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
-<div slot="javascript">mathVirtualKeyboard.layouts = {
-  rows: [
-    [
-      "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
-      "(", ")", "\\sqrt{#0}", "#@^{#?}",
-    ],
-    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
-  ]
-};</div>
+<div slot="javascript">
+document.querySelector('math-field').addEventListener('focus', () => {
+  mathVirtualKeyboard.layouts = {
+    rows: [
+      [
+        "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
+        "(", ")", "\\sqrt{#0}", "#@^{#?}",
+      ],
+      ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+    ]
+  };
+  mathVirtualKeyboard.visible = true;
+});</div>
 </code-playground>
 
 
@@ -197,33 +223,10 @@ Each keycap is a LaTeX string which is used both as the label of the keycap,
 and as the content inserted when the keycap is pressed.
 
 
-You can also mix default layouts with your own. For example, to add the
-alphabetic layout after your own:
-
-```js
-mathVirtualKeyboard.layouts = [
-  {
-    label: "minimal",
-    toolip: "Only the essential",
-    rows: [
-      [
-        "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
-        "(", ")", "\\sqrt{#0}", "#@^{#?}",
-      ],
-      ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
-    ]
-  }, 
-  "alphabetic"
-];
-```
-
-If you include more than one layout, it's a good idea to provide a label
-and tooltip so they get propertly displayed in the layout switcher.
-
 ### Placeholder Tokens
 
 You'll notice from the example above that the LaTeX fragments defining the 
-keycap can contain the following special placeholder tokens:
+keycap can contain some special placeholder tokens:
 
 <div class='symbols-table'>
 
@@ -235,70 +238,108 @@ keycap can contain the following special placeholder tokens:
 
 </div>
 
+### Keycap Shortcuts
+
+The value of  the keycap can be a LaTeX string, or one of the special values
+below, corresponding to a standard keycap. These shortcuts define 
+the label, appearance, command when pressed, shifted command and variants 
+for those keys.
+
+`"[left]"` `"[right]"`  `"[return]"`  `"[hide-keyboard]"` `"[shift]"` 
+
+`"[backspace]"`  `"[undo]"` `"[redo]"` `"[cut]"` `"[copy]"` `"[paste]"` 
+
+`"[.]"`  `"[+]"`  `"[-]"`  `"[/]"`  `"[*]"`  `"[=]"` 
+
+`"[(]"` `"[)]"` 
+
+`"[0]"` `"[1]"` `"[2]"` `"[3]"` `"[4]"` `"[5]"` `"[6]"` `"[7]"` `"[8]"` `"[9]"` 
+
+`"[separator]"` `["hr"]`
+
+`"[foreground-color]"` `"[background-color]"`
+
 ### Advanced Keycaps
 
-Instead of defining keycaps with a string, you can use an object literal 
-with the following properties:
+For more control over the appearance and behaviro of a keycap, instead of a 
+string, use an object literal with the following properties:
 
 - `label`: the label of the keycap, displayed using the system font. This
-  can include some HTML markup, for example `"<span><i>x</i>&thinsp;²</span>"`
-- `latex`: if no label is provided, the value of this property is used as
+  can include some HTML markup, for example `"<span><i>x</i>&thinsp;²</span>"`.
+  If none is provided, the `latex` property is used instead for the label of
+  the keycap. The label can also be one of the keycap shortcuts mentioned
+  above, e.g. `[left]`. If a keycap shortcut is used, the other properties
+  override the values defined by the shortcut.
+- `latex`: if no `label` is provided, the value of the `latex` property is used as
   the label of the keycap. This property is also used to insert content in 
   the mathfield when the keycap is pressed.
 - `class`: a set of CSS classes to style this keycap. The classes can be custom 
-defined (see below about the `styles` layer property), or be one or more of the
+defined (see below about the `style` layer property), or be one or more of the
  standard ones:
     - `tex`: use the TeX font for its label.
       Using the `tex` class is not necessary if using the `latex` property to 
       define the label.
+    - `ghost`: the keycap with no border or background
     - `small`: display the label in a smaller size
-    - `modifier`: a modifier (shift/option, etc...) keycap
     - `action`: an "action" keycap (for arrows, return, etc...)
-    - `separator w5`: a half-width blank used as a separator. Other widths
-    include `w15` (1.5 width), `w20` (double width) and `w50` (five-wide, used 
-    for the space bar).
     - `bottom`, `left`, `right`: alignment of the label
-- `command`: the command to perform when the keycap is pressed. For example: 
- `["performWithFeedback", "commit"]`
+    - `hide-shift`: do not display the shift top-right label on the keycap if 
+       a `shift` property is provided.
+- `width`: the width of the keycap, as a multiple of a standard keycap. That
+  is 0.5 for half-wide keys, 1.5 for one and half wide keys, etc...
 - `aside`: an optional small label displayed below the keycap. This label
   may not be displayed if the space available is too small.
 - `altKeys`: a set of variants to display when the keycap is long-pressed.
-- `shifted`: the HTML markup to display as the label of the keycap when the
-shift key is pressed
-- `shiftedCommand`: the command to perform when the keycap is pressed with
-the shift key.
+- `shift`: either a LaTeX string indicated what is inserted when the shift
+  key is pressed with this keycap, or a keycap record
+- `variants`: an array of keycaps (either as string or keycap records) defining
+  the variants for this keycap (see below).
+
+The action when the keycap is pressed is defined by one of these properties:
+- `insert`: the LaTeX to be inserted when the keycap is pressed.
+- `command`: the command to perform when the keycap is pressed. For example: 
+ `["performWithFeedback", "commit"]`.
+
+If neither `insert` nor `command` are provided, the `latex` property is used to
+define the content inserted when the keycap is pressed.
+
 
 {% readmore "/mathlive/guides/commands/" %}
 Learn more about the available commands
 {% endreadmore %}
 
-**To use a SVG glyph in the keycap label**, use some SVG markup in the `label` 
-property and set the `class` attribute to `svg-glyph`
 
-To reference the built-in SVG glyphs, use the `<use>` SVG command:
-- `svg-commit`
-- `svg-tab`
-- `svg-arrow-left`
-- `svg-arrow-right`
-- `svg-angle-double-left`
-- `svg-angle-double-right`
-- `svg-shift`
-- `svg-command`
-- `svg-delete-backward`
-- `svg-copy`
-- `svg-undo`
-- `svg-redo`
-- `svg-trash`
+Here's an example of a basic keyboard layout:
 
-For example:
+```js
+mathVirtualKeyboard.layouts = {
+  label: 'Basic',
+  rows: [
+    [
+      '[7]', '[8]', '[9]', '[+]', {'[separator]', width: 0.5 },
+      { class: 'small', latex: '\\frac{#@}{#0}' },
+      '\\varnothing', '\\infty', '\\in', '\\notin',
+      '[separator]',
+    ],
+    [
+      '[4]', '[5]', '[6]', '[-]', {'[separator]', width: 0.5 },
+      '[(]', '[)]', '\\lt', '\\le', '\\hat{=}', '[separator]',
+    ],
+    [
+      '[1]', '[2]', '[3]', '\\cdot', {'[separator]', width: 0.5 },
+      '[', ']', '\\gt', '\\ge',
 
-```json
-  {
-    class: "action",
-    label: "<svg><use xlink:href='#svg-commit' /></svg>",
-    command: ["performWithFeedback", "commit"]
-  },
+      { label: '[backspace]', width: 2 },
+    ],
+    [
+      { label: '[0]', width: 2 },
+      '[.]', '\\colon', {'[separator]', width: 0.5 },
+      '\\lbrace', '\\rbrace', '=', '\\ne', '[left]', '[right]',
+    ],
+  ],
+};
 ```
+
 
 ### Keycap Variants
 
@@ -322,37 +363,17 @@ rows: [
 ]
 ```
 
-### Layout Defined with Markup
-
-Defining a layout using rows of keycaps is a convenient and compact
-way of creating your own layout.
-
-However, if you need more control in the appearance of your layout, you
-can define a layout with some HTML markup.
-
-```js
-mathVirtualKeyboard.layouts = [
-  {
-    label: "minimal",
-    toolip: "Only the essential",
-    markup: "<ul><li>...</li></ul>"
-  }, 
-  "alphabetic"
-];
-
-```
-
 ### Layer Styling
 
 If you want to apply custom CSS classes to some keycaps, you can provide
-a definition for them using the `styles` property:
+a definition for them using the `style` property:
 
 ```js
 mathVirtualKeyboard.layouts = [
   {
     label: "minimal",
     toolip: "Only the essential",
-    styles: ".digit { background: blue; color: white }",
+    style: ".digit { background: blue; color: white }",
     rows: [
       [
         "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
@@ -381,8 +402,8 @@ mathVirtualKeyboard.layouts = [
 ### Multiple Layers
 
 Most keyboard layouts are made of a single layer. However, if your layout 
-includes multiple layers, for example a layer accessible with a shifted key,
-use the `layers` property to provide an array of layers.
+includes multiple layers, use the `layers` property to provide an array of 
+layers.
 
 
 ```js
@@ -406,6 +427,31 @@ mathVirtualKeyboard.layouts = {
 };
 
 ```
+### Multiple Layouts
+
+You can also mix default layouts with your own. For example, to add the
+alphabetic layout after your own:
+
+```js
+mathVirtualKeyboard.layouts = [
+  {
+    label: "minimal",
+    toolip: "Only the essential",
+    rows: [
+      [
+        "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
+        "(", ")", "\\sqrt{#0}", "#@^{#?}",
+      ],
+      ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+    ]
+  }, 
+  "alphabetic"
+];
+```
+
+If you include more than one layout, it's a good idea to provide a label
+and tooltip so they get propertly displayed in the layout switcher.
+
 
 ## Customizing the Appearance of the Virtual Keyboard
 
@@ -467,7 +513,7 @@ value of the following CSS variables to a CSS color:
 
 ## Customizing the Alphabetical Layout
 
-By default the alphabetic layout is determined based on the locale (QWERTY 
+By default the `"alphabetic"` layout is determined based on the locale (QWERTY 
 for english speaking countries, AZERTY for french speaking
 countries, etc..). 
 
@@ -484,7 +530,12 @@ use the `mathVirtualKeyboard.alphabeticLayout` property.
       outline: none;
     }
   </style>
-  <div slot="javascript">mathVirtualKeyboard.alphabeticLayout = "dvorak";
+  <div slot="javascript">const mf = document.querySelector('math-field');
+document.querySelector('math-field').addEventListener('focus', () => {
+  mathVirtualKeyboard.layouts = ["alphabetic"];
+  mathVirtualKeyboard.alphabeticLayout = "dvorak";
+  mathVirtualKeyboard.visible = true;
+});
 </div>
     <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
@@ -492,7 +543,61 @@ use the `mathVirtualKeyboard.alphabeticLayout` property.
 </code-playground>
 
 
+### QWERTZ Layout
 
+<div style="display: flex">
+
+<div style="width: 50%; margin: auto">
+
+![QWERTZ layout](/assets/images/mathfield/virtual-keyboard-ipad/ipad-qwertz.webp)
+
+</div>
+
+<div style="width: 50%; margin: auto">
+
+![QWERTZ layout, shifted](/assets/images/mathfield/virtual-keyboard-ipad/ipad-qwertz-shift.webp)
+
+</div>
+
+</div>
+
+
+### AZERTY Layout
+
+<div style="display: flex">
+
+<div style="width: 50%; margin: auto">
+
+![AZERTY layout](/assets/images/mathfield/virtual-keyboard-ipad/ipad-azerty.webp)
+
+</div>
+
+<div style="width: 50%; margin: auto">
+
+
+![AZERTY layout, shifted](/assets/images/mathfield/virtual-keyboard-ipad/ipad-azerty-shift.webp)
+
+</div>
+
+</div>
+
+### DVORAK Layout
+
+<div style="display: flex">
+
+<div style="width: 50%; margin: auto">
+
+![DVORAK Layout](/assets/images/mathfield/virtual-keyboard-ipad/ipad-dvorak.webp)
+
+</div>
+
+<div style="width: 50%; margin: auto">
+
+![DVORAK Layout, shifted](/assets/images/mathfield/virtual-keyboard-ipad/ipad-dvorak-shift.webp)
+
+</div>
+
+</div>
 
 
 

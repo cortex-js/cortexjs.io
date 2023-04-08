@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: Supported TeX/LaTeX Commands
+title: LaTeX Commands
 permalink: /mathlive/reference/commands/
 read_time: false
 version: Version
@@ -160,6 +160,16 @@ MathLive supports over 800 LaTeX commands.{.xl}
 If you know the shape of a symbol, use <strong>Detexify</strong> to find the 
 name of the corresponding LaTeX command
 {% endreadmore %}
+
+**To enter a LaTeX command** press the **ESC** key or `\`  to enter LaTeX editing
+mode. Press **ESC** to exit LaTeX editing mode. You can examine the LaTeX 
+code for an expression by selecting it, then pressing **ESC**.
+
+
+{% readmore "/mathlive/reference/keybindings" %}
+The most common symbols can be entered using **keyboard shortcuts**.
+{% endreadmore %}
+
 
 
 ## Text Mode, Math Mode and Math Style
@@ -352,7 +362,6 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 ## Functions
 
-* <span class='math'>$$\deg $$</span> `\deg`
 * <span class='math'>$$\det $$</span> `\det`
 * <span class='math'>$$\exp $$</span> `\exp`
 * <span class='math'>$$\ker $$</span> `\ker`
@@ -365,6 +374,7 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 ### Trigonometry
 
+* <span class='math'>$$\degree $$</span> `\degree`
 * <span class='math'>$$\arccos $$</span> `\arccos`
 * <span class='math'>$$\arcsin $$</span> `\arcsin`
 * <span class='math'>$$\arctan $$</span> `\arctan`
@@ -1080,8 +1090,6 @@ To grow delimiters based on their content, use `\left...\right`.
 
 </div>
 
-
-Internally, MathLive uses the non-standard `\mleft` and `\mright` command. These commands are use to indicate some delimiters that have been automatically converted to "smart" delimiters when the `smartFence` option is on. However, because they are not standard LaTeX commands, they may not be recognized by other LaTeX-compatible software. When exporting using the `latex-expanded` format, or when using the clipboard, those commands are automatically removed.{.notice--warning}
 
 The left and right delimiters do not have to match:
 

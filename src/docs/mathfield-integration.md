@@ -196,7 +196,7 @@ path from the JavaScript directory to the fonts directory is `../assets/mathlive
 The `MathfieldElement.soundsDirectory` property can similarly be set to point 
 to the sound file assets.
 
-<h2 id='asset-pipeline'>Integrating with an Asset Pipeline</h2>
+<h2 id='asset-pipeline'>Integrating with a Bundler or an Asset Pipeline</h2>
 
 In some cases, simply pointing MathLive to the directory where the fonts can 
 be located might not be enough. For example, some bundlers, such as WebPack, 
@@ -206,6 +206,8 @@ in order to provide more control of the caching of those assets.
 In this case, you should include the stylesheet `mathlive-fonts.css` to your 
 project. You can find this stylesheet in the `dist` folder on GitHub or in the 
 `mathlive` folder in your `node_modules` directory.
+
+If you import this stylesheet, use `import mathliveStyle from "mathlive/fonts.css"`
 
 This stylesheet will explicitly load the required font files. Because your 
 bundler will be able to parse it, it will do the necessary changes to the font 
@@ -339,10 +341,11 @@ fonts will be injected in the current page.
 **To generate markup for a formula**, use `convertLatexToMarkup()`. You may 
 save the output or return it from a server-side process.
 
-To correctly display this markup, use the `mathlive-static.css` stylesheet, 
-which can be found in the `/dist/` directory. When using this method, the
-MathLive library is not necessary to render the formula once the markup 
-has been generated.
+To correctly display this markup, import the stylesheet with
+`import "mathlive/static.css"`. The stylesheet can be found in `dist/mathlive-static.css`.
+
+When using this method, the MathLive library is not necessary to render the 
+formula once the markup has been generated.
 
 ```html
 <!DOCTYPE html>

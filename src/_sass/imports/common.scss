@@ -207,7 +207,8 @@ $semantic-green: #2d9d78;
   --table-thin-line-color: #{$gray-800};  // #ddd;
   --table-thick-line-color: #{$gray-200}; // #333;
 
-  --placeholder-color: #{$gray-700}; // #9aa0a6;
+  --placeholder-color: #{$primary-color}; // #{$gray-300}; // #9aa0a6;
+  --placeholder-opacity: 1.0;
 
   --card-background: #{$gray-900}; // #fafafa;
   --card-background-alternate: #{$gray-600}; //  #a0a0a0;

@@ -35,6 +35,21 @@
 					"url": "/mathlive/demo/",
           "icon": "flask"
         },
+				{
+					"title": "Using the Virtual Keyboard",
+					"url": "/mathlive/virtual-keyboard/",
+          "icon": "reference"
+				},
+        {
+					"title": "LaTeX Commands",
+					"url": "/mathlive/reference/commands/",
+          "icon": "reference"
+        },
+        {
+					"title": "Keyboard Shortcuts",
+					"url": "/mathlive/reference/keybindings/",
+          "icon": "reference"
+        },
         { "separator": true },
 				{
 					"title": "Changelog",
@@ -63,12 +78,12 @@
           "icon": "guide"
 				},
 				{
-					"title": "Fill in the blank",
+					"title": "Fill-in-the-Blank",
 					"url": "/mathlive/guides/fill-in-the-blank/",
           "icon": "guide"
 				},
 				{
-					"title": "Customize",
+					"title": "Customize the Mathfield",
 					"url": "/mathlive/guides/customizing/",
           "icon": "guide"
 				},
@@ -98,7 +113,7 @@
           "icon": "guide"
 				},
 				{
-					"title": "Virtual Keyboard",
+					"title": "Customize the Virtual Keyboard",
 					"url": "/mathlive/guides/virtual-keyboards/",
           "icon": "guide"
 				},
@@ -108,16 +123,6 @@
           "icon": "guide"
 				},
         { "separator": true },
-        {
-					"title": "LaTeX Commands",
-					"url": "/mathlive/reference/commands/",
-          "icon": "reference"
-        },
-        {
-					"title": "Keyboard Shortcuts",
-					"url": "/mathlive/reference/keybindings/",
-          "icon": "reference"
-        },
 				{
 					"title": "SDK Reference",
 					"url": "/docs/mathlive/",

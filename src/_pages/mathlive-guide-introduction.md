@@ -72,12 +72,33 @@ For example change it to `f(x) = \frac{x}{2}`.
 
 <div class="notice--warning" markdown="1">
 
-#### Caution
-The HTML quirks mode is not supported. This means that the host page
-must use the strict mode, indicated by a `<!DOCTYPE html>` directive at the top
-of the page. Without it, the layout of the equations inside the mathfield may be incorrect.
+#### Caution: HTML quirks mode
+The **HTML quirks mode** is not supported. 
+
+The host page must use the **strict mode** by including a `<!DOCTYPE html>` 
+directive at the top of the page. 
+
+Without it, the layout of the expression inside the mathfield may be incorrect.
 
 </div>
+
+<div class="notice--warning" markdown="1">
+
+#### Caution: `file://` protocol
+For security reasons there are some restrictions when using the `file://` 
+protocol. This happens if you open a file in the browser from your local file
+storage. You will notice the adress in the browser address bar starts with `file://`.
+
+In this situation, some functionality may not be available and some errors may 
+be displayed in the console.
+
+To prevent this, use a **local file server**. 
+
+With VSCode, the **Live Server** extension can be used to launch a local 
+development server with one click.
+
+</div>
+
 
 Here's a complete web page:
 

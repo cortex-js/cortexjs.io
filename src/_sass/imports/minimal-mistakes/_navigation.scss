@@ -605,16 +605,16 @@ button.nav__sub-title_toggle:hover {
 */
 
 .toc {
-  margin: 2em auto 2em auto;
+  margin: 0 0 1em 1em;
   width: fit-content;
-  min-width: 40ex;
-  max-width: 60ex;
-  font-family: var(--ui-font-family);
+  max-width: 50%;
   background-color: var(--ui-background);
   border-radius: $border-radius;
+  float: right;
 
   .nav__title {
     color: #fff;
+    font-family: var(--body-font-family);
     font-size: $type-size-5;
     background: var(--primary-color);
     border: none;
