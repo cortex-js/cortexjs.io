@@ -11,31 +11,6 @@ render_math_in_document: true
 ---
 
 <style>
-  /* td:nth-child(1) code, td:nth-child(1) kbd {
-    display: inline-block;
-    min-width: 42px;
-    text-align: center;
-    font-size: 24px;
-    font-weight:normal;
-    margin: 8px;
-    line-height: 1.5;
-    font-variant-ligatures: none;
-  }
-  table {
-    table-layout: auto;
-  }
-  table tr td {
-    vertical-align: middle;
-  }
-  table tr td:first-child {
-    min-width: 15ex;
-    width: 1ex;
-    white-space: nowrap;
-    font-size: 24px;
-    font-weight: 900;
-    color: var(--primary-color-dark);
-  } */
-
   kbd {
     font-family: var(--ui-font-family);
     padding-left: 4px;
@@ -47,7 +22,13 @@ render_math_in_document: true
     border: var(--code-border);
     background: var(--code-background);
     border-radius: 4px;
-    color: var(--primary-color-dark);
+    color: var(--blue-800);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    kbd {
+      color: var(--blue-100);
+    }
   }
 
   table td code {
@@ -118,12 +99,12 @@ render_math_in_document: true
 .keybindings-table tr {
   display: flex;
   flex-flow: column-reverse;
-  justify-content: space-evenly;
+  justify-content: flex-end;
   width: 20%;
   gap: 0;
   padding: 8px;
   margin: 0;
-  border: 1px solid #ddd;
+  border: 1px solid var(--callout-border-color);
   border-radius: 8px;
   box-sizing: content-box;
 }
@@ -152,8 +133,11 @@ render_math_in_document: true
 .keybindings-table tr td:last-child {
   flex-flow: column;
   border-radius: 8px;
-  background: #f5f5f5;
+  padding: 8px;
+  background: var(--callout-background);
+  color: var(--text-color);
   align-items: center;
+  overflow-wrap: anywhere;
 }
 
 /* .keybindings-table tr td:not(:first-child) {
@@ -195,27 +179,27 @@ table tr td:first-child {
 .inlineshortcut-table tr {
   display: flex;
   flex-flow: column-reverse;
-  justify-content: space-evenly;
+  justify-content: flex-end;
   width: 20%;
   gap: 0;
   padding: 8px;
   margin: 0;
-  border: 1px solid #ddd;
+  border: 1px solid var(--callout-border-color);
   border-radius: 8px;
   box-sizing: content-box;
 }
 .inlineshortcut-table tr td {
   display: flex;
   justify-content: center;
+  align-items: baseline;
   padding: 0;
   padding-bottom: 8px;
+  padding-top: 8px;
   margin: 0;
   font-size: 20px;
   font-weight: 400;
   line-height: 1;
   text-align: center;
-  padding-top: 8px;
-  align-items: baseline;
   font-variant-ligatures: none;
 }
 
@@ -230,8 +214,11 @@ table tr td:first-child {
 .inlineshortcut-table tr td:last-child {
   flex-flow: column;
   border-radius: 8px;
-  background: #f5f5f5;
+  padding: 8px;
+  background: var(--callout-background);
+  color: var(--text-color);
   align-items: center;
+  overflow-wrap: anywhere;
 }
 
 .inlineshortcut-table tr td kbd {
@@ -486,7 +473,7 @@ If the conversion was not desired, for example you actually meant "pi", type <kb
 | `AA` | `forall` | <div data-tooltip="\forall">$$\forall$$</div> |
 | `EE` | `exists` | <div data-tooltip="\exists">$$\exists$$</div> |
 | `!EE` | `!exists` | <div data-tooltip="\nexists">$$\nexists$$</div> |
-| `$` | $$\$$$ `\$` |
+| `$` | <div data-tooltip="\$">$</div>  |
 | `%` | <div data-tooltip="\%">$$\%$$</div> |
 | `#` | <div data-tooltip="\#">$$\#$$</div> |
 | `//` | <div data-tooltip="\slash">$$\slash$$</div> |

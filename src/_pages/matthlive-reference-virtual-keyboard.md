@@ -7,23 +7,6 @@ read_time: false
 sidebar:
     - nav: "universal"
 toc: true
-head:
-  stylesheets:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css
-  scripts:
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js
-    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
-  modules:
-    - /assets/js/code-playground.min.js
-    - //unpkg.com/mathlive?module
-  moduleMap: |
-    window.moduleMap = {
-    "mathlive": "//unpkg.com/mathlive?module",
-    // "mathlive": "/js/mathlive.mjs",
-    "html-to-image": "///assets/js/html-to-image.js",
-    "compute-engine": "//unpkg.com/@cortex-js/compute-engine?module"
-    };
 ---
 Typing math requires access to many special symbols. While [keyboard 
 shortcuts and inline shortcuts](/mathlive/guides/shortcuts) can help when a 
