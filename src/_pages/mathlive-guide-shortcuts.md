@@ -288,95 +288,10 @@ the focus on the mathfield, will automatically timeout the shortcuts.
 [ASCIIMath](https://github.com/asciimath/asciimathml/blob/master/ASCIIMathML.js) defines a series of shortcuts that can be typed with ASCII characters to
 represent mathematical symbols and expressions.
 
-The most common ASCIIMath shortcuts are part of the default inline shortcuts.
+{% readmore "/mathlive/reference/keybindings/" %}
+**Learn more:** ASCIIMath and other default keybindings
+{% endreadmore %}
 
-**To support additional ASCIIMath shortcuts**, add them to the `inlineShortcuts`
-setting.
-
-```js
-mf.inlineShortcuts = {
-  ...mf.inlineShortcuts,
-  //
-  // ASCIIIMath
-  //
-  // Binary operation symbols
-  '*': '\\cdot',
-  '**': '\\ast',
-  '***': '\\star',
-  '//': '\\slash',
-  '\\\\\': '\\backslash',
-  'setminus': '\\backslash',
-  '|><': '\\ltimes',
-  '><|': '\\rtimes',
-  '|><|': '\\bowtie',
-  '-:': '\\div',
-  'divide': '\\div',
-  '@': '\\circ',
-  'o+': '\\oplus',
-  'ox': '\\otimes',
-  'o.': '\\odot',
-  '^^': '\\wedge',
-  '^^^': '\\bigwedge',
-  'vv': '\\vee',
-  'vvv': '\\bigvee',
-  'nn': '\\cap',
-  'nnn': '\\bigcap',
-  'uu': '\\cup',
-  'uuu': '\\bigcup',
-
-  // Binary relation symbols
-  '-=': '\\equiv',
-  '~=': '\\cong',
-  'lt': '<',
-  'lt=': '\\leq',
-  'gt': '>',
-  'gt=': '\\geq',
-  '-<': '\\prec',
-  '-lt': '\\prec',
-  '-<=': '\\preceq',
-  // '>-': '\\succ',
-  '>-=': '\\succeq',
-  'prop': '\\propto',
-  'diamond': '\\diamond',
-  'square': '\\square',
-  'iff': '\\iff',
-
-  'sub': '\\subset',
-  'sup': '\\supset',
-  'sube': '\\subseteq',
-  'supe': '\\supseteq',
-  'uarr': '\\uparrow',
-  'darr': '\\downarrow',
-  'rarr': '\\rightarrow',
-  'rArr': '\\Rightarrow',
-  'larr': '\\leftarrow',
-  'lArr': '\\Leftarrow',
-  'harr': '\\leftrightarrow',
-  'hArr': '\\Leftrightarrow',
-  'aleph': '\\aleph',
-
-  // Logic
-  'and': '\\land',
-  'or': '\\lor',
-  'not': '\\neg',
-  '_|_': '\\bot',
-  'TT': '\\top',
-  '|--': '\\vdash',
-  '|==': '\\models',
-
-  // Other functions
-  '|__': '\\lfloor',
-  '__|': '\\rfloor',
-
-  '|~': '\\lceiling',
-  '~|': '\\rceiling',
-
-  // Arrows
-  '>->': '\\rightarrowtail',
-  '->>': '\\twoheadrightarrow',
-  '>->>': '\\twoheadrightarrowtail'
-};
-```
 
 </section>
 

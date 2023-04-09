@@ -373,7 +373,6 @@ Read more about definining your own **keybindings** and **shortcuts**.
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>K</kbd> | toggle keystroke caption |
 | <kbd>⌥</kbd>+<kbd>space</kbd> | toggle virtual keyboard |
 | <kbd>⌥</kbd>+<kbd>=</kbd> | apply text mode |
-| <kbd>⇧</kbd>+<kbd>'</kbd> | toggle math/text mode <aside>may not work in non-US QWERTY layout</aside> |
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>T</kbd> | toggle math/text mode |
 | <kbd>esc</kbd> | enter/exit LaTeX mode |
 | <kbd>\\</kbd> | enter LaTeX mode |
@@ -391,22 +390,12 @@ Read more about definining your own **keybindings** and **shortcuts**.
 | <kbd>/</kbd> | <div data-tooltip='\frac{}{}'>$$\frac{\char"2B1A}{\char"2B1A}$$</div>  |
 | <kbd>⌃</kbd>+<kbd>2</kbd> | | <kbd>⌥</kbd>+<kbd>V</kbd> | <div data-tooltip='\sqrt{}'>$$\sqrt{\char"2B1A}$$</div>|
 | <kbd>⌥</kbd>+<kbd>P</kbd> | <div data-tooltip="\pi">$$\pi$$</div>|
-| <kbd>⌥</kbd>+<kbd>W</kbd> | <div data-tooltip='\sum_{i=}^{}'>$$\sum_{i=\char"2B1A}^{\char"2B1A}$$</div> |
-| <kbd>⌥</kbd>+<kbd>U</kbd> | <div data-tooltip="\cup">$$\cup$$</div>|
-| <kbd>⌥</kbd>+<kbd>N</kbd> | <div data-tooltip="\cap">$$\cap$$</div>|
 | <kbd>⌥</kbd>+<kbd>O</kbd> | <div data-tooltip="\emptyset">$$\emptyset$$</div>|
 | <kbd>⌥</kbd>+<kbd>D</kbd> | <div data-tooltip="\differentialD">$$\differentialD$$</div>|
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>O</kbd> | <div data-tooltip="\varnothing">$$\varnothing$$</div>|
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>D</kbd> | <div data-tooltip="\partial">$$\partial$$</div>|
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>P</kbd> | <div data-tooltip='\prod'>$$\prod_{i=\char"2B1A}^{\char"2B1A}$$</div>  |
-| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>U</kbd> | <div data-tooltip="\bigcup">$$\bigcup$$</div>|
-| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>N</kbd> | <div data-tooltip="\bigcap">$$\bigcap$$</div>|
-| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>A</kbd> | <div data-tooltip="\forall">$$\forall$$</div>|
-| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>E</kbd> | <div data-tooltip="\exists">$$\exists$$</div>|
-| <kbd>⌥</kbd>+<kbd>B</kbd> | <div data-tooltip='\int'>$$\int_{\char"2B1A}^{\char"2B1A}$$</div>  |
 | <kbd>⌥</kbd>+<kbd>5</kbd> | <div data-tooltip='\infty'>$$\infty$$</div>|
-| <kbd>⌥</kbd>+<kbd>6</kbd> | <div data-tooltip="\wedge">$$\wedge$$</div>|
-| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>6</kbd> | <div data-tooltip="\vee">$$\vee$$</div>|
 | <kbd>⌥</kbd>+<kbd>9</kbd> | <div data-tooltip="(">$$($$</div>|
 | <kbd>⌥</kbd>+<kbd>0</kbd> | <div data-tooltip=")">$$)$$</div>|
 | <kbd>⌥</kbd>+<kbd>\|</kbd> | <div data-tooltip="\|">$$\|$$</div>|
