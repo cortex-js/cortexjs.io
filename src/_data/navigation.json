@@ -127,7 +127,14 @@
 					"title": "SDK Reference",
 					"url": "/docs/mathlive/",
           "icon": "sdk"
+				},
+        { "separator": true },
+				{
+					"title": "Editor",
+					"url": "/mathlive/editor",
+          "icon": "flask"
 				}
+        
 			]
 		},
 

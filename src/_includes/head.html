@@ -52,7 +52,7 @@
 {% endif %}
 
 
-<link rel="stylesheet" href="{{ stylesheet | default: '/assets/css/main.css' | url }}">
+<link rel="stylesheet" href="{{ stylesheet | default: '/assets/css/main.css' | url }}" crossorigin>
 {% if head.stylesheets %}
   {% for x in head.stylesheets %}
     {% if x contains "://" %}
@@ -60,7 +60,7 @@
     {% else %}
       {% capture stylesheet_path %}{{ x | url }}{% endcapture %}
     {% endif %}
-    <link rel="stylesheet" href="{{ stylesheet_path }}">
+    <link rel="stylesheet" href="{{ stylesheet_path }}" crossorigin>
   {% endfor %}
 {% endif %}
 

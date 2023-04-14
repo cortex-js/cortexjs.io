@@ -38,7 +38,7 @@ then
   ## Grok (.d.ts -> .html with frontmatter)
   # Uses grok.config.js for additional config option
 
-  echo -e "$BASENAME$DOT Groking mathlive"
+  echo -e "$BASENAME$DOT Groking MathLive"
   npx grok build ../mathlive --inFile ./src/mathlive.ts --config ./grok.config.js --sdkName mathlive --outDir ./src/build/ --outFile mathlive.html
 
   # echo -e "$BASENAME$DOT Groking MathJSON"
