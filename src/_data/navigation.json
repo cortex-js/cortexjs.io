@@ -164,6 +164,11 @@
           "icon": "guide"
 				},
 				{
+					"title": "Defining New Symbols",
+					"url": "/compute-engine/guides/augmenting/",
+          "icon": "guide"
+				},
+				{
 					"title": "Canonical Form",
 					"url": "/compute-engine/guides/canonical-form/",
           "icon": "guide"
