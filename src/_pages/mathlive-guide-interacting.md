@@ -314,24 +314,22 @@ corresponding definition, `\mathrm{d}`. {.notice--info}
 For example, to wrap the exported latex with `<math>...</math>` instead:
 
 ```js
-mf.setOptions({onExport: (mf, latex) => `<math>${latex}</math>`});
+mf.onExport = (mf, latex) => `<math>${latex}</math>`
 ```
 
 **To export the "raw" (not expanded) LaTeX)**, use:
 
 ```js
-mf.setOptions({onExport: (mf, latex, range) => 
-  `$$${mf.getValue(range, 'latex')}$$`
-});
+mf.onExport = (mf, latex, range) => `$$${mf.getValue(range, 'latex')}$$`
 ```
 
 The exported format doesn't have to be LaTeX. To export ASCIIMath instead:
 
 ```js
-mf.setOptions({onExport: (mf, latex, range) => 
-  "`" + mf.getValue(range, 'ascii-math') + "`"
-});
+mf.onExport = (mf, latex, range) => 
+    "`" + mf.getValue(range, 'ascii-math') + "`"
 ```
+
 The standard delimiter for ASCIIMath is the <kbd>&#96;</kbd> (backtick) character .{.notice--info}
 
 ## Applying Style to a Mathfield
