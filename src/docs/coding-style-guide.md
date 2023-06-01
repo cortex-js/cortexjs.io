@@ -4,12 +4,14 @@ permalink: /docs/coding-style-guide/
 read_time: true
 layout: single
 date: Last Modified
+sidebar:
+  - nav: "universal"
 ---
 # Coding Style Guide
 
 ## Guiding Principles
 
-Good style is subjective and many decisions are arbitrary. The project uses
+Good style is subjective and many decisions are subjective. The project uses
 these guiding principles:
 
 -   **Consistency.** The code in the project should look as if it had been
@@ -26,12 +28,13 @@ these guiding principles:
     you do, be liberal in what you accept from others". For example, functions that
     are invoked internally do not need to check that the input parameters are valid.
     However, public APIs should check the validity of parameters, and behave
-    reasonably when they are invalid. See [this plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for Visual Studio Code.
+    reasonably when they are invalid. 
+    
 
 The project is setup to use [`prettier`](https://prettier.io/) an opinionated
-code formatter. Formatting will be applied before pushing to the repo. You can 
-also configure your editor to apply the formatting automatically on save, for 
-example.
+code formatter. You can configure your editor to apply the formatting automatically on 
+save, for example. See [this plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for Visual Studio Code.
+
 
 In general:
 
@@ -114,13 +117,8 @@ const objectCopy = { ...object };
 const arrayCopy = { ...array };
 ```
 
--   To make a deep clone of an object literal or an array, use JSON.
-    <br>However, be aware that Dates, functions, `undefined`, `Infinity`, `RegExp`,
-    `Map`, `Set`, `Blob`, `FileList`, `ImageData`, sparse `Array`, Typed Arrays and
-    circular references cannot be serialized to JSON, and will be replaced by `null`
-    or throw.
-    <br>There is [a proposal](https://github.com/whatwg/html/issues/793_) for an API for deep cloning making its way through the
-    standardization process.
+-   To make a deep clone of an object literal or an array, use 
+    `structuredClone()`.
 
 ```javascript
 const array = [
@@ -135,6 +133,6 @@ const object = {
     aliases: ['Mithrandir', 'Tharkûn', 'Olórin', ' Incánus'],
 };
 
-const deepClone = JSON.parse(JSON.stringify(object));
-const arrayDeepCopy = JSON.parse(JSON.stringify(array));
+const deepClone = structuredClone(object);
+const arrayDeepCopy = structuredClone(array);
 ```

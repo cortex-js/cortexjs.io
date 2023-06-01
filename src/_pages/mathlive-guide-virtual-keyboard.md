@@ -34,12 +34,13 @@ Learn more about using the math virtual keyboard
 ## Controlling when the Virtual Keyboard is Displayed
 
 The default behavior is to display the virtual keyboard when a mathfield is
-focused on a touch-enabled devices (mobile phones, tablets and laptops with 
-a touch-screen).
+focused on a touch-enabled devices: mobile phones, tablets and laptops with 
+a touch-screen.
 
 
 This behavior can be changed with the `mf.mathVirtualKeyboardPolicy` property 
-or the equivalent `math-virtual-keyboard-policy` attribute.
+or the equivalent `math-virtual-keyboard-policy` attribute (set one or the 
+other, not both).
 
 <div class='symbols-table'>
 
@@ -49,6 +50,15 @@ or the equivalent `math-virtual-keyboard-policy` attribute.
 | `"manual"` | Do not show the virtual keyboard panel automatically. The visibility of the virtual keyboard panel can be controlled programatically with `mathVirtualKeyboard.show()` and `mathVirtualKeyboard.hide()`|
 
 </div>
+
+To show the math virtual keyboard anytime the mathfield is focused, on 
+touch or non-touch devices, use:
+
+```js
+mf.mathVirtualKeyboardPolicy = "manual";
+mf.addEventListener("focusin", () =>  mathVirtualKeyboard.show());
+mf.addEventListener("focusout", () =>  mathVirtualKeyboard.hide());
+```
 
 
 ## Controlling the Virtual Toggle Visibility
@@ -69,36 +79,54 @@ For example to hide the toggle unless on a touch-enabled device, use:
 }
 ```
 
-## Preventing Input from the Physical Keyboard
 
-**To require the virtual keyboard to be used for input and ignore 
-keys pressed on the physical keyboard** listen and `preventDefault()` on `"keydown"`
-events during the capture phase, and show the virtual keyboard when the mathfield
-is focused.
+## Customizing the Size of the Keyboard
 
-```js
-mf.addEventListener("keydown", (evt) =>  evt.preventDefault(), {capture: true});
-mf.addEventListener("focus", () =>  mathVirtualKeyboard.show());
+By default the virtual keyboard is sized so that it can be used comfortably
+on touch-devices. Its size will adjust based on the available space in the 
+viewport.
+
+However, you may want to have a more compact virtual keyboard to leave more 
+room for the content. You can control the appearance of the virtual keyboard
+using some CSS variables. Set those variables in a rule that applies to 
+the entire document, for example the `body` element selector.
+
+```css
+body {
+  --keycap-height: 24px;
+  --keycap-font-size: 16px;
+  --keycap-shift-font-size: 9px;
+  --keycap-small-font-size: 9px;
+  --keycap-extra-small-font-size: 9px;
+  --keyboard-toolbar-font-size: 16px;
+  --keycap-gap: 1px;
+}
 ```
 
 
-## Displaying the Virtual Keyboard in a Custom Container
+The following CSS variables can be used to adjust the layout:
 
-By default the virtual keyboard is inserted at the end of the document's `body` 
-element.
+- `--keycap-height`
+- `--keycap-max-width`
+- `--keycap-gap`
+- `--keycap-font-size`
+- `--keycap-shift-font-size`
+- `--keycap-small-font-size`
+- `--keycap-extra-small-font-size`
+- `--keycap-secondary-border-bottom`
+- `--keycap-secondary-border-bottom`
+- `--keyboard-toolbar-font-size`
 
-In some cases you may want to display the virtual keyboard in some other 
-container.
+- `--keyboard-padding-horizontal`
+- `--keyboard-padding-top`
+- `--keyboard-padding-bottom`
+- `--keyboard-row-padding-left`
+- `--keyboard-row-padding-right`
 
-For example when using [full screen elements](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API) that contain a mathfield, you want to make sure the virtual
-keyboard panel is visible by attaching it to the full screen element.
+- `--variant-keycap-length`
+- `--variant-keycap-font-size`
+- `--variant-keycap-aside-font-size`
 
-**To select which DOM element the virtual keyboard is attached to**, set the
-`mathVirtualKeyboard.container` property to the desired DOM element.
-
-The container element should be at least 320px wide to ensure that the 
-default layouts can fit. The height of the container element will be 
-adjusted so that the virtual keyboard can fit. {.notice--warning}
 
 
 ## Customizing the Layouts
@@ -474,40 +502,93 @@ document.body.style.setProperty("--keyboard-zindex", "3000");
 
 ### Customizing the Virtual Keyboard Stack Order
 
-**To specify the stack order of the virtual keyboard panel relative to 
+**To specify the stack order of the virtual keyboard relative to 
 other DOM elements** set the `--keyboard-zindex` CSS variable. 
 
-The default `zindex` of the virtual keyboard panel is `105`.
+The default `zindex` of the virtual keyboard is `105`.
 
 
 ### Customizing the Virtual Keyboard Colors
 
 **To control the appearance of the virtual keyboard text and background colors**, set the 
 value of the following CSS variables to a CSS color:
-- `--keyboard-background`
-- `--keyboard-text`
-- `--keyboard-text-active`
-- `--keyboard-background-border`
+
+- `--keyboard-accent-color`
+- `--keyboard-toolbar-text`
+- `--keyboard-toolbar-text-active`
+- `--keyboard-toolbar-background`
+- `--keyboard-toolbar-background-hover`
+- `--keyboard-toolbar-background-selected`
+
+- `--keycap-background`
+- `--keycap-background-hover`
+- `--keycap-background-active`
+- `--keycap-background-pressed`
+- `--keycap-border`
+- `--keycap-border-bottom`
+- `--keycap-text`
+- `--keycap-text-active`
+- `--keycap-text-hover`
+- `--keycap-text-pressed`
+- `--keycap-shift-text`
+- `--keycap-shift-color`
+- `--keycap-primary-background`
+- `--keycap-primary-text`
+- `--keycap-primary-background-hover`
+- `--keycap-secondary-background`
+- `--keycap-secondary-background-hover`
+- `--keycap-secondary-text`
+- `--keycap-secondary-border`
+- `--keycap-secondary-border-bottom`
+- `--box-placeholder-color`
+
+- `--variant-panel-background`
+- `--variant-keycap-text`
+- `--variant-keycap-text-active`
+- `--variant-keycap-background-active`
 
 
-### Customizing the Keycaps
+The following CSS variables are a border shorthand value:
 
-**To control the appearance of keycaps**, use the following CSS variables:
-  - `--keycap-height`
-  - `--keycap-font-size`
-  - `--keycap-small-font-size` (only if needed)
-  - `--keycap-extra-small-font-size` (only if needed)
-  - `--keycap-tt-font-size` (only if needed)
-  - `--keycap-background`, a color
-  - `--keycap-background-active`, a color
-  - `--keycap-background-border`, a color
-  - `--keycap-background-border-bottom`, a color
-  - `--keycap-text`, a color
-  - `--keycap-text-active`, a color
-  - `--keycap-secondary-text`, a color
-  - `--keycap-modifier-background`, a color
-  - `--keycap-modifier-border`, a color
-  - `--keycap-modifier-border-bottom`, a color
+- `--keyboard-border`
+- `--keyboard-horizontal-rule`
+
+
+
+
+
+
+## Preventing Input from the Physical Keyboard
+
+**To require the virtual keyboard to be used for input and ignore 
+keys pressed on the physical keyboard** listen and `preventDefault()` on `"keydown"`
+events during the capture phase, and show the virtual keyboard when the mathfield
+is focused.
+
+```js
+mf.addEventListener("keydown", (evt) =>  evt.preventDefault(), {capture: true});
+mf.addEventListener("focus", () =>  mathVirtualKeyboard.show());
+```
+
+
+## Displaying the Virtual Keyboard in a Custom Container
+
+By default the virtual keyboard is inserted at the end of the document's `body` 
+element.
+
+In some cases you may want to display the virtual keyboard in some other 
+container.
+
+For example when using [full screen elements](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API) that contain a mathfield, you want to make sure the virtual
+keyboard panel is visible by attaching it to the full screen element.
+
+**To select which DOM element the virtual keyboard is attached to**, set the
+`mathVirtualKeyboard.container` property to the desired DOM element.
+
+The container element should be at least 320px wide to ensure that the 
+default layouts can fit. The height of the container element will be 
+adjusted so that the virtual keyboard can fit. {.notice--warning}
+
 
 
 

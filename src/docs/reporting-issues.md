@@ -28,9 +28,10 @@ Avoid filing duplicates, but you can add a comment to an existing issue if you'd
 
 ## What Happens After I File an Issue?
 
--   Once a developer has started working on the bug, the bug will be assigned to them.
--   Once a bug has been resolved, it is closed. You can still comment on 
-  closed bugs, or re-open them if necessary.
+-   Once a developer has started working on the issue, the issue will be assigned to them.
+-   Once an issue has been resolved, it is closed. Avoid commentting on 
+  closed issues, but you can re-open them if necessary, or file a new issue referencing
+  an old one.
 
 Issues may be tagged with the following:
 

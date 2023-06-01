@@ -13,7 +13,7 @@
     "removeComments": true,
     "sourceMap": true,
     "strictNullChecks": false,
-    "target": "es2019",
+    "target": "es2020",
     "module": "es2020", // es2020 includes support for dynamic imports, and import.meta
 
     "lib": ["es2020", "dom", "dom.iterable", "scripthost"]

@@ -294,6 +294,12 @@
           "title": "Trigonometry",
           "url": "/compute-engine/reference/trigonometry/",
           "icon": "reference"
+        },
+        { "separator": true },
+        {
+          "title": "Contributing",
+          "url": "/compute-engine/contributing/",
+          "icon": "seedling"
         }
 
       ]
@@ -386,8 +392,8 @@
           "icon": "code-branch"
 				},
 				{
-					"title": "Funding",
-					"url": "/funding/",
+					"title": "Support the Project",
+					"url": "/support/",
           "icon": "seedling"
 				},
 				{
