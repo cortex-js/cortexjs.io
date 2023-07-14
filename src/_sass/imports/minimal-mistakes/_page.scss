@@ -11,7 +11,7 @@
     max-width: 100%;
     animation-delay: 0.15s;
   
-    @include breakpoint($max-width) {
+    @include breakpoint($large) {
       padding: 0;
       display: flex;
       justify-content: center;

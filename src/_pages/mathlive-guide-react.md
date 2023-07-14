@@ -6,7 +6,7 @@ permalink: /mathlive/guides/react/
 read_time: false
 sidebar:
     - nav: "universal"
-toc: true
+toc: false
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css
@@ -19,90 +19,85 @@ head:
     - //unpkg.com/mathlive/dist/mathlive.min.js
 ---
 
-A mathfield is a web component. Once the MathLive library has been loaded
-it can be used as a regular HTML tag: `<math-field>`
+# Using MathLive with React
 
-However, when using MathLive with React, you might want to consider using
-some simple wrappers to better integrate with the React environment.
+**To use a mathfield with React**, import the MathLive library and use a `<math-field>` tag.
 
-## JSX
+```jsx
+import "./App.css";
+import "//unpkg.com/mathlive";
+import { useState } from "react";
 
-In order for JSX to be aware of the attributes specific to a mathfield, use 
-the following
+function App() {
+  const [value, setValue] = useState("");
 
-```js
-import { DOMAttributes } from "react";
-import { MathfieldElementAttributes } from 'mathlive'
-
-type CustomElement<T> = Partial<T & DOMAttributes<T>>;
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      ["math-field"]: CustomElement<MathfieldElementAttributes>;
-    }
-  }
+  return (
+    <div className="App">
+      <math-field 
+        onInput={evt => setValue(evt.target.value)}
+      >
+        {value}
+      </math-field>
+      <p>Value: {value}</p>
+    </div>
+  );
 }
+
+export default App;
 
 ```
 
-## Wrapping a Mathfield
+## Theory of Operations
 
-For your convenience, you may want to wrap a mathfield in a React 
-component.
+A MathLive mathfield behaves as a regular DOM element:
+- define mathfields using the `<math-field>` tag in JSX
+- use the `useRef()` hook to get a reference to the corresponding DOM element
+- use the `useEffect(..., [])` hook to customize the mathfield on mount
 
-Here's an example of such a wrapper.
+## Customization
 
-```js
-import * as React from "react";
+**To customize a mathfield**, use a `useEffect` hook. Note that the empty brackets
+indicate the hook should only be run once when the component is mounted. 
+Use a `useRef` hook to access the mathfield DOM element.
 
-import { useEffect, useMemo } from "react";
-import { MathfieldElement, MathfieldOptions } from "mathlive";
+```jsx
+import "./App.css";
+import "//unpkg.com/mathlive";
+import { useState, useEffect, useRef } from "react";
 
-export type MathfieldProps = {
-  options?: Partial<MathfieldOptions>;
+function App() {
+  const [value, setValue] = useState("");
 
-  value: string;
-  onChange: (latex: string) => void;
-
-  className?: string;
-};
-
-export default const Mathfield = () => {
-  const mathfieldRef = useRef<MathfieldElement>(null);
-
+  // Customize the mathfield when it is created
+  const mf = useRef();
   useEffect(() => {
-    // mathfieldRef.current.<option> = <value>;
+    mf.current.mathVirtualKeyboardPolicy = "manual";
+    mf.current.addEventListener("focusin", (evt) => 
+      mathVirtualKeyboard.show()
+    );
+    mf.current.addEventListener("focusout", (evt) => 
+      mathVirtualKeyboard.hide()
+    );
   }, []);
 
   return (
-    <math-field ref={mathfieldRef}/>
+    <div className="App">
+      <math-field 
+        ref={mf} 
+        onInput={evt => setValue(evt.target.value)}
+      >
+        {value}
+      </math-field>
+      <p>Value: {value}</p>
+    </div>
   );
-};
-    
-```
-
-You can then import the component dynamically. Keep in mind that this needs
-to be done on the browser/client side.
-
-```ts
-const Mathfield = dynamic(() => import("components/Mathfield"), {
-  ssr: false
-})
-
-const MyApp = () => {
-  return (
-    <Mathfield />
-  )
 }
 
+export default App;
+
 ```
 
 
-
-
-{% readmore "https://legacy.reactjs.org/docs/web-components.html" %}
-**Learn more about** <strong>React and Web Components</strong>
-{% endreadmore %}
-
+{% readmore "https://github.com/arnog/react-mathlive" %} A ready-to-run 
+example project is available on <strong>GitHub</strong>{% endreadmore %}
 

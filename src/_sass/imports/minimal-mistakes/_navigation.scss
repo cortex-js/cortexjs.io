@@ -331,7 +331,8 @@
 
   @include breakpoint(max-width $large - 1px) {
     label {
-      display: block;
+      display: flex;
+      align-items: center;
 
       padding: 1em;
 
@@ -340,7 +341,7 @@
       color: var(--text-color);
       border: var(--ui-border);
       background: var(--ui-background);
-      border-radius: 4px;
+      border-radius: 8px;
       line-height: .9;
       z-index: 20;
       cursor: pointer;

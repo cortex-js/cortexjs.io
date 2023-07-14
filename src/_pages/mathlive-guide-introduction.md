@@ -35,7 +35,7 @@ Let's add an editable mathfield to a web page.
 <script defer src="//unpkg.com/mathlive"></script>
 ```
 
-**2. Add a `<math-field>` tag.** The content of the this tag is the initial value 
+**2. Add a `<math-field>` tag.** The content of this tag is the initial value 
 of the mathfield, as a LaTeX expression.
 
 ```html
@@ -69,6 +69,39 @@ For example change it to `f(x) = \frac{x}{2}`.
 </code-playground>
 
 
+### MathLive and React
+
+To use MathLive in a React project, use a `<math-field>` tag with JSX:
+
+```js
+import "./App.css";
+import "//unpkg.com/mathlive";
+import { useState } from "react";
+
+function App() {
+  const [value, setValue] = useState("");
+
+  return (
+    <div className="App">
+      <math-field 
+        onInput={evt => setValue(evt.target.value)}
+      >
+        {value}
+      </math-field>
+      <p>Value: {value}</p>
+    </div>
+  );
+}
+
+export default App;
+```
+
+
+{% readmore "/mathlive/guides/react/" %}
+Read more about <strong>MathLive and React</strong>
+{% endreadmore %}
+
+### Caution
 
 <div class="notice--warning" markdown="1">
 

@@ -435,20 +435,20 @@ sidebar:
 <section id="all-content">${substitutions.content}</section>
 <div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>
 <script type="module">
-  window.addEventListener('DOMContentLoaded', (event) => {
-    import('https://unpkg.com/mathlive?module').then((mathlive) => {  
-      mathlive.renderMathInDocument(document.getElementsByClassName('page__content')[0], { 
-      renderAccessibleContent: false,
-      TeX: { 
-        delimiters: {
-          inline: [['\\\\(', '\\\\)']],
-          display: [ ['$$', '$$'], ['\\\\[', '\\\\]']],
-        },
-        processEnvironments : false 
+window.addEventListener('DOMContentLoaded', (event) => {
+  import('https://unpkg.com/mathlive?module').then((mathlive) => {  
+    mathlive.renderMathInDocument(document.getElementsByClassName('page__content')[0], { 
+    renderAccessibleContent: false,
+    TeX: { 
+      delimiters: {
+        inline: [['\\\\(', '\\\\)']],
+        display: [ ['$$', '$$'], ['\\\\[', '\\\\]']],
       },
-      asciiMath: null,
-    });
+      processEnvironments : false 
+    },
+    asciiMath: null,
   });
+})});
 </script>
 `,
 };

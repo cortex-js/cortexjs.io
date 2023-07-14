@@ -178,11 +178,12 @@ $semantic-orange: #e68619;
 $semantic-green: #2d9d78;
 
 :root {
-  --monospace-font-family: 'Berkeley', 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', monospace;
-  --body-font-family: 'Inter', 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
-  --display-font-family: 'Inter', 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
-  --ui-font-family: 'Inter', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
-  --ui-font: 'Inter', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  --monospace-font-family: 'Berkeley Mono', 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', monospace;
+  --monospace-font: var(--monospace-font-family);
+  --body-font-family: 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
+  --display-font-family: 'Source Sans Pro', 'IBM Plex Sans', sans-serif;
+  --ui-font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  --ui-font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 
 
   --primary-color: #{$primary-color};
