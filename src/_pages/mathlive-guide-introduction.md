@@ -69,39 +69,31 @@ For example change it to `f(x) = \frac{x}{2}`.
 </code-playground>
 
 
-### MathLive and React
+## MathLive with React
 
-To use MathLive in a React project, use a `<math-field>` tag with JSX:
+**To use MathLive in a React project**, use a `<math-field>` tag with JSX:
 
 ```js
-import "./App.css";
 import "//unpkg.com/mathlive";
 import { useState } from "react";
 
-function App() {
-  const [value, setValue] = useState("");
+export View = () => {
+  const [value, setValue] = useState("f(x) = \\frac{x}{2}");
 
   return (
-    <div className="App">
-      <math-field 
-        onInput={evt => setValue(evt.target.value)}
-      >
-        {value}
-      </math-field>
-      <p>Value: {value}</p>
-    </div>
+    <math-field 
+      onInput={evt => setValue(evt.target.value)}
+    > {value} </math-field>
+    <p>Value: {value}</p>
   );
 }
-
-export default App;
 ```
-
 
 {% readmore "/mathlive/guides/react/" %}
 Read more about <strong>MathLive and React</strong>
 {% endreadmore %}
 
-### Caution
+## Caution
 
 <div class="notice--warning" markdown="1">
 

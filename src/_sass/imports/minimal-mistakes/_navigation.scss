@@ -318,6 +318,8 @@
 
 .nav__list {
   width: 100%;
+  font-family: var(--ui-font-family);
+  font-weight: 600;
   @include breakpoint(max-width $large - 1px) {
     width: auto;
   }
@@ -612,6 +614,9 @@ button.nav__sub-title_toggle:hover {
   background-color: var(--ui-background);
   border-radius: $border-radius;
   float: right;
+
+  font-family: var(--ui-font-family);
+  font-weight: 600;
 
   .nav__title {
     color: #fff;

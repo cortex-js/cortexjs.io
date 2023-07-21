@@ -13,10 +13,10 @@
     "removeComments": true,
     "sourceMap": true,
     "strictNullChecks": false,
-    "target": "es2020",
-    "module": "es2020", // es2020 includes support for dynamic imports, and import.meta
+    "target": "es2022",
+    "module": "esnext", // es2020 includes support for dynamic imports, and import.meta
 
-    "lib": ["es2020", "dom", "dom.iterable", "scripthost"]
+    "lib": ["es2022", "dom", "dom.iterable", "scripthost"]
     // "lib": ["es2020", "scripthost"]
   },
   "exclude": ["node_modules", "**/*.spec.ts", "bin", "config"]
