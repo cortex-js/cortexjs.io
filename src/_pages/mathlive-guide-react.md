@@ -51,14 +51,19 @@ export default App;
 
 A MathLive mathfield behaves as a regular DOM element:
 - define mathfields using the `<math-field>` tag in JSX
-- use the `useRef()` hook to get a reference to the corresponding DOM element
-- use the `useEffect(..., [])` hook to customize the mathfield on mount
+- get a reference to the corresponding DOM element with the `useRef()` hook
+- customize the mathfield on mount with `useEffect(..., [])` hook
 
 ## Customization
 
-**To customize a mathfield**, use a `useEffect` hook. Note that the empty brackets
-indicate the hook should only be run once when the component is mounted. 
-Use a `useRef` hook to access the mathfield DOM element.
+**To customize a mathfield**, use a `useEffect` hook. The last parameter
+is set to empty brackets to indicate the hook should only be run once when 
+the component is mounted. 
+
+**To access the mathfield DOM element** use a `useRef()` hook. With the 
+`current` property of the ref, you can access and manipulate all the 
+properties and methods that are specific to the mathfield (`value`, `selection`, `insert()`,
+etc...). See [MathfieldElement](https://cortexjs.io/docs/mathlive/#(MathfieldElement%3Aclass)).
 
 ```jsx
 import "./App.css";
@@ -66,19 +71,22 @@ import "//unpkg.com/mathlive";
 import { useState, useEffect, useRef } from "react";
 
 function App() {
-  const [value, setValue] = useState("");
+  // Get a ref to the mathfield element (see `ref={mf}` in the markup below)
+  const mf = useRef();
 
   // Customize the mathfield when it is created
-  const mf = useRef();
   useEffect(() => {
     mf.current.mathVirtualKeyboardPolicy = "manual";
     mf.current.addEventListener("focusin", (evt) => 
-      mathVirtualKeyboard.show()
+      window.mathVirtualKeyboard.show()
     );
     mf.current.addEventListener("focusout", (evt) => 
-      mathVirtualKeyboard.hide()
+      window.mathVirtualKeyboard.hide()
     );
   }, []);
+
+
+  const [value, setValue] = useState("");
 
   return (
     <div className="App">
