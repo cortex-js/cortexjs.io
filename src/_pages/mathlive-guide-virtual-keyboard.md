@@ -344,24 +344,24 @@ mathVirtualKeyboard.layouts = {
   label: 'Basic',
   rows: [
     [
-      '[7]', '[8]', '[9]', '[+]', {'[separator]', width: 0.5 },
+      '[7]', '[8]', '[9]', '[+]', {label: '[separator]', width: 0.5 },
       { class: 'small', latex: '\\frac{#@}{#0}' },
       '\\varnothing', '\\infty', '\\in', '\\notin',
       '[separator]',
     ],
     [
-      '[4]', '[5]', '[6]', '[-]', {'[separator]', width: 0.5 },
+      '[4]', '[5]', '[6]', '[-]', {label: '[separator]', width: 0.5 },
       '[(]', '[)]', '\\lt', '\\le', '\\hat{=}', '[separator]',
     ],
     [
-      '[1]', '[2]', '[3]', '\\cdot', {'[separator]', width: 0.5 },
+      '[1]', '[2]', '[3]', '\\cdot', {label: '[separator]', width: 0.5 },
       '[', ']', '\\gt', '\\ge',
 
       { label: '[backspace]', width: 2 },
     ],
     [
       { label: '[0]', width: 2 },
-      '[.]', '\\colon', {'[separator]', width: 0.5 },
+      '[.]', '\\colon', {label: '[separator]', width: 0.5 },
       '\\lbrace', '\\rbrace', '=', '\\ne', '[left]', '[right]',
     ],
   ],
@@ -394,36 +394,53 @@ rows: [
 ### Layer Styling
 
 If you want to apply custom CSS classes to some keycaps, you can provide
-a definition for them using the `style` property:
+a definition for them using the `style` property. Note that in that case
+you can't use the `rows` shortcut, you must provide the full definition
+of the layers.
+
+Also, note that you may need to use the `!important` modifier to override
+the default styling.
 
 ```js
 mathVirtualKeyboard.layouts = [
   {
-    label: "minimal",
-    toolip: "Only the essential",
-    style: ".digit { background: blue; color: white }",
-    rows: [
-      [
-        "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
-        "(", ")", "\\sqrt{#0}", "#@^{#?}",
-      ],
-      [
-        {class: "digit", latex: "1"},
-        {class: "digit", latex: "2"},
-        {class: "digit", latex: "3"},
-        {class: "digit", latex: "4"},
-        {class: "digit", latex: "5"},
-        {class: "digit", latex: "6"},
-        {class: "digit", latex: "7"},
-        {class: "digit", latex: "8"},
-        {class: "digit", latex: "9"},
-        {class: "digit", latex: "0"},
-      ],
-    ]
-  }, 
-  "alphabetic"
+    label: 'minimal',
+    toolip: 'Only the essential',
+    layers: [
+      {
+        style:
+          '.digit { background: blue !important; color: white !important }',
+        rows: [
+          [
+            '+',
+            '-',
+            '\\times',
+            '\\frac{#@}{#?}',
+            '=',
+            '.',
+            '(',
+            ')',
+            '\\sqrt{#0}',
+            '#@^{#?}',
+          ],
+          [
+            { class: 'digit', latex: '1' },
+            { class: 'digit', latex: '2' },
+            { class: 'digit', latex: '3' },
+            { class: 'digit', latex: '4' },
+            { class: 'digit', latex: '5' },
+            { class: 'digit', latex: '6' },
+            { class: 'digit', latex: '7' },
+            { class: 'digit', latex: '8' },
+            { class: 'digit', latex: '9' },
+            { class: 'digit', latex: '0' },
+          ],
+        ],
+      },
+    ],
+  },
+  'alphabetic',
 ];
-
 ```
 
 
