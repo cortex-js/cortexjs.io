@@ -68,14 +68,8 @@ latex.addEventListener("input", (ev) =>
 
 ## Reading the Content of a Mathfield
 
-**To read the content of a `<math-field>` element** use its `value` property, 
+**To read the content of a `<math-field>` element as a LaTeX string** use its `value` property, 
 just like with a `<textarea>`.
-
-The `expression.json` property of a mathfield contains a MathJSON representation
-of its content. The [MathJSON](/math-json) format is a lightweight 
-mathematical notation interchange format. 
-
-To use MathJSON, import the compute-engine library, e.g. `import "https://unpkg.com/@cortex-js/compute-engine?module"` {.notice--info}
 
 **To be notified when the content of the mathfield is modified** listen for 
 an `"input"` event.
@@ -127,6 +121,39 @@ mf.addEventListener('input',(ev) => {
     console.log(ev.target.getValue('math-json'));
 });</div>
 </code-playground>
+
+
+## Using a Mathfield with the Compute Engine
+
+The [MathJSON](/math-json) format is a lightweight mathematical notation interchange format. 
+
+The CortexJS Compute Engine is a JavaScript library that can perform
+mathematical operations on MathJSON expressions.
+
+**To use MathJSON**, import the compute-engine library, e.g. `import "https://unpkg.com/@cortex-js/compute-engine?module"` {.notice--info}
+
+**To read the content of a `<math-field>` element as a boxed MathJSON expression** use the mathfield `expression` property.
+
+The instance of the compute engine used by mathfields is accessible
+with the `MathfieldElement.engine` property.
+
+Using `mf.expression` is equivalent to calling `MathfieldElement.box(mf.getValue('math-json'))`.
+
+
+<code-playground layout="stack">
+    <div slot="html">
+&lt;math-field id="formula"&gt;
+    \mathrm{Expand}((a+b)^6)
+&lt;/math-field&gt;</div>
+    <div slot="javascript">import 'compute-engine';
+const mf = document.getElementById('formula');
+console.log(mf.expression.evaluate());
+mf.addEventListener('input',(ev) => {
+    console.log(mf.expression.evaluate());
+});</div>
+</code-playground>
+
+
 
 
 ## Listening for Changes to a Mathfield
