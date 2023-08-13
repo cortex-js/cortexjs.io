@@ -104,7 +104,7 @@ Reading the `value` property is equivalent to calling the `getValue()` method wi
 no argument. 
 
 **To control the format of the result**, pass options to [`getValue()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
-For example to get the content as a MathJSON expression, use `getValue('math-json')`.
+For example to get the content as a MathJSON expression, use `mf.getValue('math-json')`.
 
 
 **Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `"math-json"` to `"spoken-text"`.{.notice--info}
@@ -123,7 +123,7 @@ mf.addEventListener('input',(ev) => {
 </code-playground>
 
 
-## Using a Mathfield with the Compute Engine
+## Using a Mathfield with the CortexJS Compute Engine
 
 The [MathJSON](/math-json) format is a lightweight mathematical notation interchange format. 
 
@@ -134,10 +134,12 @@ mathematical operations on MathJSON expressions.
 
 **To read the content of a `<math-field>` element as a boxed MathJSON expression** use the mathfield `expression` property.
 
-The instance of the compute engine used by mathfields is accessible
-with the `MathfieldElement.engine` property.
+Using `mf.expression` is equivalent to calling `MathfieldElement.computeEngine.box(mf.getValue("math-json"))`.
 
-Using `mf.expression` is equivalent to calling `MathfieldElement.box(mf.getValue('math-json'))`.
+The instance of the compute engine used by mathfields is accessible
+with the `MathfieldElement.computeEngine` property. If you do not set this property,
+a default instance of the compute engine will be used.
+
 
 
 <code-playground layout="stack">
@@ -147,10 +149,8 @@ Using `mf.expression` is equivalent to calling `MathfieldElement.box(mf.getValue
 &lt;/math-field&gt;</div>
     <div slot="javascript">import 'compute-engine';
 const mf = document.getElementById('formula');
+mf.addEventListener('input',() => console.log(mf.expression.evaluate()));</div>
 console.log(mf.expression.evaluate());
-mf.addEventListener('input',(ev) => {
-    console.log(mf.expression.evaluate());
-});</div>
 </code-playground>
 
 

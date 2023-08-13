@@ -16,13 +16,120 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
 ---
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg-settings" >
+  <defs>
+    <linearGradient id="orange-gradient">
+      <stop offset="0%" style="stop-color: #FF8C00; stop-opacity: 1;" />
+      <stop offset="100%" style="stop-color: #FFD700; stop-opacity: 1;" />
+  </linearGradient>
+
+  <linearGradient id="purple-gradient" gradientTransform="rotate(45)">
+    <stop offset="0%" style="stop-color:#a03b7d ; stop-opacity: 1;" />
+    <stop offset="100%" style="stop-color: #bf00ff; stop-opacity: 1;" />
+</linearGradient>
+
+<linearGradient id="blue-gradient">
+    <stop offset="0%" style="stop-color: rgba(44, 44, 224, 0.679); stop-opacity: 1;" />
+    <stop offset="100%" style="stop-color: #30afdd; stop-opacity: 1;" />
+</linearGradient>
+
+<linearGradient id="yellow-gradient" gradientTransform="rotate(90)">
+  <stop offset="0%" style="stop-color: #ff5e00; stop-opacity: 1;" />
+  <stop offset="100%" style="stop-color: #ff9900; stop-opacity: 1;" />
+</linearGradient>
+  
+
+<linearGradient id="green-gradient" gradientTransform="rotate(45)">
+  <stop offset="0%" style="stop-color: rgb(16, 126, 6); stop-opacity: 1;" />
+  <stop offset="100%" style="stop-color: #0abe46; stop-opacity: 1;" />
+</linearGradient>
+
+  </defs>
+</svg>
+
+
 <style>
+.svg-settings {
+    position: absolute !important;
+    height: 1px; width: 1px;
+    overflow: hidden;
+    clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+    clip: rect(1px, 1px, 1px, 1px);
+}
+
+
 .pod {
   margin-bottom: 6rem;
   border-radius: 8px;
   background:  #fff;
   padding: 16px 32px 8px 32px;
 }
+
+#features-section {
+  display: flex; gap: 1rem;
+}
+
+#features-section p {
+  color: var(--body-color);
+  font-weight: 400;
+  line-height: 1.2;
+  font-size: 1.2rem;
+}
+
+#use-cases-section {
+  display: flex;
+  flex-flow: column;
+  gap: 2rem;
+}
+
+.use-case {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--page-background);
+}
+.use-case .icon {
+  font-size: 5rem;
+  margin-right: 2rem;
+  margin-left: 1rem;
+}
+
+.page__content .use-case p {
+  color: var(--body-color);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+
+.fill-purple path {
+  fill: url(#purple-gradient);
+}
+.fill-orange path {
+  fill: url(#orange-gradient);
+}
+.fill-blue path {
+  fill: url(#blue-gradient);
+}
+.fill-yellow path {
+  fill: url(#yellow-gradient);
+}
+.fill-green path {
+  fill: url(#green-gradient);
+}
+
+
+.use-case  div {
+  margin: 0;
+}
+
+.use-case  div h3 {
+  margin: 0;
+
+}
+
 
 .fullwidth {
   display: flex;
@@ -45,11 +152,12 @@ head:
 
 h1 {
   display: flex;
+  flex-flow: column;
   justify-content: center;
   text-align: center;
-  font-size: 6rem;
+  font-size: 8rem;
   letter-spacing: -0.04em;
-  line-height: .9;
+  line-height: .8;
   font-weight: 700;
   text-fill-color: transparent;
   -webkit-text-fill-color: transparent;
@@ -59,7 +167,15 @@ h1 {
   -moz-background-clip: text;
   background-image: linear-gradient(0deg, #2f475e, #cc6666);
 }
-h1::selection {
+
+.page__content h1 .small {
+  margin-top: 1rem;
+  font-size: .6em;
+  font-weight: 400;
+  letter-spacing: -0.1ex;
+}
+
+h1::selection, .page__content h1 .small::selection {
   -webkit-text-fill-color: #000;
   background: #abd;
   background-clip:inherit;
@@ -150,17 +266,31 @@ div.figure {
   .fullwidth .copy {
     max-width: 75%;
   }
+
+  #features-section {
+    flex-flow: column;
+  }
+
+  .use-case {
+    display: flex;
+    flex-flow: column;
+  }
+  .use-case .icon {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
 }
 
 </style>
+
 
 <img alt="MathLive" class="full-width" src="/assets/mathlive-1.jpg" 
 style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
 
 
-<h1>A WEB COMPONENT FOR MATH INPUT</h1>
+<h1>EQUATIONS <span class="small">SERVED WITH A SIDE OF</span> INTERACTION</h1>
 
-<p style="text-align:center">Introducing  <kbd>&lt;math-field&gt;</kbd>: works just like an HTML <kbd>&lt;textarea&gt;</kbd>, but for math.</p>
+<p>Introducing the MathLive <kbd>&lt;math-field&gt;</kbd>: a ready to use web component that works just like an HTML <kbd>&lt;textarea&gt;</kbd>, but for math.</p>
 
 <section class="m-lg mb-xl max-w-2xl">
 <code-playground layout="stack">
@@ -179,97 +309,77 @@ style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
   x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
   </code-playground>
+
 </section>
 
 
-<!-- <h2><img src='/assets/images/mathfield/screenshot.jpg'></h2> -->
-
-<section>
-  <div class="pod">
-  <h2>LaTeX Quality Typesetting</h2>
-  <div class="copy">
-    <p>MathLive is a faithful JavaScript implementation of the <strong>TeX layout algorithms</strong>, the gold standard for typesetting of mathematical content.</p>
-    <div class="figure">
-      <img src="/assets/images/mathfield/loop-eqn.png">
-    </div>
-    <p style="margin-top: 2rem">MathLive supports over <strong>800 LaTeX commands</strong>, including mathematical symbols, matrices, chemical equations, styling, macros and complex layouts.</p>
+<section id="features-section">
+  <div>
+<h2>LaTeX</h2>
+  <p>MathLive includes a faithful JavaScript implementation of the <strong>TeX layout algorithms</strong>, the gold standard for typesetting of mathematical content.</p>
+  <div class="figure">
+    <img src="/assets/images/mathfield/loop-eqn.png">
   </div>
-{% readmore "/mathlive/reference/commands/" %}
-Read more about the <strong>LaTeX commands</strong> supported by MathLive
-{% endreadmore %}
-</div>
-
-<div class="pod">
-<h2>Perfectly suited... to you</h2>
-<section class="fullwidth">
+  {% readmore "/mathlive/reference/commands/" %}
+  Read more about the <strong>800+ LaTeX commands</strong> supported by MathLive
+  {% endreadmore %}
+</div><div>
+  <h2>Virtual Math Keyboards</h2>
+  <p>MathLive comes with a virtual keyboard that supports LaTeX input. It is fully customizable and can be used in any web application.</p>
   <div class="figure">
     <img src="/assets/images/mathfield/virtualKeyboard.png">
   </div>
-  <div class="copy">
-    <p>Many options are customizable with a <a href="/docs/mathlive/">comprehensive API</a>, from you own dictionary of LaTeX macros,
-      your own inline shortcuts, your own virtual keyboard and more.</p>
-    <p>Paste in MathASCII or LaTeX, and read the content in the format you need, including an 
-      easy to parse <a href="/math-json">MathJSON object</a> representing an Abstract Syntax Tree of the formula.</p>
-  </div>
-</section>
-
-{% readmore "/mathlive/guides/customizing/" %}
-Read more about <strong>customizing a mathfield</strong>
-{% endreadmore %}
-
-{% readmore "/mathlive/guides/virtual-keyboards/" %}
+  {% readmore "/mathlive/guides/virtual-keyboards/" %}
 Read more about the <strong>virtual keyboard</strong>
 {% endreadmore %}
 </div>
+</section>
 
-<div class="pod">
-  <h2>Easy as π</h2>
-  <section class="fullwidth">
-    <div class="figure">
-      <img src="/assets/images/mathfield/quadratic.gif">
+<section id="use-cases-section">
+
+  <div class="use-case">
+    <i class="icon fas fa-chalkboard-teacher fill-green"></i>
+    <div>
+      <h3>E-Learning Adventures: Math that Takes You Places</h3>
+      <p>Integrate MathLive into online courses, e-learning platforms, and educational websites to display math equations and formulas interactively.</p><p> Develop interactive quizzes and tests that involve math problems, making the learning experience more engaging</p>
     </div>
-    <div class="copy">
-      <p>Use the <a href="/mathlive/reference/keybindings/">keyboard</a> to type symbols, arrow keys to navigate.</p>
-    </div>
-  </section>
-  
-  {% readmore "/mathlive/reference/keybindings/" %}
-  Read more about <strong>keybindings and inline shortcuts</strong>
-  {% endreadmore %}
+  </div>
   
 
-  <section class="fullwidth">
-  <div class="copy">
-    <p>Type <kbd>p</kbd><kbd>i</kbd> and it becomes π.</p>
+<div class="use-case">
+  <!-- <i class="icon fas fa-lightbulb fill-orange"></i> -->
+  <i class="icon fas fa-flask fill-orange"></i>
+  <div>
+    <h3>Science and Research Websites: Equation Experiments</h3>
+    <p>Unleash your inner mad scientist! With MathLive, equations aren't just boring symbols; they're your laboratory assistants. Display scientific research findings, formulas, and equations on websites dedicated to scientific fields. 🧪</p>
   </div>
-  <div class="figure">
-    <img src="/assets/images/mathfield/euler.gif">
-  </div>
-</section>
-
-
-
 </div>
 
-<div class="pod">
-  <h2>For anyone. Anywhere.</h2>
-<section class="fullwidth">
-  <div class="copy">
-      <p>MathLive is accessible and works with screenreaders. A custom text-to-speech engine helps navigate equations.</p>
-    <p>A customizable, <a href="/mathlive/guides/virtual-keyboards/">virtual keyboard</a> make input easy, even on mobile devices.</p>
+<div class="use-case">
+  <i class="icon fas fa-calculator fill-purple"></i>
+  <div>
+    <h3>Online Calculators</h3>
+    <p>Build interactive calculators that allow users to input math equations and receive real-time calculations and results</p>
   </div>
-  <div class="figure" style="box-shadow: none; border:none;background: transparent">
-    <i class="fa-10x fad fa-universal-access"></i>
-  </div>
-</section>
+</div>
 
-  {% readmore "/mathlive/guides/speech/" %}
-Read more about the <strong>text to speech engine</strong>
-{% endreadmore %}
+<div class="use-case">
+  <i class="icon fas fa-file-alt fill-blue"></i>
+  <div>
+    <h3>Dynamic Documentation: Math with a Twist</h3>
+    <p>No more snooze-worthy documentation! MathLive spices things up by turning complex equations into a visual journey. Your technical explanations just got a serious upgrade. 📖</p>
+  </div>
+</div>
+
+<div class="use-case">
+  <i class="icon fas fa-pencil-alt fill-yellow"></i>
+  <div>
+    <h3>Math Enthusiast Blogs: Write Math, Write Magic</h3>
+    <p>Calling all math storytellers! With MathLive, equations become the heroes of your blog. Craft captivating content that waltzes between math and magic, delighting readers along the way. ✨</p>
+  </div>
 </div>
 
 
 
+
 </section>
-
-

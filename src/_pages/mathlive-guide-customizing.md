@@ -110,7 +110,7 @@ Alternatively you can set these CSS variables programatically:
 
 | CSS Variable | Usage |
 |:---|:---|
-| `--contains-highlight-backround-color` | Backround color for items that contain the caret |
+| `--contains-highlight-background-color` | Background color for items that contain the caret |
 | `--primary` | Primary accent color, used for example in the virtual keyboard |
 | `--smart-fence-color` | Color of a smart fence (default is current color) |
 | `--smart-fence-opacity` | Opacity of a smart fence (default is 50%) |
@@ -118,7 +118,6 @@ Alternatively you can set these CSS variables programatically:
 | `--placeholder-color` | Color of the placeholder symbol |
 | `--placeholder-opacity` | Opacity (0-1) of the placeholder symbol |
 | `--selection-background-color-focused`| Background color of the selection, when the mathfield is focused. By default, same as `--selection-background-color` | 
-| `--selection-color-focused`| Color of the content in the selection, when the mathfield is focused. By default, same as `--selection-color` | 
 | `--selection-background-color`| Background color of the selection | 
 | `--correct-color`| Highlight color of a prompt inside a mathfield when in the `"correct"` state| 
 | `--incorrect-color`| Highlight color of a prompt inside a mathfield when in the `"incorrect"` state | 
