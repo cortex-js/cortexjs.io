@@ -3,6 +3,8 @@ layout: single
 title: MathLive
 permalink: /mathlive/
 read_time: false
+date: Last Modified
+version: MathLive version
 sidebar:
     - nav: "universal"
 head:
@@ -16,6 +18,14 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
 ---
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => 
+      import('//unpkg.com/mathlive/dist/mathlive.min.mjs').then((mathlive) => document.getElementById('version').innerText = mathlive.version.mathlive
+  ));
+  customElements.whenDefined('math-field').then(() =>   
+      document.body.classList.add('ready')
+  )
+</script>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" class="svg-settings" >
   <defs>
     <linearGradient id="orange-gradient">
@@ -66,7 +76,9 @@ head:
 }
 
 #features-section {
-  display: flex; gap: 1rem;
+  display: flex; 
+  gap: 3rem;
+  align-items: end;
 }
 
 #features-section p {
@@ -92,12 +104,19 @@ head:
   background: var(--page-background);
 }
 .use-case .icon {
-  font-size: 5rem;
+  font-size: 6rem;
   margin-right: 2rem;
   margin-left: 1rem;
 }
 
+.page__content .use-case h3 {
+  font-size: 3rem;
+  line-height: .9;
+  margin-bottom: 2rem;
+}
+
 .page__content .use-case p {
+  font-size: 2rem;
   color: var(--body-color);
   font-weight: 400;
   line-height: 1.2;
@@ -165,23 +184,87 @@ h1 {
   background-clip: text;
   -webkit-background-clip: text;
   -moz-background-clip: text;
-  background-image: linear-gradient(0deg, #2f475e, #cc6666);
+  background-image: linear-gradient(0deg, #b95a52, #2c5072);
+  padding-top: 10rem;
+  padding-bottom: 8rem;
+  margin-left: 0;
+  margin-right: 0;
+  margin-left: -2rem;
+  margin-right: -2rem;
+  margin-top: -2rem;
+  animation: zoom-in-zoom-out 1.2s ease 1;
 }
 
-.page__content h1 .small {
-  margin-top: 1rem;
-  font-size: .6em;
+
+h1 span.first-part {
+  font-size:160px;
+}
+
+h1 span.second-part {
+  margin-top: -6px;
+  font-size: 127px;
   font-weight: 400;
-  letter-spacing: -0.1ex;
+  letter-spacing: -6px;
+  font-variant: all-small-caps;
+  /* animation-delay: .2s; */
+  /* animation: zoom-in-zoom-out 1s ease infinite; */
+  /* animation: 0.2s zoom-in-zoom-out 1s ease infinite;; */
+
 }
 
-h1::selection, .page__content h1 .small::selection {
+h1 span.third-part {
+  font-size: 142px; letter-spacing: -8px;
+  /* animation-delay: .4s; */
+  /* animation: 0.5s zoom-in-zoom-out 1s ease; */
+}
+
+
+@keyframes zoom-in-zoom-out {
+  0% {
+    transform: scale(0, 0);
+  }
+  50% {
+    transform: scale(1.2, 1.2);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+
+
+h1::selection, h1 span::selection {
   -webkit-text-fill-color: #000;
   background: #abd;
   background-clip:inherit;
   -webkit-background-clip: inherit;
   -moz-background-clip: inherit;
 }
+
+
+.page__content .intro {
+  border: 1px solid var(--border-color);
+  padding: 2rem;
+  border-radius: 8px;
+  background: var(--content-background);
+  color: var(--text-color);
+}
+
+.page__content p.intro-copy {
+  text-align: center;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  color: var(--text-color);
+  font-size: 3rem;
+  margin-bottom: 6rem;
+}
+
+.page__content h2 {
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
 .page__content .pod h2 {
   font-size: 5rem;
   line-height: 4.5rem;
@@ -254,6 +337,27 @@ div.figure {
   h1 {
     font-size: 3rem;
   }
+
+  h1 span.first-part {
+    font-size: 4.5rem;
+    letter-spacing: -2px;
+  }
+
+  h1 span.second-part {
+    font-size: 3rem;
+    letter-spacing: 0;
+  }
+
+  h1 span.third-part {
+    font-size: 4rem;
+    letter-spacing: -2px;
+
+  }
+
+  .page__content p.intro-copy {
+    font-size: 2rem;
+  }
+
   .page__content .pod h2 {
     font-size: 3rem;
     line-height: 1;
@@ -288,30 +392,28 @@ div.figure {
 style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
 
 
-<h1>EQUATIONS <span class="small">SERVED WITH A SIDE OF</span> INTERACTION</h1>
+<h1><span class="first-part">EQUATIONS</span> <span class="second-part">SERVED WITH A SIDE OF</span> <span class="third-part">INTERACTION</span></h1>
 
-<p>Introducing the MathLive <kbd>&lt;math-field&gt;</kbd>: a ready to use web component that works just like an HTML <kbd>&lt;textarea&gt;</kbd>, but for math.</p>
+<div class="intro">
+  <p class="intro-copy">Introducing <br><kbd>&lt;math-field&gt;</kbd>:<br> a ready to use web component that works just like an HTML <kbd>&lt;textarea&gt;</kbd>, but for math.</p>
 
-<section class="m-lg mb-xl max-w-2xl">
-<code-playground layout="stack">
-  <style slot="style">
-    .output:focus-within {
-      outline: Highlight auto 1px;
-      outline: -webkit-focus-ring-color auto 1px
-    }
-    .output math-field:focus, .output math-field:focus-within {
-      outline: none;
-    }
-    math-field { font-size: 32px; }
-  </style>
-    <div slot="html">
-&lt;math-field &gt;
-  x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
-  </code-playground>
+  <section class="m-lg mb-xl">
+  <code-playground layout="stack" style="width:100%">
+    <style slot="style">
+      .output { border: none }
+      .output math-field:focus-within {
+        outline: Highlight auto 1px;
+        outline: -webkit-focus-ring-color auto 1px
+      }
+      math-field { font-size: 3rem; }
+    </style>
+      <div slot="html">
+  &lt;math-field&gt;x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
+    </code-playground>
 
-</section>
+  </section>
 
+</div>
 
 <section id="features-section">
   <div>
@@ -324,7 +426,7 @@ style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
   Read more about the <strong>800+ LaTeX commands</strong> supported by MathLive
   {% endreadmore %}
 </div><div>
-  <h2>Virtual Math Keyboards</h2>
+  <h2>Math Virtual Keyboards</h2>
   <p>MathLive comes with a virtual keyboard that supports LaTeX input. It is fully customizable and can be used in any web application.</p>
   <div class="figure">
     <img src="/assets/images/mathfield/virtualKeyboard.png">

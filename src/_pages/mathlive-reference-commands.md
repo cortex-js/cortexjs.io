@@ -1504,13 +1504,11 @@ MathLive support some commands from the [MathJax HTML extension](http://docs.mat
 
 When used in a `<math-field>` component, the class names should refer to a 
 stylesheet defined with a `<style>` tag inside the `<math-field>` element.
-The stylesheet can also be specified by setting ther `innerHTML` property of 
-the `MathFieldElement`.
 
 ```html
 <math-field>
   <style>
-    .custom-class { box-shadow: 2px 2px 2px #000 };
+    .custom-class { box-shadow: 2px 2px 2px #000; }
   </style>
 
   \class{custom-class}{\frac{1}{x+1}}
