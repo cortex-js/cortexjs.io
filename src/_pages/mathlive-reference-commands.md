@@ -699,6 +699,8 @@ For example use `é` rather than `\'{e}`.
 * <span class='math'>$$\\^{e} $$</span> `\^{e}`
 * <span class='math'>$$\\\`{e} $$</span> <code>\`{e}</code>
 * <span class='math'>$$\\'{e} $$</span> `\'{e}`
+* <span class='math'>$$\\"{a} $$</span>   `\"{a}` 
+* <span class='math'>$$\\={a} $$</span>   `\={a}` 
 * <span class='math'>$$\c{c} $$</span> `\c{c}`
 * <span class='math'>$$\\~{n} $$</span>   `\~{n}` 
 {.command-list}
@@ -840,6 +842,58 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 * <span class='math'>$$\approx $$</span>   `\approx`
 * <span class='math'>$$\parallel $$</span>   `\parallel`
 * <span class='math'>$$\simeq $$</span>   `\simeq` 
+
+* <span class='math'>$$\ratio $$</span>   `\ratio` 
+* <span class='math'>$$\coloncolon $$</span>   `\coloncolon` 
+* <span class='math'>$$\colonequals $$</span>   `\colonequals` 
+* <span class='math'>$$\coloncolonequals $$</span>   `\coloncolonequals` 
+* <span class='math'>$$\equalscolon $$</span>   `\equalscolon` 
+* <span class='math'>$$\equalscoloncolon $$</span>   `\equalscoloncolon` 
+* <span class='math'>$$\colonminus $$</span>   `\colonminus` 
+* <span class='math'>$$\coloncolonminus $$</span>   `\coloncolonminus` 
+* <span class='math'>$$\minuscolon $$</span>   `\minuscolon` 
+* <span class='math'>$$\minuscoloncolon $$</span>   `\minuscoloncolon` 
+* <span class='math'>$$\coloncolonapprox $$</span>   `\coloncolonapprox` 
+* <span class='math'>$$\coloncolonsim $$</span>   `\coloncolonsim` 
+* <span class='math'>$$\simcolon $$</span>   `\simcolon` 
+* <span class='math'>$$\simcoloncolon $$</span>   `\simcoloncolon` 
+* <span class='math'>$$\approxcoloncolon $$</span>   `\approxcoloncolon` 
+* <span class='math'>$$\notni $$</span>   `\notni` 
+* <span class='math'>$$\limsup $$</span>   `\limsup` 
+* <span class='math'>$$\liminf $$</span>   `\liminf` 
+
+* <span class='math'>$$\ordinarycolon $$</span>   `\ordinarycolon` 
+* <span class='math'>$$\vcentcolon $$</span>   `\vcentcolon` 
+* <span class='math'>$$\dblcolon $$</span>   `\dblcolon` 
+* <span class='math'>$$\coloneqq $$</span>   `\coloneqq` 
+* <span class='math'>$$\Coloneqq $$</span>   `\Coloneqq` 
+* <span class='math'>$$\coloneq $$</span>   `\coloneq` 
+* <span class='math'>$$\Coloneq $$</span>   `\Coloneq` 
+* <span class='math'>$$\eqqcolon $$</span>   `\eqqcolon` 
+* <span class='math'>$$\Eqqcolon $$</span>   `\Eqqcolon` 
+* <span class='math'>$$\eqcolon $$</span>   `\eqcolon` 
+* <span class='math'>$$\Eqcolon $$</span>   `\Eqcolon` 
+* <span class='math'>$$\colonapprox $$</span>   `\colonapprox` 
+* <span class='math'>$$\Colonapprox $$</span>   `\Colonapprox` 
+* <span class='math'>$$\colonsim $$</span>   `\colonsim` 
+* <span class='math'>$$\Colonsim $$</span>   `\Colonsim` 
+
+<!-- statmath.sty -->
+* <span class='math'>$$\argmin $$</span>   `\argmin` 
+* <span class='math'>$$\argmax $$</span>   `\argmax` 
+* <span class='math'>$$\plim $$</span>   `\plim` 
+
+<!-- amsopn.sty.sty -->
+
+* <span class='math'>$$\injlim $$</span>   `\injlim` 
+* <span class='math'>$$\projlim $$</span>   `\projlim` 
+* <span class='math'>$$\varlimsup $$</span>   `\varlimsup` 
+* <span class='math'>$$\varliminf $$</span>   `\varliminf` 
+* <span class='math'>$$\varinjlim $$</span>   `\varinjlim` 
+* <span class='math'>$$\varprojlim $$</span>   `\varprojlim` 
+* <span class='math'>$$\ $$</span>   `\` 
+
+
 {.command-list}
 
 
@@ -1384,6 +1438,22 @@ They can be combined:
 
 The `\cancel`, `\bcancel` and `\xcancel` commands are part of the
 ["cancel"](https://www.ctan.org/pkg/cancel) LaTeX package.{.notice--info}
+
+
+### Shortcuts
+
+Some commands are shortcuts for common notations:
+
+<div class='thin-line two-col'>
+
+| Command...       | is a shorthand for...                                 |
+| :--------------- | :---------------------------------------------------- |
+| <span class='math'>$$\angl{body} $$</span> `\angl{body}`  | `\enclose{actuarial}{body}`                    |
+| <span class='math'>$$\angln $$</span> `\angln`  | `\enclose{actuarial}{n}`                    |
+| <span class='math'>$$\anglr $$</span> `\anglr`  | `\enclose{actuarial}{r}`                    |
+| <span class='math'>$$\anglk $$</span> `\anglk`  | `\enclose{actuarial}{k}`                    |
+
+</div>
 
 
 ### Colors
