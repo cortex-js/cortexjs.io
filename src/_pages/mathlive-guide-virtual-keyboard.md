@@ -405,7 +405,7 @@ the default styling.
 mathVirtualKeyboard.layouts = [
   {
     label: 'minimal',
-    toolip: 'Only the essential',
+    tooltip: 'Only the essential',
     layers: [
       {
         style:
@@ -481,7 +481,7 @@ alphabetic layout after your own:
 mathVirtualKeyboard.layouts = [
   {
     label: "minimal",
-    toolip: "Only the essential",
+    tooltip: "Only the essential",
     rows: [
       [
         "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
