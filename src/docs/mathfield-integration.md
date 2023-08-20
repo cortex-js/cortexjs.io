@@ -133,6 +133,21 @@ when required.
 ```
 
 
+## Checking the Version of MathLive
+
+The version of MathLive currently loaded can be obtained with:
+
+```javascript
+console.log(globalThis[Symbol.for('io.cortexjs.mathlive')].version);
+```
+
+For more recent versions of MathLive, this is also available as:
+
+```javascript
+console.log(MathfieldElement.version);
+```
+
+
 <h2 id='files'>MathLive Library Files</h2>
 
 If you need to incorporate the MathLive library files directly into your project
