@@ -33,7 +33,7 @@ Here are a few common examples.
 ## Styling
 
 **To style the mathfield** define a CSS rule targeting the mathfield or use the 
-`style` attribute on the `<math-field>` element.
+`style` attribute of the `<math-field>` element.
 
 This can be used to modify the appearance of the mathfield in many ways, for 
 example changing the base font size or adding a border around it.
@@ -41,52 +41,14 @@ example changing the base font size or adding a border around it.
 **To display the mathfield as a block element**, rather than an inline element, 
 add an attribute `style="display: block"`
 
-```html
-<p>Answer: <math-field></math-field>.</p>
-<p>Answer: <math-field style="display: block"></math-field>.</p>
-```
-
-
-**To change the color of the caret (insertion point)** set the value of the 
-`--caret-color` CSS custom property.
-
-**To change the background color and ink color of the math content when 
-selected** set the value of the `--selection-color` and 
-`--selection-background-color` CSS properties with a rule targeting the 
-elements you want to customize.
-
-```css
-math-field {
-  --caret-color: red;
-  --selection-background-color: lightgoldenrodyellow;
-  --selection-color: darkblue;
-}
-```
-
-
-You can also use the `style` attribute of a `<math-field>` tag.
-
-Change the style attribute in the playground below to `color: #dde; background: #256291;`.
-
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <div slot="html">
-    &lt;math-field style="
-    font-size: 32px; 
-    margin: 3em;
-    padding: 8px; 
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, .3); 
-    box-shadow: 0 0 8px rgba(0, 0, 0, .2);
-    --caret-color: red;
-    --selection-background-color: lightgoldenrodyellow;
-    --selection-color: darkblue;
-"&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+<div slot="html">
+&lt;p>Answer: &lt;math-field style="font-size:16px">42&lt;/math-field>.&lt;/p>
+&lt;p>Answer: &lt;math-field style="font-size:32px; display: block">3.1415&lt;/math-field></div>
 </code-playground>
 <!-- htmlmin:ignore -->
+
 
 
 ## CSS Variables
@@ -100,6 +62,11 @@ math-field {
 }
 ```
 
+Set these CSS variables on any selector that applies to the
+`<math-field>` element you want to customize, for example, `body`. 
+Although CSS styles are "invisible" to custom components, CSS variables are 
+"passed through" and will affect the content of the `<math-field>` custom component.
+
 Alternatively you can set these CSS variables programatically:
 
 ```js
@@ -110,15 +77,16 @@ Alternatively you can set these CSS variables programatically:
 
 | CSS Variable | Usage |
 |:---|:---|
+| `--caret-color` | Color of the insertion point |
+| `--selection-background-color`| Background color of the selection | 
+| `--selection-background-color-focused`| Background color of the selection, when the mathfield is focused. By default, same as `--selection-background-color` | 
 | `--contains-highlight-background-color` | Background color for items that contain the caret |
+| `--placeholder-color` | Color of the placeholder symbol |
+| `--placeholder-opacity` | Opacity (0-1) of the placeholder symbol |
 | `--primary` | Primary accent color, used for example in the virtual keyboard |
 | `--smart-fence-color` | Color of a smart fence (default is current color) |
 | `--smart-fence-opacity` | Opacity of a smart fence (default is 50%) |
 | `--text-font-family` | The font stack used in text mode |
-| `--placeholder-color` | Color of the placeholder symbol |
-| `--placeholder-opacity` | Opacity (0-1) of the placeholder symbol |
-| `--selection-background-color-focused`| Background color of the selection, when the mathfield is focused. By default, same as `--selection-background-color` | 
-| `--selection-background-color`| Background color of the selection | 
 | `--correct-color`| Highlight color of a prompt inside a mathfield when in the `"correct"` state| 
 | `--incorrect-color`| Highlight color of a prompt inside a mathfield when in the `"incorrect"` state | 
 
@@ -127,37 +95,31 @@ Alternatively you can set these CSS variables programatically:
 
 </div>
  
-Set these CSS variables on any selector that applies to the
-`<math-field>` element you want to customize, for example, `body`. 
-Although CSS styles are "invisible" to custom components, CSS variables are 
-"passed through" and will affect the content of the `<math-field>` custom component. {.notice--info}
 
 
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <style slot="style">
-      .output:focus-within {
-        outline: Highlight auto 1px;
-        outline: -webkit-focus-ring-color auto 1px
-      }
-      .output math-field:focus, .output math-field:focus-within {
-        outline: none;
-      }
-    </style>
-    <div slot="html">&lt;math-field style="
+    <div slot="html">&lt;style&gt;
+math-field {
   --caret-color: red;
-"&gt;
+  --selection-background-color: lightgoldenrodyellow;
+  --selection-color: darkblue;
+}
+&lt;/style&gt;
+&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;
 </div>
 </code-playground>
 <!-- htmlmin:ignore -->
 
+
+
 <br>
 
- You can customize the appearance and zindex of the virtual keyboard panel
- with some CSS variables associated with a selector that applies to the
+You can customize the appearance and zindex of the virtual keyboard panel
+with some CSS variables associated with a selector that applies to the
 virtual keyboard panel container.
 
 Read more about [customizing the virtual keyboard appearance](https://cortexjs.io/mathlive/guides/virtual-keyboards/#custom-appearance)
@@ -191,7 +153,42 @@ mathfield, make sure to replace it with another indicator, for example
 by displaying an outline on an enclosing element.  {.notice--warning}
 
 
+## MathLive Parts
 
+Because the mathfield is a custom element with a shadow DOM, it is not possible
+to style its children using CSS selectors.
+
+However, there are a few parts that can be used to style the 
+content of the mathfield using the `::part()` pseudo-element.
+
+<div class='symbols-table' style='--first-col-width:25ex'>
+
+| Pseudo-element | Usage |
+|:---|:---|
+| `virtual-keyboard-toggle` | The virtual keyboard toggle button |
+| `content` | The math formula |
+| `container` | The element containing the formula and keyboard toggle |
+| `keyboard-sink` | The hidden element capturing the physical keyboard input |
+| `prompt` | The prompts (`placeholder{}`) inside the mathfield |
+
+</div>
+
+For example:
+
+```css
+/* Right align the formula */
+math-field::part(content) {
+  text-align: right;
+}
+/* Right align the virtual keyboard toggle */
+math-field::part(container) {
+  flex-flow: row-reverse;
+}
+/* Hide the virtual keyboard toggle */
+math-field::part(virtual-keyboard-toggle) {
+  display: none;
+}
+```
 
 ## Display Options
 
