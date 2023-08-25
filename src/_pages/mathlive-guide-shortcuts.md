@@ -7,6 +7,7 @@ read_time: false
 sidebar:
     - nav: "universal"
 toc: true
+render_math_in_document: true
 head:
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css
@@ -209,24 +210,25 @@ Possible values are:
 </section>
 
 
-## Multicharacter Symbol
+## Multicharacter Identifiers
 
-In some cases it may not be possible to define in advance all the possible 
-combinations of keystrokes that should be interpreted as an inline shortcut. 
-For example, it might be desirable to recognize multi-character symbols, e.g. 
-\\[ \mathrm{speed} = \frac{\mathrm{distance}}{\mathrm{time}}\\]
+It may not be possible to define in advance all the keystroke combinations 
+that should be interpreted as an inline shortcut. 
 
-There are several ways to represent multicharacter symbols in LaTeX. 
+For example, it might be desirable to recognize multi-character identifiers, e.g. \\( \mathrm{speed} = \frac{\mathrm{distance}}{\mathrm{time}} \\)
+
+
+There are several ways to represent multicharacter identifiers in LaTeX. 
 Conventionally, the `\mathit{}` command is used to represent variables and the 
 `\mathrm{}` for function names. You may prefer to use `\mathrm{}` in both cases.
 The command `\operatorname{}` may also be used for this purpose.
 
-**To recognize multicharacter symbols,** provide a `onInlineShortcut()` handler.
-If the handler recognize the input as a valid multichar symbol, it 
-should return a command representing this symbol.
+**To recognize multicharacter identifiers,** provide a `onInlineShortcut()` handler.
+If the handler recognize the input as a valid multichar identifiers, it 
+should return a command representing this identifiers.
 
 The string passed to the `onInlineShortcut` handler is a raw sequence of 
-characters the user typed on the keyboard.
+characters the user typed on the physical or virtual keyboard.
 
 ```ts
 mf.onInlineShortcut = (_mf, s) => {
@@ -237,6 +239,7 @@ mf.onInlineShortcut = (_mf, s) => {
 ```
 
 You can use the `onInlineShortcut` handler to recognize arbitrary patterns.
+
 For example:
 
 ```ts
@@ -248,7 +251,7 @@ mf.onInlineShortcut = (_mf, s) => {
         return `\\${m[1]}_{${m[2]}}`;
       return `\\mathrm{${m[1]}}_{${m[2]}}`;
     }
-    return '\\mathrm{' + s + '}';
+    return `\\mathrm{${s}}`;
   }
   return '';
 };
