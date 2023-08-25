@@ -862,6 +862,12 @@ render_math_in_document: true
     const mathJsonEl = el.querySelector('.mathjson');
     if (mathJsonEl) mathJsonEl.innerHTML = exprToString(expr.json);
 
+    if (mathJsonEl.tagName === 'TEXTAREA') {
+      // Adjust the height of the textarea to fit the content
+      mathJsonEl.style.height = 'auto';
+      mathJsonEl.style.height = mathJsonEl.scrollHeight + 2 + 'px';
+    }
+
     const latexEl = el.querySelector('.latex');
     if (latexEl) latexEl.value = expr.latex;
   }
