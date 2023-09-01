@@ -81,7 +81,7 @@ modified. This behavior can be controlled using the `captureSelection` flag
 in the expanded definition of a macro.
 
 **To define a macro whose content is selectable and editable** set 
-`captureSelection` to `true`.
+`captureSelection` to `false`.
 
 <code-playground layout="stack">
     <style slot="style">
