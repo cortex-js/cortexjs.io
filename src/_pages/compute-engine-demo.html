@@ -366,7 +366,14 @@ render_math_in_document: true
 <main id="main" class="container">
   <div class="samples">
     <span class="sample" data-sample="e^{i\pi}"></span>
-    <span class="sample" data-sample="\sum_{n=1}^5 n^2"></span>
+    <span
+      class="sample"
+      data-sample="\sqrt{6\sum_{n=1}^{\infty} \frac{1}{n^2}}"
+    ></span>
+    <span
+      class="sample"
+      data-sample="2\prod_{n=1}^{\infty} \frac{4n^2}{4n^2-1}"
+    ></span>
     <span class="sample" data-sample="\mathrm{Expand}((a+b)^6)"></span>
     <span class="sample" data-sample="\mathrm{Rational}(\pi)"></span>
     <span class="sample" data-sample="\cos(\frac{\pi}{6})"></span>
@@ -592,7 +599,7 @@ render_math_in_document: true
   document.getElementById('version').innerText =
     version.computeEngine ?? version;
 
-  const MAX_LINE_LENGTH = 64;
+  const MAX_LINE_LENGTH = 75;
 
   //
   // Numeric format segmented control
@@ -728,7 +735,21 @@ render_math_in_document: true
         latex = expr.latex;
       } catch (e) {
         expr = ce.box([]);
-        latex = `\\error{\\text{${e.toString()}}}`;
+        let msg = e.toString();
+        msg = msg
+          .replace(/\\/g, '\\textbackslash ')
+          .replace(/{/g, '\\textbraceleft')
+          .replace(/}/g, '\\textbraceright')
+          .replace(/\[/g, '\\lbrack')
+          .replace(/\]/g, '\\rbrack')
+          .replace(/%/g, '\\%')
+          .replace(/#/g, '\\#')
+          .replace(/&/g, '\\&')
+          .replace(/&/g, '\\&')
+          .replace(/_/g, '\\_')
+          .replace(/\^/g, '\\textasciicircum ')
+          .replace(/~/g, '\\textasciitilde ');
+        latex = `\\error{\\text{${msg}}}`;
       }
     updateContent(mf, expr);
     mf.value = latex;
@@ -860,14 +881,18 @@ render_math_in_document: true
       document.getElementById('numeric-mode').classList.add('is-visible');
 
     const mathJsonEl = el.querySelector('.mathjson');
-    if (mathJsonEl) mathJsonEl.innerHTML = exprToString(expr.json);
-
-    if (mathJsonEl.tagName === 'TEXTAREA') {
-      // Adjust the height of the textarea to fit the content
-      mathJsonEl.style.height = 'auto';
-      mathJsonEl.style.height = mathJsonEl.scrollHeight + 2 + 'px';
+    if (mathJsonEl) {
+      if (mathJsonEl.tagName === 'TEXTAREA') {
+        if (document.activeElement !== mathJsonEl) {
+          // Adjust the height of the textarea to fit the content
+          mathJsonEl.value = exprToStringRecursive(expr.json, 0);
+          mathJsonEl.style.height = 'auto';
+          mathJsonEl.style.height = mathJsonEl.scrollHeight + 2 + 'px';
+        }
+      } else {
+        mathJsonEl.innerHTML = exprToString(expr.json);
+      }
     }
-
     const latexEl = el.querySelector('.latex');
     if (latexEl) latexEl.value = expr.latex;
   }
@@ -935,9 +960,11 @@ render_math_in_document: true
       Object.keys(expr).forEach(
         (x) => (elements[x] = exprToStringRecursive(expr[x], start + 2))
       );
-      let result = `\n${indent}{${Object.keys(expr)
+      let result = `{${Object.keys(expr).map((key) => `"${key}": ${elements[key]}`).join('; ')}}`;
+      if (start + result.length < MAX_LINE_LENGTH) return result;
+      result = `\n${indent}{${Object.keys(expr)
         .map((key) => {
-          return `${key}: ${elements[key]}`;
+          return `"${key}": ${elements[key]}`;
         })
         .join('; ')}}`;
       if (start + result.length < MAX_LINE_LENGTH) return result;
@@ -945,7 +972,7 @@ render_math_in_document: true
         `\n${indent}{\n` +
         Object.keys(expr)
           .map((key) => {
-            return `${indent}  ${key}: ${elements[key]}`;
+            return `${indent}  "${key}": ${elements[key]}`;
           })
           .join(`;\n${indent}`) +
         '\n' +
