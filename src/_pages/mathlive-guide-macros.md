@@ -131,15 +131,16 @@ mf.macros = {...mf.macros, diamonds: undefined };
 ## Adding a Matching Shortcut
 
 By defining a new macro, a new LaTeX command is added to the dictionary
-of commands that can be used in a LaTeX expression. They can be inserted
-in a mathfield by typing <kbd>ESC</kbd> or <kbd>/</kbd> to enter the LaTeX editing mode, followed by the name of the macro.
+of commands that can be used in a LaTeX expression. 
+
+To input a macro, type <kbd>\</kbd> followed by the macro name, then <kbd>RETURN</kbd>
 
 Custom macros are also included in the value of the mathfield 
 expressed as a LaTeX string (`mf.value`).
 
-However, it may also be convenient to associate the macro with an inline
+It may also be convenient to associate the macro with an inline
 shortcut. Inline shortcuts can be typed without having to enter the LaTeX
-editing mode.
+editing mode (without having to type the <kbd>\</kbd> key).
 
 **To define an associated inline shortcut**, use the `inlineShortcuts` option.
 
@@ -159,7 +160,7 @@ mf.macros = {...mf.macros,
     seconds: '\\,\\doubleprime\\;',
 };
 mf.inlineShortcuts = {...mf.inlineShortcuts,
-    minutes: '\\minutes',
+    minutes: '\\minutes', // This means that typing the inline shortcut "minutes" will insert "\minutes"
     seconds: '\\seconds',
 };
 </div>
