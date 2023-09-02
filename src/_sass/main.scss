@@ -145,10 +145,13 @@ math-field {
 
 
 
+
 @media (prefers-color-scheme: dark) {
     :root {
     --selection-background-color: var(--primary-color);
     --selection-color: #fff;
+    --contains-highlight-background-color: hsl(212, 40%, 25%);
+    // --contains-highlight-background-color: red;
   }
 
   math-field:focus-within {
