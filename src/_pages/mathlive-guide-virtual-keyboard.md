@@ -289,18 +289,23 @@ for those keys.
 
 ### Advanced Keycaps
 
-For more control over the appearance and behaviro of a keycap, instead of a 
-string, use an object literal with the following properties:
+For more control over the appearance and behavior of a keycap use an object 
+literal with the following properties:
 
 - `label`: the label of the keycap, displayed using the system font. This
   can include some HTML markup, for example `"<span><i>x</i>&thinsp;²</span>"`.
-  If none is provided, the `latex` property is used instead for the label of
+  If property is absent, the `latex` property is used for the label of
   the keycap. The label can also be one of the keycap shortcuts mentioned
   above, e.g. `[left]`. If a keycap shortcut is used, the other properties
   override the values defined by the shortcut.
 - `latex`: if no `label` is provided, the value of the `latex` property is used as
   the label of the keycap. This property is also used to insert content in 
   the mathfield when the keycap is pressed.
+- `key`: if present, when the keycap is pressed the corresponding physical
+  keyboard key is simulated, potentially triggering keyboard shortcuts.
+- `insert`: if present, a LaTeX string to be inserted when the keycap is pressed.
+- `command`: the command to perform when the keycap is pressed. For example: 
+ `["performWithFeedback", "commit"]`.
 - `class`: a set of CSS classes to style this keycap. The classes can be custom 
 defined (see below about the `style` layer property), or be one or more of the
  standard ones:
@@ -314,22 +319,16 @@ defined (see below about the `style` layer property), or be one or more of the
     - `hide-shift`: do not display the shift top-right label on the keycap if 
        a `shift` property is provided.
 - `width`: the width of the keycap, as a multiple of a standard keycap. That
-  is 0.5 for half-wide keys, 1.5 for one and half wide keys, etc...
+  is, 0.5 for half-wide keys, 1.5 for one and half wide keys, etc...
 - `aside`: an optional small label displayed below the keycap. This label
   may not be displayed if the space available is too small.
-- `altKeys`: a set of variants to display when the keycap is long-pressed.
-- `shift`: either a LaTeX string indicated what is inserted when the shift
-  key is pressed with this keycap, or a keycap record
+- `shift`: a LaTeX string or a keycap record indicating what happens when 
+  this keycap is pressed with the shift key down.
 - `variants`: an array of keycaps (either as string or keycap records) defining
   the variants for this keycap (see below).
 
-The action when the keycap is pressed is defined by one of these properties:
-- `insert`: the LaTeX to be inserted when the keycap is pressed.
-- `command`: the command to perform when the keycap is pressed. For example: 
- `["performWithFeedback", "commit"]`.
-
-If neither `insert` nor `command` are provided, the `latex` property is used to
-define the content inserted when the keycap is pressed.
+If neither `insert` nor `command` are provided, the `latex` or `key` properties
+are used to define the content inserted when the keycap is pressed.
 
 
 {% readmore "/mathlive/guides/commands/" %}
