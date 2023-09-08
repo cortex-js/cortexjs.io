@@ -29,6 +29,10 @@ The Compute Engine is for anyone who wants to make technical computing apps
 in the browser or in server-side environments such as Node: educators, 
 students, scientists and engineers.
 
+**Note:** To use the Compute Engine you must write JavaScript code. This guide 
+assumes you are familiar with JavaScript or TypeScript.{.notice--info}
+
+
 The CortexJS Compute Engine manipulates math expressions represented with the <a href ="/math-json/">MathJSON format</a>.
 
 

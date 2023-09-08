@@ -23,12 +23,16 @@ access to specialized symbols for math input with only a tap.
 The math keyboard includes multiple **layouts** which you can select with the 
 layout selector.
 
-The default layouts include the most common math symbols. They are 
+The default layouts include the most common math symbols. They are: 
 **numeric**, **symbols**, **alphabetic** and **greek letters**.
 
 
-These layouts can be customized to fit specific needs. Learn more about 
-[customizing virtual keyboards](/mathlive/guides/virtual-keyboards).
+{% readmore "/mathlive/guides/virtual-keyboards/" %}
+These layouts can be customized to fit specific needs. Learn more about **customizing virtual keyboards**.
+{% endreadmore %}
+
+
+
 
 
 ### Undo/Redo/Paste

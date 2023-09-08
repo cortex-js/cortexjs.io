@@ -1,7 +1,7 @@
 ---
 layout: single
 date: Last Modified
-title: Virtual Keyboard
+title: Customizing the Virtual Keyboard
 permalink: /mathlive/guides/virtual-keyboards/
 read_time: false
 sidebar:
@@ -26,8 +26,12 @@ head:
     };
 ---
 
+The math virtual keyboard is a keyboard displayed on screen that gives
+access to specialized symbols for math input with only a tap. This guide 
+explains how to customize the virtual keyboard.{.xl}
+
 {% readmore "/mathlive/virtual-keyboard/" %}
-Learn more about using the math virtual keyboard
+Learn more about **using the math virtual keyboard**
 {% endreadmore %}
 
 

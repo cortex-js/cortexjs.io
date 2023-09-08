@@ -164,8 +164,8 @@
           "icon": "guide"
 				},
 				{
-					"title": "Defining New Symbols",
-					"url": "/compute-engine/guides/augmenting/",
+					"title": "Symbols",
+					"url": "/compute-engine/guides/symbols/",
           "icon": "guide"
 				},
 				{
@@ -174,13 +174,13 @@
           "icon": "guide"
 				},
 				{
-					"title": "LaTeX Syntax",
-					"url": "/compute-engine/guides/latex-syntax/",
+					"title": "Adding New Definitions",
+					"url": "/compute-engine/guides/augmenting/",
           "icon": "guide"
 				},
 				{
-					"title": "Symbols",
-					"url": "/compute-engine/guides/symbols/",
+					"title": "LaTeX Syntax",
+					"url": "/compute-engine/guides/latex-syntax/",
           "icon": "guide"
 				},
 				{
