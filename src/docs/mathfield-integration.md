@@ -263,8 +263,8 @@ mfe.value = '\\frac{\\pi}{2}';
 document.body.appendChild(mfe);
 ```
 
-In Javascript, the `\` in a string must be escaped and the escape character 
-is also `\`. So, in Javascript strings LaTeX commands start with a `\\`.{.notice--info}
+In JavaScript, the `\` in a string must be escaped and the escape character 
+is also `\`. So, in JavaScript strings LaTeX commands start with a `\\`.{.notice--info}
 
 
 {% readmore "/docs/mathlive/#(%22mathfield-element%22%3Amodule)" %}

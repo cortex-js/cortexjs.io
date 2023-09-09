@@ -209,6 +209,11 @@
           "icon": "guide"
 				},
 				{
+					"title": "Compiling",
+					"url": "/compute-engine/guides/compiling/",
+          "icon": "guide"
+				},
+				{
 					"title": "Assumptions",
 					"url": "/compute-engine/guides/assumptions/",
           "icon": "guide"
