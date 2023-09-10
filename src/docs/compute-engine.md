@@ -41,6 +41,8 @@ The Compute Engine can:
 - <a href="/compute-engine/guides/simplify/">**simplify**</a> expressions
 - <a href="/compute-engine/guides/evaluate/">**evaluate symbolically**</a> expressions
 - <a href="/compute-engine/guides/numeric-evaluation/">**evaluate numerically**</a> expressions
+- <a href="/compute-engine/guides/compiling/">**compile**</a> expressions to JavaScript functions
+
 
 {% readmore "/compute-engine/demo/" %}
 Try the **interactive demo** now
