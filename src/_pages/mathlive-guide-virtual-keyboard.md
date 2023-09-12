@@ -52,8 +52,7 @@ other, not both).
 |:-- | :-- |
 | `"auto"` |  On touch-enabled devices, show the virtual keyboard panel when the mathfield is focused. This is the default behavior. |
 | `"manual"` | Do not show the virtual keyboard panel automatically. The visibility of the virtual keyboard panel can be controlled programatically with `mathVirtualKeyboard.show()` and `mathVirtualKeyboard.hide()`|
-| `"sandboxed"` | The virtual keyboard is displayed in the current browsing context (iframe) if it has a defined container or is the
-top-level browsing context. |
+| `"sandboxed"` | The virtual keyboard is displayed in the current browsing context (iframe) if it has a defined container or is the top-level browsing context. |
 
 </div>
 
