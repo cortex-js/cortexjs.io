@@ -94,6 +94,14 @@ render_math_in_document: true
     white-space: pre-wrap;
   }
 
+  .text.output {
+    width: 100%
+  }
+
+  .timing {
+    align-self: flex-end;
+  }
+
   .mathfield {
     border: 1px solid var(--editable-border);
     padding: 5px;
@@ -237,8 +245,10 @@ render_math_in_document: true
   }
 
   .output-section.is-visible {
-    display: block;
+    display: flex;
+    flex-flow: column;
   }
+
   .output-section {
     display: none;
     margin-bottom: 1em;
@@ -525,6 +535,29 @@ render_math_in_document: true
     <div class="output mathjson toggle-field"></div>
   </div>
 
+  <div class="output-section" id="evaluate">
+    <code class="label">expr.evaluate()&nbsp;=&nbsp;</code>
+    <div class="row">
+      <math-field class="latex" read-only></math-field>
+      <button class="toggle">
+        <svg><use xlink:href="#info-circle" /></svg>
+      </button>
+    </div>
+    <div class="output mathjson toggle-field"></div>
+  </div>
+
+  <div class="output-section" id="compile">
+    <code class="label">compiled to JavaScript&nbsp;=&nbsp;</code>
+    <div class="row">
+      <div class="text output"></div>
+      <button class="toggle">
+        <svg><use xlink:href="#info-circle" /></svg>
+      </button>
+    </div>
+    <div class="output javascript toggle-field"></div>
+    <div class="timing"></div>
+  </div>
+
   <div id="numeric-mode" class="row" style="margin-bottom: 0.5em">
     <div class="segmented-control" style="--segments: 4">
       <input
@@ -559,16 +592,7 @@ render_math_in_document: true
     </div>
   </div>
 
-  <div class="output-section" id="evaluate">
-    <code class="label">expr.evaluate()&nbsp;=&nbsp;</code>
-    <div class="row">
-      <math-field class="latex" read-only></math-field>
-      <button class="toggle">
-        <svg><use xlink:href="#info-circle" /></svg>
-      </button>
-    </div>
-    <div class="output mathjson toggle-field"></div>
-  </div>
+
 
   <div class="output-section" id="evaluate-numerically">
     <code class="label">expr.N()&nbsp;=&nbsp;</code>
@@ -579,6 +603,7 @@ render_math_in_document: true
       </button>
     </div>
     <div class="output mathjson toggle-field"></div>
+    <div class="timing"></div>
   </div>
 
   <div class="output-section" id="solve">
@@ -767,6 +792,7 @@ render_math_in_document: true
     } catch (e) {}
 
     document.getElementById('numeric-mode').classList.remove('is-visible');
+    document.getElementById('compile').classList.remove('is-visible');
     updateExpr(null, 'canonical-form');
     updateExpr(null, 'json-form');
     updateExpr(null, 'simplify');
@@ -851,19 +877,41 @@ render_math_in_document: true
           'background: transparent'
         );
       }
-
-    const exprN = expr.N();
-    if (!exprN.isSame(exprEvaluate))
-      try {
-        updateExpr(exprN, 'evaluate-numerically');
-      } catch (e) {
-        console.error(
-          'N(%c ' + latex + '%c) ' + e.toString(),
-          'color: red;  background: hsla(0, 60%, 90%)',
-          'background: transparent'
-        );
+    {
+      const start = performance.now();
+      const fn = expr.compile();
+      const timing = performance.now() - start;
+      if (fn) {
+        const el = document.getElementById('compile');
+        const textEl = el.querySelector('.text');
+        const javascriptEl = el.querySelector('.javascript');
+        const timingEl = el.querySelector('.timing');
+        javascriptEl.innerHTML = fn.toString();
+        textEl.innerHTML = fn();
+        timingEl.innerHTML = `⏱️ ${timing.toFixed(2)}ms`;
+        el.classList.add('is-visible');
+      } 
+      
+      {
+        const start= performance.now();
+        const exprN = expr.N();
+        const timing = performance.now() - start;
+        if (!exprN.isSame(exprEvaluate))
+          try {
+            updateExpr(exprN, 'evaluate-numerically');
+            const timingEl = document.querySelector(
+              '#evaluate-numerically .timing'
+            );
+            timingEl.innerHTML = `⏱️ ${timing.toFixed(2)}ms`;
+          } catch (e) {
+            console.error(
+              'N(%c ' + latex + '%c) ' + e.toString(),
+              'color: red;  background: hsla(0, 60%, 90%)',
+              'background: transparent'
+            );
+          }
       }
-
+    }
     // try {
     //   updateExpr(await ce.solve(expr, ['x']), 'solve');
     // } catch (e) {
@@ -936,6 +984,7 @@ render_math_in_document: true
     'canonical-form',
     'domain',
     'simplify',
+    'compile',
     'evaluate-numerically',
     'evaluate',
     'solve',
@@ -965,7 +1014,9 @@ render_math_in_document: true
       Object.keys(expr).forEach(
         (x) => (elements[x] = exprToStringRecursive(expr[x], start + 2))
       );
-      let result = `{${Object.keys(expr).map((key) => `"${key}": ${elements[key]}`).join('; ')}}`;
+      let result = `{${Object.keys(expr)
+        .map((key) => `"${key}": ${elements[key]}`)
+        .join('; ')}}`;
       if (start + result.length < MAX_LINE_LENGTH) return result;
       result = `\n${indent}{${Object.keys(expr)
         .map((key) => {

@@ -31,6 +31,10 @@ with a LaTeX expression. You can extend MathLive with your own macros.{.xl}
 If you do not include the `...mf.macros` call, all the standard macros will be
 turned off.
 
+The example below will define a new command, `\average`, which will be
+replaced by `\operatorname{average}`, that is displayed as a single unit
+using an upright font.
+
 <code-playground layout="stack">
     <style slot="style">
       .output:focus-within {
@@ -43,13 +47,25 @@ turned off.
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
-    minutes: '\\,{}^\\prime\\;',
-    seconds: '\\,\\doubleprime\\;',
+  average: '\operatorname{average};',
 };
 </div>
     <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
 </div>
 </code-playground>
+
+
+You can use standard LaTeX commands in the definition of a macro. For example,
+the following macro definition uses the `\,` and `\;` commands to insert
+horizontal spacing and `{}^` to place the `\prime` command on the subscript
+line.
+
+```javascript
+mf.macros = { ...mf.macros,
+  minutes: '\\,{}^\\prime\\;',
+  seconds: '\\,\\doubleprime\\;',
+};
+```
 
 <hr>
 
@@ -70,7 +86,7 @@ mf.macros = {...mf.macros,
   smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
+    <div slot="html">&lt;math-field id="mf"&gt;\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
 </div>
 </code-playground>
 
