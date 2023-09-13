@@ -47,13 +47,14 @@ using an upright font.
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
-  average: '\operatorname{average};',
+  average: '\\operatorname{average}',
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
+    <div slot="html">&lt;math-field id="mf"&gt;\average([2, 4, 8])}&lt;/math-field&gt;
 </div>
 </code-playground>
 
+<hr>
 
 You can use standard LaTeX commands in the definition of a macro. For example,
 the following macro definition uses the `\,` and `\;` commands to insert
@@ -149,14 +150,14 @@ mf.macros = {...mf.macros, diamonds: undefined };
 By defining a new macro, a new LaTeX command is added to the dictionary
 of commands that can be used in a LaTeX expression. 
 
-To input a macro, type <kbd>\</kbd> followed by the macro name, then <kbd>RETURN</kbd>
+To input a macro, type <kbd>\\</kbd> followed by the macro name, then <kbd>RETURN</kbd>
 
 Custom macros are also included in the value of the mathfield 
 expressed as a LaTeX string (`mf.value`).
 
 It may also be convenient to associate the macro with an inline
 shortcut. Inline shortcuts can be typed without having to enter the LaTeX
-editing mode (without having to type the <kbd>\</kbd> key).
+editing mode (without having to type the <kbd>\\</kbd> key).
 
 **To define an associated inline shortcut**, use the `inlineShortcuts` option.
 
