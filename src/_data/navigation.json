@@ -256,6 +256,11 @@
           "icon": "reference"
         },
         {
+          "title": "Complex",
+          "url": "/compute-engine/reference/complex/",
+          "icon": "reference"
+        },
+        {
           "title": "Control Structures",
           "url": "/compute-engine/reference/control-structures/",
           "icon": "reference"
