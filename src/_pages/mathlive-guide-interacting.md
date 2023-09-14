@@ -195,8 +195,7 @@ to be dispatched.
 
 </div>
 
-The event may also include a `data` property which is a
-string representing the content being modified.
+On iOS, the `inputType` property is removed. However, its content can also be access as `ev.data`. Until this issue is addressed in iOS, for better compatibility, use `ev.data`.{.notice-warning}
 
 The `beforeinput` event is dispatched before any modifications to the mathfield 
 have been done. This event is cancelable. Calling `preventDefault()` on the 
