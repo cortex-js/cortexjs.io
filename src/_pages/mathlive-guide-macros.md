@@ -222,5 +222,5 @@ console.log(mf.macros);
 
 
 {% readmore "/mathlive/guides/shortcuts/" %}
-**Next:** Manage <strong>Key bindings and Inline Shortcuts</strong>
+**Next:** Manage <strong>Key Bindings and Inline Shortcuts</strong>
 {% endreadmore %}
