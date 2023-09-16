@@ -268,8 +268,8 @@ $semantic-green: #2d9d78;
   --base-blue: var(--base-0d);
   --base-green: var(--base-0b);
 
-  --console-background: var(--base-00);
-  --console-color: var(--base-04);
+  --console-background: var(--blue-900); // var(--base-00); 
+  --console-color: var(--blue-50); // var(--base-04);
 
   --red-50: #{$red-50};
   --red-100: #{$red-100};

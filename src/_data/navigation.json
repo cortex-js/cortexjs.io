@@ -13,11 +13,11 @@
 			"url": "/cortex/"
 		},
 		{
-			"title": "<svg class='icon1quarterem' role='img'><title>Gitter Forum</title><use xlink:href='/assets/icons.svg#gitter'></use></svg>",
+			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Gitter Forum</title><use xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
 			"url": "/gitter/"
 		},
 		{
-			"title": "<svg class='icon1quarterem' role='img'><title>GitHub</title><use xlink:href='/assets/icons.svg#github'></use></svg>",
+			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>GitHub</title><use xlink:href=\"/assets/icons.svg#github\"></use></svg>",
 			"url": "https://github.com/cortex-js"
 		}
 	],
@@ -293,6 +293,11 @@
         {
           "title": "Special Functions",
           "url": "/compute-engine/reference/special-functions/",
+          "icon": "reference"
+        },
+        {
+          "title": "Statistics",
+          "url": "/compute-engine/reference/statistics/",
           "icon": "reference"
         },
         {

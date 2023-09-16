@@ -142,16 +142,18 @@ module.exports = function (eleventyConfig) {
       .join('')}</span>`;
   });
 
-  eleventyConfig.addPairedLiquidShortcode('def', (content, name) => {
-    return `<tr><td><code>${name}</code></td><td>
-    ${md.render(content)}</td></tr>`;
+  eleventyConfig.addPairedLiquidShortcode('defs', (content, col1, col2) => {
+    return `${content}`;
   });
 
-  eleventyConfig.addPairedLiquidShortcode('defs', (content, col1, col2) => {
-    return `<table class="defs"><thead><tr><th>${col1 ?? ''}</th><th>${
-      col2 ?? ''
-    }</th></tr></thead><tbody>
-    ${content}</tbody></table>`;
+  eleventyConfig.addPairedLiquidShortcode('def', (content, name) => {
+    return `<h3 class="visually-hidden" id="${name}" tabindex="-1">${name}</h3><div class="defs"><div class="def">${md.render(
+      content
+    )}</div></div>`;
+  });
+
+  eleventyConfig.addShortcode('latex', (content) => {
+    return `<div class='latex'><div class="source">${content}</div><div class="display">\\[ ${content} \\]</div></div>`;
   });
 
   eleventyConfig.addPairedLiquidShortcode('readmore', (content, url) => {

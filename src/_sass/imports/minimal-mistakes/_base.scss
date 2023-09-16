@@ -184,6 +184,84 @@ kbd {
 }
 
 
+element.style {
+  border-radius: 0 8px 8px 0;
+  border-left: 3px solid var(--teal-800);
+  background: var(--teal-50);
+  padding-top: .5em;
+  padding-bottom: 0.5em;
+  padding-left: .5em;
+  color: var(--blue-800);
+}
+
+.page__content p.signature:first-of-type {
+  margin: -8px;
+  padding: 8px 0 8px 8px;
+  border-radius: 16px 16px 0 0;
+  background: var(--blue-600);
+  color: var(--blue-100);
+  strong {
+    color: #fff;
+  }
+}
+
+.page__content p.signature:not(:first-of-type) {
+  margin: -8px;
+  padding: 8px 0 8px 8px;
+  border-radius: 0;
+  background: var(--blue-600);
+  color: var(--blue-100);
+  strong {
+    color: #fff;
+  }
+}
+
+
+.signature {
+  font-family: var(--monospace-font-family);
+  font-weight: 900;
+  font-size: 1.2rem;
+  i, em {
+    opacity: 0.8;
+  }
+}
+
+div.defs .def {
+  clear: both;
+  border-radius: 16px;
+  background: var(--card-background);
+  border: 1px solid var(--callout-border-color);
+  padding: 8px;
+  margin-bottom: 4em;
+  .ML__mathlive {
+    font-size: 1.2rem;
+  }
+}
+
+.page__content .def p.signature + p:not(.signature) {
+  margin-top: 1.3em;
+}
+
+
+div.latex {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border-left: 3px solid var(--blue-200);
+  background: var(--blue-50);
+  padding: .5em;
+  color: black;
+  border-radius: 0 8px 8px 0;
+  .source {
+    font-family: var(--monospace-font-family);
+    color: var(--blue-900);
+  }
+  .display {
+    font-size: 1.2rem;
+    padding-top: .5em;
+    padding-bottom: .5em;
+  }
+}
+
 pre {
   overflow-x: auto; /* add scrollbars to wide code blocks*/
 }

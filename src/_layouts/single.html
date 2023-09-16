@@ -68,9 +68,9 @@ layout: default
 
 
         {% if page.last_modified_at %}
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime='{{ page.last_modified_at | date: "%Y-%m-%d" }}'>{{ page.last_modified_at | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ page.last_modified_at | date: "%Y-%m-%d" }}">{{ page.last_modified_at | date: "%B %d, %Y" }}</time></p>
         {% elsif page.date %}
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime='{{ page.date | date: "%Y-%m-%d" }}'>{{ page.date | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ page.date | date: "%Y-%m-%d" }}">{{ page.date | date: "%B %d, %Y" }}</time></p>
         {% endif %}
 
           <p class="page__meta-link"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#bug"/></svg> <strong>Problem? Feedback?</strong> File a report at&nbsp;<a href="https://github.com/cortex-js/cortexjs.io">github.com/cortex-js/cortexjs.io</a></p>

@@ -77,7 +77,7 @@ function parseCodeFence(lines, index) {
     if (!lines[index] && qualifier) {
       // Replace empty lines with some spaces, to prevent
       // eleventy from getting confused
-      content.push('<!-- -->');
+      content.push('\u00A0');
     } else {
       content.push(lines[index]);
     }

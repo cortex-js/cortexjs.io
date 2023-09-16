@@ -386,7 +386,7 @@ used, which is equivalent to a `VirtualKeyboardKeycap` with a `latex` property
 equal to the string, that is, it will display the latex string as the keycap
 label and insert it when the key is pressed.
 
-```json
+```json example
 rows: [
   [
     { latex: "a", variants: ["A", "\\alpha", "\\Alpha"] }
