@@ -130,9 +130,9 @@ library.
 
 ```js
 const ce = new ComputeEngine({
-  symbolTables: ComputeEngine.getSymbolTable('arithmetic')
+  symbolTables: ComputeEngine.getSymbolTable("arithmetic")
 });
-console.log(ce.box(['Add', 5, 2]).evaluate().json);
+console.log(ce.box(["Add", 5, 2]).evaluate().json);
 ```
 
 Each entry in a symbol table defines the properties of that function or
