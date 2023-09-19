@@ -103,26 +103,29 @@ the npm package as `dist/compute-engine.esm.js`.
 Expressions reference identifiers that are defined in libraries.
 
 By default, a `ComputeEngine` instance includes a robust set of
-functions and symbols, the standard library, grouped in several categories.
+functions and symbols, the standard library, grouped in several topics.
 
 <div class=symbols-table>
 
-| Category | Identifiers |
-|:---|:---|
-| [Arithmetic](/compute-engine/reference/arithmetic/) | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`...|
-| [Calculus](/compute-engine/reference/calculus/) | `Derive` `Integrate`...|
-| [Collections](/compute-engine/reference/collections/)| `Sequence` `List` `Dictionary` `Set`... |
-| [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` `Sum`  ... |
-| [Core](/compute-engine/reference/core/) |`InverseFunction` `LatexTokens`... |
-| [Domains](/compute-engine/reference/domains/) | `Anything` `Nothing` `Number` `Integer` ... |
-| [Functions](/compute-engine/reference/functions/) | `Function` `Apply` `Return`  ... |
-| [Logic](/compute-engine/reference/logic/) |`And` `Or` `Not` `True` `False` `Maybe` ...|
-| [Sets](/compute-engine/reference/sets/) | `Union` `Intersection` `EmptySet` ...|
-| [Special Functions](/compute-engine/reference/special-functions/) | `Erf` `Gamma` `Factorial`...|
-| [Styling](/compute-engine/reference/styling/) | `Delimiter` `Style`...|
-| [Trigonometry](/compute-engine/reference/trigonometry/)  | `Pi` `Cos` `Sin` `Tan`...| 
+| Topic                                                               |                                                       |
+| :------------------------------------------------------------------ | :--------------------------------------------------------------------- |
+| [Arithmetic](/compute-engine/reference/arithmetic/)                 | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`... |
+| [Calculus](/compute-engine/reference/calculus/)                     | `Derivative` `Integrate`...                                                |
+| [Collections](/compute-engine/reference/collections/)               | `List` `Reverse` `Filter`...                                           |
+| [Complex](/compute-engine/reference/complex/)                       | `Real` `Conjugate`, `ComplexRoots`...                                  |
+| [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` ...                                          |
+| [Core](/compute-engine/reference/core/)                             | `Declare`, `Assign`, `Error` `LatexString`...                       |
+| [Domains](/compute-engine/reference/domains/)                       | `Anything` `Nothing` `Number` `Integer` ...                            |
+| [Functions](/compute-engine/reference/functions/)                   | `Function` `Apply` `Return` ...                                        |
+| [Logic](/compute-engine/reference/logic/)                           | `And` `Or` `Not` `True` `False` `Maybe` ...                            |
+| [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` ...                                  |
+| [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
+| [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
+| [Styling](/compute-engine/reference/styling/)                       | `Delimiter` `Style`...                                                 |
+| [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>
+
 
 
 You can define your own identifiers to complement or replace the standard 
