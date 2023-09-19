@@ -257,7 +257,7 @@ $semantic-green: #2d9d78;
   --base-08: #cc6666; // base0c
   --base-09: $base-09;
   --base-0a: #f0c674;
-  --base-0b: #b5bd68;
+  --base-0b: var(--green-300); // #b5bd68;
   --base-0c: #8abeb7; // base08
   --base-0d: #81a2be;
   --base-0e: #b294bb;

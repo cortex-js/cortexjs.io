@@ -68,11 +68,14 @@ $base-green: $base0b;
 */
 
 /* Tomorrow Comment */
-.hljs-comment,
-.hljs-title {
+.hljs-comment {
     color: var(--base-04, $base04);
-    font-style: italic;
 }
+/* for name of functions */
+.hljs-title {
+    color: var(--base-0a, $base0a);
+}
+
 
 /* Tomorrow Red */
 .hljs-variable,
@@ -183,8 +186,8 @@ $base-green: $base0b;
 
 .cm-s-tomorrow-night.CodeMirror { background: var(--base-00, $base00); color: var(--base-05, $base05); }
 .cm-s-tomorrow-night div.CodeMirror-selected { background: var(--base-01, $base01); }
-.cm-s-tomorrow-night .CodeMirror-line::selection, .cm-s-tomorrow-night .CodeMirror-line > span::selection, .cm-s-tomorrow-night .CodeMirror-line > span > span::selection { background: rgba(45, 45, 45, 0.99); }
-.cm-s-tomorrow-night .CodeMirror-line::-moz-selection, .cm-s-tomorrow-night .CodeMirror-line > span::-moz-selection, .cm-s-tomorrow-night .CodeMirror-line > span > span::-moz-selection { background: rgba(45, 45, 45, 0.99); }
+.cm-s-tomorrow-night .CodeMirror-line::selection, .cm-s-tomorrow-night .CodeMirror-line > span::selection, .cm-s-tomorrow-night .CodeMirror-line > span > span::selection { background: var(--semantic-blue, #0066ce); }
+.cm-s-tomorrow-night .CodeMirror-line::-moz-selection, .cm-s-tomorrow-night .CodeMirror-line > span::-moz-selection, .cm-s-tomorrow-night .CodeMirror-line > span > span::-moz-selection { background: var(--semantic-blue, #0066ce); }
 .cm-s-tomorrow-night .CodeMirror-gutters { background: var(--base-00, $base00); border-right: 0px; }
 .cm-s-tomorrow-night .CodeMirror-guttermarker { color: var(--base-0c, $base0c); }
 .cm-s-tomorrow-night .CodeMirror-guttermarker-subtle { color: var(--base-03, $base03); }

@@ -173,6 +173,49 @@ pre {
   font-family: var(--monospace-font-family);
 }
 
+section pre {
+  position: relative;
+  overflow: auto hidden;
+  background: var(--console-background);
+  // background-image: radial-gradient(
+  //   var(--console-background), black 350%
+  // );
+  background-color: var(--console-background);
+  background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+
+  color: var(--console-color);
+  text-shadow: 0 0 5px #C8C8C870;
+
+  font-size: 1.1rem;
+  line-height: 1.4;
+  user-select: all;
+}
+
+// Does not seem to work... ???
+section pre::selection {
+  color:  var(--semantic-orange);
+  background: var(--semantic-blue, #0066ce);
+}
+
+
+section pre::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(black, 0.10),
+    rgba(black, 0.10) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+}
+
+
+
 kbd {
   padding: 2px 5px 2px;
   margin-left: 2px;
@@ -251,14 +294,20 @@ div.latex {
   padding: .5em;
   color: black;
   border-radius: 0 8px 8px 0;
+  overflow: hidden;
   .source {
     font-family: var(--monospace-font-family);
     color: var(--blue-900);
+    font-size: 1.1rem;
+    line-height: 1.4;
   }
   .display {
     font-size: 1.2rem;
     padding-top: .5em;
     padding-bottom: .5em;
+    .ML__mathlive {
+      font-size: 1.6rem;
+    }
   }
 }
 
@@ -295,6 +344,15 @@ td > code {
   td > code {
     color: var(--blue-100);
   }
+
+  div.latex {
+    background: #1f345b;
+    border-color: var(--blue-900);
+    color: var(--base-06);
+    .source {
+      color: var(--blue-100);
+    }
+   }
 
 }
 
