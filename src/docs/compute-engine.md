@@ -12,10 +12,17 @@ sidebar:
 The **CortexJS Compute Engine** is a JavaScript/TypeScript library for symbolic
 computing and numeric evaluation of mathematical expressions.{.xl}
 
+The **Compute Engine** is for educators, students, scientists and engineers 
+who need to make technical computing apps running in the browser or in
+server-side JavaScript environments such as Node.
+
+<div style="height:2rem"></div>
+
+
 ```ts
 const ce = new ComputeEngine();
 
-console.log(ce.parse("e^{i\\pi}").N().latex);
+console.log(ce.parse("e^{i\\pi}").evaluate().latex);
 // ➔ "-1"
 
 
@@ -25,9 +32,6 @@ console.log(ce.box(["Expand", expr]).evaluate().latex);
 
 ```
 
-The Compute Engine is for anyone who wants to make technical computing apps 
-in the browser or in server-side environments such as Node: educators, 
-students, scientists and engineers.
 
 **Note:** To use the Compute Engine you must write JavaScript code. This guide 
 assumes you are familiar with JavaScript or TypeScript.{.notice--info}
@@ -62,7 +66,7 @@ from a CDN.
     'https://unpkg.com/@cortex-js/compute-engine?module';
 
   const ce = new ComputeEngine();
-  console.log(ce.parse("e^{i\\pi}").N().latex);
+  console.log(ce.parse("e^{i\\pi}").evaluate().latex);
   // ➔ "-1"
 </script>
 
@@ -74,7 +78,9 @@ The ESM (module) version is also available in the npm package in `dist/compute-e
 ### Using Vintage JavaScript
 
 If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version. 
+modern JavaScript features, use the UMD version. You can load the UMD
+version by using a `<script>` tag.
+
 
 For example, WebPack 4 does not support the optional chaining operator, using 
 the UMD version will make use of polyfills as necessary.
@@ -87,7 +93,7 @@ The UMD version is also available in the npm package in `dist/compute-engine.min
 <script>
   window.onload = function() {
     const ce = new ComputeEngine.ComputeEngine();
-    console.log(ce.parse("e^{i\\pi}").N().latex);
+    console.log(ce.parse("e^{i\\pi}").evaluate().latex);
     // ➔ "-1"
   }
 </script>
@@ -100,10 +106,9 @@ the npm package as `dist/compute-engine.esm.js`.
 
 ## Standard Library
 
-Expressions reference identifiers that are defined in libraries.
-
-By default, a `ComputeEngine` instance includes a robust set of
-functions and symbols, the standard library, grouped in several topics.
+The identifiers in a MathJSON expression are defined libraries. The standard
+library is a collection of functions and symbols that are available by default
+in a `ComputeEngine` instance.
 
 <div class=symbols-table>
 
@@ -126,25 +131,39 @@ functions and symbols, the standard library, grouped in several topics.
 
 </div>
 
+{% readmore "/compute-engine/guides/standard-library/" %}
+Read more about <strong>Standard Library</strong>
+{% endreadmore %}
 
+### Extending the Standard Library
 
-You can define your own identifiers to complement or replace the standard 
-library.
+The standard library can be extended by defining new definitions:
 
 ```js
-const ce = new ComputeEngine({
-  symbolTables: ComputeEngine.getSymbolTable("arithmetic")
-});
-console.log(ce.box(["Add", 5, 2]).evaluate().json);
+// Declare that the identifier "f" is a function, 
+// but without giving it a value
+ce.declare("f", "Function");
+
+// Define a new function `double` that returns twice its input
+ce.assign("double(x)", ["Multiply", "x", 2]);
+
+// LaTeX can be used for the definition as well...
+ce.assign("half(x)", ce.parse("\\frac{x}{2}"));
 ```
+
+
+
+{% readmore "/compute-engine/guides/augmenting/" %}
+Read more about <strong>Augmenting the Standard Library</strong>
+{% endreadmore %}
+
+
+
 
 Each entry in a symbol table defines the properties of that function or
 symbol, as well as how to put expressions using that function in canonical form 
 and how to simplify and evaluate it.
 
-{% readmore "/compute-engine/guides/standard-library/" %}
-Read more about <strong>Standard Library</strong>
-{% endreadmore %}
 
 
 
@@ -152,5 +171,5 @@ You can also customize the LaTeX syntax, that is how to parse and serialize
 LaTeX to MathJSON.
 
 {% readmore "/compute-engine/guides/latex-syntax/" %}
-Read more about the <strong>LaTeX Syntax</strong>
+Read more about <strong>Parsing and Serializing LaTeX</strong>
 {% endreadmore %}

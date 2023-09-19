@@ -177,24 +177,25 @@ section pre {
   position: relative;
   overflow: auto hidden;
   background: var(--console-background);
-  // background-image: radial-gradient(
-  //   var(--console-background), black 350%
-  // );
-  background-color: var(--console-background);
   background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
 
   color: var(--console-color);
   text-shadow: 0 0 5px #C8C8C870;
+  box-shadow: inset 1px 1px 15px #000;
+  border-radius: 8px;
+  border: 1px solid #000;
 
   font-size: 1.1rem;
   line-height: 1.4;
   user-select: all;
+  code {
+    border-radius: 8px;
+  }
 }
 
-// Does not seem to work... ???
-section pre::selection {
-  color:  var(--semantic-orange);
-  background: var(--semantic-blue, #0066ce);
+code::selection, code *::selection {
+  color:  var(--semantic-orange) !important;
+  background: var(--semantic-blue, #0066ce) !important;
 }
 
 
@@ -237,37 +238,38 @@ element.style {
   color: var(--blue-800);
 }
 
-.page__content p.signature:first-of-type {
+.page__content p.signature {
   margin: -8px;
   padding: 8px 0 8px 8px;
-  border-radius: 16px 16px 0 0;
-  background: var(--blue-600);
-  color: var(--blue-100);
-  strong {
-    color: #fff;
-  }
-}
 
-.page__content p.signature:not(:first-of-type) {
-  margin: -8px;
-  padding: 8px 0 8px 8px;
   border-radius: 0;
-  background: var(--blue-600);
-  color: var(--blue-100);
-  strong {
-    color: #fff;
-  }
-}
 
-
-.signature {
   font-family: var(--monospace-font-family);
   font-weight: 900;
   font-size: 1.2rem;
+  background: var(--blue-600);
+  color: var(--blue-100);
+  strong {
+    color: #fff;
+  }
   i, em {
     opacity: 0.8;
   }
 }
+
+.page__content p.signature:first-of-type {
+  border-radius: 16px 16px 0 0;
+}
+
+:not(.signature) + p.signature {
+  margin-top: 2em;
+}
+
+
+// .page__content p.signature:not(:first-of-type) {
+// }
+
+
 
 div.defs .def {
   clear: both;
@@ -337,6 +339,11 @@ td > code {
 }
 
 @media (prefers-color-scheme: dark) {
+  // Inset border of the "console" box
+  section pre {
+    box-shadow: inset 1px 1px 15px rgba(0, 0, 0, .2)
+  }
+
   p > code,
   a > code,
   li > code,

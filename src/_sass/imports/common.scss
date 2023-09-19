@@ -396,6 +396,8 @@ $semantic-green: #2d9d78;
 
 @media (prefers-color-scheme: dark) {
   :root {
+  --console-background: var(--base-00);
+
   --primary-color: hsl(210, 80%, 40%);
   --primary-color-dark: hsl(210, 80%, 30%);;
   --primary-color-light: hsl(210, 80%, 60%);;
