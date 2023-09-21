@@ -1,1 +1,3 @@
-{}
+{
+  "prettier.configPath": "./node_modules/@cortex-js/prettier-config/index.json"
+}
