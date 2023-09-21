@@ -29,7 +29,6 @@ console.log(ce.parse("e^{i\\pi}").evaluate().latex);
 const expr = ce.parse("(a+b)^2");
 console.log(ce.box(["Expand", expr]).evaluate().latex);
 // ➔ "a^2 + 2ab + b^2"
-
 ```
 
 
@@ -104,18 +103,18 @@ The UMD version is also available in the npm package in `dist/compute-engine.min
 A non-minified module which may be useful for debugging is available in
 the npm package as `dist/compute-engine.esm.js`.
 
-## Standard Library
+## MathJSON Standard Library
 
-The identifiers in a MathJSON expression are defined libraries. The standard
-library is a collection of functions and symbols that are available by default
-in a `ComputeEngine` instance.
+The identifiers in a MathJSON expression are defined in libraries. The 
+**MathJSON Standard Library** is a collection of functions and symbols that are
+available by default to a `ComputeEngine` instance.
 
 <div class=symbols-table>
 
 | Topic                                                               |                                                       |
 | :------------------------------------------------------------------ | :--------------------------------------------------------------------- |
 | [Arithmetic](/compute-engine/reference/arithmetic/)                 | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`... |
-| [Calculus](/compute-engine/reference/calculus/)                     | `Derivative` `Integrate`...                                                |
+| [Calculus](/compute-engine/reference/calculus/)                     | `D` `Derivative` `Integrate`...                                                |
 | [Collections](/compute-engine/reference/collections/)               | `List` `Reverse` `Filter`...                                           |
 | [Complex](/compute-engine/reference/complex/)                       | `Real` `Conjugate`, `ComplexRoots`...                                  |
 | [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` ...                                          |
@@ -132,40 +131,15 @@ in a `ComputeEngine` instance.
 </div>
 
 {% readmore "/compute-engine/guides/standard-library/" %}
-Read more about <strong>Standard Library</strong>
+Read more about the <strong>MathJSON Standard Library</strong>
 {% endreadmore %}
 
-### Extending the Standard Library
-
-The standard library can be extended by defining new definitions:
-
-```js
-// Declare that the identifier "f" is a function, 
-// but without giving it a value
-ce.declare("f", "Function");
-
-// Define a new function `double` that returns twice its input
-ce.assign("double(x)", ["Multiply", "x", 2]);
-
-// LaTeX can be used for the definition as well...
-ce.assign("half(x)", ce.parse("\\frac{x}{2}"));
-```
-
-
+In addition to the built-in definitions from the MathJSON Standard Library
+you can also add your own definitions.
 
 {% readmore "/compute-engine/guides/augmenting/" %}
-Read more about <strong>Augmenting the Standard Library</strong>
+Read more about <strong>Augmenting the MathJSON Standard Library</strong>
 {% endreadmore %}
-
-
-
-
-Each entry in a symbol table defines the properties of that function or
-symbol, as well as how to put expressions using that function in canonical form 
-and how to simplify and evaluate it.
-
-
-
 
 You can also customize the LaTeX syntax, that is how to parse and serialize 
 LaTeX to MathJSON.

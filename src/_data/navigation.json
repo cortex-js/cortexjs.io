@@ -236,7 +236,7 @@
 				},
         { "separator": true },
         {
-          "title": "Standard Library",
+          "title": "MathJSON Standard Library",
           "url": "/compute-engine/guides/standard-library/",
           "icon": "intro"
         },
