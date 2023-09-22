@@ -62,6 +62,14 @@ module.exports = function (eleventyConfig) {
 
   buildSass('./src/_sass/', './src/build/css');
 
+  hljs.unregisterLanguage('js');
+  // hljs.registerLanguage('js', require('highlight.js/lib/languages/javascript'));
+  hljs.registerLanguage('js', require('./hljs-javascript.js'));
+
+  // import('./hljs-javascript.js').then((module) => {
+  //   hljs.registerLanguage('js', module);
+  // });
+
   const markdownIt = require('markdown-it');
   // const markdownItAttrs = require('markdown-it-attrs');
   // let markdownItEmoji = require('markdown-it-emoji');
