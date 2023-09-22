@@ -150,6 +150,11 @@ render_math_in_document: true
     color: #35324e;
     font-size: .9em;
     white-space: break-spaces;
+    border: none;
+    box-shadow: none;
+  }
+  .side-by-side > pre::after {
+    display: none;
   }
 </style>
 
@@ -221,39 +226,24 @@ the current math style (smaller in superscript/subscript).
 
 The `\textrm{}` command works like `\text{}` but will use a serif (roman) font.
 
-<div class="side-by-side">
 
-  <div class='math frame'>$$\textrm{Don Knuth}_\textrm{Don Knuth} $$</div>
+{% latex "\\textrm{Don Knuth}_\\textrm{Don Knuth}" %}
 
-  ```tex
-    \textrm{Don Knuth}_\textrm{Don Knuth}
-  ```
-</div>
 
 ---
 
 The `\mbox{}` command uses the same font as `\text` but its size does not 
 account for the current math style.
 
-<div class="side-by-side">
-  <div class='math frame'>$$\mbox{Don Knuth}_\mbox{Don Knuth} $$</div>
+{% latex "\\mbox{Don Knuth}_\\mbox{Don Knuth}" %}
 
-  ```tex
-    \mbox{Don Knuth}_\mbox{Don Knuth}
-  ```
-</div>
 
 ---
 
 The `\textnormal{}` command works like `\text{}`. But it's longer to type.
 
-<div class="side-by-side">
-  <div class='math frame'>$$\textnormal{Don Knuth}_\textnormal{Don Knuth} $$</div>
-  
-  ```tex
-    \textnormal{Don Knuth}_\textnormal{Don Knuth}
-  ```
-</div>
+{% latex "\\textnormal{Don Knuth}_\\textnormal{Don Knuth}" %}
+
 
 When in Text Mode, use `$...$` to switch back to Math Mode, Text Style (inline math) or `\\[...\\]` to switch
 to Math Mode, Display Style.
@@ -367,6 +357,9 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 * <span class='math'>$$\ker $$</span> `\ker`
 * <span class='math'>$$\ln $$</span> `\ln`
 * <span class='math'>$$\log $$</span> `\log`
+* <span class='math'>$$\lg $$</span> `\lg`
+* <span class='math'>$$\lb $$</span> `\lb`
+* <span class='math'>$$\arg $$</span> `\arg`
 {.command-list}
 
 
@@ -390,8 +383,6 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 * <span class='math'>$$\cotg $$</span> `\cotg`
 * <span class='math'>$$\csc $$</span> `\csc`
 * <span class='math'>$$\cosec $$</span> `\cosec`
-* <span class='math'>$$\lg $$</span> `\lg`
-* <span class='math'>$$\lb $$</span> `\lb`
 * <span class='math'>$$\sec $$</span> `\sec`
 * <span class='math'>$$\sh $$</span> `\sh`
 * <span class='math'>$$\sin $$</span> `\sin`
@@ -419,7 +410,6 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 * <span class='math'>$$\Pr $$</span> `\Pr`
 * <span class='math'>$$\hom $$</span> `\hom`
-* <span class='math'>$$\arg $$</span> `\arg`
 {.command-list}
 
 ### Modulo
@@ -619,29 +609,10 @@ below is determined by the length of the content above and below
 the arrows, which is specified as an argument (and optional argument):
 
 
-<div class="side-by-side">
- <div class='math frame'>$$\xrightarrow[\text{long text below}]{}$$</div> 
 
-  ```tex
-  \xrightarrow[\text{long text below}]{}
-  ```
-</div>
-
-<div class="side-by-side">
-  <div class='math frame'>$$\xrightarrow{\text{long text above}}$$</div>
-
-  ```tex
-    \xrightarrow{\text{long text above}}
-  ```
-</div>
-
-<div class="side-by-side">
-  <div class='math frame'>$$\xrightarrow[\text{and below}]{\text{long text above}}$$</div>
-
-  ```tex
-    \xrightarrow[\text{and below}]{\text{long text above}}
-  ```  
-</div>
+{% latex "\\xrightarrow[\\text{long text below}]{}" %}
+{% latex "\\xrightarrow{\\text{long text above}}" %}
+{% latex "\\xrightarrow[\\text{and below}]{\\text{long text above}}" %}
 
 
 <section class='full-width no-header center thin-line two-col math-80px'>
@@ -651,7 +622,6 @@ the arrows, which is specified as an argument (and optional argument):
 | <span class='math'>$$\xlongequal[below]{above} $$</span> `\xlongequal[]{}` | 
 | <span class='math'>$$\xrightarrow[below]{above} $$</span> `\xrightarrow[]{}` | <span class='math'>$$\xleftarrow[below]{above} $$</span> `\xleftarrow[]{}` |
 | <span class='math'>$$\xleftrightarrow[below]{above} $$</span> `\xleftrightarrow[]{}` | 
-| <span class='math'>$$\xrightleftarrows[below]{above} $$</span> `\xrightleftarrows[]{}` |
 | <span class='math'>$$\xtwoheadrightarrow[below]{above} $$</span> `\xtwoheadrightarrow[]{}` | <span class='math'>$$\xtwoheadleftarrow[below]{above} $$</span> `\xtwoheadleftarrow[]{}` |
 | <span class='math'>$$\xRightarrow[below]{above} $$</span> `\xRightarrow[]{}` | <span class='math'>$$\xLeftarrow[below]{above} $$</span> `\xLeftarrow[]{}` |
 | <span class='math'>$$\xrightharpoonup[below]{above} $$</span> `\xrightharpoonup[]{}` | <span class='math'>$$\xleftharpoonup[below]{above} $$</span> `\xleftharpoonup[]{}` |
@@ -661,7 +631,6 @@ the arrows, which is specified as an argument (and optional argument):
 |  <span class='math'>$$\xhookrightarrow[below]{above} $$</span> `\xhookrightarrow[]{}` | <span class='math'>$$\xhookleftarrow[below]{above} $$</span> `\xhookleftarrow[]{}` |
 | <span class='math'>$$\xmapsto[below]{above} $$</span> `\xmapsto[]{}` |
 | <span class='math'>$$\xtofrom[below]{above} $$</span> `\xtofrom[]{}`  |
-|  <span class='math'>$$\xrightequilibrium[below]{above} $$</span> `\xrightequilibrium[]{}`  | <span class='math'>$$\xleftequilibrium[below]{above} $$</span> `\xleftequilibrium[]{}` |
 
 </section>
 
@@ -758,10 +727,6 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 * <span class='math'>$$\leq $$</span>   `\leq`
 * <span class='math'>$$\ge $$</span>   `\ge`
 * <span class='math'>$$\geq $$</span>   `\geq`
-{.command-list}
-
----
-
 * <span class='math'>$$\shortparallel $$</span>   `\shortparallel`
 * <span class='math'>$$\leqslant $$</span>   `\leqslant`
 * <span class='math'>$$\geqslant $$</span>   `\geqslant`
@@ -842,7 +807,6 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 * <span class='math'>$$\approx $$</span>   `\approx`
 * <span class='math'>$$\parallel $$</span>   `\parallel`
 * <span class='math'>$$\simeq $$</span>   `\simeq` 
-
 * <span class='math'>$$\ratio $$</span>   `\ratio` 
 * <span class='math'>$$\coloncolon $$</span>   `\coloncolon` 
 * <span class='math'>$$\colonequals $$</span>   `\colonequals` 
@@ -861,7 +825,6 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 * <span class='math'>$$\notni $$</span>   `\notni` 
 * <span class='math'>$$\limsup $$</span>   `\limsup` 
 * <span class='math'>$$\liminf $$</span>   `\liminf` 
-
 * <span class='math'>$$\ordinarycolon $$</span>   `\ordinarycolon` 
 * <span class='math'>$$\vcentcolon $$</span>   `\vcentcolon` 
 * <span class='math'>$$\dblcolon $$</span>   `\dblcolon` 
@@ -877,11 +840,13 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 * <span class='math'>$$\Colonapprox $$</span>   `\Colonapprox` 
 * <span class='math'>$$\colonsim $$</span>   `\colonsim` 
 * <span class='math'>$$\Colonsim $$</span>   `\Colonsim` 
+{.command-list}
 
 <!-- statmath.sty -->
 * <span class='math'>$$\argmin $$</span>   `\argmin` 
 * <span class='math'>$$\argmax $$</span>   `\argmax` 
 * <span class='math'>$$\plim $$</span>   `\plim` 
+{.command-list}
 
 <!-- amsopn.sty.sty -->
 
@@ -892,9 +857,9 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 * <span class='math'>$$\varinjlim $$</span>   `\varinjlim` 
 * <span class='math'>$$\varprojlim $$</span>   `\varprojlim` 
 * <span class='math'>$$\ $$</span>   `\` 
-
-
 {.command-list}
+
+
 
 
 ### Negated Relational Operators
@@ -1368,7 +1333,7 @@ The `\enclose` command is very flexible. It accepts three arguments, two of
 which are required:
 
 ```tex
-    \enclose{<notation>}[<style>]{<body>}
+\enclose{<notation>}[<style>]{<body>}
 ```
 
 - `<notation>` a list of whitespace-delimited values:
@@ -1563,13 +1528,11 @@ and `Magenta`. Those names are case-sensitive. {.notice--info}
 
 MathLive support some commands from the [MathJax HTML extension](http://docs.mathjax.org/en/latest/input/tex/extensions/html.html).
 
-<div class="side-by-side">
-  <div class='math frame'>$$\class{custom-class}{x+1} $$</div>
+#### `\class`
 
-  ```tex
-    \class{custom-class}{x+1}
-  ```
-</div>
+
+
+{% latex "\\class{custom-class}{x+1}" %}
 
 
 When used in a `<math-field>` component, the class names should refer to a 
@@ -1578,7 +1541,9 @@ stylesheet defined with a `<style>` tag inside the `<math-field>` element.
 ```html
 <math-field>
   <style>
-    .custom-class { box-shadow: 2px 2px 2px #000; }
+    #custom-class { 
+      box-shadow: 0 0 10px #000; border-radius: 8px; padding: 8px;
+    }
   </style>
 
   \class{custom-class}{\frac{1}{x+1}}
@@ -1588,35 +1553,46 @@ stylesheet defined with a `<style>` tag inside the `<math-field>` element.
 
 ---
 
-<div class="side-by-side">
-  <div class='math frame'>$$\cssId{test-dentifier}{Don Knuth} $$</div> 
+<style>
+  #custom-class { box-shadow: 0 0 10px #000; border-radius: 8px; padding: 8px;}
+</style>
 
-  ```tex
-    \cssId{}{}
-  ```
-</div>
+{% latex "\\cssId{custom-class}{Don Knuth}" %}
+
 
 ---
 
-<div class="side-by-side">
-
-  ```tex
-    \htmlData{}{}
-  ```
-</div>
+#### `\htmlData`
 
 The argument of this command is a comma-delimited list of key/value pairs, e.g. 
 `\htmlData{foo=green,bar=blue}{x=0}`. A corresponding
   `data-foo` and `data-bar` DOM attribute is generated to the rendered DOM.
 
-<div class="side-by-side">
-  <div class='math frame'>$$\htmlData{foo=green,bar=blue}{ \text{Don Knuth} } $$</div> 
-  
-  ```tex
-    \htmlData{foo=green,bar=blue}{ \text{Don Knuth} }
-  ```
-</div>
+{% latex "\\htmlData{foo=green,bar=blue}{ \\text{Don Knuth} }" %}
  
+
+### Other Extensions
+
+#### `\error`
+
+The argument of this command is a string that will be rendered in red.
+
+{% latex "\\error{\\text{Don Knuth}}" %}
+
+#### `\texttip`
+
+The first argument is a math expression to display, the second argument is the text to
+display on hover.
+
+{% latex "\\mathtip{\\text{Don Knuth}}{\\text{Knuth is the author of TeX}}" %}
+
+#### `\mathtip`
+
+The first argument is a math expression to display, the second argument is the 
+a math expression to display on hover.
+
+{% latex "\\mathtip{e^{i\\pi}}{-1}" %}
+
 
 ### Others
 
@@ -1865,20 +1841,17 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 
 ### Complex Examples
 
-* <span class='math'>$$\ce{CO2 + C -> 2 CO} $$</span> <br>  `\ce{CO2 + C -> 2 CO}`
-* <span class='math'>$$\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-} $$</span> <br>   `\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}`
-<!-- * <span class='math'>$$C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K} $$</span> <br>   `C_p[\ce{H2O(l)}] = \pu{75.3 J // mol K}` -->
-<!-- * <span class='math'>$$\ce{Zn^2+  <=>[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  <=>[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$} $$</span> <br>  `\ce{Zn^2+  <=>[+ 2OH-][+ 2H+]  $\underset{\text{amphoteres Hydroxid}}{\ce{Zn(OH)2 v}}$  <=>[+ 2OH-][+ 2H+]  $\underset{\text{Hydroxozikat}}{\ce{[Zn(OH)4]^2-}}$}` -->
-* <span class='math'>$$\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$} $$</span>  <br>  `\ce{$K = \frac{[\ce{Hg^2+}][\ce{Hg}]}{[\ce{Hg2^2+}]}$}`
-* <span class='math'>$$\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$} $$</span> <br>  `\ce{$K = \ce{\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}`
-* <span class='math'>$$\ce{Hg^2+ ->[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  ->[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$} $$</span> <br>   `\ce{Hg^2+ ->[I-]  $\underset{\mathrm{red}}{\ce{HgI2}}$  ->[I-]  $\underset{\mathrm{red}}{\ce{[Hg^{II}I4]^2-}}$}`
+
+{% latex "\\ce{CO2 + C -> 2 CO}" %}
+{% latex "\\ce{Hg^2+ ->[I-] HgI2 ->[I-] [Hg^{II}I4]^2-}" %}
+{% latex "\\ce{$K = \\ce{\\frac{[Hg^2+][Hg]}{[Hg2^2+]}}$}" %}
+{% latex "\\ce{Hg^2+ ->[I-]  $\\underset{\\mathrm{red}}{\\ce{HgI2}}$  ->[I-]  $\\underset{\\mathrm{red}}{\\ce{[Hg^{II}I4]^2-}}$}" %}
 
 
 ## Macros
 
 * <span class='math'>$$\iff $$</span> `\iff`
 * <span class='math'>$$\set{ab} $$</span> `\set{}`
-* <span class='math'>$$\Set{ x\in\mathbf{R}^2 | 0<{|x|}<5 } $$</span> `\Set{ x\in\mathbf{R}^2 | 0<{|x|}<5 }`
 * <span class='math'>$$\rd $$</span> `\rd`
 * <span class='math'>$$\rD $$</span> `\rD`
 * <span class='math'>$$\scriptCapitalE $$</span> `\scriptCapitalE`
@@ -1895,6 +1868,8 @@ MathLive  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhche
 * <span class='math'>$$\capitalDifferentialD $$</span> `\capitalDifferentialD`
 {.command-list}
 
+
+{% latex "\\Set{ x\\in\\mathbf{R}^2 | 0<{|x|}<5 }" %}
 
 ## Environments / Matrixes
 
@@ -2092,6 +2067,8 @@ A matrix with **double bars** as delimiters.
 
 #### `matrix*`
 
+An array, a matrix without delimiters.
+
 <div class='side-by-side'>
 
 <div class='math frame'>$$\begin{matrix*}a & b \\\\ c & \frac{1}{d}\end{matrix*}$$</div>
@@ -2105,6 +2082,10 @@ A matrix with **double bars** as delimiters.
 </div>
 
 #### `smallmatrix`
+
+A matrix typeset in a way that may be suitable on the same line as text.
+
+{% latex "" %}
 
 <div class='side-by-side'>
 
@@ -2196,7 +2177,8 @@ Consecutive equations without alignment
 
 #### `multline`
 
-The first line is left aligned, the last line is right aligned.
+The first line is left aligned, the last line is right aligned, and all the
+intermediate lines are centered.
 
 <div class='side-by-side'>
 
@@ -2289,7 +2271,9 @@ f(x) & = (a+b)^2 \\
 ```
  
 </div>
- -- Avoid, use `align` instead
+ -- 
+ 
+ Avoid, use `align` instead
 
 <div class='side-by-side'>
 
@@ -2306,6 +2290,7 @@ f(x) & = (a+b)^2 \\
 
 These environments do not form a math environment by themselves but 
 can be used as building blocks for more elaborate structures: 
+
 
 <div class='side-by-side'>
 
