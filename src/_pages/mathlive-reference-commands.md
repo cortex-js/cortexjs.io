@@ -294,7 +294,7 @@ when creating modern LaTeX content.
 ## Binary Operators
 
 Some binary operators can also be used as a unary operator: `+`, `-`, etc...
-Their spacing is adjusted accordingly. For example in $$-1-2$$
+Their spacing is adjusted accordingly. For example in \\( -1-2 \\)
 there is less space between `-` and `1` than there is between `-` and `2`.
 
 * <span class='math'>$$+ $$</span>   `+`
@@ -352,17 +352,35 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 ## Functions
 
-* <span class='math'>$$\det $$</span> `\det`
 * <span class='math'>$$\exp $$</span> `\exp`
-* <span class='math'>$$\ker $$</span> `\ker`
 * <span class='math'>$$\ln $$</span> `\ln`
 * <span class='math'>$$\log $$</span> `\log`
 * <span class='math'>$$\lg $$</span> `\lg`
 * <span class='math'>$$\lb $$</span> `\lb`
+{.command-list}
+
+
+* <span class='math'>$$\ker $$</span> `\ker`
+* <span class='math'>$$\det $$</span> `\det`
 * <span class='math'>$$\arg $$</span> `\arg`
 {.command-list}
 
 
+<!-- statmath.sty -->
+* <span class='math'>$$\argmin $$</span>   `\argmin` 
+* <span class='math'>$$\argmax $$</span>   `\argmax` 
+* <span class='math'>$$\plim $$</span>   `\plim` 
+{.command-list}
+
+<!-- amsopn.sty.sty -->
+
+* <span class='math'>$$\injlim $$</span>   `\injlim` 
+* <span class='math'>$$\projlim $$</span>   `\projlim` 
+* <span class='math'>$$\varlimsup $$</span>   `\varlimsup` 
+* <span class='math'>$$\varliminf $$</span>   `\varliminf` 
+* <span class='math'>$$\varinjlim $$</span>   `\varinjlim` 
+* <span class='math'>$$\varprojlim $$</span>   `\varprojlim` 
+{.command-list}
 
 
 ### Trigonometry
@@ -418,9 +436,15 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 * <span class='math'>$$n \mod{3} $$</span> `n \mod{3}`
 * <span class='math'>$$n \bmod 3 $$</span> `n \bmod 3`
 
+
+
+
 ### Custom Functions
 
-* <span class='math'>$$\operatorname{argth}(\theta) $$</span> `\operatorname{argth}(\theta)`
+Use `\operatorname{}` to define a custom function: it will be display in upright
+font and will have the appropriate spacing.
+
+{% latex "\\operatorname{argth}(\\theta)" %}
 
 
 
@@ -842,24 +866,6 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 * <span class='math'>$$\Colonsim $$</span>   `\Colonsim` 
 {.command-list}
 
-<!-- statmath.sty -->
-* <span class='math'>$$\argmin $$</span>   `\argmin` 
-* <span class='math'>$$\argmax $$</span>   `\argmax` 
-* <span class='math'>$$\plim $$</span>   `\plim` 
-{.command-list}
-
-<!-- amsopn.sty.sty -->
-
-* <span class='math'>$$\injlim $$</span>   `\injlim` 
-* <span class='math'>$$\projlim $$</span>   `\projlim` 
-* <span class='math'>$$\varlimsup $$</span>   `\varlimsup` 
-* <span class='math'>$$\varliminf $$</span>   `\varliminf` 
-* <span class='math'>$$\varinjlim $$</span>   `\varinjlim` 
-* <span class='math'>$$\varprojlim $$</span>   `\varprojlim` 
-* <span class='math'>$$\ $$</span>   `\` 
-{.command-list}
-
-
 
 
 ### Negated Relational Operators
@@ -931,7 +937,7 @@ To negate other relational operators, use the `\not` command, e.g.
 * <span class='math'>$$\doubleStruckCapitalP $$</span> `\doubleStruckCapitalP` (macro)
 {.command-list}
 
-### Unary/Binary Set Operators
+### Set Operators
 
 * <span class='math'>$$\cap $$</span>   `\cap`
 * <span class='math'>$$\cup $$</span>   `\cup`
