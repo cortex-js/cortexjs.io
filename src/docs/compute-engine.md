@@ -5,7 +5,32 @@ layout: single
 date: Last Modified
 sidebar:
     - nav: "universal"
+head:
+  stylesheets:
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css
+  scripts:
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/javascript/javascript.min.js
+    - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
+  modules:
+    - /assets/js/code-playground.min.js
 ---
+
+<script type="module">
+  window.addEventListener("DOMContentLoaded", () => 
+    import("//unpkg.com/@cortex-js/compute-engine?module").then((ComputeEngine) => {
+      globalThis.ce = new ComputeEngine.ComputeEngine();
+      const playgrounds = [...document.querySelectorAll("code-playground")];
+      for (const playground of playgrounds) {
+        playground.autorun = 1000; // delay in ms
+        playground.run();
+      }
+    })
+);
+</script>
+
+
+
 
 <img alt="Compute Engine" class='full-width' src='/assets/Compute-Engine-2.jpg' style='border-radius:8px 8px 0 0 ; border:1px solid #203346; margin-bottom: 2em'>
 
@@ -19,17 +44,18 @@ server-side JavaScript environments such as Node.
 <div style="height:2rem"></div>
 
 
-```ts
-const ce = new ComputeEngine();
-
-console.log(ce.parse("e^{i\\pi}").evaluate().latex);
-// ➔ "-1"
-
-
+<code-playground layout="stack" show-line-numbers autorun="never">
+<div slot="javascript">
+console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);
+//
 const expr = ce.parse("(a+b)^2");
 console.log(ce.box(["Expand", expr]).evaluate().latex);
-// ➔ "a^2 + 2ab + b^2"
-```
+//
+const lhs = ce.parse("2x^2 + 3x + 1");
+const rhs = ce.parse("1 + 2x + x + 2x^2");
+console.log(lhs.latex, lhs.isEqual(rhs) ? "=" : "≠", rhs.latex);</div>
+</code-playground>
+
 
 
 **Note:** To use the Compute Engine you must write JavaScript code. This guide 
@@ -68,7 +94,6 @@ from a CDN.
   console.log(ce.parse("e^{i\\pi}").evaluate().latex);
   // ➔ "-1"
 </script>
-
 ```
 
 The ESM (module) version is also available in the npm package in `dist/compute-engine.min.esm.js` 

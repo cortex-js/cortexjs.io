@@ -35,7 +35,9 @@ The example below will define a new command, `\average`, which will be
 replaced by `\operatorname{average}`, that is displayed as a single unit
 using an upright font.
 
-<code-playground layout="stack">
+Try changing `\operatorname` to `\mathbf` to see the difference.
+
+<code-playground layout="stack" show-line-numbers mark-javascript-line="3">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -48,10 +50,8 @@ using an upright font.
     <div slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
   average: '\\operatorname{average}',
-};
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;\average([2, 4, 8])}&lt;/math-field&gt;
-</div>
+};</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\average([2, 4, 8])}&lt;/math-field&gt;</div>
 </code-playground>
 
 <hr>
@@ -63,8 +63,8 @@ line.
 
 ```javascript
 mf.macros = { ...mf.macros,
-  minutes: '\\,{}^\\prime\\;',
-  seconds: '\\,\\doubleprime\\;',
+  minutes: "\\,{}^\\prime\\;",
+  seconds: "\\,\\doubleprime\\;",
 };
 ```
 
@@ -72,7 +72,7 @@ mf.macros = { ...mf.macros,
 
 The macro definition can contain up to eight arguments, represented by `#1` to `#9`.
 
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers >
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -87,8 +87,7 @@ mf.macros = {...mf.macros,
   smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
-</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;</div>
 </code-playground>
 
 <hr>
@@ -100,7 +99,7 @@ in the expanded definition of a macro.
 **To define a macro whose content is selectable and editable** set 
 `captureSelection` to `false`.
 
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers mark-javascript-line=6>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -119,15 +118,14 @@ mf.macros = {...mf.macros,
   },
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;
-</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;</div>
 </code-playground>
 
 <hr>
 
 **To remove a macro** set its definition to undefined:
 
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -138,10 +136,8 @@ mf.macros = {...mf.macros,
       }
     </style>
     <div slot="javascript">const mf = document.getElementById('mf');
-mf.macros = {...mf.macros, diamonds: undefined };
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;
-</div>
+mf.macros = {...mf.macros, diamonds: undefined };</div>
+    <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;</div>
 </code-playground>
 
 
@@ -161,7 +157,7 @@ editing mode (without having to type the <kbd>\\</kbd> key).
 
 **To define an associated inline shortcut**, use the `inlineShortcuts` option.
 
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -181,8 +177,7 @@ mf.inlineShortcuts = {...mf.inlineShortcuts,
     seconds: '\\seconds',
 };
 </div>
-    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;
-</div>
+    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;</div>
 </code-playground>
 
 
@@ -196,7 +191,7 @@ mf.inlineShortcuts = {...mf.inlineShortcuts,
 
 **To view the available macros**, inspect the `macros` property:
 
-<code-playground layout="stack" >
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -209,8 +204,7 @@ mf.inlineShortcuts = {...mf.inlineShortcuts,
     <div slot="javascript">const mf = document.getElementById('mf');
 console.log(mf.macros);
 </div>
-    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;
-</div>
+    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
 </code-playground>
 
 

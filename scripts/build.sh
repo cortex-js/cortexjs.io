@@ -24,6 +24,13 @@ ENVIRONMENT="${1-dev}"
 mkdir -p ./build
 mkdir -p ./src/build
 
+if [ "$ENVIRONMENT" == "playground" ]
+then
+    echo -e "$BASENAME$DOT Building playground"
+    npm --prefix submodules/code-playground run dist
+    echo -e "$BASENAME$CHECK Playground built"
+fi
+
 if [ "$ENVIRONMENT" != "watch" ]
 then
 

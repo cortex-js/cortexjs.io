@@ -53,7 +53,8 @@ head:
   } */
   #latex {
     margin-top: 1em;
-    font-family: var(--monospace-font-family), 'IBM Plex Mono', 'Fira Code', 'Source Code Pro',   monospace;
+
+    font-family: var(--monospace-font-family), 'Berkeley Mono', 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', monospace;
   }
   pre.console {
     display: block;
@@ -61,7 +62,7 @@ head:
     padding: 8px 8px 8px 1em;
     border-radius: 8px;
     overflow: auto;
-    font-family: var(--monospace-font,'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', 'Source Code Pro', monospace);
+    font-family: var(--monospace-font-family),'Berkeley Mono', 'JetBrains Mono', 'IBM Plex Mono', 'Fira Code', monospace;
     font-size: 1em;
     color: var(--base-05, ${base05});
     background: var(--base-00, ${base00});

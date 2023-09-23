@@ -60,8 +60,7 @@ latex.addEventListener("input", (ev) =>
   &lt;/math-field&gt;                
   &lt;label&gt;Latex&lt;/label&gt;
   <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
-  autocorrect="off" spellcheck="false"></textarea>
-  </div>
+  autocorrect="off" spellcheck="false"></textarea></div>
 </code-playground>
 
 
@@ -389,8 +388,7 @@ mf.applyStyle(
 <div slot="html">
 &lt;math-field id="formula"&gt;
 x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;                
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 
 
@@ -416,8 +414,7 @@ mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
 <div slot="html">
 &lt;math-field id="formula"&gt;
 x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;                
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 
 

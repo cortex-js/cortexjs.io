@@ -49,7 +49,11 @@ sequence is replaced with the current selection).
 Commands can also be associated with virtual keyboard keycaps.
 
 ```json example
-{ class: "action", label: "Next", command: ["performWithFeedback", "commit"] }
+{ 
+  class: "action", 
+  label: "Next", 
+  command: ["performWithFeedback", "commit"] 
+}
 ```
 ## Editing
 

@@ -145,7 +145,7 @@ and `greek`.
 
 For example, to only show the numeric and symbols layouts, use:
 
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -157,11 +157,11 @@ For example, to only show the numeric and symbols layouts, use:
     </style>
 <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
 <div slot="javascript">
-document.querySelector('math-field').addEventListener('focus', () => { 
-  mathVirtualKeyboard.layouts = ["numeric", "symbols"];
-  mathVirtualKeyboard.visible = true;
-});
-</div>
+document.querySelector('math-field').
+  addEventListener('focus', () => { 
+    mathVirtualKeyboard.layouts = ["numeric", "symbols"];
+    mathVirtualKeyboard.visible = true;
+  });</div>
 </code-playground>
 
 <hr>
@@ -223,7 +223,7 @@ literal with a `rows` property, an array of keycaps.
 
 For best result, you should make sure the rows have no more than 10 keycaps.
 
-<code-playground layout="stack">
+<code-playground layout="stack" show-line-numbers>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -235,15 +235,16 @@ For best result, you should make sure the rows have no more than 10 keycaps.
     </style>
 <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
 <div slot="javascript">
-document.querySelector('math-field').addEventListener('focus', () => {
-  mathVirtualKeyboard.layouts = {
-    rows: [
-      [
-        "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
-        "(", ")", "\\sqrt{#0}", "#@^{#?}",
-      ],
-      ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
-    ]
+document.querySelector('math-field').
+  addEventListener('focus', () => {
+    mathVirtualKeyboard.layouts = {
+      rows: [
+        [
+          "+", "-", "\\times", "\\frac{#@}{#?}", "=", ".",
+          "(", ")", "\\sqrt{#0}", "#@^{#?}",
+        ],
+        ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+      ]
   };
   mathVirtualKeyboard.visible = true;
 });</div>
@@ -640,8 +641,7 @@ document.querySelector('math-field').addEventListener('focus', () => {
 });
 </div>
     <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 
 

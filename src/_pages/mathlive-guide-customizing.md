@@ -42,7 +42,7 @@ example changing the base font size or adding a border around it.
 add an attribute `style="display: block"`
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" >
+<code-playground layout="stack" mark-html-line="2">
 <div slot="html">
 &lt;p>Answer: &lt;math-field style="font-size:16px">42&lt;/math-field>.&lt;/p>
 &lt;p>Answer: &lt;math-field style="font-size:32px; display: block">3.1415&lt;/math-field></div>
@@ -70,7 +70,7 @@ Although CSS styles are "invisible" to custom components, CSS variables are
 Alternatively you can set these CSS variables programatically:
 
 ```js
-  document.body.style.setProperty("--smart-fence-color", "red");
+document.body.style.setProperty("--smart-fence-color", "red");
 ```
 
 <div class='symbols-table' style='--first-col-width:25ex'>
@@ -109,8 +109,7 @@ math-field {
 &lt;/style&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -141,8 +140,7 @@ Read more about [customizing the virtual keyboard appearance](https://cortexjs.i
 &lt;/style&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -301,8 +299,7 @@ To get it laid out as a block element, set `display: inline-block` on the mathfi
     min-width: 100px;
   "&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-  &lt;/math-field&gt;.
-</div>
+  &lt;/math-field&gt;.</div>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -363,11 +360,12 @@ when typing "if x > 0"
 
 These properties can also be passed as an argument to [`new MathfieldElement()`](https://cortexjs.io/docs/mathlive/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor) when programmatically creating mathfield elements.
 
-In the code playground below, try some of these options. For example, change
-line 3 to `scriptDepth: 0`, then try to type "x^2" in the mathfield.
+In the interactive code playground below, try some of these options. For example, 
+in line 1 add the attribute `smart-mode=false`, then type some parentheses 
+in the mathfield.
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" >
+<code-playground layout="stack" show-line-numbers mark-html-line="1">
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -427,7 +425,7 @@ unfamiliar with LaTeX may be confused if they accidentally press those keys.
 **To prevent the LaTeX mode from being enabled** intercept the trigger keys
 and call `preventDefault().
 
-```ts
+```js
 mf.addEventListener(
   'keydown',
   (ev) => {
@@ -466,7 +464,7 @@ will affect all mathfield elements on the page.
 await customElements.whenDefined('math-field');
 const locale = MathfieldElement.locale;
 console.log("Locale:", locale);
-console.log(MathfieldElement.strings[locale]);
+console.log(MathfieldElement.strings[locale.substring(0, 2)]);
 </div>
 <div slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
@@ -506,8 +504,7 @@ keycap is  labeled `,` instead and contextually inserts a `{,}` when appropriate
     </style>
 <div slot="javascript">
 await customElements.whenDefined('math-field');
-MathfieldElement.decimalSeparator = ",";
-</div>
+MathfieldElement.decimalSeparator = ",";</div>
 <div slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
@@ -574,7 +571,7 @@ property.
     </style>
 <div slot="javascript">
 await window.customElements.whenDefined("math-field");
-MathfieldElement.fontsDirectory="//unpkg.com/mathlive/dist/fonts/";
+MathfieldElement.fontsDirectory = "//unpkg.com/mathlive/dist/fonts/";
 </div>
 <div slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}

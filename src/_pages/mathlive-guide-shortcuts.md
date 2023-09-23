@@ -152,7 +152,9 @@ sequence, press the **Space** bar between them.
 MathLive has some [built-in inline shortcuts](https://github.com/arnog/mathlive/blob/master/src/editor/shortcuts-definitions.ts) 
 defined, but they can be replaced or enhanced with additional shortcuts.
 
-<code-playground layout="stack">
+One line 4, we're adding a shortcut for "infty".
+
+<code-playground layout="stack" show-line-numbers mark-javascript-line=4>
     <style slot="style">
       .output:focus-within {
         outline: Highlight auto 1px;
@@ -166,8 +168,7 @@ defined, but they can be replaced or enhanced with additional shortcuts.
 mf.inlineShortcuts = {
   ...mf.inlineShortcuts,    // Preserve default shortcuts
   "infty": '\\infty'
-};
-</div><div slot="html">&lt;math-field id="mf"&gt;
+};</div><div slot="html">&lt;math-field id="mf"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</div>
 </code-playground>
@@ -178,11 +179,11 @@ property:
 
 ```javascript
 mf.inlineShortcuts = {
-...mf.inlineShortcuts,    // Preserve default shortcuts
-  in: {
-      after: 'space | letter | digit | symbol | fence',
-      value: '\\in',
-  },
+  ...mf.inlineShortcuts,    // Preserve default shortcuts
+  "in": {
+      after: "space | letter | digit | symbol | fence",
+      value: "\\in",
+  }
 };
 ```
 

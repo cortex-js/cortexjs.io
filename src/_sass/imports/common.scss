@@ -16,6 +16,37 @@ $subheading-font-size: 11px;
 $global-transition: none;
 
 
+// Import Berkeley Mono font
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('../berkeley-mono/BerkeleyMono-Regular.woff2') format('WOFF2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('../berkeley-mono/BerkeleyMono-Bold.woff2') format('WOFF2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('../berkeley-mono/BerkeleyMono-Italic.woff2') format('WOFF2');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Berkeley Mono';
+  src: url('../berkeley-mono/BerkeleyMono-BoldItalic.woff2') format('WOFF2');
+  font-weight: bold;
+  font-style: italic;
+}
+
+
+
 $gray-25: #131416;  
 $gray-50: #262627;      // hsl(240, 1%, 15%)
 $gray-75: #2d2d2e;    //hsl(264, 5%,  18%)

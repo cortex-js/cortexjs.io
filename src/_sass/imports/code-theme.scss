@@ -252,11 +252,17 @@ code-playground::part(console) {
   position: relative;
   --base-00: var(--console-background, var(--blue-900));
   background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+
+  font-size: 1.1rem;
+  line-height: 1.4;
 }
 
 
-code-playground::part(editor), 
-code-playground::part(console) {
+
+code-playground::part(editor)::selection, 
+code-playground::part(editor) *::selection,
+code-playground::part(console)::selection,
+code-playground::part(console) *::selection {
   --selection-background: var(--semantic-blue, #0066ce);
   --selection-color: var(--semantic-orange);
 }

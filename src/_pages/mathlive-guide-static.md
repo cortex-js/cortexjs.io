@@ -158,8 +158,7 @@ element.
     <div slot="html">The solution of the equation is&amp;nbsp;
 &lt;math-field read-only style="display:inline-block"&gt;
   x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;
-</div>
+&lt;/math-field&gt;</div>
 </code-playground>
 
 
