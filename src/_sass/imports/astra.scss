@@ -1,9 +1,22 @@
+@use 'sass:math';
+
 $intro-transition: none;
 $global-transition: none;
 $theme: "light" !default;
 
 @import 'code-theme';
 @import 'common';
+
+$background-color: null;
+$card-background-color: null;
+$text-color: null;
+$border-color: null;
+$footer-background-color: null;
+$link-color: null;
+$masthead-link-color: null;
+$masthead-link-color-hover: null;
+$navicon-link-color-hover: null;
+$card-shadow: null;
 
 
 @if ($theme == "dark") {

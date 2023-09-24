@@ -1,0 +1,178 @@
+/* base16-default-dark */
+/* tomorrow */
+/* tomorrow-night */
+/*
+
+    Name:       Base16 Tomorrow Dark
+    Author:     Chris Kempson (http://chriskempson.com)
+
+    highlight.js v8.0 template by Jan T. Sott (https://github.com/idleberg/base16-highlight.js)
+    Original Base16 color scheme by Chris Kempson (https://github.com/chriskempson/base16)
+
+*/
+/* Tomorrow Comment */
+.hljs-comment {
+  color: var(--base-04, #b4b7b4);
+}
+
+/* Function (JS) and tag (HTML) names */
+.hljs-tag, .hljs-title {
+  color: var(--base-0a, #f0c674);
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-attribute,
+.hljs-regexp,
+.ruby .hljs-constant,
+.xml .hljs-tag .hljs-title,
+.xml .hljs-pi,
+.xml .hljs-doctype,
+.html .hljs-doctype,
+.css .hljs-id,
+.css .hljs-class,
+.css .hljs-pseudo {
+  color: var(--base-0c, #cc6666);
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-preprocessor,
+.hljs-built_in,
+.hljs-literal,
+.hljs-params,
+.hljs-constant {
+  color: var(--base-09, #ec9c65);
+  font-weight: normal;
+}
+
+/* Tomorrow Yellow */
+.ruby .hljs-class .hljs-title,
+.css .hljs-rules .hljs-attribute {
+  color: var(--base-0a, #f0c674);
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-value,
+.hljs-inheritance,
+.hljs-header,
+.ruby .hljs-symbol,
+.xml .hljs-cdata {
+  color: var(--base-0b, #b5bd68);
+}
+
+/* Tomorrow Aqua */
+.css .hljs-hexcolor {
+  color: var(--base-08, #8abeb7);
+}
+
+/* Tomorrow Blue */
+.hljs-function,
+.python .hljs-decorator,
+.python .hljs-title,
+.ruby .hljs-function .hljs-title,
+.ruby .hljs-title .hljs-keyword,
+.perl .hljs-sub,
+.javascript .hljs-title,
+.coffeescript .hljs-title {
+  color: var(--base-0d, #81a2be);
+  font-weight: bold;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.javascript .hljs-function {
+  color: var(--base-0e, #b294bb);
+  font-weight: bold;
+}
+
+.hljs {
+  display: block;
+  background: var(--base-00, #35434e);
+  color: var(--base-05, #c5c8c6);
+  padding: 0.5em;
+}
+
+.coffeescript .javascript,
+.javascript .xml,
+.tex .hljs-formula,
+.xml .javascript,
+.xml .vbscript,
+.xml .css,
+.xml .hljs-cdata {
+  opacity: 0.5;
+}
+
+.highlight .c1,
+.highlight .cm {
+  font-style: italic;
+}
+
+.highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt,
+.highlight .kv {
+  font-weight: bold;
+}
+
+code-playground {
+  font-size: 1em;
+}
+
+code-playground::part(editor):hover {
+  transform: scale(1.007);
+}
+
+code-playground::part(editor):focus-within {
+  transform: scale(1.007);
+  border-color: #fff;
+  outline: -webkit-focus-ring-color solid 2px;
+}
+
+code-playground::part(editor) {
+  position: relative;
+  border: 3px solid transparent;
+  --base-00: var(--console-background, var(--blue-900));
+  background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  color: var(--console-color) !important;
+  text-shadow: 0 0 5px rgba(200, 200, 200, 0.4392156863);
+  box-shadow: inset 1px 1px 15px #000;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+code-playground::part(console) {
+  position: relative;
+  --base-00: var(--console-background, var(--blue-900));
+  background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+code-playground::part(editor)::selection,
+code-playground::part(editor) *::selection,
+code-playground::part(console)::selection,
+code-playground::part(console) *::selection {
+  --selection-background: var(--semantic-blue, #0066ce);
+  --selection-color: var(--semantic-orange);
+}
+
+code-playground::part(editor)::after,
+code-playground::part(console)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) 1px, transparent 1px, transparent 2px);
+  pointer-events: none;
+}
+
+/*# sourceMappingURL=code-theme.css.map */

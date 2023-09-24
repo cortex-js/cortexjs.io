@@ -2,7 +2,6 @@
 // $body-font:  $sans-serif;
 // $display-font:  $sans-serif;
 
-@import 'code-theme';
 
 $body-font-size: 16px;
 $code-font-size: 13px;
@@ -194,8 +193,8 @@ $magenta-700: #c53777 !default;
 $magenta-800: #ac2d60 !default;
 $magenta-900: #861d3d !default;
 
-$primary-color: $blue-700 !default !global;
-$primary-color-dark: $blue-800 !default !global;
+$primary-color: $blue-700 !default;
+$primary-color-dark: $blue-800 !default;
 $primary-color-light: $blue-500;
 // $primary: $primary-color;
 

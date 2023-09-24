@@ -29,6 +29,9 @@ then
     echo -e "$BASENAME$DOT Building playground"
     npm --prefix submodules/code-playground run dist
     echo -e "$BASENAME$CHECK Playground built"
+    cp ./submodules/code-playground/dist/code-playground.min.js ./submodules/cortex-js.github.io/assets/js/code-playground.min.js
+    cp ./submodules/code-playground/dist/code-playground.js ./submodules/cortex-js.github.io/assets/js/code-playground.js
+    exit 0;
 fi
 
 if [ "$ENVIRONMENT" != "watch" ]

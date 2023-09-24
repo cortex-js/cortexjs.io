@@ -20,6 +20,10 @@ head:
   window.addEventListener("DOMContentLoaded", () => 
     import("//unpkg.com/@cortex-js/compute-engine?module").then((ComputeEngine) => {
       globalThis.ce = new ComputeEngine.ComputeEngine();
+
+      // The playgrounds need the global ce to be instanciated before
+      // they can be run. So we set them to autorun="nenver", 
+      // then we run them manually here, and reset the autorun attribute.
       const playgrounds = [...document.querySelectorAll("code-playground")];
       for (const playground of playgrounds) {
         playground.autorun = 1000; // delay in ms
@@ -46,11 +50,19 @@ server-side JavaScript environments such as Node.
 
 <code-playground layout="stack" show-line-numbers autorun="never">
 <div slot="javascript">
-console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);
-//
+console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);</div>
+</code-playground>
+
+
+<code-playground layout="stack" show-line-numbers autorun="never">
+<div slot="javascript">
 const expr = ce.parse("(a+b)^2");
-console.log(ce.box(["Expand", expr]).evaluate().latex);
-//
+console.log(ce.box(["Expand", expr]).evaluate().latex);</div>
+</code-playground>
+
+
+<code-playground layout="stack" show-line-numbers autorun="never">
+<div slot="javascript">
 const lhs = ce.parse("2x^2 + 3x + 1");
 const rhs = ce.parse("1 + 2x + x + 2x^2");
 console.log(lhs.latex, lhs.isEqual(rhs) ? "=" : "≠", rhs.latex);</div>

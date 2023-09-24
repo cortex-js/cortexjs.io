@@ -1,4 +1,4 @@
-const sass = require('node-sass');
+const sass = require('sass');
 const fs = require('fs-extra');
 const path = require('path');
 const hljs = require('highlight.js'); // https://highlightjs.org/
@@ -18,9 +18,7 @@ function buildSass(srcDir, destDir) {
         // console.log('Compiling "' + srcDir + file + '" to "' + path.format(p));
 
         // Encapsulate rendered css from scssPath into result variable
-        const result = sass.renderSync({
-          file: path.join(srcDir, file),
-        });
+        const result = sass.compile(path.join(srcDir, file));
         // Create cssPath directory recursively
         // Then write result css string to cssPath file
         fs.writeFile(path.format(p), result.css.toString()).catch((error) =>
@@ -186,8 +184,8 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.setDataDeepMerge(true);
 
-  eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
-  eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
+  eleventyConfig.addWatchTarget('./src/build/css/**/*.css');
+  // eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
   // eleventyConfig.addWatchTarget(
   //   './submodules/compute-engine/src/docs/**/*.{css,md,html}'
   // );

@@ -217,10 +217,10 @@ $base-green: $base0b;
 // .cm-s-tomorrow-night .CodeMirror-matchingbracket { text-decoration: underline; color: white !important; }
 
 
-code-playground {
-  font-size: 1em;
-}
 
+code-playground {
+  margin-bottom: 2em;
+}
 
 code-playground::part(editor):hover {
   transform: scale(1.007)
