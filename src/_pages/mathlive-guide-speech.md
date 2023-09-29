@@ -80,12 +80,12 @@ Another set of speech rules supported are the SRE speech rules from Volker Sorge
    You can download it on [GitHub](https://github.com/zorkow/speech-rule-engine)
 2. Set `MathfieldElement.textToSpeechRules` to `"sre"`.
 
-**To configure SRE**, set the `MathfieldElement.textToSpeechRules` property. 
+**To configure SRE**, set the `MathfieldElement.textToSpeechRulesOptions` property. 
 
 For example:
 
 ```javascript
-MathfieldElement.textToSpeechRules = {
+MathfieldElement.textToSpeechRulesOptions = {
     domain: 'mathspeak', // 'mathspeak' or 'chromevox'
     ruleset: 'mathspeak-brief',   // 'mathspeak-default', 'mathspeak-brief', 'mathspeak-sbrief', 'chromevox-short', 'chromevox-default' or 'chromevox-alternative'
 };
