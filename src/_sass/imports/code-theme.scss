@@ -259,13 +259,11 @@ code-playground::part(console) {
 
 
 
-code-playground::part(editor)::selection, 
-code-playground::part(editor) *::selection,
-code-playground::part(console)::selection,
-code-playground::part(console) *::selection {
+code-playground {
   --selection-background: var(--semantic-blue, #0066ce);
   --selection-color: var(--semantic-orange);
 }
+
 
 code-playground::part(editor)::after,
 code-playground::part(console)::after {
@@ -285,3 +283,10 @@ code-playground::part(console)::after {
   pointer-events: none;
 }
 
+
+@media (prefers-color-scheme: dark) {
+  code-playground::part(editor) {
+    box-shadow: inset 1px 1px 30px rgba(0, 0, 0, 0.4);
+  }  
+
+}

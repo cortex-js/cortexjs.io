@@ -71,9 +71,9 @@
                 "url": "https://github.com/cortex-js"
             },
             {
-                "label": "Gitter Forum",
+                "label": "Discussion Forum",
                 "icon": "<svg class=\"icon1quarterem\"><use role=\"none\" xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
-                "url": "/gitter/"
+                "url": "/forum/"
             }
         ],
         "pages": [

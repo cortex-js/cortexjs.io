@@ -13,8 +13,8 @@
 			"url": "/cortex/"
 		},
 		{
-			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Gitter Forum</title><use xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
-			"url": "/gitter/"
+			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Discussion Forum</title><use xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
+			"url": "/forum/"
 		},
 		{
 			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>GitHub</title><use xlink:href=\"/assets/icons.svg#github\"></use></svg>",
@@ -392,8 +392,18 @@
           "icon": "person"
 				},
 				{
-					"title": "Discuss in Gitter Forum",
-					"url": "/gitter/",
+					"title": "GitHub Repo (MathLive)",
+					"url": "https://github.com/arnog/mathlive",
+          "icon": "github"
+				},
+				{
+					"title": "GitHub Repo (Compute Engine)",
+					"url": "https://github.com/cortex-js/compute-engine",
+          "icon": "github"
+				},
+				{
+					"title": "Discussion Forum",
+					"url": "/forum/",
           "icon": "gitter"
 				},
 				{

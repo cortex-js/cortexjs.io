@@ -42,10 +42,14 @@ example changing the base font size or adding a border around it.
 add an attribute `style="display: block"`
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" mark-html-line="2">
-<div slot="html">
-&lt;p>Answer: &lt;math-field style="font-size:16px">42&lt;/math-field>.&lt;/p>
-&lt;p>Answer: &lt;math-field style="font-size:32px; display: block">3.1415&lt;/math-field></div>
+<code-playground layout="stack" mark-html-line="5">
+<pre slot="html">
+&lt;p>Answer: 
+  &lt;math-field style="font-size:2rem">42&lt;/math-field>.
+&lt;/p>
+&lt;p>Answer: 
+  &lt;math-field style="font-size:2rem; display: block">3.1415&lt;/math-field>
+&lt;/p></pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -100,7 +104,7 @@ document.body.style.setProperty("--smart-fence-color", "red");
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <div slot="html">&lt;style&gt;
+    <pre slot="html">&lt;style&gt;
 math-field {
   --caret-color: red;
   --selection-background-color: lightgoldenrodyellow;
@@ -109,7 +113,7 @@ math-field {
 &lt;/style&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -131,7 +135,7 @@ Read more about [customizing the virtual keyboard appearance](https://cortexjs.i
 
 <!-- htmlmin:ignore -->
 <code-playground layout="stack" >
-    <div slot="html">&lt;style&gt;
+    <pre slot="html">&lt;style&gt;
   math-field:focus-within {
     outline: 4px solid #d7170b;
     border-radius: 4px;
@@ -140,7 +144,7 @@ Read more about [customizing the virtual keyboard appearance](https://cortexjs.i
 &lt;/style&gt;
 &lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -284,24 +288,21 @@ property or the `default-mode` attribute.
 
 Set it to `"inline-math"` to use `textstyle` or `"math"` to use `displaystyle`.
 
-By default, the mathfield element is laid out on the page as an inline element.
-To get it laid out as a block element, set `display: inline-block` on the mathfield. 
-
 
 <!-- htmlmin:ignore -->
-<code-playground layout="stack" >
-  <div slot="html">The answer is &lt;math-field 
-  style="
-    vertical-align: middle;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, .3);
-    padding-left: 5px; padding-right: 5px;
-    min-width: 100px;
-  "&gt;
+<code-playground layout="stack" mark-html-line="2">
+  <pre slot="html">&lt;p>The answer is 
+  &lt;math-field default-mode="inline-math"&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-  &lt;/math-field&gt;.</div>
+  &lt;/math-field&gt;.
+&lt;/p></pre>
 </code-playground>
 <!-- htmlmin:ignore -->
+
+By default, the mathfield element is laid out on the page as an inline element
+when in an inline context (when inside a `<p>` tag for example).
+
+To get it laid out as a block element, set `display: block` on the mathfield. 
 
 
 
@@ -375,9 +376,9 @@ in the mathfield.
         outline: none;
       }
     </style>
-<div slot="html">&lt;math-field smart-mode&gt;
+<pre slot="html">&lt;math-field smart-mode&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -460,15 +461,15 @@ will affect all mathfield elements on the page.
         outline: none;
       }
     </style>
-<div slot="javascript">
+<pre slot="javascript">
 await customElements.whenDefined('math-field');
 const locale = MathfieldElement.locale;
 console.log("Locale:", locale);
 console.log(MathfieldElement.strings[locale.substring(0, 2)]);
-</div>
-<div slot="html">&lt;math-field id='formula'&gt;
+</pre>
+<pre slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -502,12 +503,12 @@ keycap is  labeled `,` instead and contextually inserts a `{,}` when appropriate
         outline: none;
       }
     </style>
-<div slot="javascript">
+<pre slot="javascript">
 await customElements.whenDefined('math-field');
-MathfieldElement.decimalSeparator = ",";</div>
-<div slot="html">&lt;math-field id='formula'&gt;
+MathfieldElement.decimalSeparator = ",";</pre>
+<pre slot="html">&lt;math-field id='formula'&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -532,13 +533,13 @@ before the numerator.
         outline: none;
       }
     </style>
-<div slot="javascript">
+<pre slot="javascript">
 await window.customElements.whenDefined('math-field');
 MathfieldElement.fractionNavigationOrder = "denominator-numerator";
-</div>
-<div slot="html">&lt;math-field&gt;
+</pre>
+<pre slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 
@@ -569,13 +570,13 @@ property.
         outline: none;
       }
     </style>
-<div slot="javascript">
+<pre slot="javascript">
 await window.customElements.whenDefined("math-field");
 MathfieldElement.fontsDirectory = "//unpkg.com/mathlive/dist/fonts/";
-</div>
-<div slot="html">&lt;math-field&gt;
+</pre>
+<pre slot="html">&lt;math-field&gt;
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 <!-- htmlmin:ignore -->
 

@@ -49,23 +49,23 @@ server-side JavaScript environments such as Node.
 
 
 <code-playground layout="stack" show-line-numbers autorun="never">
-<div slot="javascript">
-console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);</div>
+<pre slot="javascript">
+console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);</pre>
 </code-playground>
 
 
 <code-playground layout="stack" show-line-numbers autorun="never">
-<div slot="javascript">
+<pre slot="javascript">
 const expr = ce.parse("(a+b)^2");
-console.log(ce.box(["Expand", expr]).evaluate().latex);</div>
+console.log(ce.box(["Expand", expr]).evaluate().latex);</pre>
 </code-playground>
 
 
 <code-playground layout="stack" show-line-numbers autorun="never">
-<div slot="javascript">
+<pre slot="javascript">
 const lhs = ce.parse("2x^2 + 3x + 1");
 const rhs = ce.parse("1 + 2x + x + 2x^2");
-console.log(lhs.latex, lhs.isEqual(rhs) ? "=" : "≠", rhs.latex);</div>
+console.log(lhs.latex, lhs.isEqual(rhs) ? "=" : "≠", rhs.latex);</pre>
 </code-playground>
 
 

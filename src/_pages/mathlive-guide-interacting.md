@@ -39,7 +39,7 @@ changing the content of the mathfield, to prevent an `"input"` event from being
 triggered and creating an infinite loop.{.notice--info}
 
 <code-playground layout="stack">
-  <div slot="javascript">
+  <pre slot="javascript">
 const mf = document.getElementById("formula");
 const latex = document.getElementById("latex");
 //
@@ -47,20 +47,23 @@ mf.addEventListener("input",(ev) => latex.value = mf.value);
 //
 latex.value = mf.value;
 //
-// Listen for changes in the "latex" text field, and reflect its value in 
-// the mathfield.
+// Listen for changes in the "latex" text field, 
+// and reflect its value in the mathfield.
 //
 latex.addEventListener("input", (ev) => 
-    mf.setValue( ev.target.value, {suppressChangeNotifications: true})
+    mf.setValue(
+      ev.target.value, 
+      {suppressChangeNotifications: true}
+    )
 );
-  </div>
-  <div slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
-  &lt;math-field id="formula"&gt;
-      x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-  &lt;/math-field&gt;                
-  &lt;label&gt;Latex&lt;/label&gt;
-  <textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
-  autocorrect="off" spellcheck="false"></textarea></div>
+  </pre>
+  <pre slot="html">&lt;label&gt;Mathfield&lt;/label&gt;
+&lt;math-field id="formula"&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;                
+&lt;label&gt;Latex&lt;/label&gt;
+&lt;textarea class="output" id="latex" autocapitalize="off" autocomplete="off"
+  autocorrect="off" spellcheck="false">&lt;/textarea></pre>
 </code-playground>
 
 
@@ -87,14 +90,14 @@ loses focus and the content has been modified. {.notice--info}
       outline: none;
     }
   </style>
-  <div slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
+  <pre slot="javascript">document.getElementById('formula').addEventListener('input',(ev) => {
   // `ev.target` is an instance of `MathfieldElement`
   console.log(ev.target.value);
-});</div>
-    <div slot="html">
+});</pre>
+    <pre slot="html">
 &lt;math-field id="formula"&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
 </code-playground>
 
 <hr>
@@ -109,16 +112,17 @@ For example to get the content as a MathJSON expression, use `mf.getValue('math-
 **Try:** [Other formats](/docs/mathlive/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `"math-json"` to `"spoken-text"`.{.notice--info}
 
 <code-playground layout="stack">
-    <div slot="html">
+    <pre slot="html">
 &lt;math-field id="formula"&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
-    <div slot="javascript">import 'compute-engine';
-    const mf = document.getElementById('formula');
-mf.addEventListener('input',(ev) => {
-    // `ev.target` is an instance of `MathfieldElement`
-    console.log(ev.target.getValue('math-json'));
-});</div>
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
+    <pre slot="javascript">import 'compute-engine';
+const mf = document.getElementById('formula');
+//
+// `ev.target` is an instance of `MathfieldElement`
+mf.addEventListener('input',
+  (ev) => console.log(ev.target.getValue('math-json'))
+);</pre>
 </code-playground>
 
 
@@ -142,13 +146,15 @@ a default instance of the compute engine will be used.
 
 
 <code-playground layout="stack">
-    <div slot="html">
+    <pre slot="html">
 &lt;math-field id="formula"&gt;
-    \mathrm{Expand}((a+b)^6)
-&lt;/math-field&gt;</div>
-    <div slot="javascript">import 'compute-engine';
+  \mathrm{Expand}((a+b)^6)
+&lt;/math-field&gt;</pre>
+    <pre slot="javascript">import 'compute-engine';
 const mf = document.getElementById('formula');
-mf.addEventListener('input',() => console.log(mf.expression.evaluate()));</div>
+mf.addEventListener('input', () => 
+  console.log(mf.expression.evaluate())
+);</pre>
 console.log(mf.expression.evaluate());
 </code-playground>
 
@@ -377,18 +383,18 @@ the content of the formula, see [Customizing](mathlive/guides/customizing/). {.n
         outline: none;
       }
     </style>
-    <div slot="javascript">
+    <pre slot="javascript">
 const mf = document.getElementById('formula');
 // Change the background color of the entire mathfield
 mf.applyStyle(
   {backgroundColor: 'yellow' }, 
   {range: [0, -1]}
 );
-</div>
-<div slot="html">
+</pre>
+<pre slot="html">
 &lt;math-field id="formula"&gt;
 x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 
 
@@ -406,15 +412,15 @@ to `applyStyle()`.
         outline: none;
       }
     </style>
-    <div slot="javascript">
+    <pre slot="javascript">
 const mf = document.getElementById('formula');
 // Change the color and size of the first two characters of the mathfield
 mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
-</div>
-<div slot="html">
+</pre>
+<pre slot="html">
 &lt;math-field id="formula"&gt;
-x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
 </code-playground>
 
 

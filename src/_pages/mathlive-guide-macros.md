@@ -47,11 +47,11 @@ Try changing `\operatorname` to `\mathbf` to see the difference.
         outline: none;
       }
     </style>
-    <div slot="javascript">const mf = document.getElementById('mf');
+    <pre slot="javascript">const mf = document.getElementById('mf');
 mf.macros = { ...mf.macros,
   average: '\\operatorname{average}',
-};</div>
-    <div slot="html">&lt;math-field id="mf"&gt;\average([2, 4, 8])}&lt;/math-field&gt;</div>
+};</pre>
+    <pre slot="html">&lt;math-field id="mf"&gt;\average([2, 4, 8])}&lt;/math-field&gt;</pre>
 </code-playground>
 
 <hr>
@@ -82,12 +82,12 @@ The macro definition can contain up to eight arguments, represented by `#1` to `
         outline: none;
       }
     </style>
-    <div slot="javascript">const mf = document.getElementById('mf');
+    <pre slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros, 
   smallfrac: '{}^{#1}\\!\\!/\\!{}_{#2}',
 };
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;</div>
+</pre>
+    <pre slot="html">&lt;math-field id="mf"&gt;\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;</pre>
 </code-playground>
 
 <hr>
@@ -109,7 +109,7 @@ in the expanded definition of a macro.
         outline: none;
       }
     </style>
-    <div slot="javascript">const mf = document.getElementById('mf');
+    <pre slot="javascript">const mf = document.getElementById('mf');
 mf.macros = {...mf.macros,
   smallfrac: {
     args: 2,
@@ -117,8 +117,8 @@ mf.macros = {...mf.macros,
     captureSelection: false,
   },
 };
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;</div>
+</pre>
+    <pre slot="html">&lt;math-field id="mf"&gt;\scriptCapitalE=\smallfrac{5}{7}+\frac{5}{7}&lt;/math-field&gt;</pre>
 </code-playground>
 
 <hr>
@@ -135,9 +135,9 @@ mf.macros = {...mf.macros,
         outline: none;
       }
     </style>
-    <div slot="javascript">const mf = document.getElementById('mf');
-mf.macros = {...mf.macros, diamonds: undefined };</div>
-    <div slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;</div>
+    <pre slot="javascript">const mf = document.getElementById('mf');
+mf.macros = {...mf.macros, diamonds: undefined };</pre>
+    <pre slot="html">&lt;math-field id="mf"&gt;\diamonds&lt;/math-field&gt;</pre>
 </code-playground>
 
 
@@ -167,17 +167,25 @@ editing mode (without having to type the <kbd>\\</kbd> key).
         outline: none;
       }
     </style>
-    <div slot="javascript">const mf = document.getElementById('mf');
+    <pre slot="javascript">const mf = document.getElementById('mf');
+//
 mf.macros = {...mf.macros,
-    minutes: '\\,{}^\\prime\\;',
-    seconds: '\\,\\doubleprime\\;',
+  // This means that the command macro `\minutes`
+  // will be replaced with `\,{}^\\prime\\;`
+  minutes: '\\,{}^\\prime\\;',
+  seconds: '\\,\\doubleprime\\;',
 };
+//
 mf.inlineShortcuts = {...mf.inlineShortcuts,
-    minutes: '\\minutes', // This means that typing the inline shortcut "minutes" will insert "\minutes"
-    seconds: '\\seconds',
+  // This means that typing the inline shortcut 
+  // "minutes" will insert the command "\minutes"
+  minutes: '\\minutes', 
+  seconds: '\\seconds',
 };
-</div>
-    <div slot="html">&lt;math-field id="mf"&gt;3\minutes 15\seconds}&lt;/math-field&gt;</div>
+</pre>
+    <pre slot="html">&lt;math-field id="mf"&gt;
+  3\minutes 15\seconds
+&lt;/math-field&gt;</pre>
 </code-playground>
 
 
@@ -201,10 +209,10 @@ mf.inlineShortcuts = {...mf.inlineShortcuts,
         outline: none;
       }
     </style>
-    <div slot="javascript">const mf = document.getElementById('mf');
+    <pre slot="javascript">const mf = document.getElementById('mf');
 console.log(mf.macros);
-</div>
-    <div slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
+</pre>
+    <pre slot="html">&lt;math-field id='mf'&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</pre>
 </code-playground>
 
 

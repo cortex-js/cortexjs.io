@@ -60,13 +60,10 @@ module.exports = function (eleventyConfig) {
 
   buildSass('./src/_sass/', './src/build/css');
 
+  // Use a custom hljs JavaScript grammar that fixes the parsing of
+  // "evaluate" (have submitted a PR)
   hljs.unregisterLanguage('js');
-  // hljs.registerLanguage('js', require('highlight.js/lib/languages/javascript'));
   hljs.registerLanguage('js', require('./hljs-javascript.js'));
-
-  // import('./hljs-javascript.js').then((module) => {
-  //   hljs.registerLanguage('js', module);
-  // });
 
   const markdownIt = require('markdown-it');
   // const markdownItAttrs = require('markdown-it-attrs');
@@ -185,10 +182,11 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.setDataDeepMerge(true);
 
   eleventyConfig.addWatchTarget('./src/build/css/**/*.css');
-  // eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
+
   // eleventyConfig.addWatchTarget(
   //   './submodules/compute-engine/src/docs/**/*.{css,md,html}'
   // );
+  // eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
 
   return {
     passtroughFileCopy: true,

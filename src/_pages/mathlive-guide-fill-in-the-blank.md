@@ -57,7 +57,7 @@ We also change the state of the prompts to indicate whether the answer
 was correct or not.
 
 <code-playground layout="stack">
-  <div slot="javascript">
+  <pre slot="javascript">
 const mf = document.getElementById('mf');
 //
 mf.addEventListener('input', (ev) => {
@@ -72,12 +72,12 @@ mf.addEventListener('input', (ev) => {
     console.info('Correct!');
    else 
     console.info('Incorrect!');
-});</div>
-  <div slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
+});</pre>
+  <pre slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
   \frac{15}{12}= \frac
     {\placeholder[numerator]{?}}
     {\placeholder[denominator]{?}}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 
 The value returned by `mf.getPromptValue()` is a LaTeX string. If you need to
@@ -89,7 +89,7 @@ This allows you to check the answer using more sophisticated symbolic
 computation.
 
 <code-playground layout="stack">
-  <div slot="javascript">
+  <pre slot="javascript">
 const mf = document.getElementById("mf");
 //
 let typingTimer;  // Timer identifier
@@ -108,10 +108,10 @@ function checkAnswer () {
   const ok = answer.isSame(correctAnswer);
 //
   console.info(ok ? "Correct!" : "Incorrect!");
-}</div>
-  <div slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
+}</pre>
+  <pre slot="html">&lt;math-field readonly id=mf  style="font-size:2em"&gt;
   (x+1)(x-1) = \placeholder[answer]{?}
-&lt;/math-field&gt;</div>
+&lt;/math-field&gt;</pre>
 </code-playground>
 
 In the example above, we use the Compute Engine to parse the answer provided
@@ -126,8 +126,16 @@ Because we are using `isSame()` to compare the answer, the student can
 provide the answer in a different form, for example `x^2 - 1` or `-1 + x^2`.
 
 If you want a more strict comparison, you can use the non-canonical form
-of the answer, i.e. `ce.parse(mf.getPromptValue('answer'), {canonical: false});` and 
-`ce.parse("x^2 - 1", {canonical: false})`.
+of the answer, i.e. 
+
+```js example
+const answer = ce.parse(mf.getPromptValue("answer"), {canonical: false});
+const correctAnswer = ce.parse("x^2 - 1", {canonical: false});
+```
+
+{% readmore "/compute-engine/guides/symbolic-computing/#comparing-expressions" %}
+Read more about **Comparing Expressions** using the Compute Engine.
+{% endreadmore %}
 
 
 

@@ -9,7 +9,7 @@
 .sidebar {
   display: flex;
   justify-content: center;
-  padding-left: 8px;
+  padding-left: 4px;
   padding-right: 0;
 
   /** When displayed as a menu (width < $large) take the whole width */
@@ -28,7 +28,7 @@
     float: left;
     // width: calc(#{$left-sidebar-width-wide} - 1em);
     margin-right: 0.5em;
-    width: 344px;
+    max-width: 344px;
 
     &.sticky {
       overflow-y: auto;
@@ -58,14 +58,14 @@
     font-size: $type-size-5;
     line-height: 1;
     // padding: 8px 4px 8px 8px;
-    padding-right: 8px;
+    // padding-right: 8px;
     border-radius: 4px;
 
     a {
       display: flex;
       align-items: center;
       border-radius: 4px;
-      padding: 12px 4px 12px 8px;
+      padding: 10px 4px 10px 8px;
 
       &:hover {
         background: var(--ui-background-hover);

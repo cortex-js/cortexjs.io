@@ -75,9 +75,7 @@ fi
 # mkdir ./src/build/js/
 # cp ../mathlive/dist/mathlive.mjs ./src/build/js/
 
-
-
-## Build the guides from the source directories
+## Build the Compute Engine guides from the source directories
 echo -e "$BASENAME$DOT Building guides"
 node ./scripts/build-guides.js  "./submodules/compute-engine/src/" ""
 echo -e "$BASENAME$CHECK Guides built"
@@ -86,10 +84,11 @@ echo -e "$BASENAME$CHECK Guides built"
 # DEBUG=Eleventy* npx eleventy --config ./config/eleventy.js
 if [ "$ENVIRONMENT" != "watch" ]
 then
+
     # In watch mode, no need to do a build, the watch call will do it later.
     echo -e "$BASENAME$DOT Building static site with eleventy"
     npx eleventy --config ./config/eleventy.js
-    echo -e "$BASENAME$CHECK Static site built"
+    echo -e "$BASENAME$CHECK Static site built."
 fi
 
 if [ "$ENVIRONMENT" == "production" ]

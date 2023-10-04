@@ -65,7 +65,7 @@ For example change it to `f(x) = \frac{x}{2}`.
         outline: none;
       }
     </style>
-    <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
+    <pre slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</pre>
 </code-playground>
 
 

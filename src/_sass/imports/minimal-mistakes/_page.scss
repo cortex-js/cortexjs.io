@@ -8,7 +8,7 @@
     @include clearfix;
     padding: 0;
     animation: $intro-transition;
-    max-width: 100%;
+    width: 100%;
     animation-delay: 0.15s;
   
     @include breakpoint($large) {
@@ -32,14 +32,15 @@
   .search-content {
     display: flex;
     flex: 1 0 auto;
-    justify-content: center;
+    width: 100%;
     background: var(--page-background, #f5f5f7);
   }
   
   /** `.page` is the main content, does not include `.sidebar` */
   .page {
     display: flex;
-    max-width: 840px;
+    justify-content: center;
+    // max-width: 840px;
     width: 100%;
     margin: 0 8px 0 0 ;
 
@@ -160,7 +161,8 @@
       p,
       li,
       dl {
-          font-size: 1em;
+          font-size: $type-size-4;
+          line-height: 1.47059;
       }
   
       /* paragraph indents */
@@ -195,11 +197,11 @@
       dd {
           margin-left: 1em;
           font-family: var(--body-font-family);
-          font-size: $type-size-5;
+          font-size: $type-size-4;
       }
   
       .small {
-          font-size: $type-size-6;
+          font-size: $type-size-5;
       }
   
       /* blockquote citations */

@@ -155,13 +155,13 @@ For example, to only show the numeric and symbols layouts, use:
         outline: none;
       }
     </style>
-<div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
-<div slot="javascript">
+<pre slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</pre>
+<pre slot="javascript">
 document.querySelector('math-field').
   addEventListener('focus', () => { 
     mathVirtualKeyboard.layouts = ["numeric", "symbols"];
     mathVirtualKeyboard.visible = true;
-  });</div>
+  });</pre>
 </code-playground>
 
 <hr>
@@ -233,8 +233,8 @@ For best result, you should make sure the rows have no more than 10 keycaps.
         outline: none;
       }
     </style>
-<div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</div>
-<div slot="javascript">
+<pre slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</pre>
+<pre slot="javascript">
 document.querySelector('math-field').
   addEventListener('focus', () => {
     mathVirtualKeyboard.layouts = {
@@ -247,7 +247,7 @@ document.querySelector('math-field').
       ]
   };
   mathVirtualKeyboard.visible = true;
-});</div>
+});</pre>
 </code-playground>
 
 
@@ -633,15 +633,15 @@ use the `mathVirtualKeyboard.alphabeticLayout` property.
       outline: none;
     }
   </style>
-  <div slot="javascript">const mf = document.querySelector('math-field');
+  <pre slot="javascript">const mf = document.querySelector('math-field');
 document.querySelector('math-field').addEventListener('focus', () => {
   mathVirtualKeyboard.layouts = ["alphabetic"];
   mathVirtualKeyboard.alphabeticLayout = "dvorak";
   mathVirtualKeyboard.visible = true;
 });
-</div>
-    <div slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</div>
+</pre>
+    <pre slot="html">&lt;math-field&gt;x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
 </code-playground>
 
 

@@ -91,7 +91,8 @@ a.chevron::after {
   /* override*/
   color: #494e52;   /* This color is not currently used, as the read-more content is a <a> tag. See ".read-more a" below */
   font-family: var(--body-font-family);
-  font-size: 1rem !important;
+  font-size: $type-size-4 !important;
+  line-height: 1.47059;
   text-indent: initial;
   /* override*/
   background: var(--callout-background);

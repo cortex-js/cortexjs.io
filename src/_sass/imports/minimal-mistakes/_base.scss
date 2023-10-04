@@ -246,7 +246,7 @@ element.style {
 
   font-family: var(--monospace-font-family);
   font-weight: 900;
-  font-size: 1.2rem;
+  font-size: $type-size-4;
   background: var(--blue-600);
   color: var(--blue-100);
   strong {
@@ -279,7 +279,7 @@ div.defs .def {
   padding: 8px;
   margin-bottom: 4em;
   .ML__mathlive {
-    font-size: 1.2rem;
+    font-size: $type-size-4;
   }
 }
 
@@ -304,11 +304,10 @@ div.latex {
     line-height: 1.4;
   }
   .display {
-    font-size: 1.2rem;
     padding-top: .5em;
     padding-bottom: .5em;
     .ML__mathlive {
-      font-size: 1.6rem;
+      font-size: $type-size-4;
     }
   }
 }

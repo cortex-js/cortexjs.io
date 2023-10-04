@@ -16,5 +16,6 @@ cd "$(dirname "$0")/.."
 # Start watching the SASS directory
 npx sass ./src/_sass:./src/build/css&
 
+
 # boot the project and any other necessary processes.
 npx eleventy --config ./config/eleventy.js --serve

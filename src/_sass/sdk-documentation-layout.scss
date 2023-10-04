@@ -291,11 +291,11 @@ ul {
 }
 
 .page__content dl.inset {
-    margin-left: 1rem;
+    margin-left: 1.2rem;
 }
 .page__content dd {
     font-family: var(--body-font-family);
-    font-size: 1rem;
+    font-size: $type-size-4;
 }
 
 .page__content div.code ul {
@@ -306,11 +306,11 @@ ul {
 
 .page__content p,
 .page__content li {
-    font-size: 1rem !important;
-    line-height: 1.52;
+    font-size: $type-size-4 !important;
+    line-height: 1.47;
 
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin-top: 1.2rem;
+    margin-bottom: 1.2rem;
     color: var(--text-color);
 }
 
@@ -354,7 +354,13 @@ body.layout--sdk-documentation-layout article.page a:hover {
     // displayed in a card.
     position: relative;
     z-index: 0;
+    color: var(--strong-color);
+  }
+
+.page__content dt em {
+  color: var(--strong-color);
 }
+
 
 // Show the anchor when it is the target
 .page__content dt .permalink {
@@ -370,23 +376,17 @@ body.layout--sdk-documentation-layout article.page a:hover {
     background: #f0f0f0;
 }
 
-.page__content dt strong {
-    color: var(--strong-color);
-}
-
-.page__content dt em {
-    color: var(--strong-color);
-}
 
 .page__content dd {
-    font-size: 1rem;
+    font-size: $type-size-4;
     color: var(--text-color);
 
     margin-bottom: 20px;
 }
 
 table {
-    font-size: 1rem; // .main.sccs has it at .75em
+    font-size: $type-size-4; // .main.sccs has it at .75em
+    line-height: 1.47;
     width: 100%;
     display: table;
 }
