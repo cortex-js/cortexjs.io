@@ -133,17 +133,54 @@ The [MathJSON](/math-json) format is a lightweight mathematical notation interch
 The CortexJS Compute Engine is a JavaScript library that can perform
 mathematical operations on MathJSON expressions.
 
-**To use MathJSON**, import the compute-engine library, e.g. `import "https://unpkg.com/@cortex-js/compute-engine?module"` {.notice--info}
+**To use the Compute Engine**, import the Compute Engine library, e.g. `import "https://unpkg.com/@cortex-js/compute-engine?module"` 
+
+
+If the Compute Engine has been loaded in the page, mathfields will automatically
+create an instance of the compute engine when needed. 
+
+**To access that shared Compute Engine instance**, use `MathfieldElement.computeEngine`.
+
+If the value returned is `undefined`, it means that the Compute Engine has not
+been loaded in the page. {.notice--info}
+
+You can also create your own instance of the Compute Engine and pass it to the
+mathfield using the `computeEngine` property.
+
+```js example
+import { ComputeEngine } from 'compute-engine';
+MathfieldElement.computeEngine = new ComputeEngine();
+```
+
+This is usually not necessary and you can rely on the default shared instance 
+of the Compute Engine. {.notice--info}
+
 
 **To read the content of a `<math-field>` element as a boxed MathJSON expression** use the mathfield `expression` property.
 
-Using `mf.expression` is equivalent to calling `MathfieldElement.computeEngine.box(mf.getValue("math-json"))`.
+Using `mf.expression` is equivalent to calling `MathfieldElement.computeEngine.parse(mf.value)` or `MathfieldElement.computeEngine.box(mf.getValue("math-json"))`.
 
-The instance of the compute engine used by mathfields is accessible
-with the `MathfieldElement.computeEngine` property. If you do not set this property,
-a default instance of the compute engine will be used.
+Once you have a boxed expression, you can perform operations on it using the
+Compute Engine.
+
+For example, you can:
+- [evaluate it](/compute-engine/guides/evaluate/) using `mf.expression.evaluate()`
+- simplify it using `mf.expression.simplify()`
+- [compare it to another expression](/compute-engine/guides/symbolic-computing/#comparing-expressions) using `mf.expression.isEqual()` and
+   `mf.expression.isSame()`
+- [compile it](/compute-engine/guides/compiling/) to JavaScript
+
+Note that the expressions are returned by default in a canonical form, which means that
+they may be different from the original input. For example, `x + 1` and `1 + x`
+are considered equal, and will be returned as `1 + x`. If necessary you
+can request non-canonical forms.{.notice--info}
+
+{% readmore "/compute-engine/guides/canonical-form/" %}
+Learn more about **canonical forms**.
+{% endreadmore %}
 
 
+You can also extend the definitions of the Compute Engine [by adding your own](/compute-engine/guides/augmenting/).
 
 <code-playground layout="stack">
     <pre slot="html">
@@ -158,6 +195,10 @@ mf.addEventListener('input', () =>
 console.log(mf.expression.evaluate());
 </code-playground>
 
+
+{% readmore "/compute-engine/guides/symbolic-computing/" %}
+Learn more about **symbolic computing** with the Compute Engine
+{% endreadmore %}
 
 
 
@@ -221,7 +262,8 @@ This event is also fired if the mathfield loses focus, even if the user did not
 use the keyboard. This behavior matches the `<textarea>` element.
 
 **To listen specifically for a press of the **Return** or **Enter** key on the 
-keyboard** listen for an `input` event with an `inputType` property of `"insertLineBreak"`.
+keyboard** listen for an `input` event with an `inputType` 
+(or `ev.data` on iOS) property of `"insertLineBreak"`.
 
 
 ```js
@@ -286,7 +328,6 @@ To cancel the default behavior, use `ev.preventDefault()`.
 
 
 ```js
-
 mf.addEventListener('move-out', (ev) => {
 ev.preventDefault();
   // Remove focus from mathfield
@@ -304,7 +345,6 @@ mf.addEventListener('focus-out', (ev) => {
   else if (ev.detail.direction === 'backward')
     mf.executeCommand('moveToMathfieldStart');
 });
-
 ```
 
 <section id='clipboard'>
@@ -385,15 +425,16 @@ the content of the formula, see [Customizing](mathlive/guides/customizing/). {.n
     </style>
     <pre slot="javascript">
 const mf = document.getElementById('formula');
+//
 // Change the background color of the entire mathfield
 mf.applyStyle(
-  {backgroundColor: 'yellow' }, 
-  {range: [0, -1]}
+  { backgroundColor: 'yellow' },
+  { range: [0, -1] }
 );
 </pre>
 <pre slot="html">
 &lt;math-field id="formula"&gt;
-x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+  x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 &lt;/math-field&gt;</pre>
 </code-playground>
 
@@ -414,6 +455,7 @@ to `applyStyle()`.
     </style>
     <pre slot="javascript">
 const mf = document.getElementById('formula');
+//
 // Change the color and size of the first two characters of the mathfield
 mf.applyStyle({color: "red", fontSize: 7 }, { range: [0, 2] });
 </pre>
