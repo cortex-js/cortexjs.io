@@ -107,19 +107,21 @@ head:
   font-size: 6rem;
   margin-right: 2rem;
   margin-left: 1rem;
+  min-width: 120px;
 }
 
 .page__content .use-case h3 {
-  font-size: 3rem;
-  line-height: .9;
+  font-size: 2rem;
+  line-height: 1;
   margin-bottom: 2rem;
+  margin-top: 1rem;
 }
 
 .page__content .use-case p {
-  font-size: 2rem;
+  font-size: 1.2rem;
   color: var(--body-color);
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 
@@ -261,7 +263,7 @@ h1::selection, h1 span::selection {
 }
 
 .page__content h2 {
-  font-size: 3rem;
+  font-size: 2rem;
   line-height: 1;
   letter-spacing: -0.03em;
 }
@@ -393,10 +395,8 @@ div.figure {
 style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
 
 
-<h1><span class="first-part">EQUATIONS</span> <span class="second-part">SERVED WITH A SIDE OF</span> <span class="third-part">INTERACTION</span></h1>
-
 <div class="intro">
-  <p class="intro-copy">Introducing <kbd>&lt;math-field&gt;</kbd>.<br><br> Like <kbd>&lt;textarea&gt;</kbd>, <br>but for math.</p>
+  <p class="intro-copy">Introducing<br><kbd>&lt;math-field&gt;</kbd>.<br><br> Like <kbd>&lt;textarea&gt;</kbd>, <br>but for math.</p>
 
   <section class="m-lg mb-xl">
   <code-playground layout="stack" style="width:100%">
@@ -409,16 +409,21 @@ style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
       math-field { font-size: 3rem; }
     </style>
       <pre slot="html">
-  &lt;math-field&gt;x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}&lt;/math-field&gt;</pre>
+  &lt;math-field&gt;
+  x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
     </code-playground>
 
   </section>
 
 </div>
 
+<h1><span class="first-part">EQUATIONS</span> <span class="second-part">SERVED WITH A SIDE OF</span> <span class="third-part">INTERACTION</span></h1>
+
+
 <section id="features-section">
   <div>
-<h2>LaTeX</h2>
+<h2>LaTeX Foundation</h2>
   <p>MathLive includes a faithful JavaScript implementation of the <strong>TeX layout algorithms</strong>, the gold standard for typesetting of mathematical content.</p>
   <div class="figure">
     <img src="/assets/images/mathfield/loop-eqn.png">
@@ -443,9 +448,14 @@ Read more about the <strong>virtual keyboard</strong>
   <div class="use-case">
     <i class="icon fas fa-chalkboard-teacher fill-green"></i>
     <div>
-      <h3>E-Learning Adventures: Math that Takes You Places</h3>
-      <p>Integrate MathLive into online courses, e-learning platforms, and educational websites to display interactive math equations and formulas.</p><p>Develop interactive quizzes and tests that involve math problems, making the learning experience more engaging.</p>
-    </div>
+      <h3>E-Learning Adventures:<br>Math that Takes You Places</h3>
+      <p>Integrate MathLive into online courses, e-learning platforms, and educational websites to display interactive math equations and formulas.</p><p>Develop interactive quizzes and tests that involve math problems, making the learning experience more engaging. Combine MathLive 
+        with the Compute Engine to check the correctness of the student's answers in real-time.
+      </p>
+      {% readmore "/mathlive/guides/fill-in-the-blank/" %}
+      Learn more about authoring **fill-in-the-blank** questions with MathLive
+      {% endreadmore %}
+          </div>
   </div>
   
 
@@ -454,8 +464,11 @@ Read more about the <strong>virtual keyboard</strong>
   <i class="icon fas fa-flask fill-orange"></i>
   <div>
     <h3>Equation Experiments</h3>
-    <p>Unleash your inner mad scientist! With MathLive, equations aren't just boring symbols; they're your laboratory assistants. Display scientific research findings, formulas, and equations on websites dedicated to scientific fields. 🧪</p>
-  </div>
+    <p>Unleash your inner mad scientist! With MathLive, equations aren't just boring symbols; they're your laboratory assistants. Display scientific research findings, formulas, and equations on websites dedicated to scientific fields.</p>
+    {% readmore "/compute-engine/guides/symbolic-computing/" %}
+    Use MathLive with the **Compute Engine** to symbolically compute and manipulate equations
+    {% endreadmore %}
+</div>
 </div>
 
 <div class="use-case">
@@ -463,14 +476,17 @@ Read more about the <strong>virtual keyboard</strong>
   <div>
     <h3>Online Calculators</h3>
     <p>Build interactive calculators that allow users to input math equations and receive real-time calculations and results</p>
+    {% readmore "/compute-engine/guides/numeric-evaluation/" %}
+    Make your calculator **interactive** by using the **Compute Engine** to evaluate the user's input
+    {% endreadmore %}  
   </div>
 </div>
 
 <div class="use-case">
   <i class="icon fas fa-file-alt fill-blue"></i>
   <div>
-    <h3>Dynamic Documentation: Math with a Twist</h3>
-    <p>MathLive spices things up by turning complex equations into a visual journey. Your technical explanations just got a serious upgrade. 📖</p>
+    <h3>Dynamic Documentation:<br>Math with a Twist</h3>
+    <p>MathLive spices things up by turning complex equations into a visual journey. Your technical explanations just got a serious upgrade.</p>
   </div>
 </div>
 
@@ -478,7 +494,7 @@ Read more about the <strong>virtual keyboard</strong>
   <i class="icon fas fa-pencil-alt fill-yellow"></i>
   <div>
     <h3>Write Math, Write Magic</h3>
-    <p>Calling all math storytellers! With MathLive, equations become the heroes of your blog. Craft captivating content that waltzes between math and magic, delighting readers along the way. ✨</p>
+    <p>Calling all math storytellers! With MathLive, equations become the heroes of your blog. Craft captivating content that waltzes between math and magic, delighting readers along the way.</p>
   </div>
 </div>
 

@@ -93,7 +93,9 @@ a.chevron::after {
   font-family: var(--body-font-family);
   font-feature-settings: var(--body-font-settings);
   font-size: $type-size-4 !important;
-  line-height: 1.47059;
+  line-height: 1.2;
+  font-weight: 500;
+  // line-height: 1.47059;
   text-indent: initial;
   /* override*/
   background: var(--callout-background);
@@ -109,7 +111,6 @@ a.chevron::after {
   padding: 1em;
   display: block;
   color: var(--link-color); 
-  font-size: 1.1em;
   text-decoration: none;
 }
 
