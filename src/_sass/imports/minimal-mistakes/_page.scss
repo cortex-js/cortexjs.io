@@ -191,12 +191,14 @@
       dt {
           margin-top: 1em;
           font-family: var(--body-font-family);
+          font-feature-settings: var(--body-font-settings);
           font-weight: bold;
       }
   
       dd {
           margin-left: 1em;
           font-family: var(--body-font-family);
+          font-feature-settings: var(--body-font-settings);
           font-size: $type-size-4;
       }
   
@@ -312,6 +314,7 @@
       margin-top: 2em;
       color: #707070;
       font-family: var(--display-font-family);
+      font-feature-settings: var(--display-font-settings);
       font-size: $type-size-6;
       @media (prefers-color-scheme: dark) {
         color: #d0d0d0;

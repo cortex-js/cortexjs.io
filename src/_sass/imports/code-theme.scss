@@ -253,17 +253,19 @@ code-playground::part(console) {
   --base-00: var(--console-background, var(--blue-900));
   background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
 
+
+  --selection-background: var(--semantic-blue, #0066ce);
+  --selection-color: var(--semantic-orange);
+
   font-size: 1.1rem;
   line-height: 1.4;
 }
 
-
-
-code-playground {
-  --selection-background: var(--semantic-blue, #0066ce);
-  --selection-color: var(--semantic-orange);
-}
-
+// Does not work. Need a variable for the selection color.
+// code-playground::part(editor) *::selection {
+//   background-color: var(--semantic-blue, #0066ce);
+//   color: var(--semantic-orange);
+// }
 
 code-playground::part(editor)::after,
 code-playground::part(console)::after {

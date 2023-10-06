@@ -46,6 +46,7 @@
 .archive__item-title {
   margin-bottom: 0.25em;
   font-family: var(--display-font-family);
+  font-feature-settings: var(--display-font-settings);
   line-height: initial;
   overflow: hidden;
   text-overflow: ellipsis;

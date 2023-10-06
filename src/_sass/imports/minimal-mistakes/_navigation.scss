@@ -621,6 +621,7 @@ button.nav__sub-title_toggle:hover {
   .nav__title {
     color: #fff;
     font-family: var(--body-font-family);
+    font-feature-settings: var(--body-font-settings);
     font-size: $type-size-5;
     background: var(--primary-color);
     border: none;

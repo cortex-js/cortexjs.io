@@ -16,6 +16,7 @@ table {
   border-spacing: 0;
   line-height: 1.47059;
   font-family: var(--body-font-family);
+  font-feature-settings: var(--body-font-settings);
   font-size: $type-size-4;
 
   & + table {

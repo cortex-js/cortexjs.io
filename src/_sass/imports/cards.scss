@@ -68,6 +68,7 @@
 .card h2 {
   color: var(--text-color);
   font: 700 56px/50px var(--display-font-family);
+  font-feature-settings: var(--display-font-settings);
   margin: 0;
   padding: 0;
   padding-bottom: .5em;
@@ -76,6 +77,7 @@
   & .eyebrow {
     display: block;
     font: 400 32px/36px var(--display-font-family);
+    font-feature-settings: var(--display-font-settings);
     margin: 0;
     padding: 0;
     opacity: .4;
@@ -91,6 +93,7 @@
 .card h3 {
   color: var(--text-color);
   font: 700 36px/40px var(--display-font-family);
+  font-feature-settings: var(--display-font-settings);
   margin: 0;
   padding: 0;
   padding-bottom: .5em;
@@ -98,6 +101,7 @@
 
 .card p {
   font: 400 21px/29px var(--body-font-family);
+  font-feature-settings: var(--body-font-settings);
   margin: 0;
   padding:0;
 }
@@ -114,6 +118,7 @@
   }
   & .card h2 {
       font: 700 24px/24px var(--display-font-family);
+      font-feature-settings: var(--display-font-settings);
       padding-top: .5em;
   }
   & .card .copy {
@@ -124,13 +129,15 @@
       padding-top: 1em;
 
       font: 500 16px/20px var(--body-font-family);
-  }
+      font-feature-settings: var(--body-font-settings);
+    }
   & .card .copy p {
       text-align: center;
       margin-bottom: 1em;
       text-align: center;
 
       font: 500 16px/20px var(--body-font-family);
-  }
+      font-feature-settings: var(--body-font-settings);
+    }
 }
 

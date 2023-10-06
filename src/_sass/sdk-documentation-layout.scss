@@ -20,6 +20,7 @@ mark {
 
 section.page__content {
   font-family: var(--body-font-family);
+  font-feature-settings: var(--body-font-settings);
   line-height: 1.5;
   color: var(--text-color);
 }
@@ -30,7 +31,8 @@ section.page__content h3,
 section.page__content h4,
 section.page__content h5 {
     font-family: var(--display-font-family);
-}
+    font-feature-settings: var(--body-font-settings);
+  }
 
 .stack {
     display: flex;
@@ -295,6 +297,7 @@ ul {
 }
 .page__content dd {
     font-family: var(--body-font-family);
+    font-feature-settings: var(--body-font-settings);
     font-size: $type-size-4;
 }
 
