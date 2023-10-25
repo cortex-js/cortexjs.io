@@ -71,16 +71,21 @@
                 "url": "https://github.com/cortex-js"
             },
             {
-                "label": "Discussion Forum",
-                "icon": "<svg class=\"icon1quarterem\"><use role=\"none\" xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
-                "url": "/forum/"
+              "label": "Discussion Forum",
+              "icon": "<svg class=\"icon1quarterem\"><use role=\"none\" xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
+              "url": "/forum/"
+            },
+            {
+              "label": "Discord",
+              "icon": "<svg class=\"icon1quarterem\"><use role=\"none\" xlink:href=\"/assets/icons.svg#discord\"></use></svg>",
+              "url": "https://discord.gg/yhmvVeJ4Hd"
             }
         ],
         "pages": [
           {
-                "label": "About Us",
-                "url": "/about/"
-            }
+            "label": "About Us",
+            "url": "/about/"
+          }
         ]
     }
 }

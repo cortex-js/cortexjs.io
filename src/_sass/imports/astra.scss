@@ -4,57 +4,57 @@ $intro-transition: none;
 $global-transition: none;
 $theme: "light" !default;
 
-@import 'code-theme';
+// @import 'code-theme';
 @import 'common';
 
-$background-color: null;
-$card-background-color: null;
-$text-color: null;
-$border-color: null;
-$footer-background-color: null;
-$link-color: null;
-$masthead-link-color: null;
-$masthead-link-color-hover: null;
-$navicon-link-color-hover: null;
-$card-shadow: null;
+// $background-color: null;
+// $card-background-color: null;
+// $text-color: null;
+// $border-color: null;
+// $footer-background-color: null;
+// $link-color: null;
+// $masthead-link-color: null;
+// $masthead-link-color-hover: null;
+// $navicon-link-color-hover: null;
+// $card-shadow: null;
 
 
-@if ($theme == "dark") {
-  $background-color: #252a34 !default !global;
-  $card-background-color: #112 !default !global;
-  $text-color: #eaeaea !default !global;
-  $border-color: mix(#000, $background-color, 20%) !default !global;
-  // $code-background-color: mix(#000, $background-color, 15%) !default !global;
-  // $code-background-color-dark: mix(#000, $background-color, 20%) !default !global;
-  // $form-background-color: mix(#000, $background-color, 15%) !default !global;
-  $footer-background-color: mix(#000, $background-color, 30%) !default !global;
-  $link-color: lighten($primary-color, 20%) !default !global;
-  $masthead-link-color: $text-color !default !global;
-  $masthead-link-color-hover: mix(#000, $text-color, 20%) !default !global;
-  $navicon-link-color-hover: mix(#000, $background-color, 30%) !default !global;
-  $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
+// @if ($theme == "dark") {
+//   $background-color: #252a34 !default !global;
+//   $card-background-color: #112 !default !global;
+//   $text-color: #eaeaea !default !global;
+//   $border-color: mix(#000, $background-color, 20%) !default !global;
+//   // $code-background-color: mix(#000, $background-color, 15%) !default !global;
+//   // $code-background-color-dark: mix(#000, $background-color, 20%) !default !global;
+//   // $form-background-color: mix(#000, $background-color, 15%) !default !global;
+//   $footer-background-color: mix(#000, $background-color, 30%) !default !global;
+//   $link-color: lighten($primary-color, 20%) !default !global;
+//   $masthead-link-color: $text-color !default !global;
+//   $masthead-link-color-hover: mix(#000, $text-color, 20%) !default !global;
+//   $navicon-link-color-hover: mix(#000, $background-color, 30%) !default !global;
+//   $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
 
-  .author__urls.social-icons .svg-inline--fa,
-  .page__footer-follow .social-icons .svg-inline--fa {
-      color: inherit;
-  }
-} @else {
-  $background-color: #fff !default !global;
-  /* Colors */
-  $card-background-color: #fafafa !default !global;
-  $text-color: #333 !default !global;
-  // $muted-text-color: $text-color !default !global;
-  $border-color: mix(#fff, $text-color, 85%) !default !global;
-  $footer-background-color: #303035 !default !global;
-  $link-color: $primary-color !default !global;
-  $masthead-link-color: $text-color !default !global;
-  $masthead-link-color-hover: $text-color !default !global;
-  $navicon-link-color-hover: mix(#fff, $text-color, 80%) !default !global;
-  $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
-}
+//   .author__urls.social-icons .svg-inline--fa,
+//   .page__footer-follow .social-icons .svg-inline--fa {
+//       color: inherit;
+//   }
+// } @else {
+//   $background-color: #fff !default !global;
+//   /* Colors */
+//   $card-background-color: #fafafa !default !global;
+//   $text-color: #333 !default !global;
+//   // $muted-text-color: $text-color !default !global;
+//   $border-color: mix(#fff, $text-color, 85%) !default !global;
+//   $footer-background-color: #303035 !default !global;
+//   $link-color: $primary-color !default !global;
+//   $masthead-link-color: $text-color !default !global;
+//   $masthead-link-color-hover: $text-color !default !global;
+//   $navicon-link-color-hover: mix(#fff, $text-color, 80%) !default !global;
+//   $card-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23) !default !global;
+// }
 
-$link-color-hover: mix(#fff, $link-color, 25%) !default;
-$link-color-visited: mix(#000, $link-color, 25%) !default;
+// $link-color-hover: mix(#fff, $link-color, 25%) !default;
+// $link-color-visited: mix(#000, $link-color, 25%) !default;
 
 
 .page__content {
@@ -64,7 +64,7 @@ $link-color-visited: mix(#000, $link-color, 25%) !default;
   .notice--warning,
   .notice--success,
   .notice--danger {
-    color: $text-color;
+    color: var(--text-color);
   }
 }
 

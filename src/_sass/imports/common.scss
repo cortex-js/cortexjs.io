@@ -196,8 +196,6 @@ $magenta-900: #861d3d !default;
 $primary-color: $blue-700 !default;
 $primary-color-dark: $blue-800 !default;
 $primary-color-light: $blue-500;
-// $primary: $primary-color;
-
 
 $card-border: #fff;
 $card-background: #fafafa;
@@ -289,19 +287,20 @@ $semantic-green: #2d9d78;
   --base-08: #cc6666; // base0c
   --base-09: #f5871f; 
   --base-0a: #f0c674;
-  --base-0b: var(--green-300); // #b5bd68;
+  --base-0b: #64cf75; // var(--green-300);
   --base-0c: #8abeb7; // base08
   --base-0d: #81a2be;
   --base-0e: #b294bb;
   --base-0f: #a3685a;
   
-  --base-red: var(--base-08);
-  --base-yellow: var(--base-0a);
-  --base-blue: var(--base-0d);
-  --base-green: var(--base-0b);
-
   --console-background: var(--blue-900); // var(--base-00); 
   --console-color: var(--blue-50); // var(--base-04);
+
+  // --base-red: var(--base-08);
+  // --base-yellow: var(--base-0a);
+  // --base-blue: var(--base-0d);
+  // --base-green: var(--base-0b);
+
 
   --red-50: #{$red-50};
   --red-100: #{$red-100};
@@ -428,6 +427,8 @@ $semantic-green: #2d9d78;
 
 @media (prefers-color-scheme: dark) {
   :root {
+  // --base-00: #101417;
+  // --base-06: #b9b9b9;
   --console-background: var(--base-00);
 
   --primary-color: hsl(210, 80%, 40%);
@@ -488,8 +489,6 @@ $semantic-green: #2d9d78;
   --semantic-orange: #{$orange-400};
   --semantic-green: #{$green-700};
 
-  // --base-00: #101417;
-  // --base-06: #b9b9b9;
 
 }
 }

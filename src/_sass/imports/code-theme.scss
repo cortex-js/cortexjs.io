@@ -1,61 +1,60 @@
-/* base16-default-dark */
-// $base00: #212430;
-// $base01: #282828;
-// $base02: #383838;
-// $base03: #585858;
-// $base04: #b8b8b8;
-// $base05: #d8d8d8;
-// $base06: #e8e8e8;
-// $base07: #f8f8f8;
-// $base08: #ab4642;
-// $base09: #dc9656;
-// $base0a: #f7ca88;
-// $base0b: #a1b56c;
-// $base0c: #86c1b9;
-// $base0d: #7cafc2;
-// $base0e: #ba8baf;
-// $base0f: #a16946;
-
 /* tomorrow */
-// $base00: #ffffff;
-// $base01: #e0e0e0;
-// $base02: #d6d6d6;
-// $base03: #8e908c;
-// $base04: #969896;
-// $base05: #4d4d4c;
-// $base06: #282a2e;
-// $base07: #1d1f21;
-// $base08: #c82829;
-// $base09: #f5871f;
-// $base0a: #eab700;
-// $base0b: #718c00;
-// $base0c: #3e999f;
-// $base0d: #4271ae;
-// $base0e: #8959a8;
-// $base0f: #a3685a;
+// base00  #ffffff  Default Background
+// base01  #e0e0e0  Lighter Background (Used for status bars, line number and folding marks)
+// base02  #d6d6d6  Selection Background
+// base03  #8e908c  Comments, Invisibles, Line Highlighting
+// base04  #969896  Dark Foreground (Used for status bars)
+// base05  #4d4d4c  Default Foreground, Caret, Delimiters, Operators
+// base06  #282a2e  Light Foreground (Not often used)
+// base07  #1d1f21  Light Background (Not often used)
+// base08  #c82829  Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
+// base09  #f5871f  Integers, Boolean, Constants, XML Attributes, Markup Link Url
+// base0A  #eab700  Classes, Markup Bold, Search Text Background
+// base0B  #718c00  Strings, Inherited Class, Markup Code, Diff Inserted
+// base0C  #3e999f  Support, Regular Expressions, Escape Characters, Markup Quotes
+// base0D  #4271ae  Functions, Methods, Attribute IDs, Headings
+// base0E  #8959a8  Keywords, Storage, Selector, Markup Italic, Diff Changed
+// base0F  #a3685a  Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
 
-/* tomorrow-night */
-$base00: #35434e; // was #1d1f21;
+/* tomorrow-night
+base00  #2d2d2d  Default Background
+base01  #393939  Lighter Background (Used for status bars, line number and folding marks)
+base02  #515151  Selection Background
+base03  #999999  Comments, Invisibles, Line Highlighting
+base04  #b4b7b4  Dark Foreground (Used for status bars)
+base05  #cccccc  Default Foreground, Caret, Delimiters, Operators
+base06  #e0e0e0  Light Foreground (Not often used)
+base07  #ffffff  Light Background (Not often used)
+base08  #f2777a  Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
+base09  #f99157  Integers, Boolean, Constants, XML Attributes, Markup Link Url
+base0A  #ffcc66  Classes, Markup Bold, Search Text Background
+base0B  #99cc99  Strings, Inherited Class, Markup Code, Diff Inserted
+base0C  #66cccc  Support, Regular Expressions, Escape Characters, Markup Quotes
+base0D  #6699cc  Functions, Methods, Attribute IDs, Headings
+base0E  #cc99cc  Keywords, Storage, Selector, Markup Italic, Diff Changed
+base0F  #a3685a  Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
+*/
+
+
+
+/* variation based on tomorrow-night */
+$base00: #35434e;
 $base01: #282a2e;
 $base02: #373b41;
 $base03: #969896;
 $base04: #b4b7b4;
-$base05: #c5c8c6; // base05
+$base05: #c5c8c6;
 $base06: #e0e0e0;
 $base07: #ffffff;
-$base0c: #cc6666; // base08
-$base09: #ec9c65; // was #de935f;
+$base0c: #cc6666;
+$base09: #f5871f; 
 $base0a: #f0c674;
-$base0b: #b5bd68;
-$base08: #8abeb7; // base0c
-$base0d: #81a2be; // base0d
+$base0b: #64cf75;
+$base08: #8abeb7;
+$base0d: #81a2be;
 $base0e: #b294bb;
 $base0f: #a3685a;
 
-$base-red: $base0c;
-$base-yellow: $base0a;
-$base-blue: $base0d;
-$base-green: $base0b;
 
 /*
 

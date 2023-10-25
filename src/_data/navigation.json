@@ -17,6 +17,10 @@
 			"url": "/forum/"
 		},
 		{
+			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Discord</title><use xlink:href=\"/assets/icons.svg#discord\"></use></svg>",
+			"url": "https://discord.gg/yhmvVeJ4Hd"
+		},
+		{
 			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>GitHub</title><use xlink:href=\"/assets/icons.svg#github\"></use></svg>",
 			"url": "https://github.com/cortex-js"
 		}
@@ -405,6 +409,11 @@
 					"title": "Discussion Forum",
 					"url": "/forum/",
           "icon": "gitter"
+				},
+				{
+					"title": "Discord",
+					"url": "https://discord.gg/yhmvVeJ4Hd",
+          "icon": "discord"
 				},
 				{
 					"title": "Reporting Issues",
