@@ -36,6 +36,13 @@ render_math_in_document: true
     background: none;
   }
 
+  #special-keys {
+    border-radius: 8px;
+    margin-top: 2rem;
+    border: var(--ui-border);
+    padding: 1rem;
+  }
+
   #special-keys-table {
     display: flex;
     flex-wrap: wrap;
@@ -114,14 +121,13 @@ render_math_in_document: true
   padding: 0;
   padding-bottom: 8px;
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
-  line-height: 1;
+  line-height: 1.2;
   text-align: center;
   padding-top: 8px;
-  align-items: baseline;
+  align-items: center;
 }
-
 
 
 .keybindings-table tr td aside {
@@ -134,6 +140,7 @@ render_math_in_document: true
   flex-flow: column;
   border-radius: 8px;
   padding: 8px;
+  min-height: 4em;
   background: var(--callout-background);
   color: var(--text-color);
   align-items: center;
@@ -158,6 +165,9 @@ table tr td:first-child {
   align-items: center;
 }
 
+.keybindings-table kbd {
+  user-select: none;
+}
 
 
 .inlineshortcut-table table {
@@ -275,8 +285,162 @@ div[data-tooltip]:hover::after {
   display: flex;
 }
 
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  display: none;
+  /* opacity: 0;
+  width: 0;
+  height: 0; */
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 34px;
+  background-color: var(--ui-surface);
+  transition: .2s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  border-radius: 50%;
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--ui-handle);
+  transition: .2s;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+input:focus-visible + .slider {
+  outline: 5px auto #0c6abe;
+  outline-offset: -2px;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.settings-row {
+  border-radius: 8px;
+  border: var(--ui-border);
+  padding: 1rem;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.page__content label p {
+  margin: 0;
+  padding: 0;
+  opacity: .6;
+}
+
+.page__content label p:has(strong) {
+  opacity: 1;
+}
+
+#special-keys {
+  display: none;
+}
+
+body.apple #special-keys {
+  display: block;
+}
+
+.if-apple {
+  display: none;
+}
+
+body.apple .if-apple {
+  display: inherit;
+}
+
+.if-glyphs, .if-not-glyphs {
+  display: none;
+}
+
+body.glyphs .if-glyphs {
+  display: inherit;
+}
+
+body:not(.glyphs) .if-not-glyphs {
+  display: inherit;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 0.5em;
+  font-variant: small-caps;
+}
+
 
 </style>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const platform = navigator['userAgentData']?.platform ?? navigator.platform;
+    const isApple = /^mac/i.test(platform) || /iphone|ipod|ipad/i.test(navigator.userAgent);
+
+    const appleSwitch = document.getElementById('apple');
+
+    if (isApple) {
+      appleSwitch.checked = true;
+      document.body.classList.add('apple', 'glyphs');
+    }
+
+    appleSwitch.addEventListener('click', (e) => {
+      if (e.target.checked) 
+        document.body.classList.add('apple', 'glyphs');
+       else 
+        document.body.classList.remove('apple', 'glyphs');
+    });
+
+  function replaceGlyphs(root) {
+    // Recurse over all the children of the node
+    root.childNodes.forEach((node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        const html = text.replace(/⌘|⌃|⇧|⌥|⤒|⤓|⇞|⇟|⇥|⌫|⌦|⏎|⌤|⇥/g, (match) => {
+          const glyph = match;
+          const caption = {'⌘': 'Ctrl', '⌃': 'Ctrl', '⇧': 'Shift', '⌥': 'Alt', '⤒': "Home", '⤓': 'End', "⇞": 'Page Up', '⇟': "Page Down", '⌫': 'Backspace', '⌦': 'Del', '⏎': 'Return', '⌤': 'Enter', '⇥': 'Tab'}[glyph];
+          if (!caption) return glyph;
+          return `<span class="if-glyphs">${glyph}</span><span class="if-not-glyphs">${caption}</span>`;
+        });
+        const span = document.createElement('span');
+        span.innerHTML = html;
+        node.replaceWith(span);
+      } else {
+        replaceGlyphs(node);
+      }
+    });
+  }
+
+    document.querySelectorAll('.keybindings-table').forEach((table) => 
+      table.querySelectorAll('td').forEach((td) => replaceGlyphs(td))
+    );
+
+  });
+
+</script>
 
 ## Keybindings
 
@@ -286,21 +450,28 @@ combinations.
 The keybinding below are applicable to a US QWERTY keyboard. Some of the
 keybindings may not be available with other keyboard layouts.{.notice--info}
 
-{% readmore "/mathlive/reference/shortcuts/" %}
+{% readmore "/mathlive/guides/shortcuts/" %}
 Read more about definining your own **keybindings** and **shortcuts**.
 {% endreadmore %}
 
 
+<div class="settings-row">
+<label for="apple"><p><strong>Shortcuts for macOS and iOS</strong></p><p>Display shortcuts using the ⌘, ⌥, ⌃, ⇧ keys</p></label>
+<label class="switch">
+  <input id="apple" type="checkbox">
+  <span class="slider"></span>
+</label>
 
 
-### Special Keys
+</div>
 
+<section id="special-keys">
 
 <div id='special-keys-table'>
   <div> <kbd>⇧</kbd><span class="label"><kbd>Shift</kbd></div> 
-   <div> <kbd>⌃</kbd><span class="label"><kbd>Ctrl</kbd> or <kbd>Control</kbd></span></div>
-   <div> <kbd>⌥</kbd><span class="label"><kbd>Option</kbd> or <kbd>Alt</kbd></span></div>
-   <div> <kbd>⌘</kbd><span class="label">macOS: <kbd>Command</kbd><br>Windows:<kbd>Ctrl</kbd></span></div>
+   <div> <kbd>⌃</kbd><span class="label"><kbd>Control</kbd></span></div>
+   <div> <kbd>⌥</kbd><span class="label"><kbd>Option</kbd></span></div>
+   <div> <kbd>⌘</kbd><span class="label"><kbd>Command</kbd></span></div>
 
 </div>
 
@@ -324,6 +495,8 @@ Read more about definining your own **keybindings** and **shortcuts**.
 
 </div>
 
+</section>
+
 
 
 ### Editing
@@ -333,21 +506,21 @@ Read more about definining your own **keybindings** and **shortcuts**.
 
 | Keybinding | Result | 
 | --- | --- |
-| <kbd>⌃</kbd>+<kbd>B</kbd>| <kbd>⇠</kbd> | move backward |
-| <kbd>⌃</kbd>+<kbd>F</kbd> | <kbd>⇢</kbd> |move forward |
-| <kbd>⌃</kbd>+<kbd>P</kbd> | <kbd>⇡</kbd> |move up |
-| <kbd>⌃</kbd>+<kbd>N</kbd> | <kbd>⇣</kbd> | move down |
-| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd> | <kbd>⇧</kbd>+<kbd>⇠</kbd> |extend selection backward |
-| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd> | <kbd>⇧</kbd>+<kbd>⇢</kbd> |extend selection forward |
-| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>P</kbd> | <kbd>⇧</kbd>+<kbd>⇡</kbd> | extend selection upward |
-| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>N</kbd> | <kbd>⇧</kbd>+<kbd>⇣</kbd> | extend selection downward |
+| <span class="if-apple"> <kbd>⌃</kbd>+<kbd>B</kbd> </span> | <kbd>⇠</kbd> | move backward |
+| <span class="if-apple"><kbd>⌃</kbd>+<kbd>F</kbd> </span> | <kbd>⇢</kbd> |move forward |
+| <span class="if-apple"><kbd>⌃</kbd>+<kbd>P</kbd> </span> | <kbd>⇡</kbd> |move up |
+| <span class="if-apple"><kbd>⌃</kbd>+<kbd>N</kbd> </span> | <kbd>⇣</kbd> | move down |
+| <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></span> | <kbd>⇧</kbd>+<kbd>⇠</kbd> |extend selection backward |
+| <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd></span> | <kbd>⇧</kbd>+<kbd>⇢</kbd> |extend selection forward |
+|  <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>P</kbd> </span> | <kbd>⇧</kbd>+<kbd>⇡</kbd> | extend selection upward |
+|  <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>N</kbd> </span> | <kbd>⇧</kbd>+<kbd>⇣</kbd> | extend selection downward |
 | <kbd>⇥</kbd> | move to next placeholder |
 | <kbd>⇧</kbd>+<kbd>⇥</kbd> | move to previous placeholder |
-| <kbd>⌃</kbd>+<kbd>H</kbd> | <kbd>⌥</kbd>+<kbd>⌦</kbd> | <kbd>⌫</kbd> | delete backward |
-| <kbd>⌃</kbd>+<kbd>D</kbd> | <kbd>⌥</kbd>+<kbd>⌫</kbd> | <kbd>⌦</kbd> | delete forward |
-| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd> |<kbd>⌥</kbd>+<kbd>⇠</kbd> | move to previous word |
+| <span class="if-apple"><kbd>⌃</kbd>+<kbd>H</kbd></span> | <kbd>⌥</kbd>+<kbd>⌦</kbd> | <kbd>⌫</kbd> | delete backward |
+| <span class="if-apple"><kbd>⌃</kbd>+<kbd>D</kbd></span> | <kbd>⌥</kbd>+<kbd>⌫</kbd> | <kbd>⌦</kbd> | delete forward |
+| <span class="if-apple"><kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></span> |<kbd>⌥</kbd>+<kbd>⇠</kbd> | move to previous word |
 | <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd> | <kbd>⌥</kbd>+<kbd>⇢</kbd> | move to next word |
-| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd> | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⇠</kbd> | extend selection to previous word |
+| <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>B</kbd></span> | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⇠</kbd> | extend selection to previous word |
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>F</kbd> | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>⇢</kbd> | extend selection to next word |
 | <kbd>⇞</kbd> | <kbd>⌃</kbd>+<kbd>⇠</kbd> | move to group start |
 | <kbd>⇟</kbd> |<kbd>⌃</kbd>+<kbd>⇢</kbd> | move to group end |
@@ -355,29 +528,29 @@ Read more about definining your own **keybindings** and **shortcuts**.
 | <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>⇢</kbd> | extend selection to group end |
 | <kbd>space</kbd> | move after parent |
 | <kbd>⇧</kbd>+<kbd>space</kbd> | move before parent |
-| <kbd>⌃</kbd>+<kbd>A</kbd> |<kbd>⤒</kbd> | <kbd>⌘</kbd>+<kbd>⇠</kbd> | move to mathfield start |
-| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>A</kbd> | <kbd>⇧</kbd>+<kbd>⤒</kbd> | <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇠</kbd> | extend selection to mathfield start |
-| <kbd>⌃</kbd>+<kbd>E</kbd> | <kbd>⤓</kbd> | <kbd>⌘</kbd>+<kbd>⇢</kbd> |move to mathfield end |
-| <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>E</kbd> | <kbd>⇧</kbd>+<kbd>⤓</kbd> | <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇢</kbd> |extend selection to mathfield end |
+| <span class="if-apple"><kbd>⌃</kbd>+<kbd>A</kbd></span> |<kbd>⤒</kbd> | <kbd>⌘</kbd>+<kbd>⇠</kbd> | move to mathfield start |
+| <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>A</kbd></span> | <kbd>⇧</kbd>+<kbd>⤒</kbd> | <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇠</kbd> | extend selection to mathfield start |
+| <span class="if-apple"><kbd>⌃</kbd>+<kbd>E</kbd></span> | <kbd>⤓</kbd> | <kbd>⌘</kbd>+<kbd>⇢</kbd> |move to mathfield end |
+| <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>E</kbd></span> | <kbd>⇧</kbd>+<kbd>⤓</kbd> | <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇢</kbd> |extend selection to mathfield end |
 | <kbd>⌃</kbd>+<kbd>5</kbd> | move to opposite <aside>superscript/subscript, upper/lower</aside> |
 | <kbd>⌃</kbd>+<kbd>6</kbd> | move to superscript/upper |
 | <kbd>⌃</kbd>+<kbd>-</kbd> | move to subscript/lower |
-| <kbd>esc</kbd> | complete |
-| <kbd>⇧</kbd>+<kbd>esc</kbd> | complete ("reject") |
+| <kbd>esc</kbd> | finish |
+| <kbd>⇧</kbd>+<kbd>esc</kbd> | reject |
 | <kbd>⇥</kbd> | accept suggestion |
 | <kbd>⌤</kbd> | <kbd>⏎</kbd> | complete |
-| <kbd>⌃</kbd>+<kbd>A</kbd> | <kbd>⌘</kbd>+<kbd>A</kbd> | select all |
-| <kbd>⌃</kbd>+<kbd>Z</kbd> | <kbd>⌘</kbd>+<kbd>Z</kbd> | undo |
-| <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Z</kbd> | <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>Z</kbd> | <kbd>⌃</kbd>+<kbd>Y</kbd> | <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Y</kbd> | redo |
-| <kbd>⌃</kbd>+<kbd>L</kbd> | scroll into view |
+| <kbd>⌃</kbd>+<kbd>A</kbd> | <span class="if-apple"><kbd>⌘</kbd>+<kbd>A</kbd></span> | select all |
+| <kbd>⌃</kbd>+<kbd>Z</kbd> | <span class="if-apple"><kbd>⌘</kbd>+<kbd>Z</kbd></span> | undo |
+| <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Z</kbd></span> | <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>Z</kbd> | <kbd>⌃</kbd>+<kbd>Y</kbd> | <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Y</kbd></span> | redo |
+| <span class="if-apple"><kbd>⌃</kbd>+<kbd>L</kbd></span> | scroll into view |
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>K</kbd> | toggle keystroke caption |
 | <kbd>⌥</kbd>+<kbd>space</kbd> | toggle virtual keyboard |
 | <kbd>⌥</kbd>+<kbd>=</kbd> | apply text mode |
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>T</kbd> | toggle math/text mode |
 | <kbd>esc</kbd> | enter/exit LaTeX mode |
 | <kbd>\\</kbd> | enter LaTeX mode |
-| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇡</kbd> | speak("parent") |
-| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇣</kbd> | speak("all") |
+| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇡</kbd> | speak parent |
+| <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇣</kbd> | speak all |
 
 </div>
 
