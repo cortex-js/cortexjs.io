@@ -35,7 +35,7 @@ For example, pressing the <kbd>Alt/Option/⌥</kbd> key and the <kbd>V</kbd> key
 same time will insert a square root. Pressing the <kbd>Control/Command/⌘</kbd> 
 key and the <kbd>Z</kbd> key at the same time will undo the last command.
 
-MathLive has an extensive set of [default key bindings](https://github.com/arnog/mathlive/blob/master/src/editor/keybindings.ts). 
+MathLive has an extensive set of [default key bindings](/mathlive/reference/keybindings). 
 
 **To override, customize or add to the list of supported key bindings**, set
 the `keybindings` property on a mathfield element.
@@ -69,9 +69,9 @@ one of the following special placeholder tokens:
 
 ### International Keyboards
 
-Correctly handling keyboard shortcuts while accounting for international 
+Correctly handling keyboard shortcuts while accounting for non-US 
 keyboard layout is surprisingly difficult. MathLive uses some heuristics that
-may occasionally result in a surprising result.
+may occasionally result in surprising results.
 
 This section details how MathLive uses keyboard events to determine which
 keyboard shortcut to activate.
@@ -79,14 +79,14 @@ keyboard shortcut to activate.
 
 Let's consider the keyboard shortcut <kbd>Control/⌘</kbd>+<kbd>Alt/Option</kbd>+<kbd>A</kbd>
 
-When the user presses this key combination on a keyboard with a US keyboard 
+When this key combination is pressed on a keyboard with a US keyboard 
 layout, the event received will have the properties `code = "KeyA"` and  `key = "\u00e5"`.
 
 On a French AZERTY keyboard layout, the event received will have `code =
 "KeyQ"` and  `key = "\u00e6"`.
 
 Why is the code `KeyQ` even though the user pressed the key labeled `A` on their
-AZERTY keyboard? On this keyboard layout, the Q and A keys are swapped compared
+AZERTY keyboard? On this keyboard layout, the **Q** and **A** keys are swapped compared
 to the US layout and the `code` property reflects the "physical" key pressed.
 
 This is not unusual. While some keys retain their positions, many keys are
@@ -94,8 +94,8 @@ swapped around or altogether unique in some layouts, particularly for
 punctuations and symbols. The code property of the event does not
 represent the label of the key, but indicates the physical position of the key
 as if it was on a US keyboard, in this case "the key immediately to the right of
-the caps lock key, which is labeled Q on a US keyboard (but is labeled A on a
-French keyboard".
+the caps lock key, which is labeled **Q** on a US keyboard (but is labeled **A** on a
+French keyboard)".
 
 What we want to know is that the user pressed a key labeled <kbd>A</kbd>. But none of the
 information in the event record tells us that. The value of the key field varies

@@ -48,7 +48,7 @@ other, not both).
 
 <div class='symbols-table'>
 
-| `mathVirtualKeyboardPolicy` | |
+| `mathVirtualKeyboardPolicy` |
 |:-- | :-- |
 | `"auto"` |  On touch-enabled devices, show the virtual keyboard panel when the mathfield is focused. This is the default behavior. |
 | `"manual"` | Do not show the virtual keyboard panel automatically. The visibility of the virtual keyboard panel can be controlled programatically with `mathVirtualKeyboard.show()` and `mathVirtualKeyboard.hide()`|
@@ -85,55 +85,6 @@ For example to hide the toggle unless on a touch-enabled device, use:
 ```
 
 
-## Customizing the Size of the Keyboard
-
-By default the virtual keyboard is sized so that it can be used comfortably
-on touch-devices. Its size will adjust based on the available space in the 
-viewport.
-
-However, you may want to have a more compact virtual keyboard to leave more 
-room for the content. You can control the appearance of the virtual keyboard
-using some CSS variables. Set those variables in a rule that applies to 
-the entire document, for example the `body` element selector.
-
-```css
-body {
-  --keycap-height: 24px;
-  --keycap-font-size: 16px;
-  --keycap-shift-font-size: 9px;
-  --keycap-small-font-size: 9px;
-  --keycap-extra-small-font-size: 9px;
-  --keyboard-toolbar-font-size: 16px;
-  --keycap-gap: 1px;
-}
-```
-
-
-The following CSS variables can be used to adjust the layout:
-
-- `--keycap-height`
-- `--keycap-max-width`
-- `--keycap-gap`
-- `--keycap-font-size`
-- `--keycap-shift-font-size`
-- `--keycap-small-font-size`
-- `--keycap-extra-small-font-size`
-- `--keycap-secondary-border-bottom`
-- `--keycap-secondary-border-bottom`
-- `--keyboard-toolbar-font-size`
-
-- `--keyboard-padding-horizontal`
-- `--keyboard-padding-top`
-- `--keyboard-padding-bottom`
-- `--keyboard-row-padding-left`
-- `--keyboard-row-padding-right`
-
-- `--variant-keycap-length`
-- `--variant-keycap-font-size`
-- `--variant-keycap-aside-font-size`
-
-
-
 ## Customizing the Layouts
 
 The virtual keyboard panel displays multiple layouts which can be 
@@ -143,7 +94,7 @@ and `greek`.
 **To choose which layouts are listed in the layout switcher**, use the 
 `mathVirtualKeyboard.layouts` property.
 
-For example, to only show the numeric and symbols layouts, use:
+For example, to only show the **numeric** and **symbols** layouts, use:
 
 <code-playground layout="stack" show-line-numbers>
     <style slot="style">
@@ -166,11 +117,35 @@ document.querySelector('math-field').
 
 <hr>
 
-To revert to the default layouts, use: 
+**To revert to the default layouts**, use: 
 
 ```js
 mathVirtualKeyboard.layouts = "default";
 ```
+
+
+### Different Layouts for Multiple Mathfields
+
+There is a single instance of the virtual keyboard panel, shared by all
+mathfields. The layouts are shared by all mathfields as well.
+
+**To display a different set of layouts for a specific mathfield**, change the
+`mathVirtualKeyboardLayouts` property of the mathfield when it is focused.
+
+```js example
+// Layout for mathfield mf1
+mf1.addEventListener("focusin", () => {
+  mathVirtualKeyboard.layouts = ["numeric", "symbols"];
+});
+
+// Layout for mathfield mf2
+mf2.addEventListener("focusin", () => {
+  mathVirtualKeyboard.layouts = ["minimalist"];
+});
+```
+
+
+
 
 ## Additional Layouts
 
@@ -575,9 +550,52 @@ The following CSS variables are a border shorthand value:
 - `--keyboard-border`
 - `--keyboard-horizontal-rule`
 
+### Customizing the Size of the Keyboard
+
+By default the virtual keyboard is sized so that it can be used comfortably
+on touch-devices. Its size will adjust based on the available space in its 
+container, which is the viewport by default.
+
+However, you may want to have a more compact virtual keyboard to leave more 
+room for the content. You can control the appearance of the virtual keyboard
+using some CSS variables. Set those variables in a rule that applies to 
+the entire document, for example the `body` element selector.
+
+```css
+body {
+  --keycap-height: 24px;
+  --keycap-font-size: 16px;
+  --keycap-shift-font-size: 9px;
+  --keycap-small-font-size: 9px;
+  --keycap-extra-small-font-size: 9px;
+  --keyboard-toolbar-font-size: 16px;
+  --keycap-gap: 1px;
+}
+```
 
 
+The following CSS variables can be used to adjust the layout:
 
+- `--keycap-height`
+- `--keycap-max-width`
+- `--keycap-gap`
+- `--keycap-font-size`
+- `--keycap-shift-font-size`
+- `--keycap-small-font-size`
+- `--keycap-extra-small-font-size`
+- `--keycap-secondary-border-bottom`
+- `--keycap-secondary-border-bottom`
+- `--keyboard-toolbar-font-size`
+
+- `--keyboard-padding-horizontal`
+- `--keyboard-padding-top`
+- `--keyboard-padding-bottom`
+- `--keyboard-row-padding-left`
+- `--keyboard-row-padding-right`
+
+- `--variant-keycap-length`
+- `--variant-keycap-font-size`
+- `--variant-keycap-aside-font-size`
 
 
 ## Preventing Input from the Physical Keyboard

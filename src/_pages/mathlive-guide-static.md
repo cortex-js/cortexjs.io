@@ -49,7 +49,9 @@ enclosed with the following delimiters will be rendered as math:
 
 ```html
 <h1>Taxicab Number</h1>
-<p>The second taxicab number is \\(1729 = 10^3 + 9^3 = 12^3 + 1^3\\)</p>
+<p>The second taxicab number 
+   is \\(1729 = 10^3 + 9^3 = 12^3 + 1^3\\)
+</p>
 ```
 
 More complex expressions can be wrapped in a `<script>` tag. One of the 
@@ -115,12 +117,13 @@ functions pass an optional `options` object literal:
 
 ```javascript
 renderMathInElement(document.getElementById('formulas'), {
-  // Elements with a class of "instruction" or "source will be skipped
+  // Elements with a class of "instruction" or "source"
+  // will be skipped
   ignoreClass: 'instruction|source',
   TeX: {
     delimiters: {
-      // Allow math formulas surround by $...$ or \(...\)
-      // to be rendered as textstyle content.
+      // Allow math formulas surrounded by $...$ or \(...\)
+      // to be rendered as inline (textstyle) content.
       inline: [
         ['$', '$'],
         ['\\(', '\\)'],
@@ -155,10 +158,10 @@ element.
         outline: none;
       }
     </style>
-    <pre slot="html">The solution of the equation is&amp;nbsp;
+    <pre slot="html"><p>The solution of the equation is&amp;nbsp;
 &lt;math-field read-only style="display:inline-block"&gt;
   x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</pre>
+&lt;/math-field&gt;</p></pre>
 </code-playground>
 
 

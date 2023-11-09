@@ -127,6 +127,7 @@ render_math_in_document: true
   text-align: center;
   padding-top: 8px;
   align-items: center;
+  width: 100%;
 }
 
 
@@ -145,6 +146,7 @@ render_math_in_document: true
   color: var(--text-color);
   align-items: center;
   overflow-wrap: anywhere;
+  width: 100%;
 }
 
 /* .keybindings-table tr td:not(:first-child) {
@@ -211,6 +213,7 @@ table tr td:first-child {
   line-height: 1;
   text-align: center;
   font-variant-ligatures: none;
+  width: 100%;
 }
 
 
@@ -229,6 +232,7 @@ table tr td:first-child {
   color: var(--text-color);
   align-items: center;
   overflow-wrap: anywhere;
+  width: 100%;
 }
 
 .inlineshortcut-table tr td kbd {
@@ -339,16 +343,74 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
-.settings-row {
+.settings-row, .settings-stack {
   border-radius: 8px;
   border: var(--ui-border);
   padding: 1rem;
   display: flex;
   width: 100%;
-  align-items: center;
-  justify-content: space-between;
   user-select: none;
 }
+
+.settings-row {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-stack {
+  flex-flow: column;
+}
+
+.settings-stack div div.row {
+  display: flex;
+  flex-flow: row;
+  align-items: baseline;
+}
+
+.settings-row label, .settings-stack label {
+  font-size: 1.25rem;
+}
+
+.settings-stack .label {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+div.row input + label {
+  margin-left: 8px;
+}
+
+input[type="radio"] {
+  appearance: none;
+  background-color: var(--ui-background);
+  margin: 0;
+  font: inherit;
+  color: var(--ui-border);
+  width: 1.5em;
+  height: 1.5em;
+  border: 2.5px solid #555;
+  border-radius: 50%;
+  translate: 0 -1.25px;
+  display: grid;
+  place-content: center;
+}
+
+input[type="radio"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  border-radius: 50%;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em var(--primary-color);
+}
+
+input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+
 
 .page__content label p {
   margin: 0;
@@ -400,19 +462,49 @@ body:not(.glyphs) .if-not-glyphs {
     const platform = navigator['userAgentData']?.platform ?? navigator.platform;
     const isApple = /^mac/i.test(platform) || /iphone|ipod|ipad/i.test(navigator.userAgent);
 
-    const appleSwitch = document.getElementById('apple');
+    const glyphsRadio = document.getElementById('glyphs-radio');
+    const textRadio = document.getElementById('text-radio');
+
+    // const appleSwitch = document.getElementById('apple');
+    // appleSwitch.addEventListener('click', (e) => {
+    //   if (e.target.checked) 
+    //     document.body.classList.add('apple', 'glyphs');
+    //    else 
+    //     document.body.classList.remove('apple', 'glyphs');
+    // });
 
     if (isApple) {
-      appleSwitch.checked = true;
+      // appleSwitch.checked = true;
+      glyphsRadio.checked = true;
+      textRadio.checked = false;
+
       document.body.classList.add('apple', 'glyphs');
+    } else {
+      glyphsRadio.checked = false;
+      textRadio.checked = true;
     }
 
-    appleSwitch.addEventListener('click', (e) => {
-      if (e.target.checked) 
-        document.body.classList.add('apple', 'glyphs');
-       else 
-        document.body.classList.remove('apple', 'glyphs');
+    glyphsRadio.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        document.body.classList.add('apple');
+        document.body.classList.add('glyphs');
+      }
+       else  {
+        document.body.classList.remove('apple');
+        document.body.classList.remove('glyphs');
+      }
     });
+    textRadio.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        document.body.classList.remove('apple');
+        document.body.classList.remove('glyphs');
+      }
+       else  {
+        document.body.classList.add('apple');
+        document.body.classList.add('glyphs');
+      }
+    });
+
 
   function replaceGlyphs(root) {
     // Recurse over all the children of the node
@@ -455,17 +547,30 @@ Read more about definining your own **keybindings** and **shortcuts**.
 {% endreadmore %}
 
 
-<div class="settings-row">
+<!-- <div class="settings-row">
 <label for="apple"><p><strong>Shortcuts for macOS and iOS</strong></p><p>Display shortcuts using the ⌘, ⌥, ⌃, ⇧ keys</p></label>
 <label class="switch">
   <input id="apple" type="checkbox">
   <span class="slider"></span>
 </label>
+</div> -->
 
-
+<div class="settings-stack">
+<div class="label">Display shortcuts for:</div>
+<div>
+<div class="row">
+<input type="radio" id="glyphs-radio" name="glyphs" value="glyphs" checked>
+<label for="glyphs-radio">macOS, iOS</label>
+</div>
+<div class="row">
+<input type="radio" id="text-radio" name="glyphs" value="text">
+<label for="text-radio">Windows, ChromeOS, Linux</label>
+</div>
+</div>
 </div>
 
-<section id="special-keys">
+
+<section id="special-keys" class="if-glyphs">
 
 <div id='special-keys-table'>
   <div> <kbd>⇧</kbd><span class="label"><kbd>Shift</kbd></div> 
