@@ -607,10 +607,15 @@ button.nav__sub-title_toggle:hover {
   ========================================================================== 
 */
 
+/* When the .toc is displayed inside the page (narrow layout) */
+.page__content .toc {
+  padding-top: 2rem;
+}
+
 .toc {
   margin: 0 0 1em 1em;
   width: fit-content;
-  max-width: 50%;
+  // max-width: 50%;
   background-color: var(--ui-background);
   border-radius: $border-radius;
   float: right;
@@ -643,6 +648,11 @@ button.nav__sub-title_toggle:hover {
   .active a {
       @include yiq-contrasted($active-color);
   }
+}
+
+// Override the .page__content li styles
+.page__content .toc__menu li {
+  font-size: $type-size-5;
 }
 
 .toc__menu {

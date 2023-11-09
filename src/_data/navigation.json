@@ -285,6 +285,11 @@
           "icon": "reference"
 				},
         {
+          "title": "Linear Algebra",
+          "url": "/compute-engine/reference/linear-algebra/",
+          "icon": "reference"
+        },
+        {
           "title": "Logic",
           "url": "/compute-engine/reference/logic/",
           "icon": "reference"

@@ -159,6 +159,17 @@ a {
   }
 }
 
+a:has(code) {
+  text-decoration: none;
+  color: var(--link-color);
+}
+
+a:has(code):hover {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+
 /* buttons */
 
 button:focus {

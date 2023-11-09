@@ -62,10 +62,11 @@
           <h4 class="page__meta-title">{{ site.data.ui-text[site.locale].meta_label }}</h4>
         {% endif %}
         {% include page__taxonomy.html %}
-        {% if last_modified_at %}
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong>{{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ last_modified_at | date: '%Y-%m-%d' }}">{{ last_modified_at | date: "%B %d, %Y" }}</time></p>
+        {% if page.last_modified_at %}
+        <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong>Updated:</strong> <time datetime='{{ page.last_modified_at | date: "%Y-%m-%d" }}'>{{ page.last_modified_at | date: "%B %d, %Y" }}</time></p>
+        <!-- <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong>{{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime='{{ page.last_modified_at | date: "%Y-%m-%d" }}'>{{ page.last_modified_at | date: "%B %d, %Y" }}</time></p> -->
         {% elsif date %}
-          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong> {{ site.data.ui-text[site.locale].date_label | default: "Updated" }}</strong> <time datetime="{{ date | '%Y-%m-%d' }}">{{ date | date: "%B %d, %Y" }}</time></p>
+          <p class="page__date"><svg class="icon1quarterem"><use role="none" xlink:href="/assets/icons.svg#calendar-days"/></svg><strong>Updated: </strong> <time datetime='{{ date | date: "%Y-%m-%d" }}' >{{ date | date: "%B %d, %Y" }}</time></p>
         {% endif %}
       </footer>
 

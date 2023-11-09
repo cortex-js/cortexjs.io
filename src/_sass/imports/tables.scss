@@ -43,9 +43,22 @@
 // List of symbols: Narrow first column
 .symbols-table table {
   table-layout: auto;
+  tr th {
+    overflow: visible;
+    max-width: var(--first-col-width, 15ex);
+  }
   tr td:first-child {
     min-width: var(--first-col-width, 15ex);
+    width: var(--first-col-width, 15ex);
+    max-width: var(--first-col-width, 15ex);
   }
+
+  tr td {
+    min-width: fit-content;
+    width: fit-content;
+    max-width: fit-content;
+  }
+
 
 
   // Used by the list of dictionaries table (in the intro page and elsewhere)

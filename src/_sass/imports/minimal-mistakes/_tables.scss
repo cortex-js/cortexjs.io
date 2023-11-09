@@ -4,7 +4,10 @@
 
 
 table {
-  width: 100%;
+  table-layout: auto;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
   margin-bottom: 3em;
   word-wrap: normal;
   // table-layout: fixed;
@@ -31,6 +34,7 @@ table {
         padding: 3px 1em 3px 0;
         vertical-align: bottom;
         text-align: left;
+        line-height: 1.1;
       }
     }
   }
@@ -48,6 +52,11 @@ table {
       line-height: 1.5em;
       padding: .5em 1em .5em 0;
       vertical-align: top;
+      width: fit-content;
+    }
+
+    td:last-child {
+      width: max-content;
     }
   }
 }

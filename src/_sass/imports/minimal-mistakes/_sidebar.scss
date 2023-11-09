@@ -122,8 +122,8 @@
     margin-top: 1rem;
 
     overflow-y: auto;
-    width: 380px;
-    height: calc(100vh - 2em);
+    min-width: fit-content;
+    height: calc(100vh - 1rem);
     }  
 }
 
