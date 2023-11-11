@@ -13,12 +13,16 @@
 			"url": "/cortex/"
 		},
 		{
-			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Discussion Forum</title><use xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
+			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Gitter Forum</title><use xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
 			"url": "/forum/"
 		},
 		{
 			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Discord</title><use xlink:href=\"/assets/icons.svg#discord\"></use></svg>",
 			"url": "https://discord.gg/yhmvVeJ4Hd"
+		},
+		{
+			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>ChatGPT Assistant</title><use xlink:href=\"/assets/icons.svg#openai\"></use></svg>",
+			"url": "https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant"
 		},
 		{
 			"title": "<svg class=\"icon1quarterem\" role=\"img\"><title>GitHub</title><use xlink:href=\"/assets/icons.svg#github\"></use></svg>",
@@ -411,7 +415,7 @@
           "icon": "github"
 				},
 				{
-					"title": "Discussion Forum",
+					"title": "Gitter Forum",
 					"url": "/forum/",
           "icon": "gitter"
 				},
@@ -419,6 +423,11 @@
 					"title": "Discord",
 					"url": "https://discord.gg/yhmvVeJ4Hd",
           "icon": "discord"
+				},
+				{
+					"title": "ChatGPT Assistant",
+					"url": "https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant",
+          "icon": "openai"
 				},
 				{
 					"title": "Reporting Issues",

@@ -71,7 +71,7 @@
                 "url": "https://github.com/cortex-js"
             },
             {
-              "label": "Discussion Forum",
+              "label": "Gitter Forum",
               "icon": "<svg class=\"icon1quarterem\"><use role=\"none\" xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
               "url": "/forum/"
             },
@@ -79,6 +79,11 @@
               "label": "Discord",
               "icon": "<svg class=\"icon1quarterem\"><use role=\"none\" xlink:href=\"/assets/icons.svg#discord\"></use></svg>",
               "url": "https://discord.gg/yhmvVeJ4Hd"
+            },
+            {
+              "label": "AI Assistant",
+              "icon": "<svg class=\"icon1quarterem\"><use role=\"none\" xlink:href=\"/assets/icons.svg#openai\"></use></svg>",
+              "url": "https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant"
             }
         ],
         "pages": [

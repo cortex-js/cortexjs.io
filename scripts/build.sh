@@ -58,6 +58,10 @@ then
   # npm --prefix ./submodules/compute-engine run build
   npx grok build ./submodules/compute-engine/ --inFile ./src/compute-engine.ts --config ./grok.config.js --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
 
+  # Copy the MathLive and Compute Engine HTML files to the build directory, needed for the knowledge base
+  cp ./src/build/mathlive.html ./build/mathlive.html 2>/dev/null  || :
+  cp ./src/build/compute-engine.html ./build/compute-engine.html 2>/dev/null  || :
+
   echo -e "$BASENAME$CHECK Groked"
 
   # Copy the ChangeLogs
