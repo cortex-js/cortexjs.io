@@ -630,6 +630,32 @@ default layouts can fit. The height of the container element will be
 adjusted so that the virtual keyboard can fit. {.notice--warning}
 
 
+## Reacting to the Virtual Keyboard Geometry Changes
+
+The virtual keyboard panel is positioned relative to the container element
+using the `position: absolute` CSS property. This means that the virtual
+keyboard panel will not affect the layout of the container element.
+
+However, the container element may need to adjust its layout to make room
+for the virtual keyboard panel. For example, if the container element is
+a full screen element, it may need to adjust its height to make room for
+the virtual keyboard panel.
+
+**To react to the geometry changes of the virtual keyboard panel**, listen
+to the `"geometrychange"` event on the `mathVirtualKeyboard` object.
+
+The bounding rectangle of the virtual keyboard is available in the
+`mathVirtualKeyboard.boundingRect` property.
+
+For example, to adjust the height of the container element to make room
+for the virtual keyboard panel:
+
+```js
+mathVirtualKeyboard.addEventListener("geometrychange", () => {
+  container.style.height = mathVirtualKeyboard.boundingRect.height + "px";
+});
+```
+
 
 
 ## Customizing the Alphabetical Layout
