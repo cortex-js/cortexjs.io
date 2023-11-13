@@ -48,19 +48,19 @@ then
   ## Grok (.d.ts -> .html with frontmatter)
   # Uses grok.config.js for additional config option
 
-  echo -e "$BASENAME$DOT Groking MathLive"
-  npx grok build ../mathlive --inFile ./src/mathlive.ts --config ./grok.config.js --sdkName mathlive --outDir ./src/build/ --outFile mathlive.html
+  # echo -e "$BASENAME$DOT Groking MathLive"
+  # npx grok build ../mathlive --inFile ./src/mathlive.ts --config ./grok.config.js --sdkName mathlive --outDir ./src/build/ --outFile mathlive.html
 
   # echo -e "$BASENAME$DOT Groking MathJSON"
   # npx grok  ./submodules/compute-engine/src/latex-syntax/public.ts --sdkName math-json --outDir ./src/build/ --outFile math-json.html
 
   echo -e "$BASENAME$DOT Groking Compute Engine"
   # npm --prefix ./submodules/compute-engine run build
-  npx grok build ./submodules/compute-engine/ --inFile ./src/compute-engine.ts --config ./grok.config.js --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
+  # npx grok build ./submodules/compute-engine/ --inFile ./src/compute-engine.ts --config ./grok.config.js --sdkName compute-engine --outDir ./src/build/ --outFile compute-engine.html
 
   # Copy the MathLive and Compute Engine HTML files to the build directory, needed for the knowledge base
-  cp ./src/build/mathlive.html ./build/mathlive.html 2>/dev/null  || :
-  cp ./src/build/compute-engine.html ./build/compute-engine.html 2>/dev/null  || :
+  # cp ./src/build/mathlive.html ./build/mathlive.html 2>/dev/null  || :
+  # cp ./src/build/compute-engine.html ./build/compute-engine.html 2>/dev/null  || :
 
   echo -e "$BASENAME$CHECK Groked"
 
@@ -105,6 +105,75 @@ then
     #     --input-dir "./submodules/cortex-js.github.io/" \
     #     --output-dir "./submodules/cortex-js.github.io/"
     postcss --config "./config" --replace "./submodules/cortex-js.github.io/**/*.css"
-    echo -e "$LINECLEAR$BASENAME$CHECK Completed build"
 
+    echo -e "$LINECLEAR$BASENAME$DOT Building Knowledge Base"
+
+    # Build the knowledge base
+
+    current_dir=$(pwd)
+
+    output_file="./build/kb-compute-engine.md"
+    pattern='./submodules/compute-engine/src/docs/*.md'
+
+    if [ -f "$output_file" ]; then
+        rm "$output_file"
+    fi
+
+    touch "$output_file"
+
+    while IFS= read -r -d '' file; do
+        echo "Processing $file"
+        cat "$file" >> "$output_file"
+    done < <(find $(dirname "$pattern") -name "$(basename "$pattern")" -print0)
+
+
+    output_file="./build/kb-compute-engineapi.d.ts"
+    pattern='./submodules/compute-engine/dist/types/**/*.d.ts'
+
+    if [ -f "$output_file" ]; then
+        rm "$output_file"
+    fi
+
+    touch "$output_file"
+
+    while IFS= read -r -d '' file; do
+        echo "Processing $file"
+        cat "$file" >> "$output_file"
+    done < <(find $(dirname "$pattern") -name "$(basename "$pattern")" -print0)
+
+
+    output_file="./build/kb-mathlive.md"
+    pattern='./src/_pages/*.md'
+
+    if [ -f "$output_file" ]; then
+        rm "$output_file"
+    fi
+
+    touch "$output_file"
+
+    while IFS= read -r -d '' file; do
+        echo "Processing $file"
+        cat "$file" >> "$output_file"
+    done < <(find $(dirname "$pattern") -name "$(basename "$pattern")" -print0)
+
+
+    output_file="./build/kb-mathlive-api.d.ts"
+    pattern="$(dirname "$current_dir")/mathlive/dist/types/**/*.d.ts"
+
+    if [ -f "$output_file" ]; then
+        rm "$output_file"
+    fi
+
+    touch "$output_file"
+
+    while IFS= read -r -d '' file; do
+        echo "Processing $file"
+        cat "$file" >> "$output_file"
+    done < <(find $(dirname "$pattern") -name "$(basename "$pattern")" -print0)
+
+
+
+    echo -e "$BASENAME$CHECK Knowledge Base built"
+
+    echo -e "$LINECLEAR$BASENAME$CHECK Completed build"
 fi

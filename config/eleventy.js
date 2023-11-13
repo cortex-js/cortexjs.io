@@ -188,35 +188,6 @@ module.exports = function (eleventyConfig) {
   // );
   // eleventyConfig.addWatchTarget('./src/_sass/**/*.{js,scss}');
 
-  //
-  // Create a collection to use as a knowledge base
-  //
-  let kbCollection = [];
-
-  eleventyConfig.addCollection('kb', (collection) => {
-    kbCollection = collection.getFilteredByGlob([
-      './src/_pages/*.md',
-      './src/build/mathlive/**/*.md',
-      './src/build/compute-engine/**/*.md',
-      './build/**/*.html',
-    ]);
-
-    console.log('########', kbCollection.map((x) => x.inputPath).join('\n'));
-
-    return kbCollection;
-  });
-
-  eleventyConfig.on('afterBuild', () => {
-    let combinedContent = '';
-
-    kbCollection.forEach((doc) => {
-      const content = fs.readFileSync(doc.inputPath, 'utf8');
-      combinedContent += content + '\n\n'; // Append each file's content
-    });
-
-    fs.writeFileSync('./build/kb.md', combinedContent);
-  });
-
   return {
     passtroughFileCopy: true,
     dir: {
