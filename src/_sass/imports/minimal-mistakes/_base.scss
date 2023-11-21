@@ -302,6 +302,15 @@ div.defs .def {
 
 
 div.latex {
+  &.column {
+    column-count: 2;
+    gap: 1em;
+    .display {
+      display: flex;
+      justify-content: center;
+      background: transparent;
+    }
+  }
   margin-top: 1em;
   margin-bottom: 1em;
   border-left: 3px solid var(--blue-200);
@@ -315,6 +324,9 @@ div.latex {
     color: var(--blue-900);
     font-size: 1.1rem;
     line-height: 1.4;
+    overflow: overlay;
+    word-wrap: break-word;
+    white-space: pre;
   }
   .display {
     padding-top: .5em;

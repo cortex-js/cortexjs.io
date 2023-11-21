@@ -376,9 +376,10 @@ module.exports = {
   documentTemplate: (substitutions) => `---
 permalink: "/docs/${substitutions.sdkName}/"
 title: "${
-    { 'mathlive': 'MathLive', 'compute-engine': 'Compute Engine' }[
-      substitutions.sdkName
-    ] ?? substitutions.sdkName
+    {
+      'mathlive': 'MathLive API Reference',
+      'compute-engine': 'Compute Engine API Reference',
+    }[substitutions.sdkName] ?? substitutions.sdkName
   }"
 chapter: ${substitutions.sdkName}
 read_time: false
@@ -435,20 +436,24 @@ sidebar:
 <section id="all-content">${substitutions.content}</section>
 <div>Documentation built with <a href="https://github.com/ui-js/grok"><code>grok</code></a></div>
 <script type="module">
-window.addEventListener('DOMContentLoaded', (event) => {
-  import('https://unpkg.com/mathlive?module').then((mathlive) => {  
-    mathlive.renderMathInDocument(document.getElementsByClassName('page__content')[0], { 
+window.addEventListener('DOMContentLoaded', () => {
+  const renderOptions = {
     renderAccessibleContent: false,
-    TeX: { 
+    TeX: {
       delimiters: {
         inline: [['\\\\(', '\\\\)']],
-        display: [ ['$$', '$$'], ['\\\\[', '\\\\]']],
+        display: [
+          ['$$', '$$'],
+          ['\\\\[', '\\\\]'],
+        ],
       },
-      processEnvironments : false 
+      processEnvironments: false,
     },
     asciiMath: null,
-  });
-})});
+  };
+  const page = document.getElementsByClassName('page__content')[0];
+  mathlive.renderMathInDocument(page, renderOptions);
+});
 </script>
 `,
 };

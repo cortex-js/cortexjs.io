@@ -631,8 +631,8 @@ Read more about definining your own **keybindings** and **shortcuts**.
 | <kbd>⇟</kbd> |<kbd>⌃</kbd>+<kbd>⇢</kbd> | move to group end |
 | <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>⇠</kbd> | extend selection to group start |
 | <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>⇢</kbd> | extend selection to group end |
-| <kbd>space</kbd> | move after parent |
-| <kbd>⇧</kbd>+<kbd>space</kbd> | move before parent |
+| <kbd>SPACE</kbd> | move after parent |
+| <kbd>⇧</kbd>+<kbd>SPACE</kbd> | move before parent |
 | <span class="if-apple"><kbd>⌃</kbd>+<kbd>A</kbd></span> |<kbd>⤒</kbd> | <kbd>⌘</kbd>+<kbd>⇠</kbd> | move to mathfield start |
 | <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>A</kbd></span> | <kbd>⇧</kbd>+<kbd>⤒</kbd> | <kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>⇠</kbd> | extend selection to mathfield start |
 | <span class="if-apple"><kbd>⌃</kbd>+<kbd>E</kbd></span> | <kbd>⤓</kbd> | <kbd>⌘</kbd>+<kbd>⇢</kbd> |move to mathfield end |
@@ -640,8 +640,8 @@ Read more about definining your own **keybindings** and **shortcuts**.
 | <kbd>⌃</kbd>+<kbd>5</kbd> | move to opposite <aside>superscript/subscript, upper/lower</aside> |
 | <kbd>⌃</kbd>+<kbd>6</kbd> | move to superscript/upper |
 | <kbd>⌃</kbd>+<kbd>-</kbd> | move to subscript/lower |
-| <kbd>esc</kbd> | finish |
-| <kbd>⇧</kbd>+<kbd>esc</kbd> | reject |
+| <kbd>ESC</kbd> | finish |
+| <kbd>⇧</kbd>+<kbd>ESC</kbd> | reject |
 | <kbd>⇥</kbd> | accept suggestion |
 | <kbd>⌤</kbd> | <kbd>⏎</kbd> | complete |
 | <kbd>⌃</kbd>+<kbd>A</kbd> | <span class="if-apple"><kbd>⌘</kbd>+<kbd>A</kbd></span> | select all |
@@ -649,10 +649,11 @@ Read more about definining your own **keybindings** and **shortcuts**.
 | <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Z</kbd></span> | <kbd>⇧</kbd>+<kbd>⌃</kbd>+<kbd>Z</kbd> | <kbd>⌃</kbd>+<kbd>Y</kbd> | <span class="if-apple"><kbd>⇧</kbd>+<kbd>⌘</kbd>+<kbd>Y</kbd></span> | redo |
 | <span class="if-apple"><kbd>⌃</kbd>+<kbd>L</kbd></span> | scroll into view |
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>K</kbd> | toggle keystroke caption |
-| <kbd>⌥</kbd>+<kbd>space</kbd> | toggle virtual keyboard |
+| <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>SPACE</kbd> | toggle virtual keyboard |
+| <kbd>⌥</kbd>+<kbd>SPACE</kbd> | show context menu |
 | <kbd>⌥</kbd>+<kbd>=</kbd> | apply text mode |
 | <kbd>⇧</kbd>+<kbd>⌥</kbd>+<kbd>T</kbd> | toggle math/text mode |
-| <kbd>esc</kbd> | enter/exit LaTeX mode |
+| <kbd>ESC</kbd> | enter/exit LaTeX mode |
 | <kbd>\\</kbd> | enter LaTeX mode |
 | <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇡</kbd> | speak parent |
 | <kbd>⌥</kbd>+<kbd>⌃</kbd>+<kbd>⇣</kbd> | speak all |

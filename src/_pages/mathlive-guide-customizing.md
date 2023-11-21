@@ -418,7 +418,7 @@ mf.mathModeSpace = '\\:';
 
 ## Turning off the LaTeX mode
 
-Pressing the `\` (backslash) or `ESC` key switches to the LaTeX mode where it 
+Pressing the <kbd>\\</kbd> (backslash) or <kbd>ESC</kbd> key switches to the LaTeX mode where it 
 is possible to enter raw LaTeX command. For users familiar with LaTeX, it is
 a powerful way to enter or edit LaTeX in an expression. However, users
 unfamiliar with LaTeX may be confused if they accidentally press those keys.
@@ -482,7 +482,7 @@ between using a dot `.` or a comma `,` as a decimal marker.
 **To change the marker used with decimal numbers** set the 
 `MathfieldElement.decimalSeparator` property to `","` or `"."`.
 
-When set to `","`, pressing the `,` key on a physical keyboard will insert a 
+When set to `","`, pressing the <kbd>,</kbd> key on a physical keyboard will insert a 
 `{,}` LaTeX string, if in math mode and if before a digit. 
 
 The LaTeX sequence `{,}` is traditionally used to correctly typeset the comma 

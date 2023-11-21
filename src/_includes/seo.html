@@ -1,11 +1,11 @@
 
 <title>
-    {{ seo_title | default: site.title }}{% if paginator %}{% unless
-    paginator.page == 1 %} {{ title_separator }} {{
+    {{ page.seo_title | default: site.title }}{% if paginator %}{% unless
+    paginator.page == 1 %} {{ site.title_separator }} {{
     site.data.ui-text[site.locale].page | default: "Page" }} {{ paginator.page
     }}{% endunless %}{% endif %}
 </title>
-<meta name="description" content="{{ seo_description }}" />
+<meta name="description" content="{{ page.seo_description | default: site.seo_description }}" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ECEC8YT7XS"></script>
 <script async>
   if(/cortexjs\.io/.test(window.location.hostname)) {

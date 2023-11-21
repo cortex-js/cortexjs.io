@@ -44,8 +44,12 @@ head:
     padding: 8px;
   }
   math-field { 
-    font-size: 24px; border-radius: 8px; 
+    font-size: 24px; 
+    border-radius: 8px; 
     width: 100%;
+    /* The position and z-index are required to prevent some elements (like a readmore) to be displayed on top of elements of the mathfield. That's an issue in particular with the contextmenu which extends outside the boundary of the mathfield */
+    position: relative;
+    z-index: 1;
   } 
   /* math-field:focus-within {
     outline: Highlight auto 1px;

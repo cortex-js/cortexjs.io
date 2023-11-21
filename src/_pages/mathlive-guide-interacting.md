@@ -77,7 +77,7 @@ just like with a `<textarea>`.
 an `"input"` event.
 
 **Try**: modify the `"input"` event below to a `"change"` event. Notice how the `"change"` event
-is only sent if you press the **Return** or **Enter** key, or when the mathfield
+is only sent if you press the <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key, or when the mathfield
 loses focus and the content has been modified. {.notice--info}
 
 <code-playground layout="stack">
@@ -222,7 +222,7 @@ to be dispatched.
 | `inputType` | |
 |:-- | :-- |
 | `insertText` | Some content was added. It could be math content, plain text or raw latex. It could also be a row or column in matrix that was added. |
-| `insertLineBreak` | The **Enter** or **Return** key was pressed. Note that the actual content of the mathfield may not have changed. |
+| `insertLineBreak` | The <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key was pressed. Note that the actual content of the mathfield may not have changed. |
 | `insertFromPaste`| The content of the mathfield was changed because of a paste operation |
 | `deleteWordBackward`|  |
 | `deleteWordForward`|  |
@@ -252,7 +252,7 @@ and a `input` event is dispatched. The `input` event is not cancelable.
 
 ## Detecting When the User has Finished Editing a Mathfield
 
-**To detect when the user presses the **Return** or **Enter** key in a mathfield**,
+**To detect when the user presses the <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key in a mathfield**,
 listen for the `change` event. 
 
 Note that this event is not fired when in LaTeX editing mode, where **Return** 
@@ -261,7 +261,7 @@ or **Enter** is used to exit the mode.
 This event is also fired if the mathfield loses focus, even if the user did not 
 use the keyboard. This behavior matches the `<textarea>` element.
 
-**To listen specifically for a press of the **Return** or **Enter** key on the 
+**To listen specifically for a press of the <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key on the 
 keyboard** listen for an `input` event with an `inputType` 
 (or `ev.data` on iOS) property of `"insertLineBreak"`.
 
@@ -292,11 +292,11 @@ mathfield (that is, the `evt.target` will be the mathfield itself).
 
 This include the following standard events:
 
-- `change`: **Return** or **Enter** key was pressed, or the field lost focus.
+- `change`: the <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key was pressed, or the field lost focus.
 - `blur`, `focus`, `focusin`, `focusout`
 - `click`
 - `mousedown`, `mouseup`, `mousemove`, `mouseout, `mouseover`
-- `beforeinput`, `input`. If the `inputType` property of the event is `"insertLineBreak"` the **Return** or **Enter** key was pressed
+- `beforeinput`, `input`. If the `inputType` property of the event is `"insertLineBreak"` the <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key was pressed
 - `keydown`, `keypress`, `keyup`
 - `wheel`
 - all the [pointer events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events) such as `pointerdown`, `pointerup`, etc... and all the touch events
@@ -315,10 +315,10 @@ As well as these mathfield specific events:
 
 A user may navigate outside of a mathfield by pressing the arrow keys, or the tab, home and end keys.
 
-By default, the mathfield reacts as a standard textarea field: moving to the next focusable element when the tab (or shift-tab) key is pressed, and
+By default, the mathfield reacts as a standard textarea field: moving to the next focusable element when the <kbd>TAB</kbd> (or <kbd>SHIFT+TAB</kbd>) key is pressed, and
 doing nothing when reaching the start or end of the mathfield when navigation with the arrow keys.
 
-In some cases, you may want to implement a different behavior. For example if a mathfield is embedded inside an editable paragraph, you may want the arrow keys to exit the mathfield when reaching the end/start. Or you may want the tab key to simply move the caret to the end/start of the mathfield.
+In some cases, you may want to implement a different behavior. For example if a mathfield is embedded inside an editable paragraph, you may want the arrow keys to exit the mathfield when reaching the end/start. Or you may want the <KBD>TAB</kbd> key to simply move the caret to the end/start of the mathfield.
 
 **To change the behavior of a mathfield when navigation out of a mathfield** listen
 for the `focus-out` and `move-out` events.

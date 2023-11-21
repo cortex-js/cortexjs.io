@@ -159,6 +159,14 @@ module.exports = function (eleventyConfig) {
     return `<div class='latex'><div class="source">${content}</div><div class="display">\\[ ${content} \\]</div></div>`;
   });
 
+  // eleventyConfig.addShortcode('latex-col', (content) => {
+  //   return `<div class='latex column'><div class="source">${content}</div><div class="display">\\[ ${content} \\]</div></div>`;
+  // });
+
+  eleventyConfig.addPairedLiquidShortcode('latex-col', (content) => {
+    return `<div class='latex column'><div class="source">${content.trim()}</div><div class="display">\\[ ${content} \\]</div></div>`;
+  });
+
   eleventyConfig.addPairedLiquidShortcode('readmore', (content, url) => {
     return `<div class='read-more'><a href="${url}">${md.renderInline(
       content

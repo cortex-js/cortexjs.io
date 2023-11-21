@@ -166,7 +166,7 @@ If you know the shape of a symbol, use <strong>Detexify</strong> to find the
 name of the corresponding LaTeX command
 {% endreadmore %}
 
-**To enter a LaTeX command** press the **ESC** key or `\`  to enter LaTeX editing
+**To enter a LaTeX command** press the <kbd>ESC</kbd> key or <kbd>\\</kbd>  to enter LaTeX editing
 mode. Press **ESC** to exit LaTeX editing mode. You can examine the LaTeX 
 code for an expression by selecting it, then pressing **ESC**.
 
@@ -1268,6 +1268,43 @@ following commands.
 {.command-list}
 
 
+## St Mary's Road Symbols for Theoretical Computer Science
+
+  * <span class='math'>$$\mapsfrom $$</span>   `\mapsfrom`
+  * <span class='math'>$$\Mapsfrom $$</span>   `\Mapsfrom`
+  * <span class='math'>$$\MapsTo $$</span>   `\MapsTo`
+  * <span class='math'>$$\Yup $$</span>   `\Yup`
+  * <span class='math'>$$\lightning $$</span>   `\lightning`
+  * <span class='math'>$$\leftarrowtriangle $$</span>   `\leftarrowtriangle`
+  * <span class='math'>$$\rightarrowtriangle $$</span>   `\rightarrowtriangle`
+  * <span class='math'>$$\leftrightarrowtriangle $$</span>   `\leftrightarrowtriangle`
+  * <span class='math'>$$\boxdot $$</span>   `\boxdot`
+  * <span class='math'>$$\bigtriangleup $$</span>   `\bigtriangleup`
+  * <span class='math'>$$\bigtriangledown $$</span>   `\bigtriangledown`
+  * <span class='math'>$$\boxbar $$</span>   `\boxbar`
+  * <span class='math'>$$\Lbag $$</span>   `\Lbag`
+  * <span class='math'>$$\Rbag $$</span>   `\Rbag`
+  * <span class='math'>$$\llbracket $$</span>   `\llbracket`
+  * <span class='math'>$$\rrbracket $$</span>   `\rrbracket`
+  * <span class='math'>$$\longmapsfrom $$</span>   `\longmapsfrom`
+  * <span class='math'>$$\Longmapsfrom $$</span>   `\Longmapsfrom`
+  * <span class='math'>$$\Longmapsto $$</span>   `\Longmapsto`
+  * <span class='math'>$$\boxslash $$</span>   `\boxslash`
+  * <span class='math'>$$\boxbslash $$</span>   `\boxbslash`
+  * <span class='math'>$$\boxast $$</span>   `\boxast`
+  * <span class='math'>$$\boxcircle $$</span>   `\boxcircle`
+  * <span class='math'>$$\boxbox $$</span>   `\boxbox`
+  * <span class='math'>$$\fatsemi $$</span>   `\fatsemi`
+  * <span class='math'>$$\leftslice $$</span>   `\leftslice`
+  * <span class='math'>$$\rightslice $$</span>   `\rightslice`
+  * <span class='math'>$$\interleave $$</span>   `\interleave`
+  * <span class='math'>$$\biginterleave $$</span>   `\biginterleave`
+  * <span class='math'>$$\sslash $$</span>   `\sslash`
+  * <span class='math'>$$\talloblong $$</span>   `\talloblong`
+
+  {.command-list}
+
+
 ## Layout
 
 These commands change the amount of space around a symbol: `\mathop{}`
@@ -2346,6 +2383,7 @@ the `registers` option.
 | :--- |  :--- |
 | `arrayrulewidth` | Width of separator lines in array environments |
 | `arraycolsep` | Amount of space between separator lines |
+| `arraystretch` | Stretch factor between rows in an environment |
 | `delimitershortfall` | |
 | `doublerulesep` | Amount of space between adjacent separator lines |
 | `jot` | Vertical space between the lines for all math expressions which allow multiple lines |
@@ -2373,9 +2411,9 @@ TeX packages or macros.
 | `\relax` | | 
 | `\noexpand` | | 
 | `\obeyspaces` | In Math Mode, spaces are normally ignored. Using this command spaces will be preserved even in Math Mode. |
-| `\bgroup` <br> `\egroup` | |
+| `\bgroup` <br> `\egroup` | Begin/End group, synonym for open/close brace |
 | `\string` | | 
-| `\csname` <br> `\endcsname` | | 
+| `\csname` <br> `\endcsname` | Turn the next tokens, until `\endcsname`, into a command | 
 | `\ensuremath{}` | If in Math Mode, does nothing. Otherwise, switch to Math Mode. |
 
 </div>

@@ -103,7 +103,6 @@ a.chevron::after {
   box-shadow: var(--callout-shadow);
   border: 1px solid var(--callout-border-color);
   transition: box-shadow,transform,border .16s ease-out,-webkit-transform .16s ease-out;
-  will-change: box-shadow,transform,border;
 }
 
 /* The body of a read-more is a <a> tag */
@@ -144,6 +143,9 @@ math-field {
   border-radius: 8px;
   color: var(--text-color);
   background: var(--ui-background);
+  /* The position and z-index are required to prevent some elements (like a readmore) to be displayed on top of elements of the mathfield. That's an issue in particular with the contextmenu which extends outside the boundary of the mathfield */
+  position: relative;
+  z-index: 1;
 }
 
 

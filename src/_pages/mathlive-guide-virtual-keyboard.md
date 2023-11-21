@@ -304,7 +304,7 @@ defined (see below about the `style` layer property), or be one or more of the
 - `aside`: an optional small label displayed below the keycap. This label
   may not be displayed if the space available is too small.
 - `shift`: a LaTeX string or a keycap record indicating what happens when 
-  this keycap is pressed with the shift key down.
+  this keycap is pressed with the <kbd>SHIFT</kbd> key down.
 - `variants`: an array of keycaps (either as string or keycap records) defining
   the variants for this keycap (see below).
 

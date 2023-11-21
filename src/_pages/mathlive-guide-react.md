@@ -44,8 +44,48 @@ function App() {
 }
 
 export default App;
-
 ```
+
+## Using MathLive with React and TypeScript
+
+**To use a mathfield with React and TypeScript**, you need to add TypeScript definitions for MathLive.
+
+```jsx
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'math-field': React.DetailedHTMLProps<React.HTMLAttributes<MathfieldElement>, MathfieldElement>;
+    }
+  }
+}
+
+
+import "./App.css";
+import "//unpkg.com/mathlive";
+import { useState } from "react";
+
+function App() {
+  const [value, setValue] = useState<string>("");
+
+  return (
+    <div className="App">
+      <math-field 
+        onInput={
+          (evt: React.ChangeEvent<HTMLElement>) => 
+            setValue(evt.target.value)
+        }
+      >
+        {value}
+      </math-field>
+      <p>Value: {value}</p>
+    </div>
+  );
+}
+
+export default App;
+```
+
+
 
 ## Theory of Operations
 
@@ -71,7 +111,8 @@ import "//unpkg.com/mathlive";
 import { useState, useEffect, useRef } from "react";
 
 function App() {
-  // Get a ref to the mathfield element (see `ref={mf}` in the markup below)
+  // Get a ref to the mathfield element 
+  // (see `ref={mf}` in the markup below)
   const mf = useRef();
 
   // Customize the mathfield when it is created
@@ -102,7 +143,6 @@ function App() {
 }
 
 export default App;
-
 ```
 
 

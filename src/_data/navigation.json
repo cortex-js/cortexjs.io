@@ -48,6 +48,11 @@
 					"url": "/mathlive/virtual-keyboard/",
           "icon": "reference"
 				},
+				{
+					"title": "Using the Matrix Editor",
+					"url": "/mathlive/matrix/",
+          "icon": "reference"
+				},
         {
 					"title": "LaTeX Commands",
 					"url": "/mathlive/reference/commands/",
@@ -118,6 +123,11 @@
 				{
 					"title": "Display Static Math",
 					"url": "/mathlive/guides/static/",
+          "icon": "guide"
+				},
+				{
+					"title": "Menus",
+					"url": "/mathlive/guides/menus/",
           "icon": "guide"
 				},
 				{

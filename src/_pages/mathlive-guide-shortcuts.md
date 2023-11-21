@@ -77,7 +77,7 @@ This section details how MathLive uses keyboard events to determine which
 keyboard shortcut to activate.
 
 
-Let's consider the keyboard shortcut <kbd>Control/⌘</kbd>+<kbd>Alt/Option</kbd>+<kbd>A</kbd>
+Let's consider the keyboard shortcut <kbd>CONTROL/⌘</kbd>+<kbd>ALT/OPTION</kbd>+<kbd>A</kbd>
 
 When this key combination is pressed on a keyboard with a US keyboard 
 layout, the event received will have the properties `code = "KeyA"` and  `key = "\u00e5"`.
@@ -105,7 +105,7 @@ However, if we know the keyboard layout, we can use a table that maps the value
 of the key field to infer the label of the key  the user pressed, i.e. what the
 user sees printed on the top of the key cap, regardless of its physical location
 on the keyboard. Once we have the label, we can figure out that the user pressed
-<kbd>Control/Command/⌘</kbd> + <kbd>A</kbd> using the modifier fields of the event.
+<kbd>CONTROL/COMMAND/⌘</kbd> + <kbd>A</kbd> using the modifier fields of the event.
 
 But how do we know what is the current keyboard layout? There is unfortunately
 no web platform API (broadly supported) to obtain that information. 

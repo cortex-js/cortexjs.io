@@ -50,8 +50,8 @@ with their corresponding keybindings: <kbd>Ctrl/Command</kbd>+<kbd>Z</kbd>,
 Press the **Shift Key** <kbd>⇧</kbd> to access alternative symbols. The 
 keyboard updates when the key is pressed to reveal the symbols.
 
-If you have a physical keyboard, you can also press the <kbd>shift</kbd> or 
-<kbd>capslock</kbd> key on the physical keyboard.
+If you have a physical keyboard, you can also press the <kbd>SHIFT</kbd> or 
+<kbd>CAPSLOCK</kbd> key on the physical keyboard.
 
 The symbol corresponding to the shifted variant is displayed
 in the top right corner of some keys. Some keys have a shifted variant even

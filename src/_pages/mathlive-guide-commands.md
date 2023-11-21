@@ -86,7 +86,7 @@ Commands can also be associated with virtual keyboard keycaps.
 ## User Interface
 
 - `commit` The user has completed input. Triggered when pressing the **Return**
-or **Enter** key.
+or <kbd>ENTER</kbd> key.
 - `switchMode`
 - `complete` Exit command mode and insert result
 - `nextSuggestion` and `previousSuggestion` when the popover panel is selected,
