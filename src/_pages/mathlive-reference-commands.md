@@ -2128,14 +2128,12 @@ An array, a matrix without delimiters.
 
 A matrix typeset in a way that may be suitable on the same line as text.
 
-{% latex "" %}
-
 <div class='side-by-side'>
 
 <div class='math frame'>$$\begin{smallmatrix}a & b \\\\ c & \frac{1}{d}\end{smallmatrix}$$</div>
 
 ```tex
-\begin{smallmatrix}a & b \\ c & \frac{1}{d}\end{smallmatrix}
+\begin{smallmatrix} a & b \\ c & \frac{1}{d} \end{smallmatrix}
 ```
 
 </div>

@@ -25,14 +25,34 @@ head:
     };
 ---
 
-User initiated commands that control the mathfield can be dispatched using
-[`executeCommand()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)). 
+You may need to perform some editing operations on the mathfield programmatically.
+For example, you may want to insert a fraction when the user clicks on a button.
+Or you may want some buttons that control the position of the insertion point.
 
-Commands are identified by a string called the **selector**. 
+You can do this by dispatching **commands** to the mathfield, such as 
+`select-all`, `move-to-next-char`, `delete-backward`, etc...
+
+You can dispatch commands using the [`mf.executeCommand()`](/docs/mathlive/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)) method.
 
 ```js
-mf.executeCommand('deleteBackward');
+mf.executeCommand('delete-backward');
 ```
+
+You can also associate commands with virtual keyboard keycaps.
+
+```json example
+{ 
+  "class": "action", 
+  "label": "Delete", 
+  "command": ["perform-with-feedback", "delete-backward"] 
+}
+```
+
+
+Commands are identified by a string called the **selector**.
+
+The selector can use either CamelCase or kebab-case syntax. For example:
+`"moveToNextChar"` or `"move-to-next-char"` are the same selector.
 
 
 Most commands take no parameters. When a command does have a parameter, a tuple 
@@ -40,22 +60,14 @@ with the selector and the commands arguments can be passed to
 `executeCommand()`. For example:
 
 ```js
-mf.executeCommand(['insert', '(#0)']);
+mf.executeCommand(["insert", "(#0)"]);
 ```
 
 The command above will insert an open and close parenthesis around the selection (the `#0`
 sequence is replaced with the current selection).
 
-Commands can also be associated with virtual keyboard keycaps.
 
-```json example
-{ 
-  class: "action", 
-  label: "Next", 
-  command: ["performWithFeedback", "commit"] 
-}
-```
-## Editing
+## Editing Commands
 
 - `insert` This selector takes two arguments. The first one is required and is
   the content to be inserted, as a string. The second one is an optional set of
@@ -73,6 +85,7 @@ Commands can also be associated with virtual keyboard keycaps.
 - `deleteNextWord` `deletePreviousWord`
 - `deleteToGroupStart` `deleteToGroupEnd`
 - `deleteToMathFieldEnd`
+- `deleteAll`
 - `transpose`
 
 ## Edit Menu
@@ -85,7 +98,7 @@ Commands can also be associated with virtual keyboard keycaps.
 
 ## User Interface
 
-- `commit` The user has completed input. Triggered when pressing the **Return**
+- `commit` The user has completed input. Triggered when pressing the <kbd>RETURN</kbd>
 or <kbd>ENTER</kbd> key.
 - `switchMode`
 - `complete` Exit command mode and insert result
@@ -128,10 +141,12 @@ or <kbd>ENTER</kbd> key.
 
 - `addRowAfter` `addRowBefore`
 - `addColumnAfter` `addColumnBefore`
+- `removeRow` `removeColumn`
+
 
 ## Speech
 
-- `speak` This selector takes two optional arguments. The first argument is a string that
+- `speak` This selector takes an optional argument, the string that
   determines what should be spoken. The valid values are:
   - `all`
   - `left`

@@ -1,8 +1,8 @@
 ---
 layout: single
 date: Last Modified
-title: MathLive Context Menu
-permalink: /mathlive/guides/menus/
+title: Menu
+permalink: /mathlive/guides/menu/
 read_time: false
 sidebar:
     - nav: "universal"
@@ -175,16 +175,16 @@ mf.addEventListener('menu-select', (event) => {
 
 **To hide the menu toggle button** use the following CSS:
   
-```css
+```css example
 math-field::part(menu-toggle) {
   display: none;
 }
 ```
 
-When the menu button is hidden, the context menu is still accessible
-with keyboard shortcut, right-click on long press.
+Even if the menu toggle button is hidden, the context menu is still accessible
+with keyboard shortcut, right-click or long press.
 
-**To prevent the menu from being displayed** in any case, set the
+**To prevent the menu from being displayed**, set the
 `mf.menuItems` to an empty array:
 
 ```javascript example

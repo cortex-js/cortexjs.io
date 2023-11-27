@@ -42,6 +42,18 @@ h1 {
   letter-spacing: -3px;
 }
 
+// eyebrow
+h1 em {
+  display: block;
+  font-size: 24px;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  font-weight: 900;
+  opacity: .7;
+}
+
+
 @include breakpoint($small) {
   h1 {
     font-size: 5rem;
@@ -200,7 +212,6 @@ section pre {
 
   font-size: 1.1rem;
   line-height: 1.4;
-  user-select: all;
   code {
     border-radius: 8px;
   }
@@ -226,6 +237,7 @@ section pre::after {
     transparent 1px,
     transparent 2px
   );
+  pointer-events: none;
 }
 
 
