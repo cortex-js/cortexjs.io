@@ -129,8 +129,9 @@ If you want a more strict comparison, you can use the non-canonical form
 of the answer, i.e. 
 
 ```js example
-const answer = ce.parse(mf.getPromptValue("answer"), {canonical: false});
-const correctAnswer = ce.parse("x^2 - 1", {canonical: false});
+const answer = ce.parse(
+    mf.getPromptValue("answer"), { canonical: false });
+const correctAnswer = ce.parse("x^2 - 1", { canonical: false });
 ```
 
 {% readmore "/compute-engine/guides/symbolic-computing/#comparing-expressions" %}

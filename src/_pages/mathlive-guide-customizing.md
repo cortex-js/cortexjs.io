@@ -77,7 +77,7 @@ Alternatively you can set these CSS variables programatically:
 document.body.style.setProperty("--smart-fence-color", "red");
 ```
 
-<div class='symbols-table' style='--first-col-width:25ex'>
+<div class='symbols-table' style='--first-col-width:25ch'>
 
 | CSS Variable | Usage |
 |:---|:---|
@@ -129,32 +129,6 @@ Read more about [customizing the virtual keyboard appearance](https://cortexjs.i
 
 
 
-## Focus Ring
-
-**To change the appearance of the focus ring**, use the `:focus-within` pseudo-element.
-
-<!-- htmlmin:ignore -->
-<code-playground layout="stack" >
-    <pre slot="html">&lt;style&gt;
-  math-field:focus-within {
-    outline: 4px solid #d7170b;
-    border-radius: 4px;
-    background: rgba(251,	187,	182, .1);
-  }
-&lt;/style&gt;
-&lt;math-field&gt;
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-&lt;/math-field&gt;</pre>
-</code-playground>
-<!-- htmlmin:ignore -->
-
-**Caution** Removing outlines in CSS creates issues for people navigating the web 
-with a keyboard. However, you can change the appearance of the outline,
-for example to indicate an error condition. If you remove the outline on the
-mathfield, make sure to replace it with another indicator, for example
-by displaying an outline on an enclosing element.  {.notice--warning}
-
-
 ## MathLive Parts
 
 Because the mathfield is a custom element with a shadow DOM, it is not possible
@@ -163,13 +137,14 @@ to style its children using CSS selectors.
 However, there are a few parts that can be used to style the 
 content of the mathfield using the `::part()` pseudo-element.
 
-<div class='symbols-table' style='--first-col-width:25ex'>
+<div class='symbols-table' style='--first-col-width:22ch'>
 
 | Pseudo-element | Usage |
 |:---|:---|
 | `virtual-keyboard-toggle` | The virtual keyboard toggle button |
+| `menu-toggle` | The menu toggle button |
 | `content` | The math formula |
-| `container` | The element containing the formula and keyboard toggle |
+| `container` | The element containing the formula, the keyboard toggle and the menu toggle |
 | `keyboard-sink` | The hidden element capturing the physical keyboard input |
 | `prompt` | The prompts (`placeholder{}`) inside the mathfield |
 
@@ -177,20 +152,31 @@ content of the mathfield using the `::part()` pseudo-element.
 
 For example:
 
-```css
+```css example
 /* Right align the formula */
 math-field::part(content) {
   text-align: right;
 }
+
 /* Right align the virtual keyboard toggle */
 math-field::part(container) {
   flex-flow: row-reverse;
 }
+
 /* Hide the virtual keyboard toggle */
 math-field::part(virtual-keyboard-toggle) {
   display: none;
 }
+
+/* Hide the menu toggle */
+math-field::part(menu-toggle) {
+  display: none;
+}
 ```
+
+**Note** When the menu toggle is hidden, the menu can still be opened by 
+right-clicking on the mathfield. You can [customize the menu](/mathlive/guides/menu/) to change
+this behavior.
 
 ## Display Options
 
@@ -334,6 +320,34 @@ The French typographical convention is to only italicize lowercase roman letters
 
 The default letter shape style is `auto`: if the system locale is "french",
 the `french` style is used, otherwise `tex` is used.
+
+
+
+## Focus Ring
+
+**To change the appearance of the focus ring**, use the `:focus-within` pseudo-element.
+
+<!-- htmlmin:ignore -->
+<code-playground layout="stack" >
+    <pre slot="html">&lt;style&gt;
+  math-field:focus-within {
+    outline: 4px solid #d7170b;
+    border-radius: 4px;
+    background: rgba(251,	187,	182, .1);
+  }
+&lt;/style&gt;
+&lt;math-field&gt;
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+&lt;/math-field&gt;</pre>
+</code-playground>
+<!-- htmlmin:ignore -->
+
+**Caution** Removing outlines in CSS creates issues for people navigating the web 
+with a keyboard. However, you can change the appearance of the outline,
+for example to indicate an error condition. If you remove the outline on the
+mathfield, make sure to replace it with another indicator, for example
+by displaying an outline on an enclosing element.  {.notice--warning}
+
 
 
 

@@ -33,7 +33,7 @@ operations on a mathfield.
 **To display the context menu:**
 - Right-click on the mathfield
 - Long press on a mathfield 
-- Tap on the menu button in the mathfield
+- Tap on the menu toggle (hamburger icon) in the mathfield
 - Press the <kbd>ALT/OPTION</kbd>+<kbd>SPACE</kbd>, <kbd>FN</kbd>+<kbd>F10</kbd> or <kbd>MENU</kbd> key 
   on a keyboard
 
@@ -97,7 +97,7 @@ mf. menuItems = [
   },
   {
     label: 'Paste',
-    onMenuSelect: () => console.log('Paste');
+    onMenuSelect: () => console.log('Paste')
   },
   {
     type: 'divider'
@@ -107,11 +107,11 @@ mf. menuItems = [
     submenu: [
       {
         label: 'Submenu 1',
-        onMenuSelect: () => console.log('Submenu 1');
+        onMenuSelect: () => console.log('Submenu 1')
       },
       {
         label: 'Submenu 2',
-        onMenuSelect: () => console.log('Submenu 2');
+        onMenuSelect: () => console.log('Submenu 2')
       }
     ]
   },
@@ -165,13 +165,13 @@ mf. menuItems = [
   },
 ];
 
-mf.addEventListener('menu-select', (event) => {
-    console.log('Menu item selected:', event.detail.id);
-});
+mf.addEventListener('menu-select', (event) => 
+  console.log('Menu item selected:', event.detail.id)
+);
 ```
 
 
-## Controling the Visibility ot the Menu
+## Controling the Menu Visibility
 
 **To hide the menu toggle button** use the following CSS:
   
@@ -181,11 +181,11 @@ math-field::part(menu-toggle) {
 }
 ```
 
-Even if the menu toggle button is hidden, the context menu is still accessible
+Even when the menu toggle button is hidden, the context menu is still accessible
 with keyboard shortcut, right-click or long press.
 
 **To prevent the menu from being displayed**, set the
-`mf.menuItems` to an empty array:
+`mf.menuItems` property to an empty array:
 
 ```javascript example
 mf.menuItems = [];

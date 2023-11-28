@@ -19,8 +19,8 @@ head:
 
 **To speak the formula or a portion of it**, use these keyboard shortcuts:
 
-- **alt/⌥ + ctrl + ⇡**: speak the entire formula
-- **alt/⌥ + ctrl + ⇣**: speak the selection
+- <kbd>alt/⌥</kbd> + <kbd>ctrl</kbd> + <kbd>⇡</kbd>: speak the entire formula
+- <kbd>alt/⌥</kbd> + <kbd>ctrl</kbd> + <kbd>⇣</kbd>: speak the selection
 
 **To programatically trigger speech output**, use:
 
@@ -87,7 +87,9 @@ For example:
 ```javascript
 MathfieldElement.textToSpeechRulesOptions = {
     domain: 'mathspeak', // 'mathspeak' or 'chromevox'
-    ruleset: 'mathspeak-brief',   // 'mathspeak-default', 'mathspeak-brief', 'mathspeak-sbrief', 'chromevox-short', 'chromevox-default' or 'chromevox-alternative'
+    ruleset: 'mathspeak-brief',   // 'mathspeak-default', 
+    // 'mathspeak-brief', 'mathspeak-sbrief', 'chromevox-short', 
+    // 'chromevox-default' or 'chromevox-alternative'
 };
 ```
 

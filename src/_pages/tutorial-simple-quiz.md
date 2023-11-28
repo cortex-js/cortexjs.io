@@ -79,7 +79,7 @@ the answer, a submission button, and a feedback section.
 ```
 
 When the MathLive library is loaded, a new HTML element becomes available: 
-`<math-field>`. 
+`<math-field>`.
 
 This element is a math input field that allows users to type math expressions.
 We'll use this element to allow students to input their answers.
@@ -147,22 +147,23 @@ function checkAnswer() {
 }
 ```
 
-The method `ce.parse()` returns a boxed expression, a
-JavaScript object that represents a mathematical expression. It can be
-evaluated, simplified, expanded, etc. The `ce.parse()` function creates a boxed
-expression from a LaTeX string.
+The method `ce.parse()` returns a **boxed expression** from a LaTeX string. A
+boxed expression is a JavaScript object that represents a mathematical 
+expression.
 
-
-Using the `isSame()` method, we can compare the student's input with the expected answer. This method returns `true` if the two expressions are equivalent, and `false` otherwise.
-
-This method compares the two expressions not as strings, but as mathematical
-expressions. For example, it will consider `2x` and `2\timesx` to be equivalent.
-
-The Compute Engine provides many operations that can be performed on expressions,
-including calculus, statistical operations and linear algebra.
+The Compute Engine provides many operations that can be performed on 
+boxed expressions, including calculus, statistical operations and linear algebra.
 
 For example, we can simplify an expression, expand it or evaluate it for a 
 given value of `x`.
+
+
+Using the `isSame()` method, we can compare the student's input with the 
+expected answer. This method returns `true` if the two expressions are 
+structurally equivalent, and `false` otherwise.
+
+This method compares the two expressions not as strings, but as mathematical
+expressions. For example, it will consider `2x` or `2\times x` to be the same.
 
 
 ## Step 5: Listening for Keyboard Events
@@ -180,11 +181,15 @@ answerField.addEventListener('input', (event) => {
 });
 ```
 
+Note that we could also use the `keypress` event, but the `input` event is
+will work both when using a physical keyboard and when using the virtual
+keyboard.
 
 ## Step 6: Displaying Static Math
 
 In our example so far, we display the question in plain text. We can
-display it as LaTeX instead.
+display it as LaTeX instead. It doesn't make much of a difference in this
+case, but it can be useful when we want to display more complex math.
 
 First, we'll modify the HTML to indicate that a portion of the question 
 should be rendered as math by surrounding it with `$$` delimiters.
@@ -227,7 +232,8 @@ math in the page.
 
 ## Step 7: Generating Random Questions
 
-To keep the quiz interesting, we can generate random questions.
+So far our quiz always asks the same question. To keep it interesting, we can 
+generate random questions.
 
 We'll create a function that generates a product of two random terms.
 
@@ -270,7 +276,7 @@ const expectedAnswer = question.simplify();
 
 Since we expect the student to have simplified the expression,
 we use `simplify()` to simplify the product of two terms into a polynomial and
-compare it with the student's input, 
+compare it with the student's input.
 
 
 

@@ -731,7 +731,7 @@ figure.highlight {
 .symbols-table table {
   table-layout: auto;
   tr td:first-child {
-    min-width: var(--first-col-width, 15ex);
+    min-width: var(--first-col-width, 15ch);
   }
 }
 

@@ -44,8 +44,9 @@ table {
     
     td:first-child { 
       // Insane trick to make sure the column is no wider than it needs to.
-      width: 1ex;
+      width: 1ch;
       white-space: nowrap;  
+      text-wrap: pretty;
     }
 
     td {

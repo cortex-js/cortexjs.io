@@ -237,13 +237,13 @@ and as the content inserted when the keycap is pressed.
 You'll notice from the example above that the LaTeX fragments defining the 
 keycap can contain some special placeholder tokens:
 
-<div class='symbols-table'>
+<div class='symbols-table' style='--first-col-width:5ch'>
 
 | Token | |
-|:-- | :-- |
+| --: | :-- |
 | `#@` |  Replaced with the selection, if there is one. If there is no selection, replaced with an implicit argument to the left of the caret. For example, for `12+34`, if the caret is at the end, `#@` would be replaced with `34`. |
-| `#0` |  replaced with the selection if there is one, a `\placeholder{}` command otherwise |
-| `#?` |  replaced with a `\placeholder{}` command |
+| `#0` |  Replaced with the selection if there is one, a `\placeholder{}` command otherwise |
+| `#?` |  Replaced with a `\placeholder{}` command |
 
 </div>
 
@@ -324,24 +324,27 @@ mathVirtualKeyboard.layouts = {
   label: 'Basic',
   rows: [
     [
-      '[7]', '[8]', '[9]', '[+]', {label: '[separator]', width: 0.5 },
+      '[7]', '[8]', '[9]', '[+]', 
+      { label: '[separator]', width: 0.5 },
       { class: 'small', latex: '\\frac{#@}{#0}' },
       '\\varnothing', '\\infty', '\\in', '\\notin',
       '[separator]',
     ],
     [
-      '[4]', '[5]', '[6]', '[-]', {label: '[separator]', width: 0.5 },
+      '[4]', '[5]', '[6]', '[-]', 
+      { label: '[separator]', width: 0.5 },
       '[(]', '[)]', '\\lt', '\\le', '\\hat{=}', '[separator]',
     ],
     [
-      '[1]', '[2]', '[3]', '\\cdot', {label: '[separator]', width: 0.5 },
+      '[1]', '[2]', '[3]', '\\cdot', 
+      { label: '[separator]', width: 0.5 },
       '[', ']', '\\gt', '\\ge',
 
       { label: '[backspace]', width: 2 },
     ],
     [
-      { label: '[0]', width: 2 },
-      '[.]', '\\colon', {label: '[separator]', width: 0.5 },
+      { label: '[0]', width: 2 }, '[.]', '\\colon', 
+      { label: '[separator]', width: 0.5 },
       '\\lbrace', '\\rbrace', '=', '\\ne', '[left]', '[right]',
     ],
   ],
@@ -378,18 +381,14 @@ a definition for them using the `style` property. Note that in that case
 you can't use the `rows` shortcut, you must provide the full definition
 of the layers.
 
-Also, note that you may need to use the `!important` modifier to override
-the default styling.
-
 ```js
 mathVirtualKeyboard.layouts = [
   {
-    label: 'minimal',
-    tooltip: 'Only the essential',
+    label: "minimal",
+    tooltip: "Only the essential",
     layers: [
       {
-        style:
-          '.digit { background: blue !important; color: white !important }',
+        style: ".digit { background: blue; color: white }",
         rows: [
           [
             '+',
@@ -419,7 +418,7 @@ mathVirtualKeyboard.layouts = [
       },
     ],
   },
-  'alphabetic',
+  "alphabetic",
 ];
 ```
 
@@ -605,9 +604,12 @@ keys pressed on the physical keyboard** listen and `preventDefault()` on `"keydo
 events during the capture phase, and show the virtual keyboard when the mathfield
 is focused.
 
-```js
-mf.addEventListener("keydown", (evt) =>  evt.preventDefault(), {capture: true});
-mf.addEventListener("focus", () =>  mathVirtualKeyboard.show());
+```js example
+mf.addEventListener("keydown", (evt) =>  
+  evt.preventDefault(), { capture: true });
+
+mf.addEventListener("focus", () => 
+  mathVirtualKeyboard.show());
 ```
 
 
@@ -652,7 +654,8 @@ for the virtual keyboard panel:
 
 ```js
 mathVirtualKeyboard.addEventListener("geometrychange", () => {
-  container.style.height = mathVirtualKeyboard.boundingRect.height + "px";
+  container.style.height = 
+    mathVirtualKeyboard.boundingRect.height + "px";
 });
 ```
 

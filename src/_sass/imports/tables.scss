@@ -45,12 +45,12 @@
   table-layout: auto;
   tr th {
     overflow: visible;
-    max-width: var(--first-col-width, 15ex);
+    max-width: var(--first-col-width, 15ch);
   }
   tr td:first-child {
-    min-width: var(--first-col-width, 15ex);
-    width: var(--first-col-width, 15ex);
-    max-width: var(--first-col-width, 15ex);
+    min-width: var(--first-col-width, 15ch);
+    width: var(--first-col-width, 15ch);
+    max-width: var(--first-col-width, 15ch);
   }
 
   tr td {
