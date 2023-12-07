@@ -6,21 +6,19 @@
   @include clearfix;
 
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 
   margin-left: 0;
   margin-right: 0;
-  margin-top: 2em;
-  padding: 1em 1em 1em 1em;
+  margin-top: 3rem;
+  padding: 1rem 1rem 1rem 1rem;
   
   width: 100%;
   max-width: 100%;
 
   color: $dark-gray;
   background-color: $footer-background-color;
-
-  // animation: $intro-transition;
-  // animation-delay: 0.45s;
 
   @include breakpoint($large) {
     padding-left: calc((100% - #{$max-width}) / 2);
@@ -44,10 +42,12 @@
 }
 
 .page__footer-follow, .page__footer-pages {
-  width: 50%;
   display: flex;
+  flex-grow: 1;
+
   ul {
     display: flex;
+    flex-wrap: wrap;
     margin: 0;
     padding: 0;
     list-style-type: none;
@@ -55,11 +55,10 @@
 
   li {
     display: flex;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    
     font-family: var(--display-font-family);
     font-feature-settings: var(--display-font-settings);
-    font-size: 1rem;
+    font-size: clamp(12px, 1.2vmin, 1rem);
     text-transform: uppercase;
   }
 

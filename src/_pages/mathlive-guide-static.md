@@ -27,6 +27,63 @@ head:
 ---
 # Static Math Formulas
 
+## Converting LaTeX to Various Formats
+
+MathLive includes some utility functions to convert between various formats. These utility functions can be used without a mathfield.
+In fact, they do not require a browser environment at all, and can be used in a Node.js environment.
+
+MathLive is available as a Service Side Render (SSR) package: 
+`import * from 'mathlive/ssr';`
+
+**To convert LaTeX to HTML**, use the [`latexToMarkup()`](/docs/mathlive/?q=latexToMarkup) function.
+
+```javascript
+import { latexToMarkup } from 'mathlive';
+console.log(latexToMarkup('x^2 + y^2 = z^2'));
+```
+
+**To convert LaTeX to MathML**, use the [`latexToMathML()`](/docs/mathlive/?q=latexToMathML) function.
+
+```javascript
+import { latexToMathML } from 'mathlive';
+console.log(latexToMathML('x^2 + y^2 = z^2'));
+```
+
+**To convert LaTeX to spoken text**, use the [`latexToSpeakableText()`](/docs/mathlive/?q=latexToSpeakableText) function.
+
+```javascript
+import { latexToSpeakableText } from 'mathlive';
+console.log(latexToSpeakableText('x^2 + y^2 = z^2'));
+```
+
+**To convert LaTeX to AsciiMath**, use the [`latexToAsciiMath()`](/docs/mathlive/?q=latexToAsciiMath) function.
+
+```javascript
+import { latexToAsciiMath } from 'mathlive';
+console.log(latexToAsciiMath('x^2 + y^2 = z^2'));
+```
+
+
+## Converting From Various Formats to LaTeX
+
+**To convert MathJson to LaTeX**, use the [`mathJsonToLatex()`](/docs/mathlive/?q=mathJsonToLatex) function.
+
+```javascript
+import { mathJsonToLatex } from 'mathlive';
+console.log(mathJsonToLatex(["Add", "x", "y"]));
+```
+
+**To convert AsciiMath to LaTeX**, use the [`asciiMathToLatex()`](/docs/mathlive/?q=asciiMathToLatex) function.
+
+```javascript
+import { asciiMathToLatex } from 'mathlive';
+console.log(asciiMathToLatex('x^2 + y^2 = z^2'));
+```
+
+
+
+## Rendering Static Math Formulas
+
 **To render math contained in a document as a static (non-editable) formula**, 
 call [`renderMathInDocument()`](/docs/mathlive/?q=renderMathInDocument) at the 
 end of your document, or in a `DOMContentLoaded` event handler.

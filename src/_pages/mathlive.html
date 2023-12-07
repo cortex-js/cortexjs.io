@@ -10,7 +10,7 @@ sidebar:
 head:
   modules:
     - /assets/js/code-playground.min.js
-    - https://unpkg.com/mathlive
+    - //unpkg.com/mathlive/dist/mathlive.min.mjs
   stylesheets:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css
   scripts:
@@ -341,12 +341,12 @@ div.figure {
   }
 
   h1 span.first-part {
-    font-size: 4.5rem;
+    font-size: clamp(2rem, 8vmin, 4.5rem);
     letter-spacing: -2px;
   }
 
   h1 span.second-part {
-    font-size: 3rem;
+    font-size: clamp(1rem, 3vmin, 3rem);
     letter-spacing: 0;
   }
 
@@ -405,7 +405,7 @@ style="margin-bottom:2em; border-radius:8px 8px 0 0; border:1px solid #203346">
         outline: Highlight auto 1px;
         outline: -webkit-focus-ring-color auto 1px
       }
-      math-field { font-size: 3rem; }
+      math-field { font-size: clamp(1rem, 5vmin, 3rem); }
     </style>
       <pre slot="html">
   &lt;math-field&gt;

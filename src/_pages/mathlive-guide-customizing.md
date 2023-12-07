@@ -131,8 +131,8 @@ Read more about [customizing the virtual keyboard appearance](https://cortexjs.i
 
 ## MathLive Parts
 
-Because the mathfield is a custom element with a shadow DOM, it is not possible
-to style its children using CSS selectors.
+Because the mathfield is a custom element with a shadow DOM, its content
+is not directly accessible to CSS rules outside of the shadow DOM.
 
 However, there are a few parts that can be used to style the 
 content of the mathfield using the `::part()` pseudo-element.
@@ -146,6 +146,7 @@ content of the mathfield using the `::part()` pseudo-element.
 | `content` | The math formula |
 | `container` | The element containing the formula, the keyboard toggle and the menu toggle |
 | `keyboard-sink` | The hidden element capturing the physical keyboard input |
+| `placeholder` | The element containing the placeholder attribute when the mathfield is empty |
 | `prompt` | The prompts (`placeholder{}`) inside the mathfield |
 
 </div>
