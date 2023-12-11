@@ -34,7 +34,7 @@ property.
 In the playground below, the **LaTeX** input field is editable and is reflected 
 in the mathfield, and vice-versa.
 
-Note that we use the `suppressChangeNotifications` option when
+Note that we use the `silenceNotifications` option when
 changing the content of the mathfield, to prevent an `"input"` event from being 
 triggered and creating an infinite loop.{.notice--info}
 
@@ -53,7 +53,7 @@ latex.value = mf.value;
 latex.addEventListener("input", (ev) => 
     mf.setValue(
       ev.target.value, 
-      {suppressChangeNotifications: true}
+      {silenceNotifications: true}
     )
 );
   </pre>
