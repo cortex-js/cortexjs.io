@@ -27,7 +27,7 @@ read-only**, use a `readonly` mathfield, and the `\placeholder[]{}` command.
 ```html
 <math-field readonly>
   x=\placeholder[answer]{}
-</mathfield>
+</math-field>
 ```
 
 This feature is called **"fill-in-the-blank"**.
