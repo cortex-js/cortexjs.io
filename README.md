@@ -3,8 +3,6 @@
 
 [![](https://dcbadge.vercel.app/api/server/yhmvVeJ4Hd?style=flat)](https://discord.gg/yhmvVeJ4Hd)
 
-[![Gitter](https://badges.gitter.im/cortex-js/community.svg)](https://cortexjs.io/gitter)
-
 ![Maintenance](https://img.shields.io/maintenance/yes/2023)
 
 This repo contains the source files for the "cortexjs.io" website.

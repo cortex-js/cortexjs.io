@@ -13,10 +13,6 @@
       "url": "/cortex/"
     },
     {
-      "title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Gitter Forum</title><use xlink:href=\"/assets/icons.svg#gitter\"></use></svg>",
-      "url": "/forum/"
-    },
-    {
       "title": "<svg class=\"icon1quarterem\" role=\"img\"><title>Discord</title><use xlink:href=\"/assets/icons.svg#discord\"></use></svg>",
       "url": "https://discord.gg/yhmvVeJ4Hd"
     },
@@ -450,11 +446,6 @@
           "title": "GitHub Repo (Compute Engine)",
           "url": "https://github.com/cortex-js/compute-engine",
           "icon": "github"
-        },
-        {
-          "title": "Gitter Forum",
-          "url": "/forum/",
-          "icon": "gitter"
         },
         {
           "title": "Discord",
