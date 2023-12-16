@@ -92,7 +92,7 @@ Try the **interactive demo** now
 
 ## Getting Started
 
-The easiest way to get started it to load the Compute Engine JavaScript module
+The easiest way to get started is to load the Compute Engine JavaScript module
 from a CDN.
 
 ### Using JavaScript Modules
