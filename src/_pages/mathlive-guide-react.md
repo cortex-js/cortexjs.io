@@ -85,7 +85,22 @@ function App() {
 export default App;
 ```
 
+### Using LaTeX strings with JSX
 
+You can specify the initial value of the mathfield by providing a LaTeX 
+string as a child of the `<math-field>` tag.
+
+However, since both JSX and LaTeX use curly braces, you need to escape the
+LaTeX braces. The easiest way to do this is to use a backtick string.
+The content of the backtick string will be interpreted as a JavaScript string,
+which means that the backslashes will need to be escaped as well.
+
+
+```jsx
+<math-field>{`
+  \\frac{1}{2}
+`}</math-field>
+```
 
 ## Theory of Operations
 

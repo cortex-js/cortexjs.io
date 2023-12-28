@@ -1,7 +1,7 @@
 ---
 title: Changelog - CortexJS Compute Engine
 permalink: /compute-engine/changelog/
-layout: single
+layout: changelog
 date: Last Modified
 sidebar:
     - nav: "universal"

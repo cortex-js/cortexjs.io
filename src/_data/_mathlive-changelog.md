@@ -1,7 +1,7 @@
 ---
 title: Changelog - MathLive
 permalink: /mathlive/changelog/
-layout: single
+layout: changelog
 date: Last Modified
 sidebar:
     - nav: "universal"
