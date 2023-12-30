@@ -30,7 +30,7 @@
       "title": "Tutorials",
       "children": [
         {
-          "title": "Simple Quizz",
+          "title": "Simple Quiz",
           "url": "/tutorials/simple-quiz/",
           "icon": "tutorial"
         }

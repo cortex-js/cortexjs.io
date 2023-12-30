@@ -32,7 +32,7 @@ read-only**, use a `readonly` mathfield, and the `\placeholder[]{}` command.
 
 This feature is called **"fill-in-the-blank"**.
 
-It's often used to prompt a student to provide an answer to a quizz by 
+It's often used to prompt a student to provide an answer to a quiz by 
 filling in portions of a formula.
 
 The first argument of the `\placeholder` command, i.e. `[answer]` in the

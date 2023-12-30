@@ -16,7 +16,6 @@ head:
     - https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/xml/xml.min.js
   modules:
     - /assets/js/code-playground.min.js
-    - //unpkg.com/mathlive?module
   moduleMap: |
     window.moduleMap = {
     "mathlive": "//unpkg.com/mathlive?module",
@@ -26,13 +25,14 @@ head:
     };
 ---
 
-# <em>Tutorial</em> A Simple Quizz
+# <em>Tutorial</em> Simple Quiz
 
 
 In this tutorial, we'll create a web-based quiz application that allows 
 students to practice simplifying mathematical expressions into polynomials. 
+
 We'll use two powerful tools: **MathLive** for math input and 
-**CortexJS Compute Engine** for evaluating mathematical expressions.{.xl}
+**CortexJS Compute Engine** for evaluating mathematical expressions.
 
 ## Step 1: Setting Up Your Project
 
@@ -45,15 +45,17 @@ Let's start by setting up our HTML file.
 <html>
 <head>
     <title>Math Quiz</title>
-    <!-- Include MathLive and CortexJS Compute Engine -->
-    <script src="//unpkg.com/mathlive"></script>
-    <script src="//unpkg.com/@cortex-js/compute-engine"></script>
 </head>
 <body>
     <!-- Interactive elements will be added here -->
 </body>
-<script>
-    // JavaScript code will be added here
+<script type="module">
+  // Import the MathLive and Compute Engine libraries
+  import "//unpkg.com/mathlive?module";
+  import "//unpkg.com/@cortex-js/compute-engine";
+  
+  // JavaScript code will be added here
+
 </script>
 </html>
 ```
@@ -65,6 +67,9 @@ Since we want to use the Compute Engine, we'll need to load its library as well.
 We could use MathLive without the Compute Engine, but we'll need it to evaluate
 the student's input.
 
+Note that the `<script>` tag has a `type="module"` attribute. This is required
+to use the `import` statement.{.notice--warning}
+
 
 ## Step 2: Creating the Quiz Interface
 
@@ -72,7 +77,7 @@ Our quiz will have a simple interface: a question area, an input field for
 the answer, a submission button, and a feedback section.
 
 ```html
-<div>Simplify the expression: (x+1)(2x -1)</div>
+<p>Simplify the expression: (x+1)(2x -1)</p>
 <math-field id="answer"></math-field>
 <button id="submitAnswer">Check Answer</button>
 <div id="feedback"></div>
@@ -82,8 +87,44 @@ When the MathLive library is loaded, a new HTML element becomes available:
 `<math-field>`.
 
 This element is a math input field that allows users to type math expressions.
+
 We'll use this element to allow students to input their answers.
 
+Let's add some CSS to make our quiz look nicer.
+
+```html
+<style>
+  math-field {
+    width: 100%;
+    border-radius: 8px;
+    margin: 8px 0;
+  }
+  button {
+    border-radius: 8px;
+    padding: 8px;
+    margin: 8px 0;
+    font-size: 1em;
+    font-weight: bold;
+    font-family: system-ui;
+  }
+  p {
+    font-family: system-ui;
+    font-size: 1.5em;
+    padding: 8px;
+  }
+  #feedback {
+    font-family: system-ui;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f0f0f0;
+  }
+</style>
+```
 
 ## Step 3: Processing and Checking Answers
 
@@ -201,32 +242,49 @@ should be rendered as math by surrounding it with `$$` delimiters.
 Then we'll call the `renderMathInElement()` function to render the math in the question.
 
 ```javascript example
-const question = document.getElementById('question');
-renderMathInElement(question);
+renderMathInElement(document.getElementById('question'));
 ```
 
 If we had a lot of math in our quiz, we could call `renderMathInDocument()` 
 to render all the math in the page.
+
+
+We also need to load a CSS stylesheet to render the math. We can use the
+`mathlive-static.css` stylesheet provided by the MathLive library.
+
+```html
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+/>
+```
+
 
 Another way to render math is to use the `convertLatexToMarkup()` function.
 
 To do this, we'll modify our markup to use a `<span>` element.
 
 ```html
-<div>Simplify the expression: <span id="question">(x+1)(2x-1)</span></div>
+<p>Simplify the expression: <span id="question">(x+1)(2x-1)</span></p>
 ```
 
 Then we'll modify our JavaScript to use this function to render the question.
 
 ```javascript example
 const questionSpan = document.getElementById('question');
-questionSpan.htmlContent = 
+questionSpan.innerHTML = 
   convertLatexToMarkup(questionSpan.textContent);
 ```
 
 Here we're using `convertLatexToMarkup()` to convert the LaTeX representation
 of the expression into HTML markup. It's a more direct way to render static 
 math in the page.
+
+Note that we need to modify our `import` statement to import the `convertLatexToMarkup()` function.
+
+```javascript
+import { renderMathInElement, convertLatexToMarkup } from "//unpkg.com/mathlive?module";
+```
 
 
 
@@ -245,21 +303,10 @@ function generateRandomQuestion() {
   const c = Math.floor(Math.random() * 10) + 1;
   const d = Math.floor(Math.random() * 10) ;
   // (ax+b)(cx+d)
-  return ce.mul(
-      ce.add(ce.mul(a, 'x'), b),
-      ce.add(ce.mul(c, 'x'), d),
-  );
+  return ce.box(["Multiply", 
+    ["Add", ["Multiply", a, "x"], b], 
+    ["Add", ["Multiply", c, "x"], d]]);
 }
-```
-
-The `ce.add()` and `ce.mul()` functions create a sum and a product, respectively.
-They are a short and convenient way to create a MathJSON expression.
-They are equivalent to the following:
-
-```javascript example
-return ce.box(["Multiply", 
-  ["Add", ["Multiply", a, "x"], b], 
-  ["Add", ["Multiply", c, "x"], d]]).evaluate();
 ```
 
 The `ce.box()` function creates a boxed expression from a MathJSON expression.
@@ -269,7 +316,7 @@ Then we'll update our script to use this function to generate the question.
 
 ```js example
 const question = generateRandomQuestion();
-document.getElementById('question').htmlContent = 
+document.getElementById('question').innerHTML = 
   convertLatexToMarkup(question.latex);
 const expectedAnswer = question.simplify();
 ```
@@ -289,22 +336,56 @@ Here's the complete code for our quiz application:
 <html>
 <head>
     <title>Math Quiz</title>
-    <!-- Include MathLive and CortexJS Compute Engine -->
-    <script src="//unpkg.com/mathlive"></script>
-    <script src="//unpkg.com/@cortex-js/compute-engine"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+    />
+    <style>
+      math-field {
+        width: 100%;
+        border-radius: 8px;
+        margin: 8px 0;
+      }
+      button {
+        border-radius: 8px;
+        padding: 8px;
+        margin: 8px 0;
+        font-size: 1em;
+        font-weight: bold;
+        font-family: system-ui;
+      }
+      p {
+        font-family: system-ui;
+        font-size: 1.5em;
+        padding: 8px;
+      }
+      #feedback {
+        font-family: system-ui;
+        font-size: 1.2em;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f0f0f0;
+      }
+    </style>
 </head>
 <body>
-    <div>Simplify the expression: <span id="question"></span></div>
+    <p>Simplify the expression <span id="question"></span></p>
     <math-field id="answer"></math-field>
     <button id="submitAnswer">Check Answer</button>
     <div id="feedback"></div>
 </body>
-<script>
+<script type="module">
+  import { convertLatexToMarkup } from "//unpkg.com/mathlive?module";
+  import "//unpkg.com/@cortex-js/compute-engine";
   const ce = MathfieldElement.computeEngine;
   const question = generateRandomQuestion();
   const expectedAnswer = question.simplify();
 
-  document.getElementById('question').htmlContent = 
+  document.getElementById('question').innerHTML = 
     convertLatexToMarkup(question.latex);
   
   const answerButton = document.getElementById('submitAnswer');
@@ -321,14 +402,14 @@ Here's the complete code for our quiz application:
       const c = Math.floor(Math.random() * 10) + 1;
       const d = Math.floor(Math.random() * 10) ;
       // (ax+b)(cx+d)
-      return ce.mul(
-          ce.add(ce.mul(a, 'x'), b),
-          ce.add(ce.mul(c, 'x'), d),
-      );
+      return ce.box(["Multiply", 
+        ["Add", ["Multiply", a, "x"], b], 
+        ["Add", ["Multiply", c, "x"], d]]);
   }
 
   function checkAnswer() {
-    const studentInput = mathfield.expression;
+    const answer = document.getElementById('answer');
+    const studentInput = answer.expression;
 
     // Compare the expressions using `isSame()`
     const feedback = studentInput.isSame(expectedAnswer) ?
