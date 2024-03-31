@@ -59,7 +59,7 @@ For example, to ommit all commands related to the Compute Engine (such as
 Evaluate, Simplify and Solve), you can filter the menu items by id:
 
 ```js example
-mf.menuItems = mf.menuItems.filter(item => !item.id.startWith('ce-');
+mf.menuItems = mf.menuItems.filter(item => !item.id.startWith('ce-'));
 ```
 
 **CAUTION:** Do not modify the value of the elements of `mf.menuItems` directly or the menu 
