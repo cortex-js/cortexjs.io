@@ -992,7 +992,7 @@ If the conversion was not desired, for example you actually meant "pi", type <kb
 </div>
 
 
-### Miscelaneous
+### Miscellaneous
 
 <div class="inlineshortcut-table">
 
