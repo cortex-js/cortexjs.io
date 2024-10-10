@@ -2231,7 +2231,7 @@ intermediate lines are centered.
 
 
 ```tex
-  \​begin{multline}
+  \begin{multline}
     3(a-x) = 3.5x + a - 1 \\
     3a - 3x = 3.5x + a - 1 \\
     a = \frac{13}{4}x - \frac{1}{2}
