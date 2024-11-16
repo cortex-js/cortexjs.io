@@ -1,0 +1,17 @@
+p.version {
+  color: var(--neutral-400);
+  font-size: .6rem;
+  font-weight: 600;
+  margin: 0;
+  margin-bottom: 4px;
+}
+
+p.version svg {
+  font-size: .8rem;
+  margin-right: 6px;
+  vertical-align: top;
+}
+
+p.version .versionNumber {
+  font-weight: 900;
+}

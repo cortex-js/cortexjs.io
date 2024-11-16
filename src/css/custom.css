@@ -1,0 +1,452 @@
+/**
+ * Infima is a CSS framework designed to work well for content-centric websites.
+ */
+
+:root {
+  --ifm-color-primary: var(--primary-color);
+
+  --ifm-color-primary-dark: var(--blue-500);
+  --ifm-color-primary-darker: var(--blue-400);
+  --ifm-color-primary-darkest: var(--blue-300);
+  --ifm-color-primary-light: var(---blue-600);
+  --ifm-color-primary-lighter: var(--blue-700);
+  --ifm-color-primary-lightest: var(--blue-800);
+  --ifm-color-primary-contrast-background: var(--blue-50);
+  --ifm-color-primary-contrast-foreground: var(--blue-900);
+
+  --ifm-menu-color-active: #fff;
+  --ifm-menu-color-background-active: var(--primary-color);
+  --ifm-menu-link-padding-vertical: 8px;
+  --ifm-menu-link-padding-horizontal: 16px;
+
+  --ifm-color-secondary: var(--primary-color-light);
+  --ifm-color-success: var(--semantic-green);
+  --ifm-color-info: var(--semantic-blue);
+  --ifm-color-warning: var(--semantic-orange);
+  --ifm-color-danger: var(--semantic-red);
+
+  --ifm-link-color: var(--link-color);
+  --ifm-link-hover-color: var(--link-color-hover);
+
+  /* --ifm-color-content: var(--ifm-color-emphasis-900);
+  --ifm-color-content-inverse: var(--ifm-color-emphasis-0);
+  --ifm-color-content-secondary: #525860; */
+
+  --ifm-font-family-base: var(--body-font-family);
+  --ifm-font-family-monospace: var(--monospace-font-family);
+  --ifm-font-size-base: 125%;
+  --ifm-line-height-base: 1.47059;
+
+  --ifm-global-radius: 4px;
+}
+
+.alert--warning {
+  --ifm-alert-background-color: var(--yellow-50);
+  --ifm-alert-border-color: var(--orange-500);
+  --ifm-color-warning-contrast-foreground: var(--orange-900);
+}
+
+.alert--warning code, 
+[data-theme="dark"] .alert--warning code{
+  color: currentColor;
+  border-color: var(--orange-500);
+  background: transparent;
+}
+
+[data-theme="dark"] .alert--warning {
+  --ifm-alert-background-color: var(--orange-900);
+  --ifm-alert-border-color: var(--orange-500);
+  --ifm-color-warning-contrast-foreground: var(--orange-200);
+}
+
+.alert--info {
+  --ifm-alert-background-color: var(--blue-25);
+  --ifm-alert-border-color: var(--blue-200);
+  --ifm-color-info-contrast-foreground: var(--blue-800);
+}
+
+.alert--info code,
+[data-theme="dark"] .alert--info code{
+  color: currentColor;
+  border-color: var(--blue-200);
+  background: transparent;
+}
+
+[data-theme="dark"] .alert--info {
+  --ifm-alert-background-color: var(--blue-900);
+  --ifm-alert-border-color: var(--blue-400);
+  --ifm-color-info-contrast-foreground: var(--blue-200);
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme="dark"] {
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  --ifm-code-background: var(--console-background);
+  --ifm-pre-background: var(--console-background);
+}
+
+:root {
+  --link-color: var(--blue-800);
+  --link-color-visited: #0b5c9c;
+  --link-color-hover: #0d80f2;
+
+  /* Callout boxes are used for "Read More" */
+  --callout-background: #e6f0fa;
+  --callout-shadow: 0 1px 1px rgba(0, 102, 206, 0.25);
+  --callout-border-color: rgba(0, 102, 206, 0.25);
+  --callout-border-color-hover: var(--primary-color);
+
+  --highlight-color: hsla(49, 100%, 63%, 0.56);
+
+  --text-color: var(--neutral-100); /* hsl(0,0,20); */
+  --strong-color: var(--primary-color);
+  --muted-text-color: var(--neutral-500);
+
+  --table-thin-line-color: var(--neutral-600); /* #ddd; */
+  --table-thick-line-color: var(--neutral-300); /* #333; */
+
+  --placeholder-color: var(--primary-color-light);
+  --placeholder-opacity: 1;
+
+  --card-background: var(--neutral-900); /* #fafafa; */
+  --card-background-alternate: var(--neutral-600); /*  #a0a0a0; */
+  --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+
+  --page-background: var(--neutral-900); /* #f5f5f7; */
+  --content-background: var(--neutral-900);
+  --content-border-color: var(--neutral-900);
+
+  --ui-background: var(--neutral-900);
+  --ui-background-hover: var(--neutral-600);
+  --ui-border: 1px solid var(--neutral-700);
+  --ui-border-focus: solid 1px var(--neutral-900);
+  --ui-focus-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302),
+    0 2px 6px 2px rgba(60, 64, 67, 0.149);
+  --ui-divider: 0.5px solid #3334;
+  /* --ui-elevated-shadow:0px 0px 10px rgba(0, 0, 0, 0.3); */
+  /* Used by the background of a slider */
+  --ui-surface: var(--neutral-700);
+  --ui-handle: var(--neutral-900);
+
+  --border-color: var(--neutral-800); /* #e7e7e7; */
+
+  --semantic-blue: var(--blue-700);
+  --semantic-red: var(--red-400);
+  --semantic-orange: var(--orange-400);
+  --semantic-green: var(--green-700);
+
+  --glass-filter: drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1)) grayscale(0.6);
+  --glass-backdrop-filter: blur(18px) saturate(180%);
+  --glass-border: 1px solid rgba(209, 213, 219, 0.3);
+  --glass-border-color: var(--neutral-900) rgba(209, 213, 219, 0.3)
+    rgba(209, 213, 219, 0.3);
+  --glass-box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 4px 30px rgba(0, 0, 0, 0.1),
+    0 0 10px rgb(0 0 0 / 0.05);
+  --glass-background: rgba(251, 251, 253, 0.8);
+
+  --shadow-color: 0deg 0% 50%;
+
+  /** Three elevatios: small, medium, and large */
+  /* See also https://www.joshwcomeau.com/shadow-palette/ */
+  --box-shadow-sm: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.57),
+    0px 1.9px 1.9px -3.2px hsl(var(--shadow-color) / 0.44);
+
+  --box-shadow-md: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.54),
+    0px 2.2px 2.2px -1.6px hsl(var(--shadow-color) / 0.45),
+    0.1px 9.4px 9.5px -3.2px hsl(var(--shadow-color) / 0.37);
+
+  --box-shadow-lg: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.5),
+    0px 2.7px 2.7px -0.6px hsl(var(--shadow-color) / 0.46),
+    0px 6px 6.1px -1.3px hsl(var(--shadow-color) / 0.42),
+    0.1px 12.5px 12.7px -1.9px hsl(var(--shadow-color) / 0.38),
+    0.2px 24.3px 24.6px -2.6px hsl(var(--shadow-color) / 0.34),
+    0.3px 43.5px 44px -3.2px hsl(var(--shadow-color) / 0.31);
+
+    --depth-effect-text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+    --emboss-text-shadow: 0 -4px 3px rgba(255, 255, 255, 0.3), 0 3px 4px rgba(0, 0, 0, 0.2);
+    --letter-press-text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3), 0 -1px 2px rgba(0, 0, 0, 0.3);
+
+
+}
+
+.rainbow-text {
+  --color-background: var(--content-background);;
+  background-clip: text;
+  background-image: linear-gradient(to right, var(--blue-600), var(--teal-700), var(--magenta-500), var(--yellow-500));
+  -webkit-text-stroke-color: transparent;
+  -webkit-text-stroke-width: calc(1em / 8);
+  color: var(--content-background);
+  text-shadow: none;
+  line-height: 1.3;
+}
+
+[data-theme="dark"] {
+  --primary-color: hsl(210, 80%, 40%);
+  --primary-color-dark: hsl(210, 80%, 30%);
+  --primary-color-light: hsl(210, 80%, 60%);
+
+  --link-color: var(--blue-400);
+  --link-color-hover: var(--blue-300);
+  --link-color-visited: var(--blue-500);
+
+  /* Callout boxes are used for "Read More" */
+  --callout-background: #183854; /* #{$blue-900}; */
+  --callout-shadow: 0 1px 1px rgba(25, 50, 50, 0.25);
+  --callout-border-color: rgba(0, 102, 206, 0.25);
+  --callout-border-color-hover: hsl(210, 80%, 40%);
+
+  --ui-surface: var(--neutral-300);
+
+  --highlight-color: hsla(49, 100%, 63%, 0.7);
+
+  /* --text-color: var(--neutral-800); */
+  --strong-color: #86c0f9;
+  --muted-text-color: var(--neutral-500);
+  --text-color-dimmed: #999;
+
+  --table-thin-line-color: #444;
+  --table-thick-line-color: #555;
+
+  --placeholder-color: #9aa0a6;
+
+  --page-background: var(--neutral-25);
+  /* --content-background: var(--neutral-50); */
+  /* --content-border-color: #393939; */
+  /* --card-background: var(--neutral-50); */
+  /* --card-background--alternate: var(--neutral-100); */
+
+  /* --ui-background: var(--neutral-100); */
+  /* --ui-background-hover: var(--neutral-200); */
+  /* --ui-border: 0.5px solid var(--neutral-300); */
+  /* --ui-border-focus: 0.5px solid var(--neutral-500); */
+  /* Used for hover state of masthead and nav links */
+  --ui-focus-shadow: none;
+
+  /* --border-color: var(--neutral-200); */
+
+  --semantic-blue: #0c6abe;
+  --semantic-red: #f43e31;
+  --semantic-orange: #ffa852;
+  --semantic-green: #199533;
+}
+
+body header {
+  padding: 0 !important;
+  border-radius: 8px;
+  margin: 8px;
+}
+
+/** Make sure that anchors are not displayed under the header */
+:target::before {
+  content: '';
+  display: block;
+  height:      80px;
+  margin-top: -80px;
+}
+
+
+/* This is the size of the h1 header when *not* in markdown 
+  (i.e. for auto-generated titles) 
+*/
+header h1 {
+  font-size: var(--ifm-h1-font-size);
+  text-wrap: balance;
+}
+
+.navbar {
+  margin-inline: auto;
+  top: 8px;
+  margin-top: 8px;
+  width: min(1024px, calc(100% - 2em));
+
+  filter: var(--glass-filter);
+  background: var(--glass-background);
+
+  /* From https://css.glass */
+  border-radius: 16px;
+  box-shadow: var(--glass-box-shadow);
+  backdrop-filter: var(--glass-backdrop-filter);
+  border: var(--glass-border);
+  border-color: var(--glass-border-color);
+  transition: background, filter, backdrop-filter 0.5s ease-in-out;
+}
+
+.navbar-sidebar--show {
+  backdrop-filter: none;
+  filter: none;
+}
+
+.navbar-sidebar__back {
+  color: white;
+}
+
+/* The word "Farsight" */
+.navbar__title {
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -1px;
+}
+
+/* The navigation links in the page header */
+.navbar__link {
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.navbar__link:hover {
+  color: var(--link-color-hover);
+  border-radius: 8px;
+  background: var(--neutral-800);
+  box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 0 10px rgb(0 0 0 / 0.05);
+}
+
+.theme-doc-sidebar-menu hr {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--neutral-800);
+  width: 90%;
+  margin-left: 1em;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+[data-theme="dark"] .navbar {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 0, 0, 0.48);
+  border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+/** The site logo */
+[data-theme="dark"] .navbar img {
+  filter: invert(1);
+}
+
+[data-theme="dark"] .navbar__link:hover,
+[data-theme="dark"] .navbar__link--active {
+  --ifm-navbar-link-hover-color: var(--link-color);
+}
+
+.menu {
+  font-weight: 600;
+  font-size: 0.8em;
+  font-family: var(--ui-font-family);
+}
+
+.menu__list-item:not(:first-child) {
+  margin-top: 0;
+}
+
+.menu__list-item-collapsible > a {
+  color: var(--primary-color);
+}
+.menu__list-item-collapsible > :hover {
+  color: var(--primary-color);
+}
+
+/** The nav menu when displayed as a pull-down menu */
+@media (max-width: 996px) {
+  .col {
+    --ifm-menu-color-background-active: var(--neutral-800);
+  }
+}
+
+.breadcrumbs__link {
+  --ifm-breadcrumb-color-active: var(--link-color);
+  --ifm-breadcrumb-item-background-active: var(--neutral-800);
+}
+
+/* .menu__link--active {
+  color: var(--primary-color);
+}
+
+.menu__link .menu__link--active {
+  background: red;
+  color: #fff;
+  border-radius: 8px;
+} */
+
+.pagination-nav__link {
+  border-radius: 8px;
+  backdrop-filter: var(--glass-backdrop-filter);
+  transition: all 0.15s ease-in-out;
+}
+
+.pagination-nav__sublabel {
+  display: none;
+}
+
+.pagination-nav__link:hover {
+  scale: 1.03;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.04);
+  transition: all 0.15s ease-in-out;
+}
+
+
+/* The footer that includes version number and last modified date */
+.theme-doc-footer p {
+  margin: 0 0 4px 0;
+}
+
+
+
+body .DocSearch-Button-Keys, 
+body .DocSearch-Button-Placeholder {
+  display: none;
+}
+
+body .DocSearch-Button {
+  background: transparent
+}
+
+/** Adding `body` to the selector to make it more specific */
+body .DocSearch-Button:active, 
+body .DocSearch-Button:focus, 
+body .DocSearch-Button:hover {
+  /* background: var(--primary-color); */
+  background: transparent;
+  /* color: var(--ifm-color-primary-contrast-background); */
+  border-color: transparent;
+
+  color: var(--link-color-hover);
+  background: var(--neutral-800);
+  box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 0 10px rgb(0 0 0 / 0.05);
+
+}
+
+body .DocSearch-Modal {
+  margin-top: 100px;
+  padding-top: 8px;
+  border-radius: 8px;
+}
+
+body .DocSearch-Form {
+  --docsearch-searchbox-shadow: inset 0 0 0 2px #ccc;
+  border-radius: 16px;
+  margin-inline: 4px;
+  font-weight: 600;
+}
+
+.footer--dark {
+  background: linear-gradient(180deg, #bbb 0%, #111 100%);
+  border-top: 1px solid var(--neutral-600);
+}
+
+.footer--dark a, .footer--dark a:visited, .footer--dark a:hover, .footer--dark a:active {
+  border-radius: 8px;
+  padding: 8px;
+  padding-inline: 16px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer__title {
+  margin: 0;
+  margin-bottom: 8px;
+  margin-left: 16px;
+}
+
+.footer--dark a:visited, .footer--dark a:hover, .footer--dark a:active {
+  background: #666;
+  backdrop-filter: var(--glass-backdrop-filter);
+}

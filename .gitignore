@@ -1,6 +1,8 @@
-.sass-cache
 node_modules
-
-.DS_Store
 /build
-/src/build
+/.docusaurus
+.DS_Store
+.npm
+.eslintcache
+.tgz
+.node_repl_history

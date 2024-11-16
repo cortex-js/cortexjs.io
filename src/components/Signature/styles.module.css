@@ -1,0 +1,39 @@
+
+.signature {
+  margin: -8px;
+  padding: 8px 0 8px 8px;
+  margin-bottom: 8px;
+
+  border-radius: 0;
+
+  font-family: var(--monospace-font-family);
+  font-weight: 900;
+  font-size: 1em;
+  background: var(--blue-600);
+  color: var(--blue-100);
+}
+
+[data-theme="dark"] .signature {
+  background: var(--blue-800);
+  color: var(--blue-300);
+}
+
+.signature b {
+  color: #ffff;
+  font-weight: 900;
+}
+
+.signature i, .signature em {
+  opacity: 0.8;
+}
+
+
+
+
+.signature:first-of-type {
+  border-radius: 16px 16px 0 0;
+}
+
+:not(.signature) + p.signature {
+  margin-top: 2em;
+}

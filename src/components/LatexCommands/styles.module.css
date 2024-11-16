@@ -1,0 +1,26 @@
+.latexCommands {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5em;
+  margin-bottom: 1em;
+}
+
+.latexCommands > div {
+  display: flex;
+  align-items: center;
+  padding: .5em;
+  width: calc(50% - .5em);
+  font-size: .8em;
+  border-radius: 8px;
+  border: 1px solid var(--blue-100);
+  background: var(--blue-25);
+  color: var(--blue-900);
+}
+
+.latexCommands > :global(.language-latex) {
+  font-weight: 900;
+}
+
+.latexCommands > div > div {
+  width: 50%;
+}

@@ -17,50 +17,54 @@
   ],
   "main": "root/index.html",
   "scripts": {
-    "build": "bash scripts/build.sh",
-    "build:code-playground": "npm --prefix submodules/code-playground run dist",
-    "build-guides": "node ./scripts/build-guides.js  \"./submodules/compute-engine/src/\" \"\"",
-    "clean": "bash scripts/clean.sh",
-    "coverage": "bash scripts/test.sh --coverage",
-    "deploy": "bash scripts/deploy.sh",
-    "lint": "prettier --config config/prettierrc.yaml --ignore-path ./.prettierignore --write \"**/*.{ts,js,css,md,yml,json}\"",
-    "restart": "bash scripts/restart.sh",
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "xdeploy": "docusaurus deploy",
+    "clear": "docusaurus clear",
+    "serve": "docusaurus serve",
+    "write-translations": "docusaurus write-translations",
+    "write-heading-ids": "docusaurus write-heading-ids",
+    "update": "bash scripts/update.sh",
     "stage": "bash scripts/stage.sh",
-    "start": "bash scripts/start.sh",
-    "test": "bash scripts/test.sh"
+    "deploy": "bash scripts/deploy.sh"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^3.1.1",
+    "@docusaurus/preset-classic": "^3.1.1",
+    "@mdx-js/react": "^3.0.0",
+    "clsx": "^2.0.0",
+    "mathlive": "^0.98.6",
+    "prism-react-renderer": "^2.3.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "remark-math": "^6.0.0",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "^3.1.1",
+    "@docusaurus/tsconfig": "^3.1.1",
+    "@docusaurus/types": "^3.1.1",
+    "typedoc": "^0.25.8",
+    "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=16.14.2"
+    "node": ">=18.0"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
-  ],
+  "browserslist": {
+    "production": [
+      "defaults and supports es6-module"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "author": "Arno Gourdol <arno@arno.org>",
   "contributors": [],
   "bugs": "https://github.com/cortex-js/cortexjs.io/issues/",
-  "devDependencies": {
-    "@11ty/eleventy": "^2.0.1",
-    "@cortex-js/prettier-config": "^1.2.0",
-    "@ui-js/grok": "^1.8.0",
-    "cssnano": "^6.0.1",
-    "eleventy-plugin-toc": "^1.1.5",
-    "highlight.js": "^11.8.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^14.0.1",
-    "markdown-it": "^13.0.1",
-    "markdown-it-anchor": "^8.6.7",
-    "markdown-it-attrs": "^4.1.6",
-    "markdown-it-deflist": "^2.1.0",
-    "markdown-it-multimd-table": "^4.2.3",
-    "postcss": "^8.4.30",
-    "postcss-cli": "^10.1.0",
-    "prettier": "^3.0.3",
-    "sass": "^1.68.0",
-    "typedoc": "^0.25.1",
-    "typescript": "^5.2.2",
-    "update-notifier": "^6.0.2"
-  },
   "prettier": "@cortex-js/prettier-config",
   "husky": {
     "hooks": {
@@ -72,5 +76,8 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "optionalDependencies": {
+    "fsevents": "^2.3.3"
   }
 }

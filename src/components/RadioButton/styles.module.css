@@ -1,0 +1,40 @@
+.row {
+  display: flex;
+  flex-flow: row;
+  align-items: baseline;
+}
+
+.label {
+  font-family: var(--ui-font-family);
+  margin-left: 8px;
+}
+
+.radioButton {
+  appearance: none;
+  background-color: var(--ui-background);
+  margin: 0;
+  font: inherit;
+  color: var(--ui-border);
+  width: 1em;
+  height: 1em;
+  border: 2.5px solid #555;
+  border-radius: 50%;
+  translate: 0 -1.25px;
+  display: grid;
+  place-content: center;
+  box-sizing: border-box;
+}
+
+.radioButton::before {
+  content: "";
+  width: calc(1em - 10px);
+  height: calc(1em - 10px);
+  border-radius: 50%;
+  box-shadow: inset 1em 1em var(--primary-color);
+  transition: 120ms transform ease-in-out;
+  transform: scale(0);
+}
+
+.radioButton:checked::before {
+  transform: scale(1);
+}

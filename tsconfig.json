@@ -1,23 +1,6 @@
 {
+  "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
-    "allowJs": true,
-    "declaration": true,
-    "emitDecoratorMetadata": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "incremental": true,
-    "moduleResolution": "node",
-    // "newLine": "lf",
-    "noImplicitAny": false,
-    "noLib": false,
-    "removeComments": true,
-    "sourceMap": true,
-    "strictNullChecks": false,
-    "target": "es2022",
-    "module": "esnext", // es2020 includes support for dynamic imports, and import.meta
-
-    "lib": ["es2022", "dom", "dom.iterable", "scripthost"]
-    // "lib": ["es2020", "scripthost"]
-  },
-  "exclude": ["node_modules", "**/*.spec.ts", "bin", "config"]
+    "baseUrl": "."
+  }
 }

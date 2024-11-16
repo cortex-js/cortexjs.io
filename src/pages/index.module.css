@@ -1,0 +1,136 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.h1 {
+  --outline-color: rgb(200 0 0 / 10%);
+  font-size: 10rem;
+  font-weight: 700;
+}
+
+
+.heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+header p.subtitle {
+  font-weight: 400;
+  line-height: 1;
+  max-width: 60%;
+  font-size: 2.2rem;
+  text-wrap: balance;
+  margin-inline: auto !important;
+  margin-bottom: 3rem !important;
+}
+
+.section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2em;
+  margin: 0 4rem 4rem 4rem;
+}
+
+.container {
+  position: relative;
+  padding: 24px;
+  padding-bottom: 48px;
+  border-radius: 24px;
+  min-height: 200px;
+  color: var(--text-color);
+  scale: 1;
+  transition: all 0.3s ease-in-out;
+  background: rgb(0 0 0 / 25%);
+
+  /* border: 1px solid rgb(205 205 205 / 15%); */
+  /* border-top-color: rgb(255 255 255 / 35%); */
+  outline: 2px outset rgb(255 255 255 / 25%);
+  box-shadow: 0 -2px 10px rgb(255 255 255 / 20%),
+    var(--box-shadow-sm); 
+    /* 0 0 7px 2px rgb(0 0 0 / .1),
+    0 0 15px 10px rgb(0 0 0 / .2),
+    0 0 20px rgb(0 0 0  / .3)
+    ;
+*/
+
+  backdrop-filter: blur(18px) saturate(180%) contrast(80%) brightness(80%);
+}
+
+.title {
+  line-height: 1;
+  font-size: clamp(1.3rem, 3.5vw, 4rem);
+  font-weight: 700;
+  color: #ddd;
+  padding-bottom: 1em;
+  text-shadow: var(--letter-press-text-shadow) !important;
+}
+
+.container p {
+  margin-top: 1.5em !important;
+  font-size: clamp(1rem, 1.8vw, 2rem);
+  line-height: 1.25;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.section a {
+  width: 30%;
+}
+
+.section a:hover {
+  text-decoration: none;
+}
+
+.section a:hover .container{
+  scale: 1.05;
+  box-shadow: 
+    0 -2px 20px rgb(255 255 255 / .3),
+    var(--box-shadow-md);
+transition: all 0.3s ease-in-out;
+}
+
+@media screen and (max-width: 1024px) {
+  .h1 {
+    font-size: max(2rem, 22vw);
+  }
+
+  header p.subtitle {
+    font-size: max(2rem, 7vw);
+  }
+
+  .container {
+    min-height: 100px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }  
+  
+  .section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .section a {
+    width: 100%;
+  }
+}

@@ -1,0 +1,66 @@
+.name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* .memberCard {
+  border-radius: 0;
+  border-top: 3px solid var(--neutral-600);
+  padding: 0;
+  padding-top: 1rem;
+  margin: 0;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+ */
+.memberCard {
+  border: 1px solid var(--neutral-700);
+  padding-inline: 1rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin: 0;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.memberCard h2, .memberCard h3, .memberCard h4, .memberCard h5 {
+  font-size: .8rem;
+  border-radius: 8px 8px 0 0;
+  background: var(--neutral-900);
+  margin-left: -1rem;
+  margin-right: -1rem;
+
+  padding: 0;
+  padding-left: 1rem;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
+
+border-bottom: 1px solid var(--neutral-800);
+
+  font-family: var(--monospace-font-family);
+  font-weight: bold;
+  color: var(--neutral-200);
+}
+
+/* .memberCard2 h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.memberCard2 h3 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0;
+  margin-bottom: 1em;
+  padding: 0;
+  color: #666;
+} */
+
+.memberCard blockquote {
+  font-size: 1rem;
+}

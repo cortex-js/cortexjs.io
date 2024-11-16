@@ -1,0 +1,11 @@
+.intro {
+  font-size: 1.5rem;
+  color: var(--blue-800);
+  font-weight: 600;
+  line-height: 1.1;
+  padding-block: 1em;
+}
+
+.intro a {
+  text-decoration: underline;
+}

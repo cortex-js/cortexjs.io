@@ -1,0 +1,92 @@
+.line {
+  display: block;
+}
+
+.latexWrapper {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border-left: 3px solid var(--blue-200);
+  background: var(--blue-50);
+  padding: .5em;
+  color: black;
+  border-radius: 0 8px 8px 0;
+  overflow: hidden;
+}
+
+[data-theme="dark"]  .latexWrapper {
+  border-left: 3px solid var(--blue-300);
+  background: var(--blue-900);
+  color: var(--blue-200);
+}
+
+.latexWrapperColumn {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1em;
+
+  background: var(--neutral-900);
+  padding: .5em;
+  margin-bottom: .5em;
+  border-radius: 8px;
+}
+
+.latexWrapperColumn .source {
+  border-right: 1px solid var(--neutral-700);
+}
+
+.latexWrapperColumnDisplay {
+  display: flex;
+  justify-content: center;
+  background: transparent;
+}
+
+
+.source {
+  font-family: var(--monospace-font-family);
+  color: var(--blue-900);
+  font-size: 1.1em;
+  line-height: 1.4;
+  overflow: visible;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+[data-theme="dark"] .source {
+  color: var(--blue-200);
+}
+
+.source .command {
+  color: var(--cyan-700);
+}
+
+[data-theme="dark"] .source .command {
+  color: var(--cyan-400);
+}
+
+
+.source .punctuation {
+  color: var(--teal-700);
+}
+
+[data-theme="dark"] .source .punctuation {
+  color: var(--teal-500);
+}
+
+
+.aside {
+  margin-top: .5em;
+  font-family: var(--body-font-family);
+  font-size: .8em;
+  line-height: 1;
+  overflow:visible;
+  white-space: normal;
+}
+
+.display {
+  padding-top: .5em;
+  padding-bottom: .5em;
+}
+
+.display .ML__mathlive {
+  font-size: 2em;
+}

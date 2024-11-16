@@ -1,0 +1,25 @@
+
+
+.icon {
+    width: 1em;
+    height: 1em;
+    color: currentColor;
+}
+
+.chevronRight {
+  vertical-align: -4px;
+  margin-left: 4px;
+}
+
+.chevronRightBold {
+  font-size: 1.1em;
+  vertical-align: -4px;
+  margin-left: 4px;
+}
+
+
+.chevronLeft {
+  transform: rotate(180deg);
+  vertical-align: -4px;
+  margin-left: 4px;
+}

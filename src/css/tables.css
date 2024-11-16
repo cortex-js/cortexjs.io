@@ -1,0 +1,133 @@
+
+
+table {
+  /* font-size: $type-size-4; // .main.sccs has it at .75em */
+  line-height: 1.47;
+  width: 100%;
+  display: table;
+  border: none;
+}
+
+table thead {
+  background-color: transparent;
+}
+table thead tr {
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid var(--table-thick-line-color);
+}
+
+table thead th {
+  overflow: visible;
+  line-height: 1.1;
+  vertical-align: bottom;
+  border: none;
+  overflow-wrap: normal;
+  color: var(--text-color);
+}
+
+table thead tr th code {
+  font-weight: 900;
+  border: none;
+}
+
+table th:empty {
+  display: none;
+}
+
+table tr {
+  width: 100%;
+  border: none;
+}
+
+table tr code {
+  /* Avoid breaking code in tables (often used as first column index) */
+  white-space: break-spaces;
+}
+
+table td {
+  border-bottom-color: var(--table-thin-line-color);
+  border-right: none;
+  border-left: none;
+  line-height: 1.2;
+}
+
+table td ul {
+  margin: 0;
+  margin-top: 0.5em;
+  padding-left: 1em;
+  list-style-type: square;
+}
+
+table tr:nth-child(2n) {
+  /* background-color: var(--table-even-row-background-color); */
+  background-color: transparent
+}
+
+  /* List of symbols: Narrow first column */
+  .symbols-table table {
+    table-layout: auto;
+  }
+    .symbols-table table tr th {
+      overflow: visible;
+      max-width: var(--first-col-width, 15ch);
+    }
+    .symbols-table table tr td:first-child {
+      min-width: var(--first-col-width, 15ch);
+      width: var(--first-col-width, 15ch);
+      max-width: var(--first-col-width, 15ch);
+    }
+  
+    .symbols-table table tr td {
+      min-width: fit-content;
+      width: fit-content;
+      max-width: fit-content;
+    }
+  
+  
+  
+    /* Used by the list of dictionaries table (in the intro page and elsewhere) */
+    .symbols-table table tr td:first-child a {
+      display: block;
+      text-decoration: none;
+      border: 2px solid var(--primary-color);
+      border-radius: 4px;
+      padding: 4px 8px 4px 8px;
+      margin: 0 8px 0 8px;
+  
+      font-weight: 600;
+  
+  
+    }
+    .symbols-table table a:hover {
+      text-decoration: none;
+      background: var(--link-color);
+      color: #fff;
+    }
+
+  .first-column-header table thead tr th:first-child {
+    background: var(--callout-background);
+    padding-left: 0.5em;
+  }
+  
+  .first-column-header table thead tr th:nth-child(2) {
+    padding-left: 0.5em;
+  }
+  
+  .first-column-header table tr td:first-child {
+    background: var(--callout-background);
+    padding-left: 0.5em;
+  }
+  
+  .first-column-header table tr td:nth-child(2) {
+    padding-left: 0.5em;
+  }
+  
+  
+.equal-width-columns table {
+  table-layout: fixed;
+}
+
+.equal-width-columns table th {
+  width: 1%;
+}

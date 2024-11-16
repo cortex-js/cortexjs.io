@@ -1,0 +1,58 @@
+/** ReadMore **/
+
+.readMore {
+  margin: 2em 0 !important;
+  overflow: hidden;
+
+  /* override*/
+  color: #494e52;   /* This color is not currently used, as the read-more content is a <a> tag. See ".read-more a" below */
+  font-family: var(--body-font-family);
+  font-feature-settings: var(--body-font-settings);
+  /* font-size: 1rem !important; */
+  line-height: 1.2;
+  font-weight: 500;
+  /* line-height: 1.47059; */
+  text-indent: initial;
+  /* override*/
+  background: var(--callout-background);
+  border-radius: 4px;
+  box-shadow: var(--callout-shadow);
+  border: 1px solid var(--callout-border-color);
+  transition: all 0.15s ease;
+
+}
+
+/* The body of a read-more is a <a> tag */
+.readMore a {
+  padding: 1em;
+  display: block;
+  color: var(--link-color); 
+  text-decoration: none;
+}
+
+.readMore a p {
+  margin: 0;
+  padding: 0;
+}
+
+.readMore:hover {
+  border: 1px solid var(--callout-border-color-hover);
+  transform: scale(1.02);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.04);
+  transition: all 0.15s ease;
+}
+
+.readMore code {
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid var(--callout-border-color);
+  color: currentColor;
+
+}
+
+.readMore kbd {
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid var(--callout-border-color);
+  color: currentColor;
+}
