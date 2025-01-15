@@ -26,10 +26,10 @@ function.
 
 Declaring it indicates to the Compute Engine the "kind" of object it is (a
 string, a real number, a function...), and allows it to be used in expressions.
-The "kind" of an object is called its **domain**.
+The "kind" of an object is called its **type**.
 
-<ReadMore path="/compute-engine/guides/domains" >
-Learn more about **domains**.<Icon name="chevron-right-bold" />
+<ReadMore path="/compute-engine/guides/types" >
+Learn more about **types**.<Icon name="chevron-right-bold" />
 </ReadMore>
 
 **To declare an identifier** use the `ce.declare()` method:

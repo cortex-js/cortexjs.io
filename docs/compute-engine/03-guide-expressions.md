@@ -50,7 +50,7 @@ By default, `ce.box()` returns a canonical expression. See
 
 ```js
 let expr = ce.box(1.729e3);
-console.log(expr.machineNumber);
+console.log(expr.re);
 // ➔ 1729
 
 console.log(expr.isPositive);
@@ -58,10 +58,10 @@ console.log(expr.isPositive);
 
 expr = ce.box({ num: "+Infinity" });
 console.log(expr.latex);
-// ➔ +\infty
+// ➔ "+\infty"
 
 expr = ce.box(["Add", 3, "x"]);
-console.log(expr.head);
+console.log(expr.operator);
 // ➔ "Add"
 ```
 
@@ -71,7 +71,7 @@ function.
 
 ```js
 const expr = ce.parse("3 + x + y");
-console.log(expr.head);
+console.log(expr.operator);
 // ➔ "Add"
 
 console.log(expr.json);
@@ -105,7 +105,7 @@ console.log(expr.json);
 ```
 
 **To customize the format of the MathJSON expression returned by `expr.json`**
-use the `ce.jsonSerializationOptions` property.
+use the `ce.toMathJson` method.
 
 Use this option to control:
 
@@ -121,13 +121,11 @@ const expr = ce.parse("2 + \\frac{q}{p}");
 console.log(expr.json);
 // ➔ ["Add", 2, ["Divide", "q", "p"]]
 
-ce.jsonSerializationOptions = {
+console.log(expr.toMathJson({
   exclude: ["Divide"], // Don't use `Divide` functions,
   // use `Multiply`/`Power` instead
   shorthands: [], // Don't use any shorthands
-};
-
-console.log(expr.json);
+}));
 // ➔ ["fn": ["Add", ["num": "2"],
 //      ["fn": ["Multiply",
 //        ["sym": "q"],
@@ -191,6 +189,8 @@ By default, `ce.box()` and `ce.parse()` produce a canonical expression.
 **To get a non-canonical expression instead**, use
 `ce.box(expr, {canonical: false})` or `ce.parse(latex, {canonical: false})`.
 
+The non-canonical form sticks closer to the original LaTeX input.
+
 ```js
 const expr = "\\frac{30}{-50}";
 
@@ -201,7 +201,7 @@ ce.parse(expr, { canonical: false });
 // non-canonical form ➔ ["Divide", 30, -50]
 ```
 
-**To obtain the canonical representation of an expression**, use
+**To obtain the canonical representation of a non-canonical expression**, use
 `expr.canonical`.
 
 A non-canonical expression may include errors as a result of parsing from LaTeX,
@@ -209,7 +209,7 @@ if the LaTeX input contained LaTeX syntax errors.
 
 A canonical expression may include additional errors compared to a non-canonical
 expression, for example `["Divide", 2, 5, 6]` (three arguments instead of two),
-`["Add", 2, "True"]` (mismatched argument domain, expected a number but got a
+`["Add", 2, "True"]` (mismatched argument type, expected a number but got a
 boolean).
 
 The canonical form of an expression which is not valid will include one or more
@@ -219,7 +219,7 @@ The canonical form of an expression which is not valid will include one or more
 
 When doing this check on a canonical expression it takes into consideration not
 only possible syntax errors, but also semantic errors (incorrect number or
-domain of arguments, etc...).
+type of arguments, etc...).
 
 </section>
 
@@ -234,21 +234,21 @@ The functions that manipulate Boxed Expressions, such as `expr.simplify()`,
 However, the properties of the expression may change, since some of them may
 depend on contextual information which can change over time.
 
-For example, `expr.isPositive` may return `undefined` if nothing is known about
-a symbol. But if an assumption about the symbol is made later, or a value
-assigned to it, then `expr.isPositive` may take a different value.
+For example, `ce.box('n').isPositive` may return `undefined` if nothing is known 
+about the symbol `n`. But if an assumption about the symbol is made later, or a value
+assigned to it, then `ce.box('n').isPositive` may take a different value.
 
 ```js
-const expr = ce.box("x");
+const expr = ce.box("n");
 console.log(expr.isPositive);
 // ➔ undefined
 
-ce.assume("x > 0");
+ce.assume(ce.parse("n > 0"));
 console.log(expr.isPositive);
 // ➔ true
 ```
 
-What doesn't change is the fact that `expr` represents the symbol `"x"`.
+What doesn't change is the fact that `expr` represents the symbol `"n"`.
 
 ## Pure Expressions
 
@@ -275,28 +275,25 @@ dictionary, use the following boolean expressions:
 
 | Kind           | Boolean Expression                                     |
 | :------------- | :----------------------------------------------------- |
-| **Number**     | `expr.numericValue !== null`                           |
-| **Symbol**     | `expr.symbol !== null` <br/> `expr.head === "Symbol"`   |
+| **Number**     | `expr.isNumberLiteral`                           |
+| **Symbol**     | `expr.symbol !== null` |
 | **Function**   | `expr.ops !== null`                                    |
-| **String**     | `expr.string !== null` <br/> `expr.head === "String"`   |
-| **Dictionary** | `expr.keys !== null` <br/> `expr.head === "Dictionary"` |
+| **String**     | `expr.string !== null`  |
 
 </div>
 
 The value of `expr.numericValue` may be:
 
 - `typeof expr.numericValue === "number"`: the expression is a JavaScript number
-- `ce.isBignum(expr.numericValue)`: the expression is a bignum. Use
-  `expr.numericValue.toNumber()` to convert it to a JavaScript number.
-- `ce.isComplex(expr.numericValue)`: the expression is a complex number. Use
-  `expr.numericValue.re` and `expr.numericValue.im` to access the real and
-  imaginary parts.
-- `Array.isArray(expr.numericValue)`: the expression is a rational as a tuple of
-  two JavaScript `number` or two JavaScript `bigint`.
+- otherwise, the property is a `NumericValue` object.
 
 **To access a the value of an expression as a JavaScript primitive**, use
 `expr.value`. The result is a JavaScript primitive, such as a number, string or
 boolean.
+
+**To access the value of an expression as a JavaScript number**, use
+`expr.re`. The result is the real part of the number, as a JavaScript number, 
+or `NaN` if the expression is not a number. Use `expr.im` to get the imaginary part.
 
 
 ## Errors
@@ -312,7 +309,7 @@ arguments to the error.
 
 For example if the problem is that an argument of a function expression is a
 boolean when a number was expected, an expression such as
-`["Error", ["ErrorCode", "'incompatible-domain'", "Numbers", "Booleans"]]` could
+`["Error", ["ErrorCode", "'incompatible-type'", "'number'", "'boolean'"]]` could
 be returned.
 
 The `<location>` argument indicates the context of the error. This can be a

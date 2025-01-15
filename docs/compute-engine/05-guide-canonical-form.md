@@ -29,6 +29,36 @@ object:
 The Compute Engine stores expressions internally in a canonical form to make
 it easier to work with symbolic expressions.
 
+The canonical form is intended to be “stable”, that is it does not depend on 
+the values of non-constant symbols or on assumptions about a symbol or 
+expression.
+
+The type of symbols *can* be used during canonicalization of expressions 
+referencing the symbol, as the type can only be narrowed later and thus would 
+not change the result of the canonicalization. The value of variables 
+(non-constant symbols) is never used during canonicalization as 
+it could be changed later.
+
+```js
+ce.assign("x", -2);
+console.info(ce.parse("\\frac{10}{x}").json);
+// ➔ ["Rational", 10, "x"]
+// and not `["Rational", -10, ["Negate", "x"]]` or `5`
+```
+
+Future versions of the Compute Engine could have different canonical forms, 
+however a given version of the Compute Engine will always produce the same
+canonical form for a given expression, given the same type information about 
+symbols and the same dictionary.
+
+**To check if an expression is canonical** use `expr.isCanonical`.
+
+**To obtain the canonical representation of a non-canonical expression**, use
+the `expr.canonical` property.
+
+If the expression is already canonical, `expr.canonical` immediately returns
+`expr`.
+
 The return value of `expr.simplify()`, `expr.evaluate()` and `expr.N()` are 
 canonical expressions.
 
@@ -39,18 +69,19 @@ default, which is the desirable behavior in most cases.
 of `ce.parse(s, {canonical: false})` or `ce.box(expr, {canonical: false})`.
 
 You can further customize the canonical form of an expression by using the
-[`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function or by specifying the form you want to use. See [below](#custom-canonical-form) for more details.
+[`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
+or by specifying the form you want to use. See [below](#custom-canonical-form) for more details.
 
 The non-canonical version will be closer to the literal LaTeX input, which may
 be desirable to compare a "raw" user input with an expected answer.
 
 ```js
-ce.parse('\\frac{30}{-50}').print();
+console.info(ce.parse('\\frac{30}{-50}').json);
 // ➔ ["Rational", -3, 5]
 // The canonical version moves the sign to the numerator 
 // and reduces the numerator and denominator
 
-ce.parse('\\frac{30}{-50}', { canonical: false }).print();
+console.info(ce.parse('\\frac{30}{-50}', { canonical: false }).json);
 // ➔ ["Divide", 30, -50]
 // The non-canonical version does not change the arguments,
 // so this is interpreted as a regular fraction ("Divide"), 
@@ -63,33 +94,18 @@ representation before being returned, for example `["Power", "x", 2]` is
 returned as `["Square", "x"]`.
 
 You can customize how an expression is serialized to plain JSON by using
-[`ce.jsonSerializationOptions`](/docs/compute-engine/#(ComputeEngine%3Aclass).(jsonSerializationOptions%3Ainstance)).
+`expr.toMathJson()`.
 
 ```js
 const expr = ce.parse("\\frac{3}{5}");
-console.log(expr.json)
+console.log(expr.toMathJson());
 // ➔ ["Rational", 3, 5]
 
-ce.jsonSerializationOptions = { exclude: ["Rational"] };
-console.log(expr.json);
+console.log(expr.expr.toMathJson({ exclude: ["Rational"] }));
 // ➔ ["Divide", 3, 5]
 // We have excluded `["Rational"]` expressions, so it 
 // is interepreted as a division instead.
 ```
-
-The canonical form of an expression is always the same when used with a given
-Compute Engine instance. However, do not rely on the canonical form as future
-versions of the Compute Engine could have a different definition of 
-canonical form.
-
-
-**To check if an expression is canonical** use `expr.isCanonical`.
-
-**To obtain the canonical representation of a non-canonical expression**, use
-the `expr.canonical` property.
-
-If the expression is already canonical, `expr.canonical` immediately returns
-`expr`.
 
 
 ```js

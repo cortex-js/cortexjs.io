@@ -13,3 +13,6 @@ if [ ! -d node_modules ]; then
 fi
 
 npm --prefix submodules/code-playground run dist
+
+cp ./submodules/code-playground/dist/code-playground.min.js ./submodules/cortex-js.github.io/assets/js/code-playground.min.js
+cp ./submodules/code-playground/dist/code-playground.js ./submodules/cortex-js.github.io/assets/js/code-playground.js

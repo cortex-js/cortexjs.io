@@ -145,8 +145,7 @@ applied to some arguments.
 Assign the anonymous function _fn_ to the identifier _id_.
 
 The identifier _id_ should either not have been declared yet, or been declared
-as a function. If _id_ is already defined in the domain of `Numbers` for example, it is an
-error to assign a function to it.
+as a function.
 
 `Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions).
 

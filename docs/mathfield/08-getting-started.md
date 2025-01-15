@@ -52,8 +52,35 @@ Press **Reset** to bring back the playground to its original state.
 </math-field>
 ```
 
+## Vanilla HTML Example
 
-## Mathfields with React
+Here's a complete web page in vanilla HTML:
+
+```html
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>untitled</title>
+  <script defer src="//unpkg.com/mathlive"></script>
+</head>
+
+<body>
+  <math-field id="mf">x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}</math-field>
+  <script>
+    mf.addEventListener('input', evt =>
+      console.log('Value:', evt.target.value)
+    );
+  </script>
+</body>
+
+</html>
+```
+
+
+
+## React Example
 
 **To use mathfields in a React project**, use a `<math-field>` tag with JSX:
 
@@ -105,22 +132,6 @@ With VSCode, the **Live Server** extension can be used to launch a local
 development server with one click.
 
 :::
-
-Here's a complete web page:
-
-```html
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>untitled</title>
-    <script defer src="//unpkg.com/mathlive"></script>
-  </head>
-  <body>
-    <math-field>x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}</math-field>
-  </body>
-</html>
-```
 
 
 <ReadMore path="/mathfield/guides/integration/" >

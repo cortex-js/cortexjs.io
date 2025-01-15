@@ -39,7 +39,7 @@ There are three common transformations that can be applied to an expression:
 A key difference between `expr.evaluate()` and `expr.N()` is that the former
 will use the exact value of symbols, while the latter will use their numeric
 approximation. An exact value is a rational number, an integer, the square root
-of a rational and some constants such as \\(\pi\\) or \\(e\\). A numeric
+of an integer and some constants such as \\(\pi\\) or \\(e\\). A numeric
 approximation is a floating point number.
 
 

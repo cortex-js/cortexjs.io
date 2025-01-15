@@ -6,15 +6,14 @@ toc_max_heading_level: 2
 ---
 
 <Intro>
-Mathfields supports over **800** LaTeX commands.
+Mathfields support over **800** LaTeX commands.
 </Intro>
 
 <ReadMore path="http://detexify.kirelabs.org/classify.html" >
-If you know the shape of a symbol, use **Detexify** to find the 
-name of the corresponding LaTeX command<Icon name="chevron-right-bold" />
+**To find the name of the LaTeX command matching the shape of a symbol you can draw**, use **Detexify**<Icon name="chevron-right-bold" />
 </ReadMore>
 
-**To enter a LaTeX command** press the <kbd>ESC</kbd> key or <kbd>\\</kbd>  
+**To enter a LaTeX command in mathfield** press the <kbd>ESC</kbd> key or <kbd>\\</kbd>  
 to enter LaTeX editing mode. Press <kbd>ESC</kbd> to exit LaTeX editing mode. 
 You can examine the LaTeX 
 code for an expression by selecting it, then pressing <kbd>ESC</kbd>.
@@ -34,12 +33,12 @@ When in **Math Mode**, the content is laid out using typesetting rules specific
 to math. 
 
 For example, variables are displayed in italics, an appropriate amount
-of space is inserted around some letters such as "f" to improve their legibility
+of space is inserted around some letters such as $ f $ to improve their legibility,
 and white spaces are ignored.
 
 In Math Mode, the layout and size of some math elements is adjusted based on the
 context in which they are used. For example, superscripts and subscripts are
-displayed in a smaller font.
+displayed using a smaller font size: $ 2^2 $.
 
 
 **To override the default _math style_**, use the following commands:
@@ -56,7 +55,7 @@ displayed in a smaller font.
 
 ### Text Mode
 
-**To include some textual comments**, use the `\text{}` command to switch 
+**To include some textual content**, use the `\text{}` command to switch 
 to **Text Mode**.
 
 | Math Mode | Text Mode | 
@@ -69,7 +68,7 @@ The `\text{}` command will use the font defined by the CSS `font-family` propert
 of the enclosing mathfield. The size of the text will adjust depending on 
 the current math style (smaller in superscript/subscript).
 
-<Latex value='\text{Knuth created LaTeX}' />
+<Latex value='\text{Donald Knuth created LaTeX}' />
 
 
 ---
@@ -78,7 +77,7 @@ the current math style (smaller in superscript/subscript).
 The `\textrm{}` command works like `\text{}` but will use a serif (roman) font.
 
 
-<Latex value='\textrm{Knuth is the autor of "The Art of Computer Programming"}'/>
+<Latex value='\textrm{Donald Knuth is the author of “The Art of Computer Programming”}'/>
 
 
 ---
@@ -86,14 +85,14 @@ The `\textrm{}` command works like `\text{}` but will use a serif (roman) font.
 The `\mbox{}` command uses the same font as `\text` but its size does not 
 account for the current math style.
 
-<Latex value="\mbox{Knuth received the Turing Award in 1974}"/>
+<Latex value="\mbox{Donald Knuth received the Turing Award in 1974}"/>
 
 
 ---
 
 The `\textnormal{}` command works like `\text{}`. But it's longer to type.
 
-<Latex value="\textnormal{Knuth is a Professor Emeritus at Stanford University}"/>
+<Latex value="\textnormal{Donald Knuth is a Professor Emeritus at Stanford University}"/>
 
 
 When in Text Mode, use `$...$` to switch back to Inline Math Mode or `\\[...\\]` to switch

@@ -29,7 +29,7 @@ property of the keycap definition. For example:
 { 
   "class": "action", 
   "label": "Delete", 
-  "command": ["perform-with-feedback", "delete-backward"] 
+  "command": 'perform-with-feedback("delete-backward")'
 }
 ```
 

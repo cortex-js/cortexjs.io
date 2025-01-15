@@ -33,10 +33,9 @@ the documentation.
 | [Complex](/compute-engine/reference/complex/)                       | `Real` `Conjugate`, `ComplexRoots`...                                  |
 | [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` ...                                          |
 | [Core](/compute-engine/reference/core/)                             | `Declare` `Assign` `Error` `LatexString`...                       |
-| [Domains](/compute-engine/reference/domains/)                       | `Anything` `Nothing` `Numbers` `Integers` ...                            |
 | [Functions](/compute-engine/reference/functions/)                   | `Function` `Apply` `Return` ...                                        |
 | [Logic](/compute-engine/reference/logic/)                           | `And` `Or` `Not` `True` `False` `ForAll` ...                            |
-| [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` ...                                  |
+| [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
 | [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
 | [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
 | [Styling](/compute-engine/reference/styling/)                       | `Delimiter` `Style`...                                                 |

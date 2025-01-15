@@ -12,8 +12,6 @@ function renderMath() {
     setTimeout(renderMath, 500);
     return;
   }
-
-  debugger;
   MathLive.renderMathInDocument({
     renderAccessibleContent: false,
     skipTags: [

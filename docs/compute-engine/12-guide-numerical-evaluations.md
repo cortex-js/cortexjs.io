@@ -14,7 +14,7 @@ An evaluation with `expr.evaluate()` preserves **exact values**.
 Exact values are:
 
 - integers and rationals
-- square roots of integers and rationals
+- square roots of integers
 - constants such as `ExponentialE` and `Pi`
 
 If one of the arguments is not an exact value the expression is evaluated as a
@@ -24,63 +24,33 @@ If one of the arguments is not an exact value the expression is evaluated as a
 provide a numeric evaluation, a symbolic representation of the partially
 evaluated expression is returned.
 
-The value of `N()` is a boxed expression. The `numericValue` property is either
-a machine number, a `Decimal` object or a `Complex` object, depending on the
-`numericMode` of the compute engine, or `null` if the result is not a number.
+The value of `N()` is a boxed expression. The `numericValue` property of this
+expression is either a machine number (a JavaScript `number`), a 
+`NumericValue` object or `null` if the expression is not a number.
 
-**To check if the `numericValue` is a `Decimal`** use
-`ce.isBignum(expr.N().numericValue)`.
-
-**To check if the `numericValue` is a `Complex`** use
-`ce.isComplex(expr.N().numericValue)`.
-
-**To access a JavaScript machine number approximation of the result** use
-`expr.value`. If `numericValue` is a machine number, a `Decimal` object, or a
-rational, `expr.value` will return a machine number approximation.
+While a `NumericValue` object can represent arbitrary precision numbers, for 
+use with JavaScript, a reduced precision approximation can be accessed using
+the `re` (for the real part of the number) and `im` (for the imaginary part)
+properties.
 
 ```js
-console.log(ce.parse('11 + \\sqrt{x}').value);
-// ➔ "["Add",11,["Sqrt","x"]]"
-// Note: if the result is not a number, value returns a string
-// representation of the expression
-
-const expr = ce.parse('\\sqrt{5} + 7^3').N();
-
-console.log(expr.value);
-// ➔ 345.2360679774998
-// If the result is a number, value returns a machine number approximation
-
-console.log(expr.latex);
-// ➔ "345.236\,067\,977\,499\,8,"
-// Note: the LaTeX representation of the numeric value is rounded to the
-// display precision
-
-console.log(expr.numericValue);
-// ➔ [Decimal]
-// Note: depending on the numeric mode, this may be a machine number,
-// a Decimal object or a Complex object
-
-if (ce.isBignum(expr.numericValue)) {
-  console.log(
-    'The numeric value is a Decimal object',
-    expr.numericValue.toNumber()
-  );
-} else if (ce.isComplex(expr.numericValue)) {
-  console.log(
-    'The numeric value is a Complex object',
-    expr.numericValue.re,
-    expr.numericValue.im
-  );
-} else if (Array.isArray(expr.numericValue)) {
-  console.log(
-    'The numeric value is a rational',
-    expr.numericValue[0],
-    expr.numericValue[1]
-  );
-} else {
-  console.log('The numeric value is a machine number', expr.numericValue);
-}
+const expr = ce.parse('1/3 + 1/4');
+console.log(expr.N().re);
+// ➔ 0.5833333333333334
 ```
+
+Another way to obtain a JavaScript compatible representation of an expression
+is to use the `value` property of the boxed expression.
+
+```js
+const expr = ce.parse('1/3 + 1/4');
+console.log(expr.N().value);
+// ➔ 0.5833333333333334
+```
+
+Unlike the `.re` property, the `.value` property can also return a `boolean`,
+a `string`, depending on the value of the expression.
+
 
 <ReadMore path="/compute-engine/guides/symbolic-computing/" > Read more about
 <strong>Symbolic Computing</strong> <Icon name="chevron-right-bold" /></ReadMore>
@@ -96,7 +66,7 @@ const expr = ce.parse('3x^2+4x+2');
 
 for (const x = 0; x < 1; x += 0.01) {
   ce.assign('x', x);
-  console.log(`f(${x}) = ${expr.value}`);
+  console.log(`f(${x}) = ${expr.N().re}`);
 }
 ```
 
@@ -107,7 +77,7 @@ each iteration, and will be much slower.
 const expr = ce.parse('3x^2+4x+2');
 
 for (const x = 0; x < 1; x += 0.01) {
-  console.log(`f(${x}) = ${expr.subs({ x: x }).value}`);
+  console.log(`f(${x}) = ${expr.subs({ x: x }).N().re}`);
 }
 ```
 
@@ -120,7 +90,7 @@ console.log(expr.N().latex);
 // ➔ "3x^2+4x+c"
 ```
 
-You can change the value of a variable by setting its `value` property:
+You can also change the value of a variable by directly setting its `value` property:
 
 ```ts
 ce.symbol('x').value = 5;
@@ -128,10 +98,11 @@ ce.symbol('x').value = 5;
 ce.symbol('x').value = undefined;
 ```
 
-If performance is important, you can compile the expression to a JavaScript
-function.
 
 ## Compiling
+
+If performance is important, you can compile the expression to a JavaScript
+function.
 
 **To get a compiled version of an expression** use the `expr.compile()` method:
 
@@ -153,46 +124,24 @@ this approach has some limitations.
 <ReadMore path="/compute-engine/guides/compiling/" > Read more about **Compiling
 Expressions to JavaScript** <Icon name="chevron-right-bold" /></ReadMore>
 
-## Numeric Modes
+## Numeric Precision
 
-Four numeric modes may be used to perform numeric evaluations with the Compute
-Engine: `"machine"` `"bignum"` `"complex"` and `"auto"`. The default mode is
-`"auto"`.
+The number of significant digits used in numeric calculations can be controlled
+by the `precision` property of the `ComputeEngine` instance.
 
-Numbers are represented internally in one of the following format:
+The default precision is 21.
 
-- `number`: a 64-bit float
-- `complex`: a pair of 64-bit float for the real and imaginary part
-- `bignum`: an arbitrary precision floating point number
-- `rational`: a pair of 64-bit float for the numerator and denominator
-- `big rational`: a pair of arbitrary precision floating point numbers for the
-  numerator and denominator
+```js
+ce.precision = 30;
+console.log(ce.parse('\\pi').N().latex);
+// ➔ 3.141592653589793238462643383279502884197169399375105820974944592307
+```
 
-Depending on the current numeric mode, this is what happens to calculations
-involving the specified number types:
+### Machine Precision
 
-- <Icon name="circle-check" color="green-700"/> indicate that no transformation is done
-- `upgraded` indicate that a transformation is done without loss of precision
-- `downgraded` indicate that a transformation is done with may result in a loss
-  of precision, a rounding towards 0 if underflow occurs, or a rounding towards
-  \\( \\pm\\infty \\) if overflow occurs.
-
-<div className="symbols-table first-column-header">
-
-|                | `auto`                                | `machine`                             | `bignum`                              | `complex`                             |
-| :------------- | ------------------------------------- | ------------------------------------- | ------------------------------------- | ------------------------------------- |
-| `number`       | upgraded to `bignum`                  | <Icon name="circle-check" color="green-700"/> | upgraded to `bignum`                  | <Icon name="circle-check" color="green-700"/> |
-| `complex`      | <Icon name="circle-check" color="green-700"/> | `NaN`                                 | `NaN`                                 | <Icon name="circle-check" color="green-700"/> |
-| `bignum`       | <Icon name="circle-check" color="green-700"/> | downgraded to `number`                | <Icon name="circle-check" color="green-700"/> | downgraded to `number`                |
-| `rational`     | <Icon name="circle-check" color="green-700"/> | <Icon name="circle-check" color="green-700"/> | upgraded to `big rational`            | <Icon name="circle-check" color="green-700"/> |
-| `big rational` | <Icon name="circle-check" color="green-700"/> | downgraded to `rational`              | <Icon name="circle-check" color="green-700"/> | downgraded to `rational`              |
-
-</div>
-
-### Machine Numeric Mode
-
-Calculations in the `machine` numeric mode use a
-[64-bit binary floating point format](https://en.wikipedia.org/wiki/IEEE_754).
+If the precision is less than 15, the Compute Engine uses a
+[64-bit binary floating point format](https://en.wikipedia.org/wiki/IEEE_754)
+for its internal calculations.
 
 This format is implemented in hardware and well suited to do fast computations.
 It uses a fixed amount of memory and represent significant digits in base-2 with
@@ -201,12 +150,10 @@ about 15 digits of precision and with a minimum value of \\( \pm5\times
 \\)
 
 **To change the numeric mode to the `machine` mode**, use
-`engine.numericMode = "machine"`.
+`engine.precision = "machine"`.
 
-Changing the numeric mode to `machine` automatically sets the precision to 15.
 
-Calculations that have a complex value, for example \\( \sqrt{-1} \\) will
-return `NaN`. Some calculations that have a value very close to 0 may return 0.
+Some calculations that have a value very close to 0 may return 0.
 Some calculations that have a value greater than the maximum value representable
 by a machine number may return \\( \pm\infty \\).
 
@@ -216,7 +163,7 @@ results.
 :::
 
 ```ts
-ce.numericMode = 'machine';
+ce.precision = 'machine';
 console.log(ce.parse('0.1 + 0.2').N().latex);
 // ➔ "0.30000000000000004"
 ```
@@ -230,42 +177,38 @@ Read **"What Every Computer Scientist Should Know About Floating-Point
 Arithmetic"** by David Goldberg <Icon name="chevron-right-bold" />
 </ReadMore>
 
-### Bignum Numeric Mode
+### Arbitrary Precision
 
-In the `bignum` numeric mode, numbers are represented as a string of base-10
-digits and an exponent.
+In the `ce.precision` is greater than 15, numbers are represented as a string 
+of base-10 digits and an exponent, `bignum` numbers.
 
 Bignum numbers have a minimum value of $$ \\pm
 10^{-9\\,000\\,000\\,000\\,000\\,000} \\) and a maximum value of \\(
 \\pm9.99999\\ldots \\times 10^{+9\\,000\\,000\\,000\\,000\\,000} $$.
 
-**To change the numeric mode to the `bignum` mode**, use
-`engine.numericMode = "bignum"`.
 
 ```ts
-ce.numericMode = 'bignum';
+ce.numericMode = 21;
 console.log(ce.parse('0.1 + 0.2').N().latex);
 // ➔ "0.3"
 ```
 
-When using the `bignum` mode, the precision of computation (number of
-significant digits used) can be changed. By default, the precision is 100.
-
 Trigonometric operations are accurate for precision up to 1,000.
 
-**To change the precision of calculations in `bignum` mode**, set the
-`engine.precision` property.
+### Serialization
 
 The `precision` property affects how the computations are performed, but not how
-they are serialized. To change how numbers are serialized to LaTeX, use
-`engine.latexOptions = { precision: 6 }` to set it to 6 significant digits, for
+they are serialized. 
+
+**To change the number of digits when serializing to LaTeX**, use
+`expr.toLatex({ precision: 6 })` to set it to 6 significant digits, for
 example.
 
 The LaTeX precision is adjusted automatically when the `precision` is changed so
 that the display precision is never greater than the computation precision.
 
-When using the `bignum` mode, the return value of `expr.N().json` may be a
-MathJSON number that looks like this:
+When the precision is greater than 15, the return value of `expr.N().json` may 
+be a MathJSON number that looks like this:
 
 ```json example
 {
@@ -286,40 +229,6 @@ MathJSON number that looks like this:
 }
 ```
 
-<ReadMore path="https://mikemcl.github.io/decimal.js/" > Support for the `bignum`
-mode is implemented using the <strong>decimal.js</strong> library. This library
-is built-in with the Compute Engine. <Icon name="chevron-right-bold" /></ReadMore>
-
-### Complex Numeric Mode
-
-The `complex` numeric mode can represent complex numbers as a pair of real and
-imaginary components. The real and imaginary components are stored as 64-bit
-floating point numbers and have thus the same limitations as the `machine`
-format.
-
-The complex number \\(1 + 2\imaginaryI\\) is represented as `["Complex", 1, 2]`.
-This is a convenient shorthand for
-`["Add", 1, ["Multiply", 2, "ImaginaryUnit"]]`.
-
-**To change the numeric mode to the `complex` mode**, use
-`engine.numericMode = "complex"`.
-
-Changing the numeric mode to `complex` automatically sets the precision to 15.
-
-<ReadMore path="https://github.com/infusion/Complex.js" > Support for the
-`complex` mode is implemented using the <strong>Complex.js</strong> library.
-This library is built-in with the Compute Engine. <Icon name="chevron-right-bold" /></ReadMore>
-
-### `Auto` Numeric Mode
-
-When using the `auto` numeric mode, calculations are performed using bignum
-numbers.
-
-Computations which result in a complex number will return a complex number as a
-`Complex` object.
-
-To check the type of the result, use `ce.isComplex(expr.N().numericValue)` and
-`ce.isBignum(expr.N().numericValue)`.
 
 ## Simplifying Before Evaluating
 
@@ -329,9 +238,10 @@ evaluated.**
 Because of the limitations of machine numbers, this may produce surprising
 results.
 
-For example, when `numericMode = "machine"`:
+For example:
 
 ```js
+ce.precision = 'machine';
 const x = ce.parse('0.1 + 0.2').N();
 console.log(ce.box(['Subtract', x, x]).N());
 // ➔ 2.7755575615628914e-17

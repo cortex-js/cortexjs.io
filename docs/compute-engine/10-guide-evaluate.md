@@ -7,10 +7,10 @@ preamble:
 # Evaluation
 
 <Intro>
-To apply a sequence of definitions to an
-expression in order to simplify it, calculate its value or get a numerical
-approximation of its value, call the `expr.simplify()`,
-`expr.evaluate()` or `expr.N()` function.
+To apply a sequence of definitions to an expression in order to simplify it,
+calculate its value or get a numerical approximation of its value, 
+call the `expr.simplify()`, `expr.evaluate()` or `expr.N()` function, 
+respectively.
 </Intro>
 
 

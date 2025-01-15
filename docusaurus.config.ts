@@ -168,6 +168,9 @@ const config: Config = {
     // ],
   ],
 
+  // themes: ['@docusaurus/theme-search-algolia'],
+
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     {
@@ -176,12 +179,41 @@ const config: Config = {
         disableSwitch: true,
         respectPrefersColorScheme: true,
       },
+
       algolia: {
-        apiKey: 'YOUR_API_KEY',
-        appId: 'YOUR_INDEX_NAME',
-        indexName: 'YOUR_INDEX_NAME',
+        // The application ID provided by Algolia
+        appId: 'Q23Y5RN3UQ',
+  
+        // Public API key: it is safe to commit it
+        apiKey: '37e3ceb91bf483b3c86cc3018fcd7611',
+        // apiKey: 'c3008baa16b5ec52773c460530fb14e1',
+  
+        indexName: 'cortexjs',
+  
+        // Optional: see doc section below
         contextualSearch: true,
+  
+        // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
+        externalUrlRegex: 'external\\.com|domain\\.com',
+  
+        // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
+        replaceSearchResultPathname: {
+          from: '/docs/', // or as RegExp: /\/docs\//
+          to: '/',
+        },
+  
+        // Optional: Algolia search parameters
+        searchParameters: {},
+  
+        // Optional: path for search page that enabled by default (`false` to disable it)
+        searchPagePath: 'search',
+  
+        // Optional: whether the insights feature is enabled or not on Docsearch (`false` by default)
+        insights: false,
+  
+        //... other Algolia params
       },
+  
       navbar: {
         title: 'CortexJS',
         // logo: {
@@ -231,20 +263,14 @@ const config: Config = {
           {
             title: 'Community',
             items: [
-              {
-                label: 'GitHub',
-                icon: '<svg class="icon1quarterem"><use role="none" xlink:href="/static/icons.svg#github"></use></svg>',
-                href: 'https://github.com/cortex-js',
+              {                
+                html: '<a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
               },
-              {
-                label: 'Discord',
-                icon: '<svg class="icon1quarterem"><use role="none" xlink:href="/static/icons.svg#discord"></use></svg>',
-                href: 'https://discord.gg/yhmvVeJ4Hd',
+              {                
+                html: '<a href="https://discord.gg/yhmvVeJ4Hd" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#discord"></use></svg>Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
               },
-              {
-                label: 'AI Assistant',
-                icon: '<svg class="icon1quarterem"><use role="none" xlink:href="/static/icons.svg#openai"></use></svg>',
-                href: 'https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant',
+              {                
+                html: '<a href="https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#openai"></use></svg>CortexJS Chatbot<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
               },
             ],
           },

@@ -158,7 +158,7 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "compute-engine/guide-domains",
+          id: "compute-engine/guide-types",
           className: "guide-icon",
         },
         {
@@ -241,11 +241,6 @@ const sidebars = {
         {
           type: "doc",
           id: "compute-engine/reference-core",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "compute-engine/reference-domains",
           className: "reference-icon",
         },
         {

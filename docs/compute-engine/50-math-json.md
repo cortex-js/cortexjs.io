@@ -69,12 +69,12 @@ MathJSON to LaTeX, and provide a collection of functions for symbolic
 manipulation and numeric evaluations of MathJSON expressions.
 
 <ReadMore path="/compute-engine/demo/"> 
-Try a demo of the **Compute Engine**.<Icon name="chevron-right-bold" />
+Try a demo of the **Compute Engine**<Icon name="chevron-right-bold" />
 </ReadMore>
 
 <ReadMore path="/compute-engine/guides/latex-syntax/">
 Read more about the **Compute Engine** LaTeX syntax parsing and
-serializing.<Icon name="chevron-right-bold" />
+serializing<Icon name="chevron-right-bold" />
 </ReadMore>
 
 Mathematical notation is used in a broad array of fields, from elementary school
@@ -130,23 +130,10 @@ A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 {"fn": [{sym: "Add"}, {num: "1"}, {sym: "x"}]}
 ```
 
-**Dictionary**
-
-```json example
-{
-  "dict": {
-    "hello": 3,
-    "world": ["Add", 5, 7]
-  }
-}
-```
 
 **Numbers**, **symbols**, **strings** and **functions** are expressed either as
 object literals with a `"num"` `"str"` `"sym"` or `"fn"` key, respectively, or
 using a shorthand notation as a a JSON number, string or array.
-
-**Dictionaries** do not have a shorthand notation and are always expressed as an
-object literal with a `"dict"` key.
 
 The shorthand notation is more concise and easier to read, but it cannot include
 metadata properties.
@@ -157,7 +144,9 @@ A MathJSON **number** is either:
 
 - an object literal with a `"num"` key
 - a JSON number
-- a JSON string starting with `+`, `-` or the digits `0`-`9`
+- a JSON string starting with `+`, `-` or the digits `0`-`9`. Using a string
+  is useful to represent numbers with a higher precision or greater range than
+  JSON numbers.
 
 ### Numbers as Object Literals
 
@@ -179,8 +168,8 @@ the following differences:
   64-bit float.
 
 - The string values `"NaN"` `"+Infinity"` and `"-Infinity"` are used to
-  represent respectively an undefined result, as per
-  [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754), positive infinity and
+  represent respectively an undefined result as per
+  [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754), positive infinity, and
   negative infinity.
 
 - If the string includes the pattern `/\([0-9]+\)/` (that is a series of one or
@@ -193,7 +182,7 @@ the following differences:
 {  "num": "0.(142857)e7" }
 ```
 
-- The following characters in the string are ignored:
+- The following characters in a string representing a number are ignored:
 
 <div className="symbols-table">
 
@@ -225,7 +214,7 @@ Specifically:
 
 -234.534e-46
 
-// The numbers below may not be represented as JSON number literals:
+// The numeric values below may not be represented as JSON number literals:
 
 // Exponent out of bounds
 { "num": "5.78e309" }
@@ -233,7 +222,7 @@ Specifically:
 // Too many digits
 { "num": "3.14159265358979323846264338327950288419716" }
 
-// Non-finite number
+// Non-finite numeric value
 { "num": "-Infinity" }
 
 ```
@@ -285,16 +274,6 @@ UTF-16LE, UTF-16BE, etc...
 "'Alan Turing'"
 ```
 
-## Symbols
-
-A MathJSON **symbol** is either:
-
-- an object literal with a `"sym"` key
-- a JSON string
-
-**Symbols** are [identifiers](#identifiers) that represent the name of
-variables, constants and wildcards.
-
 ## Functions
 
 A MathJSON function expression is either:
@@ -314,19 +293,19 @@ The function `"f"` can be used as a symbol, or in a function expression:
 
 ### Functions as Object Literal
 
-The default representation of **function** expressions is an object literal with
-a `"fn"` key. The value of the key is an array representing the function head
-and its arguments.
+The default representation of **function  expressions** is an object literal with
+a `"fn"` key. The value of the `fn` key is an array representing the function head
+(its operator) and its arguments (its operands).
 
 ```js
 {
-  "fn": [Expression, ...Expression[]]
+  "fn": [Operator, ...Operands[]]
 }
 ```
 
 ### Functions as JSON Arrays
 
-If a **function** has no extra metadata it may be represented as a JSON array.
+If a **function expression** has no extra metadata it may be represented as a JSON array.
 
 For example these two expressions are equivalent:
 
@@ -344,7 +323,7 @@ function. Therefore `[]` is not a valid expression.
 ### Function Head
 
 The **head** of the function expression is the first element in the array. Its
-presence is required. It indicates the **name of the function** or "what" the
+presence is required. It indicates the **name of the function** or **operator**: this is what the
 function is about.
 
 The head is an identifier following the conventions for function names (see
@@ -362,10 +341,10 @@ arguments, or **operands**, form the **tail** of the function.
 
 :::warning[CAUTION]
 The arguments of a function are expressions. To represent an
-argument which is a list, use a `["List"]` expression, do not use an JSON array.
+argument which is a list, use a `["List"]` expression, do not use a JSON array.
 :::
 
-The expression corresponding to \\(\sin^{-1}(x)\\) is:
+The expression corresponding to $ \sin^{-1}(x) $ is:
 
 ```json example
 ["Apply", ["InverseFunction", "Sin"], "x"]
@@ -374,12 +353,22 @@ The expression corresponding to \\(\sin^{-1}(x)\\) is:
 The head of this expression is `"Apply"` and its argument are the expressions
 `["InverseFunction", "Sin"]` and `"x"`.
 
+## Symbols
+
+A MathJSON **symbol** is either:
+
+- an object literal with a `"sym"` key
+- a JSON string
+
+**Symbols** are [identifiers](#identifiers) that represent the name of
+variables, constants and wildcards.
+
+
+
 ## Identifiers
 
-Identifiers are the names of symbols, variables, constants, wildcards and
+Identifiers are JSON strings that represent the names of symbols, variables, constants, wildcards and
 functions.
-
-They are represented as JSON strings.
 
 Before they are used, JSON escape sequences (such as `\u` sequences, `\\`, etc.)
 are decoded.
@@ -388,7 +377,7 @@ The identifiers are then normalized to the
 [Unicode Normalization Form C (NFC)](https://unicode.org/reports/tr15/). They
 are stored internally and compared using the Unicode NFC.
 
-These four JSON strings represent the same identifier:
+For example, these four JSON strings represent the same identifier:
 
 - `"Å"`
 - `"A\u030a"` `A‌` **U+0041 LATIN CAPITAL LETTER** + **U+030A COMBINING RING
@@ -405,8 +394,8 @@ modifications:
 - The characters should belong to a
   [recommended script](https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts)
 - An identifier can be a sequence of one or more emojis. Characters that have
-  both the Emoji and XIDC proeprty are only considered emojis when they are
-  preceeded with emoji modifiers. The definition below is based on
+  both the Emoji and XIDC property are only considered emojis when they are
+  preceded with emoji modifiers. The definition below is based on
   [Unicode TR51](https://unicode.org/reports/tr51/#EBNF_and_Regex) but modified
   to exclude invalid identifiers.
 
@@ -440,12 +429,12 @@ In summary, when using Latin characters, identifiers can start with a letter or
 an underscore, followed by zero or more letters, digits and underscores.
 
 Carefully consider when to use non-latin characters. Use non-latin characters
-for whole words, for example: `"半径"` (radius), "מְהִירוּת" (speed), "直徑"
-(diameter) or "सतह" (surface).
+for whole words, for example: `"半径"` (radius), `"מְהִירוּת"` (speed), `"直徑"`
+(diameter) or `"सतह"` (surface).
 
 Avoid mixing Unicode characters from different scripts in the same identifier.
 
-Do not include bidi markers such as LTR **U+200E** or RTL **U+200F** in
+Do not include bidi markers such as **LTR** **U+200E** or **RTL** **U+200F** in
 identifiers. LTR and RTL marks should be added as needed by the client
 displaying the identifier. They should be ignored when parsing identifiers.
 
@@ -516,9 +505,10 @@ These recommendations do not affect computation or manipulation of expressions
 following these conventions.
 
 - An identifier may be composed of a main body, some modifiers, some style
-  variants, some subscripts and subscripts. For example `"alpha_0__prime"` \\(
-  \alpha_0\prime \\) or `"x_vec"` (\\ \vec\{x\} \\) or `"Re_fraktur"` \\(
-  \mathfrak\{Re\} \\).
+  variants, some subscripts and subscripts. For example:
+    - `"alpha_0__prime"` $$\alpha_0^\prime $$
+    - `"x_vec"` $$ \vec{x} $$
+    - `"Re_fraktur"` $$\mathfrak{Re} $$.
 - Subscripts are indicated by an underscore `_` and superscripts by a
   double-underscore `__`. There may be more than one superscript or subscripts,
   but they get concatenated. For example `"a_b__c_q__p"` -> `a_{b, q}^{c, p}`
@@ -679,37 +669,6 @@ Modifiers include:
 
 </div>
 
-## Dictionary
-
-A **dictionary** is a collection of key-value pairs. In some progamming
-languages it is called a map or associative array.
-
-The keys are strings and the values are MathJSON expressions.
-
-A **dictionary** is represented as an object literal with a `"dict"` key. The
-value of the key is a JSON object literal holding the content of the dictionary.
-
-```json example
-{
-  "dict": {
-    "first": 1,
-    "second": 2,
-    "third": ["Add", 1, 2]
-  }
-}
-```
-
-An alternate representation of a dictionary is as a `["Dictionary"]` function
-expression, but this is quite a bit more verbose:
-
-```json example
-[
-  "Dictionary",
-  ["KeyValuePair", ""first"", 1],
-  ["KeyValuePair", ""second"", 2],
-  ["KeyValuePair", ""third"", ["Add", 1, 2]]
-]
-```
 
 ## Metadata
 
@@ -772,10 +731,9 @@ The MathJSON Standard Library includes definitions for:
 | [Complex](/compute-engine/reference/complex/)                       | `Real` `Conjugate` `ComplexRoots`...                                  |
 | [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` ...                                                |
 | [Core](/compute-engine/reference/core/)                             | `Declare` `Assign` `Error` `LatexString`...                          |
-| [Domains](/compute-engine/reference/domains/)                       | `Anything` `Nothing` `Numbers` `Integers` ...                            |
 | [Functions](/compute-engine/reference/functions/)                   | `Function` `Apply` `Return` ...                                        |
 | [Logic](/compute-engine/reference/logic/)                           | `And` `Or` `Not` `True` `False` `ForAll` ...                            |
-| [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` ...                                  |
+| [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
 | [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
 | [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
 | [Styling](/compute-engine/reference/styling/)                       | `Delimiter` `Style`...                                                 |

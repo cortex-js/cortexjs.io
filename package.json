@@ -19,7 +19,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "build": "docusaurus build",
+    "build": "bash  scripts/build.sh",
     "swizzle": "docusaurus swizzle",
     "xdeploy": "docusaurus deploy",
     "clear": "docusaurus clear",
@@ -31,11 +31,12 @@
     "deploy": "bash scripts/deploy.sh"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.1.1",
-    "@docusaurus/preset-classic": "^3.1.1",
+    "@docusaurus/core": "^3.6.1",
+    "@docusaurus/preset-classic": "^3.6.1",
+    "@docusaurus/theme-search-algolia": "^3.6.1",
     "@mdx-js/react": "^3.0.0",
     "clsx": "^2.0.0",
-    "mathlive": "^0.98.6",
+    "mathlive": "^0.101.2",
     "prism-react-renderer": "^2.3.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -43,11 +44,11 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^3.1.1",
-    "@docusaurus/tsconfig": "^3.1.1",
-    "@docusaurus/types": "^3.1.1",
-    "typedoc": "^0.25.8",
-    "typescript": "^5.3.3"
+    "@docusaurus/module-type-aliases": "^3.6.1",
+    "@docusaurus/tsconfig": "^3.6.1",
+    "@docusaurus/types": "^3.6.1",
+    "typedoc": "^0.26.11",
+    "typescript": "^5.6.3"
   },
   "engines": {
     "node": ">=18.0"

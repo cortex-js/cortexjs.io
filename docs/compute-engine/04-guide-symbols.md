@@ -21,21 +21,21 @@ toc: true
 
 
 <Intro>
-A **symbol** is an identifier representing a
-named mathematical object. It belongs to a domain and it may hold a value. A
-symbol without a value represents a mathematical unknown in an expression.
+A **symbol** is an identifier representing a named mathematical object. It 
+may have a type and may hold a value. A symbol without a value represents a
+mathematical unknown in an expression.
 </Intro>
 
-**To change the value or domain of a symbol**, use the `value` and `domain`
+**To change the value or type of a symbol**, use the `value` and `type`
 properties of the symbol.
 
-A symbol does not have to be declared before it can be used. The domain of a
+A symbol does not have to be declared before it can be used. The type of a
 symbol will be inferred based on its usage or its value.
 
 ```live show-line-numbers
 const n = ce.box("n");
 n.value = 5;
-console.log("n =", n.value);
+console.log("n =", n.value, ": ", n.type);
 ```
 
 **To get a list of all the symbols in an expression** use `expr.symbols`.

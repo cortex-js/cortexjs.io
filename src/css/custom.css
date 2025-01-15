@@ -428,7 +428,7 @@ body .DocSearch-Form {
 }
 
 .footer--dark {
-  background: linear-gradient(180deg, #bbb 0%, #111 100%);
+  background: linear-gradient(180deg, #000 0%, #334 100%);
   border-top: 1px solid var(--neutral-600);
 }
 
@@ -446,7 +446,24 @@ body .DocSearch-Form {
   margin-left: 16px;
 }
 
-.footer--dark a:visited, .footer--dark a:hover, .footer--dark a:active {
-  background: #666;
-  backdrop-filter: var(--glass-backdrop-filter);
+.footer--dark a:hover, .footer--dark a:active {
+  background: #445;
+  /* backdrop-filter: var(--glass-backdrop-filter); */
+}
+
+
+/* Used for the icons in the footer */
+.icon-one-rem {
+  width: 1.25rem;
+  height: 1rem;
+  padding-right: .25rem;
+}
+
+/* The date displayed after the version number in the TOC of the Changelogs */
+.docs-doc-id-compute-engine\/changelog .table-of-contents__link em,
+.docs-doc-id-mathfield\/changelog .table-of-contents__link em  {
+  padding-left: 1em;
+  font-size: .75em;
+  font-style: normal;
+ opacity: 0.5;
 }
