@@ -94,8 +94,8 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.
 
 ## Structure of a MathJSON Expression
 
-A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
-**functions** and **dictionaries**.
+A MathJSON expression is a combination of **numbers**, **symbols**, **strings**
+and **functions**.
 
 **Number**
 
@@ -169,17 +169,17 @@ the following differences:
 
 - The string values `"NaN"` `"+Infinity"` and `"-Infinity"` are used to
   represent respectively an undefined result as per
-  [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754), positive infinity, and
-  negative infinity.
+  [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754), $+\infty$, and
+  $-\infty$.
 
-- If the string includes the pattern `/\([0-9]+\)/` (that is a series of one or
-  more digits enclosed in parentheses), that pattern should be interpreted as
+- If the string includes the pattern `/\([0-9]+\)/`, that is a series of one or
+  more digits enclosed in parentheses, that pattern should be interpreted as
   repeating digits.
 
 ```json example
-{  "num": "1.(3)" }
-{  "num": "0.(142857)" }
-{  "num": "0.(142857)e7" }
+{ "num": "1.(3)" }
+{ "num": "0.(142857)" }
+{ "num": "0.(142857)e7" }
 ```
 
 - The following characters in a string representing a number are ignored:
@@ -200,8 +200,8 @@ the following differences:
 
 ### Numbers as Number Literals
 
-When a **number** has no extra metadata and is compatible with the JSON
-representation of numbers, a JSON number literal may be used.
+When a **number** is compatible with the JSON representation of numbers and
+has no metadata a JSON number literal may be used.
 
 Specifically:
 
@@ -242,7 +242,7 @@ greater range than JSON numbers.
 
 ## Strings
 
-A MathJSON **string** is either
+A MathJSON **string** is either:
 
 - an object literal with a `"str"` key
 - a [JSON string](https://tools.ietf.org/html/rfc7159#section-7) that starts and
@@ -262,8 +262,8 @@ the following characters must be escaped as indicated:
 | **U+000A**               | **LINE FEED**                   | `\n` or `\u000a`     |
 | **U+000C**               | **FORM FEED**                   | `\f` or `\u000c`     |
 | **U+000D**               | **CARRIAGE RETURN**             | `\r` or `\u000d`     |
+| **U+0027**               | **APOSTROPHE**                   | `\'` or `\u0027`    |
 | **U+005C**               | **REVERSE SOLIDUS** (backslash) | `\\` or `\u005c`     |
-| **U+0022**               | **QUOTATION MARK**              | `\"` or `\u0022`     |
 
 </div>
 
@@ -288,20 +288,23 @@ of a function to some arguments.
 The function expression `["Add", 2, 3]` applies the function named `Add` to the
 arguments `2` and `3`.
 
-The function `"f"` can be used as a symbol, or in a function expression:
-`["f", "x"]`.
-
 ### Functions as Object Literal
 
 The default representation of **function  expressions** is an object literal with
-a `"fn"` key. The value of the `fn` key is an array representing the function head
-(its operator) and its arguments (its operands).
+a `"fn"` key. The value of the `fn` key is an array representing the function 
+operator (its name) and its arguments (its operands).
 
 ```js
 {
   "fn": [Operator, ...Operands[]]
 }
 ```
+
+For example:
+- $$2+x$$: `{ "fn": ["Add", 2, "x"] }`
+- $$\sin(2x+\pi)$$: `{ "fn": ["Sin", ["Add", ["Multiply", 2, "x"], "Pi"]] }`
+- $$x^2-3x+5$$: `{ "fn": ["Add", ["Power", "x", 2], ["Multiply", -3, "x"], 5] }`
+
 
 ### Functions as JSON Arrays
 
@@ -316,28 +319,29 @@ For example these two expressions are equivalent:
 ```
 
 :::note
-An array representing a function must have at least one element, the head of the
+An array representing a function must have at least one element, the operator of the
 function. Therefore `[]` is not a valid expression.
 :::
 
-### Function Head
+### Function Operator
 
-The **head** of the function expression is the first element in the array. Its
-presence is required. It indicates the **name of the function** or **operator**: this is what the
-function is about.
+The **operator** of the function expression is the first element in the array. 
+Its presence is required. It indicates the **name of the function**: this is 
+what the function is about.
 
-The head is an identifier following the conventions for function names (see
+The operator is an identifier following the conventions for function names (see
 below).
 
 ```json example
 // Apply the function "Sin" to the argument "x"
 ["Sin", "x"]
+
 // Apply "Cos" to a function expression
 ["Cos", ["Divide", "Pi", 2]]
 ```
 
-Following the head are zero or more **arguments**, which are expressions. The
-arguments, or **operands**, form the **tail** of the function.
+Following the operator are zero or more **arguments** (or **operands**),
+which are expressions.
 
 :::warning[CAUTION]
 The arguments of a function are expressions. To represent an
@@ -350,7 +354,7 @@ The expression corresponding to $ \sin^{-1}(x) $ is:
 ["Apply", ["InverseFunction", "Sin"], "x"]
 ```
 
-The head of this expression is `"Apply"` and its argument are the expressions
+The operator of this expression is `"Apply"` and its argument are the expressions
 `["InverseFunction", "Sin"]` and `"x"`.
 
 ## Symbols
@@ -655,13 +659,13 @@ Modifiers include:
 - Identifier fragments ending in digits may be rendered with a corresponding
   subscript.
 
-<div className="symbols-table">
+<div className="symbols-table" style={{"--first-col-width":"21ch"}}>
 
 | Identifier           | LaTeX              |                           |
 | :------------------- | :----------------- | ------------------------- |
 | `time`               | `\mathrm{time}`    | \\( \mathrm\{time\} \\)     |
 | `speed_italic`       | `\mathit{speed}`   | \\( \mathit\{speed\} \\)    |
-| `P_blackboard__plus` | `\mathbb{P}^{+}`   | $$ \mathbb\{P^+\} $$      |
+| `P_blackboard__plus` | `\mathbb{P}^{+}`   | $$ \mathbb{P}^+ $$      |
 | `alpha`              | `\alpha`           | \\( \alpha \\)            |
 | `mu0`                | `\mu_{0}`          | \\( \mu_0 \\)             |
 | `m56`                | `m_{56}`           | \\( m\_\{56\} \\)           |
@@ -684,7 +688,7 @@ The following metadata keys are recommended:
 
 | Key             | Note                                                                                                                                                                         |
 | :-------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `wikidata`      | A short string indicating an entry in a wikibase.<br/>This information can be used to disambiguate the meaning of an identifier                                               |
+| `wikidata`      | A short string indicating an entry in a wikibase.<br/>This information can be used to disambiguate the meaning of an identifier. Unless otherwise specified, the entry in this key refers to an enty in the `wikidata.org` wikibase                                               |
 | `comment`       | A human readable plain string to annotate an expression, since JSON does not allow comments in its encoding                                                                  |
 | `documentation` | A Markdown-encoded string providing documentation about this expression.                                                                                                     |
 | `latex`         | A visual representation in LaTeX of the expression. <br/> This can be useful to preserve non-semantic details, for example parentheses in an expression or styling attributes |

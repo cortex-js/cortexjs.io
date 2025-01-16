@@ -1290,7 +1290,7 @@ relational operator, `\mathbin{}` a binary operator, `\mathopen{}` and `\mathclo
 The `\enclose` command is very flexible. It accepts three arguments, two of
 which are required:
 
-```tex
+```latex
 \enclose{<notation>}[<style>]{<body>}
 ```
 

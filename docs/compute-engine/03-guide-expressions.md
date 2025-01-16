@@ -268,8 +268,8 @@ function itself is pure, and all its arguments are pure as well.
 
 ## Checking the Kind of Expression
 
-To identify if an expression is a number, symbol, function, string or
-dictionary, use the following boolean expressions:
+To identify if an expression is a number, symbol, function or string
+use the following boolean expressions:
 
 <div className="symbols-table first-column-header">
 

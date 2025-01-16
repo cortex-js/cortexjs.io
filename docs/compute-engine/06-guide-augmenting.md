@@ -1,5 +1,5 @@
 ---
-title: Adding New Definitions
+title: Defining Custom Functions and Symbols
 slug: /compute-engine/guides/augmenting/
 ---
 
@@ -12,360 +12,234 @@ own definitions.
 
 <ReadMore path="/compute-engine/guides/latex-syntax/#customizing-the-latex-dictionary" >
 You may also be interested in **augmenting the LaTeX dictionary** which defines
-how LaTeX is parsed from and serialized to MathJSON. This is useful if you want
-to add support for new LaTeX commands, or if you've defined custom LaTeX macros
-that you'd like to parse to MathJSON. <Icon name="chevron-right-bold" />
+how LaTeX is parsed from and serialized to MathJSON. 
+
+
+This is useful if you want to add support for custom LaTeX macros that you'd 
+like to parse to MathJSON. <Icon name="chevron-right-bold" />
 </ReadMore>
 
 ## Introduction
 
-### Declaring an Identifier
+When a new symbol or function is encountered in an expression, the Compute Engine
+will look up its definition in the set of known identifiers, including the Standard 
+Library.
 
-Before it can be used, an identifier must be **declared** as a symbol or a
-function.
+### Automatic Declaration
 
-Declaring it indicates to the Compute Engine the "kind" of object it is (a
-string, a real number, a function...), and allows it to be used in expressions.
-The "kind" of an object is called its **type**.
+If the identifier is found, the definition associated with it will be
+used to evaluate the expression.
+
+If the identifier is not found, an automatic declaration will be made of the
+identifier as a symbol of type `unknown`, or a more specific type if the
+context allows it.
 
 <ReadMore path="/compute-engine/guides/types" >
 Learn more about **types**.<Icon name="chevron-right-bold" />
 </ReadMore>
 
-**To declare an identifier** use the `ce.declare()` method:
-
-```js
-ce.declare("m_e", {
-  domain: "RealNumbers",
-  constant: true,
-  value: 9.1e-31,
-});
-```
-
-After an identifier has been declared, its domain cannot be changed: other
-expressions may depend on it, and changing its domain would invalidate them.
-
-You can also declare an identifier without providing a value:
-
-```js
-ce.declare("f", "Functions");
-
-// Shortcut for:
-ce.declare("f", { signature: { domain: "Functions" } });
-```
-
-By default, when a new identifier is encountered in an expression, it is
-declared automatically with no domain and no value.
-
-<ReadMore path="/compute-engine/guides/evaluate/#default-domain" > Read more about
-the **default domain**. <Icon name="chevron-right-bold" /></ReadMore>
-
-We will discuss in more details below how to declare and define symbols and
-functions.
+To provide a more explicit definition for the identifier, you can [define it
+using a LaTeX](#definitions-using-latex) expression, or an [explicit declaration](#explicit-declarations) using the `ce.declare()` 
+or `ce.assign()` methods.
 
 ### Declarations are Scoped
 
 The declaration of an identifier is done within a **scope**. A scope is a
 hierarchical collection of definitions.
 
-`ce.declare()` will add a definition in the current scope.
-
 <ReadMore path="/compute-engine/guides/evaluate/#scopes" >
 Read more about **scopes** <Icon name="chevron-right-bold" />
 </ReadMore>
 
-## Defining a Symbol
 
-A symbol is a named value, such as `Pi` or `x`.
+## Definitions Using LaTeX
 
-<ReadMore path="/compute-engine/guides/symbols" >
-Learn more about **symbols**.<Icon name="chevron-right-bold" />
-</ReadMore>
+The simplest way to define a new symbol or function is to use LaTeX. 
 
-**To declare a new symbol** use the `ce.declare()` method.
+For example, to define a new symbol $m$ with a value of $42$, you can use the
+following LaTeX expression:
 
 ```js
-ce.declare("m", { domain: "Numbers", value: 5 });
-ce.declare("n", { domain: "Integers" });
+ce.parse("m := 42").evaluate();
+ce.parse("m").evaluate().print();
+// ➔ 42
 ```
 
-The `domain` property is optional when a value is provided: a compatible domain
-is inferred from the value.
+**Note**: the assignment expression must be evaluated to take effect.
 
-See the `SymbolDefinition` type for more details on the properties associated
-with a symbol.
-
-As a shortcut, if the symbol was not previously defined, a new definition will
-be created. The domain of the symbol will be set to inferred from the value.
-
-### Assigning a Value
-
-Once declared an identifier can be used in expressions, and it can be assigned a
-value.
-
-**To change the value of a symbol**, use the `value` property of the symbol or
-the `ce.assign()` method.
+To define a new function $f$ that multiplies its argument by $2$, you can use
+the following LaTeX expression:
 
 ```js
-const n = ce.box("n");
-n.value = 5;
-console.log(`${n.latex} = ${n.value.json}`);
-// ➔ n = 5
-
-ce.assign("n", 18);
-// ➔ n = 18
+ce.parse("f(x) := 2x").evaluate();
+ce.parse("f(3)").evaluate().print();
+// ➔ 6
 ```
 
-You can also evaluate a MathJSON expression that contains an `["Assign"]`
-expression:
+
+You can also use the `\mapsto` operator to define a function:
 
 ```js
-ce.box(["Assign", "n", 42]).evaluate();
-// ➔ n = 42
+ce.parse("f := x \\mapsto 2x").evaluate();
+ce.parse("f(3)").evaluate().print();
+// ➔ 6
 ```
 
-or parse a LaTeX expression that contains an assignment:
+**To define multiletter symbols**, use the `\operatorname{}` command:
 
 ```js
-ce.parse("n := 31").evaluate();
-// ➔ n = 31
+ce.parse('\\operatorname{double}(x) := 2x').evaluate().print();
+ce.parse('\\operatorname{double}(3)').evaluate().print();
+// ➔ 6
 ```
 
-In LaTeX, assignments are indicated by the `:=` or `\coloneq` operator. 
-The `=` operator is used for equality.
+**Note**: you can also use the `\mathrm{}` or `\mathit{}` commands to wrap
+multiletter symbols.
 
-The right hand side argument of an assignment (with a `ce.assign()`,
-`expr.value` or `["Assign"]` expression) can be one of the following:
+The LaTeX identifiers are mapped to MathJSON identifiers. For example,
+the LaTeX `\operatorname{double}` is mapped to the MathJSON identifier `double`.
 
-- a JavaScript boolean: interpreted as `True` or `False`
-- a JavaScript number
-- a tuple of two numbers, for a rational
-- a `bignum`, for a large number
-- a `complex`, for a complex number
-- a JavaScript string: interpreted as string, unless it starts and ends with a
-  `$` in which case it is interpreted as a LaTeX expression that defines a
-  function.
-- a MathJSON expression, which defines a function
-- a JavaScript function, which also defines a functon
-
-```js example
-ce.assign("b", true);
-ce.assign("n", 5);
-ce.assign("q", [1, 2]);
-ce.assign(
-  "d",
-  ce.bignum("123456789012345678901234567890.123456789012345678901234567890e512")
-);
-ce.assign("z", ce.complex(1, 2));
-ce.assign("s", "Hello");
-
-// Functions
-ce.assign("f", "$$ 2x + 3 $$");
-ce.assign("double", ["Function", ["Multiply", "x", 2], "x"]);
-ce.assign("halve", (ce, args) => ce.number(args[0].value / 2));
-```
-
-Note that when assigning an expression to a symbol, the expression is not
-evaluated. It is used to define a function
-
-## Declaring a Function
-
-A function is a named operation, such as `Add`, `Sin` or `f`.
-
-<ReadMore path="/compute-engine/guides/functions" > 
-Learn more about **functions**. <Icon name="chevron-right-bold" />
-</ReadMore>
-
-Let's say you want to parse the following expression:
-
-```js example
-const expr = ce.parse("\\operatorname{double}(3)");
-console.log(expr.json);
-// ➔ ["Multiply", "double", "3"]
-```
-
-🤔 Hmmm... That's probably not what you want.
-
-You probably want to get `["double", 3]` instead.
-
-The problem is that the Compute Engine doesn't know what `double` is, so it
-assumes it's a symbol.
-
-:::info[Note]
-
-You can control how unknown identifiers are handled by setting the
-`ce.latexOptions.parseUnknownIdentifier` property to a function that returns
-`function` if the parameter string is a function, `symbol` if it's a symbol or
-`unknown` otherwise. For example, you set it up so that identifiers that start
-with an upper case letter are always assume to be functions, or any other
-convention you want. This only affects what happens when parsing LaTeX, though,
-and has no effect when using MathJSON expressions. 
-:::
-
-To tell the Compute Engine that `double` is a function, you need to declare it.
-
-**To declare a function**, use the `ce.declare()` function.
-
-`ce.declare()` can be used to declare symbols or functions depending on its
-second parameter.
-
-```js example
-ce.declare("double", { signature: { domain: "Functions" } });
-```
-
-If the definition (the second parameter of `ce.declare()`) includes a
-`signature` property, a function is being declared.
-
-The `signature` property defines how the function can be used. It is a
-`FunctionDefinition` object with the following properties (all are optional):
-
-- `domain`: the domain of the function. The `Functions` domain represents any
-  function. "NumericFunctions" represents a function whose parameters are number
-  and that returns a numeric value. More complex domains can be specified to
-  described the domain of the parameters of the function and the domain of its
-  return v
-- `canonical(ce, args)` returns a canonical representation of the function. This
-  is an opportunity to check that the arguments are valid, and to return a
-  canonical representation of the function.
-- `simplify(ce, args)` returns a simplified representation of the function. This
-  is an opportunity to simplify the function, for example if the arguments are
-  known to be numeric and exact.
-- `evaluate(ce, args)` returns a symbolic evaluation of the function. The
-  arguments may be evaluated symbolically.
-- `N(ce, args)` returns a numeric evaluation of the function.
-
-See `FunctionDefinition` for more details on these properties and others
-associated with a function definition.
-
-Now, when you parse the expression, you get the expected result:
-
-```js example
-const expr = ce.parse("\\operatorname{double}(3)");
-console.log(expr.json);
-// ➔ ["double", 2] 🎉
-```
-
-
-### Defining a Function
-
-However, you still can't evaluate the expression, because the Compute Engine
-knows that `double` is a function but it doesn't know how to evaluate it yet.
-
-```js example
-console.log(ce.evaluate(expr).json);
+```js
+console.info(ce.parse('\\operatorname{double}(3)').json);
 // ➔ ["double", 3]
 ```
 
-For the Compute Engine to evaluate `double`, you need to provide a definition
-for it. You can do this by adding a `evaluate` handler to the definition of
-`double`:
+## Explicit Declarations
 
-```js example
-ce.declare("double", {
-  signature: {
-    domain: "Functions",
-    evaluate: (ce, args) => ce.number(args[0].value * 2),
-  },
+**To have more control over the definition of a symbol or function**, use
+the `ce.declare()` and `ce.assign()` methods.
+
+When declaring a symbol or function, you can specify the type of the symbol or signature of the function, its
+value or body, and other properties.
+
+```js
+// Declaring a symbol "m"
+ce.declare("m", { type: "integer", value: 42 });
+
+// Declaring a function "f"
+ce.declare("f", {
+  signature: "number -> number",
+  evaluate: ce.parse("x \\mapsto 2x"),
 });
 ```
 
-The `evaluate` handler is called when the corresponding function is evaluated.
+### Defining a Symbol
 
-It has two parameters:
+To prevent the value of a symbol from being changed, you can set the `constant`
+property to `true`:
 
-- `ce`: the Compute Engine instance
+```js
+ce.declare("m_e", {
+  value: 9.1e-31,
+  constant: true,
+});
+```
+
+If you do not provide a `type` property for a symbol, the type will be
+inferred from the value of the symbol. If no type and no value are
+provided, the type will be `unknown`.
+
+If you only want to provide the type of the identifier, without associating
+it with a value, you can use the following syntax:
+
+```js
+ce.declare("n", "integer");
+```
+
+As a shorthand, you can also declare a symbol by assigning it a value using `ce.assign()`:
+
+```js
+ce.assign("m", 42);
+```
+
+If the symbol was not previously defined, this is equivalent to:
+
+```js
+ce.declare("m", { value: 42 });
+```
+
+Alternatively, you can use:
+
+```js
+ce.box("m").value = 42;
+```
+
+### Defining a Function
+
+**To define a function**, associate an `evaluate` handler, which 
+is the body of the function, with the function declaration.
+
+```js
+ce.declare("double", { evaluate: ce.parse("x \\mapsto 2x") });
+```
+
+The evaluate handler can be either a MathJSON expression as above or 
+a JavaScript function.
+
+```js
+ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+```
+
+The signature of the `evaluate` handler is `(args[], options)`, where:
+
 - `args`: an array of the arguments that have been applied to the function. Each
-  argument is a `MathJSON` expression. The array may be empty if there are no
+  argument is a boxed expression. The array may be empty if there are no
   arguments.
+- `options`: an object literal which includes an `engine` property that is the
+  Compute Engine instance that is evaluating the expression and a `numericApproximation` property that is true if the result should be a numeric approximation.
 
-If you evaluate the expression now, you get the expected result:
+Since `args` is an array, you can use destructuring to get the arguments:
 
-```js example
-console.log(ce.evaluate(expr).json);
-// ➔ 6 🎉
+```js
+ce.declare("double", { evaluate: (args) => args[0].mul(2) });
+
+// or
+ce.declare("double", { evaluate: ([x]) => x.mul(2) });
 ```
 
-### Changing the Definition of a Function
-
-**To change the definition of a function**, use `ce.assign()`.
-
-:::info[Note]
-If `"f"` was previously declared as something other than a function, a runtime
-error will be thrown. The domain of a symbol cannot be changed after its
-declaration.
-:::
-
-As a shortcut, if you assign a value to an identifier that was not previously
-declared, a new function definition is created, if the value is a function.
-
-Using `ce.assign()` gives you more flexibility than `ce.declare()`: the "value"
-of the function can be a JavaScript function, a MathJSON expression or a LaTeX
-expression.
-
-```js example
-ce.assign("f", (ce, args) => ce.number(args[0].value * 5)};
-```
-
-The value can also be a MathJSON expression:
-
-```js example
-ce.assign("f(x)", ["Multiply", "x", 5]);
-```
-
-Note in this case we added `(x)` to the first parameter of `ce.assign()` to
-indicate that `f` is a function. This is equivalent to the more verbose:
-
-```js example
-ce.assign("f", ["Function", ["Multiply", "x", 5], "x"]);
-```
-
-The value can be a LaTeX expression:
-
-```js example
-ce.assign("f(x)", "$$ 5x $$"));
-```
-
-You can also use `ce.parse()` but you have to watch out and make sure you parse
-a non-canonical expression, otherwise any unknowns (such as `x`) will be
-automatically declared, instead of being interpreted as a parameter of the
+In addition to the `evaluate` handler the function definition can include
+a `signature` type that describes the arguments and return value of the
 function.
 
-```js example
-ce.assign("f(x)", ce.parse("5x", { canonical: false }));
+```js
+ce.declare("double", {
+  signature: "number -> number",
+  evaluate: ([x]) => x.mul(2),
+});
 ```
 
-You can also use a more explicit LaTeX syntax:
+See `FunctionDefinition` for more details on the other handlers and
+properties that can be provided when defining a function.
 
-```js example
-ce.assign("f", ce.parse("(x) \\mapsto 5x"));
+**To define a function without specifying a body for it**, specify
+the signature of the function as the second argument of `ce.declare()` or
+use the `"function"` type.
+
+```js
+ce.declare("double", "function" );
 ```
 
-The arguments on the left hand side of the `\\mapsto` operator are the
-parameters of the function. The right hand side is the body of the function. The
-parenthesis around the parameters is optional if there is only one parameter. If
-there are multiple parameters, they must be enclosed in parenthesis and
-separatated by commas. If there are _no_ parameters (rare, but possible), the
-parenthesis are still required to indicate the parameter list is empty.
+Functions that do not have an evaluate handler remain unchanged when
+evaluated.
 
-When using `\\mapsto` you don't have to worry about the canonical flag, because
-the expression indicates what the parameters are, and so they are not intepreted
-as unknowns in the body of the function.
+You can set the body of the function later using `ce.assign()`:
 
-Evaluating an `["Assign"]` expression is equivalent to calling `ce.assign()`:
 
-```js example
-ce.box(["Assign", "f", ["Function", ["Multiply", "x", 2], "x"]]).evaluate();
+When using `ce.assign()` to define a function, the value can be a JavaScript
+function, a MathJSON expression or a LaTeX expression.
+
+```js
+ce.assign("double", ([x]) => x.mul(2));
+
+ce.assign("double", ["Function", ["Multiply", "x", 2], "x"]);
+
+ce.assign("double",ce.parse("x \\mapsto 2x"));
 ```
 
-You can also evaluate a LaTeX assignment expression:
 
-```js example
-ce.parse("\\operatorname{double} := x \\mapsto 2x").evaluate();
-```
+## Defining Multiple Functions and Symbols
 
-## Acting on Multiple Functions and Symbols
-
-**To declare multiple functions and symbols**, use the `ce.declare()` method
+**To define multiple functions and symbols**, use the `ce.declare()` method
 with a dictionary of definitions.
 
 :::info[Note]
@@ -376,14 +250,12 @@ identifiers, not LaTeX commands. For example, if you have a symbol `α`, use
 
 ```js
 ce.declare({
-  m: { domain: "Numbers", value: 5 },
-  f: { domain: "Functions" },
-  g: { domain: "Functions" },
+  m: { type: "number", value: 5 },
+  f: { type: "function" },
+  g: { type: "function" },
   Smallfrac: {
-    signature: {
-      domain: "NumericFunctions",
-      evaluate: (ce, args) => ce.box(args[0].value / args[1].value),
-    },
+    signature: "(number, number) -> number",
+    evaluate: ([x,y]) => x.div(y),
   },
 });
 ```
@@ -397,19 +269,4 @@ ce.assign({
   "f(x)": ce.parse("x^2 + x + 41"),
   "g(t)": ce.parse("t^3 + t^2 + 17"),
 });
-```
-
-## Summary
-
-Before a function can be used in an expression, it must be declared. This is
-done by adding a definition to the MathJSON library.
-
-The quickest way to declare and define a function is to use `ce.assign()`:
-
-```js example
-// With LaTeX
-ce.assign("f(x)", "$$ 5x $$");
-
-// With MathJSON
-ce.assign("g", ["Function", ["Multiply", "x", 2], "x"]);
 ```
