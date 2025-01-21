@@ -231,7 +231,10 @@ there is less space between `-` and `1` than there is between `-` and `2`.
   <Latex value='\ker' source='\ker' flow='column'/>
   <Latex value='\det' source='\det' flow='column'/>
   <Latex value='\arg' source='\arg' flow='column'/>
+  <Latex value='\dim' source='\dim' flow='column'/>
+  <Latex value='\gcd' source='\gcd' flow='column'/>
 </LatexCommands>
+
 
 <!-- statmath.sty -->
 <LatexCommands>
@@ -244,31 +247,44 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 ### Trigonometry
 
 <LatexCommands>
-  <Latex value='\degree' source='\degree' flow='column'/>
+  <Latex value='\unicode{"2B1A}\degree' source='\degree' flow='column'/>
+  <Latex value='\unicode{"2B1A}^\circ' source='^\circ' flow='column'/>
+  <Latex value='\ang{\unicode{"2B1A}}' source="\ang{}" flow="column"/> 
+
   <Latex value='\arccos' source='\arccos' flow='column'/>
   <Latex value='\arcsin' source='\arcsin' flow='column'/>
   <Latex value='\arctan' source='\arctan' flow='column'/>
-  <Latex value='\arctg' source='\arctg' flow='column'/>
-  <Latex value='\arcctg' source='\arcctg' flow='column'/>
-  <Latex value='\ch' source='\ch' flow='column'/>
   <Latex value='\cos' source='\cos' flow='column'/>
   <Latex value='\cosh' source='\cosh' flow='column'/>
   <Latex value='\cot' source='\cot' flow='column'/>
   <Latex value='\coth' source='\coth' flow='column'/>
-  <Latex value='\ctg' source='\ctg' flow='column'/>
-  <Latex value='\cth' source='\cth' flow='column'/>
-  <Latex value='\cotg' source='\cotg' flow='column'/>
   <Latex value='\csc' source='\csc' flow='column'/>
-  <Latex value='\cosec' source='\cosec' flow='column'/>
   <Latex value='\sec' source='\sec' flow='column'/>
-  <Latex value='\sh' source='\sh' flow='column'/>
   <Latex value='\sin' source='\sin' flow='column'/>
   <Latex value='\sinh' source='\sinh' flow='column'/>
   <Latex value='\tan' source='\tan' flow='column'/>
   <Latex value='\tanh' source='\tanh' flow='column'/>
+</LatexCommands>
+
+### Non-Standard Trig Functions
+
+The functions below are not part of the standard LaTeX distribution
+but are available in some packages. Use them with caution as they may not
+be supported by all LaTeX engines. Consider using `\operatorname{}` instead.
+
+<LatexCommands>
+  <Latex value='\arctg' source='\arctg' flow='column'/>
+  <Latex value='\arcctg' source='\arcctg' flow='column'/>
+  <Latex value='\ch' source='\ch' flow='column'/>
+  <Latex value='\ctg' source='\ctg' flow='column'/>
+  <Latex value='\cth' source='\cth' flow='column'/>
+  <Latex value='\cotg' source='\cotg' flow='column'/>
+  <Latex value='\cosec' source='\cosec' flow='column'/>
+  <Latex value='\sh' source='\sh' flow='column'/>
   <Latex value='\tg' source='\tg' flow='column'/>
   <Latex value='\th' source='\th' flow='column'/>
 </LatexCommands>
+
 
 ### Bounds
 
@@ -287,7 +303,6 @@ there is less space between `-` and `1` than there is between `-` and `2`.
   <Latex value='\varliminf' source='\varliminf' flow='column'/>
   <Latex value='\varinjlim' source='\varinjlim' flow='column'/>
 
-  <Latex value='\dim' source='\dim' flow='column'/>
 </LatexCommands>
 
 ### Projections
@@ -310,10 +325,12 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 
 
+
+
 ### Custom Functions
 
-Use `\operatorname{}` to define a custom function: it will be displayed in upright
-font and will have the appropriate spacing.
+**To define a custom function** use the `\operatorname{}` command: the name of the function will be displayed in upright
+font and with the appropriate spacing.
 
 <Latex value="\operatorname{argth}(\theta)" flow="column"/>
 
@@ -564,14 +581,30 @@ the arrows, which is specified as an argument (and optional argument):
 
 ## Accents
 
-### Deprectated Accents
+<LatexCommands>
+
+<Latex value='\dot{\unicode{"2B1A}}' source='\dot' flow='column'/>
+<Latex value='\ddot{\unicode{"2B1A}}' source='\ddot' flow='column'/>
+<Latex value='\dddot{\unicode{"2B1A}}' source='\dddot' flow='column'/>
+<Latex value='\ddddot{\unicode{"2B1A}}' source='\ddddot' flow='column'/>
+<Latex value='\mathring{\unicode{"2B1A}}' source='\mathring' flow='column'/>
+<Latex value='\tilde{\unicode{"2B1A}}' source='\tilde' flow='column'/>
+<Latex value='\bar{\unicode{"2B1A}}' source='\bar' flow='column'/>
+<Latex value='\breve{\unicode{"2B1A}}' source='\breve' flow='column'/>
+<Latex value='\check{\unicode{"2B1A}}' source='\check' flow='column'/>
+<Latex value='\hat{\unicode{"2B1A}}' source='\hat' flow='column'/>
+<Latex value='\vec{\unicode{"2B1A}}' source='\vec' flow='column'/>
+</LatexCommands>
+
+
+### Deprecated Accents
 <br/>
 
 :::warning[Deprecated]
 
 The following commands are supported for compatibility with existing content,
 but their use is generally discouraged when creating new LaTeX content
-if there is an equivalent Unicode character available.
+when an equivalent Unicode character is available.
 
 For example use `é` rather than `\'{e}`.
 
@@ -581,17 +614,8 @@ For example use `é` rather than `\'{e}`.
 
 <LatexCommands>
 
-<Latex value='\acute{\unicode{"2B1A}}' source="\acute" flow='column'/>
-<Latex value='\grave{\unicode{"2B1A}}' source='\grave' flow='column'/>
-<Latex value='\dot{\unicode{"2B1A}}' source='\dot' flow='column'/>
-<Latex value='\ddot{\unicode{"2B1A}}' source='\ddot' flow='column'/>
-<Latex value='\mathring{\unicode{"2B1A}}' source='\mathring' flow='column'/>
-<Latex value='\tilde{\unicode{"2B1A}}' source='\tilde' flow='column'/>
-<Latex value='\bar{\unicode{"2B1A}}' source='\bar' flow='column'/>
-<Latex value='\breve{\unicode{"2B1A}}' source='\breve' flow='column'/>
-<Latex value='\check{\unicode{"2B1A}}' source='\check' flow='column'/>
-<Latex value='\hat{\unicode{"2B1A}}' source='\hat' flow='column'/>
-<Latex value='\vec{\unicode{"2B1A}}' source='\vec' flow='column'/>
+<Latex value='\acute{e}' source="\acute" flow='column'/>
+<Latex value='\grave{e}' source='\grave' flow='column'/>
 <Latex value='\^{e}' source="\^" flow='column'/>
 <Latex value='\`{e}' source="\`" flow='column'/>
 <Latex value="\'{e}" source="\'" flow='column'/>
@@ -753,8 +777,6 @@ To display a vertical "stack" of two symbols as a relational operator, use the
 <Latex value='\simcoloncolon' flow='column'/>
 <Latex value='\approxcoloncolon' flow='column'/>
 <Latex value='\notni' flow='column'/>
-<Latex value='\limsup' flow='column'/>
-<Latex value='\liminf' flow='column'/>
 <Latex value='\ordinarycolon' flow='column'/>
 <Latex value='\vcentcolon' flow='column'/>
 <Latex value='\dblcolon' flow='column'/>
@@ -832,6 +854,13 @@ To negate other relational operators, use the `\not` command, e.g.
 <LatexCommands>
 <Latex value='\emptyset' flow='column'/>
 <Latex value='\varnothing' flow='column'/>
+</LatexCommands>
+
+**To represent sets such as the natural numbers, integers, real numbers, etc.,** use the `\mathbb` command for best compatibility, e.g.
+ `\mathbb{N}` $ \mathbb{N} $ or `\mathbb{C}` $ \mathbb{C} $, etc...
+
+Non standard commands, may not be supported by all LaTeX engines:
+<LatexCommands>
 <Latex value='\N' flow='column'/>
 <Latex value='\R' flow='column'/>
 <Latex value='\Q' flow='column'/>
@@ -844,6 +873,9 @@ To negate other relational operators, use the `\not` command, e.g.
 <Latex value='\doubleStruckCapitalZ' flow='column'/>
 <Latex value='\doubleStruckCapitalP' flow='column'/>
 </LatexCommands>
+
+
+
 
 ### Set Operators
 

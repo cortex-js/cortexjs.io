@@ -20,7 +20,7 @@ value other than themselves.
 | `All`       | All the possible values apply                                                                                                                                                      |
 | `None`      | None of the possible values apply                                                                                                                                                  |
 | `Nothing`   | An **optional** expression is not present. Used in sparse list to indicate skipped elements.                                                                                       |
-| `Undefined` | The result is not defined. For example, the domain of an unknown symbol is `Undefined`.<br/>Note that for numbers, the equivalent is `NaN` (Not a Number) |
+| `Undefined` | The result is not defined.<br/>Note that for numbers, the equivalent is `NaN` (Not a Number) |
 
 <Latex value="\lbrack 2, ,3 \rbrack "/>
 
@@ -44,11 +44,11 @@ that a variable is positive, or that a function is continuous.
 
 <FunctionDefinition name="Declare">
 
-<Signature name="Declare">_identifier_, _domain_</Signature>
+<Signature name="Declare">_identifier_, _type__</Signature>
 
-<Signature name="Declare">_identifier_, _domain_, _value_</Signature>
+<Signature name="Declare">_identifier_, _type_, _value_</Signature>
 
-Declare a new identifier in the current scope, and set its value and domain.
+Declare a new identifier in the current scope, and set its value and type.
 
 If the identifier already has a definition in the current scope, evaluate to an
 error, otherwise evaluate to `value`.
@@ -76,11 +76,11 @@ If `identifier` has not been declared in the current scope, consider parent
 scopes until a definition for the identifier is found.
 
 If a definition is found, change the value of the identifier to `value` if the
-value is compatible with the domain of the identifier: once set, the domain of
+value is compatible with the type of the identifier: once set, the type of
 an identifier cannot be changed.
 
 If there is no definition for the identifier, add a new definition in the
-current scope, and use the `value` to infer the domain of the identifier.
+current scope, and use the `value` to infer the type of the identifier.
 
 This is equivalent to `=` in may programming languages.
 
@@ -124,7 +124,7 @@ expression.
 <Signature name="About">_identifier_</Signature>
 
 Evaluate to a dictionary expression containing information about an identifier
-such as its domain, its attributes, its value, etc...
+such as its type, its attributes, its value, etc...
 
 </FunctionDefinition>
 

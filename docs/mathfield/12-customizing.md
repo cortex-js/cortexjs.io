@@ -215,18 +215,22 @@ value on the `mathfield` or static element.
 Within a formula, the size can be specified from a font scale with 10 values, 
 where 1 em is the base font size of the mathfield or static element.
 
-| `fontSize`| | LaTeX command | 
+<div className="symbols-table" style={{"--first-col-width":"7ch"}}>
+
+| `fontSize` | &nbsp;| LaTeX Command | 
 |------:|:------|:----|
 | 1 | 0.5 em | `\tiny` | 
-| 2 | 0.7 em | `\tiny` | 
+| 2 | 0.7 em | `\scriptsize` | 
 | 3 | 0.8 em | `\footnotesize` | 
 | 4 | 0.9 em | `\small` | 
-| 5 | 1.0 em | `\normalsize` or `\normal` | 
+| 5 | 1 em | `\normalsize` or `\normal` | 
 | 6 | 1.2 em | `\large` | 
 | 7 | 1.44 em | `\Large` | 
 | 8 | 1.728 em | `\LARGE` | 
 | 9 | 2.074 em | `\huge` | 
 | 10 | 2.488 em | `\Huge` | 
+
+</div>
 
 :::warning
 
@@ -460,7 +464,7 @@ console.log(MathfieldElement.strings[locale.substring(0, 2)]);
 
 
 :::html
-<math-field id='formula'>
+<math-field id=formula>
     x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
 </math-field>
 ```

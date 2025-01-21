@@ -9,11 +9,11 @@ example, the assumption that \\(x\\) is a positive real number is used to simpli
 \\(|x|\\) to \\(x\\).
 </Intro>
 
-When declaring a symbol, it is possible to specify its domain. For example, the
+When declaring a symbol, it is possible to specify its type. For example, the
 symbol \\(x\\) can be declared to be a real number:
 
 ```js
-ce.declare("x", "RealNumbers");
+ce.declare("x", "real");
 ```
 
 However, assumptions can be used to describe more complex properties of symbols.
@@ -58,11 +58,11 @@ ce.assume(ce.parse("\\beta \\in \\R"));
 ce.assume(["Element", "Beta", "RealNumbers"]);
 ```
 
-In this case, this would be equivalent to declaring a domain for the symbol
+In this case, this would be equivalent to declaring a type for the symbol
 \\(\beta\\):
 
 ```js
-ce.declare("Beta", "RealNumbers");
+ce.declare("Beta", "real");
 ```
 
 The head of the proposition can be one of the following:
@@ -119,12 +119,12 @@ made:
 
 <div className="symbols-table">
 
-| Symbol                                               | Domain          |
+| Symbol                                               | Type          |
 | :--------------------------------------------------- | :-------------- |
-| `a` `b` `c` `d`<br/>`i` `j` `k`<br/>`r` `t`<br/>`x` `y` | `RealNumbers`    |
-| `f` `g` `h`                                          | `Functions`      |
-| `m` `n`<br/>`p` `q`                                   | `Integers`       |
-| `w` `z`                                              | `ComplexNumbers` |
+| `a` `b` `c` `d`<br/>`i` `j` `k`<br/>`r` `t`<br/>`x` `y` | `real`    |
+| `f` `g` `h`                                          | `function`      |
+| `m` `n`<br/>`p` `q`                                   | `integer`       |
+| `w` `z`                                              | `complex` |
 
 </div>
 

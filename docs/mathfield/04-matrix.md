@@ -38,7 +38,7 @@ or by tapping on the menu button in the mathfield.
 
 
 **To insert a matrix using the context menu** select the **Insert Matrix** 
-menu item,  then select the number of rows and columsn of the matrix.
+menu, then select the number of rows and columns of the matrix.
 
 
 ## Matrix Borders
@@ -47,7 +47,7 @@ The borders of a matrix are parentheses by default. They can
 be changed to square brackets, curly braces, vertical bars, or none.
 
 **To change the border of a matrix** right click (or <kbd>CTRL</kbd>+click) on the
-matrix, then select the desired border from the **Matrix Border** menu item.
+matrix, then select the desired border from the **Matrix Border** menu.
 
 
 In LaTeX, matrices are represented using the `\\begin\{\}...\\end\{\}` syntax. The argument to the `begin` command determines the type of matrix and is called

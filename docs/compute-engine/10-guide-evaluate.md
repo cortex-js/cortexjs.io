@@ -54,9 +54,9 @@ of associating a **value** to a symbol.
 <ReadMore path="/compute-engine/guides/symbols/#scopes" >Read more about
 <strong>identifiers</strong> and value binding.<Icon name="chevron-right-bold" /></ReadMore>
 
-For symbols, the definition records contain information such as the domain of
+For symbols, the definition records contain information such as the type of
 the symbol and its value. For functions, the definition record include the
-signature of the function (the domain of the argument it expects), and how to
+signature of the function (the type of the argument it expects), and how to
 simplify or evaluate function expressions that have this function as their head.
 
 Name binding is done during canonicalization. If name binding failed, the

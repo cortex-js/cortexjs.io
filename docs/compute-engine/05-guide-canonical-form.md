@@ -11,6 +11,8 @@ render_math_in_document: true
 
 <Intro>
 Many mathematical objects can be represented by several equivalent expressions.
+A **canonical form** is a unique representation of an object that is chosen as the
+standard representation.
 </Intro>
 
 For example, the expressions in each row below represent the same mathematical
@@ -211,7 +213,7 @@ form:
   - Simplified if associative: \\( f(a, f(b, c)) \to f(a, b, c) \\)
 
 
-## Custom Canonical Form
+## Custom Canonical Forms
 
 The full canonical form of an expression is not always the most convenient
 representation for a given application. For example, if you want to check
@@ -233,7 +235,7 @@ console.log(expr.json);
 ```
 
 **To get the full canonical form**, use `ce.box(expr, { canonical: true })` or
-`ce.parse(s, { canonical: true })`. You can also ommit the `canonical` option
+`ce.parse(s, { canonical: true })`. You can also omit the `canonical` option
 as it is `true` by default.
 
 ```js example

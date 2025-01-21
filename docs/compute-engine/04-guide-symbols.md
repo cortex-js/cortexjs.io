@@ -22,7 +22,7 @@ toc: true
 
 <Intro>
 A **symbol** is an identifier representing a named mathematical object. It 
-may have a type and may hold a value. A symbol without a value represents a
+has a type and may hold a value. A symbol without a value represents a
 mathematical unknown in an expression.
 </Intro>
 
@@ -35,7 +35,7 @@ symbol will be inferred based on its usage or its value.
 ```live show-line-numbers
 const n = ce.box("n");
 n.value = 5;
-console.log("n =", n.value, ": ", n.type);
+console.log("n =", n.value, ":", n.type);
 ```
 
 **To get a list of all the symbols in an expression** use `expr.symbols`.
@@ -100,17 +100,17 @@ console.log("pi = ", smallPi, "=", bigPi);
 An unknown symbol is automatically declared when it is first used in an
 expression.
 
-The new definition has a domain of `undefined` and no value associated with it,
-so the symbol will be an **unknwon**.
+The symbol has a type of `unknown` and no value associated with it,
+so the symbol will be an **unknown**.
 
 ```js
 const symbol = ce.box("m"); // m for mystery
-console.log(symbol.domain);
-// ➔ undefined
+console.log(symbol.type);
+// ➔ "unknown"
 
 symbol.value = 5;
-console.log(symbol);
-// ➔ 5
+console.log(symbol.type);
+// ➔ "finite_integer"
 ```
 
 ## Forgetting a Symbol

@@ -54,7 +54,7 @@ Press **Reset** to bring back the playground to its original state.
 
 ## Vanilla HTML Example
 
-Here's a complete web page in vanilla HTML:
+Here's a complete web page using a `<math-field>` in vanilla HTML:
 
 ```html
 <!doctype html>
@@ -133,6 +133,18 @@ development server with one click.
 
 :::
 
+
+:::warning[Caution: CSP (Content Security Policy)]
+
+In order to interactively display mathfields, some CSS styles are generated dynamically. If you are using a **Content Security Policy (CSP)**, you may need to adjust it to allow the use of inline styles.
+
+Specifically, you may need to add `'unsafe-inline'` to the `style-src` directive in your CSP.
+
+```html
+<meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline';">
+```
+
+:::
 
 <ReadMore path="/mathfield/guides/integration/" >
 Learn more about other options to <strong>add mathfields to your project</strong><Icon name="chevron-right-bold" />
