@@ -3,7 +3,6 @@ title: Complex
 slug: /compute-engine/reference/complex/
 ---
 
-<section id="constants">
 
 ## Constants
 
@@ -11,7 +10,6 @@ slug: /compute-engine/reference/complex/
 | :-------------- | :------------------ | --------------------------------------------- |
 | `ImaginaryUnit` | $$ \imaginaryI $$ | The imaginary unit, solution of $$x^2+1=0$$ |
 
-</section>
 
 ## Functions
 

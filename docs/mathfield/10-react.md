@@ -78,7 +78,7 @@ export default function App({children}) {
 
 ## Using LaTeX strings with JSX
 
-You can specify the initial value of the mathfield by providing a LaTeX 
+**To specify the initial value of the mathfield** provide a LaTeX 
 string as a child of the `<math-field>` tag.
 
 However, since both JSX and LaTeX use curly braces, you need to escape the

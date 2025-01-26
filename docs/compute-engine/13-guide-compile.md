@@ -4,7 +4,7 @@ slug: /compute-engine/guides/compiling/
 ---
 
 <Intro>
-With the Compute Engine you can compile **LaTeX expressions** to **JavaScript functions**!
+The Compute Engine **LaTeX expressions** can compile expressions to **JavaScript functions**!
 </Intro>
 
 ## Introduction

@@ -19,7 +19,7 @@ access to specialized symbols for math input with only a tap.
 
 ### Layout Selector
 
-The math keyboard includes multiple **layouts** which you can select with the 
+The math keyboard includes multiple **layouts** which can be chosen with the 
 layout selector.
 
 The default layouts include the most common math symbols. They are: 
@@ -49,8 +49,8 @@ with their corresponding keybindings: <kbd>Ctrl/Command</kbd>+<kbd>Z</kbd>,
 Press the **Shift Key** <kbd>⇧</kbd> to access alternative symbols. The 
 keyboard updates when the key is pressed to reveal the symbols.
 
-If you have a physical keyboard, you can also press the <kbd>SHIFT</kbd> or 
-<kbd>CAPSLOCK</kbd> key on the physical keyboard.
+If a physical keyboard is available, the <kbd>SHIFT</kbd> or 
+<kbd>CAPSLOCK</kbd> key on the physical keyboard can also be used.
 
 The symbol corresponding to the shifted variant is displayed
 in the top right corner of some keys. Some keys have a shifted variant even

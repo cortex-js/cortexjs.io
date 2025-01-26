@@ -5,6 +5,10 @@ function setupComputeEngine() {
     return;
   }
   window.ce = new ComputeEngine.ComputeEngine();
+  // Reload all the CodePlayground elements
+  document.querySelectorAll("code-playground").forEach((x) => {
+    if (typeof x.reset === 'function') x.reset() 
+  });
 }
 
 function renderMath() {
@@ -46,6 +50,7 @@ function renderMath() {
 export function onRouteDidUpdate({ location, previousLocation }) {
   // Don't execute if we are still on the same page; the lifecycle may be fired
   // because the hash changes (e.g. when navigating between headings)
+  console.log('route update', location.pathname, previousLocation?.pathname);
   if (location.pathname !== previousLocation?.pathname) {
     renderMath();
     setupComputeEngine();

@@ -88,7 +88,7 @@ New sets can be defined using one of the following operators.
 
 ## Relations
 
-You can check the membership of an element in a set or the relationship between two sets using the following operators.
+To check the membership of an element in a set or the relationship between two sets using the following operators.
 
 <div className="symbols-table">
 

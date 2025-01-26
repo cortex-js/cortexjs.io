@@ -95,7 +95,7 @@ not be in canonical form: some "sugaring" is applied to the internal
 representation before being returned, for example `["Power", "x", 2]` is
 returned as `["Square", "x"]`.
 
-You can customize how an expression is serialized to plain JSON by using
+**To customize how an expression is serialized to plain JSON** use
 `expr.toMathJson()`.
 
 ```js
@@ -235,7 +235,7 @@ console.log(expr.json);
 ```
 
 **To get the full canonical form**, use `ce.box(expr, { canonical: true })` or
-`ce.parse(s, { canonical: true })`. You can also omit the `canonical` option
+`ce.parse(s, { canonical: true })`. The `canonical` option can be omitted
 as it is `true` by default.
 
 ```js example

@@ -8,7 +8,6 @@ The functions described in this section are part of the **core** of the Compute
 Engine.
 </Intro>
 
-<section id="constants">
 
 ## Constants
 
@@ -28,7 +27,6 @@ value other than themselves.
 ["List", 2, "Nothing", 3]
 ```
 
-</section>
 
 ## Declaring, Assigning and Assuming
 
@@ -451,7 +449,6 @@ Evaluate to a numerical approximation of the expression.
 
 </FunctionDefinition>
 
-<section id='core-functions'>
 
 ## Core Functions
 
@@ -523,7 +520,6 @@ use `Declare`.
 
 </FunctionDefinition>
 
-</section>
 
 ## Parsing and Serializing Latex
 
@@ -557,7 +553,6 @@ Tag a string as a LaTeX string
 
 </FunctionDefinition>
 
-<section id="supsub">
 
 ## Superscripts and Subscripts
 
@@ -577,4 +572,3 @@ These functions are all inert functions, that is they evaluate to themselves.
 | `Superstar`   | $$ x^*$$       | When the argument is a complex number, indicate the conjugate. |
 
 </div>
-</section>

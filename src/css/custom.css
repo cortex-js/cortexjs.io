@@ -38,6 +38,46 @@
   --ifm-line-height-base: 1.47059;
 
   --ifm-global-radius: 4px;
+
+  --ifm-toc-padding-vertical: 0;
+  --ifm-toc-padding-horizontal: 1em;
+}
+
+.table-of-contents {
+  /* Do not display scrollbars: */
+  overflow:hidden;
+  padding-top: 8px;
+  padding-bottom: 8px
+}
+
+.table-of-contents li {
+  margin: 0;
+}
+
+.table-of-contents > li  {
+  margin-bottom: 0;
+}
+
+.table-of-contents a {
+  border-radius: 8px;
+  margin: -8px;
+  margin-right: 0;
+  padding: 8px;
+}
+
+.table-of-contents a:hover {
+  background: var(--neutral-800);
+
+}
+
+.table-of-contents > li > .table-of-contents__link {
+  font-weight: 600;
+}
+
+.table-of-contents__link {
+  line-height: 1.2; 
+  padding-bottom: .33em;
+  opacity: .8;
 }
 
 .alert--warning {

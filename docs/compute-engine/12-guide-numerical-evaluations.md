@@ -9,24 +9,56 @@ To obtain an exact numeric evaluation of an expression use `expr.evaluate()`.
 To obtain a  numeric approximation use `expr.N()`.
 </Intro>
 
+
+## Exact Evaluation
+
 An evaluation with `expr.evaluate()` preserves **exact values**.
 
 Exact values are:
 
-- integers and rationals
-- square roots of integers
-- constants such as `ExponentialE` and `Pi`
+<div className="symbols-table no-header" style={{"--first-col-width":"25ch"}}>
 
-If one of the arguments is not an exact value the expression is evaluated as a
-**numeric approximation**.
+| Type                         | Examples                                      |
+|------------------------------|-----------------------------------------------|
+| Integers and Rationals       | $42$, $\nicefrac{3}{4}$                       |
+| Square Roots of Integers     | $\sqrt{2}$, $3\sqrt{5}$                       |
+| Constants                    | $e$ (`ExponentialE`), $\pi$ (`Pi`)            |
 
-**To obtain a numeric approximation, use `expr.N()`**. If `expr.N()` cannot
-provide a numeric evaluation, a symbolic representation of the partially
-evaluated expression is returned.
+</div>
 
-The value of `N()` is a boxed expression. The `numericValue` property of this
-expression is either a machine number (a JavaScript `number`), a 
-`NumericValue` object or `null` if the expression is not a number.
+```live
+console.log(ce.parse('1/3 + 1/4').evaluate());
+
+console.log(ce.parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').evaluate());
+```
+
+
+
+## Numeric Approximation
+
+**To force the evaluation of an expression to be a numeric approximation**, use `expr.N()`.
+
+```live
+console.log(ce.parse('1/3 + 1/4').N());
+console.log(ce.parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').N());
+```
+
+
+When using `expr.evaluate()`, if one of the arguments is not an exact value 
+the expression is automatically evaluated as a **numeric approximation**.
+
+```live
+console.log(ce.parse('1/3 + 1/4 + 1.24').evaluate());
+```
+
+## JavaScript Interoperability
+
+The result of `expr.evaluate()` and `expr.N()` is a boxed expression. 
+
+The `numericValue` property of this expression is either a machine number 
+(a JavaScript `number`), a `NumericValue` object or `null` if the expression 
+is not a number.
+
 
 While a `NumericValue` object can represent arbitrary precision numbers, for 
 use with JavaScript, a reduced precision approximation can be accessed using
@@ -52,8 +84,22 @@ Unlike the `.re` property, the `.value` property can also return a `boolean`,
 a `string`, depending on the value of the expression.
 
 
-<ReadMore path="/compute-engine/guides/symbolic-computing/" > Read more about
-<strong>Symbolic Computing</strong> <Icon name="chevron-right-bold" /></ReadMore>
+
+The `value` property of a boxed expression can be used in JavaScript
+expressions.
+
+```live
+const expr = ce.parse('1/3 + 1/4');
+console.log(expr.N().value + 1);
+```
+
+**To get a boxed number from a JavaScript number**, use `ce.box()` or `ce.number()`.
+
+```live
+const boxed = ce.box(1.5);
+console.log(boxed.N().value);
+```
+
 
 ## Repeated Evaluation
 
@@ -61,36 +107,36 @@ a `string`, depending on the value of the expression.
 of variables. `ce.assign()` changes the value associated with one or more
 variables in the current scope.
 
-```js
+```live
 const expr = ce.parse('3x^2+4x+2');
 
-for (const x = 0; x < 1; x += 0.01) {
+for (let x = 0; x < 1; x += 0.01) {
   ce.assign('x', x);
-  console.log(`f(${x}) = ${expr.N().re}`);
+  console.log(`f(${x}) = ${expr.evaluate()}`);
 }
 ```
 
 You can also use `expr.subs()`, but this will create a brand new expression on
 each iteration, and will be much slower.
 
-```js
+```live
 const expr = ce.parse('3x^2+4x+2');
 
-for (const x = 0; x < 1; x += 0.01) {
-  console.log(`f(${x}) = ${expr.subs({ x: x }).N().re}`);
+for (let x = 0; x < 1; x += 0.01) {
+  console.log(`f(${x}) = ${expr.subs({ x }).evaluate()}`);
 }
 ```
 
 **To reset a variable to be unbound to a value** use `ce.assign()`
 
-```js
-ce.assign('x', null);
+```live
+ce.assign("x", null);
 
-console.log(expr.N().latex);
+console.log(ce.parse('3x^2+4x+2').N());
 // ➔ "3x^2+4x+c"
 ```
 
-You can also change the value of a variable by directly setting its `value` property:
+The value of a variable can also be changed by directly setting its `value` property:
 
 ```ts
 ce.symbol('x').value = 5;
@@ -131,9 +177,9 @@ by the `precision` property of the `ComputeEngine` instance.
 
 The default precision is 21.
 
-```js
+```live
 ce.precision = 30;
-console.log(ce.parse('\\pi').N().latex);
+console.log(ce.parse('\\pi').N());
 // ➔ 3.141592653589793238462643383279502884197169399375105820974944592307
 ```
 
@@ -164,7 +210,7 @@ results.
 
 ```ts
 ce.precision = 'machine';
-console.log(ce.parse('0.1 + 0.2').N().latex);
+console.log(ce.parse('0.1 + 0.2').N());
 // ➔ "0.30000000000000004"
 ```
 
@@ -179,17 +225,17 @@ Arithmetic"** by David Goldberg <Icon name="chevron-right-bold" />
 
 ### Arbitrary Precision
 
-In the `ce.precision` is greater than 15, numbers are represented as a string 
-of base-10 digits and an exponent, `bignum` numbers.
+If `ce.precision` is greater than 15, numbers are represented as bignum numbers,
+a string of base-10 digits and an exponent.
 
-Bignum numbers have a minimum value of $$ \\pm
-10^{-9\\,000\\,000\\,000\\,000\\,000} \\) and a maximum value of \\(
-\\pm9.99999\\ldots \\times 10^{+9\\,000\\,000\\,000\\,000\\,000} $$.
+Bignum numbers have a minimum value of $ \pm
+10^{-9\,000\,000\,000\,000\,000} $ and a maximum value of $
+\pm9.99999\ldots \times 10^{+9\,000\,000\,000\,000\,000} $.
 
 
 ```ts
-ce.numericMode = 21;
-console.log(ce.parse('0.1 + 0.2').N().latex);
+ce.precision = 21;
+console.log(ce.parse('0.1 + 0.2').N());
 // ➔ "0.3"
 ```
 
@@ -281,7 +327,7 @@ The topics below from the
 [MathJSON Standard Library](/compute-engine/guides/standard-library/) can provide numeric
 evaluations for their numeric functions:
 
-<div className="symbols-table">
+<div className="symbols-table" style={{"--first-col-width":"16ch"}}>
 
 | Topic                                                             | Symbols/Functions                                                      |
 | :---------------------------------------------------------------- | :--------------------------------------------------------------------- |

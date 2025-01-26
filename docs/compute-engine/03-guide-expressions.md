@@ -134,7 +134,6 @@ console.log(expr.toMathJson({
 //    ]]
 ```
 
-<section id="canonical">
 
 ## Canonical Expressions
 
@@ -159,8 +158,8 @@ console.log(expr.json);
 // ➔ 17
 ```
 
-You can check if a non-canonical expression is a reduced (canonical) rational 
-number by checking the GCD of the numerator and denominator:
+**To determine if a non-canonical expression is a reduced (canonical) rational 
+number** check that the GCD of the numerator and denominator is 1.
 
 ```js example
 const input = ce.parse("\\frac{30}{50}", {canonical: false});
@@ -221,7 +220,6 @@ When doing this check on a canonical expression it takes into consideration not
 only possible syntax errors, but also semantic errors (incorrect number or
 type of arguments, etc...).
 
-</section>
 
 ## Mutability
 

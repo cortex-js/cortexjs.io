@@ -341,7 +341,6 @@ mf.addEventListener('focus-out', (ev) => {
 });
 ```
 
-<section id='clipboard'>
 
 ## Interacting with the Clipboard
 
@@ -469,5 +468,4 @@ You can ignore styles applied to a formula by using `mf.getValue('latex-unstyled
 
 <!-- ## Performing editing commands -->
 
-</section>
 

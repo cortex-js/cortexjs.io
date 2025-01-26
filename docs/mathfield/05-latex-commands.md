@@ -15,8 +15,8 @@ Mathfields support over **800** LaTeX commands.
 
 **To enter a LaTeX command in mathfield** press the <kbd>ESC</kbd> key or <kbd>\\</kbd>  
 to enter LaTeX editing mode. Press <kbd>ESC</kbd> to exit LaTeX editing mode. 
-You can examine the LaTeX 
-code for an expression by selecting it, then pressing <kbd>ESC</kbd>.
+
+**To examine the LaTeX code for an expression**, select it, then press <kbd>ESC</kbd>.
 
 
 <ReadMore path="/mathfield/reference/keybindings" >
@@ -25,43 +25,46 @@ The most common symbols can be entered using **keyboard shortcuts**.<Icon name="
 
 
 
-## Text Mode, Math Mode and Math Style
+## Text Zone, Math Zone and Math Style
 
-### Math Mode
+### Math Zone
 
-When in **Math Mode**, the content is laid out using typesetting rules specific
+When in a **Math Zone**, the content is laid out using typesetting rules specific
 to math. 
 
-For example, variables are displayed in italics, an appropriate amount
+For example, variables such as $x$ are displayed in italics, an appropriate amount
 of space is inserted around some letters such as $ f $ to improve their legibility,
 and white spaces are ignored.
 
-In Math Mode, the layout and size of some math elements is adjusted based on the
+In a Math Zone, the layout and size of some math elements is adjusted based on the
 context in which they are used. For example, superscripts and subscripts are
 displayed using a smaller font size: $ 2^2 $.
 
+Inside a Math Zone, the **Math Style** indicate the size of the font used to display
+the content, and some layout options, such as placement of the limits of a sum or
+integral.
 
-**To override the default _math style_**, use the following commands:
+**To override the default _Math Style_**, use the following commands:
 <div className="symbols-table" style={{"--first-col-width":"19ch"}}>
 
 | Math Style |  |  | | 
 | :---- | :---- | :--- | :--- |
-| `\displaystyle` <br/><br/> For equations in their own paragraph | `\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}` | $$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$  |
-| `\textstyle` <br/><br/> Confusingly, for **inline math**, not for text mode| `\textstyle \sum_{i=0}^n \frac{a_i}{1+x}` | $$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$ |
+| `\displaystyle` <br/><br/> For equations in their own paragraph/block | `\displaystyle \sum_{i=0}^n \frac{a_i}{1+x}` | $$\displaystyle \sum_{i=0}^n \frac{a_i}{1+x} $$  |
+| `\textstyle` <br/><br/> Confusingly, for **inline math**, not for text content| `\textstyle \sum_{i=0}^n \frac{a_i}{1+x}` | $$\textstyle \sum_{i=0}^n \frac{a_i}{1+x} $$ |
 | `\scriptstyle`<br/><br/>For subscripts and superscripts| `\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x}` | $$\scriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$ |
 | `\scriptscriptstyle` <br/><br/>For subscripts and superscripts of subscripts and superscripts| `\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x}` | $$\scriptscriptstyle \sum_{i=0}^n \frac{a_i}{1+x} $$  |
 
 </div>
 
-### Text Mode
+### Text Zone
 
-**To include some textual content**, use the `\text{}` command to switch 
-to **Text Mode**.
+**To include some textual content**, use the `\text{}` or `\textrm{}` commands to switch 
+to a **Text Zone**. Inside a Text Zone, white spaces are preserved and the spacing of characters is not adjusted.
 
-| Math Mode | Text Mode | 
-| :---- | :---- |
-| `if and only if x > 0` | `\text{if and only if } x > 0` | 
-| $$if and only if x > 0$$ | $$\text{if and only if } x > 0$$ | 
+
+<Latex value='if and only if x > 0' flow='column'/>
+<Latex value='\textrm{if and only if } x > 0' flow='column'/>
+
 
 
 The `\text{}` command will use the font defined by the CSS `font-family` property
@@ -95,15 +98,15 @@ The `\textnormal{}` command works like `\text{}`. But it's longer to type.
 <Latex value="\textnormal{Donald Knuth is a Professor Emeritus at Stanford University}"/>
 
 
-When in Text Mode, use `$...$` to switch back to Inline Math Mode or `\\[...\\]` to switch
-to Display (block) Math Mode.
+When in a Text Zone, use `$...$` to switch back to an Inline Math Zone or `\\[...\\]` to switch
+to a Display (block) Math Zone.
 
 ## Fractions and Binomials
 
-The `\frac` command is used to create a fraction. The first argument is the numerator,
+The `\frac` command is used to represent a fraction. The first argument is the numerator,
 the second argument is the denominator. It will size itself according to the 
-current context (display, text (inline), script, scriptscript). The `\dfrac` and
-`\tfrac` commands force the size to be display or text (inline) style respectively.
+current math style (display, text (inline), script, scriptscript). The `\dfrac` and
+`\tfrac` commands force the math style to be display or text (inline) style respectively.
 
 The `\cfrac` (continuous fraction) command has an optional argument, `[l]` or 
 `[r]`, that controls if the numerator is left-aligned or right-aligned.
@@ -126,8 +129,8 @@ The `\pdiff` command is a convenient shortcut for partial differentials.
 
 ---
 
-The `\binom` command is used to create a binomial coefficient. The `\dbinom` and
-`\tbinom` commands force the size to be display or text (inline) style respectively.
+The `\binom` command is used to represent a binomial coefficient. The `\dbinom` and
+`\tbinom` commands force the math style to be display or text (inline) style respectively.
 
 <LatexCommands>
   <Latex value='\binom{\unicode{"2B1A}}{\unicode{"2B1A}}' source="\binom{}{}" flow="column"/> 
@@ -187,6 +190,15 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 </LatexCommands>
 
 <LatexCommands>
+  <Latex value='\circ' source='\circ' flow='column'/>
+  <Latex value='\bullet' source='\bullet' flow='column'/>
+  <Latex value='\centerdot' source='\centerdot' flow='column'/>
+</LatexCommands>
+
+
+<br/>
+
+<LatexCommands>
   <Latex value='\boxminus' source='\boxminus' flow='column'/>
   <Latex value='\boxplus' source='\boxplus' flow='column'/>
   <Latex value='\boxtimes' source='\boxtimes' flow='column'/>
@@ -195,13 +207,6 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 <br/>
 
-<LatexCommands>
-  <Latex value='\circ' source='\circ' flow='column'/>
-  <Latex value='\bullet' source='\bullet' flow='column'/>
-  <Latex value='\centerdot' source='\centerdot' flow='column'/>
-</LatexCommands>
-
-<br/>
 
 <LatexCommands>
   <Latex value='\ominus' source='\ominus' flow='column'/>
@@ -268,7 +273,7 @@ there is less space between `-` and `1` than there is between `-` and `2`.
 
 ### Non-Standard Trig Functions
 
-The functions below are not part of the standard LaTeX distribution
+The commands in this section are not part of the standard LaTeX distribution
 but are available in some packages. Use them with caution as they may not
 be supported by all LaTeX engines. Consider using `\operatorname{}` instead.
 
@@ -337,13 +342,16 @@ font and with the appropriate spacing.
 
 ## Unicode
 
+If a symbol is not available as a LaTeX command, you can use the Unicode codepoint
+of the character. The commands below can be used to insert a Unicode character in a mathfield.
+
 <div className="symbols-table">
 
 | Command | | 
 | :--- | :--- | 
-| `\unicode{}` | The argument is a Unicode codepoint expressed as a number. To use a hexadecimal number, start the argument with `x` or `"` and use **uppercase** `A`-`F` for hexadecimal digits.<br/><ul><li>$$\unicode{10775} $$ `\unicode{10775}`</li><li>$$\unicode{"2A17}$$ `\unicode{"2A17}`</li><li>$$\unicode{x2A17}$$ `\unicode{x2A17}`</li></ul> |
-| `\char` | The argument is also a Unicode codepoint, but the `{`...`}` delimiters are optional when using `"`. <br/> <ul><li>$$\char"2A17 $$ `\char"2A17`  </li></ul> |
-| `^^` <br/> `^^^^` | Followed by 2 or 4 hexadecimal digits with **lowercase** `a`-`f` to specify a Unicode codepoint.<br/><ul><li>$$^^4a $$ `^^4a`</li><li>$$^^^^2a17 $$ `^^^^2a17`</li></ul> | 
+| `\unicode{}` | The argument is a Unicode codepoint expressed as a number. To use a hexadecimal number, start the argument with `x` or `"` and use **uppercase** `A`-`F` for hexadecimal digits.<br/><ul><li>$$\Large\unicode{10775} $$ `\unicode{10775}`</li><li>$$\Large\unicode{"2A17}$$ `\unicode{"2A17}`</li><li>$$\Large\unicode{x2A17}$$ `\unicode{x2A17}`</li></ul> |
+| `\char` | The argument is also a Unicode codepoint, but the `{`...`}` delimiters are optional when using `"`. <br/> <ul><li>$$\Large\char"2A17 $$ `\char"2A17`  </li></ul> |
+| `^^` <br/> `^^^^` | Followed by 2 or 4 hexadecimal digits with **lowercase** `a`-`f` to specify a Unicode codepoint.<br/><ul><li>$$\Large^^4a $$ `^^4a`</li><li>$$\Large^^^^2a17 $$ `^^^^2a17`</li></ul> | 
 
 </div>
 
@@ -1378,7 +1386,7 @@ They can be combined:
 \\enclose{circle}[mathbackground="#fbc0bd"]{\\frac1x}
 `}</Latex>
 <Latex>{`
-\\enclose{roundedbox}[1px dotted #cd0030]{\\frac{x^2+y^2}{\sqrt{x^2+y^2}}}
+\\enclose{roundedbox}[1px dotted #cd0030]{\\frac{x^2+y^2}{\\sqrt{x^2+y^2}}}
 `}</Latex>
 
 #### `\cancel`, `\bcancel` and `\xcancel`
@@ -1516,7 +1524,7 @@ and `Magenta`. Those names are case-sensitive.
 <LatexCommands>
   <Latex value='\textsf{Don Knuth}' source="\textsf{}" flow="column" />
   <Latex value='\mathsf{ABCabc}' source="\mathsf{}" flow="column" />
-  <Latex value='${\sffamily ABCabc}' source="\sffamily" flow="column" />
+  <Latex value='{\sffamily ABCabc}' source="\sffamily" flow="column" />
 </LatexCommands>
 
 #### Math Variants
@@ -1526,8 +1534,8 @@ and `Magenta`. Those names are case-sensitive.
   <Latex value='\mathscr{ABCdef}' source="\mathscr{ABCdef}" aside="Script" flow="column" />
   <Latex value='\mathbb{ABCabc}' source="\mathbb{}" aside="Blackboard" flow="column" />
   <Latex value='\Bbb{ABCdef}' source="\Bbb{}" flow="column" />
-  <Latex value='${\rmfamily ABCabc}' source="\rmfamily" flow="column" />
   <Latex value='${\frak ABC}' source="{\frak}" flow="column" />
+  <Latex value='\text{\rmfamily ABCabc}' source="\text{\rmfamily}" flow="column" />
 </LatexCommands>
 
 ### MathJax HTML Extension
@@ -1577,7 +1585,7 @@ Apply an element ID to the expression. The element can then be styled using CSS.
 
 The argument of this command is a comma-delimited list of key/value pairs, e.g. 
 `\htmlData{foo=green,bar=blue}{x=0}`. A corresponding
-  `data-foo` and `data-bar` DOM attributes are attached to the rendered DOM element.
+  `foo` and `bar` DOM attributes are attached to the rendered DOM element.
 
 <Latex value="\htmlData{foo=green,bar=blue}{ \text{Don Knuth} }"/>
  
@@ -1596,7 +1604,7 @@ background and a red underline.
 The first argument is a math expression to display, the second argument is the text to
 display on hover.
 
-<Latex value="\mathtip{\text{Don Knuth}}{\text{Knuth is the author of TeX}}"/>
+<Latex value="\texttip{e^{i\pi}-1=0}{The most beautiful equation}"/>
 
 #### `\mathtip`
 
@@ -1673,7 +1681,14 @@ delimiters based on the content.
 
 
 <LatexCommands>
+  <Latex value='\infty ' flow="column"/>
+  <Latex value='\prime ' flow="column"/>
+  <Latex value='\doubleprime ' flow="column"/>
   <Latex value='/ ' flow="column"/>
+  <Latex value='\/ ' flow="column"/>
+  <Latex value='| ' flow="column"/>
+  <Latex value='\backslash ' flow="column"/>
+  <Latex value='\diagup ' flow="column"/>
   <Latex value='\sharp ' flow="column"/>
   <Latex value='\flat ' flow="column"/>
   <Latex value='\natural ' flow="column"/>
@@ -1683,20 +1698,13 @@ delimiters based on the content.
   <Latex value='\heartsuit ' flow="column"/>
   <Latex value='\spadesuit ' flow="column"/>
   <Latex value='\diamondsuit ' flow="column"/>
-  <Latex value='\backslash ' flow="column"/>
-  <Latex value='\infty ' flow="column"/>
-  <Latex value='\prime ' flow="column"/>
-  <Latex value='\doubleprime ' flow="column"/>
   <Latex value='\angle ' flow="column"/>
   <Latex value='\_ ' flow="column"/>
   <Latex value='\checkmark ' flow="column"/>
-  <Latex value='\diagup ' flow="column"/>
   <Latex value='\measuredangle ' flow="column"/>
   <Latex value='\sphericalangle ' flow="column"/>
   <Latex value='\backprime ' flow="column"/>
   <Latex value='\backdoubleprime ' flow="column"/>
-  <Latex value='\/ ' flow="column"/>
-  <Latex value='| ' flow="column"/>
   <Latex value='\originalof ' flow="column"/>
   <Latex value='\laplace ' flow="column"/>
   <Latex value='\imageof ' flow="column"/>
@@ -1717,7 +1725,7 @@ delimiters based on the content.
 
 ## MediaWiki (`texvc.sty` package)
 
-Mathfields supports the commands used by [MediaWiki](https://en.wikipedia.org/wiki/Help:Displaying_a_formula) pages, except for the deprecated ones.
+Mathfields support the commands used by [MediaWiki](https://en.wikipedia.org/wiki/Help:Displaying_a_formula) pages, except for the deprecated ones.
 
 
 <LatexCommands>
@@ -1791,7 +1799,7 @@ Mathfields supports the commands used by [MediaWiki](https://en.wikipedia.org/wi
 
 ### Braket Notation 
 
-Mathfields supports the [`braket` package](https://ctan.org/pkg/braket)
+Mathfields support the commands of the [`braket` package](https://ctan.org/pkg/braket)
 
 <LatexCommands>
   <Latex value='\bra{\Psi}' flow="column"/>
@@ -1805,7 +1813,7 @@ Mathfields supports the [`braket` package](https://ctan.org/pkg/braket)
 
 ## Chemistry (`mhchem` package)
 
-Mathfields  supports the [`mhchem` package](https://mhchem.github.io/MathJax-mhchem/).
+Mathfields support the commands of the [`mhchem` package](https://mhchem.github.io/MathJax-mhchem/).
 
 
 ### Chemical Formulas
@@ -2161,7 +2169,7 @@ can be used as building blocks for more elaborate structures:
 
 The math typesetting is influenced by some "constants" that are stored 
 in "registers". Those registers can be set globally on a mathfield using 
-the `registers` option.
+the `mf.registers` property.
 
 <div className="symbols-table" style={{"--first-col-width":"18ch"}}>
 

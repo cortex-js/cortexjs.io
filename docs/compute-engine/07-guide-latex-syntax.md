@@ -13,9 +13,7 @@ string (**serializing**)
 
 :::info[Note]
 In this documentation, functions such as `ce.box()` and `ce.parse()` require a
-`ComputeEngine` instance which is denoted by a `ce.` prefix.
-
-Functions that
+`ComputeEngine` instance which is denoted by a `ce.` prefix.<br/>Functions that
 apply to a boxed expression, such as `expr.simplify()` are denoted with a
 `expr.` prefix.
 :::
@@ -119,152 +117,195 @@ console.log(ce.box(["Add", ["Power", "x", 3], 2]).latex);
 // ➔  "x^3 + 2"
 ```
 
-Alternatively, you can use the `ce.serialize()` function.
+## Customizing Parsing
 
-```javascript
-console.log(ce.serialize(["Add", ["Power", "x", 3], 2]));
-// ➔  "x^3 + 2"
+The LaTeX parsing can be customized by providing a `ParseLatexOptions` object as
+the second argument to the `ce.parse()` function.
+
+### Customizing Parsing of Numbers
+
+See the [Number Formatting](#number-formatting) section for details on how to
+customize the parsing of numbers. Most of the same options are available for
+parsing as for serialization.
+
+### Other Parsing Options
+
+| Key | Description |
+| :--- | :--- |
+| `skipSpace` | If `true`, ignore space characters in a math zone. Default is `true`. |
+| `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: if the number includes repeating digits (e.g. `1.33(333)`), it will be parsed as a decimal number even if this setting is `"rational"`. **Default**: `"auto"`|
+| `preserveLatex` | If `true`, the expression will be decorated with the LaTeX fragments corresponding to each element of the expression. The top-level expression, that is the one returned by `parse()`, will include the verbatim LaTeX input that was parsed. The sub-expressions may contain a slightly different LaTeX, for example with consecutive spaces replaced by one, with comments removed, and with some low-level LaTeX commands replaced, for example `\egroup` and `\bgroup`. **Default:** `false` |
+
+#### `getIdentifierType`
+
+This handler is invoked when the parser encounters an identifier
+that has not yet been declared.
+
+The `identifier` argument is a [valid identifier](/math-json/#identifiers).
+
+The handler can return:
+
+- `"variable"`: the identifier is a variable
+- `"function"`: the identifier is a function name. If an apply
+function operator (typically, parentheses) follow, they will be parsed
+as arguments to the function.
+- `"unknown"`: the identifier is not recognized.
+
+
+```live
+console.info(ce.parse("f(x)", {
+  getIdentifierType: (identifier) => {
+    if (identifier === "f") {
+      return "function";
+    }
+    return "unknown";
+  },
+}).json);
 ```
 
-The `ce.serialize()` function takes an optional `canonical` argument. Set it to
-`false` to prevent some transformations that are done by default to produce more
-readable LaTeX, but that may not match exactly the MathJSON.
+#### `parseUnexpectedToken`
 
-For example:
+This handler is invoked when the parser encounters a token that it does not
+know how to handle.
 
-```javascript
-console.log(ce.serialize(["Power", "x", -1]));
-// ➔  "\\frac{1}{x}"
+The `lhs` argument is the previous token, if any.
 
-console.log(ce.serialize(["Power", "x", -1], { canonical: false }));
-// ➔  "x^{-1}"
+The handler can access the unexpected token with `parser.peek`. If
+it is a token that should be recognized, the handler can consume it
+by calling `parser.nextToken()`.
+
+The handler should return an expression or `null` if the token is not
+recognized.
+
+```live
+console.info(ce.parse("3\\frac{1}{\\foo}", {
+  parseUnexpectedToken: (lhs, parser) => {
+    if (parser.peek === '\\foo') {
+      parser.nextToken();
+      return "foo";
+    }
+    return null;
+  },
+}).json);
 ```
 
-## Customizing Parsing and Serialization
+## Customizing Serialization
 
-**To customize the behavior of `ce.parse()` and `expr.latex`** set the
-`ce.latexOptions` property.
+While `expr.latex` provides a simple, default serialization to LaTeX, it may not
+always be the most suitable for your needs.
 
-Example of customization:
+**To customize the serialization to LaTeX**, use the `expr.toLatex()` method.
 
-- whether to use an invisible multiply operator between expressions
-- whether the input LaTeX should be preserved as metadata in the output
-  expression
-- how to handle encountering unknown identifiers while parsing
-- whether to use a dot or a comma as a decimal marker
-- how to display imaginary numbers and infinity
-- whether to format numbers using engineering or scientific format
-- what precision to use when formatting numbers
-- how to serialize an explicit or implicit multiplication (using `\times`,
-  `\cdot`, etc...)
-- how to serialize functions, fractions, groups, logical operators, intervals,
-  roots and powers.
+The argument of the `expr.toLatex()` method is a `SerializeLatexOptions` object
+that can be used to customize the serialization. The keys are explained in the
+sections below.
 
-The type of `ce.latexOptions` is
-<kbd>[NumberFormattingOptions](/docs/compute-engine/?q=NumberFormattingOptions)
-& [ParseLatexOptions](/docs/compute-engine/?q=ParseLatexOptions) &
-[SerializeLatexOptions](/docs/compute-engine/?q=SerializeLatexOptions)</kbd>.
-Refer to these interfaces for more details.
+### Number Formatting
 
-```javascript
-const ce = new ComputeEngine();
-ce.latexOptions = {
-  precision: 3,
-  decimalMarker: "{,}",
-};
+| Key | Description |
+| :--- | :--- |
+| `fractionalDigits` | The number of decimal places to use when formatting numbers. Use `"max"` to include all available digits and `"auto"` to use the same precision as for evaluation. Default is `"auto"`. |
+| `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, or `"engineering"`. Default is `"auto"`. |
+| `avoidExponentsInRange` | A tuple of two values representing a range of exponents. If the exponent for the number is within this range, a decimal notation is used. Otherwise, the number is displayed with an exponent. Default is `[-6, 20]`. |
+| `digitGroupSeparator` | The LaTeX string used to separate group of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provide, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
+| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tupe is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`.|
+  | `exponentProduct` | A LaTeX string inserted before an exponent, if necessary. Default is `"\cdot"`. |
+| `beginExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"10^{"`. |
+| `endExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"}"`. |
+| `truncationMarker` | A LaTeX string used to indicate that a number has more precision than what is displayed. Default is `"\ldots"`. |
+| `repeatingDecimal` | The decoration around repeating digits. Valid values are `"auto"`, `"vinculum"`, `"dots"`, `"parentheses"`,  `"arc"` and `"none"`. Default is `"auto"`. |
 
-console.log(ce.parse("\\frac{1}{7}").N().latex);
-// ➔ "0{,}14\\ldots"
+```live
+console.log(ce.parse("\\pi").N().toLatex({ 
+    fractionalDigits: 6,
+}));
 ```
 
-### Customizing the Decimal Marker
+
+```live
+console.log(ce.box(700).toLatex({
+  notation: "scientific",
+  avoidExponentsInRange: null,
+  exponentProduct: "\\times"
+}));
+// ➔ "7\times10^{2}"
+
+console.log(ce.box(123456.789).toLatex({
+  notation: "scientific",
+  avoidExponentsInRange: null,
+  exponentProduct: "\\times",
+}));
+// ➔ "1.234\,567\,89\times10^{5}"
+```
+
+### Customizing the Decimal Separator
 
 The world is
 [about evenly split](https://en.wikipedia.org/wiki/Decimal_separator#/media/File:DecimalSeparator.svg)
 between using a dot or a comma as a decimal marker.
 
-By default, the ComputeEngine is configured to use a dot.
+By default, the ComputeEngine is configured to use a dot, i.e. $ 3.1415 $.
 
-**To use a comma as a decimal marker**, set the `decimalMarker` option:
+**To use a comma as a decimal marker**, set the `decimalSeparator` option:
 
-```ts
-ce.latexOptions.decimalMarker = "{,}";
+```live
+console.log(ce.box(3.141).toLatex({ 
+    decimalSeparator: "{,}"
+}));
 ```
 
 Note that in LaTeX, in order to get the correct spacing around the comma, it
 must be surrounded by curly brackets.
 
-### Customizing the Number Formatting
 
-There are several options that can be used to customize the formating of numbers
-when using `expr.latex`. Note that the format of numbers in JSON serialization
-is standardized and cannot be customized.
+### Special Numbers and Symbols
 
-The options are members of `ce.latexOptions`.
+| Key | Description |
+| :--- | :--- |
+| `positiveInfinity` | The LaTeX string used to represent positive infinity. Default is `"\infty"` $ \infty $. |
+| `negativeInfinity` | The LaTeX string used to represent negative infinity. Default is `"-\infty"` $ -\infty $. |
+| `imaginaryUnit` | The LaTeX string used to represent the imaginary unit symbol. Default is `"\imaginaryI"` $ \imaginaryI $ |
+| `notANumber` | The LaTeX string to represent the number NaN. Default value is `"\operatorname{NaN}"` $ \operatorname{NaN} $. |
+| `prettify` | If `true`, the output will be formatted to be more human-readable. Default is `false`. |
+| `invisibleMultiply` | A LaTeX string to use as an invisible multiply operator between expressions. Use `"\cdot"` to use a $ \cdot $. Default is `""`. |
+| `invisiblePlus` | A LaTeX string to use as an invisible plus operator between expressions, for example with mixed numbers. Leave it empty to join the main number and the fraction. Use `"+"` to insert an explicit $ + $ operator between them. Default is `""`. |
+| `multiply` | A LaTeX string to use as a multiply operator between expressions. Use `"\cdot"` to use a $ \cdot $. Default is `"\times"` $ \times $. |
+| `missingSymbol` | A LaTeX string to use when a symbol is missing. Default is `"\placeholder{}"` $ \placeholder{} $. |
 
-- `notation`
-  - `"auto"`: (**default**) the whole part may take any value
-  - `"scientific"`: the whole part is a number between 1 and 9, there is an
-    exponent, unless it is 0.
-  - `"engineering"`: the whole part is a number between 1 and 999, the exponent
-    is a multiple of 3.
-- `avoidExponentsInRange`
-  - if `null`, exponents are always used
-  - otherwise, it is a tuple of two values representing a range of exponents. If
-    the exponent for the number is within this range, a decimal notation is
-    used. Otherwise, the number is displayed with an exponent. The default is
-    `[-6, 20]`
-- `exponentProduct`: a LaTeX string inserted before an exponent, if necessary.
-  Default is `"\cdot"`. Another popular value is `"\times"`.
-- `beginExponentMarker` and `endExponentMarker`: LaTeX strings used as template
-  to format an exponent. Default values are `"10^{"` and `"}"` respectively.
-  Other values could include `"\operatorname{E}{"` and `"}"`.
-- `truncationMarker`: a LaTeX string used to indicate that a number has more
-  precision than what is displayed. Default is `"\ldots"`
-- `beginRepeatingDigits` and `endRepeatingDigits`: LaTeX strings used a template
-  to format repeating digits, as in `1.333333333...`. Default is `"\overline{"`
-  and `"}"`. Other popular values are `"("` and `")"`.
-- `imaginaryUnit`: the LaTeX string used to represent the imaginary unit symbol.
-  Default is `"\imaginaryI"`. Other popular values are `"\operatorname{i}"`.
-- `positiveInfinity` and `negativeInfinity` the LaTeX strings used to represent
-  positive and negative infinity, respectively. Defaults are `"\infty"` and
-  `"-\infty"`.
-- `notANumber`: the LaTeX string to represent the number NaN. Default value is
-  `"\operatorname{NaN}"`.
-- `groupSeparator`: the LaTeX string used to separate group of digits, for
-  example thousands. Default is `"\,"`. To turn off group separators, set to
-  `""`
-
-```ts
-console.log(ce.parse("700").latex);
-// ➔ "700"
-console.log(ce.parse("123456.789").latex);
-// ➔ "123\,456.789"
-
-// Always use the scientific notation
-ce.latexOptions.notation = "scientific";
-ce.latexOptions.avoidExponentsInRange = null;
-ce.latexOptions.exponentProduct = "\\times";
-
-console.log(ce.parse("700").latex);
-// ➔ "7\times10^{2}"
-console.log(ce.parse("123456.789").latex);
-// ➔ "1.234\,567\,89\times10^{5}"
+```live
+console.log(ce.parse("3\\frac{1}{4}").toLatex({ 
+    invisiblePlus: "+"
+}));
 ```
 
 ### Customizing the Serialization Style
 
-Some category of expressions can be serialized in different ways based on
-conventions or personal preference. For example, a group can be indicate by
-simple parentheses, or by a `\left...\right` command. A fraction can be
-indicated by a `\frac{}{}` command or by a `{}{}^{-1}`.
+In addition, the keys `applyFunctionStyle`, `groupStyle`, `powerStyle`, 
+`rootStyle`, `fractionStyle`, `logicStyle` and `numericSetStyle` 
+can be used to customize the serialization of specific types of expressions.
 
-The compute engine includes some built-in defaults, but they can be customized
-as desired. For example to always represent fractions with a `\frac{}{}`
-command:
 
-```ts
-ce.latexSyntax.options.fractionStyle = () => "quotient";
+
+For example, a group can be indicated by simple parentheses, or by a 
+`\left...\right` command. A fraction can be indicated by a 
+`\frac{}{}` command or by a `{}{}^{-1}`.
+
+The Compute Engine includes some built-in defaults, but they can be customized
+as desired. These style options are functions that take an expression fragment
+and return a string indicating the desired style.
+
+
+For example to always represent fractions with a solidus (forward slash) use:
+
+```live
+console.log(ce.parse("\\frac{3}{5}").toLatex({
+  fractionStyle: () => "quotient"
+}));
+
+console.log(ce.parse("\\frac{3}{5}").toLatex({
+  fractionStyle: () => "inline-solidus"
+}));
+
 ```
 
 The style option handler has two arguments:
@@ -272,19 +313,30 @@ The style option handler has two arguments:
 - the expression fragment being styled
 - the depth/level of the expression in the overall expression
 
-For example, to serialize rational numbers and division deeper than level 2 as
+For example, to serialize fractions deeper than level 0 as
 an inline solidus:
 
-```ts
-ce.latexSyntax.options.fractionStyle = (expr, level) =>
-  head(expr) === "Rational" || level > 2 ? "inline-solidus" : "quotient";
+```live
+
+console.log(ce.parse("\\frac{a}{b}+\\sqrt{\\frac{c}{d}}").toLatex({
+  fractionStyle: (expr, level) =>
+     level > 0 ? "inline-solidus" : "quotient"
+}));
 ```
 
 #### Function Application
 
-`["Sin", "x"]`
+**To customize the serialization of function application**, use the
+`applyFunctionStyle` style option handler.
 
-|               |                      |                        |
+```live
+console.log(ce.parse("\\sin x").toLatex({
+  applyFunctionStyle: () => "big"
+}));
+```
+
+
+|   |                     |                       |
 | :------------ | :------------------- | :--------------------- |
 | `"paren"`     | `\sin(x)`            | $$\sin(x)$$            |
 | `"leftright"` | `\sin\left(x\right)` | $$\sin\left(x\right)$$ |
@@ -293,7 +345,14 @@ ce.latexSyntax.options.fractionStyle = (expr, level) =>
 
 #### Group
 
-`["Multiply", "x", ["Add", "a", "b"]]`
+**To customize the serialization of groups**, use the `groupStyle` style option
+handler.
+
+```live
+console.log(ce.parse("(a+b)", {canonical: false}).toLatex({
+  groupStyle: () => "big"
+}));
+```
 
 |               |                     |                       |
 | :------------ | :------------------ | :-------------------- |
@@ -304,6 +363,15 @@ ce.latexSyntax.options.fractionStyle = (expr, level) =>
 
 #### Root
 
+**To customize how roots are serialized**, use the `rootStyle` style option
+handler.
+
+```live
+console.log(ce.parse("\\sqrt{2}").toLatex({
+  rootStyle: () => "solidus"
+}));
+```
+
 |              |     |     |
 | :----------- | :-- | :-- |
 | `"radical"`  |     |     |
@@ -311,6 +379,15 @@ ce.latexSyntax.options.fractionStyle = (expr, level) =>
 | `"solidus"`  |     |     |
 
 #### Fraction
+
+**To customize how fractions are serialized**, use the `fractionStyle` style
+option handler.
+
+```live
+console.log(ce.parse("\\frac{3}{5}").toLatex({
+  fractionStyle: () => "nice-solidus"
+}));
+```
 
 |                    |     |     |
 | :----------------- | :-- | :-- |
@@ -322,16 +399,32 @@ ce.latexSyntax.options.fractionStyle = (expr, level) =>
 
 #### Logic
 
-`["And", "p", "q"]`
+**To customize how logic expressions are serialized**, use the `logicStyle` style
+option handler.
+
+```live
+console.log(ce.parse("p\\land q").toLatex({
+  logicStyle: () => "word"
+}));
+```
 
 |                    |                    |                      |
 | :----------------- | :----------------- | :------------------- |
-| `"word"`           | `a \text\{ and \} b` | $$a \text\{ and \} b$$ |
+| `"word"`           | `a \text{ and } b` | $$a \text{ and } b$$ |
 | `"boolean"`        |                    |                      |
-| `"uppercase-word"` |                    |                      |
+| `"uppercase-word"` | `p \text{ AND } q`  | $ p \text{ AND } q $                     |
 | `"punctuation"`    |                    |                      |
 
 #### Power
+
+**To customize how powers are serialized**, use the `powerStyle` style option
+handler.
+
+```live
+console.log(ce.parse("x^2").toLatex({
+  powerStyle: () => "solidus"
+}));
+```
 
 |              |     |     |
 | :----------- | :-- | :-- |
@@ -340,6 +433,15 @@ ce.latexSyntax.options.fractionStyle = (expr, level) =>
 | `"quotient"` |     |     |
 
 #### Numeric Sets
+
+**To customize how numeric sets are serialized**, use the `numericSetStyle` style
+option handler.
+
+```live
+console.log(ce.parse("x \\in \\Z").toLatex({
+  numericSetStyle: () => "interval"
+}));
+```
 
 |                 |     |     |
 | :-------------- | :-- | :-- |
@@ -376,14 +478,14 @@ such as `Divide` or `PlusMinus` and are not prefixed with a backslash.
 **To extend the LaTeX syntax** update the `latexDictionary` property of the
 Compute Engine
 
-```javascript
-const ce = new ComputeEngine();
+```live
 ce.latexDictionary = [
   // Include all the entries from the default dictionary...
   ...ce.latexDictionary,
   // ...and add the `\smoll{}{}` command
   {
-    // The parse handler below will be invoked when this LaTeX command is encountered
+    // The parse handler below will be invoked when this LaTeX command 
+    // is encountered
     latexTrigger: '\\smoll',
     parse: (parser) => {
       // We're expecting two arguments, so we're calling
@@ -391,8 +493,8 @@ ce.latexDictionary = [
       // we assume that the argument is missing.
       return [
         "Divide",
-        parser.parseGroup() ?? ["Error", ""missing""],
-        parser.parseGroup() ?? ["Error", ""missing""],
+        parser.parseGroup() ?? ["Error", "'missing'"],
+        parser.parseGroup() ?? ["Error", "'missing'"],
       ];
     },
   },
@@ -403,12 +505,12 @@ console.log(ce.parse('\\smoll{1}{5}').json);
 // both arguments are integers.
 // ➔ ["Rational", 1, 5]
 ```
-
+:::caution
 Do not modify the `ce.latexDictionary` array directly. Instead, create a new
 array that includes the entries from the default dictionary, and add your own
 entries. Later entries will override earlier ones, so you can replace or
 modify existing entries by providing a new definition for them.
-
+:::
 
 ### LaTeX Dictionary Entries
 
@@ -500,7 +602,7 @@ Each entry in the LaTeX dictionary is an object with the following properties:
   can have different triggers that produce the same expression. This is useful
   for synonyms, such as `\operatorname{floor}` and `\lfloor`...`\rfloor`.
 
-### Expressions
+#### Expressions
 
 The most general type of entry is one of kind `expression`. If no `kind`
 property is provided, the kind is assumed to be `expression`.
@@ -672,10 +774,11 @@ handler should return a MathJSON expression.
 ### Parsing
 
 When parsing a LaTeX string, the first step is to tokenize the string according
-to the LaTeX syntax. For example, the input string `\\frac{ab}{10}` will result
-in the tokens `["\\frac", "{", "a", "b", "}", "{", "1", "0", "}"]`. Note that
-each LaTeX command is a single token, but that digits and ordinary letters are
-each separate tokens.
+to the LaTeX syntax. For example, the input string `\frac{ab}{10}` will result
+in the tokens `["\\frac", "{", "a", "b", "}", "{", "1", "0", "}"]`. 
+
+Note that each LaTeX command is a single token, but that digits and ordinary 
+letters are each separate tokens.
 
 The `parse` handler is invoked when the trigger is encountered in the LaTeX
 token strings.
@@ -757,7 +860,7 @@ help you parse the LaTeX string:
   `null` otherwise. This is useful to parse the argument of a function. For
   example with `f(x, y, z)`, the arguments would be `[x, y, z]`.
 
-If the `parse` handler returns `null`, the parser will continue to look for
+If the `parse()` handler returns `null`, the parser will continue to look for
 another handler that matches the current token.
 
 Note there is a pattern in the names of the methods of the parser. The `match`
@@ -801,7 +904,7 @@ left-hand side of the operator as the first argument to the `parse` handler.
 
 ### Serializing
 
-When serializing a MathJSON expression to a LaTeX string, the `serialize`
+When serializing a MathJSON expression to a LaTeX string, the `serialize()`
 handler is invoked. You must specify a `name` property to associate the
 serialization handler with a MathJSON identifier.
 
@@ -830,10 +933,10 @@ serialization handler with a MathJSON identifier.
 ```
 
 In the example above, the LaTeX command `\oplus` is associated with the
-`Concatenate` function. The `serialize` handler will be invoked when the
+`Concatenate` function. The `serialize()` handler will be invoked when the
 `expr.latex` property is read.
 
-Note that we did not provide a `parse` handler: if a `name` property is
+Note that we did not provide a `parse()` handler: if a `name` property is
 provided, a default `parse` handler will be used that is equivalent to:
 `parse: name`.
 
@@ -894,7 +997,7 @@ You can now parse the input from a mathfield using:
 console.log(ce.parse(mfe.value).json);
 ```
 
-Alternatively, you can associate the customized compute engine with the
+Alternatively, the customized compute engine can be associated with the
 mathfields in the document:
 
 ```js

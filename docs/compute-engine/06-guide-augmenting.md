@@ -56,7 +56,7 @@ Read more about **scopes** <Icon name="chevron-right-bold" />
 
 The simplest way to define a new symbol or function is to use LaTeX. 
 
-For example, to define a new symbol $m$ with a value of $42$, you can use the
+For example, to define a new symbol $m$ with a value of $42$, use the
 following LaTeX expression:
 
 ```js
@@ -67,7 +67,7 @@ ce.parse("m").evaluate().print();
 
 **Note**: the assignment expression must be evaluated to take effect.
 
-To define a new function $f$ that multiplies its argument by $2$, you can use
+To define a new function $f$ that multiplies its argument by $2$, use
 the following LaTeX expression:
 
 ```js
@@ -77,7 +77,7 @@ ce.parse("f(3)").evaluate().print();
 ```
 
 
-You can also use the `\mapsto` operator to define a function:
+The `\mapsto` operator is an alternative syntax to define a function:
 
 ```js
 ce.parse("f := x \\mapsto 2x").evaluate();
@@ -125,7 +125,7 @@ ce.declare("f", {
 
 ### Defining a Symbol
 
-To prevent the value of a symbol from being changed, you can set the `constant`
+**To prevent the value of a symbol from being changed**, set the `constant`
 property to `true`:
 
 ```js
@@ -139,14 +139,14 @@ If you do not provide a `type` property for a symbol, the type will be
 inferred from the value of the symbol. If no type and no value are
 provided, the type will be `unknown`.
 
-If you only want to provide the type of the identifier, without associating
-it with a value, you can use the following syntax:
+**To provide the type of the identifier, without associating
+it with a value**, use the following syntax:
 
 ```js
 ce.declare("n", "integer");
 ```
 
-As a shorthand, you can also declare a symbol by assigning it a value using `ce.assign()`:
+As a shorthand, a symbol can be declated by assigning it a value using `ce.assign()`:
 
 ```js
 ce.assign("m", 42);
@@ -158,7 +158,7 @@ If the symbol was not previously defined, this is equivalent to:
 ce.declare("m", { value: 42 });
 ```
 
-Alternatively, you can use:
+Alternatively:
 
 ```js
 ce.box("m").value = 42;

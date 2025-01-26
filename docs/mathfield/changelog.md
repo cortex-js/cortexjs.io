@@ -1166,11 +1166,11 @@ MathfieldElement.soundsDirectory = null;
 #### Miscellaneous Breaking Changes
 
 - For consistency with `<textarea>` the `<math-field>` tag now has a default
-  display style of "inline". You can change the display style to "block" using a
+  display style of "inline". The display style can be changed to "block" using a
   CSS rule.
 - The `<math-field>` tag now has some default styling, including a background
-  and border, consistent with a `<textarea>` element. You can override this
-  styling by defining CSS rules for the `math-field` selector.
+  and border, consistent with a `<textarea>` element. This
+  styling can be overridden by defining CSS rules for the `math-field` selector.
 - The previously deprecated option `horizontalSpacingScale`has been removed. It
   is replaced by the standard TeX registers`\thinmuskip`, `\medmuskip` and
   `\thickmuskip`.

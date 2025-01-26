@@ -9,7 +9,7 @@ slug: /mathfield/guides/customizing/
 <Intro>
 The appearance and behavior of the mathfield is highly customizable.
 
-In this section we'll go over some of the ways you can customize the mathfield.
+In this section we'll go over some of the ways a mathfield can be customized.
 </Intro>
 
 ## Styling
@@ -17,8 +17,21 @@ In this section we'll go over some of the ways you can customize the mathfield.
 **To style the mathfield** define a CSS rule targeting the mathfield or use the 
 `style` attribute of the `<math-field>` element.
 
-This can be used to modify the appearance of the mathfield in many ways, for 
+CSS attributes can be used to modify the appearance of the mathfield in many ways, for 
 example changing the base font size or adding a border around it.
+
+**To remove the border around the mathfield**, set the
+`border` property to `none` or `0`.
+
+**To change the background color of the mathfield**, use the `background` property.
+
+```live
+:::html
+<math-field style="border: none; background: #d8f0ff">
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+</math-field>
+```
+
 
 **To display the mathfield as a block element**, rather than an inline element, 
 add an attribute `style="display: block"`
@@ -26,7 +39,7 @@ add an attribute `style="display: block"`
 ```live mark-html-line="5"
 :::html
 <p>Answer: 
-  <math-field style="font-size:2rem">42</math-field>.
+  <math-field style="font-size:1.2rem">42</math-field>.
 </p>
 <p>Answer: 
   <math-field style="font-size:2rem; display: block">3.1415</math-field>
@@ -35,7 +48,8 @@ add an attribute `style="display: block"`
 
 
 
-## CSS Variables
+
+### CSS Variables
 
 **To customize the appearance of the mathfield**, use the following CSS
 variables (custom properties) in a ruleset that applies to the mathfield element.
@@ -46,35 +60,41 @@ math-field {
 }
 ```
 
-Set these CSS variables on any selector that applies to the
-`<math-field>` element you want to customize, for example, `body`. 
 Although CSS styles are "invisible" to custom components, CSS variables are 
 "passed through" and will affect the content of the `<math-field>` custom component.
 
-Alternatively you can set these CSS variables programatically:
+Set these CSS variables on any selector that applies to the
+`<math-field>` element you want to customize, for example, `body`. 
+
+Alternatively these CSS variables programatically can be set programmatically:
 
 ```js
 document.body.style.setProperty("--smart-fence-color", "red");
 ```
 
-<div className="symbols-table" style={{"--first-col-width":"35ch"}}>
+<div className="symbols-table" style={{"--first-col-width":"34ch"}}>
 
 | CSS Variable | Usage |
 |:---|:---|
+| `--primary` | Primary accent color, used for example keyboard toggle and menu glyphs and in the virtual keyboard |
 | `--caret-color` | Color of the insertion point |
+| `--selection-color` | Color of the content when selected |
 | `--selection-background-color`| Background color of the selection | 
-| `--selection-background-color-focused`| Background color of the selection, when the mathfield is focused. By default, same as `--selection-background-color` | 
-| `--contains-highlight-background-color` | Background color for items that contain the caret |
+| `--contains-highlight-background-color` | Background color of items that contain the caret |
 | `--placeholder-color` | Color of the placeholder symbol |
 | `--placeholder-opacity` | Opacity (0-1) of the placeholder symbol |
-| `--primary` | Primary accent color, used for example in the virtual keyboard |
-| `--smart-fence-color` | Color of a smart fence (default is current color) |
-| `--smart-fence-opacity` | Opacity of a smart fence (default is 50%) |
-| `--text-font-family` | The font stack used in text mode |
-| `--correct-color`| Highlight color of a prompt inside a mathfield when in the `"correct"` state| 
-| `--incorrect-color`| Highlight color of a prompt inside a mathfield when in the `"incorrect"` state | 
+| `--smart-fence-color` | Color of a smart fence (default is `current` color) |
+| `--smart-fence-opacity` | Opacity of a smart fence (default is `50%`) |
+| `--highlight-text` | The background color indicating the caret is in a text zone |
+| `--text-font-family` | The font stack used for content in a text zone |
+| `--latex-color` | The color of content in a LaTeX zone |
+| `--correct-color`| Highlight color of a prompt when in the `"correct"` state| 
+| `--incorrect-color`| Highlight color of a prompt when in the `"incorrect"` state | 
 
-**Note** To change the placeholder symbol, set the option `placeholderSymbol`.
+For color values, you can use any valid CSS color value, such as a color name,
+or `transparent to remove the color.
+
+**Note** To change the placeholder symbol, use the `mf.placeholderSymbol` property.
 
 
 </div>
@@ -108,7 +128,7 @@ Read more about [customizing the virtual keyboard appearance](/mathfield/guides/
 
 
 
-## Mathfield Parts
+### Mathfield Parts
 
 Because the mathfield is a custom element with a shadow DOM, its content
 is not directly accessible to CSS rules outside of the shadow DOM.
@@ -158,7 +178,51 @@ math-field::part(menu-toggle) {
 right-clicking on the mathfield. You can [customize the menu](/mathfield/guides/menu/) to change
 this behavior.
 
-## Display Options
+### Placeholder
+
+**To customize the placeholder text** set the `placeholder` attribute on the 
+`<math-field>` element.
+
+Note that the content of the `placeholder` attributed is interpreted as a
+LaTeX string. To display it as regular text, use the `\text{}` command.
+
+```live
+:::html
+<math-field placeholder="\text{Enter a formula}">
+</math-field>
+```
+
+### Focus Ring
+
+**To change the appearance of the focus ring**, use the `:focus-within` pseudo-element.
+
+```live
+:::html
+<style>
+  math-field:focus-within {
+    outline: 4px solid #d7170b;
+    border-radius: 4px;
+    background: rgba(251,	187,	182, .1);
+  }
+</style>
+<math-field>
+    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
+</math-field>
+```
+
+:::warning
+
+**Caution** Removing outlines in CSS creates issues for people navigating the web 
+with a keyboard. However, you can change the appearance of the outline,
+for example to indicate an error condition. If you remove the outline on the
+mathfield, make sure to replace it with another indicator, for example
+by displaying an outline on an enclosing element.
+
+:::
+
+
+
+## Math Display Options
 
 The appearance of a formula, in an editable mathfield or as a static
 representation, can be controlled with some of the following options:
@@ -322,38 +386,8 @@ the `french` style is used, otherwise `tex` is used.
 
 
 
-## Focus Ring
-
-**To change the appearance of the focus ring**, use the `:focus-within` pseudo-element.
-
-```live
-:::html
-<style>
-  math-field:focus-within {
-    outline: 4px solid #d7170b;
-    border-radius: 4px;
-    background: rgba(251,	187,	182, .1);
-  }
-</style>
-<math-field>
-    x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}
-</math-field>
-```
-
-:::warning
-
-**Caution** Removing outlines in CSS creates issues for people navigating the web 
-with a keyboard. However, you can change the appearance of the outline,
-for example to indicate an error condition. If you remove the outline on the
-mathfield, make sure to replace it with another indicator, for example
-by displaying an outline on an enclosing element.
-
-:::
 
 
-
-
-<section id='editing-options'>
 
 
 ## Editing Options
@@ -395,12 +429,8 @@ See `EditingOptions` for more details about these and other available options<Ic
 </ReadMore>
 
 
-</section>
 
-
-<section id='space-bar'>
-
-## Handling the Space Bar
+### Handling the Space Bar
 
 In traditional math typesetting, spaces have no effect: the spacing of elements
 in a formula is determined by the nature of the elements: numbers, punctuation,
@@ -418,10 +448,9 @@ By default, pressing the spacebar when in math mode does not insert anything.
 mf.mathModeSpace = '\\:';
 ```
 
-</section>
 
 
-## Turning off the LaTeX mode
+### Turning off the LaTeX mode
 
 Pressing the <kbd>\\</kbd> (backslash) or <kbd>ESC</kbd> key switches to the LaTeX mode where it 
 is possible to enter raw LaTeX command. For users familiar with LaTeX, it is
@@ -444,7 +473,6 @@ mf.addEventListener(
 );
 ```
 
-<section id='localization'>
 
 ## Localization
 
@@ -501,11 +529,17 @@ MathfieldElement.decimalSeparator = ",";
 
 ### Fraction Navigation Order
 
-In some East Asian cultures the denominator of fractions is read/written
-before the numerator.
+When using the keyboard to navigate a fraction, the order in which the
+numerator and navigator are traversed:
+- "numerator-denominator": first the elements in the numerator, then
+  the elements in the denominator.
+- "denominator-numerator": first the elements in the denominator, then
+  the elements in the numerator. In some East-Asian cultures, fractions
+  are read and written denominator first ("fēnzhī"). With this option
+  the keyboard navigation follows this convention.
 
 **To change the keyboard navigation order of fractions** set the 
-`fractionNavigationOrder` option.
+`MathfieldElement.fractionNavigationOrder` property.
 
 ```live
 :::js
@@ -518,7 +552,6 @@ MathfieldElement.fractionNavigationOrder = "denominator-numerator";
 </math-field>
 ```
 
-</section>
 
 ## Fonts
 

@@ -453,7 +453,6 @@ div.figure {
 
 </div>
 
-<section id="features-section">
   <div>
   <div className="figure" style={{marginBottom: "2em"}}>
     <img src="/img/mathfield/loop-eqn.png"/>
@@ -474,10 +473,6 @@ div.figure {
     Read more about the **virtual keyboard**<Icon name="chevron-right-bold" />
   </ReadMore>
 </div>
-</section>
-
-
-<section id="use-cases-section">
 
   <div className="use-case">
     <div style={{}}>
@@ -563,5 +558,3 @@ div.figure {
 
 
 
-
-</section>

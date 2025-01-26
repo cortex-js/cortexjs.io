@@ -42,7 +42,6 @@ Read more about **Simplifying Expressions** <Icon name="chevron-right-bold" />
 In general, assumptions are not used when evaluating expressions.
 
 
-<section id='defining-new-assumptions'>
 
 ## Defining New Assumptions
 
@@ -208,9 +207,6 @@ ce.is(["Element", "\\alpha", "RealNumbers"]);
 // ➔  undefined
 ```
 
-</section>
-
-<section id='scoped-assumptions'>
 
 ## Scoped Assumptions
 
@@ -238,4 +234,3 @@ ce.is(["Element", "\\alpha", "RealNumbers"]);
 // ➔  undefined
 ```
 
-</section>

@@ -26,7 +26,7 @@ Functions that apply to a boxed expression, such as `expr.simplify()` are denote
 
 There are three common transformations that can be applied to an expression:
 
-<div className="symbols-table">
+<div className="symbols-table" style={{"--first-col-width":"16ch"}}>
 
 | Transformation    |                                                                                                                                                                        |
 | :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -189,7 +189,7 @@ console.log('isEqual?', a.isEqual(b));
 
 ### Other Comparisons
 
-<div className="symbols-table">
+<div>
 
 |                                          |                                        |
 | :--------------------------------------- | :------------------------------------- |
@@ -244,7 +244,7 @@ that are available.
 <ReadMore path="/compute-engine/guides/expressions/" > Read more about
 <strong>Expressions</strong>, their properties and methods <Icon name="chevron-right-bold" /></ReadMore>
 
-You can check if an expression match a pattern, apply a substitution to some
+**To check if an expression matches a pattern**, apply a substitution to some
 elements in an expression or apply conditional rewriting rules to an expression.
 
 <ReadMore path="/compute-engine/guides/patterns-and-rules/" > Read more about
