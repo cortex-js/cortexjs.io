@@ -51,7 +51,7 @@
     "typescript": "^5.6.3"
   },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=21.0"
   },
   "browserslist": {
     "production": [
