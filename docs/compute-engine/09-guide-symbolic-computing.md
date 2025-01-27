@@ -9,24 +9,10 @@ The Compute Engine essentially performs computation by applying
 rewriting rules to a MathJSON expression.
 </Intro>
 
-:::info[Note]
-To use the Compute Engine you must write JavaScript or TypeScript
-code. This guide assumes you are familiar with one of these programming
-languages.
-:::
-
-
-:::info[Note]
-In this guide, functions such as `ce.box()` and `ce.parse()` require a
-`ComputeEngine` instance which is denoted by a `ce.` prefix.
-
-Functions that apply to a boxed expression, such as `expr.simplify()` are denoted with a
-`expr.` prefix.
-:::
 
 There are three common transformations that can be applied to an expression:
 
-<div className="symbols-table" style={{"--first-col-width":"16ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16ch"}}>
 
 | Transformation    |                                                                                                                                                                        |
 | :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

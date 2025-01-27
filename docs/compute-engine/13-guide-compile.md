@@ -79,17 +79,17 @@ console.log(ce.parse("a^2+b^3").unknowns);
 
 ## Limitations
 
+The calculations are only performed using machine precision numbers.
+
 Complex numbers, arbitrary precision numbers, and symbolic calculations are not
 supported.
-
-The calculations are only performed using machine precision numbers.
 
 Some functions are not supported.
 
 If the expression cannot be compiled, the `compile()` method will return
 `undefined`. The expression can be numerically evaluated as a fallback:
 
-```javascript
+```live
 const expr = ce.parse("-i\\sqrt{-1}");
 console.log(expr.compile() ?? expr.N().numericValue);
 // Compile cannot handle complex numbers, so it returns `undefined`

@@ -7,7 +7,7 @@ date: Last Modified
 ## Constants
 
 
-<div className="symbols-table" style={{"--first-col-width":"12ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"12ch"}}>
 
 | Symbol | LaTeX |  Notation |
 | :--- | :--- | :--- |
@@ -23,7 +23,7 @@ date: Last Modified
 
 ## Logical Operators
 
-<div className="symbols-table" style={{"--first-col-width":"12ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"12ch"}}>
 
 | Symbol |  LaTeX | Notation| |
 | :--- | :--- | :--- |:---  |

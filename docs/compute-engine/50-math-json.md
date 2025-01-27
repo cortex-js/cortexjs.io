@@ -184,7 +184,7 @@ the following differences:
 
 - The following characters in a string representing a number are ignored:
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header" style={{'--first-col-width': '9ch'}}>
 
 |            |                       |
 | :--------- | :-------------------- |
@@ -252,7 +252,7 @@ Strings may contain any character represented by a Unicode scalar value (a
 codepoint in the `[0...0x10FFFF]` range, except for `[0xD800...0xDFFF]`), but
 the following characters must be escaped as indicated:
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header" style={{'--first-col-width': '9ch'}}>
 
 | Codepoint                | Name                            | Escape Sequence      |
 | :----------------------- | :------------------------------ | :------------------- |
@@ -464,7 +464,7 @@ For example, they may be used to denote the positional parameter in a function
 expression. They may also denote placeholders and captured expression in
 patterns.
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header" style={{'--first-col-width': '7ch'}}>
 
 | Wildcard                    |                                                                       |
 | :-------------------------- | :-------------------------------------------------------------------- |
@@ -522,7 +522,7 @@ following these conventions.
 
 Modifiers include:
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header" style={{'--first-col-width': '14ch'}}>
 
 | Modifier        | LaTeX             |                          |
 | :-------------- | :---------------- | ------------------------ |
@@ -553,7 +553,7 @@ Modifiers include:
   subscript/superscript of an identifier, may be replaced with a corresponding
   LaTeX command:
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header" style={{'--first-col-width': '15ch'}}>
 
 | Common Names     | LaTeX         |                     |
 | :--------------- | :------------ | ------------------- |
@@ -639,7 +639,7 @@ Modifiers include:
 - The following names, when used as a subscript or superscript, may be replaced
   with a corresponding LaTeX command:
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | Subscript/Supscript | LaTeX                 |                            |
 | :------------------ | :-------------------- | -------------------------- |
@@ -659,7 +659,7 @@ Modifiers include:
 - Identifier fragments ending in digits may be rendered with a corresponding
   subscript.
 
-<div className="symbols-table" style={{"--first-col-width":"21ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"18ch"}}>
 
 | Identifier           | LaTeX              |                           |
 | :------------------- | :----------------- | ------------------------- |
@@ -684,7 +684,7 @@ array must be transformed into the equivalent object literal to be annotated.
 
 The following metadata keys are recommended:
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header" style={{'--first-col-width': '14ch'}}>
 
 | Key             | Note                                                                                                                                                                         |
 | :-------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

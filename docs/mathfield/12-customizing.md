@@ -72,7 +72,7 @@ Alternatively these CSS variables programatically can be set programmatically:
 document.body.style.setProperty("--smart-fence-color", "red");
 ```
 
-<div className="symbols-table" style={{"--first-col-width":"34ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"34ch"}}>
 
 | CSS Variable | Usage |
 |:---|:---|
@@ -136,7 +136,7 @@ is not directly accessible to CSS rules outside of the shadow DOM.
 However, there are a few parts that can be used to style the 
 content of the mathfield using the `::part()` pseudo-element.
 
-<div className="symbols-table" style={{"--first-col-width":22+"ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":22+"ch"}}>
 
 | Pseudo-element | Usage |
 |:---|:---|
@@ -279,7 +279,7 @@ value on the `mathfield` or static element.
 Within a formula, the size can be specified from a font scale with 10 values, 
 where 1 em is the base font size of the mathfield or static element.
 
-<div className="symbols-table" style={{"--first-col-width":"7ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"7ch"}}>
 
 | `fontSize` | &nbsp;| LaTeX Command | 
 |------:|:------|:----|
@@ -361,7 +361,7 @@ To get it laid out as a block element, set `display: block` on the mathfield.
 **To control which letters are automatically italicized**, set the `letterShapeStyle` property or `letter-shape-style` attribute.
 
 
-<div className='symbols-table'>
+<div className='symbols-table first-column-header'>
 
 | `letterShapeStyle` | xyz    | ABC    | αβɣ    | ΓΔΘ   |
 | :----------------- | ---    | ---    | ---    | ---   |
@@ -529,17 +529,20 @@ MathfieldElement.decimalSeparator = ",";
 
 ### Fraction Navigation Order
 
-When using the keyboard to navigate a fraction, the order in which the
-numerator and navigator are traversed:
-- "numerator-denominator": first the elements in the numerator, then
-  the elements in the denominator.
-- "denominator-numerator": first the elements in the denominator, then
-  the elements in the numerator. In some East-Asian cultures, fractions
-  are read and written denominator first ("fēnzhī"). With this option
-  the keyboard navigation follows this convention.
+When using the arrow keys on the keyboard to navigate a fraction, the order in 
+which the numerator and navigator are traversed can be customized.
 
 **To change the keyboard navigation order of fractions** set the 
 `MathfieldElement.fractionNavigationOrder` property.
+
+The possible values are:
+- `"numerator-denominator"`: first the elements in the numerator, then
+  the elements in the denominator. This is the default behavior.
+- `"denominator-numerator"`: first the elements in the denominator, then
+  the elements in the numerator. In some East-Asian cultures, fractions
+  are read and written denominator first (_fēnzhī_). With this option
+  the keyboard navigation follows this convention.
+
 
 ```live
 :::js

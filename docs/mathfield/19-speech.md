@@ -24,7 +24,7 @@ mf.executeCommand(['speak', 'selection');
 ```
 The options to specify the speech "scope" are:
 
-<div className='symbols-table'>
+<div className='symbols-table first-column-header'>
 
 | | |
 |---:|:---|

@@ -42,7 +42,7 @@ ce.parse("42 \\in \\Z").evaluate().print();
 
 ## Constants
 
-<div className="symbols-table" style={{"--first-col-width":"22ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"22ch"}}>
 
 | Symbol     | Notation                                 | &nbsp; | Definition |
 | :--------- | :--------------------------------------- | :--------- | :--------- |
@@ -72,7 +72,7 @@ ce.parse("42 \\in \\Z").evaluate().print();
 
 New sets can be defined using one of the following operators.
 
-<div className="symbols-table" style={{"--first-col-width":"19ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"19ch"}}>
 
 | Function              | Operation                                           |                                                                                                                                                                                                                     |
 | :-------------------- | :-------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -90,7 +90,7 @@ New sets can be defined using one of the following operators.
 
 To check the membership of an element in a set or the relationship between two sets using the following operators.
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | Function        | Notation                                                                                                                                                                 | &nbsp;                                                                                                      |
 | :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------- |

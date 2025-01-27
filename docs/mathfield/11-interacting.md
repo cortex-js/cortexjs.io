@@ -207,7 +207,7 @@ content, and formatting changes.
 The events include an `inputType` property that describe what caused the event 
 to be dispatched.
 
-<div className="symbols-table" style={{"--first-col-width":"21ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"21ch"}}>
 
 | `inputType` | |
 |:-- | :-- |
@@ -349,7 +349,7 @@ commands (<kbd>Control/⌘</kbd> <kbd>X</kbd> and <kbd>Control/⌘</kbd> <kbd>C<
 
 Multiple flavors are put on the clipboard:
 
-<div className='symbols-table'>
+<div className='symbols-table first-column-header'>
 
 | | |
 |:-- | :-- |

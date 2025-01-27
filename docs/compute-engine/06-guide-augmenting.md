@@ -1,5 +1,5 @@
 ---
-title: Defining Custom Functions and Symbols
+title: Custom Functions and Symbols
 slug: /compute-engine/guides/augmenting/
 ---
 

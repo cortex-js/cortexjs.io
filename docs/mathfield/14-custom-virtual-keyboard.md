@@ -33,7 +33,7 @@ This behavior can be changed with the `mf.mathVirtualKeyboardPolicy` property
 or the equivalent `math-virtual-keyboard-policy` attribute (set one or the 
 other, not both).
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | `mathVirtualKeyboardPolicy` | |
 | :-- | :-- |
@@ -211,7 +211,7 @@ and as the content inserted when the keycap is pressed.
 You'll notice from the example above that the LaTeX fragments defining the 
 keycap can contain some special placeholder tokens:
 
-<div className="symbols-table" style={{"--first-col-width":"5ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"5ch"}}>
 
 | Token | |
 | --: | :-- |

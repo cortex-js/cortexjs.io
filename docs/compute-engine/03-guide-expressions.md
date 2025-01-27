@@ -44,6 +44,41 @@ The input of `ce.box()` can be:
 
 The result is an instance of a `BoxedExpression`.
 
+### String Representation
+
+The `expr.toString()` method returns a [AsciiMath](https://asciimath.org/) string representation of the expression.
+
+```live
+let expr = ce.parse("3x^2+\\sqrt{2}");
+console.log(expr.toString());
+```
+
+When used in a context where a string is expected, the `expr.toString()` method
+is called automatically.
+
+```live
+let expr = ce.parse("3x^2+\\sqrt{2}");
+console.log(expr);
+```
+
+**To output an AsciiMath representation of the expressio to the console** use
+`expr.print()`.
+
+```live
+let expr = ce.parse("3x^2+\\sqrt{2}");
+expr.print();
+```
+
+**To obtain a LaTeX representation of the expression** use `expr.latex` or
+`expr.toLatex()` for additional formatting options.
+
+```live
+let expr = ce.parse("3x^2+\\sqrt{2}");
+console.log(expr.latex);
+```
+
+### Canonical Expressions
+
 By default, `ce.box()` returns a canonical expression. See
 [Canonical Expressions](#canonical) for more info.
 
@@ -105,7 +140,7 @@ console.log(expr.json);
 ```
 
 **To customize the format of the MathJSON expression returned by `expr.json`**
-use the `ce.toMathJson` method.
+use the `ce.toMathJson()` method.
 
 Use this option to control:
 
@@ -113,25 +148,18 @@ Use this option to control:
 - whether to use shorthand notation
 - to exclude some functions.
 
-See [JsonSerializationOptions](/docs/compute-engine/?q=JsonSerializationOptions)
+See [JsonSerializationOptions](/compute-engine/api#jsonserializationoptions)
 for more info about the formatting options available.
 
-```ts
+```live
 const expr = ce.parse("2 + \\frac{q}{p}");
-console.log(expr.json);
-// ➔ ["Add", 2, ["Divide", "q", "p"]]
+console.log("expr.json:", expr.json);
 
-console.log(expr.toMathJson({
+console.log("expr.toMathJson():", expr.toMathJson({
   exclude: ["Divide"], // Don't use `Divide` functions,
   // use `Multiply`/`Power` instead
   shorthands: [], // Don't use any shorthands
 }));
-// ➔ ["fn": ["Add", ["num": "2"],
-//      ["fn": ["Multiply",
-//        ["sym": "q"],
-//        ["fn": ["Power", ["sym": "p"], ["num": "-1"]]]]
-//      ]
-//    ]]
 ```
 
 
@@ -253,10 +281,10 @@ What doesn't change is the fact that `expr` represents the symbol `"n"`.
 A pure expression is an expression whose value is fixed. Evaluating it produces
 no side effect.
 
-The \\( \sin() \\) function is pure: it evaluates to the same value when the
+The $ \sin() $ function is pure: it evaluates to the same value when the
 same arguments are applied to it.
 
-On the other hand, the \\( \operatorname\{window\}() \\) function is not pure: by
+On the other hand, the $ \operatorname{Random}() $ function is not pure: by
 its nature it evaluates to a different value on every evaluation.
 
 Numbers, symbols and strings are pure. A function expression is pure if the
@@ -350,20 +378,19 @@ request the canonical version of the expression.
 **To get the list of all the `["Error"]` subexpression** use the `expr.errors`
 property.
 
-<div className="symbols-table first-column-header">
+<div className="symbols-table first-column-header"  style={{"--first-col-width":"26ch"}}>
 
 | Error Code                     | Meaning                                                                                                          |
 | :----------------------------- | :--------------------------------------------------------------------------------------------------------------- |
 | `syntax-error`                 | the parsing could not continue                                                                                   |
 | `missing`                      | an expression was expected                                                                                       |
+| `unexpected-argument`          | too many arguments provided                                                                                      |
+| `expected-argument`            | not enough arguments provided                                                                                    |
 | `expected-expression`          | an expression was expected inside an enclosure (parentheses)                                                     |
 | `unexpected-command`           | the command is unknown, or not applicable in the current parsing context                                         |
 | `unexpected-token`             | the character does not apply to the current parsing context                                                      |
-| `incompatible-domain`          | the argument provided does not match the expected domain                                                         |
-| `unexpected-argument`          | too many arguments provided                                                                                      |
-| `expected-argument`            | not enough arguments provided                                                                                    |
+| `incompatible-type`          | the type of the provided argument does not match the expected type                                                         |
 | `invalid-identifier`           | the identifier cannot be used (see [MathJSON Symbols](/math-json/#symbols))                                      |
-| `invalid-domain`               | the domain is not a valid domain literal or domain expression                                                    |
 | `expected-closing-delimiter`   | a closing `}` was expected, but is missing                                                                       |
 | `unexpected-closing-delimiter` | a closing `}` was encountered, but not expected                                                                  |
 | `expected-environment-name`    | the name of an environment should be provided with a `\begin` or `\end` command                                  |

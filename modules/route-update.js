@@ -1,14 +1,15 @@
 function setupComputeEngine() {
-  if (window.ce !== undefined) return;
-  if (!("ComputeEngine" in window)) {
+  if (window.ce !== undefined && 'CodeMirror' in window) return;
+  // If we're not ready, try again in 500ms
+  if (!("ComputeEngine" in window) || !("CodeMirror" in window)) {
     setTimeout(setupComputeEngine, 500);
     return;
   }
   window.ce = new ComputeEngine.ComputeEngine();
-  // Reload all the CodePlayground elements
-  document.querySelectorAll("code-playground").forEach((x) => {
-    if (typeof x.reset === 'function') x.reset() 
-  });
+  // Reset all the CodePlayground elements
+  // Give some time for the CodeMirror and ComputeEngine libraries to load
+  setTimeout(() => document.querySelectorAll("code-playground").forEach((x) => x.run()),
+    200);
 }
 
 function renderMath() {
@@ -50,7 +51,6 @@ function renderMath() {
 export function onRouteDidUpdate({ location, previousLocation }) {
   // Don't execute if we are still on the same page; the lifecycle may be fired
   // because the hash changes (e.g. when navigating between headings)
-  console.log('route update', location.pathname, previousLocation?.pathname);
   if (location.pathname !== previousLocation?.pathname) {
     renderMath();
     setupComputeEngine();

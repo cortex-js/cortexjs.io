@@ -5,7 +5,7 @@ slug: /compute-engine/reference/arithmetic/
 
 ## Constants
 
-<div className="symbols-table" style={{"--first-col-width":"16h"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16h"}}>
 
 | Symbol            | Value                        |                                                                                                                                                           |
 | :---------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -27,7 +27,7 @@ See also **Complex** for `ImaginaryUnit` and related functions<Icon name="chevro
 
 ## Relational Operators
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | Function       | Notation         |                                                                       |
 | :------------- | :--------------- | :------------------------------------------------------------------------------ |
@@ -44,7 +44,7 @@ See below for additonal relational operators: `Congruent`, etc...
 
 ## Functions
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | Function   | Notation                      |                                                                                            |
 | :--------- | :---------------------------- | :----------------------------------------------------------------------------------------- |
@@ -62,7 +62,7 @@ See below for additonal relational operators: `Congruent`, etc...
 
 ### Transcendental Functions
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | Function     | Notation                |                                                                                                                            |
 | :----------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------------- |
@@ -89,7 +89,7 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 
 ### Rounding
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | Function | Notation     |                                                                                                                   |
 | :------- | :----------- | :---------------------------------------------------------------------------------------------------------------- |

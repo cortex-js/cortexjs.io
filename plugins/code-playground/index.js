@@ -105,6 +105,7 @@ async function toJsxNode(node) {
   // Need help constructing this AST node?
   // Use the MDX Playground and explore what your output mdast should look like
   // https://mdxjs.com/playground/
+  
   const jsxNode = {
     type: "mdxJsxFlowElement",
     name: "code-playground",

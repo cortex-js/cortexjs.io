@@ -73,7 +73,7 @@ For convenience, the _pattern_ argument can be an unboxed MathJSON expression.
 The commutativity of functions is taken into account when matching patterns.
 
 ```live example
-const pattern = ["Add", "_", "x"];
+const pattern = ce.box(["Add", "_", "x"]);
 console.log("x+1 ➔", ce.box(["Add", 1, "x"]).match(pattern));
 // ➔ { } : the expression matches the pattern
 
@@ -91,7 +91,7 @@ expression, for example `x+_a` and `x` are considered to match (with the
 substitution `{_a : 0}`).
 
 ```live example
-const pattern = ["Add", "x", "_a"];
+const pattern = ce.box(["Add", "x", "_a"]);
 const expr = ce.box("x");
 
 console.log("x ➔", expr.match(pattern));
@@ -101,7 +101,7 @@ console.log("x ➔", expr.match(pattern));
 **To prevent the matching of variants**, set the `exact` property to `true`.
 
 ```live example
-const pattern = ["Add", "x", "_a"];
+const pattern = ce.box(["Add", "x", "_a"]);
 const expr = ce.box("x");
 
 console.log("exact: x ➔", expr.match(pattern, {exact: true}));
@@ -111,7 +111,7 @@ console.log("exact: x ➔", expr.match(pattern, {exact: true}));
 The variants can be applied to the whole expression or to sub-expressions.
 
 ```live example
-const pattern = ["Add", ["Multiply", "_a", "x"], "_b"];
+const pattern = ce.box(["Add", ["Multiply", "_a", "x"], "_b"]);
 
 console.log("x ➔", ce.box("x").match(pattern));
 // ➔ { _a: 1, _b: 0 } : the expression matches the pattern
@@ -149,10 +149,10 @@ If a named wildcard is referenced multiple times in a pattern, all its values
 must match.
 
 ```live example
-console.log(ce.box(["Add", 1, "x"]).match(["Add", '_a', '_a']));
+console.log(ce.box(["Add", 1, "x"]).match(ce.box(["Add", '_a', '_a'])));
 // ➔ null
 
-console.log(ce.box(["Add", "x", "x"]).match(["Add", '_a', '_a']));
+console.log(ce.box(["Add", "x", "x"]).match(ce.box(["Add", '_a', '_a'])));
 // ➔ { _a: "x" }
 ```
 
@@ -161,7 +161,7 @@ console.log(ce.box(["Add", "x", "x"]).match(["Add", '_a', '_a']));
 Wildcards can be used to capture the head of functions:
 
 ```live example
-console.log(ce.box(["Add", 1, "x"]).match(["_f", "__args"]));
+console.log(ce.box(["Add", 1, "x"]).match(ce.box(["_f", "__args"])));
 // ➔ { _f: "Add", __args: ["Sequence", [1, "x"]] }
 ```
 
@@ -239,9 +239,9 @@ expr.replace([
     { match: "b", replace: 3 }
   ], 
   { recursive: true }
-).print();
-// ➔ ["Add", ["Multiply", 2, "x"], 3]
+)?.print();
+// ➔ 2x + 3
 
 expr.subs({"a": 2, "b": 3}).print();
-// ➔ ["Add", ["Multiply", 2, "x"], 3]
+// ➔ 2x + 3
 ```

@@ -35,7 +35,7 @@
   --body-font-settings: "calt", "tnum", "ss01", "ss03";  /* For Inter font, see https://rsms.me/inter/#variable */
   --display-font-family: Inter, "Source Sans Pro", "IBM Plex Sans", sans-serif;
   --display-font-settings: "calt", "tnum", "ss01", "ss03";  /* For Inter font, see https://rsms.me/inter/#variable */
-  --ui-font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  --ui-font-family: Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   --ui-font: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 }
 

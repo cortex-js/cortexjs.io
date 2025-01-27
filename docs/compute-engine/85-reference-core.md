@@ -558,7 +558,7 @@ Tag a string as a LaTeX string
 
 These functions are all inert functions, that is they evaluate to themselves.
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | Function      |                  | Description                                                    |
 | :------------ | :--------------- | :------------------------------------------------------------- |

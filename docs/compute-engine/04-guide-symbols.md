@@ -95,7 +95,7 @@ console.log("pi = ", smallPi, "=", bigPi);
 // ➔ pi  = 3.1415 = 3.1415926535
 ```
 
-## Automatic Declaration of Symbols
+## Automatic Declaration
 
 An unknown symbol is automatically declared when it is first used in an
 expression.

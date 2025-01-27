@@ -30,12 +30,12 @@ echo -e "$BASENAME$DOT Making the changelog and API files"
 
 # Copy the ChangeLogs
 mkdir -p ./src/build/compute-engine/
-cp ./src/_data/_compute-engine-changelog.md ./src/build/compute-engine/changelog.md
-cat ./submodules/compute-engine/CHANGELOG.md >> ./src/build/compute-engine/changelog.md
+# cp ./src/_data/_compute-engine-changelog.md ./src/build/compute-engine/changelog.md
+# cat ./submodules/compute-engine/CHANGELOG.md >> ./src/build/compute-engine/changelog.md
 
 mkdir -p ./src/build/mathlive/
-cp ./src/_data/_mathlive-changelog.md ./src/build/mathlive/changelog.md
-cat ../mathlive/CHANGELOG.md >> ./src/build/mathlive/changelog.md
+# cp ./src/_data/_mathlive-changelog.md ./src/build/mathlive/changelog.md
+# cat ../mathlive/CHANGELOG.md >> ./src/build/mathlive/changelog.md
 
 
 # Build Docusaurus (.md -> .html)

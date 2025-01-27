@@ -17,47 +17,64 @@ The **Compute Engine** is a JavaScript/TypeScript library for symbolic
 computing and numeric evaluation of mathematical expressions.
 </Intro>
 
-The **Compute Engine** is for educators, students, scientists and engineers 
-who need to make technical computing apps running in the browser or in
-server-side JavaScript environments such as Node.
 
-<div style={{height:"3rem"}}></div>
 
+:::info[Note]
+To use the Compute Engine, you must write JavaScript or TypeScript code. This 
+guide assumes familiarity with one of these programming languages.
+:::
+
+<div style={{height:"2rem"}}></div>
 
 ```live
-console.log("e^{i\\pi} =", ce.parse("e^{i\\pi}").N().latex);
+console.log("exp(i*pi) =", ce.parse("e^{i\\pi}").evaluate());
 ```
 
 ```live
 const expr = ce.parse("(a+b)^2");
-console.log(ce.box(["Expand", expr]).evaluate().latex);
+ce.box(["Expand", expr]).evaluate().print();
 ```
 
 
 ```live
 const lhs = ce.parse("2x^2 + 3x + 1");
 const rhs = ce.parse("1 + 2x + x + 2x^2");
-console.log(lhs.latex, lhs.isEqual(rhs) ? "=" : "≠", rhs.latex);
+console.log(lhs, lhs.isEqual(rhs) ? "=" : "≠", rhs);
 ```
 
 
+The **Compute Engine** is for educators, students, scientists and engineers 
+who need to make technical computing apps running in the browser or in
+server-side JavaScript environments such as Node.
 
-:::info[Note]
-To use the Compute Engine you must write JavaScript code. This guide 
-assumes you are familiar with JavaScript or TypeScript.
-:::
+
 
 
 The Compute Engine manipulates math expressions represented with 
-the <a href="math-json/">MathJSON format</a>.
+the <a href="math-json/">MathJSON format</a>:
+
+For example, the expression \\(x^2 + 2x + 1\\) is represented as:
+
+```json
+["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]
+```
 
 
 The Compute Engine can:
 - <a href="/compute-engine/guides/latex-syntax/">**parse** and **serialize**</a> expressions from and to LaTeX
 - <a href="/compute-engine/guides/simplify/">**simplify**</a> expressions
-- <a href="/compute-engine/guides/evaluate/">**evaluate symbolically**</a> expressions
-- <a href="/compute-engine/guides/numeric-evaluation/">**evaluate numerically**</a> expressions
+- evaluate expression <a href="/compute-engine/guides/evaluate/">**symbolically**</a>
+- evaluate expressions <a href="/compute-engine/guides/numeric-evaluation/">**numerically**</a>
 - <a href="/compute-engine/guides/compiling/">**compile**</a> expressions to JavaScript functions
+
+
+:::info[Note]
+In this guide, functions such as `ce.box()` and `ce.parse()` require a
+`ComputeEngine` instance which is denoted by the `ce.` prefix.
+
+Functions that apply to a boxed expression, such as `expr.simplify()` are denoted with the
+`expr.` prefix.
+:::
 
 
 <ReadMore path="/compute-engine/demo/" >
@@ -68,17 +85,17 @@ Try the **interactive demo** now<Icon name="chevron-right-bold" />
 ## Getting Started
 
 The easiest way to get started is to load the Compute Engine JavaScript module
-from a CDN.
+from a CDN, then instantiate a `ComputeEngine` object.
 
 ### Using JavaScript Modules
 
 ```html
 <script type="module">
   import { ComputeEngine } from 
-    'https://unpkg.com/@cortex-js/compute-engine?module';
+    "https://unpkg.com/@cortex-js/compute-engine?module";
 
   const ce = new ComputeEngine();
-  console.log(ce.parse("e^{i\\pi}").evaluate().latex);
+  ce.parse("e^{i\\pi}").evaluate().print();
   // ➔ "-1"
 </script>
 ```
@@ -145,14 +162,14 @@ available by default to a `ComputeEngine` instance.
 Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold" />
 </ReadMore>
 
-In addition to the built-in definitions from the MathJSON Standard Library
-you can also add your own definitions.
+You can add your own definitions to the built-in definitions from the MathJSON Standard Library.
 
 <ReadMore path="/compute-engine/guides/augmenting/" >
-Read more about **Augmenting the MathJSON Standard Library**<Icon name="chevron-right-bold" />
+Read more about **Extending the MathJSON Standard Library**<Icon name="chevron-right-bold" />
 </ReadMore>
 
-You can also customize the LaTeX syntax, that is how to parse and serialize 
+If you use a custom LaTeX syntax, such as macros, you can add your own 
+definitions to the LaTeX dictionary, which defines how to parse and serialize 
 LaTeX to MathJSON.
 
 <ReadMore path="/compute-engine/guides/latex-syntax/" >

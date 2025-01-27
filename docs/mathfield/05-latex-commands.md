@@ -45,7 +45,7 @@ the content, and some layout options, such as placement of the limits of a sum o
 integral.
 
 **To override the default _Math Style_**, use the following commands:
-<div className="symbols-table" style={{"--first-col-width":"19ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"19ch"}}>
 
 | Math Style |  |  | | 
 | :---- | :---- | :--- | :--- |
@@ -345,7 +345,7 @@ font and with the appropriate spacing.
 If a symbol is not available as a LaTeX command, you can use the Unicode codepoint
 of the character. The commands below can be used to insert a Unicode character in a mathfield.
 
-<div className="symbols-table">
+<div className="symbols-table first-column-header">
 
 | Command | | 
 | :--- | :--- | 
@@ -2171,7 +2171,7 @@ The math typesetting is influenced by some "constants" that are stored
 in "registers". Those registers can be set globally on a mathfield using 
 the `mf.registers` property.
 
-<div className="symbols-table" style={{"--first-col-width":"18ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"18ch"}}>
 
 | Register | Purpose |
 | :--- |  :--- |
@@ -2197,7 +2197,7 @@ the `mf.registers` property.
 The commands below are TeX primitives. Most are only useful when writing
 TeX packages or macros.
 
-<div className="symbols-table" style={{"--first-col-width":"14ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"14ch"}}>
 
 | Command |  |
 | :--- |  :--- |

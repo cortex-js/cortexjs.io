@@ -10,7 +10,8 @@ The **type** of an expression is the set of the possible values of that expressi
 The Compute Engine uses a type system to ensure that the operations are 
 performed on the correct types of values.
 
-A type is represented by a **type expression**. For example:
+A type is represented by a **type expression**, which is a string with 
+a specific syntax. For example:
 
 - `"integer"`
 - `"boolean"`
@@ -23,9 +24,8 @@ such as `"integer"` or `"boolean"` or a **constructed type**.
 
 **To check the type of an expression**, use the `expr.type` property.
 
-```js
-ce.parse("3.14").type;
-// ➔ "finite_real"
+```live
+console.log(ce.parse("3.14").type);
 ```
 
 The type of a symbol can be declared explicitly, or it can be inferred from 
@@ -107,7 +107,7 @@ A **primitive type** is a type that is not defined in terms of other types.
 
 The Compute Engine supports the following primitive types:
 
-<div className="symbols-table" style={{"--first-col-width":"12ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"12ch"}}>
 
 | Type          | Description                                                                                      |
 | :-------------- | :----------------------------------------------------------------------------------------------- |
@@ -158,7 +158,7 @@ any
             │       └── matrix
             └── map
 ```
-**Note:** this diagram is simplified and does not correctly reflect the finite vs
+**Note:** this diagram is simplified and does not accuarely reflect the finite vs
 non-finite distinction for the numeric types.
 
 
@@ -168,10 +168,10 @@ The type `number` represent all numeric values, including `NaN`.
 
 More specific types of numeric values are represented by subtypes of `number`. 
 
-Some numeric type have a variant that excludes non-finite values, such as 
+Some numeric types have a variant that excludes non-finite values, such as 
 `PositiveInfinity`, `NegativeInfinity` and `ComplexInfinity`.
 
-<div className="symbols-table" style={{"--first-col-width":"21ch"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"17ch"}}>
 
 | Type          | Description                                                                                      |
 | :-------------- | :----------------------------------------------------------------------------------------------- |
@@ -190,7 +190,7 @@ Some numeric type have a variant that excludes non-finite values, such as
 
 </div>
 
-Here are the type of various numeric values:
+Here is the type of various numeric values:
 
 | Value               | Type                |
 | ------------------: | :------------------ |
@@ -202,7 +202,7 @@ Here are the type of various numeric values:
 | $-\infty$           | `non_finite_number` |
 | $\mathrm{NaN}$      | `number`            |
 
-The Compute Engine Standard Library includes definition for sets that
+The Compute Engine Standard Library includes definitions for sets that
 correspond to some numeric types.
 
 <ReadMore path="/compute-engine/reference/sets/" > 

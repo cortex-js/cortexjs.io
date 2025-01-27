@@ -367,9 +367,14 @@ header h1 {
   --ifm-navbar-link-hover-color: var(--link-color);
 }
 
+.table-of-contents {
+  font-size: 0.75rem;
+}
+
 .menu {
   font-weight: 600;
-  font-size: 0.8em;
+  font-size: 0.75rem;
+  line-height: 1.1;
   font-family: var(--ui-font-family);
 }
 
@@ -396,15 +401,6 @@ header h1 {
   --ifm-breadcrumb-item-background-active: var(--neutral-800);
 }
 
-/* .menu__link--active {
-  color: var(--primary-color);
-}
-
-.menu__link .menu__link--active {
-  background: red;
-  color: #fff;
-  border-radius: 8px;
-} */
 
 .pagination-nav__link {
   border-radius: 8px;
@@ -505,5 +501,5 @@ body .DocSearch-Form {
   padding-left: 1em;
   font-size: .75em;
   font-style: normal;
- opacity: 0.5;
+  opacity: 0.5;
 }
