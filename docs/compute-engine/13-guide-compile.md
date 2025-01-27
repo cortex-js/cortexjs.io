@@ -16,22 +16,19 @@ they contain a large number of terms or involve a loop \\((\sum\\) or
 In this case, it is useful to compile the expression into a JavaScript function
 that can be evaluated much faster.
 
-For example this approximation of \\(\pi\\): \\(
-\sqrt\{6\sum^\{10^6\}\_\{n=1\}\frac\{1\}\{n^2\}\} \\)
+For example this approximation: $ \pi \approx \textstyle\sqrt{6\sum^{10^6}_{n=1}\frac{1}{n^2}} $
 
-```javascript
-const expr = ce.parse("\\sqrt{6\\sum^{10^6}_{n=1}\\frac{1}{n^2}}");
+```live
+const expr = ce.parse("\\sqrt{6\\sum^{10^2}_{n=1}\\frac{1}{n^2}}");
 
 // Numerical evaluation using the Compute Engine
-console.log(expr.evaluate().latex);
-// ➔ 3.14159169866146
-// Timing: 1,531ms
+console.time('evaluate');
+console.timeEnd('evaluate', expr.evaluate());
 
 // Compilation to a JavaScript function and execution
+console.time('compile');
 const fn = expr.compile();
-console.log(fn());
-// ➔ 3.1415916986605086
-// Timing: 6.2ms (247x faster)
+console.timeEnd('compile', fn());
 ```
 
 ## Compiling
@@ -51,30 +48,27 @@ console.log(fn());
 // ➔ 3.141592653589793
 ```
 
-If the expression cannot be compiled, the `compile()` method will return
-`undefined`.
+If the expression cannot be compiled, the `compile()` method will throw an error.
 
 ## Arguments
 
 The function returned by `expr.compile()` can be called with an object literal
 containing the value of the arguments:
 
-```javascript
+```live
 const expr = ce.parse("n^2");
 const fn = expr.compile();
-for (const i = 1; i < 10; i++) console.log(fn({ n: i }));
-// ➔ 1, 4, 9, 16, 25, 36, 49, 64, 81
+
+for (let i = 1; i < 10; i++) console.log(fn({ n: i }));
 ```
 
 **To get a list of the unknows of an expression** use the `expr.unknowns`
 property:
 
-```javascript
+```live
 console.log(ce.parse("n^2").unknowns);
-// ➔ ["n"]
 
 console.log(ce.parse("a^2+b^3").unknowns);
-// ➔ ["a", "b"]
 ```
 
 ## Limitations
@@ -86,13 +80,25 @@ supported.
 
 Some functions are not supported.
 
-If the expression cannot be compiled, the `compile()` method will return
-`undefined`. The expression can be numerically evaluated as a fallback:
+If the expression cannot be compiled, the `compile()` method will throw an 
+error. The expression can be numerically evaluated as a fallback:
 
 ```live
-const expr = ce.parse("-i\\sqrt{-1}");
-console.log(expr.compile() ?? expr.N().numericValue);
-// Compile cannot handle complex numbers, so it returns `undefined`
-// and we fall back to numerical evaluation with expr.N()
-// ➔ 1
+function compileOrEvaluate(expr) {
+  try {
+    const fn = expr.compile();
+    return "compiled: " + fn();
+  } catch (e) {
+    return "evaluated: " + expr.N().numericValue;
+  }
+}
+
+  // `expr.compile()` can handle this expression
+  console.log(compileOrEvaluate(ce.parse("\\frac{\\sqrt{5}+1}{2}")));
+
+
+  // `expr.compile()` cannot handle complex numbers, so it throws
+  // and we fall back to numerical evaluation with expr.N()
+  console.log(compileOrEvaluate(ce.parse("-i\\sqrt{-1}")));
+
 ```
