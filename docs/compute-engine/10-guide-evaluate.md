@@ -7,11 +7,102 @@ preamble:
 # Evaluation
 
 <Intro>
-To apply a sequence of definitions to an expression in order to simplify it,
-calculate its value or get a numerical approximation of its value, 
-call the `expr.simplify()`, `expr.evaluate()` or `expr.N()` function, 
-respectively.
+Evaluating an expression is the process of determining the value of the
+expression. This involves looking up the definitions of symbols and functions,
+evaluating the arguments of functions, and applying the function to the
+arguments.
 </Intro>
+
+## Evaluation Methods
+
+**To evaluate an expression**, use the `expr.evaluate()` method.
+
+```live
+const expr = ce.parse('2 + 2');
+expr.evaluate().print();
+```
+
+By default, `expr.evaluate()` preserves [exact values](/compute-engine/guides/numeric-evaluation/#exact-evaluation) in the result.
+To force [numeric evaluation](/compute-engine/guides/numeric-evaluation/) use the `numeric` option.
+
+```live
+const expr = ce.parse('2\\pi');
+expr.evaluate().print();
+expr.evaluate({ numericApproximation: true }).print();
+```
+
+A shorthand for numeric evaluation is to use the `expr.N()` method.
+
+```live
+const expr = ce.parse('2\\pi');
+expr.N().print();
+```
+
+## Asynchronous Evaluation
+
+Some computations can be time-consuming, for example, computing a very large
+factorial. To prevent the browser from freezing, the Compute Engine can
+perform some operations asynchronously.
+
+**To perform an asynchronous operation**, use the `expr.evaluateAsync()` method.
+
+For example:
+
+```live
+try {
+  const fact = ce.parse('(70!)!');
+  const factResult = await fact.evaluateAsync();
+  factResult.print();
+} catch (e) {
+  console.error(e);
+}
+```
+
+The `expr.evaluateAsync()` method returns a `Promise` that resolves to the result
+of the evaluation. It accepts the same `numericApproximation` as `expr.evaluate()`.
+
+It is also possible to interrupt an operation, for example by providing a
+pause/cancel button that the user can press. 
+
+**To make an operation interruptible**, use an `AbortController`
+object and a `signal`. 
+
+For example, to interrupt an operation after 500ms:
+
+```live
+const abort = new AbortController();
+const signal = abort.signal;
+setTimeout(() => abort.abort(), 500);
+try {
+  const fact = ce.parse('(70!)!');
+  const factResult = await fact.evaluateAsync({ signal });
+  factResult.print();
+} catch (e) {
+  console.error(e);
+}
+```
+
+
+**To set a time limit for an operation**, use the `ce.timeLimit` option, which
+is a number of milliseconds.
+
+```live
+ce.timeLimit = 1000;
+try {
+  const fact = ce.parse('(70!)!');
+  fact.evaluate().print();
+} catch (e) {
+  console.error(e);
+}
+```
+
+The time limit applies to both the synchronous or asynchronous evaluation.
+
+The default time limit is 2,000ms (2 seconds).
+
+When an operation is canceled either because of a timeout or an abort, a
+`CancellationError` is thrown.
+
 
 
 ## Scopes
@@ -110,5 +201,3 @@ When a function is evaluated, the following steps are followed:
 4. Apply the function to the arguments
 
 5. Return the canonical form of the result
-
-The same evaluation loop is used for `expr.simplify()` and `expr.N()`.

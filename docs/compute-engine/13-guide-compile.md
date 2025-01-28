@@ -87,9 +87,9 @@ error. The expression can be numerically evaluated as a fallback:
 function compileOrEvaluate(expr) {
   try {
     const fn = expr.compile();
-    return "compiled: " + fn();
+    return   fn() + " (compiled)";
   } catch (e) {
-    return "evaluated: " + expr.N().numericValue;
+    return   expr.N().numericValue + " (evaluated)";
   }
 }
 
