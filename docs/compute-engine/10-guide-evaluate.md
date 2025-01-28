@@ -22,8 +22,10 @@ const expr = ce.parse('2 + 2');
 expr.evaluate().print();
 ```
 
+### Numeric Approximation
+
 By default, `expr.evaluate()` preserves [exact values](/compute-engine/guides/numeric-evaluation/#exact-evaluation) in the result.
-To force [numeric evaluation](/compute-engine/guides/numeric-evaluation/) use the `numeric` option.
+To force [numeric evaluation](/compute-engine/guides/numeric-evaluation/) use the `numericApproximation` option.
 
 ```live
 const expr = ce.parse('2\\pi');
@@ -31,22 +33,28 @@ expr.evaluate().print();
 expr.evaluate({ numericApproximation: true }).print();
 ```
 
-A shorthand for numeric evaluation is to use the `expr.N()` method.
+The `expr.N()` method is a shorthand for `expr.evaluate({numericApproximation: true})`.
 
 ```live
 const expr = ce.parse('2\\pi');
 expr.N().print();
 ```
 
+### Compilation
+
+An expression can be evaluated by compiling it to JavaScript using the `expr.compile()` method.
+
+<ReadMore path="/compute-engine/guides/compiling/" > 
+Read more about **compiling expressions** <Icon name="chevron-right-bold" />
+</ReadMore>
+
 ## Asynchronous Evaluation
 
-Some computations can be time-consuming, for example, computing a very large
+Some computations can be time-consuming. For example, computing a very large
 factorial. To prevent the browser from freezing, the Compute Engine can
 perform some operations asynchronously.
 
-**To perform an asynchronous operation**, use the `expr.evaluateAsync()` method.
-
-For example:
+**To perform an asynchronous evaluation**, use the `expr.evaluateAsync()` method.
 
 ```live
 try {
@@ -59,15 +67,15 @@ try {
 ```
 
 The `expr.evaluateAsync()` method returns a `Promise` that resolves to the result
-of the evaluation. It accepts the same `numericApproximation` as `expr.evaluate()`.
+of the evaluation. It accepts the same `numericApproximation` options as `expr.evaluate()`.
 
-It is also possible to interrupt an operation, for example by providing a
-pause/cancel button that the user can press. 
+It is also possible to interrupt an evaluation, for example by providing the user
+with a pause/cancel button. 
 
-**To make an operation interruptible**, use an `AbortController`
+**To make an evaluation interruptible**, use an `AbortController`
 object and a `signal`. 
 
-For example, to interrupt an operation after 500ms:
+For example, to interrupt an evaluation after 500ms:
 
 ```live
 const abort = new AbortController();
@@ -81,6 +89,44 @@ try {
   console.error(e);
 }
 ```
+
+```live
+:::html
+<div class="stack">
+  <div class="row">
+    <button id="evaluate-button">Evaluate</button>
+    <button id="cancel-button" disabled>Cancel</button>
+  </div>
+
+  <div id="output"></div>
+</div>
+:::js
+const abort = new AbortController();
+
+document.getElementById('cancel-button').addEventListener('click', 
+  () => abort.abort()
+);
+
+document.getElementById('evaluate-button').addEventListener('click', async () => {
+  try {
+    document.getElementById('evaluate-button').disabled = true;
+    document.getElementById('cancel-button').disabled = false;
+
+    const fact = ce.parse('(70!)!');
+    const factResult = await fact.evaluateAsync({ signal: abort.signal });
+    document.getElementById('output').textContent = factResult.toString();
+    
+    document.getElementById('evaluate-button').disabled = false;
+    document.getElementById('cancel-button').disabled = true;
+  } catch (e) {
+    document.getElementById('evaluate-button').disabled = false;
+    document.getElementById('cancel-button').disabled = true;
+    console.error(e);
+  }
+});
+
+```
+
 
 
 **To set a time limit for an operation**, use the `ce.timeLimit` option, which

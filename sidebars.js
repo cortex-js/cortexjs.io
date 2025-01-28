@@ -138,12 +138,27 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "compute-engine/guide-symbols",
+          id: "compute-engine/guide-evaluate",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
+          id: "compute-engine/guide-symbolic-computing",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
+          id: "compute-engine/guide-numerical-evaluations",
           className: "guide-icon",
         },
         {
           type: "doc",
           id: "compute-engine/guide-canonical-form",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
+          id: "compute-engine/guide-symbols",
           className: "guide-icon",
         },
         {
@@ -163,22 +178,7 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "compute-engine/guide-symbolic-computing",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "compute-engine/guide-evaluate",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
           id: "compute-engine/guide-simplify",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "compute-engine/guide-numerical-evaluations",
           className: "guide-icon",
         },
         {

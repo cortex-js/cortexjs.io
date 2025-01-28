@@ -1,15 +1,17 @@
 function setupComputeEngine() {
   if (window.ce !== undefined && 'CodeMirror' in window) return;
-  // If we're not ready, try again in 500ms
+  // If we're not ready, try again in 50ms
   if (!("ComputeEngine" in window) || !("CodeMirror" in window)) {
-    setTimeout(setupComputeEngine, 500);
+    setTimeout(setupComputeEngine, 50);
     return;
   }
   window.ce = new ComputeEngine.ComputeEngine();
   // Reset all the CodePlayground elements
   // Give some time for the CodeMirror and ComputeEngine libraries to load
-  setTimeout(() => document.querySelectorAll("code-playground").forEach((x) => x.run()),
-    200);
+  setTimeout(() => document.querySelectorAll("code-playground").forEach((x) => {
+    if (typeof x.run === 'function') x.run()
+    }),
+    20);
 }
 
 function renderMath() {
