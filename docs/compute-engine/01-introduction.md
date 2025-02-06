@@ -121,7 +121,7 @@ The UMD version is also available in the npm package in `dist/compute-engine.min
 <script>
   window.onload = function() {
     const ce = new ComputeEngine.ComputeEngine();
-    console.log(ce.parse("e^{i\\pi}").evaluate().latex);
+    console.log(ce.parse("e^{i\\pi}").evaluate());
     // ➔ "-1"
   }
 </script>

@@ -103,9 +103,10 @@ pre.prism-code {
 
   font-size: 1.1rem;
   line-height: 1.4;
-  code {
-    border-radius: 8px;
-  }
+}
+
+.theme-code-block code {
+  border-radius: 8px;
 }
 
 html.docs-doc-id-compute-engine\/api .theme-code-block code {

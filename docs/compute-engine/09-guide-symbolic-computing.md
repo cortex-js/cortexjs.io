@@ -55,7 +55,7 @@ replacing part of it, and applying conditional rewrite rules.
 
 ```live show-line-numbers
 const expr = ce.parse('3x^2 + 2x^2 + x + 5');
-console.log(expr.latex, '=', expr.simplify().latex);
+console.log(expr, '=', expr.simplify());
 ```
 
 ## Comparing Expressions
@@ -206,7 +206,7 @@ console.log(expr.json);
 expr = expr.subs({x: 3});
 
 console.log("Substitute x -> 3\n", expr.json);
-console.log("Numerical Evaluation:", expr.N().latex);
+console.log("Numerical Evaluation:", expr.N());
 ```
 
 ## Other Symbolic Manipulation

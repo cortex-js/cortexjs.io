@@ -6,11 +6,6 @@ hide_title: true
 sidebar_class_name: "sdk-icon"
 ---
 
-import { ComputeEngine } from 
-  "https://unpkg.com/@cortex-js/compute-engine?module";
-// We explicitly import ComputeEngine here to make sure it is available
-// by the time the MathfieldElement is created.
-
 import Mathfield from '@site/src/components/Mathfield';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
 import {useState, useEffect} from 'react';

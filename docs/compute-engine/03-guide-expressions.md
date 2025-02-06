@@ -123,7 +123,7 @@ use the `mf.expression` property:
 const mf = document.getElementById("input");
 mf.value = "\\frac{10}{5}";
 const expr = mf.expression;
-console.log(expr.evaluate().latex);
+console.log(expr.evaluate());
 // ➔ 2
 ```
 
