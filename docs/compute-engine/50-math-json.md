@@ -6,6 +6,11 @@ hide_title: true
 sidebar_class_name: "sdk-icon"
 ---
 
+import { ComputeEngine } from 
+  "https://unpkg.com/@cortex-js/compute-engine?module";
+// We explicitly import ComputeEngine here to make sure it is available
+// by the time the MathfieldElement is created.
+
 import Mathfield from '@site/src/components/Mathfield';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
 import {useState, useEffect} from 'react';
@@ -21,7 +26,7 @@ export function MathJSONOutput({children}) {
   }, [value]);
   return<>
     <Mathfield 
-      style={{width: "100%", borderRadius: "8px", padding: "8px", marginBottom: "1em"}} 
+      style={{ width: "100%", borderRadius: "8px", padding: "8px", marginBottom: "1em" }}
       onChange={(ev) => setValue(ev.target.value)}
     >{value}</Mathfield>
     <ConsoleMarkup value={json}/>
@@ -127,7 +132,7 @@ and **functions**.
 
 ```json example
 ["Add", 1, "x"]
-{"fn": [{sym: "Add"}, {num: "1"}, {sym: "x"}]}
+{"fn": [{"sym": "Add"}, {"num": "1"}, {"sym": "x"}]}
 ```
 
 
@@ -153,9 +158,9 @@ A MathJSON **number** is either:
 **Numbers** may be represented as an object literal with a `"num"` key. The
 value of the key is a **string** representation of the number.
 
-```typescript
+```json
 {
-    "num": string
+  "num": <string>
 }
 ```
 
@@ -167,13 +172,21 @@ the following differences:
   precision supported by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)
   64-bit float.
 
+```json example
+{ "num": "1.1238976755823478721365872345683247563245876e-4567" }
+```
+
 - The string values `"NaN"` `"+Infinity"` and `"-Infinity"` are used to
   represent respectively an undefined result as per
   [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754), $+\infty$, and
   $-\infty$.
 
+```json example
+{ "num": "+Infinity" }
+```
+
 - If the string includes the pattern `/\([0-9]+\)/`, that is a series of one or
-  more digits enclosed in parentheses, that pattern should be interpreted as
+  more digits enclosed in parentheses, that pattern is interpreted as
   repeating digits.
 
 ```json example
@@ -201,21 +214,23 @@ the following differences:
 ### Numbers as Number Literals
 
 When a **number** is compatible with the JSON representation of numbers and
-has no metadata a JSON number literal may be used.
+has no metadata, a JSON number literal may be used.
 
 Specifically:
 
-- the number is in the range \\([-(2^\{53\})+1, (2^\{53\})-1]\\) so it fits in a
+- the number is in the range \\(\bigl[-(2^\{53\})+1, (2^\{53\})-1\bigr]\\) so it fits in a
   64-bit float (**IEEE 754-2008**, 52-bit, about 15 digits of precision).
 - the number is finite: it is not `+Infinity` `-Infinity` or `NaN`.
 
 ```json example
 0
-
 -234.534e-46
+```
 
-// The numeric values below may not be represented as JSON number literals:
 
+The numeric values below may not be represented as JSON number literals:
+
+```json example
 // Exponent out of bounds
 { "num": "5.78e309" }
 
@@ -224,7 +239,6 @@ Specifically:
 
 // Non-finite numeric value
 { "num": "-Infinity" }
-
 ```
 
 ### Numbers as String Literals
@@ -246,7 +260,7 @@ A MathJSON **string** is either:
 
 - an object literal with a `"str"` key
 - a [JSON string](https://tools.ietf.org/html/rfc7159#section-7) that starts and
-  ends with **U+0027 APOSTROPHE** `'`.
+  ends with **U+0027 `'` APOSTROPHE** .
 
 Strings may contain any character represented by a Unicode scalar value (a
 codepoint in the `[0...0x10FFFF]` range, except for `[0xD800...0xDFFF]`), but
@@ -357,6 +371,24 @@ The expression corresponding to $ \sin^{-1}(x) $ is:
 The operator of this expression is `"Apply"` and its argument are the expressions
 `["InverseFunction", "Sin"]` and `"x"`.
 
+### Shorthands
+
+The following shorthands are allowed:
+
+- A `["Dictionary"]` expression may be represented as a string starting with
+  **U+007B `{` LEFT CURLY BRACKET** and ending with **U+007D `}` RIGHT CURLY BRACKET**. The string must be a valid JSON object literal.
+- A `["List"]` expression may be represented as a string starting with 
+  **U+005B `[` LEFT SQUARE BRACKET** and ending with
+  **U+005D `]` RIGHT SQUARE BRACKET**. The string must be a valid JSON array.
+
+```json example
+"{\"x\": 2, \"y\": 3}"
+// ➔ ["Dictionary", ["Tuple", "x", 2], ["Tuple", "y", 3]]
+
+"[1, 2, 3]"
+// ➔ ["List", 1, 2, 3]
+```
+
 ## Symbols
 
 A MathJSON **symbol** is either:
@@ -384,17 +416,17 @@ are stored internally and compared using the Unicode NFC.
 For example, these four JSON strings represent the same identifier:
 
 - `"Å"`
-- `"A\u030a"` `A‌` **U+0041 LATIN CAPITAL LETTER** + **U+030A COMBINING RING
+- `"A\u030a"` **U+0041 `A‌` LATIN CAPITAL LETTER** + **U+030A ` ̊` COMBINING RING
   ABOVE**
-- `"\u00c5"` **U+00C5 LATIN CAPITAL LETTER A WITH RING ABOVE** `Å`
-- `"\u0041\u030a"` **U+0041 LATIN CAPITAL LETTER A** + **U+030A COMBINING RING
-  ABOVE** `A‌` + ` ̊`
+- `"\u00c5"` **U+00C5 `Å` LATIN CAPITAL LETTER A WITH RING ABOVE** 
+- `"\u0041\u030a"` **U+0041 `A‌`  LATIN CAPITAL LETTER A** + **U+030A ` ̊` COMBINING RING
+  ABOVE**
 
 Identifiers conforms to a profile of
 [UAX31-R1-1](https://unicode.org/reports/tr31/) with the following
 modifications:
 
-- The character `_` **U+005F LOW LINE** is added to the `Start` character set
+- The character **U+005F `_` LOW LINE** is added to the `Start` character set
 - The characters should belong to a
   [recommended script](https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts)
 - An identifier can be a sequence of one or more emojis. Characters that have
@@ -438,17 +470,17 @@ for whole words, for example: `"半径"` (radius), `"מְהִירוּת"` (speed
 
 Avoid mixing Unicode characters from different scripts in the same identifier.
 
-Do not include bidi markers such as **LTR** **U+200E** or **RTL** **U+200F** in
+Do not include bidi markers such as **U+200E `LTR`***  or **U+200F `RTL`** in
 identifiers. LTR and RTL marks should be added as needed by the client
 displaying the identifier. They should be ignored when parsing identifiers.
 
 Avoid visual ambiguity issues that might arise with some Unicode characters. For
 example:
 
-- prefer using `"gamma"` rather than `"ɣ"` **U+0194 LATIN SMALL LETTER GAMMA**
-  or `"γ"` **U+03B3 GREEK SMALL LETTER GAMMA**
-- prefer using `"Sum"` rather than `"∑"` **U+2211 N-ARY SUMMATION**, which can
-  be visually confused with `"Σ"` **U+03A3 GREEK CAPITAL LETTER SIGMA**.
+- prefer using `"gamma"` rather than **U+0194 `ɣ` LATIN SMALL LETTER GAMMA**
+  or **U+03B3 `γ` GREEK SMALL LETTER GAMMA**
+- prefer using `"Sum"` rather than **U+2211 `∑` N-ARY SUMMATION**, which can
+  be visually confused with **U+03A3 `Σ` GREEK CAPITAL LETTER SIGMA**.
 
 ---
 
@@ -457,7 +489,7 @@ names are recommendations.
 
 ### Wildcards Naming Convention
 
-Symbols that begin with `_` **U+005F LOW LINE** (underscore) should be used to
+Symbols that begin with **U+005F `_` LOW LINE** (underscore) should be used to
 denote wildcards and other placeholders.
 
 For example, they may be used to denote the positional parameter in a function

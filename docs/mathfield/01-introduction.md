@@ -54,7 +54,14 @@ hide_title: true
   display: flex; 
   gap: 1rem;
   align-items: start;
+
+  flex-flow: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+
+
   margin-bottom: 1rem;
+
 }
 
 #features-section p {
@@ -93,7 +100,7 @@ div.use-case {
   height: fit-content;
 
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 16px;
   background: var(--content-background);
   color: var(--text-color);
 }
@@ -120,6 +127,11 @@ div.use-case h3 {
   line-height: 1;
   margin-bottom: 2rem;
   margin-top: 1rem;
+}
+
+div.use-case h3 .hash-link,
+div.use-case h3:hover .hash-link {
+  display: none;
 }
 
 div.use-case p {
@@ -156,6 +168,21 @@ div.use-case p {
   align-self: center;
   justify-self: center;
   margin: auto;
+}
+
+#features-section p.link {
+    width: 100%;
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 2em;
+    /* box-shadow: var(--callout-shadow);
+    background: var(--callout-background);
+    border: 1px solid var(--callout-border-color); */
+}
+
+#features-section p.link a {
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 h1 {
@@ -260,18 +287,19 @@ div.intro-copy p {
 }
 
 div.intro-copy p.p1 {
-  font-size: 6rem;
+  font-size: 4rem;
   line-height: .8;
   letter-spacing: -0.03em;
 }
 
 div.intro-copy p.p2 {
-  font-size: 4.5rem;
+  font-size: 2rem;
   line-height: .8;
 }
 
 div.intro-copy p.p3 {
-  font-size: 2rem;
+  font-size: 1rem;
+  font-weight: 400;
 }
 
 div.intro-copy hr {
@@ -404,10 +432,10 @@ div.figure {
 `}</style>
 
 <div className="intro-copy">
-  <p className="p1">Introducing</p>
-  <p className="p2"><kbd>&lt;math-field&gt;</kbd></p>
+  <p className="p1"><kbd>&lt;math-field&gt;</kbd></p>
+  <p className="p2">The Math Editor for the Web</p>
   <hr/>
-  <p className="p3">A <kbd>&lt;textarea&gt;</kbd> for math.</p>
+  <p className="p3">A flexible, powerful, and accessible way to write math on the web.</p>
   <hr/>
 
 <div>
@@ -445,6 +473,7 @@ div.figure {
         }
     }
   :::html
+  <p>Start typing math below:</p>
   <math-field>
     x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
   </math-field>
@@ -453,43 +482,56 @@ div.figure {
 
 </div>
 
-  <div>
-  <div className="figure" style={{marginBottom: "2em"}}>
-    <img src="/img/mathfield/loop-eqn.png"/>
+<h2>Why MathField?</h2>
+
+<div id="features-section">
+
+  <div className="use-case">
+    <h2>Built on LaTeX</h2>
+    <div className="figure" style={{marginBottom: "2em"}}>
+      <img src="/img/mathfield/loop-eqn.png"/>
+    </div>
+    <p>The gold standard, for beautiful math typesetting.</p>
+    <p className="link"><a href="/mathfield/reference/commands/">Read more about the **800+ LaTeX commands** supported by mathfields <Icon name="chevron-right-bold" /></a></p>
   </div>
-  <h2>Built on a Rock Solid LaTeX Foundation</h2>
-  <p>Mathfields includes a faithful JavaScript implementation of the <strong>TeX layout algorithms</strong>, the gold standard for typesetting of mathematical content.</p>
-  <ReadMore path="/mathfield/reference/commands/" >
-  Read more about the **800+ LaTeX commands** supported by mathfields <Icon name="chevron-right-bold" />
-  </ReadMore>
-</div>
-<div>
-  <div className="figure" style={{marginBottom: "2em"}}>
-    <img src="/img/mathfield/virtualKeyboard.png"/>
+
+
+  <div className="use-case">
+    <h2>Math Virtual Keyboards</h2>
+    <div className="figure" style={{marginBottom: "2em"}}>
+      <img src="/img/mathfield/virtualKeyboard.png"/>
+    </div>
+    <p>Fully customizable and makes math input easy on desktop and mobile.</p>
+    <p className="link"><a href="/mathfield/virtual-keyboard/">Read more about the **virtual keyboard** <Icon name="chevron-right-bold" /></a></p>
   </div>
-  <h2>Math Virtual Keyboards</h2>
-  <p>Mathfields come with a virtual keyboard for easy LaTeX input. It is fully customizable and can be used in any web application.</p>
-  <ReadMore path="/mathfield/virtual-keyboard/" >
-    Read more about the **virtual keyboard**<Icon name="chevron-right-bold" />
-  </ReadMore>
+
+
+  <div className="use-case">
+    <h2>Open Source & Extensible</h2>
+    <div>
+      <svg style={{width:"8rem", height: "8rem", marginBottom: "2rem"}} ><use role="none" xlinkHref="/icons.svg#github"></use></svg>
+    </div>
+    <p>MathField is an open source project available on GitHub. Contributions are welcome.</p>
+    <p className="link"><a href="https://github.com/arnog/mathlive">View the project on GitHub <Icon name="chevron-right-bold" /></a></p>
+    <p>Individuals and commercial partners can <a href="https://paypal.me/arnogourdol">contribute financially</a> to the project.</p>
+    <p className="link"><a href="https://paypal.me/arnogourdol">Donate on PayPal <Icon name="chevron-right-bold" /></a></p>
+
+
+  </div>
+
 </div>
 
+<h2>What Can You Do with MathField?</h2>
+
+<div id="use-cases-section">
   <div className="use-case">
     <div style={{}}>
 
 <svg className="icon fill-green" aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg=""><path fill="currentColor" d="M208 352c-2.39 0-4.78.35-7.06 1.09C187.98 357.3 174.35 360 160 360c-14.35 0-27.98-2.7-40.95-6.91-2.28-.74-4.66-1.09-7.05-1.09C49.94 352-.33 402.48 0 464.62.14 490.88 21.73 512 48 512h224c26.27 0 47.86-21.12 48-47.38.33-62.14-49.94-112.62-112-112.62zm-48-32c53.02 0 96-42.98 96-96s-42.98-96-96-96-96 42.98-96 96 42.98 96 96 96zM592 0H208c-26.47 0-48 22.25-48 49.59V96c23.42 0 45.1 6.78 64 17.8V64h352v288h-64v-64H384v64h-76.24c19.1 16.69 33.12 38.73 39.69 64H592c26.47 0 48-22.25 48-49.59V49.59C640 22.25 618.47 0 592 0z"></path></svg>
 
-      ### E-Learning Adventures:<br/>Math that Takes You Places
+      ### E-Learning Made Engaging
 
-      Integrate mathfields into online courses, e-learning platforms, 
-      and educational websites to display interactive math equations 
-      and formulas.
-    
-    
-      Develop interactive quizzes and tests that involve math problems, 
-      making the learning experience more engaging. Combine mathfields 
-      with the Compute Engine to check the correctness of the student's 
-      answers in real-time.
+      Enable interactive math quizzes, exercises, and problem-solving tools that check answers in real-time
       
       <ReadMore path="/tutorials/simple-quiz/" >
       Read this step-by-step tutorial to learn how to build a **simple quiz** with mathfield<Icon name="chevron-right-bold" />
@@ -506,10 +548,10 @@ div.figure {
 <div>
     <svg className="icon fill-orange" aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M437.2 403.5L320 215V64h8c13.3 0 24-10.7 24-24V24c0-13.3-10.7-24-24-24H120c-13.3 0-24 10.7-24 24v16c0 13.3 10.7 24 24 24h8v151L10.8 403.5C-18.5 450.6 15.3 512 70.9 512h306.2c55.7 0 89.4-61.5 60.1-108.5zM137.9 320l48.2-77.6c3.7-5.2 5.8-11.6 5.8-18.4V64h64v160c0 6.9 2.2 13.2 5.8 18.4l48.2 77.6h-172z"></path></svg>  
 
-    ### Equation Experiments
+    ### Scientific Computing & Research
 
-    Unleash your inner mad scientist! With mathfields, equations aren't 
-    just boring symbols; they're your laboratory assistants. Display scientific research findings, formulas, and equations on websites dedicated to scientific fields.
+    Render complex formulas and let users symbolically manipulate equations.
+
 
     <ReadMore path="/compute-engine/guides/symbolic-computing/" >
     Use mathfields with the **Compute Engine** to symbolically compute and manipulate equations<Icon name="chevron-right-bold" />
@@ -522,10 +564,9 @@ div.figure {
 
 <svg className="icon fill-purple" aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M400 0H48C22.4 0 0 22.4 0 48v416c0 25.6 22.4 48 48 48h352c25.6 0 48-22.4 48-48V48c0-25.6-22.4-48-48-48zM128 435.2c0 6.4-6.4 12.8-12.8 12.8H76.8c-6.4 0-12.8-6.4-12.8-12.8v-38.4c0-6.4 6.4-12.8 12.8-12.8h38.4c6.4 0 12.8 6.4 12.8 12.8v38.4zm0-128c0 6.4-6.4 12.8-12.8 12.8H76.8c-6.4 0-12.8-6.4-12.8-12.8v-38.4c0-6.4 6.4-12.8 12.8-12.8h38.4c6.4 0 12.8 6.4 12.8 12.8v38.4zm128 128c0 6.4-6.4 12.8-12.8 12.8h-38.4c-6.4 0-12.8-6.4-12.8-12.8v-38.4c0-6.4 6.4-12.8 12.8-12.8h38.4c6.4 0 12.8 6.4 12.8 12.8v38.4zm0-128c0 6.4-6.4 12.8-12.8 12.8h-38.4c-6.4 0-12.8-6.4-12.8-12.8v-38.4c0-6.4 6.4-12.8 12.8-12.8h38.4c6.4 0 12.8 6.4 12.8 12.8v38.4zm128 128c0 6.4-6.4 12.8-12.8 12.8h-38.4c-6.4 0-12.8-6.4-12.8-12.8V268.8c0-6.4 6.4-12.8 12.8-12.8h38.4c6.4 0 12.8 6.4 12.8 12.8v166.4zm0-256c0 6.4-6.4 12.8-12.8 12.8H76.8c-6.4 0-12.8-6.4-12.8-12.8V76.8C64 70.4 70.4 64 76.8 64h294.4c6.4 0 12.8 6.4 12.8 12.8v102.4z"></path></svg>  
 
-    ### Online Calculators
+    ### Interactive Online Calculators
 
-    <p>Build interactive calculators that allow users to input math equations 
-    and receive real-time calculations and results</p>
+    <p>Build real-time calculators that evaluate math expressions dynamically</p>
     
     <ReadMore path="/compute-engine/guides/numeric-evaluation/" >
     Make your calculator **interactive** by using the **Compute Engine** to evaluate the user's input<Icon name="chevron-right-bold" />
@@ -538,22 +579,12 @@ div.figure {
     
   <svg className="icon fill-blue" aria-hidden="true" focusable="false" data-icon="file-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" ><path fill="currentColor" d="M224 136V0H24C10.7 0 0 10.7 0 24v464c0 13.3 10.7 24 24 24h336c13.3 0 24-10.7 24-24V160H248c-13.2 0-24-10.8-24-24zm64 236c0 6.6-5.4 12-12 12H108c-6.6 0-12-5.4-12-12v-8c0-6.6 5.4-12 12-12h168c6.6 0 12 5.4 12 12v8zm0-64c0 6.6-5.4 12-12 12H108c-6.6 0-12-5.4-12-12v-8c0-6.6 5.4-12 12-12h168c6.6 0 12 5.4 12 12v8zm0-72v8c0 6.6-5.4 12-12 12H108c-6.6 0-12-5.4-12-12v-8c0-6.6 5.4-12 12-12h168c6.6 0 12 5.4 12 12zm96-114.1v6.1H256V0h6.1c6.4 0 12.5 2.5 17 7l97.9 98c4.5 4.5 7 10.6 7 16.9z"></path></svg>  
 
-    ### Dynamic Documentation:<br/>Math with a Twist
+    ### Beautiful Math Documentation
 
-    Mathfields spices things up by turning complex equations into a visual journey. Your technical explanations just got a serious upgrade.
+    Embed math seamlessly in **blogs**, **wikis**, and **papers**, ensuring clarity and readability
   </div>
 </div>
 
-<div className="use-case">
-  <div>
-
-    <svg className="icon fill-yellow" aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg>  <div>
-
-    ### Write Math, Write Magic
-
-    <p>Calling all math storytellers! With mathfields, equations become the heroes of your blog. Craft captivating content that waltzes between math and magic, delighting readers along the way.</p>
-  </div>
-  </div>
 </div>
 
 

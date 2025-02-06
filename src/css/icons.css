@@ -2,7 +2,7 @@
 /**
   Icons used in the navbar.
   They are specified in the sidebar.js file
-  Coulr also use sidebar_class_name in the front-matter of the markdown file for auto-generated navbars
+  Could also use sidebar_class_name in the front-matter of the markdown file for auto-generated navbars
 */
 
 .github-icon a::before {

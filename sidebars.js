@@ -101,6 +101,7 @@ const sidebars = {
         { type: "doc", id: "mathfield/speech", className: "guide-icon" },
         { type: "doc", id: "mathfield/static", className: "guide-icon" },
         { type: "doc", id: "mathfield/lifecycle", className: "guide-icon" },
+        { type: "doc", id: "mathfield/security", className: "guide-icon" },
         { type: "html", value: "<hr/>" },
         {
           type: "doc",

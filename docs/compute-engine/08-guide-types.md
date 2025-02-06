@@ -47,7 +47,7 @@ Two types can be evaluated for their **compatibility**. A type `A` is
 compatible with a type `B` (or matches it) if all values of type `A` are also 
 values of type `B`. In other words, if `A` is a non-strict subtype of `B`.
 
-The compatibility of two types can be evaluated using the `type.matches()` method.
+**To check if two types are compatible**, use the `type.matches()` method.
 
 ```js
 ce.type("integer").matches("number");
@@ -71,6 +71,71 @@ ce.parse("3.14").type.matches("real");
 ```
 
 :::
+
+### Compatibility of Complex Types
+
+#### Maps
+
+Maps are compatible if they have the same keys and the values are compatible.
+
+```js
+ce.parse("{red: 1, green: 2}").type.matches("map<red: integer, green: integer>");
+// ➔ true
+```
+
+**Width subtyping** is supported for maps, meaning that a map with more keys is
+compatible with a map with fewer keys.
+
+```js
+ce.parse("{red: 1, green: 2, blue: 3}").type.matches("map<red: integer, green: integer>");
+// ➔ true
+```
+
+#### Tuples
+
+Tuples are compatible if they have the same length and the elements are compatible.
+
+```js
+ce.parse("(1, 2, 3)").type.matches("tuple<integer, integer, integer>");
+// ➔ true
+```
+
+If the elements of a tuple are named, the names must match.
+
+```js
+ce.parse("(x: 1, y: 2)").type.matches("tuple<x: integer, y: integer>");
+// ➔ true
+
+ce.parse("(x: 1, y: 2)").type.matches("tuple<a: integer, b: integer>");
+// ➔ false
+```
+
+
+#### Lists
+
+Lists are compatible if they have the same length and the elements are compatible.
+
+```js
+ce.parse("[1, 2, 3]").type.matches("list<finite_integer>");
+// ➔ true
+```
+
+#### Functions
+
+Functions are compatible if the input types are compatible and the output types are compatible.
+
+```js
+ce.type("integer -> integer").matches("number -> number");
+// ➔ true
+```
+
+The name of the arguments of a function signature is not taken into account when
+checking for compatibility.
+
+```js
+ce.type("x: integer -> integer").matches("integer -> integer");
+// ➔ true
+```
 
 ### Checking the Type of a Numeric Value
 
@@ -158,7 +223,7 @@ any
             │       └── matrix
             └── map
 ```
-**Note:** this diagram is simplified and does not accuarely reflect the finite vs
+**Note:** this diagram is simplified and does not accurately reflect the finite vs
 non-finite distinction for the numeric types.
 
 
@@ -302,15 +367,16 @@ and **`tensor<T>`** is a tensor of elements of type `T`.
 A **map** is a collection of key-value pairs, used to represent a dictionary, 
 also known as an associative array, a hash table or a record.
 
+The keys of a map must use the letters `a` to `z` or `A` to `Z`, the digits `0` to `9` or the underscore `_`. Keys containing other characters must be enclosed in backticks.
+
+Keys must be unique within a map, but they are not ordered.
+
 The type of a map is represented by the type expression `map<K1: T1, K2: T2, ...>`, 
 where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the values.
 
 For example: `map<red: integer, green: integer, blue: integer>` is a map that 
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
-The keys of a map must use the letters `a` to `z` or `A` to `Z`, the digits `0` to `9` or the underscore `_`. Keys containing other characters must be enclosed in backticks.
-
-Keys must be unique within a map.
 
 The type `map` matches any map.
 
