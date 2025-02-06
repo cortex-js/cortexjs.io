@@ -3,7 +3,7 @@
 
 [![](https://dcbadge.vercel.app/api/server/yhmvVeJ4Hd?style=flat)](https://discord.gg/yhmvVeJ4Hd)
 
-![Maintenance](https://img.shields.io/maintenance/yes/2023)
+![Maintenance](https://img.shields.io/maintenance/yes/2025)
 
 This repo contains the source files for the "cortexjs.io" website.
 
@@ -51,25 +51,7 @@ the workflow integration (pubshing to GH triggers an automatic update of the
 site being served)
 
 The content of the sites are authored primarily as Markdown files, processed
-with `eleventy` to turn them into HTML/CSS.
-
-The main `eleventy` configuration is in the `config/eleventy.js` file, including
-the definition of the Markdown to use.
-
-The Markdown engine is `markdown-it` which implements
-[CommonMark](https://spec.commonmark.org/0.29/).
-
-The `mardown-it-attrs` plugin allows the styling of paragraphs, e.g.
-
-This is a notice. {.notice--info}
-
-The `markdown-it-deflist` plugin supports pandc style definition lists:
-
-```
-Term 1
-:   Definition 1
-:   Second definition
-```
+with Docusaurus to turn them into HTML/CSS.
 
 The output is in the `submodules/cortex-js.github.io` directory. That directory
 is a Git **submodule** which is linked to the `cortex-js.github.io` repo. That

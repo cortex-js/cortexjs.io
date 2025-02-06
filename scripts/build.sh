@@ -3,7 +3,7 @@
 set -e  # exit immediately on error
 set -o nounset   # abort on unbound variable
 set -o pipefail  # don't hide errors within pipes
-set -x    # for debuging, trace what is being executed.
+# set -x    # for debuging, trace what is being executed.
 
 cd "$(dirname "$0")/.."
 
@@ -55,7 +55,7 @@ then
     #     --file-ext html \
     #     --input-dir "./submodules/cortex-js.github.io/" \
     #     --output-dir "./submodules/cortex-js.github.io/"
-    postcss --config "./config" --replace "./submodules/cortex-js.github.io/**/*.css"
+    # postcss --config "./config" --replace "./submodules/cortex-js.github.io/**/*.css"
 
     echo -e "$LINECLEAR$BASENAME$DOT Building Knowledge Base"
 
@@ -125,6 +125,12 @@ then
 
 
     echo -e "$BASENAME$CHECK Knowledge Base built"
+
+    # Copy build directory to submodules/cortex-js.github.io
+    echo -e "$BASENAME$DOT Copying build directory to submodules/cortex-js.github.io"
+    cp -r ./build/* ./submodules/cortex-js.github.io/
+    echo -e "$BASENAME$CHECK Copied build directory to submodules/cortex-js.github.io"
+
 
     echo -e "$LINECLEAR$BASENAME$CHECK Completed build"
 fi

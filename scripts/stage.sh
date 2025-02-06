@@ -10,8 +10,8 @@ cd "$(dirname "$0")/.."
 # Make a build
 
 ./scripts/setup.sh
-# ./scripts/build.sh production
-npm run build
+./scripts/build.sh production
+# npm run build
 ./scripts/test.sh
 
 # Add the .nojekyll file to prevent GH Pages from processing the content

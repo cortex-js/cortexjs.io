@@ -185,13 +185,12 @@ const config: Config = {
         appId: 'Q23Y5RN3UQ',
   
         // Public API key: it is safe to commit it
-        apiKey: '37e3ceb91bf483b3c86cc3018fcd7611',
-        // apiKey: 'c3008baa16b5ec52773c460530fb14e1',
+        apiKey: 'c3008baa16b5ec52773c460530fb14e1',
   
         indexName: 'cortexjs',
   
         // Optional: see doc section below
-        contextualSearch: true,
+        contextualSearch: false,
   
         // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
         externalUrlRegex: 'external\\.com|domain\\.com',

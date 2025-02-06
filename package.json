@@ -19,7 +19,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "build": "bash  scripts/build.sh",
+    "build": "bash scripts/build.sh",
     "swizzle": "docusaurus swizzle",
     "xdeploy": "docusaurus deploy",
     "clear": "docusaurus clear",
