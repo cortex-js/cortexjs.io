@@ -249,7 +249,7 @@ console.log(ce.parse('3x^2+4x+2').N());
 // ➔ "3x^2+4x+c"
 ```
 
-The value of a variable can also be changed by directly setting its `value` property:
+**To change the value of a variable** set its `value` property:
 
 ```ts
 ce.symbol('x').value = 5;
@@ -260,8 +260,7 @@ ce.symbol('x').value = undefined;
 
 ## Compiling
 
-If performance is important, you can compile the expression to a JavaScript
-function.
+If performance is important, the expression can be compiled to a JavaScript
 
 **To get a compiled version of an expression** use the `expr.compile()` method:
 

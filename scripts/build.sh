@@ -78,14 +78,14 @@ then
     #     --output-dir "./submodules/cortex-js.github.io/"
     # postcss --config "./config" --replace "./submodules/cortex-js.github.io/**/*.css"
 
-    echo -e "$LINECLEAR$BASENAME$DOT Building Knowledge Base"
-
     # Build the knowledge base
+
+    echo -e "$LINECLEAR$BASENAME$DOT Building Knowledge Base"
 
     current_dir=$(pwd)
 
     output_file="./build/kb-compute-engine.md"
-    pattern='./submodules/compute-engine/src/docs/*.md'
+    pattern='./docs/compute-engine/*.md'
 
     if [ -f "$output_file" ]; then
         rm "$output_file"
@@ -100,7 +100,7 @@ then
 
 
     output_file="./build/kb-compute-engineapi.d.ts"
-    pattern='./submodules/compute-engine/dist/types/**/*.d.ts'
+    pattern='../compute-engine/dist/types/**/*.d.ts'
 
     if [ -f "$output_file" ]; then
         rm "$output_file"
@@ -115,7 +115,7 @@ then
 
 
     output_file="./build/kb-mathlive.md"
-    pattern='./src/_pages/*.md'
+    pattern='./docs/mathfield/*.md'
 
     if [ -f "$output_file" ]; then
         rm "$output_file"
@@ -130,7 +130,7 @@ then
 
 
     output_file="./build/kb-mathlive-api.d.ts"
-    pattern="$(dirname "$current_dir")/mathlive/dist/types/**/*.d.ts"
+    pattern="../mathlive/dist/types/**/*.d.ts"
 
     if [ -f "$output_file" ]; then
         rm "$output_file"

@@ -30,8 +30,8 @@ const ce = new ComputeEngine();
 **To input math using an interactive mathfield**, use the [Mathfield](/mathfield/) library.
 
 A `<math-field>` DOM element works like a `<textarea>` in HTML, but for
-math. It provides its content as a LaTeX string or a MathJSON expression, ready
-to be used with the Compute Engine.
+math. It provides its content as a LaTeX string, ready to be used with the 
+Compute Engine.
 
 <ReadMore path="/mathfield/" >
   Read more about the **mathfield element**<Icon name="chevron-right-bold" />
