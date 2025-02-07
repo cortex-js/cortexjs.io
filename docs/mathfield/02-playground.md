@@ -723,7 +723,6 @@ Read more about all the available **keybindings** and **shortcuts**.<Icon name="
 
 export default function ({children}) {
   useEffect(() => {
-    console.log('in effect');
     const platform = navigator['userAgentData']?.platform ?? navigator.platform;
     const isApple = /^mac/i.test(platform) || /iphone|ipod|ipad/i.test(navigator.userAgent);
 

@@ -28,17 +28,38 @@ mkdir -p ./build
 echo -e "$BASENAME$DOT Making the changelog and API files"
 # @todo
 
+#
 # Copy the ChangeLogs
-mkdir -p ./src/build/compute-engine/
-# cp ./src/_data/_compute-engine-changelog.md ./src/build/compute-engine/changelog.md
-# cat ./submodules/compute-engine/CHANGELOG.md >> ./src/build/compute-engine/changelog.md
+#
 
-mkdir -p ./src/build/mathlive/
-# cp ./src/_data/_mathlive-changelog.md ./src/build/mathlive/changelog.md
-# cat ../mathlive/CHANGELOG.md >> ./src/build/mathlive/changelog.md
+cp ./docs/compute-engine/_changelog.md ./docs/compute-engine/changelog.md
+cat ../compute-engine/CHANGELOG.md >> ./docs/compute-engine/changelog.md
+# Add "</ChangeLog>" to the end of the file
+echo "</ChangeLog>" >> ./docs/compute-engine/changelog.md
+# Replace [Unreleased] with Coming Soon
+sed -i '' 's/\[Unreleased\]/Coming Soon/g' ./docs/compute-engine/changelog.md
+
+cp ./docs/mathfield/_changelog.md ./docs/mathfield/changelog.md
+cat ../mathlive/CHANGELOG.md >> ./docs/mathfield/changelog.md
+# Add "</ChangeLog>" to the end of the file
+echo "</ChangeLog>" >> ./docs/mathfield/changelog.md
+# Replace [Unreleased] with Coming Soon
+sed -i '' 's/\[Unreleased\]/Coming Soon/g' ./docs/mathfield/changelog.md
+
+#
+# Copy the API files
+#
+
+cp ./docs/mathfield/_api.md ./docs/mathfield/api.md
+cat ../mathlive/src/api.md >> ./docs/mathfield/api.md
+
+cp ./docs/compute-engine/_api.md ./docs/compute-engine/api.md
+cat ../compute-engine/src/api.md >> ./docs/compute-engine/api.md
 
 
+#
 # Build Docusaurus (.md -> .html)
+#
 echo -e "$BASENAME$DOT Building Docusaurus"
 npx docusaurus build
 echo -e "$BASENAME$CHECK Docusaurus built"

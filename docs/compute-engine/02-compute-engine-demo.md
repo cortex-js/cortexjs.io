@@ -63,12 +63,14 @@ The canonical form of fractions is their reduced form.`,
 
     { 
       latex: '\\sqrt{6\\sum_{n=1}^{\\infty} \\frac{1}{n^2}}', 
-      preamble: 'Evaluate a sum' 
+      preamble: 'Evaluate a sum',
+      template: 'eval-async'
     },
 
     { 
       latex: '2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}', 
-      preamble: 'Evaluate a product'
+      preamble: 'Evaluate a product',
+      template: 'eval-async'
     },
 
     { 
@@ -158,7 +160,12 @@ console.info(expr.evaluate().latex);
   N: `$0
 const expr = $1;
 console.info(expr.N());
+`,
+  "eval-async": `$0
+const expr = $1;
+console.info(await expr.evaluateAsync());
 `
+
 };
 
 
