@@ -2084,8 +2084,8 @@ intermediate lines are centered.
 <Latex flow="column">{`
 \\begin{multline}
   3(a-x) = 3.5x + a - 1 \\\\
-    3a - 3x = 3.5x + a - 1 \\\\
-    a = \\frac{13}{4}x - \\frac{1}{2}
+  3a - 3x = 3.5x + a - 1 \\\\
+  a = \\frac{13}{4}x - \\frac{1}{2}
 \\end{multline}
 `}</Latex>
 
