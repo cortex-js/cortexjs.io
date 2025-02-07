@@ -213,8 +213,10 @@ has no metadata, a JSON number literal may be used.
 
 Specifically:
 
-- the number is in the range \\(\bigl[-(2^\{53\})+1, (2^\{53\})-1\bigr]\\) so it fits in a
-  64-bit float (**IEEE 754-2008**, 52-bit, about 15 digits of precision).
+- the number fits in a 64-bit binary floating point, as per **IEEE 754-2008**, with a 
+  53-bit significand (about 15 digits of precision) and 11-bit exponent.
+  If negative, its range is from $-1.797693134862315 \cdot 10^{+308}$ to $-2.225073858507201\cdot 10^{-308}$ 
+  and if positive from $2.225073858507201\cdot 10^{-308}$ to $1.797693134862315\cdot 10^{+308}$
 - the number is finite: it is not `+Infinity` `-Infinity` or `NaN`.
 
 ```json example
@@ -227,7 +229,7 @@ The numeric values below may not be represented as JSON number literals:
 
 ```json example
 // Exponent out of bounds
-{ "num": "5.78e309" }
+{ "num": "5.78e400" }
 
 // Too many digits
 { "num": "3.14159265358979323846264338327950288419716" }
