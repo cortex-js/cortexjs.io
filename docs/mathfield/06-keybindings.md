@@ -797,7 +797,7 @@ If the conversion was not desired, for example you actually meant "pi", type <kb
 <Shortcut value="\Omega">Omega</Shortcut>
 </div>
 
-### Miscelaneous
+### Miscellaneous
 
 <div className="inlineshortcut-table">
 <Shortcut value="\%">\%</Shortcut>
