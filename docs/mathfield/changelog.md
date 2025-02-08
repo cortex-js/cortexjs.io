@@ -10,7 +10,7 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.104.0 _2025-02-08_
 
 ### Security Advisories
 

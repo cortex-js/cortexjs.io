@@ -146,8 +146,8 @@
   --table-thin-line-color: var(--neutral-600); /* #ddd; */
   --table-thick-line-color: var(--neutral-300); /* #333; */
 
-  --placeholder-color: var(--primary-color-light);
-  --placeholder-opacity: 1;
+  --placeholder-color: var(--primary-color);
+  --placeholder-opacity: .4;
 
   --card-background: var(--neutral-900); /* #fafafa; */
   --card-background-alternate: var(--neutral-600); /*  #a0a0a0; */
