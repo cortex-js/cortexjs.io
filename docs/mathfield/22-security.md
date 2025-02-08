@@ -75,10 +75,13 @@ whenAvailable("DOMPurify", () => {
 (Note that this example is moot, as the `htmlData` command already sanitizes its input.)
 
 
-## Restricting Commands That Modify the DOM
+## Restricting Commands That Could Modify the DOM
 
 
-Some commands modify the DOM and pose a higher risk of XSS attacks. For instance, `\htmlData{}{}` and `\href{}{}` allow the insertion of HTML attributes. While both commands sanitize their input to prevent harmful attributes, you may want to disable them for added security.
+Some commands modify the DOM and pose a higher risk of XSS attacks. 
+For instance, `\htmlData{}{}` and `\href{}{}` allow the insertion of HTML 
+attributes. While both commands sanitize their input to prevent harmful 
+attributes, you may want to disable or restrict them for added security.
 
 
 ### Disabling Commands

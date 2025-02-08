@@ -556,6 +556,62 @@ MathfieldElement.fractionNavigationOrder = "denominator-numerator";
 ```
 
 
+## Sounds and Haptic Feedback
+
+The mathfield provides some audio feedback when a key is pressed on the virtual 
+keyboard or when an action cannot be performed, for example when trying to
+delete when the mathfield is empty (the "plonk" sound).
+
+The files for the sounds played by the mathfield should be located in a 
+directory named `sounds` next to the mathfield library. If your bundler or 
+asset management system require a different configuration you can specify 
+where the sounds can be located using the `MathfieldElement.soundsDirectory` 
+property.
+
+```js
+MathfieldElement.soundsDirectory = 
+  "https://unpkg.com/mathlive/dist/sounds/";
+```
+
+Specific sounds can be disabeld or customized with the `MathfieldElement.keypressSound`
+property.
+
+```js
+MathfieldElement.keypressSound = {
+  spacebar: null,
+  return: "./sounds/return.mp3",
+  delete: null,
+  default: null,
+}
+```
+
+### Playing "Plonk" Sound
+
+**To play the "plonk" sound** when an action cannot be performed, use `MathfieldElement.playSound('plonk')`.
+
+```js
+MathfieldElement.playSound('plonk');
+```
+
+
+### Disabling Sounds
+
+**To turn off the sounds** set the `MathfieldElement.soundsDirectory` property to `null`.
+
+```js
+MathfieldElement.soundsDirectory = null;
+```
+
+### Haptic Feedback
+
+When a key on the virtual keyboard is pressed, a small vibration is triggered
+on devices that support it. This can be turned off by setting the
+`MathfieldElement.keypressVibration` property to `false`.
+
+```js
+MathfieldElement.keypressVibration = false;
+```
+
 ## Fonts
 
 The content of the mathfield is displayed using a family of high-quality 

@@ -8,7 +8,7 @@ simplest way to use mathfields is by loading the library from a CDN.
 
 In this section we'll discuss other options for adding a mathfield to a web page.
 
-## Using Mathfields with JavaScript Modules
+## Using JavaScript Modules
 
 In addition to `MathfieldElement`, the Mathfield library provide some functions
 such as `renderMathInDocument()`.
@@ -61,7 +61,7 @@ keyboard shortcuts, use custom macros and more.
 The section below discuss additional options to load the library for more
 complex configurations.
 
-<h2 id='npm'>Using NPM</h2>
+## Using NPM
 
 If you need...
 
@@ -97,7 +97,7 @@ Make sure the contents of the `/fonts/` and `/sounds/` folder are copied to
 your build output directory.
 :::
 
-## Using `<script>` Tags
+## Using a `<script>` Tag
 
 If you need to support browsers that don't support JavaScript modules, you
 can use a `<script>` tag to load a UMD version of the library.
@@ -134,7 +134,7 @@ The version of the library currently loaded can be obtained with:
 console.log(MathfieldElement.version);
 ```
 
-<h2 id='files'>Library Files</h2>
+## Library Files
 
 If you need to incorporate the library files directly into your project
 (for example if you are building a standalone application), you can obtain
@@ -159,7 +159,7 @@ and may be useful for debugging.
 | `dist/mathlive-static.css`  | A stylesheet which can be used when the MathLive library is not loaded to display markup that has been rendered by the MathLive library previously. Rarely needed.                                                  |
 | `dist/types`                | The TypeScript declaration files. Not needed at runtime.                                                                                                                                                            |
 
-<h2 id='fonts-folder'> Controlling the Location of the <kbd>fonts</kbd> Folder</h2>
+Controlling the Location of the `fonts` Folder
 
 In order to display mathfields correctly a set of specialized math fonts must
 be available. These fonts are provided as part of the library in a directory called `fonts`.
@@ -189,7 +189,7 @@ path from the JavaScript directory to the fonts directory is `../assets/mathlive
 The `MathfieldElement.soundsDirectory` property can similarly be set to point
 to the sound file assets.
 
-<h2 id='asset-pipeline'>Integrating with a Bundler or an Asset Pipeline</h2>
+## Integrating with a Bundler or an Asset Pipeline
 
 In some cases, simply pointing MathLive to the directory where the fonts can
 be located might not be enough. For example, some bundlers, such as WebPack,
@@ -259,7 +259,7 @@ Learn more about the attributes, properties, methods and events <kbd>ENTER</kbd>
 Learn more about the <strong>Lifecycle</strong> of the mathfield web component.
 </ReadMore>
 
-<h2 id='static-render'>Displaying Non-Editable Formulas</h2>
+## Displaying Non-Editable Formulas
 
 While MathLive is primarily a math editor, the same engine that renders
 an interactive math formula can also render "static" formulas in a web page,

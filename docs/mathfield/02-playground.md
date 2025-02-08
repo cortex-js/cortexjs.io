@@ -614,7 +614,7 @@ Read more about the supported **LaTeX commands**.<Icon name="chevron-right-bold"
 Learn more about MathJSON and try a demo of the **Compute Engine**.<Icon name="chevron-right-bold" />
 </ReadMore>
 
-<h2 id="shortcuts">Keyboard Shortcuts</h2>
+## Keyboard Shortcuts
 
 
 <div className="shortcuts">
