@@ -42,24 +42,25 @@ export function Console({children}) {
 export function ExampleSelector({ onSelect, index }) {  
   const examples = [
     { 
-      latex: 'e^{i\\pi}', 
-      preamble: `To create a boxed expression from a LaTeX string, use the \`ce.parse()\` function.
-
-The \`expr.N()\` function evaluates the expression numerically, 
-including complex numbers.`,
-      template: "N"
-    },
-
-    { 
       latex: "\\frac{165}{315}",
       json: '["Divide", 165, 315]', 
-      preamble: `To create a boxed expression from a MathJSON expression, use the \`ce.box()\` function.
+      preamble: `To create a boxed expression from a MathJSON expression, 
+use the \`ce.box()\` function.
 
 By default expressions are put in canonical form. 
 The canonical form of fractions is their reduced form.`,
       template: "as-json"
     },
 
+    { 
+      latex: 'e^{i\\pi}', 
+      preamble: `To create a boxed expression from a LaTeX string, 
+use the \`ce.parse()\` function.
+
+The \`expr.N()\` function evaluates the expression numerically, 
+including complex numbers.`,
+      template: "N"
+    },
 
     { 
       latex: '\\sqrt{6\\sum_{n=1}^{\\infty} \\frac{1}{n^2}}', 
@@ -74,10 +75,10 @@ The canonical form of fractions is their reduced form.`,
     },
 
     { 
-      latex: '\\mathrm{Expand}((a+b)^6)', 
+      latex: '\\mathrm{Expand}((a+b)^5)', 
       preamble: `Symbolically expand an expression.
 Use the \`latex\` property to get the result in LaTeX format.`,
-      template: 'eval-latex'
+      template: 'eval-string'
     },
 
     { 
@@ -90,12 +91,13 @@ approximates a number as a rational.`
     { 
       latex: '\\cos\\left(\\frac{\\pi}{6}\\right)',
       preamble: 'Exact trigonometric values',
-      template: 'eval-latex'
+      template: 'eval-string'
     },
 
     { 
       latex: '\\sin(30\\degree)', 
       preamble: 'Use degrees unit in trig functions',
+      template: 'eval-string'
     },
 
     {

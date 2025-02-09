@@ -49,7 +49,7 @@ function HomepageHeader({ height }) {
                 Mathfield
               </Heading>
               <p className={styles.description}>
-                A web component to edit math, rendered with LaTex.
+                A web component to edit math, rendered with LaTeX.
               </p>
             </div>
           </a>
@@ -71,7 +71,7 @@ function HomepageHeader({ height }) {
                 Compute Engine
               </Heading>
               <p className={styles.description}>
-                A versatile Compute Engine for symbolic and numerical
+                A versatile library for symbolic and numerical
                 computation.
               </p>
             </div>

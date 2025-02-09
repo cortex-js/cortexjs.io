@@ -88,7 +88,7 @@ async function toJsxNode(node) {
   // "style" is for inline styles
   let style = value.match(/:::style\s*\n([\s\S]*?)(\n:::|$)/)?.[1];
 
-  /** @fixme: tempory: should be able to use CSS variables instead*/
+  /** @fixme: temporary: should be able to use CSS variables instead*/
   style = `
       math-field {
         border: 1px solid var(--neutral-400);
