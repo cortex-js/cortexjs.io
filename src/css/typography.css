@@ -54,12 +54,21 @@ body {
   text-wrap: balance;
 }
 
+:root[data-theme="dark"] .markdown > h2 {
+  color: var(--blue-300);
+}
+
 .markdown > h3 {
   --ifm-h3-font-size: 1.25rem;
   font-weight: 600;
   color: var(--primary-color);
   text-wrap: balance;
 }
+
+:root[data-theme="dark"] .markdown > h3 {
+  color: var(--blue-300);
+}
+
 
 .markdown h1:first-child {
   --ifm-h1-font-size: 4rem;

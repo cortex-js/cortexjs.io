@@ -180,7 +180,7 @@
   --magenta-900: #8a004c;
 }
 
-[data-theme='dark'] {
+:root[data-theme='dark'] {
   
     --semantic-blue: var(--blue-700);
     --semantic-red: var(--red-400);
@@ -236,7 +236,7 @@
   
 }
 
-[data-theme='dark'] {
+:root[data-theme='dark'] {
   --neutral-900: #302e33;  
   --neutral-800: #3b3a3f; 
   --neutral-700: hsl(255,3%, 30%);

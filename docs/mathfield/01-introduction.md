@@ -442,10 +442,10 @@ div.figure {
   ```live
   :::style
       math-field {
-      border: 1px solid var(--neutral-400);
-      background: var(--neutral-200);
-      border-radius: 8px;
-      padding: 8px;
+        border: 1px solid var(--neutral-400);
+        background: var(--neutral-200);
+        border-radius: 8px;
+        padding: 8px;
       }
     @media (pointer: coarse) {
         math-field {
@@ -460,10 +460,10 @@ div.figure {
             inset 4px 4px 16px rgb(0 0 0 / 10%),
             inset 2px 2px 8px rgb(0 0 0 / 60%);
 
-        --smart-fence-color: white;
-        --caret-color: var(--blue-400);
-        --selection-background-color: var(--blue-300);
-        --contains-highlight-background-color: var(--blue-900);
+          --smart-fence-color: white;
+          --caret-color: var(--blue-400);
+          --selection-background-color: var(--blue-300);
+          --contains-highlight-background-color: var(--blue-900);
         }
         math-field:focus {
           outline: 4px solid rgb(255 255 255 / 25%);

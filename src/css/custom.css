@@ -43,6 +43,15 @@
   --ifm-toc-padding-horizontal: 1em;
 }
 
+math-field {
+  border: 1px solid var(--neutral-400);
+  background: var(--neutral-200);
+  border-radius: 8px;
+  padding: 8px;
+  background: red;
+}
+
+
 .table-of-contents {
   /* Do not display scrollbars: */
   overflow:hidden;
@@ -119,7 +128,7 @@
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme="dark"] {
+:root[data-theme="dark"] {
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 
   --ifm-code-background: var(--console-background);
@@ -221,7 +230,7 @@
   line-height: 1.3;
 }
 
-[data-theme="dark"] {
+:root[data-theme="dark"] {
   --primary-color: hsl(210, 80%, 40%);
   --primary-color-dark: hsl(210, 80%, 30%);
   --primary-color-light: hsl(210, 80%, 60%);

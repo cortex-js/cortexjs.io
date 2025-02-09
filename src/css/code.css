@@ -40,7 +40,7 @@
 
 }
 
-[data-theme='dark'] {
+:root[data-theme='dark'] {
   --console-background: var(--base-00);
   --code-background: var(--neutral-100);
 }
@@ -55,8 +55,8 @@ code {
   border-radius: 4px;
 }
 
-[data-theme='dark'] code {
-  color: var(--primary-color-light);
+:root[data-theme='dark'] code {
+  color: var(--blue-300);
   border: 1px solid var(--neutral-600);
 }
 

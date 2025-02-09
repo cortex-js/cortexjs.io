@@ -6,6 +6,10 @@
   padding-block: 1em;
 }
 
+:root[data-theme="dark"] .intro {
+  color: var(--blue-400);
+}
+
 .intro a {
   text-decoration: underline;
 }
