@@ -44,45 +44,6 @@ The input of `ce.box()` can be:
 
 The result is an instance of a `BoxedExpression`.
 
-### String Representation
-
-The `expr.toString()` method returns a [AsciiMath](https://asciimath.org/) string representation of the expression.
-
-```live
-let expr = ce.parse("3x^2+\\sqrt{2}");
-console.log(expr.toString());
-```
-
-When used in a context where a string is expected, the `expr.toString()` method
-is called automatically.
-
-```live
-let expr = ce.parse("3x^2+\\sqrt{2}");
-console.log(expr);
-```
-
-**To output an AsciiMath representation of the expressio to the console** use
-`expr.print()`.
-
-```live
-let expr = ce.parse("3x^2+\\sqrt{2}");
-expr.print();
-```
-
-**To obtain a LaTeX representation of the expression** use `expr.latex` or
-`expr.toLatex()` for additional formatting options.
-
-```live
-let expr = ce.parse("3x^2+\\sqrt{2}");
-console.log(expr.latex);
-```
-
-### Canonical Expressions
-
-By default, `ce.box()` returns a canonical expression. See
-[Canonical Expressions](#canonical) for more info.
-
-
 ```js
 let expr = ce.box(1.729e3);
 console.log(expr.re);
@@ -113,9 +74,6 @@ console.log(expr.json);
 // ➔ ["Add", 3, "x", "y"]
 ```
 
-By default, `ce.parse()` returns a canonical expression. See
-[Canonical Expressions](#canonical-expressions) for more info.
-
 **To get a Boxed Expression representing the content of a mathfield**
 use the `mf.expression` property:
 
@@ -126,42 +84,6 @@ const expr = mf.expression;
 console.log(expr.evaluate());
 // ➔ 2
 ```
-
-## Unboxing
-
-**To access the MathJSON expression of a boxed expression as plain JSON**, use
-the `expr.json` property. This property is an "unboxed" version of the
-expression.
-
-```js
-const expr = ce.box(["Add", 3, "x"]);
-console.log(expr.json);
-// ➔ ["Add", 3, "x"]
-```
-
-**To customize the format of the MathJSON expression returned by `expr.json`**
-use the `ce.toMathJson()` method.
-
-Use this option to control:
-
-- which metadata, if any, should be included
-- whether to use shorthand notation
-- to exclude some functions.
-
-See [JsonSerializationOptions](/compute-engine/api#jsonserializationoptions)
-for more info about the formatting options available.
-
-```live
-const expr = ce.parse("2 + \\frac{q}{p}");
-console.log("expr.json:", expr.json);
-
-console.log("expr.toMathJson():", expr.toMathJson({
-  exclude: ["Divide"], // Don't use `Divide` functions,
-  // use `Multiply`/`Power` instead
-  shorthands: [], // Don't use any shorthands
-}));
-```
-
 
 ## Canonical Expressions
 
@@ -216,15 +138,20 @@ By default, `ce.box()` and `ce.parse()` produce a canonical expression.
 **To get a non-canonical expression instead**, use
 `ce.box(expr, {canonical: false})` or `ce.parse(latex, {canonical: false})`.
 
-The non-canonical form sticks closer to the original LaTeX input.
+When using `ce.parse()`, the non-canonical form sticks closer to the original 
+LaTeX input. When using `ce.box()`, the non-canonical form matches the
+input MathJSON.
 
 ```js
-const expr = "\\frac{30}{-50}";
+const latex = "\\frac{30}{-50}";
 
-ce.parse(expr);
+ce.parse(latex);
 // canonical form ➔ ["Rational", -3, 5]
 
-ce.parse(expr, { canonical: false });
+ce.parse(latex, { canonical: false });
+// non-canonical form ➔ ["Divide", 30, -50]
+
+ce.box(["Divide", 30, -50], { canonical: false });
 // non-canonical form ➔ ["Divide", 30, -50]
 ```
 
@@ -247,6 +174,85 @@ The canonical form of an expression which is not valid will include one or more
 When doing this check on a canonical expression it takes into consideration not
 only possible syntax errors, but also semantic errors (incorrect number or
 type of arguments, etc...).
+
+
+
+
+## String Representation
+
+The `expr.toString()` method returns a [AsciiMath](https://asciimath.org/) string representation of the expression.
+
+```live
+let expr = ce.parse("3x^2+\\sqrt{2}");
+console.log(expr.toString());
+```
+
+When used in a context where a string is expected, the `expr.toString()` method
+is called automatically.
+
+```live
+let expr = ce.parse("3x^2+\\sqrt{2}");
+console.log(expr);
+```
+
+**To output an AsciiMath representation of the expression to the console** use
+`expr.print()`.
+
+```live
+let expr = ce.parse("\\frac{1+\\sqrt{5}}{2}");
+expr.print();
+```
+
+**To obtain a LaTeX representation of the expression** use `expr.latex` or
+`expr.toLatex()` for additional formatting options.
+
+```live
+let expr = ce.parse("3x^2+\\sqrt{2}");
+console.log(expr.latex);
+```
+
+
+
+
+
+
+
+## Unboxing
+
+**To access the MathJSON expression of a boxed expression as plain JSON**, use
+the `expr.json` property. This property is an "unboxed" version of the
+expression.
+
+```js
+const expr = ce.box(["Add", 3, "x"]);
+console.log(expr.json);
+// ➔ ["Add", 3, "x"]
+```
+
+**To customize the format of the MathJSON expression returned by `expr.json`**
+use the `ce.toMathJson()` method.
+
+Use this option to control:
+
+- which metadata, if any, should be included
+- whether to use shorthand notation
+- to exclude some functions.
+
+See [JsonSerializationOptions](/compute-engine/api#jsonserializationoptions)
+for more info about the formatting options available.
+
+```live
+const expr = ce.parse("2 + \\frac{q}{p}");
+console.log("expr.json:", expr.json);
+
+console.log("expr.toMathJson():", expr.toMathJson({
+  exclude: ["Divide"], // Don't use `Divide` functions,
+  // use `Multiply`/`Power` instead
+  shorthands: [], // Don't use any shorthands
+}));
+```
+
+
 
 
 ## Mutability

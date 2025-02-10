@@ -24,7 +24,7 @@ To use the Compute Engine, you must write JavaScript or TypeScript code. This
 guide assumes familiarity with one of these programming languages.
 :::
 
-<div style={{height:"2rem"}}></div>
+<div style={{height:"1rem"}}></div>
 
 ```live
 console.log("exp(i*pi) =", ce.parse("e^{i\\pi}").evaluate());
@@ -37,8 +37,8 @@ ce.box(["Expand", expr]).evaluate().print();
 
 
 ```live
-const lhs = ce.parse("2x^2 + 3x + 1");
-const rhs = ce.parse("1 + 2x + x + 2x^2");
+const lhs = ce.parse("1 + x(1 + 2x) + 2x");
+const rhs = ce.parse("2x^2 + 3x + 1");
 console.log(lhs, lhs.isEqual(rhs) ? "=" : "≠", rhs);
 ```
 
@@ -72,8 +72,13 @@ The Compute Engine can:
 In this guide, functions such as `ce.box()` and `ce.parse()` require a
 `ComputeEngine` instance which is denoted by the `ce.` prefix.
 
+**To create a new `ComputeEngine` instance:**, use `ce = new ComputeEngine()`
+
 Functions that apply to a boxed expression, such as `expr.simplify()` are denoted with the
 `expr.` prefix.
+
+**To create a new boxed expression:**, use `expr = ce.parse()` or `expr = ce.box()`
+
 :::
 
 
@@ -85,9 +90,12 @@ Try the **interactive demo** now<Icon name="chevron-right-bold" />
 ## Getting Started
 
 The easiest way to get started is to load the Compute Engine JavaScript module
-from a CDN, then instantiate a `ComputeEngine` object.
+from a CDN, then create a `ComputeEngine` instance.
 
 ### Using JavaScript Modules
+
+JavaScript modules are the modern way to load JavaScript code. You can load the
+Compute Engine module from a CDN using an `import` statement.
 
 ```html
 <script type="module">
