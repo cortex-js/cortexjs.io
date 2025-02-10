@@ -1,0 +1,125 @@
+html {
+  font-family: system-ui,-apple-system,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+  font-display: swap;
+  text-align: center;
+  color: #555;
+  fill: currentColor;
+}
+
+body {
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 32px;
+  line-height: 1.125;
+  font-weight: 600;
+  letter-spacing: 0.004em;
+  margin: 0 0 1em 0;
+  width: 420px;
+  /* margin-bottom: 35px; */
+}
+
+h2 {
+  font-size: 112px;
+  font-weight: 600;
+  line-height: .7;
+}
+h3 {
+  font-size: 100px;
+  font-weight: 600;
+  line-height: .7;
+}
+h2, h3 {
+  color: hsl(210, 50%, 20%);
+  margin: 0;
+}
+/* h2, h3 {
+  background: linear-gradient(#eee, #333);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+} */
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rows {
+  display: flex;
+  flex-flow: row wrap;
+  width: min-content;
+}
+
+.rows * {
+  width: 100%;
+}
+
+.fa-w-8 {
+  width: 8px;
+  vertical-align: -5px;
+}
+
+svg[data-icon='compass'] {
+  width: 188px;
+  padding: 32px;
+  fill: url(#gradient) #447799;
+  animation: 3s infinite alternate cubic-bezier(0.5, 0, 0.32, 0.67) wiggle
+}
+
+@keyframes wiggle {
+  from { transform: rotate(0); }
+  20% { transform: rotate(5deg); }
+  45% { transform: rotate(-10deg); }
+  70% { transform: rotate(15deg); }
+  to { transform: rotate(0); }
+}
+
+a, a:visited, a:active {
+  font-size: 24px;
+  text-decoration: none;
+  color: #0066ce;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+@media only screen and (max-width: 600px) {
+
+  h1 {
+      max-width: 320px;
+      width: auto;
+  }
+  h2 {
+      font-size: 64px;
+  } 
+  h3 {
+      font-size: 50px;
+  }
+  svg[data-icon='compass'] {
+      width: 94px;
+  }
+}
+
+@media (prefers-color-scheme: dark) { 
+  body {
+      background-color: hsl(210, 50%, 16%);
+      color: #fffff0;
+  }
+  h2, h3 {
+      color: hsl(210, 50%, 90%);
+  }
+  svg[data-icon='compass'] {
+      fill: url(#gradient-dark) #447799;
+  }
+}

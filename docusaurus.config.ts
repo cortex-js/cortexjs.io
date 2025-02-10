@@ -29,7 +29,9 @@ const config: Config = {
   trailingSlash: false,
 
   onBrokenLinks: 'warn',
+  onBrokenAnchors: 'warn',
   onBrokenMarkdownLinks: 'warn',
+  onDuplicateRoutes: 'warn',
 
   i18n: {
     defaultLocale: 'en',

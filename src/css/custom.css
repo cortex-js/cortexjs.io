@@ -50,6 +50,12 @@ math-field {
   padding: 8px;
 }
 
+:root[data-theme="dark"] math-field {
+  background: var(--neutral-200);
+  color: var(--neutral-900);
+  border-color: var(--neutral-400);
+}
+
 
 .table-of-contents {
   /* Do not display scrollbars: */

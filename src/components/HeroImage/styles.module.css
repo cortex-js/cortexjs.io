@@ -38,6 +38,7 @@
   color: var(--text-color);
   text-shadow: 0 0 8px #3335;
   position: absolute;
+  top: 20%;
   bottom: 0;
   left: 0;
   padding-bottom: 1em;
@@ -46,10 +47,25 @@
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0 0 0 / .6) 100%) repeat scroll 0 0;
 }
 
+.heroText > div {
+  display: flex;
+  flex-direction: row; /* Default, but can be explicit */
+  align-items: stretch; /* Makes all children take the height of the tallest */
+}
+
+.heroText a {
+  flex: 1;
+}
+
+.heroText a div {
+  height: 100%;
+}
+
+
 @media screen and (max-width: 1024px) {
   .heroText {
-    top: 0;
-    bottom: auto;
+    top: 2em;
+    bottom: 0;
     padding: 0;
   }
 

@@ -88,15 +88,6 @@ async function toJsxNode(node) {
   // "style" is for inline styles
   let style = value.match(/:::style\s*\n([\s\S]*?)(\n:::|$)/)?.[1];
 
-  /** @fixme: temporary: should be able to use CSS variables instead*/
-  style = `
-      math-field {
-        border: 1px solid var(--neutral-400);
-        background: var(--neutral-200);
-        border-radius: 8px;
-        padding: 8px;
-      }
-` + style;
   // "html" and "js" are for editable blocks
   const html = value.match(/:::html\s*\n([\s\S]*?)(\n:::|$)/)?.[1];
   let js = value.match(

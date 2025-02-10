@@ -56,7 +56,7 @@ loadScripts([
   "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js",
   "https://unpkg.com/@cortex-js/compute-engine",
   "https://unpkg.com/mathlive/dist/mathlive.min.js",
-  "https://unpkg.com/@ui-js/code-playground@module",
+  "https://unpkg.com/@ui-js/code-playground/dist/code-playground.js@module",
   ]
 );
 })();
