@@ -16,9 +16,19 @@ git submodule init
 
 git submodule update
 
+npm install
 # Setup, make a dev build and start a server
 npm start
 ```
+
+If you get an
+```bash
+Error: MDX compilation failed for file "X:\PATHTO\cortexjs.io\docs\mathfield\22-security.md"
+Cause: Cannot read properties of null (reading '1')
+Details:
+TypeError: Cannot read properties of null (reading '1')
+```
+Then go through each of the .md files and save them (CTRL+S) so you are sure the contents is saved to disk. You should be able to build successfully.
 
 ## To update the documentation after a new release
 
