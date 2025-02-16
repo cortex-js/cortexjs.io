@@ -467,14 +467,20 @@ body .DocSearch-Button:hover {
 body .DocSearch-Modal {
   margin-top: 100px;
   padding-top: 8px;
-  border-radius: 8px;
+  border-radius: 16px;
 }
 
 body .DocSearch-Form {
   --docsearch-searchbox-shadow: inset 0 0 0 2px #ccc;
-  border-radius: 16px;
+  border-radius: 12px;
   margin-inline: 4px;
   font-weight: 600;
+}
+
+
+/** The footer at the bottom of the model search dialog */
+body .DocSearch-Footer {
+  display: none;
 }
 
 .footer--dark {

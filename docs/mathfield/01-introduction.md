@@ -79,6 +79,13 @@ hide_title: true
   color: var(--text-color);
 }
 
+@media only screen and (max-width: 767px) {
+#features-section > div {
+  padding: 16px;
+}
+
+}
+
 
 #use-cases-section {
   display: flex;
@@ -293,13 +300,15 @@ div.intro-copy p.p1 {
 }
 
 div.intro-copy p.p2 {
-  font-size: 2rem;
+  margin-top: 1rem;
+  font-size: clamp(18px, 6vw, 2rem);
   line-height: .8;
 }
 
 div.intro-copy p.p3 {
-  font-size: 1rem;
+  font-size: clamp(18px, 4vw, 1rem);
   font-weight: 400;
+  padding-inline: 1em;
 }
 
 div.intro-copy hr {
@@ -311,14 +320,24 @@ div.intro-copy hr {
 
 div.intro-copy div {
   display: block;
-  width: 70%;
+  width: 100%;
+  padding-inline: 10%;
+}
+
+@media only screen and (max-width: 767px) {
+div.intro-copy div {
+  padding-inline: 8px;
+}
+
+
 }
 
 div.intro-copy kbd {
   font-family: var(--monospace-font);
   background: transparent;
   color: var(--primary-color);
-  font-size: 1em;
+  font-size: clamp(24px, 12vw, 1em);
+  line-height: 1;
   border: none;
   box-shadow: none;
 }

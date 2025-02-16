@@ -16,8 +16,8 @@ export default function ({
         ...(backgroundStyle ?? {}),
       }}
     >
-      <div className={styles.heroImage} style={imageStyle}></div>
       <div className={styles.heroText}>{children}</div>
+      <div className={styles.heroImage} style={imageStyle}></div>
     </div>
   );
 }

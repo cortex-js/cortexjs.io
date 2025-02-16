@@ -105,9 +105,18 @@ pre.prism-code {
   line-height: 1.4;
 }
 
+.member-card .theme-code-block {
+  font-size: 1rem;
+  line-height: 1;
+  margin-bottom: .5em;
+  --ifm-pre-padding: 8px;
+}
+
 .theme-code-block code {
   border-radius: 8px;
 }
+
+
 
 html.docs-doc-id-compute-engine\/api .theme-code-block code {
   padding: 0.5em;

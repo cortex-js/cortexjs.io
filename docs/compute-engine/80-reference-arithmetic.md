@@ -9,11 +9,11 @@ slug: /compute-engine/reference/arithmetic/
 
 | Symbol            | Value                        |                                                                                                                                                           |
 | :---------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ExponentialE`    | $$2.7182818284\ldots$$     | [Euler's number](https://www.wikidata.org/wiki/Q82435)                                                                                                    |
+| `ExponentialE`    | $$\approx 2.7182818284\ldots$$     | [Euler's number](https://www.wikidata.org/wiki/Q82435)                                                                                                    |
 | `MachineEpsilon`  | $$ 2^{−52}$$               | The difference between 1 and the next larger floating point number. <br/>See [Machine Epsilon on Wikipedia](https://en.wikipedia.org/wiki/Machine_epsilon) |
-| `CatalanConstant` | $$ = 0.9159655941\ldots $$ | $$ \sum_{n=0}^{\infty} \frac{(-1)^{n}}{(2n+1)^2} $$ <br/> See [Catalan's Constant on Wikipedia](https://en.wikipedia.org/wiki/Catalan%27s_constant)      |
-| `GoldenRatio`     | $$ = 1.6180339887\ldots$$  | $$ \frac{1+\sqrt{5}}{2} $$ See [Golden Ratio on Wikipedia](https://en.wikipedia.org/wiki/Golden_ratio)                                                  |
-| `EulerGamma`      | $$ = 0.5772156649\ldots $$ | See [Euler-Mascheroni Constant on Wikipedia](https://en.wikipedia.org/wiki/Euler%E2%80%93Mascheroni_constant)                                             |
+| `CatalanConstant` | $$\approx 0.9159655941\ldots $$ | $$ \sum_{n=0}^{\infty} \frac{(-1)^{n}}{(2n+1)^2} $$ <br/> See [Catalan's Constant on Wikipedia](https://en.wikipedia.org/wiki/Catalan%27s_constant)      |
+| `GoldenRatio`     | $$\approx 1.6180339887\ldots$$  | $$ \frac{1+\sqrt{5}}{2} $$ <br/>See [Golden Ratio on Wikipedia](https://en.wikipedia.org/wiki/Golden_ratio)                                                  |
+| `EulerGamma`      | $$\approx 0.5772156649\ldots $$ | See [Euler-Mascheroni Constant on Wikipedia](https://en.wikipedia.org/wiki/Euler%E2%80%93Mascheroni_constant)                                             |
 
 </div>
 
@@ -22,7 +22,7 @@ See also **Trigonometry** for `Pi` and related constants<Icon name="chevron-righ
 </ReadMore>
 
 <ReadMore path="/compute-engine/reference/complex/" > 
-See also **Complex** for `ImaginaryUnit` and related functions<Icon name="chevron-right-bold" />
+See also **Complex** for `ImaginaryUnit`<Icon name="chevron-right-bold" />
 </ReadMore>
 
 ## Relational Operators
@@ -31,12 +31,12 @@ See also **Complex** for `ImaginaryUnit` and related functions<Icon name="chevro
 
 | Function       | Notation         |                                                                       |
 | :------------- | :--------------- | :------------------------------------------------------------------------------ |
-| `Equal`        | $$ x = y $$    | <br/>Mathematical relationship asserting that two quantities have the same value |
-| `Greater`      | $$ x \gt y $$  |                                                                                 |
+| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value |
+| `NotEqual`     | $$ x \ne y $$  |                                                                                 |
+| `Greater`      | $$ x \gt y $$  | |
 | `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
 | `Less`         | $$ x \lt y $$  |                                                                                 |
 | `LessEqual`    | $$ x \leq y $$ |                                                                                 |
-| `NotEqual`     | $$ x \ne y $$  |                                                                                 |
 
 See below for additonal relational operators: `Congruent`, etc...
 
@@ -54,7 +54,7 @@ See below for additonal relational operators: `Congruent`, etc...
 | `Multiply` | $$ a\times b $$             | [Multiplication](https://www.wikidata.org/wiki/Q40276)    |
 | `Divide`   | $$ \frac{a}{b} $$           | [Divide](https://www.wikidata.org/wiki/Q1226939)          |
 | `Power`    | $$ a^b $$                   | [Exponentiation](https://www.wikidata.org/wiki/Q33456)    |
-| `Root`     | $$\sqrt[n]{x}=x^{\frac1n}$$ | [nth root](https://www.wikidata.org/wiki/Q601053)        |
+| `Root`     | $$\sqrt[n]{x}=x^{\frac1n}$$ | [n<sup>th</sup> root](https://www.wikidata.org/wiki/Q601053)        |
 | `Sqrt`     | $$\sqrt{x}=x^{\frac12}$$    | [Square root](https://www.wikidata.org/wiki/Q134237)      |
 | `Square`   | $$x^2$$                     |                                                           |
 
@@ -67,10 +67,10 @@ See below for additonal relational operators: `Congruent`, etc...
 | Function     | Notation                |                                                                                                                            |
 | :----------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------------- |
 | `Exp`        | $$\exponentialE^{x}$$ | [Exponential function](https://www.wikidata.org/wiki/Q168698)                             |
-| `Ln`         | $$\ln(x)$$            | [Logarithm function](https://www.wikidata.org/wiki/Q11197), the inverse of `Exp`          |
-| `Log`        | $$\log_b(x)$$         | `["Log", _v_, _b_]` logarithm of base _b_, default 10                                     |
+| `Ln`         | $$\ln(x)$$            | [Logarithm function](https://www.wikidata.org/wiki/Q11197), the natural logarithm, the inverse of `Exp`          |
+| `Log`        | $$\log_b(x)$$         | `["Log", <v>, <b>]`<br/> Logarithm of base _b_, default 10                                     |
 | `Lb`         | $$\log_2(x)$$         | [Binary logarithm function](https://www.wikidata.org/wiki/Q581168), the base-2 logarithm  |
-| `Lg`         | $$\log\_{10}(x)$$     | [Common logarithm](https://www.wikidata.org/wiki/Q966582), the base-10 logarithm                                        |
+| `Lg`         | $$\log_{10}(x)$$     | [Common logarithm](https://www.wikidata.org/wiki/Q966582), the base-10 logarithm                                        |
 | `LogOnePlus` | $$\ln(x+1)$$          |                                                                                           |
 
 </div>
@@ -94,9 +94,9 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 | Function | Notation     |                                                                                                                   |
 | :------- | :----------- | :---------------------------------------------------------------------------------------------------------------- |
 | `Abs`    | $$\|x\| $$ | Absolute value, [magnitude](https://www.wikidata.org/wiki/Q3317982)              |
-| `Ceil`   |              | Rounds a number up to the next largest integer                                   |
+| `Ceil`   | $$\lceil x \rceil $$ | Rounds a number up to the next largest integer                                   |
+| `Floor`  | $$\lfloor x \rfloor$$ | Round a number to the greatest integer less than the input value                 |
 | `Chop`   |              | Replace real numbers that are very close to 0 (less than $$10^{-10}$$) with 0  |
-| `Floor`  |              | Round a number to the greatest integer less than the input value                 |
 | `Round`  |              |                                                                                  |
 
 </div>
@@ -109,7 +109,6 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 
 Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 
-<Latex value=" 26 \equiv 11 \pmod{5}"/>
 
 
 ```json example
@@ -117,6 +116,7 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 // ➔ True
 ```
 
+<Latex value=" 26 \equiv 11 \pmod{5}" flow="column"/>
 
 </FunctionDefinition>
 

@@ -17,6 +17,8 @@ export default function ({ children, value, flow = "row", source, aside }) {
 
   source = source ?? value;
 
+  value = `$$$${value}$$`;
+
   if (flow === "column") {
     return (
       <div className={styles.latexWrapperColumn}>
@@ -25,7 +27,7 @@ export default function ({ children, value, flow = "row", source, aside }) {
           {aside && <div className={styles.aside}>{aside}</div>}
         </div>
 
-        <div className={styles.latexWrapperColumnDisplay}>{`$$${value}$$`}</div>
+        <div className={styles.latexWrapperColumnDisplay}>{value}</div>
       </div>
     );
   }
@@ -37,7 +39,7 @@ export default function ({ children, value, flow = "row", source, aside }) {
         {aside && <div className={styles.aside}>{aside}</div>}
       </div>
 
-      <div className={styles.display}>{`$$${value}$$`}</div>
+      <div className={styles.display}>{value}</div>
     </div>
   );
 }

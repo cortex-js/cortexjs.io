@@ -26,7 +26,7 @@ const config: Config = {
   organizationName: 'cortex-js',
   projectName: 'cortex-js.github.io',
   deploymentBranch: 'master',
-  trailingSlash: false,
+  trailingSlash: true,
 
   onBrokenLinks: 'warn',
   onBrokenAnchors: 'warn',
@@ -211,8 +211,9 @@ const config: Config = {
   
         // Optional: whether the insights feature is enabled or not on Docsearch (`false` by default)
         insights: false,
+        disableUserPersonalization: true,
+        placeholder: 'Search',
   
-        //... other Algolia params
       },
   
       navbar: {

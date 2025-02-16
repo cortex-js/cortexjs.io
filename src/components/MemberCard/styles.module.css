@@ -37,11 +37,19 @@
   padding-top: .5rem;
   padding-bottom: .5rem;
 
-border-bottom: 1px solid var(--neutral-800);
+  border-bottom: 1px solid var(--neutral-800);
 
   font-family: var(--monospace-font-family);
   font-weight: bold;
   color: var(--neutral-200);
+}
+
+.memberCard h3 {
+  font-size: 1.2rem;
+}
+
+.memberCard h4, .memberCard h5 {
+  font-size: 1rem;
 }
 
 /* .memberCard2 h2 {
