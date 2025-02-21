@@ -553,7 +553,7 @@ div.figure {
       <img src="/img/mathfield/loop-eqn.png"/>
     </div>
     <p>The gold standard, for beautiful math typesetting.</p>
-    <p>Matfields support <strong>800 LaTeX commands</strong>.</p>
+    <p>Mathfields support <strong>800 LaTeX commands</strong>.</p>
     <div><a href="/mathfield/reference/commands/"><button>Learn More</button></a></div>
   </div>
 
