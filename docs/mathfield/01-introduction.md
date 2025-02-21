@@ -368,7 +368,8 @@ p {
     color: #999;
 }
 
-button {
+/* We add #features-section so that this rule does not apply to the global menu button in the header */
+#features-section button {
   appearance: none;
   border: none;
   background: var(--primary-color);
@@ -379,22 +380,22 @@ button {
   margin-bottom: 1rem;
 }
 
-button:hover {
+#features-section button:hover {
   background: var(--primary-color-dark);
   transition: background-color 0.3s ease-in-out;
 }
 
-[data-theme="dark"] button:hover {
+[data-theme="dark"] #features-section section button:hover {
   background: var(--primary-color-light);
 }
 
-.pod button:active {
+#features-section button:active {
   background: var(--primary-color-dark);
   scale: 1.05;
   transition: background-color 0.3s ease-in-out;
 }
 
-[data-theme="dark"] button:active {
+[data-theme="dark"] #features-section button:active {
   background: var(--primary-color-light);
 
 }
