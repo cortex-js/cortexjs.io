@@ -71,10 +71,16 @@ body {
 
 
 .markdown h1:first-child {
-  --ifm-h1-font-size: 4rem;
+  /* --ifm-h1-font-size: 4rem; */
   --ifm-heading-line-height: 1;
   --ifm-heading-font-weight: 700;
 
   text-wrap: balance;
   letter-spacing: -3px;
+}
+
+@media only screen and (min-width: 767px) {
+  .markdown h1:first-child {
+    --ifm-h1-font-size: 4rem;
+  }
 }

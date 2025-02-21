@@ -65,11 +65,18 @@ hide_title: true
 }
 
 #features-section p {
-  color: var(--body-color);
-  font-weight: 400;
-  line-height: 1.275;
+  color: var(--neutral-500);
+  font-weight: 600;
+  line-height: 1;
   font-size: 1rem;
 }
+
+#features-section p strong {
+  color: var(--neutral-0);
+}
+
+
+
 
 #features-section > div {
   padding: 2rem;
@@ -144,10 +151,13 @@ div.use-case h3:hover .hash-link {
 div.use-case p {
   font-size: 1rem;
   color: var(--body-color);
-  font-weight: 400;
-  line-height: 1.25;
+  font-weight: 600;
+  line-height: 1.1;
 }
 
+div.use-case > div > p {
+  color: var(--neutral-500);
+}
 
 .fill-purple path {
   fill: url(#purple-gradient);
@@ -307,7 +317,8 @@ div.intro-copy p.p2 {
 
 div.intro-copy p.p3 {
   font-size: clamp(18px, 4vw, 1rem);
-  font-weight: 400;
+  color: var(--neutral-500);
+  font-weight: 600;
   padding-inline: 1em;
 }
 
@@ -325,11 +336,9 @@ div.intro-copy div {
 }
 
 @media only screen and (max-width: 767px) {
-div.intro-copy div {
-  padding-inline: 8px;
-}
-
-
+  div.intro-copy div {
+    padding-inline: 8px;
+  }
 }
 
 div.intro-copy kbd {
@@ -358,6 +367,38 @@ p {
     letter-spacing: 0.006em;
     color: #999;
 }
+
+button {
+  appearance: none;
+  border: none;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px 8px 16px;
+  border-radius: 36px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+button:hover {
+  background: var(--primary-color-dark);
+  transition: background-color 0.3s ease-in-out;
+}
+
+[data-theme="dark"] button:hover {
+  background: var(--primary-color-light);
+}
+
+.pod button:active {
+  background: var(--primary-color-dark);
+  scale: 1.05;
+  transition: background-color 0.3s ease-in-out;
+}
+
+[data-theme="dark"] button:active {
+  background: var(--primary-color-light);
+
+}
+
 
 .copy strong {
   color: #000;
@@ -511,7 +552,8 @@ div.figure {
       <img src="/img/mathfield/loop-eqn.png"/>
     </div>
     <p>The gold standard, for beautiful math typesetting.</p>
-    <p className="link"><a href="/mathfield/reference/commands/">Read more about the **800+ LaTeX commands** supported by mathfields <Icon name="chevron-right-bold" /></a></p>
+    <p>Matfields support <strong>800 LaTeX commands</strong>.</p>
+    <div><a href="/mathfield/reference/commands/"><button>Learn More</button></a></div>
   </div>
 
 
@@ -520,8 +562,8 @@ div.figure {
     <div className="figure" style={{marginBottom: "2em"}}>
       <img src="/img/mathfield/virtualKeyboard.png"/>
     </div>
-    <p>Fully customizable and makes math input easy on desktop and mobile.</p>
-    <p className="link"><a href="/mathfield/virtual-keyboard/">Read more about the **virtual keyboard** <Icon name="chevron-right-bold" /></a></p>
+    <p>Fully <strong>customizable</strong> and makes math input easy on <strong>desktop and mobile</strong>.</p>
+    <div><a href="/mathfield/virtual-keyboard/"><button>Learn More</button></a></div>
   </div>
 
 
@@ -530,10 +572,10 @@ div.figure {
     <div>
       <svg style={{width:"8rem", height: "8rem", marginBottom: "2rem"}} ><use role="none" xlinkHref="/icons.svg#github"></use></svg>
     </div>
-    <p>MathField is an open source project available on GitHub. Contributions are welcome.</p>
-    <p className="link"><a href="https://github.com/arnog/mathlive">View the project on GitHub <Icon name="chevron-right-bold" /></a></p>
-    <p>Individuals and commercial partners can <a href="https://paypal.me/arnogourdol">contribute financially</a> to the project.</p>
-    <p className="link"><a href="https://paypal.me/arnogourdol">Donate on PayPal <Icon name="chevron-right-bold" /></a></p>
+    <p>MathField is an <strong>open source</strong> project available on GitHub. Contributions are welcome.</p>
+    <div><a href="https://github.com/arnog/mathlive"><button>View on GitHub</button></a></div>
+    <p>Individuals and commercial partners are encouraged to <a href="https://paypal.me/arnogourdol">support financially</a> the project.</p>
+    <div><a href="https://paypal.me/arnogourdol"><button>Donate with PayPal</button></a></div>
 
 
   </div>
@@ -552,12 +594,12 @@ div.figure {
 
       Enable interactive math quizzes, exercises, and problem-solving tools that check answers in real-time
       
-      <ReadMore path="/tutorials/simple-quiz/" >
-      Read this step-by-step tutorial to learn how to build a **simple quiz** with mathfield<Icon name="chevron-right-bold" />
+      <ReadMore path="/tutorials/simple-quiz/">
+      Read this step-by-step tutorial to build a **simple quiz** <Icon name="chevron-right-bold" />
       </ReadMore>
 
       <ReadMore path="/mathfield/guides/fill-in-the-blank/" >
-      Learn more about authoring **fill-in-the-blank** questions with mathfields<Icon name="chevron-right-bold" />
+      Learn more about authoring **fill-in-the-blank** questions <Icon name="chevron-right-bold" />
       </ReadMore>
     </div>
   </div>
@@ -573,7 +615,7 @@ div.figure {
 
 
     <ReadMore path="/compute-engine/guides/symbolic-computing/" >
-    Use mathfields with the **Compute Engine** to symbolically compute and manipulate equations<Icon name="chevron-right-bold" />
+    Use mathfields with the <strong>Compute Engine</strong><Icon name="chevron-right-bold" />
     </ReadMore>
   </div>
 </div>
@@ -588,7 +630,7 @@ div.figure {
     <p>Build real-time calculators that evaluate math expressions dynamically</p>
     
     <ReadMore path="/compute-engine/guides/numeric-evaluation/" >
-    Make your calculator **interactive** by using the **Compute Engine** to evaluate the user's input<Icon name="chevron-right-bold" />
+    Use the <strong>Compute Engine</strong> to evaluate the user's input<Icon name="chevron-right-bold" />
     </ReadMore>  
   </div>
 </div>

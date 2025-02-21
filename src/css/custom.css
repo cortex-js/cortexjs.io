@@ -41,6 +41,8 @@
 
   --ifm-toc-padding-vertical: 0;
   --ifm-toc-padding-horizontal: 1em;
+
+  --ifm-footer-padding-vertical: var(--ifm-spacing-vertical);
 }
 
 math-field {
@@ -500,6 +502,10 @@ body .DocSearch-Footer {
   margin: 0;
   margin-bottom: 8px;
   margin-left: 16px;
+}
+
+.footer__link-item {
+  line-height: 1.2;
 }
 
 .footer--dark a:hover, .footer--dark a:active {

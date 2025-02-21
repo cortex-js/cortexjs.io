@@ -3,66 +3,73 @@
  * and scoped locally.
  */
 
-.h1 {
-  --outline-color: rgb(200 0 0 / 10%);
-  font-size: 10rem;
-  font-weight: 700;
-}
-
-
-.heroBanner {
+ .header {
   padding: 4rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
+
+.h1 {
+  font-size: clamp(1rem, 20vw, 10rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--neutral-100);
 }
 
-.buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-header p.subtitle {
-  font-weight: 400;
+.subtitle {
+  font-weight: 900;
   line-height: 1;
-  max-width: 60%;
-  font-size: 2.2rem;
+  max-width: 80%;
+  font-size: clamp(1rem, 5vw, 5rem);
   text-wrap: balance;
   margin-inline: auto !important;
   margin-bottom: 3rem !important;
+  color: var(--neutral-400);
+  text-transform: uppercase;
 }
 
-.section {
+.pods {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 2rem 1rem 2rem;
+
+  align-items: stretch;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 2em;
-  margin: 0 4rem 4rem 4rem;
+  justify-content: space-between;
 }
 
-.container {
+
+
+
+.pods a {
+  text-decoration: none;
+  flex: 1;
+}
+
+.pods a:hover {
+  text-decoration: none;
+}
+
+
+
+.pod {
   position: relative;
-  padding: 24px;
-  padding-bottom: 48px;
-  border-radius: 24px;
+  padding: 8px;
+  min-width: 250px;
+  /* padding-bottom: 48px; */
+  border-radius: 16px;
   min-height: 200px;
   color: var(--text-color);
-  scale: 1;
+  transform: scale(1);
   transition: all 0.3s ease-in-out;
-  background: rgb(0 0 0 / 25%);
+  background: var(--neutral-900);
+  height: 100%;
 
-  /* border: 1px solid rgb(205 205 205 / 15%); */
-  /* border-top-color: rgb(255 255 255 / 35%); */
+  border: 1px solid rgb(205 205 205 / 20%);
+  border-top-color: rgb(255 255 255 / 40%);
   outline: 2px outset rgb(255 255 255 / 25%);
   box-shadow: 0 -2px 10px rgb(255 255 255 / 20%),
     var(--box-shadow-sm); 
@@ -72,81 +79,76 @@ header p.subtitle {
     ;
 */
 
-  backdrop-filter: blur(18px) saturate(180%) contrast(80%) brightness(80%);
+  /* backdrop-filter: blur(18px) saturate(180%) contrast(80%) brightness(80%); */
 }
 
-.title {
-  line-height: 1;
-  font-size: clamp(1.3rem, 3.5vw, 4rem);
-  font-weight: 700;
-  color: #ddd;
-  padding-bottom: 1em;
-  text-shadow: var(--letter-press-text-shadow) !important;
-}
-
-.container p {
-  margin-top: 1.5em !important;
-  font-size: clamp(1rem, 1.8vw, 2rem);
-  line-height: 1.25;
-  font-weight: 400;
-  opacity: 0.6;
-}
-
-.section a {
-  width: 30%;
-}
-
-.section a:hover {
-  text-decoration: none;
-}
-
-.section a:hover .container{
-  scale: 1.05;
+.pods a:hover .pod {
+  transform: scale(1.05);
   box-shadow: 
     0 -2px 20px rgb(255 255 255 / .3),
     var(--box-shadow-md);
-transition: all 0.3s ease-in-out;
 }
 
-/* When on a narrow screen... */
-@media screen and (max-width: 1024px) {
-  .h1 {
-    font-size: max(2rem, 16vw);
-  }
-
-  header p.subtitle {
-    font-size: max(2rem, 7vw);
-  }
-
-  .container {
-    min-height: 100px;
-  }
-
-  .title {
-    font-size: 1.5rem;
-  }  
-  
-  .section {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .section a {
-    width: 100%;
-  }
+.pod h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  padding: 1rem .5rem 0 .5rem;
 }
 
-/** Very narrow... */
-@media screen and (max-width: 512px) {
+.pod p {
+  color: var(--neutral-500);
+  font-weight: 600;
+  line-height: 1.1;
+  font-size: 1.2rem;
+  padding-inline: .5rem;
+}
 
-  .section {
-    gap: 1rem;
-    margin: 1rem;
-  }
+.pod p strong {
+  color: var(--neutral-200);
+}
 
-  .container {
-    padding: 1em;
-  }
+.pod button {
+  appearance: none;
+  border: none;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px 16px 8px 16px;
+  border-radius: 36px;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.pod button:hover {
+  background: var(--primary-color-dark);
+  transition: background-color 0.3s ease-in-out;
+}
+
+[data-theme="dark"] .pod button:hover {
+  background: var(--primary-color-light);
+}
+
+.pod button:active {
+  background: var(--primary-color-dark);
+  scale: 1.05;
+  transition: background-color 0.3s ease-in-out;
+}
+
+[data-theme="dark"] .pod button:active {
+  background: var(--primary-color-light);
+
+}
 
 
+[data-theme="dark"] .pod {
+  --shadow-color: red;
+  outline: none;
+  box-shadow: 0 -2px 10px rgb(0 0 0 / 20%); 
+
+}
+
+[data-theme="dark"] .pods a:hover .pod {
+  box-shadow: 
+    0 -2px 20px rgb(0 0 0  / .3);
 }
