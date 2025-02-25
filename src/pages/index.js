@@ -1,43 +1,19 @@
 import clsx from "clsx";
-import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
-import HeroImage from "@site/src/components/HeroImage";
 import Heading from "@theme/Heading";
 import styles from "./index.module.css";
-
-// function HomepageHeader() {
-//   const { siteConfig } = useDocusaurusContext();
-//   return (
-//     <header className={clsx("hero hero--primary", styles.heroBanner)}>
-//       <div className="container">
-//         <Heading as="h1" className="hero__title">
-//           {siteConfig.title}
-//         </Heading>
-//         <p className="hero__subtitle">{siteConfig.tagline}</p>
-//         <div className={styles.buttons}>
-//           <Link
-//             className="button button--secondary button--lg"
-//             to="/docs/intro"
-//           >
-//             Docusaurus Tutorial - 5min ⏱️
-//           </Link>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// }
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <header className={styles.header}>
       <div>
-        <h1 className={styles.h1}>CortexJS</h1>
+        <h1 className={styles.h1}>Cortex<span className={styles.js}>JS</span></h1>
         <p className={styles.subtitle}>Scientific Computing for Everyone</p>
         <div className={styles.pods}>
           <a href="/mathfield">
-            <div className={styles.pod}>
+            <div className={clsx(styles.pod, styles.mathfieldPod)}>
               <Heading as="h2" className={styles.title}>
                 Mathfield
               </Heading>
@@ -49,7 +25,7 @@ function HomepageHeader() {
           </a>
 
           <a href="/compute-engine/">
-            <div className={styles.pod}>
+            <div className={clsx(styles.pod, styles.computeEnginePod)}>
               <Heading as="h2" className={styles.title}>
                 Compute Engine
               </Heading>
@@ -61,7 +37,7 @@ function HomepageHeader() {
           </a>
 
           <a href="/math-json">
-            <div className={styles.pod}>
+            <div className={clsx(styles.pod, styles.mathJsonPod)}>
               <Heading as="h2" className={styles.title}>
                 MathJSON
               </Heading>
