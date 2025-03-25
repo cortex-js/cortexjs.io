@@ -74,6 +74,12 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "mathfield/svelte",
+          className: "guide-icon",
+          label: "Using Svelte",
+        },
+        {
+          type: "doc",
           id: "mathfield/interacting",
           className: "guide-icon",
           label: "Interact",

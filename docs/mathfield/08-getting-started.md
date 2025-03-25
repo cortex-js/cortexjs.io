@@ -104,6 +104,11 @@ export View = () => {
 Read more about using mathfields with **React**<Icon name="chevron-right-bold" />
 </ReadMore>
 
+<ReadMore path="/mathfield/guides/svelte/" >
+Read more about using mathfields with **Svelte**<Icon name="chevron-right-bold" />
+</ReadMore>
+
+
 ## Caution
 
 

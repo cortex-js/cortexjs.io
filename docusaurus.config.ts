@@ -113,6 +113,22 @@ const config: Config = {
   clientModules: ['./modules/route-update.js'],
 
   plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        createRedirects(existingPath) {
+          if (existingPath.includes('/mathfield')) {
+            // Redirect from /docs/mathfield to /docs/mathlive
+            return [
+              existingPath.replace('/mathfield', '/mathlive'),
+            ];
+          }
+          return undefined; // Return a falsy value: no redirect created
+        },
+      },
+    ],
+  
+
     loadScripts,
     // [
     //   '@docusaurus/plugin-pwa',
@@ -326,3 +342,5 @@ const config: Config = {
 // theme$4 as vsLight,
 
 export default config;
+
+

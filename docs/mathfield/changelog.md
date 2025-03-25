@@ -14,6 +14,31 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Issues Resolved
 
+- **#2635** In Chrome (and Firefox), clicking on the padding area of the
+  mathfield would not result in the focus getting into a zombie state and
+  keyboard event no longer being dispatched.
+
+## 0.104.2 _2025-03-23_
+
+### Issues Resolved
+
+- **#2588** With Chrome 133+ input with the physical keyboard was disabled after
+  showing the virtual keyboard.
+
+## 0.104.1 _2025-03-18_
+
+### Improvements
+
+- Improved support for the `jsdelivr` CDN. To use it, use
+
+```js
+    import { MathfieldElement } from "https://esm.run/mathlive";
+```
+
+### Issues Resolved
+
+- **#2628** Attempting to delete an empty line in a multiline environment would
+  not delete the line.
 - **#2585** In some cases, the arguments of a macro were not serialized
   correctly. This could happen when using a macro in conjunction with a inline
   shortcut.
