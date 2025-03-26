@@ -1,6 +1,6 @@
 ---
 date: Last Modified
-title: Using A Mathfield with Svelte
+title: Using a Mathfield with Svelte
 slug: /mathfield/guides/svelte/
 ---
 
@@ -75,6 +75,8 @@ declare namespace svelteHTML {
   const config = {
     "smart-mode": true
     // ...
+    // see here for the full list of API's
+    // https://cortexjs.io/mathfield/api/
   }
 </script>
 
@@ -85,11 +87,12 @@ declare namespace svelteHTML {
 <MathField {...config}></MathField>
 
 <!-- 2-way binding -->
-<MathField bind:value={value}></MathField>
+<MathField bind:value></MathField>
 
-<p>Current LaTeX: {value}</p>
+<p>Current value: {value}</p>
 
-<button onclick={() => {value = "1 + 1";}}>
+<button
+  onclick={() => {value = String.raw`x=\frac{-b\pm \sqrt{b^2-4ac}}{2a}`}}>
   reset to default
 </button>
 ```
