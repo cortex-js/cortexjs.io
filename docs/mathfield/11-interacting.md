@@ -227,15 +227,7 @@ to be dispatched.
 | `deleteContentForward`|  |
 | `historyUndo`| The content was changed because of an undo command |
 | `historyRedo`| The content was changed because of a redo command |
-
-
 </div>
-
-:::warning
-
-On iOS, the `inputType` property is removed. However, its content can also be access as `ev.data`. Until this issue is addressed in iOS, for better compatibility, use `ev.data`.
-
-:::
 
 The `beforeinput` event is dispatched before any modifications to the mathfield 
 have been done. This event is cancelable. Calling `preventDefault()` on the 
