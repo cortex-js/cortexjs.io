@@ -570,7 +570,7 @@ property.
 
 ```js
 MathfieldElement.soundsDirectory = 
-  "https://unpkg.com/mathlive/dist/sounds/";
+  "https://unpkg.com/mathlive/sounds/";
 ```
 
 Specific sounds can be disabeld or customized with the `MathfieldElement.keypressSound`
@@ -636,7 +636,7 @@ property.
 
 :::js
 await window.customElements.whenDefined("math-field");
-MathfieldElement.fontsDirectory = "https://unpkg.com/mathlive/dist/fonts/";
+MathfieldElement.fontsDirectory = "https://unpkg.com/mathlive/fonts/";
 
 
 :::html

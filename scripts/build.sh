@@ -130,7 +130,7 @@ then
 
 
     output_file="./build/kb-mathlive-api.d.ts"
-    pattern="../mathlive/dist/types/**/*.d.ts"
+    pattern="../mathlive/types/**/*.d.ts"
 
     if [ -f "$output_file" ]; then
         rm "$output_file"

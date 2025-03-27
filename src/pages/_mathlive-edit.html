@@ -3,10 +3,10 @@ layout: single
 title: MathLive Editor
 slug: /mathlive/editor/
 sidebar:
-  - nav: "universal"
+- nav: "universal"
 head:
-  stylesheets:
-    - https://unpkg.com/mathlive/dist/mathlive-static.css
+stylesheets:
+- https://unpkg.com/mathlive/mathlive-static.css
 ---
 
 <style>
@@ -17,6 +17,7 @@ head:
     justify-content: flex-end;
     align-items: center;
   }
+
   .buttonbar button {
     background: none;
     border: 1px solid rgba(0, 0, 0, 0.24);
@@ -95,7 +96,8 @@ head:
     padding: 5px;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
-    width: calc(100% - 10px); /* Subtract horizontal padding */
+    width: calc(100% - 10px);
+    /* Subtract horizontal padding */
 
     font-family: var(--monospace-font-family);
     color: #f0c674;
@@ -120,15 +122,8 @@ head:
 <main>
   <div id="inputs">
     <math-field id="mf">f(x)=\sqrt{\frac{1}{x}}</math-field>
-    <textarea
-      id="latex"
-      autocapitalize="off"
-      autocomplete="off"
-      autocorrect="off"
-      spellcheck="false"
-    >
-f(x)=\sqrt{\frac{1}{x}}</textarea
-    >
+    <textarea id="latex" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false">
+f(x)=\sqrt{\frac{1}{x}}</textarea>
   </div>
   <div class="buttonbar">
     <button id="copy-to-png">Copy</button>

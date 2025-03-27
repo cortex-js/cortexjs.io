@@ -235,7 +235,7 @@ We also need to load a CSS stylesheet to render the math. We can use the
 ```html
 <link
   rel="stylesheet"
-  href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+  href="https://unpkg.com/mathlive/mathlive-static.css"
 />
 ```
 
@@ -318,7 +318,7 @@ Here's the complete code for our quiz application:
     <title>Math Quiz</title>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+      href="https://unpkg.com/mathlive/mathlive-static.css"
     />
     <style>
       math-field {

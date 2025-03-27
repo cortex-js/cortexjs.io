@@ -10,9 +10,12 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.105.0 _2025-03-27_
 
 ### Issues Resolved
+
+- **#2647**, **#2634**, **#2562** Some accents (`\hat{}`, `\vec{}`) where not
+  rendered correctly in some cases.
 
 - **#2635** In Chrome (and Firefox), clicking on the padding area of the
   mathfield would not result in the focus getting into a zombie state and

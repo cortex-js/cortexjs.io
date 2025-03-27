@@ -140,24 +140,21 @@ If you need to incorporate the library files directly into your project
 (for example if you are building a standalone application), you can obtain
 those files either from npm (see above) or from a CDN, for example [https://unpkg.com/mathlive/](https://unpkg.com/mathlive/)
 
-The `/dist` folder inside the library contains the various flavors of libraries
-and assets required.
-
 The `.mjs` suffix indicates ESM/module versions. The `.min` tag
 indicates a "minified" version. The ones without `.min` are more legible
 and may be useful for debugging.
 
 | File                        | Usage                                                                                                                                                                                                               |
 | :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `dist/fonts`                | The fonts required to render MathLive content                                                                                                                                                                       |
-| `dist/sounds`               | The optional sound files used when typing on the virtual keyboard                                                                                                                                                   |
-| `dist/mathlive.min.mjs`     | MathLive library, as a JavScript module, minified                                                                                                                                                                   |
-| `dist/mathlive.mjs`         | MathLive library, as a JavScript module, not minified, useful for debugging                                                                                                                                         |
-| `dist/mathlive.min.js`      | MathLive library, as a UMD package if your environment doesn't support modules, minified                                                                                                                            |
-| `dist/mathlive.js`          | MathLive library, as a UMD package if your environment doesn't support modules, not minified, useful for debugging                                                                                                  |
-| `dist/mathlive-ssr.min.mjs` | A subset of the MathLive library which can be used on the server side or in environments that do not have a DOM. Does not include the MathfieldElement, but does include functions such as `convertLatexToMarkup()` |
-| `dist/mathlive-static.css`  | A stylesheet which can be used when the MathLive library is not loaded to display markup that has been rendered by the MathLive library previously. Rarely needed.                                                  |
-| `dist/types`                | The TypeScript declaration files. Not needed at runtime.                                                                                                                                                            |
+| `./fonts/`                | The fonts required to render MathLive content                                                                                                                                                                       |
+| `./sounds/`               | The optional sound files used when typing on the virtual keyboard                                                                                                                                                   |
+| `./mathlive.min.mjs`     | MathLive library, as a JavScript module, minified                                                                                                                                                                   |
+| `./mathlive.mjs`         | MathLive library, as a JavScript module, not minified, useful for debugging                                                                                                                                         |
+| `./mathlive.min.js`      | MathLive library, as a UMD package if your environment doesn't support modules, minified                                                                                                                            |
+| `./mathlive.js`          | MathLive library, as a UMD package if your environment doesn't support modules, not minified, useful for debugging                                                                                                  |
+| `./mathlive-ssr.min.mjs` | A subset of the MathLive library which can be used on the server side or in environments that do not have a DOM. Does not include the MathfieldElement, but does include functions such as `convertLatexToMarkup()` |
+| `./mathlive-static.css`  | A stylesheet which can be used when the MathLive library is not loaded to display markup that has been rendered by the MathLive library previously. Rarely needed.                                                  |
+| `./types/`                | The TypeScript declaration files. Not needed at runtime.                                                                                                                                                            |
 
 Controlling the Location of the `fonts` Folder
 
@@ -197,7 +194,7 @@ can modify the names of the files containting assets, including a hash string
 in order to provide more control of the caching of those assets.
 
 In this case, you should include the stylesheet `mathlive-fonts.css` to your
-project. You can find this stylesheet in the `dist` folder on GitHub or in the
+project. You can find this stylesheet in the
 `mathlive` folder in your `node_modules` directory.
 
 If you import this stylesheet, use `import mathliveStyle from "mathlive/fonts.css"`
@@ -277,7 +274,7 @@ fonts will be injected in the current page.
 save the output or return it from a server-side process.
 
 To correctly display this markup, import the stylesheet with
-`import "mathlive/static.css"`. The stylesheet can be found in `dist/mathlive-static.css`.
+`import "mathlive/static.css"`.
 
 When using this method, the MathLive library is not necessary to render the
 formula once the markup has been generated.
@@ -287,7 +284,7 @@ formula once the markup has been generated.
 <head>
   <link
     rel="stylesheet"
-    href="https://unpkg.com/mathlive/dist/mathlive-static.css"
+    href="https://unpkg.com/mathlive/mathlive-static.css"
   />
 </head>
 <html>
