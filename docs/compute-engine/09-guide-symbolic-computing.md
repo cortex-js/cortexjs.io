@@ -180,13 +180,12 @@ console.log('isEqual?', a.isEqual(b));
 |                                          |                                        |
 | :--------------------------------------- | :------------------------------------- |
 | `lhs === rhs`                            | If true, same box expression instances |
-| `lhs.value === rhs.value`                | Equivalent to `lhs.N().isEqual(rhs.N())` |
 | `lhs.isSame(rhs)`                        | Structural equality                    |
 | `lhs.isEqual(rhs)`                       | Mathematical equality                  |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
-| `lhs.is(rhs)`                            | Synonym for `isSame()`                 |
-| `ce.box(["Equal", lhs, rhs]).evaluate()` | Synonym for `isEqual()`                |
-| `ce.box(["Same", lhs, rhs]).evaluate()`  | Synonym for `isSame()`                 |
+| `lhs.is(rhs)`                            | Synonym for `lhs.isSame(rhs)`, but the argument of `is()` can be a boolean or number.                 |
+| `ce.box(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
+| `ce.box(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)`                 |
 
 </div>
 

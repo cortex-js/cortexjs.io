@@ -242,7 +242,7 @@ ce.assign("double",ce.parse("x \\mapsto 2x"));
 **To overload a function**, use the `ce.lookupFunction()` and  `ce.define()` methods.
 
 For example, to overload the `Sqrt` function to return `NaN` for
-non-real numbers, you can use the following code:
+non-real numbers, use the following code:
 
 ```js
 const originalSqrtDefinition = ce.lookupFunction('Sqrt')!;

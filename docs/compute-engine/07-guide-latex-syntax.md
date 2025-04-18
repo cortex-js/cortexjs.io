@@ -505,12 +505,45 @@ console.log(ce.parse('\\smoll{1}{5}').json);
 // both arguments are integers.
 // ➔ ["Rational", 1, 5]
 ```
+
+
+**To override an existing entry**, create a new array that includes the
+default entries and add your own entry at the end of the array.
+
+Entries at the end of the array will override earlier entries. When parsing
+an expression, the first entry (starting at the bottom) whose trigger
+matches is selected.
+
+```
+ce.latexDictionary = [
+  ...ce.latexDictionary,
+  // The entry below will override the default entry for the `\times` command
+  {
+    latexTrigger: ['\\times'],
+    name: 'CrossProduct',
+    kind: 'infix',
+    associativity: 'none'
+    precedence: 390,
+  },
+];
+```
+
 :::caution
-Do not modify the `ce.latexDictionary` array directly. Instead, create a new
-array that includes the entries from the default dictionary, and add your own
+Do not modify the `ce.latexDictionary` array, or the entries in the array, 
+directly. Instead, create a new array that includes the entries from the \
+default dictionary, and add your own
 entries. Later entries will override earlier ones, so you can replace or
 modify existing entries by providing a new definition for them.
 :::
+
+The `precedence` property is used to determine the order of operations when parsing
+expressions, but it does not impact whether an entry is used for parsing. Only the 
+`latexTrigger` or `identifierTrigger` properties are used to determine if an entry
+is used for parsing.
+
+Note that `latexTrigger` can be an array of tokens. However, the tokens
+are not interpreted as alternatives. The array is treated as a sequence of tokens
+that must be matched in order.
 
 ### LaTeX Dictionary Entries
 

@@ -10,8 +10,17 @@ Let's add an editable mathfield to a web page.
 **1. Load the Mathfield library from a CDN with a `<script>` tag.**
 
 ```html
-<script defer src="//unpkg.com/mathlive"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 ```
+
+
+Alternatively, you can use the **unpkg** CDN to load the module:
+
+```html
+<script defer src="https://unpkg.com/mathlive"></script>
+```
+
+
 
 **2. Add a `<math-field>` tag.** The content of this tag is the initial value 
 of the mathfield, as a LaTeX expression.
@@ -63,7 +72,7 @@ Here's a complete web page using a `<math-field>` in vanilla HTML:
 <head>
   <meta charset="utf-8" />
   <title>untitled</title>
-  <script defer src="//unpkg.com/mathlive"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathlive"></script>
 </head>
 
 <body>
@@ -85,7 +94,7 @@ Here's a complete web page using a `<math-field>` in vanilla HTML:
 **To use mathfields in a React project**, use a `<math-field>` tag with JSX:
 
 ```js
-import "//unpkg.com/mathlive";
+import "https://esm.run/mathlive";
 import { useState } from "react";
 
 export View = () => {

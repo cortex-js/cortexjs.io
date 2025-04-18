@@ -300,28 +300,27 @@ function itself is pure, and all its arguments are pure as well.
 
 ## Checking the Kind of Expression
 
-To identify if an expression is a number, symbol, function or string
-use the following boolean expressions:
+To identify if an expression is a number literal, symbol, function expression 
+or string use the following boolean expressions:
 
 <div className="symbols-table first-column-header">
 
-| Kind           | Boolean Expression                                     |
-| :------------- | :----------------------------------------------------- |
-| **Number**     | `expr.isNumberLiteral`                           |
-| **Symbol**     | `expr.symbol !== null` |
-| **Function**   | `expr.ops !== null`                                    |
-| **String**     | `expr.string !== null`  |
+| Kind           | Boolean Expression                  |
+| :------------- | :---------------------------------- |
+| **Number**     | `expr.isNumberLiteral`              |
+| **Symbol**     | `expr.symbol !== null`              |
+| **Function**   | `expr.isFunctionExpression`         |
+| **String**     | `expr.string !== null`              |
 
 </div>
 
-The value of `expr.numericValue` may be:
-
-- `typeof expr.numericValue === "number"`: the expression is a JavaScript number
-- otherwise, the property is a `NumericValue` object.
-
 **To access a the value of an expression as a JavaScript primitive**, use
 `expr.value`. The result is a JavaScript primitive, such as a number, string or
-boolean.
+boolean. When converting to a number, the result may have lost precision if the
+original expression had more than 15 digits of precision. Note that `expr.value`
+is equivalent to `expr.valueOf()`.
+
+
 
 **To access the value of an expression as a JavaScript number**, use
 `expr.re`. The result is the real part of the number, as a JavaScript number, 

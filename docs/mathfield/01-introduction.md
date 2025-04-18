@@ -6,6 +6,7 @@ hide_title: true
 ---
 
 
+
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" className="svg-settings">
   <defs>
     <linearGradient id="orange-gradient">
@@ -36,6 +37,8 @@ hide_title: true
     </linearGradient>
   </defs>
 </svg>
+
+
 
 
 
@@ -492,12 +495,19 @@ div.figure {
 
 `}</style>
 
+<HeroImage path="/img/hand-slugs.jpg" >
+# Mathfield
+</HeroImage>
+
+
 <div className="intro-copy">
   <p className="p1"><kbd>&lt;math-field&gt;</kbd></p>
   <p className="p2">The Math Editor for the Web</p>
   <hr/>
   <p className="p3">A flexible, powerful, and accessible way to write math on the web.</p>
   <hr/>
+
+
 
 <div>
   ```live

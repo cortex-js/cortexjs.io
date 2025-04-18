@@ -7,7 +7,8 @@ export default function ({
   imageStyle,
   backgroundStyle,
 }) {
-  return (
+  return (<>
+    <div className={styles.heroText}>{children}</div>
     <div
       className={styles.heroContainer}
       style={{
@@ -16,8 +17,8 @@ export default function ({
         ...(backgroundStyle ?? {}),
       }}
     >
-      <div className={styles.heroText}>{children}</div>
       <div className={styles.heroImage} style={imageStyle}></div>
     </div>
+    </>  
   );
 }

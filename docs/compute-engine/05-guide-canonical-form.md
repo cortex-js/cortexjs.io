@@ -223,29 +223,18 @@ canonical form that is closer to the user input.
 **To get the non-canonical form**, use `ce.box(expr, { canonical: false })` or
 `ce.parse(s, { canonical: false })`.
 
-```js example
-const expr = ce.parse("2(0+x\\times x-1)", {canonical: false});
-console.log(expr.json);
-// ➔ ["InvisibleOperator", 
-//      2,
-//      ["Delimiter",
-//        ["Sequence", ["Add", 0, ["Subtract", ["Multiply","x","x"],1]]]
-//      ]
-//   ]
+```live
+console.log(ce.parse("2(0+x\\times x-1)", {canonical: false}).json);
 ```
 
 **To get the full canonical form**, use `ce.box(expr, { canonical: true })` or
 `ce.parse(s, { canonical: true })`. The `canonical` option can be omitted
 as it is `true` by default.
 
-```js example
-const expr = ce.parse("2(0+x\\times x-1)", 
-  {canonical: true}
-).print();
-// ➔ ["Multiply", 2, ["Subtract", ["Square", "x"], 1]]
+```live
+console.log(ce.parse("2(0+x\\times x-1)", {canonical: true}).json);
 
-const expr = ce.parse("2(0+x\\times x-1)").print();
-// ➔ ["Multiply", 2, ["Subtract", ["Square", "x"], 1]]
+console.log(ce.parse("2(0+x\\times x-1)").json);
 ```
 
 **To get a custom canonical form of an expression**, use the
@@ -257,12 +246,10 @@ and `ce.parse()`.
 
 **To order the arguments in a canonical order**, use `ce.box(expr, { canonical: "Order" })` or `ce.parse(s, { canonical: "Order" })`.
 
-```js example
-const expr = ce.parse("0+1+x+2+\\sqrt{5}", 
+```live
+ce.parse("0+1+x+2+\\sqrt{5}", 
   {canonical: "Order"}
-);
-expr.print();
-// ➔ ["Add", ["Sqrt", 5], "x", 0, 1, 2]
+).print();
 ```
 
 Note in particular that the `0` is preserved in the expression, which is not
@@ -274,17 +261,14 @@ expression. See the documentation of
 
 For example:
 
-```js example
-const latex = "2(0+x\\times x-1)";
+```live
+const latex = "3(2+x)";
 ce.parse(latex, {canonical: false}).print();
-// -> ["InvisibleOperator",2,["Delimiter",["Sequence",["Add",0,["Subtract",["Multiply","x","x"],1]]]]]
 
 ce.parse(latex, {canonical: ["InvisibleOperator"]}).print();
-// -> ["Multiply",2,["Add",0,["Subtract",["Multiply","x","x"],1]]]
 
 ce.parse(latex, 
   {canonical: ["InvisibleOperator", "Add", "Order", ]}
-);
-// -> ["Multiply",2,["Subtract",["Multiply","x","x"],1]]
+).print();
 ```
 

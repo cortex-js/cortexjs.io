@@ -6,7 +6,7 @@ sidebar:
 - nav: "universal"
 head:
 stylesheets:
-- https://unpkg.com/mathlive/mathlive-static.css
+- https://cdn.jsdelivr.net/npm/mathlive/mathlive-static.css
 ---
 
 <style>
@@ -134,7 +134,7 @@ f(x)=\sqrt{\frac{1}{x}}</textarea>
 
 <script type="module">
   // import { convertLatexToMarkup } from '/dist/mathlive.mjs';
-  import { convertLatexToMarkup } from "https://unpkg.com/mathlive?module";
+  import { convertLatexToMarkup } from "https://esm.run/mathlive";
   import * as htmlToImage from "/assets/js/html-to-image.mjs";
 
   const mf = document.getElementById("mf");

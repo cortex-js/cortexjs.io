@@ -81,11 +81,6 @@ console.log(expr.N().value);
 // ➔ 0.5833333333333334
 ```
 
-Unlike the `.re` property, the `.value` property can also return a `boolean`,
-a `string`, depending on the value of the expression.
-
-
-
 The `value` property of a boxed expression can be used in JavaScript
 expressions.
 
@@ -94,11 +89,17 @@ const expr = ce.parse('1/3 + 1/4');
 console.log(expr.N().value + 1);
 ```
 
+
+Unlike the `.re` property, the `.value` property can also return a `boolean`
+or a `string`, depending on the value of the expression.
+
+
+
 **To get a boxed number from a JavaScript number**, use `ce.box()` or `ce.number()`.
 
 ```live
 const boxed = ce.box(1.5);
-console.log(boxed.N().value);
+console.log(boxed.value);
 ```
 
 
@@ -221,7 +222,7 @@ of variables. `ce.assign()` changes the value associated with one or more
 variables in the current scope.
 
 ```live
-const expr = ce.parse('3x^2+4x+2');
+const expr = ce.parse("3x^2+4x+2");
 
 for (let x = 0; x < 1; x += 0.01) {
   ce.assign('x', x);
@@ -233,7 +234,7 @@ You can also use `expr.subs()`, but this will create a brand new expression on
 each iteration, and will be much slower.
 
 ```live
-const expr = ce.parse('3x^2+4x+2');
+const expr = ce.parse("3x^2+4x+2");
 
 for (let x = 0; x < 1; x += 0.01) {
   console.log(`f(${x}) = ${expr.subs({ x }).evaluate()}`);
@@ -245,16 +246,16 @@ for (let x = 0; x < 1; x += 0.01) {
 ```live
 ce.assign("x", null);
 
-console.log(ce.parse('3x^2+4x+2').N());
+console.log(ce.parse("3x^2+4x+2").N());
 // ➔ "3x^2+4x+c"
 ```
 
 **To change the value of a variable** set its `value` property:
 
 ```ts
-ce.symbol('x').value = 5;
+ce.symbol("x").value = 5;
 
-ce.symbol('x').value = undefined;
+ce.symbol("x").value = undefined;
 ```
 
 

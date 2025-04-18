@@ -18,7 +18,7 @@ A mathfield behaves as a regular DOM element:
 **To use a mathfield with React**, import the MathLive library and use a `<math-field>` tag.
 
 ```jsx
-import "//unpkg.com/mathlive";
+import "https://esm.run/mathlive";
 import { useState } from "react";
 
 export default function App() {
@@ -54,7 +54,7 @@ declare global {
 }
 
 
-import "//unpkg.com/mathlive";
+import "https://esm.run/mathlive";
 import { useState } from "react";
 
 export default function App({children}) {
@@ -103,7 +103,7 @@ etc...). See [MathfieldElement](/docs/mathfield/#(MathfieldElement%3Aclass)).
 
 ```jsx
 import "./App.css";
-import "//unpkg.com/mathlive";
+import "https://esm.run/mathlive";
 import { useState, useEffect, useRef } from "react";
 
 export default function App({children}) {

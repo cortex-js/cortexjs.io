@@ -23,16 +23,12 @@ to use mathfield APIs in your project.
 
 1. Include a `<script>` tag, with a `type="module"` attribute
 2. In the body of this `<script>` tag, use an `import` directive pointing to a
-   CDN URL for MathLive, such as `//unpkg.com/mathlive?module`. If your
+   CDN URL for MathLive, such as `https://esm.run/mathlive`. If your
    target browser supports it, you can also use the `import()` function for a
    dynamic import.
 
-:::info[Note]
-The `?module` suffix indicates to the CDN we need the ESM (module) version of
-MathLive, not the UMD version.
-:::
 
-1. Invoke a mathfield API, such as `renderMathInDocument()`.
+3. Invoke a mathfield API, such as `renderMathInDocument()`.
 
 With this setup one or more stylesheets will be dynamically inserted in
 the page, as needed, for example when a mathfield is created. The required 
@@ -45,7 +41,7 @@ fonts will be automatically downloaded from the CDN as well.
     <p>$$\frac{\pi}{2}$$</p>
     <script type="module">
       window.addEventListener("DOMContentLoaded", () =>
-        import("//unpkg.com/mathlive?module").then((mathlive) =>
+        import("https://esm.run/mathlive").then((mathlive) =>
           mathlive.renderMathInDocument(),
         ),
       );
@@ -116,7 +112,7 @@ A few things to note:
 <html>
   <body>
     <p>$$\frac{\pi}{2}$$</p>
-    <script src="https://unpkg.com/mathlive"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathlive"></script>
     <script>
       window.addEventListener("DOMContentLoaded", () =>
         MathLive.renderMathInDocument(),
@@ -138,7 +134,7 @@ console.log(MathfieldElement.version);
 
 If you need to incorporate the library files directly into your project
 (for example if you are building a standalone application), you can obtain
-those files either from npm (see above) or from a CDN, for example [https://unpkg.com/mathlive/](https://unpkg.com/mathlive/)
+those files directly from npm (see above).
 
 The `.mjs` suffix indicates ESM/module versions. The `.min` tag
 indicates a "minified" version. The ones without `.min` are more legible
@@ -284,7 +280,7 @@ formula once the markup has been generated.
 <head>
   <link
     rel="stylesheet"
-    href="https://unpkg.com/mathlive/mathlive-static.css"
+    href="https://cdn.jsdelivr.net/npm/mathlive/mathlive-static.css"
   />
 </head>
 <html>
@@ -292,7 +288,7 @@ formula once the markup has been generated.
     <div id="formula"></div>
     <script type="module">
       window.addEventListener("DOMContentLoaded", () =>
-        import("https://unpkg.com/mathlive?module").then((mathlive) => {
+        import("https://esm.run/mathlive").then((mathlive) => {
           document.getElementById("formula").innerHTML =
             mathlive.convertLatexToMarkup(
               `\\xrightarrow[\\Delta]{\\text{abcd}}`,

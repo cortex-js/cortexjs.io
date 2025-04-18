@@ -76,7 +76,7 @@ end of your document, or in a `DOMContentLoaded` event handler.
 ```html
 <script defer type="module">
   window.addEventListener('DOMContentLoaded', () => 
-    import('//unpkg.com/mathlive?module').then((mathlive) => 
+    import('https://esm.run/mathlive').then((mathlive) => 
       mathlive.renderMathInDocument()
     )
   );

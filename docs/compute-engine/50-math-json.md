@@ -20,7 +20,7 @@ export function setupComputeEngine() {
   const [value, setValue] = useState(children);
   const [json, setJson] = useState({});
   window.ce = new ComputeEngine.ComputeEngine();
-    setJson(window.ce?.parse(value).json);
+  setJson(window.ce?.parse(value).json);
 }
 export function MathJSONOutput({children}) {
   const [value, setValue] = useState(children);
@@ -42,12 +42,12 @@ export function MathJSONOutput({children}) {
 }
 
 
-<HeroImage path="/img/hero/math-json.jpg" >
+<HeroImage path="/img/hand-cube.jpg" >
 # MathJSON
 </HeroImage>
 
 <Intro>
-MathJSON: a lightweight data interchange format for mathematical notation.
+A lightweight data interchange format for mathematical notation.
 </Intro>
 
 <div className="symbols-table">

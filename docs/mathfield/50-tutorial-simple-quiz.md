@@ -29,8 +29,8 @@ Let's start by setting up our HTML file.
 </body>
 <script type="module">
   // Import the Mathfield and Compute Engine libraries
-  import "//unpkg.com/mathlive?module";
-  import "//unpkg.com/@cortex-js/compute-engine";
+  import "https://esm.run/mathlive";
+  import "https://esm.run/@cortex-js/compute-engine";
   
   // JavaScript code will be added here
 
@@ -39,7 +39,7 @@ Let's start by setting up our HTML file.
 ```
 
 For convenience, we're loading the MathLive and ComputeEngine library from 
-the **unpkg** CDN. You can also download the libraries and host them locally.
+the **jsdelivr** CDN. You can also download the libraries and host them locally.
 
 Since we want to use the Compute Engine, we'll need to load its library as well.
 We could use MathLive without the Compute Engine, but we'll need it to evaluate
@@ -235,7 +235,7 @@ We also need to load a CSS stylesheet to render the math. We can use the
 ```html
 <link
   rel="stylesheet"
-  href="https://unpkg.com/mathlive/mathlive-static.css"
+  href="https://cdn.jsdelivr.net/npm/mathlive/mathlive-static.css"
 />
 ```
 
@@ -263,7 +263,7 @@ math in the page.
 Note that we need to modify our `import` statement to import the `convertLatexToMarkup()` function.
 
 ```javascript
-import { renderMathInElement, convertLatexToMarkup } from "//unpkg.com/mathlive?module";
+import { renderMathInElement, convertLatexToMarkup } from "https://esm.run/mathlive";
 ```
 
 
@@ -318,7 +318,7 @@ Here's the complete code for our quiz application:
     <title>Math Quiz</title>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/mathlive/mathlive-static.css"
+      href="https://cdn.jsdelivr.net/npm/mathlive/mathlive-static.css"
     />
     <style>
       math-field {
@@ -359,8 +359,8 @@ Here's the complete code for our quiz application:
     <div id="feedback"></div>
 </body>
 <script type="module">
-  import { convertLatexToMarkup } from "//unpkg.com/mathlive?module";
-  import "//unpkg.com/@cortex-js/compute-engine";
+  import { convertLatexToMarkup } from "https://esm.run/mathlive";
+  import "https://esm.run/@cortex-js/compute-engine";
   const ce = MathfieldElement.computeEngine;
   const question = generateRandomQuestion();
   const expectedAnswer = question.simplify();

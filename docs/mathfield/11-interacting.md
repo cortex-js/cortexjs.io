@@ -113,7 +113,7 @@ The [MathJSON](/math-json) format is a lightweight mathematical notation interch
 The Compute Engine is a JavaScript library that can perform
 mathematical operations on MathJSON expressions.
 
-**To use the Compute Engine**, import the Compute Engine library, e.g. `import "https://unpkg.com/@cortex-js/compute-engine?module"` 
+**To use the Compute Engine**, import the Compute Engine library, e.g. `import "https://esm.run/@cortex-js/compute-engine"` 
 
 
 If the Compute Engine has been loaded in the page, mathfields will automatically

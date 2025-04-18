@@ -6,19 +6,6 @@ date: Last Modified
 toc: true
 ---
 
-<script type="module">{`
-  window.addEventListener("DOMContentLoaded", () => 
-    import("//unpkg.com/@cortex-js/compute-engine?module").then((ComputeEngine) => {
-      globalThis.ce = new ComputeEngine.ComputeEngine();
-      const playgrounds = [...document.querySelectorAll("code-playground")];
-      for (const playground of playgrounds) {
-        playground.autorun = 1000; // delay in ms
-        playground.run();
-      }
-    })
-);
-`}</script>
-
 
 <Intro>
 A **symbol** is an identifier representing a named mathematical object. It 

@@ -8,12 +8,12 @@ description: The Compute Engine is a JavaScript/TypeScript library for symbolic 
 sidebar_class_name: "compass-icon"
 ---
 
-<HeroImage path="/img/hero/compute-engine.jpg" >
+<HeroImage path="/img/hand-gears.jpg" >
 # Compute Engine
 </HeroImage>
 
 <Intro>
-The **Compute Engine** is a JavaScript/TypeScript library for symbolic
+A JavaScript/TypeScript library for symbolic
 computing and numeric evaluation of mathematical expressions.
 </Intro>
 
@@ -99,8 +99,7 @@ Compute Engine module from a CDN using an `import` statement.
 
 ```html
 <script type="module">
-  import { ComputeEngine } from 
-    "https://unpkg.com/@cortex-js/compute-engine?module";
+  import { ComputeEngine } from "https://esm.run/@cortex-js/compute-engine";
 
   const ce = new ComputeEngine();
   ce.parse("e^{i\\pi}").evaluate().print();
@@ -108,7 +107,15 @@ Compute Engine module from a CDN using an `import` statement.
 </script>
 ```
 
-The ESM (module) version is also available in the npm package in `dist/compute-engine.min.esm.js` 
+Alternatively, you can use the **unpkg** CDN to load the module:
+
+```js
+  import { ComputeEngine } from 
+    "https://unpkg.com/@cortex-js/compute-engine?module";
+```
+
+
+The ESM (module) version is also available in the npm package in `/compute-engine.min.esm.js` 
 
 
 ### Using Vintage JavaScript
@@ -121,11 +128,11 @@ version by using a `<script>` tag.
 For example, WebPack 4 does not support the optional chaining operator, using 
 the UMD version will make use of polyfills as necessary.
 
-The UMD version is also available in the npm package in `dist/compute-engine.min.js` 
+The UMD version is also available in the npm package in `/compute-engine.min.js` 
 
 
 ```html
-<script src="//unpkg.com/@cortex-js/compute-engine"></script>
+<script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.js"></script>
 <script>
   window.onload = function() {
     const ce = new ComputeEngine.ComputeEngine();
@@ -135,10 +142,17 @@ The UMD version is also available in the npm package in `dist/compute-engine.min
 </script>
 ```
 
+Alternatively, you can use the **unpkg** CDN to load the module:
+
+```html
+<script src="//unpkg.com/@cortex-js/compute-engine"></script>
+```
+
+
 ### Other Versions
 
 A non-minified module which may be useful for debugging is available in
-the npm package as `dist/compute-engine.esm.js`.
+the npm package as `/compute-engine.esm.js`.
 
 ## MathJSON Standard Library
 

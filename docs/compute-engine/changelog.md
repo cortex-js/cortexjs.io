@@ -10,6 +10,26 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Breaking Changes
+
+- The `expr.value` property is now equivalent to `expr.valueOf()`. It was
+  previously equivalent to `expr.N().valueOf()`, however the implicit evaluation
+  of the expression produced some unexpected results, for example when the
+  expression was not pure.
+
+### New Features and Improvements
+
+- Added a rule to solve the equation `a^x + b = 0`
+- The LaTeX parser now supports the `\placeholder[]{}`, `\phantom{}`,
+  `\hphantom{}`, `\vphantom{}`, `\mathstrut`, `\strut` and `\smash{}` commands.
+
+## 0.29.1 _2025-03-31_
+
+- **#231** During evaluation, some numbers, for example `10e-15` were
+  incorrectly rounded to 0.
+
 ## 0.28.0 _2025-02-06_
 
 ### Issues Resolved
@@ -2007,7 +2027,8 @@ Work around unpckg.com issue with libraries using BigInt.
 
 Read more at
 [Core Reference](https://cortexjs.io/compute-engine/reference/core/) and
-[Arithmetic Reference] (https://cortexjs.io/compute-engine/reference/arithmetic/)
+[Arithmetic Reference]
+(https://cortexjs.io/compute-engine/reference/arithmetic/)
 
 ### Bugs Fixed
 
