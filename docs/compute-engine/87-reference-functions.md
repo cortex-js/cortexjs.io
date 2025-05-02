@@ -5,7 +5,7 @@ slug: /compute-engine/reference/functions/
 
 <Intro>
 The Compute Engine Standard Library includes many built-in functions such as
-`Add`, `Sin`, `Power`, etc...
+`Add`, `Sin`, `Power`, but you can also define your own functions.
 </Intro>
 
 The standard library can be extended with your own functions.
@@ -14,24 +14,36 @@ The standard library can be extended with your own functions.
 Read more about adding new definitions to the Compute Engine.
 </ReadMore>
 
-## Anonymous Functions
 
-A function that is not bound to an identifier is called an **anonymous
-function**.
+<div className="symbols-table" style={{"--first-col-width":"23ch"}}>
 
-Anonymous functions are frequently used as arguments to other functions.
 
-In the example below, the `["Function"]` expression is an anonymous function
-that is passed as an argument to the `["Sum"]` function.
+| **Term**                    | **Definition** |
+| :-----------------------------| :----------------|
+| **Function Expression**     | An expression representing a **function application**, e.g. `["Add", 1, 2]`, where a function is called with arguments. |
+| **Function Signature**      | A type describing the function's inputs and outputs, e.g. `(real, integer) -> boolean` |
+| **Function Literal**        | A first-class function value, defined using a construct like `["Function", body, params...]`, which may or may not capture variables from its lexical scope. |
+| **Shorthand Function Literal** | A compact way to write a function literal using placeholders (e.g. `_`) instead of explicitly listing parameters, e.g. `["Add", "_", 1]` desugared to `["Function", ["Add", "_", 1], "_"]`. |
+| **Closure**                 | A function literal that *captures* one or more free variables from its defining lexical scope, preserving their values at the time of definition. |
+| **Anonymous Function**      | A function that is not bound to an identifier, often used as an argument to other functions. |
 
-The first argument of the `["Function"]` expression is the body of the function,
-the remaining arguments are the name of the parameters of the function.
+</div>
+
+
+
+## Function Literals
+
+A **function literal** is a first-class function value, defined using a
+`["Function"]` expression. It can be passed as an argument to other functions, 
+returned from a function, or assigned to a variable.
+
+The `["Function"]` expression takes a body and a list of parameters.
 
 ```json example
 ["Sum", ["Function", ["Multiply", "x", 2], "x"]]
 ```
 
-To specify an anonymous function with LaTeX use the `\mapsto` command:
+To specify a function literal with LaTeX use the `\mapsto` command:
 
 <Latex value=" x \mapsto 2x"/>
 
@@ -46,43 +58,72 @@ To specify an anonymous function with LaTeX use the `\mapsto` command:
 ```
 
 <ReadMore path="/compute-engine/reference/control-structures/" >The examples in
-this section define functions as a simple expression, but functions can include
-more complex control structures, including blocks, loops and conditionals. Learn
-more about **control structures**. </ReadMore>
+this section define functions as a simple expression, but function literals can
+ include more complex control structures, including blocks, local variables, 
+ loops and conditionals. Learn more about **control structures**. </ReadMore>
 
+## Shorthand Function Literals
 
-## Anonymous Parameters
-
-The parameters of a function can also be anonymous. 
-
-In this case, the parameters are bound to the wildcards `_`, `_1`, `_2`, etc... 
-in the body of the function. The wildcard `_` is a shorthand for `_1`, the 
-first parameter.
-
-In the example below, both the function and its parameters are anonymous.
+A shorthand function literal is a compact way to write a function literal using
+placeholders (e.g. `_`) instead of explicitly listing parameters.
+The shorthand function literal is desugared to a function literal.
 
 ```json example
-["Sum", ["Multiply", "_", 2]]
+["Multiply", "_", 2]
+```
+is desugared to:
+
+```json example
+["Function", ["Multiply", "_", 2], "_"]
 ```
 
-Note that as a shortcut when using anonymous parameters, the `["Function"]`
-expression can be omitted.
+If more than one parameter is used, the placeholders are: `_`, `_2`, `_3`, etc.
 
 
-Anonymous parameters can also be used in LaTeX, but the anonymous parameters
+Placeholder arguments can also be used in LaTeX, but the placeholder arguments
 must be wrapped with an `\operatorname` command except for `\_`.
 
 <Latex value=" () \mapsto \_ + \operatorname{\_2}"/>
 
 ```json example
-["Function", ["Add", "_", "_2"]]
+["Add", "_", "_2"]
+```
+
+A symbol which is the name of an operator is also a valid function literal.
+
+```json example
+["Map", "xs", "Sin"]
+```
+
+
+## Anonymous Functions
+
+A function that is not bound to an identifier is called an **anonymous
+function**.
+
+Anonymous functions are frequently used as arguments to other functions.
+
+In the example below, the second argument of the `["Map"]` function is an
+anonymous function expressed as a function literal that multiplies its argument by `2`.
+
+```json example
+["Map", "xs", ["Function", ["Multiply", "x", 2], "x"]]
+```
+
+The same function can be expressed using a shorthand function literal, which
+uses `_` as a placeholder for the parameter. The shorthand function literal
+is desugared to a function literal.
+
+```json example
+["Map", "xs", ["Multiply", "_", 2]]
 ```
 
 
 
-## Evaluating an Anonymous Function
 
-To apply a function to some arguments, use an `["Apply"]` expression.
+## Evaluating a Function Literal
+
+**To apply a function literal to some arguments** use an `["Apply"]` expression.
 
 ```json example
 ["Apply", ["Function", ["Add", 2, "x"], "x"], 11]
@@ -95,9 +136,8 @@ To apply a function to some arguments, use an `["Apply"]` expression.
 // ➔ 8
 ```
 
-The first argument of `Apply` is an anonymous function, either as an
-identifier, or as a `["Function"]` expression. The rest of the arguments are the
-arguments of the anonymous function.
+The first argument of `Apply` is a function literal. The rest of the arguments are the
+arguments of the function literal.
 
 ## Operating on Functions
 
@@ -109,17 +149,18 @@ arguments of the anonymous function.
 
 Create an
 [anonymous function](https://en.wikipedia.org/wiki/Anonymous_function), also
-called **lambda expression**.
+called a **function literal**.
 
 The `arg-n` arguments are identifiers of the bound variables (parameters) of the
-anonymous function.
+function literal.
 
 :::info[Note]
-All the arguments have the `Hold` attribute set, so they are not evaluated when
-the function is created.
+The `Function` operator has the `lazy` flag set to `true`, which means
+that neither the body nor the parameters are evaluated until the function is
+applied to some arguments.
 :::
 
-The _body_ is a `MathJSON` expression that is evaluated when the function is
+The _body_ is an expression that is evaluated when the function is
 applied to some arguments.
 
 **To apply some arguments to a function expression**, use `["Apply"]`.
@@ -142,12 +183,14 @@ applied to some arguments.
 
 <Signature name="Assign">_id_, _fn_</Signature>
 
-Assign the anonymous function _fn_ to the identifier _id_.
+Assign the function literal _fn_ to the identifier _id_.
 
-The identifier _id_ should either not have been declared yet, or been declared
-as a function.
 
-`Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions).
+`Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions),
+as it changes the state of the Compute Engine.
+
+The _fn_ is a function literal, which can be created using the `["Function"]`
+expression or the shorthand function literal.
 
 <Latex value="\operatorname{double}(x) \coloneq 2x"/>
 
@@ -165,19 +208,10 @@ as a function.
 <Signature name="Apply">_function_, _expr-1_, ..._expr-n_</Signature>
 
 [Apply](https://en.wikipedia.org/wiki/Apply) a list of arguments to a function.
-The _function_ is either an identifier of a function, or a `["Function"]`
-expression.
+The _function_ is a function literal, or an identifier whose value is a function literal.
 
-The following wildcards in _body_ are replaced as indicated
+The _expr-n_ arguments are the arguments of the function literal.
 
-- `_` or `_1` : the first argument
-- `_2` : the second argument
-- `_3` : the third argument, etc...
-- `__`: the sequence of arguments, so `["Length", "__"]` is the number of
-  arguments
-
-If _body_ is a `["Function"]` expression, the named arguments of `["Function"]`
-are replaced by the wildcards.
 
 ```json example
 ["Apply", ["Multiply", "_", "_"], 3]
@@ -187,7 +221,7 @@ are replaced by the wildcards.
 // ➔ 9
 ```
 
-The `\lhd` and `\rhd` operators can be used to apply a function to a single
+With LaTeX, the `\lhd` and `\rhd` commands can be used to apply a function to a single
 argument on the left or right respectively.
 
 <Latex value="f\lhd g \lhd x"/>
@@ -196,8 +230,6 @@ argument on the left or right respectively.
 ```json example
 ["Apply", "f", ["Apply", "g", "x"]]
 ```
-
-
 
 </FunctionDefinition>
 

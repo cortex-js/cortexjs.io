@@ -22,7 +22,7 @@ symbol will be inferred based on its usage or its value.
 ```live show-line-numbers
 const n = ce.box("n");
 n.value = 5;
-console.log("n =", n.value, ":", n.type);
+console.log("n =", n.value.toString(), ":", n.type);
 ```
 
 **To get a list of all the symbols in an expression** use `expr.symbols`.
@@ -35,7 +35,7 @@ Read more about **adding definitions** for symbols and functions<Icon name="chev
 
 Symbols are defined within a **scope**.
 
-<ReadMore path="/compute-engine/guides/evaluate/#scopes" >
+<ReadMore path="/compute-engine/guides/evaluate/#lexical-scopes-and-evaluation-contexts" >
 Read more about **scopes**<Icon name="chevron-right-bold" /> 
 </ReadMore>
 

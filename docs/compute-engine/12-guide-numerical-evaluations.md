@@ -73,21 +73,20 @@ console.log(expr.N().re);
 ```
 
 Another way to obtain a JavaScript compatible representation of an expression
-is to use the `value` property of the boxed expression.
+is to use the `valueOf()` method of the boxed expression.
 
 ```js
 const expr = ce.parse('1/3 + 1/4');
-console.log(expr.N().value);
+console.log(expr.N().valueOf());
 // ➔ 0.5833333333333334
 ```
 
-The `value` property of a boxed expression can be used in JavaScript
+The `valueOf()` property of a boxed expression can be used in JavaScript
 expressions.
 
 ```live
 const expr = ce.parse('1/3 + 1/4');
-console.log(expr.N().value + 1);
-```
+console.log(expr.N().valueOf() + 1);
 
 
 Unlike the `.re` property, the `.value` property can also return a `boolean`
@@ -99,7 +98,7 @@ or a `string`, depending on the value of the expression.
 
 ```live
 const boxed = ce.box(1.5);
-console.log(boxed.value);
+console.log(boxed.valueOf());
 ```
 
 

@@ -13,15 +13,15 @@ sidebar_class_name: "compass-icon"
 </HeroImage>
 
 <Intro>
-A JavaScript/TypeScript library for symbolic
-computing and numeric evaluation of mathematical expressions.
+A JavaScript library for symbolic computing and numeric evaluation of 
+mathematical expressions.
 </Intro>
 
 
 
 :::info[Note]
-To use the Compute Engine, you must write JavaScript or TypeScript code. This 
-guide assumes familiarity with one of these programming languages.
+To use Compute Engine, you must write JavaScript or TypeScript code. 
+This guide assumes you’re familiar with these languages.
 :::
 
 <div style={{height:"1rem"}}></div>
@@ -43,17 +43,17 @@ console.log(lhs, lhs.isEqual(rhs) ? "=" : "≠", rhs);
 ```
 
 
-The **Compute Engine** is for educators, students, scientists and engineers 
-who need to make technical computing apps running in the browser or in
-server-side JavaScript environments such as Node.
+The **Compute Engine** is for educators, students, scientists, and engineers 
+who need to run technical computing apps in browsers or server-side 
+JavaScript environments like Node.js.
 
 
 
 
 The Compute Engine manipulates math expressions represented with 
-the <a href="math-json/">MathJSON format</a>:
+the <a href="math-json/">MathJSON format</a>.
 
-For example, the expression \\(x^2 + 2x + 1\\) is represented as:
+The expression \\(x^2 + 2x + 1\\) is represented in MathJSON as:
 
 ```json
 ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]
@@ -61,25 +61,14 @@ For example, the expression \\(x^2 + 2x + 1\\) is represented as:
 
 
 The Compute Engine can:
-- <a href="/compute-engine/guides/latex-syntax/">**parse** and **serialize**</a> expressions from and to LaTeX
-- <a href="/compute-engine/guides/simplify/">**simplify**</a> expressions
+- <a href="/compute-engine/guides/latex-syntax/">**parse** and **serialize**</a> expressions from and to LaTeX.
+- <a href="/compute-engine/guides/simplify/">**simplify**</a> symbolic expressions
 - evaluate expression <a href="/compute-engine/guides/evaluate/">**symbolically**</a>
-- evaluate expressions <a href="/compute-engine/guides/numeric-evaluation/">**numerically**</a>
-- <a href="/compute-engine/guides/compiling/">**compile**</a> expressions to JavaScript functions
+  or <a href="/compute-engine/guides/numeric-evaluation/">**numerically**</a>
+- solve equations, calculate derivatives and integrals, and perform other
+  <a href="/compute-engine/reference/calculus/">**calculus**</a> operations
+- <a href="/compute-engine/guides/compiling/">**compile**</a> expressions to JavaScript
 
-
-:::info[Note]
-In this guide, functions such as `ce.box()` and `ce.parse()` require a
-`ComputeEngine` instance which is denoted by the `ce.` prefix.
-
-**To create a new `ComputeEngine` instance:**, use `ce = new ComputeEngine()`
-
-Functions that apply to a boxed expression, such as `expr.simplify()` are denoted with the
-`expr.` prefix.
-
-**To create a new boxed expression:**, use `expr = ce.parse()` or `expr = ce.box()`
-
-:::
 
 
 <ReadMore path="/compute-engine/demo/" >
@@ -94,8 +83,8 @@ from a CDN, then create a `ComputeEngine` instance.
 
 ### Using JavaScript Modules
 
-JavaScript modules are the modern way to load JavaScript code. You can load the
-Compute Engine module from a CDN using an `import` statement.
+**To load the Compute Engine module from the jsdelivr CDN**, use a `<script>` tag with the
+`type="module"` attribute and an `import` statement.
 
 ```html
 <script type="module">
@@ -110,29 +99,29 @@ Compute Engine module from a CDN using an `import` statement.
 Alternatively, you can use the **unpkg** CDN to load the module:
 
 ```js
-  import { ComputeEngine } from 
-    "https://unpkg.com/@cortex-js/compute-engine?module";
+import { ComputeEngine } from 
+  "https://unpkg.com/@cortex-js/compute-engine?module";
 ```
 
 
-The ESM (module) version is also available in the npm package in `/compute-engine.min.esm.js` 
+The ESM (module) version is also available in the npm package as `/compute-engine.min.esm.js` 
 
 
 ### Using Vintage JavaScript
 
 If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version. You can load the UMD
-version by using a `<script>` tag.
-
+modern JavaScript features, use the UMD version. 
 
 For example, WebPack 4 does not support the optional chaining operator, using 
 the UMD version will make use of polyfills as necessary.
 
-The UMD version is also available in the npm package in `/compute-engine.min.js` 
+**To load the UMD version**, use a `<script>` tag with the `src` attribute.
 
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.js"></script>
+<script 
+  src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.js">
+</script>
 <script>
   window.onload = function() {
     const ce = new ComputeEngine.ComputeEngine();
@@ -142,11 +131,14 @@ The UMD version is also available in the npm package in `/compute-engine.min.js`
 </script>
 ```
 
-Alternatively, you can use the **unpkg** CDN to load the module:
+Alternatively, use the **unpkg** CDN to load the library:
 
 ```html
 <script src="//unpkg.com/@cortex-js/compute-engine"></script>
 ```
+
+The UMD version is also available in the npm package in `/compute-engine.min.js` 
+
 
 
 ### Other Versions
@@ -156,7 +148,7 @@ the npm package as `/compute-engine.esm.js`.
 
 ## MathJSON Standard Library
 
-The identifiers in a MathJSON expression are defined in libraries. The 
+The operators in a MathJSON expression are defined in libraries. The 
 **MathJSON Standard Library** is a collection of functions and symbols that are
 available by default to a `ComputeEngine` instance.
 
@@ -179,6 +171,23 @@ available by default to a `ComputeEngine` instance.
 | [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>
+
+
+:::info[Note]
+In this guide, the `ce.` prefix in `ce.box()` or `ce.parse()` indicates
+that the function is a method of the `ComputeEngine` class.
+
+**To create a new `ComputeEngine` instance** use `ce = new ComputeEngine()`
+
+
+The `expr.` prefix in `expr.evaluate()` or `expr.simplify()` indicates that the
+function is a method of the `BoxedExpression` class.
+
+**To create a new boxed expression** use `expr = ce.parse()` or `expr = ce.box()`
+
+:::
+
+
 
 <ReadMore path="/compute-engine/guides/standard-library/" >
 Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold" />

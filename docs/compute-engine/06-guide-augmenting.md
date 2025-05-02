@@ -21,14 +21,14 @@ like to parse to MathJSON. <Icon name="chevron-right-bold" />
 
 ## Introduction
 
-When a new symbol or function is encountered in an expression, the Compute Engine
-will look up its definition in the set of known identifiers, including the Standard 
-Library.
+When an identifier such as a symbol (`Pi`) or an operator (`Sin`) is encountered
+in an expression, the Compute Engine will look up its definition in the set of
+ known identifiers, including the Standard Library.
 
 ### Automatic Declaration
 
 If the identifier is found, the definition associated with it will be
-used to evaluate the expression.
+bound to the identifier and used later to evaluate the expression.
 
 If the identifier is not found, an automatic declaration will be made of the
 identifier as a symbol of type `unknown`, or a more specific type if the
@@ -39,22 +39,21 @@ Learn more about **types**.<Icon name="chevron-right-bold" />
 </ReadMore>
 
 To provide a more explicit definition for the identifier, you can [define it
-using a LaTeX](#definitions-using-latex) expression, or an [explicit declaration](#explicit-declarations) using the `ce.declare()` 
-or `ce.assign()` methods.
+using a LaTeX](#definitions-using-latex) expression, or an [explicit declaration](#explicit-declarations) using the `ce.declare()` method.
 
 ### Declarations are Scoped
 
-The declaration of an identifier is done within a **scope**. A scope is a
-hierarchical collection of definitions.
+The declaration of an identifier is done within a **lexical scope**. A scope 
+is a hierarchical collection of definitions.
 
-<ReadMore path="/compute-engine/guides/evaluate/#scopes" >
+<ReadMore path="/compute-engine/guides/evaluate/#lexical-scopes-and-evaluation-contexts" >
 Read more about **scopes** <Icon name="chevron-right-bold" />
 </ReadMore>
 
 
 ## Definitions Using LaTeX
 
-The simplest way to define a new symbol or function is to use LaTeX. 
+The simplest way to define a new symbol or operator (function) is to use LaTeX. 
 
 For example, to define a new symbol $m$ with a value of $42$, use the
 following LaTeX expression:
@@ -85,7 +84,7 @@ ce.parse("f(3)").evaluate().print();
 // ➔ 6
 ```
 
-**To define multiletter symbols**, use the `\operatorname{}` command:
+**To define multiletter identifiers**, use the `\operatorname{}` command:
 
 ```js
 ce.parse('\\operatorname{double}(x) := 2x').evaluate().print();
@@ -106,15 +105,14 @@ console.info(ce.parse('\\operatorname{double}(3)').json);
 
 ## Explicit Declarations
 
-**To have more control over the definition of a symbol or function**, use
-the `ce.declare()` and `ce.assign()` methods.
+**To have more control over the definition of a symbol or function** use
+the `ce.declare()` method.
 
-When declaring a symbol or function, you can specify the type of the symbol or signature of the function, its
-value or body, and other properties.
+When declaring a symbol or function, you can specify the type of the symbol or signature of the function, its value or body, and other properties.
 
 ```js
 // Declaring a symbol "m"
-ce.declare("m", { type: "integer", value: 42 });
+ce.declare("m",  "integer");
 
 // Declaring a function "f"
 ce.declare("f", {
@@ -123,30 +121,36 @@ ce.declare("f", {
 });
 ```
 
-### Defining a Symbol
+### Declaring a Symbol
 
-**To prevent the value of a symbol from being changed**, set the `constant`
-property to `true`:
-
-```js
-ce.declare("m_e", {
-  value: 9.1e-31,
-  constant: true,
-});
-```
-
-If you do not provide a `type` property for a symbol, the type will be
-inferred from the value of the symbol. If no type and no value are
-provided, the type will be `unknown`.
-
-**To provide the type of the identifier, without associating
-it with a value**, use the following syntax:
+**To declare a symbol** use the `ce.declare()` method with the identifier
+as the first argument and a type as the second argument.
 
 ```js
 ce.declare("n", "integer");
 ```
 
-As a shorthand, a symbol can be declated by assigning it a value using `ce.assign()`:
+<ReadMore path="/compute-engine/guides/types" >The type specifies the 
+valid values of the symbol. For example, `boolean`, `integer`, `rational`, `function`, `string` etc.. Learn more about **types**.<Icon name="chevron-right-bold" /></ReadMore>
+
+Alternatively, you can provide an object literal with the additional properties
+`value`, `type`, `isConstant`, and more.
+
+```js
+ce.declare("m", {
+  type: "integer",
+  value: 42,
+});
+```
+
+
+
+If you do not provide a `type` property for a symbol, the type will be
+inferred from the value of the symbol. If no type and no value are
+provided, the type of the symbol will be `unknown`.
+
+
+As a shorthand, a symbol can be declared by assigning it a value using `ce.assign()`:
 
 ```js
 ce.assign("m", 42);
@@ -158,20 +162,38 @@ If the symbol was not previously defined, this is equivalent to:
 ce.declare("m", { value: 42 });
 ```
 
-Alternatively:
+Alternatively, you can set the value of a symbol using the `value` property:
 
 ```js
 ce.box("m").value = 42;
 ```
 
-### Defining a Function
-
-**To define a function**, associate an `evaluate` handler, which 
-is the body of the function, with the function declaration.
+**To prevent the value of a symbol from being changed**, set the `constant`
+property to `true`:
 
 ```js
-ce.declare("double", { evaluate: ce.parse("x \\mapsto 2x") });
+ce.declare("m_e", {
+  value: 9.1e-31,
+  constant: true,
+});
 ```
+
+
+### Declaring a Function
+
+**To declare a function**, associate an `evaluate` handler, which 
+is the body of the function, with an identifier.
+
+```js
+ce.declare("double", { 
+  evaluate: ce.parse("x \\mapsto 2x") 
+});
+```
+
+:::caution[Caution]
+The first argument of `declare()` is a MathJSON identifier, not a LaTeX command.
+For example, use `double` instead of `\operatorname{double}`.
+:::
 
 The evaluate handler can be either a MathJSON expression as above or 
 a JavaScript function.
@@ -216,11 +238,13 @@ the signature of the function as the second argument of `ce.declare()` or
 use the `"function"` type.
 
 ```js
-ce.declare("double", "function" );
+ce.declare("double", "function");
 ```
 
-Functions that do not have an evaluate handler remain unchanged when
-evaluated.
+
+
+Functions that do not have an evaluate handler or a function literal as a 
+value remain unchanged when evaluated.
 
 You can set the body of the function later using `ce.assign()`:
 
@@ -237,16 +261,20 @@ ce.assign("double",ce.parse("x \\mapsto 2x"));
 ```
 
 
+<ReadMore path="/compute-engine/reference/functions/" >
+Learn more about the standard operator to manipulate **functions**. <Icon name="chevron-right-bold" />
+</ReadMore>
+
 ## Overloading Functions
 
-**To overload a function**, use the `ce.lookupFunction()` and  `ce.define()` methods.
+**To overload a standard function**, use the `ce.declare()` methods.
 
 For example, to overload the `Sqrt` function to return `NaN` for
 non-real numbers, use the following code:
 
 ```js
-const originalSqrtDefinition = ce.lookupFunction('Sqrt')!;
-ce.defineFunction('Sqrt', {
+const originalSqrtDefinition = ce.box('Sqrt').operatorDefinition!;
+ce.declare('Sqrt', {
   ...originalSqrtDefinition,
   evaluate: (x, options) => {
     const y = originalSqrtDefinition.evaluate!(x, options);
@@ -254,6 +282,11 @@ ce.defineFunction('Sqrt', {
   },
 });
 ```
+
+In general, re-declaring a function in the same scope is not allowed and 
+will throw an error. However, the standard functions are in a `system` scope
+so a new declaration in the `global` scope or a child scope will
+override the original declaration.
 
 
 ## Defining Multiple Functions and Symbols
@@ -285,7 +318,7 @@ a dictionary of values.
 ```js
 ce.assign({
   "m": 10,
-  "f(x)": ce.parse("x^2 + x + 41"),
-  "g(t)": ce.parse("t^3 + t^2 + 17"),
+  "f": ce.parse("x \\mapsto x^2 + x + 41"),
+  "g": ce.parse("t \\mapsto t^3 + t^2 + 17"),
 });
 ```

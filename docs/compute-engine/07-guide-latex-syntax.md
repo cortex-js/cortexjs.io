@@ -122,7 +122,7 @@ console.log(ce.box(["Add", ["Power", "x", 3], 2]).latex);
 The LaTeX parsing can be customized by providing a `ParseLatexOptions` object as
 the second argument to the `ce.parse()` function.
 
-### Customizing Parsing of Numbers
+### Customizing the Parsing of Numbers
 
 See the [Number Formatting](#number-formatting) section for details on how to
 customize the parsing of numbers. Most of the same options are available for
@@ -135,6 +135,11 @@ parsing as for serialization.
 | `skipSpace` | If `true`, ignore space characters in a math zone. Default is `true`. |
 | `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: if the number includes repeating digits (e.g. `1.33(333)`), it will be parsed as a decimal number even if this setting is `"rational"`. **Default**: `"auto"`|
 | `preserveLatex` | If `true`, the expression will be decorated with the LaTeX fragments corresponding to each element of the expression. The top-level expression, that is the one returned by `parse()`, will include the verbatim LaTeX input that was parsed. The sub-expressions may contain a slightly different LaTeX, for example with consecutive spaces replaced by one, with comments removed, and with some low-level LaTeX commands replaced, for example `\egroup` and `\bgroup`. **Default:** `false` |
+
+```js
+ce.parse('x + 0.5', { parseNumbers: "rational" }).print();
+// ➔ x + 1/2
+```
 
 #### `getIdentifierType`
 

@@ -25,16 +25,16 @@ repetitive calculations. They also ensure that expressions are valid and in a
 standard format.
 
 Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
-as VSCode Studio, to provide suitable hints in the editor regarding which
-methods and properties are available for a given expression.
+as **VSCode Studio**, to provide hints in the editor regarding the
+methods and properties available for a given expression.
 
-Boxed Expression can be created from a LaTeX string or from a raw MathJSON
+Boxed Expressions can be created from a LaTeX string or from a raw MathJSON
 expression.
 
 ## Boxing
 
-**To create a Boxed Expression from a MathJSON expression**, use the `ce.box()`
-function.
+**To create a `BoxedExpression` from a MathJSON expression** use the `ce.box()`
+method.
 
 The input of `ce.box()` can be:
 - a [MathJSON expression](/math-json/)
@@ -62,7 +62,7 @@ console.log(expr.operator);
 ```
 
 
-**To create a Boxed Expression from a LaTeX string**, call the `ce.parse()`
+**To create a Boxed Expression from a LaTeX string** use the `ce.parse()`
 function.
 
 ```js
@@ -115,7 +115,7 @@ number** check that the GCD of the numerator and denominator is 1.
 const input = ce.parse("\\frac{30}{50}", {canonical: false});
 console.info(ce.box(
   ["GCD", ["NumeratorDenominator", input]]
-).evaluate().value === 1);
+).evaluate().valueOf() === 1);
 // ➔ false
 ```
 
@@ -155,7 +155,7 @@ ce.box(["Divide", 30, -50], { canonical: false });
 // non-canonical form ➔ ["Divide", 30, -50]
 ```
 
-**To obtain the canonical representation of a non-canonical expression**, use
+**To obtain the canonical representation of a non-canonical expression** use
 `expr.canonical`.
 
 A non-canonical expression may include errors as a result of parsing from LaTeX,
@@ -169,7 +169,9 @@ boolean).
 The canonical form of an expression which is not valid will include one or more
 `["Error"]` expressions indicating the nature of the problem.
 
-**To check if an expression contains errors** use `expr.isValid`.
+**To check if an expression contains errors** use `expr.isValid`. The `expr.errors`
+property returns a list of all the `["Error"]` subexpressions.
+
 
 When doing this check on a canonical expression it takes into consideration not
 only possible syntax errors, but also semantic errors (incorrect number or
@@ -180,7 +182,7 @@ type of arguments, etc...).
 
 ## String Representation
 
-The `expr.toString()` method returns a [AsciiMath](https://asciimath.org/) string representation of the expression.
+The `expr.toString()` method returns an [AsciiMath](https://asciimath.org/) string representation of the expression.
 
 ```live
 let expr = ce.parse("3x^2+\\sqrt{2}");
@@ -219,7 +221,7 @@ console.log(expr.latex);
 
 ## Unboxing
 
-**To access the MathJSON expression of a boxed expression as plain JSON**, use
+**To access the MathJSON expression of a boxed expression as plain JSON** use
 the `expr.json` property. This property is an "unboxed" version of the
 expression.
 
@@ -236,7 +238,7 @@ Use this option to control:
 
 - which metadata, if any, should be included
 - whether to use shorthand notation
-- to exclude some functions.
+- to exclude some functions
 
 See [JsonSerializationOptions](/compute-engine/api#jsonserializationoptions)
 for more info about the formatting options available.
@@ -284,55 +286,74 @@ What doesn't change is the fact that `expr` represents the symbol `"n"`.
 
 ## Pure Expressions
 
-A pure expression is an expression whose value is fixed. Evaluating it produces
-no side effect.
+A pure expression is an expression that produces no side effect (doesn't change
+the state of the Compute Engine) and always evaluates to the same value when the same
+arguments are applied to it.
 
-The $ \sin() $ function is pure: it evaluates to the same value when the
+The `Sin` function is pure: it evaluates to the same value when the
 same arguments are applied to it.
 
-On the other hand, the $ \operatorname{Random}() $ function is not pure: by
+On the other hand, the `Random` function is not pure: by
 its nature it evaluates to a different value on every evaluation.
 
 Numbers, symbols and strings are pure. A function expression is pure if the
 function itself is pure, and all its arguments are pure as well.
 
-**To check if an expression is pure**, use `expr.isPure`.
+**To check if an expression is pure** use `expr.isPure`.
 
 ## Checking the Kind of Expression
 
-To identify if an expression is a number literal, symbol, function expression 
-or string use the following boolean expressions:
+To identify if an expression is a number literal, a symbol, a function expression
+or a string use the following boolean expressions:
 
-<div className="symbols-table first-column-header">
+<div className="symbols-table first-column-header" style={{"--first-col-width":"18ch"}}>
 
 | Kind           | Boolean Expression                  |
 | :------------- | :---------------------------------- |
-| **Number**     | `expr.isNumberLiteral`              |
+| **Number Literal**     | `expr.isNumberLiteral`              |
+| **Function Expression**   | `expr.isFunctionExpression`         |
 | **Symbol**     | `expr.symbol !== null`              |
-| **Function**   | `expr.isFunctionExpression`         |
 | **String**     | `expr.string !== null`              |
 
 </div>
 
-**To access a the value of an expression as a JavaScript primitive**, use
-`expr.value`. The result is a JavaScript primitive, such as a number, string or
+
+## Accessing the Value of an Expression
+
+**To access the value of an expression as a MathJSON expression** use
+`expr.json`.
+
+**To access the value of an expression as a JavaScript primitive** use
+`expr.valueOf()`. The result is a JavaScript primitive, such as a number, string or
 boolean. When converting to a number, the result may have lost precision if the
-original expression had more than 15 digits of precision. Note that `expr.value`
-is equivalent to `expr.valueOf()`.
+original expression had more than 15 digits of precision.
 
 
-
-**To access the value of an expression as a JavaScript number**, use
+**To access the value of an expression as a JavaScript number** use
 `expr.re`. The result is the real part of the number, as a JavaScript number, 
 or `NaN` if the expression is not a number. Use `expr.im` to get the imaginary part.
+
+In general, expressions need to be evaluated before they can be converted to a
+JavaScript primitive. For example, `ce.parse("2 + 3").valueOf()` will return
+`"2 + 3"`, while `ce.parse("2 + 3").evaluate().valueOf()` will return `5`.
+
+If the expression is a number literal or a symbol with a numeric value, the
+`expr.value` property will return the value of the expression as `BoxedExpression`
+or `undefined` if the expression is not a number.
+
 
 
 ## Errors
 
 Sometimes, things go wrong.
 
+If a boxed expression is not valid, the `expr.isValid` property will be set to
+`false`, and the `expr.errors` property will contain a list of all the
+`["Error"]` subexpressions.
+
 When something goes wrong the Compute Engine uses an
 `["Error", <cause>, <location>]` expression.
+
 
 The `<cause>` argument provides details about the nature of the problem. This
 can be either a string or an `["ErrorCode"]` expression if there are additional

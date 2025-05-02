@@ -151,58 +151,85 @@ When an operation is canceled either because of a timeout or an abort, a
 
 
 
-## Scopes
+## Lexical Scopes and Evaluation Contexts
 
 The Compute Engine supports
 [lexical scoping](<https://en.wikipedia.org/wiki/Scope_(computer_science)>).
 
-A scope includes a symbol table, which is a collection of definitions for
-symbols and functions.
+A **lexical scope** is a table mapping identifiers to their definitions. The 
+identifiers are the names of the symbols and functions in the scope.
 
-Scopes are arranged in a stack, with the current (top-most) scope available with
-`ce.context`.
+The lexical scope resolves metadata about identifiers, such as their type and 
+constant status.
 
-To locate the definition of an identifier, the symbol table associated with the
-current (top-most) scope is searched first. If no matching definition is found,
-the parent scope is searched, and so on until a definition is found.
+An **evaluation context** is a snapshot of the current state of the compute 
+engine. It includes the values of all identifiers and the current scope.
 
-**To add a new scope to the context** use `ce.pushScope()`.
+Evaluation contexts are arranged in a stack, with the current (top-most) 
+evaluation context available with `ce.context`.
 
-```ts
-ce.pushScope();
-ce.assign('x', 500); // "x" is defined in the new scope
-```
+Evaluation contexts are created automatically, for example when a new scope is
+created, or each time a recursive function is called.
 
-**To exit a scope** use `ce.popScope()`.
-
-This will invalidate any definition associated with the scope, and restore the
-symbol table from previous scopes that may have been shadowed by the current
-scope.
-
-## Binding
+### Binding
 
 **[Name Binding](https://en.wikipedia.org/wiki/Name_binding) is the process of
 associating an identifier (the name of a function or symbol) with a
 definition.**
 
-Name Binding should not be confused with **value binding** with is the process
+Name Binding should not be confused with **value binding** which is the process
 of associating a **value** to a symbol.
 
 <ReadMore path="/compute-engine/guides/symbols/#scopes" >Read more about
 <strong>identifiers</strong> and value binding.<Icon name="chevron-right-bold" /></ReadMore>
 
-For symbols, the definition records contain information such as the type of
-the symbol and its value. For functions, the definition record include the
-signature of the function (the type of the argument it expects), and how to
-simplify or evaluate function expressions that have this function as their head.
+To bind a name to a definition, the Compute Engine looks up the symbol table
+of the current scope. If the identifier is not found, the parent scope is
+searched, and so on until a definition is found.
+
+If no definition is found, the identifier is declared as a symbol of type
+`unknown`, or a more specific type if the context allows it.
+
+If the identifier is found, the definition record is used to evaluate the
+expression. 
+
+The definition record contains information about the identifier, such as its
+type, whether it is a constant, and how to evaluate it.
+
+There are two kind of definition records:
+1. **Value Definition Record**: This record contains information about the
+   symbol, such as its type and whether it is a constant.
+2. **Operator Definition Record**: This record contains information about the
+   operator, such as its signature and how to evaluate it.
 
 Name binding is done during canonicalization. If name binding failed, the
-`isValid` property of the expession is `false`.
+`isValid` property of the expression is `false`.
 
 **To get a list of the errors in an expression** use the `expr.errors` property.
 
 <ReadMore path="/compute-engine/guides/expressions/#errors" > Read more about the
 <strong>errors</strong> <Icon name="chevron-right-bold" /></ReadMore>
+
+
+### Creating New Scopes
+
+**To add a new scope** use `ce.pushScope()`.
+
+```ts
+ce.assign('x', 100); // "x" is defined in the current scope
+ce.pushScope();
+ce.assign('x', 500); // "x" is defined in the new scope
+ce.box('x').print(); // 500
+ce.popScope();
+ce.box('x').print(); // 100
+```
+
+**To exit a scope** use `ce.popScope()`.
+
+This will invalidate any definitions associated with the scope, and restore the
+symbol table from previous scopes that may have been shadowed by the current
+scope.
+
 
 ## Evaluation Loop
 
@@ -215,23 +242,23 @@ library and providing your own function definitions.
 :::
 
 Each identifier (name of symbol or function) is **bound** to a definition within
-a **scope** during canonicalization. This usually happens when calling
-`ce.box()` or `ce.parse()`, but could also happen during `expr.evaluate()` if
-`expr` was not canonical.
+a **lexical scope** during canonicalization. This usually happens when calling
+`ce.box()` or `ce.parse()`, or if accessing the `.canonical` property of a
+non-canonical expression.
 
 When a function is evaluated, the following steps are followed:
 
-1. If the expression is not canonical, it is put in canonical form
+1. If the expression is not canonical, it cannot be evaluated and an error is
+   thrown. The expression must be canonicalized first.
 
-2. Each argument of the function are evaluated, left to right.
+2. Each argument of the function are evaluated, left to right, unless the 
+   function has a `lazy` flag. If the function is lazy, the arguments are not
+   evaluated.
 
    1. An argument can be **held**, in which case it is not evaluated. Held
       arguments can be useful when you need to pass a symbolic expression to a
       function. If it wasn't held, the result of evaluating the expression would
       be used, not the symbolic expression.
-
-      A function definition can indicate that one or more of its arguments
-      should be held.
 
       Alternatively, using the `Hold` function will prevent its argument from
       being evaluated. Conversely, the `ReleaseHold` function will force an

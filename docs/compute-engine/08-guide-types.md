@@ -164,36 +164,7 @@ console.info(ce.box(3.14).isInteger)
 
 ```
 
-
-
-## Primitive Types
-
-A **primitive type** is a type that is not defined in terms of other types.
-
-The Compute Engine supports the following primitive types:
-
-<div className="symbols-table first-column-header" style={{"--first-col-width":"12ch"}}>
-
-| Type          | Description                                                                                      |
-| :-------------- | :----------------------------------------------------------------------------------------------- |
-| `any`      | The universal type, it contains all possible values. It has the following sub-types: `error`, `nothing`,   `never`,  `unknown` and `expression`. |
-| `error` | The type of an invalid expression, such as `["Error"]` |
-| `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
-| `never`       | The type that has no values; the empty type or bottom type                                             |
-| `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. |
-| `expression`       | A symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
-| `symbol`        | An identifier used to represent the name of a constant or variable in an expression |
-| `function`        | A function expression that can be applied to arguments to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
-| `value`        | A constant value, such as `1`, `True`, `'hello'` or `Pi`: a `scalar` or a `collection` |
-| `collection`    | A collection of values: a `list`, a `set`, a `tuple`, or a `map` |
-| `scalar`        | A single value: a `boolean`, a `string`, or a `number` |
-| `boolean`       | `True` or `False`|
-| `string`        | A string of Unicode characters    |
-| `number`        | A numeric value |
-
-</div>
-
-### Type Hierarchy
+## Type Hierarchy
 
 ```plaintext
 any
@@ -215,16 +186,45 @@ any
         │             └── rational
         │                 └── integer
         └── collection
-            ├── set
             ├── tuple
-            ├── list
-            │   └── tensor
-            │       ├── vector
-            │       └── matrix
-            └── map
+            ├── set
+            ├── map
+            └── list
+                └── tensor
+                    ├── vector
+                    └── matrix
 ```
 **Note:** this diagram is simplified and does not accurately reflect the finite vs
 non-finite distinction for the numeric types.
+
+
+## Primitive Types
+
+A **primitive type** is a type that is not defined in terms of other types.
+
+The Compute Engine supports the following primitive types:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"12ch"}}>
+
+| Type          | Description                                                                                      |
+| :-------------- | :----------------------------------------------------------------------------------------------- |
+| `any`      | The universal type, it contains all possible values. It has the following sub-types: `error`, `nothing`,   `never`,  `unknown` and `expression`. |
+| `error` | The type of an invalid expression, such as `["Error"]` |
+| `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
+| `never`       | The type that has no values; the empty type or bottom type                                             |
+| `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. |
+| `expression`       | A symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
+| `symbol`        | An identifier used to represent the name of a constant or variable in an expression, for example `"x"` or `"alpha"` |
+| `function`        | A function is an expression applied to some arguments to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
+| `value`        | A constant value, such as `1`, `True`, `'hello'` or `Pi`: a `scalar` or a `collection` |
+| `collection`    | A collection of values: a `list`, a `set`, a `tuple`, or a `map` |
+| `scalar`        | A single value: a `boolean`, a `string`, or a `number` |
+| `boolean`       | `True` or `False`|
+| `string`        | A string of Unicode characters    |
+| `number`        | A numeric value |
+
+</div>
+
 
 
 ### Numeric Types
