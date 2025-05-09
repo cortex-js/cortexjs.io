@@ -4,11 +4,11 @@ slug: /compute-engine/guides/augmenting/
 ---
 
 The [MathJSON Standard Library](/compute-engine/guides/standard-library/) is a
-collection of definitions for **symbols** and **functions** such as `Pi`, `Add`,
+collection of definitions for **symbols** such as `Pi`, `Add`,
 `Sin`, `Power`, `List`, etc...
 
 In this guide we discuss how to augment the MathJSON Standard Library with your
-own definitions.
+own symbols.
 
 <ReadMore path="/compute-engine/guides/latex-syntax/#customizing-the-latex-dictionary" >
 You may also be interested in **augmenting the LaTeX dictionary** which defines
@@ -21,29 +21,28 @@ like to parse to MathJSON. <Icon name="chevron-right-bold" />
 
 ## Introduction
 
-When an identifier such as a symbol (`Pi`) or an operator (`Sin`) is encountered
-in an expression, the Compute Engine will look up its definition in the set of
- known identifiers, including the Standard Library.
+When an symbol such as `Pi` or `Sin` is encountered in an expression, the 
+Compute Engine will look up its definition in the set of known 
+symbols, including the Standard Library.
 
 ### Automatic Declaration
 
-If the identifier is found, the definition associated with it will be
-bound to the identifier and used later to evaluate the expression.
+If a matching definition is found, it will be bound to the symbol and 
+used later to evaluate the expression.
 
-If the identifier is not found, an automatic declaration will be made of the
-identifier as a symbol of type `unknown`, or a more specific type if the
-context allows it.
+If no definition is found, an automatic declaration will be made of the
+symbol with a type `unknown` or a more specific type if the context allows it.
 
 <ReadMore path="/compute-engine/guides/types" >
 Learn more about **types**.<Icon name="chevron-right-bold" />
 </ReadMore>
 
-To provide a more explicit definition for the identifier, you can [define it
+To provide a more explicit definition for the symbol, you can [define it
 using a LaTeX](#definitions-using-latex) expression, or an [explicit declaration](#explicit-declarations) using the `ce.declare()` method.
 
 ### Declarations are Scoped
 
-The declaration of an identifier is done within a **lexical scope**. A scope 
+The declaration of a symbol is done within a **lexical scope**. A scope 
 is a hierarchical collection of definitions.
 
 <ReadMore path="/compute-engine/guides/evaluate/#lexical-scopes-and-evaluation-contexts" >
@@ -53,14 +52,14 @@ Read more about **scopes** <Icon name="chevron-right-bold" />
 
 ## Definitions Using LaTeX
 
-The simplest way to define a new symbol or operator (function) is to use LaTeX. 
+The simplest way to define a new symbol is to use LaTeX. 
 
 For example, to define a new symbol $m$ with a value of $42$, use the
 following LaTeX expression:
 
 ```js
 ce.parse("m := 42").evaluate();
-ce.parse("m").evaluate().print();
+ce.parse("m").value.print();
 // ➔ 42
 ```
 
@@ -84,7 +83,7 @@ ce.parse("f(3)").evaluate().print();
 // ➔ 6
 ```
 
-**To define multiletter identifiers**, use the `\operatorname{}` command:
+**To define multiletter symbols**, use the `\operatorname{}` command:
 
 ```js
 ce.parse('\\operatorname{double}(x) := 2x').evaluate().print();
@@ -95,8 +94,8 @@ ce.parse('\\operatorname{double}(3)').evaluate().print();
 **Note**: you can also use the `\mathrm{}` or `\mathit{}` commands to wrap
 multiletter symbols.
 
-The LaTeX identifiers are mapped to MathJSON identifiers. For example,
-the LaTeX `\operatorname{double}` is mapped to the MathJSON identifier `double`.
+The LaTeX identifiers are mapped to MathJSON symbols. For example,
+the LaTeX `\operatorname{double}` is mapped to the MathJSON symbol `double`.
 
 ```js
 console.info(ce.parse('\\operatorname{double}(3)').json);
@@ -105,10 +104,11 @@ console.info(ce.parse('\\operatorname{double}(3)').json);
 
 ## Explicit Declarations
 
-**To have more control over the definition of a symbol or function** use
+**To have more control over the definition of a symbol** use
 the `ce.declare()` method.
 
-When declaring a symbol or function, you can specify the type of the symbol or signature of the function, its value or body, and other properties.
+When declaring a symbol, you can specify the type of the symbol, its value
+and other properties.
 
 ```js
 // Declaring a symbol "m"
@@ -123,8 +123,8 @@ ce.declare("f", {
 
 ### Declaring a Symbol
 
-**To declare a symbol** use the `ce.declare()` method with the identifier
-as the first argument and a type as the second argument.
+**To declare a symbol** use the `ce.declare()` method with the name of the
+symmbol as the first argument and a type as the second argument.
 
 ```js
 ce.declare("n", "integer");
@@ -142,8 +142,6 @@ ce.declare("m", {
   value: 42,
 });
 ```
-
-
 
 If you do not provide a `type` property for a symbol, the type will be
 inferred from the value of the symbol. If no type and no value are
@@ -182,7 +180,7 @@ ce.declare("m_e", {
 ### Declaring a Function
 
 **To declare a function**, associate an `evaluate` handler, which 
-is the body of the function, with an identifier.
+is the body of the function, with a symbol.
 
 ```js
 ce.declare("double", { 
@@ -191,7 +189,7 @@ ce.declare("double", {
 ```
 
 :::caution[Caution]
-The first argument of `declare()` is a MathJSON identifier, not a LaTeX command.
+The first argument of `declare()` is a MathJSON symbol, not a LaTeX command.
 For example, use `double` instead of `\operatorname{double}`.
 :::
 
@@ -267,7 +265,9 @@ Learn more about the standard operator to manipulate **functions**. <Icon name="
 
 ## Overloading Functions
 
-**To overload a standard function**, use the `ce.declare()` methods.
+**Overloading** is the ability to define multiple functions with the same name.
+
+**To overload a function**, use the `ce.declare()` methods.
 
 For example, to overload the `Sqrt` function to return `NaN` for
 non-real numbers, use the following code:
@@ -296,7 +296,7 @@ with a dictionary of definitions.
 
 :::info[Note]
 The keys to `ce.declare()` (`m`, `f`, etc...) are MathJSON
-identifiers, not LaTeX commands. For example, if you have a symbol `α`, use
+symbols, not LaTeX commands. For example, if you have a symbol `α`, use
 `alpha`, not `\alpha` 
 :::
 

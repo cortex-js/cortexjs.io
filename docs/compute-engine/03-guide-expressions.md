@@ -384,7 +384,7 @@ syntax error or typo: missing `}`, mistyped command name, etc...
 ### Semantic Errors
 
 Some errors are not caught until an expression is bound, that is until an
-attempt is made to associate its symbol or function identifiers to a definition.
+attempt is made to associate its symbols to definitions.
 This could include errors such as missing or mismatched arguments.
 
 Some errors that could be considered LaTeX syntax errors may not surface until
@@ -416,7 +416,7 @@ property.
 | `unexpected-command`           | the command is unknown, or not applicable in the current parsing context                                         |
 | `unexpected-token`             | the character does not apply to the current parsing context                                                      |
 | `incompatible-type`          | the type of the provided argument does not match the expected type                                                         |
-| `invalid-identifier`           | the identifier cannot be used (see [MathJSON Symbols](/math-json/#symbols))                                      |
+| `invalid-symbol`           | the symbol cannot be used (see [MathJSON Symbols](/math-json/#symbols))                                      |
 | `expected-closing-delimiter`   | a closing `}` was expected, but is missing                                                                       |
 | `unexpected-closing-delimiter` | a closing `}` was encountered, but not expected                                                                  |
 | `expected-environment-name`    | the name of an environment should be provided with a `\begin` or `\end` command                                  |

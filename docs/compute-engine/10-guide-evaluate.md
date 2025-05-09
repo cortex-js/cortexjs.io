@@ -22,27 +22,37 @@ const expr = ce.parse('2 + 2');
 expr.evaluate().print();
 ```
 
-### Numeric Approximation
-
-By default, `expr.evaluate()` preserves [exact values](/compute-engine/guides/numeric-evaluation/#exact-evaluation) in the result.
-To force [numeric evaluation](/compute-engine/guides/numeric-evaluation/) use the `numericApproximation` option.
+The `expr.value` property does not evaluate the expression. If the expression
+is a literal, it returns the literal value. If the expression is a symbol, it
+looks up the symbol in the current scope and returns its value.
 
 ```live
-const expr = ce.parse('2\\pi');
-expr.evaluate().print();
-expr.evaluate({ numericApproximation: true }).print();
+ce.box('x').value = 314;
+console.info(ce.parse('42').value)
+console.info(ce.parse('x').value)
+console.info(ce.parse('2 + 2').value)
 ```
 
 The `expr.N()` method is a shorthand for `expr.evaluate({numericApproximation: true})`.
 
 ```live
 const expr = ce.parse('2\\pi');
+expr.evaluate().print();
 expr.N().print();
 ```
 
 ### Compilation
 
 An expression can be evaluated by compiling it to JavaScript using the `expr.compile()` method.
+The method returns a JavaScript function that can be called to evaluate the expression.
+
+
+
+```live
+const f = ce.parse('2\\pi').compile();
+console.log(f());
+```
+
 
 <ReadMore path="/compute-engine/guides/compiling/" > 
 Read more about **compiling expressions** <Icon name="chevron-right-bold" />
@@ -56,7 +66,7 @@ perform some operations asynchronously.
 
 **To perform an asynchronous evaluation**, use the `expr.evaluateAsync()` method.
 
-```live
+```js
 try {
   const fact = ce.parse('(70!)!');
   const factResult = await fact.evaluateAsync();
@@ -77,7 +87,7 @@ object and a `signal`.
 
 For example, to interrupt an evaluation after 500ms:
 
-```live
+```js
 const abort = new AbortController();
 const signal = abort.signal;
 setTimeout(() => abort.abort(), 500);
@@ -90,7 +100,8 @@ try {
 }
 ```
 
-```live
+```text
+
 :::html
 <div class="stack">
   <div class="row">
@@ -132,7 +143,7 @@ document.getElementById('evaluate-button').addEventListener('click', async () =>
 **To set a time limit for an operation**, use the `ce.timeLimit` option, which
 is a number of milliseconds.
 
-```live
+```js
 ce.timeLimit = 1000;
 try {
   const fact = ce.parse('(70!)!');
@@ -156,14 +167,15 @@ When an operation is canceled either because of a timeout or an abort, a
 The Compute Engine supports
 [lexical scoping](<https://en.wikipedia.org/wiki/Scope_(computer_science)>).
 
-A **lexical scope** is a table mapping identifiers to their definitions. The 
-identifiers are the names of the symbols and functions in the scope.
+A **lexical scope** is a region of the code where a symbol is defined. 
+Each scope has its own bindings table, which is a
+mapping of symbols to their definitions. The definition includes the type
+of the symbol, whether it is a constant and other properties.
 
-The lexical scope resolves metadata about identifiers, such as their type and 
-constant status.
 
-An **evaluation context** is a snapshot of the current state of the compute 
-engine. It includes the values of all identifiers and the current scope.
+An **evaluation context** is a snapshot of the current state of the Compute 
+Engine. It includes the values of all symbols currently in scope and 
+a chain of lexical scopes.
 
 Evaluation contexts are arranged in a stack, with the current (top-most) 
 evaluation context available with `ce.context`.
@@ -171,29 +183,32 @@ evaluation context available with `ce.context`.
 Evaluation contexts are created automatically, for example when a new scope is
 created, or each time a recursive function is called.
 
+Some functions may create their own scope. These functions have the `scoped`
+flag set to `true`. For example, the `Block` function creates a new scope
+when it is called: any declarations made in the block are only visible within the
+block. Similarly, the `Sum` function creates a new scope so that the index
+variable is not visible outside the sum.
+
 ### Binding
 
 **[Name Binding](https://en.wikipedia.org/wiki/Name_binding) is the process of
-associating an identifier (the name of a function or symbol) with a
-definition.**
+associating a symbol with a definition.**
 
 Name Binding should not be confused with **value binding** which is the process
 of associating a **value** to a symbol.
 
-<ReadMore path="/compute-engine/guides/symbols/#scopes" >Read more about
-<strong>identifiers</strong> and value binding.<Icon name="chevron-right-bold" /></ReadMore>
 
-To bind a name to a definition, the Compute Engine looks up the symbol table
-of the current scope. If the identifier is not found, the parent scope is
-searched, and so on until a definition is found.
+To bind a symbol to a definition, the Compute Engine looks up the bindings table
+of the current scope. If the symbol is not found in the table, the parent 
+scope is searched, and so on until a definition is found.
 
-If no definition is found, the identifier is declared as a symbol of type
+If no definition is found, the symbol is declared with a type of
 `unknown`, or a more specific type if the context allows it.
 
-If the identifier is found, the definition record is used to evaluate the
+If the symbol is found, the definition record is used to evaluate the
 expression. 
 
-The definition record contains information about the identifier, such as its
+The definition record contains information about the symbol, such as its
 type, whether it is a constant, and how to evaluate it.
 
 There are two kind of definition records:
@@ -209,6 +224,21 @@ Name binding is done during canonicalization. If name binding failed, the
 
 <ReadMore path="/compute-engine/guides/expressions/#errors" > Read more about the
 <strong>errors</strong> <Icon name="chevron-right-bold" /></ReadMore>
+
+### Default Scopes
+
+The Compute Engine has a set of default scopes that are used to look up
+symbols. These scopes are created automatically when the Compute Engine
+is initialized. The default scopes include the **system** scope, and the **global** scope.
+
+The **system** scope contains the definitions of all the built-in functions and
+operators. The **global** scope is initially empty, but can be used to
+store user-defined functions and symbols.
+
+The **global** scope is the default scope used when the Compute Engine is
+initialized.
+
+Additional scopes can be created using the `ce.pushScope()` method.
 
 
 ### Creating New Scopes
@@ -241,9 +271,9 @@ library and providing your own function definitions.
 
 :::
 
-Each identifier (name of symbol or function) is **bound** to a definition within
-a **lexical scope** during canonicalization. This usually happens when calling
-`ce.box()` or `ce.parse()`, or if accessing the `.canonical` property of a
+Each symbol is **bound** to a definition within a **lexical scope** during 
+canonicalization. This usually happens when calling `ce.box()` or `ce.parse()`, 
+or if accessing the `.canonical` property of a
 non-canonical expression.
 
 When a function is evaluated, the following steps are followed:
@@ -273,4 +303,4 @@ When a function is evaluated, the following steps are followed:
 
 4. Apply the function to the arguments
 
-5. Return the canonical form of the result
+5. Return the result in canonical form.

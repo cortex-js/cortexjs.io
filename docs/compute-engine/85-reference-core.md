@@ -30,55 +30,56 @@ value other than themselves.
 
 ## Declaring, Assigning and Assuming
 
-Before an identifier can be used it has to be declared. The `Declare` function
-is used to declare a new identifier in the current scope.
+A `["Declare"]` expression is used to declare a symbol in the current scope.
 
-Once an identifier has been declared, its value can be changed using the
-`Assign` function.
+Once a symbol has been declared, its value can be changed using an
+`["Assign"]` expression.
 
-The `Assume` function is used to assert a predicate about an expression. It is
+An `["Assume"]` expression is used to assert a predicate about an expression. It is
 used to provide additional information to the system, for example to indicate
-that a variable is positive, or that a function is continuous.
+that a variable is positive.
 
 <FunctionDefinition name="Declare">
 
-<Signature name="Declare">_identifier_, _type__</Signature>
+<Signature name="Declare">_symbol_, _type__</Signature>
 
-<Signature name="Declare">_identifier_, _type_, _value_</Signature>
+<Signature name="Declare">_symbol_, _type_, _value_</Signature>
 
-Declare a new identifier in the current scope, and set its value and type.
+Declare a new symbol in the current scope, and set its value and type.
 
-If the identifier already has a definition in the current scope, evaluate to an
+If the symbol already has a definition in the current scope, evaluate to an
 error, otherwise evaluate to `value`.
 
 This is equivalent to `let` in JavaScript or `var` in Python.
 
-**To change the value of an existing identifier**, use an `["Assign"]`
+**To change the value of an existing symbol**, use an `["Assign"]`
 expression.
 
-`Declare` is not a [pure function](/compute-engine/guides/expressions#pure-expressions).
+`Declare` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
+since it changes the state of the Compute Engine.
+
 
 
 <ReadMore path="/compute-engine/guides/augmenting/" >Read more about using
-`ce.declare()` to declare a new symbol or function. </ReadMore>
+`ce.declare()` to declare a new symbol. </ReadMore>
 
 </FunctionDefinition>
 
 <FunctionDefinition name="Assign">
 
-<Signature name="Assign">_identifier_, _value_</Signature>
+<Signature name="Assign">_symbol_, _value_</Signature>
 
-Set the value of `identifier` to `value`.
+Set the value of `symbol` to `value`.
 
-If `identifier` has not been declared in the current scope, consider parent
-scopes until a definition for the identifier is found.
+If `symbol` has not been declared in the current scope, consider parent
+scopes until a definition for the symbol is found.
 
-If a definition is found, change the value of the identifier to `value` if the
-value is compatible with the type of the identifier: once set, the type of
-an identifier cannot be changed.
+If a definition is found, change the value of the symbol to `value` if the
+value is compatible with the type of the symbol: once set, the type of
+a symbol cannot be changed.
 
-If there is no definition for the identifier, add a new definition in the
-current scope, and use the `value` to infer the type of the identifier.
+If there is no definition for the symbol, add a new definition in the
+current scope, and use the `value` to infer the type of the symbol.
 
 This is equivalent to `=` in may programming languages.
 
@@ -95,9 +96,9 @@ This is equivalent to `=` in may programming languages.
 
 The predicate is an expression that evaluates to `True` or `False`.
 
-The identifiers in the predicate expression may be free, i.e. they may not have
-have been declared yet. Asserting an assumption does not declare the identifiers
-in the predicate.
+The symbols in the predicate expression may be free, i.e. they may not have 
+been declared yet. Asserting an assumption does not declare the symbols in 
+the predicate.
 
 The predicate can take the form of:
 
@@ -105,7 +106,8 @@ The predicate can take the form of:
 - an inequality: `["Assume", ["Greater", "x", 0]]`
 - a membership expression: `["Assume", ["Element", "x", "Integers"]]`
 
-`Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions).
+`Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
+since it changes the state of the Compute Engine.
 
 
 </FunctionDefinition>
@@ -119,9 +121,9 @@ expression.
 
 <FunctionDefinition name="About">
 
-<Signature name="About">_identifier_</Signature>
+<Signature name="About">_symbol__</Signature>
 
-Evaluate to a dictionary expression containing information about an identifier
+Evaluate to a dictionary expression containing information about a symbol
 such as its type, its attributes, its value, etc...
 
 </FunctionDefinition>
@@ -457,7 +459,7 @@ Evaluate to a numerical approximation of the expression.
 <Signature name="Error">_error-code_, _context_</Signature>
 
 Tag an expression that could not be interpreted correctly. It may have a syntax
-error, a reference to an unknown identifier or some other problem.
+error, a reference to an unknown symbol or some other problem.
 
 The first argument, `error-code` is either a string, or an `["ErrorCode"]`
 expression.

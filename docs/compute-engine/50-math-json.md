@@ -354,7 +354,7 @@ The **operator** of the function expression is the first element in the array.
 Its presence is required. It indicates the **name of the function**: this is 
 what the function is about.
 
-The operator is an identifier following the conventions for function names (see
+The operator is a symbol following the conventions for function names (see
 below).
 
 ```json example
@@ -407,24 +407,17 @@ A MathJSON **symbol** is either:
 - an object literal with a `"sym"` key
 - a JSON string
 
-**Symbols** are [identifiers](#identifiers) that represent the name of
-variables, constants and wildcards.
-
-
-
-## Identifiers
-
-Identifiers are JSON strings that represent the names of symbols, variables, constants, wildcards and
-functions.
+Symbols are JSON strings that represent the names of symbols, variables, 
+constants, wildcards and functions.
 
 Before they are used, JSON escape sequences (such as `\u` sequences, `\\`, etc.)
 are decoded.
 
-The identifiers are then normalized to the
+The symbols are then normalized to the
 [Unicode Normalization Form C (NFC)](https://unicode.org/reports/tr15/). They
 are stored internally and compared using the Unicode NFC.
 
-For example, these four JSON strings represent the same identifier:
+For example, these four JSON strings represent the same symbol:
 
 - `"Å"`
 - `"A\u030a"` **U+0041 `A‌` LATIN CAPITAL LETTER** + **U+030A ` ̊` COMBINING RING
@@ -433,24 +426,24 @@ For example, these four JSON strings represent the same identifier:
 - `"\u0041\u030a"` **U+0041 `A‌`  LATIN CAPITAL LETTER A** + **U+030A ` ̊` COMBINING RING
   ABOVE**
 
-Identifiers conforms to a profile of
+Symbols conform to a profile of
 [UAX31-R1-1](https://unicode.org/reports/tr31/) with the following
 modifications:
 
 - The character **U+005F `_` LOW LINE** is added to the `Start` character set
 - The characters should belong to a
   [recommended script](https://www.unicode.org/reports/tr31/#Table_Recommended_Scripts)
-- An identifier can be a sequence of one or more emojis. Characters that have
+- A symbol can be a sequence of one or more emojis. Characters that have
   both the Emoji and XIDC property are only considered emojis when they are
   preceded with emoji modifiers. The definition below is based on
   [Unicode TR51](https://unicode.org/reports/tr51/#EBNF_and_Regex) but modified
-  to exclude invalid identifiers.
+  to exclude invalid symbols.
 
-Identifiers match either the `NON_EMOJI_IDENTIFIER` or the `EMOJI_IDENTIFIER`
-patterns below:
+Symbols match either the `NON_EMOJI_SYMBOL` or the `EMOJI_SYMBOL`
+regex patterns below:
 
 ```js
-const NON_EMOJI_IDENTIFIER = /^[\p{XIDS}_]\p{XIDC}*$/u;
+const NON_EMOJI_SYMBOL = /^[\p{XIDS}_]\p{XIDC}*$/u;
 ```
 
 (from [Unicode TR51](https://unicode.org/reports/tr51/#EBNF_and_Regex))
@@ -466,24 +459,24 @@ const FLAG_SEQUENCE = "\\p{RI}\\p{RI}";
 
 const TAG_MOD = `(?:[\\u{E0020}-\\u{E007E}]+\\u{E007F})`;
 const EMOJI_MOD = `(?:\\p{EMod}|${VS16}${KEYCAP}?|${TAG_MOD})`;
-const EMOJI_NOT_IDENTIFIER = `(?:(?=\\P{XIDC})\\p{Emoji})`;
-const ZWJ_ELEMENT = `(?:${EMOJI_NOT_IDENTIFIER}${EMOJI_MOD}*|\\p{Emoji}${EMOJI_MOD}+|${FLAG_SEQUENCE})`;
+const EMOJI_NOT_SYMBOL = `(?:(?=\\P{XIDC})\\p{Emoji})`;
+const ZWJ_ELEMENT = `(?:${EMOJI_NOT_SYMBOL}${EMOJI_MOD}*|\\p{Emoji}${EMOJI_MOD}+|${FLAG_SEQUENCE})`;
 const POSSIBLE_EMOJI = `(?:${ZWJ_ELEMENT})(${ZWJ}${ZWJ_ELEMENT})*`;
-const EMOJI_IDENTIFIER = new RegExp(`^(?:${POSSIBLE_EMOJI})+$`, "u");
+const EMOJI_SYMBOL = new RegExp(`^(?:${POSSIBLE_EMOJI})+$`, "u");
 ```
 
-In summary, when using Latin characters, identifiers can start with a letter or
+In summary, when using Latin characters, symbols can start with a letter or
 an underscore, followed by zero or more letters, digits and underscores.
 
 Carefully consider when to use non-latin characters. Use non-latin characters
 for whole words, for example: `"半径"` (radius), `"מְהִירוּת"` (speed), `"直徑"`
 (diameter) or `"सतह"` (surface).
 
-Avoid mixing Unicode characters from different scripts in the same identifier.
+Avoid mixing Unicode characters from different scripts in the same symbols.
 
 Do not include bidi markers such as **U+200E `LTR`***  or **U+200F `RTL`** in
-identifiers. LTR and RTL marks should be added as needed by the client
-displaying the identifier. They should be ignored when parsing identifiers.
+symbols. LTR and RTL marks should be added as needed by the client
+displaying the symbol. They should be ignored when parsing symbols.
 
 Avoid visual ambiguity issues that might arise with some Unicode characters. For
 example:
@@ -546,18 +539,18 @@ patterns.
 ### LaTeX Rendering Conventions
 
 The following recommendations may be followed by clients displaying MathJSON
-identifiers with LaTeX, or parsing LaTeX to MathJSON identifiers.
+symbols with LaTeX, or parsing LaTeX to MathJSON symbols.
 
 These recommendations do not affect computation or manipulation of expressions
 following these conventions.
 
-- An identifier may be composed of a main body, some modifiers, some style
-  variants, some subscripts and subscripts. For example:
+- A symbol may be composed of a main body, some modifiers, some style
+  variants, some subscripts and superscripts. For example:
     - `"alpha_0__prime"` $$\alpha_0^\prime $$
     - `"x_vec"` $$ \vec{x} $$
     - `"Re_fraktur"` $$\mathfrak{Re} $$.
 - Subscripts are indicated by an underscore `_` and superscripts by a
-  double-underscore `__`. There may be more than one superscript or subscripts,
+  double-underscore `__`. There may be more than one superscript or subscript,
   but they get concatenated. For example `"a_b__c_q__p"` -> `a_{b, q}^{c, p}`
   \\( a\_\{b, q\}^\{c, p\} \\).
 - Modifiers after a superscript or subscript apply to the closest preceding
@@ -593,7 +586,7 @@ Modifiers include:
 </div>
 
 - The following common names, when they appear as the body or in a
-  subscript/superscript of an identifier, may be replaced with a corresponding
+  subscript/superscript of a symbol, may be replaced with a corresponding
   LaTeX command:
 
 <div className="symbols-table first-column-header" style={{'--first-col-width': '15ch'}}>
@@ -696,15 +689,15 @@ Modifiers include:
 
 </div>
 
-- Multi-letter identifiers may be rendered with a `\mathit{}`, `\mathrm{}` or
+- Multi-letter symbols may be rendered with a `\mathit{}`, `\mathrm{}` or
   `\operatorname{}` command.
 
-- Identifier fragments ending in digits may be rendered with a corresponding
+- Symbol fragments ending in digits may be rendered with a corresponding
   subscript.
 
 <div className="symbols-table first-column-header" style={{"--first-col-width":"18ch"}}>
 
-| Identifier           | LaTeX              |                           |
+| Symbol           | LaTeX              |                           |
 | :------------------- | :----------------- | ------------------------- |
 | `time`               | `\mathrm{time}`    | \\( \mathrm\{time\} \\)     |
 | `speed_italic`       | `\mathit{speed}`   | \\( \mathit\{speed\} \\)    |
@@ -731,7 +724,7 @@ The following metadata keys are recommended:
 
 | Key             | Note                                                                                                                                                                         |
 | :-------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `wikidata`      | A short string indicating an entry in a wikibase.<br/>This information can be used to disambiguate the meaning of an identifier. Unless otherwise specified, the entry in this key refers to an enty in the `wikidata.org` wikibase                                               |
+| `wikidata`      | A short string indicating an entry in a wikibase.<br/>This information can be used to disambiguate the meaning of a symbol. Unless otherwise specified, the entry in this key refers to an entry in the `wikidata.org` wikibase                                               |
 | `comment`       | A human readable plain string to annotate an expression, since JSON does not allow comments in its encoding                                                                  |
 | `documentation` | A Markdown-encoded string providing documentation about this expression.                                                                                                     |
 | `latex`         | A visual representation in LaTeX of the expression. <br/> This can be useful to preserve non-semantic details, for example parentheses in an expression or styling attributes |

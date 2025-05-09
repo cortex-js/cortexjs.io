@@ -141,26 +141,20 @@ ce.parse('x + 0.5', { parseNumbers: "rational" }).print();
 // ➔ x + 1/2
 ```
 
-#### `getIdentifierType`
+#### `getSymbolType`
 
-This handler is invoked when the parser encounters an identifier
+This handler is invoked when the parser encounters a symbol
 that has not yet been declared.
 
-The `identifier` argument is a [valid identifier](/math-json/#identifiers).
+The `symbol` argument is a [valid symbol](/math-json/#symbols).
 
-The handler can return:
-
-- `"variable"`: the identifier is a variable
-- `"function"`: the identifier is a function name. If an apply
-function operator (typically, parentheses) follow, they will be parsed
-as arguments to the function.
-- `"unknown"`: the identifier is not recognized.
+The handler should return the type of the symbol.
 
 
 ```live
 console.info(ce.parse("f(x)", {
-  getIdentifierType: (identifier) => {
-    if (identifier === "f") {
+  getSymbolType: (symbol) => {
+    if (symbol === "f") {
       return "function";
     }
     return "unknown";
@@ -459,7 +453,7 @@ console.log(ce.parse("x \\in \\Z").toLatex({
 
 The <a href ="/math-json/">MathJSON format</a> is independent of any source or
 target language (LaTeX, MathASCII, Python, etc...) or of any specific
-interpretation of the identifiers used in a MathJSON expression (`"Pi"`,
+interpretation of the symbols used in a MathJSON expression (`"Pi"`,
 `"Sin"`, etc...).
 
 A **LaTeX dictionary** defines how a MathJSON expression can be expressed as a
@@ -476,7 +470,7 @@ It includes definitions such as:
 
 Note that the dictionary will include LaTeX commands as triggers. LaTeX commands
 are usually prefixed with a backslash, such as `\frac` or `\pm`. It will also
-reference MathJSON identifiers. MathJSON identifiers are usually capitalized,
+reference MathJSON symbols. MathJSON symbols are usually capitalized,
 such as `Divide` or `PlusMinus` and are not prefixed with a backslash.
 
 
@@ -543,7 +537,7 @@ modify existing entries by providing a new definition for them.
 
 The `precedence` property is used to determine the order of operations when parsing
 expressions, but it does not impact whether an entry is used for parsing. Only the 
-`latexTrigger` or `identifierTrigger` properties are used to determine if an entry
+`latexTrigger` or `symbolTrigger` properties are used to determine if an entry
 is used for parsing.
 
 Note that `latexTrigger` can be an array of tokens. However, the tokens
@@ -566,23 +560,23 @@ Each entry in the LaTeX dictionary is an object with the following properties:
   The meaning of the values and how to use them is explained below.
 
   Note that it is possible to provide multiple entries with the same `latexTrigger`
-  or `identifierTrigger` but with different `kind` properties. For example, the
+  or `symbolTrigger` but with different `kind` properties. For example, the
   `+` operator is both an `infix` (binary) and a `prefix` (unary) operator.
 
 - `latexTrigger`
 
   A LaTeX fragment that will trigger the entry. For example, `^{+}` or `\mathbb{D}`.
 
-- `identifierTrigger`
+- `symbolTrigger`
 
   A string, usually wrapped in a LaTeX command, that will trigger the entry. 
   
-  For example, if `identifierTrigger` is `floor`, the LaTeX
+  For example, if `symbolTrigger` is `floor`, the LaTeX
   command `\mathrm{floor}` or `\operatorname{floor}` will trigger the entry.
 
-  Only one of `latexTrigger` or `identifierTrigger` should be provided. 
+  Only one of `latexTrigger` or `symbolTrigger` should be provided. 
   
-  If `kind`  is `"environment"`, only `identifierTrigger` is valid, and it 
+  If `kind`  is `"environment"`, only `symbolTrigger` is valid, and it 
   represents the name of the environment.
   
   If kind is `matchfix`, both `openTrigger` and `closeTrigger` must be provided instead.
@@ -626,7 +620,7 @@ Each entry in the LaTeX dictionary is an object with the following properties:
 
 - `name`
   
-  The name of the MathJSON identifier associated with this entry.
+  The name of the MathJSON symbol associated with this entry.
   
   If provided, a default `parse` handler will be used that is equivalent to:
   `parse: name`.
@@ -662,21 +656,21 @@ token.
 #### Functions
 
 The `function` kind is a special case of `expression` where the expression is a
-function, possibly using multi-character identifiers, as in
+function, possibly using multi-character symbols, as in
 `\operatorname{concat}`. 
 
 Unlike an `expression` entry, after the `parse` handler is invoked, the 
 parser will look for a pair of parentheses to parse the arguments of the 
 function and apply them to the function.
 
-The parse handler should return the identifier corresponding to the function,
+The parse handler should return the symbol corresponding to the function,
 such as `Concatenate`. As a shortcut, the `parse` handler can be provided as an
 Expression. For example:
 
 ```javascript
 {
   kind: "function",
-  identifierTrigger: "concat",
+  symbolTrigger: "concat",
   parse: "Concatenate"
 }
 ```
@@ -769,7 +763,7 @@ passed a `parser` object and the left-hand side of the operator.
 
 The `environment` kind is used for LaTeX environments. 
 
-The `identifierTrigger property in that case is the name of the environment. 
+The `symbolTrigger property in that case is the name of the environment. 
 
 The `parse` handler wil be passed a `parser` object. The `parseTabular()` 
 method can be used to parse the rows and columns of the environment. It 
@@ -780,7 +774,7 @@ The `parse` handler should return a MathJSON expression.
 ```javascript
 {
   kind: "environment",
-  identifierTrigger: "matrix",
+  symbolTrigger: "matrix",
   parse: (parser) => {
     const content = parser.parseTabular();
     return ["Matrix", ["List", content.map(row => ["List", row.map(cell => cell)])]];
@@ -821,11 +815,10 @@ letters are each separate tokens.
 The `parse` handler is invoked when the trigger is encountered in the LaTeX
 token strings.
 
-A common case is to return from the parse handler a MathJSON identifier for a
-symbol or function.
+A common case is to return from the parse handler a MathJSON symbol.
 
 For example, let's say you wanted to map the LaTeX command `\div` to the
-MathJSON `Divide` function. You would write:
+MathJSON `Divide` symbol. You would write:
 
 ```javascript
 {
@@ -944,7 +937,7 @@ left-hand side of the operator as the first argument to the `parse` handler.
 
 When serializing a MathJSON expression to a LaTeX string, the `serialize()`
 handler is invoked. You must specify a `name` property to associate the
-serialization handler with a MathJSON identifier.
+serialization handler with a MathJSON symbol.
 
 ```javascript
 {

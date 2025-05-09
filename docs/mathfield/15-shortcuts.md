@@ -185,22 +185,22 @@ Possible values are:
 </section>
 
 
-## Multicharacter Identifiers
+## Multicharacter Symbols
 
 It may not be possible to define in advance all the keystroke combinations 
 that should be interpreted as an inline shortcut. 
 
-For example, it might be desirable to recognize multi-character identifiers, e.g. \\( \mathrm\{speed\} = \frac\{\mathrm\{distance\}\}\{\mathrm\{time\}\} \\)
+For example, it might be desirable to recognize multi-character symbols, e.g. \\( \mathrm\{speed\} = \frac\{\mathrm\{distance\}\}\{\mathrm\{time\}\} \\)
 
 
-There are several ways to represent multicharacter identifiers in LaTeX. 
+There are several ways to represent multicharacter symbols in LaTeX. 
 Conventionally, the `\mathit{}` command is used to represent variables and the 
 `\mathrm{}` for function names. You may prefer to use `\mathrm{}` in both cases.
 The command `\operatorname{}` may also be used for this purpose.
 
-**To recognize multicharacter identifiers,** provide a `onInlineShortcut()` handler.
-If the handler recognize the input as a valid multichar identifiers, it 
-should return a command representing this identifiers.
+**To recognize multicharacter symbols,** provide a `onInlineShortcut()` handler.
+If the handler recognize the input as a valid multichar symbols, it 
+should return a command representing this symbols.
 
 The string passed to the `onInlineShortcut` handler is a raw sequence of 
 characters the user typed on the physical or virtual keyboard.

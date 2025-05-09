@@ -9,7 +9,7 @@ identify and manipulate the structure of expressions.
 
 ## Wildcards
 
-Wildcard are placeholders identifiers in an expression. They start with a `_`.
+Wildcards are placeholders symbols in an expression. They start with a `_`.
 
 The `"_"` universal wildcard matches anything that is in the corresponding 
 position in an expression.

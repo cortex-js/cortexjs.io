@@ -8,16 +8,17 @@ toc: true
 
 
 <Intro>
-A **symbol** is an identifier representing a named mathematical object. It 
-has a type and may hold a value. A symbol without a value represents a
-mathematical unknown in an expression.
+A **symbol** is a named object in the Compute Engine. It has a type and may 
+hold a value. A symbol without a value represents a mathematical unknown in 
+an expression.
 </Intro>
 
 **To change the value or type of a symbol**, use the `value` and `type`
 properties of the symbol.
 
 A symbol does not have to be declared before it can be used. The type of a
-symbol will be inferred based on its usage or its value.
+symbol will be inferred based on its usage or its value. If its type cannot be
+inferred, the type will be `unknown`.
 
 ```live show-line-numbers
 const n = ce.box("n");
@@ -33,7 +34,7 @@ Read more about **adding definitions** for symbols and functions<Icon name="chev
 
 ## Scope
 
-Symbols are defined within a **scope**.
+Symbols are defined within a **lexical scope**.
 
 <ReadMore path="/compute-engine/guides/evaluate/#lexical-scopes-and-evaluation-contexts" >
 Read more about **scopes**<Icon name="chevron-right-bold" /> 
@@ -99,6 +100,12 @@ symbol.value = 5;
 console.log(symbol.type);
 // ➔ "finite_integer"
 ```
+
+If the type of a symbol is inferred from its usage, the type can be 
+adjusted later as further information is provided. However, if the type is
+provided in the declaration, the type cannot be changed later.
+
+
 
 ## Forgetting a Symbol
 

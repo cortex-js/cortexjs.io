@@ -8,7 +8,7 @@ hide_table_of_contents: true
 The **MathJSON standard library** defines the **vocabulary** used by a MathJSON
 expression.
 
-This library defines the meaning of the identifiers used in a MathJSON
+This library defines the meaning of the symbols used in a MathJSON
 expression. It is independent of the syntax used to parse/serialize from another
 language such as LaTeX.
 
@@ -16,7 +16,7 @@ It includes definitions such as:
 
 - "_`Pi` is a transcendental number whose value is approximately 3.14159265..._"
 - "_The `Add` function is associative, commutative, pure, idempotent and can be
-  applied to arbitrary number of Real or Complex numbers_".
+  applied to an arbitrary number of Real or Complex numbers_".
 
 ## Topics
 
@@ -51,9 +51,9 @@ the documentation.
 The MathJSON Standard Library can be extended by defining new functions:
 
 ```js
-// Declare that the identifier "f" is a function, 
+// Declare that the symbol "f" is a function, 
 // but without giving it a definition
-ce.declare("f", "Function");
+ce.declare("f", "function");
 
 // Define a new function `double` that returns twice its input
 ce.assign("double(x)", ["Multiply", "x", 2]);
