@@ -23,9 +23,9 @@ to calculate a numerical approximation
 
 <FunctionDefinition name="D">
 
-<Signature name="D">_expr_, _var_</Signature>
+<Signature name="D" returns="(number -> number)">_f_: number -> number, _var_: symbol</Signature>
 
-The `D` function represents the partial derivative of a function `expr` with respect to
+The `D` function represents the partial derivative of a function `f` with respect to
 the variable `var`.
 
 <Latex value=" f^\prime(x)"/>
@@ -34,7 +34,7 @@ the variable `var`.
 ["D", "f", "x"]
 ```
 
-<Signature name="D">_expr_, _var-1_, _var-2_, ...</Signature>
+<Signature name="D" returns="(number -> number)">_f_, ..._var_: symbol</Signature>
 
 Multiple variables can be specified to compute the partial derivative of a multivariate
 function.
@@ -46,8 +46,6 @@ function.
 ```json example
 ["D", "f", "x", "y"]
 ```
-
-<Signature name="D">_expr_, _var_, _var_</Signature>
 
 A variable can be repeated to compute the second derivative of a function.
 
@@ -61,9 +59,13 @@ A variable can be repeated to compute the second derivative of a function.
 
 **Explanation**
 
-The derivative is a measure of how a function changes as its input changes. It is the ratio of the change in the value of a function to the change in its input value. 
+The derivative is a measure of how a function changes as its input changes. It 
+is the ratio of the change in the value of a function to the change in its 
+input value. 
 
-The derivative of a function $$ f(x) $$ with respect to its input $$ x $$ is denoted by $$ f'(x) $$ or $$ \frac{df}{dx} $$. The derivative of a function $$ f(x) $$ is defined as:
+The derivative of a function $$ f(x) $$ with respect to its input $$ x $$ is 
+denoted by $$ f'(x) $$ or $$ \frac{df}{dx} $$. The derivative of a function 
+$$ f(x) $$ is defined as:
 
 $$
 f'(x) = \lim_{h \to 0} \frac{f(x + h) - f(x)}{h}
@@ -76,15 +78,15 @@ where:
 - $$ \lim_{h \to 0} \frac{f(x + h) - f(x)}{h} $$ is the limit of the ratio of the change in the value of the function to the change in its input value as $$ h $$ approaches $$ 0 $$.
 - The limit is taken as $$ h $$ approaches $$ 0 $$ because the derivative is the instantaneous rate of change of the function at a point, and the change in the input value must be infinitesimally small to be instantaneous.
 
-- Wikipedia: [Derivative](https://en.wikipedia.org/wiki/Derivative)
-- Wolfram Mathworld: [Derivative](https://mathworld.wolfram.com/Derivative.html)
+- **Wikipedia**: [Derivative](https://en.wikipedia.org/wiki/Derivative)
+- **Wolfram Mathworld**: [Derivative](https://mathworld.wolfram.com/Derivative.html)
 
 
 <b>Reference</b>
-- Wikipedia: [Derivative](https://en.wikipedia.org/wiki/Derivative)
-- Wikipedia: [Notation for Differentiation](https://en.wikipedia.org/wiki/Notation_for_differentiation), [Leibniz's Notation](https://en.wikipedia.org/wiki/Leibniz%27s_notation), [Lagrange's Notation](https://en.wikipedia.org/wiki/Lagrange%27s_notation),  [Newton's Notation](https://en.wikipedia.org/wiki/Newton%27s_notation)
-- Wolfram Mathworld: [Derivative](https://mathworld.wolfram.com/Derivative.html)
-- NIST: [Derivative](https://dlmf.nist.gov/2.1#E1)
+- **Wikipedia**: [Derivative](https://en.wikipedia.org/wiki/Derivative)
+- **Wikipedia**: [Notation for Differentiation](https://en.wikipedia.org/wiki/Notation_for_differentiation), [Leibniz's Notation](https://en.wikipedia.org/wiki/Leibniz%27s_notation), [Lagrange's Notation](https://en.wikipedia.org/wiki/Lagrange%27s_notation),  [Newton's Notation](https://en.wikipedia.org/wiki/Newton%27s_notation)
+- **Wolfram Mathworld**: [Derivative](https://mathworld.wolfram.com/Derivative.html)
+- **NIST**: [Derivative](https://dlmf.nist.gov/2.1#E1)
 
 <b>Lagrange Notation</b>
 
@@ -93,11 +95,11 @@ where:
 | `f'(x)`               | `["Derivative", "f", "x"]` |
 | `f\prime(x)`          | `["Derivative", "f", "x"]` |
 | `f^{\prime}(x)`       |   `["Derivative", "f", "x"]` |
-| `f''(x)`              | `["Derivative", "f", "x", 2]` |
-| `f\prime\prime(x)`    | `["Derivative", "f", "x", 2]` |
-| `f^{\prime\prime}(x)` | `["Derivative", "f", "x", 2]` |
-| `f\doubleprime(x)` |  `["Derivative", "f", "x", 2]` |
-| `f^{(n)}(x)` |  `["Derivative", "f", "x", "n"]` |
+| `f''(x)`              | `["Derivative", "f", "x", "x"]` |
+| `f\prime\prime(x)`    | `["Derivative", "f", "x", "x"]` |
+| `f^{\prime\prime}(x)` | `["Derivative", "f", "x", "x"]` |
+| `f\doubleprime(x)` |  `["Derivative", "f", "x", "x"]` |
+| `f^{(n)}(x)` |  `["Derivative", "f", "x", n]` |
 
 
 
@@ -108,9 +110,9 @@ where:
 
 <FunctionDefinition name="ND">
 
-<Signature name="ND">_expr_, _value_</Signature>
+<Signature name="ND" returns="number">_f_: number -> number, _x_: number</Signature>
 
-The `ND` function returns a numerical approximation of the partial derivative of a function _expr_ at the point _value_.
+The `ND` function returns a numerical approximation of the partial derivative of a function $f$ at the point $x$.
 
 <Latex value=" \sin^{\prime}(x)|_{x=1}"/>
 
@@ -119,7 +121,7 @@ The `ND` function returns a numerical approximation of the partial derivative of
 // ➔ 0.5403023058681398
 ```
 
-**Note:** `["ND", "Sin", 1]` is equivalent to `["N", ["D", "Sin", 1]]`.
+**Note:** `["ND", "Sin", 1]` is equivalent to `["Apply", ["D", "Sin"], 1]`.
 
 
 </FunctionDefinition>
@@ -128,29 +130,26 @@ The `ND` function returns a numerical approximation of the partial derivative of
 
 <FunctionDefinition name="Derivative">
 
-<Signature name="Derivative">_expr_</Signature>
+<Signature name="Derivative" returns="(number -> number)">_f_: number -> number</Signature>
 
-The `Derivative` function represents the derivative of a function _expr_.
+The `Derivative` function represents the derivative of a function $f$.
 
 <Latex value=" f^\prime(x)"/>
 
 ```json example
 ["Apply", ["Derivative", "f"], "x"]
-
-// This is equivalent to:
-[["Derivative", "f"], "x"]
 ```
 
 
 
-<Signature name="Derivative">_expr_, _n_</Signature>
+<Signature name="Derivative" returns="(number -> number)">_f_: number -> number, _n_: integer</Signature>
 
-When a `n` argument is present it represents the _n_-th derivative of a function _expr_.
+When an argument $n$ is present it represents the _n_-th derivative of a function _expr_.
 
 <Latex value="f^{(n)}(x)"/>
 
 ```json example
-["Apply", ["Derivative", "f", "n"], "x"]
+["Apply", ["Derivative", "f", n], "x"]
 ```
 
 
@@ -164,7 +163,7 @@ The `Derivative` function is used to represent the derivative of a function in a
 
 
 <FunctionDefinition name="Integrate">
-<Signature name="Integrate">_expr_</Signature>
+<Signature name="Integrate" returns="(number -> number)">_f_: number -> number</Signature>
 
 An **indefinite integral**, also known as an antiderivative, refers to the reverse 
 process of differentiation. 
@@ -175,7 +174,7 @@ process of differentiation.
 ["Integrate", "Sin"]
 ```
 
-<Signature name="Integrate">_expr_, _index_</Signature>
+<Signature name="Integrate">_f_: number -> number, _index_</Signature>
 
 <Latex value="\int \sin x \,\mathrm{d}x"/>
 

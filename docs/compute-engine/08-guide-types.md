@@ -408,7 +408,7 @@ ce.type("(integer, ...integer) -> number").matches("(integer, integer) -> number
 
 ### Function Type
 
-The type `function` matches any function literal, it is a shorthand for `(...any) -> any`.
+The type `function` matches any function literal, it is a shorthand for `(...any) -> unknown`.
 
 ## Value Type
 
@@ -506,7 +506,8 @@ ce.parse("3.14").type.matches("real");
 Maps are compatible if they have the same keys and the values are compatible.
 
 ```js
-ce.parse("{red: 1, green: 2}").type.matches("map<red: integer, green: integer>");
+ce.parse("{red: 1, green: 2}").type
+  .matches("map<red: integer, green: integer>");
 // ➔ true
 ```
 
@@ -514,7 +515,8 @@ ce.parse("{red: 1, green: 2}").type.matches("map<red: integer, green: integer>")
 compatible with a map with fewer keys.
 
 ```js
-ce.parse("{red: 1, green: 2, blue: 3}").type.matches("map<red: integer, green: integer>");
+ce.parse("{red: 1, green: 2, blue: 3}").type
+  .matches("map<red: integer, green: integer>");
 // ➔ true
 ```
 
@@ -523,17 +525,20 @@ ce.parse("{red: 1, green: 2, blue: 3}").type.matches("map<red: integer, green: i
 Tuples are compatible if they have the same length and the elements are compatible.
 
 ```js
-ce.parse("(1, 2, 3)").type.matches("tuple<integer, integer, integer>");
+ce.parse("(1, 2, 3)").type
+  .matches("tuple<integer, integer, integer>");
 // ➔ true
 ```
 
 If the elements of a tuple are named, the names must match.
 
 ```js
-ce.parse("(x: 1, y: 2)").type.matches("tuple<x: integer, y: integer>");
+ce.parse("(x: 1, y: 2)").type
+  .matches("tuple<x: integer, y: integer>");
 // ➔ true
 
-ce.parse("(x: 1, y: 2)").type.matches("tuple<a: integer, b: integer>");
+ce.parse("(x: 1, y: 2)").type
+  .matches("tuple<a: integer, b: integer>");
 // ➔ false
 ```
 
@@ -543,7 +548,8 @@ ce.parse("(x: 1, y: 2)").type.matches("tuple<a: integer, b: integer>");
 Lists are compatible if they have the same length and the elements are compatible.
 
 ```js
-ce.parse("[1, 2, 3]").type.matches("list<finite_integer>");
+ce.parse("[1, 2, 3]").type
+  .matches("list<finite_integer>");
 // ➔ true
 ```
 
@@ -552,7 +558,8 @@ ce.parse("[1, 2, 3]").type.matches("list<finite_integer>");
 Function literals are compatible if the input types are compatible and the output types are compatible.
 
 ```js
-ce.type("integer -> integer").matches("number -> number");
+ce.type("integer -> integer")
+  .matches("number -> number");
 // ➔ true
 ```
 
@@ -560,7 +567,8 @@ The name of the arguments of a function signature is not taken into account when
 checking for compatibility.
 
 ```js
-ce.type("x: integer -> integer").matches("integer -> integer");
+ce.type("x: integer -> integer")
+  .matches("integer -> integer");
 // ➔ true
 ```
 

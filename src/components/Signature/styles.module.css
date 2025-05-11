@@ -7,11 +7,13 @@
   border-radius: 0;
 
   font-family: var(--monospace-font-family);
-  font-weight: 900;
+  font-weight: 100;
   font-size: 1em;
   background: var(--blue-600);
   color: var(--blue-100);
 }
+
+
 
 [data-theme="dark"] .signature {
   background: var(--blue-800);
@@ -24,7 +26,7 @@
 }
 
 .signature i, .signature em {
-  opacity: 0.8;
+  font-weight: 900;
 }
 
 

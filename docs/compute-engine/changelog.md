@@ -12,27 +12,45 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
-### ? ? ?
-
-- More consistency with BoxedSymbol properties causing symbol-binding: e.g.
-  `isFinite` and `isInfinity` cause binding, in a similar way to `isOdd`,
-  `isEven`.
-
 ### Breaking Changes
 
-- The `expr.value` property is now equivalent to `expr.valueOf()`. It was
-  previously equivalent to `expr.N().valueOf()`, however the implicit evaluation
-  of the expression produced some unexpected results, for example when the
-  expression was not pure.
+- The `expr.value` property reflects the value of the expression if it is a
+  number literal or a symbol with a literal value. If you previously used the
+  `expr.value` property to get the value of an expression, you should now use
+  the `expr.N().valueOf()` method instead. The `valueOf()` method is suitable
+  for interoperability with JavaScript, but it may result in a loss of precision
+  for numbers with more than 15 digits.
 
 - `BoxedExpr.sgn` now returns _undefined_ for complex numbers, or symbols with a
   complex-number value.
 
--
+- The `ce.assign()` method previously accepted
+  `ce.assign("f(x, y)", ce.parse("x+y"))`. This is now deprecated. Use
+  `ce.assign("f", ce.parse("(x, y) \\mapsto x+y")` instead.
+
+- It was previously possible to invoke `expr.evaluate()` or `expr.N()` on a
+  non-canonical expression. This will now return the expression itself.
+
+  To evaluate a non-canonical expression, use `expr.canonical.evaluate()` or
+  `expr.canonical.N()`.
+
+  That's also the case for the methods `numeratorDenominator()`, `numerator()`,
+  and `denominator()`.
+
+  In addition, invoking the methods `inv()`, `abs()`, `add()`, `mul()`, `div()`,
+  `pow()`, `root()`, `ln()` will throw an error if the expression is not
+  canonical.
 
 ### New Features and Improvements
 
+- The bindings of symbols and function expressions is now consistently done
+  during canonicalization.
+
+- It was previously not possible to change the type of an identifier from a
+  function to a value or vice versa. This is now possible.
+
 - Added a rule to solve the equation `a^x + b = 0`
+
 - The LaTeX parser now supports the `\placeholder[]{}`, `\phantom{}`,
   `\hphantom{}`, `\vphantom{}`, `\mathstrut`, `\strut` and `\smash{}` commands.
 
@@ -1721,7 +1739,7 @@ They can be iterated, sliced, filtered, mapped, etc...
 ### Breaking Changes
 
 - The entries in the LaTeX syntax dictionary can now have LaTeX triggers
-  (`latexTrigger`) or triggers based on identifiers (`identifierTrigger`). The
+  (`latexTrigger`) or triggers based on identifiers (`symbolTrigger`). The
   former replaces the `trigger` property. The latter is new. An entry with a
   `triggerIdentifier` of `average` will match `\operatorname{average}`,
   `\mathrm{average}` and other variants.
