@@ -1542,7 +1542,7 @@ and `Magenta`. Those names are case-sensitive.
 
 Mathfields support some commands from the [MathJax HTML extension](http://docs.mathjax.org/en/latest/input/tex/extensions/html.html).
 
-#### `\class`
+#### `\class{className}{expression}`
 
 <Latex value="\class{custom-CSS-class}{x+1}"/>
 
@@ -1562,7 +1562,7 @@ stylesheet defined with a `<style>` tag inside the `<math-field>` element.
 </math-field>
 ```
 
-#### `\cssId`
+#### `\cssId{id}{expression}`
 
 Apply an element ID to the expression. The element can then be styled using CSS.
 
@@ -1581,7 +1581,7 @@ Apply an element ID to the expression. The element can then be styled using CSS.
 <Latex value="\cssId{custom-CSS-class}{\text{Don Knuth}}"/>
 
 
-#### `\htmlData`
+#### `\htmlData{key=value,...}{content}`
 
 The argument of this command is a comma-delimited list of key/value pairs, e.g. 
 `\htmlData{foo=green,bar=blue}{x=0}`. A corresponding
@@ -1590,23 +1590,35 @@ The argument of this command is a comma-delimited list of key/value pairs, e.g.
 <Latex value="\htmlData{foo=green,bar=blue}{ \text{Don Knuth} }"/>
  
 
+ #### `\href{url}{content}`
+
+
+The first argument is a URL, the second argument is the content to display, in math mode.
+
+```html example
+<math-field>
+  \href{https://cortexjs.io}{\text{CortexJS website}}
+</math-field>
+```
+
+
 ### Other Extensions
 
-#### `\error`
+#### `\error{content}`
 
 The argument of this command is a string that will be rendered with a red
 background and a red underline.
 
 <Latex value="\text{Don \error{\text{Knuht}}}"/>
 
-#### `\texttip`
+#### `\texttip{expression}{hover text}`
 
 The first argument is a math expression to display, the second argument is the text to
 display on hover.
 
 <Latex value="\texttip{e^{i\pi}-1=0}{The most beautiful equation}"/>
 
-#### `\mathtip`
+#### `\mathtip{expression}{hover text}`
 
 The first argument is a math expression to display, the second argument is the 
 a math expression to display on hover.
