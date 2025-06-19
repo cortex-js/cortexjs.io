@@ -301,10 +301,11 @@ enclosed in backticks.
 
 Keys must be unique within a map, but they are not ordered.
 
-The type of a map is represented by the type expression `map<K1: T1, K2: T2, ...>`, 
-where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the values.
+The type of a map is represented by the type expression `map<T>`, indicating
+a map of elements of type `T`, or by the type expression
+`map<K1: T1, K2: T2, ...>`, where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the values.
 
-For example: `map<red: integer, green: integer, blue: integer>` is a map that 
+For example: `map<red: integer, green: integer, blue: integer>` is a map that
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
 For a map `A` to be compatible with a map `B`, the keys of `A` must be a
@@ -325,6 +326,8 @@ ce.type("map<red: integer, green: integer, blue: integer>")
 // ➔ true
 ```
 
+
+The type `map<T>` matches any map with values of type `T`.
 
 The type `map` matches any map.
 
@@ -598,3 +601,76 @@ console.info(ce.box(3.14).isInteger)
 // ➔ false
 
 ```
+
+
+## Defining New Types
+
+**To define new types** use the `ce.declareType()` function.
+
+For example, to defines a new type `point` that is a tuple of two 
+integers, `x` and `y`:
+
+```js
+ce.declareType("point", "tuple<x: integer, y: integer>");
+```
+
+The type is defined in the current lexical scope.
+
+
+### Nominal vs Structural Types
+
+By default, types are nominal, meaning that to be compatible, they must have 
+the same name and not just the same structure.
+
+```js
+ce.type("tuple<x: integer, y: integer>")
+  .matches("point");
+// ➔ false
+```
+
+To make a type structural, use the `ce.declareType()` function with the
+`alias` option. Two structural types are compatible if they have the same structure,
+regardless of their names.
+
+```js
+ce.declareType("pointData", "tuple<x: integer, y: integer>", { alias: true });
+```
+
+```js
+ce.type("tuple<x: integer, y: integer>")
+  .matches("pointData");
+// ➔ true
+```
+
+### Recursive Types
+
+A recursive type is a type that refers to itself in its definition.
+
+For example, a binary tree can be defined as a tuple of a value and two subtrees:
+
+```js
+ce.declareType("tree", "tuple<value: integer, left: tree, right: tree>");
+```
+
+A set of types can be mutually recursive, meaning that they can refer to each other in their definitions.
+In this case, you can use a type before declaring it by prefacing if with the `type` keyword.
+
+For example, a definition of a JSON value could be:
+
+```js
+ce.declareType("json", `
+    nothing
+  | boolean
+  | number
+  | string
+  | type json_array
+  | type json_object
+`);
+ce.declareType("json_object", "map<json>");
+ce.declareType("json_array", "list<json>");
+```
+
+When using `type json_array` or `type json_object`, the type is not yet defined, but it will be
+defined later in the code. This allows you to use the type before declaring it,
+but it is not necessary to use the `type` keyword if the type is already defined.
+

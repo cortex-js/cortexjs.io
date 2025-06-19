@@ -636,7 +636,7 @@ set minFontScale(value: number): void
 ```
 
 Set the minimum relative font size for nested superscripts and fractions. The value
-should be a number between `0` and `1`. The size is in releative `em` units relative to the
+should be a number between `0` and `1`. The size is in relative `em` units relative to the
 font size of the `math-field` element. Specifying a value of `0` allows the `math-field`
 to use its default sizing logic.
 
@@ -1617,7 +1617,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.105.2';
+static version: string = '0.105.3';
 ```
 
 </MemberCard>
@@ -6390,7 +6390,7 @@ const version: {
 };
 ```
 
-Current version: `0.105.2`
+Current version: `0.105.3`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 

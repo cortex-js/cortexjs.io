@@ -40,7 +40,7 @@ of the list is the second row of the matrix, etc.
 
 <ReadMore path="/compute-engine/reference/collections/" >Since
 matrixes are `List` collections, some **collection operations**
-can also be applied to them such as `At`, `Fold` and `Map`. </ReadMore>
+can also be applied to them such as `At`, `Reduce` and `Map`. </ReadMore>
 
 
 An extension of linear algebra is [tensor algebra](https://en.wikipedia.org/wiki/Tensor_algebra) 
@@ -52,7 +52,7 @@ triplets. Tensors are also represented as nested lists.
 
 The Compute Engine provides a number of functions for working with matrices.
 
-### Representing Matrices
+## Representing Matrices
 
 Vectors (row vectors) are represented as lists, that is an expression with the 
 head `List`.
@@ -85,6 +85,9 @@ In LaTeX, each column is separated by an `&` and each row is separated by
 `\`.
 
 
+<div style={{visibility:"hidden"}}>
+### Vector
+</div>
 <FunctionDefinition name="Vector">
 
 <Signature name="Vector">_x-1_, ..._x-2_</Signature>
@@ -112,6 +115,9 @@ A row vector can be represented with a simple list or a tuple.
 
 
 
+<div style={{visibility:"hidden"}}>
+### Matrix
+</div>
 <FunctionDefinition name="Matrix">
 
 <Signature name="Matrix">_matrix_</Signature>
@@ -166,6 +172,9 @@ columns and `:` indicate a dashed lines between two columns.
 ## Matrix Properties
 
 
+<div style={{visibility:"hidden"}}>
+### Shape
+</div>
 <FunctionDefinition name="Shape">
 
 <Signature name="Shape">_matrix_</Signature>
@@ -195,6 +204,9 @@ used to refer to the length of a matrix along a specific axis.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Rank
+</div>
 <FunctionDefinition name="Rank">
 
 <Signature name="Rank">_matrix_</Signature>
@@ -225,6 +237,9 @@ The rank is the length of the shape of the tensor.
 
 ## Accessing the content of Tensors
 
+<div style={{visibility:"hidden"}}>
+### At
+</div>
 <FunctionDefinition name="At">
 
 <Signature name="At">_matrix_, _index-1_, _index-2_, ...</Signature>
@@ -269,6 +284,9 @@ square brackets following a matrix.
 
 ## Transforming Matrixes
 
+<div style={{visibility:"hidden"}}>
+### Flatten
+</div>
 <FunctionDefinition name="Flatten">
 
 <Signature name="Flatten">_matrix_</Signature>
@@ -293,6 +311,9 @@ are flattened.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Reshape
+</div>
 <FunctionDefinition name="Reshape">
 
 <Signature name="Reshape">_matrix_, _shape_</Signature>
@@ -329,6 +350,9 @@ with zeros.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Transpose
+</div>
 <FunctionDefinition name="Transpose">
 
 <Signature name="Transpose">_matrix_</Signature>
@@ -350,6 +374,9 @@ indexes start at 1.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### ConjugateTranspose
+</div>
 <FunctionDefinition name="ConjugateTranspose">
 
 <Signature name="ConjugateTranspose">_matrix_</Signature>
@@ -374,6 +401,9 @@ of the tensor are conjugated.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Inverse
+</div>
 <FunctionDefinition name="Inverse">
 
 <Signature name="Inverse">_matrix_</Signature>
@@ -389,6 +419,9 @@ Returns the inverse of the matrix.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### PseudoInverse
+</div>
 <FunctionDefinition name="PseudoInverse">
 
 <Signature name="PseudoInverse">_matrix_</Signature>
@@ -404,6 +437,9 @@ Returns the [Moore-Penrose pseudoinverse](https://en.wikipedia.org/wiki/Moore%E2
 
 </FunctionDefinition>
   
+<div style={{visibility:"hidden"}}>
+### Diagonal
+</div>
 <FunctionDefinition name="Diagonal">
 
 <Signature name="Diagonal">_matrix_</Signature>
@@ -421,6 +457,9 @@ on the diagonal of the matrix.
 ## Calculating with Matrixes
 
 
+<div style={{visibility:"hidden"}}>
+### Determinant
+</div>
 <FunctionDefinition name="Determinant">
 
 <Signature name="Determinant">_matrix_</Signature>
@@ -436,6 +475,9 @@ Returns the determinant of the matrix.
 
 
 
+<div style={{visibility:"hidden"}}>
+### AdjugateMatrix
+</div>
 <FunctionDefinition name="AdjugateMatrix">
 
 <Signature name="AdjugateMatrix">_matrix_</Signature>
@@ -459,6 +501,9 @@ the element.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### Trace
+</div>
 <FunctionDefinition name="Trace">
 
 <Signature name="Trace">_matrix_</Signature>

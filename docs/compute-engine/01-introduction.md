@@ -189,7 +189,7 @@ function is a method of the `BoxedExpression` class.
 
 
 
-<ReadMore path="/compute-engine/guides/standard-library/" >
+<ReadMore path="/compute-engine/standard-library/" >
 Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold" />
 </ReadMore>
 

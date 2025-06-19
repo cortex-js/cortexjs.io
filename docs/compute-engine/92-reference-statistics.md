@@ -15,6 +15,9 @@ following forms:
 ## Functions
 
 
+<div style={{visibility:"hidden"}}>
+### Mean
+</div>
 <FunctionDefinition name="Mean">
 
 <Signature name="Mean">_collection_</Signature>
@@ -38,6 +41,9 @@ $$x_i$$ is the $$i$$-th number in the list.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Median
+</div>
 <FunctionDefinition name="Median">
 
 <Signature name="Median">_collection_</Signature>
@@ -57,6 +63,9 @@ the average of the two middle elements.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Mode
+</div>
 <FunctionDefinition name="Mode">
 
 <Signature name="Mode">_collection_</Signature>
@@ -69,8 +78,16 @@ numbers can have more than one mode. If there are two modes, the list is called
 modes, the list is called **trimodal**. If there are more than three modes, the
 list is called **multimodal**.
 
+```json example
+["Mode", ["List", 1, 2, 2, 3, 4, 4, 5, 5]]
+// 2
+```
+
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Variance
+</div>
 <FunctionDefinition name="Variance">
 
 <Signature name="Variance">_collection_</Signature>
@@ -90,6 +107,29 @@ where $$\mu$$ is the mean of the list.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### PopulationVariance
+</div>
+<FunctionDefinition name="PopulationVariance">
+
+<Signature name="PopulationVariance">_collection_</Signature>
+
+Evaluate to the **population variance** of a _collection_ of numbers.
+
+The population variance is the variance calculated by dividing the sum of squared
+differences from the mean by the number of elements in the population.
+
+The formula for the population variance is
+
+$$\frac{1}{N} \sum_{i=1}^N (x_i - \mu)^2$$
+
+where $$N$$ is the size of the population, and $$\mu$$ is the population mean.
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### StandardDeviation
+</div>
 <FunctionDefinition name="StandardDeviation">
 
 <Signature name="StandardDeviation">_collection_</Signature>
@@ -109,6 +149,28 @@ where $$\mu$$ is the mean of the list.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### PopulationStandardDeviation
+</div>
+<FunctionDefinition name="PopulationStandardDeviation">
+
+<Signature name="PopulationStandardDeviation">_collection_</Signature>
+
+Evaluate to the **population standard deviation** of a _collection_ of numbers.
+
+The population standard deviation is the square root of the population variance.
+
+The formula for the population standard deviation is
+
+$$\sqrt{\frac{1}{N} \sum_{i=1}^N (x_i - \mu)^2}$$
+
+where $$N$$ is the size of the population, and $$\mu$$ is the population mean.
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Skewness
+</div>
 <FunctionDefinition name="Skewness">
 
 <Signature name="Skewness">_collection_</Signature>
@@ -127,6 +189,9 @@ standard deviation of the _collection_.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Kurtosis
+</div>
 <FunctionDefinition name="Kurtosis">
 
 <Signature name="Kurtosis">_collection_</Signature>
@@ -146,6 +211,9 @@ deviation of the list.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Quantile
+</div>
 <FunctionDefinition name="Quantile">
 
 <Signature name="Quantile">_collection_, _q:number_</Signature>
@@ -160,6 +228,9 @@ So, $$\operatorname{median} = \operatorname{quantile}(0.5)$$.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Quartiles
+</div>
 <FunctionDefinition name="Quartiles">
 
 <Signature name="Quartiles">_collection_</Signature>
@@ -169,8 +240,16 @@ Evaluate to the **quartiles** of a _collection_ of numbers.
 The quartiles are the three points that divide a _collection_ of numbers into
 four equal groups, each group comprising a quarter of the _collection_.
 
+```json example
+["Quartiles", ["List", 1, 2, 3, 4, 5, 6, 7, 8]]
+// [2.5, 4.5, 6.5]
+```
+
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### InterquartileRange
+</div>
 <FunctionDefinition name="InterquartileRange">
 
 <Signature name="InterquartileRange">_collection_</Signature>
@@ -182,103 +261,102 @@ first quartile.
 
 </FunctionDefinition>
 
-<FunctionDefinition name="Sum">
+<div style={{visibility:"hidden"}}>
+### Histogram
+</div>
+<FunctionDefinition name="Histogram">
 
-<Signature name="Sum">_collection_</Signature>
+<Signature name="Histogram">_collection_, _bins:number_</Signature>
 
-Evaluate to a sum of all the elements in _collection_. If all the elements are
-numbers, the result is a number. Otherwise it is a simplified _collection_.
+Evaluate to the **histogram** of a _collection_ of numbers.
 
-<Latex value="\sum x_{i}"/>
-
-```json example
-["Sum", ["List", 5, 7, 11]]
-// ➔ 23
-```
-
-<Signature name="Sum">_body_, _bounds_</Signature>
-
-Return the sum of `body`for each value in `bounds`.
-
-<Latex value="\sum{i=1}^{n} f(i)"/>
+The histogram groups the data into a specified number of bins and counts the
+number of elements in each bin.
 
 ```json example
-["Sum", ["Add", "x", 1], ["Tuple", 1, 10, "x"]]
-// ➔ 65
+["Histogram", ["List", 1, 2, 2, 3, 4, 5, 5, 5], 3]
+// [2, 2, 5]
 ```
 
 </FunctionDefinition>
 
-<FunctionDefinition name="Product">
+<div style={{visibility:"hidden"}}>
+### BinCounts
+</div>
+<FunctionDefinition name="BinCounts">
 
-<Signature name="Product">_collection_</Signature>
+<Signature name="BinCounts">_collection_, _bins:number_</Signature>
 
-Evaluate to a product of all the elements in `collection`.
+Evaluate to the **bin counts** of a _collection_ of numbers.
 
-If all the elements are numbers, the result is a number. Otherwise it is a
-simplified _collection_.
-
-<Latex value="\prod x_{i}"/>
-
-```json example
-["Product", ["List", 5, 7, 11]]
-// ➔ 385
-
-["Product", ["List", 5, "x", 11]]
-// ➔ ["List", 55, "x"]
-```
-
-<Signature name="Product">_body_, _bounds_</Signature>
-
-Return the product of `body`for each value in `bounds`.
-
-<Latex value="\prod_{i=1}^{n} f(i)"/>
+Bin counts are the counts of the number of elements in each bin for a given
+number of bins.
 
 ```json example
-["Product", ["Add", "x", 1], ["Tuple", 1, 10, "x"]]
-// ➔ 39916800
+["BinCounts", ["List", 1, 2, 2, 3, 4, 5, 5, 5], 3]
+// [2, 2, 5]
 ```
 
 </FunctionDefinition>
 
-<FunctionDefinition name="Erf">
+<div style={{visibility:"hidden"}}>
+### SlidingWindow
+</div>
+<FunctionDefinition name="SlidingWindow">
 
-<Signature name="Erf">_z:complex_</Signature>
+<Signature name="SlidingWindow">_collection_, _windowSize:number_</Signature>
 
-Evaluate to the **error function** of a complex number.
+Evaluate to the **sliding windows** of a _collection_ of numbers.
 
-The error function is an odd function ( $$ \operatorname{erf} -z = -
-\operatorname{erf} z$$ ) that is used in statistics to calculate probabilities
-of normally distributed events.
+A sliding window is a moving subset of the data of a specified window size.
 
-The formula for the error function of a complex number is:
-
-$$ \operatorname{erf} z = \frac{2}{\sqrt{\pi}} \int_0^z e^{-t^2} dt$$
-
-where $$z$$ is a complex number.
-
-</FunctionDefinition>
-
-<FunctionDefinition name="Erfc">
-
-<Signature name="Erfc">_z:complex_</Signature>
-
-Evaluate to the **complementary error function** of a complex number.
-
-It is defined as $$ \operatorname{erfc} z = 1 - \operatorname {erf} z $$.
-
+```json example
+["SlidingWindow", ["List", 1, 2, 3, 4, 5], 3]
+// [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+```
 
 </FunctionDefinition>
 
-<FunctionDefinition name="ErfInv">
 
-<Signature name="ErfInv">_x:real_</Signature>
+<div style={{visibility:"hidden"}}>
+### Sample
+</div>
+<FunctionDefinition name="Sample">
 
-Evaluate to the **inverse error function** of a real number $$ -1 < x < 1 $$
+<Signature name="Sample">_collection_, _size:number_</Signature>
 
-It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
-= x $$.
+Evaluate to a **random sample** of a specified size from a _collection_ of numbers.
 
+Sampling is done without replacement unless otherwise specified.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Rank
+</div>
+<FunctionDefinition name="Rank">
+
+<Signature name="Rank">_collection_</Signature>
+
+Evaluate to the **rank** of each element in a _collection_ of numbers.
+
+The rank is the position of each element in the sorted order of the collection.
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Argsort
+</div>
+<FunctionDefinition name="Argsort">
+
+<Signature name="Argsort">_collection_</Signature>
+
+Evaluate to the **indices that would sort** a _collection_ of numbers.
+
+This returns a list of indices that sorts the collection.
+
+</FunctionDefinition>
+
+
+<ReadMore path="/compute-engine/reference/special-functions/" > See also Special Functions for
+the <strong>Error Functions</strong> </ReadMore>

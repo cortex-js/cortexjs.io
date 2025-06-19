@@ -287,7 +287,7 @@ Symbolic **indefinite integral** of a function $$ f $$ with respect to a variabl
 ```
 
 
-<Signature name="Integrate" return="function">_f_: function, ..._limits_:tuple</Signature>
+<Signature name="Integrate" returns="function">_f_: function, ..._limits_:tuple</Signature>
 
 A **definite integral** of a function $$ f $$. The function is evaluated
 symbolically as: 
@@ -314,7 +314,8 @@ The first element of the tuple is the variable of integration, and the second an
 ]
 ```
 
-The variable of integration can be omitted if it is the same as the variable in the function.
+The variable of integration can be omitted if it is the same as the argument of 
+the function.
 
 ```json example
 ["Integrate", 
@@ -323,7 +324,7 @@ The variable of integration can be omitted if it is the same as the variable in 
 ]
 ```
 
-Double integrals can be computed by specifying more than one limits.
+Double integrals can be computed by specifying more than one limit.
 <Latex flow="column" value="\int_1^3\int_0^2 x^2+y^2 dx dy"/>
 
 ```json example
@@ -354,9 +355,11 @@ Calculate a **numerical approximation** of the definite integral of a function.
 
 The `limits` tuples indicate the variable of integration and the limits of integration.
 
-The first element of the tuple is the variable of integration, and the second and third elements are the lower and upper limits of integration, respectively.
+The first element of the tuple is the variable of integration, and the second 
+and third elements are the lower and upper limits of integration, respectively.
 
-The variable of integration can be omitted if it is the same as the variable in the function.
+The variable of integration can be omitted if it is the same as the argument of 
+the function.
 
 ```json example
 ["NIntegrate", ["Power", "x", 2], ["Tuple", 0, 2]]
@@ -365,7 +368,7 @@ The variable of integration can be omitted if it is the same as the variable in 
 
 
 
-A double integral can be computed by specifying more than one limits.
+A double integral can be computed by specifying more than one limit.
 
 <Latex flow="column" value="\int_1^3\int_0^2 x^2+y^2 dx dy"/>
 

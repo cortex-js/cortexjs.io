@@ -3,7 +3,7 @@ title: Custom Functions and Symbols
 slug: /compute-engine/guides/augmenting/
 ---
 
-The [MathJSON Standard Library](/compute-engine/guides/standard-library/) is a
+The [MathJSON Standard Library](/compute-engine/standard-library/) is a
 collection of definitions for **symbols** such as `Pi`, `Add`,
 `Sin`, `Power`, `List`, etc...
 

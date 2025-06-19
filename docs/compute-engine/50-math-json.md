@@ -99,7 +99,7 @@ account for those notations.
 The Compute Engine includes a standard library of functions and symbols which
 can be extended with custom libraries.
 
-<ReadMore path="/compute-engine/guides/standard-library/">
+<ReadMore path="/compute-engine/standard-library/">
 Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold" />
 </ReadMore>
 
@@ -525,16 +525,19 @@ patterns.
 
 - If using latin characters, the first character of a constant should be an
   uppercase letter `A`-`Z`
-- If a constant name is made up of several words, use camelCase. For example
+
+- If the name of a constant is made up of several words, use PascalCase. For example
   `"SpeedOfLight"`
 
 ### Function Names Naming Convention
 
 - The name of the functions in the MathJSON Standard Library starts with an
-  uppercase letter `A`-`Z`. For example `"Sin"`, `"Fold"`.
+  uppercase letter `A`-`Z`. For example `"Sin"`, `"Reduce"`.
+
 - The name of your own functions can start with a lowercase or uppercase letter.
-- If a function name is made up of several words, use camelCase. For example
-  `"InverseFunction"`
+
+- If the name of a function is made up of several words, use PascalCase or camelCase. For example
+  `"InverseFunction"` or `"inverseFunction"`.
 
 ### LaTeX Rendering Conventions
 

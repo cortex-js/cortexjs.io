@@ -169,8 +169,8 @@ the previous and current values are compared with `Equal`.
 Inside `body`, use a `["Break"]` expression to exit the loop immediately or
 `Return` to exit the enclosing `["Function"]` expression.
 
-<ReadMore path="/compute-engine/reference/collections/#Fold" >
-See also the **`Fold` function** which operates on a collection 
+<ReadMore path="/compute-engine/reference/collections/#reduce" >
+See also the **`Reduce` function** which operates on a collection 
 </ReadMore>
 
 </FunctionDefinition>
@@ -180,7 +180,7 @@ Read more about the `Product` and `Sum` functions which are specialized version 
 </ReadMore>
 
 <ReadMore path="/compute-engine/reference/collections/" >
-Read more about operations on collection such as `Map` and `Fold` which are functional
+Read more about operations on collection such as `Map` and `Reduce` which are functional
 programming constructs that can be used to replace loops. 
 </ReadMore>
 

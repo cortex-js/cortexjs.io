@@ -3,6 +3,48 @@ title: Special Functions
 slug: /compute-engine/reference/special-functions/
 ---
 
+
+<FunctionDefinition name="Erf">
+
+<Signature name="Erf">_z:complex_</Signature>
+
+Evaluate to the **error function** of a complex number.
+
+The error function is an odd function ( $$ \operatorname{erf} -z = -
+\operatorname{erf} z$$ ) that is used in statistics to calculate probabilities
+of normally distributed events.
+
+The formula for the error function of a complex number is:
+
+$$ \operatorname{erf} z = \frac{2}{\sqrt{\pi}} \int_0^z e^{-t^2} dt$$
+
+where $$z$$ is a complex number.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Erfc">
+
+<Signature name="Erfc">_z:complex_</Signature>
+
+Evaluate to the **complementary error function** of a complex number.
+
+It is defined as $$ \operatorname{erfc} z = 1 - \operatorname {erf} z $$.
+
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ErfInv">
+
+<Signature name="ErfInv">_x:real_</Signature>
+
+Evaluate to the **inverse error function** of a real number $$ -1 < x < 1 $$
+
+It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
+= x $$.
+
+
+</FunctionDefinition>
+
 <FunctionDefinition name="Factorial">
 
 <Signature name="Factorial">_n_</Signature>
@@ -84,5 +126,3 @@ Mathematica.
 </FunctionDefinition>
 
 
-<ReadMore path="/compute-engine/reference/statistics/" > See also Statistics for
-the <strong>Error Functions</strong> </ReadMore>

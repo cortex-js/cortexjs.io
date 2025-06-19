@@ -39,6 +39,9 @@ An `["Assume"]` expression is used to assert a predicate about an expression. It
 used to provide additional information to the system, for example to indicate
 that a variable is positive.
 
+<div style={{visibility:"hidden"}}>
+### Declare
+</div>
 <FunctionDefinition name="Declare">
 
 <Signature name="Declare">_symbol_, _type__</Signature>
@@ -65,6 +68,9 @@ since it changes the state of the Compute Engine.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Assign
+</div>
 <FunctionDefinition name="Assign">
 
 <Signature name="Assign">_symbol_, _value_</Signature>
@@ -90,6 +96,9 @@ This is equivalent to `=` in may programming languages.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Assume
+</div>
 <FunctionDefinition name="Assume">
 
 <Signature name="Assume">_predicate_</Signature>
@@ -119,6 +128,9 @@ The following functions can be applied to non-canonical expressions.
 The do not depend on the canonical form, but reflect the structure of the
 expression.
 
+<div style={{visibility:"hidden"}}>
+### About
+</div>
 <FunctionDefinition name="About">
 
 <Signature name="About">_symbol__</Signature>
@@ -129,6 +141,9 @@ such as its type, its attributes, its value, etc...
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### Head
+</div>
 <FunctionDefinition name="Head">
 
 <Signature name="Head">_expression_</Signature>
@@ -143,6 +158,9 @@ Evaluate to the head of _expression_
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Tail
+</div>
 <FunctionDefinition name="Tail">
 
 <Signature name="Tail">_expression_</Signature>
@@ -166,6 +184,9 @@ Evaluate to a sequence of the arguments of _expression_.
 
 
 
+<div style={{visibility:"hidden"}}>
+### Hold
+</div>
 <FunctionDefinition name="Hold">
 
 <Signature name="Hold">_expression_</Signature>
@@ -174,6 +195,9 @@ Tag an expression that should be kept in an unevaluated form
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Identity
+</div>
 <FunctionDefinition name="Identity">
 
 <Signature name="Identity">_expression_</Signature>
@@ -192,6 +216,9 @@ as an argument and returns a function).
 The following functions can be used to obtain information about an expression.
 
 
+<div style={{visibility:"hidden"}}>
+### Domain
+</div>
 <FunctionDefinition name="Domain">
 
 <Signature name="Domain">_expression_</Signature>
@@ -207,6 +234,9 @@ Evaluate to the domain of _expression_
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### IsSame
+</div>
 <FunctionDefinition name="IsSame">
 
 <Signature name="IsSame">_expression1_, _expression2_</Signature>
@@ -233,6 +263,9 @@ as the `Equal` function.
 
 ## Transforming an Expression
 
+<div style={{visibility:"hidden"}}>
+### Evaluate
+</div>
 <FunctionDefinition name="Evaluate">
 
 <Signature name="Evaluate">_expression_</Signature>
@@ -247,6 +280,9 @@ Read more about [exact calculations and approximate calculations](/compute-engin
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Expand
+</div>
 <FunctionDefinition name="Expand">
 
 <Signature name="Expand">_expression_</Signature>
@@ -265,6 +301,9 @@ For example: `a(b + c) = ab + ac`
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### ExpandAll
+</div>
 <FunctionDefinition name="ExpandAll">
 
 <Signature name="ExpandAll">_expression_</Signature>
@@ -279,6 +318,9 @@ Expand an expression, recursively.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Factor
+</div>
 <FunctionDefinition name="Factor">
 
 <Signature name="Factor">_expression_</Signature>
@@ -293,6 +335,9 @@ Factor an expression.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### Together
+</div>
 <FunctionDefinition name="Together">
 
 <Signature name="Together">_expression_</Signature>
@@ -307,6 +352,9 @@ Combine the terms of a sum of fractions into a single fraction.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### Simplify
+</div>
 <FunctionDefinition name="Simplify">
 
 <Signature name="Simplify">_expression_</Signature>
@@ -317,6 +365,9 @@ in order to reduce, simplify and calculate its value.
 </FunctionDefinition>
 
 
+<div style={{visibility:"hidden"}}>
+### CanonicalForm
+</div>
 <FunctionDefinition name="CanonicalForm">
 
 <Signature name="CanonicalForm">_expression_</Signature>
@@ -437,6 +488,9 @@ const correct = ce.parse(mf.value, {canonical: "Order"})
 
 
 
+<div style={{visibility:"hidden"}}>
+### N
+</div>
 <FunctionDefinition name="N">
 
 <Signature name="N">_expression_</Signature>
@@ -454,6 +508,9 @@ Evaluate to a numerical approximation of the expression.
 
 ## Core Functions
 
+<div style={{visibility:"hidden"}}>
+### Error
+</div>
 <FunctionDefinition name="Error">
 
 <Signature name="Error">_error-code_, _context_</Signature>
@@ -469,6 +526,9 @@ about the error.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### InverseFunction
+</div>
 <FunctionDefinition name="InverseFunction">
 
 <Signature name="InverseFunction">_symbol_</Signature>
@@ -486,6 +546,9 @@ as an argument and returns a function).
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### String
+</div>
 <FunctionDefinition name="String">
 
 <Signature name="String">_expression_</Signature>
@@ -501,6 +564,9 @@ strings
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Symbol
+</div>
 <FunctionDefinition name="Symbol">
 
 <Signature name="Symbol">_expression_</Signature>
@@ -525,6 +591,9 @@ use `Declare`.
 
 ## Parsing and Serializing Latex
 
+<div style={{visibility:"hidden"}}>
+### Parse
+</div>
 <FunctionDefinition name="Parse">
 
 <Signature name="Parse">_string_</Signature>
@@ -540,6 +609,9 @@ corresponding to the LaTeX string.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Latex
+</div>
 <FunctionDefinition name="Latex">
 
 <Signature name="Latex">_expression_</Signature>
@@ -547,6 +619,9 @@ corresponding to the LaTeX string.
 Evaluate to a `LatexString` which is the expression serialized to LaTeX
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### LatexString
+</div>
 <FunctionDefinition name="LatexString">
 
 <Signature name="LatexString">_string_</Signature>

@@ -25,24 +25,9 @@ See also **Trigonometry** for `Pi` and related constants<Icon name="chevron-righ
 See also **Complex** for `ImaginaryUnit`<Icon name="chevron-right-bold" />
 </ReadMore>
 
-## Relational Operators
-
-<div className="symbols-table first-column-header">
-
-| Function       | Notation         |                                                                       |
-| :------------- | :--------------- | :------------------------------------------------------------------------------ |
-| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value |
-| `NotEqual`     | $$ x \ne y $$  |                                                                                 |
-| `Greater`      | $$ x \gt y $$  | |
-| `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
-| `Less`         | $$ x \lt y $$  |                                                                                 |
-| `LessEqual`    | $$ x \leq y $$ |                                                                                 |
-
-See below for additonal relational operators: `Congruent`, etc...
-
-</div>
-
 ## Functions
+
+### Arithmetic Functions
 
 <div className="symbols-table first-column-header">
 
@@ -59,6 +44,85 @@ See below for additonal relational operators: `Congruent`, etc...
 | `Square`   | $$x^2$$                     |                                                           |
 
 </div>
+
+### Sums and Products
+
+<FunctionDefinition name="Sum">
+
+<Signature name="Sum">_xs_: collection</Signature>
+
+Evaluate to a sum of all the elements in _collection_. If all the elements are
+numbers, the result is a number. Otherwise it is an `["Add"]` expression.
+
+<Latex flow="column" value="\sum x_{i}"/>
+
+```json example
+["Sum", ["List", 5, 7, 11]]
+// ➔ 23
+
+["Sum", ["List", 5, 7, "x" , "y"]]
+// ➔ ["Add", 12, "x", "y"]
+```
+
+Note this is equivalent to:
+
+```json example
+["Reduce", ["List", 5, 7, 11], "Add"]
+```
+
+
+<Signature name="Sum" returns="number">_body_: function, ..._bounds_: tuple</Signature>
+
+Evaluate to the sum of `body` for each value in `bounds`.
+
+<Latex flow="column" value="\sum{i=1}^{10} i+1"/>
+
+```json example
+["Sum", ["Add", "i", 1], ["Tuple", "i", 1, 10]]
+// ➔ 65
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Product">
+
+<Signature name="Product">_xs_: collection</Signature>
+
+Evaluate to a product of all the elements in `collection`.
+
+If all the elements are numbers, the result is a number. Otherwise it is a `["Multiply"]` expression.
+
+
+<Latex value="\prod x_{i}"/>
+
+```json example
+["Product", ["List", 5, 7, 11]]
+// ➔ 385
+
+["Product", ["List", 5, "x", 11]]
+// ➔ ["Multiply", 55, "x"]
+```
+
+Note this is equivalent to:
+
+```json example
+["Reduce", ["List", 5, 7, 11], "Multiply"]
+```
+
+
+<Signature name="Product">_f_: function, _bounds_:tuple</Signature>
+
+Return the product of `body`for each value in `bounds`.
+
+<Latex value="\prod_{i=1}^{n} f(i)"/>
+
+```json example
+["Product", ["Add", "x", 1], ["Tuple", "x", 1, 10]]
+// ➔ 39916800
+```
+
+</FunctionDefinition>
+
 
 ### Transcendental Functions
 
@@ -121,7 +185,11 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 </FunctionDefinition>
 
 
+
+
 ### Other Functions
+
+
 
 <FunctionDefinition name="BaseForm">
 
@@ -337,3 +405,22 @@ check if the fraction is in its canonical form:
 
 
 
+
+
+
+## Relational Operators
+
+<div className="symbols-table first-column-header">
+
+| Function       | Notation         |                                                                       |
+| :------------- | :--------------- | :------------------------------------------------------------------------------ |
+| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value |
+| `NotEqual`     | $$ x \ne y $$  |                                                                                 |
+| `Greater`      | $$ x \gt y $$  | |
+| `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
+| `Less`         | $$ x \lt y $$  |                                                                                 |
+| `LessEqual`    | $$ x \leq y $$ |                                                                                 |
+
+See below for additonal relational operators: `Congruent`, etc...
+
+</div>

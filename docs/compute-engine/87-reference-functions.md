@@ -79,27 +79,35 @@ For example, here's a simple "clamp" function, using a `["Block"]` expression.
 
 ## Shorthand Function Literals
 
-A shorthand function literal is a compact way to write a function literal using
-wildcards (e.g. `_` ,`_2`) instead of explicitly listing parameters.
+A **shorthand function literal** is a compact way to write a function literal 
+without explicitly listing parameters.
+
+A shorthand function literal can use either **wildcards** (`_`, `_2`, etc...) or 
+**unknowns** (symbols that have no value) as implicit parameters.
 
 The shorthand function literal is desugared to a function literal.
 
-For example the shorthand function literal `["Multiply", "_", 2]` is desugared to `["Function", ["Multiply", "_", 2], "_"]`.
+For example the shorthand function literal `["Multiply", "_", 2]` is desugared 
+to `["Function", ["Multiply", "_", 2], "_"]`.
 
+**To use wildcards in LaTeX**, they must be wrapped with an `\operatorname` command except for `\_`.
 
-If more than one parameter is used, the wildcards are `_`, `_2`, `_3`, etc.
-
-
-Wildcard arguments can also be used in LaTeX, but the wildcard arguments
-must be wrapped with an `\operatorname` command except for `\_`.
-
-<Latex value=" () \mapsto \_ + \operatorname{\_2}"/>
+<Latex flow="column" value="\_ + \operatorname{\_2}"/>
 
 ```json example
 ["Add", "_", "_2"]
 ```
 
-A symbol which is the name of an operator is also a valid shorthand for a function literal.
+
+The shorthand function literal `["Multiply", "x", 2]` which uses the unknown `x`
+is equivalent to the function literal `["Function", ["Multiply", "x", 2], "x"]`.
+When using this form, make sure that the symbol `x` is not defined in the current scope.
+
+
+
+
+A symbol which is the name of an operator (for example `Sin`) is also a valid
+function literal  shorthand.
 
 This expression will apply the `Sin` function to the elements of `xs`.
 

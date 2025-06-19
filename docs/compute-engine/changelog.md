@@ -43,6 +43,33 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### New Features and Improvements
 
+- Antiderivatives are now computed symbolically:
+
+```js
+ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).evaluate().print();
+// -> 2 / pi
+ce.parse(`\\int \\sin(\\pi x) dx`).evaluate().print();
+// -> -cos(pi * x) / pi
+```
+
+Requesting a numeric approximation of the integral will use a Monte Carlo
+method:
+
+```js
+ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).N().print();
+// -> 0.6366
+```
+
+- Numeric approximations of integrals is several order of magnitude faster.
+
+- The `symbol` type can be refined to match a specific symbol. For example
+  `symbol<True>`. The type `expression` can be refined to match expressions with
+  a specific operator, for example `expression<Add>` is a type that matches
+  expressions with the `Add` operator. The numeric types can be refined with a
+  lower and upper bound. For example `integer<0..10>` is a type that matches
+  integers between 0 and 10. The type `real<1..>` matches real numbers greater
+  than 1 and `rational<..0>` matches non-positive rational numbers.
+
 - The bindings of symbols and function expressions is now consistently done
   during canonicalization.
 
@@ -117,7 +144,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ce.parse('a+1').evaluate().print();
   ```
 
-  now returns `1 + i` instead of throwing a type error.
+````
+
+now returns `1 + i` instead of throwing a type error.
 
 - Correctly parse and evaluate unary and binary `\pm` and `\mp` operators.
 
@@ -1063,7 +1092,7 @@ the `ce.rule()` function.
   consistent and simpler.
 
 - The name of some number formatting options has changed. The number formatting
-  options are an optional argument of `ce.parse()` and `ce.toLatex()`. See the  
+  options are an optional argument of `ce.parse()` and `ce.toLatex()`. See the
   `NumberFormat` and `NumberSerializationFormat` types.
 
 - The values +infinity, -infinity and NaN are now represented preferably with
@@ -2285,4 +2314,5 @@ console.log(expr.isEqual(ce.box(2)));
 ### Improvements
 
 - In LaTeX, parse `\operatorname{foo}` as the MathJSON symbol `"foo"`.
+````
 </ChangeLog>

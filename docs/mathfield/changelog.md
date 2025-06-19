@@ -12,10 +12,25 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
+### New Features
+
+- Export to **typst** format. Use `mf.getValue("typst")` to get the value of the
+  mathfield in typst format.
+
+### Resolved Issues
+
+- The commands `\iff`, `\Coloneqq` and `\hArr` did not render correctly.
+
+## 0.105.3 _2025-05-14_
+
 ### Resolved Issues
 
 - Using the kebab version of commands (for example `"select-all"` instead of
   `"SelectAll"`) would incorrectly result in a runtime error.
+
+- Using a padding with an `\enclose` command would not render the padding
+  correctly. To specify some padding, use
+  `\enclose{updiagonalstrike downdiagonalstrike}[padding="10px", 6px solid rgba(205, 0, 11, .4)]{42}`.
 
 ## 0.105.1 _2025-04-18_
 

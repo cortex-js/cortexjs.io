@@ -330,7 +330,7 @@ value is smaller than the tolerance will be considered equal to 0.
 ## Numeric Functions
 
 The topics below from the
-[MathJSON Standard Library](/compute-engine/guides/standard-library/) can provide numeric
+[MathJSON Standard Library](/compute-engine/standard-library/) can provide numeric
 evaluations for their numeric functions:
 
 <div className="symbols-table" style={{"--first-col-width":"16ch"}}>

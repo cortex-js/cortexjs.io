@@ -13,6 +13,9 @@ slug: /compute-engine/reference/complex/
 
 ## Functions
 
+<div style={{visibility:"hidden"}}>
+### Real
+</div>
 <FunctionDefinition name="Real">
 
 <Signature name="Real">_z_</Signature>
@@ -28,6 +31,9 @@ Evaluate to the real part of a complex number.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Imaginary
+</div>
 <FunctionDefinition name="Imaginary">
 
 <Signature name="Imaginary">_z_</Signature>
@@ -47,6 +53,9 @@ imaginary part is zero.
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Conjugate
+</div>
 <FunctionDefinition name="Conjugate">
 
 <Signature name="Conjugate">_z_</Signature>
@@ -67,6 +76,9 @@ $$
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Abs
+</div>
 <FunctionDefinition name="Abs">
 
 <Signature name="Abs">_z_</Signature>
@@ -91,6 +103,9 @@ $$
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### Arg
+</div>
 <FunctionDefinition name="Arg">
 
 <Signature name="Arg">_z_</Signature>
@@ -114,6 +129,9 @@ $$
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### AbsArg
+</div>
 <FunctionDefinition name="AbsArg">
 
 <Signature name="AbsArg">_z_</Signature>
@@ -134,6 +152,9 @@ $$
 
 </FunctionDefinition>
 
+<div style={{visibility:"hidden"}}>
+### ComplexRoots
+</div>
 <FunctionDefinition name="ComplexRoots">
 
 <Signature name="ComplexRoots">_z_, _n_</Signature>

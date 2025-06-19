@@ -282,6 +282,16 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "compute-engine/reference-combinatorics",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "compute-engine/reference-number-theory",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
           id: "compute-engine/reference-styling",
           className: "reference-icon",
         },
