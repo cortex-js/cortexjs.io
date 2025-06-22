@@ -14,7 +14,7 @@ const config: Config = {
   title: 'CortexJS',
   titleDelimiter: '·',
   tagline: 'Scientific Web Computing',
-  favicon: '/img/favicon.ico',
+  favicon: '/img/logo.svg',
 
   url: 'https://cortexjs.io',
 
@@ -234,12 +234,12 @@ const config: Config = {
   
       navbar: {
         title: 'CortexJS',
-        // logo: {
-        //   alt: "Farsight Logo",
-        //   src: "farsight-logo.svg",
-        //   width: 42,
-        //   height: 42,
-        // },
+        logo: {
+          alt: "Farsight Logo",
+          src: "img/logo.svg",
+          width: 42,
+          height: 42,
+        },
         items: [
           {
             type: 'docSidebar',

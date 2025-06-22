@@ -12,34 +12,162 @@ into one unit. Each element in a collection is a
 
 ## Introduction
 
-Collections are **immutable**. They cannot be modified. Operations on
-collections produce new collections.
+Collections are **immutable**: they cannot be modified in place.  
+Operations on collections produce new collections.
 
-There are several types of collections in the Compute Engine:
-- **Lists**: ordered collections of elements, which are also used to represent
-  **vectors** and **matrices**. Elements in a list are accessed by their
-  index, which starts at 1.
-- **Sets**: unordered collections of unique elements. The elements in a set are
-  not accessed by index, they are enumerated. A set can contain an infinite number
-  of elements.
-- **Tuples**: ordered collections of elements, but with a fixed number of elements that have a specific type and an optional name.
-- **Records**: unordered collections of key-value pairs.
-- **Ranges** and **Linear Spaces (linspaces)**: ordered sequences of numbers (integers and reals, respectively) with a specified start, end and step size.
+The most common collection types are:
+- [**List**](#list): ordered collection of elements (duplicates allowed)
+- [**Set**](#set): unordered collection of unique elements
+- [**Tuple**](#tuple): ordered, fixed-size collection with optional names
+- [**Dictionary**](#dictionary): unordered key-value pairs with string keys
+- [**Record**](#record): structured data with a fixed set of known string keys
 
+You can use collections to represent mathematical vectors, matrices, sequences, mappings, or records — in both finite and infinite forms.
 
 <ReadMore path="/compute-engine/reference/linear-algebra/" >
-See also the **Linear Algebra** section for operations on vectors, matrices and tensors.<Icon name="chevron-right-bold" />
+See also the **Linear Algebra** section for operations on vectors, matrices, tensors which are a special kind of collection.<Icon name="chevron-right-bold" />
 </ReadMore>
+
+
+
+### Core Properties of Collections
+
+All collections share these basic properties:
+- Their elements can be **enumerated**
+- They can check whether an element is a **member** of the collection
+- The number of elements can be **counted**
+
+**Note:** Depending on the type of collection, counting and membership checking can be an expensive operation, for example, for lazy infinite collections.
+
+
+### Finite and Infinite Collections
+
+Collections may be:
+- **Finite**: containing a definite number of elements.
+- **Infinite**: continuing indefinitely (for example, a sequence of all natural numbers).
+
+Compute Engine supports **lazy evaluation** to make working with infinite collections possible.
+
+
+### Lazy and Strict Collections
+
+Collections can be:
+- **Strict**: elements are fully evaluated when the collection is created.
+- **Lazy**: elements are evaluated only as they are accessed.
+
+Lazy collections are useful when working with infinite sequences or with expensive computations.
+
+You can convert a lazy collection to a strict collection using `ListFrom` or `SetFrom`.  
+These functions enumerate all elements (if finite) and produce a strict result.
+
+```json example
+["ListFrom", ["Range", 1, 10]]
+// ➔ ["List", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+### Why Lazy Infinite Collections?
+
+Lazy infinite collections provide a natural way to model mathematical sequences, iterative processes, or cyclic patterns — with minimal memory use.  
+Common examples include:
+- Natural numbers (`Range`)
+- Cyclic patterns (`Cycle`)
+- Iterative computations (`Iterate`)
+
+
+### Ordered and Unordered Collections
+
+Collections fall into two broad categories:
+- **Ordered collections** (such as `List` and `Tuple`)  
+  → Elements can be accessed by an **index**.  
+    The first element has index `1`, the second has index `2`, etc.  
+    Negative indexes count from the end: index `-1` is the last element.
+- **Unordered collections** (such as `Set`, `Record`)  
+  → Elements cannot be accessed by index. They can be enumerated or looked up by key.
+
+
+### Types
+
+- The type `collection` represents any collection, whether ordered or unordered, finite or infinite.
+- The type `ordered collection` applies to collections that support index-based access (such as `List`, and `Tuple`).
+
+
+
+### Summary of Collection Types
+
+| Collection Type | Ordered? | Unique Elements? | Fixed Size? | Lazy Possible? | Example |
+| --------------- | -------- | ---------------- | ----------- | -------------- | ------- |
+| **List**        | Yes      | No               | No          | Yes            | `["List", 1, 2, 3]` |
+| **Set**         | No       | Yes              | No          | Yes            | `["Set", 1, 2, 3]` |
+| **Tuple**       | Yes      | No               | Yes         | No             | `["Tuple", "x", "y"]` |
+| **Dictionary**  | Keys unordered | Keys unique | No          | No             | `["Dictionary", ["Tuple", "a", 1], ["Tuple", "b", 2]]` |
+| **Record**      | Keys unordered | Keys unique | Yes         | No             | `["Record", ["Tuple", "name", "Alice"], ["Tuple", "age", 30]]` |
+
+*Note:*  
+Collections like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections** that behave like infinite Lists, unless a strict conversion or truncation (e.g. with `Take()`) is used.
+
+---
+
+
+### Ordered Collections
+
+The elements of some collections can be accessed by their **index**, a
+number that indicates the position of the element in the collection. 
+
+Collections that can be accessed by index are called **ordered collections**. 
+
+The first element has index `1`, the second element has index `2`, and so on. The last
+element has index equal to the length of the collection.
+
+Negative indexes can also be used to access elements from the end of the
+collection. 
+
+The last element has index `-1`, the second to last element has index `-2`,
+and so on. This is useful for accessing elements without knowing the length of the
+collection.
+
+```json example
+["At", ["List", 2, 5, 7, 11], 3]
+// ➔ 7
+
+["At", ["List", 2, 5, 7, 11], -3]
+// ➔ 5
+```
+
+
+
+Some of the collections in the Compute Engine include:
+- [**List**](#list): ordered collections of elements, which are also used to represent
+  **vectors** and **matrices**. Elements in a list are accessed by their
+  index, which starts at 1. Type: `list<T>` where `T` is the type of the elements.
+- [**Set**](#set): unordered collections of unique elements. The elements in a set are
+  not accessed by index, they are enumerated. A set can contain an infinite number
+  of elements. Type : `set<T>` where `T` is the type of the elements.
+- [**Tuple**](#tuple): ordered collections of elements, but with a fixed number 
+  of elements that have a specific type and an optional name. Type : `tuple<T1, T2, ..., Tn>` where `T1`, `T2`, ..., `Tn` are the types of the elements.
+- [**Dictionary**](#dictionary): unordered collections of key-value pairs, 
+    where each key is unique. Type: `dictionary<V>` where `V` is the type of the values, the keys are strings.
+- [**Record**](#record): unordered collections of key-value pairs. Unlike dictionaries, records are used to represent structured data with a fixed set of keys, and the keys are known at compile time. 
+  Type: `record<K1: T1, K2: T2, ..., Kn: Tn>` where `K1`, `K2`, ..., `Kn` are the keys and `T1`, `T2`, ..., `Tn` are the types of the values.
+
+Some functions evaluate to a lazy collection. This is useful for creating
+infinite collections or for collections that are expensive to compute. Examples of lazy collections include:
+
+- [**Range**](#range) and [**Linspace**](#linspace): ordered sequences of numbers (integers and reals, respectively) with a specified start, end and step size.
+- [**Cycle**](#cycle): infinite collections that repeat a finite collection.
+- [**Iterate**](#iterate): infinite collections that apply a function to an initial value repeatedly.
+- [**Repeat**](#repeat): infinite collections that repeat a single value.
+- [**Fill**](#fill): collections of a specified size, where each element is computed by a function or set to a specific value.
+
+The type `collection` is used to represent any collection, whether it is ordered or unordered, finite or infinite.
+The type `ordered collection` is used to represent collections that can be accessed by index, such as `List`, `Tuple`, and `Dictionary`.
+
 
 
 ### Operations on Collections
 
-Operations creating new collections:
-- [**List**](#list), [**Range**](#range), [**Linspace**](#linspace), [**Set**](#set): create a new collection from some values.
-- [**Fill**](#fill), [**Repeat**](#repeat), [**Cycle**](#cycle), [**Iterate**](#iterate): create a new collection from a function or a value.
-
 Operations on ordered and unordered collections:
-- [**Length**](#length), [**IsEmpty**](#isempty): check the size of a collection.
+- [**Filter**](#filter), [**Map**](#map), and [**Reduce**](#reduce): operations that create new collections by applying a function to each element of an existing collection.
+- [**Length**](#length), [**IsEmpty**](#isempty): check the number of elements of a collection.
 - [**Filter**](#filter), [**Map**](#map), [**Reduce**](#reduce): apply a function to each element of a collection.
 - [**Join**](#join), [**Zip**](#zip): combine multiple collections into one.
 - [**Tally**](#tally): count the number of occurrences of each element in a collection.
@@ -54,26 +182,16 @@ Operations on ordered collections:
 - [**Unique**](#unique): remove duplicates from a collection.
 - [**RotateLeft**](#rotateleft), [**RotateRight**](#rotateright): rotate a collection to the left or right.
 
+<ReadMore path="/compute-engine/reference/linear-algebra/" >
+See also the **Linear Algebra** section for operations on vectors, matrices, tensors which are a special kind of collection.<Icon name="chevron-right-bold" />
+</ReadMore>
 
-### Indexing Collections
-
-Ordered collections (lists, tuples, ranges and linspaces) are indexed starting from 1. Negative indexes count from the end of
-the collection. For example, `-1` is the last element, `-2` is the second to last
-element, etc.
-
-```json example
-["At", ["List", 2, 5, 7, 11], -2]
-// ➔ 7
-
-["At", ["Range", 2, 10], -1]
-// ➔ ["List", 10]
-```
 
 
 
 ## Creating Collections
 
-This section contains functions that create new collections from some values.
+This section contains functions that create new collections from some elements.
 
 <div style={{visibility:"hidden"}}>
 ### List
@@ -83,7 +201,7 @@ This section contains functions that create new collections from some values.
 
 <Signature name="List" returns="list">..._element_:any</Signature>
 
-A `List` is an **ordered**, **indexable** collection of elements. An element in
+A `List` is an **ordered** collection of elements. An element in
 a list may be repeated.
 
 <Latex value="\lbrack 42, 3.14, x, y \rbrack"/>
@@ -145,6 +263,65 @@ See also the **Linear Algebra** section for operations on vectors, matrices and 
 
 </FunctionDefinition>
 
+
+<div style={{visibility:"hidden"}}>
+### Set
+</div>
+
+<FunctionDefinition name="Set">
+
+<Signature name="Set" returns="set">..._elements_:any</Signature>
+
+An **unordered** collection of unique elements.
+
+<Latex value="\lbrace 12, 15, 17 \rbrace"/>
+
+```json example
+["Set", 12, 15, 17]
+```
+
+</FunctionDefinition>
+
+<div style={{visibility:"hidden"}}>
+### Fill
+</div>
+
+<FunctionDefinition name="Fill">
+
+<Signature name="Fill" returns="list">_dimensions_, _value_:any</Signature>
+
+<Signature name="Fill" returns="list">_dimensions_, _f_:function</Signature>
+
+Create a list of the specified dimensions.
+
+If a `value` is provided, the elements of the list are all set to that value.
+
+If a `function` is provided, the elements of the list are computed by applying
+the function to the index of the element.
+
+If `dimensions` is a number, a list of that length is created.
+
+```json example
+["Fill", 3, 0]
+// ➔ ["List", 0, 0, 0]
+```
+
+If dimension is a tuple, a matrix of the specified dimensions is created.
+
+```json example
+["Fill", ["Tuple", 2, 3], 0]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+```
+
+If a `function` is specified, it is applied to the index of the element to
+compute the value of the element.
+
+```json example
+["Fill", ["Tuple", 2, 3], ["Function", ["Add", "i", "j"], "i", "j"]]
+// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
+```
+
+</FunctionDefinition>
 
 <div style={{visibility:"hidden"}}>
 ### Range
@@ -248,64 +425,7 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
-### Set
-</div>
 
-<FunctionDefinition name="Set">
-
-<Signature name="Set" returns="set">..._elements_:any</Signature>
-
-An **unordered** collection of unique elements.
-
-<Latex value="\lbrace 12, 15, 17 \rbrace"/>
-
-```json example
-["Set", 12, 15, 17]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### Fill
-</div>
-
-<FunctionDefinition name="Fill">
-
-<Signature name="Fill" returns="list">_dimensions_, _value_:any</Signature>
-
-<Signature name="Fill" returns="list">_dimensions_, _f_:function</Signature>
-
-Create a list of the specified dimensions.
-
-If a `value` is provided, the elements of the list are all set to that value.
-
-If a `function` is provided, the elements of the list are computed by applying
-the function to the index of the element.
-
-If `dimensions` is a number, a list of that length is created.
-
-```json example
-["Fill", 3, 0]
-// ➔ ["List", 0, 0, 0]
-```
-
-If dimension is a tuple, a matrix of the specified dimensions is created.
-
-```json example
-["Fill", ["Tuple", 2, 3], 0]
-// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
-```
-
-If a `function` is specified, it is applied to the index of the element to
-compute the value of the element.
-
-```json example
-["Fill", ["Tuple", 2, 3], ["Function", ["Add", "i", "j"], "i", "j"]]
-// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
-```
-
-</FunctionDefinition>
 
 <div style={{visibility:"hidden"}}>
 ### Repeat

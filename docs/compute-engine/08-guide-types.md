@@ -11,7 +11,9 @@ The Compute Engine uses a type system to ensure that operations are
 performed on the correct types of values. 
 
 A type is represented by a **type expression**, which is a string with 
-a specific syntax. For example:
+a specific syntax. 
+
+For example:
 
 - `"integer"`
 - `"boolean"`
@@ -49,7 +51,10 @@ ce.parse("n").type;
 // ➔ "integer"
 ```
 
+
 ## Type Hierarchy
+
+
 
 The type system is based on the concept of **subtyping**, which allows for
 a hierarchy of types, where a type can be a subtype of another type. This
@@ -79,7 +84,8 @@ any
         └── collection
             ├── tuple
             ├── set
-            ├── map
+            ├── dictionary
+                └── record
             └── list
                 └── tensor
                     ├── vector
@@ -89,11 +95,45 @@ any
 **Note:** this diagram is simplified and does not accurately reflect the finite vs
 non-finite distinction for the numeric types.
 
+This hierarchy allows the Compute Engine to reason about compatibility and subtyping relationships between expressions.
+
 The `unknown` type is a placeholder for an expression whose type has not yet 
 been determined, typically during type inference or partial evaluation. It is 
 compatible with all types, and all types are compatible with it. It serves as 
 a wildcard in type matching and can be replaced or refined as more information 
 becomes available.
+
+<div style={{visibility:"hidden"}}>
+<a href="#naming-constraints-for-elements-and-arguments" id="naming-constraints-for-elements-and-arguments"></a>
+</div>
+
+:::info **Naming Constraints for Elements and Arguments**
+
+Element names (used in tuples, records, dictionaries) and function argument names must:
+
+- start with a letter or underscore
+- contain only letters, digits, or underscores
+
+If a name does not follow these rules, it must be enclosed in backticks.
+
+For example:
+
+``tuple<`1st`: integer, `2nd`: integer, `3rd`: integer>``
+
+``record<`durée`: number, vitesse: number>``
+
+``(`直径`: number) -> number``
+
+
+The backticks are not part of the name, they are used to escape the name.
+
+In the unlikely event that the name contains a backtick, it must be escaped with a backslash:
+
+``record<`name\`with\`backticks`: integer>``
+
+Element names are stored and compared using Unicode Normalization Form C (NFC).
+:::
+
 
 ## Primitive Types
 
@@ -110,24 +150,28 @@ The Compute Engine supports the following primitive types:
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
 | `never`       | The type that has no values; the empty type or **bottom type**                                             |
 | `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown` |
-| `expression`       | A symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
-| `symbol`        | A named object, for example a constant or variable in an expression such as `x` or `alpha` |
-| `function`        | A function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
-| `value`        | A constant value, such as `1`, `True`, `'hello'` or `Pi`: a `scalar` or a `collection` |
-| `collection`    | A collection of values: a `list`, a `set`, a `tuple`, or a `map` |
-| `scalar`        | A single value: a `boolean`, a `string`, or a `number` |
-| `boolean`       | The symbol `True` or `False`|
-| `string`        | A string of Unicode characters    |
-| `number`        | A numeric value |
+| `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
+| `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
+| `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
+| `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
+| `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `dictionary` or a `record` |
+| `scalar`        | The type of a single value: a `boolean`, a `string`, or a `number` |
+| `boolean`       | The type of the symbol `True` or `False`|
+| `string`        | The type of a string of Unicode characters    |
+| `number`        | The type of a numeric value |
 
 </div>
 
-<div className="symbols-table first-column-header" style={{"--first-col-width":"9ch"}}>
-
 ### Comparison of Special Types
 
+This table summarizes how each special type behaves when assigning values: whether a value of one type can be assigned to or from another.
+
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"9ch"}}>
+
+
 | Type     | Description                                       | Assignable To | Assignable From |
-|----------|---------------------------------------------------|----------------|------------------|
+|----------|:--------------------------------------------------|:---------------|:-----------------|
 | `any`    | All possible values                               | ✓              | ✓                |
 | `unknown`| Undetermined type, placeholder for inference      | ✓              | ✓                |
 | `never`  | No values at all (bottom type)                    | ✓              | ✗                |
@@ -139,7 +183,7 @@ The Compute Engine supports the following primitive types:
 
 ### Numeric Types
 
-The type `number` represent all numeric values, including `NaN`. 
+The type `number` represents all numeric values, including `NaN`. 
 
 More specific types of numeric values are represented by subtypes of `number`. 
 
@@ -186,10 +230,11 @@ Read more about the **sets** included in the Standard Library <Icon name="chevro
 
 ## Collection Types
 
-A **collection type** is the type of an object that contains multiple values.
+A collection type represents an expression that contains multiple values, such as a list, a set, or a dictionary.
 
-The Compute Engine supports the following collection types: `set`, `tuple`, \
-`list` (including `vector`, `matrix` and `tensor`),  `map` and `collection`.
+The Compute Engine supports the following collection types: `set`, `tuple`,
+`list` (including `vector`, `matrix` and `tensor`), `record`, `dictionary` and 
+`collection`.
 
 ### Set
 
@@ -199,7 +244,7 @@ The type of a set is represented by the type expression `set<T>`, where `T`
 is the type of the elements of the set.
 
 ```js
-ce.parse("\\{1, 2, 3\\}").type
+ce.parse("\\{5, 7, 9\\}").type
 // ➔ "set<finite_integer>"
 ```
 
@@ -212,25 +257,25 @@ The type of a tuple is represented by the type expression `tuple<T1, T2, ...>`,
 where `T1`, `T2`, ... are the types of the elements of the tuple.
 
 ```js
-ce.parse("(1, 2, 3)").type
+ce.parse("(7, 5, 7)").type
 // ➔ "tuple<finite_integer, finite_integer, finite_integer>"
 ```
 
-The elements of a tuple can be named: `tuple<x: integer, y: integer>`. If
-an element is named, all elements must be named and the names must be unique.
+The elements of a tuple can be named: `tuple<x: integer, y: integer>`. 
 
+If an element is named, all elements must be named and the names must be unique
+when compared in Unicode Normalization Form C (NFC).
 
-The name of the elements of a tuple must use the letters `a` to `z` or `A` to
- `Z`, the digits `0` to `9` or the underscore `_` and must start with a letter 
- or an underscore.
-
+(See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on element names.)
 
 For two tuples to be compatible, each element must have the same type and the names must match.
 
 ```js
-ce.parse("(x: 1, y: 2)").type.matches("tuple<x: integer, y: integer>");
+ce.parse("(x: 1, y: 2)")
+  .type.matches("tuple<x: integer, y: integer>");
 // ➔ true
-ce.parse("(x: 1, y: 2)").type.matches("tuple<a: integer, b: integer>");
+ce.parse("(x: 1, y: 2)")
+  .type.matches("tuple<a: integer, b: integer>");
 // ➔ false
 ```
 
@@ -243,35 +288,35 @@ matrices, and sequences.
 The type of a list is represented by the type expression `list<T>`, where `T` is the type of the elements of the list.
 
 ```js
-ce.parse("[1, 2, 3]").type.toString();
+ce.parse("\\[1, 2, 3\\]").type.toString();
 // ➔ "list<number>"
 ```
 
 The shorthand **`list`** is equivalent to `list<any>`, a list of values of any type.
 
 ```js
-ce.parse("[1, 2, 3]").matches("list");
+ce.parse("\\[1, 2, 3\\]").matches("list");
 // ➔ true
 ```
 
 The shorthand **`vector`** is a list of numbers, equivalent to `list<number>`.
 
 ```js
-ce.parse("[1, 2, 3]").matches("vector");
+ce.parse("\\[1, 2, 3\\]").matches("vector");
 // ➔ true
 ```
 
 A **`vector<n>`** is a list of `n` numbers.
 
-```js 
-ce.parse("[1, 2, 3]").type.matches("vector<3>");
+```js
+ce.parse("\\[1, 2, 3\\]").type.matches("vector<3>");
 // ➔ true
 ```
 
 A **`vector<T^n>`** is a list of `n` elements of type `T`.
 
 ```js
-ce.parse("[1, 2, 3]").type.matches("vector<integer^3>");
+ce.parse("\\[1, 2, 3\\]").type.matches("vector<integer^3>");
 // ➔ true
 ```
 
@@ -290,52 +335,73 @@ and **`tensor<T>`** is a tensor of elements of type `T`.
 
 
 
-### Map
+### Dictionary and Record
 
-A **map** is a collection of key-value pairs, used to represent a dictionary, 
-also known as an associative array, a hash table or a record.
+The **dictionary** and **record** types represent a collection of key-value pairs, 
+where each key is a string and each value can be any type.
 
-The keys of a map must use the letters `a` to `z` or `A` to `Z`, the digits 
-`0` to `9` or the underscore `_`. Keys containing other characters must be 
-enclosed in backticks.
+A **record** is a special case of a dictionary where the keys are fixed, 
+while a **dictionary** can have keys that are dynamically added or removed at runtime.
 
-Keys must be unique within a map, but they are not ordered.
+A **record** is used to represent objects and structured data with a fixed set of properties.
+A **dictionary** is well suited to represent data such as hash tables or caches.
 
-The type of a map is represented by the type expression `map<T>`, indicating
-a map of elements of type `T`, or by the type expression
-`map<K1: T1, K2: T2, ...>`, where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the values.
+**Keys** must be unique (when compared in NFC form) within a dictionary or record. Keys are not ordered.
 
-For example: `map<red: integer, green: integer, blue: integer>` is a map that
+(See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on key names.)
+
+
+The type of a **dictionary** is represented by the type expression `dictionary<T>`
+where `T` is the type of the values.
+
+The type of a **record** is represented by the type expression `record<K1: T1, K2: T2, ...>`, 
+where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the values.
+
+For example: `record<red: integer, green: integer, blue: integer>` is a record that
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
-For a map `A` to be compatible with a map `B`, the keys of `A` must be a
-subset of the keys of `B` and the values of `A` must be compatible with the
-values of `B`.
+**Compatibility:**
+- A record of type `record<K1: T1, K2: T2, ...>` is compatible with a record of type
+  `record<K1: T1, K2: T2, ..., K3: T3, ...>` if:
+  - The keys of the first record are a subset of the keys of the second.
+  - The values of the first record are compatible with the values of the second.
+  - The order of the keys does not matter.
+- A record is compatible with a dictionary `dictionary<T>` if each value type `T1`, `T2`, ... is compatible with `T`.
+
 
 ```js
-ce.type("map<red: integer, green: integer>")
-  .matches("map<red: integer, green: integer>");
+ce.type("record<red: integer, green: integer>")
+  .matches("record<red: integer, green: integer>");
 // ➔ true
 
-ce.type("map<red: integer, green: integer>")
-  .matches("map<red: integer, green: integer, blue: integer>");
+ce.type("record<red: integer, green: integer>")
+  .matches("record<red: integer, green: integer, blue: integer>");
 // ➔ false
 
-ce.type("map<red: integer, green: integer, blue: integer>")
-  .matches("map<red: integer, green: integer>");
+ce.type("record<red: integer, green: integer, blue: integer>")
+  .matches("dictionary<integer>");
 // ➔ true
 ```
 
 
-The type `map<T>` matches any map with values of type `T`.
 
-The type `map` matches any map.
+The `record` type is compatible with any record, and the `dictionary` type is compatible with both records and dictionaries.
+
+```js
+ce.type("record<red: integer, green: integer>")
+  .matches("record");
+// ➔ true
+
+ce.type("record<red: integer, green: integer>")
+  .matches("dictionary");
+// ➔ true
+```
 
 
 ### Collection
 
 The type `collection` represent any collection of values, such as a `list`, 
-a `set`, a `tuple`, or a `map`.
+a `set`, a `tuple`, a `record` or a `dictionary`.
 
 The type `collection<T>` is a collection of values of type `T`.
 
@@ -354,31 +420,42 @@ type of the output value, or return type, of the function literal.
 
 ### Return Types
 
+If the function does not return a value, the function signature is `(T) -> nothing`.
+
 If the function never returns, the function signature is `(T) -> never`.
 
-If the function does not return a value, the function signature is `(T) -> nothing`.
+
 
 ### Arguments
 
 If there is a single input argument, the parentheses can be omitted: `T1 -> T2`.
+
 For example, `real -> integer` is the type of functions that map real numbers to integers.
 
-If there are no input arguments, use `() -> T`, for example `() -> integer` is 
+If there are no input arguments, use `() -> T`.
+
+For example `() -> integer` is 
 the type of functions that return an integer and have no input arguments.
 
-If there are multiple input arguments, the function signature is `(T1, T2, ...) -> T`,
-for example `(integer, integer) -> integer` is the type of functions that map two integers to an integer.
+If there are multiple input arguments, the function signature is `(T1, T2, ...) -> T`.
+
+For example `(integer, integer) -> integer` is the type of functions that map two integers to an integer.
 
 ### Named Arguments
 
 Optionally, the input arguments can be named, for example: `(x: integer, y: integer) -> integer`.
 
-The name of the argument must use the letters `a` to `z` and `A` to `Z`, the digits `0` to `9` or the underscore `_`
-and must start with a letter or an underscore.
+(See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on argument names.)
+
+If a named argument is used, the input arguments must be enclosed in parentheses, even if there is only one argument.
+
+For example, `(x: integer) -> integer` is a function that takes a single named argument `x` of type `integer` and returns an `integer`.
+
+
 
 ### Optional Argument
 
-An optional argument is indicated by a question mark after the type.
+An optional argument is indicated by a question mark after its type.
 
 For example `(integer, integer?) -> integer` indicates a function literal accepting 
 one or two integers as input and returning an integer.
@@ -386,7 +463,8 @@ one or two integers as input and returning an integer.
 If there are any optional arguments, they must be at the end of the argument list.
 
 ```js
-ce.type("(integer, integer?) -> number").matches("(integer) -> number");
+ce.type("(integer, integer?) -> number")
+  .matches("integer -> number");
 // ➔ true
 ```
 
@@ -395,7 +473,7 @@ ce.type("(integer, integer?) -> number").matches("(integer) -> number");
 ### Rest Argument
 
 A function signature can include a variable number of arguments, also known as 
-a rest argument, indicated by an ellipsis `...` before the type of the last argument.
+a **rest argument**, indicated by an ellipsis `...` before the type of the last argument.
 
 For example `(string, ...integer) -> integer` is a function that accepts a 
 string as a first argument followed by any number of integers and returns an integer.
@@ -404,20 +482,23 @@ To indicate that the function accepts a variable number of arguments of any
 type, use `...any`.
 
 ```js
-ce.type("(integer, ...integer) -> number").matches("(integer, integer) -> number");
+ce.type("(integer, ...integer) -> number")
+  .matches("(integer, integer) -> number");
 // ➔ true
 ```
 
+If a signature has a rest argument, it must be the last argument in the list, 
+and it cannot be combined with optional arguments.
 
 ### Function Type
 
-The type `function` matches any function literal, it is a shorthand for `(...any) -> unknown`.
+The type `function` matches any function literal. It is a shorthand for `(...any) -> unknown`.
 
 ## Value Type
 
 A **value type** is a type that represents a single value. 
 
-A value can be:
+The value can be:
 - a boolean: `true` or `false`
 - a number, such as `42`, `-3.14`, or `6.022e23`
 - a string, such as `"yellow"`, 
@@ -432,11 +513,13 @@ can be one of multiple values, for example:
 
 ## Other Constructed Types
 
-Types can be combined to form new types using the following operations:
+Types can be combined to form new types using a **union**, an **intersection**, or a **negation**.
 
 ### Union
 
 A **union** is the type of values that are in either of two types.
+
+Unions are useful when a value may be one of several possible types.
 
 The type of a union is represented by the type expression `T1 | T2`, where `T1` and `T2` are the types of the values.
 
@@ -446,14 +529,19 @@ For example, `number | boolean` is the type of values that are numbers or boolea
 
 An **intersection** is the type of values that are in both of two types.
 
+Intersections are useful when a value must satisfy multiple type constraints at once.
+They can be used to model values that meet several structural or semantic requirements.
+
 The type of an intersection is represented by the type expression `T1 & T2`, where `T1` and `T2` are the types of the values.
 
-For example, `map<length: integer> & map<size: integer>` is the type of values 
-that are dictionaries with both a `length` and a `size` key.
+For example, `record<length: integer> & record<size: integer>` is the type of values 
+that are records with both a `length` and a `size` key.
 
 ### Negation
 
-A **negation** is the type of values that are not of a given type.
+A **negation** represents values that are excluded from a given type.
+
+This can be useful for excluding special cases such as `0`, `NaN`, or `Infinity`.
 
 A type negation is represented by the type expression `!T`, where `T` is a type.
 
@@ -468,10 +556,10 @@ The type `integer & !0` is the type of values that are integers but not `0`.
 
 ## Matching Types
 
+Two types can be evaluated for **compatibility**. 
 
-Two types can be evaluated for their **compatibility**. A type `A` is 
-compatible with a type `B` (or matches it) if all values of type `A` are also 
-values of type `B`. In other words, if `A` is a non-strict subtype of `B`.
+A type `A` matches type `B` if all values of `A` are also values of `B`, that is, if `A` is a subtype of `B`.
+Matching is used for type checking and for validating function arguments.
 
 **To check if two types are compatible**, use the `type.matches()` method.
 
@@ -504,24 +592,51 @@ ce.parse("3.14").type.matches("real");
 
 ### Compatibility of Complex Types
 
-#### Maps
+When checking compatibility of complex types, both structure and element types must be considered.
 
-Maps are compatible if they have the same keys and the values are compatible.
+Compatibility of complex types follows specific rules depending on the type of structure, such as records, tuples, or lists.
+
+#### Records
+
+Records are compatible if they have the same keys and the values are compatible.
 
 ```js
-ce.parse("{red: 1, green: 2}").type
-  .matches("map<red: integer, green: integer>");
+ce.parse("\\{red: 1, green: 2\\}").type
+  .matches("record<red: integer, green: integer>");
 // ➔ true
 ```
 
-**Width subtyping** is supported for maps, meaning that a map with more keys is
-compatible with a map with fewer keys.
+**Width subtyping** is supported for records, meaning that a record with more keys is
+compatible with a record with fewer keys.
 
 ```js
-ce.parse("{red: 1, green: 2, blue: 3}").type
-  .matches("map<red: integer, green: integer>");
+ce.parse("\\{red: 1, green: 2, blue: 3\\}").type
+  .matches("record<red: integer, green: integer>");
 // ➔ true
 ```
+
+
+#### Dictionaries
+Dictionaries are compatible if the values are compatible.
+
+```js
+ce.parse("\\{red: 1, green: 2\\}").type 
+  .matches("dictionary<integer>");
+// ➔ true
+```
+
+Records are compatible with dictionaries if all the values of the record are compatible with the dictionary's value type.
+
+```js
+ce.parse("\\{red: 104, green: 2, blue: 37\\}").type
+  .matches("dictionary<integer>");
+// ➔ true
+ce.parse("\\{user: \"Bob\", age: 24\\}").type
+  .matches("dictionary<integer>");
+// ➔ false
+```
+
+
 
 #### Tuples
 
@@ -551,7 +666,7 @@ ce.parse("(x: 1, y: 2)").type
 Lists are compatible if they have the same length and the elements are compatible.
 
 ```js
-ce.parse("[1, 2, 3]").type
+ce.parse("\\[1, 2, 3\\]").type
   .matches("list<finite_integer>");
 // ➔ true
 ```
@@ -606,6 +721,8 @@ console.info(ce.box(3.14).isInteger)
 ## Defining New Types
 
 **To define new types** use the `ce.declareType()` function.
+This enables defining domain-specific types that can improve type checking and clarity.
+Custom types help document intent and improve code maintainability.
 
 For example, to defines a new type `point` that is a tuple of two 
 integers, `x` and `y`:
@@ -633,7 +750,10 @@ To make a type structural, use the `ce.declareType()` function with the
 regardless of their names.
 
 ```js
-ce.declareType("pointData", "tuple<x: integer, y: integer>", { alias: true });
+ce.declareType(
+    "pointData", "tuple<x: integer, y: integer>", 
+    { alias: true }
+);
 ```
 
 ```js
@@ -646,14 +766,18 @@ ce.type("tuple<x: integer, y: integer>")
 
 A recursive type is a type that refers to itself in its definition.
 
+In this case, you can use a type before declaring it by prefacing if with the `type` keyword.
+
 For example, a binary tree can be defined as a tuple of a value and two subtrees:
 
 ```js
-ce.declareType("tree", "tuple<value: integer, left: tree, right: tree>");
+ce.declareType(
+  "tree", 
+  "tuple<value: integer, left: type tree, right: type tree>"
+);
 ```
 
 A set of types can be mutually recursive, meaning that they can refer to each other in their definitions.
-In this case, you can use a type before declaring it by prefacing if with the `type` keyword.
 
 For example, a definition of a JSON value could be:
 
@@ -666,11 +790,12 @@ ce.declareType("json", `
   | type json_array
   | type json_object
 `);
-ce.declareType("json_object", "map<json>");
+ce.declareType("json_object", "dictionary<json>");
 ce.declareType("json_array", "list<json>");
 ```
 
-When using `type json_array` or `type json_object`, the type is not yet defined, but it will be
-defined later in the code. This allows you to use the type before declaring it,
-but it is not necessary to use the `type` keyword if the type is already defined.
+When using `type json_array` or `type json_object`, the type is not yet defined, 
+but it will be defined later in the code. This allows you to use the type
+before declaring it. If the referenced type is already defined, the `type` keyword is optional.
+
 

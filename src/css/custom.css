@@ -192,18 +192,18 @@ math-field {
   --semantic-orange: var(--orange-400);
   --semantic-green: var(--green-700);
 
-  --glass-filter: drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1)) grayscale(0.6);
-  --glass-backdrop-filter: blur(18px) saturate(180%);
+  --glass-filter: drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1));
+  --glass-backdrop-filter: blur(8px) saturate(90%);
   --glass-border: 1px solid rgba(209, 213, 219, 0.3);
   --glass-border-color: var(--neutral-900) rgba(209, 213, 219, 0.3)
-    rgba(209, 213, 219, 0.3);
+    rgba(209, 213, 219, 1);
   --glass-box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 4px 30px rgba(0, 0, 0, 0.1),
-    0 0 10px rgb(0 0 0 / 0.05);
-  --glass-background: rgba(251, 251, 253, 0.8);
+    0 0 10px rgb(0 0 0 / 0.1);
+  --glass-background: rgba(255, 255, 255, 0.6);
 
   --shadow-color: 0deg 0% 50%;
 
-  /** Three elevatios: small, medium, and large */
+  /** Three elevations: small, medium, and large */
   /* See also https://www.joshwcomeau.com/shadow-palette/ */
   --box-shadow-sm: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.57),
     0px 1.9px 1.9px -3.2px hsl(var(--shadow-color) / 0.44);
@@ -311,6 +311,7 @@ header h1 {
 }
 
 .navbar {
+  color: white;
   margin-inline: auto;
   top: 8px;
   margin-top: 8px;
@@ -320,11 +321,13 @@ header h1 {
   background: var(--glass-background);
 
   /* From https://css.glass */
-  border-radius: 16px;
+  border-radius: 24px;
   box-shadow: var(--glass-box-shadow);
   backdrop-filter: var(--glass-backdrop-filter);
   border: var(--glass-border);
   border-color: var(--glass-border-color);
+  /* border-top: 2px solid rgba(255, 255, 255, 0.7);
+  border-bottom-color: rgba(0, 0, 0, 0.2); */
   transition: background, filter, backdrop-filter 0.5s ease-in-out;
 }
 

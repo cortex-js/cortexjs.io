@@ -62,6 +62,15 @@ ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).N().print();
 
 - Numeric approximations of integrals is several order of magnitude faster.
 
+- Added **Number Theory** functions: `Totient`, `Sigma0`, `Sigma1`,
+  `SigmaMinus1`, `IsPerfect`, `Eulerian`, `Stirling`, `NPartition`,
+  `IsTriangular`, `IsSquare`, `IsOctahedral`, `IsCenteredSquare`, `IsHappy`,
+  `IsAbundant`.
+
+- Added **Combinatorics** functions: `Choose`, `Fibonacci`, `Binomial`,
+  `CartesianProduct`, `PowerSet`, `Permutations`, `Combinations`, `Multinomial`,
+  `Subfactorial` and `BellNumber`.
+
 - The `symbol` type can be refined to match a specific symbol. For example
   `symbol<True>`. The type `expression` can be refined to match expressions with
   a specific operator, for example `expression<Add>` is a type that matches
@@ -88,27 +97,27 @@ ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).N().print();
 - The Power canonical-form is less aggressive - only carrying-out ops. as listed
   in doc. - is much more careful in its consideration of operand types &
   values... (for example, typically, exponents are required to be _numbers_:
-  e.g. `x^1` will simplify, but `x^y` (where y===0), or `x^{1+0}`, will not)
+  e.g. `x^1` will simplify, but `x^y` (where `y===0`), or `x^{1+0}`, will not)
 
 ### Issues Resolved
 
 - Ensure expression LaTeX serialization is based on MathJSON generated with
-  matching 'pretty' formatting (or not), therefore resulting in LaTeX with less
-  prettification, where `prettify == false` (#daef87f)
+  matching "pretty" formatting (or not), therefore resulting in LaTeX with less
+  prettification, where `prettify === false` (#daef87f)
 
-- Symbols declare with a `constant` flag are now not marked as 'inferred'
+- Symbols declare with a `constant` flag are now not marked as "inferred"
 
-- Some BoxedSymbols properties now more consistently return 'undefined', instead
-  of a 'boolean' (i.e. because the symbol is non-bound)
+- Some `BoxedSymbols` properties now more consistently return `undefined`,
+  instead of a `boolean` (i.e. because the symbol is non-bound)
 
 - Some `expr.root()` computations
 
 - Canonical-forms
   - Fixes the `Number` form
-  - Forms (at least, 'Number', 'Power') do not mistakenly _fully_ canonicalize
+  - Forms (at least, `Number`, `Power`) do not mistakenly _fully_ canonicalize
     operands
   - This (partial canonicalization) now substitutes symbols (constants) with a
-    `holdUntil` value of _never_ during/prior-to canonicalization (i.e. just
+    `holdUntil` value of `"never"` during/prior-to canonicalization (i.e. just
     like for full canonicalization)
 
 ## 0.29.1 _2025-03-31_

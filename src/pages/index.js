@@ -9,8 +9,10 @@ function HomepageHeader() {
   return (
     <header className={styles.header}>
       <div>
+        <img alt="MathLive Logo" height="256" width="256" src="/img/logo.svg"></img>
         <h1 className={styles.h1}>Cortex<span className={styles.js}>JS</span></h1>
         <p className={styles.subtitle}>Scientific Computing for Everyone</p>
+        
         <div className={styles.pods}>
           <a href="/mathfield">
             <div className={clsx(styles.pod, styles.mathfieldPod)}>
@@ -57,7 +59,7 @@ function HomepageHeader() {
 export default function Home() {
   return (
     <Layout
-      title={`CortexJS -- Scientific Computing for Everyone`}
+      title={`Scientific Computing for Everyone`}
       description="CortexJS: Enhancing scientific computing with user-friendly mathfield for easy math input, MathJSON for a web-native math format, and a versatile Compute Engine for symbolic and numerical computation."
     >
       <main>
