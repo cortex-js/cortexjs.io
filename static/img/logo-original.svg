@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- rainbow-stroke isometric cube -->
+
+<!-- https://www.learnui.design/tools/gradient-generator.html -->
+<svg
+   width="160"
+   height="160"
+   viewBox="0 0 120 120"
+   fill="none"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- diagonal rainbow gradient -->
+    <linearGradient
+       id="rainbowGradient"
+       x1="10"
+       y1="10"
+       x2="110"
+       y2="110"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#FF5252" />
+      <!-- red -->
+      <stop
+         offset="24%"
+         stop-color="#FF8A00" />
+      <!-- orange -->
+      <stop
+         offset="40%"
+         stop-color="#FFEB3B"/>
+      <!-- yellow -->
+      <stop
+         offset="58%"
+         stop-color="#4CAF50"/>
+      <!-- green -->
+      <stop
+         offset="65%"
+         stop-color="#00BCD4"/>
+      <!-- cyan -->
+      <stop
+         offset="85%"
+         stop-color="#3F51B5"/>
+      <!-- blue -->
+    </linearGradient>
+
+
+    <linearGradient id="sunrise" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#f7ff0a" />
+        <stop offset="16%" stop-color="#fece4d" />
+        <stop offset="33%" stop-color="#fb9f39" />
+        <stop offset="50%" stop-color="#f66936" />
+        <stop offset="66%" stop-color="#e02d55" />
+        <stop offset="83%" stop-color="#af1472" />
+        <stop offset="1" stop-color="#77107b" />
+    </linearGradient>
+
+
+    <linearGradient id="ocean" x1="120" y1="120" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+      
+        <stop offset="0" stop-color="#eeffbd" />
+        <stop offset="16%" stop-color="#27fa3b" />
+        <stop offset="33%" stop-color="#062059" />
+        <stop offset="50%" stop-color="transparent" />
+
+    </linearGradient>
+
+
+    <linearGradient id="ocean2" x1="120" y1="120" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+      
+        <stop offset="0" stop-color="#eeffbd" />
+        <stop offset="16%" stop-color="#27fa3b" />
+        <stop offset="33%" stop-color="#13c898" />
+        <stop offset="50%" stop-color="#0e9c97" />
+        <stop offset="66%" stop-color="#097285" />
+        <stop offset="83%" stop-color="#044b6e" />
+        <stop offset="100%" stop-color="#062059" />
+
+    </linearGradient>
+
+
+  </defs>
+  <!-- outer edges -->
+<path d="M60 10L100 30V80L60 110L20 80V30Z
+         M60 55V110
+         M100 30L60 55
+         M20 30L60 55"
+      fill="white"
+      stroke="url(#rainbowGradient)"
+      stroke-width="10"
+      stroke-linejoin="round"
+      stroke-linecap="round"/>
+
+<!-- <path d="M60 10L100 30V80L60 110L20 80V30Z
+         M60 55V110
+         M100 30L60 55
+         M20 30L60 55"
+      fill="transparent"
+      stroke="url(#ocean)"
+      stroke-width="10"
+      stroke-linejoin="round"
+      stroke-linecap="round"/>
+ -->
+
+
+
+  </svg>

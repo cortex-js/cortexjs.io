@@ -19,13 +19,13 @@ export default function ({ children, name, returns }) {
   if (!returns) {
       return (
       <p className={styles.signature}>
-        <b>{name}</b>: ({children})
+        <b>{name}</b>({children})
       </p>
     );
   }
   return (
     <p className={styles.signature}>
-      <b>{name}</b>: ({children}) -&gt; <span className={styles.returns}> {returns}</span>
+      <b>{name}</b>({children}) -&gt; <span className={styles.returns}> {returns}</span>
     </p>
   );
 }

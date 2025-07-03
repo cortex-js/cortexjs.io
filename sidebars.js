@@ -292,6 +292,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "compute-engine/reference-strings",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
           id: "compute-engine/reference-styling",
           className: "reference-icon",
         },

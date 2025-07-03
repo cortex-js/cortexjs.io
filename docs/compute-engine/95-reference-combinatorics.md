@@ -11,9 +11,9 @@ Combinatorics functions in the Compute Engine provide essential tools for counti
 
 ## Functions
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Choose
-</div>
+</nav>
 <FunctionDefinition name="Choose">
 <Signature name="Choose" returns="number">n: number, m: number</Signature>
 Computes the <b>binomial coefficient</b>, often read as “n choose m,” representing the number of ways to select <b>m</b> elements from a set of <b>n</b> elements without regard to order. 
@@ -38,9 +38,9 @@ See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binom
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Fibonacci
-</div>
+</nav>
 <FunctionDefinition name="Fibonacci">
 <Signature name="Fibonacci" returns="integer">n: integer</Signature>
 Returns the <b>n<sup>th</sup> Fibonacci number</b>, a sequence defined by the sum of the two preceding numbers starting with 0 and 1. 
@@ -66,9 +66,9 @@ See also: [Fibonacci number - Wikipedia](https://en.wikipedia.org/wiki/Fibonacci
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Binomial
-</div>
+</nav>
 <FunctionDefinition name="Binomial">
 <Signature name="Binomial" returns="integer">n: integer, k: integer</Signature>
 Calculates the <b>binomial coefficient</b> $$ C(n, k) $$, the number of ways to choose <b>k</b> elements from a set of <b>n</b> elements. Returns <b>0</b> if <code>k &lt; 0</code> or <code>k &gt; n</code>, and <b>1</b> if <code>k = 0</code> or <code>k = n</code>.
@@ -89,9 +89,9 @@ See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binom
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### CartesianProduct
-</div>
+</nav>
 <FunctionDefinition name="CartesianProduct">
 <Signature name="CartesianProduct" returns="set">set₁: set, set₂: set, ...</Signature>
 Returns the <b>Cartesian product</b> of one or more input sets, producing all ordered tuples where each element is drawn from the corresponding input set.
@@ -112,9 +112,9 @@ A \\times B = \\{ (a, b) \\mid a \\in A, b \\in B \\}
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### PowerSet
-</div>
+</nav>
 <FunctionDefinition name="PowerSet">
 <Signature name="PowerSet" returns="set">set: set</Signature>
 Computes the <b>power set</b> of the given set, which is the set of all subsets including the empty set and the set itself.
@@ -135,9 +135,9 @@ See also: [Power set - Wikipedia](https://en.wikipedia.org/wiki/Power_set)
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Permutations
-</div>
+</nav>
 <FunctionDefinition name="Permutations">
 <Signature name="Permutations" returns="list&lt;list&gt;">collection: list, k?: integer</Signature>
 Generates all <b>permutations</b> of the input collection of length <code>k</code>. If <code>k</code> is omitted, permutations of the full length of the collection are returned.
@@ -162,9 +162,9 @@ See also: [Permutation - Wikipedia](https://en.wikipedia.org/wiki/Permutation)
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Combinations
-</div>
+</nav>
 <FunctionDefinition name="Combinations">
 <Signature name="Combinations" returns="list&lt;list&gt;">collection: list, k: integer</Signature>
 Returns all <b>k-element combinations</b> (unordered subsets) of the input collection.
@@ -182,9 +182,9 @@ See also: [Combination - Wikipedia](https://en.wikipedia.org/wiki/Combination)
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Multinomial
-</div>
+</nav>
 <FunctionDefinition name="Multinomial">
 <Signature name="Multinomial" returns="integer">k₁: integer, k₂: integer, ...</Signature>
 Calculates the <b>multinomial coefficient</b> for the given group sizes, representing the number of ways to partition a set of $$ n = k_1 + k_2 + \cdots $$ elements into groups of sizes $$ k_1, k_2, \ldots $$.
@@ -205,9 +205,9 @@ See also: [Multinomial theorem - Wikipedia](https://en.wikipedia.org/wiki/Multin
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Subfactorial
-</div>
+</nav>
 <FunctionDefinition name="Subfactorial">
 <Signature name="Subfactorial" returns="integer">n: integer</Signature>
 Returns the number of <b>derangements</b> of <code>n</code> elements, i.e., permutations with no fixed points where no element appears in its original position.
@@ -228,9 +228,9 @@ See also: [Derangement - Wikipedia](https://en.wikipedia.org/wiki/Derangement)
 `}</Latex>
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### BellNumber
-</div>
+</nav>
 <FunctionDefinition name="BellNumber">
 <Signature name="BellNumber" returns="integer">n: integer</Signature>
 Computes the <b>Bell number</b> $$ B(n) $$, which counts the number of ways to partition a set of <code>n</code> elements into any number of non-empty, disjoint subsets.

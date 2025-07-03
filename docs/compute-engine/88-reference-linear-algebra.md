@@ -85,9 +85,9 @@ In LaTeX, each column is separated by an `&` and each row is separated by
 `\`.
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Vector
-</div>
+</nav>
 <FunctionDefinition name="Vector">
 
 <Signature name="Vector">_x-1_, ..._x-2_</Signature>
@@ -115,9 +115,9 @@ A row vector can be represented with a simple list or a tuple.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Matrix
-</div>
+</nav>
 <FunctionDefinition name="Matrix">
 
 <Signature name="Matrix">_matrix_</Signature>
@@ -172,9 +172,9 @@ columns and `:` indicate a dashed lines between two columns.
 ## Matrix Properties
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Shape
-</div>
+</nav>
 <FunctionDefinition name="Shape">
 
 <Signature name="Shape">_matrix_</Signature>
@@ -204,9 +204,9 @@ used to refer to the length of a matrix along a specific axis.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Rank
-</div>
+</nav>
 <FunctionDefinition name="Rank">
 
 <Signature name="Rank">_matrix_</Signature>
@@ -237,9 +237,9 @@ The rank is the length of the shape of the tensor.
 
 ## Accessing the content of Tensors
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### At
-</div>
+</nav>
 <FunctionDefinition name="At">
 
 <Signature name="At">_matrix_, _index-1_, _index-2_, ...</Signature>
@@ -284,9 +284,9 @@ square brackets following a matrix.
 
 ## Transforming Matrixes
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Flatten
-</div>
+</nav>
 <FunctionDefinition name="Flatten">
 
 <Signature name="Flatten">_matrix_</Signature>
@@ -311,9 +311,9 @@ are flattened.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Reshape
-</div>
+</nav>
 <FunctionDefinition name="Reshape">
 
 <Signature name="Reshape">_matrix_, _shape_</Signature>
@@ -350,9 +350,9 @@ with zeros.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Transpose
-</div>
+</nav>
 <FunctionDefinition name="Transpose">
 
 <Signature name="Transpose">_matrix_</Signature>
@@ -374,9 +374,9 @@ indexes start at 1.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### ConjugateTranspose
-</div>
+</nav>
 <FunctionDefinition name="ConjugateTranspose">
 
 <Signature name="ConjugateTranspose">_matrix_</Signature>
@@ -401,9 +401,9 @@ of the tensor are conjugated.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Inverse
-</div>
+</nav>
 <FunctionDefinition name="Inverse">
 
 <Signature name="Inverse">_matrix_</Signature>
@@ -419,9 +419,9 @@ Returns the inverse of the matrix.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### PseudoInverse
-</div>
+</nav>
 <FunctionDefinition name="PseudoInverse">
 
 <Signature name="PseudoInverse">_matrix_</Signature>
@@ -437,9 +437,9 @@ Returns the [Moore-Penrose pseudoinverse](https://en.wikipedia.org/wiki/Moore%E2
 
 </FunctionDefinition>
   
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Diagonal
-</div>
+</nav>
 <FunctionDefinition name="Diagonal">
 
 <Signature name="Diagonal">_matrix_</Signature>
@@ -457,9 +457,9 @@ on the diagonal of the matrix.
 ## Calculating with Matrixes
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Determinant
-</div>
+</nav>
 <FunctionDefinition name="Determinant">
 
 <Signature name="Determinant">_matrix_</Signature>
@@ -475,9 +475,9 @@ Returns the determinant of the matrix.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### AdjugateMatrix
-</div>
+</nav>
 <FunctionDefinition name="AdjugateMatrix">
 
 <Signature name="AdjugateMatrix">_matrix_</Signature>
@@ -501,9 +501,9 @@ the element.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Trace
-</div>
+</nav>
 <FunctionDefinition name="Trace">
 
 <Signature name="Trace">_matrix_</Signature>

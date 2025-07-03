@@ -12,114 +12,42 @@ into one unit. Each element in a collection is a
 
 ## Introduction
 
+The most common kind of collection are:
+- [**List**](#list)`:list`: ordered collection of elements (duplicates allowed)
+- [**Set**](#set)`:set`: unordered collection of unique elements
+- [**Tuple**](#tuple)`:tuple`: ordered, fixed-size collection with optional names
+- [**Record**](#record)`:record`: structured data with a fixed set of known string keys
+- [**Dictionary**](#dictionary)`:dictionary`: unordered key-value pairs with string keys
+
 Collections are **immutable**: they cannot be modified in place.  
-Operations on collections produce new collections.
+Instead, operations on collections produce new collections.
 
-The most common collection types are:
-- [**List**](#list): ordered collection of elements (duplicates allowed)
-- [**Set**](#set): unordered collection of unique elements
-- [**Tuple**](#tuple): ordered, fixed-size collection with optional names
-- [**Dictionary**](#dictionary): unordered key-value pairs with string keys
-- [**Record**](#record): structured data with a fixed set of known string keys
 
-You can use collections to represent mathematical vectors, matrices, sequences, mappings, or records — in both finite and infinite forms.
+
+Collections can be used to represent vectors, matrices, sets,
+mappings, or records — in both finite and infinite forms.
 
 <ReadMore path="/compute-engine/reference/linear-algebra/" >
-See also the **Linear Algebra** section for operations on vectors, matrices, tensors which are a special kind of collection.<Icon name="chevron-right-bold" />
+See also the **Linear Algebra** section for operations on vectors, matrices, 
+tensors which are a special kind of collection (lists of lists of numbers).<Icon name="chevron-right-bold" />
 </ReadMore>
 
-
-
-### Core Properties of Collections
-
-All collections share these basic properties:
-- Their elements can be **enumerated**
-- They can check whether an element is a **member** of the collection
-- The number of elements can be **counted**
-
-**Note:** Depending on the type of collection, counting and membership checking can be an expensive operation, for example, for lazy infinite collections.
-
-
-### Finite and Infinite Collections
-
-Collections may be:
-- **Finite**: containing a definite number of elements.
-- **Infinite**: continuing indefinitely (for example, a sequence of all natural numbers).
-
-Compute Engine supports **lazy evaluation** to make working with infinite collections possible.
-
-
-### Lazy and Strict Collections
-
-Collections can be:
-- **Strict**: elements are fully evaluated when the collection is created.
-- **Lazy**: elements are evaluated only as they are accessed.
-
-Lazy collections are useful when working with infinite sequences or with expensive computations.
-
-You can convert a lazy collection to a strict collection using `ListFrom` or `SetFrom`.  
-These functions enumerate all elements (if finite) and produce a strict result.
-
-```json example
-["ListFrom", ["Range", 1, 10]]
-// ➔ ["List", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-```
-
-### Why Lazy Infinite Collections?
-
-Lazy infinite collections provide a natural way to model mathematical sequences, iterative processes, or cyclic patterns — with minimal memory use.  
-Common examples include:
-- Natural numbers (`Range`)
-- Cyclic patterns (`Cycle`)
-- Iterative computations (`Iterate`)
 
 
 ### Ordered and Unordered Collections
 
 Collections fall into two broad categories:
 - **Ordered collections** (such as `List` and `Tuple`)  
-  → Elements can be accessed by an **index**.  
-    The first element has index `1`, the second has index `2`, etc.  
-    Negative indexes count from the end: index `-1` is the last element.
-- **Unordered collections** (such as `Set`, `Record`)  
+  → Elements can be accessed by an **index**, an integer that indicates the position of the element in the collection.
+- **Unordered collections** (such as `Set` and `Record`)  
   → Elements cannot be accessed by index. They can be enumerated or looked up by key.
 
 
-### Types
+The first element of an ordered collection has index `1`, the second element 
+has index `2`, and so on. The last element has index equal to the length of the collection.
 
-- The type `collection` represents any collection, whether ordered or unordered, finite or infinite.
-- The type `ordered collection` applies to collections that support index-based access (such as `List`, and `Tuple`).
-
-
-
-### Summary of Collection Types
-
-| Collection Type | Ordered? | Unique Elements? | Fixed Size? | Lazy Possible? | Example |
-| --------------- | -------- | ---------------- | ----------- | -------------- | ------- |
-| **List**        | Yes      | No               | No          | Yes            | `["List", 1, 2, 3]` |
-| **Set**         | No       | Yes              | No          | Yes            | `["Set", 1, 2, 3]` |
-| **Tuple**       | Yes      | No               | Yes         | No             | `["Tuple", "x", "y"]` |
-| **Dictionary**  | Keys unordered | Keys unique | No          | No             | `["Dictionary", ["Tuple", "a", 1], ["Tuple", "b", 2]]` |
-| **Record**      | Keys unordered | Keys unique | Yes         | No             | `["Record", ["Tuple", "name", "Alice"], ["Tuple", "age", 30]]` |
-
-*Note:*  
-Collections like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections** that behave like infinite Lists, unless a strict conversion or truncation (e.g. with `Take()`) is used.
-
----
-
-
-### Ordered Collections
-
-The elements of some collections can be accessed by their **index**, a
-number that indicates the position of the element in the collection. 
-
-Collections that can be accessed by index are called **ordered collections**. 
-
-The first element has index `1`, the second element has index `2`, and so on. The last
-element has index equal to the length of the collection.
-
-Negative indexes can also be used to access elements from the end of the
-collection. 
+**Negative indexes** can also be used to access elements from the end of the
+collection, if the collection is finite.
 
 The last element has index `-1`, the second to last element has index `-2`,
 and so on. This is useful for accessing elements without knowing the length of the
@@ -134,6 +62,62 @@ collection.
 ```
 
 
+### Finite and Infinite Collections
+
+Collections may be:
+- **Finite**: containing a definite number of elements.
+- **Infinite**: continuing indefinitely (for example, a sequence of all natural numbers).
+
+Compute Engine supports **lazy evaluation** to make working with infinite collections possible.
+
+### Lazy and Eager Collections
+
+Collections can be:
+- **Eager**: elements are fully evaluated when the collection is created.
+- **Lazy**: elements are evaluated only as they are accessed.
+
+Lazy collections are useful when working with with expensive computations
+and necessary when working with infinite collections.
+
+Some operations like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections**.
+
+You can convert a lazy collection to an eager collection using [`ListFrom`](#listfrom) 
+or [`SetFrom`](#setfrom). These functions enumerate all elements of a finite 
+collection and produce a matching eager collection.
+
+```json example
+["ListFrom", ["Range", 1, 10]]
+// ➔ ["List", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+
+Lazy infinite collections provide a natural way to model mathematical 
+sequences, iterative processes, or cyclic patterns, with minimal memory use.
+
+Common examples include:
+- Natural numbers (`Range`)
+- Cyclic patterns (`Cycle`)
+- Iterative computations (`Iterate`)
+
+
+### Core Properties of Collections
+
+All collections share these basic properties:
+- Their elements can be **enumerated**
+- Their elements can be **counted**
+- They can check whether an element is a **member** of the collection
+- They can check if another collection is a **subset** of the collection
+
+**Note:** Depending on the type of collection, counting and membership checking 
+can be an expensive operation. See the information on specific collection types for details.
+
+In addition, ordered collections support:
+- **Index-based access**: elements can be accessed by their index.
+- **Finding elements**: elements can be searched for by a predicate and 
+  their index can be returned.
+
+
+
+#### Eager Collections
 
 Some of the collections in the Compute Engine include:
 - [**List**](#list): ordered collections of elements, which are also used to represent
@@ -149,17 +133,22 @@ Some of the collections in the Compute Engine include:
 - [**Record**](#record): unordered collections of key-value pairs. Unlike dictionaries, records are used to represent structured data with a fixed set of keys, and the keys are known at compile time. 
   Type: `record<K1: T1, K2: T2, ..., Kn: Tn>` where `K1`, `K2`, ..., `Kn` are the keys and `T1`, `T2`, ..., `Tn` are the types of the values.
 
-Some functions evaluate to a lazy collection. This is useful for creating
-infinite collections or for collections that are expensive to compute. Examples of lazy collections include:
+#### Lazy Collections
 
+Some functions evaluate to a lazy collection. This is useful for creating
+infinite collections or for collections that are expensive to compute. 
+
+Examples of function evaluating to a lazy collection include:
 - [**Range**](#range) and [**Linspace**](#linspace): ordered sequences of numbers (integers and reals, respectively) with a specified start, end and step size.
 - [**Cycle**](#cycle): infinite collections that repeat a finite collection.
 - [**Iterate**](#iterate): infinite collections that apply a function to an initial value repeatedly.
 - [**Repeat**](#repeat): infinite collections that repeat a single value.
 - [**Fill**](#fill): collections of a specified size, where each element is computed by a function or set to a specific value.
 
-The type `collection` is used to represent any collection, whether it is ordered or unordered, finite or infinite.
-The type `ordered collection` is used to represent collections that can be accessed by index, such as `List`, `Tuple`, and `Dictionary`.
+### Types
+
+- The type `collection` represents any collection, whether ordered or unordered, finite or infinite.
+- The type `ordered_collection` applies to collections that support index-based access (such as `List`, and `Tuple`).
 
 
 
@@ -189,17 +178,43 @@ See also the **Linear Algebra** section for operations on vectors, matrices, ten
 
 
 
-## Creating Collections
+## Creating Eager Collections
 
-This section contains functions that create new collections from some elements.
+This section contains functions that create eager collections from some elements.
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
+### Sequence
+</nav>
+
+<FunctionDefinition name="Sequence">
+<Signature name="Sequence" returns="collection">..._elements_:any</Signature>
+
+A sequence is a collection of elements. When a sequence is used where an element
+is expected, the elements of the sequence are spliced into the expression.
+
+```json example
+["List", 1, ["Sequence", 2, 3], 4]
+// ➔ ["List", 1, 2, 3, 4]
+```
+
+The `Nothing` symbol is a synonym for the empty sequence `["Sequence"]`.
+When the `Nothing` symbol is used in a context where an element is expected, it is ignored.
+
+
+```json example
+["List", 1, "Nothing", 2]
+// ➔ ["List", 1, 2]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### List
-</div>
+</nav>
 
 <FunctionDefinition name="List">
 
-<Signature name="List" returns="list">..._element_:any</Signature>
+<Signature name="List" returns="list">..._elements_:any</Signature>
 
 A `List` is an **ordered** collection of elements. An element in
 a list may be repeated.
@@ -210,18 +225,23 @@ a list may be repeated.
 ["List", 42, 3.14, "x", "y"]
 ```
 
+The type of a list is `list<T>`, where `T` is the type of the elements in the list.
+The type `list` is a shorthand for `list<any>`, meaning the list can contain elements of any type.
+
 The visual presentation of a `List` expression can be customized using the
 `Delimiter` function.
 
 ```js example
-ce.box(["List", 5, 2, 10, 18]).latex;
+const xs = ce.box(["List", 5, 2, 10, 18]);
+
+xs.latex
 // ➔ "\lbrack 5, 2, 10, 18 \rbrack"
 
-ce.box(["Delimiter", ["List", 5, 2, 10, 18], "<;>"]).latex;
+ce.box(["Delimiter", xs, "<;>"]).latex;
 // ➔ "\langle5; 2; 10; 18\rangle"
 ```
 
-A **vector** is represented as a `List` of numbers.
+A **vector** is represented using a `List` of numbers.
 
 <Latex value="\lbrack 1, 2, 3 \rbrack"/>
 
@@ -264,9 +284,9 @@ See also the **Linear Algebra** section for operations on vectors, matrices and 
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Set
-</div>
+</nav>
 
 <FunctionDefinition name="Set">
 
@@ -280,60 +300,41 @@ An **unordered** collection of unique elements.
 ["Set", 12, 15, 17]
 ```
 
-</FunctionDefinition>
+The type of a set is `set<T>`, where `T` is the type of the elements in the set.
 
-<div style={{visibility:"hidden"}}>
-### Fill
-</div>
+The type `set` is a shorthand for `set<any>`, meaning the set can contain elements of any type.
 
-<FunctionDefinition name="Fill">
-
-<Signature name="Fill" returns="list">_dimensions_, _value_:any</Signature>
-
-<Signature name="Fill" returns="list">_dimensions_, _f_:function</Signature>
-
-Create a list of the specified dimensions.
-
-If a `value` is provided, the elements of the list are all set to that value.
-
-If a `function` is provided, the elements of the list are computed by applying
-the function to the index of the element.
-
-If `dimensions` is a number, a list of that length is created.
+If the same element is repeated, it is included only once in the set. The 
+elements are compared using the `IsSame` function.
 
 ```json example
-["Fill", 3, 0]
-// ➔ ["List", 0, 0, 0]
+["Set", 12, 15, 17, 12, 15]
+// ➔ ["Set", 12, 15, 17]
 ```
 
-If dimension is a tuple, a matrix of the specified dimensions is created.
+The elements in a set are not ordered. When enumerating a set, the elements are
+returned in an arbitrary order, and two successive enumerations may return the
+elements in a different order.
 
-```json example
-["Fill", ["Tuple", 2, 3], 0]
-// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
-```
-
-If a `function` is specified, it is applied to the index of the element to
-compute the value of the element.
-
-```json example
-["Fill", ["Tuple", 2, 3], ["Function", ["Add", "i", "j"], "i", "j"]]
-// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
-```
+The elements in a set are counted in constant time.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+
+## Creating Lazy Collections
+
+
+<nav className="hidden">
 ### Range
-</div>
+</nav>
 
 <FunctionDefinition name="Range">
 
-<Signature name="Range" returns="collection<integer>">_upper_:integer</Signature>
+<Signature name="Range" returns="ordered_collection<integer>">_upper_:integer</Signature>
 
-<Signature name="Range" returns="collection<integer>">_lower_:integer, _upper_:integer</Signature>
+<Signature name="Range" returns="ordered_collection<integer>">_lower_:integer, _upper_:integer</Signature>
 
-<Signature name="Range" returns="collection<integer>">_lower_:integer, _upper_:integer, _step_:integer</Signature>
+<Signature name="Range" returns="ordered_collection<integer>">_lower_:integer, _upper_:integer, _step_:integer</Signature>
 
 A sequence of numbers, starting with `lower`, ending with `upper`, and
 incrementing by `step`.
@@ -367,19 +368,19 @@ negative.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Linspace
-</div>
+</nav>
 
 <FunctionDefinition name="Linspace">
 
-<Signature name="Linspace" returns="collection<real>">_upper_:real</Signature>
+<Signature name="Linspace" returns="ordered_collection<real>">_upper_:real</Signature>
 
-<Signature name="Linspace" returns="collection<real>">_lower_:real, _upper_:real</Signature>
+<Signature name="Linspace" returns="ordered_collection<real>">_lower_:real, _upper_:real</Signature>
 
-<Signature name="Linspace" returns="collection<real>">_lower_:real, _upper_:real, _count_:integer</Signature>
+<Signature name="Linspace" returns="ordered_collection<real>">_lower_:real, _upper_:real, _count_:integer</Signature>
 
-Short for "linearly spaced", from the [MATLAB function of the same
+`Linspace` is short for "linearly spaced", from the [MATLAB function of the same
 name](https://mathworks.com/help/matlab/ref/linspace.html).
 
 A sequence of numbers evenly spaced between `lower` and `upper`. Similar to `Range` but the number of elements in the collection is specified with `count` instead of a `step` value.
@@ -426,34 +427,85 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 
 
 
+<nav className="hidden">
+### Fill
+</nav>
 
-<div style={{visibility:"hidden"}}>
+<FunctionDefinition name="Fill">
+
+<Signature name="Fill" returns="ordered_collection">_dimensions_, _value_:any</Signature>
+
+<Signature name="Fill" returns="ordered_collection">_dimensions_, _f_:function</Signature>
+
+Create an ordered collection of the specified dimensions.
+
+If a `value` is provided, the elements of the collection are all set to that value.
+
+If a `function` is provided, the elements of the collection are computed by applying
+the function to the index of the element.
+
+If `dimensions` is a number, a collection with that many elements is created.
+
+```json example
+["Fill", 3, 0]
+// ➔ ["List", 0, 0, 0]
+```
+
+If dimension is a tuple, a matrix of the specified dimensions is created.
+
+```json example
+["Fill", ["Tuple", 2, 3], 0]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+```
+
+If a `function` is specified, it is applied to the index of the element to
+compute the value of the element.
+
+```json example
+["Fill", 
+  ["Tuple", 2, 3], 
+  ["Function", ["Add", "i", "j"], "i", "j"]
+]
+// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
 ### Repeat
-</div>
+</nav>
 
 
 <FunctionDefinition name="Repeat">
 
-<Signature name="Repeat" returns="list">_value_: any</Signature>
+<Signature name="Repeat" returns="ordered_collection">_value_: any</Signature>
 
-An infinite list of the same element.
+An infinite collection of the same element.
 
-<Signature name="Repeat" returns="list">_value_: any, _count_: integer?</Signature>
+<Signature name="Repeat" returns="ordered_collection">_value_: any, _count_: integer?</Signature>
 
-A list of the same element repeated `count` times.
+A collection of the same element repeated `count` times.
 
 ```json example
 ["Repeat", 42, 5]
+// ➔ ["List", 42, 42, 42, 42, 42]
 ```
 
+**Note:** `["Repeat", n]` is equivalent to `["Cycle", ["List", n]]`. See 
+[`Cycle`](#cycle) for more information.
 
-**Note:** `["Repeat", n]` is equivalent to `["Cycle", ["List", n]]`.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Cycle
+</nav>
+
+
 <FunctionDefinition name="Cycle">
 
-<Signature name="Cycle" returns="list">_seed_:collection</Signature>
+<Signature name="Cycle" returns="ordered_collection">_seed_:collection</Signature>
 
 A collection that repeats the elements of the `seed` collection. The `seed`
 collection must be finite.
@@ -475,17 +527,15 @@ Use `Take` to get a finite number of elements.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Iterate
-</div>
-
-
+</nav>
 
 <FunctionDefinition name="Iterate">
 
-<Signature name="Iterate" returns="list">_f_:function</Signature>
+<Signature name="Iterate" returns="ordered_collection">_f_:function</Signature>
 
-<Signature name="Iterate"  returns="list">_f_:function, _initial_:any</Signature>
+<Signature name="Iterate"  returns="ordered_collection">_f_:function, _initial_:any</Signature>
 
 An infinite collection of the results of applying `f` to the initial
 value.
@@ -493,42 +543,37 @@ value.
 If the `initial` value is not specified, it is assumed to be `0`
 
 ```json example
-["Iterate", ["Function", ["Multiply", "_", 2]], 1]
-
-
+["Iterate", ["Multiply", "_", 2], 1]
 // ➔ ["List", 1, 2, 4, 8, 16, ...]
 ```
 
 Use `Take` to get a finite number of elements.
 
 ```json example
-["Take", ["Iterate", ["Function", ["Add", "_", 2]], 7], 5]
+["Take", ["Iterate", ["Add", "_", 2]], 7], 5]
 // ➔ ["List", 7, 9, 11, 13, 15]
 ```
 
 </FunctionDefinition>
 
 
-## Operating On Collections
+## Accessing Elements of Collections
 
-The section contains functions whose argument is a collection, but whose return
-value is not a collection.
+Elements of ordered collections can be accessed using their index.
 
-<div style={{visibility:"hidden"}}>
+Indexes start at `1` for the first element. Negative indexes access elements from the end of the collection, with `-1` being the last element.
+
+<nav className="hidden">
 ### At
-</div>
+</nav>
 
 
 <FunctionDefinition name="At">
 
-<Signature name="At">_collection_, _index_</Signature>
+<Signature name="At">_xs_: ordered_collection, _index_: integer</Signature>
 
-<Signature name="At">_collection_, _index1_, _index2_, ...</Signature>
 
 Returns the element at the specified index.
-
-If the collection is nested, the indexes are applied in order.
-
 
 ```json example
 ["At", ["List", 5, 2, 10, 18], 2]
@@ -536,44 +581,28 @@ If the collection is nested, the indexes are applied in order.
 
 ["At", ["List", 5, 2, 10, 18], -2]
 // ➔ 10
+```
 
+<Signature name="At">_xs_: ordered_collection, ..._indexes_: integer</Signature>
+
+If the collection is nested, the indexes are applied in order.
+
+```json example
 ["At", ["List", ["List", 1, 2], ["List", 3, 4]], 2, 1]
 // ➔ 3
 ```
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
-### Filter
-</div>
-
-
-
-<FunctionDefinition name="Filter">
-
-<Signature name="Filter">_collection_, _function_</Signature>
-
-Returns a collection where _function_ is applied to each element of the
-collection. Only the elements for which the function returns `"True"` are kept.
-
-```json example
-["Filter", ["List", 5, 2, 10, 18], ["Function", ["Less", "_", 10]]]
-// ➔ ["List", 5, 2]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### First
-</div>
+</nav>
 
 <FunctionDefinition name="First">
 
-<Signature name="First">_collection_</Signature>
+<Signature name="First">_xs_: ordered_collection</Signature>
 
 Return the first element of the collection.
-
-It's equivalent to `["Take", _collection_, 1]`.
 
 ```json example
 ["First", ["List", 5, 2, 10, 18]]
@@ -583,16 +612,38 @@ It's equivalent to `["Take", _collection_, 1]`.
 // ➔ "x"
 ```
 
+It's equivalent to `["At", xs, 1]`.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Second
+</nav>
+
+<FunctionDefinition name="Second">
+
+<Signature name="Second">_xs_: ordered_collection</Signature>
+
+Return the second element of the collection.
+
+```json example
+["Second", ["Tuple", "x", "y"]]
+// ➔ "y"
+```
+
+It's equivalent to `["At", xs, 2]`.
+
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+
+<nav className="hidden">
 ### Last
-</div>
+</nav>
 
 <FunctionDefinition name="Last">
 
-<Signature name="Last">_collection_</Signature>
+<Signature name="Last">_xs_: ordered_collection</Signature>
 
 Return the last element of the collection.
 
@@ -601,27 +652,342 @@ Return the last element of the collection.
 // ➔ 18
 ```
 
-<Signature name="Last">_collection_, _n_</Signature>
+It's equivalent to `["At", xs, -1]`.
 
-Return the last _n_ elements of the collection.
+</FunctionDefinition>
+
+<nav className="hidden">
+### Most
+</nav>
+
+<FunctionDefinition name="Most">
+
+<Signature name="Most" returns="ordered_collection">_xs_: ordered_collection</Signature>
+
+Return everything but the last element of the collection.
 
 ```json example
-["Last", ["List", 5, 2, 10, 18], 2]
+["Most", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 5, 2, 10]
+```
+
+It's equivalent to `["Drop", xs, -1]`.
+
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Rest
+</nav>
+
+<FunctionDefinition name="Rest">
+
+<Signature name="Rest" returns="ordered_collection">_xs_: ordered_collection</Signature>
+
+Return everything but the first element of the collection.
+
+
+```json example
+["Rest", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 2, 10, 18]
+```
+
+It's equivalent to `["Drop", xs, 1]`.
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Take
+</nav>
+
+<FunctionDefinition name="Take">
+
+<Signature name="Take" returns="ordered_collection">_xs_: ordered_collection, _n_: integer</Signature>
+
+Return a list of the first `n` elements of `xs`. The collection `xs` must be ordered.
+
+If `n` is negative, it returns the last `n` elements.
+
+```json example
+["Take", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 5, 2]
+
+["Take", ["List", 5, 2, 10, 18], -2]
+// ➔ ["List", 18, 10]
+```
+
+See [**Drop**](#drop) for a function that returns everything but the first `n` elements.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Drop
+</nav>
+
+<FunctionDefinition name="Drop">
+<Signature name="Drop" returns="collection">_xs_:collection, _n_:integer</Signature>
+
+Return a list without the first `n` elements.
+
+If `n` is negative, it returns a list without the last `n` elements.
+
+```json example
+["Drop", ["List", 5, 2, 10, 18], 2]
 // ➔ ["List", 10, 18]
+
+["Drop", ["List", 5, 2, 10, 18], -2]
+// ➔ ["List", 5, 2]
+```
+
+See [**Take**](#take) for a function that returns the first `n` elements.
+
+
+</FunctionDefinition>
+
+
+## Changing the Order of Elements
+
+
+<nav className="hidden">
+### Reverse
+</nav>
+
+<FunctionDefinition name="Reverse">
+
+<Signature name="Reverse">_xs_: ordered_collection</Signature>
+
+Return the collection in reverse order.
+
+```json example
+["Reverse", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 18, 10, 2, 5]
+```
+
+It's equivalent to `["Extract", xs, ["Tuple", -1, 1]]`.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Extract
+</nav>
+
+<FunctionDefinition name="Extract">
+
+<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, _index_:integer</Signature>
+
+<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, ..._indexes_:integer</Signature>
+
+<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, _range_:tuple&lt;integer, integer&gt;</Signature>
+
+Returns a list of the elements at the specified indexes.
+
+`Extract` always return an ordered collection, even if the result is a single element. If no
+elements match, an empty collection is returned.
+
+```json example
+["Extract", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10]
+
+["Extract", ["List", 5, 2, 10, 18], -2, 1]
+// ➔ ["List", 10, 5]
+
+
+["Extract", ["List", 5, 2, 10, 18], 17]
+// ➔ ["List"]
+```
+
+When using a range, it is specified as a `Tuple`.
+
+```json example
+// Elements 2 to 3
+["Extract", ["List", 5, 2, 10, 18], ["Tuple", 2, 4]]
+// ➔ ["List", 2, 10, 18]
+
+// From start to end, every other element
+["Extract", ["List", 5, 2, 10, 18], ["Tuple", 1, -1, 2]]
+// ➔ ["List", 5, 10]
+```
+
+The elements are returned in the order in which they're specified. Using
+negative indexes (or ranges) reverses the order of the elements.
+
+```json example
+// From last to first = reverse
+["Extract", ["List", 5, 2, 10, 18], ["Tuple", -1, 1]]
+// ➔ ["List", 18, 10, 2, 5]
+
+// From last to first = reverse
+["Extract", ""desserts"", ["Tuple", -1, 1]]
+// ➔ ""stressed""
+```
+
+An index can be repeated to extract the same element multiple times.
+
+```json example
+["Extract", ["List", 5, 2, 10, 18], 3, 3, 1]
+// ➔ ["List", 10, 10, 5]
 ```
 
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
+### Exclude
+</nav>
+
+<FunctionDefinition name="Exclude">
+
+<Signature name="Exclude" returns="ordered_collection">_xs_:ordered_collection,, _index_:integer</Signature>
+
+<Signature name="Exclude" returns="ordered_collection">_xs_:ordered_collection, _indexes_:tuple&lt;integer&gt;</Signature>
+
+`Exclude` is the opposite of `Extract`. It returns a list of the elements that
+are not at the specified indexes.
+
+The order of the elements is preserved.
+
+
+```json example
+["Exclude", ["List", 5, 2, 10, 18], 3]
+// ➔ ["List", 5, 2, 18]
+
+["Exclude", ["List", 5, 2, 10, 18], -2, 1]
+// ➔ ["List", 2, 18]
+```
+
+
+An index may be repeated, but the corresponding element will only be dropped
+once.
+
+```json example
+["Exclude", ["List", 5, 2, 10, 18], 3, 3, 1]
+// ➔ ["List", 2, 18]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### RotateLeft
+</nav>
+
+<FunctionDefinition name="RotateLeft">
+
+<Signature name="RotateLeft" returns="ordered_collection">_xs_: ordered_collection, _count_: integer</Signature>
+
+Returns a collection where the elements are rotated to the left by the specified
+count.
+
+```json example
+["RotateLeft", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10, 18, 5, 2]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### RotateRight
+</nav>
+
+<FunctionDefinition name="RotateRight">
+
+<Signature name="RotateRight" returns="ordered_collection">_xs_: ordered_collection, _count_: integer</Signature>
+
+Returns a collection where the elements are rotated to the right by the
+specified count.
+
+```json example
+["RotateRight", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10, 18, 5, 2]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Shuffle
+</nav>
+
+<FunctionDefinition name="Shuffle">
+
+<Signature name="Shuffle" returns="ordered_collection">_xs_: ordered_collection</Signature>
+
+Return the collection in random order.
+
+```json example
+["Shuffle", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 10, 18, 5, 5]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Sort
+</nav>
+
+<FunctionDefinition name="Sort">
+
+<Signature name="Sort" returns="ordered_collection">_xs_: collection</Signature>
+
+<Signature name="Sort" returns="ordered_collection">_xs_: collection, _order-function_: function</Signature>
+
+Return the collection in sorted order.
+
+```json example
+["Sort", ["Set", 18, 5, 2, 10]]
+// ➔ ["List", 2, 5, 10, 18]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Ordering
+</nav>
+
+<FunctionDefinition name="Ordering">
+
+<Signature name="Ordering" returns="ordered_collection">_collection_</Signature>
+
+<Signature name="Ordering" returns="ordered_collection">_collection_, _order-function_</Signature>
+
+Return the indexes of the collection in sorted order.
+
+```json example
+["Ordering", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 2, 1, 3, 4]
+```
+
+To get the values in sorted order, use `Extract`:
+
+```json example
+["Assign", "xs", ["List", 5, 2, 10, 18]]
+["Extract", "xs", ["Ordering", "xs"]]
+// ➔ ["List", 2, 5, 10, 18]
+
+// Same as Sort:
+["Sort", "xs"]
+// ➔ ["List", 2, 5, 10, 18]
+```
+
+</FunctionDefinition>
+
+
+## Operating On Collections
+
+
+
+
+
+<nav className="hidden">
 ### Length
-</div>
+</nav>
 
 
 
 <FunctionDefinition name="Length">
 
-<Signature name="Length">_collection_</Signature>
+<Signature name="Length" returns="integer">_xs_: collection</Signature>
 
 Returns the number of elements in the collection.
 
@@ -633,25 +999,18 @@ rows.
 // ➔ 4
 ```
 
-When the collection is a string, `Length` returns the number of characters in
-the string.
-
-```json example
-["Length", { "str": "Hello" }]
-// ➔ 5
-```
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsEmpty
-</div>
+</nav>
 
 <FunctionDefinition name="IsEmpty">
 
-<Signature name="IsEmpty">_collection_</Signature>
+<Signature name="IsEmpty" returns="boolean">_xs_: collection</Signature>
 
-Returns the symbol `True` if the collection is empty.
+Returns the symbol `True` if the collection has no elements.
 
 ```json example
 ["IsEmpty", ["List", 5, 2, 10, 18]]
@@ -663,38 +1022,40 @@ Returns the symbol `True` if the collection is empty.
 ["IsEmpty", "x"]
 // ➔ "True"
 
-["IsEmpty", {str: "Hello"]
+["IsEmpty", {str: "Hello"}]
 // ➔ "False"
 ```
 
 </FunctionDefinition>
 
 <FunctionDefinition name="Contains">
-<Signature name="Contains">_collection_, _value_</Signature>
+<Signature name="Contains" returns="boolean">_xs_: collection, _value_: any</Signature>
 
-Returns `True` if the collection contains the given value, `False` otherwise.
+Returns `True` if the collection contains the given value, `False` otherwise. The value is compared using the `IsSame` function.
+
 
 ```json example
 ["Contains", ["List", 5, 2, 10, 18], 10]
 // ➔ "True"
+
 ["Contains", ["List", 5, 2, 10, 18], 42]
 // ➔ "False"
 ```
 </FunctionDefinition>
 
 <FunctionDefinition name="IndexWhere">
-<Signature name="IndexWhere">_collection_, _predicate_:function</Signature>
+<Signature name="IndexWhere" returns="number">_xs_: ordered_collection, _predicate_:function</Signature>
 
 Returns the 1-based index of the first element in the collection that satisfies the predicate, or 0 if not found.
 
 ```json example
-["IndexWhere", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 9]]]
+["IndexWhere", ["List", 5, 2, 10, 18], ["Greater", "_", 9]]
 // ➔ 3
 ```
 </FunctionDefinition>
 
 <FunctionDefinition name="Find">
-<Signature name="Find">_collection_, _predicate_:function</Signature>
+<Signature name="Find">_xs_: ordered_collection, _predicate_:function</Signature>
 
 Returns the first element in the collection that satisfies the predicate, or `Nothing` if none found.
 
@@ -707,12 +1068,12 @@ Returns the first element in the collection that satisfies the predicate, or `No
 </FunctionDefinition>
 
 <FunctionDefinition name="CountIf">
-<Signature name="CountIf">_collection_, _predicate_:function</Signature>
+<Signature name="CountIf" returns="number">_xs_: ordered_collection, _predicate_:function</Signature>
 
 Returns the number of elements in the collection that satisfy the predicate.
 
 ```json example
-["CountIf", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+["CountIf", ["List", 5, 2, 10, 18], ["Greater", "_", 5]]
 // ➔ 2
 ```
 </FunctionDefinition>
@@ -754,9 +1115,28 @@ Returns `True` if all elements of the collection satisfy the predicate, `False` 
 ```
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
+### Filter
+</nav>
+
+<FunctionDefinition name="Filter">
+
+<Signature name="Filter" returns="collection">_xs_: collection, _pred_: function</Signature>
+
+Returns a collection where _pred_ is applied to each element of the
+collection. Only the elements for which the predicate returns `"True"` are kept.
+
+```json example
+["Filter", ["List", 5, 2, 10, 18], ["Function", ["Less", "_", 10]]]
+// ➔ ["List", 5, 2]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
 ### Map
-</div>
+</nav>
 
 
 <FunctionDefinition name="Map">
@@ -779,14 +1159,14 @@ Returns a collection where _f_ is applied to each element of _xs_.
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Reduce
-</div>
+</nav>
 
 <FunctionDefinition name="Reduce">
 
 
-<Signature name="Reduce" returns="value">_xs_:collection, _fn_:function, _initial_:value?</Signature>
+<Signature name="Reduce" returns="value">_xs_:ordered_collection, _fn_:function, _initial_:value?</Signature>
 
 Returns a value by applying the reducing function _fn_ to each element
 of the collection.
@@ -824,55 +1204,12 @@ See also the **`FixedPoint` function** which operates without a collection.<Icon
 
 
 
-<FunctionDefinition name="Ordering">
-
-<Signature name="Ordering">_collection_</Signature>
-
-<Signature name="Ordering">_collection_, _order-function_</Signature>
-
-Return the indexes of the collection in sorted order.
-
-```json example
-["Ordering", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 2, 1, 3, 4]
-```
-
-To get the values in sorted order, use `Extract`:
-
-```json example
-["Assign", "l", ["List", 5, 2, 10, 18]]
-["Extract", "l", ["Ordering", "l"]]
-// ➔ ["List", 2, 5, 10, 18]
-
-// Same as Sort:
-["Sort", "l"]
-// ➔ ["List", 2, 5, 10, 18]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### Second
-</div>
-
-<FunctionDefinition name="Second">
-
-<Signature name="Second">_collection_</Signature>
-
-Return the second element of the collection.
-
-```json example
-["Second", ["Tuple", "x", "y"]]
-// ➔ "y"
-```
-
-</FunctionDefinition>
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Tally
-</div>
+</nav>
 
 
 <FunctionDefinition name="Tally">
@@ -892,13 +1229,13 @@ Evaluate to a tuple of two lists:
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Zip
-</div>
+</nav>
 
 <FunctionDefinition name="Zip">
 
-<Signature name="Zip">_collection-1_, _collection-2_, ...</Signature>
+<Signature name="Zip" return="ordered_collection">..._xss_: ordered_collection</Signature>
 
 Returns a collection of tuples where the first element of each tuple is the
 first element of the first collection, the second element of each tuple is the
@@ -959,156 +1296,18 @@ a collection made of a subset of the elements of the input.
 Collections are immutable. These functions do not modify the input collection, but
 return a new collection.
 
-<div style={{visibility:"hidden"}}>
-### Drop
-</div>
-
-<FunctionDefinition name="Drop">
-<Signature name="Drop" returns="collection">_xs_:collection, _n_:integer</Signature>
-
-Return a list without the first `n` elements.
-
-If `n` is negative, it returns a list without the last `n` elements.
-
-```json example
-["Drop", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10, 18]
-
-["Drop", ["List", 5, 2], -2]
-// ➔ ["List", 5, 2]
-```
-
-See [**Take**](#take) for a function that returns the first `n` elements.
-
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### Exclude
-</div>
-
-<FunctionDefinition name="Exclude">
-
-<Signature name="Exclude" returns="collection">_xs_:collection,, _index_:integer</Signature>
-
-<Signature name="Exclude" returns="collection">_xs_:collection, _indexes_:collection&lt;integer&gt;</Signature>
-
-`Exclude` is the opposite of `Extract`. It returns a list of the elements that
-are not at the specified index.
-
-The order of the elements is preserved.
-
-
-```json example
-["Exclude", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 5, 10, 18]
-
-["Exclude", ["List", 5, 2, 10, 18], -2, 1]
-// ➔ ["List", 2, 18]
-```
-
-When `indexes` is a list, it is used to specify the indexes of the elements to
-be dropped.
-
-```json example
-["Exclude", ["List", 5, 2, 10, 18], ["List", 2, 3]]
-// ➔ ["List", 5, 2]
-
-["Exclude", ["List", 5, 2, 10, 18], ["List", -2, 1]]
-// ➔ ["List", 2, 18]
-```
-
-
-An index may be repeated, but the corresponding element will only be dropped
-once.
-
-```json example
-["Exclude", ["List", 5, 2, 10, 18], ["List", 3, 3, 1]]
-// ➔ ["List", 2, 18]
-```
-
-</FunctionDefinition>
-
-
-
-<div style={{visibility:"hidden"}}>
-### Extract
-</div>
-
-<FunctionDefinition name="Extract">
-
-<Signature name="Extract">_collection_, _index_</Signature>
-
-<Signature name="Extract">_collection_, _index1_, _index2_</Signature>
-
-<Signature name="Extract">_collection_, _range_</Signature>
-
-Returns a list of the elements at the specified indexes.
-
-`Extract` is a flexible function that can be used to extract a single element, a
-range of elements, or a list of elements.
-
-`Extract` always return a list, even if the result is a single element. If no
-elements match, an empty list is returned.
-
-```json example
-["Extract", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10]
-
-["Extract", ["List", 5, 2, 10, 18], -2, 1]
-// ➔ ["List", 10, 5]
-
-
-["Extract", ["List", 5, 2, 10, 18], 17]
-// ➔ ["List"]
-```
-
-When using a range, it is specified as a [`Range`](#Range) expression.
-
-```json example
-// Elements 2 to 3
-["Extract", ["List", 5, 2, 10, 18], ["Range", 2, 4]]
-// ➔ ["List", 2, 10, 18]
-
-// From start to end, every other element
-["Extract", ["List", 5, 2, 10, 18], ["Range", 1, -1, 2]]
-// ➔ ["List", 5, 10]
-```
-
-The elements are returned in the order in which they're specified. Using
-negative indexes (or ranges) reverses the order of the elements.
-
-```json example
-// From last to first = reverse
-["Extract", ["List", 5, 2, 10, 18], ["Range", -1, 1]]
-// ➔ ["List", 18, 10, 2, 5]
-
-// From last to first = reverse
-["Extract", ""desserts"", ["Range", -1, 1]]
-// ➔ ""stressed""
-```
-
-An index can be repeated to extract the same element multiple times.
-
-```json example
-["Extract", ["List", 5, 2, 10, 18], 3, 3, 1]
-// ➔ ["List", 10, 10, 5]
-```
-
-</FunctionDefinition>
 
 
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Join
-</div>
+</nav>
 
 <FunctionDefinition name="Join">
 
-<Signature name="Join" returns="list">...collections:collection</Signature>
-<Signature name="Join" returns="set">...sets:set</Signature>
+<Signature name="Join" returns="list">...collection</Signature>
+<Signature name="Join" returns="set">...set</Signature>
 
 If the collections are of different types, the result is a `List` 
 containing the elements of the first collection followed
@@ -1132,170 +1331,17 @@ elements of the collections.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
-### Most
-</div>
-
-<FunctionDefinition name="Most">
-
-<Signature name="Most">_collection_</Signature>
-
-Return everything but the last element of the collection.
-
-It's equivalent to `["Drop", _collection_, -1]`.
-
-```json example
-["Most", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 5, 2, 10]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### Rest
-</div>
-
-<FunctionDefinition name="Rest">
-
-<Signature name="Rest">_collection_</Signature>
-
-Return everything but the first element of the collection.
-
-It's equivalent to `["Drop", _collection_, 1]`.
-
-```json example
-["Rest", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 2, 10, 18]
-```
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### Reverse
-</div>
-
-<FunctionDefinition name="Reverse">
-
-<Signature name="Reverse">_collection_</Signature>
-
-Return the collection in reverse order.
-
-```json example
-["Reverse", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 18, 10, 2, 5]
-```
-
-It's equivalent to `["Extract", _collection_, ["Tuple", -1, 1]]`.
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### RotateLeft
-</div>
-
-<FunctionDefinition name="RotateLeft">
-
-<Signature name="RotateLeft">_collection_, _count_</Signature>
-
-Returns a collection where the elements are rotated to the left by the specified
-count.
-
-```json example
-["RotateLeft", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10, 18, 5, 2]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### RotateRight
-</div>
-
-<FunctionDefinition name="RotateRight">
-
-<Signature name="RotateRight">_collection_, _count_</Signature>
-
-Returns a collection where the elements are rotated to the right by the
-specified count.
-
-```json example
-["RotateRight", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10, 18, 5, 2]
-```
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### Shuffle
-</div>
-
-<FunctionDefinition name="Shuffle">
-
-<Signature name="Shuffle" returns="list">_xs_:collection</Signature>
-
-Return the collection in random order.
-
-```json example
-["Shuffle", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 10, 18, 5, 5]
-```
-
-</FunctionDefinition>
-
-<div style={{visibility:"hidden"}}>
-### Sort
-</div>
-
-<FunctionDefinition name="Sort">
-
-<Signature name="Sort">_collection_</Signature>
-
-<Signature name="Sort">_collection_, _order-function_</Signature>
-
-Return the collection in sorted order.
-
-```json example
-["Sort", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 2, 5, 10, 18]
-```
-
-</FunctionDefinition>
-
-
-<div style={{visibility:"hidden"}}>
-### Take
-</div>
-
-<FunctionDefinition name="Take">
-
-<Signature name="Take" returns="collection">_xs_:collection, _n_:integer</Signature>
-
-Return a list of the first `n` elements of `xs`. The collection _xs_ must be ordered.
-
-If `n` is negative, it returns the last `n` elements.
-
-```json example
-["Take", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 5, 2]
-
-["Take", ["List", 5, 2, 10, 18], -2]
-// ➔ ["List", 18, 10]
-```
-
-See [**Drop**](#drop) for a function that returns everything but the first `n` elements.
-
-
-</FunctionDefinition>
 
 
 
 
-<div style={{visibility:"hidden"}}>
+
+
+
+
+<nav className="hidden">
 ### Unique
-</div>
+</nav>
 
 
 <FunctionDefinition name="Unique">
@@ -1310,6 +1356,61 @@ This is equivalent to the first element of the result of `Tally`:
 ```json example
 ["Unique", ["List", 5, 2, 10, 18, 5, 2, 5]]
 // ➔ ["List", 5, 2, 10, 18]
+```
+
+</FunctionDefinition>
+
+## Converting Lazy Collections to Eager Collections
+
+<nav className="hidden">
+### ListFrom
+### SetFrom
+### TupleFrom
+</nav>
+
+
+<FunctionDefinition>
+
+<Signature name="ListFrom" returns="list">_xs_: collection</Signature>
+<Signature name="SetFrom" returns="set">_xs_: collection</Signature>
+<Signature name="TupleFrom" returns="tuple">_xs_: collection</Signature>
+
+Returns an eager list, set or tuple containing the elements of the collection `xs`.
+
+The collection `xs` should be a finite collection.
+
+```json example
+["ListFrom", ["Range", 1, 3]]
+// ➔ ["List", 1, 2, 3]
+
+["SetFrom", ["Range", 1, 3]]
+// ➔ ["Set", 1, 2, 3]
+
+["TupleFrom", ["Range", 1, 3]]
+// ➔ ["Tuple", 1, 2, 3]
+```
+</FunctionDefinition>
+
+<nav className="hidden">
+### RecordFrom
+### MapFrom
+</nav>
+
+<FunctionDefinition>
+<Signature name="RecordFrom" returns="record">_xs_: collection</Signature>
+<Signature name="MapFrom" returns="map">_xs_: collection</Signature>
+
+Returns a record or map containing the elements of the collection `xs`.
+
+The collection `xs` should be a finite collection of key-value pairs, each key being
+a string.
+
+```json example
+["RecordFrom", ["List", ["Tuple", "a", 1], ["Tuple", "b", 2]]]
+// ➔ ["Record", ["Tuple", "a", 1], ["Tuple", "b", 2]]
+
+["MapFrom", ["List", ["Tuple", "a", 1], ["Tuple", "b", 2]]]
+// ➔ ["Map", ["Tuple", "a", 1], ["Tuple", "b", 2]]
 ```
 
 </FunctionDefinition>

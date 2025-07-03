@@ -532,3 +532,18 @@ body .DocSearch-Footer {
   font-style: normal;
   opacity: 0.5;
 }
+
+/* The current (3.8) version of Docusaurus only support heading specified in Markdown. 
+We wrap the markdown headings in a <nav> element, so that we can hide it. We have to "hide" it with visibility (otherwise it gets skipped), but we
+then set the actual heading to be with a margin/padding/fontsize of 0 */
+nav.hidden {
+  visibility: hidden;
+  display: block !important;
+}
+
+nav.hidden h1, nav.hidden h2, nav.hidden h3 {
+  margin: 0;
+  padding: 0;
+  font-size: 0;
+  line-height: 0;
+}

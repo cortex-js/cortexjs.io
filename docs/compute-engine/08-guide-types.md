@@ -4,7 +4,8 @@ slug: /compute-engine/guides/types/
 ---
 
 <Intro>
-In the Compute Engine, the **type** of an expression is the set of the possible values of that expression.
+In the Compute Engine, the **type** of an expression is the set of the 
+possible values of that expression.
 </Intro>
 
 The Compute Engine uses a type system to ensure that operations are 
@@ -13,20 +14,23 @@ performed on the correct types of values.
 A type is represented by a **type expression**, which is a string with 
 a specific syntax. 
 
+A type expression is either a **primitive type** represented by an identifier
+such as `"integer"` or `"boolean"` or a **constructed type**.
+
+
 For example:
 
 - `"integer"`
 - `"boolean"`
 - `"matrix<3x3>"`
 - `"integer & !0"`
-- `"integer -> integer"`
+- `"(integer, integer) -> number"`
+- `"(distance: integer+) -> tuple<x: integer, y: integer>"`
 
-A type expression is either a **primitive type** represented by an identifier
-such as `"integer"` or `"boolean"` or a **constructed type**.
 
 **To check the type of an expression**, use the `expr.type` property.
 
-```live
+```js live
 console.log(ce.parse("3.14").type);
 ```
 
@@ -54,12 +58,13 @@ ce.parse("n").type;
 
 ## Type Hierarchy
 
-
-
 The type system is based on the concept of **subtyping**, which allows for
 a hierarchy of types, where a type can be a subtype of another type. This
 allows for more flexible and expressive type definitions, as well as
 better error checking and type inference.
+
+Type A is a **subtype** of type B if all values of type A are also values of type B.
+It is also said that type A **matches** type B.
 
 
 ```plaintext
@@ -80,16 +85,17 @@ any
         │         ├── imaginary
         │         └── real
         │             └── rational
-        │                 └── integer
+        │                 └─ integer
         └── collection
-            ├── tuple
             ├── set
             ├── dictionary
-                └── record
-            └── list
-                └── tensor
-                    ├── vector
-                    └── matrix
+            |   └─ record
+            └── indexed_collection
+                ├── tuple
+                └── list
+                    ├─ vector
+                    ├─ matrix
+                    └─ tensor
 ```
 
 **Note:** this diagram is simplified and does not accurately reflect the finite vs
@@ -127,11 +133,13 @@ For example:
 
 The backticks are not part of the name, they are used to escape the name.
 
-In the unlikely event that the name contains a backtick, it must be escaped with a backslash:
+In the unlikely event that the name contains a backtick or backslash, it must be escaped with a backslash:
 
-``record<`name\`with\`backticks`: integer>``
+``record<`name\`with\`backticks\\and\\backslash`: integer>``
 
-Element names are stored and compared using Unicode Normalization Form C (NFC).
+The backtick syntax is used instead of quotes to clearly distinguish identifiers from string values, following conventions from languages such as Swift and Kotlin
+
+Element and argument names are stored and compared using Unicode Normalization Form C (NFC).
 :::
 
 
@@ -155,28 +163,11 @@ The Compute Engine supports the following primitive types:
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
 | `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
 | `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `dictionary` or a `record` |
+| `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `list`, a `vector`, a `matrix` or a `tensor` |
 | `scalar`        | The type of a single value: a `boolean`, a `string`, or a `number` |
 | `boolean`       | The type of the symbol `True` or `False`|
 | `string`        | The type of a string of Unicode characters    |
 | `number`        | The type of a numeric value |
-
-</div>
-
-### Comparison of Special Types
-
-This table summarizes how each special type behaves when assigning values: whether a value of one type can be assigned to or from another.
-
-
-<div className="symbols-table first-column-header" style={{"--first-col-width":"9ch"}}>
-
-
-| Type     | Description                                       | Assignable To | Assignable From |
-|----------|:--------------------------------------------------|:---------------|:-----------------|
-| `any`    | All possible values                               | ✓              | ✓                |
-| `unknown`| Undetermined type, placeholder for inference      | ✓              | ✓                |
-| `never`  | No values at all (bottom type)                    | ✓              | ✗                |
-| `nothing`| Singleton unit type (`Nothing`)                   | ✓              | Only `Nothing`   |
-| `error`  | Invalid or ill-formed expression                  | ✗              | ✗                |
 
 </div>
 
@@ -209,6 +200,26 @@ Some numeric types have a variant that excludes non-finite values, such as
 
 </div>
 
+Numeric types can be constrained to a specific range within a lower and upper 
+bound
+
+For example `real< -1.0..1.0 >` is the type of real numbers between $-1.0$ and $1.0$, inclusive.
+
+An non-finite endpoint can be represented by the symbol `-oo` or `+oo` or
+by omitting the endpoint.
+
+For example: `real<..1.0>` is the type of real numbers less than $1.0$, 
+and is equivalent to `real< -oo..1.0 >`.
+
+To represent an open interval, use a negation value type to exclude the endpoints.
+For example `real<0..> & !0` is the type of real numbers greater than $0$.
+
+When using integers, you can adjust the endpoint instead, so for example 
+`integer<1..>` is the type of integers greater than or equal to $1$, which 
+is equivalent to `integer<0..> & !0`.
+
+Note that `complex` and `imaginary` types do not support ranges, as they are not ordered types.
+
 Here is the type of various numeric values:
 
 | Value               | Type                |
@@ -233,12 +244,11 @@ Read more about the **sets** included in the Standard Library <Icon name="chevro
 A collection type represents an expression that contains multiple values, such as a list, a set, or a dictionary.
 
 The Compute Engine supports the following collection types: `set`, `tuple`,
-`list` (including `vector`, `matrix` and `tensor`), `record`, `dictionary` and 
-`collection`.
+`list` (including `vector`, `matrix` and `tensor`), `record` and `dictionary`.
 
 ### Set
 
-A **set** is an unordered collection of unique values.
+A **set** is a non-indexed collection of unique values.
 
 The type of a set is represented by the type expression `set<T>`, where `T` 
 is the type of the elements of the set.
@@ -248,9 +258,11 @@ ce.parse("\\{5, 7, 9\\}").type
 // ➔ "set<finite_integer>"
 ```
 
+A set can have an infinite number of elements.
+
 ### Tuple
 
-A **tuple** is an ordered collection of values, representing a fixed 
+A **tuple** is an indexed collection of values, representing a fixed 
 number of elements.
 
 The type of a tuple is represented by the type expression `tuple<T1, T2, ...>`, 
@@ -268,6 +280,9 @@ when compared in Unicode Normalization Form C (NFC).
 
 (See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on element names.)
 
+The elements of a tuple can be accessed with a one-based index or by name.
+
+
 For two tuples to be compatible, each element must have the same type and the names must match.
 
 ```js
@@ -282,8 +297,10 @@ ce.parse("(x: 1, y: 2)")
 
 ### List, Vector, Matrix and Tensor
 
-A **list** is an ordered collection of values, used to represent vectors, 
+A **list** is an indexed collection of values, used to represent vectors, 
 matrices, and sequences.
+
+The first element of a list is at index 1, the second element is at index 2, and so on.
 
 The type of a list is represented by the type expression `list<T>`, where `T` is the type of the elements of the list.
 
@@ -341,12 +358,12 @@ The **dictionary** and **record** types represent a collection of key-value pair
 where each key is a string and each value can be any type.
 
 A **record** is a special case of a dictionary where the keys are fixed, 
-while a **dictionary** can have keys that are dynamically added or removed at runtime.
+while a **dictionary** can have keys that are not defined in advance.
 
 A **record** is used to represent objects and structured data with a fixed set of properties.
-A **dictionary** is well suited to represent data such as hash tables or caches.
+A **dictionary** is well suited to represent hash tables or caches.
 
-**Keys** must be unique (when compared in NFC form) within a dictionary or record. Keys are not ordered.
+**Keys** must be unique when compared in NFC form within a dictionary or record. Keys are not ordered.
 
 (See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on key names.)
 
@@ -379,13 +396,17 @@ ce.type("record<red: integer, green: integer>")
 // ➔ false
 
 ce.type("record<red: integer, green: integer, blue: integer>")
+  .matches("record<red: integer, green: integer>");
+// ➔ true
+
+ce.type("record<red: integer, green: integer, blue: integer>")
   .matches("dictionary<integer>");
 // ➔ true
 ```
 
 
-
-The `record` type is compatible with any record, and the `dictionary` type is compatible with both records and dictionaries.
+The `record` type is compatible with any record, and the `dictionary` type 
+is compatible with both records and dictionaries.
 
 ```js
 ce.type("record<red: integer, green: integer>")
@@ -405,10 +426,9 @@ a `set`, a `tuple`, a `record` or a `dictionary`.
 
 The type `collection<T>` is a collection of values of type `T`.
 
-The collection type is an abstract type that is not directly instantiated. It 
-can be used to check if an expression is a collection of values, without
-specifying the exact type of the collection.
-
+The type `indexed_collection<T>` is an indexed collection of values of type `T`,
+such as a `list`, a `tuple`, or a `matrix`. It is a subtype of 
+`collection<T>`.
 
 ## Function Signature
 
@@ -422,22 +442,19 @@ type of the output value, or return type, of the function literal.
 
 If the function does not return a value, the function signature is `(T) -> nothing`.
 
-If the function never returns, the function signature is `(T) -> never`.
+A function that never returns, has a signature of `(T) -> never`.
 
 
 
 ### Arguments
 
-If there is a single input argument, the parentheses can be omitted: `T1 -> T2`.
+The arguments of a function are a sequence of comma-separated types surrounded 
+by parentheses, for example `(T1, T2, ...) -> T3`.
 
-For example, `real -> integer` is the type of functions that map real numbers to integers.
+If there are no input arguments, the signature is `() -> T`.
 
-If there are no input arguments, use `() -> T`.
-
-For example `() -> integer` is 
-the type of functions that return an integer and have no input arguments.
-
-If there are multiple input arguments, the function signature is `(T1, T2, ...) -> T`.
+For example `() -> integer` is the type of functions that return an integer 
+and have no input arguments.
 
 For example `(integer, integer) -> integer` is the type of functions that map two integers to an integer.
 
@@ -447,15 +464,15 @@ Optionally, the input arguments can be named, for example: `(x: integer, y: inte
 
 (See [Naming Constraints for Elements and Arguments](#naming-constraints-for-elements-and-arguments) for rules on argument names.)
 
-If a named argument is used, the input arguments must be enclosed in parentheses, even if there is only one argument.
-
 For example, `(x: integer) -> integer` is a function that takes a single named argument `x` of type `integer` and returns an `integer`.
 
 
 
-### Optional Argument
+### Optional Arguments
 
-An optional argument is indicated by a question mark after its type.
+A function signature can include **optional arguments**, which are arguments 
+that may or may not be provided when calling the function. An optional 
+argument is indicated by a question mark immediately after its type.
 
 For example `(integer, integer?) -> integer` indicates a function literal accepting 
 one or two integers as input and returning an integer.
@@ -464,35 +481,40 @@ If there are any optional arguments, they must be at the end of the argument lis
 
 ```js
 ce.type("(integer, integer?) -> number")
-  .matches("integer -> number");
+  .matches("(integer) -> number");
 // ➔ true
 ```
 
 
 
-### Rest Argument
+### Variadic Arguments
 
 A function signature can include a variable number of arguments, also known as 
-a **rest argument**, indicated by an ellipsis `...` before the type of the last argument.
+**variadic arguments**. 
 
-For example `(string, ...integer) -> integer` is a function that accepts a 
-string as a first argument followed by any number of integers and returns an integer.
+Variadic arguments are indicated by a `+` or `*` 
+immediately after the type of the last argument. The `+` prefix indicates that
+the function accepts one or more arguments of that type, while the `*` prefix
+indicates that the function accepts zero or more arguments of that type.
+
+For example `(string, integer+) -> integer` is a function that accepts a 
+string as a first argument followed by one or more integers and returns an integer.
 
 To indicate that the function accepts a variable number of arguments of any 
-type, use `...any`.
+type, use `any+` or `any*`.
 
 ```js
-ce.type("(integer, ...integer) -> number")
-  .matches("(integer, integer) -> number");
+ce.type("(integer, integer) -> number")
+  .matches("(integer, integer+) -> number");
 // ➔ true
 ```
 
-If a signature has a rest argument, it must be the last argument in the list, 
+If a signature has a variadic argument, it must be the last argument in the list, 
 and it cannot be combined with optional arguments.
 
 ### Function Type
 
-The type `function` matches any function literal. It is a shorthand for `(...any) -> unknown`.
+The type `function` matches any function literal. It is a shorthand for `(any*) -> unknown`.
 
 ## Value Type
 
@@ -507,7 +529,7 @@ Value types can be used in conjunction with a union to represent a type that
 can be one of multiple values, for example:
 
 - `0 | 1` is the type of values that are either `0` or `1`.
-- `integer | false` is the type of values that are integers or `False`.
+- `integer | nothing` is the type of values that are integers or `Nothing`.
 - `"red" | "green" | "blue"` is the type of values that are either of the strings `"red"`, `"green"` or `"blue"`.
 
 
@@ -534,8 +556,11 @@ They can be used to model values that meet several structural or semantic requir
 
 The type of an intersection is represented by the type expression `T1 & T2`, where `T1` and `T2` are the types of the values.
 
+Intersections are most useful for extending or combining record types.
+
 For example, `record<length: integer> & record<size: integer>` is the type of values 
-that are records with both a `length` and a `size` key.
+that are records with both a `length` and a `size` key, that is `record<length: integer, size: integer>`.
+
 
 ### Negation
 
@@ -673,11 +698,14 @@ ce.parse("\\[1, 2, 3\\]").type
 
 #### Function Literals
 
-Function literals are compatible if the input types are compatible and the output types are compatible.
+Function literals are compatible if the input types are compatible and the 
+output types are compatible, specifically the output type is covariant and the 
+input types are contravariant.
+
 
 ```js
-ce.type("integer -> integer")
-  .matches("number -> number");
+ce.type("(integer) -> integer")
+  .matches("(number) -> number");
 // ➔ true
 ```
 
@@ -685,8 +713,8 @@ The name of the arguments of a function signature is not taken into account when
 checking for compatibility.
 
 ```js
-ce.type("x: integer -> integer")
-  .matches("integer -> integer");
+ce.type("(x: integer) -> integer")
+  .matches("(integer) -> integer");
 // ➔ true
 ```
 
@@ -795,7 +823,7 @@ ce.declareType("json_array", "list<json>");
 ```
 
 When using `type json_array` or `type json_object`, the type is not yet defined, 
-but it will be defined later in the code. This allows you to use the type
+but it will be defined later in the code. Using the `type` keyword allows you to use the type
 before declaring it. If the referenced type is already defined, the `type` keyword is optional.
 
 

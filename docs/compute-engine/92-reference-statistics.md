@@ -15,9 +15,9 @@ following forms:
 ## Functions
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Mean
-</div>
+</nav>
 <FunctionDefinition name="Mean">
 
 <Signature name="Mean">_collection_</Signature>
@@ -41,9 +41,9 @@ $$x_i$$ is the $$i$$-th number in the list.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Median
-</div>
+</nav>
 <FunctionDefinition name="Median">
 
 <Signature name="Median">_collection_</Signature>
@@ -63,9 +63,9 @@ the average of the two middle elements.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Mode
-</div>
+</nav>
 <FunctionDefinition name="Mode">
 
 <Signature name="Mode">_collection_</Signature>
@@ -85,9 +85,9 @@ list is called **multimodal**.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Variance
-</div>
+</nav>
 <FunctionDefinition name="Variance">
 
 <Signature name="Variance">_collection_</Signature>
@@ -107,9 +107,9 @@ where $$\mu$$ is the mean of the list.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### PopulationVariance
-</div>
+</nav>
 <FunctionDefinition name="PopulationVariance">
 
 <Signature name="PopulationVariance">_collection_</Signature>
@@ -127,9 +127,9 @@ where $$N$$ is the size of the population, and $$\mu$$ is the population mean.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### StandardDeviation
-</div>
+</nav>
 <FunctionDefinition name="StandardDeviation">
 
 <Signature name="StandardDeviation">_collection_</Signature>
@@ -149,9 +149,9 @@ where $$\mu$$ is the mean of the list.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### PopulationStandardDeviation
-</div>
+</nav>
 <FunctionDefinition name="PopulationStandardDeviation">
 
 <Signature name="PopulationStandardDeviation">_collection_</Signature>
@@ -168,9 +168,9 @@ where $$N$$ is the size of the population, and $$\mu$$ is the population mean.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Skewness
-</div>
+</nav>
 <FunctionDefinition name="Skewness">
 
 <Signature name="Skewness">_collection_</Signature>
@@ -189,9 +189,9 @@ standard deviation of the _collection_.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Kurtosis
-</div>
+</nav>
 <FunctionDefinition name="Kurtosis">
 
 <Signature name="Kurtosis">_collection_</Signature>
@@ -211,9 +211,9 @@ deviation of the list.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Quantile
-</div>
+</nav>
 <FunctionDefinition name="Quantile">
 
 <Signature name="Quantile">_collection_, _q:number_</Signature>
@@ -228,9 +228,9 @@ So, $$\operatorname{median} = \operatorname{quantile}(0.5)$$.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Quartiles
-</div>
+</nav>
 <FunctionDefinition name="Quartiles">
 
 <Signature name="Quartiles">_collection_</Signature>
@@ -247,9 +247,9 @@ four equal groups, each group comprising a quarter of the _collection_.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### InterquartileRange
-</div>
+</nav>
 <FunctionDefinition name="InterquartileRange">
 
 <Signature name="InterquartileRange">_collection_</Signature>
@@ -261,9 +261,9 @@ first quartile.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Histogram
-</div>
+</nav>
 <FunctionDefinition name="Histogram">
 
 <Signature name="Histogram">_collection_, _bins:number_</Signature>
@@ -280,9 +280,9 @@ number of elements in each bin.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### BinCounts
-</div>
+</nav>
 <FunctionDefinition name="BinCounts">
 
 <Signature name="BinCounts">_collection_, _bins:number_</Signature>
@@ -299,9 +299,9 @@ number of bins.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### SlidingWindow
-</div>
+</nav>
 <FunctionDefinition name="SlidingWindow">
 
 <Signature name="SlidingWindow">_collection_, _windowSize:number_</Signature>
@@ -318,9 +318,9 @@ A sliding window is a moving subset of the data of a specified window size.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Sample
-</div>
+</nav>
 <FunctionDefinition name="Sample">
 
 <Signature name="Sample">_collection_, _size:number_</Signature>
@@ -331,9 +331,9 @@ Sampling is done without replacement unless otherwise specified.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Rank
-</div>
+</nav>
 <FunctionDefinition name="Rank">
 
 <Signature name="Rank">_collection_</Signature>
@@ -344,9 +344,9 @@ The rank is the position of each element in the sorted order of the collection.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Argsort
-</div>
+</nav>
 <FunctionDefinition name="Argsort">
 
 <Signature name="Argsort">_collection_</Signature>

@@ -11,9 +11,9 @@ divisor functions, partitions, polygonal numbers, perfect/happy numbers, and spe
 
 ## Function Definitions
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Totient
-</div>
+</nav>
 
 <FunctionDefinition name="Totient">
 <Signature name="Totient" returns="integer">n: integer</Signature>
@@ -31,9 +31,9 @@ See also: [Euler's totient function - Wikipedia](https://en.wikipedia.org/wiki/E
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Sigma0
-</div>
+</nav>
 
 <FunctionDefinition name="Sigma0">
 <Signature name="Sigma0" returns="integer">n: integer</Signature>
@@ -50,9 +50,9 @@ See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_f
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Sigma1
-</div>
+</nav>
 
 <FunctionDefinition name="Sigma1">
 <Signature name="Sigma1" returns="integer">n: integer</Signature>
@@ -69,9 +69,9 @@ See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_f
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### SigmaMinus1
-</div>
+</nav>
 
 <FunctionDefinition name="SigmaMinus1">
 <Signature name="SigmaMinus1" returns="number">n: integer</Signature>
@@ -88,9 +88,9 @@ See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_f
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Eulerian
-</div>
+</nav>
 
 <FunctionDefinition name="Eulerian">
 <Signature name="Eulerian" returns="integer">n: integer, m: integer</Signature>
@@ -108,9 +108,9 @@ See also: [Eulerian number - Wikipedia](https://en.wikipedia.org/wiki/Eulerian_n
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### Stirling
-</div>
+</nav>
 
 <FunctionDefinition name="Stirling">
 <Signature name="Stirling" returns="integer">n: integer, m: integer</Signature>
@@ -127,9 +127,9 @@ See also: [Stirling number of the second kind - Wikipedia](https://en.wikipedia.
 
 </FunctionDefinition>
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### NPartition
-</div>
+</nav>
 
 <FunctionDefinition name="NPartition">
 <Signature name="NPartition" returns="integer">n: integer</Signature>
@@ -146,9 +146,9 @@ See also: [Partition function (number theory) - Wikipedia](https://en.wikipedia.
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsTriangular
-</div>
+</nav>
 
 <FunctionDefinition name="IsTriangular">
 <Signature name="IsTriangular" returns="boolean">n: integer</Signature>
@@ -165,9 +165,9 @@ See also: [Triangular number - Wikipedia](https://en.wikipedia.org/wiki/Triangul
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsSquare
-</div>
+</nav>
 
 <FunctionDefinition name="IsSquare">
 <Signature name="IsSquare" returns="boolean">n: integer</Signature>
@@ -184,9 +184,9 @@ See also: [Square number - Wikipedia](https://en.wikipedia.org/wiki/Square_numbe
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsPentagonal
-</div>
+</nav>
 
 <FunctionDefinition name="IsPentagonal">
 <Signature name="IsPentagonal" returns="boolean">n: integer</Signature>
@@ -203,9 +203,9 @@ See also: [Pentagonal number - Wikipedia](https://en.wikipedia.org/wiki/Pentagon
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsOctahedral
-</div>
+</nav>
 
 <FunctionDefinition name="IsOctahedral">
 <Signature name="IsOctahedral" returns="boolean">n: integer</Signature>
@@ -222,9 +222,9 @@ See also: [Octahedral number - Wikipedia](https://en.wikipedia.org/wiki/Octahedr
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsCenteredSquare
-</div>
+</nav>
 
 <FunctionDefinition name="IsCenteredSquare">
 <Signature name="IsCenteredSquare" returns="boolean">n: integer</Signature>
@@ -241,9 +241,9 @@ See also: [Centered square number - OEIS A001844](https://oeis.org/A001844)
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsPerfect
-</div>
+</nav>
 
 <FunctionDefinition name="IsPerfect">
 <Signature name="IsPerfect" returns="boolean">n: integer</Signature>
@@ -260,9 +260,9 @@ See also: [Perfect number - Wikipedia](https://en.wikipedia.org/wiki/Perfect_num
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsHappy
-</div>
+</nav>
 
 <FunctionDefinition name="IsHappy">
 <Signature name="IsHappy" returns="boolean">n: integer</Signature>
@@ -279,9 +279,9 @@ See also: [Happy number - Wikipedia](https://en.wikipedia.org/wiki/Happy_number)
 </FunctionDefinition>
 
 
-<div style={{visibility:"hidden"}}>
+<nav className="hidden">
 ### IsAbundant
-</div>
+</nav>
 
 <FunctionDefinition name="IsAbundant">
 <Signature name="IsAbundant" returns="boolean">n: integer</Signature>

@@ -191,35 +191,6 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 
 
 
-<FunctionDefinition name="BaseForm">
-
-<Signature name="BaseForm">_value:integer_</Signature>
-
-<Signature name="BaseForm">_value:integer_, _base_</Signature>
-
-Format an _integer_ in a specific _base_, such as hexadecimal or binary.
-
-If no _base_ is specified, use base-10.
-
-The sign of _integer_ is ignored.
-
-- _value_ should be an integer.
-- _base_ should be an integer from 2 to 36.
-
-```json example
-["Latex", ["BaseForm", 42, 16]]
-
-// ➔ (\text(2a))_{16}
-```
-
-```cortex
-Latex(BaseForm(42, 16))
-// ➔ (\text(2a))_{16}
-String(BaseForm(42, 16))
-// ➔ "'0x2a'"
-```
-
-</FunctionDefinition>
 
 <FunctionDefinition name="Clamp">
 
