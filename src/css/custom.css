@@ -377,9 +377,16 @@ header h1 {
 }
 
 /** The site logo */
-[data-theme="dark"] .navbar img {
+/* [data-theme="dark"] .navbar img {
   filter: invert(1);
+} */
+
+/* Weird bug in Safari: it automatically inverts SVG images. By setting
+a filter with a very small value, we can prevent this. */
+[data-theme="dark"] header img[src$=".svg"]  {
+  filter: invert(0.001);
 }
+
 
 [data-theme="dark"] .navbar__link:hover,
 [data-theme="dark"] .navbar__link--active {
@@ -546,4 +553,11 @@ nav.hidden h1, nav.hidden h2, nav.hidden h3 {
   padding: 0;
   font-size: 0;
   line-height: 0;
+}
+
+
+/* Docusaurus default style sets the html,body to 100% height, which is not what we want */
+html, body {
+  height: auto !important;
+  min-height: 100%;
 }
