@@ -746,6 +746,75 @@ console.info(ce.box(3.14).isInteger)
 ```
 
 
+## Type Inference
+
+When  an explicit type is not provided for a symbol, the Compute Engine will
+attempt to **infer** the type of the symbol based on the context in which it is used.
+This process is known as **type inference**.
+
+When assigning a value to an undeclared symbol, the type of the value is
+used to infer the type of the symbol.
+
+If the symbol is a constant, the type is used exactly as the type of the symbol.
+If the symbol is a variable, the type of the value may be widened to a more general 
+type:
+
+<div className="symbols-table" style={{"--first-col-width":"18ch"}}>
+
+
+| Value Type         | Inferred Symbol Type |
+|:--------------------|:----------------------|
+| `complex`  <br/> `imaginary` <br/> `non_finite_number` <br/> `finite_number`          | `number`            |
+| `integer` <br/> `finite_integer`           | `integer`             |
+| `real` <br/> `finite_real` <br/> `rational` <br/> `finite_rational`          | `real`            |
+
+</div>
+
+Examples:
+
+<div className="symbols-table" style={{"--first-col-width":"8ch"}}>
+
+| Value               | Value Type | Inferred Symbol Type |
+|:--------------------|:--------------------------|:--------------------------|
+| 34                  | `finite_integer` | `integer`                |
+| 3.14                | `finite_real` | `real`                   |
+| 4i                   | `imaginary` | `number`                   |
+| 1/2                  | `finite_rational` | `real`                   |
+</div>
+
+```js
+ce.assign("n", 34);
+ce.box("n").type;
+// ➔ "integer"
+```
+
+When a symbol is used in a function expression, the expected type of the
+arguments is used to infer the type of the symbol.
+
+```js
+ce.declare("n", "unknown");
+ce.declare("f", "(number) -> number");
+ce.box(["f", "n"]);
+ce.box("n").type;
+// ➔ "number"
+```
+
+A type that has been inferred can be refined later, for example by
+assigning a value of a more specific type to the symbol or by using the
+symbol in a context that requires a more specific type.
+
+Continuing the example above:
+
+```js
+ce.declare("g", "(integer) -> number");
+ce.box(["g", "n"]);
+ce.box("n").type;
+// ➔ "integer": "n" has been narrowed 
+//    from "number" to "integer"
+```
+
+
+
 ## Defining New Types
 
 **To define new types** use the `ce.declareType()` function.
@@ -756,7 +825,10 @@ For example, to defines a new type `point` that is a tuple of two
 integers, `x` and `y`:
 
 ```js
-ce.declareType("point", "tuple<x: integer, y: integer>");
+ce.declareType(
+  "point",
+  "tuple<x: integer, y: integer>"
+);
 ```
 
 The type is defined in the current lexical scope.
@@ -764,7 +836,7 @@ The type is defined in the current lexical scope.
 
 ### Nominal vs Structural Types
 
-By default, types are nominal, meaning that to be compatible, they must have 
+By default, types are nominal, meaning that to be compatible two types must have 
 the same name and not just the same structure.
 
 ```js
@@ -773,7 +845,7 @@ ce.type("tuple<x: integer, y: integer>")
 // ➔ false
 ```
 
-To make a type structural, use the `ce.declareType()` function with the
+**To make a type structural**, use the `ce.declareType()` function with the
 `alias` option. Two structural types are compatible if they have the same structure,
 regardless of their names.
 
@@ -794,7 +866,7 @@ ce.type("tuple<x: integer, y: integer>")
 
 A recursive type is a type that refers to itself in its definition.
 
-In this case, you can use a type before declaring it by prefacing if with the `type` keyword.
+**To use a type before declaring it**, preface it with the `type` keyword in the type expression.
 
 For example, a binary tree can be defined as a tuple of a value and two subtrees:
 
