@@ -43,7 +43,13 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### New Features and Improvements
 
-- Antiderivatives are now computed symbolically:
+- The bindings of symbols and function expressions is now consistently done
+  during canonicalization.
+
+- It was previously not possible to change the type of an identifier from a
+  function to a value or vice versa. This is now possible.
+
+- **Antiderivatives** are now computed symbolically:
 
 ```js
 ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).evaluate().print();
@@ -79,11 +85,45 @@ ce.parse(`\\int_0^1 \\sin(\\pi x) dx`).N().print();
   integers between 0 and 10. The type `real<1..>` matches real numbers greater
   than 1 and `rational<..0>` matches non-positive rational numbers.
 
-- The bindings of symbols and function expressions is now consistently done
-  during canonicalization.
+- Numeric types can now be constrtained with a lower and upper bound. For
+  example, `real<0..10>` is a type that matches real numbers between 0 and 10.
+  The type `integer<1..>` matches integers greater than or equal to 1.
 
-- It was previously not possible to change the type of an identifier from a
-  function to a value or vice versa. This is now possible.
+- Collections that can be indexed (`list`, `tuple`) are now a subtype of
+  `indexed_collection`.
+
+- The `map` type has been replaced with `dictionary` for collections of
+  arbitrary key-value pairs and `record` for collections of structured key-value
+  pairs.
+
+- Support for structural typing has been added. To define a structural type, use
+  `ce.declareType()` with the `alias` flag, for example:
+
+  ```js
+  ce.declareType(
+    "point", "tuple<x: integer, y: integer>",
+    { alias: true }
+  );
+  ```
+
+- Recursive types are now supported by using the `type` keyword to forward
+  reference types. For example, to define a type for a binary tree:
+
+  ```js
+  ce.declareType(
+    "binary_tree",
+    "tuple<value: integer, left: type binary_tree?, right: type binary_tree?>",
+  );
+  ```
+
+- The syntax for variadic arguments has changeed. To indicate a variadic
+  argument, use a `+` or `*` after the type, for example:
+
+  ```js
+  ce.declare('f', '(number+) -> number');
+  ```
+
+  Use `+` for a non-empty list of arguments and `*` for a possibly empty list.
 
 - Added a rule to solve the equation `a^x + b = 0`
 
