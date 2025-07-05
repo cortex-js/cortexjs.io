@@ -18,5 +18,5 @@ cd "$(dirname "$0")/.."
 touch submodules/cortex-js.github.io/.nojekyll
 
 # Add CNAME file
-printf "cortexjs.io" >submodules/cortex-js.github.io/CNAME
+printf "mathlive.io" >submodules/cortex-js.github.io/CNAME
 

@@ -345,8 +345,8 @@ const sidebars = {
         },
         {
           type: "link",
-          label: "ChatGPT Assistant",
-          href: "https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant",
+          label: "MathLive GPT",
+          href: "https://chatgpt.com/g/g-8YgEfR7ig-mathlive-gpt",
           className: "chatgpt-icon",
         },
       ],

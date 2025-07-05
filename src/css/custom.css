@@ -37,12 +37,16 @@
   --ifm-font-size-base: 125%;
   --ifm-line-height-base: 1.47059;
 
-  --ifm-global-radius: 4px;
+  --ifm-global-radius:4px;
 
   --ifm-toc-padding-vertical: 0;
   --ifm-toc-padding-horizontal: 1em;
 
   --ifm-footer-padding-vertical: var(--ifm-spacing-vertical);
+
+  --ifm-breadcrumb-border-radius: 12px;
+
+  --docusaurus-collapse-button-bg: red;
 }
 
 math-field {
@@ -329,6 +333,9 @@ header h1 {
   /* border-top: 2px solid rgba(255, 255, 255, 0.7);
   border-bottom-color: rgba(0, 0, 0, 0.2); */
   transition: background, filter, backdrop-filter 0.5s ease-in-out;
+
+  --ifm-navbar-padding-horizontal: 12px;
+  --ifm-navbar-item-padding-vertical: 10px;
 }
 
 .navbar-sidebar--show {
@@ -340,12 +347,23 @@ header h1 {
   color: white;
 }
 
-/* The word "Farsight" */
+navbar-sidebar__close {
+  stroke-width: 2px;
+}
+
+/* The word "MathLive" */
 .navbar__title {
   font-weight: 700;
   font-size: 24px;
   letter-spacing: -1px;
 }
+
+.navbar__logo {
+    flex: 0 0 auto;
+    height: 2rem;
+    margin-right: 0.1rem;
+  }
+
 
 /* The navigation links in the page header */
 .navbar__link {
@@ -359,6 +377,31 @@ header h1 {
   background: var(--neutral-800);
   box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 0 10px rgb(0 0 0 / 0.05);
 }
+
+.navbar__toggle {
+    color: var(--ifm-navbar-link-color);
+    padding: 8px;
+    margin-right: 0;
+}
+
+.navbar__toggle:hover {
+  color: var(--link-color-hover);
+  border-radius: 8px;
+  background: var(--neutral-800);
+  box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 0 10px rgb(0 0 0 / 0.05);
+}
+
+.navbar__brand {
+  padding: 4px 20px 4px 8px;
+}
+
+.navbar__brand:hover {
+  color: var(--link-color-hover);
+  border-radius: 8px;
+  background: var(--neutral-800);
+  box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 0 10px rgb(0 0 0 / 0.05);
+}
+
 
 .theme-doc-sidebar-menu hr {
   margin: 0;
@@ -458,7 +501,9 @@ body .DocSearch-Button-Placeholder {
 }
 
 body .DocSearch-Button {
-  background: transparent
+  background: transparent;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
 }
 
 /** Adding `body` to the selector to make it more specific */
@@ -558,6 +603,6 @@ nav.hidden h1, nav.hidden h2, nav.hidden h3 {
 
 /* Docusaurus default style sets the html,body to 100% height, which is not what we want */
 html, body {
-  height: auto !important;
+  height: 100vh !important;
   min-height: 100%;
 }

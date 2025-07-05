@@ -16,7 +16,11 @@ body {
 
 
 .h1 {
-  font-size: clamp(1rem, 20vw, 10rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: clamp(1rem, 14vw, 10rem);
   font-weight: 900;
   letter-spacing: -0.04em;
   /* color: var(--neutral-100); */
@@ -29,8 +33,10 @@ body {
   background-size: 500% 200%;
 }
 
-.h1 .js {
-  font-weight: 100;
+.h1 img {
+  width: clamp(1rem, 14vw, 10rem);
+  height: clamp(1rem, 14vw, 10rem);
+  margin-right: 1rem;
 }
 
 @keyframes glow {
@@ -49,11 +55,11 @@ body {
   font-weight: 900;
   line-height: 1;
   max-width: 80%;
-  font-size: clamp(1rem, 5vw, 5rem);
+  font-size: clamp(1rem, 5vw, 3rem);
   text-wrap: balance;
   margin-inline: auto !important;
   margin-bottom: 3rem !important;
-  color: var(--neutral-400);
+  color: var(--blue-800);
   text-transform: uppercase;
 }
 

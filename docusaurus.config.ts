@@ -11,12 +11,12 @@ import type { Config } from '@docusaurus/types';
 
 /** @type {import('@docusaurus/types').Config} */
 const config: Config = {
-  title: 'CortexJS',
+  title: 'MathLive',
   titleDelimiter: '·',
   tagline: 'Scientific Web Computing',
   favicon: '/img/logo.svg',
 
-  url: 'https://cortexjs.io',
+  url: 'https://mathlive.io',
 
   // Since we use a custom domain, we set the base URL to '/'
   baseUrl: '/',
@@ -198,6 +198,13 @@ const config: Config = {
         respectPrefersColorScheme: true,
       },
 
+      docs: {
+        sidebar: {
+          hideable: true,
+          autoCollapseCategories: true,
+        },
+      },
+
       algolia: {
         // The application ID provided by Algolia
         appId: 'Q23Y5RN3UQ',
@@ -211,7 +218,7 @@ const config: Config = {
         contextualSearch: false,
   
         // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
-        externalUrlRegex: 'external\\.com|domain\\.com',
+        // externalUrlRegex: 'external\\.com|domain\\.com',
   
         // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
         replaceSearchResultPathname: {
@@ -233,9 +240,9 @@ const config: Config = {
       },
   
       navbar: {
-        title: 'CortexJS',
+        title: 'MathLive',
         logo: {
-          alt: "Farsight Logo",
+          alt: "MathLive Logo",
           src: "img/logo.svg",
           width: 42,
           height: 42,
@@ -288,7 +295,7 @@ const config: Config = {
                 html: '<a href="https://discord.gg/yhmvVeJ4Hd" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#discord"></use></svg>Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
               },
               {                
-                html: '<a href="https://chat.openai.com/g/g-8YgEfR7ig-cortexjs-assistant" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#openai"></use></svg>CortexJS Chatbot<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
+                html: '<a href="https://chatgpt.com/g/g-8YgEfR7ig-mathlive-gpt" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#openai"></use></svg>MathLive GPT<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
               },
             ],
           },
@@ -302,7 +309,7 @@ const config: Config = {
             ],
           },
         ],
-        // copyright: `Copyright CortexJS.`,
+        // copyright: `Copyright MathLive.`,
       },
       prism: {
         additionalLanguages: [

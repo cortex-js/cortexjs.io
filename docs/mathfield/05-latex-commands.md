@@ -1597,7 +1597,7 @@ The first argument is a URL, the second argument is the content to display, in m
 
 ```html example
 <math-field>
-  \href{https://cortexjs.io}{\text{CortexJS website}}
+  \href{https://mathlive.io}{\text{MathLive website}}
 </math-field>
 ```
 

@@ -37,7 +37,7 @@
     "@docusaurus/theme-search-algolia": "^3.8.1",
     "@mdx-js/react": "^3.1.0",
     "clsx": "^2.1.1",
-    "mathlive": "^0.104.0",
+    "mathlive": "^0.105.3",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -48,7 +48,7 @@
     "@docusaurus/module-type-aliases": "^3.7.0",
     "@docusaurus/tsconfig": "^3.7.0",
     "@docusaurus/types": "^3.7.0",
-    "typedoc": "^0.27.6",
+    "typedoc": "^0.28.7",
     "typescript": "^5.7.3"
   },
   "engines": {

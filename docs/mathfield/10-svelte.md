@@ -76,7 +76,7 @@ declare namespace svelteHTML {
     "smart-mode": true
     // ...
     // see here for the full list of API's
-    // https://cortexjs.io/mathfield/api/
+    // https://mathlive.io/mathfield/api/
   }
 </script>
 

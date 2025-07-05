@@ -7,7 +7,7 @@ set -o pipefail  # don't hide errors within pipes
 
 cd "$(dirname "$0")/.."
 
-export BASENAME="\033[40m Cortexjs.io \033[0;0m " # `basename "$0"`
+export BASENAME="\033[40m mathlive.io \033[0;0m " # `basename "$0"`
 
 export DOT="\033[32m 羽 \033[0;0m" # Hourglass
 export CHECK="\033[32m ✔ \033[0;0m"
