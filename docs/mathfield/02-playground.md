@@ -203,6 +203,7 @@ body.glyphs .if-glyphs, body:not(.glyphs) .if-not-glyphs {
 
 import { useEffect } from 'react';
 import { convertLatexToMarkup } from 'mathlive';
+import ErrorBoundary from '@site/src/components/ErrorBoundary';
 
 export function MathfieldDemo({children}) {
   const INDENT = '  ';
@@ -528,36 +529,41 @@ export function MathfieldDemo({children}) {
     const latexField = document.getElementById('latex');
     if (!latexField) return;
     latexField.value = mf.value;
-    const expr = mf.expression;
+    const expr = mf?.expression;
     // Output MathJSON representation of the expression
-    document.getElementById('math-json').innerHTML = asString(0, expr.json).text;
-  
+    document.getElementById('math-json').innerHTML = expr ? asString(0, expr.json).text : '😕 The Compute Engine is not available';
+    if (!expr) return;
+
     let result = '';
-  
-    MathfieldElement.computeEngine.precision = 7;
-  
+
+    if (typeof MathfieldElement !== 'undefined' && MathfieldElement.computeEngine) {
+      MathfieldElement.computeEngine.precision = 7;
+    }
+
     if (expr.head !== 'Equal') {
       const exprN = expr.N();
-  
+
       if (!exprN.isSame(expr)) result = exprN.latex;
     }
-  
+
     if (!result) {
       const exprSimplify = expr.simplify();
       if (!exprSimplify.isSame(expr)) result = exprSimplify.latex;
     }
-  
+
     if (expr.head !== 'Equal') {
       if (!result) {
         const exprEval = expr.evaluate();
         if (!exprEval.isSame(expr)) result = exprEval.latex;
       }
     }
-  
+
     if (result) {
       document.getElementById('result').innerHTML = convertLatexToMarkup('= ' + result);
       document.getElementById('result-section').classList.add('is-visible');
-    } else document.getElementById('result-section').classList.remove('is-visible');
+    } else {
+      document.getElementById('result-section').classList.remove('is-visible');
+    }
   };
 
   const onInput = (evt) => onMathfieldUpdate(evt.target);
@@ -578,7 +584,9 @@ export function MathfieldDemo({children}) {
 }
 
 
-<MathfieldDemo>{`x=\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}`}</MathfieldDemo>
+<ErrorBoundary>
+  <MathfieldDemo>{`x=\\frac{-b\\pm \\sqrt{b^2-4ac}}{2a}`}</MathfieldDemo>
+</ErrorBoundary>
 
 <div style={{marginLeft: "auto", paddingTop: ".5em", textAlign: "right"}}>
   <a href="#shortcuts">Keyboard Shortcuts</a>

@@ -1,8 +1,8 @@
-function setupComputeEngine() {
+function setupComputeEngine(delay) {
   if (window.ce !== undefined && 'CodeMirror' in window) return;
   // If we're not ready, try again in 50ms
   if (!("ComputeEngine" in window) || !("CodeMirror" in window)) {
-    setTimeout(setupComputeEngine, 50);
+    setTimeout(() => setupComputeEngine(Math.max(1000, 2 * delay)), delay);
     return;
   }
   window.ce = new ComputeEngine.ComputeEngine();
@@ -11,12 +11,12 @@ function setupComputeEngine() {
   setTimeout(() => document.querySelectorAll("code-playground").forEach((x) => {
     if (typeof x.run === 'function') x.run()
     }),
-    20);
+  20);
 }
 
-function renderMath() {
+function renderMath(delay) {
   if (!("MathLive" in window)) {
-    setTimeout(renderMath, 500);
+    setTimeout(() => renderMath(Math.max(1000, 2 * delay)), delay);
     return;
   }
   MathLive.renderMathInDocument({
@@ -54,7 +54,7 @@ export function onRouteDidUpdate({ location, previousLocation }) {
   // Don't execute if we are still on the same page; the lifecycle may be fired
   // because the hash changes (e.g. when navigating between headings)
   if (location.pathname !== previousLocation?.pathname) {
-    renderMath();
-    setupComputeEngine();
+    renderMath(20);
+    setupComputeEngine(10);
   }
 }

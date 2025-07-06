@@ -211,7 +211,7 @@ by omitting the endpoint.
 For example: `real<..1.0>` is the type of real numbers less than $1.0$, 
 and is equivalent to `real< -oo..1.0 >`.
 
-To represent an open interval, use a negation value type to exclude the endpoints.
+To represent an open interval, use a negation and a literal type to exclude the endpoints.
 For example `real<0..> & !0` is the type of real numbers greater than $0$.
 
 When using integers, you can adjust the endpoint instead, so for example 
@@ -383,7 +383,7 @@ contains three elements with keys `red`, `green` and `blue`, and values of type 
   - The keys of the first record are a subset of the keys of the second.
   - The values of the first record are compatible with the values of the second.
   - The order of the keys does not matter.
-- A record is compatible with a dictionary `dictionary<T>` if each value type `T1`, `T2`, ... is compatible with `T`.
+- A record is compatible with a dictionary `dictionary<T>` if each type `T1`, `T2`, ... is compatible with `T`.
 
 
 ```js
@@ -516,21 +516,21 @@ and it cannot be combined with optional arguments.
 
 The type `function` matches any function literal. It is a shorthand for `(any*) -> unknown`.
 
-## Value Type
+## Literal Type
 
-A **value type** is a type that represents a single value. 
+A **literal type** is a type that represents a single value. 
 
 The value can be:
 - a boolean: `true` or `false`
 - a number, such as `42`, `-3.14`, or `6.022e23`
 - a string, such as `"yellow"`, 
 
-Value types can be used in conjunction with a union to represent a type that 
+Literal types can be used in conjunction with a union to represent a type that 
 can be one of multiple values, for example:
 
 - `0 | 1` is the type of values that are either `0` or `1`.
-- `integer | nothing` is the type of values that are integers or `Nothing`.
-- `"red" | "green" | "blue"` is the type of values that are either of the strings `"red"`, `"green"` or `"blue"`.
+- `"red" | "green" | "blue"` is the type of values that are either of the 
+  strings `"red"`, `"green"` or `"blue"`.
 
 
 ## Other Constructed Types
@@ -650,7 +650,8 @@ ce.parse("\\{red: 1, green: 2\\}").type
 // ➔ true
 ```
 
-Records are compatible with dictionaries if all the values of the record are compatible with the dictionary's value type.
+Records are compatible with dictionaries if all the values of the record are 
+compatible with the dictionary's value type.
 
 ```js
 ce.parse("\\{red: 104, green: 2, blue: 37\\}").type

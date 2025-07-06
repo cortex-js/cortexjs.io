@@ -54,7 +54,7 @@ loadScripts([
   "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js",
-  // "https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/dist/compute-engine.min.cjs",
+  // "https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@latest/dist/compute-engine.umd.js",
   "https://unpkg.com/@cortex-js/compute-engine",
   "https://cdn.jsdelivr.net/npm/mathlive",
   "https://cdn.jsdelivr.net/npm/@ui-js/code-playground/dist/code-playground.min.js@module",
@@ -62,6 +62,7 @@ loadScripts([
 );
 })();
 `;
+
 
 export default function (context, options) {
   return {

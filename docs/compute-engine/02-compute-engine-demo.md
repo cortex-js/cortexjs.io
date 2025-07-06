@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { clsx } from 'clsx';
 import CodePlayground from '@site/src/components/CodePlayground';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
+import ErrorBoundary from '@site/src/components/ErrorBoundary';
 
 export function ToggleButton ({toggle, className, style}) {
 return <button 
@@ -126,15 +127,17 @@ n^2+1 & n \\geq 2
 
 return (
     <div className="example-cells">{
-      examples.map((x, i) => 
-        <div 
-          key={x.label ?? x.latex ?? x.json}
-          className={clsx("example-cell", {"active": i === index} )} 
-          onClick={() => onSelect(x, i)}
-        >
-          {x.label ? x.label: `$$${x.latex}$$`}
-        </div>
-      )
+      examples.map((x, i) => {
+        return (
+          <div 
+            key={x.label ?? x.latex ?? x.json}
+            className={clsx("example-cell", {"active": i === index} )} 
+            onClick={() => onSelect(x, i)}
+          >
+            {x.label ? x.label: `$$${x.latex}$$`}
+          </div>
+        );
+      })
     }
     </div>
   );
@@ -199,14 +202,23 @@ console.info(await expr.evaluateAsync());
       }
     }  
 
-    setValue(code);
+    if (!('ComputeEngine' in window)) {
+      setValue(`// 😕 The Compute Engine could not be loaded.
+// Check your network connection or try again later.`);
+    } else {
+      setValue(code);
+    }
     setIndex(exampleIndex);
   };
 
   return (
     <div className="flex flex-col items-center">
-      <ExampleSelector onSelect={handleSelect} index={index}/>
-      <CodePlayground js={value} />
+      <ErrorBoundary>
+        <ExampleSelector onSelect={handleSelect} index={index}/>
+        <ErrorBoundary>
+          <CodePlayground js={value} />
+        </ErrorBoundary>
+      </ErrorBoundary>
     </div>
   );
 }
@@ -350,4 +362,3 @@ button.toggle svg {
 
 
 <ComputeEngineDemo/>
-

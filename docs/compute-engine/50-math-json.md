@@ -9,6 +9,7 @@ import Mathfield from '@site/src/components/Mathfield';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
 import {useState, useEffect} from 'react';
 import {BrowserOnly} from '@docusaurus/BrowserOnly';
+import ErrorBoundary from '@site/src/components/ErrorBoundary';
 
 export function setupComputeEngine() {
   if (window.ce !== undefined) return;
@@ -17,10 +18,6 @@ export function setupComputeEngine() {
     setTimeout(setupComputeEngine, 50);
     return;
   }
-  const [value, setValue] = useState(children);
-  const [json, setJson] = useState({});
-  window.ce = new ComputeEngine.ComputeEngine();
-  setJson(window.ce?.parse(value).json);
 }
 export function MathJSONOutput({children}) {
   const [value, setValue] = useState(children);
@@ -29,8 +26,20 @@ export function MathJSONOutput({children}) {
   // We need to use useEffect so that the MathfieldElement is available
   // when this code runs (in the client).
   useEffect(() => {
-    setupComputeEngine();
-    setJson(window.ce?.parse(value).json);
+    let cancelled = false;
+
+    const tryParse = () => {
+      if (window.ce) {
+        const result = window.ce.parse(value);
+        setJson(result?.json ?? {});
+      } else if (!cancelled) {
+        setTimeout(tryParse, 50);
+      }
+    };
+
+    tryParse();
+
+    return () => { cancelled = true; };
   }, [value]);
   return<>
     <Mathfield 
@@ -73,7 +82,9 @@ MathJSON can be transformed from (parsing) and to (serialization) other formats.
 
 :::info[Demo]
 Type an expression in the mathfield below to see its MathJSON representation.
-<MathJSONOutput>{`e^{i\\pi}+1=0`}</MathJSONOutput>
+<ErrorBoundary>
+  <MathJSONOutput>{`e^{i\\pi}+1=0`}</MathJSONOutput>
+</ErrorBoundary>
 :::
 
 
@@ -790,3 +801,4 @@ Library.
 <ReadMore path="/compute-compute-engine/guides/augmenting/">
 Read more about **Adding New Definitions**<Icon name="chevron-right-bold" />
 </ReadMore>
+
