@@ -14,7 +14,7 @@ const config: Config = {
   title: 'MathLive',
   titleDelimiter: '·',
   tagline: 'Scientific Web Computing',
-  favicon: '/img/logo.svg',
+  favicon: '/img/logo.webp',
 
   url: 'https://mathlive.io',
 
@@ -243,7 +243,7 @@ const config: Config = {
         title: 'MathLive',
         logo: {
           alt: "MathLive Logo",
-          src: "img/logo.svg",
+          src: "img/logo.webp",
           width: 42,
           height: 42,
         },

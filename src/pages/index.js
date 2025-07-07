@@ -9,7 +9,7 @@ function HomepageHeader() {
   return (
     <header className={styles.header}>
       <div>
-        <h1 className={styles.h1}><img alt="MathLive Logo" height="256" width="256" src="/img/logo.svg"></img>MathLive</h1>
+        <h1 className={styles.h1}><img alt="MathLive Logo" height="256" width="256" src="/img/logo.webp"></img>MathLive</h1>
         
         <p className={styles.subtitle}>Scientific Computing for Everyone</p>
         

@@ -1,13 +1,16 @@
 .heroContainer {
-  /* display: flex; */
+  display: flex;
+  align-self: center;
+  justify-self: center;
   position: relative;
   width: 100%;
   min-height: var(--container-height, 50vh);
   border: 1px solid var(--neutral-700);
-  border-radius: 8px;
+  border-radius: 16px;
   --text-color: #fff;
   margin-bottom: 1em;
   background: var(--blue-900);
+  max-width: 1024px
 }
 
 .heroContainer h1, .heroContainer h2, 
@@ -32,7 +35,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 6px;
+  border-radius: 14.5px;
   /* filter: brightness(0.9) grayscale(0.2); */
 }
 
