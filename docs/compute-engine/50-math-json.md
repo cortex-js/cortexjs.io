@@ -51,7 +51,7 @@ export function MathJSONOutput({children}) {
 }
 
 
-<HeroImage path="/img/hand-cube.jpg" >
+<HeroImage path="/img/hand-cube2.jpg" style={{"--container-height": "800px"}} >
 # MathJSON
 </HeroImage>
 
@@ -119,8 +119,8 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.
 
 ## Structure of a MathJSON Expression
 
-A MathJSON expression is a combination of **numbers**, **symbols**, **strings**
-and **functions**.
+A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
+**functions** and **dictionaries**.
 
 **Number**
 
@@ -152,7 +152,7 @@ and **functions**.
 
 ```json example
 ["Add", 1, "x"]
-{"fn": [{"sym": "Add"}, {"num": "1"}, {"sym": "x"}]}
+{"fn": ["Add", {"num": "1"}, {"sym": "x"}]}
 ```
 
 
@@ -284,9 +284,8 @@ A MathJSON **string** is either:
 - a [JSON string](https://tools.ietf.org/html/rfc7159#section-7) that starts and
   ends with **U+0027 `'` APOSTROPHE** .
 
-Strings may contain any character represented by a Unicode scalar value (a
-codepoint in the `[0...0x10FFFF]` range, except for `[0xD800...0xDFFF]`), but
-the following characters must be escaped as indicated:
+MathJSON strings must be [well formed JSON strings](https://tc39.es/proposal-well-formed-stringify/), which means they must escape surrogate codepoints `U+D800` to `U+DFFF`, control characters `U+0000` to `U+001F`, and the characters **U+0022 `'` QUOTATION MARK** and **U+005C `\` REVERSE SOLIDUS** (backslash).
+
 
 <div className="symbols-table first-column-header" style={{'--first-col-width': '9ch'}}>
 
@@ -298,10 +297,19 @@ the following characters must be escaped as indicated:
 | **U+000A**               | **LINE FEED**                   | `\n` or `\u000a`     |
 | **U+000C**               | **FORM FEED**                   | `\f` or `\u000c`     |
 | **U+000D**               | **CARRIAGE RETURN**             | `\r` or `\u000d`     |
-| **U+0027**               | **APOSTROPHE**                   | `\'` or `\u0027`    |
+| **U+0022**               | **QUOTATION MARK**              | `\"` or `\u0022`    |
 | **U+005C**               | **REVERSE SOLIDUS** (backslash) | `\\` or `\u005c`     |
-
+| **U+D800** to **U+DFFF** | **SURROGATE CODEPOINTS**        | `\uD800` to `\uDFFF`  |
 </div>
+
+Any character may be escaped using the `\u` escape sequence, which is a
+Unicode escape sequence of the form `\uXXXX` where `XXXX` is a four-digit hexadecimal codepoint. The hexadecimal letters `A` though `F` can be upper or lower case.
+
+To escape a character that is not in the Basic Multilingual Plane (BMP), 
+the character is represented as a 12-character sequence, encoding the UTF-16 
+surrogate pair.
+
+For example, the character **U+1F34E 🍎 RED APPLE** is represented as the sequence `\uD83C\uDF4E`.
 
 The encoding of the string follows the encoding of the JSON payload: UTF-8,
 UTF-16LE, UTF-16BE, etc...
@@ -722,6 +730,53 @@ Modifiers include:
 | `c_max`              | `\mathrm{c_{max}}` | \\( \mathrm\{c\_\{max\}\} \\) |
 
 </div>
+
+
+## Dictionaries
+
+MathJSON supports the concept of **dictionaries**, which are collections of 
+key-value pairs. 
+
+Dictionaries can be represented as a `["Dictionary"]` expression, with 
+its arguments being tuples of key-value pairs.
+
+```json example
+["Dictionary", 
+  ["Tuple", "x", 120], 
+  ["Tuple", "y", 36]
+]
+```
+
+The value of the key-value tuples can be any valid MathJSON expression, including
+numbers, strings, functions, lists, or other dictionaries.
+
+For example, the following dictionary contains an expression and a list as values:
+
+```json example
+["Dictionary",
+  ["Tuple", "expression", ["Add", "x", 1]],
+  ["Tuple", "list", ["List", 1, 2, 3]]
+]
+```
+
+
+Dictionaries can also be represented as a JSON object literal with a `"dict"` key,
+which is an object with string keys and values that can be any valid MathJSON
+expression.
+
+
+```js
+{
+  "dict": {
+    "expression":  ["Add", "x", 1] ,
+    "list": ["List", 1, 2, 3] 
+  }
+}
+```
+
+The keys of a dictionary are Unicode strings. They are compared using the
+[Unicode Normalization Form C (NFC)](https://unicode.org/reports/tr15/).
+Keys must be unique within a dictionary.
 
 
 ## Metadata
