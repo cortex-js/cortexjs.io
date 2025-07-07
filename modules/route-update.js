@@ -50,6 +50,19 @@ function renderMath(delay) {
   });
 }
 
+
+export function onRouteUpdate({ location, previousLocation }) {
+  // Don't execute if we are still on the same page; the lifecycle may be fired
+  // because the hash changes (e.g. when navigating between headings)
+  if (location.pathname !== previousLocation?.pathname) {
+    // Make sure the virtual keyboard gets closed. It normally happens when 
+    // the mathfield loses focus, but in some cases it doesn't (timing issue?)
+    const vk = window.mathVirtualKeyboard;
+    if (vk?.visible) vk.hide();
+      
+  }
+} 
+
 export function onRouteDidUpdate({ location, previousLocation }) {
   // Don't execute if we are still on the same page; the lifecycle may be fired
   // because the hash changes (e.g. when navigating between headings)
