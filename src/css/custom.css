@@ -2,7 +2,7 @@
  * Infima is a CSS framework designed to work well for content-centric websites.
  */
 
-:root {
+html:root {
   --ifm-color-primary: var(--primary-color);
 
   --ifm-color-primary-dark: var(--blue-500);
@@ -46,8 +46,142 @@
 
   --ifm-breadcrumb-border-radius: 12px;
 
-  --docusaurus-collapse-button-bg: red;
+  /* --docusaurus-collapse-button-bg: red; */
+
+
+  --link-color: var(--blue-800);
+  --link-color-visited: #0b5c9c;
+  --link-color-hover: #0d80f2;
+
+  /* Callout boxes are used for "Read More" */
+  --callout-background: #e6f0fa;
+  --callout-shadow: 0 1px 1px rgba(0, 102, 206, 0.25);
+  --callout-border-color: rgba(0, 102, 206, 0.25);
+  --callout-border-color-hover: var(--primary-color);
+
+  --highlight-color: hsla(49, 100%, 63%, 0.56);
+
+  --text-color: var(--neutral-100); /* hsl(0,0,20); */
+  --strong-color: var(--primary-color);
+  --muted-text-color: var(--neutral-500);
+
+  --table-thin-line-color: var(--neutral-600); /* #ddd; */
+  --table-thick-line-color: var(--neutral-300); /* #333; */
+
+  --placeholder-color: var(--primary-color);
+  --placeholder-opacity: .4;
+
+  --card-background: var(--neutral-900); /* #fafafa; */
+  --card-background-alternate: var(--neutral-600); /*  #a0a0a0; */
+  --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+
+  --page-background: var(--neutral-900); /* #f5f5f7; */
+  --content-background: var(--neutral-900);
+  --content-border-color: var(--neutral-900);
+
+  --ui-background: var(--neutral-900);
+  --ui-background-hover: var(--neutral-600);
+  --ui-border: 1px solid var(--neutral-700);
+  --ui-border-focus: solid 1px var(--neutral-900);
+  --ui-focus-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302),
+    0 2px 6px 2px rgba(60, 64, 67, 0.149);
+  --ui-divider: 0.5px solid #3334;
+  /* --ui-elevated-shadow:0px 0px 10px rgba(0, 0, 0, 0.3); */
+  /* Used by the background of a slider */
+  --ui-surface: var(--neutral-700);
+  --ui-handle: var(--neutral-900);
+
+  --border-color: var(--neutral-800); /* #e7e7e7; */
+
+  --semantic-blue: var(--blue-700);
+  --semantic-red: var(--red-400);
+  --semantic-orange: var(--orange-400);
+  --semantic-green: var(--green-700);
+
+  --glass-filter: drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1));
+  --glass-backdrop-filter: blur(8px) saturate(90%);
+  --glass-border: 1px solid rgba(209, 213, 219, 0.3);
+  --glass-border-color: var(--neutral-900) rgba(209, 213, 219, 0.3)
+    rgba(209, 213, 219, 1);
+  --glass-box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 4px 30px rgba(0, 0, 0, 0.1),
+    0 0 10px rgb(0 0 0 / 0.1);
+  --glass-background: rgba(255, 255, 255, 0.6);
+
+  --shadow-color: 0deg 0% 50%;
+
+  /** Three elevations: small, medium, and large */
+  /* See also https://www.joshwcomeau.com/shadow-palette/ */
+  --box-shadow-sm: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.57),
+    0px 1.9px 1.9px -3.2px hsl(var(--shadow-color) / 0.44);
+
+  --box-shadow-md: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.54),
+    0px 2.2px 2.2px -1.6px hsl(var(--shadow-color) / 0.45),
+    0.1px 9.4px 9.5px -3.2px hsl(var(--shadow-color) / 0.37);
+
+  --box-shadow-lg: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.5),
+    0px 2.7px 2.7px -0.6px hsl(var(--shadow-color) / 0.46),
+    0px 6px 6.1px -1.3px hsl(var(--shadow-color) / 0.42),
+    0.1px 12.5px 12.7px -1.9px hsl(var(--shadow-color) / 0.38),
+    0.2px 24.3px 24.6px -2.6px hsl(var(--shadow-color) / 0.34),
+    0.3px 43.5px 44px -3.2px hsl(var(--shadow-color) / 0.31);
+
+    --depth-effect-text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+    --emboss-text-shadow: 0 -4px 3px rgba(255, 255, 255, 0.3), 0 3px 4px rgba(0, 0, 0, 0.2);
+    --letter-press-text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3), 0 -1px 2px rgba(0, 0, 0, 0.3);
+
+
 }
+
+:root[data-theme="dark"] {
+  --primary-color: hsl(210, 80%, 60%);
+  --primary-color-dark: hsl(210, 80%, 40%);
+  --primary-color-light: hsl(210, 90%, 75%);
+
+  --link-color: var(--blue-400);
+  --link-color-hover: var(--blue-300);
+  --link-color-visited: var(--blue-500);
+
+  /* Callout boxes are used for "Read More" */
+  --callout-background: #183854; /* #{$blue-900}; */
+  --callout-shadow: 0 1px 1px rgba(25, 50, 50, 0.25);
+  --callout-border-color: rgba(0, 102, 206, 0.25);
+  --callout-border-color-hover: hsl(210, 80%, 40%);
+
+  --ui-surface: var(--neutral-300);
+
+  --highlight-color: hsla(49, 100%, 63%, 0.7);
+
+  /* --text-color: var(--neutral-800); */
+  --strong-color: #86c0f9;
+  --muted-text-color: var(--neutral-500);
+  --text-color-dimmed: #999;
+
+  --table-thin-line-color: #444;
+  --table-thick-line-color: #555;
+
+  --placeholder-color: #9aa0a6;
+
+  --page-background: var(--neutral-25);
+  /* --content-background: var(--neutral-50); */
+  /* --content-border-color: #393939; */
+  /* --card-background: var(--neutral-50); */
+  /* --card-background--alternate: var(--neutral-100); */
+
+  /* --ui-background: var(--neutral-100); */
+  /* --ui-background-hover: var(--neutral-200); */
+  /* --ui-border: 0.5px solid var(--neutral-300); */
+  /* --ui-border-focus: 0.5px solid var(--neutral-500); */
+  /* Used for hover state of masthead and nav links */
+  --ui-focus-shadow: none;
+
+  /* --border-color: var(--neutral-200); */
+
+  --semantic-blue: #0c6abe;
+  --semantic-red: #f43e31;
+  --semantic-orange: #ffa852;
+  --semantic-green: #199533;
+}
+
 
 math-field {
   border: 1px solid var(--neutral-400);
@@ -146,89 +280,6 @@ math-field {
   --ifm-pre-background: var(--console-background);
 }
 
-:root {
-  --link-color: var(--blue-800);
-  --link-color-visited: #0b5c9c;
-  --link-color-hover: #0d80f2;
-
-  /* Callout boxes are used for "Read More" */
-  --callout-background: #e6f0fa;
-  --callout-shadow: 0 1px 1px rgba(0, 102, 206, 0.25);
-  --callout-border-color: rgba(0, 102, 206, 0.25);
-  --callout-border-color-hover: var(--primary-color);
-
-  --highlight-color: hsla(49, 100%, 63%, 0.56);
-
-  --text-color: var(--neutral-100); /* hsl(0,0,20); */
-  --strong-color: var(--primary-color);
-  --muted-text-color: var(--neutral-500);
-
-  --table-thin-line-color: var(--neutral-600); /* #ddd; */
-  --table-thick-line-color: var(--neutral-300); /* #333; */
-
-  --placeholder-color: var(--primary-color);
-  --placeholder-opacity: .4;
-
-  --card-background: var(--neutral-900); /* #fafafa; */
-  --card-background-alternate: var(--neutral-600); /*  #a0a0a0; */
-  --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-
-  --page-background: var(--neutral-900); /* #f5f5f7; */
-  --content-background: var(--neutral-900);
-  --content-border-color: var(--neutral-900);
-
-  --ui-background: var(--neutral-900);
-  --ui-background-hover: var(--neutral-600);
-  --ui-border: 1px solid var(--neutral-700);
-  --ui-border-focus: solid 1px var(--neutral-900);
-  --ui-focus-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302),
-    0 2px 6px 2px rgba(60, 64, 67, 0.149);
-  --ui-divider: 0.5px solid #3334;
-  /* --ui-elevated-shadow:0px 0px 10px rgba(0, 0, 0, 0.3); */
-  /* Used by the background of a slider */
-  --ui-surface: var(--neutral-700);
-  --ui-handle: var(--neutral-900);
-
-  --border-color: var(--neutral-800); /* #e7e7e7; */
-
-  --semantic-blue: var(--blue-700);
-  --semantic-red: var(--red-400);
-  --semantic-orange: var(--orange-400);
-  --semantic-green: var(--green-700);
-
-  --glass-filter: drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1));
-  --glass-backdrop-filter: blur(8px) saturate(90%);
-  --glass-border: 1px solid rgba(209, 213, 219, 0.3);
-  --glass-border-color: var(--neutral-900) rgba(209, 213, 219, 0.3)
-    rgba(209, 213, 219, 1);
-  --glass-box-shadow: 0 0 2px rgb(0 0 0 / 0.1), 0 4px 30px rgba(0, 0, 0, 0.1),
-    0 0 10px rgb(0 0 0 / 0.1);
-  --glass-background: rgba(255, 255, 255, 0.6);
-
-  --shadow-color: 0deg 0% 50%;
-
-  /** Three elevations: small, medium, and large */
-  /* See also https://www.joshwcomeau.com/shadow-palette/ */
-  --box-shadow-sm: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.57),
-    0px 1.9px 1.9px -3.2px hsl(var(--shadow-color) / 0.44);
-
-  --box-shadow-md: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.54),
-    0px 2.2px 2.2px -1.6px hsl(var(--shadow-color) / 0.45),
-    0.1px 9.4px 9.5px -3.2px hsl(var(--shadow-color) / 0.37);
-
-  --box-shadow-lg: 0px 0.5px 0.5px hsl(var(--shadow-color) / 0.5),
-    0px 2.7px 2.7px -0.6px hsl(var(--shadow-color) / 0.46),
-    0px 6px 6.1px -1.3px hsl(var(--shadow-color) / 0.42),
-    0.1px 12.5px 12.7px -1.9px hsl(var(--shadow-color) / 0.38),
-    0.2px 24.3px 24.6px -2.6px hsl(var(--shadow-color) / 0.34),
-    0.3px 43.5px 44px -3.2px hsl(var(--shadow-color) / 0.31);
-
-    --depth-effect-text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
-    --emboss-text-shadow: 0 -4px 3px rgba(255, 255, 255, 0.3), 0 3px 4px rgba(0, 0, 0, 0.2);
-    --letter-press-text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3), 0 -1px 2px rgba(0, 0, 0, 0.3);
-
-
-}
 
 .rainbow-text {
   --color-background: var(--content-background);;
@@ -241,55 +292,6 @@ math-field {
   line-height: 1.3;
 }
 
-:root[data-theme="dark"] {
-  --primary-color: hsl(210, 80%, 40%);
-  --primary-color-dark: hsl(210, 80%, 30%);
-  --primary-color-light: hsl(210, 80%, 60%);
-
-  --link-color: var(--blue-400);
-  --link-color-hover: var(--blue-300);
-  --link-color-visited: var(--blue-500);
-
-  /* Callout boxes are used for "Read More" */
-  --callout-background: #183854; /* #{$blue-900}; */
-  --callout-shadow: 0 1px 1px rgba(25, 50, 50, 0.25);
-  --callout-border-color: rgba(0, 102, 206, 0.25);
-  --callout-border-color-hover: hsl(210, 80%, 40%);
-
-  --ui-surface: var(--neutral-300);
-
-  --highlight-color: hsla(49, 100%, 63%, 0.7);
-
-  /* --text-color: var(--neutral-800); */
-  --strong-color: #86c0f9;
-  --muted-text-color: var(--neutral-500);
-  --text-color-dimmed: #999;
-
-  --table-thin-line-color: #444;
-  --table-thick-line-color: #555;
-
-  --placeholder-color: #9aa0a6;
-
-  --page-background: var(--neutral-25);
-  /* --content-background: var(--neutral-50); */
-  /* --content-border-color: #393939; */
-  /* --card-background: var(--neutral-50); */
-  /* --card-background--alternate: var(--neutral-100); */
-
-  /* --ui-background: var(--neutral-100); */
-  /* --ui-background-hover: var(--neutral-200); */
-  /* --ui-border: 0.5px solid var(--neutral-300); */
-  /* --ui-border-focus: 0.5px solid var(--neutral-500); */
-  /* Used for hover state of masthead and nav links */
-  --ui-focus-shadow: none;
-
-  /* --border-color: var(--neutral-200); */
-
-  --semantic-blue: #0c6abe;
-  --semantic-red: #f43e31;
-  --semantic-orange: #ffa852;
-  --semantic-green: #199533;
-}
 
 body header {
   padding: 0 !important;
@@ -603,6 +605,7 @@ nav.hidden h1, nav.hidden h2, nav.hidden h3 {
 
 /* Docusaurus default style sets the html,body to 100% height, which is not what we want */
 html, body {
-  height: 100vh !important;
-  min-height: 100%;
+  height: auto !important;
+  min-height: 100vh !important;
 }
+
