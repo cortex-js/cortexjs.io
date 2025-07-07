@@ -155,6 +155,12 @@ A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 {"fn": ["Add", {"num": "1"}, {"sym": "x"}]}
 ```
 
+**Dictionary**
+
+```json example
+{"dict": {"x": 2, "y": 3}}
+["Dictionary", ["Tuple", "'x'", 2], ["Tuple", "'y'", 3]]
+```
 
 **Numbers**, **symbols**, **strings** and **functions** are expressed either as
 object literals with a `"num"` `"str"` `"sym"` or `"fn"` key, respectively, or
@@ -742,8 +748,8 @@ its arguments being tuples of key-value pairs.
 
 ```json example
 ["Dictionary", 
-  ["Tuple", "x", 120], 
-  ["Tuple", "y", 36]
+  ["Tuple", "'x'", 120], 
+  ["Tuple", "'y'", 36]
 ]
 ```
 
@@ -754,8 +760,8 @@ For example, the following dictionary contains an expression and a list as value
 
 ```json example
 ["Dictionary",
-  ["Tuple", "expression", ["Add", "x", 1]],
-  ["Tuple", "list", ["List", 1, 2, 3]]
+  ["Tuple", "'expression'", ["Add", "x", 1]],
+  ["Tuple", "'list'", ["List", 1, 2, 3]]
 ]
 ```
 
