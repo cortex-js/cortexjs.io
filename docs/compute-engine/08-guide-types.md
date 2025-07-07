@@ -115,12 +115,13 @@ becomes available.
 
 :::info **Naming Constraints for Elements and Arguments**
 
-Element names (used in tuples, records, dictionaries) and function argument names must:
+Element names (used in tuples, records, dictionaries) and function argument names should:
 
-- start with a letter or underscore
-- contain only letters, digits, or underscores
+- start with a letter (`U+0041` to `U+005A` or `U+0061` to `U+007A`) or underscore (`U+005F`)
+- contain only letters, digits (`U+0030` to `U+0039`), or underscores
 
-If a name does not follow these rules, it must be enclosed in backticks.
+Names that don’t follow these rules must be enclosed in backticks.
+The backticks are not part of the name, they are used to escape the name.
 
 For example:
 
@@ -131,9 +132,7 @@ For example:
 ``(`直径`: number) -> number``
 
 
-The backticks are not part of the name, they are used to escape the name.
-
-In the unlikely event that the name contains a backtick or backslash, it must be escaped with a backslash:
+If the name contains a backtick or backslash, those characters must be escaped with a backslash:
 
 ``record<`name\`with\`backticks\\and\\backslash`: integer>``
 
