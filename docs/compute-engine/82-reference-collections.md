@@ -12,16 +12,18 @@ into one unit. Each element in a collection is a
 
 ## Introduction
 
-The most common kind of collection are:
-- [**List**](#list)`:list`: ordered collection of elements (duplicates allowed)
-- [**Set**](#set)`:set`: unordered collection of unique elements
-- [**Tuple**](#tuple)`:tuple`: ordered, fixed-size collection with optional names
-- [**Record**](#record)`:record`: structured data with a fixed set of known string keys
-- [**Dictionary**](#dictionary)`:dictionary`: unordered key-value pairs with string keys
+The most common types of collection are:
+
+| Type         | Description                                             | See                     |
+|:-------------|:-------------------------------------------------------|--------------------------|
+| `list`       | Collection of elements accessible by their index, duplicates allowed    | [**List**](#list)        |
+| `set`        | Collection of unique elements                           | [**Set**](#set)          |
+| `tuple`      | Collection with a fixed size and optional names        | [**Tuple**](#tuple)      |
+| `dictionary` | Collection of key-value pairs with string keys        | [**Dictionary**](#dictionary) |
+| `record`     | Structured data with a fixed set of known string keys  |                          |
 
 Collections are **immutable**: they cannot be modified in place.  
 Instead, operations on collections produce new collections.
-
 
 
 Collections can be used to represent vectors, matrices, sets,
@@ -33,17 +35,34 @@ tensors which are a special kind of collection (lists of lists of numbers).<Icon
 </ReadMore>
 
 
+### Core Properties of Collections
 
-### Ordered and Unordered Collections
+All collections share these basic properties:
+- Elements of the collection can be **enumerated**
+- Elements of the collection can be **counted**
+- Membership of an element can be checked
+- Subset relationships with another collection can be checked
+
+**Note:** Depending on the collection, counting and membership checking 
+can be an expensive operation. See the information on specific collections for details.
+
+In addition, indexed collections support:
+- **Index-based access**: elements can be accessed by their index.
+- **Finding elements**: elements matching a predicate can be found by their index.
+
+
+
+
+### Indexed and Non-indexed Collections
 
 Collections fall into two broad categories:
-- **Ordered collections** (such as `List` and `Tuple`)  
+- **Indexed collections**, such as `List` and `Tuple`
   → Elements can be accessed by an **index**, an integer that indicates the position of the element in the collection.
-- **Unordered collections** (such as `Set` and `Record`)  
+- **Non-indexed collections**, such as `Set` and `Record`
   → Elements cannot be accessed by index. They can be enumerated or looked up by key.
 
 
-The first element of an ordered collection has index `1`, the second element 
+The first element of an indexed collection has index `1`, the second element 
 has index `2`, and so on. The last element has index equal to the length of the collection.
 
 **Negative indexes** can also be used to access elements from the end of the
@@ -65,8 +84,9 @@ collection.
 ### Finite and Infinite Collections
 
 Collections may be:
-- **Finite**: containing a definite number of elements.
-- **Infinite**: continuing indefinitely (for example, a sequence of all natural numbers).
+- **Finite**: containing a definite number of elements
+- **Infinite**: continuing indefinitely (for example, a sequence of all natural numbers)
+- **Indeterminate**: containing an unknown number of elements, such as a stream of data that may end at some point
 
 Compute Engine supports **lazy evaluation** to make working with infinite collections possible.
 
@@ -81,9 +101,10 @@ and necessary when working with infinite collections.
 
 Some operations like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections**.
 
-You can convert a lazy collection to an eager collection using [`ListFrom`](#listfrom) 
+**To convert a lazy collection to an eager collection** use [`ListFrom`](#listfrom) 
 or [`SetFrom`](#setfrom). These functions enumerate all elements of a finite 
-collection and produce a matching eager collection.
+collection and produce a matching eager collection. This process is called **materialization**.
+or **realization**.
 
 ```json example
 ["ListFrom", ["Range", 1, 10]]
@@ -98,40 +119,59 @@ Common examples include:
 - Cyclic patterns (`Cycle`)
 - Iterative computations (`Iterate`)
 
+For example, let's say you want to express the first 10 prime numbers:
 
-### Core Properties of Collections
+```json example
+["ListFrom", 
+  ["Take", 
+    ["Filter", "Integers", ["IsPrime", "_"]], 
+    10
+  ]
+]
+// ➔ ["List", 2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+```
 
-All collections share these basic properties:
-- Their elements can be **enumerated**
-- Their elements can be **counted**
-- They can check whether an element is a **member** of the collection
-- They can check if another collection is a **subset** of the collection
+In this expression, only the first 10 prime numbers are computed, 
+and only when the `ListFrom` function is called.
 
-**Note:** Depending on the type of collection, counting and membership checking 
-can be an expensive operation. See the information on specific collection types for details.
+Lazy collections are partially materialized when converting an expression to
+a string representation, such as when using the `expr.latex`, `expr.toString()` 
+or `expr.print()` methods. A placeholder is inserted to indicate missing 
+elements.
 
-In addition, ordered collections support:
-- **Index-based access**: elements can be accessed by their index.
-- **Finding elements**: elements can be searched for by a predicate and 
-  their index can be returned.
-
+```js example
+const expr = ce.box(["Map", "Integers", ["Square", "_"]]);
+expr.print();
+// ➔ [1, 4, 9, 16, 25...]
+```
 
 
 #### Eager Collections
 
-Some of the collections in the Compute Engine include:
-- [**List**](#list): ordered collections of elements, which are also used to represent
+Some of the eager collections include:
+- [**List**](#list): indexed collections of elements, which are also used to represent
   **vectors** and **matrices**. Elements in a list are accessed by their
-  index, which starts at 1. Type: `list<T>` where `T` is the type of the elements.
-- [**Set**](#set): unordered collections of unique elements. The elements in a set are
+  index, which starts at 1. Lists can contain duplicate elements and they can 
+  contain an infinite number of elements.
+  
+  **Type:** `list<T>` where `T` is the type of the elements.
+- [**Set**](#set): non-indexed collections of unique elements. The elements in a set are
   not accessed by index, they are enumerated. A set can contain an infinite number
-  of elements. Type : `set<T>` where `T` is the type of the elements.
-- [**Tuple**](#tuple): ordered collections of elements, but with a fixed number 
-  of elements that have a specific type and an optional name. Type : `tuple<T1, T2, ..., Tn>` where `T1`, `T2`, ..., `Tn` are the types of the elements.
-- [**Dictionary**](#dictionary): unordered collections of key-value pairs, 
-    where each key is unique. Type: `dictionary<V>` where `V` is the type of the values, the keys are strings.
-- [**Record**](#record): unordered collections of key-value pairs. Unlike dictionaries, records are used to represent structured data with a fixed set of keys, and the keys are known at compile time. 
-  Type: `record<K1: T1, K2: T2, ..., Kn: Tn>` where `K1`, `K2`, ..., `Kn` are the keys and `T1`, `T2`, ..., `Tn` are the types of the values.
+  of elements. 
+  
+  **Type:** `set<T>` where `T` is the type of the elements.
+- [**Tuple**](#tuple): indexed collections of elements, but with a fixed number
+  of elements that have a specific type and an optional name. 
+  
+  **Type:** `tuple<T1, T2, ..., Tn>` where `T1`, `T2`, ..., `Tn` are the types of the elements.
+- [**Dictionary**](#dictionary): non-indexed collections of key-value pairs, 
+    where each key is unique. 
+    
+    **Type:** either `dictionary<V>` where `V` is the 
+    type of the values, the keys are strings or `record<K1: T1, K2: T2, ..., Kn: Tn>` where `K1`, `K2`, ..., `Kn` are the keys and `T1`, `T2`, ..., `Tn` are the types of the values. The `dictionary` type is used when the 
+    set of keys is not known in advance, for example when a dictionary 
+    is used as a cache. The `record` type is used when the set of keys is known 
+    in advance and fixed, for example to represent a structured data type.
 
 #### Lazy Collections
 
@@ -139,7 +179,7 @@ Some functions evaluate to a lazy collection. This is useful for creating
 infinite collections or for collections that are expensive to compute. 
 
 Examples of function evaluating to a lazy collection include:
-- [**Range**](#range) and [**Linspace**](#linspace): ordered sequences of numbers (integers and reals, respectively) with a specified start, end and step size.
+- [**Range**](#range) and [**Linspace**](#linspace): indexed sequences of numbers (integers and reals, respectively) with a specified start, end and step size.
 - [**Cycle**](#cycle): infinite collections that repeat a finite collection.
 - [**Iterate**](#iterate): infinite collections that apply a function to an initial value repeatedly.
 - [**Repeat**](#repeat): infinite collections that repeat a single value.
@@ -147,22 +187,21 @@ Examples of function evaluating to a lazy collection include:
 
 ### Types
 
-- The type `collection` represents any collection, whether ordered or unordered, finite or infinite.
-- The type `ordered_collection` applies to collections that support index-based access (such as `List`, and `Tuple`).
+- The type `collection` represents any collection, whether indexed or not, finite or infinite.
+- The type `indexed_collection` applies to collections that support index-based access, such as `List`, and `Tuple`.
 
 
 
 ### Operations on Collections
 
-Operations on ordered and unordered collections:
+Operations on all collections, whether indexed or not, include:
 - [**Filter**](#filter), [**Map**](#map), and [**Reduce**](#reduce): operations that create new collections by applying a function to each element of an existing collection.
 - [**Length**](#length), [**IsEmpty**](#isempty): check the number of elements of a collection.
-- [**Filter**](#filter), [**Map**](#map), [**Reduce**](#reduce): apply a function to each element of a collection.
 - [**Join**](#join), [**Zip**](#zip): combine multiple collections into one.
 - [**Tally**](#tally): count the number of occurrences of each element in a collection.
 
 
-Operations on ordered collections:
+Operations on indexed collections:
 - [**At**](#at), [**First**](#first), [**Second**](#second), [**Last**](#last): access a specific element of a collection.
 - [**Take**](#take), [**Drop**](#drop), [**Most**](#most), [**Rest**](#rest): access a subset of a collection.
 - [**IndexOf**](#indexof): find the index of an element in a collection.
@@ -216,7 +255,7 @@ When the `Nothing` symbol is used in a context where an element is expected, it 
 
 <Signature name="List" returns="list">..._elements_:any</Signature>
 
-A `List` is an **ordered** collection of elements. An element in
+A `List` is an **indexed** collection of elements. An element in
 a list may be repeated.
 
 <Latex value="\lbrack 42, 3.14, x, y \rbrack"/>
@@ -292,7 +331,7 @@ See also the **Linear Algebra** section for operations on vectors, matrices and 
 
 <Signature name="Set" returns="set">..._elements_:any</Signature>
 
-An **unordered** collection of unique elements.
+A **non-indexed** collection of unique elements.
 
 <Latex value="\lbrace 12, 15, 17 \rbrace"/>
 
@@ -330,11 +369,11 @@ The elements in a set are counted in constant time.
 
 <FunctionDefinition name="Range">
 
-<Signature name="Range" returns="ordered_collection<integer>">_upper_:integer</Signature>
+<Signature name="Range" returns="indexed_collection<integer>">_upper_:integer</Signature>
 
-<Signature name="Range" returns="ordered_collection<integer>">_lower_:integer, _upper_:integer</Signature>
+<Signature name="Range" returns="indexed_collection<integer>">_lower_:integer, _upper_:integer</Signature>
 
-<Signature name="Range" returns="ordered_collection<integer>">_lower_:integer, _upper_:integer, _step_:integer</Signature>
+<Signature name="Range" returns="indexed_collection<integer>">_lower_:integer, _upper_:integer, _step_:integer</Signature>
 
 A sequence of numbers, starting with `lower`, ending with `upper`, and
 incrementing by `step`.
@@ -374,11 +413,11 @@ negative.
 
 <FunctionDefinition name="Linspace">
 
-<Signature name="Linspace" returns="ordered_collection<real>">_upper_:real</Signature>
+<Signature name="Linspace" returns="indexed_collection<real>">_upper_:real</Signature>
 
-<Signature name="Linspace" returns="ordered_collection<real>">_lower_:real, _upper_:real</Signature>
+<Signature name="Linspace" returns="indexed_collection<real>">_lower_:real, _upper_:real</Signature>
 
-<Signature name="Linspace" returns="ordered_collection<real>">_lower_:real, _upper_:real, _count_:integer</Signature>
+<Signature name="Linspace" returns="indexed_collection<real>">_lower_:real, _upper_:real, _count_:integer</Signature>
 
 `Linspace` is short for "linearly spaced", from the [MATLAB function of the same
 name](https://mathworks.com/help/matlab/ref/linspace.html).
@@ -433,11 +472,11 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 
 <FunctionDefinition name="Fill">
 
-<Signature name="Fill" returns="ordered_collection">_dimensions_, _value_:any</Signature>
+<Signature name="Fill" returns="indexed_collection">_dimensions_, _value_:any</Signature>
 
-<Signature name="Fill" returns="ordered_collection">_dimensions_, _f_:function</Signature>
+<Signature name="Fill" returns="indexed_collection">_dimensions_, _f_:function</Signature>
 
-Create an ordered collection of the specified dimensions.
+Create an indexed collection of the specified dimensions.
 
 If a `value` is provided, the elements of the collection are all set to that value.
 
@@ -479,11 +518,11 @@ compute the value of the element.
 
 <FunctionDefinition name="Repeat">
 
-<Signature name="Repeat" returns="ordered_collection">_value_: any</Signature>
+<Signature name="Repeat" returns="indexed_collection">_value_: any</Signature>
 
 An infinite collection of the same element.
 
-<Signature name="Repeat" returns="ordered_collection">_value_: any, _count_: integer?</Signature>
+<Signature name="Repeat" returns="indexed_collection">_value_: any, _count_: integer?</Signature>
 
 A collection of the same element repeated `count` times.
 
@@ -505,7 +544,7 @@ A collection of the same element repeated `count` times.
 
 <FunctionDefinition name="Cycle">
 
-<Signature name="Cycle" returns="ordered_collection">_seed_:collection</Signature>
+<Signature name="Cycle" returns="indexed_collection">_seed_:collection</Signature>
 
 A collection that repeats the elements of the `seed` collection. The `seed`
 collection must be finite.
@@ -533,9 +572,9 @@ Use `Take` to get a finite number of elements.
 
 <FunctionDefinition name="Iterate">
 
-<Signature name="Iterate" returns="ordered_collection">_f_:function</Signature>
+<Signature name="Iterate" returns="indexed_collection">_f_:function</Signature>
 
-<Signature name="Iterate"  returns="ordered_collection">_f_:function, _initial_:any</Signature>
+<Signature name="Iterate"  returns="indexed_collection">_f_:function, _initial_:any</Signature>
 
 An infinite collection of the results of applying `f` to the initial
 value.
@@ -559,7 +598,7 @@ Use `Take` to get a finite number of elements.
 
 ## Accessing Elements of Collections
 
-Elements of ordered collections can be accessed using their index.
+Elements of indexed collections can be accessed using their index.
 
 Indexes start at `1` for the first element. Negative indexes access elements from the end of the collection, with `-1` being the last element.
 
@@ -570,7 +609,7 @@ Indexes start at `1` for the first element. Negative indexes access elements fro
 
 <FunctionDefinition name="At">
 
-<Signature name="At">_xs_: ordered_collection, _index_: integer</Signature>
+<Signature name="At">_xs_: indexed_collection, _index_: integer</Signature>
 
 
 Returns the element at the specified index.
@@ -583,7 +622,7 @@ Returns the element at the specified index.
 // ➔ 10
 ```
 
-<Signature name="At">_xs_: ordered_collection, ..._indexes_: integer</Signature>
+<Signature name="At">_xs_: indexed_collection, ..._indexes_: integer</Signature>
 
 If the collection is nested, the indexes are applied in order.
 
@@ -600,7 +639,7 @@ If the collection is nested, the indexes are applied in order.
 
 <FunctionDefinition name="First">
 
-<Signature name="First">_xs_: ordered_collection</Signature>
+<Signature name="First">_xs_: indexed_collection</Signature>
 
 Return the first element of the collection.
 
@@ -622,7 +661,7 @@ It's equivalent to `["At", xs, 1]`.
 
 <FunctionDefinition name="Second">
 
-<Signature name="Second">_xs_: ordered_collection</Signature>
+<Signature name="Second">_xs_: indexed_collection</Signature>
 
 Return the second element of the collection.
 
@@ -643,7 +682,7 @@ It's equivalent to `["At", xs, 2]`.
 
 <FunctionDefinition name="Last">
 
-<Signature name="Last">_xs_: ordered_collection</Signature>
+<Signature name="Last">_xs_: indexed_collection</Signature>
 
 Return the last element of the collection.
 
@@ -662,7 +701,7 @@ It's equivalent to `["At", xs, -1]`.
 
 <FunctionDefinition name="Most">
 
-<Signature name="Most" returns="ordered_collection">_xs_: ordered_collection</Signature>
+<Signature name="Most" returns="indexed_collection">_xs_: indexed_collection</Signature>
 
 Return everything but the last element of the collection.
 
@@ -671,7 +710,7 @@ Return everything but the last element of the collection.
 // ➔ ["List", 5, 2, 10]
 ```
 
-It's equivalent to `["Drop", xs, -1]`.
+It's equivalent to `["Reverse", ["Drop", ["Reverse", xs], 1]]`.
 
 
 </FunctionDefinition>
@@ -682,7 +721,7 @@ It's equivalent to `["Drop", xs, -1]`.
 
 <FunctionDefinition name="Rest">
 
-<Signature name="Rest" returns="ordered_collection">_xs_: ordered_collection</Signature>
+<Signature name="Rest" returns="indexed_collection">_xs_: indexed_collection</Signature>
 
 Return everything but the first element of the collection.
 
@@ -703,9 +742,11 @@ It's equivalent to `["Drop", xs, 1]`.
 
 <FunctionDefinition name="Take">
 
-<Signature name="Take" returns="ordered_collection">_xs_: ordered_collection, _n_: integer</Signature>
+<Signature name="Take" returns="indexed_collection">_xs_: indexed_collection, _n_: integer</Signature>
 
-Return a list of the first `n` elements of `xs`. The collection `xs` must be ordered.
+<div className="tags"><span className="tag">lazy</span></div>
+
+Return a list of the first `n` elements of `xs`. The collection `xs` must be indexed.
 
 If `n` is negative, it returns the last `n` elements.
 
@@ -755,7 +796,8 @@ See [**Take**](#take) for a function that returns the first `n` elements.
 
 <FunctionDefinition name="Reverse">
 
-<Signature name="Reverse">_xs_: ordered_collection</Signature>
+<Signature name="Reverse">_xs_: indexed_collection</Signature>
+<div className="tags"><span className="tag">lazy</span></div>
 
 Return the collection in reverse order.
 
@@ -774,15 +816,15 @@ It's equivalent to `["Extract", xs, ["Tuple", -1, 1]]`.
 
 <FunctionDefinition name="Extract">
 
-<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, _index_:integer</Signature>
+<Signature name="Extract" returns="indexed_collection">_xs_: indexed_collection, _index_:integer</Signature>
 
-<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, ..._indexes_:integer</Signature>
+<Signature name="Extract" returns="indexed_collection">_xs_: indexed_collection, ..._indexes_:integer</Signature>
 
-<Signature name="Extract" returns="ordered_collection">_xs_: ordered_collection, _range_:tuple&lt;integer, integer&gt;</Signature>
+<Signature name="Extract" returns="indexed_collection">_xs_: indexed_collection, _range_:tuple&lt;integer, integer&gt;</Signature>
 
 Returns a list of the elements at the specified indexes.
 
-`Extract` always return an ordered collection, even if the result is a single element. If no
+`Extract` always return an indexed collection, even if the result is a single element. If no
 elements match, an empty collection is returned.
 
 ```json example
@@ -838,9 +880,9 @@ An index can be repeated to extract the same element multiple times.
 
 <FunctionDefinition name="Exclude">
 
-<Signature name="Exclude" returns="ordered_collection">_xs_:ordered_collection,, _index_:integer</Signature>
+<Signature name="Exclude" returns="indexed_collection">_xs_:indexed_collection,, _index_:integer</Signature>
 
-<Signature name="Exclude" returns="ordered_collection">_xs_:ordered_collection, _indexes_:tuple&lt;integer&gt;</Signature>
+<Signature name="Exclude" returns="indexed_collection">_xs_:indexed_collection, _indexes_:tuple&lt;integer&gt;</Signature>
 
 `Exclude` is the opposite of `Extract`. It returns a list of the elements that
 are not at the specified indexes.
@@ -873,7 +915,7 @@ once.
 
 <FunctionDefinition name="RotateLeft">
 
-<Signature name="RotateLeft" returns="ordered_collection">_xs_: ordered_collection, _count_: integer</Signature>
+<Signature name="RotateLeft" returns="indexed_collection">_xs_: indexed_collection, _count_: integer</Signature>
 
 Returns a collection where the elements are rotated to the left by the specified
 count.
@@ -891,7 +933,7 @@ count.
 
 <FunctionDefinition name="RotateRight">
 
-<Signature name="RotateRight" returns="ordered_collection">_xs_: ordered_collection, _count_: integer</Signature>
+<Signature name="RotateRight" returns="indexed_collection">_xs_: indexed_collection, _count_: integer</Signature>
 
 Returns a collection where the elements are rotated to the right by the
 specified count.
@@ -910,7 +952,7 @@ specified count.
 
 <FunctionDefinition name="Shuffle">
 
-<Signature name="Shuffle" returns="ordered_collection">_xs_: ordered_collection</Signature>
+<Signature name="Shuffle" returns="indexed_collection">_xs_: indexed_collection</Signature>
 
 Return the collection in random order.
 
@@ -927,9 +969,9 @@ Return the collection in random order.
 
 <FunctionDefinition name="Sort">
 
-<Signature name="Sort" returns="ordered_collection">_xs_: collection</Signature>
+<Signature name="Sort" returns="indexed_collection">_xs_: collection</Signature>
 
-<Signature name="Sort" returns="ordered_collection">_xs_: collection, _order-function_: function</Signature>
+<Signature name="Sort" returns="indexed_collection">_xs_: collection, _order-function_: function</Signature>
 
 Return the collection in sorted order.
 
@@ -947,9 +989,9 @@ Return the collection in sorted order.
 
 <FunctionDefinition name="Ordering">
 
-<Signature name="Ordering" returns="ordered_collection">_collection_</Signature>
+<Signature name="Ordering" returns="indexed_collection">_collection_</Signature>
 
-<Signature name="Ordering" returns="ordered_collection">_collection_, _order-function_</Signature>
+<Signature name="Ordering" returns="indexed_collection">_collection_, _order-function_</Signature>
 
 Return the indexes of the collection in sorted order.
 
@@ -1044,7 +1086,7 @@ Returns `True` if the collection contains the given value, `False` otherwise. Th
 </FunctionDefinition>
 
 <FunctionDefinition name="IndexWhere">
-<Signature name="IndexWhere" returns="number">_xs_: ordered_collection, _predicate_:function</Signature>
+<Signature name="IndexWhere" returns="number">_xs_: indexed_collection, _predicate_:function</Signature>
 
 Returns the 1-based index of the first element in the collection that satisfies the predicate, or 0 if not found.
 
@@ -1055,7 +1097,7 @@ Returns the 1-based index of the first element in the collection that satisfies 
 </FunctionDefinition>
 
 <FunctionDefinition name="Find">
-<Signature name="Find">_xs_: ordered_collection, _predicate_:function</Signature>
+<Signature name="Find">_xs_: indexed_collection, _predicate_:function</Signature>
 
 Returns the first element in the collection that satisfies the predicate, or `Nothing` if none found.
 
@@ -1068,7 +1110,7 @@ Returns the first element in the collection that satisfies the predicate, or `No
 </FunctionDefinition>
 
 <FunctionDefinition name="CountIf">
-<Signature name="CountIf" returns="number">_xs_: ordered_collection, _predicate_:function</Signature>
+<Signature name="CountIf" returns="number">_xs_: indexed_collection, _predicate_:function</Signature>
 
 Returns the number of elements in the collection that satisfy the predicate.
 
@@ -1166,7 +1208,7 @@ Returns a collection where _f_ is applied to each element of _xs_.
 <FunctionDefinition name="Reduce">
 
 
-<Signature name="Reduce" returns="value">_xs_:ordered_collection, _fn_:function, _initial_:value?</Signature>
+<Signature name="Reduce" returns="value">_xs_:indexed_collection, _fn_:function, _initial_:value?</Signature>
 
 Returns a value by applying the reducing function _fn_ to each element
 of the collection.
@@ -1235,7 +1277,7 @@ Evaluate to a tuple of two lists:
 
 <FunctionDefinition name="Zip">
 
-<Signature name="Zip" return="ordered_collection">..._xss_: ordered_collection</Signature>
+<Signature name="Zip" return="indexed_collection">..._xss_: indexed_collection</Signature>
 
 Returns a collection of tuples where the first element of each tuple is the
 first element of the first collection, the second element of each tuple is the
