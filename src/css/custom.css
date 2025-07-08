@@ -609,3 +609,27 @@ html, body {
   min-height: 100vh !important;
 }
 
+
+
+div.tags {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: right;
+  gap: 0.5em;
+  width: 100%;
+  margin-bottom: .5em;
+}
+
+span.tag {
+  border: 1px solid var(--blue-200);
+  background: var(--blue-100);
+  border-radius: 100px;
+  padding-left: 1em;
+  padding-right: 1em;
+  font-weight: 600;
+  text-transform:uppercase;
+  font-size: 0.8em;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
