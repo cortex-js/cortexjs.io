@@ -7,6 +7,12 @@ body {
   background-color: var(--neutral-900);
 }
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
  .header {
   padding: 4rem 0;
   text-align: center;
@@ -71,7 +77,7 @@ body {
   align-items: stretch;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
+  text-align: center;
 }
 
 
@@ -103,7 +109,9 @@ body {
   /* Transparent border to ensure spacing for the glow */
   border: 3px solid transparent;
   background-clip: padding-box;
+  padding-bottom: 60px; /* Ensure space for the button */
 }
+
 
 .pod::before {
   content: "";
@@ -174,17 +182,31 @@ body {
 
 .pod button {
   appearance: none;
+  padding: 8px 16px 8px 16px;
+  border-radius: 36px;
   border: none;
   background: var(--primary-color);
   color: white;
-  padding: 8px 16px 8px 16px;
-  border-radius: 36px;
+
   font-weight: 600;
-  margin-bottom: 1rem;
+  font-size: 1rem;
 }
 
+.pod div:has(button) {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+}
+
+
+
+
 .pod button:hover {
-  background: var(--primary-color-dark);
+  background: var(--primary-color-light);
+  color: var(--primary-color);
   transition: background-color 0.3s ease-in-out;
 }
 

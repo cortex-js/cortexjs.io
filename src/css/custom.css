@@ -611,7 +611,7 @@ html, body {
 
 
 
-div.tags {
+.markdown div.tags {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -621,7 +621,7 @@ div.tags {
   margin-bottom: .5em;
 }
 
-span.tag {
+.markdown div.tags span.tag {
   border: 1px solid var(--blue-200);
   background: var(--blue-100);
   border-radius: 100px;

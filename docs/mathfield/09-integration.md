@@ -11,7 +11,7 @@ In this section we'll discuss other options for adding a mathfield to a web page
 ## Using JavaScript Modules
 
 In addition to `MathfieldElement`, the Mathfield library provide some functions
-such as `renderMathInDocument()`.
+such as [`renderMathInDocument()`](/api/#rendermathindocument).
 
 **To access those functions**, import them from the MathLive module.
 
@@ -179,7 +179,7 @@ In the example above, if the MathLive library is in a `/js/` directory and the
 MathLive fonts are in a `/assets/mathlive-fonts/` directory, then the relative
 path from the JavaScript directory to the fonts directory is `../assets/mathlive-fonts`.
 
-The `MathfieldElement.soundsDirectory` property can similarly be set to point
+The [`MathfieldElement.soundsDirectory`](/mathfield/api/#mathfieldelementsoundsdirectory) property can similarly be set to point
 to the sound file assets.
 
 ## Integrating with a Bundler or an Asset Pipeline

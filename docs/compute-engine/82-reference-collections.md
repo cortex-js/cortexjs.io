@@ -53,12 +53,15 @@ In addition, indexed collections support:
 
 
 
-### Indexed and Non-indexed Collections
+### Indexed Collections and Non-indexed Collections
 
 Collections fall into two broad categories:
 - **Indexed collections**, such as `List` and `Tuple`
+
   → Elements can be accessed by an **index**, an integer that indicates the position of the element in the collection.
+
 - **Non-indexed collections**, such as `Set` and `Record`
+
   → Elements cannot be accessed by index. They can be enumerated or looked up by key.
 
 
@@ -90,7 +93,7 @@ Collections may be:
 
 Compute Engine supports **lazy evaluation** to make working with infinite collections possible.
 
-### Lazy and Eager Collections
+### Lazy Collections and Eager Collections
 
 Collections can be:
 - **Eager**: elements are fully evaluated when the collection is created.
@@ -101,10 +104,13 @@ and necessary when working with infinite collections.
 
 Some operations like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections**.
 
-**To convert a lazy collection to an eager collection** use [`ListFrom`](#listfrom) 
+Materializing a lazy collection involves evaluating all its elements and storing 
+them in memory, resulting in an **eager collection**. This is also known as 
+**realizing** the collection.
+
+**To materialize a collection** use [`ListFrom`](#listfrom) 
 or [`SetFrom`](#setfrom). These functions enumerate all elements of a finite 
-collection and produce a matching eager collection. This process is called **materialization**.
-or **realization**.
+collection and produce a matching eager collection.
 
 ```json example
 ["ListFrom", ["Range", 1, 10]]
@@ -115,9 +121,9 @@ Lazy infinite collections provide a natural way to model mathematical
 sequences, iterative processes, or cyclic patterns, with minimal memory use.
 
 Common examples include:
-- Natural numbers (`Range`)
-- Cyclic patterns (`Cycle`)
-- Iterative computations (`Iterate`)
+- Natural numbers (`["Range"]`)
+- Cyclic patterns (`["Cycle"]`)
+- Iterative computations (`["Iterate"]`)
 
 For example, let's say you want to express the first 10 prime numbers:
 
@@ -148,22 +154,34 @@ expr.print();
 
 #### Eager Collections
 
+Eager collections are fully materialized when they are created. This means that 
+all elements are computed and stored in memory, making them immediately 
+available for access. 
+
 Some of the eager collections include:
+
 - [**List**](#list): indexed collections of elements, which are also used to represent
   **vectors** and **matrices**. Elements in a list are accessed by their
   index, which starts at 1. Lists can contain duplicate elements and they can 
   contain an infinite number of elements.
   
   **Type:** `list<T>` where `T` is the type of the elements.
+
+- **Sequence**: a sequence is a list but it is handled differently in the
+  Compute Engine. It is used to splice elements into an expression where an element
+  is expected. The `Nothing` symbol is a synonym for the empty sequence.
+  
 - [**Set**](#set): non-indexed collections of unique elements. The elements in a set are
   not accessed by index, they are enumerated. A set can contain an infinite number
   of elements. 
   
   **Type:** `set<T>` where `T` is the type of the elements.
+
 - [**Tuple**](#tuple): indexed collections of elements, but with a fixed number
   of elements that have a specific type and an optional name. 
   
   **Type:** `tuple<T1, T2, ..., Tn>` where `T1`, `T2`, ..., `Tn` are the types of the elements.
+
 - [**Dictionary**](#dictionary): non-indexed collections of key-value pairs, 
     where each key is unique. 
     
@@ -1402,7 +1420,11 @@ This is equivalent to the first element of the result of `Tally`:
 
 </FunctionDefinition>
 
-## Converting Lazy Collections to Eager Collections
+## Materializing Collections
+
+Materializing a collection means converting it from a lazy representation to 
+an eager one. This involves evaluating all elements of the collection and 
+storing them in memory.
 
 <nav className="hidden">
 ### ListFrom
@@ -1417,7 +1439,8 @@ This is equivalent to the first element of the result of `Tally`:
 <Signature name="SetFrom" returns="set">_xs_: collection</Signature>
 <Signature name="TupleFrom" returns="tuple">_xs_: collection</Signature>
 
-Returns an eager list, set or tuple containing the elements of the collection `xs`.
+Returns a materialized list, set or tuple containing the elements of the 
+collection `xs`.
 
 The collection `xs` should be a finite collection.
 
@@ -1435,12 +1458,12 @@ The collection `xs` should be a finite collection.
 
 <nav className="hidden">
 ### RecordFrom
-### MapFrom
+### DictionaryFrom
 </nav>
 
 <FunctionDefinition>
 <Signature name="RecordFrom" returns="record">_xs_: collection</Signature>
-<Signature name="MapFrom" returns="map">_xs_: collection</Signature>
+<Signature name="DictionaryFrom" returns="map">_xs_: collection</Signature>
 
 Returns a record or map containing the elements of the collection `xs`.
 
@@ -1448,11 +1471,11 @@ The collection `xs` should be a finite collection of key-value pairs, each key b
 a string.
 
 ```json example
-["RecordFrom", ["List", ["Tuple", "a", 1], ["Tuple", "b", 2]]]
-// ➔ ["Record", ["Tuple", "a", 1], ["Tuple", "b", 2]]
+["RecordFrom", ["List", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]]
+// ➔ ["Record", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]
 
-["MapFrom", ["List", ["Tuple", "a", 1], ["Tuple", "b", 2]]]
-// ➔ ["Map", ["Tuple", "a", 1], ["Tuple", "b", 2]]
+["DictionaryFrom", ["List", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]]
+// ➔ ["Dictionary", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]
 ```
 
 </FunctionDefinition>
