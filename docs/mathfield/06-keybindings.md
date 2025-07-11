@@ -532,6 +532,7 @@ Read more about definining your own **keybindings** and **shortcuts**.
 <Keybinding value="/">$$\frac{}{}$$</Keybinding>
 <Keybinding value="⌃+2">$$\sqrt{}$$</Keybinding>
 <Keybinding value="⌥+V">$$\sqrt{}$$</Keybinding>
+<Keybinding value="⌥+⇧+V">$$\sqrt[n]{}$$</Keybinding>
 <Keybinding value="⌥+P">$$\pi$$</Keybinding>
 <Keybinding value="⌥+O">$$\emptyset$$</Keybinding>
 <Keybinding value="⌥+D">$$\differentialD$$</Keybinding>

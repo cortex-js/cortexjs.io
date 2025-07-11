@@ -1617,7 +1617,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.105.3';
+static version: string = '0.106.0';
 ```
 
 </MemberCard>
@@ -2505,6 +2505,7 @@ type OutputFormat =
   | "latex-expanded"
   | "latex-unstyled"
   | "latex-without-placeholders"
+  | "typst"
   | "math-json"
   | "math-ml"
   | "plain-text"
@@ -5901,8 +5902,8 @@ Note that this affects some keybindings, but not general text input.
 type StaticRenderOptions = Partial<LayoutOptions> & {
   asciiMath: {
      delimiters: {
-        display: string[];
-        inline: string[];
+        display: [string, string][];
+        inline: [string, string][];
        };
     };
   ignoreClass: string;
@@ -6266,7 +6267,7 @@ with a mode token such as `$$` or `\(`.
 
 ##### options?
 
-`Partial`\<`LayoutOptions`\>
+`Partial`\<[`LayoutOptions`](#layoutoptions)\>
 
 </MemberCard>
 
@@ -6382,6 +6383,94 @@ type Expression =
 
 <MemberCard>
 
+### LayoutOptions
+
+<MemberCard>
+
+##### LayoutOptions.backgroundColorMap()
+
+```ts
+backgroundColorMap: (name) => string | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.colorMap()
+
+```ts
+colorMap: (name) => string | undefined;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.defaultMode
+
+```ts
+defaultMode: "inline-math" | "math" | "text";
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.letterShapeStyle
+
+```ts
+letterShapeStyle: "auto" | "tex" | "iso" | "french" | "upright";
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.macros
+
+```ts
+macros: MacroDictionary;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.maxMatrixCols
+
+```ts
+maxMatrixCols: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.minFontScale
+
+```ts
+minFontScale: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### LayoutOptions.registers
+
+```ts
+registers: Registers;
+```
+
+LaTeX global registers override.
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
 ### version
 
 ```ts
@@ -6390,7 +6479,7 @@ const version: {
 };
 ```
 
-Current version: `0.105.3`
+Current version: `0.106.0`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
