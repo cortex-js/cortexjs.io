@@ -202,7 +202,6 @@ body.glyphs .if-glyphs, body:not(.glyphs) .if-not-glyphs {
 
 
 import { useEffect } from 'react';
-import { convertLatexToMarkup } from 'mathlive';
 import ErrorBoundary from '@site/src/components/ErrorBoundary';
 
 export function MathfieldDemo({children}) {
@@ -559,8 +558,13 @@ export function MathfieldDemo({children}) {
     }
 
     if (result) {
-      document.getElementById('result').innerHTML = convertLatexToMarkup('= ' + result);
-      document.getElementById('result-section').classList.add('is-visible');
+      const markup = window.MathLive?.convertLatexToMarkup?.('= ' + result);
+      if (markup) {
+        document.getElementById('result').innerHTML = markup;
+        document.getElementById('result-section').classList.add('is-visible');
+      } else {
+        document.getElementById('result-section').classList.remove('is-visible');
+      }
     } else {
       document.getElementById('result-section').classList.remove('is-visible');
     }
