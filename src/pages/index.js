@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useEffect, useState, useRef } from "react";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import Heading from "@theme/Heading";
@@ -6,11 +7,48 @@ import styles from "./index.module.css";
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
+
+  const posterImages = [
+    "/posters/folon.jpg",
+    "/posters/escher.jpg",
+    "/posters/herge.jpg",
+    "/posters/hokusai.jpg"
+  ];
+
+  const [visible, setVisible] = useState(true);
+  const [posterA, setPosterA] = useState(posterImages[0]);
+  const [posterB, setPosterB] = useState(posterImages[1]);
+
+  const indexRef = useRef(1);
+  const visibleRef = useRef(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextIndex = (indexRef.current + 1) % posterImages.length;
+      const next = posterImages[nextIndex];
+
+      if (visibleRef.current) {
+        setPosterB(next);
+      } else {
+        setPosterA(next);
+      }
+
+      setVisible(prev => {
+        visibleRef.current = !prev;
+        return !prev;
+      });
+
+      indexRef.current = nextIndex;
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.h1}><img alt="MathLive Logo" height="256" width="256" src="/img/logo.webp"></img>MathLive</h1>
-        
+        <h1 className={styles.h1}>MathLive</h1>
+        <img alt="MathLive Logo" height="384" width="384" src="/img/logo.webp"></img>
         <p className={styles.subtitle}>Scientific Computing for Everyone</p>
       </header>
 
@@ -52,6 +90,20 @@ function HomepageHeader() {
         </a>
 
       </div>
+
+      {/* <div className={styles.posterContainer}>
+        <img
+          src={posterA}
+          className={clsx(styles.poster, visible ? styles.fadeIn : styles.fadeOut)}
+          alt="Poster A"
+        />
+        <img
+          src={posterB}
+          className={clsx(styles.poster, !visible ? styles.fadeIn : styles.fadeOut)}
+          alt="Poster B"
+        />
+      </div> */}
+
     </div>
   );
 }

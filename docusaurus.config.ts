@@ -108,6 +108,96 @@ const config: Config = {
         onload: "this.media='all'",
       },
     },
+    // Preload critical fonts for better performance
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href: '/fonts/berkeley-mono/BerkeleyMono-Regular.woff2',
+        crossorigin: 'anonymous',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href: '/fonts/berkeley-mono/BerkeleyMono-Bold.woff2',
+        crossorigin: 'anonymous',
+      },
+    },
+    // Preload most critical KaTeX fonts from MathLive CDN
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href: 'https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Main-Regular.woff2',
+        crossorigin: 'anonymous',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href: 'https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Math-Italic.woff2',
+        crossorigin: 'anonymous',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href: 'https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_AMS-Regular.woff2',
+        crossorigin: 'anonymous',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'font',
+        type: 'font/woff2',
+        href: 'https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2',
+        crossorigin: 'anonymous',
+      },
+    },
+    // Preload hero images for better performance
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'image',
+        href: '/img/hand-slugs.jpg',
+        fetchpriority: 'high',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'image',
+        href: '/img/hand-gears.jpg',
+        fetchpriority: 'high',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preload',
+        as: 'image',
+        href: '/img/hand-cube2.jpg',
+        fetchpriority: 'high',
+      },
+    },
   ],
 
   clientModules: ['./modules/route-update.js'],

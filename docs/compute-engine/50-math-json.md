@@ -865,7 +865,7 @@ The MathJSON Standard Library includes definitions for:
 | [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
 | [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
 | [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
-| [Styling](/compute-engine/reference/styling/)                       | `Delimiter` `Style`...                                                 |
+| [Styling](/compute-engine/reference/styling/)                       | `Delimiter` `Annotated`...                                                 |
 | [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>

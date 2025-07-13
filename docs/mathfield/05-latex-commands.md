@@ -1618,12 +1618,12 @@ display on hover.
 
 <Latex value="\texttip{e^{i\pi}-1=0}{The most beautiful equation}"/>
 
-#### `\mathtip{expression}{hover text}`
+#### `\mathtip{expression}{hover math expression}`
 
 The first argument is a math expression to display, the second argument is the 
-a math expression to display on hover.
+math expression to display on hover.
 
-<Latex value="\mathtip{e^{i\pi}}{-1}"/>
+<Latex value="\mathtip{e^{i\pi}}{e^{i\pi}=1}"/>
 
 
 ### Others
