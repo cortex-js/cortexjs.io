@@ -297,11 +297,6 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "compute-engine/reference-styling",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
           id: "compute-engine/reference-trigonometry",
           className: "reference-icon",
         },
@@ -326,10 +321,16 @@ const sidebars = {
       label: "Additional Resources",
       items: [
         {
-          type: "link",
+          type: "doc",
+          id: "about",
           label: "About Us",
-          href: "/about",
           className: "person-icon",
+        },
+        {
+          type: "doc",
+          id: "sdk",
+          label: "SDKs",
+          className: "sdk-icon",
         },
         {
           type: "link",

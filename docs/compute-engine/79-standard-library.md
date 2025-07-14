@@ -38,8 +38,7 @@ the documentation.
 | [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
 | [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
 | [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
-| [Strings](/compute-engine/reference/strings/)                       | ...                                     |
-| [Styling](/compute-engine/reference/styling/)                       | `Delimiter` `Annotated`...                                                 |
+| [Strings and Text](/compute-engine/reference/strings/)              | `Text` `Annotated`...                                                 |
 | [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>

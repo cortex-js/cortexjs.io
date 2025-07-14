@@ -139,8 +139,8 @@ A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 ```json example
 "x"
 "Pi"
-"🍎"
-"半径"
+{"sym": "🍎"}
+{"sym": "半径"}
 {"sym": "Pi", "wikidata": "Q167"}
 ```
 
@@ -302,7 +302,8 @@ A MathJSON **string** is either:
 
 - an object literal with a `"str"` key
 - a [JSON string](https://tools.ietf.org/html/rfc7159#section-7) that starts and
-  ends with **U+0027 `'` APOSTROPHE** .
+  ends with **U+0027 `'` APOSTROPHE**.
+- a JSON string that is not an identifier shorthand or a number, that is a 
 
 MathJSON strings must be [well formed JSON strings](https://tc39.es/proposal-well-formed-stringify/), which means they must escape surrogate codepoints `U+D800` to `U+DFFF`, control characters `U+0000` to `U+001F`, and the characters **U+0022 `'` QUOTATION MARK** and **U+005C `\` REVERSE SOLIDUS** (backslash).
 
@@ -865,7 +866,7 @@ The MathJSON Standard Library includes definitions for:
 | [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
 | [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
 | [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
-| [Styling](/compute-engine/reference/styling/)                       | `Delimiter` `Annotated`...                                                 |
+| [Strings and Text](/compute-engine/reference/strings/)              | `Text` `Annotated`...                                                 |
 | [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>

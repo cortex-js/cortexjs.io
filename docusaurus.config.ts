@@ -363,7 +363,7 @@ const config: Config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: 'SDKs',
             items: [
               {
                 label: 'Mathfield',
@@ -372,6 +372,10 @@ const config: Config = {
               {
                 label: 'Compute Engine',
                 to: '/compute-engine',
+              },
+              {
+                label: 'MathJSON',
+                to: '/math-json',
               },
             ],
           },

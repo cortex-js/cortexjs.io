@@ -66,15 +66,15 @@ body {
 
 
 .subtitle {
-  font-weight: 400;
+  font-weight: 800;
   line-height: 1;
   max-width: 80%;
-  font-size: clamp(1rem, 8vw, 10rem);
+  font-size: clamp(1rem, 4vw, 5rem);
   text-wrap: balance;
   margin-inline: auto !important;
   margin-bottom: 3rem !important;
   color: var(--blue-800);
-  letter-spacing: -0.08em;
+  letter-spacing: -0.04em;
   text-transform: uppercase;
 }
 
