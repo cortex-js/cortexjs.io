@@ -139,7 +139,7 @@ A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 ```json example
 "x"
 "Pi"
-{"sym": "🍎"}
+"`🍎`"
 {"sym": "半径"}
 {"sym": "Pi", "wikidata": "Q167"}
 ```
@@ -189,9 +189,8 @@ A MathJSON **number** is either:
 
 - an object literal with a `"num"` key
 - a JSON number
-- a JSON string starting with `+`, `-` or the digits `0`-`9`. Using a string
-  is useful to represent numbers with a higher precision or greater range than
-  JSON numbers.
+- a JSON string literal. Using a string is useful to represent numbers with a 
+  higher precision or greater range than JSON numbers.
 
 ### Numbers as Object Literals
 
@@ -286,14 +285,15 @@ The numeric values below may not be represented as JSON number literals:
 ### Numbers as String Literals
 
 An alternate representation of a **number** with no extra metadata is as a
-string following the format described above.
+string matching the Regex pattern `/^[+-]?(0|[1-9][0-9]*)(\.[0-9]+)?(\([0-9]+\))?([eE][+-]?[0-9]+)?$/`.
 
 This allows for a shorthand representation of numbers with a higher precision or
 greater range than JSON numbers.
 
 ```json example
 "3.14159265358979323846264338327950288419716"
-"+Infinity"
+"-1.7976931348623157e+308"
+"5.7(317)e-2"
 ```
 
 ## Strings
@@ -303,7 +303,16 @@ A MathJSON **string** is either:
 - an object literal with a `"str"` key
 - a [JSON string](https://tools.ietf.org/html/rfc7159#section-7) that starts and
   ends with **U+0027 `'` APOSTROPHE**.
-- a JSON string that is not an identifier shorthand or a number, that is a 
+- a JSON string that is not a symbol shorthand or a number shorthand.
+
+That is:
+
+- `"Hello World"` is a string (it includes a space character which is not allowed in symbols)
+- `"HelloWorld"` is a symbol (it does not include a space character)
+- `"3.14"` is a number (it is a valid JSON number)
+- `"'3.14'"` is a string (it is wrapped with single quotes)
+- `"🍎"` is a string
+- ``"`🍎`"`` is a symbol shorthand (it is wrapped with backticks)
 
 MathJSON strings must be [well formed JSON strings](https://tc39.es/proposal-well-formed-stringify/), which means they must escape surrogate codepoints `U+D800` to `U+DFFF`, control characters `U+0000` to `U+001F`, and the characters **U+0022 `'` QUOTATION MARK** and **U+005C `\` REVERSE SOLIDUS** (backslash).
 
@@ -450,6 +459,11 @@ A MathJSON **symbol** is either:
 Symbols are JSON strings that represent the names of symbols, variables, 
 constants, wildcards and functions.
 
+For a JSON string literal to be interpreted as a symbol, it must either 
+begin and start with a `` ` `` (`U+0060` GRAVE ACCENT) or be a 
+string matching the Regex pattern `/^[a-zA-Z_][a-zA-Z0-9_]*$/`.
+
+
 Before they are used, JSON escape sequences (such as `\u` sequences, `\\`, etc.)
 are decoded.
 
@@ -457,13 +471,13 @@ The symbols are then normalized to the
 [Unicode Normalization Form C (NFC)](https://unicode.org/reports/tr15/). They
 are stored internally and compared using the Unicode NFC.
 
-For example, these four JSON strings represent the same symbol:
+For example, these four object literals represent the same symbol:
 
-- `"Å"`
-- `"A\u030a"` **U+0041 `A‌` LATIN CAPITAL LETTER** + **U+030A ` ̊` COMBINING RING
+- `{ "sym": "Å" }`
+- `{ "sym": "A\u030a" }` **U+0041 `A‌` LATIN CAPITAL LETTER** + **U+030A ` ̊` COMBINING RING
   ABOVE**
-- `"\u00c5"` **U+00C5 `Å` LATIN CAPITAL LETTER A WITH RING ABOVE** 
-- `"\u0041\u030a"` **U+0041 `A‌`  LATIN CAPITAL LETTER A** + **U+030A ` ̊` COMBINING RING
+- `{ "sym": "\u00c5" }` **U+00C5 `Å` LATIN CAPITAL LETTER A WITH RING ABOVE** 
+- `{ "sym": "\u0041\u030a" }` **U+0041 `A‌`  LATIN CAPITAL LETTER A** + **U+030A ` ̊` COMBINING RING
   ABOVE**
 
 Symbols conform to a profile of
