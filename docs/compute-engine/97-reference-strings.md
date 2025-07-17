@@ -48,6 +48,10 @@ semantic metadata that is not material to the interpretation of an expression
 such as text color and size or other typographic variations, a tooltip or a hyperlink
 data to link to a web page.
 
+While annotated expression can be applied to string, they can also
+be used to annotate mathematical expressions, such as variables, operators, or
+functions, to provide additional context or visual emphasis.
+
 For example, an annotated expression can be used to highlight a specific
 part of a mathematical expression:
 
@@ -126,7 +130,6 @@ their default string representation.
 
 ["String", 42, " is the answer"]
 // ➔ "42 is the answer"  
-
 ```
 
 </FunctionDefinition>
