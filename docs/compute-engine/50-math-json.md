@@ -122,7 +122,7 @@ mathematical notations, and as such is not a replacement for LaTeX or MathML.
 ## Structure of a MathJSON Expression
 
 A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
-**functions** and **dictionaries**.
+**functions**.
 
 
 **Number**
@@ -156,13 +156,6 @@ A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 ```json example
 ["Add", 1, "x"]
 {"fn": ["Add", {"num": "1"}, {"sym": "x"}]}
-```
-
-**Dictionary**
-
-```json example
-{"dict": {"x": 2, "y": 3}}
-["Dictionary", ["Tuple", "'x'", 2], ["Tuple", "'y'", 3]]
 ```
 
 **Numbers**, **symbols**, **strings** and **functions** are expressed either as
@@ -431,23 +424,6 @@ The expression corresponding to $ \sin^{-1}(x) $ is:
 The operator of this expression is `"Apply"` and its argument are the expressions
 `["InverseFunction", "Sin"]` and `"x"`.
 
-### Shorthands
-
-The following shorthands are allowed:
-
-- A `["Dictionary"]` expression may be represented as a string starting with
-  **U+007B `{` LEFT CURLY BRACKET** and ending with **U+007D `}` RIGHT CURLY BRACKET**. The string must be a valid JSON object literal.
-- A `["List"]` expression may be represented as a string starting with 
-  **U+005B `[` LEFT SQUARE BRACKET** and ending with
-  **U+005D `]` RIGHT SQUARE BRACKET**. The string must be a valid JSON array.
-
-```json example
-"{\"x\": 2, \"y\": 3}"
-// ➔ ["Dictionary", ["Tuple", "x", 2], ["Tuple", "y", 3]]
-
-"[1, 2, 3]"
-// ➔ ["List", 1, 2, 3]
-```
 
 ## Symbols
 
@@ -769,49 +745,66 @@ Modifiers include:
 
 ## Dictionaries
 
-MathJSON supports the concept of **dictionaries**, which are collections of 
-key-value pairs. 
-
-Dictionaries can be represented as a `["Dictionary"]` expression, with 
-its arguments being tuples of key-value pairs.
+**Dictionaries** are collections of key-value pairs. They are represented as a
+`["Dictionary", ["Tuple", key, value], ...]` expression.
 
 ```json example
 ["Dictionary", 
-  ["Tuple", "'x'", 120], 
-  ["Tuple", "'y'", 36]
+  ["Tuple", {str: "x"}, 120], 
+  ["Tuple", {str: "y"}, 36]
 ]
-```
-
-The value of the key-value tuples can be any valid MathJSON expression, including
-numbers, strings, functions, lists, or other dictionaries.
-
-For example, the following dictionary contains an expression and a list as values:
-
-```json example
-["Dictionary",
-  ["Tuple", "'expression'", ["Add", "x", 1]],
-  ["Tuple", "'list'", ["List", 1, 2, 3]]
-]
-```
-
-
-Dictionaries can also be represented as a JSON object literal with a `"dict"` key,
-which is an object with string keys and values that can be any valid MathJSON
-expression.
-
-
-```js
-{
-  "dict": {
-    "expression":  ["Add", "x", 1] ,
-    "list": ["List", 1, 2, 3] 
-  }
-}
 ```
 
 The keys of a dictionary are Unicode strings. They are compared using the
 [Unicode Normalization Form C (NFC)](https://unicode.org/reports/tr15/).
 Keys must be unique within a dictionary.
+
+The value of the key-value tuples can be any valid MathJSON expression, including
+numbers, strings and functions.
+
+For example, the following dictionary contains an expression and a list as values:
+
+```json example
+["Dictionary",
+  ["Tuple", {str: "expression"}, {fn: ["Add", "x", 1]}],
+  ["Tuple", {str: "list"}, [1, 2, 3]]
+]
+```
+
+As a shorthand, dictionaries can be represented as a JSON object literal with a
+`"dict"` property. The keys are strings and the values are interpreted as
+follow:
+
+| Value Type      | MathJSON Representation                       |
+| :------------ | :-------------------------------------------- |
+| boolean       | `{symbol: "True"}` or `{symbol: "False"}`                        |
+| string       | `{str: "value"}`                          |
+| array        | `["List", ...]`             |
+| `{sym: }` | `{sym: "name"}` |
+| `{fn: }`     | `{fn: "name", args: [...]}`             |
+
+The values are *not* interpreted as a MathJSON expression, but as a JSON value,
+which is then transformed into a MathJSON expression.
+
+```json
+{
+  "dict": {
+    "title": "My Dictionary",
+    "enabled": true,
+    "list": [1, 2, 3] 
+  }
+}
+```
+
+which is interpreted as:
+
+```json example
+["Dictionary",
+  ["Tuple", {sym: "title"}, {str: "My Dictionary"}],
+  ["Tuple", {sym: "enabled"}, {sym: "True"}],
+  ["Tuple", {sym: "list"}, ["List", 1, 2, 3]]
+]
+```
 
 
 ## Metadata

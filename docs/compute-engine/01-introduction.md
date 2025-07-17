@@ -120,7 +120,7 @@ the UMD version will make use of polyfills as necessary.
 
 ```html
 <script 
-  src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.js">
+  src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.umd.js">
 </script>
 <script>
   window.onload = function() {
@@ -137,14 +137,13 @@ Alternatively, use the **unpkg** CDN to load the library:
 <script src="//unpkg.com/@cortex-js/compute-engine"></script>
 ```
 
-The UMD version is also available in the npm package in `/compute-engine.min.js` 
+The UMD version is also available in the npm package in `/compute-engine.min.umd.js` 
 
 
 
 ### Other Versions
 
-A non-minified module which may be useful for debugging is available in
-the npm package as `/compute-engine.esm.js`.
+A non-minified module which may be useful for debugging is available as `/compute-engine.esm.js`.
 
 ## MathJSON Standard Library
 

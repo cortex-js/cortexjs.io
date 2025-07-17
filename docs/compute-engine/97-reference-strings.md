@@ -7,19 +7,38 @@ slug: /compute-engine/reference/strings/
 
 ### Strings
 
-A string is a sequence of characters such as <span style={{fontSize: "1.2rem"}}>`"Hello, 🌍!"`</span> or <span style={{fontSize: "1.2rem"}}>`"Simplify(👨‍🚀 + ⚡️) → 👨‍🎤"`.</span>
+A string is a sequence of characters such as <span style={{fontSize: "1.2rem"}}>`"Hello, 🌍!"`</span> or <span style={{fontSize: "1.2rem"}}>`"Simplify(👨‍🚀 × ⚡️) → 👨‍🎤"`.</span>
 
 In the Compute Engine, strings are composed of encoding-independent Unicode
 characters and provide access to those characters through a variety of Unicode
 representations.
 
-Strings are **not treated as collections**. This is 
-because the concept of a “character” is inherently ambiguous: a single 
-user-perceived character (a **grapheme cluster**) may consist of multiple 
-**Unicode scalars** (code points), and those scalars may in turn be represented differently 
-in various encodings. To avoid confusion and ensure consistent behavior, 
-strings must be explicitly converted to a sequence of **grapheme clusters** or 
-**Unicode scalars** when individual elements need to be accessed.
+Strings are **not handled as collections**. This is because the concept of a  
+“character” is inherently ambiguous: a single user-perceived character (a  
+**grapheme cluster**) may consist of multiple **Unicode scalars** (code  
+points), and those scalars may in turn be represented differently in various  
+encodings: UTF-8, UTF-16, or UTF-32.
+
+For example:
+
+- The grapheme `é` can be represented as one Unicode scalar (`U+00E9`) or  
+  two scalars (`U+0065` + `U+0301`, i.e. `e` + combining acute).
+- The emoji `👨‍🚀` is a grapheme cluster made of multiple scalars:  
+  `[U+1F468, U+200D, U+1F680]`.
+
+  In UTF-8, it's encoded as the byte sequence:  
+  `[240, 159, 145, 168, 226, 128, 141, 240, 159, 154, 128]`
+
+  In UTF-16, it's encoded as the code units:  
+  `[55357, 56457, 8205, 55357, 56960]`
+
+
+```live
+const s = ce.string("Hello, 🌍!");
+console.info(ce.function("Utf8", [s]).evaluate().json);
+```
+
+To avoid confusion and ensure consistent behavior, strings are **not accessed directly** as collections of characters. Instead, they must be **explicitly converted** either to a sequence of **grapheme clusters** (what users perceive as individual characters), or to a sequence of **Unicode scalars** (code points). For encoding-level operations (such as manipulating UTF-8 or UTF-16), strings must be converted to their encoded form, as **Unicode scalars are not encodings**. This distinction matters because a single grapheme cluster may be composed of multiple scalars, and each scalar may map to different byte representations depending on the encoding.
 
 
 ### Annotated Expressions
@@ -53,13 +72,16 @@ Annotated expressions are similar to attributed strings in other systems.
 ### Text Expressions
 
 A `["Text"]` expression is a sequence of strings, annotated expressions or
-other `["Text"]` expressions. It is used to represent formatted text content 
-in the Compute Engine, for example from a LaTeX expression like `\text{Hello \mathbf{world}}`.
+other `["Text"]` expressions. It is used to represent formatted text content, 
+for example from a LaTeX expression like `\text{Hello \mathbf{world}}`.
 
 What would happen if you used a string expression instead of a text expression?
 
-The argument of a `["String"]` expression get converted to their string
-representation, then joined together with no spaces.
+The arguments of a `["String"]` expression get converted to their string
+representation, then joined together with no spaces. The text representation
+of an annotated expression is the name of the expression, not its formatted
+version. For example, `["Annotated", "world", {"dict": {"color": "blue"}}]` would
+be serialized to LaTeX as `\mathrm{Annotated}(\text{world}, {color \to "blue"})`, which is not what you want.
 
 The arguments of a `["Text"]` expression remain a sequence of elements. When 
 serialized to LaTeX, the elements are serialized to appropriate LaTeX commands
@@ -70,7 +92,7 @@ to preserve their formatting and structure.
 const stringExpr = ce.box([
   "String", 
   "Hello", 
-  ["Annotated", "world", {"color": "blue"}]
+  ["Annotated", "world", {dict: {"color": "blue"}}]
 ]);
 console.info(stringExpr.latex);
 // ➔ "\text{Hello $\mathrm{Annotated}(\text{world}, {color: "blue"})$}"
@@ -78,11 +100,10 @@ console.info(stringExpr.latex);
 const textExpr = ce.box([
   "Text", 
   "Hello", 
-  ["Annotated", "world", {"color": "blue"}]
+  ["Annotated", "world", {dict: {"color": "blue"}}]
 ]);
 console.info(textExpr.latex);
 // ➔ "\text{Hello \textcolor{blue}{world}}"
-
 ```
 
 ## Functions
@@ -95,7 +116,8 @@ console.info(textExpr.latex);
 
 <Signature name="String" returns="string">any*</Signature>
 
-A string created by joining its arguments. The arguments are converted to their default string representation.
+A string created by joining its arguments. The arguments are converted to 
+their default string representation.
 
 
 ```json example
@@ -129,18 +151,17 @@ Convert the argument to a string, using the specified _format_.
 For example: 
 
 ```json example
-["StringFrom", [240, 159, 148, 159], "utf-8"]
+["StringFrom", ["List" 240, 159, 148, 159], "utf-8"]
 // ➔ "Hello"
 
-["StringFrom", [55357, 56607], "utf-16"]
+["StringFrom", ["List", 55357, 56607], "utf-16"]
 // ➔ "\u0048\u0065\u006c\u006c\u006f"
 
-["StringFrom", [128287], "unicode-scalars"]
+["StringFrom", 128287, "unicode-scalars"]
 // ➔ "🔟"
 
-["StringFrom", [127467, 127479], "unicode-scalars"]
+["StringFrom", ["List", 127467, 127479], "unicode-scalars"]
 // ➔ "🇫🇷"
-
 ```
 
 </FunctionDefinition>
@@ -158,11 +179,11 @@ Return a list of UTF-8 code points for the given _string_.
 **Note:** The values returned are UTF-8 bytes, not Unicode scalar values.
 
 ```json example
-["Utf8", "Hello"]
-// ➔ [72, 101, 108, 108, 111]  
+["Utf8", {str: "Hello"}]
+// ➔ ["List", 72, 101, 108, 108, 111]  
 
-["Utf8", "👩‍🎓"]
-// ➔ [240, 159, 145, 169, 226, 128, 141, 240, 159, 142, 147]
+["Utf8", {str: "👩‍🎓"}]
+// ➔ ["List", 240, 159, 145, 169, 226, 128, 141, 240, 159, 142, 147]
 ```
 
 </FunctionDefinition>
@@ -180,11 +201,11 @@ Return a list of utf-16 code points for the given _string_.
 **Note:** The values returned are UTF-16 code units, not Unicode scalar values.
 
 ```json example
-["Utf16", "Hello"]
-// ➔ [72, 101, 108, 108, 111]  
+["Utf16", {str: "Hello"}]
+// ➔ ["List", 72, 101, 108, 108, 111]  
 
-["Utf16", "👩‍🎓"]
-// ➔ [55357, 56489, 8205, 55356, 57235]
+["Utf16", {str: "👩‍🎓"}]
+// ➔ ["List", 55357, 56489, 8205, 55356, 57235]
 ```
 
 </FunctionDefinition>
@@ -199,19 +220,21 @@ Return a list of utf-16 code points for the given _string_.
 
 A **Unicode scalar** is any valid Unicode code point, represented as a number 
 between `U+0000` and `U+10FFFF`, excluding the surrogate range 
-(`U+D800` to `U+DFFF`). In other words, Unicode scalars correspond exactly to UTF-32 code units.
+(`U+D800` to `U+DFFF`). In other words, Unicode scalars correspond exactly to 
+UTF-32 code units.
 
 
 This function returns the sequence of Unicode scalars (code points) that make 
 up the string. Note that some characters perceived as a single visual unit 
 (grapheme clusters) may consist of multiple scalars. For example, the emoji 
-<span style={{fontSize: "1.2em"}}>👩‍🚀</span> is a single grapheme but is composed of several scalars.
+<span style={{fontSize: "1.2em"}}>👩‍🚀</span> is a single grapheme but is 
+composed of several scalars.
 
 ```json example
-["UnicodeScalars", "Hello"]
+["UnicodeScalars", {str: "Hello"}]
 // ➔ [72, 101, 108, 108, 111]  
 
-["UnicodeScalars", "👩‍🎓"]
+["UnicodeScalars", {str: "👩‍🎓"}]
 // ➔ [128105, 8205, 127891]
 ```
 

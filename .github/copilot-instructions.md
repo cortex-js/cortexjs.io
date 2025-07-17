@@ -53,6 +53,8 @@ This guide provides essential knowledge for AI coding agents to be productive in
 
 ## Style Guide
 
+Follow the STYLE_GUIDE.md for documentation style.
+
 ### Style guide for Tutorial pages
 
 Tutorial pages are also called "guides".
