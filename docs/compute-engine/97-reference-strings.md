@@ -146,21 +146,23 @@ Convert the argument to a string, using the specified _format_.
 | :--- | :--- |
 | `utf-8` | The argument is a list of UTF-8 code points |
 | `utf-16` | The argument is a list of UTF-16 code points |
-| `unicode-scalars` | The argument is a list of Unicode scalars (same as UTF-32) |
+| `unicode-scalars` | The argument is a list of Unicode scalars (same as UTF-32) or a single Unicode scalar |
+
+If no _format_ is specified, the default is `unicode-scalars`.
 
 For example: 
 
 ```json example
-["StringFrom", ["List" 240, 159, 148, 159], "utf-8"]
+["StringFrom", ["List" 240, 159, 148, 159], {str: "utf-8"}]
 // ➔ "Hello"
 
-["StringFrom", ["List", 55357, 56607], "utf-16"]
+["StringFrom", ["List", 55357, 56607], {str: "utf-16"}]
 // ➔ "\u0048\u0065\u006c\u006c\u006f"
 
-["StringFrom", 128287, "unicode-scalars"]
+["StringFrom", 128287]
 // ➔ "🔟"
 
-["StringFrom", ["List", 127467, 127479], "unicode-scalars"]
+["StringFrom", ["List", 127467, 127479]]
 // ➔ "🇫🇷"
 ```
 
@@ -186,6 +188,10 @@ Return a list of UTF-8 code points for the given _string_.
 // ➔ ["List", 240, 159, 145, 169, 226, 128, 141, 240, 159, 142, 147]
 ```
 
+**To create a string from UTF-8 code points**, use the `["StringFrom", _list_, "utf-8"]` function.
+
+**See also**: [`Utf16`](#utf16), [`UnicodeScalars`](#unicodescalars) and [`GraphemeClusters`](#graphemeclusters).
+
 </FunctionDefinition>
 
 
@@ -196,7 +202,7 @@ Return a list of UTF-8 code points for the given _string_.
 <FunctionDefinition name="Utf16">
 <Signature name="Utf16" returns="list<integer>">string</Signature>
 
-Return a list of utf-16 code points for the given _string_.
+Return a list of UTF-16 code points for the given _string_.
 
 **Note:** The values returned are UTF-16 code units, not Unicode scalar values.
 
@@ -207,6 +213,10 @@ Return a list of utf-16 code points for the given _string_.
 ["Utf16", {str: "👩‍🎓"}]
 // ➔ ["List", 55357, 56489, 8205, 55356, 57235]
 ```
+
+**To create a string from UTF-16 code units**, use the `["StringFrom", _list_, "utf-16"]` function.
+
+**See also**: [`Utf8`](#utf8), [`UnicodeScalars`](#unicodescalars) and [`GraphemeClusters`](#graphemeclusters).
 
 </FunctionDefinition>
 
@@ -238,6 +248,10 @@ composed of several scalars.
 // ➔ [128105, 8205, 127891]
 ```
 
+**To create a string from Unicode scalars**, use the `["StringFrom", _list_, "unicode-scalars"]` function.
+
+**See also**: [`Utf8`](#utf8), [`Utf16`](#utf16), and [`GraphemeClusters`](#graphemeclusters).
+
 </FunctionDefinition>
 
 
@@ -249,7 +263,7 @@ composed of several scalars.
 <FunctionDefinition name="GraphemeClusters">
 <Signature name="GraphemeClusters" returns="list<string>">string</Signature>
 
- A **grapheme cluster** is the smallest unit of text that a reader perceives 
+A **grapheme cluster** is the smallest unit of text that a reader perceives 
 as a single character. It may consist of one or more **Unicode scalars** 
 (code points). 
 
@@ -276,10 +290,8 @@ The table below illustrates the difference between grapheme clusters and Unicode
 | <span style={{fontSize: "1.3rem"}}>`é`</span> (NFD)    | <span style={{fontSize: "1.3rem"}}>`["é"]`</span>              | `[101, 769]`                         |
 | <span style={{fontSize: "1.3rem"}}>`👩‍🎓`</span>         | <span style={{fontSize: "1.3rem"}}>`["👩‍🎓"]`</span>           | `[128105, 8205, 127891]`             |
 
-In contrast, a Unicode scalar is a single code point in the Unicode standard,
- corresponding to a UTF-32 value. Grapheme clusters are built from one or more scalars.
 
-This function splits a string into grapheme clusters, not scalars.
+This function splits a string into grapheme clusters:
 
 ```json example
 ["GraphemeClusters", "Hello"]
@@ -294,6 +306,8 @@ This function splits a string into grapheme clusters, not scalars.
 
 For more details on how grapheme cluster boundaries are determined, 
 see [Unicode® Standard Annex #29](https://unicode.org/reports/tr29/).
+
+**See also**: [`Utf8`](#utf8), [`Utf16`](#utf16), and [`UnicodeScalars`](#unicodescalars).
 
 </FunctionDefinition>
 
@@ -439,7 +453,7 @@ A script level of `0` is normal size, `1` is smaller, and `2` is even smaller.
 The following keys are applicable to text content:
 - `weight` a string, one of `"normal"`, `"bold"`, `"bolder"`, `"light"`
 - `style` a string, one of `"normal"`, `"italic"`, `"oblique"`
-- `language` a string indicating the language of the expression, e.g. `"en"`, `"fr"`, `"es"` etc.
+- `language` a string indicating the language of the expression, e.g. `"en"` (English), `"fr"` (French), `"es"` (Spanish)
 
 
 
@@ -452,9 +466,7 @@ The following keys are applicable to both math expressions and text content:
 - `cssId` a string indicating the CSS id of the expression
 
 
-
-
-
+<!--
 The keys in the dictionary include:
 - `style` a string, one of `"normal"`, `"italic"`, `"oblique"`
 - `size` a number from `1` to `10` where `5` is normal size
@@ -462,57 +474,14 @@ The keys in the dictionary include:
 - `fontSize` a number indicating the font size in pixels
 - `fontWeight` a string indicating the font weight, e.g. `"normal"`, `"bold"`, `"bolder"`, `"lighter"`
 - `fontStyle` a string indicating the font style, e.g. `"normal"`, `"italic"`, `"oblique"`  
-- `textDecoration` a string indicating the text decoration, e.g. `"none"`, `"underline"`, `"line-through"`
-- `textAlign` a string indicating the text alignment, e.g. `"left"`, `"center"`, `"right"`  
-- `textTransform` a string indicating the text transformation, e.g. `"none"`, `"uppercase"`, `"lowercase"`
-- `textIndent` a number indicating the text indentation in pixels
-- `lineHeight` a number indicating the line height in pixels
-- `letterSpacing` a number indicating the letter spacing in pixels
-- `wordSpacing` a number indicating the word spacing in pixels
 - `backgroundColor` a color name or hex code for the background color
 - `border` a string indicating the border style, e.g. `"none"`, `"solid"`, `"dashed"`, `"dotted"`
 - `borderColor` a color name or hex code for the border color
 - `borderWidth` a number indicating the border width in pixels
 - `padding` a number indicating the padding in pixels
 - `margin` a number indicating the margin in pixels 
-- `textShadow` a string indicating the text shadow, e.g. `"2px 2px 2px rgba(0,0,0,0.5)"`
-- `boxShadow` a string indicating the box shadow, e.g. `"2px 2px 5px rgba(0,0,0,0.5)"`
 - `opacity` a number from `0` to `1` indicating the opacity of the expression
-- `transform` a string indicating the CSS transform, e.g. `"rotate(45deg)"`, `"scale(1.5)"`, `"translateX(10px)"`
-- `transition` a string indicating the CSS transition, e.g. `"all 0.3s ease-in-out"`
-- `cursor` a string indicating the cursor style, e.g. `"pointer"`, `"default"`, `"text"`
-- `display` a string indicating the CSS display property, e.g. `"inline"`, `"block"`, `"flex"`, `"grid"`  
-- `visibility` a string indicating the CSS visibility property, e.g. `"visible"`, `"hidden"`, `"collapse"`
-- `zIndex` a number indicating the z-index of the expression
-- `position` a string indicating the CSS position property, e.g. `"static"`, `"relative"`, `"absolute"`, `"fixed"`
-- `float` a string indicating the CSS float property, e.g. `"left"`, `"right"`, `"none"`
-- `clear` a string indicating the CSS clear property, e.g. `"left"`, `"right"`, `"both"`, `"none"`
-- `overflow` a string indicating the CSS overflow property, e.g. `"visible"`, `"hidden"`, `"scroll"`, `"auto"`
-- `overflowX` a string indicating the CSS overflow-x property, e.g. `"visible"`, `"hidden"`, `"scroll"`, `"auto"`
-- `overflowY` a string indicating the CSS overflow-y property, e.g. `"visible"`, `"hidden"`, `"scroll"`, `"auto"`
-- `whiteSpace` a string indicating the CSS white-space property, e.g. `"normal"`, `"nowrap"`, `"pre"`,
-- `textOverflow` a string indicating the CSS text-overflow property, e.g. `"ellipsis"`, `"clip"`
-- `direction` a string indicating the text direction, e.g. `"ltr"` (left-to-right) or `"rtl"` (right-to-left)
-- `lang` a string indicating the language of the expression, e.g. `"en"` (English), `"fr"` (French), `"es"` (Spanish)
-- `role` a string indicating the ARIA role of the expression, e.g. `"button"`, `"link"`, `"textbox"`
-- `aria-label` a string providing an accessible label for the expression
-- `aria-labelledby` a string providing an accessible label by referencing another element's ID
-- `aria-describedby` a string providing an accessible description by referencing another element's ID
-- `aria-hidden` a boolean indicating whether the expression is hidden from assistive technologies
-- `aria-live` a string indicating the ARIA live region, e.g. `"off"`, `"polite"`, `"assertive"`
-- `aria-atomic` a boolean indicating whether assistive technologies should treat the expression as a whole
-- `aria-relevant` a string indicating what changes in the expression are relevant to assistive technologies, e.g. `"additions"  
-- `aria-controls` a string providing the ID of another element that the expression controls
-- `aria-expanded` a boolean indicating whether the expression is expanded or collapsed
-- `aria-pressed` a boolean indicating whether the expression is pressed (for toggle buttons)
-- `aria-selected` a boolean indicating whether the expression is selected
-- `aria-checked` a boolean indicating whether the expression is checked (for checkboxes or radio buttons)
-- `aria-valuenow` a number indicating the current value of the expression (for sliders or progress bars)
-- `aria-valuetext` a string providing a text representation of the current value of the expression
-- `aria-valuemin` a number indicating the minimum value of the expression (for sliders or progress bars)
-- `aria-valuemax` a number indicating the maximum value of the expression (for sliders or progress bars)
-- `aria-keyshortcuts` a   
-
+-->
 
 The `Annotated` function is **inert** and the value of a `["Annotated", expr]` expression is `expr`.
 

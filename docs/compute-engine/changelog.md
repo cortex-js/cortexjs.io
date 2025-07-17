@@ -10,6 +10,14 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Breaking Changes
+
+- The `[Length]` function has been renamed to `[Count]`.
+- The `xsize` property of collections has been renamed to `count`.
+- The `xcontains()` method of collections has been renamed to `contains()`.
+
 ## 0.30.2 _2025-07-15_
 
 ### Breaking Changes
