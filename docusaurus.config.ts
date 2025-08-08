@@ -6,6 +6,7 @@ import loadScripts from './plugins/load-scripts';
 import remarkMath from 'remark-math';
 
 import codePlaygroundRemarkPlugin from './plugins/code-playground';
+import { getDocusaurusNavbarConfig, getDocusaurusFooterConfig } from './src/shared/utils/docusaurus-config';
 
 import type { Config } from '@docusaurus/types';
 
@@ -77,6 +78,7 @@ const config: Config = {
         // },
         theme: {
           customCss: [
+            './src/shared/styles/variables.css',
             './src/css/colors.css',
             './src/css/typography.css',
             './src/css/code-playground.css',
@@ -329,82 +331,8 @@ const config: Config = {
   
       },
   
-      navbar: {
-        title: 'MathLive',
-        logo: {
-          alt: "MathLive Logo",
-          src: "img/logo.webp",
-          width: 42,
-          height: 42,
-        },
-        items: [
-          {
-            type: 'docSidebar',
-            sidebarId: 'docSidebar',
-            position: 'left',
-            label: 'Mathfield',
-          },
-          {
-            to: '/compute-engine',
-            position: 'left',
-            label: 'Compute Engine',
-          },
-          // { to: "/mathfield", label: "Mathfield", position: "left" },
-          // { to: "/compute-engine", label: "Compute Engine", position: "left" },
-          {
-            href: 'https://github.com/cortex-js',
-            label: 'GitHub',
-            icon: 'github',
-            position: 'right',
-          },
-        ],
-      },
-      footer: {
-        style: 'dark',
-        links: [
-          {
-            title: 'SDKs',
-            items: [
-              {
-                label: 'Mathfield',
-                to: '/mathfield',
-              },
-              {
-                label: 'Compute Engine',
-                to: '/compute-engine',
-              },
-              {
-                label: 'MathJSON',
-                to: '/math-json',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              {                
-                html: '<a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
-              },
-              {                
-                html: '<a href="https://discord.gg/yhmvVeJ4Hd" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#discord"></use></svg>Discord<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
-              },
-              {                
-                html: '<a href="https://chatgpt.com/g/g-8YgEfR7ig-mathlive-gpt" target="_blank" rel="noopener noreferrer" class="footer__link-item"><svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#openai"></use></svg>MathLive GPT<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a>',
-              },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
-              {
-                label: 'About Us',
-                to: '/about',
-              },
-            ],
-          },
-        ],
-        // copyright: `Copyright MathLive.`,
-      },
+      navbar: getDocusaurusNavbarConfig(),
+      footer: getDocusaurusFooterConfig(),
       prism: {
         additionalLanguages: [
           // See https://prismjs.com/#supported-languages for a full list

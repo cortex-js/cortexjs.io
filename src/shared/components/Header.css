@@ -1,0 +1,136 @@
+/* Styles for Docusaurus integration */
+.shared-header .navbar {
+  background: var(--cortex-navbar-bg, var(--ifm-navbar-background-color));
+  border-bottom: 1px solid var(--cortex-navbar-border, var(--ifm-navbar-border-color));
+  box-shadow: var(--cortex-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.1));
+}
+
+.shared-header .navbar__brand {
+  color: var(--cortex-navbar-text, var(--ifm-navbar-link-color));
+  margin-left: var(--cortex-radius-md, 8px);
+  border-radius: 16px var(--cortex-radius-md, 8px) var(--cortex-radius-md, 8px) 16px;
+}
+
+.shared-header .navbar__title {
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -1px;
+}
+
+.shared-header .navbar__logo {
+  margin-right: 4px;
+  border-radius: 50%;
+  background: #fafafa;
+  padding: 4px;
+  box-sizing: content-box;
+}
+
+.shared-header .navbar__inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.shared-header .navbar__items:first-child {
+  flex: 1 0 auto;
+}
+
+.shared-header .navbar__items:nth-child(2) {
+  flex: 1;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  gap: 0;
+}
+
+.shared-header .navbar__items--right {
+  flex: 0 0 auto;
+  margin-right: 8px;
+}
+
+.shared-header .navbar__item {
+  color: var(--cortex-navbar-text, var(--ifm-navbar-link-color));
+}
+
+.shared-header .navbar__link {
+  color: var(--cortex-navbar-text, var(--ifm-navbar-link-color));
+  transition: background-color 0.2s;
+}
+
+.shared-header .navbar__link:hover {
+  background-color: var(--cortex-navbar-hover, var(--ifm-navbar-link-hover-color));
+}
+
+.shared-header .navbar__item.dropdown {
+  border-radius: var(--cortex-radius-md, 8px);
+}
+
+.shared-header .navbar__item.dropdown:hover {
+  background: var(--cortex-navbar-hover, var(--ifm-navbar-link-hover-color));
+  box-shadow: var(--cortex-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+}
+
+
+.shared-header .navbar__item.dropdown .navbar__link:hover {
+  background: transparent;
+  box-shadow: none;
+
+}
+
+.shared-header .navbar__item.dropdown .iconExternalLink_nPIU {
+  display: none;
+}
+
+.shared-header .dropdown__menu {
+  background: var(--cortex-navbar-bg, var(--ifm-navbar-background-color));
+  border: 1px solid var(--cortex-navbar-border, var(--ifm-navbar-border-color));
+  border-radius: var(--cortex-radius-md, 8px);
+  box-shadow: var(--cortex-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+}
+
+.shared-header .dropdown__link {
+  color: var(--cortex-navbar-text, var(--ifm-navbar-link-color));
+}
+
+.shared-header .dropdown__link:hover {
+  background-color: var(--cortex-navbar-hover, var(--ifm-navbar-link-hover-color));
+}
+
+/* Fixed positioning and glass effect for standalone header */
+.shared-header .navbar--fixed-top {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1024px, calc(100% - 2em));
+  z-index: 1000;
+  
+  /* Glass effect */
+  filter: var(--glass-filter, drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1)));
+  background: var(--glass-background, rgba(255, 255, 255, 0.6));
+  border-radius: 24px;
+  box-shadow: var(--glass-box-shadow, 0 0 2px rgb(0 0 0 / 0.1), 0 4px 30px rgba(0, 0, 0, 0.1), 0 0 10px rgb(0 0 0 / 0.1));
+  backdrop-filter: var(--glass-backdrop-filter, blur(8px) saturate(90%));
+  border: var(--glass-border, 1px solid rgba(209, 213, 219, 0.3));
+  transition: background, filter, backdrop-filter 0.5s ease-in-out;
+}
+
+/* Ensure consistent styling with Docusaurus theme */
+.navbar__brand strong {
+  font-family: var(--cortex-font-family, var(--ifm-font-family-base));
+}
+
+/* Custom dropdown behavior for standalone apps */
+.dropdown--hoverable .dropdown__menu {
+  display: block;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.dropdown--hoverable:hover .dropdown__menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}

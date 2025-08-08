@@ -1,0 +1,71 @@
+{
+  "logo": {
+    "alt": "MathLive Logo",
+    "src": "/img/logo.webp",
+    "width": 42,
+    "height": 42
+  },
+  "navbar": {
+    "title": "MathLive",
+    "items": [
+      {
+        "type": "docSidebar",
+        "sidebarId": "docSidebar",
+        "position": "left",
+        "label": "Mathfield"
+      },
+      {
+        "label": "Compute Engine",
+        "href": "/compute-engine",
+        "position": "left"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/cortex-js",
+        "position": "right",
+        "icon": "github"
+      }
+    ]
+  },
+  "footer": {
+    "sections": [
+      {
+        "title": "SDKs",
+        "items": [
+          { "label": "Mathfield", "href": "/mathfield" },
+          { "label": "Compute Engine", "href": "/compute-engine" },
+          { "label": "MathJSON", "href": "/math-json" }
+        ]
+      },
+      {
+        "title": "Community",
+        "items": [
+          {
+            "type": "github",
+            "label": "GitHub",
+            "href": "https://github.com/cortex-js",
+            "icon": "github"
+          },
+          {
+            "type": "discord",
+            "label": "Discord",
+            "href": "https://discord.gg/yhmvVeJ4Hd",
+            "icon": "discord"
+          },
+          {
+            "type": "openai",
+            "label": "MathLive GPT",
+            "href": "https://chatgpt.com/g/g-8YgEfR7ig-mathlive-gpt",
+            "icon": "openai"
+          }
+        ]
+      },
+      {
+        "title": "More",
+        "items": [
+          { "label": "About Us", "href": "/about" }
+        ]
+      }
+    ]
+  }
+}

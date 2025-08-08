@@ -46,6 +46,9 @@ html:root {
 
   --ifm-breadcrumb-border-radius: 12px;
 
+  --ifm-navbar-padding-vertical: 0;
+  --ifm-navbar-padding-horizontal: 0;
+
   /* --docusaurus-collapse-button-bg: red; */
 
 
@@ -336,8 +339,8 @@ header h1 {
   border-bottom-color: rgba(0, 0, 0, 0.2); */
   transition: background, filter, backdrop-filter 0.5s ease-in-out;
 
-  --ifm-navbar-padding-horizontal: 12px;
-  --ifm-navbar-item-padding-vertical: 10px;
+  /* --ifm-navbar-padding-horizontal: 12px;
+  --ifm-navbar-item-padding-vertical: 10px; */
 }
 
 .navbar-sidebar--show {

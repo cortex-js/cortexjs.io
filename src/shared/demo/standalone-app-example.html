@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standalone App Example - MathLive</title>
+    <link rel="stylesheet" href="../styles/variables.css">
+    <link rel="stylesheet" href="../components/Header.css">
+    <link rel="stylesheet" href="../components/Footer.css">
+</head>
+<body>
+    <!-- This shows how the standalone Header component would look -->
+    <div id="app-header"></div>
+    
+    <main style="padding: 2rem; min-height: 70vh;">
+        <h1>Example Standalone App</h1>
+        <p>This demonstrates how the shared Header and Footer components work in a standalone React application.</p>
+        
+        <h2>Navigation Features:</h2>
+        <ul>
+            <li><strong>Documentation Link:</strong> Takes users back to the main docs site</li>
+            <li><strong>Compute Engine:</strong> Direct link to CE documentation</li>
+            <li><strong>Tools Dropdown:</strong> Links to all interactive apps (editor, calculator, grapher, notebook)</li>
+            <li><strong>GitHub:</strong> External link to the repository</li>
+        </ul>
+
+        <h2>Usage in React:</h2>
+        <pre><code>import { Header, Footer } from '../shared/components';
+
+function App() {
+  return (
+    &lt;&gt;
+      &lt;Header currentApp="editor" standalone={true} /&gt;
+      &lt;main&gt;
+        {/* Your app content */}
+      &lt;/main&gt;
+      &lt;Footer /&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+    </main>
+    
+    <div id="app-footer"></div>
+
+    <!-- Example of how this would be used in React -->
+    <script type="module">
+        // This is pseudo-code showing the concept
+        const headerHTML = `
+            <header class="cortex-header">
+                <nav class="cortex-navbar">
+                    <div class="navbar-container">
+                        <a href="/" class="navbar-brand">
+                            <img src="/img/logo.webp" alt="MathLive Logo" width="42" height="42" class="navbar-logo">
+                            <span class="navbar-title">MathLive</span>
+                        </a>
+                        <div class="navbar-items">
+                            <div class="navbar-item">
+                                <a href="/" class="navbar-link">Documentation</a>
+                            </div>
+                            <div class="navbar-item">
+                                <a href="/compute-engine" class="navbar-link">Compute Engine</a>
+                            </div>
+                            <div class="navbar-item dropdown">
+                                <span class="navbar-link">Tools ▼</span>
+                                <div class="dropdown-menu">
+                                    <a href="https://editor.mathlive.io" class="dropdown-item">LaTeX Editor</a>
+                                    <a href="https://calculator.mathlive.io" class="dropdown-item">Calculator</a>
+                                    <a href="https://grapher.mathlive.io" class="dropdown-item">Grapher</a>
+                                    <a href="https://notebook.mathlive.io" class="dropdown-item">Notebook</a>
+                                </div>
+                            </div>
+                            <div class="navbar-item">
+                                <a href="https://github.com/cortex-js" class="navbar-link" target="_blank">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </header>
+        `;
+        
+        document.getElementById('app-header').innerHTML = headerHTML;
+    </script>
+</body>
+</html>

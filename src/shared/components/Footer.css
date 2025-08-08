@@ -1,0 +1,42 @@
+/* Shared footer styles - applies to both Docusaurus and standalone */
+.shared-footer .container {
+  max-width: 800px !important;
+}
+
+.shared-footer .footer {
+  background: var(--cortex-footer-bg, var(--ifm-footer-background-color));
+  color: var(--cortex-footer-text, var(--ifm-footer-color));
+}
+
+.shared-footer .footer__title {
+  color: var(--cortex-footer-text, var(--ifm-footer-title-color));
+  font-family: var(--cortex-font-family, var(--ifm-font-family-base));
+}
+
+.shared-footer .footer__link-item {
+  color: var(--cortex-footer-text-secondary, var(--ifm-footer-link-color));
+  font-family: var(--cortex-font-family, var(--ifm-font-family-base));
+  transition: color 0.2s;
+}
+
+.shared-footer .footer__link-item:hover {
+  color: var(--cortex-footer-text, var(--ifm-footer-link-hover-color));
+}
+
+.shared-footer .footer__copyright {
+  color: var(--cortex-footer-text-secondary, var(--ifm-footer-color));
+  font-family: var(--cortex-font-family, var(--ifm-font-family-base));
+}
+
+.shared-footer .iconExternalLink_nPIU {
+  opacity: 0.7;
+  margin-left: 8px;
+}
+
+.shared-footer .icon-one-rem {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 4px;
+  vertical-align: -3px;
+  fill: currentColor;
+}

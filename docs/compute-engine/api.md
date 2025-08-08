@@ -13,8 +13,6 @@ import MemberCard from '@site/src/components/MemberCard';
 
 ## Compute Engine
 
-<a id="angularunit" name="angularunit"></a>
-
 <MemberCard>
 
 ### AngularUnit
@@ -41,8 +39,6 @@ ce.angularUnit = 'deg';
 
 </MemberCard>
 
-<a id="assignvalue" name="assignvalue"></a>
-
 <MemberCard>
 
 ### AssignValue
@@ -62,8 +58,6 @@ It can be a primitive value, a boxed expression, or a function that
 takes a list of arguments and returns a boxed expression.
 
 </MemberCard>
-
-<a id="evalcontext" name="evalcontext"></a>
 
 <MemberCard>
 
@@ -110,8 +104,6 @@ debugging.
 </MemberCard>
 
 ## Boxed Expression
-
-<a id="boxedexpression" name="boxedexpression"></a>
 
 ### BoxedExpression
 
@@ -283,8 +275,6 @@ of the symbol, not its value.
 
 #### Function Expression
 
-<a id="boxedexpression_isfunctionexpression" name="boxedexpression_isfunctionexpression"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isFunctionExpression
@@ -299,8 +289,6 @@ If `true`, `expr.ops` is not `null`, and `expr.operator` is the name
 of the function.
 
 </MemberCard>
-
-<a id="boxedexpression_operator" name="boxedexpression_operator"></a>
 
 <MemberCard>
 
@@ -324,8 +312,6 @@ collapse to `"Number"`.
 
 </MemberCard>
 
-<a id="boxedexpression_ops" name="boxedexpression_ops"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.ops
@@ -343,8 +329,6 @@ Applicable to canonical and non-canonical expressions.
 :::
 
 </MemberCard>
-
-<a id="boxedexpression_nops" name="boxedexpression_nops"></a>
 
 <MemberCard>
 
@@ -365,8 +349,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_op1" name="boxedexpression_op1"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.op1
@@ -385,8 +367,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_op2" name="boxedexpression_op2"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.op2
@@ -404,8 +384,6 @@ Applicable to canonical and non-canonical expressions.
 :::
 
 </MemberCard>
-
-<a id="boxedexpression_op3" name="boxedexpression_op3"></a>
 
 <MemberCard>
 
@@ -427,8 +405,6 @@ Applicable to canonical and non-canonical expressions.
 
 #### Numeric Expression
 
-<a id="boxedexpression_isnumberliteral" name="boxedexpression_isnumberliteral"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isNumberLiteral
@@ -443,8 +419,6 @@ Return `true` if this expression is a number literal, for example
 When `true`, `expr.numericValue` is not `null`.
 
 </MemberCard>
-
-<a id="boxedexpression_numericvalue-1" name="boxedexpression_numericvalue-1"></a>
 
 <MemberCard>
 
@@ -470,8 +444,6 @@ If `expr.isNumberLiteral` is `true`, `expr.numericValue` is not `null`.
 
 </MemberCard>
 
-<a id="boxedexpression_iseven" name="boxedexpression_iseven"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isEven
@@ -484,8 +456,6 @@ If the value of this expression is not an **integer** return `undefined`.
 
 </MemberCard>
 
-<a id="boxedexpression_isodd" name="boxedexpression_isodd"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isOdd
@@ -497,8 +467,6 @@ readonly isOdd: boolean;
 If the value of this expression is not an **integer** return `undefined`.
 
 </MemberCard>
-
-<a id="boxedexpression_re-1" name="boxedexpression_re-1"></a>
 
 <MemberCard>
 
@@ -514,8 +482,6 @@ Otherwise, return `NaN` (not a number).
 
 </MemberCard>
 
-<a id="boxedexpression_im-1" name="boxedexpression_im-1"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.im
@@ -530,8 +496,6 @@ value. If the value is a real number, the imaginary part is 0.
 Otherwise, return `NaN` (not a number).
 
 </MemberCard>
-
-<a id="boxedexpression_bignumre-1" name="boxedexpression_bignumre-1"></a>
 
 <MemberCard>
 
@@ -554,8 +518,6 @@ When using this pattern, the value is returned as a bignum if available,
 otherwise as a number or `NaN` if the value is not a number.
 
 </MemberCard>
-
-<a id="boxedexpression_bignumim-1" name="boxedexpression_bignumim-1"></a>
 
 <MemberCard>
 
@@ -581,8 +543,6 @@ When using this pattern, the value is returned as a bignum if available, otherwi
 
 </MemberCard>
 
-<a id="boxedexpression_sgn-1" name="boxedexpression_sgn-1"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.sgn
@@ -605,8 +565,6 @@ Non-canonical expressions return `undefined`.
 
 </MemberCard>
 
-<a id="boxedexpression_ispositive" name="boxedexpression_ispositive"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isPositive
@@ -618,8 +576,6 @@ readonly isPositive: boolean;
 The value of this expression is > 0, same as `isGreaterEqual(0)`
 
 </MemberCard>
-
-<a id="boxedexpression_isnonnegative" name="boxedexpression_isnonnegative"></a>
 
 <MemberCard>
 
@@ -633,8 +589,6 @@ The value of this expression is >= 0, same as `isGreaterEqual(0)`
 
 </MemberCard>
 
-<a id="boxedexpression_isnegative" name="boxedexpression_isnegative"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isNegative
@@ -647,8 +601,6 @@ The value of this expression is &lt; 0, same as `isLess(0)`
 
 </MemberCard>
 
-<a id="boxedexpression_isnonpositive" name="boxedexpression_isnonpositive"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isNonPositive
@@ -660,8 +612,6 @@ readonly isNonPositive: boolean;
 The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
 
 </MemberCard>
-
-<a id="boxedexpression_isnan-1" name="boxedexpression_isnan-1"></a>
 
 <MemberCard>
 
@@ -681,8 +631,6 @@ number).
 
 </MemberCard>
 
-<a id="boxedexpression_isinfinity" name="boxedexpression_isinfinity"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isInfinity
@@ -694,8 +642,6 @@ readonly isInfinity: boolean;
 The numeric value of this expression is `±Infinity` or ComplexInfinity.
 
 </MemberCard>
-
-<a id="boxedexpression_isfinite" name="boxedexpression_isfinite"></a>
 
 <MemberCard>
 
@@ -712,8 +658,6 @@ This expression is a number, but not `±Infinity`, `ComplexInfinity` or
 
 #### Other
 
-<a id="boxedexpression_engine" name="boxedexpression_engine"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.engine
@@ -727,8 +671,6 @@ a context in which to interpret it, such as definition of symbols
 and functions.
 
 </MemberCard>
-
-<a id="boxedexpression_tolatex" name="boxedexpression_tolatex"></a>
 
 <MemberCard>
 
@@ -750,8 +692,6 @@ Will ignore any LaTeX metadata.
 
 </MemberCard>
 
-<a id="boxedexpression_latex" name="boxedexpression_latex"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.latex
@@ -771,8 +711,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_tomathjson" name="boxedexpression_tomathjson"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.toMathJson()
@@ -788,8 +726,6 @@ Serialize to a MathJSON expression with specified options
 `Readonly`\<`Partial`\<[`JsonSerializationOptions`](#jsonserializationoptions)\>\>
 
 </MemberCard>
-
-<a id="boxedexpression_json" name="boxedexpression_json"></a>
 
 <MemberCard>
 
@@ -819,8 +755,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_print-1" name="boxedexpression_print-1"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.print()
@@ -835,8 +769,6 @@ Note that lazy collections are eagerly evaluated when printed.
 
 </MemberCard>
 
-<a id="boxedexpression_verbatimlatex" name="boxedexpression_verbatimlatex"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.verbatimLatex?
@@ -850,8 +782,6 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 
 </MemberCard>
 
-<a id="boxedexpression_iscanonical" name="boxedexpression_iscanonical"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isCanonical
@@ -859,8 +789,6 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 If `true`, this expression is in a canonical form.
 
 </MemberCard>
-
-<a id="boxedexpression_isstructural" name="boxedexpression_isstructural"></a>
 
 <MemberCard>
 
@@ -873,8 +801,6 @@ an expression. For example, a rational number is represented as a
 function expression instead of a `BoxedExpression` object.
 
 </MemberCard>
-
-<a id="boxedexpression_canonical" name="boxedexpression_canonical"></a>
 
 <MemberCard>
 
@@ -910,8 +836,6 @@ This means that, likewise for partially canonical expressions, the
 
 </MemberCard>
 
-<a id="boxedexpression_structural" name="boxedexpression_structural"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.structural
@@ -928,8 +852,6 @@ If there is a structural representation of the expression, return it,
 otherwise return `this`.
 
 </MemberCard>
-
-<a id="boxedexpression_isvalid" name="boxedexpression_isvalid"></a>
 
 <MemberCard>
 
@@ -950,8 +872,6 @@ mismatch, or missing or unexpected arguments.
 :::
 
 </MemberCard>
-
-<a id="boxedexpression_ispure" name="boxedexpression_ispure"></a>
 
 <MemberCard>
 
@@ -985,8 +905,6 @@ Applicable to canonical expressions only
 
 </MemberCard>
 
-<a id="boxedexpression_isconstant" name="boxedexpression_isconstant"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isConstant
@@ -1010,8 +928,6 @@ with constant arguments are all *constant*, i.e.:
 
 </MemberCard>
 
-<a id="boxedexpression_errors" name="boxedexpression_errors"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.errors
@@ -1030,8 +946,6 @@ Applicable to canonical and non-canonical expressions.
 :::
 
 </MemberCard>
-
-<a id="boxedexpression_getsubexpressions" name="boxedexpression_getsubexpressions"></a>
 
 <MemberCard>
 
@@ -1061,8 +975,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_subexpressions" name="boxedexpression_subexpressions"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.subexpressions
@@ -1087,8 +999,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_symbols" name="boxedexpression_symbols"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.symbols
@@ -1111,8 +1021,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_unknowns" name="boxedexpression_unknowns"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.unknowns
@@ -1125,8 +1033,6 @@ All the symbols used in the expression that do not have a value
 associated with them, i.e. they are declared but not defined.
 
 </MemberCard>
-
-<a id="boxedexpression_tonumericvalue" name="boxedexpression_tonumericvalue"></a>
 
 <MemberCard>
 
@@ -1151,8 +1057,6 @@ Attempts to make `rest` a positive value (i.e. pulls out negative sign).
 
 </MemberCard>
 
-<a id="boxedexpression_neg-2" name="boxedexpression_neg-2"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.neg()
@@ -1164,8 +1068,6 @@ neg(): BoxedExpression
 Negate (additive inverse)
 
 </MemberCard>
-
-<a id="boxedexpression_inv-1" name="boxedexpression_inv-1"></a>
 
 <MemberCard>
 
@@ -1179,8 +1081,6 @@ Inverse (multiplicative inverse)
 
 </MemberCard>
 
-<a id="boxedexpression_abs-1" name="boxedexpression_abs-1"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.abs()
@@ -1192,8 +1092,6 @@ abs(): BoxedExpression
 Absolute value
 
 </MemberCard>
-
-<a id="boxedexpression_add-3" name="boxedexpression_add-3"></a>
 
 <MemberCard>
 
@@ -1211,8 +1109,6 @@ Addition
 
 </MemberCard>
 
-<a id="boxedexpression_sub-2" name="boxedexpression_sub-2"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.sub()
@@ -1229,8 +1125,6 @@ Subtraction
 
 </MemberCard>
 
-<a id="boxedexpression_mul-2" name="boxedexpression_mul-2"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.mul()
@@ -1243,11 +1137,9 @@ Multiplication
 
 ####### rhs
 
-`number` | [`NumericValue`](#numericvalue) | [`BoxedExpression`](#boxedexpression)
+`number` | [`NumericValue`](#numericvalue-1) | [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="boxedexpression_div-2" name="boxedexpression_div-2"></a>
 
 <MemberCard>
 
@@ -1265,8 +1157,6 @@ Division
 
 </MemberCard>
 
-<a id="boxedexpression_pow-2" name="boxedexpression_pow-2"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.pow()
@@ -1282,8 +1172,6 @@ Power
 `number` | [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="boxedexpression_root-1" name="boxedexpression_root-1"></a>
 
 <MemberCard>
 
@@ -1301,8 +1189,6 @@ Exponentiation
 
 </MemberCard>
 
-<a id="boxedexpression_sqrt-1" name="boxedexpression_sqrt-1"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.sqrt()
@@ -1314,8 +1200,6 @@ sqrt(): BoxedExpression
 Square root
 
 </MemberCard>
-
-<a id="boxedexpression_ln-1" name="boxedexpression_ln-1"></a>
 
 <MemberCard>
 
@@ -1333,8 +1217,6 @@ Logarithm (natural by default)
 
 </MemberCard>
 
-<a id="boxedexpression_numerator-1" name="boxedexpression_numerator-1"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.numerator
@@ -1342,8 +1224,6 @@ Logarithm (natural by default)
 Return this expression expressed as a numerator.
 
 </MemberCard>
-
-<a id="boxedexpression_denominator-1" name="boxedexpression_denominator-1"></a>
 
 <MemberCard>
 
@@ -1353,8 +1233,6 @@ Return this expression expressed as a denominator.
 
 </MemberCard>
 
-<a id="boxedexpression_numeratordenominator" name="boxedexpression_numeratordenominator"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.numeratorDenominator
@@ -1362,8 +1240,6 @@ Return this expression expressed as a denominator.
 Return this expression expressed as a numerator and denominator.
 
 </MemberCard>
-
-<a id="boxedexpression_isscoped" name="boxedexpression_isscoped"></a>
 
 <MemberCard>
 
@@ -1379,8 +1255,6 @@ function expression.
 
 </MemberCard>
 
-<a id="boxedexpression_localscope" name="boxedexpression_localscope"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.localScope
@@ -1388,8 +1262,6 @@ function expression.
 If this expression has a local scope, return it.
 
 </MemberCard>
-
-<a id="boxedexpression_subs" name="boxedexpression_subs"></a>
 
 <MemberCard>
 
@@ -1416,17 +1288,15 @@ Applicable to canonical and non-canonical expressions.
 
 ####### sub
 
-[`Substitution`](#substitutiont)\<[`SemiBoxedExpression`](#semiboxedexpression)\>
+[`Substitution`](#substitution-1)
 
 ####### options?
 
-####### canonical
+####### canonical?
 
 [`CanonicalOptions`](#canonicaloptions)
 
 </MemberCard>
-
-<a id="boxedexpression_map" name="boxedexpression_map"></a>
 
 <MemberCard>
 
@@ -1462,13 +1332,11 @@ Applicable to canonical and non-canonical expressions.
 
 [`CanonicalOptions`](#canonicaloptions)
 
-####### recursive
+####### recursive?
 
 `boolean`
 
 </MemberCard>
-
-<a id="boxedexpression_replace" name="boxedexpression_replace"></a>
 
 <MemberCard>
 
@@ -1504,8 +1372,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_has" name="boxedexpression_has"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.has()
@@ -1525,8 +1391,6 @@ Applicable to canonical and non-canonical expressions.
 `string` | `string`[]
 
 </MemberCard>
-
-<a id="boxedexpression_match" name="boxedexpression_match"></a>
 
 <MemberCard>
 
@@ -1562,8 +1426,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_wikidata" name="boxedexpression_wikidata"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.wikidata
@@ -1577,8 +1439,6 @@ Wikidata identifier.
 If not a canonical expression, return `undefined`.
 
 </MemberCard>
-
-<a id="boxedexpression_description" name="boxedexpression_description"></a>
 
 <MemberCard>
 
@@ -1596,8 +1456,6 @@ If not a canonical expression, return `undefined`.
 
 </MemberCard>
 
-<a id="boxedexpression_url" name="boxedexpression_url"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.url
@@ -1612,8 +1470,6 @@ An optional URL pointing to more information about the symbol or
 If not a canonical expression, return `undefined`.
 
 </MemberCard>
-
-<a id="boxedexpression_complexity" name="boxedexpression_complexity"></a>
 
 <MemberCard>
 
@@ -1630,8 +1486,6 @@ If not a canonical expression, return `undefined`.
 
 </MemberCard>
 
-<a id="boxedexpression_basedefinition" name="boxedexpression_basedefinition"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.baseDefinition
@@ -1647,8 +1501,6 @@ definition.
 If not a canonical expression, return `undefined`.
 
 </MemberCard>
-
-<a id="boxedexpression_operatordefinition" name="boxedexpression_operatordefinition"></a>
 
 <MemberCard>
 
@@ -1667,8 +1519,6 @@ its value is `undefined`.
 
 </MemberCard>
 
-<a id="boxedexpression_valuedefinition" name="boxedexpression_valuedefinition"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.valueDefinition
@@ -1683,8 +1533,6 @@ not an operator.
 If not a canonical expression, or not a value, its value is `undefined`.
 
 </MemberCard>
-
-<a id="boxedexpression_simplify" name="boxedexpression_simplify"></a>
 
 <MemberCard>
 
@@ -1718,8 +1566,6 @@ To manipulate symbolically non-canonical expressions, use `expr.replace()`.
 
 </MemberCard>
 
-<a id="boxedexpression_expand" name="boxedexpression_expand"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.expand()
@@ -1732,8 +1578,6 @@ Expand the expression: distribute multiplications over additions,
 and expand powers.
 
 </MemberCard>
-
-<a id="boxedexpression_evaluate" name="boxedexpression_evaluate"></a>
 
 <MemberCard>
 
@@ -1766,8 +1610,6 @@ The result is in canonical form.
 
 </MemberCard>
 
-<a id="boxedexpression_evaluateasync" name="boxedexpression_evaluateasync"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.evaluateAsync()
@@ -1786,8 +1628,6 @@ The `options` argument can include a `signal` property, which is an
 `Partial`\<[`EvaluateOptions`](#evaluateoptions)\>
 
 </MemberCard>
-
-<a id="boxedexpression_n-1" name="boxedexpression_n-1"></a>
 
 <MemberCard>
 
@@ -1813,8 +1653,6 @@ If the function is not numeric, the result of `this.N()` is the same as
 The result is in canonical form.
 
 </MemberCard>
-
-<a id="boxedexpression_compile" name="boxedexpression_compile"></a>
 
 <MemberCard>
 
@@ -1856,33 +1694,31 @@ function will throw an error if it cannot be compiled.
 
 ####### options?
 
-####### to
+####### to?
 
-`"javascript"`
+`"javascript"` \| `"wgsl"` \| `"python"` \| `"webassembly"`
 
-####### functions
+####### functions?
 
-`Record`\<`string`, `string` \| (...`any`) => `any`\>
+`Record`\<[`MathJsonSymbol`](#mathjsonsymbol), [`JSSource`](#jssource) \| (...`any`) => `any`\>
 
-####### vars
+####### vars?
 
-`Record`\<`string`, [`CompiledType`](#compiledtype)\>
+`Record`\<[`MathJsonSymbol`](#mathjsonsymbol), [`JSSource`](#jssource)\>
 
-####### imports
+####### imports?
 
 (...`any`) => `any`[]
 
-####### preamble
+####### preamble?
 
 `string`
 
-####### fallback
+####### fallback?
 
 `boolean`
 
 </MemberCard>
-
-<a id="boxedexpression_solve" name="boxedexpression_solve"></a>
 
 <MemberCard>
 
@@ -1902,11 +1738,9 @@ console.log(expr.solve("x"));
 
 ####### vars?
 
-`string` | `Iterable`\<`string`\> | [`BoxedExpression`](#boxedexpression) | `Iterable`\<[`BoxedExpression`](#boxedexpression)\>
+`string` | `Iterable`\<`string`, `any`, `any`\> | [`BoxedExpression`](#boxedexpression) | `Iterable`\<[`BoxedExpression`](#boxedexpression), `any`, `any`\>
 
 </MemberCard>
-
-<a id="boxedexpression_value" name="boxedexpression_value"></a>
 
 <MemberCard>
 
@@ -1967,8 +1801,6 @@ about it in the current scope.
 
 </MemberCard>
 
-<a id="boxedexpression_iscollection" name="boxedexpression_iscollection"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isCollection
@@ -1989,8 +1821,6 @@ When `isCollection` is `true`, the expression:
   expression is in the collection.
 
 </MemberCard>
-
-<a id="boxedexpression_isindexedcollection" name="boxedexpression_isindexedcollection"></a>
 
 <MemberCard>
 
@@ -2017,8 +1847,6 @@ When `isIndexedCollection` is `true`, the expression:
 
 </MemberCard>
 
-<a id="boxedexpression_islazycollection" name="boxedexpression_islazycollection"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isLazyCollection
@@ -2037,8 +1865,6 @@ Use `ListFrom` and related functions to create eager collections from
 lazy collections.
 
 </MemberCard>
-
-<a id="boxedexpression_each" name="boxedexpression_each"></a>
 
 <MemberCard>
 
@@ -2060,14 +1886,12 @@ for (const e of expr.each()) {
 
 </MemberCard>
 
-<a id="boxedexpression_xcontains" name="boxedexpression_xcontains"></a>
-
 <MemberCard>
 
-##### BoxedExpression.xcontains()
+##### BoxedExpression.contains()
 
 ```ts
-xcontains(rhs): boolean
+contains(rhs): boolean
 ```
 
 If this is a collection, return true if the `rhs` expression is in the
@@ -2081,8 +1905,6 @@ iterating over the collection.
 [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="boxedexpression_subsetof" name="boxedexpression_subsetof"></a>
 
 <MemberCard>
 
@@ -2108,11 +1930,9 @@ If true, the subset relation is strict (i.e., proper subset).
 
 </MemberCard>
 
-<a id="boxedexpression_xsize" name="boxedexpression_xsize"></a>
-
 <MemberCard>
 
-##### BoxedExpression.xsize
+##### BoxedExpression.count
 
 If this is a collection, return the number of elements in the collection.
 
@@ -2123,8 +1943,6 @@ example, if the collection is lazy and not finite and the size cannot
 be determined without iterating over the collection.
 
 </MemberCard>
-
-<a id="boxedexpression_isfinitecollection" name="boxedexpression_isfinitecollection"></a>
 
 <MemberCard>
 
@@ -2137,8 +1955,6 @@ isFiniteCollection: boolean;
 If this is a finite collection, return true.
 
 </MemberCard>
-
-<a id="boxedexpression_isemptycollection" name="boxedexpression_isemptycollection"></a>
 
 <MemberCard>
 
@@ -2153,8 +1969,6 @@ If this is an empty collection, return true.
 An empty collection has a size of 0.
 
 </MemberCard>
-
-<a id="boxedexpression_at-1" name="boxedexpression_at-1"></a>
 
 <MemberCard>
 
@@ -2177,8 +1991,6 @@ The last element is at index -1.
 
 </MemberCard>
 
-<a id="boxedexpression_get" name="boxedexpression_get"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.get()
@@ -2198,8 +2010,6 @@ If `key` is a `BoxedExpression`, it should be a string.
 
 </MemberCard>
 
-<a id="boxedexpression_indexwhere" name="boxedexpression_indexwhere"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.indexWhere()
@@ -2218,8 +2028,6 @@ that matches the predicate.
 </MemberCard>
 
 #### Primitive Methods
-
-<a id="boxedexpression_valueof-2" name="boxedexpression_valueof-2"></a>
 
 <MemberCard>
 
@@ -2257,8 +2065,6 @@ of the expression.
 
 </MemberCard>
 
-<a id="boxedexpression_toprimitive-2" name="boxedexpression_toprimitive-2"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.\[toPrimitive\]()
@@ -2274,8 +2080,6 @@ Similar to`expr.valueOf()` but includes a hint.
 `"string"` | `"number"` | `"default"`
 
 </MemberCard>
-
-<a id="boxedexpression_tostring-1" name="boxedexpression_tostring-1"></a>
 
 <MemberCard>
 
@@ -2298,8 +2102,6 @@ Used when coercing a `BoxedExpression` to a `String`.
 
 </MemberCard>
 
-<a id="boxedexpression_tojson-2" name="boxedexpression_tojson-2"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.toJSON()
@@ -2317,8 +2119,6 @@ Based on `Object.toJSON()`.
 Note that lazy collections are *not* eagerly evaluated.
 
 </MemberCard>
-
-<a id="boxedexpression_is-1" name="boxedexpression_is-1"></a>
 
 <MemberCard>
 
@@ -2339,8 +2139,6 @@ a JavaScript primitive. For example, `expr.is(2)` is equivalent to
 </MemberCard>
 
 #### Relational Operator
-
-<a id="boxedexpression_issame" name="boxedexpression_issame"></a>
 
 <MemberCard>
 
@@ -2366,8 +2164,6 @@ Applicable to canonical and non-canonical expressions.
 
 </MemberCard>
 
-<a id="boxedexpression_isless" name="boxedexpression_isless"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isLess()
@@ -2385,8 +2181,6 @@ If the expressions cannot be compared, return `undefined`
 `number` | [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="boxedexpression_islessequal" name="boxedexpression_islessequal"></a>
 
 <MemberCard>
 
@@ -2406,8 +2200,6 @@ If the expressions cannot be compared, return `undefined`
 
 </MemberCard>
 
-<a id="boxedexpression_isgreater" name="boxedexpression_isgreater"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isGreater()
@@ -2426,8 +2218,6 @@ If the expressions cannot be compared, return `undefined`
 
 </MemberCard>
 
-<a id="boxedexpression_isgreaterequal" name="boxedexpression_isgreaterequal"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isGreaterEqual()
@@ -2445,8 +2235,6 @@ If the expressions cannot be compared, return `undefined`
 `number` | [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="boxedexpression_isequal" name="boxedexpression_isequal"></a>
 
 <MemberCard>
 
@@ -2494,8 +2282,6 @@ console.log(expr.is(4)); // true (fastest)
 
 #### String Expression
 
-<a id="boxedexpression_string-1" name="boxedexpression_string-1"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.string
@@ -2514,8 +2300,6 @@ Applicable to canonical and non-canonical expressions.
 </MemberCard>
 
 #### Symbol Expression
-
-<a id="boxedexpression_symbol" name="boxedexpression_symbol"></a>
 
 <MemberCard>
 
@@ -2536,8 +2320,6 @@ Applicable to canonical and non-canonical expressions.
 
 #### Tensor Expression
 
-<a id="boxedexpression_tensor" name="boxedexpression_tensor"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.tensor
@@ -2554,8 +2336,6 @@ Applicable to canonical and non-canonical expressions.
 :::
 
 </MemberCard>
-
-<a id="boxedexpression_shape-2" name="boxedexpression_shape-2"></a>
 
 <MemberCard>
 
@@ -2575,8 +2355,6 @@ When the expression is a vector of length `n`, the shape is `[n]`.
 When the expression is a `n` by `m` matrix, the shape is `[n, m]`.
 
 </MemberCard>
-
-<a id="boxedexpression_rank-2" name="boxedexpression_rank-2"></a>
 
 <MemberCard>
 
@@ -2604,8 +2382,6 @@ singular values of a matrix.
 </MemberCard>
 
 #### Type Properties
-
-<a id="boxedexpression_type-2" name="boxedexpression_type-2"></a>
 
 <MemberCard>
 
@@ -2648,8 +2424,6 @@ If the type is not known, return `"unknown"`.
 
 </MemberCard>
 
-<a id="boxedexpression_isnumber" name="boxedexpression_isnumber"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isNumber
@@ -2674,8 +2448,6 @@ number and `expr.isNumber` is `true`, but `isNumberLiteral` is `false`.
 
 </MemberCard>
 
-<a id="boxedexpression_isinteger" name="boxedexpression_isinteger"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isInteger
@@ -2689,8 +2461,6 @@ The value of this expression is an element of the set ℤ: ...,-2, -1, 0, 1, 2..
 Note that ±∞ and NaN are not integers.
 
 </MemberCard>
-
-<a id="boxedexpression_isrational" name="boxedexpression_isrational"></a>
 
 <MemberCard>
 
@@ -2710,8 +2480,6 @@ Note that ±∞ and NaN are not rationals.
 
 </MemberCard>
 
-<a id="boxedexpression_isreal" name="boxedexpression_isreal"></a>
-
 <MemberCard>
 
 ##### BoxedExpression.isReal
@@ -2727,8 +2495,6 @@ This is equivalent to `this.type === "rational" || this.type === "integer" || th
 Note that ±∞ and NaN are not real numbers.
 
 </MemberCard>
-
-<a id="semiboxedexpression" name="semiboxedexpression"></a>
 
 <MemberCard>
 
@@ -2757,8 +2523,6 @@ of an existing `BoxedExpression` while avoiding unboxing and reboxing.
 
 </MemberCard>
 
-<a id="replaceoptions" name="replaceoptions"></a>
-
 <MemberCard>
 
 ### ReplaceOptions
@@ -2773,84 +2537,7 @@ type ReplaceOptions = {
 };
 ```
 
-<a id="replaceoptions_recursive-1" name="replaceoptions_recursive-1"></a>
-
-#### ReplaceOptions.recursive
-
-```ts
-recursive: boolean;
-```
-
-If `true`, apply replacement rules to all sub-expressions.
-
-If `false`, only consider the top-level expression.
-
-**Default**: `false`
-
-<a id="replaceoptions_once" name="replaceoptions_once"></a>
-
-#### ReplaceOptions.once
-
-```ts
-once: boolean;
-```
-
-If `true`, stop after the first rule that matches.
-
-If `false`, apply all the remaining rules even after the first match.
-
-**Default**: `false`
-
-<a id="replaceoptions_usevariations-1" name="replaceoptions_usevariations-1"></a>
-
-#### ReplaceOptions.useVariations
-
-```ts
-useVariations: boolean;
-```
-
-If `true` the rule will use some equivalent variations to match.
-
-For example when `useVariations` is true:
-- `x` matches `a + x` with a = 0
-- `x` matches `ax` with a = 1
-- etc...
-
-Setting this to `true` can save time by condensing multiple rules
-into one. This can be particularly useful when describing equations
-solutions. However, it can lead to infinite recursion and should be
-used with caution.
-
-<a id="replaceoptions_iterationlimit" name="replaceoptions_iterationlimit"></a>
-
-#### ReplaceOptions.iterationLimit
-
-```ts
-iterationLimit: number;
-```
-
-If `iterationLimit` > 1, the rules will be repeatedly applied
-until no rules apply, up to `iterationLimit` times.
-
-Note that if `once` is true, `iterationLimit` has no effect.
-
-**Default**: `1`
-
-<a id="replaceoptions_canonical-2" name="replaceoptions_canonical-2"></a>
-
-#### ReplaceOptions.canonical
-
-```ts
-canonical: CanonicalOptions;
-```
-
-Indicate if the expression should be canonicalized after the replacement.
-If not provided, the expression is canonicalized if the expression
-that matched the pattern is canonical.
-
 </MemberCard>
-
-<a id="simplifyoptions" name="simplifyoptions"></a>
 
 <MemberCard>
 
@@ -2868,37 +2555,7 @@ type SimplifyOptions = {
 
 Options for `BoxedExpression.simplify()`
 
-<a id="simplifyoptions_rules" name="simplifyoptions_rules"></a>
-
-#### SimplifyOptions.rules?
-
-```ts
-optional rules: 
-  | null
-  | Rule
-  | ReadonlyArray<BoxedRule | Rule>
-  | BoxedRuleSet;
-```
-
-The set of rules to apply. If `null`, use no rules. If not provided,
-use the default simplification rules.
-
-<a id="simplifyoptions_costfunction" name="simplifyoptions_costfunction"></a>
-
-#### SimplifyOptions.costFunction()?
-
-```ts
-optional costFunction: (expr) => number;
-```
-
-Use this cost function to determine if a simplification is worth it.
-
-If not provided, `ce.costFunction`, the cost function of the engine is
-used.
-
 </MemberCard>
-
-<a id="canonicalform" name="canonicalform"></a>
 
 <MemberCard>
 
@@ -2940,8 +2597,6 @@ it was provided.
 
 </MemberCard>
 
-<a id="canonicaloptions" name="canonicaloptions"></a>
-
 <MemberCard>
 
 ### CanonicalOptions
@@ -2954,8 +2609,6 @@ type CanonicalOptions =
 ```
 
 </MemberCard>
-
-<a id="evaluateoptions" name="evaluateoptions"></a>
 
 <MemberCard>
 
@@ -2972,43 +2625,7 @@ type EvaluateOptions = {
 
 Options for `BoxedExpression.evaluate()`
 
-<a id="evaluateoptions_numericapproximation" name="evaluateoptions_numericapproximation"></a>
-
-#### EvaluateOptions.numericApproximation
-
-```ts
-numericApproximation: boolean;
-```
-
-If `true`, the evaluation will return a numeric approximation
-of the expression, if possible.
-If `false`, the evaluation will return an exact value, if possible.
-Defaults to `false`.
-
-<a id="evaluateoptions_materialization" name="evaluateoptions_materialization"></a>
-
-#### EvaluateOptions.materialization
-
-```ts
-materialization: boolean | number | [number, number];
-```
-
-If `false`, and the result of the expression is a lazy collection,
-the collection will not be evaluated and will remain lazy.
-
-If `true` and the expression is a finite lazy collection,
-the collection will be evaluated and returned as a non-lazy collection.
-
-If an integer, the collection will be evaluated up to that many elements.
-
-If a pair of integers `[n,m]`, and the collection is finite, the first `n`
-elements will be evaluated, and the last `m` elements will be evaluated.
-
-Defaults to `false`.
-
 </MemberCard>
-
-<a id="metadata-1" name="metadata-1"></a>
 
 <MemberCard>
 
@@ -3026,8 +2643,6 @@ Metadata that can be associated with an MathJSON expression.
 </MemberCard>
 
 ## Pattern Matching
-
-<a id="patternmatchoptions" name="patternmatchoptions"></a>
 
 <MemberCard>
 
@@ -3056,8 +2671,6 @@ Control how a pattern is matched to an expression.
 
 </MemberCard>
 
-<a id="substitutiont" name="substitutiont"></a>
-
 <MemberCard>
 
 ### Substitution\<T\>
@@ -3078,8 +2691,6 @@ rule whose `match` is always a symbol.
 
 </MemberCard>
 
-<a id="boxedsubstitution" name="boxedsubstitution"></a>
-
 <MemberCard>
 
 ### BoxedSubstitution
@@ -3091,8 +2702,6 @@ type BoxedSubstitution = Substitution<BoxedExpression>;
 </MemberCard>
 
 ## Rules
-
-<a id="rulereplacefunction" name="rulereplacefunction"></a>
 
 <MemberCard>
 
@@ -3115,8 +2724,6 @@ For example:
 
 </MemberCard>
 
-<a id="ruleconditionfunction" name="ruleconditionfunction"></a>
-
 <MemberCard>
 
 ### RuleConditionFunction()
@@ -3126,8 +2733,6 @@ type RuleConditionFunction = (wildcards, ce) => boolean;
 ```
 
 </MemberCard>
-
-<a id="rulefunction" name="rulefunction"></a>
 
 <MemberCard>
 
@@ -3142,8 +2747,6 @@ type RuleFunction = (expr) =>
 
 </MemberCard>
 
-<a id="rulestep" name="rulestep"></a>
-
 <MemberCard>
 
 ### RuleStep
@@ -3157,8 +2760,6 @@ type RuleStep = {
 
 </MemberCard>
 
-<a id="rulesteps" name="rulesteps"></a>
-
 <MemberCard>
 
 ### RuleSteps
@@ -3168,8 +2769,6 @@ type RuleSteps = RuleStep[];
 ```
 
 </MemberCard>
-
-<a id="rule" name="rule"></a>
 
 <MemberCard>
 
@@ -3233,8 +2832,6 @@ When set to false, infinite recursion is possible.
 
 </MemberCard>
 
-<a id="boxedrule" name="boxedrule"></a>
-
 <MemberCard>
 
 ### BoxedRule
@@ -3260,8 +2857,6 @@ done in the `replace` function.
 
 </MemberCard>
 
-<a id="boxedruleset" name="boxedruleset"></a>
-
 <MemberCard>
 
 ### BoxedRuleSet
@@ -3280,11 +2875,7 @@ Do not create a `BoxedRuleSet` directly.
 
 ## Assumptions
 
-<a id="assumption" name="assumption"></a>
-
 ### Assumption
-
-<a id="assumption_ispositive-1" name="assumption_ispositive-1"></a>
 
 <MemberCard>
 
@@ -3296,8 +2887,6 @@ isPositive: boolean;
 
 </MemberCard>
 
-<a id="assumption_isnonnegative-1" name="assumption_isnonnegative-1"></a>
-
 <MemberCard>
 
 ##### Assumption.isNonNegative
@@ -3307,8 +2896,6 @@ isNonNegative: boolean;
 ```
 
 </MemberCard>
-
-<a id="assumption_isnegative-1" name="assumption_isnegative-1"></a>
 
 <MemberCard>
 
@@ -3320,8 +2907,6 @@ isNegative: boolean;
 
 </MemberCard>
 
-<a id="assumption_isnonpositive-1" name="assumption_isnonpositive-1"></a>
-
 <MemberCard>
 
 ##### Assumption.isNonPositive
@@ -3331,8 +2916,6 @@ isNonPositive: boolean;
 ```
 
 </MemberCard>
-
-<a id="assumption_isnumber-1" name="assumption_isnumber-1"></a>
 
 <MemberCard>
 
@@ -3344,8 +2927,6 @@ isNumber: boolean;
 
 </MemberCard>
 
-<a id="assumption_isinteger-1" name="assumption_isinteger-1"></a>
-
 <MemberCard>
 
 ##### Assumption.isInteger
@@ -3355,8 +2936,6 @@ isInteger: boolean;
 ```
 
 </MemberCard>
-
-<a id="assumption_isrational-1" name="assumption_isrational-1"></a>
 
 <MemberCard>
 
@@ -3368,8 +2947,6 @@ isRational: boolean;
 
 </MemberCard>
 
-<a id="assumption_isreal-1" name="assumption_isreal-1"></a>
-
 <MemberCard>
 
 ##### Assumption.isReal
@@ -3379,8 +2956,6 @@ isReal: boolean;
 ```
 
 </MemberCard>
-
-<a id="assumption_iscomplex" name="assumption_iscomplex"></a>
 
 <MemberCard>
 
@@ -3392,8 +2967,6 @@ isComplex: boolean;
 
 </MemberCard>
 
-<a id="assumption_isimaginary" name="assumption_isimaginary"></a>
-
 <MemberCard>
 
 ##### Assumption.isImaginary
@@ -3403,8 +2976,6 @@ isImaginary: boolean;
 ```
 
 </MemberCard>
-
-<a id="assumption_isfinite-2" name="assumption_isfinite-2"></a>
 
 <MemberCard>
 
@@ -3416,8 +2987,6 @@ isFinite: boolean;
 
 </MemberCard>
 
-<a id="assumption_isinfinite" name="assumption_isinfinite"></a>
-
 <MemberCard>
 
 ##### Assumption.isInfinite
@@ -3427,8 +2996,6 @@ isInfinite: boolean;
 ```
 
 </MemberCard>
-
-<a id="assumption_isnan-2" name="assumption_isnan-2"></a>
 
 <MemberCard>
 
@@ -3440,8 +3007,6 @@ isNaN: boolean;
 
 </MemberCard>
 
-<a id="assumption_iszero-3" name="assumption_iszero-3"></a>
-
 <MemberCard>
 
 ##### Assumption.isZero
@@ -3451,8 +3016,6 @@ isZero: boolean;
 ```
 
 </MemberCard>
-
-<a id="assumption_matches-1" name="assumption_matches-1"></a>
 
 <MemberCard>
 
@@ -3468,8 +3031,6 @@ matches(t): boolean
 
 </MemberCard>
 
-<a id="assumption_isgreater-1" name="assumption_isgreater-1"></a>
-
 <MemberCard>
 
 ##### Assumption.isGreater()
@@ -3483,8 +3044,6 @@ isGreater(other): boolean
 [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="assumption_isgreaterequal-1" name="assumption_isgreaterequal-1"></a>
 
 <MemberCard>
 
@@ -3500,8 +3059,6 @@ isGreaterEqual(other): boolean
 
 </MemberCard>
 
-<a id="assumption_isless-1" name="assumption_isless-1"></a>
-
 <MemberCard>
 
 ##### Assumption.isLess()
@@ -3515,8 +3072,6 @@ isLess(other): boolean
 [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="assumption_islessequal-1" name="assumption_islessequal-1"></a>
 
 <MemberCard>
 
@@ -3532,8 +3087,6 @@ isLessEqual(other): boolean
 
 </MemberCard>
 
-<a id="assumption_isequal-1" name="assumption_isequal-1"></a>
-
 <MemberCard>
 
 ##### Assumption.isEqual()
@@ -3547,8 +3100,6 @@ isEqual(other): boolean
 [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="assumption_toexpression" name="assumption_toexpression"></a>
 
 <MemberCard>
 
@@ -3568,11 +3119,7 @@ toExpression(ce, x): BoxedExpression
 
 </MemberCard>
 
-<a id="expressionmapinterfaceu" name="expressionmapinterfaceu"></a>
-
 ### ExpressionMapInterface\<U\>
-
-<a id="expressionmapinterfaceu_has-2" name="expressionmapinterfaceu_has-2"></a>
 
 <MemberCard>
 
@@ -3588,8 +3135,6 @@ has(expr): boolean
 
 </MemberCard>
 
-<a id="expressionmapinterfaceu_get-2" name="expressionmapinterfaceu_get-2"></a>
-
 <MemberCard>
 
 ##### ExpressionMapInterface.get()
@@ -3603,8 +3148,6 @@ get(expr): U
 [`BoxedExpression`](#boxedexpression)
 
 </MemberCard>
-
-<a id="expressionmapinterfaceu_set" name="expressionmapinterfaceu_set"></a>
 
 <MemberCard>
 
@@ -3624,8 +3167,6 @@ set(expr, value): void
 
 </MemberCard>
 
-<a id="expressionmapinterfaceu_delete" name="expressionmapinterfaceu_delete"></a>
-
 <MemberCard>
 
 ##### ExpressionMapInterface.delete()
@@ -3640,8 +3181,6 @@ delete(expr): void
 
 </MemberCard>
 
-<a id="expressionmapinterfaceu_clear" name="expressionmapinterfaceu_clear"></a>
-
 <MemberCard>
 
 ##### ExpressionMapInterface.clear()
@@ -3651,8 +3190,6 @@ clear(): void
 ```
 
 </MemberCard>
-
-<a id="expressionmapinterfaceu_iterator-1" name="expressionmapinterfaceu_iterator-1"></a>
 
 <MemberCard>
 
@@ -3664,8 +3201,6 @@ iterator: IterableIterator<[BoxedExpression, U]>
 
 </MemberCard>
 
-<a id="expressionmapinterfaceu_entries-1" name="expressionmapinterfaceu_entries-1"></a>
-
 <MemberCard>
 
 ##### ExpressionMapInterface.entries()
@@ -3675,8 +3210,6 @@ entries(): IterableIterator<[BoxedExpression, U]>
 ```
 
 </MemberCard>
-
-<a id="assumeresult" name="assumeresult"></a>
 
 <MemberCard>
 
@@ -3695,8 +3228,6 @@ type AssumeResult =
 
 ## Compiling
 
-<a id="compiledtype" name="compiledtype"></a>
-
 <MemberCard>
 
 ### CompiledType
@@ -3707,8 +3238,6 @@ type CompiledType = boolean | number | string | object;
 
 </MemberCard>
 
-<a id="jssource" name="jssource"></a>
-
 <MemberCard>
 
 ### JSSource
@@ -3718,8 +3247,6 @@ type JSSource = string;
 ```
 
 </MemberCard>
-
-<a id="compiledexpression" name="compiledexpression"></a>
 
 <MemberCard>
 
@@ -3735,8 +3262,6 @@ type CompiledExpression = {
 
 ## Definitions
 
-<a id="eqhandlers" name="eqhandlers"></a>
-
 ### EqHandlers
 
 These handlers compare two expressions.
@@ -3744,8 +3269,6 @@ These handlers compare two expressions.
 If only one of the handlers is provided, the other is derived from it.
 
 Having both may be useful if comparing non-equality is faster than equality.
-
-<a id="eqhandlers_eq-1" name="eqhandlers_eq-1"></a>
 
 <MemberCard>
 
@@ -3757,8 +3280,6 @@ eq: (a, b) => boolean;
 
 </MemberCard>
 
-<a id="eqhandlers_neq" name="eqhandlers_neq"></a>
-
 <MemberCard>
 
 ##### EqHandlers.neq()
@@ -3769,8 +3290,6 @@ neq: (a, b) => boolean;
 
 </MemberCard>
 
-<a id="hold" name="hold"></a>
-
 <MemberCard>
 
 ### Hold
@@ -3780,8 +3299,6 @@ type Hold = "none" | "all" | "first" | "rest" | "last" | "most";
 ```
 
 </MemberCard>
-
-<a id="valuedefinition-1" name="valuedefinition-1"></a>
 
 <MemberCard>
 
@@ -3831,8 +3348,6 @@ value:
 `ComputeEngine` and possible other environment settings
 
 </MemberCard>
-
-<a id="operatordefinition-1" name="operatordefinition-1"></a>
 
 <MemberCard>
 
@@ -4088,13 +3603,9 @@ Return a compiled (optimized) expression.
 
 </MemberCard>
 
-<a id="basedefinition-1" name="basedefinition-1"></a>
-
 ### BaseDefinition
 
 Metadata common to both symbols and functions.
-
-<a id="basedefinition-1_description-1" name="basedefinition-1_description-1"></a>
 
 <MemberCard>
 
@@ -4112,8 +3623,6 @@ May contain Markdown.
 
 </MemberCard>
 
-<a id="basedefinition-1_examples" name="basedefinition-1_examples"></a>
-
 <MemberCard>
 
 ##### BaseDefinition.examples
@@ -4129,8 +3638,6 @@ For example, `["Add", 1, 2]` or `$\\sin(\\pi/4)$`.
 
 </MemberCard>
 
-<a id="basedefinition-1_url-1" name="basedefinition-1_url-1"></a>
-
 <MemberCard>
 
 ##### BaseDefinition.url
@@ -4142,8 +3649,6 @@ url: string;
 A URL pointing to more information about this symbol or operator.
 
 </MemberCard>
-
-<a id="basedefinition-1_wikidata-1" name="basedefinition-1_wikidata-1"></a>
 
 <MemberCard>
 
@@ -4160,8 +3665,6 @@ for the `Pi` constant.
 
 </MemberCard>
 
-<a id="basedefinition-1_isconstant-1" name="basedefinition-1_isconstant-1"></a>
-
 <MemberCard>
 
 ##### BaseDefinition.isConstant?
@@ -4173,8 +3676,6 @@ readonly optional isConstant: boolean;
 If true, the value or type of the definition cannot be changed
 
 </MemberCard>
-
-<a id="symboldefinition" name="symboldefinition"></a>
 
 <MemberCard>
 
@@ -4195,8 +3696,6 @@ following rules are recommended:
 
 </MemberCard>
 
-<a id="symboldefinitions" name="symboldefinitions"></a>
-
 <MemberCard>
 
 ### SymbolDefinitions
@@ -4207,8 +3706,6 @@ type SymbolDefinitions = Readonly<{}>;
 
 </MemberCard>
 
-<a id="basecollectionhandlers" name="basecollectionhandlers"></a>
-
 ### BaseCollectionHandlers
 
 These handlers are the primitive operations that can be performed on
@@ -4216,14 +3713,12 @@ all collections, indexed or not.
 
 #### Definitions
 
-<a id="basecollectionhandlers_iterator" name="basecollectionhandlers_iterator"></a>
-
 <MemberCard>
 
 ##### BaseCollectionHandlers.iterator()
 
 ```ts
-iterator: (collection) => Iterator<BoxedExpression, undefined>;
+iterator: (collection) => Iterator<BoxedExpression, undefined, any>;
 ```
 
 Return an iterator that iterates over the elements of the collection.
@@ -4235,8 +3730,6 @@ different order.
 </MemberCard>
 
 #### Other
-
-<a id="basecollectionhandlers_count" name="basecollectionhandlers_count"></a>
 
 <MemberCard>
 
@@ -4252,8 +3745,6 @@ An empty collection has a count of 0.
 
 </MemberCard>
 
-<a id="basecollectionhandlers_isempty" name="basecollectionhandlers_isempty"></a>
-
 <MemberCard>
 
 ##### BaseCollectionHandlers.isEmpty()?
@@ -4266,8 +3757,6 @@ Optional flag to quickly check if the collection is empty, without having to cou
 
 </MemberCard>
 
-<a id="basecollectionhandlers_isfinite-1" name="basecollectionhandlers_isfinite-1"></a>
-
 <MemberCard>
 
 ##### BaseCollectionHandlers.isFinite()?
@@ -4279,8 +3768,6 @@ optional isFinite: (collection) => boolean;
 Optional flag to quickly check if the collection is finite, without having to count exactly how many elements it has (useful for lazy evaluation).
 
 </MemberCard>
-
-<a id="basecollectionhandlers_islazy" name="basecollectionhandlers_islazy"></a>
 
 <MemberCard>
 
@@ -4299,8 +3786,6 @@ Default: `true`
 
 </MemberCard>
 
-<a id="basecollectionhandlers_contains" name="basecollectionhandlers_contains"></a>
-
 <MemberCard>
 
 ##### BaseCollectionHandlers.contains()?
@@ -4315,8 +3800,6 @@ Return `true` if the target expression is in the collection,
 Return `undefined` if the membership cannot be determined.
 
 </MemberCard>
-
-<a id="basecollectionhandlers_subsetof-1" name="basecollectionhandlers_subsetof-1"></a>
 
 <MemberCard>
 
@@ -4336,8 +3819,6 @@ Return `undefined` if the subset relation cannot be determined.
 
 </MemberCard>
 
-<a id="basecollectionhandlers_eltsgn" name="basecollectionhandlers_eltsgn"></a>
-
 <MemberCard>
 
 ##### BaseCollectionHandlers.eltsgn()?
@@ -4349,8 +3830,6 @@ optional eltsgn: (collection) => Sign;
 Return the sign of all the elements of the collection.
 
 </MemberCard>
-
-<a id="basecollectionhandlers_elttype" name="basecollectionhandlers_elttype"></a>
 
 <MemberCard>
 
@@ -4364,8 +3843,6 @@ Return the widest type of all the elements in the collection
 
 </MemberCard>
 
-<a id="indexedcollectionhandlers" name="indexedcollectionhandlers"></a>
-
 ### IndexedCollectionHandlers
 
 These additional collection handlers are applicable to indexed
@@ -4373,8 +3850,6 @@ collections only.
 
 The elements of an indexed collection can be accessed by index, and
 the order of the elements is defined.
-
-<a id="indexedcollectionhandlers_at-2" name="indexedcollectionhandlers_at-2"></a>
 
 <MemberCard>
 
@@ -4397,8 +3872,6 @@ If the index is invalid, return `undefined`.
 
 </MemberCard>
 
-<a id="indexedcollectionhandlers_indexwhere-1" name="indexedcollectionhandlers_indexwhere-1"></a>
-
 <MemberCard>
 
 ##### IndexedCollectionHandlers.indexWhere()
@@ -4413,8 +3886,6 @@ If no element matches the predicate, return `undefined`.
 
 </MemberCard>
 
-<a id="collectionhandlers" name="collectionhandlers"></a>
-
 <MemberCard>
 
 ### CollectionHandlers
@@ -4427,8 +3898,6 @@ The collection handlers are the primitive operations that can be
 performed on collections, such as lists, sets, tuples, etc...
 
 </MemberCard>
-
-<a id="taggedvaluedefinition" name="taggedvaluedefinition"></a>
 
 <MemberCard>
 
@@ -4444,8 +3913,6 @@ The definition for a value, represented as a tagged object literal.
 
 </MemberCard>
 
-<a id="taggedoperatordefinition" name="taggedoperatordefinition"></a>
-
 <MemberCard>
 
 ### TaggedOperatorDefinition
@@ -4459,8 +3926,6 @@ type TaggedOperatorDefinition = {
 The definition for an operator, represented as a tagged object literal.
 
 </MemberCard>
-
-<a id="boxeddefinition" name="boxeddefinition"></a>
 
 <MemberCard>
 
@@ -4480,8 +3945,6 @@ references to the definition in bound expressions.
 
 </MemberCard>
 
-<a id="boxedbasedefinition" name="boxedbasedefinition"></a>
-
 ### BoxedBaseDefinition
 
 #### Extends
@@ -4492,8 +3955,6 @@ references to the definition in bound expressions.
 
 - [`BoxedValueDefinition`](#boxedvaluedefinition)
 - [`BoxedOperatorDefinition`](#boxedoperatordefinition)
-
-<a id="boxedbasedefinition_collection" name="boxedbasedefinition_collection"></a>
 
 <MemberCard>
 
@@ -4509,15 +3970,11 @@ enumerating it, etc...).
 
 </MemberCard>
 
-<a id="boxedvaluedefinition" name="boxedvaluedefinition"></a>
-
 ### BoxedValueDefinition
 
 #### Extends
 
 - [`BoxedBaseDefinition`](#boxedbasedefinition)
-
-<a id="boxedvaluedefinition_holduntil" name="boxedvaluedefinition_holduntil"></a>
 
 <MemberCard>
 
@@ -4549,8 +4006,6 @@ Some examples:
 
 </MemberCard>
 
-<a id="boxedvaluedefinition_value-1" name="boxedvaluedefinition_value-1"></a>
-
 <MemberCard>
 
 ##### BoxedValueDefinition.value
@@ -4565,8 +4020,6 @@ This is either the initial value of the symbol (i.e. when a new
 
 </MemberCard>
 
-<a id="boxedvaluedefinition_eq-2" name="boxedvaluedefinition_eq-2"></a>
-
 <MemberCard>
 
 ##### BoxedValueDefinition.eq()?
@@ -4576,8 +4029,6 @@ optional eq: (a) => boolean;
 ```
 
 </MemberCard>
-
-<a id="boxedvaluedefinition_neq-1" name="boxedvaluedefinition_neq-1"></a>
 
 <MemberCard>
 
@@ -4589,8 +4040,6 @@ optional neq: (a) => boolean;
 
 </MemberCard>
 
-<a id="boxedvaluedefinition_cmp" name="boxedvaluedefinition_cmp"></a>
-
 <MemberCard>
 
 ##### BoxedValueDefinition.cmp()?
@@ -4600,8 +4049,6 @@ optional cmp: (a) => ">" | "<" | "=";
 ```
 
 </MemberCard>
-
-<a id="boxedvaluedefinition_inferredtype" name="boxedvaluedefinition_inferredtype"></a>
 
 <MemberCard>
 
@@ -4618,8 +4065,6 @@ A type that is not inferred, but has been set explicitly, cannot be updated.
 
 </MemberCard>
 
-<a id="boxedvaluedefinition_type-3" name="boxedvaluedefinition_type-3"></a>
-
 <MemberCard>
 
 ##### BoxedValueDefinition.type
@@ -4629,8 +4074,6 @@ type: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="operatordefinitionflags" name="operatordefinitionflags"></a>
 
 <MemberCard>
 
@@ -4653,143 +4096,7 @@ type OperatorDefinitionFlags = {
 An operator definition can have some flags to indicate specific
 properties of the operator.
 
-<a id="operatordefinitionflags_lazy" name="operatordefinitionflags_lazy"></a>
-
-#### OperatorDefinitionFlags.lazy
-
-```ts
-lazy: boolean;
-```
-
-If `true`, the arguments to this operator are not automatically
-evaluated. The default is `false` (the arguments are evaluated).
-
-This can be useful for example for operators that take symbolic
-expressions as arguments, such as `Declare` or `Integrate`.
-
-This is also useful for operators that take an argument that is
-potentially an infinite collection.
-
-It will be up to the `evaluate()` handler to evaluate the arguments as
-needed. This is convenient to pass symbolic expressions as arguments
-to operators without having to explicitly use a `Hold` expression.
-
-This also applies to the `canonical()` handler.
-
-<a id="operatordefinitionflags_scoped" name="operatordefinitionflags_scoped"></a>
-
-#### OperatorDefinitionFlags.scoped
-
-```ts
-scoped: boolean;
-```
-
-If `true`, the operator requires a new lexical scope when canonicalized.
-This will allow it to declare variables that are not visible outside
-the function expression using the operator.
-
-**Default**: `false`
-
-<a id="operatordefinitionflags_broadcastable" name="operatordefinitionflags_broadcastable"></a>
-
-#### OperatorDefinitionFlags.broadcastable
-
-```ts
-broadcastable: boolean;
-```
-
-If `true`, the operator is applied element by element to lists, matrices
-(`["List"]` or `["Tuple"]` expressions) and equations (relational
-operators).
-
-**Default**: `false`
-
-<a id="operatordefinitionflags_associative" name="operatordefinitionflags_associative"></a>
-
-#### OperatorDefinitionFlags.associative
-
-```ts
-associative: boolean;
-```
-
-If `true`, `["f", ["f", a], b]` simplifies to `["f", a, b]`
-
-**Default**: `false`
-
-<a id="operatordefinitionflags_commutative" name="operatordefinitionflags_commutative"></a>
-
-#### OperatorDefinitionFlags.commutative
-
-```ts
-commutative: boolean;
-```
-
-If `true`, `["f", a, b]` equals `["f", b, a]`. The canonical
-version of the function will order the arguments.
-
-**Default**: `false`
-
-<a id="operatordefinitionflags_commutativeorder" name="operatordefinitionflags_commutativeorder"></a>
-
-#### OperatorDefinitionFlags.commutativeOrder
-
-```ts
-commutativeOrder: (a, b) => number | undefined;
-```
-
-If `commutative` is `true`, the order of the arguments is determined by
-this function.
-
-If the function is not provided, the arguments are ordered by the
-default order of the arguments.
-
-<a id="operatordefinitionflags_idempotent" name="operatordefinitionflags_idempotent"></a>
-
-#### OperatorDefinitionFlags.idempotent
-
-```ts
-idempotent: boolean;
-```
-
-If `true`, `["f", ["f", x]]` simplifies to `["f", x]`.
-
-**Default**: `false`
-
-<a id="operatordefinitionflags_involution" name="operatordefinitionflags_involution"></a>
-
-#### OperatorDefinitionFlags.involution
-
-```ts
-involution: boolean;
-```
-
-If `true`, `["f", ["f", x]]` simplifies to `x`.
-
-**Default**: `false`
-
-<a id="operatordefinitionflags_pure" name="operatordefinitionflags_pure"></a>
-
-#### OperatorDefinitionFlags.pure
-
-```ts
-pure: boolean;
-```
-
-If `true`, the value of this operator is always the same for a given
-set of arguments and it has no side effects.
-
-An expression using this operator is pure if the operator and all its
-arguments are pure.
-
-For example `Sin` is pure, `Random` isn't.
-
-This information may be used to cache the value of expressions.
-
-**Default:** `true`
-
 </MemberCard>
-
-<a id="boxedoperatordefinition" name="boxedoperatordefinition"></a>
 
 ### BoxedOperatorDefinition
 
@@ -4801,8 +4108,6 @@ operator.
 
 - [`BoxedBaseDefinition`](#boxedbasedefinition).[`OperatorDefinitionFlags`](#operatordefinitionflags)
 
-<a id="boxedoperatordefinition_complexity-1" name="boxedoperatordefinition_complexity-1"></a>
-
 <MemberCard>
 
 ##### BoxedOperatorDefinition.complexity
@@ -4812,8 +4117,6 @@ complexity: number;
 ```
 
 </MemberCard>
-
-<a id="boxedoperatordefinition_inferredsignature" name="boxedoperatordefinition_inferredsignature"></a>
 
 <MemberCard>
 
@@ -4828,8 +4131,6 @@ as more information becomes available.
 
 </MemberCard>
 
-<a id="boxedoperatordefinition_signature" name="boxedoperatordefinition_signature"></a>
-
 <MemberCard>
 
 ##### BoxedOperatorDefinition.signature
@@ -4841,8 +4142,6 @@ signature: BoxedType;
 The type of the arguments and return value of this function
 
 </MemberCard>
-
-<a id="boxedoperatordefinition_type-4" name="boxedoperatordefinition_type-4"></a>
 
 <MemberCard>
 
@@ -4874,8 +4173,6 @@ should *not* be evaluated, only their types should be used.
 
 </MemberCard>
 
-<a id="boxedoperatordefinition_sgn-2" name="boxedoperatordefinition_sgn-2"></a>
-
 <MemberCard>
 
 ##### BoxedOperatorDefinition.sgn()?
@@ -4896,8 +4193,6 @@ simplifications are valid.
 
 </MemberCard>
 
-<a id="boxedoperatordefinition_eq-3" name="boxedoperatordefinition_eq-3"></a>
-
 <MemberCard>
 
 ##### BoxedOperatorDefinition.eq()?
@@ -4907,8 +4202,6 @@ optional eq: (a, b) => boolean;
 ```
 
 </MemberCard>
-
-<a id="boxedoperatordefinition_neq-2" name="boxedoperatordefinition_neq-2"></a>
 
 <MemberCard>
 
@@ -4920,8 +4213,6 @@ optional neq: (a, b) => boolean;
 
 </MemberCard>
 
-<a id="boxedoperatordefinition_canonical-1" name="boxedoperatordefinition_canonical-1"></a>
-
 <MemberCard>
 
 ##### BoxedOperatorDefinition.canonical()?
@@ -4931,8 +4222,6 @@ optional canonical: (ops, options) => BoxedExpression;
 ```
 
 </MemberCard>
-
-<a id="boxedoperatordefinition_evaluate-1" name="boxedoperatordefinition_evaluate-1"></a>
 
 <MemberCard>
 
@@ -4944,8 +4233,6 @@ optional evaluate: (ops, options) => BoxedExpression;
 
 </MemberCard>
 
-<a id="boxedoperatordefinition_evaluateasync-1" name="boxedoperatordefinition_evaluateasync-1"></a>
-
 <MemberCard>
 
 ##### BoxedOperatorDefinition.evaluateAsync()?
@@ -4955,8 +4242,6 @@ optional evaluateAsync: (ops, options?) => Promise<BoxedExpression>;
 ```
 
 </MemberCard>
-
-<a id="boxedoperatordefinition_evaldimension" name="boxedoperatordefinition_evaldimension"></a>
 
 <MemberCard>
 
@@ -4968,8 +4253,6 @@ optional evalDimension: (ops, options) => BoxedExpression;
 
 </MemberCard>
 
-<a id="boxedoperatordefinition_compile-1" name="boxedoperatordefinition_compile-1"></a>
-
 <MemberCard>
 
 ##### BoxedOperatorDefinition.compile()?
@@ -4979,8 +4262,6 @@ optional compile: (expr) => CompiledExpression;
 ```
 
 </MemberCard>
-
-<a id="scope" name="scope"></a>
 
 <MemberCard>
 
@@ -5009,8 +4290,6 @@ context.
 
 ## Latex Parsing and Serialization
 
-<a id="latextoken" name="latextoken"></a>
-
 <MemberCard>
 
 ### LatexToken
@@ -5027,8 +4306,6 @@ letters and punctuation.
 
 </MemberCard>
 
-<a id="latexstring" name="latexstring"></a>
-
 <MemberCard>
 
 ### LatexString
@@ -5041,8 +4318,6 @@ A LatexString is a regular string of LaTeX, for example:
 `\frac{\pi}{2}`
 
 </MemberCard>
-
-<a id="delimiter" name="delimiter"></a>
 
 <MemberCard>
 
@@ -5074,8 +4349,6 @@ record to define new LaTeX dictionary entries.
 
 </MemberCard>
 
-<a id="delimiterscale" name="delimiterscale"></a>
-
 <MemberCard>
 
 ### DelimiterScale
@@ -5085,8 +4358,6 @@ type DelimiterScale = "normal" | "scaled" | "big" | "none";
 ```
 
 </MemberCard>
-
-<a id="librarycategory" name="librarycategory"></a>
 
 <MemberCard>
 
@@ -5122,8 +4393,6 @@ type LibraryCategory =
 ```
 
 </MemberCard>
-
-<a id="precedence" name="precedence"></a>
 
 <MemberCard>
 
@@ -5180,8 +4449,6 @@ The JavaScript operator precedence is documented
 
 </MemberCard>
 
-<a id="terminator" name="terminator"></a>
-
 <MemberCard>
 
 ### Terminator
@@ -5199,8 +4466,6 @@ This indicates a condition under which parsing should stop:
 - or if a condition is provided, the condition returns true
 
 </MemberCard>
-
-<a id="parsehandler" name="parsehandler"></a>
 
 <MemberCard>
 
@@ -5241,8 +4506,6 @@ return `Nothing`.
 
 </MemberCard>
 
-<a id="expressionparsehandler" name="expressionparsehandler"></a>
-
 <MemberCard>
 
 ### ExpressionParseHandler()
@@ -5252,8 +4515,6 @@ type ExpressionParseHandler = (parser, until?) => Expression | null;
 ```
 
 </MemberCard>
-
-<a id="prefixparsehandler" name="prefixparsehandler"></a>
 
 <MemberCard>
 
@@ -5265,8 +4526,6 @@ type PrefixParseHandler = (parser, until?) => Expression | null;
 
 </MemberCard>
 
-<a id="symbolparsehandler" name="symbolparsehandler"></a>
-
 <MemberCard>
 
 ### SymbolParseHandler()
@@ -5276,8 +4535,6 @@ type SymbolParseHandler = (parser, until?) => Expression | null;
 ```
 
 </MemberCard>
-
-<a id="functionparsehandler" name="functionparsehandler"></a>
 
 <MemberCard>
 
@@ -5289,8 +4546,6 @@ type FunctionParseHandler = (parser, until?) => Expression | null;
 
 </MemberCard>
 
-<a id="environmentparsehandler" name="environmentparsehandler"></a>
-
 <MemberCard>
 
 ### EnvironmentParseHandler()
@@ -5300,8 +4555,6 @@ type EnvironmentParseHandler = (parser, until?) => Expression | null;
 ```
 
 </MemberCard>
-
-<a id="postfixparsehandler" name="postfixparsehandler"></a>
 
 <MemberCard>
 
@@ -5313,8 +4566,6 @@ type PostfixParseHandler = (parser, lhs, until?) => Expression | null;
 
 </MemberCard>
 
-<a id="infixparsehandler" name="infixparsehandler"></a>
-
 <MemberCard>
 
 ### InfixParseHandler()
@@ -5325,8 +4576,6 @@ type InfixParseHandler = (parser, lhs, until) => Expression | null;
 
 </MemberCard>
 
-<a id="matchfixparsehandler" name="matchfixparsehandler"></a>
-
 <MemberCard>
 
 ### MatchfixParseHandler()
@@ -5336,8 +4585,6 @@ type MatchfixParseHandler = (parser, body) => Expression | null;
 ```
 
 </MemberCard>
-
-<a id="latexargumenttype" name="latexargumenttype"></a>
 
 <MemberCard>
 
@@ -5361,16 +4608,13 @@ type LatexArgumentType =
 
 </MemberCard>
 
-<a id="trigger" name="trigger"></a>
-
 <MemberCard>
 
 ### Trigger
 
 ```ts
 type Trigger = {
-  latexTrigger:   | LatexString
-     | LatexToken[];
+  latexTrigger: LatexString | LatexToken[];
   symbolTrigger: MathJsonSymbol;
 };
 ```
@@ -5388,8 +4632,6 @@ LaTeX expressions that are equivalent, for example `\operatorname{gcd}` or
 
 </MemberCard>
 
-<a id="baseentry" name="baseentry"></a>
-
 <MemberCard>
 
 ### BaseEntry
@@ -5397,52 +4639,13 @@ LaTeX expressions that are equivalent, for example `\operatorname{gcd}` or
 ```ts
 type BaseEntry = {
   name: MathJsonSymbol;
-  serialize:   | LatexString
-     | SerializeHandler;
+  serialize: LatexString | SerializeHandler;
 };
 ```
 
 Maps a string of LaTeX tokens to a function or symbol and vice-versa.
 
-<a id="baseentry_name-1" name="baseentry_name-1"></a>
-
-#### BaseEntry.name?
-
-```ts
-optional name: MathJsonSymbol;
-```
-
-Map a MathJSON symbol to this entry.
-
-Each entry should have at least a `name` or a `parse` handler.
-
-An entry with no `name` cannot be serialized: the `name` is used to map
-a MathJSON function or symbol name to the appropriate entry for
-serializing.
-
-However, an entry with no `name` can be used to define a synonym (for
-example for the symbol `\varnothing` which is a synonym for `\emptyset`).
-
-If no `parse` handler is provided, only the trigger is used to select this
-entry. Otherwise, if the trigger of the entry matches the current
-token, the `parse` handler is invoked.
-
-<a id="baseentry_serialize-1" name="baseentry_serialize-1"></a>
-
-#### BaseEntry.serialize?
-
-```ts
-optional serialize: 
-  | LatexString
-  | SerializeHandler;
-```
-
-Transform an expression into a LaTeX string.
-If no `serialize` handler is provided, the trigger is used.
-
 </MemberCard>
-
-<a id="defaultentry" name="defaultentry"></a>
 
 <MemberCard>
 
@@ -5456,8 +4659,6 @@ type DefaultEntry = BaseEntry & Trigger & {
 ```
 
 </MemberCard>
-
-<a id="expressionentry" name="expressionentry"></a>
 
 <MemberCard>
 
@@ -5473,8 +4674,6 @@ type ExpressionEntry = BaseEntry & Trigger & {
 ```
 
 </MemberCard>
-
-<a id="matchfixentry" name="matchfixentry"></a>
 
 <MemberCard>
 
@@ -5509,8 +4708,6 @@ The argument of the handler is the body, i.e. the content between
 the open delimiter and the close delimiter.
 
 </MemberCard>
-
-<a id="infixentry" name="infixentry"></a>
 
 <MemberCard>
 
@@ -5551,8 +4748,6 @@ optional associativity: "right" | "left" | "none" | "any";
 
 </MemberCard>
 
-<a id="postfixentry" name="postfixentry"></a>
-
 <MemberCard>
 
 ### PostfixEntry
@@ -5576,8 +4771,6 @@ Postfix position, with an operand before: `a ⊛`
 Example: `!`.
 
 </MemberCard>
-
-<a id="prefixentry" name="prefixentry"></a>
 
 <MemberCard>
 
@@ -5603,8 +4796,6 @@ Example: `-`, `\not`.
 
 </MemberCard>
 
-<a id="environmententry" name="environmententry"></a>
-
 <MemberCard>
 
 ### EnvironmentEntry
@@ -5621,8 +4812,6 @@ A LaTeX dictionary entry for an environment, that is a LaTeX
 construct using `\begin{...}...\end{...}`.
 
 </MemberCard>
-
-<a id="symbolentry" name="symbolentry"></a>
 
 <MemberCard>
 
@@ -5647,8 +4836,6 @@ Used for appropriate wrapping (i.e. when to surround it with parens)
 
 </MemberCard>
 
-<a id="functionentry" name="functionentry"></a>
-
 <MemberCard>
 
 ### FunctionEntry
@@ -5670,8 +4857,6 @@ inverse functions postfix (i.e. ^{-1}), use a custom parse handler with a
 entry of kind `expression`.
 
 </MemberCard>
-
-<a id="latexdictionaryentry" name="latexdictionaryentry"></a>
 
 <MemberCard>
 
@@ -5697,8 +4882,6 @@ Set the ComputeEngine.latexDictionary property to an array of
 dictionary entries to define custom LaTeX parsing and serialization.
 
 </MemberCard>
-
-<a id="parselatexoptions" name="parselatexoptions"></a>
 
 <MemberCard>
 
@@ -5794,14 +4977,10 @@ commands replaced, for example `\egroup` and `\bgroup`.
 
 </MemberCard>
 
-<a id="parser" name="parser"></a>
-
 ### Parser
 
 An instance of `Parser` is provided to the `parse` handlers of custom
 LaTeX dictionary entries.
-
-<a id="parser_options" name="parser_options"></a>
 
 <MemberCard>
 
@@ -5812,8 +4991,6 @@ readonly options: Required<ParseLatexOptions>;
 ```
 
 </MemberCard>
-
-<a id="parser_index" name="parser_index"></a>
 
 <MemberCard>
 
@@ -5826,8 +5003,6 @@ index: number;
 The index of the current token
 
 </MemberCard>
-
-<a id="parser_atend" name="parser_atend"></a>
 
 <MemberCard>
 
@@ -5842,8 +5017,6 @@ Consider also `atTerminator()`.
 
 </MemberCard>
 
-<a id="parser_peek" name="parser_peek"></a>
-
 <MemberCard>
 
 ##### Parser.peek
@@ -5856,15 +5029,11 @@ Return the next token, without advancing the index
 
 </MemberCard>
 
-<a id="parser_atboundary" name="parser_atboundary"></a>
-
 <MemberCard>
 
 ##### Parser.atBoundary
 
 </MemberCard>
-
-<a id="parser_getsymboltype" name="parser_getsymboltype"></a>
 
 <MemberCard>
 
@@ -5880,8 +5049,6 @@ getSymbolType(id): BoxedType
 
 </MemberCard>
 
-<a id="parser_pushsymboltable" name="parser_pushsymboltable"></a>
-
 <MemberCard>
 
 ##### Parser.pushSymbolTable()
@@ -5892,8 +5059,6 @@ pushSymbolTable(): void
 
 </MemberCard>
 
-<a id="parser_popsymboltable" name="parser_popsymboltable"></a>
-
 <MemberCard>
 
 ##### Parser.popSymbolTable()
@@ -5903,8 +5068,6 @@ popSymbolTable(): void
 ```
 
 </MemberCard>
-
-<a id="parser_addsymbol" name="parser_addsymbol"></a>
 
 <MemberCard>
 
@@ -5924,8 +5087,6 @@ addSymbol(id, type): void
 
 </MemberCard>
 
-<a id="parser_atterminator" name="parser_atterminator"></a>
-
 <MemberCard>
 
 ##### Parser.atTerminator()
@@ -5943,8 +5104,6 @@ has been reached.
 
 </MemberCard>
 
-<a id="parser_nexttoken" name="parser_nexttoken"></a>
-
 <MemberCard>
 
 ##### Parser.nextToken()
@@ -5956,8 +5115,6 @@ nextToken(): string
 Return the next token and advance the index
 
 </MemberCard>
-
-<a id="parser_latex-1" name="parser_latex-1"></a>
 
 <MemberCard>
 
@@ -5980,8 +5137,6 @@ between `start` and `end` (default: the whole expression)
 
 </MemberCard>
 
-<a id="parser_error" name="parser_error"></a>
-
 <MemberCard>
 
 ##### Parser.error()
@@ -6002,8 +5157,6 @@ Return an error expression with the specified code and arguments
 
 </MemberCard>
 
-<a id="parser_skipspace" name="parser_skipspace"></a>
-
 <MemberCard>
 
 ##### Parser.skipSpace()
@@ -6015,8 +5168,6 @@ skipSpace(): boolean
 If there are any space, advance the index until a non-space is encountered
 
 </MemberCard>
-
-<a id="parser_skipvisualspace" name="parser_skipvisualspace"></a>
 
 <MemberCard>
 
@@ -6030,8 +5181,6 @@ Skip over "visual space" which
 includes space tokens, empty groups `{}`, and commands such as `\,` and `\!`
 
 </MemberCard>
-
-<a id="parser_match-1" name="parser_match-1"></a>
 
 <MemberCard>
 
@@ -6050,8 +5199,6 @@ return false
 
 </MemberCard>
 
-<a id="parser_matchall" name="parser_matchall"></a>
-
 <MemberCard>
 
 ##### Parser.matchAll()
@@ -6067,8 +5214,6 @@ Return true if the next tokens match the argument, an array of tokens, or null o
 `string`[]
 
 </MemberCard>
-
-<a id="parser_matchany" name="parser_matchany"></a>
 
 <MemberCard>
 
@@ -6086,8 +5231,6 @@ Return the next token if it matches any of the token in the argument or null oth
 
 </MemberCard>
 
-<a id="parser_parsechar" name="parser_parsechar"></a>
-
 <MemberCard>
 
 ##### Parser.parseChar()
@@ -6101,8 +5244,6 @@ This includes plain characters (e.g. 'a', '+'...), characters
 defined in hex (^^ and ^^^^), the `\char` and `\unicode` command.
 
 </MemberCard>
-
-<a id="parser_parsegroup" name="parser_parsegroup"></a>
 
 <MemberCard>
 
@@ -6120,8 +5261,6 @@ Return `null` if none was found
 Return `Nothing` if an empty group `{}` was found
 
 </MemberCard>
-
-<a id="parser_parsetoken" name="parser_parsetoken"></a>
 
 <MemberCard>
 
@@ -6146,8 +5285,6 @@ The excluded tokens include `!"#$%&(),/;:?@[]`|~", `\left`, `\bigl`, etc...
 
 </MemberCard>
 
-<a id="parser_parseoptionalgroup" name="parser_parseoptionalgroup"></a>
-
 <MemberCard>
 
 ##### Parser.parseOptionalGroup()
@@ -6162,8 +5299,6 @@ Return `null` if none was found.
 
 </MemberCard>
 
-<a id="parser_parseenclosure" name="parser_parseenclosure"></a>
-
 <MemberCard>
 
 ##### Parser.parseEnclosure()
@@ -6175,8 +5310,6 @@ parseEnclosure(): Expression
 Parse an enclosure (open paren/close paren, etc..) and return the expression inside the enclosure
 
 </MemberCard>
-
-<a id="parser_parsestringgroup" name="parser_parsestringgroup"></a>
 
 <MemberCard>
 
@@ -6206,8 +5339,6 @@ otherwise it is a regular group in braces.
 
 </MemberCard>
 
-<a id="parser_parsesymbol" name="parser_parsesymbol"></a>
-
 <MemberCard>
 
 ##### Parser.parseSymbol()
@@ -6227,8 +5358,6 @@ A symbol can be:
 
 </MemberCard>
 
-<a id="parser_parsetabular" name="parser_parsetabular"></a>
-
 <MemberCard>
 
 ##### Parser.parseTabular()
@@ -6244,8 +5373,6 @@ Return rows of sparse columns: empty rows are indicated with `Nothing`,
 and empty cells are also indicated with `Nothing`.
 
 </MemberCard>
-
-<a id="parser_parsearguments" name="parser_parsearguments"></a>
 
 <MemberCard>
 
@@ -6275,8 +5402,6 @@ argument was found.
 
 </MemberCard>
 
-<a id="parser_parsepostfixoperator" name="parser_parsepostfixoperator"></a>
-
 <MemberCard>
 
 ##### Parser.parsePostfixOperator()
@@ -6298,8 +5423,6 @@ Prefix, infix and matchfix operators are handled by `parseExpression()`
 `Partial`\<[`Terminator`](#terminator)\>
 
 </MemberCard>
-
-<a id="parser_parseexpression" name="parser_parseexpression"></a>
 
 <MemberCard>
 
@@ -6340,8 +5463,6 @@ or the sequence of tokens `until.tokens` is encountered
 
 </MemberCard>
 
-<a id="parser_parsenumber" name="parser_parsenumber"></a>
-
 <MemberCard>
 
 ##### Parser.parseNumber()
@@ -6353,8 +5474,6 @@ parseNumber(): Expression
 Parse a number.
 
 </MemberCard>
-
-<a id="parser_addboundary" name="parser_addboundary"></a>
 
 <MemberCard>
 
@@ -6382,8 +5501,6 @@ parsing when it encounters the `\end{bmatrix}` boundary.
 
 </MemberCard>
 
-<a id="parser_removeboundary" name="parser_removeboundary"></a>
-
 <MemberCard>
 
 ##### Parser.removeBoundary()
@@ -6394,8 +5511,6 @@ removeBoundary(): void
 
 </MemberCard>
 
-<a id="parser_matchboundary" name="parser_matchboundary"></a>
-
 <MemberCard>
 
 ##### Parser.matchBoundary()
@@ -6405,8 +5520,6 @@ matchBoundary(): boolean
 ```
 
 </MemberCard>
-
-<a id="parser_boundaryerror" name="parser_boundaryerror"></a>
 
 <MemberCard>
 
@@ -6421,8 +5534,6 @@ boundaryError(msg): Expression
 `string` | \[`string`, `...Expression[]`\]
 
 </MemberCard>
-
-<a id="serializelatexoptions" name="serializelatexoptions"></a>
 
 <MemberCard>
 
@@ -6534,14 +5645,10 @@ Serialize the expression `["Error", "'missing'"]`,  with this LaTeX string
 
 </MemberCard>
 
-<a id="serializer" name="serializer"></a>
-
 ### Serializer
 
 An instance of `Serializer` is provided to the `serialize` handlers of custom
 LaTeX dictionary entries.
-
-<a id="serializer_options-1" name="serializer_options-1"></a>
 
 <MemberCard>
 
@@ -6553,8 +5660,6 @@ readonly options: Required<SerializeLatexOptions>;
 
 </MemberCard>
 
-<a id="serializer_dictionary-1" name="serializer_dictionary-1"></a>
-
 <MemberCard>
 
 ##### Serializer.dictionary
@@ -6564,8 +5669,6 @@ readonly dictionary: IndexedLatexDictionary;
 ```
 
 </MemberCard>
-
-<a id="serializer_level" name="serializer_level"></a>
 
 <MemberCard>
 
@@ -6588,8 +5691,6 @@ For example use `\Bigl(` for the top level, and `\bigl(` or `(` for others.
 
 </MemberCard>
 
-<a id="serializer_serialize" name="serializer_serialize"></a>
-
 <MemberCard>
 
 ##### Serializer.serialize()
@@ -6601,8 +5702,6 @@ serialize: (expr) => string;
 Output a LaTeX string representing the expression
 
 </MemberCard>
-
-<a id="serializer_wrap" name="serializer_wrap"></a>
 
 <MemberCard>
 
@@ -6617,8 +5716,6 @@ an operator of precedence less than or equal to `prec`.
 
 </MemberCard>
 
-<a id="serializer_applyfunctionstyle" name="serializer_applyfunctionstyle"></a>
-
 <MemberCard>
 
 ##### Serializer.applyFunctionStyle()
@@ -6631,8 +5728,6 @@ Styles
 
 </MemberCard>
 
-<a id="serializer_groupstyle" name="serializer_groupstyle"></a>
-
 <MemberCard>
 
 ##### Serializer.groupStyle()
@@ -6643,8 +5738,6 @@ groupStyle: (expr, level) => DelimiterScale;
 
 </MemberCard>
 
-<a id="serializer_rootstyle" name="serializer_rootstyle"></a>
-
 <MemberCard>
 
 ##### Serializer.rootStyle()
@@ -6654,8 +5747,6 @@ rootStyle: (expr, level) => "radical" | "quotient" | "solidus";
 ```
 
 </MemberCard>
-
-<a id="serializer_fractionstyle" name="serializer_fractionstyle"></a>
 
 <MemberCard>
 
@@ -6674,8 +5765,6 @@ fractionStyle: (expr, level) =>
 
 </MemberCard>
 
-<a id="serializer_logicstyle" name="serializer_logicstyle"></a>
-
 <MemberCard>
 
 ##### Serializer.logicStyle()
@@ -6685,8 +5774,6 @@ logicStyle: (expr, level) => "boolean" | "word" | "uppercase-word" | "punctuatio
 ```
 
 </MemberCard>
-
-<a id="serializer_powerstyle" name="serializer_powerstyle"></a>
 
 <MemberCard>
 
@@ -6698,8 +5785,6 @@ powerStyle: (expr, level) => "quotient" | "solidus" | "root";
 
 </MemberCard>
 
-<a id="serializer_numericsetstyle" name="serializer_numericsetstyle"></a>
-
 <MemberCard>
 
 ##### Serializer.numericSetStyle()
@@ -6709,8 +5794,6 @@ numericSetStyle: (expr, level) => "interval" | "compact" | "regular" | "set-buil
 ```
 
 </MemberCard>
-
-<a id="serializer_serializefunction" name="serializer_serializefunction"></a>
 
 <MemberCard>
 
@@ -6730,8 +5813,6 @@ serializeFunction(expr, def?): string
 
 </MemberCard>
 
-<a id="serializer_serializesymbol" name="serializer_serializesymbol"></a>
-
 <MemberCard>
 
 ##### Serializer.serializeSymbol()
@@ -6745,8 +5826,6 @@ serializeSymbol(expr): string
 [`Expression`](#expression)
 
 </MemberCard>
-
-<a id="serializer_wrapstring" name="serializer_wrapstring"></a>
 
 <MemberCard>
 
@@ -6774,8 +5853,6 @@ If `delimiters` is not specified, use `()`
 
 </MemberCard>
 
-<a id="serializer_wraparguments" name="serializer_wraparguments"></a>
-
 <MemberCard>
 
 ##### Serializer.wrapArguments()
@@ -6792,8 +5869,6 @@ commas.
 [`Expression`](#expression)
 
 </MemberCard>
-
-<a id="serializer_wrapshort" name="serializer_wrapshort"></a>
 
 <MemberCard>
 
@@ -6812,8 +5887,6 @@ short (not a function)
 
 </MemberCard>
 
-<a id="serializehandler" name="serializehandler"></a>
-
 <MemberCard>
 
 ### SerializeHandler()
@@ -6828,8 +5901,6 @@ a function of this type.
 </MemberCard>
 
 ## Numerics
-
-<a id="sign" name="sign"></a>
 
 <MemberCard>
 
@@ -6848,8 +5919,6 @@ type Sign =
 
 </MemberCard>
 
-<a id="exactnumericvaluedata" name="exactnumericvaluedata"></a>
-
 <MemberCard>
 
 ### ExactNumericValueData
@@ -6865,8 +5934,6 @@ The value is equal to `(decimal * rational * sqrt(radical)) + im * i`
 
 </MemberCard>
 
-<a id="numericvaluedata" name="numericvaluedata"></a>
-
 <MemberCard>
 
 ### NumericValueData
@@ -6880,8 +5947,6 @@ type NumericValueData = {
 
 </MemberCard>
 
-<a id="numericvaluefactory" name="numericvaluefactory"></a>
-
 <MemberCard>
 
 ### NumericValueFactory()
@@ -6891,8 +5956,6 @@ type NumericValueFactory = (data) => NumericValue;
 ```
 
 </MemberCard>
-
-<a id="numericvalue" name="numericvalue"></a>
 
 ### `abstract` NumericValue
 
@@ -6905,8 +5968,6 @@ new NumericValue(): NumericValue
 ```
 
 </MemberCard>
-
-<a id="numericvalue_im" name="numericvalue_im"></a>
 
 <MemberCard>
 
@@ -6922,15 +5983,11 @@ Can be negative, zero or positive.
 
 </MemberCard>
 
-<a id="numericvalue_type-1" name="numericvalue_type-1"></a>
-
 <MemberCard>
 
 ##### NumericValue.type
 
 </MemberCard>
-
-<a id="numericvalue_isexact" name="numericvalue_isexact"></a>
 
 <MemberCard>
 
@@ -6944,8 +6001,6 @@ But it doesn't include 0.5, 3.141592, etc...
 
 </MemberCard>
 
-<a id="numericvalue_asexact" name="numericvalue_asexact"></a>
-
 <MemberCard>
 
 ##### NumericValue.asExact
@@ -6953,8 +6008,6 @@ But it doesn't include 0.5, 3.141592, etc...
 If `isExact()`, returns an ExactNumericValue, otherwise returns undefined.
 
 </MemberCard>
-
-<a id="numericvalue_re" name="numericvalue_re"></a>
 
 <MemberCard>
 
@@ -6966,8 +6019,6 @@ Can be negative, 0 or positive.
 
 </MemberCard>
 
-<a id="numericvalue_bignumre" name="numericvalue_bignumre"></a>
-
 <MemberCard>
 
 ##### NumericValue.bignumRe
@@ -6976,15 +6027,11 @@ bignum version of .re, if available
 
 </MemberCard>
 
-<a id="numericvalue_bignumim" name="numericvalue_bignumim"></a>
-
 <MemberCard>
 
 ##### NumericValue.bignumIm
 
 </MemberCard>
-
-<a id="numericvalue_numerator" name="numericvalue_numerator"></a>
 
 <MemberCard>
 
@@ -6992,15 +6039,11 @@ bignum version of .re, if available
 
 </MemberCard>
 
-<a id="numericvalue_denominator" name="numericvalue_denominator"></a>
-
 <MemberCard>
 
 ##### NumericValue.denominator
 
 </MemberCard>
-
-<a id="numericvalue_isnan" name="numericvalue_isnan"></a>
 
 <MemberCard>
 
@@ -7008,15 +6051,11 @@ bignum version of .re, if available
 
 </MemberCard>
 
-<a id="numericvalue_ispositiveinfinity" name="numericvalue_ispositiveinfinity"></a>
-
 <MemberCard>
 
 ##### NumericValue.isPositiveInfinity
 
 </MemberCard>
-
-<a id="numericvalue_isnegativeinfinity" name="numericvalue_isnegativeinfinity"></a>
 
 <MemberCard>
 
@@ -7024,15 +6063,11 @@ bignum version of .re, if available
 
 </MemberCard>
 
-<a id="numericvalue_iscomplexinfinity" name="numericvalue_iscomplexinfinity"></a>
-
 <MemberCard>
 
 ##### NumericValue.isComplexInfinity
 
 </MemberCard>
-
-<a id="numericvalue_iszero" name="numericvalue_iszero"></a>
 
 <MemberCard>
 
@@ -7040,23 +6075,17 @@ bignum version of .re, if available
 
 </MemberCard>
 
-<a id="numericvalue_isone" name="numericvalue_isone"></a>
-
 <MemberCard>
 
 ##### NumericValue.isOne
 
 </MemberCard>
 
-<a id="numericvalue_isnegativeone" name="numericvalue_isnegativeone"></a>
-
 <MemberCard>
 
 ##### NumericValue.isNegativeOne
 
 </MemberCard>
-
-<a id="numericvalue_iszerowithtolerance" name="numericvalue_iszerowithtolerance"></a>
 
 <MemberCard>
 
@@ -7072,8 +6101,6 @@ isZeroWithTolerance(_tolerance): boolean
 
 </MemberCard>
 
-<a id="numericvalue_sgn" name="numericvalue_sgn"></a>
-
 <MemberCard>
 
 ##### NumericValue.sgn()
@@ -7085,8 +6112,6 @@ abstract sgn(): -1 | 0 | 1
 The sign of complex numbers is undefined
 
 </MemberCard>
-
-<a id="numericvalue_n" name="numericvalue_n"></a>
 
 <MemberCard>
 
@@ -7100,8 +6125,6 @@ Return a non-exact representation of the numeric value
 
 </MemberCard>
 
-<a id="numericvalue_neg" name="numericvalue_neg"></a>
-
 <MemberCard>
 
 ##### NumericValue.neg()
@@ -7111,8 +6134,6 @@ abstract neg(): NumericValue
 ```
 
 </MemberCard>
-
-<a id="numericvalue_inv" name="numericvalue_inv"></a>
 
 <MemberCard>
 
@@ -7124,8 +6145,6 @@ abstract inv(): NumericValue
 
 </MemberCard>
 
-<a id="numericvalue_add" name="numericvalue_add"></a>
-
 <MemberCard>
 
 ##### NumericValue.add()
@@ -7136,11 +6155,9 @@ abstract add(other): NumericValue
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_sub" name="numericvalue_sub"></a>
 
 <MemberCard>
 
@@ -7152,11 +6169,9 @@ abstract sub(other): NumericValue
 
 ####### other
 
-[`NumericValue`](#numericvalue)
+[`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_mul" name="numericvalue_mul"></a>
 
 <MemberCard>
 
@@ -7168,11 +6183,9 @@ abstract mul(other): NumericValue
 
 ####### other
 
-`number` | `Decimal` | [`NumericValue`](#numericvalue)
+`number` | `Decimal` | [`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_div" name="numericvalue_div"></a>
 
 <MemberCard>
 
@@ -7184,11 +6197,9 @@ abstract div(other): NumericValue
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_pow" name="numericvalue_pow"></a>
 
 <MemberCard>
 
@@ -7200,14 +6211,12 @@ abstract pow(n): NumericValue
 
 ####### n
 
-`number` | [`NumericValue`](#numericvalue) | \{
+`number` | [`NumericValue`](#numericvalue-1) | \{
 `re`: `number`;
 `im`: `number`;
 \}
 
 </MemberCard>
-
-<a id="numericvalue_root" name="numericvalue_root"></a>
 
 <MemberCard>
 
@@ -7223,8 +6232,6 @@ abstract root(n): NumericValue
 
 </MemberCard>
 
-<a id="numericvalue_sqrt" name="numericvalue_sqrt"></a>
-
 <MemberCard>
 
 ##### NumericValue.sqrt()
@@ -7234,8 +6241,6 @@ abstract sqrt(): NumericValue
 ```
 
 </MemberCard>
-
-<a id="numericvalue_gcd" name="numericvalue_gcd"></a>
 
 <MemberCard>
 
@@ -7247,11 +6252,9 @@ abstract gcd(other): NumericValue
 
 ####### other
 
-[`NumericValue`](#numericvalue)
+[`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_abs" name="numericvalue_abs"></a>
 
 <MemberCard>
 
@@ -7262,8 +6265,6 @@ abstract abs(): NumericValue
 ```
 
 </MemberCard>
-
-<a id="numericvalue_ln" name="numericvalue_ln"></a>
 
 <MemberCard>
 
@@ -7279,8 +6280,6 @@ abstract ln(base?): NumericValue
 
 </MemberCard>
 
-<a id="numericvalue_exp" name="numericvalue_exp"></a>
-
 <MemberCard>
 
 ##### NumericValue.exp()
@@ -7290,8 +6289,6 @@ abstract exp(): NumericValue
 ```
 
 </MemberCard>
-
-<a id="numericvalue_floor" name="numericvalue_floor"></a>
 
 <MemberCard>
 
@@ -7303,8 +6300,6 @@ abstract floor(): NumericValue
 
 </MemberCard>
 
-<a id="numericvalue_ceil" name="numericvalue_ceil"></a>
-
 <MemberCard>
 
 ##### NumericValue.ceil()
@@ -7314,8 +6309,6 @@ abstract ceil(): NumericValue
 ```
 
 </MemberCard>
-
-<a id="numericvalue_round" name="numericvalue_round"></a>
 
 <MemberCard>
 
@@ -7327,8 +6320,6 @@ abstract round(): NumericValue
 
 </MemberCard>
 
-<a id="numericvalue_eq" name="numericvalue_eq"></a>
-
 <MemberCard>
 
 ##### NumericValue.eq()
@@ -7339,11 +6330,9 @@ abstract eq(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_lt" name="numericvalue_lt"></a>
 
 <MemberCard>
 
@@ -7355,11 +6344,9 @@ abstract lt(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_lte" name="numericvalue_lte"></a>
 
 <MemberCard>
 
@@ -7371,11 +6358,9 @@ abstract lte(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_gt" name="numericvalue_gt"></a>
 
 <MemberCard>
 
@@ -7387,11 +6372,9 @@ abstract gt(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_gte" name="numericvalue_gte"></a>
 
 <MemberCard>
 
@@ -7403,11 +6386,9 @@ abstract gte(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#numericvalue-1)
 
 </MemberCard>
-
-<a id="numericvalue_valueof-1" name="numericvalue_valueof-1"></a>
 
 <MemberCard>
 
@@ -7421,8 +6402,6 @@ Object.valueOf(): returns a primitive value, preferably a JavaScript
  number over a string, even if at the expense of precision
 
 </MemberCard>
-
-<a id="numericvalue_toprimitive-1" name="numericvalue_toprimitive-1"></a>
 
 <MemberCard>
 
@@ -7440,8 +6419,6 @@ Object.toPrimitive()
 
 </MemberCard>
 
-<a id="numericvalue_tojson-1" name="numericvalue_tojson-1"></a>
-
 <MemberCard>
 
 ##### NumericValue.toJSON()
@@ -7454,8 +6431,6 @@ Object.toJSON
 
 </MemberCard>
 
-<a id="numericvalue_print" name="numericvalue_print"></a>
-
 <MemberCard>
 
 ##### NumericValue.print()
@@ -7465,8 +6440,6 @@ print(): void
 ```
 
 </MemberCard>
-
-<a id="smallinteger" name="smallinteger"></a>
 
 <MemberCard>
 
@@ -7479,8 +6452,6 @@ type SmallInteger = IsInteger<number>;
 A `SmallInteger` is an integer < 1e6
 
 </MemberCard>
-
-<a id="rational-1" name="rational-1"></a>
 
 <MemberCard>
 
@@ -7500,8 +6471,6 @@ a pair of big integers.
 
 </MemberCard>
 
-<a id="bignum-1" name="bignum-1"></a>
-
 <MemberCard>
 
 ### BigNum
@@ -7512,11 +6481,7 @@ type BigNum = Decimal;
 
 </MemberCard>
 
-<a id="ibignum" name="ibignum"></a>
-
 ### IBigNum
-
-<a id="ibignum__bignum_nan" name="ibignum__bignum_nan"></a>
 
 <MemberCard>
 
@@ -7528,8 +6493,6 @@ readonly _BIGNUM_NAN: Decimal;
 
 </MemberCard>
 
-<a id="ibignum__bignum_zero" name="ibignum__bignum_zero"></a>
-
 <MemberCard>
 
 ##### IBigNum.\_BIGNUM\_ZERO
@@ -7539,8 +6502,6 @@ readonly _BIGNUM_ZERO: Decimal;
 ```
 
 </MemberCard>
-
-<a id="ibignum__bignum_one" name="ibignum__bignum_one"></a>
 
 <MemberCard>
 
@@ -7552,8 +6513,6 @@ readonly _BIGNUM_ONE: Decimal;
 
 </MemberCard>
 
-<a id="ibignum__bignum_two" name="ibignum__bignum_two"></a>
-
 <MemberCard>
 
 ##### IBigNum.\_BIGNUM\_TWO
@@ -7563,8 +6522,6 @@ readonly _BIGNUM_TWO: Decimal;
 ```
 
 </MemberCard>
-
-<a id="ibignum__bignum_half" name="ibignum__bignum_half"></a>
 
 <MemberCard>
 
@@ -7576,8 +6533,6 @@ readonly _BIGNUM_HALF: Decimal;
 
 </MemberCard>
 
-<a id="ibignum__bignum_pi" name="ibignum__bignum_pi"></a>
-
 <MemberCard>
 
 ##### IBigNum.\_BIGNUM\_PI
@@ -7588,8 +6543,6 @@ readonly _BIGNUM_PI: Decimal;
 
 </MemberCard>
 
-<a id="ibignum__bignum_negative_one" name="ibignum__bignum_negative_one"></a>
-
 <MemberCard>
 
 ##### IBigNum.\_BIGNUM\_NEGATIVE\_ONE
@@ -7599,8 +6552,6 @@ readonly _BIGNUM_NEGATIVE_ONE: Decimal;
 ```
 
 </MemberCard>
-
-<a id="ibignum_bignum" name="ibignum_bignum"></a>
 
 <MemberCard>
 
@@ -7618,14 +6569,10 @@ bignum(value): Decimal
 
 ## Other
 
-<a id="dictionaryinterface" name="dictionaryinterface"></a>
-
 ### DictionaryInterface
 
 Interface for dictionary-like structures.
 Use `isDictionary()` to check if an expression is a dictionary.
-
-<a id="dictionaryinterface_keys" name="dictionaryinterface_keys"></a>
 
 <MemberCard>
 
@@ -7633,23 +6580,17 @@ Use `isDictionary()` to check if an expression is a dictionary.
 
 </MemberCard>
 
-<a id="dictionaryinterface_entries" name="dictionaryinterface_entries"></a>
-
 <MemberCard>
 
 ##### DictionaryInterface.entries
 
 </MemberCard>
 
-<a id="dictionaryinterface_values" name="dictionaryinterface_values"></a>
-
 <MemberCard>
 
 ##### DictionaryInterface.values
 
 </MemberCard>
-
-<a id="dictionaryinterface_get-1" name="dictionaryinterface_get-1"></a>
 
 <MemberCard>
 
@@ -7665,8 +6606,6 @@ get(key): BoxedExpression
 
 </MemberCard>
 
-<a id="dictionaryinterface_has-1" name="dictionaryinterface_has-1"></a>
-
 <MemberCard>
 
 ##### DictionaryInterface.has()
@@ -7681,8 +6620,6 @@ has(key): boolean
 
 </MemberCard>
 
-<a id="symboltable" name="symboltable"></a>
-
 <MemberCard>
 
 ### SymbolTable
@@ -7696,8 +6633,6 @@ type SymbolTable = {
 
 </MemberCard>
 
-<a id="bignumfactory" name="bignumfactory"></a>
-
 <MemberCard>
 
 ### BigNumFactory()
@@ -7710,8 +6645,6 @@ type BigNumFactory = (value) => Decimal;
 
 ## Serialization
 
-<a id="jsonserializationoptions" name="jsonserializationoptions"></a>
-
 <MemberCard>
 
 ### JsonSerializationOptions
@@ -7720,7 +6653,7 @@ type BigNumFactory = (value) => Decimal;
 type JsonSerializationOptions = {
   prettify: boolean;
   exclude: string[];
-  shorthands: ("all" | "number" | "symbol" | "function" | "string")[];
+  shorthands: ("all" | "number" | "symbol" | "function" | "string" | "dictionary")[];
   metadata: ("all" | "wikidata" | "latex")[];
   repeatingDecimal: boolean;
   fractionalDigits: "auto" | "max" | number;
@@ -7729,96 +6662,7 @@ type JsonSerializationOptions = {
 
 Options to control the serialization to MathJSON when using `BoxedExpression.toMathJson()`.
 
-<a id="jsonserializationoptions_prettify" name="jsonserializationoptions_prettify"></a>
-
-#### JsonSerializationOptions.prettify
-
-```ts
-prettify: boolean;
-```
-
-If true, the serialization applies some transformations to make
-the JSON more readable. For example, `["Power", "x", 2]` is serialized
-as `["Square", "x"]`.
-
-<a id="jsonserializationoptions_exclude" name="jsonserializationoptions_exclude"></a>
-
-#### JsonSerializationOptions.exclude
-
-```ts
-exclude: string[];
-```
-
-A list of space separated function names that should be excluded from
-the JSON output.
-
-Those functions are replaced with an equivalent, for example, `Square` with
-`Power`, etc...
-
-Possible values include `Sqrt`, `Root`, `Square`, `Exp`, `Subtract`,
-`Rational`, `Complex`
-
-**Default**: `[]` (none)
-
-<a id="jsonserializationoptions_shorthands" name="jsonserializationoptions_shorthands"></a>
-
-#### JsonSerializationOptions.shorthands
-
-```ts
-shorthands: ("all" | "number" | "symbol" | "function" | "string")[];
-```
-
-A list of space separated keywords indicating which MathJSON expressions
-can use a shorthand.
-
-**Default**: `["all"]`
-
-<a id="jsonserializationoptions_metadata" name="jsonserializationoptions_metadata"></a>
-
-#### JsonSerializationOptions.metadata
-
-```ts
-metadata: ("all" | "wikidata" | "latex")[];
-```
-
-A list of space separated keywords indicating which metadata should be
-included in the MathJSON. If metadata is included, shorthand notation
-is not used.
-
-**Default**: `[]`  (none)
-
-<a id="jsonserializationoptions_repeatingdecimal" name="jsonserializationoptions_repeatingdecimal"></a>
-
-#### JsonSerializationOptions.repeatingDecimal
-
-```ts
-repeatingDecimal: boolean;
-```
-
-If true, repeating decimals are detected and serialized accordingly
-For example:
-- `1.3333333333333333` \( \to \) `1.(3)`
-- `0.142857142857142857142857142857142857142857142857142` \( \to \) `0.(1428571)`
-
-**Default**: `true`
-
-<a id="jsonserializationoptions_fractionaldigits" name="jsonserializationoptions_fractionaldigits"></a>
-
-#### JsonSerializationOptions.fractionalDigits
-
-```ts
-fractionalDigits: "auto" | "max" | number;
-```
-
-The maximum number of significant digits in serialized numbers.
-- `"max"`: all availabe digits are serialized.
-- `"auto"`: use the same precision as the compute engine.
-
-**Default**: `"auto"`
-
 </MemberCard>
-
-<a id="numberformat" name="numberformat"></a>
 
 <MemberCard>
 
@@ -7844,73 +6688,7 @@ type NumberFormat = {
 
 These options control how numbers are parsed and serialized.
 
-<a id="numberformat_decimalseparator" name="numberformat_decimalseparator"></a>
-
-#### NumberFormat.decimalSeparator
-
-```ts
-decimalSeparator: LatexString;
-```
-
-A string representing the decimal separator, the string separating
-the whole portion of a number from the fractional portion, i.e.
-the "." in "3.1415".
-
-Some countries use a comma rather than a dot. In this case it is
-recommended to use `"{,}"` as the separator: the surrounding brackets
-ensure there is no additional gap after the comma.
-
-**Default**: `"."`
-
-<a id="numberformat_digitgroupseparator" name="numberformat_digitgroupseparator"></a>
-
-#### NumberFormat.digitGroupSeparator
-
-```ts
-digitGroupSeparator: 
-  | LatexString
-  | [LatexString, LatexString];
-```
-
-A string representing the separator between groups of digits,
-to make numbers with many digits easier to read.
-
-If a single string is provided, it is used to group digits in the
-whole and the fractional part of the number. If two strings are provided,
-the first is used for the whole part and the second for the fractional
-part.
-
-Caution: some values may lead to unexpected results.
-
-For example, if the `digitGroupSeparator` is `,` (comma) the expression
-`\operatorname{Hypot}(1,2)` will parse as `["Hypot", 1.2]` rather than
-`["Hypot", 1, 2]`. You can however use `{,}` which will avoid this issue
-and display with correct spacing.
-
-**Default**: `"\\,"` (thin space, 3/18mu) (Resolution 7 of the 1948 CGPM)
-
-<a id="numberformat_digitgroup" name="numberformat_digitgroup"></a>
-
-#### NumberFormat.digitGroup
-
-```ts
-digitGroup: "lakh" | number | [number | "lakh", number];
-```
-
-Maximum length of digits between digit group separators.
-
-If a single number is provided, it is used for the whole and the fractional
-part of the number. If two numbers are provided, the first is used for the
-whole part and the second for the fractional part.
-
-If '`"lakh"`' is provided, the number is grouped in groups of 2 digits,
-except for the last group which has 3 digits. For example: `1,00,00,000`.
-
-**Default**: `3`
-
 </MemberCard>
-
-<a id="numberserializationformat" name="numberserializationformat"></a>
 
 <MemberCard>
 
@@ -7940,8 +6718,6 @@ Default: `"auto"`
 
 ## Tensors
 
-<a id="datatypemap" name="datatypemap"></a>
-
 <MemberCard>
 
 ### DataTypeMap
@@ -7963,8 +6739,6 @@ Map of `TensorDataType` to JavaScript type.
 
 </MemberCard>
 
-<a id="tensordatatype" name="tensordatatype"></a>
-
 <MemberCard>
 
 ### TensorDataType
@@ -7977,17 +6751,13 @@ The type of the cells in a tensor.
 
 </MemberCard>
 
-<a id="tensordatadt" name="tensordatadt"></a>
-
 ### TensorData\<DT\>
 
 A record representing the type, shape and data of a tensor.
 
 #### Extended by
 
-- [`Tensor`](#tensordt)
-
-<a id="tensordatadt_dtype" name="tensordatadt_dtype"></a>
+- [`Tensor`](#tensor)
 
 <MemberCard>
 
@@ -7999,8 +6769,6 @@ dtype: DT;
 
 </MemberCard>
 
-<a id="tensordatadt_shape" name="tensordatadt_shape"></a>
-
 <MemberCard>
 
 ##### TensorData.shape
@@ -8010,8 +6778,6 @@ shape: number[];
 ```
 
 </MemberCard>
-
-<a id="tensordatadt_rank" name="tensordatadt_rank"></a>
 
 <MemberCard>
 
@@ -8023,8 +6789,6 @@ optional rank: number;
 
 </MemberCard>
 
-<a id="tensordatadt_data" name="tensordatadt_data"></a>
-
 <MemberCard>
 
 ##### TensorData.data
@@ -8035,11 +6799,7 @@ data: DataTypeMap[DT][];
 
 </MemberCard>
 
-<a id="tensorfieldt" name="tensorfieldt"></a>
-
 ### TensorField\<T\>
-
-<a id="tensorfieldt_one" name="tensorfieldt_one"></a>
 
 <MemberCard>
 
@@ -8051,8 +6811,6 @@ readonly one: T;
 
 </MemberCard>
 
-<a id="tensorfieldt_zero" name="tensorfieldt_zero"></a>
-
 <MemberCard>
 
 ##### TensorField.zero
@@ -8063,8 +6821,6 @@ readonly zero: T;
 
 </MemberCard>
 
-<a id="tensorfieldt_nan" name="tensorfieldt_nan"></a>
-
 <MemberCard>
 
 ##### TensorField.nan
@@ -8074,8 +6830,6 @@ readonly nan: T;
 ```
 
 </MemberCard>
-
-<a id="tensorfieldt_cast" name="tensorfieldt_cast"></a>
 
 <MemberCard>
 
@@ -8321,8 +7075,6 @@ keyof [`DataTypeMap`](#datatypemap)
 
 </MemberCard>
 
-<a id="tensorfieldt_expression" name="tensorfieldt_expression"></a>
-
 <MemberCard>
 
 ##### TensorField.expression()
@@ -8336,8 +7088,6 @@ expression(x): BoxedExpression
 `T`
 
 </MemberCard>
-
-<a id="tensorfieldt_iszero-1" name="tensorfieldt_iszero-1"></a>
 
 <MemberCard>
 
@@ -8353,8 +7103,6 @@ isZero(x): boolean
 
 </MemberCard>
 
-<a id="tensorfieldt_isone-1" name="tensorfieldt_isone-1"></a>
-
 <MemberCard>
 
 ##### TensorField.isOne()
@@ -8368,8 +7116,6 @@ isOne(x): boolean
 `T`
 
 </MemberCard>
-
-<a id="tensorfieldt_equals" name="tensorfieldt_equals"></a>
 
 <MemberCard>
 
@@ -8389,8 +7135,6 @@ equals(lhs, rhs): boolean
 
 </MemberCard>
 
-<a id="tensorfieldt_add-1" name="tensorfieldt_add-1"></a>
-
 <MemberCard>
 
 ##### TensorField.add()
@@ -8409,8 +7153,6 @@ add(lhs, rhs): T
 
 </MemberCard>
 
-<a id="tensorfieldt_addn" name="tensorfieldt_addn"></a>
-
 <MemberCard>
 
 ##### TensorField.addn()
@@ -8425,8 +7167,6 @@ addn(...xs): T
 
 </MemberCard>
 
-<a id="tensorfieldt_neg-1" name="tensorfieldt_neg-1"></a>
-
 <MemberCard>
 
 ##### TensorField.neg()
@@ -8440,8 +7180,6 @@ neg(x): T
 `T`
 
 </MemberCard>
-
-<a id="tensorfieldt_sub-1" name="tensorfieldt_sub-1"></a>
 
 <MemberCard>
 
@@ -8461,8 +7199,6 @@ sub(lhs, rhs): T
 
 </MemberCard>
 
-<a id="tensorfieldt_mul-1" name="tensorfieldt_mul-1"></a>
-
 <MemberCard>
 
 ##### TensorField.mul()
@@ -8481,8 +7217,6 @@ mul(lhs, rhs): T
 
 </MemberCard>
 
-<a id="tensorfieldt_muln" name="tensorfieldt_muln"></a>
-
 <MemberCard>
 
 ##### TensorField.muln()
@@ -8496,8 +7230,6 @@ muln(...xs): T
 ...`T`[]
 
 </MemberCard>
-
-<a id="tensorfieldt_div-1" name="tensorfieldt_div-1"></a>
 
 <MemberCard>
 
@@ -8517,8 +7249,6 @@ div(lhs, rhs): T
 
 </MemberCard>
 
-<a id="tensorfieldt_pow-1" name="tensorfieldt_pow-1"></a>
-
 <MemberCard>
 
 ##### TensorField.pow()
@@ -8537,8 +7267,6 @@ pow(rhs, n): T
 
 </MemberCard>
 
-<a id="tensorfieldt_conjugate" name="tensorfieldt_conjugate"></a>
-
 <MemberCard>
 
 ##### TensorField.conjugate()
@@ -8553,15 +7281,11 @@ conjugate(x): T
 
 </MemberCard>
 
-<a id="tensordt" name="tensordt"></a>
-
 ### Tensor\<DT\>
 
 #### Extends
 
-- [`TensorData`](#tensordatadt)\<`DT`\>
-
-<a id="tensordt_dtype-1" name="tensordt_dtype-1"></a>
+- [`TensorData`](#tensordata)\<`DT`\>
 
 <MemberCard>
 
@@ -8573,8 +7297,6 @@ dtype: DT;
 
 </MemberCard>
 
-<a id="tensordt_shape-1" name="tensordt_shape-1"></a>
-
 <MemberCard>
 
 ##### Tensor.shape
@@ -8584,8 +7306,6 @@ shape: number[];
 ```
 
 </MemberCard>
-
-<a id="tensordt_rank-1" name="tensordt_rank-1"></a>
 
 <MemberCard>
 
@@ -8597,8 +7317,6 @@ rank: number;
 
 </MemberCard>
 
-<a id="tensordt_data-1" name="tensordt_data-1"></a>
-
 <MemberCard>
 
 ##### Tensor.data
@@ -8608,8 +7326,6 @@ data: DataTypeMap[DT][];
 ```
 
 </MemberCard>
-
-<a id="tensordt_field" name="tensordt_field"></a>
 
 <MemberCard>
 
@@ -8621,8 +7337,6 @@ readonly field: TensorField<DT>;
 
 </MemberCard>
 
-<a id="tensordt_expression-1" name="tensordt_expression-1"></a>
-
 <MemberCard>
 
 ##### Tensor.expression
@@ -8632,8 +7346,6 @@ readonly expression: BoxedExpression;
 ```
 
 </MemberCard>
-
-<a id="tensordt_array" name="tensordt_array"></a>
 
 <MemberCard>
 
@@ -8645,8 +7357,6 @@ readonly array: NestedArray<DataTypeMap[DT]>;
 
 </MemberCard>
 
-<a id="tensordt_issquare" name="tensordt_issquare"></a>
-
 <MemberCard>
 
 ##### Tensor.isSquare
@@ -8656,8 +7366,6 @@ readonly isSquare: boolean;
 ```
 
 </MemberCard>
-
-<a id="tensordt_issymmetric" name="tensordt_issymmetric"></a>
 
 <MemberCard>
 
@@ -8669,8 +7377,6 @@ readonly isSymmetric: boolean;
 
 </MemberCard>
 
-<a id="tensordt_isskewsymmetric" name="tensordt_isskewsymmetric"></a>
-
 <MemberCard>
 
 ##### Tensor.isSkewSymmetric
@@ -8680,8 +7386,6 @@ readonly isSkewSymmetric: boolean;
 ```
 
 </MemberCard>
-
-<a id="tensordt_isdiagonal" name="tensordt_isdiagonal"></a>
 
 <MemberCard>
 
@@ -8693,8 +7397,6 @@ readonly isDiagonal: boolean;
 
 </MemberCard>
 
-<a id="tensordt_isuppertriangular" name="tensordt_isuppertriangular"></a>
-
 <MemberCard>
 
 ##### Tensor.isUpperTriangular
@@ -8704,8 +7406,6 @@ readonly isUpperTriangular: boolean;
 ```
 
 </MemberCard>
-
-<a id="tensordt_islowertriangular" name="tensordt_islowertriangular"></a>
 
 <MemberCard>
 
@@ -8717,8 +7417,6 @@ readonly isLowerTriangular: boolean;
 
 </MemberCard>
 
-<a id="tensordt_istriangular" name="tensordt_istriangular"></a>
-
 <MemberCard>
 
 ##### Tensor.isTriangular
@@ -8728,8 +7426,6 @@ readonly isTriangular: boolean;
 ```
 
 </MemberCard>
-
-<a id="tensordt_isidentity" name="tensordt_isidentity"></a>
 
 <MemberCard>
 
@@ -8741,8 +7437,6 @@ readonly isIdentity: boolean;
 
 </MemberCard>
 
-<a id="tensordt_iszero-2" name="tensordt_iszero-2"></a>
-
 <MemberCard>
 
 ##### Tensor.isZero
@@ -8752,8 +7446,6 @@ readonly isZero: boolean;
 ```
 
 </MemberCard>
-
-<a id="tensordt_at" name="tensordt_at"></a>
 
 <MemberCard>
 
@@ -8768,8 +7460,6 @@ at(...indices): DataTypeMap[DT]
 ...`number`[]
 
 </MemberCard>
-
-<a id="tensordt_diagonal" name="tensordt_diagonal"></a>
 
 <MemberCard>
 
@@ -8789,8 +7479,6 @@ diagonal(axis1?, axis2?): DataTypeMap[DT][]
 
 </MemberCard>
 
-<a id="tensordt_trace" name="tensordt_trace"></a>
-
 <MemberCard>
 
 ##### Tensor.trace()
@@ -8809,8 +7497,6 @@ trace(axis1?, axis2?): DataTypeMap[DT]
 
 </MemberCard>
 
-<a id="tensordt_reshape" name="tensordt_reshape"></a>
-
 <MemberCard>
 
 ##### Tensor.reshape()
@@ -8824,8 +7510,6 @@ reshape(...shape): Tensor<DT>
 ...`number`[]
 
 </MemberCard>
-
-<a id="tensordt_slice" name="tensordt_slice"></a>
 
 <MemberCard>
 
@@ -8841,8 +7525,6 @@ slice(index): Tensor<DT>
 
 </MemberCard>
 
-<a id="tensordt_flatten" name="tensordt_flatten"></a>
-
 <MemberCard>
 
 ##### Tensor.flatten()
@@ -8852,8 +7534,6 @@ flatten(): DataTypeMap[DT][]
 ```
 
 </MemberCard>
-
-<a id="tensordt_upcast" name="tensordt_upcast"></a>
 
 <MemberCard>
 
@@ -8870,8 +7550,6 @@ upcast<DT>(dtype): Tensor<DT>
 `DT`
 
 </MemberCard>
-
-<a id="tensordt_transpose" name="tensordt_transpose"></a>
 
 <MemberCard>
 
@@ -8891,8 +7569,6 @@ transpose(axis1?, axis2?): Tensor<DT>
 
 </MemberCard>
 
-<a id="tensordt_conjugatetranspose" name="tensordt_conjugatetranspose"></a>
-
 <MemberCard>
 
 ##### Tensor.conjugateTranspose()
@@ -8911,8 +7587,6 @@ conjugateTranspose(axis1?, axis2?): Tensor<DT>
 
 </MemberCard>
 
-<a id="tensordt_determinant" name="tensordt_determinant"></a>
-
 <MemberCard>
 
 ##### Tensor.determinant()
@@ -8922,8 +7596,6 @@ determinant(): DataTypeMap[DT]
 ```
 
 </MemberCard>
-
-<a id="tensordt_inverse" name="tensordt_inverse"></a>
 
 <MemberCard>
 
@@ -8935,8 +7607,6 @@ inverse(): Tensor<DT>
 
 </MemberCard>
 
-<a id="tensordt_pseudoinverse" name="tensordt_pseudoinverse"></a>
-
 <MemberCard>
 
 ##### Tensor.pseudoInverse()
@@ -8947,8 +7617,6 @@ pseudoInverse(): Tensor<DT>
 
 </MemberCard>
 
-<a id="tensordt_adjugatematrix" name="tensordt_adjugatematrix"></a>
-
 <MemberCard>
 
 ##### Tensor.adjugateMatrix()
@@ -8958,8 +7626,6 @@ adjugateMatrix(): Tensor<DT>
 ```
 
 </MemberCard>
-
-<a id="tensordt_minor" name="tensordt_minor"></a>
 
 <MemberCard>
 
@@ -8979,8 +7645,6 @@ minor(axis1, axis2): DataTypeMap[DT]
 
 </MemberCard>
 
-<a id="tensordt_map1" name="tensordt_map1"></a>
-
 <MemberCard>
 
 ##### Tensor.map1()
@@ -8999,8 +7663,6 @@ map1(fn, scalar): Tensor<DT>
 
 </MemberCard>
 
-<a id="tensordt_map2" name="tensordt_map2"></a>
-
 <MemberCard>
 
 ##### Tensor.map2()
@@ -9015,11 +7677,9 @@ map2(fn, rhs): Tensor<DT>
 
 ####### rhs
 
-[`Tensor`](#tensordt)\<`DT`\>
+[`Tensor`](#tensor)\<`DT`\>
 
 </MemberCard>
-
-<a id="tensordt_add-2" name="tensordt_add-2"></a>
 
 <MemberCard>
 
@@ -9031,11 +7691,9 @@ add(other): Tensor<DT>
 
 ####### other
 
-[`Tensor`](#tensordt)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
+[`Tensor`](#tensor)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
 
 </MemberCard>
-
-<a id="tensordt_subtract" name="tensordt_subtract"></a>
 
 <MemberCard>
 
@@ -9047,11 +7705,9 @@ subtract(other): Tensor<DT>
 
 ####### other
 
-[`Tensor`](#tensordt)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
+[`Tensor`](#tensor)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
 
 </MemberCard>
-
-<a id="tensordt_multiply" name="tensordt_multiply"></a>
 
 <MemberCard>
 
@@ -9063,11 +7719,9 @@ multiply(other): Tensor<DT>
 
 ####### other
 
-[`Tensor`](#tensordt)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
+[`Tensor`](#tensor)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
 
 </MemberCard>
-
-<a id="tensordt_divide" name="tensordt_divide"></a>
 
 <MemberCard>
 
@@ -9079,11 +7733,9 @@ divide(other): Tensor<DT>
 
 ####### other
 
-[`Tensor`](#tensordt)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
+[`Tensor`](#tensor)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
 
 </MemberCard>
-
-<a id="tensordt_power" name="tensordt_power"></a>
 
 <MemberCard>
 
@@ -9095,11 +7747,9 @@ power(other): Tensor<DT>
 
 ####### other
 
-[`Tensor`](#tensordt)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
+[`Tensor`](#tensor)\<`DT`\> | [`DataTypeMap`](#datatypemap)\[`DT`\]
 
 </MemberCard>
-
-<a id="tensordt_equals-1" name="tensordt_equals-1"></a>
 
 <MemberCard>
 
@@ -9111,13 +7761,11 @@ equals(other): boolean
 
 ####### other
 
-[`Tensor`](#tensordt)\<`DT`\>
+[`Tensor`](#tensor)\<`DT`\>
 
 </MemberCard>
 
 ## Type
-
-<a id="boxedtype" name="boxedtype"></a>
 
 ### BoxedType
 
@@ -9139,8 +7787,6 @@ new BoxedType(type, typeResolver?): BoxedType
 
 </MemberCard>
 
-<a id="boxedtype_unknown" name="boxedtype_unknown"></a>
-
 <MemberCard>
 
 ##### BoxedType.unknown
@@ -9150,8 +7796,6 @@ static unknown: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="boxedtype_number" name="boxedtype_number"></a>
 
 <MemberCard>
 
@@ -9163,8 +7807,6 @@ static number: BoxedType;
 
 </MemberCard>
 
-<a id="boxedtype_non_finite_number" name="boxedtype_non_finite_number"></a>
-
 <MemberCard>
 
 ##### BoxedType.non\_finite\_number
@@ -9174,8 +7816,6 @@ static non_finite_number: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="boxedtype_finite_number" name="boxedtype_finite_number"></a>
 
 <MemberCard>
 
@@ -9187,8 +7827,6 @@ static finite_number: BoxedType;
 
 </MemberCard>
 
-<a id="boxedtype_finite_integer" name="boxedtype_finite_integer"></a>
-
 <MemberCard>
 
 ##### BoxedType.finite\_integer
@@ -9198,8 +7836,6 @@ static finite_integer: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="boxedtype_finite_real" name="boxedtype_finite_real"></a>
 
 <MemberCard>
 
@@ -9211,8 +7847,6 @@ static finite_real: BoxedType;
 
 </MemberCard>
 
-<a id="boxedtype_string" name="boxedtype_string"></a>
-
 <MemberCard>
 
 ##### BoxedType.string
@@ -9222,8 +7856,6 @@ static string: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="boxedtype_dictionary" name="boxedtype_dictionary"></a>
 
 <MemberCard>
 
@@ -9235,8 +7867,6 @@ static dictionary: BoxedType;
 
 </MemberCard>
 
-<a id="boxedtype_setnumber" name="boxedtype_setnumber"></a>
-
 <MemberCard>
 
 ##### BoxedType.setNumber
@@ -9246,8 +7876,6 @@ static setNumber: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="boxedtype_setcomplex" name="boxedtype_setcomplex"></a>
 
 <MemberCard>
 
@@ -9259,8 +7887,6 @@ static setComplex: BoxedType;
 
 </MemberCard>
 
-<a id="boxedtype_setimaginary" name="boxedtype_setimaginary"></a>
-
 <MemberCard>
 
 ##### BoxedType.setImaginary
@@ -9270,8 +7896,6 @@ static setImaginary: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="boxedtype_setreal" name="boxedtype_setreal"></a>
 
 <MemberCard>
 
@@ -9283,8 +7907,6 @@ static setReal: BoxedType;
 
 </MemberCard>
 
-<a id="boxedtype_setrational" name="boxedtype_setrational"></a>
-
 <MemberCard>
 
 ##### BoxedType.setRational
@@ -9294,8 +7916,6 @@ static setRational: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="boxedtype_setfiniteinteger" name="boxedtype_setfiniteinteger"></a>
 
 <MemberCard>
 
@@ -9307,8 +7927,6 @@ static setFiniteInteger: BoxedType;
 
 </MemberCard>
 
-<a id="boxedtype_setinteger" name="boxedtype_setinteger"></a>
-
 <MemberCard>
 
 ##### BoxedType.setInteger
@@ -9318,8 +7936,6 @@ static setInteger: BoxedType;
 ```
 
 </MemberCard>
-
-<a id="boxedtype_type" name="boxedtype_type"></a>
 
 <MemberCard>
 
@@ -9331,15 +7947,11 @@ type: Type;
 
 </MemberCard>
 
-<a id="boxedtype_isunknown" name="boxedtype_isunknown"></a>
-
 <MemberCard>
 
 ##### BoxedType.isUnknown
 
 </MemberCard>
-
-<a id="boxedtype_widen" name="boxedtype_widen"></a>
 
 <MemberCard>
 
@@ -9351,13 +7963,9 @@ static widen(...types): BoxedType
 
 ####### types
 
-...readonly (
-  \| [`Type`](#type-3)
-  \| [`BoxedType`](#boxedtype))[]
+...readonly ([`Type`](#type-3) \| [`BoxedType`](#boxedtype))[]
 
 </MemberCard>
-
-<a id="boxedtype_narrow" name="boxedtype_narrow"></a>
 
 <MemberCard>
 
@@ -9369,13 +7977,9 @@ static narrow(...types): BoxedType
 
 ####### types
 
-...readonly (
-  \| [`Type`](#type-3)
-  \| [`BoxedType`](#boxedtype))[]
+...readonly ([`Type`](#type-3) \| [`BoxedType`](#boxedtype))[]
 
 </MemberCard>
-
-<a id="boxedtype_matches" name="boxedtype_matches"></a>
 
 <MemberCard>
 
@@ -9391,8 +7995,6 @@ matches(other): boolean
 
 </MemberCard>
 
-<a id="boxedtype_is" name="boxedtype_is"></a>
-
 <MemberCard>
 
 ##### BoxedType.is()
@@ -9407,8 +8009,6 @@ is(other): boolean
 
 </MemberCard>
 
-<a id="boxedtype_tostring" name="boxedtype_tostring"></a>
-
 <MemberCard>
 
 ##### BoxedType.toString()
@@ -9419,8 +8019,6 @@ toString(): string
 
 </MemberCard>
 
-<a id="boxedtype_tojson" name="boxedtype_tojson"></a>
-
 <MemberCard>
 
 ##### BoxedType.toJSON()
@@ -9430,8 +8028,6 @@ toJSON(): string
 ```
 
 </MemberCard>
-
-<a id="boxedtype_toprimitive" name="boxedtype_toprimitive"></a>
 
 <MemberCard>
 
@@ -9447,8 +8043,6 @@ toPrimitive: string
 
 </MemberCard>
 
-<a id="boxedtype_valueof" name="boxedtype_valueof"></a>
-
 <MemberCard>
 
 ##### BoxedType.valueOf()
@@ -9462,8 +8056,6 @@ valueOf(): string
 
 
 ## MathJSON
-
-<a id="mathjsonattributes" name="mathjsonattributes"></a>
 
 <MemberCard>
 
@@ -9487,131 +8079,7 @@ type MathJsonAttributes = {
 The following properties can be added to any MathJSON expression
 to provide additional information about the expression.
 
-<a id="mathjsonattributes_comment" name="mathjsonattributes_comment"></a>
-
-#### MathJsonAttributes.comment?
-
-```ts
-optional comment: string;
-```
-
-A human readable string to annotate this expression, since JSON does not
-allow comments in its encoding
-
-<a id="mathjsonattributes_documentation" name="mathjsonattributes_documentation"></a>
-
-#### MathJsonAttributes.documentation?
-
-```ts
-optional documentation: string;
-```
-
-A Markdown-encoded string providing documentation about this expression.
-
-<a id="mathjsonattributes_latex" name="mathjsonattributes_latex"></a>
-
-#### MathJsonAttributes.latex?
-
-```ts
-optional latex: string;
-```
-
-A visual representation of this expression as a LaTeX string.
-
-This can be useful to preserve non-semantic details, for example
-parentheses in an expression or styling attributes.
-
-<a id="mathjsonattributes_wikidata" name="mathjsonattributes_wikidata"></a>
-
-#### MathJsonAttributes.wikidata?
-
-```ts
-optional wikidata: string;
-```
-
-A short string referencing an entry in a wikibase.
-
-For example:
-
-`"Q167"` is the [wikidata entry](https://www.wikidata.org/wiki/Q167)
- for the `Pi` constant.
-
-<a id="mathjsonattributes_wikibase" name="mathjsonattributes_wikibase"></a>
-
-#### MathJsonAttributes.wikibase?
-
-```ts
-optional wikibase: string;
-```
-
-A base URL for the `wikidata` key.
-
-A full URL can be produced by concatenating this key with the `wikidata`
-key. This key applies to this node and all its children.
-
-The default value is "https://www.wikidata.org/wiki/"
-
-<a id="mathjsonattributes_openmathsymbol" name="mathjsonattributes_openmathsymbol"></a>
-
-#### MathJsonAttributes.openmathSymbol?
-
-```ts
-optional openmathSymbol: string;
-```
-
-A short string indicating an entry in an OpenMath Content Dictionary.
-
-For example: `arith1/#abs`.
-
-<a id="mathjsonattributes_openmathcd" name="mathjsonattributes_openmathcd"></a>
-
-#### MathJsonAttributes.openmathCd?
-
-```ts
-optional openmathCd: string;
-```
-
-A base URL for an OpenMath content dictionary. This key applies to this
-node and all its children.
-
-The default value is "http://www.openmath.org/cd".
-
-<a id="mathjsonattributes_sourceurl" name="mathjsonattributes_sourceurl"></a>
-
-#### MathJsonAttributes.sourceUrl?
-
-```ts
-optional sourceUrl: string;
-```
-
-A URL to the source code from which this expression was generated.
-
-<a id="mathjsonattributes_sourcecontent" name="mathjsonattributes_sourcecontent"></a>
-
-#### MathJsonAttributes.sourceContent?
-
-```ts
-optional sourceContent: string;
-```
-
-The source code from which this expression was generated.
-
-It could be a LaTeX expression, or some other source language.
-
-<a id="mathjsonattributes_sourceoffsets" name="mathjsonattributes_sourceoffsets"></a>
-
-#### MathJsonAttributes.sourceOffsets?
-
-```ts
-optional sourceOffsets: [number, number];
-```
-
-A character offset in `sourceContent` or `sourceUrl` from which this
-expression was generated.
-
 </MemberCard>
-
-<a id="mathjsonsymbol" name="mathjsonsymbol"></a>
 
 <MemberCard>
 
@@ -9622,8 +8090,6 @@ type MathJsonSymbol = string;
 ```
 
 </MemberCard>
-
-<a id="mathjsonnumberobject" name="mathjsonnumberobject"></a>
 
 <MemberCard>
 
@@ -9660,8 +8126,6 @@ For example:
 
 </MemberCard>
 
-<a id="mathjsonsymbolobject" name="mathjsonsymbolobject"></a>
-
 <MemberCard>
 
 ### MathJsonSymbolObject
@@ -9673,8 +8137,6 @@ type MathJsonSymbolObject = {
 ```
 
 </MemberCard>
-
-<a id="mathjsonstringobject" name="mathjsonstringobject"></a>
 
 <MemberCard>
 
@@ -9688,8 +8150,6 @@ type MathJsonStringObject = {
 
 </MemberCard>
 
-<a id="mathjsonfunctionobject" name="mathjsonfunctionobject"></a>
-
 <MemberCard>
 
 ### MathJsonFunctionObject
@@ -9702,7 +8162,20 @@ type MathJsonFunctionObject = {
 
 </MemberCard>
 
-<a id="mathjsondictionaryobject" name="mathjsondictionaryobject"></a>
+<MemberCard>
+
+### DictionaryValue
+
+```ts
+type DictionaryValue = 
+  | boolean
+  | number
+  | string
+  | ExpressionObject
+| ReadonlyArray<DictionaryValue>;
+```
+
+</MemberCard>
 
 <MemberCard>
 
@@ -9710,13 +8183,11 @@ type MathJsonFunctionObject = {
 
 ```ts
 type MathJsonDictionaryObject = {
-  dict: Record<string, Expression>;
+  dict: Record<string, DictionaryValue>;
  } & MathJsonAttributes;
 ```
 
 </MemberCard>
-
-<a id="expressionobject" name="expressionobject"></a>
 
 <MemberCard>
 
@@ -9732,8 +8203,6 @@ type ExpressionObject =
 ```
 
 </MemberCard>
-
-<a id="expression" name="expression"></a>
 
 <MemberCard>
 
@@ -9758,8 +8227,6 @@ The dictionary and function nodes can contain expressions themselves.
 
 
 ## Type
-
-<a id="primitivetype" name="primitivetype"></a>
 
 <MemberCard>
 
@@ -9828,8 +8295,6 @@ A primitive type is a simple type that represents a concrete value.
 
 </MemberCard>
 
-<a id="numericprimitivetype" name="numericprimitivetype"></a>
-
 <MemberCard>
 
 ### NumericPrimitiveType
@@ -9865,8 +8330,6 @@ type NumericPrimitiveType =
 
 </MemberCard>
 
-<a id="namedelement" name="namedelement"></a>
-
 <MemberCard>
 
 ### NamedElement
@@ -9879,8 +8342,6 @@ type NamedElement = {
 ```
 
 </MemberCard>
-
-<a id="functionsignature" name="functionsignature"></a>
 
 <MemberCard>
 
@@ -9899,8 +8360,6 @@ type FunctionSignature = {
 
 </MemberCard>
 
-<a id="algebraictype" name="algebraictype"></a>
-
 <MemberCard>
 
 ### AlgebraicType
@@ -9913,8 +8372,6 @@ type AlgebraicType = {
 ```
 
 </MemberCard>
-
-<a id="negationtype" name="negationtype"></a>
 
 <MemberCard>
 
@@ -9929,8 +8386,6 @@ type NegationType = {
 
 </MemberCard>
 
-<a id="valuetype" name="valuetype"></a>
-
 <MemberCard>
 
 ### ValueType
@@ -9943,8 +8398,6 @@ type ValueType = {
 ```
 
 </MemberCard>
-
-<a id="recordtype" name="recordtype"></a>
 
 <MemberCard>
 
@@ -9966,8 +8419,6 @@ subset of the keys, and all their types must match (width subtyping).
 
 </MemberCard>
 
-<a id="dictionarytype" name="dictionarytype"></a>
-
 <MemberCard>
 
 ### DictionaryType
@@ -9988,8 +8439,6 @@ A dictionary is suitable for use as cache or data storage.
 
 </MemberCard>
 
-<a id="collectiontype" name="collectiontype"></a>
-
 <MemberCard>
 
 ### CollectionType
@@ -10007,8 +8456,6 @@ type CollectionType = {
 - Non-indexed: Set, Record, Dictionary
 
 </MemberCard>
-
-<a id="listtype" name="listtype"></a>
 
 <MemberCard>
 
@@ -10034,8 +8481,6 @@ dimensions 2x3x4 is a 3D tensor with 2 layers, 3 rows and 4 columns.
 
 </MemberCard>
 
-<a id="symboltype" name="symboltype"></a>
-
 <MemberCard>
 
 ### SymbolType
@@ -10049,8 +8494,6 @@ type SymbolType = {
 
 </MemberCard>
 
-<a id="expressiontype" name="expressiontype"></a>
-
 <MemberCard>
 
 ### ExpressionType
@@ -10063,8 +8506,6 @@ type ExpressionType = {
 ```
 
 </MemberCard>
-
-<a id="numerictype" name="numerictype"></a>
 
 <MemberCard>
 
@@ -10080,8 +8521,6 @@ type NumericType = {
 ```
 
 </MemberCard>
-
-<a id="settype" name="settype"></a>
 
 <MemberCard>
 
@@ -10099,8 +8538,6 @@ The elements of a set are not indexed.
 
 </MemberCard>
 
-<a id="tupletype" name="tupletype"></a>
-
 <MemberCard>
 
 ### TupleType
@@ -10116,8 +8553,6 @@ The elements of a tuple are indexed and may be named or unnamed.
 If one element is named, all elements must be named.
 
 </MemberCard>
-
-<a id="typereference" name="typereference"></a>
 
 <MemberCard>
 
@@ -10135,8 +8570,6 @@ type TypeReference = {
 Nominal typing
 
 </MemberCard>
-
-<a id="type-3" name="type-3"></a>
 
 <MemberCard>
 
@@ -10163,8 +8596,6 @@ type Type =
 ```
 
 </MemberCard>
-
-<a id="typestring" name="typestring"></a>
 
 <MemberCard>
 
@@ -10281,8 +8712,6 @@ Examples of types strings:
 
 </MemberCard>
 
-<a id="typecompatibility" name="typecompatibility"></a>
-
 <MemberCard>
 
 ### TypeCompatibility
@@ -10292,8 +8721,6 @@ type TypeCompatibility = "covariant" | "contravariant" | "bivariant" | "invarian
 ```
 
 </MemberCard>
-
-<a id="typeresolver" name="typeresolver"></a>
 
 <MemberCard>
 
