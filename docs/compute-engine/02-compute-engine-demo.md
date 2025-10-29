@@ -168,7 +168,7 @@ console.info(expr.N());
 `,
   "eval-async": `$0
 const expr = $1;
-console.info(await expr.evaluateAsync());
+expr.evaluateAsync().then(result => console.info(result));
 `
 
 };

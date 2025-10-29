@@ -31,4 +31,126 @@ The documentation sometimes uses `mathfield` and `MathfieldElement` interchangea
     *   Use `MathfieldElement` when referring to the JavaScript class or its static properties/methods (`MathfieldElement.computeEngine`).
     *   Use "mathfield" (lowercase) as a general term for an instance of the component on a page.
 
-    
+## Future Expansion
+
+### Interactive Applications Architecture
+
+**Recommended Approach:** Deploy interactive applications as separate React apps on subdomains, keeping them independent from the Docusaurus documentation site.
+
+**Deployment Strategy:**
+- Use Cloudflare for subdomain routing and CDN
+- Each app deployed to its own subdirectory in the build
+- DNS configuration: CNAME records for each subdomain pointing to the main domain
+- Cloudflare Workers or Page Rules to route subdomains to appropriate directories
+
+**Implementation Structure:**
+```
+cortexjs.io/
+├── src/
+│   ├── pages/          # Docusaurus pages (documentation)
+│   ├── components/     # Documentation components
+│   └── apps/           # Interactive applications
+│       ├── editor/
+│       ├── calculator/
+│       ├── grapher/
+│       └── notebook/
+├── build/
+│   ├── docs/           # Main documentation site
+│   └── apps/           # Built applications
+│       ├── editor/     # → editor.mathlive.io
+│       ├── calculator/ # → calculator.mathlive.io
+│       ├── grapher/    # → grapher.mathlive.io
+│       └── notebook/   # → notebook.mathlive.io
+```
+
+### Interactive Applications
+
+- **`editor.mathlive.io`** - LaTeX/MathLive Editor
+  - Split-pane interface: MathLive mathfield on one side, LaTeX editor on the other
+  - Bidirectional real-time synchronization between panels
+  - LaTeX side uses CodeMirror or Monaco Editor with LaTeX syntax highlighting
+  - Configurable layout: horizontal or vertical split (responsive to device/user preference)
+  - Future: Session saving with left sidebar for saved expressions
+  - Export options: Copy as LaTeX, MathML, or image
+
+- **`calculator.mathlive.io`** - Scientific Calculator
+  - MathLive input field at bottom for expression entry
+  - Scrollable history of calculations above
+  - Integration with Compute Engine for evaluation
+  - "ans" variable to reference previous result (with custom virtual keyboard key)
+  - Session persistence using localStorage
+  - Export history as text or LaTeX
+
+- **`grapher.mathlive.io`** - Function Graphing Tool
+  - Desmos-style interface with function list panel and graph canvas
+  - MathLive input for function definitions
+  - Automatic detection of function type:
+    - 2D Cartesian (y = f(x))
+    - 2D Parametric (x(t), y(t))
+    - Polar (r = f(θ))
+    - 3D surfaces (z = f(x,y))
+  - Interactive pan, zoom, and trace features
+  - Export graphs as SVG or PNG
+
+- **`notebook.mathlive.io`** - Interactive Math Notebook
+  - Jupyter-style cell-based interface
+  - MathLive for mathematical input/output
+  - Compute Engine for evaluations
+  - Markdown cells for documentation
+  - Save/load notebooks as JSON
+  - Export to LaTeX, PDF, or HTML
+
+### Shared Components Strategy
+
+To ensure consistent header/footer across all applications:
+
+**Shared Component Library** (`src/shared/`)
+- **Components**: Reusable Header and Footer components in React
+- **Configuration**: Centralized navigation config in JSON format
+- **Styles**: Shared CSS variables and brand styles
+
+**Implementation:**
+```javascript
+// In any React app (Docusaurus or standalone)
+import { Header, Footer } from '../shared/components';
+
+function App() {
+  return (
+    <>
+      <Header currentApp="editor" />
+      {/* App content */}
+      <Footer />
+    </>
+  );
+}
+```
+
+**Benefits:**
+- Single source of truth for navigation
+- Consistent branding across all apps
+- Easy updates propagate to all applications
+- Dark mode support built-in
+
+### Implementation Phases
+
+**Phase 1: Infrastructure Setup**
+- ✅ Create shared component library structure
+- ✅ Extract navigation configuration
+- ✅ Build reusable Header/Footer components
+- Configure build pipeline for multiple apps
+- Set up Cloudflare routing for subdomains
+
+**Phase 2: MVP Development**
+- Start with editor.mathlive.io as proof of concept
+- Implement core split-pane functionality
+- Deploy and test subdomain routing
+
+**Phase 3: Full Rollout**
+- Develop remaining applications
+- Add persistence and sharing features
+- Implement analytics and error tracking
+
+**Phase 4: Enhancement**
+- User accounts and cloud storage
+- Collaborative features
+- API for embedding in other sites

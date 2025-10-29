@@ -12,6 +12,34 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
+### Resolved Issues
+
+- Improved rendering of prompts in some cases.
+- **2849** For compatibility with KaTeX, do not wrap the argument of delimiter
+  commands.
+
+## 0.107.1 _2025-09-30_
+
+### Resolved Issues
+
+- **#2817** Calling `setPromptValue()` no longer changes the focus to the
+  mathfield.
+- **#2805** On mobile, show the math virtual keyboard when using prompts
+- Custom macros are now read when using speakable text to speech.
+- **#2824** Using TypeScript would trigger a compile error about
+  `Cannot find module '../editor/keyboard-layout'`
+
+## 0.107.0 _2025-08-17_
+
+### New Features
+
+- Added `mountMathVirtualKeyboard()` to control in which browsing context the
+  math virtual keyboard is mounted.
+
+### Resolved Issues
+
+- **#2800**: New line on matrix causes duplicated input
+
 ## 0.106.0 _2025-07-11_
 
 ### New Features
@@ -170,7 +198,6 @@ MathfieldElement.createHTML = (html) => DOMPurify.sanitize(html);
 - Generate only standard trigonometric functions, i.e. those available in the
   `amsmath` package. Use `\operatorname{}` for the others. The standard commands
   are:
-
   - `\arccos`
   - `\arcsin`
   - `\arctan`
@@ -325,7 +352,6 @@ For example:
   definition.
 
   The keycaps are one of these special shortcuts:
-
   - `[left]`, `[right]`, `[up]`, `[down]`, `[return]`, `[action]`,
   - `[space]`, `[tab]`, `[backspace]`, `[shift]`,
   - `[undo]`, `[redo]`, `[foreground-color]`, `[background-color]`,
@@ -540,7 +566,6 @@ numbers.
 
   Added CSS variables to control the appearance of the toolip displayed with
   `\mathtip` and `\texttip`:
-
   - `--tooltip-border`
   - `--tooltip-color`
   - `--tooltip-background-color`

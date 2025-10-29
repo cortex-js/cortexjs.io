@@ -272,3 +272,25 @@ ce.parse(latex,
 ).print();
 ```
 
+## Custom Transformations
+
+You can also define your own transformations to apply to an expression to
+obtain a custom canonical form.
+
+For example, let's say you want to the structural form of two expressions
+but ignoring any extra parentheses. You could define a transformation like this:
+
+```js
+const deparenthesize = (expr) =>
+  expr.map((e) => (e.operator === 'Delimiter' ? e.op1 : e));
+```
+You can then apply this transformation to an expression like this:
+
+```js
+const expr1 = ce.parse('3+4\\times2', { canonical: false });
+const expr2 = ce.parse('3+(4\\times(2))', { canonical: false });
+const transformedExpr1 = deparenthesize(expr1);
+const transformedExpr2 = deparenthesize(expr2);
+console.log(transformedExpr1.isSame(transformedExpr2));
+// ➔ true
+```
