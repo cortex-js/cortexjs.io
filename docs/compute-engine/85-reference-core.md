@@ -641,7 +641,7 @@ These functions are all inert functions, that is they evaluate to themselves.
 | :------------ | :--------------- | :------------------------------------------------------------- |
 | `Subminus`    | $$ x_- $$      |                                                                |
 | `Subplus`     | $$ x_+$$       |                                                                |
-| `Subscript`   | $$ x_{n} $$    |                                                                |
+| `Subscript`   | $$ x_{n} $$    | See below for details on subscript handling.                   |
 | `Substar`     | $$ x_*$$       |                                                                |
 | `Superdagger` | $$ x^\dagger$$ |                                                                |
 | `Superminus`  | $$ x^-$$       |                                                                |
@@ -649,3 +649,27 @@ These functions are all inert functions, that is they evaluate to themselves.
 | `Superstar`   | $$ x^*$$       | When the argument is a complex number, indicate the conjugate. |
 
 </div>
+
+### Subscript Handling
+
+When a symbol has a subscript, the Compute Engine converts it to a compound
+symbol name in most cases:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `A_1` | `A_1` | Numeric subscript becomes part of symbol name |
+| `A_{n}` | `A_n` | Single-letter subscript becomes part of symbol name |
+| `A_{max}` | `A_max` | Multi-letter subscript becomes part of symbol name |
+| `x_{ij}` | `x_ij` | Common for matrix indices |
+| `T_{max}` | `T_max` | Common for named subscripts |
+
+To use an **expression** as a subscript (rather than a symbol name), wrap
+it in parentheses:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `A_{(n+1)}` | `["Subscript", "A", ...]` | Parentheses indicate an expression |
+| `A_{(CD)}` | `["Subscript", "A", ...]` | Parentheses: `C × D` as expression |
+
+This convention allows natural mathematical notation like `T_{max}` to work
+as expected while still supporting expression subscripts when needed.
