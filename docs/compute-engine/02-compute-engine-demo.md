@@ -69,13 +69,27 @@ including complex numbers.`,
       template: 'eval-async'
     },
 
-    { 
-      latex: '2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}', 
+    {
+      latex: '2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}',
       preamble: 'Evaluate a product',
       template: 'eval-async'
     },
 
-    { 
+    {
+      latex: '\\sum_{n=1}^{b} n^2',
+      preamble: `Simplify a sum with symbolic bounds to a closed-form formula.
+The sum of squares simplifies to b(b+1)(2b+1)/6.`,
+      template: 'simplify'
+    },
+
+    {
+      latex: '\\prod_{n=1}^{b} n',
+      preamble: `Simplify a product with symbolic bounds.
+The product of consecutive integers simplifies to factorial.`,
+      template: 'simplify'
+    },
+
+    {
       latex: '\\mathrm{Expand}((a+b)^5)', 
       preamble: `Symbolically expand an expression.
 Use the \`latex\` property to get the result in LaTeX format.`,
@@ -157,7 +171,7 @@ console.info(expr.json);
   "eval-string": `$0
 const expr = $1;
 console.info(expr.evaluate());
-`,  
+`,
   "eval-latex": `$0
 const expr = $1;
 console.info(expr.evaluate().latex);
@@ -169,6 +183,10 @@ console.info(expr.N());
   "eval-async": `$0
 const expr = $1;
 expr.evaluateAsync().then(result => console.info(result));
+`,
+  "simplify": `$0
+const expr = $1;
+console.info(expr.simplify());
 `
 
 };
