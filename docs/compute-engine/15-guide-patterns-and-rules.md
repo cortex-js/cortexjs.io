@@ -36,6 +36,37 @@ form of wildcards.
 Patterns are similar to Regular Expressions in traditional programming languages
 but they are tailored to deal with MathJSON expressions instead of strings.
 
+### Validating Patterns
+
+Some wildcard combinations are invalid because they create ambiguity. For
+example, consecutive sequence wildcards like `['Add', '__a', '__b']` are
+invalid because there's no way to determine where `__a` ends and `__b` begins.
+
+**To check if a pattern is valid**, use the `validatePattern()` function:
+
+```js example
+import { validatePattern } from 'compute-engine';
+
+const ce = new ComputeEngine();
+const pattern = ce.box(['Add', '__a', '__b']);
+
+try {
+  validatePattern(pattern);
+} catch (e) {
+  console.log(e.message);
+  // ➔ "Invalid pattern: consecutive sequence wildcards..."
+}
+```
+
+Invalid patterns include:
+- `['Add', '__a', '__b']` - consecutive sequence wildcards
+- `['Add', '___a', '___b']` - consecutive optional sequence wildcards
+- `['Add', '__a', '___b']` - sequence followed by optional sequence
+
+Valid patterns with multi-element wildcards:
+- `['Add', '__a', '_b']` - `_b` matches last element, `__a` gets the rest
+- `['Add', '___a', '_b', '___c']` - `_b` anchors the middle
+
 Given a pattern and an expression the goal of pattern matching is to find a
 substitution for all the wildcards such that the pattern becomes the expression.
 

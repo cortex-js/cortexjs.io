@@ -673,3 +673,18 @@ it in parentheses:
 
 This convention allows natural mathematical notation like `T_{max}` to work
 as expected while still supporting expression subscripts when needed.
+
+#### Styled Subscripts
+
+To apply a specific style to a subscript (italic, bold, etc.), use the
+appropriate LaTeX command:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `A_{\mathit{max}}` | `A_max_italic` | Italic subscript |
+| `A_{\mathbf{max}}` | `A_max_bold` | Bold subscript |
+| `A_{\mathrm{max}}` | `A_max` | Upright (roman) subscript |
+
+The style suffix (`_italic`, `_bold`, etc.) becomes part of the symbol name,
+allowing you to distinguish between differently styled versions of the same
+subscript if needed.

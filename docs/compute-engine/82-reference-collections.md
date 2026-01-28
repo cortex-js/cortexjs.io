@@ -214,7 +214,7 @@ Examples of function evaluating to a lazy collection include:
 
 Operations on all collections, whether indexed or not, include:
 - [**Filter**](#filter), [**Map**](#map), and [**Reduce**](#reduce): operations that create new collections by applying a function to each element of an existing collection.
-- [**Length**](#length), [**IsEmpty**](#isempty): check the number of elements of a collection.
+- [**Count**](#count), [**IsEmpty**](#isempty): check the number of elements of a collection.
 - [**Join**](#join), [**Zip**](#zip): combine multiple collections into one.
 - [**Tally**](#tally): count the number of occurrences of each element in a collection.
 
@@ -1040,22 +1040,22 @@ To get the values in sorted order, use `Extract`:
 
 
 <nav className="hidden">
-### Length
+### Count
 </nav>
 
 
 
-<FunctionDefinition name="Length">
+<FunctionDefinition name="Count">
 
-<Signature name="Length" returns="integer">_xs_: collection</Signature>
+<Signature name="Count" returns="integer">_xs_: collection</Signature>
 
 Returns the number of elements in the collection.
 
-When the collection is a matrix (list of lists), `Length` returns the number of
+When the collection is a matrix (list of lists), `Count` returns the number of
 rows.
 
 ```json example
-["Length", ["List", 5, 2, 10, 18]]
+["Count", ["List", 5, 2, 10, 18]]
 // ➔ 4
 ```
 

@@ -89,11 +89,12 @@ When `simplify()` is called on a `Sum` expression with symbolic bounds, the foll
 | Pattern | Simplifies to | Name |
 | :------ | :------------ | :--- |
 | $$\sum_{n=1}^{b} c$$ | $$b \cdot c$$ | Constant body |
-| $$\sum_{n=1}^{b} n$$ | $$\frac{b(b+1)}{2}$$ | Triangular number |
+| $$\sum_{n=a}^{b} n$$ | $$\frac{b(b+1) - a(a-1)}{2}$$ | Triangular number (general bounds) |
 | $$\sum_{n=1}^{b} n^2$$ | $$\frac{b(b+1)(2b+1)}{6}$$ | Sum of squares |
 | $$\sum_{n=1}^{b} n^3$$ | $$\left[\frac{b(b+1)}{2}\right]^2$$ | Sum of cubes |
 | $$\sum_{n=0}^{b} r^n$$ | $$\frac{1-r^{b+1}}{1-r}$$ | Geometric series |
 | $$\sum_{n=0}^{b} (-1)^n$$ | $$\frac{1+(-1)^b}{2}$$ | Alternating unit series |
+| $$\sum_{n=0}^{b} (-1)^n \cdot n$$ | $$(-1)^b \lfloor\frac{b+1}{2}\rfloor$$ | Alternating linear series |
 | $$\sum_{n=0}^{b} (a + dn)$$ | $$(b+1)\left(a + \frac{db}{2}\right)$$ | Arithmetic progression |
 | $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
 
@@ -148,6 +149,8 @@ When `simplify()` is called on a `Product` expression with symbolic bounds, the 
 | :------ | :------------ | :--- |
 | $$\prod_{n=1}^{b} c$$ | $$c^b$$ | Constant body |
 | $$\prod_{n=1}^{b} n$$ | $$b!$$ | Factorial |
+| $$\prod_{n=1}^{b} (2n-1)$$ | $$(2b-1)!!$$ | Odd double factorial |
+| $$\prod_{n=1}^{b} 2n$$ | $$2^b \cdot b!$$ | Even double factorial |
 | $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
@@ -428,3 +431,171 @@ check if the fraction is in its canonical form:
 See below for additonal relational operators: `Congruent`, etc...
 
 </div>
+
+## Polynomial Arithmetic
+
+These functions operate on polynomial expressions.
+
+<div className="symbols-table first-column-header">
+
+| Function               | Description                                                      |
+| :--------------------- | :--------------------------------------------------------------- |
+| `Expand`               | Expand products and positive integer powers                      |
+| `ExpandAll`            | Recursively expand products and positive integer powers          |
+| `Factor`               | Factor an expression into irreducible factors                    |
+| `Together`             | Combine rational expressions into a single fraction              |
+| `Distribute`           | Distribute multiplication over addition                          |
+| `PolynomialDegree`     | Return the degree of a polynomial                                |
+| `CoefficientList`      | Return the list of coefficients of a polynomial                  |
+| `PolynomialQuotient`   | Return the quotient of polynomial division                       |
+| `PolynomialRemainder`  | Return the remainder of polynomial division                      |
+| `PolynomialGCD`        | Return the greatest common divisor of two polynomials            |
+| `Cancel`               | Cancel common polynomial factors in a rational expression        |
+
+</div>
+
+<FunctionDefinition name="Expand">
+
+<Signature name="Expand">_expr_</Signature>
+
+Expand out products and positive integer powers in `expr`.
+
+```json example
+["Expand", ["Power", ["Add", "x", 1], 2]]
+// ➔ ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ExpandAll">
+
+<Signature name="ExpandAll">_expr_</Signature>
+
+Recursively expand out products and positive integer powers in `expr` and all subexpressions.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Factor">
+
+<Signature name="Factor">_expr_</Signature>
+
+Factor an algebraic expression into a product of irreducible factors.
+
+```json example
+["Factor", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
+// ➔ ["Power", ["Add", "x", 1], 2]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Together">
+
+<Signature name="Together">_expr_</Signature>
+
+Combine rational expressions into a single fraction with a common denominator.
+
+```json example
+["Together", ["Add", ["Divide", 1, "x"], ["Divide", 1, "y"]]]
+// ➔ ["Divide", ["Add", "x", "y"], ["Multiply", "x", "y"]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Distribute">
+
+<Signature name="Distribute">_expr_</Signature>
+
+Distribute multiplication over addition in `expr`.
+
+```json example
+["Distribute", ["Multiply", "a", ["Add", "b", "c"]]]
+// ➔ ["Add", ["Multiply", "a", "b"], ["Multiply", "a", "c"]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialDegree">
+
+<Signature name="PolynomialDegree">_poly_, _var_</Signature>
+
+Return the degree of the polynomial `poly` with respect to the variable `var`.
+
+```json example
+["PolynomialDegree", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
+// ➔ 3
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="CoefficientList">
+
+<Signature name="CoefficientList">_poly_, _var_</Signature>
+
+Return the list of coefficients of the polynomial `poly` with respect to the variable `var`, ordered from lowest to highest degree.
+
+```json example
+["CoefficientList", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
+// ➔ ["List", 1, 2, 0, 1]
+```
+
+The result represents the polynomial $$ 1 + 2x + 0x^2 + 1x^3 $$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialQuotient">
+
+<Signature name="PolynomialQuotient">_dividend_, _divisor_, _var_</Signature>
+
+Return the quotient of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+```json example
+["PolynomialQuotient", ["Subtract", ["Power", "x", 3], 1], ["Subtract", "x", 1], "x"]
+// ➔ ["Add", ["Power", "x", 2], "x", 1]
+```
+
+This represents $$ \frac{x^3 - 1}{x - 1} = x^2 + x + 1 $$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialRemainder">
+
+<Signature name="PolynomialRemainder">_dividend_, _divisor_, _var_</Signature>
+
+Return the remainder of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+```json example
+["PolynomialRemainder", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], ["Add", "x", 1], "x"]
+// ➔ -2
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialGCD">
+
+<Signature name="PolynomialGCD">_a_, _b_, _var_</Signature>
+
+Return the greatest common divisor of two polynomials `a` and `b` with respect to the variable `var`.
+
+```json example
+["PolynomialGCD", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1], "x"]
+// ➔ ["Subtract", "x", 1]
+```
+
+This represents $$ \gcd(x^2 - 1, x - 1) = x - 1 $$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Cancel">
+
+<Signature name="Cancel">_expr_, _var_</Signature>
+
+Cancel common polynomial factors in the numerator and denominator of the rational expression `expr` with respect to the variable `var`.
+
+```json example
+["Cancel", ["Divide", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1]], "x"]
+// ➔ ["Add", "x", 1]
+```
+
+This represents $$ \frac{x^2 - 1}{x - 1} = x + 1 $$ after canceling the common factor $$(x - 1)$$.
+
+</FunctionDefinition>
