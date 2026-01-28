@@ -10,20 +10,117 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.31.0 _2026-01-27_
 
 ### Breaking Changes
 
-- The `Length` function has been renamed to `Count`.
+- The `[Length]` function has been renamed to `[Count]`.
 - The `xsize` property of collections has been renamed to `count`.
 - The `xcontains()` method of collections has been renamed to `contains()`.
-- Handling of dictionaries (`"Dictionary"` expressions and `{dict:...}`
+- Handling of dictionaries (`["Dictionary"]` expressions and `\{dict:...\}`
   shorthand) has been improved.
+- **Inverse hyperbolic functions** have been renamed to follow the ISO 80000-2
+  standard: `Arcsinh` → `Arsinh`, `Arccosh` → `Arcosh`, `Arctanh` → `Artanh`,
+  `Arccoth` → `Arcoth`, `Arcsech` → `Arsech`, `Arccsch` → `Arcsch`. The "ar"
+  prefix (for "area") is mathematically correct since these functions relate to
+  areas on a hyperbola, not arc lengths. Both LaTeX spellings (`\arsinh` and
+  `\arcsinh`) are accepted as input (Postel's law).
 
-## New Features and Improvements
+### Bug Fixes
+
+- **Metadata Preservation**: Fixed `verbatimLatex` not being preserved when
+  parsing with `preserveLatex: true`. The original LaTeX source is now correctly
+  stored on parsed expressions (when using non-canonical mode). Also fixed
+  metadata (`latex`, `wikidata`) being lost when boxing MathJSON objects that
+  contain these attributes.
+
+- **String Parsing**: Fixed parsing of `\text{...}` with `preserveLatex: true`
+  which was incorrectly returning an "invalid-symbol" error instead of a string
+  expression.
+
+- **Derivatives**: `d/dx e^x` now correctly simplifies to `e^x` instead of
+  `ln(e) * e^x`. The `hasSymbolicTranscendental()` function now recognizes that
+  transcendentals which simplify to exact rational values (like `ln(e) = 1`)
+  should not be preserved symbolically.
+
+- **Derivatives**: `d/dx log(x)` now returns `1 / (x * ln(10))` symbolically
+  instead of evaluating to `0.434... / x`. Fixed by using substitution instead
+  of function application when applying derivative formulas, which preserves
+  symbolic transcendental constants.
+
+- **Rationals**: Fixed `reducedRational()` to properly normalize negative
+  denominators before the early return check. Previously `1/-2` would not
+  canonicalize to `-1/2`.
+
+- **Arithmetic**: Fixed `.mul()` to preserve logarithms symbolically. Previously
+  multiplying expressions containing `Ln` or `Log` would evaluate the logarithm
+  to its numeric value.
+
+- **Serialization**: Fixed case inconsistency in `toString()` output for
+  trigonometric functions. Some functions like `Cot` were being serialized with
+  capital letters while others like `csc` were lowercase. All trig functions now
+  consistently serialize in lowercase (e.g., `cot(x)` instead of `Cot(x)`).
+
+- **Serialization**: Improved display of inverse trig derivatives and similar
+  expressions:
+  - Negative exponents like `x^(-1/2)` now display as `1/sqrt(x)` in both LaTeX
+    and ASCII-math output
+  - When a sum starts with a negative term and contains a positive constant, the
+    constant is moved to the front (e.g., `-x^2 + 1` displays as `1 - x^2`)
+    while preserving polynomial ordering (e.g., `x^2 - x + 3` stays unchanged)
+  - `d/dx arcsin(x)` now displays as `1/sqrt(1-x^2)` instead of
+    `(-x^2+1)^(-1/2)`
+
+- **Compilation**: Fixed compilation of `Sum` and `Product` expressions.
+
+- **Sum/Product**: Fixed `sum` and `prod` library functions to correctly handle
+  substitution of index variables.
+
+- **Scientific Notation**: Fixed normalization of scientific notation for
+  fractional values (e.g., numbers less than 1).
+
+### New Features and Improvements
+
+- **Number Serialization**: Added `adaptiveScientific` notation mode. When
+  serializing numbers to LaTeX, this mode uses scientific notation but avoids
+  exponents within a configurable range (controlled by `avoidExponentsInRange`).
+  This provides a balance between readability and precision for numbers across
+  different orders of magnitude.
 
 - Refactored the type parser to use a modular architecture. This allows for
   better extensibility and maintainability of the type system.
+
+- **Pattern Matching**: The `validatePattern()` function is now exported from
+  the public API. Use it to check patterns for invalid combinations like
+  consecutive sequence wildcards before using them.
+
+- **Polynomial Arithmetic**: Added new library functions for polynomial
+  operations:
+  - `PolynomialDegree(expr, var)` - Get the degree of a polynomial
+  - `CoefficientList(expr, var)` - Get the list of coefficients
+  - `PolynomialQuotient(dividend, divisor, var)` - Polynomial division quotient
+  - `PolynomialRemainder(dividend, divisor, var)` - Polynomial division
+    remainder
+  - `PolynomialGCD(a, b, var)` - Greatest common divisor of polynomials
+  - `Cancel(expr, var)` - Cancel common factors in rational expressions
+
+- **Integration**: Significantly expanded symbolic integration capabilities:
+  - **Polynomial division**: Integrals like `∫ x²/(x²+1) dx` now correctly
+    divide first, yielding `x - arctan(x)`
+  - **Repeated linear roots**: `∫ 1/(x-1)² dx = -1/(x-1)` and higher powers
+  - **Derivative pattern recognition**: `∫ f'(x)/f(x) dx = ln|f(x)|` is now
+    recognized automatically
+  - **Completing the square**: Irreducible quadratics like `∫ 1/(x²+2x+2) dx`
+    now yield `arctan(x+1)`
+  - **Reduction formulas**: `∫ 1/(x²+1)² dx` now works using reduction formulas
+  - **Mixed partial fractions**: `∫ 1/((x-1)(x²+1)) dx` now decomposes correctly
+  - **Factor cancellation**: `∫ (x+1)/(x²+3x+2) dx` simplifies before
+    integrating
+  - **Inverse hyperbolic**: Added `∫ 1/√(x²+1) dx = arcsinh(x)` and
+    `∫ 1/√(x²-1) dx = arccosh(x)`
+  - **Arcsec pattern**: Added `∫ 1/(x·√(x²-1)) dx = arcsec(x)`
+  - **Trigonometric substitution**: Added support for `∫√(a²-x²) dx`,
+    `∫√(x²+a²) dx`, and `∫√(x²-a²) dx` using trig/hyperbolic substitution
 
 ## 0.30.2 _2025-07-15_
 
@@ -2373,8 +2470,4 @@ console.log(expr.isEqual(ce.box(2)));
 ### Improvements
 
 - In LaTeX, parse `\operatorname{foo}` as the MathJSON symbol `"foo"`.
-
-```
-
-```
 </ChangeLog>

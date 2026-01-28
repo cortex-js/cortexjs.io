@@ -1039,8 +1039,8 @@ https://docs.aws.amazon.com/polly/latest/dg/voicelist.html
 ##### MathfieldElement.textToSpeechMarkup
 
 ```ts
-get static textToSpeechMarkup(): "" | "ssml" | "ssml_step" | "mac"
-set static textToSpeechMarkup(value: "" | "ssml" | "ssml_step" | "mac"): void
+get static textToSpeechMarkup(): "" | "mac" | "ssml" | "ssml_step"
+set static textToSpeechMarkup(value: "" | "mac" | "ssml" | "ssml_step"): void
 ```
 
 The markup syntax to use for the output of conversion to spoken text.
@@ -1496,8 +1496,8 @@ Use `null` to prevent any sound from being loaded.
 ##### MathfieldElement.decimalSeparator
 
 ```ts
-get static decimalSeparator(): "." | ","
-set static decimalSeparator(value: "." | ","): void
+get static decimalSeparator(): "," | "."
+set static decimalSeparator(value: "," | "."): void
 ```
 
 The symbol used to separate the integer part from the fractional part of a
@@ -1555,6 +1555,29 @@ If none is provided, the locale of the browser is used.
 
 <MemberCard>
 
+##### MathfieldElement.scientificNotationTemplate
+
+```ts
+get static scientificNotationTemplate(): string
+set static scientificNotationTemplate(value: string): void
+```
+
+The template used to format numbers in scientific notation.
+The template should include the placeholders `#1` and `#2`, which will
+be replaced by the significand and exponent, respectively.
+
+The template is used when typing a number in scientific notation, e.g.
+`1.23e4`, which will be rendered as `1.23×10^4`.
+
+**Default**: `'#1\\times10^{#2}'`
+
+Other common formats include:
+- `'#1\\,\\mathrm{E}\\mathop{#2}'` (e.g. `1.23\,\mathrm{E}\mathop{-4}`)
+
+</MemberCard>
+
+<MemberCard>
+
 ##### MathfieldElement.strings
 
 ```ts
@@ -1606,7 +1629,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.107.1';
+static version: string = '0.108.2';
 ```
 
 </MemberCard>
@@ -4682,7 +4705,7 @@ optional label: DynamicValue<string>;
 ##### MenuItemSubmenu.submenu
 
 ```ts
-submenu: Readonly<MenuItem[]>;
+submenu: readonly MenuItem[];
 ```
 
 </MemberCard>
@@ -4956,8 +4979,8 @@ get layouts(): readonly (
 set layouts(value: 
   | VirtualKeyboardLayout
   | VirtualKeyboardName
-  | VirtualKeyboardLayout | VirtualKeyboardName[]
-  | readonly VirtualKeyboardLayout | VirtualKeyboardName[]): void
+  | readonly VirtualKeyboardLayout | VirtualKeyboardName[]
+  | VirtualKeyboardLayout | VirtualKeyboardName[]): void
 ```
 
 A layout is made up of one or more layers (think of the main layer
@@ -5480,8 +5503,8 @@ get layouts(): readonly (
 set layouts(value: 
   | VirtualKeyboardLayout
   | VirtualKeyboardName
-  | VirtualKeyboardLayout | VirtualKeyboardName[]
-  | readonly VirtualKeyboardLayout | VirtualKeyboardName[]): void
+  | readonly VirtualKeyboardLayout | VirtualKeyboardName[]
+  | VirtualKeyboardLayout | VirtualKeyboardName[]): void
 ```
 
 A layout is made up of one or more layers (think of the main layer
@@ -5712,7 +5735,7 @@ type VirtualKeyboardMessage =
   editToolbar: EditToolbarOptions;
   isShifted: boolean;
   layers: Record<string, string | Partial<VirtualKeyboardLayer>>;
-  layouts: Readonly<(string | VirtualKeyboardLayout)[]>;
+  layouts: readonly (string | VirtualKeyboardLayout)[];
   setKeycap: {
      keycap: string;
      value: Partial<VirtualKeyboardKeycap>;
@@ -5724,9 +5747,9 @@ type VirtualKeyboardMessage =
   alphabeticLayout: AlphabeticKeyboardLayout;
   editToolbar: EditToolbarOptions;
   layers: Record<string, string | Partial<VirtualKeyboardLayer>>;
-  layouts: Readonly<(
+  layouts: readonly (
      | VirtualKeyboardName
-     | VirtualKeyboardLayout)[]>;
+     | VirtualKeyboardLayout)[];
   setKeycap: {
      keycap: string;
      value: Partial<VirtualKeyboardKeycap>;
@@ -6384,6 +6407,368 @@ type Expression =
 
 ## Other
 
+### MathDivElement
+
+`<math-div>` web component for block-level mathematical expressions.
+
+Renders mathematical content as a block element using displaystyle by default.
+
+#### Example
+
+```html
+<math-div>\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}</math-div>
+<math-div format="ascii-math">int_0^oo e^(-x^2) dx</math-div>
+<math-div mode="textstyle">x + y</math-div>
+```
+
+ render - Fired when content is successfully rendered
+ render-error - Fired when rendering fails
+
+#### Group
+
+Events
+
+#### Extends
+
+- `MathStaticElement`
+
+<MemberCard>
+
+##### new MathDivElement()
+
+<MemberCard>
+
+##### new MathDivElement()
+
+```ts
+new MathDivElement(): MathDivElement
+```
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.format
+
+```ts
+get format(): StaticElementFormat
+set format(value: StaticElementFormat): void
+```
+
+The input format: 'latex', 'ascii-math', or 'math-json'
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.letterShapeStyle
+
+```ts
+get letterShapeStyle(): "auto" | "tex" | "iso" | "french" | "upright"
+set letterShapeStyle(value: "auto" | "tex" | "iso" | "french" | "upright"): void
+```
+
+Letter shape style option
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.macros
+
+```ts
+get macros(): string
+set macros(value: string): void
+```
+
+Macros to use for rendering
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.maxMatrixCols
+
+```ts
+get maxMatrixCols(): number
+set maxMatrixCols(value: number): void
+```
+
+Maximum matrix columns
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.minFontScale
+
+```ts
+get minFontScale(): number
+set minFontScale(value: number): void
+```
+
+Minimum font scale
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.mode
+
+```ts
+get mode(): "displaystyle" | "textstyle"
+set mode(value: "displaystyle" | "textstyle"): void
+```
+
+The rendering mode: 'textstyle' or 'displaystyle'
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.observedAttributes
+
+Observed attributes that trigger re-rendering
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.attributeChangedCallback()
+
+```ts
+attributeChangedCallback(name, oldValue, newValue): void
+```
+
+###### name
+
+`string`
+
+###### oldValue
+
+`string`
+
+###### newValue
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.connectedCallback()
+
+```ts
+connectedCallback(): void
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.disconnectedCallback()
+
+```ts
+disconnectedCallback(): void
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathDivElement.render()
+
+```ts
+render(): void
+```
+
+Manually trigger a re-render of the content
+
+</MemberCard>
+
+### MathSpanElement
+
+`<math-span>` web component for inline mathematical expressions.
+
+Renders mathematical content inline using textstyle by default.
+
+#### Example
+
+```html
+<math-span>x^2 + y^2 = z^2</math-span>
+<math-span format="ascii-math">x^2 + y^2</math-span>
+<math-span mode="displaystyle">\\sum_{i=1}^n i</math-span>
+```
+
+ render - Fired when content is successfully rendered
+ render-error - Fired when rendering fails
+
+#### Group
+
+Events
+
+#### Extends
+
+- `MathStaticElement`
+
+<MemberCard>
+
+##### new MathSpanElement()
+
+<MemberCard>
+
+##### new MathSpanElement()
+
+```ts
+new MathSpanElement(): MathSpanElement
+```
+
+</MemberCard>
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.format
+
+```ts
+get format(): StaticElementFormat
+set format(value: StaticElementFormat): void
+```
+
+The input format: 'latex', 'ascii-math', or 'math-json'
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.letterShapeStyle
+
+```ts
+get letterShapeStyle(): "auto" | "tex" | "iso" | "french" | "upright"
+set letterShapeStyle(value: "auto" | "tex" | "iso" | "french" | "upright"): void
+```
+
+Letter shape style option
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.macros
+
+```ts
+get macros(): string
+set macros(value: string): void
+```
+
+Macros to use for rendering
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.maxMatrixCols
+
+```ts
+get maxMatrixCols(): number
+set maxMatrixCols(value: number): void
+```
+
+Maximum matrix columns
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.minFontScale
+
+```ts
+get minFontScale(): number
+set minFontScale(value: number): void
+```
+
+Minimum font scale
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.mode
+
+```ts
+get mode(): "displaystyle" | "textstyle"
+set mode(value: "displaystyle" | "textstyle"): void
+```
+
+The rendering mode: 'textstyle' or 'displaystyle'
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.observedAttributes
+
+Observed attributes that trigger re-rendering
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.attributeChangedCallback()
+
+```ts
+attributeChangedCallback(name, oldValue, newValue): void
+```
+
+###### name
+
+`string`
+
+###### oldValue
+
+`string`
+
+###### newValue
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.connectedCallback()
+
+```ts
+connectedCallback(): void
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.disconnectedCallback()
+
+```ts
+disconnectedCallback(): void
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### MathSpanElement.render()
+
+```ts
+render(): void
+```
+
+Manually trigger a re-render of the content
+
+</MemberCard>
+
 <MemberCard>
 
 ### LayoutOptions
@@ -6482,7 +6867,7 @@ const version: {
 };
 ```
 
-Current version: `0.107.1`
+Current version: `0.108.2`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
