@@ -10,6 +10,101 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Bug Fixes
+
+- **([#243](https://github.com/cortex-js/compute-engine/issues/243))
+  LaTeX Parsing**: Fixed logic operator precedence causing expressions like
+  `x = 1 \vee x = 2` to be parsed incorrectly as `x = (1 ∨ x) = 2` instead of
+  `(x = 1) ∨ (x = 2)`. Comparison operators (`=`, `<`, `>`, etc.) now correctly
+  bind tighter than logic operators (`\land`, `\lor`, `\veebar`, etc.).
+
+- **([#258](https://github.com/cortex-js/compute-engine/issues/258))
+  Pattern Matching**: Fixed `BoxedExpression.match()` returning `null` when
+  matching patterns against canonicalized expressions. Several cases are now
+  handled:
+  - `Rational` patterns now match expressions like `['Rational', 'x', 2]` which
+    are canonicalized to `['Multiply', ['Rational', 1, 2], 'x']`
+  - `Power` patterns now match `['Power', 'x', -1]` which is canonicalized to
+    `['Divide', 1, 'x']`, returning `{_base: x, _exp: -1}`
+  - `Power` patterns now match `['Root', 'x', 3]` (cube root), returning
+    `{_base: x, _exp: ['Divide', 1, 3]}`
+
+- **([#264](https://github.com/cortex-js/compute-engine/issues/264))
+  Serialization**: Fixed LaTeX serialization of quantified expressions
+  (`ForAll`, `Exists`, `ExistsUnique`, `NotForAll`, `NotExists`). Previously,
+  only the quantifier symbol was output (e.g., `\forall x` instead of
+  `\forall x, x>y`). The body of the quantified expression is now correctly
+  serialized.
+
+- **([#252](https://github.com/cortex-js/compute-engine/issues/252))
+  Sum/Product**: Fixed `Sum` and `Product` returning `NaN` when the body
+  contains free variables (variables not bound by the index). For example,
+  `\sum_{n=1}^{10}(x)` now correctly evaluates to `10x` instead of `NaN`, and
+  `\prod_{n=1}^{5}(x)` evaluates to `x^5`. Mixed expressions like
+  `\sum_{n=1}^{10}(n \cdot x)` now return `55x`. Also fixed `toString()` for
+  `Sum` and `Product` expressions with non-trivial bodies (e.g., `Multiply`)
+  which were incorrectly displayed as `int()`.
+
+- **([#257](https://github.com/cortex-js/compute-engine/issues/257))
+  LaTeX Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
+  Previously `\gcd\left(24,37\right)` would parse as `["Tuple", "GCD", ["Tuple", 24, 37]]`
+  instead of the expected `["GCD", 24, 37]`. The `\operatorname{gcd}` form was
+  unaffected. Also added support for `\lcm` as a LaTeX command (in addition to
+  the existing `\operatorname{lcm}`).
+
+- **LaTeX Parsing**: Fixed `\cosh` incorrectly mapping to `Csch` instead of `Cosh`.
+
+- **([#255](https://github.com/cortex-js/compute-engine/issues/255))
+  LaTeX Parsing**: Fixed multi-letter subscripts like `A_{CD}` causing
+  "incompatible-type" errors in arithmetic operations. Multi-letter subscripts
+  without parentheses are now interpreted as compound symbol names (e.g.,
+  `A_{CD}` → `A_CD`, `x_{ij}` → `x_ij`, `T_{max}` → `T_max`). Use parentheses
+  for expression subscripts: `A_{(CD)}` creates a `Subscript` expression where
+  `CD` represents implicit multiplication. The `Delimiter` wrapper is now
+  stripped from subscript expressions for cleaner output.
+
+### Improvements
+
+- **Polynomial Simplification**: The `simplify()` function now automatically
+  cancels common polynomial factors in univariate rational expressions. For
+  example, `(x² - 1)/(x - 1)` simplifies to `x + 1`, `(x³ - x)/(x² - 1)`
+  simplifies to `x`, and `(x + 1)/(x² + 3x + 2)` simplifies to `1/(x + 2)`.
+  Previously, this required explicitly calling the `Cancel` function with a
+  variable argument.
+
+- **Sum/Product Simplification**: Added simplification rules for `Sum` and
+  `Product` expressions with symbolic bounds:
+  - Constant body: `\sum_{n=1}^{b}(x)` simplifies to `b * x`
+  - Triangular numbers (general bounds): `\sum_{n=a}^{b}(n)` simplifies to `(b(b+1) - a(a-1))/2`
+  - Sum of squares: `\sum_{n=1}^{b}(n^2)` simplifies to `b(b+1)(2b+1)/6`
+  - Sum of cubes: `\sum_{n=1}^{b}(n^3)` simplifies to `[b(b+1)/2]^2`
+  - Geometric series: `\sum_{n=0}^{b}(r^n)` simplifies to `(1-r^(b+1))/(1-r)`
+  - Alternating unit series: `\sum_{n=0}^{b}((-1)^n)` simplifies to `(1+(-1)^b)/2`
+  - Alternating linear series: `\sum_{n=0}^{b}((-1)^n * n)` simplifies to `(-1)^b * floor((b+1)/2)`
+  - Arithmetic progression: `\sum_{n=0}^{b}(a + d*n)` simplifies to `(b+1)(a + db/2)`
+  - Sum of binomial coefficients: `\sum_{k=0}^{n}C(n,k)` simplifies to `2^n`
+  - Product of constant: `\prod_{n=1}^{b}(x)` simplifies to `x^b`
+  - Factorial: `\prod_{n=1}^{b}(n)` simplifies to `b!`
+  - Odd double factorial: `\prod_{n=1}^{b}(2n-1)` simplifies to `(2b-1)!!`
+  - Even double factorial: `\prod_{n=1}^{b}(2n)` simplifies to `2^b * b!`
+  - Rising factorial (Pochhammer): `\prod_{k=0}^{n-1}(x+k)` simplifies to `(x)_n`
+  - Falling factorial: `\prod_{k=0}^{n-1}(x-k)` simplifies to `x!/(x-n)!`
+  - Factor out constants: `\sum_{n=1}^{b}(c \cdot f(n))` simplifies to
+    `c \cdot \sum_{n=1}^{b}(f(n))`, and similarly for products where the
+    constant is raised to the power of the iteration count
+  - Nested sums/products: inner sums/products are simplified first, enabling
+    cascading simplification
+  - Edge cases: empty ranges (upper < lower) return identity elements (0 for
+    Sum, 1 for Product), and single-iteration ranges substitute the bound value
+
+- **([#257](https://github.com/cortex-js/compute-engine/issues/257))
+  LaTeX Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
+  Previously `\gcd\left(24,37\right)` would parse as `["Tuple", "GCD", ["Tuple", 24, 37]]`
+  instead of the expected `["GCD", 24, 37]`. The `\operatorname{gcd}` form was
+  unaffected.
+
 ## 0.31.0 _2026-01-27_
 
 ### Breaking Changes

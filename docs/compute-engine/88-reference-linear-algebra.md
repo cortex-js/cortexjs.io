@@ -6,7 +6,7 @@ slug: /compute-engine/reference/linear-algebra/
 <Intro>
 [Linear algebra](https://en.wikipedia.org/wiki/Linear_algebra) is the branch of 
 mathematics that studies vector spaces and linear transformations between them 
-like adding and scaling. It uses matrixes to represent linear maps. 
+like adding and scaling. It uses matrices to represent linear maps. 
 Linear algebra is widely used in science and engineering. 
 </Intro>
 
@@ -17,7 +17,7 @@ In the Compute Engine matrices are represented as lists of lists.
 For example the matrix above is represented as the following list of lists:
 
 ```json example
-["List", ["List", 1, 3, ["List", 5, 0]]]
+["List", ["List", 1, 3], ["List", 5, 0]]
 ```
 
 An **axis** is a dimension of a tensor. A vector has one axis, a matrix has two
@@ -39,7 +39,7 @@ of the list is the second row of the matrix, etc.
 
 
 <ReadMore path="/compute-engine/reference/collections/" >Since
-matrixes are `List` collections, some **collection operations**
+matrices are `List` collections, some **collection operations**
 can also be applied to them such as `At`, `Reduce` and `Map`. </ReadMore>
 
 
@@ -57,9 +57,9 @@ The Compute Engine provides a number of functions for working with matrices.
 Vectors (row vectors) are represented as lists, that is an expression with the 
 head `List`.
 
-Matrixes are represented as lists of lists.
+Matrices are represented as lists of lists.
 
-Tensors (multi-dimensional matrixes) are represented as nested lists.
+Tensors (multi-dimensional matrices) are represented as nested lists.
 
 :::info[Note]
 Tensors are represented internally using an optimized format that is more
@@ -72,10 +72,10 @@ such as `Reshape` and `Transpose` can be done in O(1) time.
 column vector.
 
 `Matrix` is an optional "tag" inert function that is used to influence the visual
-representation of a matrix. It has not impact on the value of the matrix.
+representation of a matrix. It has no impact on the value of the matrix.
 
 In LaTeX notation, a matrix is represented with "environments" (with command
-`\begin` and `\end`) such as  `pmatrix` or `bmatrix`.:
+`\begin` and `\end`) such as `pmatrix` or `bmatrix`:
 
 <Latex value="\begin{pmatrix} 1 & 3 \\ 5 & 0 \end{pmatrix}"/>
 
@@ -90,11 +90,11 @@ In LaTeX, each column is separated by an `&` and each row is separated by
 </nav>
 <FunctionDefinition name="Vector">
 
-<Signature name="Vector">_x-1_, ..._x-2_</Signature>
+<Signature name="Vector">_x-1_, ..._x-n_</Signature>
 
 `Vector` interprets the elements _x-1_... as a column vector
 
-This is essentially a shortcut for `["Matrix", ["List", ["List", _x-1_], ["List, _x-2_], ...]]]`.
+This is essentially a shortcut for `["Matrix", ["List", ["List", _x-1_], ["List", _x-2_], ...]]]`.
 
 ```json example
 ["Vector", 1, 3, 5, 0]
@@ -145,7 +145,7 @@ The delimiters can be any of the following characters:
 
 In addition, the character `.` can be used to indicate no delimiter.
 
-Some commom combinations may be represented using some 
+Some common combinations may be represented using some 
 standard LaTeX environments:
 
 | Delimiters | LaTeX Environment | Example |
@@ -162,8 +162,8 @@ _columns_format_ is an optional string indicating the format of each column.
 A character `=` indicates a centered column, `<` indicates a left-aligned 
 column, and `>` indicates a right-aligned column. 
 
-A character of `|` indicate a solid line between two
-columns and `:` indicate a dashed lines between two columns.
+A character of `|` indicates a solid line between two
+columns and `:` indicates a dashed line between two columns.
 
 </FunctionDefinition>
 
@@ -282,7 +282,7 @@ square brackets following a matrix.
 
 
 
-## Transforming Matrixes
+## Transforming Matrices
 
 <nav className="hidden">
 ### Flatten
@@ -297,7 +297,7 @@ order.
 This function can also be applied to any collection.
 
 Only elements with the same head as the collection are flattened.
-Matrixes have a head of `List`, so only other `List` elements
+Matrices have a head of `List`, so only other `List` elements
 are flattened.
 
 
@@ -343,7 +343,7 @@ If the result has fewer elements, the elements are dropped from the end of the
 element list. If the result has more elements, the lists of elements
 is filled cyclically. 
 
-This is the same behavior as APL, but other environment may behave differently.
+This is the same behavior as APL, but other environments may behave differently.
 For example, by default Mathematica `ArrayReshape` will fill the missing elements
 with zeros.
 
@@ -454,7 +454,7 @@ on the diagonal of the matrix.
 
 </FunctionDefinition>
 
-## Calculating with Matrixes
+## Calculating with Matrices
 
 
 <nav className="hidden">

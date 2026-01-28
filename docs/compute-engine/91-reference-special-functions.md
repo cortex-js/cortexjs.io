@@ -118,7 +118,7 @@ $$
 
 <Signature name="GammaLn">_z_</Signature>
 
-<Latex value="\\ln(\\gamma(z))"/>
+<Latex value="\\ln(\\Gamma(z))"/>
 
 This function is called `gammaln` in MatLab and SciPy and `LogGamma` in
 Mathematica.

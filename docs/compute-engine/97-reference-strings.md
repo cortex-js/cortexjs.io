@@ -48,7 +48,7 @@ semantic metadata that is not material to the interpretation of an expression
 such as text color and size or other typographic variations, a tooltip or a hyperlink
 data to link to a web page.
 
-While annotated expression can be applied to string, they can also
+While annotated expressions can be applied to strings, they can also
 be used to annotate mathematical expressions, such as variables, operators, or
 functions, to provide additional context or visual emphasis.
 
@@ -156,7 +156,7 @@ If no _format_ is specified, the default is `unicode-scalars`.
 For example: 
 
 ```json example
-["StringFrom", ["List" 240, 159, 148, 159], {str: "utf-8"}]
+["StringFrom", ["List", 240, 159, 148, 159], {str: "utf-8"}]
 // ➔ "Hello"
 
 ["StringFrom", ["List", 55357, 56607], {str: "utf-16"}]
@@ -413,7 +413,7 @@ the type of _expr_:
 <Signature name="Spacing">_width_</Signature>
 
 
-When serializing to LaTeX,  `width`is the dimension of the spacing, in 1/18 em.
+When serializing to LaTeX, `width` is the dimension of the spacing, in 1/18 em.
 
 The `Spacing` function is **inert** and the value of a `["Spacing", _expr_]` expression is `expr`.
 
@@ -494,7 +494,7 @@ The `Annotated` function is **inert** and the value of a `["Annotated", expr]` e
 
 
 <ReadMore path="/compute-engine/reference/linear-algebra/#formatting" > 
-Read more about formatting of **matrixes** and **vectors**
+Read more about formatting of **matrices** and **vectors**
 </ReadMore>
 
 

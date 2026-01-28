@@ -13,7 +13,7 @@ date: Last Modified
 | :--- | :--- | :--- |
 | `True` | `\top` | $$ \top $$ |
 |  ’’ | `\mathsf{T}` | $$ \mathsf{T}$$| 
-|  ’’ | `\operator{True}` | $$ \operatorname{True}$$| 
+|  '' | `\operatorname{True}` | $$ \operatorname{True}$$| 
 | `False` | `\bot` | $$ \bot $$ | 
 | ’’ | `\mathsf{F}` |  $$ \mathsf{F}$$ | 
 |  ’’ | `\operatorname{False}` | $$ \operatorname{False}$$| 

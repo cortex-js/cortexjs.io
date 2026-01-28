@@ -82,7 +82,7 @@ Calculate $$ \binom{6}{2} = \frac{6!}{2!4!} = \frac{720}{2 \times 24} = 15 $$.
 ["Binomial", 6, 2]
 ```
 
-See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficent)
+See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binomial_coefficient)
 
 <Latex>{`
 \\mathrm{Binomial}(n, k) = \\binom{n}{k} = \\frac{n!}{k!(n-k)!}

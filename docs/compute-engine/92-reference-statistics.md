@@ -254,7 +254,7 @@ four equal groups, each group comprising a quarter of the _collection_.
 
 <Signature name="InterquartileRange">_collection_</Signature>
 
-Evaluate to the **interquartile range** (IRQ) of a _collection_ of numbers.
+Evaluate to the **interquartile range** (IQR) of a _collection_ of numbers.
 
 The interquartile range is the difference between the third quartile and the
 first quartile.
