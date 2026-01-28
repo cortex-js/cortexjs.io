@@ -113,3 +113,80 @@ The `ExistsUnique` function represents the **unique existential quantifier**.
 <Latex value="\exists! x, x^2 = 1"/>
 
 </FunctionDefinition>
+
+
+## First-Order Logic
+
+When working with First-Order Logic (FOL) expressions, there are several features
+to be aware of:
+
+### Predicates
+
+In FOL, predicates are typically represented as uppercase letters followed by
+arguments in parentheses, such as `P(x)` or `Q(a, b)`.
+
+Single uppercase letters followed by parentheses are **automatically recognized**
+as function/predicate applications:
+
+```javascript
+ce.parse('P(x)')           // → ["P", "x"]
+ce.parse('Q(a, b)')        // → ["Q", "a", "b"]
+```
+
+For multi-letter predicate names or lowercase predicates, you should declare
+them explicitly:
+
+```javascript
+ce.declare('Loves', { signature: '(value, value) -> boolean' });
+ce.parse('Loves(x, y)')    // → ["Loves", "x", "y"]
+```
+
+### Quantifier Scope
+
+By default, quantifiers use **tight binding**, following standard FOL conventions.
+The quantifier scope extends only to the immediately following well-formed formula,
+stopping at logical connectives.
+
+<Latex value="\forall x. P(x) \rightarrow Q(x)"/>
+
+This parses as `(∀x. P(x)) → Q(x)`, not `∀x. (P(x) → Q(x))`.
+
+```json example
+["To", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+```
+
+To include the connective in the quantifier's scope, use explicit parentheses:
+
+<Latex value="\forall x. (P(x) \rightarrow Q(x))"/>
+
+```json example
+["ForAll", "x", ["Delimiter", ["Implies", ["P", "x"], ["Q", "x"]]]]
+```
+
+### Quantifier Scope Option
+
+You can control the quantifier scope behavior with the `quantifierScope` parsing
+option:
+
+```javascript
+// Tight binding (default) - quantifier binds only the next formula
+ce.parse('\\forall x. P(x) \\rightarrow Q(x)', { quantifierScope: 'tight' })
+// → ["To", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+
+// Loose binding - quantifier scope extends to end of expression
+ce.parse('\\forall x. P(x) \\rightarrow Q(x)', { quantifierScope: 'loose' })
+// → ["ForAll", "x", ["To", ["P", "x"], ["Q", "x"]]]
+```
+
+### Negated Quantifiers
+
+The negated quantifiers `NotForAll` and `NotExists` are also supported:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"14ch"}}>
+
+| Symbol | LaTeX | Notation |
+| :--- | :--- | :--- |
+| `NotForAll` | `\lnot\forall x, P(x)` | $$ \lnot\forall x, P(x) $$ |
+| `NotExists` | `\lnot\exists x, P(x)` | $$ \lnot\exists x, P(x) $$ |
+
+</div>
