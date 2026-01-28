@@ -99,7 +99,7 @@ Collections can be:
 - **Eager**: elements are fully evaluated when the collection is created.
 - **Lazy**: elements are evaluated only as they are accessed.
 
-Lazy collections are useful when working with with expensive computations
+Lazy collections are useful when working with expensive computations
 and necessary when working with infinite collections.
 
 Some operations like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections**.

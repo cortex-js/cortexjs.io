@@ -161,7 +161,7 @@ $$
 
 <Latex value="\operatorname{ComplexRoot}(1, 3)"/>
 
-Retrurn a list of the n<sup>th</sup> roots of a number _z_.
+Return a list of the n<sup>th</sup> roots of a number _z_.
 
 The complex roots of a number are the solutions of the equation $$z^n = a$$.
 

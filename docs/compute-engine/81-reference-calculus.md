@@ -156,7 +156,7 @@ When an argument $n$ is present it represents the _n_-th derivative of a functio
 <Latex value="f^{(n)}(x)"/>
 
 ```json example
-["Apply", ["Derivative", "f", n], "x"]
+["Apply", ["Derivative", "f", "n"], "x"]
 ```
 
 

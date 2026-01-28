@@ -59,15 +59,15 @@ evaluated and the value of the `["Block"]` is this expression.
 
 <Signature name="If">_condition_, _expr-1_</Signature>
 
-If the value of `condition`is the symbol `True`, the value of the `["If"]`
+If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`, otherwise `Nothing`.
 
 <Signature name="If">_condition_, _expr-1_, _expr-2_</Signature>
 
-If the value of `condition`is the symbol `True`, the value of the `["If"]`
+If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`, otherwise `expr-2`.
 
-Here's an example of a function that returns the absoluve value of a number:
+Here's an example of a function that returns the absolute value of a number:
 
 ```json example
 ["Function", ["If", ["Greater", "n", 0], "n", ["Negate", "n"]], "n"]
@@ -119,7 +119,7 @@ the `Which[]` function in Mathematica.
 
 <Signature name="Loop">_body_</Signature>
 
-Repeatedly evaluate `body`until the value of `body`is a `["Break"]` expression,
+Repeatedly evaluate `body` until the value of `body` is a `["Break"]` expression,
 or a `["Return"]` expression.
 
 - `["Break"]` exits the loop immediately. The value of the `["Loop"]` expression
@@ -158,9 +158,9 @@ in JavaScript. It is somewhat similar to a `Do[...]` in Mathematica.
 <Signature name="FixedPoint">_body_, _initial-value_,
 _max-iterations_</Signature>
 
-Assumes `body`is an expression using an implicit argument `_`.
+Assumes `body` is an expression using an implicit argument `_`.
 
-Apply `body`to `initial-value`, then apply `body`to the result until the result
+Apply `body` to `initial-value`, then apply `body` to the result until the result
 no longer changes.
 
 To determine if a fixed point has been reached and the loop should terminate,
@@ -195,7 +195,7 @@ programming constructs that can be used to replace loops.
 
 <Signature name="Return">_value_</Signature>
 
-Interupts the evaluation of a `["Function"]` expression. The value of the
+Interrupts the evaluation of a `["Function"]` expression. The value of the
 `["Function"]` expression is `value`.
 
 The `["Return"]` expression is useful when used with functions that have
@@ -229,7 +229,7 @@ Read more about **functions**.
 <Signature name="Break">_value_</Signature>
 
 When in a loop exit the loop immediately. The final value of the loop is
-`value`or `Nothing` if not provided.
+`value` or `Nothing` if not provided.
 
 </FunctionDefinition>
 

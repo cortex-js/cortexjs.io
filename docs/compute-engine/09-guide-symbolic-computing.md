@@ -189,12 +189,12 @@ console.log('isEqual?', a.isEqual(b));
 
 </div>
 
-## Replacing a Symbol in an Expresssion
+## Replacing a Symbol in an Expression
 
 **To replace a symbol in an expression** use the `subs()` function.
 
 The argument of the `subs()` function is an object literal. Each key/value 
-pairs is a symbol and the value to be substituted with. The value can be either
+pair is a symbol and the value to be substituted with. The value can be either
 a number or a boxed expression.
 
 ```live show-line-numbers mark-javascript-line="4"

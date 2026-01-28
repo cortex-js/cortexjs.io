@@ -44,7 +44,7 @@ that a variable is positive.
 </nav>
 <FunctionDefinition name="Declare">
 
-<Signature name="Declare">_symbol_, _type__</Signature>
+<Signature name="Declare">_symbol_, _type_</Signature>
 
 <Signature name="Declare">_symbol_, _type_, _value_</Signature>
 
@@ -87,7 +87,7 @@ a symbol cannot be changed.
 If there is no definition for the symbol, add a new definition in the
 current scope, and use the `value` to infer the type of the symbol.
 
-This is equivalent to `=` in may programming languages.
+This is equivalent to `=` in many programming languages.
 
 `Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions).
 
@@ -115,7 +115,7 @@ The predicate can take the form of:
 - an inequality: `["Assume", ["Greater", "x", 0]]`
 - a membership expression: `["Assume", ["Element", "x", "Integers"]]`
 
-`Assign` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
+`Assume` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
 since it changes the state of the Compute Engine.
 
 
@@ -125,7 +125,7 @@ since it changes the state of the Compute Engine.
 ## Structural Operations
 
 The following functions can be applied to non-canonical expressions.
-The do not depend on the canonical form, but reflect the structure of the
+They do not depend on the canonical form, but reflect the structure of the
 expression.
 
 <nav className="hidden">
@@ -133,7 +133,7 @@ expression.
 </nav>
 <FunctionDefinition name="About">
 
-<Signature name="About">_symbol__</Signature>
+<Signature name="About">_symbol_</Signature>
 
 Evaluate to a dictionary expression containing information about a symbol
 such as its type, its attributes, its value, etc...

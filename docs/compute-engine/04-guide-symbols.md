@@ -113,7 +113,7 @@ provided in the declaration, the type cannot be changed later.
 
 The `ce.forget()` function will remove any
 [assumptions](/compute-engine/guides/assumptions) associated with a symbol, and
-remove its value. Howeve, the symbol will remained declared, since other
+remove its value. However, the symbol will remain declared, since other
 expressions may depend on it.
 
 **To forget about a specific symbol**, pass the name of the symbol as an

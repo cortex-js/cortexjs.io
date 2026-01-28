@@ -4,7 +4,7 @@ slug: /compute-engine/guides/compiling/
 ---
 
 <Intro>
-The Compute Engine **LaTeX expressions** can compile expressions to **JavaScript functions**!
+The Compute Engine can compile **LaTeX expressions** to **JavaScript functions**!
 </Intro>
 
 ## Introduction
@@ -62,7 +62,7 @@ const fn = expr.compile();
 for (let i = 1; i < 10; i++) console.log(fn({ n: i }));
 ```
 
-**To get a list of the unknows of an expression** use the `expr.unknowns`
+**To get a list of the unknowns of an expression** use the `expr.unknowns`
 property:
 
 ```live

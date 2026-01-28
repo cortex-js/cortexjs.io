@@ -204,18 +204,52 @@ sections below.
 | Key | Description |
 | :--- | :--- |
 | `fractionalDigits` | The number of decimal places to use when formatting numbers. Use `"max"` to include all available digits and `"auto"` to use the same precision as for evaluation. Default is `"auto"`. |
-| `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, or `"engineering"`. Default is `"auto"`. |
+| `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, `"engineering"`, or `"adaptiveScientific"`. The `"adaptiveScientific"` mode uses scientific notation but avoids exponents within the range specified by `avoidExponentsInRange`. Default is `"auto"`. |
 | `avoidExponentsInRange` | A tuple of two values representing a range of exponents. If the exponent for the number is within this range, a decimal notation is used. Otherwise, the number is displayed with an exponent. Default is `[-6, 20]`. |
-| `digitGroupSeparator` | The LaTeX string used to separate group of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provide, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
-| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tupe is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`.|
+| `digitGroupSeparator` | The LaTeX string used to separate group of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provided, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
+| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tuple is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`.|
   | `exponentProduct` | A LaTeX string inserted before an exponent, if necessary. Default is `"\cdot"`. |
 | `beginExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"10^{"`. |
 | `endExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"}"`. |
 | `truncationMarker` | A LaTeX string used to indicate that a number has more precision than what is displayed. Default is `"\ldots"`. |
 | `repeatingDecimal` | The decoration around repeating digits. Valid values are `"auto"`, `"vinculum"`, `"dots"`, `"parentheses"`,  `"arc"` and `"none"`. Default is `"auto"`. |
 
+#### Notation Modes Comparison
+
+The following table shows how different numbers are serialized with each notation mode (using default `avoidExponentsInRange` of `[-6, 20]`):
+
+| Value | `"auto"` | `"scientific"` | `"engineering"` | `"adaptiveScientific"` |
+| :---- | :------- | :------------- | :-------------- | :--------------------- |
+| 0.000001234 | $0.000\,001\,234$ | $1.234 \cdot 10^{-6}$ | $1.234 \cdot 10^{-6}$ | $0.000\,001\,234$ |
+| 0.0000001234 | $1.234 \cdot 10^{-7}$ | $1.234 \cdot 10^{-7}$ | $123.4 \cdot 10^{-9}$ | $1.234 \cdot 10^{-7}$ |
+| 3.14159 | $3.141\,59$ | $3.141\,59 \cdot 10^{0}$ | $3.141\,59 \cdot 10^{0}$ | $3.141\,59$ |
+| 1234.5 | $1\,234.5$ | $1.234\,5 \cdot 10^{3}$ | $1.234\,5 \cdot 10^{3}$ | $1\,234.5$ |
+| 12345678 | $12\,345\,678$ | $1.234\,567\,8 \cdot 10^{7}$ | $12.345\,678 \cdot 10^{6}$ | $12\,345\,678$ |
+| 1e21 | $1 \cdot 10^{21}$ | $1 \cdot 10^{21}$ | $1 \cdot 10^{21}$ | $1 \cdot 10^{21}$ |
+
+- **`"auto"`**: Uses decimal notation within `avoidExponentsInRange`, otherwise scientific notation. The decision is based on the number's natural string representation.
+- **`"scientific"`**: Always uses scientific notation with one digit before the decimal point. Ignores `avoidExponentsInRange`.
+- **`"engineering"`**: Uses scientific notation with exponents that are multiples of 3.
+- **`"adaptiveScientific"`**: Normalizes to scientific notation first, then falls back to decimal if the exponent is within `avoidExponentsInRange`.
+
+#### Difference between `"auto"` and `"adaptiveScientific"`
+
+With the default `avoidExponentsInRange` of `[-6, 20]`, `"auto"` and `"adaptiveScientific"` produce similar results. The difference becomes apparent with a custom range.
+
+With `avoidExponentsInRange: [-2, 2]`:
+
+| Value | `"auto"` | `"adaptiveScientific"` |
+| :---- | :------- | :--------------------- |
+| 0.05 | $0.05$ | $0.05$ |
+| 0.005 | $0.005$ | $5 \cdot 10^{-3}$ |
+| 50 | $50$ | $50$ |
+| 5000 | $5\,000$ | $5 \cdot 10^{3}$ |
+| 1234.5 | $1\,234.5$ | $1.234\,5 \cdot 10^{3}$ |
+
+The key difference: `"adaptiveScientific"` always computes the scientific notation exponent first, then decides whether to display it. `"auto"` bases its decision on how JavaScript naturally represents the number, which may not have an exponent for moderately-sized values.
+
 ```live
-console.log(ce.parse("\\pi").N().toLatex({ 
+console.log(ce.parse("\\pi").N().toLatex({
     fractionalDigits: 6,
 }));
 ```

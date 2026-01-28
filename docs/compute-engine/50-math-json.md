@@ -160,7 +160,7 @@ A MathJSON expression is a combination of **numbers**, **symbols**, **strings**,
 
 **Numbers**, **symbols**, **strings** and **functions** are expressed either as
 object literals with a `"num"` `"str"` `"sym"` or `"fn"` key, respectively, or
-using a shorthand notation as a a JSON number, string or array.
+using a shorthand notation as a JSON number, string or array.
 
 The shorthand notation is more concise and easier to read, but it cannot include
 metadata properties.
@@ -357,7 +357,7 @@ arguments `2` and `3`.
 
 ### Functions as Object Literal
 
-The default representation of **function  expressions** is an object literal with
+The default representation of **function expressions** is an object literal with
 a `"fn"` key. The value of the `fn` key is an array representing the function 
 operator (its name) and its arguments (its operands).
 
@@ -607,7 +607,7 @@ Modifiers include:
 | `_dot`          | `\dot{}`          | \\( \dot\{x\} \\)          |
 | `_ddot`         | `\ddot{}`         | \\( \ddot\{x\} \\)         |
 | `_tdot`         | `\dddot{}`        | \\( \dddot\{x\} \\)        |
-| `_qdot`         | `\ddddot{}`       | \\( \dddodt\{x\} \\)       |
+| `_qdot`         | `\ddddot{}`       | \\( \ddddot\{x\} \\)       |
 | `_operator`     | `\operatorname{}` | \\( \operatorname\{x\} \\) |
 | `_upright`      | `\mathrm{}`       | \\( \mathrm\{x\} \\)       |
 | `_italic`       | `\mathit{}`       | \\( \mathit\{x\} \\)       |
@@ -693,7 +693,7 @@ Modifiers include:
 | `invertedOhm`    | `\mho`        | \\( \mho \\)        |
 | `hBar`           | `\hbar`       | \\( \hbar \\)       |
 | `hSlash`         | `\hslash`     | \\( \hslash \\)     |
-| `blacksquare`    | `\hslash`     | \\( \hslash \\)     |
+| `blacksquare`    | `\blacksquare`| \\( \blacksquare \\)|
 | `bottom`         | `\bot`        | \\( \bot \\)        |
 | `bullet`         | `\bullet`     | \\( \bullet \\)     |
 | `circle`         | `\circ`       | \\( \circ \\)       |
@@ -881,7 +881,7 @@ The MathJSON Standard Library includes definitions for:
 When defining a new function, avoid using a name already defined in the Standard
 Library.
 
-<ReadMore path="/compute-compute-engine/guides/augmenting/">
+<ReadMore path="/compute-engine/guides/augmenting/">
 Read more about **Adding New Definitions**<Icon name="chevron-right-bold" />
 </ReadMore>
 

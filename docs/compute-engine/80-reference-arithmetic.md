@@ -5,7 +5,7 @@ slug: /compute-engine/reference/arithmetic/
 
 ## Constants
 
-<div className="symbols-table first-column-header" style={{"--first-col-width":"16h"}}>
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16ch"}}>
 
 | Symbol            | Value                        |                                                                                                                                                           |
 | :---------------- | :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -96,11 +96,13 @@ When `simplify()` is called on a `Sum` expression with symbolic bounds, the foll
 | $$\sum_{n=0}^{b} (-1)^n$$ | $$\frac{1+(-1)^b}{2}$$ | Alternating unit series |
 | $$\sum_{n=0}^{b} (-1)^n \cdot n$$ | $$(-1)^b \lfloor\frac{b+1}{2}\rfloor$$ | Alternating linear series |
 | $$\sum_{n=0}^{b} (a + dn)$$ | $$(b+1)\left(a + \frac{db}{2}\right)$$ | Arithmetic progression |
+| $$\sum_{k=0}^{n} \binom{n}{k}$$ | $$2^n$$ | Sum of binomial coefficients |
 | $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
 - Empty range (upper < lower): returns `0`
 - Single iteration (upper = lower): substitutes the bound value and returns the body
+- Nested sums: inner sums are simplified first, enabling cascading simplification
 
 </FunctionDefinition>
 
@@ -132,7 +134,7 @@ Note this is equivalent to:
 
 <Signature name="Product">_f_: function, _bounds_:tuple</Signature>
 
-Return the product of `body`for each value in `bounds`.
+Return the product of `body` for each value in `bounds`.
 
 <Latex value="\prod_{i=1}^{n} f(i)"/>
 
@@ -151,6 +153,8 @@ When `simplify()` is called on a `Product` expression with symbolic bounds, the 
 | $$\prod_{n=1}^{b} n$$ | $$b!$$ | Factorial |
 | $$\prod_{n=1}^{b} (2n-1)$$ | $$(2b-1)!!$$ | Odd double factorial |
 | $$\prod_{n=1}^{b} 2n$$ | $$2^b \cdot b!$$ | Even double factorial |
+| $$\prod_{k=0}^{n-1} (x+k)$$ | $$(x)_n$$ | Rising factorial (Pochhammer) |
+| $$\prod_{k=0}^{n-1} (x-k)$$ | $$\frac{x!}{(x-n)!}$$ | Falling factorial |
 | $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:

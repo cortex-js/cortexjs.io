@@ -9,7 +9,7 @@ is easier to understand.
 </Intro>
 
 The `expr.simplify()` function tries expanding, factoring and applying many
-other transformations to find a simple a simpler form of a symbolic expression.
+other transformations to find a simpler form of a symbolic expression.
 
 Before the transformation rules are applied, the expression is put into a
 canonical form.
@@ -61,6 +61,24 @@ It avoids making any simplification that could result in a loss of precision.
 
 For example, \\( 10^{300} + 1\\) cannot be simplified without losing the least
 significant digit, so `expr.simplify()` will return the expression unmodified.
+
+## Polynomial Simplifications
+
+For univariate rational expressions (fractions with polynomials in a single
+variable), `simplify()` automatically cancels common factors in the numerator
+and denominator.
+
+For example:
+- $ \frac{x^2 - 1}{x - 1} $ simplifies to $ x + 1 $
+- $ \frac{x^3 - x}{x^2 - 1} $ simplifies to $ x $
+- $ \frac{x + 1}{x^2 + 3x + 2} $ simplifies to $ \frac{1}{x + 2} $
+
+For more control over polynomial operations, or for multivariate expressions,
+use the explicit `Cancel`, `PolynomialGCD`, `PolynomialQuotient`, and
+`PolynomialRemainder` functions.
+
+<ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
+<strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
 ## Using Assumptions
 

@@ -150,7 +150,7 @@ uses `_` as a wildcard for the parameter.
 
 ```json example
 ["Apply", ["Function", ["Add", 2, "x"], "x"], 11]
-// ➔ 22
+// ➔ 13
 
 ["Apply", ["Add", 2, "_"], 4]
 // ➔ 6
@@ -194,10 +194,10 @@ when the function is applied, it will use that value of `a` in the computation.
 // ➔ 1 + 10
 ```
 
-Note that the value of `a` is `3` when the function is defined, and it
-is `10` when the function is applied. The function will always use the value of
+Note that the value of `a` is `10` when the function is defined, and it
+is `100` when the function is applied. The function will always use the value of
 `a` that was in scope when the function was defined, not the value of `a` at the
-time the function is applied. In fact, the out `a` is a different variable
+time the function is applied. In fact, the outer `a` is a different variable
 which is unrelated to the `a` in the scope of the function, but with the same
 name.
 
