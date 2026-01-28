@@ -82,6 +82,25 @@ Evaluate to the sum of `body` for each value in `bounds`.
 // ➔ 65
 ```
 
+#### Simplification
+
+When `simplify()` is called on a `Sum` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
+
+| Pattern | Simplifies to | Name |
+| :------ | :------------ | :--- |
+| $$\sum_{n=1}^{b} c$$ | $$b \cdot c$$ | Constant body |
+| $$\sum_{n=1}^{b} n$$ | $$\frac{b(b+1)}{2}$$ | Triangular number |
+| $$\sum_{n=1}^{b} n^2$$ | $$\frac{b(b+1)(2b+1)}{6}$$ | Sum of squares |
+| $$\sum_{n=1}^{b} n^3$$ | $$\left[\frac{b(b+1)}{2}\right]^2$$ | Sum of cubes |
+| $$\sum_{n=0}^{b} r^n$$ | $$\frac{1-r^{b+1}}{1-r}$$ | Geometric series |
+| $$\sum_{n=0}^{b} (-1)^n$$ | $$\frac{1+(-1)^b}{2}$$ | Alternating unit series |
+| $$\sum_{n=0}^{b} (a + dn)$$ | $$(b+1)\left(a + \frac{db}{2}\right)$$ | Arithmetic progression |
+| $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
+
+Edge cases:
+- Empty range (upper < lower): returns `0`
+- Single iteration (upper = lower): substitutes the bound value and returns the body
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Product">
@@ -120,6 +139,20 @@ Return the product of `body`for each value in `bounds`.
 ["Product", ["Add", "x", 1], ["Tuple", "x", 1, 10]]
 // ➔ 39916800
 ```
+
+#### Simplification
+
+When `simplify()` is called on a `Product` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
+
+| Pattern | Simplifies to | Name |
+| :------ | :------------ | :--- |
+| $$\prod_{n=1}^{b} c$$ | $$c^b$$ | Constant body |
+| $$\prod_{n=1}^{b} n$$ | $$b!$$ | Factorial |
+| $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
+
+Edge cases:
+- Empty range (upper < lower): returns `1`
+- Single iteration (upper = lower): substitutes the bound value and returns the body
 
 </FunctionDefinition>
 
