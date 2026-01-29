@@ -21,7 +21,7 @@ like to parse to MathJSON. <Icon name="chevron-right-bold" />
 
 ## Introduction
 
-When an symbol such as `Pi` or `Sin` is encountered in an expression, the 
+When a symbol such as `Pi` or `Sin` is encountered in an expression, the 
 Compute Engine will look up its definition in the set of known 
 symbols, including the Standard Library.
 
@@ -124,14 +124,14 @@ ce.declare("f", {
 ### Declaring a Symbol
 
 **To declare a symbol** use the `ce.declare()` method with the name of the
-symmbol as the first argument and a type as the second argument.
+symbol as the first argument and a type as the second argument.
 
 ```js
 ce.declare("n", "integer");
 ```
 
 <ReadMore path="/compute-engine/guides/types" >The type specifies the 
-valid values of the symbol. For example, `boolean`, `integer`, `rational`, `function`, `string` etc.. Learn more about **types**.<Icon name="chevron-right-bold" /></ReadMore>
+valid values of the symbol. For example, `boolean`, `integer`, `rational`, `function`, `string`, etc. Learn more about **types**.<Icon name="chevron-right-bold" /></ReadMore>
 
 Alternatively, you can provide an object literal with the additional properties
 `value`, `type`, `isConstant`, and more.
@@ -166,13 +166,13 @@ Alternatively, you can set the value of a symbol using the `value` property:
 ce.box("m").value = 42;
 ```
 
-**To prevent the value of a symbol from being changed**, set the `constant`
+**To prevent the value of a symbol from being changed**, set the `isConstant`
 property to `true`:
 
 ```js
 ce.declare("m_e", {
   value: 9.1e-31,
-  constant: true,
+  isConstant: true,
 });
 ```
 

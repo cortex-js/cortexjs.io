@@ -6,7 +6,7 @@ date: Last Modified
 
 <Intro>
 To obtain an exact numeric evaluation of an expression use `expr.evaluate()`. 
-To obtain a  numeric approximation use `expr.N()`.
+To obtain a numeric approximation use `expr.N()`.
 </Intro>
 
 
@@ -52,6 +52,20 @@ the expression is automatically evaluated as a **numeric approximation**.
 console.log(ce.parse('1/3 + 1/4 + 1.24').evaluate());
 ```
 
+## Angular Units
+
+When a trigonometric function is given a unitless value, the Compute Engine
+interprets it using the current angular unit. Set it with `ce.angularUnit`
+(default: `"rad"`).
+
+Valid values: `"rad"`, `"deg"`, `"grad"`, `"turn"`.
+
+```live
+ce.angularUnit = "deg";
+console.log(ce.parse("\\cos 60").N());
+// ➔ 0.5
+```
+
 ## JavaScript Interoperability
 
 The result of `expr.evaluate()` and `expr.N()` is a boxed expression. 
@@ -81,16 +95,16 @@ console.log(expr.N().valueOf());
 // ➔ 0.5833333333333334
 ```
 
-The `valueOf()` property of a boxed expression can be used in JavaScript
+The `valueOf()` method of a boxed expression can be used in JavaScript
 expressions.
 
 ```live
 const expr = ce.parse('1/3 + 1/4');
 console.log(expr.N().valueOf() + 1);
+```
 
-
-Unlike the `.re` property, the `.value` property can also return a `boolean`
-or a `string`, depending on the value of the expression.
+Unlike the `.re` property, `valueOf()` can also return a `boolean` or a
+`string`, depending on the value of the expression.
 
 
 
@@ -124,7 +138,7 @@ If the precision is 15 or less, the Compute Engine uses a
 for its internal calculations.
 
 This format is implemented in hardware and well suited to do fast computations.
-It uses a fixed amount of memory and represent significant digits in base-2 with
+It uses a fixed amount of memory and represents significant digits in base-2 with
 about 15 digits of precision and with a minimum value of $ \pm5\times
 10^{-324} $ and a maximum value of $ \pm1.7976931348623157\times 10^{+308}
 $
@@ -220,6 +234,9 @@ be a MathJSON number that looks like this:
 of variables. `ce.assign()` changes the value associated with one or more
 variables in the current scope.
 
+`ce.assign()` accepts booleans, numbers, bigints, boxed expressions, or
+functions. Use `undefined` to clear a value.
+
 ```live
 const expr = ce.parse("3x^2+4x+2");
 
@@ -243,10 +260,10 @@ for (let x = 0; x < 1; x += 0.01) {
 **To reset a variable to be unbound to a value** use `ce.assign()`
 
 ```live
-ce.assign("x", null);
+ce.assign("x", undefined);
 
 console.log(ce.parse("3x^2+4x+2").N());
-// ➔ "3x^2+4x+c"
+// ➔ "3x^2+4x+2"
 ```
 
 **To change the value of a variable** set its `value` property:
@@ -261,6 +278,7 @@ ce.symbol("x").value = undefined;
 ## Compiling
 
 If performance is important, the expression can be compiled to a JavaScript
+function.
 
 **To get a compiled version of an expression** use the `expr.compile()` method:
 

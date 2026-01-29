@@ -25,7 +25,7 @@ repetitive calculations. They also ensure that expressions are valid and in a
 standard format.
 
 Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
-as **VSCode Studio**, to provide hints in the editor regarding the
+as **Visual Studio Code (VS Code)**, to provide hints in the editor regarding the
 methods and properties available for a given expression.
 
 Boxed Expressions can be created from a LaTeX string or from a raw MathJSON
@@ -320,8 +320,9 @@ or a string use the following boolean expressions:
 
 ## Accessing the Value of an Expression
 
-**To access the value of an expression as a MathJSON expression** use
-`expr.json`.
+**To access the expression as a MathJSON expression** use
+`expr.json`. To access the evaluated value as MathJSON, evaluate first:
+`expr.evaluate().json`.
 
 **To access the value of an expression as a JavaScript primitive** use
 `expr.valueOf()`. The result is a JavaScript primitive, such as a number, string or

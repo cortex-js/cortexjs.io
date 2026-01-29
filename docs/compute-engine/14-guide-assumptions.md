@@ -140,7 +140,7 @@ ce.verify(ce.parse("x > 0"));
 ```
 
 
-The method `ce.verify()` return `true` if the assumption is true, `false` if it is
+The method `ce.verify()` returns `true` if the assumption is true, `false` if it is
 not, and `undefined` if it cannot be determined.
 
 While `ce.verify()` is appropriate to get boolean answers, more complex queries can
@@ -164,7 +164,6 @@ ce.ask(["Greater", "x", "_val"]);
 <ReadMore path="/compute-engine/guides/patterns-and-rules/" > 
 Read more about **Patterns and Rules**<Icon name="chevron-right-bold" />
 </ReadMore>
-
 
 
 

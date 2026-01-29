@@ -87,7 +87,7 @@ and `rhs`.
 
 - \\(1 + 1 \\) and \\( 2 \\) are not structurally equal, one is a sum of two
   integers, the other is an integer
-- \\( (x + 1)^2 \\) and \\( x^2 + 2x + 1 \\) are not structural equal, one is a
+- \\( (x + 1)^2 \\) and \\( x^2 + 2x + 1 \\) are not structurally equal, one is a
   power of a sum, the other a sum of terms.
 
 
@@ -149,7 +149,7 @@ identical in general.
 However, there are many cases where it is possible to make a comparison between
 two expressions to check if they represent the same mathematical object.
 
-The `lhs.isEqual(rhs)` function return true if `lhs` and `rhs` represent the
+The `lhs.isEqual(rhs)` function returns true if `lhs` and `rhs` represent the
 same mathematical object. 
 
 If `lhs` and `rhs` are numeric expressions, they are evaluated before being 

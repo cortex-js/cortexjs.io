@@ -63,7 +63,7 @@ The expression \\(x^2 + 2x + 1\\) is represented in MathJSON as:
 The Compute Engine can:
 - <a href="/compute-engine/guides/latex-syntax/">**parse** and **serialize**</a> expressions from and to LaTeX.
 - <a href="/compute-engine/guides/simplify/">**simplify**</a> symbolic expressions
-- evaluate expression <a href="/compute-engine/guides/evaluate/">**symbolically**</a>
+- evaluate expressions <a href="/compute-engine/guides/evaluate/">**symbolically**</a>
   or <a href="/compute-engine/guides/numeric-evaluation/">**numerically**</a>
 - solve equations, calculate derivatives and integrals, and perform other
   <a href="/compute-engine/reference/calculus/">**calculus**</a> operations

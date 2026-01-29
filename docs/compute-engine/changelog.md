@@ -14,6 +14,67 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Bug Fixes
 
+- **Sign Simplification**: Fixed `Sign(x).simplify()` returning `1` instead of
+  `-1` when `x` is negative. The simplification rule incorrectly returned
+  `ce.One` for both positive and negative cases.
+
+- **Abs Derivative**: Fixed `d/dx |x|` returning an error when evaluated with
+  a variable that has an assigned value. The derivative formula now uses
+  `Sign(x)` instead of a complex `Which` expression that couldn't be evaluated
+  symbolically.
+
+- **LaTeX Serialization**: Fixed TypeScript error in power serialization where
+  `denom` (a `number | null`) was incorrectly passed where an `Expression` was
+  expected. Now correctly uses `operand(exp, 2)` to get the expression form.
+
+- **Step Function Derivatives**: Fixed `D(floor(x), x)`, `D(ceil(x), x)`, and
+  `D(round(x), x)` causing infinite recursion. These step functions now correctly
+  return 0 (the derivative is 0 almost everywhere). Also fixed a bug where
+  derivative formulas that evaluate to 0 weren't recognized due to a falsy check.
+
+- **Inverse Trig Integrals**: Fixed incorrect integration formulas for `arcsin`,
+  `arccos`, and `arctan`. The previous formulas were completely wrong. Correct:
+  - `∫ arcsin(x) dx = x·arcsin(x) + √(1-x²)`
+  - `∫ arccos(x) dx = x·arccos(x) - √(1-x²)`
+  - `∫ arctan(x) dx = x·arctan(x) - (1/2)·ln(1+x²)`
+
+- **Erfc Derivative**: Fixed incorrect derivative formula for `erfc(x)`. Now
+  correctly returns `-2/√π · e^(-x²)` (the negative of the `erf` derivative).
+
+- **LogGamma Derivative**: Added derivative rule for `LogGamma(x)` which returns
+  `Digamma(x)` (the digamma/psi function).
+
+- **Polynomial Degree Detection**: Fixed `polynomialDegree()` returning 0 for
+  expressions like `e^x` or `e^(-x^2)` when it should return -1 (not a polynomial).
+  When the base of a power is constant but the exponent depends on the variable,
+  this is not a polynomial. This bug caused infinite recursion in simplification
+  when simplifying expressions containing exponentials, such as the derivative
+  of `erf(x)` which is `(2/√π)·e^(-x²)`.
+
+- **([#168](https://github.com/cortex-js/compute-engine/issues/168))
+  Absolute Value**: Fixed parsing of nested absolute value expressions that
+  start with a double bar (e.g. `||3-5|-4|`), which previously produced an
+  invalid structure instead of evaluating correctly.
+
+- **([#244](https://github.com/cortex-js/compute-engine/issues/244))
+  Serialization**: Fixed LaTeX and ASCIIMath serialization ambiguity for
+  negative bases and negated powers. Powers now render `(-2)^2` (instead of
+  `-2^2`) when the base is negative, and negated powers now render as `-(2^2)`
+  rather than `-2^2`.
+
+- **([#263](https://github.com/cortex-js/compute-engine/issues/263))
+  Quantifier Scope**: Fixed quantifier scope in First-Order Logic expressions.
+  Previously, `\forall x.P(x)\rightarrow Q(x)` was parsed with the implication
+  inside the quantifier scope: `["ForAll", "x", ["To", P(x), Q(x)]]`. Now it
+  correctly follows standard FOL conventions where the quantifier binds only
+  the immediately following formula: `["To", ["ForAll", "x", P(x)], Q(x)]`.
+  This applies to all quantifiers (`ForAll`, `Exists`, `ExistsUnique`,
+  `NotForAll`, `NotExists`) and all logical connectives (`\rightarrow`, `\to`,
+  `\implies`, `\land`, `\lor`, `\iff`). Use explicit parentheses for wider
+  scope: `\forall x.(P(x)\rightarrow Q(x))`. Also fixed quantifier type
+  signatures to properly return `boolean`, enabling correct type checking
+  when quantified expressions are used as arguments to logical operators.
+
 - **([#243](https://github.com/cortex-js/compute-engine/issues/243))
   LaTeX Parsing**: Fixed logic operator precedence causing expressions like
   `x = 1 \vee x = 2` to be parsed incorrectly as `x = (1 ∨ x) = 2` instead of
@@ -54,7 +115,28 @@ import ChangeLog from '@site/src/components/ChangeLog';
   unaffected. Also added support for `\lcm` as a LaTeX command (in addition to
   the existing `\operatorname{lcm}`).
 
+- **([#223](https://github.com/cortex-js/compute-engine/issues/223))
+  Serialization**: Fixed scientific/engineering LaTeX serialization dropping
+  the leading coefficient for exact powers of ten. For example, `1000` now
+  serializes to `1\cdot10^{3}` (or `1\times10^{3}` depending on
+  `exponentProduct`) instead of `10^{3}`.
+
 - **LaTeX Parsing**: Fixed `\cosh` incorrectly mapping to `Csch` instead of `Cosh`.
+
+- **([#242](https://github.com/cortex-js/compute-engine/issues/242))
+  Solve**: Fixed `solve()` returning an empty array for equations with variables
+  in fractions. For example, `F = 3g/h` solved for `g` now correctly returns
+  `Fh/3` instead of an empty array. The solver now clears denominators before
+  applying solve rules, enabling it to handle expressions like `a + bx/c = 0`.
+  Also added support for solving equations where the variable is in the
+  denominator (e.g., `a/x = b` now returns `x = a/b`).
+
+- **([#220](https://github.com/cortex-js/compute-engine/issues/220))
+  Solve**: Fixed `solve()` returning an empty array for equations involving
+  square roots of the unknown, e.g. `2x = \sqrt{5x}`. The solver now handles
+  equations of the form `ax + b√x + c = 0` using quadratic substitution. Also
+  added support for solving logarithmic equations like `a·ln(x) + b = 0` which
+  returns `x = e^(-b/a)`.
 
 - **([#255](https://github.com/cortex-js/compute-engine/issues/255))
   LaTeX Parsing**: Fixed multi-letter subscripts like `A_{CD}` causing
@@ -66,6 +148,55 @@ import ChangeLog from '@site/src/components/ChangeLog';
   stripped from subscript expressions for cleaner output.
 
 ### Improvements
+
+- **([#263](https://github.com/cortex-js/compute-engine/issues/263))
+  First-Order Logic**: Added several improvements for working with First-Order
+  Logic expressions:
+  - **Configurable quantifier scope**: New `quantifierScope` parsing option
+    controls how quantifier scope is determined. Use `"tight"` (default) for
+    standard FOL conventions where quantifiers bind only the immediately
+    following formula, or `"loose"` for scope extending to the end of the
+    expression.
+    ```typescript
+    ce.parse('\\forall x. P(x)', { quantifierScope: 'tight' })  // default
+    ce.parse('\\forall x. P(x)', { quantifierScope: 'loose' })
+    ```
+  - **Automatic predicate inference**: Single uppercase letters followed by
+    parentheses (e.g., `P(x)`, `Q(a,b)`) are now automatically recognized as
+    predicate/function applications without requiring explicit declaration.
+    This enables natural FOL syntax like `\forall x. P(x) \rightarrow Q(x)`
+    to work out of the box.
+  - **Quantifier evaluation over finite domains**: Quantifiers (`ForAll`,
+    `Exists`, `ExistsUnique`, `NotForAll`, `NotExists`) now evaluate to boolean
+    values when the bound variable is constrained to a finite set. For example:
+    ```typescript
+    ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 0]]).evaluate()
+    // Returns True (all values in {1,2,3} are > 0)
+    ce.box(['Exists', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 2]]).evaluate()
+    // Returns True (3 > 2)
+    ce.box(['ExistsUnique', ['Element', 'x', ['Set', 1, 2, 3]], ['Equal', 'x', 2]]).evaluate()
+    // Returns True (only one element equals 2)
+    ```
+    Supports `Set`, `List`, `Range`, and integer `Interval` domains up to 1000
+    elements. Nested quantifiers are evaluated over the Cartesian product of
+    their domains.
+  - **Symbolic simplification for quantifiers**: Quantifiers now simplify
+    automatically in special cases:
+    - `∀x. True` → `True`, `∀x. False` → `False`
+    - `∃x. True` → `True`, `∃x. False` → `False`
+    - `∀x. P` → `P` (when P doesn't contain x)
+    - `∃x. P` → `P` (when P doesn't contain x)
+  - **CNF/DNF conversion**: New `ToCNF` and `ToDNF` functions convert boolean
+    expressions to Conjunctive Normal Form and Disjunctive Normal Form
+    respectively:
+    ```typescript
+    ce.box(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate()
+    // Returns (A ∨ C) ∧ (B ∨ C)
+    ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
+    // Returns (A ∧ C) ∨ (B ∧ C)
+    ```
+    Handles `And`, `Or`, `Not`, `Implies`, `Equivalent`, and `Xor` operators
+    using De Morgan's laws and distribution.
 
 - **Polynomial Simplification**: The `simplify()` function now automatically
   cancels common polynomial factors in univariate rational expressions. For
@@ -85,12 +216,25 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - Alternating linear series: `\sum_{n=0}^{b}((-1)^n * n)` simplifies to `(-1)^b * floor((b+1)/2)`
   - Arithmetic progression: `\sum_{n=0}^{b}(a + d*n)` simplifies to `(b+1)(a + db/2)`
   - Sum of binomial coefficients: `\sum_{k=0}^{n}C(n,k)` simplifies to `2^n`
+  - Alternating binomial sum: `\sum_{k=0}^{n}((-1)^k * C(n,k))` simplifies to `0`
+  - Weighted binomial sum: `\sum_{k=0}^{n}(k * C(n,k))` simplifies to `n * 2^(n-1)`
+  - Partial fractions (telescoping): `\sum_{k=1}^{n}(1/(k(k+1)))` simplifies to `n/(n+1)`
+  - Partial fractions (telescoping): `\sum_{k=2}^{n}(1/(k(k-1)))` simplifies to `(n-1)/n`
+  - Weighted squared binomial sum: `\sum_{k=0}^{n}(k^2 * C(n,k))` simplifies to `n(n+1) * 2^(n-2)`
+  - Weighted cubed binomial sum: `\sum_{k=0}^{n}(k^3 * C(n,k))` simplifies to `n²(n+3) * 2^(n-3)`
+  - Alternating weighted binomial sum: `\sum_{k=0}^{n}((-1)^k * k * C(n,k))` simplifies to `0` (n ≥ 2)
+  - Sum of binomial squares: `\sum_{k=0}^{n}(C(n,k)^2)` simplifies to `C(2n, n)`
+  - Sum of consecutive products: `\sum_{k=1}^{n}(k(k+1))` simplifies to `n(n+1)(n+2)/3`
+  - Arithmetic progression (general bounds): `\sum_{n=m}^{b}(a + d*n)` simplifies to `(b-m+1)(a + d(m+b)/2)`
   - Product of constant: `\prod_{n=1}^{b}(x)` simplifies to `x^b`
   - Factorial: `\prod_{n=1}^{b}(n)` simplifies to `b!`
+  - Shifted factorial: `\prod_{n=1}^{b}(n+c)` simplifies to `(b+c)!/c!`
   - Odd double factorial: `\prod_{n=1}^{b}(2n-1)` simplifies to `(2b-1)!!`
   - Even double factorial: `\prod_{n=1}^{b}(2n)` simplifies to `2^b * b!`
   - Rising factorial (Pochhammer): `\prod_{k=0}^{n-1}(x+k)` simplifies to `(x)_n`
   - Falling factorial: `\prod_{k=0}^{n-1}(x-k)` simplifies to `x!/(x-n)!`
+  - Telescoping product: `\prod_{k=1}^{n}((k+1)/k)` simplifies to `n+1`
+  - Wallis-like product: `\prod_{k=2}^{n}(1 - 1/k^2)` simplifies to `(n+1)/(2n)`
   - Factor out constants: `\sum_{n=1}^{b}(c \cdot f(n))` simplifies to
     `c \cdot \sum_{n=1}^{b}(f(n))`, and similarly for products where the
     constant is raised to the power of the iteration count

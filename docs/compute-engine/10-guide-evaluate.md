@@ -100,8 +100,7 @@ try {
 }
 ```
 
-```text
-
+```live
 :::html
 <div class="stack">
   <div class="row">

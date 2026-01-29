@@ -5,7 +5,7 @@ slug: /compute-engine/guides/logic/
 
 This guide covers working with logical expressions and First-Order Logic (FOL)
 in the Compute Engine. You'll learn how to parse, manipulate, evaluate, and
-transform boolean and quantified expressions.
+transform Boolean and quantified expressions.
 
 ## Boolean Expressions
 
@@ -52,7 +52,7 @@ allowing you to make statements about objects in a domain.
 
 ### Predicates
 
-In FOL, predicates are functions that return boolean values. They are typically
+In FOL, predicates are functions that return Boolean values. They are typically
 written as uppercase letters followed by arguments:
 
 ```js example
@@ -86,6 +86,8 @@ ce.parse('\\exists! x, P(x)');
 // → ["ExistsUnique", "x", ["P", "x"]]
 ```
 
+Negated quantifiers are also supported: `NotForAll` and `NotExists`.
+
 Quantifiers can also specify a domain using set membership:
 
 ```js example
@@ -99,15 +101,15 @@ By default, quantifiers use **tight binding** following standard FOL conventions
 The scope extends only to the immediately following formula:
 
 ```js example
-ce.parse('\\forall x. P(x) \\rightarrow Q(x)');
+ce.parse('\\forall x. P(x) \\implies Q(x)');
 // Parses as: (∀x. P(x)) → Q(x)
-// → ["To", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+// → ["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
 ```
 
 Use parentheses to extend the quantifier's scope:
 
 ```js example
-ce.parse('\\forall x. (P(x) \\rightarrow Q(x))');
+ce.parse('\\forall x. (P(x) \\implies Q(x))');
 // Parses as: ∀x. (P(x) → Q(x))
 // → ["ForAll", "x", ["Delimiter", ["Implies", ["P", "x"], ["Q", "x"]]]]
 ```
@@ -116,13 +118,13 @@ You can change this behavior with the `quantifierScope` option:
 
 ```js example
 // Loose binding - scope extends to end of expression
-ce.parse('\\forall x. P(x) \\rightarrow Q(x)', { quantifierScope: 'loose' });
-// → ["ForAll", "x", ["To", ["P", "x"], ["Q", "x"]]]
+ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'loose' });
+// → ["ForAll", "x", ["Implies", ["P", "x"], ["Q", "x"]]]
 ```
 
 ## Evaluating Quantifiers
 
-Quantifiers can be evaluated to boolean values when the bound variable is
+Quantifiers can be evaluated to Boolean values when the bound variable is
 constrained to a finite domain.
 
 ### Finite Domain Evaluation
@@ -213,7 +215,7 @@ ce.box(['ForAll', 'x', ['Greater', 'y', 0]]).evaluate();
 
 ## Normal Forms
 
-The Compute Engine can convert boolean expressions to standard normal forms,
+The Compute Engine can convert Boolean expressions to standard normal forms,
 useful for automated reasoning and satisfiability checking.
 
 ### Conjunctive Normal Form (CNF)

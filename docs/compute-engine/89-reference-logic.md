@@ -12,11 +12,11 @@ date: Last Modified
 | Symbol | LaTeX |  Notation |
 | :--- | :--- | :--- |
 | `True` | `\top` | $$ \top $$ |
-|  ’’ | `\mathsf{T}` | $$ \mathsf{T}$$| 
-|  '' | `\operatorname{True}` | $$ \operatorname{True}$$| 
-| `False` | `\bot` | $$ \bot $$ | 
-| ’’ | `\mathsf{F}` |  $$ \mathsf{F}$$ | 
-|  ’’ | `\operatorname{False}` | $$ \operatorname{False}$$| 
+| `True` | `\mathsf{T}` | $$ \mathsf{T}$$ |
+| `True` | `\operatorname{True}` | $$ \operatorname{True}$$ |
+| `False` | `\bot` | $$ \bot $$ |
+| `False` | `\mathsf{F}` |  $$ \mathsf{F}$$ |
+| `False` | `\operatorname{False}` | $$ \operatorname{False}$$ |
 
 </div>
 
@@ -25,24 +25,24 @@ date: Last Modified
 
 <div className="symbols-table first-column-header" style={{"--first-col-width":"12ch"}}>
 
-| Symbol |  LaTeX | Notation| |
+| Symbol |  LaTeX | Notation | Description |
 | :--- | :--- | :--- |:---  |
-| `And` | `p \land q` | $$ p \land q$$ | Conjunction | 
-| ’’ | `p \operatorname{and} q` | $$ p \operatorname{and} q$$ |  | 
-| `Or` | `p \lor q` | $$ p \lor q$$ | Disjunction | 
-| ’’ | `p \operatorname{or} q` | $$ p \operatorname{or} q$$ |  | 
-| `Xor` | `p \veebar q` | $$ p \veebar q$$ | Exclusive Or | 
-| `Nand` | `p \barwedge q` | $$ p \barwedge q$$ | Not And | 
-| `Nor` | `p \char"22BD q` | $$ p \char"22BD q$$ | Not Or | 
-| `Not` | `\lnot p` |  $$ \lnot p$$ | Negation | 
-| ’’ | `\operatorname{not} p` | $$ \operatorname{not} p$$ |  | 
-| `Equivalent` | `p \iff q` | $$ p \iff q$$ || 
-| ’’ | `p \Leftrightarrow q` | $$ p \Leftrightarrow q$$ || 
-| `Implies` | `p \implies q` | $$p \implies q $$ | | 
-| ’’ | `p \Rightarrow q` | $$p \Rightarrow q $$ | | 
-| `Proves` | `p \vdash q` | $$p \vdash q $$ | | 
-| `Entails` | `p \vDash q` | $$p \vDash q $$ | | 
-| `Satisfies` | `p \models q` | $$p \models q $$ | | 
+| `And` | `p \land q` | $$ p \land q$$ | Conjunction |
+| `And` | `p \operatorname{and} q` | $$ p \operatorname{and} q$$ | |
+| `Or` | `p \lor q` | $$ p \lor q$$ | Disjunction |
+| `Or` | `p \operatorname{or} q` | $$ p \operatorname{or} q$$ | |
+| `Xor` | `p \veebar q` | $$ p \veebar q$$ | Exclusive OR |
+| `Nand` | `p \barwedge q` | $$ p \barwedge q$$ | NAND (Not AND) |
+| `Nor` | `p \char"22BD q` | $$ p \char"22BD q$$ | NOR (Not OR) |
+| `Not` | `\lnot p` |  $$ \lnot p$$ | Negation |
+| `Not` | `\operatorname{not} p` | $$ \operatorname{not} p$$ | |
+| `Equivalent` | `p \iff q` | $$ p \iff q$$ | Equivalence |
+| `Equivalent` | `p \Leftrightarrow q` | $$ p \Leftrightarrow q$$ | |
+| `Implies` | `p \implies q` | $$ p \implies q $$ | Implication |
+| `Implies` | `p \Rightarrow q` | $$ p \Rightarrow q $$ | |
+| `Proves` | `p \vdash q` | $$ p \vdash q $$ | Provability |
+| `Entails` | `p \vDash q` | $$ p \vDash q $$ | Entailment |
+| `Satisfies` | `p \models q` | $$ p \models q $$ | Satisfaction |
 
 </div>
 
@@ -55,12 +55,13 @@ date: Last Modified
 
 The `ForAll` function represents the **universal quantifier**.
 
-The condition is the variable or variables that are being quantified over or
-the set of elements that the variable can take.
+The condition is the variable (or variables) being quantified over, or the set
+of elements that the variable can take.
 
 The predicate is the statement that is being quantified.
 
-The condition and the predicate are separated by a comma, a colon, or a vertical bar. The predicate can also be enclosed in parentheses after the condition.
+The condition and the predicate are separated by a comma, a colon, or a vertical
+bar. The predicate can also be enclosed in parentheses after the condition.
 
 <Latex value="\forall x, x + 1 > x"/>
 
@@ -88,9 +89,11 @@ The condition and the predicate are separated by a comma, a colon, or a vertical
 
 The `Exists` function represents the **existential quantifier**.
 
-The condition is the variable or variables that are being quantified over, and the predicate is the statement that is being quantified.
+The condition is the variable (or variables) being quantified over, and the
+predicate is the statement that is being quantified.
 
-The condition and the predicate are separated by a comma, a colon, or a vertical bar. The predicate can also be enclosed in parentheses after the condition.
+The condition and the predicate are separated by a comma, a colon, or a vertical
+bar. The predicate can also be enclosed in parentheses after the condition.
 
 <Latex value="\exists x, x^2 = 1"/>
 
@@ -105,6 +108,11 @@ The condition and the predicate are separated by a comma, a colon, or a vertical
 
 ["Exists", ["Element", "x", "RealNumbers"], ["Equal", ["Square", "x"], 1]]
 ```
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="ExistsUnique">
 
 <Signature name="ExistsUnique">_condition_, _predicate_</Signature>
 
@@ -147,17 +155,17 @@ By default, quantifiers use **tight binding**, following standard FOL convention
 The quantifier scope extends only to the immediately following well-formed formula,
 stopping at logical connectives.
 
-<Latex value="\forall x. P(x) \rightarrow Q(x)"/>
+<Latex value="\forall x. P(x) \implies Q(x)"/>
 
-This parses as `(∀x. P(x)) → Q(x)`, not `∀x. (P(x) → Q(x))`.
+This parses as `(∀x. P(x)) ⇒ Q(x)`, not `∀x. (P(x) ⇒ Q(x))`.
 
 ```json example
-["To", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
 ```
 
 To include the connective in the quantifier's scope, use explicit parentheses:
 
-<Latex value="\forall x. (P(x) \rightarrow Q(x))"/>
+<Latex value="\forall x. (P(x) \implies Q(x))"/>
 
 ```json example
 ["ForAll", "x", ["Delimiter", ["Implies", ["P", "x"], ["Q", "x"]]]]
@@ -170,12 +178,12 @@ option:
 
 ```javascript
 // Tight binding (default) - quantifier binds only the next formula
-ce.parse('\\forall x. P(x) \\rightarrow Q(x)', { quantifierScope: 'tight' })
-// → ["To", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'tight' })
+// → ["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
 
 // Loose binding - quantifier scope extends to end of expression
-ce.parse('\\forall x. P(x) \\rightarrow Q(x)', { quantifierScope: 'loose' })
-// → ["ForAll", "x", ["To", ["P", "x"], ["Q", "x"]]]
+ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'loose' })
+// → ["ForAll", "x", ["Implies", ["P", "x"], ["Q", "x"]]]
 ```
 
 ### Negated Quantifiers
@@ -193,7 +201,7 @@ The negated quantifiers `NotForAll` and `NotExists` are also supported:
 
 ### Quantifier Evaluation
 
-Quantifiers can be evaluated to boolean values when the bound variable is
+Quantifiers can be evaluated to Boolean values when the bound variable is
 constrained to a finite domain using an `Element` condition.
 
 **Supported domains:**

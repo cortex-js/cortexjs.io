@@ -103,10 +103,10 @@ const expr = ce.parse("\\frac{3}{5}");
 console.log(expr.toMathJson());
 // ➔ ["Rational", 3, 5]
 
-console.log(expr.expr.toMathJson({ exclude: ["Rational"] }));
+console.log(expr.toMathJson({ exclude: ["Rational"] }));
 // ➔ ["Divide", 3, 5]
 // We have excluded `["Rational"]` expressions, so it 
-// is interepreted as a division instead.
+// is interpreted as a division instead.
 ```
 
 
@@ -277,7 +277,7 @@ ce.parse(latex,
 You can also define your own transformations to apply to an expression to
 obtain a custom canonical form.
 
-For example, let's say you want to the structural form of two expressions
+For example, let's say you want to compare the structural form of two expressions
 but ignoring any extra parentheses. You could define a transformation like this:
 
 ```js

@@ -50,7 +50,8 @@ document:
 ```js
 const ce = new ComputeEngine();
 MathfieldElement.computeEngine = ce;
-console.log(mfe.expression.json);
+const mf = document.querySelector("math-field");
+console.log(mf.expression.json);
 ```
 
 <hr/>
@@ -63,7 +64,7 @@ console.log(ce.parse("5x + 1").json);
 // ➔  ["Add", ["Multiply", 5, "x"], 1]
 ```
 
-By default, `ce.parse()` return a
+By default, `ce.parse()` returns a
 [canonical expression](/compute-engine/guides/canonical-form/). To get a
 non-canonical expression instead, use the `{canonical: false}` option: The
 non-canonical form is closer to the literal LaTeX input.
@@ -206,9 +207,9 @@ sections below.
 | `fractionalDigits` | The number of decimal places to use when formatting numbers. Use `"max"` to include all available digits and `"auto"` to use the same precision as for evaluation. Default is `"auto"`. |
 | `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, `"engineering"`, or `"adaptiveScientific"`. The `"adaptiveScientific"` mode uses scientific notation but avoids exponents within the range specified by `avoidExponentsInRange`. Default is `"auto"`. |
 | `avoidExponentsInRange` | A tuple of two values representing a range of exponents. If the exponent for the number is within this range, a decimal notation is used. Otherwise, the number is displayed with an exponent. Default is `[-6, 20]`. |
-| `digitGroupSeparator` | The LaTeX string used to separate group of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provided, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
-| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tuple is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`.|
-  | `exponentProduct` | A LaTeX string inserted before an exponent, if necessary. Default is `"\cdot"`. |
+| `digitGroupSeparator` | The LaTeX string used to separate groups of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provided, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
+| `digitGroupSize` | The number of digits in a group. If set to `"lakh"` the digits are in groups of 2, except for the last group which has 3 digits. If a tuple is provided, the first element is used for the whole part and the second element for the fractional part. Default is `3`. |
+| `exponentProduct` | A LaTeX string inserted before an exponent, if necessary. Default is `"\cdot"`. |
 | `beginExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"10^{"`. |
 | `endExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"}"`. |
 | `truncationMarker` | A LaTeX string used to indicate that a number has more precision than what is displayed. Default is `"\ldots"`. |
