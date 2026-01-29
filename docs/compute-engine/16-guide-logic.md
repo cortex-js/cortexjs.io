@@ -32,6 +32,32 @@ ce.parse('p \\implies q');        // → ["Implies", "p", "q"]
 ce.parse('p \\iff q');            // → ["Equivalent", "p", "q"]
 ```
 
+### Additional Operators
+
+The Compute Engine also supports exclusive OR, NAND, and NOR:
+
+```js example
+// Exclusive OR (XOR)
+ce.parse('p \\veebar q');         // → ["Xor", "p", "q"]
+
+// NAND (Not AND)
+ce.parse('p \\barwedge q');       // → ["Nand", "p", "q"]
+```
+
+These operators support any number of arguments:
+
+```js example
+// N-ary XOR: true when an odd number of arguments are true
+ce.box(['Xor', 'True', 'True', 'True']).evaluate();   // → True (3 is odd)
+ce.box(['Xor', 'True', 'True', 'False']).evaluate();  // → False (2 is even)
+
+// N-ary NAND: NOT(AND(a, b, c, ...))
+ce.box(['Nand', 'True', 'True', 'False']).evaluate(); // → True
+
+// N-ary NOR: NOT(OR(a, b, c, ...))
+ce.box(['Nor', 'False', 'False', 'False']).evaluate(); // → True
+```
+
 ### Evaluating Boolean Expressions
 
 Boolean expressions with concrete `True`/`False` values evaluate to their
@@ -43,6 +69,9 @@ ce.box(['Or', 'True', 'False']).evaluate();      // → True
 ce.box(['Not', 'False']).evaluate();             // → True
 ce.box(['Implies', 'True', 'False']).evaluate(); // → False
 ce.box(['Implies', 'False', 'True']).evaluate(); // → True
+ce.box(['Xor', 'True', 'False']).evaluate();     // → True
+ce.box(['Nand', 'True', 'True']).evaluate();     // → False
+ce.box(['Nor', 'False', 'False']).evaluate();    // → True
 ```
 
 ## First-Order Logic
@@ -53,10 +82,23 @@ allowing you to make statements about objects in a domain.
 ### Predicates
 
 In FOL, predicates are functions that return Boolean values. They are typically
-written as uppercase letters followed by arguments:
+written as uppercase letters followed by arguments.
+
+**Inside quantifier scopes**, predicates are wrapped in a `Predicate` expression
+to distinguish them from regular function applications:
 
 ```js example
-// Single uppercase letters are automatically recognized as predicates
+ce.parse('\\forall x, P(x)');
+// → ["ForAll", "x", ["Predicate", "P", "x"]]
+
+ce.parse('\\exists x, Q(x, y)');
+// → ["Exists", "x", ["Predicate", "Q", "x", "y"]]
+```
+
+**Outside quantifier scopes**, single uppercase letters followed by parentheses
+are parsed as regular function applications to maintain backward compatibility:
+
+```js example
 ce.parse('P(x)');           // → ["P", "x"]
 ce.parse('Q(a, b)');        // → ["Q", "a", "b"]
 ```
@@ -68,6 +110,14 @@ ce.declare('Loves', { signature: '(value, value) -> boolean' });
 ce.parse('Loves(x, y)');    // → ["Loves", "x", "y"]
 ```
 
+**Note about `D(f, x)` and `N(x)`:** These notations in LaTeX are **not**
+interpreted as their library function equivalents:
+- `D(f, x)` parses as `["Predicate", "D", "f", "x"]` (not the derivative)
+- `N(x)` parses as `["Predicate", "N", "x"]` (not numeric evaluation)
+
+Use Leibniz notation (`\frac{d}{dx}f`) for derivatives, or construct directly in
+MathJSON. For numeric evaluation, use the `.N()` method on expressions.
+
 ### Quantifiers
 
 The Compute Engine supports universal and existential quantifiers:
@@ -75,15 +125,15 @@ The Compute Engine supports universal and existential quantifiers:
 ```js example
 // Universal quantifier: "for all x"
 ce.parse('\\forall x, P(x)');
-// → ["ForAll", "x", ["P", "x"]]
+// → ["ForAll", "x", ["Predicate", "P", "x"]]
 
 // Existential quantifier: "there exists x"
 ce.parse('\\exists x, P(x)');
-// → ["Exists", "x", ["P", "x"]]
+// → ["Exists", "x", ["Predicate", "P", "x"]]
 
 // Unique existential: "there exists exactly one x"
 ce.parse('\\exists! x, P(x)');
-// → ["ExistsUnique", "x", ["P", "x"]]
+// → ["ExistsUnique", "x", ["Predicate", "P", "x"]]
 ```
 
 Negated quantifiers are also supported: `NotForAll` and `NotExists`.
@@ -103,15 +153,18 @@ The scope extends only to the immediately following formula:
 ```js example
 ce.parse('\\forall x. P(x) \\implies Q(x)');
 // Parses as: (∀x. P(x)) → Q(x)
-// → ["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+// → ["Implies", ["ForAll", "x", ["Predicate", "P", "x"]], ["Q", "x"]]
 ```
+
+Note that `P(x)` inside the quantifier becomes `["Predicate", "P", "x"]`, while
+`Q(x)` outside the quantifier scope becomes `["Q", "x"]`.
 
 Use parentheses to extend the quantifier's scope:
 
 ```js example
 ce.parse('\\forall x. (P(x) \\implies Q(x))');
 // Parses as: ∀x. (P(x) → Q(x))
-// → ["ForAll", "x", ["Delimiter", ["Implies", ["P", "x"], ["Q", "x"]]]]
+// → ["ForAll", "x", ["Delimiter", ["Implies", ["Predicate", "P", "x"], ["Predicate", "Q", "x"]]]]
 ```
 
 You can change this behavior with the `quantifierScope` option:
@@ -119,7 +172,7 @@ You can change this behavior with the `quantifierScope` option:
 ```js example
 // Loose binding - scope extends to end of expression
 ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'loose' });
-// → ["ForAll", "x", ["Implies", ["P", "x"], ["Q", "x"]]]
+// → ["ForAll", "x", ["Implies", ["Predicate", "P", "x"], ["Predicate", "Q", "x"]]]
 ```
 
 ## Evaluating Quantifiers
@@ -326,6 +379,86 @@ ce.box(['Exists', ['Element', 'person', people],
 // → True (Bob is 30)
 ```
 
+## Satisfiability and Tautology Checking
+
+The Compute Engine can check whether Boolean formulas are satisfiable (can be
+made true) or are tautologies (always true).
+
+### Satisfiability
+
+Use `IsSatisfiable` to check if there exists an assignment of truth values that
+makes the expression true:
+
+```js example
+// A contradiction is not satisfiable
+ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate();
+// → False
+
+// Most formulas are satisfiable
+ce.box(['IsSatisfiable', ['And', 'A', 'B']]).evaluate();
+// → True (set A=True, B=True)
+
+// A tautology is satisfiable
+ce.box(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate();
+// → True
+```
+
+### Tautology Checking
+
+Use `IsTautology` to check if an expression is true for all possible assignments:
+
+```js example
+// Law of excluded middle
+ce.box(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate();
+// → True
+
+// Double negation
+ce.box(['IsTautology', ['Equivalent', ['Not', ['Not', 'A']], 'A']]).evaluate();
+// → True
+
+// De Morgan's law
+ce.box(['IsTautology', ['Equivalent',
+  ['Not', ['And', 'A', 'B']],
+  ['Or', ['Not', 'A'], ['Not', 'B']]
+]]).evaluate();
+// → True
+
+// Modus Ponens
+ce.box(['IsTautology', ['Implies',
+  ['And', ['Implies', 'A', 'B'], 'A'],
+  'B'
+]]).evaluate();
+// → True
+
+// A simple conjunction is not a tautology
+ce.box(['IsTautology', ['And', 'A', 'B']]).evaluate();
+// → False
+```
+
+## Truth Table Generation
+
+Use `TruthTable` to generate a complete truth table for any Boolean expression:
+
+```js example
+// Truth table for AND
+ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate();
+// → [["A", "B", "Result"],
+//    ["False", "False", "False"],
+//    ["False", "True", "False"],
+//    ["True", "False", "False"],
+//    ["True", "True", "True"]]
+
+// Truth table for implication
+ce.box(['TruthTable', ['Implies', 'P', 'Q']]).evaluate();
+// → [["P", "Q", "Result"],
+//    ["False", "False", "True"],
+//    ["False", "True", "True"],
+//    ["True", "False", "False"],
+//    ["True", "True", "True"]]
+```
+
+Truth tables are limited to 10 variables (1024 rows) to prevent excessive output.
+
 ## Performance Considerations
 
 - **Domain size**: Evaluation iterates through all domain elements. Keep domains
@@ -334,6 +467,8 @@ ce.box(['Exists', ['Element', 'person', people],
   checks k^n combinations. Use sparingly.
 - **Short-circuit evaluation**: `ForAll` stops at the first `False`, `Exists`
   stops at the first `True`.
+- **Satisfiability/Tautology**: These check all 2^n truth assignments for n
+  variables. Limited to 20 variables.
 
 ## See Also
 

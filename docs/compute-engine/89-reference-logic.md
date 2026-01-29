@@ -31,9 +31,9 @@ date: Last Modified
 | `And` | `p \operatorname{and} q` | $$ p \operatorname{and} q$$ | |
 | `Or` | `p \lor q` | $$ p \lor q$$ | Disjunction |
 | `Or` | `p \operatorname{or} q` | $$ p \operatorname{or} q$$ | |
-| `Xor` | `p \veebar q` | $$ p \veebar q$$ | Exclusive OR |
-| `Nand` | `p \barwedge q` | $$ p \barwedge q$$ | NAND (Not AND) |
-| `Nor` | `p \char"22BD q` | $$ p \char"22BD q$$ | NOR (Not OR) |
+| `Xor` | `p \veebar q` | $$ p \veebar q$$ | Exclusive OR (n-ary: true when odd count) |
+| `Nand` | `p \barwedge q` | $$ p \barwedge q$$ | NAND (n-ary: NOT of AND) |
+| `Nor` | `p \char"22BD q` | $$ p \char"22BD q$$ | NOR (n-ary: NOT of OR) |
 | `Not` | `\lnot p` |  $$ \lnot p$$ | Negation |
 | `Not` | `\operatorname{not} p` | $$ \operatorname{not} p$$ | |
 | `Equivalent` | `p \iff q` | $$ p \iff q$$ | Equivalence |
@@ -133,8 +133,20 @@ to be aware of:
 In FOL, predicates are typically represented as uppercase letters followed by
 arguments in parentheses, such as `P(x)` or `Q(a, b)`.
 
-Single uppercase letters followed by parentheses are **automatically recognized**
-as function/predicate applications:
+**Inside quantifier scopes** (ForAll, Exists, etc.), single uppercase letters
+followed by parentheses are parsed as `Predicate` expressions to distinguish
+them from regular function applications:
+
+```javascript
+ce.parse('\\forall x, P(x)')
+// → ["ForAll", "x", ["Predicate", "P", "x"]]
+
+ce.parse('\\exists x, Q(x, y)')
+// → ["Exists", "x", ["Predicate", "Q", "x", "y"]]
+```
+
+**Outside quantifier scopes**, they parse as regular function applications to
+maintain backward compatibility with function definitions:
 
 ```javascript
 ce.parse('P(x)')           // → ["P", "x"]
@@ -149,6 +161,42 @@ ce.declare('Loves', { signature: '(value, value) -> boolean' });
 ce.parse('Loves(x, y)')    // → ["Loves", "x", "y"]
 ```
 
+<FunctionDefinition name="Predicate">
+
+<Signature name="Predicate">_name_, _args..._</Signature>
+
+The `Predicate` function explicitly represents a predicate application in
+First-Order Logic. It distinguishes predicate applications from regular
+function calls.
+
+Predicates return Boolean values and are used within logical formulas,
+particularly with quantifiers.
+
+```json example
+["Predicate", "P", "x"]
+
+["Predicate", "Q", "a", "b"]
+```
+
+When serialized to LaTeX, predicates render as standard function notation:
+
+```javascript
+ce.box(['Predicate', 'P', 'x']).latex   // → "P(x)"
+```
+
+**Note:** The notations `D(f, x)` and `N(x)` in LaTeX are **not** interpreted as
+their library function equivalents (derivative and numeric evaluation). Since
+these are not standard mathematical notations, they parse as predicate
+applications:
+- `D(f, x)` → `["Predicate", "D", "f", "x"]`
+- `N(x)` → `["Predicate", "N", "x"]`
+
+For derivatives, use Leibniz notation (`\frac{d}{dx}f`) or construct directly in
+MathJSON: `["D", expr, "x"]`. For numeric evaluation, use the `.N()` method or
+construct directly: `["N", expr]`.
+
+</FunctionDefinition>
+
 ### Quantifier Scope
 
 By default, quantifiers use **tight binding**, following standard FOL conventions.
@@ -160,15 +208,18 @@ stopping at logical connectives.
 This parses as `(∀x. P(x)) ⇒ Q(x)`, not `∀x. (P(x) ⇒ Q(x))`.
 
 ```json example
-["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+["Implies", ["ForAll", "x", ["Predicate", "P", "x"]], ["Q", "x"]]
 ```
+
+Note that `P(x)` inside the quantifier becomes `["Predicate", "P", "x"]`, while
+`Q(x)` outside the quantifier becomes `["Q", "x"]` (a regular function application).
 
 To include the connective in the quantifier's scope, use explicit parentheses:
 
 <Latex value="\forall x. (P(x) \implies Q(x))"/>
 
 ```json example
-["ForAll", "x", ["Delimiter", ["Implies", ["P", "x"], ["Q", "x"]]]]
+["ForAll", "x", ["Delimiter", ["Implies", ["Predicate", "P", "x"], ["Predicate", "Q", "x"]]]]
 ```
 
 ### Quantifier Scope Option
@@ -179,11 +230,11 @@ option:
 ```javascript
 // Tight binding (default) - quantifier binds only the next formula
 ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'tight' })
-// → ["Implies", ["ForAll", "x", ["P", "x"]], ["Q", "x"]]
+// → ["Implies", ["ForAll", "x", ["Predicate", "P", "x"]], ["Q", "x"]]
 
 // Loose binding - quantifier scope extends to end of expression
 ce.parse('\\forall x. P(x) \\implies Q(x)', { quantifierScope: 'loose' })
-// → ["ForAll", "x", ["Implies", ["P", "x"], ["Q", "x"]]]
+// → ["ForAll", "x", ["Implies", ["Predicate", "P", "x"], ["Predicate", "Q", "x"]]]
 ```
 
 ### Negated Quantifiers
@@ -307,5 +358,101 @@ ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
 ce.box(['ToDNF', ['Not', ['Or', 'A', 'B']]]).evaluate()
 // → ¬A ∧ ¬B  (De Morgan's law)
 ```
+
+</FunctionDefinition>
+
+
+## Satisfiability and Tautology
+
+<FunctionDefinition name="IsSatisfiable">
+
+<Signature name="IsSatisfiable">_expression_</Signature>
+
+Checks if a Boolean expression is **satisfiable** — that is, whether there exists
+an assignment of truth values to variables that makes the expression true.
+
+Returns `True` if the expression is satisfiable, `False` otherwise.
+
+```javascript
+// A contradiction is not satisfiable
+ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate()
+// → False
+
+// Most formulas are satisfiable
+ce.box(['IsSatisfiable', ['Or', 'A', 'B']]).evaluate()
+// → True
+
+// A tautology is also satisfiable
+ce.box(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate()
+// → True
+```
+
+Limited to expressions with at most 20 variables (2^20 = 1,048,576 combinations).
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="IsTautology">
+
+<Signature name="IsTautology">_expression_</Signature>
+
+Checks if a Boolean expression is a **tautology** — that is, whether it is true
+for all possible assignments of truth values to variables.
+
+Returns `True` if the expression is a tautology, `False` otherwise.
+
+```javascript
+// Law of excluded middle
+ce.box(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate()
+// → True
+
+// Double negation elimination
+ce.box(['IsTautology', ['Equivalent', ['Not', ['Not', 'A']], 'A']]).evaluate()
+// → True
+
+// De Morgan's law
+ce.box(['IsTautology', ['Equivalent',
+  ['Not', ['And', 'A', 'B']],
+  ['Or', ['Not', 'A'], ['Not', 'B']]
+]]).evaluate()
+// → True
+
+// A simple variable is not a tautology
+ce.box(['IsTautology', 'A']).evaluate()
+// → False
+```
+
+Limited to expressions with at most 20 variables.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="TruthTable">
+
+<Signature name="TruthTable">_expression_</Signature>
+
+Generates a complete **truth table** for a Boolean expression.
+
+Returns a `List` of `List`s, where the first row contains the variable names
+followed by "Result", and subsequent rows contain the truth values for each
+combination of inputs.
+
+```javascript
+ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate()
+// → [["A", "B", "Result"],
+//    ["False", "False", "False"],
+//    ["False", "True", "False"],
+//    ["True", "False", "False"],
+//    ["True", "True", "True"]]
+
+ce.box(['TruthTable', ['Xor', 'P', 'Q']]).evaluate()
+// → [["P", "Q", "Result"],
+//    ["False", "False", "False"],
+//    ["False", "True", "True"],
+//    ["True", "False", "True"],
+//    ["True", "True", "False"]]
+```
+
+Limited to expressions with at most 10 variables (1024 rows).
 
 </FunctionDefinition>

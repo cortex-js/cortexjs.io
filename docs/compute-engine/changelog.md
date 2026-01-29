@@ -10,9 +10,26 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.32.0 _2026-01-28_
 
 ### Bug Fixes
+
+- **([#256](https://github.com/cortex-js/compute-engine/issues/256))
+  Subscript Symbol Parsing**: Fixed parsing of single-letter symbols with
+  subscripts. Previously, `i_A` was incorrectly parsed as
+  `["Subscript", ["Complex", 0, 1], "A"]` because `i` was recognized as the
+  imaginary unit before the subscript was processed. Now `i_A` correctly parses
+  as the symbol `i_A`. This applies to all single-letter symbols including
+  constants like `e` and `i`. Complex subscripts containing operators (`n+1`),
+  commas (`n,m`), or parentheses (`(n+1)`) still produce `Subscript` expressions.
+
+- **([#230](https://github.com/cortex-js/compute-engine/issues/230))
+  Root Derivatives**: Fixed the `D` operator not differentiating expressions
+  containing the `Root` operator (n-th roots). Previously, `D(Root(x, 3), x)`
+  (derivative of ∛x) would return an unevaluated derivative expression instead
+  of computing the result. Now correctly returns `1/(3x^(2/3))`, equivalent to
+  the expected `(1/3)·x^(-2/3)`. The fix adds a special case in the `differentiate`
+  function to handle `Root(base, n)` by applying the power rule with exponent `1/n`.
 
 - **Sign Simplification**: Fixed `Sign(x).simplify()` returning `1` instead of
   `-1` when `x` is negative. The simplification rule incorrectly returned
@@ -32,6 +49,11 @@ import ChangeLog from '@site/src/components/ChangeLog';
   return 0 (the derivative is 0 almost everywhere). Also fixed a bug where
   derivative formulas that evaluate to 0 weren't recognized due to a falsy check.
 
+- **Ceil Type Signature**: Fixed `Ceil` function signature from `(real) -> integer`
+  to `(number) -> integer` to match `Floor`. This resolves "incompatible-type" errors
+  when computing derivatives of ceiling expressions or using `Ceil` in contexts
+  expecting a general number type.
+
 - **Inverse Trig Integrals**: Fixed incorrect integration formulas for `arcsin`,
   `arccos`, and `arctan`. The previous formulas were completely wrong. Correct:
   - `∫ arcsin(x) dx = x·arcsin(x) + √(1-x²)`
@@ -50,6 +72,20 @@ import ChangeLog from '@site/src/components/ChangeLog';
   this is not a polynomial. This bug caused infinite recursion in simplification
   when simplifying expressions containing exponentials, such as the derivative
   of `erf(x)` which is `(2/√π)·e^(-x²)`.
+
+- **Special Function Derivatives**: Fixed derivative formulas for several special
+  functions and removed incorrect ones:
+  - Fixed `d/dx erfi(x) = (2/√π)·e^(x²)` (imaginary error function)
+  - Fixed `d/dx S(x) = sin(πx²/2)` (Fresnel sine integral)
+  - Fixed `d/dx C(x) = cos(πx²/2)` (Fresnel cosine integral)
+  - Removed incorrect derivative formulas for Zeta, Digamma, PolyGamma, Beta,
+    LambertW, Bessel functions, and Airy functions (these now return symbolic
+    derivatives like `Digamma'(x)` instead of wrong numeric results)
+
+- **Symbolic Derivative Evaluation**: Fixed derivatives of unknown functions
+  returning `0` instead of symbolic derivatives. For example, `D(Digamma(x), x)`
+  now correctly returns `Digamma'(x)` (as `Apply(Derivative(Digamma, 1), x)`)
+  instead of incorrectly returning `0`.
 
 - **([#168](https://github.com/cortex-js/compute-engine/issues/168))
   Absolute Value**: Fixed parsing of nested absolute value expressions that
@@ -195,8 +231,62 @@ import ChangeLog from '@site/src/components/ChangeLog';
     ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
     // Returns (A ∧ C) ∨ (B ∧ C)
     ```
-    Handles `And`, `Or`, `Not`, `Implies`, `Equivalent`, and `Xor` operators
-    using De Morgan's laws and distribution.
+    Handles `And`, `Or`, `Not`, `Implies`, `Equivalent`, `Xor`, `Nand`, and `Nor`
+    operators using De Morgan's laws and distribution.
+  - **Boolean operator evaluation**: Added evaluation support for `Xor`, `Nand`,
+    and `Nor` operators with `True`/`False` arguments:
+    ```typescript
+    ce.box(['Xor', 'True', 'False']).evaluate()   // Returns True
+    ce.box(['Nand', 'True', 'True']).evaluate()   // Returns False
+    ce.box(['Nor', 'False', 'False']).evaluate()  // Returns True
+    ```
+  - **N-ary boolean operators**: `Xor`, `Nand`, and `Nor` now support any number
+    of arguments:
+    - `Xor(a, b, c, ...)` returns true when an odd number of arguments are true
+    - `Nand(a, b, c, ...)` returns the negation of `And(a, b, c, ...)`
+    - `Nor(a, b, c, ...)` returns the negation of `Or(a, b, c, ...)`
+  - **Satisfiability checking**: New `IsSatisfiable` function checks if a boolean
+    expression can be made true with some assignment of variables:
+    ```typescript
+    ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate()  // False
+    ce.box(['IsSatisfiable', ['Or', 'A', 'B']]).evaluate()            // True
+    ```
+  - **Tautology checking**: New `IsTautology` function checks if a boolean
+    expression is true for all possible variable assignments:
+    ```typescript
+    ce.box(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate()     // True
+    ce.box(['IsTautology', ['And', 'A', 'B']]).evaluate()             // False
+    ```
+  - **Truth table generation**: New `TruthTable` function generates a complete
+    truth table for a boolean expression:
+    ```typescript
+    ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate()
+    // Returns [["A","B","Result"],["False","False","False"],...]
+    ```
+  - **Explicit `Predicate` function**: Added a new `Predicate` function to
+    explicitly represent predicate applications in First-Order Logic. Inside
+    quantifier scopes (`\forall`, `\exists`, etc.), single uppercase letters
+    followed by parentheses are now parsed as `["Predicate", "P", "x"]` instead
+    of `["P", "x"]`. This distinguishes predicates from regular function
+    applications and avoids naming conflicts with library functions.
+    ```typescript
+    ce.parse('\\forall x. P(x)').json
+    // Returns ["ForAll", "x", ["Predicate", "P", "x"]]
+    ```
+    Outside quantifier scopes, `P(x)` is still parsed as `["P", "x"]` to
+    maintain backward compatibility with function definitions like `Q(x) := ...`.
+  - **`D(f, x)` no longer maps to derivative**: The LaTeX notation `D(f, x)` is
+    not standard mathematical notation for derivatives and previously caused
+    confusion with the `D` derivative function in MathJSON. Now `D(f, x)` in
+    LaTeX parses as `["Predicate", "D", "f", "x"]` instead of the derivative.
+    Use Leibniz notation (`\frac{d}{dx}f`) for derivatives in LaTeX, or
+    construct the derivative directly in MathJSON: `["D", expr, "x"]`.
+  - **`N(x)` no longer maps to numeric evaluation**: Similarly, `N(x)` in LaTeX
+    is CAS-specific notation, not standard math notation. Now `N(x)` parses as
+    `["Predicate", "N", "x"]` instead of the numeric evaluation function. This
+    allows `N` to be used as a variable (e.g., "for all N in Naturals"). Use
+    the `.N()` method for numeric evaluation, or construct it directly in
+    MathJSON: `["N", expr]`.
 
 - **Polynomial Simplification**: The `simplify()` function now automatically
   cancels common polynomial factors in univariate rational expressions. For

@@ -77,6 +77,17 @@ The `ND` function is used to calculate a numerical approximation of the derivati
 The `D` function represents the partial derivative of a function `f` with respect to
 the variable `var`.
 
+:::info[Note on LaTeX Notation]
+The LaTeX notation `D(f, x)` does **not** parse as a derivative. Since `D(f, x)` is
+not standard mathematical notation for derivatives, it is parsed as a predicate
+application `["Predicate", "D", "f", "x"]`.
+
+To compute derivatives in LaTeX, use Leibniz notation: `\frac{d}{dx}f` or
+`\frac{\partial}{\partial x}f`.
+
+To construct derivatives directly in MathJSON, use `["D", expr, "x"]`.
+:::
+
 <Latex value=" f^\prime(x)"/>
 
 ```json example
