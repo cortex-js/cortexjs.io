@@ -208,6 +208,11 @@ const sidebars = {
           id: "compute-engine/guide-logic",
           className: "guide-icon",
         },
+        {
+          type: "doc",
+          id: "compute-engine/guide-linear-algebra",
+          className: "guide-icon",
+        },
         { type: "html", value: "<hr/>" },
         {
           type: "doc",

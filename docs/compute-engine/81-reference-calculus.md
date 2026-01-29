@@ -52,19 +52,69 @@ The limit is taken as $$ h $$ approaches $$ 0 $$ because the derivative is the i
 - **Wolfram Mathworld**: [Derivative](https://mathworld.wolfram.com/Derivative.html)
 - **NIST**: [Derivative](https://dlmf.nist.gov/2.1#E1)
 
-<b>Lagrange Notation</b>
+<b>Lagrange Notation (Prime Notation)</b>
+
+When the prime notation is followed by arguments, the differentiation variable
+is inferred from the first argument:
 
 | LaTeX                 | MathJSON          |
 | :-------------------- | :---------------- |
-| `f'(x)`               | `["Derivative", "f", "x"]` |
-| `f\prime(x)`          | `["Derivative", "f", "x"]` |
-| `f^{\prime}(x)`       |   `["Derivative", "f", "x"]` |
-| `f''(x)`              | `["Derivative", "f", "x", "x"]` |
-| `f\prime\prime(x)`    | `["Derivative", "f", "x", "x"]` |
-| `f^{\prime\prime}(x)` | `["Derivative", "f", "x", "x"]` |
-| `f\doubleprime(x)` |  `["Derivative", "f", "x", "x"]` |
-| `f^{(n)}(x)` |  `["Derivative", "f", "x", n]` |
+| `f'(x)`               | `["D", ["f", "x"], "x"]` |
+| `f''(x)`              | `["D", ["D", ["f", "x"], "x"], "x"]` |
+| `f'''(x)`             | Third derivative with nested `D` |
+| `\sin'(x)`            | `["D", ["Sin", "x"], "x"]` |
 
+When the prime notation is used without arguments, it represents a derivative operator:
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `f'`                  | `["Derivative", "f"]` |
+| `f\prime`             | `["Derivative", "f"]` |
+| `f^{\prime}`          | `["Derivative", "f"]` |
+| `f''`                 | `["Derivative", "f", 2]` |
+| `f^{(n)}`             | `["Derivative", "f", n]` |
+
+<b>Newton Notation (Dot Notation)</b>
+
+Newton's notation uses dots above the variable to indicate time derivatives.
+This is common in physics for derivatives with respect to time.
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `\dot{x}`             | `["D", "x", "t"]` |
+| `\ddot{x}`            | `["D", ["D", "x", "t"], "t"]` |
+| `\dddot{x}`           | Third derivative w.r.t. time |
+| `\ddddot{x}`          | Fourth derivative w.r.t. time |
+
+The time variable defaults to `"t"` but can be configured via the
+`timeDerivativeVariable` parser option:
+
+```javascript
+ce.parse('\\dot{x}', { timeDerivativeVariable: 'τ' })
+// → ["D", "x", "τ"]
+```
+
+<b>Euler Notation (Subscript Notation)</b>
+
+Euler's notation uses subscripts to indicate the differentiation variable:
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `D_x f`               | `["D", "f", "x"]` |
+| `D_t x`               | `["D", "x", "t"]` |
+| `D^2_x f`             | `["D", ["D", "f", "x"], "x"]` |
+| `D_x^2 f`             | `["D", ["D", "f", "x"], "x"]` |
+| `D_x (x^2 + 1)`       | `["D", ["Add", ["Square", "x"], 1], "x"]` |
+
+Note: Plain `D` without a subscript is parsed as a symbol, not a derivative operator.
+
+<b>Leibniz Notation</b>
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `\frac{d}{dx}f`       | `["D", "f", "x"]` |
+| `\frac{df}{dx}`       | `["D", "f", "x"]` |
+| `\frac{d^2f}{dx^2}`   | `["D", ["D", "f", "x"], "x"]` |
 
 The `Derivative` function represents a derivative of a function with respect to a single variable.
 The `D` function is used to calculate the symbolic derivative of a function with respect to one or more variables.

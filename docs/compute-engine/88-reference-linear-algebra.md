@@ -289,7 +289,7 @@ square brackets following a matrix.
 </nav>
 <FunctionDefinition name="Flatten">
 
-<Signature name="Flatten">_matrix_</Signature>
+<Signature name="Flatten">_value_</Signature>
 
 Returns a list of all the elements of the matrix, recursively, in row-major
 order.
@@ -300,10 +300,16 @@ Only elements with the same head as the collection are flattened.
 Matrices have a head of `List`, so only other `List` elements
 are flattened.
 
-
 ```json example
 ["Flatten", ["List", ["List", 5, 2, 10, 18], ["List", 1, 2, 3]]]
 // ➔ ["List", 5, 2, 10, 18, 1, 2, 3]
+```
+
+**Scalar**: A scalar is wrapped in a single-element list.
+
+```json example
+["Flatten", 42]
+// ➔ ["List", 42]
 ```
 
 `Flatten` is similar to the APL `,` Ravel operator or `numpy.ravel`
@@ -340,8 +346,31 @@ When reshaping, the elements are taken from the original tensor in row-major
 order, that is the order of elements as returned by `Flatten`.
 
 If the result has fewer elements, the elements are dropped from the end of the
-element list. If the result has more elements, the lists of elements
-is filled cyclically. 
+element list. If the result has more elements, the list of elements
+is filled cyclically (APL-style ravel cycling).
+
+```json example
+// Reshape a 7-element vector to a 3x3 matrix (9 elements needed)
+// Elements cycle: 7, -2, 11, -5, 13, -7, 17, 7, -2
+["Reshape", ["List", 7, -2, 11, -5, 13, -7, 17], ["Tuple", 3, 3]]
+// ➔ ["List", ["List", 7, -2, 11], ["List", -5, 13, -7], ["List", 17, 7, -2]]
+```
+
+**Scalar input**: A scalar can be reshaped to any shape. The scalar value is
+replicated to fill the entire result:
+
+```json example
+["Reshape", 42, ["Tuple", 2, 3]]
+// ➔ ["List", ["List", 42, 42, 42], ["List", 42, 42, 42]]
+```
+
+**Empty shape**: Reshaping to an empty shape `["Tuple"]` returns the first
+element as a scalar:
+
+```json example
+["Reshape", ["List", 5, 2, 10], ["Tuple"]]
+// ➔ 5
+```
 
 This is the same behavior as APL, but other environments may behave differently.
 For example, by default Mathematica `ArrayReshape` will fill the missing elements
@@ -412,9 +441,19 @@ Returns the inverse of the matrix.
 
 <Latex value="\mathbf{A}^{-1}"/>
 
+The matrix must be square and non-singular (determinant ≠ 0). For vectors
+or tensors (rank > 2), an `expected-square-matrix` error is returned.
+
 ```json example
 ["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ ["List", ["List", -2, 1], ["List", 1.5, -0.5]]
+```
+
+**Scalar**: The inverse of a scalar is its reciprocal (1/scalar).
+
+```json example
+["Inverse", 4]
+// ➔ 0.25
 ```
 
 </FunctionDefinition>
@@ -442,15 +481,38 @@ Returns the [Moore-Penrose pseudoinverse](https://en.wikipedia.org/wiki/Moore%E2
 </nav>
 <FunctionDefinition name="Diagonal">
 
-<Signature name="Diagonal">_matrix_</Signature>
+<Signature name="Diagonal">_value_</Signature>
 
-Returns the diagonal of the matrix, that is the list of all the elements
-on the diagonal of the matrix.
+`Diagonal` has bidirectional behavior depending on the input:
+
+**Vector → Matrix**: When given a vector, creates a square diagonal matrix with
+the vector elements along the diagonal and zeros elsewhere.
+
+```json example
+["Diagonal", ["List", 1, 2, 3]]
+// ➔ ["List", ["List", 1, 0, 0], ["List", 0, 2, 0], ["List", 0, 0, 3]]
+```
+
+**Matrix → Vector**: When given a matrix, extracts the diagonal elements as a
+vector. For non-square matrices, extracts min(rows, cols) diagonal elements.
 
 ```json example
 ["Diagonal", ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ ["List", 1, 4]
+
+["Diagonal", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]
+// ➔ ["List", 1, 5]
 ```
+
+**Scalar**: Returns the scalar unchanged (can be thought of as a 1×1 matrix).
+
+```json example
+["Diagonal", 5]
+// ➔ 5
+```
+
+**Tensor (rank > 2)**: Returns an error. `Diagonal` is only defined for
+vectors and 2D matrices.
 
 </FunctionDefinition>
 
@@ -466,9 +528,20 @@ on the diagonal of the matrix.
 
 Returns the determinant of the matrix.
 
+The matrix must be square (same number of rows and columns). For vectors
+or tensors (rank > 2), an `expected-square-matrix` error is returned.
+
 ```json example
 ["Determinant", ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ -2
+```
+
+**Scalar**: The determinant of a scalar (thought of as a 1×1 matrix) is the
+scalar itself.
+
+```json example
+["Determinant", 5]
+// ➔ 5
 ```
 
 </FunctionDefinition>
@@ -510,13 +583,23 @@ the element.
 
 <Latex value="\operatorname{tr}(\mathbf{A})"/>
 
-Returns the [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) of 
-the matrix, the sum of the elements on the diagonal of the matrix. The trace 
-is only defined for square matrices. The trace is also the sum of the 
+Returns the [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) of
+the matrix, the sum of the elements on the diagonal of the matrix. The trace
+is only defined for square matrices. The trace is also the sum of the
 eigenvalues of the matrix.
+
+For vectors or tensors (rank > 2), an `expected-square-matrix` error is returned.
 
 ```json example
 ["Trace", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ 5
+```
+
+**Scalar**: The trace of a scalar (thought of as a 1×1 matrix) is the
+scalar itself.
+
+```json example
+["Trace", 5]
 // ➔ 5
 ```
 
