@@ -190,3 +190,114 @@ The negated quantifiers `NotForAll` and `NotExists` are also supported:
 | `NotExists` | `\lnot\exists x, P(x)` | $$ \lnot\exists x, P(x) $$ |
 
 </div>
+
+### Quantifier Evaluation
+
+Quantifiers can be evaluated to boolean values when the bound variable is
+constrained to a finite domain using an `Element` condition.
+
+**Supported domains:**
+- `Set` - explicit finite sets: `["Element", "x", ["Set", 1, 2, 3]]`
+- `List` - explicit finite lists: `["Element", "x", ["List", 1, 2, 3]]`
+- `Range` - integer ranges: `["Element", "n", ["Range", 1, 10]]`
+- `Interval` - integer intervals: `["Element", "n", ["Interval", 1, 10]]`
+
+Domains are limited to 1000 elements maximum.
+
+```javascript
+// All elements in {1, 2, 3} are greater than 0
+ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 0]]).evaluate()
+// → True
+
+// Some element in {1, 2, 3} is greater than 2
+ce.box(['Exists', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 2]]).evaluate()
+// → True (x = 3 satisfies the condition)
+
+// Exactly one element equals 2
+ce.box(['ExistsUnique', ['Element', 'x', ['Set', 1, 2, 3]], ['Equal', 'x', 2]]).evaluate()
+// → True
+```
+
+**Nested quantifiers** are evaluated over the Cartesian product of domains:
+
+```javascript
+// For all (x, y) in {1, 2} × {1, 2}: x + y > 0
+ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2]],
+  ['ForAll', ['Element', 'y', ['Set', 1, 2]],
+    ['Greater', ['Add', 'x', 'y'], 0]]]).evaluate()
+// → True
+
+// Some (x, y) in {1, 2} × {1, 2} satisfies x + y = 4
+ce.box(['Exists', ['Element', 'x', ['Set', 1, 2]],
+  ['Exists', ['Element', 'y', ['Set', 1, 2]],
+    ['Equal', ['Add', 'x', 'y'], 4]]]).evaluate()
+// → True (x = 2, y = 2)
+```
+
+**Symbolic simplifications** are applied when possible:
+- `∀x. True` → `True`
+- `∀x. False` → `False`
+- `∃x. True` → `True`
+- `∃x. False` → `False`
+- `∀x. P` (where P doesn't contain x) → `P`
+- `∃x. P` (where P doesn't contain x) → `P`
+
+
+## Normal Forms
+
+<FunctionDefinition name="ToCNF">
+
+<Signature name="ToCNF">_expression_</Signature>
+
+Converts a boolean expression to **Conjunctive Normal Form** (CNF).
+
+CNF is a conjunction (And) of disjunctions (Or) of literals. A literal is
+either a variable or its negation.
+
+Example: $(A \lor B) \land (\lnot A \lor C)$
+
+The conversion applies:
+- De Morgan's laws: $\lnot(A \land B) \equiv \lnot A \lor \lnot B$
+- Distribution: $(A \land B) \lor C \equiv (A \lor C) \land (B \lor C)$
+- Implication elimination: $A \to B \equiv \lnot A \lor B$
+- Equivalence elimination: $A \leftrightarrow B \equiv (\lnot A \lor B) \land (\lnot B \lor A)$
+
+```javascript
+ce.box(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate()
+// → (A ∨ C) ∧ (B ∨ C)
+
+ce.box(['ToCNF', ['Implies', 'A', 'B']]).evaluate()
+// → ¬A ∨ B
+
+ce.box(['ToCNF', ['Not', ['And', 'A', 'B']]]).evaluate()
+// → ¬A ∨ ¬B  (De Morgan's law)
+```
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="ToDNF">
+
+<Signature name="ToDNF">_expression_</Signature>
+
+Converts a boolean expression to **Disjunctive Normal Form** (DNF).
+
+DNF is a disjunction (Or) of conjunctions (And) of literals. A literal is
+either a variable or its negation.
+
+Example: $(A \land B) \lor (\lnot A \land C)$
+
+The conversion applies:
+- De Morgan's laws: $\lnot(A \lor B) \equiv \lnot A \land \lnot B$
+- Distribution: $(A \lor B) \land C \equiv (A \land C) \lor (B \land C)$
+- Implication and equivalence elimination (same as CNF)
+
+```javascript
+ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
+// → (A ∧ C) ∨ (B ∧ C)
+
+ce.box(['ToDNF', ['Not', ['Or', 'A', 'B']]]).evaluate()
+// → ¬A ∧ ¬B  (De Morgan's law)
+```
+
+</FunctionDefinition>
