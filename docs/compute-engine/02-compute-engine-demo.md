@@ -109,18 +109,31 @@ approximates a number as a rational.`
       template: 'eval-string'
     },
 
-    { 
-      latex: '\\sin(30\\degree)', 
+    {
+      latex: '\\sin(30\\degree)',
       preamble: 'Use degrees unit in trig functions',
       template: 'eval-string'
+    },
+
+    {
+      latex: '(1,2,3)+(3,5,6)',
+      preamble: 'Vector addition with element-wise operations',
+      template: 'eval-string'
+    },
+
+    {
+      json: '["MatrixMultiply", ["List", ["List", 1, 2], ["List", 3, 4]], ["List", ["List", 5, 6], ["List", 7, 8]]]',
+      label: 'Matrix Multiply',
+      preamble: 'Matrix multiplication using MatrixMultiply function',
+      template: 'as-json'
     },
 
     {
       latex: `\\begin{cases}
 0 & n =  0\\\\
 1 & n =  1\\\\
-n^2+1 & n \\geq 2   
-\\end{cases}`, 
+n^2+1 & n \\geq 2
+\\end{cases}`,
       label: "Piecewise"
     },
 

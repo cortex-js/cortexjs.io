@@ -4938,7 +4938,7 @@ type LatexDictionaryEntry = OneOf<[
 A dictionary entry is a record that maps a LaTeX token or string of tokens
 ( a trigger) to a MathJSON expression or to a parsing handler.
 
-Set the ComputeEngine.latexDictionary property to an array of
+Set the `ComputeEngine.latexDictionary` property to an array of
 dictionary entries to define custom LaTeX parsing and serialization.
 
 </MemberCard>
@@ -4955,6 +4955,7 @@ type ParseLatexOptions = NumberFormat & {
   parseUnexpectedToken: (lhs, parser) => Expression | null;
   preserveLatex: boolean;
   quantifierScope: "tight" | "loose";
+  timeDerivativeVariable: string;
 };
 ```
 
@@ -5067,6 +5068,19 @@ like `\forall x. P(x) \rightarrow Q(x)`.
 // \forall x. P(x) \rightarrow Q(x)
 // parses as: ∀x. (P(x) → Q(x))
 ```
+
+#### ParseLatexOptions.timeDerivativeVariable
+
+```ts
+timeDerivativeVariable: string;
+```
+
+The variable used for time derivatives in Newton notation
+(`\dot{x}`, `\ddot{x}`, etc.).
+
+When parsing `\dot{x}`, it will be interpreted as `["D", "x", timeDerivativeVariable]`.
+
+**Default:** `"t"`
 
 </MemberCard>
 
@@ -5919,7 +5933,7 @@ powerStyle: (expr, level) => "quotient" | "solidus" | "root";
 ##### Serializer.numericSetStyle()
 
 ```ts
-numericSetStyle: (expr, level) => "interval" | "compact" | "regular" | "set-builder";
+numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-builder";
 ```
 
 </MemberCard>
@@ -7613,7 +7627,7 @@ diagonal(axis1?, axis2?): DataTypeMap[DT][]
 ##### Tensor.trace()
 
 ```ts
-trace(axis1?, axis2?): DataTypeMap[DT]
+trace(axis1?, axis2?): Tensor<DT> | DataTypeMap[DT]
 ```
 
 ####### axis1?

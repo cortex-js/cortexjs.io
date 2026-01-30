@@ -25,12 +25,19 @@ ce.parse('p \\lor q');            // → ["Or", "p", "q"]
 // Negation (NOT)
 ce.parse('\\lnot p');             // → ["Not", "p"]
 
-// Implication
+// Implication (multiple notations supported)
 ce.parse('p \\implies q');        // → ["Implies", "p", "q"]
+ce.parse('p \\Rightarrow q');     // → ["Implies", "p", "q"]
+ce.parse('p \\rightarrow q');     // → ["Implies", "p", "q"]
 
-// Equivalence (biconditional)
+// Equivalence (biconditional, multiple notations)
 ce.parse('p \\iff q');            // → ["Equivalent", "p", "q"]
+ce.parse('p \\Leftrightarrow q'); // → ["Equivalent", "p", "q"]
+ce.parse('p \\leftrightarrow q'); // → ["Equivalent", "p", "q"]
 ```
+
+**Note:** `\to` is reserved for function/set mapping notation (e.g., `f: A \to B`)
+and parses as `To`, not `Implies`.
 
 ### Additional Operators
 
@@ -56,6 +63,46 @@ ce.box(['Nand', 'True', 'True', 'False']).evaluate(); // → True
 
 // N-ary NOR: NOT(OR(a, b, c, ...))
 ce.box(['Nor', 'False', 'False', 'False']).evaluate(); // → True
+```
+
+### Operator Precedence
+
+Logical operators are designed to work naturally with comparison operators.
+Comparisons bind tighter than logical operators, so you can write compound
+conditions without parentheses:
+
+```js example
+// Comparisons bind tighter than Or
+ce.parse('x = 1 \\lor y = 2');
+// → ["Or", ["Equal", "x", 1], ["Equal", "y", 2]]
+
+// And binds tighter than Or
+ce.parse('a \\land b \\lor c');
+// → ["Or", ["And", "a", "b"], "c"]
+
+// Or binds tighter than Implies
+ce.parse('p \\lor q \\implies r');
+// → ["Implies", ["Or", "p", "q"], "r"]
+```
+
+**Important:** `Not` (`\lnot`, `\neg`) has very high precedence and only applies
+to the immediately following atom. This matches standard mathematical convention:
+
+```js example
+// \lnot only applies to p, not the whole expression
+ce.parse('\\lnot p \\land q');
+// → ["And", ["Not", "p"], "q"]
+
+// Use parentheses to negate compound expressions
+ce.parse('\\lnot(p \\land q)');
+// → ["Not", ["And", "p", "q"]]
+
+// Similarly for comparisons
+ce.parse('\\lnot x = 1');
+// → ["Equal", ["Not", "x"], 1]  -- probably not what you want!
+
+ce.parse('\\lnot(x = 1)');
+// → ["Not", ["Equal", "x", 1]]  -- correct way to negate a comparison
 ```
 
 ### Evaluating Boolean Expressions

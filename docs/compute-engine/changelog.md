@@ -10,34 +10,330 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Features
+
+- **([#163](https://github.com/cortex-js/compute-engine/issues/163)) Additional
+  Derivative Notations**: Added support for parsing multiple derivative notations
+  beyond Leibniz notation:
+
+  - **Newton's dot notation** for time derivatives: `\dot{x}` → `["D", "x", "t"]`,
+    `\ddot{x}` for second derivative, `\dddot{x}` and `\ddddot{x}` for higher orders.
+    The time variable is configurable via the new `timeDerivativeVariable` parser
+    option (default: `"t"`).
+
+  - **Lagrange prime notation with arguments**: `f'(x)` now parses to
+    `["D", ["f", "x"], "x"]`, inferring the differentiation variable from the
+    function argument. Works for `f''(x)`, `f'''(x)`, etc. for higher derivatives.
+
+  - **Euler's subscript notation**: `D_x f` → `["D", "f", "x"]` and
+    `D^2_x f` or `D_x^2 f` for second derivatives.
+
+  - **Derivative serialization**: `D` expressions now serialize to Leibniz notation
+    (`\frac{\mathrm{d}}{\mathrm{d}x}f`) for consistent round-trip parsing.
+
+- **Special Function Definitions**: Added type signatures for Digamma, Trigamma,
+  and PolyGamma functions to the library:
+  - `Digamma(x)` - The digamma function ψ(x), logarithmic derivative of Gamma
+  - `Trigamma(x)` - The trigamma function ψ₁(x), derivative of digamma
+  - `PolyGamma(n, x)` - The polygamma function ψₙ(x), nth derivative of digamma
+
+- **Derivative Rules for Special Functions**: Added derivative formulas for:
+  - `d/dx Digamma(x) = Trigamma(x)`
+  - `d/dx Erf(x)`, `d/dx Erfc(x)`, `d/dx Erfi(x)`
+  - `d/dx FresnelS(x)`, `d/dx FresnelC(x)`
+  - `d/dx LogGamma(x) = Digamma(x)`
+
+- **Trigonometric Periodicity Reduction**: Trigonometric functions now simplify
+  arguments containing integer multiples of π:
+  - `sin(5π + k)` → `-sin(k)` (period 2π, with sign change for odd multiples)
+  - `cos(4π + k)` → `cos(k)` (period 2π)
+  - `tan(3π + k)` → `tan(k)` (period π)
+  - Works for all six trig functions: sin, cos, tan, cot, sec, csc
+  - Handles both positive and negative multiples of π
+
+- **Pythagorean Trigonometric Identities**: Added simplification rules for all
+  Pythagorean identities:
+  - `sin²(x) + cos²(x)` → `1`
+  - `1 - sin²(x)` → `cos²(x)` and `1 - cos²(x)` → `sin²(x)`
+  - `sin²(x) - 1` → `-cos²(x)` and `cos²(x) - 1` → `-sin²(x)`
+  - `tan²(x) + 1` → `sec²(x)` and `sec²(x) - 1` → `tan²(x)`
+  - `1 + cot²(x)` → `csc²(x)` and `csc²(x) - 1` → `cot²(x)`
+  - `a·sin²(x) + a·cos²(x)` → `a` (with coefficient)
+
+- **Trigonometric Equation Solving**: The `solve()` method now handles basic
+  trigonometric equations:
+  - `sin(x) = a` → `x = arcsin(a)` and `x = π - arcsin(a)` (two solutions)
+  - `cos(x) = a` → `x = arccos(a)` and `x = -arccos(a)` (two solutions)
+  - `tan(x) = a` → `x = arctan(a)` (one solution per period)
+  - `cot(x) = a` → `x = arccot(a)`
+  - Supports coefficient form: `a·sin(x) + b = 0`
+  - Domain validation: returns no solutions when |a| > 1 for sin/cos
+  - Automatic deduplication of equivalent solutions (e.g., `cos(x) = 1` → single solution `0`)
+
+- **([#133](https://github.com/cortex-js/compute-engine/issues/133)) Element-based
+  Indexing Sets for Sum/Product**: Added support for `\in` notation in summation
+  and product subscripts:
+
+  - **Parsing**: `\sum_{n \in \{1,2,3\}} n` now correctly parses to
+    `["Sum", "n", ["Element", "n", ["Set", 1, 2, 3]]]` instead of silently
+    dropping the constraint.
+
+  - **Evaluation**: Sums and products over finite sets, lists, and ranges are
+    now evaluated correctly:
+    - `\sum_{n \in \{1,2,3\}} n` → `6`
+    - `\sum_{n \in \{1,2,3\}} n^2` → `14`
+    - `\prod_{k \in \{1,2,3,4\}} k` → `24`
+
+  - **Serialization**: Element-based indexing sets serialize back to LaTeX with
+    proper `\in` notation: `\sum_{n\in \{1, 2, 3\}}n`
+
+  - **Range support**: Works with `Range` expressions via `ce.box()`:
+    `["Sum", "n", ["Element", "n", ["Range", 1, 5]]]` → `15`
+
+  - **Bracket notation as Range**: Two-element integer lists in bracket notation
+    `[a,b]` are now treated as Range(a,b) when used in Element context:
+    - `\sum_{n \in [1,5]} n` → `15` (iterates 1, 2, 3, 4, 5)
+    - Previously returned `6` (treated as List with just elements 1 and 5)
+
+  - **Interval support**: `Interval` expressions work with Element-based indexing,
+    including support for `Open` and `Closed` boundary markers:
+    - `["Interval", 1, 5]` → iterates integers 1, 2, 3, 4, 5 (closed bounds)
+    - `["Interval", ["Open", 0], 5]` → iterates 1, 2, 3, 4, 5 (excludes 0)
+    - `["Interval", 1, ["Open", 6]]` → iterates 1, 2, 3, 4, 5 (excludes 6)
+
+  - **Infinite series with Element notation**: Known infinite integer sets are
+    converted to their equivalent Limits form and iterated (capped at 1,000,000):
+    - `NonNegativeIntegers` (ℕ₀) → iterates from 0, like `\sum_{n=0}^{\infty}`
+    - `PositiveIntegers` (ℤ⁺) → iterates from 1, like `\sum_{n=1}^{\infty}`
+    - Convergent series produce numeric approximations:
+      `\sum_{n \in \Z^+} \frac{1}{n^2}` → `≈1.6449` (close to π²/6)
+
+  - **Non-enumerable domains stay symbolic**: When the domain cannot be enumerated
+    (unknown symbol, non-iterable infinite set, or symbolic bounds), the expression
+    stays symbolic instead of returning NaN:
+    - `\sum_{n \in S} n` with unknown `S` → stays as `["Sum", "n", ["Element", "n", "S"]]`
+    - `\sum_{n \in \Z} n` → stays symbolic (bidirectional, can't forward iterate)
+    - `\sum_{x \in \R} f(x)` → stays symbolic (non-countable)
+    - `\sum_{n \in [1,a]} n` with symbolic bound → stays symbolic
+    - Previously these would all return `NaN` with no explanation
+
+  - **Multiple Element indexing sets**: Comma-separated Element expressions now
+    parse and evaluate correctly:
+    - `\sum_{n \in A, m \in B} (n+m)` → `["Sum", ..., ["Element", "n", "A"], ["Element", "m", "B"]]`
+    - Nested sums like `\sum_{i \in A}\sum_{j \in B} i \cdot j` evaluate correctly
+    - Mixed indexing sets (Element + Limits) work together
+
+  - **Condition/filter support in Element expressions**: Conditions can be attached
+    to Element expressions to filter values from the set:
+    - `\sum_{n \in S, n > 0} n` → sums only positive values from S
+    - `\sum_{n \in S, n \ge 2} n` → sums values ≥ 2 from S
+    - `\prod_{k \in S, k < 0} k` → multiplies only negative values from S
+    - Supported operators: `>`, `>=`, `<`, `<=`, `!=`
+    - Conditions are attached as the 4th operand of Element:
+      `["Element", "n", "S", ["Greater", "n", 0]]`
+
+- **Linear Algebra Enhancements**: Improved tensor and matrix operations with
+  better scalar handling, new functionality, and clearer error messages:
+
+  - **Matrix Multiplication**: Added `MatrixMultiply` function supporting:
+    - Matrix × Matrix: `A (m×n) × B (n×p) → result (m×p)`
+    - Matrix × Vector: `A (m×n) × v (n) → result (m)`
+    - Vector × Matrix: `v (m) × B (m×n) → result (n)`
+    - Vector × Vector (dot product): `v1 (n) · v2 (n) → scalar`
+    - Proper dimension validation with `incompatible-dimensions` errors
+    - LaTeX serialization using `\cdot` notation
+
+  - **Matrix Addition and Scalar Broadcasting**: `Add` now supports element-wise
+    operations on tensors (matrices and vectors):
+    - Matrix + Matrix: Element-wise addition (shapes must match)
+    - Scalar + Matrix: Broadcasts scalar to all elements
+    - Vector + Vector: Element-wise addition
+    - Scalar + Vector: Broadcasts scalar to all elements
+    - Symbolic support: `[[a,b],[c,d]] + [[1,2],[3,4]]` evaluates correctly
+    - Proper dimension validation with `incompatible-dimensions` errors
+
+  - **Matrix Construction Functions**: Added convenience functions for creating
+    common matrices:
+    - `IdentityMatrix(n)`: Creates an n×n identity matrix
+    - `ZeroMatrix(m, n?)`: Creates an m×n matrix of zeros (square if n omitted)
+    - `OnesMatrix(m, n?)`: Creates an m×n matrix of ones (square if n omitted)
+
+  - **Matrix and Vector Norms**: Added `Norm` function for computing various
+    norms:
+    - **Vector norms**: L1 (sum of absolute values), L2 (Euclidean, default),
+      L-infinity (max absolute value), and general Lp norms
+    - **Matrix norms**: Frobenius (default, sqrt of sum of squared elements),
+      L1 (max column sum), L-infinity (max row sum)
+    - Scalar norms return the absolute value
+
+  - **Higher-Rank Tensor Operations**: Extended `Transpose`, `ConjugateTranspose`,
+    and `Trace` to work with rank > 2 tensors:
+    - **Transpose**: Swaps last two axes by default (batch transpose), or
+      specify explicit axes with `['Transpose', T, axis1, axis2]`
+    - **ConjugateTranspose**: Same axis behavior as Transpose, plus element-wise
+      complex conjugation
+    - **Trace (batch trace)**: Returns a tensor of traces over the last two axes.
+      For a `[2,2,2]` tensor, returns `[trace of T[0], trace of T[1]]`.
+      Optional axis parameters: `['Trace', T, axis1, axis2]`
+    - All operations support explicit axis specification for flexible tensor
+      manipulation
+
+  - **Eigenvalues and Eigenvectors**: Added functions for eigenvalue decomposition:
+    - `Eigenvalues(matrix)`: Returns list of eigenvalues
+      - 2×2 matrices: symbolic computation via characteristic polynomial
+      - 3×3 matrices: Cardano's formula for cubic roots
+      - Larger matrices: numeric QR algorithm
+      - Optimized for diagonal/triangular matrices
+    - `Eigenvectors(matrix)`: Returns list of corresponding eigenvectors
+      - Uses null space computation via Gaussian elimination
+    - `Eigen(matrix)`: Returns tuple of (eigenvalues, eigenvectors)
+
+  - **Diagonal function**: Now fully implemented with bidirectional behavior:
+    - Vector → Matrix: Creates a diagonal matrix from a vector
+      (`Diagonal([1,2,3])` → 3×3 diagonal matrix)
+    - Matrix → Vector: Extracts the diagonal as a vector
+      (`Diagonal([[1,2],[3,4]])` → `[1,4]`)
+
+  - **Reshape cycling**: Implements APL-style ravel cycling. When reshaping
+    to a larger shape, elements cycle from the beginning:
+    `Reshape([1,2,3], (2,2))` → `[[1,2],[3,1]]`
+
+  - **Scalar handling**: Most linear algebra functions now handle scalar inputs:
+    - `Flatten(42)` → `[42]` (single-element list)
+    - `Transpose(42)` → `42` (identity)
+    - `Determinant(42)` → `42` (1×1 matrix determinant)
+    - `Trace(42)` → `42` (1×1 matrix trace)
+    - `Inverse(42)` → `1/42` (scalar reciprocal)
+    - `ConjugateTranspose(42)` → `42` (conjugate of real is itself)
+    - `Reshape(42, (2,2))` → `[[42,42],[42,42]]` (scalar replication)
+
+  - **Error messages**: Operations requiring square matrices (`Determinant`,
+    `Trace`, `Inverse`) now return `expected-square-matrix` error for vectors
+    and tensors (rank > 2).
+
+### Bug Fixes
+
+- **([#176](https://github.com/cortex-js/compute-engine/issues/176)) Power
+  Combination Simplification**: Fixed simplification failing to combine powers
+  with the same base when one factor has an implicit exponent or when there are
+  3+ operands. Previously, expressions like `2 * 2^x`, `e * e^x * e^{-x}`, and
+  `x^2 * x` would not simplify. Now correctly simplifies to `2^(x+1)`, `e`, and
+  `x^3` respectively. The fix includes:
+  - Extended power combination rules to support numeric literal bases
+  - Added functional rule to handle n-ary Multiply expressions (3+ operands)
+  - Adjusted simplification cost threshold from 1.2 to 1.3 to accept
+    mathematically valid simplifications where exponents become slightly more
+    complex (e.g., `2 * 2^x → 2^(x+1)`)
+
+- **Matrix Operations Type Validation**: Fixed matrix operations (`Shape`, `Rank`,
+  `Flatten`, `Transpose`, `Determinant`, `Inverse`, `Trace`, etc.) returning
+  incorrect results or failing with type errors. The root cause was a type
+  mismatch: function signatures expected `matrix` type (a 2D list with dimensions),
+  but `BoxedTensor.type` returned `list<number>` without dimensions. Now
+  `BoxedTensor`, `BoxedFunction`, and `BoxedSymbol` correctly derive `shape` and
+  `rank` from their type's dimensions. Additionally, linear algebra functions now
+  properly evaluate their operands before checking if they are tensors.
+
+- **Numerical Integration**: Fixed `\int_0^1 \sin(x) dx` returning `NaN` when
+  evaluated numerically with `.N()`. The integrand was already wrapped in a
+  `Function` expression by the canonical form, but the numerical evaluation code
+  was wrapping it again, creating a nested function that returned a function
+  instead of a number. Now correctly checks if the integrand is already a
+  `Function` before wrapping.
+
+- **Subscript Function Calls**: Fixed parsing of function calls with subscripted
+  names like `f_\text{a}(5)`. Previously, this was incorrectly parsed as a
+  `Tuple` instead of a function call because `Subscript` expressions weren't
+  being canonicalized before the function call check. Now correctly recognizes
+  that `f_a(5)` is a function call when the subscript canonicalizes to a symbol.
+
+- **Symbolic Factorial**: Fixed `(n-1)!` incorrectly evaluating to `NaN` instead
+  of staying symbolic. The factorial `evaluate` function was attempting numeric
+  computation on symbolic arguments. Now correctly returns `undefined` (keeping
+  the expression symbolic) when the argument is not a number literal.
+
+- **([#130](https://github.com/cortex-js/compute-engine/issues/130)) Prefix/Postfix
+  Operator LaTeX Serialization**: Fixed incorrect LaTeX output for prefix operators
+  (like `Negate`) and postfix operators (like `Factorial`) when applied to
+  expressions with lower precedence. Previously, `Negate(Add(a, b))` incorrectly
+  serialized as `-a+b` instead of `-(a+b)`, causing round-trip failures where
+  parsing the output produced a mathematically different expression. Similarly,
+  `Factorial(Add(a, b))` now correctly serializes as `(a+b)!` instead of `a+b!`.
+  The fix ensures operands are wrapped in parentheses when their precedence is
+  lower than the operator's precedence.
+
+- **Rules Cache Isolation**: Fixed rules cache building failing with "Invalid
+  rule" errors when user expressions had previously polluted the global scope.
+  For example, parsing `x(y+z)` would add `x` as a symbol with function type to
+  the global scope. Later, when the simplification rules cache was built, rule
+  parsing would fail because wildcards like `_x` in rules would be type-checked
+  against the polluted scope where `x` had incompatible type. The fix ensures
+  rule parsing uses a clean scope that inherits only from the system scope
+  (containing built-in definitions), not from user-polluted scopes.
+
+- **([#156](https://github.com/cortex-js/compute-engine/issues/156)) Logical
+  Operator Precedence**: Fixed parsing of logical operators `\vee` (Or) and
+  `\wedge` (And) with relational operators. Previously, expressions like
+  `3=4\vee 7=8` were incorrectly parsed with the wrong precedence. Now correctly
+  parses as `["Or", ["Equal", 3, 4], ["Equal", 7, 8]]`. Logical operators have
+  lower precedence (230-235) than comparison operators (245) and set relations
+  (240), so compound propositions parse correctly without requiring parentheses.
+
+- **([#156](https://github.com/cortex-js/compute-engine/issues/156)) Logical
+  Connective Arrows**: Added support for additional arrow notation in logical
+  expressions:
+  - `\rightarrow` now parses as `Implies` (previously parsed as `To` for
+    set/function mapping)
+  - `\leftrightarrow` now parses as `Equivalent` (previously produced an
+    "unexpected-command" error)
+  - Long arrow variants now supported: `\Longrightarrow`, `\longrightarrow` →
+    `Implies`; `\Longleftrightarrow`, `\longleftrightarrow` → `Equivalent`
+  - The existing variants `\Rightarrow`, `\Leftrightarrow`, `\implies`, `\iff`
+    continue to work
+  - `\to` remains available for function/set mapping notation (e.g., `f: A \to B`)
+
+- **Simplification Rules**: Added and fixed several simplification rules:
+  - `x + x` now correctly simplifies to `2x` (term combination)
+  - `e^x * e^{-x}` now correctly simplifies to `1` (exponential inverse)
+  - `sin(∞)` and `cos(∞)` now correctly evaluate to `NaN`
+  - `tanh(∞)` now correctly evaluates to `1`, `tanh(-∞)` to `-1`
+  - `log_b(x^n)` now correctly simplifies to `n * log_b(x)` (log power rule)
+  - Improved cost function to prefer `n * ln(x)` form over `ln(x^n)`
+  - Trigonometric functions now reduce arguments by their period (e.g.,
+    `cos(5π + k)` simplifies using `cos(π + k) = -cos(k)`)
+
 ## 0.32.0 _2026-01-28_
 
 ### Bug Fixes
 
-- **([#256](https://github.com/cortex-js/compute-engine/issues/256))
-  Subscript Symbol Parsing**: Fixed parsing of single-letter symbols with
-  subscripts. Previously, `i_A` was incorrectly parsed as
+- **([#256](https://github.com/cortex-js/compute-engine/issues/256)) Subscript
+  Symbol Parsing**: Fixed parsing of single-letter symbols with subscripts.
+  Previously, `i_A` was incorrectly parsed as
   `["Subscript", ["Complex", 0, 1], "A"]` because `i` was recognized as the
   imaginary unit before the subscript was processed. Now `i_A` correctly parses
   as the symbol `i_A`. This applies to all single-letter symbols including
   constants like `e` and `i`. Complex subscripts containing operators (`n+1`),
-  commas (`n,m`), or parentheses (`(n+1)`) still produce `Subscript` expressions.
+  commas (`n,m`), or parentheses (`(n+1)`) still produce `Subscript`
+  expressions.
 
-- **([#230](https://github.com/cortex-js/compute-engine/issues/230))
-  Root Derivatives**: Fixed the `D` operator not differentiating expressions
+- **([#230](https://github.com/cortex-js/compute-engine/issues/230)) Root
+  Derivatives**: Fixed the `D` operator not differentiating expressions
   containing the `Root` operator (n-th roots). Previously, `D(Root(x, 3), x)`
   (derivative of ∛x) would return an unevaluated derivative expression instead
   of computing the result. Now correctly returns `1/(3x^(2/3))`, equivalent to
-  the expected `(1/3)·x^(-2/3)`. The fix adds a special case in the `differentiate`
-  function to handle `Root(base, n)` by applying the power rule with exponent `1/n`.
+  the expected `(1/3)·x^(-2/3)`. The fix adds a special case in the
+  `differentiate` function to handle `Root(base, n)` by applying the power rule
+  with exponent `1/n`.
 
 - **Sign Simplification**: Fixed `Sign(x).simplify()` returning `1` instead of
   `-1` when `x` is negative. The simplification rule incorrectly returned
   `ce.One` for both positive and negative cases.
 
-- **Abs Derivative**: Fixed `d/dx |x|` returning an error when evaluated with
-  a variable that has an assigned value. The derivative formula now uses
-  `Sign(x)` instead of a complex `Which` expression that couldn't be evaluated
+- **Abs Derivative**: Fixed `d/dx |x|` returning an error when evaluated with a
+  variable that has an assigned value. The derivative formula now uses `Sign(x)`
+  instead of a complex `Which` expression that couldn't be evaluated
   symbolically.
 
 - **LaTeX Serialization**: Fixed TypeScript error in power serialization where
@@ -45,14 +341,15 @@ import ChangeLog from '@site/src/components/ChangeLog';
   expected. Now correctly uses `operand(exp, 2)` to get the expression form.
 
 - **Step Function Derivatives**: Fixed `D(floor(x), x)`, `D(ceil(x), x)`, and
-  `D(round(x), x)` causing infinite recursion. These step functions now correctly
-  return 0 (the derivative is 0 almost everywhere). Also fixed a bug where
-  derivative formulas that evaluate to 0 weren't recognized due to a falsy check.
+  `D(round(x), x)` causing infinite recursion. These step functions now
+  correctly return 0 (the derivative is 0 almost everywhere). Also fixed a bug
+  where derivative formulas that evaluate to 0 weren't recognized due to a falsy
+  check.
 
-- **Ceil Type Signature**: Fixed `Ceil` function signature from `(real) -> integer`
-  to `(number) -> integer` to match `Floor`. This resolves "incompatible-type" errors
-  when computing derivatives of ceiling expressions or using `Ceil` in contexts
-  expecting a general number type.
+- **Ceil Type Signature**: Fixed `Ceil` function signature from
+  `(real) -> integer` to `(number) -> integer` to match `Floor`. This resolves
+  "incompatible-type" errors when computing derivatives of ceiling expressions
+  or using `Ceil` in contexts expecting a general number type.
 
 - **Inverse Trig Integrals**: Fixed incorrect integration formulas for `arcsin`,
   `arccos`, and `arctan`. The previous formulas were completely wrong. Correct:
@@ -67,14 +364,14 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `Digamma(x)` (the digamma/psi function).
 
 - **Polynomial Degree Detection**: Fixed `polynomialDegree()` returning 0 for
-  expressions like `e^x` or `e^(-x^2)` when it should return -1 (not a polynomial).
-  When the base of a power is constant but the exponent depends on the variable,
-  this is not a polynomial. This bug caused infinite recursion in simplification
-  when simplifying expressions containing exponentials, such as the derivative
-  of `erf(x)` which is `(2/√π)·e^(-x²)`.
+  expressions like `e^x` or `e^(-x^2)` when it should return -1 (not a
+  polynomial). When the base of a power is constant but the exponent depends on
+  the variable, this is not a polynomial. This bug caused infinite recursion in
+  simplification when simplifying expressions containing exponentials, such as
+  the derivative of `erf(x)` which is `(2/√π)·e^(-x²)`.
 
-- **Special Function Derivatives**: Fixed derivative formulas for several special
-  functions and removed incorrect ones:
+- **Special Function Derivatives**: Fixed derivative formulas for several
+  special functions and removed incorrect ones:
   - Fixed `d/dx erfi(x) = (2/√π)·e^(x²)` (imaginary error function)
   - Fixed `d/dx S(x) = sin(πx²/2)` (Fresnel sine integral)
   - Fixed `d/dx C(x) = cos(πx²/2)` (Fresnel cosine integral)
@@ -87,10 +384,10 @@ import ChangeLog from '@site/src/components/ChangeLog';
   now correctly returns `Digamma'(x)` (as `Apply(Derivative(Digamma, 1), x)`)
   instead of incorrectly returning `0`.
 
-- **([#168](https://github.com/cortex-js/compute-engine/issues/168))
-  Absolute Value**: Fixed parsing of nested absolute value expressions that
-  start with a double bar (e.g. `||3-5|-4|`), which previously produced an
-  invalid structure instead of evaluating correctly.
+- **([#168](https://github.com/cortex-js/compute-engine/issues/168)) Absolute
+  Value**: Fixed parsing of nested absolute value expressions that start with a
+  double bar (e.g. `||3-5|-4|`), which previously produced an invalid structure
+  instead of evaluating correctly.
 
 - **([#244](https://github.com/cortex-js/compute-engine/issues/244))
   Serialization**: Fixed LaTeX and ASCIIMath serialization ambiguity for
@@ -98,29 +395,28 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `-2^2`) when the base is negative, and negated powers now render as `-(2^2)`
   rather than `-2^2`.
 
-- **([#263](https://github.com/cortex-js/compute-engine/issues/263))
-  Quantifier Scope**: Fixed quantifier scope in First-Order Logic expressions.
-  Previously, `\forall x.P(x)\rightarrow Q(x)` was parsed with the implication
-  inside the quantifier scope: `["ForAll", "x", ["To", P(x), Q(x)]]`. Now it
-  correctly follows standard FOL conventions where the quantifier binds only
-  the immediately following formula: `["To", ["ForAll", "x", P(x)], Q(x)]`.
-  This applies to all quantifiers (`ForAll`, `Exists`, `ExistsUnique`,
-  `NotForAll`, `NotExists`) and all logical connectives (`\rightarrow`, `\to`,
-  `\implies`, `\land`, `\lor`, `\iff`). Use explicit parentheses for wider
-  scope: `\forall x.(P(x)\rightarrow Q(x))`. Also fixed quantifier type
-  signatures to properly return `boolean`, enabling correct type checking
-  when quantified expressions are used as arguments to logical operators.
+- **([#263](https://github.com/cortex-js/compute-engine/issues/263)) Quantifier
+  Scope**: Fixed quantifier scope in First-Order Logic expressions. Previously,
+  `\forall x.P(x)\rightarrow Q(x)` was parsed with the implication inside the
+  quantifier scope: `["ForAll", "x", ["To", P(x), Q(x)]]`. Now it correctly
+  follows standard FOL conventions where the quantifier binds only the
+  immediately following formula: `["To", ["ForAll", "x", P(x)], Q(x)]`. This
+  applies to all quantifiers (`ForAll`, `Exists`, `ExistsUnique`, `NotForAll`,
+  `NotExists`) and all logical connectives (`\rightarrow`, `\to`, `\implies`,
+  `\land`, `\lor`, `\iff`). Use explicit parentheses for wider scope:
+  `\forall x.(P(x)\rightarrow Q(x))`. Also fixed quantifier type signatures to
+  properly return `boolean`, enabling correct type checking when quantified
+  expressions are used as arguments to logical operators.
 
-- **([#243](https://github.com/cortex-js/compute-engine/issues/243))
-  LaTeX Parsing**: Fixed logic operator precedence causing expressions like
+- **([#243](https://github.com/cortex-js/compute-engine/issues/243)) LaTeX
+  Parsing**: Fixed logic operator precedence causing expressions like
   `x = 1 \vee x = 2` to be parsed incorrectly as `x = (1 ∨ x) = 2` instead of
   `(x = 1) ∨ (x = 2)`. Comparison operators (`=`, `<`, `>`, etc.) now correctly
   bind tighter than logic operators (`\land`, `\lor`, `\veebar`, etc.).
 
-- **([#258](https://github.com/cortex-js/compute-engine/issues/258))
-  Pattern Matching**: Fixed `BoxedExpression.match()` returning `null` when
-  matching patterns against canonicalized expressions. Several cases are now
-  handled:
+- **([#258](https://github.com/cortex-js/compute-engine/issues/258)) Pattern
+  Matching**: Fixed `BoxedExpression.match()` returning `null` when matching
+  patterns against canonicalized expressions. Several cases are now handled:
   - `Rational` patterns now match expressions like `['Rational', 'x', 2]` which
     are canonicalized to `['Multiply', ['Rational', 1, 2], 'x']`
   - `Power` patterns now match `['Power', 'x', -1]` which is canonicalized to
@@ -144,38 +440,40 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `Sum` and `Product` expressions with non-trivial bodies (e.g., `Multiply`)
   which were incorrectly displayed as `int()`.
 
-- **([#257](https://github.com/cortex-js/compute-engine/issues/257))
-  LaTeX Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
-  Previously `\gcd\left(24,37\right)` would parse as `["Tuple", "GCD", ["Tuple", 24, 37]]`
-  instead of the expected `["GCD", 24, 37]`. The `\operatorname{gcd}` form was
-  unaffected. Also added support for `\lcm` as a LaTeX command (in addition to
-  the existing `\operatorname{lcm}`).
+- **([#257](https://github.com/cortex-js/compute-engine/issues/257)) LaTeX
+  Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
+  Previously `\gcd\left(24,37\right)` would parse as
+  `["Tuple", "GCD", ["Tuple", 24, 37]]` instead of the expected
+  `["GCD", 24, 37]`. The `\operatorname{gcd}` form was unaffected. Also added
+  support for `\lcm` as a LaTeX command (in addition to the existing
+  `\operatorname{lcm}`).
 
 - **([#223](https://github.com/cortex-js/compute-engine/issues/223))
-  Serialization**: Fixed scientific/engineering LaTeX serialization dropping
-  the leading coefficient for exact powers of ten. For example, `1000` now
+  Serialization**: Fixed scientific/engineering LaTeX serialization dropping the
+  leading coefficient for exact powers of ten. For example, `1000` now
   serializes to `1\cdot10^{3}` (or `1\times10^{3}` depending on
   `exponentProduct`) instead of `10^{3}`.
 
-- **LaTeX Parsing**: Fixed `\cosh` incorrectly mapping to `Csch` instead of `Cosh`.
+- **LaTeX Parsing**: Fixed `\cosh` incorrectly mapping to `Csch` instead of
+  `Cosh`.
 
-- **([#242](https://github.com/cortex-js/compute-engine/issues/242))
-  Solve**: Fixed `solve()` returning an empty array for equations with variables
-  in fractions. For example, `F = 3g/h` solved for `g` now correctly returns
-  `Fh/3` instead of an empty array. The solver now clears denominators before
-  applying solve rules, enabling it to handle expressions like `a + bx/c = 0`.
-  Also added support for solving equations where the variable is in the
-  denominator (e.g., `a/x = b` now returns `x = a/b`).
+- **([#242](https://github.com/cortex-js/compute-engine/issues/242)) Solve**:
+  Fixed `solve()` returning an empty array for equations with variables in
+  fractions. For example, `F = 3g/h` solved for `g` now correctly returns `Fh/3`
+  instead of an empty array. The solver now clears denominators before applying
+  solve rules, enabling it to handle expressions like `a + bx/c = 0`. Also added
+  support for solving equations where the variable is in the denominator (e.g.,
+  `a/x = b` now returns `x = a/b`).
 
-- **([#220](https://github.com/cortex-js/compute-engine/issues/220))
-  Solve**: Fixed `solve()` returning an empty array for equations involving
-  square roots of the unknown, e.g. `2x = \sqrt{5x}`. The solver now handles
-  equations of the form `ax + b√x + c = 0` using quadratic substitution. Also
-  added support for solving logarithmic equations like `a·ln(x) + b = 0` which
-  returns `x = e^(-b/a)`.
+- **([#220](https://github.com/cortex-js/compute-engine/issues/220)) Solve**:
+  Fixed `solve()` returning an empty array for equations involving square roots
+  of the unknown, e.g. `2x = \sqrt{5x}`. The solver now handles equations of the
+  form `ax + b√x + c = 0` using quadratic substitution. Also added support for
+  solving logarithmic equations like `a·ln(x) + b = 0` which returns
+  `x = e^(-b/a)`.
 
-- **([#255](https://github.com/cortex-js/compute-engine/issues/255))
-  LaTeX Parsing**: Fixed multi-letter subscripts like `A_{CD}` causing
+- **([#255](https://github.com/cortex-js/compute-engine/issues/255)) LaTeX
+  Parsing**: Fixed multi-letter subscripts like `A_{CD}` causing
   "incompatible-type" errors in arithmetic operations. Multi-letter subscripts
   without parentheses are now interpreted as compound symbol names (e.g.,
   `A_{CD}` → `A_CD`, `x_{ij}` → `x_ij`, `T_{max}` → `T_max`). Use parentheses
@@ -185,9 +483,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Improvements
 
-- **([#263](https://github.com/cortex-js/compute-engine/issues/263))
-  First-Order Logic**: Added several improvements for working with First-Order
-  Logic expressions:
+- **([#263](https://github.com/cortex-js/compute-engine/issues/263)) First-Order
+  Logic**: Added several improvements for working with First-Order Logic
+  expressions:
   - **Configurable quantifier scope**: New `quantifierScope` parsing option
     controls how quantifier scope is determined. Use `"tight"` (default) for
     standard FOL conventions where quantifiers bind only the immediately
@@ -199,9 +497,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
     ```
   - **Automatic predicate inference**: Single uppercase letters followed by
     parentheses (e.g., `P(x)`, `Q(a,b)`) are now automatically recognized as
-    predicate/function applications without requiring explicit declaration.
-    This enables natural FOL syntax like `\forall x. P(x) \rightarrow Q(x)`
-    to work out of the box.
+    predicate/function applications without requiring explicit declaration. This
+    enables natural FOL syntax like `\forall x. P(x) \rightarrow Q(x)` to work
+    out of the box.
   - **Quantifier evaluation over finite domains**: Quantifiers (`ForAll`,
     `Exists`, `ExistsUnique`, `NotForAll`, `NotExists`) now evaluate to boolean
     values when the bound variable is constrained to a finite set. For example:
@@ -231,8 +529,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
     ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
     // Returns (A ∧ C) ∨ (B ∧ C)
     ```
-    Handles `And`, `Or`, `Not`, `Implies`, `Equivalent`, `Xor`, `Nand`, and `Nor`
-    operators using De Morgan's laws and distribution.
+    Handles `And`, `Or`, `Not`, `Implies`, `Equivalent`, `Xor`, `Nand`, and
+    `Nor` operators using De Morgan's laws and distribution.
   - **Boolean operator evaluation**: Added evaluation support for `Xor`, `Nand`,
     and `Nor` operators with `True`/`False` arguments:
     ```typescript
@@ -245,8 +543,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
     - `Xor(a, b, c, ...)` returns true when an odd number of arguments are true
     - `Nand(a, b, c, ...)` returns the negation of `And(a, b, c, ...)`
     - `Nor(a, b, c, ...)` returns the negation of `Or(a, b, c, ...)`
-  - **Satisfiability checking**: New `IsSatisfiable` function checks if a boolean
-    expression can be made true with some assignment of variables:
+  - **Satisfiability checking**: New `IsSatisfiable` function checks if a
+    boolean expression can be made true with some assignment of variables:
     ```typescript
     ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate()  // False
     ce.box(['IsSatisfiable', ['Or', 'A', 'B']]).evaluate()            // True
@@ -274,7 +572,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
     // Returns ["ForAll", "x", ["Predicate", "P", "x"]]
     ```
     Outside quantifier scopes, `P(x)` is still parsed as `["P", "x"]` to
-    maintain backward compatibility with function definitions like `Q(x) := ...`.
+    maintain backward compatibility with function definitions like
+    `Q(x) := ...`.
   - **`D(f, x)` no longer maps to derivative**: The LaTeX notation `D(f, x)` is
     not standard mathematical notation for derivatives and previously caused
     confusion with the `D` derivative function in MathJSON. Now `D(f, x)` in
@@ -284,9 +583,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - **`N(x)` no longer maps to numeric evaluation**: Similarly, `N(x)` in LaTeX
     is CAS-specific notation, not standard math notation. Now `N(x)` parses as
     `["Predicate", "N", "x"]` instead of the numeric evaluation function. This
-    allows `N` to be used as a variable (e.g., "for all N in Naturals"). Use
-    the `.N()` method for numeric evaluation, or construct it directly in
-    MathJSON: `["N", expr]`.
+    allows `N` to be used as a variable (e.g., "for all N in Naturals"). Use the
+    `.N()` method for numeric evaluation, or construct it directly in MathJSON:
+    `["N", expr]`.
 
 - **Polynomial Simplification**: The `simplify()` function now automatically
   cancels common polynomial factors in univariate rational expressions. For
@@ -298,30 +597,44 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **Sum/Product Simplification**: Added simplification rules for `Sum` and
   `Product` expressions with symbolic bounds:
   - Constant body: `\sum_{n=1}^{b}(x)` simplifies to `b * x`
-  - Triangular numbers (general bounds): `\sum_{n=a}^{b}(n)` simplifies to `(b(b+1) - a(a-1))/2`
+  - Triangular numbers (general bounds): `\sum_{n=a}^{b}(n)` simplifies to
+    `(b(b+1) - a(a-1))/2`
   - Sum of squares: `\sum_{n=1}^{b}(n^2)` simplifies to `b(b+1)(2b+1)/6`
   - Sum of cubes: `\sum_{n=1}^{b}(n^3)` simplifies to `[b(b+1)/2]^2`
   - Geometric series: `\sum_{n=0}^{b}(r^n)` simplifies to `(1-r^(b+1))/(1-r)`
-  - Alternating unit series: `\sum_{n=0}^{b}((-1)^n)` simplifies to `(1+(-1)^b)/2`
-  - Alternating linear series: `\sum_{n=0}^{b}((-1)^n * n)` simplifies to `(-1)^b * floor((b+1)/2)`
-  - Arithmetic progression: `\sum_{n=0}^{b}(a + d*n)` simplifies to `(b+1)(a + db/2)`
+  - Alternating unit series: `\sum_{n=0}^{b}((-1)^n)` simplifies to
+    `(1+(-1)^b)/2`
+  - Alternating linear series: `\sum_{n=0}^{b}((-1)^n * n)` simplifies to
+    `(-1)^b * floor((b+1)/2)`
+  - Arithmetic progression: `\sum_{n=0}^{b}(a + d*n)` simplifies to
+    `(b+1)(a + db/2)`
   - Sum of binomial coefficients: `\sum_{k=0}^{n}C(n,k)` simplifies to `2^n`
-  - Alternating binomial sum: `\sum_{k=0}^{n}((-1)^k * C(n,k))` simplifies to `0`
-  - Weighted binomial sum: `\sum_{k=0}^{n}(k * C(n,k))` simplifies to `n * 2^(n-1)`
-  - Partial fractions (telescoping): `\sum_{k=1}^{n}(1/(k(k+1)))` simplifies to `n/(n+1)`
-  - Partial fractions (telescoping): `\sum_{k=2}^{n}(1/(k(k-1)))` simplifies to `(n-1)/n`
-  - Weighted squared binomial sum: `\sum_{k=0}^{n}(k^2 * C(n,k))` simplifies to `n(n+1) * 2^(n-2)`
-  - Weighted cubed binomial sum: `\sum_{k=0}^{n}(k^3 * C(n,k))` simplifies to `n²(n+3) * 2^(n-3)`
-  - Alternating weighted binomial sum: `\sum_{k=0}^{n}((-1)^k * k * C(n,k))` simplifies to `0` (n ≥ 2)
+  - Alternating binomial sum: `\sum_{k=0}^{n}((-1)^k * C(n,k))` simplifies to
+    `0`
+  - Weighted binomial sum: `\sum_{k=0}^{n}(k * C(n,k))` simplifies to
+    `n * 2^(n-1)`
+  - Partial fractions (telescoping): `\sum_{k=1}^{n}(1/(k(k+1)))` simplifies to
+    `n/(n+1)`
+  - Partial fractions (telescoping): `\sum_{k=2}^{n}(1/(k(k-1)))` simplifies to
+    `(n-1)/n`
+  - Weighted squared binomial sum: `\sum_{k=0}^{n}(k^2 * C(n,k))` simplifies to
+    `n(n+1) * 2^(n-2)`
+  - Weighted cubed binomial sum: `\sum_{k=0}^{n}(k^3 * C(n,k))` simplifies to
+    `n²(n+3) * 2^(n-3)`
+  - Alternating weighted binomial sum: `\sum_{k=0}^{n}((-1)^k * k * C(n,k))`
+    simplifies to `0` (n ≥ 2)
   - Sum of binomial squares: `\sum_{k=0}^{n}(C(n,k)^2)` simplifies to `C(2n, n)`
-  - Sum of consecutive products: `\sum_{k=1}^{n}(k(k+1))` simplifies to `n(n+1)(n+2)/3`
-  - Arithmetic progression (general bounds): `\sum_{n=m}^{b}(a + d*n)` simplifies to `(b-m+1)(a + d(m+b)/2)`
+  - Sum of consecutive products: `\sum_{k=1}^{n}(k(k+1))` simplifies to
+    `n(n+1)(n+2)/3`
+  - Arithmetic progression (general bounds): `\sum_{n=m}^{b}(a + d*n)`
+    simplifies to `(b-m+1)(a + d(m+b)/2)`
   - Product of constant: `\prod_{n=1}^{b}(x)` simplifies to `x^b`
   - Factorial: `\prod_{n=1}^{b}(n)` simplifies to `b!`
   - Shifted factorial: `\prod_{n=1}^{b}(n+c)` simplifies to `(b+c)!/c!`
   - Odd double factorial: `\prod_{n=1}^{b}(2n-1)` simplifies to `(2b-1)!!`
   - Even double factorial: `\prod_{n=1}^{b}(2n)` simplifies to `2^b * b!`
-  - Rising factorial (Pochhammer): `\prod_{k=0}^{n-1}(x+k)` simplifies to `(x)_n`
+  - Rising factorial (Pochhammer): `\prod_{k=0}^{n-1}(x+k)` simplifies to
+    `(x)_n`
   - Falling factorial: `\prod_{k=0}^{n-1}(x-k)` simplifies to `x!/(x-n)!`
   - Telescoping product: `\prod_{k=1}^{n}((k+1)/k)` simplifies to `n+1`
   - Wallis-like product: `\prod_{k=2}^{n}(1 - 1/k^2)` simplifies to `(n+1)/(2n)`
@@ -333,11 +646,11 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - Edge cases: empty ranges (upper < lower) return identity elements (0 for
     Sum, 1 for Product), and single-iteration ranges substitute the bound value
 
-- **([#257](https://github.com/cortex-js/compute-engine/issues/257))
-  LaTeX Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
-  Previously `\gcd\left(24,37\right)` would parse as `["Tuple", "GCD", ["Tuple", 24, 37]]`
-  instead of the expected `["GCD", 24, 37]`. The `\operatorname{gcd}` form was
-  unaffected.
+- **([#257](https://github.com/cortex-js/compute-engine/issues/257)) LaTeX
+  Parsing**: Fixed `\gcd` command not parsing function arguments correctly.
+  Previously `\gcd\left(24,37\right)` would parse as
+  `["Tuple", "GCD", ["Tuple", 24, 37]]` instead of the expected
+  `["GCD", 24, 37]`. The `\operatorname{gcd}` form was unaffected.
 
 ## 0.31.0 _2026-01-27_
 

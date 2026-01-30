@@ -395,10 +395,29 @@ Returns the transpose of the matrix.
 // ➔ ["List", ["List", 1, 4], ["List", 2, 5], ["List", 3, 6]]
 ```
 
+<Signature name="Transpose">_tensor_</Signature>
+
+For tensors with rank > 2, swaps the last two axes by default (batch transpose).
+This is useful for transposing each matrix "slice" in a batch of matrices.
+
+```json example
+// 2×2×2 tensor (two 2×2 matrices)
+["Transpose", ["List", ["List", ["List", 1, 2], ["List", 3, 4]],
+                       ["List", ["List", 5, 6], ["List", 7, 8]]]]
+// ➔ [[[1,3],[2,4]],[[5,7],[6,8]]] (each matrix transposed)
+```
+
 <Signature name="Transpose">_tensor_, _axis-1_, _axis-2_</Signature>
 
 Swap the two specified axes of the tensor. Note that axis
 indexes start at 1.
+
+```json example
+// Swap axes 1 and 2 of a rank-3 tensor
+["Transpose", ["List", ["List", ["List", 1, 2], ["List", 3, 4]],
+                       ["List", ["List", 5, 6], ["List", 7, 8]]], 1, 2]
+// Rearranges the tensor by swapping the first two axes
+```
 
 </FunctionDefinition>
 
@@ -413,7 +432,7 @@ indexes start at 1.
 <Latex value="A^\star"/>
 
 Returns the [conjugate transpose](https://en.wikipedia.org/wiki/Conjugate_transpose) of the matrix, that is
-the transpose of the matrix with all its (complex) elements conjugated. 
+the transpose of the matrix with all its (complex) elements conjugated.
 Also known as the Hermitian transpose.
 
 ```json example
@@ -421,9 +440,17 @@ Also known as the Hermitian transpose.
 // ➔ ["List", ["List", 1, 4], ["List", 2, 5], ["List", 3, 6]]
 ```
 
-<Signature name="ConjugateTranspose">_matrix_, _axis-1_, _axis-2_</Signature>
+<Signature name="ConjugateTranspose">_tensor_</Signature>
 
-Swap the two specified axes of the _matrix_. Note that axis
+For tensors with rank > 2, swaps the last two axes by default (batch conjugate transpose)
+and conjugates all elements. This is useful for computing the Hermitian adjoint of each
+matrix "slice" in a batch.
+
+For vectors (rank 1), returns the element-wise conjugate without transposition.
+
+<Signature name="ConjugateTranspose">_tensor_, _axis-1_, _axis-2_</Signature>
+
+Swap the two specified axes of the _tensor_. Note that axis
 indexes start at 1. In addition, all the (complex) elements
 of the tensor are conjugated.
 
@@ -516,6 +543,73 @@ vectors and 2D matrices.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### IdentityMatrix
+</nav>
+<FunctionDefinition name="IdentityMatrix">
+
+<Signature name="IdentityMatrix">_n_</Signature>
+
+Creates an n×n [identity matrix](https://en.wikipedia.org/wiki/Identity_matrix),
+a square matrix with ones on the main diagonal and zeros elsewhere.
+
+```json example
+["IdentityMatrix", 3]
+// ➔ ["List", ["List", 1, 0, 0], ["List", 0, 1, 0], ["List", 0, 0, 1]]
+
+["IdentityMatrix", 2]
+// ➔ ["List", ["List", 1, 0], ["List", 0, 1]]
+```
+
+The argument _n_ must be a positive integer. If not, an `expected-positive-integer`
+error is returned.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ZeroMatrix
+</nav>
+<FunctionDefinition name="ZeroMatrix">
+
+<Signature name="ZeroMatrix">_m_, _n?_</Signature>
+
+Creates an m×n matrix filled with zeros. If _n_ is omitted, creates a square
+m×m matrix.
+
+```json example
+["ZeroMatrix", 3]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0], ["List", 0, 0, 0]]
+
+["ZeroMatrix", 2, 4]
+// ➔ ["List", ["List", 0, 0, 0, 0], ["List", 0, 0, 0, 0]]
+```
+
+Both _m_ and _n_ must be positive integers.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### OnesMatrix
+</nav>
+<FunctionDefinition name="OnesMatrix">
+
+<Signature name="OnesMatrix">_m_, _n?_</Signature>
+
+Creates an m×n matrix filled with ones. If _n_ is omitted, creates a square
+m×m matrix.
+
+```json example
+["OnesMatrix", 3]
+// ➔ ["List", ["List", 1, 1, 1], ["List", 1, 1, 1], ["List", 1, 1, 1]]
+
+["OnesMatrix", 2, 3]
+// ➔ ["List", ["List", 1, 1, 1], ["List", 1, 1, 1]]
+```
+
+Both _m_ and _n_ must be positive integers.
+
+</FunctionDefinition>
+
 ## Calculating with Matrices
 
 
@@ -588,8 +682,6 @@ the matrix, the sum of the elements on the diagonal of the matrix. The trace
 is only defined for square matrices. The trace is also the sum of the
 eigenvalues of the matrix.
 
-For vectors or tensors (rank > 2), an `expected-square-matrix` error is returned.
-
 ```json example
 ["Trace", ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ 5
@@ -598,9 +690,373 @@ For vectors or tensors (rank > 2), an `expected-square-matrix` error is returned
 **Scalar**: The trace of a scalar (thought of as a 1×1 matrix) is the
 scalar itself.
 
+**Vector**: For vectors (rank 1), an `expected-matrix-or-tensor` error is returned.
+
+<Signature name="Trace">_tensor_</Signature>
+
+For tensors with rank > 2 (batch trace), returns a tensor of traces computed over
+the last two axes. The last two axes must have the same size (square slices).
+
+```json example
+// 2×2×2 tensor (two 2×2 matrices)
+["Trace", ["List", ["List", ["List", 1, 2], ["List", 3, 4]],
+                   ["List", ["List", 5, 6], ["List", 7, 8]]]]
+// ➔ [5, 13] (trace of first matrix: 1+4=5, trace of second: 5+8=13)
+```
+
+<Signature name="Trace">_tensor_, _axis-1_, _axis-2_</Signature>
+
+Compute the trace over the specified axes. Both axes must have the same size.
+Note that axis indexes start at 1.
+
+```json example
+// Trace over axes 1 and 2 instead of last two axes
+["Trace", ["List", ["List", ["List", 1, 2], ["List", 3, 4]],
+                   ["List", ["List", 5, 6], ["List", 7, 8]]], 1, 2]
+// Returns a vector with traces computed over the first two axes
+```
+
 ```json example
 ["Trace", 5]
 // ➔ 5
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### MatrixMultiply
+</nav>
+<FunctionDefinition name="MatrixMultiply">
+
+<Signature name="MatrixMultiply">_A_, _B_</Signature>
+
+<Latex value="\mathbf{A} \cdot \mathbf{B}"/>
+
+Returns the [matrix product](https://en.wikipedia.org/wiki/Matrix_multiplication)
+of two matrices, vectors, or a combination thereof.
+
+**Matrix × Matrix**: If _A_ is an m×n matrix and _B_ is an n×p matrix, the result
+is an m×p matrix where each element (i,j) is the dot product of row i of _A_
+and column j of _B_.
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 19, 22], ["List", 43, 50]]
+```
+
+**Matrix × Vector**: If _A_ is an m×n matrix and _B_ is an n-element vector
+(treated as a column vector), the result is an m-element vector.
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]],
+  ["List", 1, 2, 3]]
+// ➔ ["List", 14, 32]
+```
+
+**Vector × Matrix**: If _A_ is an m-element vector (treated as a row vector)
+and _B_ is an m×n matrix, the result is an n-element vector.
+
+```json example
+["MatrixMultiply",
+  ["List", 1, 2],
+  ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]
+// ➔ ["List", 9, 12, 15]
+```
+
+**Vector × Vector (Dot Product)**: If both _A_ and _B_ are vectors of the same
+length, the result is their dot product (a scalar).
+
+```json example
+["MatrixMultiply",
+  ["List", 1, 2, 3],
+  ["List", 4, 5, 6]]
+// ➔ 32
+```
+
+**Dimension Validation**: The inner dimensions must match. For matrix × matrix,
+the number of columns in _A_ must equal the number of rows in _B_. If dimensions
+are incompatible, an `incompatible-dimensions` error is returned.
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", 1, 2, 3]]
+// ➔ Error("incompatible-dimensions", "2 vs 3")
+```
+
+**Symbolic Operations**: `MatrixMultiply` works with symbolic matrices:
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", "a", "b"], ["List", "c", "d"]],
+  ["List", ["List", "e", "f"], ["List", "g", "h"]]]
+// ➔ ["List", ["List", ["Add", ["Multiply", "a", "e"], ["Multiply", "b", "g"]], ...], ...]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Matrix Addition (Add)
+</nav>
+<FunctionDefinition name="Add">
+
+<Signature name="Add">_A_, _B_, ...</Signature>
+
+The `Add` function supports element-wise addition of matrices and vectors,
+as well as scalar broadcasting.
+
+**Matrix + Matrix**: If all matrix operands have the same shape, elements are
+added position by position.
+
+```json example
+["Add",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 6, 8], ["List", 10, 12]]
+```
+
+**Scalar + Matrix**: A scalar is broadcast to all elements of the matrix.
+
+```json example
+["Add", 10, ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List", ["List", 11, 12], ["List", 13, 14]]
+```
+
+**Vector + Vector**: Vectors of the same length are added element-wise.
+
+```json example
+["Add", ["List", 1, 2, 3], ["List", 4, 5, 6]]
+// ➔ ["List", 5, 7, 9]
+```
+
+**Scalar + Vector**: A scalar is broadcast to all elements of the vector.
+
+```json example
+["Add", ["List", 7, 11], 3]
+// ➔ ["List", 10, 14]
+```
+
+**Multiple Operands**: Multiple matrices and scalars can be combined in a
+single `Add` operation.
+
+```json example
+["Add",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  10,
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 16, 18], ["List", 20, 22]]
+```
+
+**Symbolic Operations**: `Add` works with symbolic matrices:
+
+```json example
+["Add",
+  ["List", ["List", "a", "b"], ["List", "c", "d"]],
+  ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List", ["List", ["Add", "a", 1], ["Add", "b", 2]], ["List", ["Add", "c", 3], ["Add", "d", 4]]]
+```
+
+**Dimension Validation**: All matrices must have the same shape. If shapes
+are incompatible, an `incompatible-dimensions` error is returned.
+
+```json example
+["Add",
+  ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]],
+  ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ Error("incompatible-dimensions", "2x2 vs 2x3")
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Norm
+</nav>
+<FunctionDefinition name="Norm">
+
+<Signature name="Norm">_value_</Signature>
+
+<Signature name="Norm">_value_, _p_</Signature>
+
+<Latex value="\| \mathbf{v} \|"/>
+
+Returns the [norm](https://en.wikipedia.org/wiki/Norm_(mathematics)) of a vector
+or matrix.
+
+**Scalar**: The norm of a scalar is its absolute value.
+
+```json example
+["Norm", -5]
+// ➔ 5
+```
+
+**Vector Norms**:
+
+The default is the L2 (Euclidean) norm: sqrt(sum of |xi|^2)
+
+```json example
+["Norm", ["List", 3, 4]]
+// ➔ 5
+```
+
+The second argument specifies the norm type:
+
+- **L1 norm** (_p_ = 1): Sum of absolute values: sum of |xi|
+
+```json example
+["Norm", ["List", 3, -4], 1]
+// ➔ 7
+```
+
+- **L2 norm** (_p_ = 2, default): Euclidean norm: sqrt(sum of |xi|^2)
+
+```json example
+["Norm", ["List", 3, 4], 2]
+// ➔ 5
+```
+
+- **L-infinity norm** (_p_ = `"Infinity"`): Maximum absolute value: max(|xi|)
+
+```json example
+["Norm", ["List", 3, -4], "Infinity"]
+// ➔ 4
+```
+
+- **General Lp norm**: (sum of |xi|^p)^(1/p)
+
+```json example
+["Norm", ["List", 3, 4], 3]
+// ➔ 4.498 (the cube root of 91)
+```
+
+**Matrix Norms**:
+
+For matrices, the default is the Frobenius norm: sqrt(sum of |aij|^2)
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ sqrt(30) ≈ 5.477
+```
+
+- **Frobenius norm** (_p_ = 2 or `"Frobenius"`): Square root of sum of squared elements
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "Frobenius"]
+// ➔ sqrt(30) ≈ 5.477
+```
+
+- **L1 norm** (_p_ = 1): Maximum column sum of absolute values
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], 1]
+// ➔ 6 (max of column sums: 4 and 6)
+```
+
+- **L-infinity norm** (_p_ = `"Infinity"`): Maximum row sum of absolute values
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "Infinity"]
+// ➔ 7 (max of row sums: 3 and 7)
+```
+
+</FunctionDefinition>
+
+
+## Eigenvalues and Eigenvectors
+
+<nav className="hidden">
+### Eigenvalues
+</nav>
+<FunctionDefinition name="Eigenvalues">
+
+<Signature name="Eigenvalues">_matrix_</Signature>
+
+Returns the [eigenvalues](https://en.wikipedia.org/wiki/Eigenvalue) of a square matrix as a list.
+
+Eigenvalues are the scalars λ such that Av = λv for some non-zero vector v (the eigenvector).
+
+The matrix must be square. For non-square matrices, an `expected-square-matrix` error is returned.
+
+```json example
+["Eigenvalues", ["List", ["List", 2, 0], ["List", 0, 3]]]
+// ➔ ["List", 2, 3]
+
+["Eigenvalues", ["List", ["List", 4, 2], ["List", 1, 3]]]
+// ➔ ["List", 5, 2]  (roots of characteristic polynomial)
+```
+
+**Computation Methods**:
+- **1×1 matrices**: Returns the single element
+- **Diagonal/triangular matrices**: Returns the diagonal elements (fast path)
+- **2×2 matrices**: Uses the quadratic formula on the characteristic polynomial
+- **3×3 matrices**: Uses Cardano's formula for the cubic characteristic polynomial
+- **Larger matrices**: Uses the QR algorithm for numerical computation
+
+**Symbolic matrices**: For symbolic matrices, the eigenvalue computation may be returned unevaluated if closed-form solutions cannot be determined.
+
+```json example
+["Eigenvalues", ["List", ["List", "a", 0], ["List", 0, "b"]]]
+// ➔ ["List", "a", "b"]  (diagonal matrix)
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Eigenvectors
+</nav>
+<FunctionDefinition name="Eigenvectors">
+
+<Signature name="Eigenvectors">_matrix_</Signature>
+
+Returns the [eigenvectors](https://en.wikipedia.org/wiki/Eigenvector) of a square matrix as a list of vectors.
+
+An eigenvector v is a non-zero vector such that Av = λv for some eigenvalue λ.
+
+The eigenvectors are returned in the same order as the eigenvalues from `Eigenvalues`.
+Each eigenvector is normalized.
+
+```json example
+["Eigenvectors", ["List", ["List", 2, 0], ["List", 0, 3]]]
+// ➔ ["List", ["List", 1, 0], ["List", 0, 1]]
+
+["Eigenvectors", ["List", ["List", 4, 2], ["List", 1, 3]]]
+// ➔ ["List", ["List", 0.894, 0.447], ["List", -0.707, 0.707]]
+```
+
+**Computation**: For each eigenvalue λ, the eigenvector is found by solving the null space of (A - λI), where I is the identity matrix.
+
+**Numerical precision**: For matrices with repeated or nearly-repeated eigenvalues, eigenvector computation may be less numerically stable.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Eigen
+</nav>
+<FunctionDefinition name="Eigen">
+
+<Signature name="Eigen">_matrix_</Signature>
+
+Returns both the eigenvalues and eigenvectors of a square matrix as a dictionary with keys `Eigenvalues` and `Eigenvectors`.
+
+This is more efficient than calling `Eigenvalues` and `Eigenvectors` separately when both are needed.
+
+```json example
+["Eigen", ["List", ["List", 2, 0], ["List", 0, 3]]]
+// ➔ ["Dictionary",
+//     ["KeyValuePair", "Eigenvalues", ["List", 2, 3]],
+//     ["KeyValuePair", "Eigenvectors", ["List", ["List", 1, 0], ["List", 0, 1]]]]
+```
+
+**Usage**: Access the components using dictionary operations:
+
+```json example
+["At", ["Eigen", matrix], "Eigenvalues"]
+// Returns just the eigenvalues
+
+["At", ["Eigen", matrix], "Eigenvectors"]
+// Returns just the eigenvectors
 ```
 
 </FunctionDefinition>

@@ -7,6 +7,155 @@ This guide covers working with vectors, matrices, and tensors in the Compute
 Engine. You'll learn how to create, manipulate, and perform operations on
 multidimensional arrays.
 
+## Quick Start: Basic Operations
+
+If you're just getting started, here are the most common operations:
+
+### Vector Addition
+
+Add vectors element-wise using LaTeX parentheses notation:
+
+```js example
+const ce = new ComputeEngine();
+
+// Parse and evaluate vector addition
+ce.parse('(1,2,3) + (3,5,6)').evaluate();
+// → [4,7,9]
+
+// Or using the Add function directly
+ce.box(['Add', ['List', 1, 2, 3], ['List', 3, 5, 6]]).evaluate();
+// → [5,7,9]
+```
+
+### Matrix Addition
+
+Matrices are added element-wise:
+
+```js example
+const m1 = ce.box(['List', ['List', 1, 2], ['List', 3, 4]]);
+const m2 = ce.box(['List', ['List', 5, 6], ['List', 7, 8]]);
+m1.add(m2).evaluate();
+// → [[6,8],[10,12]]
+```
+
+### Scalar Multiplication
+
+Multiply a scalar with a vector or matrix:
+
+```js example
+ce.parse('2(1,2,3)').evaluate();
+// → [2,4,6]
+```
+
+### Element-wise vs Matrix Multiplication
+
+**Important distinction:**
+- Use `Multiply` or `*` for **element-wise** multiplication (Hadamard product)
+- Use `MatrixMultiply` for **linear algebraic** matrix multiplication
+
+```js example
+// Element-wise multiplication
+ce.box(['Multiply',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]).evaluate();
+// → [[5,12],[21,32]]  (each element multiplied independently)
+
+// Matrix multiplication (linear algebraic product)
+ce.box(['MatrixMultiply',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]).evaluate();
+// → [[19,22],[43,50]]  (row-column dot products)
+```
+
+For detailed information on matrix multiplication, see the [Matrix Multiplication](#matrix-multiplication) section below.
+
+## LaTeX Matrix Notation
+
+The Compute Engine supports standard LaTeX matrix environments. Here's a quick
+reference:
+
+### Matrix Environments
+
+| LaTeX Environment | Delimiters | Example |
+|-------------------|------------|---------|
+| `matrix` | None | $\begin{matrix} a & b \\ c & d \end{matrix}$ |
+| `pmatrix` | Parentheses ( ) | $\begin{pmatrix} a & b \\ c & d \end{pmatrix}$ |
+| `bmatrix` | Brackets [ ] | $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$ |
+| `vmatrix` | Vertical bars \| \| | $\begin{vmatrix} a & b \\ c & d \end{vmatrix}$ (determinant) |
+| `Vmatrix` | Double bars ‖ ‖ | $\begin{Vmatrix} a & b \\ c & d \end{Vmatrix}$ (norm) |
+
+```js example
+const ce = new ComputeEngine();
+
+// All these create the same 2×2 matrix internally
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
+ce.parse('\\begin{bmatrix} 1 & 2 \\\\ 3 & 4 \\end{bmatrix}');
+ce.parse('\\begin{matrix} 1 & 2 \\\\ 3 & 4 \\end{matrix}');
+// → ["List", ["List", 1, 2], ["List", 3, 4]]
+
+// vmatrix is parsed as a determinant
+ce.parse('\\begin{vmatrix} 1 & 2 \\\\ 3 & 4 \\end{vmatrix}');
+// → ["Determinant", ["List", ["List", 1, 2], ["List", 3, 4]]]
+```
+
+### LaTeX Syntax Rules
+
+- Use `&` to separate columns
+- Use `\\` to separate rows
+- Spaces are optional but improve readability
+
+```latex
+% Row vector (1×3)
+\begin{bmatrix} 1 & 2 & 3 \end{bmatrix}
+
+% Column vector (3×1)
+\begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix}
+
+% 2×3 matrix
+\begin{bmatrix}
+  1 & 2 & 3 \\
+  4 & 5 & 6
+\end{bmatrix}
+
+% Symbolic matrix
+\begin{pmatrix}
+  a & b \\
+  c & d
+\end{pmatrix}
+```
+
+### Common Operations in LaTeX
+
+```js example
+// Transpose using superscript T
+ce.parse('A^T');
+// → ["Transpose", "A"]
+
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^T');
+// → ["Transpose", ["List", ["List", 1, 2], ["List", 3, 4]]]
+
+// Determinant using vertical bars
+ce.parse('\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}');
+// → ["Determinant", ["List", ["List", "a", "b"], ["List", "c", "d"]]]
+
+// Determinant using \det command
+ce.parse('\\det\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
+// → ["Determinant", ["List", ["List", 1, 2], ["List", 3, 4]]]
+
+// Inverse using superscript -1
+ce.parse('A^{-1}');
+// → ["Inverse", "A"]
+
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^{-1}');
+// → ["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
+
+// Trace using \operatorname
+ce.parse('\\operatorname{tr}\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
+// → ["Trace", ["List", ["List", 1, 2], ["List", 3, 4]]]
+```
+
 ## Creating Vectors and Matrices
 
 ### Vectors
@@ -158,6 +307,16 @@ ce.box(['Transpose', 42]).evaluate();
 // → 42
 ```
 
+**LaTeX:** Use superscript `T` for transpose:
+
+```js example
+ce.parse('\\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}^T').evaluate();
+// → [[1, 4], [2, 5], [3, 6]]
+
+// Or with a named matrix
+ce.parse('A^T');  // → ["Transpose", "A"]
+```
+
 ### Conjugate Transpose
 
 For complex matrices, `ConjugateTranspose` transposes and conjugates each element:
@@ -168,6 +327,13 @@ ce.box(['ConjugateTranspose', ['List',
   ['List', ['Complex', 5, 6], ['Complex', 7, 8]]
 ]]).evaluate();
 // → [[(1 - 2i), (5 - 6i)], [(3 - 4i), (7 - 8i)]]
+```
+
+**LaTeX:** Use superscript `*`, `†` (dagger), or `H` (Hermitian):
+
+```js example
+ce.parse('A^*');   // → ["ConjugateTranspose", "A"]
+ce.parse('A^\\dagger');  // → ["ConjugateTranspose", "A"]
 ```
 
 ## Working with Diagonals
@@ -217,6 +383,21 @@ ce.box(['Determinant', ['List',
 // → a*d - b*c
 ```
 
+**LaTeX:** Use `vmatrix` environment or `\det` command:
+
+```js example
+// Using vmatrix (vertical bars denote determinant)
+ce.parse('\\begin{vmatrix} 1 & 2 \\\\ 3 & 4 \\end{vmatrix}').evaluate();
+// → -2
+
+// Using \det command
+ce.parse('\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}').evaluate();
+// → a*d - b*c
+
+// Symbolic determinant
+ce.parse('\\det(A)');  // → ["Determinant", "A"]
+```
+
 ### Trace
 
 The trace is the sum of diagonal elements:
@@ -228,6 +409,15 @@ ce.box(['Trace', ['List',
   ['List', 7, 8, 9]
 ]]).evaluate();
 // → 15  (1 + 5 + 9)
+```
+
+**LaTeX:** Use `\operatorname{tr}` or `\mathrm{tr}`:
+
+```js example
+ce.parse('\\operatorname{tr}\\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 9 \\end{pmatrix}').evaluate();
+// → 15
+
+ce.parse('\\operatorname{tr}(A)');  // → ["Trace", "A"]
 ```
 
 ### Inverse
@@ -242,6 +432,315 @@ ce.box(['Inverse', ['List',
 // Inverse of a scalar is its reciprocal
 ce.box(['Inverse', 4]).evaluate();
 // → 0.25
+```
+
+**LaTeX:** Use superscript `-1`:
+
+```js example
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^{-1}').evaluate();
+// → [[-2, 1], [1.5, -0.5]]
+
+ce.parse('A^{-1}');  // → ["Inverse", "A"]
+```
+
+### Norm
+
+The `Norm` function computes various norms for vectors and matrices.
+
+**Vector Norms:**
+
+```js example
+// L2 norm (Euclidean, default): √(|3|² + |4|²) = 5
+ce.box(['Norm', ['List', 3, 4]]).evaluate();
+// → 5
+
+// L1 norm: |3| + |-4| = 7
+ce.box(['Norm', ['List', 3, -4], 1]).evaluate();
+// → 7
+
+// L-infinity norm: max(|3|, |-4|) = 4
+ce.box(['Norm', ['List', 3, -4], 'Infinity']).evaluate();
+// → 4
+
+// General Lp norm: (|3|³ + |4|³)^(1/3)
+ce.box(['Norm', ['List', 3, 4], 3]).evaluate();
+// → ≈4.498
+```
+
+**Matrix Norms:**
+
+```js example
+// Frobenius norm (default): √(1² + 2² + 3² + 4²) = √30
+ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
+// → √30 ≈ 5.477
+
+// L1 norm: max column sum = max(4, 6) = 6
+ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 1]).evaluate();
+// → 6
+
+// L-infinity norm: max row sum = max(3, 7) = 7
+ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 'Infinity']).evaluate();
+// → 7
+```
+
+**Scalar:** The norm of a scalar is its absolute value.
+
+```js example
+ce.box(['Norm', -5]).evaluate();
+// → 5
+```
+
+## Eigenvalues and Eigenvectors
+
+Eigenvalues and eigenvectors are fundamental concepts in linear algebra, used
+in applications ranging from principal component analysis to solving differential
+equations.
+
+### Computing Eigenvalues
+
+The `Eigenvalues` function returns the eigenvalues of a square matrix:
+
+```js example
+// Diagonal matrix: eigenvalues are the diagonal elements
+ce.box(['Eigenvalues', ['List',
+  ['List', 2, 0],
+  ['List', 0, 3]
+]]).evaluate();
+// → [2, 3]
+
+// General 2×2 matrix
+ce.box(['Eigenvalues', ['List',
+  ['List', 4, 2],
+  ['List', 1, 3]
+]]).evaluate();
+// → [5, 2]
+
+// 3×3 matrix
+ce.box(['Eigenvalues', ['List',
+  ['List', 1, 2, 0],
+  ['List', 0, 3, 0],
+  ['List', 2, -4, 2]
+]]).evaluate();
+// → [3, 2, 1]
+```
+
+### Computing Eigenvectors
+
+The `Eigenvectors` function returns the eigenvectors corresponding to each
+eigenvalue:
+
+```js example
+// Eigenvectors of a diagonal matrix are the standard basis vectors
+ce.box(['Eigenvectors', ['List',
+  ['List', 2, 0],
+  ['List', 0, 3]
+]]).evaluate();
+// → [[1, 0], [0, 1]]
+
+// General matrix eigenvectors
+ce.box(['Eigenvectors', ['List',
+  ['List', 4, 2],
+  ['List', 1, 3]
+]]).evaluate();
+// → [[0.894, 0.447], [-0.707, 0.707]]
+```
+
+### Getting Both at Once
+
+Use `Eigen` to compute both eigenvalues and eigenvectors in a single operation:
+
+```js example
+const result = ce.box(['Eigen', ['List',
+  ['List', 2, 0],
+  ['List', 0, 3]
+]]).evaluate();
+// → Dictionary with 'Eigenvalues' and 'Eigenvectors' keys
+
+// Access the components
+ce.box(['At', result, 'Eigenvalues']).evaluate();
+// → [2, 3]
+
+ce.box(['At', result, 'Eigenvectors']).evaluate();
+// → [[1, 0], [0, 1]]
+```
+
+### Practical Example: Diagonalization
+
+A matrix A can be diagonalized as A = PDP⁻¹ where D is a diagonal matrix of
+eigenvalues and P is the matrix of eigenvectors:
+
+```js example
+const A = ['List',
+  ['List', 4, 2],
+  ['List', 1, 3]
+];
+
+// Get eigenvalues and eigenvectors
+const eigenvalues = ce.box(['Eigenvalues', A]).evaluate();
+// → [5, 2]
+
+const eigenvectors = ce.box(['Eigenvectors', A]).evaluate();
+// → [[0.894, 0.447], [-0.707, 0.707]]
+
+// The eigenvalues form the diagonal of D
+const D = ce.box(['Diagonal', eigenvalues]).evaluate();
+// → [[5, 0], [0, 2]]
+```
+
+## Matrix Multiplication
+
+Use `MatrixMultiply` to perform matrix multiplication. The function supports
+multiple combinations of operands:
+
+### Matrix × Matrix
+
+```js example
+// 2×3 matrix times 3×2 matrix → 2×2 matrix
+ce.box(['MatrixMultiply',
+  ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
+  ['List', ['List', 7, 8], ['List', 9, 10], ['List', 11, 12]]
+]).evaluate();
+// → [[58, 64], [139, 154]]
+
+// Symbolic matrix multiplication
+ce.box(['MatrixMultiply',
+  ['List', ['List', 'a', 'b'], ['List', 'c', 'd']],
+  ['List', ['List', 'e', 'f'], ['List', 'g', 'h']]
+]).evaluate();
+// → [[a*e + b*g, a*f + b*h], [c*e + d*g, c*f + d*h]]
+```
+
+### Matrix × Vector
+
+When multiplying a matrix by a vector, the vector is treated as a column vector:
+
+```js example
+// 2×3 matrix times 3-vector → 2-vector
+ce.box(['MatrixMultiply',
+  ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
+  ['List', 1, 2, 3]
+]).evaluate();
+// → [14, 32]
+```
+
+### Vector × Matrix
+
+When a vector multiplies a matrix, it's treated as a row vector:
+
+```js example
+// 2-vector times 2×3 matrix → 3-vector
+ce.box(['MatrixMultiply',
+  ['List', 1, 2],
+  ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]]
+]).evaluate();
+// → [9, 12, 15]
+```
+
+### Dot Product (Vector × Vector)
+
+Multiplying two vectors of the same length computes their dot product:
+
+```js example
+ce.box(['MatrixMultiply',
+  ['List', 1, 2, 3],
+  ['List', 4, 5, 6]
+]).evaluate();
+// → 32  (1*4 + 2*5 + 3*6)
+```
+
+### Dimension Validation
+
+`MatrixMultiply` validates that dimensions are compatible and returns an error
+if they don't match:
+
+```js example
+// 2×2 matrix times 3-vector: incompatible (2 ≠ 3)
+ce.box(['MatrixMultiply',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', 1, 2, 3]
+]).evaluate();
+// → Error("incompatible-dimensions", "2 vs 3")
+```
+
+### LaTeX Serialization
+
+`MatrixMultiply` expressions serialize using the `\cdot` notation:
+
+```js example
+const A = ['Matrix', ['List', ['List', 1, 2], ['List', 3, 4]]];
+const B = ['Matrix', ['List', ['List', 5, 6], ['List', 7, 8]]];
+ce.box(['MatrixMultiply', A, B]).latex;
+// → "\begin{pmatrix}1 & 2\\ 3 & 4\end{pmatrix} \cdot \begin{pmatrix}5 & 6\\ 7 & 8\end{pmatrix}"
+```
+
+## Matrix Addition and Scalar Broadcasting
+
+The `Add` function supports element-wise addition of matrices and vectors,
+as well as scalar broadcasting.
+
+### Matrix + Matrix
+
+Add two matrices of the same shape element-wise:
+
+```js example
+// 2×2 matrix + 2×2 matrix
+ce.box(['Add',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]).evaluate();
+// → [[6, 8], [10, 12]]
+
+// Symbolic matrix addition
+ce.box(['Add',
+  ['List', ['List', 'a', 'b'], ['List', 'c', 'd']],
+  ['List', ['List', 1, 2], ['List', 3, 4]]
+]).evaluate();
+// → [[a + 1, b + 2], [c + 3, d + 4]]
+```
+
+### Scalar + Matrix
+
+Add a scalar to every element of a matrix:
+
+```js example
+// Scalar + 2×2 matrix
+ce.box(['Add', 10, ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
+// → [[11, 12], [13, 14]]
+
+// Multiple operands: scalar + matrix + matrix
+ce.box(['Add',
+  ['List', ['List', 1, 2], ['List', 3, 4]],
+  10,
+  ['List', ['List', 5, 6], ['List', 7, 8]]
+]).evaluate();
+// → [[16, 18], [20, 22]]
+```
+
+### Vector Addition
+
+Vectors also support element-wise addition and scalar broadcasting:
+
+```js example
+// Vector + vector
+ce.box(['Add', ['List', 1, 2, 3], ['List', 4, 5, 6]]).evaluate();
+// → [5, 7, 9]
+
+// Scalar + vector
+ce.box(['Add', ['List', 7, 11], 3]).evaluate();
+// → [10, 14]
+```
+
+### Dimension Validation
+
+`Add` validates that all matrices have compatible dimensions:
+
+```js example
+// 2×3 matrix + 2×2 matrix: incompatible shapes
+ce.box(['Add',
+  ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
+  ['List', ['List', 1, 2], ['List', 3, 4]]
+]).evaluate();
+// → Error("incompatible-dimensions", "2x2 vs 2x3")
 ```
 
 ## Accessing Elements
@@ -268,17 +767,29 @@ ce.box(['At', M, -1, -1]).evaluate();
 ### Creating Special Matrices
 
 ```js example
-// Zero matrix (3×3)
-ce.box(['Reshape', 0, ['Tuple', 3, 3]]).evaluate();
-// → [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-
 // Identity matrix (3×3)
-ce.box(['Diagonal', ['List', 1, 1, 1]]).evaluate();
+ce.box(['IdentityMatrix', 3]).evaluate();
 // → [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
 
-// Matrix filled with a value
+// Zero matrix (3×3) - square
+ce.box(['ZeroMatrix', 3]).evaluate();
+// → [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+// Zero matrix (2×4) - rectangular
+ce.box(['ZeroMatrix', 2, 4]).evaluate();
+// → [[0, 0, 0, 0], [0, 0, 0, 0]]
+
+// Ones matrix (2×3)
+ce.box(['OnesMatrix', 2, 3]).evaluate();
+// → [[1, 1, 1], [1, 1, 1]]
+
+// Matrix filled with a specific value using Reshape
 ce.box(['Reshape', 7, ['Tuple', 2, 4]]).evaluate();
 // → [[7, 7, 7, 7], [7, 7, 7, 7]]
+
+// Diagonal matrix from vector
+ce.box(['Diagonal', ['List', 1, 2, 3]]).evaluate();
+// → [[1, 0, 0], [0, 2, 0], [0, 0, 3]]
 ```
 
 ### Matrix Properties
@@ -305,9 +816,12 @@ To solve Ax = b, multiply both sides by A⁻¹:
 const A = ['List', ['List', 1, 2], ['List', 3, 4]];
 const b = ['List', 5, 11];
 
-// x = A⁻¹ * b (conceptually - matrix multiplication not yet implemented)
+// x = A⁻¹ * b
 const A_inv = ce.box(['Inverse', A]).evaluate();
 // → [[-2, 1], [1.5, -0.5]]
+
+const solution = ce.box(['MatrixMultiply', A_inv, b]).evaluate();
+// → [1, 2]
 // Solution: x = 1, y = 2
 ```
 
@@ -344,6 +858,37 @@ ce.box(['Inverse', ['List',
 ]]).evaluate();
 // → Error("expected-square-matrix", "[[1, 2, 3], [4, 5, 6]]")
 ```
+
+## Serializing to LaTeX
+
+After performing computations, you can convert results back to LaTeX for display:
+
+```js example
+const ce = new ComputeEngine();
+
+// Create and evaluate a matrix operation
+const M = ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
+const inv = ce.box(['Inverse', M]).evaluate();
+
+// Convert back to LaTeX
+console.log(inv.latex);
+// → "\begin{pmatrix}-2 & 1\\ \frac{3}{2} & -\frac{1}{2}\end{pmatrix}"
+
+// Transpose example
+const T = ce.box(['Transpose', M]).evaluate();
+console.log(T.latex);
+// → "\begin{pmatrix}1 & 3\\ 2 & 4\end{pmatrix}"
+
+// Determinant (returns a scalar)
+const det = ce.parse('\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}').evaluate();
+console.log(det.latex);
+// → "ad - bc"
+```
+
+### Controlling Matrix Delimiters
+
+By default, matrices serialize with parentheses (`pmatrix`). The delimiter style
+is preserved from the original parse when possible.
 
 ## See Also
 

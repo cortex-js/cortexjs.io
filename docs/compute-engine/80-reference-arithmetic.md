@@ -82,6 +82,83 @@ Evaluate to the sum of `body` for each value in `bounds`.
 // ➔ 65
 ```
 
+<Signature name="Sum" returns="number">_body_: function, ..._bounds_: Element</Signature>
+
+Evaluate to the sum of `body` for each value in an Element-based indexing set.
+
+This form uses `["Element", index, collection]` to specify that the index variable
+iterates over a finite collection (Set, List, or Range).
+
+<Latex flow="column" value="\sum_{n \in \{1,2,3\}} n"/>
+
+```json example
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3]]]
+// ➔ 6
+
+["Sum", ["Power", "n", 2], ["Element", "n", ["Set", 1, 2, 3]]]
+// ➔ 14  (1² + 2² + 3² = 1 + 4 + 9)
+
+["Sum", "n", ["Element", "n", ["Range", 1, 5]]]
+// ➔ 15  (1 + 2 + 3 + 4 + 5)
+```
+
+The indexing set can be:
+- **Set**: `["Set", 1, 2, 3]` - explicit finite set of values
+- **List**: `["List", 1, 2, 3]` - ordered list of values
+- **List (2-element)**: `["List", 1, 5]` - when a List has exactly 2 integer elements,
+  it is treated as a Range. This allows bracket notation like `\sum_{n \in [1,5]} n`
+  to iterate over all integers from 1 to 5 (evaluates to 15, not 6).
+- **Range**: `["Range", 1, 10]` - integer range from 1 to 10
+- **Interval**: `["Interval", 1, 10]` - enumerates integers in the interval.
+  Supports `Open` and `Closed` boundary markers:
+  - `["Interval", 1, 5]` → iterates 1, 2, 3, 4, 5 (closed bounds)
+  - `["Interval", ["Open", 0], 5]` → iterates 1, 2, 3, 4, 5 (excludes 0)
+  - `["Interval", 1, ["Open", 6]]` → iterates 1, 2, 3, 4, 5 (excludes 6)
+
+**Note:** Evaluation requires a finite, enumerable domain with at most 1000 elements.
+Sums over infinite sets (like `\sum_{n \in \mathbb{N}}`) remain symbolic.
+
+#### Multiple Indexing Sets
+
+Multiple Element expressions can be specified for multi-index sums:
+
+<Latex flow="column" value="\sum_{n \in A}\sum_{m \in B} n \cdot m"/>
+
+```json example
+["Sum", ["Multiply", "n", "m"], ["Element", "n", ["Set", 1, 2]], ["Element", "m", ["Set", 3, 4]]]
+// ➔ 21  (1·3 + 1·4 + 2·3 + 2·4)
+```
+
+Mixed indexing sets (Element + Limits) can be used together:
+
+```json example
+["Sum", ["Add", "n", "m"], ["Element", "n", ["Set", 1, 2]], ["Limits", "m", 1, 2]]
+// ➔ 12  (n iterates {1,2}, m iterates 1 to 2)
+```
+
+#### Condition Filtering
+
+A condition can be attached to an Element expression to filter values from the set.
+The condition is the optional 4th operand of the Element expression.
+
+<Latex flow="column" value="\sum_{n \in S, n > 0} n"/>
+
+```json example
+// Sum only positive values from S
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3, -1, -2], ["Greater", "n", 0]]]
+// ➔ 6  (only 1 + 2 + 3)
+
+// Sum values greater than or equal to 2
+["Sum", "n", ["Element", "n", ["Set", 1, 2, 3, 4], ["GreaterEqual", "n", 2]]]
+// ➔ 9  (only 2 + 3 + 4)
+
+// Product of negative values
+["Product", "k", ["Element", "k", ["Set", 1, -2, 3, -4], ["Less", "k", 0]]]
+// ➔ 8  (only (-2) × (-4))
+```
+
+Supported condition operators: `Greater`, `GreaterEqual`, `Less`, `LessEqual`, `NotEqual`.
+
 #### Simplification
 
 When `simplify()` is called on a `Sum` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
@@ -152,6 +229,25 @@ Return the product of `body` for each value in `bounds`.
 ["Product", ["Add", "x", 1], ["Tuple", "x", 1, 10]]
 // ➔ 39916800
 ```
+
+<Signature name="Product" returns="number">_body_: function, ..._bounds_: Element</Signature>
+
+Evaluate to the product of `body` for each value in an Element-based indexing set.
+
+This form uses `["Element", index, collection]` to specify that the index variable
+iterates over a finite collection (Set, List, or Range).
+
+<Latex flow="column" value="\prod_{k \in \{1,2,3,4\}} k"/>
+
+```json example
+["Product", "k", ["Element", "k", ["Set", 1, 2, 3, 4]]]
+// ➔ 24  (4!)
+
+["Product", ["Power", "k", 2], ["Element", "k", ["Set", 1, 2, 3]]]
+// ➔ 36  (1² × 2² × 3² = 1 × 4 × 9)
+```
+
+See the `Sum` documentation above for details on supported collection types.
 
 #### Simplification
 

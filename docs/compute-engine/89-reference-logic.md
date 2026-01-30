@@ -38,13 +38,54 @@ date: Last Modified
 | `Not` | `\operatorname{not} p` | $$ \operatorname{not} p$$ | |
 | `Equivalent` | `p \iff q` | $$ p \iff q$$ | Equivalence |
 | `Equivalent` | `p \Leftrightarrow q` | $$ p \Leftrightarrow q$$ | |
+| `Equivalent` | `p \leftrightarrow q` | $$ p \leftrightarrow q$$ | |
+| `Equivalent` | `p \Longleftrightarrow q` | $$ p \Longleftrightarrow q$$ | |
+| `Equivalent` | `p \longleftrightarrow q` | $$ p \longleftrightarrow q$$ | |
 | `Implies` | `p \implies q` | $$ p \implies q $$ | Implication |
 | `Implies` | `p \Rightarrow q` | $$ p \Rightarrow q $$ | |
+| `Implies` | `p \rightarrow q` | $$ p \rightarrow q $$ | |
+| `Implies` | `p \Longrightarrow q` | $$ p \Longrightarrow q $$ | |
+| `Implies` | `p \longrightarrow q` | $$ p \longrightarrow q $$ | |
 | `Proves` | `p \vdash q` | $$ p \vdash q $$ | Provability |
 | `Entails` | `p \vDash q` | $$ p \vDash q $$ | Entailment |
 | `Satisfies` | `p \models q` | $$ p \models q $$ | Satisfaction |
 
 </div>
+
+### Operator Precedence
+
+Logical operators have lower precedence than comparison and arithmetic operators,
+so expressions parse naturally without requiring parentheses:
+
+| Precedence | Operators | Example |
+| :--- | :--- | :--- |
+| 880 | `Not` (`\lnot`, `\neg`) | `\lnot p` binds only to `p` |
+| 245 | Comparisons (`=`, `<`, `>`, `\leq`, `\geq`, `\neq`) | `x = 1` |
+| 240 | Set relations (`\subset`, `\subseteq`, `\in`, etc.) | `x \in S` |
+| 235 | `And` (`\land`, `\wedge`) | `p \land q` |
+| 232 | `Xor`, `Nand`, `Nor` | `p \veebar q` |
+| 230 | `Or` (`\lor`, `\vee`) | `p \lor q` |
+| 220 | `Implies` (`\implies`, `\Rightarrow`, `\rightarrow`) | `p \implies q` |
+| 219 | `Equivalent` (`\iff`, `\Leftrightarrow`, `\leftrightarrow`) | `p \iff q` |
+| 200 | Quantifiers (`\forall`, `\exists`) | `\forall x, P(x)` |
+
+**Examples:**
+
+- `x = 1 \lor y = 2` parses as `(x = 1) \lor (y = 2)` — comparisons bind tighter than `Or`
+- `p \land q \lor r` parses as `(p \land q) \lor r` — `And` binds tighter than `Or`
+- `p \lor q \implies r` parses as `(p \lor q) \implies r` — `Or` binds tighter than `Implies`
+
+**Important:** `Not` has very high precedence and only applies to the immediately
+following atom. To negate a compound expression, use parentheses:
+
+- `\lnot p \land q` parses as `(\lnot p) \land q`
+- `\lnot(p \land q)` parses as `\lnot(p \land q)` — negates the entire conjunction
+
+### Arrow Notation
+
+Note that `\to` is reserved for function/set mapping notation (e.g., `f: A \to B`)
+and parses as `To`, not `Implies`. Use `\rightarrow`, `\Rightarrow`, or `\implies`
+for logical implication.
 
 ## Quantifiers
 
