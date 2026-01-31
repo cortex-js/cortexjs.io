@@ -41,3 +41,37 @@ date: Last Modified
 | `InverseHaversine`     | $$\operatorname{InverseHaversine}(z) = 2 \operatorname{Arcsin}(\sqrt{z})$$                                                                                                                                                                                                                                                                       |
 
 </div>
+
+## Trigonometric Simplification
+
+The `trigSimplify()` method applies the Fu algorithm to simplify trigonometric
+expressions. This systematic approach uses transformation rules to find simpler
+equivalent forms.
+
+```javascript
+const expr = ce.parse("\\sin^2(x) + \\cos^2(x)");
+expr.trigSimplify();  // Returns: 1
+
+const expr2 = ce.parse("2\\sin(x)\\cos(x)");
+expr2.trigSimplify(); // Returns: sin(2x)
+```
+
+Alternatively, use the `strategy` option with `simplify()`:
+
+```javascript
+expr.simplify({ strategy: 'fu' });
+```
+
+### Supported Identities
+
+The Fu algorithm recognizes and applies:
+
+- **Pythagorean identities**: `sin²(x) + cos²(x) = 1`, `1 + tan²(x) = sec²(x)`
+- **Reciprocal identities**: `sec(x) = 1/cos(x)`, `csc(x) = 1/sin(x)`
+- **Double angle formulas**: `sin(2x) = 2sin(x)cos(x)`, `cos(2x) = cos²(x) - sin²(x)`
+- **Product-to-sum**: `sin(x)cos(y) = ½[sin(x+y) + sin(x-y)]`
+- **Sum-to-product**: `sin(x) + sin(y) = 2sin((x+y)/2)cos((x-y)/2)`
+- **Morrie's law**: Products of cosines with doubled angles
+
+<ReadMore path="/compute-engine/guides/simplify/" > Read more about
+<strong>Simplification</strong> <Icon name="chevron-right-bold" /></ReadMore>

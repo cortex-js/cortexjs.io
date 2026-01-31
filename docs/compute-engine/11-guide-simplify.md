@@ -93,3 +93,57 @@ For example, if no assumptions about \\(x \\) is available the expression \\(
 
 <ReadMore path="/compute-engine/guides/assumptions/" > Read more about
 <strong>Assumptions</strong> <Icon name="chevron-right-bold" /></ReadMore>
+
+## Trigonometric Simplification
+
+Trigonometric expressions can be simplified using the Fu algorithm, a systematic
+approach based on the paper "Automated and readable simplification of
+trigonometric expressions" by Fu, Zhong, and Zeng (2006).
+
+The Fu algorithm applies a series of transformation rules (TR) organized into
+rule lists (RL) that are optimized for different types of expressions:
+
+- **RL1**: For expressions containing `tan` and `cot`
+- **RL2**: For expressions containing `sin` and `cos`
+
+Each rule applies specific identities:
+- **Reciprocal forms**: `sec(x)` → `1/cos(x)`, `csc(x)` → `1/sin(x)`
+- **Ratio forms**: `tan(x)` → `sin(x)/cos(x)`
+- **Pythagorean identities**: `sin²(x) + cos²(x)` → `1`
+- **Double angle**: `2sin(x)cos(x)` → `sin(2x)`
+- **Product-to-sum**: `sin(x)cos(y)` → `½[sin(x+y) + sin(x-y)]`
+- **Sum-to-product**: `sin(x) + sin(y)` → `2sin((x+y)/2)cos((x-y)/2)`
+- **Morrie's law**: `cos(x)cos(2x)cos(4x)` → `sin(8x)/(8sin(x))`
+
+### Using the Fu Algorithm
+
+There are two ways to apply trigonometric simplification:
+
+**Option 1: Strategy option with `simplify()`**
+
+```javascript
+const expr = ce.parse("\\sin^2(x) + \\cos^2(x)");
+const simplified = expr.simplify({ strategy: 'fu' });
+// Returns: 1
+```
+
+**Option 2: Dedicated `trigSimplify()` method**
+
+```javascript
+const expr = ce.parse("2\\sin(x)\\cos(x)");
+const simplified = expr.trigSimplify();
+// Returns: sin(2x)
+```
+
+### Examples
+
+| Expression | Simplified |
+|:-----------|:-----------|
+| `sin²(x) + cos²(x)` | `1` |
+| `tan(x)·cot(x)` | `1` |
+| `2sin(x)cos(x)` | `sin(2x)` |
+| `sin(x)⁴ - cos(x)⁴` | `-cos(2x)` |
+| `cos(x)cos(2x)cos(4x)` | `sin(8x)/(8sin(x))` |
+
+<ReadMore path="/compute-engine/reference/trigonometry/" > Read more about
+<strong>Trigonometric Functions</strong> <Icon name="chevron-right-bold" /></ReadMore>
