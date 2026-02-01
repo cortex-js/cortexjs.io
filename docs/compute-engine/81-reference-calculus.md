@@ -175,6 +175,82 @@ A variable can be repeated to compute the second derivative of a function.
 
 </FunctionDefinition>
 
+### Supported Derivative Formulas
+
+The `D` function supports symbolic differentiation for the following functions.
+For functions not listed, the chain rule is applied and a symbolic derivative
+`Apply(Derivative(f, 1), x)` is returned for unknown single-argument functions.
+
+<div className="symbols-table">
+
+| Function | Derivative | Notes |
+| :------- | :--------- | :---- |
+| **Trigonometric** | | |
+| `Sin(x)` | `Cos(x)` | |
+| `Cos(x)` | `-Sin(x)` | |
+| `Tan(x)` | `Sec(x)²` | |
+| `Sec(x)` | `Tan(x)·Sec(x)` | |
+| `Csc(x)` | `-Cot(x)·Csc(x)` | |
+| `Cot(x)` | `-Csc(x)²` | |
+| **Inverse Trigonometric** | | |
+| `Arcsin(x)` | `1/√(1-x²)` | |
+| `Arccos(x)` | `-1/√(1-x²)` | |
+| `Arctan(x)` | `1/(1+x²)` | |
+| `Arccot(x)` | `-1/(1+x²)` | |
+| **Hyperbolic** | | |
+| `Sinh(x)` | `Cosh(x)` | |
+| `Cosh(x)` | `Sinh(x)` | |
+| `Tanh(x)` | `Sech(x)²` | |
+| `Sech(x)` | `-Tanh(x)·Sech(x)` | |
+| `Csch(x)` | `-Coth(x)·Csch(x)` | |
+| `Coth(x)` | `-Csch(x)²` | |
+| **Inverse Hyperbolic** | | |
+| `Arsinh(x)` | `1/√(x²+1)` | |
+| `Arcosh(x)` | `1/√(x²-1)` | |
+| `Artanh(x)` | `1/(1-x²)` | |
+| `Arcoth(x)` | `-1/(1-x²)` | |
+| `Arsech(x)` | `-1/(x·√(1-x²))` | |
+| `Arcsch(x)` | `-1/(\|x\|·√(1+x²))` | |
+| **Logarithmic & Exponential** | | |
+| `Ln(x)` | `1/x` | Natural logarithm |
+| `Log(x)` | `1/(x·ln(10))` | Base-10 logarithm |
+| `Log(x, b)` | `1/(x·ln(b))` | Custom base logarithm |
+| `Sqrt(x)` | `1/(2√x)` | |
+| `Root(x, n)` | `x^(1/n-1)/n` | nth root |
+| `Power(a, x)` | `a^x·ln(a)` | Exponential with constant base |
+| `Power(x, n)` | `n·x^(n-1)` | Power rule |
+| `Power(f, g)` | Full formula | When both base and exponent depend on x |
+| **Special Functions** | | |
+| `Abs(x)` | `Sign(x)` | Undefined at 0 |
+| `Gamma(x)` | `Gamma(x)·Digamma(x)` | |
+| `LogGamma(x)` | `Digamma(x)` | |
+| `Digamma(x)` | `Trigamma(x)` | |
+| `Erf(x)` | `(2/√π)·e^(-x²)` | Error function |
+| `Erfc(x)` | `-(2/√π)·e^(-x²)` | Complementary error function |
+| `Erfi(x)` | `(2/√π)·e^(x²)` | Imaginary error function |
+| `FresnelS(x)` | `sin(πx²/2)` | Fresnel sine integral |
+| `FresnelC(x)` | `cos(πx²/2)` | Fresnel cosine integral |
+| `LambertW(x)` | `W(x)/(x·(1+W(x)))` | Lambert W function |
+| **Bessel Functions** | | |
+| `BesselJ(n, x)` | `(J_{n-1}(x) - J_{n+1}(x))/2` | First kind |
+| `BesselY(n, x)` | `(Y_{n-1}(x) - Y_{n+1}(x))/2` | Second kind |
+| `BesselI(n, x)` | `(I_{n-1}(x) + I_{n+1}(x))/2` | Modified first kind |
+| `BesselK(n, x)` | `-(K_{n-1}(x) + K_{n+1}(x))/2` | Modified second kind |
+| **Step Functions** | | |
+| `Floor(x)` | `0` | Derivative is 0 almost everywhere |
+| `Ceil(x)` | `0` | Derivative is 0 almost everywhere |
+| `Round(x)` | `0` | Derivative is 0 almost everywhere |
+| `Mod(x, n)` | `0` | Derivative is 0 almost everywhere |
+| `GCD(x, n)` | `0` | Discrete function |
+| `LCM(x, n)` | `0` | Discrete function |
+
+</div>
+
+:::info[Chain Rule]
+For all supported functions, the chain rule is automatically applied. For example,
+`d/dx sin(x²) = cos(x²)·2x`.
+:::
+
 
 <FunctionDefinition name="ND">
 
@@ -446,6 +522,67 @@ The numerical approximation is computed using a **Monte Carlo** method.
 
 
 </FunctionDefinition>
+
+### Supported Integral Formulas
+
+The `Integrate` function supports symbolic integration for standard forms including
+polynomials, exponentials, logarithms, trigonometric functions, and their compositions.
+Below are some notable integration patterns:
+
+#### Logarithmic Patterns
+
+The pattern $\int \frac{1}{x \ln x} dx$ is recognized as a case where the denominator
+is a product and one factor is the derivative of another:
+
+$$
+\int \frac{1}{x \ln x} \, dx = \ln|\ln x| + C
+$$
+
+```javascript
+ce.parse('\\int \\frac{1}{x\\ln x} dx').evaluate()
+// → ln(|ln(x)|)
+
+ce.parse('\\int \\frac{3}{x\\ln x} dx').evaluate()
+// → 3·ln(|ln(x)|)
+```
+
+This uses u-substitution: since $\frac{1}{x} = \frac{d}{dx}(\ln x)$, the integral
+becomes $\int \frac{h'(x)}{h(x)} dx = \ln|h(x)| + C$.
+
+#### Exponential-Trigonometric Products
+
+Products of exponentials and trigonometric functions require the "solve for the
+integral" technique (also known as cyclic integration):
+
+$$
+\int e^x \sin x \, dx = \frac{e^x}{2}(\sin x - \cos x) + C
+$$
+
+$$
+\int e^x \cos x \, dx = \frac{e^x}{2}(\sin x + \cos x) + C
+$$
+
+```javascript
+ce.parse('\\int e^x \\sin x dx').evaluate()
+// → -1/2·cos(x)·e^x + 1/2·sin(x)·e^x
+
+ce.parse('\\int e^x \\cos x dx').evaluate()
+// → 1/2·sin(x)·e^x + 1/2·cos(x)·e^x
+```
+
+This also works with linear arguments in the trigonometric function:
+
+```javascript
+ce.parse('\\int e^x \\sin(2x) dx').evaluate()
+// → -2/5·cos(2x)·e^x + 1/5·sin(2x)·e^x
+
+ce.parse('\\int e^x \\cos(2x) dx').evaluate()
+// → 1/5·cos(2x)·e^x + 2/5·sin(2x)·e^x
+```
+
+The general formulas used are:
+- $\int e^x \sin(ax+b) \, dx = \frac{e^x}{a^2+1}(\sin(ax+b) - a\cos(ax+b)) + C$
+- $\int e^x \cos(ax+b) \, dx = \frac{e^x}{a^2+1}(a\sin(ax+b) + \cos(ax+b)) + C$
 
 
 ## Limit

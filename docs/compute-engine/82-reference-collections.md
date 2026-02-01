@@ -649,6 +649,31 @@ If the collection is nested, the indexes are applied in order.
 // ➔ 3
 ```
 
+#### Subscript Notation
+
+When a symbol is declared as a collection type, subscripts in LaTeX are
+automatically converted to `At` expressions:
+
+```javascript
+ce.declare('v', 'list<number>');
+ce.parse('v_n');      // → ["At", "v", "n"]
+ce.parse('v_{n+1}');  // → ["At", "v", ["Add", "n", 1]]
+ce.parse('v_{i,j}');  // → ["At", "v", ["Tuple", "i", "j"]]
+```
+
+You can also use bracket notation, which always produces `At` regardless
+of the symbol's type:
+
+<Latex value="v[n]"/>
+
+```json
+["At", "v", "n"]
+```
+
+The type of the `At` expression is inferred from the collection's element type,
+so `v_n` where `v` is `list<number>` has type `number` and can be used in
+arithmetic expressions.
+
 </FunctionDefinition>
 
 <nav className="hidden">

@@ -263,6 +263,362 @@ ce.assign("double",ce.parse("x \\mapsto 2x"));
 Learn more about the standard operator to manipulate **functions**. <Icon name="chevron-right-bold" />
 </ReadMore>
 
+### Declaring a Sequence with Subscript Evaluation
+
+Mathematical sequences like Fibonacci numbers ($F_n$), indexed coefficients
+($a_n$), or matrix elements ($M_{i,j}$) are commonly written using subscript
+notation. You can define custom evaluation logic for subscripted symbols using
+the `subscriptEvaluate` handler.
+
+```js
+// Define a sequence of squares: S_n = n²
+ce.declare("S", {
+  subscriptEvaluate: (subscript, { engine }) => {
+    const n = subscript.re;
+    if (!Number.isInteger(n) || n < 0) return undefined;
+    return engine.number(n * n);
+  },
+});
+
+ce.parse("S_{5}").evaluate();   // → 25
+ce.parse("S_3").evaluate();     // → 9
+ce.parse("S_n").evaluate();     // → stays as Subscript(S, n)
+```
+
+The `subscriptEvaluate` handler receives:
+- `subscript`: the subscript expression (already evaluated)
+- `options`: an object with `engine` (the ComputeEngine) and `numericApproximation`
+  (true when called from `.N()`)
+
+**Return `undefined`** to keep the expression symbolic. This is useful when the
+subscript contains unknowns or is outside the valid range.
+
+```js
+// Fibonacci sequence with memoization
+const fibMemo = new Map();
+const fib = (n) => {
+  if (n <= 1) return n;
+  if (fibMemo.has(n)) return fibMemo.get(n);
+  const result = fib(n - 1) + fib(n - 2);
+  fibMemo.set(n, result);
+  return result;
+};
+
+ce.declare("F", {
+  subscriptEvaluate: (subscript, { engine }) => {
+    const n = subscript.re;
+    if (!Number.isInteger(n) || n < 0) return undefined;
+    return engine.number(fib(n));
+  },
+});
+
+ce.parse("F_{10}").evaluate();  // → 55
+ce.parse("F_n").evaluate();     // → Subscript(F, n) - stays symbolic
+```
+
+**Multi-index subscripts** (like matrix elements) receive the subscript as a
+`Tuple` expression:
+
+```js
+const matrix = [[1,2,3], [4,5,6], [7,8,9]];
+
+ce.declare("M", {
+  subscriptEvaluate: (subscript, { engine }) => {
+    if (subscript.operator === "Tuple" && subscript.ops) {
+      const [i, j] = subscript.ops;
+      const row = matrix[i.re - 1];  // 1-indexed
+      if (row && row[j.re - 1] !== undefined) {
+        return engine.number(row[j.re - 1]);
+      }
+    }
+    return undefined;
+  },
+});
+
+ce.parse("M_{2,3}").evaluate();  // → 6
+```
+
+Subscripted expressions with `subscriptEvaluate` have type `number` and can be
+used in arithmetic:
+
+```js
+ce.parse("S_{5} + S_{3}").evaluate();  // → 34 (25 + 9)
+ce.parse("2 * F_{10}").evaluate();     // → 110 (2 × 55)
+```
+
+### Declarative Sequence Definitions
+
+For common mathematical sequences defined by recurrence relations, the
+`declareSequence()` method provides a simpler declarative API:
+
+```js
+// Fibonacci sequence: F_n = F_{n-1} + F_{n-2}, with F_0 = 0, F_1 = 1
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+ce.parse('F_{10}').evaluate();  // → 55
+ce.parse('F_{20}').evaluate();  // → 6765
+```
+
+The `SequenceDefinition` object accepts:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `base` | `Record<number, number \| BoxedExpression>` | **Required.** Base cases as index → value mapping |
+| `recurrence` | `string \| BoxedExpression` | **Required.** Recurrence relation (LaTeX string or expression) |
+| `variable` | `string` | Index variable name (default: `'n'`) |
+| `memoize` | `boolean` | Cache computed values (default: `true`) |
+| `domain` | `{ min?: number, max?: number }` | Valid index range |
+
+**Examples:**
+
+```js
+// Arithmetic sequence: a_n = a_{n-1} + 2
+ce.declareSequence('A', {
+  base: { 0: 1 },
+  recurrence: 'A_{n-1} + 2',
+});
+ce.parse('A_{5}').evaluate();  // → 11
+
+// Factorial via recurrence: n! = n × (n-1)!
+ce.declareSequence('H', {
+  base: { 0: 1 },
+  recurrence: 'n \\cdot H_{n-1}',
+});
+ce.parse('H_{5}').evaluate();  // → 120
+
+// Triangular numbers: T_n = T_{n-1} + n
+ce.declareSequence('T', {
+  base: { 0: 0 },
+  recurrence: 'T_{n-1} + n',
+});
+ce.parse('T_{5}').evaluate();  // → 15
+
+// Using a custom index variable
+ce.declareSequence('W', {
+  variable: 'k',
+  base: { 0: 1 },
+  recurrence: 'W_{k-1} + k',
+});
+ce.parse('W_{5}').evaluate();  // → 16
+
+// With domain constraints (only valid for n ≥ 1)
+ce.declareSequence('X', {
+  base: { 1: 1 },
+  recurrence: 'X_{n-1} + 1',
+  domain: { min: 1 },
+});
+ce.parse('X_{5}').evaluate();  // → 5
+ce.parse('X_{0}').evaluate();  // → stays symbolic (outside domain)
+```
+
+**Symbolic behavior:** When the subscript is symbolic or non-integer, the
+expression stays symbolic:
+
+```js
+ce.parse('F_k').evaluate();     // → Subscript(F, k) - stays symbolic
+ce.parse('F_{1.5}').evaluate(); // → Subscript(F, 1.5) - stays symbolic
+```
+
+**Memoization:** By default, computed values are cached for efficiency. This is
+especially important for sequences like Fibonacci that have exponential
+complexity without memoization:
+
+```js
+// Fast even for large indices thanks to memoization
+ce.parse('F_{30}').evaluate();  // → 832040 (computed quickly)
+```
+
+To disable memoization (e.g., for memory-constrained environments):
+
+```js
+ce.declareSequence('O', {
+  base: { 0: 1 },
+  recurrence: 'O_{n-1} + 1',
+  memoize: false,
+});
+```
+
+### LaTeX-Based Sequence Definitions
+
+Sequences can also be defined using natural LaTeX assignment notation. This is
+especially useful in interactive environments or when working with mathematical
+notation directly:
+
+```js
+// Arithmetic sequence via LaTeX
+ce.parse('L_0 := 1').evaluate();
+ce.parse('L_n := L_{n-1} + 2').evaluate();
+ce.parse('L_{5}').evaluate();  // → 11
+
+// Fibonacci via LaTeX
+ce.parse('F_0 := 0').evaluate();
+ce.parse('F_1 := 1').evaluate();
+ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
+ce.parse('F_{10}').evaluate();  // → 55
+
+// Factorial via LaTeX
+ce.parse('D_0 := 1').evaluate();
+ce.parse('D_n := n \\cdot D_{n-1}').evaluate();
+ce.parse('D_{5}').evaluate();  // → 120
+```
+
+**Order independence:** Base cases and recurrence can be defined in any order.
+The sequence is finalized when both a base case and a recurrence relation are
+present:
+
+```js
+// Recurrence first, then base case
+ce.parse('K_n := K_{n-1} + 1').evaluate();
+ce.parse('K_0 := 0').evaluate();  // Sequence finalized here
+ce.parse('K_{5}').evaluate();  // → 5
+```
+
+**How it works:** The system detects sequence definitions by checking if the
+right-hand side contains self-references (like `L_{n-1}` when defining `L_n`).
+Assignments without self-references are treated as function definitions instead:
+
+```js
+// This defines a function f(x) = x², not a sequence
+ce.parse('f_x := x^2').evaluate();
+ce.parse('f_{3}').evaluate();  // → 9
+```
+
+### Sequence Status and Introspection
+
+You can query the status of sequence definitions and inspect defined sequences:
+
+```js
+// Check if a sequence is fully defined
+ce.parse('F_0 := 0').evaluate();
+ce.getSequenceStatus('F');
+// → { status: 'pending', hasBase: true, hasRecurrence: false, baseIndices: [0] }
+
+ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
+ce.getSequenceStatus('F');
+// → { status: 'complete', hasBase: true, hasRecurrence: true, baseIndices: [0] }
+
+// For non-sequences:
+ce.getSequenceStatus('x');
+// → { status: 'not-a-sequence', hasBase: false, hasRecurrence: false }
+```
+
+**Introspection methods** let you examine and manage defined sequences:
+
+```js
+// Get detailed information about a sequence
+ce.getSequence('F');
+// → { name: 'F', variable: 'n', baseIndices: [0, 1], memoize: true, cacheSize: 5 }
+
+// List all defined sequences
+ce.listSequences();  // → ['F', 'A', 'T']
+
+// Check if a symbol is a sequence
+ce.isSequence('F');  // → true
+ce.isSequence('x');  // → false
+
+// Manage memoization cache
+ce.getSequenceCache('F');  // → Map { 2 => 1, 3 => 2, 5 => 5, ... }
+ce.clearSequenceCache('F');  // Clear cache for specific sequence
+ce.clearSequenceCache();     // Clear all sequence caches
+```
+
+### Generating Sequence Terms
+
+Generate a list of sequence terms with `getSequenceTerms()`:
+
+```js
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+// Get terms from index 0 to 10 (inclusive)
+ce.getSequenceTerms('F', 0, 10);
+// → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+
+// With a step parameter (every other term)
+ce.getSequenceTerms('F', 0, 10, 2);
+// → [0, 1, 3, 8, 21, 55]
+
+// Starting from a non-zero index
+ce.getSequenceTerms('F', 5, 10);
+// → [5, 8, 13, 21, 34, 55]
+```
+
+### Sum and Product over Sequences
+
+`Sum` and `Product` work seamlessly with user-defined sequences:
+
+```js
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+// Sum of Fibonacci terms from k=0 to 10
+ce.parse('\\sum_{k=0}^{10} F_k').evaluate();  // → 143
+
+// Product over sequence terms
+ce.declareSequence('A', {
+  base: { 1: 1 },
+  recurrence: 'A_{n-1} + 1',
+});
+ce.parse('\\prod_{k=1}^{5} A_k').evaluate();  // → 120 (factorial)
+```
+
+### OEIS Integration
+
+The [Online Encyclopedia of Integer Sequences (OEIS)](https://oeis.org) contains
+over 350,000 integer sequences. You can look up sequences and verify your
+definitions against known mathematical sequences:
+
+```js
+// Look up a sequence by its terms
+const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
+// → [{ id: 'A000045', name: 'Fibonacci numbers', terms: [...], url: '...' }]
+
+// Each result contains:
+// - id: OEIS sequence ID (e.g., 'A000045')
+// - name: Sequence description
+// - terms: First several terms
+// - formula: Formula if available
+// - url: Link to OEIS page
+```
+
+**Verify your sequences** against OEIS:
+
+```js
+ce.declareSequence('F', {
+  base: { 0: 0, 1: 1 },
+  recurrence: 'F_{n-1} + F_{n-2}',
+});
+
+const result = await ce.checkSequenceOEIS('F', 10);
+// → {
+//     matches: [{ id: 'A000045', name: 'Fibonacci numbers', ... }],
+//     terms: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+//   }
+
+if (result.matches.length > 0) {
+  console.log(`Your sequence matches ${result.matches[0].name}!`);
+}
+```
+
+**Options:**
+
+```js
+// Limit number of results
+await ce.lookupOEIS([1, 2, 3, 4, 5], { maxResults: 3 });
+
+// Set timeout (in milliseconds)
+await ce.lookupOEIS([1, 2, 3, 4, 5], { timeout: 5000 });
+```
+
+> **Note:** OEIS lookups require network access to oeis.org.
+
 ## Overloading Functions
 
 **Overloading** is the ability to define multiple functions with the same name.

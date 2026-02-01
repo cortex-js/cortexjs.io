@@ -587,6 +587,134 @@ const D = ce.box(['Diagonal', eigenvalues]).evaluate();
 // → [[5, 0], [0, 2]]
 ```
 
+## Matrix Decompositions
+
+Matrix decompositions factor a matrix into products of simpler matrices. They are
+fundamental tools for solving linear systems, computing eigenvalues, and performing
+numerical computations efficiently.
+
+### LU Decomposition
+
+LU decomposition factors a matrix A into a lower triangular matrix L and an upper
+triangular matrix U, with a permutation matrix P for numerical stability:
+
+```js example
+// LU decomposition returns [P, L, U] where PA = LU
+const result = ce.box(['LUDecomposition', ['List',
+  ['List', 2, 3, 1],
+  ['List', 4, 7, 5],
+  ['List', 6, 18, 10]
+]]).evaluate();
+
+// Extract components
+const [P, L, U] = result.ops;
+// P: permutation matrix
+// L: lower triangular with 1s on diagonal
+// U: upper triangular
+```
+
+**Use Cases:**
+- Solving systems of linear equations (Ax = b)
+- Computing matrix determinants efficiently
+- Matrix inversion
+
+### QR Decomposition
+
+QR decomposition factors a matrix A into an orthogonal matrix Q and an upper
+triangular matrix R:
+
+```js example
+// QR decomposition returns [Q, R] where A = QR
+const result = ce.box(['QRDecomposition', ['List',
+  ['List', 1, 2],
+  ['List', 3, 4],
+  ['List', 5, 6]
+]]).evaluate();
+
+const [Q, R] = result.ops;
+// Q: orthogonal matrix (Q^T × Q = I)
+// R: upper triangular matrix
+```
+
+**Use Cases:**
+- Solving least squares problems
+- Computing eigenvalues (QR algorithm)
+- Orthogonalization of vectors
+
+### Cholesky Decomposition
+
+Cholesky decomposition factors a symmetric positive-definite matrix A into
+the product of a lower triangular matrix L and its transpose:
+
+```js example
+// Cholesky decomposition returns L where A = L × L^T
+const L = ce.box(['CholeskyDecomposition', ['List',
+  ['List', 4, 2],
+  ['List', 2, 5]
+]]).evaluate();
+// → [[2, 0], [1, 2]]
+
+// Verify: L × L^T = A
+ce.box(['MatrixMultiply', L, ['Transpose', L]]).evaluate();
+// → [[4, 2], [2, 5]]
+```
+
+**Requirements:** The input matrix must be symmetric and positive-definite.
+The function returns an error for matrices that don't meet these criteria.
+
+**Use Cases:**
+- Efficient solving of symmetric positive-definite systems
+- Monte Carlo simulations
+- Kalman filters
+
+### Singular Value Decomposition (SVD)
+
+SVD factors any matrix A into three matrices: U (left singular vectors),
+Σ (diagonal matrix of singular values), and V (right singular vectors):
+
+```js example
+// SVD returns [U, Σ, V] where A = U × Σ × V^T
+const result = ce.box(['SVD', ['List',
+  ['List', 1, 2],
+  ['List', 3, 4],
+  ['List', 5, 6]
+]]).evaluate();
+
+const [U, Sigma, V] = result.ops;
+// U: m×m orthogonal matrix
+// Σ: m×n diagonal matrix of singular values
+// V: n×n orthogonal matrix
+```
+
+**Use Cases:**
+- Principal Component Analysis (PCA)
+- Image compression
+- Pseudoinverse computation
+- Dimensionality reduction
+- Solving ill-conditioned linear systems
+
+### Practical Example: Solving Linear Systems with LU
+
+Using LU decomposition to solve Ax = b is more efficient than computing A⁻¹
+directly, especially when solving multiple systems with the same matrix A:
+
+```js example
+const A = ['List',
+  ['List', 2, 1, 1],
+  ['List', 4, 3, 3],
+  ['List', 8, 7, 9]
+];
+const b = ['List', 4, 10, 24];
+
+// Get LU decomposition
+const [P, L, U] = ce.box(['LUDecomposition', A]).evaluate().ops;
+
+// The solution process:
+// 1. Solve Ly = Pb for y (forward substitution)
+// 2. Solve Ux = y for x (back substitution)
+// This is implemented internally when using Inverse
+```
+
 ## Matrix Multiplication
 
 Use `MatrixMultiply` to perform matrix multiplication. The function supports
@@ -807,7 +935,39 @@ const shape = ce.box(['Shape', M]).evaluate();
 
 ### Solving Linear Systems
 
-To solve Ax = b, multiply both sides by A⁻¹:
+The most direct way to solve systems of linear equations is using the `solve()`
+method on a system parsed from LaTeX `\begin{cases}` notation:
+
+```js example
+// Solve the system: x + y = 70, 2x - 4y = 80
+const system = ce.parse('\\begin{cases}x+y=70\\\\2x-4y=80\\end{cases}');
+const result = system.solve(['x', 'y']);
+
+console.log(result.x.json);  // 60
+console.log(result.y.json);  // 10
+```
+
+The `solve()` method returns an object mapping variable names to their solutions,
+or `null` if the system has no unique solution (inconsistent or under-determined).
+
+```js example
+// 3x3 system: x + y + z = 6, 2x + y - z = 1, x - y + 2z = 5
+const system3 = ce.parse('\\begin{cases}x+y+z=6\\\\2x+y-z=1\\\\x-y+2z=5\\end{cases}');
+const result3 = system3.solve(['x', 'y', 'z']);
+// → { x: 1, y: 2, z: 3 }
+
+// Inconsistent system returns null
+const bad = ce.parse('\\begin{cases}x+y=1\\\\x+y=2\\end{cases}');
+bad.solve(['x', 'y']);  // → null
+
+// Non-linear systems also return null
+const nonlinear = ce.parse('\\begin{cases}xy=6\\\\x+y=5\\end{cases}');
+nonlinear.solve(['x', 'y']);  // → null (contains product xy)
+```
+
+#### Matrix Method
+
+Alternatively, you can solve Ax = b by multiplying both sides by A⁻¹:
 
 ```js example
 // Solve: x + 2y = 5, 3x + 4y = 11

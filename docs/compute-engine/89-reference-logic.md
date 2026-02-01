@@ -87,6 +87,45 @@ Note that `\to` is reserved for function/set mapping notation (e.g., `f: A \to B
 and parses as `To`, not `Implies`. Use `\rightarrow`, `\Rightarrow`, or `\implies`
 for logical implication.
 
+## Boolean Simplification
+
+When `simplify()` is called on boolean expressions, the following algebraic laws
+are applied automatically:
+
+| Law | Rule | Example |
+| :--- | :--- | :--- |
+| **Absorption** | $A \land (A \lor B) \to A$ | `And(A, Or(A, B))` → `A` |
+| **Absorption** | $A \lor (A \land B) \to A$ | `Or(A, And(A, B))` → `A` |
+| **Idempotence** | $A \land A \to A$ | `And(A, A)` → `A` |
+| **Idempotence** | $A \lor A \to A$ | `Or(A, A)` → `A` |
+| **Complementation** | $A \land \lnot A \to \bot$ | `And(A, Not(A))` → `False` |
+| **Complementation** | $A \lor \lnot A \to \top$ | `Or(A, Not(A))` → `True` |
+| **Identity** | $A \land \top \to A$ | `And(A, True)` → `A` |
+| **Identity** | $A \lor \bot \to A$ | `Or(A, False)` → `A` |
+| **Domination** | $A \land \bot \to \bot$ | `And(A, False)` → `False` |
+| **Domination** | $A \lor \top \to \top$ | `Or(A, True)` → `True` |
+| **Double Negation** | $\lnot\lnot A \to A$ | `Not(Not(A))` → `A` |
+
+```javascript
+ce.box(['And', 'A', ['Or', 'A', 'B']]).simplify()
+// → A (absorption)
+
+ce.box(['Or', 'A', ['And', 'A', 'B']]).simplify()
+// → A (absorption)
+
+ce.box(['And', 'A', 'A', 'B']).simplify()
+// → A ∧ B (idempotence)
+
+ce.box(['And', 'A', ['Not', 'A']]).simplify()
+// → False (complementation)
+
+ce.box(['Or', 'A', ['Not', 'A']]).simplify()
+// → True (complementation)
+
+ce.box(['Not', ['Not', 'A']]).simplify()
+// → A (double negation)
+```
+
 ## Quantifiers
 
 
@@ -495,5 +534,127 @@ ce.box(['TruthTable', ['Xor', 'P', 'Q']]).evaluate()
 ```
 
 Limited to expressions with at most 10 variables (1024 rows).
+
+</FunctionDefinition>
+
+
+## Prime Implicants and Minimal Normal Forms
+
+The following functions use the **Quine-McCluskey algorithm** to find minimal
+representations of Boolean expressions.
+
+<FunctionDefinition name="PrimeImplicants">
+
+<Signature name="PrimeImplicants">_expression_</Signature>
+
+Finds all **prime implicants** of a Boolean expression.
+
+A prime implicant is a product term (conjunction of literals) that:
+1. Implies the original expression (covers some minterms)
+2. Cannot be reduced further (removing any literal would make it not an implicant)
+
+Returns a `List` of expressions, each representing a prime implicant.
+
+```javascript
+// AB ∨ A¬B has one prime implicant: A
+ce.box(['PrimeImplicants', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate()
+// → [A]
+
+// A ∨ B has two prime implicants
+ce.box(['PrimeImplicants', ['Or', 'A', 'B']]).evaluate()
+// → [A, B]
+
+// XOR has two prime implicants
+ce.box(['PrimeImplicants', ['Xor', 'A', 'B']]).evaluate()
+// → [¬A ∧ B, A ∧ ¬B]
+```
+
+Limited to expressions with at most 12 variables.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="PrimeImplicates">
+
+<Signature name="PrimeImplicates">_expression_</Signature>
+
+Finds all **prime implicates** of a Boolean expression.
+
+A prime implicate is a sum term (disjunction of literals) that:
+1. Is implied by the original expression (is true whenever the expression is true)
+2. Cannot be reduced further (removing any literal would make it not an implicate)
+
+Prime implicates are the dual of prime implicants and represent the minimal
+clauses in CNF.
+
+Returns a `List` of expressions, each representing a prime implicate.
+
+```javascript
+// A ∧ B implies both A and B separately
+ce.box(['PrimeImplicates', ['And', 'A', 'B']]).evaluate()
+// → [A, B]
+
+// A ∨ B has one prime implicate
+ce.box(['PrimeImplicates', ['Or', 'A', 'B']]).evaluate()
+// → [A ∨ B]
+```
+
+Limited to expressions with at most 12 variables.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="MinimalDNF">
+
+<Signature name="MinimalDNF">_expression_</Signature>
+
+Converts a Boolean expression to **minimal Disjunctive Normal Form** (DNF).
+
+Uses the Quine-McCluskey algorithm to find prime implicants, then selects a
+minimal cover. The result is a disjunction of conjunctions with the fewest
+terms possible.
+
+Unlike `ToDNF` which may produce a non-minimal DNF, `MinimalDNF` guarantees
+the result has the minimum number of product terms.
+
+```javascript
+// AB ∨ A¬B ∨ ¬AB simplifies to A ∨ B
+ce.box(['MinimalDNF', ['Or',
+  ['And', 'A', 'B'],
+  ['And', 'A', ['Not', 'B']],
+  ['And', ['Not', 'A'], 'B']
+]]).evaluate()
+// → A ∨ B (3 terms reduced to 2)
+
+// AB ∨ A¬B simplifies to A
+ce.box(['MinimalDNF', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate()
+// → A (2 terms reduced to 1)
+```
+
+Limited to expressions with at most 12 variables.
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="MinimalCNF">
+
+<Signature name="MinimalCNF">_expression_</Signature>
+
+Converts a Boolean expression to **minimal Conjunctive Normal Form** (CNF).
+
+Uses the Quine-McCluskey algorithm to find prime implicates, then selects a
+minimal cover. The result is a conjunction of disjunctions with the fewest
+clauses possible.
+
+Unlike `ToCNF` which may produce a non-minimal CNF, `MinimalCNF` guarantees
+the result has the minimum number of clauses.
+
+```javascript
+// (A ∨ B) ∧ (A ∨ ¬B) simplifies to A
+ce.box(['MinimalCNF', ['And', ['Or', 'A', 'B'], ['Or', 'A', ['Not', 'B']]]]).evaluate()
+// → A (2 clauses reduced to 1)
+```
+
+Limited to expressions with at most 12 variables.
 
 </FunctionDefinition>

@@ -63,10 +63,107 @@ Tensors (multi-dimensional matrices) are represented as nested lists.
 
 :::info[Note]
 Tensors are represented internally using an optimized format that is more
-efficient than nested lists. Because of this, some operations on tensors 
-such as `Reshape` and `Transpose` can be done in O(1) time. 
+efficient than nested lists. Because of this, some operations on tensors
+such as `Reshape` and `Transpose` can be done in O(1) time.
 :::
 
+## Basic Operations: Quick Start
+
+This section shows common matrix and vector operations to get started quickly.
+
+### Vector Addition
+
+Vectors can be added element-wise using the `+` operator or the `Add` function.
+In LaTeX, vectors can be written using parentheses `(1,2,3)` or square brackets `[1,2,3]`.
+
+```typescript example
+ce.parse('(1,2,3) + (3,5,6)').evaluate()
+// ➔ [4,7,9]
+```
+
+```json example
+["Add", ["List", 1, 2, 3], ["List", 3, 5, 6]]
+// ➔ ["List", 4, 7, 9]
+```
+
+### Matrix Addition
+
+Matrices are added element-wise. Both matrices must have the same dimensions.
+
+```typescript example
+const m1 = ce.box(['List', ['List', 1, 2], ['List', 3, 4]]);
+const m2 = ce.box(['List', ['List', 5, 6], ['List', 7, 8]]);
+m1.add(m2).evaluate()
+// ➔ [[6,8],[10,12]]
+```
+
+```json example
+["Add",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 6, 8], ["List", 10, 12]]
+```
+
+### Scalar Multiplication
+
+A scalar can be multiplied with a vector or matrix. The scalar is broadcast
+to all elements.
+
+```typescript example
+ce.parse('2(1,2,3)').evaluate()
+// ➔ [2,4,6]
+```
+
+```json example
+["Multiply", 2, ["List", 1, 2, 3]]
+// ➔ ["List", 2, 4, 6]
+```
+
+### Element-wise vs Matrix Multiplication
+
+**Important**: The `Multiply` function and `*` operator perform **element-wise**
+(Hadamard) multiplication. For matrix multiplication, use the `MatrixMultiply` function.
+
+**Element-wise multiplication** (each element multiplied independently):
+
+```json example
+["Multiply",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 5, 12], ["List", 21, 32]]
+// Each position: [1×5, 2×6], [3×7, 4×8]
+```
+
+**Matrix multiplication** (linear algebraic product):
+
+```json example
+["MatrixMultiply",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 19, 22], ["List", 43, 50]]
+// Matrix product: [[1×5+2×7, 1×6+2×8], [3×5+4×7, 3×6+4×8]]
+```
+
+```typescript example
+const m1 = ce.box(['List', ['List', 1, 2], ['List', 3, 4]]);
+const m2 = ce.box(['List', ['List', 5, 6], ['List', 7, 8]]);
+ce.function('MatrixMultiply', [m1, m2]).evaluate()
+// ➔ [[19,22],[43,50]]
+```
+
+### LaTeX Matrix Syntax
+
+Matrices can be parsed from LaTeX using standard matrix environments:
+
+```typescript example
+ce.parse('\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}')
+// Creates a 2×2 matrix
+```
+
+```typescript example
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix} + \\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}')
+// Matrix addition in LaTeX notation
+```
 
 `Vector` is a convenience function that interprets a list of elements as a
 column vector.
@@ -735,6 +832,16 @@ Note that axis indexes start at 1.
 Returns the [matrix product](https://en.wikipedia.org/wiki/Matrix_multiplication)
 of two matrices, vectors, or a combination thereof.
 
+:::info[Element-wise vs Matrix Multiplication]
+**Important**: Use `MatrixMultiply` for linear algebraic matrix multiplication.
+The `Multiply` function performs element-wise (Hadamard) multiplication where
+corresponding elements are multiplied: `[1,2,3] * [4,5,6]` → `[4,10,18]`.
+
+For matrix multiplication where the result is computed using row-column dot products,
+always use `MatrixMultiply`. See the [Quick Start](#basic-operations-quick-start)
+section for examples.
+:::
+
 **Matrix × Matrix**: If _A_ is an m×n matrix and _B_ is an n×p matrix, the result
 is an m×p matrix where each element (i,j) is the dot product of row i of _A_
 and column j of _B_.
@@ -1058,6 +1165,178 @@ This is more efficient than calling `Eigenvalues` and `Eigenvectors` separately 
 ["At", ["Eigen", matrix], "Eigenvectors"]
 // Returns just the eigenvectors
 ```
+
+</FunctionDefinition>
+
+
+## Matrix Decompositions
+
+Matrix decompositions factor a matrix into products of simpler matrices. These are
+fundamental operations in numerical linear algebra, used for solving linear systems,
+computing inverses, and many other applications.
+
+### LUDecomposition
+
+<FunctionDefinition name="LUDecomposition">
+
+<Signature name="LUDecomposition">_matrix_</Signature>
+
+Compute the **LU decomposition** of a square matrix with partial pivoting.
+
+Returns a tuple `[P, L, U]` where:
+- **P** is a permutation matrix
+- **L** is a lower triangular matrix with 1s on the diagonal
+- **U** is an upper triangular matrix
+
+The decomposition satisfies: **PA = LU**
+
+```json example
+["LUDecomposition", ["List", ["List", 4, 3], ["List", 6, 3]]]
+// ➔ ["Tuple", P, L, U] where PA = LU
+```
+
+```json example
+["LUDecomposition", ["List", ["List", 2, 1, 1], ["List", 4, 3, 3], ["List", 8, 7, 9]]]
+// ➔ ["Tuple", P, L, U] for 3×3 matrix
+```
+
+**Applications:**
+- Solving linear systems: Solve Ax = b by solving Ly = Pb, then Ux = y
+- Computing determinant: det(A) = det(U) = product of diagonal elements (with sign from P)
+- Computing matrix inverse
+
+**Note:** Returns an error for non-square matrices.
+
+</FunctionDefinition>
+
+
+### QRDecomposition
+
+<FunctionDefinition name="QRDecomposition">
+
+<Signature name="QRDecomposition">_matrix_</Signature>
+
+Compute the **QR decomposition** of a matrix using Householder reflections.
+
+Returns a tuple `[Q, R]` where:
+- **Q** is an orthogonal matrix (Q^T Q = I)
+- **R** is an upper triangular matrix
+
+The decomposition satisfies: **A = QR**
+
+Works with both square and rectangular (m×n) matrices.
+
+```json example
+["QRDecomposition", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["Tuple", Q, R] where A = QR
+```
+
+```json example
+["QRDecomposition", ["List", ["List", 12, -51, 4], ["List", 6, 167, -68], ["List", -4, 24, -41]]]
+// ➔ ["Tuple", Q, R] for 3×3 matrix
+```
+
+For a rectangular m×n matrix:
+```json example
+["QRDecomposition", ["List", ["List", 1, 2], ["List", 3, 4], ["List", 5, 6]]]
+// ➔ Q is 3×3, R is 3×2
+```
+
+**Applications:**
+- Solving least squares problems
+- Computing eigenvalues (QR algorithm)
+- Orthogonalization of vectors
+
+</FunctionDefinition>
+
+
+### CholeskyDecomposition
+
+<FunctionDefinition name="CholeskyDecomposition">
+
+<Signature name="CholeskyDecomposition">_matrix_</Signature>
+
+Compute the **Cholesky decomposition** of a symmetric positive definite matrix.
+
+Returns a lower triangular matrix **L** such that: **A = LL^T**
+
+```json example
+["CholeskyDecomposition", ["List", ["List", 4, 2], ["List", 2, 2]]]
+// ➔ ["List", ["List", 2, 0], ["List", 1, 1]]
+// Verify: L * L^T = [[4,2],[2,2]] ✓
+```
+
+```json example
+["CholeskyDecomposition", ["List", ["List", 1, 0], ["List", 0, 1]]]
+// ➔ Identity matrix (Cholesky of identity is identity)
+```
+
+**Requirements:** The input matrix must be:
+- Square
+- Symmetric (A = A^T)
+- Positive definite (all eigenvalues > 0)
+
+Returns error `'expected-positive-definite-matrix'` if the matrix is not positive definite.
+
+```json example
+["CholeskyDecomposition", ["List", ["List", 1, 2], ["List", 2, 1]]]
+// ➔ Error: not positive definite (determinant = -3 < 0)
+```
+
+**Applications:**
+- Efficient solving of symmetric positive definite systems
+- Monte Carlo simulations (generating correlated random variables)
+- Kalman filters
+
+</FunctionDefinition>
+
+
+### SVD (Singular Value Decomposition)
+
+<FunctionDefinition name="SVD">
+
+<Signature name="SVD">_matrix_</Signature>
+
+Compute the **Singular Value Decomposition** of a matrix.
+
+Returns a tuple `[U, Σ, V]` where:
+- **U** is an orthogonal matrix (left singular vectors)
+- **Σ** (Sigma) is a diagonal matrix with non-negative singular values
+- **V** is an orthogonal matrix (right singular vectors)
+
+The decomposition satisfies: **A = UΣV^T**
+
+Works with both square and rectangular (m×n) matrices.
+
+```json example
+["SVD", ["List", ["List", 4, 0], ["List", 3, -5]]]
+// ➔ ["Tuple", U, Σ, V]
+// Σ contains the singular values on the diagonal
+```
+
+For a diagonal matrix, singular values equal the absolute values of diagonal elements:
+```json example
+["SVD", ["List", ["List", 1, 0, 0], ["List", 0, 2, 0], ["List", 0, 0, 3]]]
+// ➔ Singular values are [3, 2, 1] (or permutation thereof)
+```
+
+For a rectangular m×n matrix with m > n:
+```json example
+["SVD", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]
+// ➔ U is 2×2, Σ is 2×3, V is 3×3
+```
+
+**Applications:**
+- Computing the pseudoinverse (Moore-Penrose inverse)
+- Dimensionality reduction (PCA)
+- Data compression
+- Computing matrix rank (count of non-zero singular values)
+- Solving ill-conditioned linear systems
+
+**Properties:**
+- Singular values are always non-negative
+- The rank of the matrix equals the number of non-zero singular values
+- The 2-norm of a matrix equals its largest singular value
 
 </FunctionDefinition>
 

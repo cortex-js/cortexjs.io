@@ -91,8 +91,60 @@ For example, if no assumptions about \\(x \\) is available the expression \\(
 \sqrt\{x^2\} \\) cannot be simplified. However, if an assumption that \\( x \geq 0
 \\) is available, then the expression can be simplified to \\( x \\).
 
+### Sign-Dependent Simplifications
+
+When assumptions about the sign of a variable are available, several
+simplifications become possible:
+
+```javascript
+// Without assumptions, sqrt(x^2) = |x|
+ce.parse('\\sqrt{x^2}').simplify().latex;
+// ➔ "|x|"
+
+// With positive assumption
+ce.assume(ce.parse('x > 0'));
+ce.parse('\\sqrt{x^2}').simplify().latex;
+// ➔ "x"
+
+ce.parse('|x|').simplify().latex;
+// ➔ "x"
+```
+
+```javascript
+// With negative assumption
+ce.assume(ce.parse('y < 0'));
+ce.parse('\\sqrt{y^2}').simplify().latex;
+// ➔ "-y"
+
+ce.parse('|y|').simplify().latex;
+// ➔ "-y"
+```
+
 <ReadMore path="/compute-engine/guides/assumptions/" > Read more about
 <strong>Assumptions</strong> <Icon name="chevron-right-bold" /></ReadMore>
+
+## Nested Root Simplification
+
+Nested roots are automatically simplified to a single root with the product
+of the indices:
+
+| Expression | Simplified |
+|:-----------|:-----------|
+| `sqrt(sqrt(x))` | `root(4)(x)` |
+| `root(sqrt(x), n)` | `root(2n)(x)` |
+| `sqrt(root(x, n))` | `root(2n)(x)` |
+| `root(root(x, m), n)` | `root(m·n)(x)` |
+
+```javascript
+ce.box(['Sqrt', ['Sqrt', 'x']]).simplify().latex;
+// ➔ "\\sqrt[4]{x}"
+
+ce.box(['Root', ['Root', 'x', 3], 2]).simplify().latex;
+// ➔ "\\sqrt[6]{x}"
+
+ce.box(['Sqrt', ['Root', 'x', 3]]).simplify().latex;
+// ➔ "\\sqrt[6]{x}"
+```
 
 ## Trigonometric Simplification
 

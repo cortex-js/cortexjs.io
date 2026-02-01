@@ -147,6 +147,15 @@ n^2+1 & n \\geq 2
       latex: '(x = \\pi) + 2',
       label: "Errors",
       preamble: 'Syntax errors are represented as \`Error\` functions'
+    },
+
+    {
+      latex: 'F_{10}',
+      label: "Fibonacci",
+      preamble: `Define sequences using LaTeX assignment notation.
+Base cases and recurrence are automatically detected.
+Generate terms and compute sums over sequences.`,
+      template: "sequence"
     }
   ];
 
@@ -200,6 +209,24 @@ expr.evaluateAsync().then(result => console.info(result));
   "simplify": `$0
 const expr = $1;
 console.info(expr.simplify());
+`,
+  "sequence": `$0
+// Define Fibonacci sequence via LaTeX assignments
+ce.parse('F_0 := 0').evaluate();
+ce.parse('F_1 := 1').evaluate();
+ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
+
+// Evaluate specific terms
+console.info('F_10 =', ce.parse('F_{10}').evaluate().value);
+console.info('F_20 =', ce.parse('F_{20}').evaluate().value);
+
+// Generate a list of terms
+const terms = ce.getSequenceTerms('F', 0, 10);
+console.info('First 11 terms:', terms.map(t => t.value).join(', '));
+
+// Sum over sequence terms
+const sum = ce.parse('\\\\sum_{k=0}^{10} F_k').evaluate();
+console.info('Sum of F_0 to F_10 =', sum.value);
 `
 
 };
