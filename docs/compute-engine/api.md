@@ -888,7 +888,7 @@ If *false*, evaluating this expression may change the state of the
 Compute Engine or it may return a different value each time it is
 evaluated, even if the state of the Compute Engine is the same.
 
-As an example, the ["Add", 2, 3]` function expression is pure, but
+As an example, the `["Add", 2, 3]` function expression is pure, but
 the `["Random"]` function expression is not pure.
 
 For a function expression to be pure, the function itself (its operator)
@@ -1743,11 +1743,34 @@ falls back to the interpreting the expression, unless the
 `options.fallback` is set to `false`. If it is set to `false`, the
 function will throw an error if it cannot be compiled.
 
+**Custom operators**: You can override operators to use function calls
+instead of native operators, useful for vector/matrix operations:
+
+```javascript
+const expr = ce.parse("v + w");
+const f = expr.compile({
+  operators: {
+    Add: ['add', 11],      // Convert + to add()
+    Multiply: ['mul', 12]   // Convert * to mul()
+  }
+});
+// Result: add(v, w) instead of v + w
+```
+
 ####### options?
 
 ####### to?
 
-`"javascript"` \| `"wgsl"` \| `"python"` \| `"webassembly"`
+`string`
+
+####### target?
+
+`any`
+
+####### operators?
+
+  \| `Partial`\<`Record`\<`string`, \[`string`, `number`\]\>\>
+  \| (`op`) => \[`string`, `number`\]
 
 ####### functions?
 
@@ -1776,15 +1799,33 @@ function will throw an error if it cannot be compiled.
 ##### BoxedExpression.solve()
 
 ```ts
-solve(vars?): readonly BoxedExpression[]
+solve(vars?): 
+  | readonly BoxedExpression[]
+  | Record<string, BoxedExpression>
+  | Record<string, BoxedExpression>[]
 ```
 
 If this is an equation, solve the equation for the variables in vars.
 Otherwise, solve the equation `this = 0` for the variables in vars.
 
+For univariate equations, returns an array of solutions (roots).
+For systems of linear equations (List of Equal expressions), returns
+an object mapping variable names to their values.
+For non-linear polynomial systems (like xy=6, x+y=5), returns an array
+of solution objects (multiple solutions possible).
+
 ```javascript
+// Univariate equation
 const expr = ce.parse("x^2 + 2*x + 1 = 0");
-console.log(expr.solve("x"));
+console.log(expr.solve("x")); // Returns array of roots
+
+// System of linear equations
+const system = ce.parse("\\begin{cases}x+y=70\\\\2x-4y=80\\end{cases}");
+console.log(system.solve(["x", "y"])); // Returns { x: 60, y: 10 }
+
+// Non-linear polynomial system (product + sum)
+const nonlinear = ce.parse("\\begin{cases}xy=6\\\\x+y=5\\end{cases}");
+console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y: 2 }]
 ```
 
 ####### vars?
@@ -2868,7 +2909,7 @@ A rule describes how to modify an expression that matches a pattern `match`
 into a new expression `replace`.
 
 - `x-1` \( \to \) `1-x`
-- `(x+1)(x-1)` \( \to \) `x^2-1
+- `(x+1)(x-1)` \( \to \) `x^2-1`
 
 The patterns can be expressed as LaTeX strings or `SemiBoxedExpression`'s.
 Alternatively, match/replace logic may be specified by a `RuleFunction`, allowing both custom
@@ -3475,7 +3516,23 @@ ce.parse('F_{10}').evaluate();  // → 55
 optional variable: string;
 ```
 
-Index variable name, default 'n'
+Index variable name for single-index sequences, default 'n'.
+For multi-index sequences, use `variables` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceDefinition.variables?
+
+```ts
+optional variables: string[];
+```
+
+Index variable names for multi-index sequences.
+Example: `['n', 'k']` for Pascal's triangle `P\_{n,k}`
+
+If provided, this takes precedence over `variable`.
 
 </MemberCard>
 
@@ -3484,10 +3541,27 @@ Index variable name, default 'n'
 ##### SequenceDefinition.base
 
 ```ts
-base: Record<number, number | BoxedExpression>;
+base: Record<number | string, number | BoxedExpression>;
 ```
 
-Base cases as index → value mapping
+Base cases as index → value mapping.
+
+For single-index sequences, use numeric keys:
+```typescript
+base: { 0: 0, 1: 1 }  // F_0 = 0, F_1 = 1
+```
+
+For multi-index sequences, use comma-separated string keys:
+```typescript
+base: {
+  '0,0': 1,    // Exact: P_{0,0} = 1
+  'n,0': 1,    // Pattern: P_{n,0} = 1 for all n
+  'n,n': 1,    // Pattern: P_{n,n} = 1 (diagonal)
+}
+```
+
+Pattern keys use variable names to match any value. When the same
+variable appears multiple times (e.g., 'n,n'), the indices must be equal.
 
 </MemberCard>
 
@@ -3520,13 +3594,237 @@ Whether to memoize computed values (default: true)
 ##### SequenceDefinition.domain?
 
 ```ts
-optional domain: {
+optional domain: 
+  | {
   min: number;
   max: number;
-};
+ }
+  | Record<string, {
+  min: number;
+  max: number;
+}>;
 ```
 
-Valid index domain constraints
+Valid index domain constraints.
+
+For single-index sequences:
+```typescript
+domain: { min: 0, max: 100 }
+```
+
+For multi-index sequences, use per-variable constraints:
+```typescript
+domain: { n: { min: 0 }, k: { min: 0 } }
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceDefinition.constraints?
+
+```ts
+optional constraints: string | BoxedExpression;
+```
+
+Constraint expression for multi-index sequences.
+The expression should evaluate to a boolean/numeric value.
+If it evaluates to false or 0, the subscript is considered out of domain.
+
+Example: `'k <= n'` for Pascal's triangle (only valid when k ≤ n)
+
+</MemberCard>
+
+### SequenceStatus
+
+Status of a sequence definition.
+
+<MemberCard>
+
+##### SequenceStatus.status
+
+```ts
+status: "complete" | "pending" | "not-a-sequence";
+```
+
+Status of the sequence:
+- 'complete': Both base case(s) and recurrence defined
+- 'pending': Waiting for base case(s) or recurrence
+- 'not-a-sequence': Symbol is not a sequence
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.hasBase
+
+```ts
+hasBase: boolean;
+```
+
+Whether at least one base case is defined
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.hasRecurrence
+
+```ts
+hasRecurrence: boolean;
+```
+
+Whether a recurrence relation is defined
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.baseIndices
+
+```ts
+baseIndices: (string | number)[];
+```
+
+Keys of defined base cases.
+For single-index: numeric indices (e.g., [0, 1])
+For multi-index: string keys including patterns (e.g., ['0,0', 'n,0', 'n,n'])
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.variable?
+
+```ts
+optional variable: string;
+```
+
+Index variable name if recurrence is defined (single-index)
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceStatus.variables?
+
+```ts
+optional variables: string[];
+```
+
+Index variable names if recurrence is defined (multi-index)
+
+</MemberCard>
+
+### SequenceInfo
+
+Information about a defined sequence for introspection.
+
+<MemberCard>
+
+##### SequenceInfo.name
+
+```ts
+name: string;
+```
+
+The sequence name
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.variable?
+
+```ts
+optional variable: string;
+```
+
+Index variable name for single-index sequences (e.g., `"n"`)
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.variables?
+
+```ts
+optional variables: string[];
+```
+
+Index variable names for multi-index sequences (e.g., `["n", "k"]`)
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.baseIndices
+
+```ts
+baseIndices: (string | number)[];
+```
+
+Base case keys.
+For single-index: numeric indices
+For multi-index: string keys including patterns
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.memoize
+
+```ts
+memoize: boolean;
+```
+
+Whether memoization is enabled
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.domain
+
+```ts
+domain: 
+  | {
+  min: number;
+  max: number;
+ }
+  | Record<string, {
+  min: number;
+  max: number;
+}>;
+```
+
+Domain constraints.
+For single-index: `{ min?, max? }`
+For multi-index: per-variable constraints
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.cacheSize
+
+```ts
+cacheSize: number;
+```
+
+Number of cached values
+
+</MemberCard>
+
+<MemberCard>
+
+##### SequenceInfo.isMultiIndex
+
+```ts
+isMultiIndex: boolean;
+```
+
+Whether this is a multi-index sequence
 
 </MemberCard>
 
@@ -5104,6 +5402,7 @@ dictionary entries to define custom LaTeX parsing and serialization.
 
 ```ts
 type ParseLatexOptions = NumberFormat & {
+  strict: boolean;
   skipSpace: boolean;
   parseNumbers: "auto" | "rational" | "decimal" | "never";
   getSymbolType: (symbol) => BoxedType;
@@ -5116,6 +5415,20 @@ type ParseLatexOptions = NumberFormat & {
 ```
 
 The LaTeX parsing options can be used with the `ce.parse()` method.
+
+#### ParseLatexOptions.strict
+
+```ts
+strict: boolean;
+```
+
+Controls the strictness of LaTeX parsing:
+
+- `true`: Strict LaTeX syntax required (e.g., `\sin{x}`, `x^{n+1}`)
+- `false`: Accept relaxed Math-ASCII/Typst-like syntax in addition to
+  LaTeX (e.g., `sin(x)`, `x^(n+1)`)
+
+**Default**: `true`
 
 #### ParseLatexOptions.skipSpace
 
@@ -6890,6 +7203,112 @@ bignum(value): Decimal
 ####### value
 
 `string` | `number` | `bigint` | `Decimal`
+
+</MemberCard>
+
+## OEIS
+
+### OEISSequenceInfo
+
+Result from an OEIS lookup operation.
+
+<MemberCard>
+
+##### OEISSequenceInfo.id
+
+```ts
+id: string;
+```
+
+OEIS sequence ID (e.g., 'A000045')
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.name
+
+```ts
+name: string;
+```
+
+Sequence name/description
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.terms
+
+```ts
+terms: number[];
+```
+
+First several terms of the sequence
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.formula?
+
+```ts
+optional formula: string;
+```
+
+Formula or recurrence (if available)
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.comments?
+
+```ts
+optional comments: string[];
+```
+
+Comments about the sequence
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISSequenceInfo.url
+
+```ts
+url: string;
+```
+
+URL to the OEIS page
+
+</MemberCard>
+
+### OEISOptions
+
+Options for OEIS operations.
+
+<MemberCard>
+
+##### OEISOptions.timeout?
+
+```ts
+optional timeout: number;
+```
+
+Request timeout in milliseconds (default: 10000)
+
+</MemberCard>
+
+<MemberCard>
+
+##### OEISOptions.maxResults?
+
+```ts
+optional maxResults: number;
+```
+
+Maximum number of results to return for lookups (default: 5)
 
 </MemberCard>
 

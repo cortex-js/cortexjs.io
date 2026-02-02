@@ -592,11 +592,46 @@ Recursively expand out products and positive integer powers in `expr` and all su
 
 <Signature name="Factor">_expr_</Signature>
 
-Factor an algebraic expression into a product of irreducible factors.
+<Signature name="Factor">_expr_, _var_</Signature>
 
+Factor a polynomial expression into a product of irreducible factors.
+
+Supports:
+- **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
+- **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
+- **Quadratic factoring**: $ ax^2 + bx + c $ (when roots are rational)
+- **Common factor extraction**: $ 2x + 4 \to 2(x+2) $
+
+The optional `var` parameter specifies which variable to factor over.
+
+**Perfect square trinomial:**
 ```json example
 ["Factor", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
-// ➔ ["Power", ["Add", "x", 1], 2]
+// ➔ ["Power", ["Add", "x", 1], 2]  // (x+1)²
+```
+
+**Quadratic with rational roots:**
+```json example
+["Factor", ["Add", ["Power", "x", 2], ["Multiply", 5, "x"], 6]]
+// ➔ ["Multiply", ["Add", "x", 2], ["Add", "x", 3]]  // (x+2)(x+3)
+```
+
+**Difference of squares:**
+```json example
+["Factor", ["Add", ["Power", "x", 2], -4]]
+// ➔ ["Multiply", ["Add", "x", -2], ["Add", "x", 2]]  // (x-2)(x+2)
+```
+
+**With coefficients:**
+```json example
+["Factor", ["Add", ["Multiply", 4, ["Power", "x", 2]], ["Multiply", 12, "x"], 9]]
+// ➔ ["Power", ["Add", ["Multiply", 2, "x"], 3], 2]  // (2x+3)²
+```
+
+**Automatic use in sqrt simplification:**
+```json example
+["Sqrt", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
+// ➔ ["Abs", ["Add", "x", 1]]  // |x+1| (auto-factors before applying sqrt rule)
 ```
 
 </FunctionDefinition>

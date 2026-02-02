@@ -77,6 +77,51 @@ For more control over polynomial operations, or for multivariate expressions,
 use the explicit `Cancel`, `PolynomialGCD`, `PolynomialQuotient`, and
 `PolynomialRemainder` functions.
 
+### Automatic Factoring in Square Roots
+
+When simplifying square root expressions, the engine automatically attempts to
+factor the argument to enable further simplification. This handles cases where
+the argument is an expanded perfect square.
+
+For example:
+- $ \sqrt{x^2 + 2x + 1} $ simplifies to $ |x + 1| $ (recognizes perfect square trinomial)
+- $ \sqrt{4x^2 + 12x + 9} $ simplifies to $ |2x + 3| $
+- $ \sqrt{a^2 + 2ab + b^2} $ simplifies to $ |a + b| $
+- $ \sqrt{a^2 - 2ab + b^2} $ simplifies to $ |a - b| $
+
+```javascript
+ce.parse('\\sqrt{x^2 + 2x + 1}').simplify().latex;
+// ➔ "|x+1|"
+
+ce.parse('\\sqrt{4x^2 + 12x + 9}').simplify().latex;
+// ➔ "|2x+3|"
+```
+
+This automatic factoring only occurs within `sqrt()` expressions during
+simplification. For explicit factoring of polynomials, use the `Factor` function.
+
+### Explicit Factoring and Expansion
+
+For more control over polynomial form, use `Factor` and `Expand`:
+
+```javascript
+// Factor a polynomial
+ce.parse('x^2 + 5x + 6').factor().latex;
+// ➔ "(x+2)(x+3)"
+
+ce.parse('x^2 - 4').factor().latex;
+// ➔ "(x-2)(x+2)"
+
+// Expand a product
+ce.parse('(x+1)(x+2)').expand().latex;
+// ➔ "x^2+3x+2"
+```
+
+The `Factor` function currently supports:
+- **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
+- **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
+- **Quadratics with rational roots**: $ x^2 + bx + c $ when roots are rational
+
 <ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
 <strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
 

@@ -248,6 +248,9 @@ ce.verify(ce.parse("x > 0"));
 The method `ce.verify()` returns `true` if the assumption is true, `false` if it is
 not, and `undefined` if it cannot be determined.
 
+Logical operators (`And`, `Or`, `Not`) use 3-valued logic, so expressions like
+`And(True, Unknown)` return `undefined`.
+
 While `ce.verify()` is appropriate to get boolean answers, more complex queries can
 also be made.
 
@@ -257,18 +260,26 @@ The argument of `ce.ask()` can be a pattern, and it returns an array of matches 
 `Substitution` objects.
 
 ```js
-// "x is a positive integer"
+// "x is positive"
 ce.assume(ce.parse("x > 0"));
 
-// "What is x greater than?"
-ce.ask(["Greater", "x", "_val"]);
+// Ask for a lower bound (common query pattern)
+ce.ask(["Greater", "x", "_k"]);
 
-//  -> [{"val": 0}] "It is greater than 0"
+//  -> [{"_k": 0}] "It is greater than 0"
+
+// You can also ask "which symbols are greater than 0?"
+ce.ask(["Greater", "_x", 0]);
+
+//  -> [{"_x": x}]
+
+// Inequalities are stored internally in a normalized form, so this is also a
+// matching query:
+ce.ask(["Less", ["Negate", "x"], "_k"]);
+
+//  -> [{"_k": 0}]
 ```
 
 <ReadMore path="/compute-engine/guides/patterns-and-rules/" > 
 Read more about **Patterns and Rules**<Icon name="chevron-right-bold" />
 </ReadMore>
-
-
-

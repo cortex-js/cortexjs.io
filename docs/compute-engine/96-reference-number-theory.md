@@ -94,7 +94,7 @@ See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_f
 
 <FunctionDefinition name="Eulerian">
 <Signature name="Eulerian" returns="integer">n: integer, m: integer</Signature>
-Returns the <b>Eulerian number</b> A(n, m), counting permutations of {1..n} with exactly m ascents.
+Returns the <b>Eulerian number</b> A(n, m), counting permutations of `{1..n}` with exactly m ascents.
 
 Eulerian numbers count the permutations of the numbers 1 through $n$ that have exactly $m$ ascents (positions where the next number is greater than the previous one). For example, for $n=4$ and $m=2$, there are 11 such permutations.
 

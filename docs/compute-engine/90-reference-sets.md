@@ -17,6 +17,19 @@ ce.parse("42 \\in \\Z").evaluate().print();
 // ➔ True
 ```
 
+`Element` and `NotElement` can also be used with a **type name** on the right
+hand side (e.g. `integer`, `real`, `finite_real`, `number`, `any`), in which
+case the check is done against the expression type.
+
+```js
+ce.declare('x', 'finite_real');
+ce.box(['Element', 'x', 'real']).evaluate().print();
+// ➔ True
+
+ce.box(['Element', 'x', 'integer']).evaluate().print();
+// ➔ False
+```
+
 Checking if an element is in a set is equivalent to checking if the type of the
 element matches the type associated with the set.
 
@@ -104,3 +117,80 @@ To check the membership of an element in a set or the relationship between two s
 | `SupersetEqual` | $$ \operatorname{A} \supseteq \operatorname{B} $$                                                                                                                       | `\operatorname{A} \supseteq \operatorname{B}`                                                              |
 
 </div>
+
+## Intervals
+
+An **interval** is a set of real numbers that contains all numbers between two endpoints. Intervals can be open (excluding endpoints), closed (including endpoints), or half-open (including one endpoint but not the other).
+
+### Interval Notation
+
+The Compute Engine supports both American and ISO/European interval notation:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16ch"}}>
+
+| Notation | LaTeX | MathJSON | Description |
+| :------- | :---- | :------- | :---------- |
+| $[a, b]$ | `[a, b]` | `["Interval", a, b]` | Closed interval (both endpoints included) |
+| $(a, b)$ | `(a, b)` | `["Interval", ["Open", a], ["Open", b]]` | Open interval (both endpoints excluded) |
+| $[a, b)$ | `[a, b)` | `["Interval", a, ["Open", b]]` | Half-open (closed-open) |
+| $(a, b]$ | `(a, b]` | `["Interval", ["Open", a], b]` | Half-open (open-closed) |
+| $]a, b[$ | `]a, b[` | `["Interval", ["Open", a], ["Open", b]]` | Open interval (ISO notation) |
+
+</div>
+
+The `Open` wrapper indicates that an endpoint is excluded from the interval.
+
+### Delimiter Variants
+
+All interval notations support LaTeX delimiter sizing commands:
+
+- **Explicit bracket commands**: `\lbrack`, `\rbrack`, `\lparen`, `\rparen`
+- **Sizing prefixes**: `\left`/`\right`, `\bigl`/`\bigr`, `\Bigl`/`\Bigr`, `\biggl`/`\biggr`, `\Biggl`/`\Biggr`
+- **Spacing commands**: `\mathopen`/`\mathclose`
+
+```js
+// All of these parse to the same Interval expression:
+ce.parse('[3, 4)').json;
+ce.parse('\\lbrack 3, 4\\rparen').json;
+ce.parse('\\left[ 3, 4 \\right)').json;
+ce.parse('\\bigl[ 3, 4 \\bigr)').json;
+ce.parse('\\mathopen\\lbrack 3, 4\\mathclose\\rparen').json;
+// → ["Interval", 3, ["Open", 4]]
+```
+
+```js
+ce.parse('[0, 1)').json;
+// ➔ ["Interval", 0, ["Open", 1]]
+
+ce.parse('(-\\infty, 0]').json;
+// ➔ ["Interval", ["Open", ["Negate", "PositiveInfinity"]], 0]
+```
+
+### Contextual Interval Parsing
+
+When bracket notation appears in a set context (such as with `\in`, `\cup`, `\cap`, `\subset`, etc.), the Compute Engine automatically interprets it as an interval:
+
+```js
+// In set context: [0, 1] becomes an Interval
+ce.parse('x \\in [0, 1]').json;
+// ➔ ["Element", "x", ["Interval", 0, 1]]
+
+ce.parse('[0, 1] \\cup [2, 3]').json;
+// ➔ ["Union", ["Interval", 0, 1], ["Interval", 2, 3]]
+
+// Standalone: [0, 1] remains a List for backward compatibility
+ce.parse('[0, 1]').json;
+// ➔ ["List", 0, 1]
+```
+
+### Interval Serialization
+
+Intervals are serialized using American notation with explicit LaTeX bracket commands:
+
+```js
+ce.box(['Interval', 0, ['Open', 1]]).latex;
+// ➔ "\\lbrack0, 1\\rparen"
+
+ce.box(['Interval', ['Open', 0], ['Open', 1]]).latex;
+// ➔ "\\lparen0, 1\\rparen"
+```
