@@ -268,11 +268,13 @@ The Compute Engine includes a plugin architecture that allows you to register cu
 
 ### Built-in Targets
 
-The Compute Engine comes with three compilation targets:
+The Compute Engine comes with these compilation targets:
 
 - **`javascript`** (default) - Compiles to executable JavaScript functions
 - **`glsl`** - Compiles to GLSL (OpenGL Shading Language) for WebGL shaders
 - **`python`** - Compiles to Python/NumPy code for scientific computing (requires registration)
+- **`interval-js`** - Compiles to JavaScript using interval arithmetic for reliable function plotting
+- **`interval-glsl`** - Compiles to GLSL using interval arithmetic for GPU-based plotting
 
 ### Compiling to Different Targets
 
@@ -373,6 +375,122 @@ The Python target maps to NumPy functions:
 - **Linear Algebra**: `dot` → `np.dot`, `cross` → `np.cross`
 
 For complete documentation, see the [Python Target Guide](https://cortexjs.io/compute-engine/guides/python-target/).
+
+### Interval Arithmetic Targets
+
+The Compute Engine includes interval arithmetic compilation targets designed for
+reliable function plotting. These targets operate on intervals `[lo, hi]` rather
+than point values, providing guaranteed enclosures of the true result and
+detecting singularities.
+
+#### Why Interval Arithmetic?
+
+Standard plotting approaches sample functions at regular intervals, which can:
+- Miss features (spikes between sample points)
+- Create aliasing (high-frequency oscillations appear as lower frequencies)
+- Produce wild line segments at singularities (like `tan(π/2)`)
+- Render discontinuities as vertical lines
+
+Interval arithmetic addresses these by:
+- Returning wide intervals when uncertainty is high (triggers refinement)
+- Explicitly detecting division by zero and other singularities
+- Indicating when function domains are restricted
+
+#### JavaScript Interval Target (`interval-js`)
+
+```javascript
+const expr = ce.parse('\\sin(x) / x');
+const fn = expr.compile({ to: 'interval-js' });
+
+// Call with interval inputs
+const result = fn({ x: { lo: -0.1, hi: 0.1 } });
+console.log(result);
+// → { kind: 'singular' }  // Division by interval containing zero
+```
+
+The function accepts an object where keys are variable names and values are
+`Interval` objects with `lo` and `hi` properties.
+
+#### Result Types
+
+The compiled function returns an `IntervalResult` discriminated union:
+
+| Kind | Meaning | Example |
+|------|---------|---------|
+| `interval` | Normal result with bounds | `sin([0, π])` → `{ kind: 'interval', value: { lo: 0, hi: 1 } }` |
+| `empty` | No valid output values | `sqrt([-2, -1])` → `{ kind: 'empty' }` |
+| `entire` | Result spans all reals | Division with mixed signs near zero |
+| `singular` | Contains a pole/asymptote | `1 / [-1, 1]` → `{ kind: 'singular' }` |
+| `partial` | Partially valid domain | `sqrt([-1, 4])` → `{ kind: 'partial', value: { lo: 0, hi: 2 }, domainClipped: 'lo' }` |
+
+#### Examples
+
+```javascript
+// Simple function - normal result
+const sin = ce.parse('\\sin(x)').compile({ to: 'interval-js' });
+sin({ x: { lo: 0, hi: Math.PI } });
+// → { kind: 'interval', value: { lo: 0, hi: 1 } }
+
+// Singularity detection
+const recip = ce.parse('1/x').compile({ to: 'interval-js' });
+recip({ x: { lo: -1, hi: 1 } });
+// → { kind: 'singular' }
+
+// Partial domain
+const sqrt = ce.parse('\\sqrt{x}').compile({ to: 'interval-js' });
+sqrt({ x: { lo: -1, hi: 4 } });
+// → { kind: 'partial', value: { lo: 0, hi: 2 }, domainClipped: 'lo' }
+
+// Multi-variable expressions
+const fn = ce.parse('x^2 + y').compile({ to: 'interval-js' });
+fn({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
+// → { kind: 'interval', value: { lo: 1, hi: 4.5 } }
+```
+
+#### GLSL Interval Target (`interval-glsl`)
+
+For GPU-based plotting, compile to GLSL interval arithmetic:
+
+```javascript
+import { IntervalGLSLTarget } from '@cortex-js/compute-engine';
+
+const target = new IntervalGLSLTarget();
+const expr = ce.parse('\\sin(x) + y^2');
+
+// Generate complete shader code
+const shader = target.compileShaderFunction(expr, {
+  functionName: 'evaluateInterval',
+  parameters: ['x', 'y'],
+  version: '300 es'
+});
+
+console.log(shader);
+// Outputs complete GLSL shader with interval arithmetic library
+```
+
+In GLSL, intervals are represented as `vec2` where `.x` is the lower bound and
+`.y` is the upper bound. The generated shader includes status flags for
+singularity detection.
+
+#### Plotting Integration
+
+The interval results enable adaptive plotting algorithms:
+
+```javascript
+function shouldSubdivide(result, tolerance) {
+  switch (result.kind) {
+    case 'singular':
+    case 'entire':
+      return true;  // Always refine near singularities
+    case 'interval':
+    case 'partial':
+      return (result.value.hi - result.value.lo) > tolerance;
+    case 'empty':
+      return false;  // Nothing to plot
+  }
+}
+```
+
 
 ### Registering Custom Targets
 

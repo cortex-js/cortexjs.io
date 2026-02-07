@@ -10,6 +10,166 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.35.6 _2026-02-07_
+
+### Bug Fixes
+
+- **Monte Carlo improper integrals**: Fixed two bugs in `monteCarloEstimate()`
+  that produced incorrect results (typically `NaN` or `Infinity`) for improper
+  integrals. The change-of-variables estimator was inverted (`f(x) / jacobian`
+  instead of `f(x) * jacobian`), and the finite-interval scale factor `b - a`
+  was applied to transformed domains where it is infinite. Affects `NIntegrate`
+  and compiled `integrate` for any integral with infinite bounds.
+
+### Compilation
+
+- **`Truncate`, `Remainder`, and `Mod` for JS/GLSL targets**: Added `Truncate`
+  (`Math.trunc` / `trunc`), `Remainder`, and `Mod` to the JavaScript and GLSL
+  compilation targets, matching the Python target which already had them.
+
+- **Interval `trunc` and `remainder`**: Added `trunc()` and `remainder()` to the
+  interval arithmetic library. `trunc` has proper discontinuity detection
+  (behaves like `floor` for positive, `ceil` for negative, continuous at zero).
+  `remainder(a, b) = a - b * round(a/b)` composes existing interval operations
+  with discontinuity detection inherited from `round`. Added corresponding
+  mappings to both interval JavaScript and interval GLSL targets.
+
+- **Interval `Lb`, `Log`, and `Root` for GLSL**: Added `ia_log2`, `ia_log10`,
+  and `Root` to the interval GLSL target for consistency with the interval
+  JavaScript target.
+
+- **Reverse cross-reference test**: Added a test that verifies all core CE math
+  functions have compilation support in every target. Currently all 5 targets
+  have full coverage of the 47 compilable math functions.
+
+## 0.35.5 _2026-02-06_
+
+### Bug Fixes
+
+- **Compilation Target Function Name Mismatches**: Fixed several function keys
+  in compilation targets that did not match their canonical library operator
+  names, causing silent compilation failures and runtime errors ("Unexpected
+  value"). Affected mappings: `Ceiling` → `Ceil`, `Sgn` → `Sign`, `LogGamma` →
+  `GammaLn`, `Arcsinh` → `Arsinh`, `Arccosh` → `Arcosh`, `Arctanh` → `Artanh`,
+  `Re` → `Real`, `Im` → `Imaginary`, `Arg` → `Argument` across all five
+  compilation targets.
+
+- **Missing Library Operator Definitions**: Added library definitions for
+  `Exp2`, `Fract`, `Log10`, `Log2`, `Remainder`, and `Truncate` which were
+  referenced by compilation targets but had no corresponding library entries.
+  `Exp2` canonicalizes to `Power(2, x)`, `Log10`/`Log2` canonicalize to `Log`
+  with the appropriate base, and `Fract`, `Remainder`, `Truncate` have direct
+  numeric evaluation.
+
+- **Derivative Rule for GammaLn**: Fixed the derivative table entry that used
+  the non-canonical name `LogGamma` instead of `GammaLn`, preventing the
+  derivative `d/dx GammaLn(x) = Digamma(x)` from being computed.
+
+## 0.35.4 _2026-02-06_
+
+### Interval Arithmetic
+
+- **Discontinuity Continuity Direction**: Singular interval results now include
+  an optional `continuity` field (`'left'` or `'right'`) indicating from which
+  side the function is continuous at a jump discontinuity. `Floor`, `Round`,
+  `Fract`, and `Mod` report `'right'` (right-continuous), `Ceil` reports
+  `'left'` (left-continuous). Pole-type singularities (e.g., `tan`, `1/x`) leave
+  the field undefined. This is reflected in both the JavaScript and GLSL
+  interval arithmetic targets (new `IA_SINGULAR_RIGHT` and `IA_SINGULAR_LEFT`
+  status constants in GLSL).
+
+## 0.35.3 _2026-02-06_
+
+### Compilation
+
+- **Expanded Function Support Across All Targets**: Added comprehensive function
+  mappings to all five compilation targets (JavaScript, GLSL, Interval GLSL,
+  Interval JavaScript, Python): reciprocal trig (`Cot`, `Csc`, `Sec`), inverse
+  reciprocal trig (`Arccot`, `Arccsc`, `Arcsec`), hyperbolic (`Sinh`, `Cosh`,
+  `Tanh`), reciprocal hyperbolic (`Coth`, `Csch`, `Sech`), inverse hyperbolic
+  (`Arcosh`, `Arsinh`, `Artanh`, `Arcoth`, `Arcsch`, `Arsech`), and elementary
+  functions (`Sgn`, `Lb`, `Log` with base, `Square`, `Root`, `Fract`).
+
+- **Interval Discontinuity Detection**: `Floor`, `Ceil`, `Round`, `Sign`,
+  `Fract`, and `Mod` now correctly report singularities when an interval spans a
+  discontinuity point, in both the JavaScript and GLSL interval arithmetic
+  targets. Previously these functions returned normal interval bounds even
+  across jump discontinuities, which could cause incorrect connecting lines in
+  plotted curves.
+
+- **New Interval Functions**: Added `Round`, `Fract`, and `Mod` to the interval
+  arithmetic targets (both JS and GLSL) with proper discontinuity detection.
+
+## 0.35.2 _2026-02-05_
+
+### Bug Fixes
+
+- **Decimal Number Representation**: Numbers written with a decimal point (e.g.,
+  `6.02e23`) are now correctly treated as approximate decimal values
+  (`BigNumericValue`) rather than exact integers. Previously, `6.02e23` was
+  incorrectly converted to the exact bigint `602000000000000000000000`, which
+  implied false precision and caused memory inefficiency for very large
+  exponents. Numbers without a decimal point (e.g., `602e21`) continue to be
+  treated as exact integers when possible. This change aligns with the
+  documented behavior of the `parseNumbers: 'auto'` option.
+
+- **Scientific Notation Serialization**
+  ([#284](https://github.com/cortex-js/compute-engine/issues/284)): Fixed
+  `toLatex()` with `scientific` and `adaptiveScientific` notation options to
+  produce properly normalized output. Previously, numbers like `6.02e23` would
+  serialize as `602\cdot10^{21}` instead of the expected `6.02\cdot10^{23}`. The
+  output now depends only on the numeric value and formatting options, not on
+  the internal representation.
+
+- **Numeric Sum Precision**: Fixed precision loss when summing large integers
+  with rational values (e.g., `12345678^3 + 1/3`). The `ExactNumericValue.sum()`
+  method now uses `bignumRe` instead of `re` to preserve full precision when
+  handling large integer values from `BigNumericValue`.
+
+- **Broadcastable Functions with Union/Any Types**
+  ([#235](https://github.com/cortex-js/compute-engine/issues/235)):
+  Broadcastable (threadable) functions like `Multiply` and `Add` no longer
+  reject arguments whose type is a union of numeric and collection types (e.g.,
+  `number | list`) or `any`. Previously, declaring a symbol as
+  `ce.declare('a', 'number | list')` and using it in
+  `ce.box(['Multiply', 'a', 'b'])` would produce an `incompatible-type` error.
+
+- **Division Canonicalization Over-Simplification**
+  ([#227](https://github.com/cortex-js/compute-engine/issues/227)): Fixed `A/A`
+  being incorrectly simplified to `1` during canonicalization for constant
+  expressions that evaluate to infinity or zero, such as `tan(π/2)/tan(π/2)`.
+  This now correctly evaluates to `NaN` (since `∞/∞` is indeterminate) instead
+  of `1`. Expressions with free variables (e.g., `x/x`, `sin(x)/sin(x)`)
+  continue to simplify to `1` per standard algebraic convention. Also fixed
+  deferred constant divisions like `0/(1-1)` and `(1-1)/(1-1)` to properly
+  evaluate to `NaN` instead of remaining as unevaluated expressions.
+
+## 0.35.1 _2026-02-03_
+
+### Bug Fixes
+
+- **Interval Arithmetic (JS/GLSL)**: Fixed interval evaluation of compound
+  arguments (e.g. `sin(2x)`, `sin(x+x)`, `sin(x^2)`, `cos(2x)`) by propagating
+  interval results through trig, elementary, and comparison functions in
+  `interval-js`, and by adding `IntervalResult` overloads to the GLSL interval
+  library for `interval-glsl`.
+
+## 0.35.0 _2026-02-02_
+
+### Parsing
+
+- **Large Integer Precision**: Fixed precision loss when parsing integers
+  exceeding `Number.MAX_SAFE_INTEGER` with `parseNumbers: 'rational'`. Large
+  integers and rational numerators now use BigInt arithmetic to preserve exact
+  values. Fixes #283.
+
+### Compilation
+
+- **Interval Arithmetic Targets**: Added two new compilation targets for
+  reliable singularity detection:
+  - `interval-js` - Compiles to JavaScript using interval arithmetic
+  - `interval-glsl` - Compiles to GLSL for GPU-based interval evaluation
+
 ## 0.34.0 _2026-02-01_
 
 ### Parsing
@@ -53,10 +213,10 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Compilation
 
-- **Custom Operator Compilation**: The `compile()` method now supports overriding
-  operators to use function calls instead of native operators. This enables
-  compilation of vector/matrix operations and custom domain-specific languages.
-  Addresses #240.
+- **Custom Operator Compilation**: The `compile()` method now supports
+  overriding operators to use function calls instead of native operators. This
+  enables compilation of vector/matrix operations and custom domain-specific
+  languages. Addresses #240.
 
   ```javascript
   // Override operators for vector operations
@@ -107,13 +267,14 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ```
 
   Exported building blocks include `CompileTarget`, `LanguageTarget`,
-  `CompilationOptions`, `CompiledExecutable`, `BaseCompiler`, `JavaScriptTarget`,
-  and `GLSLTarget` (plus helper types like `CompiledOperators` and
-  `CompiledFunctions`).
+  `CompilationOptions`, `CompiledExecutable`, `BaseCompiler`,
+  `JavaScriptTarget`, and `GLSLTarget` (plus helper types like
+  `CompiledOperators` and `CompiledFunctions`).
 
-- **Compilation Plugin Architecture**: The Compute Engine now supports registering
-  custom compilation targets, allowing you to compile mathematical expressions to
-  any target language beyond the built-in JavaScript and GLSL targets.
+- **Compilation Plugin Architecture**: The Compute Engine now supports
+  registering custom compilation targets, allowing you to compile mathematical
+  expressions to any target language beyond the built-in JavaScript and GLSL
+  targets.
 
   ```javascript
   import { ComputeEngine, BaseCompiler } from '@cortex-js/compute-engine';
@@ -188,8 +349,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   See the [Python/NumPy Target Guide](/compute-engine/guides/python-target/) for
   complete documentation and examples.
 
-- **GLSL Compilation Target**: New built-in GLSL (OpenGL Shading Language) target
-  for compiling mathematical expressions to WebGL shaders.
+- **GLSL Compilation Target**: New built-in GLSL (OpenGL Shading Language)
+  target for compiling mathematical expressions to WebGL shaders.
 
   ```javascript
   const expr = ce.parse('x^2 + y^2');
@@ -255,9 +416,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   // → "(x+2)(x+3)"
   ```
 
-  **Automatic Factoring in sqrt Simplification**: Square roots now
-  automatically factor their arguments before applying simplification rules,
-  enabling expressions like `√(x²+2x+1)` to simplify to `|x+1|`.
+  **Automatic Factoring in sqrt Simplification**: Square roots now automatically
+  factor their arguments before applying simplification rules, enabling
+  expressions like `√(x²+2x+1)` to simplify to `|x+1|`.
 
   ```javascript
   // Issue #180 - Now works!
@@ -277,6 +438,7 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `factorPolynomial`).
 
   **MathJSON API**:
+
   ```json
   ["Factor", expr]              // Auto-detect variable
   ["Factor", expr, variable]    // Explicit variable specification
@@ -299,8 +461,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ce.parse('|x^{3/2}|').simplify().latex;  // → "|x|^{3/2}" (odd numerator)
   ```
 
-- **Assumption-Based Simplification**: Simplification rules use assumptions about
-  symbol signs:
+- **Assumption-Based Simplification**: Simplification rules use assumptions
+  about symbol signs:
 
   ```javascript
   ce.assume(ce.parse('x > 0'));
@@ -4184,8 +4346,8 @@ Work around unpckg.com issue with libraries using BigInt.
 - Changed from "decimal" to "bignum". "Decimal" is a confusing name, since it is
   used to represent both integers and floating point numbers. Its key
   characteristic is that it is an arbitrary precision number, aka "bignum". This
-  affects `ce.numericMode` which now uses `bignum` instead of
-  `decimal`, `expr.decimalValue`->`expr.bignumValue`, `decimalValue()`->`bignumValue()`
+  affects `ce.numericMode` which now uses `bignum` instead of `decimal`,
+  `expr.decimalValue`->`expr.bignumValue`, `decimalValue()`->`bignumValue()`
 
 ### Bugs Fixed
 
@@ -4214,8 +4376,8 @@ Work around unpckg.com issue with libraries using BigInt.
 - Added `Min`, `Max`, `Clamp`
 - Parsing of `\sum`, `\prod`, `\int`.
 - Added parsing of log functions, `\lb`, `\ln`, `\ln_{10}`, `\ln_2`, etc...
-- Added
-  `expr.subexpressions`, `expr.getSubexpressions()`, `expr.errors`, `expr.symbols`, `expr.isValid`.
+- Added `expr.subexpressions`, `expr.getSubexpressions()`, `expr.errors`,
+  `expr.symbols`, `expr.isValid`.
 - Symbols can now be used to represent functions, i.e. `ce.box('Sin').domain`
   correctly returns `["Domain", "Function"]`.
 - Correctly handle rational numbers with a numerator or denominator outside the

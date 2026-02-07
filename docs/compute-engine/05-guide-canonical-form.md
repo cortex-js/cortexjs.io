@@ -272,6 +272,33 @@ ce.parse(latex,
 ).print();
 ```
 
+## Canonical Form Pipeline
+
+When you specify a list of canonical forms (e.g., `["Number", "Power", "Divide"]`),
+the forms are applied in the specified order. Each form recursively transforms
+sub-expressions that match its type.
+
+Some forms have dependencies on other forms:
+
+- The **Divide** form internally applies the **Power** form to its operands
+  before calling `canonicalDivide`. This is because division canonicalization
+  benefits from having power expressions already normalized.
+
+- All forms apply **symbol canonicalization** first (constant symbols with
+  `holdUntil: 'never'` are substituted with their values).
+
+The result of partial canonicalization is a **structural** expression, not a
+fully canonical one. This means:
+
+- `expr.isCanonical` returns `false`
+- `expr.isStructural` returns `true`
+- Calling `expr.canonical` will perform full canonicalization
+- The expression can be used in arithmetic operations (`.add()`, `.mul()`, etc.)
+
+The order in which forms are specified matters. For example, applying `"Number"`
+before `"Power"` ensures that numeric literals are resolved before power
+simplifications are attempted.
+
 ## Custom Transformations
 
 You can also define your own transformations to apply to an expression to

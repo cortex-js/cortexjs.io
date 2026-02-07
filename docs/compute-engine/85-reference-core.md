@@ -475,6 +475,15 @@ const correct = ce.parse(mf.value, {canonical: "Order"})
 
 Both `1+x` and `x+1` will return **true**, but `2-1+x` will return **false**.
 
+**Note**: The **Divide** form internally applies the **Power** form to its
+operands. If you need division canonicalization, it is not necessary to
+separately specify **Power** in your form list, though it does no harm.
+
+The result of partial canonicalization is a **structural** expression.
+Calling `.canonical` on the result will perform full canonicalization.
+The form application order matters: forms are applied sequentially, and
+each form may benefit from transformations made by earlier forms.
+
 **Note**: see also the options for the `canonical` option of `ce.parse()` and
 `ce.box()` which can also be used to specify a custom canonical form:
 
