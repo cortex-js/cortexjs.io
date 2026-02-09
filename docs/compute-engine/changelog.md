@@ -336,6 +336,40 @@ ce.simplificationRules.push({
   Applied to `\det`, `\tr`, `\Re`, `\Im`, `\arg`, `\max`, `\min`, `\sup`,
   `\inf`.
 
+### Simplification
+
+- **Infinity handling for 24+ functions**: `arctan(∞)`, `arccot(±∞)`,
+  `tanh/coth/sech/csch(±∞)`, `arsinh(-∞)`, `arcosh(-∞)`, `arccoth(±∞)`,
+  `arcsch(±∞)`, `π^∞`, `∞^n`, `(-∞)^{-n}`, `log_∞(x)`, `log_{0.5}(∞)`,
+  `√∞`, `∛∞` now all return correct limits.
+
+- **Root edge cases**: `Root(x, 0) → NaN`, `Root(0, n)`, `Root(1, n)`,
+  `Root(+∞, n)`, and `Sqrt(+∞)` now handled correctly.
+
+- **Division edge cases**: `a/a → 1` now works for compound expressions
+  (e.g., `(π+1)/(π+1)`); `2/0 → ComplexInfinity` and `1/(1/0) → 0` propagate
+  correctly.
+
+- **Logarithm edge cases**: Fixed infinity detection in `simplify-log.ts`
+  (was using `sym()` which fails on `BoxedNumber` infinity values); added
+  `log_∞(∞) → NaN`, base-aware `log_c(0)`, guards for `log_1(x)` and
+  `log_c(c^x)` evaluation.
+
+- **Absolute value of odd functions**: `|arcsin(x)|`, `|sinh(x)|`, `|arsinh(x)|`,
+  `|artanh(x)|` now simplify to `f(|x|)`.
+
+- **Even function with abs argument**: `cosh(|x+2|) → cosh(x+2)`.
+
+- **Trig period shifts**: `cot(π+x) → cot(x)`, `csc(π+x) → -csc(x)`.
+
+- **Ln simplification in Add/Multiply operands**: `ln(x^3) − 3·ln(x) → 0`
+  and `ln(x^√2) → √2·ln(x)` now work; cost function bypassed for log rules
+  that are mathematically valid but structurally more expensive.
+
+- **Preserved function identity**: Removed unconditional expansions of
+  `sinh/cosh → exp`, `arsinh/arcosh/artanh → ln`, and `arcsin → arctan2` that
+  prevented abs/odd-function rules from firing.
+
 ### Bug Fixes
 
 - **`Sequence` type inference now returns a proper tuple type**: Multi-argument

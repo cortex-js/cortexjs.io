@@ -167,38 +167,38 @@ form:
 
 - **Literal Numbers**
   - Rationals are reduced, e.g. $ \frac{6}{4} \to \frac{3}{2}$
-  - The denominator of rationals is made positive, e.g. \\(\frac{5}{-11}
-    \to \frac{-5}{11}\\)
+  - The denominator of rationals is made positive, e.g. $\frac{5}{-11} \to \frac{-5}{11}$
   - A rational with a denominator of 1 is replaced with the numerator, e.g.
-    \\(\frac{19}{1} \to 19\\)
+    $\frac{19}{1} \to 19$
   - Complex numbers with no imaginary component are replaced with the real component
 - `Add`
   - Literal 0 is removed
   - Exact numeric operands are folded: integers, rationals, and radicals are
-    summed together, e.g. \\(2 + x + 5 \to x + 7\\), \\(\frac{1}{3} + x +
-    \frac{2}{3} \to x + 1\\), \\(\sqrt{2} + x + \sqrt{2} \to x + 2\sqrt{2}\\).
-    Machine floats (e.g. 1.5) are not folded.
+    summed together, e.g. \\(2 + x + 5 \to x + 7\\), 
+    $\frac{1}{3} + x + \frac{2}{3} \to x + 1$, 
+    $\sqrt{2} + x + \sqrt{2} \to x + 2\sqrt{2}$.
+    Machine floats (e.g. $1.5$) are not folded.
   - Sum of a literal and the product of a literal with the imaginary unit are
     replaced with a complex number.
   - Associativity is applied
   - Arguments are sorted
 - `Multiply`
-  - Literal 1 is removed
+  - Literal $1$ is removed
   - Exact numeric operands are folded: integers, rationals, and radicals are
-    multiplied together, e.g. \\(2 \times x \times 5 \to 10x\\), \\(\frac{1}{2}
-    \times x \times 2 \to x\\). Machine floats (e.g. 1.5) are not folded.
+    multiplied together, e.g. \\(2 \times x \times 5 \to 10x\\), $\frac{1}{2} \times x \times 2 \to x$. 
+    Machine floats (e.g. $1.5$) are not folded.
   - Product of a literal and the imaginary unit are replaced with a complex
     number.
-  - Literal -1 multiplied by an expression is replaced with the negation of the
+  - Literal $-1$ multiplied by an expression is replaced with the negation of the
     expression.
-  - Signs are simplified: (-x)(-y) -> xy
+  - Signs are simplified: $(-x)(-y)$ -> $xy$
   - Associativity is applied
   - Arguments are sorted
 - `Negate`
   - Literal numbers are negated
   - Negate of a negation is removed
 - `Power`
-  - \\(x^n)^m \to x^\{nm\}\\)
+  - \\((x^n)^m \to x^\{nm\}\\)
   - \\(x^\{\tilde\infty\} \to \operatorname\{NaN\}\\)
   - \\(x^0 \to 1\\)
   - \\(x^1 \to x\\)

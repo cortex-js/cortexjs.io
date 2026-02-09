@@ -133,9 +133,7 @@ Assumptions are additional information available about some symbols, for example
 
 Some transformations are only applicable if some assumptions can be verified.
 
-For example, if no assumptions about \\(x \\) is available the expression \\(
-\sqrt\{x^2\} \\) cannot be simplified. However, if an assumption that \\( x \geq 0
-\\) is available, then the expression can be simplified to \\( x \\).
+For example, if no assumptions about \\(x\\) is available the expression \\(\sqrt\{x^2\}\\) cannot be simplified. However, if an assumption that \\(x \geq 0\\) is available, then the expression can be simplified to \\(x\\).
 
 ### Sign-Dependent Simplifications
 

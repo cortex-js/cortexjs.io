@@ -441,7 +441,7 @@ window.addEventListener('DOMContentLoaded', () => {
     renderAccessibleContent: false,
     TeX: {
       delimiters: {
-        inline: [['\\\\(', '\\\\)']],
+        inline: [['\\\\(', '\\\\)'], ['$', '$']],
         display: [
           ['$$', '$$'],
           ['\\\\[', '\\\\]'],

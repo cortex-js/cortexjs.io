@@ -139,9 +139,7 @@ for its internal calculations.
 
 This format is implemented in hardware and well suited to do fast computations.
 It uses a fixed amount of memory and represents significant digits in base-2 with
-about 15 digits of precision and with a minimum value of $ \pm5\times
-10^{-324} $ and a maximum value of $ \pm1.7976931348623157\times 10^{+308}
-$
+about 15 digits of precision and with a minimum value of $ \pm5\times 10^{-324} $ and a maximum value of $ \pm1.7976931348623157\times 10^{+308} $
 
 **To change the precision to machine precision**, use
 `ce.precision = "machine"`.
@@ -178,9 +176,7 @@ Arithmetic"** by David Goldberg <Icon name="chevron-right-bold" />
 If `ce.precision` is greater than 15, numbers are represented as bignum numbers,
 a string of base-10 digits and an exponent.
 
-Bignum numbers have a minimum value of $ \pm
-10^{-9\,000\,000\,000\,000\,000} $ and a maximum value of $
-\pm9.99999\ldots \times 10^{+9\,000\,000\,000\,000\,000} $.
+Bignum numbers have a minimum value of $ \pm 10^{-9\,000\,000\,000\,000\,000} $ and a maximum value of $ \pm9.99999\ldots \times 10^{+9\,000\,000\,000\,000\,000} $.
 
 
 ```ts

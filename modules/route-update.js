@@ -37,7 +37,7 @@ function renderMath(delay) {
 
     TeX: {
       delimiters: {
-        inline: [["\\(", "\\)"]],
+        inline: [["\\(", "\\)"], ["$", "$"]],
         display: [
           ["$$", "$$"],
           ["\\[", "\\]"],
