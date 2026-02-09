@@ -599,6 +599,8 @@ LU decomposition factors a matrix A into a lower triangular matrix L and an uppe
 triangular matrix U, with a permutation matrix P for numerical stability:
 
 ```js example
+import { isBoxedFunction } from '@cortex-js/compute-engine';
+
 // LU decomposition returns [P, L, U] where PA = LU
 const result = ce.box(['LUDecomposition', ['List',
   ['List', 2, 3, 1],
@@ -607,10 +609,12 @@ const result = ce.box(['LUDecomposition', ['List',
 ]]).evaluate();
 
 // Extract components
-const [P, L, U] = result.ops;
-// P: permutation matrix
-// L: lower triangular with 1s on diagonal
-// U: upper triangular
+if (isBoxedFunction(result)) {
+  const [P, L, U] = result.ops;
+  // P: permutation matrix
+  // L: lower triangular with 1s on diagonal
+  // U: upper triangular
+}
 ```
 
 **Use Cases:**
@@ -624,6 +628,8 @@ QR decomposition factors a matrix A into an orthogonal matrix Q and an upper
 triangular matrix R:
 
 ```js example
+import { isBoxedFunction } from '@cortex-js/compute-engine';
+
 // QR decomposition returns [Q, R] where A = QR
 const result = ce.box(['QRDecomposition', ['List',
   ['List', 1, 2],
@@ -631,9 +637,11 @@ const result = ce.box(['QRDecomposition', ['List',
   ['List', 5, 6]
 ]]).evaluate();
 
-const [Q, R] = result.ops;
-// Q: orthogonal matrix (Q^T × Q = I)
-// R: upper triangular matrix
+if (isBoxedFunction(result)) {
+  const [Q, R] = result.ops;
+  // Q: orthogonal matrix (Q^T × Q = I)
+  // R: upper triangular matrix
+}
 ```
 
 **Use Cases:**
@@ -673,6 +681,8 @@ SVD factors any matrix A into three matrices: U (left singular vectors),
 Σ (diagonal matrix of singular values), and V (right singular vectors):
 
 ```js example
+import { isBoxedFunction } from '@cortex-js/compute-engine';
+
 // SVD returns [U, Σ, V] where A = U × Σ × V^T
 const result = ce.box(['SVD', ['List',
   ['List', 1, 2],
@@ -680,10 +690,12 @@ const result = ce.box(['SVD', ['List',
   ['List', 5, 6]
 ]]).evaluate();
 
-const [U, Sigma, V] = result.ops;
-// U: m×m orthogonal matrix
-// Σ: m×n diagonal matrix of singular values
-// V: n×n orthogonal matrix
+if (isBoxedFunction(result)) {
+  const [U, Sigma, V] = result.ops;
+  // U: m×m orthogonal matrix
+  // Σ: m×n diagonal matrix of singular values
+  // V: n×n orthogonal matrix
+}
 ```
 
 **Use Cases:**
@@ -699,6 +711,8 @@ Using LU decomposition to solve Ax = b is more efficient than computing A⁻¹
 directly, especially when solving multiple systems with the same matrix A:
 
 ```js example
+import { isBoxedFunction } from '@cortex-js/compute-engine';
+
 const A = ['List',
   ['List', 2, 1, 1],
   ['List', 4, 3, 3],
@@ -707,12 +721,15 @@ const A = ['List',
 const b = ['List', 4, 10, 24];
 
 // Get LU decomposition
-const [P, L, U] = ce.box(['LUDecomposition', A]).evaluate().ops;
+const luResult = ce.box(['LUDecomposition', A]).evaluate();
+if (isBoxedFunction(luResult)) {
+  const [P, L, U] = luResult.ops;
 
-// The solution process:
-// 1. Solve Ly = Pb for y (forward substitution)
-// 2. Solve Ux = y for x (back substitution)
-// This is implemented internally when using Inverse
+  // The solution process:
+  // 1. Solve Ly = Pb for y (forward substitution)
+  // 2. Solve Ux = y for x (back substitution)
+  // This is implemented internally when using Inverse
+}
 ```
 
 ## Matrix Multiplication
@@ -959,11 +976,30 @@ const result3 = system3.solve(['x', 'y', 'z']);
 // Inconsistent system returns null
 const bad = ce.parse('\\begin{cases}x+y=1\\\\x+y=2\\end{cases}');
 bad.solve(['x', 'y']);  // → null
-
-// Non-linear systems also return null
-const nonlinear = ce.parse('\\begin{cases}xy=6\\\\x+y=5\\end{cases}');
-nonlinear.solve(['x', 'y']);  // → null (contains product xy)
 ```
+
+#### Exact Rational Arithmetic
+
+The linear system solver uses exact rational arithmetic throughout the Gaussian
+elimination process. When a system has fractional coefficients, the solution
+preserves exact rational results rather than introducing floating-point errors:
+
+```js example
+// System with fractional coefficients
+const frac = ce.parse('\\begin{cases}x+y=1\\\\x-y=\\frac{1}{2}\\end{cases}');
+const result = frac.solve(['x', 'y']);
+
+console.log(result.x.json);  // ["Rational", 3, 4]  (exact 3/4)
+console.log(result.y.json);  // ["Rational", 1, 4]  (exact 1/4)
+
+// More complex fractional system
+const frac2 = ce.parse('\\begin{cases}\\frac{x}{3}+\\frac{y}{2}=1\\\\\\frac{x}{4}+\\frac{y}{5}=1\\end{cases}');
+const result2 = frac2.solve(['x', 'y']);
+// → { x: 36/7, y: -10/7 }
+```
+
+This is particularly useful for educational applications where exact fractions
+are preferred over decimal approximations.
 
 #### Matrix Method
 
@@ -984,6 +1020,99 @@ const solution = ce.box(['MatrixMultiply', A_inv, b]).evaluate();
 // → [1, 2]
 // Solution: x = 1, y = 2
 ```
+
+#### Non-linear Polynomial Systems
+
+The `solve()` method also handles certain non-linear polynomial systems with
+2 equations and 2 variables. Two patterns are recognized:
+
+**Product + Sum Pattern**: Systems where one equation is a product `xy = p` and
+another is a sum `x + y = s`:
+
+```js example
+// xy = 6, x + y = 5
+// x and y are roots of t² - 5t + 6 = 0
+const e = ce.parse('\\begin{cases}xy=6\\\\x+y=5\\end{cases}');
+const result = e.solve(['x', 'y']);
+// → [{ x: 2, y: 3 }, { x: 3, y: 2 }]
+```
+
+**Substitution Method**: When one equation is linear in one variable:
+
+```js example
+// From x + y = 5: y = 5 - x
+// Substitute into x² + y = 7: x² + (5-x) = 7 → x² - x - 2 = 0
+const e = ce.parse('\\begin{cases}x+y=5\\\\x^2+y=7\\end{cases}');
+const result = e.solve(['x', 'y']);
+// → [{ x: 2, y: 3 }, { x: -1, y: 6 }]
+```
+
+Non-linear systems return an array of solution objects (since there may be
+multiple solutions), unlike linear systems which return a single object.
+Only real solutions are returned; complex solutions are filtered out.
+
+#### Linear Inequality Systems
+
+The `solve()` method also handles systems of linear inequalities in 2 variables.
+Instead of finding a single point, it returns the vertices of the feasible region
+(a convex polygon):
+
+```js example
+// Triangle region: x >= 0, y >= 0, x + y <= 10
+const e = ce.parse('\\begin{cases}x\\geq 0\\\\y\\geq 0\\\\x+y\\leq 10\\end{cases}');
+const result = e.solve(['x', 'y']);
+// → [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }]
+
+// Square region: 0 <= x <= 5, 0 <= y <= 5
+const square = ce.parse('\\begin{cases}x\\geq 0\\\\x\\leq 5\\\\y\\geq 0\\\\y\\leq 5\\end{cases}');
+const vertices = square.solve(['x', 'y']);
+// → [{ x: 0, y: 0 }, { x: 5, y: 0 }, { x: 5, y: 5 }, { x: 0, y: 5 }]
+
+// Pentagon with multiple constraints
+const pentagon = ce.parse('\\begin{cases}x\\geq 0\\\\y\\geq 0\\\\x\\leq 4\\\\y\\leq 4\\\\x+y\\leq 6\\end{cases}');
+const pentagonVertices = pentagon.solve(['x', 'y']);
+// → [{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 2 }, { x: 2, y: 4 }, { x: 0, y: 4 }]
+```
+
+The solver supports all inequality operators: `<`, `<=`, `>`, `>=`. Vertices are
+returned in counterclockwise convex hull order. Returns `null` if the system has
+no feasible region (infeasible) or contains non-linear constraints.
+
+**Note:** Currently only 2-variable systems are supported. The solver finds the
+vertices of the feasible region by computing all pairwise intersections of
+constraint boundaries and filtering to those that satisfy all constraints.
+
+#### Under-determined Systems (Parametric Solutions)
+
+When a linear system has fewer equations than variables (under-determined), it has
+infinitely many solutions. Instead of returning `null`, the `solve()` method
+returns parametric solutions where free variables appear as themselves:
+
+```js example
+// Single equation with two variables
+const e = ce.parse('\\begin{cases}x+y=5\\end{cases}');
+const result = e.solve(['x', 'y']);
+console.log(result.x.latex);  // "5 - y"
+console.log(result.y.latex);  // "y"
+// Here y is a free variable, and x is expressed in terms of y
+
+// Two equations with three variables
+const e2 = ce.parse('\\begin{cases}x+y+z=6\\\\x-y=2\\end{cases}');
+const result2 = e2.solve(['x', 'y', 'z']);
+console.log(result2.x.latex);  // "4 - z/2"
+console.log(result2.y.latex);  // "2 - z/2"
+console.log(result2.z.latex);  // "z"
+// Here z is free, and x, y are expressed in terms of z
+
+// Three equations with four variables
+const e3 = ce.parse('\\begin{cases}a+b+c+d=10\\\\a-b=2\\\\c+d=4\\end{cases}');
+const result3 = e3.solve(['a', 'b', 'c', 'd']);
+// → { a: 4, b: 2, c: 4 - d, d: d }
+```
+
+The solver uses Gaussian elimination to identify which variables are "pivot"
+variables (determined by the equations) and which are "free" variables (can take
+any value). Inconsistent systems still return `null`.
 
 ## Performance Considerations
 

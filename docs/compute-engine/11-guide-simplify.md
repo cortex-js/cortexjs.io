@@ -113,7 +113,8 @@ ce.parse('x^2 - 4').factor().latex;
 // ➔ "(x-2)(x+2)"
 
 // Expand a product
-ce.parse('(x+1)(x+2)').expand().latex;
+// import { expand } from '@cortex-js/compute-engine';
+expand(ce.parse('(x+1)(x+2)')).latex;
 // ➔ "x^2+3x+2"
 ```
 

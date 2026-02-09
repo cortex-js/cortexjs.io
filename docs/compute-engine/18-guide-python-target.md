@@ -29,12 +29,12 @@ const code = python.compile(expr);
 console.log(code); // "x ** 2 + y ** 2"
 ```
 
-## Using with expr.compile()
+## Using with compile()
 
-To use the Python target with `expr.compile()`, register it first:
+To use the Python target with `compile()`, register it first:
 
 ```javascript
-import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
+import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine';
 
 const ce = new ComputeEngine();
 
@@ -43,8 +43,8 @@ ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }
 
 // Now you can use it throughout your code
 const expr = ce.parse('\\sin(x) + \\cos(y)');
-const pythonCode = expr.compile({ to: 'python' });
-console.log(pythonCode.toString());
+const result = compile(expr, { to: 'python' });
+console.log(result.code);
 // → import numpy as np
 //
 //   np.sin(x) + np.cos(y)

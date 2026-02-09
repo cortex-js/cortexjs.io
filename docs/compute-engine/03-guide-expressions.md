@@ -112,7 +112,7 @@ console.log(expr.json);
 number** check that the GCD of the numerator and denominator is 1.
 
 ```js example
-const input = ce.parse("\\frac{30}{50}", {canonical: false});
+const input = ce.parse("\\frac{30}{50}", {form: 'raw'});
 console.info(ce.box(
   ["GCD", ["NumeratorDenominator", input]]
 ).evaluate().valueOf() === 1);
@@ -136,7 +136,7 @@ Read more about the **Canonical Form** <Icon name="chevron-right-bold" />
 By default, `ce.box()` and `ce.parse()` produce a canonical expression.
 
 **To get a non-canonical expression instead**, use
-`ce.box(expr, {canonical: false})` or `ce.parse(latex, {canonical: false})`.
+`ce.box(expr, {form: 'raw'})` or `ce.parse(latex, {form: 'raw'})`.
 
 When using `ce.parse()`, the non-canonical form sticks closer to the original 
 LaTeX input. When using `ce.box()`, the non-canonical form matches the
@@ -148,10 +148,10 @@ const latex = "\\frac{30}{-50}";
 ce.parse(latex);
 // canonical form ➔ ["Rational", -3, 5]
 
-ce.parse(latex, { canonical: false });
+ce.parse(latex, { form: 'raw' });
 // non-canonical form ➔ ["Divide", 30, -50]
 
-ce.box(["Divide", 30, -50], { canonical: false });
+ce.box(["Divide", 30, -50], { form: 'raw' });
 // non-canonical form ➔ ["Divide", 30, -50]
 ```
 
@@ -304,18 +304,58 @@ function itself is pure, and all its arguments are pure as well.
 ## Checking the Kind of Expression
 
 To identify if an expression is a number literal, a symbol, a function expression
-or a string use the following boolean expressions:
+or a string, use **type guards**. Type guards narrow the type of the expression
+and provide type-safe access to properties specific to that expression type:
 
 <div className="symbols-table first-column-header" style={{"--first-col-width":"18ch"}}>
 
-| Kind           | Boolean Expression                  |
+| Kind           | Type Guard                  |
 | :------------- | :---------------------------------- |
-| **Number Literal**     | `expr.isNumberLiteral`              |
-| **Function Expression**   | `expr.isFunctionExpression`         |
-| **Symbol**     | `expr.symbol !== null`              |
-| **String**     | `expr.string !== null`              |
+| **Number Literal**     | `isBoxedNumber(expr)`              |
+| **Function Expression**   | `isBoxedFunction(expr)`         |
+| **Symbol**     | `isBoxedSymbol(expr)`         |
+| **String**     | `isBoxedString(expr)`         |
 
 </div>
+
+After using a type guard, you can safely access properties specific to that type:
+
+```js
+import { isBoxedNumber, isBoxedSymbol, isBoxedFunction } from '@cortex-js/compute-engine';
+
+const expr = ce.parse("3.14");
+
+// Check if it's a number and access its numeric value
+if (isBoxedNumber(expr)) {
+  console.log(expr.numericValue);  // Type-safe access
+  console.log(expr.isNumberLiteral); // Always true for number literals
+}
+
+// Check if it's a symbol and access its name
+const sym = ce.parse("x");
+if (isBoxedSymbol(sym)) {
+  console.log(sym.symbol);  // Type-safe access to symbol name
+}
+
+// Check if it's a function and access its operands
+const fn = ce.parse("2 + 3");
+if (isBoxedFunction(fn)) {
+  console.log(fn.operator);  // "Add"
+  console.log(fn.ops.length); // 2
+  console.log(fn.op1, fn.op2); // Access first and second operands
+}
+```
+
+For convenience, use the `sym()` helper to get a symbol name without explicit type checking:
+
+```js
+import { sym } from '@cortex-js/compute-engine';
+
+const expr = ce.parse("Pi");
+if (sym(expr) === 'Pi') {
+  // This is the Pi symbol
+}
+```
 
 
 ## Accessing the Value of an Expression

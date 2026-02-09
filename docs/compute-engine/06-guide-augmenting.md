@@ -320,11 +320,13 @@ ce.parse("F_n").evaluate();     // → Subscript(F, n) - stays symbolic
 `Tuple` expression:
 
 ```js
+import { isBoxedFunction } from '@cortex-js/compute-engine';
+
 const matrix = [[1,2,3], [4,5,6], [7,8,9]];
 
 ce.declare("M", {
   subscriptEvaluate: (subscript, { engine }) => {
-    if (subscript.operator === "Tuple" && subscript.ops) {
+    if (isBoxedFunction(subscript) && subscript.operator === "Tuple") {
       const [i, j] = subscript.ops;
       const row = matrix[i.re - 1];  // 1-indexed
       if (row && row[j.re - 1] !== undefined) {

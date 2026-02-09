@@ -240,7 +240,7 @@ const squareRule = {
   replace: ["Square", "_x"],
 };
 
-const expr = ce.box(["Multiply", 7, 7], { canonical: false });
+const expr = ce.box(["Multiply", 7, 7], { form: 'raw' });
 (expr.replace(squareRule) ?? expr).print();
 // ➔ ["Square", 7]
 ```

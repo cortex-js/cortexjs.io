@@ -19,6 +19,7 @@ that can be evaluated much faster.
 For example this approximation: $ \pi \approx \textstyle\sqrt{6\sum^{10^6}_{n=1}\frac{1}{n^2}} $
 
 ```live
+// import { compile } from '@cortex-js/compute-engine';
 const expr = ce.parse("\\sqrt{6\\sum^{10^2}_{n=1}\\frac{1}{n^2}}");
 
 // Numerical evaluation using the Compute Engine
@@ -27,39 +28,43 @@ console.timeEnd('evaluate', expr.evaluate());
 
 // Compilation to a JavaScript function and execution
 console.time('compile');
-const fn = expr.compile();
-console.timeEnd('compile', fn());
+const result = compile(expr);
+console.timeEnd('compile', result.run());
 ```
 
 ## Compiling
 
-**To get a compiled version of an expression** use the `expr.compile()` method:
+**To get a compiled version of an expression** use the `compile()` function:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse("2\\prod_{n=1}^{\\infty} \\frac{4n^2}{4n^2-1}");
-const fn = expr.compile();
+const result = compile(expr);
 ```
 
-**To evaluate the compiled expression** call the function returned by
-`expr.compile()`:
+**To evaluate the compiled expression** call the `run` method on the
+`CompilationResult` returned by `compile()`:
 
 ```javascript
-console.log(fn());
+console.log(result.run());
 // ➔ 3.141592653589793
 ```
 
-If the expression cannot be compiled, the `compile()` method will throw an error.
+If the expression cannot be compiled, the `result.success` property will be
+`false`.
 
 ## Arguments
 
-The function returned by `expr.compile()` can be called with an object literal
+The `run` method on the `CompilationResult` can be called with an object literal
 containing the value of the arguments:
 
 ```live
+// import { compile } from '@cortex-js/compute-engine';
 const expr = ce.parse("n^2");
-const fn = expr.compile();
+const result = compile(expr);
 
-for (let i = 1; i < 10; i++) console.log(fn({ n: i }));
+for (let i = 1; i < 10; i++) console.log(result.run({ n: i }));
 ```
 
 **To get a list of the unknowns of an expression** use the `expr.unknowns`
@@ -84,8 +89,10 @@ By default, operators like `+`, `-`, `*`, `/` compile to their JavaScript equiva
 Override operators by passing an `operators` option to `compile()`:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('v + w');
-const fn = expr.compile({
+const result = compile(expr, {
   operators: {
     Add: ['add', 11],      // Convert + to add() function
     Multiply: ['mul', 12]  // Convert * to mul() function
@@ -96,8 +103,8 @@ const fn = expr.compile({
   }
 });
 
-const result = fn({ v: [1, 2, 3], w: [4, 5, 6] });
-console.log(result);
+const value = result.run({ v: [1, 2, 3], w: [4, 5, 6] });
+console.log(value);
 // ➔ [5, 7, 9]
 ```
 
@@ -110,7 +117,9 @@ The operator override format is `[functionName, precedence]`:
 You can also use a function to conditionally override operators:
 
 ```javascript
-const fn = expr.compile({
+import { compile } from '@cortex-js/compute-engine';
+
+const result = compile(expr, {
   operators: (op) => {
     // Only override Add, let other operators use defaults
     if (op === 'Add') return ['vectorAdd', 11];
@@ -127,8 +136,10 @@ const fn = expr.compile({
 Operator overrides work with complex nested expressions:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('(a + b) * c');
-const fn = expr.compile({
+const result = compile(expr, {
   operators: {
     Add: ['add', 11],
     Multiply: ['mul', 12]
@@ -139,12 +150,12 @@ const fn = expr.compile({
   }
 });
 
-const result = fn({
+const value = result.run({
   a: [1, 2, 3],
   b: [4, 5, 6],
   c: [2, 2, 2]
 });
-console.log(result);
+console.log(value);
 // ➔ [10, 14, 18]  // (a + b) * c = ([1,2,3] + [4,5,6]) * [2,2,2]
 ```
 
@@ -163,13 +174,15 @@ console.log(result);
 ### Example: Complete Vector Math
 
 ```live
+// import { compile } from '@cortex-js/compute-engine';
+
 // Define vector operations
 function add(a, b) { return a.map((v, i) => v + b[i]); }
 function mul(a, b) { return a.map((v, i) => v * b[i]); }
 function neg(a) { return a.map(v => -v); }
 
 const expr = ce.parse('u * v + w - z');
-const fn = expr.compile({
+const result = compile(expr, {
   operators: {
     Add: ['add', 11],
     Multiply: ['mul', 12],
@@ -178,7 +191,7 @@ const fn = expr.compile({
   functions: { add, mul, neg }
 });
 
-console.log(fn({
+console.log(result.run({
   u: [2, 3, 4],
   v: [1, 1, 1],
   w: [5, 6, 7],
@@ -207,6 +220,8 @@ import {
 Define a custom target object that implements the `CompileTarget` interface:
 
 ```javascript
+import { BaseCompiler } from '@cortex-js/compute-engine';
+
 const myTarget = {
   language: 'my-dsl',
   operators: (op) => {
@@ -235,6 +250,8 @@ console.log(code);
 ### Example: SQL-like Target
 
 ```javascript
+import { BaseCompiler } from '@cortex-js/compute-engine';
+
 const sqlTarget = {
   language: 'sql',
   operators: (op) => {
@@ -281,15 +298,17 @@ The Compute Engine comes with these compilation targets:
 Use the `to` option to specify the target language:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('x^2 + y^2');
 
 // Compile to JavaScript (default)
-const jsFunc = expr.compile();
-console.log(jsFunc({ x: 3, y: 4 })); // → 25
+const jsResult = compile(expr);
+console.log(jsResult.run({ x: 3, y: 4 })); // → 25
 
 // Compile to GLSL
-const glslCode = expr.compile({ to: 'glsl' });
-console.log(glslCode.toString()); // → pow(x, 2.0) + pow(y, 2.0)
+const glslResult = compile(expr, { to: 'glsl' });
+console.log(glslResult.code); // → pow(x, 2.0) + pow(y, 2.0)
 ```
 
 ### Python/NumPy Target
@@ -297,7 +316,7 @@ console.log(glslCode.toString()); // → pow(x, 2.0) + pow(y, 2.0)
 The Compute Engine includes a complete Python/NumPy compilation target for scientific computing:
 
 ```javascript
-import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
+import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine';
 
 const ce = new ComputeEngine();
 
@@ -306,8 +325,8 @@ ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }
 
 // Compile expressions to Python/NumPy code
 const expr = ce.parse('\\sin(x) + \\cos(y)');
-const pythonCode = expr.compile({ to: 'python' });
-console.log(pythonCode.toString());
+const result = compile(expr, { to: 'python' });
+console.log(result.code);
 // → import numpy as np
 //
 //   np.sin(x) + np.cos(y)
@@ -399,12 +418,14 @@ Interval arithmetic addresses these by:
 #### JavaScript Interval Target (`interval-js`)
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('\\sin(x) / x');
-const fn = expr.compile({ to: 'interval-js' });
+const result = compile(expr, { to: 'interval-js' });
 
 // Call with interval inputs
-const result = fn({ x: { lo: -0.1, hi: 0.1 } });
-console.log(result);
+const value = result.run({ x: { lo: -0.1, hi: 0.1 } });
+console.log(value);
 // → { kind: 'singular' }  // Division by interval containing zero
 ```
 
@@ -426,24 +447,26 @@ The compiled function returns an `IntervalResult` discriminated union:
 #### Examples
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 // Simple function - normal result
-const sin = ce.parse('\\sin(x)').compile({ to: 'interval-js' });
-sin({ x: { lo: 0, hi: Math.PI } });
+const sinResult = compile(ce.parse('\\sin(x)'), { to: 'interval-js' });
+sinResult.run({ x: { lo: 0, hi: Math.PI } });
 // → { kind: 'interval', value: { lo: 0, hi: 1 } }
 
 // Singularity detection
-const recip = ce.parse('1/x').compile({ to: 'interval-js' });
-recip({ x: { lo: -1, hi: 1 } });
+const recipResult = compile(ce.parse('1/x'), { to: 'interval-js' });
+recipResult.run({ x: { lo: -1, hi: 1 } });
 // → { kind: 'singular' }
 
 // Partial domain
-const sqrt = ce.parse('\\sqrt{x}').compile({ to: 'interval-js' });
-sqrt({ x: { lo: -1, hi: 4 } });
+const sqrtResult = compile(ce.parse('\\sqrt{x}'), { to: 'interval-js' });
+sqrtResult.run({ x: { lo: -1, hi: 4 } });
 // → { kind: 'partial', value: { lo: 0, hi: 2 }, domainClipped: 'lo' }
 
 // Multi-variable expressions
-const fn = ce.parse('x^2 + y').compile({ to: 'interval-js' });
-fn({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
+const fnResult = compile(ce.parse('x^2 + y'), { to: 'interval-js' });
+fnResult.run({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
 // → { kind: 'interval', value: { lo: 1, hi: 4.5 } }
 ```
 
@@ -497,7 +520,7 @@ function shouldSubdivide(result, tolerance) {
 You can also create your own compilation targets using `ce.registerCompilationTarget()`:
 
 ```javascript
-import { ComputeEngine, BaseCompiler } from '@cortex-js/compute-engine';
+import { ComputeEngine, BaseCompiler, compile } from '@cortex-js/compute-engine';
 
 const ce = new ComputeEngine();
 
@@ -533,20 +556,22 @@ class CustomTarget {
     };
   }
 
-  compileToExecutable(expr, options = {}) {
+  compile(expr, options = {}) {
     const target = this.createTarget();
     const code = BaseCompiler.compile(expr, target);
 
-    const result = function () { return code; };
-    Object.defineProperty(result, 'toString', { value: () => code });
-    Object.defineProperty(result, 'isCompiled', { value: true });
-    return result;
+    return {
+      target: 'custom',
+      success: true,
+      code,
+    };
   }
 }
 
 // Register and use
 ce.registerCompilationTarget('custom', new CustomTarget());
-const code = expr.compile({ to: 'custom' });
+const result = compile(expr, { to: 'custom' });
+console.log(result.code);
 ```
 
 ### Direct Target Override
@@ -554,6 +579,8 @@ const code = expr.compile({ to: 'custom' });
 For one-time use, you can provide a `CompileTarget` directly without registration:
 
 ```javascript
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse('a + b');
 
 const customTarget = {
@@ -568,8 +595,8 @@ const customTarget = {
   preamble: '',
 };
 
-const code = expr.compile({ target: customTarget });
-console.log(code.toString()); // → A + B
+const result = compile(expr, { target: customTarget });
+console.log(result.code); // → A + B
 ```
 
 The `target` option takes precedence over the `to` option if both are provided.
@@ -598,14 +625,14 @@ interface LanguageTarget {
   createTarget(options?: Partial<CompileTarget>): CompileTarget;
 
   /**
-   * Compiles an expression to an executable form.
-   * For non-JavaScript targets, this typically returns a function
-   * that returns the source code as a string.
+   * Compiles an expression to a CompilationResult.
+   * For non-JavaScript targets, this typically returns a result
+   * with the source code in the `code` property.
    */
-  compileToExecutable(
+  compile(
     expr: BoxedExpression,
     options?: CompilationOptions
-  ): CompiledExecutable;
+  ): CompilationResult;
 }
 ```
 
@@ -646,8 +673,6 @@ The benchmarks test the same mathematical expressions across different targets:
 - Python/NumPy excels at vectorized array operations
 - GLSL enables GPU parallelism for millions of simultaneous operations
 
-See [`benchmarks/README.md`](../benchmarks/README.md) for detailed benchmark documentation.
-
 ## Limitations
 
 The calculations are only performed using machine precision numbers.
@@ -657,25 +682,28 @@ supported.
 
 Some functions are not supported.
 
-If the expression cannot be compiled, the `compile()` method will throw an
-error. The expression can be numerically evaluated as a fallback:
+If the expression cannot be compiled, `compile()` returns a `CompilationResult`
+with `success` set to `false`. The expression can be numerically evaluated as a
+fallback:
 
 ```live
+// import { compile, isBoxedNumber } from '@cortex-js/compute-engine';
 function compileOrEvaluate(expr) {
-  try {
-    const fn = expr.compile();
-    return   fn() + " (compiled)";
-  } catch (e) {
-    return   expr.N().numericValue + " (evaluated)";
+  const result = compile(expr);
+  if (result.success) {
+    return   result.run() + " (compiled)";
+  } else {
+    const evaluated = expr.N();
+    return (isBoxedNumber(evaluated) ? evaluated.numericValue : evaluated) + " (evaluated)";
   }
 }
 
-  // `expr.compile()` can handle this expression
+  // `compile()` can handle this expression
   console.log(compileOrEvaluate(ce.parse("\\frac{\\sqrt{5}+1}{2}")));
 
 
-  // `expr.compile()` cannot handle complex numbers, so it throws
-  // and we fall back to numerical evaluation with expr.N()
+  // `compile()` cannot handle complex numbers, so it falls back
+  // and we use numerical evaluation with expr.N()
   console.log(compileOrEvaluate(ce.parse("-i\\sqrt{-1}")));
 
 ```

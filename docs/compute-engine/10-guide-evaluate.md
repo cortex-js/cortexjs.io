@@ -43,14 +43,15 @@ expr.N().print();
 
 ### Compilation
 
-An expression can be evaluated by compiling it to JavaScript using the `expr.compile()` method.
-The method returns a JavaScript function that can be called to evaluate the expression.
+An expression can be evaluated by compiling it to JavaScript using the `compile()` function.
+The result includes a `run` function that can be called to evaluate the expression.
 
 
 
 ```live
-const f = ce.parse('2\\pi').compile();
-console.log(f());
+// import { compile } from '@cortex-js/compute-engine';
+const result = compile(ce.parse('2\\pi'));
+console.log(result.run());
 ```
 
 

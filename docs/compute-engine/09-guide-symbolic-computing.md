@@ -118,8 +118,8 @@ const a = ce.parse('\\frac{1}{10}');
 const b = ce.parse('\\frac{2}{20}');
 console.log('Canonical isSame?', a.isSame(b));
 
-const aPrime = ce.parse('\\frac{1}{10}', {canonical: false});
-const bPrime = ce.parse('\\frac{2}{20}', {canonical: false});
+const aPrime = ce.parse('\\frac{1}{10}', {form: 'raw'});
+const bPrime = ce.parse('\\frac{2}{20}', {form: 'raw'});
 console.log('Non-canonical isSame?', aPrime.isSame(bPrime));
 ```
 

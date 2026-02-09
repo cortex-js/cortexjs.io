@@ -66,14 +66,14 @@ console.log(ce.parse("5x + 1").json);
 
 By default, `ce.parse()` returns a
 [canonical expression](/compute-engine/guides/canonical-form/). To get a
-non-canonical expression instead, use the `{canonical: false}` option: The
+non-canonical expression instead, use the `{form: 'raw'}` option: The
 non-canonical form is closer to the literal LaTeX input.
 
 ```js
 ce.parse("\\frac{7}{-4}").json;
 // ➔  ["Rational", -7, 4]
 
-ce.parse("\\frac{7}{-4}", { canonical: false }).json;
+ce.parse("\\frac{7}{-4}", { form: 'raw' }).json;
 // ➔  ["Divide", 7, -4]
 ```
 
@@ -383,7 +383,7 @@ console.log(ce.parse("\\sin x").toLatex({
 handler.
 
 ```live
-console.log(ce.parse("(a+b)", {canonical: false}).toLatex({
+console.log(ce.parse("(a+b)", {form: 'raw'}).toLatex({
   groupStyle: () => "big"
 }));
 ```
@@ -981,10 +981,12 @@ serialization handler with a MathJSON symbol.
   serialize: (serializer, expr) =>
     "\\oplus" + serializer.wrapArguments(expr),
   evaluate: (ce, args) => {
+    const { isBoxedNumber } = ce;
     let result = '';
     for (const arg of args) {
-      val = arg.numericValue;
-      if (val === null || ce.isComplex(val) || Array.isArray(val)) return null;
+      if (!isBoxedNumber(arg)) return null;
+      const val = arg.numericValue;
+      if (ce.isComplex(val) || Array.isArray(val)) return null;
       if (ce.isBignum(val)) {
         if (!val.isInteger() || val.isNegative()) return null;
         result += val.toString();

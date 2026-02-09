@@ -68,7 +68,7 @@ The `ce.box()` and `ce.parse()` functions return a canonical expression by
 default, which is the desirable behavior in most cases.
 
 **To get a non-canonical version of an expression** use
-of `ce.parse(s, {canonical: false})` or `ce.box(expr, {canonical: false})`.
+of `ce.parse(s, {form: 'raw'})` or `ce.box(expr, {form: 'raw'})`.
 
 You can further customize the canonical form of an expression by using the
 [`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
@@ -83,7 +83,7 @@ console.info(ce.parse('\\frac{30}{-50}').json);
 // The canonical version moves the sign to the numerator 
 // and reduces the numerator and denominator
 
-console.info(ce.parse('\\frac{30}{-50}', { canonical: false }).json);
+console.info(ce.parse('\\frac{30}{-50}', { form: 'raw' }).json);
 // ➔ ["Divide", 30, -50]
 // The non-canonical version does not change the arguments,
 // so this is interpreted as a regular fraction ("Divide"), 
@@ -111,7 +111,7 @@ console.log(expr.toMathJson({ exclude: ["Rational"] }));
 
 
 ```js
-const expr = ce.parse("\\frac{10}{30}", { canonical: false });
+const expr = ce.parse("\\frac{10}{30}", { form: 'raw' });
 console.log(expr.json);
 // ➔ ["Divide", 10, 30]
 
@@ -166,7 +166,7 @@ Below is a list of some of the transformations applied to obtain the canonical
 form:
 
 - **Literal Numbers**
-  - Rationals are reduced, e.g. \\( \frac{6}{4} \to \frac{3}{2}\\)
+  - Rationals are reduced, e.g. $ \frac{6}{4} \to \frac{3}{2}$
   - The denominator of rationals is made positive, e.g. \\(\frac{5}{-11}
     \to \frac{-5}{11}\\)
   - A rational with a denominator of 1 is replaced with the numerator, e.g.
@@ -174,12 +174,19 @@ form:
   - Complex numbers with no imaginary component are replaced with the real component
 - `Add`
   - Literal 0 is removed
+  - Exact numeric operands are folded: integers, rationals, and radicals are
+    summed together, e.g. \\(2 + x + 5 \to x + 7\\), \\(\frac{1}{3} + x +
+    \frac{2}{3} \to x + 1\\), \\(\sqrt{2} + x + \sqrt{2} \to x + 2\sqrt{2}\\).
+    Machine floats (e.g. 1.5) are not folded.
   - Sum of a literal and the product of a literal with the imaginary unit are
     replaced with a complex number.
   - Associativity is applied
   - Arguments are sorted
 - `Multiply`
   - Literal 1 is removed
+  - Exact numeric operands are folded: integers, rationals, and radicals are
+    multiplied together, e.g. \\(2 \times x \times 5 \to 10x\\), \\(\frac{1}{2}
+    \times x \times 2 \to x\\). Machine floats (e.g. 1.5) are not folded.
   - Product of a literal and the imaginary unit are replaced with a complex
     number.
   - Literal -1 multiplied by an expression is replaced with the negation of the
@@ -220,35 +227,35 @@ representation for a given application. For example, if you want to check
 the answers from a quiz, you may want to compare the user input with a
 canonical form that is closer to the user input.
 
-**To get the non-canonical form**, use `ce.box(expr, { canonical: false })` or
-`ce.parse(s, { canonical: false })`.
+**To get the non-canonical form**, use `ce.box(expr, { form: 'raw' })` or
+`ce.parse(s, { form: 'raw' })`.
 
 ```live
-console.log(ce.parse("2(0+x\\times x-1)", {canonical: false}).json);
+console.log(ce.parse("2(0+x\\times x-1)", {form: 'raw'}).json);
 ```
 
-**To get the full canonical form**, use `ce.box(expr, { canonical: true })` or
-`ce.parse(s, { canonical: true })`. The `canonical` option can be omitted
-as it is `true` by default.
+**To get the full canonical form**, use `ce.box(expr, { form: 'canonical' })` or
+`ce.parse(s, { form: 'canonical' })`. The `form` option can be omitted
+as it defaults to `'canonical'`.
 
 ```live
-console.log(ce.parse("2(0+x\\times x-1)", {canonical: true}).json);
+console.log(ce.parse("2(0+x\\times x-1)", {form: 'canonical'}).json);
 
 console.log(ce.parse("2(0+x\\times x-1)").json);
 ```
 
 **To get a custom canonical form of an expression**, use the
 [`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
-or specify the form you want to use with the `canonical` option of `ce.box()` 
+or specify the form you want to use with the `form` option of `ce.box()`
 and `ce.parse()`.
 
 
 
-**To order the arguments in a canonical order**, use `ce.box(expr, { canonical: "Order" })` or `ce.parse(s, { canonical: "Order" })`.
+**To order the arguments in a canonical order**, use `ce.box(expr, { form: "Order" })` or `ce.parse(s, { form: "Order" })`.
 
 ```live
 ce.parse("0+1+x+2+\\sqrt{5}", 
-  {canonical: "Order"}
+  {form: "Order"}
 ).print();
 ```
 
@@ -263,12 +270,12 @@ For example:
 
 ```live
 const latex = "3(2+x)";
-ce.parse(latex, {canonical: false}).print();
+ce.parse(latex, {form: 'raw'}).print();
 
-ce.parse(latex, {canonical: ["InvisibleOperator"]}).print();
+ce.parse(latex, {form: ["InvisibleOperator"]}).print();
 
-ce.parse(latex, 
-  {canonical: ["InvisibleOperator", "Add", "Order", ]}
+ce.parse(latex,
+  {form: ["InvisibleOperator", "Add", "Order", ]}
 ).print();
 ```
 
@@ -308,14 +315,16 @@ For example, let's say you want to compare the structural form of two expression
 but ignoring any extra parentheses. You could define a transformation like this:
 
 ```js
+import { isBoxedFunction } from '@cortex-js/compute-engine';
+
 const deparenthesize = (expr) =>
-  expr.map((e) => (e.operator === 'Delimiter' ? e.op1 : e));
+  expr.map((e) => (isBoxedFunction(e) && e.operator === 'Delimiter' ? e.op1 : e));
 ```
 You can then apply this transformation to an expression like this:
 
 ```js
-const expr1 = ce.parse('3+4\\times2', { canonical: false });
-const expr2 = ce.parse('3+(4\\times(2))', { canonical: false });
+const expr1 = ce.parse('3+4\\times2', { form: 'raw' });
+const expr2 = ce.parse('3+(4\\times(2))', { form: 'raw' });
 const transformedExpr1 = deparenthesize(expr1);
 const transformedExpr2 = deparenthesize(expr2);
 console.log(transformedExpr1.isSame(transformedExpr2));

@@ -280,12 +280,14 @@ ce.symbol("x").value = undefined;
 If performance is important, the expression can be compiled to a JavaScript
 function.
 
-**To get a compiled version of an expression** use the `expr.compile()` method:
+**To get a compiled version of an expression** use the `compile()` function:
 
 ```js
+import { compile } from '@cortex-js/compute-engine';
+
 const expr = ce.parse("3x^2+4x+2");
-const fn = expr.compile();
-for (const x = 0; x < 1; x += 0.01) console.log(fn({ x }));
+const result = compile(expr);
+for (const x = 0; x < 1; x += 0.01) console.log(result.run({ x }));
 ```
 
 :::info[Note]
