@@ -41,6 +41,21 @@ expr.evaluate().print();
 expr.N().print();
 ```
 
+### Parse + Evaluate Free Function
+
+For the common "parse then evaluate" flow, use the `evaluate()` free function:
+
+```live
+// import { evaluate, assign } from '@cortex-js/compute-engine';
+assign('x', 3);
+evaluate('x+2').print();
+evaluate('\\sqrt{2}').print();
+```
+
+The `evaluate()` free function accepts either a LaTeX string or a
+`BoxedExpression`. It uses a shared `ComputeEngine` instance created on
+first call.
+
 ### Compilation
 
 An expression can be evaluated by compiling it to JavaScript using the `compile()` function.
@@ -51,7 +66,8 @@ The result includes a `run` function that can be called to evaluate the expressi
 ```live
 // import { compile } from '@cortex-js/compute-engine';
 const result = compile(ce.parse('2\\pi'));
-console.log(result.run());
+console.log(result.success ? 'compiled' : 'fallback');
+console.log(result.run?.());
 ```
 
 

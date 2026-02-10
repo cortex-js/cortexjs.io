@@ -9,6 +9,19 @@ To obtain an exact numeric evaluation of an expression use `expr.evaluate()`.
 To obtain a numeric approximation use `expr.N()`.
 </Intro>
 
+## Parse + Numeric Free Function
+
+For the common "parse then numeric approximation" flow, use the `N()` free
+function:
+
+```live
+// import { N } from '@cortex-js/compute-engine';
+N("\\sqrt{2}").print();
+```
+
+The `N()` free function accepts either a LaTeX string or a `BoxedExpression`.
+It uses a shared `ComputeEngine` instance created on first call.
+
 
 ## Exact Evaluation
 

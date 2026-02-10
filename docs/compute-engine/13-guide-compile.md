@@ -24,12 +24,15 @@ const expr = ce.parse("\\sqrt{6\\sum^{10^2}_{n=1}\\frac{1}{n^2}}");
 
 // Numerical evaluation using the Compute Engine
 console.time('evaluate');
-console.timeEnd('evaluate', expr.evaluate());
+const evaluated = expr.evaluate();
+console.timeEnd('evaluate');
+console.log(evaluated.toString());
 
 // Compilation to a JavaScript function and execution
 console.time('compile');
 const result = compile(expr);
-console.timeEnd('compile', result.run());
+console.timeEnd('compile');
+console.log(result.run?.());
 ```
 
 ## Compiling
@@ -53,6 +56,20 @@ console.log(result.run());
 
 If the expression cannot be compiled, the `result.success` property will be
 `false`.
+
+### Validation and Fallback Behavior
+
+Compilation APIs enforce runtime contracts to catch malformed extension payloads
+early:
+
+- `ce.registerCompilationTarget(name, target)` validates target names and
+  required `LanguageTarget` methods (`getOperators()`, `getFunctions()`,
+  `createTarget()`, `compile()`).
+- `compile(expr, options)` validates option payload shape for `to`, `target`,
+  `operators`, `functions`, `vars`, `imports`, `preamble`, and `fallback`.
+
+By default, `compile()` falls back to interpretation (`success: false` with a
+`run` function). To disable fallback and fail fast, set `fallback: false`.
 
 ## Arguments
 

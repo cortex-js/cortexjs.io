@@ -21,6 +21,22 @@ function will be held, that is, not simplified. Conversely, a held argument
 wrapped with a `ReleaseHold` function will not be held, and it will be
 simplified.
 
+## Parse + Simplify Free Function
+
+For the common "parse then simplify" flow, use the `simplify()` free function:
+
+```live
+// import { simplify } from '@cortex-js/compute-engine';
+simplify("x+x+1").print();
+```
+
+The `simplify()` free function accepts either a LaTeX string or a
+`BoxedExpression`. It uses a shared `ComputeEngine` instance created on
+first call.
+
+For trigonometric simplification, use `expr.simplify({ strategy: 'fu' })`
+on a parsed expression.
+
 ## Defining "Simpler"
 
 An expression may be represented by several equivalent forms.

@@ -69,6 +69,27 @@ The Compute Engine can:
   <a href="/compute-engine/reference/calculus/">**calculus**</a> operations
 - <a href="/compute-engine/guides/compiling/">**compile**</a> expressions to JavaScript
 
+## Free Functions
+
+For common operations, use the free functions — no setup required:
+
+```live
+simplify("x+x+1").print();
+evaluate("2^{11} - 1").print();
+N("\\frac{1}{3}").print();
+```
+
+Available free functions:
+
+- `parse(latex)` — parse a LaTeX string into a `BoxedExpression`
+- `simplify(latex | expr)` — simplify a LaTeX string or expression
+- `evaluate(latex | expr)` — evaluate a LaTeX string or expression
+- `N(latex | expr)` — compute a numeric approximation
+- `assign(id, value)` — assign a value to a symbol
+
+These use a shared `ComputeEngine` instance created on first call.
+Use `getDefaultEngine()` to configure it.
+
 
 
 <ReadMore path="/compute-engine/demo/" >
@@ -88,10 +109,9 @@ from a CDN, then create a `ComputeEngine` instance.
 
 ```html
 <script type="module">
-  import { ComputeEngine } from "https://esm.run/@cortex-js/compute-engine";
+  import { evaluate } from "https://esm.run/@cortex-js/compute-engine";
 
-  const ce = new ComputeEngine();
-  ce.parse("e^{i\\pi}").evaluate().print();
+  evaluate("e^{i\\pi}").print();
   // ➔ "-1"
 </script>
 ```
