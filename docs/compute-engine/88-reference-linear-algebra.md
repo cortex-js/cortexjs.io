@@ -821,6 +821,165 @@ Note that axis indexes start at 1.
 </FunctionDefinition>
 
 <nav className="hidden">
+### Kernel
+</nav>
+<FunctionDefinition name="Kernel">
+
+<Signature name="Kernel">_map_</Signature>
+
+<Latex value="\ker \mathbf{A}"/>
+
+Returns a basis for the [kernel (null space)](https://en.wikipedia.org/wiki/Kernel_(linear_algebra))
+of a linear map.
+
+For numeric real vectors and matrices, `Kernel` returns a list of basis vectors.
+Each basis vector is represented as a `List`.
+
+```json example
+["Kernel", ["List", ["List", 1, 0], ["List", 0, 0]]]
+// ➔ ["List", ["List", 0, 1]]
+```
+
+If the kernel is trivial, the result is an empty list:
+
+```json example
+["Kernel", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List"]
+```
+
+Vectors are interpreted as 1×n linear maps:
+
+```json example
+["Kernel", ["List", 1, 0, 0]]
+// ➔ ["List", ["List", 0, 1, 0], ["List", 0, 0, 1]]
+```
+
+Scalars are treated as 1×1 maps:
+
+```json example
+["Kernel", 0]
+// ➔ ["List", ["List", 1]]
+
+["Kernel", 5]
+// ➔ ["List"]
+```
+
+**Edge cases**
+- Rank > 2 tensors return `Error("expected-matrix", ...)`.
+- Non-numeric/symbolic inputs, or complex entries with non-zero imaginary part,
+  remain unevaluated.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Dimension
+</nav>
+<FunctionDefinition name="Dimension">
+
+<Signature name="Dimension">_value_</Signature>
+
+<Latex value="\dim V"/>
+
+Returns the finite dimension of an object when it can be inferred.
+
+For concrete tensors/collections, `Dimension` returns the product of axis sizes
+(or the element count for finite indexed collections).
+
+```json example
+["Dimension", 5]
+// ➔ 1
+
+["Dimension", ["List", 1, 2, 3]]
+// ➔ 3
+
+["Dimension", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]
+// ➔ 6
+```
+
+For hom-sets with inferable finite dimensions:
+
+```json example
+["Dimension", ["Hom", ["List", 1, 2], ["List", 3, 4, 5]]]
+// ➔ 6
+```
+
+**Note:** This is not matrix rank (number of linearly independent rows/columns).
+Use `Rank` for tensor rank (number of axes), and other specialized tools for
+row/column rank.
+
+If the dimension cannot be inferred, the expression remains unevaluated.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Degree
+</nav>
+<FunctionDefinition name="Degree">
+
+<Signature name="Degree">_expr_</Signature>
+
+<Latex value="\deg p"/>
+
+Returns the polynomial degree (total degree) of polynomial-form expressions.
+
+```json example
+["Degree", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1]]
+// ➔ 3
+```
+
+Constants have degree 0:
+
+```json example
+["Degree", 42]
+// ➔ 0
+```
+
+**Edge cases**
+- Bare symbols are ambiguous and remain symbolic:
+
+```json example
+["Degree", "p"]
+// ➔ ["Degree", "p"]
+```
+
+- Non-polynomial expressions remain unevaluated:
+
+```json example
+["Degree", ["Sin", "x"]]
+// ➔ ["Degree", ["Sin", "x"]]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Hom
+</nav>
+<FunctionDefinition name="Hom">
+
+<Signature name="Hom">_domain_, _codomain_</Signature>
+
+<Latex value="\hom(V, W)"/>
+
+Represents the hom-set of morphisms from _domain_ to _codomain_.
+
+`Hom` is symbolic: it preserves the `Hom(...)` form, but evaluates/simplifies
+its arguments.
+
+```json example
+["Hom", ["Add", 1, 2], ["Multiply", 2, 3]]
+// ➔ ["Hom", 3, 6]
+```
+
+`Hom` is commonly used with `Dimension`:
+
+```json example
+["Dimension", ["Hom", ["List", 1, 2], ["List", 3, 4, 5]]]
+// ➔ 6
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### MatrixMultiply
 </nav>
 <FunctionDefinition name="MatrixMultiply">
@@ -1339,4 +1498,3 @@ For a rectangular m×n matrix with m > n:
 - The 2-norm of a matrix equals its largest singular value
 
 </FunctionDefinition>
-
