@@ -13,1534 +13,6 @@ import MemberCard from '@site/src/components/MemberCard';
 
 ## Compute Engine
 
-### ComputeEngine
-
-Compute engine surface used by definition callbacks.
-
-This interface is augmented by `types-engine.ts` with the concrete
-`IComputeEngine` members to avoid type-layer circular dependencies.
-
-<MemberCard>
-
-##### ComputeEngine.latexDictionary
-
-```ts
-latexDictionary: readonly OnlyFirst<
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry, {} & 
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry>[];
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.decimalSeparator
-
-```ts
-decimalSeparator: string;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.True
-
-```ts
-readonly True: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.False
-
-```ts
-readonly False: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.Pi
-
-```ts
-readonly Pi: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.E
-
-```ts
-readonly E: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.Nothing
-
-```ts
-readonly Nothing: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.Zero
-
-```ts
-readonly Zero: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.One
-
-```ts
-readonly One: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.Half
-
-```ts
-readonly Half: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.NegativeOne
-
-```ts
-readonly NegativeOne: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.I
-
-```ts
-readonly I: BoxedExpression;
-```
-
-ImaginaryUnit
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.NaN
-
-```ts
-readonly NaN: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.PositiveInfinity
-
-```ts
-readonly PositiveInfinity: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.NegativeInfinity
-
-```ts
-readonly NegativeInfinity: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.ComplexInfinity
-
-```ts
-readonly ComplexInfinity: BoxedExpression;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.context
-
-```ts
-readonly context: EvalContext;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.contextStack
-
-```ts
-contextStack: readonly EvalContext[];
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.timeLimit
-
-```ts
-timeLimit: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.iterationLimit
-
-```ts
-iterationLimit: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.recursionLimit
-
-```ts
-recursionLimit: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.bignum()
-
-```ts
-bignum: (a) => Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.complex()
-
-```ts
-complex: (a, b?) => Complex;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.tolerance
-
-```ts
-tolerance: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.angularUnit
-
-```ts
-angularUnit: AngularUnit;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.costFunction()
-
-```ts
-costFunction: (expr) => number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.simplificationRules
-
-```ts
-simplificationRules: Rule[];
-```
-
-The rules used by `.simplify()` when no explicit `rules` option is passed.
- Initialized to the built-in simplification rules.
- Users can `push()` additional rules or replace the entire array.
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.strict
-
-```ts
-strict: boolean;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.trace
-
-```ts
-trace: readonly string[];
-```
-
-A list of the function calls to the current evaluation context
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.precision
-
-```ts
-get precision(): number
-set precision(p: number | "auto" | "machine"): void
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.chop()
-
-###### chop(n)
-
-```ts
-chop(n): number
-```
-
-####### n
-
-`number`
-
-###### chop(n)
-
-```ts
-chop(n): 0 | Decimal
-```
-
-####### n
-
-`Decimal`
-
-###### chop(n)
-
-```ts
-chop(n): number | Decimal
-```
-
-####### n
-
-`number` | `Decimal`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.box()
-
-```ts
-box(expr, options?): BoxedExpression
-```
-
-####### expr
-
-[`NumericValue`](#numericvalue) | [`ExpressionInput`](#expressioninput)
-
-####### options?
-
-####### form?
-
-[`FormOption`](#formoption)
-
-####### scope?
-
-`Scope`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.function()
-
-```ts
-function(name, ops, options?): BoxedExpression
-```
-
-####### name
-
-`string`
-
-####### ops
-
-readonly [`ExpressionInput`](#expressioninput)[]
-
-####### options?
-
-####### metadata?
-
-[`Metadata`](#metadata-1)
-
-####### form?
-
-[`FormOption`](#formoption)
-
-####### scope?
-
-`Scope`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.registerCompilationTarget()
-
-```ts
-registerCompilationTarget(name, target): void
-```
-
-Register a custom compilation target.
-
-####### name
-
-`string`
-
-####### target
-
-`LanguageTarget`\<[`BoxedExpression`](#boxedexpression)\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.getCompilationTarget()
-
-```ts
-getCompilationTarget(name): LanguageTarget<BoxedExpression>
-```
-
-Get a registered compilation target by name.
-
-####### name
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.listCompilationTargets()
-
-```ts
-listCompilationTargets(): string[]
-```
-
-Return the names of all registered compilation targets.
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.unregisterCompilationTarget()
-
-```ts
-unregisterCompilationTarget(name): void
-```
-
-Remove a registered compilation target.
-
-####### name
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.number()
-
-```ts
-number(value, options?): BoxedExpression
-```
-
-####### value
-
-`any`
-
-####### options?
-
-####### metadata?
-
-[`Metadata`](#metadata-1)
-
-####### canonical?
-
-[`CanonicalOptions`](#canonicaloptions)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.symbol()
-
-```ts
-symbol(sym, options?): BoxedExpression
-```
-
-####### sym
-
-`string`
-
-####### options?
-
-####### canonical?
-
-[`CanonicalOptions`](#canonicaloptions)
-
-####### metadata?
-
-[`Metadata`](#metadata-1)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.string()
-
-```ts
-string(s, metadata?): BoxedExpression
-```
-
-####### s
-
-`string`
-
-####### metadata?
-
-[`Metadata`](#metadata-1)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.error()
-
-```ts
-error(message, where?): BoxedExpression
-```
-
-####### message
-
-`string` | `string`[]
-
-####### where?
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.typeError()
-
-```ts
-typeError(expectedType, actualType, where?): BoxedExpression
-```
-
-####### expectedType
-
-[`Type`](#type-3)
-
-####### actualType
-
-[`Type`](#type-3) | [`BoxedType`](#boxedtype)
-
-####### where?
-
-[`ExpressionInput`](#expressioninput)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.hold()
-
-```ts
-hold(expr): BoxedExpression
-```
-
-####### expr
-
-[`ExpressionInput`](#expressioninput)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.tuple()
-
-###### tuple(elements)
-
-```ts
-tuple(...elements): BoxedExpression
-```
-
-####### elements
-
-...readonly `number`[]
-
-###### tuple(elements)
-
-```ts
-tuple(...elements): BoxedExpression
-```
-
-####### elements
-
-...readonly [`BoxedExpression`](#boxedexpression)[]
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.type()
-
-```ts
-type(type): BoxedType
-```
-
-####### type
-
-`string` | [`AlgebraicType`](#algebraictype) | [`NegationType`](#negationtype) | [`CollectionType`](#collectiontype) | [`ListType`](#listtype) | [`SetType`](#settype) | [`RecordType`](#recordtype) | [`DictionaryType`](#dictionarytype) | [`TupleType`](#tupletype) | [`SymbolType`](#symboltype) | [`ExpressionType`](#expressiontype) | [`NumericType`](#numerictype) | [`FunctionSignature`](#functionsignature) | [`ValueType`](#valuetype) | [`TypeReference`](#typereference) | [`BoxedType`](#boxedtype)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.rules()
-
-```ts
-rules(rules, options?): BoxedRuleSet
-```
-
-####### rules
-
-`Rule` | `BoxedRuleSet` | readonly Rule \| BoxedRule[]
-
-####### options?
-
-####### canonical?
-
-`boolean`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.getRuleSet()
-
-```ts
-getRuleSet(id?): BoxedRuleSet
-```
-
-####### id?
-
-`"harmonization"` | `"solve-univariate"` | `"standard-simplification"`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.parse()
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): null
-```
-
-####### latex
-
-`null`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): BoxedExpression
-```
-
-####### latex
-
-`string`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): BoxedExpression
-```
-
-####### latex
-
-`string`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.pushScope()
-
-```ts
-pushScope(scope?, name?): void
-```
-
-####### scope?
-
-`Scope`
-
-####### name?
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.popScope()
-
-```ts
-popScope(): void
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.lookupContext()
-
-```ts
-lookupContext(id): EvalContext
-```
-
-####### id
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.lookupDefinition()
-
-```ts
-lookupDefinition(id): BoxedDefinition
-```
-
-####### id
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.assign()
-
-###### assign(ids)
-
-```ts
-assign(ids): IComputeEngine
-```
-
-####### ids
-
-###### assign(id, value)
-
-```ts
-assign(id, value): IComputeEngine
-```
-
-####### id
-
-`string`
-
-####### value
-
-`AssignValue`
-
-###### assign(arg1, arg2)
-
-```ts
-assign(arg1, arg2?): IComputeEngine
-```
-
-####### arg1
-
-`string` | \{\}
-
-####### arg2?
-
-`AssignValue`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.declareType()
-
-```ts
-declareType(name, type, options?): void
-```
-
-####### name
-
-`string`
-
-####### type
-
-[`Type`](#type-3)
-
-####### options?
-
-####### alias?
-
-`boolean`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.declare()
-
-###### declare(symbols)
-
-```ts
-declare(symbols): IComputeEngine
-```
-
-####### symbols
-
-###### declare(id, def, scope)
-
-```ts
-declare(id, def, scope?): IComputeEngine
-```
-
-####### id
-
-`string`
-
-####### def
-
-`string` | [`AlgebraicType`](#algebraictype) | [`NegationType`](#negationtype) | [`CollectionType`](#collectiontype) | [`ListType`](#listtype) | [`SetType`](#settype) | [`RecordType`](#recordtype) | [`DictionaryType`](#dictionarytype) | [`TupleType`](#tupletype) | [`SymbolType`](#symboltype) | [`ExpressionType`](#expressiontype) | [`NumericType`](#numerictype) | [`FunctionSignature`](#functionsignature) | [`ValueType`](#valuetype) | [`TypeReference`](#typereference) | `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
-`holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
-`type`:   \| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`inferred`: `boolean`;
-`value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`BoxedExpression`](#boxedexpression);
-`eq`: (`a`) => `boolean`;
-`neq`: (`a`) => `boolean`;
-`cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
-`collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`BoxedExpression`](#boxedexpression);
-\} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
-`signature`:   \| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`type`: (`ops`, `options`) =>
-\| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`sgn`: (`ops`, `options`) => [`Sign`](#sign);
-`isPositive`: `boolean`;
-`isNonNegative`: `boolean`;
-`isNegative`: `boolean`;
-`isNonPositive`: `boolean`;
-`even`: (`ops`, `options`) => `boolean`;
-`complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluate`:   \| [`BoxedExpression`](#boxedexpression)
-\| (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`BoxedExpression`](#boxedexpression)\>;
-`evalDimension`: (`args`, `options`) => [`BoxedExpression`](#boxedexpression);
-`xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
-`eq`: (`a`, `b`) => `boolean`;
-`neq`: (`a`, `b`) => `boolean`;
-`collection`: [`CollectionHandlers`](#collectionhandlers);
-\}\>\> | `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
-`holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
-`type`:   \| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`inferred`: `boolean`;
-`value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`BoxedExpression`](#boxedexpression);
-`eq`: (`a`) => `boolean`;
-`neq`: (`a`) => `boolean`;
-`cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
-`collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`BoxedExpression`](#boxedexpression);
-\} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
-`signature`:   \| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`type`: (`ops`, `options`) =>
-\| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`sgn`: (`ops`, `options`) => [`Sign`](#sign);
-`isPositive`: `boolean`;
-`isNonNegative`: `boolean`;
-`isNegative`: `boolean`;
-`isNonPositive`: `boolean`;
-`even`: (`ops`, `options`) => `boolean`;
-`complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluate`:   \| [`BoxedExpression`](#boxedexpression)
-\| (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`BoxedExpression`](#boxedexpression)\>;
-`evalDimension`: (`args`, `options`) => [`BoxedExpression`](#boxedexpression);
-`xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
-`eq`: (`a`, `b`) => `boolean`;
-`neq`: (`a`, `b`) => `boolean`;
-`collection`: [`CollectionHandlers`](#collectionhandlers);
-\}\>\>
-
-####### scope?
-
-`Scope`
-
-###### declare(arg1, arg2, arg3)
-
-```ts
-declare(arg1, arg2?, arg3?): IComputeEngine
-```
-
-####### arg1
-
-`string` | \{\}
-
-####### arg2?
-
-`string` | [`AlgebraicType`](#algebraictype) | [`NegationType`](#negationtype) | [`CollectionType`](#collectiontype) | [`ListType`](#listtype) | [`SetType`](#settype) | [`RecordType`](#recordtype) | [`DictionaryType`](#dictionarytype) | [`TupleType`](#tupletype) | [`SymbolType`](#symboltype) | [`ExpressionType`](#expressiontype) | [`NumericType`](#numerictype) | [`FunctionSignature`](#functionsignature) | [`ValueType`](#valuetype) | [`TypeReference`](#typereference) | `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
-`holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
-`type`:   \| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`inferred`: `boolean`;
-`value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`BoxedExpression`](#boxedexpression);
-`eq`: (`a`) => `boolean`;
-`neq`: (`a`) => `boolean`;
-`cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
-`collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`BoxedExpression`](#boxedexpression);
-\} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
-`signature`:   \| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`type`: (`ops`, `options`) =>
-\| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`sgn`: (`ops`, `options`) => [`Sign`](#sign);
-`isPositive`: `boolean`;
-`isNonNegative`: `boolean`;
-`isNegative`: `boolean`;
-`isNonPositive`: `boolean`;
-`even`: (`ops`, `options`) => `boolean`;
-`complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluate`:   \| [`BoxedExpression`](#boxedexpression)
-\| (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`BoxedExpression`](#boxedexpression)\>;
-`evalDimension`: (`args`, `options`) => [`BoxedExpression`](#boxedexpression);
-`xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
-`eq`: (`a`, `b`) => `boolean`;
-`neq`: (`a`, `b`) => `boolean`;
-`collection`: [`CollectionHandlers`](#collectionhandlers);
-\}\>\> | `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
-`holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
-`type`:   \| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`inferred`: `boolean`;
-`value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`BoxedExpression`](#boxedexpression);
-`eq`: (`a`) => `boolean`;
-`neq`: (`a`) => `boolean`;
-`cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
-`collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`BoxedExpression`](#boxedexpression);
-\} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
-`signature`:   \| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`type`: (`ops`, `options`) =>
-\| `string`
-\| [`AlgebraicType`](#algebraictype)
-\| [`NegationType`](#negationtype)
-\| [`CollectionType`](#collectiontype)
-\| [`ListType`](#listtype)
-\| [`SetType`](#settype)
-\| [`RecordType`](#recordtype)
-\| [`DictionaryType`](#dictionarytype)
-\| [`TupleType`](#tupletype)
-\| [`SymbolType`](#symboltype)
-\| [`ExpressionType`](#expressiontype)
-\| [`NumericType`](#numerictype)
-\| [`FunctionSignature`](#functionsignature)
-\| [`ValueType`](#valuetype)
-\| [`TypeReference`](#typereference)
-\| [`BoxedType`](#boxedtype);
-`sgn`: (`ops`, `options`) => [`Sign`](#sign);
-`isPositive`: `boolean`;
-`isNonNegative`: `boolean`;
-`isNegative`: `boolean`;
-`isNonPositive`: `boolean`;
-`even`: (`ops`, `options`) => `boolean`;
-`complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluate`:   \| [`BoxedExpression`](#boxedexpression)
-\| (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`BoxedExpression`](#boxedexpression)\>;
-`evalDimension`: (`args`, `options`) => [`BoxedExpression`](#boxedexpression);
-`xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
-`eq`: (`a`, `b`) => `boolean`;
-`neq`: (`a`, `b`) => `boolean`;
-`collection`: [`CollectionHandlers`](#collectionhandlers);
-\}\>\>
-
-####### arg3?
-
-`Scope`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.assume()
-
-```ts
-assume(predicate): AssumeResult
-```
-
-####### predicate
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.declareSequence()
-
-```ts
-declareSequence(name, def): IComputeEngine
-```
-
-Declare a sequence with a recurrence relation.
-
-####### name
-
-`string`
-
-####### def
-
-[`SequenceDefinition`](#sequencedefinition)
-
-###### Example
-
-```typescript
-// Fibonacci sequence
-ce.declareSequence('F', {
-  base: { 0: 0, 1: 1 },
-  recurrence: 'F_{n-1} + F_{n-2}',
-});
-ce.parse('F_{10}').evaluate();  // → 55
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.getSequenceStatus()
-
-```ts
-getSequenceStatus(name): SequenceStatus
-```
-
-Get the status of a sequence definition.
-
-####### name
-
-`string`
-
-###### Example
-
-```typescript
-ce.parse('F_0 := 0').evaluate();
-ce.getSequenceStatus('F');
-// → { status: 'pending', hasBase: true, hasRecurrence: false, baseIndices: [0] }
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.getSequence()
-
-```ts
-getSequence(name): SequenceInfo
-```
-
-Get information about a defined sequence.
-Returns `undefined` if the symbol is not a sequence.
-
-####### name
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.listSequences()
-
-```ts
-listSequences(): string[]
-```
-
-List all defined sequences.
-Returns an array of sequence names.
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.isSequence()
-
-```ts
-isSequence(name): boolean
-```
-
-Check if a symbol is a defined sequence.
-
-####### name
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.clearSequenceCache()
-
-```ts
-clearSequenceCache(name?): void
-```
-
-Clear the memoization cache for a sequence.
-If no name is provided, clears caches for all sequences.
-
-####### name?
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.getSequenceCache()
-
-```ts
-getSequenceCache(name): Map<string | number, BoxedExpression>
-```
-
-Get the memoization cache for a sequence.
-Returns a Map of index → value, or `undefined` if not a sequence or memoization is disabled.
-
-For single-index sequences, keys are numbers.
-For multi-index sequences, keys are comma-separated strings (e.g., '5,2').
-
-####### name
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.getSequenceTerms()
-
-```ts
-getSequenceTerms(
-   name, 
-   start, 
-   end, 
-   step?): BoxedExpression[]
-```
-
-Generate a list of sequence terms from start to end (inclusive).
-
-####### name
-
-`string`
-
-The sequence name
-
-####### start
-
-`number`
-
-Starting index (inclusive)
-
-####### end
-
-`number`
-
-Ending index (inclusive)
-
-####### step?
-
-`number`
-
-Step size (default: 1)
-
-###### Example
-
-```typescript
-ce.declareSequence('F', { base: { 0: 0, 1: 1 }, recurrence: 'F_{n-1} + F_{n-2}' });
-ce.getSequenceTerms('F', 0, 10);
-// → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.lookupOEIS()
-
-```ts
-lookupOEIS(terms, options?): Promise<OEISSequenceInfo[]>
-```
-
-Look up sequences in OEIS by their terms.
-
-####### terms
-
-(`number` \| [`BoxedExpression`](#boxedexpression))[]
-
-Array of sequence terms to search for
-
-####### options?
-
-[`OEISOptions`](#oeisoptions)
-
-Optional configuration (timeout, maxResults)
-
-###### Example
-
-```typescript
-const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
-// → [{ id: 'A000045', name: 'Fibonacci numbers', ... }]
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.checkSequenceOEIS()
-
-```ts
-checkSequenceOEIS(name, count?, options?): Promise<{
-  matches: OEISSequenceInfo[];
-  terms: number[];
-}>
-```
-
-Check if a defined sequence matches an OEIS sequence.
-
-####### name
-
-`string`
-
-Name of the defined sequence
-
-####### count?
-
-`number`
-
-Number of terms to check (default: 10)
-
-####### options?
-
-[`OEISOptions`](#oeisoptions)
-
-Optional configuration
-
-###### Example
-
-```typescript
-ce.declareSequence('F', { base: { 0: 0, 1: 1 }, recurrence: 'F_{n-1} + F_{n-2}' });
-const result = await ce.checkSequenceOEIS('F', 10);
-// → { matches: [{ id: 'A000045', name: 'Fibonacci numbers', ... }], terms: [0, 1, 1, ...] }
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.forget()
-
-```ts
-forget(symbol?): void
-```
-
-####### symbol?
-
-`string` | `string`[]
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.ask()
-
-```ts
-ask(pattern): BoxedSubstitution[]
-```
-
-####### pattern
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.verify()
-
-```ts
-verify(query): boolean
-```
-
-####### query
-
-[`BoxedExpression`](#boxedexpression)
-
-</MemberCard>
-
 <MemberCard>
 
 ### AngularUnit
@@ -1572,7 +44,7 @@ ce.angularUnit = 'deg';
 ### AssignValue
 
 ```ts
-type AssignValue = KernelAssignValue<BoxedExpression, ExpressionInput, ComputeEngine>;
+type AssignValue = KernelAssignValue<Expression, ExpressionInput, ComputeEngine>;
 ```
 
 Assignable value for `ce.assign()`.
@@ -1629,7 +101,7 @@ decimalSeparator: string;
 ##### ExpressionComputeEngine.True
 
 ```ts
-readonly True: BoxedExpression;
+readonly True: Expression;
 ```
 
 </MemberCard>
@@ -1639,7 +111,7 @@ readonly True: BoxedExpression;
 ##### ExpressionComputeEngine.False
 
 ```ts
-readonly False: BoxedExpression;
+readonly False: Expression;
 ```
 
 </MemberCard>
@@ -1649,7 +121,7 @@ readonly False: BoxedExpression;
 ##### ExpressionComputeEngine.Pi
 
 ```ts
-readonly Pi: BoxedExpression;
+readonly Pi: Expression;
 ```
 
 </MemberCard>
@@ -1659,7 +131,7 @@ readonly Pi: BoxedExpression;
 ##### ExpressionComputeEngine.E
 
 ```ts
-readonly E: BoxedExpression;
+readonly E: Expression;
 ```
 
 </MemberCard>
@@ -1669,7 +141,7 @@ readonly E: BoxedExpression;
 ##### ExpressionComputeEngine.Nothing
 
 ```ts
-readonly Nothing: BoxedExpression;
+readonly Nothing: Expression;
 ```
 
 </MemberCard>
@@ -1679,7 +151,7 @@ readonly Nothing: BoxedExpression;
 ##### ExpressionComputeEngine.Zero
 
 ```ts
-readonly Zero: BoxedExpression;
+readonly Zero: Expression;
 ```
 
 </MemberCard>
@@ -1689,7 +161,7 @@ readonly Zero: BoxedExpression;
 ##### ExpressionComputeEngine.One
 
 ```ts
-readonly One: BoxedExpression;
+readonly One: Expression;
 ```
 
 </MemberCard>
@@ -1699,7 +171,7 @@ readonly One: BoxedExpression;
 ##### ExpressionComputeEngine.Half
 
 ```ts
-readonly Half: BoxedExpression;
+readonly Half: Expression;
 ```
 
 </MemberCard>
@@ -1709,7 +181,7 @@ readonly Half: BoxedExpression;
 ##### ExpressionComputeEngine.NegativeOne
 
 ```ts
-readonly NegativeOne: BoxedExpression;
+readonly NegativeOne: Expression;
 ```
 
 </MemberCard>
@@ -1719,7 +191,7 @@ readonly NegativeOne: BoxedExpression;
 ##### ExpressionComputeEngine.I
 
 ```ts
-readonly I: BoxedExpression;
+readonly I: Expression;
 ```
 
 ImaginaryUnit
@@ -1731,7 +203,7 @@ ImaginaryUnit
 ##### ExpressionComputeEngine.NaN
 
 ```ts
-readonly NaN: BoxedExpression;
+readonly NaN: Expression;
 ```
 
 </MemberCard>
@@ -1741,7 +213,7 @@ readonly NaN: BoxedExpression;
 ##### ExpressionComputeEngine.PositiveInfinity
 
 ```ts
-readonly PositiveInfinity: BoxedExpression;
+readonly PositiveInfinity: Expression;
 ```
 
 </MemberCard>
@@ -1751,7 +223,7 @@ readonly PositiveInfinity: BoxedExpression;
 ##### ExpressionComputeEngine.NegativeInfinity
 
 ```ts
-readonly NegativeInfinity: BoxedExpression;
+readonly NegativeInfinity: Expression;
 ```
 
 </MemberCard>
@@ -1761,7 +233,7 @@ readonly NegativeInfinity: BoxedExpression;
 ##### ExpressionComputeEngine.ComplexInfinity
 
 ```ts
-readonly ComplexInfinity: BoxedExpression;
+readonly ComplexInfinity: Expression;
 ```
 
 </MemberCard>
@@ -1954,7 +426,7 @@ chop(n): number | Decimal
 ##### ExpressionComputeEngine.box()
 
 ```ts
-box(expr, options?): BoxedExpression
+box(expr, options?): Expression
 ```
 
 ####### expr
@@ -1978,7 +450,7 @@ box(expr, options?): BoxedExpression
 ##### ExpressionComputeEngine.function()
 
 ```ts
-function(name, ops, options?): BoxedExpression
+function(name, ops, options?): Expression
 ```
 
 ####### name
@@ -2021,7 +493,7 @@ Register a custom compilation target.
 
 ####### target
 
-`LanguageTarget`\<[`BoxedExpression`](#boxedexpression)\>
+`LanguageTarget`\<[`Expression`](#expression-4)\>
 
 </MemberCard>
 
@@ -2030,7 +502,7 @@ Register a custom compilation target.
 ##### ExpressionComputeEngine.getCompilationTarget()
 
 ```ts
-getCompilationTarget(name): LanguageTarget<BoxedExpression>
+getCompilationTarget(name): LanguageTarget<Expression>
 ```
 
 Get a registered compilation target by name.
@@ -2074,7 +546,7 @@ Remove a registered compilation target.
 ##### ExpressionComputeEngine.number()
 
 ```ts
-number(value, options?): BoxedExpression
+number(value, options?): Expression
 ```
 
 ####### value
@@ -2098,7 +570,7 @@ number(value, options?): BoxedExpression
 ##### ExpressionComputeEngine.symbol()
 
 ```ts
-symbol(sym, options?): BoxedExpression
+symbol(sym, options?): Expression
 ```
 
 ####### sym
@@ -2122,7 +594,7 @@ symbol(sym, options?): BoxedExpression
 ##### ExpressionComputeEngine.string()
 
 ```ts
-string(s, metadata?): BoxedExpression
+string(s, metadata?): Expression
 ```
 
 ####### s
@@ -2140,7 +612,7 @@ string(s, metadata?): BoxedExpression
 ##### ExpressionComputeEngine.error()
 
 ```ts
-error(message, where?): BoxedExpression
+error(message, where?): Expression
 ```
 
 ####### message
@@ -2158,7 +630,7 @@ error(message, where?): BoxedExpression
 ##### ExpressionComputeEngine.typeError()
 
 ```ts
-typeError(expectedType, actualType, where?): BoxedExpression
+typeError(expectedType, actualType, where?): Expression
 ```
 
 ####### expectedType
@@ -2180,7 +652,7 @@ typeError(expectedType, actualType, where?): BoxedExpression
 ##### ExpressionComputeEngine.hold()
 
 ```ts
-hold(expr): BoxedExpression
+hold(expr): Expression
 ```
 
 ####### expr
@@ -2196,7 +668,7 @@ hold(expr): BoxedExpression
 ###### tuple(elements)
 
 ```ts
-tuple(...elements): BoxedExpression
+tuple(...elements): Expression
 ```
 
 ####### elements
@@ -2206,12 +678,12 @@ tuple(...elements): BoxedExpression
 ###### tuple(elements)
 
 ```ts
-tuple(...elements): BoxedExpression
+tuple(...elements): Expression
 ```
 
 ####### elements
 
-...readonly [`BoxedExpression`](#boxedexpression)[]
+...readonly [`Expression`](#expression-4)[]
 
 </MemberCard>
 
@@ -2286,7 +758,7 @@ parse(latex, options?): null
 ###### parse(latex, options)
 
 ```ts
-parse(latex, options?): BoxedExpression
+parse(latex, options?): Expression
 ```
 
 ####### latex
@@ -2302,7 +774,7 @@ parse(latex, options?): BoxedExpression
 ###### parse(latex, options)
 
 ```ts
-parse(latex, options?): BoxedExpression
+parse(latex, options?): Expression
 ```
 
 ####### latex
@@ -2483,12 +955,12 @@ declare(id, def, scope?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`BoxedExpression`](#boxedexpression);
+\| (`ce`) => [`Expression`](#expression-4);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`BoxedExpression`](#boxedexpression);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -2530,11 +1002,11 @@ declare(id, def, scope?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluate`:   \| [`BoxedExpression`](#boxedexpression)
-\| (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`BoxedExpression`](#boxedexpression)\>;
-`evalDimension`: (`args`, `options`) => [`BoxedExpression`](#boxedexpression);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluate`:   \| [`Expression`](#expression-4)
+\| (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -2559,12 +1031,12 @@ declare(id, def, scope?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`BoxedExpression`](#boxedexpression);
+\| (`ce`) => [`Expression`](#expression-4);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`BoxedExpression`](#boxedexpression);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -2606,11 +1078,11 @@ declare(id, def, scope?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluate`:   \| [`BoxedExpression`](#boxedexpression)
-\| (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`BoxedExpression`](#boxedexpression)\>;
-`evalDimension`: (`args`, `options`) => [`BoxedExpression`](#boxedexpression);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluate`:   \| [`Expression`](#expression-4)
+\| (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -2653,12 +1125,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`BoxedExpression`](#boxedexpression);
+\| (`ce`) => [`Expression`](#expression-4);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`BoxedExpression`](#boxedexpression);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -2700,11 +1172,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluate`:   \| [`BoxedExpression`](#boxedexpression)
-\| (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`BoxedExpression`](#boxedexpression)\>;
-`evalDimension`: (`args`, `options`) => [`BoxedExpression`](#boxedexpression);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluate`:   \| [`Expression`](#expression-4)
+\| (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -2729,12 +1201,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`BoxedExpression`](#boxedexpression);
+\| (`ce`) => [`Expression`](#expression-4);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`BoxedExpression`](#boxedexpression);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -2776,11 +1248,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluate`:   \| [`BoxedExpression`](#boxedexpression)
-\| (`ops`, `options`) => [`BoxedExpression`](#boxedexpression);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`BoxedExpression`](#boxedexpression)\>;
-`evalDimension`: (`args`, `options`) => [`BoxedExpression`](#boxedexpression);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluate`:   \| [`Expression`](#expression-4)
+\| (`ops`, `options`) => [`Expression`](#expression-4);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -2803,7 +1275,7 @@ assume(predicate): AssumeResult
 
 ####### predicate
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -2930,7 +1402,7 @@ If no name is provided, clears caches for all sequences.
 ##### ExpressionComputeEngine.getSequenceCache()
 
 ```ts
-getSequenceCache(name): Map<string | number, BoxedExpression>
+getSequenceCache(name): Map<string | number, Expression>
 ```
 
 Get the memoization cache for a sequence.
@@ -2954,7 +1426,7 @@ getSequenceTerms(
    name, 
    start, 
    end, 
-   step?): BoxedExpression[]
+   step?): Expression[]
 ```
 
 Generate a list of sequence terms from start to end (inclusive).
@@ -3005,7 +1477,7 @@ Look up sequences in OEIS by their terms.
 
 ####### terms
 
-(`number` \| [`BoxedExpression`](#boxedexpression))[]
+(`number` \| [`Expression`](#expression-4))[]
 
 Array of sequence terms to search for
 
@@ -3089,7 +1561,7 @@ ask(pattern): BoxedSubstitution[]
 
 ####### pattern
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -3103,7 +1575,7 @@ verify(query): boolean
 
 ####### query
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -3121,7 +1593,7 @@ type SimplifyOptions = {
 };
 ```
 
-Options for `BoxedExpression.simplify()`
+Options for `Expression.simplify()`
 
 </MemberCard>
 
@@ -3130,7 +1602,7 @@ Options for `BoxedExpression.simplify()`
 ### EvaluateOptions
 
 ```ts
-type EvaluateOptions = KernelEvaluateOptions<BoxedExpression>;
+type EvaluateOptions = KernelEvaluateOptions<Expression>;
 ```
 
 Options for evaluating boxed expressions.
@@ -3139,16 +1611,16 @@ This is the compute-engine-specialized form of the generic kernel type.
 
 </MemberCard>
 
-### BoxedExpression
+### Expression
 
 :::info[THEORY OF OPERATIONS]
 
-The `BoxedExpression` interface includes the methods and properties
+The `Expression` interface includes the methods and properties
 applicable to all kinds of expression. For example it includes `expr.symbol`
 which only applies to symbols or `expr.ops` which only applies to
 function expressions.
 
-When a property is not applicable to this `BoxedExpression` its value is
+When a property is not applicable to this `Expression` its value is
 `undefined`. For example `expr.symbol` for a `BoxedNumber` is `undefined`.
 
 This convention makes it convenient to manipulate expressions without
@@ -3311,7 +1783,7 @@ of the symbol, not its value.
 
 <MemberCard>
 
-##### BoxedExpression.operator
+##### Expression.operator
 
 ```ts
 readonly operator: string;
@@ -3335,7 +1807,7 @@ collapse to `"Number"`.
 
 <MemberCard>
 
-##### BoxedExpression.isEven
+##### Expression.isEven
 
 ```ts
 readonly isEven: boolean;
@@ -3347,7 +1819,7 @@ If the value of this expression is not an **integer** return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.isOdd
+##### Expression.isOdd
 
 ```ts
 readonly isOdd: boolean;
@@ -3359,7 +1831,7 @@ If the value of this expression is not an **integer** return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.re
+##### Expression.re
 
 ```ts
 readonly re: number;
@@ -3373,7 +1845,7 @@ Otherwise, return `NaN` (not a number).
 
 <MemberCard>
 
-##### BoxedExpression.im
+##### Expression.im
 
 ```ts
 readonly im: number;
@@ -3388,7 +1860,7 @@ Otherwise, return `NaN` (not a number).
 
 <MemberCard>
 
-##### BoxedExpression.bignumRe
+##### Expression.bignumRe
 
 ```ts
 readonly bignumRe: Decimal;
@@ -3410,7 +1882,7 @@ otherwise as a number or `NaN` if the value is not a number.
 
 <MemberCard>
 
-##### BoxedExpression.bignumIm
+##### Expression.bignumIm
 
 ```ts
 readonly bignumIm: Decimal;
@@ -3434,7 +1906,7 @@ When using this pattern, the value is returned as a bignum if available, otherwi
 
 <MemberCard>
 
-##### BoxedExpression.sgn
+##### Expression.sgn
 
 ```ts
 readonly sgn: Sign;
@@ -3456,7 +1928,7 @@ Non-canonical expressions return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.isPositive
+##### Expression.isPositive
 
 ```ts
 readonly isPositive: boolean;
@@ -3468,7 +1940,7 @@ The value of this expression is > 0, same as `isGreaterEqual(0)`
 
 <MemberCard>
 
-##### BoxedExpression.isNonNegative
+##### Expression.isNonNegative
 
 ```ts
 readonly isNonNegative: boolean;
@@ -3480,7 +1952,7 @@ The value of this expression is >= 0, same as `isGreaterEqual(0)`
 
 <MemberCard>
 
-##### BoxedExpression.isNegative
+##### Expression.isNegative
 
 ```ts
 readonly isNegative: boolean;
@@ -3492,7 +1964,7 @@ The value of this expression is &lt; 0, same as `isLess(0)`
 
 <MemberCard>
 
-##### BoxedExpression.isNonPositive
+##### Expression.isNonPositive
 
 ```ts
 readonly isNonPositive: boolean;
@@ -3504,7 +1976,7 @@ The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
 
 <MemberCard>
 
-##### BoxedExpression.isNaN
+##### Expression.isNaN
 
 ```ts
 readonly isNaN: boolean;
@@ -3522,7 +1994,7 @@ number).
 
 <MemberCard>
 
-##### BoxedExpression.isInfinity
+##### Expression.isInfinity
 
 ```ts
 readonly isInfinity: boolean;
@@ -3534,7 +2006,7 @@ The numeric value of this expression is `±Infinity` or ComplexInfinity.
 
 <MemberCard>
 
-##### BoxedExpression.isFinite
+##### Expression.isFinite
 
 ```ts
 readonly isFinite: boolean;
@@ -3549,7 +2021,7 @@ This expression is a number, but not `±Infinity`, `ComplexInfinity` or
 
 <MemberCard>
 
-##### BoxedExpression.engine
+##### Expression.engine
 
 ```ts
 readonly engine: ExpressionComputeEngine;
@@ -3563,7 +2035,7 @@ and functions.
 
 <MemberCard>
 
-##### BoxedExpression.toLatex()
+##### Expression.toLatex()
 
 ```ts
 toLatex(options?): string
@@ -3583,7 +2055,7 @@ Will ignore any LaTeX metadata.
 
 <MemberCard>
 
-##### BoxedExpression.latex
+##### Expression.latex
 
 LaTeX representation of this expression.
 
@@ -3602,10 +2074,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.toMathJson()
+##### Expression.toMathJson()
 
 ```ts
-toMathJson(options?): Expression
+toMathJson(options?): MathJsonExpression
 ```
 
 Serialize to a MathJSON expression with specified options
@@ -3618,10 +2090,10 @@ Serialize to a MathJSON expression with specified options
 
 <MemberCard>
 
-##### BoxedExpression.json
+##### Expression.json
 
 ```ts
-readonly json: Expression;
+readonly json: MathJsonExpression;
 ```
 
 MathJSON representation of this expression.
@@ -3646,7 +2118,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.print()
+##### Expression.print()
 
 ```ts
 print(): void
@@ -3660,7 +2132,7 @@ Note that lazy collections are eagerly evaluated when printed.
 
 <MemberCard>
 
-##### BoxedExpression.verbatimLatex?
+##### Expression.verbatimLatex?
 
 ```ts
 optional verbatimLatex: string;
@@ -3673,7 +2145,7 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 
 <MemberCard>
 
-##### BoxedExpression.isCanonical
+##### Expression.isCanonical
 
 If `true`, this expression is in a canonical form.
 
@@ -3681,19 +2153,19 @@ If `true`, this expression is in a canonical form.
 
 <MemberCard>
 
-##### BoxedExpression.isStructural
+##### Expression.isStructural
 
 If `true`, this expression is in a structural form.
 
 The structural form of an expression is used when applying rules to
 an expression. For example, a rational number is represented as a
-function expression instead of a `BoxedExpression` object.
+function expression instead of a `Expression` object.
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.canonical
+##### Expression.canonical
 
 Return the canonical form of this expression.
 
@@ -3727,12 +2199,12 @@ This means that, likewise for partially canonical expressions, the
 
 <MemberCard>
 
-##### BoxedExpression.structural
+##### Expression.structural
 
 Return the structural form of this expression.
 
 Some expressions, such as rational numbers, are represented with
-a `BoxedExpression` object. In some cases, for example when doing a
+a `Expression` object. In some cases, for example when doing a
 structural comparison of two expressions, it is useful to have a
 structural representation of the expression where the rational numbers
 is represented by a function expression instead.
@@ -3744,7 +2216,7 @@ otherwise return `this`.
 
 <MemberCard>
 
-##### BoxedExpression.isValid
+##### Expression.isValid
 
 ```ts
 readonly isValid: boolean;
@@ -3764,7 +2236,7 @@ mismatch, or missing or unexpected arguments.
 
 <MemberCard>
 
-##### BoxedExpression.isPure
+##### Expression.isPure
 
 ```ts
 readonly isPure: boolean;
@@ -3796,7 +2268,7 @@ Applicable to canonical expressions only
 
 <MemberCard>
 
-##### BoxedExpression.isConstant
+##### Expression.isConstant
 
 ```ts
 readonly isConstant: boolean;
@@ -3819,10 +2291,10 @@ with constant arguments are all *constant*, i.e.:
 
 <MemberCard>
 
-##### BoxedExpression.errors
+##### Expression.errors
 
 ```ts
-readonly errors: readonly BoxedExpression[];
+readonly errors: readonly Expression[];
 ```
 
 All the `["Error"]` subexpressions.
@@ -3838,10 +2310,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.getSubexpressions()
+##### Expression.getSubexpressions()
 
 ```ts
-getSubexpressions(operator): readonly BoxedExpression[]
+getSubexpressions(operator): readonly Expression[]
 ```
 
 All the subexpressions matching the named operator, recursively.
@@ -3866,10 +2338,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.subexpressions
+##### Expression.subexpressions
 
 ```ts
-readonly subexpressions: readonly BoxedExpression[];
+readonly subexpressions: readonly Expression[];
 ```
 
 All the subexpressions in this expression, recursively
@@ -3890,7 +2362,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.symbols
+##### Expression.symbols
 
 ```ts
 readonly symbols: readonly string[];
@@ -3912,7 +2384,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.unknowns
+##### Expression.unknowns
 
 ```ts
 readonly unknowns: readonly string[];
@@ -3925,10 +2397,10 @@ associated with them, i.e. they are declared but not defined.
 
 <MemberCard>
 
-##### BoxedExpression.toNumericValue()
+##### Expression.toNumericValue()
 
 ```ts
-toNumericValue(): [NumericValue, BoxedExpression]
+toNumericValue(): [NumericValue, Expression]
 ```
 
 Attempt to factor a numeric coefficient `c` and a `rest` out of a
@@ -3948,10 +2420,10 @@ Attempts to make `rest` a positive value (i.e. pulls out negative sign).
 
 <MemberCard>
 
-##### BoxedExpression.neg()
+##### Expression.neg()
 
 ```ts
-neg(): BoxedExpression
+neg(): Expression
 ```
 
 Negate (additive inverse)
@@ -3960,10 +2432,10 @@ Negate (additive inverse)
 
 <MemberCard>
 
-##### BoxedExpression.inv()
+##### Expression.inv()
 
 ```ts
-inv(): BoxedExpression
+inv(): Expression
 ```
 
 Inverse (multiplicative inverse)
@@ -3972,10 +2444,10 @@ Inverse (multiplicative inverse)
 
 <MemberCard>
 
-##### BoxedExpression.abs()
+##### Expression.abs()
 
 ```ts
-abs(): BoxedExpression
+abs(): Expression
 ```
 
 Absolute value
@@ -3984,106 +2456,106 @@ Absolute value
 
 <MemberCard>
 
-##### BoxedExpression.add()
+##### Expression.add()
 
 ```ts
-add(rhs): BoxedExpression
+add(rhs): Expression
 ```
 
 Addition
 
 ####### rhs
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.sub()
+##### Expression.sub()
 
 ```ts
-sub(rhs): BoxedExpression
+sub(rhs): Expression
 ```
 
 Subtraction
 
 ####### rhs
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.mul()
+##### Expression.mul()
 
 ```ts
-mul(rhs): BoxedExpression
+mul(rhs): Expression
 ```
 
 Multiplication
 
 ####### rhs
 
-`number` | [`NumericValue`](#numericvalue) | [`BoxedExpression`](#boxedexpression)
+`number` | [`NumericValue`](#numericvalue) | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.div()
+##### Expression.div()
 
 ```ts
-div(rhs): BoxedExpression
+div(rhs): Expression
 ```
 
 Division
 
 ####### rhs
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.pow()
+##### Expression.pow()
 
 ```ts
-pow(exp): BoxedExpression
+pow(exp): Expression
 ```
 
 Power
 
 ####### exp
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.root()
+##### Expression.root()
 
 ```ts
-root(exp): BoxedExpression
+root(exp): Expression
 ```
 
 Exponentiation
 
 ####### exp
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.sqrt()
+##### Expression.sqrt()
 
 ```ts
-sqrt(): BoxedExpression
+sqrt(): Expression
 ```
 
 Square root
@@ -4092,23 +2564,23 @@ Square root
 
 <MemberCard>
 
-##### BoxedExpression.ln()
+##### Expression.ln()
 
 ```ts
-ln(base?): BoxedExpression
+ln(base?): Expression
 ```
 
 Logarithm (natural by default)
 
 ####### base?
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.numerator
+##### Expression.numerator
 
 Return this expression expressed as a numerator.
 
@@ -4116,7 +2588,7 @@ Return this expression expressed as a numerator.
 
 <MemberCard>
 
-##### BoxedExpression.denominator
+##### Expression.denominator
 
 Return this expression expressed as a denominator.
 
@@ -4124,7 +2596,7 @@ Return this expression expressed as a denominator.
 
 <MemberCard>
 
-##### BoxedExpression.numeratorDenominator
+##### Expression.numeratorDenominator
 
 Return this expression expressed as a numerator and denominator.
 
@@ -4132,7 +2604,7 @@ Return this expression expressed as a numerator and denominator.
 
 <MemberCard>
 
-##### BoxedExpression.isScoped
+##### Expression.isScoped
 
 ```ts
 readonly isScoped: boolean;
@@ -4146,7 +2618,7 @@ function expression.
 
 <MemberCard>
 
-##### BoxedExpression.localScope
+##### Expression.localScope
 
 If this expression has a local scope, return it.
 
@@ -4154,10 +2626,10 @@ If this expression has a local scope, return it.
 
 <MemberCard>
 
-##### BoxedExpression.subs()
+##### Expression.subs()
 
 ```ts
-subs(sub, options?): BoxedExpression
+subs(sub, options?): Expression
 ```
 
 Replace all the symbols in the expression as indicated.
@@ -4193,10 +2665,10 @@ does not differ from that of this expr.: then a call this method is analagous to
 
 <MemberCard>
 
-##### BoxedExpression.map()
+##### Expression.map()
 
 ```ts
-map(fn, options?): BoxedExpression
+map(fn, options?): Expression
 ```
 
 Recursively replace all the subexpressions in the expression as indicated.
@@ -4217,7 +2689,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### fn
 
-(`expr`) => [`BoxedExpression`](#boxedexpression)
+(`expr`) => [`Expression`](#expression-4)
 
 ####### options?
 
@@ -4233,10 +2705,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.replace()
+##### Expression.replace()
 
 ```ts
-replace(rules, options?): BoxedExpression
+replace(rules, options?): Expression
 ```
 
 Transform the expression by applying one or more replacement rules:
@@ -4254,7 +2726,7 @@ Procedure for the determining the canonical-status of the input expression and r
 the replacement occurs at the top-level, or within/recursively.
 
 - If otherwise, the *direct replacement will be canonical* if either the 'replaced' expression
-is canonical, or the given replacement (- is a BoxedExpression and -) is canonical.
+is canonical, or the given replacement (- is a Expression and -) is canonical.
 Notably also, if this replacement takes place recursively (not at the top-level), then exprs.
 containing the replaced expr. will still however have their (previous) canonical-status
 *preserved*... unless this expr. was previously non-canonical, and *replacements have resulted
@@ -4265,7 +2737,7 @@ canonical status. (Canonicalization is opportunistic here, in other words).
 Applicable to canonical and non-canonical expressions.
 
 To match a specific symbol (not a wildcard pattern), the `match` must be
-a `BoxedExpression` (e.g., `{ match: ce.box('x'), replace: ... }`).
+a `Expression` (e.g., `{ match: ce.box('x'), replace: ... }`).
 For simple symbol substitution, consider using `subs()` instead.
 :::
 
@@ -4281,7 +2753,7 @@ For simple symbol substitution, consider using `subs()` instead.
 
 <MemberCard>
 
-##### BoxedExpression.has()
+##### Expression.has()
 
 ```ts
 has(v): boolean
@@ -4301,10 +2773,10 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### BoxedExpression.match()
+##### Expression.match()
 
 ```ts
-match(pattern, options?): BoxedSubstitution<BoxedExpression>
+match(pattern, options?): BoxedSubstitution<Expression>
 ```
 
 If this expression matches `pattern`, return a substitution that makes
@@ -4325,17 +2797,17 @@ Applicable to canonical and non-canonical expressions.
 
 ####### pattern
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 ####### options?
 
-`PatternMatchOptions`\<[`BoxedExpression`](#boxedexpression)\>
+`PatternMatchOptions`\<[`Expression`](#expression-4)\>
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.wikidata
+##### Expression.wikidata
 
 ```ts
 readonly wikidata: string;
@@ -4349,7 +2821,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.description
+##### Expression.description
 
 ```ts
 readonly description: string[];
@@ -4365,7 +2837,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.url
+##### Expression.url
 
 ```ts
 readonly url: string;
@@ -4380,7 +2852,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.complexity
+##### Expression.complexity
 
 ```ts
 readonly complexity: number;
@@ -4395,7 +2867,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.baseDefinition
+##### Expression.baseDefinition
 
 ```ts
 readonly baseDefinition: BoxedBaseDefinition;
@@ -4411,7 +2883,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.operatorDefinition
+##### Expression.operatorDefinition
 
 ```ts
 readonly operatorDefinition: BoxedOperatorDefinition;
@@ -4428,7 +2900,7 @@ its value is `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.valueDefinition
+##### Expression.valueDefinition
 
 ```ts
 readonly valueDefinition: BoxedValueDefinition;
@@ -4443,10 +2915,10 @@ If not a canonical expression, or not a value, its value is `undefined`.
 
 <MemberCard>
 
-##### BoxedExpression.simplify()
+##### Expression.simplify()
 
 ```ts
-simplify(options?): BoxedExpression
+simplify(options?): Expression
 ```
 
 Return a simpler form of this expression.
@@ -4475,10 +2947,10 @@ To manipulate symbolically non-canonical expressions, use `expr.replace()`.
 
 <MemberCard>
 
-##### BoxedExpression.evaluate()
+##### Expression.evaluate()
 
 ```ts
-evaluate(options?): BoxedExpression
+evaluate(options?): Expression
 ```
 
 Return the value of the canonical form of this expression.
@@ -4506,10 +2978,10 @@ The result is in canonical form.
 
 <MemberCard>
 
-##### BoxedExpression.evaluateAsync()
+##### Expression.evaluateAsync()
 
 ```ts
-evaluateAsync(options?): Promise<BoxedExpression>
+evaluateAsync(options?): Promise<Expression>
 ```
 
 Asynchronous version of `evaluate()`.
@@ -4525,10 +2997,10 @@ The `options` argument can include a `signal` property, which is an
 
 <MemberCard>
 
-##### BoxedExpression.N()
+##### Expression.N()
 
 ```ts
-N(): BoxedExpression
+N(): Expression
 ```
 
 Return a numeric approximation of the canonical form of this expression.
@@ -4550,13 +3022,13 @@ The result is in canonical form.
 
 <MemberCard>
 
-##### BoxedExpression.solve()
+##### Expression.solve()
 
 ```ts
 solve(vars?): 
-  | readonly BoxedExpression[]
-  | Record<string, BoxedExpression>
-  | Record<string, BoxedExpression>[]
+  | readonly Expression[]
+  | Record<string, Expression>
+  | Record<string, Expression>[]
 ```
 
 If this is an equation, solve the equation for the variables in vars.
@@ -4584,16 +3056,16 @@ console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y:
 
 ####### vars?
 
-`string` | `Iterable`\<`string`, `any`, `any`\> | [`BoxedExpression`](#boxedexpression) | `Iterable`\<[`BoxedExpression`](#boxedexpression), `any`, `any`\>
+`string` | `Iterable`\<`string`, `any`, `any`\> | [`Expression`](#expression-4) | `Iterable`\<[`Expression`](#expression-4), `any`, `any`\>
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.value
+##### Expression.value
 
 ```ts
-get value(): BoxedExpression
+get value(): Expression
 set value(value: 
   | string
   | number
@@ -4609,7 +3081,7 @@ set value(value:
  } & {
   num: number;
   denom: number;
- } & BoxedExpression>
+ } & Expression>
   | OnlyFirst<{
   num: number;
   denom: number;
@@ -4619,14 +3091,14 @@ set value(value:
  } & {
   num: number;
   denom: number;
- } & BoxedExpression>
-  | OnlyFirst<BoxedExpression, {
+ } & Expression>
+  | OnlyFirst<Expression, {
   re: number;
   im: number;
  } & {
   num: number;
   denom: number;
- } & BoxedExpression>): void
+ } & Expression>): void
 ```
 
 If this expression is a number literal, a string literal or a function
@@ -4649,7 +3121,7 @@ about it in the current scope.
 
 <MemberCard>
 
-##### BoxedExpression.isCollection
+##### Expression.isCollection
 
 ```ts
 isCollection: boolean;
@@ -4670,7 +3142,7 @@ When `isCollection` is `true`, the expression:
 
 <MemberCard>
 
-##### BoxedExpression.isIndexedCollection
+##### Expression.isIndexedCollection
 
 ```ts
 isIndexedCollection: boolean;
@@ -4687,7 +3159,7 @@ When `isIndexedCollection` is `true`, the expression:
    as for a collection.
 - has an `at(index: number)` method that returns the element at the
    specified index.
-- has an `indexWhere(predicate: (element: BoxedExpression) => boolean)`
+- has an `indexWhere(predicate: (element: Expression) => boolean)`
    method that returns the index of the first element that matches the
    predicate.
 
@@ -4695,7 +3167,7 @@ When `isIndexedCollection` is `true`, the expression:
 
 <MemberCard>
 
-##### BoxedExpression.isLazyCollection
+##### Expression.isLazyCollection
 
 ```ts
 isLazyCollection: boolean;
@@ -4714,10 +3186,10 @@ lazy collections.
 
 <MemberCard>
 
-##### BoxedExpression.each()
+##### Expression.each()
 
 ```ts
-each(): Generator<BoxedExpression>
+each(): Generator<Expression>
 ```
 
 If this is a collection, return an iterator over the elements of the
@@ -4734,7 +3206,7 @@ for (const e of expr.each()) {
 
 <MemberCard>
 
-##### BoxedExpression.contains()
+##### Expression.contains()
 
 ```ts
 contains(rhs): boolean
@@ -4748,13 +3220,13 @@ iterating over the collection.
 
 ####### rhs
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.subsetOf()
+##### Expression.subsetOf()
 
 ```ts
 subsetOf(other, strict): boolean
@@ -4764,7 +3236,7 @@ Check if this collection is a subset of another collection.
 
 ####### other
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 The other collection to check against.
 
@@ -4778,7 +3250,7 @@ If true, the subset relation is strict (i.e., proper subset).
 
 <MemberCard>
 
-##### BoxedExpression.count
+##### Expression.count
 
 If this is a collection, return the number of elements in the collection.
 
@@ -4792,7 +3264,7 @@ be determined without iterating over the collection.
 
 <MemberCard>
 
-##### BoxedExpression.isFiniteCollection
+##### Expression.isFiniteCollection
 
 ```ts
 isFiniteCollection: boolean;
@@ -4804,7 +3276,7 @@ If this is a finite collection, return true.
 
 <MemberCard>
 
-##### BoxedExpression.isEmptyCollection
+##### Expression.isEmptyCollection
 
 ```ts
 isEmptyCollection: boolean;
@@ -4818,10 +3290,10 @@ An empty collection has a size of 0.
 
 <MemberCard>
 
-##### BoxedExpression.at()
+##### Expression.at()
 
 ```ts
-at(index): BoxedExpression
+at(index): Expression
 ```
 
 If this is an indexed collection, return the element at the specified
@@ -4839,26 +3311,26 @@ The last element is at index -1.
 
 <MemberCard>
 
-##### BoxedExpression.get()
+##### Expression.get()
 
 ```ts
-get(key): BoxedExpression
+get(key): Expression
 ```
 
 If this is a keyed collection (map, record, tuple), return the value of
 the corresponding key.
 
-If `key` is a `BoxedExpression`, it should be a string.
+If `key` is a `Expression`, it should be a string.
 
 ####### key
 
-`string` | [`BoxedExpression`](#boxedexpression)
+`string` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.indexWhere()
+##### Expression.indexWhere()
 
 ```ts
 indexWhere(predicate): number
@@ -4877,7 +3349,7 @@ that matches the predicate.
 
 <MemberCard>
 
-##### BoxedExpression.valueOf()
+##### Expression.valueOf()
 
 ```ts
 valueOf(): string | number | boolean | number[] | number[][] | number[][][]
@@ -4913,7 +3385,7 @@ of the expression.
 
 <MemberCard>
 
-##### BoxedExpression.\[toPrimitive\]()
+##### Expression.\[toPrimitive\]()
 
 ```ts
 toPrimitive: string | number
@@ -4929,7 +3401,7 @@ Similar to`expr.valueOf()` but includes a hint.
 
 <MemberCard>
 
-##### BoxedExpression.toString()
+##### Expression.toString()
 
 ```ts
 toString(): string
@@ -4944,16 +3416,16 @@ To get a LaTeX representation of the expression, use `expr.latex`.
 
 Note that lazy collections are eagerly evaluated.
 
-Used when coercing a `BoxedExpression` to a `String`.
+Used when coercing a `Expression` to a `String`.
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.toJSON()
+##### Expression.toJSON()
 
 ```ts
-toJSON(): Expression
+toJSON(): MathJsonExpression
 ```
 
 Used by `JSON.stringify()` to serialize this object to JSON.
@@ -4968,19 +3440,19 @@ Note that lazy collections are *not* eagerly evaluated.
 
 <MemberCard>
 
-##### BoxedExpression.is()
+##### Expression.is()
 
 ```ts
 is(other): boolean
 ```
 
-Equivalent to `BoxedExpression.isSame()` but the argument can be
+Equivalent to `Expression.isSame()` but the argument can be
 a JavaScript primitive. For example, `expr.is(2)` is equivalent to
 `expr.isSame(ce.number(2))`.
 
 ####### other
 
-`string` | `number` | `bigint` | `boolean` | [`BoxedExpression`](#boxedexpression)
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -4988,7 +3460,7 @@ a JavaScript primitive. For example, `expr.is(2)` is equivalent to
 
 <MemberCard>
 
-##### BoxedExpression.isSame()
+##### Expression.isSame()
 
 ```ts
 isSame(rhs): boolean
@@ -5006,13 +3478,13 @@ Applicable to canonical and non-canonical expressions.
 
 ####### rhs
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isLess()
+##### Expression.isLess()
 
 ```ts
 isLess(other): boolean
@@ -5024,13 +3496,13 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isLessEqual()
+##### Expression.isLessEqual()
 
 ```ts
 isLessEqual(other): boolean
@@ -5042,13 +3514,13 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isGreater()
+##### Expression.isGreater()
 
 ```ts
 isGreater(other): boolean
@@ -5060,13 +3532,13 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isGreaterEqual()
+##### Expression.isGreaterEqual()
 
 ```ts
 isGreaterEqual(other): boolean
@@ -5078,13 +3550,13 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedExpression.isEqual()
+##### Expression.isEqual()
 
 ```ts
 isEqual(other): boolean
@@ -5122,7 +3594,7 @@ console.log(expr.is(4)); // true (fastest)
 
 ####### other
 
-`number` | [`BoxedExpression`](#boxedexpression)
+`number` | [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -5130,7 +3602,7 @@ console.log(expr.is(4)); // true (fastest)
 
 <MemberCard>
 
-##### BoxedExpression.shape
+##### Expression.shape
 
 ```ts
 readonly shape: number[];
@@ -5149,7 +3621,7 @@ When the expression is a `n` by `m` matrix, the shape is `[n, m]`.
 
 <MemberCard>
 
-##### BoxedExpression.rank
+##### Expression.rank
 
 ```ts
 readonly rank: number;
@@ -5176,7 +3648,7 @@ singular values of a matrix.
 
 <MemberCard>
 
-##### BoxedExpression.type
+##### Expression.type
 
 ```ts
 get type(): BoxedType
@@ -5217,7 +3689,7 @@ If the type is not known, return `"unknown"`.
 
 <MemberCard>
 
-##### BoxedExpression.isNumber
+##### Expression.isNumber
 
 ```ts
 readonly isNumber: boolean;
@@ -5241,7 +3713,7 @@ number and `expr.isNumber` is `true`, but `isNumberLiteral` is `false`.
 
 <MemberCard>
 
-##### BoxedExpression.isInteger
+##### Expression.isInteger
 
 ```ts
 readonly isInteger: boolean;
@@ -5255,7 +3727,7 @@ Note that ±∞ and NaN are not integers.
 
 <MemberCard>
 
-##### BoxedExpression.isRational
+##### Expression.isRational
 
 ```ts
 readonly isRational: boolean;
@@ -5273,7 +3745,7 @@ Note that ±∞ and NaN are not rationals.
 
 <MemberCard>
 
-##### BoxedExpression.isReal
+##### Expression.isReal
 
 ```ts
 readonly isReal: boolean;
@@ -5350,7 +3822,7 @@ readonly isFunctionExpression: true;
 ##### FunctionInterface.ops
 
 ```ts
-readonly ops: readonly BoxedExpression[];
+readonly ops: readonly Expression[];
 ```
 
 </MemberCard>
@@ -5370,7 +3842,7 @@ readonly nops: number;
 ##### FunctionInterface.op1
 
 ```ts
-readonly op1: BoxedExpression;
+readonly op1: Expression;
 ```
 
 </MemberCard>
@@ -5380,7 +3852,7 @@ readonly op1: BoxedExpression;
 ##### FunctionInterface.op2
 
 ```ts
-readonly op2: BoxedExpression;
+readonly op2: Expression;
 ```
 
 </MemberCard>
@@ -5390,7 +3862,7 @@ readonly op2: BoxedExpression;
 ##### FunctionInterface.op3
 
 ```ts
-readonly op3: BoxedExpression;
+readonly op3: Expression;
 ```
 
 </MemberCard>
@@ -5502,7 +3974,7 @@ readonly isEmptyCollection: boolean;
 ##### CollectionInterface.each()
 
 ```ts
-each(): Generator<BoxedExpression>
+each(): Generator<Expression>
 ```
 
 </MemberCard>
@@ -5517,7 +3989,7 @@ contains(rhs): boolean
 
 ####### rhs
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -5531,7 +4003,7 @@ subsetOf(other, strict): boolean
 
 ####### other
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 ####### strict
 
@@ -5565,7 +4037,7 @@ readonly isIndexedCollection: true;
 ##### IndexedCollectionInterface.at()
 
 ```ts
-at(index): BoxedExpression
+at(index): Expression
 ```
 
 ####### index
@@ -5604,14 +4076,14 @@ type ExpressionInput =
   | MathJsonFunctionObject
   | MathJsonDictionaryObject
   | readonly [MathJsonSymbol, ...ExpressionInput[]]
-  | BoxedExpression;
+  | Expression;
 ```
 
-A semi boxed expression is a MathJSON expression which can include some
-boxed terms.
+An expression input is a MathJSON expression which can include some
+engine expression terms.
 
 This is convenient when creating new expressions from portions
-of an existing `BoxedExpression` while avoiding unboxing and reboxing.
+of an existing `Expression` while avoiding unboxing and reboxing.
 
 </MemberCard>
 
@@ -5630,7 +4102,7 @@ type ReplaceOptions = {
 };
 ```
 
-Options for `BoxedExpression.replace()`.
+Options for `Expression.replace()`.
 
 </MemberCard>
 
@@ -5731,7 +4203,7 @@ type BoxedSubstitution<T> = KernelBoxedSubstitution<T>;
 
 #### Type Parameters
 
-• T = [`BoxedExpression`](#boxedexpression)
+• T = [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -5747,7 +4219,7 @@ Control how a pattern is matched to an expression.
 
 #### Type Parameters
 
-• T = [`BoxedExpression`](#boxedexpression)
+• T = [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -5758,7 +4230,7 @@ Control how a pattern is matched to an expression.
 ### RuleReplaceFunction
 
 ```ts
-type RuleReplaceFunction = KernelRuleReplaceFunction<BoxedExpression>;
+type RuleReplaceFunction = KernelRuleReplaceFunction<Expression>;
 ```
 
 Rule replacement callback specialized to boxed expressions.
@@ -5770,7 +4242,7 @@ Rule replacement callback specialized to boxed expressions.
 ### RuleConditionFunction
 
 ```ts
-type RuleConditionFunction = KernelRuleConditionFunction<BoxedExpression, ComputeEngine>;
+type RuleConditionFunction = KernelRuleConditionFunction<Expression, ComputeEngine>;
 ```
 
 Rule condition callback with access to the compute engine.
@@ -5782,7 +4254,7 @@ Rule condition callback with access to the compute engine.
 ### RuleFunction
 
 ```ts
-type RuleFunction = KernelRuleFunction<BoxedExpression>;
+type RuleFunction = KernelRuleFunction<Expression>;
 ```
 
 Dynamic rule callback.
@@ -5794,7 +4266,7 @@ Dynamic rule callback.
 ### Rule
 
 ```ts
-type Rule = KernelRule<BoxedExpression, ExpressionInput, ComputeEngine>;
+type Rule = KernelRule<Expression, ExpressionInput, ComputeEngine>;
 ```
 
 Rule declaration specialized to boxed expression and compute engine types.
@@ -5808,7 +4280,7 @@ Rule declaration specialized to boxed expression and compute engine types.
 ### ExpressionMapInterface
 
 ```ts
-type ExpressionMapInterface<U> = KernelExpressionMapInterface<U, BoxedExpression>;
+type ExpressionMapInterface<U> = KernelExpressionMapInterface<U, Expression>;
 ```
 
 Map-like interface keyed by boxed expressions.
@@ -5824,7 +4296,7 @@ Map-like interface keyed by boxed expressions.
 ### Assumption
 
 ```ts
-type Assumption = KernelAssumption<BoxedExpression, ComputeEngine>;
+type Assumption = KernelAssumption<Expression, ComputeEngine>;
 ```
 
 Assumption predicates bound to this compute engine.
@@ -5874,7 +4346,7 @@ type JSSource = string;
 
 ```ts
 type CompiledExpression = {
-  evaluate: (scope) => number | BoxedExpression;
+  evaluate: (scope) => number | Expression;
 };
 ```
 
@@ -5895,12 +4367,12 @@ type ValueDefinition = BaseDefinition & {
   inferred: boolean;
   value:   | LatexString
      | ExpressionInput
-     | (ce) => BoxedExpression | null;
+     | (ce) => Expression | null;
   eq: (a) => boolean | undefined;
   neq: (a) => boolean | undefined;
   cmp: (a) => "=" | ">" | "<" | undefined;
   collection: CollectionHandlers;
-  subscriptEvaluate: (subscript, options) => BoxedExpression | undefined;
+  subscriptEvaluate: (subscript, options) => Expression | undefined;
 };
 ```
 
@@ -5923,7 +4395,7 @@ declared.
 value: 
   | LatexString
   | ExpressionInput
-  | (ce) => BoxedExpression | null;
+  | (ce) => Expression | null;
 ```
 
 `value` can be a JS function since for some constants, such as
@@ -5933,7 +4405,7 @@ value:
 #### ValueDefinition.subscriptEvaluate()?
 
 ```ts
-optional subscriptEvaluate: (subscript, options) => BoxedExpression | undefined;
+optional subscriptEvaluate: (subscript, options) => Expression | undefined;
 ```
 
 Custom evaluation handler for subscripted expressions of this symbol.
@@ -5941,7 +4413,7 @@ Called when evaluating `Subscript(symbol, index)`.
 
 ###### subscript
 
-[`BoxedExpression`](#boxedexpression)
+[`Expression`](#expression-4)
 
 The subscript expression (already evaluated)
 
@@ -5951,7 +4423,7 @@ Contains the compute engine and evaluation options
 
 ####### engine
 
-[`ComputeEngine`](#computeengine)
+`ComputeEngine`
 
 ####### numericApproximation?
 
@@ -6009,7 +4481,7 @@ If provided, this takes precedence over `variable`.
 ##### SequenceDefinition.base
 
 ```ts
-base: Record<number | string, number | BoxedExpression>;
+base: Record<number | string, number | Expression>;
 ```
 
 Base cases as index → value mapping.
@@ -6038,10 +4510,10 @@ variable appears multiple times (e.g., 'n,n'), the indices must be equal.
 ##### SequenceDefinition.recurrence
 
 ```ts
-recurrence: string | BoxedExpression;
+recurrence: string | Expression;
 ```
 
-Recurrence relation as LaTeX string or BoxedExpression
+Recurrence relation as LaTeX string or Expression
 
 </MemberCard>
 
@@ -6092,7 +4564,7 @@ domain: { n: { min: 0 }, k: { min: 0 } }
 ##### SequenceDefinition.constraints?
 
 ```ts
-optional constraints: string | BoxedExpression;
+optional constraints: string | Expression;
 ```
 
 Constraint expression for multi-index sequences.
@@ -6317,11 +4789,11 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   isNonPositive: boolean;
   even: (ops, options) => boolean | undefined;
   complexity: number;
-  canonical: (ops, options) => BoxedExpression | null;
-  evaluate:   | (ops, options) => BoxedExpression | undefined
-     | BoxedExpression;
-  evaluateAsync: (ops, options) => Promise<BoxedExpression | undefined>;
-  evalDimension: (args, options) => BoxedExpression;
+  canonical: (ops, options) => Expression | null;
+  evaluate:   | (ops, options) => Expression | undefined
+     | Expression;
+  evaluateAsync: (ops, options) => Promise<Expression | undefined>;
+  evalDimension: (args, options) => Expression;
   xcompile: (expr) => CompiledExpression;
   eq: (a, b) => boolean | undefined;
   neq: (a, b) => boolean | undefined;
@@ -6459,7 +4931,7 @@ lower complexity when ordered canonically in commutative functions.
 #### OperatorDefinition.canonical()?
 
 ```ts
-optional canonical: (ops, options) => BoxedExpression | null;
+optional canonical: (ops, options) => Expression | null;
 ```
 
 Return the canonical form of the expression with the arguments `args`.
@@ -6502,8 +4974,8 @@ canonical form, the handler should return `null`.
 
 ```ts
 optional evaluate: 
-  | (ops, options) => BoxedExpression | undefined
-  | BoxedExpression;
+  | (ops, options) => Expression | undefined
+  | Expression;
 ```
 
 Evaluate a function expression.
@@ -6525,7 +4997,7 @@ an `["Error"]` expression.
 #### OperatorDefinition.evaluateAsync()?
 
 ```ts
-optional evaluateAsync: (ops, options) => Promise<BoxedExpression | undefined>;
+optional evaluateAsync: (ops, options) => Promise<Expression | undefined>;
 ```
 
 An asynchronous version of `evaluate`.
@@ -6533,7 +5005,7 @@ An asynchronous version of `evaluate`.
 #### OperatorDefinition.evalDimension()?
 
 ```ts
-optional evalDimension: (args, options) => BoxedExpression;
+optional evalDimension: (args, options) => Expression;
 ```
 
 **`Experimental`**
@@ -6749,7 +5221,7 @@ all collections, indexed or not.
 ##### BaseCollectionHandlers.iterator()
 
 ```ts
-iterator: (collection) => Iterator<BoxedExpression, undefined, any>;
+iterator: (collection) => Iterator<Expression, undefined, any>;
 ```
 
 Return an iterator that iterates over the elements of the collection.
@@ -6887,7 +5359,7 @@ the order of the elements is defined.
 ##### IndexedCollectionHandlers.at()
 
 ```ts
-at: (collection, index) => BoxedExpression;
+at: (collection, index) => Expression;
 ```
 
 Return the element at the specified index.
@@ -7042,7 +5514,7 @@ Some examples:
 ##### BoxedValueDefinition.value
 
 ```ts
-readonly value: BoxedExpression;
+readonly value: Expression;
 ```
 
 This is either the initial value of the symbol (i.e. when a new
@@ -7111,7 +5583,7 @@ type: BoxedType;
 ##### BoxedValueDefinition.subscriptEvaluate()?
 
 ```ts
-optional subscriptEvaluate: (subscript, options) => BoxedExpression;
+optional subscriptEvaluate: (subscript, options) => Expression;
 ```
 
 Custom evaluation handler for subscripted expressions of this symbol.
@@ -7262,7 +5734,7 @@ optional neq: (a, b) => boolean;
 ##### BoxedOperatorDefinition.canonical()?
 
 ```ts
-optional canonical: (ops, options) => BoxedExpression;
+optional canonical: (ops, options) => Expression;
 ```
 
 </MemberCard>
@@ -7272,7 +5744,7 @@ optional canonical: (ops, options) => BoxedExpression;
 ##### BoxedOperatorDefinition.evaluate()?
 
 ```ts
-optional evaluate: (ops, options) => BoxedExpression;
+optional evaluate: (ops, options) => Expression;
 ```
 
 </MemberCard>
@@ -7282,7 +5754,7 @@ optional evaluate: (ops, options) => BoxedExpression;
 ##### BoxedOperatorDefinition.evaluateAsync()?
 
 ```ts
-optional evaluateAsync: (ops, options?) => Promise<BoxedExpression>;
+optional evaluateAsync: (ops, options?) => Promise<Expression>;
 ```
 
 </MemberCard>
@@ -7292,7 +5764,7 @@ optional evaluateAsync: (ops, options?) => Promise<BoxedExpression>;
 ##### BoxedOperatorDefinition.evalDimension()?
 
 ```ts
-optional evalDimension: (ops, options) => BoxedExpression;
+optional evalDimension: (ops, options) => Expression;
 ```
 
 </MemberCard>
@@ -7579,7 +6051,7 @@ return `Nothing`.
 ### ExpressionParseHandler()
 
 ```ts
-type ExpressionParseHandler = (parser, until?) => Expression | null;
+type ExpressionParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -7589,7 +6061,7 @@ type ExpressionParseHandler = (parser, until?) => Expression | null;
 ### PrefixParseHandler()
 
 ```ts
-type PrefixParseHandler = (parser, until?) => Expression | null;
+type PrefixParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -7599,7 +6071,7 @@ type PrefixParseHandler = (parser, until?) => Expression | null;
 ### SymbolParseHandler()
 
 ```ts
-type SymbolParseHandler = (parser, until?) => Expression | null;
+type SymbolParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -7609,7 +6081,7 @@ type SymbolParseHandler = (parser, until?) => Expression | null;
 ### FunctionParseHandler()
 
 ```ts
-type FunctionParseHandler = (parser, until?) => Expression | null;
+type FunctionParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -7619,7 +6091,7 @@ type FunctionParseHandler = (parser, until?) => Expression | null;
 ### EnvironmentParseHandler()
 
 ```ts
-type EnvironmentParseHandler = (parser, until?) => Expression | null;
+type EnvironmentParseHandler = (parser, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -7629,7 +6101,7 @@ type EnvironmentParseHandler = (parser, until?) => Expression | null;
 ### PostfixParseHandler()
 
 ```ts
-type PostfixParseHandler = (parser, lhs, until?) => Expression | null;
+type PostfixParseHandler = (parser, lhs, until?) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -7639,7 +6111,7 @@ type PostfixParseHandler = (parser, lhs, until?) => Expression | null;
 ### InfixParseHandler()
 
 ```ts
-type InfixParseHandler = (parser, lhs, until) => Expression | null;
+type InfixParseHandler = (parser, lhs, until) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -7649,7 +6121,7 @@ type InfixParseHandler = (parser, lhs, until) => Expression | null;
 ### MatchfixParseHandler()
 
 ```ts
-type MatchfixParseHandler = (parser, body) => Expression | null;
+type MatchfixParseHandler = (parser, body) => MathJsonExpression | null;
 ```
 
 </MemberCard>
@@ -7721,7 +6193,7 @@ Maps a string of LaTeX tokens to a function or symbol and vice-versa.
 
 ```ts
 type DefaultEntry = BaseEntry & Trigger & {
-  parse:   | Expression
+  parse:   | MathJsonExpression
      | ExpressionParseHandler;
 };
 ```
@@ -7735,7 +6207,7 @@ type DefaultEntry = BaseEntry & Trigger & {
 ```ts
 type ExpressionEntry = BaseEntry & Trigger & {
   kind: "expression";
-  parse:   | Expression
+  parse:   | MathJsonExpression
      | ExpressionParseHandler;
   precedence: Precedence;
 };
@@ -7889,7 +6361,7 @@ construct using `\begin{...}...\end{...}`.
 type SymbolEntry = BaseEntry & Trigger & {
   kind: "symbol";
   precedence: Precedence;
-  parse:   | Expression
+  parse:   | MathJsonExpression
      | SymbolParseHandler;
 };
 ```
@@ -7911,7 +6383,7 @@ Used for appropriate wrapping (i.e. when to surround it with parens)
 ```ts
 type FunctionEntry = BaseEntry & Trigger & {
   kind: "function";
-  parse:   | Expression
+  parse:   | MathJsonExpression
      | FunctionParseHandler;
   arguments: "enclosure" | "implicit";
 };
@@ -7979,7 +6451,7 @@ type ParseLatexOptions = NumberFormat & {
      | BoxedType
      | TypeString;
   hasSubscriptEvaluate: (symbol) => boolean;
-  parseUnexpectedToken: (lhs, parser) => Expression | null;
+  parseUnexpectedToken: (lhs, parser) => MathJsonExpression | null;
   preserveLatex: boolean;
   quantifierScope: "tight" | "loose";
   timeDerivativeVariable: string;
@@ -8060,7 +6532,7 @@ into a compound symbol name.
 #### ParseLatexOptions.parseUnexpectedToken()
 
 ```ts
-parseUnexpectedToken: (lhs, parser) => Expression | null;
+parseUnexpectedToken: (lhs, parser) => MathJsonExpression | null;
 ```
 
 This handler is invoked when the parser encounters an unexpected token.
@@ -8355,14 +6827,14 @@ between `start` and `end` (default: the whole expression)
 ##### Parser.error()
 
 ```ts
-error(code, fromToken): Expression
+error(code, fromToken): MathJsonExpression
 ```
 
 Return an error expression with the specified code and arguments
 
 ####### code
 
-`string` | \[`string`, `...Expression[]`\]
+`string` | \[`string`, `...MathJsonExpression[]`\]
 
 ####### fromToken
 
@@ -8463,7 +6935,7 @@ defined in hex (^^ and ^^^^), the `\char` and `\unicode` command.
 ##### Parser.parseGroup()
 
 ```ts
-parseGroup(): Expression
+parseGroup(): MathJsonExpression
 ```
 
 Parse an expression in a LaTeX group enclosed in curly brackets `{}`.
@@ -8480,7 +6952,7 @@ Return `Nothing` if an empty group `{}` was found
 ##### Parser.parseToken()
 
 ```ts
-parseToken(): Expression
+parseToken(): MathJsonExpression
 ```
 
 Some LaTeX commands (but not all) can accept arguments as single
@@ -8503,7 +6975,7 @@ The excluded tokens include `!"#$%&(),/;:?@[]`|~", `\left`, `\bigl`, etc...
 ##### Parser.parseOptionalGroup()
 
 ```ts
-parseOptionalGroup(): Expression
+parseOptionalGroup(): MathJsonExpression
 ```
 
 Parse an expression enclosed in a LaTeX optional group enclosed in square brackets `[]`.
@@ -8517,7 +6989,7 @@ Return `null` if none was found.
 ##### Parser.parseEnclosure()
 
 ```ts
-parseEnclosure(): Expression
+parseEnclosure(): MathJsonExpression
 ```
 
 Parse an enclosure (open paren/close paren, etc..) and return the expression inside the enclosure
@@ -8557,7 +7029,7 @@ otherwise it is a regular group in braces.
 ##### Parser.parseSymbol()
 
 ```ts
-parseSymbol(until?): Expression
+parseSymbol(until?): MathJsonExpression
 ```
 
 A symbol can be:
@@ -8576,7 +7048,7 @@ A symbol can be:
 ##### Parser.parseTabular()
 
 ```ts
-parseTabular(): Expression[][]
+parseTabular(): MathJsonExpression[][]
 ```
 
 Parse an expression in a tabular format, where rows are separated by `\\`
@@ -8592,7 +7064,7 @@ and empty cells are also indicated with `Nothing`.
 ##### Parser.parseArguments()
 
 ```ts
-parseArguments(kind?, until?): readonly Expression[]
+parseArguments(kind?, until?): readonly MathJsonExpression[]
 ```
 
 Parse an argument list, for example: `(12, x+1)` or `\left(x\right)`
@@ -8620,7 +7092,7 @@ argument was found.
 ##### Parser.parsePostfixOperator()
 
 ```ts
-parsePostfixOperator(lhs, until?): Expression
+parsePostfixOperator(lhs, until?): MathJsonExpression
 ```
 
 Parse a postfix operator, such as `'` or `!`.
@@ -8629,7 +7101,7 @@ Prefix, infix and matchfix operators are handled by `parseExpression()`
 
 ####### lhs
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 ####### until?
 
@@ -8642,7 +7114,7 @@ Prefix, infix and matchfix operators are handled by `parseExpression()`
 ##### Parser.parseExpression()
 
 ```ts
-parseExpression(until?): Expression
+parseExpression(until?): MathJsonExpression
 ```
 
 Parse an expression:
@@ -8681,7 +7153,7 @@ or the sequence of tokens `until.tokens` is encountered
 ##### Parser.parseNumber()
 
 ```ts
-parseNumber(): Expression
+parseNumber(): MathJsonExpression
 ```
 
 Parse a number.
@@ -8739,12 +7211,12 @@ matchBoundary(): boolean
 ##### Parser.boundaryError()
 
 ```ts
-boundaryError(msg): Expression
+boundaryError(msg): MathJsonExpression
 ```
 
 ####### msg
 
-`string` | \[`string`, `...Expression[]`\]
+`string` | \[`string`, `...MathJsonExpression[]`\]
 
 </MemberCard>
 
@@ -9018,7 +7490,7 @@ serializeFunction(expr, def?): string
 
 ####### expr
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 ####### def?
 
@@ -9036,7 +7508,7 @@ serializeSymbol(expr): string
 
 ####### expr
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 </MemberCard>
 
@@ -9079,7 +7551,7 @@ commas.
 
 ####### expr
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 </MemberCard>
 
@@ -9096,7 +7568,7 @@ short (not a function)
 
 ####### expr
 
-[`Expression`](#expression)
+[`MathJsonExpression`](#mathjsonexpression)
 
 </MemberCard>
 
@@ -9916,7 +8388,7 @@ type SymbolTable = {
 ### RuleStep
 
 ```ts
-type RuleStep = KernelRuleStep<BoxedExpression>;
+type RuleStep = KernelRuleStep<Expression>;
 ```
 
 A single rule application step with provenance.
@@ -9928,7 +8400,7 @@ A single rule application step with provenance.
 ### RuleSteps
 
 ```ts
-type RuleSteps = KernelRuleSteps<BoxedExpression>;
+type RuleSteps = KernelRuleSteps<Expression>;
 ```
 
 A list of rule application steps.
@@ -9940,7 +8412,7 @@ A list of rule application steps.
 ### BoxedRule
 
 ```ts
-type BoxedRule = KernelBoxedRule<BoxedExpression, ComputeEngine>;
+type BoxedRule = KernelBoxedRule<Expression, ComputeEngine>;
 ```
 
 A boxed/normalized rule form.
@@ -9952,7 +8424,7 @@ A boxed/normalized rule form.
 ### BoxedRuleSet
 
 ```ts
-type BoxedRuleSet = KernelBoxedRuleSet<BoxedExpression, ComputeEngine>;
+type BoxedRuleSet = KernelBoxedRuleSet<Expression, ComputeEngine>;
 ```
 
 Collection of boxed rules.
@@ -9976,7 +8448,7 @@ Lexical scope specialized to boxed definitions.
 ### EvalContext
 
 ```ts
-type EvalContext = KernelEvalContext<BoxedExpression, BoxedDefinition>;
+type EvalContext = KernelEvalContext<Expression, BoxedDefinition>;
 ```
 
 Evaluation context specialized to this engine/runtime model.
@@ -10011,7 +8483,7 @@ Use `isDictionary()` to check if an expression is a dictionary.
 ##### DictionaryInterface.get()
 
 ```ts
-get(key): BoxedExpression
+get(key): Expression
 ```
 
 ####### key
@@ -10031,6 +8503,34 @@ has(key): boolean
 ####### key
 
 `string`
+
+</MemberCard>
+
+<MemberCard>
+
+### ~~BoxedExpression~~
+
+```ts
+type BoxedExpression = Expression;
+```
+
+#### Deprecated
+
+Use `Expression` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+### ~~SemiBoxedExpression~~
+
+```ts
+type SemiBoxedExpression = ExpressionInput;
+```
+
+#### Deprecated
+
+Use `ExpressionInput` instead.
 
 </MemberCard>
 
@@ -10104,7 +8604,7 @@ type JsonSerializationOptions = {
 ```
 
 Options to control serialization to MathJSON when using
-`BoxedExpression.toMathJson()`.
+`Expression.toMathJson()`.
 
 </MemberCard>
 
@@ -10123,7 +8623,7 @@ type DataTypeMap = {
   complex128: Complex;
   complex64: Complex;
   bool: boolean;
-  expression: BoxedExpression;
+  expression: Expression;
 };
 ```
 
@@ -10328,7 +8828,7 @@ cast(x, dtype): boolean
 ###### cast(x, dtype)
 
 ```ts
-cast(x, dtype): BoxedExpression
+cast(x, dtype): Expression
 ```
 
 ####### x
@@ -10440,7 +8940,7 @@ cast(x, dtype): boolean[]
 ###### cast(x, dtype)
 
 ```ts
-cast(x, dtype): BoxedExpression[]
+cast(x, dtype): Expression[]
 ```
 
 ####### x
@@ -10472,7 +8972,7 @@ keyof [`DataTypeMap`](#datatypemap)
 ##### TensorField.expression()
 
 ```ts
-expression(x): BoxedExpression
+expression(x): Expression
 ```
 
 ####### x
@@ -10734,7 +9234,7 @@ readonly field: TensorField<DT>;
 ##### Tensor.expression
 
 ```ts
-readonly expression: BoxedExpression;
+readonly expression: Expression;
 ```
 
 </MemberCard>
@@ -11548,7 +10048,7 @@ type MathJsonStringObject = {
 
 ```ts
 type MathJsonFunctionObject = {
-  fn: [MathJsonSymbol, ...Expression[]];
+  fn: [MathJsonSymbol, ...MathJsonExpression[]];
  } & MathJsonAttributes;
 ```
 
@@ -11598,15 +10098,15 @@ type ExpressionObject =
 
 <MemberCard>
 
-### Expression
+### MathJsonExpression
 
 ```ts
-type Expression = 
+type MathJsonExpression = 
   | ExpressionObject
   | number
   | MathJsonSymbol
   | string
-  | readonly [MathJsonSymbol, ...Expression[]];
+  | readonly [MathJsonSymbol, ...MathJsonExpression[]];
 ```
 
 A MathJSON expression is a recursive data structure.

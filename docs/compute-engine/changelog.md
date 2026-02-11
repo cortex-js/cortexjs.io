@@ -10,7 +10,7 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.50.0 _2026-02-11_
 
 ### Breaking API Changes
 
@@ -20,6 +20,10 @@ The most significant is the restructuring of the `Expression` type hierarchy and
 the introduction of type-guarded role interfaces, which improves type safety and
 API ergonomics but requires updates to code that accessed role-specific
 properties directly on expression instances.
+
+See
+[`MIGRATION_GUIDE_0.50.0.md`](https://github.com/cortex-js/compute-engine/blob/main/MIGRATION_GUIDE_0.50.0.md)
+for details.
 
 #### Naming Alignment: `Expression`, `MathJsonExpression`, and `ExpressionInput`
 
@@ -78,19 +82,19 @@ ce.box(['Add', 1, 'x'], { form: ['Number', 'Order'] }); // selective passes
 Top-level free functions are now available for common operations and use a
 shared `ComputeEngine` instance created on first call.
 
-| Function | Purpose |
-| :-- | :-- |
-| `getDefaultEngine()` | Return the shared default `ComputeEngine` instance. |
-| `parse(latex)` | Parse a LaTeX string into an `Expression`. |
-| `simplify(exprOrLatex)` | Simplify an expression or LaTeX input. |
-| `evaluate(exprOrLatex)` | Evaluate an expression or LaTeX input symbolically. |
-| `N(exprOrLatex)` | Numerically evaluate an expression or LaTeX input. |
-| `assign(id, value)` / `assign(record)` | Assign one symbol value or many at once. |
-| `expand(exprOrLatex)` | Expand distributively at the top level (`Expression \| null`). |
-| `expandAll(exprOrLatex)` | Expand distributively recursively (`Expression \| null`). |
-| `solve(exprOrLatex, vars?)` | Solve equations/systems (returns solve result variants). |
-| `factor(exprOrLatex)` | Factor an expression. |
-| `compile(exprOrLatex, options?)` | Compile to a target language with `CompilationResult`. |
+| Function                               | Purpose                                                        |
+| :------------------------------------- | :------------------------------------------------------------- |
+| `getDefaultEngine()`                   | Return the shared default `ComputeEngine` instance.            |
+| `parse(latex)`                         | Parse a LaTeX string into an `Expression`.                     |
+| `simplify(exprOrLatex)`                | Simplify an expression or LaTeX input.                         |
+| `evaluate(exprOrLatex)`                | Evaluate an expression or LaTeX input symbolically.            |
+| `N(exprOrLatex)`                       | Numerically evaluate an expression or LaTeX input.             |
+| `assign(id, value)` / `assign(record)` | Assign one symbol value or many at once.                       |
+| `expand(exprOrLatex)`                  | Expand distributively at the top level (`Expression \| null`). |
+| `expandAll(exprOrLatex)`               | Expand distributively recursively (`Expression \| null`).      |
+| `solve(exprOrLatex, vars?)`            | Solve equations/systems (returns solve result variants).       |
+| `factor(exprOrLatex)`                  | Factor an expression.                                          |
+| `compile(exprOrLatex, options?)`       | Compile to a target language with `CompilationResult`.         |
 
 ```ts
 import {
@@ -115,87 +119,19 @@ factor('(2x)(4y)');         // 8xy
 compile('x^2 + 1').run({ x: 3 }); // 10
 ```
 
-Except for `parse()`, `assign()`, and `getDefaultEngine()`, these free
-functions accept either a LaTeX string or an existing `Expression`.
+Except for `parse()`, `assign()`, and `getDefaultEngine()`, these free functions
+accept either a LaTeX string or an existing `Expression`.
 
-#### `compile()` Is Now a Free Function
+#### Free Function Notes
 
-The `expr.compile()` method has been replaced by a standalone `compile()`
-function with a structured `CompilationResult` return type. It accepts either a
-LaTeX string or an `Expression`.
-
-```ts
-import { compile } from '@cortex-js/compute-engine';
-
-// From a LaTeX string
-const result = compile('x^2 + 1');
-result.run({ x: 3 });  // 10
-result.code;            // generated source
-result.success;         // true
-result.target;          // 'javascript'
-
-// Target a different language
-compile(expr, { to: 'python' });
-```
-
-Custom compilation targets can be registered and unregistered dynamically via
-`ce.registerCompilationTarget()` and `ce.unregisterCompilationTarget()`.
-
-#### `expand()` and `expandAll()` Are Now Public Free Functions
-
-`expand()` applies the distributive law at the top level of the expression,
-while `expandAll()` applies it recursively. Both return `null` if the expression
-cannot be expanded.
-
-Both accept a LaTeX string or an `Expression`, consistent with the other free
-functions (`simplify`, `evaluate`, `N`).
-
-```ts
-import { expand, expandAll } from '@cortex-js/compute-engine';
-
-// From a LaTeX string
-expand('(x+1)^2');         // x^2 + 2x + 1
-expandAll('(x+1)(x+2) + (a+b)^2');  // recursive expansion
-
-// From an Expression
-const expr = ce.parse('(x+1)(x+2)');
-expand(expr);               // x^2 + 3x + 2
-
-// Returns null when not expandable — use ?? for fallback
-const result = expand(expr) ?? expr;
-```
-
-#### `solve()` Is a Free Function
-
-A new `solve()` free function is available for solving equations without
-explicitly creating a `ComputeEngine` instance. Like the other free functions,
-it accepts either a LaTeX string or an `Expression`.
-
-```ts
-import { solve } from '@cortex-js/compute-engine';
-
-// Solve from LaTeX
-solve('x^2 - 5x + 6 = 0', 'x');  // [2, 3]
-
-// Solve from an Expression
-const expr = ce.parse('x^2 - 5x + 6 = 0');
-solve(expr, 'x');                   // [2, 3]
-```
-
-#### `factor()` Is a Free Function
-
-Polynomial factoring functions are now standalone free functions. `factor()`
-accepts a LaTeX string or an `Expression`. The specialized variants
-(`factorPolynomial`, `factorQuadratic`, etc.) accept only an `Expression`.
-
-```ts
-import { factor, factorPolynomial, factorQuadratic } from '@cortex-js/compute-engine';
-
-factor('(2x)(4y)');        // 8xy — from LaTeX
-factor(expr);              // general factoring
-factorPolynomial(expr);    // polynomial-specific
-factorQuadratic(expr);     // quadratic-specific
-```
+- `compile()` is now a top-level entry point returning `CompilationResult`.
+  Custom compilation targets are managed with `ce.registerCompilationTarget()`
+  and `ce.unregisterCompilationTarget()`.
+- `expand()` and `expandAll()` return `null` when an expression is not
+  expandable.
+- `solve()` is available as a top-level wrapper over equation/system solving.
+- `factor()` is the top-level factoring entry point. Specialized helpers such as
+  `factorPolynomial()` and `factorQuadratic()` remain expression-only APIs.
 
 #### `trigSimplify()` Method Removed
 
@@ -471,6 +407,31 @@ ce.simplificationRules.push({
   `sinh/cosh → exp`, `arsinh/arcosh/artanh → ln`, and `arcsin → arctan2` that
   prevented abs/odd-function rules from firing.
 
+### Compilation
+
+- **WGSL (WebGPU Shading Language) Compilation Target**: New built-in WGSL
+  target for compiling mathematical expressions to WebGPU shaders.
+
+  ```ts
+  // Via the registry
+  const result = compile(expr, { to: 'wgsl' });
+  ```
+
+  WGSL-specific differences from GLSL:
+  - `inverseSqrt` (camelCase) instead of `inversesqrt`
+  - `%` operator for mod instead of `mod()` function
+  - `vec2f`/`vec3f`/`vec4f` constructors instead of `vec2`/`vec3`/`vec4`
+  - `array<f32, n>()` instead of `float[n]()`
+  - `fn name(x: f32) -> f32` instead of `float name(float x)`
+  - `@vertex`/`@fragment`/`@compute` entry points with struct-based I/O
+  - `@group`/`@binding` uniform declarations and `@workgroup_size` for compute
+
+- **Interval WGSL Compilation Target**: New `interval-wgsl` target for interval
+  arithmetic in WebGPU shaders, mirroring the existing `interval-glsl` target.
+  Since WGSL does not support function overloading, the library uses `_v`
+  suffixes for internal vec2f-parameter implementations (e.g., `ia_add_v`),
+  while the public API (`ia_add`, `ia_sin`, etc.) takes `IntervalResult` values.
+
 ### Bug Fixes
 
 - **`Sequence` type inference now returns a proper tuple type**: Multi-argument
@@ -553,6 +514,15 @@ ce.simplificationRules.push({
   the serializer decodes `____XXXXXX` back to `\unicode{"XXXX"}` in LaTeX
   output. Previously, these characters passed through raw and caused symbol
   validation to fail.
+
+- **Assign to compound symbol names no longer misinterpreted as sequence
+  definitions** (fixes
+  [#286](https://github.com/cortex-js/compute-engine/issues/286)):
+  `ce.box(["Assign", "t_half", 10])` previously failed because the Assign
+  evaluate handler split any symbol containing `_` and treated it as a
+  subscripted sequence definition. User-provided compound symbols like `t_half`
+  or `half_life` are now assigned correctly. Sequence definitions via parsed
+  LaTeX (e.g., `L_0 := 1`) continue to work as before.
 
 ## 0.35.6 _2026-02-07_
 
