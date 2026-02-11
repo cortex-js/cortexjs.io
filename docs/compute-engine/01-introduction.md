@@ -81,15 +81,17 @@ N("\\frac{1}{3}").print();
 
 Available free functions:
 
-- `parse(latex)` — parse a LaTeX string into a `BoxedExpression`
+- `parse(latex)` — parse a LaTeX string into an `Expression`
 - `simplify(latex | expr)` — simplify a LaTeX string or expression
 - `evaluate(latex | expr)` — evaluate a LaTeX string or expression
 - `N(latex | expr)` — compute a numeric approximation
 - `assign(id, value)` — assign a value to a symbol
 
+:::info[Note]
+
 These use a shared `ComputeEngine` instance created on first call.
 Use `getDefaultEngine()` to configure it.
-
+:::
 
 
 <ReadMore path="/compute-engine/demo/" >
@@ -200,9 +202,9 @@ that the function is a method of the `ComputeEngine` class.
 
 
 The `expr.` prefix in `expr.evaluate()` or `expr.simplify()` indicates that the
-function is a method of the `BoxedExpression` class.
+function is a method of the `Expression` class.
 
-**To create a new boxed expression** use `expr = ce.parse()` or `expr = ce.box()`
+**To create a new expression** use `expr = ce.parse()` or `expr = ce.box()`
 
 :::
 

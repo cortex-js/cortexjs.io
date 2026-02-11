@@ -647,7 +647,7 @@ interface LanguageTarget {
    * with the source code in the `code` property.
    */
   compile(
-    expr: BoxedExpression,
+    expr: Expression,
     options?: CompilationOptions
   ): CompilationResult;
 }
@@ -704,14 +704,14 @@ with `success` set to `false`. The expression can be numerically evaluated as a
 fallback:
 
 ```live
-// import { compile, isBoxedNumber } from '@cortex-js/compute-engine';
+// import { compile, isNumber } from '@cortex-js/compute-engine';
 function compileOrEvaluate(expr) {
   const result = compile(expr);
   if (result.success) {
     return   result.run() + " (compiled)";
   } else {
     const evaluated = expr.N();
-    return (isBoxedNumber(evaluated) ? evaluated.numericValue : evaluated) + " (evaluated)";
+    return (isNumber(evaluated) ? evaluated.numericValue : evaluated) + " (evaluated)";
   }
 }
 

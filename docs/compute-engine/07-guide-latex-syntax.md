@@ -14,7 +14,7 @@ string (**serializing**)
 :::info[Note]
 In this documentation, functions such as `ce.box()` and `ce.parse()` require a
 `ComputeEngine` instance which is denoted by a `ce.` prefix.<br/>Functions that
-apply to a boxed expression, such as `expr.simplify()` are denoted with a
+apply to a expression, such as `expr.simplify()` are denoted with a
 `expr.` prefix.
 :::
 
@@ -981,10 +981,10 @@ serialization handler with a MathJSON symbol.
   serialize: (serializer, expr) =>
     "\\oplus" + serializer.wrapArguments(expr),
   evaluate: (ce, args) => {
-    const { isBoxedNumber } = ce;
+    const { isNumber } = ce;
     let result = '';
     for (const arg of args) {
-      if (!isBoxedNumber(arg)) return null;
+      if (!isNumber(arg)) return null;
       const val = arg.numericValue;
       if (ce.isComplex(val) || Array.isArray(val)) return null;
       if (ce.isBignum(val)) {

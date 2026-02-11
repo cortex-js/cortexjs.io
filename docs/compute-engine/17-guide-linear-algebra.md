@@ -599,7 +599,7 @@ LU decomposition factors a matrix A into a lower triangular matrix L and an uppe
 triangular matrix U, with a permutation matrix P for numerical stability:
 
 ```js example
-import { isBoxedFunction } from '@cortex-js/compute-engine';
+import { isFunction } from '@cortex-js/compute-engine';
 
 // LU decomposition returns [P, L, U] where PA = LU
 const result = ce.box(['LUDecomposition', ['List',
@@ -609,7 +609,7 @@ const result = ce.box(['LUDecomposition', ['List',
 ]]).evaluate();
 
 // Extract components
-if (isBoxedFunction(result)) {
+if (isFunction(result)) {
   const [P, L, U] = result.ops;
   // P: permutation matrix
   // L: lower triangular with 1s on diagonal
@@ -628,7 +628,7 @@ QR decomposition factors a matrix A into an orthogonal matrix Q and an upper
 triangular matrix R:
 
 ```js example
-import { isBoxedFunction } from '@cortex-js/compute-engine';
+import { isFunction } from '@cortex-js/compute-engine';
 
 // QR decomposition returns [Q, R] where A = QR
 const result = ce.box(['QRDecomposition', ['List',
@@ -637,7 +637,7 @@ const result = ce.box(['QRDecomposition', ['List',
   ['List', 5, 6]
 ]]).evaluate();
 
-if (isBoxedFunction(result)) {
+if (isFunction(result)) {
   const [Q, R] = result.ops;
   // Q: orthogonal matrix (Q^T × Q = I)
   // R: upper triangular matrix
@@ -681,7 +681,7 @@ SVD factors any matrix A into three matrices: U (left singular vectors),
 Σ (diagonal matrix of singular values), and V (right singular vectors):
 
 ```js example
-import { isBoxedFunction } from '@cortex-js/compute-engine';
+import { isFunction } from '@cortex-js/compute-engine';
 
 // SVD returns [U, Σ, V] where A = U × Σ × V^T
 const result = ce.box(['SVD', ['List',
@@ -690,7 +690,7 @@ const result = ce.box(['SVD', ['List',
   ['List', 5, 6]
 ]]).evaluate();
 
-if (isBoxedFunction(result)) {
+if (isFunction(result)) {
   const [U, Sigma, V] = result.ops;
   // U: m×m orthogonal matrix
   // Σ: m×n diagonal matrix of singular values
@@ -711,7 +711,7 @@ Using LU decomposition to solve Ax = b is more efficient than computing A⁻¹
 directly, especially when solving multiple systems with the same matrix A:
 
 ```js example
-import { isBoxedFunction } from '@cortex-js/compute-engine';
+import { isFunction } from '@cortex-js/compute-engine';
 
 const A = ['List',
   ['List', 2, 1, 1],
@@ -722,7 +722,7 @@ const b = ['List', 4, 10, 24];
 
 // Get LU decomposition
 const luResult = ce.box(['LUDecomposition', A]).evaluate();
-if (isBoxedFunction(luResult)) {
+if (isFunction(luResult)) {
   const [P, L, U] = luResult.ops;
 
   // The solution process:

@@ -7,7 +7,7 @@ date: Last Modified
 <Intro>
 In the Compute Engine, **collections** group together multiple elements
 into one unit. Each element in a collection is a
-[**Boxed Expression**](/compute-engine/guides/expressions/).
+[**Expression**](/compute-engine/guides/expressions/).
 </Intro>
 
 ## Introduction

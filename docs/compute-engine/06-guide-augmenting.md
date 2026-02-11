@@ -203,7 +203,7 @@ ce.declare("double", { evaluate: ([x]) => x.mul(2) });
 The signature of the `evaluate` handler is `(args[], options)`, where:
 
 - `args`: an array of the arguments that have been applied to the function. Each
-  argument is a boxed expression. The array may be empty if there are no
+  argument is a expression. The array may be empty if there are no
   arguments.
 - `options`: an object literal which includes an `engine` property that is the
   Compute Engine instance that is evaluating the expression and a `numericApproximation` property that is true if the result should be a numeric approximation.
@@ -320,13 +320,13 @@ ce.parse("F_n").evaluate();     // → Subscript(F, n) - stays symbolic
 `Tuple` expression:
 
 ```js
-import { isBoxedFunction } from '@cortex-js/compute-engine';
+import { isFunction } from '@cortex-js/compute-engine';
 
 const matrix = [[1,2,3], [4,5,6], [7,8,9]];
 
 ce.declare("M", {
   subscriptEvaluate: (subscript, { engine }) => {
-    if (isBoxedFunction(subscript) && subscript.operator === "Tuple") {
+    if (isFunction(subscript) && subscript.operator === "Tuple") {
       const [i, j] = subscript.ops;
       const row = matrix[i.re - 1];  // 1-indexed
       if (row && row[j.re - 1] !== undefined) {
@@ -368,8 +368,8 @@ The `SequenceDefinition` object accepts:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `base` | `Record<number, number \| BoxedExpression>` | **Required.** Base cases as index → value mapping |
-| `recurrence` | `string \| BoxedExpression` | **Required.** Recurrence relation (LaTeX string or expression) |
+| `base` | `Record<number, number \| Expression>` | **Required.** Base cases as index → value mapping |
+| `recurrence` | `string \| Expression` | **Required.** Recurrence relation (LaTeX string or expression) |
 | `variable` | `string` | Index variable name (default: `'n'`) |
 | `memoize` | `boolean` | Cache computed values (default: `true`) |
 | `domain` | `{ min?: number, max?: number }` | Valid index range |

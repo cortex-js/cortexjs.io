@@ -195,7 +195,7 @@ console.log('isEqual?', a.isEqual(b));
 
 The argument of the `subs()` function is an object literal. Each key/value 
 pair is a symbol and the value to be substituted with. The value can be either
-a number or a boxed expression.
+a number or a expression.
 
 ```live show-line-numbers mark-javascript-line="4"
 

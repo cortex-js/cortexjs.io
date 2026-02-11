@@ -18,31 +18,31 @@ In the Compute Engine, expressions are represented internally using the
 [MathJSON format](/math-json/).
 
 They are wrapped in a JavaScript object, a process called **boxing**, and the
-resulting expressions are **Boxed Expressions**.
+resulting expressions are **Expressions**.
 
-Boxed Expressions improve performance by implementing caching to avoid
+Expressions improve performance by implementing caching to avoid
 repetitive calculations. They also ensure that expressions are valid and in a
 standard format.
 
-Unlike the plain data types used by JSON, Boxed Expressions allow an IDE, such
+Unlike the plain data types used by JSON, Expressions allow an IDE, such
 as **Visual Studio Code (VS Code)**, to provide hints in the editor regarding the
 methods and properties available for a given expression.
 
-Boxed Expressions can be created from a LaTeX string or from a raw MathJSON
+Expressions can be created from a LaTeX string or from a raw MathJSON
 expression.
 
 ## Boxing
 
-**To create a `BoxedExpression` from a MathJSON expression** use the `ce.box()`
+**To create an `Expression` from a MathJSON expression** use the `ce.box()`
 method.
 
 The input of `ce.box()` can be:
 - a [MathJSON expression](/math-json/)
-- a `BoxedExpression` (in which case it is returned as-is)
-- a `SemiBoxedExpression`, that is a MathJSON expression with some of its
-  subexpressions already boxed.
+- an `Expression` (in which case it is returned as-is)
+- an `ExpressionInput`, that is a MathJSON expression with some of its
+  subexpressions already represented as `Expression` values.
 
-The result is an instance of a `BoxedExpression`.
+The result is an instance of an `Expression`.
 
 ```js
 let expr = ce.box(1.729e3);
@@ -62,7 +62,7 @@ console.log(expr.operator);
 ```
 
 
-**To create a Boxed Expression from a LaTeX string** use the `ce.parse()`
+**To create a Expression from a LaTeX string** use the `ce.parse()`
 function.
 
 ```js
@@ -74,7 +74,7 @@ console.log(expr.json);
 // ➔ ["Add", 3, "x", "y"]
 ```
 
-**To get a Boxed Expression representing the content of a mathfield**
+**To get a Expression representing the content of a mathfield**
 use the `mf.expression` property:
 
 ```js
@@ -221,7 +221,7 @@ console.log(expr.latex);
 
 ## Unboxing
 
-**To access the MathJSON expression of a boxed expression as plain JSON** use
+**To access the MathJSON expression of a expression as plain JSON** use
 the `expr.json` property. This property is an "unboxed" version of the
 expression.
 
@@ -261,8 +261,8 @@ console.log("expr.toMathJson():", expr.toMathJson({
 
 Unless otherwise specified, expressions are immutable.
 
-The functions that manipulate Boxed Expressions, such as `expr.simplify()`,
-`expr.evaluate()`, `expr.N()` return a new Boxed Expression, without modifying
+The functions that manipulate Expressions, such as `expr.simplify()`,
+`expr.evaluate()`, `expr.N()` return a new Expression, without modifying
 `expr`.
 
 However, the properties of the expression may change, since some of them may
@@ -311,35 +311,35 @@ and provide type-safe access to properties specific to that expression type:
 
 | Kind           | Type Guard                  |
 | :------------- | :---------------------------------- |
-| **Number Literal**     | `isBoxedNumber(expr)`              |
-| **Function Expression**   | `isBoxedFunction(expr)`         |
-| **Symbol**     | `isBoxedSymbol(expr)`         |
-| **String**     | `isBoxedString(expr)`         |
+| **Number Literal**     | `isNumber(expr)`              |
+| **Function Expression**   | `isFunction(expr)`         |
+| **Symbol**     | `isSymbol(expr)`         |
+| **String**     | `isString(expr)`         |
 
 </div>
 
 After using a type guard, you can safely access properties specific to that type:
 
 ```js
-import { isBoxedNumber, isBoxedSymbol, isBoxedFunction } from '@cortex-js/compute-engine';
+import { isNumber, isSymbol, isFunction } from '@cortex-js/compute-engine';
 
 const expr = ce.parse("3.14");
 
 // Check if it's a number and access its numeric value
-if (isBoxedNumber(expr)) {
+if (isNumber(expr)) {
   console.log(expr.numericValue);  // Type-safe access
   console.log(expr.isNumberLiteral); // Always true for number literals
 }
 
 // Check if it's a symbol and access its name
 const sym = ce.parse("x");
-if (isBoxedSymbol(sym)) {
+if (isSymbol(sym)) {
   console.log(sym.symbol);  // Type-safe access to symbol name
 }
 
 // Check if it's a function and access its operands
 const fn = ce.parse("2 + 3");
-if (isBoxedFunction(fn)) {
+if (isFunction(fn)) {
   console.log(fn.operator);  // "Add"
   console.log(fn.ops.length); // 2
   console.log(fn.op1, fn.op2); // Access first and second operands
@@ -379,7 +379,7 @@ JavaScript primitive. For example, `ce.parse("2 + 3").valueOf()` will return
 `"2 + 3"`, while `ce.parse("2 + 3").evaluate().valueOf()` will return `5`.
 
 If the expression is a number literal or a symbol with a numeric value, the
-`expr.value` property will return the value of the expression as `BoxedExpression`
+`expr.value` property will return the value of the expression as `Expression`
 or `undefined` if the expression is not a number.
 
 
@@ -388,7 +388,7 @@ or `undefined` if the expression is not a number.
 
 Sometimes, things go wrong.
 
-If a boxed expression is not valid, the `expr.isValid` property will be set to
+If a expression is not valid, the `expr.isValid` property will be set to
 `false`, and the `expr.errors` property will contain a list of all the
 `["Error"]` subexpressions.
 

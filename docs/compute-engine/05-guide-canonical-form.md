@@ -189,7 +189,7 @@ form:
     Machine floats (e.g. $1.5$) are not folded.
   - Product of a literal and the imaginary unit are replaced with a complex
     number.
-  - Literal $-1$ multiplied by an expression is replaced with the negation of the
+  - Literal -1 multiplied by an expression is replaced with the negation of the
     expression.
   - Signs are simplified: $(-x)(-y)$ -> $xy$
   - Associativity is applied
@@ -315,10 +315,10 @@ For example, let's say you want to compare the structural form of two expression
 but ignoring any extra parentheses. You could define a transformation like this:
 
 ```js
-import { isBoxedFunction } from '@cortex-js/compute-engine';
+import { isFunction } from '@cortex-js/compute-engine';
 
 const deparenthesize = (expr) =>
-  expr.map((e) => (isBoxedFunction(e) && e.operator === 'Delimiter' ? e.op1 : e));
+  expr.map((e) => (isFunction(e) && e.operator === 'Delimiter' ? e.op1 : e));
 ```
 You can then apply this transformation to an expression like this:
 

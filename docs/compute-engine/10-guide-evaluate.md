@@ -53,7 +53,7 @@ evaluate('\\sqrt{2}').print();
 ```
 
 The `evaluate()` free function accepts either a LaTeX string or a
-`BoxedExpression`. It uses a shared `ComputeEngine` instance created on
+`Expression`. It uses a shared `ComputeEngine` instance created on
 first call.
 
 ### Compilation

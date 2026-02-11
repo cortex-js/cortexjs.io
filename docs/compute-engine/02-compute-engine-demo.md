@@ -45,7 +45,7 @@ export function ExampleSelector({ onSelect, index }) {
     { 
       latex: "\\frac{165}{315}",
       json: '["Divide", 165, 315]', 
-      preamble: `To create a boxed expression from a MathJSON expression, 
+      preamble: `To create a expression from a MathJSON expression, 
 use the \`ce.box()\` function.
 
 By default expressions are put in canonical form. 
@@ -55,7 +55,7 @@ The canonical form of fractions is their reduced form.`,
 
     { 
       latex: 'e^{i\\pi}', 
-      preamble: `To create a boxed expression from a LaTeX string, 
+      preamble: `To create a expression from a LaTeX string, 
 use the \`ce.parse()\` function.
 
 The \`expr.N()\` function evaluates the expression numerically, 

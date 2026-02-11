@@ -1,10 +1,35 @@
+const EXPORTED_COMPUTE_ENGINE_FREE_FUNCTIONS = [
+  "parse",
+  "evaluate",
+  "simplify",
+  "assign",
+  "N",
+  "expand",
+  "solve",
+  "expandAll",
+  "factor",
+];
+
+function exposeComputeEngineFreeFunctions() {
+  if (!("ComputeEngine" in window)) return;
+
+  for (const fnName of EXPORTED_COMPUTE_ENGINE_FREE_FUNCTIONS) {
+    const fn = window.ComputeEngine?.[fnName];
+    if (typeof fn === "function") window[fnName] = fn;
+  }
+}
+
 function setupComputeEngine(delay) {
-  if (window.ce !== undefined && 'CodeMirror' in window) return;
+  if (window.ce !== undefined && 'CodeMirror' in window) {
+    exposeComputeEngineFreeFunctions();
+    return;
+  }
   // If we're not ready, try again in 50ms
   if (!("ComputeEngine" in window) || !("CodeMirror" in window)) {
     setTimeout(() => setupComputeEngine(Math.max(1000, 2 * delay)), delay);
     return;
   }
+  exposeComputeEngineFreeFunctions();
   window.ce = new ComputeEngine.ComputeEngine();
   // Reset all the CodePlayground elements
   // Give some time for the CodeMirror and ComputeEngine libraries to load

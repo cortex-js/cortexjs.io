@@ -19,7 +19,7 @@ function:
 N("\\sqrt{2}").print();
 ```
 
-The `N()` free function accepts either a LaTeX string or a `BoxedExpression`.
+The `N()` free function accepts either a LaTeX string or an `Expression`.
 It uses a shared `ComputeEngine` instance created on first call.
 
 
@@ -81,7 +81,7 @@ console.log(ce.parse("\\cos 60").N());
 
 ## JavaScript Interoperability
 
-The result of `expr.evaluate()` and `expr.N()` is a boxed expression. 
+The result of `expr.evaluate()` and `expr.N()` is a expression. 
 
 The `numericValue` property of this expression is either a machine number 
 (a JavaScript `number`), a `NumericValue` object or `null` if the expression 
@@ -100,7 +100,7 @@ console.log(expr.N().re);
 ```
 
 Another way to obtain a JavaScript compatible representation of an expression
-is to use the `valueOf()` method of the boxed expression.
+is to use the `valueOf()` method of the expression.
 
 ```js
 const expr = ce.parse('1/3 + 1/4');
@@ -108,7 +108,7 @@ console.log(expr.N().valueOf());
 // ➔ 0.5833333333333334
 ```
 
-The `valueOf()` method of a boxed expression can be used in JavaScript
+The `valueOf()` method of a expression can be used in JavaScript
 expressions.
 
 ```live
@@ -121,11 +121,11 @@ Unlike the `.re` property, `valueOf()` can also return a `boolean` or a
 
 
 
-**To get a boxed number from a JavaScript number**, use `ce.box()` or `ce.number()`.
+**To get an `Expression` number literal from a JavaScript number**, use `ce.box()` or `ce.number()`.
 
 ```live
-const boxed = ce.box(1.5);
-console.log(boxed.valueOf());
+const expr = ce.box(1.5);
+console.log(expr.valueOf());
 ```
 
 
@@ -243,7 +243,7 @@ be a MathJSON number that looks like this:
 of variables. `ce.assign()` changes the value associated with one or more
 variables in the current scope.
 
-`ce.assign()` accepts booleans, numbers, bigints, boxed expressions, or
+`ce.assign()` accepts booleans, numbers, bigints, expressions, or
 functions. Use `undefined` to clear a value.
 
 ```live

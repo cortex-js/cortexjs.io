@@ -31,7 +31,7 @@ simplify("x+x+1").print();
 ```
 
 The `simplify()` free function accepts either a LaTeX string or a
-`BoxedExpression`. It uses a shared `ComputeEngine` instance created on
+`Expression`. It uses a shared `ComputeEngine` instance created on
 first call.
 
 For trigonometric simplification, use `expr.simplify({ strategy: 'fu' })`

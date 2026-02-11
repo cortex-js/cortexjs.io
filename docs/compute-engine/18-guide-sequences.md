@@ -46,7 +46,7 @@ The `declareSequence()` method accepts the following options:
 | Option | Type | Description |
 |:-------|:-----|:------------|
 | `base` | `Record<number, number>` | Initial values as index → value pairs |
-| `recurrence` | `string \| BoxedExpression` | The recurrence formula |
+| `recurrence` | `string \| Expression` | The recurrence formula |
 | `variable` | `string` | Index variable name (default: `'n'`) |
 | `memoize` | `boolean` | Enable caching of computed values (default: `true`) |
 | `domain` | `{ min?: number, max?: number }` | Valid index range |
