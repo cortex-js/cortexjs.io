@@ -15,52 +15,50 @@ arguments.
 
 ## Evaluation Methods
 
-**To evaluate an expression**, use the `expr.evaluate()` method.
+**To evaluate an expression**, use the `evaluate()` function.
 
 ```live
-const expr = ce.parse('2 + 2');
-expr.evaluate().print();
+// String expression
+console.log(evaluate("3^2"));
+
+// Expression object
+const expr = parse("2 + 2");
+console.log(evaluate(expr));
 ```
 
+
+:::info[Note]
 The `expr.value` property does not evaluate the expression. If the expression
 is a literal, it returns the literal value. If the expression is a symbol, it
 looks up the symbol in the current scope and returns its value.
+:::
 
 ```live
-ce.box('x').value = 314;
-console.info(ce.parse('42').value)
-console.info(ce.parse('x').value)
-console.info(ce.parse('2 + 2').value)
+parse("x").value = 314;
+console.info(parse('42').value)
+console.info(parse('x').value)
+console.info(parse('2 + 2').value)
 ```
+
+The `N()` function provides a numeric evaluation of its argument.
+
+```live
+console.log(evaluate("2\\pi"));
+console.log(N("2\\pi"));
+```
+
+:::info[Note]
+The `N()` and `evaluate()` functions are shorthands for the `expr.N()` and 
+`expr.evaluate()` methods. They use a common shared compute engine instance.
 
 The `expr.N()` method is a shorthand for `expr.evaluate({numericApproximation: true})`.
+:::
 
-```live
-const expr = ce.parse('2\\pi');
-expr.evaluate().print();
-expr.N().print();
-```
-
-### Parse + Evaluate Free Function
-
-For the common "parse then evaluate" flow, use the `evaluate()` free function:
-
-```live
-// import { evaluate, assign } from '@cortex-js/compute-engine';
-assign('x', 3);
-evaluate('x+2').print();
-evaluate('\\sqrt{2}').print();
-```
-
-The `evaluate()` free function accepts either a LaTeX string or a
-`Expression`. It uses a shared `ComputeEngine` instance created on
-first call.
 
 ### Compilation
 
 An expression can be evaluated by compiling it to JavaScript using the `compile()` function.
 The result includes a `run` function that can be called to evaluate the expression.
-
 
 
 ```live
@@ -87,7 +85,7 @@ perform some operations asynchronously.
 try {
   const fact = ce.parse('(70!)!');
   const factResult = await fact.evaluateAsync();
-  factResult.print();
+  console.log(factResult);
 } catch (e) {
   console.error(e);
 }
@@ -111,7 +109,7 @@ setTimeout(() => abort.abort(), 500);
 try {
   const fact = ce.parse('(70!)!');
   const factResult = await fact.evaluateAsync({ signal });
-  factResult.print();
+  console.log(factResult);
 } catch (e) {
   console.error(e);
 }
@@ -163,7 +161,7 @@ is a number of milliseconds.
 ce.timeLimit = 1000;
 try {
   const fact = ce.parse('(70!)!');
-  fact.evaluate().print();
+  console.log(fact.evaluate());
 } catch (e) {
   console.error(e);
 }
@@ -265,9 +263,9 @@ Additional scopes can be created using the `ce.pushScope()` method.
 ce.assign('x', 100); // "x" is defined in the current scope
 ce.pushScope();
 ce.assign('x', 500); // "x" is defined in the new scope
-ce.box('x').print(); // 500
+console.log(ce.box('x')); // 500
 ce.popScope();
-ce.box('x').print(); // 100
+console.log(ce.box('x')); // 100
 ```
 
 **To exit a scope** use `ce.popScope()`.

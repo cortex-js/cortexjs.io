@@ -59,7 +59,7 @@ following LaTeX expression:
 
 ```js
 ce.parse("m := 42").evaluate();
-ce.parse("m").value.print();
+console.log(ce.parse("m").value);
 // ➔ 42
 ```
 
@@ -70,7 +70,7 @@ the following LaTeX expression:
 
 ```js
 ce.parse("f(x) := 2x").evaluate();
-ce.parse("f(3)").evaluate().print();
+console.log(ce.parse("f(3)").evaluate());
 // ➔ 6
 ```
 
@@ -79,15 +79,15 @@ The `\mapsto` operator is an alternative syntax to define a function:
 
 ```js
 ce.parse("f := x \\mapsto 2x").evaluate();
-ce.parse("f(3)").evaluate().print();
+console.log(ce.parse("f(3)").evaluate());
 // ➔ 6
 ```
 
 **To define multiletter symbols**, use the `\operatorname{}` command:
 
 ```js
-ce.parse('\\operatorname{double}(x) := 2x').evaluate().print();
-ce.parse('\\operatorname{double}(3)').evaluate().print();
+console.log(ce.parse('\\operatorname{double}(x) := 2x').evaluate());
+console.log(ce.parse('\\operatorname{double}(3)').evaluate());
 // ➔ 6
 ```
 

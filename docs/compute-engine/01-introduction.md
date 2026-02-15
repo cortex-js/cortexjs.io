@@ -67,9 +67,9 @@ The Compute Engine can:
 For common operations, use the free functions — no setup required:
 
 ```live
-simplify("x+x+1").print();
-evaluate("2^{11} - 1").print();
-N("\\frac{1}{3}").print();
+console.log(simplify("x+x+1"));
+console.log(evaluate("2^{11} - 1"));
+console.log(N("\\frac{1}{3}"));
 ```
 
 | Function                               | Purpose                                                        |
@@ -113,7 +113,7 @@ Try the **interactive demo** now<Icon name="chevron-right-bold" />
 <script type="module">
   import { evaluate } from "https://esm.run/@cortex-js/compute-engine";
 
-  evaluate("e^{i\\pi}").print();
+  console.log(evaluate("e^{i\\pi}"));
   // ➔ "-1"
 </script>
 ```

@@ -16,13 +16,13 @@ and check dimensional compatibility.
 // import { parse, evaluate } from '@cortex-js/compute-engine';
 
 // Parse LaTeX with units
-parse('12\\,\\mathrm{cm}').print();
+console.log(parse('12\\,\\mathrm{cm}'));
 
 // Arithmetic: add compatible quantities (largest-scale-unit wins)
-evaluate('12\\,\\mathrm{cm} + 1\\,\\mathrm{m}').print();
+console.log(evaluate('12\\,\\mathrm{cm} + 1\\,\\mathrm{m}'));
 
 // Convert units
-evaluate(['UnitConvert', ['Quantity', 1500, 'm'], 'km']).print();
+console.log(evaluate(['UnitConvert', ['Quantity', 1500, 'm'], 'km']));
 ```
 
 ## Creating Quantities
@@ -91,11 +91,11 @@ The engine recognizes units inside `\mathrm{...}` and `\text{...}` when they
 appear next to a number:
 
 ```live
-parse('5\\,\\mathrm{m}').print();
+console.log(parse('5\\,\\mathrm{m}'));
 
-parse('9.8\\,\\mathrm{m/s^{2}}').print();
+console.log(parse('9.8\\,\\mathrm{m/s^{2}}'));
 
-parse('3\\,\\text{kg}').print();
+console.log(parse('3\\,\\text{kg}'));
 ```
 
 ### siunitx Commands
@@ -104,12 +104,12 @@ The `siunitx` LaTeX package commands are also supported:
 
 ```live
 // Modern siunitx
-parse('\\qty{12}{cm}').print();
-parse('\\unit{m/s}').print();
+console.log(parse('\\qty{12}{cm}'));
+console.log(parse('\\unit{m/s}'));
 
 // Legacy siunitx
-parse('\\SI{5}{kg}').print();
-parse('\\si{MHz}').print();
+console.log(parse('\\SI{5}{kg}'));
+console.log(parse('\\si{MHz}'));
 ```
 
 ### Serialization
@@ -133,7 +133,7 @@ Operands must have compatible dimensions. The result is expressed in the unit
 with the largest scale factor:
 
 ```live
-evaluate(['Add', ['Quantity', 12, 'cm'], ['Quantity', 1, 'm']]).print();
+console.log(evaluate(['Add', ['Quantity', 12, 'cm'], ['Quantity', 1, 'm']]));
 // → ["Quantity", 1.12, "m"]
 ```
 
@@ -145,17 +145,17 @@ the expression unevaluated.
 Units combine when multiplying or dividing quantities:
 
 ```live
-evaluate(['Multiply', ['Quantity', 5, 'm'], ['Quantity', 3, 's']]).print();
+console.log(evaluate(['Multiply', ['Quantity', 5, 'm'], ['Quantity', 3, 's']]));
 // → ["Quantity", 15, ["Multiply", "m", "s"]]
 
-evaluate(['Divide', ['Quantity', 100, 'm'], ['Quantity', 10, 's']]).print();
+console.log(evaluate(['Divide', ['Quantity', 100, 'm'], ['Quantity', 10, 's']]));
 // → ["Quantity", 10, ["Divide", "m", "s"]]
 ```
 
 Scalar multiplication works naturally:
 
 ```live
-evaluate(['Multiply', 2, ['Quantity', 5, 'kg']]).print();
+console.log(evaluate(['Multiply', 2, ['Quantity', 5, 'kg']]));
 // → ["Quantity", 10, "kg"]
 ```
 
@@ -164,7 +164,7 @@ evaluate(['Multiply', 2, ['Quantity', 5, 'kg']]).print();
 The unit is raised to the power:
 
 ```live
-evaluate(['Power', ['Quantity', 3, 'm'], 2]).print();
+console.log(evaluate(['Power', ['Quantity', 3, 'm'], 2]));
 // → ["Quantity", 9, ["Power", "m", 2]]
 ```
 
@@ -173,20 +173,20 @@ evaluate(['Power', ['Quantity', 3, 'm'], 2]).print();
 Use `UnitConvert` to convert a quantity to a different compatible unit:
 
 ```live
-evaluate(['UnitConvert', ['Quantity', 1500, 'm'], 'km']).print();
+console.log(evaluate(['UnitConvert', ['Quantity', 1500, 'm'], 'km']));
 // → ["Quantity", 1.5, "km"]
 
-evaluate(['UnitConvert', ['Quantity', 180, 'deg'], 'rad']).print();
+console.log(evaluate(['UnitConvert', ['Quantity', 180, 'deg'], 'rad']));
 // → ["Quantity", 3.14159..., "rad"]
 ```
 
 Compound unit conversion is also supported:
 
 ```live
-evaluate(['UnitConvert',
+console.log(evaluate(['UnitConvert',
   ['Quantity', 36, ['Divide', 'km', 'h']],
   ['Divide', 'm', 's']
-]).print();
+]));
 // → ["Quantity", 10, ["Divide", "m", "s"]]
 ```
 
@@ -196,20 +196,20 @@ Temperature units (`degC`, `degF`, `K`) use affine conversions that correctly
 handle the offset between scales:
 
 ```live
-evaluate(['UnitConvert', ['Quantity', 100, 'degC'], 'degF']).print();
+console.log(evaluate(['UnitConvert', ['Quantity', 100, 'degC'], 'degF']));
 // → ["Quantity", 212, "degF"]
 
-evaluate(['UnitConvert', ['Quantity', 32, 'degF'], 'degC']).print();
+console.log(evaluate(['UnitConvert', ['Quantity', 32, 'degF'], 'degC']));
 // → ["Quantity", 0, "degC"]
 
-evaluate(['UnitConvert', ['Quantity', 0, 'K'], 'degC']).print();
+console.log(evaluate(['UnitConvert', ['Quantity', 0, 'K'], 'degC']));
 // → ["Quantity", -273.15, "degC"]
 ```
 
 Converting incompatible units returns an `Error` expression:
 
 ```live
-evaluate(['UnitConvert', ['Quantity', 5, 'm'], 's']).print();
+console.log(evaluate(['UnitConvert', ['Quantity', 5, 'm'], 's']));
 // → Error
 ```
 
@@ -218,9 +218,9 @@ evaluate(['UnitConvert', ['Quantity', 5, 'm'], 's']).print();
 `UnitSimplify` reduces a compound unit to a named derived unit when one exists:
 
 ```live
-evaluate(['UnitSimplify',
+console.log(evaluate(['UnitSimplify',
   ['Quantity', 100, ['Multiply', 'kg', 'm', ['Power', 's', -2]]]
-]).print();
+]));
 // → ["Quantity", 100, "N"]
 ```
 
@@ -235,16 +235,16 @@ Use `IsCompatibleUnit` to test whether two units have the same dimension.
 Both simple and compound unit expressions are supported:
 
 ```live
-evaluate(['IsCompatibleUnit', 'm', 'km']).print();
+console.log(evaluate(['IsCompatibleUnit', 'm', 'km']));
 // → True
 
-evaluate(['IsCompatibleUnit', 'm', 's']).print();
+console.log(evaluate(['IsCompatibleUnit', 'm', 's']));
 // → False
 
-evaluate(['IsCompatibleUnit',
+console.log(evaluate(['IsCompatibleUnit',
   ['Divide', 'm', 's'],
   ['Divide', 'km', 'h']
-]).print();
+]));
 // → True
 ```
 
@@ -257,10 +257,10 @@ Use `UnitDimension` to retrieve it. Both simple symbols and compound
 expressions are supported:
 
 ```live
-evaluate(['UnitDimension', 'm']).print();
+console.log(evaluate(['UnitDimension', 'm']));
 // → [1, 0, 0, 0, 0, 0, 0]
 
-evaluate(['UnitDimension', ['Divide', 'm', ['Power', 's', 2]]]).print();
+console.log(evaluate(['UnitDimension', ['Divide', 'm', ['Power', 's', 2]]]));
 // → [1, 0, -2, 0, 0, 0, 0]
 ```
 
@@ -270,10 +270,10 @@ Trigonometric functions accept `Quantity` arguments with angular units. The
 angle is automatically converted to radians before evaluation:
 
 ```live
-evaluate(['Sin', ['Quantity', 90, 'deg']]).print();
+console.log(evaluate(['Sin', ['Quantity', 90, 'deg']]));
 // → 1
 
-evaluate(['Cos', ['Quantity', 200, 'grad']]).print();
+console.log(evaluate(['Cos', ['Quantity', 200, 'grad']]));
 // → -1
 ```
 
@@ -286,29 +286,29 @@ The `physics` library (loaded by default) provides physical constants as
 `Quantity` expressions:
 
 ```live
-evaluate('SpeedOfLight').print();
+console.log(evaluate('SpeedOfLight'));
 // → ["Quantity", 299792458, ["Divide", "m", "s"]]
 
-evaluate('PlanckConstant').print();
+console.log(evaluate('PlanckConstant'));
 // → ["Quantity", 6.62607015e-34, ["Multiply", "J", "s"]]
 
-evaluate('StandardGravity').print();
+console.log(evaluate('StandardGravity'));
 // → ["Quantity", 9.80665, ["Divide", "m", ["Power", "s", 2]]]
 ```
 
-| Constant         | Symbol              | Value            | Unit   |
-| :--------------- | :------------------ | :--------------- | :----- |
-| Speed of light   | `SpeedOfLight`      | 299792458        | m/s    |
-| Planck constant  | `PlanckConstant`    | 6.62607015e-34   | J s    |
-| Vacuum permeability | `Mu0`            | 1.25663706212e-6 | N/A^2  |
-| Standard gravity | `StandardGravity`   | 9.80665          | m/s^2  |
-| Elementary charge | `ElementaryCharge` | 1.602176634e-19  | C      |
-| Boltzmann constant | `BoltzmannConstant` | 1.380649e-23   | J/K    |
-| Avogadro constant | `AvogadroConstant` | 6.02214076e23    | mol^-1 |
-| Vacuum permittivity | `VacuumPermittivity` | 8.8541878128e-12 | F/m |
-| Gravitational constant | `GravitationalConstant` | 6.67430e-11 | m^3/(kg s^2) |
-| Stefan-Boltzmann | `StefanBoltzmannConstant` | 5.670374419e-8 | W/(m^2 K^4) |
-| Gas constant     | `GasConstant`       | 8.314462618      | J/(mol K) |
+| Symbol              | Value            | Unit   |
+| :------------------ | :--------------- | :----- |
+| `SpeedOfLight`      | 299792458        | m/s    |
+| `PlanckConstant`    | 6.62607015e-34   | J s    |
+| `Mu0` (Vacuum permeability) | 1.25663706212e-6 | N/A^2  |
+| `StandardGravity`   | 9.80665          | m/s^2  |
+| `ElementaryCharge` | 1.602176634e-19  | C      |
+| `BoltzmannConstant` | 1.380649e-23   | J/K    |
+| `AvogadroConstant` | 6.02214076e23    | mol^-1 |
+| `VacuumPermittivity` | 8.8541878128e-12 | F/m |
+| `GravitationalConstant` | 6.67430e-11 | m^3/(kg s^2) |
+| `StefanBoltzmannConstant` | 5.670374419e-8 | W/(m^2 K^4) |
+| `GasConstant`       | 8.314462618      | J/(mol K) |
 
 
 ## Supported Units

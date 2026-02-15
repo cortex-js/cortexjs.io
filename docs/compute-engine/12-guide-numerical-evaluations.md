@@ -16,7 +16,7 @@ function:
 
 ```live
 // import { N } from '@cortex-js/compute-engine';
-N("\\sqrt{2}").print();
+console.log(N("\\sqrt{2}"));
 ```
 
 The `N()` free function accepts either a LaTeX string or an `Expression`.

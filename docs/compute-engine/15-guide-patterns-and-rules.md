@@ -214,7 +214,7 @@ const subs = expr.match(pattern);
 console.log(subs);
 // ➔ { _a: "x" }
 
-pattern.subs(subs).print();
+console.log(pattern.subs(subs));
 // ➔ ["Add", 1, "x"]
 ```
 
@@ -241,7 +241,7 @@ const squareRule = {
 };
 
 const expr = ce.box(["Multiply", 7, 7], { form: 'raw' });
-(expr.replace(squareRule) ?? expr).print();
+console.log(expr.replace(squareRule) ?? expr);
 // ➔ ["Square", 7]
 ```
 
@@ -265,14 +265,14 @@ If a pattern does not contain any named wildcards and only symbols, the
 ```live example
 const expr = ce.box(["Add", ["Multiply", "a", "x"], "b"]);
 
-expr.replace([
+console.log(expr.replace([
     { match: "a", replace: 2 }, 
     { match: "b", replace: 3 }
   ], 
   { recursive: true }
-)?.print();
+));
 // ➔ 2x + 3
 
-expr.subs({"a": 2, "b": 3}).print();
+console.log(expr.subs({"a": 2, "b": 3}));
 // ➔ 2x + 3
 ```

@@ -27,7 +27,7 @@ For the common "parse then simplify" flow, use the `simplify()` free function:
 
 ```live
 // import { simplify } from '@cortex-js/compute-engine';
-simplify("x+x+1").print();
+console.log(simplify("x+x+1"));
 ```
 
 The `simplify()` free function accepts either a LaTeX string or a

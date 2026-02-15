@@ -254,9 +254,9 @@ and `ce.parse()`.
 **To order the arguments in a canonical order**, use `ce.box(expr, { form: "Order" })` or `ce.parse(s, { form: "Order" })`.
 
 ```live
-ce.parse("0+1+x+2+\\sqrt{5}", 
+console.log(ce.parse("0+1+x+2+\\sqrt{5}", 
   {form: "Order"}
-).print();
+));
 ```
 
 Note in particular that the `0` is preserved in the expression, which is not
@@ -270,13 +270,13 @@ For example:
 
 ```live
 const latex = "3(2+x)";
-ce.parse(latex, {form: 'raw'}).print();
+console.log(ce.parse(latex, {form: 'raw'}));
 
-ce.parse(latex, {form: ["InvisibleOperator"]}).print();
+console.log(ce.parse(latex, {form: ["InvisibleOperator"]}));
 
-ce.parse(latex,
+console.log(ce.parse(latex,
   {form: ["InvisibleOperator", "Add", "Order", ]}
-).print();
+));
 ```
 
 ## Canonical Form Pipeline

@@ -14,6 +14,9 @@ window.moduleMap = {
   // "html-to-image": "///assets/js/html-to-image.js",
   "compute-engine": "https://esm.run/@cortex-js/compute-engine",
   "@cortex-js/compute-engine": "https://esm.run/@cortex-js/compute-engine",
+  // "compute-engine": "https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/+esm",
+  // "@cortex-js/compute-engine": "https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/+esm",
+
 };
 function hash(str, seed = 0) {
   let h1 = 0xdeadbeef ^ seed;
