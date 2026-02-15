@@ -10,6 +10,226 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.51.0 _2026-02-14_
+
+### Colors
+
+- **New `colors` library**: Four MathJSON operators for color manipulation and
+  color space conversion, available as the `"colors"` library category.
+- **`Color`**: Parse a color string (hex 3/6/8-digit, `rgb()`, `hsl()`, named
+  CSS color, `transparent`) into a canonical sRGB `Tuple` with components
+  normalized to 0-1. Alpha is included as a fourth component when not equal
+  to 1.
+- **`Colormap`**: Sample named visualization palettes. Three variants: no second
+  argument returns the full palette as a `List`; integer _n_ >= 2 resamples to
+  _n_ evenly spaced colors; real _t_ in [0, 1] interpolates at position _t_
+  using OKLCh color space with shorter-arc hue interpolation. Includes 8
+  sequential palettes (viridis, inferno, magma, plasma, cividis, turbo, rocket,
+  mako), 6 categorical palettes (graph6, spectrum6, spectrum12, tableau10,
+  tycho11, kelly22), and 12 diverging palettes (roma, vik, broc, rdbu,
+  coolwarm, ocean-balance, plus reversed variants).
+- **`ColorToColorspace`**: Convert an sRGB color (string or `Tuple`) to
+  components in `"rgb"`, `"hsl"`, `"oklch"`, or `"oklab"` (alias `"lab"`).
+  Preserves alpha when present.
+- **`ColorFromColorspace`**: Convert color space components back to a canonical
+  sRGB `Tuple`. Accepts the same color space names as `ColorToColorspace`.
+- **`ColorToString`**: Convert a color (string or sRGB `Tuple`) to a formatted
+  string. Supports optional format argument: `"hex"` (default), `"rgb"`,
+  `"hsl"`, or `"oklch"` for CSS-style output. Alpha is included when not
+  equal to 1.
+- **`ColorMix`**: Blend two colors in OKLCh space with an optional ratio
+  (default 0.5). Accepts color strings or sRGB `Tuple` values. Interpolates
+  lightness and chroma linearly, hue with shorter-arc interpolation.
+- **`ColorContrast`**: Compute the APCA contrast ratio between a background
+  and foreground color. Returns a positive value for dark-on-light and
+  negative for light-on-dark.
+- **`ContrastingColor`**: Choose the foreground color with better APCA contrast
+  against a background. With one argument, picks between white and black. With
+  three arguments, picks the better of two foreground candidates.
+- **LaTeX color support**: `\textcolor{color}{body}`, `\colorbox{color}{body}`,
+  and `\boxed{body}` now roundtrip through `Annotated` expressions. Parsing
+  and serialization are handled in the core `Annotated` infrastructure.
+- **LaTeX font annotations**: `\textbf`, `\textit`, `\texttt`, `\textsf`,
+  `\textup` now serialize correctly from `Annotated` expressions via
+  `fontWeight`, `fontStyle`, and `fontFamily` dict keys.
+- **JavaScript compilation**: All color operators (`Color`, `ColorToString`,
+  `ColorMix`, `ColorContrast`, `ContrastingColor`, `ColorToColorspace`,
+  `ColorFromColorspace`, `Colormap`) now compile to JavaScript.
+- **`oklab()` CSS parsing**: `parseColor()` now accepts `oklab(L a b)` and
+  `oklab(L a b / alpha)` syntax, matching the existing `oklch()` support.
+- **GPU compilation**: `ColorMix`, `ColorContrast`, `ContrastingColor`,
+  `ColorToColorspace`, and `ColorFromColorspace` now compile to GLSL and WGSL.
+  Preamble functions provide sRGB ↔ OKLab ↔ OKLCh conversion, color mixing
+  with shorter-arc hue interpolation, and APCA contrast on the GPU.
+- Added `rgbToHsl()` conversion function. Exported `hslToRgb()` (previously
+  private).
+
+### Bug Fixes
+
+- **(#290) Derivatives of user-defined functions**: `\frac{d}{dx} f` and `f'(x)`
+  now correctly evaluate when `f` is a user-defined function (e.g.,
+  `f(x) := 2x`). Previously `\frac{d}{dx} f` returned `0` and `f'(x)` returned a
+  symbolic `Apply(Derivative(...))`.
+- **Cleaner `D` canonical form**: `f'(x)` now canonicalizes to
+  `["D", ["f", "x"], "x"]` instead of the verbose
+  `["D", ["Function", ["Block", ["f", "x"]], "x"], "x"]`. Function calls are no
+  longer redundantly wrapped in `Function(Block(...))`. Similarly,
+  `\frac{d}{dx} f` where `f` is a known function symbol canonicalizes to
+  `["D", ["f", "x"], "x"]` by applying the function to the differentiation
+  variable.
+
+### Free Functions
+
+- Free functions (`simplify`, `evaluate`, `N`, `expand`, `expandAll`, `factor`,
+  `solve`, `compile`) now accept `ExpressionInput` in addition to `LatexString`
+  and `Expression`. This means you can pass numbers, MathJSON objects, or tuple
+  arrays directly — e.g., `evaluate(["Add", 1, 2])` or
+  `simplify(["Power", "x", 2])`.
+- Added `declare()` free function to declare symbols without instantiating a
+  `ComputeEngine` explicitly — e.g., `declare('x', 'integer')` or
+  `declare({ x: 'integer', y: 'real' })`.
+
+### Units and Quantities
+
+- **New `units` library**: A comprehensive unit system for physical quantities,
+  available as the `"units"` library category. Supports SI base units, 18 named
+  derived units, SI prefixes (quetta through quecto), and common non-SI units
+  (imperial, angles, logarithmic).
+- **`Quantity` expression**: Pairs a numeric value with a unit:
+  `["Quantity", 9.8, ["Divide", "m", ["Power", "s", 2]]]`. Accessors
+  `QuantityMagnitude` and `QuantityUnit` extract the parts.
+- **Quantity arithmetic**: `Add`, `Subtract`, `Multiply`, `Divide`, and `Power`
+  are unit-aware. Addition and subtraction automatically convert compatible
+  units and express the result in the unit with the largest scale factor (e.g.,
+  `12 cm + 1 m` evaluates to `1.12 m`). Incompatible dimensions remain
+  unevaluated.
+- **Unit conversion**: `UnitConvert` converts between compatible units,
+  including compound units like `m/s` to `km/h`. Supports affine temperature
+  conversions (`degC`, `degF`, `K`). Returns an error for incompatible units.
+  `UnitSimplify` reduces compound units to named derived units when possible
+  (e.g., `kg*m/s^2` to `N`).
+- **Dimensional analysis**: `IsCompatibleUnit` tests dimensional compatibility.
+  `UnitDimension` returns the 7-element SI dimension vector. Both support
+  compound unit expressions.
+- **LaTeX parsing**: `\mathrm{...}` and `\text{...}` containing recognized units
+  produce `Quantity` expressions when juxtaposed with numbers. Compound units
+  with `/`, `^`, and `\cdot` are supported (e.g., `5\,\mathrm{m/s^{2}}`).
+- **siunitx commands**: `\qty{value}{unit}`, `\SI{value}{unit}`, `\unit{unit}`,
+  and `\si{unit}` are parsed.
+- **LaTeX serialization**: `Quantity` expressions serialize to
+  `value\,\mathrm{unit}` notation.
+- **DSL string sugar**: Compound units can be specified as strings in MathJSON:
+  `["Quantity", 9.8, "m/s^2"]` is canonicalized to the structured form.
+  Parentheses are supported for grouping: `"kg/(m*s^2)"`.
+- **Temperature units**: `degC` and `degF` with affine offset conversions.
+- **Angular unit unification**: Trigonometric functions (`Sin`, `Cos`, `Tan`,
+  etc.) accept `Quantity` arguments with angular units (`deg`, `rad`, `grad`,
+  `arcmin`, `arcsec`) and convert to radians automatically.
+- **Physics constants**: 11 CODATA 2018 constants defined as `Quantity`
+  expressions: `SpeedOfLight`, `PlanckConstant`, `Mu0`, `StandardGravity`,
+  `ElementaryCharge`, `BoltzmannConstant`, `AvogadroConstant`,
+  `VacuumPermittivity`, `GravitationalConstant`, `StefanBoltzmannConstant`, and
+  `GasConstant`.
+
+### Compilation
+
+- **Tuple and Matrix compilation**: `Tuple` and `Matrix` expressions can now be
+  compiled across all targets. `compile('(\\sin(t), \\cos(t))')` produces
+  `[Math.sin(t), Math.cos(t)]` in JavaScript, `vec2(sin(t), cos(t))` in GLSL,
+  `vec2f(sin(t), cos(t))` in WGSL, and `(np.sin(t), np.cos(t))` in Python.
+- **GPU-native matrix types**: Square matrices (2x2, 3x3, 4x4) compile to native
+  GPU matrix constructors (`mat2`/`mat3`/`mat4` in GLSL,
+  `mat2x2f`/`mat3x3f`/`mat4x4f` in WGSL) with proper column-major transposition.
+  Column vectors are flattened to `vecN`/`vecNf` instead of nested
+  single-element arrays.
+- **Complex number compilation**: The JavaScript compilation target now supports
+  complex-valued expressions. The compiler performs static type analysis at
+  compile time to determine whether each subexpression is real or complex, and
+  emits the appropriate code path. Simple arithmetic (Add, Subtract, Multiply,
+  Divide, Negate) uses inline `{re, im}` field math to avoid allocation.
+  Transcendental functions (Sin, Cos, Exp, Ln, Sqrt, Power, and others) delegate
+  to runtime helpers backed by the `complex-esm` library. Mixed real/complex
+  operands are promoted inline. `ImaginaryUnit` compiles to `{re: 0, im: 1}`.
+  Symbols with unknown type are assumed real. Complex-aware `Sum` and `Product`
+  loops emit `{re, im}` accumulators when the loop body is complex-valued.
+  Reciprocal trig/hyperbolic functions (Cot, Sec, Csc, Coth, Sech, Csch) and
+  their inverses dispatch to complex helpers when operands are complex.
+- **Python complex compilation**: The Python target now supports complex-valued
+  expressions using Python's native `complex()` constructor and the `cmath`
+  module for transcendental functions. Real-valued expressions continue to use
+  NumPy.
+- **Gamma function compilation**: `Gamma` and `GammaLn` can now be compiled to
+  `interval-js`, `glsl`, `wgsl`, and `interval-glsl` targets. The interval
+  targets include pole detection at non-positive integers and correct
+  monotonicity handling around the minimum at x ≈ 1.46.
+- **Special function compilation**: 27 additional functions can now be compiled
+  to JavaScript: `Erf`, `Erfc`, `ErfInv`, `Beta`, `Digamma`, `Trigamma`,
+  `PolyGamma`, `Zeta`, `LambertW`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`,
+  `AiryAi`, `AiryBi`, `Factorial`, `Factorial2`, `Exp2`, `Log2`, `Log10`, `Lg`,
+  `Arctan2`, `Hypot`, `Degrees`, `Haversine`, `InverseHaversine`, `Binomial`,
+  and `Fibonacci`.
+- **GPU special functions**: `Erf`, `Erfc`, `ErfInv`, `Beta`, `Factorial`,
+  `Arctan2`, `Hypot`, `Haversine`, `InverseHaversine`, `Log10`, and `Lg` can now
+  be compiled to GLSL and WGSL targets. `Erf`/`ErfInv` use Abramowitz & Stegun
+  polynomial approximations; `Beta` and `Factorial` leverage the existing GPU
+  Gamma preamble.
+
+### Simplification
+
+- **Factorial quotient simplification**: `n!/k!` is now simplified to a partial
+  product for both concrete integers (e.g., `10!/7!` → `720`) and symbolic
+  expressions with small constant difference (e.g., `n!/(n-2)!` → `n(n-1)`).
+- **Binomial detection**: Expressions of the form `n!/(k!(n-k)!)` are
+  automatically recognized and simplified to `Binomial(n, k)`.
+- **Binomial identity simplification**: `C(n,0)` → `1`, `C(n,1)` → `n`, `C(n,n)`
+  → `1`, `C(n,n-1)` → `n`.
+- **Factorial sum factoring**: Sums and differences of factorials with related
+  arguments are factored out, e.g., `n! - (n-1)!` → `(n-1)! * (n-1)`,
+  `(n+1)! + n!` → `n! * (n+2)`.
+
+## 0.50.2 _2026-02-12_
+
+### Numerics
+
+- **Centralized overflow protection**: Improved robustness of `Rational` and
+  `ExactNumericValue` arithmetic by centralizing overflow checks and automatic
+  promotion to `BigInt`.
+- **\[#287\](https://github.com/cortex-js/compute-engine/issues/287) Improved
+  precision for large integer products**: Multiplications and additions of large
+  integers that would previously lose precision (exceeding
+  `Number.MAX_SAFE_INTEGER`) are now automatically promoted to `BigInt` to
+  maintain exact results.
+
+### Symbols
+
+- **[\#288](https://github.com/cortex-js/compute-engine/issues/288) Allow
+  reassigning a symbol from operator to value**: `ce.assign()` no longer throws
+  when assigning a plain value to a symbol that was previously declared as a
+  function. Existing expressions using the symbol as a function head will
+  produce a type error at evaluation time if the new value is not callable.
+
+### Evaluation
+
+- **Fixed scope leaks**: Ensured that evaluation contexts are correctly popped
+  even when an error or timeout occurs in `BoxedFunction.evaluate()`,
+  `findUnivariateRoots()`, and rule-boxing operations.
+- **Improved numerical evaluation performance**: `Sum`, `Product`, `Divide`, and
+  statistical operators (`Mean`, `Variance`, etc.) now correctly propagate the
+  `numericApproximation` option, significantly speeding up large numerical
+  calculations by avoiding expensive exact arithmetic.
+
+## 0.50.1 _2026-02-11_
+
+### Compilation
+
+- **`CompilationResult.preamble` for shader targets**: `compile()` with
+  `interval-wgsl` and `interval-glsl` targets now returns a `preamble` field
+  containing the interval arithmetic library (struct definitions, helper
+  functions). Previously, the compiled `code` referenced functions like `ia_div`
+  and `ia_sin` that were not included in the output. Use `preamble + code` for a
+  self-contained shader, or call `compileShaderFunction()` on the target
+  directly.
+
 ## 0.50.0 _2026-02-11_
 
 ### Breaking API Changes

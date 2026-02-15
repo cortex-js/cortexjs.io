@@ -510,7 +510,62 @@ such as `Divide` or `PlusMinus` and are not prefixed with a backslash.
 
 
 **To extend the LaTeX syntax** update the `latexDictionary` property of the
-Compute Engine
+Compute Engine.
+
+The simplest way to add a custom LaTeX command for a function is to provide
+a declarative entry with `name`, `kind`, and a trigger. No custom `parse`
+handler is needed:
+
+```js
+ce.latexDictionary = [
+  ...ce.latexDictionary,
+  {
+    name: "triple",
+    kind: "function",
+    latexTrigger: "\\triple",
+    // "implicit" so that \triple{x}, \triple(x), and \triple x all work
+    arguments: "implicit",
+    serialize: "\\triple",
+  },
+];
+
+ce.parse("\\triple{5}").json;
+// ➔ ["triple", 5]
+```
+
+If the function has already been declared with `ce.declare()`, parsing and
+evaluating work together:
+
+```js
+ce.declare("triple", {
+  signature: "number -> number",
+  evaluate: ([x]) => x.mul(3),
+});
+
+ce.parse("\\triple{5}").evaluate().json;
+// ➔ 15
+```
+
+For **multi-character names** that don't need their own LaTeX command, use
+`symbolTrigger` instead of `latexTrigger`. This matches
+`\operatorname{name}` and `\mathrm{name}` automatically:
+
+```js
+ce.latexDictionary = [
+  ...ce.latexDictionary,
+  {
+    kind: "function",
+    symbolTrigger: "double",
+    parse: "double",
+  },
+];
+
+ce.parse("\\operatorname{double}(5)").json;
+// ➔ ["double", 5]
+```
+
+For more complex parsing — for example when a command takes multiple
+LaTeX group arguments — use a custom `parse` handler:
 
 ```live
 ce.latexDictionary = [
@@ -518,7 +573,7 @@ ce.latexDictionary = [
   ...ce.latexDictionary,
   // ...and add the `\smoll{}{}` command
   {
-    // The parse handler below will be invoked when this LaTeX command 
+    // The parse handler below will be invoked when this LaTeX command
     // is encountered
     latexTrigger: '\\smoll',
     parse: (parser) => {

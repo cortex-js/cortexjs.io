@@ -17,23 +17,32 @@ such as numbers, constants, variables and functions.
 In the Compute Engine, expressions are represented internally using the
 [MathJSON format](/math-json/).
 
-They are wrapped in a JavaScript object, a process called **boxing**, and the
-resulting expressions are **Expressions**.
+They are wrapped in a JavaScript object, an instance of the `Expression` class.
 
-Expressions improve performance by implementing caching to avoid
-repetitive calculations. They also ensure that expressions are valid and in a
-standard format.
-
-Unlike the plain data types used by JSON, Expressions allow an IDE, such
+Unlike the plain data types used by JSON, `Expression` objects allow an IDE, such
 as **Visual Studio Code (VS Code)**, to provide hints in the editor regarding the
-methods and properties available for a given expression.
+methods and properties available.
 
 Expressions can be created from a LaTeX string or from a raw MathJSON
 expression.
 
-## Boxing
+## Creating Expressions
 
-**To create an `Expression` from a MathJSON expression** use the `ce.box()`
+**To create a Expression from a LaTeX string** use the `parse()` or `ce.parse()`
+function. You would use `ce.parse()` if you want to use a custom instance of 
+the `ComputeEngine` class.
+
+```js
+const expr = parse("3 + x + y");
+console.log(expr.operator);
+// ➔ "Add"
+
+console.log(expr.json);
+// ➔ ["Add", "x", "y", 3]
+```
+
+
+**To create an `Expression` object from a MathJSON expression** use the `ce.box()`
 method.
 
 The input of `ce.box()` can be:
@@ -42,7 +51,7 @@ The input of `ce.box()` can be:
 - an `ExpressionInput`, that is a MathJSON expression with some of its
   subexpressions already represented as `Expression` values.
 
-The result is an instance of an `Expression`.
+The result is an `Expression` object.
 
 ```js
 let expr = ce.box(1.729e3);
@@ -54,35 +63,11 @@ console.log(expr.isPositive);
 
 expr = ce.box({ num: "+Infinity" });
 console.log(expr.latex);
-// ➔ "+\infty"
+// ➔ "\infty"
 
 expr = ce.box(["Add", 3, "x"]);
 console.log(expr.operator);
 // ➔ "Add"
-```
-
-
-**To create a Expression from a LaTeX string** use the `ce.parse()`
-function.
-
-```js
-const expr = ce.parse("3 + x + y");
-console.log(expr.operator);
-// ➔ "Add"
-
-console.log(expr.json);
-// ➔ ["Add", 3, "x", "y"]
-```
-
-**To get a Expression representing the content of a mathfield**
-use the `mf.expression` property:
-
-```js
-const mf = document.getElementById("input");
-mf.value = "\\frac{10}{5}";
-const expr = mf.expression;
-console.log(expr.evaluate());
-// ➔ 2
 ```
 
 ## Canonical Expressions
@@ -90,11 +75,11 @@ console.log(expr.evaluate());
 The **canonical form** of an expression is a conventional way of writing an
 expression.
 
-For example, the canonical form of a fraction of two integers is a reduced
+For example, the canonical form of a fraction is a reduced
 rational number, written as a tuple of two integers, such that the GCD of the
 numerator and denominator is 1, and the denominator is positive.
 
-```js
+```live
 const expr = ce.parse("\\frac{30}{-50}");
 console.log(expr.json);
 // ➔ ["Rational", -3, 5]
@@ -104,7 +89,7 @@ The canonical form of a rational with a denominator of 1 is an integer.
 
 ```js
 const expr = ce.parse("\\frac{17}{1}");
-console.log(expr.json);
+console.log(expr);
 // ➔ 17
 ```
 

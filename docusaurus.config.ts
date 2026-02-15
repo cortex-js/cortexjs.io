@@ -1,6 +1,5 @@
 // @ts-check
 
-import { themes as prismThemes } from 'prism-react-renderer';
 import styles from './src/prism/theme-light';
 import loadScripts from './plugins/load-scripts';
 import remarkMath from 'remark-math';
@@ -32,8 +31,13 @@ const config: Config = {
 
   onBrokenLinks: 'warn',
   onBrokenAnchors: 'warn',
-  onBrokenMarkdownLinks: 'warn',
   onDuplicateRoutes: 'warn',
+
+  markdown: {
+    hooks: {
+        onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
@@ -352,24 +356,6 @@ const config: Config = {
     },
 };
 
-// theme$h as dracula,
-// theme$g as duotoneDark,
-// theme$f as duotoneLight,
-// theme$e as github,
-// theme$3 as jettwaveDark,
-// theme$2 as jettwaveLight,
-// theme$d as nightOwl,
-// theme$c as nightOwlLight,
-// theme$b as oceanicNext,
-// theme$a as okaidia,
-// theme$1 as oneDark,
-// theme as oneLight,
-// theme$9 as palenight,
-// theme$8 as shadesOfPurple,
-// theme$7 as synthwave84,
-// theme$6 as ultramin,
-// theme$5 as vsDark,
-// theme$4 as vsLight,
 
 export default config;
 

@@ -13,6 +13,7 @@ window.moduleMap = {
   // "mathlive": "/js/mathlive.mjs",
   // "html-to-image": "///assets/js/html-to-image.js",
   "compute-engine": "https://esm.run/@cortex-js/compute-engine",
+  "@cortex-js/compute-engine": "https://esm.run/@cortex-js/compute-engine",
 };
 function hash(str, seed = 0) {
   let h1 = 0xdeadbeef ^ seed;
@@ -57,7 +58,7 @@ loadScripts([
   // "https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@latest/dist/compute-engine.umd.js",
   "https://unpkg.com/@cortex-js/compute-engine",
   "https://cdn.jsdelivr.net/npm/mathlive",
-  "https://cdn.jsdelivr.net/npm/@ui-js/code-playground/dist/code-playground.min.js@module",
+  "https://cdn.jsdelivr.net/npm/@ui-js/code-playground@1.13.2/dist/code-playground.min.js@module",
   ]
 );
 })();

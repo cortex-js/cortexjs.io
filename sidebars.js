@@ -185,6 +185,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "compute-engine/guide-units",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
           id: "compute-engine/guide-simplify",
           className: "guide-icon",
         },
@@ -253,6 +258,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "compute-engine/reference-colors",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
           id: "compute-engine/reference-complex",
           className: "reference-icon",
         },
@@ -314,6 +324,11 @@ const sidebars = {
         {
           type: "doc",
           id: "compute-engine/reference-trigonometry",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "compute-engine/reference-units",
           className: "reference-icon",
         },
       ],

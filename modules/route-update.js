@@ -34,9 +34,8 @@ function setupComputeEngine(delay) {
   // Reset all the CodePlayground elements
   // Give some time for the CodeMirror and ComputeEngine libraries to load
   setTimeout(() => document.querySelectorAll("code-playground").forEach((x) => {
-    if (typeof x.run === 'function') x.run()
-    }),
-  20);
+    if (typeof x.run === 'function' ) x.run(); 
+  }), 20);
 }
 
 function renderMath(delay) {

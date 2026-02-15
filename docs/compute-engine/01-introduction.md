@@ -18,28 +18,21 @@ mathematical expressions.
 </Intro>
 
 
-
-:::info[Note]
-To use Compute Engine, you must write JavaScript or TypeScript code. 
-This guide assumes you’re familiar with these languages.
-:::
-
 <div style={{height:"1rem"}}></div>
 
 ```live
-console.log("exp(i*pi) =", ce.parse("e^{i\\pi}").evaluate());
+console.log(evaluate("e^{i\\pi}"));
 ```
 
 ```live
-const expr = ce.parse("(a+b)^2");
-ce.box(["Expand", expr]).evaluate().print();
+console.log(expand("(a+b)^2"));
 ```
 
 
 ```live
-const lhs = ce.parse("1 + x(1 + 2x) + 2x");
-const rhs = ce.parse("2x^2 + 3x + 1");
-console.log(lhs, lhs.isEqual(rhs) ? "=" : "≠", rhs);
+console.log(simplify(
+  "(sin(alpha)**2 + cos(alpha)**2) * (x**2 + 2*x + 1) / (x + 1)"
+));
 ```
 
 
@@ -79,17 +72,29 @@ evaluate("2^{11} - 1").print();
 N("\\frac{1}{3}").print();
 ```
 
-Available free functions:
+| Function                               | Purpose                                                        |
+| :------------------------------------- | :------------------------------------------------------------- |
+| `evaluate(expr \| latex)`                | Evaluate an expression or LaTeX input symbolically.            |
+| `N(expr \| latex)`                       | Numerically evaluate an expression or LaTeX input.             |
+| `simplify(expr \| latex)`                | Simplify an expression or LaTeX input.                         |
+| `assign(id, value)` / `assign(record)` | Assign one symbol value or many at once.                       |
+| `expand(expr \| latex)`                  | Expand distributively at the top level (`Expression \| null`). |
+| `expandAll(expr \| latex)`               | Expand distributively recursively (`Expression \| null`).      |
+| `factor(expr \| latex)`                  | Factor an expression.                                          |
+| `solve(expr \| latex, vars?)`            | Solve equations/systems (returns solve result variants).       |
+| `compile(expr \| latex, options?)`       | Compile to a target language with `CompilationResult`.         |
+| `parse(latex)`                         | Parse a LaTeX string into an `Expression`.                     |
 
-- `parse(latex)` — parse a LaTeX string into an `Expression`
-- `simplify(latex | expr)` — simplify a LaTeX string or expression
-- `evaluate(latex | expr)` — evaluate a LaTeX string or expression
-- `N(latex | expr)` — compute a numeric approximation
-- `assign(id, value)` — assign a value to a symbol
+You can use either regular LaTeX strings or a looser syntax similar
+to ASCIIMath or Typst:
+
+```live
+console.log(N("(1+sqrt(5))/2"));
+```
 
 :::info[Note]
 
-These use a shared `ComputeEngine` instance created on first call.
+These functions use a shared `ComputeEngine` instance created on first call.
 Use `getDefaultEngine()` to configure it.
 :::
 
@@ -100,11 +105,6 @@ Try the **interactive demo** now<Icon name="chevron-right-bold" />
 
 
 ## Getting Started
-
-The easiest way to get started is to load the Compute Engine JavaScript module
-from a CDN, then create a `ComputeEngine` instance.
-
-### Using JavaScript Modules
 
 **To load the Compute Engine module from the jsdelivr CDN**, use a `<script>` tag with the
 `type="module"` attribute and an `import` statement.
@@ -118,7 +118,7 @@ from a CDN, then create a `ComputeEngine` instance.
 </script>
 ```
 
-Alternatively, you can use the **unpkg** CDN to load the module:
+Alternatively, you can use the **unpkg** CDN:
 
 ```js
 import { ComputeEngine } from 
@@ -126,52 +126,11 @@ import { ComputeEngine } from
 ```
 
 
-The ESM (module) version is also available in the npm package as `/compute-engine.min.esm.js` 
-
-
-### Using Vintage JavaScript
-
-If you are using a vintage environment, or if your toolchain does not support
-modern JavaScript features, use the UMD version. 
-
-For example, WebPack 4 does not support the optional chaining operator, using 
-the UMD version will make use of polyfills as necessary.
-
-**To load the UMD version**, use a `<script>` tag with the `src` attribute.
-
-
-```html
-<script 
-  src="https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine/compute-engine.min.umd.js">
-</script>
-<script>
-  window.onload = function() {
-    const ce = new ComputeEngine.ComputeEngine();
-    console.log(ce.parse("e^{i\\pi}").evaluate());
-    // ➔ "-1"
-  }
-</script>
-```
-
-Alternatively, use the **unpkg** CDN to load the library:
-
-```html
-<script src="//unpkg.com/@cortex-js/compute-engine"></script>
-```
-
-The UMD version is also available in the npm package in `/compute-engine.min.umd.js` 
-
-
-
-### Other Versions
-
-A non-minified module which may be useful for debugging is available as `/compute-engine.esm.js`.
 
 ## MathJSON Standard Library
 
-The operators in a MathJSON expression are defined in libraries. The 
-**MathJSON Standard Library** is a collection of functions and symbols that are
-available by default to a `ComputeEngine` instance.
+The **MathJSON Standard Library** is a collection of functions and symbols that are
+available by default.
 
 <div className="symbols-table" style={{"--first-col-width":"21ch"}}>
 
@@ -194,22 +153,6 @@ available by default to a `ComputeEngine` instance.
 </div>
 
 
-:::info[Note]
-In this guide, the `ce.` prefix in `ce.box()` or `ce.parse()` indicates
-that the function is a method of the `ComputeEngine` class.
-
-**To create a new `ComputeEngine` instance** use `ce = new ComputeEngine()`
-
-
-The `expr.` prefix in `expr.evaluate()` or `expr.simplify()` indicates that the
-function is a method of the `Expression` class.
-
-**To create a new expression** use `expr = ce.parse()` or `expr = ce.box()`
-
-:::
-
-
-
 <ReadMore path="/compute-engine/standard-library/" >
 Read more about the **MathJSON Standard Library**<Icon name="chevron-right-bold" />
 </ReadMore>
@@ -227,3 +170,21 @@ LaTeX to MathJSON.
 <ReadMore path="/compute-engine/guides/latex-syntax/" >
 Read more about **Parsing and Serializing LaTeX**<Icon name="chevron-right-bold" />
 </ReadMore>
+
+
+:::info[Note]
+In this guide, the `ce.` prefix in `ce.box()` or `ce.parse()` indicates
+that the function is a method of the `ComputeEngine` class.
+
+Use `getDefaultEngine()` to access the shared `ComputeEngine` instance used by the free functions, or create your own instance with `new ComputeEngine()`.
+
+The `expr.` prefix in `expr.evaluate()` or `expr.simplify()` indicates that the
+function is a method of the `Expression` class.
+
+**To create a new expression** use `expr = ce.parse()` or `expr = ce.box()`
+
+:::
+
+
+
+
