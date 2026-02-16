@@ -118,6 +118,58 @@ console.log(ce.box(["Add", ["Power", "x", 3], 2]).latex);
 // ➔  "x^3 + 2"
 ```
 
+## Control Structure Keywords
+
+The Compute Engine parser recognizes keywords inside `\text{...}` and
+`\operatorname{...}` to express control structures in LaTeX.
+
+### Inline Conditionals
+
+Use `\text{if}`, `\text{then}`, and `\text{else}` keywords:
+
+```live
+console.log(ce.parse("\\text{if } x > 0 \\text{ then } x \\text{ else } -x").json);
+// ➔ ["If", ["Greater", "x", 0], "x", ["Negate", "x"]]
+```
+
+The `\text{else}` branch is optional. When omitted, the result is `Nothing` if
+the condition is false.
+
+### Local Bindings with `where`
+
+The `\text{where}` keyword binds variables to values in an expression:
+
+```live
+console.log(ce.parse("a + b \\text{ where } a \\coloneq 1,\\; b \\coloneq 2").json);
+// ➔ ["Block", ["Declare", "a"], ["Assign", "a", 1],
+//             ["Declare", "b"], ["Assign", "b", 2],
+//             ["Add", "a", "b"]]
+```
+
+### Loops
+
+Use `\text{for}`, `\text{from}`, `\text{to}`, and `\text{do}` keywords:
+
+```live
+console.log(ce.parse("\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2").json);
+// ➔ ["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]
+```
+
+### Semicolon Blocks
+
+Semicolons separate statements in a block. When any statement is an assignment,
+the result is wrapped in a `Block` with automatic variable declarations:
+
+```live
+console.log(ce.parse("x \\coloneq 3;\\; x^2 + 1").json);
+// ➔ ["Block", ["Declare", "x"], ["Assign", "x", 3],
+//             ["Add", ["Power", "x", 2], 1]]
+```
+
+<ReadMore path="/compute-engine/reference/control-structures/" >
+Read more about the **control structure** operators.
+</ReadMore>
+
 ## Customizing Parsing
 
 The LaTeX parsing can be customized by providing a `ParseLatexOptions` object as
@@ -305,9 +357,11 @@ must be surrounded by curly brackets.
 | `invisiblePlus` | A LaTeX string to use as an invisible plus operator between expressions, for example with mixed numbers. Leave it empty to join the main number and the fraction. Use `"+"` to insert an explicit $ + $ operator between them. Default is `""`. |
 | `multiply` | A LaTeX string to use as a multiply operator between expressions. Use `"\cdot"` to use a $ \cdot $. Default is `"\times"` $ \times $. |
 | `missingSymbol` | A LaTeX string to use when a symbol is missing. Default is `"\placeholder{}"` $ \placeholder{} $. |
+| `dmsFormat` | When `true`, serialize angle quantities in degrees-minutes-seconds format (e.g., `9°30'`). When `false` (default), use decimal degrees. |
+| `angleNormalization` | Normalize angles during serialization. `"none"` (default): no normalization. `"0...360"`: normalize to $[0, 360)$. `"-180...180"`: normalize to $[-180, 180]$. |
 
 ```live
-console.log(ce.parse("3\\frac{1}{4}").toLatex({ 
+console.log(parse("3\\frac{1}{4}").toLatex({ 
     invisiblePlus: "+"
 }));
 ```
@@ -332,11 +386,11 @@ and return a string indicating the desired style.
 For example to always represent fractions with a solidus (forward slash) use:
 
 ```live
-console.log(ce.parse("\\frac{3}{5}").toLatex({
+console.log(parse("\\frac{3}{5}").toLatex({
   fractionStyle: () => "quotient"
 }));
 
-console.log(ce.parse("\\frac{3}{5}").toLatex({
+console.log(parse("\\frac{3}{5}").toLatex({
   fractionStyle: () => "inline-solidus"
 }));
 
@@ -352,7 +406,7 @@ an inline solidus:
 
 ```live
 
-console.log(ce.parse("\\frac{a}{b}+\\sqrt{\\frac{c}{d}}").toLatex({
+console.log(parse("\\frac{a}{b}+\\sqrt{\\frac{c}{d}}").toLatex({
   fractionStyle: (expr, level) =>
      level > 0 ? "inline-solidus" : "quotient"
 }));
@@ -364,7 +418,7 @@ console.log(ce.parse("\\frac{a}{b}+\\sqrt{\\frac{c}{d}}").toLatex({
 `applyFunctionStyle` style option handler.
 
 ```live
-console.log(ce.parse("\\sin x").toLatex({
+console.log(parse("\\sin x").toLatex({
   applyFunctionStyle: () => "big"
 }));
 ```
@@ -383,7 +437,7 @@ console.log(ce.parse("\\sin x").toLatex({
 handler.
 
 ```live
-console.log(ce.parse("(a+b)", {form: 'raw'}).toLatex({
+console.log(parse("(a+b)", {form: 'raw'}).toLatex({
   groupStyle: () => "big"
 }));
 ```
@@ -401,7 +455,7 @@ console.log(ce.parse("(a+b)", {form: 'raw'}).toLatex({
 handler.
 
 ```live
-console.log(ce.parse("\\sqrt{2}").toLatex({
+console.log(parse("\\sqrt{2}").toLatex({
   rootStyle: () => "solidus"
 }));
 ```
@@ -418,7 +472,7 @@ console.log(ce.parse("\\sqrt{2}").toLatex({
 option handler.
 
 ```live
-console.log(ce.parse("\\frac{3}{5}").toLatex({
+console.log(parse("\\frac{3}{5}").toLatex({
   fractionStyle: () => "nice-solidus"
 }));
 ```
@@ -437,7 +491,7 @@ console.log(ce.parse("\\frac{3}{5}").toLatex({
 option handler.
 
 ```live
-console.log(ce.parse("p\\land q").toLatex({
+console.log(parse("p\\land q").toLatex({
   logicStyle: () => "word"
 }));
 ```
@@ -455,7 +509,7 @@ console.log(ce.parse("p\\land q").toLatex({
 handler.
 
 ```live
-console.log(ce.parse("x^2").toLatex({
+console.log(parse("x^2").toLatex({
   powerStyle: () => "solidus"
 }));
 ```
@@ -472,7 +526,7 @@ console.log(ce.parse("x^2").toLatex({
 option handler.
 
 ```live
-console.log(ce.parse("x \\in \\Z").toLatex({
+console.log(parse("x \\in \\Z").toLatex({
   numericSetStyle: () => "interval"
 }));
 ```
@@ -529,6 +583,9 @@ ce.latexDictionary = [
   },
 ];
 
+// NOTE: we use `ce.parse()` in order to use the Compute Engine instance with
+// the custom definitions, not the shared Compute Engine instance that the 
+// free `parse()` function uses.
 ce.parse("\\triple{5}").json;
 // ➔ ["triple", 5]
 ```

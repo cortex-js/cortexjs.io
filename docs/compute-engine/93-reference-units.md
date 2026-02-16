@@ -431,6 +431,8 @@ logarithmic and linear scales is not supported in v1.
 | `\SI{5}{kg}` | `["Quantity", 5, "kg"]` |
 | `\unit{m/s}` | `["Divide", "m", "s"]` |
 | `\si{MHz}` | `"MHz"` |
+| `9°30'15"` | `["Add", ["Quantity", 9, "deg"], ["Quantity", 30, "arcmin"], ["Quantity", 15, "arcsec"]]` |
+| `9°30'` | `["Add", ["Quantity", 9, "deg"], ["Quantity", 30, "arcmin"]]` |
 
 ### Unit Parsing Rules
 

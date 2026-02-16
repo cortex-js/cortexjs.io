@@ -42,6 +42,18 @@ date: Last Modified
 
 </div>
 
+## Cardinal Sine and Fresnel Functions
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"20ch"}}>
+
+| Function               |                                                                                                                                                                                                                                                                                                                                                                                     |
+| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Sinc`                 | $$\operatorname{sinc}(x) = \frac{\sin x}{x}$$ with $$\operatorname{sinc}(0) = 1$$. The unnormalized [cardinal sine](https://en.wikipedia.org/wiki/Sinc_function) function. |
+| `FresnelS`             | $$S(x) = \int_0^x \sin\!\left(\tfrac{\pi t^2}{2}\right) dt$$ The [Fresnel S integral](https://en.wikipedia.org/wiki/Fresnel_integral). Odd function with $$S(\infty) = \tfrac{1}{2}$$. |
+| `FresnelC`             | $$C(x) = \int_0^x \cos\!\left(\tfrac{\pi t^2}{2}\right) dt$$ The [Fresnel C integral](https://en.wikipedia.org/wiki/Fresnel_integral). Odd function with $$C(\infty) = \tfrac{1}{2}$$. |
+
+</div>
+
 ## Trigonometric Simplification
 
 The `trigSimplify()` method applies the Fu algorithm to simplify trigonometric

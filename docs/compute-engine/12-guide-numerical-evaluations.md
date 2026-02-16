@@ -41,9 +41,9 @@ Exact values are:
 </div>
 
 ```live
-console.log(ce.parse('1/3 + 1/4').evaluate());
+console.log(parse('1/3 + 1/4').evaluate());
 
-console.log(ce.parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').evaluate());
+console.log(parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').evaluate());
 ```
 
 
@@ -53,8 +53,8 @@ console.log(ce.parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').evaluate());
 **To force the evaluation of an expression to be a numeric approximation**, use `expr.N()`.
 
 ```live
-console.log(ce.parse('1/3 + 1/4').N());
-console.log(ce.parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').N());
+console.log(parse('1/3 + 1/4').N());
+console.log(parse('\\sqrt{2} + \\sqrt{3} + \\sqrt{75}').N());
 ```
 
 
@@ -62,7 +62,7 @@ When using `expr.evaluate()`, if one of the arguments is not an exact value
 the expression is automatically evaluated as a **numeric approximation**.
 
 ```live
-console.log(ce.parse('1/3 + 1/4 + 1.24').evaluate());
+console.log(parse('1/3 + 1/4 + 1.24').evaluate());
 ```
 
 ## Angular Units
@@ -94,7 +94,7 @@ the `re` (for the real part of the number) and `im` (for the imaginary part)
 properties.
 
 ```js
-const expr = ce.parse('1/3 + 1/4');
+const expr = parse('1/3 + 1/4');
 console.log(expr.N().re);
 // ➔ 0.5833333333333334
 ```
@@ -103,7 +103,7 @@ Another way to obtain a JavaScript compatible representation of an expression
 is to use the `valueOf()` method of the expression.
 
 ```js
-const expr = ce.parse('1/3 + 1/4');
+const expr = parse('1/3 + 1/4');
 console.log(expr.N().valueOf());
 // ➔ 0.5833333333333334
 ```
@@ -112,7 +112,7 @@ The `valueOf()` method of a expression can be used in JavaScript
 expressions.
 
 ```live
-const expr = ce.parse('1/3 + 1/4');
+const expr = parse('1/3 + 1/4');
 console.log(expr.N().valueOf() + 1);
 ```
 
@@ -124,7 +124,7 @@ Unlike the `.re` property, `valueOf()` can also return a `boolean` or a
 **To get an `Expression` number literal from a JavaScript number**, use `ce.box()` or `ce.number()`.
 
 ```live
-const expr = ce.box(1.5);
+const expr = box(1.5);
 console.log(expr.valueOf());
 ```
 
@@ -294,8 +294,7 @@ function.
 ```js
 import { compile } from '@cortex-js/compute-engine';
 
-const expr = ce.parse("3x^2+4x+2");
-const result = compile(expr);
+const result = compile("3x^2+4x+2");
 for (const x = 0; x < 1; x += 0.01) console.log(result.run({ x }));
 ```
 

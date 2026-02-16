@@ -19,8 +19,15 @@ color space conversion, and color palettes.
 
 Convert a color string or named color into a canonical sRGB tuple.
 
-The output is a tuple of 3 or 4 numbers between 0 and 1, representing 
+The output is a tuple of 3 or 4 numbers between 0 and 1, representing
 the red, green, blue, and optional alpha components.
+
+Supports various formats:
+- **Hex**: `#rgb`, `#rrggbb`, `#rrggbbaa` (e.g. `'#f00'`, `'#ff0000'`, `'#ff000080'`)
+- **RGB/RGBA**: `rgb(r, g, b)`, `rgba(r, g, b, a)` (e.g. `'rgb(255, 0, 0)'`, `'rgba(255, 0, 0, 0.5)'`)
+- **HSL**: `hsl(h, s%, l%)`, `hsla(h, s%, l%, a)` (e.g. `'hsl(0, 100%, 50%)'`)
+- **OKLCH**: `oklch(l%, c, h)`, `oklch(l%, c, h / a)` (e.g. `'oklch(50% 0.3 240)'`)
+- **Named colors**: From the `NAMED_COLORS` palette (see below)
 
 ```json example
 ["Color", "'#f00'"]
@@ -29,9 +36,33 @@ the red, green, blue, and optional alpha components.
 ["Color", "'rgba(255, 0, 0, 0.5)'"]
 // ➔ ["Tuple", 1, 0, 0, 0.5]
 
-["Color", "'rebeccapurple'"]
-// ➔ ["Tuple", 0.4, 0.2, 0.6]
+["Color", "'red'"]
+// ➔ ["Tuple", 0.843, 0.09, 0.043]
+
+["Color", "'blue'"]
+// ➔ ["Tuple", 0.051, 0.502, 0.949]
 ```
+
+### Named Colors
+
+The `Color` function supports a comprehensive palette of named colors from the `NAMED_COLORS` object:
+
+| Color Name | Swatch | Color Name | Swatch |
+| :--- | :--- | :--- | :--- |
+| `red` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#d7170b', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `orange` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#fe8a2b', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `yellow` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#ffc02b', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `lime` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#63b215', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `green` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#21ba3a', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `teal` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#17cfcf', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `cyan` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#13a7ec', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `blue` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#0d80f2', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `indigo` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#63c', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `purple` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#a219e6', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `magenta` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#eb4799', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `black` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#000', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `white` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#ffffff', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `dark-grey` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#666', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `grey` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#A6A6A6', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `light-grey` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#d4d5d2', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `brown` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#8c564b', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `olive` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#8a8f2a', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `midnight` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#2c4670', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `sky` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#d2dce9', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `carbon` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#111111', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `charcoal` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#333333', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `slate` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#555555', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `graphite` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#777777', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `stone` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#999999', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `ash` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#E6E6E6', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
+| `mist` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#F3F3F3', border: '1px solid #ccc', borderRadius: '3px'}}></div> | `snow` | <div style={{display: 'inline-block', width: '20px', height: '20px', backgroundColor: '#FFFFFF', border: '1px solid #ccc', borderRadius: '3px'}}></div> |
 
 </FunctionDefinition>
 

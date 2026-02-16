@@ -210,6 +210,65 @@ $$
 </FunctionDefinition>
 
 
+## Fresnel Integrals
+
+The [Fresnel integrals](https://en.wikipedia.org/wiki/Fresnel_integral) arise in
+the description of near-field diffraction and in the geometry of the Cornu
+spiral (Euler spiral).
+
+
+<FunctionDefinition name="FresnelS">
+
+<Signature name="FresnelS">_x_</Signature>
+
+<Latex value="\\operatorname{FresnelS}(x)"/>
+
+The Fresnel S integral:
+
+$$
+S(x) = \int_0^x \sin\!\left(\frac{\pi t^2}{2}\right) dt
+$$
+
+It is an odd function ($S(-x) = -S(x)$) with asymptotic value
+$S(\infty) = \tfrac{1}{2}$.
+
+```json example
+["FresnelS", 1]
+// ➔ 0.4383
+```
+
+- Wikipedia: [Fresnel integral](https://en.wikipedia.org/wiki/Fresnel_integral)
+- NIST: http://dlmf.nist.gov/7.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="FresnelC">
+
+<Signature name="FresnelC">_x_</Signature>
+
+<Latex value="\\operatorname{FresnelC}(x)"/>
+
+The Fresnel C integral:
+
+$$
+C(x) = \int_0^x \cos\!\left(\frac{\pi t^2}{2}\right) dt
+$$
+
+It is an odd function ($C(-x) = -C(x)$) with asymptotic value
+$C(\infty) = \tfrac{1}{2}$.
+
+```json example
+["FresnelC", 1]
+// ➔ 0.7799
+```
+
+- Wikipedia: [Fresnel integral](https://en.wikipedia.org/wiki/Fresnel_integral)
+- NIST: http://dlmf.nist.gov/7.2
+
+</FunctionDefinition>
+
+
 ## Bessel Functions
 
 Bessel functions are solutions to Bessel's differential equation:

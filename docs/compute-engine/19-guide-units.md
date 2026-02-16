@@ -279,6 +279,32 @@ console.log(evaluate(['Cos', ['Quantity', 200, 'grad']]));
 
 Supported angular units: `deg`, `rad`, `grad`, `turn`, `arcmin`, `arcsec`.
 
+### Degrees-Minutes-Seconds (DMS) Notation
+
+Geographic coordinates and angular measurements are often written in
+degrees-minutes-seconds notation. The engine parses DMS notation when
+arc-minute (`'`) and arc-second (`"`) symbols appear after a degree symbol:
+
+```live
+console.log(parse("9°30'15\""));
+// → Add(Quantity(9, deg), Quantity(30, arcmin), Quantity(15, arcsec))
+
+console.log(parse("9°30'"));
+// → Add(Quantity(9, deg), Quantity(30, arcmin))
+```
+
+The `'` and `"` symbols are only interpreted as arc-minutes and arc-seconds
+when they immediately follow a degree value. In other contexts, they retain
+their usual meaning (e.g., prime/derivative notation).
+
+DMS expressions canonicalize to a single angle value, so arithmetic works
+naturally:
+
+```live
+console.log(evaluate("45°30' + 44°30'"));
+// → 90°
+```
+
 
 ## Physics Constants
 

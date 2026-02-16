@@ -181,9 +181,56 @@ Read more about the `Product` and `Sum` functions which are specialized version 
 
 <ReadMore path="/compute-engine/reference/collections/" >
 Read more about operations on collection such as `Map` and `Reduce` which are functional
-programming constructs that can be used to replace loops. 
+programming constructs that can be used to replace loops.
 </ReadMore>
 
+## LaTeX Syntax for Control Structures
+
+Control structures can be expressed in LaTeX using keyword syntax with
+`\text{...}` or `\operatorname{...}`.
+
+### Inline `If`
+
+```latex
+\text{if } x > 0 \text{ then } x \text{ else } -x
+```
+
+Parses to `["If", ["Greater", "x", 0], "x", ["Negate", "x"]]`.
+
+The `\text{else}` branch is optional. `\operatorname{if}` can be used instead
+of `\text{if}`.
+
+### `where` Bindings
+
+```latex
+x^2 + y^2 \text{ where } x \coloneq 3,\; y \coloneq 4
+```
+
+Parses to a `["Block"]` with variable declarations, assignments, and the body
+expression as the return value.
+
+### `for` Loops
+
+```latex
+\text{for } i \text{ from } 1 \text{ to } 10 \text{ do } i^2
+```
+
+Parses to `["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]`.
+
+### Semicolon Blocks
+
+Semicolons (`;` or `\;`) act as statement separators to build `Block`
+expressions:
+
+```latex
+x \coloneq 3;\; x^2 + 1
+```
+
+Parses to `["Block", ["Declare", "x"], ["Assign", "x", 3], ["Add", ["Power", "x", 2], 1]]`.
+
+<ReadMore path="/compute-engine/guides/compiling/" >
+Read more about **compiling** control structures to JavaScript.
+</ReadMore>
 
 ## Controlling the Flow of Execution
 

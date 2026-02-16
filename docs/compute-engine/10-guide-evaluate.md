@@ -63,7 +63,7 @@ The result includes a `run` function that can be called to evaluate the expressi
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
-const result = compile(ce.parse('2\\pi'));
+const result = compile('2\\pi');
 console.log(result.success ? 'compiled' : 'fallback');
 console.log(result.run?.());
 ```
@@ -83,7 +83,7 @@ perform some operations asynchronously.
 
 ```js
 try {
-  const fact = ce.parse('(70!)!');
+  const fact = parse('(70!)!');
   const factResult = await fact.evaluateAsync();
   console.log(factResult);
 } catch (e) {
@@ -95,10 +95,10 @@ The `expr.evaluateAsync()` method returns a `Promise` that resolves to the resul
 of the evaluation. It accepts the same `numericApproximation` options as `expr.evaluate()`.
 
 It is also possible to interrupt an evaluation, for example by providing the user
-with a pause/cancel button. 
+with a pause/cancel button.
 
 **To make an evaluation interruptible**, use an `AbortController`
-object and a `signal`. 
+object and a `signal`.
 
 For example, to interrupt an evaluation after 500ms:
 
@@ -107,7 +107,7 @@ const abort = new AbortController();
 const signal = abort.signal;
 setTimeout(() => abort.abort(), 500);
 try {
-  const fact = ce.parse('(70!)!');
+  const fact = parse('(70!)!');
   const factResult = await fact.evaluateAsync({ signal });
   console.log(factResult);
 } catch (e) {

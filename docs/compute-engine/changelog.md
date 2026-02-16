@@ -10,6 +10,87 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.51.1 _2026-02-15_
+
+### Features
+
+- **#172 Degrees-Minutes-Seconds (DMS) notation**: Parse and serialize
+  geographic angle notation such as `9°30'15"`. The LaTeX parser now recognizes
+  arc-minute (`'`, `\prime`) and arc-second (`"`, `\doubleprime`) symbols when
+  they follow a degree symbol, producing
+  `Add(Quantity(…, deg), Quantity(…, arcmin), …)` expressions that evaluate and
+  simplify through the existing unit system. Negative angles (e.g. `-45°30'`)
+  are fully supported for latitude/longitude coordinates.
+- **`dmsFormat` serialization option**: Set `dmsFormat: true` in
+  `SerializeLatexOptions` to serialize angle quantities as DMS notation (e.g.
+  `Quantity(9.5, deg)` → `9°30'`).
+- **`angleNormalization` serialization option**: Normalize angles during
+  serialization with `'0...360'` (useful for bearings) or `'-180...180'` (useful
+  for longitude). Default is `'none'`.
+- **`realOnly` compilation option**: Pass `{ realOnly: true }` to `compile()` to
+  automatically convert complex `{ re, im }` results to real numbers — returns
+  `re` when `im === 0`, `NaN` otherwise. Useful for plotting and other contexts
+  that only need real-valued output.
+- **`Sinc` function**: Unnormalized cardinal sine `sinc(x) = sin(x)/x` with
+  `sinc(0) = 1`. Includes LaTeX parsing via `\operatorname{sinc}`, JavaScript
+  and interval-arithmetic compilation targets.
+- **Fresnel integrals (`FresnelS`, `FresnelC`)**: Numeric evaluation using
+  Cephes rational Chebyshev approximation, LaTeX parsing via
+  `\operatorname{FresnelS}` / `\operatorname{FresnelC}`, JavaScript and
+  interval-arithmetic compilation targets.
+- **`Heaviside` step function**: `H(x) = 0` for `x < 0`, `1/2` for `x = 0`,
+  `1` for `x > 0`. LaTeX parsing via `\operatorname{Heaviside}`, JavaScript
+  and interval-arithmetic compilation with singularity detection at zero.
+
+### LaTeX Syntax
+
+- **`Which` compilation**: `\begin{cases}` expressions now compile to JavaScript
+  and interval-js targets as chained ternary operators with `NaN` fallback when
+  no condition matches.
+- **`Sum`/`Product` compilation**: `\sum_{k=a}^{b}` and `\prod_{k=a}^{b}`
+  expressions with numeric bounds now compile to JavaScript loops with
+  accumulator variables, including complex number support.
+- **`Loop` compilation**: `Loop`, `Break`, `Continue`, and `Return` operators
+  compile to JavaScript `for` loops wrapped in IIFEs with standard control flow
+  keywords.
+- **Inline `If` syntax**: Parse `\text{if } C \text{ then } A \text{ else } B`
+  (or `\operatorname{if}`) to `["If", C, A, B]` expressions.
+- **`where` syntax**: Parse `E \text{ where } x \coloneq V` to `Block`
+  expressions with implicit variable declarations.
+- **Semicolon block syntax**: Semicolons (`;`, `\;`) act as statement
+  separators, building `Block` expressions with auto-declared variables when
+  assignments are present.
+- **`for` loop syntax**: Parse
+  `\text{for } i \text{ from } a \text{ to } b \text{ do } body` to
+  `["Loop", body, ["Element", "i", ["Range", a, b]]]`.
+
+### Bug Fixes
+
+- **Interval-JS compilation for Gamma functions**: Added missing `gamma` and
+  `gammaln` exports and implementations in the interval-arithmetic library.
+- **Interval-JS graceful fallback**: The `interval-js` target no longer throws
+  when encountering unsupported functions. Unsupported operators now produce
+  `{ success: false }` at compile time, and runtime errors return
+  `{ kind: "entire" }` instead of propagating.
+- **`CompilationResult.run` type signature**: The TypeScript type for `run` now
+  correctly reflects the actual calling convention (`(...args: unknown[])`)
+  instead of the previous misleading `(...args: (number | {re, im})[])`.
+- **`Loop` compilation for interval-js target**: Loop counter now uses raw
+  numbers (not `_IA.point()`) for the `for` statement, with loop index
+  references properly wrapped in the body. Conditions in `if`/`break`/
+  `continue` statements inside loops use scalar comparisons instead of
+  interval comparison functions.
+
+### Other Changes
+
+- Updated color palettes
+- Deduplicated runtime helper object (`SYS_HELPERS`) shared between
+  `ComputeEngineFunction` and `ComputeEngineFunctionLiteral` in compilation
+  target
+- Centralized `sinc` implementation in `numerics/special-functions.ts` (shared
+  by library evaluation and JS compilation runtime)
+- Removed dead `args === null` checks in compilation base class
+
 ## 0.51.0 _2026-02-14_
 
 ### Colors
@@ -26,8 +107,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   using OKLCh color space with shorter-arc hue interpolation. Includes 8
   sequential palettes (viridis, inferno, magma, plasma, cividis, turbo, rocket,
   mako), 6 categorical palettes (graph6, spectrum6, spectrum12, tableau10,
-  tycho11, kelly22), and 12 diverging palettes (roma, vik, broc, rdbu,
-  coolwarm, ocean-balance, plus reversed variants).
+  tycho11, kelly22), and 12 diverging palettes (roma, vik, broc, rdbu, coolwarm,
+  ocean-balance, plus reversed variants).
 - **`ColorToColorspace`**: Convert an sRGB color (string or `Tuple`) to
   components in `"rgb"`, `"hsl"`, `"oklch"`, or `"oklab"` (alias `"lab"`).
   Preserves alpha when present.
@@ -35,20 +116,20 @@ import ChangeLog from '@site/src/components/ChangeLog';
   sRGB `Tuple`. Accepts the same color space names as `ColorToColorspace`.
 - **`ColorToString`**: Convert a color (string or sRGB `Tuple`) to a formatted
   string. Supports optional format argument: `"hex"` (default), `"rgb"`,
-  `"hsl"`, or `"oklch"` for CSS-style output. Alpha is included when not
-  equal to 1.
+  `"hsl"`, or `"oklch"` for CSS-style output. Alpha is included when not equal
+  to 1.
 - **`ColorMix`**: Blend two colors in OKLCh space with an optional ratio
   (default 0.5). Accepts color strings or sRGB `Tuple` values. Interpolates
   lightness and chroma linearly, hue with shorter-arc interpolation.
-- **`ColorContrast`**: Compute the APCA contrast ratio between a background
-  and foreground color. Returns a positive value for dark-on-light and
-  negative for light-on-dark.
+- **`ColorContrast`**: Compute the APCA contrast ratio between a background and
+  foreground color. Returns a positive value for dark-on-light and negative for
+  light-on-dark.
 - **`ContrastingColor`**: Choose the foreground color with better APCA contrast
   against a background. With one argument, picks between white and black. With
   three arguments, picks the better of two foreground candidates.
 - **LaTeX color support**: `\textcolor{color}{body}`, `\colorbox{color}{body}`,
-  and `\boxed{body}` now roundtrip through `Annotated` expressions. Parsing
-  and serialization are handled in the core `Annotated` infrastructure.
+  and `\boxed{body}` now roundtrip through `Annotated` expressions. Parsing and
+  serialization are handled in the core `Annotated` infrastructure.
 - **LaTeX font annotations**: `\textbf`, `\textit`, `\texttt`, `\textsf`,
   `\textup` now serialize correctly from `Annotated` expressions via
   `fontWeight`, `fontStyle`, and `fontFamily` dict keys.
@@ -59,8 +140,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `oklab(L a b / alpha)` syntax, matching the existing `oklch()` support.
 - **GPU compilation**: `ColorMix`, `ColorContrast`, `ContrastingColor`,
   `ColorToColorspace`, and `ColorFromColorspace` now compile to GLSL and WGSL.
-  Preamble functions provide sRGB ↔ OKLab ↔ OKLCh conversion, color mixing
-  with shorter-arc hue interpolation, and APCA contrast on the GPU.
+  Preamble functions provide sRGB ↔ OKLab ↔ OKLCh conversion, color mixing with
+  shorter-arc hue interpolation, and APCA contrast on the GPU.
 - Added `rgbToHsl()` conversion function. Exported `hslToRgb()` (previously
   private).
 

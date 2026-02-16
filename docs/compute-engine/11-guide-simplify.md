@@ -106,10 +106,10 @@ For example:
 - $ \sqrt{a^2 - 2ab + b^2} $ simplifies to $ |a - b| $
 
 ```javascript
-ce.parse('\\sqrt{x^2 + 2x + 1}').simplify().latex;
+parse('\\sqrt{x^2 + 2x + 1}').simplify().latex;
 // ➔ "|x+1|"
 
-ce.parse('\\sqrt{4x^2 + 12x + 9}').simplify().latex;
+parse('\\sqrt{4x^2 + 12x + 9}').simplify().latex;
 // ➔ "|2x+3|"
 ```
 
@@ -122,15 +122,14 @@ For more control over polynomial form, use `Factor` and `Expand`:
 
 ```javascript
 // Factor a polynomial
-ce.parse('x^2 + 5x + 6').factor().latex;
+factor('x^2 + 5x + 6').latex;
 // ➔ "(x+2)(x+3)"
 
-ce.parse('x^2 - 4').factor().latex;
+factor('x^2 - 4').latex;
 // ➔ "(x-2)(x+2)"
 
 // Expand a product
-// import { expand } from '@cortex-js/compute-engine';
-expand(ce.parse('(x+1)(x+2)')).latex;
+expand('(x+1)(x+2)').latex;
 // ➔ "x^2+3x+2"
 ```
 
@@ -196,13 +195,13 @@ of the indices:
 | `root(root(x, m), n)` | `root(m·n)(x)` |
 
 ```javascript
-ce.box(['Sqrt', ['Sqrt', 'x']]).simplify().latex;
+box(['Sqrt', ['Sqrt', 'x']]).simplify().latex;
 // ➔ "\\sqrt[4]{x}"
 
-ce.box(['Root', ['Root', 'x', 3], 2]).simplify().latex;
+box(['Root', ['Root', 'x', 3], 2]).simplify().latex;
 // ➔ "\\sqrt[6]{x}"
 
-ce.box(['Sqrt', ['Root', 'x', 3]]).simplify().latex;
+box(['Sqrt', ['Root', 'x', 3]]).simplify().latex;
 // ➔ "\\sqrt[6]{x}"
 ```
 
@@ -234,7 +233,7 @@ There are two ways to apply trigonometric simplification:
 **Option 1: Strategy option with `simplify()`**
 
 ```javascript
-const expr = ce.parse("\\sin^2(x) + \\cos^2(x)");
+const expr = parse("\\sin^2(x) + \\cos^2(x)");
 const simplified = expr.simplify({ strategy: 'fu' });
 // Returns: 1
 ```
@@ -242,7 +241,7 @@ const simplified = expr.simplify({ strategy: 'fu' });
 **Option 2: Dedicated `trigSimplify()` method**
 
 ```javascript
-const expr = ce.parse("2\\sin(x)\\cos(x)");
+const expr = parse("2\\sin(x)\\cos(x)");
 const simplified = expr.trigSimplify();
 // Returns: sin(2x)
 ```
