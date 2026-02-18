@@ -326,7 +326,7 @@ const matrix = [[1,2,3], [4,5,6], [7,8,9]];
 
 ce.declare("M", {
   subscriptEvaluate: (subscript, { engine }) => {
-    if (isFunction(subscript) && subscript.operator === "Tuple") {
+    if (isFunction(subscript, "Tuple")) {
       const [i, j] = subscript.ops;
       const row = matrix[i.re - 1];  // 1-indexed
       if (row && row[j.re - 1] !== undefined) {

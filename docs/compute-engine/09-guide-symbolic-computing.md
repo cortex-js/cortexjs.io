@@ -83,7 +83,10 @@ they represent the same mathematical object.
 
 The `lhs.isSame(rhs)` function returns true if `lhs` and `rhs` are structurally
 exactly identical, that is each sub-expression is recursively identical in `lhs`
-and `rhs`.
+and `rhs`. The argument can be an `Expression` or a JavaScript primitive
+(`number`, `bigint`, `boolean`, `string`).
+
+This is a fast, exact check — no evaluation is performed.
 
 - \\(1 + 1 \\) and \\( 2 \\) are not structurally equal, one is a sum of two
   integers, the other is an integer
@@ -172,6 +175,28 @@ console.log('isEqual?', a.isEqual(b));
 ```
 
 
+### Smart Comparison: `is()`
+
+The `lhs.is(rhs)` method provides a convenient middle ground between `isSame()`
+and `isEqual()`. It first tries an exact structural check (like `isSame()`), and
+if that fails and the expression is **constant** (no free variables), it
+evaluates numerically and compares within `engine.tolerance`.
+
+This is useful when checking whether an expression evaluates to a known value
+without the overhead of a full `isEqual()` call:
+
+```live show-line-numbers
+console.log(ce.parse('\\cos(\\frac{\\pi}{2})').is(0));   // true
+console.log(ce.parse('\\sin(\\pi)').is(0));               // true
+console.log(ce.parse('\\cos(0)').is(1));                  // true
+console.log(ce.number(1e-17).is(0));                      // false (literal)
+console.log(ce.parse('x + 1').is(1));                     // false (not constant)
+```
+
+For **literal numbers** (created with `ce.number()`), `is()` behaves identically
+to `isSame()` — no tolerance is applied. Tolerance only kicks in for expressions
+that require evaluation, such as `\sin(\pi)`.
+
 
 ### Other Comparisons
 
@@ -180,14 +205,23 @@ console.log('isEqual?', a.isEqual(b));
 |                                          |                                        |
 | :--------------------------------------- | :------------------------------------- |
 | `lhs === rhs`                            | If true, same box expression instances |
-| `lhs.isSame(rhs)`                        | Structural equality                    |
-| `lhs.isEqual(rhs)`                       | Mathematical equality                  |
+| `lhs.isSame(rhs)`                        | Structural equality (fast, exact, no evaluation). Accepts primitives. |
+| `lhs.is(rhs)`                            | Smart check: structural first, then numeric evaluation fallback for constant expressions (within `engine.tolerance`). For literal numbers, same as `isSame()`. |
+| `lhs.isEqual(rhs)`                       | Mathematical equality (full evaluation). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
-| `lhs.is(rhs)`                            | Synonym for `lhs.isSame(rhs)`, but the argument of `is()` can be a boolean or number.                 |
 | `ce.box(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
 | `ce.box(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)`                 |
 
 </div>
+
+:::info[Choosing the Right Comparison]
+- Use **`isSame()`** when you know the exact value you're comparing against
+  (e.g., checking if an operand is `0` or `1` in a simplification rule).
+- Use **`is()`** when the expression might need evaluation to reveal its value
+  (e.g., checking user input like `\cos(\pi/2)` against `0`).
+- Use **`isEqual()`** for full mathematical equality, including symbolic
+  expressions with unknowns.
+:::
 
 ## Replacing a Symbol in an Expression
 

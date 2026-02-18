@@ -306,27 +306,72 @@ The order in which forms are specified matters. For example, applying `"Number"`
 before `"Power"` ensures that numeric literals are resolved before power
 simplifications are attempted.
 
+## Comparing Expressions Structurally
+
+In some applications — for example checking that a student used the right
+*method* to solve a problem — you want to compare expressions by structure
+rather than by value. The expression \\(3 \times 2 + 1\\) should be equivalent
+to \\(1 + 2 \times 3\\) (same operations, different order), but **not** to
+\\(7\\) (the numeric result) or \\(6 + 1\\) (different operations).
+
+Use `form: ['Flatten', 'Order']` with `isSame()` for this:
+
+```live
+const a = ce.parse('3\\times2+1', { form: ['Flatten', 'Order'] });
+const b = ce.parse('1+2\\times3', { form: ['Flatten', 'Order'] });
+const c = ce.parse('1+(3\\times2)', { form: ['Flatten', 'Order'] });
+const d = ce.parse('7', { form: ['Flatten', 'Order'] });
+
+console.log(a.isSame(b)); // ➔ true  (commutativity)
+console.log(a.isSame(c)); // ➔ true  (parentheses ignored)
+console.log(a.isSame(d)); // ➔ false (different structure)
+```
+
+This partial canonicalization:
+
+- **`Flatten`**: removes parentheses (Delimiters) and flattens associative
+  operations like \\(a + (b + c) \to a + b + c\\)
+- **`Order`**: sorts commutative operands into a consistent order so that
+  \\(a + b\\) and \\(b + a\\) have the same structure
+
+Unlike the full canonical form, it does **not** evaluate numeric expressions:
+\\(3 \times 2\\) stays as `["Multiply", 2, 3]` rather than being folded to `6`.
+
+You can combine this with `isEqual()` to give differentiated feedback:
+
+```js
+const goodAnswer = ce.parse(answerLatex, { form: ['Flatten', 'Order'] });
+const input = ce.parse(inputLatex, { form: ['Flatten', 'Order'] });
+
+if (goodAnswer.isSame(input)) {
+  // Correct method — structurally equivalent
+} else if (goodAnswer.isEqual(input)) {
+  // Right numeric value but wrong method
+} else {
+  // Incorrect
+}
+```
+
+If you only need binding (so that operator definitions are available and
+arithmetic methods like `.add()` and `.mul()` work) without any normalization,
+use `form: 'structural'`. This preserves the original operand order and
+structure.
+
 ## Custom Transformations
 
-You can also define your own transformations to apply to an expression to
-obtain a custom canonical form.
-
-For example, let's say you want to compare the structural form of two expressions
-but ignoring any extra parentheses. You could define a transformation like this:
+You can define your own transformations to apply to an expression to
+obtain a custom form. The `expr.map()` method visits every sub-expression,
+which is useful for structural transforms:
 
 ```js
 import { isFunction } from '@cortex-js/compute-engine';
 
+// Remove all Delimiter wrappers (parentheses)
 const deparenthesize = (expr) =>
-  expr.map((e) => (isFunction(e) && e.operator === 'Delimiter' ? e.op1 : e));
-```
-You can then apply this transformation to an expression like this:
+  expr.map((e) => (isFunction(e, 'Delimiter') ? e.op1 : e));
 
-```js
 const expr1 = ce.parse('3+4\\times2', { form: 'raw' });
 const expr2 = ce.parse('3+(4\\times(2))', { form: 'raw' });
-const transformedExpr1 = deparenthesize(expr1);
-const transformedExpr2 = deparenthesize(expr2);
-console.log(transformedExpr1.isSame(transformedExpr2));
+console.log(deparenthesize(expr1).isSame(deparenthesize(expr2)));
 // ➔ true
 ```

@@ -10,6 +10,150 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+### 0.52.0 _2026-02-18_
+
+### Features
+
+- **Smart `.is()` / exact `.isSame()` separation**: The `.is()` and `.isSame()`
+  methods on expressions now have distinct roles:
+
+  - **`.isSame(v)`** — Fast exact structural check. No evaluation, no tolerance.
+    Now accepts primitives (`number`, `bigint`, `boolean`, `string`) in addition
+    to `Expression`. This is the method used internally throughout the engine.
+
+  - **`.is(v)`** — Smart check with numeric evaluation fallback. Tries
+    `.isSame()` first; if that fails and the expression is constant (no free
+    variables), evaluates numerically and compares within `engine.tolerance`.
+    For literal numbers, behaves identically to `.isSame()` — tolerance only
+    applies to expressions that require evaluation.
+
+  This resolves a common pain point where `ce.parse('\\cos(\\pi/2)').is(0)`
+  returned `false` because `.is()` was purely structural. Now it returns `true`:
+
+  ```ts
+  ce.parse('\\sin(\\pi)').is(0);            // true  (evaluates, within tolerance)
+  ce.parse('\\cos(\\frac{\\pi}{2})').is(0); // true
+  ce.number(1e-17).is(0);                   // false (literal number, no tolerance)
+  ce.parse('x + 1').is(1);                  // false (not constant, no fallback)
+  ```
+
+- **`numericValue()` convenience helper**: New standalone function that combines
+  the `isNumber()` guard with `.numericValue` access. Returns the numeric value
+  if the expression is a number literal, or `undefined` otherwise. Useful for
+  safely extracting numeric values without verbose ternary patterns:
+
+  ```ts
+  import { numericValue } from '@cortex-js/compute-engine';
+
+  // Before
+  const val = isNumber(expr) ? expr.numericValue : undefined;
+
+  // After
+  const val = numericValue(expr);
+  ```
+
+- **Stochastic equality check for expressions with unknowns**: `expr.isEqual()`
+  now uses a stochastic fallback when symbolic methods (expand + simplify) can't
+  prove equality. Both expressions are evaluated at 50 sample points (9
+  well-known values + 41 random) and compared with relative+absolute tolerance.
+  This detects equivalences like `sin²(x) + cos²(x) = 1`, `(x+y)² = x²+2xy+y²`,
+  and `sin(2x) = 2sin(x)cos(x)` that were previously returned as `undefined`.
+  Singularities (NaN at a sample point) are skipped rather than treated as
+  disagreements. The check also works when the two expressions have different
+  unknowns (e.g. `x - x + y` vs `y`).
+
+- **`expr.freeVariables` property**: New property on `BoxedExpression` that
+  returns the free variables of an expression — symbols that are not constants,
+  not operators, not bound to a value, and not locally scoped by constructs like
+  `Sum` or `Product`. Semantically identical to `expr.unknowns`.
+
+- **New interval-js compilation functions**: Added `Binomial`, `GCD`, `LCM`,
+  `Chop`, `Erf`, `Erfc`, `Exp2`, `Arctan2`, and `Hypot` to the interval-js
+  compilation target, with corresponding interval arithmetic implementations.
+
+- **GLSL/WGSL variable exponent support**: The interval GLSL and WGSL targets
+  now support `Power` with variable exponents (e.g. `(-1)^k`, `x^n`). Previously
+  these threw at compile time. Added `ia_pow_interval()` to both GPU library
+  preambles using four-corner `exp(exp * ln(base))` evaluation with special cases
+  for point-integer exponents and `(-1)^n`.
+
+- **`Factorial`, `Gamma`, `GammaLn` for GLSL/WGSL interval targets**: Added
+  `ia_factorial` (via `ia_gamma(x+1)`) to both GPU targets. Added `ia_gamma`
+  (Lanczos approximation) and `ia_gammaln` (Stirling asymptotic) to the WGSL
+  target, matching existing GLSL implementations.
+
+### Bug Fixes
+
+- **`parse()` with `form: 'structural'` ignored the structural flag**: The
+  `structural` option from `formToInternal()` was dropped in
+  `parseLatexEntrypoint()`, making `ce.parse(s, { form: 'structural' })`
+  behave identically to `{ form: 'raw' }` (unbound, unsorted). Now correctly
+  produces a bound, structural expression.
+
+- **Partial canonicalization with `'Flatten'` form folded numerics**: Using
+  `ce.parse(s, { form: ['Flatten', 'Order'] })` unexpectedly evaluated
+  numeric operands (e.g. `3×2+1` became `7`) because `flattenForm()` used
+  `ce.function()` which defaults to full canonical mode. Now uses `ce._fn()`
+  to preserve operand structure. This enables structural comparison of
+  expressions modulo commutativity and associativity without numeric
+  evaluation — useful for checking the *method* used to solve a problem rather
+  than just the numeric result:
+  ```ts
+  const a = ce.parse('3\\times2+1', { form: ['Flatten', 'Order'] });
+  const b = ce.parse('1+2\\times3', { form: ['Flatten', 'Order'] });
+  a.isSame(b);  // ➔ true  (same structure, different order)
+
+  const c = ce.parse('7', { form: ['Flatten', 'Order'] });
+  a.isSame(c);  // ➔ false (different structure)
+  ```
+
+- **Sum/Product with symbolic bounds compiled incorrectly**: Expressions like
+  `\sum_{k=0}^{n} f(k, x)` where the upper bound is a variable produced loops
+  that iterated 10001 times instead of using the variable `n`. The compilation
+  extracted bounds via `normalizeIndexingSet()` which converted symbolic bounds
+  to `NaN` and fell back to a hardcoded limit. Now bounds are extracted as
+  expressions and compiled to code (e.g. `Math.floor(_.n)` for JS,
+  `Math.floor((_.n).hi)` for interval-js). This fixes Taylor series patterns
+  like `\sum_{k=0}^{n} \frac{(-1)^k x^{2k+1}}{(2k+1)!}` for both JS and
+  interval-js targets.
+
+- **Interval `(-1)^k` returned `empty` instead of correct value**: The
+  `powInterval()` function required positive bases for variable exponents,
+  causing `(-1)^k` patterns in summations (e.g. Taylor series) to fail at
+  runtime. Now correctly delegates to `intPow()` when the exponent is a point
+  interval with an integer value, preserving even/odd parity. Also handles the
+  case where base is `-1` and the exponent spans multiple integers by returning
+  the conservative interval `[-1, 1]`.
+
+- **`Factorial` missing from interval-js compilation target**: Expressions
+  containing `n!` (e.g. `\frac{(-1)^k x^{2k+1}}{(2k+1)!}`) failed interval-js
+  compilation with `success: false`. Added `Factorial` and `Factorial2` interval
+  functions and compilation handlers.
+
+- **`expr.unknowns` included bound variables**: Scoped constructs like `Sum`,
+  `Product`, `Integrate`, and `Block` bind index variables in a local scope, but
+  `expr.unknowns` was reporting them as free unknowns. For example,
+  `\sum_{k=0}^{10} k \cdot x` returned `["k", "x"]` instead of `["x"]`.
+  Now correctly excludes locally bound variables from the result.
+
+- **Symbolic upper bounds missing from `expr.unknowns`**: In expressions like
+  `\sum_{k=0}^{M} k \cdot x`, the symbolic upper bound `M` was incorrectly
+  excluded from `unknowns` because the scope's bindings map captured all symbols
+  referenced during canonicalization. Now extracts bound variables structurally
+  from `Limits`/`Element`/`Assign`/`Declare` expressions, so only true bound
+  variables are excluded. This also fixes `Block` expressions where locally
+  assigned variables (via `Assign` or `Declare`) were reported as unknowns.
+
+- **`Integrate` with symbolic bounds compiled incorrectly**: Same issue as
+  Sum/Product — `compileIntegrate()` used `normalizeIndexingSet()` which
+  converted symbolic bounds to `NaN`. Now uses `extractLimits()` and compiles
+  bounds as expressions.
+
+- **Interval `piecewise` test fix**: Fixed test that incorrectly accessed
+  `result.lo` directly instead of unwrapping the `IntervalResult` envelope
+  (`result.value.lo`). The `piecewise()` function correctly returns
+  `IntervalResult` objects.
+
 ## 0.51.1 _2026-02-15_
 
 ### Features
@@ -38,9 +182,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   Cephes rational Chebyshev approximation, LaTeX parsing via
   `\operatorname{FresnelS}` / `\operatorname{FresnelC}`, JavaScript and
   interval-arithmetic compilation targets.
-- **`Heaviside` step function**: `H(x) = 0` for `x < 0`, `1/2` for `x = 0`,
-  `1` for `x > 0`. LaTeX parsing via `\operatorname{Heaviside}`, JavaScript
-  and interval-arithmetic compilation with singularity detection at zero.
+- **`Heaviside` step function**: `H(x) = 0` for `x < 0`, `1/2` for `x = 0`, `1`
+  for `x > 0`. LaTeX parsing via `\operatorname{Heaviside}`, JavaScript and
+  interval-arithmetic compilation with singularity detection at zero.
 
 ### LaTeX Syntax
 
@@ -78,8 +222,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **`Loop` compilation for interval-js target**: Loop counter now uses raw
   numbers (not `_IA.point()`) for the `for` statement, with loop index
   references properly wrapped in the body. Conditions in `if`/`break`/
-  `continue` statements inside loops use scalar comparisons instead of
-  interval comparison functions.
+  `continue` statements inside loops use scalar comparisons instead of interval
+  comparison functions.
 
 ### Other Changes
 
@@ -343,9 +487,9 @@ now only accessible after narrowing with a type guard.
 
 | Removed from `Expression`             | Access via                                |
 | :------------------------------------ | :---------------------------------------- |
-| `.symbol`                             | `isSymbol(expr)` then `expr.symbol`       |
+| `.symbol`                             | `isSymbol(expr)` or `isSymbol(expr, 'Pi')` then `expr.symbol` |
 | `.string`                             | `isString(expr)` then `expr.string`       |
-| `.ops`, `.nops`, `.op1`/`.op2`/`.op3` | `isFunction(expr)` then `expr.ops` etc.   |
+| `.ops`, `.nops`, `.op1`/`.op2`/`.op3` | `isFunction(expr)` or `isFunction(expr, 'Add')` then `expr.ops` etc. |
 | `.numericValue`, `.isNumberLiteral`   | `isNumber(expr)` then `expr.numericValue` |
 | `.tensor`                             | `isTensor(expr)` then `expr.tensor`       |
 
@@ -357,8 +501,16 @@ if (expr.symbol !== null) console.log(expr.symbol);
 import { isSymbol, sym } from '@cortex-js/compute-engine';
 
 if (isSymbol(expr)) console.log(expr.symbol);
+// isSymbol() accepts an optional symbol name:
+if (isSymbol(expr, 'Pi')) { /* expr is the Pi symbol */ }
 // or use the convenience helper:
 if (sym(expr) === 'Pi') { /* ... */ }
+
+// isFunction() accepts an optional operator name:
+if (isFunction(expr, 'Add')) {
+  // expr is narrowed to a function AND has operator 'Add'
+  console.log(expr.ops);
+}
 ```
 
 Properties that remain on `Expression`: `.operator`, `.re`/`.im`, `.shape`, all

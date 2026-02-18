@@ -26,7 +26,12 @@ n.value = 5;
 console.log("n =", n.value.toString(), ":", n.type);
 ```
 
-**To get a list of all the symbols in an expression** use `expr.symbols`.
+**To get a list of all the symbols in an expression** use `expr.symbols`. This
+includes all symbols, even those bound by scoping constructs like `Sum` or
+`Product`.
+
+**To get only the free variables** (symbols that are not constants, operators, or
+bound by a scoping construct), use `expr.unknowns` or `expr.freeVariables`.
 
 <ReadMore path="/compute-engine/guides/augmenting/" >
 Read more about **adding definitions** for symbols and functions<Icon name="chevron-right-bold" />
@@ -43,7 +48,9 @@ Read more about **scopes**<Icon name="chevron-right-bold" />
 ## Unknowns and Constants
 
 A symbol that has been declared, but has no values associated with it, is said
-to be an **unknown**.
+to be an **unknown**. Use `expr.unknowns` or `expr.freeVariables` to get the
+list of unknowns in an expression. Symbols that are bound by scoping constructs
+(e.g., the index variable `k` in `\sum_{k=0}^{10} k \cdot x`) are excluded.
 
 A symbol whose value cannot be changed is a **constant**. Constants are
 identified by a special flag in their definition.

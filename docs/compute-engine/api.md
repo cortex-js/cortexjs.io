@@ -2368,7 +2368,11 @@ Applicable to canonical and non-canonical expressions.
 readonly symbols: readonly string[];
 ```
 
-All the symbols in the expression, recursively
+All the symbols in the expression, recursively, including
+bound variables (e.g., summation/product index variables).
+
+Use [unknowns](#unknowns) or [freeVariables](#freevariables) to get only the
+symbols that are free (not bound by a scoping construct).
 
 ```js
 const expr = ce.parse('a + b * c + d');
@@ -2392,6 +2396,22 @@ readonly unknowns: readonly string[];
 
 All the symbols used in the expression that do not have a value
 associated with them, i.e. they are declared but not defined.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.freeVariables
+
+```ts
+readonly freeVariables: readonly string[];
+```
+
+The free variables of the expression: symbols that are not constants,
+not operators, not bound to a value, and not locally scoped (e.g.,
+summation/product index variables are excluded).
+
+This is an alias for [unknowns](#unknowns).
 
 </MemberCard>
 
@@ -3446,9 +3466,21 @@ Note that lazy collections are *not* eagerly evaluated.
 is(other): boolean
 ```
 
-Equivalent to `Expression.isSame()` but the argument can be
-a JavaScript primitive. For example, `expr.is(2)` is equivalent to
-`expr.isSame(ce.number(2))`.
+Smart equality check: structural first, then numeric evaluation fallback.
+
+First tries an exact structural check (same as `isSame()`). If that fails
+and the expression is constant (no free variables), evaluates numerically
+and compares within `engine.tolerance`.
+
+For literal numbers (`BoxedNumber`), behaves identically to `isSame()` —
+no tolerance is applied. Tolerance only applies to expressions that
+require evaluation (e.g., `\\sin(\\pi)`).
+
+```typescript
+ce.parse('\\cos(\\frac{\\pi}{2})').is(0)  // true — evaluates, within tolerance
+ce.number(1e-17).is(0)                     // false — literal, no tolerance
+ce.parse('x + 1').is(1)                    // false — not constant
+```
 
 ####### other
 
@@ -3466,11 +3498,20 @@ a JavaScript primitive. For example, `expr.is(2)` is equivalent to
 isSame(rhs): boolean
 ```
 
-Structural/symbolic equality (weak equality).
+Fast exact structural/symbolic equality check.
+
+Returns `true` if the expression is structurally identical to `rhs`.
+For symbols with value bindings, follows the binding (e.g., if `one = 1`,
+then `ce.symbol('one').isSame(1)` is `true`).
+
+Accepts JavaScript primitives: `number`, `bigint`, `boolean`, `string`.
+
+Does **not** evaluate expressions — purely structural.
 
 `ce.parse('1+x', {form: 'raw'}).isSame(ce.parse('x+1', {form: 'raw'}))` is `false`.
 
-See `expr.isEqual()` for mathematical equality.
+See `expr.is()` for a smart check with numeric evaluation fallback,
+and `expr.isEqual()` for full mathematical equality.
 
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
@@ -3478,7 +3519,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### rhs
 
-[`Expression`](#expression-4)
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-4)
 
 </MemberCard>
 
@@ -3573,22 +3614,22 @@ changed to be such that the last two digits are ignored.
 
 Evaluating the expressions may be expensive. Other options to consider
 to compare two expressions include:
-- `expr.isSame(other)` for a structural comparison which does not involve
-  evaluating the expressions.
-- `expr.is(other)` for a comparison of a number literal
+- `expr.isSame(other)` for a fast exact structural comparison (no evaluation)
+- `expr.is(other)` for a smart check that tries structural first, then
+  numeric evaluation fallback for constant expressions
 
 **Examples**
 
 ```js
 let expr = ce.parse('2 + 2');
 console.log(expr.isEqual(4)); // true
-console.log(expr.isSame(ce.parse(4))); // false
-console.log(expr.is(4)); // false
+console.log(expr.isSame(4)); // false (structural only)
+console.log(expr.is(4)); // true (evaluates, within tolerance)
 
 expr = ce.parse('4');
 console.log(expr.isEqual(4)); // true
-console.log(expr.isSame(ce.parse(4))); // true
-console.log(expr.is(4)); // true (fastest)
+console.log(expr.isSame(4)); // true
+console.log(expr.is(4)); // true
 
 ```
 

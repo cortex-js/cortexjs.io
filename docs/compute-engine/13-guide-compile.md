@@ -221,7 +221,10 @@ f.run({ theta: 0.5 }); // ✓ correct → 1.8776
 f.run({ x: 0.5 });     // ✗ wrong key — returns NaN
 ```
 
-**To discover the variable names** in an expression, use `expr.unknowns`:
+**To discover the variable names** in an expression, use `expr.unknowns` (or
+its alias `expr.freeVariables`). These properties return only the free
+variables — symbols that are not constants, operators, or bound by scoping
+constructs like `Sum` or `Product`:
 
 ```live
 console.log(parse("n^2").unknowns);

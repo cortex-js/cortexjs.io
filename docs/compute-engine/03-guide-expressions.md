@@ -297,8 +297,8 @@ and provide type-safe access to properties specific to that expression type:
 | Kind           | Type Guard                  |
 | :------------- | :---------------------------------- |
 | **Number Literal**     | `isNumber(expr)`              |
-| **Function Expression**   | `isFunction(expr)`         |
-| **Symbol**     | `isSymbol(expr)`         |
+| **Function Expression**   | `isFunction(expr)` or `isFunction(expr, 'Add')`  |
+| **Symbol**     | `isSymbol(expr)` or `isSymbol(expr, 'Pi')`  |
 | **String**     | `isString(expr)`         |
 
 </div>
@@ -322,6 +322,11 @@ if (isSymbol(sym)) {
   console.log(sym.symbol);  // Type-safe access to symbol name
 }
 
+// Check for a specific symbol in one step
+if (isSymbol(sym, 'Pi')) {
+  // sym is the Pi symbol
+}
+
 // Check if it's a function and access its operands
 const fn = ce.parse("2 + 3");
 if (isFunction(fn)) {
@@ -329,17 +334,27 @@ if (isFunction(fn)) {
   console.log(fn.ops.length); // 2
   console.log(fn.op1, fn.op2); // Access first and second operands
 }
+
+// Check for a specific operator in one step
+if (isFunction(fn, 'Add')) {
+  // fn is a function expression with operator "Add"
+  console.log(fn.op1, fn.op2);
+}
 ```
 
-For convenience, use the `sym()` helper to get a symbol name without explicit type checking:
+For convenience, use the `sym()` and `numericValue()` helpers to skip
+explicit type checking:
 
 ```js
-import { sym } from '@cortex-js/compute-engine';
+import { sym, numericValue } from '@cortex-js/compute-engine';
 
 const expr = ce.parse("Pi");
 if (sym(expr) === 'Pi') {
   // This is the Pi symbol
 }
+
+// Extract the numeric value of an expression, or undefined if not a number literal
+const val = numericValue(ce.parse("3.14"));  // number | NumericValue | undefined
 ```
 
 
