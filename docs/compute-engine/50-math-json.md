@@ -885,3 +885,16 @@ Library.
 Read more about **Adding New Definitions**<Icon name="chevron-right-bold" />
 </ReadMore>
 
+## Implementations
+
+In addition to the JavaScript implementation available here, implementations
+of MathJSON for other languages are available from the projects below.
+
+### Julia
+
+- [https://github.com/s-celles/MathJSON.jl](https://github.com/s-celles/MathJSON.jl).
+
+
+### Python
+
+- [https://pypi.org/project/mathjson-solver/](https://pypi.org/project/mathjson-solver/)

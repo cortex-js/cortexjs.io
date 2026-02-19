@@ -10,13 +10,88 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+### Coming Soon
+
+- **Fix `;\;` parsing in semicolon blocks**: Semicolons followed by LaTeX visual
+  spacing commands (`\;`, `\,`, `\quad`, etc.) no longer produce spurious
+  `Nothing` nodes in the parse tree. Previously, `a \coloneq x^2;\; (a+1)`
+  would include a `Nothing` operand in the Block, making `isValid` return
+  `false` and causing compilation to fail. The parser now skips visual spacing
+  after semicolon separators.
+
+- **Fix `\text{if}` parsing with `\;` spacing**: The `\text{if}\; x \geq 0
+  \;\text{then}\; 1 \;\text{else}\; 0` pattern now parses correctly as an `If`
+  expression. Previously, `\;` before `\text{then}` or `\text{else}` prevented
+  keyword detection, producing a `Tuple` instead.
+
+- **Block serializer uses `; ` separator**: The Block serializer now emits `; `
+  instead of `;\; ` between statements, preventing round-trip serialization from
+  reintroducing the `\;` parsing issue.
+
+- **Block compiler filters `Nothing` operands**: As defense-in-depth, the Block
+  compiler now filters out `Nothing` symbols and empty compilation results
+  before generating the block IIFE.
+
+- **Subscripted variable names in blocks**: Subscripted identifiers like `r_1`
+  are now treated as compound symbols (not `Subscript` expressions) when the
+  base is not a known collection. This means `r_1 \coloneq x^2; \frac{1}{r_1}`
+  correctly declares and assigns to a local variable named `r_1`.
+
+- **Selective GLSL interval preamble**: The interval-GLSL compilation target now
+  emits only the preamble functions actually used by the compiled expression
+  (plus their transitive dependencies), instead of the full ~29KB library.
+  Typical preambles are 60–80% smaller.
+
+- **Selective WGSL interval preamble**: The interval-WGSL compilation target now
+  also emits only the preamble functions actually used by the compiled
+  expression, matching the GLSL target optimization.
+
+- **Fix recursive GLSL gamma function**: The `_gpu_gamma()` preamble in the GPU
+  and interval-GLSL compilation targets used recursion for the reflection formula
+  (z < 0.5), which is illegal in GLSL. Replaced with a non-recursive
+  implementation that inlines the Lanczos approximation for both branches.
+
+- **Non-strict parser supports exponents on bare functions**: In non-strict mode
+  (`strict: false`), bare function names like `sin`, `cos`, `tan` can now
+  include an exponent before the argument list. For example, `sin^2(x)` and
+  `cos^{10}(x)` are now correctly parsed as `["Power", ["Sin", "x"], 2]`,
+  matching the behavior of their LaTeX counterparts `\sin^2(x)` and
+  `\cos^{10}(x)`.
+
+- **Unicode superscript and subscript digit support**: The LaTeX parser now
+  recognizes Unicode superscript digits (`⁰¹²³⁴⁵⁶⁷⁸⁹⁻`) and subscript digits
+  (`₀₁₂₃₄₅₆₇₈₉₋`), converting them to `^{...}` and `_{...}` respectively.
+  This works in all parsing modes. For example, `x²` parses as `x^{2}`,
+  `sin²(x)` as `\sin^{2}(x)`, `x⁻²` as `x^{-2}`, and `x₁₂` as `x_{12}`.
+
+- **`.is()` now works with assigned variables**: Previously, `.is()` only
+  evaluated expressions made entirely of declared constants (like `Pi`). Now it
+  correctly evaluates any expression with no free variables, including those
+  containing variables with assigned values:
+
+  ```ts
+  ce.assign('v', 2);
+  ce.parse('1 + 4 / v').is(3);  // true (was false before)
+  ce.parse('1 + 4 / x').is(3);  // false (x is free)
+  ```
+
+- **`.is()` accepts an optional `tolerance` parameter**: When provided, it
+  overrides `engine.tolerance` for the numeric comparison. This applies to both
+  evaluated expressions and literal numbers:
+
+  ```ts
+  ce.parse('\\pi').is(3.14, 0.01);   // true  (within custom tolerance)
+  ce.parse('\\pi').is(3.14);          // false (not within engine.tolerance)
+  ce.number(1e-17).is(0, 1e-16);     // true  (explicit tolerance on literal)
+  ce.number(1e-17).is(0);            // false (no tolerance for literals)
+  ```
+
 ### 0.52.0 _2026-02-18_
 
 ### Features
 
 - **Smart `.is()` / exact `.isSame()` separation**: The `.is()` and `.isSame()`
   methods on expressions now have distinct roles:
-
   - **`.isSame(v)`** — Fast exact structural check. No evaluation, no tolerance.
     Now accepts primitives (`number`, `bigint`, `boolean`, `string`) in addition
     to `Expression`. This is the method used internally throughout the engine.
@@ -74,8 +149,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **GLSL/WGSL variable exponent support**: The interval GLSL and WGSL targets
   now support `Power` with variable exponents (e.g. `(-1)^k`, `x^n`). Previously
   these threw at compile time. Added `ia_pow_interval()` to both GPU library
-  preambles using four-corner `exp(exp * ln(base))` evaluation with special cases
-  for point-integer exponents and `(-1)^n`.
+  preambles using four-corner `exp(exp * ln(base))` evaluation with special
+  cases for point-integer exponents and `(-1)^n`.
 
 - **`Factorial`, `Gamma`, `GammaLn` for GLSL/WGSL interval targets**: Added
   `ia_factorial` (via `ia_gamma(x+1)`) to both GPU targets. Added `ia_gamma`
@@ -86,18 +161,19 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 - **`parse()` with `form: 'structural'` ignored the structural flag**: The
   `structural` option from `formToInternal()` was dropped in
-  `parseLatexEntrypoint()`, making `ce.parse(s, { form: 'structural' })`
-  behave identically to `{ form: 'raw' }` (unbound, unsorted). Now correctly
-  produces a bound, structural expression.
+  `parseLatexEntrypoint()`, making `ce.parse(s, { form: 'structural' })` behave
+  identically to `{ form: 'raw' }` (unbound, unsorted). Now correctly produces a
+  bound, structural expression.
 
 - **Partial canonicalization with `'Flatten'` form folded numerics**: Using
-  `ce.parse(s, { form: ['Flatten', 'Order'] })` unexpectedly evaluated
-  numeric operands (e.g. `3×2+1` became `7`) because `flattenForm()` used
-  `ce.function()` which defaults to full canonical mode. Now uses `ce._fn()`
-  to preserve operand structure. This enables structural comparison of
-  expressions modulo commutativity and associativity without numeric
-  evaluation — useful for checking the *method* used to solve a problem rather
-  than just the numeric result:
+  `ce.parse(s, { form: ['Flatten', 'Order'] })` unexpectedly evaluated numeric
+  operands (e.g. `3×2+1` became `7`) because `flattenForm()` used
+  `ce.function()` which defaults to full canonical mode. Now uses `ce._fn()` to
+  preserve operand structure. This enables structural comparison of expressions
+  modulo commutativity and associativity without numeric evaluation — useful for
+  checking the _method_ used to solve a problem rather than just the numeric
+  result:
+
   ```ts
   const a = ce.parse('3\\times2+1', { form: ['Flatten', 'Order'] });
   const b = ce.parse('1+2\\times3', { form: ['Flatten', 'Order'] });
@@ -133,8 +209,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **`expr.unknowns` included bound variables**: Scoped constructs like `Sum`,
   `Product`, `Integrate`, and `Block` bind index variables in a local scope, but
   `expr.unknowns` was reporting them as free unknowns. For example,
-  `\sum_{k=0}^{10} k \cdot x` returned `["k", "x"]` instead of `["x"]`.
-  Now correctly excludes locally bound variables from the result.
+  `\sum_{k=0}^{10} k \cdot x` returned `["k", "x"]` instead of `["x"]`. Now
+  correctly excludes locally bound variables from the result.
 
 - **Symbolic upper bounds missing from `expr.unknowns`**: In expressions like
   `\sum_{k=0}^{M} k \cdot x`, the symbolic upper bound `M` was incorrectly
@@ -485,13 +561,13 @@ Properties that were previously on all `Expression` instances (returning
 `undefined` when not applicable) have been moved to role interfaces. They are
 now only accessible after narrowing with a type guard.
 
-| Removed from `Expression`             | Access via                                |
-| :------------------------------------ | :---------------------------------------- |
-| `.symbol`                             | `isSymbol(expr)` or `isSymbol(expr, 'Pi')` then `expr.symbol` |
-| `.string`                             | `isString(expr)` then `expr.string`       |
+| Removed from `Expression`             | Access via                                                           |
+| :------------------------------------ | :------------------------------------------------------------------- |
+| `.symbol`                             | `isSymbol(expr)` or `isSymbol(expr, 'Pi')` then `expr.symbol`        |
+| `.string`                             | `isString(expr)` then `expr.string`                                  |
 | `.ops`, `.nops`, `.op1`/`.op2`/`.op3` | `isFunction(expr)` or `isFunction(expr, 'Add')` then `expr.ops` etc. |
-| `.numericValue`, `.isNumberLiteral`   | `isNumber(expr)` then `expr.numericValue` |
-| `.tensor`                             | `isTensor(expr)` then `expr.tensor`       |
+| `.numericValue`, `.isNumberLiteral`   | `isNumber(expr)` then `expr.numericValue`                            |
+| `.tensor`                             | `isTensor(expr)` then `expr.tensor`                                  |
 
 ```ts
 // Before
