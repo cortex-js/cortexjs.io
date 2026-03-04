@@ -60,39 +60,14 @@ This interface is augmented by `types-engine.ts` with the concrete
 
 <MemberCard>
 
-##### ExpressionComputeEngine.latexDictionary
+##### ExpressionComputeEngine.latexSyntax
 
 ```ts
-latexDictionary: readonly OnlyFirst<
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry, {} & 
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry>[];
+readonly latexSyntax: ILatexSyntax;
 ```
 
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.decimalSeparator
-
-```ts
-decimalSeparator: string;
-```
+The LatexSyntax instance used for LaTeX parsing/serialization.
+ `undefined` when no LatexSyntax was provided to the constructor.
 
 </MemberCard>
 
@@ -293,7 +268,7 @@ recursionLimit: number;
 ##### ExpressionComputeEngine.bignum()
 
 ```ts
-bignum: (a) => Decimal;
+bignum: (a) => BigDecimal;
 ```
 
 </MemberCard>
@@ -402,36 +377,36 @@ chop(n): number
 ###### chop(n)
 
 ```ts
-chop(n): 0 | Decimal
+chop(n): 0 | BigDecimal
 ```
 
 ####### n
 
-`Decimal`
+`BigDecimal`
 
 ###### chop(n)
 
 ```ts
-chop(n): number | Decimal
+chop(n): number | BigDecimal
 ```
 
 ####### n
 
-`number` | `Decimal`
+`number` | `BigDecimal`
 
 </MemberCard>
 
 <MemberCard>
 
-##### ExpressionComputeEngine.box()
+##### ExpressionComputeEngine.expr()
 
 ```ts
-box(expr, options?): Expression
+expr(expr, options?): Expression
 ```
 
 ####### expr
 
-[`NumericValue`](#numericvalue) | [`ExpressionInput`](#expressioninput)
+[`NumericValue`](#abstract-numericvalue) | [`ExpressionInput`](#expressioninput)
 
 ####### options?
 
@@ -442,6 +417,77 @@ box(expr, options?): Expression
 ####### scope?
 
 `Scope`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~box()~~
+
+```ts
+box(expr, options?): Expression
+```
+
+####### expr
+
+[`NumericValue`](#abstract-numericvalue) | [`ExpressionInput`](#expressioninput)
+
+####### options?
+
+####### form?
+
+[`FormOption`](#formoption)
+
+####### scope?
+
+`Scope`
+
+###### Deprecated
+
+Use `expr()` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.parse()
+
+###### parse(latex, options)
+
+```ts
+parse(latex, options?): Expression
+```
+
+Parse a LaTeX string and return a boxed expression.
+
+This is a convenience method equivalent to `ce.expr(parse(latex))`,
+but uses the engine's symbol definitions for better parsing accuracy.
+
+####### latex
+
+`string`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
+  `form`: [`FormOption`](#formoption);
+ \}
+
+###### parse(latex, options)
+
+```ts
+parse(latex, options?): Expression
+```
+
+####### latex
+
+`string`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
+  `form`: [`FormOption`](#formoption);
+ \}
 
 </MemberCard>
 
@@ -474,70 +520,6 @@ readonly [`ExpressionInput`](#expressioninput)[]
 ####### scope?
 
 `Scope`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.registerCompilationTarget()
-
-```ts
-registerCompilationTarget(name, target): void
-```
-
-Register a custom compilation target.
-
-####### name
-
-`string`
-
-####### target
-
-`LanguageTarget`\<[`Expression`](#expression-4)\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.getCompilationTarget()
-
-```ts
-getCompilationTarget(name): LanguageTarget<Expression>
-```
-
-Get a registered compilation target by name.
-
-####### name
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.listCompilationTargets()
-
-```ts
-listCompilationTargets(): string[]
-```
-
-Return the names of all registered compilation targets.
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.unregisterCompilationTarget()
-
-```ts
-unregisterCompilationTarget(name): void
-```
-
-Remove a registered compilation target.
-
-####### name
-
-`string`
 
 </MemberCard>
 
@@ -683,7 +665,7 @@ tuple(...elements): Expression
 
 ####### elements
 
-...readonly [`Expression`](#expression-4)[]
+...readonly [`Expression`](#expression-3)[]
 
 </MemberCard>
 
@@ -737,60 +719,6 @@ getRuleSet(id?): BoxedRuleSet
 
 <MemberCard>
 
-##### ExpressionComputeEngine.parse()
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): null
-```
-
-####### latex
-
-`null`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): Expression
-```
-
-####### latex
-
-`string`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
-
-###### parse(latex, options)
-
-```ts
-parse(latex, options?): Expression
-```
-
-####### latex
-
-`string`
-
-####### options?
-
-`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
-  `form`: [`FormOption`](#formoption);
- \}
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ExpressionComputeEngine.pushScope()
 
 ```ts
@@ -814,20 +742,6 @@ pushScope(scope?, name?): void
 ```ts
 popScope(): void
 ```
-
-</MemberCard>
-
-<MemberCard>
-
-##### ExpressionComputeEngine.lookupContext()
-
-```ts
-lookupContext(id): EvalContext
-```
-
-####### id
-
-`string`
 
 </MemberCard>
 
@@ -955,12 +869,12 @@ declare(id, def, scope?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`Expression`](#expression-4);
+\| (`ce`) => [`Expression`](#expression-3);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-3);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -1002,11 +916,11 @@ declare(id, def, scope?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluate`:   \| [`Expression`](#expression-4)
-\| (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
-`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluate`:   \| [`Expression`](#expression-3)
+\| (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-3)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-3);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -1031,12 +945,12 @@ declare(id, def, scope?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`Expression`](#expression-4);
+\| (`ce`) => [`Expression`](#expression-3);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-3);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -1078,11 +992,11 @@ declare(id, def, scope?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluate`:   \| [`Expression`](#expression-4)
-\| (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
-`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluate`:   \| [`Expression`](#expression-3)
+\| (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-3)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-3);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -1125,12 +1039,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`Expression`](#expression-4);
+\| (`ce`) => [`Expression`](#expression-3);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-3);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -1172,11 +1086,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluate`:   \| [`Expression`](#expression-4)
-\| (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
-`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluate`:   \| [`Expression`](#expression-3)
+\| (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-3)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-3);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -1201,12 +1115,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 \| [`BoxedType`](#boxedtype);
 `inferred`: `boolean`;
 `value`:   \| [`ExpressionInput`](#expressioninput)
-\| (`ce`) => [`Expression`](#expression-4);
+\| (`ce`) => [`Expression`](#expression-3);
 `eq`: (`a`) => `boolean`;
 `neq`: (`a`) => `boolean`;
 `cmp`: (`a`) => `">"` \| `"<"` \| `"="`;
 `collection`: [`CollectionHandlers`](#collectionhandlers);
-`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-4);
+`subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-3);
 \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
 `signature`:   \| `string`
 \| [`AlgebraicType`](#algebraictype)
@@ -1248,11 +1162,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 `isNonPositive`: `boolean`;
 `even`: (`ops`, `options`) => `boolean`;
 `complexity`: `number`;
-`canonical`: (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluate`:   \| [`Expression`](#expression-4)
-\| (`ops`, `options`) => [`Expression`](#expression-4);
-`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-4)\>;
-`evalDimension`: (`args`, `options`) => [`Expression`](#expression-4);
+`canonical`: (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluate`:   \| [`Expression`](#expression-3)
+\| (`ops`, `options`) => [`Expression`](#expression-3);
+`evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-3)\>;
+`evalDimension`: (`args`, `options`) => [`Expression`](#expression-3);
 `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
 `eq`: (`a`, `b`) => `boolean`;
 `neq`: (`a`, `b`) => `boolean`;
@@ -1275,7 +1189,7 @@ assume(predicate): AssumeResult
 
 ####### predicate
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -1477,7 +1391,7 @@ Look up sequences in OEIS by their terms.
 
 ####### terms
 
-(`number` \| [`Expression`](#expression-4))[]
+(`number` \| [`Expression`](#expression-3))[]
 
 Array of sequence terms to search for
 
@@ -1561,7 +1475,7 @@ ask(pattern): BoxedSubstitution[]
 
 ####### pattern
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -1575,7 +1489,7 @@ verify(query): boolean
 
 ####### query
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -1602,7 +1516,7 @@ Options for `Expression.simplify()`
 ### EvaluateOptions
 
 ```ts
-type EvaluateOptions = KernelEvaluateOptions<Expression>;
+type EvaluateOptions = KernelEvaluateOptions;
 ```
 
 Options for evaluating boxed expressions.
@@ -1680,12 +1594,12 @@ The following properties are applicable to expressions with a value:
 
 To create a boxed expression:
 
-#### `ce.box()` and `ce.parse()`
+#### `ce.expr()` and `ce.parse()`
 
-Use `ce.box()` or `ce.parse()`.
+Use `ce.expr()` or `ce.parse()`.
 
 Use `ce.parse()` to get a boxed expression from a LaTeX string.
-Use `ce.box()` to get a boxed expression from a MathJSON expression.
+Use `ce.expr()` to get a boxed expression from a MathJSON expression.
 
 By default, the result of these methods is a canonical expression. For
 example, if it is a rational literal, it is reduced to its canonical form.
@@ -1704,7 +1618,7 @@ If it is a function expression:
 
 #### `ce.function()`
 
-This is a specialized version of `ce.box()` for creating a new function
+This is a specialized version of `ce.expr()` for creating a new function
 expression.
 
 The canonical handler of the operator is called.
@@ -1863,7 +1777,7 @@ Otherwise, return `NaN` (not a number).
 ##### Expression.bignumRe
 
 ```ts
-readonly bignumRe: Decimal;
+readonly bignumRe: BigDecimal;
 ```
 
 If the value of this expression is a number, return the real part of the
@@ -1885,7 +1799,7 @@ otherwise as a number or `NaN` if the value is not a number.
 ##### Expression.bignumIm
 
 ```ts
-readonly bignumIm: Decimal;
+readonly bignumIm: BigDecimal;
 ```
 
 If the value of this expression is a number, return the imaginary part as
@@ -2035,52 +1949,17 @@ and functions.
 
 <MemberCard>
 
-##### Expression.toLatex()
-
-```ts
-toLatex(options?): string
-```
-
-Serialize to a LaTeX string.
-
-Note that lazy collections are eagerly evaluated.
-
-Will ignore any LaTeX metadata.
-
-####### options?
-
-`Partial`\<[`SerializeLatexOptions`](#serializelatexoptions)\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.latex
-
-LaTeX representation of this expression.
-
-If the expression was parsed from LaTeX, the LaTeX representation is
-the same as the input LaTeX.
-
-To customize the serialization, use `expr.toLatex()`.
-
-Note that lazy collections are eagerly evaluated.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
 ##### Expression.toMathJson()
 
 ```ts
 toMathJson(options?): MathJsonExpression
 ```
 
-Serialize to a MathJSON expression with specified options
+Serialize to a MathJSON expression with specified options.
+
+Use `{ fractionalDigits: 'auto' }` to round arbitrary-precision
+numbers to `ce.precision` significant digits. The default
+(`'max'`) emits all available digits with no rounding.
 
 ####### options?
 
@@ -2110,9 +1989,53 @@ For more control over the serialization, use `expr.toMathJson()`.
 
 Note that lazy collections are *not* eagerly evaluated.
 
+For arbitrary-precision numbers, the full raw `BigDecimal` value is
+emitted with no rounding (same as `toJSON()`). This preserves data
+fidelity for round-tripping but may include trailing digits beyond
+`ce.precision` that are not meaningful. Use
+`toMathJson({ fractionalDigits: 'auto' })` for rounded output.
+
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
 :::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.latex
+
+```ts
+readonly latex: string;
+```
+
+Return a LaTeX representation of this expression.
+
+This is a convenience getter that delegates to the standalone
+`serialize()` function from the `latex-syntax` module.
+
+Numeric values are rounded to `ce.precision` significant digits.
+Noise digits from precision-bounded operations (division,
+transcendentals) are not displayed.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toLatex()
+
+```ts
+toLatex(options?): string
+```
+
+Return a LaTeX representation of this expression with custom
+serialization options.
+
+Numeric values are rounded to `ce.precision` significant digits.
+
+####### options?
+
+`Record`\<`string`, `any`\>
 
 </MemberCard>
 
@@ -2486,7 +2409,7 @@ Addition
 
 ####### rhs
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2502,7 +2425,7 @@ Subtraction
 
 ####### rhs
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2518,7 +2441,7 @@ Multiplication
 
 ####### rhs
 
-`number` | [`NumericValue`](#numericvalue) | [`Expression`](#expression-4)
+`number` | [`NumericValue`](#abstract-numericvalue) | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2534,7 +2457,7 @@ Division
 
 ####### rhs
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2550,7 +2473,7 @@ Power
 
 ####### exp
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2566,7 +2489,7 @@ Exponentiation
 
 ####### exp
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2594,7 +2517,7 @@ Logarithm (natural by default)
 
 ####### base?
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -2619,6 +2542,134 @@ Return this expression expressed as a denominator.
 ##### Expression.numeratorDenominator
 
 Return this expression expressed as a numerator and denominator.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toRational()
+
+```ts
+toRational(): [number, number]
+```
+
+Return the value of this expression as a pair of integer numerator and
+denominator, or `null` if the expression is not a rational number.
+
+- For a `BoxedNumber` with an exact rational value, extracts from the
+  numeric representation.
+- For an integer, returns `[n, 1]`.
+- For a `Divide` or `Rational` function with integer operands, returns
+  `[num, den]`.
+- For everything else, returns `null`.
+
+The returned rational is always in lowest terms.
+
+```typescript
+ce.parse('\\frac{6}{4}').toRational()  // [3, 2]
+ce.parse('7').toRational()              // [7, 1]
+ce.parse('x + 1').toRational()          // null
+ce.number(1.5).toRational()             // null (machine float)
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.factors()
+
+```ts
+factors(): readonly Expression[]
+```
+
+Return the multiplicative factors of this expression as a flat array.
+
+This is a structural decomposition — it does not perform algebraic
+factoring (use `ce.function('Factor', [expr])` for that).
+
+- `Multiply(a, b, c)` returns `[a, b, c]`
+- `Negate(x)` returns `[-1, ...x.factors()]`
+- Anything else returns `[expr]`
+
+```typescript
+ce.parse('2xyz').factors()     // [2, x, y, z]
+ce.parse('-3x').factors()      // [-1, 3, x]
+ce.parse('x + 1').factors()    // [x + 1]
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.polynomialCoefficients()
+
+```ts
+polynomialCoefficients(variable?): readonly Expression[]
+```
+
+Return the coefficients of this expression as a polynomial in `variable`,
+in descending order of degree. Returns `undefined` if the expression is
+not a polynomial in the given variable.
+
+If `variable` is omitted, auto-detects when the expression has exactly
+one unknown. Returns `undefined` if there are zero or multiple unknowns.
+
+```typescript
+ce.parse('x^2 + 2x + 1').polynomialCoefficients('x')  // [1, 2, 1]
+ce.parse('x^3 + 2x + 1').polynomialCoefficients('x')  // [1, 0, 2, 1]
+ce.parse('sin(x)').polynomialCoefficients('x')          // undefined
+ce.parse('x^2 + 5').polynomialCoefficients()            // [1, 0, 5]
+```
+
+Subsumes `isPolynomial`:
+```typescript
+const isPolynomial = expr.polynomialCoefficients('x') !== undefined;
+```
+
+Subsumes `polynomialDegree`:
+```typescript
+const degree = expr.polynomialCoefficients('x')?.length - 1;
+```
+
+When `variable` is an array, the expression must be polynomial in ALL
+listed variables. Coefficients are decomposed by the first variable;
+remaining variables appear as symbolic coefficients.
+
+```typescript
+ce.parse('x^2*y + 3x + y^2').polynomialCoefficients(['x', 'y'])
+// → [y, 3, y²]  (coefficients of x², x¹, x⁰)
+```
+
+####### variable?
+
+`string` | `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.polynomialRoots()
+
+```ts
+polynomialRoots(variable?): readonly Expression[]
+```
+
+Return the roots of this expression treated as a polynomial in `variable`.
+Returns `undefined` if the expression is not a polynomial in the given
+variable. Returns an empty array if no roots can be found.
+
+If `variable` is omitted, auto-detects when the expression has exactly
+one unknown.
+
+```typescript
+ce.parse('x^2 - 5x + 6').polynomialRoots('x')  // [2, 3]
+ce.parse('x^2 + 1').polynomialRoots('x')         // [] (no real roots)
+ce.parse('sin(x)').polynomialRoots('x')           // undefined
+```
+
+####### variable?
+
+`string`
 
 </MemberCard>
 
@@ -2709,7 +2760,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### fn
 
-(`expr`) => [`Expression`](#expression-4)
+(`expr`) => [`Expression`](#expression-3)
 
 ####### options?
 
@@ -2757,7 +2808,7 @@ canonical status. (Canonicalization is opportunistic here, in other words).
 Applicable to canonical and non-canonical expressions.
 
 To match a specific symbol (not a wildcard pattern), the `match` must be
-a `Expression` (e.g., `{ match: ce.box('x'), replace: ... }`).
+a `Expression` (e.g., `{ match: ce.expr('x'), replace: ... }`).
 For simple symbol substitution, consider using `subs()` instead.
 :::
 
@@ -2809,6 +2860,15 @@ wildcard.
 If this expression matches `pattern` but there are no named wildcards,
 return the empty substitution, `{}`.
 
+`pattern` can be:
+- A **string** (LaTeX): single-character symbols are auto-converted to
+  wildcards (e.g., `'ax^2+bx+c'` treats `a`, `b`, `c` as wildcards).
+  Results use unprefixed keys (`{a: 3}` not `{_a: 3}`) and self-matches
+  are filtered out. `useVariations` and `matchMissingTerms` default to
+  `true`. Unprefixed keys are accepted in `substitution`.
+- A **MathJSON array** (e.g., `['Add', '_a', '_b']`): boxed automatically.
+- A **BoxedExpression**: used directly.
+
 Read more about [**patterns and rules**](/compute-engine/guides/patterns-and-rules/).
 
 :::info[Note]
@@ -2817,11 +2877,11 @@ Applicable to canonical and non-canonical expressions.
 
 ####### pattern
 
-[`Expression`](#expression-4)
+[`ExpressionInput`](#expressioninput)
 
 ####### options?
 
-`PatternMatchOptions`\<[`Expression`](#expression-4)\>
+`PatternMatchOptions`\<[`Expression`](#expression-3)\>
 
 </MemberCard>
 
@@ -3076,7 +3136,7 @@ console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y:
 
 ####### vars?
 
-`string` | `Iterable`\<`string`, `any`, `any`\> | [`Expression`](#expression-4) | `Iterable`\<[`Expression`](#expression-4), `any`, `any`\>
+`string` | `Iterable`\<`string`, `any`, `any`\> | [`Expression`](#expression-3) | `Iterable`\<[`Expression`](#expression-3), `any`, `any`\>
 
 </MemberCard>
 
@@ -3091,7 +3151,7 @@ set value(value:
   | number
   | boolean
   | number[]
-  | Decimal
+  | BigDecimal
   | OnlyFirst<{
   re: number;
   im: number;
@@ -3240,7 +3300,7 @@ iterating over the collection.
 
 ####### rhs
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3256,7 +3316,7 @@ Check if this collection is a subset of another collection.
 
 ####### other
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 The other collection to check against.
 
@@ -3344,7 +3404,7 @@ If `key` is a `Expression`, it should be a string.
 
 ####### key
 
-`string` | [`Expression`](#expression-4)
+`string` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3438,6 +3498,12 @@ Note that lazy collections are eagerly evaluated.
 
 Used when coercing a `Expression` to a `String`.
 
+For arbitrary-precision numbers (`BigNumericValue`), the output is
+rounded to `BigDecimal.precision` significant digits. Digits beyond the
+working precision are noise from precision-bounded operations (division,
+transcendentals) and are not displayed. Machine-precision numbers use
+their native `Number.toString()`.
+
 </MemberCard>
 
 <MemberCard>
@@ -3456,6 +3522,12 @@ Based on `Object.toJSON()`.
 
 Note that lazy collections are *not* eagerly evaluated.
 
+The output preserves the full raw `BigDecimal` value with no rounding,
+ensuring lossless round-tripping via `ce.box(expr.json)`. Digits beyond
+`ce.precision` may be present but are not guaranteed to be accurate.
+Use `toMathJson({ fractionalDigits: 'auto' })` for precision-rounded
+MathJSON output.
+
 </MemberCard>
 
 <MemberCard>
@@ -3467,14 +3539,15 @@ is(other, tolerance?): boolean
 ```
 
 Smart equality check: structural first, then numeric evaluation fallback.
+Symmetric: `a.is(b)` always equals `b.is(a)`.
 
 First tries an exact structural check (same as `isSame()`). If that fails
 and the expression is constant (no free variables), evaluates numerically
 and compares within `engine.tolerance`.
 
-For literal numbers (`BoxedNumber`), behaves identically to `isSame()` —
-no tolerance is applied. Tolerance only applies to expressions that
-require evaluation (e.g., `\\sin(\\pi)`).
+For literal numbers compared to primitives (`number`, `bigint`), behaves
+identically to `isSame()` — no tolerance is applied. Tolerance only
+applies to expressions that require evaluation (e.g., `\\sin(\\pi)`).
 
 ```typescript
 ce.parse('\\cos(\\frac{\\pi}{2})').is(0)  // true — evaluates, within tolerance
@@ -3483,9 +3556,14 @@ ce.parse('x + 1').is(1)                    // false — has free variables
 ce.parse('\\pi').is(3.14, 0.01)            // true — within custom tolerance
 ```
 
+After the structural check, attempts to expand both sides (distributing
+products, applying the multinomial theorem, etc.) and re-checks
+structural equality. This catches equivalences like `(x+1)^2` vs
+`x^2+2x+1` even when the expression has free variables.
+
 ####### other
 
-`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-4)
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-3)
 
 ####### tolerance?
 
@@ -3528,7 +3606,7 @@ Applicable to canonical and non-canonical expressions.
 
 ####### rhs
 
-`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-4)
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3546,7 +3624,7 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3564,7 +3642,7 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3582,7 +3660,7 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3600,7 +3678,7 @@ If the expressions cannot be compared, return `undefined`
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3644,7 +3722,7 @@ console.log(expr.is(4)); // true
 
 ####### other
 
-`number` | [`Expression`](#expression-4)
+`number` | [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -3821,6 +3899,16 @@ Obtained via `isNumber()`.
 
 ```ts
 readonly numericValue: number | NumericValue;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### NumberLiteralInterface.isExact
+
+```ts
+readonly isExact: boolean;
 ```
 
 </MemberCard>
@@ -4039,7 +4127,7 @@ contains(rhs): boolean
 
 ####### rhs
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4053,7 +4141,7 @@ subsetOf(other, strict): boolean
 
 ####### other
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 ####### strict
 
@@ -4253,7 +4341,7 @@ type BoxedSubstitution<T> = KernelBoxedSubstitution<T>;
 
 #### Type Parameters
 
-• T = [`Expression`](#expression-4)
+• T = [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4269,7 +4357,7 @@ Control how a pattern is matched to an expression.
 
 #### Type Parameters
 
-• T = [`Expression`](#expression-4)
+• T = [`Expression`](#expression-3)
 
 </MemberCard>
 
@@ -4463,7 +4551,7 @@ Called when evaluating `Subscript(symbol, index)`.
 
 ###### subscript
 
-[`Expression`](#expression-4)
+[`Expression`](#expression-3)
 
 The subscript expression (already evaluated)
 
@@ -5229,36 +5317,6 @@ Symbol and operator definitions
 
 </MemberCard>
 
-<MemberCard>
-
-##### LibraryDefinition.latexDictionary?
-
-```ts
-optional latexDictionary: readonly Partial<OnlyFirst<
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry, {} & 
-  | DefaultEntry
-  | ExpressionEntry
-  | MatchfixEntry
-  | InfixEntry
-  | PostfixEntry
-  | PrefixEntry
-  | EnvironmentEntry
-  | SymbolEntry
-  | FunctionEntry>>[];
-```
-
-LaTeX dictionary entries for parsing/serialization
-
-</MemberCard>
-
 ### BaseCollectionHandlers
 
 These handlers are the primitive operations that can be performed on
@@ -5564,12 +5622,12 @@ Some examples:
 ##### BoxedValueDefinition.value
 
 ```ts
-readonly value: Expression;
+value: Expression;
 ```
 
-This is either the initial value of the symbol (i.e. when a new
- evaluation context is created), or its constant value, if a constant.
- Otherwise, the current value is tracked in the evaluation context.
+The current value of the symbol. For constants, this is immutable.
+ The definition object is the single source of truth — there is no
+ separate evaluation-context values map.
 
 </MemberCard>
 
@@ -7401,7 +7459,7 @@ false
 
 ```typescript
 const ce = new ComputeEngine();
-const angle = ce.box(['Quantity', 9.5, 'deg']);
+const angle = ce.expr(['Quantity', 9.5, 'deg']);
 
 // DMS format
 angle.latex({ dmsFormat: true });  // "9°30'"
@@ -7410,7 +7468,7 @@ angle.latex({ dmsFormat: true });  // "9°30'"
 angle.latex({ dmsFormat: false }); // "9.5°"
 
 // Full DMS notation
-ce.box(['Quantity', 9.504166, 'deg'])
+ce.expr(['Quantity', 9.504166, 'deg'])
   .latex({ dmsFormat: true });     // "9°30'15\""
 ```
 
@@ -7435,22 +7493,22 @@ Useful for geographic coordinates and rotations.
 const ce = new ComputeEngine();
 
 // No normalization (show exact value)
-ce.box(['Degrees', 370])
+ce.expr(['Degrees', 370])
   .latex({ angleNormalization: 'none' });  // "370°"
 
 // Normalize to [0, 360) - useful for bearings
-ce.box(['Degrees', 370])
+ce.expr(['Degrees', 370])
   .latex({ angleNormalization: '0...360' }); // "10°"
 
-ce.box(['Degrees', -45])
+ce.expr(['Degrees', -45])
   .latex({ angleNormalization: '0...360' }); // "315°"
 
 // Normalize to [-180, 180] - useful for longitude
-ce.box(['Degrees', 190])
+ce.expr(['Degrees', 190])
   .latex({ angleNormalization: '-180...180' }); // "-170°"
 
 // Combine with DMS format
-ce.box(['Degrees', 370])
+ce.expr(['Degrees', 370])
   .latex({
     dmsFormat: true,
     angleNormalization: '0...360'
@@ -7737,7 +7795,7 @@ The value is equal to `(decimal * rational * sqrt(radical)) + im * i`
 
 ```ts
 type NumericValueData = {
-  re: Decimal | number;
+  re: BigDecimal | number;
   im: number;
 };
 ```
@@ -7894,7 +7952,7 @@ isZeroWithTolerance(_tolerance): boolean
 
 ####### \_tolerance
 
-`number` | `Decimal`
+`number` | `BigDecimal`
 
 </MemberCard>
 
@@ -7952,7 +8010,7 @@ abstract add(other): NumericValue
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -7966,7 +8024,7 @@ abstract sub(other): NumericValue
 
 ####### other
 
-[`NumericValue`](#numericvalue)
+[`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -7980,7 +8038,7 @@ abstract mul(other): NumericValue
 
 ####### other
 
-`number` | `Decimal` | [`NumericValue`](#numericvalue)
+`number` | `BigDecimal` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -7994,7 +8052,7 @@ abstract div(other): NumericValue
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -8008,7 +8066,7 @@ abstract pow(n): NumericValue
 
 ####### n
 
-`number` | [`NumericValue`](#numericvalue) | \{
+`number` | [`NumericValue`](#abstract-numericvalue) | \{
 `re`: `number`;
 `im`: `number`;
 \}
@@ -8049,7 +8107,7 @@ abstract gcd(other): NumericValue
 
 ####### other
 
-[`NumericValue`](#numericvalue)
+[`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -8127,7 +8185,7 @@ abstract eq(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -8141,7 +8199,7 @@ abstract lt(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -8155,7 +8213,7 @@ abstract lte(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -8169,7 +8227,7 @@ abstract gt(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -8183,7 +8241,7 @@ abstract gte(other): boolean
 
 ####### other
 
-`number` | [`NumericValue`](#numericvalue)
+`number` | [`NumericValue`](#abstract-numericvalue)
 
 </MemberCard>
 
@@ -8273,104 +8331,8 @@ a pair of big integers.
 ### BigNum
 
 ```ts
-type BigNum = Decimal;
+type BigNum = BigDecimal;
 ```
-
-</MemberCard>
-
-<MemberCard>
-
-### BigNumFactory()
-
-```ts
-type BigNumFactory = (value) => Decimal;
-```
-
-</MemberCard>
-
-### IBigNum
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_NAN
-
-```ts
-readonly _BIGNUM_NAN: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_ZERO
-
-```ts
-readonly _BIGNUM_ZERO: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_ONE
-
-```ts
-readonly _BIGNUM_ONE: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_TWO
-
-```ts
-readonly _BIGNUM_TWO: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_HALF
-
-```ts
-readonly _BIGNUM_HALF: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_PI
-
-```ts
-readonly _BIGNUM_PI: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.\_BIGNUM\_NEGATIVE\_ONE
-
-```ts
-readonly _BIGNUM_NEGATIVE_ONE: Decimal;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IBigNum.bignum()
-
-```ts
-bignum(value): Decimal
-```
-
-####### value
-
-`string` | `number` | `bigint` | `Decimal`
 
 </MemberCard>
 
@@ -8509,6 +8471,47 @@ type SymbolTable = {
   ids: {};
 };
 ```
+
+</MemberCard>
+
+### ILatexSyntax
+
+Minimal interface for a LaTeX parser/serializer.
+ Structurally compatible with `LatexSyntax` without importing it.
+
+<MemberCard>
+
+##### ILatexSyntax.parse()
+
+```ts
+parse(latex, options?): MathJsonExpression
+```
+
+####### latex
+
+`string`
+
+####### options?
+
+`Partial`\<[`ParseLatexOptions`](#parselatexoptions)\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### ILatexSyntax.serialize()
+
+```ts
+serialize(expr, options?): string
+```
+
+####### expr
+
+[`MathJsonExpression`](#mathjsonexpression)
+
+####### options?
+
+`Record`\<`string`, `unknown`\>
 
 </MemberCard>
 

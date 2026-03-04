@@ -38,6 +38,9 @@ cat ../compute-engine/CHANGELOG.md >> ./docs/compute-engine/changelog.md
 echo "</ChangeLog>" >> ./docs/compute-engine/changelog.md
 # Replace [Unreleased] with Coming Soon
 sed -i '' 's/\[Unreleased\]/Coming Soon/g' ./docs/compute-engine/changelog.md
+# Replace arrow shorthand that starts with "<" to avoid MDX JSX parsing
+sed -i '' 's/<->/↔/g' ./docs/compute-engine/changelog.md
+sed -i '' 's/<-\\>/↔/g' ./docs/compute-engine/changelog.md
 
 cp ./docs/mathfield/_changelog.md ./docs/mathfield/changelog.md
 cat ../mathlive/CHANGELOG.md >> ./docs/mathfield/changelog.md

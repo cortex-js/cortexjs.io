@@ -10,81 +10,300 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-### Coming Soon
+### 0.55.0 _2026-03-04_
 
-- **Fix `;\;` parsing in semicolon blocks**: Semicolons followed by LaTeX visual
-  spacing commands (`\;`, `\,`, `\quad`, etc.) no longer produce spurious
-  `Nothing` nodes in the parse tree. Previously, `a \coloneq x^2;\; (a+1)`
-  would include a `Nothing` operand in the Block, making `isValid` return
-  `false` and causing compilation to fail. The parser now skips visual spacing
-  after semicolon separators.
+#### Breaking
 
-- **Fix `\text{if}` parsing with `\;` spacing**: The `\text{if}\; x \geq 0
-  \;\text{then}\; 1 \;\text{else}\; 0` pattern now parses correctly as an `If`
-  expression. Previously, `\;` before `\text{then}` or `\text{else}` prevented
-  keyword detection, producing a `Tuple` instead.
+- `ce.box()`/`box()` renamed to `ce.expr()`/`expr()` (`ce.box()` remains as a
+  deprecated wrapper).
+- Removed `ce.latexDictionary` getter/setter; configure dictionaries through
+  `new LatexSyntax({ dictionary: [...] })`.
+- Removed `ComputeEngine.getLatexDictionary()`; import dictionary constants from
+  package exports.
+- Removed deprecated type guard aliases: `isBoxedExpression`, `isBoxedNumber`,
+  `isBoxedSymbol`, `isBoxedFunction`, `isBoxedString`, `isBoxedTensor` (use
+  `isExpression`, `isNumber`, `isSymbol`, `isFunction`, `isString`, `isTensor`).
+- Removed `LibraryDefinition.latexDictionary`; LaTeX dictionaries now live in
+  the `latex-syntax` module.
 
-- **Block serializer uses `; ` separator**: The Block serializer now emits `; `
-  instead of `;\; ` between statements, preventing round-trip serialization from
-  reintroducing the `\;` parsing issue.
+#### Fixed
 
-- **Block compiler filters `Nothing` operands**: As defense-in-depth, the Block
-  compiler now filters out `Nothing` symbols and empty compilation results
-  before generating the block IIFE.
+- **#295** The `parse()` free function now accepts the form options object, so
+  `parse("\\frac{10}{2}", { form: "raw" })` return `["Divide", "10", "2"]`.
+- Undeclared symbols followed by parenthesized numeric expressions are now
+  interpreted as multiplication, not implicit function calls (for example,
+  `q(2q)` -> `2q^2`). Function-call behavior remains for explicitly declared
+  function symbols and non-numeric argument forms.
 
-- **Subscripted variable names in blocks**: Subscripted identifiers like `r_1`
-  are now treated as compound symbols (not `Subscript` expressions) when the
-  base is not a known collection. This means `r_1 \coloneq x^2; \frac{1}{r_1}`
-  correctly declares and assigns to a local variable named `r_1`.
+#### Added
 
-- **Selective GLSL interval preamble**: The interval-GLSL compilation target now
-  emits only the preamble functions actually used by the compiled expression
-  (plus their transitive dependencies), instead of the full ~29KB library.
-  Typical preambles are 60–80% smaller.
+- Modular package exports for smaller bundles: `@cortex-js/compute-engine/core`,
+  `@cortex-js/compute-engine/compile`, `@cortex-js/compute-engine/latex-syntax`,
+  `@cortex-js/compute-engine/numerics`, and `@cortex-js/compute-engine/interval`
+  (with existing sub-paths still available, including `math-json`).
+- New standalone `LatexSyntax` API (class + `parse()`/`serialize()` helpers) for
+  LaTeX ↔ MathJSON without a `ComputeEngine` instance.
+- New `ILatexSyntax` interface exposed via `IComputeEngine.latexSyntax` to allow
+  custom LaTeX parser/serializer implementations.
+- All 16 LaTeX domain dictionaries are now exported individually, plus the
+  combined `LATEX_DICTIONARY`.
+- `Parser` type is now exported from the main package for typed custom
+  `LatexDictionaryEntry` parse handlers.
 
-- **Selective WGSL interval preamble**: The interval-WGSL compilation target now
-  also emits only the preamble functions actually used by the compiled
-  expression, matching the GLSL target optimization.
+#### Changed
 
-- **Fix recursive GLSL gamma function**: The `_gpu_gamma()` preamble in the GPU
-  and interval-GLSL compilation targets used recursion for the reflection formula
-  (z < 0.5), which is illegal in GLSL. Replaced with a non-recursive
-  implementation that inlines the Lanczos approximation for both branches.
+- `ComputeEngine` now accepts an injectable `latexSyntax` dependency.
+  - Full package imports still auto-create a LaTeX syntax instance.
+  - Core-only imports do not bundle LaTeX support; `parse()`, `.latex`, and
+    `toLatex()` require an injected `LatexSyntax`.
+  - MathJSON serialization omits optional LaTeX metadata when no LaTeX syntax is
+    present.
+- `decimal.js` has been replaced with a native `bigint`-backed `BigDecimal`
+  implementation, reducing dependency surface and bundle size.
+- `BigDecimal` `add()`, `sub()`, and `mul()` are now exact; rounding is limited
+  to operations that require it (`div()`, non-integer `pow()`, transcendentals).
+- Numeric string/LaTeX serialization now respects precision settings:
+  `.latex`/`.toString()` round to `ce.precision`, while `.json`/`toJSON()`
+  remain lossless.
+- High-precision special functions (`bigGamma`, `bigGammaln`, `bigDigamma`,
+  `bigTrigamma`, `bigPolygamma`, `bigZeta`) now scale with
+  `BigDecimal.precision`; integer Gamma values are exact.
 
-- **Non-strict parser supports exponents on bare functions**: In non-strict mode
-  (`strict: false`), bare function names like `sin`, `cos`, `tan` can now
-  include an exponent before the argument list. For example, `sin^2(x)` and
-  `cos^{10}(x)` are now correctly parsed as `["Power", ["Sin", "x"], 2]`,
-  matching the behavior of their LaTeX counterparts `\sin^2(x)` and
-  `\cos^{10}(x)`.
+### 0.54.0 _2026-02-26_
 
-- **Unicode superscript and subscript digit support**: The LaTeX parser now
-  recognizes Unicode superscript digits (`⁰¹²³⁴⁵⁶⁷⁸⁹⁻`) and subscript digits
-  (`₀₁₂₃₄₅₆₇₈₉₋`), converting them to `^{...}` and `_{...}` respectively.
-  This works in all parsing modes. For example, `x²` parses as `x^{2}`,
-  `sin²(x)` as `\sin^{2}(x)`, `x⁻²` as `x^{-2}`, and `x₁₂` as `x_{12}`.
+- **New `expr.polynomialCoefficients()` method**: Returns the coefficients of a
+  polynomial expression in descending order of degree, or `undefined` if the
+  expression is not a polynomial. Auto-detects the variable when the expression
+  has exactly one unknown. Subsumes `isPolynomial` (check `!== undefined`) and
+  degree computation (`length - 1`).
 
-- **`.is()` now works with assigned variables**: Previously, `.is()` only
-  evaluated expressions made entirely of declared constants (like `Pi`). Now it
-  correctly evaluates any expression with no free variables, including those
-  containing variables with assigned values:
+- **`polynomialCoefficients()` now accepts an array of variables**: Pass
+  `['x', 'y']` to verify the expression is polynomial in all listed variables.
+  Coefficients are decomposed by the first variable.
 
-  ```ts
-  ce.assign('v', 2);
-  ce.parse('1 + 4 / v').is(3);  // true (was false before)
-  ce.parse('1 + 4 / x').is(3);  // false (x is free)
-  ```
+- **New `expr.polynomialRoots()` method**: Returns the roots of a polynomial
+  expression, or `undefined` if not a polynomial. Handles degree 3+ polynomials
+  with rational roots via the Rational Root Theorem.
 
-- **`.is()` accepts an optional `tolerance` parameter**: When provided, it
-  overrides `engine.tolerance` for the numeric comparison. This applies to both
-  evaluated expressions and literal numbers:
+- **New `Polynomial` CAS function**: Constructs a polynomial from a coefficient
+  list (descending order) and a variable. Inverse of `CoefficientList`:
+  `Polynomial([1, 0, 2, 1], x)` evaluates to `x³ + 2x + 1`.
 
-  ```ts
-  ce.parse('\\pi').is(3.14, 0.01);   // true  (within custom tolerance)
-  ce.parse('\\pi').is(3.14);          // false (not within engine.tolerance)
-  ce.number(1e-17).is(0, 1e-16);     // true  (explicit tolerance on literal)
-  ce.number(1e-17).is(0);            // false (no tolerance for literals)
-  ```
+- **Improved `Factor` for degree 3+ polynomials**: `Factor` now uses the
+  Rational Root Theorem to factor polynomials with integer coefficients and
+  rational roots. Previously only handled degree ≤ 2.
+
+- **Improved `Factor` with content extraction**: `Factor` now extracts the GCD
+  of integer coefficients before applying other strategies. For example,
+  `Factor(6x² + 12x + 6, x)` now produces `6(x+1)²`.
+
+- **New `PartialFraction` CAS function**: Decomposes rational expressions into
+  partial fractions. Supports distinct and repeated linear factors, irreducible
+  quadratic factors, and improper fractions (polynomial division performed
+  first). Example: `PartialFraction(1/((x+1)(x+2)), x)` → `1/(x+1) - 1/(x+2)`.
+
+- **New `Apart` CAS function**: Alias for `PartialFraction`.
+
+- **New `PolynomialRoots` CAS function**: Returns the roots of a polynomial as a
+  set. Example: `PolynomialRoots(x² - 5x + 6, x)` → `{2, 3}`.
+
+- **New `Discriminant` CAS function**: Returns the discriminant of a polynomial
+  of degree 2, 3, or 4. Supports symbolic coefficients. Example:
+  `Discriminant(x² - 5x + 6, x)` → `1`.
+
+- **`simplify()` auto-decomposes partial fractions**: When a `Divide` expression
+  has a denominator already in factored form (product or power) and the
+  decomposition is simpler, `simplify()` automatically applies partial fraction
+  decomposition.
+
+- **Breaking: `CoefficientList` now returns descending order**: The CAS function
+  `CoefficientList` now returns coefficients from highest to lowest degree
+  (e.g., `[1, 0, 2, 1]` for `x^3 + 2x + 1`), matching the new
+  `polynomialCoefficients()` method and common external conventions. Previously
+  it returned ascending order.
+
+- **`expr.match()` now accepts string patterns with auto-wildcarding**: Pass a
+  LaTeX string like `'ax^2+bx+c'` and single-character symbols are automatically
+  treated as wildcards. Results use clean unprefixed keys (`{a: 3, b: 2, c: 5}`)
+  with self-matches filtered out. `useVariations` and `matchMissingTerms`
+  default to `true` for string patterns.
+
+- **`expr.match()` now accepts MathJSON arrays directly**: Pass a raw MathJSON
+  pattern like `['Add', '_a', '_b']` without calling `ce.box()` first.
+
+- **New `matchMissingTerms` option for `match()`**: When enabled, expressions
+  with fewer operands than the pattern can still match by treating missing terms
+  as identity elements (0 for `Add`, 1 for `Multiply`). For example, `3x^2+5`
+  matches the pattern `ax^2+bx+c` with `b = 0`. Enabled by default for string
+  patterns.
+
+- **Non-strict parsing: implicit superscript for letter+digit**: In non-strict
+  mode, a single letter immediately followed by a digit 2–9 is parsed as an
+  exponent: `x2 + y2` → `x^2 + y^2`. Handles common copy-paste from web pages.
+  Only digits 2–9, only single ASCII letters, and only when adjacent (no space).
+
+### 0.53.1 _2026-02-25_
+
+- **`timeLimit` now reliably interrupts long-running evaluations**: `Factorial`,
+  `Sum`, `Product`, `Loop`, and `Reduce` all respect the `timeLimit` property
+  and throw `CancellationError` when the deadline is exceeded. Previously,
+  generators yielded too infrequently (every 1,000–50,000 iterations), allowing
+  a single `gen.next()` call to block for longer than the timeout. All
+  generators now yield every iteration. The `Factorial` handler no longer
+  silently swallows `CancellationError`, and `withDeadline`/`withDeadlineAsync`
+  now use `try/finally` to always reset the engine deadline.
+
+- **Fixed GPU compilation of `Sum`, `Product`, `Loop`, and `Function`**: These
+  constructs no longer leak JavaScript-specific syntax (IIFEs, `let`, `while`,
+  arrow functions, `{ re, im }` objects) into GLSL/WGSL output. `Sum`/`Product`
+  with small constant bounds are unrolled inline; larger ranges emit native
+  `for` loops. `Loop` emits a GPU `for` loop with `int`/`i32` index. `Function`
+  (lambda) now throws a clear error for GPU targets. Block-level `Declare`
+  statements infer `vec2`/`vec2f` type from subsequent complex-valued
+  assignments.
+
+- **Added GLSL/WGSL compilation for `Heaviside`, `Sinc`, `FresnelC`, `FresnelS`,
+  `BesselJ`**: These five special functions now compile to GPU shader targets.
+  `FresnelC`/`FresnelS` use a three-region rational Chebyshev approximation
+  (ported from Cephes/scipy) with a shared `_gpu_polevl` helper. `BesselJ` uses
+  power series, Hankel asymptotic, and Miller's backward recurrence depending on
+  the argument range. Both GLSL and WGSL preambles are emitted on demand.
+
+- **Fixed GLSL/WGSL block expression compilation**: Block expressions (produced
+  by `\coloneq` / semicolon blocks) now emit valid GPU shader code instead of
+  JavaScript syntax. Variable declarations use `float x` (GLSL) or `var x: f32`
+  (WGSL) instead of `let x`, and blocks are emitted as plain statements instead
+  of JavaScript IIFEs. `compileFunction` correctly formats multi-statement
+  bodies.
+
+- **Fixed `\;` in `\text{where}` clauses**: Visual spacing commands like `\;`,
+  `\,`, `\quad`, etc. between comma-separated bindings in where-clauses are now
+  correctly skipped instead of being parsed as `HorizontalSpacing` expressions
+  wrapped in `InvisibleOperator`.
+
+- **Fixed `require()` returning empty exports on Node 22+** (#292): Because the
+  package sets `"type": "module"`, Node treated the UMD `.js` files as ESM,
+  breaking the UMD factory pattern. The UMD builds now use a `.cjs` extension so
+  Node always treats them as CommonJS.
+
+### 0.53.0 _2026-02-21_
+
+#### Runtime and Scoping
+
+- **True lexical scoping for `Function` expressions**: Functions now capture
+  their defining scope and resolve free variables from that scope chain (not the
+  call site), with a fresh child scope on each call.
+
+- **BigOp scope pollution fixed**: `Sum`, `Product`, and other big operators now
+  only declare their index variable locally. Other names are declared in the
+  enclosing scope via `noAutoDeclare`.
+
+- **Closure capture for nested functions**: Returned functions now correctly
+  capture outer parameters across multiple nesting levels.
+
+- **`EvalContext.values` removed**: Symbol values now live only in
+  `BoxedValueDefinition.value`. The per-frame shadow map and `withArguments`
+  option were removed.
+
+- **`forget()` now resets values set by `assume()`**: `forget('x')` now clears
+  values introduced by `assume('x = ...')` (value reset to `undefined`), in
+  addition to clearing assumptions.
+
+#### Expressions and Equality
+
+- **`expand()` now returns the input expression instead of `null`**: Both the
+  free function and internal `expand()`/`expandAll()` now return the original
+  expression when no expansion is possible.
+
+- **New `.toRational()` method**: Returns `[numerator, denominator]` integers
+  for rational expressions, or `null` otherwise.
+
+- **New `.factors()` method**: Returns multiplicative factors as a flat array by
+  decomposing `Multiply` and `Negate` structurally.
+
+- **`.is()` now tries expansion**: After structural comparison, `.is()` expands
+  both sides before numeric fallback, catching forms like `(x+1)^2` and
+  `x^2+2x+1`.
+
+- **`.is()` is now symmetric**: `a.is(b) === b.is(a)` now holds across all
+  expression types.
+
+#### LaTeX Parsing
+
+- **Parse `\mleft`/`\mright` delimiters**: Alternative delimiters from the
+  `mleftright` package are now treated like `\left`/`\right`.
+
+- **Parse `\color` in math mode**: `\color{...}` is now recognized in math mode;
+  the color argument is consumed so the following math parses normally.
+
+- **Parse `:` and `\colon` as infix operators**: Outside quantifier contexts, a
+  bare `:`/`\colon` now parses as `Colon` (e.g. `f:[a,b]\to\R`), without
+  affecting `:=` assignment or quantifier syntax.
+
+- **Parse `\dfrac`, `\tfrac`, and `\cfrac` as fractions**: These variants now
+  parse the same as `\frac`.
+
+#### Fractals
+
+- **New `Mandelbrot` and `Julia` functions**: Added built-in escape-time fractal
+  operators. `Mandelbrot(c, maxIter)` and `Julia(z, c, maxIter)` return a
+  smooth, normalized value in `[0, 1]` (`1` for interior points, fractional for
+  escaping points via `log₂(log₂(|z|²))` smoothing). Both evaluate in JavaScript
+  and compile to GLSL/WGSL.
+
+### 0.52.1 _2026-02-19_
+
+#### Expressions
+
+- **Exact number literal check**: Use `isNumber(expr) && expr.isExact` to test
+  for exact numeric literals.
+
+- **`raw` form preserves subtraction**: `x-1` now parses as
+  `["Subtract", "x", "1"]` (instead of `["Add", "x", -1]`) when using raw form.
+
+#### Parsing and Blocks
+
+- **Fix `;\;` parsing in semicolon blocks**: Spacing commands after semicolons
+  (`\;`, `\,`, `\quad`, etc.) no longer create spurious `Nothing` operands.
+
+- **Fix `\text{if}` parsing with `\;` spacing**:
+  `\text{if}\;...\;\text{then}\;...\;\text{else}\;...` now parses correctly as
+  `If`.
+
+- **Block serializer now uses `; `**: Serialization emits `; ` (not `;\; `) to
+  avoid reintroducing spacing-related parse issues on round-trip.
+
+- **Block compiler filters `Nothing` operands**: The Block compiler now removes
+  `Nothing` symbols and empty compile results before generating code.
+
+- **Subscripted variable names in blocks**: Names like `r_1` are treated as
+  compound symbols (not `Subscript`) when the base is not a known collection.
+
+- **Non-strict parser supports exponents on bare functions**: In `strict: false`
+  mode, forms like `sin^2(x)` and `cos^{10}(x)` now parse correctly as powers.
+
+- **Unicode superscript/subscript digits supported**: Superscript and subscript
+  Unicode digits now normalize to `^{...}` / `_{...}` in parsing.
+
+#### Compilation
+
+- **Selective GLSL interval preamble**: `interval-glsl` now emits only used
+  helper functions (plus dependencies), typically reducing preamble size by
+  60-80%.
+
+- **Selective WGSL interval preamble**: `interval-wgsl` now applies the same
+  used-only preamble strategy.
+
+- **Fix recursive GLSL gamma helper**: Replaced recursive `_gpu_gamma()`
+  reflection logic (illegal in GLSL) with a non-recursive implementation.
+
+#### Equality
+
+- **`.is()` now works with assigned variables**: Numeric fallback now applies to
+  expressions with no free variables, including variables with assigned values.
+
+- **`.is()` now accepts an optional `tolerance`**: A per-call tolerance can
+  override `engine.tolerance` for numeric comparison.
 
 ### 0.52.0 _2026-02-18_
 
@@ -894,7 +1113,7 @@ ce.simplificationRules.push({
   - `Hom` now evaluates/simplifies its arguments while preserving the symbolic
     `Hom(...)` form.
 
-### LaTeX Parsing
+#### LaTeX Parsing
 
 - **`arguments: 'implicit'` option for function dictionary entries**: Function
   entries in the LaTeX dictionary can now set `arguments: 'implicit'` to accept
