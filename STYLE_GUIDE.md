@@ -48,7 +48,7 @@ Use Markdown headings (`#`, `##`, etc.) to create a clear hierarchical structure
 *   **Static Examples (`js example`, `json example`, etc.)**: Use for non-interactive code snippets that illustrate a concept or API usage.
     ````
     ```js example
-    mf.menuItems = mf.menuItems.filter(item => !item.id.startWith('ce-'));
+    mf.menuItems = mf.menuItems.filter(item => !item.id?.startsWith('ce-'));
     ```
     ````
 *   **Line Highlighting**: Use `mark-html-line` or `mark-js-line` to draw attention to specific lines in a code block.

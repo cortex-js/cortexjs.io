@@ -41,7 +41,7 @@ For example, to omit all commands related to the Compute Engine (such as
 their id:
 
 ```js example
-mf.menuItems = mf.menuItems.filter(item => !item.id.startWith('ce-'));
+mf.menuItems = mf.menuItems.filter(item => !item.id?.startsWith('ce-'));
 ```
 
 :::warning
