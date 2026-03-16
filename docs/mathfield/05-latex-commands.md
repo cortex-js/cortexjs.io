@@ -16,8 +16,20 @@ Mathfields support over **800** LaTeX commands.
 **To enter a LaTeX command in mathfield** press the <kbd>ESC</kbd> key or <kbd>\\</kbd>  
 to enter LaTeX editing mode. Press <kbd>ESC</kbd> to exit LaTeX editing mode. 
 
+
 **To examine the LaTeX code for an expression**, select it, then press <kbd>ESC</kbd>.
 
+:::info[Note]
+If you want to prevent users from entering into the LaTeX mode, you can add the following event listener to the MathField:
+
+```ts
+mf.addEventListener('mode-change', (ev)=>{ev.preventDefault();})
+```
+
+<ReadMore path="https://mathlive.io/mathfield/guides/interacting/#listening-for-changes-to-a-mathfield" >
+Learn more about changes on a MathField.
+</ReadMore>
+:::
 
 <ReadMore path="/mathfield/reference/keybindings" >
 The most common symbols can be entered using **keyboard shortcuts**.<Icon name="chevron-right-bold" />
