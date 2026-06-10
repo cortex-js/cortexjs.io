@@ -73,6 +73,20 @@ The LatexSyntax instance used for LaTeX parsing/serialization.
 
 <MemberCard>
 
+##### ExpressionComputeEngine.latexOptions
+
+```ts
+latexOptions: Partial<ParseLatexOptions & SerializeLatexOptions>;
+```
+
+Engine-wide LaTeX parse/serialize options (e.g. `decimalSeparator`).
+ Merged into every `parse()` and `toLatex()` call between LatexSyntax
+ defaults and per-call overrides.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.True
 
 ```ts
@@ -265,6 +279,16 @@ recursionLimit: number;
 
 <MemberCard>
 
+##### ExpressionComputeEngine.maxCollectionSize
+
+```ts
+maxCollectionSize: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.bignum()
 
 ```ts
@@ -324,6 +348,39 @@ simplificationRules: Rule[];
 The rules used by `.simplify()` when no explicit `rules` option is passed.
  Initialized to the built-in simplification rules.
  Users can `push()` additional rules or replace the entire array.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.solveRules
+
+```ts
+solveRules: Rule[];
+```
+
+The rules used by `solve()` to find roots of univariate expressions.
+ Each rule matches a normalized equation `f(_x) = 0` — the unknown is
+ the wildcard `_x` — and `replace` produces a root expression.
+ Conditions should reject matches where other wildcards capture `_x`.
+ Candidate roots are validated against the original equation, so an
+ over-eager template degrades to a no-op rather than a wrong answer.
+ Initialized to the built-in root-finding rules; `push()` to extend,
+ assign to replace.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.harmonizationRules
+
+```ts
+harmonizationRules: Rule[];
+```
+
+The rules used by `solve()` to transform an equation into equivalent,
+ easier-to-solve forms before root-finding (e.g. `ln f(x) → f(x) - 1`).
+ Same conventions and extension pattern as `solveRules`.
 
 </MemberCard>
 
@@ -1493,6 +1550,83 @@ verify(query): boolean
 
 </MemberCard>
 
+<MemberCard>
+
+##### ExpressionComputeEngine.operatorInfo()
+
+```ts
+operatorInfo(head): OperatorInfo
+```
+
+Introspect a registered operator head.
+
+Returns `undefined` if no definition is registered in this engine.
+Otherwise returns `{ kind, signature? }` where `kind` is `'function'`
+when the operator has an `evaluate` or `collection` handler, and
+`'opaque'` when it is declared as a typed-but-opaque node (e.g.,
+`Triangle`, `Sphere`).
+
+Use this to classify heads encountered in parsed MathJSON without
+maintaining a parallel list of "known" operators.
+
+####### head
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.normalizeIdentifier()
+
+```ts
+normalizeIdentifier(latex): string
+```
+
+Convert a LaTeX identifier string to its canonical MathJSON name without
+declaring the symbol in the engine scope.
+
+Examples:
+- `'R_{3}'` → `'R_3'`
+- `'\\theta_x'` → `'theta_x'`
+- `'\\alpha'` → `'alpha'`
+- `'1 + 2'` → `''` (not an identifier)
+
+Use this instead of `ce.parse(latex).symbol` when you need the canonical
+name without the side-effect of auto-declaring the symbol.
+
+####### latex
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.symbolInfo()
+
+```ts
+symbolInfo(name): SymbolInfo
+```
+
+Return introspection metadata for a symbol (value definition) in the
+current scope chain.
+
+- `kind: 'constant'` when the symbol is a CE-registered constant
+  (e.g. `Pi`, `True`, `ExponentialE`).
+- `kind: 'variable'` for declared but non-constant value symbols
+  (e.g. after `ce.declare('a', 'real')`).
+
+Returns `undefined` for unknown names and for names that resolve to
+operator/function definitions (use `operatorInfo()` for those — the
+two methods are non-overlapping).
+
+####### name
+
+`string`
+
+</MemberCard>
+
 ## Boxed Expression
 
 <MemberCard>
@@ -1525,2365 +1659,23 @@ This is the compute-engine-specialized form of the generic kernel type.
 
 </MemberCard>
 
-### Expression
-
-:::info[THEORY OF OPERATIONS]
-
-The `Expression` interface includes the methods and properties
-applicable to all kinds of expression. For example it includes `expr.symbol`
-which only applies to symbols or `expr.ops` which only applies to
-function expressions.
-
-When a property is not applicable to this `Expression` its value is
-`undefined`. For example `expr.symbol` for a `BoxedNumber` is `undefined`.
-
-This convention makes it convenient to manipulate expressions without
-having to check what kind of instance they are before manipulating them.
-:::
-
-:::info[THEORY OF OPERATIONS]
-A boxed expression can represent a canonical or a non-canonical
-expression. A non-canonical expression is a "raw" form of the
-expression. For example, the non-canonical representation of `\frac{10}{20}`
-is `["Divide", 10, 20]`. The canonical representation of the same
-expression is the boxed number `1/2`.
-
-The canonical representation of symbols and function expressions are
-bound to a definition. The definition contains metadata about the symbol
-or function operator, such as its type, its signature, and other attributes.
-The value of symbols are tracked in a separate table for each
-evaluation context.
-
-The binding only occurs when the expression is constructed, if it is created
-as a canonical expression. If the expression is constructed as a
-non-canonical expression, no binding is done.
-
-<!--
-Rules:
-- nothing should cause the binding to occur outside of the constructor
-- if an operation require a canonical expression (e.g. evaluate()),
- it should return undefined or throw an error if the expression is not
-  canonical
--->
-
-:::
-
-:::info[THEORY OF OPERATIONS]
-The **value** of an expression is a number, a string, a boolean or a tensor.
-
-The value of number literals and strings are themselves.
-
-A symbol can have a value associated with it, in which case the value
-of the symbol is the value associated with it.
-
-Some symbols (unknowns) are purely symbolic and have no value associated
-with them.
-
-Function expressions do not have a value associated with them.
-For example, `["Add", 2, 3]` has no value associated with it, it is a
-symbolic expression.
-
-Some properties of a Boxed Expression are only applicable if the expression
-has a value associated with it. For example, `expr.isNumber` is only
-applicable if the value of the expression is a number, that is if the
-expression is a number literal or a symbol with a numeric value.
-
-The following properties are applicable to expressions with a value:
-- `expr.isNumber`
-:::
-
-To create a boxed expression:
-
-#### `ce.expr()` and `ce.parse()`
-
-Use `ce.expr()` or `ce.parse()`.
-
-Use `ce.parse()` to get a boxed expression from a LaTeX string.
-Use `ce.expr()` to get a boxed expression from a MathJSON expression.
-
-By default, the result of these methods is a canonical expression. For
-example, if it is a rational literal, it is reduced to its canonical form.
-If it is a function expression:
-   - the arguments are put in canonical form
-   - the arguments of commutative functions are sorted
-   - invisible operators are made explicit
-   - a limited number of core simplifications are applied,
-     for example rationals are reduced
-   - sequences are flattened: `["Add", 1, ["Sequence", 2, 3]]` is
-     transformed to `["Add", 1, 2, 3]`
-   - associative functions are flattened: `["Add", 1, ["Add", 2, 3]]` is
-     transformed to `["Add", 1, 2, 3]`
-   - symbols are **not** replaced with their values (unless they have
-      a `holdUntil` flag set to `never`).
-
-#### `ce.function()`
-
-This is a specialized version of `ce.expr()` for creating a new function
-expression.
-
-The canonical handler of the operator is called.
-
-#### Algebraic methods (`expr.add()`, `expr.mul()`, etc...)
-
-The boxed expression have some algebraic methods, i.e. `add()`, `mul()`,
-`div()`, `pow()`, etc. These methods are suitable for
-internal calculations, although they may be used as part of the public
-API as well.
-
-   - a runtime error is thrown if the expression is not canonical
-   - the arguments are not evaluated
-   - the canonical handler (of the corresponding operation) is not called
-   - some additional simplifications over canonicalization are applied.
-     For example number literals are combined.
-     However, the result is exact, and no approximation is made. Use `.N()`
-     to get an approximate value.
-     This is equivalent to calling `simplify()` on the expression (but
-     without simplifying the arguments).
-   - sequences were already flattened as part of the canonicalization process
-
-For 'add()' and 'mul()', which take multiple arguments, separate functions
-are provided that take an array of arguments. They are equivalent
-to calling the boxed algebraic method, i.e. `ce.Zero.add(1, 2, 3)` and
-`add(1, 2, 3)` are equivalent.
-
-These methods are not equivalent to calling `expr.evaluate()` on the
-expression: evaluate will replace symbols with their values, and
-evaluate the expression.
-
-For algebraic functions (`add()`, `mul()`, etc..), use the corresponding
-canonicalization function, i.e. `canonicalAdd(a, b)` instead of
-`ce.function('Add', [a, b])`.
-
-Another option is to use the algebraic methods directly, i.e. `a.add(b)`
-instead of `ce.function('Add', [a, b])`. However, the algebraic methods will
-apply further simplifications which may or may not be desirable. For
-example, number literals will be combined.
-
-#### `ce._fn()`
-
-This method is a low level method to create a new function expression which
-is typically invoked in the canonical handler of an operator definition.
-
-The arguments are not modified. The expression is not put in canonical
-form. The canonical handler is *not* called.
-
-A canonical flag can be set when calling this method, but it only
-asserts that the function expression is canonical. The caller is responsible
-for ensuring that is the case.
-
-#### Canonical Handlers
-
-Canonical handlers are responsible for:
-   - validating the signature: this can involve checking the
-     number of arguments. It is recommended to avoid checking the
-     type of non-literal arguments, since the type of symbols or
-     function expressions may change. Similarly, the canonicalization
-     process should not rely on the value of or assumptions about non-literal
-     arguments.
-   - flattening sequences
-   - flattening arguments if the function is associative
-   - sort the arguments (if the function is commutative)
-   - calling `ce._fn()` to create a new function expression
-
-When the canonical handler is invoked, the arguments have been put in
-canonical form unless the `lazy` flag is set to `true`.
-
-Note that the result of a canonical handler should be a canonical expression,
-but not all arguments need to be canonical. For example, the arguments of
-`["Declare", "x", 2]` are not canonical, since `x` refers to the name
-of the symbol, not its value.
-
-#### Function Expression
-
-<MemberCard>
-
-##### Expression.operator
-
-```ts
-readonly operator: string;
-```
-
-The name of the operator of the expression.
-
-For example, the name of the operator of `["Add", 2, 3]` is `"Add"`.
-
-A string literal has a `"String"` operator.
-
-A symbol has a `"Symbol"` operator.
-
-A number has a `"Number"`, `"Real"`, `"Rational"` or `"Integer"` operator; amongst some others.
-Practically speaking, for fully canonical and valid expressions, all of these are likely to
-collapse to `"Number"`.
-
-</MemberCard>
-
-#### Numeric Expression
-
-<MemberCard>
-
-##### Expression.isEven
-
-```ts
-readonly isEven: boolean;
-```
-
-If the value of this expression is not an **integer** return `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isOdd
-
-```ts
-readonly isOdd: boolean;
-```
-
-If the value of this expression is not an **integer** return `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.re
-
-```ts
-readonly re: number;
-```
-
-Return the real part of the value of this expression, if a number.
-
-Otherwise, return `NaN` (not a number).
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.im
-
-```ts
-readonly im: number;
-```
-
-If value of this expression is a number, return the imaginary part of the
-value. If the value is a real number, the imaginary part is 0.
-
-Otherwise, return `NaN` (not a number).
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.bignumRe
-
-```ts
-readonly bignumRe: BigDecimal;
-```
-
-If the value of this expression is a number, return the real part of the
-value as a `BigNum`.
-
-If the value is not available as a bignum return `undefined`. That is,
-the value is not upconverted to a bignum.
-
-To get the real value either as a bignum or a number, use
-`expr.bignumRe ?? expr.re`.
-
-When using this pattern, the value is returned as a bignum if available,
-otherwise as a number or `NaN` if the value is not a number.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.bignumIm
-
-```ts
-readonly bignumIm: BigDecimal;
-```
-
-If the value of this expression is a number, return the imaginary part as
-a `BigNum`.
-
-It may be 0 if the number is real.
-
-If the value of the expression is not a number or the value is not
-available as a bignum return `undefined`. That is, the value is not
-upconverted to a bignum.
-
-To get the imaginary value either as a bignum or a number, use
-`expr.bignumIm ?? expr.im`.
-
-When using this pattern, the value is returned as a bignum if available, otherwise as a number or `NaN` if the value is not a number.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.sgn
-
-```ts
-readonly sgn: Sign;
-```
-
-Return the sign of the expression.
-
-Note that complex numbers have no natural ordering, so if the value is an
-imaginary number (a complex number with a non-zero imaginary part),
-`this.sgn` will return `unsigned`.
-
-If a symbol, this does take assumptions into account, that is `this.sgn`
-will return `positive` if the symbol is assumed to be positive
-using `ce.assume()`.
-
-Non-canonical expressions return `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isPositive
-
-```ts
-readonly isPositive: boolean;
-```
-
-The value of this expression is > 0, same as `isGreaterEqual(0)`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isNonNegative
-
-```ts
-readonly isNonNegative: boolean;
-```
-
-The value of this expression is >= 0, same as `isGreaterEqual(0)`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isNegative
-
-```ts
-readonly isNegative: boolean;
-```
-
-The value of this expression is &lt; 0, same as `isLess(0)`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isNonPositive
-
-```ts
-readonly isNonPositive: boolean;
-```
-
-The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isNaN
-
-```ts
-readonly isNaN: boolean;
-```
-
-If true, the value of this expression is "Not a Number".
-
-A value representing undefined result of computations, such as `0/0`,
-as per the floating point format standard IEEE-754.
-
-Note that if `isNaN` is true, `isNumber` is also true (yes, `NaN` is a
-number).
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isInfinity
-
-```ts
-readonly isInfinity: boolean;
-```
-
-The numeric value of this expression is `±Infinity` or ComplexInfinity.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isFinite
-
-```ts
-readonly isFinite: boolean;
-```
-
-This expression is a number, but not `±Infinity`, `ComplexInfinity` or
- `NaN`
-
-</MemberCard>
-
-#### Other
-
-<MemberCard>
-
-##### Expression.engine
-
-```ts
-readonly engine: ExpressionComputeEngine;
-```
-
-The Compute Engine instance associated with this expression provides
-a context in which to interpret it, such as definition of symbols
-and functions.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.toMathJson()
-
-```ts
-toMathJson(options?): MathJsonExpression
-```
-
-Serialize to a MathJSON expression with specified options.
-
-Use `{ fractionalDigits: 'auto' }` to round arbitrary-precision
-numbers to `ce.precision` significant digits. The default
-(`'max'`) emits all available digits with no rounding.
-
-####### options?
-
-`Readonly`\<`Partial`\<[`JsonSerializationOptions`](#jsonserializationoptions)\>\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.json
-
-```ts
-readonly json: MathJsonExpression;
-```
-
-MathJSON representation of this expression.
-
-This representation always use shorthands when possible. Metadata is not
-included.
-
-Numbers are converted to JavaScript numbers and may lose precision.
-
-The expression is represented exactly and no sugaring is applied. For
-example, `["Power", "x", 2]` is not represented as `["Square", "x"]`.
-
-For more control over the serialization, use `expr.toMathJson()`.
-
-Note that lazy collections are *not* eagerly evaluated.
-
-For arbitrary-precision numbers, the full raw `BigDecimal` value is
-emitted with no rounding (same as `toJSON()`). This preserves data
-fidelity for round-tripping but may include trailing digits beyond
-`ce.precision` that are not meaningful. Use
-`toMathJson({ fractionalDigits: 'auto' })` for rounded output.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.latex
-
-```ts
-readonly latex: string;
-```
-
-Return a LaTeX representation of this expression.
-
-This is a convenience getter that delegates to the standalone
-`serialize()` function from the `latex-syntax` module.
-
-Numeric values are rounded to `ce.precision` significant digits.
-Noise digits from precision-bounded operations (division,
-transcendentals) are not displayed.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.toLatex()
-
-```ts
-toLatex(options?): string
-```
-
-Return a LaTeX representation of this expression with custom
-serialization options.
-
-Numeric values are rounded to `ce.precision` significant digits.
-
-####### options?
-
-`Record`\<`string`, `any`\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.print()
-
-```ts
-print(): void
-```
-
-Output to the console a string representation of the expression.
-
-Note that lazy collections are eagerly evaluated when printed.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.verbatimLatex?
-
-```ts
-optional verbatimLatex: string;
-```
-
-If the expression was constructed from a LaTeX string, the verbatim LaTeX
- string it was parsed from.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isCanonical
-
-If `true`, this expression is in a canonical form.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isStructural
-
-If `true`, this expression is in a structural form.
-
-The structural form of an expression is used when applying rules to
-an expression. For example, a rational number is represented as a
-function expression instead of a `Expression` object.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.canonical
-
-Return the canonical form of this expression.
-
-If a function expression or symbol, they are first bound with a definition
-in the current scope.
-
-When determining the canonical form the following operator definition
-flags are applied:
-- `associative`: \\( f(a, f(b), c) \longrightarrow f(a, b, c) \\)
-- `idempotent`: \\( f(f(a)) \longrightarrow f(a) \\)
-- `involution`: \\( f(f(a)) \longrightarrow a \\)
-- `commutative`: sort the arguments.
-
-If this expression is already canonical, the value of canonical is
-`this`.
-
-The arguments of a canonical function expression may not all be
-canonical, for example in the `["Declare", "i", 2]` expression,
-`i` is not canonical since it is used only as the name of a symbol, not
-as a (potentially) existing symbol.
-
-:::info[Note]
-Partially canonical expressions, such as those produced through
-`CanonicalForm`, also yield an expression which is marked as `canonical`.
-This means that, likewise for partially canonical expressions, the
-`canonical` property will return the self-same expression (and
-'isCanonical' will also be true).
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.structural
-
-Return the structural form of this expression.
-
-Some expressions, such as rational numbers, are represented with
-a `Expression` object. In some cases, for example when doing a
-structural comparison of two expressions, it is useful to have a
-structural representation of the expression where the rational numbers
-is represented by a function expression instead.
-
-If there is a structural representation of the expression, return it,
-otherwise return `this`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isValid
-
-```ts
-readonly isValid: boolean;
-```
-
-`false` if this expression or any of its subexpressions is an `["Error"]`
-expression.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions. For
-non-canonical expression, this may indicate a syntax error while parsing
-LaTeX. For canonical expression, this may indicate argument type
-mismatch, or missing or unexpected arguments.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isPure
-
-```ts
-readonly isPure: boolean;
-```
-
-If *true*, evaluating this expression has no side-effects (does not
-change the state of the Compute Engine).
-
-If *false*, evaluating this expression may change the state of the
-Compute Engine or it may return a different value each time it is
-evaluated, even if the state of the Compute Engine is the same.
-
-As an example, the `["Add", 2, 3]` function expression is pure, but
-the `["Random"]` function expression is not pure.
-
-For a function expression to be pure, the function itself (its operator)
-must be pure, and all of its arguments must be pure too.
-
-A pure function expression may return a different value each time it is
-evaluated if its arguments are not constant. For example, the
-`["Add", "x", 1]` function expression is pure, but it is not
-constant, because `x` is not constant.
-
-:::info[Note]
-Applicable to canonical expressions only
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isConstant
-
-```ts
-readonly isConstant: boolean;
-```
-
-`True` if evaluating this expression always returns the same value.
-
-If *true* and a function expression, implies that it is *pure* and
-that all of its arguments are constant.
-
-Number literals, symbols with constant values, and pure numeric functions
-with constant arguments are all *constant*, i.e.:
-- `42` is constant
-- `Pi` is constant
-- `["Divide", "Pi", 2]` is constant
-- `x` is not constant, unless declared with a constant flag.
-- `["Add", "x", 2]` is either constant only if `x` is constant.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.errors
-
-```ts
-readonly errors: readonly Expression[];
-```
-
-All the `["Error"]` subexpressions.
-
-If an expression includes an error, the expression is also an error.
-In that case, the `this.isValid` property is `false`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.getSubexpressions()
-
-```ts
-getSubexpressions(operator): readonly Expression[]
-```
-
-All the subexpressions matching the named operator, recursively.
-
-Example:
-
-```js
-const expr = ce.parse('a + b * c + d');
-const subexpressions = expr.getSubexpressions('Add');
-// -> `[['Add', 'a', 'b'], ['Add', 'c', 'd']]`
-```
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-####### operator
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.subexpressions
-
-```ts
-readonly subexpressions: readonly Expression[];
-```
-
-All the subexpressions in this expression, recursively
-
-Example:
-
-```js
-const expr = ce.parse('a + b * c + d');
-const subexpressions = expr.subexpressions;
-// -> `[['Add', 'a', 'b'], ['Add', 'c', 'd'], 'a', 'b', 'c', 'd']`
-```
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.symbols
-
-```ts
-readonly symbols: readonly string[];
-```
-
-All the symbols in the expression, recursively, including
-bound variables (e.g., summation/product index variables).
-
-Use [unknowns](#unknowns) or [freeVariables](#freevariables) to get only the
-symbols that are free (not bound by a scoping construct).
-
-```js
-const expr = ce.parse('a + b * c + d');
-const symbols = expr.symbols;
-// -> ['a', 'b', 'c', 'd']
-```
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.unknowns
-
-```ts
-readonly unknowns: readonly string[];
-```
-
-All the symbols used in the expression that do not have a value
-associated with them, i.e. they are declared but not defined.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.freeVariables
-
-```ts
-readonly freeVariables: readonly string[];
-```
-
-The free variables of the expression: symbols that are not constants,
-not operators, not bound to a value, and not locally scoped (e.g.,
-summation/product index variables are excluded).
-
-This is an alias for [unknowns](#unknowns).
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.toNumericValue()
-
-```ts
-toNumericValue(): [NumericValue, Expression]
-```
-
-Attempt to factor a numeric coefficient `c` and a `rest` out of a
-canonical expression such that `rest.mul(c)` is equal to `this`.
-
-Attempts to make `rest` a positive value (i.e. pulls out negative sign).
-
-```json
-['Multiply', 2, 'x', 3, 'a']
-   -> [NumericValue(6), ['Multiply', 'x', 'a']]
-
-['Divide', ['Multiply', 2, 'x'], ['Multiply', 3, 'y', 'a']]
-   -> [NumericValue({rational: [2, 3]}), ['Divide', 'x', ['Multiply, 'y', 'a']]]
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.neg()
-
-```ts
-neg(): Expression
-```
-
-Negate (additive inverse)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.inv()
-
-```ts
-inv(): Expression
-```
-
-Inverse (multiplicative inverse)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.abs()
-
-```ts
-abs(): Expression
-```
-
-Absolute value
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.add()
-
-```ts
-add(rhs): Expression
-```
-
-Addition
-
-####### rhs
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.sub()
-
-```ts
-sub(rhs): Expression
-```
-
-Subtraction
-
-####### rhs
-
-[`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.mul()
-
-```ts
-mul(rhs): Expression
-```
-
-Multiplication
-
-####### rhs
-
-`number` | [`NumericValue`](#abstract-numericvalue) | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.div()
-
-```ts
-div(rhs): Expression
-```
-
-Division
-
-####### rhs
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.pow()
-
-```ts
-pow(exp): Expression
-```
-
-Power
-
-####### exp
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.root()
-
-```ts
-root(exp): Expression
-```
-
-Exponentiation
-
-####### exp
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.sqrt()
-
-```ts
-sqrt(): Expression
-```
-
-Square root
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.ln()
-
-```ts
-ln(base?): Expression
-```
-
-Logarithm (natural by default)
-
-####### base?
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.numerator
-
-Return this expression expressed as a numerator.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.denominator
-
-Return this expression expressed as a denominator.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.numeratorDenominator
-
-Return this expression expressed as a numerator and denominator.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.toRational()
-
-```ts
-toRational(): [number, number]
-```
-
-Return the value of this expression as a pair of integer numerator and
-denominator, or `null` if the expression is not a rational number.
-
-- For a `BoxedNumber` with an exact rational value, extracts from the
-  numeric representation.
-- For an integer, returns `[n, 1]`.
-- For a `Divide` or `Rational` function with integer operands, returns
-  `[num, den]`.
-- For everything else, returns `null`.
-
-The returned rational is always in lowest terms.
-
-```typescript
-ce.parse('\\frac{6}{4}').toRational()  // [3, 2]
-ce.parse('7').toRational()              // [7, 1]
-ce.parse('x + 1').toRational()          // null
-ce.number(1.5).toRational()             // null (machine float)
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.factors()
-
-```ts
-factors(): readonly Expression[]
-```
-
-Return the multiplicative factors of this expression as a flat array.
-
-This is a structural decomposition — it does not perform algebraic
-factoring (use `ce.function('Factor', [expr])` for that).
-
-- `Multiply(a, b, c)` returns `[a, b, c]`
-- `Negate(x)` returns `[-1, ...x.factors()]`
-- Anything else returns `[expr]`
-
-```typescript
-ce.parse('2xyz').factors()     // [2, x, y, z]
-ce.parse('-3x').factors()      // [-1, 3, x]
-ce.parse('x + 1').factors()    // [x + 1]
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.polynomialCoefficients()
-
-```ts
-polynomialCoefficients(variable?): readonly Expression[]
-```
-
-Return the coefficients of this expression as a polynomial in `variable`,
-in descending order of degree. Returns `undefined` if the expression is
-not a polynomial in the given variable.
-
-If `variable` is omitted, auto-detects when the expression has exactly
-one unknown. Returns `undefined` if there are zero or multiple unknowns.
-
-```typescript
-ce.parse('x^2 + 2x + 1').polynomialCoefficients('x')  // [1, 2, 1]
-ce.parse('x^3 + 2x + 1').polynomialCoefficients('x')  // [1, 0, 2, 1]
-ce.parse('sin(x)').polynomialCoefficients('x')          // undefined
-ce.parse('x^2 + 5').polynomialCoefficients()            // [1, 0, 5]
-```
-
-Subsumes `isPolynomial`:
-```typescript
-const isPolynomial = expr.polynomialCoefficients('x') !== undefined;
-```
-
-Subsumes `polynomialDegree`:
-```typescript
-const degree = expr.polynomialCoefficients('x')?.length - 1;
-```
-
-When `variable` is an array, the expression must be polynomial in ALL
-listed variables. Coefficients are decomposed by the first variable;
-remaining variables appear as symbolic coefficients.
-
-```typescript
-ce.parse('x^2*y + 3x + y^2').polynomialCoefficients(['x', 'y'])
-// → [y, 3, y²]  (coefficients of x², x¹, x⁰)
-```
-
-####### variable?
-
-`string` | `string`[]
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.polynomialRoots()
-
-```ts
-polynomialRoots(variable?): readonly Expression[]
-```
-
-Return the roots of this expression treated as a polynomial in `variable`.
-Returns `undefined` if the expression is not a polynomial in the given
-variable. Returns an empty array if no roots can be found.
-
-If `variable` is omitted, auto-detects when the expression has exactly
-one unknown.
-
-```typescript
-ce.parse('x^2 - 5x + 6').polynomialRoots('x')  // [2, 3]
-ce.parse('x^2 + 1').polynomialRoots('x')         // [] (no real roots)
-ce.parse('sin(x)').polynomialRoots('x')           // undefined
-```
-
-####### variable?
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isScoped
-
-```ts
-readonly isScoped: boolean;
-```
-
-If true, the expression has its own local scope that can be used
-for local variables and arguments. Only true if the expression is a
-function expression.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.localScope
-
-If this expression has a local scope, return it.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.subs()
-
-```ts
-subs(sub, options?): Expression
-```
-
-Replace all the symbols in the expression as indicated.
-
-Note the same effect can be achieved with `this.replace()`, but
-using `this.subs()` is more efficient and simpler, but limited
-to replacing symbols.
-
-The result is bound to the current scope, not to `this.scope`.
-
-If `options.canonical` is not set, the result is canonical if `this`
-is canonical.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-
-If this is a function, an empty substitution is given, and the computed value of `canonical`
-does not differ from that of this expr.: then a call this method is analagous to requesting a
-*clone*.
-:::
-
-####### sub
-
-`Substitution`\<[`ExpressionInput`](#expressioninput)\>
-
-####### options?
-
-####### canonical?
-
-[`CanonicalOptions`](#canonicaloptions)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.map()
-
-```ts
-map(fn, options?): Expression
-```
-
-Recursively replace all the subexpressions in the expression as indicated.
-
-To remove a subexpression, return an empty `["Sequence"]` expression.
-
-The `canonical` option is applied to each function subexpression after
-the substitution is applied.
-
-If no `options.canonical` is set, the result is canonical if `this`
-is canonical.
-
-**Default**: `{ canonical: this.isCanonical, recursive: true }`
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-####### fn
-
-(`expr`) => [`Expression`](#expression-3)
-
-####### options?
-
-####### canonical
-
-[`CanonicalOptions`](#canonicaloptions)
-
-####### recursive?
-
-`boolean`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.replace()
-
-```ts
-replace(rules, options?): Expression
-```
-
-Transform the expression by applying one or more replacement rules:
-
-- If the expression matches the `match` pattern and the `condition`
- predicate is true, replace it with the `replace` pattern.
-
-- If no rules apply, return `null`.
-
-See also `expr.subs()` for a simple substitution of symbols.
-
-Procedure for the determining the canonical-status of the input expression and replacements:
-
-- If `options.canonical` is set, the *entire expr.* is canonicalized to this degree: whether
-the replacement occurs at the top-level, or within/recursively.
-
-- If otherwise, the *direct replacement will be canonical* if either the 'replaced' expression
-is canonical, or the given replacement (- is a Expression and -) is canonical.
-Notably also, if this replacement takes place recursively (not at the top-level), then exprs.
-containing the replaced expr. will still however have their (previous) canonical-status
-*preserved*... unless this expr. was previously non-canonical, and *replacements have resulted
-in canonical operands*. In this case, an expr. meeting this criteria will be updated to
-canonical status. (Canonicalization is opportunistic here, in other words).
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-
-To match a specific symbol (not a wildcard pattern), the `match` must be
-a `Expression` (e.g., `{ match: ce.expr('x'), replace: ... }`).
-For simple symbol substitution, consider using `subs()` instead.
-:::
-
-####### rules
-
-`Rule` | `BoxedRuleSet` | `Rule`[]
-
-####### options?
-
-`Partial`\<[`ReplaceOptions`](#replaceoptions)\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.has()
-
-```ts
-has(v): boolean
-```
-
-True if the expression includes a symbol `v` or a function operator `v`.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-####### v
-
-`string` | `string`[]
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.match()
-
-```ts
-match(pattern, options?): BoxedSubstitution<Expression>
-```
-
-If this expression matches `pattern`, return a substitution that makes
-`pattern` equal to `this`. Otherwise return `null`.
-
-If `pattern` includes wildcards (symbols that start
-with `_`), the substitution will include a prop for each matching named
-wildcard.
-
-If this expression matches `pattern` but there are no named wildcards,
-return the empty substitution, `{}`.
-
-`pattern` can be:
-- A **string** (LaTeX): single-character symbols are auto-converted to
-  wildcards (e.g., `'ax^2+bx+c'` treats `a`, `b`, `c` as wildcards).
-  Results use unprefixed keys (`{a: 3}` not `{_a: 3}`) and self-matches
-  are filtered out. `useVariations` and `matchMissingTerms` default to
-  `true`. Unprefixed keys are accepted in `substitution`.
-- A **MathJSON array** (e.g., `['Add', '_a', '_b']`): boxed automatically.
-- A **BoxedExpression**: used directly.
-
-Read more about [**patterns and rules**](/compute-engine/guides/patterns-and-rules/).
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-####### pattern
-
-[`ExpressionInput`](#expressioninput)
-
-####### options?
-
-`PatternMatchOptions`\<[`Expression`](#expression-3)\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.wikidata
-
-```ts
-readonly wikidata: string;
-```
-
-Wikidata identifier.
-
-If not a canonical expression, return `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.description
-
-```ts
-readonly description: string[];
-```
-
-An optional short description if a symbol or function expression.
-
-May include markdown. Each string is a paragraph.
-
-If not a canonical expression, return `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.url
-
-```ts
-readonly url: string;
-```
-
-An optional URL pointing to more information about the symbol or
- function operator.
-
-If not a canonical expression, return `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.complexity
-
-```ts
-readonly complexity: number;
-```
-
-Expressions with a higher complexity score are sorted
-first in commutative functions
-
-If not a canonical expression, return `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.baseDefinition
-
-```ts
-readonly baseDefinition: BoxedBaseDefinition;
-```
-
-For symbols and functions, a definition associated with the
-expression. `this.baseDefinition` is the base class of symbol and function
-definition.
-
-If not a canonical expression, return `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.operatorDefinition
-
-```ts
-readonly operatorDefinition: BoxedOperatorDefinition;
-```
-
-For function expressions, the definition of the operator associated with
-the expression. For symbols, the definition of the symbol if it is an
-operator, for example `"Sin"`.
-
-If not a canonical expression or not a function expression,
-its value is `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.valueDefinition
-
-```ts
-readonly valueDefinition: BoxedValueDefinition;
-```
-
-For symbols, a definition associated with the expression, if it is
-not an operator.
-
-If not a canonical expression, or not a value, its value is `undefined`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.simplify()
-
-```ts
-simplify(options?): Expression
-```
-
-Return a simpler form of this expression.
-
-A series of rewriting rules are applied repeatedly, until no more rules
-apply.
-
-The values assigned to symbols and the assumptions about symbols may be
-used, for example `expr.isInteger` or `expr.isPositive`.
-
-No calculations involving decimal numbers (numbers that are not
-integers) are performed but exact calculations may be performed,
-for example:
-
-$$ \sin(\frac{\pi}{4}) \longrightarrow \frac{\sqrt{2}}{2} $$.
-
-The result is canonical.
-
-To manipulate symbolically non-canonical expressions, use `expr.replace()`.
-
-####### options?
-
-`Partial`\<`SimplifyOptions`\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.evaluate()
-
-```ts
-evaluate(options?): Expression
-```
-
-Return the value of the canonical form of this expression.
-
-A pure expression always returns the same value (provided that it
-remains constant / values of sub-expressions or symbols do not change),
-and has no side effects.
-
-Evaluating an impure expression may return a varying value, and may have
-some side effects such as adjusting symbol assumptions.
-
-To perform approximate calculations, use `expr.N()` instead,
-or call with `options.numericApproximation` to `true`.
-
-It is possible that the result of `expr.evaluate()` may be the same as
-`expr.simplify()`.
-
-The result is in canonical form.
-
-####### options?
-
-`Partial`\<`EvaluateOptions`\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.evaluateAsync()
-
-```ts
-evaluateAsync(options?): Promise<Expression>
-```
-
-Asynchronous version of `evaluate()`.
-
-The `options` argument can include a `signal` property, which is an
-`AbortSignal` object. If the signal is aborted, a `CancellationError` is thrown.
-
-####### options?
-
-`Partial`\<`EvaluateOptions`\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.N()
-
-```ts
-N(): Expression
-```
-
-Return a numeric approximation of the canonical form of this expression.
-
-Any necessary calculations, including on decimal numbers (non-integers),
-are performed.
-
-The calculations are performed according to the
-`precision` property of the `ComputeEngine`.
-
-To only perform exact calculations, use `this.evaluate()` instead.
-
-If the function is not numeric, the result of `this.N()` is the same as
-`this.evaluate()`.
-
-The result is in canonical form.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.solve()
-
-```ts
-solve(vars?): 
-  | readonly Expression[]
-  | Record<string, Expression>
-  | Record<string, Expression>[]
-```
-
-If this is an equation, solve the equation for the variables in vars.
-Otherwise, solve the equation `this = 0` for the variables in vars.
-
-For univariate equations, returns an array of solutions (roots).
-For systems of linear equations (List of Equal expressions), returns
-an object mapping variable names to their values.
-For non-linear polynomial systems (like xy=6, x+y=5), returns an array
-of solution objects (multiple solutions possible).
-
-```javascript
-// Univariate equation
-const expr = ce.parse("x^2 + 2*x + 1 = 0");
-console.log(expr.solve("x")); // Returns array of roots
-
-// System of linear equations
-const system = ce.parse("\\begin{cases}x+y=70\\\\2x-4y=80\\end{cases}");
-console.log(system.solve(["x", "y"])); // Returns { x: 60, y: 10 }
-
-// Non-linear polynomial system (product + sum)
-const nonlinear = ce.parse("\\begin{cases}xy=6\\\\x+y=5\\end{cases}");
-console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y: 2 }]
-```
-
-####### vars?
-
-`string` | `Iterable`\<`string`, `any`, `any`\> | [`Expression`](#expression-3) | `Iterable`\<[`Expression`](#expression-3), `any`, `any`\>
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.value
-
-```ts
-get value(): Expression
-set value(value: 
-  | string
-  | number
-  | boolean
-  | number[]
-  | BigDecimal
-  | OnlyFirst<{
-  re: number;
-  im: number;
- }, {
-  re: number;
-  im: number;
- } & {
-  num: number;
-  denom: number;
- } & Expression>
-  | OnlyFirst<{
-  num: number;
-  denom: number;
- }, {
-  re: number;
-  im: number;
- } & {
-  num: number;
-  denom: number;
- } & Expression>
-  | OnlyFirst<Expression, {
-  re: number;
-  im: number;
- } & {
-  num: number;
-  denom: number;
- } & Expression>): void
-```
-
-If this expression is a number literal, a string literal or a function
- literal, return the expression.
-
-If the expression is a symbol, return the value of the symbol.
-
-Otherwise, the expression is a symbolic expression, including an unknown
-symbol, i.e. a symbol with no value, return `undefined`.
-
-If the expression is a symbol, set the value of the symbol.
-
-Will throw a runtime error if either not a symbol, or a symbol with the
-`constant` flag set to `true`.
-
-Setting the value of a symbol results in the forgetting of all assumptions
-about it in the current scope.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isCollection
-
-```ts
-isCollection: boolean;
-```
-
-Is `true` if the expression is a collection.
-
-When `isCollection` is `true`, the expression:
-
-- has an `each()` method that returns a generator over the elements
-  of the collection.
-- has a `size` property that returns the number of elements in the
-  collection.
-- has a `contains(other)` method that returns `true` if the `other`
-  expression is in the collection.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isIndexedCollection
-
-```ts
-isIndexedCollection: boolean;
-```
-
-Is `true` if this is an indexed collection, such as a list, a vector,
-a matrix, a tuple, etc...
-
-The elements of an indexed collection can be accessed by a one-based
-index.
-
-When `isIndexedCollection` is `true`, the expression:
-- has an `each()`, `size()` and `contains(rhs)` methods
-   as for a collection.
-- has an `at(index: number)` method that returns the element at the
-   specified index.
-- has an `indexWhere(predicate: (element: Expression) => boolean)`
-   method that returns the index of the first element that matches the
-   predicate.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isLazyCollection
-
-```ts
-isLazyCollection: boolean;
-```
-
-False if not a collection, or if the elements of the collection
-are not computed lazily.
-
-The elements of a lazy collection are computed on demand, when
-iterating over the collection using `each()`.
-
-Use `ListFrom` and related functions to create eager collections from
-lazy collections.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.each()
-
-```ts
-each(): Generator<Expression>
-```
-
-If this is a collection, return an iterator over the elements of the
-collection.
-
-```js
-const expr = ce.parse('[1, 2, 3, 4]');
-for (const e of expr.each()) {
- console.log(e);
-}
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.contains()
-
-```ts
-contains(rhs): boolean
-```
-
-If this is a collection, return true if the `rhs` expression is in the
-collection.
-
-Return `undefined` if the membership cannot be determined without
-iterating over the collection.
-
-####### rhs
-
-[`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.subsetOf()
-
-```ts
-subsetOf(other, strict): boolean
-```
-
-Check if this collection is a subset of another collection.
-
-####### other
-
-[`Expression`](#expression-3)
-
-The other collection to check against.
-
-####### strict
-
-`boolean`
-
-If true, the subset relation is strict (i.e., proper subset).
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.count
-
-If this is a collection, return the number of elements in the collection.
-
-If the collection is infinite, return `Infinity`.
-
-If the number of elements cannot be determined, return `undefined`, for
-example, if the collection is lazy and not finite and the size cannot
-be determined without iterating over the collection.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isFiniteCollection
-
-```ts
-isFiniteCollection: boolean;
-```
-
-If this is a finite collection, return true.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isEmptyCollection
-
-```ts
-isEmptyCollection: boolean;
-```
-
-If this is an empty collection, return true.
-
-An empty collection has a size of 0.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.at()
-
-```ts
-at(index): Expression
-```
-
-If this is an indexed collection, return the element at the specified
- index. The first element is at index 1.
-
-If the index is negative, return the element at index `size() + index + 1`.
-
-The last element is at index -1.
-
-####### index
-
-`number`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.get()
-
-```ts
-get(key): Expression
-```
-
-If this is a keyed collection (map, record, tuple), return the value of
-the corresponding key.
-
-If `key` is a `Expression`, it should be a string.
-
-####### key
-
-`string` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.indexWhere()
-
-```ts
-indexWhere(predicate): number
-```
-
-If this is an indexed collection, return the index of the first element
-that matches the predicate.
-
-####### predicate
-
-(`element`) => `boolean`
-
-</MemberCard>
-
-#### Primitive Methods
-
-<MemberCard>
-
-##### Expression.valueOf()
-
-```ts
-valueOf(): string | number | boolean | number[] | number[][] | number[][][]
-```
-
-Return a JavaScript primitive value for the expression, based on
-`Object.valueOf()`.
-
-This method is intended to make it easier to work with JavaScript
-primitives, for example when mixing JavaScript computations with
-symbolic computations from the Compute Engine.
-
-If the expression is a **machine number**, a **bignum**, or a **rational**
-that can be converted to a machine number, return a JavaScript `number`.
-This conversion may result in a loss of precision.
-
-If the expression is the **symbol `"True"`** or the **symbol `"False"`**,
-return `true` or `false`, respectively.
-
-If the expression is a **symbol with a numeric value**, return the numeric
-value of the symbol.
-
-If the expression is a **string literal**, return the string value.
-
-If the expression is a **tensor** (list of number or multidimensional
-array or matrix), return an array of numbers, or an array of
-arrays of numbers, or an array of arrays of arrays of numbers.
-
-If the expression is a function expression return a string representation
-of the expression.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.\[toPrimitive\]()
-
-```ts
-toPrimitive: string | number
-```
-
-Similar to`expr.valueOf()` but includes a hint.
-
-####### hint
-
-`"string"` | `"number"` | `"default"`
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.toString()
-
-```ts
-toString(): string
-```
-
-Return an ASCIIMath representation of the expression. This string is
-suitable to be output to the console for debugging, for example.
-
-Based on `Object.toString()`.
-
-To get a LaTeX representation of the expression, use `expr.latex`.
-
-Note that lazy collections are eagerly evaluated.
-
-Used when coercing a `Expression` to a `String`.
-
-For arbitrary-precision numbers (`BigNumericValue`), the output is
-rounded to `BigDecimal.precision` significant digits. Digits beyond the
-working precision are noise from precision-bounded operations (division,
-transcendentals) and are not displayed. Machine-precision numbers use
-their native `Number.toString()`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.toJSON()
-
-```ts
-toJSON(): MathJsonExpression
-```
-
-Used by `JSON.stringify()` to serialize this object to JSON.
-
-Method version of `expr.json`.
-
-Based on `Object.toJSON()`.
-
-Note that lazy collections are *not* eagerly evaluated.
-
-The output preserves the full raw `BigDecimal` value with no rounding,
-ensuring lossless round-tripping via `ce.box(expr.json)`. Digits beyond
-`ce.precision` may be present but are not guaranteed to be accurate.
-Use `toMathJson({ fractionalDigits: 'auto' })` for precision-rounded
-MathJSON output.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.is()
-
-```ts
-is(other, tolerance?): boolean
-```
-
-Smart equality check: structural first, then numeric evaluation fallback.
-Symmetric: `a.is(b)` always equals `b.is(a)`.
-
-First tries an exact structural check (same as `isSame()`). If that fails
-and the expression is constant (no free variables), evaluates numerically
-and compares within `engine.tolerance`.
-
-For literal numbers compared to primitives (`number`, `bigint`), behaves
-identically to `isSame()` — no tolerance is applied. Tolerance only
-applies to expressions that require evaluation (e.g., `\\sin(\\pi)`).
-
-```typescript
-ce.parse('\\cos(\\frac{\\pi}{2})').is(0)  // true — evaluates, within tolerance
-ce.number(1e-17).is(0)                     // false — literal, no tolerance
-ce.parse('x + 1').is(1)                    // false — has free variables
-ce.parse('\\pi').is(3.14, 0.01)            // true — within custom tolerance
-```
-
-After the structural check, attempts to expand both sides (distributing
-products, applying the multinomial theorem, etc.) and re-checks
-structural equality. This catches equivalences like `(x+1)^2` vs
-`x^2+2x+1` even when the expression has free variables.
-
-####### other
-
-`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-3)
-
-####### tolerance?
-
-`number`
-
-If provided, overrides `engine.tolerance` for the
-numeric comparison. Has no effect when the comparison is structural
-(i.e., when `isSame()` succeeds or the expression has free variables).
-
-</MemberCard>
-
-#### Relational Operator
-
-<MemberCard>
-
-##### Expression.isSame()
-
-```ts
-isSame(rhs): boolean
-```
-
-Fast exact structural/symbolic equality check.
-
-Returns `true` if the expression is structurally identical to `rhs`.
-For symbols with value bindings, follows the binding (e.g., if `one = 1`,
-then `ce.symbol('one').isSame(1)` is `true`).
-
-Accepts JavaScript primitives: `number`, `bigint`, `boolean`, `string`.
-
-Does **not** evaluate expressions — purely structural.
-
-`ce.parse('1+x', {form: 'raw'}).isSame(ce.parse('x+1', {form: 'raw'}))` is `false`.
-
-See `expr.is()` for a smart check with numeric evaluation fallback,
-and `expr.isEqual()` for full mathematical equality.
-
-:::info[Note]
-Applicable to canonical and non-canonical expressions.
-:::
-
-####### rhs
-
-`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isLess()
-
-```ts
-isLess(other): boolean
-```
-
-The value of both expressions are compared.
-
-If the expressions cannot be compared, return `undefined`
-
-####### other
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isLessEqual()
-
-```ts
-isLessEqual(other): boolean
-```
-
-The value of both expressions are compared.
-
-If the expressions cannot be compared, return `undefined`
-
-####### other
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isGreater()
-
-```ts
-isGreater(other): boolean
-```
-
-The value of both expressions are compared.
-
-If the expressions cannot be compared, return `undefined`
-
-####### other
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isGreaterEqual()
-
-```ts
-isGreaterEqual(other): boolean
-```
-
-The value of both expressions are compared.
-
-If the expressions cannot be compared, return `undefined`
-
-####### other
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isEqual()
-
-```ts
-isEqual(other): boolean
-```
-
-Mathematical equality (strong equality), that is the value
-of this expression and the value of `other` are numerically equal.
-
-Both expressions are evaluated and the result is compared numerically.
-
-Numbers whose difference is less than `engine.tolerance` are
-considered equal. This tolerance is set when the `engine.precision` is
-changed to be such that the last two digits are ignored.
-
-Evaluating the expressions may be expensive. Other options to consider
-to compare two expressions include:
-- `expr.isSame(other)` for a fast exact structural comparison (no evaluation)
-- `expr.is(other)` for a smart check that tries structural first, then
-  numeric evaluation fallback for constant expressions
-
-**Examples**
-
-```js
-let expr = ce.parse('2 + 2');
-console.log(expr.isEqual(4)); // true
-console.log(expr.isSame(4)); // false (structural only)
-console.log(expr.is(4)); // true (evaluates, within tolerance)
-
-expr = ce.parse('4');
-console.log(expr.isEqual(4)); // true
-console.log(expr.isSame(4)); // true
-console.log(expr.is(4)); // true
-
-```
-
-####### other
-
-`number` | [`Expression`](#expression-3)
-
-</MemberCard>
-
-#### Tensor Expression
-
-<MemberCard>
-
-##### Expression.shape
-
-```ts
-readonly shape: number[];
-```
-
-The **shape** describes the **axes** of the expression, where each axis
-represent a way to index the elements of the expression.
-
-When the expression is a scalar (number), the shape is `[]`.
-
-When the expression is a vector of length `n`, the shape is `[n]`.
-
-When the expression is a `n` by `m` matrix, the shape is `[n, m]`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.rank
-
-```ts
-readonly rank: number;
-```
-
-The **rank** refers to the number of dimensions (or axes) of the
-expression.
-
-Return 0 for a scalar, 1 for a vector, 2 for a matrix, > 2 for
-a multidimensional matrix.
-
-The rank is equivalent to the length of `expr.shape`
-
-:::info[Note]
-There are several definitions of rank in the literature.
-For example, the row rank of a matrix is the number of linearly
-independent rows. The rank can also refer to the number of non-zero
-singular values of a matrix.
-:::
-
-</MemberCard>
-
-#### Type Properties
-
-<MemberCard>
-
-##### Expression.type
-
-```ts
-get type(): BoxedType
-set type(type: 
-  | string
-  | AlgebraicType
-  | NegationType
-  | CollectionType
-  | ListType
-  | SetType
-  | RecordType
-  | DictionaryType
-  | TupleType
-  | SymbolType
-  | ExpressionType
-  | NumericType
-  | FunctionSignature
-  | ValueType
-  | TypeReference
-  | BoxedType): void
-```
-
-The type of the value of this expression.
-
-If a symbol the type of the value of the symbol.
-
-If a function expression, the type of the value of the function
-(the result type).
-
-If a symbol with a `"function"` type (a function literal), returns the
-signature.
-
-If not valid, return `"error"`.
-
-If the type is not known, return `"unknown"`.
-
-</MemberCard>
-
 <MemberCard>
 
-##### Expression.isNumber
+### IntervalBounds
 
 ```ts
-readonly isNumber: boolean;
+type IntervalBounds = {
+  lower: Expression;
+  lowerStrict: boolean;
+  upper: Expression;
+  upperStrict: boolean;
+};
 ```
-
-`true` if the value of this expression is a number.
-
-Note that in a fateful twist of cosmic irony, `NaN` ("Not a Number")
-**is** a number.
-
-If `isNumber` is `true`, this indicates that evaluating the expression
-will return a number.
-
-This does not indicate that the expression is a number literal. To check
-if the expression is a number literal, use `expr.isNumberLiteral`.
-
-For example, the expression `["Add", 1, "x"]` is a number if "x" is a
-number and `expr.isNumber` is `true`, but `isNumberLiteral` is `false`.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isInteger
-
-```ts
-readonly isInteger: boolean;
-```
-
-The value of this expression is an element of the set ℤ: ...,-2, -1, 0, 1, 2...
-
-Note that ±∞ and NaN are not integers.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isRational
-
-```ts
-readonly isRational: boolean;
-```
-
-The value of this expression is an element of the set ℚ, p/q with p ∈ ℕ, q ∈ ℤ ⃰  q >= 1
-
-Note that every integer is also a rational.
-
-This is equivalent to `this.type === "rational" || this.type === "integer"`
-
-Note that ±∞ and NaN are not rationals.
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isReal
-
-```ts
-readonly isReal: boolean;
-```
-
-The value of this expression is a real number.
 
-This is equivalent to `this.type === "rational" || this.type === "integer" || this.type === "real"`
+Lower and upper bounds for a symbol extracted from a domain restriction.
 
-Note that ±∞ and NaN are not real numbers.
+`lowerStrict`/`upperStrict` are `true` for strict (`<`, `>`) bounds and
+`false` (or `undefined`) for non-strict (`≤`, `≥`) bounds.
 
 </MemberCard>
 
@@ -4237,6 +2029,8 @@ type ReplaceOptions = {
   matchPermutations: boolean;
   iterationLimit: number;
   canonical: CanonicalOptions;
+  form: FormOption;
+  direction: "left-right" | "right-left";
 };
 ```
 
@@ -6565,6 +4359,7 @@ type ParseLatexOptions = NumberFormat & {
   preserveLatex: boolean;
   quantifierScope: "tight" | "loose";
   timeDerivativeVariable: string;
+  tolerance: number;
 };
 ```
 
@@ -6717,6 +4512,20 @@ The variable used for time derivatives in Newton notation
 When parsing `\dot{x}`, it will be interpreted as `["D", "x", timeDerivativeVariable]`.
 
 **Default:** `"t"`
+
+#### ParseLatexOptions.tolerance
+
+```ts
+tolerance: number;
+```
+
+The tolerance used when validating inferred range steps from sampled
+elements (e.g. `[0, 0.1, 0.2, \ldots, 1]`). Two consecutive differences
+are considered equal when they differ by less than this value.
+
+Populated automatically from `ce.tolerance` by `ce.parse()`.
+
+**Default:** `ce.tolerance` (typically `1e-7`)
 
 </MemberCard>
 
@@ -7356,6 +5165,7 @@ type SerializeLatexOptions = NumberSerializationFormat & {
   logicStyle: (expr, level) => "word" | "boolean" | "uppercase-word" | "punctuation";
   powerStyle: (expr, level) => "root" | "solidus" | "quotient";
   numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-builder";
+  dotNotation: boolean;
   dmsFormat: boolean;
   angleNormalization: "none" | "0...360" | "-180...180";
 };
@@ -7439,6 +5249,39 @@ missingSymbol: LatexString;
 ```
 
 Serialize the expression `["Error", "'missing'"]`,  with this LaTeX string
+
+#### SerializeLatexOptions.dotNotation
+
+```ts
+dotNotation: boolean;
+```
+
+When `true`, member-access heads serialize to dot notation:
+- `First(p)` → `p.x`
+- `Second(p)` → `p.y`
+- `Third(p)` → `p.z`
+- `Real(z)` → `z.\operatorname{real}`
+- `Imaginary(z)` → `z.\operatorname{imag}`
+- `Length(L)` → `L.\operatorname{count}`
+- `Sum(L)` → `L.\operatorname{total}`
+- `Max(L)` → `L.\max`
+- `Min(L)` → `L.\min`
+
+When `false` (default), the standard function-call form is used.
+
+Only applies to arity-1 forms. Multi-operand forms (e.g. `Sum` with
+an index tuple) keep their standard serialization even when this is `true`.
+
+**Serializer-only.** This flag has no effect on parsing. All input
+forms continue to parse as before regardless of the flag (e.g. `|L|`,
+`\operatorname{count}(L)`, and `L.\operatorname{count}` all parse to
+`["Length", L]` whether `dotNotation` is on or off). The flag only
+decides which form the serializer emits.
+
+Set engine-wide via `ce.latexOptions.dotNotation = true`, or per-call
+via `expr.toLatex({ dotNotation: true })`.
+
+**Default**: `false`
 
 #### SerializeLatexOptions.dmsFormat?
 
@@ -8517,6 +6360,32 @@ serialize(expr, options?): string
 
 <MemberCard>
 
+### OperatorInfo
+
+```ts
+type OperatorInfo = {
+  kind: "function" | "opaque";
+  signature: BoxedType;
+};
+```
+
+</MemberCard>
+
+<MemberCard>
+
+### SymbolInfo
+
+```ts
+type SymbolInfo = {
+  kind: "constant" | "variable";
+  type: BoxedType;
+};
+```
+
+</MemberCard>
+
+<MemberCard>
+
 ### RuleStep
 
 ```ts
@@ -8584,6 +6453,2279 @@ type EvalContext = KernelEvalContext<Expression, BoxedDefinition>;
 ```
 
 Evaluation context specialized to this engine/runtime model.
+
+</MemberCard>
+
+### Expression
+
+#### Function Expression
+
+<MemberCard>
+
+##### Expression.operator
+
+```ts
+readonly operator: string;
+```
+
+The name of the operator of the expression.
+
+For example, the name of the operator of `["Add", 2, 3]` is `"Add"`.
+
+A string literal has a `"String"` operator.
+
+A symbol has a `"Symbol"` operator.
+
+A number has a `"Number"`, `"Real"`, `"Rational"` or `"Integer"` operator; amongst some others.
+Practically speaking, for fully canonical and valid expressions, all of these are likely to
+collapse to `"Number"`.
+
+</MemberCard>
+
+#### Numeric Expression
+
+<MemberCard>
+
+##### Expression.isEven
+
+```ts
+readonly isEven: boolean;
+```
+
+If the value of this expression is not an **integer** return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isOdd
+
+```ts
+readonly isOdd: boolean;
+```
+
+If the value of this expression is not an **integer** return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.re
+
+```ts
+readonly re: number;
+```
+
+Return the real part of the value of this expression, if a number.
+
+Otherwise, return `NaN` (not a number).
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.im
+
+```ts
+readonly im: number;
+```
+
+If value of this expression is a number, return the imaginary part of the
+value. If the value is a real number, the imaginary part is 0.
+
+Otherwise, return `NaN` (not a number).
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.bignumRe
+
+```ts
+readonly bignumRe: BigDecimal;
+```
+
+If the value of this expression is a number, return the real part of the
+value as a `BigNum`.
+
+If the value is not available as a bignum return `undefined`. That is,
+the value is not upconverted to a bignum.
+
+To get the real value either as a bignum or a number, use
+`expr.bignumRe ?? expr.re`.
+
+When using this pattern, the value is returned as a bignum if available,
+otherwise as a number or `NaN` if the value is not a number.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.bignumIm
+
+```ts
+readonly bignumIm: BigDecimal;
+```
+
+If the value of this expression is a number, return the imaginary part as
+a `BigNum`.
+
+It may be 0 if the number is real.
+
+If the value of the expression is not a number or the value is not
+available as a bignum return `undefined`. That is, the value is not
+upconverted to a bignum.
+
+To get the imaginary value either as a bignum or a number, use
+`expr.bignumIm ?? expr.im`.
+
+When using this pattern, the value is returned as a bignum if available, otherwise as a number or `NaN` if the value is not a number.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.sgn
+
+```ts
+readonly sgn: Sign;
+```
+
+Return the sign of the expression.
+
+Note that complex numbers have no natural ordering, so if the value is an
+imaginary number (a complex number with a non-zero imaginary part),
+`this.sgn` will return `unsigned`.
+
+If a symbol, this does take assumptions into account, that is `this.sgn`
+will return `positive` if the symbol is assumed to be positive
+using `ce.assume()`.
+
+Non-canonical expressions return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isPositive
+
+```ts
+readonly isPositive: boolean;
+```
+
+The value of this expression is > 0, same as `isGreaterEqual(0)`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isNonNegative
+
+```ts
+readonly isNonNegative: boolean;
+```
+
+The value of this expression is >= 0, same as `isGreaterEqual(0)`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isNegative
+
+```ts
+readonly isNegative: boolean;
+```
+
+The value of this expression is &lt; 0, same as `isLess(0)`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isNonPositive
+
+```ts
+readonly isNonPositive: boolean;
+```
+
+The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isNaN
+
+```ts
+readonly isNaN: boolean;
+```
+
+If true, the value of this expression is "Not a Number".
+
+A value representing undefined result of computations, such as `0/0`,
+as per the floating point format standard IEEE-754.
+
+Note that if `isNaN` is true, `isNumber` is also true (yes, `NaN` is a
+number).
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isInfinity
+
+```ts
+readonly isInfinity: boolean;
+```
+
+The numeric value of this expression is `±Infinity` or ComplexInfinity.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isFinite
+
+```ts
+readonly isFinite: boolean;
+```
+
+This expression is a number, but not `±Infinity`, `ComplexInfinity` or
+ `NaN`
+
+</MemberCard>
+
+#### Other
+
+<MemberCard>
+
+##### Expression.engine
+
+```ts
+readonly engine: ExpressionComputeEngine;
+```
+
+The Compute Engine instance associated with this expression provides
+a context in which to interpret it, such as definition of symbols
+and functions.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toMathJson()
+
+```ts
+toMathJson(options?): MathJsonExpression
+```
+
+Serialize to a MathJSON expression with specified options.
+
+Use `{ fractionalDigits: 'auto' }` to round arbitrary-precision
+numbers to `ce.precision` significant digits. The default
+(`'max'`) emits all available digits with no rounding.
+
+####### options?
+
+`Readonly`\<`Partial`\<[`JsonSerializationOptions`](#jsonserializationoptions)\>\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.json
+
+```ts
+readonly json: MathJsonExpression;
+```
+
+MathJSON representation of this expression.
+
+This representation always use shorthands when possible. Metadata is not
+included.
+
+Numbers are converted to JavaScript numbers and may lose precision.
+
+The expression is represented exactly and no sugaring is applied. For
+example, `["Power", "x", 2]` is not represented as `["Square", "x"]`.
+
+For more control over the serialization, use `expr.toMathJson()`.
+
+Note that lazy collections are *not* eagerly evaluated.
+
+For arbitrary-precision numbers, the full raw `BigDecimal` value is
+emitted with no rounding (same as `toJSON()`). This preserves data
+fidelity for round-tripping but may include trailing digits beyond
+`ce.precision` that are not meaningful. Use
+`toMathJson({ fractionalDigits: 'auto' })` for rounded output.
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.latex
+
+```ts
+readonly latex: string;
+```
+
+Return a LaTeX representation of this expression.
+
+This is a convenience getter that delegates to the standalone
+`serialize()` function from the `latex-syntax` module.
+
+Numeric values are rounded to `ce.precision` significant digits.
+Noise digits from precision-bounded operations (division,
+transcendentals) are not displayed.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toLatex()
+
+```ts
+toLatex(options?): string
+```
+
+Return a LaTeX representation of this expression with custom
+serialization options.
+
+Numeric values are rounded to `ce.precision` significant digits.
+
+####### options?
+
+`Record`\<`string`, `any`\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.print()
+
+```ts
+print(): void
+```
+
+Output to the console a string representation of the expression.
+
+Note that lazy collections are eagerly evaluated when printed.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.verbatimLatex?
+
+```ts
+optional verbatimLatex: string;
+```
+
+If the expression was constructed from a LaTeX string, the verbatim LaTeX
+ string it was parsed from.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isCanonical
+
+If `true`, this expression is in a canonical form.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isStructural
+
+If `true`, this expression is in a structural form.
+
+The structural form of an expression is used when applying rules to
+an expression. For example, a rational number is represented as a
+function expression instead of a `Expression` object.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.canonical
+
+Return the canonical form of this expression.
+
+If a function expression or symbol, they are first bound with a definition
+in the current scope.
+
+When determining the canonical form the following operator definition
+flags are applied:
+- `associative`: \\( f(a, f(b), c) \longrightarrow f(a, b, c) \\)
+- `idempotent`: \\( f(f(a)) \longrightarrow f(a) \\)
+- `involution`: \\( f(f(a)) \longrightarrow a \\)
+- `commutative`: sort the arguments.
+
+If this expression is already canonical, the value of canonical is
+`this`.
+
+The arguments of a canonical function expression may not all be
+canonical, for example in the `["Declare", "i", 2]` expression,
+`i` is not canonical since it is used only as the name of a symbol, not
+as a (potentially) existing symbol.
+
+:::info[Note]
+Partially canonical expressions, such as those produced through
+`CanonicalForm`, also yield an expression which is marked as `canonical`.
+This means that, likewise for partially canonical expressions, the
+`canonical` property will return the self-same expression (and
+'isCanonical' will also be true).
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.structural
+
+Return the structural form of this expression.
+
+Some expressions, such as rational numbers, are represented with
+a `Expression` object. In some cases, for example when doing a
+structural comparison of two expressions, it is useful to have a
+structural representation of the expression where the rational numbers
+is represented by a function expression instead.
+
+If there is a structural representation of the expression, return it,
+otherwise return `this`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isValid
+
+```ts
+readonly isValid: boolean;
+```
+
+`false` if this expression or any of its subexpressions is an `["Error"]`
+expression.
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions. For
+non-canonical expression, this may indicate a syntax error while parsing
+LaTeX. For canonical expression, this may indicate argument type
+mismatch, or missing or unexpected arguments.
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isPure
+
+```ts
+readonly isPure: boolean;
+```
+
+If *true*, evaluating this expression has no side-effects (does not
+change the state of the Compute Engine).
+
+If *false*, evaluating this expression may change the state of the
+Compute Engine or it may return a different value each time it is
+evaluated, even if the state of the Compute Engine is the same.
+
+As an example, the `["Add", 2, 3]` function expression is pure, but
+the `["Random"]` function expression is not pure.
+
+For a function expression to be pure, the function itself (its operator)
+must be pure, and all of its arguments must be pure too.
+
+A pure function expression may return a different value each time it is
+evaluated if its arguments are not constant. For example, the
+`["Add", "x", 1]` function expression is pure, but it is not
+constant, because `x` is not constant.
+
+:::info[Note]
+Applicable to canonical expressions only
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isConstant
+
+```ts
+readonly isConstant: boolean;
+```
+
+`True` if evaluating this expression always returns the same value.
+
+If *true* and a function expression, implies that it is *pure* and
+that all of its arguments are constant.
+
+Number literals, symbols with constant values, and pure numeric functions
+with constant arguments are all *constant*, i.e.:
+- `42` is constant
+- `Pi` is constant
+- `["Divide", "Pi", 2]` is constant
+- `x` is not constant, unless declared with a constant flag.
+- `["Add", "x", 2]` is either constant only if `x` is constant.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.errors
+
+```ts
+readonly errors: readonly Expression[];
+```
+
+All the `["Error"]` subexpressions.
+
+If an expression includes an error, the expression is also an error.
+In that case, the `this.isValid` property is `false`.
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.getSubexpressions()
+
+```ts
+getSubexpressions(operator): readonly Expression[]
+```
+
+All the subexpressions matching the named operator, recursively.
+
+Example:
+
+```js
+const expr = ce.parse('a + b * c + d');
+const subexpressions = expr.getSubexpressions('Add');
+// -> `[['Add', 'a', 'b'], ['Add', 'c', 'd']]`
+```
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+####### operator
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.subexpressions
+
+```ts
+readonly subexpressions: readonly Expression[];
+```
+
+All the subexpressions in this expression, recursively
+
+Example:
+
+```js
+const expr = ce.parse('a + b * c + d');
+const subexpressions = expr.subexpressions;
+// -> `[['Add', 'a', 'b'], ['Add', 'c', 'd'], 'a', 'b', 'c', 'd']`
+```
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.symbols
+
+```ts
+readonly symbols: readonly string[];
+```
+
+All the symbols in the expression, recursively, including
+bound variables (e.g., summation/product index variables).
+
+Use [unknowns](#unknowns) or [freeVariables](#freevariables) to get only the
+symbols that are free (not bound by a scoping construct).
+
+```js
+const expr = ce.parse('a + b * c + d');
+const symbols = expr.symbols;
+// -> ['a', 'b', 'c', 'd']
+```
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.unknowns
+
+```ts
+readonly unknowns: readonly string[];
+```
+
+All the symbols used in the expression that do not have a value
+associated with them, i.e. they are declared but not defined.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.freeVariables
+
+```ts
+readonly freeVariables: readonly string[];
+```
+
+The free variables of the expression: symbols that are not constants,
+not operators, not bound to a value, and not locally scoped (e.g.,
+summation/product index variables are excluded).
+
+This is an alias for [unknowns](#unknowns).
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toNumericValue()
+
+```ts
+toNumericValue(): [NumericValue, Expression]
+```
+
+Attempt to factor a numeric coefficient `c` and a `rest` out of a
+canonical expression such that `rest.mul(c)` is equal to `this`.
+
+Attempts to make `rest` a positive value (i.e. pulls out negative sign).
+
+```json
+['Multiply', 2, 'x', 3, 'a']
+   -> [NumericValue(6), ['Multiply', 'x', 'a']]
+
+['Divide', ['Multiply', 2, 'x'], ['Multiply', 3, 'y', 'a']]
+   -> [NumericValue({rational: [2, 3]}), ['Divide', 'x', ['Multiply, 'y', 'a']]]
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.neg()
+
+```ts
+neg(): Expression
+```
+
+Negate (additive inverse)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.inv()
+
+```ts
+inv(): Expression
+```
+
+Inverse (multiplicative inverse)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.abs()
+
+```ts
+abs(): Expression
+```
+
+Absolute value
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.add()
+
+```ts
+add(rhs): Expression
+```
+
+Addition
+
+####### rhs
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.sub()
+
+```ts
+sub(rhs): Expression
+```
+
+Subtraction
+
+####### rhs
+
+[`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.mul()
+
+```ts
+mul(rhs): Expression
+```
+
+Multiplication
+
+####### rhs
+
+`number` | [`NumericValue`](#abstract-numericvalue) | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.div()
+
+```ts
+div(rhs): Expression
+```
+
+Division
+
+####### rhs
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.pow()
+
+```ts
+pow(exp): Expression
+```
+
+Power
+
+####### exp
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.root()
+
+```ts
+root(exp): Expression
+```
+
+Exponentiation
+
+####### exp
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.sqrt()
+
+```ts
+sqrt(): Expression
+```
+
+Square root
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.ln()
+
+```ts
+ln(base?): Expression
+```
+
+Logarithm (natural by default)
+
+####### base?
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.numerator
+
+Return this expression expressed as a numerator.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.denominator
+
+Return this expression expressed as a denominator.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.numeratorDenominator
+
+Return this expression expressed as a numerator and denominator.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toRational()
+
+```ts
+toRational(): [number, number]
+```
+
+Return the value of this expression as a pair of integer numerator and
+denominator, or `null` if the expression is not a rational number.
+
+- For a `BoxedNumber` with an exact rational value, extracts from the
+  numeric representation.
+- For an integer, returns `[n, 1]`.
+- For a `Divide` or `Rational` function with integer operands, returns
+  `[num, den]`.
+- For everything else, returns `null`.
+
+The returned rational is always in lowest terms.
+
+```typescript
+ce.parse('\\frac{6}{4}').toRational()  // [3, 2]
+ce.parse('7').toRational()              // [7, 1]
+ce.parse('x + 1').toRational()          // null
+ce.number(1.5).toRational()             // null (machine float)
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.factors()
+
+```ts
+factors(): readonly Expression[]
+```
+
+Return the multiplicative factors of this expression as a flat array.
+
+This is a structural decomposition — it does not perform algebraic
+factoring (use `ce.function('Factor', [expr])` for that).
+
+- `Multiply(a, b, c)` returns `[a, b, c]`
+- `Negate(x)` returns `[-1, ...x.factors()]`
+- Anything else returns `[expr]`
+
+```typescript
+ce.parse('2xyz').factors()     // [2, x, y, z]
+ce.parse('-3x').factors()      // [-1, 3, x]
+ce.parse('x + 1').factors()    // [x + 1]
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.polynomialCoefficients()
+
+```ts
+polynomialCoefficients(variable?): readonly Expression[]
+```
+
+Return the coefficients of this expression as a polynomial in `variable`,
+in descending order of degree. Returns `undefined` if the expression is
+not a polynomial in the given variable.
+
+If `variable` is omitted, auto-detects when the expression has exactly
+one unknown. Returns `undefined` if there are zero or multiple unknowns.
+
+```typescript
+ce.parse('x^2 + 2x + 1').polynomialCoefficients('x')  // [1, 2, 1]
+ce.parse('x^3 + 2x + 1').polynomialCoefficients('x')  // [1, 0, 2, 1]
+ce.parse('sin(x)').polynomialCoefficients('x')          // undefined
+ce.parse('x^2 + 5').polynomialCoefficients()            // [1, 0, 5]
+```
+
+Subsumes `isPolynomial`:
+```typescript
+const isPolynomial = expr.polynomialCoefficients('x') !== undefined;
+```
+
+Subsumes `polynomialDegree`:
+```typescript
+const degree = expr.polynomialCoefficients('x')?.length - 1;
+```
+
+When `variable` is an array, the expression must be polynomial in ALL
+listed variables. Coefficients are decomposed by the first variable;
+remaining variables appear as symbolic coefficients.
+
+```typescript
+ce.parse('x^2*y + 3x + y^2').polynomialCoefficients(['x', 'y'])
+// → [y, 3, y²]  (coefficients of x², x¹, x⁰)
+```
+
+####### variable?
+
+`string` | `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.polynomialRoots()
+
+```ts
+polynomialRoots(variable?): readonly Expression[]
+```
+
+Return the roots of this expression treated as a polynomial in `variable`.
+Returns `undefined` if the expression is not a polynomial in the given
+variable. Returns an empty array if no roots can be found.
+
+If `variable` is omitted, auto-detects when the expression has exactly
+one unknown.
+
+```typescript
+ce.parse('x^2 - 5x + 6').polynomialRoots('x')  // [2, 3]
+ce.parse('x^2 + 1').polynomialRoots('x')         // [] (no real roots)
+ce.parse('sin(x)').polynomialRoots('x')           // undefined
+```
+
+####### variable?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isScoped
+
+```ts
+readonly isScoped: boolean;
+```
+
+If true, the expression has its own local scope that can be used
+for local variables and arguments. Only true if the expression is a
+function expression.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.localScope
+
+If this expression has a local scope, return it.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.subs()
+
+```ts
+subs(sub, options?): Expression
+```
+
+Replace all the symbols in the expression as indicated.
+
+Note the same effect can be achieved with `this.replace()`, but
+using `this.subs()` is more efficient and simpler, but limited
+to replacing symbols.
+
+The result is bound to the current scope, not to `this.scope`.
+
+If `options.canonical` is not set, the result is canonical if `this`
+is canonical.
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+
+If this is a function, an empty substitution is given, and the computed value of `canonical`
+does not differ from that of this expr.: then a call this method is analagous to requesting a
+*clone*.
+:::
+
+####### sub
+
+`Substitution`\<[`ExpressionInput`](#expressioninput)\>
+
+####### options?
+
+####### canonical?
+
+[`CanonicalOptions`](#canonicaloptions)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.map()
+
+```ts
+map(fn, options?): Expression
+```
+
+Recursively replace all the subexpressions in the expression as indicated.
+
+To remove a subexpression, return an empty `["Sequence"]` expression.
+
+The `canonical` option is applied to each function subexpression after
+the substitution is applied.
+
+If no `options.canonical` is set, the result is canonical if `this`
+is canonical.
+
+**Default**: `{ canonical: this.isCanonical, recursive: true }`
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+####### fn
+
+(`expr`) => [`Expression`](#expression-3)
+
+####### options?
+
+####### canonical
+
+[`CanonicalOptions`](#canonicaloptions)
+
+####### recursive?
+
+`boolean`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.replace()
+
+```ts
+replace(rules, options?): Expression
+```
+
+Transform the expression by applying one or more replacement rules:
+
+- If the expression matches the `match` pattern and the `condition`
+ predicate is true, replace it with the `replace` pattern.
+
+- If no rules apply, return `null`.
+
+The `form` option controls the form of *replacements*. The deprecated
+`canonical` option is also accepted for backward compatibility; only one
+of the two may be specified.
+
+When neither `form` nor `canonical` is specified, the form of each
+replacement is determined as follows:
+1. the form of the replacement produced by the rule, if it has a
+   non-`'raw'` form;
+2. otherwise, the form of the expression being replaced;
+3. otherwise, the replacement is left in its raw form.
+
+While the form applies directly to replaced sub-expressions only, a
+non-`'raw'` form also propagates 'opportunistically' up the expression
+tree: an expression whose operands all share a form after replacement
+assumes that form as well. (Specifying `form: 'raw'` disables this
+propagation.)
+
+:::info[Note]
+Applicable to input expressions of any form.
+
+To match a specific symbol (not a wildcard pattern), the `match` must be
+a `Expression` (e.g., `{ match: ce.expr('x'), replace: ... }`).
+
+For simple symbol substitution, consider using `subs()` instead.
+:::
+
+####### rules
+
+`Rule` | `BoxedRuleSet` | `Rule`[]
+
+####### options?
+
+`Partial`\<[`ReplaceOptions`](#replaceoptions)\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.has()
+
+```ts
+has(v): boolean
+```
+
+True if the expression includes a symbol `v` or a function operator `v`.
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+####### v
+
+`string` | `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.match()
+
+```ts
+match(pattern, options?): BoxedSubstitution<Expression>
+```
+
+If this expression matches `pattern`, return a substitution that makes
+`pattern` equal to `this`. Otherwise return `null`.
+
+If `pattern` includes wildcards (symbols that start
+with `_`), the substitution will include a prop for each matching named
+wildcard.
+
+If this expression matches `pattern` but there are no named wildcards,
+return the empty substitution, `{}`.
+
+`pattern` can be:
+- A **string** (LaTeX): single-character symbols are auto-converted to
+  wildcards (e.g., `'ax^2+bx+c'` treats `a`, `b`, `c` as wildcards).
+  Results use unprefixed keys (`{a: 3}` not `{_a: 3}`) and self-matches
+  are filtered out. `useVariations` and `matchMissingTerms` default to
+  `true`. Unprefixed keys are accepted in `substitution`.
+- A **MathJSON array** (e.g., `['Add', '_a', '_b']`): boxed automatically.
+- A **BoxedExpression**: used directly.
+
+Read more about [**patterns and rules**](/compute-engine/guides/patterns-and-rules/).
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+####### pattern
+
+[`ExpressionInput`](#expressioninput)
+
+####### options?
+
+`PatternMatchOptions`\<[`Expression`](#expression-3)\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.wikidata
+
+```ts
+readonly wikidata: string;
+```
+
+Wikidata identifier.
+
+If not a canonical expression, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.description
+
+```ts
+readonly description: string[];
+```
+
+An optional short description if a symbol or function expression.
+
+May include markdown. Each string is a paragraph.
+
+If not a canonical expression, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.url
+
+```ts
+readonly url: string;
+```
+
+An optional URL pointing to more information about the symbol or
+ function operator.
+
+If not a canonical expression, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.complexity
+
+```ts
+readonly complexity: number;
+```
+
+Expressions with a higher complexity score are sorted
+first in commutative functions
+
+If not a canonical expression, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.baseDefinition
+
+```ts
+readonly baseDefinition: BoxedBaseDefinition;
+```
+
+For symbols and functions, a definition associated with the
+expression. `this.baseDefinition` is the base class of symbol and function
+definition.
+
+If not a canonical expression, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.operatorDefinition
+
+```ts
+readonly operatorDefinition: BoxedOperatorDefinition;
+```
+
+For function expressions, the definition of the operator associated with
+the expression. For symbols, the definition of the symbol if it is an
+operator, for example `"Sin"`.
+
+If not a canonical expression or not a function expression,
+its value is `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.valueDefinition
+
+```ts
+readonly valueDefinition: BoxedValueDefinition;
+```
+
+For symbols, a definition associated with the expression, if it is
+not an operator.
+
+If not a canonical expression, or not a value, its value is `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.simplify()
+
+```ts
+simplify(options?): Expression
+```
+
+Return a simpler form of this expression.
+
+A series of rewriting rules are applied repeatedly, until no more rules
+apply.
+
+The values assigned to symbols and the assumptions about symbols may be
+used, for example `expr.isInteger` or `expr.isPositive`.
+
+No calculations involving decimal numbers (numbers that are not
+integers) are performed but exact calculations may be performed,
+for example:
+
+$$ \sin(\frac{\pi}{4}) \longrightarrow \frac{\sqrt{2}}{2} $$.
+
+The result is canonical.
+
+To manipulate symbolically non-canonical expressions, use `expr.replace()`.
+
+####### options?
+
+`Partial`\<`SimplifyOptions`\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toSignedFunction()
+
+```ts
+toSignedFunction(): Expression
+```
+
+For a relation expression (`Equal`, `Less`, `Greater`, `LessEqual`,
+`GreaterEqual`, `NotEqual`), return the "signed function" form
+useful for implicit-surface rendering and region classification:
+
+- `Equal(a, b)` → `a - b` (zero on the surface)
+- `Less(a, b)` / `LessEqual(a, b)` → `a - b` (negative when relation holds)
+- `Greater(a, b)` / `GreaterEqual(a, b)` → `b - a` (negative when relation holds)
+- `NotEqual(a, b)` → `a - b` (caller checks ≠ 0)
+
+For non-relation expressions, returns `undefined`.
+
+Strictness (strict vs non-strict inequality) and direction (less vs
+greater) are encoded in the original `expr.operator`, not in the
+returned expression. Callers handling 3D implicit rendering use
+`expr.operator` for the boundary policy and the signed function for
+the interior/exterior classification.
+
+Notes:
+- CE canonical form normalizes `GreaterEqual(a, b)` to `LessEqual(b, a)`
+  (and similarly `Greater` to `Less`). Callers using `toSignedFunction()`
+  on canonicalized parsed expressions will see `LessEqual`/`Less` rather
+  than `GreaterEqual`/`Greater`. The signed-function semantics are
+  preserved through the normalization. The `GreaterEqual`/`Greater`
+  branches handle non-canonical expressions constructed via
+  `ce.box(['GreaterEqual', ...])`.
+- For chained relations with more than two operands (e.g.
+  `Less(a, b, c)` from `a < b < c`), only the first pair is used.
+  The result is the signed function for the first sub-relation only;
+  3D implicit rendering rarely uses chained relations, but if it
+  does, callers should decompose first.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.getInterval()
+
+```ts
+getInterval(symbol): IntervalBounds
+```
+
+For an expression representing a domain restriction (a `When` whose
+condition is a comparison or `And` of comparisons over `symbol`, or
+a bare comparison expression), return the lower/upper bounds for
+`symbol`. Returns `undefined` if no bounds can be extracted.
+
+Supported shapes:
+- Bare comparisons: `a < x`, `x < b`, etc.
+- Chained comparisons: `a < x < b` (parsed as `Less(a, x, b)`)
+- `And(c1, c2, ...)` where each `ci` is a supported shape
+- `When(e, cond)` — operates on `cond`
+- `Multiply(f, When(...), ...)` — the Desmos parse shape for
+  `f(x)\{a < x < b\}`; bounds from each `When` factor are merged
+
+`lowerStrict`/`upperStrict` are `true` for strict (`<`, `>`) bounds
+and `false` for non-strict (`≤`, `≥`).
+
+Returns `undefined` for unsupported shapes (e.g. equations, non-linear
+constraints, comparisons over multiple symbols, disjunctions).
+
+####### symbol
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.evaluate()
+
+```ts
+evaluate(options?): Expression
+```
+
+Return the value of the canonical form of this expression.
+
+A pure expression always returns the same value (provided that it
+remains constant / values of sub-expressions or symbols do not change),
+and has no side effects.
+
+Evaluating an impure expression may return a varying value, and may have
+some side effects such as adjusting symbol assumptions.
+
+To perform approximate calculations, use `expr.N()` instead,
+or call with `options.numericApproximation` to `true`.
+
+It is possible that the result of `expr.evaluate()` may be the same as
+`expr.simplify()`.
+
+The result is in canonical form.
+
+####### options?
+
+`Partial`\<`EvaluateOptions`\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.evaluateAsync()
+
+```ts
+evaluateAsync(options?): Promise<Expression>
+```
+
+Asynchronous version of `evaluate()`.
+
+The `options` argument can include a `signal` property, which is an
+`AbortSignal` object. If the signal is aborted, a `CancellationError` is thrown.
+
+####### options?
+
+`Partial`\<`EvaluateOptions`\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.N()
+
+```ts
+N(): Expression
+```
+
+Return a numeric approximation of the canonical form of this expression.
+
+Any necessary calculations, including on decimal numbers (non-integers),
+are performed.
+
+The calculations are performed according to the
+`precision` property of the `ComputeEngine`.
+
+To only perform exact calculations, use `this.evaluate()` instead.
+
+If the function is not numeric, the result of `this.N()` is the same as
+`this.evaluate()`.
+
+The result is in canonical form.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.solve()
+
+```ts
+solve(vars?): 
+  | readonly Expression[]
+  | Record<string, Expression>
+  | Record<string, Expression>[]
+```
+
+If this is an equation, solve the equation for the variables in vars.
+Otherwise, solve the equation `this = 0` for the variables in vars.
+
+For univariate equations, returns an array of solutions (roots).
+For systems of linear equations (List of Equal expressions), returns
+an object mapping variable names to their values.
+For non-linear polynomial systems (like xy=6, x+y=5), returns an array
+of solution objects (multiple solutions possible).
+
+```javascript
+// Univariate equation
+const expr = ce.parse("x^2 + 2*x + 1 = 0");
+console.log(expr.solve("x")); // Returns array of roots
+
+// System of linear equations
+const system = ce.parse("\\begin{cases}x+y=70\\\\2x-4y=80\\end{cases}");
+console.log(system.solve(["x", "y"])); // Returns { x: 60, y: 10 }
+
+// Non-linear polynomial system (product + sum)
+const nonlinear = ce.parse("\\begin{cases}xy=6\\\\x+y=5\\end{cases}");
+console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y: 2 }]
+```
+
+####### vars?
+
+`string` | `Iterable`\<`string`, `any`, `any`\> | [`Expression`](#expression-3) | `Iterable`\<[`Expression`](#expression-3), `any`, `any`\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.value
+
+```ts
+get value(): Expression
+set value(value: 
+  | string
+  | number
+  | boolean
+  | number[]
+  | BigDecimal
+  | OnlyFirst<{
+  re: number;
+  im: number;
+ }, {
+  re: number;
+  im: number;
+ } & {
+  num: number;
+  denom: number;
+ } & Expression>
+  | OnlyFirst<{
+  num: number;
+  denom: number;
+ }, {
+  re: number;
+  im: number;
+ } & {
+  num: number;
+  denom: number;
+ } & Expression>
+  | OnlyFirst<Expression, {
+  re: number;
+  im: number;
+ } & {
+  num: number;
+  denom: number;
+ } & Expression>): void
+```
+
+If this expression is a number literal, a string literal or a function
+ literal, return the expression.
+
+If the expression is a symbol, return the value of the symbol.
+
+Otherwise, the expression is a symbolic expression, including an unknown
+symbol, i.e. a symbol with no value, return `undefined`.
+
+If the expression is a symbol, set the value of the symbol.
+
+Will throw a runtime error if either not a symbol, or a symbol with the
+`constant` flag set to `true`.
+
+Setting the value of a symbol results in the forgetting of all assumptions
+about it in the current scope.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isCollection
+
+```ts
+isCollection: boolean;
+```
+
+Is `true` if the expression is a collection.
+
+When `isCollection` is `true`, the expression:
+
+- has an `each()` method that returns a generator over the elements
+  of the collection.
+- has a `size` property that returns the number of elements in the
+  collection.
+- has a `contains(other)` method that returns `true` if the `other`
+  expression is in the collection.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isIndexedCollection
+
+```ts
+isIndexedCollection: boolean;
+```
+
+Is `true` if this is an indexed collection, such as a list, a vector,
+a matrix, a tuple, etc...
+
+The elements of an indexed collection can be accessed by a one-based
+index.
+
+When `isIndexedCollection` is `true`, the expression:
+- has an `each()`, `size()` and `contains(rhs)` methods
+   as for a collection.
+- has an `at(index: number)` method that returns the element at the
+   specified index.
+- has an `indexWhere(predicate: (element: Expression) => boolean)`
+   method that returns the index of the first element that matches the
+   predicate.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isLazyCollection
+
+```ts
+isLazyCollection: boolean;
+```
+
+False if not a collection, or if the elements of the collection
+are not computed lazily.
+
+The elements of a lazy collection are computed on demand, when
+iterating over the collection using `each()`.
+
+Use `ListFrom` and related functions to create eager collections from
+lazy collections.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.each()
+
+```ts
+each(): Generator<Expression>
+```
+
+If this is a collection, return an iterator over the elements of the
+collection.
+
+```js
+const expr = ce.parse('[1, 2, 3, 4]');
+for (const e of expr.each()) {
+ console.log(e);
+}
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.contains()
+
+```ts
+contains(rhs): boolean
+```
+
+If this is a collection, return true if the `rhs` expression is in the
+collection.
+
+Return `undefined` if the membership cannot be determined without
+iterating over the collection.
+
+####### rhs
+
+[`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.subsetOf()
+
+```ts
+subsetOf(other, strict): boolean
+```
+
+Check if this collection is a subset of another collection.
+
+####### other
+
+[`Expression`](#expression-3)
+
+The other collection to check against.
+
+####### strict
+
+`boolean`
+
+If true, the subset relation is strict (i.e., proper subset).
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.count
+
+If this is a collection, return the number of elements in the collection.
+
+If the collection is infinite, return `Infinity`.
+
+If the number of elements cannot be determined, return `undefined`, for
+example, if the collection is lazy and not finite and the size cannot
+be determined without iterating over the collection.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isFiniteCollection
+
+```ts
+isFiniteCollection: boolean;
+```
+
+If this is a finite collection, return true.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isEmptyCollection
+
+```ts
+isEmptyCollection: boolean;
+```
+
+If this is an empty collection, return true.
+
+An empty collection has a size of 0.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.at()
+
+```ts
+at(index): Expression
+```
+
+If this is an indexed collection, return the element at the specified
+ index. The first element is at index 1.
+
+If the index is negative, return the element at index `size() + index + 1`.
+
+The last element is at index -1.
+
+####### index
+
+`number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.get()
+
+```ts
+get(key): Expression
+```
+
+If this is a keyed collection (map, record, tuple), return the value of
+the corresponding key.
+
+If `key` is a `Expression`, it should be a string.
+
+####### key
+
+`string` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.indexWhere()
+
+```ts
+indexWhere(predicate): number
+```
+
+If this is an indexed collection, return the index of the first element
+that matches the predicate.
+
+####### predicate
+
+(`element`) => `boolean`
+
+</MemberCard>
+
+#### Primitive Methods
+
+<MemberCard>
+
+##### Expression.valueOf()
+
+```ts
+valueOf(): string | number | boolean | number[] | number[][] | number[][][]
+```
+
+Return a JavaScript primitive value for the expression, based on
+`Object.valueOf()`.
+
+This method is intended to make it easier to work with JavaScript
+primitives, for example when mixing JavaScript computations with
+symbolic computations from the Compute Engine.
+
+If the expression is a **machine number**, a **bignum**, or a **rational**
+that can be converted to a machine number, return a JavaScript `number`.
+This conversion may result in a loss of precision.
+
+If the expression is the **symbol `"True"`** or the **symbol `"False"`**,
+return `true` or `false`, respectively.
+
+If the expression is a **symbol with a numeric value**, return the numeric
+value of the symbol.
+
+If the expression is a **string literal**, return the string value.
+
+If the expression is a **tensor** (list of number or multidimensional
+array or matrix), return an array of numbers, or an array of
+arrays of numbers, or an array of arrays of arrays of numbers.
+
+If the expression is a function expression return a string representation
+of the expression.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.\[toPrimitive\]()
+
+```ts
+toPrimitive: string | number
+```
+
+Similar to`expr.valueOf()` but includes a hint.
+
+####### hint
+
+`"string"` | `"number"` | `"default"`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toString()
+
+```ts
+toString(): string
+```
+
+Return an ASCIIMath representation of the expression. This string is
+suitable to be output to the console for debugging, for example.
+
+Based on `Object.toString()`.
+
+To get a LaTeX representation of the expression, use `expr.latex`.
+
+Note that lazy collections are eagerly evaluated.
+
+Used when coercing a `Expression` to a `String`.
+
+For arbitrary-precision numbers (`BigNumericValue`), the output is
+rounded to `BigDecimal.precision` significant digits. Digits beyond the
+working precision are noise from precision-bounded operations (division,
+transcendentals) and are not displayed. Machine-precision numbers use
+their native `Number.toString()`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.toJSON()
+
+```ts
+toJSON(): MathJsonExpression
+```
+
+Used by `JSON.stringify()` to serialize this object to JSON.
+
+Method version of `expr.json`.
+
+Based on `Object.toJSON()`.
+
+Note that lazy collections are *not* eagerly evaluated.
+
+The output preserves the full raw `BigDecimal` value with no rounding,
+ensuring lossless round-tripping via `ce.box(expr.json)`. Digits beyond
+`ce.precision` may be present but are not guaranteed to be accurate.
+Use `toMathJson({ fractionalDigits: 'auto' })` for precision-rounded
+MathJSON output.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.is()
+
+```ts
+is(other, tolerance?): boolean
+```
+
+Smart equality check: structural first, then numeric evaluation fallback.
+Symmetric: `a.is(b)` always equals `b.is(a)`.
+
+First tries an exact structural check (same as `isSame()`). If that fails
+and the expression is constant (no free variables), evaluates numerically
+and compares within `engine.tolerance`.
+
+For literal numbers compared to primitives (`number`, `bigint`), behaves
+identically to `isSame()` — no tolerance is applied. Tolerance only
+applies to expressions that require evaluation (e.g., `\\sin(\\pi)`).
+
+```typescript
+ce.parse('\\cos(\\frac{\\pi}{2})').is(0)  // true — evaluates, within tolerance
+ce.number(1e-17).is(0)                     // false — literal, no tolerance
+ce.parse('x + 1').is(1)                    // false — has free variables
+ce.parse('\\pi').is(3.14, 0.01)            // true — within custom tolerance
+```
+
+After the structural check, attempts to expand both sides (distributing
+products, applying the multinomial theorem, etc.) and re-checks
+structural equality. This catches equivalences like `(x+1)^2` vs
+`x^2+2x+1` even when the expression has free variables.
+
+####### other
+
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-3)
+
+####### tolerance?
+
+`number`
+
+If provided, overrides `engine.tolerance` for the
+numeric comparison. Has no effect when the comparison is structural
+(i.e., when `isSame()` succeeds or the expression has free variables).
+
+</MemberCard>
+
+#### Relational Operator
+
+<MemberCard>
+
+##### Expression.isSame()
+
+```ts
+isSame(rhs): boolean
+```
+
+Fast exact structural/symbolic equality check.
+
+Returns `true` if the expression is structurally identical to `rhs`.
+For symbols with value bindings, follows the binding (e.g., if `one = 1`,
+then `ce.symbol('one').isSame(1)` is `true`).
+
+Accepts JavaScript primitives: `number`, `bigint`, `boolean`, `string`.
+
+Does **not** evaluate expressions — purely structural.
+
+`ce.parse('1+x', {form: 'raw'}).isSame(ce.parse('x+1', {form: 'raw'}))` is `false`.
+
+See `expr.is()` for a smart check with numeric evaluation fallback,
+and `expr.isEqual()` for full mathematical equality.
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+####### rhs
+
+`string` | `number` | `bigint` | `boolean` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isLess()
+
+```ts
+isLess(other): boolean
+```
+
+The value of both expressions are compared.
+
+If the expressions cannot be compared, return `undefined`
+
+####### other
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isLessEqual()
+
+```ts
+isLessEqual(other): boolean
+```
+
+The value of both expressions are compared.
+
+If the expressions cannot be compared, return `undefined`
+
+####### other
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isGreater()
+
+```ts
+isGreater(other): boolean
+```
+
+The value of both expressions are compared.
+
+If the expressions cannot be compared, return `undefined`
+
+####### other
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isGreaterEqual()
+
+```ts
+isGreaterEqual(other): boolean
+```
+
+The value of both expressions are compared.
+
+If the expressions cannot be compared, return `undefined`
+
+####### other
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isEqual()
+
+```ts
+isEqual(other): boolean
+```
+
+Mathematical equality (strong equality), that is the value
+of this expression and the value of `other` are numerically equal.
+
+Both expressions are evaluated and the result is compared numerically.
+
+Numbers whose difference is less than `engine.tolerance` are
+considered equal. This tolerance is set when the `engine.precision` is
+changed to be such that the last two digits are ignored.
+
+Evaluating the expressions may be expensive. Other options to consider
+to compare two expressions include:
+- `expr.isSame(other)` for a fast exact structural comparison (no evaluation)
+- `expr.is(other)` for a smart check that tries structural first, then
+  numeric evaluation fallback for constant expressions
+
+**Examples**
+
+```js
+let expr = ce.parse('2 + 2');
+console.log(expr.isEqual(4)); // true
+console.log(expr.isSame(4)); // false (structural only)
+console.log(expr.is(4)); // true (evaluates, within tolerance)
+
+expr = ce.parse('4');
+console.log(expr.isEqual(4)); // true
+console.log(expr.isSame(4)); // true
+console.log(expr.is(4)); // true
+
+```
+
+####### other
+
+`number` | [`Expression`](#expression-3)
+
+</MemberCard>
+
+#### Tensor Expression
+
+<MemberCard>
+
+##### Expression.shape
+
+```ts
+readonly shape: number[];
+```
+
+The **shape** describes the **axes** of the expression, where each axis
+represent a way to index the elements of the expression.
+
+When the expression is a scalar (number), the shape is `[]`.
+
+When the expression is a vector of length `n`, the shape is `[n]`.
+
+When the expression is a `n` by `m` matrix, the shape is `[n, m]`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.rank
+
+```ts
+readonly rank: number;
+```
+
+The **rank** refers to the number of dimensions (or axes) of the
+expression.
+
+Return 0 for a scalar, 1 for a vector, 2 for a matrix, > 2 for
+a multidimensional matrix.
+
+The rank is equivalent to the length of `expr.shape`
+
+:::info[Note]
+There are several definitions of rank in the literature.
+For example, the row rank of a matrix is the number of linearly
+independent rows. The rank can also refer to the number of non-zero
+singular values of a matrix.
+:::
+
+</MemberCard>
+
+#### Type Properties
+
+<MemberCard>
+
+##### Expression.type
+
+```ts
+get type(): BoxedType
+set type(type: 
+  | string
+  | AlgebraicType
+  | NegationType
+  | CollectionType
+  | ListType
+  | SetType
+  | RecordType
+  | DictionaryType
+  | TupleType
+  | SymbolType
+  | ExpressionType
+  | NumericType
+  | FunctionSignature
+  | ValueType
+  | TypeReference
+  | BoxedType): void
+```
+
+The type of the value of this expression.
+
+If a symbol the type of the value of the symbol.
+
+If a function expression, the type of the value of the function
+(the result type).
+
+If a symbol with a `"function"` type (a function literal), returns the
+signature.
+
+If not valid, return `"error"`.
+
+If the type is not known, return `"unknown"`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isNumber
+
+```ts
+readonly isNumber: boolean;
+```
+
+`true` if the value of this expression is a number.
+
+Note that in a fateful twist of cosmic irony, `NaN` ("Not a Number")
+**is** a number.
+
+If `isNumber` is `true`, this indicates that evaluating the expression
+will return a number.
+
+This does not indicate that the expression is a number literal. To check
+if the expression is a number literal, use `expr.isNumberLiteral`.
+
+For example, the expression `["Add", 1, "x"]` is a number if "x" is a
+number and `expr.isNumber` is `true`, but `isNumberLiteral` is `false`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isInteger
+
+```ts
+readonly isInteger: boolean;
+```
+
+The value of this expression is an element of the set ℤ: ...,-2, -1, 0, 1, 2...
+
+Note that ±∞ and NaN are not integers.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isRational
+
+```ts
+readonly isRational: boolean;
+```
+
+The value of this expression is an element of the set ℚ, p/q with p ∈ ℕ, q ∈ ℤ ⃰  q >= 1
+
+Note that every integer is also a rational.
+
+This is equivalent to `this.type === "rational" || this.type === "integer"`
+
+Note that ±∞ and NaN are not rationals.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isReal
+
+```ts
+readonly isReal: boolean;
+```
+
+The value of this expression is a real number.
+
+This is equivalent to `this.type === "rational" || this.type === "integer" || this.type === "real"`
+
+Note that ±∞ and NaN are not real numbers.
 
 </MemberCard>
 
@@ -10273,6 +10415,7 @@ type PrimitiveType =
   | "symbol"
   | "boolean"
   | "string"
+  | "color"
   | "expression"
   | "unknown"
   | "error"

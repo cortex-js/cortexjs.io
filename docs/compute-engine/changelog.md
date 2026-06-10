@@ -10,6 +10,1097 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+### Coming Soon
+
+- **New: curated mathematical identities loader (`loadIdentities()`)** — an
+  opt-in library of 558 curated identities and special values (gamma, zeta,
+  arctan, log/exp, factorials, Lambert W, digamma, elliptic integrals, …)
+  translated from the [Fungrim](https://fungrim.org) corpus, loadable as
+  guarded simplification rules:
+
+  ```ts
+  import { ComputeEngine } from '@cortex-js/compute-engine';
+  import { loadIdentities } from '@cortex-js/compute-engine/identities';
+
+  const ce = new ComputeEngine();
+  loadIdentities(ce); // or e.g. { topics: ['gamma'] }
+  ce.parse('\\Gamma(\\frac12)').simplify(); // → √π
+  ```
+
+  The loader is synchronous, idempotent per engine, and uses only the public
+  engine API. Rules carry tri-valued, fail-closed guard conditions (a rule
+  whose side condition cannot be proven does not fire); the
+  `onGuardUndecided` hook makes non-firing observable. Selection options:
+  `topics`, `classes`, `purposes`, `solve`. Returns a load report
+  (`loaded`, `byTarget`, `byPurpose`, `declared`, `skipped`,
+  `compileLedger`). Engines that don't import the subpath pay no bundle
+  cost.
+
+- **Assorted low-severity fixes**:
+  - A symbol with a *known infinite* value times zero is now `NaN` (e.g. with
+    `a := ∞`, `a·0` was `0`); a free symbol keeps the conventional `·0 → 0`.
+  - `InterquartileRange` now equals `Q3 − Q1` from `Quartiles` (it used a
+    different upper-half slice, so the two disagreed).
+  - Interval `mod` with a *negative* modulus now encloses the compiled scalar
+    `Mod` (which uses the floored, sign-of-divisor convention); the interval
+    previously returned a non-negative `[0, |b|)` range that did not.
+  - Removed a redundant `.simplify()` in the numeric-equality path of `eq()`
+    (a latent recursion hazard, since `eq` is reachable from `isEqual`).
+
+- **Comparison and simplification correctness fixes**:
+  - An operator's equality handler returning `false` (definitely *not* equal)
+    was treated as *equal*, so unordered values such as lists compared as `<=`.
+    Only a definite `true` now means equal.
+  - The comparison predicates (`isLess`/`isGreater`/`isLessEqual`/
+    `isGreaterEqual`) returned a definitive `false` for the indeterminate
+    `<=`/`>=` an assumption can produce — e.g. after `assume(y >= 3)`, `y > 3`
+    is *unknown*, not false. They now return `undefined` in that case. These
+    predicates feed sign inference throughout the engine.
+  - `(-x)^{3/4}` (and other `(-x)^{odd/even}` rational powers of a negated base)
+    is no longer simplified to `x^{3/4}`: an even root of a negative base is
+    complex, so the two are not equal.
+  - Two simplification rules returned a rewrite step unconditionally, re-firing a
+    nested `simplify()` on every pass: the `Derivative` rule (`Derivative` is
+    lazy, so it simplified its operand but reported a change even when nothing
+    changed) and the system-of-equations rule. Both now emit a step only when
+    the result actually differs. `Hypot` also no longer calls `.simplify()`
+    internally — the driver simplifies its `Sqrt(x²+y²)` rewrite. Output is
+    unchanged; this removes redundant work and a documented recursion-hazard
+    pattern.
+
+- **`ReplaceOptions.form` replaces `canonical`** — `expr.replace()` and rule
+  application now accept a `form` option (`'canonical'`, `'structural'`,
+  `'raw'`, or specific canonical transforms) controlling the form of
+  replacements, consistent with `ce.expr()` and `ce.function()`. The
+  `canonical` option is deprecated but still accepted as an alias for one
+  release; specifying both `form` and `canonical` throws an error.
+
+- **BREAKING: `replace()` no longer eagerly canonicalizes its result** — the
+  requested `form` (or, by default, the form produced by the rule) applies to
+  the replaced sub-expressions, not the entire input expression. A
+  non-canonical replacement inside a canonical expression now yields a
+  non-canonical result; a form propagates upward only when all sibling
+  operands already share it. Previously, `replace()` on a canonical expression
+  always re-canonicalized the result — which could undo structure a rule had
+  deliberately constructed. Call `.canonical` on the result to restore the
+  previous behavior.
+
+- **`ReplaceOptions.direction`** — rule application can now traverse operands
+  left-to-right (the default, post-order) or right-to-left (reverse
+  post-order). Only observable for order-sensitive rules, such as
+  `RuleFunction` replacements with index-based logic.
+
+- **Custom rules now match user-defined functions** — a rule pattern whose
+  operator is a user-defined function (e.g. `{match: ['F', '_a'], ...}` where
+  `F` is not a built-in) previously threw internally during matching, and the
+  error was silently swallowed: the rule never applied, in `replace()` and in
+  `simplify({rules})`.
+
+- **Radical, big-decimal-power, and factoring correctness fixes**:
+  - **Exact `√8` and `√20`** did not normalize — the small-integer radical
+    lookup table had two wrong entries (`8 → √8`, `20 → √20` instead of `2√2`,
+    `2√5`), so e.g. `√8` was not structurally equal to `2√2` and `solve` of
+    `2x²−16=0` returned `±√8` rather than `±2√2`.
+  - **`BigDecimal.pow` falsely overflowed** for large exponents: the overflow
+    guard used the significand's digit count (`floor(log10)+1`) as its log10,
+    overestimating by up to a full order of magnitude, then amplifying the error
+    by the exponent — `1^1e16` returned `Infinity` (and `2^1e16`, which is
+    representable, also did). It now estimates `log10` from the leading digits.
+  - **Dividing a Gaussian integer by an integer destroyed it** —
+    `Divide((1+i), 2)` canonicalized to `Multiply(1/2, NaN)`. `factor()`'s Add
+    case takes the gcd of term coefficients to extract content, but a complex
+    coefficient (the `i`) has no gcd, so `gcd` returned `NaN` and poisoned the
+    result. `factor()` now leaves sums with complex coefficients unfactored, and
+    the division yields `(1+i)/2` (= `0.5 + 0.5i`).
+
+- **Core arithmetic correctness fixes**:
+  - **Even root of a negative real returned a wrong real** — `Root(-16, 4).N()`
+    gave `2` (the real 4th root of 16) instead of the complex principal root
+    `√2 + √2·i`, inconsistent with `Sqrt(-4).N() → 2i`.
+  - **`ln`/`log` dropped a non-integer base** — `(8).ln(2.5)` returned `ln(8)`
+    instead of `log_2.5(8)`. Non-integer bases are now honored (BoxedNumber and
+    BoxedFunction, matching BoxedSymbol).
+  - **Plain symbols reported as empty collections** — a symbol's `count`,
+    `isEmptyCollection`, and `isFiniteCollection` returned `0`/`true` via
+    fallbacks; they now return `undefined` for non-collections (the
+    abstract-class contract).
+  - **Function comparison ignored tolerance** — comparing two function
+    expressions used an exact `=== 0` on the machine path (unlike the
+    arbitrary-precision path) and mapped a `NaN` difference to `>`. It now
+    compares within the engine tolerance and returns `undefined` for `NaN`.
+  - **`commonTerms` skipped symbolic common factors** — it early-returned when
+    the numeric gcd was 1, so `factor` could not cancel `x` from `x·y < x·z`
+    (even with `x > 0`).
+  - **Division by zero was inconsistent** — `a/0` gave `ComplexInfinity` for a
+    JS-number denominator but `NaN` for a boxed zero; both are now
+    `ComplexInfinity`.
+
+- **Special-function, derivative, string, and boxing fixes**:
+  - **`Erf`/`Erfc` were only ~7-digit accurate** — the kernel used the 5-term
+    Abramowitz & Stegun approximation. It now uses a full machine-precision
+    series for `Erf` and a continued fraction for `Erfc` (so large arguments
+    like `Erfc(10)` no longer lose all precision to `1 - Erf` cancellation).
+  - **Derivative of a function with no derivative table could overflow the
+    stack** — evaluating `Apply(Derivative(Function(AiryAi(z), z), 1), 0)`
+    recursed forever; the unresolved symbolic derivative is now applied
+    structurally and stays symbolic (`Apply(Derivative("AiryAi", 1), 0)`).
+  - **String literals lost their type on round-trip** — `BoxedString.json`
+    omitted the MathJSON `'…'` delimiters for symbol-like content (e.g.
+    `"world"`), so re-boxing the serialized JSON yielded a *symbol*. String
+    literals now always serialize quoted. (This also makes embedded strings —
+    error codes, `\text{…}` content, dictionary keys — round-trip faithfully.)
+  - **A function-literal head threw instead of applying** — boxing
+    `[["Function", body, "x"], arg]` raised an error, even though the explicit
+    `["Apply", …]` form beta-reduced; a function-literal head is now treated as
+    an application.
+
+- **More numeric-value correctness fixes**:
+  - **`NumericValue` n-th root lost precision** — `root(n)` computed `pow(1/n)`
+    with a machine-precision reciprocal, so the result had only ~17 correct
+    digits regardless of working precision (`2^(1/7)` at precision 50). It now
+    computes `exp(ln(x)/n)` in full precision.
+  - **`NaN · 0` returned `0`** (BigNumericValue) — the zero branches omitted the
+    NaN check; it is now `NaN`.
+  - **`Infinity.eq(Infinity)` returned `false`** (machine precision) — `eq` used
+    a subtraction (`∞ − ∞ = NaN`) instead of `===`; this disagreed with
+    BigNumericValue.
+  - **`bigint()` of a large integer double returned `null`** — the fast-path
+    guard `a >= MAX && a <= MAX` was only true at exactly `MAX_SAFE_INTEGER`, so
+    every other integer took a string path that rejected scientific notation
+    (`(2.46e100).toString()` is `"2.46e+100"`). `BigInt(a)` is exact for any
+    integer double and is now used directly.
+  - **Exact `inv()` threw on `NaN`/`±Infinity`** — `1/NaN` and `1/∞` ran into an
+    unguarded `BigInt(...)` (RangeError). They now return `NaN` / `0`.
+  - **`gammaln` was inaccurate for small arguments** — bare Stirling asymptotics
+    gave `gammaln(0.5)` off by ~1.6e-2 (inherited by `beta()`). It now shifts
+    the argument upward by the recurrence before applying Stirling.
+  - **Division by zero dropped the sign** (BigNumericValue) — `a/0` always
+    returned `+Infinity`; it is now sign-aware (`−5.5/0 → −Infinity`), matching
+    ExactNumericValue, with complex numerators giving unsigned infinity.
+  - **Complex-exponent `pow` was wrong for non-positive-real bases** — `z^(re +
+    i·im)` used `ln(Re z)` instead of `ln|z|` and dropped the `exp(−im·arg z)`
+    magnitude factor (machine and arbitrary precision). It now evaluates the
+    principal value `exp(w·Ln z)` — e.g. `i^i = e^(−π/2)`, `(1+i)^(1+i)` correct.
+  - **`intervalContains`/`intervalSubset`** (assumption domains) had inverted
+    comparisons (`intervalContains` rejected every interior point) and a
+    non-strict open/open `intervalSubset` bound.
+
+- **Numeric correctness fixes** — several arithmetic operations produced
+  silently-wrong results:
+  - Complex `pow` (machine precision) used `arg ** n` instead of `arg · n` in
+    De Moivre's formula, so e.g. `i²` gave `−0.78 + 0.62i` instead of `−1`. A
+    negative integer exponent on a complex base also dropped the imaginary part
+    (`(1+i)⁻² → −0.5i` now).
+  - Complex reciprocal/`inv` (machine and arbitrary precision) divided the
+    conjugate by `|z|` instead of `|z|²` (`1/(2i) → −0.5i` now).
+  - Exact `x^(1/n)` took the n-th root of the numerator (always 1) instead of
+    the denominator, returning the base unchanged (`8^(1/3) → 2` now).
+  - Exact `floor`/`ceil`/`round` routed integers and rationals through a float,
+    losing digits beyond 2⁵³; they now compute exactly with bigints.
+  - `BigDecimal.mod` gave a wrong remainder when the quotient exceeded the
+    working precision (e.g. `1e60 mod 3`); the truncated quotient is now exact.
+  - `BigDecimal.exp`/`ln` bridged through an *absolute*-precision fixed-point
+    kernel, so a large-magnitude argument fell off the grid: `exp(-200)` rounded
+    to `0` (true ≈ 1.38e-87), `exp(-80)` kept only ~17 of 50 digits, and `ln` of
+    a tiny value underflowed its input to 0 — returning `-∞` (and previously
+    looping forever in the `fpsqrt(0) = 0` reduction). Both now range-reduce the
+    decimal exponent via `ln(10)` (`exp(x) = exp(r)·10^k`, `ln(x) = ln(m) +
+    e·ln 10`) so the kernel only ever sees an O(1) value.
+  - The two-argument numeric apply path (`apply2`, used by `Power`, `Arctan2`,
+    `Log`, …) chopped its *real* result to 0 below the engine tolerance, while
+    the one-argument `apply` did not. A legitimately-small value was therefore
+    discarded: `Power(10, -100).N()` and `exp(-200).N()` returned `0`, and
+    `ln(10^-100).N()` returned `-∞` (its input had been chopped to 0). `apply2`
+    no longer chops a real result, so these evaluate correctly end-to-end
+    (`Power(10,-100).N()` → `1e-100`); the complex branch still chops each
+    component, where a tiny re/im part is typically trig roundoff.
+  - Skewness and kurtosis used incorrect central-moment formulas; a symmetric
+    sample now has skewness 0 and `[1,2,3,4,5]` has (non-excess) kurtosis 1.7.
+
+- **More arithmetic correctness fixes** — additional operations produced
+  silently-wrong results:
+  - `ln` of a `Root(a, b)` returned the reciprocal `b / ln(a)` instead of
+    `ln(a) / b` (so `ln(\sqrt[3]{x})` now gives `(1/3)·ln(x)`).
+  - Boxing a rational with an infinite numerator (`ce.number([-∞, n])`) returned
+    `+∞` regardless of sign and ignored the denominator's sign; the result sign
+    is now the product of the numerator and denominator signs (`-∞/5 → -∞`,
+    `-∞/-5 → +∞`).
+  - `Arctan2(y, x)` evaluated exactly (without numeric approximation) ignored the
+    quadrant, returning `arctan(y/x)` with no `±π` correction — so
+    `Arctan2(1, -1)` gave `−π/4` instead of `3π/4`, disagreeing with its own
+    numeric evaluation. The principal value is now shifted by `±π` for `x < 0`,
+    and arguments of indeterminate sign are left unevaluated.
+  - `GCD`/`LCM` under machine precision never seeded its accumulator, so it stayed
+    unevaluated (`GCD(4, 6)` returned `gcd(4, 6)`); a leading non-integer operand
+    was also silently dropped. Both are now handled.
+  - `LCM` carried the sign of its operands (`LCM(-2, 3) → -6`); the least common
+    multiple is non-negative by convention, so it now returns `6`. The seed is
+    also taken as a magnitude, so single-operand `LCM(-7)`/`GCD(-8)` give `7`/`8`,
+    and the arbitrary-precision path no longer mishandles a non-integer leading
+    operand.
+
+- **More library-function correctness fixes**:
+  - `Congruent(a, b, m)` used a JavaScript remainder (wrong for negatives,
+    `-1 ≢ 6 (mod 7)`) and read its operands as JS numbers, so it bailed under
+    the default (bignum) precision. It now reduces with a floored bigint modulo.
+  - `Histogram`/`BinCounts` never counted the dataset maximum: every bin was
+    half-open, so the last bin excluded its upper edge. The final bin is now
+    closed (`BinCounts([1,2,2,3], 3) → [1,2,1]`).
+  - `Factorial` of a positive non-integer real rounded to an integer factorial
+    (`Factorial(2.5) → 2`); it now returns `Γ(x+1)` (≈ 3.323).
+  - `Reduce` with an explicit initial value overwrote it with the first element
+    on the compiled fast path, and returned unevaluated on a compile failure
+    instead of falling through to the interpreted path.
+  - `Filter` reported an `Infinity` count even for a finite source, so
+    `Sum(Filter([1,2,3], _ > 1))` stayed unevaluated; it now counts the matching
+    elements. `Zip` is now correctly empty/finite when *any* input is
+    empty/finite (the shortest input bounds the result), not only when *every*
+    input is.
+  - `KroneckerDelta` and `Boole` mapped an *undetermined* comparison to `0`;
+    they now stay symbolic when equality/truth cannot be decided
+    (`KroneckerDelta(x, y)`, `Boole(x > 3)`), while still resolving decidable
+    cases.
+  - `Degrees` is now a faithful linear conversion (`d·π/180`) in both the
+    canonical and evaluate paths. The canonical handler used to reduce literal
+    angles mod 360 while evaluate did not, so `Degrees(390)` canonicalized to
+    `π/6` but a symbolic argument resolving to 390 evaluated to `13π/6`. (Range
+    normalization remains available at serialization via `angleNormalization`.)
+  - `IsHappy` threw on negative input (`BigInt('-')`); non-positive integers are
+    now `False`.
+  - `Multinomial` and `BellNumber` used machine floats (rounding error and
+    overflow — `Multinomial(20,20)` was `…820.00003`); both now use exact
+    bigint arithmetic.
+
+- **Combinatorics, number-theory, and equation fixes** — several library
+  functions returned wrong results:
+  - `Subfactorial(n)` (derangements) returned 0 for every `n ≥ 1`: the float
+    recurrence reduced to `result·(n−1)`, which is 0 at `n = 1`. It now uses the
+    exact integer recurrence `!n = n·!(n−1) + (−1)ⁿ`, so `!4 = 9`, `!5 = 44`, ….
+  - `Fibonacci(−n)` produced an `Error` (it built a malformed `Negate` with two
+    operands). It now applies the reflection formula `F(−n) = (−1)^{n+1}·F(n)`
+    (`Fibonacci(-6) → -8`).
+  - `IsOctahedral(n)` tested an unrelated perfect-square condition on `3n+1`
+    (e.g. `IsOctahedral(6)` was `False`, `IsOctahedral(5)` was `True`). It now
+    solves `2m³ + m = 3n` exactly, so the octahedral numbers 1, 6, 19, 44, 85, …
+    are recognized.
+  - The `Power` type handler classified any expression with a symbolic exponent
+    as `non_finite_number` (it used `!exp.isFinite`, which is true when
+    `isFinite` is `undefined`); `2^x` is now `finite_real`. It also no longer
+    claims `finite_real` for a possibly-negative base with a non-integer exponent
+    (which may be complex).
+  - `Equal` equation-equivalence sampling substituted the *same* value for every
+    unknown, so distinct multi-unknown equations compared equal (e.g.
+    `x + y = 0` vs `2x = 0`). Each unknown now gets an independent value.
+
+- **Gamma / Factorial of complex and pole arguments** — the complex `Gamma`
+  and `GammaLn` kernels were unimplemented stubs that returned their argument
+  unchanged, so `Gamma(i).N()` gave `i` (instead of `−0.1549 − 0.498i`) and a
+  complex `Factorial` passed through. Both are now computed with the Lanczos
+  approximation. In addition:
+  - `Gamma` of a non-positive integer (`Gamma(0)`, `Gamma(-1)`, …) now returns
+    `ComplexInfinity` (the pole) instead of a garbage value or `NaN`.
+  - Explicit `Factorial(-2)` was canonicalized to `−(2!) = −2`. Since `n! =
+    Γ(n+1)` has poles at the negative integers, `Factorial` of a negative
+    integer is now `ComplexInfinity`. The `-3! = -(3!)` precedence convention is
+    handled by the LaTeX parser (which already yields `Negate(Factorial(3))`),
+    not by mangling the explicit function form.
+
+- **Set membership and subset correctness** — set-theory predicates were
+  three-valued in name only:
+  - `Element(x, S)` for a number set `S` (e.g. `Integers`, `RealNumbers`)
+    collapsed to `False` when `x` had an indeterminate type, because the
+    `contains` handlers used a two-valued type test. They are now genuinely
+    three-valued, so `Element(x, Integers)` with `x` of unknown type stays
+    unevaluated, while concrete values (`Element(2.5, Integers) → False`) and
+    sign assumptions remain decidable.
+  - `Subset`/`SubsetEqual`/`Superset` tested the relation backwards: the
+    dispatcher invoked the *subset* candidate's handler instead of the
+    *superset* candidate's, so `Subset(Integers, RationalNumbers)` was `False`
+    and `Subset(RationalNumbers, Integers)` was `True`. The direction is fixed,
+    the empty set is correctly a subset of every set, and `EmptySet`'s own
+    `subsetOf` handler no longer claimed every set as a subset of the empty set.
+
+- **`solve()` handles quadratics with symbolic coefficients** — solving a
+  quadratic for `x` when its coefficients are parameters (e.g.
+  `x^2 - a x + 1 = 0`) returned no solutions. Two issues are fixed (#300):
+  - A quadratic with a negated middle term canonicalizes that term to
+    `Negate(Multiply(a, x))` (or `Negate(x)`), which the rule patterns
+    (`Multiply(__b, _x)`) don't match. Degree-2 polynomials are now solved by
+    coefficient extraction, which handles every sign and coefficient form,
+    giving `(a ± √(a²−4)) / 2`.
+  - Root validation evaluated the back-substituted candidate without
+    simplifying, so a symbolic root that is zero only after symbolic
+    simplification was wrongly discarded. Validation now simplifies before the
+    zero-check, which also fixes `x^2 + b x + c = 0` and `a x^2 + b x + c = 0`.
+
+- **`Factor` infers the variable for a univariate polynomial** — calling
+  `Factor` without an explicit variable (e.g. `Factor(x^2 + 5x + 6)`) returned
+  the expanded form unchanged, because the quadratic, content-extraction, and
+  rational-root strategies all require a variable and only the variable-agnostic
+  strategies (perfect square, difference of squares) ran. When no variable is
+  given and the expression has a single unknown, that unknown is now used —
+  `Factor(x^2 + 5x + 6)` gives `(x+2)(x+3)`. (#309)
+
+- **`Factor` keeps extracted numeric content in factored form** — content
+  extraction reconstructed `content · primitive` with the arithmetic multiply,
+  which distributes a numeric factor over a bare sum and collapsed the result
+  back to the expanded form when the primitive didn't factor further (e.g.
+  `Factor(6x + 9)` returned `6x + 9` instead of `3(2x + 3)`). The product is now
+  built so the content stays factored.
+
+- **LaTeX serialization and parsing fixes**:
+  - The `'scaled'` and `'big'` delimiter styles emitted a stray trailing `}` /
+    `)` (e.g. `f\left(x, y\right)}`), producing invalid LaTeX.
+  - A symbol whose name merely *begins* with a spelled-out digit was corrupted
+    on serialization (`tensor` → `\mathrm{10sor}`, `onesie` → `\mathrm{1sie}`):
+    the lookup used `startsWith` instead of whole-prefix equality.
+  - An unbalanced brace in an environment name at end of input (e.g.
+    `\begin{ca{ses`) threw a `TypeError` instead of producing an Error
+    expression.
+  - `\text{…}` with nested braces joined its runs with the default `,` separator
+    (`\text{hello {world}}` → `hello ,world`); it now joins with no separator.
+  - `Multiply` dropped the sign before a factor that serializes starting with a
+    digit, merging two numbers into one — e.g. `Multiply(3, Power(2, 2))`
+    serialized as `32^2` instead of `3\times2^2`. This surfaced after a
+    non-canonical substitution, where prettify renders `Power(2, 2)` as the
+    digit-leading `2^2`. Such factors now get an explicit multiplication sign;
+    unambiguous juxtaposition (e.g. `3\sqrt{2}`) is unchanged. (#302)
+  - A prefixed symbol with an unparseable body (e.g. `\mathrm{\vec}`) parsed as
+    the literal symbol `"null"` (`body += null` coerced to the string); it now
+    produces an error expression.
+  - The repeating-decimal arc `\wideparen{…}` after a *leading* decimal
+    separator failed (`.\wideparen{3}`) due to a typo (`\wideparent`) in the
+    lookahead; it now parses like `0.\wideparen{3}`.
+  - `dictionaryFromExpression` dropped the first entry of a `Dictionary`
+    expression (it iterated from index 1 over the 0-based operands) and returned
+    an unwrapped shape for the single key-value-pair case.
+  - The `Parser.addSymbol` type-conflict check was inverted: re-declaring a
+    symbol with the *same* type threw, while a *different* type silently
+    overwrote. It now only conflicts on a different type.
+  - A matchfix dictionary-entry validation checked a property on a function
+    reference instead of the entry, so a `symbolTrigger` on a matchfix operator
+    was never flagged.
+  - Removed a dead `deserializeHexFloat` function (a tautological guard made it
+    always return `NaN`; it had no callers) and dead `\csname` parameter-/space
+    handling in the tokenizer.
+
+- **Type-string dimension parsing and round-trip fixes**:
+  - The documented matrix/list dimension syntaxes now parse: `matrix<?x3>`,
+    `matrix<2x?>`, `matrix<2 x 3>` (spaces), and the parenthesized form the
+    serializer emits, `matrix<integer^(2x3)>` / `list<integer^(2x3)>`.
+    Previously only the bare `2x3` form worked, so `typeToString → parseType`
+    did not round-trip for dimensioned element types.
+  - A single `^N` dimension was silently dropped (`parseType('list<number^2>')`
+    lost the `2`); it is now preserved. **As a result, a fixed-size numeric
+    list or matrix now infers a *dimensioned* type** — e.g. `[1, 2, 3]` is
+    `vector<3>` (was `list<number>`) and a 3×3 of numbers is `matrix<3x3>`.
+    This restores the dimensions that `BoxedTensor` already attaches but the
+    parser was discarding.
+  - A non-integer number literal type (e.g. `value 3.5`) is now a subtype of
+    `real` (and `number`), not just `number`. Previously `value 3.5 <: real`
+    wrongly failed because the literal mapped to `number`, and `number ⊄ real`.
+
+- **Type-system reduction, subtyping, and tensor-helper fixes**:
+  - Union reduction now keeps the **supertype** of a subtype-related pair:
+    `integer | number` reduces to `number` (was the order-dependent `integer`).
+  - A bare `matrix` type no longer reduces to `nothing` (its `-1` "any size"
+    dimensions were being dropped), so it no longer annihilates intersections.
+  - `isValidType` accepts the `value`, `symbol`, `expression`, and `numeric`
+    object kinds (and no longer lists a non-existent `function` kind), so
+    `parseType` of those type objects round-trips.
+  - `never` is now correctly the bottom type: `never` is a subtype of every
+    type (including itself and structured types like `list<integer>`).
+  - Narrowing two disjoint types now yields `never` instead of *widening* to a
+    common supertype (`narrow('integer', 'string')` was `scalar`).
+  - The type parser rejects invalid numeric ranges again — `integer<10..0>`
+    (inverted) and `integer<nan..10>` (NaN bound) now error.
+  - Tensor dtype join: combining a 64-bit real (`float64`) with `complex64`
+    now yields `complex128` (was `complex64`, losing 32 bits of precision).
+  - Element-wise tensor broadcasting throws on incompatible shapes instead of
+    producing silent garbage (`null`-padded data), and `diagonal()` respects
+    its axis arguments (it always read the main 2-D diagonal before).
+
+- **Matrix (tensor) linear-algebra fixes** — operations were broken beyond the
+  hardcoded 2×2 cases:
+  - `Determinant` no longer throws for 4×4 and larger matrices, and now returns
+    a usable (boxed) value for numeric matrices instead of `undefined`. The 3×3
+    case previously computed garbage (it string-concatenated its terms).
+    Integer-matrix determinants are computed exactly via fraction-free Bareiss
+    elimination.
+  - `Inverse` no longer throws for 3×3 and larger matrices.
+  - Matrix row access / slicing is 1-based and consistent for rank ≥ 2 (it was
+    off-by-one, returning the wrong row or an empty result).
+  - The matrix predicates `isUpperTriangular`, `isDiagonal`, and `isTriangular`
+    were inverted or mislabeled (`isDiagonal` tested for the zero matrix,
+    `isTriangular` tested diagonality) and are now correct.
+
+- **Collection operation fixes** — several lazy-collection handlers returned
+  wrong results, threw, or failed to terminate:
+  - `Rest` now yields every remaining element (its iterator was stuck on the
+    second element, repeating it).
+  - `Slice` element access (`.at()`) returns elements instead of always
+    `undefined`, and the reported length of a slice with negative bounds is
+    correct.
+  - `SetFrom` / `TupleFrom` flatten their collection argument (they were
+    wrapping the whole collection as a single element).
+  - `Position` no longer throws when an element matches the predicate.
+  - `Cycle` no longer stack-overflows when queried for emptiness/finiteness,
+    correctly reports as infinite (for a non-empty argument), and cycles from
+    the first element.
+  - `Drop` element access handles `n = 0` and negative indices, and no longer
+    emits trailing error elements when materialized.
+
+- **Decomposed (NFD) Unicode input is normalized** — LaTeX input is now
+  normalized to Unicode NFC at tokenization, so an identifier written with a
+  combining mark (e.g. `e` + combining acute accent) is parsed identically to
+  its precomposed form (`é`). Previously the combining mark surfaced as an
+  `unexpected-token` error. ASCII input is unaffected; boxed strings were
+  already NFC-normalized.
+
+- **Compilation correctness fixes** — several targets emitted silently-wrong
+  code:
+  - **`Range` with symbolic bounds (JavaScript)** compiled to
+    `Array.from({length: NaN})` and always produced `[]`. The guard tested
+    `parseFloat(bound) !== null`, but `parseFloat` returns `NaN` (never `null`)
+    for symbolic bounds, so the constant-length branch always won. Symbolic
+    `Range(a, b[, step])` now compiles to a correct runtime length. (A related
+    latent bug — the map callback's throwaway parameter shadowing the argument
+    object `_`, breaking a symbolic *start* like `_.a` — is also fixed.)
+  - **`Arcsec`/`Arccsc` derivatives** in the symbolic derivative table were
+    wrong and identical to each other (`-x²/√(1-x²)`, complex on the actual
+    domain `|x| ≥ 1`). They are now `±1/(|x|·√(x²-1))`, so e.g.
+    `d/dx arcsec(x)` at `x = 2` is `≈ 0.2887` instead of `NaN`.
+  - **`Degrees` on GPU targets (GLSL/WGSL)** mapped to GLSL `degrees()`
+    (radians→degrees) — the inverse of every other target. CE's `Degrees`
+    converts degrees→radians (`Degrees(180) = π`), which is GLSL `radians()`.
+  - **GPU complex multiply** compiled a compound (additive) real factor without
+    precedence parentheses, so `(x+1)·z·w` emitted
+    `(x + 1.0 * _gpu_cmul(w, z))` (= `x + z·w`) instead of
+    `((x + 1.0) * _gpu_cmul(w, z))`. Additive factors are now parenthesized.
+  - **Interval Sum/Product with a compound symbolic bound** (e.g. `n + 2`)
+    silently returned the identity (`0`/`1`). The loop bound read `.hi` off an
+    `IntervalResult` wrapper (`{kind, value: {lo, hi}}`) rather than its
+    `.value`, yielding `Math.floor(undefined) = NaN`, so the loop never ran.
+    The bound now unwraps either an `IntervalResult` or a bare interval.
+  - **GPU `Degrees` mapping (continued):** the same deg→rad fix applies to WGSL.
+  - **Python `Power` right-associativity** — `(a^b)^c` compiled to
+    `a ** b ** c`, which Python parses right-associatively as `a ** (b ** c)`.
+    The left base of a nested power is now parenthesized: `(a ** b) ** c`.
+  - **WGSL Gamma/Erf preambles** — `Gamma`/`Factorial`/`Beta`/`Erf` emitted the
+    GLSL preamble (`float _gpu_gamma(...)`) into WGSL shaders, which do not
+    compile. WGSL now gets `fn ... -> f32` variants.
+  - **GPU `If`/`Which`/`When`** — the default emitted a JS ternary and a bare
+    `NaN`, neither valid on GPU (WGSL has no `?:`; no shader language has a
+    `NaN` identifier). GPU targets now emit `select(...)` for WGSL, the ternary
+    for GLSL, and a language-appropriate NaN (`0.0/0.0` for GLSL,
+    `bitcast<f32>(0x7fc00000u)` for WGSL).
+
+- **Interval arithmetic conservative-enclosure fixes** — several interval
+  functions returned ranges that did not enclose the true result (unsound for
+  reliable plotting):
+  - **`mul`** propagated `NaN` through `0 · ∞` (e.g. `[0,1]·[1,∞)`, or `x·ln x`
+    on `[0,1]`). It now uses the interval convention `0 · ±∞ = 0`.
+  - **`clamp`** was computed as an intersection, returning `empty` when the
+    input lay entirely outside `[lo, hi]`. It is now `min(max(x, lo), hi)`, so
+    an out-of-range interval maps onto the nearer bound.
+  - **`binomial`/`gcd`/`lcm`** sampled only the four interval corners, but these
+    functions are not monotone (`C(10, [0,10])` corners are both `1`, missing
+    `C(10,5)=252`). They now enumerate the integer grid (with a conservative
+    fallback for very wide ranges).
+  - **`gamma`/`gammaln`** assumed monotonicity on each negative strip
+    `(−n−1, −n)`, but every strip has an interior extremum (a digamma zero); the
+    enclosure dropped it (e.g. `γ([−0.9,−0.1])` missed `γ(−0.5) ≈ −3.54`). The
+    extrema are now tabulated, with a conservative fallback for deep strips.
+  - **`sinc`/`fresnelS`/`fresnelC`** were not conservative past their tabulated
+    extrema (`sinc` widened only its lower bound; the Fresnel integrals had no
+    fallback at all). `sinc` now bounds the tail by `±1/|x|`, and the Fresnel
+    integrals by their `0.5 ± A` convergence band.
+
+- **Compilation fallback handles multi-argument lambdas** — when a `Function`
+  literal (lambda) cannot be compiled to the target and falls back to
+  interpretation, the fallback now uses the `'lambda'` calling convention
+  (`run(a, b, …)` with positional arguments) instead of always using the
+  `'expression'` convention (`run({ vars })`). Previously the positional
+  arguments were silently dropped and `run` returned `null` for compiled
+  lambdas that fell back. Non-lambda expressions are unaffected.
+
+- **2-arg `\arctan(y, x)` / `\tan^{-1}(y, x)` → `Arctan2`** — both `\arctan` and
+  `\tan^{-1}` with two arguments now lower to the existing `Arctan2` operator
+  (principal value of `atan2(y, x)`). Single-arg forms are unchanged. Other
+  inverse trig functions with two arguments (`\sin^{-1}(y, x)` etc.) still
+  produce an arity error — there is no 2-arg variant for them.
+
+- **Trailing `\` at end of input is tolerated** — a stray bare `\` (with no
+  following command character) is silently discarded when it appears at end of
+  input. Some editor-emitted LaTeX ends with a trailing `\`. Named space
+  commands at end of input (`\,`, `\;`, `\quad`, etc.) were already tolerated.
+
+- **`D_{…}` subscripted identifiers no longer collide with the derivative
+  operator** — a `D` followed by a multi-character subscript (e.g.
+  `D_{etectsize}`) is now parsed as a symbol instead of engaging Euler
+  derivative notation. Previously `D_{etectsize}-7` misread the subscript as a
+  differentiation variable and produced an invalid expression. Single-letter
+  Euler notation (`D_x f`, `D^2_x f`) is unchanged.
+
+- **A trailing visual space no longer wraps an expression in a `Tuple`** — a
+  purely visual horizontal space (`\,`, `\;`, `\quad`, …) following an
+  expression is now correctly treated as a no-op. Previously, when the preceding
+  value was non-numeric (e.g. a color constructor),
+  `\operatorname{hsv}(1,1,1)\,` was wrapped in a spurious single-element
+  `Tuple`. Unit-quantity spacing (`12\,\mathrm{cm}`) is unaffected.
+
+### 0.58.0 _2026-05-12_
+
+#### Added
+
+- **`\operatorname{count}(L)` lowercase alias** — function-call form now parses
+  to `["Length", L]`, matching the existing dot-notation form
+  (`L.\operatorname{count}`) and the other lowercase aliases (`mod`, `var`,
+  `shuffle`, `repeat`, `join`).
+
+- **`Repeat(value, count)` 2-arg form** — `Repeat` now accepts an optional
+  integer `count` and evaluates to a finite list of `count` copies of `value`.
+  The 1-arg `Repeat(value)` keeps its existing infinite-sequence semantics.
+  Materialization is gated by `ce.maxCollectionSize`; larger values stay lazy
+  (still accessible via `.at()` / iterator).
+
+- **`ce.maxCollectionSize`** — new configurable cap (default `10_000`) on the
+  number of elements a collection may have when materialized into a concrete
+  `List`. Assigning `<= 0` or `Infinity` disables the cap (matching
+  `iterationLimit` and `recursionLimit`).
+
+- **`Sum(L)` collection-reducer form** — `Sum` now accepts a single collection
+  argument and reduces to the sum of its elements:
+  `["Sum", ["List", 1, 2, 3, 4, 5]] // ➔ 15`. The big-op form
+  `Sum(body, [i, a, b], …)` is unchanged. The `Sum` head is now preserved
+  through canonicalization (previously rewritten to `Reduce(L, "Add", 0)`), so
+  `L.\operatorname{total}` round-trips cleanly with
+  `latexOptions.dotNotation = true`. The async path throws `CancellationError`
+  on signal abort.
+
+- **`At` extended with boolean-mask and integer-list indices** — `At(L, mask)`
+  where `mask` is a finite collection of `True`/`False` returns the elements of
+  `L` where the mask is `True`. `At(L, indices)` where `indices` is a finite
+  collection of integers returns a sublist picked at those positions;
+  out-of-range positions are filtered. Integer indices (`At(L, 2)`) and string
+  keys (`At(d, "key")`) work as before.
+
+- **Function-application broadcasting for user-defined lambdas** — when a user
+  function with scalar-typed parameters is applied to a finite indexed
+  collection, CE now broadcasts the call elementwise. For
+  `ce.assign('f', ce.parse('x \\mapsto x^2 + 1'))`, the expression
+  `["f", ["List", 1, 2, 3]]` evaluates to `["List", 2, 5, 10]`. Multi-arg
+  functions broadcast with zip semantics, mixing scalars and lists naturally.
+  The inferred default for `\mapsto` lambdas is scalar parameters, so most user
+  functions broadcast by default. To opt out, declare an explicit list parameter
+  type via `ce.declare(name, '(list<X>) -> Y')`.
+
+- **List type for mixed-kind and mixed-dimension elements** — `widen()` now
+  builds a structural union when the common supertype would otherwise collapse
+  to a lossy generic category (`scalar`, `value`, `list`, `tuple`, `dictionary`,
+  …). Consumers can detect heterogeneous lists by inspecting
+  `expr.type.toString()`:
+  - `[1, 2, 3]` → `list<number>` (precise)
+  - `[1, "hello", 3]` → `list<finite_integer | string>` (union)
+  - `[(1,2), (1,2,3)]` →
+    `list<tuple<finite_integer, finite_integer> | tuple<finite_integer, finite_integer, finite_integer>>`
+    (mixed dimension)
+  - `[]` → `list<nothing>` (empty)
+
+- **`ce.box(true)` / `ce.box(false)`** — JS boolean primitives now box to the
+  `True` / `False` symbols (previously fell through to `Undefined`).
+
+- **`Length` operator definition** — `ce.operatorInfo('Length')` now returns a
+  valid entry. The evaluator returns an integer count for finite collections and
+  leaves the expression unevaluated for non-collection or infinite inputs.
+
+- **Library entries for `Complex`, `Colon`, `Prime`** — `ce.operatorInfo()` now
+  returns introspection data for these heads (previously `undefined`). `Complex`
+  boxing is unchanged — `["Complex", re, im]` still produces a `BoxedNumber`.
+
+- **`ce.symbolInfo(name)`** — new public API parallel to `ce.operatorInfo()`,
+  for introspecting constants and declared variables. Returns
+  `{ kind: 'constant' | 'variable', type: BoxedType }` for symbols like `Pi`,
+  `True`, `ExponentialE`, `ImaginaryUnit`. Returns `undefined` for unknown names
+  and for operator heads. Added `SymbolInfo` type to the public type surface.
+  - Note: `Infinity` is registered as `PositiveInfinity` / `NegativeInfinity`;
+    `Undefined` has no value definition.
+
+- **`ce.normalizeIdentifier(latex)`** — new public helper that converts a LaTeX
+  identifier string to its canonical MathJSON name without side effects.
+  Examples: `R_{3}` → `R_3`, `f_{Bm}` → `f_Bm`, `\theta_x` → `theta_x`. Inputs
+  that aren't identifiers (`'1 + 2'`, empty string) return `''`. Useful in
+  importer pipelines that need to call `ce.declare()` with normalized names
+  before parsing referencing rows.
+
+- **`First`/`Second`/`Third` compile entries** — component access (`p.x`, `p.y`,
+  `p.z`) now compiles cleanly. JS uses `[0]`/`[1]`/`[2]` index access; GLSL/WGSL
+  use `.x`/`.y`/`.z` swizzles, assuming the argument compiles to a
+  `vec2`/`vec3`/`vec4`. 5+-element tuples (which compile to `float[N]` arrays)
+  aren't supported.
+
+- **`Range` GPU compile entry** — `Range(lo, hi[, step])` with
+  compile-time-constant bounds emits an inline `float[N](...)` (GLSL) or
+  `array<f32, N>(...)` (WGSL) literal. Non-constant bounds throw a clear error
+  directing the caller to materialize on the JS host and upload as a uniform.
+  Sequence count is capped at 256 elements per call site.
+
+- **`Variance`/`GCD`/`Median` GPU compile entries** — GLSL+WGSL parity with
+  their JS counterparts.
+  - `Variance` is inlined (no size limit).
+  - `GCD` uses a preamble function implementing the Euclidean algorithm.
+  - `Median` is supported for list sizes 2–8; lists with 9+ elements throw.
+
+- **`Random` GPU compile with deterministic seed** — `Random(seed)` in GLSL/WGSL
+  compiles to a hash-based pseudorandom. `Random()` (no args) in GLSL falls back
+  to a `gl_FragCoord`-derived seed (fragment-shader only); in WGSL it throws —
+  callers must provide an explicit seed.
+  - The fract-sin hash exhibits banding near `seed ≈ kπ`. For high-quality
+    shader random, use a more robust hash (e.g. PCG or xxHash).
+  - JS-side `Random` is unchanged (still `Math.random`, non-seeded). A seeded JS
+    form will land in a future release.
+
+- **`toSignedFunction()`** — new method on `BoxedExpression` for
+  implicit-surface rendering and region classification:
+  - `Equal(a, b)` → `a - b` (zero on the surface)
+  - `Less(a, b)` / `LessEqual(a, b)` → `a - b` (negative when relation holds)
+  - `Greater(a, b)` / `GreaterEqual(a, b)` → `b - a` (negative when relation
+    holds)
+  - `NotEqual(a, b)` → `a - b`
+  - Non-relation expressions return `undefined`.
+
+  Strictness and direction are encoded in `expr.operator`. Note that CE
+  canonical form normalizes `GreaterEqual` to `LessEqual(b, a)` (and similarly
+  `Greater` to `Less`), so callers will typically see the `Less`/`LessEqual`
+  operator on parsed expressions — the signed-function semantics are preserved.
+
+- **`BoxedExpression.getInterval(symbol)`** — new method for extracting domain
+  bounds from restriction expressions. Returns `IntervalBounds` with
+  `lower`/`upper`/`lowerStrict`/`upperStrict` for `When(e, cond)`,
+  `And(c1, c2, …)`, and bare comparison expressions; returns `undefined` for
+  unsupported shapes. Useful for 2D-plot domain derivation (e.g. clipping
+  `y = f(x)\{0 < x < 5\}` to `[0, 5]`). Added `IntervalBounds` type to the
+  public type surface.
+
+- **Compact piecewise `\{cond_1 : val_1, …, default\}`** — now parses to
+  `Which(c_1, v_1, …, True, default)`, the same head CE produces for
+  `\begin{cases}…\end{cases}`. Disambiguated from set-builder `\{x : type\}` by
+  inspecting the LHS of the top-level `Colon`: comparison/boolean heads (`Less`,
+  `Greater`, `Equal`, `And`, `Or`, `Not`, …) → piecewise branch; otherwise →
+  set-builder. Normal set literals (`\{1, 2, 3\}`) and set-builder via `\mid`
+  are unchanged.
+
+#### Fixed
+
+- **`Linspace` endpoint inclusion** — `Linspace(a, b, n)` now produces `n`
+  points evenly spanning `[a, b]` inclusive of both endpoints (matching NumPy,
+  Julia, and MATLAB). Previously the last sample fell short of `b` (e.g.
+  `Linspace(0, 1, 5)` yielded `0, 0.2, 0.4, 0.6, 0.8` instead of
+  `0, 0.25, 0.5, 0.75, 1`). `Linspace(a, b, 1)` is the degenerate case and
+  returns just `a`. The `contains` check is now tolerance-based (was an exact
+  `%` test that failed for typical floating-point values).
+
+- **Heterogeneous-list type rendering** — lists containing mixed kinds or
+  mixed-dimension tuples previously rendered their type as `"[object Object]"`
+  in some paths (`BoxedDictionary.type`, `collectionElementType`). Types are now
+  constructed programmatically. Lists containing tuples, sets, dictionaries,
+  records, or strings are no longer misclassified as numeric `BoxedTensor`s.
+
+#### Known issues
+
+- **JS `Loop` compile produces `undefined`** — the imperative `for`-loop IIFE
+  generated for `Loop(body, Element(i, Range(lo, hi)))` has no `return`
+  statement, so the compiled function returns `undefined` rather than the list
+  of body values. Tracked for a future release.
+
+- **JS `Integrate` compile produces `NaN`** — when `args[0]` is a `Function`
+  expression (the common `\int x^2 dx` parse shape), `compileIntegrate` produces
+  a double-lambda, so `_SYS.integrate` receives a function-returning function.
+  Tracked for a future release.
+
+### 0.57.0 _2026-05-10_
+
+#### Added
+
+- **`verbatim` opt-in for `toLatex()`** — `expr.toLatex({ verbatim: true })`
+  returns the original LaTeX source captured at parse time when the expression
+  was parsed with `preserveLatex: true`. Falls back to normal re-serialization
+  if no verbatim is available (e.g. for synthetic or transformed expressions).
+  The default behavior of `expr.latex` and `expr.toLatex()` is unchanged —
+  verbatim is strictly opt-in. Useful for round-tripping authored LaTeX (e.g.
+  `p.x`, `\sin(x)`) without rewriting it to canonical form.
+  - Verbatim is set only on the top-level boxed expression produced directly by
+    `ce.parse(..., { preserveLatex: true })`. Canonicalization, `simplify()`,
+    `evaluate()`, `subs()`, and `ce._fn()` produce fresh expressions with
+    `verbatimLatex === undefined`.
+  - Function expressions whose operator has a custom canonical handler (e.g.
+    `Sin`, `Add`) currently do not preserve top-level verbatim through
+    canonicalization — the handler reconstructs the result without threading
+    metadata. Atoms (symbols, numbers) and functions without custom canonical
+    handlers (e.g. `First`) do preserve it. Use `form: 'structural'` to skip
+    canonical handlers when verbatim preservation matters.
+
+- **`dotNotation` serialization option** — when enabled (default off),
+  member-access heads serialize to dot notation rather than function-call form:
+  `First(p)` → `p.x`, `Length(L)` → `L.\operatorname{count}`, etc. Useful for
+  round-tripping editor-authored dot-notation back to its source form. Set via
+  `ce.latexOptions.dotNotation = true` or per-call
+  `expr.toLatex({ dotNotation: true })`. Only applies to arity-1 forms;
+  multi-operand forms (e.g. `Sum` with an index range) keep their standard
+  serialization.
+  - **Serializer-only.** The flag lives in `SerializeLatexOptions` and has no
+    effect on parsing. All input forms continue to parse as before regardless of
+    the flag: `|L|`, `\operatorname{count}(L)`, `L.\operatorname{count}`,
+    `\operatorname{length}(L)` all still parse to `["Length", L]` whether
+    `dotNotation` is on or off. The flag only decides which form the serializer
+    emits.
+
+- **Component access** (`p.x`, `L.\operatorname{count}`, `z.\operatorname{re}`)
+  — dot notation now parses to existing semantic heads at parse time. No generic
+  accessor head was introduced.
+  - Recognized members and their AST mapping: `x`/`y`/`z` →
+    `First`/`Second`/`Third`; `real`/`re` → `Real`; `imag`/`im` → `Imaginary`;
+    `count` → `Length`; `total` → `Sum`; `max` → `Max`; `min` → `Min`.
+  - Disambiguation: after a terminated integer or decimal, `.` followed by a
+    letter or `\operatorname{...}` is component access, not a decimal point.
+    Examples: `1.x` parses as `["First", 1]` (not a malformed decimal); `1.5.x`
+    parses as `["First", 1.5]`.
+  - Only `\operatorname{...}` and bare-letter identifiers are recognized after
+    `.`. `\mathrm{...}` is not accepted (deliberately tight).
+  - `Third` is a new operator (parallels `First`/`Second`) with signature
+    `(any) -> any`. `First`/`Second` were widened from `(collection) -> any` to
+    `(any) -> any` so component access on a non-collection (e.g. `1.x`) defers
+    type-checking to evaluation; evaluation returns an `Error` expression for
+    incompatible types.
+
+- **Restriction braces** (`expr\{cond\}`) — trailing brace predicates parse to a
+  new `When` head.
+  - `f(x)\{0 < x < 2\}` → `["When", ["f", "x"], ["Less", 0, "x", 2]]`.
+  - **Stacked restrictions canonicalize**: `expr\{c_1\}\{c_2\}` →
+    `["When", expr, ["And", c_1, c_2]]`. Downstream simplification, evaluation,
+    interval intersection, and compilation see a single canonical shape
+    regardless of source form.
+  - Disambiguation from set literals is positional: standalone `\{1, 2, 3\}`
+    continues to parse as a `Set`; `<expr>\{cond\}` parses as a `When`
+    restriction. Allowed left operands include function calls, tuples, list/set
+    literals, bare symbols, subscripted symbols, member access, power
+    expressions, and chained restrictions.
+  - Evaluator semantics: `When(e, True)` evaluates `e`; `When(e, False)` returns
+    `Undefined`; indeterminate `cond` holds the form.
+  - Serializer round-trips to the stacked-brace form (not `\wedge` inside one
+    set of braces) so authored source and re-serialized output stay visually
+    consistent.
+  - JS and GLSL compilation: ternary `(cond ? e : NaN)`.
+
+- **List-range ellipsis** (`[1...9]`, `[0, 0.1, ..., 1]`) — ranges inside list
+  literals parse to the existing `Range` head.
+  - Endpoint-only form: `[a...b]` → `["Range", a, b]`. Triggers `...`, `\ldots`,
+    and `\dots` are all accepted.
+  - Inferred-step form: `[a_0, a_1, ..., a_n]` → `["Range", a_0, a_n, step]`
+    where `step = a_1 - a_0` is inferred from the first sample pair.
+    Intermediate samples are validated against `a_0 + k·step` within
+    `ce.tolerance`; inconsistent samples produce a parse error.
+  - The float idiom `[0, 0.1, 0.2, ..., 1]` is supported (tolerance-aware
+    comparison; `0.1 + 0.1 ≠ 0.2` exactly but is accepted within tolerance).
+  - Outside `[...]` brackets, `\ldots`/`\dots`/`...` continue to parse as the
+    `ContinuationPlaceholder` symbol. The trigger is bracket context.
+
+- **For-comprehensions** (`(x, y) \operatorname{for} x=L_1, y=L_2`) — the `Loop`
+  head now accepts multiple `Element` clauses, evaluated as nested loops with
+  later bindings seeing earlier ones in scope.
+  - `Loop(body, Element(x, L_1), Element(y, L_2), ...)` produces an
+    `indexed_collection<T>` of body evaluations, in row-major order.
+  - For independent bindings this is the Cartesian product:
+    `(x, y) \operatorname{for} x = [1...2], y = [1...2]` → 4 tuples.
+  - For dependent bindings later clauses see earlier:
+    `(x, y) \operatorname{for} x = [1...3], y = [1...x]` → 6 tuples (triangle,
+    not Cartesian).
+  - Precedence: `\operatorname{for}` binds looser than `,` and `=`, tighter than
+    `;`. So `(x + y) \operatorname{for} x = L_1, y = L_2` parses with body
+    `x + y` and two bindings.
+  - Bound names do not leak into the enclosing scope (uses
+    `Scope.noAutoDeclare`).
+  - Legacy single-Element form continues to round-trip via the existing
+    `\text{for } i \text{ from } a \text{ to } b \text{ do } body` syntax.
+    Multi-Element comprehensions serialize to the `\operatorname{for}` form.
+
+- **`Range` type is now dynamic** — element type narrows based on the step
+  argument: integer step (or no step) yields `indexed_collection<integer>`;
+  non-integer step yields `indexed_collection<number>`. Previously the type was
+  always `indexed_collection<integer>`, which was incorrect for float-step
+  ranges.
+
+- **`When` head** — new conditional-value operator. `When(expr, cond)` returns
+  `expr` when `cond` is true, `Undefined` when `cond` is false, and holds when
+  `cond` is indeterminate. Used by restriction-brace parsing (see above) but
+  also usable directly.
+
+- **`ce.operatorInfo(head)`** — new method on `ComputeEngine` for introspecting
+  registered operator heads. Returns
+  `{ kind: 'function' | 'opaque', signature?: BoxedType }` or `undefined`.
+  - `'function'` — head has an `evaluate` handler or a `collection` handler
+    (lazy producers like `Range`, `Linspace`, `Tuple` work via the latter).
+  - `'opaque'` — head is declared with a signature but has neither (e.g.,
+    `Triangle`, `Sphere`, `GeometricVector`).
+  - `undefined` — no operator definition (constants like `Pi` and unknown
+    heads).
+  - Lets external tooling classify heads by capability without maintaining a
+    parallel list of supported operators.
+
+- **`tolerance` in `ParseLatexOptions`** — populated automatically from
+  `ce.tolerance` when parsing through `ce.parse()`. Used by list-range sample
+  validation; available to other parse handlers that need tolerance-aware
+  comparison.
+
+#### Fixed
+
+- **`Loop` with `Element` clause** — single-Element
+  `Loop(body, Element(i, range))` previously did not produce a list of body
+  evaluations (the iteration path for `Element` form had a bug). The new
+  variadic evaluator correctly yields a `List` of body values for each
+  iteration.
+
+### 0.56.0 _2026-03-10_
+
+#### Added
+
+- **First-class color values** — colors are now typed values with a dedicated
+  `color` primitive type and per-colorspace constructor heads, rather than
+  anonymous tuples.
+  - **Constructor heads**: `Rgb`, `Hsv`, `Hsl`, `Oklab`, `Oklch`. Each takes 3
+    components plus an optional alpha. Channels follow each colorspace's own
+    conventions (RGB: 0–1 sRGB; HSV/HSL: hue in degrees, S/V/L 0–1; Oklab/Oklch:
+    standard ranges).
+  - **LaTeX**: `\operatorname{rgb}(...)`, `\operatorname{hsv}(...)`,
+    `\operatorname{hsl}(...)`, `\operatorname{oklab}(...)`,
+    `\operatorname{oklch}(...)`, parsing and serialization both directions.
+  - **Conversions**: `AsRgb`, `AsHsv`, `AsHsl`, `AsOklab`, `AsOklch` convert any
+    color to the named space (identity if already there).
+  - **`ColorDelta(a, b)`** — perceptual color difference (ΔE_OK, Euclidean
+    distance in OKLab). Wide-gamut inputs are not clipped before measurement.
+
+- **JavaScript compile-target support for color values** — all color
+  constructors, the `As*` converters, `ColorDelta`, and `Distance` are
+  supported. At runtime a color is a 3- or 4-element OKLCh array (`[L, C, H]` or
+  `[L, C, H, alpha]`), matching the GPU target's `vec3`/`vec4` representation,
+  so values move between JS, GLSL, and WGSL without conversion.
+
+- **`Distance(p1, p2)`** — Euclidean distance between two points represented as
+  tuples. Accepts any positive dimension; mismatched dimensions return a typed
+  error. LaTeX trigger `\operatorname{distance}(p1, p2)`.
+
+- **Geometric primitive heads** — `Triangle`, `Sphere`, `Segment`, and
+  `GeometricVector` are now recognized as typed function heads (no evaluator,
+  preserved structurally for downstream consumers). LaTeX triggers
+  `\operatorname{triangle}`, `\operatorname{sphere}`, `\operatorname{segment}`,
+  `\operatorname{vector}(p1, p2)`. `GeometricVector` is distinct from the
+  existing `Vector` (column-vector construction).
+
+- **`To` head registered** — `\to` already parsed to `["To", a, b]` but was
+  classified as `unsupported-operator`; it is now a known typed head.
+
+- **Function-style aliases** — lowercase `\operatorname{...}` forms common in
+  Desmos-style notation now parse to their existing capitalized operators:
+  `\operatorname{mod}` → `Mod`, `\operatorname{var}` → `Variance`,
+  `\operatorname{shuffle}` → `Shuffle`, `\operatorname{random}` → `Random`,
+  `\operatorname{repeat}` → `Repeat`, `\operatorname{join}` → `Join`.
+
+- **`ce.latexOptions`** — new mutable, engine-wide bag of LaTeX parse/serialize
+  options (e.g. `decimalSeparator`, `digitGroupSeparator`). Available as a
+  constructor option and as a read/write property:
+  ```ts
+  const ce = new ComputeEngine({ latexOptions: { decimalSeparator: '{,}' } });
+  // or post-construction:
+  ce.latexOptions = { decimalSeparator: '{,}' };
+  ```
+  These options are merged into every `ce.parse()` and `expr.toLatex()` call.
+  Precedence (most-specific wins): `LatexSyntax` instance defaults <
+  `ce.latexOptions` < per-call options. Previously, options like
+  `decimalSeparator` could only be changed per call post-construction (and
+  `expr.latex` could not be customized at all).
+
+#### Changed
+
+- **`Color('...')`** now returns an `Oklch` head instead of a 0–1 sRGB `Tuple`.
+  The string parser still accepts the same set of CSS-style inputs.
+- **`ColorMix`** now returns an `Oklch` head and mixes in OKLCh directly,
+  preserving out-of-gamut chroma. Hue interpolation takes the shortest path
+  around the wheel; mixing with an achromatic endpoint carries the other
+  endpoint's hue (matches CSS Color 4 `color-mix`).
+- **`ContrastingColor`** now returns an `Rgb` head (was: 0–1 sRGB `Tuple`).
+- **`Colormap`** now returns `Oklch` heads — either a `List(Oklch, ...)` or a
+  single `Oklch` for position-sampling.
+- **`ColorToString`** with `'oklch'` format serializes typed color inputs
+  without an sRGB round-trip; out-of-gamut chroma serializes losslessly.
+  `'hex'`/`'rgb'`/`'hsl'` paths are unchanged.
+- **Color-consuming signatures tightened** — `(any, any)` →
+  `(color | string | tuple, color | string | tuple)` for `ColorDelta`,
+  `ColorContrast`, `ColorMix`, `ContrastingColor`, `ColorToString`,
+  `ColorToColorspace`. The `As*` converters take `(color) -> color`.
+
+#### Migration notes
+
+Code that consumed the tuple output of `Color('...')`, `ColorMix`,
+`ContrastingColor`, or `Colormap` now sees a typed color head. To get the
+previous 0–1 sRGB shape, wrap with `AsRgb`:
+
+```ts
+// Before: const tuple = ce.expr(['Color', "'red'"]).evaluate();  // [r, g, b] in 0-1
+// Now (equivalent 0-1 sRGB):
+const rgb = ce.expr(['AsRgb', ['Color', "'red'"]]).evaluate();
+// rgb is ['Rgb', r, g, b] with channels 0-1
+```
+
+`Rgb` head components are **0–1 sRGB** across all layers (engine, JS compile,
+GPU compile).
+
+#### Fixed
+
+- **Super-linear parse time on deeply-nested parametric expressions** —
+  `ce.parse()` could exhibit exponential blowup on inputs like nested rotation
+  matrices `\left(\cos(\theta)\cdot S+\sin(\theta)\right)` (depth 6 took ~44s).
+  Two underlying causes were addressed: the type/sign cache on `BoxedFunction`
+  was effectively disabled (causing every `.type` access to recurse through all
+  operands), and `parseEnclosure` was speculatively trying matchfix definitions
+  whose close-delimiter token wasn't even present in the input. Parse time on
+  the affected inputs is now linear.
+
+- **`ce.parse()` ignored the injected `LatexSyntax` instance's
+  `decimalSeparator`** — `ce.parse()` hardcoded `decimalSeparator: '.'`,
+  silently overriding any value configured on a `LatexSyntax` passed via the
+  constructor's `latexSyntax` option. The injected instance's configured
+  separator now takes effect end-to-end.
+
+- **`expr.toMathJson({ metadata: ['latex'] })` was silently dropped** — passing
+  a metadata array of specific fields (e.g. `['latex']` or `['wikidata']`) was
+  ignored; only `metadata: 'all'` worked. The array form now correctly populates
+  the requested fields.
+
+- **`expr.toMathJson({ shorthands: ['all'] })` disabled all shorthands** — the
+  `['all']` array form had the opposite of its intended effect. The string form
+  `'all'` and explicit lists like `['function']` were unaffected.
+
+### 0.55.6 _2026-03-08_
+
+#### Fixed
+
+- **LaTeX parsing: `\lim` with postfix operators** —
+  `\lim_{x\to 0}\left(x\right)^x` now correctly parses as `Limit(x^x)` instead
+  of `Power(Limit(x), x)`. The `\lim` parser was using
+  `parseArguments('implicit')` which stripped the delimiters and left the `^x`
+  unconsumed; it now uses `parseExpression` so postfix operators are included in
+  the limit body.
+
+- **LaTeX parsing: style, size, and color switch commands** — `\displaystyle`,
+  `\textstyle`, `\scriptstyle`, `\scriptscriptstyle`, `\tiny`..`\Huge` (10 size
+  commands), and `\color{...}` were silently discarded during parsing. They now
+  produce `Annotated` expressions that preserve the styling information and
+  round-trip correctly through serialization. Added `\scriptstyle` /
+  `\scriptscriptstyle` serialization support (previously only `\displaystyle`
+  and `\textstyle` were handled).
+
+- **LaTeX parsing: set-builder notation** — `\{x \in \R \mid x > 0\}` now parses
+  to `["Set", expr, ["Condition", cond]]`. Registered `\mid` as an infix
+  operator (`Divides`, precedence 160). The serializer round-trips set-builder
+  notation correctly.
+
+- **LaTeX serialization: `Complement`** — `["Complement", "A"]` now serializes
+  to `A^\complement` instead of falling back to the generic function form.
+  Removed stale `@todo` comments about a non-existent multi-argument case.
+
+- **LaTeX parsing: spacing commands** — `\hspace{dim}`, `\hspace*{dim}`,
+  `\hskip`, and `\kern` are now consumed during parsing (previously caused
+  "unexpected token" errors). These are treated as visual spacing and skipped.
+
+- **LaTeX serialization: `HorizontalSpacing` math classes** — the 2-argument
+  form `["HorizontalSpacing", expr, "'bin'"]` now serializes to `\mathbin{expr}`
+  (and similarly for `rel`, `op`, `ord`, `open`, `close`, `punct`, `inner`).
+  Previously the second argument was silently dropped.
+
+- **LaTeX serialization: redundant parens on matchfix operators** — `wrap()` no
+  longer adds parentheses around `Abs`, `Floor`, `Ceil`, `Norm`, and other
+  matchfix expressions that already have visible delimiters.
+
+- **LaTeX serialization: tabular environments** — default environment serializer
+  now renders matrix bodies (List of Lists) with `&` column separators and `\\`
+  row separators instead of nested function calls.
+
+- **LaTeX serialization: matchfix delimiter scaling** — default matchfix
+  serializer now respects `groupStyle` to choose between bare delimiters,
+  `\left..\right`, or `\bigl..\bigr` scaling.
+
+- **LaTeX parsing: Greek symbols in string groups** — `\alpha`, `\beta`, etc. in
+  `parseStringGroupContent()` (used by `\begin`/`\end`, color arguments) are now
+  interpreted as their Unicode equivalents instead of passing through as raw
+  LaTeX commands.
+
+### 0.55.5 _2026-03-06_
+
+#### Fixed
+
+- **Deep-zoom fractal precision** — emulated-double (dp) and perturbation (pt)
+  shaders now compute per-pixel coordinates from `v_uv` and viewport uniforms
+  instead of the shader template's single-precision `mix()`, which lost
+  distinguishability at high zoom levels.
+- **Perturbation theory: absolute vs delta coordinates** — the perturbation
+  Mandelbrot/Julia handlers were passing absolute single-precision coordinates
+  to the shader instead of the small delta from the reference center. Fixed by
+  introducing `_pt_delta()` which computes the per-pixel offset from viewport
+  uniforms.
+- **`compile()` free function dropped `hints`** — the `hints` option (viewport
+  center/radius) was accepted but silently not forwarded to the language target.
+  Fixed in `compile-expression.ts`.
+
+#### Added
+
+- **`BigDecimal` export** — the arbitrary-precision decimal class is now
+  exported from the public API for use by plot engines and other consumers that
+  need precision beyond float64.
+- **`HighPrecisionCoord` type** — new union type
+  (`number | string | { hi: number; lo: number }`) for passing
+  extended-precision viewport coordinates through the compile API. The
+  `viewport.center` option now accepts this type instead of plain
+  `[number, number]`.
+
+### 0.55.4 _2026-03-06_
+
+#### Fixed
+
+- **[#254](https://github.com/cortex-js/compute-engine/issues/254) LaTeX
+  parsing: interval notation with `\lbrack`/`\lparen`** — parsing `\lbrack5,7)`
+  or `\left\lbrack5,7\right)` now correctly produces an `Interval` expression.
+  Previously, when the open delimiter was a LaTeX command (e.g., `\lbrack`), the
+  parser incorrectly required the close delimiter to also be a LaTeX command
+  (e.g., `\rparen` instead of `)`), causing mismatched-delimiter intervals to
+  fail.
+- **LaTeX parsing: invalid symbols in `\mathrm{}` and related prefixes** —
+  invalid content inside `\mathrm{}`, `\operatorname{}`, etc. (e.g.,
+  `\mathrm{=}` or `\mathrm{DavidBowie👨🏻‍🎤}`) now produces the correct
+  `invalid-symbol` error instead of cascading parse errors. Also fixed
+  `matchPrefixedSymbol` leaking parser state on failure, and emoji sequences are
+  now properly recognized inside symbol prefixes (e.g.,
+  `\operatorname{😎🤏😳🕶🤏}`).
+
+#### Added
+
+- **High-precision Mandelbrot/Julia compilation** — the GPU compilation targets
+  (GLSL, WGSL) now support three precision tiers for fractal rendering, selected
+  automatically based on viewport hints:
+  - **Single float** (zoom < 10^6x): existing implementation, no overhead
+  - **Emulated double** (zoom 10^6x–10^14x): double-single (float-float)
+    arithmetic using Dekker/Knuth algorithms, ~48-bit mantissa from two 32-bit
+    floats
+  - **Perturbation theory** (zoom > 10^14x): reference orbit computed on CPU at
+    arbitrary precision via `BigDecimal`, GPU iterates only the small delta from
+    the reference, with glitch detection and single-float rebase fallback
+- **Viewport-aware compile API** — `compile()` accepts optional
+  `hints: { viewport: { center, radius } }`. The compiler auto-selects the
+  precision strategy and returns `staleWhen` thresholds for cheap staleness
+  checking by the plot engine.
+- **`CompilationResult` extensions** — new optional fields: `staleWhen` (plain
+  data staleness predicate), `uniforms` (scalar shader uniforms), `textures`
+  (typed texture data with format/dimensions for GPU upload).
+
 ### 0.55.3 _2026-03-05_
 
 #### Improved
@@ -35,8 +1126,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
     integer-typed
   - `Abs` is a no-op when the operand is provably non-negative
   - `Power(x, 2)` only expands to `(x * x)` for simple operands (symbols,
-    literals) — function calls like `Power(Sin(x), 2)` use `pow`/`Math.pow`
-    to avoid duplicate evaluation
+    literals) — function calls like `Power(Sin(x), 2)` use `pow`/`Math.pow` to
+    avoid duplicate evaluation
   - Integer `Mod` with non-negative dividend uses plain `%` instead of the
     Euclidean double-mod formula
   - GPU variable declarations infer `i32`/`int` type for integer-typed locals

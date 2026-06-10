@@ -216,6 +216,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "compute-engine/15b-guide-extended-rules",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
           id: "compute-engine/guide-logic",
           className: "guide-icon",
         },

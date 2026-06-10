@@ -10,6 +10,129 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+## 0.110.0 _2026-06-08_
+
+### Security Advisories
+
+- **#3028** Fixed a cross-site scripting (XSS) vulnerability in the rendering of
+  text-mode content. The body of `\text{}`, `\mbox{}` and similar commands
+  accepts arbitrary characters, which were reflected **unescaped** into both the
+  HTML markup (`convertLatexToMarkup()`, the editor, and the `<math-span>` /
+  `<math-div>` static elements) and the MathML output
+  (`convertLatexToMathMl()`). Input such as
+  `\text{<img src=x onerror=alert(1)>}` could therefore execute arbitrary
+  JavaScript when the output was inserted into the DOM. Text content and
+  delimiters are now HTML-escaped in both output paths. Applications that render
+  untrusted LaTeX should upgrade.
+
+### Resolved Issues
+
+- **#2949** Fixed the layout of fill-in-the-blank prompts that contain content.
+  The prompt's outline box now correctly encloses and aligns with its content,
+  including tall content such as fractions, with improved vertical alignment.
+  This regression was introduced by the fix for **#2515**; note that **#2515**
+  (placeholders inside accent commands such as `\vec{}` cannot be filled)
+  remains unresolved and is tracked separately. (contributed by
+  @Scienthousiaste)
+
+- **#2963** Fixed font style (variant) changes being ignored for the first
+  character of an expression (or block). Applying a font style such as Roman
+  Upright to the first character now serializes correctly (e.g. `\mathrm{H}`
+  instead of a bare `H`), matching what is displayed in the mathfield.
+  (contributed by @psiservices-uwidmark)
+
+- **#2964** Fixed duplicate atoms accumulating when `setValue()` is called
+  repeatedly with incomplete LaTeX (such as `\sum_{`). Partially-formed atoms
+  that contain no content are now included when collecting atoms in a range, so
+  they are cleared on each sync instead of accumulating across update cycles.
+  (contributed by @Meinzzzz)
+
+- **#3030** Fixed TypeScript 6 compilation errors (TS2882) in the published type
+  declarations. The generated `.d.ts` files no longer contain bare side-effect
+  imports (such as `import '../core/modes'`) that referenced modules not
+  included in the package, which TypeScript 6 flags by default via
+  `noUncheckedSideEffectImports`.
+
+### Improvements
+
+- **#3032** `validateLatex()` now accepts an optional `options` argument with a
+  `macros` dictionary, so custom macros are recognized during validation instead
+  of being reported as unknown commands. (contributed by @Wigny)
+
+- **#3009** The types for static math elements are now exported from the package
+  entry point (`math-static-elements`), making them available to TypeScript
+  consumers. (contributed by @tsuji-riya)
+
+## 0.109.2 _2026-04-28_
+
+### Resolved Issues
+
+- **#2931** Fixed virtual keyboard recursion in sandboxed iframe mathfields. The
+  message handling guard now checks the `source` window rather than only the
+  top-level window, preventing the local mathfield from re-dispatching its own
+  command messages and avoiding the resulting infinite loop. (contributed by
+  @konbu310)
+
+- Fixed duplicated safe area padding below the virtual keyboard. The
+  `--_keyboard-height` calculation no longer adds `env(safe-area-inset-bottom)`
+  on top of `--_padding-bottom`, which already includes it; this removes the
+  doubled empty space that appeared below the keyboard on devices with bottom
+  safe areas. (contributed by @Blibbo)
+
+- Fixed a stacking issue in the color picker where the background of neighboring
+  color swatches could paint over the border of the active swatch. The focused
+  color now has an explicit `z-index` to keep it above its neighbors.
+  (contributed by @Blibbo)
+
+### Improvements
+
+- Added Catalan (`ca`) localization. (contributed by @aaronFortuno)
+
+## 0.109.1 _2026-04-01_
+
+### Resolved Issues
+
+- **#2974** Fixed empty/unresponsive mathfield after inserting a fraction
+  following a parenthesized expression built via keyboard (e.g.
+  `5 ) Home ( End /`). Also fixed a phantom duplicate caret that appeared after
+  the same input sequence. (contributed by @zojize)
+
+## 0.109.0 _2026-03-11_
+
+### Resolved Issues
+
+- **#2946** Fixed virtual keyboard toggle focus issues. Clicking the
+  `virtual-keyboard-toggle` button now correctly focuses the mathfield and
+  accepts virtual keyboard input. (contributed by @mgreminger)
+
+- **#2956** Fixed incorrect inter-atom spacing before relation operators (e.g.
+  `=`) when using accent commands like `\hat{x}`. (contributed by @repst)
+
+- **#2957** Fixed a caret trap in LaTeX command mode after deleting a lone
+  backslash. Empty `latexgroup` containers are now removed when delete
+  operations remove the last LaTeX atom. (contributed by @repst)
+
+- **#2958** Fixed smart-fence closing delimiter remaining in ghost styling after
+  pressing Space. The closing delimiter is now properly committed and rendered
+  normally. (contributed by @repst)
+
+- Fixed the caret getting trapped inside a LaTeX command group when navigating
+  with arrow keys. Pressing left or right arrow to move past the boundary of a
+  `\command` now correctly accepts the command and exits LaTeX mode.
+
+### Improvements
+
+- **#2935** Fixed Korean localization translation errors. (contributed by
+  @onu032001)
+
+- **#2938** Removed debug `console.log` from `PromptAtom`. (contributed by
+  @remiangot)
+
+- **#2726** Updated Italian localization with improved translations and
+  capitalization normalization. (contributed by @GGilli)
+
 ## 0.108.3 _2026-02-11_
 
 ### Resolved Issues

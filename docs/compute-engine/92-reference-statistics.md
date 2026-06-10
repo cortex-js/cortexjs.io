@@ -275,7 +275,7 @@ number of elements in each bin.
 
 ```json example
 ["Histogram", ["List", 1, 2, 2, 3, 4, 5, 5, 5], 3]
-// [2, 2, 5]
+// [[1, 3], [2.3333…, 1], [3.6667…, 4]]   (bin start, count)
 ```
 
 </FunctionDefinition>
@@ -294,7 +294,7 @@ number of bins.
 
 ```json example
 ["BinCounts", ["List", 1, 2, 2, 3, 4, 5, 5, 5], 3]
-// [2, 2, 5]
+// [3, 1, 4]
 ```
 
 </FunctionDefinition>

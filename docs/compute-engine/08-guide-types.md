@@ -305,7 +305,7 @@ The type of a list is represented by the type expression `list<T>`, where `T` is
 
 ```js
 ce.parse("\\[1, 2, 3\\]").type.toString();
-// ➔ "list<number>"
+// ➔ "vector<3>"  (the canonical shorthand for "list<number^3>")
 ```
 
 The shorthand **`list`** is equivalent to `list<any>`, a list of values of any type.
@@ -329,10 +329,12 @@ ce.parse("\\[1, 2, 3\\]").type.matches("vector<3>");
 // ➔ true
 ```
 
-A **`vector<T^n>`** is a list of `n` elements of type `T`.
+A **`vector<T^n>`** is a list of `n` elements of type `T`. Numeric literals are
+inferred with the broad `number` element type, so a literal list of integers is
+a `vector<number^n>` (and does not match the narrower `vector<integer^n>`).
 
 ```js
-ce.parse("\\[1, 2, 3\\]").type.matches("vector<integer^3>");
+ce.parse("\\[1, 2, 3\\]").type.matches("vector<number^3>");
 // ➔ true
 ```
 

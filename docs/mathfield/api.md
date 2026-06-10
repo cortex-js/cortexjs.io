@@ -857,10 +857,11 @@ The default operation is `"set"`.
 
 ###### options?
 
-[`Range`](#range-1) | \{
-`operation`: `"set"` \| `"toggle"`;
-`range`: [`Range`](#range-1);
-\}
+  \| [`Range`](#range-1)
+  \| \{
+  `operation`: `"set"` \| `"toggle"`;
+  `range`: [`Range`](#range-1);
+ \}
 
 </MemberCard>
 
@@ -960,7 +961,7 @@ mf.registers.medmuskip = "3mu";
 
 <MemberCard>
 
-##### MathfieldElement.readAloudHook()
+##### MathfieldElement.readAloudHook
 
 ```ts
 static readAloudHook: (element, text) => void = defaultReadAloudHook;
@@ -970,7 +971,7 @@ static readAloudHook: (element, text) => void = defaultReadAloudHook;
 
 <MemberCard>
 
-##### MathfieldElement.speakHook()
+##### MathfieldElement.speakHook
 
 ```ts
 static speakHook: (text) => void = defaultSpeakHook;
@@ -1232,7 +1233,7 @@ setPromptState(id, state, locked?): void
 
 ###### state
 
-`"undefined"` | `"correct"` | `"incorrect"`
+`"undefined"` \| `"correct"` \| `"incorrect"`
 
 ###### locked?
 
@@ -1608,7 +1609,7 @@ strings. If the locale is not supported, it will be added.
 
 <MemberCard>
 
-##### MathfieldElement.createHTML()
+##### MathfieldElement.createHTML
 
 ```ts
 static createHTML: (html) => any;
@@ -1629,7 +1630,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version
 
 ```ts
-static version: string = '0.108.3';
+static version: string = '0.110.0';
 ```
 
 </MemberCard>
@@ -1802,7 +1803,7 @@ static loadSound(sound): Promise<void>
 
 ###### sound
 
-`"keypress"` | `"plonk"` | `"delete"` | `"spacebar"` | `"return"`
+`"keypress"` \| `"plonk"` \| `"delete"` \| `"spacebar"` \| `"return"`
 
 </MemberCard>
 
@@ -1830,7 +1831,7 @@ static playSound(name): Promise<void>
 
 ###### name
 
-`"keypress"` | `"plonk"` | `"delete"` | `"spacebar"` | `"return"`
+`"keypress"` \| `"plonk"` \| `"delete"` \| `"spacebar"` \| `"return"`
 
 </MemberCard>
 
@@ -2265,7 +2266,7 @@ returned by `mf.getElementInfo()`.
 ##### ElementInfo.bounds?
 
 ```ts
-optional bounds: DOMRect;
+optional bounds?: DOMRect;
 ```
 
 The bounding box of the element
@@ -2277,7 +2278,7 @@ The bounding box of the element
 ##### ElementInfo.data?
 
 ```ts
-optional data: Record<string, string | undefined>;
+optional data?: Record<string, string | undefined>;
 ```
 
 HTML attributes associated with element or its ancestores, set with
@@ -2290,7 +2291,7 @@ HTML attributes associated with element or its ancestores, set with
 ##### ElementInfo.depth?
 
 ```ts
-optional depth: number;
+optional depth?: number;
 ```
 
 The depth in the expression tree. 0 for top-level elements
@@ -2302,7 +2303,7 @@ The depth in the expression tree. 0 for top-level elements
 ##### ElementInfo.id?
 
 ```ts
-optional id: string;
+optional id?: string;
 ```
 
 id associated with this element or its ancestor, set with `\htmlId` or
@@ -2315,7 +2316,7 @@ id associated with this element or its ancestor, set with `\htmlId` or
 ##### ElementInfo.latex?
 
 ```ts
-optional latex: string;
+optional latex?: string;
 ```
 
 A LaTeX representation of the element
@@ -2327,7 +2328,7 @@ A LaTeX representation of the element
 ##### ElementInfo.mode?
 
 ```ts
-optional mode: ParseMode;
+optional mode?: ParseMode;
 ```
 
 The mode (math, text or LaTeX)
@@ -2339,7 +2340,7 @@ The mode (math, text or LaTeX)
 ##### ElementInfo.style?
 
 ```ts
-optional style: Style;
+optional style?: Style;
 ```
 
 The style (color, weight, variant, etc...) of this element.
@@ -2357,7 +2358,7 @@ The style (color, weight, variant, etc...) of this element.
 ##### InsertOptions.feedback?
 
 ```ts
-optional feedback: boolean;
+optional feedback?: boolean;
 ```
 
 If `true`, provide audio and haptic feedback
@@ -2369,7 +2370,7 @@ If `true`, provide audio and haptic feedback
 ##### InsertOptions.focus?
 
 ```ts
-optional focus: boolean;
+optional focus?: boolean;
 ```
 
 If `true`, the mathfield will be focused after the insertion
@@ -2381,7 +2382,7 @@ If `true`, the mathfield will be focused after the insertion
 ##### InsertOptions.format?
 
 ```ts
-optional format: OutputFormat | "auto";
+optional format?: OutputFormat | "auto";
 ```
 
 The format of the input string:
@@ -2398,7 +2399,7 @@ The format of the input string:
 ##### InsertOptions.insertionMode?
 
 ```ts
-optional insertionMode: "replaceSelection" | "replaceAll" | "insertBefore" | "insertAfter";
+optional insertionMode?: "replaceSelection" | "replaceAll" | "insertBefore" | "insertAfter";
 ```
 
 </MemberCard>
@@ -2408,7 +2409,7 @@ optional insertionMode: "replaceSelection" | "replaceAll" | "insertBefore" | "in
 ##### InsertOptions.mode?
 
 ```ts
-optional mode: ParseMode | "auto";
+optional mode?: ParseMode | "auto";
 ```
 
 If `"auto"` or omitted, the current mode is used
@@ -2420,7 +2421,7 @@ If `"auto"` or omitted, the current mode is used
 ##### InsertOptions.scrollIntoView?
 
 ```ts
-optional scrollIntoView: boolean;
+optional scrollIntoView?: boolean;
 ```
 
 If `true`, scroll the mathfield into view after insertion such that the insertion point is visible
@@ -2432,7 +2433,7 @@ If `true`, scroll the mathfield into view after insertion such that the insertio
 ##### InsertOptions.selectionMode?
 
 ```ts
-optional selectionMode: "placeholder" | "after" | "before" | "item";
+optional selectionMode?: "placeholder" | "after" | "before" | "item";
 ```
 
 Describes where the selection will be after the insertion:
@@ -2451,7 +2452,7 @@ Describes where the selection will be after the insertion:
 ##### InsertOptions.silenceNotifications?
 
 ```ts
-optional silenceNotifications: boolean;
+optional silenceNotifications?: boolean;
 ```
 
 If `true`, silence notifications during insertion
@@ -2463,7 +2464,7 @@ If `true`, silence notifications during insertion
 ##### InsertOptions.style?
 
 ```ts
-optional style: Style;
+optional style?: Style;
 ```
 
 The style applied to the inserted content
@@ -2633,7 +2634,7 @@ the end of the range.
 ##### Selection.direction?
 
 ```ts
-optional direction: "forward" | "backward" | "none";
+optional direction?: "forward" | "backward" | "none";
 ```
 
 </MemberCard>
@@ -2659,7 +2660,7 @@ ranges: Range[];
 ##### Style.backgroundColor?
 
 ```ts
-optional backgroundColor: string;
+optional backgroundColor?: string;
 ```
 
 </MemberCard>
@@ -2669,7 +2670,7 @@ optional backgroundColor: string;
 ##### Style.color?
 
 ```ts
-optional color: string;
+optional color?: string;
 ```
 
 </MemberCard>
@@ -2679,7 +2680,7 @@ optional color: string;
 ##### Style.fontFamily?
 
 ```ts
-optional fontFamily: FontFamily;
+optional fontFamily?: FontFamily;
 ```
 
 </MemberCard>
@@ -2689,7 +2690,7 @@ optional fontFamily: FontFamily;
 ##### Style.fontSeries?
 
 ```ts
-optional fontSeries: FontSeries;
+optional fontSeries?: FontSeries;
 ```
 
 </MemberCard>
@@ -2699,7 +2700,7 @@ optional fontSeries: FontSeries;
 ##### Style.fontShape?
 
 ```ts
-optional fontShape: FontShape;
+optional fontShape?: FontShape;
 ```
 
 </MemberCard>
@@ -2709,7 +2710,7 @@ optional fontShape: FontShape;
 ##### Style.fontSize?
 
 ```ts
-optional fontSize: "auto" | FontSize;
+optional fontSize?: "auto" | FontSize;
 ```
 
 </MemberCard>
@@ -2719,7 +2720,7 @@ optional fontSize: "auto" | FontSize;
 ##### Style.variant?
 
 ```ts
-optional variant: Variant;
+optional variant?: Variant;
 ```
 
 </MemberCard>
@@ -2729,7 +2730,7 @@ optional variant: Variant;
 ##### Style.variantStyle?
 
 ```ts
-optional variantStyle: VariantStyle;
+optional variantStyle?: VariantStyle;
 ```
 
 </MemberCard>
@@ -2743,7 +2744,7 @@ optional variantStyle: VariantStyle;
 ##### ApplyStyleOptions.operation?
 
 ```ts
-optional operation: "set" | "toggle";
+optional operation?: "set" | "toggle";
 ```
 
 </MemberCard>
@@ -2753,7 +2754,7 @@ optional operation: "set" | "toggle";
 ##### ApplyStyleOptions.range?
 
 ```ts
-optional range: Range;
+optional range?: Range;
 ```
 
 </MemberCard>
@@ -2763,7 +2764,7 @@ optional range: Range;
 ##### ApplyStyleOptions.silenceNotifications?
 
 ```ts
-optional silenceNotifications: boolean;
+optional silenceNotifications?: boolean;
 ```
 
 </MemberCard>
@@ -2812,7 +2813,7 @@ type FontSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 <MemberCard>
 
-### InsertStyleHook()
+### InsertStyleHook
 
 ```ts
 type InsertStyleHook = (sender, at, info) => Readonly<Style>;
@@ -2919,7 +2920,7 @@ typically just uppercase and lowercase letters, and digits 0-9 in some cases.
 ##### MacroDefinition.args?
 
 ```ts
-optional args: number;
+optional args?: number;
 ```
 
 Number of arguments (`#1`, etc...) in the macro definition
@@ -2931,7 +2932,7 @@ Number of arguments (`#1`, etc...) in the macro definition
 ##### MacroDefinition.captureSelection?
 
 ```ts
-optional captureSelection: boolean;
+optional captureSelection?: boolean;
 ```
 
 If `false` elements inside the macro can be selected
@@ -2955,7 +2956,7 @@ Definition of the macro as a LaTeX expression
 ##### MacroDefinition.expand?
 
 ```ts
-optional expand: boolean;
+optional expand?: boolean;
 ```
 
 If `false`, even if `expandMacro` is true, do not expand.
@@ -2999,7 +3000,7 @@ The code above will support the following notation:
 ##### MacroPackageDefinition.captureSelection?
 
 ```ts
-optional captureSelection: boolean;
+optional captureSelection?: boolean;
 ```
 
 </MemberCard>
@@ -3019,7 +3020,7 @@ package: Record<string, string | MacroDefinition>;
 ##### MacroPackageDefinition.primitive?
 
 ```ts
-optional primitive: boolean;
+optional primitive?: boolean;
 ```
 
 </MemberCard>
@@ -3059,7 +3060,7 @@ dimension: number;
 ##### Dimension.unit?
 
 ```ts
-optional unit: DimensionUnit;
+optional unit?: DimensionUnit;
 ```
 
 </MemberCard>
@@ -3112,7 +3113,7 @@ glue: Dimension;
 ##### Glue.grow?
 
 ```ts
-optional grow: Dimension;
+optional grow?: Dimension;
 ```
 
 </MemberCard>
@@ -3122,7 +3123,7 @@ optional grow: Dimension;
 ##### Glue.shrink?
 
 ```ts
-optional shrink: Dimension;
+optional shrink?: Dimension;
 ```
 
 </MemberCard>
@@ -3225,7 +3226,7 @@ state.
 
 <MemberCard>
 
-##### Commands.extendSelectionBackward()
+##### Commands.extendSelectionBackward
 
 ```ts
 extendSelectionBackward: (model) => boolean;
@@ -3235,7 +3236,7 @@ extendSelectionBackward: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendSelectionDownward()
+##### Commands.extendSelectionDownward
 
 ```ts
 extendSelectionDownward: (model) => boolean;
@@ -3245,7 +3246,7 @@ extendSelectionDownward: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendSelectionForward()
+##### Commands.extendSelectionForward
 
 ```ts
 extendSelectionForward: (model) => boolean;
@@ -3255,7 +3256,7 @@ extendSelectionForward: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendSelectionUpward()
+##### Commands.extendSelectionUpward
 
 ```ts
 extendSelectionUpward: (model) => boolean;
@@ -3265,7 +3266,7 @@ extendSelectionUpward: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendToGroupEnd()
+##### Commands.extendToGroupEnd
 
 ```ts
 extendToGroupEnd: (model) => boolean;
@@ -3275,7 +3276,7 @@ extendToGroupEnd: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendToGroupStart()
+##### Commands.extendToGroupStart
 
 ```ts
 extendToGroupStart: (model) => boolean;
@@ -3285,7 +3286,7 @@ extendToGroupStart: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendToMathFieldEnd()
+##### Commands.extendToMathFieldEnd
 
 ```ts
 extendToMathFieldEnd: (model) => boolean;
@@ -3295,7 +3296,7 @@ extendToMathFieldEnd: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendToMathFieldStart()
+##### Commands.extendToMathFieldStart
 
 ```ts
 extendToMathFieldStart: (model) => boolean;
@@ -3305,7 +3306,7 @@ extendToMathFieldStart: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendToNextBoundary()
+##### Commands.extendToNextBoundary
 
 ```ts
 extendToNextBoundary: (model) => boolean;
@@ -3315,7 +3316,7 @@ extendToNextBoundary: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendToNextWord()
+##### Commands.extendToNextWord
 
 ```ts
 extendToNextWord: (model) => boolean;
@@ -3325,7 +3326,7 @@ extendToNextWord: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendToPreviousBoundary()
+##### Commands.extendToPreviousBoundary
 
 ```ts
 extendToPreviousBoundary: (model) => boolean;
@@ -3335,7 +3336,7 @@ extendToPreviousBoundary: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.extendToPreviousWord()
+##### Commands.extendToPreviousWord
 
 ```ts
 extendToPreviousWord: (model) => boolean;
@@ -3345,7 +3346,7 @@ extendToPreviousWord: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveAfterParent()
+##### Commands.moveAfterParent
 
 ```ts
 moveAfterParent: (model) => boolean;
@@ -3355,7 +3356,7 @@ moveAfterParent: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveBeforeParent()
+##### Commands.moveBeforeParent
 
 ```ts
 moveBeforeParent: (model) => boolean;
@@ -3365,7 +3366,7 @@ moveBeforeParent: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveDown()
+##### Commands.moveDown
 
 ```ts
 moveDown: (model) => boolean;
@@ -3375,7 +3376,7 @@ moveDown: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToGroupEnd()
+##### Commands.moveToGroupEnd
 
 ```ts
 moveToGroupEnd: (model) => boolean;
@@ -3385,7 +3386,7 @@ moveToGroupEnd: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToGroupStart()
+##### Commands.moveToGroupStart
 
 ```ts
 moveToGroupStart: (model) => boolean;
@@ -3395,7 +3396,7 @@ moveToGroupStart: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToMathfieldEnd()
+##### Commands.moveToMathfieldEnd
 
 ```ts
 moveToMathfieldEnd: (model) => boolean;
@@ -3405,7 +3406,7 @@ moveToMathfieldEnd: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToMathfieldStart()
+##### Commands.moveToMathfieldStart
 
 ```ts
 moveToMathfieldStart: (model) => boolean;
@@ -3415,7 +3416,7 @@ moveToMathfieldStart: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToNextChar()
+##### Commands.moveToNextChar
 
 ```ts
 moveToNextChar: (model) => boolean;
@@ -3425,7 +3426,7 @@ moveToNextChar: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToNextGroup()
+##### Commands.moveToNextGroup
 
 ```ts
 moveToNextGroup: (model) => boolean;
@@ -3435,7 +3436,7 @@ moveToNextGroup: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToNextPlaceholder()
+##### Commands.moveToNextPlaceholder
 
 ```ts
 moveToNextPlaceholder: (model) => boolean;
@@ -3445,7 +3446,7 @@ moveToNextPlaceholder: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToNextWord()
+##### Commands.moveToNextWord
 
 ```ts
 moveToNextWord: (model) => boolean;
@@ -3455,7 +3456,7 @@ moveToNextWord: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToOpposite()
+##### Commands.moveToOpposite
 
 ```ts
 moveToOpposite: (model) => boolean;
@@ -3465,7 +3466,7 @@ moveToOpposite: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToPreviousChar()
+##### Commands.moveToPreviousChar
 
 ```ts
 moveToPreviousChar: (model) => boolean;
@@ -3475,7 +3476,7 @@ moveToPreviousChar: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToPreviousGroup()
+##### Commands.moveToPreviousGroup
 
 ```ts
 moveToPreviousGroup: (model) => boolean;
@@ -3485,7 +3486,7 @@ moveToPreviousGroup: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToPreviousPlaceholder()
+##### Commands.moveToPreviousPlaceholder
 
 ```ts
 moveToPreviousPlaceholder: (model) => boolean;
@@ -3495,7 +3496,7 @@ moveToPreviousPlaceholder: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToPreviousWord()
+##### Commands.moveToPreviousWord
 
 ```ts
 moveToPreviousWord: (model) => boolean;
@@ -3505,7 +3506,7 @@ moveToPreviousWord: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToSubscript()
+##### Commands.moveToSubscript
 
 ```ts
 moveToSubscript: (model) => boolean;
@@ -3515,7 +3516,7 @@ moveToSubscript: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveToSuperscript()
+##### Commands.moveToSuperscript
 
 ```ts
 moveToSuperscript: (model) => boolean;
@@ -3525,7 +3526,7 @@ moveToSuperscript: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.moveUp()
+##### Commands.moveUp
 
 ```ts
 moveUp: (model) => boolean;
@@ -3535,7 +3536,7 @@ moveUp: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.selectAll()
+##### Commands.selectAll
 
 ```ts
 selectAll: (model) => boolean;
@@ -3545,7 +3546,7 @@ selectAll: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.selectGroup()
+##### Commands.selectGroup
 
 ```ts
 selectGroup: (model) => boolean;
@@ -3557,7 +3558,7 @@ selectGroup: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.applyStyle()
+##### Commands.applyStyle
 
 ```ts
 applyStyle: (mathfield, style) => boolean;
@@ -3567,7 +3568,7 @@ applyStyle: (mathfield, style) => boolean;
 
 <MemberCard>
 
-##### Commands.commit()
+##### Commands.commit
 
 ```ts
 commit: (mathfield) => boolean;
@@ -3577,7 +3578,7 @@ commit: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.dispatchEvent()
+##### Commands.dispatchEvent
 
 ```ts
 dispatchEvent: (mathfield, name, detail) => boolean;
@@ -3589,7 +3590,7 @@ Dispatch a custom event on the host (mathfield)
 
 <MemberCard>
 
-##### Commands.hideVirtualKeyboard()
+##### Commands.hideVirtualKeyboard
 
 ```ts
 hideVirtualKeyboard: (mathfield) => boolean;
@@ -3599,7 +3600,7 @@ hideVirtualKeyboard: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.insert()
+##### Commands.insert
 
 ```ts
 insert: (mathfield, s, options) => boolean;
@@ -3609,7 +3610,7 @@ insert: (mathfield, s, options) => boolean;
 
 <MemberCard>
 
-##### Commands.insertDecimalSeparator()
+##### Commands.insertDecimalSeparator
 
 ```ts
 insertDecimalSeparator: (mathfield) => boolean;
@@ -3619,7 +3620,7 @@ insertDecimalSeparator: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.performWithFeedback()
+##### Commands.performWithFeedback
 
 ```ts
 performWithFeedback: (mathfield, command) => boolean;
@@ -3635,7 +3636,7 @@ from the virtual keyboard
 
 <MemberCard>
 
-##### Commands.plonk()
+##### Commands.plonk
 
 ```ts
 plonk: (mathfield) => boolean;
@@ -3645,7 +3646,7 @@ plonk: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.showVirtualKeyboard()
+##### Commands.showVirtualKeyboard
 
 ```ts
 showVirtualKeyboard: (mathfield) => boolean;
@@ -3655,7 +3656,7 @@ showVirtualKeyboard: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.speak()
+##### Commands.speak
 
 ```ts
 speak: (mathfield, scope, options) => boolean;
@@ -3692,7 +3693,7 @@ visually highlight it as it is read (read aloud functionality)
 
 <MemberCard>
 
-##### Commands.switchMode()
+##### Commands.switchMode
 
 ```ts
 switchMode: (mathfield, mode) => boolean;
@@ -3702,7 +3703,7 @@ switchMode: (mathfield, mode) => boolean;
 
 <MemberCard>
 
-##### Commands.toggleContextMenu()
+##### Commands.toggleContextMenu
 
 ```ts
 toggleContextMenu: (mathfield) => boolean;
@@ -3712,7 +3713,7 @@ toggleContextMenu: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.toggleKeystrokeCaption()
+##### Commands.toggleKeystrokeCaption
 
 ```ts
 toggleKeystrokeCaption: (mathfield) => boolean;
@@ -3722,7 +3723,7 @@ toggleKeystrokeCaption: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.toggleVirtualKeyboard()
+##### Commands.toggleVirtualKeyboard
 
 ```ts
 toggleVirtualKeyboard: (mathfield) => boolean;
@@ -3732,7 +3733,7 @@ toggleVirtualKeyboard: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.typedText()
+##### Commands.typedText
 
 ```ts
 typedText: (text, options) => boolean;
@@ -3744,7 +3745,7 @@ typedText: (text, options) => boolean;
 
 <MemberCard>
 
-##### Commands.addColumnAfter()
+##### Commands.addColumnAfter
 
 ```ts
 addColumnAfter: (model) => boolean;
@@ -3754,7 +3755,7 @@ addColumnAfter: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.addColumnBefore()
+##### Commands.addColumnBefore
 
 ```ts
 addColumnBefore: (model) => boolean;
@@ -3764,7 +3765,7 @@ addColumnBefore: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.addRowAfter()
+##### Commands.addRowAfter
 
 ```ts
 addRowAfter: (model) => boolean;
@@ -3774,7 +3775,7 @@ addRowAfter: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.addRowBefore()
+##### Commands.addRowBefore
 
 ```ts
 addRowBefore: (model) => boolean;
@@ -3784,7 +3785,7 @@ addRowBefore: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.removeColumn()
+##### Commands.removeColumn
 
 ```ts
 removeColumn: (model) => boolean;
@@ -3794,7 +3795,7 @@ removeColumn: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.removeRow()
+##### Commands.removeRow
 
 ```ts
 removeRow: (model) => boolean;
@@ -3804,7 +3805,7 @@ removeRow: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.setEnvironment()
+##### Commands.setEnvironment
 
 ```ts
 setEnvironment: (model, environment) => boolean;
@@ -3816,7 +3817,7 @@ setEnvironment: (model, environment) => boolean;
 
 <MemberCard>
 
-##### Commands.complete()
+##### Commands.complete
 
 ```ts
 complete: (mathfield) => boolean;
@@ -3826,7 +3827,7 @@ complete: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.nextSuggestion()
+##### Commands.nextSuggestion
 
 ```ts
 nextSuggestion: (mathfield) => boolean;
@@ -3836,7 +3837,7 @@ nextSuggestion: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.previousSuggestion()
+##### Commands.previousSuggestion
 
 ```ts
 previousSuggestion: (mathfield) => boolean;
@@ -3848,7 +3849,7 @@ previousSuggestion: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.copyToClipboard()
+##### Commands.copyToClipboard
 
 ```ts
 copyToClipboard: (mathfield) => boolean;
@@ -3858,7 +3859,7 @@ copyToClipboard: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.cutToClipboard()
+##### Commands.cutToClipboard
 
 ```ts
 cutToClipboard: (mathfield) => boolean;
@@ -3868,7 +3869,7 @@ cutToClipboard: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.pasteFromClipboard()
+##### Commands.pasteFromClipboard
 
 ```ts
 pasteFromClipboard: (mathfield) => boolean;
@@ -3880,7 +3881,7 @@ pasteFromClipboard: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.deleteAll()
+##### Commands.deleteAll
 
 ```ts
 deleteAll: (model) => boolean;
@@ -3890,7 +3891,7 @@ deleteAll: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.deleteBackward()
+##### Commands.deleteBackward
 
 ```ts
 deleteBackward: (model) => boolean;
@@ -3900,7 +3901,7 @@ deleteBackward: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.deleteForward()
+##### Commands.deleteForward
 
 ```ts
 deleteForward: (model) => boolean;
@@ -3910,7 +3911,7 @@ deleteForward: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.deleteNextWord()
+##### Commands.deleteNextWord
 
 ```ts
 deleteNextWord: (model) => boolean;
@@ -3920,7 +3921,7 @@ deleteNextWord: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.deletePreviousWord()
+##### Commands.deletePreviousWord
 
 ```ts
 deletePreviousWord: (model) => boolean;
@@ -3930,7 +3931,7 @@ deletePreviousWord: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.deleteToGroupEnd()
+##### Commands.deleteToGroupEnd
 
 ```ts
 deleteToGroupEnd: (model) => boolean;
@@ -3940,7 +3941,7 @@ deleteToGroupEnd: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.deleteToGroupStart()
+##### Commands.deleteToGroupStart
 
 ```ts
 deleteToGroupStart: (model) => boolean;
@@ -3950,7 +3951,7 @@ deleteToGroupStart: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.deleteToMathFieldEnd()
+##### Commands.deleteToMathFieldEnd
 
 ```ts
 deleteToMathFieldEnd: (model) => boolean;
@@ -3960,7 +3961,7 @@ deleteToMathFieldEnd: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.deleteToMathFieldStart()
+##### Commands.deleteToMathFieldStart
 
 ```ts
 deleteToMathFieldStart: (model) => boolean;
@@ -3972,7 +3973,7 @@ deleteToMathFieldStart: (model) => boolean;
 
 <MemberCard>
 
-##### Commands.insertPrompt()
+##### Commands.insertPrompt
 
 ```ts
 insertPrompt: (mathfield, id?, options?) => boolean;
@@ -3984,7 +3985,7 @@ insertPrompt: (mathfield, id?, options?) => boolean;
 
 <MemberCard>
 
-##### Commands.scrollIntoView()
+##### Commands.scrollIntoView
 
 ```ts
 scrollIntoView: (mathfield) => boolean;
@@ -3994,7 +3995,7 @@ scrollIntoView: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.scrollToEnd()
+##### Commands.scrollToEnd
 
 ```ts
 scrollToEnd: (mathfield) => boolean;
@@ -4004,7 +4005,7 @@ scrollToEnd: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.scrollToStart()
+##### Commands.scrollToStart
 
 ```ts
 scrollToStart: (mathfield) => boolean;
@@ -4016,7 +4017,7 @@ scrollToStart: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.redo()
+##### Commands.redo
 
 ```ts
 redo: (mathfield) => boolean;
@@ -4026,7 +4027,7 @@ redo: (mathfield) => boolean;
 
 <MemberCard>
 
-##### Commands.undo()
+##### Commands.undo
 
 ```ts
 undo: (mathfield) => boolean;
@@ -4038,7 +4039,7 @@ undo: (mathfield) => boolean;
 
 <MemberCard>
 
-##### VirtualKeyboardCommands.hideVirtualKeyboard()
+##### VirtualKeyboardCommands.hideVirtualKeyboard
 
 ```ts
 hideVirtualKeyboard: () => boolean;
@@ -4048,7 +4049,7 @@ hideVirtualKeyboard: () => boolean;
 
 <MemberCard>
 
-##### VirtualKeyboardCommands.showVirtualKeyboard()
+##### VirtualKeyboardCommands.showVirtualKeyboard
 
 ```ts
 showVirtualKeyboard: () => boolean;
@@ -4058,7 +4059,7 @@ showVirtualKeyboard: () => boolean;
 
 <MemberCard>
 
-##### VirtualKeyboardCommands.switchKeyboardLayer()
+##### VirtualKeyboardCommands.switchKeyboardLayer
 
 ```ts
 switchKeyboardLayer: (mathfield, layer) => boolean;
@@ -4068,7 +4069,7 @@ switchKeyboardLayer: (mathfield, layer) => boolean;
 
 <MemberCard>
 
-##### VirtualKeyboardCommands.toggleVirtualKeyboard()
+##### VirtualKeyboardCommands.toggleVirtualKeyboard
 
 ```ts
 toggleVirtualKeyboard: () => boolean;
@@ -4220,7 +4221,7 @@ The command is a single selector, or a selector with arguments
 ##### Keybinding.ifLayout?
 
 ```ts
-optional ifLayout: string[];
+optional ifLayout?: string[];
 ```
 
 </MemberCard>
@@ -4230,7 +4231,7 @@ optional ifLayout: string[];
 ##### Keybinding.ifMode?
 
 ```ts
-optional ifMode: ParseMode;
+optional ifMode?: ParseMode;
 ```
 
 If specified, this indicates in which mode this keybinding will apply.
@@ -4243,7 +4244,7 @@ If none is specified, the keybinding will apply in every mode.
 ##### Keybinding.ifPlatform?
 
 ```ts
-optional ifPlatform: 
+optional ifPlatform?: 
   | "macos"
   | "!macos"
   | "windows"
@@ -4347,7 +4348,7 @@ to a key combination that can be generated on any keyboard.
 ### DynamicValue
 
 ```ts
-type DynamicValue<T> = T | (modifiers) => T;
+type DynamicValue<T> = T | ((modifiers) => T);
 ```
 
 #### Type Declaration
@@ -4385,7 +4386,7 @@ Declaration of a menu item
 ##### MenuItemCommand.ariaLabel?
 
 ```ts
-optional ariaLabel: DynamicValue<string>;
+optional ariaLabel?: DynamicValue<string>;
 ```
 
 An accessible text string that describes the item.
@@ -4400,7 +4401,7 @@ the `ariaLabel` can be used to describe the color.
 ##### MenuItemCommand.checked?
 
 ```ts
-optional checked: DynamicValue<boolean | "mixed">;
+optional checked?: DynamicValue<boolean | "mixed">;
 ```
 
 </MemberCard>
@@ -4410,7 +4411,7 @@ optional checked: DynamicValue<boolean | "mixed">;
 ##### MenuItemCommand.class?
 
 ```ts
-optional class: DynamicValue<string>;
+optional class?: DynamicValue<string>;
 ```
 
 A CSS class applied to the item
@@ -4422,7 +4423,7 @@ A CSS class applied to the item
 ##### MenuItemCommand.data?
 
 ```ts
-optional data: T;
+optional data?: T;
 ```
 
 This data payload is passed to the `onMenuSelect()` hook and with the `menu-select` event
@@ -4434,7 +4435,7 @@ This data payload is passed to the `onMenuSelect()` hook and with the `menu-sele
 ##### MenuItemCommand.enabled?
 
 ```ts
-optional enabled: DynamicValue<boolean>;
+optional enabled?: DynamicValue<boolean>;
 ```
 
 </MemberCard>
@@ -4444,7 +4445,7 @@ optional enabled: DynamicValue<boolean>;
 ##### MenuItemCommand.id?
 
 ```ts
-optional id: string;
+optional id?: string;
 ```
 
 This id string is passed to the `onMenuSelect()` hook and with the `menu-select` event
@@ -4456,7 +4457,7 @@ This id string is passed to the `onMenuSelect()` hook and with the `menu-select`
 ##### MenuItemCommand.keyboardShortcut?
 
 ```ts
-optional keyboardShortcut: string;
+optional keyboardShortcut?: string;
 ```
 
 </MemberCard>
@@ -4466,7 +4467,7 @@ optional keyboardShortcut: string;
 ##### MenuItemCommand.label?
 
 ```ts
-optional label: DynamicValue<string>;
+optional label?: DynamicValue<string>;
 ```
 
 A string of HTML markup used to describe the item
@@ -4475,10 +4476,10 @@ A string of HTML markup used to describe the item
 
 <MemberCard>
 
-##### MenuItemCommand.onMenuSelect()?
+##### MenuItemCommand.onMenuSelect?
 
 ```ts
-optional onMenuSelect: (_) => void;
+optional onMenuSelect?: (_) => void;
 ```
 
 When this menu item is selected, a `menu-select` event is dispatched
@@ -4491,7 +4492,7 @@ and this hook is called.
 ##### MenuItemCommand.tooltip?
 
 ```ts
-optional tooltip: DynamicValue<string>;
+optional tooltip?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4501,7 +4502,7 @@ optional tooltip: DynamicValue<string>;
 ##### MenuItemCommand.type?
 
 ```ts
-optional type: "command";
+optional type?: "command";
 ```
 
 </MemberCard>
@@ -4511,7 +4512,7 @@ optional type: "command";
 ##### MenuItemCommand.visible?
 
 ```ts
-optional visible: DynamicValue<boolean>;
+optional visible?: DynamicValue<boolean>;
 ```
 
 </MemberCard>
@@ -4552,7 +4553,7 @@ heading is not visible either.
 ##### MenuItemHeading.ariaLabel?
 
 ```ts
-optional ariaLabel: DynamicValue<string>;
+optional ariaLabel?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4562,7 +4563,7 @@ optional ariaLabel: DynamicValue<string>;
 ##### MenuItemHeading.class?
 
 ```ts
-optional class: DynamicValue<string>;
+optional class?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4572,7 +4573,7 @@ optional class: DynamicValue<string>;
 ##### MenuItemHeading.label?
 
 ```ts
-optional label: DynamicValue<string>;
+optional label?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4582,7 +4583,7 @@ optional label: DynamicValue<string>;
 ##### MenuItemHeading.tooltip?
 
 ```ts
-optional tooltip: DynamicValue<string>;
+optional tooltip?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4613,7 +4614,7 @@ These props are passed to the `menu-select` event and `onMenuSelect` hook
 ##### MenuItemProps.data?
 
 ```ts
-optional data: T;
+optional data?: T;
 ```
 
 </MemberCard>
@@ -4623,7 +4624,7 @@ optional data: T;
 ##### MenuItemProps.id?
 
 ```ts
-optional id: string;
+optional id?: string;
 ```
 
 </MemberCard>
@@ -4633,7 +4634,7 @@ optional id: string;
 ##### MenuItemProps.modifiers?
 
 ```ts
-optional modifiers: KeyboardModifiers;
+optional modifiers?: KeyboardModifiers;
 ```
 
 </MemberCard>
@@ -4649,7 +4650,7 @@ optional modifiers: KeyboardModifiers;
 ##### MenuItemSubmenu.ariaLabel?
 
 ```ts
-optional ariaLabel: DynamicValue<string>;
+optional ariaLabel?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4659,7 +4660,7 @@ optional ariaLabel: DynamicValue<string>;
 ##### MenuItemSubmenu.class?
 
 ```ts
-optional class: DynamicValue<string>;
+optional class?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4669,7 +4670,7 @@ optional class: DynamicValue<string>;
 ##### MenuItemSubmenu.columnCount?
 
 ```ts
-optional columnCount: number;
+optional columnCount?: number;
 ```
 
 If the menu is arranged in a custom grid, this is the number of columns.
@@ -4685,7 +4686,7 @@ This property is used for keyboard navigation with the arrow keys.
 ##### MenuItemSubmenu.enabled?
 
 ```ts
-optional enabled: DynamicValue<boolean>;
+optional enabled?: DynamicValue<boolean>;
 ```
 
 </MemberCard>
@@ -4695,7 +4696,7 @@ optional enabled: DynamicValue<boolean>;
 ##### MenuItemSubmenu.label?
 
 ```ts
-optional label: DynamicValue<string>;
+optional label?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4715,7 +4716,7 @@ submenu: readonly MenuItem[];
 ##### MenuItemSubmenu.submenuClass?
 
 ```ts
-optional submenuClass: string;
+optional submenuClass?: string;
 ```
 
 The class applied to the submenu container.
@@ -4727,7 +4728,7 @@ The class applied to the submenu container.
 ##### MenuItemSubmenu.tooltip?
 
 ```ts
-optional tooltip: DynamicValue<string>;
+optional tooltip?: DynamicValue<string>;
 ```
 
 </MemberCard>
@@ -4737,7 +4738,7 @@ optional tooltip: DynamicValue<string>;
 ##### MenuItemSubmenu.type?
 
 ```ts
-optional type: "submenu";
+optional type?: "submenu";
 ```
 
 </MemberCard>
@@ -4747,7 +4748,7 @@ optional type: "submenu";
 ##### MenuItemSubmenu.visible?
 
 ```ts
-optional visible: DynamicValue<boolean>;
+optional visible?: DynamicValue<boolean>;
 ```
 
 </MemberCard>
@@ -4781,7 +4782,7 @@ The type of a menu item:
 ##### NormalizedVirtualKeyboardLayer.backdrop?
 
 ```ts
-optional backdrop: string;
+optional backdrop?: string;
 ```
 
 </MemberCard>
@@ -4791,7 +4792,7 @@ optional backdrop: string;
 ##### NormalizedVirtualKeyboardLayer.container?
 
 ```ts
-optional container: string;
+optional container?: string;
 ```
 
 </MemberCard>
@@ -4801,7 +4802,7 @@ optional container: string;
 ##### NormalizedVirtualKeyboardLayer.id?
 
 ```ts
-optional id: string;
+optional id?: string;
 ```
 
 </MemberCard>
@@ -4811,7 +4812,7 @@ optional id: string;
 ##### NormalizedVirtualKeyboardLayer.markup?
 
 ```ts
-optional markup: string;
+optional markup?: string;
 ```
 
 </MemberCard>
@@ -4821,7 +4822,7 @@ optional markup: string;
 ##### NormalizedVirtualKeyboardLayer.rows?
 
 ```ts
-optional rows: Partial<VirtualKeyboardKeycap>[][];
+optional rows?: Partial<VirtualKeyboardKeycap>[][];
 ```
 
 </MemberCard>
@@ -4831,7 +4832,7 @@ optional rows: Partial<VirtualKeyboardKeycap>[][];
 ##### NormalizedVirtualKeyboardLayer.style?
 
 ```ts
-optional style: string;
+optional style?: string;
 ```
 
 </MemberCard>
@@ -5026,7 +5027,7 @@ executeCommand(command): boolean
 
 ###### command
 
-`string` | \[`string`, `...any[]`\]
+`string` \| \[`string`, `...any[]`\]
 
 </MemberCard>
 
@@ -5329,7 +5330,7 @@ Width of the keycap, as a multiple of the standard keycap width
 ##### VirtualKeyboardLayer.backdrop?
 
 ```ts
-optional backdrop: string;
+optional backdrop?: string;
 ```
 
 A CSS class name to customize the appearance of the background of the layer
@@ -5341,7 +5342,7 @@ A CSS class name to customize the appearance of the background of the layer
 ##### VirtualKeyboardLayer.container?
 
 ```ts
-optional container: string;
+optional container?: string;
 ```
 
 A CSS class name to customize the appearance of the container the layer
@@ -5353,7 +5354,7 @@ A CSS class name to customize the appearance of the container the layer
 ##### VirtualKeyboardLayer.id?
 
 ```ts
-optional id: string;
+optional id?: string;
 ```
 
 A unique string identifying the layer
@@ -5365,7 +5366,7 @@ A unique string identifying the layer
 ##### VirtualKeyboardLayer.markup?
 
 ```ts
-optional markup: string;
+optional markup?: string;
 ```
 
 </MemberCard>
@@ -5375,7 +5376,7 @@ optional markup: string;
 ##### VirtualKeyboardLayer.rows?
 
 ```ts
-optional rows: (string | Partial<VirtualKeyboardKeycap>)[][];
+optional rows?: (string | Partial<VirtualKeyboardKeycap>)[][];
 ```
 
 The rows of keycaps in this layer
@@ -5387,7 +5388,7 @@ The rows of keycaps in this layer
 ##### VirtualKeyboardLayer.style?
 
 ```ts
-optional style: string;
+optional style?: string;
 ```
 
 The CSS stylesheet associated with this layer
@@ -5600,7 +5601,7 @@ type NormalizedVirtualKeyboardLayout = VirtualKeyboardLayoutCore & {
 ### OriginValidator
 
 ```ts
-type OriginValidator = (origin) => boolean | "same-origin" | "none";
+type OriginValidator = ((origin) => boolean) | "same-origin" | "none";
 ```
 
 Specify behavior for origin validation when using the virtual keyboard.
@@ -5645,7 +5646,7 @@ type VirtualKeyboardLayout = VirtualKeyboardLayoutCore &
 ##### VirtualKeyboardLayoutCore.displayEditToolbar?
 
 ```ts
-optional displayEditToolbar: boolean;
+optional displayEditToolbar?: boolean;
 ```
 
 If false, do not include the edit toolbar in the layout
@@ -5657,7 +5658,7 @@ If false, do not include the edit toolbar in the layout
 ##### VirtualKeyboardLayoutCore.displayShiftedKeycaps?
 
 ```ts
-optional displayShiftedKeycaps: boolean;
+optional displayShiftedKeycaps?: boolean;
 ```
 
 If false, keycaps that have a shifted variant will be displayed as if they don't
@@ -5669,7 +5670,7 @@ If false, keycaps that have a shifted variant will be displayed as if they don't
 ##### VirtualKeyboardLayoutCore.id?
 
 ```ts
-optional id: string;
+optional id?: string;
 ```
 
 A unique string identifying the layout
@@ -5681,7 +5682,7 @@ A unique string identifying the layout
 ##### VirtualKeyboardLayoutCore.label?
 
 ```ts
-optional label: string;
+optional label?: string;
 ```
 
 A human readable string displayed in the layout switcher toolbar
@@ -5693,7 +5694,7 @@ A human readable string displayed in the layout switcher toolbar
 ##### VirtualKeyboardLayoutCore.labelClass?
 
 ```ts
-optional labelClass: string;
+optional labelClass?: string;
 ```
 
 </MemberCard>
@@ -5703,7 +5704,7 @@ optional labelClass: string;
 ##### VirtualKeyboardLayoutCore.tooltip?
 
 ```ts
-optional tooltip: string;
+optional tooltip?: string;
 ```
 
 A human readable tooltip associated with the label
@@ -5898,7 +5899,7 @@ Change the current physical keyboard layout.
 
 ##### name
 
-`"auto"` | [`KeyboardLayoutName`](#keyboardlayoutname)
+`"auto"` \| [`KeyboardLayoutName`](#keyboardlayoutname)
 
 </MemberCard>
 
@@ -5956,7 +5957,7 @@ type StaticRenderOptions = Partial<LayoutOptions> & {
 #### StaticRenderOptions.ignoreClass?
 
 ```ts
-optional ignoreClass: string;
+optional ignoreClass?: string;
 ```
 
 A string used as a regular expression of class names of elements whose
@@ -5967,7 +5968,7 @@ content will not be scanned for delimiter
 #### StaticRenderOptions.processClass?
 
 ```ts
-optional processClass: string;
+optional processClass?: string;
 ```
 
 A string used as a regular expression of class names of elements whose
@@ -5979,7 +5980,7 @@ parent class name would have prevented them from doing so.
 #### StaticRenderOptions.processMathJSONScriptType?
 
 ```ts
-optional processMathJSONScriptType: string;
+optional processMathJSONScriptType?: string;
 ```
 
 `<script>` tags with this type will be processed as MathJSON.
@@ -5989,7 +5990,7 @@ optional processMathJSONScriptType: string;
 #### StaticRenderOptions.processScriptType?
 
 ```ts
-optional processScriptType: string;
+optional processScriptType?: string;
 ```
 
 `<script>` tags with this type will be processed as LaTeX.
@@ -5999,7 +6000,7 @@ optional processScriptType: string;
 #### StaticRenderOptions.readAloud?
 
 ```ts
-optional readAloud: boolean;
+optional readAloud?: boolean;
 ```
 
 If true, generate markup that can
@@ -6010,7 +6011,7 @@ be read aloud later using speak
 #### StaticRenderOptions.renderAccessibleContent?
 
 ```ts
-optional renderAccessibleContent: string;
+optional renderAccessibleContent?: string;
 ```
 
 The format(s) in which to render the math for screen readers:
@@ -6025,7 +6026,7 @@ You can pass multiple values separated by spaces, e.g `"mathml speakable-text"`
 #### StaticRenderOptions.skipTags?
 
 ```ts
-optional skipTags: string[];
+optional skipTags?: string[];
 ```
 
 An array of tag names whose content will not be scanned for delimiters
@@ -6083,10 +6084,10 @@ into typeset math, recursively.
 
 ##### element
 
+`string` \| `HTMLElement`
+
 An HTML DOM element, or a string containing
 the ID of an element.
-
-`string` | `HTMLElement`
 
 ##### options?
 
@@ -6112,7 +6113,7 @@ renderMathInElement("formula");
 ##### LatexSyntaxError.after?
 
 ```ts
-optional after: string;
+optional after?: string;
 ```
 
 </MemberCard>
@@ -6122,7 +6123,7 @@ optional after: string;
 ##### LatexSyntaxError.arg?
 
 ```ts
-optional arg: string;
+optional arg?: string;
 ```
 
 </MemberCard>
@@ -6132,7 +6133,7 @@ optional arg: string;
 ##### LatexSyntaxError.before?
 
 ```ts
-optional before: string;
+optional before?: string;
 ```
 
 </MemberCard>
@@ -6152,7 +6153,7 @@ code: T;
 ##### LatexSyntaxError.latex?
 
 ```ts
-optional latex: string;
+optional latex?: string;
 ```
 
 </MemberCard>
@@ -6242,7 +6243,7 @@ convertLatexToAsciiMath("\\frac{1}{2}");
 
 `string`
 
-##### parseMode
+##### parseMode?
 
 `ParseMode` = `'math'`
 
@@ -6314,7 +6315,7 @@ Convert a LaTeX string to a string of MathML markup.
 A string of valid LaTeX. It does not have to start
 with a mode token such as a `$$` or `\(`.
 
-##### options
+##### options?
 
 ###### generateID?
 
@@ -6378,7 +6379,7 @@ convertMathJsonToLatex(["Add", 1, 2]);
 ### validateLatex()
 
 ```ts
-function validateLatex(s): LatexSyntaxError[]
+function validateLatex(s, options?): LatexSyntaxError[]
 ```
 
 Check if a string of LaTeX is valid and return an array of syntax errors.
@@ -6386,6 +6387,10 @@ Check if a string of LaTeX is valid and return an array of syntax errors.
 ##### s
 
 `string`
+
+##### options?
+
+`Pick`\<[`LayoutOptions`](#layoutoptions), `"macros"`\>
 
 </MemberCard>
 
@@ -6775,7 +6780,7 @@ Manually trigger a re-render of the content
 
 <MemberCard>
 
-##### LayoutOptions.backgroundColorMap()
+##### LayoutOptions.backgroundColorMap
 
 ```ts
 backgroundColorMap: (name) => string | undefined;
@@ -6785,7 +6790,7 @@ backgroundColorMap: (name) => string | undefined;
 
 <MemberCard>
 
-##### LayoutOptions.colorMap()
+##### LayoutOptions.colorMap
 
 ```ts
 colorMap: (name) => string | undefined;
@@ -6859,6 +6864,18 @@ LaTeX global registers override.
 
 <MemberCard>
 
+### StaticElementFormat
+
+```ts
+type StaticElementFormat = "latex" | "ascii-math" | "math-json";
+```
+
+Format types supported by static elements
+
+</MemberCard>
+
+<MemberCard>
+
 ### version
 
 ```ts
@@ -6867,7 +6884,7 @@ const version: {
 };
 ```
 
-Current version: `0.108.3`
+Current version: `0.110.0`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 
