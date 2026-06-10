@@ -10,548 +10,177 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-### Coming Soon
+## 0.59.0 _2026-06-10_
 
-- **New: curated mathematical identities loader (`loadIdentities()`)** — an
-  opt-in library of 558 curated identities and special values (gamma, zeta,
-  arctan, log/exp, factorials, Lambert W, digamma, elliptic integrals, …)
-  translated from the [Fungrim](https://fungrim.org) corpus, loadable as
-  guarded simplification rules:
+This is a significant update to the Compute Engine.
+
+The headline feature of this release is a large collection of curated
+mathematical identities, the Identities Library:
+
+```js
+// When the Identities Library is loaded, CE can prove that...
+console.log(parse("\\arctan(2-\\sqrt{3})").simplify().latex);
+// ➔ "\frac{\pi}{12}"
+
+// Declare that n is a positive integer...
+ce.declare("n", "integer");
+ce.assume(parse("n > 0"));
+
+// ...and the parity identity applies:
+console.log(parse("\\sin(\\pi n + \\frac{\\pi}{2})").simplify().latex);
+// ➔ "(-1)^n"
+```
+
+Read more about the Identities Library in the
+[dedicated guide](https://mathlive.io/compute-engine/guides/identities/).
+
+This release also includes a large collection of performance improvements and
+bug fixes across the library.
+
+This release includes some breaking changes.
+
+### Breaking Changes
+
+- **`replace()` no longer eagerly canonicalizes the complete result.** The
+  requested `form`, or the form produced by the rule, applies to replaced
+  subexpressions. Call `.canonical` on the result to restore the previous
+  behavior.
+
+- **Fixed-size numeric collections now infer dimensioned types.** For example,
+  `[1, 2, 3]` is now `vector<3>` instead of `list<number>`, and a 3×3 numeric
+  collection is `matrix<3x3>`.
+
+### Features
+
+- **Curated mathematical identities**: the new opt-in `loadIdentities()` API
+  loads 558 guarded simplification rules and special values derived from
+  [Fungrim](https://fungrim.org). Identities can be selected by topic, class, or
+  purpose, and rules apply only when their side conditions can be proven.
 
   ```ts
   import { ComputeEngine } from '@cortex-js/compute-engine';
   import { loadIdentities } from '@cortex-js/compute-engine/identities';
 
   const ce = new ComputeEngine();
-  loadIdentities(ce); // or e.g. { topics: ['gamma'] }
+  loadIdentities(ce); // Or: loadIdentities(ce, { topics: ['gamma'] })
   ce.parse('\\Gamma(\\frac12)').simplify(); // → √π
   ```
 
-  The loader is synchronous, idempotent per engine, and uses only the public
-  engine API. Rules carry tri-valued, fail-closed guard conditions (a rule
-  whose side condition cannot be proven does not fire); the
-  `onGuardUndecided` hook makes non-firing observable. Selection options:
-  `topics`, `classes`, `purposes`, `solve`. Returns a load report
-  (`loaded`, `byTarget`, `byPurpose`, `declared`, `skipped`,
-  `compileLedger`). Engines that don't import the subpath pay no bundle
-  cost.
+  The loader is synchronous and idempotent per engine. Importing the identities
+  subpath is required, so applications that do not use it incur no bundle cost.
 
-- **Assorted low-severity fixes**:
-  - A symbol with a *known infinite* value times zero is now `NaN` (e.g. with
-    `a := ∞`, `a·0` was `0`); a free symbol keeps the conventional `·0 → 0`.
-  - `InterquartileRange` now equals `Q3 − Q1` from `Quartiles` (it used a
-    different upper-half slice, so the two disagreed).
-  - Interval `mod` with a *negative* modulus now encloses the compiled scalar
-    `Mod` (which uses the floored, sign-of-divisor convention); the interval
-    previously returned a non-negative `[0, |b|)` range that did not.
-  - Removed a redundant `.simplify()` in the numeric-equality path of `eq()`
-    (a latent recursion hazard, since `eq` is reachable from `isEqual`).
+- **More control over replacements**:
+  - `ReplaceOptions.form` controls the form of replacement expressions:
+    `'canonical'`, `'structural'`, `'raw'`, or a specific canonical transform.
+    The previous `canonical` option is deprecated and remains available as an
+    alias for this release.
+  - `ReplaceOptions.direction` selects left-to-right or right-to-left traversal
+    for order-sensitive rules.
+  - Custom rules can now match user-defined function operators in `replace()`
+    and `simplify({ rules })`.
 
-- **Comparison and simplification correctness fixes**:
-  - An operator's equality handler returning `false` (definitely *not* equal)
-    was treated as *equal*, so unordered values such as lists compared as `<=`.
-    Only a definite `true` now means equal.
-  - The comparison predicates (`isLess`/`isGreater`/`isLessEqual`/
-    `isGreaterEqual`) returned a definitive `false` for the indeterminate
-    `<=`/`>=` an assumption can produce — e.g. after `assume(y >= 3)`, `y > 3`
-    is *unknown*, not false. They now return `undefined` in that case. These
-    predicates feed sign inference throughout the engine.
-  - `(-x)^{3/4}` (and other `(-x)^{odd/even}` rational powers of a negated base)
-    is no longer simplified to `x^{3/4}`: an even root of a negative base is
-    complex, so the two are not equal.
-  - Two simplification rules returned a rewrite step unconditionally, re-firing a
-    nested `simplify()` on every pass: the `Derivative` rule (`Derivative` is
-    lazy, so it simplified its operand but reported a change even when nothing
-    changed) and the system-of-equations rule. Both now emit a step only when
-    the result actually differs. `Hypot` also no longer calls `.simplify()`
-    internally — the driver simplifies its `Sqrt(x²+y²)` rewrite. Output is
-    unchanged; this removes redundant work and a documented recursion-hazard
-    pattern.
+- **Improved algebra**:
+  - `solve()` now handles quadratics with symbolic coefficients, including
+    `x^2 - a x + 1 = 0` and the general `a x^2 + b x + c = 0`. (#300)
+  - `Factor` infers the variable of a univariate polynomial and preserves
+    extracted numeric content: `Factor(x^2 + 5x + 6)` returns `(x+2)(x+3)`, and
+    `Factor(6x + 9)` returns `3(2x + 3)`. (#309)
 
-- **`ReplaceOptions.form` replaces `canonical`** — `expr.replace()` and rule
-  application now accept a `form` option (`'canonical'`, `'structural'`,
-  `'raw'`, or specific canonical transforms) controlling the form of
-  replacements, consistent with `ce.expr()` and `ce.function()`. The
-  `canonical` option is deprecated but still accepted as an alias for one
-  release; specifying both `form` and `canonical` throws an error.
+- **Parsing improvements**:
+  - Two-argument `\arctan(y, x)` and `\tan^{-1}(y, x)` now parse as `Arctan2`.
+  - LaTeX input is normalized to Unicode NFC, so decomposed identifiers parse
+    like their precomposed equivalents.
+  - A trailing bare `\` and trailing visual spacing commands are tolerated.
+  - Multi-character subscripted identifiers such as `D_{etectsize}` no longer
+    collide with Euler derivative notation.
 
-- **BREAKING: `replace()` no longer eagerly canonicalizes its result** — the
-  requested `form` (or, by default, the form produced by the rule) applies to
-  the replaced sub-expressions, not the entire input expression. A
-  non-canonical replacement inside a canonical expression now yields a
-  non-canonical result; a form propagates upward only when all sibling
-  operands already share it. Previously, `replace()` on a canonical expression
-  always re-canonicalized the result — which could undo structure a rule had
-  deliberately constructed. Call `.canonical` on the result to restore the
-  previous behavior.
+### Resolved Issues
 
-- **`ReplaceOptions.direction`** — rule application can now traverse operands
-  left-to-right (the default, post-order) or right-to-left (reverse
-  post-order). Only observable for order-sensitive rules, such as
-  `RuleFunction` replacements with index-based logic.
+- **Numeric evaluation and arithmetic**:
+  - Corrected complex powers, reciprocals, roots, and logarithms, including
+    `i^2`, `i^i`, negative complex exponents, and even roots of negative reals.
+  - Restored arbitrary-precision accuracy for roots, `exp()`, `ln()`, `mod()`,
+    `gammaln()`, and large integer conversion. Very small real results such as
+    `Power(10, -100).N()` are no longer rounded to zero.
+  - Exact `floor()`, `ceil()`, and `round()` no longer lose digits beyond 2^53.
+    Large decimal powers no longer report false overflow.
+  - Division by zero, `NaN * 0`, infinity comparisons, and signed infinities now
+    behave consistently across numeric representations.
+  - Corrected `Arctan2` quadrants, `ln(Root(a, b))`, non-integer logarithm
+    bases, exact radicals such as `sqrt(8)`, and division of Gaussian integers.
 
-- **Custom rules now match user-defined functions** — a rule pattern whose
-  operator is a user-defined function (e.g. `{match: ['F', '_a'], ...}` where
-  `F` is not a built-in) previously threw internally during matching, and the
-  error was silently swallowed: the rule never applied, in `replace()` and in
-  `simplify({rules})`.
+- **Special functions and statistics**:
+  - Added complex `Gamma` and `GammaLn` evaluation. Gamma and factorial poles at
+    non-positive integers now return `ComplexInfinity`, while factorials of
+    positive non-integers evaluate through `Gamma(x + 1)`.
+  - Improved `Erf`/`Erfc` to machine precision and corrected small-argument
+    `gammaln()`.
+  - Corrected `GCD`, `LCM`, `Congruent`, `Subfactorial`, negative-index
+    `Fibonacci`, `IsOctahedral`, `Multinomial`, and `BellNumber`.
+  - Corrected skewness, kurtosis, interquartile range, histogram/bin endpoints,
+    and exact combinatorial calculations.
 
-- **Radical, big-decimal-power, and factoring correctness fixes**:
-  - **Exact `√8` and `√20`** did not normalize — the small-integer radical
-    lookup table had two wrong entries (`8 → √8`, `20 → √20` instead of `2√2`,
-    `2√5`), so e.g. `√8` was not structurally equal to `2√2` and `solve` of
-    `2x²−16=0` returned `±√8` rather than `±2√2`.
-  - **`BigDecimal.pow` falsely overflowed** for large exponents: the overflow
-    guard used the significand's digit count (`floor(log10)+1`) as its log10,
-    overestimating by up to a full order of magnitude, then amplifying the error
-    by the exponent — `1^1e16` returned `Infinity` (and `2^1e16`, which is
-    representable, also did). It now estimates `log10` from the leading digits.
-  - **Dividing a Gaussian integer by an integer destroyed it** —
-    `Divide((1+i), 2)` canonicalized to `Multiply(1/2, NaN)`. `factor()`'s Add
-    case takes the gcd of term coefficients to extract content, but a complex
-    coefficient (the `i`) has no gcd, so `gcd` returned `NaN` and poisoned the
-    result. `factor()` now leaves sums with complex coefficients unfactored, and
-    the division yields `(1+i)/2` (= `0.5 + 0.5i`).
+- **Simplification, comparison, and assumptions**:
+  - Indeterminate comparisons now remain unknown instead of becoming `false`;
+    this also improves sign inference, `Boole`, and `KroneckerDelta`.
+  - Fixed equality handling for unordered expressions and multi-variable
+    equation equivalence.
+  - Prevented invalid simplification of rational powers such as `(-x)^(3/4)`.
+  - Set membership now remains undecided when a symbol's type is unknown, and
+    `Subset`, `SubsetEqual`, `Superset`, and empty-set relations use the correct
+    direction.
+  - Symbolic common factors are now recognized, and unresolved derivatives
+    remain symbolic instead of recursing indefinitely.
 
-- **Core arithmetic correctness fixes**:
-  - **Even root of a negative real returned a wrong real** — `Root(-16, 4).N()`
-    gave `2` (the real 4th root of 16) instead of the complex principal root
-    `√2 + √2·i`, inconsistent with `Sqrt(-4).N() → 2i`.
-  - **`ln`/`log` dropped a non-integer base** — `(8).ln(2.5)` returned `ln(8)`
-    instead of `log_2.5(8)`. Non-integer bases are now honored (BoxedNumber and
-    BoxedFunction, matching BoxedSymbol).
-  - **Plain symbols reported as empty collections** — a symbol's `count`,
-    `isEmptyCollection`, and `isFiniteCollection` returned `0`/`true` via
-    fallbacks; they now return `undefined` for non-collections (the
-    abstract-class contract).
-  - **Function comparison ignored tolerance** — comparing two function
-    expressions used an exact `=== 0` on the machine path (unlike the
-    arbitrary-precision path) and mapped a `NaN` difference to `>`. It now
-    compares within the engine tolerance and returns `undefined` for `NaN`.
-  - **`commonTerms` skipped symbolic common factors** — it early-returned when
-    the numeric gcd was 1, so `factor` could not cancel `x` from `x·y < x·z`
-    (even with `x > 0`).
-  - **Division by zero was inconsistent** — `a/0` gave `ComplexInfinity` for a
-    JS-number denominator but `NaN` for a boxed zero; both are now
-    `ComplexInfinity`.
+- **Collections, matrices, and tensors**:
+  - Corrected `Rest`, `Slice`, `Drop`, `Cycle`, `Position`, `SetFrom`,
+    `TupleFrom`, `Filter`, `Zip`, and compiled `Reduce` behavior.
+  - Determinants now work for matrices of any supported size, with exact integer
+    results; inverses work beyond 2×2.
+  - Corrected matrix row access and the `isUpperTriangular`, `isDiagonal`, and
+    `isTriangular` predicates.
+  - Incompatible tensor broadcasts now throw instead of producing invalid data;
+    `diagonal()` respects its axis arguments, and mixed real/complex dtype joins
+    preserve precision.
 
-- **Special-function, derivative, string, and boxing fixes**:
-  - **`Erf`/`Erfc` were only ~7-digit accurate** — the kernel used the 5-term
-    Abramowitz & Stegun approximation. It now uses a full machine-precision
-    series for `Erf` and a continued fraction for `Erfc` (so large arguments
-    like `Erfc(10)` no longer lose all precision to `1 - Erf` cancellation).
-  - **Derivative of a function with no derivative table could overflow the
-    stack** — evaluating `Apply(Derivative(Function(AiryAi(z), z), 1), 0)`
-    recursed forever; the unresolved symbolic derivative is now applied
-    structurally and stays symbolic (`Apply(Derivative("AiryAi", 1), 0)`).
-  - **String literals lost their type on round-trip** — `BoxedString.json`
-    omitted the MathJSON `'…'` delimiters for symbol-like content (e.g.
-    `"world"`), so re-boxing the serialized JSON yielded a *symbol*. String
-    literals now always serialize quoted. (This also makes embedded strings —
-    error codes, `\text{…}` content, dictionary keys — round-trip faithfully.)
-  - **A function-literal head threw instead of applying** — boxing
-    `[["Function", body, "x"], arg]` raised an error, even though the explicit
-    `["Apply", …]` form beta-reduced; a function-literal head is now treated as
-    an application.
+- **Types and serialization**:
+  - Dimensioned list and matrix type strings now parse and round-trip, including
+    unknown dimensions, spaces, parenthesized element types, and single `^N`
+    dimensions.
+  - Corrected union reduction, `never` subtyping, narrowing of disjoint types,
+    bare `matrix` handling, numeric literal subtyping, and invalid range
+    validation.
+  - String literals now remain strings after MathJSON round-trips, dictionary
+    conversion retains every entry, and function literals can be applied
+    directly.
+  - Plain symbols no longer report themselves as empty finite collections.
 
-- **More numeric-value correctness fixes**:
-  - **`NumericValue` n-th root lost precision** — `root(n)` computed `pow(1/n)`
-    with a machine-precision reciprocal, so the result had only ~17 correct
-    digits regardless of working precision (`2^(1/7)` at precision 50). It now
-    computes `exp(ln(x)/n)` in full precision.
-  - **`NaN · 0` returned `0`** (BigNumericValue) — the zero branches omitted the
-    NaN check; it is now `NaN`.
-  - **`Infinity.eq(Infinity)` returned `false`** (machine precision) — `eq` used
-    a subtraction (`∞ − ∞ = NaN`) instead of `===`; this disagreed with
-    BigNumericValue.
-  - **`bigint()` of a large integer double returned `null`** — the fast-path
-    guard `a >= MAX && a <= MAX` was only true at exactly `MAX_SAFE_INTEGER`, so
-    every other integer took a string path that rejected scientific notation
-    (`(2.46e100).toString()` is `"2.46e+100"`). `BigInt(a)` is exact for any
-    integer double and is now used directly.
-  - **Exact `inv()` threw on `NaN`/`±Infinity`** — `1/NaN` and `1/∞` ran into an
-    unguarded `BigInt(...)` (RangeError). They now return `NaN` / `0`.
-  - **`gammaln` was inaccurate for small arguments** — bare Stirling asymptotics
-    gave `gammaln(0.5)` off by ~1.6e-2 (inherited by `beta()`). It now shifts
-    the argument upward by the recurrence before applying Stirling.
-  - **Division by zero dropped the sign** (BigNumericValue) — `a/0` always
-    returned `+Infinity`; it is now sign-aware (`−5.5/0 → −Infinity`), matching
-    ExactNumericValue, with complex numerators giving unsigned infinity.
-  - **Complex-exponent `pow` was wrong for non-positive-real bases** — `z^(re +
-    i·im)` used `ln(Re z)` instead of `ln|z|` and dropped the `exp(−im·arg z)`
-    magnitude factor (machine and arbitrary precision). It now evaluates the
-    principal value `exp(w·Ln z)` — e.g. `i^i = e^(−π/2)`, `(1+i)^(1+i)` correct.
-  - **`intervalContains`/`intervalSubset`** (assumption domains) had inverted
-    comparisons (`intervalContains` rejected every interior point) and a
-    non-strict open/open `intervalSubset` bound.
+- **LaTeX parsing and serialization**:
+  - Corrected scaled/big delimiters, nested `\text{...}`, repeating decimals
+    beginning with `.`, digit-like symbol names, prefixed-symbol errors, and
+    unbalanced environment names.
+  - Multiplication signs are now emitted where juxtaposition would merge numeric
+    factors, for example `3 \times 2^2` instead of `32^2`. (#302)
+  - Re-declaring a parser symbol with the same type no longer reports a
+    conflict.
 
-- **Numeric correctness fixes** — several arithmetic operations produced
-  silently-wrong results:
-  - Complex `pow` (machine precision) used `arg ** n` instead of `arg · n` in
-    De Moivre's formula, so e.g. `i²` gave `−0.78 + 0.62i` instead of `−1`. A
-    negative integer exponent on a complex base also dropped the imaginary part
-    (`(1+i)⁻² → −0.5i` now).
-  - Complex reciprocal/`inv` (machine and arbitrary precision) divided the
-    conjugate by `|z|` instead of `|z|²` (`1/(2i) → −0.5i` now).
-  - Exact `x^(1/n)` took the n-th root of the numerator (always 1) instead of
-    the denominator, returning the base unchanged (`8^(1/3) → 2` now).
-  - Exact `floor`/`ceil`/`round` routed integers and rationals through a float,
-    losing digits beyond 2⁵³; they now compute exactly with bigints.
-  - `BigDecimal.mod` gave a wrong remainder when the quotient exceeded the
-    working precision (e.g. `1e60 mod 3`); the truncated quotient is now exact.
-  - `BigDecimal.exp`/`ln` bridged through an *absolute*-precision fixed-point
-    kernel, so a large-magnitude argument fell off the grid: `exp(-200)` rounded
-    to `0` (true ≈ 1.38e-87), `exp(-80)` kept only ~17 of 50 digits, and `ln` of
-    a tiny value underflowed its input to 0 — returning `-∞` (and previously
-    looping forever in the `fpsqrt(0) = 0` reduction). Both now range-reduce the
-    decimal exponent via `ln(10)` (`exp(x) = exp(r)·10^k`, `ln(x) = ln(m) +
-    e·ln 10`) so the kernel only ever sees an O(1) value.
-  - The two-argument numeric apply path (`apply2`, used by `Power`, `Arctan2`,
-    `Log`, …) chopped its *real* result to 0 below the engine tolerance, while
-    the one-argument `apply` did not. A legitimately-small value was therefore
-    discarded: `Power(10, -100).N()` and `exp(-200).N()` returned `0`, and
-    `ln(10^-100).N()` returned `-∞` (its input had been chopped to 0). `apply2`
-    no longer chops a real result, so these evaluate correctly end-to-end
-    (`Power(10,-100).N()` → `1e-100`); the complex branch still chops each
-    component, where a tiny re/im part is typically trig roundoff.
-  - Skewness and kurtosis used incorrect central-moment formulas; a symmetric
-    sample now has skewness 0 and `[1,2,3,4,5]` has (non-excess) kurtosis 1.7.
+- **Compilation**:
+  - Corrected JavaScript compilation of symbolic `Range`, compound-bounded
+    interval `Sum`/`Product`, and interpreted fallback for multi-argument
+    lambdas.
+  - Corrected Python parentheses for `(a^b)^c`.
+  - Corrected GLSL/WGSL output for `Degrees`, complex multiplication,
+    `Gamma`/`Factorial`/`Beta`/`Erf`, and `If`/`Which`/`When`.
+  - Corrected symbolic derivatives of `Arcsec` and `Arccsc`.
 
-- **More arithmetic correctness fixes** — additional operations produced
-  silently-wrong results:
-  - `ln` of a `Root(a, b)` returned the reciprocal `b / ln(a)` instead of
-    `ln(a) / b` (so `ln(\sqrt[3]{x})` now gives `(1/3)·ln(x)`).
-  - Boxing a rational with an infinite numerator (`ce.number([-∞, n])`) returned
-    `+∞` regardless of sign and ignored the denominator's sign; the result sign
-    is now the product of the numerator and denominator signs (`-∞/5 → -∞`,
-    `-∞/-5 → +∞`).
-  - `Arctan2(y, x)` evaluated exactly (without numeric approximation) ignored the
-    quadrant, returning `arctan(y/x)` with no `±π` correction — so
-    `Arctan2(1, -1)` gave `−π/4` instead of `3π/4`, disagreeing with its own
-    numeric evaluation. The principal value is now shifted by `±π` for `x < 0`,
-    and arguments of indeterminate sign are left unevaluated.
-  - `GCD`/`LCM` under machine precision never seeded its accumulator, so it stayed
-    unevaluated (`GCD(4, 6)` returned `gcd(4, 6)`); a leading non-integer operand
-    was also silently dropped. Both are now handled.
-  - `LCM` carried the sign of its operands (`LCM(-2, 3) → -6`); the least common
-    multiple is non-negative by convention, so it now returns `6`. The seed is
-    also taken as a magnitude, so single-operand `LCM(-7)`/`GCD(-8)` give `7`/`8`,
-    and the arbitrary-precision path no longer mishandles a non-integer leading
-    operand.
+- **Interval arithmetic**:
+  - Restored conservative enclosures for multiplication involving zero and
+    infinity, negative-modulus `mod`, `clamp`, `binomial`, `gcd`, `lcm`,
+    `gamma`, `gammaln`, `sinc`, and Fresnel integrals.
 
-- **More library-function correctness fixes**:
-  - `Congruent(a, b, m)` used a JavaScript remainder (wrong for negatives,
-    `-1 ≢ 6 (mod 7)`) and read its operands as JS numbers, so it bailed under
-    the default (bignum) precision. It now reduces with a floored bigint modulo.
-  - `Histogram`/`BinCounts` never counted the dataset maximum: every bin was
-    half-open, so the last bin excluded its upper edge. The final bin is now
-    closed (`BinCounts([1,2,2,3], 3) → [1,2,1]`).
-  - `Factorial` of a positive non-integer real rounded to an integer factorial
-    (`Factorial(2.5) → 2`); it now returns `Γ(x+1)` (≈ 3.323).
-  - `Reduce` with an explicit initial value overwrote it with the first element
-    on the compiled fast path, and returned unevaluated on a compile failure
-    instead of falling through to the interpreted path.
-  - `Filter` reported an `Infinity` count even for a finite source, so
-    `Sum(Filter([1,2,3], _ > 1))` stayed unevaluated; it now counts the matching
-    elements. `Zip` is now correctly empty/finite when *any* input is
-    empty/finite (the shortest input bounds the result), not only when *every*
-    input is.
-  - `KroneckerDelta` and `Boole` mapped an *undetermined* comparison to `0`;
-    they now stay symbolic when equality/truth cannot be decided
-    (`KroneckerDelta(x, y)`, `Boole(x > 3)`), while still resolving decidable
-    cases.
-  - `Degrees` is now a faithful linear conversion (`d·π/180`) in both the
-    canonical and evaluate paths. The canonical handler used to reduce literal
-    angles mod 360 while evaluate did not, so `Degrees(390)` canonicalized to
-    `π/6` but a symbolic argument resolving to 390 evaluated to `13π/6`. (Range
-    normalization remains available at serialization via `angleNormalization`.)
-  - `IsHappy` threw on negative input (`BigInt('-')`); non-positive integers are
-    now `False`.
-  - `Multinomial` and `BellNumber` used machine floats (rounding error and
-    overflow — `Multinomial(20,20)` was `…820.00003`); both now use exact
-    bigint arithmetic.
+## 0.58.0 _2026-05-12_
 
-- **Combinatorics, number-theory, and equation fixes** — several library
-  functions returned wrong results:
-  - `Subfactorial(n)` (derangements) returned 0 for every `n ≥ 1`: the float
-    recurrence reduced to `result·(n−1)`, which is 0 at `n = 1`. It now uses the
-    exact integer recurrence `!n = n·!(n−1) + (−1)ⁿ`, so `!4 = 9`, `!5 = 44`, ….
-  - `Fibonacci(−n)` produced an `Error` (it built a malformed `Negate` with two
-    operands). It now applies the reflection formula `F(−n) = (−1)^{n+1}·F(n)`
-    (`Fibonacci(-6) → -8`).
-  - `IsOctahedral(n)` tested an unrelated perfect-square condition on `3n+1`
-    (e.g. `IsOctahedral(6)` was `False`, `IsOctahedral(5)` was `True`). It now
-    solves `2m³ + m = 3n` exactly, so the octahedral numbers 1, 6, 19, 44, 85, …
-    are recognized.
-  - The `Power` type handler classified any expression with a symbolic exponent
-    as `non_finite_number` (it used `!exp.isFinite`, which is true when
-    `isFinite` is `undefined`); `2^x` is now `finite_real`. It also no longer
-    claims `finite_real` for a possibly-negative base with a non-integer exponent
-    (which may be complex).
-  - `Equal` equation-equivalence sampling substituted the *same* value for every
-    unknown, so distinct multi-unknown equations compared equal (e.g.
-    `x + y = 0` vs `2x = 0`). Each unknown now gets an independent value.
-
-- **Gamma / Factorial of complex and pole arguments** — the complex `Gamma`
-  and `GammaLn` kernels were unimplemented stubs that returned their argument
-  unchanged, so `Gamma(i).N()` gave `i` (instead of `−0.1549 − 0.498i`) and a
-  complex `Factorial` passed through. Both are now computed with the Lanczos
-  approximation. In addition:
-  - `Gamma` of a non-positive integer (`Gamma(0)`, `Gamma(-1)`, …) now returns
-    `ComplexInfinity` (the pole) instead of a garbage value or `NaN`.
-  - Explicit `Factorial(-2)` was canonicalized to `−(2!) = −2`. Since `n! =
-    Γ(n+1)` has poles at the negative integers, `Factorial` of a negative
-    integer is now `ComplexInfinity`. The `-3! = -(3!)` precedence convention is
-    handled by the LaTeX parser (which already yields `Negate(Factorial(3))`),
-    not by mangling the explicit function form.
-
-- **Set membership and subset correctness** — set-theory predicates were
-  three-valued in name only:
-  - `Element(x, S)` for a number set `S` (e.g. `Integers`, `RealNumbers`)
-    collapsed to `False` when `x` had an indeterminate type, because the
-    `contains` handlers used a two-valued type test. They are now genuinely
-    three-valued, so `Element(x, Integers)` with `x` of unknown type stays
-    unevaluated, while concrete values (`Element(2.5, Integers) → False`) and
-    sign assumptions remain decidable.
-  - `Subset`/`SubsetEqual`/`Superset` tested the relation backwards: the
-    dispatcher invoked the *subset* candidate's handler instead of the
-    *superset* candidate's, so `Subset(Integers, RationalNumbers)` was `False`
-    and `Subset(RationalNumbers, Integers)` was `True`. The direction is fixed,
-    the empty set is correctly a subset of every set, and `EmptySet`'s own
-    `subsetOf` handler no longer claimed every set as a subset of the empty set.
-
-- **`solve()` handles quadratics with symbolic coefficients** — solving a
-  quadratic for `x` when its coefficients are parameters (e.g.
-  `x^2 - a x + 1 = 0`) returned no solutions. Two issues are fixed (#300):
-  - A quadratic with a negated middle term canonicalizes that term to
-    `Negate(Multiply(a, x))` (or `Negate(x)`), which the rule patterns
-    (`Multiply(__b, _x)`) don't match. Degree-2 polynomials are now solved by
-    coefficient extraction, which handles every sign and coefficient form,
-    giving `(a ± √(a²−4)) / 2`.
-  - Root validation evaluated the back-substituted candidate without
-    simplifying, so a symbolic root that is zero only after symbolic
-    simplification was wrongly discarded. Validation now simplifies before the
-    zero-check, which also fixes `x^2 + b x + c = 0` and `a x^2 + b x + c = 0`.
-
-- **`Factor` infers the variable for a univariate polynomial** — calling
-  `Factor` without an explicit variable (e.g. `Factor(x^2 + 5x + 6)`) returned
-  the expanded form unchanged, because the quadratic, content-extraction, and
-  rational-root strategies all require a variable and only the variable-agnostic
-  strategies (perfect square, difference of squares) ran. When no variable is
-  given and the expression has a single unknown, that unknown is now used —
-  `Factor(x^2 + 5x + 6)` gives `(x+2)(x+3)`. (#309)
-
-- **`Factor` keeps extracted numeric content in factored form** — content
-  extraction reconstructed `content · primitive` with the arithmetic multiply,
-  which distributes a numeric factor over a bare sum and collapsed the result
-  back to the expanded form when the primitive didn't factor further (e.g.
-  `Factor(6x + 9)` returned `6x + 9` instead of `3(2x + 3)`). The product is now
-  built so the content stays factored.
-
-- **LaTeX serialization and parsing fixes**:
-  - The `'scaled'` and `'big'` delimiter styles emitted a stray trailing `}` /
-    `)` (e.g. `f\left(x, y\right)}`), producing invalid LaTeX.
-  - A symbol whose name merely *begins* with a spelled-out digit was corrupted
-    on serialization (`tensor` → `\mathrm{10sor}`, `onesie` → `\mathrm{1sie}`):
-    the lookup used `startsWith` instead of whole-prefix equality.
-  - An unbalanced brace in an environment name at end of input (e.g.
-    `\begin{ca{ses`) threw a `TypeError` instead of producing an Error
-    expression.
-  - `\text{…}` with nested braces joined its runs with the default `,` separator
-    (`\text{hello {world}}` → `hello ,world`); it now joins with no separator.
-  - `Multiply` dropped the sign before a factor that serializes starting with a
-    digit, merging two numbers into one — e.g. `Multiply(3, Power(2, 2))`
-    serialized as `32^2` instead of `3\times2^2`. This surfaced after a
-    non-canonical substitution, where prettify renders `Power(2, 2)` as the
-    digit-leading `2^2`. Such factors now get an explicit multiplication sign;
-    unambiguous juxtaposition (e.g. `3\sqrt{2}`) is unchanged. (#302)
-  - A prefixed symbol with an unparseable body (e.g. `\mathrm{\vec}`) parsed as
-    the literal symbol `"null"` (`body += null` coerced to the string); it now
-    produces an error expression.
-  - The repeating-decimal arc `\wideparen{…}` after a *leading* decimal
-    separator failed (`.\wideparen{3}`) due to a typo (`\wideparent`) in the
-    lookahead; it now parses like `0.\wideparen{3}`.
-  - `dictionaryFromExpression` dropped the first entry of a `Dictionary`
-    expression (it iterated from index 1 over the 0-based operands) and returned
-    an unwrapped shape for the single key-value-pair case.
-  - The `Parser.addSymbol` type-conflict check was inverted: re-declaring a
-    symbol with the *same* type threw, while a *different* type silently
-    overwrote. It now only conflicts on a different type.
-  - A matchfix dictionary-entry validation checked a property on a function
-    reference instead of the entry, so a `symbolTrigger` on a matchfix operator
-    was never flagged.
-  - Removed a dead `deserializeHexFloat` function (a tautological guard made it
-    always return `NaN`; it had no callers) and dead `\csname` parameter-/space
-    handling in the tokenizer.
-
-- **Type-string dimension parsing and round-trip fixes**:
-  - The documented matrix/list dimension syntaxes now parse: `matrix<?x3>`,
-    `matrix<2x?>`, `matrix<2 x 3>` (spaces), and the parenthesized form the
-    serializer emits, `matrix<integer^(2x3)>` / `list<integer^(2x3)>`.
-    Previously only the bare `2x3` form worked, so `typeToString → parseType`
-    did not round-trip for dimensioned element types.
-  - A single `^N` dimension was silently dropped (`parseType('list<number^2>')`
-    lost the `2`); it is now preserved. **As a result, a fixed-size numeric
-    list or matrix now infers a *dimensioned* type** — e.g. `[1, 2, 3]` is
-    `vector<3>` (was `list<number>`) and a 3×3 of numbers is `matrix<3x3>`.
-    This restores the dimensions that `BoxedTensor` already attaches but the
-    parser was discarding.
-  - A non-integer number literal type (e.g. `value 3.5`) is now a subtype of
-    `real` (and `number`), not just `number`. Previously `value 3.5 <: real`
-    wrongly failed because the literal mapped to `number`, and `number ⊄ real`.
-
-- **Type-system reduction, subtyping, and tensor-helper fixes**:
-  - Union reduction now keeps the **supertype** of a subtype-related pair:
-    `integer | number` reduces to `number` (was the order-dependent `integer`).
-  - A bare `matrix` type no longer reduces to `nothing` (its `-1` "any size"
-    dimensions were being dropped), so it no longer annihilates intersections.
-  - `isValidType` accepts the `value`, `symbol`, `expression`, and `numeric`
-    object kinds (and no longer lists a non-existent `function` kind), so
-    `parseType` of those type objects round-trips.
-  - `never` is now correctly the bottom type: `never` is a subtype of every
-    type (including itself and structured types like `list<integer>`).
-  - Narrowing two disjoint types now yields `never` instead of *widening* to a
-    common supertype (`narrow('integer', 'string')` was `scalar`).
-  - The type parser rejects invalid numeric ranges again — `integer<10..0>`
-    (inverted) and `integer<nan..10>` (NaN bound) now error.
-  - Tensor dtype join: combining a 64-bit real (`float64`) with `complex64`
-    now yields `complex128` (was `complex64`, losing 32 bits of precision).
-  - Element-wise tensor broadcasting throws on incompatible shapes instead of
-    producing silent garbage (`null`-padded data), and `diagonal()` respects
-    its axis arguments (it always read the main 2-D diagonal before).
-
-- **Matrix (tensor) linear-algebra fixes** — operations were broken beyond the
-  hardcoded 2×2 cases:
-  - `Determinant` no longer throws for 4×4 and larger matrices, and now returns
-    a usable (boxed) value for numeric matrices instead of `undefined`. The 3×3
-    case previously computed garbage (it string-concatenated its terms).
-    Integer-matrix determinants are computed exactly via fraction-free Bareiss
-    elimination.
-  - `Inverse` no longer throws for 3×3 and larger matrices.
-  - Matrix row access / slicing is 1-based and consistent for rank ≥ 2 (it was
-    off-by-one, returning the wrong row or an empty result).
-  - The matrix predicates `isUpperTriangular`, `isDiagonal`, and `isTriangular`
-    were inverted or mislabeled (`isDiagonal` tested for the zero matrix,
-    `isTriangular` tested diagonality) and are now correct.
-
-- **Collection operation fixes** — several lazy-collection handlers returned
-  wrong results, threw, or failed to terminate:
-  - `Rest` now yields every remaining element (its iterator was stuck on the
-    second element, repeating it).
-  - `Slice` element access (`.at()`) returns elements instead of always
-    `undefined`, and the reported length of a slice with negative bounds is
-    correct.
-  - `SetFrom` / `TupleFrom` flatten their collection argument (they were
-    wrapping the whole collection as a single element).
-  - `Position` no longer throws when an element matches the predicate.
-  - `Cycle` no longer stack-overflows when queried for emptiness/finiteness,
-    correctly reports as infinite (for a non-empty argument), and cycles from
-    the first element.
-  - `Drop` element access handles `n = 0` and negative indices, and no longer
-    emits trailing error elements when materialized.
-
-- **Decomposed (NFD) Unicode input is normalized** — LaTeX input is now
-  normalized to Unicode NFC at tokenization, so an identifier written with a
-  combining mark (e.g. `e` + combining acute accent) is parsed identically to
-  its precomposed form (`é`). Previously the combining mark surfaced as an
-  `unexpected-token` error. ASCII input is unaffected; boxed strings were
-  already NFC-normalized.
-
-- **Compilation correctness fixes** — several targets emitted silently-wrong
-  code:
-  - **`Range` with symbolic bounds (JavaScript)** compiled to
-    `Array.from({length: NaN})` and always produced `[]`. The guard tested
-    `parseFloat(bound) !== null`, but `parseFloat` returns `NaN` (never `null`)
-    for symbolic bounds, so the constant-length branch always won. Symbolic
-    `Range(a, b[, step])` now compiles to a correct runtime length. (A related
-    latent bug — the map callback's throwaway parameter shadowing the argument
-    object `_`, breaking a symbolic *start* like `_.a` — is also fixed.)
-  - **`Arcsec`/`Arccsc` derivatives** in the symbolic derivative table were
-    wrong and identical to each other (`-x²/√(1-x²)`, complex on the actual
-    domain `|x| ≥ 1`). They are now `±1/(|x|·√(x²-1))`, so e.g.
-    `d/dx arcsec(x)` at `x = 2` is `≈ 0.2887` instead of `NaN`.
-  - **`Degrees` on GPU targets (GLSL/WGSL)** mapped to GLSL `degrees()`
-    (radians→degrees) — the inverse of every other target. CE's `Degrees`
-    converts degrees→radians (`Degrees(180) = π`), which is GLSL `radians()`.
-  - **GPU complex multiply** compiled a compound (additive) real factor without
-    precedence parentheses, so `(x+1)·z·w` emitted
-    `(x + 1.0 * _gpu_cmul(w, z))` (= `x + z·w`) instead of
-    `((x + 1.0) * _gpu_cmul(w, z))`. Additive factors are now parenthesized.
-  - **Interval Sum/Product with a compound symbolic bound** (e.g. `n + 2`)
-    silently returned the identity (`0`/`1`). The loop bound read `.hi` off an
-    `IntervalResult` wrapper (`{kind, value: {lo, hi}}`) rather than its
-    `.value`, yielding `Math.floor(undefined) = NaN`, so the loop never ran.
-    The bound now unwraps either an `IntervalResult` or a bare interval.
-  - **GPU `Degrees` mapping (continued):** the same deg→rad fix applies to WGSL.
-  - **Python `Power` right-associativity** — `(a^b)^c` compiled to
-    `a ** b ** c`, which Python parses right-associatively as `a ** (b ** c)`.
-    The left base of a nested power is now parenthesized: `(a ** b) ** c`.
-  - **WGSL Gamma/Erf preambles** — `Gamma`/`Factorial`/`Beta`/`Erf` emitted the
-    GLSL preamble (`float _gpu_gamma(...)`) into WGSL shaders, which do not
-    compile. WGSL now gets `fn ... -> f32` variants.
-  - **GPU `If`/`Which`/`When`** — the default emitted a JS ternary and a bare
-    `NaN`, neither valid on GPU (WGSL has no `?:`; no shader language has a
-    `NaN` identifier). GPU targets now emit `select(...)` for WGSL, the ternary
-    for GLSL, and a language-appropriate NaN (`0.0/0.0` for GLSL,
-    `bitcast<f32>(0x7fc00000u)` for WGSL).
-
-- **Interval arithmetic conservative-enclosure fixes** — several interval
-  functions returned ranges that did not enclose the true result (unsound for
-  reliable plotting):
-  - **`mul`** propagated `NaN` through `0 · ∞` (e.g. `[0,1]·[1,∞)`, or `x·ln x`
-    on `[0,1]`). It now uses the interval convention `0 · ±∞ = 0`.
-  - **`clamp`** was computed as an intersection, returning `empty` when the
-    input lay entirely outside `[lo, hi]`. It is now `min(max(x, lo), hi)`, so
-    an out-of-range interval maps onto the nearer bound.
-  - **`binomial`/`gcd`/`lcm`** sampled only the four interval corners, but these
-    functions are not monotone (`C(10, [0,10])` corners are both `1`, missing
-    `C(10,5)=252`). They now enumerate the integer grid (with a conservative
-    fallback for very wide ranges).
-  - **`gamma`/`gammaln`** assumed monotonicity on each negative strip
-    `(−n−1, −n)`, but every strip has an interior extremum (a digamma zero); the
-    enclosure dropped it (e.g. `γ([−0.9,−0.1])` missed `γ(−0.5) ≈ −3.54`). The
-    extrema are now tabulated, with a conservative fallback for deep strips.
-  - **`sinc`/`fresnelS`/`fresnelC`** were not conservative past their tabulated
-    extrema (`sinc` widened only its lower bound; the Fresnel integrals had no
-    fallback at all). `sinc` now bounds the tail by `±1/|x|`, and the Fresnel
-    integrals by their `0.5 ± A` convergence band.
-
-- **Compilation fallback handles multi-argument lambdas** — when a `Function`
-  literal (lambda) cannot be compiled to the target and falls back to
-  interpretation, the fallback now uses the `'lambda'` calling convention
-  (`run(a, b, …)` with positional arguments) instead of always using the
-  `'expression'` convention (`run({ vars })`). Previously the positional
-  arguments were silently dropped and `run` returned `null` for compiled
-  lambdas that fell back. Non-lambda expressions are unaffected.
-
-- **2-arg `\arctan(y, x)` / `\tan^{-1}(y, x)` → `Arctan2`** — both `\arctan` and
-  `\tan^{-1}` with two arguments now lower to the existing `Arctan2` operator
-  (principal value of `atan2(y, x)`). Single-arg forms are unchanged. Other
-  inverse trig functions with two arguments (`\sin^{-1}(y, x)` etc.) still
-  produce an arity error — there is no 2-arg variant for them.
-
-- **Trailing `\` at end of input is tolerated** — a stray bare `\` (with no
-  following command character) is silently discarded when it appears at end of
-  input. Some editor-emitted LaTeX ends with a trailing `\`. Named space
-  commands at end of input (`\,`, `\;`, `\quad`, etc.) were already tolerated.
-
-- **`D_{…}` subscripted identifiers no longer collide with the derivative
-  operator** — a `D` followed by a multi-character subscript (e.g.
-  `D_{etectsize}`) is now parsed as a symbol instead of engaging Euler
-  derivative notation. Previously `D_{etectsize}-7` misread the subscript as a
-  differentiation variable and produced an invalid expression. Single-letter
-  Euler notation (`D_x f`, `D^2_x f`) is unchanged.
-
-- **A trailing visual space no longer wraps an expression in a `Tuple`** — a
-  purely visual horizontal space (`\,`, `\;`, `\quad`, …) following an
-  expression is now correctly treated as a no-op. Previously, when the preceding
-  value was non-numeric (e.g. a color constructor),
-  `\operatorname{hsv}(1,1,1)\,` was wrapped in a spurious single-element
-  `Tuple`. Unit-quantity spacing (`12\,\mathrm{cm}`) is unaffected.
-
-### 0.58.0 _2026-05-12_
-
-#### Added
+### Added
 
 - **`\operatorname{count}(L)` lowercase alias** — function-call form now parses
   to `["Length", L]`, matching the existing dot-notation form
@@ -718,9 +347,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   a double-lambda, so `_SYS.integrate` receives a function-returning function.
   Tracked for a future release.
 
-### 0.57.0 _2026-05-10_
+## 0.57.0 _2026-05-10_
 
-#### Added
+### Added
 
 - **`verbatim` opt-in for `toLatex()`** — `expr.toLatex({ verbatim: true })`
   returns the original LaTeX source captured at parse time when the expression
@@ -860,9 +489,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   variadic evaluator correctly yields a `List` of body values for each
   iteration.
 
-### 0.56.0 _2026-03-10_
+## 0.56.0 _2026-03-10_
 
-#### Added
+### Added
 
 - **First-class color values** — colors are now typed values with a dedicated
   `color` primitive type and per-colorspace constructor heads, rather than
@@ -980,9 +609,9 @@ GPU compile).
   `['all']` array form had the opposite of its intended effect. The string form
   `'all'` and explicit lists like `['function']` were unaffected.
 
-### 0.55.6 _2026-03-08_
+## 0.55.6 _2026-03-08_
 
-#### Fixed
+### Resolved Issues
 
 - **LaTeX parsing: `\lim` with postfix operators** —
   `\lim_{x\to 0}\left(x\right)^x` now correctly parses as `Limit(x^x)` instead
@@ -1034,9 +663,9 @@ GPU compile).
   interpreted as their Unicode equivalents instead of passing through as raw
   LaTeX commands.
 
-### 0.55.5 _2026-03-06_
+## 0.55.5 _2026-03-06_
 
-#### Fixed
+### Resolved Issues
 
 - **Deep-zoom fractal precision** — emulated-double (dp) and perturbation (pt)
   shaders now compute per-pixel coordinates from `v_uv` and viewport uniforms
@@ -1051,7 +680,7 @@ GPU compile).
   center/radius) was accepted but silently not forwarded to the language target.
   Fixed in `compile-expression.ts`.
 
-#### Added
+### New Features
 
 - **`BigDecimal` export** — the arbitrary-precision decimal class is now
   exported from the public API for use by plot engines and other consumers that
@@ -1062,9 +691,9 @@ GPU compile).
   `viewport.center` option now accepts this type instead of plain
   `[number, number]`.
 
-### 0.55.4 _2026-03-06_
+## 0.55.4 _2026-03-06_
 
-#### Fixed
+### Resolved Issues
 
 - **[#254](https://github.com/cortex-js/compute-engine/issues/254) LaTeX
   parsing: interval notation with `\lbrack`/`\lparen`** — parsing `\lbrack5,7)`
@@ -1081,7 +710,7 @@ GPU compile).
   now properly recognized inside symbol prefixes (e.g.,
   `\operatorname{😎🤏😳🕶🤏}`).
 
-#### Added
+### New Features
 
 - **High-precision Mandelbrot/Julia compilation** — the GPU compilation targets
   (GLSL, WGSL) now support three precision tiers for fractal rendering, selected
@@ -1101,9 +730,9 @@ GPU compile).
   data staleness predicate), `uniforms` (scalar shader uniforms), `textures`
   (typed texture data with format/dimensions for GPU upload).
 
-### 0.55.3 _2026-03-05_
+## 0.55.3 _2026-03-05_
 
-#### Improved
+### Improved
 
 - **Compilation: constant folding** — `Add`, `Multiply`, `Subtract`, `Negate`,
   `Divide`, `Power`, `Sqrt`, and `Root` handlers now fold numeric literals at
@@ -1132,21 +761,21 @@ GPU compile).
     Euclidean double-mod formula
   - GPU variable declarations infer `i32`/`int` type for integer-typed locals
 
-#### Fixed
+### Resolved Issues
 
 - **`Abs` signature**: return type is now `real` instead of propagating the
   input type (which incorrectly returned `complex` for complex inputs).
 - **Compilation fallback**: uses `pushScope`/`assign` pattern instead of
   crashing when receiving a vars object.
 
-#### Added
+### New Features
 
 - **`Mandelbrot` and `Julia`** operators in JavaScript and GPU compilation
   targets.
 
-### 0.55.2 _2026-03-04_
+## 0.55.2 _2026-03-04_
 
-#### Fixed
+### Resolved Issues
 
 - **`\text{}` flush bug**: `\text{a$x$b}` now correctly produces
   `["Text", "'a'", "x", "'b'"]`. Previously the text before and after inline
@@ -1167,7 +796,7 @@ GPU compile).
   `\p{XIDC}` before being consumed as symbols, providing defense-in-depth
   against future `isValidSymbol` regressions.
 
-#### Added
+### New Features
 
 - **Text promotion**: When `InvisibleOperator` canonicalization encounters a
   `Text` expression or a string operand, it now absorbs all operands into a
@@ -1186,9 +815,9 @@ GPU compile).
 - **`Text` evaluate handler**: Evaluating a `Text` expression now concatenates
   all operands into a single string.
 
-### 0.55.1 _2026-03-04_
+## 0.55.1 _2026-03-04_
 
-#### Fixed
+### Resolved Issues
 
 - After `parse('f(x):=\\sin(x)')`, the symbol `f` is now immediately recognized
   as having type `function`. Previously its type remained `unknown` until the
@@ -1208,9 +837,9 @@ GPU compile).
   `2g(x,y)`) are now auto-declared as functions in all invisible operator paths,
   not just the two-operand path.
 
-### 0.55.0 _2026-03-04_
+## 0.55.0 _2026-03-04_
 
-#### Breaking
+### Breaking Changes
 
 - `ce.box()`/`box()` renamed to `ce.expr()`/`expr()` (`ce.box()` remains as a
   deprecated wrapper).
@@ -1224,7 +853,7 @@ GPU compile).
 - Removed `LibraryDefinition.latexDictionary`; LaTeX dictionaries now live in
   the `latex-syntax` module.
 
-#### Fixed
+### Resolved Issues
 
 - **#295** The `parse()` free function now accepts the form options object, so
   `parse("\\frac{10}{2}", { form: "raw" })` return `["Divide", "10", "2"]`.
@@ -1233,7 +862,7 @@ GPU compile).
   `q(2q)` -> `2q^2`). Function-call behavior remains for explicitly declared
   function symbols and non-numeric argument forms.
 
-#### Added
+### New Features
 
 - Modular package exports for smaller bundles: `@cortex-js/compute-engine/core`,
   `@cortex-js/compute-engine/compile`, `@cortex-js/compute-engine/latex-syntax`,
@@ -1248,7 +877,7 @@ GPU compile).
 - `Parser` type is now exported from the main package for typed custom
   `LatexDictionaryEntry` parse handlers.
 
-#### Changed
+### Changed
 
 - `ComputeEngine` now accepts an injectable `latexSyntax` dependency.
   - Full package imports still auto-create a LaTeX syntax instance.
@@ -1267,7 +896,7 @@ GPU compile).
   `bigTrigamma`, `bigPolygamma`, `bigZeta`) now scale with
   `BigDecimal.precision`; integer Gamma values are exact.
 
-### 0.54.0 _2026-02-26_
+## 0.54.0 _2026-02-26_
 
 - **New `expr.polynomialCoefficients()` method**: Returns the coefficients of a
   polynomial expression in descending order of degree, or `undefined` if the
@@ -1340,7 +969,7 @@ GPU compile).
   exponent: `x2 + y2` → `x^2 + y^2`. Handles common copy-paste from web pages.
   Only digits 2–9, only single ASCII letters, and only when adjacent (no space).
 
-### 0.53.1 _2026-02-25_
+## 0.53.1 _2026-02-25_
 
 - **`timeLimit` now reliably interrupts long-running evaluations**: `Factorial`,
   `Sum`, `Product`, `Loop`, and `Reduce` all respect the `timeLimit` property
@@ -1384,9 +1013,9 @@ GPU compile).
   breaking the UMD factory pattern. The UMD builds now use a `.cjs` extension so
   Node always treats them as CommonJS.
 
-### 0.53.0 _2026-02-21_
+## 0.53.0 _2026-02-21_
 
-#### Runtime and Scoping
+### Runtime and Scoping
 
 - **True lexical scoping for `Function` expressions**: Functions now capture
   their defining scope and resolve free variables from that scope chain (not the
@@ -1407,7 +1036,7 @@ GPU compile).
   values introduced by `assume('x = ...')` (value reset to `undefined`), in
   addition to clearing assumptions.
 
-#### Expressions and Equality
+### Expressions and Equality
 
 - **`expand()` now returns the input expression instead of `null`**: Both the
   free function and internal `expand()`/`expandAll()` now return the original
@@ -1426,7 +1055,7 @@ GPU compile).
 - **`.is()` is now symmetric**: `a.is(b) === b.is(a)` now holds across all
   expression types.
 
-#### LaTeX Parsing
+### LaTeX Parsing
 
 - **Parse `\mleft`/`\mright` delimiters**: Alternative delimiters from the
   `mleftright` package are now treated like `\left`/`\right`.
@@ -1441,7 +1070,7 @@ GPU compile).
 - **Parse `\dfrac`, `\tfrac`, and `\cfrac` as fractions**: These variants now
   parse the same as `\frac`.
 
-#### Fractals
+### Fractals
 
 - **New `Mandelbrot` and `Julia` functions**: Added built-in escape-time fractal
   operators. `Mandelbrot(c, maxIter)` and `Julia(z, c, maxIter)` return a
@@ -1449,9 +1078,9 @@ GPU compile).
   escaping points via `log₂(log₂(|z|²))` smoothing). Both evaluate in JavaScript
   and compile to GLSL/WGSL.
 
-### 0.52.1 _2026-02-19_
+## 0.52.1 _2026-02-19_
 
-#### Expressions
+### Expressions
 
 - **Exact number literal check**: Use `isNumber(expr) && expr.isExact` to test
   for exact numeric literals.
@@ -1459,7 +1088,7 @@ GPU compile).
 - **`raw` form preserves subtraction**: `x-1` now parses as
   `["Subtract", "x", "1"]` (instead of `["Add", "x", -1]`) when using raw form.
 
-#### Parsing and Blocks
+### Parsing and Blocks
 
 - **Fix `;\;` parsing in semicolon blocks**: Spacing commands after semicolons
   (`\;`, `\,`, `\quad`, etc.) no longer create spurious `Nothing` operands.
@@ -1483,7 +1112,7 @@ GPU compile).
 - **Unicode superscript/subscript digits supported**: Superscript and subscript
   Unicode digits now normalize to `^{...}` / `_{...}` in parsing.
 
-#### Compilation
+### Compilation
 
 - **Selective GLSL interval preamble**: `interval-glsl` now emits only used
   helper functions (plus dependencies), typically reducing preamble size by
@@ -1495,7 +1124,7 @@ GPU compile).
 - **Fix recursive GLSL gamma helper**: Replaced recursive `_gpu_gamma()`
   reflection logic (illegal in GLSL) with a non-recursive implementation.
 
-#### Equality
+### Equality
 
 - **`.is()` now works with assigned variables**: Numeric fallback now applies to
   expressions with no free variables, including variables with assigned values.
@@ -1503,9 +1132,9 @@ GPU compile).
 - **`.is()` now accepts an optional `tolerance`**: A per-call tolerance can
   override `engine.tolerance` for numeric comparison.
 
-### 0.52.0 _2026-02-18_
+## 0.52.0 _2026-02-18_
 
-### Features
+### New Features
 
 - **Smart `.is()` / exact `.isSame()` separation**: The `.is()` and `.isSame()`
   methods on expressions now have distinct roles:
@@ -1574,7 +1203,7 @@ GPU compile).
   (Lanczos approximation) and `ia_gammaln` (Stirling asymptotic) to the WGSL
   target, matching existing GLSL implementations.
 
-### Bug Fixes
+### Resolved Issues
 
 - **`parse()` with `form: 'structural'` ignored the structural flag**: The
   `structural` option from `formToInternal()` was dropped in
@@ -1701,7 +1330,7 @@ GPU compile).
   `\text{for } i \text{ from } a \text{ to } b \text{ do } body` to
   `["Loop", body, ["Element", "i", ["Range", a, b]]]`.
 
-### Bug Fixes
+### Resolved Issues
 
 - **Interval-JS compilation for Gamma functions**: Added missing `gamma` and
   `gammaln` exports and implementations in the interval-arithmetic library.
@@ -1782,7 +1411,7 @@ GPU compile).
 - Added `rgbToHsl()` conversion function. Exported `hslToRgb()` (previously
   private).
 
-### Bug Fixes
+### Resolved Issues
 
 - **(#290) Derivatives of user-defined functions**: `\frac{d}{dx} f` and `f'(x)`
   now correctly evaluate when `f` is a user-defined function (e.g.,
