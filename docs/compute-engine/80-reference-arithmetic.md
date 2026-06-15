@@ -560,10 +560,16 @@ These functions operate on polynomial expressions.
 | `Distribute`           | Distribute multiplication over addition                          |
 | `PolynomialDegree`     | Return the degree of a polynomial                                |
 | `CoefficientList`      | Return the list of coefficients of a polynomial                  |
+| `Polynomial`           | Construct a polynomial from a coefficient list                   |
 | `PolynomialQuotient`   | Return the quotient of polynomial division                       |
 | `PolynomialRemainder`  | Return the remainder of polynomial division                      |
+| `GCD`                  | Greatest common divisor of integers or polynomials               |
 | `PolynomialGCD`        | Return the greatest common divisor of two polynomials            |
 | `Cancel`               | Cancel common polynomial factors in a rational expression        |
+| `PartialFraction`      | Decompose a rational expression into partial fractions           |
+| `Apart`                | Alias for `PartialFraction`                                      |
+| `PolynomialRoots`      | Return the roots of a polynomial                                 |
+| `Discriminant`         | Return the discriminant of a polynomial                          |
 
 </div>
 
@@ -600,6 +606,8 @@ Supports:
 - **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
 - **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
 - **Quadratic factoring**: $ ax^2 + bx + c $ (when roots are rational)
+- **Rational root factoring**: Degree 3+ polynomials with rational roots (via Rational Root Theorem)
+- **Content extraction**: $ 6x^2 + 12x + 6 \to 6(x+1)^2 $ (extracts GCD of integer coefficients first)
 - **Common factor extraction**: $ 2x + 4 \to 2(x+2) $
 
 The optional `var` parameter specifies which variable to factor over.
@@ -622,10 +630,28 @@ The optional `var` parameter specifies which variable to factor over.
 // ➔ ["Multiply", ["Add", "x", -2], ["Add", "x", 2]]  // (x-2)(x+2)
 ```
 
+A difference of squares is factored recursively, so a higher-degree input such
+as $$ x^6 - 1 $$ is reduced all the way to its irreducible (cyclotomic) factors
+rather than stopping at the first split:
+```json example
+["Factor", ["Subtract", ["Power", "x", 6], 1]]
+// ➔ (x-1)(x+1)(x²+x+1)(x²-x+1)
+```
+
+The factors are always polynomials: `Factor` never introduces `Sqrt` or `Abs`
+(e.g. $$ x^3 - 1 \to (x-1)(x^2+x+1) $$, not the branch-dependent
+$$ (x\sqrt{x}-1)(x\sqrt{x}+1) $$).
+
 **With coefficients:**
 ```json example
 ["Factor", ["Add", ["Multiply", 4, ["Power", "x", 2]], ["Multiply", 12, "x"], 9]]
 // ➔ ["Power", ["Add", ["Multiply", 2, "x"], 3], 2]  // (2x+3)²
+```
+
+**Cubic with rational roots:**
+```json example
+["Factor", ["Add", ["Power", "x", 3], ["Negate", ["Multiply", 6, ["Power", "x", 2]]], ["Multiply", 11, "x"], -6]]
+// ➔ ["Multiply", ["Add", "x", -1], ["Add", "x", -2], ["Add", "x", -3]]  // (x-1)(x-2)(x-3)
 ```
 
 **Automatic use in sqrt simplification:**
@@ -679,14 +705,84 @@ Return the degree of the polynomial `poly` with respect to the variable `var`.
 
 <Signature name="CoefficientList">_poly_, _var_</Signature>
 
-Return the list of coefficients of the polynomial `poly` with respect to the variable `var`, ordered from lowest to highest degree.
+Return the list of coefficients of the polynomial `poly` with respect to the variable `var`, ordered from highest to lowest degree.
 
 ```json example
 ["CoefficientList", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
-// ➔ ["List", 1, 2, 0, 1]
+// ➔ ["List", 1, 0, 2, 1]
 ```
 
-The result represents the polynomial $$ 1 + 2x + 0x^2 + 1x^3 $$.
+The result represents the polynomial $$ 1 \cdot x^3 + 0 \cdot x^2 + 2 \cdot x + 1 $$. The first element is the leading coefficient, and the last element is the constant term.
+
+This function is also available as a method on expressions:
+
+```javascript
+const coeffs = ce.parse('x^3 + 2x + 1').polynomialCoefficients('x');
+// ➔ [1, 0, 2, 1]  (as BoxedExpression[])
+```
+
+When the variable is omitted, it is auto-detected if the expression has exactly one unknown:
+
+```javascript
+ce.parse('x^2 + 5').polynomialCoefficients();
+// ➔ [1, 0, 5]
+```
+
+Returns `undefined` if the expression is not a polynomial in the given variable. This subsumes an `isPolynomial` check and degree computation:
+
+```javascript
+const isPolynomial = expr.polynomialCoefficients('x') !== undefined;
+const degree = expr.polynomialCoefficients('x')?.length - 1;
+```
+
+**Multivariate validation:** Pass an array of variables to validate that the expression is polynomial in all of them. The coefficients are decomposed by the first variable:
+
+```javascript
+ce.parse('x^2*y + 3x + y^2').polynomialCoefficients(['x', 'y']);
+// ➔ [y, 3, y²]  (polynomial in both x and y, decomposed by x)
+
+ce.parse('sin(x)*y + 1').polynomialCoefficients(['x', 'y']);
+// ➔ undefined  (not polynomial in x)
+```
+
+### `polynomialRoots()`
+
+The `polynomialRoots()` method returns the roots of a polynomial expression:
+
+```javascript
+ce.parse('x^2 - 5x + 6').polynomialRoots('x');
+// ➔ [2, 3]
+
+ce.parse('x^3 - 6x^2 + 11x - 6').polynomialRoots('x');
+// ➔ [1, 2, 3]
+
+ce.parse('x^2 + 1').polynomialRoots('x');
+// ➔ []  (no real roots)
+
+ce.parse('sin(x)').polynomialRoots('x');
+// ➔ undefined  (not a polynomial)
+```
+
+Returns `undefined` if the expression is not a polynomial. Returns an empty array if no roots can be found (e.g., irreducible over the rationals). Supports auto-detection of the variable when omitted.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Polynomial">
+
+<Signature name="Polynomial">_coefficients_, _var_</Signature>
+
+Construct a polynomial expression from a list of coefficients (highest degree first) and a variable. This is the inverse of `CoefficientList`.
+
+```json example
+["Polynomial", ["List", 1, 0, 2, 1], "x"]
+// ➔ ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1]
+```
+
+This constructs the polynomial $$ x^3 + 2x + 1 $$ from the coefficient list $$[1, 0, 2, 1]$$.
+
+**Round-trip with CoefficientList:**
+
+$$\operatorname{Polynomial}(\operatorname{CoefficientList}(p, x), x) = p$$
 
 </FunctionDefinition>
 
@@ -718,6 +814,41 @@ Return the remainder of the polynomial division of `dividend` by `divisor` with 
 
 </FunctionDefinition>
 
+<FunctionDefinition name="GCD">
+
+<Signature name="GCD">_x-1_, _x-2_, ...</Signature>
+
+Return the greatest common divisor of the arguments.
+
+With integer arguments, `GCD` returns their integer greatest common divisor:
+
+```json example
+["GCD", 60, 12, 18]
+// ➔ 6
+```
+
+`GCD` also computes the greatest common divisor of **polynomials**. When the
+arguments are univariate polynomials in the same variable that share a
+non-trivial common factor, the variable is inferred and a (monic) polynomial
+GCD is returned:
+
+```json example
+["GCD",
+  ["Add", ["Power", "x", 2], ["Multiply", 3, "x"], 2],
+  ["Add", ["Power", "x", 2], ["Multiply", 4, "x"], 3]]
+// ➔ ["Add", "x", 1]
+```
+
+This represents $$ \gcd(x^2 + 3x + 2, x^2 + 4x + 3) = x + 1 $$.
+
+When the polynomial GCD would be a constant, the expression is left
+unevaluated, so that a bare symbol keeps its integer-GCD reading — for example
+`["GCD", "x", 6]` (where `x` may stand for an unknown integer) stays symbolic.
+Use `PolynomialGCD` with an explicit variable when you want the coprime
+&rarr; `1` result, or to control which variable the GCD is taken over.
+
+</FunctionDefinition>
+
 <FunctionDefinition name="PolynomialGCD">
 
 <Signature name="PolynomialGCD">_a_, _b_, _var_</Signature>
@@ -745,5 +876,68 @@ Cancel common polynomial factors in the numerator and denominator of the rationa
 ```
 
 This represents $$ \frac{x^2 - 1}{x - 1} = x + 1 $$ after canceling the common factor $$(x - 1)$$.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PartialFraction">
+
+<Signature name="PartialFraction">_expr_, _var_</Signature>
+
+Decompose a rational expression into a sum of simpler fractions (partial fractions) with respect to the variable `var`.
+
+Supports:
+- **Distinct linear factors**: $ \frac{1}{(x+1)(x+2)} \to \frac{1}{x+1} - \frac{1}{x+2} $
+- **Repeated linear factors**: $ \frac{3x+5}{(x+1)^2} \to \frac{3}{x+1} + \frac{2}{(x+1)^2} $
+- **Irreducible quadratic factors**: $ \frac{1}{(x+1)(x^2+1)} \to \frac{1}{2(x+1)} + \frac{-x+1}{2(x^2+1)} $
+- **Improper fractions**: Performs polynomial division first, then decomposes the proper remainder.
+
+Returns the expression unchanged if it is not a rational expression in `var`, or if the denominator cannot be factored.
+
+```json example
+["PartialFraction", ["Divide", 1, ["Multiply", ["Add", "x", 1], ["Add", "x", 2]]], "x"]
+// ➔ ["Add", ["Divide", 1, ["Add", "x", 1]], ["Divide", -1, ["Add", "x", 2]]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Apart">
+
+<Signature name="Apart">_expr_, _var_</Signature>
+
+Alias for `PartialFraction`. Decompose a rational expression into partial fractions.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="PolynomialRoots">
+
+<Signature name="PolynomialRoots">_poly_, _var_</Signature>
+
+Return the roots of the polynomial `poly` with respect to the variable `var` as a set.
+
+Returns `undefined` if the expression is not a polynomial or no roots can be found. Supports polynomials up to degree 4 with rational roots, and degree 2 with irrational roots.
+
+```json example
+["PolynomialRoots", ["Add", ["Power", "x", 2], ["Multiply", -5, "x"], 6], "x"]
+// ➔ ["Set", 2, 3]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Discriminant">
+
+<Signature name="Discriminant">_poly_, _var_</Signature>
+
+Return the discriminant of the polynomial `poly` with respect to the variable `var`. Supports degree 2, 3, and 4 polynomials. Works with symbolic coefficients.
+
+- **Degree 2** ($$ax^2 + bx + c$$): returns $$b^2 - 4ac$$
+- **Degree 3** ($$ax^3 + bx^2 + cx + d$$): returns $$b^2c^2 - 4ac^3 - 4b^3d + 18abcd - 27a^2d^2$$
+- **Degree 4**: returns the full 16-term discriminant formula
+
+```json example
+["Discriminant", ["Add", ["Power", "x", 2], ["Multiply", -5, "x"], 6], "x"]
+// ➔ 1
+```
+
+A discriminant of 0 indicates repeated roots. For quadratics, a negative discriminant indicates no real roots.
 
 </FunctionDefinition>

@@ -47,6 +47,19 @@ precise statement, conditions, and references.
   function, the arithmetic–geometric mean, and others), so expressions using
   them parse, canonicalize, and serialize correctly.
 
+## Identity Reference
+
+The [Fungrim Identities reference](/compute-engine/reference/fungrim/) lists
+every identity and its validity conditions, organized by topic:
+
+| | |
+| --- | --- |
+| [Elementary functions](/compute-engine/reference/fungrim-elementary/) | [Complex numbers](/compute-engine/reference/fungrim-complex/) |
+| [Gamma and related functions](/compute-engine/reference/fungrim-gamma/) | [Orthogonal polynomials](/compute-engine/reference/fungrim-orthogonal-polynomials/) |
+| [Bessel and hypergeometric functions](/compute-engine/reference/fungrim-bessel-hypergeometric/) | [Elliptic integrals](/compute-engine/reference/fungrim-elliptic-integrals/) |
+| [Modular forms and theta functions](/compute-engine/reference/fungrim-modular-theta/) | [Zeta and L-functions](/compute-engine/reference/fungrim-zeta/) |
+| [Number theory](/compute-engine/reference/fungrim-number-theory/) | [Combinatorial and integer sequences](/compute-engine/reference/fungrim-sequences/) |
+
 ## Guarded Rules and Assumptions
 
 Many identities are only valid under conditions: an exponent must be an
@@ -129,6 +142,33 @@ loadIdentities(ce, {
     console.log(`${ruleId} did not fire: condition undecided`),
 });
 ```
+
+## Solve Templates
+
+The library also ships a small set of **solve templates** — derived from the
+inverse-function identities in the corpus (`f(g(x)) = x`) — that extend
+`expr.solve()` to transcendental equations the built-in solver does not
+handle. They are **off by default** and enabled with `{ solve: true }`:
+
+```js
+const ce = new ComputeEngine();
+loadIdentities(ce, { solve: true });
+
+// x·eˣ = 3  →  x = W(3)  (Lambert W)
+ce.parse("x e^x = 3").solve("x");
+// ➔ [LambertW(3)]   (≈ 1.0499)
+
+// arctan(x) = c  →  x = tan(c)
+ce.parse("\\arctan(x) = 0.5").solve("x");
+// ➔ [tan(0.5)]   (≈ 0.5463)
+```
+
+The templates are **safe by construction**: `solve()` validates every
+candidate root against the original equation, so a template that does not
+truly apply contributes nothing — it never produces a wrong answer. Because of
+this, the templates carry no domain guards; they return a principal root and
+defer general solution families (`x = arctan(c) + πn`). They route to
+`ce.solveRules`, leaving `simplify()` unchanged.
 
 ## Performance
 

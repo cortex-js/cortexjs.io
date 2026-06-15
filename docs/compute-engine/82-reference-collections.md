@@ -83,6 +83,28 @@ collection.
 // ➔ 5
 ```
 
+### Nested Collections
+
+The elements of a collection are its **top-level** elements: a nested
+collection such as a matrix (a list of lists) is a collection of its rows.
+
+Collection operations apply to those top-level elements. For example
+`Count` of a 3×3 matrix is 3 (the number of rows), `First` is its first
+row, and `Take`, `Drop` and `Slice` select rows.
+
+```json example
+["Count", ["List", ["List", 2, 3, 4], ["List", 6, 7, 9]]]
+// ➔ 2
+
+["First", ["List", ["List", 2, 3, 4], ["List", 6, 7, 9]]]
+// ➔ ["List", 2, 3, 4]
+```
+
+To access a scalar entry of a nested collection, use `At` with multiple
+indexes (e.g. `["At", matrix, i, j]`), and to operate on the scalar
+entries, flatten the collection first with
+[`Flatten`](/compute-engine/reference/linear-algebra/#flatten).
+
 
 ### Finite and Infinite Collections
 
@@ -150,6 +172,35 @@ const expr = ce.box(["Map", "Integers", ["Square", "_"]]);
 expr.print();
 // ➔ [1, 4, 9, 16, 25...]
 ```
+
+#### Materialization Cap
+
+The `ce.maxCollectionSize` property (default `10_000`) bounds how many
+elements a lazy collection may have when it is converted to a concrete
+`List`. Sites that would otherwise build an oversize list — such as
+`Repeat(value, count)` with a large `count`, or the eager-materialization
+path for a finite indexed collection — leave the expression in its lazy
+form instead. Elements remain individually accessible via `.at()` and
+the iterator.
+
+```js example
+ce.maxCollectionSize = 5;
+ce.box(['Repeat', 7, 100]).evaluate();
+// ➔ ["Repeat", 7, 100]  (stays lazy; would exceed the cap)
+
+ce.box(['Repeat', 7, 3]).evaluate();
+// ➔ ["List", 7, 7, 7]
+```
+
+Set `ce.maxCollectionSize` to `Infinity` (or to `0` / a negative number)
+to disable the cap. The setter normalizes any non-positive value to
+`Infinity`, mirroring `ce.iterationLimit` and `ce.recursionLimit`.
+
+The cap applies to materialization specifically. Element-wise operations
+on lazy collections (broadcasting an operator like `Add` over a `Range`,
+or applying a user-defined lambda to a list) are not currently bounded
+by `maxCollectionSize`; use a finite, explicitly-materialized list if
+strict size enforcement is required throughout the evaluation pipeline.
 
 
 #### Eager Collections
@@ -387,11 +438,11 @@ The elements in a set are counted in constant time.
 
 <FunctionDefinition name="Range">
 
-<Signature name="Range" returns="indexed_collection<integer>">_upper_:integer</Signature>
+<Signature name="Range" returns="indexed_collection<integer>">_upper_:number</Signature>
 
-<Signature name="Range" returns="indexed_collection<integer>">_lower_:integer, _upper_:integer</Signature>
+<Signature name="Range" returns="indexed_collection<integer>">_lower_:number, _upper_:number</Signature>
 
-<Signature name="Range" returns="indexed_collection<integer>">_lower_:integer, _upper_:integer, _step_:integer</Signature>
+<Signature name="Range" returns="indexed_collection<number>">_lower_:number, _upper_:number, _step_:number</Signature>
 
 A sequence of numbers, starting with `lower`, ending with `upper`, and
 incrementing by `step`.
@@ -406,7 +457,6 @@ If the `step` is not specified, it is assumed to be 1.
 // ➔ ["List", 1, 3, 5, 7, 9]
 ```
 
-
 If there is a single argument, it is assumed to be the `upper` bound, and the
 `lower` bound is assumed to be 1.
 
@@ -414,6 +464,7 @@ If there is a single argument, it is assumed to be the `upper` bound, and the
 ["Range", 7]
 // ➔ ["List", 1, 2, 3, 4, 5, 6, 7]
 ```
+
 If the `lower` bound is greater than the `upper` bound, the `step` must be
 negative.
 
@@ -421,6 +472,37 @@ negative.
 ["Range", 10, 1, -1]
 // ➔ ["List", 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 ```
+
+**Element type narrows by step.** When the step is omitted or is an integer
+literal, the result is `indexed_collection<integer>`. When the step is
+non-integer (e.g. `0.1`) or a symbolic expression, the result widens to
+`indexed_collection<number>`.
+
+```json example
+["Range", 0, 1, 0.1]
+// type: indexed_collection<number>
+// ➔ ["List", 0, 0.1, 0.2, 0.3, ..., 1.0]
+```
+
+### LaTeX Syntax
+
+In addition to `\operatorname{range}(...)` and the `..` infix form, `Range`
+can be authored inside a list literal using ellipsis notation:
+
+```latex
+[1...9]                 % endpoint-only form
+[1, 3, ..., 9]          % inferred-step form (step = 3 - 1 = 2)
+[0, 0.1, 0.2, ..., 1]   % inferred float step
+```
+
+The ellipsis token can be `...` (three periods), `\ldots`, or `\dots`. In
+the inferred-step form, the step is computed from the first sample pair and
+all intermediate samples are validated against the inferred step within
+`ce.tolerance`. Inconsistent samples (e.g. `[0, 0.1, 0.5, ..., 1]`) produce
+a parse error.
+
+Outside `[...]` brackets, the ellipsis tokens continue to parse as the
+`ContinuationPlaceholder` symbol.
 
 </FunctionDefinition>
 
@@ -647,6 +729,28 @@ If the collection is nested, the indexes are applied in order.
 ```json example
 ["At", ["List", ["List", 1, 2], ["List", 3, 4]], 2, 1]
 // ➔ 3
+```
+
+<Signature name="At">_xs_: indexed_collection, _indices_: indexed_collection&lt;integer&gt;</Signature>
+
+When the index is a collection of integers, `At` returns a new list
+containing the elements of `xs` at those positions. Out-of-range
+positions are silently filtered.
+
+```json example
+["At", ["List", 10, 20, 30, 40, 50], ["List", 1, 3, 5]]
+// ➔ ["List", 10, 30, 50]
+```
+
+<Signature name="At">_xs_: indexed_collection, _mask_: indexed_collection&lt;boolean&gt;</Signature>
+
+When the index is a collection of `True`/`False` values, `At` returns
+the elements of `xs` where the mask is `True`. If the mask is shorter
+than `xs`, the iteration stops at the end of the mask.
+
+```json example
+["At", ["List", 10, 20, 30, 40], ["List", "True", "False", "True", "False"]]
+// ➔ ["List", 10, 30]
 ```
 
 #### Subscript Notation

@@ -10,6 +10,363 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Behavior Changes
+
+- **`isFinite` is now known for finite symbolic constants.** Expressions such as
+  `√π`, `1/π`, and `π^π` report `expr.isFinite === true` (previously
+  `undefined`), because finiteness is propagated through `Sqrt`, `Root`,
+  `Power`, and `Divide` of finite operands. Cases that are genuinely
+  indeterminate (e.g. `1/x` for an unconstrained `x`) still report `undefined`.
+
+- **Exact transcendental expressions now remain symbolic under `evaluate()`.**
+  For example, `ln(2)` remains `ln(2)` instead of becoming `0.693…`. Use `.N()`
+  or `{ numericApproximation: true }` when a numeric approximation is wanted.
+  Inexact inputs still evaluate numerically, and known exact values such as
+  `cos(π) = -1` and `arctan(1) = π/4` still simplify. As a result, definite
+  integrals also preserve exact results, such as `∫₁² 1/x dx = ln(2)` and
+  `∫₀¹ 1/(1+x²) dx = π/4`.
+
+- **`(aⁿ)ᵐ` no longer folds to `aⁿᵐ` based solely on an odd inner exponent.**
+  This combine was unsound on the principal branch: when `a < 0` and `m` is not
+  an integer, the two sides differ by a phase. For example `(x³)^{1/2}` now
+  stays `√(x³)` (which is `8i` at `x = -4`) instead of becoming the inequivalent
+  `x^{3/2}` (`-8i`), and it is again confluent with the `√(x³)` form. The fold
+  still applies when the base is non-negative or the outer exponent is an
+  integer. (Roots are unaffected: `(x³)^{1/3} = x` still holds, since odd-index
+  roots use the real-root convention.)
+
+- **`N()` at a known pole now returns `ComplexInfinity` instead of `NaN`.** When
+  a function is evaluated numerically at a pole recorded in the new
+  analytic-property metadata store (see Special Functions), the result is
+  `ComplexInfinity` rather than `NaN` or an unevaluated expression — for example
+  `Digamma(0).N()` and `Digamma(-2).N()`. Functions whose kernels already
+  returned an infinity at their poles (such as `Gamma`) are unchanged.
+
+### Calculus
+
+- **`Limit` can now return exact symbolic results.** This includes direct
+  substitution, indeterminate quotients, rational functions at infinity,
+  dominant-term analysis, and exponential forms. Examples include
+  `lim(x→0) sin(x)/x = 1`, `lim(x→∞) (1+1/x)^x = e`, and
+  `lim(x→∞) arctan(x) = π/2`. Limits that cannot be determined reliably fall
+  back to numeric evaluation or remain unevaluated. `NLimit` remains numeric.
+
+- **Symbolic integration supports many more integrands**, including:
+  - Gaussian integrals and quadratic exponentials using `Erf` and `Erfi`
+  - Fresnel integrals
+  - Sine, cosine, exponential, and logarithmic integrals
+  - Products of polynomials, exponentials, and trigonometric functions
+  - More radical and quadratic-root integrands
+  - Powers of secant, cosecant, tangent, and cotangent
+  - Reverse power-chain forms such as `∫ln(x)/x dx = ½ln²(x)`
+  - Products with symbolic exponents that previously failed or timed out
+  - Powers and radicals of a linear function, e.g. `∫√(1+x) dx`, `∫x√(1+2x) dx`,
+    and `∫(a+bx)^p dx`
+  - Radical powers of a polynomial via the reverse chain rule, e.g.
+    `∫x√(1−x²) dx = −⅓(1−x²)^{3/2}`
+  - Quotients by a sum of two square roots, e.g.
+    `∫1/(√(a+bx)+√(c+bx)) dx`, by conjugate rationalization
+
+- **Rational-function integration is more exact and complete.** Partial
+  fractions now preserve rational and radical coefficients for a wider range of
+  denominators, including `x³+1`, `x⁴+1`, `x⁴-1`, and biquadratic polynomials.
+  Several cases that previously returned incomplete results, floating-point
+  coefficients, or no result now return exact antiderivatives.
+
+- **More improper integrals evaluate correctly.** Exact results now include
+  Gaussian, rational, and Fresnel integrals over infinite intervals. Numeric
+  integration of convergent oscillatory integrals is also more reliable, while
+  divergent or low-confidence cases remain unevaluated instead of returning a
+  misleading finite value.
+
+- Fixed incorrect or missing antiderivatives for `sin²(ax+b)`, `cos²(ax+b)`,
+  `√x`, `1/√x`, `1/√(1-x²)`, and related forms.
+
+### Algebra and Solving
+
+- **`solve` now handles general cubic, quartic, and higher-degree polynomials.**
+  Exact roots are still preferred; when no supported exact form is available,
+  real roots are returned as numeric approximations.
+
+- **Absolute-value equations solve more reliably.** This includes equations such
+  as `|x| = 2`, `|x-1| = 2`, non-linear arguments such as `|x²-3| = 1`, and
+  equations with an absolute value on both sides.
+
+- **`solve` handles more transcendental and substitution equations.** Equations
+  with equal exponential bases reduce by their exponents (`e^{2-x²} = e^{-x} →
+  -1, 2`; `2^x = 2^3 → 3`); `a·sin(x) + b·cos(x) = 0` solves via the tangent
+  (`sin x = cos x → π/4`); equations that are polynomials in a root of the
+  unknown solve by substitution (`2√x + 3·⁴√x = 2 → 1/16`); and a single square
+  root with a non-constant coefficient is eliminated by squaring
+  (`x = 1/√(x²+1)`).
+
+- **Biquadratic and sparse-power equations return exact roots.** Polynomials
+  whose exponents share a common factor — such as `x⁴ + x² − 1` — are solved by
+  substituting `u = x²` (or `x³`, …), so the roots are exact radicals
+  (`±√((√5−1)/2)`) instead of numeric approximations.
+
+- **`solve` handles equations that are polynomials in a single nonlinear
+  generator**, by substituting `u = g(x)` for a logarithmic, exponential,
+  trigonometric, or radical generator `g`, solving for `u`, and inverting. For
+  example `(ln x)² = 4 → e², e⁻²`, `e^{2x} − 3eˣ + 2 = 0 → 0, ln 2`, and
+  `√(ln x) = ln√x → 1, e⁴`.
+
+- **`solve` factors a zero product.** When an equation is a product whose
+  factors each involve the unknown — such as `ln(x)·(x − 1) = 0`, or an
+  already-factored `(x + 1)·cos³(3x) = 0` — its roots are the union of the roots
+  of each factor.
+
+- **`GCD` now finds common polynomial factors** for univariate and multivariate
+  polynomials. Integer operands retain their existing behavior; use
+  `PolynomialGCD()` when an explicit polynomial result of `1` is needed for
+  coprime inputs.
+
+- **New `Resultant(a, b, x)` operator** computes the resultant of two
+  polynomials with respect to a variable (the Sylvester-matrix determinant). It
+  is zero exactly when the polynomials share a common factor, e.g.
+  `Resultant(x² - 1, x - 1, x) → 0` and `Resultant(x² + 1, x² - 1, x) → 4`.
+  Symbolic coefficients are supported: `Resultant(x² + a, x + b, x) → a + b²`.
+
+- **Polynomial factorization is more complete and reliable.** In particular,
+  `Factor(xⁿ-1)` now returns polynomial factors without introducing
+  branch-dependent radicals, and the public `factor()` function once again
+  factors expressions such as `x²+5x+6`.
+
+- **Nested radicals are simplified when possible**, for example
+  `√(3+2√2) = 1+√2`.
+
+### Special Functions
+
+- Added numeric evaluation for:
+  - Complete and incomplete elliptic integrals: `EllipticK`, `EllipticE`,
+    `EllipticF`, and `EllipticPi`
+  - The arithmetic-geometric mean `AGM`
+  - `Hypergeometric2F1`, `Hypergeometric1F1`, and `AppellF1`
+  - Jacobi theta functions and the Dedekind eta function
+  - `Erfi`, `SinIntegral`, `CosIntegral`, `ExpIntegralEi`, and `LogIntegral`
+
+- **`Hypergeometric2F1` now supports analytic continuation across most of the
+  complex plane**, rather than being limited to its defining power series.
+
+- **`Zeta` and `Gamma` now honor the requested precision.** At high
+  `ce.precision`, numeric evaluation of `Zeta`, `Gamma`, `GammaLn`, `Beta`,
+  `Digamma`, `Trigamma`, and `PolyGamma` previously stalled near machine
+  precision (e.g. `Zeta(3)` was correct to only ~16 digits regardless of
+  precision). They now return the full requested precision — `Zeta` uses the
+  Cohen–Villegas–Zagier acceleration, and all of these kernels compute with
+  guard digits.
+
+- **`EulerGamma` (γ) now honors the requested precision.** It was previously a
+  fixed ~858-digit constant, so at higher `ce.precision` it silently stopped at
+  ~858 correct digits (making identities such as `Digamma(1) = -γ` appear wrong
+  past that point). It is now computed on demand to the full working precision.
+
+- **`Gamma` and the polygamma family are dramatically faster at high precision**
+  (~340× at 300 digits — `Gamma(1/3)` ≈1.9 s → ≈5 ms; ~130× at 1000 digits). The
+  Stirling-series kernels (`Gamma`, `GammaLn`, `Digamma`, `Trigamma`,
+  `PolyGamma`) were both shifting their argument just short of where the series
+  converges (running far more terms than needed) and letting intermediate
+  products grow in size without bound; the shift, term count, and per-step
+  rounding are now chosen so the series converges quickly with bounded-size
+  arithmetic. Results are unchanged to full precision.
+
+- The Identities Library has been updated from 1,350 to 1,376 verified rules,
+  including corrected Jacobi theta identities.
+
+- **New analytic-property metadata store.** `ce.functionProperties(name)`
+  exposes per-operator analytic properties drawn from the Fungrim corpus —
+  poles, zeros, branch points and cuts, residues, and holomorphic/meromorphic
+  domains. For example `ce.functionProperties('Gamma')?.poles` is the set
+  `NonPositiveIntegers`. Convenience accessors (`poles`, `zeros`, `branchCuts`,
+  `holomorphicDomain`, …) return the unconditional record of each kind;
+  parametric records (such as residues that depend on parameters) are available
+  via `entries`. This also powers pole-aware `N()` (see Behavior Changes).
+
+### Numeric Evaluation
+
+- **Arbitrary-precision elementary and transcendental functions are
+  substantially faster**, especially at hundreds or thousands of digits.
+  High-precision `π` and trigonometric functions are no longer limited to about
+  2,350 digits. Square root is roughly twice as fast at 1,000+ digits (a
+  giant-steps integer square root), the natural logarithm switches to the faster
+  arithmetic–geometric-mean method from around 700 digits (previously ~1,250),
+  and a power no longer recomputes the logarithm of its base on every call — at
+  1,000 digits `Exp(x).N()` is about three times faster, and a repeated base such
+  as `2^x` or `10^x` about 2.8 times faster. Results are unchanged.
+
+- Odd roots of negative real numbers now use the real-root convention, so
+  `Root(-8, 3)` and `(-8)^(1/3)` evaluate to `-2`.
+
+- **`N()` of a non-unit rational power of a negative base no longer returns
+  `NaN`.** Previously only unit fractions worked (they route through
+  `Sqrt`/`Root`); `(-4)^{3/2}`, `(-8)^{2/3}`, and similar fell through to
+  `Math.pow(negative, non-integer) = NaN`. They now follow the same branch
+  conventions as the roots above: an even denominator takes the principal
+  complex value (`(-4)^{3/2} = -8i`, consistent with `Sqrt(-4) = 2i`), and an
+  odd denominator the real root (`(-8)^{2/3} = 4`, `(-8)^{5/3} = -32`,
+  consistent with `(-8)^{1/3} = -2`).
+
+- **Exact `evaluate()` of a non-unit rational power of a perfect power now
+  reduces.** When `x^{p/q}` has a real base and its `q`-th root is an exact
+  perfect power, it reduces to an exact value (`8^{2/3} = 4`, `27^{2/3} = 9`,
+  `(-8)^{5/3} = -32`), extending the unit-fraction behavior (`8^{1/3} = 2`) to
+  non-unit numerators and matching `N()`. Non-perfect powers (`2^{2/3}`) and
+  the negative even-root branch (`(-4)^{3/2}`, complex) stay symbolic under
+  `evaluate()`.
+
+- `N()` now fully evaluates applied functions and constants such as `e`, `i`,
+  and expressions in Euler form.
+
+- Complex equality and arbitrary-precision complex square roots are more robust
+  in the presence of small rounding errors.
+
+### Benchmarks
+
+The numeric and symbolic gains in this release are summarized below against the
+last release (`0.59.0`), SymPy and math.js. The tables are generated by the
+harness in [`benchmarks/`](./benchmarks/) (`node benchmarks/report_changelog.mjs`);
+every result is verified numerically against an independent `mpmath` reference,
+never another tool. "CE (current)" is this release.
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **milliseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression | CE (current) | CE 0.59.0 | SymPy | math.js |
+| --- | --: | --: | --: | --: |
+| $\pi^2$ | 0.02 | 0.02 | 0.18 | 0.10 |
+| $\sin 1$ | 0.02 | 0.06 | 0.23 | 0.43 |
+| $\cos 1$ | 0.03 | 0.06 | 0.23 | 0.48 |
+| $\ln 2$ | 0.10 | 0.31 | 0.34 | 4.4 |
+| $e^{\pi}$ | 0.03 | 0.41 | 0.22 | 4.8 |
+| $\zeta(3)$ | 3.5 | — | 0.27 | — |
+| $\Gamma(\tfrac13)$ | 1.9 | 438 | 0.35 | — |
+| $\psi(\tfrac13)$ | 1.7 | 412 | 2.9 | — |
+
+Biggest gains over `0.59.0`: $\psi(\tfrac13)$ **247× faster**,
+$\Gamma(\tfrac13)$ **229× faster**, $e^{\pi}$ **13× faster** (it no longer
+recomputes $\ln e$ on every call), $\ln 2$ **3.2× faster**, $\sin 1$ / $\cos 1$
+**~2.5× faster**. The elementary functions widen further at 1000+ digits (e.g.
+$\ln 2$ ≈ 21× faster, where it now also leads SymPy and mpmath). `0.59.0` could
+not reach 200 digits for $\zeta(3)$ (it was capped near machine precision);
+math.js has no arbitrary-precision ζ/Γ/ψ.
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than SymPy** that engine is on the case
+(`SymPy ÷ engine`, so **higher is better**; SymPy itself is `1×`). `—` means the
+engine can't do the case; `✓` means it solves a case SymPy can't. Compare the
+**CE (current)** and **CE 0.59.0** columns to see what is *new this release*
+(a `—` under `0.59.0` next to a number under the current build). The **CE + R/F**
+column is the current build with the opt-in Rubi integrator and Fungrim
+identities loaded (`loadIntegrationRules` / `loadIdentities`), on the same
+minified bundle.
+
+| Operation | CE (current) | CE + R/F | CE 0.59.0 | SymPy | math.js |
+| --- | :--: | :--: | :--: | :--: | :--: |
+| **Antiderivatives** |  |  |  |  |  |
+| $\int\frac{1}{\sqrt x}\,dx$ | 2.1× | 2.0× | — | 1× | — |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$ | 28× | 20× | — | 1× | — |
+| $\int\frac{1}{x^3+1}\,dx$ | 3.0× | 23× | — | 1× | — |
+| $\int\frac{\sqrt x}{1+x}\,dx$ | — | 32× | — | 1× | — |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$ | — | 202× | — | 1× | — |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$ | — | 309× | — | 1× | — |
+| **Derivatives** |  |  |  |  |  |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$ | 7.2× | 13× | 10.0× | 1× | 2.7× |
+| **Simplification** |  |  |  |  |  |
+| $\sqrt{3+2\sqrt2}$ | ✓ | ✓ | — | — | — |
+| $\sqrt6\,x+\sqrt2\,x$ | 10× | 15× | 10.0× | 1× | 5.4× |
+| **Evaluation** |  |  |  |  |  |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$ | 2.7× | 1.4× | — | 1× | — |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$ | 0.7× | 0.7× | — | 1× | — |
+| $\int_1^2\tfrac1x\,dx$ | 15× | 2.6× | — | 1× | — |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ | 35× | 17× | — | 1× | — |
+| **Solving** |  |  |  |  |  |
+| $x^4+x^2-1=0$ | 1.0× | 0.9× | — | 1× | — |
+| $x^3-x-1=0$ | 1.8× | 3.3× | — | 1× | — |
+
+Across the cases both solve, Compute Engine is a **median 10× faster than
+SymPy** (up to 309×), in the browser rather than a Python backend. The `—`
+entries under `0.59.0` show what is new this release: limits, exact
+definite/improper integrals, and polynomial solving. The bottom three
+antiderivative rows are integrals the base engine still leaves unevaluated but
+the opt-in **Rubi** rules solve.
+
+<sub>Measured 2026-06-15 · SymPy 1.14.0 · math.js 15.2.0 · Node 22 · verified
+against `mpmath`. Reproduce: `npm run build production && ./venv/bin/python3
+benchmarks/gen_cases.py && node benchmarks/report.mjs && node
+benchmarks/report_changelog.mjs`.</sub>
+
+### Collections and Matrices
+
+- `Take`, `Drop`, `Slice`, and `Count` now operate on matrix rows consistently.
+  For example, `Count(matrix)` returns the number of rows.
+
+- `Join` now preserves list order, duplicates, and all elements when joining
+  lists. Joining sets continues to produce a deduplicated set.
+
+- Sums and products over ranges from `-∞` to a finite bound, or from `-∞` to
+  `∞`, now iterate over an appropriate finite approximation instead of an empty
+  range.
+
+### Resolved Issues
+
+- **Long-running evaluation is interruptible.** Collection operations,
+  number-theory functions, limits, differentiation, simplification, and
+  integration now respect `ce.timeLimit` more consistently. Operations that
+  cannot finish in time either throw `CancellationError` or return the best
+  numeric estimate available, as appropriate.
+
+- **Fractional powers and radicals now preserve the correct principal complex
+  branch.** This fixes several unsafe transformations involving negative or
+  unknown-sign values, including `x/√(x²)`, negative factors under roots,
+  products and quotients raised to fractional powers, and `1/√u`.
+
+- Infinity arithmetic is more reliable for finite symbolic denominators, while
+  indeterminate forms such as `∞/∞` remain indeterminate.
+
+- Numeric limits now reject overflow, catastrophic cancellation, oscillation,
+  and other low-confidence results instead of returning spurious values.
+
+- Fixed hangs and crashes when factoring certain sums, simplifying expressions
+  with radical coefficients, or mixing non-finite rational values with
+  arbitrary-precision integers.
+
+- `ce.number()` now throws a helpful error when passed a MathJSON expression
+  array; use `ce.box()` for expressions.
+
+- Fixed incorrect simplification or evaluation of `2^i`, division by a
+  floating-point zero coefficient, and several exact expressions involving
+  negative radicals.
+
+- Fixed a rational function such as `1/(x(x²+x))` wrongly simplifying (and
+  integrating) to `0` when its factored denominator contained factors sharing a
+  common root. The partial-fraction solver now detects the inconsistent system
+  instead of returning a spurious all-zero decomposition.
+
+- `Factor` is more complete: it now extracts a common monomial factor (e.g.
+  `x³+x² → x²(x+1)`, `3x⁴+2x³ → x³(3x+2)`) and fully factors already-factored
+  products and powers, so partial-fraction decomposition sees irreducible
+  factors with correct multiplicities.
+
+- Partial-fraction decomposition now uses exact arbitrary-precision integer
+  arithmetic, so decompositions of higher-degree denominators no longer lose
+  precision (the previous machine-integer solver overflowed past 2⁵³ and could
+  return wrong coefficients).
+
+- Rational functions with **repeated** linear or irreducible-quadratic factors
+  now integrate to a closed form via full partial-fraction decomposition — e.g.
+  `∫1/(x²(x+1)) dx` and `∫1/(x(1+x²)²) dx`, which previously returned an
+  unevaluated integral.
+
+- **Nested powers serialize to LaTeX and round-trip correctly.** A `Power`
+  whose base is itself a `Power` — i.e. `(aᵇ)ᶜ` — was serialized as `a^{bᶜ}`,
+  which re-parses as `a^(bᶜ)`, a different expression. It now serializes as
+  `{aᵇ}^ᶜ`, so e.g. `(x³)^{2/5}` round-trips instead of becoming `x^{3^{2/5}}`.
+
 ## 0.59.0 _2026-06-10_
 
 This is a significant update to the Compute Engine.
@@ -53,7 +410,7 @@ This release includes some breaking changes.
 ### Features
 
 - **Curated mathematical identities**: the new opt-in `loadIdentities()` API
-  loads 558 guarded simplification rules and special values derived from
+  loads over 1,300 guarded simplification rules and special values derived from
   [Fungrim](https://fungrim.org). Identities can be selected by topic, class, or
   purpose, and rules apply only when their side conditions can be proven.
 
@@ -2007,7 +2364,7 @@ ce.simplificationRules.push({
   suffixes for internal vec2f-parameter implementations (e.g., `ia_add_v`),
   while the public API (`ia_add`, `ia_sin`, etc.) takes `IntervalResult` values.
 
-### Bug Fixes
+### Resolved Issues
 
 - **`Sequence` type inference now returns a proper tuple type**: Multi-argument
   `Sequence` expressions previously returned `'any'` as their inferred type,
@@ -2101,7 +2458,7 @@ ce.simplificationRules.push({
 
 ## 0.35.6 _2026-02-07_
 
-### Bug Fixes
+### Resolved Issues
 
 - **Monte Carlo improper integrals**: Fixed two bugs in `monteCarloEstimate()`
   that produced incorrect results (typically `NaN` or `Infinity`) for improper
@@ -2134,7 +2491,7 @@ ce.simplificationRules.push({
 
 ## 0.35.5 _2026-02-06_
 
-### Bug Fixes
+### Resolved Issues
 
 - **Compilation Target Function Name Mismatches**: Fixed several function keys
   in compilation targets that did not match their canonical library operator
@@ -2192,7 +2549,7 @@ ce.simplificationRules.push({
 
 ## 0.35.2 _2026-02-05_
 
-### Bug Fixes
+### Resolved Issues
 
 - **Decimal Number Representation**: Numbers written with a decimal point (e.g.,
   `6.02e23`) are now correctly treated as approximate decimal values
@@ -2236,7 +2593,7 @@ ce.simplificationRules.push({
 
 ## 0.35.1 _2026-02-03_
 
-### Bug Fixes
+### Resolved Issues
 
 - **Interval Arithmetic (JS/GLSL)**: Fixed interval evaluation of compound
   arguments (e.g. `sin(2x)`, `sin(x+x)`, `sin(x^2)`, `cos(2x)`) by propagating
@@ -3294,7 +3651,7 @@ ce.simplificationRules.push({
 
 ## 0.33.0 _2026-01-30_
 
-### Bug Fixes
+### Resolved Issues
 
 #### Arithmetic and Infinity
 
@@ -3733,7 +4090,7 @@ ce.simplificationRules.push({
   - Example: Matching `a + b + c + 1` against `x + y + z` now rejects
     immediately (arity mismatch: 4 vs 3) instead of trying 24 permutations
 
-### Bug Fixes
+### Resolved Issues
 
 #### Arithmetic
 
@@ -3856,7 +4213,7 @@ ce.simplificationRules.push({
 
 ## 0.32.0 _2026-01-28_
 
-### Bug Fixes
+### Resolved Issues
 
 #### Calculus
 
@@ -4236,7 +4593,7 @@ ce.simplificationRules.push({
   areas on a hyperbola, not arc lengths. Both LaTeX spellings (`\arsinh` and
   `\arcsinh`) are accepted as input (Postel's law).
 
-### Bug Fixes
+### Resolved Issues
 
 #### LaTeX Parsing
 

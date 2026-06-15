@@ -88,15 +88,99 @@ into the expression by substituting the wildcards.
 **To check if an expression matches a pattern**, use the
 `_expression_.match(_pattern_)` method.
 
-If there is no match, the method returns `null`. 
+If there is no match, the method returns `null`.
 
-If there is a match, a `Substitution` object literal with 
+If there is a match, a `Substitution` object literal with
 keys corresponding to the matching named wildcards is returned.
 
 If no named wildcards are used and there is a match, an empty object literal
 is returned.
 
-For convenience, the _pattern_ argument can be an unboxed MathJSON expression.
+
+### Pattern Formats
+
+The `pattern` argument can be provided in three formats:
+
+**String (LaTeX)** — Single-character symbols are automatically treated as
+wildcards. Results use clean unprefixed keys. `useVariations` and
+`matchMissingTerms` default to `true`.
+
+```live example
+const expr = ce.parse('3x^2+2x+5');
+console.log(expr.match('ax^2+bx+c'));
+// ➔ { a: 3, b: 2, c: 5 }
+```
+
+**MathJSON array** — Passed directly, boxed automatically. Use `_`-prefixed
+wildcard names explicitly.
+
+```live example
+const expr = ce.parse('3x^2+2x+5');
+console.log(expr.match(["Add", ["Multiply", "_a", ["Power", "x", 2]],
+  ["Multiply", "_b", "x"], "_c"]));
+// ➔ { _a: 3, _b: 2, _c: 5 }
+```
+
+**BoxedExpression** — Used directly.
+
+```live example
+const expr = ce.parse('3x^2+2x+5');
+const pattern = ce.box(["Add", ["Multiply", "_a", ["Power", "x", 2]],
+  ["Multiply", "_b", "x"], "_c"]);
+console.log(expr.match(pattern));
+// ➔ { _a: 3, _b: 2, _c: 5 }
+```
+
+
+### String Patterns
+
+When a string pattern is used, several conveniences are applied:
+
+- **Auto-wildcarding**: All single-character symbols become wildcards. In the
+  pattern `'ax^2+bx+c'`, `a`, `b`, `c`, and `x` all become wildcards. Multi-
+  character symbols (like `pi`) remain literal.
+
+- **Clean results**: Only unprefixed keys are returned (`{a: 3}` not
+  `{_a: 3}`), and self-matches are filtered out (e.g. wildcard `x` capturing
+  symbol `x` is omitted).
+
+- **Flexible defaults**: `useVariations` and `matchMissingTerms` default to
+  `true`, enabling matching of structurally equivalent variants and expressions
+  with missing terms.
+
+- **Unprefixed substitution keys**: The `substitution` option accepts
+  unprefixed keys:
+
+```live example
+const expr = ce.parse('3y^2+5');
+console.log(expr.match('ax^2+bx+c', { substitution: { x: ce.box('y') } }));
+// ➔ { a: 3, b: 0, c: 5 }
+```
+
+
+### Matching Missing Terms
+
+When `matchMissingTerms` is enabled (default for string patterns), expressions
+with fewer operands than the pattern can still match. Missing terms in an
+`Add` are treated as `0`, and missing factors in a `Multiply` are treated
+as `1`.
+
+```live example
+// 3x^2+5 has no bx term, but still matches with b=0
+const expr = ce.parse('3x^2+5');
+console.log(expr.match('ax^2+bx+c'));
+// ➔ { a: 3, b: 0, c: 5 }
+
+// Works with MathJSON patterns too (opt in explicitly)
+console.log(expr.match(
+  ["Add", ["Multiply", "_a", ["Power", "x", 2]], ["Multiply", "_b", "x"], "_c"],
+  { matchMissingTerms: true }
+));
+// ➔ { _a: 3, _b: 0, _c: 5 }
+```
+
+For MathJSON and BoxedExpression patterns, set `matchMissingTerms: true`
+explicitly to enable this behavior.
 
 
 ### Commutativity
@@ -221,11 +305,20 @@ console.log(pattern.subs(subs));
 
 ## Applying Rewrite Rules
 
-A rewrite rule is an object with three properties:
+A rewrite rule is an object with these properties:
 
 - `match`: a matching pattern
 - `replace`: a substitution pattern
 - `condition`: an optional condition predicate
+- `useVariations`: an optional boolean (default `false`); when `true` the rule
+  may match equivalent variants, e.g. matching `x` against `a + x`
+- `operators`: an optional dispatch hint — a list of operators this rule can
+  apply to. It does not change the rule's semantics (the rule is simply never
+  tried against expressions with a different operator), but it lets the engine
+  index large rule sets efficiently
+- `purpose`: optional, see [**Rule Purpose**](#rule-purpose) below
+- `id`: an optional identifier, surfaced in the `because` field of simplify
+  steps for debugging
 
 **To apply a set of rules to an expression**, call the `expr.replace()`
 function.
@@ -250,6 +343,26 @@ until no rules are applicable.
 
 If `expr` is not canonical, the result of the replace operation is not
 canonical either.
+
+### Rule Purpose
+
+The optional `purpose` property controls how `simplify()` treats a rule. It
+does not affect `replace()`, which always applies every rule.
+
+<div className="symbols-table">
+
+| `purpose`     |                                                                                                                   |
+| :------------ | :---------------------------------------------------------------------------------------------------------------- |
+| `'simplify'`  | **(default)** Subject to the cost gate: the rewrite is kept only if the result is "simpler" (lower cost).         |
+| `'transform'` | A mathematically-preferred rewrite that is **exempt** from the cost gate — applied even if it does not lower cost. |
+| `'expand'`    | Grows the expression by design (e.g. expanding a definition). **Excluded** from `simplify()`'s scan, but still reachable through `expr.replace()`. |
+
+</div>
+
+So a rule tagged `'expand'` will fire with `expr.replace(rules)` but will be
+ignored by `expr.simplify()` — which is how a rewrite like
+`Γ(z+1) → z·Γ(z)` (useful on demand, but not a simplification) is kept out of
+the automatic simplifier.
 
 ### Simplifying an Expression
 
@@ -276,3 +389,42 @@ console.log(expr.replace([
 console.log(expr.subs({"a": 2, "b": 3}));
 // ➔ 2x + 3
 ```
+
+## Extending `solve()`
+
+`expr.solve()` finds the roots of an equation using two extensible rule sets on
+the engine, both of which follow the same push/replace pattern as
+`ce.simplificationRules`:
+
+- `ce.solveRules` — **root templates**. Each matches an equation normalized to
+  `expression = 0` and produces a root. By convention the unknown is the
+  wildcard `_x`, and a condition ensures the other wildcards do not themselves
+  capture the unknown.
+- `ce.harmonizationRules` — rewrites that transform an equation into an
+  equivalent, easier-to-solve form *before* root-finding (for example
+  `ln(f(x)) = 0 → f(x) − 1 = 0`).
+
+```live example
+const ce = new ComputeEngine();
+
+// sinh(x) + b = 0  →  x = arsinh(−b)
+ce.solveRules.push({
+  match: ["Add", ["Sinh", "_x"], "__b"],
+  replace: ["Arsinh", ["Negate", "__b"]],
+  condition: (sub) => !sub.__b.has("_x"),
+});
+
+console.log(ce.parse("\\sinh(x) - 3 = 0").solve("x"));
+// ➔ [Arsinh(3)]
+```
+
+Pushed root templates are **safe**: `solve()` validates every candidate root
+against the original equation (`validateRoots`), so an over-broad or incorrect
+template contributes no roots — it degrades to a no-op rather than returning a
+wrong answer.
+
+The Fungrim-derived
+[identities library](/compute-engine/guides/identities/) ships a curated
+set of these templates (LambertW, inverse trigonometric and exponential
+forms); load them with `loadIdentities(ce, { solve: true })` to solve, e.g.,
+`x·eˣ = 3 → W(3)`.

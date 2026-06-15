@@ -366,6 +366,12 @@ The `\iint` command is used to typeset the double integral symbol.
 
 **To calculate a numerical approximation of the integral of a function**, use the `NIntegrate` function.
 
+<ReadMore path="/compute-engine/guides/integration-rules/" >
+The optional **Integration Rules** library extends `Integrate` with a large
+rule set (ported from Rubi) for harder algebraic integrands. Read more about
+**Extended Symbolic Integration** <Icon name="chevron-right-bold" />
+</ReadMore>
+
 
 <b>Reference</b>
 - Wikipedia: [Integral](https://en.wikipedia.org/wiki/Integral), [Antiderivative](https://en.wikipedia.org/wiki/Antiderivative), [Integral Symbol](https://en.wikipedia.org/wiki/Integral_symbol)

@@ -232,7 +232,46 @@ ce.assume(ce.parse("x > 0"));
 ce.assume(ce.parse("0 < x"));
 ```
 
+### Constraints on Parts of a Value
 
+An inequality can constrain the **real part**, **imaginary part**, **magnitude**
+or **argument** of a symbol, rather than the symbol itself. This is useful for
+complex-valued symbols, where a bare inequality (which assumes both sides are
+real) does not apply.
+
+```js example
+ce.assume(ce.parse("\\Re(s) > 1"));    // real part of s
+ce.assume(ce.parse("\\Im(\\tau) > 0")); // imaginary part of τ (upper half-plane)
+ce.assume(["Less", ["Abs", "q"], 1]);   // |q| < 1 (inside the unit disk)
+```
+
+These part-constraints are honored when discharging conditions during
+simplification and rule application: a rule guarded by `Re(s) > 1` will fire
+for a symbol assumed to satisfy it, and will **not** fire (fail-closed) when
+the constraint is unknown.
+
+### Conjunctions
+
+Use `And` to make several assumptions about a symbol in a single call. (Unlike
+separate `ce.assume()` calls, the parts are added together rather than each
+replacing the previous.)
+
+```js example
+ce.assume(["And", ["Greater", "x", 0], ["Less", "x", 1]]); // 0 < x < 1
+```
+
+### Excluding Values from a Domain
+
+`Element` and `NotElement` describe the domain of a symbol. Combine `Element`
+with `SetMinus` to assume a symbol belongs to a set with specific values
+removed — for example, a nonzero complex number:
+
+```js example
+ce.assume(["Element", "z", ["SetMinus", "ComplexNumbers", ["Set", 0]]]);
+
+// Equivalent, for excluding a single value:
+ce.assume(["NotElement", "z", ["Set", 0]]);
+```
 
 
 

@@ -907,6 +907,21 @@ ce.box(['At', M, -1, -1]).evaluate();
 // → 6 (last row, last column)
 ```
 
+As a collection, a matrix is a collection of its **rows**: `At` with a
+single index returns a row, and collection operations such as `Count`,
+`First`, `Take` and `Drop` operate row by row.
+
+```js example
+ce.box(['At', M, 2]).evaluate();
+// → [4, 5, 6] (second row)
+
+ce.box(['Count', M]).evaluate();
+// → 2 (number of rows)
+```
+
+To operate on the scalar entries instead, flatten the matrix first:
+`['Count', ['Flatten', M]]` is 6.
+
 ## Practical Examples
 
 ### Creating Special Matrices
