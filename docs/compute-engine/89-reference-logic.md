@@ -107,22 +107,22 @@ are applied automatically:
 | **Double Negation** | $\lnot\lnot A \to A$ | `Not(Not(A))` → `A` |
 
 ```javascript
-ce.box(['And', 'A', ['Or', 'A', 'B']]).simplify()
+ce.expr(['And', 'A', ['Or', 'A', 'B']]).simplify()
 // → A (absorption)
 
-ce.box(['Or', 'A', ['And', 'A', 'B']]).simplify()
+ce.expr(['Or', 'A', ['And', 'A', 'B']]).simplify()
 // → A (absorption)
 
-ce.box(['And', 'A', 'A', 'B']).simplify()
+ce.expr(['And', 'A', 'A', 'B']).simplify()
 // → A ∧ B (idempotence)
 
-ce.box(['And', 'A', ['Not', 'A']]).simplify()
+ce.expr(['And', 'A', ['Not', 'A']]).simplify()
 // → False (complementation)
 
-ce.box(['Or', 'A', ['Not', 'A']]).simplify()
+ce.expr(['Or', 'A', ['Not', 'A']]).simplify()
 // → True (complementation)
 
-ce.box(['Not', ['Not', 'A']]).simplify()
+ce.expr(['Not', ['Not', 'A']]).simplify()
 // → A (double negation)
 ```
 
@@ -261,7 +261,7 @@ particularly with quantifiers.
 When serialized to LaTeX, predicates render as standard function notation:
 
 ```javascript
-ce.box(['Predicate', 'P', 'x']).latex   // → "P(x)"
+ce.expr(['Predicate', 'P', 'x']).latex   // → "P(x)"
 ```
 
 **Note:** The notations `D(f, x)` and `N(x)` in LaTeX are **not** interpreted as
@@ -345,15 +345,15 @@ Domains are limited to 1000 elements maximum.
 
 ```javascript
 // All elements in {1, 2, 3} are greater than 0
-ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 0]]).evaluate()
+ce.expr(['ForAll', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 0]]).evaluate()
 // → True
 
 // Some element in {1, 2, 3} is greater than 2
-ce.box(['Exists', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 2]]).evaluate()
+ce.expr(['Exists', ['Element', 'x', ['Set', 1, 2, 3]], ['Greater', 'x', 2]]).evaluate()
 // → True (x = 3 satisfies the condition)
 
 // Exactly one element equals 2
-ce.box(['ExistsUnique', ['Element', 'x', ['Set', 1, 2, 3]], ['Equal', 'x', 2]]).evaluate()
+ce.expr(['ExistsUnique', ['Element', 'x', ['Set', 1, 2, 3]], ['Equal', 'x', 2]]).evaluate()
 // → True
 ```
 
@@ -361,13 +361,13 @@ ce.box(['ExistsUnique', ['Element', 'x', ['Set', 1, 2, 3]], ['Equal', 'x', 2]]).
 
 ```javascript
 // For all (x, y) in {1, 2} × {1, 2}: x + y > 0
-ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2]],
+ce.expr(['ForAll', ['Element', 'x', ['Set', 1, 2]],
   ['ForAll', ['Element', 'y', ['Set', 1, 2]],
     ['Greater', ['Add', 'x', 'y'], 0]]]).evaluate()
 // → True
 
 // Some (x, y) in {1, 2} × {1, 2} satisfies x + y = 4
-ce.box(['Exists', ['Element', 'x', ['Set', 1, 2]],
+ce.expr(['Exists', ['Element', 'x', ['Set', 1, 2]],
   ['Exists', ['Element', 'y', ['Set', 1, 2]],
     ['Equal', ['Add', 'x', 'y'], 4]]]).evaluate()
 // → True (x = 2, y = 2)
@@ -402,13 +402,13 @@ The conversion applies:
 - Equivalence elimination: $A \leftrightarrow B \equiv (\lnot A \lor B) \land (\lnot B \lor A)$
 
 ```javascript
-ce.box(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate()
+ce.expr(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate()
 // → (A ∨ C) ∧ (B ∨ C)
 
-ce.box(['ToCNF', ['Implies', 'A', 'B']]).evaluate()
+ce.expr(['ToCNF', ['Implies', 'A', 'B']]).evaluate()
 // → ¬A ∨ B
 
-ce.box(['ToCNF', ['Not', ['And', 'A', 'B']]]).evaluate()
+ce.expr(['ToCNF', ['Not', ['And', 'A', 'B']]]).evaluate()
 // → ¬A ∨ ¬B  (De Morgan's law)
 ```
 
@@ -432,10 +432,10 @@ The conversion applies:
 - Implication and equivalence elimination (same as CNF)
 
 ```javascript
-ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
+ce.expr(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate()
 // → (A ∧ C) ∨ (B ∧ C)
 
-ce.box(['ToDNF', ['Not', ['Or', 'A', 'B']]]).evaluate()
+ce.expr(['ToDNF', ['Not', ['Or', 'A', 'B']]]).evaluate()
 // → ¬A ∧ ¬B  (De Morgan's law)
 ```
 
@@ -455,15 +455,15 @@ Returns `True` if the expression is satisfiable, `False` otherwise.
 
 ```javascript
 // A contradiction is not satisfiable
-ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate()
+ce.expr(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate()
 // → False
 
 // Most formulas are satisfiable
-ce.box(['IsSatisfiable', ['Or', 'A', 'B']]).evaluate()
+ce.expr(['IsSatisfiable', ['Or', 'A', 'B']]).evaluate()
 // → True
 
 // A tautology is also satisfiable
-ce.box(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate()
+ce.expr(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate()
 // → True
 ```
 
@@ -483,22 +483,22 @@ Returns `True` if the expression is a tautology, `False` otherwise.
 
 ```javascript
 // Law of excluded middle
-ce.box(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate()
+ce.expr(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate()
 // → True
 
 // Double negation elimination
-ce.box(['IsTautology', ['Equivalent', ['Not', ['Not', 'A']], 'A']]).evaluate()
+ce.expr(['IsTautology', ['Equivalent', ['Not', ['Not', 'A']], 'A']]).evaluate()
 // → True
 
 // De Morgan's law
-ce.box(['IsTautology', ['Equivalent',
+ce.expr(['IsTautology', ['Equivalent',
   ['Not', ['And', 'A', 'B']],
   ['Or', ['Not', 'A'], ['Not', 'B']]
 ]]).evaluate()
 // → True
 
 // A simple variable is not a tautology
-ce.box(['IsTautology', 'A']).evaluate()
+ce.expr(['IsTautology', 'A']).evaluate()
 // → False
 ```
 
@@ -518,14 +518,14 @@ followed by "Result", and subsequent rows contain the truth values for each
 combination of inputs.
 
 ```javascript
-ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate()
+ce.expr(['TruthTable', ['And', 'A', 'B']]).evaluate()
 // → [["A", "B", "Result"],
 //    ["False", "False", "False"],
 //    ["False", "True", "False"],
 //    ["True", "False", "False"],
 //    ["True", "True", "True"]]
 
-ce.box(['TruthTable', ['Xor', 'P', 'Q']]).evaluate()
+ce.expr(['TruthTable', ['Xor', 'P', 'Q']]).evaluate()
 // → [["P", "Q", "Result"],
 //    ["False", "False", "False"],
 //    ["False", "True", "True"],
@@ -557,15 +557,15 @@ Returns a `List` of expressions, each representing a prime implicant.
 
 ```javascript
 // AB ∨ A¬B has one prime implicant: A
-ce.box(['PrimeImplicants', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate()
+ce.expr(['PrimeImplicants', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate()
 // → [A]
 
 // A ∨ B has two prime implicants
-ce.box(['PrimeImplicants', ['Or', 'A', 'B']]).evaluate()
+ce.expr(['PrimeImplicants', ['Or', 'A', 'B']]).evaluate()
 // → [A, B]
 
 // XOR has two prime implicants
-ce.box(['PrimeImplicants', ['Xor', 'A', 'B']]).evaluate()
+ce.expr(['PrimeImplicants', ['Xor', 'A', 'B']]).evaluate()
 // → [¬A ∧ B, A ∧ ¬B]
 ```
 
@@ -591,11 +591,11 @@ Returns a `List` of expressions, each representing a prime implicate.
 
 ```javascript
 // A ∧ B implies both A and B separately
-ce.box(['PrimeImplicates', ['And', 'A', 'B']]).evaluate()
+ce.expr(['PrimeImplicates', ['And', 'A', 'B']]).evaluate()
 // → [A, B]
 
 // A ∨ B has one prime implicate
-ce.box(['PrimeImplicates', ['Or', 'A', 'B']]).evaluate()
+ce.expr(['PrimeImplicates', ['Or', 'A', 'B']]).evaluate()
 // → [A ∨ B]
 ```
 
@@ -619,7 +619,7 @@ the result has the minimum number of product terms.
 
 ```javascript
 // AB ∨ A¬B ∨ ¬AB simplifies to A ∨ B
-ce.box(['MinimalDNF', ['Or',
+ce.expr(['MinimalDNF', ['Or',
   ['And', 'A', 'B'],
   ['And', 'A', ['Not', 'B']],
   ['And', ['Not', 'A'], 'B']
@@ -627,7 +627,7 @@ ce.box(['MinimalDNF', ['Or',
 // → A ∨ B (3 terms reduced to 2)
 
 // AB ∨ A¬B simplifies to A
-ce.box(['MinimalDNF', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate()
+ce.expr(['MinimalDNF', ['Or', ['And', 'A', 'B'], ['And', 'A', ['Not', 'B']]]]).evaluate()
 // → A (2 terms reduced to 1)
 ```
 
@@ -651,7 +651,7 @@ the result has the minimum number of clauses.
 
 ```javascript
 // (A ∨ B) ∧ (A ∨ ¬B) simplifies to A
-ce.box(['MinimalCNF', ['And', ['Or', 'A', 'B'], ['Or', 'A', ['Not', 'B']]]]).evaluate()
+ce.expr(['MinimalCNF', ['And', ['Or', 'A', 'B'], ['Or', 'A', ['Not', 'B']]]]).evaluate()
 // → A (2 clauses reduced to 1)
 ```
 

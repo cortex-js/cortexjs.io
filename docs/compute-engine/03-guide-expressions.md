@@ -42,10 +42,10 @@ console.log(expr.json);
 ```
 
 
-**To create an `Expression` object from a MathJSON expression** use the `ce.box()`
+**To create an `Expression` object from a MathJSON expression** use the `ce.expr()`
 method.
 
-The input of `ce.box()` can be:
+The input of `ce.expr()` can be:
 - a [MathJSON expression](/math-json/)
 - an `Expression` (in which case it is returned as-is)
 - an `ExpressionInput`, that is a MathJSON expression with some of its
@@ -54,18 +54,18 @@ The input of `ce.box()` can be:
 The result is an `Expression` object.
 
 ```js
-let expr = ce.box(1.729e3);
+let expr = ce.expr(1.729e3);
 console.log(expr.re);
 // ➔ 1729
 
 console.log(expr.isPositive);
 // ➔ true
 
-expr = ce.box({ num: "+Infinity" });
+expr = ce.expr({ num: "+Infinity" });
 console.log(expr.latex);
 // ➔ "\infty"
 
-expr = ce.box(["Add", 3, "x"]);
+expr = ce.expr(["Add", 3, "x"]);
 console.log(expr.operator);
 // ➔ "Add"
 ```
@@ -98,7 +98,7 @@ number** check that the GCD of the numerator and denominator is 1.
 
 ```js example
 const input = ce.parse("\\frac{30}{50}", {form: 'raw'});
-console.info(ce.box(
+console.info(ce.expr(
   ["GCD", ["NumeratorDenominator", input]]
 ).evaluate().valueOf() === 1);
 // ➔ false
@@ -118,13 +118,13 @@ console.log(expr.json);
 Read more about the **Canonical Form** <Icon name="chevron-right-bold" />
 </ReadMore>
 
-By default, `ce.box()` and `ce.parse()` produce a canonical expression.
+By default, `ce.expr()` and `ce.parse()` produce a canonical expression.
 
 **To get a non-canonical expression instead**, use
-`ce.box(expr, {form: 'raw'})` or `ce.parse(latex, {form: 'raw'})`.
+`ce.expr(expr, {form: 'raw'})` or `ce.parse(latex, {form: 'raw'})`.
 
 When using `ce.parse()`, the non-canonical form sticks closer to the original 
-LaTeX input. When using `ce.box()`, the non-canonical form matches the
+LaTeX input. When using `ce.expr()`, the non-canonical form matches the
 input MathJSON.
 
 ```js
@@ -136,7 +136,7 @@ ce.parse(latex);
 ce.parse(latex, { form: 'raw' });
 // non-canonical form ➔ ["Divide", 30, -50]
 
-ce.box(["Divide", 30, -50], { form: 'raw' });
+ce.expr(["Divide", 30, -50], { form: 'raw' });
 // non-canonical form ➔ ["Divide", 30, -50]
 ```
 
@@ -211,7 +211,7 @@ the `expr.json` property. This property is an "unboxed" version of the
 expression.
 
 ```js
-const expr = ce.box(["Add", 3, "x"]);
+const expr = ce.expr(["Add", 3, "x"]);
 console.log(expr.json);
 // ➔ ["Add", 3, "x"]
 ```
@@ -253,12 +253,12 @@ The functions that manipulate Expressions, such as `expr.simplify()`,
 However, the properties of the expression may change, since some of them may
 depend on contextual information which can change over time.
 
-For example, `ce.box('n').isPositive` may return `undefined` if nothing is known 
+For example, `ce.expr('n').isPositive` may return `undefined` if nothing is known 
 about the symbol `n`. But if an assumption about the symbol is made later, or a value
-assigned to it, then `ce.box('n').isPositive` may take a different value.
+assigned to it, then `ce.expr('n').isPositive` may take a different value.
 
 ```js
-const expr = ce.box("n");
+const expr = ce.expr("n");
 console.log(expr.isPositive);
 // ➔ undefined
 

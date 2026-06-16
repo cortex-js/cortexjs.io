@@ -172,7 +172,21 @@ The time limit applies to both the synchronous or asynchronous evaluation.
 The default time limit is 2,000ms (2 seconds).
 
 When an operation is canceled either because of a timeout or an abort, a
-`CancellationError` is thrown.
+`CancellationError` is thrown. The class can be imported from the package
+to distinguish cancellations from other errors:
+
+```js
+import { CancellationError } from "@cortex-js/compute-engine";
+```
+
+The time limit is respected by long-running operations including iteration
+over large or infinite collections, big operators (`Sum`, `Product`,
+`Reduce`), number-theoretic functions (`Factorial`, `Totient`, `Sigma0`…),
+and numeric limit extraction (`Limit`, `NLimit`).
+
+Numerical integration is an exception: rather than throwing, Monte Carlo
+integration (`NIntegrate`) returns the estimate computed from the samples
+taken so far, with a correspondingly larger error bound.
 
 
 
@@ -263,9 +277,9 @@ Additional scopes can be created using the `ce.pushScope()` method.
 ce.assign('x', 100); // "x" is defined in the current scope
 ce.pushScope();
 ce.assign('x', 500); // "x" is defined in the new scope
-console.log(ce.box('x')); // 500
+console.log(ce.expr('x')); // 500
 ce.popScope();
-console.log(ce.box('x')); // 100
+console.log(ce.expr('x')); // 100
 ```
 
 **To exit a scope** use `ce.popScope()`.
@@ -286,7 +300,7 @@ library and providing your own function definitions.
 :::
 
 Each symbol is **bound** to a definition within a **lexical scope** during 
-canonicalization. This usually happens when calling `ce.box()` or `ce.parse()`, 
+canonicalization. This usually happens when calling `ce.expr()` or `ce.parse()`, 
 or if accessing the `.canonical` property of a
 non-canonical expression.
 

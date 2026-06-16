@@ -64,11 +64,11 @@ If the expression is already canonical, `expr.canonical` immediately returns
 The return value of `expr.simplify()`, `expr.evaluate()` and `expr.N()` are 
 canonical expressions.
 
-The `ce.box()` and `ce.parse()` functions return a canonical expression by
+The `ce.expr()` and `ce.parse()` functions return a canonical expression by
 default, which is the desirable behavior in most cases.
 
 **To get a non-canonical version of an expression** use
-of `ce.parse(s, {form: 'raw'})` or `ce.box(expr, {form: 'raw'})`.
+of `ce.parse(s, {form: 'raw'})` or `ce.expr(expr, {form: 'raw'})`.
 
 You can further customize the canonical form of an expression by using the
 [`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
@@ -227,14 +227,14 @@ representation for a given application. For example, if you want to check
 the answers from a quiz, you may want to compare the user input with a
 canonical form that is closer to the user input.
 
-**To get the non-canonical form**, use `ce.box(expr, { form: 'raw' })` or
+**To get the non-canonical form**, use `ce.expr(expr, { form: 'raw' })` or
 `ce.parse(s, { form: 'raw' })`.
 
 ```live
 console.log(ce.parse("2(0+x\\times x-1)", {form: 'raw'}).json);
 ```
 
-**To get the full canonical form**, use `ce.box(expr, { form: 'canonical' })` or
+**To get the full canonical form**, use `ce.expr(expr, { form: 'canonical' })` or
 `ce.parse(s, { form: 'canonical' })`. The `form` option can be omitted
 as it defaults to `'canonical'`.
 
@@ -246,12 +246,12 @@ console.log(ce.parse("2(0+x\\times x-1)").json);
 
 **To get a custom canonical form of an expression**, use the
 [`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
-or specify the form you want to use with the `form` option of `ce.box()`
+or specify the form you want to use with the `form` option of `ce.expr()`
 and `ce.parse()`.
 
 
 
-**To order the arguments in a canonical order**, use `ce.box(expr, { form: "Order" })` or `ce.parse(s, { form: "Order" })`.
+**To order the arguments in a canonical order**, use `ce.expr(expr, { form: "Order" })` or `ce.parse(s, { form: "Order" })`.
 
 ```live
 console.log(ce.parse("0+1+x+2+\\sqrt{5}", 

@@ -50,7 +50,7 @@ Alternatively, to declare the type of a symbol you can evaluate a
 `["Declare"]` expression
 
 ```js
-ce.box(["Declare", "n", "'integer'"]).evaluate();
+ce.expr(["Declare", "n", "'integer'"]).evaluate();
 ce.parse("n").type;
 // ➔ "integer"
 ```
@@ -727,22 +727,22 @@ The properties `expr.isNumber`, `expr.isInteger`, `expr.isRational` and
 types  `"number"`, `"integer"`, `"rational"` and `"real"` respectively.
 
 ```js
-console.info(ce.box(3.14).type);
+console.info(ce.expr(3.14).type);
 // ➔ "finite_real"
 
-console.info(ce.box(3.14).type.matches("finite_real")) 
+console.info(ce.expr(3.14).type.matches("finite_real")) 
 // ➔ true
 
-console.info(ce.box(3.14).type.matches("real")) 
+console.info(ce.expr(3.14).type.matches("real")) 
 // ➔ true
 
-console.info(ce.box(3.14).isReal) 
+console.info(ce.expr(3.14).isReal) 
 // ➔ true
 
-console.info(ce.box(3.14).type.matches("integer")) 
+console.info(ce.expr(3.14).type.matches("integer")) 
 // ➔ false
 
-console.info(ce.box(3.14).isInteger) 
+console.info(ce.expr(3.14).isInteger) 
 // ➔ false
 
 ```
@@ -786,7 +786,7 @@ Examples:
 
 ```js
 ce.assign("n", 34);
-ce.box("n").type;
+ce.expr("n").type;
 // ➔ "integer"
 ```
 
@@ -796,8 +796,8 @@ arguments is used to infer the type of the symbol.
 ```js
 ce.declare("n", "unknown");
 ce.declare("f", "(number) -> number");
-ce.box(["f", "n"]);
-ce.box("n").type;
+ce.expr(["f", "n"]);
+ce.expr("n").type;
 // ➔ "number"
 ```
 
@@ -809,8 +809,8 @@ Continuing the example above:
 
 ```js
 ce.declare("g", "(integer) -> number");
-ce.box(["g", "n"]);
-ce.box("n").type;
+ce.expr(["g", "n"]);
+ce.expr("n").type;
 // ➔ "integer": "n" has been narrowed 
 //    from "number" to "integer"
 ```

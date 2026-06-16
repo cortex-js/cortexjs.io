@@ -91,8 +91,8 @@ ce.parse('(1,2,3) + (3,5,6)').evaluate()
 Matrices are added element-wise. Both matrices must have the same dimensions.
 
 ```typescript example
-const m1 = ce.box(['List', ['List', 1, 2], ['List', 3, 4]]);
-const m2 = ce.box(['List', ['List', 5, 6], ['List', 7, 8]]);
+const m1 = ce.expr(['List', ['List', 1, 2], ['List', 3, 4]]);
+const m2 = ce.expr(['List', ['List', 5, 6], ['List', 7, 8]]);
 m1.add(m2).evaluate()
 // ➔ [[6,8],[10,12]]
 ```
@@ -145,8 +145,8 @@ ce.parse('2(1,2,3)').evaluate()
 ```
 
 ```typescript example
-const m1 = ce.box(['List', ['List', 1, 2], ['List', 3, 4]]);
-const m2 = ce.box(['List', ['List', 5, 6], ['List', 7, 8]]);
+const m1 = ce.expr(['List', ['List', 1, 2], ['List', 3, 4]]);
+const m2 = ce.expr(['List', ['List', 5, 6], ['List', 7, 8]]);
 ce.function('MatrixMultiply', [m1, m2]).evaluate()
 // ➔ [[19,22],[43,50]]
 ```

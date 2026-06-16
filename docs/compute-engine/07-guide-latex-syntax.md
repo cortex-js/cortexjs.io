@@ -12,18 +12,34 @@ string (**serializing**)
 </Intro>
 
 :::info[Note]
-In this documentation, functions such as `ce.box()` and `ce.parse()` require a
+In this documentation, functions such as `ce.expr()` and `ce.parse()` require a
 `ComputeEngine` instance which is denoted by a `ce.` prefix.<br/>Functions that
-apply to a expression, such as `expr.simplify()` are denoted with a
+apply to an expression, such as `expr.simplify()` are denoted with an
 `expr.` prefix.
 :::
 
 **To create a new instance of the Compute Engine**, use the
-`new ComputeEngine()` constructor.
+`new ComputeEngine()` constructor. When using the full package, LaTeX support
+is included automatically.
 
 ```javascript
+import { ComputeEngine } from '@cortex-js/compute-engine';
 const ce = new ComputeEngine();
 ```
+
+If you are using only the `core` sub-path, inject a `LatexSyntax` instance to
+enable LaTeX parsing and serialization:
+
+```javascript
+import { ComputeEngine } from '@cortex-js/compute-engine/core';
+import { LatexSyntax } from '@cortex-js/compute-engine/latex-syntax';
+
+const ce = new ComputeEngine({ latexSyntax: new LatexSyntax() });
+```
+
+Without a `LatexSyntax`, calling `ce.parse()`, `.latex`, or `.toLatex()` will
+throw an error. MathJSON operations (`ce.expr()`, `.json`, `.evaluate()`, etc.)
+work without it.
 
 <hr/>
 
@@ -114,7 +130,7 @@ Read more about the **errors** that can be returned. <Icon name="chevron-right-b
 property.
 
 ```javascript
-console.log(ce.box(["Add", ["Power", "x", 3], 2]).latex);
+console.log(ce.expr(["Add", ["Power", "x", 3], 2]).latex);
 // ➔  "x^3 + 2"
 ```
 
@@ -168,6 +184,169 @@ console.log(ce.parse("x \\coloneq 3;\\; x^2 + 1").json);
 
 <ReadMore path="/compute-engine/reference/control-structures/" >
 Read more about the **control structure** operators.
+</ReadMore>
+
+## Alternate Syntax
+
+The parser accepts several alternate forms in addition to the preferred LaTeX
+constructs documented above. They cover dot-style component access,
+restriction predicates, list-range ellipsis, and trailing for-comprehensions.
+
+Each alternate form lowers to an existing AST head — the parser absorbs the
+syntactic variation; downstream evaluation, simplification, and compilation
+operate on a single shape.
+
+### Component Access
+
+Use `.` to extract a component of a tuple, a member of a list, or a property
+of a complex number. The accepted member names map to existing semantic
+heads at parse time (no generic accessor head is introduced).
+
+```live
+console.log(ce.parse("p.x").json);
+// ➔ ["First", "p"]
+
+console.log(ce.parse("L.\\operatorname{count}").json);
+// ➔ ["Length", "L"]
+
+console.log(ce.parse("z.\\operatorname{re}").json);
+// ➔ ["Real", "z"]
+```
+
+Recognized members: `x`, `y`, `z` (→ `First`, `Second`, `Third`); `real`,
+`re` (→ `Real`); `imag`, `im` (→ `Imaginary`); `count` (→ `Length`);
+`total` (→ `Sum`); `max` (→ `Max`); `min` (→ `Min`).
+
+Two surface forms are accepted: bare-letter (`p.x`) and operator-name
+(`L.\operatorname{count}` or `L.\max`). `\mathrm{...}` is not accepted as
+a member name.
+
+Component access composes with chained access, function calls, and other
+postfix operators:
+
+```live
+console.log(ce.parse("p.x.\\operatorname{real}").json);
+// ➔ ["Real", ["First", "p"]]
+```
+
+**Disambiguation from decimal points.** After an integer or a complete
+decimal, a `.` followed by a letter or `\operatorname{...}` is component
+access, not a decimal continuation:
+
+```live
+console.log(ce.parse("1.x").json);
+// ➔ ["First", 1]
+
+console.log(ce.parse("1.5.x").json);
+// ➔ ["First", 1.5]
+```
+
+`First(1)` is a legal AST shape — evaluation produces an `Error` expression
+since `1` is not a collection.
+
+#### Round-tripping with `dotNotation`
+
+By default the serializer emits the standard function-call form
+(`\operatorname{First}(p)`). To preserve the dot-notation form in output —
+useful when the source was authored with dot notation — enable the `dotNotation`
+serialization option:
+
+```ts
+const ce = new ComputeEngine();
+ce.latexOptions = { dotNotation: true };
+
+ce.parse('p.x').toLatex();           // ➔ "p.x"
+ce.parse('L.\\operatorname{count}').toLatex(); // ➔ "L.\\operatorname{count}"
+```
+
+Per-call override is also supported:
+
+```ts
+ce.expr(['First', 'p']).toLatex({ dotNotation: true }); // ➔ "p.x"
+```
+
+Multi-operand forms (e.g. `Sum` with an index range) are never emitted as dot
+notation — only arity-1 forms are affected.
+
+### Restriction Braces
+
+Trailing `\{cond\}` after an expression masks the value by a predicate. This
+parses to the `["When", expr, cond]` head:
+
+```live
+console.log(ce.parse("f(x)\\left\\{0 < x < 2\\right\\}").json);
+// ➔ ["When", ["f", "x"], ["Less", 0, "x", 2]]
+```
+
+When `cond` evaluates to `True`, the expression evaluates to its left
+operand; when `False`, to `Undefined`. Indeterminate predicates hold.
+
+Stacked restrictions chain and canonicalize to a single `When` with an
+`And` predicate:
+
+```live
+console.log(ce.parse("x\\left\\{x>0\\right\\}\\left\\{x<10\\right\\}").json);
+// ➔ ["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]
+```
+
+Standalone `\{1, 2, 3\}` (no preceding expression) continues to parse as a
+`Set` literal — the disambiguation is positional.
+
+### List Ranges
+
+Inside list literals, an ellipsis (`...`, `\ldots`, or `\dots`) produces
+a `Range`:
+
+```live
+console.log(ce.parse("\\left[1...9\\right]").json);
+// ➔ ["Range", 1, 9]
+
+console.log(ce.parse("\\left[1, 3, \\ldots, 9\\right]").json);
+// ➔ ["Range", 1, 9, 2]   (step inferred from 3 - 1 = 2)
+
+console.log(ce.parse("\\left[0, 0.1, 0.2, \\ldots, 1\\right]").json);
+// ➔ ["Range", 0, 1, 0.1]   (float step, tolerance-validated)
+```
+
+Intermediate samples are validated against the inferred step within
+`ce.tolerance` — `0.1 + 0.1 ≠ 0.2` exactly but is accepted within tolerance.
+Inconsistent samples produce a parse error.
+
+Outside list literals, the ellipsis tokens continue to parse as the
+`ContinuationPlaceholder` symbol.
+
+### For-Comprehensions
+
+A trailing `\operatorname{for}` clause produces a list comprehension —
+the variadic form of `Loop`:
+
+```live
+console.log(
+  ce.parse("(x, y) \\operatorname{for} x = \\left[1...2\\right], y = \\left[1...2\\right]").json
+);
+// ➔ ["Loop",
+//      ["Tuple", "x", "y"],
+//      ["Element", "x", ["Range", 1, 2]],
+//      ["Element", "y", ["Range", 1, 2]]]
+```
+
+Multiple bindings iterate as nested loops. Later bindings see earlier ones
+in scope, so a clause's collection can depend on a name bound by an earlier
+clause:
+
+```live
+console.log(
+  ce.parse("(x, y) \\operatorname{for} x = \\left[1...3\\right], y = \\left[1...x\\right]").json
+);
+// Evaluating this Loop produces 6 tuples: (1,1), (2,1), (2,2), (3,1), (3,2), (3,3)
+```
+
+`\operatorname{for}` binds looser than `,` and `=`, so the body expression
+is parsed before the keyword fires. Bound names do not leak into the
+enclosing scope.
+
+<ReadMore path="/compute-engine/reference/control-structures/" >
+Read more about the `Loop` and `When` operators in the **control structures** reference.
 </ReadMore>
 
 ## Customizing Parsing
@@ -309,14 +488,14 @@ console.log(ce.parse("\\pi").N().toLatex({
 
 
 ```live
-console.log(ce.box(700).toLatex({
+console.log(ce.expr(700).toLatex({
   notation: "scientific",
   avoidExponentsInRange: null,
   exponentProduct: "\\times"
 }));
 // ➔ "7\times10^{2}"
 
-console.log(ce.box(123456.789).toLatex({
+console.log(ce.expr(123456.789).toLatex({
   notation: "scientific",
   avoidExponentsInRange: null,
   exponentProduct: "\\times",
@@ -335,7 +514,7 @@ By default, the ComputeEngine is configured to use a dot, i.e. $ 3.1415 $.
 **To use a comma as a decimal marker**, set the `decimalSeparator` option:
 
 ```live
-console.log(ce.box(3.141).toLatex({ 
+console.log(ce.expr(3.141).toLatex({ 
     decimalSeparator: "{,}"
 }));
 ```
@@ -563,29 +742,33 @@ reference MathJSON symbols. MathJSON symbols are usually capitalized,
 such as `Divide` or `PlusMinus` and are not prefixed with a backslash.
 
 
-**To extend the LaTeX syntax** update the `latexDictionary` property of the
-Compute Engine.
+**To extend the LaTeX syntax**, create a `LatexSyntax` instance with a custom
+dictionary and pass it to the `ComputeEngine` constructor.
 
 The simplest way to add a custom LaTeX command for a function is to provide
 a declarative entry with `name`, `kind`, and a trigger. No custom `parse`
 handler is needed:
 
 ```js
-ce.latexDictionary = [
-  ...ce.latexDictionary,
-  {
-    name: "triple",
-    kind: "function",
-    latexTrigger: "\\triple",
-    // "implicit" so that \triple{x}, \triple(x), and \triple x all work
-    arguments: "implicit",
-    serialize: "\\triple",
-  },
-];
+import { ComputeEngine } from '@cortex-js/compute-engine';
+import { LatexSyntax, LATEX_DICTIONARY } from '@cortex-js/compute-engine/latex-syntax';
 
-// NOTE: we use `ce.parse()` in order to use the Compute Engine instance with
-// the custom definitions, not the shared Compute Engine instance that the 
-// free `parse()` function uses.
+const syntax = new LatexSyntax({
+  dictionary: [
+    ...LATEX_DICTIONARY,
+    {
+      name: "triple",
+      kind: "function",
+      latexTrigger: "\\triple",
+      // "implicit" so that \triple{x}, \triple(x), and \triple x all work
+      arguments: "implicit",
+      serialize: "\\triple",
+    },
+  ],
+});
+
+const ce = new ComputeEngine({ latexSyntax: syntax });
+
 ce.parse("\\triple{5}").json;
 // ➔ ["triple", 5]
 ```
@@ -608,14 +791,17 @@ For **multi-character names** that don't need their own LaTeX command, use
 `\operatorname{name}` and `\mathrm{name}` automatically:
 
 ```js
-ce.latexDictionary = [
-  ...ce.latexDictionary,
-  {
-    kind: "function",
-    symbolTrigger: "double",
-    parse: "double",
-  },
-];
+const syntax = new LatexSyntax({
+  dictionary: [
+    ...LATEX_DICTIONARY,
+    {
+      kind: "function",
+      symbolTrigger: "double",
+      parse: "double",
+    },
+  ],
+});
+const ce = new ComputeEngine({ latexSyntax: syntax });
 
 ce.parse("\\operatorname{double}(5)").json;
 // ➔ ["double", 5]
@@ -625,26 +811,29 @@ For more complex parsing — for example when a command takes multiple
 LaTeX group arguments — use a custom `parse` handler:
 
 ```live
-ce.latexDictionary = [
-  // Include all the entries from the default dictionary...
-  ...ce.latexDictionary,
-  // ...and add the `\smoll{}{}` command
-  {
-    // The parse handler below will be invoked when this LaTeX command
-    // is encountered
-    latexTrigger: '\\smoll',
-    parse: (parser) => {
-      // We're expecting two arguments, so we're calling
-      // `parseGroup()` twice. If `parseGroup()` returns `null`,
-      // we assume that the argument is missing.
-      return [
-        "Divide",
-        parser.parseGroup() ?? ["Error", "'missing'"],
-        parser.parseGroup() ?? ["Error", "'missing'"],
-      ];
+const syntax = new LatexSyntax({
+  dictionary: [
+    // Include all the entries from the default dictionary...
+    ...LATEX_DICTIONARY,
+    // ...and add the `\smoll{}{}` command
+    {
+      // The parse handler below will be invoked when this LaTeX command
+      // is encountered
+      latexTrigger: '\\smoll',
+      parse: (parser) => {
+        // We're expecting two arguments, so we're calling
+        // `parseGroup()` twice. If `parseGroup()` returns `null`,
+        // we assume that the argument is missing.
+        return [
+          "Divide",
+          parser.parseGroup() ?? ["Error", "'missing'"],
+          parser.parseGroup() ?? ["Error", "'missing'"],
+        ];
+      },
     },
-  },
-];
+  ],
+});
+const ce = new ComputeEngine({ latexSyntax: syntax });
 
 console.log(ce.parse('\\smoll{1}{5}').json);
 // The "Divide" get represented as a "Rational" by default when
@@ -653,33 +842,34 @@ console.log(ce.parse('\\smoll{1}{5}').json);
 ```
 
 
-**To override an existing entry**, create a new array that includes the
-default entries and add your own entry at the end of the array.
+**To override an existing entry**, create a new dictionary array that includes
+the default entries and add your own entry at the end.
 
 Entries at the end of the array will override earlier entries. When parsing
 an expression, the first entry (starting at the bottom) whose trigger
 matches is selected.
 
-```
-ce.latexDictionary = [
-  ...ce.latexDictionary,
-  // The entry below will override the default entry for the `\times` command
-  {
-    latexTrigger: ['\\times'],
-    name: 'CrossProduct',
-    kind: 'infix',
-    associativity: 'none'
-    precedence: 390,
-  },
-];
+```js
+const syntax = new LatexSyntax({
+  dictionary: [
+    ...LATEX_DICTIONARY,
+    // The entry below will override the default entry for the `\times` command
+    {
+      latexTrigger: ['\\times'],
+      name: 'CrossProduct',
+      kind: 'infix',
+      associativity: 'none',
+      precedence: 390,
+    },
+  ],
+});
+const ce = new ComputeEngine({ latexSyntax: syntax });
 ```
 
-:::caution
-Do not modify the `ce.latexDictionary` array, or the entries in the array, 
-directly. Instead, create a new array that includes the entries from the \
-default dictionary, and add your own
-entries. Later entries will override earlier ones, so you can replace or
-modify existing entries by providing a new definition for them.
+:::tip
+Individual domain dictionaries are also available as named exports:
+`ARITHMETIC_DICTIONARY`, `CALCULUS_DICTIONARY`, `TRIGONOMETRY_DICTIONARY`, etc.
+Use these to build a minimal dictionary with only the domains you need.
 :::
 
 The `precedence` property is used to determine the order of operations when parsing

@@ -162,6 +162,61 @@ uses `_` as a wildcard for the parameter.
 The first argument of `Apply` is a function literal. The rest of the arguments are the
 arguments that will be applied to the function literal.
 
+### Broadcasting Over Collections
+
+When a user-defined function with scalar parameter types is applied to a
+finite indexed collection, the call is **broadcast** elementwise: the
+function is applied to each element and the results are returned as a
+new `List`.
+
+```js example
+ce.assign('f', ce.parse('x \\mapsto x^2 + 1'));
+ce.expr(['f', ['List', 1, 2, 3]]).evaluate();
+// ➔ ["List", 2, 5, 10]
+```
+
+Multi-argument functions broadcast with **zip semantics**. Scalar
+arguments are repeated for each element of the collection argument(s):
+
+```js example
+ce.assign('h', ce.parse('(x, y) \\mapsto x + y'));
+
+// list + scalar
+ce.expr(['h', ['List', 1, 2, 3], 10]).evaluate();
+// ➔ ["List", 11, 12, 13]
+
+// list + list
+ce.expr(['h', ['List', 1, 2, 3], ['List', 10, 20, 30]]).evaluate();
+// ➔ ["List", 11, 22, 33]
+```
+
+Broadcasting also applies to lazy collections like `Range`:
+
+```js example
+ce.assign('sq', ce.parse('x \\mapsto x^2'));
+ce.expr(['sq', ['Range', 1, 4]]).evaluate();
+// ➔ ["List", 1, 4, 9, 16]
+```
+
+#### Opting Out
+
+To author a function that intentionally consumes a list (rather than
+broadcasting elementwise over it), declare the parameter type
+explicitly as `list<…>` or another collection type. The function will
+then receive the collection as a single argument.
+
+```js example
+ce.declare('len', { signature: '(list<number>) -> integer' });
+ce.assign('len', ce.parse('L \\mapsto \\operatorname{length}(L)'));
+
+ce.expr(['len', ['List', 1, 2, 3]]).evaluate();
+// ➔ 3  (no broadcasting; len receives the list as a whole)
+```
+
+For lambdas defined with `\mapsto` without an explicit signature, the
+inferred parameter type is `unknown`, which is treated as scalar — so
+they broadcast by default.
+
 
 ## Closures
 

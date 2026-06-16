@@ -23,7 +23,7 @@ ce.parse('(1,2,3) + (3,5,6)').evaluate();
 // → [4,7,9]
 
 // Or using the Add function directly
-ce.box(['Add', ['List', 1, 2, 3], ['List', 3, 5, 6]]).evaluate();
+ce.expr(['Add', ['List', 1, 2, 3], ['List', 3, 5, 6]]).evaluate();
 // → [5,7,9]
 ```
 
@@ -32,8 +32,8 @@ ce.box(['Add', ['List', 1, 2, 3], ['List', 3, 5, 6]]).evaluate();
 Matrices are added element-wise:
 
 ```js example
-const m1 = ce.box(['List', ['List', 1, 2], ['List', 3, 4]]);
-const m2 = ce.box(['List', ['List', 5, 6], ['List', 7, 8]]);
+const m1 = ce.expr(['List', ['List', 1, 2], ['List', 3, 4]]);
+const m2 = ce.expr(['List', ['List', 5, 6], ['List', 7, 8]]);
 m1.add(m2).evaluate();
 // → [[6,8],[10,12]]
 ```
@@ -55,14 +55,14 @@ ce.parse('2(1,2,3)').evaluate();
 
 ```js example
 // Element-wise multiplication
-ce.box(['Multiply',
+ce.expr(['Multiply',
   ['List', ['List', 1, 2], ['List', 3, 4]],
   ['List', ['List', 5, 6], ['List', 7, 8]]
 ]).evaluate();
 // → [[5,12],[21,32]]  (each element multiplied independently)
 
 // Matrix multiplication (linear algebraic product)
-ce.box(['MatrixMultiply',
+ce.expr(['MatrixMultiply',
   ['List', ['List', 1, 2], ['List', 3, 4]],
   ['List', ['List', 5, 6], ['List', 7, 8]]
 ]).evaluate();
@@ -166,7 +166,7 @@ A vector is a one-dimensional array represented as a `List`:
 const ce = new ComputeEngine();
 
 // Row vector
-const v = ce.box(['List', 1, 2, 3]);
+const v = ce.expr(['List', 1, 2, 3]);
 console.log(v.toString());  // → [1, 2, 3]
 
 // Parse from LaTeX
@@ -178,7 +178,7 @@ For column vectors, use `Vector`:
 
 ```js example
 // Column vector
-ce.box(['Vector', 1, 2, 3]);
+ce.expr(['Vector', 1, 2, 3]);
 // Internally becomes: ["Matrix", ["List", ["List", 1], ["List", 2], ["List", 3]]]
 
 // Parse from LaTeX
@@ -191,7 +191,7 @@ A matrix is a two-dimensional array represented as a nested `List`:
 
 ```js example
 // 2×3 matrix
-const M = ce.box(['List',
+const M = ce.expr(['List',
   ['List', 1, 2, 3],
   ['List', 4, 5, 6]
 ]);
@@ -207,7 +207,7 @@ Higher-dimensional arrays (tensors) use deeper nesting:
 
 ```js example
 // 2×2×2 tensor
-const T = ce.box(['List',
+const T = ce.expr(['List',
   ['List', ['List', 1, 2], ['List', 3, 4]],
   ['List', ['List', 5, 6], ['List', 7, 8]]
 ]);
@@ -221,19 +221,19 @@ The **shape** of an array is a tuple of dimensions along each axis:
 
 ```js example
 // Scalar: empty shape
-ce.box(['Shape', 5]).evaluate();  // → ()
+ce.expr(['Shape', 5]).evaluate();  // → ()
 
 // Vector: single dimension
-ce.box(['Shape', ['List', 1, 2, 3]]).evaluate();  // → (3)
+ce.expr(['Shape', ['List', 1, 2, 3]]).evaluate();  // → (3)
 
 // 2×3 Matrix
-ce.box(['Shape', ['List',
+ce.expr(['Shape', ['List',
   ['List', 1, 2, 3],
   ['List', 4, 5, 6]
 ]]).evaluate();  // → (2, 3)
 
 // 2×3×4 Tensor
-ce.box(['Shape', ['List',
+ce.expr(['Shape', ['List',
   ['List', ['List', 1, 2, 3, 4], ['List', 5, 6, 7, 8], ['List', 9, 10, 11, 12]],
   ['List', ['List', 13, 14, 15, 16], ['List', 17, 18, 19, 20], ['List', 21, 22, 23, 24]]
 ]]).evaluate();  // → (2, 3, 4)
@@ -244,9 +244,9 @@ ce.box(['Shape', ['List',
 The **rank** is the number of dimensions (length of the shape):
 
 ```js example
-ce.box(['Rank', 5]).evaluate();                  // → 0 (scalar)
-ce.box(['Rank', ['List', 1, 2, 3]]).evaluate();  // → 1 (vector)
-ce.box(['Rank', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();  // → 2 (matrix)
+ce.expr(['Rank', 5]).evaluate();                  // → 0 (scalar)
+ce.expr(['Rank', ['List', 1, 2, 3]]).evaluate();  // → 1 (vector)
+ce.expr(['Rank', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();  // → 2 (matrix)
 ```
 
 ## Transforming Arrays
@@ -257,14 +257,14 @@ ce.box(['Rank', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();  // → 2
 
 ```js example
 // Flatten a matrix
-ce.box(['Flatten', ['List',
+ce.expr(['Flatten', ['List',
   ['List', 1, 2, 3],
   ['List', 4, 5, 6]
 ]]).evaluate();
 // → [1, 2, 3, 4, 5, 6]
 
 // Flatten a scalar (returns single-element list)
-ce.box(['Flatten', 42]).evaluate();
+ce.expr(['Flatten', 42]).evaluate();
 // → [42]
 ```
 
@@ -275,19 +275,19 @@ order and cycle if needed (APL-style):
 
 ```js example
 // Reshape a vector to a matrix
-ce.box(['Reshape', ['List', 1, 2, 3, 4, 5, 6], ['Tuple', 2, 3]]).evaluate();
+ce.expr(['Reshape', ['List', 1, 2, 3, 4, 5, 6], ['Tuple', 2, 3]]).evaluate();
 // → [[1, 2, 3], [4, 5, 6]]
 
 // Reshape with cycling (7 elements → 9 needed for 3×3)
-ce.box(['Reshape', ['List', 1, 2, 3, 4, 5, 6, 7], ['Tuple', 3, 3]]).evaluate();
+ce.expr(['Reshape', ['List', 1, 2, 3, 4, 5, 6, 7], ['Tuple', 3, 3]]).evaluate();
 // → [[1, 2, 3], [4, 5, 6], [7, 1, 2]]
 
 // Create a matrix filled with a single value
-ce.box(['Reshape', 0, ['Tuple', 3, 3]]).evaluate();
+ce.expr(['Reshape', 0, ['Tuple', 3, 3]]).evaluate();
 // → [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
 // Reshape to scalar (takes first element)
-ce.box(['Reshape', ['List', 5, 10, 15], ['Tuple']]).evaluate();
+ce.expr(['Reshape', ['List', 5, 10, 15], ['Tuple']]).evaluate();
 // → 5
 ```
 
@@ -296,14 +296,14 @@ ce.box(['Reshape', ['List', 5, 10, 15], ['Tuple']]).evaluate();
 `Transpose` swaps rows and columns (or specified axes):
 
 ```js example
-ce.box(['Transpose', ['List',
+ce.expr(['Transpose', ['List',
   ['List', 1, 2, 3],
   ['List', 4, 5, 6]
 ]]).evaluate();
 // → [[1, 4], [2, 5], [3, 6]]
 
 // Transpose of a scalar is itself
-ce.box(['Transpose', 42]).evaluate();
+ce.expr(['Transpose', 42]).evaluate();
 // → 42
 ```
 
@@ -322,7 +322,7 @@ ce.parse('A^T');  // → ["Transpose", "A"]
 For complex matrices, `ConjugateTranspose` transposes and conjugates each element:
 
 ```js example
-ce.box(['ConjugateTranspose', ['List',
+ce.expr(['ConjugateTranspose', ['List',
   ['List', ['Complex', 1, 2], ['Complex', 3, 4]],
   ['List', ['Complex', 5, 6], ['Complex', 7, 8]]
 ]]).evaluate();
@@ -343,7 +343,7 @@ The `Diagonal` function has bidirectional behavior:
 ### Extract Diagonal from Matrix
 
 ```js example
-ce.box(['Diagonal', ['List',
+ce.expr(['Diagonal', ['List',
   ['List', 1, 2, 3],
   ['List', 4, 5, 6],
   ['List', 7, 8, 9]
@@ -354,11 +354,11 @@ ce.box(['Diagonal', ['List',
 ### Create Diagonal Matrix from Vector
 
 ```js example
-ce.box(['Diagonal', ['List', 1, 2, 3]]).evaluate();
+ce.expr(['Diagonal', ['List', 1, 2, 3]]).evaluate();
 // → [[1, 0, 0], [0, 2, 0], [0, 0, 3]]
 
 // Create an identity matrix
-ce.box(['Diagonal', ['List', 1, 1, 1]]).evaluate();
+ce.expr(['Diagonal', ['List', 1, 1, 1]]).evaluate();
 // → [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
 ```
 
@@ -369,14 +369,14 @@ ce.box(['Diagonal', ['List', 1, 1, 1]]).evaluate();
 The determinant is defined for square matrices:
 
 ```js example
-ce.box(['Determinant', ['List',
+ce.expr(['Determinant', ['List',
   ['List', 1, 2],
   ['List', 3, 4]
 ]]).evaluate();
 // → -2
 
 // Symbolic determinant
-ce.box(['Determinant', ['List',
+ce.expr(['Determinant', ['List',
   ['List', 'a', 'b'],
   ['List', 'c', 'd']
 ]]).evaluate();
@@ -403,7 +403,7 @@ ce.parse('\\det(A)');  // → ["Determinant", "A"]
 The trace is the sum of diagonal elements:
 
 ```js example
-ce.box(['Trace', ['List',
+ce.expr(['Trace', ['List',
   ['List', 1, 2, 3],
   ['List', 4, 5, 6],
   ['List', 7, 8, 9]
@@ -423,14 +423,14 @@ ce.parse('\\operatorname{tr}(A)');  // → ["Trace", "A"]
 ### Inverse
 
 ```js example
-ce.box(['Inverse', ['List',
+ce.expr(['Inverse', ['List',
   ['List', 1, 2],
   ['List', 3, 4]
 ]]).evaluate();
 // → [[-2, 1], [1.5, -0.5]]
 
 // Inverse of a scalar is its reciprocal
-ce.box(['Inverse', 4]).evaluate();
+ce.expr(['Inverse', 4]).evaluate();
 // → 0.25
 ```
 
@@ -451,19 +451,19 @@ The `Norm` function computes various norms for vectors and matrices.
 
 ```js example
 // L2 norm (Euclidean, default): √(|3|² + |4|²) = 5
-ce.box(['Norm', ['List', 3, 4]]).evaluate();
+ce.expr(['Norm', ['List', 3, 4]]).evaluate();
 // → 5
 
 // L1 norm: |3| + |-4| = 7
-ce.box(['Norm', ['List', 3, -4], 1]).evaluate();
+ce.expr(['Norm', ['List', 3, -4], 1]).evaluate();
 // → 7
 
 // L-infinity norm: max(|3|, |-4|) = 4
-ce.box(['Norm', ['List', 3, -4], 'Infinity']).evaluate();
+ce.expr(['Norm', ['List', 3, -4], 'Infinity']).evaluate();
 // → 4
 
 // General Lp norm: (|3|³ + |4|³)^(1/3)
-ce.box(['Norm', ['List', 3, 4], 3]).evaluate();
+ce.expr(['Norm', ['List', 3, 4], 3]).evaluate();
 // → ≈4.498
 ```
 
@@ -471,22 +471,22 @@ ce.box(['Norm', ['List', 3, 4], 3]).evaluate();
 
 ```js example
 // Frobenius norm (default): √(1² + 2² + 3² + 4²) = √30
-ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
+ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
 // → √30 ≈ 5.477
 
 // L1 norm: max column sum = max(4, 6) = 6
-ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 1]).evaluate();
+ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 1]).evaluate();
 // → 6
 
 // L-infinity norm: max row sum = max(3, 7) = 7
-ce.box(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 'Infinity']).evaluate();
+ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 'Infinity']).evaluate();
 // → 7
 ```
 
 **Scalar:** The norm of a scalar is its absolute value.
 
 ```js example
-ce.box(['Norm', -5]).evaluate();
+ce.expr(['Norm', -5]).evaluate();
 // → 5
 ```
 
@@ -502,21 +502,21 @@ The `Eigenvalues` function returns the eigenvalues of a square matrix:
 
 ```js example
 // Diagonal matrix: eigenvalues are the diagonal elements
-ce.box(['Eigenvalues', ['List',
+ce.expr(['Eigenvalues', ['List',
   ['List', 2, 0],
   ['List', 0, 3]
 ]]).evaluate();
 // → [2, 3]
 
 // General 2×2 matrix
-ce.box(['Eigenvalues', ['List',
+ce.expr(['Eigenvalues', ['List',
   ['List', 4, 2],
   ['List', 1, 3]
 ]]).evaluate();
 // → [5, 2]
 
 // 3×3 matrix
-ce.box(['Eigenvalues', ['List',
+ce.expr(['Eigenvalues', ['List',
   ['List', 1, 2, 0],
   ['List', 0, 3, 0],
   ['List', 2, -4, 2]
@@ -531,14 +531,14 @@ eigenvalue:
 
 ```js example
 // Eigenvectors of a diagonal matrix are the standard basis vectors
-ce.box(['Eigenvectors', ['List',
+ce.expr(['Eigenvectors', ['List',
   ['List', 2, 0],
   ['List', 0, 3]
 ]]).evaluate();
 // → [[1, 0], [0, 1]]
 
 // General matrix eigenvectors
-ce.box(['Eigenvectors', ['List',
+ce.expr(['Eigenvectors', ['List',
   ['List', 4, 2],
   ['List', 1, 3]
 ]]).evaluate();
@@ -550,17 +550,17 @@ ce.box(['Eigenvectors', ['List',
 Use `Eigen` to compute both eigenvalues and eigenvectors in a single operation:
 
 ```js example
-const result = ce.box(['Eigen', ['List',
+const result = ce.expr(['Eigen', ['List',
   ['List', 2, 0],
   ['List', 0, 3]
 ]]).evaluate();
 // → Dictionary with 'Eigenvalues' and 'Eigenvectors' keys
 
 // Access the components
-ce.box(['At', result, 'Eigenvalues']).evaluate();
+ce.expr(['At', result, 'Eigenvalues']).evaluate();
 // → [2, 3]
 
-ce.box(['At', result, 'Eigenvectors']).evaluate();
+ce.expr(['At', result, 'Eigenvectors']).evaluate();
 // → [[1, 0], [0, 1]]
 ```
 
@@ -576,14 +576,14 @@ const A = ['List',
 ];
 
 // Get eigenvalues and eigenvectors
-const eigenvalues = ce.box(['Eigenvalues', A]).evaluate();
+const eigenvalues = ce.expr(['Eigenvalues', A]).evaluate();
 // → [5, 2]
 
-const eigenvectors = ce.box(['Eigenvectors', A]).evaluate();
+const eigenvectors = ce.expr(['Eigenvectors', A]).evaluate();
 // → [[0.894, 0.447], [-0.707, 0.707]]
 
 // The eigenvalues form the diagonal of D
-const D = ce.box(['Diagonal', eigenvalues]).evaluate();
+const D = ce.expr(['Diagonal', eigenvalues]).evaluate();
 // → [[5, 0], [0, 2]]
 ```
 
@@ -602,7 +602,7 @@ triangular matrix U, with a permutation matrix P for numerical stability:
 import { isFunction } from '@cortex-js/compute-engine';
 
 // LU decomposition returns [P, L, U] where PA = LU
-const result = ce.box(['LUDecomposition', ['List',
+const result = ce.expr(['LUDecomposition', ['List',
   ['List', 2, 3, 1],
   ['List', 4, 7, 5],
   ['List', 6, 18, 10]
@@ -631,7 +631,7 @@ triangular matrix R:
 import { isFunction } from '@cortex-js/compute-engine';
 
 // QR decomposition returns [Q, R] where A = QR
-const result = ce.box(['QRDecomposition', ['List',
+const result = ce.expr(['QRDecomposition', ['List',
   ['List', 1, 2],
   ['List', 3, 4],
   ['List', 5, 6]
@@ -656,14 +656,14 @@ the product of a lower triangular matrix L and its transpose:
 
 ```js example
 // Cholesky decomposition returns L where A = L × L^T
-const L = ce.box(['CholeskyDecomposition', ['List',
+const L = ce.expr(['CholeskyDecomposition', ['List',
   ['List', 4, 2],
   ['List', 2, 5]
 ]]).evaluate();
 // → [[2, 0], [1, 2]]
 
 // Verify: L × L^T = A
-ce.box(['MatrixMultiply', L, ['Transpose', L]]).evaluate();
+ce.expr(['MatrixMultiply', L, ['Transpose', L]]).evaluate();
 // → [[4, 2], [2, 5]]
 ```
 
@@ -684,7 +684,7 @@ SVD factors any matrix A into three matrices: U (left singular vectors),
 import { isFunction } from '@cortex-js/compute-engine';
 
 // SVD returns [U, Σ, V] where A = U × Σ × V^T
-const result = ce.box(['SVD', ['List',
+const result = ce.expr(['SVD', ['List',
   ['List', 1, 2],
   ['List', 3, 4],
   ['List', 5, 6]
@@ -721,7 +721,7 @@ const A = ['List',
 const b = ['List', 4, 10, 24];
 
 // Get LU decomposition
-const luResult = ce.box(['LUDecomposition', A]).evaluate();
+const luResult = ce.expr(['LUDecomposition', A]).evaluate();
 if (isFunction(luResult)) {
   const [P, L, U] = luResult.ops;
 
@@ -741,14 +741,14 @@ multiple combinations of operands:
 
 ```js example
 // 2×3 matrix times 3×2 matrix → 2×2 matrix
-ce.box(['MatrixMultiply',
+ce.expr(['MatrixMultiply',
   ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
   ['List', ['List', 7, 8], ['List', 9, 10], ['List', 11, 12]]
 ]).evaluate();
 // → [[58, 64], [139, 154]]
 
 // Symbolic matrix multiplication
-ce.box(['MatrixMultiply',
+ce.expr(['MatrixMultiply',
   ['List', ['List', 'a', 'b'], ['List', 'c', 'd']],
   ['List', ['List', 'e', 'f'], ['List', 'g', 'h']]
 ]).evaluate();
@@ -761,7 +761,7 @@ When multiplying a matrix by a vector, the vector is treated as a column vector:
 
 ```js example
 // 2×3 matrix times 3-vector → 2-vector
-ce.box(['MatrixMultiply',
+ce.expr(['MatrixMultiply',
   ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
   ['List', 1, 2, 3]
 ]).evaluate();
@@ -774,7 +774,7 @@ When a vector multiplies a matrix, it's treated as a row vector:
 
 ```js example
 // 2-vector times 2×3 matrix → 3-vector
-ce.box(['MatrixMultiply',
+ce.expr(['MatrixMultiply',
   ['List', 1, 2],
   ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]]
 ]).evaluate();
@@ -786,7 +786,7 @@ ce.box(['MatrixMultiply',
 Multiplying two vectors of the same length computes their dot product:
 
 ```js example
-ce.box(['MatrixMultiply',
+ce.expr(['MatrixMultiply',
   ['List', 1, 2, 3],
   ['List', 4, 5, 6]
 ]).evaluate();
@@ -800,7 +800,7 @@ if they don't match:
 
 ```js example
 // 2×2 matrix times 3-vector: incompatible (2 ≠ 3)
-ce.box(['MatrixMultiply',
+ce.expr(['MatrixMultiply',
   ['List', ['List', 1, 2], ['List', 3, 4]],
   ['List', 1, 2, 3]
 ]).evaluate();
@@ -814,7 +814,7 @@ ce.box(['MatrixMultiply',
 ```js example
 const A = ['Matrix', ['List', ['List', 1, 2], ['List', 3, 4]]];
 const B = ['Matrix', ['List', ['List', 5, 6], ['List', 7, 8]]];
-ce.box(['MatrixMultiply', A, B]).latex;
+ce.expr(['MatrixMultiply', A, B]).latex;
 // → "\begin{pmatrix}1 & 2\\ 3 & 4\end{pmatrix} \cdot \begin{pmatrix}5 & 6\\ 7 & 8\end{pmatrix}"
 ```
 
@@ -829,14 +829,14 @@ Add two matrices of the same shape element-wise:
 
 ```js example
 // 2×2 matrix + 2×2 matrix
-ce.box(['Add',
+ce.expr(['Add',
   ['List', ['List', 1, 2], ['List', 3, 4]],
   ['List', ['List', 5, 6], ['List', 7, 8]]
 ]).evaluate();
 // → [[6, 8], [10, 12]]
 
 // Symbolic matrix addition
-ce.box(['Add',
+ce.expr(['Add',
   ['List', ['List', 'a', 'b'], ['List', 'c', 'd']],
   ['List', ['List', 1, 2], ['List', 3, 4]]
 ]).evaluate();
@@ -849,11 +849,11 @@ Add a scalar to every element of a matrix:
 
 ```js example
 // Scalar + 2×2 matrix
-ce.box(['Add', 10, ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
+ce.expr(['Add', 10, ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
 // → [[11, 12], [13, 14]]
 
 // Multiple operands: scalar + matrix + matrix
-ce.box(['Add',
+ce.expr(['Add',
   ['List', ['List', 1, 2], ['List', 3, 4]],
   10,
   ['List', ['List', 5, 6], ['List', 7, 8]]
@@ -867,11 +867,11 @@ Vectors also support element-wise addition and scalar broadcasting:
 
 ```js example
 // Vector + vector
-ce.box(['Add', ['List', 1, 2, 3], ['List', 4, 5, 6]]).evaluate();
+ce.expr(['Add', ['List', 1, 2, 3], ['List', 4, 5, 6]]).evaluate();
 // → [5, 7, 9]
 
 // Scalar + vector
-ce.box(['Add', ['List', 7, 11], 3]).evaluate();
+ce.expr(['Add', ['List', 7, 11], 3]).evaluate();
 // → [10, 14]
 ```
 
@@ -881,7 +881,7 @@ ce.box(['Add', ['List', 7, 11], 3]).evaluate();
 
 ```js example
 // 2×3 matrix + 2×2 matrix: incompatible shapes
-ce.box(['Add',
+ce.expr(['Add',
   ['List', ['List', 1, 2, 3], ['List', 4, 5, 6]],
   ['List', ['List', 1, 2], ['List', 3, 4]]
 ]).evaluate();
@@ -899,11 +899,11 @@ const M = ['List',
 ];
 
 // Access element at row 2, column 3
-ce.box(['At', M, 2, 3]).evaluate();
+ce.expr(['At', M, 2, 3]).evaluate();
 // → 6
 
 // Negative indices count from the end
-ce.box(['At', M, -1, -1]).evaluate();
+ce.expr(['At', M, -1, -1]).evaluate();
 // → 6 (last row, last column)
 ```
 
@@ -912,10 +912,10 @@ single index returns a row, and collection operations such as `Count`,
 `First`, `Take` and `Drop` operate row by row.
 
 ```js example
-ce.box(['At', M, 2]).evaluate();
+ce.expr(['At', M, 2]).evaluate();
 // → [4, 5, 6] (second row)
 
-ce.box(['Count', M]).evaluate();
+ce.expr(['Count', M]).evaluate();
 // → 2 (number of rows)
 ```
 
@@ -928,27 +928,27 @@ To operate on the scalar entries instead, flatten the matrix first:
 
 ```js example
 // Identity matrix (3×3)
-ce.box(['IdentityMatrix', 3]).evaluate();
+ce.expr(['IdentityMatrix', 3]).evaluate();
 // → [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
 
 // Zero matrix (3×3) - square
-ce.box(['ZeroMatrix', 3]).evaluate();
+ce.expr(['ZeroMatrix', 3]).evaluate();
 // → [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
 // Zero matrix (2×4) - rectangular
-ce.box(['ZeroMatrix', 2, 4]).evaluate();
+ce.expr(['ZeroMatrix', 2, 4]).evaluate();
 // → [[0, 0, 0, 0], [0, 0, 0, 0]]
 
 // Ones matrix (2×3)
-ce.box(['OnesMatrix', 2, 3]).evaluate();
+ce.expr(['OnesMatrix', 2, 3]).evaluate();
 // → [[1, 1, 1], [1, 1, 1]]
 
 // Matrix filled with a specific value using Reshape
-ce.box(['Reshape', 7, ['Tuple', 2, 4]]).evaluate();
+ce.expr(['Reshape', 7, ['Tuple', 2, 4]]).evaluate();
 // → [[7, 7, 7, 7], [7, 7, 7, 7]]
 
 // Diagonal matrix from vector
-ce.box(['Diagonal', ['List', 1, 2, 3]]).evaluate();
+ce.expr(['Diagonal', ['List', 1, 2, 3]]).evaluate();
 // → [[1, 0, 0], [0, 2, 0], [0, 0, 3]]
 ```
 
@@ -961,7 +961,7 @@ const M = ['List',
 ];
 
 // Check if square: compare shape dimensions
-const shape = ce.box(['Shape', M]).evaluate();
+const shape = ce.expr(['Shape', M]).evaluate();
 // → (2, 2) - equal dimensions means square
 ```
 
@@ -1028,10 +1028,10 @@ const A = ['List', ['List', 1, 2], ['List', 3, 4]];
 const b = ['List', 5, 11];
 
 // x = A⁻¹ * b
-const A_inv = ce.box(['Inverse', A]).evaluate();
+const A_inv = ce.expr(['Inverse', A]).evaluate();
 // → [[-2, 1], [1.5, -0.5]]
 
-const solution = ce.box(['MatrixMultiply', A_inv, b]).evaluate();
+const solution = ce.expr(['MatrixMultiply', A_inv, b]).evaluate();
 // → [1, 2]
 // Solution: x = 1, y = 2
 ```
@@ -1142,7 +1142,7 @@ For large matrices, avoid creating intermediate results when possible:
 ```js example
 // Instead of multiple reshape operations, compute the final shape first
 const data = ['Range', 1, 24];
-ce.box(['Reshape', data, ['Tuple', 2, 3, 4]]).evaluate();
+ce.expr(['Reshape', data, ['Tuple', 2, 3, 4]]).evaluate();
 ```
 
 ## Error Handling
@@ -1152,11 +1152,11 @@ properties aren't met:
 
 ```js example
 // Determinant requires a square matrix
-ce.box(['Determinant', ['List', 1, 2, 3]]).evaluate();
+ce.expr(['Determinant', ['List', 1, 2, 3]]).evaluate();
 // → Error("expected-square-matrix", "[1, 2, 3]")
 
 // Inverse requires a square matrix
-ce.box(['Inverse', ['List',
+ce.expr(['Inverse', ['List',
   ['List', 1, 2, 3],
   ['List', 4, 5, 6]
 ]]).evaluate();
@@ -1172,14 +1172,14 @@ const ce = new ComputeEngine();
 
 // Create and evaluate a matrix operation
 const M = ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
-const inv = ce.box(['Inverse', M]).evaluate();
+const inv = ce.expr(['Inverse', M]).evaluate();
 
 // Convert back to LaTeX
 console.log(inv.latex);
 // → "\begin{pmatrix}-2 & 1\\ \frac{3}{2} & -\frac{1}{2}\end{pmatrix}"
 
 // Transpose example
-const T = ce.box(['Transpose', M]).evaluate();
+const T = ce.expr(['Transpose', M]).evaluate();
 console.log(T.latex);
 // → "\begin{pmatrix}1 & 3\\ 2 & 4\end{pmatrix}"
 

@@ -46,7 +46,7 @@ export function ExampleSelector({ onSelect, index }) {
       latex: "\\frac{165}{315}",
       json: '["Divide", 165, 315]', 
       preamble: `To create a expression from a MathJSON expression, 
-use the \`ce.box()\` function.
+use the \`ce.expr()\` function.
 
 By default expressions are put in canonical form. 
 The canonical form of fractions is their reduced form.`,
@@ -250,7 +250,7 @@ console.info('Sum of F_0 to F_10 =', sum.value);
     // Prioritize JSON over LaTeX if we have both. The LaTeX will be used
     // as a label.
     if (example.json) {
-      code = code.replace("$1", `ce.box(${example.json})`);
+      code = code.replace("$1", `ce.expr(${example.json})`);
     } else if (example.latex) {
       if (example.latex.includes('\n')) {
         const escaped = example.latex.replace(/\\/g, '\\\\');

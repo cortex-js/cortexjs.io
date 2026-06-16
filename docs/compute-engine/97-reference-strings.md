@@ -93,7 +93,7 @@ to preserve their formatting and structure.
 
 
 ```js example
-const stringExpr = ce.box([
+const stringExpr = ce.expr([
   "String", 
   "Hello", 
   ["Annotated", "world", {dict: {"color": "blue"}}]
@@ -101,7 +101,7 @@ const stringExpr = ce.box([
 console.info(stringExpr.latex);
 // ➔ "\text{Hello $\mathrm{Annotated}(\text{world}, {color: "blue"})$}"
 
-const textExpr = ce.box([
+const textExpr = ce.expr([
   "Text", 
   "Hello", 
   ["Annotated", "world", {dict: {"color": "blue"}}]

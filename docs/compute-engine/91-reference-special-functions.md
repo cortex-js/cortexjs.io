@@ -93,7 +93,7 @@ $$((n!)!)$$).
 
 <Signature name="Gamma">_z_</Signature>
 
-<Latex value="\\Gamma(n) = (n-1)!"/>
+<Latex value="\Gamma(n) = (n-1)!"/>
 
 The [Gamma Function](https://en.wikipedia.org/wiki/Gamma_function) is an
 extension of the factorial function, with its argument shifted by 1, to real and
@@ -112,13 +112,37 @@ $$
 // 24
 ```
 
+<Signature name="Gamma">_s_, _z_</Signature>
+
+<Latex value="\Gamma(s, z)"/>
+
+With two arguments, `Gamma` is the **upper incomplete Gamma function**. The lower
+limit of the integral is the second argument `z` instead of `0`:
+
+$$
+\operatorname{\Gamma}\left(s, z\right) = \int\limits_{z}^{\infty} t^{s-1}
+\mathrm{e}^{-t} \, \mathrm{d}t
+$$
+
+The order `s` and the lower limit `z` may be real or complex, including negative
+and fractional orders. The two-argument form is evaluated numerically with
+`.N()` and otherwise stays symbolic; $$ \Gamma(s, 0) $$ reduces to $$ \Gamma(s) $$.
+(This matches the `Gamma[s, z]` convention of Mathematica.)
+
+- NIST: http://dlmf.nist.gov/8.2.E2
+
+```json example
+["N", ["Gamma", 2, 1]]
+// 0.7357588823428849
+```
+
 </FunctionDefinition>
 
 <FunctionDefinition name="GammaLn">
 
 <Signature name="GammaLn">_z_</Signature>
 
-<Latex value="\\ln(\\Gamma(z))"/>
+<Latex value="\ln(\Gamma(z))"/>
 
 This function is called `gammaln` in MatLab and SciPy and `LogGamma` in
 Mathematica.
@@ -130,7 +154,7 @@ Mathematica.
 
 <Signature name="Zeta">_s_</Signature>
 
-<Latex value="\\zeta(s)"/>
+<Latex value="\zeta(s)"/>
 
 The [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function),
 defined for complex numbers with real part greater than 1 as:
@@ -156,7 +180,7 @@ and extended to other values by analytic continuation.
 
 <Signature name="Beta">_a_, _b_</Signature>
 
-<Latex value="\\Beta(a, b)"/>
+<Latex value="\Beta(a, b)"/>
 
 The [Euler beta function](https://en.wikipedia.org/wiki/Beta_function), defined as:
 
@@ -185,7 +209,7 @@ $$
 
 <Signature name="LambertW">_x_</Signature>
 
-<Latex value="\\operatorname{W}(x)"/>
+<Latex value="\operatorname{W}(x)"/>
 
 The [Lambert W function](https://en.wikipedia.org/wiki/Lambert_W_function),
 also called the product logarithm. It is the inverse function of
@@ -221,7 +245,7 @@ spiral (Euler spiral).
 
 <Signature name="FresnelS">_x_</Signature>
 
-<Latex value="\\operatorname{FresnelS}(x)"/>
+<Latex value="\operatorname{FresnelS}(x)"/>
 
 The Fresnel S integral:
 
@@ -247,7 +271,7 @@ $S(\infty) = \tfrac{1}{2}$.
 
 <Signature name="FresnelC">_x_</Signature>
 
-<Latex value="\\operatorname{FresnelC}(x)"/>
+<Latex value="\operatorname{FresnelC}(x)"/>
 
 The Fresnel C integral:
 
@@ -395,7 +419,7 @@ They arise in physics, particularly in quantum mechanics and optics.
 
 <Signature name="AiryAi">_x_</Signature>
 
-<Latex value="\\operatorname{Ai}(x)"/>
+<Latex value="\operatorname{Ai}(x)"/>
 
 The [Airy function of the first kind](https://en.wikipedia.org/wiki/Airy_function).
 
@@ -416,7 +440,7 @@ positive $x$ and oscillates for negative $x$.
 
 <Signature name="AiryBi">_x_</Signature>
 
-<Latex value="\\operatorname{Bi}(x)"/>
+<Latex value="\operatorname{Bi}(x)"/>
 
 The [Airy function of the second kind](https://en.wikipedia.org/wiki/Airy_function).
 
@@ -429,6 +453,229 @@ positive $x$ and oscillates for negative $x$.
 ```
 
 - NIST: http://dlmf.nist.gov/9.2
+
+</FunctionDefinition>
+
+
+## Elliptic Integrals
+
+The complete elliptic integrals arise in computing the arc length of an
+ellipse, the period of a pendulum, and throughout number theory.
+
+**Convention:** these functions use the **parameter** $m = k^2$, where $k$
+is the modulus. This matches Mathematica, mpmath and
+[Fungrim](https://fungrim.org). To evaluate in terms of the modulus $k$,
+pass $k^2$.
+
+
+<FunctionDefinition name="EllipticK">
+
+<Signature name="EllipticK">_m_</Signature>
+
+<Latex value="K(m)"/>
+
+The [complete elliptic integral of the first kind](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_first_kind):
+
+$$
+K(m) = \int_0^{\pi/2} \frac{d\theta}{\sqrt{1 - m \sin^2\theta}}
+$$
+
+It is computed via the arithmetic-geometric mean: $K(m) =
+\dfrac{\pi}{2\operatorname{agm}(1, \sqrt{1-m})}$.
+
+$K(1) = \infty$. For $m > 1$ the value is complex.
+
+```json example
+["EllipticK", 0.5]
+// ➔ 1.85407467730137
+```
+
+- Wikidata: [Q1080993](https://www.wikidata.org/wiki/Q1080993)
+- NIST: http://dlmf.nist.gov/19.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="EllipticE">
+
+<Signature name="EllipticE">_m_</Signature>
+
+<Latex value="E(m)"/>
+
+The [complete elliptic integral of the second kind](https://en.wikipedia.org/wiki/Elliptic_integral#Complete_elliptic_integral_of_the_second_kind):
+
+$$
+E(m) = \int_0^{\pi/2} \sqrt{1 - m \sin^2\theta} \, d\theta
+$$
+
+The perimeter of an ellipse with semi-major axis $a$ and eccentricity $e$
+is $4aE(e^2)$.
+
+$E(1) = 1$. For $m > 1$ the value is complex.
+
+```json example
+["EllipticE", 0.5]
+// ➔ 1.35064388104768
+```
+
+- Wikidata: [Q1375529](https://www.wikidata.org/wiki/Q1375529)
+- NIST: http://dlmf.nist.gov/19.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="AGM">
+
+<Signature name="AGM">_a_, _b_</Signature>
+
+<Signature name="AGM">_z_</Signature>
+
+<Latex value="\operatorname{agm}(a, b)"/>
+
+The [arithmetic-geometric mean](https://en.wikipedia.org/wiki/Arithmetic%E2%80%93geometric_mean)
+of two numbers: the common limit of the sequences $a_{n+1} = \frac{a_n +
+b_n}{2}$ and $b_{n+1} = \sqrt{a_n b_n}$.
+
+With a single argument, $\operatorname{agm}(z)$ is shorthand for
+$\operatorname{agm}(1, z)$.
+
+```json example
+["AGM", 1, 2]
+// ➔ 1.45679103104691
+```
+
+- Wikidata: [Q360074](https://www.wikidata.org/wiki/Q360074)
+- NIST: http://dlmf.nist.gov/19.8
+
+</FunctionDefinition>
+
+
+## Hypergeometric Functions
+
+<FunctionDefinition name="Hypergeometric2F1">
+
+<Signature name="Hypergeometric2F1">_a_, _b_, _c_, _z_</Signature>
+
+<Latex value="{}_2F_1(a, b; c; z)"/>
+
+The [Gauss hypergeometric function](https://en.wikipedia.org/wiki/Hypergeometric_function),
+defined for $|z| < 1$ by the series:
+
+$$
+{}_2F_1(a, b; c; z) = \sum_{n=0}^{\infty} \frac{(a)_n (b)_n}{(c)_n}
+\frac{z^n}{n!}
+$$
+
+where $(q)_n$ is the Pochhammer symbol (rising factorial), and extended
+elsewhere by analytic continuation.
+
+Many elementary and special functions are particular cases. For example
+$\ln(1+z) = z \cdot {}_2F_1(1, 1; 2; -z)$ and
+$K(m) = \frac{\pi}{2} \, {}_2F_1\big(\frac12, \frac12; 1; m\big)$.
+
+If $a$ or $b$ is a non-positive integer the series terminates and the
+function is a polynomial in $z$, evaluable for any $z$. Otherwise the
+function evaluates numerically for $z \le 1$ (real) and for complex $z$
+within the unit disk and the Pfaff-transform region.
+
+```json example
+["Hypergeometric2F1", 1, 1, 2, 0.5]
+// ➔ 1.38629436111989  (= 2 ln 2)
+```
+
+- Wikidata: [Q672619](https://www.wikidata.org/wiki/Q672619)
+- NIST: http://dlmf.nist.gov/15.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="Hypergeometric1F1">
+
+<Signature name="Hypergeometric1F1">_a_, _b_, _z_</Signature>
+
+<Latex value="{}_1F_1(a; b; z)"/>
+
+The [Kummer confluent hypergeometric function](https://en.wikipedia.org/wiki/Confluent_hypergeometric_function),
+also written $M(a, b, z)$:
+
+$$
+{}_1F_1(a; b; z) = \sum_{n=0}^{\infty} \frac{(a)_n}{(b)_n} \frac{z^n}{n!}
+$$
+
+It is an entire function of $z$ and evaluates numerically for any real or
+complex $z$.
+
+```json example
+["Hypergeometric1F1", 1, 2, 2]
+// ➔ 3.19452804946533  (= (e² − 1)/2)
+```
+
+- Wikidata: [Q1331447](https://www.wikidata.org/wiki/Q1331447)
+- NIST: http://dlmf.nist.gov/13.2
+
+</FunctionDefinition>
+
+
+## Theta and Modular Functions
+
+<FunctionDefinition name="JacobiTheta">
+
+<Signature name="JacobiTheta">_j_, _z_, _&tau;_</Signature>
+
+<Latex value="\theta_j(z, \tau)"/>
+
+The [Jacobi theta functions](https://en.wikipedia.org/wiki/Theta_function)
+$\theta_j(z, \tau)$ for $j \in \{1, 2, 3, 4\}$, with nome $q = e^{i\pi\tau}$
+and $\operatorname{Im}(\tau) > 0$:
+
+$$
+\theta_3(z, \tau) = 1 + 2\sum_{n=1}^{\infty} q^{n^2} \cos(2n\pi z)
+$$
+
+and similarly for $\theta_1$, $\theta_2$, $\theta_4$.
+
+**Convention:** the trigonometric argument is a multiple of $\pi z$ (the
+functions have period 1 in $z$), matching [Fungrim](https://fungrim.org)
+and mpmath — not the classical convention with period $\pi$.
+
+An optional fourth argument indicates the order of differentiation with
+respect to $z$; only order 0 currently evaluates numerically.
+
+```json example
+["JacobiTheta", 3, 0, "ImaginaryUnit"]
+// ➔ 1.08643481121331  (= π^(1/4)/Γ(3/4))
+```
+
+- Wikidata: [Q1154532](https://www.wikidata.org/wiki/Q1154532)
+- NIST: http://dlmf.nist.gov/20.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="DedekindEta">
+
+<Signature name="DedekindEta">_&tau;_</Signature>
+
+<Latex value="\eta(\tau)"/>
+
+The [Dedekind eta function](https://en.wikipedia.org/wiki/Dedekind_eta_function),
+defined on the upper half-plane ($\operatorname{Im}(\tau) > 0$) by:
+
+$$
+\eta(\tau) = e^{i\pi\tau/12} \prod_{k=1}^{\infty} \left(1 - e^{2\pi i k
+\tau}\right)
+$$
+
+It is a modular form of weight $\frac12$, central to the theory of modular
+functions and integer partitions.
+
+```json example
+["DedekindEta", "ImaginaryUnit"]
+// ➔ 0.768225422326057  (= Γ(1/4)/(2π^(3/4)))
+```
+
+- Wikidata: [Q1187208](https://www.wikidata.org/wiki/Q1187208)
+- NIST: http://dlmf.nist.gov/23.15
 
 </FunctionDefinition>
 

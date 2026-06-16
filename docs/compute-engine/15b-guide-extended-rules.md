@@ -88,13 +88,13 @@ console.log(ce.parse("\\sin(\\pi n + \\frac{\\pi}{2})").simplify().latex);
 Conditions over the complex domain work with the assumptions system as well
 (see <a href="/compute-engine/guides/assumptions/">Assumptions</a>). For
 example, identities for theta and modular functions require their parameter
-to be in the upper half-plane:
+to be in the upper half-plane — that is, `Im(τ) > 0`:
 
 ```js
-ce.assume(ce.box(["Element", "tau", "HH"]));
+ce.assume(ce.expr(["Greater", ["Imaginary", "tau"], 0])); // τ in the upper half-plane
 
 // Jacobi's identity: θ₂(0,τ)⁴ + θ₄(0,τ)⁴ = θ₃(0,τ)⁴
-ce.box(["Add",
+ce.expr(["Add",
   ["Power", ["JacobiTheta", 2, 0, "tau"], 4],
   ["Power", ["JacobiTheta", 4, 0, "tau"], 4],
 ]).simplify();
@@ -112,7 +112,7 @@ integral. These are loaded with a `purpose` of `"expand"` and are deliberately
 full rule set:
 
 ```js
-const expr = ce.box(["CarlsonRF", 0, 1, 2]);
+const expr = ce.expr(["CarlsonRF", 0, 1, 2]);
 expr.replace(ce.rules(ce.simplificationRules), { recursive: true });
 // ➔ Gamma(1/4)² / (4 · sqrt(2π))
 ```
@@ -123,8 +123,8 @@ expr.replace(ce.rules(ce.simplificationRules), { recursive: true });
 
 ```js
 const report = loadIdentities(ce, {
-  topics: ["gamma", "zeta", "log"],   // only these topics
-  classes: ["specific-value"],         // and only value rules
+  topics: ["gamma", "riemann_zeta", "log"], // only these corpus topics
+  classes: ["specific-value"],              // and only value rules
 });
 
 console.log(report.loaded);       // number of rules registered
@@ -172,11 +172,14 @@ defer general solution families (`x = arctan(c) + πn`). They route to
 
 ## Performance
 
-Loading the full library takes on the order of 100ms and registers the rules
-behind an operator-indexed dispatcher, so the impact on `simplify()` for
-expressions that don't involve special functions is small (typically
-20–60%, depending on the expression mix). Loading is per-engine and
-idempotent: calling `loadIdentities()` twice does not duplicate rules.
+Loading the full library is a one-time per-engine cost and registers the rules
+behind an **operator-indexed (per-head) dispatcher**: a rule is only considered
+when the expression's operator matches the rule's `operators` hint. Because of
+this, the impact on `simplify()` for expressions that don't involve special
+functions is small — roughly **1.3× the unloaded baseline** (typically a
+10–30% overhead, depending on the expression mix), rather than scaling with the
+1,300+ rules loaded. Loading is per-engine and idempotent: calling
+`loadIdentities()` twice does not duplicate rules.
 
 Call `loadIdentities()` early — before declaring your own symbols — so the
 library's symbol declarations (e.g. `JacobiTheta`) do not conflict with

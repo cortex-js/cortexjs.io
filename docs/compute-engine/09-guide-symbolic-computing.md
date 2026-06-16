@@ -133,7 +133,7 @@ of canonicalization, for example to ignore the order of the arguments of a sum.
 You can achieve this by comparing the expressions in their canonical order:
 
 ```json example
-ce.box(["CanonicalForm", ["Add", 1, "x"], "Order"]).isSame(
+ce.expr(["CanonicalForm", ["Add", 1, "x"], "Order"]).isSame(
   ["CanonicalForm", ["Add", "x", 1], "Order"]
 )
 ```
@@ -209,8 +209,8 @@ that require evaluation, such as `\sin(\pi)`.
 | `lhs.is(rhs)`                            | Smart check: structural first, then numeric evaluation fallback for constant expressions (within `engine.tolerance`). For literal numbers, same as `isSame()`. |
 | `lhs.isEqual(rhs)`                       | Mathematical equality (full evaluation). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
-| `ce.box(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
-| `ce.box(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)`                 |
+| `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
+| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)`                 |
 
 </div>
 

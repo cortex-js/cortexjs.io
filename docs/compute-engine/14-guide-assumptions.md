@@ -120,15 +120,15 @@ The type of a symbol is automatically inferred from assumptions:
 
 ```js
 ce.assume(ce.parse("x > 4"));
-ce.box("x").type.toString();
+ce.expr("x").type.toString();
 // ➔ 'real'
 
 ce.assume(ce.parse("n = 42"));
-ce.box("n").type.toString();
+ce.expr("n").type.toString();
 // ➔ 'integer'
 
 ce.assume(ce.parse("z = 3.14"));
-ce.box("z").type.toString();
+ce.expr("z").type.toString();
 // ➔ 'real'
 ```
 
@@ -245,10 +245,27 @@ ce.assume(ce.parse("\\Im(\\tau) > 0")); // imaginary part of τ (upper half-plan
 ce.assume(["Less", ["Abs", "q"], 1]);   // |q| < 1 (inside the unit disk)
 ```
 
+The open upper half-plane has a LaTeX shorthand: `\mathbb{C}^+`. In a
+membership, `\tau \in \mathbb{C}^+` is equivalent to `Im(τ) > 0` — it
+canonicalizes to that inequality, so it both reads naturally and discharges the
+same guards.
+
+```js example
+ce.assume(ce.parse("\\tau \\in \\mathbb{C}^+")); // same as Im(τ) > 0
+```
+
 These part-constraints are honored when discharging conditions during
 simplification and rule application: a rule guarded by `Re(s) > 1` will fire
 for a symbol assumed to satisfy it, and will **not** fire (fail-closed) when
 the constraint is unknown.
+
+The discharge matches like with like. An assumed part-inequality satisfies a
+guard expressed as an inequality on the **same** part, including transitively —
+assuming `Re(s) > 1` also discharges `Re(s) > 0`, and `Im(τ) > 1` discharges
+`Im(τ) > 0`. The upper half-plane is expressed this way: identities for modular
+and theta functions are guarded by `Im(τ) > 0`, so a symbol assumed to satisfy
+`ce.assume(["Greater", ["Imaginary", "tau"], 0])` discharges them. See the
+[Identities Library](/compute-engine/guides/identities/).
 
 ### Conjunctions
 

@@ -163,7 +163,7 @@ ce.declare("m", { value: 42 });
 Alternatively, you can set the value of a symbol using the `value` property:
 
 ```js
-ce.box("m").value = 42;
+ce.expr("m").value = 42;
 ```
 
 **To prevent the value of a symbol from being changed**, set the `isConstant`
@@ -631,7 +631,7 @@ For example, to overload the `Sqrt` function to return `NaN` for
 non-real numbers, use the following code:
 
 ```js
-const originalSqrtDefinition = ce.box('Sqrt').operatorDefinition!;
+const originalSqrtDefinition = ce.expr('Sqrt').operatorDefinition!;
 ce.declare('Sqrt', {
   ...originalSqrtDefinition,
   evaluate: (x, options) => {

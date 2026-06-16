@@ -10,7 +10,7 @@ A **set** is a collection of distinct elements.
 The Compute Engine standard library includes definitions for common numeric sets. Checking if a value belongs to a set is done using the `Element` expression, or the $\in$ (`\in`) command in LaTeX.
 
 ```js
-ce.box(['Element', 3.14, 'NegativeIntegers']).evaluate().print();
+ce.expr(['Element', 3.14, 'NegativeIntegers']).evaluate().print();
 // ➔ False
 
 ce.parse("42 \\in \\Z").evaluate().print();
@@ -23,10 +23,10 @@ case the check is done against the expression type.
 
 ```js
 ce.declare('x', 'finite_real');
-ce.box(['Element', 'x', 'real']).evaluate().print();
+ce.expr(['Element', 'x', 'real']).evaluate().print();
 // ➔ True
 
-ce.box(['Element', 'x', 'integer']).evaluate().print();
+ce.expr(['Element', 'x', 'integer']).evaluate().print();
 // ➔ False
 ```
 
@@ -34,7 +34,7 @@ Checking if an element is in a set is equivalent to checking if the type of the
 element matches the type associated with the set.
 
 ```js
-const x = ce.box(42);
+const x = ce.expr(42);
 
 x.type;
 // ➔ "finite_integer"
@@ -45,7 +45,7 @@ x.type.matches("integer");
 x.isInteger;
 // ➔ true
 
-ce.box(['Element', x, 'Integers']).evaluate().print();
+ce.expr(['Element', x, 'Integers']).evaluate().print();
 // ➔ True
 
 ce.parse("42 \\in \\Z").evaluate().print();
@@ -188,9 +188,9 @@ ce.parse('[0, 1]').json;
 Intervals are serialized using American notation with explicit LaTeX bracket commands:
 
 ```js
-ce.box(['Interval', 0, ['Open', 1]]).latex;
+ce.expr(['Interval', 0, ['Open', 1]]).latex;
 // ➔ "\\lbrack0, 1\\rparen"
 
-ce.box(['Interval', ['Open', 0], ['Open', 1]]).latex;
+ce.expr(['Interval', ['Open', 0], ['Open', 1]]).latex;
 // ➔ "\\lparen0, 1\\rparen"
 ```

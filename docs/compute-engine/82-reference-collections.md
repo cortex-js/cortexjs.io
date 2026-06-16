@@ -168,7 +168,7 @@ or `expr.print()` methods. A placeholder is inserted to indicate missing
 elements.
 
 ```js example
-const expr = ce.box(["Map", "Integers", ["Square", "_"]]);
+const expr = ce.expr(["Map", "Integers", ["Square", "_"]]);
 expr.print();
 // ➔ [1, 4, 9, 16, 25...]
 ```
@@ -185,10 +185,10 @@ the iterator.
 
 ```js example
 ce.maxCollectionSize = 5;
-ce.box(['Repeat', 7, 100]).evaluate();
+ce.expr(['Repeat', 7, 100]).evaluate();
 // ➔ ["Repeat", 7, 100]  (stays lazy; would exceed the cap)
 
-ce.box(['Repeat', 7, 3]).evaluate();
+ce.expr(['Repeat', 7, 3]).evaluate();
 // ➔ ["List", 7, 7, 7]
 ```
 
@@ -340,12 +340,12 @@ The visual presentation of a `List` expression can be customized using the
 `Delimiter` function.
 
 ```js example
-const xs = ce.box(["List", 5, 2, 10, 18]);
+const xs = ce.expr(["List", 5, 2, 10, 18]);
 
 xs.latex
 // ➔ "\lbrack 5, 2, 10, 18 \rbrack"
 
-ce.box(["Delimiter", xs, "<;>"]).latex;
+ce.expr(["Delimiter", xs, "<;>"]).latex;
 // ➔ "\langle5; 2; 10; 18\rangle"
 ```
 

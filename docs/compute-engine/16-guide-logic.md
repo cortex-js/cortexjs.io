@@ -55,14 +55,14 @@ These operators support any number of arguments:
 
 ```js example
 // N-ary XOR: true when an odd number of arguments are true
-ce.box(['Xor', 'True', 'True', 'True']).evaluate();   // → True (3 is odd)
-ce.box(['Xor', 'True', 'True', 'False']).evaluate();  // → False (2 is even)
+ce.expr(['Xor', 'True', 'True', 'True']).evaluate();   // → True (3 is odd)
+ce.expr(['Xor', 'True', 'True', 'False']).evaluate();  // → False (2 is even)
 
 // N-ary NAND: NOT(AND(a, b, c, ...))
-ce.box(['Nand', 'True', 'True', 'False']).evaluate(); // → True
+ce.expr(['Nand', 'True', 'True', 'False']).evaluate(); // → True
 
 // N-ary NOR: NOT(OR(a, b, c, ...))
-ce.box(['Nor', 'False', 'False', 'False']).evaluate(); // → True
+ce.expr(['Nor', 'False', 'False', 'False']).evaluate(); // → True
 ```
 
 ### Operator Precedence
@@ -111,14 +111,14 @@ Boolean expressions with concrete `True`/`False` values evaluate to their
 logical result:
 
 ```js example
-ce.box(['And', 'True', 'False']).evaluate();     // → False
-ce.box(['Or', 'True', 'False']).evaluate();      // → True
-ce.box(['Not', 'False']).evaluate();             // → True
-ce.box(['Implies', 'True', 'False']).evaluate(); // → False
-ce.box(['Implies', 'False', 'True']).evaluate(); // → True
-ce.box(['Xor', 'True', 'False']).evaluate();     // → True
-ce.box(['Nand', 'True', 'True']).evaluate();     // → False
-ce.box(['Nor', 'False', 'False']).evaluate();    // → True
+ce.expr(['And', 'True', 'False']).evaluate();     // → False
+ce.expr(['Or', 'True', 'False']).evaluate();      // → True
+ce.expr(['Not', 'False']).evaluate();             // → True
+ce.expr(['Implies', 'True', 'False']).evaluate(); // → False
+ce.expr(['Implies', 'False', 'True']).evaluate(); // → True
+ce.expr(['Xor', 'True', 'False']).evaluate();     // → True
+ce.expr(['Nand', 'True', 'True']).evaluate();     // → False
+ce.expr(['Nor', 'False', 'False']).evaluate();    // → True
 ```
 
 ## First-Order Logic
@@ -234,21 +234,21 @@ Specify a finite domain using `Element` with a `Set`, `List`, `Range`, or
 
 ```js example
 // Universal: all elements satisfy the predicate
-ce.box(['ForAll',
+ce.expr(['ForAll',
   ['Element', 'x', ['Set', 1, 2, 3]],
   ['Greater', 'x', 0]
 ]).evaluate();
 // → True (1 > 0, 2 > 0, 3 > 0 all hold)
 
 // Existential: at least one element satisfies the predicate
-ce.box(['Exists',
+ce.expr(['Exists',
   ['Element', 'x', ['Set', 1, 2, 3]],
   ['Greater', 'x', 2]
 ]).evaluate();
 // → True (3 > 2 holds)
 
 // Unique existential: exactly one element satisfies the predicate
-ce.box(['ExistsUnique',
+ce.expr(['ExistsUnique',
   ['Element', 'x', ['Set', 1, 2, 3]],
   ['Equal', 'x', 2]
 ]).evaluate();
@@ -261,14 +261,14 @@ For integer ranges, use `Range`:
 
 ```js example
 // All integers from 1 to 100 are positive
-ce.box(['ForAll',
+ce.expr(['ForAll',
   ['Element', 'n', ['Range', 1, 100]],
   ['Greater', 'n', 0]
 ]).evaluate();
 // → True
 
 // Some integer from 1 to 10 is a perfect square greater than 5
-ce.box(['Exists',
+ce.expr(['Exists',
   ['Element', 'n', ['Range', 1, 10]],
   ['And', ['Greater', 'n', 5], ['Equal', ['Sqrt', 'n'], ['Floor', ['Sqrt', 'n']]]]
 ]).evaluate();
@@ -281,7 +281,7 @@ Nested quantifiers are evaluated over the Cartesian product of their domains:
 
 ```js example
 // For all pairs (x, y) in {1,2} × {1,2}: x + y > 0
-ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2]],
+ce.expr(['ForAll', ['Element', 'x', ['Set', 1, 2]],
   ['ForAll', ['Element', 'y', ['Set', 1, 2]],
     ['Greater', ['Add', 'x', 'y'], 0]
   ]
@@ -289,7 +289,7 @@ ce.box(['ForAll', ['Element', 'x', ['Set', 1, 2]],
 // → True (checks all 4 pairs: (1,1), (1,2), (2,1), (2,2))
 
 // There exist x, y in {1,2,3} such that x + y = 5
-ce.box(['Exists', ['Element', 'x', ['Set', 1, 2, 3]],
+ce.expr(['Exists', ['Element', 'x', ['Set', 1, 2, 3]],
   ['Exists', ['Element', 'y', ['Set', 1, 2, 3]],
     ['Equal', ['Add', 'x', 'y'], 5]
   ]
@@ -303,13 +303,13 @@ Quantifiers simplify automatically in certain cases:
 
 ```js example
 // Constant body
-ce.box(['ForAll', 'x', 'True']).evaluate();   // → True
-ce.box(['ForAll', 'x', 'False']).evaluate();  // → False
-ce.box(['Exists', 'x', 'True']).evaluate();   // → True
-ce.box(['Exists', 'x', 'False']).evaluate();  // → False
+ce.expr(['ForAll', 'x', 'True']).evaluate();   // → True
+ce.expr(['ForAll', 'x', 'False']).evaluate();  // → False
+ce.expr(['Exists', 'x', 'True']).evaluate();   // → True
+ce.expr(['Exists', 'x', 'False']).evaluate();  // → False
 
 // Body doesn't contain the quantified variable
-ce.box(['ForAll', 'x', ['Greater', 'y', 0]]).evaluate();
+ce.expr(['ForAll', 'x', ['Greater', 'y', 0]]).evaluate();
 // → y > 0 (the quantifier is eliminated)
 ```
 
@@ -324,15 +324,15 @@ CNF is a conjunction (AND) of disjunctions (OR) of literals:
 
 ```js example
 // Convert (A ∧ B) ∨ C to CNF
-ce.box(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate();
+ce.expr(['ToCNF', ['Or', ['And', 'A', 'B'], 'C']]).evaluate();
 // → (A ∨ C) ∧ (B ∨ C)
 
 // Convert implication to CNF
-ce.box(['ToCNF', ['Implies', 'A', 'B']]).evaluate();
+ce.expr(['ToCNF', ['Implies', 'A', 'B']]).evaluate();
 // → ¬A ∨ B
 
 // De Morgan's law is applied automatically
-ce.box(['ToCNF', ['Not', ['And', 'A', 'B']]]).evaluate();
+ce.expr(['ToCNF', ['Not', ['And', 'A', 'B']]]).evaluate();
 // → ¬A ∨ ¬B
 ```
 
@@ -342,11 +342,11 @@ DNF is a disjunction (OR) of conjunctions (AND) of literals:
 
 ```js example
 // Convert (A ∨ B) ∧ C to DNF
-ce.box(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate();
+ce.expr(['ToDNF', ['And', ['Or', 'A', 'B'], 'C']]).evaluate();
 // → (A ∧ C) ∨ (B ∧ C)
 
 // De Morgan's law
-ce.box(['ToDNF', ['Not', ['Or', 'A', 'B']]]).evaluate();
+ce.expr(['ToDNF', ['Not', ['Or', 'A', 'B']]]).evaluate();
 // → ¬A ∧ ¬B
 ```
 
@@ -370,7 +370,7 @@ Check if an argument is valid by verifying the conclusion follows from premises:
 // Modus Ponens: If P → Q and P, then Q
 // Check: for all truth values, (P → Q) ∧ P → Q is a tautology
 
-ce.box(['ForAll', ['Element', 'p', ['Set', 'True', 'False']],
+ce.expr(['ForAll', ['Element', 'p', ['Set', 'True', 'False']],
   ['ForAll', ['Element', 'q', ['Set', 'True', 'False']],
     ['Implies',
       ['And', ['Implies', 'p', 'q'], 'p'],
@@ -387,7 +387,7 @@ Verify mathematical properties:
 
 ```js example
 // Commutativity of addition for small integers
-ce.box(['ForAll', ['Element', 'a', ['Range', -5, 5]],
+ce.expr(['ForAll', ['Element', 'a', ['Range', -5, 5]],
   ['ForAll', ['Element', 'b', ['Range', -5, 5]],
     ['Equal', ['Add', 'a', 'b'], ['Add', 'b', 'a']]
   ]
@@ -396,7 +396,7 @@ ce.box(['ForAll', ['Element', 'a', ['Range', -5, 5]],
 
 // Check if a function is injective over a domain
 // f(x) = x² is not injective on {-2, -1, 0, 1, 2}
-ce.box(['Exists', ['Element', 'x', ['Set', -2, -1, 0, 1, 2]],
+ce.expr(['Exists', ['Element', 'x', ['Set', -2, -1, 0, 1, 2]],
   ['Exists', ['Element', 'y', ['Set', -2, -1, 0, 1, 2]],
     ['And',
       ['NotEqual', 'x', 'y'],
@@ -420,7 +420,7 @@ const people = ['Set',
 ];
 
 // Check if someone is over 28
-ce.box(['Exists', ['Element', 'person', people],
+ce.expr(['Exists', ['Element', 'person', people],
   ['Greater', ['At', 'person', 2], 28]
 ]).evaluate();
 // → True (Bob is 30)
@@ -438,15 +438,15 @@ makes the expression true:
 
 ```js example
 // A contradiction is not satisfiable
-ce.box(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate();
+ce.expr(['IsSatisfiable', ['And', 'A', ['Not', 'A']]]).evaluate();
 // → False
 
 // Most formulas are satisfiable
-ce.box(['IsSatisfiable', ['And', 'A', 'B']]).evaluate();
+ce.expr(['IsSatisfiable', ['And', 'A', 'B']]).evaluate();
 // → True (set A=True, B=True)
 
 // A tautology is satisfiable
-ce.box(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate();
+ce.expr(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate();
 // → True
 ```
 
@@ -456,29 +456,29 @@ Use `IsTautology` to check if an expression is true for all possible assignments
 
 ```js example
 // Law of excluded middle
-ce.box(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate();
+ce.expr(['IsTautology', ['Or', 'A', ['Not', 'A']]]).evaluate();
 // → True
 
 // Double negation
-ce.box(['IsTautology', ['Equivalent', ['Not', ['Not', 'A']], 'A']]).evaluate();
+ce.expr(['IsTautology', ['Equivalent', ['Not', ['Not', 'A']], 'A']]).evaluate();
 // → True
 
 // De Morgan's law
-ce.box(['IsTautology', ['Equivalent',
+ce.expr(['IsTautology', ['Equivalent',
   ['Not', ['And', 'A', 'B']],
   ['Or', ['Not', 'A'], ['Not', 'B']]
 ]]).evaluate();
 // → True
 
 // Modus Ponens
-ce.box(['IsTautology', ['Implies',
+ce.expr(['IsTautology', ['Implies',
   ['And', ['Implies', 'A', 'B'], 'A'],
   'B'
 ]]).evaluate();
 // → True
 
 // A simple conjunction is not a tautology
-ce.box(['IsTautology', ['And', 'A', 'B']]).evaluate();
+ce.expr(['IsTautology', ['And', 'A', 'B']]).evaluate();
 // → False
 ```
 
@@ -488,7 +488,7 @@ Use `TruthTable` to generate a complete truth table for any Boolean expression:
 
 ```js example
 // Truth table for AND
-ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate();
+ce.expr(['TruthTable', ['And', 'A', 'B']]).evaluate();
 // → [["A", "B", "Result"],
 //    ["False", "False", "False"],
 //    ["False", "True", "False"],
@@ -496,7 +496,7 @@ ce.box(['TruthTable', ['And', 'A', 'B']]).evaluate();
 //    ["True", "True", "True"]]
 
 // Truth table for implication
-ce.box(['TruthTable', ['Implies', 'P', 'Q']]).evaluate();
+ce.expr(['TruthTable', ['Implies', 'P', 'Q']]).evaluate();
 // → [["P", "Q", "Result"],
 //    ["False", "False", "True"],
 //    ["False", "True", "True"],

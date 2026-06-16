@@ -173,7 +173,7 @@ Read more about **Parsing and Serializing LaTeX**<Icon name="chevron-right-bold"
 
 
 :::info[Note]
-In this guide, the `ce.` prefix in `ce.box()` or `ce.parse()` indicates
+In this guide, the `ce.` prefix in `ce.expr()` or `ce.parse()` indicates
 that the function is a method of the `ComputeEngine` class.
 
 Use `getDefaultEngine()` to access the shared `ComputeEngine` instance used by the free functions, or create your own instance with `new ComputeEngine()`.
@@ -181,7 +181,7 @@ Use `getDefaultEngine()` to access the shared `ComputeEngine` instance used by t
 The `expr.` prefix in `expr.evaluate()` or `expr.simplify()` indicates that the
 function is a method of the `Expression` class.
 
-**To create a new expression** use `expr = ce.parse()` or `expr = ce.box()`
+**To create a new expression** use `expr = ce.parse()` or `expr = ce.expr()`
 
 :::
 

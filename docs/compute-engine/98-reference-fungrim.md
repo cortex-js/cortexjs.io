@@ -7,7 +7,7 @@ slug: /compute-engine/reference/fungrim/
 
 The Compute Engine ships a library of **special-function identities** derived from the [Fungrim](https://fungrim.org/) "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation solving for functions such as the elliptic integrals, Jacobi theta functions, Bessel functions, the Riemann zeta function, and many more.
 
-This reference catalogues the **1380 identities** behind the engine's **1385 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
+This reference catalogues the **1383 identities** behind the engine's **1388 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -39,9 +39,9 @@ Airy functions (9) · Bessel functions (57) · Confluent hypergeometric function
 
 Arithmetic-geometric mean (28) · Carlson symmetric elliptic integrals (183) · Legendre elliptic integrals (80) · Weierstrass elliptic functions (13)
 
-### [Modular forms and theta functions](/compute-engine/reference/fungrim-modular-theta/) (311)
+### [Modular forms and theta functions](/compute-engine/reference/fungrim-modular-theta/) (314)
 
-Dedekind eta function (23) · Illustrations of Eisenstein series (41) · Jacobi theta functions (204) · Modular j-invariant (19) · Modular lambda function (24)
+Dedekind eta function (23) · Illustrations of Eisenstein series (41) · Jacobi theta functions (206) · Modular j-invariant (20) · Modular lambda function (24)
 
 ### [Zeta and L-functions](/compute-engine/reference/fungrim-zeta/) (79)
 

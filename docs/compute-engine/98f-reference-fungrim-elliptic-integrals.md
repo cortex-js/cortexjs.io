@@ -349,7 +349,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassP}(\mathrm{CarlsonRF}(z-\mathrm{EllipticRootE}(1, \tau), z-\mathrm{EllipticRootE}(2, \tau), z-\mathrm{EllipticRootE}(3, \tau)), \tau)=z$$
 
-**Holds when** $z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`124339` · Fungrim entry ↗](https://fungrim.org/entry/124339)
@@ -2516,7 +2516,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{z\mathrm{JacobiTheta}(1, 0, \tau, 3)}{3\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`0207dc` · Fungrim entry ↗](https://fungrim.org/entry/0207dc)
@@ -2525,7 +2525,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\mathrm{WeierstrassSigma}(z, \tau)^{\prime}(z)=\mathrm{WeierstrassZeta}(z, \tau)\mathrm{WeierstrassSigma}(z, \tau)$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`0e649f` · Fungrim entry ↗](https://fungrim.org/entry/0e649f)
@@ -2534,7 +2534,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassP}(-z, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`12a9e8` · Fungrim entry ↗](https://fungrim.org/entry/12a9e8)
@@ -2543,7 +2543,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassSigma}(-z, \tau)=-\mathrm{WeierstrassSigma}(z, \tau)$$
 
-**Holds when** $z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\in\C$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function.
 Used by the Compute Engine for expansion.
 [`23beb5` · Fungrim entry ↗](https://fungrim.org/entry/23beb5)
@@ -2552,7 +2552,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{WeierstrassSigma}(z+1, \tau)=-(\mathrm{WeierstrassSigma}(z, \tau)\exp(2(z+\frac{1}{2})\mathrm{WeierstrassZeta}(1/2, \tau)))$$
 
-**Holds when** $z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\in\C$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`35403b` · Fungrim entry ↗](https://fungrim.org/entry/35403b)
@@ -2561,7 +2561,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassZeta}(-z, \tau)=-\mathrm{WeierstrassZeta}(z, \tau)$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for expansion.
 [`72eb69` · Fungrim entry ↗](https://fungrim.org/entry/72eb69)
@@ -2570,7 +2570,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{WeierstrassZeta}(\tau+z, \tau)=\mathrm{WeierstrassZeta}(\frac{\tau}{2}, \tau)+\mathrm{WeierstrassZeta}(z, \tau)$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`a0c85d` · Fungrim entry ↗](https://fungrim.org/entry/a0c85d)
@@ -2579,7 +2579,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassP}(n\tau+m+z, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}\land m\in\Z\land n\in\Z$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land m\in\Z\land n\in\Z$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`a95b7e` · Fungrim entry ↗](https://fungrim.org/entry/a95b7e)
@@ -2588,7 +2588,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassP}(z, \tau)=\frac{\pi\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^2-\frac{1}{3}((\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(3, 0, \tau)^4)\pi^2)$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`af0dfc` · Fungrim entry ↗](https://fungrim.org/entry/af0dfc)
@@ -2597,7 +2597,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassSigma}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\exp(-((\mathrm{JacobiTheta}(1, 0, \tau, 3)z^2)/(6\mathrm{JacobiTheta}(1, 0, \tau, 1))))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
-**Holds when** $z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\in\C$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassSigma** — Weierstrass sigma function.
 Used by the Compute Engine for simplification.
 [`b96c9d` · Fungrim entry ↗](https://fungrim.org/entry/b96c9d)
@@ -2606,7 +2606,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassSigma}(\tau+z, \tau)=-(\mathrm{WeierstrassSigma}(z, \tau)\exp(2(\frac{\tau}{2}+z)\mathrm{WeierstrassZeta}(\tau/2, \tau)))$$
 
-**Holds when** $z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\in\C$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`de9f42` · Fungrim entry ↗](https://fungrim.org/entry/de9f42)
@@ -2615,7 +2615,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\mathrm{WeierstrassZeta}(z, \tau)^{\prime}(z)=-\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`e677fb` · Fungrim entry ↗](https://fungrim.org/entry/e677fb)
@@ -2624,7 +2624,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassZeta}(z+1, \tau)=\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)+\mathrm{WeierstrassZeta}(z, \tau)$$
 
-**Holds when** $z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land\tau\in\mathrm{HH}$.
+**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`ffcc0f` · Fungrim entry ↗](https://fungrim.org/entry/ffcc0f)

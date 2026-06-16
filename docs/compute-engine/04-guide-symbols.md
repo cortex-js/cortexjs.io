@@ -21,7 +21,7 @@ symbol will be inferred based on its usage or its value. If its type cannot be
 inferred, the type will be `unknown`.
 
 ```live show-line-numbers
-const n = ce.box("n");
+const n = ce.expr("n");
 n.value = 5;
 console.log("n =", n.value.toString(), ":", n.type);
 ```
@@ -58,10 +58,10 @@ identified by a special flag in their definition.
 **To check if a symbol is a constant**, use the `expr.isConstant` property.
 
 ```js
-console.log(ce.box("x").isConstant);
+console.log(ce.expr("x").isConstant);
 // ➔ false
 
-console.log(ce.box("Pi").isConstant);
+console.log(ce.expr("Pi").isConstant);
 // ➔ true
 ```
 :::warning
@@ -75,12 +75,12 @@ changed will be updated.
 
 ```js
 ce.precision = 4;
-const smallPi = ce.box("Pi"); // π with 4 digits
+const smallPi = ce.expr("Pi"); // π with 4 digits
 console.log(smallPi.latex);
 // ➔ 3.1415
 
 ce.precision = 10;
-const bigPi = ce.box("Pi"); // π with 10 digits
+const bigPi = ce.expr("Pi"); // π with 10 digits
 console.log(bigPi.latex);
 // ➔ 3.1415926535
 
@@ -99,7 +99,7 @@ The symbol has a type of `unknown` and no value associated with it,
 so the symbol will be an **unknown**.
 
 ```js
-const symbol = ce.box("m"); // m for mystery
+const symbol = ce.expr("m"); // m for mystery
 console.log(symbol.type);
 // ➔ "unknown"
 

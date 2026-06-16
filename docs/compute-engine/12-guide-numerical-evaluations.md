@@ -121,7 +121,7 @@ Unlike the `.re` property, `valueOf()` can also return a `boolean` or a
 
 
 
-**To get an `Expression` number literal from a JavaScript number**, use `ce.box()` or `ce.number()`.
+**To get an `Expression` number literal from a JavaScript number**, use `ce.expr()` or `ce.number()`.
 
 ```live
 const expr = box(1.5);
@@ -200,40 +200,43 @@ console.log(ce.parse('0.1 + 0.2').N().json);
 
 Trigonometric operations are accurate for precision up to 1,000.
 
-### Serialization
+### Serialization and Precision
 
-The `precision` property affects how the computations are performed, but not how
-they are serialized. 
+The `precision` property controls how computations are performed. It also
+affects how results are displayed:
 
-**To change the number of digits when serializing to LaTeX**, use
-`expr.toLatex({ precision: 6 })` to set it to 6 significant digits, for
-example.
+- **`.latex`** and **`.toString()`** round numeric output to `ce.precision`
+  significant digits. This hides noise digits that arise from internal
+  rounding in division and transcendental functions.
+- **`.json`** and **`toJSON()`** emit the full unrounded value for lossless
+  data interchange. Use `expr.toMathJson({ fractionalDigits: 'auto' })` to
+  get precision-rounded MathJSON output.
 
-The LaTeX precision is adjusted automatically when the `precision` is changed so
-that the display precision is never greater than the computation precision.
+**To explicitly control digits in MathJSON output**, use
+`expr.toMathJson()` with the `fractionalDigits` option:
 
-When the precision is greater than 15, the return value of `expr.N().json` may 
-be a MathJSON number that looks like this:
+```ts
+expr.toMathJson({ fractionalDigits: 'auto' }); // rounded to ce.precision
+expr.toMathJson({ fractionalDigits: 'max' });  // all digits (default)
+expr.toMathJson({ fractionalDigits: 5 });      // 5 fractional digits
+```
+
+When the precision is greater than 15, the return value of `expr.N().json` may
+be a MathJSON number with a `num` string containing all available digits:
 
 ```json example
 {
-  "num": "3.141592653589793238462643383279502884197169399375105820974944
-  5923078164062862089986280348253421170679821480865132823066470938446095
-  5058223172535940812848111745028410270193852110555964462294895493038196
-  4428810975665933446128475648233786783165271201909145648566923460348610
-  4543266482133936072602491412737245870066063155881748815209209628292540
-  9173643678925903600113305305488204665213841469519415116094330572703657
-  5959195309218611738193261179310511854807446237996274956735188575272489
-  1227938180119491298336733624406566430860213949463952247371907021798609
-  4370277053921717629317675238467481846766940513200056812714526356082778
-  5771342757789609173637178721468440901224953430146549585371050792279689
-  2589235420199561121290219608640344181598136297747713099605187072113499
-  9999837297804995105973173281609631859502445945534690830264252230825334
-  4685035261931188171010003137838752886587533208381420617177669147303598
-  2534904287554687311595628638823537875937519577818577805321712268066130
-  01927876611195909216420199"
+  "num": "3.14159265358979323846264338327950288419716939937510"
 }
 ```
+
+:::info[Note]
+The `.json` output may contain more digits than `ce.precision` because
+some arithmetic operations (addition, subtraction, multiplication) are exact
+and preserve all digits. Digits beyond the working precision are not
+guaranteed to be accurate. For display purposes, use `.latex` or
+`.toString()` which automatically round to the working precision.
+:::
 
 
 
@@ -323,7 +326,7 @@ For example:
 ```js
 ce.precision = "machine";
 const x = ce.parse("0.1 + 0.2").N();
-console.log(ce.box(["Subtract", x, x]).N());
+console.log(ce.expr(["Subtract", x, x]).N());
 // ➔ 2.7755575615628914e-17
 ```
 

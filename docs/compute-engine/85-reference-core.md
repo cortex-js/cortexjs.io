@@ -366,6 +366,33 @@ in order to reduce, simplify and calculate its value.
 
 
 <nav className="hidden">
+### Solve
+</nav>
+<FunctionDefinition name="Solve">
+
+<Signature name="Solve">_equation_, _unknown_</Signature>
+
+Return a list of the solutions of _equation_ for _unknown_.
+
+The _equation_ is an `Equal` expression, or a bare expression that is solved as
+if it were equal to zero.
+
+```json example
+["Solve", ["Equal", ["Power", "x", 2], 1], "x"]
+// -> ["List", 1, -1]
+
+["Solve", ["Subtract", ["Power", "x", 2], 1], "x"]
+// -> ["List", 1, -1]
+```
+
+`Solve` is the operator form of the `expr.solve()` method, and uses the same
+solver. The result is a `List` of the solutions, or an empty list when none are
+found.
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
 ### CanonicalForm
 </nav>
 <FunctionDefinition name="CanonicalForm">
@@ -485,7 +512,7 @@ The form application order matters: forms are applied sequentially, and
 each form may benefit from transformations made by earlier forms.
 
 **Note**: see also the options for the `canonical` option of `ce.parse()` and
-`ce.box()` which can also be used to specify a custom canonical form:
+`ce.expr()` which can also be used to specify a custom canonical form:
 
 ```js example
 const correct = ce.parse(mf.value, {canonical: "Order"})

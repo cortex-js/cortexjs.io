@@ -48,7 +48,7 @@ invalid because there's no way to determine where `__a` ends and `__b` begins.
 import { validatePattern } from 'compute-engine';
 
 const ce = new ComputeEngine();
-const pattern = ce.box(['Add', '__a', '__b']);
+const pattern = ce.expr(['Add', '__a', '__b']);
 
 try {
   validatePattern(pattern);
@@ -125,7 +125,7 @@ console.log(expr.match(["Add", ["Multiply", "_a", ["Power", "x", 2]],
 
 ```live example
 const expr = ce.parse('3x^2+2x+5');
-const pattern = ce.box(["Add", ["Multiply", "_a", ["Power", "x", 2]],
+const pattern = ce.expr(["Add", ["Multiply", "_a", ["Power", "x", 2]],
   ["Multiply", "_b", "x"], "_c"]);
 console.log(expr.match(pattern));
 // ➔ { _a: 3, _b: 2, _c: 5 }
@@ -153,7 +153,7 @@ When a string pattern is used, several conveniences are applied:
 
 ```live example
 const expr = ce.parse('3y^2+5');
-console.log(expr.match('ax^2+bx+c', { substitution: { x: ce.box('y') } }));
+console.log(expr.match('ax^2+bx+c', { substitution: { x: ce.expr('y') } }));
 // ➔ { a: 3, b: 0, c: 5 }
 ```
 
@@ -188,14 +188,14 @@ explicitly to enable this behavior.
 The commutativity of functions is taken into account when matching patterns.
 
 ```live example
-const pattern = ce.box(["Add", "_", "x"]);
-console.log("x+1 ➔", ce.box(["Add", 1, "x"]).match(pattern));
+const pattern = ce.expr(["Add", "_", "x"]);
+console.log("x+1 ➔", ce.expr(["Add", 1, "x"]).match(pattern));
 // ➔ { } : the expression matches the pattern
 
-console.log("x+42 ➔", ce.box(["Add", "x", 42]).match(pattern));
+console.log("x+42 ➔", ce.expr(["Add", "x", 42]).match(pattern));
 // ➔ { } : the expression matches the pattern by commutativity
 
-console.log("5*x ➔", ce.box(["Multiply", 5, "x"]).match(pattern));
+console.log("5*x ➔", ce.expr(["Multiply", 5, "x"]).match(pattern));
 // ➔ null : the expression does not match the pattern
 ```
 
@@ -206,8 +206,8 @@ expression, for example `x+_a` and `x` are considered to match (with the
 substitution `{_a : 0}`).
 
 ```live example
-const pattern = ce.box(["Add", "x", "_a"]);
-const expr = ce.box("x");
+const pattern = ce.expr(["Add", "x", "_a"]);
+const expr = ce.expr("x");
 
 console.log("x ➔", expr.match(pattern));
 // ➔ { _a: 0 } : the expression matches the pattern
@@ -216,8 +216,8 @@ console.log("x ➔", expr.match(pattern));
 **To prevent the matching of variants**, set the `exact` property to `true`.
 
 ```live example
-const pattern = ce.box(["Add", "x", "_a"]);
-const expr = ce.box("x");
+const pattern = ce.expr(["Add", "x", "_a"]);
+const expr = ce.expr("x");
 
 console.log("exact: x ➔", expr.match(pattern, {exact: true}));
 // ➔ null : the expression does not match the pattern
@@ -226,9 +226,9 @@ console.log("exact: x ➔", expr.match(pattern, {exact: true}));
 The variants can be applied to the whole expression or to sub-expressions.
 
 ```live example
-const pattern = ce.box(["Add", ["Multiply", "_a", "x"], "_b"]);
+const pattern = ce.expr(["Add", ["Multiply", "_a", "x"], "_b"]);
 
-console.log("x ➔", ce.box("x").match(pattern));
+console.log("x ➔", ce.expr("x").match(pattern));
 // ➔ { _a: 1, _b: 0 } : the expression matches the pattern
 ```
 
@@ -239,8 +239,8 @@ By default, the `expr.match()` method does not consider sub-expressions:
 it is not recursive.
 
 ```live example
-const pattern = ce.box(["Add", "_", "x"]);
-const expr = ce.box(["Multiply", 2, ["Add", 1, "x"]]);
+const pattern = ce.expr(["Add", "_", "x"]);
+const expr = ce.expr(["Multiply", 2, ["Add", 1, "x"]]);
 
 console.log("2(1+x) ➔", expr.match(pattern));
 // ➔ null : the expression does not match the pattern
@@ -250,8 +250,8 @@ console.log("2(1+x) ➔", expr.match(pattern));
 `true`.
 
 ```live example
-const pattern = ce.box(["Add", "_", "x"]);
-const expr = ce.box(["Multiply", 2, ["Add", 1, "x"]]);
+const pattern = ce.expr(["Add", "_", "x"]);
+const expr = ce.expr(["Multiply", 2, ["Add", 1, "x"]]);
 
 console.log("recursive: 2(1+x) ➔", expr.match(pattern, {recursive: true}));
 // ➔ { } : the expression matches the pattern
@@ -264,10 +264,10 @@ If a named wildcard is referenced multiple times in a pattern, all its values
 must match.
 
 ```live example
-console.log(ce.box(["Add", 1, "x"]).match(ce.box(["Add", '_a', '_a'])));
+console.log(ce.expr(["Add", 1, "x"]).match(ce.expr(["Add", '_a', '_a'])));
 // ➔ null
 
-console.log(ce.box(["Add", "x", "x"]).match(ce.box(["Add", '_a', '_a'])));
+console.log(ce.expr(["Add", "x", "x"]).match(ce.expr(["Add", '_a', '_a'])));
 // ➔ { _a: "x" }
 ```
 
@@ -276,7 +276,7 @@ console.log(ce.box(["Add", "x", "x"]).match(ce.box(["Add", '_a', '_a'])));
 Wildcards can be used to capture the head of functions:
 
 ```live example
-console.log(ce.box(["Add", 1, "x"]).match(ce.box(["_f", "__args"])));
+console.log(ce.expr(["Add", 1, "x"]).match(ce.expr(["_f", "__args"])));
 // ➔ { _f: "Add", __args: ["Sequence", [1, "x"]] }
 ```
 
@@ -292,8 +292,8 @@ If there is no match, `expr.match()` returns `null`.
 it was derived from, use the `subs()` function.
 
 ```live example
-const expr = ce.box(["Add", 1, "x"]);
-const pattern = ce.box(["Add", 1, "_a"]);
+const expr = ce.expr(["Add", 1, "x"]);
+const pattern = ce.expr(["Add", 1, "_a"]);
 const subs = expr.match(pattern);
 console.log(subs);
 // ➔ { _a: "x" }
@@ -333,7 +333,7 @@ const squareRule = {
   replace: ["Square", "_x"],
 };
 
-const expr = ce.box(["Multiply", 7, 7], { form: 'raw' });
+const expr = ce.expr(["Multiply", 7, 7], { form: 'raw' });
 console.log(expr.replace(squareRule) ?? expr);
 // ➔ ["Square", 7]
 ```
@@ -376,7 +376,7 @@ If a pattern does not contain any named wildcards and only symbols, the
 `expr.subs()` function can be used to replace all occurrences of matching symbols.
 
 ```live example
-const expr = ce.box(["Add", ["Multiply", "a", "x"], "b"]);
+const expr = ce.expr(["Add", ["Multiply", "a", "x"], "b"]);
 
 console.log(expr.replace([
     { match: "a", replace: 2 }, 
