@@ -10,6 +10,200 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.62.1 _2026-06-22_
+
+### New Features
+
+- **`indexStyle` serialization option for collection indexing.** The `At`
+  operator (e.g. `["At", v, 1]`) can now be serialized either as a subscript
+  (`v_1`, `M_{i,j}`) or with programming-style brackets (`v[1]`, `M[i,j]`).
+  Like the other style options (`fractionStyle`, `rootStyle`, …) it is a
+  callback `(expr, level) => 'subscript' | 'bracket'`, settable engine-wide via
+  `ce.latexOptions.indexStyle` or per-call via `expr.toLatex({ indexStyle })`.
+  The default is `'subscript'`.
+
+### Resolved Issues
+
+- **Collection indexing (`At`) now serializes to valid, round-tripping LaTeX.**
+  `["At", v, 1]` previously serialized to `\lbrack v, 1\rbrack` — i.e. the
+  _list_ `[v, 1]`, which re-parsed as `["List", v, 1]`, silently changing the
+  meaning on a serialize→parse cycle. It now serializes as `v_1` (or `v[1]`
+  with `indexStyle: 'bracket'`), both of which parse back to `At`.
+
+- **Accents and decorations serialize with brace notation and round-trip.**
+  `OverHat`, `OverVector`, `OverTilde`, `OverBar`, `UnderBar`, the over-arrows,
+  `OverBrace`, etc. had no serializer and fell back to function-call notation —
+  `\hat{x}` came back out as `\hat(x)`, which re-parsed to
+  `["Multiply", x, ["OverHat"]]` instead of `["OverHat", x]`. They now serialize
+  as `\hat{x}`, `\vec{v}`, `\overline{x}`, … and round-trip correctly,
+  including when subscripted (`\hat{x}_0`).
+
+- **Subscripted single-letter symbols serialize with an italic base instead of
+  an upright one.** When a symbol name carried a subscript (e.g. `a_1`, `x_n`,
+  `S_t`), the serializer chose its font style from the _decorated_ string rather
+  than the base: the subscript inflated the token count, so the multi-character
+  rule wrapped the whole thing in `\mathrm{…}` and rendered the base letter
+  upright (`\mathrm{a_1}`). A single-letter variable with a subscript is now
+  rendered italic, as a variable should be — `a_1` serializes to `a_1`, not
+  `\mathrm{a_1}`. The font style is now decided from the base alone: multi-letter
+  bases are still upright with the wrapper enclosing the whole symbol, so
+  descriptive subscripts stay roman (`speed_max → \mathrm{speed_{max}}`), and
+  explicit style modifiers (`\mathbf`, `\mathbb`, …) are unchanged. Greek
+  single-letter bases are likewise rendered with their default (italic) style.
+
+## 0.62.0 _2026-06-20_
+
+### Resolved Issues
+
+- **Arbitrary-precision sums of three or more terms no longer collapse to
+  machine precision.** `BigNumericValue.add` had a fast path that, when adding
+  to a zero value, cloned the other operand through a constructor that reads its
+  **machine** real part (`decimal.toNumber()`), silently truncating a
+  full-precision bignum to ~16 significant digits. The exact (rational/radical)
+  arithmetic path was unaffected, and two-term sums were unaffected, so this
+  only surfaced when summing **three or more inexact values** at a precision
+  above machine: `ExactNumericValue.sum` folds those starting from a zero
+  accumulator, and the very first `0 + xᵢ` step lost all extra precision. The
+  degradation was invisible when the terms were of similar magnitude (the result
+  was merely capped at ~16 digits), but became a wrong answer under cancellation
+  — e.g. numerically evaluating a high-order symbolic derivative at a point
+  (large factorial-scale terms cancelling to a small value) returned garbage at
+  any working precision. The zero-accumulator path now reads the full-precision
+  real part, matching the non-zero path. Coefficients were always computed
+  exactly; only the final numeric summation was affected.
+
+- **High-order derivatives are reduced instead of blowing up.** The `Derivative`
+  operator applies the differentiation rules iteratively, and the quotient and
+  product rules square the denominator at each step, so the r-th derivative of a
+  quotient carried an `x^(2ʳ)`-scale denominator — e.g. the 75th derivative of
+  `sin(x)/x` came back over `x^(2⁷⁵)`. The result was mathematically exact (the
+  integer coefficients are computed exactly), but the enormous exponent made it
+  unusable and overflowed to `NaN` when evaluated at a point. `Derivative` of
+  order ≥ 2 now runs a single simplification at the end, cancelling the common
+  factors back to a linear-degree denominator (`x^(2⁷⁵) → x⁷⁶`). It is applied
+  once, not per step, so it is cheap (~30 ms at order 75) and leaves first
+  derivatives and the existing low-order results unchanged.
+
+- **`interval-glsl` is now outward-rounded, making it a sound standalone
+  exclusion oracle in `float32` (preview).** As shipped in 0.61.0 the `_iv_*`
+  ops clamped to the sentinel range but rounded to nearest, so an operation — or
+  the cell box itself — could come back slightly **narrower** than the true
+  range. At a boundary that is enough to flip the exclusion verdict for a box
+  the curve only grazes (e.g. the unit circle's tangent corner at `(1, 0)`),
+  violating the containment contract that the GLSL interval must _contain_ the
+  `interval-js` (float64) result — a spuriously narrow interval can exclude a
+  box the curve actually passes through. Every inexact operation now widens its
+  result outward (`lo` toward −∞, `hi` toward +∞) before the clamp: by ~1 ulp
+  for the correctly-rounded ops (`+ − ×`, `Square`), and by a larger relative
+  margin for the GLSL ES built-ins that are not correctly rounded — 8 ulp for
+  `/`, `Sqrt`, `Exp`/`Ln`/`Log`, and inverse trigonometry, and 32 ulp for
+  `Power` (`x^n` with `n ≥ 3`, and fractional powers such as the astroid
+  `x^{2/3}`). Crucially, the cell box that `compileExclusionShader`'s `main()`
+  builds is itself outward-rounded (via the new `_iv_widen_box`): the float32
+  `mix` that constructs it rounds to nearest and is the actual source of the
+  grazing miss, which per-op widening alone cannot fix (with exact endpoints the
+  op chain is exact). That box pad is scaled to the **domain extent**, not the
+  edge value, since that is what bounds the `mix` error — a value-relative pad
+  would vanish for a box edge near 0 in a wide domain. Widening only ever moves
+  a bound outward, so it cannot break soundness; the `empty` (`lo > hi`) /
+  `entire` (`±IV_INF`) encodings, the finite `IV_INF` sentinel, the per-op
+  clamp, and exact empty-propagation are all preserved. `Sin`/`Cos` remain
+  best-effort (see below).
+
+- **`freeVariables` / `unknowns` no longer report the bound variables of
+  `Function` literals and integrals.** A function literal leaked its own
+  parameters, and `Integrate` / `Limit` leaked their variable — e.g.
+  `freeVariables` of `f(x) := x^2 + b` wrongly included the parameter `x`, and a
+  definite integral leaked its integration variable. They now return only
+  genuinely free symbols (`[b, f]` for that definition, `[]` for `∫ sin(x) dx`),
+  while a free coefficient is still reported (`∫ a·sin(x) dx → [a]`). `Sum` /
+  `Product` were already correct, and `symbols` is unchanged (it still includes
+  bound variables). This is a behavior change for code that relied on the
+  previous, over-inclusive result.
+
+- **Runaway user-function recursion now throws a catchable `CancellationError`
+  instead of a native `RangeError`.** A recursive definition with no reachable
+  base case (e.g. `f(x) := f(x-1) + 1`) previously overflowed the JavaScript
+  call stack with an uninformative `RangeError`. `recursionLimit` — previously
+  defined but never enforced — is now applied to user-function application:
+  exceeding it throws a `CancellationError` with
+  `cause: 'recursion-depth-exceeded'`, consistent with how `timeLimit` and
+  `iterationLimit` are surfaced. The default `recursionLimit` is now **256**
+  (was a nominal, unenforced 1024), chosen to fire below the native stack limit
+  on typical engines; raise `ce.recursionLimit` for legitimately deep recursion.
+  Iterating a user function (e.g. `\sum f(i)`) is **not** counted as recursion.
+  (A sufficiently complex single call can still exceed the native stack before
+  the limit is reached, so a robust caller catches `RangeError` as a backstop.)
+
+- **`Integrate` binds only the integration variable in its canonical
+  integrand.** `∫ a·sin(x) dx` previously canonicalized to
+  `Integrate(Function(body, a, x), …)`, listing the free coefficient `a` as a
+  spurious integrand parameter; it is now `Integrate(Function(body, x), …)`.
+  Introspecting the integrand (`expr.op1`) therefore reports `a` as free, and
+  the integrand is a proper single-variable function. Evaluation is unchanged.
+
+- **Nested (multivariate) integrals now parse and evaluate correctly.**
+  `\int_1^2\int_3^4 x y \, dx \, dy` previously attached _all_ the trailing
+  differentials to the innermost integral, leaving the outer integrals with a
+  `Nothing` integration variable — so the expression could not evaluate. Each
+  `\int` now consumes only its own differential (the innermost `dx` pairs with
+  the innermost `\int`, the next `dy` with the next), producing a properly
+  nested `Integrate` where every level carries its own variable and limits
+  (`\iint` / `\iiint` still bind 2 / 3 variables at one level). Combined with
+  the definite-integral evaluator now applying the limits to a _parametric_
+  antiderivative (e.g. `∫_3^4 k·x dx → 7/2·k`; the symbolic `f(b) - f(a)` was
+  previously left as an unevaluated `EvaluateAt`), nested definite integrals
+  evaluate to a value: `∫_1^2∫_3^4 x·y dx dy → 21/4`.
+
+- **Multiple-integral and contour-integral serialization round-trips.** `\iint`
+  / `\iiint` (and `\oiint` / `\oiiint`) now serialize back to the compact sign
+  with a single region subscript (`\iint_{D}\!…`) instead of a stack of `\int`s,
+  so a flat multiple integral round-trips to the same structure. A separate
+  long-standing bug that emitted the literal text `\ointundefined` for any
+  `\oint` with a region (its limit is a 3-element `Tuple`, serialized to
+  MathJSON as `Triple`, which the serializer did not recognize) is also fixed:
+  `\oint_V f(s)\,ds` now serializes as `\oint_{V}\!f(s)\, \mathrm{d}s`.
+
+- **`1^x` simplifies to `1` for any finite exponent.** A symbolic or function
+  exponent (e.g. `1^{n+1}`, `1^{\sin x}`) previously left `Power(1, x)`
+  un-reduced because the canonicalizer bailed before its base-1 rule. `1^x → 1`
+  now (matching SymPy / Mathematica); only a genuinely infinite or NaN exponent
+  stays indeterminate (`1^∞ → NaN`, unchanged).
+
+### New Features
+
+- **`interval-glsl`: public outward-rounding helpers and an opt-in absolute trig
+  pad (preview).** The widen helpers `_iv_widen` / `_iv_widen_t` /
+  `_iv_widen_pow` / `_iv_widen_sc` / `_iv_widen_box`, and their epsilons
+  `IV_EPS` / `IV_EPS_FN` / `IV_EPS_POW` / `IV_BOX_EPS`, are a stable, public
+  part of the emitted preamble: a renderer that builds its own cell box (instead
+  of using `compileExclusionShader`) outward-rounds it by calling
+  `_iv_widen_box(vec2(lo, hi), extent)` per axis, where `extent` is the domain
+  extent for that axis (the box pad is domain-scaled, not value-relative). The
+  preamble is now emitted for any expression with free variables (not only ones
+  that reference an `_iv_*` op), so those helpers are always available — e.g.
+  for an axis line `f = x`. GLSL ES `Sin`/`Cos` carry an _absolute_,
+  implementation-defined error (≈2⁻¹¹ in the worst case; macOS ANGLE→Metal
+  differs) that no relative pad can cover. A new `trigAbsPad` option (default
+  `0`, off) on `compile()`, `IntervalGLSLTarget.compileExclusionShader()`, and
+  the new `IntervalGLSLTarget.getPreamble()` adds an absolute `Sin`/`Cos` pad,
+  so a trigonometric implicit curve can be a strictly-sound standalone oracle at
+  the cost of fatter trig intervals.
+
+- **`BoxedExpression.defines`.** A new accessor returning the symbols an
+  expression _defines_: the target of a top-level `Assign` / `Declare` (`a` in
+  `a := 3`, `f` in `f(x) := …`), recursing through `Block`. It complements
+  `freeVariables` (the symbols an expression _references_) — together they let
+  tooling build a definition/use dependency graph, with
+  `references = freeVariables` minus `defines`.
+
+- **`ComputeEngine.appliedNonFunctions(latex)`.** Returns the symbols written in
+  function-application syntax `f(…)` in `latex` that are **not** functions in
+  the current scope, and so parse as implicit multiplication (`f·x`) or are left
+  unresolved. The check is scope-aware (a symbol declared as a function is not
+  reported) and has no side effects. Useful for flagging a likely call to an
+  undefined function — e.g. warning that `f(x)` was read as `f·x`.
+
 ## 0.61.0 _2026-06-17_
 
 ### New Features
