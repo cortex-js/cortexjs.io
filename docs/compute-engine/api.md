@@ -2194,6 +2194,7 @@ Controls how expressions are created.
 type Metadata = {
   latex: string;
   wikidata: string;
+  sourceOffsets: [number, number];
 };
 ```
 
@@ -4870,13 +4871,41 @@ between `start` and `end` (default: the whole expression)
 error(code, fromToken): MathJsonExpression
 ```
 
-Return an error expression with the specified code and arguments
+Return an error expression with the specified code and arguments.
+
+The returned `Error` expression includes `sourceOffsets` metadata with
+zero-based, end-exclusive offsets into the serialized LaTeX. Missing-operand
+errors use a collapsed (zero-width) range at the position where the operand
+was expected.
 
 ####### code
 
 `string` \| \[`string`, `...MathJsonExpression[]`\]
 
 ####### fromToken
+
+`number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Parser.sourceOffsets()
+
+```ts
+sourceOffsets(startToken, endToken?): [number, number]
+```
+
+Return source offsets for a token range, as zero-based, end-exclusive
+character offsets into the serialized LaTeX (`tokensToString`). For input
+that round-trips unchanged (e.g. editor-generated LaTeX), these match the
+original input string.
+
+####### startToken
+
+`number`
+
+####### endToken?
 
 `number`
 
@@ -8678,6 +8707,18 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 
 <MemberCard>
 
+##### Expression.sourceOffsets?
+
+```ts
+optional sourceOffsets?: [number, number];
+```
+
+Source offsets in the original source string, when available.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### Expression.isCanonical
 
 If `true`, this expression is in a canonical form.
@@ -8964,7 +9005,62 @@ expressions that define nothing.
 Complements [freeVariables](#freevariables) (the symbols an expression
 *references*). A tool that builds a dependency graph keyed on cells —
 e.g. a notebook — can use `defines` for the out-edges and
-`freeVariables` minus `defines` for the in-edges.
+[references](#references) for the in-edges.
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.referencedFunctions
+
+```ts
+readonly referencedFunctions: readonly string[];
+```
+
+The user functions **applied** in this expression: the operator head of
+a function application when that head is a user-definable symbol — `f` in
+`f(x)`, `g` in `g(x) := f(x) + 1`. Built-in operators (`Add`, `Sin`, …),
+constants, and names bound to a value or by an enclosing scope (function
+parameters, summation indices, `Block` locals) are excluded — the same
+predicate [freeVariables](#freevariables) applies to ordinary symbols.
+
+Operator heads are not symbols of the expression, so they appear in
+neither [symbols](#symbols) nor [freeVariables](#freevariables). This accessor recovers
+the function-call dependency edges those views miss.
+
+:::info[Note]
+Applicable to canonical and non-canonical expressions.
+:::
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.references
+
+```ts
+readonly references: readonly string[];
+```
+
+The symbols this expression **references** but does not itself define:
+the union of [freeVariables](#freevariables) (referenced values) and
+[referencedFunctions](#referencedfunctions) (applied user functions), minus
+[defines](#defines).
+
+This is the complete in-edge set for a dependency graph keyed on cells
+(e.g. a notebook): pair it with [defines](#defines) for the out-edges.
+Subtracting `defines` drops self-references, so a recursive
+`g(x) := g(x - 1)` reports no dependency on itself.
+
+```js
+const cell = ce.parse('g(x) := f(x) + a', { canonical: false });
+cell.defines;    // -> ['g']
+cell.references; // -> ['a', 'f']
+```
 
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
@@ -10753,7 +10849,7 @@ type JsonSerializationOptions = {
   prettify: boolean;
   exclude: string[];
   shorthands: ("all" | "number" | "symbol" | "function" | "string" | "dictionary")[];
-  metadata: ("all" | "wikidata" | "latex")[];
+  metadata: ("all" | "wikidata" | "latex" | "sourceOffsets")[];
   repeatingDecimal: boolean;
   fractionalDigits: "auto" | "max" | number;
 };
