@@ -143,6 +143,18 @@ The default precision is 21.
 
 **To set the precision to the default value**, use `ce.precision = "auto"`.
 
+**To request a specific precision for a single evaluation**, use the `N`
+function with a precision argument: `["N", expr, digits]`.
+
+```live
+console.log(ce.box(['N', 'Pi', 50]).evaluate().toString());
+```
+
+If the requested precision is greater than `ce.precision`, the working precision
+is raised to match and **kept** raised (display precision is global). If it is at
+or below `ce.precision`, the result is rounded to that many significant digits
+without changing the working precision.
+
 
 ### Machine Precision
 

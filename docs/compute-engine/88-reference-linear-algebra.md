@@ -332,6 +332,83 @@ The rank is the length of the shape of the tensor.
 </FunctionDefinition>
 
 
+<nav className="hidden">
+### MatrixRank
+</nav>
+<FunctionDefinition name="MatrixRank">
+
+<Signature name="MatrixRank">_matrix_</Signature>
+
+Returns the **rank** of a matrix: the number of linearly independent rows (or,
+equivalently, columns).
+
+This is the linear-algebra rank, **not** `Rank`, which returns the number of
+axes of a tensor.
+
+```json example
+["MatrixRank", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ 2
+
+["MatrixRank", ["List", ["List", 1, 2], ["List", 2, 4]]]
+// ➔ 1
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### IsSquareMatrix
+</nav>
+<FunctionDefinition name="IsSquareMatrix">
+
+<Signature name="IsSquareMatrix">_matrix_</Signature>
+
+Returns `True` if the value is a square matrix (same number of rows and
+columns), `False` otherwise.
+
+```json example
+["IsSquareMatrix", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ "True"
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### IsSymmetric
+</nav>
+<FunctionDefinition name="IsSymmetric">
+
+<Signature name="IsSymmetric">_matrix_</Signature>
+
+Returns `True` if the matrix is symmetric, that is, equal to its transpose
+($$\mathbf{A} = \mathbf{A}^\top$$).
+
+```json example
+["IsSymmetric", ["List", ["List", 1, 2], ["List", 2, 1]]]
+// ➔ "True"
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### IsDiagonal
+</nav>
+<FunctionDefinition name="IsDiagonal">
+
+<Signature name="IsDiagonal">_matrix_</Signature>
+
+Returns `True` if every off-diagonal entry of the matrix is zero.
+
+```json example
+["IsDiagonal", ["List", ["List", 5, 0], ["List", 0, 3]]]
+// ➔ "True"
+```
+
+</FunctionDefinition>
+
+
 ## Accessing the content of Tensors
 
 <nav className="hidden">
@@ -704,6 +781,28 @@ m×m matrix.
 ```
 
 Both _m_ and _n_ must be positive integers.
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### RowReduce
+</nav>
+<FunctionDefinition name="RowReduce">
+
+<Signature name="RowReduce">_matrix_</Signature>
+
+Returns the [reduced row echelon form](https://en.wikipedia.org/wiki/Row_echelon_form)
+(RREF) of the matrix, obtained by Gauss–Jordan elimination. The matrix need not
+be square.
+
+```json example
+["RowReduce", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List", ["List", 1, 0], ["List", 0, 1]]
+
+["RowReduce", ["List", ["List", 1, 2], ["List", 2, 4]]]
+// ➔ ["List", ["List", 1, 2], ["List", 0, 0]]
+```
 
 </FunctionDefinition>
 
@@ -1230,6 +1329,70 @@ For matrices, the default is the Frobenius norm: sqrt(sum of |aij|^2)
 </FunctionDefinition>
 
 
+<nav className="hidden">
+### Dot
+</nav>
+<FunctionDefinition name="Dot">
+
+<Signature name="Dot">_a_, _b_</Signature>
+
+<Latex value="\mathbf{a} \cdot \mathbf{b}"/>
+
+Returns the dot product. For two vectors, this is their inner product (a scalar);
+for matrices, it is the matrix product. Equivalent to `MatrixMultiply`.
+
+```json example
+["Dot", ["List", 1, 2, 3], ["List", 4, 5, 6]]
+// ➔ 32
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Cross
+</nav>
+<FunctionDefinition name="Cross">
+
+<Signature name="Cross">_a_, _b_</Signature>
+
+<Latex value="\mathbf{a} \times \mathbf{b}"/>
+
+Returns the [cross product](https://en.wikipedia.org/wiki/Cross_product) of two
+3-dimensional vectors. Both operands must be vectors of length 3.
+
+```json example
+["Cross", ["List", 1, 0, 0], ["List", 0, 1, 0]]
+// ➔ ["List", 0, 0, 1]
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### MatrixPower
+</nav>
+<FunctionDefinition name="MatrixPower">
+
+<Signature name="MatrixPower">_matrix_, _n_</Signature>
+
+<Latex value="\mathbf{A}^n"/>
+
+Returns the square matrix raised to the integer power _n_, that is the repeated
+matrix product $$\mathbf{A} \cdot \mathbf{A} \cdots$$. A power of `0` returns the
+identity matrix; a negative power raises the inverse to `|n|`.
+
+This is distinct from `["Power", matrix, n]`, which raises each element to the
+power _n_ (element-wise).
+
+```json example
+["MatrixPower", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
+// ➔ ["List", ["List", 7, 10], ["List", 15, 22]]
+```
+
+</FunctionDefinition>
+
+
 ## Eigenvalues and Eigenvectors
 
 <nav className="hidden">
@@ -1323,6 +1486,32 @@ This is more efficient than calling `Eigenvalues` and `Eigenvectors` separately 
 
 ["At", ["Eigen", matrix], "Eigenvectors"]
 // Returns just the eigenvectors
+```
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### CharacteristicPolynomial
+</nav>
+<FunctionDefinition name="CharacteristicPolynomial">
+
+<Signature name="CharacteristicPolynomial">_matrix_, _variable_?</Signature>
+
+<Latex value="\det(x\mathbf{I} - \mathbf{A})"/>
+
+Returns the monic [characteristic polynomial](https://en.wikipedia.org/wiki/Characteristic_polynomial)
+$$\det(x\mathbf{I} - \mathbf{A})$$ of a square matrix. The roots of this
+polynomial are the eigenvalues of the matrix.
+
+The variable defaults to `x` when omitted.
+
+```json example
+["CharacteristicPolynomial", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["Add", ["Power", "x", 2], ["Multiply", -5, "x"], -2]
+
+["CharacteristicPolynomial", ["List", ["List", 1, 2], ["List", 3, 4]], "t"]
+// ➔ ["Add", ["Power", "t", 2], ["Multiply", -5, "t"], -2]
 ```
 
 </FunctionDefinition>

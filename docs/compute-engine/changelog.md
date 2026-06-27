@@ -10,6 +10,130 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.64.0 _2026-06-27_
+
+### New Features
+
+- **Expanded number-theory library.** A set of standard number-theoretic
+  functions has been added to the `number-theory` library. Integer arguments use
+  arbitrary-precision (bigint) arithmetic, and long-running cases honor the
+  evaluation deadline.
+
+  _Factorization & divisors:_
+
+  - **`FactorInteger(n)`** — prime factorization as a list of
+    `[prime, exponent]` tuples ordered by ascending prime: `FactorInteger(360)`
+    → `[(2, 3), (3, 2), (5, 1)]`. Following Mathematica's conventions,
+    `FactorInteger(0)` → `[(0, 1)]`, `FactorInteger(1)` → `[(1, 1)]`, and a
+    negative integer carries its sign in a leading `[-1, 1]` tuple.
+  - **`PrimeFactors(n)`** — the sorted distinct prime factors:
+    `PrimeFactors(360)` → `[2, 3, 5]`.
+  - **`Divisors(n)`** — the sorted positive divisors: `Divisors(12)` →
+    `[1, 2, 3, 4, 6, 12]`. `Divisors(0)` is left unevaluated.
+  - **`Radical(n)`** — the square-free kernel (product of distinct primes):
+    `Radical(360)` → `30`.
+  - **`PrimeNu(n)`** / **`PrimeOmega(n)`** — the number of prime factors without
+    / with multiplicity (ω and Ω).
+  - **`MoebiusMu(n)`** — the Möbius function μ(n).
+  - **`DivisorSigma(k, n)`** — the divisor function σ_k(n) (generalizes the
+    existing `Sigma0`/`Sigma1`).
+  - **`IsSquareFree(n)`** — whether `n` is square-free.
+  - **`IsPerfectPower(n)`** — whether `n = a^b` for integers `a`, `b ≥ 2`.
+
+  _Primes:_
+
+  - **`NthPrime(n)`** — the nth prime (1-based): `NthPrime(10)` → 29.
+    (Mathematica names this `Prime`, but in the Compute Engine `Prime` denotes
+    derivative notation, so the prime-number function is `NthPrime`.)
+  - **`NextPrime(n)`** / **`NextPrime(n, k)`** — the smallest prime greater than
+    `n`; with `k`, the kth prime after `n` (or the |k|th before it when
+    `k < 0`).
+  - **`PrimePi(n)`** — the prime-counting function π(n): `PrimePi(10)` → 4.
+  - **`RandomPrime(n)`** / **`RandomPrime(m, n)`** — a random prime in the
+    range.
+
+    Primality for these uses exact 6k±1 trial division for small `n` and
+    switches to Miller–Rabin above 2³² (deterministic for the supported range),
+    so `NextPrime` and `RandomPrime` are fast even for very large arguments.
+
+  _Modular arithmetic & GCD:_
+
+  - **`PowerMod(a, b, m)`** — modular exponentiation `a^b mod m`; a negative `b`
+    uses the modular inverse (undefined when `a` and `m` are not coprime).
+  - **`ExtendedGCD(a, b)`** — the GCD with Bézout coefficients, as `(g, x, y)`.
+  - **`ChineseRemainder(residues, moduli)`** — solves a system of simultaneous
+    congruences (moduli need not be coprime).
+  - **`MultiplicativeOrder(a, n)`** — the order of `a` modulo `n`;
+    **`PrimitiveRoot(n)`** — the smallest primitive root mod `n`.
+  - **`JacobiSymbol(a, n)`** / **`LegendreSymbol(a, p)`** — the Jacobi and
+    Legendre symbols.
+
+  _Other primitives:_
+
+  - **`IntegerSqrt(n)`** — the integer (floor) square root.
+  - **`CarmichaelLambda(n)`** — the reduced totient λ(n).
+  - **`LucasL(n)`** — the nth Lucas number; **`CatalanNumber(n)`** — the nth
+    Catalan number.
+  - **`BernoulliB(n)`** — the nth Bernoulli number as an exact rational, with
+    the convention B₁ = -1/2.
+  - **`ContinuedFraction(x, n?)`** / **`FromContinuedFraction(list)`** — the
+    continued-fraction expansion of a number (exact for rationals) and its
+    inverse.
+  - **`IntegerDigits(n, base?, length?)`** / **`FromDigits(list, base?)`** — the
+    digits of `n` in a given base, and its inverse.
+    **`DigitCount(n, base?, digit?)`** — digit-occurrence counts;
+    **`DigitSum(n, base?)`** — the digit sum.
+
+- **`IsPrime` is now reliable for large integers.** Primality was previously
+  left unevaluated above ~10¹⁵ and could silently round integers beyond 2⁵³ to a
+  wrong machine value. `IsPrime` (and `IsComposite`) now route through a single
+  deterministic Miller–Rabin implementation shared with the number-theory
+  library, so e.g. `IsPrime(2^61 - 1)` correctly returns `True`. (The previous
+  duplicate Miller–Rabin code, which used random bases and overflowed for large
+  inputs, has been removed.) Relatedly, the internal `toInteger` helper now
+  returns `null` instead of a precision-lost value for integers beyond the
+  safe-integer range, so this class of silent-rounding bug cannot recur in the
+  operators that use it for counts and indices.
+
+- **`Factorial2`, `Subfactorial`, and `BellNumber` no longer round a
+  non-integer argument.** These are defined only on integers; in non-strict
+  mode they previously rounded a non-integer (e.g. `Factorial2(5.5)` returned
+  `6!!`). They now stay symbolic for non-integer arguments. (In strict mode the
+  `(integer)` signature already rejected such inputs.)
+
+- **`N(expr, precision)` evaluates to a requested number of significant
+  digits.** The `N` function (and the `["N", expr]` MathJSON form) now accepts
+  an optional precision argument: `["N", "Pi", 50]` returns π to 50 significant
+  digits. When the requested precision exceeds the engine's working precision,
+  the working precision is raised to match — and kept, since display precision
+  is a global setting. When it is at or below the working precision, the result
+  is rounded to that many significant digits without changing the global
+  precision (`N(1/3, 4)` → `0.3333`).
+
+- **New linear-algebra operators.**
+  - **`Dot(a, b)`** — vector inner product / matrix product (Mathematica's `.`):
+    `Dot([1,2,3], [4,5,6])` → `32`.
+  - **`Cross(a, b)`** — cross product of two 3-vectors.
+  - **`MatrixRank(m)`** — the rank (number of linearly independent rows/columns)
+    via the rank–nullity theorem.
+  - **`MatrixPower(m, n)`** — a square matrix raised to an integer power (the
+    repeated matrix product `A·A·…`, with negative powers using the inverse).
+    Distinct from `["Power", m, n]`, which threads element-wise.
+  - **`CharacteristicPolynomial(m, x?)`** — the monic characteristic polynomial
+    `det(x·I − A)` (variable defaults to `x`): `[[1,2],[3,4]]` → `x² − 5x − 2`.
+  - **`RowReduce(m)`** — the reduced row echelon form (RREF) of a matrix.
+  - **`IsSymmetric(m)`** / **`IsDiagonal(m)`** / **`IsSquareMatrix(m)`** —
+    matrix-shape predicates returning `True`/`False`.
+
+### Resolved Issues
+
+- **`["N", expr]` now numerically evaluates its operand.** The `N` operator
+  holds its argument unevaluated and previously called `.N()` on the still
+  unbound operand — a no-op for symbolic constants — so `["N", "Pi"]` returned
+  `Pi` unchanged (and `["N", ["Sqrt", 2]]` returned `Sqrt(2)`) instead of a
+  numeric value. The operand is now bound before evaluation, making
+  `["N", expr]` equivalent to `expr.N()`.
+
 ## 0.63.0 _2026-06-26_
 
 ### New Features
@@ -19,8 +143,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   character range identifying where in the input the error occurred, so a
   consumer can map a parse error back to the offending span — e.g. to highlight
   an invalid token in a mathfield. Offsets are zero-based and end-exclusive into
-  the serialized LaTeX (`tokensToString`); for input that round-trips through the
-  tokenizer unchanged — editor-generated LaTeX, with no comments, Unicode
+  the serialized LaTeX (`tokensToString`); for input that round-trips through
+  the tokenizer unchanged — editor-generated LaTeX, with no comments, Unicode
   normalization, or macro expansion — they match the original input string.
   Missing-operand errors (an empty `\sqrt{}` or `\frac{}{}`) use a zero-width
   range at the position where the token was expected. The new
@@ -64,26 +188,27 @@ import ChangeLog from '@site/src/components/ChangeLog';
   bracket form accepts a string key, so `\mathrm{data}["height"]` (or
   `\mathrm{data}[\text{height}]`) parses to `["At", "data", "height"]`.
   Dot-notation also works when the base is a symbol declared as a dictionary:
-  `\mathrm{data}.height` → `["At", "data", "height"]` (the key is an
-  alphabetic, space-free name; for a dictionary base, `.x` / `.real` are key
-  lookups, not `First` / `Real` component access). Positional indexing of
-  indexed collections is unchanged.
+  `\mathrm{data}.height` → `["At", "data", "height"]` (the key is an alphabetic,
+  space-free name; for a dictionary base, `.x` / `.real` are key lookups, not
+  `First` / `Real` component access). Positional indexing of indexed collections
+  is unchanged.
 
-- **`BoxedExpression.referencedFunctions` and `BoxedExpression.references`.** Two
-  accessors aimed at dependency graphs (e.g. notebooks). The operator head of a
-  function application — the `f` in `f(x)` or `g(x) := f(x) + 1` — is not a symbol
-  of the expression, so it appears in neither `symbols` nor `freeVariables`;
-  `referencedFunctions` recovers those applied user-function names (excluding
-  built-in operators, constants, and names bound by an enclosing scope, using the
-  same predicate `freeVariables` applies to ordinary symbols). `references` is the
-  complete in-edge set — `freeVariables` ∪ `referencedFunctions`, minus
-  `defines` — so it pairs with `defines` (the out-edges) to build a use/def graph
-  in one call. Subtracting `defines` drops self-references, so a recursive
-  `g(x) := g(x - 1)` reports no dependency on itself.
+- **`BoxedExpression.referencedFunctions` and `BoxedExpression.references`.**
+  Two accessors aimed at dependency graphs (e.g. notebooks). The operator head
+  of a function application — the `f` in `f(x)` or `g(x) := f(x) + 1` — is not a
+  symbol of the expression, so it appears in neither `symbols` nor
+  `freeVariables`; `referencedFunctions` recovers those applied user-function
+  names (excluding built-in operators, constants, and names bound by an
+  enclosing scope, using the same predicate `freeVariables` applies to ordinary
+  symbols). `references` is the complete in-edge set — `freeVariables` ∪
+  `referencedFunctions`, minus `defines` — so it pairs with `defines` (the
+  out-edges) to build a use/def graph in one call. Subtracting `defines` drops
+  self-references, so a recursive `g(x) := g(x - 1)` reports no dependency on
+  itself.
 
-- **`ce.declare()` refines an auto-declared binding instead of throwing.** Parsing
-  auto-declares the names it encounters (a free variable `a` in `a + 1`, a called
-  function `f` in `f(x)`), recording an _inferred_ binding. Calling
+- **`ce.declare()` refines an auto-declared binding instead of throwing.**
+  Parsing auto-declares the names it encounters (a free variable `a` in `a + 1`,
+  a called function `f` in `f(x)`), recording an _inferred_ binding. Calling
   `ce.declare(name, …)` for such a name now refines that inferred binding rather
   than throwing `"… already declared in this scope"` — which is exactly what the
   `inferred` flag is for. This lets a declare-first workflow parse cells to
@@ -98,10 +223,11 @@ import ChangeLog from '@site/src/components/ChangeLog';
   deciding how to box their result, so the documented `canonical` / `structural`
   shortcuts were silently ignored: `ce.parse(latex, { canonical: false })`
   returned a _canonical_ expression (and, as a side effect of canonicalization,
-  auto-declared its symbols), and `ce.function('Power', ops, { structural: true })`
-  returned canonical `Root` instead of a structural `Power`. The keys now resolve
-  the same way `form` does, with an explicit `form` taking precedence. As part of
-  this, `ce.assume()` now canonicalizes its predicate so the assumption machinery
+  auto-declared its symbols), and
+  `ce.function('Power', ops, { structural: true })` returned canonical `Root`
+  instead of a structural `Power`. The keys now resolve the same way `form`
+  does, with an explicit `form` taking precedence. As part of this,
+  `ce.assume()` now canonicalizes its predicate so the assumption machinery
   always sees a normalized form (e.g. `Negate(ImaginaryUnit)` folded to the
   complex literal `-i`) regardless of how the caller boxed it.
 

@@ -367,6 +367,39 @@ If `lower`and `upper`are not provided, they take the default values of -1 and
 
 </FunctionDefinition>
 
+<FunctionDefinition name="Random">
+
+<Signature name="Random"></Signature>
+
+<Signature name="Random">_seed_</Signature>
+
+<Signature name="Random">_n_</Signature>
+
+<Signature name="Random">_m_, _n_</Signature>
+
+`Random` is **not** a pure function: by its nature it evaluates to a different
+value on each evaluation.
+
+- `["Random"]` evaluates to a non-deterministic floating-point number in the
+  interval $[0, 1)$.
+- `["Random", seed]` (with a real `seed`) evaluates to a deterministic
+  floating-point number in $[0, 1)$ derived from the seed.
+- `["Random", n]` (with an integer `n`) evaluates to a non-deterministic integer
+  in the interval $[0, n)$.
+- `["Random", m, n]` evaluates to a non-deterministic integer in the interval
+  $[m, n)$.
+
+```json example
+["Random"]
+// ➔ 0.6233… (for example)
+["Random", 10]
+// ➔ 7 (for example)
+["Random", 5, 10]
+// ➔ 8 (for example)
+```
+
+</FunctionDefinition>
+
 <FunctionDefinition name="Max">
 
 <Signature name="Max">_x1_, _x2_, ...</Signature>

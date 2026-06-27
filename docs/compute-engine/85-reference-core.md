@@ -539,6 +539,25 @@ Evaluate to a numerical approximation of the expression.
 // ➔ 3.141592653589793
 ```
 
+<Signature name="N">_expression_, _precision_</Signature>
+
+Evaluate to a numerical approximation with the given number of significant
+digits.
+
+If _precision_ is greater than the engine's current working precision
+(`ce.precision`), the working precision is raised to match — and **kept** raised,
+since display precision is a global setting. If _precision_ is at or below the
+working precision, the result is rounded to that many significant digits without
+changing the working precision.
+
+```json example
+["N", "Pi", 20]
+// ➔ 3.1415926535897932385
+
+["N", ["Divide", 1, 3], 4]
+// ➔ 0.3333
+```
+
 </FunctionDefinition>
 
 
