@@ -26,6 +26,9 @@ calculate a symbolic derivative or `ND` to calculate a numerical approximation
 
 **To calculate the limit of a function**, use the `Limit` function.
 
+**To solve a differential equation**, use the `DSolve` function to find a
+symbolic solution or `NDSolve` to compute a numerical approximation.
+
 ## Derivative
 
 The derivative of a function is a measure of how the function changes as its input changes.
@@ -640,6 +643,111 @@ Evaluate the function _f_ as it approaches the value _value_.
 
 The numerical approximation is computed using a Richardson extrapolation
 algorithm.
+
+</FunctionDefinition>
+
+## Differential Equations
+
+A **differential equation** is an equation that relates a function to its
+derivatives. An **ordinary differential equation** (ODE) involves a function of
+a single variable and its derivatives.
+
+The unknown function is written as an applied function, for example `["y", "x"]`,
+and its derivative with `D`, for example `["D", ["y", "x"], "x"]`.
+
+**To solve a differential equation symbolically**, use the `DSolve` function.
+
+**To compute a numerical approximation of the solution**, use the `NDSolve`
+function.
+
+:::info[Note]
+Differential equation support is an initial, deliberately narrow slice:
+`DSolve` handles first-order linear scalar equations, and `NDSolve` handles
+explicit scalar first-order initial value problems. Equations outside these
+classes are left unevaluated (returned as-is).
+:::
+
+<b>Reference</b>
+- Wikipedia: [Ordinary differential equation](https://en.wikipedia.org/wiki/Ordinary_differential_equation), [Runge–Kutta methods](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods)
+- Wolfram Mathworld: [Ordinary Differential Equation](https://mathworld.wolfram.com/OrdinaryDifferentialEquation.html)
+
+
+<FunctionDefinition name="DSolve">
+
+<Signature name="DSolve" returns="list">_eq_: expression, _y_: symbol, _x_: symbol</Signature>
+
+Solve the ordinary differential equation _eq_ for the function _y_ with respect
+to the independent variable _x_.
+
+<Latex flow="column" value="y'(x) = y(x)"/>
+
+```json example
+["DSolve", ["Equal", ["D", ["y", "x"], "x"], ["y", "x"]], "y", "x"]
+// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", "C", ["Power", "ExponentialE", "x"]]]]
+```
+
+`DSolve` returns a `List` of solutions, each an `Equal` expression giving
+_y(x)_. An integration constant `C` is introduced (a different name is chosen if
+`C` is already in use).
+
+Currently `DSolve` solves **first-order linear scalar** equations of the form:
+
+<center>
+$$ y'(x) + p(x)\,y(x) = q(x) $$
+</center>
+
+| Equation | Solution |
+| :--- | :--- |
+| $y' = y$ | $y = C\,e^{x}$ |
+| $y' = x^2$ | $y = \frac{1}{3}x^3 + C$ |
+| $y' + y = x$ | $y = x - 1 + C\,e^{-x}$ |
+| $y' + 2xy = 0$ | $y = C\,e^{-x^2}$ |
+
+Nonlinear or higher-order equations are not yet supported and are left
+unevaluated (the `DSolve` expression is returned as-is).
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="NDSolve">
+
+<Signature name="NDSolve" returns="list">_eq_: expression, _y_: symbol, _limits_: tuple, _y0_: number, _steps_: number?</Signature>
+
+Compute a numerical approximation of the solution of the **initial value
+problem** _eq_ for the function _y_ over the interval given by _limits_, with
+initial value _y0_.
+
+`NDSolve` handles **explicit scalar first-order** initial value problems:
+
+<center>
+$$ y'(x) = f(x, y), \quad y(x_0) = y_0 $$
+</center>
+
+The equation must isolate the derivative on one side, for example
+`["Equal", ["D", ["y", "x"], "x"], f]`.
+
+The _limits_ argument is a `Limits` or `Tuple` of `(x, x0, x1)` giving the
+independent variable and the bounds of the integration interval. _y0_ is the
+value of _y_ at _x0_. The optional _steps_ argument is the number of integration
+steps (default 100).
+
+```json example
+["NDSolve",
+  ["Equal", ["D", ["y", "x"], "x"], ["y", "x"]],
+  "y",
+  ["Tuple", "x", 0, 1],
+  1,
+  100
+]
+// ➔ ["List", ["List", 0, 1], …, ["List", 1, 2.7182818…]]
+```
+
+`NDSolve` returns a `List` of `[x, y]` sample pairs (of length _steps_ + 1),
+computed with a fixed-step fourth-order **Runge–Kutta** (RK4) method. This works
+even when the solution has no elementary closed form.
+
+Implicit, higher-order, or stiff equations are not yet supported and are left
+unevaluated.
 
 </FunctionDefinition>
 
