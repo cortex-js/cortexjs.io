@@ -82,6 +82,20 @@ Evaluate to the sum of `body` for each value in `bounds`.
 // ➔ 65
 ```
 
+The bounds can also be written as a `\le` (or `\ge`) range in the subscript,
+instead of the `i=1`/superscript form. The chained form gives both bounds; a
+one-sided form supplies a single bound (the other defaults):
+
+```json example
+// \sum_{1 \le i \le 10} i^2
+ce.parse('\\sum_{1 \\le i \\le 10} i^2').evaluate()
+// ➔ 385
+
+// \sum_{i \le 10} i   (lower bound defaults to 1)
+ce.parse('\\sum_{i \\le 10} i').evaluate()
+// ➔ 55
+```
+
 <Signature name="Sum" returns="number">_body_: function, ..._bounds_: Element</Signature>
 
 Evaluate to the sum of `body` for each value in an Element-based indexing set.

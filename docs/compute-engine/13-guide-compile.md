@@ -148,7 +148,7 @@ JavaScript.
 // import { compile } from '@cortex-js/compute-engine';
 
 // If expression
-const f = compile("\\text{if } x > 0 \\text{ then } x \\text{ else } -x");
+const f = compile("\\keyword{if} x > 0 \\keyword{then} x \\keyword{else} -x");
 console.log(f.run({ x: -5 }));
 // ➔ 5
 
@@ -181,7 +181,7 @@ and `Return` compile to their JavaScript equivalents:
 ```live
 // import { compile } from '@cortex-js/compute-engine';
 
-const f = compile("\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2");
+const f = compile("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2");
 console.log(f.run());
 // ➔ 100 (last iteration value)
 ```

@@ -566,7 +566,7 @@ The symbols that appear in function-application syntax `f(…)` in `latex`
 but are not defined as functions in the current scope (so they parse as
 implicit multiplication or are left unresolved). Scope-aware and
 side-effect-free. Intended to flag calls to undefined functions in tools
-such as notebooks; intersect with BoxedExpression.freeVariables
+such as notebooks; intersect with [Expression.freeVariables](#freevariables)
 to drop deliberate multiplication of defined values.
 
 ####### latex
@@ -5314,6 +5314,7 @@ type SerializeLatexOptions = NumberSerializationFormat & {
   invisiblePlus: LatexString;
   multiply: LatexString;
   missingSymbol: LatexString;
+  keywordStyle: "text" | "keyword" | "operatorname";
   applyFunctionStyle: (expr, level) => DelimiterScale;
   groupStyle: (expr, level) => DelimiterScale;
   rootStyle: (expr, level) => "radical" | "quotient" | "solidus";
@@ -5413,6 +5414,30 @@ missingSymbol: LatexString;
 ```
 
 Serialize the expression `["Error", "'missing'"]`,  with this LaTeX string
+
+#### SerializeLatexOptions.keywordStyle
+
+```ts
+keywordStyle: "text" | "keyword" | "operatorname";
+```
+
+How to serialize keyword constructs (`if`/`then`/`else`, `for`, `where`,
+`and`, `or`, the quantifiers, …).
+
+- `'text'` (default): `\text{if }`, `\text{ then }`, … — the conventional
+  spelling. Spacing is encoded manually inside the braces.
+- `'keyword'`: `\keyword{if}`, `\keyword{then}`, … — a math-mode command
+  whose renderer applies symmetric keyword spacing. Requires the rendering
+  environment to define `\keyword`.
+- `'operatorname'`: `\operatorname{if}`, … — operator-name spacing.
+
+All three spellings parse back to the same expression.
+
+##### Default
+
+```ts
+'text'
+```
 
 #### SerializeLatexOptions.indexStyle
 
@@ -7101,7 +7126,7 @@ The symbols that appear in function-application syntax `f(…)` in `latex`
 but are not defined as functions in the current scope (so they parse as
 implicit multiplication or are left unresolved). Scope-aware and
 side-effect-free. Intended to flag calls to undefined functions in tools
-such as notebooks; intersect with BoxedExpression.freeVariables
+such as notebooks; intersect with [Expression.freeVariables](#freevariables)
 to drop deliberate multiplication of defined values.
 
 ####### latex

@@ -71,6 +71,12 @@ which would correspond to the LaTeX expression:
 
 Annotated expressions are similar to attributed strings in other systems.
 
+When `\textcolor` (or `\color`) wraps a bare **operator** rather than an operand
+— for example `x \textcolor{red}{=} y` — the operator is parsed as usual
+(`["Equal", "x", "y"]`) and the color is dropped: MathJSON has no way to attach
+an `Annotated` wrapper to a lone operator glyph. Coloring an operand (such as
+`\textcolor{red}{x + 1}`) still produces an `Annotated` expression.
+
 
 
 ### Text Expressions

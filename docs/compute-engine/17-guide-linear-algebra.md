@@ -47,29 +47,34 @@ ce.parse('2(1,2,3)').evaluate();
 // → [2,4,6]
 ```
 
-### Element-wise vs Matrix Multiplication
+### Matrix vs Element-wise Multiplication
 
 **Important distinction:**
-- Use `Multiply` or `*` for **element-wise** multiplication (Hadamard product)
-- Use `MatrixMultiply` for **linear algebraic** matrix multiplication
+- `Multiply` / `*` / `\cdot` / `\times` — and writing two matrices next to each
+  other — perform **matrix multiplication** (the linear-algebraic product),
+  consistent with `*` being scalar multiplication.
+- Use `\odot` (`HadamardProduct`) for **element-wise** (Hadamard) multiplication.
 
 ```js example
-// Element-wise multiplication
+// Matrix multiplication (row-column dot products)
 ce.expr(['Multiply',
   ['List', ['List', 1, 2], ['List', 3, 4]],
   ['List', ['List', 5, 6], ['List', 7, 8]]
 ]).evaluate();
-// → [[5,12],[21,32]]  (each element multiplied independently)
+// → [[19,22],[43,50]]
 
-// Matrix multiplication (linear algebraic product)
-ce.expr(['MatrixMultiply',
-  ['List', ['List', 1, 2], ['List', 3, 4]],
-  ['List', ['List', 5, 6], ['List', 7, 8]]
-]).evaluate();
-// → [[19,22],[43,50]]  (row-column dot products)
+// Same as writing the matrices next to each other in LaTeX
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}\\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}').evaluate();
+// → [[19,22],[43,50]]
+
+// Element-wise (Hadamard) multiplication
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix} \\odot \\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}').evaluate();
+// → [[5,12],[21,32]]  (each element multiplied independently)
 ```
 
-For detailed information on matrix multiplication, see the [Matrix Multiplication](#matrix-multiplication) section below.
+Matrix multiplication is **not commutative** — operand order is preserved, and a
+`vector·vector` product reduces to the dot product. For detailed information,
+see the [Matrix Multiplication](#matrix-multiplication) section below.
 
 ## LaTeX Matrix Notation
 
@@ -150,6 +155,10 @@ ce.parse('A^{-1}');
 
 ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^{-1}');
 // → ["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
+
+// Integer power: the matrix power (A·A·…), not element-wise
+ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^2').evaluate();
+// → [[7,10],[15,22]]  (A·A, the matrix product)
 
 // Trace using \operatorname
 ce.parse('\\operatorname{tr}\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
@@ -734,8 +743,11 @@ if (isFunction(luResult)) {
 
 ## Matrix Multiplication
 
-Use `MatrixMultiply` to perform matrix multiplication. The function supports
-multiple combinations of operands:
+Use `MatrixMultiply` to perform matrix multiplication. The `*`, `\cdot` and
+`\times` operators, and writing two matrices next to each other, also compute the
+matrix product for tensor operands and reuse the same implementation — so
+`A * B`, `A \cdot B`, `AB`, and `MatrixMultiply(A, B)` are equivalent. The
+function supports multiple combinations of operands:
 
 ### Matrix × Matrix
 
@@ -816,6 +828,54 @@ const A = ['Matrix', ['List', ['List', 1, 2], ['List', 3, 4]]];
 const B = ['Matrix', ['List', ['List', 5, 6], ['List', 7, 8]]];
 ce.expr(['MatrixMultiply', A, B]).latex;
 // → "\begin{pmatrix}1 & 2\\ 3 & 4\end{pmatrix} \cdot \begin{pmatrix}5 & 6\\ 7 & 8\end{pmatrix}"
+```
+
+## Matrix Power
+
+Raising a square matrix to an integer power `A^n` computes the **matrix power**
+(repeated matrix product), consistent with `*` being the matrix product:
+
+```js example
+// A^2 = A · A
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}^2').evaluate();
+// → [[7,10],[15,22]]
+
+// A^0 is the identity matrix
+ce.expr(['Power', ['List', ['List', 1, 2], ['List', 3, 4]], 0]).evaluate();
+// → [[1,0],[0,1]]
+
+// A^{-1} is the inverse, A^{-n} = (A^n)^{-1}
+ce.expr(['Power', ['List', ['List', 1, 2], ['List', 3, 4]], -1]).evaluate();
+// → [[-2,1],[1.5,-0.5]]
+```
+
+`A^n` (an integer power) routes to `MatrixPower`. A non-square base returns an
+`expected-square-matrix` error. For an element-wise power of the entries, map
+`Power` over the matrix.
+
+## Hadamard (Element-wise) Product
+
+The `\odot` operator (`HadamardProduct`) multiplies two same-shape tensors entry
+by entry — distinct from the matrix product computed by `*`:
+
+```js example
+ce.parse('[1,2,3] \\odot [4,5,6]').evaluate();
+// → [4,10,18]
+
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix} \\odot \\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}').evaluate();
+// → [[5,12],[21,32]]
+```
+
+Operands of incompatible shape return an `incompatible-dimensions` error.
+
+## Matrix Subtraction
+
+Matrices subtract element-wise, including products of matrices — for example the
+commutator `AB − BA`:
+
+```js example
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}\\begin{pmatrix}5&6\\\\7&8\\end{pmatrix} - \\begin{pmatrix}5&6\\\\7&8\\end{pmatrix}\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}').evaluate();
+// → [[-4,-12],[12,4]]
 ```
 
 ## Matrix Addition and Scalar Broadcasting

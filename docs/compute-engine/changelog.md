@@ -10,12 +10,141 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.66.0 _2026-06-28_
 
 ### New Features
 
-- **Differential equation solvers.** Two new functions in the calculus library
-  provide an initial slice of ordinary differential equation (ODE) support:
+- **`Multiply` now operates on vectors and matrices.** Previously a product with
+  any list/matrix operand was left unevaluated — even `2 * [1, 2, 3]`.
+  `Multiply` (i.e. `*`, `\cdot`, `\times`, and implicit products) now follows
+  matrix-product / scalar-scaling semantics, matching `Add`'s existing
+  element-wise threading:
+
+  - **Scalar × tensor** scales every element: `2 * [1, 2, 3]` → `[2, 4, 6]`,
+    `2 * \begin{pmatrix}1&2\\3&4\end{pmatrix}` →
+    `\begin{pmatrix}2&4\\6&8\end{pmatrix}` (exact values are preserved, e.g.
+    `\frac12 [2, 4, 6]` → `[1, 2, 3]`).
+  - **Two or more matrices/vectors** form the **matrix product**, folded
+    left-to-right in the written order:
+    `\begin{pmatrix}1&2\\3&4\end{pmatrix}\begin{pmatrix}5&6\\7&8\end{pmatrix}` →
+    `\begin{pmatrix}19&22\\43&50\end{pmatrix}`. The product is **not**
+    commutative — operand order is preserved (including for `matrix·vector` vs
+    `vector·matrix`), and `vector·vector` reduces to the dot product. This
+    reuses the existing `MatrixMultiply` implementation.
+
+  Element-wise (Hadamard) multiplication of two same-shape tensors is therefore
+  **not** what `*` does; tensors of incompatible dimensions are left
+  unevaluated, and symbolic operands of unknown shape are unaffected.
+
+- **Hadamard (element-wise) product `\odot`.** A new `HadamardProduct` operator,
+  written `\odot`, multiplies two vectors or matrices of the same shape entry by
+  entry: `[1,2,3] \odot [4,5,6]` → `[4,10,18]` and
+  `\begin{pmatrix}1&2\\3&4\end{pmatrix} \odot \begin{pmatrix}5&6\\7&8\end{pmatrix}`
+  → `\begin{pmatrix}5&12\\21&32\end{pmatrix}` (compare the matrix product `*`,
+  which gives `\begin{pmatrix}19&22\\43&50\end{pmatrix}`). Operands of
+  incompatible shape report an `incompatible-dimensions` error. It binds like
+  multiplication and round-trips through LaTeX as `\odot`.
+
+### Resolved Issues
+
+- **Mixed chained inequalities keep their middle term.** A chain combining
+  different operators — e.g. `5 \le b \lt 7` — canonicalized to
+  `And(5 \le 7, b \lt 7)`, dropping `b` from the first link (so `3 \le 2 \lt 7`
+  wrongly evaluated to `True`). It now canonicalizes to `And(5 \le b, b \lt 7)`.
+  Uniform chains (`5 \le b \le 7`) and the already-correct `a \lt b \le c` form
+  are unchanged.
+
+- **A transcendental of an exact _constant expression_ stays symbolic.** Per the
+  exactness contract, `evaluate()` of a transcendental of an exact argument
+  returns a symbolic result and only `.N()` numericizes. This held for number
+  literals (`sin(2)` → `sin(2)`) but not for exact constant _expressions_:
+  `sin(\pi^2)` numericized to `-0.4303…` instead of staying `sin(π²)` (and
+  likewise `cos(√2)`, etc.). These now stay symbolic under `evaluate()`; an
+  inexact (float) argument such as `sin(2.5)` still numericizes.
+
+- **An exact real added to the imaginary unit keeps its exact real part.**
+  `\frac12 + i` evaluated to `0.5 + i`, and `\frac34\sqrt3 + i` to `1.299… + i`
+  — the exact real part was floatified when folded with `i`. Exact reals
+  (rationals, radicals) are now preserved alongside the imaginary unit
+  (`1/2 + i`, `3/4·√3 + i`); `.N()` still numericizes, and inexact reals
+  (`1.5 + i`) are unchanged.
+
+- **Matrix/vector arithmetic preserves exact entries.** A tensor with exact
+  rational or radical entries was stored with a `float64` element type, so
+  element-wise operations silently produced floats — e.g.
+  `\begin{pmatrix}½&⅓\end{pmatrix} + \begin{pmatrix}½&⅓\end{pmatrix}` returned
+  `[1, 0.666…]` instead of `[1, ⅔]`, and a matrix of `√2` entries decayed to
+  decimals. Exact entries now use the `expression` element type and stay exact;
+  inexact (machine/decimal) values continue to use `float64`.
+
+- **`A^n` is now the matrix power for an integer exponent.** A power of a matrix
+  was element-wise for non-negative exponents (`A^2` squared each entry, `A^0`
+  gave a matrix of ones) yet `A^{-1}` already returned the inverse, and
+  `\begin{pmatrix}…\end{pmatrix}^2` did not evaluate at all. `A^n` is now the
+  matrix power — repeated matrix multiplication — consistent with `*` being the
+  matrix product: `A^2 = A·A`, `A^0` is the identity, `A^{-1}` the inverse, and
+  `A^{-n} = (A^n)^{-1}`. A non-square base reports `expected-square-matrix`.
+  (Also fixes `MatrixPower(A, n)` for `n < -1`, which previously collapsed to
+  `A^{-1}`.)
+
+- **Element-wise functions now distribute over matrix/vector-valued
+  sub-expressions.** A broadcastable unary function applied to an operand that
+  only becomes a collection _after_ evaluation — e.g. `\sqrt{AB}`, `\sin(AB)`,
+  `|AB|` where `AB` is a matrix product — was left unevaluated, because
+  broadcasting was decided from the raw (un-evaluated) operand. It now also
+  broadcasts over the evaluated operand, so these distribute element-wise like
+  `\sqrt{M}` on a literal matrix already did. (`Add`/`Multiply` keep their
+  dedicated tensor handling.)
+
+- **Juxtaposed matrices now form the matrix product.** Writing two matrices next
+  to each other (`\begin{pmatrix}…\end{pmatrix}\begin{pmatrix}…\end{pmatrix}`),
+  or a scalar next to a matrix (`2\begin{pmatrix}…\end{pmatrix}`), previously
+  produced a `Tuple` instead of a product, because the `Matrix(…)` wrapper is
+  not reported as an indexed collection. The invisible (implicit) operator now
+  treats matrix operands as multiplication, consistent with
+  `*`/`\cdot`/`\times`.
+
+- **`Negate` (and hence `Subtract`) of a matrix-valued product is distributed
+  correctly.** A negation whose operand only became a vector/matrix after
+  evaluation — e.g. `Negate(Multiply(A, B))` from `A B - A B` — was left
+  undistributed, so the following `Add`/`Subtract` misclassified it as a scalar
+  and broadcast it over the other matrix, yielding a bogus higher-rank result.
+  Matrix subtraction (e.g. the commutator `AB - BA`) now evaluates correctly.
+
+- **A `\textcolor` wrapping a bare operator now parses as that operator.** Input
+  such as `x \textcolor{red}{=} y` previously failed — the `=` could not be
+  parsed as a standalone group, producing a `Tuple` around an
+  `expected-closing-delimiter` error. The color command is now transparent in
+  operator position, so `x \textcolor{red}{=} y` parses as `Equal(x, y)` (and
+  likewise for `+`, `<`, `\le`, `\times`, …). Because MathJSON has no way to
+  annotate a lone operator glyph, the operator's color is dropped; coloring an
+  operand (`\textcolor{red}{y}`, `\textcolor{red}{x+1}`) is unchanged and still
+  yields an `Annotated`.
+
+- **One-sided `\left( … \right.` enclosures now parse.** `\right.` (and the
+  `\bigr.`/`\Bigr.`/… variants) is a TeX _null delimiter_: a fence with no
+  visible closing glyph. Previously a one-sided group such as
+  `\sin\left(x\right.` was rejected, leaking the `\left` out as an
+  `unexpected-command` error; it now parses the same as `\sin\left(x\right)` (→
+  `Sin(x)`). The null _open_ form (`\left.…\right|`, used by `EvaluateAt`) and
+  ordinary two-sided delimiters are unchanged.
+
+- **Summation/product indices written as a `\le` range are now recognized.** An
+  index set of the form `\sum_{1 \le i \le 10} i^2` (and the one-sided
+  `\sum_{i \le 10}`) is now turned into the expected `Limits`, so the index `i`
+  is bound by the sum instead of falling through to the imaginary unit. The
+  example above now evaluates to `385` rather than staying symbolic with
+  `i → Complex(0, 1)`. This mirrors the existing handling of `i \ge 1` and
+  `i = 1`; strict `<` chains are not yet treated as index sets.
+
+## 0.65.0 _2026-06-28_
+
+### New Features
+
+- **Differential equation solvers.** (contributed by
+  [KingArth0r](https://github.com/KingArth0r)) Two new functions in the calculus
+  library provide an initial slice of ordinary differential equation (ODE)
+  support:
 
   - **`DSolve(eq, y, x)`** — symbolic solver for **first-order linear scalar**
     equations of the form `y'(x) + p(x)·y(x) = q(x)`. It returns a `List` of
@@ -30,12 +159,33 @@ import ChangeLog from '@site/src/components/ChangeLog';
     using a fixed-step fourth-order Runge–Kutta (RK4) method. It returns a
     `List` of `[x, y]` sample pairs over the interval given by `limits` (a
     `Limits` or `Tuple` of `(x, x0, x1)`); the number of steps defaults to 100.
-    It handles integrands with no elementary antiderivative (e.g. a Gaussian
-    IVP whose solution is expressed with `Erf`).
+    It handles integrands with no elementary antiderivative (e.g. a Gaussian IVP
+    whose solution is expressed with `Erf`).
 
   This slice is intentionally narrow so the API and result shape can get
   feedback before broader ODE support (adaptive RK45, systems, higher-order
   reductions, stiff and implicit solvers) is added.
+
+- **`\keyword{…}` command for control-flow and logic keywords.** Keyword
+  constructs — `if`/`then`/`else`, `for`/`from`/`to`/`do`, `where`, `such that`,
+  `and`, `or`, `iff`, `for all`, `there exists`, `break`, `continue`, `return` —
+  can now be written with a dedicated `\keyword{…}` command, for example:
+
+  ```latex
+  \keyword{if} x > 0 \keyword{then} 1 \keyword{else} 0
+  ```
+
+  Unlike `\text{…}`, `\keyword{…}` keeps the input in math mode, and unlike
+  `\operatorname{…}` it is rendered with symmetric keyword spacing. The existing
+  `\text{…}` and `\operatorname{…}` spellings continue to work, and all three
+  parse to the same expression. Multi-word keywords are written as a single
+  token (e.g. `\keyword{for all}`). `\keyword{otherwise}` / `\keyword{else}`
+  also serve as the default-branch marker inside a `cases` environment.
+
+  A new `keywordStyle` serialization option — `"text"` (default), `"keyword"`,
+  or `"operatorname"` — selects which spelling is emitted when serializing `If`,
+  `Loop`, `Break`, `Continue`, and `Return` back to LaTeX. The default preserves
+  the previous `\text{…}` output.
 
 ## 0.64.0 _2026-06-27_
 
@@ -165,16 +315,17 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### New Features
 
-- **LaTeX parse errors carry their source location.** The `Error` expressions
-  produced by the LaTeX parser now include a `sourceOffsets: [start, end]`
-  character range identifying where in the input the error occurred, so a
-  consumer can map a parse error back to the offending span — e.g. to highlight
-  an invalid token in a mathfield. Offsets are zero-based and end-exclusive into
-  the serialized LaTeX (`tokensToString`); for input that round-trips through
-  the tokenizer unchanged — editor-generated LaTeX, with no comments, Unicode
-  normalization, or macro expansion — they match the original input string.
-  Missing-operand errors (an empty `\sqrt{}` or `\frac{}{}`) use a zero-width
-  range at the position where the token was expected. The new
+- **LaTeX parse errors carry their source location.** (contributed by
+  [zojize](https://github.com/zojize)) The `Error` expressions produced by the
+  LaTeX parser now include a `sourceOffsets: [start, end]` character range
+  identifying where in the input the error occurred, so a consumer can map a
+  parse error back to the offending span — e.g. to highlight an invalid token in
+  a mathfield. Offsets are zero-based and end-exclusive into the serialized
+  LaTeX (`tokensToString`); for input that round-trips through the tokenizer
+  unchanged — editor-generated LaTeX, with no comments, Unicode normalization,
+  or macro expansion — they match the original input string. Missing-operand
+  errors (an empty `\sqrt{}` or `\frac{}{}`) use a zero-width range at the
+  position where the token was expected. The new
   `Parser.sourceOffsets(startToken, endToken?)` helper lets custom dictionary
   entries attach a range to errors they raise. The raw parser output
   (`LatexSyntax().parse()`) always carries these offsets, so an `Error` node is

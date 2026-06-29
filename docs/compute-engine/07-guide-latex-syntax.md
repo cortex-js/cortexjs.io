@@ -120,6 +120,10 @@ resulting expression will have its `expr.isValid` property set to `false`. An
 the list of all the errors in an expression, use `expr.errors` which will return
 an array of `["Error"]` expressions.
 
+Common LaTeX variations are also accepted even when not strictly necessary. For
+example, a one-sided delimiter group written with a TeX *null delimiter* —
+`\sin\left(x\right.` — parses the same as a closed `\sin\left(x\right)` group.
+
 <ReadMore path="/compute-engine/guides/expressions/#errors" > 
 Read more about the **errors** that can be returned. <Icon name="chevron-right-bold" />
 </ReadMore>
@@ -136,27 +140,47 @@ console.log(ce.expr(["Add", ["Power", "x", 3], 2]).latex);
 
 ## Control Structure Keywords
 
-The Compute Engine parser recognizes keywords inside `\text{...}` and
-`\operatorname{...}` to express control structures in LaTeX.
+The Compute Engine parser recognizes a set of keywords (`if`, `then`, `else`,
+`for`, `where`, `and`, `or`, `for all`, …) that express control structures and
+logic in LaTeX.
+
+Each keyword can be written three equivalent ways:
+
+- **`\keyword{if}`** — the preferred form. It keeps the input in math mode and
+  renders with the symmetric spacing expected of a keyword.
+- **`\text{if}`** — the conventional form. It switches to text mode, which is
+  awkward to enter inside a formula.
+- **`\operatorname{if}`** (or `\mathrm{if}`) — the operator-name spelling, with
+  the tighter spacing used for function names.
+
+All three parse to the same expression and may be mixed freely. Multi-word
+keywords are written as a single token, e.g. `\keyword{for all}` or
+`\keyword{such that}`.
+
+:::info[Note]
+`\keyword{...}` requires the rendering environment (such as MathLive) to define
+the `\keyword` command. `\text{...}` and `\operatorname{...}` render everywhere.
+All three are always accepted on input.
+:::
 
 ### Inline Conditionals
 
-Use `\text{if}`, `\text{then}`, and `\text{else}` keywords:
+Use the `if`, `then`, and `else` keywords:
 
 ```live
-console.log(ce.parse("\\text{if } x > 0 \\text{ then } x \\text{ else } -x").json);
+console.log(ce.parse("\\keyword{if} x > 0 \\keyword{then} x \\keyword{else} -x").json);
 // ➔ ["If", ["Greater", "x", 0], "x", ["Negate", "x"]]
 ```
 
-The `\text{else}` branch is optional. When omitted, the result is `Nothing` if
-the condition is false.
+The `else` branch is optional. When omitted, the result is `Nothing` if the
+condition is false.
 
 ### Local Bindings with `where`
 
-The `\text{where}` keyword binds variables to values in an expression:
+The `where` keyword binds variables to values in an expression:
 
 ```live
-console.log(ce.parse("a + b \\text{ where } a \\coloneq 1,\\; b \\coloneq 2").json);
+console.log(ce.parse("a + b \\keyword{where} a \\coloneq 1,\\; b \\coloneq 2").json);
 // ➔ ["Block", ["Declare", "a"], ["Assign", "a", 1],
 //             ["Declare", "b"], ["Assign", "b", 2],
 //             ["Add", "a", "b"]]
@@ -164,10 +188,10 @@ console.log(ce.parse("a + b \\text{ where } a \\coloneq 1,\\; b \\coloneq 2").js
 
 ### Loops
 
-Use `\text{for}`, `\text{from}`, `\text{to}`, and `\text{do}` keywords:
+Use the `for`, `from`, `to`, and `do` keywords:
 
 ```live
-console.log(ce.parse("\\text{for } i \\text{ from } 1 \\text{ to } 10 \\text{ do } i^2").json);
+console.log(ce.parse("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2").json);
 // ➔ ["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]
 ```
 
@@ -681,6 +705,23 @@ console.log(parse("p\\land q").toLatex({
 | `"boolean"`        |                    |                      |
 | `"uppercase-word"` | `p \text{ AND } q`  | $ p \text{ AND } q $                     |
 | `"punctuation"`    |                    |                      |
+
+#### Control Structure Keywords
+
+**To customize how control structure keywords** (`if`/`then`/`else`, `for`,
+`break`, `return`, …) **are serialized**, use the `keywordStyle` option.
+
+```live
+console.log(parse("\\keyword{if} x > 0 \\keyword{then} 1 \\keyword{else} 0").toLatex({
+  keywordStyle: "keyword"
+}));
+```
+
+| Value             |                                       |
+| :---------------- | :------------------------------------ |
+| `"text"` (default) | `\text{if } x \text{ then } 1 …`     |
+| `"keyword"`        | `\keyword{if} x \keyword{then} 1 …`  |
+| `"operatorname"`   | `\operatorname{if} x …`              |
 
 #### Power
 

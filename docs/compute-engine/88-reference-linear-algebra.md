@@ -119,36 +119,42 @@ ce.parse('2(1,2,3)').evaluate()
 // ➔ ["List", 2, 4, 6]
 ```
 
-### Element-wise vs Matrix Multiplication
+### Matrix Multiplication and the Hadamard Product
 
-**Important**: The `Multiply` function and `*` operator perform **element-wise**
-(Hadamard) multiplication. For matrix multiplication, use the `MatrixMultiply` function.
+The `Multiply` function and the `*`, `\cdot` and `\times` operators — and writing
+two matrices next to each other — perform **matrix multiplication** when their
+operands are vectors or matrices. This is consistent with `*` denoting scalar
+multiplication:
 
-**Element-wise multiplication** (each element multiplied independently):
+- a **scalar × tensor** scales every element;
+- **two or more matrices/vectors** form the [matrix product](#matrixmultiply),
+  folded left to right (a `vector × vector` reduces to the dot product).
 
 ```json example
+// Matrix product
 ["Multiply",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 19, 22], ["List", 43, 50]]
+
+// Scalar scaling
+["Multiply", 2, ["List", 1, 2, 3]]
+// ➔ ["List", 2, 4, 6]
+```
+
+Matrix multiplication is **not commutative**, so the operand order is preserved.
+Operands with incompatible dimensions are left unevaluated.
+
+For the **element-wise (Hadamard) product** — multiplying corresponding entries
+of two same-shape tensors — use [`HadamardProduct`](#hadamardproduct), written
+`\odot`:
+
+```json example
+["HadamardProduct",
   ["List", ["List", 1, 2], ["List", 3, 4]],
   ["List", ["List", 5, 6], ["List", 7, 8]]]
 // ➔ ["List", ["List", 5, 12], ["List", 21, 32]]
 // Each position: [1×5, 2×6], [3×7, 4×8]
-```
-
-**Matrix multiplication** (linear algebraic product):
-
-```json example
-["MatrixMultiply",
-  ["List", ["List", 1, 2], ["List", 3, 4]],
-  ["List", ["List", 5, 6], ["List", 7, 8]]]
-// ➔ ["List", ["List", 19, 22], ["List", 43, 50]]
-// Matrix product: [[1×5+2×7, 1×6+2×8], [3×5+4×7, 3×6+4×8]]
-```
-
-```typescript example
-const m1 = ce.expr(['List', ['List', 1, 2], ['List', 3, 4]]);
-const m2 = ce.expr(['List', ['List', 5, 6], ['List', 7, 8]]);
-ce.function('MatrixMultiply', [m1, m2]).evaluate()
-// ➔ [[19,22],[43,50]]
 ```
 
 ### LaTeX Matrix Syntax
@@ -1090,14 +1096,13 @@ its arguments.
 Returns the [matrix product](https://en.wikipedia.org/wiki/Matrix_multiplication)
 of two matrices, vectors, or a combination thereof.
 
-:::info[Element-wise vs Matrix Multiplication]
-**Important**: Use `MatrixMultiply` for linear algebraic matrix multiplication.
-The `Multiply` function performs element-wise (Hadamard) multiplication where
-corresponding elements are multiplied: `[1,2,3] * [4,5,6]` → `[4,10,18]`.
-
-For matrix multiplication where the result is computed using row-column dot products,
-always use `MatrixMultiply`. See the [Quick Start](#basic-operations-quick-start)
-section for examples.
+:::info[`MatrixMultiply` vs `Multiply` vs `HadamardProduct`]
+`MatrixMultiply` is the explicit matrix product. The `Multiply` function and the
+`*`, `\cdot`, `\times` operators (and writing matrices next to each other) also
+produce the **matrix product** for tensor operands — they reuse this
+implementation. For the **element-wise (Hadamard) product**, use
+[`HadamardProduct`](#hadamardproduct) (`\odot`): `[1,2,3] \odot [4,5,6]` →
+`[4,10,18]`.
 :::
 
 **Matrix × Matrix**: If _A_ is an m×n matrix and _B_ is an n×p matrix, the result
@@ -1164,6 +1169,39 @@ are incompatible, an `incompatible-dimensions` error is returned.
 </FunctionDefinition>
 
 <nav className="hidden">
+### HadamardProduct
+</nav>
+<FunctionDefinition name="HadamardProduct">
+
+<Signature name="HadamardProduct">_A_, _B_</Signature>
+
+<Latex value="\mathbf{A} \odot \mathbf{B}"/>
+
+Returns the [Hadamard product](https://en.wikipedia.org/wiki/Hadamard_product_(matrices))
+(element-wise product) of two vectors or matrices of the **same shape**: each
+entry is the product of the corresponding entries.
+
+This is distinct from the [matrix product](#matrixmultiply), which `Multiply`
+(`*`, `\cdot`, `\times`) computes for tensor operands.
+
+```json example
+["HadamardProduct", ["List", 1, 2, 3], ["List", 4, 5, 6]]
+// ➔ ["List", 4, 10, 18]
+
+["HadamardProduct",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 5, 12], ["List", 21, 32]]
+```
+
+In LaTeX, the operator is written `\odot` and round-trips as such.
+
+**Dimension Validation**: The operands must have the same shape. Otherwise an
+`incompatible-dimensions` error is returned.
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### Matrix Addition (Add)
 </nav>
 <FunctionDefinition name="Add">
@@ -1222,6 +1260,16 @@ single `Add` operation.
   ["List", ["List", "a", "b"], ["List", "c", "d"]],
   ["List", ["List", 1, 2], ["List", 3, 4]]]
 // ➔ ["List", ["List", ["Add", "a", 1], ["Add", "b", 2]], ["List", ["Add", "c", 3], ["Add", "d", 4]]]
+```
+
+**Exact Values**: Element-wise matrix and vector arithmetic preserves exact
+entries (rationals, radicals) rather than converting them to decimals.
+
+```json example
+["Add",
+  ["List", ["List", ["Rational", 1, 2], ["Rational", 1, 3]]],
+  ["List", ["List", ["Rational", 1, 2], ["Rational", 1, 3]]]]
+// ➔ ["List", ["List", 1, ["Rational", 2, 3]]]
 ```
 
 **Dimension Validation**: All matrices must have the same shape. If shapes
@@ -1380,13 +1428,21 @@ Returns the [cross product](https://en.wikipedia.org/wiki/Cross_product) of two
 
 Returns the square matrix raised to the integer power _n_, that is the repeated
 matrix product $$\mathbf{A} \cdot \mathbf{A} \cdots$$. A power of `0` returns the
-identity matrix; a negative power raises the inverse to `|n|`.
+identity matrix; a negative power raises the inverse to `|n|`
+($$\mathbf{A}^{-n} = (\mathbf{A}^{n})^{-1}$$). A non-square base returns an
+`expected-square-matrix` error.
 
-This is distinct from `["Power", matrix, n]`, which raises each element to the
-power _n_ (element-wise).
+Writing `A^n` (`["Power", matrix, n]`) with an integer exponent is the **matrix
+power** as well — it routes here — so `\begin{pmatrix}1&2\\3&4\end{pmatrix}^2`
+evaluates to the matrix product, not an element-wise power. For an element-wise
+power of the entries, map `Power` over the matrix.
 
 ```json example
 ["MatrixPower", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
+// ➔ ["List", ["List", 7, 10], ["List", 15, 22]]
+
+// A^n notation routes to MatrixPower:
+["Power", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
 // ➔ ["List", ["List", 7, 10], ["List", 15, 22]]
 ```
 

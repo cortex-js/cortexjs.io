@@ -113,6 +113,41 @@ the `Which[]` function in Mathematica.
 
 </FunctionDefinition>
 
+<FunctionDefinition name="When">
+
+<Signature name="When">_expr_, _condition_</Signature>
+
+Returns the value of `expr` when `condition` evaluates to `True`, and
+`Undefined` when `condition` evaluates to `False`. When `condition` cannot
+be determined, the expression holds unevaluated.
+
+`["When"]` is the AST head produced by **restriction-brace** syntax:
+`expr\{cond\}` parses to `["When", expr, cond]`. It is also useful directly
+for masking values where a predicate does not hold.
+
+```json example
+["When", ["Square", "x"], ["Greater", "x", 0]]
+// Evaluates to x^2 when x > 0, Undefined otherwise.
+```
+
+**Stacked restrictions canonicalize** to a single `When` with an `And`
+predicate:
+
+```json example
+["When", ["When", "x", ["Greater", "x", 0]], ["Less", "x", 10]]
+// Canonicalizes to:
+["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]
+```
+
+Downstream simplification, interval intersection, and compilation operate on
+the canonical form, so source variants (stacked braces or a single brace
+with `\wedge`) are interchangeable.
+
+When compiled to JavaScript or GLSL, `When(e, cond)` emits a ternary
+`(cond ? e : NaN)`. This makes `When` suitable for plot-domain masking.
+
+</FunctionDefinition>
+
 ## Loops
 
 <FunctionDefinition name="Loop">
@@ -148,6 +183,43 @@ expression is the value of the last iteration of the loop, or the value of the
 
 `Loop` with a `body` and `collection` to iterate is equivalent to a `forEach()`
 in JavaScript. It is somewhat similar to a `Do[...]` in Mathematica.
+
+<Signature name="Loop">_body_, _element-1_, _element-2_, ...</Signature>
+
+Iterates over multiple `["Element", _name_, _collection_]` clauses, evaluating
+`body` once per combination and accumulating the results into an
+`indexed_collection`. This is the **list-comprehension** form of `Loop`.
+
+Bindings are evaluated as nested loops, outermost = first `Element` clause.
+Later clauses see earlier bindings in scope, so a clause's collection can
+depend on a name bound by an earlier clause.
+
+When all clauses are independent, the result is the Cartesian product:
+
+```json example
+["Loop",
+  ["Tuple", "x", "y"],
+  ["Element", "x", ["Range", 1, 2]],
+  ["Element", "y", ["Range", 1, 2]]]
+// ➔ [(1,1), (1,2), (2,1), (2,2)]  — 4 tuples
+```
+
+When a later clause depends on an earlier binding, the iteration follows
+the dependency (and the Cartesian product collapses):
+
+```json example
+["Loop",
+  ["Tuple", "x", "y"],
+  ["Element", "x", ["Range", 1, 3]],
+  ["Element", "y", ["Range", 1, "x"]]]
+// ➔ [(1,1), (2,1), (2,2), (3,1), (3,2), (3,3)]  — 6 tuples (triangle)
+```
+
+Bound names do not leak into the enclosing scope.
+
+The list-comprehension form of `Loop` is produced by trailing
+`\operatorname{for}` syntax (see **LaTeX Syntax for Control Structures**
+below).
 
 </FunctionDefinition>
 
@@ -186,24 +258,32 @@ programming constructs that can be used to replace loops.
 
 ## LaTeX Syntax for Control Structures
 
-Control structures can be expressed in LaTeX using keyword syntax with
-`\text{...}` or `\operatorname{...}`.
+Control structures are expressed in LaTeX using keywords. Each keyword can be
+written three equivalent ways, which may be mixed freely:
+
+- **`\keyword{if}`** — the preferred form: stays in math mode and renders with
+  symmetric keyword spacing.
+- **`\text{if}`** — the conventional form.
+- **`\operatorname{if}`** (or `\mathrm{if}`) — operator-name spelling.
+
+Multi-word keywords are a single token, e.g. `\keyword{for all}`. (`\keyword{...}`
+requires the rendering environment to define the `\keyword` command; `\text{...}`
+and `\operatorname{...}` render everywhere.)
 
 ### Inline `If`
 
 ```latex
-\text{if } x > 0 \text{ then } x \text{ else } -x
+\keyword{if} x > 0 \keyword{then} x \keyword{else} -x
 ```
 
 Parses to `["If", ["Greater", "x", 0], "x", ["Negate", "x"]]`.
 
-The `\text{else}` branch is optional. `\operatorname{if}` can be used instead
-of `\text{if}`.
+The `else` branch is optional.
 
 ### `where` Bindings
 
 ```latex
-x^2 + y^2 \text{ where } x \coloneq 3,\; y \coloneq 4
+x^2 + y^2 \keyword{where} x \coloneq 3,\; y \coloneq 4
 ```
 
 Parses to a `["Block"]` with variable declarations, assignments, and the body
@@ -212,10 +292,60 @@ expression as the return value.
 ### `for` Loops
 
 ```latex
-\text{for } i \text{ from } 1 \text{ to } 10 \text{ do } i^2
+\keyword{for} i \keyword{from} 1 \keyword{to} 10 \keyword{do} i^2
 ```
 
 Parses to `["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]`.
+
+### `for` Comprehensions
+
+A trailing `for` clause produces a list comprehension:
+
+```latex
+(x, y) \keyword{for} x = [1...3], y = [1...x]
+```
+
+Parses to:
+
+```json
+["Loop",
+  ["Tuple", "x", "y"],
+  ["Element", "x", ["Range", 1, 3]],
+  ["Element", "y", ["Range", 1, "x"]]]
+```
+
+The trailing `for` keyword binds looser than `,` and `=`, so the body
+expression (`(x, y)` above) is parsed before the keyword fires, and the
+bindings are parsed as comma-separated `name = expr` pairs after it.
+
+Multiple bindings produce a Cartesian product (or a dependency-shaped
+iteration when later bindings reference earlier ones). See the
+`Loop` definition above for full semantics.
+
+### Restriction Braces
+
+A trailing `\{cond\}` after an expression masks the value by a predicate:
+
+```latex
+f(x)\left\{0 < x < 2\right\}
+```
+
+Parses to `["When", ["f", "x"], ["Less", 0, "x", 2]]`.
+
+When the condition is `True`, the expression evaluates to its left operand;
+when `False`, it evaluates to `Undefined`. This is distinct from a set
+literal (standalone `\{1, 2, 3\}` continues to parse as a `Set`); the
+disambiguation is positional — trailing braces after a complete expression
+attach as a `When` restriction.
+
+Stacked restrictions chain and canonicalize:
+
+```latex
+x\left\{x > 0\right\}\left\{x < 10\right\}
+```
+
+Parses to `["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]`.
+The serializer round-trips this canonical form back to stacked braces.
 
 ### Semicolon Blocks
 
