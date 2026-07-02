@@ -264,16 +264,14 @@ When serialized to LaTeX, predicates render as standard function notation:
 ce.expr(['Predicate', 'P', 'x']).latex   // → "P(x)"
 ```
 
-**Note:** The notations `D(f, x)` and `N(x)` in LaTeX are **not** interpreted as
-their library function equivalents (derivative and numeric evaluation). Since
-these are not standard mathematical notations, they parse as predicate
-applications:
-- `D(f, x)` → `["Predicate", "D", "f", "x"]`
-- `N(x)` → `["Predicate", "N", "x"]`
+**Note:** Predicate wrapping only happens **inside a quantifier scope**. Outside
+a quantifier, a predicate-looking application is parsed as an ordinary function
+application. In particular, the library functions `D` and `N` behave as expected:
+- `D(f, x)` → the derivative function, `["D", ...]`
+- `N(\sqrt{10})` → the numeric evaluation function, `["N", ["Sqrt", 10]]`
 
-For derivatives, use Leibniz notation (`\frac{d}{dx}f`) or construct directly in
-MathJSON: `["D", expr, "x"]`. For numeric evaluation, use the `.N()` method or
-construct directly: `["N", expr]`.
+Inside a quantifier scope these same names are wrapped as predicates, e.g.
+`\forall x, D(x)` → `["ForAll", "x", ["Predicate", "D", "x"]]`.
 
 </FunctionDefinition>
 

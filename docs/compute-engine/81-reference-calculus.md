@@ -119,6 +119,18 @@ Note: Plain `D` without a subscript is parsed as a symbol, not a derivative oper
 | `\frac{df}{dx}`       | `["D", "f", "x"]` |
 | `\frac{d^2f}{dx^2}`   | `["D", ["D", "f", "x"], "x"]` |
 
+<b>Partial Derivative Notation</b>
+
+The partial-derivative symbol $\partial$ is parsed into the same `D` operator,
+in both the Euler form $\partial_x f$ and the Leibniz form $\partial f / \partial x$.
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `\partial_x f(x, y)`  | `["D", ["f", "x", "y"], "x"]` |
+| `\frac{\partial}{\partial x} f(x, y)` | `["D", ["f", "x", "y"], "x"]` |
+| `\frac{\partial^2}{\partial x \partial y} f(x, y)` | `["D", ["f", "x", "y"], "x", "y"]` |
+| `\frac{\partial^2}{\partial x^2} f(x, y)` | `["D", ["f", "x", "y"], "x", "x"]` |
+
 The `Derivative` function represents a derivative of a function with respect to a single variable.
 The `D` function is used to calculate the symbolic derivative of a function with respect to one or more variables.
 The `ND` function is used to calculate a numerical approximation of the derivative of a function.
@@ -170,8 +182,15 @@ A variable can be repeated to compute the second derivative of a function.
 ["D", "f", "x", "x"]
 ```
 
+Differentiating an application of an **unknown** function keeps the result
+symbolic. The partial with respect to each argument is carried as a multi-index
+`Derivative` (see the `Derivative` function below):
 
-
+```json example
+    ["D", ["f", "x", "y"], "x"]
+evaluates to
+    ["Apply", ["Derivative", "f", 1, 0], "x", "y"]
+```
 
 
 
@@ -182,7 +201,11 @@ A variable can be repeated to compute the second derivative of a function.
 
 The `D` function supports symbolic differentiation for the following functions.
 For functions not listed, the chain rule is applied and a symbolic derivative
-`Apply(Derivative(f, 1), x)` is returned for unknown single-argument functions.
+is returned. For an unknown univariate function this is
+`Apply(Derivative(f, 1), x)`; for an unknown multivariate function each partial
+is carried as a multi-index `Derivative` (see **Partial derivatives of unknown
+functions** below), e.g. `D(f(x, y), x)` evaluates to
+`Apply(Derivative(f, 1, 0), x, y)`.
 
 <div className="symbols-table">
 
@@ -297,6 +320,38 @@ When an argument $n$ is present it represents the _n_-th derivative of a functio
 
 ```json example
 ["Apply", ["Derivative", "f", "n"], "x"]
+```
+
+
+
+<Signature name="Derivative" returns="(number -> number)">_f_: (number, ...) -> number, _n₁_: integer, _n₂_: integer, ...</Signature>
+
+For a function of several arguments, the order argument is a **multi-index**:
+one differentiation order per argument of _f_. `["Derivative", "f", 1, 0]` is the
+partial derivative of a bivariate _f_ with respect to its first argument, and
+`["Derivative", "f", 0, 1]` with respect to its second. Mixed and higher-order
+partials accumulate on the multi-index — `["Derivative", "f", 1, 1]` is
+$\partial^2 f / \partial x\,\partial y$, `["Derivative", "f", 2, 0]` is
+$\partial^2 f / \partial x^2$. This follows the convention of Mathematica's
+`Derivative[n₁, n₂, …][f]`.
+
+When applied to plain symbols, a multi-index derivative serializes in Leibniz
+notation; unapplied it uses the parenthesized index list $f^{(1,0)}$.
+
+<Latex value="\frac{\partial}{\partial x} f(x, y)"/>
+
+```json example
+["Apply", ["Derivative", "f", 1, 0], "x", "y"]
+```
+
+**Partial derivatives of unknown functions.** Differentiating an application of
+an unknown function produces these forms automatically via the multivariate
+chain rule:
+
+```json example
+    ["D", ["f", "x", "y"], "x"]
+evaluates to
+    ["Apply", ["Derivative", "f", 1, 0], "x", "y"]
 ```
 
 

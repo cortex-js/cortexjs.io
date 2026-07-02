@@ -157,13 +157,14 @@ ce.declare('Loves', { signature: '(value, value) -> boolean' });
 ce.parse('Loves(x, y)');    // → ["Loves", "x", "y"]
 ```
 
-**Note about `D(f, x)` and `N(x)`:** These notations in LaTeX are **not**
-interpreted as their library function equivalents:
-- `D(f, x)` parses as `["Predicate", "D", "f", "x"]` (not the derivative)
-- `N(x)` parses as `["Predicate", "N", "x"]` (not numeric evaluation)
+This applies to the library functions `D` and `N` too: outside a quantifier
+scope they parse as their function equivalents, so they behave as expected:
+- `D(f, x)` parses as the derivative function `["D", ...]`
+- `N(\sqrt{10})` parses as the numeric evaluation function `["N", ["Sqrt", 10]]`
 
-Use Leibniz notation (`\frac{d}{dx}f`) for derivatives, or construct directly in
-MathJSON. For numeric evaluation, use the `.N()` method on expressions.
+Inside a quantifier scope, these names are wrapped as predicates like any other
+single uppercase letter (e.g. `\forall x, D(x)` →
+`["ForAll", "x", ["Predicate", "D", "x"]]`).
 
 ### Quantifiers
 
