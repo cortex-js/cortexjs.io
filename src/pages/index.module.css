@@ -64,6 +64,13 @@ body {
   margin-right: 1rem;
 }
 
+/* Logo image (direct child of .header): keep its aspect ratio when the
+   available width is smaller than its intrinsic size. */
+.header img {
+  max-width: 100%;
+  height: auto;
+}
+
 
 .subtitle {
   font-weight: 800;
@@ -244,6 +251,30 @@ body {
 [data-theme="dark"] .pods a:hover .pod {
   box-shadow: 
     0 -2px 20px rgb(0 0 0  / .3);
+}
+
+@media (max-width: 600px) {
+  .pods {
+    gap: 2rem;
+    margin: 0 1rem 3rem 1rem;
+  }
+
+  .pods a {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .pod {
+    min-width: 0;
+  }
+
+  .pod h2 {
+    font-size: clamp(2rem, 11vw, 4rem);
+  }
+
+  .pod p {
+    font-size: clamp(1.4rem, 6vw, 2.4rem);
+  }
 }
 
 .posterContainer {

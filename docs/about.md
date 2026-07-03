@@ -57,23 +57,19 @@ date: 2021-06-24
 
 <div className="max-w-4xl mt-lg">
 
-In 1984 I built WinMath for the Mac, one of the first graphing calculator 
-for modern computers.
 
-A few years later I had the privilege of bringing the Mac UI to life at Apple, 
-then I helped build tools for creative professionals and
-move the web platform forward at Adobe.
+In 1984, I built WinMath for the Mac, one of the first graphing calculators for modern computers.
 
-Now I'm returning where it all began: 
-I'm building tools for scientific computing,
-including [mathfield](/mathfield), a web component to edit 
-beautifully typeset math equations 
-and the [Compute Engine](/compute-engine/) to perform symbolic 
-computing and numeric evaluations in JavaScript environments.
+A few years later, I had the privilege of helping bring the Mac user interface to life at Apple. Later, at Adobe, I helped build tools for creative professionals and move the web platform forward.
 
-These tools are available under an Open Source license.
+Today, through [Farfield Studio⁠￼](https://farfield.studio), I’m returning to where it all began: building better tools for scientific computing.
 
-I can’t wait to see what you do with them. Enjoy!
+That includes [mathfield](/mathfield), a web component for editing beautifully typeset math equations, and the [Compute Engine](/compute-engine/), a JavaScript library for symbolic computing and numeric evaluation.
+
+Both projects are available under an open source license.
+
+I can’t wait to see what you build with them.
+
 
 <ul className="signature">
   <li>
