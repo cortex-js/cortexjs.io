@@ -39,7 +39,7 @@ Used by the Compute Engine for simplification.
 
 $$a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)=\frac{(\pi a-2\mathrm{AGM}(a, b)\mathrm{EllipticE}((a-b)/(a+b)^2))\mathrm{AGM}(a, b)}{\pi a(a-b)}$$
 
-**Holds when** $b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean; **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/09.54.20.0001.01)
@@ -127,7 +127,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(a, b)=\frac{\pi(a+b)}{4\mathrm{EllipticK}((a-b)/(a+b)^2)}$$
 
-**Holds when** $b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`71a0ff` · Fungrim entry ↗](https://fungrim.org/entry/71a0ff)
@@ -153,7 +153,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{AGM}(1, b)=b\mathrm{AGM}(1, \frac{1}{b})$$
 
-**Holds when** $b\notin\lparen-\infty, 0\rbrack\land b\in\C$.
+**Holds when** $b\in\C\land b\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`8e80c6` · Fungrim entry ↗](https://fungrim.org/entry/8e80c6)
@@ -169,7 +169,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{AGM}(b+1, 1-b)=\mathrm{AGM}(1, \sqrt{1-b^2})$$
+$$\mathrm{AGM}(1+b, 1-b)=\mathrm{AGM}(1, \sqrt{1-b^2})$$
 
 **Holds when** $b\in\C$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
@@ -178,9 +178,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$(a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a)+(3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a))\mathrm{AGM}(a, b)+2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2=0$$
+$$2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2+((3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)+a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a))\mathrm{AGM}(a, b)=0$$
 
-**Holds when** $b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/09.54.13.0001.01)
@@ -199,7 +199,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(a, b)=a\mathrm{AGM}(1, \frac{b}{a})$$
 
-**Holds when** $a\ne0\land\frac{b}{a}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land a\ne0\land\frac{b}{a}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`ce2395` · Fungrim entry ↗](https://fungrim.org/entry/ce2395)
@@ -208,7 +208,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(a, b)=\frac{a+b}{2\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, (a-b)/(a+b)^2)}$$
 
-**Holds when** $b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean; **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`d6d836` · Fungrim entry ↗](https://fungrim.org/entry/d6d836)
@@ -234,7 +234,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(a, b)=b\mathrm{AGM}(1, \frac{a}{b})$$
 
-**Holds when** $b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack\land a\in\C\land b\in\C$.
+**Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`ea1d58` · Fungrim entry ↗](https://fungrim.org/entry/ea1d58)
@@ -257,7 +257,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{AGM}(a, b)=\mathrm{AGM}(\frac{a+b}{2}, \begin{cases}1&0\le\Re((a+b)/(2(ab)^{1/2}))\lor(ab)^{1/2}=0\\-1&\top\end{cases}\sqrt{ab})$$
+$$\mathrm{AGM}(a, b)=\mathrm{AGM}(\frac{a+b}{2}, \begin{cases}1&(ab)^{1/2}=0\lor\Re((a+b)/2/(ab)^{1/2})\ge0\\-1&\top\end{cases}\sqrt{ab})$$
 
 **Holds when** $a\in\C\land b\in\C$.
 **Symbols:** **AGM** — Arithmetic-geometric mean.
@@ -268,7 +268,7 @@ Used by the Compute Engine for simplification.
 
 ## Carlson symmetric elliptic integrals
 
-$$\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 3/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))$$
+$$\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 3/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -277,7 +277,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(\sqrt{x/(x+y)})-\frac{\imaginaryI\pi}{2}}{\sqrt{x+y}}$$
+$$\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(\sqrt{x/(x+y)})+(\frac{-1}{2}\imaginaryI)\pi}{\sqrt{x+y}}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -286,7 +286,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 1, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRD}(0, 1, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -312,7 +312,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{x^{1/2}}{w})}{2(w-x)}&x\ne w\\\sqrt{x}^{-3}&x=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{x^{1/2}}{w})}{2(w-x)}&x\ne w\\x^{-(3/2)}&x=w\end{cases}$$
 
 **Holds when** $x\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -349,7 +349,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassP}(\mathrm{CarlsonRF}(z-\mathrm{EllipticRootE}(1, \tau), z-\mathrm{EllipticRootE}(2, \tau), z-\mathrm{EllipticRootE}(3, \tau)), \tau)=z$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`124339` · Fungrim entry ↗](https://fungrim.org/entry/124339)
@@ -374,7 +374,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 0, -1)=\infty\imaginaryI$$
+$$\mathrm{CarlsonRD}(0, 0, -1)=\imaginaryI\infty$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -382,7 +382,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(1, y+1)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -y)$$
+$$\mathrm{CarlsonRC}(1, 1+y)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -y)$$
 
 **Holds when** $y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -441,7 +441,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{1}{x^{1/2}})}{x-w}&x\ne w\\\sqrt{w}^{-3}&x=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{1}{x^{1/2}})}{x-w}&x\ne w\\w^{-(3/2)}&x=w\end{cases}$$
 
 **Holds when** $x\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -459,7 +459,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(x, y, z)=2\mathrm{CarlsonRF}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})$$
+$$\mathrm{CarlsonRF}(x, y, z)=2\mathrm{CarlsonRF}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z})$$
 
 **Holds when** $x\in\C\land y\in\C\land z\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -476,7 +476,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(1, -1)=\frac{1}{4}(-\imaginaryI\pi\sqrt{2})+\frac{1}{2}(\sqrt{2}\ln(1+\sqrt{2}))$$
+$$\mathrm{CarlsonRC}(1, -1)=\frac{1}{2}(\sqrt{2}\ln(1+2^{1/2}))-\frac{1}{4}(\pi\sqrt{2}\imaginaryI)$$
 
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -484,7 +484,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, -(cx))=\frac{1}{\sqrt{x}}(\begin{cases}\mathrm{EllipticK}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&\top\end{cases})$$
+$$\mathrm{CarlsonRF}(0, x, -(cx))=\begin{cases}\mathrm{EllipticK}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&\top\end{cases}/\sqrt{x}$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
@@ -493,7 +493,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, 1, 2)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{CarlsonRF}(0, 1, 2)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -518,7 +518,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, -1, -1, -1)=\frac{-3}{4}-\frac{1}{8}(3\sqrt{2}\ln(1+\sqrt{2}))+\frac{1}{16}(3\sqrt{2}\imaginaryI\pi)$$
+$$\mathrm{CarlsonRJ}(1, -1, -1, -1)=-(\frac{3}{4})-\frac{1}{8}(3\sqrt{2}\ln(1+2^{1/2}))+\frac{1}{16}(3\sqrt{2}\pi\imaginaryI)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -526,7 +526,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(1, -1, -1)=\frac{-3}{4}-\frac{1}{8}(3\sqrt{2}\ln(1+\sqrt{2}))+\frac{1}{16}(3\sqrt{2}\imaginaryI\pi)$$
+$$\mathrm{CarlsonRD}(1, -1, -1)=-(\frac{3}{4})-\frac{1}{8}(3\sqrt{2}\ln(1+2^{1/2}))+\frac{1}{16}(3\sqrt{2}\pi\imaginaryI)$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -534,25 +534,25 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, y, z)=2\mathrm{CarlsonRD}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})+(3)((z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z})\sqrt{z})^{-1}$$
+$$\mathrm{CarlsonRD}(x, y, z)=2\mathrm{CarlsonRD}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}, z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z})+(3)(\sqrt{z}(z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}))^{-1}$$
 
-**Holds when** $z\ne0\land x\in\C\land y\in\C\land z\in\C$.
+**Holds when** $x\in\C\land y\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`31a3ba` · Fungrim entry ↗](https://fungrim.org/entry/31a3ba)
 
 ---
 
-$$\arccos(\frac{x}{y})=\mathrm{CarlsonRC}(x^2, y^2)\sqrt{y^2-x^2}$$
+$$\arccos(\frac{x}{y})=\sqrt{y^2-x^2}\mathrm{CarlsonRC}(x^2, y^2)$$
 
-**Holds when** $x\in\lbrack0, y\rbrack\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\lbrack0, y\rbrack$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`33e034` · Fungrim entry ↗](https://fungrim.org/entry/33e034)
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 0, -1, -1)=\infty\imaginaryI$$
+$$\mathrm{CarlsonRJ}(0, 0, -1, -1)=\imaginaryI\infty$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -560,7 +560,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(0, -1)=-(\frac{\imaginaryI\pi}{2})$$
+$$\mathrm{CarlsonRC}(0, -1)=-(\frac{\pi\imaginaryI}{2})$$
 
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -568,7 +568,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, z, z\bigr\rbrack))$$
+$$\mathrm{CarlsonRD}(0, y, z)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, z, z\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -577,7 +577,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(\mathrm{lamda}+x, \mathrm{lamda}+y, \mathrm{lamda})+\mathrm{CarlsonRF}(\frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y, \frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRF}(x, y, 0)$$
+$$\mathrm{CarlsonRF}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda})+\mathrm{CarlsonRF}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRF}(x, y, 0)$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -603,7 +603,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, -1, -1)=\frac{-(\imaginaryI\pi)}{2}$$
+$$\mathrm{CarlsonRF}(0, -1, -1)=\frac{-(\pi\imaginaryI)}{2}$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -638,7 +638,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, 2x)=(\frac{\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}+\frac{\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}})\sqrt{x}$$
+$$\mathrm{CarlsonRG}(0, x, 2x)=\sqrt{x}(\frac{\Gamma(1/4)^2}{8\sqrt{2\pi}}+\frac{\sqrt{\pi}^{3}}{\sqrt{2}\Gamma(1/4)^2})$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -665,34 +665,34 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, y)=\frac{1}{\sqrt{x}}(\mathrm{EllipticK}(1-\frac{y}{x}))$$
+$$\mathrm{CarlsonRF}(0, x, y)=\mathrm{EllipticK}(1-y/x)/\sqrt{x}$$
 
-**Holds when** $\vert\arg(x)-\arg(y)\vert\lt\pi\land x\in\C\land y\in\C$.
+**Holds when** $x\in\C\land y\in\C\land\vert\arg(x)-\arg(y)\vert\lt\pi$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`415ff0` · Fungrim entry ↗](https://fungrim.org/entry/415ff0)
 
 ---
 
-$$\mathrm{arsinh}(\frac{x}{y})=x\mathrm{CarlsonRC}(x^2+y^2, y^2)$$
+$$\mathrm{arsinh}(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2+x^2, y^2)$$
 
-**Holds when** $x\in\R\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\R$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`423b36` · Fungrim entry ↗](https://fungrim.org/entry/423b36)
 
 ---
 
-$$\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack\frac{1}{2}, \frac{1}{2}, \frac{1}{2}\bigr\rbrack, \bigl\lbrack x, y, y\bigr\rbrack)$$
+$$\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(-(\frac{1}{2}), \bigl\lbrack\frac{1}{2}, \frac{1}{2}, \frac{1}{2}\bigr\rbrack, \bigl\lbrack x, y, y\bigr\rbrack)$$
 
-**Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land x\in\C\setminus\lparen-\infty, 0\rparen$.
+**Holds when** $x\in\C\setminus\lparen-\infty, 0\rparen\land y\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`42c7f1` · Fungrim entry ↗](https://fungrim.org/entry/42c7f1)
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, 2, 2, 4)=\frac{1}{24}(\pi(9-4\sqrt{3}))$$
+$$\mathrm{CarlsonRJ}(1, 2, 2, 4)=\frac{1}{24}((9-4\sqrt{3})\pi)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -700,7 +700,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, -(cx))=\frac{1}{2}(\begin{cases}\mathrm{EllipticE}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\\mathrm{EllipticE}(c+1)+2\imaginaryI(\mathrm{EllipticK}(-c)-\mathrm{EllipticE}(-c))&\top\end{cases}\sqrt{x})$$
+$$\mathrm{CarlsonRG}(0, x, -(cx))=\frac{1}{2}(\sqrt{x}\begin{cases}\mathrm{EllipticE}(1+c)&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\\mathrm{EllipticE}(1+c)+2\imaginaryI(\mathrm{EllipticK}(-c)-\mathrm{EllipticE}(-c))&\top\end{cases})$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
@@ -734,7 +734,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, -1, -1, 1)=\frac{-3}{2}-\frac{1}{8}(3\sqrt{2}\imaginaryI\pi)+\frac{1}{4}(3\sqrt{2}\ln(1+\sqrt{2}))$$
+$$\mathrm{CarlsonRJ}(1, -1, -1, 1)=\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2}-\frac{1}{8}(3\sqrt{2}\pi\imaginaryI)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -742,7 +742,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, x, x, x)=\sqrt{x}^{-3}$$
+$$\mathrm{CarlsonRJ}(x, x, x, x)=x^{-(\frac{3}{2})}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -767,7 +767,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(1, 1, 2)=\frac{\ln(1+\sqrt{2})}{2}+\frac{\sqrt{2}}{2}$$
+$$\mathrm{CarlsonRG}(1, 1, 2)=\frac{\sqrt{2}}{2}+\frac{\ln(1+\sqrt{2})}{2}$$
 
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -786,14 +786,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticE}(1-z/y)-(z\mathrm{EllipticK}(1-z/y))/y)}{(z(1-z/y))/y}&z\ne0\land z\ne y\\\frac{3\pi}{4}&z=y\\\tilde\infty&z=0\end{cases}}{\sqrt{y}^{3}}$$
 
-**Holds when** $\vert\arg(y)-\arg(z)\vert\lt\pi\land z\in\C\land y\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $y\in\C\setminus\lbrace0\rbrace\land z\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`4e4380` · Fungrim entry ↗](https://fungrim.org/entry/4e4380)
 
 ---
 
-$$\mathrm{CarlsonRJ}(\mathrm{lamda}+x, \mathrm{lamda}+y, \mathrm{lamda}, \mathrm{lamda}+w)+\mathrm{CarlsonRJ}(\frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y, \frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}+w)=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}((\frac{xy}{\mathrm{lamda}}+\mathrm{lamda}+x+y)w^2, w(\mathrm{lamda}+w)(\frac{xy}{\mathrm{lamda}}+w))$$
+$$\mathrm{CarlsonRJ}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda}, w+\mathrm{lamda})+\mathrm{CarlsonRJ}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}, w+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}(w^2(\mathrm{lamda}+\frac{xy}{\mathrm{lamda}}+x+y), w(w+\mathrm{lamda})(w+\frac{xy}{\mathrm{lamda}}))$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land w\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -802,7 +802,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 1, 1, 2)=\frac{3\pi}{2(2+\sqrt{2})}$$
+$$\mathrm{CarlsonRJ}(0, 1, 1, 2)=\frac{3\pi}{4+2\sqrt{2}}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -810,7 +810,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, 1, -1, -1)=\imaginaryI(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})-\frac{3\sqrt{2}\pi}{8}$$
+$$\mathrm{CarlsonRJ}(1, 1, -1, -1)=(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})\imaginaryI-\frac{1}{8}(3\sqrt{2}\pi)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -836,7 +836,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(1, 1, -1)=\imaginaryI(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})-\frac{3\sqrt{2}\pi}{8}$$
+$$\mathrm{CarlsonRD}(1, 1, -1)=(\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2})\imaginaryI-\frac{1}{8}(3\sqrt{2}\pi)$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -852,7 +852,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(-1, 0)=-(\infty\imaginaryI)$$
+$$\mathrm{CarlsonRC}(-1, 0)=-(\imaginaryI\infty)$$
 
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -862,14 +862,14 @@ Used by the Compute Engine for simplification.
 
 $$\arcsin(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2-x^2, y^2)$$
 
-**Holds when** $x\in\lbrack-y, y\rbrack\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\lbrack-y, y\rbrack$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`584a61` · Fungrim entry ↗](https://fungrim.org/entry/584a61)
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1\bigr\rbrack, \bigl\lbrack y, z, w\bigr\rbrack))$$
+$$\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1\bigr\rbrack, \bigl\lbrack y, z, w\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack\land w\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -887,7 +887,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arctan((y/x-1)^{1/2})}{\sqrt{y-x}}&x\lt y\\\frac{1}{\sqrt{x}}&x=y\\\frac{\mathrm{artanh}((1-y/x)^{1/2})}{\sqrt{x-y}}&y\lt x\end{cases}$$
+$$\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arctan((y/x-1)^{1/2})}{\sqrt{y-x}}&x\lt y\\\frac{1}{\sqrt{x}}&x=y\\\frac{\mathrm{artanh}((1-y/x)^{1/2})}{\sqrt{x-y}}&x\gt y\end{cases}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -896,7 +896,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, -1, -2)=-(\frac{\sqrt{2}\imaginaryI\Gamma(1/4)^2}{8\sqrt{\pi}})$$
+$$\mathrm{CarlsonRF}(0, -1, -2)=-(((2^{1/2}/8\imaginaryI)\Gamma(1/4)^2)/\sqrt{\pi})$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1014,16 +1014,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(y, z, x)+\mathrm{CarlsonRD}(z, x, y)+\mathrm{CarlsonRD}(x, y, z)=(3)(\sqrt{x}\sqrt{y}\sqrt{z})^{-1}$$
+$$\mathrm{CarlsonRD}(x, y, z)+\mathrm{CarlsonRD}(y, z, x)+\mathrm{CarlsonRD}(z, x, y)=(3)(\sqrt{x}\sqrt{y}\sqrt{z})^{-1}$$
 
-**Holds when** $x\ne0\land y\ne0\land x\in\C\land y\in\C\land z\in\C$ &nbsp;_or_&nbsp; $z\ne0$.
+**Holds when** $x\in\C\land y\in\C\land z\in\C\land x\ne0\land y\ne0$ &nbsp;_or_&nbsp; $z\ne0$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`6dda7a` · Fungrim entry ↗](https://fungrim.org/entry/6dda7a)
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, 1, 2, 4)=-\pi\frac{\sqrt{2}}{8}+\ln(1+\sqrt{2})$$
+$$\mathrm{CarlsonRJ}(1, 1, 2, 4)=\ln(1+\sqrt{2})-\frac{\sqrt{2}\pi}{8}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1031,7 +1031,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arccos(x/y^{1/2})}{\sqrt{y-x}}&x\lt y\\\frac{1}{\sqrt{x}}&x=y\\\frac{\mathrm{arcosh}(x/y^{1/2})}{\sqrt{x-y}}&y\lt x\end{cases}$$
+$$\mathrm{CarlsonRC}(x, y)=\begin{cases}\frac{\arccos(x/y^{1/2})}{\sqrt{y-x}}&x\lt y\\\frac{1}{\sqrt{x}}&x=y\\\frac{\mathrm{arcosh}(x/y^{1/2})}{\sqrt{x-y}}&x\gt y\end{cases}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -1049,7 +1049,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(\frac{-3}{2}, \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, w, w\bigr\rbrack))$$
+$$\mathrm{CarlsonRJ}(0, y, z, w)=\frac{1}{4}(3\pi\mathrm{CarlsonHypergeometricR}(-(3/2), \bigl\lbrack1/2, 1/2, 1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z, w, w\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack\land w\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -1075,7 +1075,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-\frac{1}{y^{1/2}})}{y-x}&x\ne y\\\sqrt{x}^{-3}&x=y\end{cases}$$
+$$\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-\frac{1}{y^{1/2}})}{y-x}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1101,9 +1101,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\arctan(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2, x^2+y^2)$$
+$$\arctan(\frac{x}{y})=x\mathrm{CarlsonRC}(y^2, y^2+x^2)$$
 
-**Holds when** $x\in\R\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\R$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`7a9dad` · Fungrim entry ↗](https://fungrim.org/entry/7a9dad)
@@ -1119,7 +1119,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, 0)=\begin{cases}\infty\mathrm{sgn}(\frac{1}{x^{1/2}})&x\ne0\\\tilde\infty&x=0\end{cases}$$
+$$\mathrm{CarlsonRC}(x, 0)=\begin{cases}\mathrm{sgn}(\frac{1}{x^{1/2}})\infty&x\ne0\\\tilde\infty&x=0\end{cases}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -1128,25 +1128,25 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, y)=\frac{1}{2}(\mathrm{EllipticE}(1-\frac{y}{x})\sqrt{x})$$
+$$\mathrm{CarlsonRG}(0, x, y)=\frac{1}{2}(\sqrt{x}\mathrm{EllipticE}(1-y/x))$$
 
-**Holds when** $\vert\arg(x)-\arg(y)\vert\lt\pi\land x\in\C\land y\in\C$.
+**Holds when** $x\in\C\land y\in\C\land\vert\arg(x)-\arg(y)\vert\lt\pi$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`7cddc6` · Fungrim entry ↗](https://fungrim.org/entry/7cddc6)
 
 ---
 
-$$\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack\frac{1}{2}, 1\bigr\rbrack, \bigl\lbrack x, y\bigr\rbrack)$$
+$$\mathrm{CarlsonRC}(x, y)=\mathrm{CarlsonHypergeometricR}(-(\frac{1}{2}), \bigl\lbrack\frac{1}{2}, 1\bigr\rbrack, \bigl\lbrack x, y\bigr\rbrack)$$
 
-**Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land x\in\C\setminus\lparen-\infty, 0\rparen$.
+**Holds when** $x\in\C\setminus\lparen-\infty, 0\rparen\land y\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`7ded8f` · Fungrim entry ↗](https://fungrim.org/entry/7ded8f)
 
 ---
 
-$$\mathrm{CarlsonRC}(-1, 1)=\frac{1}{2}(-\imaginaryI\sqrt{2}\ln(1+\sqrt{2}))+\frac{\pi\sqrt{2}}{4}$$
+$$\mathrm{CarlsonRC}(-1, 1)=\frac{\pi\sqrt{2}}{4}-\frac{1}{2}(\sqrt{2}\ln(1+2^{1/2})\imaginaryI)$$
 
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1179,7 +1179,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, 1, 2)=\frac{\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}+\frac{\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}$$
+$$\mathrm{CarlsonRG}(0, 1, 2)=\frac{\Gamma(1/4)^2}{8\sqrt{2\pi}}+\frac{\sqrt{\pi}^{3}}{\sqrt{2}\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -1203,7 +1203,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, cx)=\begin{cases}\frac{\arctan((c-1)^{1/2})}{\sqrt{x(c-1)}}&1\lt c\\\frac{1}{\sqrt{x}}&c=1\\\frac{\mathrm{artanh}((1-c)^{1/2})}{\sqrt{x(1-c)}}&c\lt1\end{cases}$$
+$$\mathrm{CarlsonRC}(x, cx)=\begin{cases}\frac{\arctan((c-1)^{1/2})}{\sqrt{(c-1)x}}&c\gt1\\\frac{1}{\sqrt{x}}&c=1\\\frac{\mathrm{artanh}((1-c)^{1/2})}{\sqrt{(1-c)x}}&c\lt1\end{cases}$$
 
 **Holds when** $x\in\C\land c\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -1214,14 +1214,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticK}(1-y/z)-\mathrm{EllipticE}(1-y/z))}{1-y/z}&y\ne z\\\frac{3\pi}{4}&y=z\end{cases}}{\sqrt{z}^{3}}$$
 
-**Holds when** $\vert\arg(y)-\arg(z)\vert\lt\pi\land y\in\C\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $z\in\C\setminus\lbrace0\rbrace\land y\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`8d0629` · Fungrim entry ↗](https://fungrim.org/entry/8d0629)
 
 ---
 
-$$\mathrm{CarlsonRF}(x, y, z)=\mathrm{CarlsonRF}(\frac{1}{4}(x+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}), \frac{1}{4}(y+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}), \frac{1}{4}(z+\sqrt{x}\sqrt{y}+\sqrt{x}\sqrt{z}+\sqrt{y}\sqrt{z}))$$
+$$\mathrm{CarlsonRF}(x, y, z)=\mathrm{CarlsonRF}(\frac{1}{4}(x+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}), \frac{1}{4}(y+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}), \frac{1}{4}(z+\sqrt{x}\sqrt{y}+\sqrt{y}\sqrt{z}+\sqrt{x}\sqrt{z}))$$
 
 **Holds when** $x\in\C\land y\in\C\land z\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -1239,7 +1239,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, 0, -1)=-(\infty\imaginaryI)$$
+$$\mathrm{CarlsonRF}(0, 0, -1)=-(\imaginaryI\infty)$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1330,7 +1330,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(\mathrm{lamda}, \mathrm{lamda}+x, \mathrm{lamda}+y)+\mathrm{CarlsonRD}(\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}+x, \frac{xy}{\mathrm{lamda}}+y)=\mathrm{CarlsonRD}(0, x, y)-(3)(y\sqrt{\frac{xy}{\mathrm{lamda}}+\mathrm{lamda}+x+y})^{-1}$$
+$$\mathrm{CarlsonRD}(\mathrm{lamda}, x+\mathrm{lamda}, y+\mathrm{lamda})+\mathrm{CarlsonRD}(\frac{xy}{\mathrm{lamda}}, x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRD}(0, x, y)-(3)(y\sqrt{x+y+\mathrm{lamda}+(xy)/\mathrm{lamda}})^{-1}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1339,7 +1339,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, cx)=\frac{1}{2}(\mathrm{EllipticE}(1-c)\sqrt{x})$$
+$$\mathrm{CarlsonRG}(0, x, cx)=\frac{1}{2}(\sqrt{x}\mathrm{EllipticE}(1-c))$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
@@ -1477,7 +1477,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 1, 2, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRJ}(0, 1, 2, 2)=\frac{3\sqrt{2}\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1501,7 +1501,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&x\ne y\\\sqrt{x}^{-3}&x=y\end{cases}$$
+$$\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1510,7 +1510,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, x, x)=\sqrt{x}^{-3}$$
+$$\mathrm{CarlsonRD}(x, x, x)=x^{-(\frac{3}{2})}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1536,7 +1536,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, -1, -1, -1)=\frac{3\imaginaryI\pi}{4}$$
+$$\mathrm{CarlsonRJ}(0, -1, -1, -1)=\frac{3\pi\imaginaryI}{4}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1552,7 +1552,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, y, z)=\frac{1}{2}(\pi\mathrm{CarlsonHypergeometricR}(\frac{-1}{2}, \bigl\lbrack1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))$$
+$$\mathrm{CarlsonRF}(0, y, z)=\frac{1}{2}(\pi\mathrm{CarlsonHypergeometricR}(-(1/2), \bigl\lbrack1/2, 1/2\bigr\rbrack, \bigl\lbrack y, z\bigr\rbrack))$$
 
 **Holds when** $y\in\C\setminus\lparen-\infty, 0\rbrack\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonHypergeometricR** — Carlson multivariate hypergeometric function; **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -1569,7 +1569,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&x\ne y\land y=w\\\sqrt{x}^{-3}&x=y=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&y=w\land x\ne y\\x^{-(3/2)}&x=y=w\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -1578,7 +1578,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(1, 2, 2)=\frac{1}{2}+\frac{\pi}{4}$$
+$$\mathrm{CarlsonRG}(1, 2, 2)=\frac{\pi}{4}+\frac{1}{2}$$
 
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -1586,7 +1586,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, -1, -1)=\frac{3\imaginaryI\pi}{4}$$
+$$\mathrm{CarlsonRD}(0, -1, -1)=\frac{3\pi\imaginaryI}{4}$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1611,9 +1611,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{arcosh}(\frac{x}{y})=\mathrm{CarlsonRC}(x^2, y^2)\sqrt{x^2-y^2}$$
+$$\mathrm{arcosh}(\frac{x}{y})=\sqrt{x^2-y^2}\mathrm{CarlsonRC}(x^2, y^2)$$
 
-**Holds when** $x\in\lbrack y, \infty\rparen\land y\in\lparen0, \infty\rparen$.
+**Holds when** $y\in\lparen0, \infty\rparen\land x\in\lbrack y, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`d9765b` · Fungrim entry ↗](https://fungrim.org/entry/d9765b)
@@ -1637,7 +1637,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(1, 1, 1, -1)=\frac{-3}{2}-\frac{1}{8}(3\sqrt{2}\imaginaryI\pi)+\frac{1}{4}(3\sqrt{2}\ln(1+\sqrt{2}))$$
+$$\mathrm{CarlsonRJ}(1, 1, 1, -1)=\frac{1}{4}(3\times2^{1/2}\ln(1+2^{1/2}))-\frac{3}{2}-\frac{1}{8}(3\sqrt{2}\pi\imaginaryI)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1645,7 +1645,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 0, z, w)=\begin{cases}\infty\mathrm{sgn}(\frac{1}{wz^{1/2}})&z\ne0\land w\ne0\\\tilde\infty&\top\end{cases}$$
+$$\mathrm{CarlsonRJ}(0, 0, z, w)=\begin{cases}\mathrm{sgn}(\frac{1}{z^{1/2}w})\infty&z\ne0\land w\ne0\\\tilde\infty&\top\end{cases}$$
 
 **Holds when** $z\in\C\land w\in\C$.
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -1695,7 +1695,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{1}{2}, 1, 1-x))$$
+$$\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, 1-x))$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -1720,7 +1720,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(1, y+1)=\begin{cases}\frac{\arctan(y^{1/2})}{\sqrt{y}}&y\ne0\\1&y=0\end{cases}$$
+$$\mathrm{CarlsonRC}(1, 1+y)=\begin{cases}\frac{\arctan(y^{1/2})}{\sqrt{y}}&y\ne0\\1&y=0\end{cases}$$
 
 **Holds when** $y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -1746,7 +1746,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 0, z)=\begin{cases}\infty\mathrm{sgn}(z^{1/2}^{-3})&z\ne0\\\tilde\infty&\top\end{cases}$$
+$$\mathrm{CarlsonRD}(0, 0, z)=\begin{cases}\mathrm{sgn}(\frac{1}{z^{1/2}^{3}})\infty&z\ne0\\\tilde\infty&\top\end{cases}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1797,7 +1797,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(\mathrm{lamda}x, \mathrm{lamda}y, \mathrm{lamda}z)=\mathrm{CarlsonRG}(x, y, z)\sqrt{\mathrm{lamda}}$$
+$$\mathrm{CarlsonRG}(\mathrm{lamda}x, \mathrm{lamda}y, \mathrm{lamda}z)=\sqrt{\mathrm{lamda}}\mathrm{CarlsonRG}(x, y, z)$$
 
 **Holds when** $x\in\C\land y\in\C\land z\in\C\land\mathrm{lamda}\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -1806,7 +1806,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, 0, -1, 1)=-(\infty\imaginaryI)$$
+$$\mathrm{CarlsonRJ}(0, 0, -1, 1)=-(\imaginaryI\infty)$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1859,7 +1859,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{EllipticK}(\frac{1}{2}(1+\sqrt{3}\imaginaryI))=\frac{\sqrt[4]{3}\exp(\frac{\imaginaryI\pi}{12})\Gamma(1/3)^3}{\pi\times2^{\frac{7}{3}}}$$
+$$\mathrm{EllipticK}(\frac{1}{2}(1+\sqrt{3}\imaginaryI))=\frac{\exp(\frac{\imaginaryI\pi}{12})\sqrt[4]{3}\Gamma(1/3)^3}{2^{\frac{7}{3}}\pi}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1901,7 +1901,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{1}{2}, 1, m))$$
+$$\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -1910,7 +1910,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(\frac{1}{2}(1-\imaginaryI\sqrt{3}))=\frac{\sqrt[4]{3}\exp(-((\imaginaryI\pi)/12))\Gamma(1/3)^3}{\pi\times2^{\frac{7}{3}}}$$
+$$\mathrm{EllipticK}(\frac{1}{2}(1-3^{1/2}\imaginaryI))=\frac{\exp(-((\imaginaryI\pi)/12))\sqrt[4]{3}\Gamma(1/3)^3}{2^{\frac{7}{3}}\pi}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1961,7 +1961,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\frac{\pi}{2}, -1)=\sqrt{2}(\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}})$$
+$$\mathrm{IncompleteEllipticE}(\frac{\pi}{2}, -1)=\sqrt{2}(\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2})$$
 
 **Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -1969,7 +1969,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}((3-2\sqrt{2})^2)=\frac{(2+\sqrt{2})\Gamma(1/4)^2}{16\sqrt{\pi}}$$
+$$\mathrm{EllipticK}((3-2\times2^{1/2})^2)=\frac{(2+\sqrt{2})\Gamma(1/4)^2}{16\sqrt{\pi}}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1994,7 +1994,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(\frac{1}{2})=\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{EllipticE}(\frac{1}{2})=\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -2010,7 +2010,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(\frac{1}{2}-\frac{3^{1/2}}{4})=\frac{\sqrt[4]{3}\Gamma(1/3)^3}{4\pi\sqrt[3]{2}}$$
+$$\mathrm{EllipticK}(\frac{1}{2}-\frac{3^{1/2}}{4})=\frac{\sqrt[4]{3}\Gamma(1/3)^3}{4\sqrt[3]{2}\pi}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -2020,7 +2020,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticE}(m)=\frac{1}{3}((1-m)(\mathrm{CarlsonRD}(0, 1-m, 1)+\mathrm{CarlsonRD}(0, 1, 1-m)))$$
 
-**Holds when** $m\ne1\land m\in\C$.
+**Holds when** $m\in\C\land m\ne1$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`41cf8e` · Fungrim entry ↗](https://fungrim.org/entry/41cf8e)
@@ -2044,7 +2044,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(\frac{1}{8}(4-3\sqrt{2}))=\frac{\Gamma(1/4)^2}{4\sqrt[4]{2}\sqrt{\pi}}$$
+$$\mathrm{EllipticK}(\frac{1}{8}(4-3\times2^{1/2}))=\frac{\Gamma(1/4)^2}{4\sqrt[4]{2}\sqrt{\pi}}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -2094,9 +2094,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticPi}(n, \pi k+\phi, m)=2k\mathrm{EllipticPi}(n, m)+\mathrm{IncompleteEllipticPi}(n, \phi, m)$$
+$$\mathrm{IncompleteEllipticPi}(n, \phi+k\pi, m)=\mathrm{IncompleteEllipticPi}(n, \phi, m)+2k\mathrm{EllipticPi}(n, m)$$
 
-**Holds when** $n\ne1\land m\ne1\land n\in\C\land\phi\in\C\land m\in\C\land k\in\Z$.
+**Holds when** $n\in\C\land\phi\in\C\land m\in\C\land k\in\Z\land n\ne1\land m\ne1$.
 **Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind; **IncompleteEllipticPi** — Legendre incomplete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`5f84d9` · Fungrim entry ↗](https://fungrim.org/entry/5f84d9)
@@ -2128,9 +2128,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticF}(\pi k+\phi, m)=2k\mathrm{EllipticK}(m)+\mathrm{IncompleteEllipticF}(\phi, m)$$
+$$\mathrm{IncompleteEllipticF}(\phi+k\pi, m)=\mathrm{IncompleteEllipticF}(\phi, m)+2k\mathrm{EllipticK}(m)$$
 
-**Holds when** $m\ne1\land\phi\in\C\land m\in\C\land k\in\Z$.
+**Holds when** $\phi\in\C\land m\in\C\land k\in\Z\land m\ne1$.
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`685126` · Fungrim entry ↗](https://fungrim.org/entry/685126)
@@ -2146,7 +2146,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{3}{2}, 1, m))$$
+$$2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{3}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -2181,9 +2181,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{IncompleteEllipticPi}(n, \phi, m)=\frac{1}{3}(n\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)\sin(\phi)^3)+\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
+$$\mathrm{IncompleteEllipticPi}(n, \phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)+\frac{n}{3}\sin(\phi)^3\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)$$
 
-**Holds when** $\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land n\in\C\land\phi\in\C\land m\in\C$.
+**Holds when** $n\in\C\land\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind; **IncompleteEllipticPi** — Legendre incomplete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`8f4e31` · Fungrim entry ↗](https://fungrim.org/entry/8f4e31)
@@ -2216,7 +2216,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticPi}(\frac{1}{2}, \frac{1}{2})=\frac{2\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}$$
+$$\mathrm{EllipticPi}(\frac{1}{2}, \frac{1}{2})=\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}+\frac{2\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
 **Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -2224,16 +2224,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticPi}(n, m)=\frac{1}{3}(n\mathrm{CarlsonRJ}(0, 1-m, 1, 1-n))+\mathrm{CarlsonRF}(0, 1-m, 1)$$
+$$\mathrm{EllipticPi}(n, m)=\mathrm{CarlsonRF}(0, 1-m, 1)+\frac{1}{3}(n\mathrm{CarlsonRJ}(0, 1-m, 1, 1-n))$$
 
-**Holds when** $m\ne1\land n\in\C\land m\in\C$.
+**Holds when** $n\in\C\land m\in\C\land m\ne1$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind; **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`9ccaef` · Fungrim entry ↗](https://fungrim.org/entry/9ccaef)
 
 ---
 
-$$\mathrm{EllipticE}(-1)=\sqrt{2}(\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}+\frac{\Gamma(1/4)^2}{8\sqrt{\pi}})$$
+$$\mathrm{EllipticE}(-1)=\sqrt{2}(\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2})$$
 
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -2283,7 +2283,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticF}(\frac{\pi}{2}, -1)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{IncompleteEllipticF}(\frac{\pi}{2}, -1)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}$$
 
 **Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -2291,7 +2291,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(-1)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{EllipticK}(-1)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -2325,7 +2325,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticF}(\phi, 1)=\begin{cases}\ln(\frac{\sin(\phi)+1}{\cos(\phi)})&(-\pi)/2\le\Re(\phi)\le\pi/2\land\phi\notin\lbrace(-\pi)/2, \pi/2\rbrace\\\infty\mathrm{sgn}(\phi)&\phi\in\lbrace(-\pi)/2, \pi/2\rbrace\\\tilde\infty&\top\end{cases}$$
+$$\mathrm{IncompleteEllipticF}(\phi, 1)=\begin{cases}\ln(\frac{1+\sin(\phi)}{\cos(\phi)})&(-\pi)/2\le\Re(\phi)\le\pi/2\land\phi\notin\lbrace(-\pi)/2, \pi/2\rbrace\\\mathrm{sgn}(\phi)\infty&\phi\in\lbrace(-\pi)/2, \pi/2\rbrace\\\tilde\infty&\top\end{cases}$$
 
 **Holds when** $\phi\in\C$.
 **Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
@@ -2334,7 +2334,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(4\sqrt{3}-7)=\frac{\sqrt{3+2\sqrt{3}}\Gamma(1/3)^3}{\pi\times2^{\frac{10}{3}}}$$
+$$\mathrm{EllipticK}(4\sqrt{3}-7)=\frac{\sqrt{3+2\sqrt{3}}\Gamma(1/3)^3}{2^{\frac{10}{3}}\pi}$$
 
 **Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -2374,7 +2374,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\pi k+\phi, m)=2k\mathrm{EllipticE}(m)+\mathrm{IncompleteEllipticE}(\phi, m)$$
+$$\mathrm{IncompleteEllipticE}(\phi+k\pi, m)=\mathrm{IncompleteEllipticE}(\phi, m)+2k\mathrm{EllipticE}(m)$$
 
 **Holds when** $\phi\in\C\land m\in\C\land k\in\Z$.
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
@@ -2444,7 +2444,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{IncompleteEllipticF}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
 
-**Holds when** $\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land\phi\in\C\land m\in\C$.
+**Holds when** $\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`e2445d` · Fungrim entry ↗](https://fungrim.org/entry/e2445d)
@@ -2460,7 +2460,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\frac{\pi}{6}, 4)=2\mathrm{EllipticE}(\frac{1}{4})-\frac{1}{2}(3\mathrm{EllipticK}(\frac{1}{4}))$$
+$$\mathrm{IncompleteEllipticE}(\frac{\pi}{6}, 4)=2\mathrm{EllipticE}(\frac{1}{4})-\frac{1}{2}(3\mathrm{EllipticK}(1/4))$$
 
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -2477,7 +2477,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\arcsin(\frac{1}{m^{1/2}}), m)=(\mathrm{EllipticE}(\frac{1}{m})-(1-\frac{1}{m})\mathrm{EllipticK}(\frac{1}{m}))\sqrt{m}$$
+$$\mathrm{IncompleteEllipticE}(\arcsin(\frac{1}{m^{1/2}}), m)=\sqrt{m}(\mathrm{EllipticE}(\frac{1}{m})-(1-\frac{1}{m})\mathrm{EllipticK}(\frac{1}{m}))$$
 
 **Holds when** $m\in\C\setminus\lbrace0, 1\rbrace$.
 **Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
@@ -2486,7 +2486,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\phi, 1)=2\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor+\sin(\phi)\times(-1)^{\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor}$$
+$$\mathrm{IncompleteEllipticE}(\phi, 1)=(-1)^{\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor}\sin(\phi)+2\lfloor\frac{\Re(\phi)}{\pi}+\frac{1}{2}\rfloor$$
 
 **Holds when** $\phi\in\C$.
 **Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
@@ -2495,9 +2495,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{1}{3}(m\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)\sin(\phi)^3)$$
+$$\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{m}{3}\sin(\phi)^3\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
 
-**Holds when** $\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}\land\phi\in\C\land m\in\C$.
+**Holds when** $\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`f48f54` · Fungrim entry ↗](https://fungrim.org/entry/f48f54)
@@ -2516,7 +2516,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{z\mathrm{JacobiTheta}(1, 0, \tau, 3)}{3\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`0207dc` · Fungrim entry ↗](https://fungrim.org/entry/0207dc)
@@ -2525,7 +2525,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\mathrm{WeierstrassSigma}(z, \tau)^{\prime}(z)=\mathrm{WeierstrassZeta}(z, \tau)\mathrm{WeierstrassSigma}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`0e649f` · Fungrim entry ↗](https://fungrim.org/entry/0e649f)
@@ -2534,7 +2534,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassP}(-z, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`12a9e8` · Fungrim entry ↗](https://fungrim.org/entry/12a9e8)
@@ -2543,16 +2543,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassSigma}(-z, \tau)=-\mathrm{WeierstrassSigma}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function.
 Used by the Compute Engine for expansion.
 [`23beb5` · Fungrim entry ↗](https://fungrim.org/entry/23beb5)
 
 ---
 
-$$\mathrm{WeierstrassSigma}(z+1, \tau)=-(\mathrm{WeierstrassSigma}(z, \tau)\exp(2(z+\frac{1}{2})\mathrm{WeierstrassZeta}(1/2, \tau)))$$
+$$\mathrm{WeierstrassSigma}(z+1, \tau)=-(\exp(2(z+\frac{1}{2})\mathrm{WeierstrassZeta}(1/2, \tau))\mathrm{WeierstrassSigma}(z, \tau))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`35403b` · Fungrim entry ↗](https://fungrim.org/entry/35403b)
@@ -2561,34 +2561,34 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassZeta}(-z, \tau)=-\mathrm{WeierstrassZeta}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for expansion.
 [`72eb69` · Fungrim entry ↗](https://fungrim.org/entry/72eb69)
 
 ---
 
-$$\mathrm{WeierstrassZeta}(\tau+z, \tau)=\mathrm{WeierstrassZeta}(\frac{\tau}{2}, \tau)+\mathrm{WeierstrassZeta}(z, \tau)$$
+$$\mathrm{WeierstrassZeta}(z+\tau, \tau)=\mathrm{WeierstrassZeta}(z, \tau)+\mathrm{WeierstrassZeta}(\frac{\tau}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`a0c85d` · Fungrim entry ↗](https://fungrim.org/entry/a0c85d)
 
 ---
 
-$$\mathrm{WeierstrassP}(n\tau+m+z, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
+$$\mathrm{WeierstrassP}(z+m+n\tau, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C\land m\in\Z\land n\in\Z$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)\land m\in\Z\land n\in\Z$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`a95b7e` · Fungrim entry ↗](https://fungrim.org/entry/a95b7e)
 
 ---
 
-$$\mathrm{WeierstrassP}(z, \tau)=\frac{\pi\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^2-\frac{1}{3}((\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(3, 0, \tau)^4)\pi^2)$$
+$$\mathrm{WeierstrassP}(z, \tau)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^2-\frac{1}{3}(\pi^2(\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(3, 0, \tau)^4))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`af0dfc` · Fungrim entry ↗](https://fungrim.org/entry/af0dfc)
@@ -2597,16 +2597,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{WeierstrassSigma}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\exp(-((\mathrm{JacobiTheta}(1, 0, \tau, 3)z^2)/(6\mathrm{JacobiTheta}(1, 0, \tau, 1))))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassSigma** — Weierstrass sigma function.
 Used by the Compute Engine for simplification.
 [`b96c9d` · Fungrim entry ↗](https://fungrim.org/entry/b96c9d)
 
 ---
 
-$$\mathrm{WeierstrassSigma}(\tau+z, \tau)=-(\mathrm{WeierstrassSigma}(z, \tau)\exp(2(\frac{\tau}{2}+z)\mathrm{WeierstrassZeta}(\tau/2, \tau)))$$
+$$\mathrm{WeierstrassSigma}(z+\tau, \tau)=-(\exp(2(z+\frac{\tau}{2})\mathrm{WeierstrassZeta}(\tau/2, \tau))\mathrm{WeierstrassSigma}(z, \tau))$$
 
-**Holds when** $0\lt\Im(\tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`de9f42` · Fungrim entry ↗](https://fungrim.org/entry/de9f42)
@@ -2615,16 +2615,16 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\mathrm{WeierstrassZeta}(z, \tau)^{\prime}(z)=-\mathrm{WeierstrassP}(z, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`e677fb` · Fungrim entry ↗](https://fungrim.org/entry/e677fb)
 
 ---
 
-$$\mathrm{WeierstrassZeta}(z+1, \tau)=\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)+\mathrm{WeierstrassZeta}(z, \tau)$$
+$$\mathrm{WeierstrassZeta}(z+1, \tau)=\mathrm{WeierstrassZeta}(z, \tau)+\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)$$
 
-**Holds when** $0\lt\Im(\tau)\land z\notin\mathrm{Lattice}(1, \tau)\land z\in\C$.
+**Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`ffcc0f` · Fungrim entry ↗](https://fungrim.org/entry/ffcc0f)

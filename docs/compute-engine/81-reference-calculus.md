@@ -716,9 +716,11 @@ and its derivative with `D`, for example `["D", ["y", "x"], "x"]`.
 function.
 
 :::info[Note]
-Differential equation support is an initial, deliberately narrow slice:
-`DSolve` handles first-order linear scalar equations, and `NDSolve` handles
-explicit scalar first-order initial value problems. Equations outside these
+Differential equation support is a focused slice. `DSolve` handles first-order
+linear scalar equations, linear constant-coefficient homogeneous equations of
+any order, second-order constant-coefficient nonhomogeneous equations, and
+second-order Cauchy–Euler equations. `NDSolve` handles explicit scalar
+first-order and higher-order initial value problems. Equations outside these
 classes are left unevaluated (returned as-is).
 :::
 
@@ -738,53 +740,83 @@ to the independent variable _x_.
 
 ```json example
 ["DSolve", ["Equal", ["D", ["y", "x"], "x"], ["y", "x"]], "y", "x"]
-// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", "C", ["Power", "ExponentialE", "x"]]]]
+// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", "c_1", ["Power", "ExponentialE", "x"]]]]
 ```
 
 `DSolve` returns a `List` of solutions, each an `Equal` expression giving
-_y(x)_. An integration constant `C` is introduced (a different name is chosen if
-`C` is already in use).
+_y(x)_. Integration constants are introduced as needed, named `c_1`, `c_2`, …
+(different names are chosen if those are already in use).
 
-Currently `DSolve` solves **first-order linear scalar** equations of the form:
+`DSolve` solves the following classes of equations.
 
-<center>
-$$ y'(x) + p(x)\,y(x) = q(x) $$
-</center>
+**First-order linear scalar** equations of the form
+$y'(x) + p(x)\,y(x) = q(x)$:
 
 | Equation | Solution |
 | :--- | :--- |
-| $y' = y$ | $y = C\,e^{x}$ |
-| $y' = x^2$ | $y = \frac{1}{3}x^3 + C$ |
-| $y' + y = x$ | $y = x - 1 + C\,e^{-x}$ |
-| $y' + 2xy = 0$ | $y = C\,e^{-x^2}$ |
+| $y' = y$ | $y = c_1\,e^{x}$ |
+| $y' = x^2$ | $y = \frac{1}{3}x^3 + c_1$ |
+| $y' + y = x$ | $y = x - 1 + c_1\,e^{-x}$ |
+| $y' + 2xy = 0$ | $y = c_1\,e^{-x^2}$ |
 
-Nonlinear or higher-order equations are not yet supported and are left
-unevaluated (the `DSolve` expression is returned as-is).
+**Linear constant-coefficient homogeneous** equations of any order, solved via
+the characteristic polynomial (distinct real, repeated, and complex roots). Roots
+are kept exact when the characteristic polynomial factors and fall back to
+numeric roots otherwise:
+
+| Equation | Solution |
+| :--- | :--- |
+| $y'' = y$ | $y = c_1\,e^{x} + c_2\,e^{-x}$ |
+| $y'' + y = 0$ | $y = c_1\cos x + c_2\sin x$ |
+| $y'' - 2y' + y = 0$ | $y = (c_1 + c_2\,x)\,e^{x}$ |
+| $y''' - 6y'' + 11y' - 6y = 0$ | $y = c_1\,e^{x} + c_2\,e^{2x} + c_3\,e^{3x}$ |
+
+**Second-order constant-coefficient nonhomogeneous** equations, using
+undetermined coefficients for polynomial forcing and variation of parameters
+otherwise (when the resulting integrals are elementary):
+
+| Equation | Solution |
+| :--- | :--- |
+| $y'' - y = x$ | $y = -x + c_1\,e^{x} + c_2\,e^{-x}$ |
+
+**Second-order Cauchy–Euler** (equidimensional) homogeneous equations
+$a\,x^2 y'' + b\,x\,y' + c\,y = 0$:
+
+| Equation | Solution |
+| :--- | :--- |
+| $x^2 y'' - 2y = 0$ | $y = c_1\,x^2 + c_2\,x^{-1}$ |
+
+Equations outside these classes are not yet supported and are left unevaluated
+(the `DSolve` expression is returned as-is).
 
 </FunctionDefinition>
 
 
 <FunctionDefinition name="NDSolve">
 
-<Signature name="NDSolve" returns="list">_eq_: expression, _y_: symbol, _limits_: tuple, _y0_: number, _steps_: number?</Signature>
+<Signature name="NDSolve" returns="list">_eq_: expression, _y_: symbol, _limits_: tuple, _y0_: number | list, _steps_: number?</Signature>
 
 Compute a numerical approximation of the solution of the **initial value
 problem** _eq_ for the function _y_ over the interval given by _limits_, with
 initial value _y0_.
 
-`NDSolve` handles **explicit scalar first-order** initial value problems:
+`NDSolve` handles **explicit scalar** initial value problems, both first-order
+and higher-order:
 
 <center>
 $$ y'(x) = f(x, y), \quad y(x_0) = y_0 $$
+$$ y^{(n)}(x) = f(x, y, y', \ldots, y^{(n-1)}), \quad y(x_0) = y_0,\; y'(x_0) = y_1,\; \ldots $$
 </center>
 
-The equation must isolate the derivative on one side, for example
-`["Equal", ["D", ["y", "x"], "x"], f]`.
+The equation must isolate the highest derivative on one side, for example
+`["Equal", ["D", ["y", "x"], "x"], f]`. Higher-order problems are reduced to a
+first-order system internally.
 
 The _limits_ argument is a `Limits` or `Tuple` of `(x, x0, x1)` giving the
 independent variable and the bounds of the integration interval. _y0_ is the
-value of _y_ at _x0_. The optional _steps_ argument is the number of integration
-steps (default 100).
+value of _y_ at _x0_ for a first-order problem, or a `List` of the initial
+values `[y(x0), y'(x0), …]` for an order-_n_ problem. The optional _steps_
+argument is the number of integration steps (default 100).
 
 ```json example
 ["NDSolve",
@@ -797,12 +829,27 @@ steps (default 100).
 // ➔ ["List", ["List", 0, 1], …, ["List", 1, 2.7182818…]]
 ```
 
-`NDSolve` returns a `List` of `[x, y]` sample pairs (of length _steps_ + 1),
-computed with a fixed-step fourth-order **Runge–Kutta** (RK4) method. This works
-even when the solution has no elementary closed form.
+For a higher-order problem, pass the initial values as a `List`. For example,
+the second-order IVP $y''(x) = -y(x)$, $y(0) = 0$, $y'(0) = 1$ (whose solution is
+$\sin x$):
 
-Implicit, higher-order, or stiff equations are not yet supported and are left
-unevaluated.
+```json example
+["NDSolve",
+  ["Equal", ["D", ["D", ["y", "x"], "x"], "x"], ["Negate", ["y", "x"]]],
+  "y",
+  ["Tuple", "x", 0, 1],
+  ["List", 0, 1],
+  200
+]
+// ➔ ["List", ["List", 0, 0], …, ["List", 1, 0.8414709…]]
+```
+
+`NDSolve` returns a `List` of `[x, y]` sample pairs (of length _steps_ + 1),
+computed with a fixed-step fourth-order **Runge–Kutta** (RK4) method. For a
+higher-order problem, each pair reports the value of _y_ itself (not its
+derivatives). This works even when the solution has no elementary closed form.
+
+Implicit or stiff equations are not yet supported and are left unevaluated.
 
 </FunctionDefinition>
 

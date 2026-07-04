@@ -26,7 +26,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sgn}(x)=\begin{cases}1&0\lt x\\-1&x\lt0\\0&x=0\end{cases}$$
+$$\mathrm{sgn}(x)=\begin{cases}1&x\gt0\\-1&x\lt0\\0&x=0\end{cases}$$
 
 **Holds when** $x\in\R$.
 Used by the Compute Engine for simplification.
@@ -50,7 +50,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert x+\imaginaryI y\vert=\sqrt{x^2+y^2}$$
+$$\vert x+y\imaginaryI\vert=\sqrt{x^2+y^2}$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -106,7 +106,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Re(x+\imaginaryI y)=x$$
+$$\Re(x+y\imaginaryI)=x$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -129,7 +129,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(x+\imaginaryI y)^\star=x-\imaginaryI y$$
+$$(x+y\imaginaryI)^\star=x-y\imaginaryI$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -137,7 +137,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arg(x+\imaginaryI y)=\mathrm{Arctan_2}(y, x)$$
+$$\arg(x+y\imaginaryI)=\mathrm{Arctan_2}(y, x)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -145,7 +145,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(x+\imaginaryI y)=y$$
+$$\Im(x+y\imaginaryI)=y$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -189,7 +189,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{BernsteinEllipse}(\rho)=\lbrace\frac{1}{2}(\rho\exp(\imaginaryI\theta)+\frac{\exp(-(\imaginaryI\theta))}{\rho}), \theta\in\lbrack0, 2\pi\rparen\rbrace$$
 
-**Holds when** $1\lt\rho\land\rho\in\R$.
+**Holds when** $\rho\in\R\land\rho\gt1$.
 Used by the Compute Engine for simplification.
 [`40baa9` · Fungrim entry ↗](https://fungrim.org/entry/40baa9)
 
@@ -197,15 +197,15 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{OpenDisk}(z, r)=\lbrace t, t\in\C\in\vert z-t\vert\lt r\rbrace$$
 
-**Holds when** $0\lt r\land z\in\C\land r\in\R$.
+**Holds when** $z\in\C\land r\in\R\land r\gt0$.
 Used by the Compute Engine for simplification.
 [`c98bad` · Fungrim entry ↗](https://fungrim.org/entry/c98bad)
 
 ---
 
-$$\mathrm{ClosedDisk}(z, r)=\lbrace t, t\in\C\in\vert z-t\vert\le r\rbrace$$
+$$\mathrm{ClosedDisk}(z, r)=\lbrace t, t\in\C\in(\vert z-t\vert\le r)\rbrace$$
 
-**Holds when** $0\le r\land z\in\C\land r\in\R$.
+**Holds when** $z\in\C\land r\in\R\land r\ge0$.
 Used by the Compute Engine for simplification.
 [`d1cf0c` · Fungrim entry ↗](https://fungrim.org/entry/d1cf0c)
 
@@ -220,7 +220,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI^{z}=\imaginaryI\sin(\frac{\pi z}{2})+\cos(\frac{\pi z}{2})$$
+$$\imaginaryI^{z}=\cos(\frac{\pi z}{2})+\sin(\frac{\pi z}{2})\imaginaryI$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -228,7 +228,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyLog}(2, \imaginaryI)=\imaginaryI G-\frac{\pi^2}{48}$$
+$$\mathrm{PolyLog}(2, \imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}$$
 
 Used by the Compute Engine for simplification.
 [`208da7` · Fungrim entry ↗](https://fungrim.org/entry/208da7)
@@ -249,7 +249,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(\mathrm{Digamma}(\imaginaryI))=\frac{1}{2}(1+\pi\coth(\pi))$$
+$$\Im(\mathrm{Digamma}(\imaginaryI))=\frac{1}{2}(\pi\coth(\pi)+1)$$
 
 Used by the Compute Engine for simplification.
 [`3ac0ce` · Fungrim entry ↗](https://fungrim.org/entry/3ac0ce)
@@ -320,7 +320,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI^{z}=\exp(\frac{\imaginaryI\pi z}{2})$$
+$$\imaginaryI^{z}=\exp(\frac{\pi\imaginaryI z}{2})$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.

@@ -26,7 +26,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Exponential function
 
-$$\exponentialE^{z}=\sinh(z)+\cosh(z)$$
+$$\exponentialE^{z}=\cosh(z)+\sinh(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -42,7 +42,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\exp(2\imaginaryI\pi n+z)=\exponentialE^{z}$$
+$$\exp(z+2n\pi\imaginaryI)=\exponentialE^{z}$$
 
 **Holds when** $z\in\C\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -74,14 +74,14 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\exp(\imaginaryI\pi)=-1$$
+$$\exp(\pi\imaginaryI)=-1$$
 
 Used by the Compute Engine for simplification.
 [`54aaf1` · Fungrim entry ↗](https://fungrim.org/entry/54aaf1)
 
 ---
 
-$$\exp(a+\imaginaryI b)=(\imaginaryI\sin(b)+\cos(b))\exponentialE^{a}$$
+$$\exp(a+b\imaginaryI)=\exponentialE^{a}(\cos(b)+\sin(b)\imaginaryI)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -105,7 +105,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\exp(\imaginaryI\pi n+z)=(-1)^{n}\exponentialE^{z}$$
+$$\exp(z+n\pi\imaginaryI)=(-1)^{n}\exponentialE^{z}$$
 
 **Holds when** $z\in\C\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -121,14 +121,14 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\exp(\frac{\imaginaryI\pi}{2})=\imaginaryI$$
+$$\exp(\frac{\pi\imaginaryI}{2})=\imaginaryI$$
 
 Used by the Compute Engine for simplification.
 [`a90f35` · Fungrim entry ↗](https://fungrim.org/entry/a90f35)
 
 ---
 
-$$\Re(\exponentialE^{z})=\cos(\Im(z))\exp(\Re(z))$$
+$$\Re(\exponentialE^{z})=\exp(\Re(z))\cos(\Im(z))$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -136,7 +136,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sgn}(\exponentialE^{z})=\exp(\imaginaryI\Im(z))$$
+$$\mathrm{sgn}(\exponentialE^{z})=\exp(\Im(z)\imaginaryI)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -144,7 +144,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(\exponentialE^{z})=\sin(\Im(z))\exp(\Re(z))$$
+$$\Im(\exponentialE^{z})=\exp(\Re(z))\sin(\Im(z))$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -169,7 +169,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\varphi^{n}=\varphi\mathrm{Fibonacci}(n)+\mathrm{Fibonacci}(n-1)$$
+$$\varphi^{n}=\mathrm{Fibonacci}(n)\varphi+\mathrm{Fibonacci}(n-1)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -177,7 +177,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$-1-\varphi+\varphi^2=0$$
+$$\varphi^2-\varphi-1=0$$
 
 Used by the Compute Engine for simplification.
 [`b464d3` · Fungrim entry ↗](https://fungrim.org/entry/b464d3)
@@ -193,7 +193,7 @@ Used by the Compute Engine for simplification.
 
 ## Inverse tangent
 
-$$\arctan(x)-\arctan(y)=\mathrm{Arctan_2}(x-y, xy+1)$$
+$$\arctan(x)-\arctan(y)=\mathrm{Arctan_2}(x-y, 1+xy)$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for expansion.
@@ -209,7 +209,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\cos(\arctan(z))=\frac{1}{\sqrt{z^2+1}}$$
+$$\cos(\arctan(z))=\frac{1}{\sqrt{1+z^2}}$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 Used by the Compute Engine for simplification.
@@ -225,9 +225,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\arctan(z)=-(\frac{1}{2}(\imaginaryI\ln((\imaginaryI z+1)/(1-\imaginaryI z))))$$
+$$\arctan(z)=-\frac{\imaginaryI}{2}\ln(\frac{1+\imaginaryI z}{1-\imaginaryI z})$$
 
-**Holds when** $\imaginaryI z\notin\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land z\imaginaryI\notin\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`12765e` · Fungrim entry ↗](https://fungrim.org/entry/12765e)
 
@@ -248,7 +248,7 @@ Used by the Compute Engine for simplification and equation solving.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=\begin{cases}0&x=y=0\\\arctan(\frac{y}{x})&0\lt x\\\frac{\pi\mathrm{sgn}(y)}{2}-\arctan(x/y)&y\ne0\\\pi&x\lt0\land y=0\end{cases}$$
+$$\mathrm{Arctan_2}(y, x)=\begin{cases}0&x=y=0\\\arctan(\frac{y}{x})&x\gt0\\\frac{\pi\mathrm{sgn}(y)}{2}-\arctan(x/y)&y\ne0\\\pi&y=0\land x\lt0\end{cases}$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -256,9 +256,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(x+y)=\arctan(x)+\arctan((y)(x(x+y)+1)^{-1})$$
+$$\arctan(x+y)=\arctan(x)+\arctan((y)(1+x(x+y))^{-1})$$
 
-**Holds when** $\vert x\vert\lt1\land\vert x+y\vert\lt1\land x\in\C\land y\in\C$ &nbsp;_or_&nbsp; $-1\lt x(x+y)\land x\in\R\land y\in\R$.
+**Holds when** $x\in\C\land y\in\C\land\vert x+y\vert\lt1\land\vert x\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land x(x+y)\gt-1$.
 Used by the Compute Engine for simplification.
 [`268c9e` · Fungrim entry ↗](https://fungrim.org/entry/268c9e)
 
@@ -273,15 +273,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\arctan(z)^{\prime}(z)=\frac{((z+\imaginaryI)^{-n}-(z-\imaginaryI)^{-n})(n-1)!\times(-1)^{n}}{2\imaginaryI}$$
+$$z\mapsto\arctan(z)^{\prime}(z)=\frac{(-1)^{n}(n-1)!(\frac{1}{(z+\imaginaryI)^{n}}-\frac{1}{(z-\imaginaryI)^{n}})}{2\imaginaryI}$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land n\in\N^*\land z\in\C$.
-Used by the Compute Engine for expansion.
+**Holds when** $n\in\N^*\land z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
+Used by the Compute Engine for simplification.
 [`36171f` · Fungrim entry ↗](https://fungrim.org/entry/36171f)
 
 ---
 
-$$\arctan(\frac{\sqrt{3}}{3})=\frac{\pi}{6}$$
+$$\arctan(\frac{1}{\sqrt{3}})=\frac{\pi}{6}$$
 
 Used by the Compute Engine for simplification.
 [`3c1021` · Fungrim entry ↗](https://fungrim.org/entry/3c1021)
@@ -290,13 +290,13 @@ Used by the Compute Engine for simplification.
 
 $$\arctan(x)+\arctan(y)=\arctan(\frac{x+y}{1-xy})$$
 
-**Holds when** $\vert x\vert\lt1\land\vert y\vert\lt1\land x\in\C\land y\in\C$ &nbsp;_or_&nbsp; $xy\lt1\land x\in\R\land y\in\R$.
+**Holds when** $x\in\C\land y\in\C\land\vert x\vert\lt1\land\vert y\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land xy\lt1$.
 Used by the Compute Engine for simplification.
 [`3ea11b` · Fungrim entry ↗](https://fungrim.org/entry/3ea11b)
 
 ---
 
-$$\vert\arctan(x+y)-\arctan(x)\vert=\mathrm{Arctan_2}(\vert y\vert, x(x+y)+1)$$
+$$\vert\arctan(x+y)-\arctan(x)\vert=\mathrm{Arctan_2}(\vert y\vert, 1+x(x+y))$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -304,17 +304,17 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=\frac{1}{2}(\imaginaryI\ln(\frac{1-\imaginaryI z}{\imaginaryI z+1}))$$
+$$\arctan(z)=\frac{1}{2}(\imaginaryI\ln(\frac{1-\imaginaryI z}{1+\imaginaryI z}))$$
 
-**Holds when** $-(\imaginaryI z)\notin\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land-z\imaginaryI\notin\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`500c0a` · Fungrim entry ↗](https://fungrim.org/entry/500c0a)
 
 ---
 
-$$\arctan(x)-\arctan(y)=\arctan(\frac{x-y}{xy+1})$$
+$$\arctan(x)-\arctan(y)=\arctan(\frac{x-y}{1+xy})$$
 
-**Holds when** $\vert x\vert\lt1\land\vert y\vert\lt1\land x\in\C\land y\in\C$ &nbsp;_or_&nbsp; $-1\lt xy\land x\in\R\land y\in\R$.
+**Holds when** $x\in\C\land y\in\C\land\vert x\vert\lt1\land\vert y\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land xy\gt-1$.
 Used by the Compute Engine for simplification.
 [`503d4d` · Fungrim entry ↗](https://fungrim.org/entry/503d4d)
 
@@ -322,7 +322,7 @@ Used by the Compute Engine for simplification.
 
 $$\arctan(z^\star)=\arctan(z)^\star$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rparen\cup\lparen1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rparen\cup\lparen1, \infty\rparen$.
 Used by the Compute Engine for expansion.
 [`632063` · Fungrim entry ↗](https://fungrim.org/entry/632063)
 
@@ -335,7 +335,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=2\arctan((z)(\sqrt{z^2+1}+1)^{-1})$$
+$$\arctan(z)=2\arctan((z)(1+\sqrt{1+z^2})^{-1})$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -365,9 +365,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=\arcsin(\frac{z}{\sqrt{z^2+1}})$$
+$$\arctan(z)=\arcsin(\frac{z}{\sqrt{1+z^2}})$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`7954ad` · Fungrim entry ↗](https://fungrim.org/entry/7954ad)
 
@@ -380,9 +380,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\arctan(z)^{\prime}(z)=\frac{1}{z^2+1}$$
+$$z\mapsto\arctan(z)^{\prime}(z)=\frac{1}{1+z^2}$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`8fbf69` · Fungrim entry ↗](https://fungrim.org/entry/8fbf69)
 
@@ -390,7 +390,7 @@ Used by the Compute Engine for simplification.
 
 $$z\mapsto\arctan(z)^{\prime}(z)=\frac{(n-1)!\mathrm{ChebyshevU}(n-1, -(z/(z^2+1)^{1/2}))}{{(z^2+1)}^{\frac{n+1}{2}}}$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land n\in\N^*\land z\in\C$.
+**Holds when** $n\in\N^*\land z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
 Used by the Compute Engine for simplification.
 **Reference:** M. A. Boutiche and M. Rahmani (2017), On the higher derivatives of the inverse tangent function, [https://arxiv.org/abs/1712.03521,](https://arxiv.org/abs/1712.03521,) Theorem 9
@@ -398,22 +398,22 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(-\imaginaryI)=-\infty\imaginaryI$$
+$$\arctan(-\imaginaryI)=-\imaginaryI\infty$$
 
 Used by the Compute Engine for simplification.
 [`9b0994` · Fungrim entry ↗](https://fungrim.org/entry/9b0994)
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=-(\imaginaryI\ln(\mathrm{sgn}(x+\imaginaryI y)))$$
+$$\mathrm{Arctan_2}(y, x)=-\imaginaryI\ln(\mathrm{sgn}(x+y\imaginaryI))$$
 
-**Holds when** $x+\imaginaryI y\ne0\land x\in\R\land y\in\R$.
+**Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`9dec3e` · Fungrim entry ↗](https://fungrim.org/entry/9dec3e)
 
 ---
 
-$$\arctan(z)=\frac{1}{2}(\imaginaryI(\ln(1-\imaginaryI z)-\ln(\imaginaryI z+1)))$$
+$$\arctan(z)=\frac{1}{2}(\imaginaryI(\ln(1-\imaginaryI z)-\ln(1+\imaginaryI z)))$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -421,22 +421,22 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(\imaginaryI)=\infty\imaginaryI$$
+$$\arctan(\imaginaryI)=\imaginaryI\infty$$
 
 Used by the Compute Engine for simplification.
 [`a2d208` · Fungrim entry ↗](https://fungrim.org/entry/a2d208)
 
 ---
 
-$$z\mapsto\arctan(z)^{\doubleprime}(z)=-(\frac{2z}{(z^2+1)^2})$$
+$$z\mapsto\arctan(z)^{\doubleprime}(z)=-(\frac{2z}{(1+z^2)^2})$$
 
-**Holds when** $\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
 [`a4eb86` · Fungrim entry ↗](https://fungrim.org/entry/a4eb86)
 
 ---
 
-$$\mathrm{Arctan_2}(0, x)=\begin{cases}0&0\le x\\\pi&x\lt0\end{cases}$$
+$$\mathrm{Arctan_2}(0, x)=\begin{cases}0&x\ge0\\\pi&x\lt0\end{cases}$$
 
 **Holds when** $x\in\R$.
 Used by the Compute Engine for simplification.
@@ -458,9 +458,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(\arctan(x+\imaginaryI y))=\frac{1}{4}(\ln(\frac{x^2+(y+1)^2}{x^2+(1-y)^2}))$$
+$$\Im(\arctan(x+y\imaginaryI))=\frac{1}{4}(\ln(\frac{x^2+(1+y)^2}{x^2+(1-y)^2}))$$
 
-**Holds when** $x+\imaginaryI y\notin\lbrace-\imaginaryI, \imaginaryI\rbrace\land x\in\R\land y\in\R$.
+**Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\notin\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 Used by the Compute Engine for simplification.
 [`b65d19` · Fungrim entry ↗](https://fungrim.org/entry/b65d19)
 
@@ -468,7 +468,7 @@ Used by the Compute Engine for simplification.
 
 $$\arctan(\frac{1}{z})=\frac{1}{2}(\pi\mathrm{Csgn}(1/z))-\arctan(z)$$
 
-**Holds when** $\imaginaryI z\notin\lbrace0\rbrace\cup\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen\land z\in\C$.
+**Holds when** $z\in\C\land\imaginaryI z\notin\lbrace0\rbrace\cup\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
 **Symbols:** **Csgn** — Real-valued sign function for complex numbers.
 Used by the Compute Engine for simplification.
 [`bfc13f` · Fungrim entry ↗](https://fungrim.org/entry/bfc13f)
@@ -483,7 +483,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(1+\sqrt{2})=\frac{3\pi}{8}$$
+$$\arctan(\sqrt{2}+1)=\frac{3\pi}{8}$$
 
 Used by the Compute Engine for simplification.
 [`c6c92a` · Fungrim entry ↗](https://fungrim.org/entry/c6c92a)
@@ -505,7 +505,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(\arctan(z))=\frac{z}{\sqrt{z^2+1}}$$
+$$\sin(\arctan(z))=\frac{z}{\sqrt{1+z^2}}$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 Used by the Compute Engine for simplification.
@@ -513,7 +513,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=\arccos(\frac{1}{\sqrt{z^2+1}})\mathrm{Csgn}(z)$$
+$$\arctan(z)=\mathrm{Csgn}(z)\arccos(\frac{1}{\sqrt{1+z^2}})$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 **Symbols:** **Csgn** — Real-valued sign function for complex numbers.
@@ -522,9 +522,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Arctan_2}(y, x)=\Im(\ln(x+\imaginaryI y))$$
+$$\mathrm{Arctan_2}(y, x)=\Im(\ln(x+y\imaginaryI))$$
 
-**Holds when** $x+\imaginaryI y\ne0\land x\in\R\land y\in\R$.
+**Holds when** $x\in\R\land y\in\R\land x+y\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`eca4ce` · Fungrim entry ↗](https://fungrim.org/entry/eca4ce)
 
@@ -532,7 +532,7 @@ Used by the Compute Engine for simplification.
 
 $$\arctan(\tan(\theta))=\theta$$
 
-**Holds when** $-(\frac{\pi}{2})\lt\Re(\theta)\lt\frac{\pi}{2}\land\theta\in\C$.
+**Holds when** $\theta\in\C\land-(\frac{\pi}{2})\lt\Re(\theta)\lt\frac{\pi}{2}$.
 Used by the Compute Engine for simplification and equation solving.
 [`f516e3` · Fungrim entry ↗](https://fungrim.org/entry/f516e3)
 
@@ -585,7 +585,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(2\mathrm{LambertWPuiseuxCoefficient}(k-2)+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-3}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k-1)&\top\end{cases})}{4(k+1)}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k+1)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
+$$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(2\mathrm{LambertWPuiseuxCoefficient}(k-2)+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-3}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k-1)&\top\end{cases})}{4(k+1)}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k+1)-j)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
 
 **Holds when** $k\in2..\infty$.
 **Symbols:** **LambertWPuiseuxCoefficient** — Coefficient in scaled Puiseux expansion of Lambert W-function.
@@ -619,7 +619,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\ln(-1)=\imaginaryI\pi$$
+$$\ln(-1)=\pi\imaginaryI$$
 
 Used by the Compute Engine for simplification.
 [`2f1f7b` · Fungrim entry ↗](https://fungrim.org/entry/2f1f7b)
@@ -641,7 +641,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\ln(\exponentialE^{z})=z-2\imaginaryI\pi\lceil\frac{\Im(z)}{2\pi}-\frac{1}{2}\rceil$$
+$$\ln(\exponentialE^{z})=z-2\pi\imaginaryI\lceil\Im(z)/(2\pi)-1/2\rceil$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -649,14 +649,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\ln(\imaginaryI)=\frac{\imaginaryI\pi}{2}$$
+$$\ln(\imaginaryI)=\frac{\pi\imaginaryI}{2}$$
 
 Used by the Compute Engine for simplification.
 [`c331da` · Fungrim entry ↗](https://fungrim.org/entry/c331da)
 
 ---
 
-$$\ln(z)=\imaginaryI\arg(z)+\ln(\vert z\vert)$$
+$$\ln(z)=\ln(\vert z\vert)+\arg(z)\imaginaryI$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -664,7 +664,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\ln(z)\vert=\sqrt{\arg(z)^2+\ln(\vert z\vert)^2}$$
+$$\vert\ln(z)\vert=\sqrt{\ln(\vert z\vert)^2+\arg(z)^2}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -674,7 +674,7 @@ Used by the Compute Engine for simplification.
 
 $$\ln(cz)=\ln(c)+\ln(z)$$
 
-**Holds when** $z\in\C\setminus\lbrace0\rbrace\land c\in\lparen0, \infty\rparen$.
+**Holds when** $c\in\lparen0, \infty\rparen\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
 [`f67fa2` · Fungrim entry ↗](https://fungrim.org/entry/f67fa2)
 
@@ -690,14 +690,14 @@ Used by the Compute Engine for simplification.
 
 ## Pi
 
-$$1+\exp(\imaginaryI\pi)=0$$
+$$\exp(\pi\imaginaryI)+1=0$$
 
 Used by the Compute Engine for simplification.
 [`271314` · Fungrim entry ↗](https://fungrim.org/entry/271314)
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F_1}(\frac{-1}{3}, \frac{1}{3}, 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F_1}(-(1/3), \frac{1}{3}, 1, 1))$$
 
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -705,7 +705,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{-1}{2}, 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F_1}(\frac{1}{2}, -(1/2), 1, 1))$$
 
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -713,7 +713,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F_1}(\frac{-1}{2}, \frac{-1}{2}, 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F_1}(-(1/2), -(1/2), 1, 1))$$
 
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
@@ -723,25 +723,25 @@ Used by the Compute Engine for simplification.
 
 ## Powers
 
-$$(a+\imaginaryI b)^{c+\imaginaryI d}=(\imaginaryI\sin(c\arg(a+\imaginaryI b)+d\ln(\vert a+\imaginaryI b\vert))+\cos(c\arg(a+\imaginaryI b)+d\ln(\vert a+\imaginaryI b\vert)))\exp(-(d\arg(a+\imaginaryI b)))\vert a+\imaginaryI b\vert^{c}$$
+$$(a+b\imaginaryI)^{c+d\imaginaryI}=\vert a+b\imaginaryI\vert^{c}\exp(-(d\arg(a+b\imaginaryI)))(\cos(c\arg(a+b\imaginaryI)+d\ln(\vert a+b\imaginaryI\vert))+\imaginaryI\sin(c\arg(a+b\imaginaryI)+d\ln(\vert a+b\imaginaryI\vert)))$$
 
-**Holds when** $a+\imaginaryI b\ne0\land a\in\R\land b\in\R\land c\in\R\land d\in\R$.
+**Holds when** $a\in\R\land b\in\R\land c\in\R\land d\in\R\land a+b\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`0aac97` · Fungrim entry ↗](https://fungrim.org/entry/0aac97)
 
 ---
 
-$$\Im((a+\imaginaryI b)^{c+\imaginaryI d})=\sin(c\arg(a+\imaginaryI b)+d\ln(\vert a+\imaginaryI b\vert))\exp(-(d\arg(a+\imaginaryI b)))\vert a+\imaginaryI b\vert^{c}$$
+$$\Im((a+b\imaginaryI)^{c+d\imaginaryI})=\vert a+b\imaginaryI\vert^{c}\exp(-(d\arg(a+b\imaginaryI)))\sin(c\arg(a+b\imaginaryI)+d\ln(\vert a+b\imaginaryI\vert))$$
 
-**Holds when** $a+\imaginaryI b\ne0\land a\in\R\land b\in\R\land c\in\R\land d\in\R$.
+**Holds when** $a\in\R\land b\in\R\land c\in\R\land d\in\R\land a+b\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`18873d` · Fungrim entry ↗](https://fungrim.org/entry/18873d)
 
 ---
 
-$$(xy)^{a}=\exp(2\imaginaryI\pi a\lfloor\frac{-\arg(x)-\arg(y)+\pi}{2\pi}\rfloor)x^{a}y^{a}$$
+$$(xy)^{a}=x^{a}y^{a}\exp(2\pi\imaginaryI a\lfloor\frac{\pi-\arg(x)-\arg(y)}{2\pi}\rfloor)$$
 
-**Holds when** $a\in\C\land x\in\C\setminus\lbrace0\rbrace\land y\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $x\in\C\setminus\lbrace0\rbrace\land y\in\C\setminus\lbrace0\rbrace\land a\in\C$.
 Used by the Compute Engine for simplification.
 [`2090c3` · Fungrim entry ↗](https://fungrim.org/entry/2090c3)
 
@@ -757,13 +757,13 @@ Used by the Compute Engine for expansion.
 
 $$a^{b}=\exp(b\ln(a))$$
 
-**Holds when** $b\in\C\land a\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $a\in\C\setminus\lbrace0\rbrace\land b\in\C$.
 Used by the Compute Engine for simplification.
 [`4d6416` · Fungrim entry ↗](https://fungrim.org/entry/4d6416)
 
 ---
 
-$$z^{n+1}=zz^{n}$$
+$$z^{n+1}=z^{n}z$$
 
 **Holds when** $z\in\C\land n\in\N$ &nbsp;_or_&nbsp; $z\in R\land R\in\mathrm{Rings}\land n\in\N$.
 Used by the Compute Engine for simplification.
@@ -771,17 +771,17 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert(a+\imaginaryI b)^{c+\imaginaryI d}\vert=\exp(-(d\arg(a+\imaginaryI b)))\vert a+\imaginaryI b\vert^{c}$$
+$$\vert(a+b\imaginaryI)^{c+d\imaginaryI}\vert=\vert a+b\imaginaryI\vert^{c}\exp(-(d\arg(a+b\imaginaryI)))$$
 
-**Holds when** $a+\imaginaryI b\ne0\land a\in\R\land b\in\R\land c\in\R\land d\in\R$.
+**Holds when** $a\in\R\land b\in\R\land c\in\R\land d\in\R\land a+b\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`bc4d0a` · Fungrim entry ↗](https://fungrim.org/entry/bc4d0a)
 
 ---
 
-$$\Re((a+\imaginaryI b)^{c+\imaginaryI d})=\cos(c\arg(a+\imaginaryI b)+d\ln(\vert a+\imaginaryI b\vert))\exp(-(d\arg(a+\imaginaryI b)))\vert a+\imaginaryI b\vert^{c}$$
+$$\Re((a+b\imaginaryI)^{c+d\imaginaryI})=\vert a+b\imaginaryI\vert^{c}\exp(-(d\arg(a+b\imaginaryI)))\cos(c\arg(a+b\imaginaryI)+d\ln(\vert a+b\imaginaryI\vert))$$
 
-**Holds when** $a+\imaginaryI b\ne0\land a\in\R\land b\in\R\land c\in\R\land d\in\R$.
+**Holds when** $a\in\R\land b\in\R\land c\in\R\land d\in\R\land a+b\imaginaryI\ne0$.
 Used by the Compute Engine for simplification.
 [`caf8cf` · Fungrim entry ↗](https://fungrim.org/entry/caf8cf)
 
@@ -797,15 +797,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sinc}(z)=\frac{\sqrt{2}\operatorname{J}_{\frac{1}{2}}(z)\sqrt{\pi}}{2\sqrt{z}}$$
+$$\mathrm{sinc}(z)=\frac{\operatorname{J}_{\frac{1}{2}}(z)}{\sqrt{\frac{2z}{\pi}}}$$
 
-**Holds when** $z\ne0\land z\in\C$.
+**Holds when** $z\in\C\land z\ne0$.
 Used by the Compute Engine for simplification.
 [`19d7d9` · Fungrim entry ↗](https://fungrim.org/entry/19d7d9)
 
 ---
 
-$$z\mapsto\mathrm{sinc}(z)^{\prime}(0)=\begin{cases}\frac{(-1)^{\lfloor n/2\rfloor}}{n+1}&\lnot\mathrm{IsOdd}(n)\\0&\mathrm{IsOdd}(n)\end{cases}$$
+$$z\mapsto\mathrm{sinc}(z)^{\prime}(0)=\begin{cases}\frac{(-1)^{\lfloor n/2\rfloor}}{n+1}&\mathrm{IsEven}(n)\\0&\mathrm{IsOdd}(n)\end{cases}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -875,7 +875,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{sinc}(z)^{\doubleprime}(z)=\begin{cases}(\frac{2}{z^3}-\frac{1}{z})\sin(z)-\frac{2\cos(z)}{z^2}&z\ne0\\\frac{-1}{3}&z=0\end{cases}$$
+$$z\mapsto\mathrm{sinc}(z)^{\doubleprime}(z)=\begin{cases}(2/z^3-1/z)\sin(z)-\frac{2\cos(z)}{z^2}&z\ne0\\-(\frac{1}{3})&z=0\end{cases}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -900,13 +900,13 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{sinc}(\imaginaryI z)=\frac{\sinh(z)}{z}$$
 
-**Holds when** $z\ne0\land z\in\C$.
+**Holds when** $z\in\C\land z\ne0$.
 Used by the Compute Engine for expansion.
 [`b41d08` · Fungrim entry ↗](https://fungrim.org/entry/b41d08)
 
 ---
 
-$$z\mathrm{sinc}(z)+zz\mapsto\mathrm{sinc}(z)^{\doubleprime}(z)+2z\mapsto\mathrm{sinc}(z)^{\prime}(z)=0$$
+$$zz\mapsto\mathrm{sinc}(z)^{\doubleprime}(z)+2z\mapsto\mathrm{sinc}(z)^{\prime}(z)+z\mathrm{sinc}(z)=0$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -921,7 +921,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sinc}(2z)=\cos(z)\mathrm{sinc}(z)$$
+$$\mathrm{sinc}(2z)=\mathrm{sinc}(z)\cos(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -955,7 +955,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{sinc}(z)=\frac{\sin(z)}{z}$$
 
-**Holds when** $z\ne0\land z\in\C$.
+**Holds when** $z\in\C\land z\ne0$.
 Used by the Compute Engine for simplification.
 [`fa9283` · Fungrim entry ↗](https://fungrim.org/entry/fa9283)
 
@@ -994,7 +994,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)=\operatorname{J}_{\frac{1}{2}}(z)\sqrt{\frac{\pi z}{2}}$$
+$$\sin(z)=\sqrt{\frac{\pi z}{2}}\operatorname{J}_{\frac{1}{2}}(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1002,7 +1002,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)=\frac{\exp(\imaginaryI z)-\exp(-(\imaginaryI z))}{2\imaginaryI}$$
+$$\sin(z)=\frac{\exp(\imaginaryI z)-\exp(-\imaginaryI z)}{2\imaginaryI}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1018,7 +1018,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z+\pi)=-\sin(z)$$
+$$\sin(\pi+z)=-\sin(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -1026,7 +1026,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sin(z)+z\mapsto\sin(z)^{\doubleprime}(z)=0$$
+$$z\mapsto\sin(z)^{\doubleprime}(z)+\sin(z)=0$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1081,7 +1081,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(\pi k+z)=\sin(z)\times(-1)^{k}$$
+$$\sin(z+\pi k)=(-1)^{k}\sin(z)$$
 
 **Holds when** $z\in\C\land k\in\Z$.
 Used by the Compute Engine for simplification.
@@ -1089,7 +1089,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(a+\imaginaryI b)=\imaginaryI\cos(a)\sinh(b)+\sin(a)\cosh(b)$$
+$$\sin(a+b\imaginaryI)=\sin(a)\cosh(b)+\imaginaryI\cos(a)\sinh(b)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -1112,7 +1112,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(\pi k+\frac{\pi}{2})=(-1)^{k}$$
+$$\sin(\frac{\pi}{2}+\pi k)=(-1)^{k}$$
 
 **Holds when** $k\in\Z$.
 Used by the Compute Engine for simplification.
@@ -1120,7 +1120,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(a-b)=\sin(a)\cos(b)-\sin(b)\cos(a)$$
+$$\sin(a-b)=\sin(a)\cos(b)-\cos(a)\sin(b)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -1137,7 +1137,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)^{2n}=\frac{2(\sum_{k=0}^{n-1}\cos(2z(n-k))\mathrm{Binomial}(2n, k)\times(-1)^{k+n})}{4^{n}}+\frac{\mathrm{Binomial}(2n, n)}{4^{n}}$$
+$$\sin(z)^{2n}=\frac{\binom{2n}{n}}{4^{n}}+\frac{2(\sum_{k=0}^{n-1}\cos(2z(n-k))\binom{2n}{k}\times(-1)^{k+n})}{4^{n}}$$
 
 **Holds when** $z\in\C\land n\in\N$.
 Used by the Compute Engine for simplification.
@@ -1159,7 +1159,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\sin(z)^{\prime}(z)=\sin(\frac{\pi r}{2}+z)$$
+$$z\mapsto\sin(z)^{\prime}(z)=\sin(z+\frac{\pi r}{2})$$
 
 **Holds when** $z\in\C\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -1174,7 +1174,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(2\pi k+z)=\sin(z)$$
+$$\sin(z+2\pi k)=\sin(z)$$
 
 **Holds when** $z\in\C\land k\in\Z$.
 Used by the Compute Engine for simplification.
@@ -1206,7 +1206,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(a+b)=\sin(b)\cos(a)+\sin(a)\cos(b)$$
+$$\sin(a+b)=\sin(a)\cos(b)+\cos(a)\sin(b)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -1301,7 +1301,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI\sin(z)+\cos(z)=\exp(\imaginaryI z)$$
+$$\cos(z)+\imaginaryI\sin(z)=\exp(\imaginaryI z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1309,7 +1309,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z+\frac{\pi}{2})=\cos(z)$$
+$$\sin(\frac{\pi}{2}+z)=\cos(z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1355,7 +1355,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)=-(\imaginaryI\sinh(\imaginaryI z))$$
+$$\sin(z)=-\imaginaryI\sinh(\imaginaryI z)$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1363,7 +1363,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\imaginaryI\sin(z)+\cos(z))^{n}=\imaginaryI\sin(nz)+\cos(nz)$$
+$$(\cos(z)+\imaginaryI\sin(z))^{n}=\cos(nz)+\imaginaryI\sin(nz)$$
 
 **Holds when** $z\in\C\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -1410,7 +1410,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(a)-\sin(b)=2\sin(\frac{a-b}{2})\cos(\frac{a+b}{2})$$
+$$\sin(a)-\sin(b)=2\cos(\frac{a+b}{2})\sin(\frac{a-b}{2})$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -1426,7 +1426,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sin(a)^2-\cos(b)^2=-(\cos(a+b)\cos(a-b))$$
+$$\sin(a)^2-\cos(b)^2=-\cos(a+b)\cos(a-b)$$
 
 **Holds when** $a\in\C\land b\in\C$.
 Used by the Compute Engine for simplification.
@@ -1452,7 +1452,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sqrt{\imaginaryI}=\frac{1}{2}(\sqrt{2}(1+\imaginaryI))$$
+$$\sqrt{\imaginaryI}=\frac{1+\imaginaryI}{\sqrt{2}}$$
 
 Used by the Compute Engine for simplification.
 [`0ad836` · Fungrim entry ↗](https://fungrim.org/entry/0ad836)
@@ -1467,7 +1467,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sqrt{r\exp(\imaginaryI\theta)}=\exp(\frac{\imaginaryI\theta}{2})\sqrt{r}$$
+$$\sqrt{r\exp(\imaginaryI\theta)}=\sqrt{r}\exp(\frac{\imaginaryI\theta}{2})$$
 
 **Holds when** $r\in\lbrack0, \infty\rparen\land\theta\in\lparen-\pi, \pi\rbrack$.
 Used by the Compute Engine for simplification.
@@ -1477,7 +1477,7 @@ Used by the Compute Engine for simplification.
 
 $$\sqrt{\frac{z}{c-z}}=\sqrt{z}\sqrt{\frac{1}{c-z}}$$
 
-**Holds when** $c-z\ne0\land z\in\R\land c\in\lbrack0, \infty\rparen$.
+**Holds when** $z\in\R\land c\in\lbrack0, \infty\rparen\land c-z\ne0$.
 Used by the Compute Engine for simplification.
 [`185efc` · Fungrim entry ↗](https://fungrim.org/entry/185efc)
 
@@ -1529,7 +1529,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Re(\sqrt{z})=\sqrt{\frac{\Re(z)+\vert z\vert}{2}}$$
+$$\Re(\sqrt{z})=\sqrt{\frac{\vert z\vert+\Re(z)}{2}}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1537,7 +1537,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sqrt{\frac{z}{2}}=\frac{\sqrt{2}\sqrt{z}}{2}$$
+$$\sqrt{\frac{z}{2}}=\frac{\sqrt{z}}{\sqrt{2}}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1555,15 +1555,15 @@ Used by the Compute Engine for simplification.
 
 $$\sqrt{\frac{z}{z-c}}=\frac{\sqrt{-z}}{\sqrt{c-z}}$$
 
-**Holds when** $z-c\ne0\land z\in\C\land c\in\lbrack0, \infty\rparen$.
+**Holds when** $z\in\C\land c\in\lbrack0, \infty\rparen\land z-c\ne0$.
 Used by the Compute Engine for simplification.
 [`6f63dd` · Fungrim entry ↗](https://fungrim.org/entry/6f63dd)
 
 ---
 
-$$z\mapsto\sqrt{z}^{\prime}(z)=\mathrm{RisingFactorial}(\frac{-1}{2}, r)\times(-1)^{r}z^{r-\frac{1}{2}}$$
+$$z\mapsto\sqrt{z}^{\prime}(z)=(-1)^{r}\mathrm{RisingFactorial}(-(\frac{1}{2}), r)z^{r-\frac{1}{2}}$$
 
-**Holds when** $r\in\N\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
+**Holds when** $z\in\C\setminus\lparen-\infty, 0\rbrack\land r\in\N$.
 **Symbols:** **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`83abff` · Fungrim entry ↗](https://fungrim.org/entry/83abff)
@@ -1617,9 +1617,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sqrt{\frac{z}{c+z}}=\frac{\sqrt{z}}{\sqrt{c+z}}$$
+$$\sqrt{\frac{z}{z+c}}=\frac{\sqrt{z}}{\sqrt{z+c}}$$
 
-**Holds when** $c+z\ne0\land z\in\C\land c\in\lbrack0, \infty\rparen$.
+**Holds when** $z\in\C\land c\in\lbrack0, \infty\rparen\land z+c\ne0$.
 Used by the Compute Engine for simplification.
 [`d40229` · Fungrim entry ↗](https://fungrim.org/entry/d40229)
 
@@ -1641,10 +1641,10 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sqrt{\infty\exp(\imaginaryI\theta)}=\infty\exp(\frac{\imaginaryI\theta}{2})$$
+$$\sqrt{\exp(\imaginaryI\theta)\infty}=\exp(\frac{\imaginaryI\theta}{2})\infty$$
 
 **Holds when** $\theta\in\lparen-\pi, \pi\rbrack$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`f9f31d` · Fungrim entry ↗](https://fungrim.org/entry/f9f31d)
 
 ---

@@ -5,7 +5,7 @@ slug: /compute-engine/reference/fungrim-sequences/
 
 # Combinatorial and integer sequences
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **62 identities** for combinatorial and integer sequences.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **64 identities** for combinatorial and integer sequences.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -15,7 +15,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 - [Bell numbers](#bell-numbers) (1)
 - [Bernoulli numbers and polynomials](#bernoulli-numbers-and-polynomials) (9)
-- [Fibonacci numbers](#fibonacci-numbers) (34)
+- [Fibonacci numbers](#fibonacci-numbers) (36)
 - [Integer sequences](#integer-sequences) (8)
 - [Partition function](#partition-function) (6)
 - [Stirling numbers](#stirling-numbers) (4)
@@ -51,7 +51,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliPolynomial}(n, 1)=\mathrm{BernoulliB}(n)\times(-1)^{n}$$
+$$\mathrm{BernoulliPolynomial}(n, 1)=(-1)^{n}\mathrm{BernoulliB}(n)$$
 
 **Holds when** $n\in\N$.
 **Symbols:** **BernoulliB** — Bernoulli number; **BernoulliPolynomial** — Bernoulli polynomial.
@@ -60,7 +60,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliPolynomial}(n, x+1)=nx^{n-1}+\mathrm{BernoulliPolynomial}(n, x)$$
+$$\mathrm{BernoulliPolynomial}(n, x+1)=\mathrm{BernoulliPolynomial}(n, x)+nx^{n-1}$$
 
 **Holds when** $n\in\N\land x\in\C$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
@@ -87,7 +87,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliPolynomial}(n, 1-x)=\mathrm{BernoulliPolynomial}(n, x)\times(-1)^{n}$$
+$$\mathrm{BernoulliPolynomial}(n, 1-x)=(-1)^{n}\mathrm{BernoulliPolynomial}(n, x)$$
 
 **Holds when** $n\in\N\land x\in\C$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
@@ -105,7 +105,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliPolynomial}(n, -x)=(nx^{n-1}+\mathrm{BernoulliPolynomial}(n, x))\times(-1)^{n}$$
+$$\mathrm{BernoulliPolynomial}(n, -x)=(-1)^{n}(\mathrm{BernoulliPolynomial}(n, x)+nx^{n-1})$$
 
 **Holds when** $n\in\N\land x\in\C$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
@@ -116,7 +116,7 @@ Used by the Compute Engine for simplification.
 
 ## Fibonacci numbers
 
-$$\mathrm{Fibonacci}(n)=\lfloor\frac{1}{5}(\sqrt{5}\varphi^{n})+\frac{1}{2}\rfloor$$
+$$\mathrm{Fibonacci}(n)=\lfloor\frac{\varphi^{n}}{\sqrt{5}}+\frac{1}{2}\rfloor$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -124,7 +124,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)^2=\mathrm{Fibonacci}(n-1)\mathrm{Fibonacci}(n+1)-(-1)^{n}$$
+$$\mathrm{Fibonacci}(n)^2=\mathrm{Fibonacci}(n+1)\mathrm{Fibonacci}(n-1)-(-1)^{n}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -132,7 +132,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n+2)=\mathrm{Fibonacci}(n)+\mathrm{Fibonacci}(n+1)$$
+$$\begin{pmatrix}\mathrm{Fibonacci}(n+1)\\ \mathrm{Fibonacci}(n)\end{pmatrix}=\begin{pmatrix}1 & 1\\ 1 & 0\end{pmatrix}\begin{pmatrix}\mathrm{Fibonacci}(n)\\ \mathrm{Fibonacci}(n-1)\end{pmatrix}$$
+
+**Holds when** $n\in\Z$.
+Used by the Compute Engine for simplification.
+[`0e2425` · Fungrim entry ↗](https://fungrim.org/entry/0e2425)
+
+---
+
+$$\mathrm{Fibonacci}(n+2)=\mathrm{Fibonacci}(n+1)+\mathrm{Fibonacci}(n)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -140,7 +148,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{5}(\sqrt{5}(\exp(n\ln(\varphi))-\cos(\pi n)\exp(-(n\ln(\varphi)))))$$
+$$\mathrm{Fibonacci}(n)=(\exp(n\ln(\varphi))-\cos(\pi n)\exp(-n\ln(\varphi)))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -158,7 +166,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(2n+1)=\frac{1}{\sqrt{5}}(2\mathrm{ChebyshevT}(2n+1, \frac{5^{1/2}}{2}))$$
+$$\mathrm{Fibonacci}(2n+1)=(2\mathrm{ChebyshevT}(2n+1, \frac{5^{1/2}}{2}))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -167,7 +175,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\mathrm{Fibonacci}(n-2)+\mathrm{Fibonacci}(n-1)$$
+$$\mathrm{Fibonacci}(n)=\mathrm{Fibonacci}(n-1)+\mathrm{Fibonacci}(n-2)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -175,7 +183,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{5}(\sqrt{5}(\varphi^{n}-(-\varphi)^{-n}))$$
+$$\mathrm{Fibonacci}(n)=(\varphi^{n}-(-\varphi)^{-n})/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -183,7 +191,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(2n)=(\mathrm{Fibonacci}(n-1)+\mathrm{Fibonacci}(n+1))\mathrm{Fibonacci}(n)$$
+$$\mathrm{Fibonacci}(2n)=(\mathrm{Fibonacci}(n+1)+\mathrm{Fibonacci}(n-1))\mathrm{Fibonacci}(n)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -191,7 +199,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n+1)-\mathrm{Fibonacci}(n)\mathrm{Fibonacci}(m+1)=\mathrm{Fibonacci}(m-n)\times(-1)^{n}$$
+$$\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n+1)-\mathrm{Fibonacci}(m+1)\mathrm{Fibonacci}(n)=(-1)^{n}\mathrm{Fibonacci}(m-n)$$
 
 **Holds when** $n\in\Z\land m\in\Z$.
 Used by the Compute Engine for simplification.
@@ -207,6 +215,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\begin{pmatrix}\mathrm{Fibonacci}(n+m)\\ \mathrm{Fibonacci}((n+m)-1)\end{pmatrix}=\begin{pmatrix}1 & 1\\ 1 & 0\end{pmatrix}^{m}\begin{pmatrix}\mathrm{Fibonacci}(n)\\ \mathrm{Fibonacci}(n-1)\end{pmatrix}$$
+
+**Holds when** $n\in\Z\land m\in\Z$.
+Used by the Compute Engine for expansion.
+[`3a9c67` · Fungrim entry ↗](https://fungrim.org/entry/3a9c67)
+
+---
+
 $$\mathrm{Count}(\lbrace k, k\in\Z\in(n\mid\mathrm{Fibonacci}(k))\rbrace)=\mathrm{Count}(\Z)$$
 
 **Holds when** $n\in\Z\setminus\lbrace0\rbrace$.
@@ -215,7 +231,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(2n)=-2\mathrm{Fibonacci}(n)^2-\mathrm{Fibonacci}(n+1)^2+\mathrm{Fibonacci}(n+2)^2$$
+$$\mathrm{Fibonacci}(2n)=\mathrm{Fibonacci}(n+2)^2-\mathrm{Fibonacci}(n+1)^2-2\mathrm{Fibonacci}(n)^2$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -223,7 +239,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(-m+n-1)+\mathrm{Fibonacci}(m+1)\mathrm{Fibonacci}(n-m)$$
+$$\mathrm{Fibonacci}(n)=\mathrm{Fibonacci}(m+1)\mathrm{Fibonacci}(n-m)+\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n-m-1)$$
 
 **Holds when** $m\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -239,7 +255,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(m+n-1)=\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n)+\mathrm{Fibonacci}(m-1)\mathrm{Fibonacci}(n-1)$$
+$$\mathrm{Fibonacci}((m+n)-1)=\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n)+\mathrm{Fibonacci}(m-1)\mathrm{Fibonacci}(n-1)$$
 
 **Holds when** $m\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -271,9 +287,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(\mathrm{i_{var}}+n)\mathrm{Fibonacci}(j+n)-\mathrm{Fibonacci}(n)\mathrm{Fibonacci}(\mathrm{i_{var}}+j+n)=\mathrm{Fibonacci}(\mathrm{i_{var}})\mathrm{Fibonacci}(j)\times(-1)^{n}$$
+$$\mathrm{Fibonacci}(n+i_{var})\mathrm{Fibonacci}(n+j)-\mathrm{Fibonacci}(n)\mathrm{Fibonacci}(n+i_{var}+j)=(-1)^{n}\mathrm{Fibonacci}(i_{var})\mathrm{Fibonacci}(j)$$
 
-**Holds when** $n\in\Z\land\mathrm{i_{var}}\in\Z\land j\in\Z$.
+**Holds when** $n\in\Z\land i_{var}\in\Z\land j\in\Z$.
 Used by the Compute Engine for simplification.
 [`8db61e` · Fungrim entry ↗](https://fungrim.org/entry/8db61e)
 
@@ -288,7 +304,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(m+n)=\mathrm{Fibonacci}(n)\mathrm{Fibonacci}(m-1)+\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n+1)$$
+$$\mathrm{Fibonacci}(m+n)=\mathrm{Fibonacci}(m)\mathrm{Fibonacci}(n+1)+\mathrm{Fibonacci}(m-1)\mathrm{Fibonacci}(n)$$
 
 **Holds when** $m\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -321,7 +337,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)^2=(-1)^{m+n}\mathrm{Fibonacci}(m)^2+\mathrm{Fibonacci}(m+n)\mathrm{Fibonacci}(n-m)$$
+$$\mathrm{Fibonacci}(n)^2=\mathrm{Fibonacci}(n+m)\mathrm{Fibonacci}(n-m)+(-1)^{n+m}\mathrm{Fibonacci}(m)^2$$
 
 **Holds when** $n\in\Z\land m\in\Z$.
 Used by the Compute Engine for simplification.
@@ -329,7 +345,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{5}(\sqrt{5}(\varphi^{n}-\frac{\cos(\pi n)}{\varphi^{n}}))$$
+$$\mathrm{Fibonacci}(n)=(\varphi^{n}-\frac{\cos(\pi n)}{\varphi^{n}})/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -337,7 +353,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\mathrm{ChebyshevU}(n-1, -(\frac{\imaginaryI}{2}))\imaginaryI^{n-1}$$
+$$\mathrm{Fibonacci}(n)=\imaginaryI^{n-1}\mathrm{ChebyshevU}(n-1, -(\frac{\imaginaryI}{2}))$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -346,7 +362,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{5}(\sqrt{5}((1-\cos(\pi n))\cosh(n\ln(\varphi))+(\cos(\pi n)+1)\sinh(n\ln(\varphi))))$$
+$$\mathrm{Fibonacci}(n)=((1+\cos(\pi n))\sinh(n\ln(\varphi))+(1-\cos(\pi n))\cosh(n\ln(\varphi)))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -354,7 +370,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{\sqrt{5}}(2\sinh(n(\frac{\imaginaryI\pi}{2}+\ln(\varphi)))(-\imaginaryI)^{n})$$
+$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n})/\sqrt{5}\sinh(n(\ln(\varphi)+\frac{\pi}{2}\imaginaryI))$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -362,7 +378,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=2\mathrm{Fibonacci}(n-4)+3\mathrm{Fibonacci}(n-3)$$
+$$\mathrm{Fibonacci}(n)=3\mathrm{Fibonacci}(n-3)+2\mathrm{Fibonacci}(n-4)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -370,7 +386,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(-n)=\mathrm{Fibonacci}(n)\times(-1)^{n+1}$$
+$$\mathrm{Fibonacci}(-n)=(-1)^{n+1}\mathrm{Fibonacci}(n)$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -378,7 +394,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(2n+1)=\mathrm{Fibonacci}(n)^2+\mathrm{Fibonacci}(n+1)^2$$
+$$\mathrm{Fibonacci}(2n+1)=\mathrm{Fibonacci}(n+1)^2+\mathrm{Fibonacci}(n)^2$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -386,7 +402,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{1}{\sqrt{5}}(2\begin{cases}\sinh(n\ln(\varphi))&\lnot\mathrm{IsOdd}(n)\\\cosh(n\ln(\varphi))&\mathrm{IsOdd}(n)\end{cases})$$
+$$\mathrm{Fibonacci}(n)=(2\begin{cases}\sinh(n\ln(\varphi))&\mathrm{IsEven}(n)\\\cosh(n\ln(\varphi))&\mathrm{IsOdd}(n)\end{cases})/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -515,7 +531,7 @@ Used by the Compute Engine for simplification.
 
 ## Stirling numbers
 
-$$\mathrm{StirlingS_1}(n, k)=\mathrm{StirlingCycle}(n, k)\times(-1)^{k+n}$$
+$$\mathrm{StirlingS_1}(n, k)=(-1)^{n+k}\mathrm{StirlingCycle}(n, k)$$
 
 **Holds when** $n\in\N\land k\in\N$.
 **Symbols:** **StirlingCycle** — Unsigned Stirling number of the first kind; **StirlingS1** — Signed Stirling number of the first kind.

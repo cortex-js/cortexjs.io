@@ -5,7 +5,7 @@ slug: /compute-engine/reference/fungrim-number-theory/
 
 # Number theory
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **67 identities** for number theory.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **70 identities** for number theory.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -15,19 +15,19 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 - [Greatest common divisor](#greatest-common-divisor) (56)
 - [Prime numbers](#prime-numbers) (1)
-- [Totient function](#totient-function) (10)
+- [Totient function](#totient-function) (13)
 
 ## Greatest common divisor
 
 $$\gcd(p, q)=1$$
 
-**Holds when** $p\ne q\land p\in\mathrm{Primes}\land q\in\mathrm{Primes}$.
+**Holds when** $p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q$.
 Used by the Compute Engine for simplification.
 [`062423` · Fungrim entry ↗](https://fungrim.org/entry/062423)
 
 ---
 
-$$\gcd(bn+a, b)=\gcd(a, b)$$
+$$\gcd(a+nb, b)=\gcd(a, b)$$
 
 **Holds when** $a\in\Z\land b\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -77,7 +77,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\lcm(a, 2)=(\frac{1-(-1)^{a}}{2}+1)\vert a\vert$$
+$$\lcm(a, 2)=\vert a\vert(1+\frac{1-(-1)^{a}}{2})$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -92,7 +92,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{XGCD}(-1, b)=(1,-\vert\mathrm{sgn}((b-1)(b+1))\vert,(\mathrm{sgn}(b+1)-\mathrm{sgn}(b-1))\mathrm{sgn}(b))$$
+$$\mathrm{XGCD}(-1, b)=(1,-\vert\mathrm{sgn}((b-1)(b+1))\vert,\mathrm{sgn}(b)(\mathrm{sgn}(b+1)-\mathrm{sgn}(b-1)))$$
 
 **Holds when** $b\in\Z$.
 **Symbols:** **XGCD** — Extended greatest common divisor.
@@ -101,9 +101,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(bn+a, b)=\frac{1}{\vert a\vert}(\lcm(a, b)\vert bn+a\vert)$$
+$$\lcm(a+nb, b)=\frac{1}{\vert a\vert}(\vert a+nb\vert\lcm(a, b))$$
 
-**Holds when** $b\in\Z\land n\in\Z\land a\in\Z\setminus\lbrace0\rbrace$.
+**Holds when** $a\in\Z\setminus\lbrace0\rbrace\land b\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
 [`1bbdaf` · Fungrim entry ↗](https://fungrim.org/entry/1bbdaf)
 
@@ -127,7 +127,7 @@ Used by the Compute Engine for simplification.
 
 $$\lcm(r, s)=\vert rs\vert$$
 
-**Holds when** $\gcd(r, s)=1\land r\in\Z\land s\in\Z$.
+**Holds when** $r\in\Z\land s\in\Z\land\gcd(r, s)=1$.
 Used by the Compute Engine for expansion.
 [`250a45` · Fungrim entry ↗](https://fungrim.org/entry/250a45)
 
@@ -158,13 +158,13 @@ Used by the Compute Engine for expansion.
 
 $$\gcd(p^{m}, q^{n})=1$$
 
-**Holds when** $p\ne q\land p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land m\in\N\land n\in\N$.
+**Holds when** $p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q\land m\in\N\land n\in\N$.
 Used by the Compute Engine for simplification.
 [`499cfc` · Fungrim entry ↗](https://fungrim.org/entry/499cfc)
 
 ---
 
-$$\lcm(a, b)\gcd(a, b)=\vert ab\vert$$
+$$\gcd(a, b)\lcm(a, b)=\vert ab\vert$$
 
 **Holds when** $a\in\Z\land b\in\Z$.
 Used by the Compute Engine for simplification.
@@ -179,15 +179,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a+b, b)=\frac{1}{\vert a\vert}(\lcm(a, b)\vert a+b\vert)$$
+$$\lcm(a+b, b)=\frac{1}{\vert a\vert}(\vert a+b\vert\lcm(a, b))$$
 
-**Holds when** $b\in\Z\land a\in\Z\setminus\lbrace0\rbrace$.
+**Holds when** $a\in\Z\setminus\lbrace0\rbrace\land b\in\Z$.
 Used by the Compute Engine for simplification.
 [`5781de` · Fungrim entry ↗](https://fungrim.org/entry/5781de)
 
 ---
 
-$$\gcd(a, 2)=\frac{(-1)^{a}+1}{2}+1$$
+$$\gcd(a, 2)=1+\frac{1+(-1)^{a}}{2}$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for expansion.
@@ -205,7 +205,7 @@ Used by the Compute Engine for simplification.
 
 $$\gcd(a, b)=\frac{\vert ab\vert}{\lcm(a, b)}$$
 
-**Holds when** $a\ne0\land b\ne0\land a\in\Z\land b\in\Z$.
+**Holds when** $a\in\Z\land b\in\Z\land a\ne0\land b\ne0$.
 Used by the Compute Engine for simplification.
 [`6572c5` · Fungrim entry ↗](https://fungrim.org/entry/6572c5)
 
@@ -236,7 +236,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a, a-2)=\frac{1}{2}((\frac{1-(-1)^{a}}{2}+1)\vert a(a-2)\vert)$$
+$$\lcm(a, a-2)=\frac{1}{2}(\vert a(a-2)\vert(1+\frac{1-(-1)^{a}}{2}))$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -260,7 +260,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\gcd(a, a-2)=\frac{(-1)^{a}+1}{2}+1$$
+$$\gcd(a, a-2)=1+\frac{1+(-1)^{a}}{2}$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -270,7 +270,7 @@ Used by the Compute Engine for simplification.
 
 $$\gcd(rs, c)=\gcd(r, c)\gcd(s, c)$$
 
-**Holds when** $\gcd(r, s)=1\land r\in\Z\land s\in\Z\land c\in\Z$.
+**Holds when** $r\in\Z\land s\in\Z\land c\in\Z\land\gcd(r, s)=1$.
 Used by the Compute Engine for simplification.
 [`8621f6` · Fungrim entry ↗](https://fungrim.org/entry/8621f6)
 
@@ -301,7 +301,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(an, bn)=\lcm(a, b)\vert n\vert$$
+$$\lcm(na, nb)=\vert n\vert\lcm(a, b)$$
 
 **Holds when** $a\in\Z\land b\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -311,7 +311,7 @@ Used by the Compute Engine for simplification.
 
 $$\gcd(a\bmod b, b)=\gcd(a, b)$$
 
-**Holds when** $b\ne0\land a\in\Z\land b\in\Z$.
+**Holds when** $a\in\Z\land b\in\Z\land b\ne0$.
 Used by the Compute Engine for simplification.
 [`959a25` · Fungrim entry ↗](https://fungrim.org/entry/959a25)
 
@@ -341,7 +341,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{XGCD}(1, b)=(1,\vert\mathrm{sgn}((b-1)(b+1))\vert,(\mathrm{sgn}(b+1)-\mathrm{sgn}(b-1))\mathrm{sgn}(b))$$
+$$\mathrm{XGCD}(1, b)=(1,\vert\mathrm{sgn}((b-1)(b+1))\vert,\mathrm{sgn}(b)(\mathrm{sgn}(b+1)-\mathrm{sgn}(b-1)))$$
 
 **Holds when** $b\in\Z$.
 **Symbols:** **XGCD** — Extended greatest common divisor.
@@ -390,7 +390,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\gcd(an, bn)=\gcd(a, b)\vert n\vert$$
+$$\gcd(na, nb)=\vert n\vert\gcd(a, b)$$
 
 **Holds when** $a\in\Z\land b\in\Z\land n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -439,9 +439,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a-b, b)=\frac{1}{\vert a\vert}(\lcm(a, b)\vert a-b\vert)$$
+$$\lcm(a-b, b)=\frac{1}{\vert a\vert}(\vert a-b\vert\lcm(a, b))$$
 
-**Holds when** $b\in\Z\land a\in\Z\setminus\lbrace0\rbrace$.
+**Holds when** $a\in\Z\setminus\lbrace0\rbrace\land b\in\Z$.
 Used by the Compute Engine for simplification.
 [`e74d86` · Fungrim entry ↗](https://fungrim.org/entry/e74d86)
 
@@ -457,7 +457,7 @@ Used by the Compute Engine for simplification.
 
 $$\lcm(rs, c)=\frac{1}{\vert c\vert}(\lcm(r, c)\lcm(s, c))$$
 
-**Holds when** $c\ne0\land\gcd(r, s)=1\land r\in\Z\land s\in\Z\land c\in\Z$.
+**Holds when** $r\in\Z\land s\in\Z\land c\in\Z\land\gcd(r, s)=1\land c\ne0$.
 Used by the Compute Engine for simplification.
 [`fbe121` · Fungrim entry ↗](https://fungrim.org/entry/fbe121)
 
@@ -473,7 +473,7 @@ Used by the Compute Engine for simplification.
 
 ## Prime numbers
 
-$$\mathrm{PrimePi}(x)=\mathrm{Count}(\lbrace p, p\in\mathrm{Primes}\in p\le x\rbrace)$$
+$$\mathrm{PrimePi}(x)=\mathrm{Count}(\lbrace p, p\in\mathrm{Primes}\in(p\le x)\rbrace)$$
 
 **Holds when** $x\in\R$.
 **Symbols:** **PrimePi** — Prime counting function.
@@ -484,7 +484,7 @@ Used by the Compute Engine for simplification.
 
 ## Totient function
 
-$$\mathrm{Totient}(m^{n})=\mathrm{Totient}(m)m^{n-1}$$
+$$\mathrm{Totient}(m^{n})=m^{n-1}\mathrm{Totient}(m)$$
 
 **Holds when** $m\in\N\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -516,7 +516,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Totient}(p^{k})=(p-1)p^{k-1}$$
+$$\mathrm{Totient}(p^{k})=p^{k-1}(p-1)$$
 
 **Holds when** $p\in\mathrm{Primes}\land k\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -524,7 +524,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Totient}(mn)=\frac{\gcd(m, n)\mathrm{Totient}(m)\mathrm{Totient}(n)}{\mathrm{Totient}(\gcd(m, n))}$$
+$$\mathrm{SequenceLimitInferior}(n\mapsto\frac{\mathrm{Totient}(n+1)}{\mathrm{Totient}(n)}, \infty)=0$$
+
+**Symbols:** **SequenceLimitInferior** — Limit inferior of sequence.
+Used by the Compute Engine for simplification.
+[`33139b` · Fungrim entry ↗](https://fungrim.org/entry/33139b)
+
+---
+
+$$\mathrm{Totient}(mn)=\frac{\mathrm{Totient}(m)\mathrm{Totient}(n)\gcd(m, n)}{\mathrm{Totient}(\gcd(m, n))}$$
 
 **Holds when** $m\in\N^*\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -532,7 +540,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Totient}(2n)=\begin{cases}2\mathrm{Totient}(n)&\lnot\mathrm{IsOdd}(n)\\\mathrm{Totient}(n)&\mathrm{IsOdd}(n)\end{cases}$$
+$$\mathrm{SequenceLimitInferior}(n\mapsto\frac{1}{n}(\mathrm{Totient}(n)\ln(\ln(n))), \infty)=\exp(-\gamma)$$
+
+**Symbols:** **SequenceLimitInferior** — Limit inferior of sequence.
+Used by the Compute Engine for simplification.
+[`acfc1f` · Fungrim entry ↗](https://fungrim.org/entry/acfc1f)
+
+---
+
+$$\mathrm{Totient}(2n)=\begin{cases}2\mathrm{Totient}(n)&\mathrm{IsEven}(n)\\\mathrm{Totient}(n)&\mathrm{IsOdd}(n)\end{cases}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -561,5 +577,13 @@ $$\mathrm{Totient}(\lcm(m, n))\mathrm{Totient}(\gcd(m, n))=\mathrm{Totient}(m)\m
 **Holds when** $m\in\N\land n\in\N$.
 Used by the Compute Engine for simplification.
 [`d1ea57` · Fungrim entry ↗](https://fungrim.org/entry/d1ea57)
+
+---
+
+$$\mathrm{SequenceLimitSuperior}(n\mapsto\frac{\mathrm{Totient}(n+1)}{\mathrm{Totient}(n)}, \infty)=\infty$$
+
+**Symbols:** **SequenceLimitSuperior** — Limit superior of sequence.
+Used by the Compute Engine for simplification.
+[`feb1a0` · Fungrim entry ↗](https://fungrim.org/entry/feb1a0)
 
 ---

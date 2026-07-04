@@ -37,7 +37,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x-(x^2-1)^{1/2})}^{n}+{(x+\sqrt{x^2-1})}^{n})$$
+$$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-(x^2-1)^{1/2})}^{n})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -118,7 +118,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(x^2-1)\mathrm{ChebyshevU}(n-1, x)^2+\mathrm{ChebyshevT}(n, x)^2=1$$
+$$\mathrm{ChebyshevT}(n, x)^2+(x^2-1)\mathrm{ChebyshevU}(n-1, x)^2=1$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind; **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -145,7 +145,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(x)\mathrm{ChebyshevU}(n, \cos(x))=\sin(nx)$$
+$$\mathrm{ChebyshevU}(n, \cos(x))\sin(x)=\sin(nx)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -163,7 +163,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{ChebyshevU}(2n, x)=\mathrm{ChebyshevU}(n-1, 2x^2-1)+\mathrm{ChebyshevT}(n, 2x^2-1)$$
+$$\mathrm{ChebyshevU}(2n, x)=\mathrm{ChebyshevT}(n, 2x^2-1)+\mathrm{ChebyshevU}(n-1, 2x^2-1)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind; **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -191,7 +191,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{ChebyshevT}(n, -x)=\mathrm{ChebyshevT}(n, x)\times(-1)^{n}$$
+$$\mathrm{ChebyshevT}(n, -x)=(-1)^{n}\mathrm{ChebyshevT}(n, x)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -263,7 +263,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevU}(n, -x)=\mathrm{ChebyshevU}(n, x)\times(-1)^{n}$$
+$$\mathrm{ChebyshevU}(n, -x)=(-1)^{n}\mathrm{ChebyshevU}(n, x)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -299,7 +299,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(2n+1, \sin(x))=\sin(x(2n+1))\times(-1)^{n}$$
+$$\mathrm{ChebyshevT}(2n+1, \sin(x))=(-1)^{n}\sin((2n+1)x)$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -353,7 +353,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevU}(n, -1)=(n+1)\times(-1)^{n}$$
+$$\mathrm{ChebyshevU}(n, -1)=(-1)^{n}(n+1)$$
 
 **Holds when** $n\in\Z$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -398,7 +398,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(2n+1, x)=2\mathrm{ChebyshevT}(n, x)\mathrm{ChebyshevT}(n+1, x)-x$$
+$$\mathrm{ChebyshevT}(2n+1, x)=2\mathrm{ChebyshevT}(n+1, x)\mathrm{ChebyshevT}(n, x)-x$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -492,7 +492,7 @@ Used by the Compute Engine for simplification.
 
 ## Legendre polynomials
 
-$$\mathrm{LegendrePolynomial}(n, -z)=\mathrm{LegendrePolynomial}(n, z)\times(-1)^{n}$$
+$$\mathrm{LegendrePolynomial}(n, -z)=(-1)^{n}\mathrm{LegendrePolynomial}(n, z)$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -516,7 +516,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)+n(n+1)\mathrm{LegendrePolynomial}(n, z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)=0$$
+$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+n(n+1)\mathrm{LegendrePolynomial}(n, z)=0$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -524,7 +524,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$-(z(2n+1)\mathrm{LegendrePolynomial}(n, z))+n\mathrm{LegendrePolynomial}(n-1, z)+(n+1)\mathrm{LegendrePolynomial}(n+1, z)=0$$
+$$(n+1)\mathrm{LegendrePolynomial}(n+1, z)-(2n+1)z\mathrm{LegendrePolynomial}(n, z)+n\mathrm{LegendrePolynomial}(n-1, z)=0$$
 
 **Holds when** $n\in\N^*\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -532,7 +532,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-n, -n, 1, \frac{z+1}{z-1})(\frac{z-1}{2})^{n}$$
+$$\mathrm{LegendrePolynomial}(n, z)=\frac{z-1}{2}^{n}\mathrm{Hypergeometric2F_1}(-n, -n, 1, \frac{z+1}{z-1})$$
 
 **Holds when** $n\in\N\land z\in\C\setminus\lbrace1\rbrace$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -566,7 +566,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, 0)=\frac{\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, 0)=\frac{\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -574,7 +574,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -583,7 +583,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\mathrm{Binomial}(2n, n)\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
@@ -600,7 +600,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+nz\mathrm{LegendrePolynomial}(n, z)-n\mathrm{LegendrePolynomial}(n-1, z)=0$$
+$$((1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+nz\mathrm{LegendrePolynomial}(n, z))-n\mathrm{LegendrePolynomial}(n-1, z)=0$$
 
 **Holds when** $n\in\N^*\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -665,7 +665,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-(\frac{n}{2}), \frac{1-n}{2}, \frac{1}{2}-n, \frac{1}{z^2})\mathrm{Binomial}(2n, n)(\frac{z}{2})^{n}$$
+$$\mathrm{LegendrePolynomial}(n, z)=\binom{2n}{n}\frac{z}{2}^{n}\mathrm{Hypergeometric2F_1}(-(\frac{n}{2}), \frac{1-n}{2}, \frac{1}{2}-n, \frac{1}{z^2})$$
 
 **Holds when** $n\in\N\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.

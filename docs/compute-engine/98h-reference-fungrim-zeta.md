@@ -37,9 +37,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletCharacter}(p^{\mathrm{e_{var}}}, \ell, n)=\exp(\frac{2\imaginaryI\pi\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{\mathrm{e_{var}}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{\mathrm{e_{var}}})}{\mathrm{Totient}(p^{\mathrm{e_{var}}})})$$
+$$\mathrm{DirichletCharacter}(p^{e_{var}}, \ell, n)=\exp(\frac{2\pi\imaginaryI\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{e_{var}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{e_{var}})}{\mathrm{Totient}(p^{e_{var}})})$$
 
-**Holds when** $3\le p\land\gcd(\ell, p^{\mathrm{e_{var}}})=\gcd(n, p^{\mathrm{e_{var}}})=1\land p\in\mathrm{Primes}\land\mathrm{e_{var}}\in\N^*\land n\in\Z\land\ell\in1..p^{\mathrm{e_{var}}}-1$.
+**Holds when** $p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..p^{e_{var}}-1\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
 **Symbols:** **ConreyGenerator** — Conrey generator; **DirichletCharacter** — Dirichlet character; **DiscreteLog** — Discrete logarithm.
 Used by the Compute Engine for simplification.
 [`4cf4e4` · Fungrim entry ↗](https://fungrim.org/entry/4cf4e4)
@@ -48,7 +48,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ConreyGenerator}(p)=\begin{cases}10&p=40\,487\\7&p=6\,692\,367\,337\\\min(\lbrace a, a\in\N^*\in\mathrm{Count}(\lbrace a^{k}\bmod p, k\in\N\rbrace)=p-1\rbrace)&\top\end{cases}$$
 
-**Holds when** $3\le p\land p\lt1\,000\,000\,000\,000\land p\in\mathrm{Primes}$.
+**Holds when** $p\in\mathrm{Primes}\land p\ge3\land p\lt10^{12}$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
 Used by the Compute Engine for simplification.
 [`540931` · Fungrim entry ↗](https://fungrim.org/entry/540931)
@@ -66,14 +66,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ConreyGenerator}(p)=\min(\lbrace a, a\in\N^*\in(\mathrm{Count}(\lbrace a^{k}\bmod p, k\in\N\rbrace)=p-1\land\mathrm{Count}(\lbrace a^{k}\bmod p^2, k\in\N\rbrace)=p(p-1))\rbrace)$$
 
-**Holds when** $3\le p\land p\in\mathrm{Primes}$.
+**Holds when** $p\in\mathrm{Primes}\land p\ge3$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
 Used by the Compute Engine for simplification.
 [`75231e` · Fungrim entry ↗](https://fungrim.org/entry/75231e)
 
 ---
 
-$$\mathrm{DirichletL}(0, \mathrm{DirichletCharacter}(q, 1))=\begin{cases}\frac{-1}{2}&q=1\\0&\top\end{cases}$$
+$$\mathrm{DirichletL}(0, \mathrm{DirichletCharacter}(q, 1))=\begin{cases}-(\frac{1}{2})&q=1\\0&\top\end{cases}$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletL** — Dirichlet L-function.
@@ -91,7 +91,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(5, 4))=\frac{1}{5}(2\sqrt{5}\ln(\varphi))$$
+$$\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(5, 4))=\frac{2\ln(\varphi)}{\sqrt{5}}$$
 
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletL** — Dirichlet L-function.
 Used by the Compute Engine for simplification.
@@ -99,7 +99,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(3, 2))=\frac{\pi\sqrt{3}}{9}$$
+$$\mathrm{DirichletL}(1, \mathrm{DirichletCharacter}(3, 2))=\frac{\pi}{\sqrt{27}}$$
 
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletL** — Dirichlet L-function.
 Used by the Compute Engine for simplification.
@@ -118,7 +118,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DirichletCharacter}(q, \ell)\lhd n=\mathrm{DirichletCharacter}(q, \ell, n)$$
 
-**Holds when** $\gcd(\ell, q)=1\land q\in\N^*\land n\in\Z\land\ell\in1..\max(q, 2)-1$.
+**Holds when** $q\in\N^*\land\ell\in1..\max(q, 2)-1\land\gcd(\ell, q)=1\land n\in\Z$.
 **Symbols:** **DirichletCharacter** — Dirichlet character.
 Used by the Compute Engine for simplification.
 [`d9a187` · Fungrim entry ↗](https://fungrim.org/entry/d9a187)
@@ -171,7 +171,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(3, \frac{1}{6})=2\sqrt{3}\pi^3+91\Zeta(3)$$
+$$\mathrm{HurwitzZeta}(3, \frac{1}{6})=91\Zeta(3)+2\sqrt{3}\pi^3$$
 
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -189,7 +189,7 @@ Used by the Compute Engine for simplification.
 
 $$s\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(s)=\mathrm{HurwitzZeta}(s, a, 1)$$
 
-**Holds when** $s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C$.
+**Holds when** $s\in\C\land s\ne1\land a\in\C\land\Re(a)\gt0$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`3ba544` · Fungrim entry ↗](https://fungrim.org/entry/3ba544)
@@ -204,7 +204,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, \frac{1}{4})=8G+\pi^2$$
+$$\mathrm{HurwitzZeta}(2, \frac{1}{4})=\pi^2+8G$$
 
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -220,9 +220,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=\mathrm{RisingFactorial}(-r-s+1, r)\mathrm{HurwitzZeta}(r+s, a)$$
+$$a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=\mathrm{RisingFactorial}(1-s-r, r)\mathrm{HurwitzZeta}(s+r, a)$$
 
-**Holds when** $s\ne1\land r+s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C\land r\in\N$.
+**Holds when** $s\in\C\land s\ne1\land s+r\ne1\land a\in\C\land\Re(a)\gt0\land r\in\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function; **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`40c3e2` · Fungrim entry ↗](https://fungrim.org/entry/40c3e2)
@@ -240,7 +240,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{HurwitzZeta}(s, \frac{1}{6})+\mathrm{HurwitzZeta}(s, \frac{5}{6})=(2^{s}-1)(3^{s}-1)\Zeta(s)$$
 
-**Holds when** $s\ne1\land s\in\C$.
+**Holds when** $s\in\C\land s\ne1$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for expansion.
 [`4d1f6b` · Fungrim entry ↗](https://fungrim.org/entry/4d1f6b)
@@ -255,16 +255,16 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyLog}(s, z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{\ln(-z)}{2\imaginaryI\pi}+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{2}-\frac{\ln(-z)}{2\imaginaryI\pi})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
+$$\mathrm{PolyLog}(s, z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((-1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
 
-**Holds when** $s\notin\N\land z\notin\lbrace0, 1\rbrace\land s\in\C\land z\in\C$.
+**Holds when** $s\in\C\land z\in\C\land z\notin\lbrace0, 1\rbrace\land s\notin\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`52ea5f` · Fungrim entry ↗](https://fungrim.org/entry/52ea5f)
 
 ---
 
-$$\Gamma(z)=\exp(\mathrm{HurwitzZeta}(0, z, 1))\sqrt{2\pi}$$
+$$\Gamma(z)=\sqrt{2\pi}\exp(\mathrm{HurwitzZeta}(0, z, 1))$$
 
 **Holds when** $z\in\C\setminus\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -299,7 +299,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, a)=\frac{\mathrm{Hypergeometric3F_2}(1, a, a, a+1, a+1, 1)}{a^2}$$
+$$\mathrm{HurwitzZeta}(2, a)=\mathrm{Hypergeometric3F_2}(1, a, a, a+1, a+1, 1)/a^2$$
 
 **Holds when** $a\in\C\setminus\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -308,7 +308,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, n+\frac{1}{2})=(2^{s}-1)\Zeta(s)-(\sum_{k=0}^{n-1}(2k+1)^{-s})\times2^{s}$$
+$$\mathrm{HurwitzZeta}(s, \frac{1}{2}+n)=(2^{s}-1)\Zeta(s)-2^{s}(\sum_{k=0}^{n-1}((2k+1)^{s})^{-1})$$
 
 **Holds when** $s\in\C\land n\in\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -317,7 +317,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, n)=\Zeta(s)-(\sum_{k=1}^{n-1}k^{-s})$$
+$$\mathrm{HurwitzZeta}(s, n)=\Zeta(s)-(\sum_{k=1}^{n-1}\frac{1}{k^{s}})$$
 
 **Holds when** $s\in\C\land n\in\N^*$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -337,7 +337,7 @@ Used by the Compute Engine for simplification.
 
 $$a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=-(s\mathrm{HurwitzZeta}(s+1, a))$$
 
-**Holds when** $0\lt\Re(a)\land s\notin\lbrace0, 1\rbrace\land s\in\C\land a\in\C$.
+**Holds when** $s\in\C\land s\notin\lbrace0, 1\rbrace\land a\in\C\land\Re(a)\gt0$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`83065e` · Fungrim entry ↗](https://fungrim.org/entry/83065e)
@@ -352,9 +352,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, \frac{1}{4})+\mathrm{HurwitzZeta}(s, \frac{3}{4})=(2^{s}-1)\Zeta(s)\times2^{s}$$
+$$\mathrm{HurwitzZeta}(s, \frac{1}{4})+\mathrm{HurwitzZeta}(s, \frac{3}{4})=2^{s}(2^{s}-1)\Zeta(s)$$
 
-**Holds when** $s\ne1\land s\in\C$.
+**Holds when** $s\in\C\land s\ne1$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`8bbb6f` · Fungrim entry ↗](https://fungrim.org/entry/8bbb6f)
@@ -439,7 +439,7 @@ Used by the Compute Engine for simplification.
 
 $$s\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(s)=\mathrm{HurwitzZeta}(s, a, r)$$
 
-**Holds when** $s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C\land r\in\N$.
+**Holds when** $s\in\C\land s\ne1\land a\in\C\land\Re(a)\gt0\land r\in\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`d0d03b` · Fungrim entry ↗](https://fungrim.org/entry/d0d03b)
@@ -457,7 +457,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{HurwitzZeta}(s, a)=\frac{\mathrm{HurwitzZeta}(s, \frac{a}{2})+\mathrm{HurwitzZeta}(s, \frac{a+1}{2})}{2^{s}}$$
 
-**Holds when** $s\ne1\land0\lt\Re(a)\land s\in\C\land a\in\C$.
+**Holds when** $s\in\C\land a\in\C\land s\ne1\land\Re(a)\gt0$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`ebc49c` · Fungrim entry ↗](https://fungrim.org/entry/ebc49c)
@@ -489,7 +489,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, 3)=-2^{-s}+\Zeta(s)-1$$
+$$\mathrm{HurwitzZeta}(s, 3)=\Zeta(s)-1-\frac{1}{2^{s}}$$
 
 **Holds when** $s\in\C$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -532,7 +532,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{MultiZetaValue}(b, a)+\mathrm{MultiZetaValue}(a, b)=\Zeta(a)\Zeta(b)-\Zeta(a+b)$$
+$$\mathrm{MultiZetaValue}(a, b)+\mathrm{MultiZetaValue}(b, a)=\Zeta(a)\Zeta(b)-\Zeta(a+b)$$
 
 **Holds when** $a\in2..\infty\land b\in2..\infty$.
 **Symbols:** **MultiZetaValue** — Multiple zeta value (MZV).
@@ -577,9 +577,9 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\Zeta(-n)=\frac{\mathrm{BernoulliB}(n+1)\times(-1)^{n}}{n+1}$$
+$$\Zeta(-n)=\frac{(-1)^{n}\mathrm{BernoulliB}(n+1)}{n+1}$$
 
-**Holds when** $0\le n\land n\in\Z$.
+**Holds when** $n\in\Z\land n\ge0$.
 **Symbols:** **BernoulliB** — Bernoulli number.
 Used by the Compute Engine for simplification.
 [`51fd98` · Fungrim entry ↗](https://fungrim.org/entry/51fd98)
@@ -588,16 +588,16 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{RiemannZetaZero}(-n)=\mathrm{RiemannZetaZero}(n)^\star$$
 
-**Holds when** $n\ne0\land n\in\Z$.
+**Holds when** $n\in\Z\land n\ne0$.
 **Symbols:** **RiemannZetaZero** — Nontrivial zero of the Riemann zeta function.
 Used by the Compute Engine for simplification.
 [`60c2ec` · Fungrim entry ↗](https://fungrim.org/entry/60c2ec)
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, a)=\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n, a)\times(-1)^{n}(s-1)^{n})+\frac{1}{s-1}$$
+$$\mathrm{HurwitzZeta}(s, a)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n, a)\times(-1)^{n}(s-1)^{n})$$
 
-**Holds when** $a\notin\Z_{\le0}\land s\in\C\land a\in\C$.
+**Holds when** $s\in\C\land a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function; **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
 [`60c6da` · Fungrim entry ↗](https://fungrim.org/entry/60c6da)
@@ -606,7 +606,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{StieltjesGamma}(n, a+1)=\mathrm{StieltjesGamma}(n, a)-\frac{\ln(a)^{n}}{a}$$
 
-**Holds when** $a\notin\Z_{\le0}\land n\in\N\land a\in\C$.
+**Holds when** $n\in\N\land a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
 [`687b4d` · Fungrim entry ↗](https://fungrim.org/entry/687b4d)
@@ -615,13 +615,13 @@ Used by the Compute Engine for simplification.
 
 $$\Zeta(s^\star)=\Zeta(s)^\star$$
 
-**Holds when** $s\ne1\land s\in\C$.
+**Holds when** $s\in\C\land s\ne1$.
 Used by the Compute Engine for expansion.
 [`69348a` · Fungrim entry ↗](https://fungrim.org/entry/69348a)
 
 ---
 
-$$\mathrm{StieltjesGamma}(1, \frac{1}{2})=-2\gamma\ln(2)-\ln(2)^2+\mathrm{StieltjesGamma}(1)$$
+$$\mathrm{StieltjesGamma}(1, \frac{1}{2})=\mathrm{StieltjesGamma}(1)-2\gamma\ln(2)-\ln(2)^2$$
 
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
@@ -629,18 +629,18 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(2n)=\frac{\mathrm{BernoulliB}(2n)\times(-1)^{n+1}(2\pi)^{2n}}{2(2n)!}$$
+$$\Zeta(2n)=\frac{(-1)^{n+1}\mathrm{BernoulliB}(2n)(2\pi)^{2n}}{2(2n)!}$$
 
-**Holds when** $1\le n\land n\in\Z$.
+**Holds when** $n\in\Z\land n\ge1$.
 **Symbols:** **BernoulliB** — Bernoulli number.
 Used by the Compute Engine for simplification.
 [`72ccda` · Fungrim entry ↗](https://fungrim.org/entry/72ccda)
 
 ---
 
-$$\Zeta(s)=\sum_{k=1}^{\mathrm{N_{var}}-1}k^{-s}-\int_{\mathrm{N_{var}}}^{\infty}\!\frac{\mathrm{RisingFactorial}(s, 2M)\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)}{(2M)!t^{2M+s}}\, \mathrm{d}t+\frac{\sum_{k=1}^{M}\frac{\mathrm{RisingFactorial}(s, 2k-1)\mathrm{BernoulliB}(2k)}{(2k)!\mathrm{N_{var}}^{2k-1}}+\frac{1}{2}}{\mathrm{N_{var}}^{s}}+\frac{\mathrm{N_{var}}^{1-s}}{s-1}$$
+$$\Zeta(s)=(\sum_{k=1}^{N_{var}-1}\frac{1}{k^{s}}+\frac{N_{var}^{1-s}}{s-1}+\frac{\sum_{k=1}^{M}(\mathrm{RisingFactorial}(s, 2k-1)\mathrm{BernoulliB}(2k))/((2k)!N_{var}^{2k-1})+\frac{1}{2}}{N_{var}^{s}})-\int_{N_{var}}^{\infty}\!\frac{\mathrm{RisingFactorial}(s, 2M)\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)}{(2M)!t^{2M+s}}\, \mathrm{d}t$$
 
-**Holds when** $s\ne1\land1\le\mathrm{N_{var}}\land1\le M\land0\lt\Re(2M+s-1)\land s\in\C\land\mathrm{N_{var}}\in\Z\land M\in\Z$.
+**Holds when** $s\in\C\land s\ne1\land N_{var}\in\Z\land M\in\Z\land\Re((s+2M)-1)\gt0\land N_{var}\ge1\land M\ge1$.
 **Symbols:** **BernoulliB** — Bernoulli number; **BernoulliPolynomial** — Bernoulli polynomial; **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 **References:**
@@ -665,7 +665,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(s)=\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n)\times(-1)^{n}(s-1)^{n})+\frac{1}{s-1}$$
+$$\Zeta(s)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n)\times(-1)^{n}(s-1)^{n})$$
 
 **Holds when** $s\in\C$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
@@ -676,14 +676,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{StieltjesGamma}(0, a)=-\mathrm{Digamma}(a)$$
 
-**Holds when** $a\notin\Z_{\le0}\land a\in\C$.
+**Holds when** $a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
 [`b6808d` · Fungrim entry ↗](https://fungrim.org/entry/b6808d)
 
 ---
 
-$$\mathrm{KeiperLiLambda}(1)=1-\frac{\ln(4\pi)}{2}+\frac{\gamma}{2}$$
+$$\mathrm{KeiperLiLambda}(1)=(\frac{\gamma}{2}+1)-\frac{\ln(4\pi)}{2}$$
 
 **Symbols:** **KeiperLiLambda** — Keiper-Li coefficient.
 Used by the Compute Engine for simplification.
