@@ -317,8 +317,15 @@ A rewrite rule is an object with these properties:
   tried against expressions with a different operator), but it lets the engine
   index large rule sets efficiently
 - `purpose`: optional, see [**Rule Purpose**](#rule-purpose) below
-- `id`: an optional identifier, surfaced in the `because` field of simplify
-  steps for debugging
+- `id`: an optional identifier. The id is surfaced in the `because` field of
+  simplify steps, and it is **user-facing**: when a rule fires during
+  `expr.explain()`, the id becomes the step's stable machine `id` — the key
+  consumers use for localization and custom copy. Choose a descriptive,
+  stable id (an arrow-style rewrite like `'x^n * x^m -> x^{n+m}'` or a
+  kebab-case slug like `'abs-negate'`), and once published treat it as
+  frozen. A curated English description can be associated with an id via
+  `registerStepLabels()`; ids without one get a readable fallback derived
+  from the id itself
 
 **To apply a set of rules to an expression**, call the `expr.replace()`
 function.

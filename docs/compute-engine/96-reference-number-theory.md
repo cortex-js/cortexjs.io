@@ -174,6 +174,45 @@ See also: [Divisor - Wikipedia](https://en.wikipedia.org/wiki/Divisor)
 
 
 <nav className="hidden">
+### Divides
+</nav>
+
+<FunctionDefinition name="Divides">
+<Signature name="Divides" returns="boolean">a: integer, b: integer</Signature>
+Returns `"True"` if $a$ divides $b$ — that is, if $b$ is an integer multiple of $a$ — corresponding to the notation $a \mid b$. By convention every integer divides 0, and only 0 divides 0.
+
+The operands are accepted as `number` (not `integer`), so a symbolic operand keeps the relation unevaluated: `Divides(a, b)` stays symbolic until both operands are concrete integers.
+
+In LaTeX, $a \mid b$ parses to `Divides` and the negated form $a \nmid b$ parses to `Not(Divides(a, b))` (also available directly as `NotDivides`).
+
+```json
+["Divides", 3, 12]
+// ➔ "True"
+
+["Divides", 4, 10]
+// ➔ "False"
+
+["NotDivides", 4, 10]
+// ➔ "True"
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### Congruence notation
+</nav>
+
+Modular **congruence** is written $a \equiv b \pmod{n}$, which parses to `Congruent(a, b, n)` and evaluates to `"True"` when $a$ and $b$ leave the same remainder modulo $n$. Like `Divides`, the relation stays symbolic until all three operands are concrete integers.
+
+```json
+["Congruent", 7, 1, 3]
+// ➔ "True"
+```
+
+Note that `\bmod` is the binary modulo operator ($a \bmod n$ parses to `Mod(a, n)`), distinct from the `\pmod{n}` congruence annotation. The `Congruent` operator is described in the [Arithmetic reference](/compute-engine/reference/arithmetic/#Congruent).
+
+
+<nav className="hidden">
 ### PrimeFactors
 </nav>
 

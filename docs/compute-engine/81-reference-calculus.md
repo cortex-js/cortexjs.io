@@ -701,6 +701,209 @@ algorithm.
 
 </FunctionDefinition>
 
+## Series Expansion
+
+A **series expansion** approximates a function near a point by a polynomial (or,
+at ±∞, by a series in $1/x$). The **Taylor series** of $f$ about $x_0$ is:
+
+<center>
+$$f(x) = \sum_{k=0}^{n} \frac{f^{(k)}(x_0)}{k!}(x - x_0)^k + O\left((x - x_0)^{n+1}\right)$$
+</center>
+
+**To compute a series expansion**, use the `Series` function. The result is an
+ordinary expression: a truncated sum plus an inert `BigO` remainder term.
+
+**To discard the remainder** and recover the plain truncated polynomial (which
+can be simplified, compiled, and plotted), use the `Normal` function.
+
+<b>Reference</b>
+- Wikipedia: [Taylor series](https://en.wikipedia.org/wiki/Taylor_series), [Laurent series](https://en.wikipedia.org/wiki/Laurent_series), [Asymptotic expansion](https://en.wikipedia.org/wiki/Asymptotic_expansion), [Big O notation](https://en.wikipedia.org/wiki/Big_O_notation)
+- Wolfram Mathworld: [Series Expansion](https://mathworld.wolfram.com/SeriesExpansion.html)
+
+<FunctionDefinition name="Series">
+
+<Signature name="Series" returns="expression">_f_: expression, _x_: symbol</Signature>
+
+Expand _f_ as a Taylor series in the variable _x_ about $x_0 = 0$, up to and
+including the power $x^5$ (the default order).
+
+The result is an `Add` of the truncated terms plus an inert
+`["BigO", ...]` remainder.
+
+<Latex flow="column" value="\operatorname{Series}(\sin x, x)"/>
+
+```json example
+["Series", ["Sin", "x"], "x"]
+// ➔ ["Add",
+//     "x",
+//     ["Multiply", ["Rational", -1, 6], ["Power", "x", 3]],
+//     ["Multiply", ["Rational", 1, 120], ["Power", "x", 5]],
+//     ["BigO", ["Power", "x", 7]]]
+```
+
+This renders as:
+
+<Latex flow="column" value="x - \frac{x^3}{6} + \frac{x^5}{120} + O\left(x^7\right)"/>
+
+Another example:
+
+```javascript
+ce.parse('\\operatorname{Series}(\\ln(\\cos x), x)').evaluate()
+// → -x^2/2 - x^4/12 + O(x^6)
+```
+
+The remainder is a `BigO` term (see below). Because `BigO` is inert, a series
+is a faithful symbolic object rather than a lossy approximation: the order of
+the discarded tail is carried explicitly.
+
+<Signature name="Series" returns="expression">_f_: expression, _x_: symbol, _x0_: value</Signature>
+
+Expand _f_ about the point _x0_. Coefficients are kept **exact**.
+
+<Latex flow="column" value="\operatorname{Series}(\sin x, x, \frac{\pi}{6})"/>
+
+```javascript
+ce.parse('\\operatorname{Series}(\\sin x, x, \\frac{\\pi}{6})').evaluate()
+// → 1/2 + (√3/2)(x - π/6) - 1/4(x - π/6)^2
+//     - (√3/12)(x - π/6)^3 + 1/48(x - π/6)^4
+//     + (√3/240)(x - π/6)^5 + O((x - π/6)^6)
+```
+
+The expansion point _x0_ may be $+\infty$ or $-\infty$, producing an
+**asymptotic expansion** in powers of $1/x$:
+
+<Latex flow="column" value="\operatorname{Series}(\arctan x, x, +\infty)"/>
+
+```javascript
+ce.parse('\\operatorname{Series}(\\arctan x, x, +\\infty)').evaluate()
+// → π/2 - 1/x + 1/(3x^3) - 1/(5x^5) + O(1/x^7)
+```
+
+<Signature name="Series" returns="expression">_f_: expression, _x_: symbol, _x0_: value, _n_: integer</Signature>
+
+The fourth argument _n_ is the highest power retained (it defaults to `5`). The
+remainder is then $O(x^{n+1})$.
+
+```json example
+["Series", ["Sin", "x"], "x", 0, 3]
+// ➔ ["Add",
+//     "x",
+//     ["Multiply", ["Rational", -1, 6], ["Power", "x", 3]],
+//     ["BigO", ["Power", "x", 5]]]
+```
+
+This renders as:
+
+<Latex flow="column" value="x - \frac{x^3}{6} + O\left(x^5\right)"/>
+
+**Expansion of an unknown function.** If _f_ applies an undeclared function, the
+result is the textbook Taylor form with symbolic derivative coefficients
+$f(0), f'(0), \tfrac{1}{2}f''(0), \dots$ (use the MathJSON application
+`["f", "x"]` — the LaTeX `f(x)` parses as an implicit product when `f` is not a
+declared function):
+
+```json example
+["Series", ["f", "x"], "x", 0, 3]
+// ➔ f(0) + f'(0)·x + 1/2·f''(0)·x^2 + 1/6·f'''(0)·x^3 + O(x^4)
+```
+
+**Laurent expansion at a pole.** At a pole, `Series` returns a Laurent
+expansion with a finite principal part (negative powers):
+
+```javascript
+ce.parse('\\operatorname{Series}(\\frac{1}{\\sin x}, x)').evaluate()
+// → 1/x + x/6 + 7x^3/360 + 31x^5/15120 + O(x^7)
+
+ce.parse('\\operatorname{Series}(\\cot x, x)').evaluate()
+// → 1/x - x/3 - x^3/45 - 2x^5/945 + O(x^7)
+```
+
+Special functions are expanded at their poles with exact coefficients (the
+Euler–Mascheroni constant $\gamma$ is `EulerGamma`, the Riemann zeta function is
+`Zeta`):
+
+```javascript
+ce.parse('\\operatorname{Series}(\\Gamma(x), x)').evaluate()
+// → 1/x - γ + (π²/12 + γ²/2)·x + … + O(x^6)
+
+ce.parse('\\operatorname{Series}(\\zeta(x), x, 1)').evaluate()
+// → 1/(x - 1) + γ + O(x - 1)
+```
+
+Poles at $\pm\infty$ are handled too:
+
+```javascript
+ce.parse('\\operatorname{Series}(\\frac{x^2}{x-1}, x, +\\infty)').evaluate()
+// → x + 1 + 1/x + 1/x^2 + 1/x^3 + 1/x^4 + 1/x^5 + O(1/x^6)
+```
+
+**Left unevaluated.** An essential singularity or a branch point has no valid
+series at the requested point, so the `Series` expression is returned as-is
+rather than expanded incorrectly:
+
+```json example
+["Series", ["Power", "ExponentialE", ["Divide", 1, "x"]], "x"]
+// ➔ ["Series", ["Power", "ExponentialE", ["Divide", 1, "x"]], "x", 0, 5]
+// (e^{1/x} has an essential singularity at 0)
+
+["Series", ["Ln", "x"], "x"]
+// ➔ ["Series", ["Ln", "x"], "x", 0, 5]
+// (ln x has a branch point at 0)
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="BigO">
+
+<Signature name="BigO" returns="expression">_u_: value</Signature>
+
+The **Landau big-O** remainder term $O(u)$: the terms discarded by a truncated
+series, of order no larger than _u_. It is produced by `Series` and is
+**inert** — `evaluate` and `simplify` leave it unchanged.
+
+<Latex flow="column" value="O\left(x^7\right)"/>
+
+Because the remainder is not a concrete value, a numeric approximation
+(`expr.N()`) of any expression that contains a `BigO` term is `NaN`:
+
+```json example
+["BigO", ["Power", "x", 7]]
+// evaluate ➔ ["BigO", ["Power", "x", 7]]
+// .N()     ➔ NaN
+```
+
+`BigO` serializes to LaTeX as `O\left(u\right)`. It is **parsed** from
+`\mathcal{O}(u)` and `\operatorname{O}(u)` (there is deliberately no bare `O(…)`
+capture, to avoid colliding with a variable named `O`):
+
+```javascript
+ce.parse('\\mathcal{O}(x^7)').json
+// → ["BigO", ["Power", "x", 7]]
+
+ce.parse('\\operatorname{O}(x^7)').json
+// → ["BigO", ["Power", "x", 7]]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Normal">
+
+<Signature name="Normal" returns="expression">_expr_: expression</Signature>
+
+Strip every `BigO` remainder term from _expr_, yielding the plain truncated
+polynomial. Unlike a raw `Series` result, the output contains no inert term, so
+it can be numerically approximated, compiled, and plotted. (The name follows
+Mathematica's `Normal`.)
+
+```javascript
+ce.parse('\\operatorname{Normal}(\\operatorname{Series}(\\sin x, x))').evaluate()
+// → x - x^3/6 + x^5/120
+```
+
+`Normal` is idempotent and is a passthrough on `BigO`-free input.
+
+</FunctionDefinition>
+
 ## Differential Equations
 
 A **differential equation** is an equation that relates a function to its
@@ -773,11 +976,14 @@ numeric roots otherwise:
 
 **Second-order constant-coefficient nonhomogeneous** equations, using
 undetermined coefficients for polynomial forcing and variation of parameters
-otherwise (when the resulting integrals are elementary):
+otherwise (including exponential forcing, when the resulting integrals are
+elementary):
 
 | Equation | Solution |
 | :--- | :--- |
 | $y'' - y = x$ | $y = -x + c_1\,e^{x} + c_2\,e^{-x}$ |
+| $y'' - y = e^{x}$ | $y = c_1\,e^{x} + c_2\,e^{-x} + \tfrac{1}{2}x\,e^{x} - \tfrac{1}{4}e^{x}$ |
+| $y'' + y = e^{x}$ | $y = c_1\cos x + c_2\sin x + \tfrac{1}{2}e^{x}$ |
 
 **Second-order Cauchy–Euler** (equidimensional) homogeneous equations
 $a\,x^2 y'' + b\,x\,y' + c\,y = 0$:

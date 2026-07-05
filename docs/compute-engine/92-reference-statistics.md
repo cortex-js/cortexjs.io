@@ -39,6 +39,17 @@ $$x_i$$ is the $$i$$-th number in the list.
 // 21.02
 ```
 
+<Signature name="Mean">_distribution_</Signature>
+
+When the argument is a [probability distribution](#probability-distributions),
+evaluate to the mean of the distribution, as a symbolic expression when the
+parameters are symbolic.
+
+```json example
+["Mean", ["NormalDistribution", "mu", "sigma"]]
+// mu
+```
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -105,6 +116,16 @@ $$\frac{1}{n} \sum_{i=1}^n(x_i - \mu)^2$$
 
 where $$\mu$$ is the mean of the list.
 
+<Signature name="Variance">_distribution_</Signature>
+
+When the argument is a [probability distribution](#probability-distributions),
+evaluate to the variance of the distribution.
+
+```json example
+["Variance", ["PoissonDistribution", "lambda"]]
+// lambda
+```
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -146,6 +167,16 @@ The formula for the standard deviation of a _collection_ of numbers is
 $$\sqrt{\frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2}$$
 
 where $$\mu$$ is the mean of the list.
+
+<Signature name="StandardDeviation">_distribution_</Signature>
+
+When the argument is a [probability distribution](#probability-distributions),
+evaluate to the standard deviation of the distribution.
+
+```json example
+["StandardDeviation", ["NormalDistribution", "mu", "sigma"]]
+// sigma
+```
 
 </FunctionDefinition>
 
@@ -212,19 +243,128 @@ deviation of the list.
 </FunctionDefinition>
 
 <nav className="hidden">
-### Quantile
+### Covariance
 </nav>
-<FunctionDefinition name="Quantile">
+<FunctionDefinition name="Covariance">
 
-<Signature name="Quantile">_collection_, _q:number_</Signature>
+<Signature name="Covariance">_xs:collection_, _ys:collection_</Signature>
 
-Evaluate to the **quantile** of a _collection_ of numbers.
+<Signature name="Covariance">_points:collection_</Signature>
 
-The quantile is a value that divides a _collection_ of numbers into equal-sized
-groups. The quantile is a generalization of the median, which divides a
-_collection_ of numbers into two equal-sized groups.
+Evaluate to the **sample covariance** of two data sets: either two
+equal-length collections, or a single collection of $$(x, y)$$ pairs.
 
-So, $$\operatorname{median} = \operatorname{quantile}(0.5)$$.
+$$\operatorname{cov}(x, y) = \frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})$$
+
+Exact data gives an exact result.
+
+```json example
+["Covariance", ["List", 1, 2, 3, 4, 5], ["List", 2, 4, 5, 4, 5]]
+// 3/2
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### PopulationCovariance
+</nav>
+<FunctionDefinition name="PopulationCovariance">
+
+<Signature name="PopulationCovariance">_xs:collection_, _ys:collection_</Signature>
+
+<Signature name="PopulationCovariance">_points:collection_</Signature>
+
+Evaluate to the **population covariance** of two data sets: the covariance
+with an $$n$$ denominator instead of $$n - 1$$.
+
+$$\frac{1}{n} \sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})$$
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Correlation
+</nav>
+<FunctionDefinition name="Correlation">
+
+<Signature name="Correlation">_xs:collection_, _ys:collection_</Signature>
+
+<Signature name="Correlation">_points:collection_</Signature>
+
+Evaluate to the **Pearson correlation coefficient** of two data sets: a value
+between $$-1$$ and $$1$$ measuring the strength of their linear relationship.
+
+$$r = \frac{\operatorname{cov}(x, y)}{\sigma_x \sigma_y}$$
+
+Exact data gives an exact result.
+
+```json example
+["Correlation", ["List", 1, 2, 3, 4, 5], ["List", 2, 4, 5, 4, 5]]
+// sqrt(15) / 5
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### LinearRegression
+</nav>
+<FunctionDefinition name="LinearRegression">
+
+<Signature name="LinearRegression">_xs:collection_, _ys:collection_</Signature>
+
+<Signature name="LinearRegression">_points:collection_</Signature>
+
+<Signature name="LinearRegression">..., _variable:symbol_</Signature>
+
+Evaluate to the **least-squares linear fit** of the data, as the tuple
+$$(b_0, b_1)$$ of the intercept and slope of the fitted line
+$$y = b_0 + b_1 x$$.
+
+Exact data yields exact coefficients.
+
+```json example
+["LinearRegression", ["List", 1, 2, 3, 4, 5], ["List", 2, 4, 5, 4, 5]]
+// (11/5, 3/5)
+```
+
+With a trailing _variable_ argument, evaluate to the fitted **expression** in
+that variable instead, ready to plot alongside the data.
+
+```json example
+["LinearRegression", ["List", 1, 2, 3, 4, 5], ["List", 2, 4, 5, 4, 5], "x"]
+// 3/5 x + 11/5
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### PolynomialFit
+</nav>
+<FunctionDefinition name="PolynomialFit">
+
+<Signature name="PolynomialFit">_xs:collection_, _ys:collection_, _degree:number_</Signature>
+
+<Signature name="PolynomialFit">_points:collection_, _degree:number_</Signature>
+
+<Signature name="PolynomialFit">..., _variable:symbol_</Signature>
+
+Evaluate to the **least-squares polynomial fit** of the data at the given
+degree, as the list of coefficients, constant term first.
+
+Exact data yields exact coefficients: points lying exactly on a polynomial
+recover it exactly.
+
+```json example
+["PolynomialFit",
+  ["List", ["List", 0, 1], ["List", 1, 2], ["List", 2, 5], ["List", 3, 10]],
+  2]
+// [1, 0, 1]     (the polynomial 1 + x²)
+```
+
+With a trailing _variable_ argument, evaluate to the fitted expression in
+that variable instead.
+
+The degree must satisfy $$\deg \le \min(n - 1, 12)$$ where $$n$$ is the
+number of data points.
 
 </FunctionDefinition>
 
@@ -358,5 +498,159 @@ This returns a list of indices that sorts the collection.
 </FunctionDefinition>
 
 
+## Probability Distributions
+
+A **probability distribution** is a first-class value constructed with one of
+the distribution functions below. It can be assigned to a symbol, passed as an
+argument, and queried with `PDF`, `CDF`, `Quantile`, `Mean`, `Variance` and
+`StandardDeviation`.
+
+These operators evaluate to **exact closed forms**: the result is an ordinary
+expression that can be simplified, differentiated, compiled or plotted, and
+numeric approximation (`.N()`) works at machine or arbitrary precision.
+
+```json example
+["CDF", ["NormalDistribution", 0, 1], "x"]
+// 1/2 + Erf(x / sqrt(2)) / 2
+```
+
+<nav className="hidden">
+### NormalDistribution
+</nav>
+<FunctionDefinition name="NormalDistribution">
+
+<Signature name="NormalDistribution">_mean_, _standardDeviation_</Signature>
+
+A **normal (Gaussian) distribution** with the given mean $$\mu$$ and standard
+deviation $$\sigma > 0$$.
+
+Note that the second parameter is the standard deviation, not the variance,
+following the convention of most computer algebra and statistics systems.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### BinomialDistribution
+</nav>
+<FunctionDefinition name="BinomialDistribution">
+
+<Signature name="BinomialDistribution">_n_, _p_</Signature>
+
+A **binomial distribution**: the number of successes in $$n \ge 0$$ independent
+trials, each succeeding with probability $$0 \le p \le 1$$.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### PoissonDistribution
+</nav>
+<FunctionDefinition name="PoissonDistribution">
+
+<Signature name="PoissonDistribution">_lambda_</Signature>
+
+A **Poisson distribution**: the number of events occurring in a fixed interval
+when events occur independently at a mean rate of $$\lambda > 0$$.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### UniformDistribution
+</nav>
+<FunctionDefinition name="UniformDistribution">
+
+<Signature name="UniformDistribution">_a_, _b_</Signature>
+
+A **continuous uniform distribution** on the interval $$[a, b]$$, with
+$$a < b$$.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ExponentialDistribution
+</nav>
+<FunctionDefinition name="ExponentialDistribution">
+
+<Signature name="ExponentialDistribution">_lambda_</Signature>
+
+An **exponential distribution**: the waiting time between events occurring at
+a mean rate of $$\lambda > 0$$ (the _rate_ parameterization; the mean is
+$$1/\lambda$$).
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### PDF
+</nav>
+<FunctionDefinition name="PDF">
+
+<Signature name="PDF">_distribution_, _x_</Signature>
+
+Evaluate to the **probability density function** of _distribution_ at _x_.
+For a discrete distribution, this is the **probability mass function**, and it
+is `0` at numeric non-integer points.
+
+The result is a closed-form expression: with a symbolic _x_ it is the density
+formula itself, ready to plot or integrate.
+
+```json example
+["PDF", ["BinomialDistribution", 4, ["Rational", 1, 2]], 2]
+// 3/8
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### CDF
+</nav>
+<FunctionDefinition name="CDF">
+
+<Signature name="CDF">_distribution_, _x_</Signature>
+
+Evaluate to the **cumulative distribution function** of _distribution_ at _x_:
+the probability that a random value is less than or equal to _x_.
+
+The result is exact: a normal CDF is expressed with `Erf`, and discrete CDFs
+with `GammaRegularized`/`BetaRegularized`. Use `N()` for a numeric value.
+
+```json example
+["N", ["CDF", ["NormalDistribution", 0, 1], 1]]
+// 0.8413447460685429
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Quantile
+</nav>
+<FunctionDefinition name="Quantile">
+
+<Signature name="Quantile">_distribution_, _p:number_</Signature>
+
+Evaluate to the **quantile** (inverse CDF) of _distribution_: the smallest
+value $$x$$ such that $$\operatorname{CDF}(x) \ge p$$, for $$0 \le p \le 1$$.
+
+`Quantile(dist, 0.5)` is the median of the distribution.
+
+<Signature name="Quantile">_collection_, _p:number_</Signature>
+
+When the first argument is a collection of numbers, evaluate to the
+**empirical quantile** of the data, interpolating the sorted values. It is
+consistent with `Quartiles` and `Median`: `Quantile(xs, 1/4)`,
+`Quantile(xs, 1/2)` and `Quantile(xs, 3/4)` equal the three quartiles, and
+$$p = 0$$ and $$p = 1$$ give the minimum and maximum.
+
+```json example
+["Quantile", ["PoissonDistribution", 9], 0.95]
+// 14
+```
+
+For continuous distributions the result is a closed form
+(`Quantile(NormalDistribution(mu, sigma), p)` is
+$$\mu + \sigma\sqrt2\operatorname{erf}^{-1}(2p-1)$$); for discrete
+distributions it is computed by exact search when `p` is numeric.
+
+</FunctionDefinition>
+
 <ReadMore path="/compute-engine/reference/special-functions/" > See also Special Functions for
-the <strong>Error Functions</strong> </ReadMore>
+the <strong>Error Functions</strong> and the <strong>regularized incomplete
+gamma and beta functions</strong> </ReadMore>

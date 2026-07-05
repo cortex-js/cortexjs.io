@@ -93,6 +93,28 @@ For more control over polynomial operations, or for multivariate expressions,
 use the explicit `Cancel`, `PolynomialGCD`, `PolynomialQuotient`, and
 `PolynomialRemainder` functions.
 
+To check if an expression is a polynomial and extract its coefficients, use
+`polynomialCoefficients()`:
+
+```javascript
+const coeffs = ce.parse('x^3 + 2x + 1').polynomialCoefficients('x');
+// ➔ [1, 0, 2, 1]  (descending order: x³, x², x, constant)
+
+// Check if an expression is a polynomial
+ce.parse('sin(x)').polynomialCoefficients('x');
+// ➔ undefined (not a polynomial)
+```
+
+To find the roots of a polynomial, use `polynomialRoots()`:
+
+```javascript
+ce.parse('x^2 - 5x + 6').polynomialRoots('x');
+// ➔ [2, 3]
+
+ce.parse('x^3 - 6x^2 + 11x - 6').polynomialRoots('x');
+// ➔ [1, 2, 3]
+```
+
 ### Automatic Factoring in Square Roots
 
 When simplifying square root expressions, the engine automatically attempts to
@@ -137,6 +159,24 @@ The `Factor` function currently supports:
 - **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
 - **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
 - **Quadratics with rational roots**: $ x^2 + bx + c $ when roots are rational
+- **Degree 3+ with rational roots**: Uses the Rational Root Theorem (e.g., $ x^3 - 6x^2 + 11x - 6 \to (x-1)(x-2)(x-3) $)
+- **Content extraction**: Extracts GCD of integer coefficients first (e.g., $ 6x^2 + 12x + 6 \to 6(x+1)^2 $)
+
+### Partial Fraction Decomposition
+
+For decomposing rational expressions into simpler fractions, use `PartialFraction`:
+
+```javascript
+evaluate('\\operatorname{PartialFraction}(\\frac{1}{(x+1)(x+2)}, x)').latex;
+// ➔ "\\frac{1}{x+1} - \\frac{1}{x+2}"
+
+evaluate('\\operatorname{PartialFraction}(\\frac{3x+5}{(x+1)^2}, x)').latex;
+// ➔ "\\frac{3}{x+1} + \\frac{2}{(x+1)^2}"
+```
+
+This supports distinct and repeated linear factors, irreducible quadratic factors, and improper fractions (polynomial division is performed first). `Apart` is available as an alias for `PartialFraction`.
+
+When a `Divide` expression has a denominator already in factored form (a product or power), `simplify()` automatically applies partial fraction decomposition if the result is simpler. This means `\frac{1}{(x+1)(x+2)}` is automatically simplified without needing to call `PartialFraction` explicitly.
 
 <ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
 <strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
@@ -258,3 +298,109 @@ const simplified = expr.trigSimplify();
 
 <ReadMore path="/compute-engine/reference/trigonometry/" > Read more about
 <strong>Trigonometric Functions</strong> <Icon name="chevron-right-bold" /></ReadMore>
+
+## Step-by-Step Explanations
+
+The `expr.explain()` function returns the same result as `expr.simplify()`,
+together with the chain of steps that produced it — the textbook presentation
+*expression → step (with a reason) → … → result*.
+
+```javascript
+const expr = ce.parse("\\frac{x^2-1}{x-1}");
+const explanation = expr.explain();
+
+console.log(explanation.initial.latex);
+// ➔ "\frac{x^2-1}{x-1}"
+
+for (const step of explanation.steps)
+  console.log(step.value.latex, "—", step.description);
+// ➔ "x+1 — Cancel the common factors"
+
+console.log(explanation.result.latex);
+// ➔ "x+1"
+```
+
+An `Explanation` has four properties:
+
+- `operation`: the operation that was traced (`'simplify'`, `'solve'` or
+  `'D'`)
+- `initial`: the **canonical form** of the expression `explain()` was called
+  on — the chain's step 0. Canonicalization (e.g. `x - 1` becoming
+  `Add(x, -1)`, or `2 + 3` folding to `5`) happens before the first step is
+  recorded and is not traced.
+- `steps`: the chain of steps. Each step has the expression `value` after the
+  step was applied, a stable machine `id` identifying the rule that fired,
+  and a default English `description`.
+- `result`: the same value `simplify()` returns
+
+**Explaining is free of side effects and does not change results:** the
+explanation runs the same code as `simplify()`, so `explanation.result` is
+always the same value `expr.simplify()` returns.
+
+### Explaining an Equation Solution
+
+`expr.explain('solve')` traces `expr.solve()` for a univariate equation (an
+expression `f` is read as the equation `f = 0`). The unknown is inferred, or
+passed explicitly with `options.variable`. Step values are **equations** —
+the state of the equation after each phase — so the chain reads like
+textbook working, including candidate roots and the rejection of extraneous
+candidates:
+
+```javascript
+const expr = ce.parse("\\sqrt{x+1} = x - 1");
+for (const step of expr.explain('solve').steps)
+  console.log(step.value.latex, "—", step.description);
+// ➔ -x+\sqrt{x+1}+1=0 — Move all terms to one side
+// ➔ -x^2+3x=0        — Square both sides to eliminate the radical
+// ➔ [x=0, x=3]       — Apply the quadratic formula
+// ➔ x=0              — Check each candidate in the original equation; reject the extraneous ones
+// ➔ x=3              — The solutions
+```
+
+`explanation.result` is a `List` of the same roots `solve()` returns. A
+case-split (an absolute value, a zero product) is rendered as one step whose
+value lists the sub-equations. Systems of equations are not supported yet.
+
+### Explaining a Derivative
+
+`expr.explain('D')` traces the differentiation of the expression. Steps are
+whole-expression states in traversal order — each textbook rule first
+appears with its unresolved sub-derivatives as inert `D(…)` terms, which
+then resolve one by one:
+
+```javascript
+const expr = ce.parse("x \\sin x");
+for (const step of expr.explain('D').steps)
+  console.log(step.value.latex, "—", step.description);
+// ➔ x\,\frac{\mathrm{d}}{\mathrm{d}x}\sin x+\sin x — Apply the product rule: (u·v)′ = u′·v + u·v′
+// ➔ x\cos x+\sin x — Differentiate using a known derivative
+```
+
+The variable of differentiation is inferred when the expression has exactly
+one unknown; otherwise pass it with `options.variable`. The `result`
+matches evaluating `D(expr, variable)`. When the unfolded textbook form
+differs from the engine's simplified result, the chain closes with a
+*Simplify the result* step.
+
+### Step Ids and Localization
+
+The `id` of a step is a frozen, machine-readable identifier (e.g.
+`'cancel common polynomial factors'`, `'x^n * x^m -> x^{n+m}'`,
+`'fungrim:0010f3'`). The engine ships English descriptions only; to localize
+or customize the copy, key your strings off `step.id` and use the
+`description` as a fallback.
+
+### Verbosity
+
+By default the step chain is curated: internal bookkeeping steps (such as
+the marker recorded when sub-expressions are simplified in place) are
+filtered out. Pass `verbosity: 'all'` to get the raw, uncurated trace —
+useful for debugging and for rule authors:
+
+```javascript
+expr.explain('simplify', { verbosity: 'all' });
+```
+
+The options of `simplify()` (`rules`, `costFunction`, `strategy`) are also
+accepted and honored, so `expr.explain('simplify', options).result` matches
+`expr.simplify(options)` for any options.

@@ -372,22 +372,92 @@ in order to reduce, simplify and calculate its value.
 
 <Signature name="Solve">_equation_, _unknown_</Signature>
 
-Return a list of the solutions of _equation_ for _unknown_.
+<Signature name="Solve">_equation_, _spec-1_, _spec-2_, ...</Signature>
+
+Return a list of the solutions of _equation_ for the given unknowns.
 
 The _equation_ is an `Equal` expression, or a bare expression that is solved as
-if it were equal to zero.
+if it were equal to zero. Any boolean condition (an inequality, a congruence…)
+also works when a domain is given (see below).
+
+Each _spec_ describes one unknown, and is either:
+
+- a **symbol** — the unknown, solved over its declared type;
+- **`["Element", _symbol_, _collection_]`** — the unknown restricted to a
+  domain, such as a `Range` of integers or an `Interval`;
+- **`["Element", _symbol_, _collection_, _condition_]`** — with an extra
+  boolean filter, using the same indexing-set convention as `Sum` and
+  `Product`.
+
+In LaTeX, `x \in 1..1000` parses to the `Element` form, so
+`\operatorname{Solve}(x^2=4,\; x \in 1..1000)` works without any special
+syntax.
 
 ```json example
 ["Solve", ["Equal", ["Power", "x", 2], 1], "x"]
 // -> ["List", 1, -1]
 
-["Solve", ["Subtract", ["Power", "x", 2], 1], "x"]
-// -> ["List", 1, -1]
+["Solve",
+  ["Equal", ["Subtract", ["Power", "x", 2], ["Multiply", 5, "x"]], -6],
+  ["Element", "x", ["Range", 1, 1000]]
+]
+// -> ["List", 2, 3]
 ```
 
+**With a domain**, the equation is solved symbolically and the solutions are
+filtered to the domain. Equations whose solutions form an infinite periodic
+family (such as trigonometric equations) return every member within the
+domain, not just the principal values. When no symbolic solution is found and
+the domain is finite and reasonably sized, `Solve` falls back to enumerating
+the domain; every candidate is confirmed exactly, and a search that would be
+too large returns the expression unevaluated rather than a partial answer.
+
+**With several unknowns**, each carrying a domain, the result is a `List` of
+`Tuple`s in unknown order:
+
+```json example
+["Solve",
+  ["Equal", ["Add", ["Power", "x", 3], ["Power", "y", 3]], 1729],
+  ["Element", "x", ["Range", 1, 12]],
+  ["Element", "y", ["Range", 1, 12]]
+]
+// -> ["List", ["Tuple", 1, 12], ["Tuple", 9, 10], ["Tuple", 10, 9], ["Tuple", 12, 1]]
+```
+
+**Integer (diophantine) equations are solved symbolically.** When every
+unknown ranges over integers, linear equations in any number of unknowns,
+Pell-family equations \\(x^2 - Dy^2 = N\\), and the Pythagorean equation
+\\(x^2 + y^2 = z^2\\) are solved in closed form. This
+reaches answers enumeration cannot: solving \\(x^2 - 29y^2 = 1\\) over
+\\(x, y \in 1..10^5\\) returns `[(9801, 1820)]` even though the domain has
+\\(10^{10}\\) candidate pairs, and an unsolvable equation such as
+\\(6x + 9y = 4\\) returns the empty list immediately.
+
+When the unknowns are declared with an `integer` type and no domain is given,
+the result is the general **parametric family**, expressed with fresh integer
+parameters (`t`, `t_1`, …) that range over all integers:
+
+```json example
+// with n and m declared as integers:
+["Solve", ["Equal", ["Add", ["Multiply", 3, "n"], ["Multiply", 4, "m"]], 7],
+  "n", "m"]
+// -> ["List", ["Tuple", ["Add", ["Multiply", 4, "t"], -7],
+//                       ["Add", ["Multiply", -3, "t"], 7]]]
+// i.e. n = 4t − 7, m = −3t + 7 for all integers t
+```
+
+Pythagorean triples return the complete classical two-family parametrization:
+`Solve(x²+y²=z², x, y, z)` (with integer-typed unknowns) yields
+\\(\bigl(t(t_1^2-t_2^2),\; 2t\,t_1 t_2,\; t(t_1^2+t_2^2)\bigr)\\) and its
+leg-swapped counterpart — every integer solution, including all signs, is a
+member of one of the two families.
+
+Assumptions on the unknown (such as `assume(n > 0)`) filter the solutions the
+same way, conjunctively with any explicit domain.
+
 `Solve` is the operator form of the `expr.solve()` method, and uses the same
-solver. The result is a `List` of the solutions, or an empty list when none are
-found.
+solver for the two-argument symbolic case. The result is a `List` of the
+solutions, or an empty list when none are found.
 
 </FunctionDefinition>
 

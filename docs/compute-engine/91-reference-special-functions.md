@@ -204,6 +204,60 @@ $$
 
 </FunctionDefinition>
 
+<FunctionDefinition name="GammaRegularized">
+
+<Signature name="GammaRegularized">_a_, _z_</Signature>
+
+The **upper regularized incomplete gamma function**, defined as:
+
+$$
+Q(a, z) = \frac{\Gamma(a, z)}{\Gamma(a)} = \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t} \, dt
+$$
+
+Exact arguments stay symbolic, and special values fold:
+`GammaRegularized(a, 0)` is $$1$$ and `GammaRegularized(1, z)` is $$e^{-z}$$.
+Use `N()` for a numeric value, at machine or arbitrary precision.
+
+The cumulative distribution function of a Poisson distribution evaluates to
+this function: $$\operatorname{CDF}(\operatorname{Poisson}(\lambda), k) =
+Q(k+1, \lambda)$$.
+
+```json example
+["N", ["GammaRegularized", 3, 5]]
+// ➔ 0.12465201948308115
+```
+
+- NIST: http://dlmf.nist.gov/8.2
+
+</FunctionDefinition>
+
+<FunctionDefinition name="BetaRegularized">
+
+<Signature name="BetaRegularized">_x_, _a_, _b_</Signature>
+
+The **regularized incomplete beta function**, defined as:
+
+$$
+I_x(a, b) = \frac{1}{\operatorname{B}(a, b)}\int_0^x t^{a-1}(1-t)^{b-1} \, dt
+$$
+
+Exact arguments stay symbolic, and the endpoints fold:
+`BetaRegularized(0, a, b)` is $$0$$ and `BetaRegularized(1, a, b)` is $$1$$.
+Use `N()` for a numeric value, at machine or arbitrary precision.
+
+The cumulative distribution function of a binomial distribution evaluates to
+this function: $$\operatorname{CDF}(\operatorname{Binomial}(n, p), k) =
+I_{1-p}(n-k, k+1)$$.
+
+```json example
+["N", ["BetaRegularized", 0.5, 2, 3]]
+// ➔ 0.6875
+```
+
+- NIST: http://dlmf.nist.gov/8.17
+
+</FunctionDefinition>
+
 
 <FunctionDefinition name="LambertW">
 

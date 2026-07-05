@@ -128,6 +128,40 @@ example, a one-sided delimiter group written with a TeX *null delimiter* —
 Read more about the **errors** that can be returned. <Icon name="chevron-right-bold" />
 </ReadMore>
 
+### Geometry Notation
+
+Geometry commands parse to **inert structural heads**: they capture the notation
+without prescribing a computation, so they evaluate to themselves.
+
+| LaTeX | MathJSON |
+| :--- | :--- |
+| `AB \parallel CD` | `["Parallel", ["Multiply", "A", "B"], ["Multiply", "C", "D"]]` |
+| `AB \perp CD`     | `["Perpendicular", ["Multiply", "A", "B"], ["Multiply", "C", "D"]]` |
+| `\angle ABC`      | `["Angle", "A", "B", "C"]` |
+| `\varangle ABC`   | `["Angle", "A", "B", "C"]` |
+| `\triangle ABC`   | `["Triangle", "A", "B", "C"]` |
+| `\widehat{AB}`    | `["Arc", "A", "B"]` |
+
+### Notation Changes
+
+Two parsing rules changed recently and may affect existing input:
+
+- **`\parallel`** is now the geometric relation `Parallel` (as shown above),
+  consistent with `\perp` → `Perpendicular`. For logical disjunction, use `\lor`
+  or `\vee`, which parse to `Or` (unchanged).
+- **`\rightarrow`** is now the mapping arrow `To` (matching `\to`), so
+  `f: \mathbb{R} \rightarrow \mathbb{R}` reads as a function signature. For
+  logical implication, use `\Rightarrow`, `\implies` or `\Longrightarrow`, which
+  parse to `Implies` (unchanged).
+
+```javascript
+ce.parse("x \\rightarrow y").json;
+// ➔ ["To", "x", "y"]
+
+ce.parse("P \\implies Q").json;
+// ➔ ["Implies", "P", "Q"]
+```
+
 ## Serializing to LaTeX
 
 **To serialize an expression to a LaTeX string**, read the `expr.latex`

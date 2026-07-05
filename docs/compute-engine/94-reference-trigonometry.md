@@ -54,6 +54,78 @@ date: Last Modified
 
 </div>
 
+## Trigonometric Transformations
+
+`TrigExpand`, `TrigToExp` and `TrigReduce` are transformation verbs for
+trigonometric and hyperbolic expressions, in the spirit of `Expand` and
+`Factor` for polynomials. They preserve **exactness**: an exact input produces
+an exact result, and no numeric approximation is introduced unless you request
+one with `.N()`.
+
+<nav className="hidden">
+### TrigExpand
+</nav>
+
+<FunctionDefinition name="TrigExpand">
+<Signature name="TrigExpand" returns="value">expr: value</Signature>
+Expands trigonometric and hyperbolic functions of **sums** and **integer
+multiples** of angles into products and powers of functions of the individual
+angles. This is the trigonometric analog of `Expand`.
+
+Hyperbolic functions are expanded with their own addition formulas, and
+`Sec`, `Csc` and `Cot` are handled as reciprocals of the expanded `Cos`, `Sin`
+and `Tan`.
+
+```json
+["TrigExpand", ["Sin", ["Add", "a", "b"]]]
+// ➔ sin(a)cos(b) + cos(a)sin(b)
+
+["TrigExpand", ["Cos", ["Multiply", 2, "x"]]]
+// ➔ cos(x)^2 - sin(x)^2
+
+["TrigExpand", ["Sinh", ["Add", "a", "b"]]]
+// ➔ sinh(a)cosh(b) + cosh(a)sinh(b)
+```
+</FunctionDefinition>
+
+<nav className="hidden">
+### TrigReduce
+</nav>
+
+<FunctionDefinition name="TrigReduce">
+<Signature name="TrigReduce" returns="value">expr: value</Signature>
+Rewrites products and integer powers of trigonometric and hyperbolic functions
+as a linear combination of functions of **multiple angles**. This is the
+inverse of `TrigExpand`, and the trigonometric analog of `Factor`.
+
+```json
+["TrigReduce", ["Power", ["Sin", "x"], 2]]
+// ➔ (1 - cos(2x)) / 2
+
+["TrigReduce", ["Multiply", ["Sin", "x"], ["Cos", "x"]]]
+// ➔ sin(2x) / 2
+```
+</FunctionDefinition>
+
+<nav className="hidden">
+### TrigToExp
+</nav>
+
+<FunctionDefinition name="TrigToExp">
+<Signature name="TrigToExp" returns="value">expr: value</Signature>
+Rewrites trigonometric and hyperbolic functions in terms of the complex
+exponential $e^{ix}$, exactly. Useful for manipulating expressions
+algebraically or for exposing the underlying exponential structure.
+
+```json
+["TrigToExp", ["Sin", "x"]]
+// ➔ -(i/2) e^{ix} + (i/2) e^{-ix}
+
+["TrigToExp", ["Cos", "x"]]
+// ➔ (e^{ix} + e^{-ix}) / 2
+```
+</FunctionDefinition>
+
 ## Trigonometric Simplification
 
 The `trigSimplify()` method applies the Fu algorithm to simplify trigonometric
