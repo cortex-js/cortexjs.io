@@ -281,6 +281,21 @@ when compared in Unicode Normalization Form C (NFC).
 
 The elements of a tuple can be accessed with a one-based index or by name.
 
+A tuple of numbers is a **point/vector in ℝⁿ**: arithmetic on it is
+componentwise vector arithmetic and produces a tuple, not a list.
+
+```js
+ce.parse("(1,2) + (3,4)").evaluate();   // ➔ (4, 6)
+ce.parse("3(1,2)").evaluate();          // ➔ (3, 6)
+ce.parse("(4,2)/2").evaluate();         // ➔ (2, 1)
+```
+
+Adding a scalar to a tuple (`1 + (2,3)`) is an error — a scalar does not
+broadcast into a point — as is multiplying two tuples (there is no implicit
+dot product). A symbol declared with a tuple type participates in vector
+arithmetic symbolically, and its components can be accessed with the
+`.x`/`.y`/`.z` member syntax (`P.x` is `First(P)`).
+
 
 For two tuples to be compatible, each element must have the same type and the names must match.
 

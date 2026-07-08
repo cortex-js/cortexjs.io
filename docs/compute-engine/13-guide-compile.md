@@ -175,16 +175,35 @@ console.log(f.run({ x: 1.0 }));
 
 #### `Loop`, `Break`, `Continue`, `Return`
 
-`Loop` expressions with a range compile to `for` loops. `Break`, `Continue`,
-and `Return` compile to their JavaScript equivalents:
+`Loop` is imperative control flow, compiled for effect: bare `Loop(body)`
+compiles to a JavaScript `while (true) { ... }` loop, and `Loop(body,
+Element(...), ...)` compiles to plain `for`/`for-of` loops with no result
+collection — the compiled expression's value is `undefined`. `Break`,
+`Continue`, and `Return` compile to their JavaScript equivalents:
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
 
 const f = compile("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2");
 console.log(f.run());
-// ➔ 100 (last iteration value)
+// ➔ undefined (Loop is evaluated for effect)
 ```
+
+#### `Comprehension`
+
+`Comprehension` compiles to nested `for (const x of ...)` loops that push
+each computed value into a result array, which is returned:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const f = compile("x^2 \\keyword{for} x = [1...5]");
+console.log(f.run());
+// ➔ [1, 4, 9, 16, 25]
+```
+
+`Comprehension` is not compilable to GLSL or WGSL (shaders have no dynamic
+arrays). Imperative `Loop` is still compilable to GLSL/WGSL.
 
 #### `Block` and `where`
 

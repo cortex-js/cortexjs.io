@@ -48,15 +48,40 @@ that a variable is positive.
 
 <Signature name="Declare">_symbol_, _type_, _value_</Signature>
 
-Declare a new symbol in the current scope, and set its value and type.
+<Signature name="Declare">_symbol_, _attributes_</Signature>
 
-If the symbol already has a definition in the current scope, evaluate to an
-error, otherwise evaluate to `value`.
+Declare a new symbol in the current scope, and optionally set its type and
+value.
+
+If a _value_ is provided, `Declare` evaluates to that value; otherwise it
+evaluates to `Nothing`. If the symbol already has a definition in the current
+scope, evaluating the expression **throws** an error (it does not return an
+error value).
 
 This is equivalent to `let` in JavaScript or `var` in Python.
 
-**To change the value of an existing symbol**, use an `["Assign"]`
-expression.
+An optional trailing _attributes_ dictionary provides additional properties of
+the definition — mirroring the `ce.declare()` API — using any of these keys:
+
+- `type`: the type of the symbol
+- `value`: the initial value of the symbol
+- `constant`: if `True`, the symbol is a **constant**: its value cannot be
+  changed (a later `["Assign"]` is rejected)
+- `holdUntil`: `"never"`, `"evaluate"` or `"N"` — controls when the symbol's
+  value is substituted during evaluation, as for built-in constants such as
+  `Pi`
+
+A positional _type_ or _value_ takes precedence over the same key in the
+dictionary.
+
+```json example
+// Declare the speed of light as an immutable constant
+["Declare", "c", "integer", 299792458, ["Dictionary",
+  ["KeyValuePair", "constant", "True"]]]
+```
+
+**To change the value of an existing (non-constant) symbol**, use an
+`["Assign"]` expression.
 
 `Declare` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
 since it changes the state of the Compute Engine.
@@ -217,19 +242,22 @@ The following functions can be used to obtain information about an expression.
 
 
 <nav className="hidden">
-### Domain
+### Type
 </nav>
-<FunctionDefinition name="Domain">
+<FunctionDefinition name="Type">
 
-<Signature name="Domain">_expression_</Signature>
+<Signature name="Type">_expression_</Signature>
 
-Evaluate to the domain of _expression_
+Evaluate to the type of _expression_, as a string.
 
 ```json example
-["Domain", 2.4531]
+["Type", 2.4531]
 
-// ➔ "RealNumbers"
+// ➔ "finite_real"
 ```
+
+<ReadMore path="/compute-engine/guides/types" >Read more about the
+**type system**. </ReadMore>
 
 </FunctionDefinition>
 
@@ -708,7 +736,7 @@ The symbol is not declared, it remains a free variable. To declare the symbol
 use `Declare`.
 
 ```json example
-["Declare", ["Symbol", "x", 2], "RealNumbers"]
+["Declare", ["Symbol", "x", 2], "real"]
 ```
 
 </FunctionDefinition>

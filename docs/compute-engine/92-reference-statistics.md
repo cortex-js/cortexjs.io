@@ -411,7 +411,12 @@ first quartile.
 Evaluate to the **histogram** of a _collection_ of numbers.
 
 The histogram groups the data into a specified number of bins and counts the
-number of elements in each bin.
+number of elements in each bin. The _bins_ argument is an integer bin count or
+a list of explicit bin edges; a non-integer bin count is left unevaluated (a
+Desmos-style bin *width* should be translated to explicit bin edges).
+
+The LaTeX `\operatorname{histogram}` parses to `Histogram` (likewise
+`\operatorname{pdf}` and `\operatorname{cdf}` parse to `PDF` and `CDF`).
 
 ```json example
 ["Histogram", ["List", 1, 2, 2, 3, 4, 5, 5, 5], 3]

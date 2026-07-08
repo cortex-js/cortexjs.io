@@ -19,7 +19,7 @@ constraints:
 | Property | Default | Description |
 | :--- | :--- | :--- |
 | `ce.timeLimit` | 2 000 ms | Maximum duration of a single evaluation |
-| `ce.iterationLimit` | 1 024 | Maximum number of iterations of a loop (`Loop`, `While`, `FixedPoint`) |
+| `ce.iterationLimit` | 1 024 | Maximum number of iterations of a loop (`Loop`, `Comprehension`, `While`, `FixedPoint`) |
 
 </div>
 
@@ -70,8 +70,9 @@ subsequent evaluations are unaffected.
 ## Iteration Limit
 
 The iteration limit bounds the number of iterations of the looping control
-structures `Loop`, `While` and `FixedPoint`. When the limit is exceeded, a
-`CancellationError` with cause `"iteration-limit-exceeded"` is thrown.
+structures `Loop`, `Comprehension`, `While` and `FixedPoint`. When the limit
+is exceeded, a `CancellationError` with cause `"iteration-limit-exceeded"` is
+thrown.
 
 ```js
 ce.iterationLimit = 10_000;

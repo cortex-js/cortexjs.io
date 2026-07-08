@@ -42,13 +42,35 @@ If one of the expression in the block is a `["Return"]` expression, a
 `["Break"]` expression or a `["Continue"]` expression, no more expressions are
 evaluated and the value of the `["Block"]` is this expression.
 
-`["Block"]` expressions can be nested as necessary.
+`["Block"]` expressions can be nested as necessary. Scoping is lexical: a
+nested scope — an inner `["Block"]`, an `["If"]` branch, or a `["Loop"]`
+body — can read the enclosing block's variables, and assigning to a variable
+declared in an enclosing block updates that binding. A `["Declare"]` in the
+inner block instead introduces a new variable that shadows the outer one for
+the duration of the inner block.
 
 ```json example
 ["Block", ["Assign", "c", 5], ["Multiply", "c", 2]]
 
 
 // ➔ 10
+```
+
+```json example
+["Block",
+  ["Declare", "counter", "integer"],
+  ["Assign", "counter", 0],
+  ["Loop",
+    ["Block",
+      ["If", ["Not", ["Less", "counter", 5]], ["Break"]],
+      ["Assign", "counter", ["Add", "counter", 1]]
+    ]
+  ],
+  "counter"
+]
+
+
+// ➔ 5
 ```
 
 </FunctionDefinition>
@@ -123,7 +145,9 @@ be determined, the expression holds unevaluated.
 
 `["When"]` is the AST head produced by **restriction-brace** syntax:
 `expr\{cond\}` parses to `["When", expr, cond]`. It is also useful directly
-for masking values where a predicate does not hold.
+for masking values where a predicate does not hold. The braces may be
+separated from the base expression by spacing commands
+(`(1-t)^2(1+2t)\ \{t\ge0\}\{t\le1\}` attaches both restrictions).
 
 ```json example
 ["When", ["Square", "x"], ["Greater", "x", 0]]
@@ -167,59 +191,42 @@ To exit the loop, a `["Break"]` or `["Return"]` expression must be evaluated.
 `Loop` with only a _body_ argument is equivalent to a `while(true)` in
 JavaScript or a `While[True, ...]` in Mathematica.
 
-<Signature name="Loop">_body_, _collection_</Signature>
-
-Iterates over the elements of `collection` and evaluates `body` with an implicit
-argument `_` whose value is the current element. The value of the `["Loop"]`
-expression is the value of the last iteration of the loop, or the value of the
-`["Break"]` expression if the loop was exited with a `["Break"]` expression.
-
-```json example
-["Loop", ["Print", ["Square", "_"]], ["Range", 5]]
-// ➔ 1 4 9 16 25
-["Loop", ["Function", ["Print", ["Square", "x"], "x"]], ["Range", 5]]
-// ➔ 1 4 9 16 25
-```
-
-`Loop` with a `body` and `collection` to iterate is equivalent to a `forEach()`
-in JavaScript. It is somewhat similar to a `Do[...]` in Mathematica.
-
 <Signature name="Loop">_body_, _element-1_, _element-2_, ...</Signature>
 
-Iterates over multiple `["Element", _name_, _collection_]` clauses, evaluating
-`body` once per combination and accumulating the results into an
-`indexed_collection`. This is the **list-comprehension** form of `Loop`.
+Iterates over one or more `["Element", _name_, _collection_]` clauses,
+evaluating `body` once per combination, **for effect**. The value of the
+`["Loop"]` expression is `Nothing` — unlike `Comprehension` (see below),
+`Loop` does not accumulate or return a list of results.
 
 Bindings are evaluated as nested loops, outermost = first `Element` clause.
 Later clauses see earlier bindings in scope, so a clause's collection can
-depend on a name bound by an earlier clause.
-
-When all clauses are independent, the result is the Cartesian product:
+depend on a name bound by an earlier clause (dependent collections work).
 
 ```json example
-["Loop",
-  ["Tuple", "x", "y"],
-  ["Element", "x", ["Range", 1, 2]],
-  ["Element", "y", ["Range", 1, 2]]]
-// ➔ [(1,1), (1,2), (2,1), (2,2)]  — 4 tuples
+["Loop", ["Print", ["Square", "_"]], ["Element", "_", ["Range", 5]]]
+// ➔ 1 4 9 16 25 (printed); the Loop expression evaluates to Nothing
 ```
 
-When a later clause depends on an earlier binding, the iteration follows
-the dependency (and the Cartesian product collapses):
+`Loop` with a `body` and a single `Element` clause is equivalent to a
+`forEach()` in JavaScript. It is somewhat similar to a `Do[...]` in
+Mathematica.
 
-```json example
-["Loop",
-  ["Tuple", "x", "y"],
-  ["Element", "x", ["Range", 1, 3]],
-  ["Element", "y", ["Range", 1, "x"]]]
-// ➔ [(1,1), (2,1), (2,2), (3,1), (3,2), (3,3)]  — 6 tuples (triangle)
-```
+Inside `body`:
+
+- `["Break"]`, optionally with a value, exits the loop immediately. The
+  value of the `["Loop"]` expression is the value of `Break`, or `Nothing`
+  if none was provided.
+- `["Continue"]` skips to the next iteration.
+- `["Return"]` exits the loop and propagates out of the enclosing
+  `["Function"]` expression.
 
 Bound names do not leak into the enclosing scope.
 
-The list-comprehension form of `Loop` is produced by trailing
-`\operatorname{for}` syntax (see **LaTeX Syntax for Control Structures**
-below).
+<ReadMore path="/compute-engine/reference/collections/#comprehension" >
+To build a **list** from a per-combination computation, use
+**`Comprehension`** instead (or **`Map`** / **`Filter`** for the
+single-collection case).<Icon name="chevron-right-bold" />
+</ReadMore>
 
 </FunctionDefinition>
 
@@ -297,6 +304,8 @@ expression as the return value.
 
 Parses to `["Loop", ["Power", "i", 2], ["Element", "i", ["Range", 1, 10]]]`.
 
+This is an imperative loop, evaluated for effect: its value is `Nothing`.
+
 ### `for` Comprehensions
 
 A trailing `for` clause produces a list comprehension:
@@ -308,7 +317,7 @@ A trailing `for` clause produces a list comprehension:
 Parses to:
 
 ```json
-["Loop",
+["Comprehension",
   ["Tuple", "x", "y"],
   ["Element", "x", ["Range", 1, 3]],
   ["Element", "y", ["Range", 1, "x"]]]
@@ -320,7 +329,9 @@ bindings are parsed as comma-separated `name = expr` pairs after it.
 
 Multiple bindings produce a Cartesian product (or a dependency-shaped
 iteration when later bindings reference earlier ones). See the
-`Loop` definition above for full semantics.
+`Comprehension` definition in the
+[**Collections**](/compute-engine/reference/collections/#comprehension)
+reference for full semantics.
 
 ### Restriction Braces
 
@@ -405,8 +416,11 @@ Read more about **functions**.
 
 <Signature name="Break">_value_</Signature>
 
-When in a loop exit the loop immediately. The final value of the loop is
-`value` or `Nothing` if not provided.
+`Break` is a registered operator. When in a loop, exit the loop immediately.
+The value of the enclosing `["Loop"]` expression becomes `value`, or
+`Nothing` if not provided.
+
+Outside a loop, `Break` is inert.
 
 </FunctionDefinition>
 
@@ -414,10 +428,10 @@ When in a loop exit the loop immediately. The final value of the loop is
 
 <Signature name="Continue"></Signature>
 
-<Signature name="Continue">_value_</Signature>
+`Continue` is a registered operator. When in a loop, skip to the next
+iteration of the loop. `Continue` takes no argument.
 
-When in a loop, skip to the next iteration of the loop. The value of the
-iteration is `value` or `Nothing` if not provided.
+Outside a loop, `Continue` is inert.
 
 </FunctionDefinition>
 

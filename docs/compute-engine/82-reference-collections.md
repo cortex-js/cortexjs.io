@@ -753,6 +753,35 @@ than `xs`, the iteration stops at the end of the mask.
 // ➔ ["List", 10, 30]
 ```
 
+#### Filtering with a Condition
+
+A boolean condition in index position filters the collection: relational
+operators (`<`, `<=`, `>`, `>=`, `=`, `!=`) broadcast elementwise over a list
+operand, producing the boolean mask that `At` then applies.
+
+<Latex value="L[L>0]"/>
+
+```js
+ce.assign("L", ce.parse("[-1, 2, -3, 4]"));
+ce.parse("L[L>0]").evaluate();
+// ➔ ["List", 2, 4]
+```
+
+The condition does not have to reference the filtered list itself — it can be
+another list of the same length (`L[d=4]` where `d` is a list), or a positional
+mask computed from a `Range`:
+
+```js
+// Remove the i-th element of L:
+ce.parse("L[|[1...\\operatorname{length}(L)]-i|>0]");
+// ➔ ["At", "L", ["Less", 0, ["Abs", ["Add", ["Negate", "i"], ["Range", 1, ["Length", "L"]]]]]]
+```
+
+The mask is applied positionally and truncates to the shorter of the
+collection and the mask. A comparison between **two** collections is not
+elementwise — `[1,2,3] = [1,2,3]` evaluates to `True` (whole-value equality);
+only a collection-versus-scalar comparison broadcasts.
+
 #### Subscript Notation
 
 When a symbol is declared as a collection type, subscripts in LaTeX are
@@ -1346,6 +1375,73 @@ Returns a collection where _f_ is applied to each element of _xs_.
 
 </FunctionDefinition>
 
+
+<nav className="hidden">
+### Comprehension
+</nav>
+
+<FunctionDefinition name="Comprehension">
+
+<Signature name="Comprehension" returns="list">_body_, _element-1_, _element-2_, ...</Signature>
+
+The **list-comprehension** operator. Evaluates `body` once for each
+combination of one or more `["Element", _name_, _collection_]` clauses and
+collects the results into a `List`.
+
+```json example
+["Comprehension", ["Square", "x"], ["Element", "x", ["Range", 1, 3]]]
+// ➔ ["List", 1, 4, 9]
+```
+
+`Comprehension(body, Element(x, xs))` is equivalent to
+`Map(xs, x ↦ body)`. `Comprehension` additionally supports multiple,
+possibly dependent, clauses.
+
+Bindings are evaluated as nested loops, outermost = first `Element` clause.
+Later clauses see earlier bindings in scope, so a clause's collection can
+depend on a name bound by an earlier clause.
+
+When all clauses are independent, the result is the Cartesian product:
+
+```json example
+["Comprehension",
+  ["Tuple", "x", "y"],
+  ["Element", "x", ["Range", 1, 2]],
+  ["Element", "y", ["Range", 1, 2]]]
+// ➔ [(1,1), (1,2), (2,1), (2,2)]  — 4 tuples
+```
+
+When a later clause depends on an earlier binding, the iteration follows
+the dependency (and the Cartesian product collapses):
+
+```json example
+["Comprehension",
+  ["Tuple", "x", "y"],
+  ["Element", "x", ["Range", 1, 3]],
+  ["Element", "y", ["Range", 1, "x"]]]
+// ➔ [(1,1), (2,1), (2,2), (3,1), (3,2), (3,3)]  — 6 tuples (triangle)
+```
+
+`Comprehension` is scope-hygienic: bound names do not leak into the
+enclosing scope.
+
+`Comprehension` is a **value expression**, not control flow: `Break`,
+`Continue` and `Return` inside `body` are not intercepted by
+`Comprehension`. To filter elements, use [`Filter`](#filter) or [`Map`](#map)
+instead.
+
+The trailing `\operatorname{for}` LaTeX syntax produces a `Comprehension`:
+
+```latex
+(x, y) \keyword{for} x = [1...3], y = [1...x]
+```
+
+<ReadMore path="/compute-engine/reference/control-structures/#loop" >
+See also the **`Loop`** function, which iterates for effect instead of
+collecting a result.<Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
 
 
 <nav className="hidden">

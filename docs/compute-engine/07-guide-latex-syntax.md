@@ -140,6 +140,7 @@ without prescribing a computation, so they evaluate to themselves.
 | `\angle ABC`      | `["Angle", "A", "B", "C"]` |
 | `\varangle ABC`   | `["Angle", "A", "B", "C"]` |
 | `\triangle ABC`   | `["Triangle", "A", "B", "C"]` |
+| `\operatorname{polygon}(A, B, \ldots)` | `["Polygon", "A", "B", …]` |
 | `\widehat{AB}`    | `["Arc", "A", "B"]` |
 
 ### Notation Changes
@@ -493,7 +494,8 @@ sections below.
 
 | Key | Description |
 | :--- | :--- |
-| `fractionalDigits` | The number of decimal places to use when formatting numbers. Use `"max"` to include all available digits and `"auto"` to use the same precision as for evaluation. Default is `"auto"`. |
+| `digits` | How many digits to display, and how they are counted. Use `"auto"` (round to the evaluation precision), `"max"` (all available digits), `{ significant: n }` (round to `n` significant figures), or `{ fractional: n }` (`n` digits after the decimal point). Default is `"auto"`. See [Significant Figures and Decimal Places](#significant-figures-and-decimal-places) below. |
+| `fractionalDigits` | **Deprecated — use `digits` instead.** The number of decimal places to use when formatting numbers. Use `"max"` to include all available digits and `"auto"` to use the same precision as for evaluation. Default is `"auto"`. A numeric value `n` is equivalent to `digits: { fractional: n }`. If both `digits` and `fractionalDigits` are provided, `digits` takes precedence. |
 | `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, `"engineering"`, or `"adaptiveScientific"`. The `"adaptiveScientific"` mode uses scientific notation but avoids exponents within the range specified by `avoidExponentsInRange`. Default is `"auto"`. |
 | `avoidExponentsInRange` | A tuple of two values representing a range of exponents. If the exponent for the number is within this range, a decimal notation is used. Otherwise, the number is displayed with an exponent. Default is `[-6, 20]`. |
 | `digitGroupSeparator` | The LaTeX string used to separate groups of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provided, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
@@ -560,6 +562,55 @@ console.log(ce.expr(123456.789).toLatex({
 }));
 // ➔ "1.234\,567\,89\times10^{5}"
 ```
+
+### Significant Figures and Decimal Places
+
+The `digits` option controls how many digits of a number are **displayed**. This
+is a formatting choice only — it does not change the stored value or the
+precision of computation.
+
+| Value | Description |
+| :--- | :--- |
+| `"auto"` | Round to the engine's evaluation precision (the default). |
+| `"max"` | Show all available digits, without rounding. |
+| `{ significant: n }` | Round to `n` significant figures. |
+| `{ fractional: n }` | Show `n` digits after the decimal point. |
+
+```live
+console.log(ce.parse("\\pi").N().toLatex({ digits: { significant: 3 } }));
+// ➔ "3.14"
+
+console.log(ce.parse("\\pi").N().toLatex({ digits: { fractional: 2 } }));
+// ➔ "3.14"
+
+console.log(ce.parse("2.71828").toLatex({ digits: { significant: 3 } }));
+// ➔ "2.72"
+```
+
+A few things to note:
+
+- **Rounding is independent of notation.** `digits` only decides which digits
+  survive; whether the result is shown in fixed or scientific notation is still
+  governed by `notation` and `avoidExponentsInRange`. For example, `1500` at two
+  significant figures stays `1500` in fixed notation (ambiguous by convention) —
+  set `notation: "scientific"` for an unambiguous `1.5 \cdot 10^{3}`.
+
+- **`{ significant: n }` does not round exact values.** Exact integers,
+  rationals, and radicals are displayed in full — only inexact (floating-point)
+  values are rounded to `n` significant figures. `{ fractional: n }` applies to
+  all values.
+
+```live
+console.log(ce.parse("123456").toLatex({ digits: { significant: 3 } }));
+// ➔ "123\,456"  (exact integer — displayed in full, not rounded; \, is the
+//                digit-group separator, rendered as a thin space)
+
+console.log(ce.parse("\\frac{1}{3}").toLatex({ digits: { significant: 3 } }));
+// ➔ "\frac{1}{3}"  (exact rational — displayed as a fraction)
+```
+
+The `digits` option is also available on `expr.toMathJson()` and (for the plain
+string form) is honored by `expr.toString()`.
 
 ### Customizing the Decimal Separator
 

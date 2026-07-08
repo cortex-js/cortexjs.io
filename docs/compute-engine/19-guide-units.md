@@ -337,6 +337,121 @@ console.log(evaluate('StandardGravity'));
 | `GasConstant`       | 8.314462618      | J/(mol K) |
 
 
+## Measurements and Uncertainty
+
+A **measurement** is a value with an associated uncertainty (error bar),
+written with `\pm`. It parses to a `Measurement` expression:
+
+```live
+console.log(ce.parse("5.1 \\pm 0.2").json);
+// ➔ ["Measurement", 5.1, 0.2]
+```
+
+The uncertainty **propagates through arithmetic** using standard independent,
+first-order (quadrature) error propagation:
+
+```live
+console.log(ce.parse("(5 \\pm 0.2)(3 \\pm 0.1)").N().toLatex());
+// ➔ 15.00 ± 0.78
+
+console.log(ce.parse("\\sqrt{4 \\pm 0.2}").N().toLatex());
+// ➔ 2.000 ± 0.050
+```
+
+Elementary functions propagate the error too (trigonometric functions respect
+the engine's [angular unit](#angular-units-and-trigonometry)):
+
+```live
+console.log(ce.parse("\\sin(1 \\pm 0.1)").N().toLatex());
+// ➔ 0.841 ± 0.054
+```
+
+### Measured Quantities
+
+A measurement can carry a unit. The parenthesized and bare forms are
+equivalent — a unit written on either operand of `\pm` scopes over the whole
+measurement:
+
+```live
+console.log(ce.parse("(5.1 \\pm 0.2)\\,\\mathrm{cm}").json);
+// ➔ ["Quantity", ["Measurement", 5.1, 0.2], "cm"]
+
+console.log(ce.parse("5.1 \\pm 0.2\\,\\mathrm{cm}").json);
+// ➔ ["Quantity", ["Measurement", 5.1, 0.2], "cm"]
+```
+
+To give the value and the error *different* units, write both explicitly
+(`5.1\,\mathrm{cm} \pm 2\,\mathrm{mm}`) — that form is kept as written and
+the error is converted during propagation.
+
+The uncertainty is carried through quantity arithmetic and unit conversion —
+including the unit scaling, so converting `cm` to `m` scales the error as well:
+
+```live
+console.log(ce.parse("(5 \\pm 0.2)\\,\\mathrm{cm} + (3 \\pm 0.1)\\,\\mathrm{cm}").N().toLatex());
+// ➔ (8.00 ± 0.22) cm
+
+console.log(
+  ce.box(["UnitConvert", ce.parse("(5.1 \\pm 0.2)\\,\\mathrm{cm}"), ce.parse("\\mathrm{m}")]).N().toLatex()
+);
+// ➔ (0.0510 ± 0.0020) m
+```
+
+:::info[Note]
+Bare `5.1 \pm 0.2\,\mathrm{cm}` (without parentheses) does **not** attach the
+unit to the whole measurement — `\pm` binds looser than unit juxtaposition, so
+it parses as `Measurement(5.1, 0.2\,\mathrm{cm})`. Use parentheses:
+`(5.1 \pm 0.2)\,\mathrm{cm}`.
+:::
+
+### Displaying Measurements
+
+By convention the uncertainty is shown to **two significant figures** and the
+value is rounded to the same decimal place, so the two are quoted at matching
+precision:
+
+```live
+console.log(ce.parse("5.134 \\pm 0.021").toLatex());
+// ➔ 5.134 ± 0.021
+
+console.log(ce.parse("8 \\pm 0.2236").toLatex());
+// ➔ 8.00 ± 0.22
+```
+
+Use the `digits` serialization option to change this — `{ significant: n }`
+sets the number of significant figures on the uncertainty, `{ fractional: n }`
+fixes the number of decimal places, and `"max"` shows the stored value in full.
+`.toMathJson()` is always lossless.
+
+```live
+console.log(ce.parse("5.134 \\pm 0.021").toLatex({ digits: { significant: 1 } }));
+// ➔ 5.13 ± 0.02
+```
+
+### Correctness and Limitations
+
+Error propagation is **independent** — it assumes the measurements being
+combined are uncorrelated. This is exact when each measured quantity appears
+**once** in an expression:
+
+- Combining **distinct** measurements — `A = L·W`, `F = m·a`, `\rho = m/V` — is
+  correct.
+- A single operation on one measurement — `x^2`, `\sqrt{x}` — is correct.
+
+It **over- or under-estimates** when the *same* measured variable is reused
+across an expression (`x·x` written out, `x - x`, `x/(x+1)`), because each
+occurrence is treated as independent. For the cases that reduce to a single
+occurrence, simplifying first recovers the correct result:
+
+```live
+ce.assign("x", ce.parse("5 \\pm 0.2"));
+console.log(ce.parse("x + x").simplify().N().toLatex());  // 2x  ➔ 10.00 ± 0.40
+```
+
+This is not a general fix (it cannot help `x/(x+1)`, and it is deliberately not
+applied automatically). Correlation-aware propagation is a planned future
+enhancement.
+
 ## Supported Units
 
 ### SI Base Units
