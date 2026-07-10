@@ -330,30 +330,59 @@ see [Unicode® Standard Annex #29](https://unicode.org/reports/tr29/).
 
 <FunctionDefinition name="BaseForm">
 
-<Signature name="BaseForm" returns="string">_value_:integer</Signature>
+<Signature name="BaseForm" returns="number">_value_:integer</Signature>
 
-<Signature name="BaseForm" returns="string">_value_:integer, _base_:integer</Signature>
+<Signature name="BaseForm" returns="number">_value_:integer, _base_:integer</Signature>
 
-Format an _integer_ in a specific _base_, such as hexadecimal or binary.
+Represent an _integer_ in a specific _base_, such as hexadecimal or binary.
 
-If no _base_ is specified, use base-10.
+If no _base_ is specified, use base-10. _base_ should be an integer from 2 to 36.
 
-The sign of _integer_ is ignored.
-
-- _value_ should be an integer.
-- _base_ should be an integer from 2 to 36.
+`BaseForm` evaluates to the numeric value it represents, so based numerals
+participate in arithmetic:
 
 ```json example
-["Latex", ["BaseForm", 42, 16]]
-
-// ➔ (\text(2a))_{16}
+["BaseForm", 23, 2]
+// ➔ 23
 ```
 
-```cortex
-Latex(BaseForm(42, 16))
-// ➔ (\text(2a))_{16}
-String(BaseForm(42, 16))
-// ➔ "'0x2a'"
+**Parsing.** A numeral with an integer-literal subscript base, e.g. `10111_2` or
+`2748_{16}`, parses to `BaseForm`, provided every digit is valid for the base
+(otherwise it stays an inert `Subscript`):
+
+```javascript
+ce.parse('10111_2').json;
+// ➔ ["BaseForm", 23, 2]
+
+ce.parse('1011_2 \\cdot 101_2').evaluate();
+// ➔ 55
+
+ce.parse('11_8 - 3_8 = 6_8').evaluate();
+// ➔ "True"
+
+ce.parse('19_2').json;
+// ➔ ["Subscript", 19, 2]  (9 is not a valid base-2 digit)
+```
+
+A **symbol** subscript base, e.g. `161_b`, parses to `BaseForm` of the digit
+polynomial in that base, so base equations can be solved symbolically:
+
+```javascript
+ce.parse('161_b').json;
+// ➔ ["BaseForm", ["Add", ["Power", "b", 2], ["Multiply", 6, "b"], 1], "b"]
+
+ce.parse('161_b + 134_b = 315_b').solve('b');
+// ➔ [0, 8]
+```
+
+**Serialization.** `BaseForm` round-trips through LaTeX as `value_{base}`:
+
+```javascript
+ce.box(['BaseForm', 23, 2]).latex;
+// ➔ "10111_{2}"
+
+ce.box(['BaseForm', 42, 16]).latex;
+// ➔ "\mathrm{2a}_{16}"
 ```
 
 </FunctionDefinition>

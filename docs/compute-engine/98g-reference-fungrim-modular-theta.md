@@ -987,7 +987,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{2})=(\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[4]{2}\sqrt{1+\sqrt{2}})/\sqrt{2}$$
+$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{2})=\sqrt{\frac{\sqrt{2}+1}{2}}\sqrt[4]{2}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
@@ -1455,7 +1455,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 7\imaginaryI)=(\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{(\sqrt{7+3\times7^{1/2}}+\sqrt{13+7^{1/2}})\sqrt[8]{28}})/\sqrt{14}$$
+$$\mathrm{JacobiTheta}(3, 0, 7\imaginaryI)=\sqrt{\frac{1}{14}((\sqrt{13+7^{1/2}}+\sqrt{7+3\times7^{1/2}})\sqrt[8]{28})}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 **Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.

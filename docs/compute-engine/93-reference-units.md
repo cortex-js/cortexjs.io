@@ -62,11 +62,15 @@ unit with the largest scale factor:
 // → ["Quantity", 1.12, "m"]
 ```
 
-`Multiply` and `Divide` combine units:
+`Multiply` and `Divide` combine units, cancelling common unit symbols
+structurally (a repeated unit cancels exactly, with no conversion factor):
 
 ```json example
 ["Multiply", ["Quantity", 5, "m"], ["Quantity", 3, "s"]]
 // → ["Quantity", 15, ["Multiply", "m", "s"]]
+
+["Divide", ["Quantity", 18, "in"], ["Quantity", 12, ["Divide", "in", "ft"]]]
+// → ["Quantity", 1.5, "ft"]
 ```
 
 `Power` raises the unit to the exponent:

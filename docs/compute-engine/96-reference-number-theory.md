@@ -211,6 +211,51 @@ Modular **congruence** is written $a \equiv b \pmod{n}$, which parses to `Congru
 
 Note that `\bmod` is the binary modulo operator ($a \bmod n$ parses to `Mod(a, n)`), distinct from the `\pmod{n}` congruence annotation. The `Congruent` operator is described in the [Arithmetic reference](/compute-engine/reference/arithmetic/#Congruent).
 
+### Reduction of Large Integers
+
+`Mod` and `Congruent` reduce integer-valued expressions in $ℤ/mℤ$ **without materializing** the (potentially astronomically large) intermediate value. Modular exponentiation, sums, products, negations, and factorial reduction are all handled, so an expression that would otherwise require a multi-million-digit integer reduces directly:
+
+```javascript
+ce.parse('2^{3^{20}} \\pmod{100}').evaluate();
+// ➔ 52
+
+ce.parse('2^{3^{20}} \\equiv 52 \\pmod{100}').evaluate();
+// ➔ "True"
+
+ce.parse('2 \\cdot 3^{5000000} \\pmod 7').evaluate();
+// ➔ 4
+```
+
+The floored-sign convention of `Mod` (the result follows the sign of the divisor) is preserved on this path.
+
+### Solving Congruences
+
+Passing a **linear congruence** to `solve` returns the parametric residue family with a fresh integer parameter $t ∈ ℤ$; an unsolvable congruence returns an empty result, and a gcd-divisible congruence is reduced:
+
+```javascript
+ce.parse('6n \\equiv 4 \\pmod 7').solve('n');
+// ➔ [7t + 3]
+
+ce.parse('2x \\equiv 1 \\pmod 4').solve('x');
+// ➔ []   (no solution)
+
+ce.parse('4x \\equiv 2 \\pmod 6').solve('x');
+// ➔ [3t + 2]
+```
+
+A **system of simultaneous congruences** in one unknown (an `And` of congruences) is combined via the Chinese Remainder Theorem — including non-coprime moduli — into a single family. An inconsistent system reports no solution.
+
+```javascript
+const sol = ce.box(['And',
+  ['Congruent', 'x', 2, 3],
+  ['Congruent', 'x', 3, 5],
+  ['Congruent', 'x', 2, 7]
+]).solve('x');
+// ➔ { x: 105t + 23 }
+```
+
+For a direct CRT computation from lists of residues and moduli, see [`ChineseRemainder`](#ChineseRemainder).
+
 
 <nav className="hidden">
 ### PrimeFactors
@@ -375,6 +420,28 @@ See also: [Modular exponentiation - Wikipedia](https://en.wikipedia.org/wiki/Mod
 ```json
 ["PowerMod", 2, 10, 1000]
 // ➔ 24
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### ModularInverse
+</nav>
+
+<FunctionDefinition name="ModularInverse">
+<Signature name="ModularInverse" returns="integer">a: integer, m: integer</Signature>
+Returns the modular multiplicative inverse of $a$ modulo $m$: the integer $x$ in $[0, m)$ with $a·x ≡ 1 \pmod m$.
+
+The inverse exists only when $a$ and $m$ are coprime; otherwise the expression stays symbolic.
+
+See also: [Modular multiplicative inverse - Wikipedia](https://en.wikipedia.org/wiki/Modular_multiplicative_inverse)
+
+```json
+["ModularInverse", 3, 7]
+// ➔ 5
+
+["ModularInverse", 4, 6]
+// ➔ ["ModularInverse", 4, 6]  (4 and 6 are not coprime)
 ```
 </FunctionDefinition>
 

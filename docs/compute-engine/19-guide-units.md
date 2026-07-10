@@ -112,6 +112,28 @@ console.log(parse('\\SI{5}{kg}'));
 console.log(parse('\\si{MHz}'));
 ```
 
+### English Unit Words
+
+Common measurement words spelled out in `\text{...}` — singular or plural, such
+as inches, feet, miles, gallons, pounds, minutes, hours, meters, liters, degrees
+— are normalized to their canonical unit symbols at the parse boundary,
+including inside compound units:
+
+```live
+console.log(parse('18 \\text{ inches}'));
+// → ["Quantity", 18, "in"]
+
+console.log(parse('7.5 \\text{ gallons/ft}^3'));
+// → ["Quantity", 7.5, ["Divide", "gal", ["Power", "ft", 3]]]
+```
+
+An exponent *outside* the text binds to the trailing unit factor, so
+`7.5 \text{ gallons/ft}^3` is gallons per **cubic** foot, not `(gal/ft)³`.
+
+Parsing is strictly gated: the whole text must resolve as a unit, so prose like
+`9\text{ to }80` is left untouched. There is no `ton(s)` alias — a US short ton
+is not the metric tonne `t`, and mapping it would be a silent ~10% error.
+
 ### Serialization
 
 Quantities serialize back to LaTeX with a thin space and upright unit:
@@ -151,6 +173,36 @@ console.log(evaluate(['Multiply', ['Quantity', 5, 'm'], ['Quantity', 3, 's']]));
 console.log(evaluate(['Divide', ['Quantity', 100, 'm'], ['Quantity', 10, 's']]));
 // → ["Quantity", 10, ["Divide", "m", "s"]]
 ```
+
+Compound units **cancel** structurally rather than accumulating. A repeated unit
+symbol cancels exactly, with no conversion factor introduced:
+
+```live
+console.log(evaluate(['Divide', ['Quantity', 18, 'in'], ['Quantity', 12, ['Divide', 'in', 'ft']]]));
+// → ["Quantity", 1.5, "ft"]
+
+console.log(evaluate(['Divide', ['Quantity', 6, 'm'], ['Quantity', 2, 'm']]));
+// → 3   (dimensionless)
+```
+
+Different units of the same dimension on opposite sides of a fraction bar are
+converted and folded into the magnitude, while products of same-dimension units
+are left as written:
+
+```live
+console.log(evaluate(['Divide',
+  ['Multiply', ['Quantity', 10, 'm'], ['Quantity', 1, 's']],
+  ['Quantity', 5, 'in']
+]));
+// → ["Quantity", 78.74015748031496, "s"]
+
+console.log(evaluate(['Multiply', ['Quantity', 2, 'in'], ['Quantity', 3, 'ft']]));
+// → ["Quantity", 6, ["Multiply", "ft", "in"]]
+```
+
+Simplification to a named derived SI unit still applies afterwards
+(`2 N · 3 m` → `["Quantity", 6, "J"]`). Cancellation works with
+uncertainty-carrying (measurement) magnitudes as well.
 
 Scalar multiplication works naturally:
 

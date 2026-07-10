@@ -428,6 +428,44 @@ The elements in a set are counted in constant time.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### IndexedSequence
+</nav>
+
+<FunctionDefinition name="IndexedSequence">
+
+<Signature name="IndexedSequence">_term_, _index_, _lower_</Signature>
+
+<Signature name="IndexedSequence">_term_, _index_, _lower_, _upper_</Signature>
+
+The **sequence-braces** notation $\{a_n\}_{n=1}^{\infty}$ parses to an
+`IndexedSequence`: the indexed family whose _term_ is $a_n$, with _index_ symbol
+`n` ranging from _lower_ (optionally up to _upper_).
+
+<Latex value="\{a_n\}_{n=1}^{\infty}"/>
+
+```json example
+["IndexedSequence", ["a_", "n"], "n", 1, "PositiveInfinity"]
+```
+
+The _term_ uses the operator-call form (`["a_", "n"]`) so that the index binding
+survives. A set-membership subscript maps the set's least element to the lower
+bound:
+
+```json example
+// \{a_n\}_{n\in\mathbb{N}}
+["IndexedSequence", ["a_", "n"], "n", 0]
+```
+
+`IndexedSequence` is currently **inert**: it is unchanged by `evaluate()` and
+`simplify()`, and round-trips through LaTeX (it does not yet carry collection
+semantics).
+
+Note that the bare braces $\{a_n\}$ remain a [`Set`](#Set), and the
+parenthesized form $(a_n)_{n\in\mathbb{N}}$ is unchanged.
+
+</FunctionDefinition>
+
 
 ## Creating Lazy Collections
 

@@ -287,6 +287,45 @@ Edge cases:
 </FunctionDefinition>
 
 
+### Interpreting Elliptical Notation
+
+<FunctionDefinition name="Interpret">
+
+<Signature name="Interpret">_expr_</Signature>
+
+Give formal meaning to an **elliptical** sum or product — one written with an
+ellipsis, such as $1 + 2 + \dots + n$ — by turning it into a `Sum` or
+`Product`. A sum or product containing an ellipsis is otherwise an inert
+notational object (see [Elliptical Notation](/compute-engine/guides/latex-syntax/#elliptical-notation)),
+returned unchanged by `evaluate()`.
+
+Interpretation is an explicit **opt-in**: a plain `evaluate()` never guesses.
+The recognizer handles arithmetic progressions, polynomial general terms (via
+finite differences), geometric patterns, and linear recurrences (via
+Berlekamp–Massey and `RSolve`). The gate is strict by design — an ambiguous or
+unproven pattern is returned unchanged rather than interpreted incorrectly.
+
+```json example
+["Interpret", ["Add", 1, 2, "ContinuationPlaceholder", "n"]]
+// ➔ ["Sum", "k", ["Limits", "k", 1, "n"]]
+
+["Interpret", ["Add", 1, 2, "ContinuationPlaceholder", 100]]
+// ➔ a Sum that evaluates to 5050
+
+["Interpret", ["Multiply", 2, 4, "ContinuationPlaceholder", ["Multiply", 2, "n"]]]
+// ➔ ["Product", ["Multiply", 2, "k"], ["Limits", "k", 1, "n"]]
+
+["Interpret", ["Add", 1, 1, 2, 3, 5, 8, "ContinuationPlaceholder", 55]]
+// ➔ ["Sum", ["Fibonacci", "k"], ["Limits", "k", 1, 10]]  (evaluates to 143)
+```
+
+<ReadMore path="/compute-engine/guides/sequences/#interpreting-elliptical-notation" >
+Read more about **interpreting elliptical notation** and the recognizer families <Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+
 ### Transcendental Functions
 
 <div className="symbols-table first-column-header">
@@ -737,9 +776,14 @@ Distribute multiplication over addition in `expr`.
 
 <FunctionDefinition name="PolynomialDegree">
 
+<Signature name="PolynomialDegree">_poly_</Signature>
+
 <Signature name="PolynomialDegree">_poly_, _var_</Signature>
 
 Return the degree of the polynomial `poly` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
 
 ```json example
 ["PolynomialDegree", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
@@ -750,9 +794,14 @@ Return the degree of the polynomial `poly` with respect to the variable `var`.
 
 <FunctionDefinition name="CoefficientList">
 
+<Signature name="CoefficientList">_poly_</Signature>
+
 <Signature name="CoefficientList">_poly_, _var_</Signature>
 
 Return the list of coefficients of the polynomial `poly` with respect to the variable `var`, ordered from highest to lowest degree.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
 
 ```json example
 ["CoefficientList", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], "x"]
@@ -835,9 +884,15 @@ $$\operatorname{Polynomial}(\operatorname{CoefficientList}(p, x), x) = p$$
 
 <FunctionDefinition name="PolynomialQuotient">
 
+<Signature name="PolynomialQuotient">_dividend_, _divisor_</Signature>
+
 <Signature name="PolynomialQuotient">_dividend_, _divisor_, _var_</Signature>
 
 Return the quotient of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
 
 ```json example
 ["PolynomialQuotient", ["Subtract", ["Power", "x", 3], 1], ["Subtract", "x", 1], "x"]
@@ -850,9 +905,15 @@ This represents $$ \frac{x^3 - 1}{x - 1} = x^2 + x + 1 $$.
 
 <FunctionDefinition name="PolynomialRemainder">
 
+<Signature name="PolynomialRemainder">_dividend_, _divisor_</Signature>
+
 <Signature name="PolynomialRemainder">_dividend_, _divisor_, _var_</Signature>
 
 Return the remainder of the polynomial division of `dividend` by `divisor` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
 
 ```json example
 ["PolynomialRemainder", ["Add", ["Power", "x", 3], ["Multiply", 2, "x"], 1], ["Add", "x", 1], "x"]
@@ -898,9 +959,15 @@ Use `PolynomialGCD` with an explicit variable when you want the coprime
 
 <FunctionDefinition name="PolynomialGCD">
 
+<Signature name="PolynomialGCD">_a_, _b_</Signature>
+
 <Signature name="PolynomialGCD">_a_, _b_, _var_</Signature>
 
 Return the greatest common divisor of two polynomials `a` and `b` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of the
+operands, or to `x` when there are several free variables and one of them is
+`x`.
 
 ```json example
 ["PolynomialGCD", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1], "x"]
@@ -913,9 +980,14 @@ This represents $$ \gcd(x^2 - 1, x - 1) = x - 1 $$.
 
 <FunctionDefinition name="Cancel">
 
+<Signature name="Cancel">_expr_</Signature>
+
 <Signature name="Cancel">_expr_, _var_</Signature>
 
 Cancel common polynomial factors in the numerator and denominator of the rational expression `expr` with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `expr`, or
+to `x` when there are several free variables and one of them is `x`.
 
 ```json example
 ["Cancel", ["Divide", ["Subtract", ["Power", "x", 2], 1], ["Subtract", "x", 1]], "x"]
@@ -928,9 +1000,15 @@ This represents $$ \frac{x^2 - 1}{x - 1} = x + 1 $$ after canceling the common f
 
 <FunctionDefinition name="PartialFraction">
 
+<Signature name="PartialFraction">_expr_</Signature>
+
 <Signature name="PartialFraction">_expr_, _var_</Signature>
 
 Decompose a rational expression into a sum of simpler fractions (partial fractions) with respect to the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `expr`, or
+to `x` when there are several free variables and one of them is `x` — so a
+pipeline such as `expr |> Apart` works without naming the variable.
 
 Supports:
 - **Distinct linear factors**: $ \frac{1}{(x+1)(x+2)} \to \frac{1}{x+1} - \frac{1}{x+2} $
@@ -949,6 +1027,8 @@ Returns the expression unchanged if it is not a rational expression in `var`, or
 
 <FunctionDefinition name="Apart">
 
+<Signature name="Apart">_expr_</Signature>
+
 <Signature name="Apart">_expr_, _var_</Signature>
 
 Alias for `PartialFraction`. Decompose a rational expression into partial fractions.
@@ -957,9 +1037,14 @@ Alias for `PartialFraction`. Decompose a rational expression into partial fracti
 
 <FunctionDefinition name="PolynomialRoots">
 
+<Signature name="PolynomialRoots">_poly_</Signature>
+
 <Signature name="PolynomialRoots">_poly_, _var_</Signature>
 
 Return the roots of the polynomial `poly` with respect to the variable `var` as a set.
+
+When `var` is omitted, it defaults to the single free variable of `poly`, or
+to `x` when there are several free variables and one of them is `x`.
 
 Returns `undefined` if the expression is not a polynomial or no roots can be found. Supports polynomials up to degree 4 with rational roots, and degree 2 with irrational roots.
 
@@ -971,6 +1056,8 @@ Returns `undefined` if the expression is not a polynomial or no roots can be fou
 </FunctionDefinition>
 
 <FunctionDefinition name="Discriminant">
+
+<Signature name="Discriminant">_poly_</Signature>
 
 <Signature name="Discriminant">_poly_, _var_</Signature>
 

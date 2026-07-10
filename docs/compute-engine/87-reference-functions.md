@@ -346,5 +346,29 @@ argument on the left or right respectively.
 ["Apply", "f", ["Apply", "g", "x"]]
 ```
 
+The right-pointing form is a **pipeline operator**: `\rhd` (also
+`\triangleright`, `\vartriangleright`, `⊳`, or the plain-text shortcut `|>`)
+feeds the expression on its left to the function on its right, and stages
+chain left to right.
+
+A `\square` topic marker in the right-hand side names the position the piped
+value fills, so a stage can be a multi-argument call:
+
+<Latex value="x^2 = 4 \rhd \operatorname{Solve}(\square, x)"/>
+
+```json example
+["Solve", ["Equal", ["Power", "x", 2], 4], "x"]
+```
+
+A bare function command such as `\ln`, `\lb` or `\sqrt` acts as a function
+reference (`12 \rhd \ln` is `ln(12)`), and the prefix form (`\rhd f`, with no
+left-hand side) denotes the anonymous unary function that applies `f` to its
+argument.
+
+Operators whose unknown/variable argument is inferable — `Solve`, `D`,
+`Series`, and the polynomial operators such as `Apart` — may be piped into
+without naming the variable: `x^2 = 4 \rhd \operatorname{Solve}` solves for
+`x`.
+
 </FunctionDefinition>
 

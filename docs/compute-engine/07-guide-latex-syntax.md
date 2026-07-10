@@ -108,8 +108,8 @@ semantic representation as an expression ready to be processed.
 | :--- | :--- |
 | <big>$$ \sin 3t + \cos 2t $$ </big><br/>`\sin 3t + \cos 2t`     | `["Add", ["Sin", ["Multiply", 3, "t"]], ["Cos", ["Multiply", 2, "t"]]]` |
 | <big>$$ \int \frac{dx}{x} $$</big><br/>`\int \frac{dx}{x}`     | `["Integrate", ["Divide", 1, "x"], "x"]`                                |
-| <big>$$ 123.4(567) $$ </big><br/>`123.4(567)` | `123.4(567)`   |
-| <big>$$ 123.4\overline{567} $$ </big><br/>`123.4\overline{567}` | `123.4(567)`  |
+| <big>$$ 123.4(567) $$ </big><br/>`123.4(567)` | `["Rational", 45679, 370]`   |
+| <big>$$ 123.4\overline{567} $$ </big><br/>`123.4\overline{567}` | `["Rational", 45679, 370]`  |
 | <big>$$ \vert a+\vert b\vert+c\vert $$ </big><br/>`\|a+\|b\|+c\| `   | `["Abs", ["Add", "a", ["Abs", "b"], "c"]]` |
 | <big>$$ \vert\vert a\vert\vert+\vert b\vert $$ </big><br/>`\|\|a\|\|+\|b\|`   | `["Add", ["Norm", "a"], ["Abs", "b"]]` |
 
@@ -162,6 +162,91 @@ ce.parse("x \\rightarrow y").json;
 ce.parse("P \\implies Q").json;
 // ➔ ["Implies", "P", "Q"]
 ```
+
+### Based Numerals
+
+A numeral with an **integer-literal subscript base**, e.g. `10111_2` or
+`2748_{16}`, parses to a numeric [`BaseForm`](/compute-engine/reference/strings/#BaseForm),
+so arithmetic on based numerals works:
+
+```javascript
+ce.parse("10111_2").json;
+// ➔ ["BaseForm", 23, 2]
+
+ce.parse("1011_2 \\cdot 101_2").evaluate();
+// ➔ 55
+```
+
+The guard is strict: every digit must be valid for the base (`19_2` stays an
+inert `Subscript`), and a subscripted symbol (`x_2`) is unchanged. A **symbol**
+subscript base (e.g. `161_b`) parses to `BaseForm` of the digit polynomial in
+that base, so base equations solve symbolically. See
+[`BaseForm`](/compute-engine/reference/strings/#BaseForm) for details.
+
+### Repeating Decimals
+
+A repeating-decimal literal — vinculum (`0.\overline{3}`), dots
+(`0.\overset{.}{1}4285\overset{.}{7}`), parenthetical (`1.54(2345)`), or arc
+(`0.\wideparen{142857}`) notation — boxes directly to the exact `Rational` it
+represents:
+
+```javascript
+ce.parse("0.\\overline{3}").json;
+// ➔ ["Rational", 1, 3]
+
+ce.parse("1.54(2345)").json;
+// ➔ ["Rational", 1542191, 999900]
+```
+
+The MathJSON shorthand `{num: "0.(3)"}` is handled the same way.
+
+### Elliptical Notation
+
+An `Add` or `Multiply` written with an **ellipsis** (`\dots`, which parses to the
+`ContinuationPlaceholder` symbol) is a notational pattern, not an arithmetic one.
+It keeps its operands in source order, and `evaluate()`, `N()`, and `simplify()`
+return it unchanged — no numeric terms are folded across the ellipsis:
+
+```javascript
+ce.parse("1 + 2 + \\dots + n").json;
+// ➔ ["Add", 1, 2, "ContinuationPlaceholder", "n"]
+
+ce.parse("2 \\cdot 4 \\cdot \\dots \\cdot 2n").json;
+// ➔ ["Multiply", 2, 4, "ContinuationPlaceholder", ["Multiply", 2, "n"]]
+```
+
+Subtraction-spelled ellipses (`1 - 2 + 4 - \dots + x`) stay inert too, and such
+products round-trip through LaTeX (an explicit `\times` is emitted around the
+ellipsis). To turn elliptical notation into a formal `Sum` or `Product`, use the
+[`Interpret`](/compute-engine/reference/arithmetic/#Interpret) operator. A
+sequence written with braces, `\{a_n\}_{n=1}^{\infty}`, parses to the inert
+[`IndexedSequence`](/compute-engine/reference/collections/#IndexedSequence) head.
+
+### Notation Recoveries
+
+The parser applies maximum effort to recover common notation that would
+otherwise error:
+
+| LaTeX | MathJSON | Note |
+| :--- | :--- | :--- |
+| `13^{\text{th}}` | `13` | Ordinal superscripts (`st`/`nd`/`rd`/`th`) devolve to the base number |
+| `x^{}`, `x_{}`, `\alpha_{}` | `x`, `x`, `alpha` | Empty scripts are dropped |
+| `1{,}000` | `1000` | The `{,}` thin-separator thousands idiom (between digits) |
+| `\cancel{x}`, `\bcancel{x}`, `\xcancel{x}` | `x` | Unwrap to their body |
+| `\cancelto{4}{72}` | `4` | Parses to the replacement value |
+| `d \not= 0` | `["NotEqual", "d", 0]` | `\not`-prefixed relations compose into the negated relation |
+| `a \not\in B` | `["NotElement", "a", "B"]` | |
+| `a \not\le b` | `["Not", ["LessEqual", "a", "b"]]` | Relations without a dedicated negated head wrap in `Not(…)` |
+| `\pmod{7}` | `["Mod", …, 7]` | Standalone `\pmod` places the modulus as the second argument of `Mod` |
+| `\sin a'` | `["Sin", ["Prime", "a"]]` | Primed variables type-check as arguments |
+
+`\not\equiv` (optionally with a trailing `\pmod n`) negates a congruence, and a
+chain of congruence steps such as
+`3^{27}\equiv 3^7\pmod{100}\equiv 87\pmod{100}` folds into a conjunction of the
+adjacent steps.
+
+Note that when a European `decimalSeparator: '{,}'` is configured, that
+convention takes precedence, so `3{,}14` parses as `3.14` in that mode.
 
 ## Serializing to LaTeX
 
@@ -424,7 +509,7 @@ parsing as for serialization.
 | Key | Description |
 | :--- | :--- |
 | `skipSpace` | If `true`, ignore space characters in a math zone. Default is `true`. |
-| `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: if the number includes repeating digits (e.g. `1.33(333)`), it will be parsed as a decimal number even if this setting is `"rational"`. **Default**: `"auto"`|
+| `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: a repeating-decimal literal (e.g. `1.33(333)` or `0.\overline{3}`) always boxes to the exact `Rational` it represents, regardless of this setting. **Default**: `"auto"`|
 | `preserveLatex` | If `true`, the expression will be decorated with the LaTeX fragments corresponding to each element of the expression. The top-level expression, that is the one returned by `parse()`, will include the verbatim LaTeX input that was parsed. The sub-expressions may contain a slightly different LaTeX, for example with consecutive spaces replaced by one, with comments removed, and with some low-level LaTeX commands replaced, for example `\egroup` and `\bgroup`. **Default:** `false` |
 
 ```js

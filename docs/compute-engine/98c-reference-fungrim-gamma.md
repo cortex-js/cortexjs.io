@@ -66,7 +66,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi})$$
+$$\mathrm{BarnesG}(1-x)=(-1)^{\lfloor\frac{x-1}{2}\rfloor+1}\mathrm{BarnesG}(1+x)\frac{\vert\sin(\pi x)\vert}{\pi}^{x}\exp(\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi})$$
 
 **Holds when** $x\in\R\land x\notin-\infty..-1$.
 **Symbols:** **BarnesG** — Barnes G-function.
@@ -123,7 +123,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi z)))&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\mathrm{PolyLog}(2, \exp(-2\imaginaryI\pi z)))/\pi)&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{1}{\pi}((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(2\imaginaryI\pi z)))&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-((1/2\imaginaryI)\operatorname{Li}_{2}(\exp(-2\imaginaryI\pi z)))/\pi)&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
 
 **Holds when** $z\in\C\land z\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -223,7 +223,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\mathrm{PolyLog}(2, \exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
+$$\mathrm{LogBarnesG}(1-x)=\mathrm{LogBarnesG}(1+x)+x\ln(\frac{\vert\sin(\pi x)\vert}{\pi})+\frac{\Im(\operatorname{Li}_{2}(\exp(2\imaginaryI\pi x)))}{2\pi}+\frac{1}{2}(\mathrm{sgn}(x)\lfloor x\rfloor(\lfloor x\rfloor+1)\pi\imaginaryI)$$
 
 **Holds when** $x\in\R\land x\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.

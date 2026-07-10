@@ -398,6 +398,8 @@ in order to reduce, simplify and calculate its value.
 </nav>
 <FunctionDefinition name="Solve">
 
+<Signature name="Solve">_equation_</Signature>
+
 <Signature name="Solve">_equation_, _unknown_</Signature>
 
 <Signature name="Solve">_equation_, _spec-1_, _spec-2_, ...</Signature>
@@ -407,6 +409,11 @@ Return a list of the solutions of _equation_ for the given unknowns.
 The _equation_ is an `Equal` expression, or a bare expression that is solved as
 if it were equal to zero. Any boolean condition (an inequality, a congruence…)
 also works when a domain is given (see below).
+
+When no unknown is given, it defaults to the single free variable of the
+equation, or to `x` when the equation has several free variables and one of
+them is `x`. This makes point-free forms such as `x^2 = 4 \rhd
+\operatorname{Solve}` work without naming the unknown.
 
 Each _spec_ describes one unknown, and is either:
 

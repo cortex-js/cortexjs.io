@@ -1752,7 +1752,8 @@ Options for `Expression.simplify()`
 ```ts
 type ExplainOptions = SimplifyOptions & {
   verbosity: ExplainVerbosity;
-  variable: string;
+  variable: string | string[];
+  order: number;
 };
 ```
 
@@ -1764,7 +1765,13 @@ matches `simplify(options)`):
 
 - `verbosity`: `'default'` returns the curated step chain (bookkeeping
   steps filtered out); `'all'` returns the raw, uncurated chain.
-- `variable`: the unknown, for the `'solve'` and `'D'` operations.
+- `variable`: the unknown, for the `'solve'` and `'D'` operations. For a
+  system of equations (`explain('solve')` on a `List`/`And`), pass the
+  unknowns as an array, in order.
+- `order`: for the `'D'` operation only, the order of the derivative to
+  explain (the n-th derivative with respect to `variable`). Defaults to `1`.
+  Ignored when the receiver is already a `D(…)` expression (which encodes
+  its own differentiation sequence).
 
 </MemberCard>
 

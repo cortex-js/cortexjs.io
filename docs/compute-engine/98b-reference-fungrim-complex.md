@@ -228,7 +228,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyLog}(2, \imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}$$
+$$\operatorname{Li}_{2}(\imaginaryI)=G\imaginaryI-\frac{\pi^2}{48}$$
 
 Used by the Compute Engine for simplification.
 [`208da7` · Fungrim entry ↗](https://fungrim.org/entry/208da7)

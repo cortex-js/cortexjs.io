@@ -137,10 +137,15 @@ The `ND` function is used to calculate a numerical approximation of the derivati
 
 <FunctionDefinition name="D">
 
+<Signature name="D" returns="(number -> number)">_f_: number -> number</Signature>
+
 <Signature name="D" returns="(number -> number)">_f_: number -> number, _var_: symbol</Signature>
 
 The `D` function represents the partial derivative of a function `f` with respect to
 the variable `var`.
+
+When `var` is omitted, it defaults to the single free variable of `f`, or to
+`x` when `f` has several free variables and one of them is `x`.
 
 :::info[Note on LaTeX Notation]
 The LaTeX notation `D(f, x)` does **not** parse as a derivative. Since `D(f, x)` is
@@ -722,10 +727,15 @@ can be simplified, compiled, and plotted), use the `Normal` function.
 
 <FunctionDefinition name="Series">
 
+<Signature name="Series" returns="expression">_f_: expression</Signature>
+
 <Signature name="Series" returns="expression">_f_: expression, _x_: symbol</Signature>
 
 Expand _f_ as a Taylor series in the variable _x_ about $x_0 = 0$, up to and
 including the power $x^5$ (the default order).
+
+When _x_ is omitted, it defaults to the single free variable of _f_, or to
+`x` when there are several free variables and one of them is `x`.
 
 The result is an `Add` of the truncated terms plus an inert
 `["BigO", ...]` remainder.

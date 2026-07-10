@@ -308,6 +308,79 @@ ce.clearSequenceCache('F');
 ce.clearSequenceCache();
 ```
 
+## Interpreting Elliptical Notation
+
+Mathematical writing routinely uses an ellipsis to abbreviate a sum or product:
+$$1 + 2 + \dots + n$$ or $$2 \cdot 4 \cdot \dots \cdot 2n$$. The Compute Engine
+parses such expressions faithfully but does **not** guess what they mean: a
+sum or product containing an ellipsis is an inert notational object (see
+[Elliptical Notation](/compute-engine/guides/latex-syntax/#elliptical-notation)),
+returned unchanged by `evaluate()`.
+
+The `Interpret` operator turns that notation into a formal `Sum` or `Product`:
+
+```javascript
+ce.parse('\\operatorname{Interpret}(1 + 2 + \\dots + n)').evaluate();
+// ➔ \sum_{k=1}^{n} k
+
+ce.parse('\\operatorname{Interpret}(2 \\cdot 4 \\cdot \\dots \\cdot 2n)').evaluate();
+// ➔ \prod_{k=1}^{n} 2k
+
+// A numeric anchor resolves to a concrete bound
+ce.parse('\\operatorname{Interpret}(1 + 2 + \\dots + 100)').evaluate().N();
+// ➔ 5050
+```
+
+Interpretation is an explicit **opt-in**: a plain `evaluate()` never guesses. The
+gate is deliberately strict — an ambiguous or unproven pattern is returned
+unchanged rather than interpreted incorrectly.
+
+### Recognizers
+
+`Interpret` tries a series of recognizers, in order, against the sample terms
+before the ellipsis and the single anchor after it:
+
+- **Arithmetic progression** — the samples share a constant difference
+  $d \neq 0$. The general term is $t(k) = s_1 + (k-1)d$. The anchor must place
+  the upper bound on an integer, so `1 + 3 + \dots + 2n` (whose even anchor does
+  not belong to the odd progression) stays inert.
+- **Polynomial** — successive finite differences identify a polynomial general
+  term:
+
+  ```javascript
+  ce.parse('\\operatorname{Interpret}(1 + 4 + 9 + 16 + \\dots + n^2)').evaluate();
+  // ➔ \sum_{k=1}^{n} k^2
+
+  ce.parse('\\operatorname{Interpret}(1 + 4 + 9 + \\dots + 100)').evaluate().N();
+  // ➔ 385
+  ```
+
+- **Geometric** — the samples share a constant exact ratio $r$:
+
+  ```javascript
+  ce.parse('\\operatorname{Interpret}(1 + 2 + 4 + \\dots + 2^n)').evaluate();
+  // ➔ \sum_{k=1}^{n+1} 2^{k-1}
+  ```
+
+- **Linear recurrence** — a Berlekamp–Massey pass finds the minimal
+  constant-coefficient recurrence (order $\geq 2$) behind the samples, obtains a
+  verified closed form through `RSolve`, and resolves a numeric anchor by
+  iterating the recurrence exactly:
+
+  ```javascript
+  ce.parse('\\operatorname{Interpret}(1 + 1 + 2 + 3 + 5 + 8 + \\dots + 55)').evaluate();
+  // ➔ \sum_{k=1}^{10} \operatorname{Fibonacci}(k)   (evaluates to 143)
+  ```
+
+Each recognizer applies an **evidence discipline** that guards against
+overfitting: a degree-$g$ polynomial needs its constant difference row witnessed
+twice (or one fewer sample when the anchor structurally confirms the term), and
+an order-$L$ recurrence needs $2L+1$ samples (or $2L$ with a confirming anchor).
+Because three samples fit *any* quadratic, `1 + 2 + 4 + \dots + m` stays
+untouched; primes and factorials likewise. A candidate closed form is verified
+against every sample before it is trusted. Anything the gate cannot prove is
+returned unchanged.
+
 ## OEIS Integration
 
 The Compute Engine can look up sequences in the

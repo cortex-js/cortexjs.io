@@ -255,7 +255,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyLog}(s, z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((-1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
+$$\operatorname{Li}_{s}(z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((-1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
 
 **Holds when** $s\in\C\land z\in\C\land z\notin\lbrace0, 1\rbrace\land s\notin\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.

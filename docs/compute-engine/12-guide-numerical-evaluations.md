@@ -79,6 +79,17 @@ console.log(ce.parse("\\cos 60").N());
 // ➔ 0.5
 ```
 
+The angular unit applies to the trigonometric functions (`Sin`…`Csc`,
+`Haversine`), whose argument is an angle, and to the inverse trigonometric
+functions (`Arcsin`…`Arccsc`, `Arctan2`, `InverseHaversine`), whose result is
+an angle — in degree mode `\arcsin(1)` evaluates to the exact value `90`.
+Hyperbolic functions and their inverses are **not** affected: their argument
+is a dimensionless number, not an angle.
+
+Compiled functions honor the angular unit as well: with
+`ce.angularUnit = "deg"`, `ce.compile("\\sin(x)")` returns a function that
+interprets `x` in degrees, matching `evaluate()`.
+
 ## JavaScript Interoperability
 
 The result of `expr.evaluate()` and `expr.N()` is a expression. 

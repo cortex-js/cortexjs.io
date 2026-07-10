@@ -5,7 +5,7 @@ slug: /compute-engine/reference/fungrim-elementary/
 
 # Elementary functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **205 identities** for elementary functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **208 identities** for elementary functions.
 
 :::info[Generated reference]
 This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
@@ -16,7 +16,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 - [Exponential function](#exponential-function) (16)
 - [Golden ratio](#golden-ratio) (5)
 - [Inverse tangent](#inverse-tangent) (44)
-- [Lambert W-function](#lambert-w-function) (8)
+- [Lambert W-function](#lambert-w-function) (11)
 - [Natural logarithm](#natural-logarithm) (11)
 - [Pi](#pi) (4)
 - [Powers](#powers) (8)
@@ -585,6 +585,13 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\operatorname{W}_{-1}(-(\frac{1}{\exponentialE}))=-1$$
+
+Used by the Compute Engine for simplification.
+[`d09380` · Fungrim entry ↗](https://fungrim.org/entry/d09380)
+
+---
+
 $$\mathrm{LambertWPuiseuxCoefficient}(k)=\frac{(k-1)(2\mathrm{LambertWPuiseuxCoefficient}(k-2)+\begin{cases}2&k-2=0\\-1&k-2=1\\\sum_{j=2}^{k-3}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}(-j+k-1)&\top\end{cases})}{4(k+1)}-\frac{1}{2}(\begin{cases}2&k=0\\-1&k=1\\\sum_{j=2}^{k-1}\mathrm{LambertWPuiseuxCoefficient}(j)\mathrm{LambertWPuiseuxCoefficient}((k+1)-j)&\top\end{cases})-\frac{\mathrm{LambertWPuiseuxCoefficient}(k-1)}{k+1}$$
 
 **Holds when** $k\in2..\infty$.
@@ -598,6 +605,22 @@ $$\operatorname{W}(-(\frac{\pi}{2}))=\frac{\imaginaryI\pi}{2}$$
 
 Used by the Compute Engine for simplification.
 [`e1dd64` · Fungrim entry ↗](https://fungrim.org/entry/e1dd64)
+
+---
+
+$$\operatorname{W}_{-1}(x\exponentialE^{x})=x$$
+
+**Holds when** $x\in\lparen-\infty, -1\rbrack$.
+Used by the Compute Engine for simplification and equation solving.
+[`ed7dac` · Fungrim entry ↗](https://fungrim.org/entry/ed7dac)
+
+---
+
+$$\operatorname{W}_{k}(0)=-\infty$$
+
+**Holds when** $k\in\Z\setminus\lbrace0\rbrace$.
+Used by the Compute Engine for simplification.
+[`f372e9` · Fungrim entry ↗](https://fungrim.org/entry/f372e9)
 
 ---
 

@@ -227,6 +227,10 @@ the following differences:
 { "num": "0.(142857)e7" }
 ```
 
+  A repeating-decimal number boxes to the exact `["Rational", …]` it represents
+  (for example `{ "num": "0.(3)" }` boxes to `["Rational", 1, 3]`), rather than
+  a truncated decimal float.
+
 - The following characters in a string representing a number are ignored:
 
 <div className="symbols-table first-column-header" style={{'--first-col-width': '9ch'}}>
