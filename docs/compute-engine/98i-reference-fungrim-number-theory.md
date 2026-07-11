@@ -8,7 +8,7 @@ slug: /compute-engine/reference/fungrim-number-theory/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **70 identities** for number theory.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -244,7 +244,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Count}(\lbrace k, k\in1..n\in\gcd(n, k)=1\rbrace)=\mathrm{Totient}(n)$$
+$$\mathrm{Count}(\mathrm{Filter}(1..n, k\mapsto\gcd(n, k)=1))=\mathrm{Totient}(n)$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -252,7 +252,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a, b)=\min(\lbrace m, m\in\N^*\in((a\mid m)\land(b\mid m))\rbrace)$$
+$$\lcm(a, b)=\min(\mathrm{Filter}(\N^*, m\mapsto(a\mid m)\land(b\mid m)))$$
 
 **Holds when** $a\in\Z\setminus\lbrace0\rbrace\land b\in\Z\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -473,10 +473,9 @@ Used by the Compute Engine for simplification.
 
 ## Prime numbers
 
-$$\mathrm{PrimePi}(x)=\mathrm{Count}(\lbrace p, p\in\mathrm{Primes}\in(p\le x)\rbrace)$$
+$$\mathrm{PrimePi}(x)=\mathrm{Count}(\mathrm{Filter}(\mathrm{Primes}, p\mapsto p\le x))$$
 
 **Holds when** $x\in\R$.
-**Symbols:** **PrimePi** — Prime counting function.
 Used by the Compute Engine for simplification.
 [`04427b` · Fungrim entry ↗](https://fungrim.org/entry/04427b)
 

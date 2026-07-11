@@ -8,7 +8,7 @@ slug: /compute-engine/reference/fungrim-elliptic-integrals/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **304 identities** for elliptic integrals.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -23,7 +23,6 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 $$\mathrm{AGM}(0, b)=0$$
 
 **Holds when** $b\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`08329d` · Fungrim entry ↗](https://fungrim.org/entry/08329d)
 
@@ -31,7 +30,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(1, \sqrt{2})=\frac{2\sqrt{2}\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`0d9352` · Fungrim entry ↗](https://fungrim.org/entry/0d9352)
 
@@ -40,7 +38,6 @@ Used by the Compute Engine for simplification.
 $$a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)=\frac{(\pi a-2\mathrm{AGM}(a, b)\mathrm{EllipticE}((a-b)/(a+b)^2))\mathrm{AGM}(a, b)}{\pi a(a-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
-**Symbols:** **AGM** — Arithmetic-geometric mean; **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/09.54.20.0001.01)
 [`20828c` · Fungrim entry ↗](https://fungrim.org/entry/20828c)
@@ -50,7 +47,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(z)=\mathrm{AGM}(1, z)=\mathrm{AGM}(z, 1)$$
 
 **Holds when** $z\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for expansion.
 [`21f412` · Fungrim entry ↗](https://fungrim.org/entry/21f412)
 
@@ -59,7 +55,6 @@ Used by the Compute Engine for expansion.
 $$\ln(\frac{1}{q})=(\pi)(\mathrm{AGM}(\mathrm{JacobiThetaQ}(2, 0, q)^2, \mathrm{JacobiThetaQ}(3, 0, q)^2))^{-1}$$
 
 **Holds when** $q\in\lparen0, 1\rparen$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`26fd1b` · Fungrim entry ↗](https://fungrim.org/entry/26fd1b)
 
@@ -67,7 +62,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(1, 3+2\sqrt{2})=\frac{2(2+\sqrt{2})\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`361801` · Fungrim entry ↗](https://fungrim.org/entry/361801)
 
@@ -76,7 +70,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, -a)=0$$
 
 **Holds when** $a\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`3e1398` · Fungrim entry ↗](https://fungrim.org/entry/3e1398)
 
@@ -85,7 +78,7 @@ Used by the Compute Engine for simplification.
 $$x\mapsto\mathrm{AGM}(1, x)^{\prime}(1)=\frac{n!\mathrm{SloaneA}(60\,691, n)\times(-1)^{n}}{8^{n}}$$
 
 **Holds when** $n\in\N$.
-**Symbols:** **AGM** — Arithmetic-geometric mean; **SloaneA** — Sequence X in Sloane's OEIS.
+**Symbols:** **SloaneA** — Sequence X in Sloane's OEIS.
 Used by the Compute Engine for expansion.
 [`447541` · Fungrim entry ↗](https://fungrim.org/entry/447541)
 
@@ -94,7 +87,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{AGM}(1, b)=\frac{1}{2}((b+1)\mathrm{AGM}(1, \frac{2b^{1/2}}{b+1}))$$
 
 **Holds when** $b\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`46c021` · Fungrim entry ↗](https://fungrim.org/entry/46c021)
 
@@ -102,7 +94,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(1, -\imaginaryI)=\frac{\sqrt{2}(1-\imaginaryI)\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`5174ea` · Fungrim entry ↗](https://fungrim.org/entry/5174ea)
 
@@ -111,7 +102,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, b)=\mathrm{AGM}(b, a)$$
 
 **Holds when** $a\in\C\land b\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for expansion.
 [`59fab1` · Fungrim entry ↗](https://fungrim.org/entry/59fab1)
 
@@ -119,7 +109,6 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{AGM}(1, \imaginaryI)=\frac{\sqrt{2}(1+\imaginaryI)\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`69d0a3` · Fungrim entry ↗](https://fungrim.org/entry/69d0a3)
 
@@ -128,7 +117,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, b)=\frac{\pi(a+b)}{4\mathrm{EllipticK}((a-b)/(a+b)^2)}$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
-**Symbols:** **AGM** — Arithmetic-geometric mean; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`71a0ff` · Fungrim entry ↗](https://fungrim.org/entry/71a0ff)
 
@@ -136,7 +124,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(1, \sqrt{2})=(\mathrm{JacobiTheta}(4, 0, \imaginaryI)^2)^{-1}$$
 
-**Symbols:** **AGM** — Arithmetic-geometric mean; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`7b362f` · Fungrim entry ↗](https://fungrim.org/entry/7b362f)
 
@@ -154,7 +141,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{AGM}(1, b)=b\mathrm{AGM}(1, \frac{1}{b})$$
 
 **Holds when** $b\in\C\land b\notin\lparen-\infty, 0\rbrack$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`8e80c6` · Fungrim entry ↗](https://fungrim.org/entry/8e80c6)
 
@@ -163,7 +149,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, 0)=0$$
 
 **Holds when** $a\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`8f176c` · Fungrim entry ↗](https://fungrim.org/entry/8f176c)
 
@@ -172,7 +157,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(1+b, 1-b)=\mathrm{AGM}(1, \sqrt{1-b^2})$$
 
 **Holds when** $b\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for expansion.
 [`9d84d8` · Fungrim entry ↗](https://fungrim.org/entry/9d84d8)
 
@@ -181,7 +165,6 @@ Used by the Compute Engine for expansion.
 $$2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2+((3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)+a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a))\mathrm{AGM}(a, b)=0$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/09.54.13.0001.01)
 [`a4cc5a` · Fungrim entry ↗](https://fungrim.org/entry/a4cc5a)
@@ -191,7 +174,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, a)=a$$
 
 **Holds when** $a\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`b41bdd` · Fungrim entry ↗](https://fungrim.org/entry/b41bdd)
 
@@ -200,7 +182,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, b)=a\mathrm{AGM}(1, \frac{b}{a})$$
 
 **Holds when** $a\in\C\land b\in\C\land a\ne0\land\frac{b}{a}\notin\lparen-\infty, 0\rbrack$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`ce2395` · Fungrim entry ↗](https://fungrim.org/entry/ce2395)
 
@@ -209,7 +190,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, b)=\frac{a+b}{2\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, (a-b)/(a+b)^2)}$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
-**Symbols:** **AGM** — Arithmetic-geometric mean; **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`d6d836` · Fungrim entry ↗](https://fungrim.org/entry/d6d836)
 
@@ -218,7 +198,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticK}(m)=(\pi)(2\mathrm{AGM}(1, \sqrt{1-m}))^{-1}$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean; **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`e15f43` · Fungrim entry ↗](https://fungrim.org/entry/e15f43)
 
@@ -226,7 +205,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(1, \frac{\sqrt{2}}{2})=\frac{2\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`e3896e` · Fungrim entry ↗](https://fungrim.org/entry/e3896e)
 
@@ -235,7 +213,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, b)=b\mathrm{AGM}(1, \frac{a}{b})$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`ea1d58` · Fungrim entry ↗](https://fungrim.org/entry/ea1d58)
 
@@ -243,7 +220,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(1, 1)=1$$
 
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`eb0661` · Fungrim entry ↗](https://fungrim.org/entry/eb0661)
 
@@ -251,7 +227,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{AGM}(1, 3-2\sqrt{2})=\frac{2(2-\sqrt{2})\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`f9190b` · Fungrim entry ↗](https://fungrim.org/entry/f9190b)
 
@@ -260,7 +235,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{AGM}(a, b)=\mathrm{AGM}(\frac{a+b}{2}, \begin{cases}1&(ab)^{1/2}=0\lor\Re((a+b)/2/(ab)^{1/2})\ge0\\-1&\top\end{cases}\sqrt{ab})$$
 
 **Holds when** $a\in\C\land b\in\C$.
-**Symbols:** **AGM** — Arithmetic-geometric mean.
 Used by the Compute Engine for simplification.
 [`fa6ff7` · Fungrim entry ↗](https://fungrim.org/entry/fa6ff7)
 
@@ -385,7 +359,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRC}(1, 1+y)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -y)$$
 
 **Holds when** $y\in\C$.
-**Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
+**Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`157ebb` · Fungrim entry ↗](https://fungrim.org/entry/157ebb)
 
@@ -487,7 +461,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRF}(0, x, -(cx))=\begin{cases}\mathrm{EllipticK}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&\top\end{cases}/\sqrt{x}$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
-**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`271b73` · Fungrim entry ↗](https://fungrim.org/entry/271b73)
 
@@ -632,7 +606,7 @@ Used by the Compute Engine for expansion.
 $$\mathrm{CarlsonRD}(0, y, 1)=\begin{cases}\frac{3(\mathrm{EllipticK}(1-y)-\mathrm{EllipticE}(1-y))}{1-y}&y\ne1\\\frac{3\pi}{4}&y=1\end{cases}$$
 
 **Holds when** $y\in\C$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`3e05c6` · Fungrim entry ↗](https://fungrim.org/entry/3e05c6)
 
@@ -650,7 +624,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRG}(0, 1, x)=\frac{\mathrm{EllipticE}(1-x)}{2}$$
 
 **Holds when** $x\in\C$.
-**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
+**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`3f6d40` · Fungrim entry ↗](https://fungrim.org/entry/3f6d40)
 
@@ -668,7 +642,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRF}(0, x, y)=\mathrm{EllipticK}(1-y/x)/\sqrt{x}$$
 
 **Holds when** $x\in\C\land y\in\C\land\vert\arg(x)-\arg(y)\vert\lt\pi$.
-**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`415ff0` · Fungrim entry ↗](https://fungrim.org/entry/415ff0)
 
@@ -703,7 +677,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRG}(0, x, -(cx))=\frac{1}{2}(\sqrt{x}\begin{cases}\mathrm{EllipticE}(1+c)&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\\mathrm{EllipticE}(1+c)+2\imaginaryI(\mathrm{EllipticK}(-c)-\mathrm{EllipticE}(-c))&\top\end{cases})$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
-**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`48333c` · Fungrim entry ↗](https://fungrim.org/entry/48333c)
 
@@ -787,7 +761,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticE}(1-z/y)-(z\mathrm{EllipticK}(1-z/y))/y)}{(z(1-z/y))/y}&z\ne0\land z\ne y\\\frac{3\pi}{4}&z=y\\\tilde\infty&z=0\end{cases}}{\sqrt{y}^{3}}$$
 
 **Holds when** $y\in\C\setminus\lbrace0\rbrace\land z\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`4e4380` · Fungrim entry ↗](https://fungrim.org/entry/4e4380)
 
@@ -821,7 +795,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRF}(0, x, cx)=\frac{\mathrm{EllipticK}(1-c)}{\sqrt{x}}$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
-**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`538c8c` · Fungrim entry ↗](https://fungrim.org/entry/538c8c)
 
@@ -830,7 +804,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRF}(0, 1, x)=\mathrm{EllipticK}(1-x)$$
 
 **Holds when** $x\in\C$.
-**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`53d869` · Fungrim entry ↗](https://fungrim.org/entry/53d869)
 
@@ -933,7 +907,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRD}(0, 1, z)=\begin{cases}\frac{3(\mathrm{EllipticE}(1-z)-z\mathrm{EllipticK}(1-z))}{z(1-z)}&z\ne0\land z\ne1\\\frac{3\pi}{4}&z=1\\\tilde\infty&z=0\end{cases}$$
 
 **Holds when** $z\in\C$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`61c002` · Fungrim entry ↗](https://fungrim.org/entry/61c002)
 
@@ -1043,7 +1017,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRC}(1, x)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, 1-x)$$
 
 **Holds when** $x\in\C$.
-**Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
+**Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`72b5bd` · Fungrim entry ↗](https://fungrim.org/entry/72b5bd)
 
@@ -1131,7 +1105,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRG}(0, x, y)=\frac{1}{2}(\sqrt{x}\mathrm{EllipticE}(1-y/x))$$
 
 **Holds when** $x\in\C\land y\in\C\land\vert\arg(x)-\arg(y)\vert\lt\pi$.
-**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
+**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`7cddc6` · Fungrim entry ↗](https://fungrim.org/entry/7cddc6)
 
@@ -1215,7 +1189,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticK}(1-y/z)-\mathrm{EllipticE}(1-y/z))}{1-y/z}&y\ne z\\\frac{3\pi}{4}&y=z\end{cases}}{\sqrt{z}^{3}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace\land y\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`8d0629` · Fungrim entry ↗](https://fungrim.org/entry/8d0629)
 
@@ -1284,7 +1258,7 @@ Used by the Compute Engine for expansion.
 $$\mathrm{CarlsonRD}(0, x, 1)=\frac{1}{4}(3\pi\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{3}{2}, 2, 1-x))$$
 
 **Holds when** $x\in\C$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **Hypergeometric2F1** — Gauss hypergeometric function.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`9bfd88` · Fungrim entry ↗](https://fungrim.org/entry/9bfd88)
 
@@ -1342,7 +1316,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRG}(0, x, cx)=\frac{1}{2}(\sqrt{x}\mathrm{EllipticE}(1-c))$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
-**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
+**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`a2e9dd` · Fungrim entry ↗](https://fungrim.org/entry/a2e9dd)
 
@@ -1411,7 +1385,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRF}(0, x, 1)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, 1-x))$$
 
 **Holds when** $x\in\C$.
-**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
+**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`b2fdfe` · Fungrim entry ↗](https://fungrim.org/entry/b2fdfe)
 
@@ -1454,7 +1428,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRD}(0, 1, x)=\frac{3\pi\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 2, 1-x)}{4x}$$
 
 **Holds when** $x\in\C$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **Hypergeometric2F1** — Gauss hypergeometric function.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`bbf003` · Fungrim entry ↗](https://fungrim.org/entry/bbf003)
 
@@ -1698,7 +1672,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, 1-x))$$
 
 **Holds when** $x\in\C$.
-**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **Hypergeometric2F1** — Gauss hypergeometric function.
+**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`e98dd0` · Fungrim entry ↗](https://fungrim.org/entry/e98dd0)
 
@@ -1844,7 +1818,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticPi}(1, 0)=\tilde\infty$$
 
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`061c49` · Fungrim entry ↗](https://fungrim.org/entry/061c49)
 
@@ -1853,7 +1826,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticF}(\arcsin(\frac{1}{m^{1/2}}), m)=\frac{\mathrm{EllipticK}(\frac{1}{m})}{\sqrt{m}}$$
 
 **Holds when** $m\in\C\setminus\lbrace0\rbrace$.
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
+**Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for expansion.
 [`087a7c` · Fungrim entry ↗](https://fungrim.org/entry/087a7c)
 
@@ -1861,7 +1834,6 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{EllipticK}(\frac{1}{2}(1+\sqrt{3}\imaginaryI))=\frac{\exp(\frac{\imaginaryI\pi}{12})\sqrt[4]{3}\Gamma(1/3)^3}{2^{\frac{7}{3}}\pi}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`0abbe1` · Fungrim entry ↗](https://fungrim.org/entry/0abbe1)
 
@@ -1870,7 +1842,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticF}(\frac{\pi}{2}, m)=\mathrm{EllipticK}(m)$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
+**Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`0b8fd6` · Fungrim entry ↗](https://fungrim.org/entry/0b8fd6)
 
@@ -1879,7 +1851,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticK}(m)=\mathrm{CarlsonRF}(0, 1-m, 1)$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`0cc11f` · Fungrim entry ↗](https://fungrim.org/entry/0cc11f)
 
@@ -1887,7 +1859,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticPi}(\frac{1}{2}, 0)=\frac{\pi\sqrt{2}}{2}$$
 
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`124d02` · Fungrim entry ↗](https://fungrim.org/entry/124d02)
 
@@ -1904,7 +1875,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`16d2e1` · Fungrim entry ↗](https://fungrim.org/entry/16d2e1)
 
@@ -1912,7 +1882,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(\frac{1}{2}(1-3^{1/2}\imaginaryI))=\frac{\exp(-((\imaginaryI\pi)/12))\sqrt[4]{3}\Gamma(1/3)^3}{2^{\frac{7}{3}}\pi}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`175b7a` · Fungrim entry ↗](https://fungrim.org/entry/175b7a)
 
@@ -1920,7 +1889,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticPi}(0, 1)=\infty$$
 
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`18e226` · Fungrim entry ↗](https://fungrim.org/entry/18e226)
 
@@ -1929,7 +1897,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticE}(\frac{\pi}{2}, m)=\mathrm{EllipticE}(m)$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
+**Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`1b881e` · Fungrim entry ↗](https://fungrim.org/entry/1b881e)
 
@@ -1937,7 +1905,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticE}(0)=\frac{\pi}{2}$$
 
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`1d62a7` · Fungrim entry ↗](https://fungrim.org/entry/1d62a7)
 
@@ -1971,7 +1938,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}((3-2\times2^{1/2})^2)=\frac{(2+\sqrt{2})\Gamma(1/4)^2}{16\sqrt{\pi}}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`2991b5` · Fungrim entry ↗](https://fungrim.org/entry/2991b5)
 
@@ -1980,7 +1946,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticE}(\frac{-\pi}{2}, m)=-\mathrm{EllipticE}(m)$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
+**Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for expansion.
 [`2ef763` · Fungrim entry ↗](https://fungrim.org/entry/2ef763)
 
@@ -1996,7 +1962,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticE}(\frac{1}{2})=\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`3b272e` · Fungrim entry ↗](https://fungrim.org/entry/3b272e)
 
@@ -2004,7 +1969,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticPi}(0, \frac{1}{2})=\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}$$
 
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`3c4979` · Fungrim entry ↗](https://fungrim.org/entry/3c4979)
 
@@ -2012,7 +1976,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(\frac{1}{2}-\frac{3^{1/2}}{4})=\frac{\sqrt[4]{3}\Gamma(1/3)^3}{4\sqrt[3]{2}\pi}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`40a376` · Fungrim entry ↗](https://fungrim.org/entry/40a376)
 
@@ -2021,7 +1984,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticE}(m)=\frac{1}{3}((1-m)(\mathrm{CarlsonRD}(0, 1-m, 1)+\mathrm{CarlsonRD}(0, 1, 1-m)))$$
 
 **Holds when** $m\in\C\land m\ne1$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`41cf8e` · Fungrim entry ↗](https://fungrim.org/entry/41cf8e)
 
@@ -2038,7 +2001,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(1)=\infty$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`45b157` · Fungrim entry ↗](https://fungrim.org/entry/45b157)
 
@@ -2046,7 +2008,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(\frac{1}{8}(4-3\times2^{1/2}))=\frac{\Gamma(1/4)^2}{4\sqrt[4]{2}\sqrt{\pi}}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`4b040d` · Fungrim entry ↗](https://fungrim.org/entry/4b040d)
 
@@ -2071,7 +2032,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticE}(m)-(1-m)\mathrm{EllipticK}(m)=\frac{1}{3}(m(1-m)\mathrm{CarlsonRD}(0, 1, 1-m))$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`55d23d` · Fungrim entry ↗](https://fungrim.org/entry/55d23d)
 
@@ -2079,7 +2040,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticE}(2)=\frac{\sqrt{2}(1+\imaginaryI)\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`5d2c01` · Fungrim entry ↗](https://fungrim.org/entry/5d2c01)
 
@@ -2088,7 +2048,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticPi}(n, 0)=(\pi)(2\sqrt{1-n})^{-1}$$
 
 **Holds when** $n\in\C$.
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`5d8804` · Fungrim entry ↗](https://fungrim.org/entry/5d8804)
 
@@ -2097,7 +2056,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticPi}(n, \phi+k\pi, m)=\mathrm{IncompleteEllipticPi}(n, \phi, m)+2k\mathrm{EllipticPi}(n, m)$$
 
 **Holds when** $n\in\C\land\phi\in\C\land m\in\C\land k\in\Z\land n\ne1\land m\ne1$.
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind; **IncompleteEllipticPi** — Legendre incomplete elliptic integral of the third kind.
+**Symbols:** **IncompleteEllipticPi** — Legendre incomplete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`5f84d9` · Fungrim entry ↗](https://fungrim.org/entry/5f84d9)
 
@@ -2105,7 +2064,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticPi}(0, 0)=\frac{\pi}{2}$$
 
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`618a54` · Fungrim entry ↗](https://fungrim.org/entry/618a54)
 
@@ -2113,7 +2071,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(2)=\frac{\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{8\sqrt{\pi}}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`630eca` · Fungrim entry ↗](https://fungrim.org/entry/630eca)
 
@@ -2122,7 +2079,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticE}(m)=2\mathrm{CarlsonRG}(0, 1-m, 1)$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind; **EllipticE** — Legendre complete elliptic integral of the second kind.
+**Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`6520e7` · Fungrim entry ↗](https://fungrim.org/entry/6520e7)
 
@@ -2131,7 +2088,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticF}(\phi+k\pi, m)=\mathrm{IncompleteEllipticF}(\phi, m)+2k\mathrm{EllipticK}(m)$$
 
 **Holds when** $\phi\in\C\land m\in\C\land k\in\Z\land m\ne1$.
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
+**Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`685126` · Fungrim entry ↗](https://fungrim.org/entry/685126)
 
@@ -2140,7 +2097,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticK}(m^\star)=\mathrm{EllipticK}(m)^\star$$
 
 **Holds when** $m\in\C\setminus\lparen1, \infty\rparen$.
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for expansion.
 [`713966` · Fungrim entry ↗](https://fungrim.org/entry/713966)
 
@@ -2149,7 +2105,6 @@ Used by the Compute Engine for expansion.
 $$2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{3}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`752619` · Fungrim entry ↗](https://fungrim.org/entry/752619)
 
@@ -2158,7 +2113,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticF}(\frac{-\pi}{2}, m)=-\mathrm{EllipticK}(m)$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
+**Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for expansion.
 [`81f7db` · Fungrim entry ↗](https://fungrim.org/entry/81f7db)
 
@@ -2175,7 +2130,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticE}(m^\star)=\mathrm{EllipticE}(m)^\star$$
 
 **Holds when** $m\in\C\setminus\lparen1, \infty\rparen$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for expansion.
 [`8e5c81` · Fungrim entry ↗](https://fungrim.org/entry/8e5c81)
 
@@ -2193,7 +2147,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticPi}(m, m)=\frac{\mathrm{EllipticE}(m)}{1-m}$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`9227bf` · Fungrim entry ↗](https://fungrim.org/entry/9227bf)
 
@@ -2202,7 +2155,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticK}(m)-\mathrm{EllipticE}(m)=\frac{1}{3}(m\mathrm{CarlsonRD}(0, 1-m, 1))$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind.
+**Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for expansion.
 [`94f646` · Fungrim entry ↗](https://fungrim.org/entry/94f646)
 
@@ -2210,7 +2163,6 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{EllipticE}(1)=1$$
 
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`958a3f` · Fungrim entry ↗](https://fungrim.org/entry/958a3f)
 
@@ -2218,7 +2170,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticPi}(\frac{1}{2}, \frac{1}{2})=\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}+\frac{2\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
 
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`9b0385` · Fungrim entry ↗](https://fungrim.org/entry/9b0385)
 
@@ -2227,7 +2178,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticPi}(n, m)=\mathrm{CarlsonRF}(0, 1-m, 1)+\frac{1}{3}(n\mathrm{CarlsonRJ}(0, 1-m, 1, 1-n))$$
 
 **Holds when** $n\in\C\land m\in\C\land m\ne1$.
-**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind; **EllipticPi** — Legendre complete elliptic integral of the third kind.
+**Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`9ccaef` · Fungrim entry ↗](https://fungrim.org/entry/9ccaef)
 
@@ -2235,7 +2186,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticE}(-1)=\sqrt{2}(\frac{\Gamma(1/4)^2}{8\sqrt{\pi}}+\frac{\sqrt{\pi}^{3}}{\Gamma(1/4)^2})$$
 
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`9f3474` · Fungrim entry ↗](https://fungrim.org/entry/9f3474)
 
@@ -2244,7 +2194,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticE}(\frac{\pi k}{2}, m)=k\mathrm{EllipticE}(m)$$
 
 **Holds when** $m\in\C\land k\in\Z$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
+**Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`a14442` · Fungrim entry ↗](https://fungrim.org/entry/a14442)
 
@@ -2277,7 +2227,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{IncompleteEllipticF}(\frac{\pi}{6}, 4)=\frac{\mathrm{EllipticK}(\frac{1}{4})}{2}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
+**Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`aac129` · Fungrim entry ↗](https://fungrim.org/entry/aac129)
 
@@ -2293,7 +2243,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(-1)=\frac{\Gamma(1/4)^2}{4\sqrt{2\pi}}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`afb22a` · Fungrim entry ↗](https://fungrim.org/entry/afb22a)
 
@@ -2319,7 +2268,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`b760d1` · Fungrim entry ↗](https://fungrim.org/entry/b760d1)
 
@@ -2336,7 +2284,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(4\sqrt{3}-7)=\frac{\sqrt{3+2\sqrt{3}}\Gamma(1/3)^3}{2^{\frac{10}{3}}\pi}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`b95ffa` · Fungrim entry ↗](https://fungrim.org/entry/b95ffa)
 
@@ -2352,7 +2299,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(0)=\frac{\pi}{2}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`bb4501` · Fungrim entry ↗](https://fungrim.org/entry/bb4501)
 
@@ -2377,7 +2323,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticE}(\phi+k\pi, m)=\mathrm{IncompleteEllipticE}(\phi, m)+2k\mathrm{EllipticE}(m)$$
 
 **Holds when** $\phi\in\C\land m\in\C\land k\in\Z$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
+**Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`c28288` · Fungrim entry ↗](https://fungrim.org/entry/c28288)
 
@@ -2393,7 +2339,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EllipticK}(\frac{1}{2})=\frac{\Gamma(1/4)^2}{4\sqrt{\pi}}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
 [`cc22bf` · Fungrim entry ↗](https://fungrim.org/entry/cc22bf)
 
@@ -2402,7 +2347,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticPi}(1, m)=\tilde\infty$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`ce4df4` · Fungrim entry ↗](https://fungrim.org/entry/ce4df4)
 
@@ -2428,7 +2372,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticPi}(0, m)=\mathrm{EllipticK}(m)$$
 
 **Holds when** $m\in\C$.
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for expansion.
 [`dd67fb` · Fungrim entry ↗](https://fungrim.org/entry/dd67fb)
 
@@ -2454,7 +2397,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EllipticPi}(n, 1)=\begin{cases}\frac{\infty}{1-n}&n\ne1\\\tilde\infty&n=1\end{cases}$$
 
 **Holds when** $n\in\C$.
-**Symbols:** **EllipticPi** — Legendre complete elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
 [`e9c797` · Fungrim entry ↗](https://fungrim.org/entry/e9c797)
 
@@ -2462,7 +2404,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{IncompleteEllipticE}(\frac{\pi}{6}, 4)=2\mathrm{EllipticE}(\frac{1}{4})-\frac{1}{2}(3\mathrm{EllipticK}(1/4))$$
 
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
+**Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`eba27c` · Fungrim entry ↗](https://fungrim.org/entry/eba27c)
 
@@ -2480,7 +2422,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{IncompleteEllipticE}(\arcsin(\frac{1}{m^{1/2}}), m)=\sqrt{m}(\mathrm{EllipticE}(\frac{1}{m})-(1-\frac{1}{m})\mathrm{EllipticK}(\frac{1}{m}))$$
 
 **Holds when** $m\in\C\setminus\lbrace0, 1\rbrace$.
-**Symbols:** **EllipticE** — Legendre complete elliptic integral of the second kind; **EllipticK** — Legendre complete elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
+**Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
 [`f0bcb5` · Fungrim entry ↗](https://fungrim.org/entry/f0bcb5)
 
@@ -2517,7 +2459,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{z\mathrm{JacobiTheta}(1, 0, \tau, 3)}{3\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
-**Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassZeta** — Weierstrass zeta function.
+**Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`0207dc` · Fungrim entry ↗](https://fungrim.org/entry/0207dc)
 
@@ -2589,7 +2531,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{WeierstrassP}(z, \tau)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^2-\frac{1}{3}(\pi^2(\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(3, 0, \tau)^4))$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
-**Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassP** — Weierstrass elliptic function.
+**Symbols:** **WeierstrassP** — Weierstrass elliptic function.
 Used by the Compute Engine for simplification.
 [`af0dfc` · Fungrim entry ↗](https://fungrim.org/entry/af0dfc)
 
@@ -2598,7 +2540,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{WeierstrassSigma}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\exp(-((\mathrm{JacobiTheta}(1, 0, \tau, 3)z^2)/(6\mathrm{JacobiTheta}(1, 0, \tau, 1))))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function; **WeierstrassSigma** — Weierstrass sigma function.
+**Symbols:** **WeierstrassSigma** — Weierstrass sigma function.
 Used by the Compute Engine for simplification.
 [`b96c9d` · Fungrim entry ↗](https://fungrim.org/entry/b96c9d)
 

@@ -5,10 +5,10 @@ slug: /compute-engine/reference/fungrim-elementary/
 
 # Elementary functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **208 identities** for elementary functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **212 identities** for elementary functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -16,7 +16,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 - [Exponential function](#exponential-function) (16)
 - [Golden ratio](#golden-ratio) (5)
 - [Inverse tangent](#inverse-tangent) (44)
-- [Lambert W-function](#lambert-w-function) (11)
+- [Lambert W-function](#lambert-w-function) (15)
 - [Natural logarithm](#natural-logarithm) (11)
 - [Pi](#pi) (4)
 - [Powers](#powers) (8)
@@ -267,7 +267,6 @@ Used by the Compute Engine for simplification.
 $$\arctan(z)=z\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -z^2)$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`34ff28` · Fungrim entry ↗](https://fungrim.org/entry/34ff28)
 
@@ -555,6 +554,20 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{Map}(\lparen-\infty, -\exponentialE^{-1}\rparen, x\mapsto\operatorname{W}(x))=\mathrm{Map}(\lparen0, \pi\rparen, y\mapsto y\imaginaryI-y\cot(y))$$
+
+Used by the Compute Engine for simplification.
+[`44ad09` · Fungrim entry ↗](https://fungrim.org/entry/44ad09)
+
+---
+
+$$\mathrm{Map}(\lbrace-\exponentialE^{-1}\rbrace, x\mapsto\operatorname{W}(x))=\lbrace-1\rbrace$$
+
+Used by the Compute Engine for simplification.
+[`55498b` · Fungrim entry ↗](https://fungrim.org/entry/55498b)
+
+---
+
 $$\operatorname{W}(x\exponentialE^{x})=x$$
 
 **Holds when** $x\in\lbrack-1, \infty\rparen$.
@@ -568,6 +581,14 @@ $$z\mapsto\operatorname{W}(z)^{\prime}(0)=(-r)^{r-1}$$
 **Holds when** $r\in\N^*$.
 Used by the Compute Engine for simplification.
 [`8e8a59` · Fungrim entry ↗](https://fungrim.org/entry/8e8a59)
+
+---
+
+$$\operatorname{W}_{-1}(x\ln(x))=\ln(x)$$
+
+**Holds when** $x\in\lparen0, \frac{1}{\exponentialE}\rbrack$.
+Used by the Compute Engine for simplification.
+[`a172c7` · Fungrim entry ↗](https://fungrim.org/entry/a172c7)
 
 ---
 
@@ -613,6 +634,13 @@ $$\operatorname{W}_{-1}(x\exponentialE^{x})=x$$
 **Holds when** $x\in\lparen-\infty, -1\rbrack$.
 Used by the Compute Engine for simplification and equation solving.
 [`ed7dac` · Fungrim entry ↗](https://fungrim.org/entry/ed7dac)
+
+---
+
+$$\mathrm{Map}(\lparen-\exponentialE^{-1}, \infty\rparen, x\mapsto\operatorname{W}(x))=\lparen-1, \infty\rparen$$
+
+Used by the Compute Engine for simplification.
+[`ee86fb` · Fungrim entry ↗](https://fungrim.org/entry/ee86fb)
 
 ---
 
@@ -722,7 +750,6 @@ Used by the Compute Engine for simplification.
 
 $$\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F_1}(-(1/3), \frac{1}{3}, 1, 1))$$
 
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`68b73d` · Fungrim entry ↗](https://fungrim.org/entry/68b73d)
 
@@ -730,7 +757,6 @@ Used by the Compute Engine for simplification.
 
 $$\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F_1}(\frac{1}{2}, -(1/2), 1, 1))$$
 
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`a7095f` · Fungrim entry ↗](https://fungrim.org/entry/a7095f)
 
@@ -738,7 +764,6 @@ Used by the Compute Engine for simplification.
 
 $$\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F_1}(-(1/2), -(1/2), 1, 1))$$
 
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`c6c108` · Fungrim entry ↗](https://fungrim.org/entry/c6c108)
 
@@ -883,7 +908,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\max(\lbrace\mathrm{sinc}(x), x\in\R\rbrace)=1$$
+$$\max(\mathrm{Map}(\R, x\mapsto\mathrm{sinc}(x)))=1$$
 
 Used by the Compute Engine for simplification.
 [`632d1c` · Fungrim entry ↗](https://fungrim.org/entry/632d1c)
@@ -952,7 +977,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\min(\lbrace\mathrm{sinc}(x), x\in\R\rbrace)=\mathrm{sinc}(\mathrm{BesselJZero}(\frac{3}{2}, 1))$$
+$$\min(\mathrm{Map}(\R, x\mapsto\mathrm{sinc}(x)))=\mathrm{sinc}(\mathrm{BesselJZero}(\frac{3}{2}, 1))$$
 
 Used by the Compute Engine for simplification.
 [`da7fb1` · Fungrim entry ↗](https://fungrim.org/entry/da7fb1)
@@ -1073,7 +1098,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\min(\lbrace\sin(x), x\in\R\rbrace)=-1$$
+$$\min(\mathrm{Map}(\R, x\mapsto\sin(x)))=-1$$
 
 Used by the Compute Engine for simplification.
 [`27766c` · Fungrim entry ↗](https://fungrim.org/entry/27766c)
@@ -1301,7 +1326,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ArgMin}(x\mapsto\sin(x), \R)=\lbrace\pi(2n-\frac{1}{2}), n\in\Z\rbrace$$
+$$\mathrm{ArgMin}(x\mapsto\sin(x), \R)=\mathrm{Map}(\Z, n\mapsto\pi(2n-1/2))$$
 
 **Symbols:** **ArgMin** — Locations of minimum value.
 Used by the Compute Engine for simplification.
@@ -1340,7 +1365,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\max(\lbrace\sin(x), x\in\R\rbrace)=1$$
+$$\max(\mathrm{Map}(\R, x\mapsto\sin(x)))=1$$
 
 Used by the Compute Engine for simplification.
 [`bfe28b` · Fungrim entry ↗](https://fungrim.org/entry/bfe28b)
@@ -1354,7 +1379,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ArgMax}(x\mapsto\sin(x), \R)=\lbrace\pi(2n+\frac{1}{2}), n\in\Z\rbrace$$
+$$\mathrm{ArgMax}(x\mapsto\sin(x), \R)=\mathrm{Map}(\Z, n\mapsto\pi(2n+\frac{1}{2}))$$
 
 **Symbols:** **ArgMax** — Locations of maximum value.
 Used by the Compute Engine for simplification.

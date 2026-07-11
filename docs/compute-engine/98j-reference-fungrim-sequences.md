@@ -5,17 +5,17 @@ slug: /compute-engine/reference/fungrim-sequences/
 
 # Combinatorial and integer sequences
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **64 identities** for combinatorial and integer sequences.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **65 identities** for combinatorial and integer sequences.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
 
 - [Bell numbers](#bell-numbers) (1)
 - [Bernoulli numbers and polynomials](#bernoulli-numbers-and-polynomials) (9)
-- [Fibonacci numbers](#fibonacci-numbers) (36)
+- [Fibonacci numbers](#fibonacci-numbers) (37)
 - [Integer sequences](#integer-sequences) (8)
 - [Partition function](#partition-function) (6)
 - [Stirling numbers](#stirling-numbers) (4)
@@ -36,7 +36,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{BernoulliPolynomial}(n, \frac{1}{2})=(2^{1-n}-1)\mathrm{BernoulliB}(n)$$
 
 **Holds when** $n\in\N$.
-**Symbols:** **BernoulliB** — Bernoulli number; **BernoulliPolynomial** — Bernoulli polynomial.
+**Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
 Used by the Compute Engine for simplification.
 [`03ee0b` · Fungrim entry ↗](https://fungrim.org/entry/03ee0b)
 
@@ -45,7 +45,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{BernoulliB}(2n)=\frac{2\Zeta(2n)(2n)!\times(-1)^{n+1}}{(2\pi)^{2n}}$$
 
 **Holds when** $n\in\N^*$.
-**Symbols:** **BernoulliB** — Bernoulli number.
 Used by the Compute Engine for simplification.
 [`14ecc4` · Fungrim entry ↗](https://fungrim.org/entry/14ecc4)
 
@@ -54,7 +53,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{BernoulliPolynomial}(n, 1)=(-1)^{n}\mathrm{BernoulliB}(n)$$
 
 **Holds when** $n\in\N$.
-**Symbols:** **BernoulliB** — Bernoulli number; **BernoulliPolynomial** — Bernoulli polynomial.
+**Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
 Used by the Compute Engine for simplification.
 [`829185` · Fungrim entry ↗](https://fungrim.org/entry/829185)
 
@@ -72,7 +71,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{BernoulliPolynomial}(n, 0)=\mathrm{BernoulliB}(n)$$
 
 **Holds when** $n\in\N$.
-**Symbols:** **BernoulliB** — Bernoulli number; **BernoulliPolynomial** — Bernoulli polynomial.
+**Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
 Used by the Compute Engine for expansion.
 [`a1d2d7` · Fungrim entry ↗](https://fungrim.org/entry/a1d2d7)
 
@@ -81,7 +80,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{BernoulliB}(2n+3)=0$$
 
 **Holds when** $n\in\N$.
-**Symbols:** **BernoulliB** — Bernoulli number.
 Used by the Compute Engine for simplification.
 [`a98234` · Fungrim entry ↗](https://fungrim.org/entry/a98234)
 
@@ -159,7 +157,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Fibonacci}(n)=\frac{n\mathrm{Hypergeometric2F_1}(\frac{1-n}{2}, \frac{2-n}{2}, \frac{3}{2}, 5)}{2^{n-1}}$$
 
 **Holds when** $n\in\Z$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/IntegerFunctions/Fibonacci/26/01/01/0007/)
 [`1c90fb` · Fungrim entry ↗](https://fungrim.org/entry/1c90fb)
@@ -223,7 +220,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Count}(\lbrace k, k\in\Z\in(n\mid\mathrm{Fibonacci}(k))\rbrace)=\mathrm{Count}(\Z)$$
+$$\mathrm{Count}(\mathrm{Filter}(\Z, k\mapsto n\mid\mathrm{Fibonacci}(k)))=\mathrm{Count}(\Z)$$
 
 **Holds when** $n\in\Z\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -298,9 +295,15 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Fibonacci}(n)=\mathrm{Hypergeometric2F_1}(\frac{1-n}{2}, \frac{2-n}{2}, 1-n, -4)$$
 
 **Holds when** $n\in\N^*$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`90c290` · Fungrim entry ↗](https://fungrim.org/entry/90c290)
+
+---
+
+$$\mathrm{Map}(\mathrm{Filter}(\N, n\mapsto\mathrm{Fibonacci}(n)^{1/2}\in\Z), n\mapsto\mathrm{Fibonacci}(n))=\lbrace\mathrm{Fibonacci}(0), \mathrm{Fibonacci}(1), \mathrm{Fibonacci}(2), \mathrm{Fibonacci}(12)\rbrace=\lbrace0, 1, 144\rbrace$$
+
+Used by the Compute Engine for simplification.
+[`9d26d2` · Fungrim entry ↗](https://fungrim.org/entry/9d26d2)
 
 ---
 
@@ -424,7 +427,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{PrimePi}(n)=\mathrm{SloaneA}(\text{A000720}, n)$$
 
 **Holds when** $n\in\N$.
-**Symbols:** **PrimePi** — Prime counting function; **SloaneA** — Sequence X in Sloane's OEIS.
+**Symbols:** **SloaneA** — Sequence X in Sloane's OEIS.
 Used by the Compute Engine for simplification.
 [`4fa169` · Fungrim entry ↗](https://fungrim.org/entry/4fa169)
 
@@ -460,7 +463,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{PrimeNumber}(n)=\mathrm{SloaneA}(\text{A000040}, n)$$
 
 **Holds when** $n\in\N^*$.
-**Symbols:** **PrimeNumber** — nth prime number; **SloaneA** — Sequence X in Sloane's OEIS.
+**Symbols:** **SloaneA** — Sequence X in Sloane's OEIS.
 Used by the Compute Engine for simplification.
 [`9d0839` · Fungrim entry ↗](https://fungrim.org/entry/9d0839)
 
@@ -469,7 +472,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{BernoulliB}(n)=\frac{\mathrm{SloaneA}(\text{A027641}, n)}{\mathrm{SloaneA}(\text{A027642}, n)}$$
 
 **Holds when** $n\in\N$.
-**Symbols:** **BernoulliB** — Bernoulli number; **SloaneA** — Sequence X in Sloane's OEIS.
+**Symbols:** **SloaneA** — Sequence X in Sloane's OEIS.
 Used by the Compute Engine for simplification.
 [`b6111c` · Fungrim entry ↗](https://fungrim.org/entry/b6111c)
 

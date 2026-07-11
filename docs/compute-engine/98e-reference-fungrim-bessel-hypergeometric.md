@@ -8,7 +8,7 @@ slug: /compute-engine/reference/fungrim-bessel-hypergeometric/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **115 identities** for bessel and hypergeometric functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -365,7 +365,6 @@ Used by the Compute Engine for simplification.
 $$\operatorname{J}_{\nu}(z)=\frac{\mathrm{Hypergeometric1F_1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(-(\imaginaryI z))(\frac{z}{2})^{\nu}}{\Gamma(\nu+1)}$$
 
 **Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land\nu\notin-\infty..-1\land z\in\C\setminus\lbrace0\rbrace$.
-**Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`9ad254` · Fungrim entry ↗](https://fungrim.org/entry/9ad254)
 
@@ -579,7 +578,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric0F_1}(a, z)=\exp(-(2\sqrt{z}))\mathrm{Hypergeometric1F_1}(a-\frac{1}{2}, 2a-1, 4\sqrt{z})$$
 
 **Holds when** $a\in\C\land z\in\C\land2a\notin-\infty..1$.
-**Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function; **Hypergeometric1F1** — Kummer confluent hypergeometric function.
+**Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
 Used by the Compute Engine for simplification.
 [`2df3e3` · Fungrim entry ↗](https://fungrim.org/entry/2df3e3)
 
@@ -606,7 +605,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z)z^{1-b})$$
 
 **Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0\land b\notin\Z$.
-**Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function; **HypergeometricU** — Tricomi confluent hypergeometric function.
+**Symbols:** **HypergeometricU** — Tricomi confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`6cf802` · Fungrim entry ↗](https://fungrim.org/entry/6cf802)
 
@@ -633,7 +632,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric1F_1}(a, b, z)=\exponentialE^{z}\mathrm{Hypergeometric1F_1}(b-a, b, -z)$$
 
 **Holds when** $a\in\C\land b\in\C\setminus\Z_{\le0}\land z\in\C$.
-**Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`be533c` · Fungrim entry ↗](https://fungrim.org/entry/be533c)
 
@@ -763,7 +761,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Erfi}(z)=-(\imaginaryI\mathrm{Erf}(\imaginaryI z))$$
 
 **Holds when** $z\in\C$.
-**Symbols:** **Erfi** — Imaginary error function.
 Used by the Compute Engine for simplification.
 [`01440f` · Fungrim entry ↗](https://fungrim.org/entry/01440f)
 
@@ -772,7 +769,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Erfi}(-z)=-\mathrm{Erfi}(z)$$
 
 **Holds when** $z\in\C$.
-**Symbols:** **Erfi** — Imaginary error function.
 Used by the Compute Engine for expansion.
 [`603a49` · Fungrim entry ↗](https://fungrim.org/entry/603a49)
 
@@ -797,7 +793,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2)\exp(-z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
-**Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`98688d` · Fungrim entry ↗](https://fungrim.org/entry/98688d)
 
@@ -806,7 +801,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(\frac{1}{2}, \frac{3}{2}, -z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
-**Symbols:** **Hypergeometric1F1** — Kummer confluent hypergeometric function.
 Used by the Compute Engine for simplification.
 [`abadc7` · Fungrim entry ↗](https://fungrim.org/entry/abadc7)
 
@@ -867,7 +861,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric2F_1}(a, b, c, z)=\mathrm{Hypergeometric2F_1}(b, a, c, z)$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for expansion.
 [`0e0393` · Fungrim entry ↗](https://fungrim.org/entry/0e0393)
 
@@ -876,7 +869,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{Hypergeometric2F_1}(a, b, c, 0)=1$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`18d955` · Fungrim entry ↗](https://fungrim.org/entry/18d955)
 
@@ -885,7 +877,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric2F_1}(a, b, b, z)=(1-z)^{-a}$$
 
 **Holds when** $a\in\C\land b\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrace0, 1\rbrace$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`20bf69` · Fungrim entry ↗](https://fungrim.org/entry/20bf69)
 
@@ -903,7 +894,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric2F_1}(a, b, c, z)=\mathrm{Hypergeometric2F_1}(a^\star, b^\star, c^\star, z^\star)^\star$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`3d6d7e` · Fungrim entry ↗](https://fungrim.org/entry/3d6d7e)
 
@@ -930,7 +920,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric2F1Regularized}(a, b, -n, z)=\frac{\mathrm{Hypergeometric2F_1}(a+n+1, b+n+1, n+2, z)\mathrm{RisingFactorial}(a, n+1)\mathrm{RisingFactorial}(b, n+1)z^{n+1}}{(n+1)!}$$
 
 **Holds when** $a\in\C\land b\in\C\land n\in\N\land z\in\C\setminus\lbrace1\rbrace$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function; **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function; **RisingFactorial** — Rising factorial.
+**Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function; **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 [`65693e` · Fungrim entry ↗](https://fungrim.org/entry/65693e)
 
@@ -939,7 +929,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric2F_1}(a, b, c, 1)=\frac{\Gamma(c)\Gamma(c-a-b)}{\Gamma(c-a)\Gamma(c-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land\Re(c-a-b)\gt0$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`659ce8` · Fungrim entry ↗](https://fungrim.org/entry/659ce8)
 
@@ -957,7 +946,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric2F_1}(1, 1, 2, z)=-(\frac{\ln(1-z)}{z})$$
 
 **Holds when** $z\in\C\setminus\lbrace0, 1\rbrace$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`a85994` · Fungrim entry ↗](https://fungrim.org/entry/a85994)
 
@@ -993,7 +981,6 @@ Used by the Compute Engine for simplification.
 $$(z(1-z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F_1}(a, b, c, z)=0$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`f1bd89` · Fungrim entry ↗](https://fungrim.org/entry/f1bd89)
 
@@ -1002,7 +989,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F_1}(a, b, c, z)}{\Gamma(c)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function; **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
+**Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`fe6e74` · Fungrim entry ↗](https://fungrim.org/entry/fe6e74)
 

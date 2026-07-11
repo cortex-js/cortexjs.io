@@ -8,7 +8,7 @@ slug: /compute-engine/reference/fungrim-complex/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **40 identities** for complex numbers.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -187,7 +187,7 @@ Used by the Compute Engine for simplification.
 
 ## Complex plane
 
-$$\mathrm{BernsteinEllipse}(\rho)=\lbrace\frac{1}{2}(\rho\exp(\imaginaryI\theta)+\frac{\exp(-(\imaginaryI\theta))}{\rho}), \theta\in\lbrack0, 2\pi\rparen\rbrace$$
+$$\mathrm{BernsteinEllipse}(\rho)=\mathrm{Map}(\lbrack0, 2\pi\rparen, \theta\mapsto\frac{1}{2}(\rho\exp(\imaginaryI\theta)+\exp(-(\imaginaryI\theta))/\rho))$$
 
 **Holds when** $\rho\in\R\land\rho\gt1$.
 Used by the Compute Engine for simplification.
@@ -195,7 +195,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{OpenDisk}(z, r)=\lbrace t, t\in\C\in\vert z-t\vert\lt r\rbrace$$
+$$\mathrm{OpenDisk}(z, r)=\mathrm{Filter}(\C, t\mapsto\vert z-t\vert\lt r)$$
 
 **Holds when** $z\in\C\land r\in\R\land r\gt0$.
 Used by the Compute Engine for simplification.
@@ -203,7 +203,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ClosedDisk}(z, r)=\lbrace t, t\in\C\in(\vert z-t\vert\le r)\rbrace$$
+$$\mathrm{ClosedDisk}(z, r)=\mathrm{Filter}(\C, t\mapsto\vert z-t\vert\le r)$$
 
 **Holds when** $z\in\C\land r\in\R\land r\ge0$.
 Used by the Compute Engine for simplification.

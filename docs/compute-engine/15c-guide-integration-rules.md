@@ -41,7 +41,7 @@ ce.parse("\\int \\frac{\\sqrt{1+x}}{x}\\,dx").evaluate().latex;
 ```
 
 The current corpus is Rubi's **Chapter 1** (algebraic functions): polynomial
-and rational integrands, integrands involving \\(\sqrt\{a+bx\}\\) and other
+and rational integrands, integrands involving \\(\sqrt{a+bx}\\) and other
 radicals, and binomial/trinomial powers. Transcendental and special-function
 chapters are not yet ported.
 
@@ -60,6 +60,33 @@ integral is evaluated from its antiderivative.
 ```js
 ce.parse("\\int_0^1 \\frac{x^2}{\\sqrt{1+x^3}}\\,dx").evaluate();
 ```
+
+## Step-by-Step Explanations
+
+With the rules loaded, `expr.explain('Integrate')` traces the integration
+as textbook steps — term-by-term splits, constant factors moved out, and
+each corpus rule application — each step a whole-expression state with a
+stable machine id and an English description:
+
+```js
+const expr = ce.parse("\\int x\\sqrt{1+x}\\,dx");
+for (const step of expr.explain("Integrate").steps)
+  console.log(step.value.latex, "—", step.description);
+// ➔ \int\!\sqrt{x+1}^{3}-\sqrt{x+1}\,\mathrm{d}x — Apply integration rule 1.1.1.2#19 (Rubi)
+// ➔ … — Integrate term by term: ∫(u+v) dx = ∫u dx + ∫v dx
+// ➔ … — Move the constant factor out of the integral
+// ➔ \frac{1}{5}(2\sqrt{x+1}^{5})-\frac{1}{3}(2\sqrt{x+1}^{3}) — Apply integration rule 1.1.1.1#17 (Rubi)
+```
+
+The explanation's `result` is the same value evaluating the integral
+returns. A definite integral is presented via the Fundamental Theorem of
+Calculus (antiderivative, then the bracket $F\big|_a^b$ and the bounds).
+Without the rules loaded, or when the rules cannot close the integral,
+`explain('Integrate')` throws a precise error.
+
+<ReadMore path="/compute-engine/guides/simplify/" > See
+<strong>Step-by-Step Explanations</strong> in the Simplify guide for the
+full <code>Explanation</code> API <Icon name="chevron-right-bold" /></ReadMore>
 
 ## Options and the Load Report
 

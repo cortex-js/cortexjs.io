@@ -5,16 +5,16 @@ slug: /compute-engine/reference/fungrim-zeta/
 
 # Zeta and L-functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **79 identities** for zeta and l-functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **80 identities** for zeta and l-functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
 
 - [Dirichlet characters](#dirichlet-characters) (15)
-- [Hurwitz zeta function](#hurwitz-zeta-function) (40)
+- [Hurwitz zeta function](#hurwitz-zeta-function) (41)
 - [Multiple zeta values](#multiple-zeta-values) (7)
 - [Riemann zeta function](#riemann-zeta-function) (17)
 
@@ -28,7 +28,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletGroup}(q)=\lbrace\mathrm{DirichletCharacter}(q, \ell), \ell\in1..\max(q, 2)-1\in\gcd(\ell, q)=1\rbrace$$
+$$\mathrm{DirichletGroup}(q)=\mathrm{Map}(\mathrm{Filter}(1..\max(q, 2)-1, \ell\mapsto\gcd(\ell, q)=1), \ell\mapsto\mathrm{DirichletCharacter}(q, \ell))$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletGroup** — Dirichlet characters with given modulus.
@@ -46,7 +46,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ConreyGenerator}(p)=\begin{cases}10&p=40\,487\\7&p=6\,692\,367\,337\\\min(\lbrace a, a\in\N^*\in\mathrm{Count}(\lbrace a^{k}\bmod p, k\in\N\rbrace)=p-1\rbrace)&\top\end{cases}$$
+$$\mathrm{ConreyGenerator}(p)=\begin{cases}10&p=40\,487\\7&p=6\,692\,367\,337\\\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p))=p-1))&\top\end{cases}$$
 
 **Holds when** $p\in\mathrm{Primes}\land p\ge3\land p\lt10^{12}$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
@@ -64,7 +64,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ConreyGenerator}(p)=\min(\lbrace a, a\in\N^*\in(\mathrm{Count}(\lbrace a^{k}\bmod p, k\in\N\rbrace)=p-1\land\mathrm{Count}(\lbrace a^{k}\bmod p^2, k\in\N\rbrace)=p(p-1))\rbrace)$$
+$$\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p))=p-1\land\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p^2))=p(p-1)))$$
 
 **Holds when** $p\in\mathrm{Primes}\land p\ge3$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
@@ -125,7 +125,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PrimitiveDirichletCharacters}(q)=\lbrace\chi, \chi\in\mathrm{DirichletGroup}(q)\in(\forall d\in1..q-1, (d\mid q)\implies(\exists a\in0..q-1, \mathrm{CongruentMod}(a, 1, d)\land\gcd(a, q)=1\land\chi(a)\ne1))\rbrace$$
+$$\mathrm{PrimitiveDirichletCharacters}(q)=\mathrm{Filter}(\mathrm{DirichletGroup}(q), \chi\mapsto\forall d\in1..q-1, (d\mid q)\implies(\exists a\in0..q-1, \mathrm{CongruentMod}(a, 1, d)\land\gcd(a, q)=1\land\chi(a)\ne1))$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletGroup** — Dirichlet characters with given modulus; **PrimitiveDirichletCharacters** — Primitive Dirichlet characters with given modulus.
@@ -329,7 +329,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{HurwitzZeta}(-n, 0)=-(\frac{\mathrm{BernoulliB}(n+1)}{n+1})$$
 
 **Holds when** $n\in\N$.
-**Symbols:** **BernoulliB** — Bernoulli number; **HurwitzZeta** — Hurwitz zeta function.
+**Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`7dab87` · Fungrim entry ↗](https://fungrim.org/entry/7dab87)
 
@@ -341,6 +341,15 @@ $$a\mapsto\mathrm{HurwitzZeta}(s, a)^{\prime}(a)=-(s\mathrm{HurwitzZeta}(s+1, a)
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
 [`83065e` · Fungrim entry ↗](https://fungrim.org/entry/83065e)
+
+---
+
+$$\mathrm{HurwitzZeta}(n, a)=\frac{\mathrm{PolyGamma}(n-1, a)\times(-1)^{n}}{(n-1)!}$$
+
+**Holds when** $n\in2..\infty\land a\in\C$.
+**Symbols:** **HurwitzZeta** — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+[`84196a` · Fungrim entry ↗](https://fungrim.org/entry/84196a)
 
 ---
 
@@ -580,7 +589,6 @@ Used by the Compute Engine for expansion.
 $$\Zeta(-n)=\frac{(-1)^{n}\mathrm{BernoulliB}(n+1)}{n+1}$$
 
 **Holds when** $n\in\Z\land n\ge0$.
-**Symbols:** **BernoulliB** — Bernoulli number.
 Used by the Compute Engine for simplification.
 [`51fd98` · Fungrim entry ↗](https://fungrim.org/entry/51fd98)
 
@@ -632,7 +640,6 @@ Used by the Compute Engine for simplification.
 $$\Zeta(2n)=\frac{(-1)^{n+1}\mathrm{BernoulliB}(2n)(2\pi)^{2n}}{2(2n)!}$$
 
 **Holds when** $n\in\Z\land n\ge1$.
-**Symbols:** **BernoulliB** — Bernoulli number.
 Used by the Compute Engine for simplification.
 [`72ccda` · Fungrim entry ↗](https://fungrim.org/entry/72ccda)
 
@@ -641,7 +648,7 @@ Used by the Compute Engine for simplification.
 $$\Zeta(s)=(\sum_{k=1}^{N_{var}-1}\frac{1}{k^{s}}+\frac{N_{var}^{1-s}}{s-1}+\frac{\sum_{k=1}^{M}(\mathrm{RisingFactorial}(s, 2k-1)\mathrm{BernoulliB}(2k))/((2k)!N_{var}^{2k-1})+\frac{1}{2}}{N_{var}^{s}})-\int_{N_{var}}^{\infty}\!\frac{\mathrm{RisingFactorial}(s, 2M)\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)}{(2M)!t^{2M+s}}\, \mathrm{d}t$$
 
 **Holds when** $s\in\C\land s\ne1\land N_{var}\in\Z\land M\in\Z\land\Re((s+2M)-1)\gt0\land N_{var}\ge1\land M\ge1$.
-**Symbols:** **BernoulliB** — Bernoulli number; **BernoulliPolynomial** — Bernoulli polynomial; **RisingFactorial** — Rising factorial.
+**Symbols:** **BernoulliPolynomial** — Bernoulli polynomial; **RisingFactorial** — Rising factorial.
 Used by the Compute Engine for simplification.
 **References:**
 - F. Johansson (2015), Rigorous high-precision computation of the Hurwitz zeta function and its derivatives, Numerical Algorithms 69:253, DOI: 10.1007/s11075-014-9893-1

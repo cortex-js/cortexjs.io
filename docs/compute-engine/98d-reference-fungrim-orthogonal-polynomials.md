@@ -8,7 +8,7 @@ slug: /compute-engine/reference/fungrim-orthogonal-polynomials/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **74 identities** for orthogonal polynomials.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -103,7 +103,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{ChebyshevT}(n, x)=\mathrm{Hypergeometric2F_1}(-n, n, \frac{1}{2}, \frac{1-x}{2})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
-**Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind; **Hypergeometric2F1** — Gauss hypergeometric function.
+**Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
 Used by the Compute Engine for simplification.
 [`382679` · Fungrim entry ↗](https://fungrim.org/entry/382679)
 
@@ -383,7 +383,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{ChebyshevU}(n, x)=(n+1)\mathrm{Hypergeometric2F_1}(-n, n+2, \frac{3}{2}, \frac{1-x}{2})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
-**Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind; **Hypergeometric2F1** — Gauss hypergeometric function.
+**Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
 Used by the Compute Engine for simplification.
 [`ce9a39` · Fungrim entry ↗](https://fungrim.org/entry/ce9a39)
 
@@ -535,7 +535,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{LegendrePolynomial}(n, z)=\frac{z-1}{2}^{n}\mathrm{Hypergeometric2F_1}(-n, -n, 1, \frac{z+1}{z-1})$$
 
 **Holds when** $n\in\N\land z\in\C\setminus\lbrace1\rbrace$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`3c87b9` · Fungrim entry ↗](https://fungrim.org/entry/3c87b9)
 
@@ -577,7 +576,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`6cd4a1` · Fungrim entry ↗](https://fungrim.org/entry/6cd4a1)
 
@@ -586,7 +584,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`859445` · Fungrim entry ↗](https://fungrim.org/entry/859445)
 
@@ -611,7 +608,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{LegendrePolynomial}(n, z)=\mathrm{Hypergeometric2F_1}(-n, n+1, 1, \frac{1-z}{2})$$
 
 **Holds when** $n\in\N\land z\in\C$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`9395fc` · Fungrim entry ↗](https://fungrim.org/entry/9395fc)
 
@@ -668,7 +664,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{LegendrePolynomial}(n, z)=\binom{2n}{n}\frac{z}{2}^{n}\mathrm{Hypergeometric2F_1}(-(\frac{n}{2}), \frac{1-n}{2}, \frac{1}{2}-n, \frac{1}{z^2})$$
 
 **Holds when** $n\in\N\land z\in\C\setminus\lbrace0\rbrace$.
-**Symbols:** **Hypergeometric2F1** — Gauss hypergeometric function.
 Used by the Compute Engine for simplification.
 [`f55f0a` · Fungrim entry ↗](https://fungrim.org/entry/f55f0a)
 

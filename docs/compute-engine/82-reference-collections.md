@@ -252,7 +252,8 @@ Examples of function evaluating to a lazy collection include:
 - [**Cycle**](#cycle): infinite collections that repeat a finite collection.
 - [**Iterate**](#iterate): infinite collections that apply a function to an initial value repeatedly.
 - [**Repeat**](#repeat): infinite collections that repeat a single value.
-- [**Fill**](#fill): collections of a specified size, where each element is computed by a function or set to a specific value.
+- [**Fill**](#fill) and [**Tabulate**](#tabulate): collections of a specified
+  size, where each element is computed by a function or set to a specific value.
 
 ### Types
 
@@ -648,6 +649,36 @@ compute the value of the element.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Tabulate
+</nav>
+
+<FunctionDefinition name="Tabulate">
+
+<Signature name="Tabulate" returns="collection">_f_:function, _dimension_:integer</Signature>
+
+<Signature name="Tabulate" returns="collection">_f_:function, _rows_:integer, _columns_:integer</Signature>
+
+Create a collection by applying a function to every index in the specified
+dimensions. Indices start at 1.
+
+```json example
+["Tabulate", ["Function", ["Square", "i"], "i"], 5]
+// ➔ ["List", 1, 4, 9, 16, 25]
+```
+
+With multiple dimensions, the function receives one index for each dimension
+and the result is a nested list.
+
+```json example
+["Tabulate", ["Function", ["Add", "i", "j"], "i", "j"], 2, 3]
+// ➔ ["List", ["List", 2, 3, 4], ["List", 3, 4, 5]]
+```
+
+Unlike [`Fill`](#fill), `Tabulate` takes each dimension as a separate argument.
+
+</FunctionDefinition>
+
 
 <nav className="hidden">
 ### Repeat
@@ -888,6 +919,25 @@ It's equivalent to `["At", xs, 2]`.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Third
+</nav>
+
+<FunctionDefinition name="Third">
+
+<Signature name="Third">_xs_: indexed_collection</Signature>
+
+Return the third element of the collection.
+
+```json example
+["Third", ["List", 5, 2, 10, 18]]
+// ➔ 10
+```
+
+It's equivalent to `["At", xs, 3]`.
+
+</FunctionDefinition>
+
 
 
 <nav className="hidden">
@@ -997,6 +1047,29 @@ If `n` is negative, it returns a list without the last `n` elements.
 
 See [**Take**](#take) for a function that returns the first `n` elements.
 
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Slice
+</nav>
+
+<FunctionDefinition name="Slice">
+
+<Signature name="Slice" returns="list">_xs_:indexed_collection, _start_:integer, _end_:integer</Signature>
+
+<div className="tags"><span className="tag">lazy</span></div>
+
+Return the elements from the 1-based `start` index through the `end` index,
+inclusive. Negative indices are counted from the end of the collection.
+
+```json example
+["Slice", ["List", 5, 2, 10, 18], 2, 3]
+// ➔ ["List", 2, 10]
+
+["Slice", ["List", 5, 2, 10, 18], -3, -1]
+// ➔ ["List", 2, 10, 18]
+```
 
 </FunctionDefinition>
 
@@ -1231,6 +1304,26 @@ To get the values in sorted order, use `Extract`:
 
 ## Operating On Collections
 
+<nav className="hidden">
+### Length
+</nav>
+
+<FunctionDefinition name="Length">
+
+<Signature name="Length" returns="integer">_xs_:any</Signature>
+
+Return the number of elements in a finite collection. If the argument is not a
+collection or is infinite, the expression remains unevaluated.
+
+```json example
+["Length", ["List", 5, 2, 10, 18]]
+// ➔ 4
+```
+
+For collections, `Length` and [`Count`](#count) produce the same result;
+`Count` is restricted to collection arguments by its signature.
+
+</FunctionDefinition>
 
 
 
@@ -1297,6 +1390,27 @@ Returns `True` if the collection contains the given value, `False` otherwise. Th
 ["Contains", ["List", 5, 2, 10, 18], 42]
 // ➔ "False"
 ```
+</FunctionDefinition>
+
+<nav className="hidden">
+### IndexOf
+</nav>
+
+<FunctionDefinition name="IndexOf">
+
+<Signature name="IndexOf" returns="integer">_xs_:collection, _value_:any</Signature>
+
+Return the 1-based index of the first occurrence of `value`, or 0 if it is not
+present.
+
+```json example
+["IndexOf", ["List", 5, 2, 10, 2], 2]
+// ➔ 2
+
+["IndexOf", ["List", 5, 2, 10, 2], 42]
+// ➔ 0
+```
+
 </FunctionDefinition>
 
 <FunctionDefinition name="IndexWhere">

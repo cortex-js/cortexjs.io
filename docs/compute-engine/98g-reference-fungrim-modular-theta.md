@@ -5,10 +5,10 @@ slug: /compute-engine/reference/fungrim-modular-theta/
 
 # Modular forms and theta functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **314 identities** for modular forms and theta functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **318 identities** for modular forms and theta functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -16,15 +16,14 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 - [Dedekind eta function](#dedekind-eta-function) (23)
 - [Illustrations of Eisenstein series](#illustrations-of-eisenstein-series) (41)
 - [Jacobi theta functions](#jacobi-theta-functions) (206)
-- [Modular j-invariant](#modular-j-invariant) (20)
-- [Modular lambda function](#modular-lambda-function) (24)
+- [Modular j-invariant](#modular-j-invariant) (21)
+- [Modular lambda function](#modular-lambda-function) (27)
 
 ## Dedekind eta function
 
 $$36\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2-\frac{1}{\mathrm{DedekindEta}(\tau)}(24\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau))+\tau\mapsto\frac{1}{\mathrm{DedekindEta}(\tau)}(\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))^{\tripleprime}(\tau)=0$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/EllipticFunctions/DedekindEta/13/01/0002/)
 [`02d14f` · Fungrim entry ↗](https://fungrim.org/entry/02d14f)
@@ -33,7 +32,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(16\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt[4]{2^{1/4}-1}\sqrt{(1+2^{1/2})^{1/2}-2^{5/8}}}{2^{\frac{113}{64}}\sqrt[16]{1+\sqrt{2}}}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
 [`0701dc` · Fungrim entry ↗](https://fungrim.org/entry/0701dc)
@@ -43,7 +41,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{DedekindEta}(\tau+1)=\exp(\frac{\pi\imaginaryI}{12})\mathrm{DedekindEta}(\tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`1bae52` · Fungrim entry ↗](https://fungrim.org/entry/1bae52)
 
@@ -52,7 +49,7 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{\pi}((\frac{1}{2}\imaginaryI)\mathrm{DedekindEta}(\tau)\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau))$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **WeierstrassZeta** — Weierstrass zeta function.
+**Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`1c25d3` · Fungrim entry ↗](https://fungrim.org/entry/1c25d3)
 
@@ -60,7 +57,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(\exp(\frac{2\pi\imaginaryI}{3}))=\frac{\sqrt[8]{3}\exp(-((1/24\imaginaryI)\pi))\sqrt{\Gamma(1/3)}^{3}}{2\pi}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`204acd` · Fungrim entry ↗](https://fungrim.org/entry/204acd)
 
@@ -68,7 +64,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(4\imaginaryI)=(\mathrm{DedekindEta}(\imaginaryI))(2^{\frac{13}{16}}\sqrt[4]{1+\sqrt{2}})^{-1}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`3a56d8` · Fungrim entry ↗](https://fungrim.org/entry/3a56d8)
 
@@ -77,7 +72,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{DedekindEta}(-(\frac{1}{\tau}))=\sqrt{-(\imaginaryI\tau)}\mathrm{DedekindEta}(\tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`3b806f` · Fungrim entry ↗](https://fungrim.org/entry/3b806f)
 
@@ -85,7 +79,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(6\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt[6]{\frac{5-3^{1/2}}{2}-\frac{1}{2}(2^{1/2}\times3^{3/4})}}{6^{\frac{3}{8}}}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
 [`62ffb3` · Fungrim entry ↗](https://fungrim.org/entry/62ffb3)
@@ -95,7 +88,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{DedekindEta}(\tau)=\exp(\frac{\pi\imaginaryI\tau}{12})\mathrm{JacobiTheta}(3, \frac{\tau+1}{2}, 3\tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`737805` · Fungrim entry ↗](https://fungrim.org/entry/737805)
 
@@ -103,7 +95,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(7\imaginaryI)=\sqrt[4]{7^{1/2}-7/2+\frac{1}{2}((4\times7^{1/2}-7)^{1/2})}/\sqrt{7}\mathrm{DedekindEta}(\imaginaryI)$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
 [`7cc3d3` · Fungrim entry ↗](https://fungrim.org/entry/7cc3d3)
@@ -113,7 +104,6 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{12}(\imaginaryI\pi\mathrm{DedekindEta}(\tau))\mathrm{EisensteinE}(2, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`871996` · Fungrim entry ↗](https://fungrim.org/entry/871996)
 
@@ -121,7 +111,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(2\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)}{2^{\frac{3}{8}}}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`87e9ed` · Fungrim entry ↗](https://fungrim.org/entry/87e9ed)
 
@@ -138,7 +127,6 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{DedekindEta}(\imaginaryI)=\frac{\Gamma(\frac{1}{4})}{2\pi^{\frac{3}{4}}}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`9b8c9f` · Fungrim entry ↗](https://fungrim.org/entry/9b8c9f)
 
@@ -146,7 +134,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(3\imaginaryI)=(\mathrm{DedekindEta}(\imaginaryI))(3^{\frac{3}{8}}\sqrt[12]{2+\sqrt{3}})^{-1}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`9ce413` · Fungrim entry ↗](https://fungrim.org/entry/9ce413)
 
@@ -155,7 +142,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{DedekindEta}(\tau+\frac{1}{2})=\frac{\exp((1/24\imaginaryI)\pi)\mathrm{DedekindEta}(2\tau)^3}{\mathrm{DedekindEta}(\tau)\mathrm{DedekindEta}(4\tau)}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`a1a3d4` · Fungrim entry ↗](https://fungrim.org/entry/a1a3d4)
 
@@ -164,7 +150,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{DedekindEta}(\tau+24)=\mathrm{DedekindEta}(\tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 [`acee1a` · Fungrim entry ↗](https://fungrim.org/entry/acee1a)
 
@@ -172,7 +157,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(8\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt{2^{1/4}-1}}{2^{\frac{41}{32}}\sqrt[8]{1+\sqrt{2}}}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
 [`be2f32` · Fungrim entry ↗](https://fungrim.org/entry/be2f32)
@@ -181,7 +165,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(5\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)}{\sqrt{5\varphi}}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
 [`d2900f` · Fungrim entry ↗](https://fungrim.org/entry/d2900f)
@@ -191,7 +174,6 @@ Used by the Compute Engine for simplification.
 $$(\mathrm{DedekindEta}(\tau)^2(33\tau\mapsto\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau)^2+\mathrm{DedekindEta}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{(4)}(\tau))-18{\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}^4+12\mathrm{DedekindEta}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2)-28\mathrm{DedekindEta}(\tau)^2\tau\mapsto\mathrm{DedekindEta}(\tau)^{\tripleprime}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=0$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [functions.wolfram.com](http://functions.wolfram.com/EllipticFunctions/DedekindEta/13/01/0001/)
 [`df5f38` · Fungrim entry ↗](https://fungrim.org/entry/df5f38)
@@ -200,7 +182,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DedekindEta}(\sqrt{3}\imaginaryI)=\frac{\sqrt[8]{3}\sqrt{\Gamma(1/3)}^{3}}{\pi\times2^{\frac{4}{3}}}$$
 
-**Symbols:** **DedekindEta** — Dedekind eta function.
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
 [`e3e4c5` · Fungrim entry ↗](https://fungrim.org/entry/e3e4c5)
@@ -218,7 +199,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{DedekindEta}(\tau)=\exp(\frac{\pi\imaginaryI\tau}{12})\mathrm{EulerQSeries}(\exp(2\pi\imaginaryI\tau))$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **EulerQSeries** — Euler's q-series.
+**Symbols:** **EulerQSeries** — Euler's q-series.
 Used by the Compute Engine for simplification.
 [`ff587a` · Fungrim entry ↗](https://fungrim.org/entry/ff587a)
 
@@ -229,7 +210,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(2, \tau)=-(\frac{(12\imaginaryI)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}{\pi\mathrm{DedekindEta}(\tau)})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`03ad5a` · Fungrim entry ↗](https://fungrim.org/entry/03ad5a)
 
@@ -238,7 +218,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(8, \tau)=\mathrm{EisensteinE}(4, \tau)^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`044128` · Fungrim entry ↗](https://fungrim.org/entry/044128)
 
@@ -247,7 +226,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(2k, \tau)=\frac{\mathrm{EisensteinG}(2k, \tau)}{2\Zeta(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **EisensteinG** — Eisenstein series.
+**Symbols:** **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
 [`0a2120` · Fungrim entry ↗](https://fungrim.org/entry/0a2120)
 
@@ -256,7 +235,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(6, \tau)=\frac{\mathrm{DedekindEta}(\tau)^{24}}{\mathrm{DedekindEta}(2\tau)^{12}}-480\mathrm{DedekindEta}(2\tau)^{12}-(16\,896\mathrm{DedekindEta}(2\tau)^{12}\mathrm{DedekindEta}(4\tau)^8)/\mathrm{DedekindEta}(\tau)^8+\frac{8\,192\mathrm{DedekindEta}(4\tau)^{24}}{\mathrm{DedekindEta}(2\tau)^{12}}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 **Reference:** K. Ono (2004), Web of Modularity: Arithmetic of the Coefficients of Modular Forms and q-series, American Mathematical Society. Theorem 1.67.
 [`0a5ef4` · Fungrim entry ↗](https://fungrim.org/entry/0a5ef4)
@@ -274,7 +252,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(6, \tau)=\frac{1}{2}((\mathrm{JacobiTheta}(3, 0, \tau)^{12}+\mathrm{JacobiTheta}(4, 0, \tau)^{12})-3\mathrm{JacobiTheta}(2, 0, \tau)^8(\mathrm{JacobiTheta}(3, 0, \tau)^4+\mathrm{JacobiTheta}(4, 0, \tau)^4))$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`10f3b2` · Fungrim entry ↗](https://fungrim.org/entry/10f3b2)
 
@@ -283,7 +260,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\sum_{m=1}^{\infty}\exp(2\imaginaryI\pi mn\tau)n^{2k-1})}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
-**Symbols:** **BernoulliB** — Bernoulli number; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`15b347` · Fungrim entry ↗](https://fungrim.org/entry/15b347)
 
@@ -292,7 +268,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(6, \tau)=1+63(\sum_{m=1}^{\infty}\frac{2\cos(\pi m\tau)^4+11\cos(\pi m\tau)^2+2}{\sin(\pi m\tau)^6})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`171724` · Fungrim entry ↗](https://fungrim.org/entry/171724)
 
@@ -301,7 +276,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(2, \tau)=1+6(\sum_{m=1}^{\infty}(\sin(\pi m\tau)^2)^{-1})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`18a4d1` · Fungrim entry ↗](https://fungrim.org/entry/18a4d1)
 
@@ -318,7 +292,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(2, \exp(\frac{2\pi\imaginaryI}{3}))=\frac{2\sqrt{3}}{\pi}$$
 
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`30a054` · Fungrim entry ↗](https://fungrim.org/entry/30a054)
 
@@ -326,7 +299,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinG}(4, \exp(\frac{2\pi\imaginaryI}{3}))=\mathrm{EisensteinE}(4, \exp(\frac{2\pi\imaginaryI}{3}))=0$$
 
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **EisensteinG** — Eisenstein series.
+**Symbols:** **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
 [`3102a7` · Fungrim entry ↗](https://fungrim.org/entry/3102a7)
 
@@ -335,7 +308,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(12, \tau)=\frac{1}{691}(441\mathrm{EisensteinE}(4, \tau)^3+250\mathrm{EisensteinE}(6, \tau)^2)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`36fff2` · Fungrim entry ↗](https://fungrim.org/entry/36fff2)
 
@@ -344,7 +316,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(2, \tau)=(6\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau))/\pi^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **WeierstrassZeta** — Weierstrass zeta function.
+**Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`3bf702` · Fungrim entry ↗](https://fungrim.org/entry/3bf702)
 
@@ -353,7 +325,6 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{EisensteinE}(6, \tau)^{\prime}(\tau)=\frac{1}{2}(2\pi\imaginaryI(\mathrm{EisensteinE}(2, \tau)\mathrm{EisensteinE}(6, \tau)-\mathrm{EisensteinE}(4, \tau)^2))$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 **Reference:** B. C. Berndt and A. J. Yee (2002) Ramanujan's Contributions to Eisenstein Series, Especially in His Lost Notebook. In: Kanemitsu S., Jia C. (eds) Number Theoretic Methods. Developments in Mathematics, vol 8. Springer, Boston, MA. [https://doi.org/10.1007/978-1-4757-3675-5_3](https://doi.org/10.1007/978-1-4757-3675-5_3)
 [`3bfced` · Fungrim entry ↗](https://fungrim.org/entry/3bfced)
@@ -363,7 +334,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(4, \tau)=\frac{\mathrm{DedekindEta}(\tau)^{16}}{\mathrm{DedekindEta}(2\tau)^8}+(256\mathrm{DedekindEta}(2\tau)^{16})/\mathrm{DedekindEta}(\tau)^8$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 **Reference:** K. Ono (2004), Web of Modularity: Arithmetic of the Coefficients of Modular Forms and q-series, American Mathematical Society. Theorem 1.67.
 [`4da2cd` · Fungrim entry ↗](https://fungrim.org/entry/4da2cd)
@@ -372,7 +342,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(4, \imaginaryI)=\frac{3\Gamma(1/4)^8}{64\pi^6}$$
 
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`53fcdd` · Fungrim entry ↗](https://fungrim.org/entry/53fcdd)
 
@@ -388,7 +357,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(6, \exp(\frac{2\pi\imaginaryI}{3}))=\frac{27\Gamma(1/3)^{18}}{512\pi^{12}}$$
 
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`6c71c0` · Fungrim entry ↗](https://fungrim.org/entry/6c71c0)
 
@@ -397,7 +365,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(8, \tau)=\frac{1}{2}(\mathrm{JacobiTheta}(2, 0, \tau)^{16}+\mathrm{JacobiTheta}(3, 0, \tau)^{16}+\mathrm{JacobiTheta}(4, 0, \tau)^{16})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`6d2880` · Fungrim entry ↗](https://fungrim.org/entry/6d2880)
 
@@ -406,7 +373,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{EisensteinE}(2, \tau)=1-12(\sum_{m=1}^{\infty}(\cos(2\pi m\tau)-1)^{-1})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`7b62e4` · Fungrim entry ↗](https://fungrim.org/entry/7b62e4)
 
@@ -415,7 +381,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\mathrm{DivisorSigma}(2k-1, n)\exp(2\imaginaryI\pi n\tau))}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
-**Symbols:** **BernoulliB** — Bernoulli number; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`7c00e6` · Fungrim entry ↗](https://fungrim.org/entry/7c00e6)
 
@@ -424,7 +389,6 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{EisensteinE}(2, \tau)^{\prime}(\tau)=\frac{1}{12}(2\pi\imaginaryI(\mathrm{EisensteinE}(2, \tau)^2-\mathrm{EisensteinE}(4, \tau)))$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 **Reference:** B. C. Berndt and A. J. Yee (2002) Ramanujan's Contributions to Eisenstein Series, Especially in His Lost Notebook. In: Kanemitsu S., Jia C. (eds) Number Theoretic Methods. Developments in Mathematics, vol 8. Springer, Boston, MA. [https://doi.org/10.1007/978-1-4757-3675-5_3](https://doi.org/10.1007/978-1-4757-3675-5_3)
 [`7cda09` · Fungrim entry ↗](https://fungrim.org/entry/7cda09)
@@ -434,7 +398,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}(\exp(2\imaginaryI\pi n\tau)n^{2k-1})/(1-\exp(2\imaginaryI\pi n\tau)))}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
-**Symbols:** **BernoulliB** — Bernoulli number; **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`848d97` · Fungrim entry ↗](https://fungrim.org/entry/848d97)
 
@@ -443,7 +406,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(14, \tau)=\mathrm{EisensteinE}(4, \tau)\mathrm{EisensteinE}(10, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`9e1f83` · Fungrim entry ↗](https://fungrim.org/entry/9e1f83)
 
@@ -460,7 +422,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(6, \tau)^2=\frac{1}{8}({(\mathrm{JacobiTheta}(2, 0, \tau)^8+\mathrm{JacobiTheta}(3, 0, \tau)^8+\mathrm{JacobiTheta}(4, 0, \tau)^8)}^3-54(\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau))^8)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a0dff6` · Fungrim entry ↗](https://fungrim.org/entry/a0dff6)
 
@@ -468,7 +429,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinG}(6, \imaginaryI)=\mathrm{EisensteinE}(6, \imaginaryI)=0$$
 
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **EisensteinG** — Eisenstein series.
+**Symbols:** **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
 [`a4109c` · Fungrim entry ↗](https://fungrim.org/entry/a4109c)
 
@@ -476,7 +437,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{EisensteinE}(2, \imaginaryI)=\frac{3}{\pi}$$
 
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`a691b3` · Fungrim entry ↗](https://fungrim.org/entry/a691b3)
 
@@ -485,7 +445,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(4, \tau)=1+30(\sum_{m=1}^{\infty}\frac{\cos(\pi m\tau)^2+1}{\sin(\pi m\tau)^4})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`a92c1a` · Fungrim entry ↗](https://fungrim.org/entry/a92c1a)
 
@@ -494,7 +453,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(10, \tau)=\mathrm{EisensteinE}(4, \tau)\mathrm{EisensteinE}(6, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`adaf5a` · Fungrim entry ↗](https://fungrim.org/entry/adaf5a)
 
@@ -503,7 +461,6 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{EisensteinE}(4, \tau)^{\prime}(\tau)=\frac{1}{3}(2\pi\imaginaryI(\mathrm{EisensteinE}(2, \tau)\mathrm{EisensteinE}(4, \tau)-\mathrm{EisensteinE}(6, \tau)))$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for expansion.
 **Reference:** B. C. Berndt and A. J. Yee (2002) Ramanujan's Contributions to Eisenstein Series, Especially in His Lost Notebook. In: Kanemitsu S., Jia C. (eds) Number Theoretic Methods. Developments in Mathematics, vol 8. Springer, Boston, MA. [https://doi.org/10.1007/978-1-4757-3675-5_3](https://doi.org/10.1007/978-1-4757-3675-5_3)
 [`af2ea9` · Fungrim entry ↗](https://fungrim.org/entry/af2ea9)
@@ -531,7 +488,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(4, \tau)^3-\mathrm{EisensteinE}(6, \tau)^2=\frac{1}{4}(27(\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau))^8)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`bd7d8e` · Fungrim entry ↗](https://fungrim.org/entry/bd7d8e)
 
@@ -540,7 +496,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(4, \tau)=\frac{1}{2}(\mathrm{JacobiTheta}(2, 0, \tau)^8+\mathrm{JacobiTheta}(3, 0, \tau)^8+\mathrm{JacobiTheta}(4, 0, \tau)^8)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cc579c` · Fungrim entry ↗](https://fungrim.org/entry/cc579c)
 
@@ -549,7 +504,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(2k, \tau+n)=\mathrm{EisensteinE}(2k, \tau)$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`d56eb6` · Fungrim entry ↗](https://fungrim.org/entry/d56eb6)
 
@@ -558,7 +512,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinG}(2, \tau)=-(\frac{1}{\mathrm{DedekindEta}(\tau)}((4\imaginaryI)\pi\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)))$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinG** — Eisenstein series.
+**Symbols:** **EisensteinG** — Eisenstein series.
 Used by the Compute Engine for simplification.
 [`dbf388` · Fungrim entry ↗](https://fungrim.org/entry/dbf388)
 
@@ -575,7 +529,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(14, \tau)=\mathrm{EisensteinE}(4, \tau)^2\mathrm{EisensteinE}(6, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`e60fd4` · Fungrim entry ↗](https://fungrim.org/entry/e60fd4)
 
@@ -584,7 +537,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(14, \tau)=\mathrm{EisensteinE}(6, \tau)\mathrm{EisensteinE}(8, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series.
 Used by the Compute Engine for simplification.
 [`feb95e` · Fungrim entry ↗](https://fungrim.org/entry/feb95e)
 
@@ -595,7 +547,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(3, 1/8-z, \tau)\mathrm{JacobiTheta}(3, \frac{1}{8}+z, \tau)\mathrm{JacobiTheta}(3, 3/8-z, \tau)\mathrm{JacobiTheta}(3, \frac{3}{8}+z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0096a8` · Fungrim entry ↗](https://fungrim.org/entry/0096a8)
 
@@ -604,7 +555,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0373dc` · Fungrim entry ↗](https://fungrim.org/entry/0373dc)
 
@@ -613,7 +563,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 0, \tau, 2r+1)=0$$
 
 **Holds when** $\Im(\tau)\gt0\land r\in\N$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`055b0a` · Fungrim entry ↗](https://fungrim.org/entry/055b0a)
 
@@ -622,7 +571,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \frac{-1}{\tau})=\sqrt{\frac{\tau}{\imaginaryI}}\exp(\pi\imaginaryI\tau z^2)\mathrm{JacobiTheta}(4, \tau z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`06319a` · Fungrim entry ↗](https://fungrim.org/entry/06319a)
 
@@ -631,7 +579,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)^2=1+4(\sum_{n=1}^{\infty}\frac{\exp(\pi\imaginaryI\tau)^{n}}{1+\exp(\pi\imaginaryI\tau)^{2n}})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0650f8` · Fungrim entry ↗](https://fungrim.org/entry/0650f8)
 
@@ -640,7 +587,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(2, w, \tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`077394` · Fungrim entry ↗](https://fungrim.org/entry/077394)
 
@@ -649,7 +595,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau)=\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(3, z+\frac{\tau}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0878a4` · Fungrim entry ↗](https://fungrim.org/entry/0878a4)
 
@@ -658,7 +603,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau)^4+\mathrm{JacobiTheta}(3, z, \tau)^4=\mathrm{JacobiTheta}(2, z, \tau)^4+\mathrm{JacobiTheta}(4, z, \tau)^4$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`08822c` · Fungrim entry ↗](https://fungrim.org/entry/08822c)
 
@@ -667,7 +611,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(3, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, 1/4-z, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}+z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0a9ec2` · Fungrim entry ↗](https://fungrim.org/entry/0a9ec2)
 
@@ -676,7 +619,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2=\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2-\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)^2$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`0e2635` · Fungrim entry ↗](https://fungrim.org/entry/0e2635)
 
@@ -685,7 +627,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z+\tau, \tau)=\exp(-(\pi\imaginaryI(2z+\tau)))\mathrm{JacobiTheta}(3, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`103bfb` · Fungrim entry ↗](https://fungrim.org/entry/103bfb)
 
@@ -694,7 +635,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \tau)=\imaginaryI\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(2, z+\frac{1}{2}+\frac{\tau}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`10ca40` · Fungrim entry ↗](https://fungrim.org/entry/10ca40)
 
@@ -702,7 +642,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \imaginaryI)=\frac{\Gamma(\frac{1}{4})}{\sqrt{2}\pi^{\frac{3}{4}}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1403b5` · Fungrim entry ↗](https://fungrim.org/entry/1403b5)
 
@@ -711,7 +650,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)=\mathrm{JacobiTheta}(3, z+w, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)-\mathrm{JacobiTheta}(2, z+w, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1792a9` · Fungrim entry ↗](https://fungrim.org/entry/1792a9)
 
@@ -720,7 +658,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \tau+2n)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`19acd8` · Fungrim entry ↗](https://fungrim.org/entry/19acd8)
 
@@ -729,7 +666,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, 2\tau)(\mathrm{JacobiTheta}(1, z, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2)=\mathrm{JacobiTheta}(3, 0, 2\tau)(\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`1c67c8` · Fungrim entry ↗](https://fungrim.org/entry/1c67c8)
 
@@ -738,7 +674,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(4, 0, \tau)^4-\mathrm{JacobiTheta}(2, 0, \tau)^4=1-24(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1+\exp(\pi\imaginaryI\tau)^{2n+1}})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1cec67` · Fungrim entry ↗](https://fungrim.org/entry/1cec67)
 
@@ -747,7 +682,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau+n)=\exp(\frac{\pi\imaginaryI n}{4})\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1fa8e7` · Fungrim entry ↗](https://fungrim.org/entry/1fa8e7)
 
@@ -756,7 +690,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)^4=\mathrm{JacobiTheta}(2, 0, \tau)^4+\mathrm{JacobiTheta}(4, 0, \tau)^4$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1fbc09` · Fungrim entry ↗](https://fungrim.org/entry/1fbc09)
 
@@ -765,7 +698,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`1feda6` · Fungrim entry ↗](https://fungrim.org/entry/1feda6)
 
@@ -774,7 +706,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 2z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)^4+\mathrm{JacobiTheta}(3, z, \tau)^4}{\mathrm{JacobiTheta}(3, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`20d581` · Fungrim entry ↗](https://fungrim.org/entry/20d581)
 
@@ -783,7 +714,6 @@ Used by the Compute Engine for simplification.
 $$2\mathrm{JacobiTheta}(2, 0, 2\tau)^2=\mathrm{JacobiTheta}(3, 0, \tau)^2-\mathrm{JacobiTheta}(4, 0, \tau)^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`21c2f7` · Fungrim entry ↗](https://fungrim.org/entry/21c2f7)
 
@@ -792,7 +722,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2}{\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`21dc98` · Fungrim entry ↗](https://fungrim.org/entry/21dc98)
 
@@ -801,7 +730,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`23077c` · Fungrim entry ↗](https://fungrim.org/entry/23077c)
 
@@ -810,7 +738,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau)=\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(1, z+\frac{1}{2}+\frac{\tau}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`235d0d` · Fungrim entry ↗](https://fungrim.org/entry/235d0d)
 
@@ -819,7 +746,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2=\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)^2+\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`265d9c` · Fungrim entry ↗](https://fungrim.org/entry/265d9c)
 
@@ -828,7 +754,6 @@ Used by the Compute Engine for simplification.
 $$\frac{\mathrm{JacobiTheta}(1, 0, \tau, 3)}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}=\frac{\mathrm{JacobiTheta}(2, 0, \tau, 2)}{\mathrm{JacobiTheta}(2, 0, \tau)}+\frac{\mathrm{JacobiTheta}(3, 0, \tau, 2)}{\mathrm{JacobiTheta}(3, 0, \tau)}+\frac{\mathrm{JacobiTheta}(4, 0, \tau, 2)}{\mathrm{JacobiTheta}(4, 0, \tau)}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`278274` · Fungrim entry ↗](https://fungrim.org/entry/278274)
 
@@ -837,7 +762,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(1, 1/4-z, \tau)\mathrm{JacobiTheta}(1, \frac{1}{4}+z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`27b169` · Fungrim entry ↗](https://fungrim.org/entry/27b169)
 
@@ -846,7 +770,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`2853d4` · Fungrim entry ↗](https://fungrim.org/entry/2853d4)
 
@@ -855,7 +778,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau+n)=\begin{cases}\mathrm{JacobiTheta}(3, z, \tau)&\mathrm{IsEven}(n)\\\mathrm{JacobiTheta}(4, z, \tau)&\mathrm{IsOdd}(n)\end{cases}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`28b4c3` · Fungrim entry ↗](https://fungrim.org/entry/28b4c3)
 
@@ -864,7 +786,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z+\frac{\tau}{2}, \tau)=\exp(-(\pi\imaginaryI(z+\frac{\tau}{4})))\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`2d2dde` · Fungrim entry ↗](https://fungrim.org/entry/2d2dde)
 
@@ -873,7 +794,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z+m+n\tau, \tau)=\exp(-(\pi\imaginaryI(\tau n^2+2nz)))\mathrm{JacobiTheta}(3, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land m\in\Z\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`2e4da0` · Fungrim entry ↗](https://fungrim.org/entry/2e4da0)
 
@@ -882,7 +802,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(1, \frac{n}{4}, \imaginaryI)=\begin{cases}0&\mathrm{CongruentMod}(n, 0, 4)\\(-1)^{\lfloor n/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor n/4\rfloor}\frac{\sqrt{2^{1/2}-1}}{2^{7/16}}\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`2f3ed3` · Fungrim entry ↗](https://fungrim.org/entry/2f3ed3)
 
@@ -891,7 +810,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z+2n, \tau)=\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`2faeb9` · Fungrim entry ↗](https://fungrim.org/entry/2faeb9)
 
@@ -899,7 +817,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{2})=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI){(2^{1/2}-1)}^{\frac{2}{3}}\sqrt[12]{4+3\sqrt{2}}}{2^{\frac{7}{24}}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`324483` · Fungrim entry ↗](https://fungrim.org/entry/324483)
@@ -909,7 +826,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)^2+\mathrm{JacobiTheta}(2, z, \tau)^2}{2\mathrm{JacobiTheta}(2, 0, 2\tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`3479be` · Fungrim entry ↗](https://fungrim.org/entry/3479be)
 
@@ -918,7 +834,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)+\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(2, w, \tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`34d1c6` · Fungrim entry ↗](https://fungrim.org/entry/34d1c6)
 
@@ -927,7 +842,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`378949` · Fungrim entry ↗](https://fungrim.org/entry/378949)
 
@@ -936,7 +850,6 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau, s)^{\prime}(\tau)=\frac{\mathrm{JacobiTheta}(j, z, \tau, 2r+s)}{(4\imaginaryI\pi)^{r}}$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0\land r\in\N\land s\in\N$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`37e644` · Fungrim entry ↗](https://fungrim.org/entry/37e644)
 
@@ -945,7 +858,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, -z, \tau)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`380076` · Fungrim entry ↗](https://fungrim.org/entry/380076)
 
@@ -953,7 +865,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 1+10\imaginaryI)=\frac{\sqrt{5}\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times2^{\frac{7}{8}}}{5(\sqrt[4]{5}-1)\sqrt{1+\sqrt{5}}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`390158` · Fungrim entry ↗](https://fungrim.org/entry/390158)
@@ -963,7 +874,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^4-\mathrm{JacobiTheta}(1, z, \tau)^4}{\mathrm{JacobiTheta}(2, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`3a77e0` · Fungrim entry ↗](https://fungrim.org/entry/3a77e0)
 
@@ -972,7 +882,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(4, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`3cac28` · Fungrim entry ↗](https://fungrim.org/entry/3cac28)
 
@@ -981,7 +890,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{(2^{1/2}+1)^{1/4}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`3fb309` · Fungrim entry ↗](https://fungrim.org/entry/3fb309)
 
@@ -989,7 +897,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{2})=\sqrt{\frac{\sqrt{2}+1}{2}}\sqrt[4]{2}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`4256f0` · Fungrim entry ↗](https://fungrim.org/entry/4256f0)
@@ -999,7 +906,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z+\frac{\tau}{2}, \tau)=\exp(-(\pi\imaginaryI(z+\frac{\tau}{4})))\imaginaryI\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`429093` · Fungrim entry ↗](https://fungrim.org/entry/429093)
 
@@ -1008,7 +914,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z+m+n\tau, \tau)=(-1)^{m+n}\exp(-(\pi\imaginaryI(\tau n^2+2nz)))\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land m\in\Z\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`43fa0e` · Fungrim entry ↗](https://fungrim.org/entry/43fa0e)
 
@@ -1017,7 +922,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z+n, \tau)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`4448f1` · Fungrim entry ↗](https://fungrim.org/entry/4448f1)
 
@@ -1026,7 +930,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`45165c` · Fungrim entry ↗](https://fungrim.org/entry/45165c)
 
@@ -1035,7 +938,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`45a130` · Fungrim entry ↗](https://fungrim.org/entry/45a130)
 
@@ -1044,7 +946,6 @@ Used by the Compute Engine for simplification.
 $$2\mathrm{JacobiTheta}(1, 0, 2\tau, 1)\mathrm{JacobiTheta}(4, 0, 2\tau)=\mathrm{JacobiTheta}(1, 0, \tau, 1)\mathrm{JacobiTheta}(2, 0, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`46f244` · Fungrim entry ↗](https://fungrim.org/entry/46f244)
 
@@ -1053,7 +954,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau, 2r+1)=0$$
 
 **Holds when** $\Im(\tau)\gt0\land r\in\N$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`474c51` · Fungrim entry ↗](https://fungrim.org/entry/474c51)
 
@@ -1062,7 +962,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \frac{\tau}{2})\mathrm{JacobiTheta}(4, 0, \frac{\tau}{2})=\mathrm{JacobiTheta}(4, 0, \tau)^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`476642` · Fungrim entry ↗](https://fungrim.org/entry/476642)
 
@@ -1071,7 +970,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)+\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`47e587` · Fungrim entry ↗](https://fungrim.org/entry/47e587)
 
@@ -1080,7 +978,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)/\sqrt{y}$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`47f4ba` · Fungrim entry ↗](https://fungrim.org/entry/47f4ba)
 
@@ -1089,7 +986,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+\frac{1}{2}, \tau)=-\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`47f6dd` · Fungrim entry ↗](https://fungrim.org/entry/47f6dd)
 
@@ -1097,7 +993,6 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\sqrt{5}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{5\sqrt{5^{1/2}-2}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`483e7e` · Fungrim entry ↗](https://fungrim.org/entry/483e7e)
@@ -1107,7 +1002,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`48a1c6` · Fungrim entry ↗](https://fungrim.org/entry/48a1c6)
 
@@ -1116,7 +1010,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau)=-\imaginaryI\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(4, z+\frac{\tau}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`4c462b` · Fungrim entry ↗](https://fungrim.org/entry/4c462b)
 
@@ -1124,7 +1017,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 1+\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[4]{2}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`4c8873` · Fungrim entry ↗](https://fungrim.org/entry/4c8873)
@@ -1134,7 +1026,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau+4n)=(-1)^{n}\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`4cf228` · Fungrim entry ↗](https://fungrim.org/entry/4cf228)
 
@@ -1143,7 +1034,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(4, 0, \tau)^8=1+16(\sum_{n=1}^{\infty}\frac{(-1)^{n}n^3\exp(\pi\imaginaryI\tau)^{n}}{1-\exp(\pi\imaginaryI\tau)^{n}})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`4d26ec` · Fungrim entry ↗](https://fungrim.org/entry/4d26ec)
 
@@ -1152,7 +1042,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, -z, \tau)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`4f939e` · Fungrim entry ↗](https://fungrim.org/entry/4f939e)
 
@@ -1160,7 +1049,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{3})=\sqrt[4]{2\sqrt{3}+3}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`52302f` · Fungrim entry ↗](https://fungrim.org/entry/52302f)
@@ -1169,7 +1057,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 1+6\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{1+\sqrt{3}+\sqrt{2}\sqrt[4]{27}}}{2^{\frac{11}{24}}\times3^{\frac{3}{8}}\sqrt[6]{3^{1/2}-1}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`5384f3` · Fungrim entry ↗](https://fungrim.org/entry/5384f3)
@@ -1179,7 +1066,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 2z, 4\tau)=\frac{1}{2}(\mathrm{JacobiTheta}(3, z, \tau)+\mathrm{JacobiTheta}(4, z, \tau))$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`53fef4` · Fungrim entry ↗](https://fungrim.org/entry/53fef4)
 
@@ -1188,7 +1074,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)=2\mathrm{DedekindEta}(\tau)^3$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`557b19` · Fungrim entry ↗](https://fungrim.org/entry/557b19)
 
@@ -1197,7 +1082,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z+\frac{1}{2}, \tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`563d18` · Fungrim entry ↗](https://fungrim.org/entry/563d18)
 
@@ -1206,7 +1090,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5752b8` · Fungrim entry ↗](https://fungrim.org/entry/5752b8)
 
@@ -1215,7 +1098,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, 0, \frac{\tau}{2}, 1)\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})=2\mathrm{JacobiTheta}(1, 0, \tau, 1)\mathrm{JacobiTheta}(4, 0, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`59184e` · Fungrim entry ↗](https://fungrim.org/entry/59184e)
 
@@ -1224,7 +1106,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, -z, \tau)=-\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`59f8e1` · Fungrim entry ↗](https://fungrim.org/entry/59f8e1)
 
@@ -1233,7 +1114,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})^2=2\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`59fd23` · Fungrim entry ↗](https://fungrim.org/entry/59fd23)
 
@@ -1242,7 +1122,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau)^4-\mathrm{JacobiTheta}(2, z, \tau)^4=\mathrm{JacobiTheta}(4, z, \tau)^4-\mathrm{JacobiTheta}(3, z, \tau)^4$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`5a3ebf` · Fungrim entry ↗](https://fungrim.org/entry/5a3ebf)
 
@@ -1251,7 +1130,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(1, z+n, \tau)=(-1)^{n}\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5cdae6` · Fungrim entry ↗](https://fungrim.org/entry/5cdae6)
 
@@ -1260,7 +1138,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \tau)=\mathrm{JacobiTheta}(3, z+\frac{1}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5d41b1` · Fungrim entry ↗](https://fungrim.org/entry/5d41b1)
 
@@ -1269,7 +1146,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)=\mathrm{JacobiTheta}(1, z+w, 2\tau)\mathrm{JacobiTheta}(4, z-w, 2\tau)+\mathrm{JacobiTheta}(4, z+w, 2\tau)\mathrm{JacobiTheta}(1, z-w, 2\tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5f9e54` · Fungrim entry ↗](https://fungrim.org/entry/5f9e54)
 
@@ -1278,7 +1154,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, 2z, \tau)=\frac{2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`5fe58d` · Fungrim entry ↗](https://fungrim.org/entry/5fe58d)
 
@@ -1287,7 +1162,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`64b65d` · Fungrim entry ↗](https://fungrim.org/entry/64b65d)
 
@@ -1296,7 +1170,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \tau+n)=\begin{cases}\mathrm{JacobiTheta}(4, z, \tau)&\mathrm{IsEven}(n)\\\mathrm{JacobiTheta}(3, z, \tau)&\mathrm{IsOdd}(n)\end{cases}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`64f0a5` · Fungrim entry ↗](https://fungrim.org/entry/64f0a5)
 
@@ -1305,7 +1178,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`663a02` · Fungrim entry ↗](https://fungrim.org/entry/663a02)
 
@@ -1313,7 +1185,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 6\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{-4+2\sqrt{2}\times3^{3/4}+2\sqrt{3}+3\sqrt{2}-3^{3/4}+3^{5/4}}}{2\times3^{\frac{3}{8}}\sqrt[6]{(2^{1/2}-1)(3^{1/2}-1)}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`669765` · Fungrim entry ↗](https://fungrim.org/entry/669765)
@@ -1323,7 +1194,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \frac{\tau}{2})=\frac{2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`66eb8b` · Fungrim entry ↗](https://fungrim.org/entry/66eb8b)
 
@@ -1332,15 +1202,13 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2+\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`66efb8` · Fungrim entry ↗](https://fungrim.org/entry/66efb8)
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+12\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times2^{\frac{-19}{48}}\times3^{\frac{-3}{8}}\sqrt[3]{2-3\sqrt{2}+3^{5/4}+3^{3/4}}}{\sqrt[3]{-1+\sqrt{2}\times3^{3/4}-\sqrt{3}}\sqrt[12]{2^{1/2}-1}\sqrt[6]{1+\sqrt{3}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+12\imaginaryI)=\frac{\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{2-3\times2^{1/2}+3^{5/4}+3^{3/4}}}{2^{19/48}\times3^{3/8}}}{\sqrt[3]{-1+\sqrt{2}\times3^{3/4}-\sqrt{3}}\sqrt[12]{2^{1/2}-1}\sqrt[6]{1+\sqrt{3}}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`675f23` · Fungrim entry ↗](https://fungrim.org/entry/675f23)
@@ -1350,7 +1218,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`686ce0` · Fungrim entry ↗](https://fungrim.org/entry/686ce0)
 
@@ -1359,7 +1226,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \frac{\tau}{2})=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2}{\mathrm{JacobiTheta}(3, 0, \frac{\tau}{2})}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`69b32e` · Fungrim entry ↗](https://fungrim.org/entry/69b32e)
 
@@ -1368,7 +1234,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau)=\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(4, z+\frac{1}{2}+\frac{\tau}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`6a7704` · Fungrim entry ↗](https://fungrim.org/entry/6a7704)
 
@@ -1376,7 +1241,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 45\imaginaryI)=\frac{\sqrt{10}(3+\sqrt{5}+(\sqrt{3}+\sqrt{5}+\sqrt[4]{60})\sqrt[3]{2+\sqrt{3}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{30\sqrt{1+\sqrt{5}}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`6ade92` · Fungrim entry ↗](https://fungrim.org/entry/6ade92)
@@ -1386,7 +1250,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau+1)=\exp(\frac{\pi\imaginaryI}{4})\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`6b2078` · Fungrim entry ↗](https://fungrim.org/entry/6b2078)
 
@@ -1394,7 +1257,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 1+4\imaginaryI)=\frac{\sqrt[4]{\sqrt{2}+1}}{2^{\frac{7}{16}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`6cbce8` · Fungrim entry ↗](https://fungrim.org/entry/6cbce8)
@@ -1404,7 +1266,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \tau)=-\imaginaryI\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(1, z+\frac{\tau}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`6d918c` · Fungrim entry ↗](https://fungrim.org/entry/6d918c)
 
@@ -1413,7 +1274,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2=\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2+\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`6fad93` · Fungrim entry ↗](https://fungrim.org/entry/6fad93)
 
@@ -1422,7 +1282,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^4-\mathrm{JacobiTheta}(2, z, \tau)^4}{\mathrm{JacobiTheta}(4, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`7131cd` · Fungrim entry ↗](https://fungrim.org/entry/7131cd)
 
@@ -1431,7 +1290,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(2, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2}{2\mathrm{JacobiTheta}(3, 0, 2\tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`7137a2` · Fungrim entry ↗](https://fungrim.org/entry/7137a2)
 
@@ -1440,7 +1298,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`713b6b` · Fungrim entry ↗](https://fungrim.org/entry/713b6b)
 
@@ -1449,7 +1306,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau)=\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(2, z+\frac{\tau}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`71d5ee` · Fungrim entry ↗](https://fungrim.org/entry/71d5ee)
 
@@ -1457,7 +1313,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 7\imaginaryI)=\sqrt{\frac{1}{14}((\sqrt{13+7^{1/2}}+\sqrt{7+3\times7^{1/2}})\sqrt[8]{28})}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`72f583` · Fungrim entry ↗](https://fungrim.org/entry/72f583)
@@ -1467,7 +1322,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, w, \tau)=\mathrm{JacobiTheta}(3, z+w, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)-\mathrm{JacobiTheta}(2, z+w, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`73eb5d` · Fungrim entry ↗](https://fungrim.org/entry/73eb5d)
 
@@ -1476,7 +1330,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 0, \frac{\tau}{2})^2=\mathrm{JacobiTheta}(3, 0, \tau)^2-\mathrm{JacobiTheta}(2, 0, \tau)^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`7527f1` · Fungrim entry ↗](https://fungrim.org/entry/7527f1)
 
@@ -1485,7 +1338,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(1, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`75cb8c` · Fungrim entry ↗](https://fungrim.org/entry/75cb8c)
 
@@ -1494,7 +1346,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau+2n)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`772c88` · Fungrim entry ↗](https://fungrim.org/entry/772c88)
 
@@ -1503,7 +1354,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`775637` · Fungrim entry ↗](https://fungrim.org/entry/775637)
 
@@ -1512,7 +1362,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2+\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`794106` · Fungrim entry ↗](https://fungrim.org/entry/794106)
 
@@ -1520,7 +1369,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \sqrt{6}\imaginaryI)=\sqrt{\frac{1}{\pi}(2\mathrm{EllipticK}((2-3^{1/2})^2(2^{1/2}-3^{1/2})^2))}$$
 
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [mathworld.wolfram.com](http://mathworld.wolfram.com/PolyasRandomWalkConstants.html)
 [`799b5e` · Fungrim entry ↗](https://fungrim.org/entry/799b5e)
@@ -1529,7 +1377,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(2, 0, \imaginaryI)=\mathrm{JacobiTheta}(4, 0, \imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[4]{2}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`7d7c65` · Fungrim entry ↗](https://fungrim.org/entry/7d7c65)
 
@@ -1538,7 +1385,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2}{2\mathrm{JacobiTheta}(3, 0, 2\tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`7e0002` · Fungrim entry ↗](https://fungrim.org/entry/7e0002)
 
@@ -1546,7 +1392,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{4})=\frac{(1+\frac{1}{\sqrt[4]{2}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{1+\sqrt{2}}}{\sqrt{1+\sqrt{2}}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`7f9273` · Fungrim entry ↗](https://fungrim.org/entry/7f9273)
@@ -1556,7 +1401,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 0, 1+y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, y\imaginaryI)$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`81550a` · Fungrim entry ↗](https://fungrim.org/entry/81550a)
 
@@ -1564,7 +1408,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 9\imaginaryI)=\frac{1}{3}((1+\sqrt[3]{2(\sqrt{3}+1)})\mathrm{JacobiTheta}(3, 0, \imaginaryI))$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`8356db` · Fungrim entry ↗](https://fungrim.org/entry/8356db)
@@ -1574,7 +1417,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)=\frac{\mathrm{DedekindEta}((\tau+1)/2)^2}{\mathrm{DedekindEta}(\tau+1)}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`85b2ff` · Fungrim entry ↗](https://fungrim.org/entry/85b2ff)
 
@@ -1583,7 +1425,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`89985a` · Fungrim entry ↗](https://fungrim.org/entry/89985a)
 
@@ -1592,7 +1433,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(2, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`89c9e4` · Fungrim entry ↗](https://fungrim.org/entry/89c9e4)
 
@@ -1601,7 +1441,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)^4=1+8(\sum_{n=0}^{\infty}\frac{2n\exp(\pi\imaginaryI\tau)^{2n}}{1+\exp(\pi\imaginaryI\tau)^{2n}})+8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1-\exp(\pi\imaginaryI\tau)^{2n+1}})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`8a316c` · Fungrim entry ↗](https://fungrim.org/entry/8a316c)
 
@@ -1610,7 +1449,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \tau)=1+2(\sum_{n=1}^{\infty}(-1)^{n}\exp(\pi\imaginaryI\tau)^{n^2}\cos(2n\pi z))$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`8a34d1` · Fungrim entry ↗](https://fungrim.org/entry/8a34d1)
 
@@ -1619,7 +1457,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(4, z, \tau)^4-\mathrm{JacobiTheta}(1, z, \tau)^4}{\mathrm{JacobiTheta}(4, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`8b825c` · Fungrim entry ↗](https://fungrim.org/entry/8b825c)
 
@@ -1628,7 +1465,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(4, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{(2^{1/2}+1)^{1/4}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`8c4ab4` · Fungrim entry ↗](https://fungrim.org/entry/8c4ab4)
 
@@ -1637,7 +1473,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z+m+n\tau, \tau)=(-1)^{n}\exp(-(\pi\imaginaryI(\tau n^2+2nz)))\mathrm{JacobiTheta}(4, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land m\in\Z\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`8d6a1d` · Fungrim entry ↗](https://fungrim.org/entry/8d6a1d)
 
@@ -1646,7 +1481,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(1, 0, \tau)=0$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`8f43ab` · Fungrim entry ↗](https://fungrim.org/entry/8f43ab)
 
@@ -1655,7 +1489,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2+\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2}{\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`931201` · Fungrim entry ↗](https://fungrim.org/entry/931201)
 
@@ -1664,7 +1497,6 @@ Used by the Compute Engine for simplification.
 $$(30{\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)}^3-15\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau)+\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)^2\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\tripleprime}(\tau))^2+32{(\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau)-3\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)^2)}^3+\pi^2(\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\doubleprime}(\tau)-3\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{\prime}(\tau)^2)^2{\tau\mapsto\mathrm{JacobiTheta}(j, 0, \tau)^{(0)}(\tau)}^{10}=0$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`936694` · Fungrim entry ↗](https://fungrim.org/entry/936694)
 
@@ -1673,7 +1505,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 0, \tau)=\frac{1}{\mathrm{DedekindEta}(\tau)}(\mathrm{DedekindEta}(\tau/2)^2)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9448f2` · Fungrim entry ↗](https://fungrim.org/entry/9448f2)
 
@@ -1682,7 +1513,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau)=-\mathrm{JacobiTheta}(2, z+\frac{1}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`95988c` · Fungrim entry ↗](https://fungrim.org/entry/95988c)
 
@@ -1691,7 +1521,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \frac{\tau}{2})=\frac{\mathrm{JacobiTheta}(3, z, \tau)^2-\mathrm{JacobiTheta}(2, z, \tau)^2}{\mathrm{JacobiTheta}(4, 0, \frac{\tau}{2})}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`95e508` · Fungrim entry ↗](https://fungrim.org/entry/95e508)
 
@@ -1699,7 +1528,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 4\imaginaryI)=\frac{1}{2}((1+2^{-(1/4)})\mathrm{JacobiTheta}(3, 0, \imaginaryI))$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`95e9e4` · Fungrim entry ↗](https://fungrim.org/entry/95e9e4)
@@ -1709,7 +1537,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9973ef` · Fungrim entry ↗](https://fungrim.org/entry/9973ef)
 
@@ -1718,7 +1545,6 @@ Used by the Compute Engine for simplification.
 $$2\mathrm{JacobiTheta}(2, 0, 2\tau)\mathrm{JacobiTheta}(3, 0, 2\tau)=\mathrm{JacobiTheta}(2, 0, \tau)^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9a2054` · Fungrim entry ↗](https://fungrim.org/entry/9a2054)
 
@@ -1727,7 +1553,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)=\mathrm{JacobiTheta}(2, z+w, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)+\mathrm{JacobiTheta}(3, z+w, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9a9487` · Fungrim entry ↗](https://fungrim.org/entry/9a9487)
 
@@ -1736,7 +1561,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2=\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9aa437` · Fungrim entry ↗](https://fungrim.org/entry/9aa437)
 
@@ -1745,7 +1569,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau+1)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`9c1e9a` · Fungrim entry ↗](https://fungrim.org/entry/9c1e9a)
 
@@ -1754,7 +1577,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a0552b` · Fungrim entry ↗](https://fungrim.org/entry/a0552b)
 
@@ -1763,7 +1585,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, 4\tau)=\frac{1}{2}(\mathrm{JacobiTheta}(3, z, \tau)-\mathrm{JacobiTheta}(4, z, \tau))$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a0a1ee` · Fungrim entry ↗](https://fungrim.org/entry/a0a1ee)
 
@@ -1772,7 +1593,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau, 2r+1)=0$$
 
 **Holds when** $\Im(\tau)\gt0\land r\in\N$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a19141` · Fungrim entry ↗](https://fungrim.org/entry/a19141)
 
@@ -1781,7 +1601,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\mathrm{JacobiTheta}(j, z, \tau)^{\prime}(z)=\mathrm{JacobiTheta}(j, z, \tau, r)$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0\land r\in\N$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a222ed` · Fungrim entry ↗](https://fungrim.org/entry/a222ed)
 
@@ -1790,7 +1609,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(2, 1/8-z, \tau)\mathrm{JacobiTheta}(2, \frac{1}{8}+z, \tau)\mathrm{JacobiTheta}(2, 3/8-z, \tau)\mathrm{JacobiTheta}(2, \frac{3}{8}+z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a255e1` · Fungrim entry ↗](https://fungrim.org/entry/a255e1)
 
@@ -1799,7 +1617,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a4eecf` · Fungrim entry ↗](https://fungrim.org/entry/a4eecf)
 
@@ -1808,7 +1625,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \tau+1)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a5c258` · Fungrim entry ↗](https://fungrim.org/entry/a5c258)
 
@@ -1817,7 +1633,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(j, z^\star, \tau)=\mathrm{JacobiTheta}(j, z, -\tau^\star)^\star$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a891da` · Fungrim entry ↗](https://fungrim.org/entry/a891da)
 
@@ -1826,7 +1641,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 2z, \tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a94b43` · Fungrim entry ↗](https://fungrim.org/entry/a94b43)
 
@@ -1835,7 +1649,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)=\frac{1}{\mathrm{DedekindEta}(\tau)}(2\mathrm{DedekindEta}(2\tau)^2)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a9c825` · Fungrim entry ↗](https://fungrim.org/entry/a9c825)
 
@@ -1844,7 +1657,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \frac{\tau}{2})=\frac{2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, 0, \frac{\tau}{2})}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`a9cdda` · Fungrim entry ↗](https://fungrim.org/entry/a9cdda)
 
@@ -1853,7 +1665,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2}{\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`aaa582` · Fungrim entry ↗](https://fungrim.org/entry/aaa582)
 
@@ -1862,7 +1673,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2=\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)^2+\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`abbe42` · Fungrim entry ↗](https://fungrim.org/entry/abbe42)
 
@@ -1871,7 +1681,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau+8n)=\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`abc1e7` · Fungrim entry ↗](https://fungrim.org/entry/abc1e7)
 
@@ -1880,7 +1689,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2}{\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b1d07b` · Fungrim entry ↗](https://fungrim.org/entry/b1d07b)
 
@@ -1889,7 +1697,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, 0, \tau, 2r)=0$$
 
 **Holds when** $\Im(\tau)\gt0\land r\in\N$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b3c440` · Fungrim entry ↗](https://fungrim.org/entry/b3c440)
 
@@ -1898,7 +1705,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau)=\mathrm{JacobiTheta}(4, z+\frac{1}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b3fc6d` · Fungrim entry ↗](https://fungrim.org/entry/b3fc6d)
 
@@ -1907,7 +1713,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+2n, \tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b46534` · Fungrim entry ↗](https://fungrim.org/entry/b46534)
 
@@ -1915,7 +1720,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 1+2\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[8]{2}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`b58070` · Fungrim entry ↗](https://fungrim.org/entry/b58070)
@@ -1925,7 +1729,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z+\tau, \tau)=-\exp(-(\pi\imaginaryI(2z+\tau)))\mathrm{JacobiTheta}(4, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`b83f63` · Fungrim entry ↗](https://fungrim.org/entry/b83f63)
 
@@ -1934,7 +1737,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau+2n)=\imaginaryI^{n}\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`b978f0` · Fungrim entry ↗](https://fungrim.org/entry/b978f0)
 
@@ -1943,7 +1745,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(1, z, \tau+4n)=(-1)^{n}\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`b9c650` · Fungrim entry ↗](https://fungrim.org/entry/b9c650)
 
@@ -1952,7 +1753,6 @@ Used by the Compute Engine for expansion.
 $$2\mathrm{JacobiTheta}(3, 0, 2\tau)^2=\mathrm{JacobiTheta}(3, 0, \tau)^2+\mathrm{JacobiTheta}(4, 0, \tau)^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c3d8c2` · Fungrim entry ↗](https://fungrim.org/entry/c3d8c2)
 
@@ -1961,7 +1761,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \frac{-1}{\tau})=\sqrt{\frac{\tau}{\imaginaryI}}\exp(\pi\imaginaryI\tau z^2)\mathrm{JacobiTheta}(3, \tau z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c4b16c` · Fungrim entry ↗](https://fungrim.org/entry/c4b16c)
 
@@ -1969,7 +1768,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, \sqrt{6}\imaginaryI)=\sqrt[4]{\frac{\sqrt{6}\Gamma(1/24)\Gamma(5/24)\Gamma(7/24)\Gamma(11/24)}{96(18-10\sqrt{3}-7\sqrt{6}+12\sqrt{2})\pi^3}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [mathworld.wolfram.com](http://mathworld.wolfram.com/PolyasRandomWalkConstants.html)
 [`c60033` · Fungrim entry ↗](https://fungrim.org/entry/c60033)
@@ -1979,7 +1777,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)^4=8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1+\exp(\pi\imaginaryI\tau)^{2n+1}})+8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1-\exp(\pi\imaginaryI\tau)^{2n+1}})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c743eb` · Fungrim entry ↗](https://fungrim.org/entry/c743eb)
 
@@ -1988,7 +1785,6 @@ Used by the Compute Engine for simplification.
 $$\frac{\mathrm{JacobiTheta}(2, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(2, z, \tau)}=4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\times(-1)^{n}\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})-\tan(\pi z)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land\cos(\pi z)\ne0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c7f7a5` · Fungrim entry ↗](https://fungrim.org/entry/c7f7a5)
 
@@ -1997,7 +1793,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2=\mathrm{JacobiTheta}(4, z, \tau)^2\mathrm{JacobiTheta}(2, w, \tau)^2+\mathrm{JacobiTheta}(3, z, \tau)^2\mathrm{JacobiTheta}(1, w, \tau)^2=\mathrm{JacobiTheta}(1, z, \tau)^2\mathrm{JacobiTheta}(3, w, \tau)^2+\mathrm{JacobiTheta}(2, z, \tau)^2\mathrm{JacobiTheta}(4, w, \tau)^2$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c891a1` · Fungrim entry ↗](https://fungrim.org/entry/c891a1)
 
@@ -2006,7 +1801,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \frac{\tau}{2})=\frac{\mathrm{JacobiTheta}(4, z, \tau)^2+\mathrm{JacobiTheta}(1, z, \tau)^2}{\mathrm{JacobiTheta}(3, 0, \frac{\tau}{2})}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`c92a6f` · Fungrim entry ↗](https://fungrim.org/entry/c92a6f)
 
@@ -2015,7 +1809,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cb493d` · Fungrim entry ↗](https://fungrim.org/entry/cb493d)
 
@@ -2023,7 +1816,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{5+2\sqrt{5}}}{5^{\frac{3}{4}}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`cb6c9c` · Fungrim entry ↗](https://fungrim.org/entry/cb6c9c)
@@ -2033,7 +1825,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+\frac{\tau}{2}, \tau)=\exp(-(\pi\imaginaryI(z+\frac{\tau}{4})))\mathrm{JacobiTheta}(3, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cc6d21` · Fungrim entry ↗](https://fungrim.org/entry/cc6d21)
 
@@ -2042,7 +1833,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+\tau, \tau)=\exp(-(\pi\imaginaryI(2z+\tau)))\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cd5f45` · Fungrim entry ↗](https://fungrim.org/entry/cd5f45)
 
@@ -2051,7 +1841,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau+1)=\exp(\frac{\pi\imaginaryI}{4})\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cde93e` · Fungrim entry ↗](https://fungrim.org/entry/cde93e)
 
@@ -2059,7 +1848,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 2\imaginaryI)=\frac{1}{2}(\sqrt{\sqrt{2}+2}\mathrm{JacobiTheta}(3, 0, \imaginaryI))$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`cf3c8e` · Fungrim entry ↗](https://fungrim.org/entry/cf3c8e)
@@ -2069,7 +1857,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 0, y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, 1+y\imaginaryI)$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`cf7ee3` · Fungrim entry ↗](https://fungrim.org/entry/cf7ee3)
 
@@ -2078,7 +1865,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau+n)=\exp(\frac{\pi\imaginaryI n}{4})\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d0dfba` · Fungrim entry ↗](https://fungrim.org/entry/d0dfba)
 
@@ -2087,7 +1873,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau+2n)=\imaginaryI^{n}\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`d11b7f` · Fungrim entry ↗](https://fungrim.org/entry/d11b7f)
 
@@ -2095,7 +1880,6 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{JacobiTheta}(3, 0, \imaginaryI)=\frac{\sqrt[4]{\pi}}{\Gamma(\frac{3}{4})}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d15f11` · Fungrim entry ↗](https://fungrim.org/entry/d15f11)
 
@@ -2104,7 +1888,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+m+n\tau, \tau)=(-1)^{m}\exp(-(\pi\imaginaryI(\tau n^2+2nz)))\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land m\in\Z\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d29148` · Fungrim entry ↗](https://fungrim.org/entry/d29148)
 
@@ -2113,7 +1896,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, w, \tau)=\mathrm{JacobiTheta}(4, z+w, 2\tau)\mathrm{JacobiTheta}(4, z-w, 2\tau)-\mathrm{JacobiTheta}(1, z+w, 2\tau)\mathrm{JacobiTheta}(1, z-w, 2\tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d36e97` · Fungrim entry ↗](https://fungrim.org/entry/d36e97)
 
@@ -2122,7 +1904,6 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d41a95` · Fungrim entry ↗](https://fungrim.org/entry/d41a95)
 
@@ -2131,7 +1912,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z+\frac{\tau}{2}, \tau)=\exp(-(\pi\imaginaryI(z+\frac{\tau}{4})))\imaginaryI\mathrm{JacobiTheta}(4, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d5a29e` · Fungrim entry ↗](https://fungrim.org/entry/d5a29e)
 
@@ -2140,7 +1920,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z+\tau, \tau)=-\exp(-(\pi\imaginaryI(2z+\tau)))\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`d989cd` · Fungrim entry ↗](https://fungrim.org/entry/d989cd)
 
@@ -2149,7 +1928,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^2-\mathrm{JacobiTheta}(4, z, \tau)^2}{2\mathrm{JacobiTheta}(2, 0, 2\tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`db4e29` · Fungrim entry ↗](https://fungrim.org/entry/db4e29)
 
@@ -2158,7 +1936,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 0, \tau)^4=(1+8(\sum_{n=0}^{\infty}\frac{2n\exp(\pi\imaginaryI\tau)^{2n}}{1+\exp(\pi\imaginaryI\tau)^{2n}}))-8(\sum_{n=0}^{\infty}\frac{(2n+1)\exp(\pi\imaginaryI\tau)^{2n+1}}{1+\exp(\pi\imaginaryI\tau)^{2n+1}})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`dc7c83` · Fungrim entry ↗](https://fungrim.org/entry/dc7c83)
 
@@ -2167,7 +1944,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, \frac{n}{4}, \imaginaryI)=\begin{cases}(-1)^{\lfloor(n+1)/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\0&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor(n+1)/4\rfloor}\frac{\sqrt{2^{1/2}-1}}{2^{7/16}}\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`dd5f43` · Fungrim entry ↗](https://fungrim.org/entry/dd5f43)
 
@@ -2176,7 +1952,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \frac{\tau}{2})^2=\mathrm{JacobiTheta}(2, 0, \tau)^2+\mathrm{JacobiTheta}(3, 0, \tau)^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`de7918` · Fungrim entry ↗](https://fungrim.org/entry/de7918)
 
@@ -2185,7 +1960,6 @@ Used by the Compute Engine for simplification.
 $$\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(1, z, \tau)}=\cot(\pi z)+4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land\sin(\pi z)\ne0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`dfbddd` · Fungrim entry ↗](https://fungrim.org/entry/dfbddd)
 
@@ -2194,7 +1968,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(2, z+w, \tau)\mathrm{JacobiTheta}(3, z-w, \tau)=\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)-\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`dfea7d` · Fungrim entry ↗](https://fungrim.org/entry/dfea7d)
 
@@ -2203,7 +1976,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau)^4-\mathrm{JacobiTheta}(4, z, \tau)^4=\mathrm{JacobiTheta}(2, z, \tau)^4-\mathrm{JacobiTheta}(3, z, \tau)^4$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`e08bb4` · Fungrim entry ↗](https://fungrim.org/entry/e08bb4)
 
@@ -2212,7 +1984,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(1, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e13fe9` · Fungrim entry ↗](https://fungrim.org/entry/e13fe9)
 
@@ -2221,7 +1992,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, 1+y\imaginaryI)=\frac{\sqrt{2}(1+\imaginaryI)\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)}{2\sqrt{y}}$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e2288d` · Fungrim entry ↗](https://fungrim.org/entry/e2288d)
 
@@ -2229,7 +1999,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 1+8\imaginaryI)=\frac{\sqrt[8]{16+15\sqrt[4]{2}+12\sqrt{2}+9\sqrt[4]{8}}}{2^{\frac{7}{8}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`e2bc80` · Fungrim entry ↗](https://fungrim.org/entry/e2bc80)
@@ -2239,7 +2008,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)=1+2(\sum_{n=1}^{\infty}\frac{\mathrm{LiouvilleLambda}(n)\exp(\pi\imaginaryI\tau)^{n}}{1-\exp(\pi\imaginaryI\tau)^{n}})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e4e707` · Fungrim entry ↗](https://fungrim.org/entry/e4e707)
 
@@ -2248,7 +2016,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z+n, \tau)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e56f77` · Fungrim entry ↗](https://fungrim.org/entry/e56f77)
 
@@ -2257,7 +2024,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \frac{\tau}{2})=\frac{\mathrm{JacobiTheta}(4, z, \tau)^2-\mathrm{JacobiTheta}(1, z, \tau)^2}{\mathrm{JacobiTheta}(4, 0, \frac{\tau}{2})}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e6d333` · Fungrim entry ↗](https://fungrim.org/entry/e6d333)
 
@@ -2266,7 +2032,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^4-\mathrm{JacobiTheta}(4, z, \tau)^4}{\mathrm{JacobiTheta}(2, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for expansion.
 [`e6dc09` · Fungrim entry ↗](https://fungrim.org/entry/e6dc09)
 
@@ -2275,7 +2040,6 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(1, z, \frac{-1}{\tau})=-\imaginaryI\sqrt{\frac{\tau}{\imaginaryI}}\exp(\pi\imaginaryI\tau z^2)\mathrm{JacobiTheta}(1, \tau z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`e8ce0b` · Fungrim entry ↗](https://fungrim.org/entry/e8ce0b)
 
@@ -2284,7 +2048,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(j, z, \tau, 2)-4\pi\imaginaryI\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau)^{\prime}(\tau)=0$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ebc673` · Fungrim entry ↗](https://fungrim.org/entry/ebc673)
 
@@ -2293,7 +2056,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau)=-\imaginaryI\exp(\pi\imaginaryI(z+\frac{\tau}{4}))\mathrm{JacobiTheta}(3, z+\frac{1}{2}+\frac{\tau}{2}, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ed0756` · Fungrim entry ↗](https://fungrim.org/entry/ed0756)
 
@@ -2302,7 +2064,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^4+\mathrm{JacobiTheta}(4, z, \tau)^4}{\mathrm{JacobiTheta}(3, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ed3ff9` · Fungrim entry ↗](https://fungrim.org/entry/ed3ff9)
 
@@ -2311,7 +2072,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, z, \frac{-1}{\tau})=\sqrt{\frac{\tau}{\imaginaryI}}\exp(\pi\imaginaryI\tau z^2)\mathrm{JacobiTheta}(2, \tau z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ed8ba7` · Fungrim entry ↗](https://fungrim.org/entry/ed8ba7)
 
@@ -2320,7 +2080,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(1, z+w, \tau)\mathrm{JacobiTheta}(4, z-w, \tau)=\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, w, \tau)\mathrm{JacobiTheta}(3, w, \tau)+\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(1, w, \tau)\mathrm{JacobiTheta}(4, w, \tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`ee8617` · Fungrim entry ↗](https://fungrim.org/entry/ee8617)
 
@@ -2329,7 +2088,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, 2\tau)=\frac{\mathrm{JacobiTheta}(1, 1/4-z, \tau)\mathrm{JacobiTheta}(1, \frac{1}{4}+z, \tau)}{\mathrm{JacobiTheta}(4, 0, 2\tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f12569` · Fungrim entry ↗](https://fungrim.org/entry/f12569)
 
@@ -2337,7 +2095,6 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{JacobiTheta}(3, 0, 3\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{1+\sqrt{3}}}{\sqrt[4]{2}\times3^{\frac{3}{8}}}$$
 
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
 [`f12e20` · Fungrim entry ↗](https://fungrim.org/entry/f12e20)
@@ -2347,7 +2104,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 0, 2\tau)^2=\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f14471` · Fungrim entry ↗](https://fungrim.org/entry/f14471)
 
@@ -2356,7 +2112,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, 0, \tau, 1)=\pi\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f2e28a` · Fungrim entry ↗](https://fungrim.org/entry/f2e28a)
 
@@ -2365,7 +2120,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau)=1+2(\sum_{n=1}^{\infty}\exp(\pi\imaginaryI\tau)^{n^2}\cos(2n\pi z))$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f3e75c` · Fungrim entry ↗](https://fungrim.org/entry/f3e75c)
 
@@ -2374,7 +2128,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, w, \tau)=\mathrm{JacobiTheta}(3, z+w, 2\tau)\mathrm{JacobiTheta}(3, z-w, 2\tau)+\mathrm{JacobiTheta}(2, z+w, 2\tau)\mathrm{JacobiTheta}(2, z-w, 2\tau)$$
 
 **Holds when** $z\in\C\land w\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f4554f` · Fungrim entry ↗](https://fungrim.org/entry/f4554f)
 
@@ -2383,7 +2136,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+n, \tau)=(-1)^{n}\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f697d5` · Fungrim entry ↗](https://fungrim.org/entry/f697d5)
 
@@ -2392,7 +2144,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, 0, \tau)^2=1+2(\sum_{n=1}^{\infty}(\cos(\pi\tau n))^{-1})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`f8cd8f` · Fungrim entry ↗](https://fungrim.org/entry/f8cd8f)
 
@@ -2401,7 +2152,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)^2=\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)^2+\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)^2$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fa7251` · Fungrim entry ↗](https://fungrim.org/entry/fa7251)
 
@@ -2410,7 +2160,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau+8n)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fb4b1b` · Fungrim entry ↗](https://fungrim.org/entry/fb4b1b)
 
@@ -2419,7 +2168,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, -z, \tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fb55cb` · Fungrim entry ↗](https://fungrim.org/entry/fb55cb)
 
@@ -2428,7 +2176,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 4z, 4\tau)=\frac{\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 1/4-z, \tau)\mathrm{JacobiTheta}(4, \frac{1}{4}+z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau)\mathrm{JacobiTheta}(3, \frac{1}{4}, \tau)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fc3c44` · Fungrim entry ↗](https://fungrim.org/entry/fc3c44)
 
@@ -2437,7 +2184,6 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(j, z, -\tau^\star)=\mathrm{JacobiTheta}(j, z^\star, \tau)^\star$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function.
 Used by the Compute Engine for simplification.
 [`fe1b96` · Fungrim entry ↗](https://fungrim.org/entry/fe1b96)
 
@@ -2488,7 +2234,7 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=\frac{(-2\imaginaryI)\pi\mathrm{EisensteinE}(6, \tau)\mathrm{ModularJ}(\tau)}{\mathrm{EisensteinE}(4, \tau)}$$
 
 **Holds when** $\Im(\tau)\gt0\land\mathrm{EisensteinE}(4, \tau)\ne0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **ModularJ** — Modular j-invariant.
+**Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
 [`348b26` · Fungrim entry ↗](https://fungrim.org/entry/348b26)
 
@@ -2531,7 +2277,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{ModularJ}(\tau)={(\frac{\mathrm{DedekindEta}(\tau)}{\mathrm{DedekindEta}(2\tau)}^8+(256\mathrm{DedekindEta}(2\tau)^{16})/\mathrm{DedekindEta}(\tau)^{16})}^3$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **ModularJ** — Modular j-invariant.
+**Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for expansion.
 [`664b4c` · Fungrim entry ↗](https://fungrim.org/entry/664b4c)
 
@@ -2589,7 +2335,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{ModularJ}(\tau)=\frac{32{(\mathrm{JacobiTheta}(2, 0, \tau)^8+\mathrm{JacobiTheta}(3, 0, \tau)^8+\mathrm{JacobiTheta}(4, 0, \tau)^8)}^3}{(\mathrm{JacobiTheta}(2, 0, \tau)\mathrm{JacobiTheta}(3, 0, \tau)\mathrm{JacobiTheta}(4, 0, \tau))^8}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function; **ModularJ** — Modular j-invariant.
+**Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
 [`cedcfc` · Fungrim entry ↗](https://fungrim.org/entry/cedcfc)
 
@@ -2598,16 +2344,24 @@ Used by the Compute Engine for simplification.
 $$\mathrm{ModularJ}(\tau)=\frac{\mathrm{EisensteinE}(4, \tau)^3}{\mathrm{DedekindEta}(\tau)^{24}}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series; **ModularJ** — Modular j-invariant.
+**Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for expansion.
 [`dc8251` · Fungrim entry ↗](https://fungrim.org/entry/dc8251)
+
+---
+
+$$\mathrm{Map}(\mathrm{ModularGroupFundamentalDomain}, \tau\mapsto\mathrm{ModularJ}(\tau))=\C$$
+
+**Symbols:** **ModularGroupFundamentalDomain** — Fundamental domain for action of the modular group; **ModularJ** — Modular j-invariant.
+Used by the Compute Engine for simplification.
+[`dcc8b1` · Fungrim entry ↗](https://fungrim.org/entry/dcc8b1)
 
 ---
 
 $$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=((-2\imaginaryI)\pi\mathrm{EisensteinE}(14, \tau))/\mathrm{DedekindEta}(\tau)^{24}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **EisensteinE** — Normalized Eisenstein series; **ModularJ** — Modular j-invariant.
+**Symbols:** **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
 [`f0f53b` · Fungrim entry ↗](https://fungrim.org/entry/f0f53b)
 
@@ -2618,7 +2372,7 @@ Used by the Compute Engine for simplification.
 $$\frac{1}{\mathrm{ModularLambda}(\tau)}=\frac{\mathrm{DedekindEta}(\tau/2)^8}{16\mathrm{DedekindEta}(2\tau)^8}+1$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **ModularLambda** — Modular lambda function.
+**Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`033d39` · Fungrim entry ↗](https://fungrim.org/entry/033d39)
 
@@ -2627,7 +2381,7 @@ Used by the Compute Engine for simplification.
 $$1-\mathrm{ModularLambda}(\tau)=\frac{\mathrm{JacobiTheta}(4, 0, \tau)^4}{\mathrm{JacobiTheta}(3, 0, \tau)^4}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function; **ModularLambda** — Modular lambda function.
+**Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`04d3a6` · Fungrim entry ↗](https://fungrim.org/entry/04d3a6)
 
@@ -2662,7 +2416,7 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{3}(\pi\imaginaryI((\mathrm{EisensteinE}(2, \tau/2)+8\mathrm{EisensteinE}(2, 2\tau))-6\mathrm{EisensteinE}(2, \tau)))\mathrm{ModularLambda}(\tau)$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **EisensteinE** — Normalized Eisenstein series; **ModularLambda** — Modular lambda function.
+**Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`27b2c7` · Fungrim entry ↗](https://fungrim.org/entry/27b2c7)
 
@@ -2711,10 +2465,19 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\Re(\tau)=-1), \tau\mapsto\mathrm{ModularLambda}(\tau))=\lparen-\infty, 0\rparen$$
+
+**Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function.
+Used by the Compute Engine for simplification.
+**Reference:** J. M. Borwein and P. B. Borwein. Pi and the AGM. Wiley, New York, 1987. p. 118.
+[`4b20ab` · Fungrim entry ↗](https://fungrim.org/entry/4b20ab)
+
+---
+
 $$\mathrm{ModularLambda}(\tau)=\frac{\mathrm{JacobiTheta}(2, 0, \tau)^4}{\mathrm{JacobiTheta}(3, 0, \tau)^4}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function; **ModularLambda** — Modular lambda function.
+**Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for expansion.
 [`5b9c02` · Fungrim entry ↗](https://fungrim.org/entry/5b9c02)
 
@@ -2723,7 +2486,7 @@ Used by the Compute Engine for expansion.
 $$\mathrm{ModularLambda}(\tau)=(16\mathrm{DedekindEta}(2\tau)^{16}\mathrm{DedekindEta}(\tau/2)^8)/\mathrm{DedekindEta}(\tau)^{24}$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **DedekindEta** — Dedekind eta function; **ModularLambda** — Modular lambda function.
+**Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`5dd24a` · Fungrim entry ↗](https://fungrim.org/entry/5dd24a)
 
@@ -2738,7 +2501,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularLambdaFundamentalDomain}=\lbrace\tau, \tau\in\mathrm{HH}\in(\Re(\tau)\in\lparen-1, 1\rparen\land\min(\vert\tau-1/2\vert, \vert z+1/2\vert)\gt1/2\lor\Re(\tau)=-1\lor\vert\tau+1/2\vert=1/2)\rbrace$$
+$$\mathrm{ModularLambdaFundamentalDomain}=\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\Re(\tau)\in\lparen-1, 1\rparen\land\min(\vert\tau-1/2\vert, \vert z+1/2\vert)\gt1/2\lor\Re(\tau)=-1\lor\vert\tau+1/2\vert=1/2)$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambdaFundamentalDomain** — Fundamental domain of the modular lambda function.
 Used by the Compute Engine for simplification.
@@ -2747,12 +2510,29 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{Map}(\mathrm{Interior}(\mathrm{ModularLambdaFundamentalDomain}), \tau\mapsto\mathrm{ModularLambda}(\tau))=\C\setminus(\lparen-\infty, 0\rbrack\cup\lbrack1, \infty\rparen)$$
+
+**Symbols:** **ModularLambda** — Modular lambda function; **ModularLambdaFundamentalDomain** — Fundamental domain of the modular lambda function.
+Used by the Compute Engine for simplification.
+**Reference:** J. M. Borwein and P. B. Borwein. Pi and the AGM. Wiley, New York, 1987. p. 118.
+[`830dd4` · Fungrim entry ↗](https://fungrim.org/entry/830dd4)
+
+---
+
 $$\frac{\mathrm{ModularLambda}(\tau)}{\mathrm{ModularLambda}(\tau)-1}=-(\frac{\mathrm{JacobiTheta}(2, 0, \tau)^4}{\mathrm{JacobiTheta}(4, 0, \tau)^4})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-**Symbols:** **JacobiTheta** — Jacobi theta function; **ModularLambda** — Modular lambda function.
+**Symbols:** **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
 [`903962` · Fungrim entry ↗](https://fungrim.org/entry/903962)
+
+---
+
+$$\mathrm{Map}(\mathrm{HH}, \tau\mapsto\mathrm{ModularLambda}(\tau))=\mathrm{Map}(\mathrm{ModularLambdaFundamentalDomain}, \tau\mapsto\mathrm{ModularLambda}(\tau))=\C\setminus\lbrace0, 1\rbrace$$
+
+**Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function; **ModularLambdaFundamentalDomain** — Fundamental domain of the modular lambda function.
+Used by the Compute Engine for simplification.
+[`90b419` · Fungrim entry ↗](https://fungrim.org/entry/90b419)
 
 ---
 
@@ -2772,15 +2552,6 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau=\frac{(\imaginaryI)\mathrm{EllipticK}(1-\mathrm{ModularLambda}(\tau))}{\mathrm{EllipticK}(\mathrm{ModularLambda}(\tau))}$$
-
-**Holds when** $\tau\in\mathrm{Interior}(\mathrm{ModularLambdaFundamentalDomain})\cup\lbrace\tau, \tau\in\mathrm{HH}\in\Re(\tau)=1\rbrace$.
-**Symbols:** **EllipticK** — Legendre complete elliptic integral of the first kind; **ModularLambda** — Modular lambda function.
-Used by the Compute Engine for simplification.
-[`b7174d` · Fungrim entry ↗](https://fungrim.org/entry/b7174d)
-
----
-
 $$\mathrm{ModularLambda}(\tau+1)=\frac{\mathrm{ModularLambda}(\tau)}{\mathrm{ModularLambda}(\tau)-1}$$
 
 **Holds when** $\Im(\tau)\gt0$.
@@ -2796,6 +2567,15 @@ $$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{\pi}((2\imagin
 **Symbols:** **ModularLambda** — Modular lambda function; **WeierstrassZeta** — Weierstrass zeta function.
 Used by the Compute Engine for simplification.
 [`c18c95` · Fungrim entry ↗](https://fungrim.org/entry/c18c95)
+
+---
+
+$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\vert\tau+1/2\vert=1/2), \tau\mapsto\mathrm{ModularLambda}(\tau))=\lparen1, \infty\rparen$$
+
+**Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function.
+Used by the Compute Engine for simplification.
+**Reference:** J. M. Borwein and P. B. Borwein. Pi and the AGM. Wiley, New York, 1987. p. 118.
+[`e4315f` · Fungrim entry ↗](https://fungrim.org/entry/e4315f)
 
 ---
 

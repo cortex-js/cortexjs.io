@@ -5,17 +5,17 @@ slug: /compute-engine/reference/fungrim-gamma/
 
 # Gamma and related functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **135 identities** for gamma and related functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **162 identities** for gamma and related functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `953c2afd2822`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
 
 - [Barnes G-function](#barnes-g-function) (27)
 - [Beta function](#beta-function) (13)
-- [Digamma function](#digamma-function) (39)
+- [Digamma function](#digamma-function) (66)
 - [Factorials and binomial coefficients](#factorials-and-binomial-coefficients) (32)
 - [Gamma function](#gamma-function) (24)
 
@@ -116,7 +116,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{LogBarnesG}(z+1)=(\frac{z^2}{4}+z\mathrm{GammaLn}(z+1))-(\frac{z(z+1)}{2}+\frac{1}{12})\ln(z)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n+2)}{2n(2n+1)(2n+2)z^{2n}}+\mathrm{LogBarnesGRemainder}(N_{var}, z)$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack\land N_{var}\in\N^*$.
-**Symbols:** **BernoulliB** — Bernoulli number; **LogBarnesG** — Logarithmic Barnes G-function; **LogBarnesGRemainder** — Remainder term in asymptotic expansion of logarithmic Barnes G-function.
+**Symbols:** **LogBarnesG** — Logarithmic Barnes G-function; **LogBarnesGRemainder** — Remainder term in asymptotic expansion of logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 **Reference:** [dx.doi.org](https://dx.doi.org/10.1098/rspa.2014.0534)
 [`6f8e14` · Fungrim entry ↗](https://fungrim.org/entry/6f8e14)
@@ -387,6 +387,21 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{PolyGamma}(m, z+1)=\mathrm{PolyGamma}(m, z)+\frac{(-1)^{m}m!}{z^{m+1}}$$
+
+**Holds when** $m\in\N\land z\in\C\land z\notin\Z_{\le0}$.
+Used by the Compute Engine for simplification.
+[`039051` · Fungrim entry ↗](https://fungrim.org/entry/039051)
+
+---
+
+$$\mathrm{PolyGamma}(2, \frac{1}{4})=-(2\pi^3)-56\Zeta(3)$$
+
+Used by the Compute Engine for simplification.
+[`03aca0` · Fungrim entry ↗](https://fungrim.org/entry/03aca0)
+
+---
+
 $$\Im(\mathrm{Digamma}(\imaginaryI y))=\frac{1}{2}(\pi\coth(\pi y))+\frac{1}{2y}$$
 
 **Holds when** $y\in\R\land y\ne0$.
@@ -409,6 +424,21 @@ $$\mathrm{Digamma}(\frac{1}{6})=-((3^{1/2}\pi)/2)-\gamma-2\ln(2)-\frac{3\ln(3)}{
 
 ---
 
+$$z\mapsto\mathrm{PolyGamma}(m, z)^{\prime}(z)=\mathrm{PolyGamma}(m+n, z)$$
+
+**Holds when** $n\in\N\land m\in\N\land z\in\C\land z\notin\Z_{\le0}$.
+Used by the Compute Engine for simplification.
+[`21f4f9` · Fungrim entry ↗](https://fungrim.org/entry/21f4f9)
+
+---
+
+$$\mathrm{PolyGamma}(3, \frac{1}{2})=\pi^4$$
+
+Used by the Compute Engine for simplification.
+[`2251c6` · Fungrim entry ↗](https://fungrim.org/entry/2251c6)
+
+---
+
 $$\Im(\mathrm{Digamma}(1+\imaginaryI y))=\frac{1}{2}(\pi\coth(\pi y))-\frac{1}{2y}$$
 
 **Holds when** $y\in\R\land y\ne0$.
@@ -423,6 +453,31 @@ $$\mathrm{DigammaFunctionZero}(n)=\mathrm{UniqueZero}(x\mapsto\mathrm{Digamma}(x
 **Symbols:** **DigammaFunctionZero** — Zero of the digamma function; **UniqueZero** — Unique zero (root) of function.
 Used by the Compute Engine for simplification.
 [`233814` · Fungrim entry ↗](https://fungrim.org/entry/233814)
+
+---
+
+$$\mathrm{PolyGamma}(m, z)=\frac{1}{m!}((\sum_{n=1}^{N_{var}-1}\frac{\mathrm{RisingFactorial}(m+1, 2n-1)\mathrm{BernoulliB}(2n)}{(2n)!z^{m+2n}}+(2z^{m+1})^{-1}+\frac{1}{mz^{m}})\times(-1)^{m+1})+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)$$
+
+**Holds when** $m\in\N^*\land z\in\C\setminus\lparen-\infty, 0\rbrack\land N_{var}\in\N$.
+**Symbols:** **RisingFactorial** — Rising factorial; **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
+Used by the Compute Engine for simplification.
+[`24c9e9` · Fungrim entry ↗](https://fungrim.org/entry/24c9e9)
+
+---
+
+$$\mathrm{PolyGamma}(m, z+n)=\mathrm{PolyGamma}(m, z)+(-1)^{m}m!(\sum_{k=0}^{n-1}((z+k)^{m+1})^{-1})$$
+
+**Holds when** $m\in\N\land z\in\C\land z\notin\Z_{\le0}\land n\in\N$.
+Used by the Compute Engine for simplification.
+[`34fafa` · Fungrim entry ↗](https://fungrim.org/entry/34fafa)
+
+---
+
+$$\mathrm{PolyGamma}(m, 1-z)=(-1)^{m}(\mathrm{PolyGamma}(m, z)+\pi z\mapsto\cot(\pi z)^{\prime}(z))$$
+
+**Holds when** $m\in\N\land z\in\C\land z\notin\Z$.
+Used by the Compute Engine for simplification.
+[`361f61` · Fungrim entry ↗](https://fungrim.org/entry/361f61)
 
 ---
 
@@ -457,6 +512,13 @@ $$\mathrm{Digamma}(\frac{2}{3})=\frac{3^{1/2}\pi}{6}-\gamma-\frac{3\ln(3)}{2}$$
 
 ---
 
+$$\mathrm{PolyGamma}(2, 1)=-(2\Zeta(3))$$
+
+Used by the Compute Engine for simplification.
+[`4a30f1` · Fungrim entry ↗](https://fungrim.org/entry/4a30f1)
+
+---
+
 $$\mathrm{Digamma}(z)=z\mapsto\mathrm{GammaLn}(z)^{\prime}(z)$$
 
 **Holds when** $z\in\C\land z\notin\Z_{\le0}$.
@@ -481,11 +543,42 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{PolyGamma}(1, \frac{1}{2})=\frac{\pi^2}{2}$$
+
+Used by the Compute Engine for simplification.
+[`595f46` · Fungrim entry ↗](https://fungrim.org/entry/595f46)
+
+---
+
+$$\mathrm{PolyGamma}(m, \frac{1}{2})=(-1)^{m+1}(2^{m+1}-1)m!\Zeta(m+1)$$
+
+**Holds when** $m\in\N^*$.
+Used by the Compute Engine for simplification.
+[`5ce30b` · Fungrim entry ↗](https://fungrim.org/entry/5ce30b)
+
+---
+
+$$\mathrm{PolyGamma}(m, z^\star)=\mathrm{PolyGamma}(m, z)^\star$$
+
+**Holds when** $m\in\N\land z\in\C$.
+Used by the Compute Engine for expansion.
+[`5db5f2` · Fungrim entry ↗](https://fungrim.org/entry/5db5f2)
+
+---
+
 $$\mathrm{Digamma}(z)=(\sum_{n=0}^{\infty}1/(n+1)-1/(n+z))-\gamma$$
 
 **Holds when** $z\in\C\land z\notin\Z_{\le0}$.
 Used by the Compute Engine for simplification.
 [`686524` · Fungrim entry ↗](https://fungrim.org/entry/686524)
+
+---
+
+$$z\mapsto\mathrm{Digamma}(z)^{\prime}(z)=\mathrm{PolyGamma}(n, z)$$
+
+**Holds when** $n\in\N\land z\in\C\land z\notin\Z_{\le0}$.
+Used by the Compute Engine for simplification.
+[`6db9fc` · Fungrim entry ↗](https://fungrim.org/entry/6db9fc)
 
 ---
 
@@ -504,9 +597,24 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{PolyGamma}(m, -n)=\tilde\infty$$
+
+**Holds when** $n\in\N\land m\in\N$.
+Used by the Compute Engine for simplification.
+[`78c19c` · Fungrim entry ↗](https://fungrim.org/entry/78c19c)
+
+---
+
 $$\mathrm{Digamma}(\frac{1}{4})=-(\pi/2)-\gamma-3\ln(2)$$
 
 [`7ec4f0` · Fungrim entry ↗](https://fungrim.org/entry/7ec4f0)
+
+---
+
+$$\mathrm{PolyGamma}(1, \frac{1}{4})=\pi^2+8G$$
+
+Used by the Compute Engine for simplification.
+[`807c7d` · Fungrim entry ↗](https://fungrim.org/entry/807c7d)
 
 ---
 
@@ -527,6 +635,22 @@ $$\mathrm{Digamma}(\frac{1}{2})=-(2\ln(2))-\gamma$$
 $$\mathrm{Digamma}(\frac{1}{8})=-((\pi(2^{1/2}+1))/2)-\gamma-4\ln(2)-(\ln(2+2^{1/2})-\ln(2-2^{1/2}))/\sqrt{2}$$
 
 [`8c368f` · Fungrim entry ↗](https://fungrim.org/entry/8c368f)
+
+---
+
+$$\mathrm{PolyGamma}(m, n)=(-1)^{m+1}m!\mathrm{HurwitzZeta}(m+1, n)$$
+
+**Holds when** $n\in\N^*\land m\in\N^*$.
+**Symbols:** **HurwitzZeta** — Hurwitz zeta function.
+Used by the Compute Engine for simplification.
+[`90b26f` · Fungrim entry ↗](https://fungrim.org/entry/90b26f)
+
+---
+
+$$\mathrm{PolyGamma}(2, \frac{5}{6})=4\sqrt{3}\pi^3-182\Zeta(3)$$
+
+Used by the Compute Engine for simplification.
+[`921d61` · Fungrim entry ↗](https://fungrim.org/entry/921d61)
 
 ---
 
@@ -566,6 +690,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{PolyGamma}(m, 1)=(-1)^{m+1}m!\Zeta(m+1)$$
+
+**Holds when** $m\in\N^*$.
+Used by the Compute Engine for simplification.
+[`a62320` · Fungrim entry ↗](https://fungrim.org/entry/a62320)
+
+---
+
 $$\mathrm{Digamma}(z)=-\mathrm{StieltjesGamma}(0, z)$$
 
 **Holds when** $z\in\C\land z\notin\Z_{\le0}$.
@@ -598,11 +730,40 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{PolyGamma}(2, \frac{1}{2})=-(14\Zeta(3))$$
+
+Used by the Compute Engine for simplification.
+[`b31fd2` · Fungrim entry ↗](https://fungrim.org/entry/b31fd2)
+
+---
+
 $$\mathrm{Digamma}(z-n)=\mathrm{Digamma}(n+1)-\frac{1}{z}+\sum_{k=1}^{\infty}((-1)^{k+1}\Zeta(k+1)+\sum_{j=1}^{n}\frac{1}{j^{k+1}})z^{k}$$
 
 **Holds when** $n\in\N\land z\in\C\land\vert z\vert\lt1$.
 Used by the Compute Engine for simplification.
 [`b4825b` · Fungrim entry ↗](https://fungrim.org/entry/b4825b)
+
+---
+
+$$\mathrm{PolyGamma}(1, 1)=\frac{\pi^2}{6}$$
+
+Used by the Compute Engine for simplification.
+[`babd3c` · Fungrim entry ↗](https://fungrim.org/entry/babd3c)
+
+---
+
+$$\mathrm{PolyGamma}(2, \frac{1}{6})=-(182\Zeta(3))-4\sqrt{3}\pi^3$$
+
+Used by the Compute Engine for simplification.
+[`bb88c8` · Fungrim entry ↗](https://fungrim.org/entry/bb88c8)
+
+---
+
+$$\mathrm{PolyGamma}(m, z-n)=\mathrm{PolyGamma}(m, z)-(-1)^{m}m!(\sum_{k=1}^{n}((z-k)^{m+1})^{-1})$$
+
+**Holds when** $m\in\N\land z\in\C\land n\in\N\land z-n\notin\Z_{\le0}$.
+Used by the Compute Engine for simplification.
+[`c687d6` · Fungrim entry ↗](https://fungrim.org/entry/c687d6)
 
 ---
 
@@ -617,7 +778,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Digamma}(z)=\ln(z)-\frac{1}{2z}-(\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n)}{2nz^{2n}})+z\mapsto\mathrm{StirlingSeriesRemainder}(N_{var}, z)^{\prime}(z)$$
 
 **Holds when** $z\in\C\setminus\lparen-\infty, 0\rbrack\land N_{var}\in\N$.
-**Symbols:** **BernoulliB** — Bernoulli number; **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
+**Symbols:** **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
 Used by the Compute Engine for simplification.
 [`cf5355` · Fungrim entry ↗](https://fungrim.org/entry/cf5355)
 
@@ -631,11 +792,42 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{PolyGamma}(1, \frac{3}{4})=\pi^2-8G$$
+
+Used by the Compute Engine for simplification.
+[`d2f9fb` · Fungrim entry ↗](https://fungrim.org/entry/d2f9fb)
+
+---
+
+$$\mathrm{PolyGamma}(m, z)=(-1)^{m+1}m!\mathrm{LerchPhi}(1, m+1, z)$$
+
+**Holds when** $m\in\N^*\land z\in\C\land z\notin\Z_{\le0}$.
+Used by the Compute Engine for simplification.
+[`d6fbc8` · Fungrim entry ↗](https://fungrim.org/entry/d6fbc8)
+
+---
+
 $$\mathrm{Digamma}(z)=\ln(z)-\frac{1}{2z}-2\int_{0}^{\infty}\!(t)((t^2+z^2)(\exp(2\pi t)-1))^{-1}\, \mathrm{d}t$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`d9c818` · Fungrim entry ↗](https://fungrim.org/entry/d9c818)
+
+---
+
+$$\mathrm{PolyGamma}(m, z-n)=\frac{(-1)^{m+1}m!}{z^{m+1}}+\sum_{k=0}^{\infty}\mathrm{RisingFactorial}(k+1, m)((-1)^{m+k+1}\Zeta(m+k+1)+\sum_{j=1}^{n}(j^{k+m+1})^{-1})z^{k}$$
+
+**Holds when** $n\in\N\land m\in\N^*\land z\in\C\land\vert z\vert\lt1$.
+**Symbols:** **RisingFactorial** — Rising factorial.
+Used by the Compute Engine for simplification.
+[`ddc7e1` · Fungrim entry ↗](https://fungrim.org/entry/ddc7e1)
+
+---
+
+$$\mathrm{PolyGamma}(2, \frac{3}{4})=2\pi^3-56\Zeta(3)$$
+
+Used by the Compute Engine for simplification.
+[`e83059` · Fungrim entry ↗](https://fungrim.org/entry/e83059)
 
 ---
 
@@ -663,6 +855,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
+$$\mathrm{PolyGamma}(m, z)=z\mapsto\mathrm{GammaLn}(z)^{\prime}(z)$$
+
+**Holds when** $m\in\N\land z\in\C\land z\notin\Z_{\le0}$.
+Used by the Compute Engine for simplification.
+[`f1e02b` · Fungrim entry ↗](https://fungrim.org/entry/f1e02b)
+
+---
+
 $$\mathrm{Digamma}(\frac{3}{4})=\frac{\pi}{2}-\gamma-3\ln(2)$$
 
 [`f93bae` · Fungrim entry ↗](https://fungrim.org/entry/f93bae)
@@ -674,6 +874,13 @@ $$\mathrm{Digamma}(z)=\int_{0}^{\infty}\!\frac{\exp(-t)-\exp(-(zt))}{1-\exp(-t)}
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
 [`f946a5` · Fungrim entry ↗](https://fungrim.org/entry/f946a5)
+
+---
+
+$$\mathrm{PolyGamma}(1, 2)=\frac{\pi^2}{6}-1$$
+
+Used by the Compute Engine for simplification.
+[`fa0292` · Fungrim entry ↗](https://fungrim.org/entry/fa0292)
 
 ---
 
@@ -978,7 +1185,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{GammaLn}(z)=(z-\frac{1}{2})\ln(z)-z+\frac{\ln(2\pi)}{2}+\sum_{k=1}^{n-1}\frac{\mathrm{BernoulliB}(2k)}{2k(2k-1)z^{2k-1}}+\mathrm{StirlingSeriesRemainder}(n, z)$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack\land n\in\N^*$.
-**Symbols:** **BernoulliB** — Bernoulli number; **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
+**Symbols:** **StirlingSeriesRemainder** — Remainder term in the Stirling series for the logarithmic gamma function.
 Used by the Compute Engine for simplification.
 [`37a95a` · Fungrim entry ↗](https://fungrim.org/entry/37a95a)
 

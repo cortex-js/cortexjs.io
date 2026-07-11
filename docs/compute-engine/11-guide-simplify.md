@@ -322,8 +322,8 @@ console.log(explanation.result.latex);
 
 An `Explanation` has four properties:
 
-- `operation`: the operation that was traced (`'simplify'`, `'solve'` or
-  `'D'`)
+- `operation`: the operation that was traced (`'simplify'`, `'solve'`,
+  `'D'` or `'Integrate'`)
 - `initial`: the **canonical form** of the expression `explain()` was called
   on — the chain's step 0. Canonicalization (e.g. `x - 1` becoming
   `Add(x, -1)`, or `2 + 3` folding to `5`) happens before the first step is
@@ -359,7 +359,45 @@ for (const step of expr.explain('solve').steps)
 
 `explanation.result` is a `List` of the same roots `solve()` returns. A
 case-split (an absolute value, a zero product) is rendered as one step whose
-value lists the sub-equations. Systems of equations are not supported yet.
+value lists the sub-equations.
+
+#### Systems
+
+A `List` (or `And`) of equations is traced through the same solvers
+`solve()` runs. Pass the unknowns as an array. Step values are the whole
+system — the state after each elimination and back-substitution phase:
+
+```javascript
+const system = ce.box(["List", ce.parse("x+y=5"), ce.parse("x-y=1")]);
+for (const step of system.explain("solve", { variable: ["x", "y"] }).steps)
+  console.log(step.value.latex, "—", step.description);
+// ➔ \begin{cases}x+y=5\\-2y=-4\end{cases} — Eliminate a variable from the remaining equations
+// ➔ \bigl\lbrack y=2\bigr\rbrack — Substitute the known value back to solve for the next variable
+// ➔ \begin{cases}x=3\\y=2\end{cases} — Substitute the known value back to solve for the next variable
+```
+
+Nonlinear 2×2 systems show the product–sum or solve-and-substitute
+strategy. A system of **linear inequalities** in two variables is traced
+through constraint normalization (each inequality rewritten with zero on
+the right-hand side), the intersection points of the boundary lines, and
+the feasible corner points — the same vertices `solve()` returns:
+
+```javascript
+const region = ce.box([
+  "List",
+  ce.parse("x+y\\le 4"),
+  ce.parse("x\\ge 0"),
+  ce.parse("y\\ge 0"),
+]);
+region.explain("solve", { variable: ["x", "y"] });
+// steps: normalize each inequality → boundary intersections → feasible vertices
+// result: [{x=0, y=0}, {x=4, y=0}, {x=0, y=4}]
+```
+
+A **mixed** system of equations and inequalities shows the elimination
+steps, then each candidate solution substituted into the constraints and
+accepted or rejected. When a system genuinely cannot be solved,
+`explain('solve')` throws a precise error.
 
 ### Explaining a Derivative
 
@@ -382,6 +420,67 @@ matches evaluating `D(expr, variable)`. When the unfolded textbook form
 differs from the engine's simplified result, the chain closes with a
 *Simplify the result* step.
 
+Higher-order and mixed partial derivatives are traced stage by stage: pass
+`options.order` for the $n$-th derivative, or call `explain('D')` on a `D`
+expression itself (including mixed partials such as `D(f, x, y)`). Each
+stage replays the rule applications inside the remaining derivative
+operators, folds to the simplified derivative, then differentiates again:
+
+```javascript
+ce.parse("x \\sin x").explain("D", { variable: "x", order: 2 });
+```
+
+### Explaining an Integral
+
+`expr.explain('Integrate')` traces symbolic integration through the rule
+chain of the opt-in **Integration Rules** library (the Rubi corpus) — it
+requires `loadIntegrationRules(ce)` to have been called first, and throws a
+precise error otherwise. Steps are whole-expression states: sums split term
+by term, constant factors move out, and each rule application rewrites one
+unevaluated integral until none remain:
+
+```javascript
+import { loadIntegrationRules } from "@cortex-js/compute-engine/integration-rules";
+loadIntegrationRules(ce);
+
+const expr = ce.parse("\\int (3x^2+2x+1)\\,dx");
+for (const step of expr.explain("Integrate").steps)
+  console.log(step.value.latex, "—", step.description);
+// ➔ \int\!1\,\mathrm{d}x+\int\!2x\,\mathrm{d}x+\int\!3x^2\,\mathrm{d}x — Integrate term by term: ∫(u+v) dx = ∫u dx + ∫v dx
+// ➔ x+\int\!2x\,\mathrm{d}x+\int\!3x^2\,\mathrm{d}x — The integral of a constant: ∫c dx = c·x
+// ➔ x+2\int\!x\,\mathrm{d}x+\int\!3x^2\,\mathrm{d}x — Move the constant factor out of the integral
+// ➔ x^2+x+\int\!3x^2\,\mathrm{d}x — The integral of the variable: ∫x dx = x²/2
+// ➔ x^2+x+3\int\!x^2\,\mathrm{d}x — Move the constant factor out of the integral
+// ➔ x^3+x^2+x — Apply integration rule 1.1.1.1#15 (Rubi)
+```
+
+Steps produced by a corpus rule carry a stable `rubi:…` id naming the rule.
+The `result` matches evaluating the integral. When the rules cannot close
+the integral a precise error is thrown rather than a partial explanation.
+
+A **definite** integral is presented via the Fundamental Theorem of
+Calculus: the chain reframes to finding the antiderivative $F$, then closes
+with the bracket $F\big|_a^b$, the bounds substituted (unevaluated), and
+the value:
+
+```javascript
+const expr = ce.parse("\\int_0^1 x^2\\,dx");
+for (const step of expr.explain("Integrate").steps)
+  console.log(step.value.latex, "—", step.description);
+// ➔ \int\!x^2\,\mathrm{d}x — Find the antiderivative of the integrand
+// ➔ \frac{x^3}{3} — Apply integration rule 1.1.1.1#15 (Rubi)
+// ➔ \left.\left(\frac{x^3}{3}\right)\right|_{0}^{1} — Apply the Fundamental Theorem of Calculus: ∫ᵃᵇ f dx = F(b) − F(a)
+// ➔ \frac{1^3}{3}-\frac{0^3}{3} — Evaluate the antiderivative at the bounds
+// ➔ \frac{1}{3} — Simplify the result
+```
+
+Symbolic bounds work (`\int_0^a x\,dx` → `\frac{a^2}{2}`); an improper
+integral (an infinite bound) skips the substitution step — the bracket is a
+limit, not a substitution — and closes directly with the value.
+
+<ReadMore path="/compute-engine/guides/integration-rules/" > Read more about
+the <strong>Integration Rules</strong> library <Icon name="chevron-right-bold" /></ReadMore>
+
 ### Step Ids and Localization
 
 The `id` of a step is a frozen, machine-readable identifier (e.g.
@@ -392,10 +491,12 @@ or customize the copy, key your strings off `step.id` and use the
 
 ### Verbosity
 
-By default the step chain is curated: internal bookkeeping steps (such as
-the marker recorded when sub-expressions are simplified in place) are
-filtered out. Pass `verbosity: 'all'` to get the raw, uncurated trace —
-useful for debugging and for rule authors:
+By default the step chain is curated: work done while simplifying
+sub-expressions in place is surfaced as its own labeled steps (e.g.
+$\tan x\cot x \to 1$ inside a larger sum), consecutive applications of the
+same rule are coalesced into a single step, and internal bookkeeping
+markers are filtered out. Pass `verbosity: 'all'` to get the raw, uncurated
+trace — useful for debugging and for rule authors:
 
 ```javascript
 expr.explain('simplify', { verbosity: 'all' });
