@@ -7,7 +7,7 @@ The **Integration Rules** library is an optional add-on that extends the
 Compute Engine's symbolic integration with a large rule set ported from
 [Rubi](https://rulebasedintegration.org/), the Rule-Based Integration project.
 It currently covers **Chapter 1 — algebraic functions** (rational functions,
-radicals, and binomial forms \\((a + b x^n)^p\\)), some 2,600 rules.
+radicals, and binomial forms $(a + b x^n)^p$), some 2,600 rules.
 
 It is an opt-in module: if you don't import it, it adds **zero bytes** to your
 bundle and the engine's integration behavior is unchanged.
@@ -41,7 +41,7 @@ ce.parse("\\int \\frac{\\sqrt{1+x}}{x}\\,dx").evaluate().latex;
 ```
 
 The current corpus is Rubi's **Chapter 1** (algebraic functions): polynomial
-and rational integrands, integrands involving \\(\sqrt{a+bx}\\) and other
+and rational integrands, integrands involving $\sqrt{a+bx}$ and other
 radicals, and binomial/trinomial powers. Transcendental and special-function
 chapters are not yet ported.
 
