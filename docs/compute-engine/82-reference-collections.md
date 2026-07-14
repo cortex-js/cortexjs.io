@@ -800,6 +800,11 @@ If the collection is nested, the indexes are applied in order.
 // ➔ 3
 ```
 
+Applying `At` repeatedly is equivalent to supplying several indexes at once.
+In Cortex syntax, both `m[2][1]` and `m[2, 1]` select the same matrix element.
+Indexing a matrix once returns a row with its collection type preserved, so the
+result can be indexed again.
+
 <Signature name="At">_xs_: indexed_collection, _indices_: indexed_collection&lt;integer&gt;</Signature>
 
 When the index is a collection of integers, `At` returns a new list
@@ -875,6 +880,32 @@ of the symbol's type:
 The type of the `At` expression is inferred from the collection's element type,
 so `v_n` where `v` is `list<number>` has type `number` and can be used in
 arithmetic expressions.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Keys">
+
+<Signature name="Keys" returns="list&lt;string&gt;">_dictionary_: dictionary</Signature>
+
+Return the dictionary keys as strings, in dictionary iteration order.
+
+```json example
+["Keys", ["Dictionary", ["KeyValuePair", "a", 1], ["KeyValuePair", "b", 2]]]
+// ➔ ["List", "a", "b"]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Values">
+
+<Signature name="Values" returns="list">_dictionary_: dictionary</Signature>
+
+Return the dictionary values in dictionary iteration order.
+
+```json example
+["Values", ["Dictionary", ["KeyValuePair", "a", 1], ["KeyValuePair", "b", 2]]]
+// ➔ ["List", 1, 2]
+```
 
 </FunctionDefinition>
 
@@ -1763,6 +1794,34 @@ elements of the collections.
 ```json example
 ["Join", ["Set", 5, 2, 10, 18], ["Set", 1, 2, 3]]
 // ➔ ["Set", 5, 2, 10, 18, 1, 3]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Append">
+
+<Signature name="Append" returns="collection">_collection_, _element_</Signature>
+
+Return a collection with _element_ added at the end. Collections are immutable;
+the input is not modified.
+
+```json example
+["Append", ["List", 1, 2], 3]
+// ➔ ["List", 1, 2, 3]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Fold">
+
+<Signature name="Fold">_function_, _initial_, _collection_</Signature>
+
+Apply _function_ from left to right, starting with _initial_. `Fold` is the
+function-first form of a left fold.
+
+```json example
+["Fold", "Add", 0, ["List", 1, 2, 3, 4]]
+// ➔ 10
 ```
 
 </FunctionDefinition>

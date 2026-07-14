@@ -646,14 +646,17 @@ of the tensor are conjugated.
 
 Returns the inverse of the matrix.
 
+An integer or rational matrix is inverted exactly over the rationals. Calling
+`.N()`, or supplying an inexact matrix, uses numeric values instead.
+
 <Latex value="\mathbf{A}^{-1}"/>
 
 The matrix must be square and non-singular (determinant ≠ 0). For vectors
 or tensors (rank > 2), an `expected-square-matrix` error is returned.
 
 ```json example
-["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
-// ➔ ["List", ["List", -2, 1], ["List", 1.5, -0.5]]
+["Inverse", ["List", ["List", 2, 1], ["List", 1, 3]]]
+// ➔ ["List", ["List", 3/5, -1/5], ["List", -1/5, 2/5]]
 ```
 
 **Scalar**: The inverse of a scalar is its reciprocal (1/scalar).
@@ -662,6 +665,27 @@ or tensors (rank > 2), an `expected-square-matrix` error is returned.
 ["Inverse", 4]
 // ➔ 0.25
 ```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### LinearSolve
+</nav>
+<FunctionDefinition name="LinearSolve">
+
+<Signature name="LinearSolve">_matrix_, _vector_</Signature>
+
+Solve the linear system $A x = b$. Exact matrices and vectors produce an exact
+solution; inexact input uses numeric linear algebra.
+
+```json example
+["LinearSolve",
+  ["List", ["List", 2, 1], ["List", 1, 3]],
+  ["List", 1, 2]]
+// ➔ ["List", 1/5, 3/5]
+```
+
+The equivalent composed form `Dot(Inverse(A), b)` is also supported.
 
 </FunctionDefinition>
 

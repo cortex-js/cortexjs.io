@@ -671,6 +671,8 @@ It is denoted by:
 
 <Signature name="Limit" returns="number">_f_: function, _value_: number</Signature>
 
+<Signature name="Limit" returns="number">_expr_, _variable_: symbol, _value_: number</Signature>
+
 Evaluate the function _f_ as it approaches the value _value_.
 
 <Latex flow="column" value="\lim_{x \to 0} \frac{\sin(x)}{x}"/>
@@ -680,7 +682,15 @@ Evaluate the function _f_ as it approaches the value _value_.
 ["Limit", ["Divide", ["Sin", "_"], "_"], 0]
 
 ["Limit", ["Function", ["Divide", ["Sin", "x"], "x"], "x"], 0]
+
+["Limit", ["Divide", ["Sin", "x"], "x"], "x", 0]
+// ➔ 1
 ```
+
+The explicit-variable form is useful when the expression is not written as a
+function. It canonicalizes to the same internal form as `Limit(f, value)`. The
+three-operand `(function, value, direction)` interpretation is retained when
+the middle operand is not a free variable of the first operand.
 
 This function evaluates to a numerical approximation when using `expr.N()`. To
 get a numerical evaluation with `expr.evaluate()`, use `NLimit`.
@@ -847,18 +857,78 @@ ce.parse('\\operatorname{Series}(\\frac{x^2}{x-1}, x, +\\infty)').evaluate()
 // → x + 1 + 1/x + 1/x^2 + 1/x^3 + 1/x^4 + 1/x^5 + O(1/x^6)
 ```
 
-**Left unevaluated.** An essential singularity or a branch point has no valid
-series at the requested point, so the `Series` expression is returned as-is
-rather than expanded incorrectly:
+**Puiseux expansion at a branch point.** When the expansion involves an
+algebraic branch point — a fractional power of a quantity that vanishes (or has
+a pole) at the point — `Series` returns a **Puiseux** series with fractional
+exponents:
+
+```javascript
+ce.parse('\\operatorname{Series}(\\sqrt{\\sin x}, x)').evaluate()
+// → √x - x^{5/2}/12 + x^{9/2}/1440 + O(x^{13/2})
+
+ce.parse('\\operatorname{Series}(\\cos(\\sqrt{x}), x)').evaluate()
+// → 1 - x/2 + x^2/24 - x^3/720 + O(x^4)
+// (a composition with a fractional-power argument, here collapsing to
+//  integer powers)
+```
+
+**Log-aware expansion.** A logarithm of a quantity that vanishes (or has a pole)
+at the point contributes a `\ln` term, and `Series` carries such log atoms
+through the expansion — including on the $+\infty$ side, where `\ln x` is kept
+in `x`:
+
+```javascript
+ce.parse('\\operatorname{Series}(\\ln(\\sin x), x)').evaluate()
+// → ln x - x^2/6 - x^4/180 + O(x^6)
+
+ce.parse('\\operatorname{Series}(x^x, x)').evaluate()
+// → 1 + x·ln x + x^2·ln^2 x/2 + x^3·ln^3 x/6 + O(x^4)
+
+ce.parse('\\operatorname{Series}(\\ln(x^2+x), x, +\\infty)').evaluate()
+// → 2 ln x + 1/x - 1/(2x^2) + 1/(3x^3) - … + O(1/x^6)
+```
+
+**Stirling's asymptotic for the log-gamma.** At $+\infty$, `GammaLn` (i.e.
+$\ln\Gamma$) expands to Stirling's asymptotic series (divergent, so the `BigO`
+is placed at the first omitted term):
+
+```javascript
+ce.parse('\\operatorname{Series}(\\operatorname{GammaLn}(x), x, +\\infty)').evaluate()
+// → x·ln x - x - (1/2)·ln x + (1/2)·ln(2π) + 1/(12x) - 1/(360x^3) + O(1/x^5)
+```
+
+At a finite pole of $\Gamma$ (the non-positive integers, where `GammaLn`
+evaluates to $+\infty$), the expansion is the log-aware series of
+$\ln\Gamma$:
+
+```javascript
+ce.parse('\\operatorname{Series}(\\operatorname{GammaLn}(x), x)').evaluate()
+// → -ln x - γ·x + (π²/12)·x^2 - … + O(x^6)
+```
+
+**Exact expansions render without a `BigO`.** When the truncated sum is provably
+equal to the whole function (e.g. a bare fractional monomial, a logarithm, or a
+finite Laurent expansion), the remainder term is dropped:
+
+```javascript
+ce.parse('\\operatorname{Series}(\\sqrt{x}, x)').evaluate()          // → √x
+ce.parse('\\operatorname{Series}(\\ln x, x)').evaluate()             // → ln x
+ce.parse('\\operatorname{Series}(\\frac{x}{(x-2)^2}, x, 2)').evaluate()
+// → 2(x-2)^{-2} + (x-2)^{-1}
+```
+
+**Left unevaluated.** A point with no valid Puiseux/log expansion — an essential
+singularity, an irrational or symbolic exponent, or a nested/reciprocal
+logarithm — is returned as-is rather than expanded incorrectly:
 
 ```json example
 ["Series", ["Power", "ExponentialE", ["Divide", 1, "x"]], "x"]
 // ➔ ["Series", ["Power", "ExponentialE", ["Divide", 1, "x"]], "x", 0, 5]
 // (e^{1/x} has an essential singularity at 0)
 
-["Series", ["Ln", "x"], "x"]
-// ➔ ["Series", ["Ln", "x"], "x", 0, 5]
-// (ln x has a branch point at 0)
+["Series", ["Divide", 1, ["Ln", "x"]], "x"]
+// ➔ ["Series", ["Divide", 1, ["Ln", "x"]], "x", 0, 5]
+// (1/ln x is a reciprocal logarithm)
 ```
 
 </FunctionDefinition>
@@ -1068,4 +1138,3 @@ derivatives). This works even when the solution has no elementary closed form.
 Implicit or stiff equations are not yet supported and are left unevaluated.
 
 </FunctionDefinition>
-

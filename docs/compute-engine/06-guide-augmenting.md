@@ -224,9 +224,27 @@ function.
 ```js
 ce.declare("double", {
   signature: "number -> number",
+  description: "Multiply a number by two",
+  keywords: ["twice", "doubling"],
   evaluate: ([x]) => x.mul(2),
 });
 ```
+
+The optional `description` and `keywords` properties make a definition easier
+to discover with `ce.searchDefinitions()`. The search includes definition
+names, descriptions, synonyms, keywords, and associated LaTeX commands:
+
+```js
+ce.searchDefinitions("average");
+// ➔ [{ id: "Mean", kind: "function" }, ...]
+
+ce.searchDefinitions("doubling", { limit: 5 });
+// ➔ [{ id: "double", kind: "function" }]
+```
+
+The optional `limit` setting limits the number of results and defaults to `10`.
+Pass a returned `id` to `ce.lookupDefinition(id)` to inspect the complete
+definition.
 
 See `FunctionDefinition` for more details on the other handlers and
 properties that can be provided when defining a function.
@@ -257,6 +275,29 @@ ce.assign("double", ["Function", ["Multiply", "x", 2], "x"]);
 
 ce.assign("double",ce.parse("x \\mapsto 2x"));
 ```
+
+If the function literal declares the types of its parameters (and, optionally,
+its return value), the assigned function is given that typed signature, and in
+strict mode its arguments are checked at each call:
+
+```js
+ce.assign("double", ["Function",
+  ["Typed", ["Multiply", "x", 2], "'integer'"],
+  ["Typed", "x", "'integer'"]]);
+// double now has the signature (x: integer) -> integer
+```
+
+A function assignment may refer to the function being defined; a separate
+declaration is not required for recursion:
+
+```js
+ce.parse("factorial(n) := n \\cdot factorial(n-1)").evaluate();
+```
+
+Numeric evaluation also continues through user-defined functions. For example,
+after `f(x) := x/3`, `f(2).evaluate()` is the exact value `2/3`, while
+`f(2).N()` is its numeric approximation. The approximation is evaluated in the
+function's own lexical scope.
 
 
 <ReadMore path="/compute-engine/reference/functions/" >

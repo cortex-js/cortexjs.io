@@ -81,6 +81,18 @@ ce.parse("42 \\in \\Z").evaluate().print();
 
 </div>
 
+`Union` and `Intersection` accept any finite collections, including lists. The
+result is a `Set`, so duplicate elements are removed:
+
+```json example
+["Intersection", ["List", 1, 2], ["List", 2, 3]]
+// ➔ ["Set", 2]
+```
+
+A MathJSON `List` is always a collection here, including when it has two
+elements. Interval notation is interpreted as an `Interval` while parsing
+LaTeX, before the set operation is constructed.
+
 ## Functions
 
 New sets can be defined using one of the following operators.

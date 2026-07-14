@@ -118,6 +118,19 @@ console.info(textExpr.latex);
 
 ## Functions
 
+<FunctionDefinition name="StringJoin">
+
+<Signature name="StringJoin" returns="string">..._strings_: string</Signature>
+
+Concatenate strings. In Cortex, the `<>` operator constructs `StringJoin`.
+
+```json example
+["StringJoin", "hello", " ", "world"]
+// ➔ "hello world"
+```
+
+</FunctionDefinition>
+
 <nav className="hidden">
 ### String
 </nav>
@@ -199,7 +212,7 @@ Return a list of UTF-8 code points for the given _string_.
 
 **To create a string from UTF-8 code points**, use the `["StringFrom", _list_, "utf-8"]` function.
 
-**See also**: [`Utf16`](#utf16), [`UnicodeScalars`](#unicodescalars) and [`GraphemeClusters`](#graphemeclusters).
+**See also**: [`Utf16`](#utf16), [`UnicodeScalars`](#unicodescalars) and [`Characters`](#characters).
 
 </FunctionDefinition>
 
@@ -225,7 +238,7 @@ Return a list of UTF-16 code points for the given _string_.
 
 **To create a string from UTF-16 code units**, use the `["StringFrom", _list_, "utf-16"]` function.
 
-**See also**: [`Utf8`](#utf8), [`UnicodeScalars`](#unicodescalars) and [`GraphemeClusters`](#graphemeclusters).
+**See also**: [`Utf8`](#utf8), [`UnicodeScalars`](#unicodescalars) and [`Characters`](#characters).
 
 </FunctionDefinition>
 
@@ -259,18 +272,18 @@ composed of several scalars.
 
 **To create a string from Unicode scalars**, use the `["StringFrom", _list_, "unicode-scalars"]` function.
 
-**See also**: [`Utf8`](#utf8), [`Utf16`](#utf16), and [`GraphemeClusters`](#graphemeclusters).
+**See also**: [`Utf8`](#utf8), [`Utf16`](#utf16), and [`Characters`](#characters).
 
 </FunctionDefinition>
 
 
 
 <nav className="hidden">
-### GraphemeClusters
+### Characters
 </nav>
 
-<FunctionDefinition name="GraphemeClusters">
-<Signature name="GraphemeClusters" returns="list<string>">string</Signature>
+<FunctionDefinition name="Characters">
+<Signature name="Characters" returns="list<string>">string</Signature>
 
 A **grapheme cluster** is the smallest unit of text that a reader perceives 
 as a single character. It may consist of one or more **Unicode scalars** 
@@ -300,13 +313,14 @@ The table below illustrates the difference between grapheme clusters and Unicode
 | <span style={{fontSize: "1.3rem"}}>`👩‍🎓`</span>         | <span style={{fontSize: "1.3rem"}}>`["👩‍🎓"]`</span>           | `[128105, 8205, 127891]`             |
 
 
-This function splits a string into grapheme clusters:
+This function splits a string into grapheme clusters — the user-perceived
+"characters" of the string:
 
 ```json example
-["GraphemeClusters", "Hello"]
+["Characters", "Hello"]
 // ➔ ["H", "e", "l", "l", "o"]
 
-["GraphemeClusters", "👩‍🎓"]
+["Characters", "👩‍🎓"]
 // ➔ ["👩‍🎓"]
 
 ["UnicodeScalars", "👩‍🎓"]
@@ -316,7 +330,45 @@ This function splits a string into grapheme clusters:
 For more details on how grapheme cluster boundaries are determined, 
 see [Unicode® Standard Annex #29](https://unicode.org/reports/tr29/).
 
-**See also**: [`Utf8`](#utf8), [`Utf16`](#utf16), and [`UnicodeScalars`](#unicodescalars).
+**Synonym**: `GraphemeClusters` — the original name of this function, kept
+for compatibility.
+
+**See also**: [`StringSplit`](#stringsplit), [`Utf8`](#utf8), [`Utf16`](#utf16), and [`UnicodeScalars`](#unicodescalars).
+
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### StringSplit
+</nav>
+
+<FunctionDefinition name="StringSplit">
+<Signature name="StringSplit" returns="list<string>">string</Signature>
+<Signature name="StringSplit" returns="list<string>">string, _separator_:string</Signature>
+
+Split a string into a list of substrings.
+
+With no _separator_, the string is split on runs of whitespace, and empty
+parts are dropped. Whitespace is defined as the code points with the Unicode
+`White_Space` property (`U+0009`–`U+000D`, `U+0020`, `U+0085`, `U+00A0`,
+`U+1680`, `U+2000`–`U+200A`, `U+2028`, `U+2029`, `U+202F`, `U+205F`,
+`U+3000`) — the definition does not depend on the host's interpretation of
+`\s`.
+
+With a _separator_ string, the string is split on each occurrence of the
+separator, and empty parts are kept.
+
+```json example
+["StringSplit", {str: "the quick  brown fox"}]
+// ➔ ["the", "quick", "brown", "fox"]
+
+["StringSplit", {str: "a,b,,c"}, {str: ","}]
+// ➔ ["a", "b", "", "c"]
+```
+
+**To split into individual characters**, use [`Characters`](#characters).
+
+**See also**: [`Characters`](#characters).
 
 </FunctionDefinition>
 
@@ -531,7 +583,6 @@ The `Annotated` function is **inert** and the value of a `["Annotated", expr]` e
 <ReadMore path="/compute-engine/reference/linear-algebra/#formatting" > 
 Read more about formatting of **matrices** and **vectors**
 </ReadMore>
-
 
 
 

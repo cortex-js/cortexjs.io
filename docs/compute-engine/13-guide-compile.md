@@ -591,7 +591,7 @@ The Compute Engine comes with these compilation targets:
 - **`glsl`** - Compiles to GLSL (OpenGL Shading Language) for WebGL shaders
 - **`python`** - Compiles to Python/NumPy code for scientific computing (requires registration)
 - **`interval-js`** - Compiles to JavaScript using interval arithmetic for reliable function plotting
-- **`interval-glsl`** - Compiles to GLSL using interval arithmetic for GPU-based plotting
+- **`interval-glsl`** - _(Deprecated)_ Compiles to GLSL using interval arithmetic for GPU-based plotting
 
 ### Compiling to Different Targets
 
@@ -769,6 +769,16 @@ fnResult.run({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
 ```
 
 #### GLSL Interval Target (`interval-glsl`)
+
+:::warning[Deprecated]
+The `interval-glsl` target (and the never-rebuilt `interval-wgsl` sibling) is
+deprecated and will be removed in a future release. GPU interval evaluation only
+pays off when the entire pipeline stays on the GPU; a compile → GPU framebuffer →
+`readPixels` → CPU round-trip is net-negative versus CPU `interval-js`, and the
+target cannot compile any relational operator (so it cannot host
+restriction/masking conditions). Use **`interval-js`** (CPU interval arithmetic)
+or the scalar **`glsl`**/**`wgsl`** targets instead.
+:::
 
 For GPU-based plotting, compile to GLSL interval arithmetic:
 

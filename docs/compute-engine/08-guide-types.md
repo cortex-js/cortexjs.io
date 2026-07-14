@@ -532,6 +532,30 @@ and it cannot be combined with optional arguments.
 
 The type `function` matches any function literal. It is a shorthand for `(any*) -> unknown`.
 
+### Typed Function Literals
+
+A `["Function"]` literal can declare the types of its parameters and its return
+value. A parameter is annotated by writing it as `["Typed", _symbol_, _type_]`,
+and a return type is ascribed by wrapping the body in a `Typed` expression. The
+literal then has a **named function signature** built from these annotations:
+
+```js
+ce.box(["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]]).type;
+// ➔ (x: integer) -> integer
+
+ce.box(["Function",
+  ["Typed", ["Add", "x", 1], "'integer'"],
+  ["Typed", "x", "'integer'"]]).type;
+// ➔ (x: integer) -> integer
+```
+
+The annotations are **authoritative** (an ascription, not a whole-body type
+check): the declared types define the literal's signature directly. In strict
+mode, the arguments of a typed literal are checked against the declared
+parameter types when the function is applied — a mismatch produces an
+`incompatible-type` error. Assigning a typed literal to a symbol gives that
+symbol the annotated signature, including the return type.
+
 ## Literal Type
 
 A **literal type** is a type that represents a single value. 

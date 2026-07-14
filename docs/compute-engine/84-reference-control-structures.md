@@ -16,8 +16,8 @@ There are three kind of control structures:
 
 - **Sequential**: `Block`, the most common where expressions are evaluated one
   after the other
-- **Conditional** `If` or `Which`, where expressions are evaluated depending on
-  the value of a condition
+- **Conditional** `If`, `Which` or `Match`, where expressions are evaluated
+  depending on the value of a condition or the structure of a value
 - **Iterative** `Loop` or `FixedPoint`, where expressions are evaluated
   repeatedly
 
@@ -169,6 +169,89 @@ with `\wedge`) are interchangeable.
 
 When compiled to JavaScript or GLSL, `When(e, cond)` emits a ternary
 `(cond ? e : NaN)`. This makes `When` suitable for plot-domain masking.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Match">
+
+<Signature name="Match">_subject_, _case-1_, ..._case-n_</Signature>
+
+Structural pattern matching: the value of the `["Match"]` expression is the
+value of the first case whose pattern matches the structure of `subject`
+(and whose guard, if any, is `True`).
+
+Each case is a `["MatchCase"]` expression:
+
+- `["MatchCase", pattern, body]`
+- `["MatchCase", pattern, guard, body]`
+
+The `pattern` uses the same wildcards as
+[patterns and rules](/compute-engine/guides/patterns-and-rules/): `"_n"`
+captures one value, `"__n"` a sequence, `"___n"` an optional sequence, and
+`"_"` matches anything without capturing. The `guard` and `body` reference
+captures by their **bare name** (`"n"` for `"_n"`).
+
+```json example
+["Match", ["List", 3, 4],
+  ["MatchCase", ["List", "_a", "_b"], ["Add", "a", "b"]]
+]
+// ➔ 7
+```
+
+Unlike `["Which"]`, which evaluates boolean conditions and stays unevaluated
+while a condition cannot be decided, `["Match"]` inspects the **structure**
+of the subject and always selects a case: a symbolic subject that is not
+structurally equal to a pattern falls through to the next case.
+
+```json example
+["Match", "x",
+  ["MatchCase", 0, "'zero'"],
+  ["MatchCase", "_", "'other'"]
+]
+// ➔ "other" — x could be 0 semantically, but is not structurally 0
+```
+
+A guard must evaluate to `True` for the case to be selected; `False` or an
+undecidable guard falls through to the next case:
+
+```json example
+["Match", 5,
+  ["MatchCase", "_n", ["Greater", "n", 0], "'positive'"],
+  ["MatchCase", "_", "'other'"]
+]
+// ➔ "positive"
+```
+
+Two auxiliary heads may appear inside a pattern:
+
+- `["Pin", expr]` matches the **value** of `expr`, evaluated when the match
+  is performed, rather than its structure. Use it to match against a
+  constant (`["Pin", "Pi"]`) or the current value of a variable.
+- `["Alternatives", p-1, ..., p-n]`, as a case's pattern, matches if any
+  alternative matches. The alternatives share the case's guard and body and
+  must not contain named captures.
+
+```json example
+["Match", 2,
+  ["MatchCase", ["Alternatives", 1, 2, 3], "'small'"],
+  ["MatchCase", ["Pin", "Pi"], "'pi'"],
+  ["MatchCase", "_", "'big'"]
+]
+// ➔ "small"
+```
+
+If no case matches, the value of the expression is
+`["Error", "'match-no-case'", subject]` — an ordinary error value.
+
+Matches over constant cases are dispatched in constant time, and fixed-shape
+`List`/`Tuple`/`Dictionary` patterns are matched without invoking the
+general pattern matcher. When compiled to JavaScript, constant cases emit a
+comparison chain or a `switch` statement, and fixed-shape destructuring is
+supported; symbolic patterns (such as `["Add", "_a", 1]`) cannot be
+compiled and fail with an error rather than producing incorrect code.
+
+In Cortex, `["Match"]` is written with the `match` keyword:
+`match x { 0 => "zero"; 1 | 2 | == Pi => "small or pi"; _ => "other" }`.
 
 </FunctionDefinition>
 

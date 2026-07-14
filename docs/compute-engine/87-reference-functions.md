@@ -292,6 +292,39 @@ applied to some arguments.
 ["Function", ["Add", ["Multiply", "x", 2], "y"], "x", "y"]
 ```
 
+**Typed parameters**. A parameter may be annotated with a type by writing it
+as a `["Typed", _symbol_, _type_]` expression instead of a bare symbol. The
+_type_ is a string such as `{"str": "integer"}` (or a type-name symbol, which
+is normalized to a string).
+
+```json example
+["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]]
+```
+
+The literal then types as a **named signature** — the example above has type
+`(x: integer) -> integer` — and, in strict mode, its arguments are checked
+against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#Typed)).
+
+**Return type**. To ascribe a return type, wrap the body in a `Typed`
+expression:
+
+```json example
+["Function", ["Typed", ["Add", "x", 1], "'integer'"], ["Typed", "x", "'integer'"]]
+```
+
+The annotation is authoritative: it sets the result type of the signature
+directly. Canonicalization moves the ascription **inside** the body `Block`,
+wrapping its last statement, so the canonical form of the example above is:
+
+```json example
+["Function",
+  ["Block", ["Typed", ["Add", "x", 1], "'integer'"]],
+  ["Typed", "x", "'integer'"]]
+```
+
+Type annotations round-trip through MathJSON but are dropped when serializing
+to LaTeX (there is no LaTeX notation for them).
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Assign">
@@ -351,6 +384,14 @@ The right-pointing form is a **pipeline operator**: `\rhd` (also
 feeds the expression on its left to the function on its right, and stages
 chain left to right.
 
+The corresponding expression is `Pipe(value, function)`. For example, Cortex
+`x |> f` constructs `Pipe(x, f)` and evaluates by applying `f` to `x`:
+
+```json example
+["Pipe", "x", "f"]
+// Evaluates as ["f", "x"]
+```
+
 A `\square` topic marker in the right-hand side names the position the piped
 value fills, so a stage can be a multi-argument call:
 
@@ -371,4 +412,3 @@ without naming the variable: `x^2 = 4 \rhd \operatorname{Solve}` solves for
 `x`.
 
 </FunctionDefinition>
-

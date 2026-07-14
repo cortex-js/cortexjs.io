@@ -406,6 +406,21 @@ in order to reduce, simplify and calculate its value.
 
 Return a list of the solutions of _equation_ for the given unknowns.
 
+To solve a system, pass a `List` of equations and a `List` of unknowns. Each
+solution is a `Tuple` whose values follow the order of the unknown list:
+
+```json example
+["Solve",
+  ["List",
+    ["Equal", ["Add", "x", "y"], 3],
+    ["Equal", ["Subtract", "x", "y"], 1]],
+  ["List", "x", "y"]]
+// ➔ ["List", ["Tuple", 2, 1]]
+```
+
+Linear systems are solved exactly. An underdetermined system may return a
+parametric tuple, while a system the solver cannot decide remains unevaluated.
+
 The _equation_ is an `Equal` expression, or a bare expression that is solved as
 if it were equal to zero. Any boolean condition (an inequality, a congruence…)
 also works when a domain is given (see below).
@@ -745,6 +760,32 @@ use `Declare`.
 ```json example
 ["Declare", ["Symbol", "x", 2], "real"]
 ```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Typed
+</nav>
+<FunctionDefinition name="Typed">
+
+<Signature name="Typed">_expression_, _type_</Signature>
+
+Ascribe a type to _expression_ for the benefit of the type system.
+
+The _type_ is a string such as `{"str": "integer"}`, or a type-name symbol
+such as `integer` (which is normalized to a string).
+
+`Typed` is an **ascription, not a runtime check**: it asserts the type without
+verifying the value, and it is transparent at evaluation — `Typed(x, type)`
+evaluates to the value of `x`.
+
+```json example
+["Typed", ["Add", 2, 3], "'integer'"]
+// The expression has type `integer`, and evaluates to 5
+```
+
+The main use of `Typed` is to annotate the parameters and return type of a
+[function literal](/compute-engine/reference/functions/#Function).
 
 </FunctionDefinition>
 

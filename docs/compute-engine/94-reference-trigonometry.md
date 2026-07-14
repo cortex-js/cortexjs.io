@@ -15,6 +15,23 @@ date: Last Modified
 
 </div>
 
+With `expr.N()`, inverse trigonometric and inverse hyperbolic functions return
+their complex principal value when no real value exists. Complex arguments are
+also supported:
+
+```js
+ce.parse("\\arcsin(2)").N();
+// ➔ 1.571 − 1.317i
+
+ce.parse("\\operatorname{arcosh}(0.5)").N();
+// ➔ 1.047i
+
+ce.parse("\\operatorname{arsinh}(1+i)").N();
+```
+
+Exact arguments remain symbolic with `evaluate()` unless an exact value is
+known.
+
 ## Trigonometric Functions
 
 <div className='equal-width-columns'>

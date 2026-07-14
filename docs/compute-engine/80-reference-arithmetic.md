@@ -453,6 +453,27 @@ value on each evaluation.
 
 </FunctionDefinition>
 
+<FunctionDefinition name="RandomInteger">
+
+<Signature name="RandomInteger">_upper_: integer</Signature>
+
+<Signature name="RandomInteger">_lower_: integer, _upper_: integer</Signature>
+
+Return a random integer using inclusive bounds. With one argument the lower
+bound is `0`; with two arguments the result is in $[lower, upper]$.
+`RandomInteger` uses the Compute Engine's seeded random-number generator, so a
+seeded engine produces reproducible results.
+
+```json example
+["RandomInteger", 6]
+// ➔ an integer from 0 through 6
+
+["RandomInteger", 5, 10]
+// ➔ an integer from 5 through 10
+```
+
+</FunctionDefinition>
+
 <FunctionDefinition name="Max">
 
 <Signature name="Max">_x1_, _x2_, ...</Signature>

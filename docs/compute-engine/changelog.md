@@ -10,77 +10,634 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.77.0 _2026-07-13_
 
-### Compute Engine
+### Pattern Matching
 
-- **Inverse trig/hyperbolic functions evaluate off their real domain.**
-  `.N()` now returns the complex principal value where the real branch is
-  undefined — `\operatorname{artanh}(2)` → `0.549 − 1.571i`,
-  `\arcsin(2)` → `1.571 − 1.317i`, `\operatorname{arcosh}(0.5)` →
-  `1.047i` — and for complex arguments (`\operatorname{arsinh}(1+i)`),
-  matching mpmath. Exact arguments still stay symbolic under plain
-  `evaluate()`. Two wrong-value bugs in the complex kernels were fixed en
-  route: `Arcoth` picked the wrong side of the branch cut on `(−1, 0)`,
-  and `Arsech`'s formula dropped a square root (wrong even for in-domain
-  arguments reached through a complex intermediate).
-- **`solve()` rejects out-of-range trig/hyperbolic equations robustly.**
-  `\sin x = 2`, `\tanh x = 2`, and `\cosh x = 1/2` return no real
-  solutions via explicit domain guards on the solve rules (`cosh`/`tanh`
-  had none, and the `sin`/`cos` guards missed exact ratios, silently
-  relying on the roots failing to numericize — which they no longer do,
-  per the entry above). Symbolic ratios (`\sin x = a`) and complex
-  polynomial roots (`x^2+1=0` → `±i`) are unchanged.
+- **New `Match` operator for structural pattern matching.**
+  `["Match", subject, ["MatchCase", pattern, body], …]` selects the first
+  case whose pattern matches the structure of the subject and applies its
+  body to the captured values:
+  `["Match", ["List", 3, 4], ["MatchCase", ["List", "_a", "_b"], ["Add", "a", "b"]]]`
+  → `7`. Cases may carry a guard (`["MatchCase", pattern, guard, body]`);
+  `["Pin", expr]` matches the *value* of an expression (a constant like
+  `Pi`, or the current value of a variable); `["Alternatives", p1, p2, …]`
+  shares one body among several binding-free patterns. Unlike `Which`,
+  which stays unevaluated while a condition is undecidable, `Match` always
+  decides — a symbolic subject falls through to a wildcard case. No
+  matching case yields an `["Error", "'match-no-case'"]` value.
+- **Cortex: `match` expression.** The reserved `match` keyword is now a
+  full pattern-matching expression:
+  `match x { 0 => "zero"; 1 | 2 | == Pi => "small"; [first, ...rest] => first; n if n > 3 => n; _ => "other" }`.
+  Bare identifiers in a pattern always bind (a non-final catch-all like
+  `Pi => …` is a parse error suggesting `== Pi` to match the constant);
+  `== expr` pins a value; `|` gives or-alternatives; `[…]`, `(…)` and
+  `{key -> pat}` destructure lists, tuples and dictionaries (open
+  matching); `n: integer` adds a type guard; `...rest` captures the tail.
+- **Constant-time dispatch and compilation.** Matches over constant cases
+  dispatch through a cached table instead of the general pattern matcher,
+  and fixed-shape destructuring compiles to direct positional checks.
+  `compile()` emits comparison chains or a JavaScript `switch` for
+  constant cases and destructuring closures for fixed shapes; symbolic
+  patterns (e.g. `a + b`) fail closed with a clear error rather than
+  producing incorrect code.
 
-### Integration
+### Typed Function Literals
 
-- **Mixed-parity numerators over binomial radicals integrate** (Rubi rung
-  R28): `\int\frac{c+dx}{\sqrt{-a-bx^4}}dx`,
-  `\int\frac{x^2(c+dx+ex^2+fx^3)}{(a+bx^4)^{3/2}}dx`, and Laurent
-  variants over `(a+b·x^n)^{3/2}` shapes now close (the corresponding
-  Rubi regrouping rule was inert in the compiled bundle) — the 1.1.3
-  benchmark section gains +5 (185/200), with knock-on gains in ch1
-  binomial products and inverse-tangent integrands.
+- **Function literals can declare parameter and return types.** A `Function`
+  parameter may be annotated — `["Typed", "x", "'integer'"]` — and the body
+  may carry a return-type ascription, so
+  `["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]]` now has type
+  `(x: integer) -> integer` instead of `(unknown) -> number`. Annotations feed
+  body type inference, and in strict mode arguments are checked at
+  application: applying `2.5` to an `integer` parameter yields an
+  `incompatible-type` error instead of silently computing. Partial application
+  preserves the remaining annotations and the return type. Assigning an
+  annotated literal to a symbol gives it the full typed signature — including
+  the declared return type, which is an *ascription* (authoritative, like a
+  TypeScript annotation) rather than a check against inference. Untyped
+  literals are unchanged.
+- **New `Typed` operator for type ascription.** `["Typed", expr, type]`
+  asserts the type of an expression for the type system and is transparent at
+  evaluation. It accepts a type string (`"'integer'"`) or a type-name symbol
+  (`integer`). LaTeX serialization drops annotations (no typed-parameter
+  notation in v1); MathJSON round-trips them.
+- **Cortex: typed function definitions are enforced end to end.**
+  `f(x: integer) -> real = x + 1`, `function g(n: integer) -> integer {…}`,
+  and the anonymous form `(x: integer) |-> x + 1` (new grammar) all parse to
+  native annotated literals; mistyped calls error, declared return types are
+  carried, and `serializeCortex` reconstructs the typed syntax faithfully.
+  Recursive typed definitions work
+  (`fact(n: integer) -> integer = if n <= 1 {1} else {n * fact(n - 1)}`).
 
-- **Reverse library search**: `ce.searchDefinitions(query)` returns a ranked,
-  deterministic list of `{ id, kind }` identifiers matching a plain-text
-  concept query. Matching spans four case-insensitive axes — the
-  identifier name, the definition's description, a curated `keywords`
-  synonym list (e.g. `average` → `Mean`, `antiderivative` → `Integrate`,
-  `nCr` → `Binomial`), and its LaTeX triggers (e.g. `\gcd` → `GCD`,
-  `\lfloor` → `Floor`, `\binom` → `Binomial`). Definitions now accept an
-  optional `keywords` field, so `ce.declare()`d symbols can supply their own
-  synonyms. `kind` uses the same semantics as
-  `operatorInfo()`/`symbolInfo()` (`function`, `opaque`, `constant`,
-  `variable`), and every returned `id` resolves via `ce.lookupDefinition(id)`.
-  Results are capped by an optional `limit` (default 10); an empty or
-  unmatched query returns `[]`.
-- **New builtin operators**: `Pipe(x, f)` applies `f` to `x` (so the
-  pipeline operator `x |> f` now evaluates), `Append(collection, element)`,
-  `Fold(f, init, collection)` (a `Reduce` variant with an explicit initial
-  value and `f(acc, element)` argument order), `StringJoin(s1, s2, …)`
-  (strict string concatenation — and the pre-existing `<>` LaTeX notation
-  now evaluates), and `RandomInteger(n)` / `RandomInteger(a, b)` (uniform
-  integer with inclusive bounds, honoring the seeded RNG).
-- **Recursive function definitions work in one step.** Assigning a function
-  that refers to itself — `ce.parse('f(n) := n \\cdot f(n-1)')`-style
-  definitions, or `Assign(f, Function(… f …))` — now resolves the
-  self-reference (previously it unfolded once and stalled; the symbol had
-  to be declared beforehand).
-- **Single-indexing a matrix yields a correctly-typed row.** Accessing one
-  index of a rank-≥2 collection (`At(m, 2)`) is now typed as a sub-tensor
-  (`vector<2>` from a `matrix<2x2>`) instead of the scalar element type, so
-  chained accesses like `At(At(m, 2), 1)` validate and evaluate.
-- **Collection literals evaluate their elements.** `List` literals and
-  `Dictionary` values now evaluate on `evaluate()`/`N()` — `["List", "y",
-  ["Add", "y", 1]]` with `y = 7` evaluates to `[7, 8]`, and `[1/3].N()`
-  numericizes — matching the existing behavior of `Set` and `Tuple`
-  (previously `List` evaluated nothing, so lists could capture dangling
-  references to mutated or out-of-scope variables). Lazy collection
-  operators (`Range`, `Map`, `Filter`, …) are unchanged: bounds and
-  operands snapshot, enumeration stays deferred. Lists whose elements are
-  already plain literals are returned by identity — no per-call rebuild for
-  large numeric lists.
+### Programming and Collections
+
+- **Closures capture per-call state.** A zero-parameter closure returned from a
+  factory function now captures its own instance of the factory's local
+  variables, so separate invocations no longer share mutable state. For example,
+  two counters built from the same `makeCounter()` factory advance
+  independently. Parameterized factories already behaved this way; the fix
+  extends the same per-call scope instantiation to nullary functions.
+- **Lazy collection operations iterate eager sources.** A lazy operation such as
+  `Map` or `Filter` applied to a collection that only materializes on evaluation
+  (e.g. `UnicodeScalars(s)`, `Characters(s)`) now iterates its elements instead
+  of behaving as empty. For example,
+  `StringFrom(Map(UnicodeScalars(s), c -> c + 1), "unicode-scalars")` now
+  produces the shifted string rather than `""`.
+
+### Symbolic Computation
+
+- **Arithmetic and function application thread through conditional values.**
+  A restricted value `When(v, cond)` and a piecewise `Which(c_1, v_1, …)` now
+  flow through scalar operations instead of staying inert:
+  `sin(When(x, x > 0))` → `When(sin(x), x > 0)`, guards combining by
+  conjunction (`When(x, x > 0) · When(y, y < 1)` →
+  `When(x·y, x > 0 ∧ y < 1)`), and `Which(x > 0, 1, x < 0, -1) + 2` →
+  `Which(x > 0, 3, x < 0, 1)`. Logic operators are excluded (so
+  `And(When(A, g), False)` still short-circuits to `False`), and piecewise
+  products above 16 combined branches stay unevaluated.
+- **Restriction guards survive arithmetic cancellation.** Evaluating
+  `When(x, c) − When(x, c)` previously folded to plain `0`, silently
+  discarding the restriction on the (fat) region where `c` fails; it now
+  yields `When(0, c)`. Similarly `0 · When(x, c)` → `When(0, c)` and
+  `When(x, c) / When(x, c)` → `When(1, c)`.
+- **`When` respects numeric approximation.** `When(π, cond).N()` with a true
+  condition now numericizes (previously the option was dropped and the value
+  stayed symbolic).
+- **DMS angles stay exact.** (contributed by
+  [yelliver](https://github.com/yelliver)) Degrees-minutes-seconds notation
+  now parses to an exact rational number of degrees instead of a float
+  (`9°30'` is `19/2°`),
+  and `Degrees` converts any rational — not just integers — to an exact
+  multiple of π, so `5°37'30"` simplifies to `π/32`. Decimal components are
+  recovered exactly when possible (`9°30'15.5"` → `68431/7200°`) and
+  otherwise fall back to floats. `Degrees` of values beyond 2⁵³ no longer
+  loses precision. In raw (non-canonical) parsing, DMS angles that previously
+  produced a float now produce a `Rational`. (#321)
+
+### Calculus
+
+- **Exponentials with any linear exponent integrate.** `∫e^{−ax}dx` with a
+  symbolic `a` previously stayed unevaluated (only `e^{a·x}`-shaped
+  exponents were recognized); it now returns `−e^{−ax}/a`. Any linear
+  exponent works: `∫e^{3−2x}dx`, `∫5e^{−x/2}dx`.
+- **Improper integrals with symbolic parameters return convergence-guarded
+  results.** `∫₀^∞ e^(−ax)dx` with a free `a` previously stayed unevaluated;
+  it now returns `1/a {0 < a}`. Results that formerly leaked indeterminate
+  endpoint forms are fixed: `∫₀^1 xⁿdx` returned an expression containing
+  `0^(n+1)`, and `∫₁^∞ x^(−s)dx` one containing `∞^(1−s)`; they now return
+  `1/(n+1) {0 < n+1}` and `1/(s−1) {1 < s}`. Integrals whose endpoint
+  behavior cannot be classified stay unevaluated rather than leaking
+  indeterminates. Numeric-parameter integrals are unchanged.
+- **`Series` expands at algebraic branch points (Puiseux series).** A series
+  expansion may now carry fractional powers: `Series(√(sin x), x)` →
+  `√x − x^{5/2}/12 + x^{9/2}/1440 + O(x^{13/2})`. This covers `√x`, `1/√x`,
+  `x^{3/2}·e^x`, `Root(g, r)` and rational powers `g^{p/r}` where the base
+  vanishes (or has a pole), as well as compositions: `cos(√x)`, `csc(√x)`
+  (→ `1/√x + √x/6 + …`), and `Γ(√x)` (→ `1/√x − γ + …`).
+- **`Series` expands through logarithmic singularities.** Expanding about a
+  zero or pole of a logarithm's argument now yields a log-carrying series:
+  `Series(ln(sin x), x)` → `ln x − x²/6 − x⁴/180 + O(x⁶)`, and
+  `Series(x^x, x)` → `1 + x·ln x + x²·ln²x/2 + …`. Base-`b` logarithms
+  (`log₂ x`, `log₁₀ x`) expand through the same path. Nested or reciprocal
+  logarithms (`ln(ln x)`, `1/ln x`) and essential singularities (`e^{1/x}`)
+  still stay unevaluated rather than returning a partial expansion.
+- **`Series` of an irrational power no longer returns an invalid expansion.**
+  `Series(x^π, x)` previously produced coefficients containing unresolved
+  `0^{π−1}`-style indeterminates; it now stays unevaluated at 0 (the
+  expansion about a regular point, e.g. `x^π` about 2, is unchanged).
+- **Logarithmic asymptotic expansions at `±∞`.** A log-carrying expansion at
+  `+∞` now resolves back to `x` instead of deferring:
+  `Series(ln x, x, +∞)` → `ln x`, and
+  `Series(ln(x²+x), x, +∞)` → `2 ln x + 1/x − 1/(2x²) + …`. At `−∞` (a
+  logarithm of a negative quantity) such expansions still stay unevaluated.
+- **Stirling asymptotics for the log-gamma.** `Series(GammaLn(x), x, +∞)` (and
+  the parsed `ln Γ(x)`) now returns Stirling's series
+  `x·ln x − x − ½ln x + ½ln(2π) + 1/(12x) − 1/(360x³) + O(1/x⁵)`. The series is
+  asymptotic (divergent), so the `BigO` is placed at the true remainder order.
+  `Series(Γ(x), x, +∞)` — the exponential of a trans-series — still defers.
+- **`GammaLn` evaluates to `+∞` at the poles of `Γ`** (the non-positive
+  integers, where `ln|Γ| → +∞` — as in Mathematica's `LogGamma` and SymPy's
+  `loggamma`); it previously stayed inert there. Consequently
+  `Series(GammaLn(x), x)` at such a pole now returns the log-aware expansion
+  `−ln x − γ·x + (π²/12)·x² + …` (matching the parsed `ln Γ(x)`) instead of an
+  invalid expansion with inert `GammaLn(0)`, `Digamma(0)`, … coefficients.
+- **Provably-exact expansions drop the `BigO` remainder.** When the truncated
+  sum is symbolically equal to the whole function, `Series` now returns it
+  without a remainder term: `Series(√x, x)` → `√x`, `Series(ln x, x)` → `ln x`,
+  `Series(x/(x−2)², x, 2)` → `2(x−2)⁻² + (x−2)⁻¹`. Genuinely-truncated series
+  (`1/sin x`, `Γ(x)` at 0, `ζ` at 1) keep their `BigO`.
+
+### Sums and Products
+
+- **Geometric series closed form.** `Σ_{n=0}^∞ rⁿ` now evaluates: exactly for
+  a numeric ratio (`Σ(1/2)ⁿ → 2`, `Σ(1/√2)ⁿ → 2 + √2`), and with its
+  convergence condition for a symbolic ratio (`Σxⁿ → 1/(1−x) {|x| < 1}`).
+  Constant multiples and integer start indices are handled
+  (`Σ_{n=2}^∞ xⁿ → x²/(1−x) {|x| < 1}`); divergent numeric ratios stay
+  unevaluated.
+
+### Solving Equations
+
+- **Radical equations with a symbolic right-hand side return guarded roots.**
+  `Solve(√(x+3) = a, x)` previously returned `[]`; it now returns
+  `a² − 3 {0 <= a}` (a square root is non-negative, so a real solution
+  exists only for `a ≥ 0`). Substituting a concrete value resolves the
+  guard: `a = 2` gives `1`, `a = −2` gives `Undefined`. Numeric right-hand
+  sides are unchanged.
+- **Trigonometric and hyperbolic equations with symbolic coefficients record
+  their validity condition.** `Solve(sin(x) = a, x)` previously returned
+  `arcsin(a)` and `π − arcsin(a)` unconditionally — wrong whenever
+  `|a| > 1`. Roots now carry their domain-of-validity guard — a `When`
+  restriction, displayed `arcsin(a) {|a| <= 1}` (LaTeX
+  `\arcsin(a)\left\{|a|\le 1\right\}`). The guard resolves as soon as it is
+  decidable:
+  substituting `a = 1/2` collapses the root to `π/6`, while `a = 3` yields
+  `Undefined`, and a guard known false at solve time prunes the root (down
+  to `[]`). Numeric-coefficient equations are unchanged. The same applies to
+  `cos` (`|ratio| ≤ 1`), `cosh` (`ratio ≥ 1`), and `tanh` (`|ratio| < 1`)
+  equations.
+- **`Solve` of an inequality stays inert instead of returning an empty list.**
+  `Solve(x^2 < 4, x)` previously returned `[]`, which reads as "no solutions";
+  univariate inequality solving is unsupported, so the expression now stays
+  unevaluated. Solving equations is unchanged.
+
+### Compilation
+
+- **The deprecated `interval-glsl` compilation target has been removed.** GPU
+  interval evaluation only pays off when the entire pipeline stays on the GPU,
+  and the target could not compile relational operators, so it could not host
+  restriction conditions. Use `interval-js` (CPU interval arithmetic) or the
+  scalar `glsl`/`wgsl` targets instead. The `IntervalGLSLTarget` export from
+  `@cortex-js/compute-engine/compile` is gone, and
+  `compile(expr, { to: 'interval-glsl' })` now throws an unregistered-target
+  error.
+
+### Parsing
+
+- **`ce.parse()` no longer blows up on repeated `\command[opt]{}` groups.**
+  Adjacent bracketed groups — a garbage `\begin{tikzpicture}katu[scale=0.6]{}…`
+  run, or even plain index notation `a[6]a[6]…` — triggered exponential-time
+  backtracking, so a few-hundred-character string could hang the parser for tens
+  of seconds (and `timeLimit`, which bounds evaluation, did not stop it). The
+  reversed-bracket ISO interval notation `]a, b[` opens on `]`, the same token
+  that closes an index bracket, so every stray `]` speculatively re-parsed the
+  rest of the input as an interval body, nesting exponentially. Parsing is now
+  polynomial; the interval (`]0, 1[`) and indexing (`a[6]`) notations are
+  unchanged.
+- **`\operatorname{nPr}(n, r)` now has a definition.** Matching
+  `\operatorname{nCr}` (the binomial coefficient), the Desmos
+  permutation-count notation lowers to `Choose(n, r)·r!` (= n!/(n−r)!), so
+  `nPr(5, 2)` evaluates to `20`. Previously it parsed to an inert symbol and
+  stayed symbolic under `N()`, silently producing `NaN` in a compiled function.
+
+### Arithmetic
+
+- **`Round` accepts an optional precision argument.** `Round(x, n)` rounds `x`
+  to `n` decimal places — `Round(2.567, 2) → 2.57`, `Round(1234.5, −2) → 1200`
+  — matching the Desmos/spreadsheet `round(x, n)` convention. Previously the
+  second argument produced an `unexpected-argument` error. The single-argument
+  round-to-integer form is unchanged, and the two-argument form compiles on the
+  `javascript` and `interval-js` targets.
+- **New `Rationalize` operator for rational approximation.**
+  `Rationalize(x)` approximates a real number by a rational at full working
+  precision (like single-argument `Rational`); with a tolerance,
+  `Rationalize(x, tolerance)` returns the rational with the smallest
+  denominator within the bound — `Rationalize(√3, 1/500) → 26/15`,
+  `Rationalize(π, 1/100) → 22/7` — a continued-fraction convergent cut.
+
+### Number Theory
+
+- **New `StirlingS1` operator: signed Stirling numbers of the first kind.**
+  `StirlingS1(n, m)` is the coefficient of xᵐ in the falling factorial
+  x(x−1)…(x−n+1); its absolute value counts the permutations of n elements
+  with m disjoint cycles — `StirlingS1(5, 2) → −50`. Complements the existing
+  `Stirling` (second kind).
+
+### Relational Operators
+
+- **`Equal` and `NotEqual` broadcast over a named list operand.** With
+  `R = [1, 2, 3]`, `x² + y² = R²` now broadcasts to a list of three
+  element-wise equations — matching the literal-list form
+  (`x² + y² = [1, 2, 3]`) and the inequality operators (`<`, `≤`, …), which
+  already broadcast. Previously the named form collapsed to a single `False`.
+  Whole-list equality, where two or more operands are collections
+  (`[1, 2] = [1, 2]`), still returns a single boolean.
+
+## 0.76.0 _2026-07-11_
+
+### Programming and Collections
+
+- **Dictionary lookups have the value's type.** `At(dict, key)` — and thus
+  `d["a"]` in Cortex — was statically typed as the key-value _pair_
+  (`tuple<string, T>`), so using a lookup directly in arithmetic (`d["a"] + 10`)
+  failed with an `incompatible-type` error. It is now typed as the value; a
+  record indexed by a literal string gets that field's precise type.
+
+- **`Reduce`/`Fold` honor the exactness contract.** The compiled floating-point
+  fast path no longer runs under plain `evaluate()`: exact operands fold exactly
+  (`Fold((a, k) ↦ a + 1/k, 0, Range(1, 5))` → `137/60` instead of `2.2833…`).
+  The fast path is reserved for `.N()` and already-inexact inputs.
+  Complex-valued folds no longer silently drop imaginary parts
+  (`Product(Map(Range(1, 3), k ↦ k + i))` → `10i`, previously `6`).
+
+- **`Map` infers its element type from the mapped function.** The result of
+  `Map(Range(1, 3), k ↦ k + i)` was typed with the _source_ element type
+  (`integer`); it now reflects the lambda's result type, so downstream
+  operations dispatch correctly.
+
+- **Elementwise broadcasting is uniform across lazy and eager collections.** A
+  finite lazy `Range` now broadcasts like an eager `List` in tuple products:
+  with `R = Range(-2, 2)`, `R·(2,3)` yields a list of five scaled points instead
+  of distributing the range inside the tuple components. A scalar also folds
+  into a collection produced by an inner broadcast step: `L^2 - 2` evaluates to
+  `[-1, 2, 7]` instead of the unevaluated `Add(-2, [1, 4, 9])`, and evaluation
+  is idempotent again on these shapes. Infinite or unknown-length ranges stay
+  symbolic rather than transposing.
+
+- **Scalar operations accept lazy collection operands during validation.**
+  `Mod([0,\ldots,kN], N)` with a symbolic bound produced an `incompatible-type`
+  error at canonicalization even though the eager-list form broadcast fine; the
+  argument validator now recognizes parametrized `indexed_collection<T>`
+  wherever broadcasting applies. Declared types follow the values: broadcast
+  results type `list<…>` (previously a scalar-or-list union, or a scalar type
+  for symbolic-length ranges).
+
+- **Big integers survive numeric list literals.** A list literal promoted to a
+  tensor stored oversized integers in float64 and truncated them (`[100!]` lost
+  digits, breaking exact iterative algorithms such as a Fibonacci pair
+  accumulator). Integers beyond the float-safe range now keep their exact
+  representation.
+
+- **`StringFrom` joins collections.** With a list argument and the
+  `"unicode-scalars"`, `"utf-8"`, or `"utf-16"` format,
+  `StringFrom([100, 101, 102], "unicode-scalars")` returns `"def"`; it
+  previously broadcast element-wise and returned a list of one-character
+  strings.
+
+- **One-step function definitions bind inside function bodies (Cortex).**
+  `function outer(n) { sq(m) = m * m; sq(n) }` left `sq(n)` unevaluated because
+  the call site resolved a value placeholder while the runtime created an
+  operator definition; function application now falls back to the operator
+  definition. The example-program suite grew by 18 programs covering control
+  flow, number theory, complex numbers, linear algebra, and exact sums (mirrored
+  in the Cortex documentation).
+
+- **Cortex: `do { … }` block expressions and zero-parameter lambdas.** A
+  statement block can now appear in any expression position with the explicit
+  `do` prefix — its value is its final statement — so multi-statement closure
+  bodies are expressible: `x |-> do { let t = x * x; t + 1 }`. Set literals are
+  unchanged (`x |-> {1, 2}` still returns a set). Zero-parameter lambdas
+  (`() |-> …`) now parse and apply, enabling the stateful `makeCounter`-style
+  closure documented in the examples.
+
+- **Cortex: a named inner function escapes its scope as a value.**
+  `function make() { helper(x) = x + 1; helper }` now returns a callable
+  first-class function — previously the returned symbol went inert once the call
+  frame popped. Captured locals and parameters of the enclosing call are
+  preserved; returned `|->` lambdas are unchanged.
+
+- **Cortex: lowercase `true`/`false`, ASCII `..` ranges, and `StringJoin` over a
+  list.** `true`/`false` are now input aliases for `True`/`False` (and reserved
+  as binding names); `1..n` is a range (`for k in 1..5`), equivalent to the
+  existing `‥`, without disturbing decimal literals like `1.5`; and `StringJoin`
+  accepts a single collection of strings —
+  `StringJoin(Reverse(Characters("hello")))` → `"olleh"`.
+
+- **Cortex: "did you mean" warnings for near-miss function names.** Calling an
+  undeclared function whose name is close to a library operator no longer fails
+  silently symbolic: `executeCortex` emits a warning diagnostic with the
+  suggestion (`Quartile(xs)` → _did you mean `Quartiles`?_). The match is
+  conservative (case-insensitive, singular/plural, small edit distance, unique
+  prefix) and the diagnostic only fires when a suggestion exists, so
+  intentionally symbolic calls are never flagged; the returned value is
+  unchanged. The matcher is also available as `ce.suggestOperatorName(name)`.
+  `Arg` is now an alias for `Argument`.
+
+### Compilation
+
+- **Calls to user-defined functions compile.** After `f(x) := e^{-x^2/2}`,
+  compiling `f(2)` — or any expression referencing `f` — emits the definition as
+  a named local function instead of throwing ``Unknown operator `f` ``. Nested
+  user functions are emitted in dependency order; recursive definitions fail
+  closed with an explanatory error. This also removes a silent interpreted
+  fallback in numeric integration: definite integrals of user-defined functions
+  now run compiled quadrature (10⁷ samples instead of 10⁴ — comparable wall
+  time, ~30× tighter error estimate). Applies to the `javascript` and
+  `interval-js` targets.
+
+- **Collection-valued conditions fail closed instead of compiling wrong code.**
+  `Equal`/`NotEqual` over a collection-typed operand, and `If`/`Which`/`When`
+  with a collection-typed condition, previously compiled with `success: true`
+  and returned `null` or the wrong branch at run time; they now throw an
+  explanatory compile-time error. Interpreted evaluation is unchanged:
+  comparisons broadcast elementwise, conditionals require a scalar boolean.
+
+- **`Reduce`, `Length`, and `At` compile on the `javascript` target.**
+  `Reduce(xs, Add|Multiply|Min|Max, init?)` compiles to a loop; `Length` returns
+  the element count; `At` follows the interpreter's 1-based, negative-from-end
+  indexing (out-of-range yields `NaN`).
+
+- **GLSL: `Length` no longer collides with the `length()` builtin.** CE's
+  `Length` (element count) compiled to GLSL `length()` — the Euclidean norm —
+  reporting success while computing the wrong value, or emitting invalid GLSL
+  for lists longer than four. `length()` is now emitted for `Norm`; collection
+  `Length` fails closed on the GPU targets.
+
+- **GLSL/WGSL: literal integer powers are sign-correct on the GPU.** `x^3`
+  compiled to `pow(x, 3.0)`, which the GLSL specification leaves undefined for
+  negative bases — real GPUs returned `pow(-2, 3) = +8`, silently flipping the
+  sign of odd-power terms. Small integer exponents now emit repeated
+  multiplication; larger and compound-base cases use a sign-preserving
+  `_gpu_powi` preamble helper; negative integer exponents wrap the reciprocal.
+  Fractional exponents still emit `pow`.
+
+- **The `interval-glsl` target is deprecated.** GPU interval evaluation only
+  pays off when the entire pipeline stays on the GPU, and the target cannot
+  compile relational operators, so it cannot host restriction conditions. A
+  once-per-process warning now points to `interval-js` and the scalar
+  `glsl`/`wgsl` targets. It will be removed in a future release.
+
+### Numeric Evaluation
+
+- **Numeric infinite products use tail acceleration.** `.N()` now
+  Richardson-extrapolates the logarithms of positive real factors instead of
+  returning a plain finite truncation. This gives accurate values for products
+  such as `Product(1 + 1/k², k, 1, +∞) = sinh(π)/π`. Products with non-real,
+  non-positive, or non-convergent factors decline the accelerator and retain the
+  existing bounded-truncation behavior.
+
+- **Machine `Gamma` keeps full relative accuracy through the overflow edge.**
+  Positive real arguments now use a balanced recurrence from the Lanczos core
+  instead of reconstructing large values from `exp(gammaln(z))`, which preserves
+  about 15-16 digits up to the IEEE-754 limit near `Gamma(171.624)`.
+
+### Linear Algebra
+
+- **Matrix operators infer fresh symbolic operands from context.** An expression
+  such as `\det(A+2B)` no longer fails because bottom-up arithmetic
+  canonicalization provisionally typed `A` and `B` as numbers before
+  `Determinant` required a matrix. Validation now repairs only inferences made
+  while constructing the current expression and canonicalizes the argument once
+  more with matrix context. Explicit declarations and inferences from earlier
+  expressions are never overwritten, and ambiguous products remain unchanged
+  rather than guessing which factor is the matrix.
+
+### Symbolic Computation
+
+- **Exact cube-root arithmetic handles more algebraic forms.** Positive
+  perfect-power bases with rational exponents normalize to a common base and
+  extract their integer part (`4^(2/3) → 2·2^(1/3)`), allowing compatible
+  cube-root powers to combine exactly. Real nested cube roots of the form
+  `∛(a+b√c)` are denested when exact integer conjugate identities prove a
+  result; in particular, `∛(90+34√7) → 3+√7` (and the conjugate form with minus
+  signs). The Wester-28 cube-root identity now simplifies directly to exact zero
+  (no explicit `Expand` required) and numericizes without `NaN`.
+
+- **Infinite p-series support positive-integer lower bounds beyond 1.**
+  `Sum(k^(-s), k, a, +∞)` now returns `Zeta(s) − Sum(k^(-s), k, 1, a−1)` for
+  exact real `s > 1`; for example, `Sum(1/k², k, 3, +∞)` evaluates to
+  `π²/6 − 5/4`. The existing lower-bound-1 behavior and divergence guards are
+  unchanged.
+
+- **`e^{iθ}` stays exact for constructible angles.** `e^{i\pi/3}` now evaluates
+  to `1/2 + (√3/2)i` instead of a machine float (the exact cosine/sine values
+  were being recombined through float-folding arithmetic). `.N()` numericizes as
+  before, and the degenerate angles (`e^{i\pi} → -1`, `e^{i\pi/2} → i`) are
+  unchanged.
+
+### Serialization
+
+- **AsciiMath prints series in textbook order.** Taylor-series terms are
+  serialized in ascending degree and asymptotic series in descending degree,
+  with the `BigO` remainder last, matching LaTeX output. Canonical expression
+  order and ordinary sums without a `BigO` term are unchanged.
+
+### Parsing
+
+- **Stepped ellipsis ranges accept negative and symbolic samples.**
+  `[-9,-6,\ldots,9]` now parses to `Range(-9, 9, 3)` — previously any negative
+  leading sample fell back to a literal list containing a
+  `ContinuationPlaceholder` that enumerated as `NaN`. Symbolic stepped forms
+  infer a symbolic step when the samples are numeric multiples of one common
+  symbol (`[-3N,-2N,\ldots,3N]` → `Range(-3N, 3N, N)`, progression-validated on
+  the coefficients); generic sequence notation (`[x_1,x_2,\ldots,x_n]`)
+  intentionally still parses as a plain list.
+
+### Engine Lifecycle
+
+- **Popping a scope releases configuration listeners owned by its constants.**
+  Constant definitions now retain and invoke the unsubscribe closure returned
+  when they register for precision and angular-unit changes. Local constants
+  from discarded scopes therefore no longer remain reachable for the lifetime of
+  the compute engine.
+
+- **Cancellation errors carry a structured cause.** A cap breach reports
+  `'timeout'`, `'iteration-limit-exceeded'`, or `'recursion-depth-exceeded'` via
+  the exported `CancellationCause` type. In Cortex, a final-statement breach
+  carries the cause as a second operand on the `Error` value, and non-final
+  statements emit a dedicated `evaluation-canceled` diagnostic. Error messages
+  are unchanged, so existing string matching keeps working.
+
+## 0.75.0 _2026-07-11_
+
+### Numeric Evaluation
+
+- **Inverse trigonometric and hyperbolic functions now evaluate outside their
+  real domain.** `.N()` returns the complex principal value when no real value
+  exists, for example `\arcsin(2)` → `1.571 − 1.317i` and
+  `\operatorname{arcosh}(0.5)` → `1.047i`. Complex arguments such as
+  `\operatorname{arsinh}(1+i)` are also supported. Exact arguments remain
+  symbolic with `evaluate()`. Incorrect complex values from `Arcoth` on part of
+  its branch cut and from `Arsech` have also been fixed.
+- **Products and quotients of square roots no longer throw on large radicands.**
+  Evaluating an expression such as `\sqrt{1234}\cdot\sqrt{1235}`, whose combined
+  radicand (`1234·1235`) exceeds the exact-radical limit, no longer raises an
+  internal "Unexpected value for radical part" error. Any perfect-square factor
+  is extracted (`√(k²·r) = k·√r`), keeping the result exact when the square-free
+  part is small enough and otherwise returning the numeric value.
+
+### Solving Equations
+
+- **`Solve` handles systems of equations.** `Solve([eq1, eq2, …], [x, y, …])`
+  returns each solution as a tuple of values in the order of the variable list:
+  `Solve([x + y = 3, x - y = 1], [x, y])` → `[(2, 1)]`, and a nonlinear system
+  such as `[x^2 + y^2 = 25, x + y = 7]` returns both solutions
+  `[(3, 4), (4, 3)]`. Linear systems solve exactly (rational values), an
+  underdetermined system returns a parametric tuple (`[(5 - y, y)]` for
+  `x + y = 5`), and a system the solver cannot decide stays unevaluated. This
+  matches the tuple shape already used when solving over explicit domains.
+- **`solve()` correctly rejects trigonometric and hyperbolic equations with no
+  real solutions.** Equations such as `\sin x = 2`, `\tanh x = 2`, and
+  `\cosh x = 1/2` now return no solutions. Symbolic equations and equations with
+  complex polynomial roots are unaffected.
+
+### Integration (opt-in Rubi rules)
+
+- **More integrals containing binomial radicals are supported.** This includes
+  mixed even- and odd-power numerators such as
+  `\int\frac{c+dx}{\sqrt{-a-bx^4}}dx`,
+  `\int\frac{x^2(c+dx+ex^2+fx^3)}{(a+bx^4)^{3/2}}dx`, and Laurent variants with
+  denominators of the form `(a+b·x^n)^{3/2}`.
+- **More integrals that are algebraic in a hyperbolic function are supported.**
+  Half-integer powers of hyperbolic expressions such as
+  `\int\coth(x)(a+b\sinh^2 x)^{3/2}\,dx`,
+  `\int\coth^2 x\sqrt{a+b\tanh^2 x}\,dx`,
+  `\int\frac{\operatorname{csch} x}{(a+b\sinh^2 x)^{3/2}}\,dx`, and
+  `\int\sqrt{a+b\operatorname{csch}^2 x}\,dx` now close in elementary form via a
+  hyperbolic substitution. This also fixes a wrong-answer case,
+  `\int\frac{\sqrt{\coth(a+b\ln(cx^n))}}{x}\,dx`.
+- **More integrals that are rational in a hyperbolic function are supported.**
+  Ratios of hyperbolic functions with a squared-or-higher power, such as
+  `\int\frac{\tanh^2 x}{a+b\tanh x}\,dx`, `\int\frac{\tanh x}{a+b\sinh x}\,dx`,
+  and `\int(a+b\tanh^2 x)^3\tanh^4 x\,dx`, now close in elementary form.
+
+### Library and Definitions
+
+- **Definitions can be searched by concept.** `ce.searchDefinitions(query)`
+  returns a ranked list of matching `{ id, kind }` entries. It searches names,
+  descriptions, synonyms (for example, `average` finds `Mean`), and LaTeX
+  commands (for example, `\gcd` finds `GCD`). Use the optional `limit` argument
+  to control the number of results (default: 10). Custom definitions declared
+  with `ce.declare()` can provide an optional `keywords` list, and returned IDs
+  can be passed to `ce.lookupDefinition()`.
+- **Definition descriptions filled in.** About 80 operators and constants that
+  lacked a `description` now have one (the trigonometric family, logic and
+  relational operators, collection primitives such as `List`, `Range`, and
+  `Fold`, and constants like `Pi` and `ExponentialE`), and `Sec`'s description
+  was corrected (secant is the _reciprocal_, not the inverse, of cosine). These
+  surface in `ce.searchDefinitions()` and `ce.lookupDefinition()`.
+- **New builtin operators are available:** `Pipe(x, f)`,
+  `Append(collection, element)`, `Fold(f, init, collection)`,
+  `StringJoin(s1, s2, …)`, and `RandomInteger(n)` or `RandomInteger(a, b)`.
+  `Pipe` enables evaluation of `x |> f`; `StringJoin` enables the existing `<>`
+  notation; and `RandomInteger` uses inclusive bounds and honors the seeded
+  random-number generator.
+
+### Calculus
+
+- **`Limit` accepts the explicit-variable form.** `Limit(expr, var, point)` —
+  e.g. `["Limit", ["Divide", ["Sin", "x"], "x"], "x", 0]` → `1` — now
+  canonicalizes to the same internal form as `Limit(expr, point)`, matching the
+  convention `Series` already uses. The `(function, point, direction)` reading
+  is preserved when the middle operand is not a free variable of the expression.
+
+### Linear Algebra
+
+- **`Inverse` of an exact matrix is exact.** An integer or rational matrix now
+  inverts over the rationals — `Inverse([[2,1],[1,3]])` →
+  `[[3/5,-1/5],[-1/5,2/5]]` instead of floats — with `.N()` and inexact matrices
+  using the numeric path as before.
+- **New `LinearSolve(A, b)` operator** solves the linear system `A·x = b`,
+  exactly for exact input. Composed forms like `Dot(Inverse(A), b)` also work
+  now: `Inverse`'s result is typed as a matrix, so matrix operators accept it.
+
+### Units and Quantities
+
+- **`Quantity` accepts a string unit.** `Quantity(30, "km/h")` parses the string
+  through the same unit grammar as the LaTeX path and canonicalizes identically
+  to the symbolic form; a malformed unit string produces a clear error instead
+  of a partially-built expression.
+
+### Programming and Collections
+
+- **Recursive functions can be defined without a separate declaration.** A
+  function assignment that refers to itself, such as
+  `ce.parse('f(n) := n \\cdot f(n-1)')`, now works directly.
+- **`N()` numericizes through user-defined functions.** For `f(x) := x/3`,
+  `N(f(2))` now returns `0.666…` instead of the exact `2/3`; plain `evaluate()`
+  still returns the exact form, and the approximation is applied within the
+  function's own scope, preserving lexical scoping.
+- **`Keys(dict)` and `Values(dict)` evaluate**, returning the keys (as strings)
+  and values in the dictionary's iteration order — the same order
+  `for kv in dict` yields.
+- **`Intersection` accepts lists** (any finite collection), deduplicating into a
+  `Set`; `Union` already did.
+- **A 2-element MathJSON `List` in a set operation is a collection, not an
+  interval.** `["Intersection", ["List",1,2], ["List",2,3]]` (Cortex:
+  `Intersection([1,2], [2,3])`) now intersects the two-element collections —
+  `Set(2)` — instead of reading the lists as closed intervals. The interval
+  reading of ambiguous bracket pairs is now applied where it belongs, at the
+  LaTeX boundary: `x \in \lbrack 1, 5 \rbrack`, `(-\infty, 0) \cup (0, \infty)`,
+  and the subset relations parse to `Interval` exactly as before, and
+  `\setminus` now gets the same interval reading (previously
+  `\R \setminus (0, 1)` kept a raw pair). Unambiguous interval notations
+  (`[a, b)`, `]a, b[`, …) are unchanged.
+- **Collection equality no longer depends on representation.** A computed
+  collection — an `Intersection` or `Union` result, a lazy `Map`, `Filter`, or
+  `Join` pipeline, or a symbol assigned a collection — now compares equal to a
+  literal with the same elements: `Intersection({1,2,3,4}, {2,3,5}) = {2,3}` is
+  `True` (it was `False` unless the operand was evaluated first). Sequences
+  compare element-wise in order, sets by membership, and a set is never equal to
+  a sequence. In addition, `Equal` between two collections now always returns a
+  scalar boolean instead of sometimes broadcasting element-wise (`{1,2} = [1,2]`
+  returned `["True","True"]`); broadcasting still applies to list-vs-scalar
+  comparisons such as `L = 4`.
+- **`Intersection` of two `Filter` collections no longer overflows the stack.**
+  Membership tests on a lazy `Filter` recursed without bound;
+  `Intersection(Filter(…), Filter(…))` now evaluates normally.
+- **Indexing a matrix once returns a correctly typed row.** Expressions such as
+  `At(At(m, 2), 1)` now validate and evaluate correctly for matrices and other
+  rank-2-or-higher collections.
+- **List elements and dictionary values are evaluated by `evaluate()` and
+  `.N()`.** For example, `["List", "y", ["Add", "y", 1]]` with `y = 7` evaluates
+  to `[7, 8]`, and `[1/3].N()` is numericized. Lazy collections such as `Range`,
+  `Map`, and `Filter` remain lazily enumerated.
+- **Ellipsis lists with symbolic bounds parse to `Range`.**
+  `\left[-N,\ldots,N\right]` and `\left[-3N,\ldots,3N\right]` now parse to
+  `Range(-N, N)` and `Range(-3N, 3N)`, matching the numeric-start forms
+  (`[1,\ldots,N]`). Previously a symbolic start fell through to a raw `List`
+  containing a literal `ContinuationPlaceholder`, which enumerated as `NaN`. In
+  addition, a `Range` whose bounds bind looser than the `..` operator now
+  serializes with parentheses (`(-N)..N`) so it round-trips through LaTeX (an
+  unwrapped `-N..N` reads back as `-(N..N)`).
+- **Using a symbol bound to a symbolic list no longer corrupts builtin
+  definitions.** After `ce.assign('L_1', ce.parse('\\left[N,2N\\right]'))`,
+  constructing `2 L_1` — via `subs()`, `ce.box()`, or `ce.function()` —
+  permanently broke the builtin `N` operator for the lifetime of the engine:
+  every subsequent parse of the token `N` returned an `unexpected-symbol` error.
+  Type inference on the list elements no longer overwrites an operator
+  definition with an unsatisfiable (`never`) type.
 
 ### Cortex
 
@@ -88,258 +645,234 @@ import ChangeLog from '@site/src/components/ChangeLog';
   precedence) and `n!` is `Factorial(n)` (the `!` must directly follow its
   operand; prefix `!x` is still `Not` and `x != y` is still `NotEqual`).
 - **Chained indexing**: `m[2][1]` now works alongside `m[2, 1]`.
-- The examples suite (`src/cortex/docs/examples.md`) grew to 24 verified
-  programs, including one-step recursion, pipelines, `Fold`, and postfix
-  factorials.
+- **String escape sequences are processed correctly.** `"a\tb\nc"` now contains
+  a real tab and newline (escapes were previously double-processed in plain and
+  multiline strings; interpolated strings were already correct).
+- **The examples suite roughly doubled** (`src/cortex/docs/examples.md`), adding
+  units and uncertainty, calculus, linear systems, dictionaries, sets, closures,
+  seeded randomness, errors-as-values, and string formatting — every example
+  verified by an executable test.
 
 ## 0.74.0 _2026-07-10_
 
+This release significantly expands CE's calculus capabilities. Limits, residues,
+and series now handle many poles of special functions exactly; infinite sums and
+products gain more closed forms and substantially better numeric convergence;
+and the optional Rubi integration rules support more integrands, any integration
+variable, and reliable time limits. Step-by-step explanations now cover
+integration and systems of equations or inequalities, with clearer traces for
+simplification.
+
+It also improves exact and symbolic computation throughout the engine. Linear
+algebra gains exact ranks, null spaces, eigenvectors, matrix square roots, and
+singular values; assumptions and simplification prove more identities; and
+several correctness issues involving canonicalization, fractions, symbolic
+collections, compilation, and LaTeX parsing are fixed. New special-function
+support, reproducible seeded randomness, and more useful Cortex diagnostics
+round out the release.
+
 ### Calculus
 
-- **Limits and residues at special-function poles evaluate exactly.** The
-  symbolic limit engine and `Residue` are now wired to the exact Laurent
-  kernel behind `Series`, so expressions that used to stay inert at the
-  poles of `Gamma`, `Digamma`, `Trigamma`, `PolyGamma`, and `Zeta` resolve
-  in closed form: `\lim_{x\to-1}(x+1)\psi(x) = -1`,
-  `\lim_{x\to0}(\Gamma(x)-1/x) = -\gamma`,
-  `\lim_{s\to1}(s-1)\zeta(s) = 1`, `\operatorname{Res}_{s=1}\Gamma(s)\zeta(s)
-  = 1`, `\operatorname{Res}_{x=0}\Gamma(x)^2 = -2\gamma`, and higher-order
-  poles that previously deferred (`\operatorname{Res}_{x=-2}
-  \Gamma(x)/(x+2) = 3/4 - \gamma/2`). Deferral behavior is unchanged where
-  no exact expansion exists (branch points, essential singularities,
-  two-sided pole limits). Design:
-  `docs/plans/2026-07-10-pole-asymptotics-design.md`.
-- **The polygamma family expands, differentiates and integrates through the
-  ladder.** `Series` now produces correct Laurent expansions of `Trigamma`
-  and integer-order `PolyGamma(m, x)` at their poles (previously a spurious
-  regular expansion could be produced), and `D` knows
-  `\psi_1' = \psi^{(2)}` and the general `d/du\,\psi^{(m)}(u) =
-  \psi^{(m+1)}(u)`. The `Gamma`/`Digamma` pole expansions themselves were
-  rebuilt on closed-form coefficients (exp-of-log recurrence, harmonic-number
-  sums) — `Series` at a `Digamma` pole is ~20× faster.
+- **Limits and residues at special-function poles evaluate exactly.**
+  Expressions at poles of `Gamma`, `Digamma`, `Trigamma`, `PolyGamma`, and
+  `Zeta` that previously stayed symbolic now resolve in closed form:
+  `\lim_{x\to-1}(x+1)\psi(x) = -1`, `\lim_{x\to0}(\Gamma(x)-1/x) = -\gamma`,
+  `\lim_{s\to1}(s-1)\zeta(s) = 1`,
+  `\operatorname{Res}_{s=1}\Gamma(s)\zeta(s) = 1`,
+  `\operatorname{Res}_{x=0}\Gamma(x)^2 = -2\gamma`, and higher-order poles that
+  previously deferred
+  (`\operatorname{Res}_{x=-2} \Gamma(x)/(x+2) = 3/4 - \gamma/2`). Deferral
+  behavior is unchanged where no exact expansion exists (branch points,
+  essential singularities, two-sided pole limits).
+- **The polygamma family expands, differentiates, and integrates through the
+  ladder.** `Series` now produces correct Laurent expansions of `Trigamma` and
+  integer-order `PolyGamma(m, x)` at their poles (previously a spurious regular
+  expansion could be produced), and `D` knows `\psi_1' = \psi^{(2)}` and the
+  general `d/du\,\psi^{(m)}(u) = \psi^{(m+1)}(u)`. `Series` at a `Digamma` pole
+  is also about 20× faster.
 - **Residues at infinity evaluate.** `Residue(f, x, \infty)` — any infinite
   point names the Riemann-sphere point at infinity — computes
   `-\operatorname{Res}_{s=0} f(1/s)/s^2` through the exact Laurent kernel:
   `\operatorname{Res}_\infty 1/x = -1`,
-  `\operatorname{Res}_\infty \frac{3x^2+2}{x^3+x} = -3` (the negated sum of
-  the finite residues).
-- **Limits at poles resolve to signed infinities.** A *directional* limit at
-  a pole now evaluates to `\pm\infty` from the exact Laurent data:
+  `\operatorname{Res}_\infty \frac{3x^2+2}{x^3+x} = -3` (the negated sum of the
+  finite residues).
+- **Limits at poles resolve to signed infinities.** A _directional_ limit at a
+  pole now evaluates to `\pm\infty` from the exact Laurent data:
   `\lim_{x\to0^+} 1/x = +\infty`, `\lim_{x\to0^-}\Gamma(x) = -\infty`,
   `\lim_{s\to1^\pm}\zeta(s) = \pm\infty`, `\lim_{x\to0^+}\ln x = -\infty`. A
-  *two-sided* limit resolves only when both sides agree (even pole order):
+  _two-sided_ limit resolves only when both sides agree (even pole order):
   `\lim_{x\to0} 1/x^2 = +\infty`, `\Gamma(x)^2 \to +\infty`,
   `\ln(x^2) \to -\infty`. Disagreeing two-sided limits (`\lim_{x\to0} 1/x`,
-  `\Gamma`, `\ln x` at their poles) deliberately stay inert — the engine
-  does not produce `ComplexInfinity` limits.
+  `\Gamma`, `\ln x` at their poles) deliberately stay inert — the engine does
+  not produce `ComplexInfinity` limits.
 - **`Beta` joins the meromorphic pole family.** The Laurent kernel expands
-  `\operatorname{B}(a,b)` through the `\Gamma`-quotient identity, so
-  residues, limits and `Series` at Beta poles evaluate:
+  `\operatorname{B}(a,b)` through the `\Gamma`-quotient identity, so residues,
+  limits and `Series` at Beta poles evaluate:
   `\operatorname{Res}_{x=0} \operatorname{B}(x,3) = 1`,
   `\lim_{x\to0} x\cdot\operatorname{B}(x,3) = 1`.
-- **Numeric limits of sums converge instead of hanging.** `N()` of a `Limit`
-  at `\infty` whose body contains a `Sum` with a variable-dependent bound ran
-  an unbounded, uninterruptible loop — past any `ce.timeLimit` (the numeric
-  ladder samples at geometrically increasing arguments, so a single compiled
-  summation could run for hours). The probe paths now compile `Sum`/`Product`
-  loops with an iteration budget (over-budget samples read as the ladder's
-  existing "unreliable" signal) and the sampling ladder checks the evaluation
-  deadline between rungs. The flagship cases now *converge, quickly*:
-  `\lim_{n\to\infty}(\sum_{k=1}^{n} 1/k - \ln n)` evaluates to the
-  Euler–Mascheroni constant (to 12 digits) and
-  `\lim_{n\to\infty}\frac{4}{n^2}\sum_{k=1}^{n}\sqrt{n^2-k^2}` to `\pi` — in
-  milliseconds, where both previously hung.
-- **Richardson extrapolation uses the correct series assumption.** The
-  numeric limit fallback's extrapolation defaulted to an *even*-series
-  acceleration (`power = 2`, a transcription bug — its own documentation and
-  Richardson.jl say 1), so any approach with odd-power terms (e.g.
-  `H_n - \ln n - \gamma \sim 1/2n`) never converged its error estimate and
-  was reported as `NaN`. With the Taylor default, decaying oscillations now
-  resolve too (`\operatorname{sinc}` at `-\infty` → `0`) while genuinely
-  divergent oscillations (`\sin x` at `\infty`) still correctly return `NaN`.
+- **Numeric limits containing sums now converge instead of hanging.** `N()`
+  respects evaluation limits when probing a `Limit` at `\infty` whose body
+  contains a variable-length `Sum` or `Product`. Examples that now converge
+  quickly include `\lim_{n\to\infty}(\sum_{k=1}^{n} 1/k - \ln n)`, which
+  evaluates to the Euler–Mascheroni constant, and
+  `\lim_{n\to\infty}\frac{4}{n^2}\sum_{k=1}^{n}\sqrt{n^2-k^2}`, which evaluates
+  to `\pi`.
+- **Numeric limits with odd-power error terms now converge correctly.** This
+  fixes cases such as `H_n - \ln n - \gamma \sim 1/2n`, which previously
+  returned `NaN`. Decaying oscillations such as `\operatorname{sinc}` at
+  `-\infty` now resolve to `0`, while divergent oscillations such as `\sin x` at
+  `\infty` still return `NaN`.
 
 ### Step-by-Step Explanations
 
 - **`explain('Integrate')` traces symbolic integration through the Rubi rule
-  chain.** With the opt-in integration rules loaded
-  (`loadIntegrationRules(ce)` from
-  `@cortex-js/compute-engine/integration-rules`),
+  chain.** With the opt-in integration rules loaded (`loadIntegrationRules(ce)`
+  from `@cortex-js/compute-engine/integration-rules`),
   `ce.parse('\\int x\\sqrt{1+x}\\,dx').explain('Integrate')` replays the
   driver's derivation as whole-expression states — term-by-term splits
-  (`integrate.sum`), constant factors moved out
-  (`integrate.constant-factor`), each corpus rule application (a stable
-  `rubi:…` id with a compact description such as _"Apply integration rule
-  1.1.1.2#19 (Rubi)"_), reductions to special functions
-  (`integrate.si-ci`, `integrate.partial-fractions`, …), and a closing
+  (`integrate.sum`), constant factors moved out (`integrate.constant-factor`),
+  each corpus rule application (a stable `rubi:…` id with a compact description
+  such as _"Apply integration rule 1.1.1.2#19 (Rubi)"_), reductions to special
+  functions (`integrate.si-ci`, `integrate.partial-fractions`, …), and a closing
   simplification. A **definite** integral is presented via the Fundamental
-  Theorem of Calculus: the antiderivative derivation, then the bracket
-  `F |_a^b` (`integrate.fundamental-theorem`), the bounds substituted
-  unevaluated (`integrate.evaluate-bounds` — skipped for improper
-  integrals, where the bracket is a limit), and the value. Symbolic bounds
-  are supported. The result is identical to `evaluate()`. Without the rules
-  loaded, or when the rules cannot close the integral, a precise error is
-  thrown. (Also fixed: the LaTeX serialization of the two-bound
-  `\left. F \right|_a^b` `EvaluateAt` form dropped the upper bound.)
+  Theorem of Calculus: the antiderivative derivation, then the bracket `F |_a^b`
+  (`integrate.fundamental-theorem`), the bounds substituted unevaluated
+  (`integrate.evaluate-bounds` — skipped for improper integrals, where the
+  bracket is a limit), and the value. Symbolic bounds are supported. The result
+  is identical to `evaluate()`. Without the rules loaded, or when the rules
+  cannot close the integral, a precise error is thrown. (Also fixed: the LaTeX
+  serialization of the two-bound `\left. F \right|_a^b` `EvaluateAt` form
+  dropped the upper bound.)
 
 - **`explain('solve')` traces systems of inequalities and mixed systems.** A
   `List`/`And` of linear inequalities in two variables is traced through
   constraint normalization (`solve.system.normalize-inequality`), boundary
-  intersection (`solve.system.intersect-boundaries`), and the feasible
-  vertices (`solve.system.vertices`); mixed equality/inequality systems show
-  the elimination steps, then each candidate checked against the constraints
+  intersection (`solve.system.intersect-boundaries`), and the feasible vertices
+  (`solve.system.vertices`); mixed equality/inequality systems show the
+  elimination steps, then each candidate checked against the constraints
   (`solve.system.check-constraints`, `solve.system.reject`). Both previously
   threw "not supported" errors.
 
 - **`explain('simplify')` surfaces the work done inside operands.**
-  Simplifications applied while descending into the operands of a sum,
-  product or function argument — previously summarized by an opaque
-  bookkeeping step — now appear as labeled steps with their own rule ids
-  (`\tan x\cot x + \frac{x^3+x^2}{x^2}` shows the $\tan x\cot x \to 1$
-  rewrite before the expansion). At default verbosity, consecutive
-  applications of the same rule are coalesced into a single step; pass
-  `verbosity: 'all'` for the raw chain.
+  Simplifications applied while descending into the operands of a sum, product
+  or function argument — previously summarized by an opaque bookkeeping step —
+  now appear as labeled steps with their own rule ids
+  (`\tan x\cot x + \frac{x^3+x^2}{x^2}` shows the $\tan x\cot x \to 1$ rewrite
+  before the expansion). At default verbosity, consecutive applications of the
+  same rule are coalesced into a single step; pass `verbosity: 'all'` for the
+  raw chain.
 
 ### Integration (opt-in Rubi rules)
 
-- **The per-integral time budget is now airtight.** A re-entrant call into
-  the rule driver through an `evaluate()` seam (a `With`-binding or
-  substitution containing an unsolved sub-integral) was treated as a fresh
-  top-level integration: it reset the wall-clock budget (`timeLimitMs`) —
-  letting a pathological integrand exceed it — and cleared the in-flight
-  recursion guards, re-opening potential infinite recursion on cyclic
-  subproblems. Re-entrancy is now detected by an in-flight counter, so every
-  re-entrant call inherits the outer deadline and guards.
-- **Any integration variable works — not just `x`.** The rule driver
-  returned *wrong answers* for integrals in any other variable
-  (`\int t^2\,dt` gave `x^3/3`; mixed-variable corruption for
-  `\int t\cos t\,dt`) because rule right-hand sides never bound their
-  variable pattern to the actual variable. `\int t^2\,dt` now correctly
-  gives `t^3/3` across every rule family.
+- **Integration consistently respects `timeLimitMs`.** Nested integration
+  attempts now share the original time limit and recursion safeguards, avoiding
+  runaway evaluation on cyclic or difficult subproblems.
+- **Any integration variable works—not just `x`.** Integrals using another
+  variable could previously return an expression in `x`; for example,
+  `\int t^2\,dt` now correctly returns `t^3/3`.
 - **Symbolic-coefficient quartic-denominator rationals close.**
-  `\int \frac{d+e\,x^2}{a+b\,x^4}\,dx` — and shapes that reduce to it, such
-  as `\int \frac{x^6}{(a+c\,x^4)^3}\,dx` — now reach the trinomial terminal
-  rules instead of ping-ponging between integrand expansion and binomial
-  splitting.
+  `\int \frac{d+e\,x^2}{a+b\,x^4}\,dx` — and shapes that reduce to it, such as
+  `\int \frac{x^6}{(a+c\,x^4)^3}\,dx` — now reach the trinomial terminal rules
+  instead of ping-ponging between integrand expansion and binomial splitting.
 - **Symbolic-coefficient reciprocal hyperbolics close.**
   `\int \frac{1}{a+b\sinh x}\,dx` and the cosh/tanh/coth/sech/csch variants
   resolve via a rational-normal-form retry in the exponential-substitution
   fallback.
-- **Complex special-function closures.** Rational integrands with
-  irreducible quadratic denominators split over complex-conjugate roots in
-  the Si/Ci fallback, reciprocal-argument integrands like
-  `\int x^m \sin(a + b/x)\,dx` close, and inverse-trig antiderivatives
-  producing complex-argument `Erfi` evaluate (riding the new complex
-  error-function kernels).
-- **`\int F(\ln(a\,x^n))/x\,dx` closes** via a function-of-logarithm
-  recognizer (substitution `u = \ln(a\,x^n)`).
+- **Complex special-function closures.** Rational integrands with irreducible
+  quadratic denominators split over complex-conjugate roots in the Si/Ci
+  fallback, reciprocal-argument integrands like `\int x^m \sin(a + b/x)\,dx`
+  close, and inverse-trig antiderivatives producing complex-argument `Erfi`
+  evaluate (riding the new complex error-function kernels).
+- **`\int F(\ln(a\,x^n))/x\,dx` closes** via a function-of-logarithm recognizer
+  (substitution `u = \ln(a\,x^n)`).
 - **Products of sines and cosines reduce via product-to-sum** before
-  integration, closing mixed-angle products the term-by-term rules could
-  not reach.
+  integration, closing mixed-angle products the term-by-term rules could not
+  reach.
 
 ### Arithmetic
 
-- **Canonicalization no longer folds a variable's current value into the
-  expression's structure.** The canonical folds `a/1 = a`, `a/(-1) = -a`,
-  `a/0 = \tilde\infty`, `0/a = 0`, `\ln 1 = 0`, and unit-factor removal in
-  products used a value-following comparison, so a *mutable* symbol whose
-  value happened to be `0`, `1` or `-1` at boxing time leaked into canonical
-  structure: with `x` holding `1`, `ce.box(['Divide', 2, 'x'])`
-  canonicalized to the constant `2` — and to `ComplexInfinity` with `x`
-  holding `0`. In program-style usage (a notebook cell chain, a loop body
-  canonicalized once and evaluated repeatedly) this produced silently wrong
-  results: the Newton iteration `x_{k+1} = (x_k + 2/x_k)/2` started from
-  `x = 1` computed the `(x+2)/2` ladder — `63/32` instead of `\sqrt2`.
-  Canonical folds now require an actual number literal, so canonical
-  structure is independent of any symbol's transient value; evaluation
-  still substitutes values exactly as before. (Constants participate too:
-  a `const`-declared numeric symbol now substitutes at evaluation,
-  consistent with how `Pi` behaves, rather than folding at
-  canonicalization.)
-- **Huge scientific exponents no longer crash.** Parsing or serializing a
-  number literal whose exponent exceeds what the bignum layer can represent
+- **Canonical expressions no longer depend on a variable's current value.** A
+  mutable symbol holding `0`, `1`, or `-1` could be folded into an expression
+  while it was boxed, producing stale and sometimes incorrect results after the
+  symbol changed. Canonicalization now folds only literal numbers; symbol values
+  are substituted during evaluation. Numeric `const` symbols follow the same
+  evaluation behavior as `Pi`.
+- **Huge scientific exponents no longer crash.** Parsing or serializing a number
+  literal whose exponent exceeds what the bignum layer can represent
   (`1e999999999`) threw; it now overflows cleanly to `+\infty` (and `-\infty`
   for negative mantissas), matching float semantics.
-- **Complex values with an infinite component type as `complex`.** A
-  `Complex` whose real or imaginary part is infinite was typed
-  `finite_complex`, so type-gated paths mishandled it; it now reports the
-  non-finite `complex` type.
+- **Complex values with an infinite component type as `complex`.** A `Complex`
+  whose real or imaginary part is infinite was typed `finite_complex`, so
+  type-gated paths mishandled it; it now reports the non-finite `complex` type.
 
 ### Sums and Products
 
-- **Telescoping sums and products evaluate in closed form.** A sum whose body
-  is a `k \to k+1` shift pair collapses exactly, for arbitrary symbolic
-  bounds and either orientation: `\sum_{k=0}^{n} \bigl(g(k+1) - g(k)\bigr)`
-  evaluates to `g(n+1) - g(0)`. The product counterpart recognizes a
-  shift-quotient body after combining it over a common denominator:
+- **Telescoping sums and products evaluate in closed form.** A sum whose body is
+  a `k \to k+1` shift pair collapses exactly, for arbitrary symbolic bounds and
+  either orientation: `\sum_{k=0}^{n} \bigl(g(k+1) - g(k)\bigr)` evaluates to
+  `g(n+1) - g(0)`. The product counterpart recognizes a shift-quotient body
+  after combining it over a common denominator:
   `\prod_{k=1}^{n-1}\left(1 + \frac{1}{k}\right)` evaluates to `n`.
 - **`\prod_{k=1}^{n} k` evaluates to `n!`.** The bare-index product with a
   symbolic upper bound returns `Factorial(n)` instead of staying inert.
-- **Classic infinite series and products evaluate to their exact closed
-  forms.** p-series reduce to the zeta function —
-  `\sum_{k=1}^{\infty} \frac{1}{k^2}` evaluates to `\frac{\pi^2}{6}`,
-  `\sum \frac{1}{k^2} + \frac{1}{k^3}` to `\frac{\pi^2}{6} + \zeta(3)`
-  (term-wise splitting applies only when every summand has a closed form) —
-  and the Wallis product
+- **Classic infinite series and products evaluate to their exact closed forms.**
+  p-series reduce to the zeta function — `\sum_{k=1}^{\infty} \frac{1}{k^2}`
+  evaluates to `\frac{\pi^2}{6}`, `\sum \frac{1}{k^2} + \frac{1}{k^3}` to
+  `\frac{\pi^2}{6} + \zeta(3)` (term-wise splitting applies only when every
+  summand has a closed form) — and the Wallis product
   `\prod_{k=1}^{\infty}\left(1 - \frac{1}{(2k)^2}\right)` evaluates to
-  `\frac{2}{\pi}`. Series with no known closed form stay symbolic under
-  exact `evaluate()`, per the infinite-domain contract.
+  `\frac{2}{\pi}`. Series with no known closed form stay symbolic under exact
+  `evaluate()`, per the infinite-domain contract.
 - **`.N()` of convergent infinite sums reaches near machine precision.** The
-  numeric path Richardson-extrapolates the partial sums instead of returning
-  a plain 10⁴-term truncation: `\sum 1/k^2` now numericizes to ~2·10⁻¹⁶ of
-  `π²/6` (previously ~10⁻⁴ off), and series without closed forms benefit
-  equally (`\sum 1/(k^2+1)` to ~2·10⁻¹⁴). Divergent or non-smooth series are
-  detected and fall back to the capped truncation.
+  numeric path Richardson-extrapolates the partial sums instead of returning a
+  plain 10⁴-term truncation: `\sum 1/k^2` now numericizes to ~2·10⁻¹⁶ of `π²/6`
+  (previously ~10⁻⁴ off), and series without closed forms benefit equally
+  (`\sum 1/(k^2+1)` to ~2·10⁻¹⁴). Divergent or non-smooth series are detected
+  and fall back to the capped truncation.
 
 ### Equation Solving
 
-- **Trig equations with symbolic coefficients solve.** Multi-operand wildcard
-  captures (e.g. `__a` matching `-2x`) reached the solve rules' condition
-  checks as raw, non-canonical expressions; doing arithmetic on them threw
-  `Not canonical` internally, logged errors, and returned no solutions.
-  `x^2 - 2x\cos t + 1 = 0` solved for `t` now returns
+- **Trigonometric equations with symbolic coefficients solve correctly.** For
+  example, `x^2 - 2x\cos t + 1 = 0` solved for `t` now returns
   `\pm\arccos\left(\frac{x^2+1}{2x}\right)`.
 
 ### Assumptions
 
-- **Transitive closure over assumed inequality chains.** Assumptions now
-  chain: `a \ge b`, `b \ge c`, `c \ge d` entails `a \ge d`, strictness
-  propagates (`p > q > r` entails `p > r` and `p \ne r`), and an
-  antisymmetric cycle collapses to equality — Wester 21's
-  `x \ge y, y \ge z, z \ge x` now proves `x = z` is `True`. A chain without
-  a back-edge deliberately does *not* prove equality.
+- **Transitive closure over assumed inequality chains.** Assumptions now chain:
+  `a \ge b`, `b \ge c`, `c \ge d` entails `a \ge d`, strictness propagates
+  (`p > q > r` entails `p > r` and `p \ne r`), and an antisymmetric cycle
+  collapses to equality — Wester 21's `x \ge y, y \ge z, z \ge x` now proves
+  `x = z` is `True`. A chain without a back-edge deliberately does _not_ prove
+  equality.
 - **Even-power monotonicity on ordered positives.** Wester 22's
   `x > y, y > 0 \vdash 2x^2 > 2y^2` now evaluates to `True` (a difference of
-  equally-scaled squares factors as `k(x-y)(x+y)` with both factor signs
-  settled from the assumptions). `x > y` alone deliberately does *not*
-  conclude `x^2 > y^2`, and solve()'s conservative root-filtering behavior
-  is unchanged.
+  equally-scaled squares factors as `k(x-y)(x+y)` with both factor signs settled
+  from the assumptions). `x > y` alone deliberately does _not_ conclude
+  `x^2 > y^2`, and solve()'s conservative root-filtering behavior is unchanged.
 
 ### Simplification and Exact Arithmetic
 
 - **The Fu strategy reduces same-power sin/cos differences.**
   `simplify({ strategy: 'fu' })` now rewrites `\sin^4 x - \cos^4 x` to
-  `-\cos 2x` (and the mirrored/2nd-power forms): a difference of squares
-  whose Pythagorean sum factor is `1`, which the exponent-2-only TR5/TR6/TR7
+  `-\cos 2x` (and the mirrored/2nd-power forms): a difference of squares whose
+  Pythagorean sum factor is `1`, which the exponent-2-only TR5/TR6/TR7
   transforms could not reach. Verified numerically; the default `simplify()`
   path is deliberately unchanged (pinned by test).
 - **Exact modulus of complex expressions with radical parts.** `Abs` of a
   constant `a + b\,i` with radical/rational parts computes the exact
   `\sqrt{a^2 + b^2}` when it genuinely folds: Kahan's
-  `\left|3-\sqrt{7}+i\sqrt{6\sqrt{7}-15}\right|` simplifies to exactly `1`
-  (its `.N()` alone carries a `1.0000000000000000315` float residue),
-  `|5-12i| = 13`, `|2+\sqrt{5}\,i| = 3`, `|1+2i| = \sqrt{5}`. A split whose
-  "imaginary part" is itself imaginary (a negative radicand) is rejected by
-  a numeric cross-check, and symbolic `|x+iy|` never folds.
+  `\left|3-\sqrt{7}+i\sqrt{6\sqrt{7}-15}\right|` simplifies to exactly `1` (its
+  `.N()` alone carries a `1.0000000000000000315` float residue), `|5-12i| = 13`,
+  `|2+\sqrt{5}\,i| = 3`, `|1+2i| = \sqrt{5}`. A split whose "imaginary part" is
+  itself imaginary (a negative radicand) is rejected by a numeric cross-check,
+  and symbolic `|x+iy|` never folds.
 - **Matrices differentiate elementwise.** `D` over a vector/matrix `List`
   literal maps over the elements (recursively for nested lists) instead of
-  producing a nonsensical scalar chain-rule expansion: the second derivative
-  of the rotation matrix `[[\cos t, \sin t], [-\sin t, \cos t]]` is `-M`, as
-  it should be. `Derivative` shares the fix.
-- **`Together` combines fractions correctly.** The `Together` operator summed
-  all numerators and all denominators independently
-  (`\frac{a}{b} + \frac{c}{d}` gave the freshman-sum
-  `\frac{a+c}{b+d}`, and `1 + \frac{1}{k}` gave `\frac{2}{k}`). It now folds
-  the terms over a common denominator:
+  producing a nonsensical scalar chain-rule expansion: the second derivative of
+  the rotation matrix `[[\cos t, \sin t], [-\sin t, \cos t]]` is `-M`, as it
+  should be. `Derivative` shares the fix.
+- **`Together` combines fractions correctly.** It now uses a common denominator
+  instead of adding numerators and denominators independently:
   `\frac{a}{b} + \frac{c}{d} \to \frac{ad + bc}{bd}`,
   `1 + \frac{1}{k} \to \frac{k+1}{k}`, reusing the denominator when terms
   already share it.
@@ -347,149 +880,145 @@ import ChangeLog from '@site/src/components/ChangeLog';
 ### Linear Algebra
 
 - **Exact null spaces, ranks, and eigenvectors.** The exact bigint-fraction
-  elimination introduced for `RowReduce` in 0.73.0
-  now backs `Kernel` (null-space basis vectors come out as exact rationals:
-  `[[2,3],[0,0]]` → basis `[-3/2, 1]`), `MatrixRank` (rank = exact pivot
-  count, with no float-tolerance ambiguity), and eigenvector computation
-  (when the matrix and the eigenvalue are exact rationals, `A - \lambda I`
-  is solved exactly — the eigenvectors of `[[4,1],[2,3]]` are the exact
-  `[1, 1]` and `[-1/2, 1]`). Inexact or symbolic entries fall back to the
-  numeric path unchanged.
-- **`M · M^{-1}` simplifies to the identity for symbolic matrices.** Two
-  fixes combine: `simplify()` now recurses into `List` elements (matrix
-  entries were previously unreachable by any simplify rule), and a new rule
-  combines a sum of fractions sharing an identical denominator into a single
-  fraction so the diagonal entries `\frac{a^2 b}{a^2 b - b} +
-  \frac{-b}{a^2 b - b}` cancel to `1`.
-- **Symbolic matrix rank via the determinant.** `MatrixRank` of a small
-  symbolic matrix now concludes when the simplified determinant settles the
-  question: the trigonometric matrix
-  `[[\sin 2t, \cos 2t], [2\sin t\cos t, \cos^2 t - \sin^2 t]]` has rank `1`
-  (its determinant vanishes under `TrigReduce`). Indeterminate cases stay
-  symbolic, as before.
-- **Vandermonde determinants return the difference product.** The
-  determinant of a symbolic Vandermonde matrix (either orientation) is
-  produced directly in its factored closed form
-  `\prod_{i<j}(x_j - x_i)` instead of an unfactored expansion.
-- **The numeric eigensolver converges on hard spectra.** The QR iteration
-  was rebuilt as Householder reduction to Hessenberg form followed by the
-  Francis double-shift algorithm with deflation. The classic 8×8 Rosser
-  stress matrix — double eigenvalue `1000`, a `±10\sqrt{10405}` pair, and a
-  tiny eigenvalue `≈0.098` — now yields the true spectrum (the unshifted
-  iteration returned wrong values), and non-symmetric matrices get proper
-  complex-conjugate eigenvalue pairs (`[[0,-1],[1,0]]` → `\{i, -i\}`).
-- **`MatrixPower(M, 1/2)` — principal matrix square root.** Half-integer
-  powers of an exact 2×2 positive-semidefinite matrix evaluate exactly via
-  the closed form `\sqrt{M} = (M + \sqrt{\det M}\,I)/\sqrt{\operatorname{tr}
-  M + 2\sqrt{\det M}}`: `MatrixPower([[10,7],[7,17]], 1/2)` →
-  `[[3,1],[1,4]]`, and `3/2`, `-1/2` etc. compose with the integer path.
+  elimination introduced for `RowReduce` in 0.73.0 now backs `Kernel`
+  (null-space basis vectors come out as exact rationals: `[[2,3],[0,0]]` → basis
+  `[-3/2, 1]`), `MatrixRank` (rank = exact pivot count, with no float-tolerance
+  ambiguity), and eigenvector computation (when the matrix and the eigenvalue
+  are exact rationals, `A - \lambda I` is solved exactly — the eigenvectors of
+  `[[4,1],[2,3]]` are the exact `[1, 1]` and `[-1/2, 1]`). Inexact or symbolic
+  entries fall back to the numeric path unchanged.
+- **`M · M^{-1}` simplifies to the identity for symbolic matrices.** Two fixes
+  combine: `simplify()` now recurses into `List` elements (matrix entries were
+  previously unreachable by any simplify rule), and a new rule combines a sum of
+  fractions sharing an identical denominator into a single fraction so the
+  diagonal entries `\frac{a^2 b}{a^2 b - b} + \frac{-b}{a^2 b - b}` cancel to
+  `1`.
+- **Symbolic matrix rank via the determinant.** `MatrixRank` of a small symbolic
+  matrix now concludes when the simplified determinant settles the question: the
+  trigonometric matrix
+  `[[\sin 2t, \cos 2t], [2\sin t\cos t, \cos^2 t - \sin^2 t]]` has rank `1` (its
+  determinant vanishes under `TrigReduce`). Indeterminate cases stay symbolic,
+  as before.
+- **Vandermonde determinants return the difference product.** The determinant of
+  a symbolic Vandermonde matrix (either orientation) is produced directly in its
+  factored closed form `\prod_{i<j}(x_j - x_i)` instead of an unfactored
+  expansion.
+- **The numeric eigensolver converges on hard spectra.** The QR iteration was
+  rebuilt as Householder reduction to Hessenberg form followed by the Francis
+  double-shift algorithm with deflation. The classic 8×8 Rosser stress matrix —
+  double eigenvalue `1000`, a `±10\sqrt{10405}` pair, and a tiny eigenvalue
+  `≈0.098` — now yields the true spectrum (the unshifted iteration returned
+  wrong values), and non-symmetric matrices get proper complex-conjugate
+  eigenvalue pairs (`[[0,-1],[1,0]]` → `\{i, -i\}`).
+- **`MatrixPower(M, 1/2)` — principal matrix square root.** Half-integer powers
+  of an exact 2×2 positive-semidefinite matrix evaluate exactly via the closed
+  form
+  `\sqrt{M} = (M + \sqrt{\det M}\,I)/\sqrt{\operatorname{tr} M + 2\sqrt{\det M}}`:
+  `MatrixPower([[10,7],[7,17]], 1/2)` → `[[3,1],[1,4]]`, and `3/2`, `-1/2` etc.
+  compose with the integer path.
 - **New operator: `SingularValues`** — the singular values of a matrix,
-  descending, zeros included; exact when the Gram matrix is at most 2×2
-  with rational entries (`SingularValues([[1,1],[2,2],[3,3]])` →
-  `\{2\sqrt{7}, 0\}`), numeric via the SVD machinery otherwise.
-  (Across this release's Wester rounds the `wester.test.ts` skip ledger
-  drops from 21 to 3 — the remaining three are the radical-denesting tail.)
+  descending, zeros included; exact when the Gram matrix is at most 2×2 with
+  rational entries (`SingularValues([[1,1],[2,2],[3,3]])` → `\{2\sqrt{7}, 0\}`),
+  numeric via the SVD machinery otherwise. (Across this release's Wester rounds
+  the `wester.test.ts` skip ledger drops from 21 to 3 — the remaining three are
+  the radical-denesting tail.)
 
 ### Core
 
-- **`String(…)` joins values, not serialized forms.** A string operand's
-  quotes leaked into the result: `String("x = ", 3)` evaluated to a string
-  whose *content* was `"x = "3`. It now evaluates to `x = 3`. This also
-  fixes Cortex string interpolation, which lowers to `String` — the
-  documentation's headline example `"\(x) has type \(Type(x))"` now
-  produces `"2047 has type integer"`.
-- **`Type` reports the type of symbols and expressions.** The `Type`
-  operator holds its operand unevaluated, but an unevaluated operand is not
-  canonical and a non-canonical expression has no type — so `Type(y)`
-  returned `"unknown"` even for a symbol bound to an integer, and
-  `Type(1 + x)` returned `"unknown"` instead of `"number"`. The operand is
-  now canonicalized (still not evaluated) before its type is read.
+- **`String(…)` joins values, not serialized forms.** A string operand's quotes
+  leaked into the result: `String("x = ", 3)` evaluated to a string whose
+  _content_ was `"x = "3`. It now evaluates to `x = 3`. This also fixes Cortex
+  string interpolation, which lowers to `String` — the documentation's headline
+  example `"\(x) has type \(Type(x))"` now produces `"2047 has type integer"`.
+- **`Type` reports the type of symbols and expressions.** The `Type` operator
+  holds its operand unevaluated, but an unevaluated operand is not canonical and
+  a non-canonical expression has no type — so `Type(y)` returned `"unknown"`
+  even for a symbol bound to an integer, and `Type(1 + x)` returned `"unknown"`
+  instead of `"number"`. The operand is now canonicalized (still not evaluated)
+  before its type is read.
 
 ### Cortex Language (Experimental)
 
-- **Runtime problems in non-final statements are no longer silent.** Only
-  the last statement's value is returned from `executeCortex`, so an error
-  value produced by an earlier statement used to vanish — an unsupported
-  indexed assignment (`xs[2] = 9`) or a mid-program `const` reassignment
-  went completely unreported. Each non-final statement that evaluates to an
-  error value now emits a `runtime-error` diagnostic carrying the
-  statement's source range; the final statement's errors stay in `value`,
-  per the errors-are-values contract.
+- **Runtime problems in non-final statements are no longer silent.** Only the
+  last statement's value is returned from `executeCortex`, so an error value
+  produced by an earlier statement used to vanish — an unsupported indexed
+  assignment (`xs[2] = 9`) or a mid-program `const` reassignment went completely
+  unreported. Each non-final statement that evaluates to an error value now
+  emits a `runtime-error` diagnostic carrying the statement's source range; the
+  final statement's errors stay in `value`, per the errors-are-values contract.
 - **Verbatim symbols are truly literal.** The content of a backtick-quoted
   symbol (`` `while` ``) receives no escape processing and must be a valid
   MathJSON symbol name — the verbatim form exists to name reserved words.
   Previously, string escape sequences were applied inside the backticks
-  (`` `\sin` `` silently cooked `\s` into a space) even though no valid
-  symbol name contains an escapable character, so every such escape could
-  only produce an invalid name.
+  (`` `\sin` `` silently cooked `\s` into a space) even though no valid symbol
+  name contains an escapable character, so every such escape could only produce
+  an invalid name.
 - **New “Examples” documentation page.** Eighteen complete Cortex programs —
-  iteration and accumulation, recursion, numeric methods, exact and
-  symbolic computation, collections — from FizzBuzz-as-a-`Map` to Newton's
-  method on exact rationals, the Basel problem against `\pi^2/6`, and a
-  golden-ratio continued fraction checked against a `$…$` LaTeX island.
-  Every program on the page is verified by an executable test suite.
+  iteration and accumulation, recursion, numeric methods, exact and symbolic
+  computation, collections — from FizzBuzz-as-a-`Map` to Newton's method on
+  exact rationals, the Basel problem against `\pi^2/6`, and a golden-ratio
+  continued fraction checked against a `$…$` LaTeX island. Every program on the
+  page is verified by an executable test suite.
 
 ### Collections
 
-- **Symbolic-bound `Range` and `Linspace` stay inert instead of collapsing.**
-  A symbolic bound was silently coerced to `1`, so `Range(1, n)` behaved as
-  the one-element range `[1]` everywhere: `Count(Range(1, n))` evaluated to
-  `1`, `Sum(Range(1, n))` to `1`, `Range(1, n) = Range(1, m)` to `True`, and
+- **Symbolic-bound `Range` and `Linspace` stay inert instead of collapsing.** A
+  symbolic bound was silently coerced to `1`, so `Range(1, n)` behaved as the
+  one-element range `[1]` everywhere: `Count(Range(1, n))` evaluated to `1`,
+  `Sum(Range(1, n))` to `1`, `Range(1, n) = Range(1, m)` to `True`, and
   materialization produced the literal `[1]`. All of these now stay
-  symbolic/indeterminate, across the scalar accessors (`Count`, `At`,
-  equality, `SubsetOf`, element sign), iteration, materialization, and the
-  extrema (`Supremum`/`Infimum`/`Min`/`Max`). Likewise for `Linspace`: a
-  *symbolic* point count is indeterminate (only a *missing* count selects
-  the default of 50), and symbolic endpoints no longer materialize as `NaN`
-  literals or fold `Sum(Linspace(a, 1, 3))` to `0` — a collection that
-  reports a size but cannot compute its elements now keeps its lazy form
-  rather than fold to the reduction's initial value. Concrete bounds are
-  unaffected.
-- **`Min`/`Max`/`Supremum`/`Infimum` keep unenumerable collections
-  symbolic.** The extrema used to iterate any collection operand: an
-  infinite one (a `Map` over a continuous `Interval`) ground through the
-  interval's dense sampler until the evaluation deadline, and one that
-  reports elements it cannot compute (a `Map` over a `Linspace` with a
-  symbolic endpoint) silently *vanished* from the result —
-  `Min(Map(...), 5)` returned `5` even though the mapped values could be
-  smaller. Both now stay in the symbolic result. A genuinely empty lazy
+  symbolic/indeterminate, across the scalar accessors (`Count`, `At`, equality,
+  `SubsetOf`, element sign), iteration, materialization, and the extrema
+  (`Supremum`/`Infimum`/`Min`/`Max`). Likewise for `Linspace`: a _symbolic_
+  point count is indeterminate (only a _missing_ count selects the default of
+  50), and symbolic endpoints no longer materialize as `NaN` literals or fold
+  `Sum(Linspace(a, 1, 3))` to `0` — a collection that reports a size but cannot
+  compute its elements now keeps its lazy form rather than fold to the
+  reduction's initial value. Concrete bounds are unaffected.
+- **`Min`/`Max`/`Supremum`/`Infimum` keep unenumerable collections symbolic.**
+  The extrema used to iterate any collection operand: an infinite one (a `Map`
+  over a continuous `Interval`) ground through the interval's dense sampler
+  until the evaluation deadline, and one that reports elements it cannot compute
+  (a `Map` over a `Linspace` with a symbolic endpoint) silently _vanished_ from
+  the result — `Min(Map(...), 5)` returned `5` even though the mapped values
+  could be smaller. Both now stay in the symbolic result. A genuinely empty lazy
   collection (a `Filter` with no matches) still folds away, and finite
   collections fold as before.
 
 ### Compilation
 
-- **New `iterationBudget` compile option.** `expr.compile({ iterationBudget:
-  1e6 })` caps the trip count of emitted `Sum`/`Product` loops: a loop whose
-  iteration count would exceed the budget — including an *infinite* bound,
-  which previously compiled to a loop that never terminated — evaluates to
-  `NaN` instead of running. Compilation without the option is unchanged
-  (unbounded loops, zero overhead); the engine's numeric limit probes use it
-  internally to stay interruptible.
+- **New `iterationBudget` compile option.**
+  `expr.compile({ iterationBudget: 1e6 })` caps the trip count of emitted
+  `Sum`/`Product` loops: a loop whose iteration count would exceed the budget —
+  including an _infinite_ bound, which previously compiled to a loop that never
+  terminated — evaluates to `NaN` instead of running. Compilation without the
+  option is unchanged (unbounded loops, zero overhead); the engine's numeric
+  limit probes use it internally to stay interruptible.
 - **The `interval-js` target compiles every operand of n-ary nodes.** Chained
-  relations (`1<x<4`) compiled to only their first binary comparison, and
-  n-ary `And`/`Or` dropped every operand past the first pair — for `Or` this
-  was unsound in the exclusion direction (an interval admitted only by a
-  dropped branch reported a definitive `"false"`, so a mask-driven consumer
-  would wrongly cull it). Chains now emit the tri-state conjunction of all
-  pairwise comparisons, and `And`/`Or` fold all operands; the
-  `javascript`/`glsl` targets were always correct.
-- **The `javascript` target fails closed on scalar arithmetic over a
-  list-valued operand.** `L + x` with a list-valued `L` previously compiled
-  with `success: true` to JS array coercion (returning a *string*). It now
-  reports `success: false` with an explanatory error, and the interpretation
-  fallback returns the correct broadcast list. Supported list compilation —
-  broadcast (`\sin([x, 2x])`), literals, ranges, GPU vectors, custom vector
-  operators — is unchanged.
-- **Seeded, reproducible randomness: `ce.randomSeed`.** Assigning a `number`
-  or `string` seed makes `Random()`/`Random(n)` (and `Shuffle`, `Sample`)
-  draw from a per-engine deterministic PRNG stream; re-assigning the same
-  seed resets the stream so identical evaluation sequences reproduce, and
-  `null` (the default) restores non-deterministic behavior. With a seed set
-  at compile time, each `Random` node in a `javascript`-target compilation
-  bakes to a constant derived from the seed and the node's position — a
-  compiled plot function returns the same value at the same call site on
-  every invocation (one draw per compilation), instead of flickering per
-  sample. The explicit per-call `Random(seed)` overload is unchanged.
+  relations (`1<x<4`) compiled to only their first binary comparison, and n-ary
+  `And`/`Or` dropped every operand past the first pair — for `Or` this was
+  unsound in the exclusion direction (an interval admitted only by a dropped
+  branch reported a definitive `"false"`, so a mask-driven consumer would
+  wrongly cull it). Chains now emit the tri-state conjunction of all pairwise
+  comparisons, and `And`/`Or` fold all operands; the `javascript`/`glsl` targets
+  were always correct.
+- **The `javascript` target fails closed on scalar arithmetic over a list-valued
+  operand.** `L + x` with a list-valued `L` previously compiled with
+  `success: true` to JS array coercion (returning a _string_). It now reports
+  `success: false` with an explanatory error, and the interpretation fallback
+  returns the correct broadcast list. Supported list compilation — broadcast
+  (`\sin([x, 2x])`), literals, ranges, GPU vectors, custom vector operators — is
+  unchanged.
+- **Seeded, reproducible randomness: `ce.randomSeed`.** Assigning a `number` or
+  `string` seed makes `Random()`/`Random(n)` (and `Shuffle`, `Sample`) draw from
+  a per-engine deterministic PRNG stream; re-assigning the same seed resets the
+  stream so identical evaluation sequences reproduce, and `null` (the default)
+  restores non-deterministic behavior. With a seed set at compile time, each
+  `Random` node in a `javascript`-target compilation bakes to a constant derived
+  from the seed and the node's position — a compiled plot function returns the
+  same value at the same call site on every invocation (one draw per
+  compilation), instead of flickering per sample. The explicit per-call
+  `Random(seed)` overload is unchanged.
 - **GLSL masked branches emit an overridable `_gpu_nan()` helper.** The
   else-branch of a compiled `When`/`Which`/`If` was a bare `0.0 / 0.0`, whose
   NaN semantics GLSL ES 1.00 leaves implementation-defined. The literal now
@@ -499,75 +1028,71 @@ import ChangeLog from '@site/src/components/ChangeLog';
 ### Parsing
 
 - **Bare-command function names `\abs`, `\floor`, `\mod`, `\sign` parse as
-  function calls.** `\abs\left(x\right)` → `Abs(x)`, `\floor(x)` →
-  `Floor(x)`, `\mod(a, b)` → `Mod(a, b)`, `\sign(x)` → `Sign(x)` — common
-  informal shorthand (and Desmos output) that previously errored with
-  `unexpected-command`. The infix `a \mod b` (synonym of `\bmod`) is
-  unchanged. Also, `\operatorname{sign}` now aliases to `Sign` like `sgn`
-  (it previously parsed silently as a free symbol `sign` multiplied by the
-  argument).
+  function calls.** `\abs\left(x\right)` → `Abs(x)`, `\floor(x)` → `Floor(x)`,
+  `\mod(a, b)` → `Mod(a, b)`, `\sign(x)` → `Sign(x)` — common informal shorthand
+  (and Desmos output) that previously errored with `unexpected-command`. The
+  infix `a \mod b` (synonym of `\bmod`) is unchanged. Also,
+  `\operatorname{sign}` now aliases to `Sign` like `sgn` (it previously parsed
+  silently as a free symbol `sign` multiplied by the argument).
 - **A dot-number after a closing group multiplies.**
   `\left(1-t\right).9\left(2\right)` and `t^{i}.4` parse the `.9`/`.4` as a
   decimal literal juxtaposed with the preceding operand (implicit
-  multiplication), instead of erroring with `unexpected-operator`.
-  Degenerate dot sequences after a *number* (`1.2.3`) still error, and
-  member access (`v.x`), ranges (`1..2`), and trailing-dot numbers
-  (`(1., 2)`) are unaffected.
+  multiplication), instead of erroring with `unexpected-operator`. Degenerate
+  dot sequences after a _number_ (`1.2.3`) still error, and member access
+  (`v.x`), ranges (`1..2`), and trailing-dot numbers (`(1., 2)`) are unaffected.
 - **`\frac{d}{X}` is a division unless the denominator is a differential.**
   Leibniz-derivative parsing now requires an actual `d`-marker in the
-  denominator (`\frac{d}{dx}`, `\frac{dy}{dx}`, `\frac{d^2}{dx^2}`…). A
-  bare-`d` numerator over a plain denominator — `\frac{d}{L}` where `d` is
-  an ordinary variable, common in pedagogy graphs — previously parsed to a
-  malformed derivative `D(missing, L)`; it is now `Divide(d, L)`.
+  denominator (`\frac{d}{dx}`, `\frac{dy}{dx}`, `\frac{d^2}{dx^2}`…). A bare-`d`
+  numerator over a plain denominator — `\frac{d}{L}` where `d` is an ordinary
+  variable, common in pedagogy graphs — previously parsed to a malformed
+  derivative `D(missing, L)`; it is now `Divide(d, L)`.
 - **A matrix environment parses as a function argument.**
-  `\operatorname{Trace}\left(\begin{pmatrix}1&2\\3&4\end{pmatrix}\right)` —
-  and any library or user-declared function called on a `pmatrix`-family
+  `\operatorname{Trace}\left(\begin{pmatrix}1&2\\3&4\end{pmatrix}\right)` — and
+  any library or user-declared function called on a `pmatrix`-family
   environment, with or without `\left`/`\right` — parsed the argument as a
   missing-argument error, so `Trace`, `Eigenvalues`, `Eigenvectors`, etc.
-  appeared broken from LaTeX while working from MathJSON. The matrix (alone
-  or among other arguments) now parses, evaluates, and round-trips.
+  appeared broken from LaTeX while working from MathJSON. The matrix (alone or
+  among other arguments) now parses, evaluates, and round-trips.
 
 ### API
 
-- **`ce.operatorInfo()` reports computability.** The returned record now
-  carries `canEvaluate: boolean` — `true` when the operator's definition has
-  an evaluation rule, `false` for a registered-but-inert head that only
+- **`ce.operatorInfo()` reports computability.** The returned record now carries
+  `canEvaluate: boolean` — `true` when the operator's definition has an
+  evaluation rule, `false` for a registered-but-inert head that only
   parses/serializes (e.g. `To`, `Tilde`). Together with an `undefined` return
   (no operator definition), integrators can gate free-form input on "can this
   actually compute" instead of hand-maintaining allowlists. Note: heads that
-  reduce via canonicalization to another operator (`Exp` → `Power`,
-  `Greater` → `Less`) report `false`; query the canonical form.
+  reduce via canonicalization to another operator (`Exp` → `Power`, `Greater` →
+  `Less`) report `false`; query the canonical form.
 
 ### Special Functions
 
-- **New operators: `SinhIntegral` and `CoshIntegral`** — the hyperbolic sine
-  and cosine integrals Shi and Chi, with numeric evaluation for real *and*
-  complex arguments (`Shi(2) ≈ 2.50157`, `Chi(2) ≈ 2.45267`; validated
-  against mpmath) and derivatives
-  (`\frac{d}{dx}\operatorname{Shi}(x) = \frac{\sinh x}{x}`,
-  `\frac{d}{dx}\operatorname{Chi}(x) = \frac{\cosh x}{x}`). Exact arguments
-  stay symbolic under `evaluate()`; `.N()` owns the numeric path.
-- **`Erf` and `Erfi` evaluate for complex arguments.** Both error functions
-  now have full complex-plane numeric kernels
-  (`\operatorname{erf}(1+i) ≈ 1.31615 + 0.19045i`, validated against
-  mpmath), instead of evaluating only on the real line.
+- **New operators: `SinhIntegral` and `CoshIntegral`** — the hyperbolic sine and
+  cosine integrals Shi and Chi, with numeric evaluation for real _and_ complex
+  arguments (`Shi(2) ≈ 2.50157`, `Chi(2) ≈ 2.45267`; validated against mpmath)
+  and derivatives (`\frac{d}{dx}\operatorname{Shi}(x) = \frac{\sinh x}{x}`,
+  `\frac{d}{dx}\operatorname{Chi}(x) = \frac{\cosh x}{x}`). Exact arguments stay
+  symbolic under `evaluate()`; `.N()` owns the numeric path.
+- **`Erf` and `Erfi` evaluate for complex arguments.** Both error functions now
+  have full complex-plane numeric kernels
+  (`\operatorname{erf}(1+i) ≈ 1.31615 + 0.19045i`, validated against mpmath),
+  instead of evaluating only on the real line.
 - **Subscripted special-function notation parses.** `\operatorname{W}_{-1}(x)`
   now parses to the two-argument `["LambertW", x, -1]` (branch last), and
   `\operatorname{J}_{n}(x)` / `\operatorname{Y}` / `\operatorname{I}` /
-  `\operatorname{K}` parse to `BesselJ(n, x)` et al. (order first) — these
-  forms previously serialized but did not parse back, so LaTeX round-trips of
+  `\operatorname{K}` parse to `BesselJ(n, x)` et al. (order first) — these forms
+  previously serialized but did not parse back, so LaTeX round-trips of
   non-principal Lambert branches and indexed Bessel functions now close.
 - **The two-argument `LambertW(z, k)` differentiates.** Every fixed branch
   satisfies the same functional equation, so
-  `d/dz W(z,k) = W(z,k)/(z·(1+W(z,k)))` now carries the branch through
-  (chain rule included); the derivative with respect to the discrete branch
-  index stays inert. Verified against central differences on both real
-  branches.
+  `d/dz W(z,k) = W(z,k)/(z·(1+W(z,k)))` now carries the branch through (chain
+  rule included); the derivative with respect to the discrete branch index stays
+  inert. Verified against central differences on both real branches.
 - **Fungrim identities: `W₋₁(x·ln x) → ln x` fires.** The upstream entry
-  `a172c7` published an *empty* assumption interval
-  (`OpenClosedInterval(0, −1/e)`); the corrected band `x ∈ (0, 1/e]` was
-  fixed in the corpus fork (submitted upstream), and the recompiled
-  identities artifact now carries the rule: with `loadIdentities(ce)` and
+  `a172c7` published an _empty_ assumption interval
+  (`OpenClosedInterval(0, −1/e)`); the corrected band `x ∈ (0, 1/e]` was fixed
+  in the corpus fork (submitted upstream), and the recompiled identities
+  artifact now carries the rule: with `loadIdentities(ce)` and
   `assume(0 < x ≤ 1/4)`, `simplify(W(x·ln x, −1))` returns `ln x`.
 - **Fungrim identities: the polygamma family is live (+28 rules, artifact
   1,442).** The corpus' 2-argument `DigammaFunction(z, m)` (the order-`m`
@@ -578,17 +1103,16 @@ import ChangeLog from '@site/src/components/ChangeLog';
   digamma/polygamma recurrence and reflection identities, and more.
 - **Fungrim identities: set-builder comprehensions get a real encoding (+8
   rules, artifact 1,450).** Corpus formulas of the shape
-  `{f(x) : x \in S, P(x)}` used to translate to a literal `Set` that CE read
-  as a two-element enumeration — producing wrong scalars where one was
-  consulted (`Count` of a set-builder returned its operand count). They now
-  translate to the faithful `Map(Filter(S, P), f)` form, which both fixed
-  the miscounts and *recovered* nine identities whose match side had been
-  untranslatable — notably the prime-counting definition, so with
-  `loadIdentities(ce)`, `simplify` rewrites
-  `Count(\{p \in \mathrm{Primes} : p \le x\})` to `\operatorname{PrimePi}(x)`.
-  Extrema over comprehensions (`\min\{f(x) : x \in S\}`) get the same
-  encoding. The full 2,551-entry corpus now validates with **zero**
-  numerically false entries.
+  `{f(x) : x \in S, P(x)}` used to translate to a literal `Set` that CE read as
+  a two-element enumeration — producing wrong scalars where one was consulted
+  (`Count` of a set-builder returned its operand count). They now translate to
+  the faithful `Map(Filter(S, P), f)` form, which both fixed the miscounts and
+  _recovered_ nine identities whose match side had been untranslatable — notably
+  the prime-counting definition, so with `loadIdentities(ce)`, `simplify`
+  rewrites `Count(\{p \in \mathrm{Primes} : p \le x\})` to
+  `\operatorname{PrimePi}(x)`. Extrema over comprehensions
+  (`\min\{f(x) : x \in S\}`) get the same encoding. The full 2,551-entry corpus
+  now validates with **zero** numerically false entries.
 
 ## 0.73.0 _2026-07-09_
 
