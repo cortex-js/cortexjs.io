@@ -414,6 +414,22 @@ strict: boolean;
 
 <MemberCard>
 
+##### ExpressionComputeEngine.jit
+
+```ts
+jit: "auto" | "off";
+```
+
+Whether the engine may implicitly generate and execute compiled code as
+a performance optimization (auto-compiled `Map` drains, compiled numeric
+quadrature/limit kernels). `'auto'` (default) attempts implicit
+compilation and latches to `'off'` engine-wide on the first CSP
+`EvalError`; `'off'` never attempts it. Explicit `compile()` is exempt.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.trace
 
 ```ts
@@ -582,6 +598,11 @@ implicit multiplication or are left unresolved). Scope-aware and
 side-effect-free. Intended to flag calls to undefined functions in tools
 such as notebooks; intersect with [Expression.freeVariables](#freevariables)
 to drop deliberate multiplication of defined values.
+
+Only parenthesized-group application is detected: a symbol juxtaposed
+with a matrix environment (`\mathrm{Eigenvalues}\begin{pmatrix}…`) is
+not reported, since a matrix never reaches the symbol-with-delimiter
+juxtaposition analysis.
 
 ####### latex
 
@@ -826,6 +847,7 @@ type(type): BoxedType
   \| [`CollectionType`](#collectiontype)
   \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -849,7 +871,7 @@ rules(rules, options?): BoxedRuleSet
 
 ####### rules
 
-`Rule` \| `BoxedRuleSet` \| readonly Rule \| BoxedRule[] \| `null` \| `undefined`
+`Rule` \| readonly Rule \| BoxedRule[] \| `BoxedRuleSet` \| `null` \| `undefined`
 
 ####### options?
 
@@ -1018,6 +1040,7 @@ declare(id, def, scope?): IComputeEngine
   \| [`CollectionType`](#collectiontype)
   \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -1035,6 +1058,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1060,6 +1084,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1077,6 +1102,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1100,7 +1126,7 @@ declare(id, def, scope?): IComputeEngine
      \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
   `eq`: (`a`, `b`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
@@ -1113,6 +1139,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1138,6 +1165,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1155,6 +1183,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1178,7 +1207,7 @@ declare(id, def, scope?): IComputeEngine
      \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
   `eq`: (`a`, `b`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
@@ -1206,6 +1235,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`CollectionType`](#collectiontype)
   \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -1223,6 +1253,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1248,6 +1279,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1265,6 +1297,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1288,7 +1321,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
   `eq`: (`a`, `b`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
@@ -1301,6 +1334,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1326,6 +1360,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1343,6 +1378,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -1366,7 +1402,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
   `eq`: (`a`, `b`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
@@ -1819,16 +1855,21 @@ two methods are non-overlapping).
 searchDefinitions(query, options?): DefinitionSearchResult[]
 ```
 
-Reverse library search: map a plain-text concept query to a ranked list
+Reverse library search: map plain-text concept keywords to a ranked list
 of matching identifiers in the current scope chain (standard library plus
 any user declarations).
+
+The query is a string (tokenized on whitespace) or an array of strings;
+tokens are OR-ed — a definition matches when **any** token matches — and
+definitions matching more tokens, or matching them more exactly, rank
+higher.
 
 Every returned `id` resolves via `ce.lookupDefinition(id)`; chain that
 call for full detail.
 
 ####### query
 
-`string`
+`string` \| `string`[]
 
 ####### options?
 
@@ -2600,6 +2641,60 @@ type CompiledExpression = {
 
 </MemberCard>
 
+<MemberCard>
+
+### OperatorCompileContext
+
+```ts
+type OperatorCompileContext = {
+  language: string;
+};
+```
+
+The context passed to a custom operator [OperatorCompileHandler](#operatorcompilehandler). A
+curated, stable subset of the internal compilation target: enough to emit
+target-specific source without exposing the full internal machinery.
+
+</MemberCard>
+
+<MemberCard>
+
+### OperatorCompileHandler
+
+```ts
+type OperatorCompileHandler = (args, compile, context) => string | undefined;
+```
+
+A custom compilation handler for an operator, set on an
+`OperatorDefinition`. It mirrors a built-in compiled-function handler:
+it receives the (canonical) operands, a `compile` callback to lower a
+sub-expression to target source, and the compilation `context` (branch on
+`context.language`). It returns target source, or `undefined` (or
+an empty string) to fall back to the target's default compilation of this
+operator (a `null` returned from untyped JavaScript is tolerated and
+treated the same).
+
+Takes precedence over the target's built-in operator/function mapping and
+broadcast lowering, so it can override how a built-in operator compiles
+(e.g. a custom-tolerance `GCD`, or a re-mapped `Add`/`Multiply`/`Power`/
+relational operator). It does NOT override the structural / control-flow
+heads (`Sequence`, `Sum`, `Product`, `Function`, `Declare`, `Assign`,
+`Return`, `Break`, `Continue`, `Loop`, `Comprehension`, `If`, `Which`,
+`When`, `Match`, `Block`), which have their own bespoke lowering; a handler
+declared on one of those heads is ignored.
+
+```ts
+ce.declare('MyGcd', {
+  signature: '(number, number) -> number',
+  compile: (args, compile, { language }) =>
+    language === 'javascript'
+      ? `_gcd(${compile(args[0])}, ${compile(args[1])})`
+      : undefined,
+});
+```
+
+</MemberCard>
+
 ## Definitions
 
 <MemberCard>
@@ -3042,7 +3137,7 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
      | Expression;
   evaluateAsync: (ops, options) => Promise<Expression | undefined>;
   evalDimension: (args, options) => Expression;
-  xcompile: (expr) => CompiledExpression;
+  compile: OperatorCompileHandler;
   eq: (a, b) => boolean | undefined;
   neq: (a, b) => boolean | undefined;
   collection: CollectionHandlers;
@@ -3260,13 +3355,27 @@ optional evalDimension?: (args, options) => Expression;
 
 Dimensional analysis
 
-#### OperatorDefinition.xcompile?
+#### OperatorDefinition.compile?
 
 ```ts
-optional xcompile?: (expr) => CompiledExpression;
+optional compile?: OperatorCompileHandler;
 ```
 
-Return a compiled (optimized) expression.
+A custom compilation handler for this operator: emit target-language
+source for a call to this operator. Takes precedence over the target's
+built-in operator/function mapping and its broadcast lowering, so it can
+override how a built-in operator compiles (e.g. a custom-tolerance `GCD`,
+or a re-mapped `Add`/`Multiply`/`Power`/relational operator).
+
+It does NOT override the structural / control-flow heads, which have
+their own bespoke lowering: `Sequence`, `Sum`, `Product`, `Function`,
+`Declare`, `Assign`, `Return`, `Break`, `Continue`, `Loop`,
+`Comprehension`, `If`, `Which`, `When`, `Match`, `Block`. A handler
+declared on one of those heads is ignored.
+
+Return `undefined` (or an empty string) to fall back to the
+default compilation (a `null` returned from untyped JavaScript is
+tolerated and treated the same). See [OperatorCompileHandler](#operatorcompilehandler).
 
 </MemberCard>
 
@@ -3502,6 +3611,25 @@ optional isFinite?: (collection) => boolean | undefined;
 ```
 
 Optional flag to quickly check if the collection is finite, without having to count exactly how many elements it has (useful for lazy evaluation).
+
+</MemberCard>
+
+<MemberCard>
+
+##### BaseCollectionHandlers.isCollection?
+
+```ts
+optional isCollection?: (collection) => boolean;
+```
+
+Optional predicate for operators whose collection-ness depends on their
+operands, e.g. `When(value, cond)`, which is a collection exactly when
+`value` is one.
+
+Returning `false` reports the expression as a scalar, as if it had no
+collection handlers at all.
+
+Default: `true` (an operator with a `collection` block is a collection).
 
 </MemberCard>
 
@@ -3876,6 +4004,27 @@ properties of the operator.
 
 </MemberCard>
 
+<MemberCard>
+
+### LambdaDefinition
+
+```ts
+type LambdaDefinition = {
+  parameters: ReadonlyArray<{
+     name: string;
+     type: Type | undefined;
+    }>;
+  body: Expression;
+};
+```
+
+A traversable, public view of a user-defined function literal
+(`f(x) := …`, `x ↦ …`, or `ce.assign('f', lambda)`): its parameters and
+its body as a boxed expression. Returned by
+[BoxedOperatorDefinition.lambda](#lambda).
+
+</MemberCard>
+
 ### BoxedOperatorDefinition
 
 The definition includes information specific about an operator, such as
@@ -3923,6 +4072,26 @@ The type of the arguments and return value of this function
 
 <MemberCard>
 
+##### BoxedOperatorDefinition.lambda
+
+```ts
+readonly lambda: LambdaDefinition | undefined;
+```
+
+If this operator definition was created from a user-defined function
+literal (`f(x) := …`, `x ↦ …`, `ce.assign('f', lambda)`), a structured
+view of it for traversal and classification: the parameters and the body
+as a boxed expression. `undefined` for built-in operators.
+
+The return shape and per-argument types are also available via
+[signature](#signature); this accessor additionally exposes the body so a
+consumer can resolve a function reference structurally — without
+re-parsing or textually inlining its source.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedOperatorDefinition.type?
 
 ```ts
@@ -3933,6 +4102,7 @@ optional type?: (ops, options) =>
   | CollectionType
   | ListType
   | SetType
+  | BroadcastableType
   | RecordType
   | DictionaryType
   | TupleType
@@ -4037,7 +4207,7 @@ optional evalDimension?: (ops, options) => Expression;
 ##### BoxedOperatorDefinition.compile?
 
 ```ts
-optional compile?: (expr) => CompiledExpression;
+optional compile?: OperatorCompileHandler;
 ```
 
 </MemberCard>
@@ -4728,6 +4898,7 @@ type ParseLatexOptions = NumberFormat & {
   hasSubscriptEvaluate: (symbol) => boolean;
   parseUnexpectedToken: (lhs, parser) => MathJsonExpression | null;
   preserveLatex: boolean;
+  diagnostics: boolean;
   quantifierScope: "tight" | "loose";
   timeDerivativeVariable: string;
   tolerance: number;
@@ -4836,6 +5007,27 @@ include the verbatim LaTeX input that was parsed. The sub-expressions
 may contain a slightly different LaTeX, for example with consecutive spaces
 replaced by one, with comments removed and with some low-level LaTeX
 commands replaced, for example `\egroup` and `\bgroup`.
+
+**Default:** `false`
+
+#### ParseLatexOptions.diagnostics?
+
+```ts
+optional diagnostics?: boolean;
+```
+
+If true, collect opt-in parse-time diagnostics (see [ParseDiagnostic](#parsediagnostic))
+flagging charitable parse decisions — undeclared symbols, application-like
+juxtaposition read as multiply, discarded `%` comments, and trailing noise
+dropped by recovery.
+
+This flag only takes effect through ComputeEngine.parse, which
+wires up the collector and attaches the resulting array to the top-level
+parsed expression's `parseDiagnostics` property. On the standalone
+`LatexSyntax.parse()` entry point the flag is a silent no-op (that entry
+returns plain MathJSON with nowhere to attach diagnostics).
+
+This is purely additive: enabling it never changes the parse output.
 
 **Default:** `false`
 
@@ -5420,6 +5612,31 @@ argument was found.
 
 <MemberCard>
 
+##### Parser.parseBraceArguments()
+
+```ts
+parseBraceArguments(): 
+  | readonly MathJsonExpression[]
+  | null
+```
+
+Parse one or more `{...}` groups as an argument list, exactly as if
+they were a parenthesized argument list: `\gcd{a,b}` ≡ `\gcd(a,b)`,
+and consecutive groups are successive arguments (`\mod{x}{2}` ≡
+`\mod(x,2)`, the TeX multi-argument-macro habit). A group whose
+content is a comma sequence contributes each element as an argument.
+
+An empty group is not an argument (`{}` is spacing/grouping
+decoration), and no group at all returns `null`.
+
+Used as a fallback after `parseArguments('enclosure')` for
+dictionary-registered function heads, where the writer's intent is
+unambiguous even though the braces render invisibly.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### Parser.parsePostfixOperator()
 
 ```ts
@@ -5697,11 +5914,12 @@ indexStyle: (expr, level) => "subscript" | "bracket";
 Notation used to serialize collection indexing (the `At` operator), e.g.
 `["At", v, 1]`.
 
-- `'subscript'` (default): `v_1`, `M_{i,j}` — conventional mathematical
-  notation, symmetric with how subscript indexing of an
-  `indexed_collection` parses.
-- `'bracket'`: `v[1]`, `M[i,j]` — programming-style indexing, which always
-  round-trips back to `At` even when the collection symbol is not declared.
+- `'bracket'` (default): `v[1]`, `M[i,j]` — programming-style indexing,
+  which always round-trips back to `At` even when the collection symbol
+  is not declared.
+- `'subscript'`: `v_1`, `M_{i,j}` — conventional mathematical notation,
+  symmetric with how subscript indexing of an `indexed_collection`
+  parses; only round-trips when the base is declared as a collection.
 
 #### SerializeLatexOptions.dotNotation
 
@@ -6077,6 +6295,65 @@ type SerializeHandler = (serializer, expr) => string;
 
 The `serialize` handler of a custom LaTeX dictionary entry can be
 a function of this type.
+
+</MemberCard>
+
+<MemberCard>
+
+### ParseDiagnostic
+
+```ts
+type ParseDiagnostic = {
+  code: string;
+  start: number;
+  end: number;
+  detail: Record<string, unknown>;
+};
+```
+
+An opt-in parse-time diagnostic, collected when a LaTeX string is parsed
+with `ce.parse(latex, { diagnostics: true })` and exposed on the top-level
+result via `BoxedExpression.parseDiagnostics`.
+
+Diagnostics flag *charitable* parse decisions that are usually errors in
+machine-generated LaTeX (LLM output, OCR): a name read as multiplication
+where the source looked like a function application, a reference to an
+undeclared symbol, an unescaped `%` that discarded input, or trailing noise
+silently dropped by error recovery. They are additive metadata — enabling
+them never changes the parse output.
+
+### Codes (`code`, an open enum)
+
+- `"undeclared-symbol"` — a parsed symbol reference resolves to no
+  declaration (neither a parser-local binding such as a sum index, nor a
+  definition in the engine scope). `detail: { name, type }` where `type` is
+  the string form of the resolved type (`"unknown"`). Fires at every
+  reference site, including plain variables like `x`.
+- `"juxtaposition-as-multiply"` — a symbol immediately followed by a
+  delimited group `(…)` or a matrix environment was read as multiplication
+  rather than function application. `detail: { name, declaredAs }` with
+  `declaredAs` one of `"unknown" | "value" | "function"`. `name` is the
+  source symbol even when it was lexed as a unit (`\mathrm{N}(2)`) or
+  segmented into a letter run (`divisors(60)` → `"divisors"`). When the
+  symbol was read as a unit, `detail` additionally carries
+  `lexedAs: "unit"`.
+- `"comment-discarded"` — an unescaped `%` discarded the rest of a line.
+  `detail: { discardedLength }`.
+- `"recovered"` — trailing tokens skipped/coerced by non-strict error
+  recovery that do not otherwise surface as an `Error` node. `detail` may
+  include the skipped fragment as `{ skipped }`.
+
+### Span convention (`start`/`end`)
+
+Spans for `undeclared-symbol` and `juxtaposition-as-multiply` are offsets
+into CE's **normalized** LaTeX (the re-serialized token stream), which
+matches the original input only when the input round-trips unchanged.
+`comment-discarded` is the exception: because the comment is precisely what
+was stripped before tokenization, its span is in **original-input**
+coordinates. `recovered` spans are a best-effort original-input range (equal
+to normalized coordinates for the comment-free trailing noise that recovery
+handles). Per the ratified spec, spans are informational; policy should key
+on `code` + `detail`.
 
 </MemberCard>
 
@@ -7380,6 +7657,22 @@ strict: boolean;
 
 <MemberCard>
 
+##### IComputeEngine.jit
+
+```ts
+jit: "auto" | "off";
+```
+
+Whether the engine may implicitly generate and execute compiled code as
+a performance optimization (auto-compiled `Map` drains, compiled numeric
+quadrature/limit kernels). `'auto'` (default) attempts implicit
+compilation and latches to `'off'` engine-wide on the first CSP
+`EvalError`; `'off'` never attempts it. Explicit `compile()` is exempt.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.trace
 
 ```ts
@@ -7548,6 +7841,11 @@ implicit multiplication or are left unresolved). Scope-aware and
 side-effect-free. Intended to flag calls to undefined functions in tools
 such as notebooks; intersect with [Expression.freeVariables](#freevariables)
 to drop deliberate multiplication of defined values.
+
+Only parenthesized-group application is detected: a symbol juxtaposed
+with a matrix environment (`\mathrm{Eigenvalues}\begin{pmatrix}…`) is
+not reported, since a matrix never reaches the symbol-with-delimiter
+juxtaposition analysis.
 
 ####### latex
 
@@ -7792,6 +8090,7 @@ type(type): BoxedType
   \| [`CollectionType`](#collectiontype)
   \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -7815,7 +8114,7 @@ rules(rules, options?): BoxedRuleSet
 
 ####### rules
 
-`Rule` \| `BoxedRuleSet` \| readonly Rule \| BoxedRule[] \| `null` \| `undefined`
+`Rule` \| readonly Rule \| BoxedRule[] \| `BoxedRuleSet` \| `null` \| `undefined`
 
 ####### options?
 
@@ -7984,6 +8283,7 @@ declare(id, def, scope?): IComputeEngine
   \| [`CollectionType`](#collectiontype)
   \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -8001,6 +8301,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8026,6 +8327,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8043,6 +8345,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8066,7 +8369,7 @@ declare(id, def, scope?): IComputeEngine
      \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
   `eq`: (`a`, `b`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
@@ -8079,6 +8382,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8104,6 +8408,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8121,6 +8426,7 @@ declare(id, def, scope?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8144,7 +8450,7 @@ declare(id, def, scope?): IComputeEngine
      \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
   `eq`: (`a`, `b`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
@@ -8172,6 +8478,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`CollectionType`](#collectiontype)
   \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -8189,6 +8496,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8214,6 +8522,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8231,6 +8540,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8254,7 +8564,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
   `eq`: (`a`, `b`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
@@ -8267,6 +8577,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8292,6 +8603,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8309,6 +8621,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`CollectionType`](#collectiontype)
      \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
+     \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -8332,7 +8645,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
   `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `xcompile`: (`expr`) => [`CompiledExpression`](#compiledexpression);
+  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
   `eq`: (`a`, `b`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
@@ -8785,16 +9098,21 @@ two methods are non-overlapping).
 searchDefinitions(query, options?): DefinitionSearchResult[]
 ```
 
-Reverse library search: map a plain-text concept query to a ranked list
+Reverse library search: map plain-text concept keywords to a ranked list
 of matching identifiers in the current scope chain (standard library plus
 any user declarations).
+
+The query is a string (tokenized on whitespace) or an array of strings;
+tokens are OR-ed — a definition matches when **any** token matches — and
+definitions matching more tokens, or matching them more exactly, rank
+higher.
 
 Every returned `id` resolves via `ce.lookupDefinition(id)`; chain that
 call for full detail.
 
 ####### query
 
-`string`
+`string` \| `string`[]
 
 ####### options?
 
@@ -8923,6 +9241,29 @@ A symbol has a `"Symbol"` operator.
 A number has a `"Number"`, `"Real"`, `"Rational"` or `"Integer"` operator; amongst some others.
 Practically speaking, for fully canonical and valid expressions, all of these are likely to
 collapse to `"Number"`.
+
+</MemberCard>
+
+#### Latex Parsing and Serialization
+
+<MemberCard>
+
+##### Expression.parseDiagnostics?
+
+```ts
+optional parseDiagnostics?: readonly ParseDiagnostic[];
+```
+
+Parse-time diagnostics collected when the expression was produced by
+`ce.parse(latex, { diagnostics: true })`.
+
+This property is present (as a possibly-empty, frozen array) **only** on
+the top-level expression returned by a `diagnostics: true` parse; it is
+`undefined` everywhere else (sub-expressions, and any expression parsed
+without the flag). Diagnostics are purely additive metadata: enabling them
+never changes the parse output.
+
+See [ParseDiagnostic](#parsediagnostic) for the code enumeration and span conventions.
 
 </MemberCard>
 
@@ -10119,7 +10460,7 @@ For simple symbol substitution, consider using `subs()` instead.
 
 ####### rules
 
-`Rule` \| `BoxedRuleSet` \| `Rule`[]
+`BoxedRuleSet` \| `Rule` \| `Rule`[]
 
 ####### options?
 
@@ -11248,6 +11589,7 @@ set type(type:
   | CollectionType
   | ListType
   | SetType
+  | BroadcastableType
   | RecordType
   | DictionaryType
   | TupleType
@@ -11945,9 +12287,9 @@ cast(x, dtype):
   | number[]
   | Expression
   | Complex
+  | Expression[]
   | Complex[]
   | boolean[]
-  | Expression[]
   | undefined
 ```
 
@@ -12674,6 +13016,7 @@ new BoxedType(type, typeResolver?): BoxedType
   \| [`CollectionType`](#collectiontype)
   \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -12900,6 +13243,7 @@ matches(other): boolean
   \| [`CollectionType`](#collectiontype)
   \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -13462,6 +13806,28 @@ The elements of a set are not indexed.
 
 <MemberCard>
 
+### BroadcastableType
+
+```ts
+type BroadcastableType = {
+  kind: "broadcastable";
+  elements: Type;
+};
+```
+
+A `broadcastable<T>` is either a `T`, or an indexed collection of `T`
+applied element-wise (runtime broadcasting). It is the static type of an
+arithmetic result whose operand's collection-ness is not statically visible.
+
+A `T` (and any subtype of `T`) is a subtype of `broadcastable<T>`, and so is
+any indexed collection whose elements are subtypes of `T`. It is *not* a
+subtype of `T` (it may be a collection) nor of `list<T>` (it may be a
+scalar). See `subtype.ts` for the full relation.
+
+</MemberCard>
+
+<MemberCard>
+
 ### TupleType
 
 ```ts
@@ -13505,6 +13871,7 @@ type Type =
   | CollectionType
   | ListType
   | SetType
+  | BroadcastableType
   | RecordType
   | DictionaryType
   | TupleType
@@ -13545,6 +13912,9 @@ Types are described using the following BNF grammar:
                | <tuple_type>
                | <signature>
                | <list_type>
+               | <set>
+               | <broadcastable>
+               | <collection>
 
 <primitive> ::= "any" | "unknown" | <value-type> | <symbolic-type> | <numeric-type>
 
@@ -13604,7 +13974,9 @@ Types are described using the following BNF grammar:
 
 <set> ::= "set<" <type> ">"
 
-<collection ::= "collection<" <type> ">"
+<broadcastable> ::= "broadcastable" ( "<" <type> ">" )?
+
+<collection> ::= ( "collection" | "indexed_collection" ) ( "<" <type> ">" )?
 
 <name> ::= <identifier> ":"
 

@@ -70,6 +70,30 @@ early:
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
 
+### Values That May Be Lists
+
+An operand typed
+[`broadcastable<T>`](/compute-engine/guides/types/) — a value that may be a
+scalar or a list, such as the result of a call whose return type is
+`unknown` — compiles differently per target:
+
+- **JavaScript**: arithmetic and element-wise math functions compile through a
+  runtime broadcast helper. The same compiled artifact returns a scalar for a
+  scalar binding and the element-wise list for a list binding, matching the
+  interpreter.
+- Shapes that cannot be lowered soundly **fail closed** (a compilation error;
+  with the default fallback, the interpreter is used): a product of two or
+  more possibly-list operands (a run-time matrix would require the matrix
+  product, not an element-wise one), `Equal`/`NotEqual` over a possibly-list
+  operand, and complex-element broadcasts.
+- **Python**: arithmetic over a possibly-list operand always fails closed —
+  Python's `*` and `+` repeat or concatenate a plain `list` rather than
+  broadcasting, so scalar code would silently compute the wrong value.
+  Function heads that lower to NumPy calls (`np.sin`, …) are unaffected —
+  NumPy broadcasts natively.
+- **GLSL/WGSL**: such operands compile as scalar slots, unchanged — shader
+  targets have no dynamic lists.
+
 ## What Can Be Compiled
 
 Three kinds of expressions can be compiled, and each produces a `run` function

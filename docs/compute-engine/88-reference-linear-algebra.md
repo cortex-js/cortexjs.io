@@ -471,6 +471,8 @@ square brackets following a matrix.
 
 <Signature name="Flatten">_value_</Signature>
 
+<Signature name="Flatten">_value_, _depth_:integer</Signature>
+
 Returns a list of all the elements of the matrix, recursively, in row-major
 order.
 
@@ -490,6 +492,14 @@ are flattened.
 ```json example
 ["Flatten", 42]
 // ➔ ["List", 42]
+```
+
+When a `depth` is given, only that many levels of nesting are flattened;
+without it, the collection is flattened completely.
+
+```json example
+["Flatten", ["List", ["List", 1, ["List", 2]], ["List", 3]], 1]
+// ➔ ["List", 1, ["List", 2], 3]
 ```
 
 `Flatten` is similar to the APL `,` Ravel operator or `numpy.ravel`

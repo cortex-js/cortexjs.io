@@ -446,6 +446,52 @@ The type `indexed_collection<T>` is an indexed collection of values of type `T`,
 such as a `list`, a `tuple`, or a `matrix`. It is a subtype of 
 `collection<T>`.
 
+### Broadcastable
+
+The type `broadcastable<T>` represents a value that is either a scalar `T` or
+an indexed collection of `T` applied element-wise — the static type of an
+expression that may **broadcast** at evaluation.
+
+Arithmetic in the Compute Engine broadcasts over collections at run time:
+`2 \cdot [1, 2, 3]` evaluates to `[2, 4, 6]`. When an operand is a visible
+collection, the result has a concrete collection type (`vector<3>`,
+`list<number>`). But when the collection-ness of an operand is not statically
+visible — typically a call to a function whose return type is `unknown` — the
+result may be a scalar *or* a list, depending on what the call returns. Such
+expressions are typed `broadcastable<T>`:
+
+```js
+ce.declare('h', '(number) -> unknown');
+ce.parse('2h(x) - 1').type;
+// ➔ broadcastable<number>
+```
+
+The subtyping rules follow from the meaning "a `T`, or an indexed collection
+of `T`":
+
+- `T <: broadcastable<T>` — a scalar is a valid broadcastable value
+- `list<T> <: broadcastable<T>`, `vector<n> <: broadcastable<number>` — any
+  indexed collection of `T` is too (`set` is not indexed and `tuple`s bind
+  atomically, so neither qualifies)
+- `broadcastable<S> <: broadcastable<T>` when `S <: T` (covariant)
+- `broadcastable<T>` is **not** a subtype of `T` or of `list<T>` — it may be
+  either one, so it is neither
+
+A `broadcastable<T>` expression can be used anywhere the runtime can resolve
+the ambiguity: further arithmetic propagates the type, indexing with `At`
+(`(2h(x)-1)[1]`) is valid with element type `T`, and compiled JavaScript
+handles both outcomes with a single compiled artifact.
+
+The type can also be used in declarations and signatures, e.g.
+`ce.declare('b', 'broadcastable<number>')` for a parameter that accepts a
+number or a list of numbers and is processed element-wise.
+
+Note that a bare undeclared symbol does **not** type as broadcastable: in
+`2x`, the symbol `x` is inferred to be a number by the arithmetic itself.
+Only expressions whose collection-ness genuinely cannot be resolved
+statically (function calls with top-typed results, or values declared
+`broadcastable`) carry the type.
+
 ## Function Signature
 
 A **function signature** is the type of functions literals.

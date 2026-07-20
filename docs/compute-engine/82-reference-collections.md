@@ -1104,6 +1104,60 @@ inclusive. Negative indices are counted from the end of the collection.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### TakeWhile
+</nav>
+
+<FunctionDefinition name="TakeWhile">
+
+<Signature name="TakeWhile" returns="collection">_xs_:collection, _predicate_:function</Signature>
+
+<div className="tags"><span className="tag">lazy</span></div>
+
+Returns the leading elements of `xs` for as long as the predicate is `True`,
+stopping at (and excluding) the first element for which the predicate is not
+`True`.
+
+```json example
+["TakeWhile", ["List", 1, 2, 3, 10, 1], ["Function", ["Less", "x", 5], "x"]]
+// ➔ ["List", 1, 2, 3]
+```
+
+Because it is lazy and stops early, `TakeWhile` composes with infinite
+collections.
+
+```json example
+["TakeWhile", ["Range", 1, "Infinity"], ["Function", ["Less", "x", 4], "x"]]
+// ➔ ["List", 1, 2, 3]
+```
+
+See [**DropWhile**](#dropwhile) for the complementary operation.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### DropWhile
+</nav>
+
+<FunctionDefinition name="DropWhile">
+
+<Signature name="DropWhile" returns="collection">_xs_:collection, _predicate_:function</Signature>
+
+<div className="tags"><span className="tag">lazy</span></div>
+
+Skips the leading elements of `xs` for as long as the predicate is `True`, then
+yields the remaining elements. Once an element fails the predicate, the rest of
+the collection is returned unchanged (the predicate is not applied again).
+
+```json example
+["DropWhile", ["List", 1, 2, 3, 10, 1], ["Function", ["Less", "x", 5], "x"]]
+// ➔ ["List", 10, 1]
+```
+
+See [**TakeWhile**](#takewhile) for the complementary operation.
+
+</FunctionDefinition>
+
 
 ## Changing the Order of Elements
 
@@ -1298,6 +1352,26 @@ Return the collection in sorted order.
 // ➔ ["List", 2, 5, 10, 18]
 ```
 
+The optional function is interpreted by its **arity**:
+
+- A **two-argument comparator** `f(a, b)` returns a negative number when `a`
+  should come before `b`, zero when they are equivalent, and a positive number
+  otherwise (like a conventional `compare` function).
+
+  ```json example
+  ["Sort", ["List", 3, 1, 2], ["Function", ["Subtract", "b", "a"], "a", "b"]]
+  // ➔ ["List", 3, 2, 1]
+  ```
+
+- A **one-argument key function** `f(x)` sorts the elements **ascending** by
+  the key value `f(x)`. The sort is **stable**: elements with equal keys keep
+  their original relative order.
+
+  ```json example
+  ["Sort", ["List", -3, 1, -2], ["Function", ["Abs", "x"], "x"]]
+  // ➔ ["List", 1, -2, -3]
+  ```
+
 </FunctionDefinition>
 
 
@@ -1329,6 +1403,102 @@ To get the values in sorted order, use `Extract`:
 ["Sort", "xs"]
 // ➔ ["List", 2, 5, 10, 18]
 ```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### MaxBy
+</nav>
+
+<FunctionDefinition name="MaxBy">
+
+<Signature name="MaxBy" returns="value">_xs_: collection, _f_: function</Signature>
+
+Return the **element** of `xs` for which the key `f(x)` is largest. The first
+occurrence wins on ties.
+
+```json example
+["MaxBy", ["List", -3, 1, -2], ["Function", ["Abs", "x"], "x"]]
+// ➔ -3
+```
+
+`MaxBy` stays unevaluated on an empty or infinite collection, or when a key
+comparison is undetermined.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### MinBy
+</nav>
+
+<FunctionDefinition name="MinBy">
+
+<Signature name="MinBy" returns="value">_xs_: collection, _f_: function</Signature>
+
+Return the **element** of `xs` for which the key `f(x)` is smallest. The first
+occurrence wins on ties.
+
+```json example
+["MinBy", ["List", -3, 1, -2], ["Function", ["Abs", "x"], "x"]]
+// ➔ 1
+```
+
+`MinBy` stays unevaluated on an empty or infinite collection, or when a key
+comparison is undetermined.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ArgMax
+</nav>
+
+<FunctionDefinition name="ArgMax">
+
+<Signature name="ArgMax" returns="integer">_xs_: indexed_collection</Signature>
+
+<Signature name="ArgMax" returns="integer">_xs_: indexed_collection, _f_: function</Signature>
+
+Return the **1-based index** of the element of `xs` for which the key `f(x)` is
+largest. When no key function is given, the elements themselves are compared.
+The first occurrence wins on ties.
+
+```json example
+["ArgMax", ["List", 5, 2, 10, 18]]
+// ➔ 4
+
+["ArgMax", ["List", -3, 1, -2], ["Function", ["Abs", "x"], "x"]]
+// ➔ 1
+```
+
+`ArgMax` stays unevaluated on an empty or infinite collection, or when a key
+comparison is undetermined.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ArgMin
+</nav>
+
+<FunctionDefinition name="ArgMin">
+
+<Signature name="ArgMin" returns="integer">_xs_: indexed_collection</Signature>
+
+<Signature name="ArgMin" returns="integer">_xs_: indexed_collection, _f_: function</Signature>
+
+Return the **1-based index** of the element of `xs` for which the key `f(x)` is
+smallest. When no key function is given, the elements themselves are compared.
+The first occurrence wins on ties.
+
+```json example
+["ArgMin", ["List", 5, 2, 10, 18]]
+// ➔ 2
+
+["ArgMin", ["List", -3, 1, -2], ["Function", ["Abs", "x"], "x"]]
+// ➔ 2
+```
+
+`ArgMin` stays unevaluated on an empty or infinite collection, or when a key
+comparison is undetermined.
 
 </FunctionDefinition>
 
@@ -1517,6 +1687,91 @@ Returns `True` if all elements of the collection satisfy the predicate, `False` 
 </FunctionDefinition>
 
 <nav className="hidden">
+### Any
+</nav>
+
+<FunctionDefinition name="Any">
+
+<Signature name="Any" returns="boolean">_xs_: collection</Signature>
+
+<Signature name="Any" returns="boolean">_xs_: collection, _predicate_: function</Signature>
+
+Returns `True` if at least one element of the collection satisfies the
+predicate, `False` otherwise.
+
+When no predicate is given, the elements themselves are treated as booleans.
+
+```json example
+["Any", ["List", 1, 2, 3], ["Function", ["Greater", "x", 2], "x"]]
+// ➔ "True"
+
+["Any", ["List", "False", "True", "False"]]
+// ➔ "True"
+```
+
+`Any` **short-circuits**: it stops at the first element that satisfies the
+predicate, so it can return a definite answer even for an infinite collection.
+
+```json example
+["Any", ["Range", 1, "Infinity"], ["Function", ["Greater", "x", 5], "x"]]
+// ➔ "True"
+```
+
+`Any` of an empty collection is `False`. When the answer depends on symbolic or
+undetermined elements, the expression stays unevaluated.
+
+```json example
+["Any", ["List"]]
+// ➔ "False"
+
+["Any", ["List", "a", "b"], ["Function", ["Greater", "x", 0], "x"]]
+// ➔ ["Any", ["List", "a", "b"], ["Function", ["Greater", "x", 0], "x"]]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### All
+</nav>
+
+<FunctionDefinition name="All">
+
+<Signature name="All" returns="boolean">_xs_: collection</Signature>
+
+<Signature name="All" returns="boolean">_xs_: collection, _predicate_: function</Signature>
+
+Returns `True` if every element of the collection satisfies the predicate,
+`False` otherwise.
+
+When no predicate is given, the elements themselves are treated as booleans.
+
+```json example
+["All", ["List", 1, 2, 3], ["Function", ["Greater", "x", 0], "x"]]
+// ➔ "True"
+
+["All", ["List", 1, 2, 3], ["Function", ["Greater", "x", 2], "x"]]
+// ➔ "False"
+```
+
+`All` **short-circuits**: it stops at the first element that fails the
+predicate, so it can return `False` even for an infinite collection.
+
+```json example
+["All", ["Range", 1, "Infinity"], ["Function", ["Less", "x", 5], "x"]]
+// ➔ "False"
+```
+
+`All` of an empty collection is `True`. When the answer depends on symbolic or
+undetermined elements, the expression stays unevaluated.
+
+```json example
+["All", ["List"]]
+// ➔ "True"
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### Filter
 </nav>
 
@@ -1544,6 +1799,8 @@ collection. Only the elements for which the predicate returns `"True"` are kept.
 
 <Signature name="Map" returns="collection">_xs_:collection, _f_:function</Signature>
 
+<Signature name="Map" returns="collection">..._xss_:collection, _f_:function</Signature>
+
 Returns a collection where _f_ is applied to each element of _xs_.
 
 ```json example
@@ -1554,6 +1811,52 @@ Returns a collection where _f_ is applied to each element of _xs_.
 ```json example
 ["Map", ["List", 5, 2, 10, 18], ["Multiply", "_", 2]]
 // ➔ ["List", 10, 4, 20, 36]
+```
+
+`Map` is **variadic**: when several collections are given, _f_ is applied
+element-wise across them (a `zipWith`). The function is always the **last**
+argument, and it receives one element from each collection. The result has the
+length of the **shortest** input collection.
+
+```json example
+["Map",
+  ["List", 1, 2, 3],
+  ["List", 10, 20, 30],
+  ["Function", ["Add", "x", "y"], "x", "y"]]
+// ➔ ["List", 11, 22, 33]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### FlatMap
+</nav>
+
+<FunctionDefinition name="FlatMap">
+
+<Signature name="FlatMap" returns="list">_xs_:collection, _f_:function</Signature>
+
+<div className="tags"><span className="tag">lazy</span></div>
+
+Applies _f_ to each element of _xs_ and concatenates the results into a single
+list. When _f_ returns a collection, its elements are **spliced** into the
+output; a non-collection result is included as a single element.
+
+```json example
+["FlatMap", ["List", 1, 2, 3], ["Function", ["List", "x", "x"], "x"]]
+// ➔ ["List", 1, 1, 2, 2, 3, 3]
+```
+
+```json example
+["FlatMap", ["List", 1, 2, 3], ["Function", ["Range", 1, "x"], "x"]]
+// ➔ ["List", 1, 1, 2, 1, 2, 3]
+```
+
+A scalar result is kept as a single element rather than raising an error.
+
+```json example
+["FlatMap", ["List", 1, 2, 3], ["Function", ["Multiply", "x", 2], "x"]]
+// ➔ ["List", 2, 4, 6]
 ```
 
 </FunctionDefinition>
@@ -1670,6 +1973,61 @@ See also the **`FixedPoint` function** which operates without a collection.<Icon
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Scan
+</nav>
+
+<FunctionDefinition name="Scan">
+
+<Signature name="Scan" returns="collection">_xs_:collection, _f_:function</Signature>
+
+<Signature name="Scan" returns="collection">_xs_:collection, _f_:function, _initial_:value</Signature>
+
+<div className="tags"><span className="tag">lazy</span></div>
+
+Returns the **running fold** of _f_ over _xs_: a collection of the same length as
+_xs_ whose $n$-th element is the accumulated result of _f_ applied through the
+first $n$ elements. Unlike [`Reduce`](#reduce), which returns only the final
+value, `Scan` returns every intermediate value.
+
+```json example
+["Scan", ["List", 1, 2, 3, 4], "Add"]
+// ➔ ["List", 1, 3, 6, 10]
+```
+
+When an `initial` value is provided, the accumulation starts from it and the
+first output is `f(initial, x1)`.
+
+```json example
+["Scan", ["List", 1, 2, 3, 4], "Add", 100]
+// ➔ ["List", 101, 103, 106, 110]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Differences
+</nav>
+
+<FunctionDefinition name="Differences">
+
+<Signature name="Differences" returns="collection">_xs_:collection</Signature>
+
+<div className="tags"><span className="tag">lazy</span></div>
+
+Returns the collection of **successive differences** of `xs`, that is
+$x_{n+1} - x_n$. The result has one fewer element than the input.
+
+Differences are computed exactly, preserving the type of the operands
+(integers, rationals, etc.).
+
+```json example
+["Differences", ["List", 1, 4, 9, 16]]
+// ➔ ["List", 3, 5, 7]
+```
+
+</FunctionDefinition>
+
 
 
 
@@ -1719,14 +2077,26 @@ The length of the resulting collection is the length of the shortest collection.
 </FunctionDefinition>
 
 <FunctionDefinition name="Partition">
-<Signature name="Partition">_collection_, _count_:integer</Signature>
+<Signature name="Partition">_collection_, _size_:integer</Signature>
+<Signature name="Partition">_collection_, _size_:integer, _step_:integer</Signature>
 <Signature name="Partition">_collection_, _predicate_:function</Signature>
 
-Partitions a collection into groups. If an integer is given, splits into that many groups. If a predicate function is given, splits into two groups: elements for which the predicate is true, and those for which it is false.
+Partitions a collection into chunks of `size` elements. The trailing chunk may
+be shorter when `size` does not divide the length of the collection.
+
+With a `step`, returns sliding windows of `size` elements whose starting
+positions are `step` apart; only complete windows are included.
+
+If a predicate function is given, splits into two groups: elements for which
+the predicate is true, and those for which it is false.
+
+To split a collection into a given _number_ of groups, use `Chunk` instead.
 
 ```json example
-["Partition", ["List", 1, 2, 3, 4, 5, 6], 2]
-// ➔ ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]
+["Partition", ["List", 1, 2, 3, 4, 5], 2]
+// ➔ ["List", ["List", 1, 2], ["List", 3, 4], ["List", 5]]
+["Partition", ["List", 1, 2, 3, 4, 5], 2, 1]
+// ➔ ["List", ["List", 1, 2], ["List", 2, 3], ["List", 3, 4], ["List", 4, 5]]
 ["Partition", ["List", 1, 2, 3, 4, 5, 6], ["Function", ["Even", "_"]]]
 // ➔ ["List", ["List", 2, 4, 6], ["List", 1, 3, 5]]
 ```
@@ -1735,7 +2105,9 @@ Partitions a collection into groups. If an integer is given, splits into that ma
 <FunctionDefinition name="Chunk">
 <Signature name="Chunk">_collection_, _count_:integer</Signature>
 
-Splits the collection into `count` nearly equal-sized chunks.
+Splits the collection into `count` nearly equal-sized groups.
+
+To split a collection into chunks of a given _size_, use `Partition` instead.
 
 ```json example
 ["Chunk", ["List", 1, 2, 3, 4, 5], 2]
@@ -1746,11 +2118,29 @@ Splits the collection into `count` nearly equal-sized chunks.
 <FunctionDefinition name="GroupBy">
 <Signature name="GroupBy">_collection_, _function_:function</Signature>
 
-Partitions the collection into groups according to the value of the grouping function applied to each element. Returns a dictionary mapping group keys to lists of elements.
+Partitions the collection into groups according to the value of the grouping function applied to each element. Returns a dictionary mapping group keys to lists of elements. Dictionary keys are strings: the key value returned by the function is stringified.
 
 ```json example
-["GroupBy", ["List", 1, 2, 3, 4], ["Function", ["Even", "_"]]]
-// ➔ ["Dictionary", ["Tuple", "True", ["List", 2, 4]], ["Tuple", "False", ["List", 1, 3]]]
+["GroupBy", ["List", 1, 2, 3, 4], ["Function", ["IsEven", "x"], "x"]]
+// ➔ {"dict": {"False": [1, 3], "True": [2, 4]}}
+```
+</FunctionDefinition>
+
+<nav className="hidden">
+### ChunkBy
+</nav>
+
+<FunctionDefinition name="ChunkBy">
+<Signature name="ChunkBy" returns="list">_collection_, _function_:function</Signature>
+
+Splits the collection into maximal **runs of consecutive elements** that share
+the same key value `f(x)`. Unlike [`GroupBy`](#groupby), which gathers all
+elements with the same key regardless of position, `ChunkBy` only groups
+elements that are adjacent.
+
+```json example
+["ChunkBy", ["List", 1, 1, 2, 2, 2, 1], ["Function", "x", "x"]]
+// ➔ ["List", ["List", 1, 1], ["List", 2, 2, 2], ["List", 1]]
 ```
 </FunctionDefinition>
 
@@ -1812,6 +2202,90 @@ the input is not modified.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Insert
+</nav>
+
+<FunctionDefinition name="Insert">
+
+<Signature name="Insert" returns="collection">_collection_, _index_:integer, _value_:any</Signature>
+
+Return a new collection with `value` inserted at the 1-based `index`. The
+element previously at that index and everything after it shift right. An index
+equal to $n+1$ (one past the end) appends.
+
+```json example
+["Insert", ["List", 1, 2, 3], 2, 99]
+// ➔ ["List", 1, 99, 2, 3]
+
+["Insert", ["List", 1, 2, 3], 4, 99]
+// ➔ ["List", 1, 2, 3, 99]
+```
+
+**Negative indices** count from the end, Elixir-style: `-1` appends at the very
+end, `-2` inserts before the last element, and so on.
+
+```json example
+["Insert", ["List", 1, 2, 3], -1, 99]
+// ➔ ["List", 1, 2, 3, 99]
+
+["Insert", ["List", 1, 2, 3], -2, 99]
+// ➔ ["List", 1, 2, 99, 3]
+```
+
+Collections are immutable; the input is not modified. An out-of-range or
+symbolic index leaves the expression unevaluated.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### DeleteAt
+</nav>
+
+<FunctionDefinition name="DeleteAt">
+
+<Signature name="DeleteAt" returns="collection">_collection_, _index_:integer</Signature>
+
+Return a new collection with the element at the 1-based `index` removed.
+Negative indices count from the end (`-1` is the last element).
+
+```json example
+["DeleteAt", ["List", 1, 2, 3], 2]
+// ➔ ["List", 1, 3]
+
+["DeleteAt", ["List", 1, 2, 3], -1]
+// ➔ ["List", 1, 2]
+```
+
+Collections are immutable; the input is not modified. An out-of-range or
+symbolic index leaves the expression unevaluated.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ReplaceAt
+</nav>
+
+<FunctionDefinition name="ReplaceAt">
+
+<Signature name="ReplaceAt" returns="collection">_collection_, _index_:integer, _value_:any</Signature>
+
+Return a new collection with the element at the 1-based `index` replaced by
+`value`. Negative indices count from the end (`-1` is the last element).
+
+```json example
+["ReplaceAt", ["List", 1, 2, 3], 2, 99]
+// ➔ ["List", 1, 99, 3]
+
+["ReplaceAt", ["List", 1, 2, 3], -1, 99]
+// ➔ ["List", 1, 2, 99]
+```
+
+Collections are immutable; the input is not modified. An out-of-range or
+symbolic index leaves the expression unevaluated.
+
+</FunctionDefinition>
+
 <FunctionDefinition name="Fold">
 
 <Signature name="Fold">_function_, _initial_, _collection_</Signature>
@@ -1852,6 +2326,28 @@ This is equivalent to the first element of the result of `Tally`:
 ```json example
 ["Unique", ["List", 5, 2, 10, 18, 5, 2, 5]]
 // ➔ ["List", 5, 2, 10, 18]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Dedup
+</nav>
+
+<FunctionDefinition name="Dedup">
+
+<Signature name="Dedup" returns="collection">_xs_: collection</Signature>
+
+<div className="tags"><span className="tag">lazy</span></div>
+
+Collapses **consecutive** runs of duplicate elements into a single element.
+Unlike [`Unique`](#unique), which removes every later duplicate anywhere in the
+collection, `Dedup` only removes duplicates that are adjacent, so a value that
+reappears after a different value is kept.
+
+```json example
+["Dedup", ["List", 1, 1, 2, 2, 1]]
+// ➔ ["List", 1, 2, 1]
 ```
 
 </FunctionDefinition>

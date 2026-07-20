@@ -853,6 +853,13 @@ ce.expr(['Power', ['List', ['List', 1, 2], ['List', 3, 4]], -1]).evaluate();
 `expected-square-matrix` error. For an element-wise power of the entries, map
 `Power` over the matrix.
 
+:::warning[No matrix exponential]
+`Exp` applied to a matrix broadcasts **element-wise**: `["Exp", M]` computes
+$e^{m_{ij}}$ entry by entry — it is **not** the matrix exponential $e^M$,
+which is not currently implemented. The same holds for other scalar functions
+(`Sin`, `Ln`, …): applied to a matrix, they all map over the entries.
+:::
+
 ## Hadamard (Element-wise) Product
 
 The `\odot` operator (`HadamardProduct`) multiplies two same-shape tensors entry

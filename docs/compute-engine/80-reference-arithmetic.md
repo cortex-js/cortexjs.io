@@ -205,6 +205,28 @@ Edge cases:
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 - Nested sums: inner sums are simplified first, enabling cascading simplification
 
+#### Infinite Series
+
+A `Sum` over an **infinite** upper bound is evaluated exactly when it matches
+a known convergent family; otherwise it stays symbolic (and `N()` computes an
+accelerated numerical approximation). The recognized families:
+
+| Series | Value | Name |
+| :----- | :---- | :--- |
+| $$\sum_{k=a}^{\infty} k^{-s}, \; s > 1$$ | $$\zeta(s) - \sum_{k<a} k^{-s}$$ | p-series ($\zeta(2) = \pi^2/6$, …) |
+| $$\sum_{k=n_0}^{\infty} c\,r^k, \; \|r\| < 1$$ | $$\frac{c\,r^{n_0}}{1-r}$$ | Geometric series |
+| $$\sum_{k=1}^{\infty} \frac{(-1)^{k+1}}{k^s}$$ | $$\eta(s)$$ | Alternating p-series ($\eta(1) = \ln 2$, $\eta(2) = \pi^2/12$) |
+| $$\sum_{k=1}^{\infty} \frac{1}{(2k-1)^s}, \; s > 1$$ | $$(1 - 2^{-s})\,\zeta(s)$$ | Odd p-series ($\pi^2/8$ for $s=2$) |
+| $$\sum_{k=0}^{\infty} \frac{(-1)^k}{(2k+1)^s}$$ | $$\beta(s)$$ | Dirichlet beta ($\pi/4$, Catalan's constant, $\pi^3/32$, $5\pi^5/1536$ for $s = 1, 2, 3, 5$) |
+| $$\sum_{k=a}^{\infty} \frac{r^k}{k!}$$ | $$e^r - \sum_{k<a} \frac{r^k}{k!}$$ | Exponential series (symbolic $r$ allowed) |
+| $$\sum_{k=1}^{\infty} k\,r^k, \; \|r\| < 1$$ | $$\frac{r}{(1-r)^2}$$ | First-moment geometric |
+| $$\sum_{k=1}^{\infty} \frac{r^k}{k}, \; \|r\| < 1$$ | $$-\ln(1-r)$$ | Logarithmic series |
+
+For a **symbolic** ratio $r$, the families with a convergence region return a
+`When`-guarded value recording it — for example
+$\sum k x^k \to \frac{x}{(1-x)^2} \; \{\|x\| < 1\}$. Divergent numeric cases
+($\sum 1/k$, $\sum k \cdot 2^k$) stay symbolic.
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Product">
@@ -284,6 +306,18 @@ Edge cases:
 - Empty range (upper < lower): returns `1`
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 
+#### Infinite Products
+
+A `Product` over an **infinite** upper bound is evaluated exactly for these
+known convergent families (staying symbolic otherwise):
+
+| Product | Value | Name |
+| :------ | :---- | :--- |
+| $$\prod_{k=a}^{\infty} \left(1 - \frac{1}{k^2}\right), \; a \ge 2$$ | $$\frac{a-1}{a}$$ | Telescoping |
+| $$\prod_{k=1}^{\infty} \left(1 - \frac{1}{(2k)^2}\right)$$ | $$\frac{2}{\pi}$$ | Wallis product |
+| $$\prod_{k=1}^{\infty} \left(1 - \frac{1}{(2k+1)^2}\right)$$ | $$\frac{\pi}{4}$$ | Odd Wallis analog |
+| $$\prod_{k=1}^{\infty} \left(1 + \frac{1}{k^2}\right)$$ | $$\frac{\sinh \pi}{\pi}$$ | From the $\sin$ product formula |
+
 </FunctionDefinition>
 
 
@@ -332,7 +366,7 @@ Read more about **interpreting elliptical notation** and the recognizer families
 
 | Function     | Notation                |                                                                                                                            |
 | :----------- | :---------------------- | :------------------------------------------------------------------------------------------------------------------------- |
-| `Exp`        | $$\exponentialE^{x}$$ | [Exponential function](https://www.wikidata.org/wiki/Q168698)                             |
+| `Exp`        | $$\exponentialE^{x}$$ | [Exponential function](https://www.wikidata.org/wiki/Q168698). Applied to a matrix, broadcasts element-wise — it is **not** the matrix exponential $e^M$ |
 | `Ln`         | $$\ln(x)$$            | [Logarithm function](https://www.wikidata.org/wiki/Q11197), the natural logarithm, the inverse of `Exp`          |
 | `Log`        | $$\log_b(x)$$         | `["Log", <v>, <b>]`<br/> Logarithm of base _b_, default 10                                     |
 | `Lb`         | $$\log_2(x)$$         | [Binary logarithm function](https://www.wikidata.org/wiki/Q581168), the base-2 logarithm  |

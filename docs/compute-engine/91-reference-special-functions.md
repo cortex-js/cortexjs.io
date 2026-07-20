@@ -511,6 +511,47 @@ positive $x$ and oscillates for negative $x$.
 </FunctionDefinition>
 
 
+<FunctionDefinition name="AiryAiPrime">
+
+<Signature name="AiryAiPrime">_x_</Signature>
+
+<Latex value="\operatorname{Ai}'(x)"/>
+
+The derivative of the [Airy function of the first kind](https://en.wikipedia.org/wiki/Airy_function).
+
+It satisfies $\operatorname{Ai}''(x) = x\operatorname{Ai}(x)$, so
+differentiating an Airy expression stays within the Airy family.
+
+```json example
+["AiryAiPrime", 0]
+// ➔ −1/(3^(1/3) Γ(1/3)) ≈ −0.2588
+```
+
+- NIST: http://dlmf.nist.gov/9.2
+
+</FunctionDefinition>
+
+
+<FunctionDefinition name="AiryBiPrime">
+
+<Signature name="AiryBiPrime">_x_</Signature>
+
+<Latex value="\operatorname{Bi}'(x)"/>
+
+The derivative of the [Airy function of the second kind](https://en.wikipedia.org/wiki/Airy_function).
+
+It satisfies $\operatorname{Bi}''(x) = x\operatorname{Bi}(x)$.
+
+```json example
+["AiryBiPrime", 0]
+// ➔ 3^(1/6)/Γ(1/3) ≈ 0.4483
+```
+
+- NIST: http://dlmf.nist.gov/9.2
+
+</FunctionDefinition>
+
+
 ## Elliptic Integrals
 
 The complete elliptic integrals arise in computing the arc length of an

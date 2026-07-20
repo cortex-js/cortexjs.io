@@ -198,6 +198,25 @@ ce.expr(['sq', ['Range', 1, 4]]).evaluate();
 // ➔ ["List", 1, 4, 9, 16]
 ```
 
+Broadcasting is decided by the **evaluated** argument, not its written form:
+an argument that only *evaluates* to a collection — e.g. a call to a
+list-returning function — broadcasts too, whatever the body of the applied
+function is:
+
+```js example
+ce.assign('lst', ce.parse('n \\mapsto \\lbrack n, -n \\rbrack'));
+ce.assign('k', ce.parse('x \\mapsto \\begin{cases} 1 & x > 0 \\\\ -1 & x \\leq 0 \\end{cases}'));
+
+ce.expr(['k', ['lst', 3]]).evaluate();  // lst(3) ➔ [3, -3]
+// ➔ ["List", 1, -1]
+```
+
+The static type of an application mirrors this: applied to a visible
+collection, the result types `list<R>`; applied to an argument that *may* be
+a collection (e.g. an unknown-return call), it types `broadcastable<R>` —
+where `R` is the function's return type. See the
+[broadcastable type](/compute-engine/guides/types/) in the Types guide.
+
 #### Opting Out
 
 To author a function that intentionally consumes a list (rather than

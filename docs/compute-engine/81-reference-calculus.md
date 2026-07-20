@@ -996,15 +996,17 @@ and its derivative with `D`, for example `["D", ["y", "x"], "x"]`.
 **To solve a differential equation symbolically**, use the `DSolve` function.
 
 **To compute a numerical approximation of the solution**, use the `NDSolve`
-function.
+function (a list of samples) or the `NDSolveFunction` function (an applicable
+interpolating function).
 
 :::info[Note]
 Differential equation support is a focused slice. `DSolve` handles first-order
 linear scalar equations, linear constant-coefficient homogeneous equations of
 any order, second-order constant-coefficient nonhomogeneous equations, and
 second-order Cauchy–Euler equations. `NDSolve` handles explicit scalar
-first-order and higher-order initial value problems. Equations outside these
-classes are left unevaluated (returned as-is).
+first-order and higher-order initial value problems, as well as first-order
+systems (a `List` of equations with a `List` of dependent symbols).
+Equations outside these classes are left unevaluated (returned as-is).
 :::
 
 <b>Reference</b>
@@ -1130,11 +1132,78 @@ $\sin x$):
 // ➔ ["List", ["List", 0, 0], …, ["List", 1, 0.8414709…]]
 ```
 
-`NDSolve` returns a `List` of `[x, y]` sample pairs (of length _steps_ + 1),
-computed with a fixed-step fourth-order **Runge–Kutta** (RK4) method. For a
-higher-order problem, each pair reports the value of _y_ itself (not its
-derivatives). This works even when the solution has no elementary closed form.
+`NDSolve` returns a `List` of `[x, y]` sample pairs on the uniform grid of
+_steps_ + 1 points. Integration uses an adaptive **Dormand–Prince 5(4)**
+(RK45) method with embedded error control; the uniform grid is then sampled
+from the solver's dense-output interpolant, so _steps_ controls only the
+output resolution — accuracy is tolerance-controlled regardless of the value
+of _steps_. For a higher-order problem, each pair reports the value of _y_
+itself (not its derivatives). This works even when the solution has no
+elementary closed form.
 
-Implicit or stiff equations are not yet supported and are left unevaluated.
+Implicit equations are not supported, and problems the error control cannot
+resolve (for example a finite-time blow-up such as $y' = y^2$ integrated past
+its singularity) are left unevaluated rather than returning inaccurate
+samples.
+
+To evaluate the solution at arbitrary points instead of a fixed grid, use
+`NDSolveFunction`.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="NDSolveFunction">
+
+<Signature name="NDSolveFunction" returns="function">_eq_: expression, _y_: symbol, _limits_: tuple, _y0_: number | list</Signature>
+
+Solve the same **initial value problems** as `NDSolve` (explicit scalar,
+first-order and higher-order), but return the solution as an **applicable
+function** rather than a list of samples: a `Function` literal wrapping an
+`InterpolatingFunction`, which holds the adaptive solver's dense-output
+coefficient table.
+
+The result can be assigned and evaluated anywhere in the integration
+interval, at the integration accuracy:
+
+```json example
+["Assign", "f",
+  ["NDSolveFunction",
+    ["Equal", ["D", ["y", "x"], "x"], ["y", "x"]],
+    "y",
+    ["Tuple", "x", 0, 1],
+    1
+  ]
+]
+["f", 0.5]
+// ➔ 1.6487212707001282 (= e^0.5)
+```
+
+Evaluating outside the integration interval **clamps** to the nearest
+endpoint value. Applying the function to a non-numeric argument stays
+symbolic.
+
+The solution can be compiled to JavaScript for fast repeated evaluation (for
+example for plotting): compiling the function literal itself produces a
+positional lambda (`compile(f).run(0.5)`), and compiling an applied form
+(`ce.parse('f(t)').evaluate()`) produces a plain function of `t`.
+
+The multi-dependent system form (a `List` of equations) is not supported and
+is left unevaluated.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="InterpolatingFunction">
+
+<Signature name="InterpolatingFunction" returns="number">_data_: list, _x_: number?</Signature>
+
+The piecewise-quartic dense-output interpolant of a numeric ODE solution,
+produced by `NDSolveFunction` — not usually constructed directly. The first
+operand is the per-step coefficient table; applied to a number it evaluates
+the solution there (clamping to the covered interval outside it), and stays
+symbolic otherwise.
+
+For display, both LaTeX and text serialization elide the coefficient table
+and show only the covered interval — for example
+$\operatorname{InterpolatingFunction}_{[0, 1]}(x)$. The full table is
+carried by the MathJSON representation, which round-trips losslessly.
 
 </FunctionDefinition>
