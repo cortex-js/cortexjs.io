@@ -34,12 +34,16 @@ function formatDiagnostic(message: unknown): string {
   return String(message).replace(/-/g, " ");
 }
 
-// Work around an upstream `serializeCortex` gap: it mis-serializes the MathJSON
-// dictionary *object shorthand* `{"dict": {…}}` (what an evaluated dictionary's
-// `.json` returns) to a broken `{dict -> }`, but serializes the canonical
+// Work around a `serializeCortex` gap in the currently *published* engine
+// (≤ 0.92.1, which esm.run serves): it mis-serializes the MathJSON dictionary
+// *object shorthand* `{"dict": {…}}` (what an evaluated dictionary's `.json`
+// returns) to a broken `{dict -> }`, but serializes the canonical
 // `["Dictionary", ["KeyValuePair", …]]` form correctly. Rewrite the shorthand
-// to the canonical form before serializing. Remove once the engine handles the
-// shorthand directly.
+// to the canonical form before serializing.
+//
+// FIXED upstream — ships in the next published CE release. This shim is
+// harmless once that lands (it just pre-rewrites into a form the fixed
+// serializer also accepts); remove it after the fixed version is on npm.
 function normalizeForSerialize(j: any): any {
   if (Array.isArray(j)) return j.map(normalizeForSerialize);
   if (j && typeof j === "object") {
