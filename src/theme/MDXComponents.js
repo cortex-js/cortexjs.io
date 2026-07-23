@@ -14,6 +14,7 @@ import FunctionDefinition from "@site/src/components/FunctionDefinition";
 import Signature from "@site/src/components/Signature";
 
 import Intro from "@site/src/components/Intro";
+import CortexPlayground from "@site/src/components/CortexPlayground";
 
 export default {
   // Re-use the default mapping
@@ -29,4 +30,5 @@ export default {
   Intro,
   FunctionDefinition,
   Signature,
+  CortexPlayground,
 };

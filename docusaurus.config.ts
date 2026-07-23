@@ -5,6 +5,7 @@ import loadScripts from './plugins/load-scripts';
 import remarkMath from 'remark-math';
 
 import codePlaygroundRemarkPlugin from './plugins/code-playground';
+import cortexPlaygroundRemarkPlugin from './plugins/cortex-playground';
 import remarkLatexDelimiters from './plugins/remark-latex-delimiters';
 import { getDocusaurusNavbarConfig, getDocusaurusFooterConfig } from './src/shared/utils/docusaurus-config';
 
@@ -62,7 +63,7 @@ const config: Config = {
           showLastUpdateTime: true,
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
-          remarkPlugins: [codePlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
+          remarkPlugins: [codePlaygroundRemarkPlugin, cortexPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
 
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
@@ -70,7 +71,7 @@ const config: Config = {
           //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
         pages: {
-          remarkPlugins: [codePlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
+          remarkPlugins: [codePlaygroundRemarkPlugin, cortexPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
         },
 
         blog: false,

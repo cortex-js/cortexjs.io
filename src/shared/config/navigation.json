@@ -20,6 +20,11 @@
         "position": "left"
       },
       {
+        "label": "Cortex",
+        "href": "/cortex",
+        "position": "left"
+      },
+      {
         "label": "GitHub",
         "href": "https://github.com/cortex-js",
         "position": "right",

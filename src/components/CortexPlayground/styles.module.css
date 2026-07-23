@@ -1,0 +1,142 @@
+.playground {
+  margin: 1.5rem 0;
+  border: 1px solid var(--callout-border-color, var(--ifm-color-emphasis-300));
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--neutral-1000, var(--ifm-background-surface-color));
+  font-size: 0.95rem;
+}
+
+.editor {
+  position: relative;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 1rem 1rem 0.75rem;
+  border: none;
+  outline: none;
+  resize: vertical;
+  min-height: 3rem;
+  color: var(--ifm-font-color-base);
+  background: transparent;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.95em;
+  line-height: 1.5;
+  tab-size: 2;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.run {
+  appearance: none;
+  border: none;
+  border-radius: 8px;
+  padding: 0.35rem 0.9rem;
+  font-weight: 600;
+  font-size: 0.85em;
+  cursor: pointer;
+  color: #fff;
+  background-color: var(--ifm-color-primary);
+}
+
+.run:hover {
+  background-color: var(--ifm-color-primary-dark);
+}
+
+.run:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.hint {
+  font-size: 0.8em;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.output {
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+  padding: 0.75rem 1rem;
+  background-color: var(--neutral-900, var(--ifm-color-emphasis-100));
+}
+
+.output :global(.console) {
+  margin: 0;
+}
+
+.result + .result {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--ifm-color-emphasis-200);
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.cortex {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.95em;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  color: var(--ifm-font-color-base);
+}
+
+.badge {
+  display: inline-block;
+  margin-right: 0.5rem;
+  padding: 0 0.4rem;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: 700;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.error,
+.warning,
+.fatal {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.85em;
+  padding: 0.35rem 0;
+  line-height: 1.4;
+}
+
+.error,
+.fatal {
+  color: var(--ifm-color-danger-dark, #c92a2a);
+}
+
+.error .badge,
+.fatal .badge {
+  color: #fff;
+  background-color: var(--ifm-color-danger, #e03131);
+}
+
+.warning {
+  color: var(--ifm-color-warning-dark, #e67700);
+}
+
+.warning .badge {
+  color: #000;
+  background-color: var(--ifm-color-warning, #f59f00);
+}

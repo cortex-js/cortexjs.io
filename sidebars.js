@@ -340,6 +340,94 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Cortex",
+      items: [
+        {
+          type: "doc",
+          id: "cortex/introduction",
+          className: "compass-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/goals",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/principles",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/naming",
+          className: "guide-icon",
+        },
+        { type: "html", value: "<hr/>" },
+        {
+          type: "doc",
+          id: "cortex/syntax",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/literals",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/operators",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/control-flow",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/declarations",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/evaluation",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/types",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/comments",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/pragmas",
+          className: "reference-icon",
+        },
+        { type: "html", value: "<hr/>" },
+        {
+          type: "doc",
+          id: "cortex/examples",
+          className: "flask-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/source-code",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/implementation",
+          className: "sdk-icon",
+        },
+      ],
+    },
+    {
+      type: "category",
       label: "Tutorials",
       collapsible: false,
       collapsed: false,

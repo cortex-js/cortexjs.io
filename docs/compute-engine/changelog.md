@@ -12,6 +12,1040 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
+### New Features
+
+- **`JacobianMatrix(fs, vars)`** — the matrix of partial derivatives ∂fᵢ/∂xⱼ,
+  one row per function and one column per variable.
+
+  ```js
+  ce.box(['JacobianMatrix', ['List', fs…], ['List', 'x', 'y', 'z']]).evaluate();
+  // → [[∂f₁/∂x, ∂f₁/∂y, ∂f₁/∂z], …]
+  ```
+
+  - `vars` may be **omitted**: the free variables of `fs` are used, in
+    lexicographic order, so the column order is predictable.
+  - A single (non-list) `fs` is the **gradient** case and yields a flat vector
+    `[∂f/∂x₁, …, ∂f/∂xₙ]`, directly usable as one.
+  - `JacobianMatrix(F)` accepts a **bare function** reference: its body is the
+    system and its parameters are the differentiation variables, in declared
+    order (`JacobianMatrix((z,y,x) ↦ …)` has columns z, y, x — an order
+    free-variable inference could not preserve). Explicit variables then rename
+    the parameters.
+  - A square system composes with `Determinant`, which now also reduces under
+    `simplify()` — so `JacobianDeterminant` is one composition away and is not
+    provided separately.
+
+  Beyond brevity this removes a real trap: the obvious hand-rolled form
+  `Map([x,y,z], v |-> D(f, v))` silently returns **zeros**, because the lambda
+  parameter shadows and `D` differentiates with respect to `v`.
+
+  The operands are held — evaluating the variable list would replace a symbol
+  carrying a value (`x := 5`) by that value, leaving nothing to differentiate
+  against. Whether `fs` is a system or a single function is decided on what the
+  operand *denotes*, not its syntax, so a user-defined function returning a
+  list and a symbol bound to a list are both treated as systems.
+
+### Improvements
+
+- **`simplify()` reaches a distributed form when it is cheaper.** Rules tagged
+  `purpose: 'expand'` are excluded from its scan, because expansion usually
+  grows an expression — but that left `simplify()` unable to reach a strictly
+  *cheaper* result. It was not cost-rejecting the better form; it never
+  generated the candidate.
+
+  ```js
+  const f = ce.parse('(1 + x y)^3 z + y^2 (1 + x y) (4 + 3 x y)');
+  f.subs({ z: ce.parse('-\\frac{3y}{x} + \\frac{2}{x^2}') }).simplify();
+  // Before → unchanged (cost 76)      Now → y^2 + 3y/x + 2/x^2 (cost 27)
+  ```
+
+  `simplify()` now tries expansion once, at the fixpoint, and keeps the result
+  only when the cost function says it is strictly cheaper. That cannot cycle
+  (the inner call has the trial disabled) and cannot blow up (the cost gate is
+  the acceptance test), so a factored form survives: `(x+1)^5`, `(a+b)(c+d)`
+  and `x(y+z)` are all left alone. A structural pre-check keeps the trial off
+  expressions with no product or power for expansion to act on.
+
+- **`simplify()` now evaluates structural operators.** It is rule-driven and
+  ran no operator `evaluate` handler at all, so an operator whose result comes
+  from a handler rather than a rule was handed straight back.
+
+  ```js
+  ce.parse('\\det\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}').simplify();
+  // Before → Determinant(Matrix([[a,b],[c,d]]))    Now → a * d - b * c
+  ```
+
+  The members are a closed list — `Determinant`, `Trace`, `Transpose`,
+  `Length` — chosen by a membership rule: the handler reduces its operands to a
+  closed form determined by their *structure* (a matrix to a scalar, a
+  collection to a measure) rather than rewriting the expression, and the head
+  carries no simplification rule of its own. `Max`/`Min` deliberately fail that
+  rule and are not members: they reduce their operands' *values*, which is
+  evaluation's job.
+
+  **`simplify()` remains value-blind.** With `a := 5`, `(a + 2).simplify()` is
+  still `a + 2`. A structural head whose operands mention a symbol carrying a
+  value is left alone rather than substituting it.
+
+  Operators outside the list are unchanged, so the ordering rule still stands:
+  `evaluate()` then `simplify()`; `simplify()` alone is not a superset.
+
+- **The `Simplify` operator resolves symbols bound to a value.** An operator
+  normally evaluates its arguments; the transformers are `lazy` only to keep
+  the operand's *structure* from being rewritten early, not to keep its values
+  symbolic. This applies to `Expand`, `ExpandAll`, `Factor`, `Together` and
+  `Distribute` as well.
+
+  ```js
+  ce.assign('v', ce.parse('\\frac{x^2-1}{x-1}'));
+  ce.box(['Simplify', 'v']).evaluate();
+  // Before → v      Now → x + 1
+  ```
+
+  This is the operator, not the method: `ce.symbol('v').simplify()` is still
+  `v`, because `.simplify()` is value-blind.
+
+- **`Together` reduces its result to lowest terms.** It folds the terms over
+  the *product* of the denominators, which is correct but not reduced; the
+  result is now divided through by the numerator/denominator GCD. This also
+  yields the least common denominator, since product / gcd **is** the LCD.
+
+  ```js
+  ce.box(['Together', ce.parse('-\\frac{3y}{x}+\\frac{2}{x^2}')]).evaluate();
+  // Before → (-3y * x^2 + 2x) / (x * x^2)    Now → (-3x * y + 2) / x^2
+  ```
+
+  The multivariate case needs Brown's algorithm: the univariate Euclidean GCD
+  treats `y` as an opaque coefficient and reports `1` for that pair.
+  `cancelCommonFactors` now falls back to the multivariate GCD when the
+  univariate one comes back trivial and more than one unknown is present. The
+  order matters — the cheap path runs first, so the common case is unaffected.
+
+  The same-denominator simplification rule still uses the unreduced fold: it
+  runs inside the `simplify()` fixpoint, where output stability and cost matter
+  more than presentation.
+
+- **`CircularIntegrate` (`\oint`) gained an operator definition.** It previously
+  had only a parser entry, so it typed as `any` and its limits stayed a raw
+  `Tuple`. It now types as `number` and canonicalizes its limits into `Limits`
+  expressions, matching `Integrate` so a limits-consuming caller sees a uniform
+  shape. `CircularIntegrate` remains inert — there is still no contour-
+  integration evaluation.
+
+  ```js
+  ce.parse('\\oint_C f').json;
+  // Before → ["CircularIntegrate", "f", ["Tuple", "Nothing", "C", "Nothing"]]  (type: any)
+  // Now    → ["CircularIntegrate", "f", ["Limits", "Nothing", "C", "Nothing"]] (type: number)
+  ```
+
+- **`RandomList` now compiles on the JavaScript target.** `RandomList(n)` draws
+  fresh values on every call of the compiled function, matching `evaluate()`.
+  For draws that stay the same from call to call, use the explicit-seed form
+  `RandomList(n, seed)`. A count that is negative, non-finite, or above the
+  1,000,000 cap makes the compiled function throw, rather than silently
+  clamping or returning `NaN`. (`evaluate()` reports an `out-of-range` error
+  expression for the same input.)
+
+- **`declare()` accepts a spread of an existing operator definition**, so you
+  can override one handler and keep the rest:
+
+  ```js
+  ce.declare('At', { ...ce.lookupDefinition('At').operator, evaluate });
+  ```
+
+  The built-in's other handlers (`type`, `signature`, `canonical`, …) are
+  preserved. Overriding with a bare `{ signature, evaluate }` instead **drops**
+  them — prefer the spread.
+
+- **Compiled `At` supports a collection-valued index.** An index that is a list
+  of indices or a boolean mask now works when compiled, matching `evaluate()`:
+
+  ```js
+  const p = ['List', 10, 20, 30];
+
+  ce.box(['At', p, ['List', 3, 1]]);                    // → [30, 10]
+  ce.box(['At', p, ['List', 'False', 'True', 'True']]); // → [20, 30]
+
+  ce.assign('p', ce.box(p));
+  ce.assign('X', ce.box(['List', 1, 2, 3]));
+  ce.parse('p_{X}'); // → [10, 20, 30]
+  ```
+
+  Negative indices count from the end and out-of-range entries are dropped, so
+  a gather may be shorter than its index list. Previously these returned
+  `undefined`, a wrongly-shaped scalar (`p[[2]]` gave `20` rather than `[20]`),
+  or threw.
+
+  An `At` with a collection-valued index now has type `list<T>` rather than the
+  element type `T`. **If you dispatch on `.type`, expect the new value.** This
+  is what lets surrounding operations compose: `At(p, I) + 1` broadcasts
+  element-wise, and `Length(At(p, I))` compiles.
+
+### Bug Fixes
+
+- **Value-resolution overreach in the lazy-operand fixes.** The machinery that
+  lets `Solve`/`Simplify`/`JacobianMatrix` see through a held operand resolved
+  bound symbols too aggressively. Fixed:
+  - `resolveBoundSymbols` is now **binder-aware**: it no longer resolves a
+    variable bound by a `Function`, `Block`, `Sum`, … to a same-named global
+    value (`Simplify(x ↦ x+1)` no longer corrupts the body's bound `x`).
+  - A transformer nested in a `Solve` equation could substitute an unknown that
+    also carries a value — `Solve(Simplify(x-2)=0, x)` with `x:=5` returned `[]`.
+    The unknown is now shielded across transformer reduction.
+  - `JacobianMatrix` differentiated a system in which a diff variable had
+    already been replaced by its global value (`JacobianMatrix(g,[x,y])` with
+    `x:=5`, `g:=[x²y,x+y]` gave a wrong matrix). It now resolves the operand's
+    *shape* without substituting values, and differentiates against a fresh
+    symbol when a diff variable carries a value.
+  - `simplify()` evaluated a structural head's whole operand tree, running an
+    impure descendant — `simplify(Transpose([[Random()]]))` drew a random
+    number. It now declines when the expression is impure.
+
+- **`Distribute` fold, `numeratorDenominator`, `Together`, transformers, and
+  `toString()` grouping** — as previously listed.
+
+- **Beta-reduction completeness.** A finite self-composition (`g(g(x))` for a
+  non-recursive `g`) only inlined one level, so `Solve(g(g(x))=0, x)` returned
+  `[]`; the recursion guard is now a total-count budget that still terminates
+  genuine recursion. Typed function parameters (`(x: real) ↦ …`) are unwrapped,
+  so a typed function inlines like a bare one.
+
+- **`Pipe` (`|>`) declines a non-function right-hand side** (`5 |> 3` stays
+  inert) and its handler now delegates to `apply` instead of duplicating its
+  named-operator path.
+
+- **`Pipe` (`|>`) holds its operands, so `x |> f` behaves exactly like
+  `f(x)`.** It evaluated the topic eagerly, regardless of `f` — which broke a
+  chain whose right-hand side is a *lazy* operator that needs its argument
+  unevaluated. A bare function reference was the sharp case: `F |> JacobianMatrix`
+  passed an evaluated `F`, stripped of its definition, so the Jacobian could
+  not see the map's body.
+
+  ```js
+  // F |> JacobianMatrix |> Determinant |> Simplify
+  ce.assign('F', /* the counterexample map */);
+  // Before → Pipe(Pipe(F, JacobianMatrix), Determinant)   Now → -2
+  ```
+
+  `f` now decides whether the topic is evaluated (a lazy `f` receives it
+  unevaluated). A chained topic — the inner pipe of `a |> g |> f` — is plumbing
+  whose value flows on, so it is evaluated before reaching `f`. Eager stages,
+  lambda right-hand sides, `N()`, and numeric chains are unaffected.
+
+- **Indexing into a computed list hid the unknown from `Solve`.** A held
+  equation containing `At(List(…), k)` was opaque to the solver — it saw no
+  unknown and answered `[]`, which by contract means "proven no solutions".
+  This is the last of the lazy-operand family: `At` is now projected
+  structurally in a held operand.
+
+  ```js
+  ce.box(['Solve', ['Equal', ['At', ['List', 'Y', 2], 1], 5], 'Y']).evaluate();
+  // Before → []      Now → [5]
+  ```
+
+  Projection, never evaluation: with `Y := 99`, `At([Y, 2], 1).evaluate()` is
+  `99`, which inside a held equation would replace the unknown being solved
+  for. Only a literal `List` with a literal in-range index is projected
+  (negative indices count from the end); a symbolic list or index is left
+  alone. The transformers (`Simplify`, `Expand`, …) get the same treatment.
+
+- **`Solve` returned `[]` for an equation it could not see into.** A lazy
+  operator holds its equation and takes only `.canonical`, which binds
+  structure without resolving values, so two kinds of operand stayed opaque:
+  a call to a user-defined function, and a symbol whose value *contains* the
+  unknown. Because `[]` means "proven no solutions", these were silent wrong
+  answers rather than visible inertness.
+
+  ```js
+  ce.assign('g', ce.parse('t \\mapsto t^2 - 4'));
+  ce.box(['Solve', ['Equal', ['g', 'x'], 0], 'x']).evaluate();
+  // Before → []      Now → [2, -2]
+
+  ce.assign('s', ce.parse('\\frac{9-w^2}{4}'));   // `s = 2` has no `w` in it
+  ce.box(['Solve', ['Equal', 's', 2], 'w']).evaluate();
+  // Before → []      Now → [1, -1]
+  ```
+
+  A transformer nested inside the equation (rather than at its root) is now
+  reduced too, so `Solve(Simplify(u) = 2, w)` works.
+
+  The unknown is never substituted, even when it has a value: the reduction is
+  structural — `.subs` on the lambda body, `.value` on a binding — never
+  `.evaluate()`. With `x` assigned `5`, `Solve(g(x) = 0, x)` still returns
+  `[2, -2]`. A recursive definition expands one level and stops.
+
+- **Expression transformers ignored a user-defined function in their operand.**
+  Same root cause: `Simplify(g(a))`, `Expand`, `Factor`, `Together` and
+  `Distribute` returned `g(a)` unchanged, and `Integrate(g(t), t)` stayed
+  inert.
+
+  ```js
+  ce.assign('g', ce.parse('t \\mapsto t^2 - 4'));
+  ce.box(['Factor', ['g', 'a']]).evaluate();
+  // Before → g(a)    Now → (a - 2) * (a + 2)
+  ```
+
+  Beta-reduction substitutes the function *body*, so an assigned value for a
+  symbol elsewhere in the operand is still left alone.
+
+- **`Distribute` returned a product where it should return a sum.** The helper
+  recombined the branches of a distributed sum with `Multiply` instead of
+  `Add`, so `(a + b)·c` became `(a·c)·(b·c)`. Every input the operator acted on
+  came back with a different value. The operator had no test coverage, which is
+  why this survived; it is now covered by a numeric oracle.
+
+  ```js
+  ce.box(['Distribute', ce.parse('(a+b)c')]).evaluate();
+  // Before → a * b * c * c      Now → a * c + b * c
+  ```
+
+- **`numeratorDenominator` reported a denominator of `1` for a bare negative
+  power.** Canonical form writes `1/x^2` as `Power(x, -2)`, and the `Power`
+  branch never moved a negative exponent into the denominator. The same factor
+  inside a `Multiply` (`y/x^2`) routes through `Product.asNumeratorDenominator`,
+  which splits on exponent sign and was already correct — so the two disagreed.
+  This also affected the `NumeratorDenominator` operator and `.denominator`.
+  A *symbolic* exponent is still left alone: its sign is not decidable there.
+
+  ```js
+  ce.parse('\\frac{1}{x^2}').numeratorDenominator;
+  // Before → [x^(-2), 1]        Now → [1, x^2]
+  ```
+
+- **`Together` dropped denominators written as negative powers.** It treated
+  only a `Divide` node as carrying a denominator, so such terms were folded
+  into the numerator and the combined fraction kept negative powers.
+
+  ```js
+  ce.box(['Together', ce.parse('\\frac{1}{x}+\\frac{1}{x^2}')]).evaluate();
+  // Before → (x * x^(-2) + 1) / x    Now → (x + 1) / x^2
+  ```
+
+- **Expression transformers ignored a `ReplaceAll` in their operand.**
+  `Expand`, `ExpandAll`, `Factor`, `Together`, `Distribute` and `Simplify` are
+  lazy and took only `.canonical` of their held operand, so a `ReplaceAll`
+  reached them as an unevaluated call with no polynomial structure and was
+  silently returned unchanged. The reduction is recursive, so a producer head
+  nested inside the operand is handled too.
+
+  ```js
+  ce.parse('\\mathrm{Expand}(\\mathrm{ReplaceAll}(x^2+x, x \\to a+1))').evaluate();
+  // Before → ReplaceAll(x^2 + x, To(x, a + 1))    Now → a^2 + 3a + 2
+  ```
+
+  Note this is deliberately a different set from the transformer heads reduced
+  by `Solve`/`Integrate`/`Limit`: `ReplaceAll` ends in `.evaluate()` and so
+  substitutes assigned symbol values, which those algorithms must avoid.
+
+- **`toString()` dropped the parentheses around a product-of-sums
+  denominator**, producing text that reads back as a different expression. The
+  MathJSON and LaTeX serializations were correct throughout; only the ASCII
+  form was affected. The grouping check treated any string starting with `(`
+  and ending with `)` as already parenthesized, which `(x + 1) * (x^2 - 1)`
+  satisfies without being a single group.
+
+  ```js
+  ce.box(['Divide', 1, ['Multiply', ['Add', 'x', 1], ['Add', ['Power','x',2], -1]]]).toString();
+  // Before → 1 / (x + 1) * (x^2 - 1)    Now → 1 / ((x + 1) * (x^2 - 1))
+  ```
+
+- **`Map` now evaluates over a source that only becomes a collection when
+  evaluated.** `Map(X - 1, f)` stayed in its unevaluated lazy form while
+  `Map(X, f)` and `Map([0, 1, 2], f)` both evaluated. The trigger was any
+  source whose collection-ness is not visible before evaluation — a broadcast
+  arithmetic result over a list, or an eager collection operator such as
+  `UnicodeScalars`.
+
+  ```js
+  ce.assign('X', ce.box(['List', 0, 1, 2]));
+  ce.box(['Map', ['Subtract', 'X', 1], sq]).evaluate();
+  // Before → Map(X - 1, (x) |-> x^2)     Now → [1, 0, 1]
+
+  ce.box(['Map', ['UnicodeScalars', { str: 'ab' }], sq]).evaluate();
+  // Before → Map(UnicodeScalars("ab"), …) Now → [9409, 9604]
+  ```
+
+  Applies to the `zipWith` (multi-source) form as well, and to `.at()` — which
+  previously returned `undefined` for such a source, so a result longer than
+  the materialization head was silently rendered head-only instead of
+  head-and-tail. Every other collection operator (`Filter`, `Take`, `Sort`,
+  `Reverse`, `First`, …) already accepted these sources. Expressions that are
+  genuinely not collections are unchanged: `Map(5, f)` still stays symbolic.
+
+- **Compiled comparisons and logical connectives no longer return a wrong
+  answer for a list operand.** `<`, `<=`, `>`, `>=`, `And`, `Or` and `Not`
+  could produce a scalar `false` (or one of their operands) where `evaluate()`
+  returns an element-wise list of booleans — a wrong result from a successful
+  compile. Such expressions now decline to compile and fall back to
+  interpretation, which gives the correct answer.
+
+  Mostly affects a filter whose condition is computed, such as
+  `L[|[1...n]-k|>0]`: it now evaluates correctly but is no longer compiled, so
+  expect interpreter performance for that shape. Scalar comparisons and
+  connectives, and list literals such as `Not([True, False])`, still compile.
+
+- **Complex values are handled correctly when compiled.** `At(p, 1+2i)` and
+  `RandomList(n, 7+3i)` now agree with `evaluate()`, which uses the real part
+  of a complex index or seed. Previously the compiled forms returned `NaN` and
+  a different random sequence respectively.
+
+  A compiled scalar *comparison* against a complex value is still wrong (it
+  returns `false` rather than declining); this is unchanged and tracked in
+  `ROADMAP.md`.
+
+- **`At` with several indices reports the correct type.** For a 2×3 matrix
+  `M`, `At(M, 1, [1,2])` is the 2-element list `[1,2]` and `At(M, 1, 2)` is a
+  single element — both previously reported the type of a whole matrix row.
+
+## 0.92.1 _2026-07-22_
+
+### Breaking Changes
+
+- **`Join` appends a tuple operand as a single element instead of splicing its
+  components.** A tuple is an `indexed_collection`, so `Join` used to iterate it
+  and concatenate its components. But a tuple is a _value_ — a point or vector —
+  and the engine treats it as one everywhere else (`Abs(point)` → `Norm`,
+  component-wise point arithmetic). Splicing silently degraded the point-list
+  accumulation idiom `L → Join(L, P)`: the result grew by 2 instead of 1 and
+  stopped matching `list<point>`.
+
+  ```js
+  // Before
+  ce.box(['Join', pointList, ['Tuple', 2, 5]]).evaluate();
+  // → ["List", …, 2, 5]        length +2, heterogeneous `number` tail
+  // After
+  // → ["List", …, ["Pair", 2, 5]]   length +1, still a list of points
+  ```
+
+  `Join` of collections is unchanged (`Join([1,2],[3,4])` → `[1,2,3,4]`;
+  `Join([(0,3)],[(2,5)])` → `[(0,3),(2,5)]`). The one reversal is a tuple in
+  operand position where it was previously flattened: `Join((1,2),(3,4))` was
+  `[1,2,3,4]` and is now `[(1,2),(3,4)]`. `Join` now agrees with `Append` on a
+  tuple element.
+
+- **`Join` now reports the joined ELEMENT type instead of a bare `list`.** Its
+  type handler returned `list` whatever it was given, so a joined point list did
+  not match `list<tuple<…>>` and type-directed dispatch downstream stopped
+  recognizing it. Each operand now contributes either its own type (an atomic
+  tuple, which becomes one element) or its element type (a collection, which is
+  spliced), widened into the result:
+
+  ```js
+  Join(pointList, point); // was: list      now: list<tuple<number, number>>
+  Join([1, 2], [3, 4]); //   was: list      now: list<finite_integer>
+  ```
+
+  An operand whose element type is unknown still yields the bare `list`. This is
+  a **type-surface change**: code pinning the exact string `'list'` for a `Join`
+  result sees the narrowed type instead — but `matches()`-based queries only
+  gain precision.
+
+### Issues Resolved
+
+- **`evaluateAsync()` no longer tears down a scoped operator's local scope while
+  the operator is still running.** An `evaluateAsync` handler returns at its
+  first suspension point, not at completion, so the dispatcher popped the
+  operator's local evaluation context too early; everything the resumed handler
+  did then ran against the enclosing scope. A big operator whose reduction
+  outlived one time slice (roughly, more than ~16ms of work) assigned its loop
+  index globally — leaking it, overwriting an outer binding of the same name,
+  and throwing `Cannot assign a value to the constant "i"` for the commonest
+  index spelling of all, since global `i` is `ImaginaryUnit`:
+
+  ```js
+  await ce.parse('\\sum_{i=1}^{200000} i').evaluateAsync();
+  // Before: throws `Cannot assign a value to the constant "i"`
+  // After:  20000100000  (matches the synchronous lane)
+
+  ce.assign('n', 7);
+  await ce.parse('\\sum_{n=1}^{200000} n').evaluateAsync();
+  ce.box('n'); // Before: 200000 (clobbered). After: 7
+  ```
+
+  The synchronous lane was fixed in 0.87.1; this brings the asynchronous lane —
+  the cancellation path `withTimeLimit` documents — into line with it.
+  Cancellation behavior is unchanged.
+
+  Because the context is now held across the `await`, a scoped operator's frame
+  is no longer necessarily on top of the evaluation-context stack when it
+  unwinds — a second evaluation started while the first is suspended pushes
+  above it. The frame is therefore removed by identity rather than popped, so an
+  unwinding evaluation cannot discard (and dispose the bindings of) one that is
+  still running.
+
+  One known limitation remains, unchanged by this release: while an async
+  evaluation is suspended, its scope is the engine's current one, so code that
+  enters the same engine in that window can see the operator's local bindings
+  (e.g. a loop index). Enclosing bindings still resolve correctly through the
+  scope's parent chain, and the local scope is gone once the evaluation settles,
+  but a name that collides with an in-flight index resolves to that index.
+  Removing this needs per-evaluation (task-local) context propagation; until
+  then, use one engine per concurrent evaluation.
+
+## 0.92.0 _2026-07-21_
+
+### Breaking Changes
+
+- **The parser's three symbol hooks are replaced by one oracle:
+  `resolveSymbol`.** The `ParseLatexOptions` handlers `getSymbolType` and
+  `hasSubscriptEvaluate` (and the internal `isSymbolDeclared`) are replaced by a
+  single optional handler:
+
+  ```js
+  resolveSymbol?: (symbol) => { type, subscriptEvaluate? } | undefined
+  ```
+
+  Return `undefined` for a symbol the handler does not know; return a record
+  (with a `BoxedType` or type-string `type`) for one it does. Declaration is the
+  _presence_ of the record — `{ type: 'unknown' }` is a declared symbol of
+  unknown type — so the previously inexpressible distinction between
+  "undeclared" and "declared, type unknown" is now first-class, and inconsistent
+  answers (a typed-but-undeclared symbol) are unrepresentable.
+
+  Semantics also changed from _replace_ to _supplement_: through `ce.parse()`
+  the handler is consulted first and any symbol it does not resolve falls back
+  to the engine scope's definitions. Handlers no longer need to re-implement
+  scope delegation (previously required boilerplate with `getSymbolType`):
+
+  ```js
+  // Before: vouch + hand-written scope delegation
+  getSymbolType: (id) => {
+    if (vouched(id)) return 'function';
+    const def = ce.lookupDefinition(id); // boilerplate, easy to forget
+    /* ... map def to a type ... */
+  };
+  // After: vouch only; unresolved symbols fall back to the scope
+  resolveSymbol: (id) => (vouched(id) ? { type: 'function' } : undefined);
+  ```
+
+  Similarly, the `Parser` interface (custom LaTeX dictionary entries) replaces
+  `getSymbolType()`/`hasSubscriptEvaluate()` with `parser.resolveSymbol()`, e.g.
+  `parser.getSymbolType(id).matches('function')` becomes
+  `parser.resolveSymbol(id)?.type.matches('function')`.
+
+### Improvements
+
+- **A declared name now outranks subscript-index capture.** Once a symbol `B` is
+  bound to an indexed-collection value (a point, list, tuple…), the parser reads
+  `B_{2}` as indexing (`At(B, 2)`), which made every subscripted sibling name
+  (`B_2`, `B_3`, … alongside the point `B`) unspellable — and, since `B_{2}` and
+  `B[2]` produce identical trees, unrecoverable after the parse. A subscripted
+  spelling whose joined name is declared or assigned in scope now parses as that
+  symbol; index capture applies only to undeclared joins, and bracket indexing
+  (`B[2]`) is unaffected. Note that with the non-default
+  `indexStyle: 'subscript'` serialization, `At(B, 2)` serializes as `B_{2}`,
+  which re-parses as the symbol `B_2` when such a declaration exists.
+
+- **Rubi integration (experimental) — nested-radical substitution fallback
+  (R31).** `loadIntegrationRules` now closes nested-radical and
+  sum-of-two-radical integrands the bundled algebraic rules leave inert. A
+  nested radical (`√(x+√(x+1))/x²`, `√(1/x+√(1/x+1))`, the double-radical
+  `√(x+1)/(x+√(√(x+1)+1))`) is rationalized by iteratively substituting
+  `u = (a+b·x)^{1/k}` (or the Laurent `(a+b/x)^{1/k}`) at the innermost radical
+  linear in `x`, keeping the resulting rational's denominator factored so the
+  bundled partial-fraction rules close it; the conjugate shape
+  `(√(x+1)+√(1−x))⁻²` is rationalized by its conjugate. Each result is accepted
+  only after a domain-aware numeric derivative check against the integrand, so
+  out-of-scope shapes stay cleanly unsolved. On the Bondarenko benchmark this
+  lifts CE+Rubi from 12/35 to 20/35 (closing 8 previously unsolved
+  nested-radical integrals; a ninth, #16, closes only under the production
+  bundle's compiled rule set). Structurally inert off its family, and
+  disableable with `RUBI_NO_R31`.
+
+## 0.91.0 _2026-07-21_
+
+### New Features
+
+- **`FindFit` — general nonlinear least-squares fitting.**
+  `FindFit(data, model, params, vars)` fits an arbitrary model expression to
+  data by Levenberg–Marquardt, returning a record
+  `{parameters, converged, residualNorm, iterations}`. Unlike the closed-form
+  `LinearRegression`/`PolynomialFit`, the model may be any composition
+  (`a·e^{b·x} + c`, Gaussians, power laws, cosines, …). `data` is a list of
+  `(x…, y)` tuples or a plain list of `y` values (`x = 1, 2, …`). Each parameter
+  spec is a bare symbol (start `1`, unbounded), `(a, a0)` (explicit start), or
+  `(a, a0, lo, hi)` (start plus a box constraint, with `±∞` allowed for
+  one-sided bounds). Convergence is first-class: non-convergence within the
+  iteration budget is reported as `converged: False` with the best-so-far
+  values, never a silent wrong answer. Jacobians are analytic (via `D`), with a
+  per-column forward finite-difference fallback for components that cannot be
+  differentiated symbolically. A **joint form** fits several models to several
+  datasets sharing parameters (a list of models paired with a list of datasets,
+  residuals stacked).
+
+- **`FindRoot` — numerical equation solving.** `FindRoot(equations, params)`
+  finds parameter values that zero one or more residuals, sharing the same
+  parameter-spec grammar, box constraints, and result record as `FindFit`
+  (root-finding is the zero-residual case of the same Levenberg–Marquardt core).
+  `equations` is an equation (`lhs == rhs`), a bare residual expression (read as
+  `= 0`), or a list of either.
+
+### Bug Fixes
+
+- **Applying a declared-then-assigned function to a large collection is now
+  lazy, matching the hybrid-laziness contract.** Since 0.84.0, element-wise
+  operations over collections of more than 100 elements (or of unknown length)
+  evaluate to a lazy `Map` — but a function registered via
+  `ce.declare('g', '(number) -> number')` + `ce.assign('g', x ↦ …)` resolved
+  through a value definition whose application-site broadcast still zipped
+  eagerly, walking the whole collection at `evaluate()` time. The
+  value-definition application path now goes through the same laziness gate as
+  parse-assigned functions (`g(x) := …`) and built-in broadcasts: past the eager
+  threshold `g(X)` returns a lazy `Map`, results of ≤100 known-finite elements
+  are byte-identical to before, collection-typed parameters still bind their
+  argument whole, and tuples stay atomic. (Not a recent regression: this path
+  had been eager on every release since laziness shipped in 0.84.0.)
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression         | CE (current) | CE 0.86.1 | SymPy | math.js | Mathematica |
+| ------------------ | -----------: | --------: | ----: | ------: | ----------: |
+| $\pi^2$            |          6.2 |       7.0 |   175 |     173 |         3.9 |
+| $\sin 1$           |           20 |        20 |   220 |     506 |         5.2 |
+| $\cos 1$           |           20 |        21 |   219 |     612 |         6.9 |
+| $\ln 2$            |           14 |        14 |   348 |   4,616 |         4.0 |
+| $e^{\pi}$          |           12 |        12 |   221 |   5,086 |         4.6 |
+| $\zeta(3)$         |        1,580 |     1,619 |   261 |       — |          49 |
+| $\Gamma(\tfrac13)$ |          842 |       839 |   345 |       — |         211 |
+| $\psi(\tfrac13)$   |          728 |       720 | 2,806 |       — |         168 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the
+case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is
+`1×`). `—` means the engine can't do the case; `✓` means it solves a case
+Mathematica can't. Compare the **CE (current)** and **CE 0.86.1** columns to see
+what is _new this release_ (a `—` under `0.86.1` next to a number under the
+current build). The **CE + R/F** column is the current build with the opt-in
+Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
+`loadIdentities`), on the same minified bundle.
+
+| Operation                              | CE (current) | CE + R/F | CE 0.86.1 | SymPy  | math.js | Mathematica |
+| -------------------------------------- | :----------: | :------: | :-------: | :----: | :-----: | :---------: |
+| **Antiderivatives**                    |              |          |           |        |         |             |
+| $\int\frac{1}{\sqrt x}\,dx$            |     6.7×     |   3.1×   |   5.2×    |  0.5×  |    —    |     1×      |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$       |     10×      |   1.6×   |   8.4×    | 0.08×  |    —    |     1×      |
+| $\int\frac{1}{x^3+1}\,dx$              |     6.3×     |   0.9×   |   4.4×    |  0.4×  |    —    |     1×      |
+| $\int\frac{\sqrt x}{1+x}\,dx$          |      —       |   2.0×   |     —     |  0.1×  |    —    |     1×      |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$        |      —       |   1.4×   |     —     | 0.01×  |    —    |     1×      |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$      |      —       |   1.3×   |     —     | 0.007× |    —    |     1×      |
+| **Derivatives**                        |              |          |           |        |         |             |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$            |     0.1×     |   0.1×   |   0.06×   | 0.003× |  0.01×  |     1×      |
+| **Simplification**                     |              |          |           |        |         |             |
+| $\sqrt{3+2\sqrt2}$                     |     41×      |   31×    |    32×    |   —    |    —    |     1×      |
+| $\sqrt6\,x+\sqrt2\,x$                  |     104×     |   54×    |    59×    |  3.3×  |   16×   |     1×      |
+| **Evaluation**                         |              |          |           |        |         |             |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$        |     58×      |   29×    |    47×    |  3.0×  |    —    |     1×      |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$      |     9.3×     |   5.6×   |   8.0×    |  2.1×  |    —    |     1×      |
+| $\int_1^2\tfrac1x\,dx$                 |    7405×     |  6951×   |   6437×   |  77×   |    —    |     1×      |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ |     423×     |   161×   |   363×    |  2.6×  |    —    |     1×      |
+| **Solving**                            |              |          |           |        |         |             |
+| $x^4+x^2-1=0$                          |     0.3×     |   0.3×   |   0.2×    | 0.06×  |    —    |     1×      |
+| $x^3-x-1=0$                            |     1.7×     |   2.0×   |   1.4×    | 0.04×  |    —    |     1×      |
+
+Across the cases both solve, Compute Engine is a **median 6.7× faster than
+Mathematica** (up to 7405×) — in the browser, not a proprietary kernel.
+
+<sub>
+Measured 2026-07-21 · Compute Engine `0.90.0` @ `8740998f` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
+</sub>
+
+## 0.90.0 _2026-07-21_
+
+### New Features
+
+- **`RandomList(n)` — an eagerly-materialized list of `n` independent uniform
+  reals in `[0, 1)`.** Draws come from the engine's random stream (honoring
+  `ce.randomSeed` for reproducibility); the two-argument form
+  `RandomList(n, seed)` produces a deterministic list from an explicit seed,
+  independent of the engine stream. Eagerness is deliberate: the result is a
+  concrete `List`, so every reference to it sees the same draws (a lazy
+  collection of `Random()` calls re-draws on each traversal). With a literal
+  count the length is part of the type (`RandomList(5)` types
+  `vector<finite_real^5>`). The count is capped at 10⁶ elements; a larger count
+  — or a negative one — returns an `out-of-range` error rather than silently
+  misbehaving.
+
+### Improvements and Bug Fixes
+
+- **`Abs` of a fixed-arity point is now the Euclidean norm.** `|(3, 4)|`
+  evaluates to `5` — the single-bar spelling of the vector magnitude, consistent
+  with the `\lVert…\rVert` (`Norm`) parse and with tuple arithmetic treating
+  points as vectors in ℝⁿ. Previously the expression stayed inert under
+  `evaluate()`, and **compiled to garbage**: the JavaScript target returned the
+  bare component array (which concatenated into a _string_ in downstream
+  arithmetic), and the shader targets emitted invalid code. All targets now
+  compile it as the norm (`_SYS.norm` on the js target, `length()` on GLSL/WGSL
+  for 2–4 components; other arities and points with a broadcasting component
+  fail closed to interpretation). Detection is type-based, so a tuple-_typed_
+  symbol or parameter routes as a point too. `Abs` over a `List` is unchanged
+  and still broadcasts elementwise. `Hypot` with a point argument now squares
+  through the norm as well: `Hypot((3,4), 1) = √26` (previously an inert `Power`
+  of a tuple). And `Norm`/`Abs` of a point now honor the exactness contract:
+  `evaluate()` keeps the exact `√2`, `.N()` numericizes.
+
+- **`Norm` compiles on the `interval-js` target** for fixed-arity points
+  (default L2 norm; `hypot`-based in 2-D for a tighter enclosure). Implicit
+  curves and line series expressed with `\lVert…\rVert` or `|…|` now get
+  interval-arithmetic break detection instead of silently degrading to point
+  sampling.
+
+- **`Norm`/`Abs` of a point with a broadcasting component reports an honest
+  `list<number>` type.** `‖(x+[0.5,1], y, z+2)‖` evaluates to a `List` (one norm
+  per zipped element); its static type now says so instead of `number`, matching
+  the equivalent `\sqrt{(x+[0.5,1])^2+…}` spelling.
+
+- **A `Comprehension` serializes with bracket delimiters** so it survives its
+  own round trip in every position: `H=[k^2 \operatorname{for} k=[1...4]]` now
+  serializes as `H=\left[k^2 \operatorname{for} k = 1..4\right]` (previously the
+  unfenced form re-parsed with the assignment swallowed into the comprehension
+  body, and under an `Add` the trailing term was absorbed into the iteration
+  range). The fence is unconditional — `[body for …]` parses back to the same
+  `Comprehension`, so it is lossless. (Non-canonical serialization-shape
+  callout, same class as the 0.83 big-operator body fence.)
+
+- **`Expression.isValid` is now O(1) after the first query.** Validity is a
+  structural property of an immutable expression, so it is computed once and
+  cached; previously every query re-walked the whole subtree (and a parent's
+  query re-entered each child's), which dominated large-document workloads — one
+  profiled 75-row import spent 77% of its time in repeated `isValid` walks.
+
+## 0.89.0 _2026-07-21_
+
+### Breaking Changes
+
+- **`ComputeEngine.timeLimit` is removed**, completing the deprecation begun in
+  0.88.0. There is no implicit ambient deadline anymore: an `evaluate()` or
+  `simplify()` outside a span runs unbounded, and `ce.withTimeLimit(ms, fn)` /
+  `ce.withTimeLimit({ ms, label }, fn)` spans are the only way to arm a
+  deadline. If you relied on the old 2000&nbsp;ms ambient default, wrap your
+  evaluation entry point in a span:
+
+  ```ts
+  const r = ce.withTimeLimit({ ms: 2000, label: 'my-app:eval' }, () =>
+    expr.evaluate()
+  );
+  ```
+
+  The `engine.timeLimit:<operator>` attribution synthesized for ambient timeouts
+  is gone with it — every `CancellationError.attribution` now names a span you
+  created (or is `undefined` for an unlabelled span).
+
+- **The `BoxedTensor` class is removed.** Tensor values (vectors, matrices) are
+  now ordinary canonical `List` expressions; "tensor-ness" is a property
+  (shape-regularity), not a distinct representation. The `BoxedTensor` type
+  export and the `TensorInterface.tensor` accessor (which exposed the internal
+  packed `Tensor` object) are gone. The `isTensor()` guard remains and now
+  answers the representation-independent question "is this a shape-regular
+  list?"; `.shape` and `.rank` remain and now report honestly on **every**
+  tensor-shaped list — including broadcast results, which previously reported
+  `[]`/`0`. Code that used `expr.tensor` should operate on `expr.ops` (the
+  elements) or use the public linear-algebra operators.
+
+- **Lists carry honest, shape-aware types.** A shape-regular list's type reports
+  its actual element type and dimensions: `[1, 2, 3]` types
+  `vector<finite_integer^3>` (previously `vector<3>`, i.e. `number` elements),
+  `[[1, 2], [3.5, 4.5]]` types `matrix<finite_real^(2x2)>`, and a list of
+  non-numeric values is no longer mistyped as a numeric vector —
+  `[rgb(1,0,0), rgb(0,1,0)]` types `list<color^2>`, not `vector<2>`. The new
+  types are strict subtypes of the old ones, so `type.matches('vector<3>')` and
+  similar queries continue to answer `true`; only code comparing exact type
+  _strings_ is affected. An evaluated broadcast result now carries its shape too
+  (`Sin([0,1]).evaluate()` types `vector<2>`), and the declared type of a
+  broadcast expression is always a sound upper bound of its evaluated value's
+  type.
+
+- **Signature validation of collection arguments is two-stage.** An operand
+  whose static type could still conform to a collection parameter (a symbol
+  declared plain `list`, `list<unknown>`, a `broadcastable<…>` intermediate) is
+  accepted at canonicalization and checked against its actual value when the
+  operator evaluates. Provably-wrong operands (`Determinant("abc")`,
+  `Determinant(v)` with `v: list<number>` — a flat vector can never be a matrix)
+  still error immediately. Consequently some `incompatible-type` errors that
+  used to appear at parse/canonicalization time now surface at evaluation time
+  instead (as the operator's specific error, e.g. `expected-square-matrix`, or
+  as an inert expression).
+
+### Improvements
+
+- **Matrix operations work on computed matrices.** The static type of a
+  broadcast application now mirrors its operand's shape (`Sqrt(M)` with `M` a
+  2×2 matrix types as a 2×2 matrix), so expressions like `Determinant(Sqrt(M))`,
+  `MatrixMultiply(Sqrt(M), Sqrt(M))`, or `Inverse(A + B)` — which used to fail
+  with `incompatible-type` at canonicalization — now evaluate. Symbols declared
+  `list` participate the same way once a conforming value is assigned.
+
+- **Structural matrix operations work on any cell type.** `Transpose`,
+  `ConjugateTranspose`, `Reshape`, `Flatten`, and the shape predicates
+  (`IsSquareMatrix`, `IsSymmetric`, `IsDiagonal`) operate on any shape-regular
+  list — a matrix of colors, tuples, or unevaluated function applications — not
+  just numeric ones. Numeric kernels (`Determinant`, `Inverse`, …) still require
+  numeric cells and decline others gracefully.
+
+- **Exact integer matrices stay exact.** Linear-algebra kernels over exact
+  integer matrices now use exact arithmetic under `evaluate()`:
+  `Determinant([[9007199254740991, 0], [0, 3]])` returns the exact
+  `27021597764222973` (previously rounded through float arithmetic). Under
+  `.N()` results are floated, as before (`Inverse([[2,1],[1,3]]).N()` →
+  `[[0.6, -0.2], [-0.2, 0.4]]`).
+
+- **List equality is tolerant and NaN-aware in all cases.**
+  `[1,2,3].isEqual([1,2,3+1e-11])` is `true` (engine tolerance),
+  `[x,2].isEqual([y,2])` is `undefined` (symbolic), and a list containing `NaN`
+  is never `isEqual` to itself (mirroring scalar `NaN ≠ NaN`) — uniformly for
+  every list, whatever produced it. Ordering comparisons (`isLessEqual`, …)
+  between equal tensors of any cell type now answer `true` instead of
+  `undefined`.
+
+- **Faster broadcast arithmetic.** Removing the eager tensor construction from
+  the boxing path makes broadcast-heavy evaluation measurably faster (~30% on
+  elementwise matrix expressions), with no per-expression packing cost until a
+  numeric kernel actually runs.
+
+## Issues Resolved
+
+- **A function call over a collection-valued _expression_ keeps its broadcast
+  type.** With `h` a function over numbers (declared or inferred) and `L` a
+  list, `h(L)` already typed as a list — but `h(L + 1)` or `h(2L)` typed as a
+  _scalar_ while still evaluating to a list. Both now type as the shaped vector
+  (`h(L+1)` → `vector<3>` for a 3-element `L`), and a declared scalar signature
+  no longer rejects a collection argument with `incompatible-type` —
+  scalar-parameter functions are threadable, so the argument broadcasts,
+  matching what evaluation always did. Scalar applications and genuinely invalid
+  arguments (`h("abc")`) are unchanged.
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression         | CE (current) | CE 0.86.1 | SymPy | math.js | Mathematica |
+| ------------------ | -----------: | --------: | ----: | ------: | ----------: |
+| $\pi^2$            |          6.7 |       7.5 |   176 |     137 |         4.1 |
+| $\sin 1$           |           21 |        21 |   220 |     444 |         5.1 |
+| $\cos 1$           |           20 |        20 |   224 |     536 |         6.9 |
+| $\ln 2$            |           16 |        16 |   352 |   5,754 |         3.8 |
+| $e^{\pi}$          |           14 |        15 |   215 |   4,765 |         4.5 |
+| $\zeta(3)$         |        1,734 |     1,790 |   282 |       — |          51 |
+| $\Gamma(\tfrac13)$ |          957 |       950 |   356 |       — |         209 |
+| $\psi(\tfrac13)$   |          806 |       795 | 2,818 |       — |         170 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the
+case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is
+`1×`). `—` means the engine can't do the case; `✓` means it solves a case
+Mathematica can't. Compare the **CE (current)** and **CE 0.86.1** columns to see
+what is _new this release_ (a `—` under `0.86.1` next to a number under the
+current build). The **CE + R/F** column is the current build with the opt-in
+Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
+`loadIdentities`), on the same minified bundle.
+
+| Operation                              | CE (current) | CE + R/F | CE 0.86.1 | SymPy  | math.js | Mathematica |
+| -------------------------------------- | :----------: | :------: | :-------: | :----: | :-----: | :---------: |
+| **Antiderivatives**                    |              |          |           |        |         |             |
+| $\int\frac{1}{\sqrt x}\,dx$            |     6.6×     |   3.1×   |   5.4×    |  0.5×  |    —    |     1×      |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$       |     8.0×     |   1.3×   |   6.8×    | 0.09×  |    —    |     1×      |
+| $\int\frac{1}{x^3+1}\,dx$              |     5.6×     |   0.8×   |   4.3×    |  0.3×  |    —    |     1×      |
+| $\int\frac{\sqrt x}{1+x}\,dx$          |      —       |   1.7×   |     —     |  0.1×  |    —    |     1×      |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$        |      —       |   1.2×   |     —     | 0.01×  |    —    |     1×      |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$      |      —       |   1.2×   |     —     | 0.007× |    —    |     1×      |
+| **Derivatives**                        |              |          |           |        |         |             |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$            |    0.04×     |  0.04×   |   0.02×   | 0.001× | 0.003×  |     1×      |
+| **Simplification**                     |              |          |           |        |         |             |
+| $\sqrt{3+2\sqrt2}$                     |     44×      |   34×    |    34×    |   —    |    —    |     1×      |
+| $\sqrt6\,x+\sqrt2\,x$                  |     131×     |   67×    |    72×    |  5.0×  |   23×   |     1×      |
+| **Evaluation**                         |              |          |           |        |         |             |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$        |     53×      |   25×    |    43×    |  3.0×  |    —    |     1×      |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$      |     8.7×     |   5.1×   |   7.2×    |  2.1×  |    —    |     1×      |
+| $\int_1^2\tfrac1x\,dx$                 |    6954×     |  6552×   |   5758×   |  93×   |    —    |     1×      |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ |     382×     |   133×   |   341×    |  2.6×  |    —    |     1×      |
+| **Solving**                            |              |          |           |        |         |             |
+| $x^4+x^2-1=0$                          |     0.2×     |   0.3×   |   0.2×    | 0.06×  |    —    |     1×      |
+| $x^3-x-1=0$                            |     1.5×     |   1.7×   |   1.4×    | 0.04×  |    —    |     1×      |
+
+Across the cases both solve, Compute Engine is a **median 6.6× faster than
+Mathematica** (up to 6954×) — in the browser, not a proprietary kernel.
+
+<sub>
+Measured 2026-07-21 · Compute Engine `0.88.1` @ `afde4f88` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
+</sub>
+
+## 0.88.1 _2026-07-20_
+
+## Issues Resolved
+
+- **Color converters (`AsRgb`, `AsHsv`, `AsHsl`, `AsOklab`, `AsOklch`) broadcast
+  over lists**, like the color constructors already did:
+  `AsRgb([Hsv(120,1,1), Hsv(0,1,1)])` → `[Rgb(0,1,0), Rgb(1,0,0)]` instead of an
+  `incompatible-type` error. A non-color element produces a per-element error
+  rather than rejecting the whole call. Out-of-range channels continue to pass
+  through unchanged — they can represent valid out-of-sRGB-gamut colors, so
+  constructors and converters neither clamp nor error.
+
+- **`ce.box()` no longer throws on malformed MathJSON input.** A non-MathJSON
+  plain object (`ce.box({foo: 1})`) or an array whose head is not a symbol used
+  to throw a JavaScript `Error`; both now return a boxed
+  `["Error", "'unexpected-mathjson'", …]` expression (with the offending input
+  as context), consistent with how every other input problem is reported. The
+  engine remains fully usable afterward.
+
+## 0.88.0 _2026-07-20_
+
+### Deprecations
+
+- **`ComputeEngine.timeLimit` is deprecated** in favor of
+  `ComputeEngine.withTimeLimit()`. `timeLimit` arms a hard-to-scope implicit
+  deadline around each `evaluate()`/`simplify()`; wrap the work you want bounded
+  in a span instead:
+
+  ```ts
+  // Before
+  ce.timeLimit = 500;
+  const r = expr.evaluate();
+
+  // After
+  const r = ce.withTimeLimit({ ms: 500, label: 'my-app:eval' }, () =>
+    expr.evaluate()
+  );
+  ```
+
+  `timeLimit` still functions exactly as before in this release; it will be
+  removed in a future minor version.
+
+### Improvements
+
+- **`ComputeEngine.withTimeLimit()` accepts an attribution label.** In addition
+  to the numeric form `withTimeLimit(ms, fn)`, an object form
+  `withTimeLimit({ ms, label }, fn)` (preferred for new code) records a label on
+  the span. Nesting still composes as `min()` — a labelled inner span can only
+  shorten the effective deadline, never extend it past an enclosing one.
+
+- **`CancellationError` now carries `attribution` and `spans`.** When a timeout
+  fires, `attribution` is the label of the span that owns the deadline that
+  fired (so a caller can compare it against the label it passed to distinguish
+  "my sub-budget expired" from "my caller's budget expired"), and `spans` lists
+  all active span labels, outermost first. Timeouts armed by the deprecated
+  ambient `ce.timeLimit` are attributed as `engine.timeLimit:<operator>` (e.g.
+  `engine.timeLimit:Integrate`).
+
+- **Divisor functions are now O(√n) instead of O(n).** `Sigma0`, `Sigma1`,
+  `SigmaMinus1`, `IsPerfect`, and `Totient` compute from the prime factorization
+  rather than trial iteration: `Sigma1(1000000007)` went from ~14s to ~1ms, and
+  11+-digit inputs that previously ran essentially forever return instantly.
+
+- **Integer factorization is interruptible.** The Pollard-rho factorizer now
+  honors the active deadline (a `withTimeLimit` span interrupts a hard semiprime
+  factorization on time, with attribution) and is backstopped by an iteration
+  budget (`cause: 'iteration-limit-exceeded'`) so it terminates even with no
+  time limit set.
+
+- **Symbolic integration no longer swallows a caller's timeout.** If a
+  `withTimeLimit` span enclosing an integration expires mid-attempt, the
+  `CancellationError` now propagates to the caller (identified via
+  `attribution`) instead of being silently converted into "no antiderivative
+  found". Rubi's own internal sub-budgets still degrade gracefully.
+
+### Fixes
+
+- **Unary `D` applications no longer serialize to a bare `D`.** An arity-1 (or
+  otherwise unrecognized) `D` application — e.g. a document-defined function
+  named `D` — used to serialize with its argument silently dropped (`["D","w"]`
+  → `"D"`). It now serializes as `\operatorname{D}(w)`, which round-trips
+  exactly. Recognized derivative shapes (`D(f,x)` → Leibniz notation) are
+  unchanged.
+
+- **A known-value uppercase symbol before a parenthesized group now parses as
+  multiplication.** The predicate-notation heuristic (a single uppercase letter
+  before `(...)` reads as a function application, e.g. `P(x)`) applied even when
+  the scope knew the symbol was a value: with `K` assigned `-32.3`, `K(2-0.1)`
+  parsed as a _call_ of `K` and evaluated to an `incompatible-type` error. The
+  heuristic now consults the scope — a symbol with a known non-function type
+  falls through to multiplication (`K(2-0.1)` → `-61.37`). Unknown and
+  function-typed symbols are unchanged.
+
+- **Juxtaposed-multiply serialization is round-trip safe for single-uppercase
+  factors.** `Multiply(K, group)` serialized as `K(group)`, which re-parses as a
+  function _call_ of `K` — corrupting the expression when `K` is a numeric
+  symbol. A single-uppercase-letter factor directly against a parenthesized
+  group now emits an explicit `\times` (`K\times(…)`). Other factor shapes
+  (`x(y+z)`, `2(x+1)`, `\mathrm{abc}(x+1)`) already round-tripped and are
+  untouched.
+
+- **`ce.box()` now accepts native `bigint` values.** `bigint` was declared in
+  `ExpressionInput` but unhandled by the boxing dispatch, so `ce.box(123n)` —
+  bare or as an operand in `ce.box(['Add', 10n, 5])` — silently became the
+  `Undefined` symbol. Bigints now box as exact integer literals, preserving
+  exactness at any magnitude (never routed through a float), identical to the
+  `ce.number(bigint)` path.
+
+- **Unbounded collection walks over infinite lazy sources.** `First`/`At` on a
+  `Filter` or `TakeWhile` whose predicate never (or eventually never) matches,
+  and any walk over a `Dedup` of a source with infinitely repeating duplicates
+  (e.g. `Dedup(Cycle([1,1]))`), could previously spin until the ambient time
+  limit fired — or forever with `timeLimit = 0`. These walks are now bounded by
+  `iterationLimit` and degrade gracefully (`Nothing`/`undefined`), consistent
+  with the documented lazy-collection contract. Note: as a consequence,
+  `Count(Dedup(...))` over a finite source **larger than `iterationLimit`** now
+  returns `undefined` (unknown) instead of walking the whole source, matching
+  `Filter`'s existing `count` behavior.
+
+## 0.87.2 _2026-07-20_
+
+### Breaking Changes
+
+- **`Add` no longer widens an unreachable scalar arm into a broadcast collection
+  type.** A sum mixing a scalar with a list-shaped operand typed as a union —
+  `matrix + 1` was `finite_integer | matrix`, `2·[1,2,3] + a` was
+  `number | vector<3>` — even though the value ALWAYS broadcasts elementwise and
+  can never be a scalar (`[[1,2],[3,4]] + 1` → `[[2,3],[4,5]]`). These now type
+  as the collection: `matrix`, `vector<3>`. The behavior was inconsistent as
+  well as imprecise — a dimensionless `list<number> + 1` was already repaired to
+  `list<number>` downstream, so only _dimensioned_ shapes carried the artifact.
+
+  This is a **type-surface change**: code pinning the union spelling will see
+  the narrowed type instead. It is a strict improvement for consumers that
+  _dispatch_ on the type, and that is the motivation — union matching is
+  all-members, so `type.matches('collection')` returned a confident `false` on a
+  value that is always a collection, silently routing list-valued rows down
+  scalar paths (reported by Tycho as item 67). It also unblocks expressions CE
+  itself rejected: `MatrixMultiply([[x, y]], aM₁ + M₂)` failed signature
+  validation on the union operand and now evaluates.
+
+  Generic `collection`/`set`-typed operands are deliberately unchanged and keep
+  the honest union — a non-indexed collection is never broadcast by the value
+  path, so a scalar outcome stays reachable there.
+
+### Bug Fixes
+
+- **`isValid` now honors its documented contract through a list/tensor.**
+  `isValid` is specified as `false` if the expression "or any of its
+  subexpressions" is an `["Error"]`, but `BoxedTensor.isValid` returned `true`
+  unconditionally — so a `List` whose every element was an `Error` reported
+  `isValid: true`. `(1,2)+[3,4]` broadcasts to a list of `incompatible-type`
+  errors and passed the gate. An embedded `Error` element now poisons the
+  enclosing expression, matching what `BoxedFunction.isValid` already did.
+
+  Behavior change worth noting even though the contract is unchanged: consumers
+  using `isValid` as an admission gate before compiling or plotting will now
+  correctly reject expressions they previously admitted.
+
+  Only `expression`-dtype tensors are scanned; `float64`/`complex128`/`bool`
+  fields cannot hold an `Error` by construction and keep the O(1) answer, so
+  this does not add a per-element walk to large numeric tensors.
+
+  The `isValid` documentation has been expanded to spell out the contract: the
+  check is deep (including list elements and held operands), and it tests
+  well-formedness rather than meaningfulness — free symbols, undeclared
+  functions, `NaN` and `±∞` are all valid.
+
 ## 0.87.1 _2026-07-20_
 
 ### Breaking Changes
