@@ -671,9 +671,7 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 6.7× faster than
 Mathematica** (up to 7405×) — in the browser, not a proprietary kernel.
 
-<sub>
-Measured 2026-07-21 · Compute Engine `0.90.0` @ `8740998f` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
-</sub>
+<sub>Measured 2026-07-21 · Compute Engine `0.90.0` @ `8740998f` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.90.0 _2026-07-21_
 
@@ -894,9 +892,7 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 6.6× faster than
 Mathematica** (up to 6954×) — in the browser, not a proprietary kernel.
 
-<sub>
-Measured 2026-07-21 · Compute Engine `0.88.1` @ `afde4f88` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
-</sub>
+<sub>Measured 2026-07-21 · Compute Engine `0.88.1` @ `afde4f88` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.88.1 _2026-07-20_
 
@@ -1349,9 +1345,7 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 5.4× faster than
 Mathematica** (up to 6388×) — in the browser, not a proprietary kernel.
 
-<sub>
-Measured 2026-07-20 · Compute Engine `0.87.0` @ `0158397a` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
-</sub>
+<sub>Measured 2026-07-20 · Compute Engine `0.87.0` @ `0158397a` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.86.3 _2026-07-19_
 
@@ -1923,9 +1917,7 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 7.5× faster than
 Mathematica** (up to 6653×) — in the browser, not a proprietary kernel.
 
-<sub>
-Measured 2026-07-18 · Compute Engine `0.84.2` @ `40cc077a` (current build) · published `0.84.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
-</sub>
+<sub>Measured 2026-07-18 · Compute Engine `0.84.2` @ `40cc077a` (current build) · published `0.84.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.84.1 _2026-07-17_
 
@@ -4924,9 +4916,7 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 6.3× faster than
 Mathematica** (up to 5213×).
 
-<sub>
-Measured 2026-07-10 · Compute Engine `0.72.0` @ `2cf87db4` (current build) · published `0.70.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
-</sub>
+<sub>Measured 2026-07-10 · Compute Engine `0.72.0` @ `2cf87db4` (current build) · published `0.70.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.72.0 _2026-07-09_
 
@@ -5602,9 +5592,7 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 6.8× faster than
 Mathematica** (up to 7429×).
 
-<sub>
-Measured 2026-07-08 · Compute Engine `0.68.0` @ `5a2abce1` (current build) · published `0.66.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.
-</sub>
+<sub>Measured 2026-07-08 · Compute Engine `0.68.0` @ `5a2abce1` (current build) · published `0.66.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.68.0 _2026-07-05_
 

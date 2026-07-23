@@ -41,6 +41,11 @@ sed -i '' 's/\[Unreleased\]/Coming Soon/g' ./docs/compute-engine/changelog.md
 # Replace arrow shorthand that starts with "<" to avoid MDX JSX parsing
 sed -i '' 's/<->/↔/g' ./docs/compute-engine/changelog.md
 sed -i '' 's/<-\\>/↔/g' ./docs/compute-engine/changelog.md
+# Collapse block-form <sub>...</sub> to inline form. When the <sub> opening tag
+# is alone on a line, MDX treats the content as a block and wraps it in a <p>,
+# producing invalid <sub><p>...</p></sub> nesting that crashes hydration
+# (React #418 + removeChild). Inline form renders <sub>...</sub> with no <p>.
+perl -0pi -e 's{<sub>[ \t]*\n}{<sub>}g; s{\n[ \t]*</sub>}{</sub>}g' ./docs/compute-engine/changelog.md
 
 cp ./docs/mathfield/_changelog.md ./docs/mathfield/changelog.md
 cat ../mathlive/CHANGELOG.md >> ./docs/mathfield/changelog.md
@@ -48,6 +53,8 @@ cat ../mathlive/CHANGELOG.md >> ./docs/mathfield/changelog.md
 echo "</ChangeLog>" >> ./docs/mathfield/changelog.md
 # Replace [Unreleased] with Coming Soon
 sed -i '' 's/\[Unreleased\]/Coming Soon/g' ./docs/mathfield/changelog.md
+# Collapse block-form <sub>...</sub> to inline form (see note above).
+perl -0pi -e 's{<sub>[ \t]*\n}{<sub>}g; s{\n[ \t]*</sub>}{</sub>}g' ./docs/mathfield/changelog.md
 
 #
 # Copy the API files
