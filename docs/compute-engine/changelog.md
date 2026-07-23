@@ -5647,24 +5647,19 @@ Mathematica** (up to 7429×).
     `Series(\arctan x, x, +\infty)` →
     $\tfrac{\pi}{2} - \tfrac{1}{x} + \tfrac{1}{3x^3} - \dots$. Coefficients are
     exact (`Series(\sin x, x, \frac{\pi}{6})` gives $\tfrac12$,
-    $\tfrac{\sqrt
-    3}{2}$, …), and an undeclared `f` yields the textbook form
-    $f(0) + f'(0)x +
-    \dots$.
+    $\tfrac{\sqrt 3}{2}$, …), and an undeclared `f` yields the textbook form
+    $f(0) + f'(0)x + \dots$.
   - At a **pole** the result is a Laurent expansion with a finite principal
     part: `Series(\frac{1}{\sin x}, x)` →
-    $\tfrac{1}{x} + \tfrac{x}{6} +
-    \tfrac{7x^3}{360} + O(x^7)$,
+    $\tfrac{1}{x} + \tfrac{x}{6} + \tfrac{7x^3}{360} + O(x^7)$,
     `Series(\cot x, x)` →
     $\tfrac{1}{x} - \tfrac{x}{3} - \tfrac{x^3}{45} + \dots$, and the special
     functions expand at their poles with exact coefficients —
     `Series(\Gamma(x), x)` →
-    $\tfrac{1}{x} - \gamma + (\tfrac{\gamma^2}{2} +
-    \tfrac{\pi^2}{12})x + \dots$,
+    $\tfrac{1}{x} - \gamma + (\tfrac{\gamma^2}{2} + \tfrac{\pi^2}{12})x + \dots$,
     `Series(\zeta(x), x, 1)` → $\tfrac{1}{x-1} + \gamma + O(x-1)$. Poles at `±∞`
     are handled too (`Series(\frac{x^2}{x-1}, x, +\infty)` →
-    $x + 1 + \tfrac1x + \tfrac1{x^2} +
-    \dots$). An essential singularity or
+    $x + 1 + \tfrac1x + \tfrac1{x^2} + \dots$). An essential singularity or
     branch point (e.g. `Series(e^{1/x}, x)`, `Series(\ln x, x)`) is still left
     unevaluated rather than expanded incorrectly.
   - `BigO(u)` is the inert Landau remainder, serialized `O\left(u\right)` and
@@ -5673,8 +5668,7 @@ Mathematica** (up to 7429×).
     containing it is `NaN`.
   - `Normal(expr)` strips the `BigO` terms, yielding the compilable/plottable
     truncated polynomial: `Normal(Series(\sin x, x))` →
-    $x - \tfrac{x^3}{6} +
-    \tfrac{x^5}{120}$.
+    $x - \tfrac{x^3}{6} + \tfrac{x^5}{120}$.
 
 - **`TrigExpand`, `TrigToExp`, and `TrigReduce` rewrite trigonometric and
   hyperbolic expressions.** These are transformation verbs in the spirit of
@@ -5856,8 +5850,7 @@ Mathematica** (up to 7429×).
 
 - **Periodic equations expand their root families over a bounded domain.**
   `Solve(\sin x = \tfrac12,\; x \in [0, 4\pi])` returns all four exact solutions
-  $\tfrac{\pi}{6}, \tfrac{5\pi}{6}, \tfrac{13\pi}{6},
-  \tfrac{17\pi}{6}$ — not
+  $\tfrac{\pi}{6}, \tfrac{5\pi}{6}, \tfrac{13\pi}{6}, \tfrac{17\pi}{6}$ — not
   just the principal values. Scaled arguments work too (`\sin 2x = 1` over
   $[0, 2\pi]$ → $\tfrac{\pi}{4}, \tfrac{5\pi}{4}$). Expansion applies when the
   unknown appears only inside trigonometric functions of linear arguments; each
@@ -6058,8 +6051,7 @@ corpus went from 85% to ~96%, and the one crash it exposed is fixed. See
 - **3×3 `Eigenvalues` returned wrong values — fixed.** The analytic solver used
   a sign-flipped term in its depressed cubic, mirroring every eigenvalue about
   $\operatorname{tr}/3$: e.g. $[[5,-3,-7],[-2,1,2],[2,-3,-4]]$ returned
-  $\{\tfrac{10}{3}, -\tfrac53,
-  \tfrac13\}$ instead of $\{1, -2, 3\}$. (Spectra
+  $\{\tfrac{10}{3}, -\tfrac53, \tfrac13\}$ instead of $\{1, -2, 3\}$. (Spectra
   symmetric about their mean — like $\{1,2,3\}$ — were unaffected, which is how
   it escaped notice.) Additionally, a complex-conjugate eigenvalue pair was
   returned as its real part twice ($\{2, \pm i\}$ came back $\{2, 0, 0\}$);

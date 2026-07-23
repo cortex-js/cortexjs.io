@@ -46,6 +46,10 @@ sed -i '' 's/<-\\>/↔/g' ./docs/compute-engine/changelog.md
 # producing invalid <sub><p>...</p></sub> nesting that crashes hydration
 # (React #418 + removeChild). Inline form renders <sub>...</sub> with no <p>.
 perl -0pi -e 's{<sub>[ \t]*\n}{<sub>}g; s{\n[ \t]*</sub>}{</sub>}g' ./docs/compute-engine/changelog.md
+# Collapse newlines inside inline `code`/$math$ spans (hard-wrapped upstream).
+# A multi-line inline span makes Docusaurus's MDXCode render a block <pre>,
+# which nested in a list-item <p> crashes hydration the same way. See script.
+python3 ./scripts/fix-changelog-inline-spans.py ./docs/compute-engine/changelog.md
 
 cp ./docs/mathfield/_changelog.md ./docs/mathfield/changelog.md
 cat ../mathlive/CHANGELOG.md >> ./docs/mathfield/changelog.md
@@ -55,6 +59,8 @@ echo "</ChangeLog>" >> ./docs/mathfield/changelog.md
 sed -i '' 's/\[Unreleased\]/Coming Soon/g' ./docs/mathfield/changelog.md
 # Collapse block-form <sub>...</sub> to inline form (see note above).
 perl -0pi -e 's{<sub>[ \t]*\n}{<sub>}g; s{\n[ \t]*</sub>}{</sub>}g' ./docs/mathfield/changelog.md
+# Collapse newlines inside inline `code`/$math$ spans (see note above).
+python3 ./scripts/fix-changelog-inline-spans.py ./docs/mathfield/changelog.md
 
 #
 # Copy the API files
