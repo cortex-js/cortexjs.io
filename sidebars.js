@@ -350,6 +350,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "cortex/getting-started",
+          className: "checklist-icon",
+        },
+        {
+          type: "doc",
           id: "cortex/goals",
           className: "guide-icon",
         },

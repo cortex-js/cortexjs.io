@@ -10,23 +10,22 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.93.0 _2026-07-23_
 
 ### New Features
 
-- **Cortex CLI and interactive REPL.** Installing
-  `@cortex-js/compute-engine` now provides a `cortex` executable. It evaluates
-  inline source (`cortex -e '1 + 2'`), `.cx`/`.cortex` files, or a program read
-  from standard input; with no input argument in a terminal it starts a
-  stateful REPL.
+- **Cortex CLI and interactive REPL.** Installing `@cortex-js/compute-engine`
+  now provides a `cortex` executable. It evaluates inline source
+  (`cortex -e '1 + 2'`), `.cx`/`.cortex` files, or a program read from standard
+  input; with no input argument in a terminal it starts a stateful REPL.
 
   The REPL retains declarations across inputs, supports multiline programs and
   persistent history, and adds `.load`, `.clear`, `.ast`, and `.time` commands
-  alongside Node's standard REPL commands. Non-interactive output can be
-  emitted as text, MathJSON (`--json`), or Cortex source (`--cortex`).
-  Diagnostics include source locations and are written to standard error.
-  Evaluations have a 10-second deadline by default; `--time-limit` changes it
-  and `--time-limit 0` disables it.
+  alongside Node's standard REPL commands. Non-interactive output can be emitted
+  as text, MathJSON (`--json`), or Cortex source (`--cortex`). Diagnostics
+  include source locations and are written to standard error. Evaluations have a
+  10-second deadline by default; `--time-limit` changes it and `--time-limit 0`
+  disables it.
 
 - **`JacobianMatrix(fs, vars)`** — the matrix of partial derivatives ∂fᵢ/∂xⱼ,
   one row per function and one column per variable.
@@ -56,8 +55,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   The operands are held — evaluating the variable list would replace a symbol
   carrying a value (`x := 5`) by that value, leaving nothing to differentiate
   against. Whether `fs` is a system or a single function is decided on what the
-  operand *denotes*, not its syntax, so a user-defined function returning a
-  list and a symbol bound to a list are both treated as systems.
+  operand _denotes_, not its syntax, so a user-defined function returning a list
+  and a symbol bound to a list are both treated as systems.
 
 ### Improvements
 
@@ -72,7 +71,7 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **`simplify()` reaches a distributed form when it is cheaper.** Rules tagged
   `purpose: 'expand'` are excluded from its scan, because expansion usually
   grows an expression — but that left `simplify()` unable to reach a strictly
-  *cheaper* result. It was not cost-rejecting the better form; it never
+  _cheaper_ result. It was not cost-rejecting the better form; it never
   generated the candidate.
 
   ```js
@@ -84,26 +83,26 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `simplify()` now tries expansion once, at the fixpoint, and keeps the result
   only when the cost function says it is strictly cheaper. That cannot cycle
   (the inner call has the trial disabled) and cannot blow up (the cost gate is
-  the acceptance test), so a factored form survives: `(x+1)^5`, `(a+b)(c+d)`
-  and `x(y+z)` are all left alone. A structural pre-check keeps the trial off
+  the acceptance test), so a factored form survives: `(x+1)^5`, `(a+b)(c+d)` and
+  `x(y+z)` are all left alone. A structural pre-check keeps the trial off
   expressions with no product or power for expansion to act on.
 
-- **`simplify()` now evaluates structural operators.** It is rule-driven and
-  ran no operator `evaluate` handler at all, so an operator whose result comes
-  from a handler rather than a rule was handed straight back.
+- **`simplify()` now evaluates structural operators.** It is rule-driven and ran
+  no operator `evaluate` handler at all, so an operator whose result comes from
+  a handler rather than a rule was handed straight back.
 
   ```js
   ce.parse('\\det\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}').simplify();
   // Before → Determinant(Matrix([[a,b],[c,d]]))    Now → a * d - b * c
   ```
 
-  The members are a closed list — `Determinant`, `Trace`, `Transpose`,
-  `Length` — chosen by a membership rule: the handler reduces its operands to a
-  closed form determined by their *structure* (a matrix to a scalar, a
-  collection to a measure) rather than rewriting the expression, and the head
-  carries no simplification rule of its own. `Max`/`Min` deliberately fail that
-  rule and are not members: they reduce their operands' *values*, which is
-  evaluation's job.
+  The members are a closed list — `Determinant`, `Trace`, `Transpose`, `Length`
+  — chosen by a membership rule: the handler reduces its operands to a closed
+  form determined by their _structure_ (a matrix to a scalar, a collection to a
+  measure) rather than rewriting the expression, and the head carries no
+  simplification rule of its own. `Max`/`Min` deliberately fail that rule and
+  are not members: they reduce their operands' _values_, which is evaluation's
+  job.
 
   **`simplify()` remains value-blind.** With `a := 5`, `(a + 2).simplify()` is
   still `a + 2`. A structural head whose operands mention a symbol carrying a
@@ -113,8 +112,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `evaluate()` then `simplify()`; `simplify()` alone is not a superset.
 
 - **The `Simplify` operator resolves symbols bound to a value.** An operator
-  normally evaluates its arguments; the transformers are `lazy` only to keep
-  the operand's *structure* from being rewritten early, not to keep its values
+  normally evaluates its arguments; the transformers are `lazy` only to keep the
+  operand's _structure_ from being rewritten early, not to keep its values
   symbolic. This applies to `Expand`, `ExpandAll`, `Factor`, `Together` and
   `Distribute` as well.
 
@@ -127,10 +126,10 @@ import ChangeLog from '@site/src/components/ChangeLog';
   This is the operator, not the method: `ce.symbol('v').simplify()` is still
   `v`, because `.simplify()` is value-blind.
 
-- **`Together` reduces its result to lowest terms.** It folds the terms over
-  the *product* of the denominators, which is correct but not reduced; the
-  result is now divided through by the numerator/denominator GCD. This also
-  yields the least common denominator, since product / gcd **is** the LCD.
+- **`Together` reduces its result to lowest terms.** It folds the terms over the
+  _product_ of the denominators, which is correct but not reduced; the result is
+  now divided through by the numerator/denominator GCD. This also yields the
+  least common denominator, since product / gcd **is** the LCD.
 
   ```js
   ce.box(['Together', ce.parse('-\\frac{3y}{x}+\\frac{2}{x^2}')]).evaluate();
@@ -164,9 +163,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   fresh values on every call of the compiled function, matching `evaluate()`.
   For draws that stay the same from call to call, use the explicit-seed form
   `RandomList(n, seed)`. A count that is negative, non-finite, or above the
-  1,000,000 cap makes the compiled function throw, rather than silently
-  clamping or returning `NaN`. (`evaluate()` reports an `out-of-range` error
-  expression for the same input.)
+  1,000,000 cap makes the compiled function throw, rather than silently clamping
+  or returning `NaN`. (`evaluate()` reports an `out-of-range` error expression
+  for the same input.)
 
 - **`declare()` accepts a spread of an existing operator definition**, so you
   can override one handler and keep the rest:
@@ -193,8 +192,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ce.parse('p_{X}'); // → [10, 20, 30]
   ```
 
-  Negative indices count from the end and out-of-range entries are dropped, so
-  a gather may be shorter than its index list. Previously these returned
+  Negative indices count from the end and out-of-range entries are dropped, so a
+  gather may be shorter than its index list. Previously these returned
   `undefined`, a wrongly-shaped scalar (`p[[2]]` gave `20` rather than `[20]`),
   or threw.
 
@@ -212,12 +211,12 @@ import ChangeLog from '@site/src/components/ChangeLog';
     variable bound by a `Function`, `Block`, `Sum`, … to a same-named global
     value (`Simplify(x ↦ x+1)` no longer corrupts the body's bound `x`).
   - A transformer nested in a `Solve` equation could substitute an unknown that
-    also carries a value — `Solve(Simplify(x-2)=0, x)` with `x:=5` returned `[]`.
-    The unknown is now shielded across transformer reduction.
+    also carries a value — `Solve(Simplify(x-2)=0, x)` with `x:=5` returned
+    `[]`. The unknown is now shielded across transformer reduction.
   - `JacobianMatrix` differentiated a system in which a diff variable had
     already been replaced by its global value (`JacobianMatrix(g,[x,y])` with
     `x:=5`, `g:=[x²y,x+y]` gave a wrong matrix). It now resolves the operand's
-    *shape* without substituting values, and differentiates against a fresh
+    _shape_ without substituting values, and differentiates against a fresh
     symbol when a diff variable carries a value.
   - `simplify()` evaluated a structural head's whole operand tree, running an
     impure descendant — `simplify(Transpose([[Random()]]))` drew a random
@@ -236,12 +235,12 @@ import ChangeLog from '@site/src/components/ChangeLog';
   inert) and its handler now delegates to `apply` instead of duplicating its
   named-operator path.
 
-- **`Pipe` (`|>`) holds its operands, so `x |> f` behaves exactly like
-  `f(x)`.** It evaluated the topic eagerly, regardless of `f` — which broke a
-  chain whose right-hand side is a *lazy* operator that needs its argument
-  unevaluated. A bare function reference was the sharp case: `F |> JacobianMatrix`
-  passed an evaluated `F`, stripped of its definition, so the Jacobian could
-  not see the map's body.
+- **`Pipe` (`|>`) holds its operands, so `x |> f` behaves exactly like `f(x)`.**
+  It evaluated the topic eagerly, regardless of `f` — which broke a chain whose
+  right-hand side is a _lazy_ operator that needs its argument unevaluated. A
+  bare function reference was the sharp case: `F |> JacobianMatrix` passed an
+  evaluated `F`, stripped of its definition, so the Jacobian could not see the
+  map's body.
 
   ```js
   // F |> JacobianMatrix |> Determinant |> Simplify
@@ -256,9 +255,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 - **Indexing into a computed list hid the unknown from `Solve`.** A held
   equation containing `At(List(…), k)` was opaque to the solver — it saw no
-  unknown and answered `[]`, which by contract means "proven no solutions".
-  This is the last of the lazy-operand family: `At` is now projected
-  structurally in a held operand.
+  unknown and answered `[]`, which by contract means "proven no solutions". This
+  is the last of the lazy-operand family: `At` is now projected structurally in
+  a held operand.
 
   ```js
   ce.box(['Solve', ['Equal', ['At', ['List', 'Y', 2], 1], 5], 'Y']).evaluate();
@@ -266,17 +265,17 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ```
 
   Projection, never evaluation: with `Y := 99`, `At([Y, 2], 1).evaluate()` is
-  `99`, which inside a held equation would replace the unknown being solved
-  for. Only a literal `List` with a literal in-range index is projected
-  (negative indices count from the end); a symbolic list or index is left
-  alone. The transformers (`Simplify`, `Expand`, …) get the same treatment.
+  `99`, which inside a held equation would replace the unknown being solved for.
+  Only a literal `List` with a literal in-range index is projected (negative
+  indices count from the end); a symbolic list or index is left alone. The
+  transformers (`Simplify`, `Expand`, …) get the same treatment.
 
 - **`Solve` returned `[]` for an equation it could not see into.** A lazy
-  operator holds its equation and takes only `.canonical`, which binds
-  structure without resolving values, so two kinds of operand stayed opaque:
-  a call to a user-defined function, and a symbol whose value *contains* the
-  unknown. Because `[]` means "proven no solutions", these were silent wrong
-  answers rather than visible inertness.
+  operator holds its equation and takes only `.canonical`, which binds structure
+  without resolving values, so two kinds of operand stayed opaque: a call to a
+  user-defined function, and a symbol whose value _contains_ the unknown.
+  Because `[]` means "proven no solutions", these were silent wrong answers
+  rather than visible inertness.
 
   ```js
   ce.assign('g', ce.parse('t \\mapsto t^2 - 4'));
@@ -298,8 +297,7 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 - **Expression transformers ignored a user-defined function in their operand.**
   Same root cause: `Simplify(g(a))`, `Expand`, `Factor`, `Together` and
-  `Distribute` returned `g(a)` unchanged, and `Integrate(g(t), t)` stayed
-  inert.
+  `Distribute` returned `g(a)` unchanged, and `Integrate(g(t), t)` stayed inert.
 
   ```js
   ce.assign('g', ce.parse('t \\mapsto t^2 - 4'));
@@ -307,14 +305,14 @@ import ChangeLog from '@site/src/components/ChangeLog';
   // Before → g(a)    Now → (a - 2) * (a + 2)
   ```
 
-  Beta-reduction substitutes the function *body*, so an assigned value for a
+  Beta-reduction substitutes the function _body_, so an assigned value for a
   symbol elsewhere in the operand is still left alone.
 
 - **`Distribute` returned a product where it should return a sum.** The helper
-  recombined the branches of a distributed sum with `Multiply` instead of
-  `Add`, so `(a + b)·c` became `(a·c)·(b·c)`. Every input the operator acted on
-  came back with a different value. The operator had no test coverage, which is
-  why this survived; it is now covered by a numeric oracle.
+  recombined the branches of a distributed sum with `Multiply` instead of `Add`,
+  so `(a + b)·c` became `(a·c)·(b·c)`. Every input the operator acted on came
+  back with a different value. The operator had no test coverage, which is why
+  this survived; it is now covered by a numeric oracle.
 
   ```js
   ce.box(['Distribute', ce.parse('(a+b)c')]).evaluate();
@@ -326,8 +324,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
   branch never moved a negative exponent into the denominator. The same factor
   inside a `Multiply` (`y/x^2`) routes through `Product.asNumeratorDenominator`,
   which splits on exponent sign and was already correct — so the two disagreed.
-  This also affected the `NumeratorDenominator` operator and `.denominator`.
-  A *symbolic* exponent is still left alone: its sign is not decidable there.
+  This also affected the `NumeratorDenominator` operator and `.denominator`. A
+  _symbolic_ exponent is still left alone: its sign is not decidable there.
 
   ```js
   ce.parse('\\frac{1}{x^2}').numeratorDenominator;
@@ -335,20 +333,20 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ```
 
 - **`Together` dropped denominators written as negative powers.** It treated
-  only a `Divide` node as carrying a denominator, so such terms were folded
-  into the numerator and the combined fraction kept negative powers.
+  only a `Divide` node as carrying a denominator, so such terms were folded into
+  the numerator and the combined fraction kept negative powers.
 
   ```js
   ce.box(['Together', ce.parse('\\frac{1}{x}+\\frac{1}{x^2}')]).evaluate();
   // Before → (x * x^(-2) + 1) / x    Now → (x + 1) / x^2
   ```
 
-- **Expression transformers ignored a `ReplaceAll` in their operand.**
-  `Expand`, `ExpandAll`, `Factor`, `Together`, `Distribute` and `Simplify` are
-  lazy and took only `.canonical` of their held operand, so a `ReplaceAll`
-  reached them as an unevaluated call with no polynomial structure and was
-  silently returned unchanged. The reduction is recursive, so a producer head
-  nested inside the operand is handled too.
+- **Expression transformers ignored a `ReplaceAll` in their operand.** `Expand`,
+  `ExpandAll`, `Factor`, `Together`, `Distribute` and `Simplify` are lazy and
+  took only `.canonical` of their held operand, so a `ReplaceAll` reached them
+  as an unevaluated call with no polynomial structure and was silently returned
+  unchanged. The reduction is recursive, so a producer head nested inside the
+  operand is handled too.
 
   ```js
   ce.parse('\\mathrm{Expand}(\\mathrm{ReplaceAll}(x^2+x, x \\to a+1))').evaluate();
@@ -359,12 +357,12 @@ import ChangeLog from '@site/src/components/ChangeLog';
   by `Solve`/`Integrate`/`Limit`: `ReplaceAll` ends in `.evaluate()` and so
   substitutes assigned symbol values, which those algorithms must avoid.
 
-- **`toString()` dropped the parentheses around a product-of-sums
-  denominator**, producing text that reads back as a different expression. The
-  MathJSON and LaTeX serializations were correct throughout; only the ASCII
-  form was affected. The grouping check treated any string starting with `(`
-  and ending with `)` as already parenthesized, which `(x + 1) * (x^2 - 1)`
-  satisfies without being a single group.
+- **`toString()` dropped the parentheses around a product-of-sums denominator**,
+  producing text that reads back as a different expression. The MathJSON and
+  LaTeX serializations were correct throughout; only the ASCII form was
+  affected. The grouping check treated any string starting with `(` and ending
+  with `)` as already parenthesized, which `(x + 1) * (x^2 - 1)` satisfies
+  without being a single group.
 
   ```js
   ce.box(['Divide', 1, ['Multiply', ['Add', 'x', 1], ['Add', ['Power','x',2], -1]]]).toString();
@@ -373,8 +371,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 - **`Map` now evaluates over a source that only becomes a collection when
   evaluated.** `Map(X - 1, f)` stayed in its unevaluated lazy form while
-  `Map(X, f)` and `Map([0, 1, 2], f)` both evaluated. The trigger was any
-  source whose collection-ness is not visible before evaluation — a broadcast
+  `Map(X, f)` and `Map([0, 1, 2], f)` both evaluated. The trigger was any source
+  whose collection-ness is not visible before evaluation — a broadcast
   arithmetic result over a list, or an eager collection operator such as
   `UnicodeScalars`.
 
@@ -388,18 +386,18 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ```
 
   Applies to the `zipWith` (multi-source) form as well, and to `.at()` — which
-  previously returned `undefined` for such a source, so a result longer than
-  the materialization head was silently rendered head-only instead of
-  head-and-tail. Every other collection operator (`Filter`, `Take`, `Sort`,
-  `Reverse`, `First`, …) already accepted these sources. Expressions that are
-  genuinely not collections are unchanged: `Map(5, f)` still stays symbolic.
+  previously returned `undefined` for such a source, so a result longer than the
+  materialization head was silently rendered head-only instead of head-and-tail.
+  Every other collection operator (`Filter`, `Take`, `Sort`, `Reverse`, `First`,
+  …) already accepted these sources. Expressions that are genuinely not
+  collections are unchanged: `Map(5, f)` still stays symbolic.
 
-- **Compiled comparisons and logical connectives no longer return a wrong
-  answer for a list operand.** `<`, `<=`, `>`, `>=`, `And`, `Or` and `Not`
-  could produce a scalar `false` (or one of their operands) where `evaluate()`
-  returns an element-wise list of booleans — a wrong result from a successful
-  compile. Such expressions now decline to compile and fall back to
-  interpretation, which gives the correct answer.
+- **Compiled comparisons and logical connectives no longer return a wrong answer
+  for a list operand.** `<`, `<=`, `>`, `>=`, `And`, `Or` and `Not` could
+  produce a scalar `false` (or one of their operands) where `evaluate()` returns
+  an element-wise list of booleans — a wrong result from a successful compile.
+  Such expressions now decline to compile and fall back to interpretation, which
+  gives the correct answer.
 
   Mostly affects a filter whose condition is computed, such as
   `L[|[1...n]-k|>0]`: it now evaluates correctly but is no longer compiled, so
@@ -407,17 +405,17 @@ import ChangeLog from '@site/src/components/ChangeLog';
   connectives, and list literals such as `Not([True, False])`, still compile.
 
 - **Complex values are handled correctly when compiled.** `At(p, 1+2i)` and
-  `RandomList(n, 7+3i)` now agree with `evaluate()`, which uses the real part
-  of a complex index or seed. Previously the compiled forms returned `NaN` and
-  a different random sequence respectively.
+  `RandomList(n, 7+3i)` now agree with `evaluate()`, which uses the real part of
+  a complex index or seed. Previously the compiled forms returned `NaN` and a
+  different random sequence respectively.
 
-  A compiled scalar *comparison* against a complex value is still wrong (it
+  A compiled scalar _comparison_ against a complex value is still wrong (it
   returns `false` rather than declining); this is unchanged and tracked in
   `ROADMAP.md`.
 
-- **`At` with several indices reports the correct type.** For a 2×3 matrix
-  `M`, `At(M, 1, [1,2])` is the 2-element list `[1,2]` and `At(M, 1, 2)` is a
-  single element — both previously reported the type of a whole matrix row.
+- **`At` with several indices reports the correct type.** For a 2×3 matrix `M`,
+  `At(M, 1, [1,2])` is the 2-element list `[1,2]` and `At(M, 1, 2)` is a single
+  element — both previously reported the type of a whole matrix row.
 
 ## 0.92.1 _2026-07-22_
 
@@ -829,7 +827,7 @@ Measured 2026-07-21 · Compute Engine `0.90.0` @ `8740998f` (current build) · p
   elementwise matrix expressions), with no per-expression packing cost until a
   numeric kernel actually runs.
 
-## Issues Resolved
+### Issues Resolved
 
 - **A function call over a collection-valued _expression_ keeps its broadcast
   type.** With `h` a function over numbers (declared or inferred) and `L` a
@@ -902,7 +900,7 @@ Measured 2026-07-21 · Compute Engine `0.88.1` @ `afde4f88` (current build) · p
 
 ## 0.88.1 _2026-07-20_
 
-## Issues Resolved
+### Issues Resolved
 
 - **Color converters (`AsRgb`, `AsHsv`, `AsHsl`, `AsOklab`, `AsOklch`) broadcast
   over lists**, like the color constructors already did:

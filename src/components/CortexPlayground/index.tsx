@@ -4,13 +4,15 @@ import ConsoleMarkup from "@site/src/components/ConsoleMarkup";
 import styles from "./styles.module.css";
 
 // The Cortex language lives in the `@cortex-js/compute-engine/cortex` entry
-// point. We load it lazily, from the same CDN the rest of the site uses (see
-// `plugins/load-scripts`), so it only downloads on pages that actually embed a
-// playground. The import goes through `new Function` so the bundler never sees
-// it — webpack would otherwise try (and fail) to resolve the absolute `https:`
-// URL at build time. This only ever runs in the browser (guarded by
-// `useIsBrowser`), never during server-side rendering.
-const CORTEX_MODULE_URL = "https://esm.run/@cortex-js/compute-engine/cortex";
+// point, loaded lazily from the CDN so it only downloads on pages that embed a
+// playground. The version is pinned so the REPL is reproducible and doesn't
+// silently change when a new engine publishes — bump it when the synced Cortex
+// docs are updated for a new CE release. The import goes through `new Function`
+// so the bundler never sees it (webpack would otherwise try, and fail, to
+// resolve the absolute `https:` URL at build time). This only ever runs in the
+// browser (guarded by `useIsBrowser`), never during server-side rendering.
+const CORTEX_MODULE_URL =
+  "https://esm.run/@cortex-js/compute-engine@0.93.0/cortex";
 const nativeImport = new Function("url", "return import(url)") as (
   url: string
 ) => Promise<any>;
@@ -32,34 +34,6 @@ function formatDiagnostic(message: unknown): string {
     return `${label}: ${args.map((a) => JSON.stringify(a)).join(", ")}`;
   }
   return String(message).replace(/-/g, " ");
-}
-
-// Work around a `serializeCortex` gap in the currently *published* engine
-// (≤ 0.92.1, which esm.run serves): it mis-serializes the MathJSON dictionary
-// *object shorthand* `{"dict": {…}}` (what an evaluated dictionary's `.json`
-// returns) to a broken `{dict -> }`, but serializes the canonical
-// `["Dictionary", ["KeyValuePair", …]]` form correctly. Rewrite the shorthand
-// to the canonical form before serializing.
-//
-// FIXED upstream — ships in the next published CE release. This shim is
-// harmless once that lands (it just pre-rewrites into a form the fixed
-// serializer also accepts); remove it after the fixed version is on npm.
-function normalizeForSerialize(j: any): any {
-  if (Array.isArray(j)) return j.map(normalizeForSerialize);
-  if (j && typeof j === "object") {
-    if (j.dict && typeof j.dict === "object" && !Array.isArray(j.dict)) {
-      return [
-        "Dictionary",
-        ...Object.entries(j.dict).map(([k, v]) => [
-          "KeyValuePair",
-          { str: k },
-          normalizeForSerialize(v),
-        ]),
-      ];
-    }
-    return j;
-  }
-  return j;
 }
 
 interface Diagnostic {
@@ -107,8 +81,7 @@ export default function CortexPlayground({
       let cortex: string | undefined;
       try {
         // Serialize the result back to Cortex source for a readable rendering.
-        if (json !== undefined)
-          cortex = serializeCortex(normalizeForSerialize(json));
+        if (json !== undefined) cortex = serializeCortex(json);
       } catch {
         cortex = undefined;
       }
