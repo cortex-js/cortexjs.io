@@ -16,10 +16,11 @@ date: Last Modified
   be possible.
 - Expressiveness. The solution of a problem should be expressed
   - in the closest way to the original problem formulation
-  - in a clear, natural, consice and intuitive way
+  - in a clear, natural, concise and intuitive way
 - Error Recovery: whenever an unexpected result is reached, it should be
   easy to understand what caused it, and how to recover from it.
 
 ## Non-Goals
 
-- Migration from existing programming languages
+- Source compatibility with an existing programming language.
+

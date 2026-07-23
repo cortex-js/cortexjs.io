@@ -344,7 +344,8 @@ const sidebars = {
       items: [
         {
           type: "doc",
-          id: "cortex/introduction",
+          id: "cortex/cortex",
+          label: "Introduction",
           className: "compass-icon",
         },
         {
@@ -413,6 +414,11 @@ const sidebars = {
           type: "doc",
           id: "cortex/examples",
           className: "flask-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/cli",
+          className: "guide-icon",
         },
         {
           type: "doc",

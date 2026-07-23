@@ -32,9 +32,8 @@ reassignment (see below).
 
 ## Reassignment vs. declaration
 
-A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not a
-declaration: it's a **reassignment** of an already-declared symbol, and
-compiles to `Assign`:
+A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not
+declaration syntax: it is an **assignment** and lowers to `Assign`:
 
 ```cortex
 x = 5
@@ -43,6 +42,10 @@ x = 5
 ```json
 ["Assign", "x", 5]
 ```
+
+The Compute Engine permits `Assign` to establish a value for a previously
+unbound symbol, but `let` is the explicit and idiomatic way to introduce a
+mutable binding.
 
 Reassigning a symbol that was declared `const` produces an
 [error value](/cortex/evaluation/#errors-are-values), not a parse error or a
@@ -53,7 +56,7 @@ const c = 1
 c = 2
 ```
 
-`c = 2` still parses and compiles to `["Assign", "c", 2]`; it's the engine,
+`c = 2` still parses and lowers to `["Assign", "c", 2]`; it's the engine,
 at evaluation time, that rejects the assignment and produces an `["Error",
 …]` value.
 
@@ -83,7 +86,8 @@ let x: real = 5
 ```
 
 ```json
-["Declare", "x", "real", ["Dictionary", ["KeyValuePair", "value", 5]]]
+["Declare", "x", {"str": "real"},
+  ["Dictionary", ["KeyValuePair", "value", 5]]]
 ```
 
 A declaration with no initializer omits the attributes dictionary entirely:
@@ -93,7 +97,7 @@ let x: real
 ```
 
 ```json
-["Declare", "x", "real"]
+["Declare", "x", {"str": "real"}]
 ```
 
 ```cortex
@@ -114,7 +118,7 @@ const c = 6.28
 ["Declare", "c", ["Dictionary", ["KeyValuePair", "value", 6.28], ["KeyValuePair", "constant", "True"]]]
 ```
 
-Because declarations compile directly to the engine's own `Declare`
+Because declarations lower directly to the engine's own `Declare`
 primitive, there is no separate Cortex-side declaration logic at execution
 time — the program evaluates the `Declare` expression exactly like any other
 expression.
@@ -127,7 +131,6 @@ introduced by `if`/`else`/`while`/`for`, or a function body, pushes its own
 lexical scope, so a `let`/`const` inside a block does not leak into the
 enclosing scope.
 
-`let` and `const` are the only binding keywords in v0. There is no compound
-assignment (`+=`) and no destructuring — both are out of scope for this
-phase.
+`let` and `const` are the binding keywords. There is currently no compound
+assignment (`+=`) or destructuring declaration.
 

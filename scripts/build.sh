@@ -59,6 +59,12 @@ cat ../mathlive/src/api.md >> ./docs/mathfield/api.md
 cp ./docs/compute-engine/_api.md ./docs/compute-engine/api.md
 cat ../compute-engine/src/api.md >> ./docs/compute-engine/api.md
 
+# Cortex language docs: authored as Docusaurus MDX in the compute-engine repo
+# (src/cortex/docs), synced here verbatim. The presentation shell — sidebar
+# entries and the <CortexPlayground> REPL — lives in this repo.
+mkdir -p ./docs/cortex
+cp ../compute-engine/src/cortex/docs/*.md ./docs/cortex/
+
 
 #
 # Build Docusaurus (.md -> .html)

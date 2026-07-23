@@ -1,5 +1,5 @@
 ---
-title: Introduction - Cortex
+title: Cortex
 sidebar_label: Introduction
 slug: /cortex/
 description: Cortex is a programming language for scientific computing built on the Compute Engine.
@@ -14,14 +14,25 @@ Cortex is a programming language for scientific computing, built on the
 Compute Engine.
 </Intro>
 
-:::warning[Work in progress]
-The Cortex language is a work in progress. The information below reflects the
-current thinking and may change.
+:::warning[Experimental]
+Cortex is available as an **experimental** entry point. Its syntax and
+semantics may change between releases while the language is being exercised in
+notebooks and other applications.
 :::
+
+Cortex is embedded from JavaScript through the
+`@cortex-js/compute-engine/cortex` entry point:
+
+```js
+import { ComputeEngine, executeCortex } from "@cortex-js/compute-engine/cortex";
+
+const ce = new ComputeEngine();
+const { value, diagnostics } = executeCortex(ce, "1 + 2");
+```
 
 Here is "Hello World" in Cortex. Edit the code and press **Run** (or
 <kbd>⌘/Ctrl</kbd>+<kbd>Enter</kbd>) — the result is the value of the last
-statement, shown as a MathJSON expression.
+statement, shown as a Cortex value and as its underlying MathJSON.
 
 ```cortex-live
 "Hello World"
@@ -37,7 +48,7 @@ Simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
 Values have a type, and strings support `\(…)` interpolation:
 
 ```cortex-live
-x = 2^11 - 1
+let x = 2^11 - 1
 "\(x) has type \(Type(x))"
 ```
 
@@ -68,7 +79,7 @@ calls and indexing.
 </ReadMore>
 
 <ReadMore path="/cortex/declarations/">
-**Declarations** — binding names with `=`, `let`, and `const`.
+**Declarations** — binding names with `let` and `const`.
 </ReadMore>
 
 <ReadMore path="/cortex/comments/">
@@ -76,7 +87,7 @@ calls and indexing.
 </ReadMore>
 
 <ReadMore path="/cortex/pragmas/">
-**Pragmas** — compiler directives embedded in the code.
+**Pragmas** — parser directives embedded in the code.
 </ReadMore>
 
 ## Collections
