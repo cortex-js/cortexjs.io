@@ -14,6 +14,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import { markdownPath } from "./markdown-path.js";
+
 const DOCS_PLUGIN = "docusaurus-plugin-content-docs";
 
 // Pages excluded from the concatenated bundles. They are still emitted as
@@ -80,14 +82,6 @@ function flattenSidebars(sidebars) {
   };
   for (const items of Object.values(sidebars ?? {})) walk(items, undefined);
   return order;
-}
-
-/** Turn a permalink into the path of its markdown twin: /a/b/ -> /a/b.md */
-function markdownPath(permalink, baseUrl) {
-  let p = permalink;
-  if (baseUrl !== "/" && p.startsWith(baseUrl)) p = "/" + p.slice(baseUrl.length);
-  p = p.replace(/\/+$/, "");
-  return (p === "" ? "/index" : p) + ".md";
 }
 
 export default function llmsTxtPlugin(context, options = {}) {
