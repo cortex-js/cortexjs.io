@@ -3,6 +3,7 @@ date: Last Modified
 title: Keybindings and Inline Shortcuts
 slug: /mathfield/guides/shortcuts/
 toc_max_heading_level: 2
+description: "Customize mathfield input: override or extend the default keybindings, and define inline shortcuts that expand a typed sequence into a math expression."
 ---
 
 ## Keybindings

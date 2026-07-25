@@ -2,6 +2,7 @@
 date: Last Modified
 title: Macros
 slug: /mathfield/guides/macros/
+description: "Define your own LaTeX macros in a mathfield, override or remove the predefined ones, and control which of the 800+ built-in commands stay available."
 ---
 
 # Macros

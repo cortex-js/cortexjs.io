@@ -2,6 +2,7 @@
 
 import styles from './src/prism/theme-light';
 import loadScripts from './plugins/load-scripts';
+import llmsTxt from './plugins/llms-txt';
 import remarkMath from 'remark-math';
 
 import codePlaygroundRemarkPlugin from './plugins/code-playground';
@@ -228,6 +229,7 @@ const config: Config = {
   
 
     loadScripts,
+    llmsTxt,
     // [
     //   '@docusaurus/plugin-pwa',
     //   /** @type {import('@docusaurus/plugin-pwa').Options} */

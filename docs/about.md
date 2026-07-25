@@ -2,6 +2,7 @@
 title: About Us
 slug: /about
 date: 2021-06-24
+description: "Arno Gourdol on the path from WinMath in 1984 to Apple and Adobe, and why Farfield Studio is building open source tools for scientific computing."
 ---
 <style>{`
   .signature {

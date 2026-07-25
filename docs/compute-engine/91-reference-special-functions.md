@@ -1,6 +1,7 @@
 ---
 title: Special Functions
 slug: /compute-engine/reference/special-functions/
+description: "Special functions in the Compute Engine: error and Gamma functions, Zeta, Beta, Lambert W, Fresnel integrals, Bessel and Airy functions, and elliptic integrals."
 ---
 
 

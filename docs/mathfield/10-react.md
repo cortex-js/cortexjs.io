@@ -2,6 +2,7 @@
 date: Last Modified
 title: Using A Mathfield with React
 slug: /mathfield/guides/react/
+description: "Add an editable mathfield to a React application: render the <math-field> tag in JSX, get a reference with useRef, and customize it on mount."
 ---
 
 ## Theory of Operations

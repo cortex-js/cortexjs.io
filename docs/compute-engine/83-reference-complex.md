@@ -1,6 +1,7 @@
 ---
 title: Complex
 slug: /compute-engine/reference/complex/
+description: "Complex numbers in the Compute Engine: the ImaginaryUnit constant and the Real, Imaginary, Conjugate, Abs, Arg and ComplexRoots functions."
 ---
 
 

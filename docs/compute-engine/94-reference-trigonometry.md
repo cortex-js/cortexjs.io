@@ -2,6 +2,7 @@
 title: Trigonometry
 slug: /compute-engine/reference/trigonometry/
 date: Last Modified
+description: "Trigonometry in the Compute Engine: the Pi and Degrees constants, trigonometric and hyperbolic functions, and the principal values their inverses return."
 ---
 
 ## Constants

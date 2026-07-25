@@ -1,6 +1,7 @@
 ---
 title: Strings and Text
 slug: /compute-engine/reference/strings/
+description: "Strings and text in the Compute Engine: Unicode-aware operations over grapheme clusters, scalars and code points, and why strings are not collections."
 ---
 
 ## Introduction

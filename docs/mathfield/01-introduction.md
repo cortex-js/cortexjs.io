@@ -3,6 +3,7 @@ slug: /mathfield
 title: Introduction
 hide_table_of_contents: true
 hide_title: true
+description: "MathLive is a web component for editing and displaying beautifully typeset math formulas, with LaTeX output and a virtual keyboard, in any web page."
 ---
 
 

@@ -3,6 +3,7 @@ title: Mathfield Demo
 slug: /mathfield/demo/
 date: Last Modified
 hide_table_of_contents: true
+description: "An interactive mathfield playground: edit a formula and watch its LaTeX, along with the simplified, evaluated and numeric forms, update as you type."
 ---
 
 # Mathfield Demo

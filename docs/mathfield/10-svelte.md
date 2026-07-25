@@ -2,6 +2,7 @@
 date: Last Modified
 title: Using a Mathfield with Svelte
 slug: /mathfield/guides/svelte/
+description: "Use a mathfield in a Svelte application with a wrapper component that forwards all attributes to the underlying <math-field> web component."
 ---
 
 ## Theory of Operations

@@ -2,6 +2,7 @@
 title: Logic
 slug: /compute-engine/reference/logic/
 date: Last Modified
+description: "Boolean logic in the Compute Engine: the True and False constants and the And, Or, Not, implication and equivalence operators, with their LaTeX notation."
 ---
 
 ## Constants

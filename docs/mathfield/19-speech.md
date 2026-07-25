@@ -2,6 +2,7 @@
 date: Last Modified
 title: Speech
 slug: /mathfield/guides/speech/
+description: "Speech output for mathfields: keyboard shortcuts to speak a formula or the selection, the speak command, and how to configure the speech engine."
 ---
 ## Using Speech Output
 

@@ -3,6 +3,7 @@ title: Changelog - Compute Engine
 sidebar_label: Changelog
 slug: /compute-engine/changelog/
 toc_max_heading_level: 2
+description: "Release notes for the Compute Engine: new features, behavior changes, deprecations and bug fixes, version by version."
 ---
 
 # Compute Engine Changelog
@@ -10,6 +11,354 @@ toc_max_heading_level: 2
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Breaking Changes
+
+- **`Nothing` now erases inside collections, as it already did inside operator
+  argument lists.** `Nothing` is the ERASURE marker — an empty-sequence splice
+  — so a `Nothing` element is spliced out of a `List`, `Set` or `Tuple` literal
+  instead of being retained. Length, arity, type and indexing all follow:
+
+  ```js
+  ce.box(['List', 12, 'Nothing', 34]); // → [12, 34]   (length 2, was length 3)
+  ce.box(['Set', 1, 'Nothing', 3]); // → Set(1, 3)
+  ce.box(['Tuple', 1, 'Nothing', 3]); // → (1, 3)
+  ce.parse('(a,,b)'); // → (a, b)   (an empty slot is `Nothing`)
+  ```
+
+  A key–value pair tuple is a NON-erasing position, so a dictionary/record entry
+  whose value is `Nothing` is dropped as a whole entry, but a caller that needs a
+  fixed-arity positional pair whose slot may hold an absent value must build it
+  with `ce._fn('Tuple', …)` and use `Missing` (below) for the hole. This also
+  applies to lazy iteration: an element that _evaluates_ to `Nothing` is dropped
+  (`Map(xs, _ ↦ Nothing)` is the empty collection — the `mapMaybe` idiom).
+
+- **New `Missing` marker and `missing` type for an absent-but-positioned
+  value.** `Missing` is the complement of `Nothing`: "a position exists, its
+  value is absent" (Julia `missing`, R `NA`). It is never erased —
+  `[1, Missing, 3]` is a 3-element `list<integer | missing>` — and `missing` is
+  a primitive unit type (a subtype only of itself and `any`, mirroring
+  `nothing`), reachable as `ce.Missing`.
+
+  Absence is **domain-normalized at value construction**: absence flowing
+  through an operator into a NUMERIC result cell becomes `NaN` (the numeric
+  absent element), while a non-numeric result cell keeps `Missing`. So a
+  numeric operator ABSORBS a `Missing` operand into `NaN` rather than carrying a
+  `missing` arm:
+
+  ```js
+  ce.box(['Add', 'Missing', 1]).evaluate(); // → NaN   (Add(Missing, 1) : number)
+  ce.box(['Sin', 'Missing']).evaluate(); // → NaN
+  ce.box(['Sin', ['List', 1, 'Missing', 3]]).evaluate(); // → [Sin(1), NaN, Sin(3)]
+  ```
+
+- **Out-of-band access preserves position instead of yielding `Nothing` or
+  dropping the entry.** An out-of-range index, or a dictionary key that is not
+  present, now yields a position-preserving marker chosen by the collection's
+  element domain: `NaN` when the elements are numeric, `Missing` otherwise.
+
+  ```js
+  ce.box(['At', ['List', 10, 20, 30], 9]).evaluate(); // → NaN   (numeric)
+  ce.box(['At', ['List', 'a', 'b'], 9]).evaluate(); // → Missing (non-numeric)
+  ```
+
+  **Gather is now length-preserving** — `At([a, b], [1, 9, 2])` is `[a, hole, b]`
+  (length 3), where the baseline dropped the out-of-range entry — and a **boolean
+  mask whose length differs from the collection is now an error**, where the
+  baseline silently applied the prefix.
+
+- **The 15 data-consuming aggregates return `NaN` on an absent datum or empty
+  input.** `Mean`, `Variance`, `PopulationVariance`, `StandardDeviation`,
+  `PopulationStandardDeviation`, `Kurtosis`, `Skewness`, `Median`,
+  `InterquartileRange`, `Quartiles`, `Max`, `Min`, `Supremum`, `Infimum`, and
+  `Mode` — over both call shapes (`Max(1, Missing, 3)` and
+  `Max([1, Missing, 3])`) — now evaluate to `NaN` when any datum is absent
+  (`Missing` or `NaN`) or the input is empty (`Quartiles` → `(NaN, NaN, NaN)`).
+  `Max([])`/`Min([])` are therefore `NaN` (was `∓∞`), and these operators now
+  type as `number` rather than `finite_real`, since their result may be `NaN`.
+
+  ```js
+  ce.box(['Max', 1, 'Missing', 3]).evaluate(); // → NaN
+  ce.box(['Mean', ['List']]).evaluate(); // → NaN
+  ```
+
+- **Comparisons follow IEEE 754 for `NaN` and Kleene for the `Missing` symbol,
+  across the whole relational family** (`Equal`, `NotEqual`, `Less`,
+  `LessEqual`, `Greater`, `GreaterEqual`). This is the Julia model:
+
+  - The **`Missing` symbol is Kleene** — a comparison with a `Missing` operand
+    is itself `Missing`: `Equal(x, Missing) = Missing`,
+    `NotEqual(Missing, x) = Missing`, `Less(Missing, 1) = Missing`. (An ordering
+    with a `Missing` operand previously stayed symbolically unevaluated.)
+  - **`NaN` follows IEEE** — `NaN` is unequal to everything (including itself)
+    and unordered: `Equal(NaN, NaN) = False`, `NotEqual(NaN, x) = True`, and
+    every ordering with a `NaN` operand is `False`. The `Equal`/`NotEqual`
+    results match native float `==`/`!=`; the **ordering comparisons with `NaN`
+    previously stayed symbolic** (`NaN < 1` was inert), so they now resolve to
+    `False`.
+
+  ```js
+  ce.box(['Equal', 'NaN', 'NaN']).evaluate(); // → False    (IEEE)
+  ce.box(['Less', 'NaN', 1]).evaluate(); // → False         (IEEE unordered)
+  ce.box(['Equal', 2, 'Missing']).evaluate(); // → Missing  (Kleene)
+  ce.box(['Less', 'Missing', 1]).evaluate(); // → Missing   (Kleene)
+  ce.box(['Equal', 2, 2]).evaluate(); // → True             (unchanged)
+  ```
+
+  Absence for **discharge** (`IsMissing`, `Coalesce`) and **aggregates**
+  (`Max`, `Mean`, …) is unaffected — a `NaN` is still absent there
+  (`IsMissing(NaN) = True`, `Coalesce(NaN, d) = d`, `Max(1, NaN, 3) = NaN`).
+  Broadcast comparisons apply the rule per cell. Because `NaN` follows IEEE,
+  **compiled and interpreted comparisons now agree by construction** on numeric
+  operands (plain `==` is the IEEE semantics — no guard is emitted, and
+  `NaN == NaN` compiles to `false`). A **numeric-domain** `missing` arm
+  (`number | missing`) does not widen a comparison's result type — that slot's
+  absence value is `NaN`, so the result is a plain `boolean`, a `Missing`
+  value read through such a slot compares as `NaN` (IEEE), and the comparison
+  **compiles on float-only targets (GLSL/WGSL)**. A `missing`-arm operand over
+  an object domain (e.g. `string | missing`) still types `boolean | missing`
+  and lowers via the guarded form
+  (`isAbsent(a) || isAbsent(b) ? null : a == b`) so a `Missing` becomes the
+  target null. A scalar `If`/`Which` condition that evaluates to **`Missing`**
+  yields a catchable **error expression** (`The condition is absent…`) rather
+  than crashing `evaluate()` — absence is a runtime data state, so it must be
+  renderable and catchable; discharge with `Coalesce`/`IsMissing` to branch on
+  possibly-absent data. (A condition that is not boolean at all, e.g.
+  `If(3, …)`, keeps the existing spell-check throw.) A `NaN`-comparison
+  condition yields a plain boolean (IEEE) and branches normally.
+
+- **Compiled `Max([])` / `Min([])` now return `NaN`, matching the
+  interpreter** (previously `-Infinity` / `+Infinity` from the identity-seeded
+  reduce). Non-empty folds are unchanged.
+
+### New Features
+
+- **`cortex check` — validate a program without evaluating it.** Parses the
+  source (a file, `--eval`, or stdin) and reports diagnostics; exit status is
+  `0` when there are no errors. With `--json` it emits a machine-readable
+  envelope (`{ ok, diagnostics }` with severities, codes, messages, 0-based
+  source offsets, 1-based line/column, and fix-its). The same structured
+  diagnostics are available during evaluation with `--diagnostics json`.
+- **`cortex doc` — library documentation from the terminal.**
+  `cortex doc Sin` shows a definition's kind, signature or type, description,
+  keywords, and (for constants) value; a non-name argument searches the
+  library by identifier, description, curated keywords, and LaTeX commands
+  (`cortex doc greatest common divisor` → `GCD`, …). `--limit <n>` controls
+  the number of matches and `--json` emits a structured `{ query, matches }`
+  envelope.
+- **`Cortex for AI Agents` language card.** A condensed, machine-verified
+  reference for LLMs and coding agents writing Cortex (`/cortex/for-agents/`):
+  core semantics, an operator-precedence summary, a table of
+  Python/JavaScript reflexes that don't transfer, and verified idioms. Every
+  example on the page is executed by the documentation test suite, so the
+  card cannot drift from the implementation.
+
+- **`cortex mcp` — a Model Context Protocol server for Cortex.** Starts an
+  MCP server on stdio (the default) or native Streamable HTTP, giving AI
+  agents structured access to the same operations as the CLI: an `evaluate`
+  tool (each call runs a complete, self-contained program in a fresh session
+  and returns the value as display text, Cortex source and MathJSON, plus
+  diagnostics), `check`, `doc`, `parse` and `serialize` tools, and the
+  `Cortex for AI Agents` language card as the
+  `cortex://docs/for-agents` resource. Register the stdio transport with,
+  e.g., `claude mcp add cortex -- npx -y @cortex-js/compute-engine mcp`, or
+  start the URL endpoint with
+  `cortex mcp --transport streamable-http`. The protocol implementation is
+  self-contained: the package gains no new dependencies.
+
+- **Spread arguments — `f(...t)` splices a tuple into a call's arguments.**
+  New Cortex prefix syntax `...` (call argument lists only) and engine `Spread`
+  marker: the elements of a tuple become ordinary positional arguments, so a
+  point can be fed to a component function without manual indexing —
+  `F(p) = (a(...p), b(...p), c(...p))` instead of `a(p[1], p[2], p[3])`.
+  Several spreads splice in order (`g(...p, ...q)`), variadic built-ins accept
+  them (`Max(...t)`), and the syntax round-trips through the Cortex
+  serializer. A literal tuple splices at canonicalization; a symbolic argument
+  defers — argument validation and the operator's canonical handler wait —
+  until evaluation resolves the tuple and re-validates the real arguments.
+  Tuples only: spreading a `List` or a scalar is an `incompatible-type` error,
+  and an unresolved argument leaves the call symbolic.
+
+  Spread also **compiles**, on every target: a literal tuple splices directly,
+  and a tuple-typed argument (`p: tuple<number, number>`) is rewritten
+  statically to positional accesses (`f(At(p,1), At(p,2))`). An argument whose
+  tuple arity is not statically known fails closed — a dynamic JS/Python
+  spread would silently mis-bind on an arity mismatch instead of erroring
+  like the interpreter.
+
+  ```js
+  ce.box(['Add', ['Spread', ['Tuple', 1, 2, 3]]]).evaluate(); // → 6
+  ```
+
+- **Destructuring declarations — `let (q, r) = divmod(17, 5)`.** A Cortex
+  `let`/`const` may bind the components of a tuple in one statement. Patterns
+  are irrefutable in form — bare symbols, `_` to skip a position, nested tuple
+  patterns; no literals or pins (use `match` for conditional destructuring) —
+  and require an initializer. The value is evaluated once; a shape mismatch
+  (wrong length, or not a tuple) yields an `incompatible-type` error value and
+  binds nothing. `const (x, y) = …` makes each binding constant. Lowers to the
+  `Declare` primitive with a `Tuple` pattern in the name position, which now
+  accepts it on all routes.
+
+  In **compiled** code, a destructuring declare with a literal tuple value
+  desugars to per-leaf declares (each element bound once, in order); a
+  non-literal value or a shape mismatch fails closed so the interpreter takes
+  over. (This also fixes a silent divergence: the pattern previously compiled
+  as a single `let _ = …`, and every pattern name read as NaN behind
+  `success: true`.)
+
+  ```js
+  ce.box(['Declare', ['Tuple', 'x', 'y'], d]).evaluate(); // d = {value: (3, 4)}
+  ```
+
+- **`IsMissing` and `Coalesce` — absence testing and discharge.**
+  `IsMissing(x)` is `True` when `x` is absent (the `Missing` symbol OR a `NaN`,
+  R’s `is.na`); `IsNaN` remains a NaN-specific test. `Coalesce(a, b, …)` returns
+  the first non-absent operand, evaluated left-to-right with short-circuit; if
+  every operand is absent it returns the last one verbatim. Both discharge
+  primitives work identically in the interpreter and compiled (JS/Python) — a
+  numeric hole (`NaN`) and an object hole (`Missing`/null) are handled
+  uniformly. On a target that cannot observe its absent element (a GPU shader,
+  where fast-math may not preserve `isnan`), `IsMissing`/`Coalesce` fail closed
+  with a compile error; propagation still works natively.
+
+  ```js
+  ce.box(['Coalesce', ['At', ['List', 10, 20], 9], 0]).evaluate(); // → 0
+  ce.box(['IsMissing', 'NaN']).evaluate(); // → True
+  ```
+
+- **`HoldValues(body)` — the value-blind evaluation route from the operator
+  surface.** A binder that shields the assigned free symbols of its body: for
+  the duration of the evaluation each such symbol becomes a pure symbol (its
+  declared type and in-scope assumptions apply, its assigned value does not),
+  analogous to Mathematica's `Block[{x}, …]`. Now that the `Simplify` operator
+  evaluates its argument first, `HoldValues` is the only value-blind route
+  reachable from Cortex (the `.simplify()` method is not exposed there). Shield
+  every assigned symbol, or a listed subset with a second `List`/`Set`/`Tuple`
+  or single-symbol operand. Constants are never shielded, in-scope assumptions
+  survive the shield, and the global values are intact afterwards.
+
+  ```js
+  ce.assign('x', 5);
+  ce.assign('a', 3);
+  ce.box([
+    'HoldValues',
+    ['Together', ['Add', ['Divide', 1, 'x'], ['Divide', 'a', ['Power', 'x', 2]]]],
+  ]).evaluate(); // → (a + x) / x²   (without the wrapper: 8/25)
+  ce.box(['HoldValues', ['Add', ['Power', 'x', 2], 'a'], ['List', 'a']]).evaluate();
+  // → 25 + a   (x resolves, a shielded)
+  ```
+
+### Improvements
+
+- **The Cortex serializer reconstructs `let`/`const` syntax.** A `Declare`
+  node now serializes back to its statement form — `let x = 5`,
+  `const c = 6.28`, `let x: real`, and destructuring patterns
+  `let (x, y) = p` — instead of the generic `Declare(x, {value -> 5})`
+  function spelling, so declarations round-trip source → MathJSON → source.
+  Shapes with no `let` spelling (a `holdUntil` attribute, a computed name)
+  keep the generic form.
+
+- **Compiled comparisons and connectives look through provably-scalar user
+  functions.** A helper declared with an open signature (`(unknown) -> unknown`, the shape that keeps list-broadcasting working) no longer makes a
+  scalar comparison uncompilable: `q(x) < y` with `q(t) = n·t+1` compiles when
+  every argument is scalar and the function's body provably maps scalar
+  parameters to a scalar result (arithmetic/transcendental operators,
+  scalar-typed captured symbols, and nested user helpers — analyzed
+  recursively, with self-recursion declining). A call whose argument may be a
+  collection (`q(L) < y`) still fails closed, so the sound half of the
+  0.93.0 rule is preserved — and unlike a `-> number` return annotation, the
+  look-through never mis-compiles the broadcast call. Element-wise compiled
+  comparisons over collections remain a separate roadmap item.
+
+- **`declare()` accepts `inferredSignature: true`, to vouch that a name is an
+  operator without pinning its types.** Declaring a `signature` normally makes
+  it a contract, so a wide placeholder such as `(unknown) -> unknown` keeps
+  every call typed `unknown` even after a function literal is assigned. That is
+  the right default for a fixed API, but not for a name that must be declared
+  *before* its body exists — most often so that `f(x)` parses as an application
+  rather than a multiplication:
+
+  ```js
+  ce.declare('q', { signature: '(unknown) -> unknown', inferredSignature: true });
+  ce.assign('q', ce.parse('t \\mapsto 2t+1'));
+  // signature is now `(unknown) -> finite_number`
+  // `q(x) < y` types `boolean` and compiles;
+  // `q(L) < y` over a list `L` types `list<boolean>` and still fails closed
+  ```
+
+  The flag was already honored at run time and is now part of the
+  `OperatorDefinition` type, so it no longer needs a cast. A declaration that
+  omits `signature` entirely behaves the same way.
+- **An unapplied `Derivative(f)` now evaluates to a named-parameter function
+  literal.** `Derivative(Sin)` evaluates to `x ↦ cos(x)` (`["Function", ["Cos","x"],"x"]`) instead of the hole-form `cos(_)`, which was typed
+  `finite_number` — so a stored derivative is now callable:
+  `let g = Derivative(f); g(2)` works instead of erroring with
+  `incompatible-type`. Results with no closed form stay symbolic, and the
+  multivariate mixed-partial form no longer throws
+  `Function body must be a scoped Block expression` when applied.
+- **The Cortex CLI's `--json` output materializes finite lazy collections.**
+  `Range`, `Map`/`Filter` results, and loop-built `Join` chains now serialize
+  as their elements (`["List", 1, 2, …]`, up to 10,000) instead of their
+  unevaluated recipe; infinite collections keep the structural form.
+- **Cortex trap lints and better "did you mean" suggestions.** Three common
+  cross-language reflexes that previously failed *silently* now produce an
+  advisory warning (the parse and value are unchanged): `=` inside a call
+  argument (`Solve(x^2 = 4, x)` is assignment, not an equation — use `==`),
+  a literal index `0` (indexing is 1-based; `xs[0]` is `NaN`), and a `//`
+  comment that reads as floor division (`7 // 2` is `7` followed by a
+  comment; use `Floor(a / b)`). Calling `print` (or `println`, `printf`,
+  `puts`, `echo`) now explains that a program's output is the value of its
+  last statement. The "did you mean" matcher gained a curated
+  cross-language tier: `split` → `StringSplit`, `push` → `Append`,
+  `ceiling` → `Ceil`. The agent language card gained a verified library
+  quick-roster, output-rendering notes (quoted booleans, list preview
+  elision), and binder-variable semantics for `D`/`Integrate`.
+- **`Pipe`/`Apply` reject or defer a non-function right operand more
+  sensibly.** `x |> f` (`Pipe`) now returns an `incompatible-type` error when
+  `f` is a number, string, or boolean literal (which can never be applied),
+  instead of staying silently inert; a symbol or unevaluated `f` still defers
+  (definitions may arrive later). `Apply` and `Pipe` no longer throw an
+  uncaught `Invalid function literal` when given a string function operand —
+  they decline gracefully. Applying a function-valued expression such as
+  `InverseFunction(f)` now stays symbolic (`Apply(InverseFunction(f), 2)`)
+  instead of misinterpreting it as a lambda body and substituting the argument
+  for `f`.
+- **Rubi integrator: Euler-substitution lever for √(quadratic)-nested
+  radicals.** The experimental Rubi integrator now closes nested radicals whose
+  inner radical is a square root of a quadratic with a positive leading
+  coefficient — e.g. `∫ 1/(√(x+√(x²+1))+1) dx` (Bondarenko #9) — via an Euler I
+  substitution
+  `t = √a·x + √Q` that rationalizes `√Q` and reduces the integrand to a form the
+  existing linear-radical machinery closes. This raises the Bondarenko benchmark
+  to CE+R/F 21/35.
+- **`simplify()` is value-blind for a symbol's sign and parity.**
+  `.simplify()` no longer reads an assigned symbol's *value* when applying a
+  sign- or parity-driven rewrite: with `w := 5`, `|w|.simplify()` now stays
+  `|w|` and `√(w²).simplify()` is `|w|` (previously both collapsed to `w`,
+  silently baking in `w ≥ 0` and evaluating wrong after a later `w := -3`).
+  Sign and parity are taken only from a symbol's declared type and in-scope
+  assumptions — so `assume(w > 0)` still licenses `|w| → w` — never from its
+  assigned value. `.evaluate()` and `.N()` are unchanged — they still substitute
+  the value.
+- **The `Simplify` operator now evaluates its argument before simplifying.**
+  `Simplify(expr)` is now evaluate-then-simplify — the operator counterpart of
+  the `expr.evaluate().simplify()` recipe — so it computes handler-driven results
+  the value-blind `.simplify()` method never touches: `Simplify(Max(3, 5))` → `5`,
+  `Simplify(D(x²+ax, x))` → `a + 2x`, `Simplify(∫x² dx)` → `x³/3`. Because
+  evaluation substitutes assigned symbol values, the change is visible from
+  Cortex: `let x = 5; Simplify(x^2 + x)` now gives `30`. The other transformers
+  (`Expand`, `Factor`, `Together`, `Distribute`) are unchanged — they keep
+  reduce-not-evaluate.
+- **The `.simplify()` method no longer evaluates structural operators.**
+  `Determinant`, `Trace`, `Transpose` and `Length` are no longer reduced by the
+  `.simplify()` method (an unreleased whitelist added earlier in this cycle):
+  the method is rule-driven and value-blind, and running an operator's `evaluate`
+  handler is `.evaluate()`'s job. Use `expr.evaluate()` (or the `Simplify`
+  operator, which now evaluates) to reduce them — e.g.
+  `Determinant([[a,b],[c,d]]).evaluate()` → `a·d − b·c`.
+
 ## 0.93.0 _2026-07-23_
 
 ### New Features
@@ -204,6 +553,52 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Bug Fixes
 
+- **`assume()` after `assign()` now records the assumption.** The predicate
+  was evaluated through the symbol's assigned value before the assumption
+  system saw it, so with `w := 5`, `assume(w > 0)` folded to `True`, returned
+  `'tautology'`, and recorded **nothing** — the assumption was silently
+  discarded on arrival (only the assume-before-assign order worked). Predicates
+  mentioning assigned symbols are now recorded *value-blind*, as facts about
+  the symbol: `assume(w > 0)` after `w := 5` returns `'ok'` and `|w|` then
+  simplifies to `w`. A predicate that contradicts the current value (e.g.
+  `assume(w > 0)` with `w := -2`) still returns `'contradiction'` and is
+  rejected. `'tautology'` now means tautological relative to types and existing
+  assumptions, never relative to an assigned value — re-asserting an equality
+  a symbol's value already satisfies returns `'ok'`, not `'tautology'`.
+
+- **`.N()` on a multi-limit `Integrate` no longer drops all but the first
+  limit.** The numeric-approximation branch read only the first `Limits`
+  operand, so `Integrate(f, Limits(x,0,3), Limits(y,0,2))` numericized as a
+  single-variable integral — `∫∫ 1` over `[0,3]×[0,2]` gave `3` (a wrong
+  value, not a decline) and a multivariate integrand gave `NaN`. Multiple
+  limits now perform iterated adaptive Gauss–Kronrod quadrature (Monte-Carlo
+  fallback per level, as for a single limit), following the Mathematica
+  iterator convention the symbolic path already used: the FIRST limit is the
+  OUTERMOST integral, so an inner bound may reference the outer variables —
+  `Integrate(1, Limits(x,0,1), Limits(y,0,x))` (the triangle) numericizes to
+  ½. A bound that references an inner integration variable or a foreign free
+  symbol declines (the integral stays inert) rather than integrating wrongly.
+  The same fix applies to `compile()`: a multi-limit integral that does not
+  close symbolically now compiles to nested quadrature calls — dependent
+  bounds included — where it previously truncated to the first limit.
+
+- **`Transpose`/`ConjugateTranspose` report the transposed static type.** They
+  had no type handler, so an unevaluated `Transpose(m)` typed as the generic
+  `value` and was rejected by matrix arithmetic: `Multiply(Transpose(J), J)`
+  for `J = JacobianMatrix(…)` — the Gram-matrix idiom JᵀJ — errored with
+  `incompatible-type` unless `J` was evaluated first. Both now preserve the
+  element type and swap the shape's axes (`matrix<T^(2x3)>` →
+  `matrix<T^(3x2)>`).
+
+- **`simplify()` reaches trig identities inside a quotient.** Recursion into
+  `Divide` operands is deliberately withheld to preserve factored structure
+  for common-factor cancellation, but that also blocked operand-local trig
+  reductions: `(r·cosθ)/(r·sin²θ + r·cos²θ)` didn't simplify even though the
+  denominator alone reduces to `r`. Trig-bearing operands of a `Divide` now
+  get the full recursion (the same carve-out `Add`/`Multiply` already made),
+  so it simplifies to `cos(θ)`; factored-polynomial cancellation is
+  unaffected.
+
 - **Value-resolution overreach in the lazy-operand fixes.** The machinery that
   lets `Solve`/`Simplify`/`JacobianMatrix` see through a held operand resolved
   bound symbols too aggressively. Fixed:
@@ -221,6 +616,25 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - `simplify()` evaluated a structural head's whole operand tree, running an
     impure descendant — `simplify(Transpose([[Random()]]))` drew a random
     number. It now declines when the expression is impure.
+
+- **`D` no longer evaluates its result at the differentiation variable's
+  assigned value.** With `x := 5`, `D(x², x)` is now `2x` (was `10`). Under the
+  ratified binding convention (ARCHITECTURE.md, "Bound variables, free symbols,
+  and assigned values"), the variable a binder owns is a pure symbol — its
+  declared type and assumptions apply, its assigned value never does, INCLUDING
+  in the result. A caller who wants the value evaluates the result again or
+  substitutes explicitly. Free symbols are unaffected: with `a := 3` too,
+  `D(a·x², x)` is `6x`.
+
+- **`Integrate`, `Limit`, and bundled `Solve` shield a value-bound bound
+  variable.** The same convention: a same-named global assignment no longer
+  leaks into these binders or their results. With `x := 5`, `Integrate(x², x)`
+  is `x³/3` (was `125/3`), `∫₀¹ x² dx` is `1/3` (was `0`), and
+  `Limit(Simplify(x²), x, 0)` is `0` (was `25`, on both the box and parse
+  routes). A bundled `Solve(\{Simplify(9 − w²) = 8, w ∈ -3..3\})` with `w := 9`
+  now returns `[1, -1]` (was `[]`): the value-bound bundled unknown is now
+  discovered before the shield is computed. A shared `withValueShield` helper
+  implements the shield and replaces `JacobianMatrix`'s per-variable rename.
 
 - **`Distribute` fold, `numeratorDenominator`, `Together`, transformers, and
   `toString()` grouping** — as previously listed.
@@ -671,7 +1085,11 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 6.7× faster than
 Mathematica** (up to 7405×) — in the browser, not a proprietary kernel.
 
-<sub>Measured 2026-07-21 · Compute Engine `0.90.0` @ `8740998f` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+<sub>Measured 2026-07-21 · Compute Engine `0.90.0` @ `8740998f` (current build)
+· published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.90.0 _2026-07-21_
 
@@ -892,7 +1310,11 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 6.6× faster than
 Mathematica** (up to 6954×) — in the browser, not a proprietary kernel.
 
-<sub>Measured 2026-07-21 · Compute Engine `0.88.1` @ `afde4f88` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+<sub>Measured 2026-07-21 · Compute Engine `0.88.1` @ `afde4f88` (current build)
+· published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.88.1 _2026-07-20_
 
@@ -1345,7 +1767,11 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 5.4× faster than
 Mathematica** (up to 6388×) — in the browser, not a proprietary kernel.
 
-<sub>Measured 2026-07-20 · Compute Engine `0.87.0` @ `0158397a` (current build) · published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+<sub>Measured 2026-07-20 · Compute Engine `0.87.0` @ `0158397a` (current build)
+· published `0.86.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.86.3 _2026-07-19_
 
@@ -1917,7 +2343,11 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 7.5× faster than
 Mathematica** (up to 6653×) — in the browser, not a proprietary kernel.
 
-<sub>Measured 2026-07-18 · Compute Engine `0.84.2` @ `40cc077a` (current build) · published `0.84.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+<sub>Measured 2026-07-18 · Compute Engine `0.84.2` @ `40cc077a` (current build)
+· published `0.84.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.84.1 _2026-07-17_
 
@@ -4916,7 +5346,11 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 6.3× faster than
 Mathematica** (up to 5213×).
 
-<sub>Measured 2026-07-10 · Compute Engine `0.72.0` @ `2cf87db4` (current build) · published `0.70.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+<sub>Measured 2026-07-10 · Compute Engine `0.72.0` @ `2cf87db4` (current build)
+· published `0.70.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.72.0 _2026-07-09_
 
@@ -5592,7 +6026,11 @@ Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
 Across the cases both solve, Compute Engine is a **median 6.8× faster than
 Mathematica** (up to 7429×).
 
-<sub>Measured 2026-07-08 · Compute Engine `0.68.0` @ `5a2abce1` (current build) · published `0.66.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+<sub>Measured 2026-07-08 · Compute Engine `0.68.0` @ `5a2abce1` (current build)
+· published `0.66.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.68.0 _2026-07-05_
 

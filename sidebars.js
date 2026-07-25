@@ -427,6 +427,16 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "cortex/mcp",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/for-agents",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
           id: "cortex/source-code",
           className: "reference-icon",
         },

@@ -101,43 +101,37 @@ then
     # postcss --config "./config" --replace "./submodules/cortex-js.github.io/**/*.css"
 
     # Build the knowledge base
+    #
+    # The documentation bundles (llms.txt, llms-*.txt) and the per-page raw
+    # markdown are emitted by the llms-txt Docusaurus plugin during the build
+    # above, which derives them from resolved page metadata rather than by
+    # globbing ./docs. The legacy kb-*.md names are kept as copies so the URLs
+    # already published at mathlive.io keep resolving.
+    #
+    # Only the TypeScript declaration bundles are assembled here: they come
+    # from the sibling repos' dist output, which the plugin cannot see.
 
     echo -e "$LINECLEAR$BASENAME$DOT Building Knowledge Base"
 
     current_dir=$(pwd)
 
-    output_file="./build/kb-compute-engine.md"
-    pattern='./docs/compute-engine/*.md'
+    # The bundle filenames follow the sidebar category labels, so renaming a
+    # category in sidebars.js renames its bundle. Warn rather than abort (this
+    # runs under `set -e`): a stale alias should not fail a release.
+    copy_kb_alias() {
+        if [ -f "./build/$1" ]; then
+            cp "./build/$1" "./build/$2"
+        else
+            echo -e "$BASENAME$ERROR Expected ./build/$1 for legacy alias $2 (sidebar category renamed?)"
+        fi
+    }
 
-    if [ -f "$output_file" ]; then
-        rm "$output_file"
-    fi
-
-    touch "$output_file"
-
-    while IFS= read -r -d '' file; do
-        echo "Processing $file"
-        cat "$file" >> "$output_file"
-    done < <(find $(dirname "$pattern") -name "$(basename "$pattern")" -print0)
-
+    copy_kb_alias "llms-compute-engine.txt" "kb-compute-engine.md"
+    copy_kb_alias "llms-mathfield.txt" "kb-mathlive.md"
+    copy_kb_alias "llms-cortex.txt" "kb-cortex.md"
 
     output_file="./build/kb-compute-engineapi.d.ts"
     pattern='../compute-engine/dist/types/**/*.d.ts'
-
-    if [ -f "$output_file" ]; then
-        rm "$output_file"
-    fi
-
-    touch "$output_file"
-
-    while IFS= read -r -d '' file; do
-        echo "Processing $file"
-        cat "$file" >> "$output_file"
-    done < <(find $(dirname "$pattern") -name "$(basename "$pattern")" -print0)
-
-
-    output_file="./build/kb-mathlive.md"
-    pattern='./docs/mathfield/*.md'
 
     if [ -f "$output_file" ]; then
         rm "$output_file"

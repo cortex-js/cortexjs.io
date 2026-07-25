@@ -1,6 +1,7 @@
 ---
 title: Arithmetic
 slug: /compute-engine/reference/arithmetic/
+description: "Arithmetic in the Compute Engine: numeric constants such as ExponentialE and GoldenRatio, and functions for sums, products, powers, roots and rounding."
 ---
 
 ## Constants

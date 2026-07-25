@@ -1,6 +1,7 @@
 ---
 title: Security
 slug: /compute-engine/guides/security/
+description: "Deploy mathfields safely: the Content Security Policy directives MathLive needs, Trusted Types support, and disabling commands that can modify the DOM."
 ---
 
 ## Content Security Policy
