@@ -35,7 +35,9 @@
   flex: 1 0 auto;
 }
 
-.shared-header .navbar__items:nth-child(2) {
+/* The middle group of the standalone header (the Docusaurus navbar only has
+   a left and a right group, and the right one must keep its natural size). */
+.shared-header .navbar__items:nth-child(2):not(.navbar__items--right) {
   flex: 1;
   display: flex;
   justify-content: right;
@@ -43,7 +45,7 @@
   gap: 0;
 }
 
-.shared-header .navbar__items--right {
+.shared-header .navbar__items.navbar__items--right {
   flex: 0 0 auto;
   margin-right: 8px;
 }
@@ -55,6 +57,8 @@
 .shared-header .navbar__link {
   color: var(--cortex-navbar-text, var(--ifm-navbar-link-color));
   transition: background-color 0.2s;
+  /* Keep the label and its external-link icon on a single line */
+  white-space: nowrap;
 }
 
 .shared-header .navbar__link:hover {
@@ -96,22 +100,56 @@
   background-color: var(--cortex-navbar-hover, var(--ifm-navbar-link-hover-color));
 }
 
-/* Fixed positioning and glass effect for standalone header */
-.shared-header .navbar--fixed-top {
-  position: fixed;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(1024px, calc(100% - 2em));
+/* The header sticks to the top of the viewport, but unlike a fixed navbar it
+   still takes up room in the layout flow, so the page content starts below it
+   instead of sliding under it. The padding accounts for the gap above the
+   floating navbar. */
+.shared-header {
+  position: sticky;
+  top: 0;
   z-index: 1000;
-  
-  /* Glass effect */
+  padding-top: 8px;
+  /* The wrapper spans the full width, but only the navbar itself should
+     capture clicks: the rest of the strip must stay transparent to the
+     sidebar and content scrolling underneath it. */
+  pointer-events: none;
+}
+
+/* Floating glass navbar, centered within the sticky wrapper */
+.shared-header .navbar--fixed-top {
+  position: relative;
+  top: 0;
+  margin: 0 auto;
+  width: min(1024px, calc(100% - 2em));
+  pointer-events: auto;
+  border-radius: 24px;
+
+  /* The glass effect is painted by ::before, not here: `filter` and
+     `backdrop-filter` would turn the navbar into the containing block for its
+     own position:fixed descendants, which traps the mobile drawer inside the
+     navbar's box instead of letting it cover the viewport. */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  filter: none;
+  backdrop-filter: none;
+}
+
+/* Glass effect. The negative z-index keeps it behind the navbar content and
+   behind the mobile drawer, while staying above the page: the .shared-header
+   wrapper is the stacking context here, not the navbar. */
+.shared-header .navbar--fixed-top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   filter: var(--glass-filter, drop-shadow(0 0 0.75rem rgba(0, 0, 0, 0.1)));
   background: var(--glass-background, rgba(255, 255, 255, 0.6));
-  border-radius: 24px;
   box-shadow: var(--glass-box-shadow, 0 0 2px rgb(0 0 0 / 0.1), 0 4px 30px rgba(0, 0, 0, 0.1), 0 0 10px rgb(0 0 0 / 0.1));
   backdrop-filter: var(--glass-backdrop-filter, blur(8px) saturate(90%));
   border: var(--glass-border, 1px solid rgba(209, 213, 219, 0.3));
+  border-color: var(--glass-border-color, rgba(209, 213, 219, 0.3));
   transition: background, filter, backdrop-filter 0.5s ease-in-out;
 }
 
