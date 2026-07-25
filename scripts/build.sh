@@ -146,7 +146,11 @@ then
 
 
     output_file="./build/kb-mathlive-api.d.ts"
-    pattern="../mathlive/types/**/*.d.ts"
+    # MathLive emits its declarations to dist/types, like the Compute Engine.
+    # The old ../mathlive/types path no longer exists, and because find runs in
+    # a process substitution its failure escapes `set -e` — the result was a
+    # 0-byte kb-mathlive-api.d.ts published for months.
+    pattern="../mathlive/dist/types/**/*.d.ts"
 
     if [ -f "$output_file" ]; then
         rm "$output_file"
