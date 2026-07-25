@@ -320,8 +320,13 @@ The type of a list is represented by the type expression `list<T>`, where `T` is
 
 ```js
 ce.parse("\\[1, 2, 3\\]").type.toString();
-// ➔ "vector<3>"  (the canonical shorthand for "list<number^3>")
+// ➔ "vector<finite_integer^3>"  (a list of 3 finite integers)
 ```
+
+The type of a list literal is **honest**: it reports the actual (widened)
+element type and the dimensions. Since element types are covariant, the
+honest type is a subtype of every broader form — `vector<finite_integer^3>`
+matches `vector<3>`, `vector`, `list<number>`, and `list`.
 
 The shorthand **`list`** is equivalent to `list<any>`, a list of values of any type.
 
@@ -344,14 +349,24 @@ ce.parse("\\[1, 2, 3\\]").type.matches("vector<3>");
 // ➔ true
 ```
 
-A **`vector<T^n>`** is a list of `n` elements of type `T`. Numeric literals are
-inferred with the broad `number` element type, so a literal list of integers is
-a `vector<number^n>` (and does not match the narrower `vector<integer^n>`).
+A **`vector<T^n>`** is a list of `n` elements of type `T`. A literal list's
+element type is the widened type of its actual elements, so a literal list of
+integers matches both the narrow and the broad forms:
 
 ```js
+ce.parse("\\[1, 2, 3\\]").type.matches("vector<integer^3>");
+// ➔ true
 ce.parse("\\[1, 2, 3\\]").type.matches("vector<number^3>");
 // ➔ true
+
+// A list with a non-integer element widens accordingly:
+ce.parse("\\[1, 2.5, 3\\]").type.matches("vector<integer^3>");
+// ➔ false  (the widened element type is finite_real)
 ```
+
+Lists of non-numeric values type honestly too — a list of two colors types
+`list<color^2>`, not a numeric vector — so `type.matches("list<color>")` and
+similar element-type queries answer correctly.
 
 Similarly, a **`matrix`** is a list of lists.
 
@@ -601,6 +616,16 @@ mode, the arguments of a typed literal are checked against the declared
 parameter types when the function is applied — a mismatch produces an
 `incompatible-type` error. Assigning a typed literal to a symbol gives that
 symbol the annotated signature, including the return type.
+
+Two refinements apply to this check. A **collection argument against a scalar
+parameter broadcasts**: with `h` declared `(number) -> number`, `h([1, 2, 3])`
+— or `h(L + 1)` for a list-valued `L` — is accepted and maps element-wise,
+typing as the corresponding vector. And a **collection parameter defers what
+it cannot decide**: an argument whose static type neither proves nor refutes
+conformance (say, a symbol declared plain `list` passed to a `matrix`
+parameter) is accepted provisionally and checked against its actual value
+when the operator evaluates; only a provable mismatch (a flat `list<number>`
+can never be a matrix) errors immediately at canonicalization.
 
 ## Literal Type
 

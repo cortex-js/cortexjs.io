@@ -222,6 +222,66 @@ ce.parse('|y|').simplify().latex;
 <ReadMore path="/compute-engine/guides/assumptions/" > Read more about
 <strong>Assumptions</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
+## Simplify and Assigned Values
+
+The `expr.simplify()` **method** is _value-blind_: it never substitutes the
+value you assigned to a symbol. Sign- and parity-dependent rewrites use a
+symbol's **declared type** and **in-scope assumptions**, but never its assigned
+value.
+
+This is why an assumption and an assignment behave differently, even when the
+value satisfies the assumption:
+
+```javascript
+// An assumption is a fact simplify() may use:
+ce.assume(ce.parse('w > 0'));
+ce.parse('|w|').simplify().latex;
+// ➔ "w"    (w > 0 licenses dropping the absolute value)
+
+// An assigned value is NOT used by simplify():
+ce.forget('w');
+ce.assign('w', 5);
+ce.parse('|w|').simplify().latex;
+// ➔ "|w|"  (an integer is not provably non-negative, so |w| stays symbolic)
+```
+
+Treating an assigned value as a fact would be a silent trap: the sign that held
+when you simplified would be baked into the saved expression and give a wrong
+answer after the value changes (assign `w := -3` and evaluate the baked-in `w`,
+and you would get `-3` for `|w|`). The value-blind method avoids this — an
+assigned value is treated as if the symbol were merely _declared_ with that
+value's type.
+
+### The method vs. the `Simplify` operator
+
+The `.simplify()` method applies rewrite rules only — it does not run an
+operator's evaluation. So a result that comes from a handler rather than a rule
+(a determinant, a derivative, an integral) is returned unchanged by the method:
+
+```javascript
+const m = ['List', ['List', 'a', 'b'], ['List', 'c', 'd']];
+ce.box(['Determinant', m]).simplify().operator;
+// ➔ "Determinant"   (unchanged — no rewrite rule for it)
+```
+
+To compute _then_ simplify, evaluate first — the reliable recipe is
+`evaluate().simplify()`:
+
+```javascript
+ce.box(['Determinant', m]).evaluate().simplify().latex;
+// ➔ "ad-bc"
+```
+
+The `Simplify` **operator** does exactly this for you: `Simplify(expr)`
+evaluates its argument first, then simplifies the result. Unlike the method, it
+therefore substitutes assigned symbol values and runs evaluation handlers:
+
+```javascript
+ce.assign('x', 5);
+ce.box(['Simplify', ['Add', ['Power', 'x', 2], 'x']]).evaluate().print();
+// ➔ 30   (the operator evaluates x → 5, then simplifies)
+```
+
 ## Nested Root Simplification
 
 Nested roots are automatically simplified to a single root with the product

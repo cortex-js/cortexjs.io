@@ -411,6 +411,14 @@ The corresponding expression is `Pipe(value, function)`. For example, Cortex
 // Evaluates as ["f", "x"]
 ```
 
+The right-hand side of a pipe must be applicable. A number, string, or boolean
+literal can never be applied, so piping into one is an `incompatible-type`
+error: `5 \rhd 3` errors rather than staying inert. A symbol without a
+definition is not an error — the pipe stays symbolic and evaluates once the
+symbol is defined. Note that `Pipe` is stricter here than `Apply`, which
+treats a non-function operand as a constant: `["Apply", 3, 5]` evaluates
+to `3` (this shorthand is relied on by operators such as `Map`).
+
 A `\square` topic marker in the right-hand side names the position the piped
 value fills, so a stage can be a multi-argument call:
 

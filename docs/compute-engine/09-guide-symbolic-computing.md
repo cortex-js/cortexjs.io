@@ -16,7 +16,7 @@ There are three common transformations that can be applied to an expression:
 
 | Transformation    |                                                                                                                                                                        |
 | :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `expr.simplify()` | Eliminate constants and common sub-expressions. Use available assumptions to determine which rules are applicable. Limit calculations to exact results. |
+| `expr.simplify()` | Eliminate constants and common sub-expressions. Use available assumptions to determine which rules are applicable. Limit calculations to exact results. Does not substitute assigned symbol values (that is `evaluate()`'s job). |
 | `expr.evaluate()` | Calculate the exact value of an expression. Replace symbols with their value.                                               |
 | `expr.N()`        | Calculate a numeric approximation of an expression using floating point numbers.                                                                                       |
 
@@ -35,6 +35,7 @@ approximation is a floating point number.
 |       &nbsp; |           `expr.simplify()`           |           `expr.evaluate()`           |              `expr.N()`               |
 | :---------------------------- | :-----------------------------------: | :-----------------------------------: | :-----------------------------------: |
 | Use assumptions on symbols    | <Icon name="circle-check" color="green-700"/> | | |
+| Substitute assigned symbol values | | <Icon name="circle-check" color="green-700"/> | <Icon name="circle-check" color="green-700"/> |
 | Exact calculations            | <Icon name="circle-check" color="green-700"/> | <Icon name="circle-check" color="green-700"/> |                                       |
 | Floating-point approximations |                                       |                                       | <Icon name="circle-check" color="green-700"/> |
 

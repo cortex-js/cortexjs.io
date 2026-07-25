@@ -146,6 +146,56 @@ since it changes the state of the Compute Engine.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### HoldValues
+</nav>
+<FunctionDefinition name="HoldValues">
+
+<Signature name="HoldValues">_body_</Signature>
+
+<Signature name="HoldValues">_body_, _symbols_</Signature>
+
+Evaluate _body_ with its assigned free symbols **shielded**: for the duration
+of the evaluation, each such symbol becomes a pure symbol — its declared type
+and any in-scope assumptions apply, but its assigned value does **not**. This
+is the value-blind counterpart of evaluating _body_ directly, analogous to
+Mathematica's `Block[{x}, …]`.
+
+With a single argument, every assigned, non-constant free symbol of _body_ is
+shielded. With a second _symbols_ argument (a `List`, `Set`, `Tuple`, or a
+single symbol) only the listed symbols are shielded; every other symbol
+resolves normally.
+
+Built-in constants (`Pi`, `ExponentialE`, …) are never shielded, in-scope
+assumptions survive the shield, and the global values are intact after the
+evaluation.
+
+```json example
+// With x := 5 and a := 3
+["HoldValues", ["Together", ["Add", ["Divide", 1, "x"], ["Divide", "a", ["Power", "x", 2]]]]]
+// ➔ ["Divide", ["Add", "a", "x"], ["Power", "x", 2]]   (without the wrapper: 8/25)
+
+["HoldValues", ["Add", ["Power", "x", 2], "a"], ["List", "a"]]
+// ➔ ["Add", 25, "a"]   (x resolves, a shielded)
+```
+
+Because the `Simplify` operator evaluates its argument before applying its
+rules, `HoldValues` is how you keep an assigned symbol symbolic through a
+`Simplify` on the operator surface — e.g. `["HoldValues", ["Simplify", ["Abs", "w"]]]`
+with `w := 5` is `|w|`, not `5`.
+
+**Granular alternative.** To shield a single symbol with a specific type rather
+than blanket-shielding, compose `Block` and `Declare`: declaring the symbol
+afresh in a local scope shadows the outer value for the block's duration.
+
+```json example
+// With w := 5
+["Block", ["Declare", "w", "'real'"], ["Simplify", ["Abs", "w"]]]
+// ➔ ["Abs", "w"]
+```
+
+</FunctionDefinition>
+
 
 ## Structural Operations
 

@@ -55,6 +55,29 @@ The limit is taken as $$ h $$ approaches $$ 0 $$ because the derivative is the i
 - **Wolfram Mathworld**: [Derivative](https://mathworld.wolfram.com/Derivative.html)
 - **NIST**: [Derivative](https://dlmf.nist.gov/2.1#E1)
 
+:::info[The differentiation, integration and limit variable stays symbolic]
+The variable a `D`, `Integrate` or `Limit` binds is a **bound variable**: only
+its declared type and any in-scope assumptions apply — an assigned value does
+**not**, and the variable remains symbolic in the result. So even after
+`x := 5`:
+
+```json example
+["D", ["Power", "x", 2], "x"]
+// ➔ ["Multiply", 2, "x"]        (not 10)
+
+["Integrate", ["Power", "x", 2], "x"]
+// ➔ x³/3                        (not 125/3)
+
+["Limit", ["Power", "x", 2], "x", 0]
+// ➔ 0                           (not 25)
+```
+
+Any *other* symbol in the expression is free and resolves normally: with
+`a := 3` as well, `["D", ["Multiply", "a", ["Power", "x", 2]], "x"]` is `6x`.
+To evaluate the result at the variable's value, evaluate it again or substitute
+explicitly.
+:::
+
 <b>Lagrange Notation (Prime Notation)</b>
 
 When the prime notation is followed by arguments, the differentiation variable

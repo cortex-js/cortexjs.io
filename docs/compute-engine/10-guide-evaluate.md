@@ -154,22 +154,29 @@ document.getElementById('evaluate-button').addEventListener('click', async () =>
 
 
 
-**To set a time limit for an operation**, use the `ce.timeLimit` option, which
-is a number of milliseconds.
+**To set a time limit for an operation**, wrap it in a span with
+`ce.withTimeLimit(limit, fn)`. The `limit` is either a number of milliseconds
+or an object `{ ms, label }`; everything evaluated inside the callback shares
+one deadline.
 
 ```js
-ce.timeLimit = 1000;
 try {
   const fact = ce.parse('(70!)!');
-  console.log(fact.evaluate());
+  const result = ce.withTimeLimit({ ms: 1000, label: 'my-app:eval' }, () =>
+    fact.evaluate()
+  );
+  console.log(result);
 } catch (e) {
   console.error(e);
 }
 ```
 
-The time limit applies to both the synchronous or asynchronous evaluation.
-
-The default time limit is 2,000ms (2 seconds).
+Spans nest by taking the tighter deadline, and a `CancellationError` reports
+which span's budget expired through its `attribution` and `spans` fields. See
+the [Execution Constraints](/compute-engine/guides/execution-constraints/)
+guide for the full model, including the iteration and recursion budgets.
+(The former `ce.timeLimit` property has been removed — spans are the only
+way to arm a deadline.)
 
 When an operation is canceled either because of a timeout or an abort, a
 `CancellationError` is thrown. The class can be imported from the package
@@ -252,6 +259,30 @@ Name binding is done during canonicalization. If name binding failed, the
 
 <ReadMore path="/compute-engine/guides/expressions/#errors" > Read more about the
 <strong>errors</strong> <Icon name="chevron-right-bold" /></ReadMore>
+
+### Bound Variables and Assigned Values
+
+Some operators **bind** a variable of their own: `D`, `Integrate`, `Limit`,
+`Sum`, `Product`, `Solve`, and `Function` (its parameters), among others. The
+variable such an operator binds is a **pure symbol** — only its declared type
+and any in-scope assumptions apply. A **value** assigned to a same-named symbol
+does **not** apply to it, and the variable stays symbolic in the result.
+
+```js
+ce.assign('x', 5);
+ce.parse('\\frac{d}{dx} x^2').evaluate().print();
+// ➔ 2x        (not 10 — the bound "x" ignores its assigned value)
+
+ce.parse('\\int x^2 \\,dx').evaluate().print();
+// ➔ x^3/3     (not 125/3)
+```
+
+Every **other** symbol in the expression is **free**: its value always applies
+under evaluation. So with `a := 3` as well, `\frac{d}{dx}(a\,x^2)` is `6x` —
+the free `a` resolves, the bound `x` does not.
+
+To use an assumption instead of a value (which *does* inform simplification and
+solving), use `ce.assume()` rather than `ce.assign()`.
 
 ### Default Scopes
 
