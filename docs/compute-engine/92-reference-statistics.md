@@ -464,15 +464,42 @@ A sliding window is a moving subset of the data of a specified window size.
 
 
 <nav className="hidden">
-### Sample
+### RandomSample
 </nav>
-<FunctionDefinition name="Sample">
+<FunctionDefinition name="RandomSample">
 
-<Signature name="Sample">_collection_, _size:number_</Signature>
+<Signature name="RandomSample">_xs_: indexed_collection, _k_: number</Signature>
 
-Evaluate to a **random sample** of a specified size from a _collection_ of numbers.
+Evaluate to a **random sample** of `k` elements drawn from the indexed
+collection _xs_, **without replacement**.
 
-Sampling is done without replacement unless otherwise specified.
+"Without replacement" is over **positions**, not values: each position of _xs_
+is drawn at most once, but a multiset still yields repeated values.
+`["RandomSample", ["List", 1, 1, 2], 2]` returns `[1, 1]` in about a quarter of
+trials — it does not return distinct *values*.
+
+```json example
+["RandomSample", ["List", 5, 2, 10, 18], 2]
+// ➔ ["List", 10, 5]  (for example)
+
+["WithRandomSeed", 42, ["RandomSample", ["Range", 1, 100], 3]]
+// ➔ the same three elements on every evaluation
+```
+
+`k` may not exceed the number of elements of _xs_ (an `out-of-range` error);
+`k` equal to that number returns a permutation. `k` is rounded on evaluation, so
+a computed count needs no rounding by the caller.
+
+_xs_ must be an **indexed** collection: an `Interval` or a `Set` is an invalid
+domain. Use [`RandomChoice`](/compute-engine/reference/arithmetic/#randomchoice)
+for drawing **with** replacement, or from a non-indexed domain.
+
+The collection is never materialized — a sparse Fisher-Yates over the index
+space draws exactly `k` elements, so `["RandomSample", ["Range", 1, 1000000], 3]`
+is cheap.
+
+`Sample` was renamed to `RandomSample` and no longer takes a seed argument; the
+old name throws an `operator-removed` error for one release.
 
 </FunctionDefinition>
 

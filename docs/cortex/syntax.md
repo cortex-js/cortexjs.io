@@ -70,7 +70,10 @@ U+FF41-U+FF46
 _binary-digit_ → U+0030 | U+0031 | U+FF10 | U+FF11
 
 _numerical-constant_ → **`NaN`** | **`Infinity`** | **`+Infinity`** |
-**`-Infinity`**
+**`-Infinity`** | **`oo`** | **`+oo`** | **`-oo`**
+
+(`oo` is an input alias for `Infinity`; the serializer always emits the
+canonical `Infinity` spelling.)
 
 _base-10-exponent_ → (**`e`** | **`E`**) \[_sign_\](_digit_)+
 
@@ -165,7 +168,12 @@ _argument_ → \[**`...`**\] _expression_
 
 _index-clause_ → **`[`** (_expression_)#**`,`** **`]`**
 
-_postfix-expression_ → _primary_ (_call-clause_ | _index-clause_ | **`!`**)\*
+_field-clause_ → **`.`** _symbol_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `.` must abut the base; not after a number
+literal
+
+_postfix-expression_ → _primary_ (_call-clause_ | _index-clause_ |
+_field-clause_ | **`!`**)\*
 
 _expression_ → _primary_ | _prefix-expression_ | _infix-expression_ |
 _postfix-expression_
@@ -190,12 +198,16 @@ _function-definition_ → _symbol_ _parameters_
 \[**`->`** _type_\] **`=`** _expression_ |
 **`function`** _symbol_ _parameters_ \[**`->`** _type_\] _block_
 
+_type-declaration_ → **`type`** \[**`alias`**\] _symbol_
+\[**`<`** (_symbol_)#**`,`** **`>`**\] **`=`** _type_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` slot is reserved and rejected
+
 _while-statement_ → **`while`** _expression_ _block_
 
 _for-statement_ → **`for`** _symbol_ **`in`** _expression_ _block_
 
-_statement_ → _declaration_ | _function-definition_ | _while-statement_ |
-_for-statement_ | _expression_
+_statement_ → _declaration_ | _type-declaration_ | _function-definition_ |
+_while-statement_ | _for-statement_ | _expression_
 
 _statement-separator_ → **`;`** | _linebreak_
 
@@ -270,8 +282,9 @@ call/index applies to. The primary forms are:
   [LaTeX Islands](/cortex/literals/#latex-islands)
 - a function call: `f(x, y)`
 - an index expression: `xs[i]`
+- a field access: `p.x`
 
-## Calls and indexing
+## Calls, indexing and field access
 
 A call is a symbol (or another primary) immediately followed — with **no**
 whitespace — by a parenthesized, comma-separated argument list:
@@ -307,10 +320,25 @@ xs[i]       // ["At", "xs", "i"]
 f(x)[0]     // ["At", ["f", "x"], 0]
 ```
 
-In both cases the `(` or `[` must directly abut the callee/indexed
-expression: whitespace before it means the parenthesized/bracketed form is a
-separate primary (a parenthesized expression or a list literal), not a
-call/index — the same whitespace-sensitivity that governs operators.
+Field access is a primary immediately followed — with no whitespace — by a
+`.` and a symbol, and lowers to `Field`. Chains associate left, and a call
+on a field value lowers through `Apply` like any non-symbol callee:
+
+```cortex
+p.x         // ["Field", "p", "x"]
+a.b.c       // ["Field", ["Field", "a", "b"], "c"]
+p.x(2)      // ["Apply", ["Field", "p", "x"], 2]
+```
+
+A number literal never takes a field: the lexer folds a trailing dot into
+the number, so `2.x` is the multiplication `2. * x`, and `1..5` stays a
+range. See [Types](/cortex/types/#values-of-a-new-type-are-opaque) for what
+`p.x` means on values of declared types, records and dictionaries.
+
+In all three cases the `(`, `[` or `.` must directly abut the
+callee/indexed expression: whitespace before it means the form is a
+separate primary (or, for `.`, a diagnosed stray token), not a
+call/index/field — the same whitespace-sensitivity that governs operators.
 
 ## Collections, tuples, and dictionaries
 

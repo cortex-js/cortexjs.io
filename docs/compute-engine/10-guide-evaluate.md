@@ -196,6 +196,36 @@ integration (`NIntegrate`) returns the estimate computed from the samples
 taken so far, with a correspondingly larger error bound.
 
 
+## Errors
+
+An [`["Error"]`](/compute-engine/reference/core/#Error) is a **value**, and it
+propagates along the ordinary value path. If an operand that a function
+evaluates strictly turns out to be an error, the whole expression evaluates to
+that error — not to a frozen expression wrapped around it. The propagated
+error carries an `["ErrorTrace"]` breadcrumb recording the operators it passed
+through, so the failure site is still recoverable.
+
+```ts
+console.log(ce.parse('\\ln(\\text{a}) + 2').evaluate().json);
+// ➔ ["Error",
+//      ["ErrorCode", "'incompatible-type'", "'number'", "'string'"],
+//      ["ErrorTrace", ["ErrorFrame", "'Ln'", 1], ["ErrorFrame", "'Add'", 1]]]
+```
+
+A **collection** is the exception: an error among its elements stays in place,
+because a collection containing an error is still a well-formed collection.
+
+Errors do not spread past the tools that inspect them. `Type` reports
+`"error"`, [`IsError`](/compute-engine/reference/core/#IsError) answers
+`True`/`False`, and
+[`Match`](/compute-engine/reference/control-structures/#Match) decides on an
+error subject — an `["Error", ...]` case destructures it, which is how a
+failure is rescued.
+
+`NaN` is **not** an error. It is an ordinary IEEE numeric value that inhabits
+the number domain, so it does not propagate this way: a function applied to
+`NaN` runs and receives it, and is free to inspect it.
+
 
 ## Lexical Scopes and Evaluation Contexts
 

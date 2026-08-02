@@ -102,6 +102,82 @@ console.info(ce.parse('\\operatorname{double}(3)').json);
 // ➔ ["double", 3]
 ```
 
+## When Is the Value Captured?
+
+An assignment evaluates its right-hand side **eagerly**, when the assignment
+itself is evaluated. Any symbol that has a value at that moment is replaced by
+its value, permanently:
+
+```js
+ce.parse("p := 1").evaluate();
+ce.parse("a := p + 5").evaluate(); // a is 6: the value of p was captured
+ce.parse("p := 2").evaluate();     // changing p has no effect on a
+console.log(ce.parse("a").evaluate());
+// ➔ 6
+```
+
+A symbol that has **no value** at that moment is an unknown: it remains in the
+stored value as a symbol. The value of `a` below is the expression $p + 5$,
+and evaluating `a` evaluates that expression — so `p` resolves to whatever its
+value is **at evaluation time**:
+
+```js
+ce.parse("a := p + 5").evaluate(); // p is unknown: a is the expression p + 5
+ce.parse("p := 2").evaluate();
+console.log(ce.parse("a").evaluate());
+// ➔ 7
+```
+
+The stored value itself never changes; what changes is the result of
+evaluating it. This is the usual convention in computer algebra systems (it
+matches `Set`, i.e. `=`, in Mathematica): defining a symbol in terms of an
+unknown means the symbol's value _is_ that symbolic expression. There is no
+way to "snapshot" an unknown other than as the symbol itself.
+
+**Assigning a symbol to another symbol captures its current value — it does
+not create an alias.**
+
+```js
+ce.parse("a := p + 5").evaluate();
+ce.parse("b := a").evaluate();   // b is the expression p + 5, not a reference to a
+ce.parse("p := 1").evaluate();
+ce.parse("a := 100").evaluate(); // no effect on b
+console.log(ce.parse("b").evaluate());
+// ➔ 6
+```
+
+**Self-referential and mutually referential values are allowed.** Because
+assignment is eager, a cycle can end up baked into a stored value: evaluating
+the right-hand side of `q := p + 1` when `p` is already `q + 1` stores the
+self-referential expression $q + 2$ as the value of `q`. Evaluating a symbol
+whose value refers back to itself — directly or through other symbols —
+returns the stored expression rather than recursing:
+
+```js
+ce.parse("s := s + 1").evaluate();
+console.log(ce.parse("s").evaluate());
+// ➔ s + 1
+```
+
+**To store an expression as inert data**, without capturing or resolving
+anything, wrap it in `Hold`: the value of the symbol is then the held
+expression itself, which stays unchanged under evaluation.
+
+```js
+ce.assign("a", ce.box(["Hold", ["Add", "p", 5]]));
+ce.parse("p := 2").evaluate();
+console.log(ce.parse("a").evaluate());
+// ➔ Hold(p + 5)
+```
+
+**To resolve a held expression**, apply `ReleaseHold`, which removes one
+layer of `Hold` and evaluates the result:
+
+```js
+console.log(ce.box(["ReleaseHold", "a"]).evaluate());
+// ➔ 7
+```
+
 ## Explicit Declarations
 
 **To have more control over the definition of a symbol** use
@@ -116,7 +192,7 @@ ce.declare("m",  "integer");
 
 // Declaring a function "f"
 ce.declare("f", {
-  signature: "number -> number",
+  signature: "(number) -> number",
   evaluate: ce.parse("x \\mapsto 2x"),
 });
 ```
@@ -223,7 +299,7 @@ function.
 
 ```js
 ce.declare("double", {
-  signature: "number -> number",
+  signature: "(number) -> number",
   description: "Multiply a number by two",
   keywords: ["twice", "doubling"],
   evaluate: ([x]) => x.mul(2),
@@ -248,6 +324,227 @@ definition.
 
 See `FunctionDefinition` for more details on the other handlers and
 properties that can be provided when defining a function.
+
+### Declaring the Effects of a Function
+
+If your function does something besides returning a value — draws a random
+number, writes a symbol, calls the network, prints — say so. The Compute Engine
+uses that information to decide what it may cache, share or re-evaluate, and a
+function that quietly lies about it will produce stale results.
+
+**To declare effects**, use the `effects` property, an array of labels (or the
+string `'any'` for "unknown effects"):
+
+```js
+ce.assign("lastId", 0);
+
+ce.declare("nextId", {
+  signature: "() -> integer",
+  effects: ["scope"],
+  evaluate: (_ops, { engine }) => {
+    const n = engine.box("lastId").evaluate().re + 1;
+    engine.assign("lastId", n);
+    return engine.number(n);
+  },
+});
+
+ce.lookupDefinition("nextId").operator.signature.toString();
+// ➔ "() scope -> integer"
+
+ce.box(["nextId"]).evaluate();  // ➔ 1
+ce.box(["nextId"]).evaluate();  // ➔ 2
+```
+
+Equivalently, write the effects directly in the signature string, in the slot
+between the argument list and the arrow:
+
+```js
+ce.declare("now", {
+  signature: "() time -> number",
+  evaluate: (_ops, { engine }) => engine.number(Date.now()),
+});
+
+ce.box(["now"]).isPure;
+// ➔ false
+```
+
+The nine labels and the `any` and `pure` keywords are described in
+[Effect Specifiers](/compute-engine/guides/types/#effect-specifiers).
+
+The older `pure` and `drawsRandom` flags are still accepted as shorthand —
+`drawsRandom: true` is `effects: ["random"]`, and a bare `pure: false` means
+`effects: 'any'` — and both are now *derived* from the effect set rather than
+stored separately. Declarations that contradict themselves are rejected at
+registration rather than resolved silently:
+
+```js
+ce.declare("bad", { signature: "(number) -> number", pure: true, drawsRandom: true });
+// ➔ throws: the 'pure' and 'drawsRandom' flags are contradictory
+
+ce.declare("bad", { signature: "(number) random -> number", pure: true });
+// ➔ throws: the declared effects and the 'pure'/'drawsRandom' flags disagree
+```
+
+For a function defined by a body rather than a JavaScript handler, effects are
+**inferred** from the body unless you state them. Stating them makes them a
+contract: every body later assigned to that symbol must stay within the
+declared set, or the assignment fails with an `incompatible-type` error. See
+[Inferred and Declared Effects](/compute-engine/guides/types/#inferred-and-declared-effects).
+
+**To require an effect-free argument**, give the parameter a function signature
+with a bare arrow — `signature: "((any) -> number, real, real) -> real"` says
+"the first argument must be a pure callback", and it is checked when the
+operator is applied.
+
+Alternatively, an `evaluate` handler can inspect its operands at run time and
+decline. Which property to read depends on what the handler will do with the
+operand — the difference between *invoking* a value and *evaluating* an
+expression:
+
+- **A callback the handler will invoke**: read `op.type.effects`, the latent
+  set on the operand's arrow. It resolves through symbol bindings, so a symbol
+  bound to a drawing function reports `["random"]`. The value is `undefined`
+  (no effects), `[]` (declared pure), `'any'` (unknown), or the labels.
+
+```js
+ce.declare("sampleWith", {
+  signature: "(function, integer) -> number",
+  evaluate: ([f, n], { engine }) => {
+    const latent = f.type.effects;
+    if (latent === "any" || (latent !== undefined && latent.length > 0))
+      return engine.error([
+        "incompatible-type",
+        "a pure callback",
+        `a callback with ${latent === "any" ? "unknown" : latent} effects`,
+      ]);
+    let sum = 0;
+    for (let i = 1; i <= n.re; i++)
+      sum += engine.function("Apply", [f, i]).N().re;
+    return engine.number(sum);
+  },
+});
+
+ce.box(["sampleWith", ["Function", ["Multiply", "x", 2], "x"], 3]).evaluate();
+// ➔ 12
+
+ce.box(["sampleWith", ["Function", ["Random"], "x"], 3]).evaluate();
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'a pure callback'",
+//                 "'a callback with random effects'"]]
+```
+
+- **A held expression the handler will evaluate**: read `expr.effects`, the
+  effects of evaluating it. (`expr.isPure` is the boolean summary of the same
+  answer; `effects` says *which*, so the error message can name them.)
+
+```js
+ce.declare("assertPure", {
+  signature: "(any) -> any",
+  lazy: true,
+  evaluate: ([body], { engine }) => {
+    const effects = body.canonical.effects;
+    if (effects === undefined) return body.canonical.evaluate();
+    return engine.error([
+      "incompatible-type",
+      "a pure operand",
+      `an operand with ${effects === "any" ? "unknown" : effects} effects`,
+    ]);
+  },
+});
+
+ce.box(["assertPure", ["Add", 1, 2]]).evaluate();
+// ➔ 3
+
+ce.box(["assertPure", ["Assign", "q", 1]]).evaluate();
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'a pure operand'",
+//                 "'an operand with scope effects'"]]
+```
+
+### Declaring an Operator that Binds a Variable
+
+Some operators own a **bound variable**: the `k` of a summation, the `x` of a
+derivative or an integral. A bound variable is not an ordinary argument — it
+must be a *new* variable belonging to the operator, shadowing any same-named
+symbol outside it, and it must stay symbolic even if a symbol of the same name
+has a value.
+
+**To declare a binder**, give the `scoped` property a **binding-site
+selector** instead of `true`. The selector tells the engine which operands are
+binding sites; the engine then declares those variables in the operator's own
+scope before your operands are canonicalized, and makes every occurrence in
+the other operands refer to that binding — consistently across the LaTeX,
+MathJSON, and `ce.function()` routes.
+
+The prebuilt selectors cover the common shapes:
+
+- `operandSites(...indices)` — the operands at these positions are bare
+  bound-variable symbols (like `Series`' expansion variable).
+- `operandsFrom(first)` — every operand from position `first` on is a bound
+  variable (like `D`'s variadic differentiation variables).
+- `indexingSetSites(first)` — the first element of each `Element`- or
+  `Limits`-shaped operand from position `first` on is a bound variable (like
+  `Sum`, `Product`, or a comprehension: `["Element", "k", collection]`).
+- `limitsIndexSites(op)` — the index inside the single `Limits` operand at
+  position `op`.
+
+For example, an operator that computes the maximum of an expression over an
+indexing set:
+
+```js
+import { ComputeEngine, indexingSetSites } from "@cortex-js/compute-engine";
+
+const ce = new ComputeEngine();
+
+ce.declare("MaxOver", {
+  lazy: true,
+  scoped: indexingSetSites(1),
+  signature: "(expression, expression) -> number",
+  evaluate: (ops, { engine }) => {
+    // A lazy operator receives its operands unevaluated: canonicalize
+    // the ones you consume.
+    const body = ops[0].canonical;
+    const elem = ops[1].canonical; // Element(k, collection)
+    const k = elem.op1.symbol;
+    const coll = elem.op2.evaluate();
+    let best;
+    for (const v of coll.each()) {
+      const val = body.subs({ [k]: v }).evaluate().re;
+      if (best === undefined || val > best) best = val;
+    }
+    return best === undefined ? undefined : engine.number(best);
+  },
+});
+```
+
+The engine guarantees the binding behavior without further work in the
+handler. Even with a same-named global that has a value, the bound variable is
+the operator's own:
+
+```js
+ce.parse("k := 100").evaluate();
+
+const e = ce.box([
+  "MaxOver",
+  ["Subtract", ["Multiply", "k", 6], ["Power", "k", 2]],
+  ["Element", "k", ["List", 1, 2, 3, 4, 5]],
+]);
+console.log(e.evaluate());
+// ➔ 9        (max of 6k - k² over {1…5}, at k = 3 — not affected by k := 100)
+console.log(ce.parse("k").evaluate());
+// ➔ 100      (the global k is untouched)
+```
+
+A few notes:
+
+- `scoped: true` (without a selector) still means "this operator has a scope,
+  but no syntactic bound variables" — appropriate for `Block`-like operators
+  whose scope holds declarations.
+- With multiple indexing clauses, **later clauses see earlier bindings**: a
+  collection expression in clause 2 may reference the index of clause 1, and a
+  collection in clause 1 that mentions the *name* of clause 2's index refers
+  to the enclosing scope, not the later clause.
+- A parameter or index named after a library constant (`Pi`, `e`, `i`) is
+  bound like any other variable inside the operator; the constant is
+  unaffected outside it.
 
 **To define a function without specifying a body for it**, specify
 the signature of the function as the second argument of `ce.declare()` or
@@ -686,6 +983,56 @@ In general, re-declaring a function in the same scope is not allowed and
 will throw an error. However, the standard functions are in a `system` scope
 so a new declaration in the `global` scope or a child scope will
 override the original declaration.
+
+
+## Multi-Clause Function Definitions
+
+**To define a function by cases** — separate definitions for particular
+argument values, plus a general fallback — use the `DefineFunction`
+operator. Unlike `Assign`, which replaces a binding wholesale,
+`DefineFunction` **accumulates**: each statement adds a *clause*, and a
+call dispatches to the most specific clause admitting its arguments
+(declaration order only breaks ties between equally specific clauses).
+
+```js
+ce.box(['DefineFunction', 'fib',
+  ['Function', 0, ['Typed', 'z', { str: '0' }]]]).evaluate();
+ce.box(['DefineFunction', 'fib',
+  ['Function', 1, ['Typed', 'o', { str: '1' }]]]).evaluate();
+ce.box(['DefineFunction', 'fib',
+  ['Function',
+    ['Add', ['fib', ['Subtract', 'n', 1]], ['fib', ['Subtract', 'n', 2]]],
+    ['Typed', 'n', { str: 'integer' }]]]).evaluate();
+
+console.log(ce.box(['fib', 10]).evaluate().toString());
+// ➔ 55
+```
+
+A parameter constrained to a single value (`{ str: '0' }` above) uses a
+**value type**: the clause admits exactly that value. In Cortex, literal
+parameters provide the same thing directly: `fib(0) = 0`.
+
+The clause rules:
+
+- A new clause with the **same parameter types** replaces the earlier
+  clause in place (so re-running an edited definition behaves as
+  expected); any other parameter list appends a clause.
+- A plain assignment (`Assign`, `ce.assign()`) still **replaces the whole
+  binding**, clauses and all.
+- If a symbolic argument leaves dispatch undecided — a more specific
+  clause *might* apply once the value is known — the call stays inert
+  (symbolic) rather than committing to a fallback.
+- If the evaluated arguments match **no** clause, the call is a
+  `no-matching-clause` error value.
+- Effects must be uniform across clauses: there is one effect row per
+  function. An explicit specifier on one clause establishes the row;
+  another clause's explicit specifier must agree, or the definition is
+  rejected with `incompatible-clause-effects`.
+
+**To inspect the clause set**, use `About`: it lists one line per clause
+in declaration order, and annotates overlapping equal-specificity clauses
+and clauses made unreachable by more specific ones covering their whole
+(finite) domain.
 
 
 ## Defining Multiple Functions and Symbols

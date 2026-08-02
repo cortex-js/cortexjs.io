@@ -240,6 +240,90 @@ Two auxiliary heads may appear inside a pattern:
 // ➔ "small"
 ```
 
+**Range patterns**. A two-operand `["Range", lo, hi]` at the **top level** of a
+case's pattern — or of one of its `["Alternatives"]` — is an **inclusive
+numeric membership test** rather than a structure to match: the case is
+selected if the subject is a real number between _lo_ and _hi_.
+
+```json example
+["Match", 5,
+  ["MatchCase", ["Range", 1, 10], "'in range'"],
+  ["MatchCase", "_", "'out of range'"]
+]
+// ➔ "in range"
+```
+
+Both endpoints are included, and the endpoint comparisons use the engine's
+tolerance. The bounds must be numeric literals; `Infinity` and `-Infinity`
+are allowed, so `["Range", 0, {"num": "+Infinity"}]` means "any non-negative
+number". A `Range` that is not a well-formed range pattern — a symbolic bound,
+or a third _step_ operand — is not a membership test and keeps its ordinary
+structural meaning. (In Cortex, those spellings are reported as parse
+diagnostics instead.)
+
+A subject that is not a number falls through: a symbol (including a constant
+such as `"Pi"`, which is not a *literal*), an operator expression, a string, a
+collection, a complex number, and `NaN` all fail a range case.
+
+```json example
+["Match", "Pi",
+  ["MatchCase", ["Range", 1, 10], "'in range'"],
+  ["MatchCase", "_", "'not a number literal'"]
+]
+// ➔ "not a number literal"
+```
+
+The consequence is that a literal `Range` **value** can no longer be matched
+*structurally* at the top level of a pattern. To compare a subject against a
+`Range` value, use a pin — `["Pin", ["Range", 1, 10]]`, which compares values
+and is not re-read as a membership test. A `Range` nested inside a `List`,
+`Tuple` or `Dictionary` pattern also keeps its ordinary structural meaning.
+
+In Cortex, a range pattern is written `lo..hi`:
+`match n { 0..9 => "digit"; _ => "more" }`.
+
+**Error subjects**. `["Match"]` also decides when the subject is an
+[error](/compute-engine/reference/core/#Error) — it is the construct for
+rescuing a failed computation. Matching stays total, but an error is never
+handed to a pattern that would pretend the failure has a shape: literal,
+range, pin, and structural cases all fail against an error subject, and it
+falls through to `"_"` or to a capture.
+
+```json example
+["Match", ["Ln", "'a'"],
+  ["MatchCase", 0, "'zero'"],
+  ["MatchCase", ["List", "_a"], "'a list'"],
+  ["MatchCase", "_", "'rescued'"]
+]
+// ➔ "rescued"
+```
+
+An explicit `["Error", ...]` pattern is the exception: it destructures the
+error, binding its payload. This is the idiomatic rescue:
+
+```json example
+["Match", ["Ln", "'a'"],
+  ["MatchCase", ["Error", "_code"], "code"],
+  ["MatchCase", "_", "'no error'"]
+]
+// ➔ ["ErrorCode", "'incompatible-type'", "'number'", "'string'"]
+```
+
+A guard can inspect the subject with
+[`IsError`](/compute-engine/reference/core/#IsError) or
+[`Type`](/compute-engine/reference/core/#Type):
+
+```json example
+["Match", ["Ln", "'a'"],
+  ["MatchCase", "_v", ["IsError", "v"], "'failed'"],
+  ["MatchCase", "_", "'ok'"]
+]
+// ➔ "failed"
+```
+
+The `["ErrorTrace"]` breadcrumb a bubbled error carries is stripped before
+matching, so a pattern only ever sees the error's code and context.
+
 If no case matches, the value of the expression is
 `["Error", "'match-no-case'", subject]` — an ordinary error value.
 

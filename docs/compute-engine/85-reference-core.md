@@ -94,6 +94,86 @@ since it changes the state of the Compute Engine.
 </FunctionDefinition>
 
 <nav className="hidden">
+### DeclareType
+</nav>
+<FunctionDefinition name="DeclareType">
+
+<Signature name="DeclareType">_name_, _type_</Signature>
+
+<Signature name="DeclareType">_name_, _type_, _attributes_</Signature>
+
+Declare a new type in the current scope — the MathJSON mirror of the
+`ce.declareType()` API. The _name_ is a symbol (or string) naming the type;
+the _type_ operand is a string holding a type expression.
+
+By default the declared type is **nominal**: only a value whose type is the
+named type itself is compatible. An optional trailing _attributes_ dictionary
+with the key `alias` set to `True` declares a **structural alias** instead:
+any value whose type matches the definition is compatible.
+
+```json example
+// A structural alias: any pair of numbers is a "point"
+["DeclareType", "point", "'tuple<number, number>'", ["Dictionary",
+  ["KeyValuePair", "alias", "True"]]]
+```
+
+The declaration also declares a **value constructor** — an operator of the
+same name, in the same scope, which is what makes a nominal type inhabitable:
+
+```json example
+["DeclareType", "point", "'tuple<x: number, y: number>'"]
+
+["point", 1, 2]
+// ➔ ["point", 1, 2], of type "point"
+```
+
+The constructor's signature comes from the definition: a `tuple` definition
+gives one argument per element (named, if the elements are named), and any
+other definition gives a single argument. A **`record`** definition is the
+exception: it declares no constructor, since building a record from
+positional arguments would depend on the order its fields happen to be
+written in. Arguments are validated against that signature, so a wrong arity
+or an argument of the wrong type produces the usual error value.
+
+A **nominal** constructor is inert: the application is the value, and its
+type is the declared type. An **alias** constructor is a checked identity
+instead — `["pair", 1, 2]` validates `(1, 2)` against the definition and
+evaluates to that plain tuple.
+
+Because the declaration claims both the type name and the value name, it is
+**atomic**: if the current scope already has a value or operator of that
+name, nothing is registered and an error value is returned. (A name in an
+outer scope is shadowed, not conflicted.) The host API's `mint` option has no
+`attributes` equivalent: a declaration through this operator always declares
+a constructor.
+
+Evaluates to `Nothing`. The declaration takes effect at canonicalization time,
+so later statements of the same `["Block"]` can use the type in their own
+annotations. A `DeclareType` for a name that an earlier `DeclareType`
+statement declared **replaces** that definition — constructor included — so
+re-running a program on the same engine works; a name declared any other way
+(e.g. via `ce.declareType()`) reports an error value instead.
+
+In Cortex, the `type` statement lowers to this operator. The bare form
+declares a **nominal** type (no attributes); the `type alias` form declares a
+**structural alias** (the `alias -> True` attributes dictionary):
+
+```js
+type point = tuple<x: number, y: number>  // nominal
+type alias pair = tuple<number, number>   // structural alias
+let p = point(1, 2)
+let a: pair = (1, 2)
+```
+
+`DeclareType` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
+since it changes the state of the Compute Engine.
+
+<ReadMore path="/compute-engine/guides/types/#defining-new-types" >Read more
+about defining new types. </ReadMore>
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### Assign
 </nav>
 <FunctionDefinition name="Assign">
@@ -101,6 +181,14 @@ since it changes the state of the Compute Engine.
 <Signature name="Assign">_symbol_, _value_</Signature>
 
 Set the value of `symbol` to `value`.
+
+The _value_ operand is evaluated **eagerly**, when the assignment is
+evaluated: any symbol that has a value at that moment is substituted
+permanently. A symbol with no value (an unknown) remains symbolic in the
+stored value, and resolves to its current value whenever `symbol` is
+evaluated. See
+[When Is the Value Captured?](/compute-engine/guides/augmenting/#when-is-the-value-captured)
+for details.
 
 If `symbol` has not been declared in the current scope, consider parent
 scopes until a definition for the symbol is found.
@@ -140,9 +228,44 @@ The predicate can take the form of:
 - an inequality: `["Assume", ["Greater", "x", 0]]`
 - a membership expression: `["Assume", ["Element", "x", "Integers"]]`
 
+`Assume` evaluates to a **string** reporting the outcome:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"20ch"}}>
+
+| Outcome              | Meaning                                                     |
+| :------------------- | :---------------------------------------------------------- |
+| `"ok"`               | the assumption was recorded                                  |
+| `"tautology"`        | the assumption is already implied by the existing ones       |
+| `"contradiction"`    | the assumption conflicts with the existing ones              |
+| `"not-a-predicate"`  | the argument is not a proposition that can be assumed        |
+| `"internal-error"`   | the assumption could not be processed                        |
+
+</div>
+
+```json example
+["Assume", ["Greater", "x", 0]]
+// ➔ "ok"
+
+["Assume", ["Greater", 1, 0]]
+// ➔ "tautology"
+
+["Assume", ["Less", 1, 0]]
+// ➔ "contradiction"
+```
+
+Every outcome is reported as a value: an argument that is not a predicate does
+not raise an error.
+
+```json example
+["Assume", 42]
+// ➔ "not-a-predicate"
+```
+
 `Assume` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
 since it changes the state of the Compute Engine.
 
+The `ce.assume()` method returns the same outcomes as a JavaScript string. See
+[Assumptions](/compute-engine/guides/assumptions/) for details.
 
 </FunctionDefinition>
 
@@ -335,6 +458,71 @@ of commutative functions, use [`CanonicalForm`](#CanonicalForm).
 
 See [Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions) for other options to compare two expressions, such 
 as the `Equal` function.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Same
+</nav>
+<FunctionDefinition name="Same">
+
+<Signature name="Same" returns="boolean">_expression1_, _expression2_, ...</Signature>
+
+Evaluate to `True` if every adjacent pair of operands is **structurally
+identical**, otherwise `False`. This is the `===` operator in Cortex.
+
+`Same` is **total**: it always decides. It evaluates its operands first, then
+compares the resulting values structurally — with no tolerance, and without
+numerically approximating an exact value.
+
+```json example
+["Same", ["Sqrt", 2], 1.4142135623730951]
+// ➔ "False"
+
+["Equal", ["Sqrt", 2], 1.4142135623730951]
+// ➔ "True"
+```
+
+`Equal` is the semantic, tolerant comparison: it may stay unevaluated when the
+answer is not known, since `x = y` is a *condition*. `Same` answers regardless:
+
+```json example
+["Same", "x", "y"]
+// ➔ "False"
+
+["Equal", "x", "y"]
+// ➔ ["Equal", "x", "y"]  (unevaluated)
+```
+
+Number leaves compare by **exact value**, not by notation:
+
+```json example
+["Same", 0.5, ["Divide", 1, 2]]
+// ➔ "True"
+```
+
+Totality also means `Same` has no IEEE exemption for `NaN`, where `Equal`
+does:
+
+```json example
+["Same", "NaN", "NaN"]
+// ➔ "True"
+
+["Equal", "NaN", "NaN"]
+// ➔ "False"
+```
+
+`Same` is not broadcast over collections: a list operand is compared as a
+whole, so `["Same", ["List", 1, 2], ["List", 1, 2]]` is the scalar `True`, not
+a list of booleans.
+
+With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
+`True` — matching the Cortex spelling `a === b === c`.
+
+**`Same` vs `IsSame`.** [`IsSame`](#IsSame) holds its operands and compares
+them as written, while `Same` compares the values they evaluate to. So
+`["IsSame", ["Add", 1, 1], 2]` is `False` but `["Same", ["Add", 1, 1], 2]` is
+`True`.
 
 </FunctionDefinition>
 
@@ -748,6 +936,96 @@ expression.
 
 The _context_ is an optional expression that provides additional information
 about the error.
+
+An error is an ordinary **value**. When a strict operand of an expression
+evaluates to an error, the whole expression evaluates to that error rather than
+to a frozen tree. See [Errors](/compute-engine/guides/evaluate/#errors) for the
+propagation rules.
+
+#### The `ErrorTrace` Breadcrumb
+
+An error that propagated out of the expression where it was raised carries a
+breadcrumb recording the operators it passed through. The breadcrumb is an
+`["ErrorTrace"]` expression, and it is always the **last** operand of the
+`["Error"]`:
+
+```json example
+["Add", ["Ln", "'a'"], 2]
+// ➔ ["Error",
+//      ["ErrorCode", "'incompatible-type'", "'number'", "'string'"],
+//      ["ErrorTrace", ["ErrorFrame", "'Ln'", 1], ["ErrorFrame", "'Add'", 1]]]
+```
+
+Each frame is an `["ErrorFrame", operator, index]` expression, where _index_ is
+the 1-based position of the operand the error came from. Frames read
+**innermost first** — the failure site comes first, the outermost operator
+last.
+
+An error that never propagated keeps its historical shape unchanged, with no
+`["ErrorTrace"]` operand:
+
+```json example
+["Error", "'oops'"]
+// ➔ ["Error", "'oops'"]
+```
+
+So the breadcrumb is identified **by its head, never by its position**: to read
+it, take the last operand of the `["Error"]` and check that its operator is
+`ErrorTrace`. Code that reads operand 2 as the error _context_ must skip an
+`["ErrorTrace"]` found there — a traced error whose context slot is empty is
+`["Error", code, ["ErrorTrace", ...]]`.
+
+The breadcrumb is data, not display: `toString()` and the LaTeX serializer
+render a traced error exactly like an untraced one.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### IsError
+</nav>
+<FunctionDefinition name="IsError">
+
+<Signature name="IsError" returns="boolean">_expression_</Signature>
+
+Evaluate to `True` if _expression_ evaluates to an error, `False` otherwise.
+
+`IsError` **holds** its operand — a strict position would propagate the error
+away before it could be inspected — and it is total: it always answers.
+
+```json example
+["IsError", ["Ln", "'a'"]]
+// ➔ "True"
+
+["IsError", ["Add", 1, 1]]
+// ➔ "False"
+
+["IsError", "x"]
+// ➔ "False"
+```
+
+An expression that is not itself an error but *embeds* one also reports
+`True`.
+
+There is one exception: an error held inside a **collection value** is not
+reported, because a collection containing an error is still a well-formed
+collection.
+
+```json example
+["IsError", ["List", 1, ["Ln", "'a'"]]]
+// ➔ "False"
+```
+
+`NaN` is not an error — it is an ordinary IEEE numeric value:
+
+```json example
+["IsError", "NaN"]
+// ➔ "False"
+```
+
+To inspect an error rather than merely detect it, use
+[`Type`](#Type) (which returns `"error"`), or destructure it with an
+`["Error", ...]` case in a
+[`Match`](/compute-engine/reference/control-structures/#Match) expression.
 
 </FunctionDefinition>
 

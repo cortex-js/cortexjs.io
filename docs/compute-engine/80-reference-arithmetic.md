@@ -1,7 +1,6 @@
 ---
 title: Arithmetic
 slug: /compute-engine/reference/arithmetic/
-description: "Arithmetic in the Compute Engine: numeric constants such as ExponentialE and GoldenRatio, and functions for sums, products, powers, roots and rounding."
 ---
 
 ## Constants
@@ -455,60 +454,6 @@ If `lower`and `upper`are not provided, they take the default values of -1 and
 
 </FunctionDefinition>
 
-<FunctionDefinition name="Random">
-
-<Signature name="Random"></Signature>
-
-<Signature name="Random">_seed_</Signature>
-
-<Signature name="Random">_n_</Signature>
-
-<Signature name="Random">_m_, _n_</Signature>
-
-`Random` is **not** a pure function: by its nature it evaluates to a different
-value on each evaluation.
-
-- `["Random"]` evaluates to a non-deterministic floating-point number in the
-  interval $[0, 1)$.
-- `["Random", seed]` (with a real `seed`) evaluates to a deterministic
-  floating-point number in $[0, 1)$ derived from the seed.
-- `["Random", n]` (with an integer `n`) evaluates to a non-deterministic integer
-  in the interval $[0, n)$.
-- `["Random", m, n]` evaluates to a non-deterministic integer in the interval
-  $[m, n)$.
-
-```json example
-["Random"]
-// ➔ 0.6233… (for example)
-["Random", 10]
-// ➔ 7 (for example)
-["Random", 5, 10]
-// ➔ 8 (for example)
-```
-
-</FunctionDefinition>
-
-<FunctionDefinition name="RandomInteger">
-
-<Signature name="RandomInteger">_upper_: integer</Signature>
-
-<Signature name="RandomInteger">_lower_: integer, _upper_: integer</Signature>
-
-Return a random integer using inclusive bounds. With one argument the lower
-bound is `0`; with two arguments the result is in $[lower, upper]$.
-`RandomInteger` uses the Compute Engine's seeded random-number generator, so a
-seeded engine produces reproducible results.
-
-```json example
-["RandomInteger", 6]
-// ➔ an integer from 0 through 6
-
-["RandomInteger", 5, 10]
-// ➔ an integer from 5 through 10
-```
-
-</FunctionDefinition>
-
 <FunctionDefinition name="Max">
 
 <Signature name="Max">_x1_, _x2_, ...</Signature>
@@ -669,6 +614,257 @@ check if the fraction is in its canonical form:
 
 
 
+
+### Random Numbers
+
+The random operators take a **domain** to draw from, never a seed. Seeding is
+done by wrapping the work in a `WithRandomSeed` block, which makes every draw
+inside it reproducible.
+
+<div className="symbols-table first-column-header">
+
+| Function           | Result                                     |
+| :----------------- | :----------------------------------------- |
+| `WithRandomSeed`   | evaluate an expression with a seeded block |
+| `Random`           | one draw                                   |
+| `RandomChoice`     | `k` draws, with replacement                |
+| `RandomSample`     | `k` elements, without replacement          |
+| `RandomShuffle`    | a permutation                              |
+
+</div>
+
+**One draw, or `k` draws:**
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"22ch"}}>
+
+|                      | one draw       | `k` draws                 |
+| :------------------- | :------------- | :------------------------ |
+| with replacement     | `Random(xs)`   | `RandomChoice(xs, k)`     |
+| without replacement  | `Random(xs)`   | `RandomSample(xs, k)`     |
+| all of them          | —              | `RandomShuffle(xs)`       |
+
+</div>
+
+`Random(xs)` and `RandomChoice(xs, 1)` have the same distribution: with a single
+draw, "with" and "without" replacement coincide. The wrapper is the only
+difference — `RandomChoice` returns a list.
+
+<FunctionDefinition name="WithRandomSeed">
+
+<Signature name="WithRandomSeed">_seed_: finite\_real | string, _body_: any</Signature>
+
+Evaluate _body_ with a random seed frame installed. Every draw inside the frame
+is deterministic, and the whole block replays identically on re-evaluation,
+while repeated draws **within** the frame still differ.
+
+```json example
+["WithRandomSeed", 42, ["Random"]]
+// ➔ 0.7367300395263549 — the same value on every evaluation
+
+["WithRandomSeed", 42, ["Delimiter", ["Sequence", ["Random"], ["Random"]]]]
+// ➔ (0.7367300395263549, 0.4498528692283148) — two different draws,
+//   and the same pair every time
+```
+
+Outside a frame, draws are **live**: `["Random"]` on its own is
+non-deterministic, which is what an animation or a ticker needs.
+
+Frames nest and the innermost wins. Counters are per frame, so a nested frame
+never disturbs its parent's later draws:
+
+```json example
+["WithRandomSeed", 1,
+  ["Delimiter", ["Sequence",
+    ["Random"],
+    ["WithRandomSeed", 2, ["Random"]],
+    ["Random"]]]]
+// ➔ the first and third draws are the frame-1 stream's 1st and 2nd values;
+//   the inner frame does not shift them
+```
+
+Scoping is **dynamic**: the frame is active through calls to user-defined
+functions, not just lexically inside _body_. The seed is evaluated once on entry
+to the frame, not once per draw, and it may be a string
+(`["WithRandomSeed", "'cell-a7'", …]`).
+
+Seed a **row or cell**, not a whole document: with one document-wide frame,
+inserting a draw near the top shifts every later value below it.
+
+**A frame around a lazy collection does not make it replayable.** Only
+evaluation consumes draw indices, and a lazy view is not evaluated until its
+elements are read — by which time the frame has exited, so the draws escape it.
+The expression *looks* framed and the failure is silent:
+
+```json example
+["WithRandomSeed", 12345,
+  ["Comprehension", ["Random"], ["Element", "k", ["Range", 1, 6]]]]
+// the elements draw LIVE (outside the frame), not the seeded stream:
+//   this instance: [0.9120…, 0.1273…, 0.4710…, …]   ✗ NOT the framed values
+//   re-created (a fresh parse or evaluation): different values again
+```
+
+Reading the elements of the **same instance** twice does give the same values
+— a lazy collection's elements are cached per instance, so one instance is
+one draw set (two readers of the same list agree). But that is read
+coherence, not replay: the values are live draws, and a re-created instance
+draws fresh ones.
+
+Materialize inside the frame, and it replays. `ListFrom` is the general form —
+it works over any finite collection body — and indexing or a reducer will do it
+too:
+
+```json example
+["WithRandomSeed", 12345,
+  ["ListFrom",
+    ["Comprehension", ["Random"], ["Element", "k", ["Range", 1, 6]]]]]
+// ➔ the same six values on every evaluation ✓
+//   (identical to ["RandomChoice", ["Interval", 0, 1], 6] in the same frame)
+```
+
+Note that `["Repeat", ["Random"], n]` is eager and replayable but draws
+**once**, yielding n copies of a single value — it is not a uniform batch.
+
+<ReadMore path="https://github.com/cortex-js/compute-engine/blob/main/docs/RANDOMNESS-MODEL.md" >
+The generator, the seed folding, the interpreted/compiled/GPU parity contract,
+and how many draws each operator consumes are specified in the
+**Randomness Model** note<Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+<FunctionDefinition name="Random">
+
+<Signature name="Random"></Signature>
+
+<Signature name="Random">_domain_: collection</Signature>
+
+`Random` is **not** a pure function: it carries the `random` effect and
+evaluates to a different value on each evaluation. Wrapping it in
+`WithRandomSeed` discharges that effect — the block as a whole is pure and
+replays identically.
+
+- `["Random"]` evaluates to a real number in the interval $[0, 1)$.
+- `["Random", ["Interval", a, b]]` evaluates to a real number in $[a, b)$.
+  Open/closed endpoint markers are ignored: a floating-point draw cannot respect
+  an open endpoint.
+- `["Random", ["Range", …]]` evaluates to an element of the range, which is
+  **inclusive** at both ends and normalizes reversed bounds
+  (`["Range", 7, 2]` descends).
+- `["Random", xs]` evaluates to an element of the finite collection `xs`.
+
+```json example
+["Random"]
+// ➔ 0.6233… (for example)
+["Random", ["Range", 1, 6]]
+// ➔ 4 (for example) — a die roll
+["Random", ["Interval", -1, 1]]
+// ➔ -0.318… (for example)
+["Random", ["List", 5, 2, 10, 18]]
+// ➔ 10 (for example)
+```
+
+The domain is never materialized: `["Random", ["Range", 1, 1000000]]` indexes
+the range, it does not build it.
+
+`Random` draws along the **first axis** of a non-flat domain, so
+`["Random", ["List", ["List", 1, 2], ["List", 3, 4]]]` returns a *row*.
+A `Tuple` is treated as an ordinary finite indexed collection and yields one of
+its elements — deliberately unlike `Join`, where a tuple operand is a single
+atomic element.
+
+An unbounded or empty `Interval`, an infinite `Range` or collection, and an
+empty collection are all errors.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="RandomChoice">
+
+<Signature name="RandomChoice">_domain_: collection, _k_: number</Signature>
+
+Evaluate to a list of `k` independent draws from _domain_, **with
+replacement**. Because each draw is independent, `k` may exceed the size of the
+domain — that is what replacement means.
+
+```json example
+["RandomChoice", ["Range", 1, 6], 3]
+// ➔ [4, 1, 4] (for example) — repeats are expected
+
+["WithRandomSeed", 7, ["RandomChoice", ["Interval", 0, 1], 4]]
+// ➔ a reproducible list of 4 reals in [0, 1)
+```
+
+`k` is typed `number`, not `integer`, so a computed count does not have to be
+rounded by the caller; it is rounded on evaluation (half toward $+\infty$:
+`2.5` → `3`, `-2.5` → `-2`). A negative or out-of-range count is an error, and
+`k = 0` evaluates to the empty list.
+
+Only the `k` drawn elements are materialized — the source domain is not, so
+`["RandomChoice", ["Range", 1, 1000000000], 5]` is cheap.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="RandomSample">
+
+<Signature name="RandomSample">_xs_: indexed\_collection, _k_: number</Signature>
+
+Evaluate to a list of `k` elements drawn from _xs_ **without replacement**.
+
+"Without replacement" is over **positions**, not values. On a multiset, repeated
+values are expected: `["RandomSample", ["List", 1, 1, 2], 2]` returns `[1, 1]`
+in about a quarter of trials. It does not return distinct *values*.
+
+Unlike `RandomChoice`, `k` may not exceed the size of `xs` — there are only that
+many positions to draw. `k` equal to the size returns a permutation.
+
+<ReadMore path="/compute-engine/reference/statistics/#randomsample" >
+See **Statistics** for the full description of `RandomSample`<Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+<FunctionDefinition name="RandomShuffle">
+
+<Signature name="RandomShuffle">_xs_: indexed\_collection</Signature>
+
+Evaluate to a random permutation of the elements of _xs_.
+
+<ReadMore path="/compute-engine/reference/collections/#randomshuffle" >
+See **Collections** for the full description of `RandomShuffle`<Icon name="chevron-right-bold" />
+</ReadMore>
+
+</FunctionDefinition>
+
+#### Migrating from the previous random operators
+
+`RandomInteger`, `RandomList`, `RandomSeed`, `Sample` and `Shuffle` have been
+removed, along with the `ce.randomSeed` property and every per-operator `seed`
+argument. Each removed head throws an `operator-removed` error naming its
+replacement for one release, so a stored document fails loudly rather than
+silently stopping to randomize.
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"26ch"}}>
+
+| Was                        | Now                                                 |
+| :------------------------- | :-------------------------------------------------- |
+| `Random(seed)`             | `WithRandomSeed(seed, Random())`                     |
+| `Random(n)`, $n > 0$       | `Random(Range(0, n-1))`                              |
+| `Random(m, n)`, $m < n$    | `Random(Range(m, n-1))`                              |
+| `RandomInteger(a, b)`      | `Random(Range(a, b))`                                |
+| `RandomList(n)`            | `RandomChoice(Interval(0, 1), n)`                    |
+| `RandomList(n, seed)`      | `WithRandomSeed(seed, RandomChoice(Interval(0,1), n))` |
+| `RandomSeed(s)`            | `WithRandomSeed(s, …)` around the work               |
+| `Sample(xs, k)`            | `RandomSample(xs, k)`                                |
+| `Shuffle(xs)`              | `RandomShuffle(xs)`                                  |
+| `Shuffle(xs, seed)`        | `WithRandomSeed(seed, RandomShuffle(xs))`            |
+| `ce.randomSeed = s`        | `WithRandomSeed(s, …)`                               |
+
+</div>
+
+Note the `-1` on the `Random(n)` and `Random(m, n)` rows: the old bounds were
+upper-**exclusive** and `Range` is inclusive. The formulas hold only in the
+ranges stated — degenerate old calls ($n \leq 0$, $m \geq n$) need rewriting by
+hand, because `Range` normalizes reversed bounds into a descending range instead
+of producing an empty one.
 
 ## Relational Operators
 

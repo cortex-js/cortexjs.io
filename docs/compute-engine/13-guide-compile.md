@@ -70,6 +70,21 @@ early:
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
 
+### Why a compilation declined
+
+When `success` is `false`, `CompilationResult.error` carries the reason (the
+same text the `fallback: false` path throws). The message identifies which of
+three things happened:
+
+| Message shape                                                | Meaning                                                                                   |
+| :----------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| `X: cannot compile — …` naming an operand or a component      | The head lowers, but not for these operand shapes (e.g. a collection-valued point component) |
+| `X: cannot compile — the operator is known … no lowering`     | A target gap: the engine knows `X`, this target has no codegen for it                      |
+| ``Unknown operator `X` ``                                     | No operator definition for `X` at all — a typo, or a symbol never declared as a function   |
+
+`CompilationResult.unsupported` lists the same heads declaratively, so a caller
+can branch on the condition without parsing the message.
+
 ### Values That May Be Lists
 
 An operand typed
@@ -93,6 +108,33 @@ scalar or a list, such as the result of a call whose return type is
   NumPy broadcasts natively.
 - **GLSL/WGSL**: such operands compile as scalar slots, unchanged — shader
   targets have no dynamic lists.
+
+## Implicit Compilation and the `jit` Setting
+
+Beyond explicit `compile()` calls, the engine **compiles automatically** in a
+number of implicit spots — for example when draining a large numeric `Map`,
+or when an exact integer computation over a large collection is provably safe
+to run in floating point. This is transparent: results are identical to the
+interpreter's, and any compilation failure silently falls back to
+interpretation.
+
+The `jit` property of a `ComputeEngine` instance controls this behavior:
+
+- **`"auto"`** (the default): implicit compilation is attempted where
+  beneficial. If the environment forbids code generation altogether (a
+  strict Content-Security-Policy page without `'unsafe-eval'`, an MV3
+  browser extension), the engine detects this on the first attempt and
+  latches to `"off"` engine-wide, so at most one CSP violation is reported.
+- **`"off"`**: no implicit code generation is ever attempted; every implicit
+  path uses the interpreter. Set it up front on hardened runtimes, or use it
+  as a diagnostic kill switch to compare interpreter and compiled behavior.
+
+Explicit `compile()` calls are not affected by this setting — a direct
+request keeps failing loudly with the environment's own error.
+
+Toggling `jit` is an engine-configuration change: caches whose entries were
+produced on the other route are invalidated, so `jit = "off"` genuinely
+re-runs the interpreter rather than serving previously compiled results.
 
 ## What Can Be Compiled
 
@@ -228,6 +270,24 @@ console.log(f.run());
 
 `Comprehension` is not compilable to GLSL or WGSL (shaders have no dynamic
 arrays). Imperative `Loop` is still compilable to GLSL/WGSL.
+
+#### Multi-statement constructs on the shader targets
+
+A shader has no expression-level loop or IIFE, so on GLSL and WGSL a `Sum` or
+`Product` with a symbolic bound is emitted as **statements** (with constant
+bounds it unrolls into an ordinary expression instead). Such a loop is hoisted
+ahead of the value that consumes it, so it can appear anywhere in an
+expression — `0.03\sum_{k=0}^{n}kx` compiles, and a nested sum is hoisted into
+its enclosing loop body rather than out of it.
+
+A loop inside a **conditionally-evaluated branch** — an `If`, `When`, `Which` or
+`Match` arm — fails closed (`success: false`) instead. A shader conditional is
+an expression, not a statement, so there is no place to put the loop inside the
+branch; hoisting it out would run it whichever branch is selected, which changes
+the result whenever the branch draws from the random stream.
+
+`Loop` and `Block` are not hoisted either — they remain valid only as a whole
+function body, and fail closed when used as a sub-expression.
 
 #### `Block` and `where`
 

@@ -293,10 +293,79 @@ same arguments are applied to it.
 On the other hand, the `Random` function is not pure: by
 its nature it evaluates to a different value on every evaluation.
 
-Numbers, symbols and strings are pure. A function expression is pure if the
-function itself is pure, and all its arguments are pure as well.
+Numbers, symbols and strings are pure.
+
+### Effects
+
+Being impure is not a single thing: an expression is impure because it carries
+one or more **effects**. There are nine of them — `console`, `entropy`,
+`environment`, `fs_read`, `fs_write`, `network`, `random`, `scope` and `time`.
+`Random` carries `random` (it draws from the ambient random stream); `Assign`,
+`Declare` and `Assume` carry `scope` (they mutate a binding that outlives the
+call). An expression with no effects is pure. Effects can also be declared as
+part of a function's type — see
+[Effect Specifiers](/compute-engine/guides/types/#effect-specifiers).
 
 **To check if an expression is pure** use `expr.isPure`.
+
+**To find out *which* effects it carries** use `expr.effects`: `undefined` when
+there are none, `'any'` when the effects are not known, otherwise the labels in
+alphabetical order. It reports what evaluating the expression **does**, not
+what the value it produces **can do** if you later invoke it — a symbol bound
+to a drawing function has no effects, because evaluating it just yields the
+function. The latent effects of a callable live on its type, as
+`expr.type.effects`.
+
+```js
+ce.parse("1 + x^2").effects;                     // ➔ undefined
+ce.box(["Random"]).effects;                      // ➔ ["random"]
+ce.box(["Assign", "q", 1]).effects;              // ➔ ["scope"]
+
+ce.assign("rf", ce.box(["Function", ["Random"], "x"]));
+ce.box("rf").effects;                            // ➔ undefined (producing)
+ce.box("rf").type.effects;                       // ➔ ["random"] (invoking)
+ce.box(["Map", ["List", 1, 2], "rf"]).effects;   // ➔ ["random"]
+```
+
+### Purity Is Computed, Not Looked Up
+
+The effects of a function expression are not simply "the operator's effects
+plus every operand's effects". They are computed by looking at what the
+expression will actually *do*, following symbols through their current
+bindings. Four consequences are worth knowing:
+
+- **Held content contributes nothing.** `Hold` never evaluates its operand, so
+  `Hold(Random())` is pure. The draw resurfaces where the content is forced:
+  `ReleaseHold(Hold(Random()))` is impure.
+
+- **A frame discharges what it delimits.** `WithRandomSeed(42, Random())` is
+  pure. The frame absorbs the draws inside it, and the whole block genuinely
+  replays identically on re-evaluation — which is exactly what purity claims.
+  (Two `Random()` calls *within* one frame still return different values; that
+  is the frame's stream advancing, not an effect escaping.) A `scope` write is
+  not discharged: `WithRandomSeed(42, Block(Assign(x, 1), Random()))` is
+  impure.
+
+- **A function literal is pure; its arrow carries the effect.** `x |-> Random()`
+  is pure — building the function draws nothing. The effect lives on its type,
+  `(unknown) random -> number`, and fires when the function is applied.
+
+- **Callbacks are resolved through their bindings.** `Map(xs, f)` is pure
+  exactly when `f` is. If `f` is currently bound to a drawing function, the
+  whole expression is impure; reassign `f` to a pure function and it becomes
+  pure.
+
+```js
+ce.box(["Hold", ["Random"]]).isPure;                  // ➔ true
+ce.box(["WithRandomSeed", 42, ["Random"]]).isPure;    // ➔ true
+ce.box(["Function", ["Random"], "x"]).isPure;         // ➔ true
+
+ce.assign("f", ce.box(["Function", ["Random"], "x"]));
+ce.box(["Map", ["List", 1, 2, 3], "f"]).isPure;       // ➔ false
+
+ce.assign("f", ce.box(["Function", ["Multiply", "x", 2], "x"]));
+ce.box(["Map", ["List", 1, 2, 3], "f"]).isPure;       // ➔ true
+```
 
 ## Checking the Kind of Expression
 

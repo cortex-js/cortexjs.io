@@ -11,13 +11,1809 @@ description: "Release notes for the Compute Engine: new features, behavior chang
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## 0.100.0 _2026-08-02_
+
+### Breaking Changes
+
+- **Assignments now enforce declared types consistently.** Declare-with-value,
+  `Assign`, and `ce.assign()` all reject values incompatible with an explicit
+  symbol type. Inferred types retain their widening behavior.
+
+- **Purity and effects reporting is more precise.** `expr.isPure` and
+  `expr.effects` now account for which operands an operator evaluates and for
+  the current bindings of referenced functions. Consequently, held expressions
+  and seeded-random blocks can be pure, function literals do not inherit the
+  effects of calling them, and named effectful callbacks are no longer reported
+  as pure. Unresolved forward references conservatively have unknown effects.
+
+- **Effects from partially applied functions occur only when all required
+  arguments have been supplied.** Partial application no longer evaluates an
+  effectful body early or repeats its effects.
+
+- **Contradictory operator declarations are rejected.** In particular,
+  `pure: true` cannot be combined with `drawsRandom: true`; inconsistent legacy
+  flags, effect annotations, and `effects:` declarations also fail registration.
+
+- **Errors now propagate through strict built-in operators and function
+  application.** An invalid operand generally produces the underlying `Error`
+  value instead of leaving an inert expression. Collection constructors and
+  error-observing or lazy operators can still contain or inspect errors.
+  `Assume` returns string status values such as `"ok"` and `"not-a-predicate"`.
+
+- **Literal `Nothing` arguments are removed consistently.** `f(Nothing)`,
+  `Apply(f, Nothing)`, and `Nothing |> f` now all behave like `f()`. An
+  expression that evaluates to `Nothing` is still passed as an argument. Invalid
+  `Pipe` callees now return the error directly.
+
+- **Positional collection operators require indexed collections.** `First`,
+  `Second`, `Third`, and `Last` now reject sets and other non-indexed
+  collections. Empty indexed collections still return `Missing`.
+
+- **Several elementary functions now report complex result types when their
+  real-valued domain cannot be proven.** This includes `Sqrt`, `Ln`, `Log`,
+  `Arcsec`, and `Arccsc`. Provably in-domain operands retain a real type;
+  provably negative operands use complex helpers when compiled.
+
+### New Features
+
+#### Functions, types, and effects
+
+- **Multi-clause function definitions** can dispatch by arity, literal value,
+  and parameter type. The most specific clause wins, declaration order breaks
+  ties, and redefining the same parameter domain replaces that clause. Recursive
+  clause sets compile to JavaScript. Partial application of a clause set is not
+  supported.
+
+- **Cortex programs can declare nominal types and structural aliases** with
+  `type name = …` and `type alias name = …`. Declarations provide checked
+  constructors where appropriate; nominal values are opaque, support structural
+  equality by tag and payload, and can expose named fields with `value.field`.
+  Record-shaped nominal types can use a same-name constructor function for
+  validation or normalization. Type tags are erased by compiled output.
+
+- **Function signatures can declare effects.** Types and Cortex definitions
+  accept `pure`, `any`, or effect labels including `random`, `scope`, `network`,
+  `time`, and file-system effects. Inferred effects follow the function body;
+  explicit effects are checked contracts. Callback parameters can use effect
+  annotations to restrict accepted functions.
+
+- **Operator definitions accept an `effects:` field.** The existing `pure` and
+  `drawsRandom` properties remain supported as shorthand.
+
+- **Expressions and function types expose effects directly** through
+  `expr.effects` and `type.effects`. Effect-discharging operators such as
+  `WithRandomSeed` can absorb an effect, while `Hold` defers the effects of its
+  contents until release.
+
+#### Cortex language
+
+- **Function definitions accept literal parameters**, including strings,
+  booleans, finite numbers, `NaN`, and infinities. Unicode mathematical symbols
+  such as `π`, `∞`, `ⅈ`, and `ℝ` now resolve to their standard constants or
+  sets. Non-finite literal names are reserved; verbatim identifiers remain
+  available when those spellings are needed as names.
+
+- **`match` supports inclusive numeric range patterns**, including negative and
+  infinite bounds. Range patterns can be combined with alternatives and guards
+  and compile on every target.
+
+- **Errors can be handled in Cortex.** `match` can catch error values, and the
+  new held predicate `IsError(x)` detects errors without propagating them.
+  Propagated errors include a non-rendered trace available through MathJSON and
+  the error-trace APIs.
+
+- **The structural equality operator `===` now evaluates.** It performs total,
+  exact structural comparison, including for symbolic expressions, `Missing`,
+  and `NaN`.
+
+- **`Count` accepts either a value or a predicate**, and **`Table` accepts tuple
+  iterator specifications**. Tuple and brace iterator forms now behave
+  consistently for `Sum`, `Product`, and `Integrate`.
+
+- **Static type errors are reported by `cortex check` and before program
+  evaluation.** Checking canonicalizes without executing effects.
+
+#### Compilation
+
+- **`PointList` with collection-valued components compiles to JavaScript.** GPU
+  coordinate accessors can also project compatible point-list components.
+
+- **`At` compiles to GLSL and WGSL** for statically sized numeric collections,
+  including guarded dynamic scalar indexes and literal gathers or masks.
+
+- **`D`, `Derivative`, and `ND` compile on all targets** when they can be
+  reduced to a compilable form.
+
+- **Non-finite numeric literals compile to GLSL and WGSL.**
+
+- **Python compilation supports collection equality and inequality.**
+  `Norm(matrix, 2)` now compiles with the interpreter's Frobenius-norm
+  semantics.
+
+- Added Cortex transition guides for Python and Mathematica users.
+
+### Improvements
+
+- Unknown Wolfram Language and JavaScript collection-function names now suggest
+  the corresponding Cortex operators.
+
+- Static result types are tighter for trigonometric, hyperbolic, extrema,
+  Pochhammer, and collection-rank operations when the result can be proven real
+  or finite.
+
+- User-declared type names now resolve consistently in annotations, signatures,
+  type predicates, collection operators, and MathJSON declarations. Literal
+  value types and bounded numeric refinements now accept their own values.
+
+- `Range` and `Linspace` can enumerate exact symbolic bounds and steps that have
+  a numeric value, such as multiples of π. Bracket range syntax also recognizes
+  more exact arithmetic progressions.
+
+- `Sum` and `Product` evaluate pure, closed bound expressions such as
+  `Length(P)` while retaining symbolic behavior for genuinely free bounds.
+
+- `Distance` accepts the same point-or-point-list union types as related point
+  operators and reports a clear error if a point list reaches scalar distance
+  evaluation, in both interpreted and compiled code.
+
+### Performance
+
+- Numeric integration retains a sufficiently accurate deterministic quadrature
+  estimate instead of replacing it with a much slower Monte Carlo estimate. This
+  substantially improves nested and difficult integrals.
+
+- Lazy function-applying collections, including `Map`, `Filter`, `FlatMap`,
+  `Scan`, `Tabulate`, and `Iterate`, memoize evaluated elements per instance.
+  Cache invalidation now follows actual symbol and configuration dependencies,
+  so unrelated assignments no longer discard cached collection elements.
+
+- Exact evaluation of sufficiently large, bounded integer `Map` broadcasts can
+  use compiled float64 arithmetic when exactness is statically guaranteed.
+
+- Compiled function bodies reuse repeated pure user-function calls, avoiding
+  exponential work in recursive definitions. Common-subexpression elimination
+  now also recognizes engine-provided compiled operators.
+
+### Issues Resolved
+
+#### Parsing and serialization
+
+- Chained postfix indexes parse uniformly as nested `At` expressions for
+  symbols, subscripted expressions, and literal collections.
+
+- Ranges with compound first anchors, such as `n+1..n+10`, `[2n..3n]`, or
+  `x = m+n...m+n+4`, bind the whole anchor expression instead of absorbing part
+  of it into the surrounding addition, multiplication, or negation. This applies
+  in brackets, bare expressions, and relations. A parenthesized range opts out:
+  `n+(1..10)` remains a broadcast addition.
+
+- Dictionary-valued function results preserve parameter bindings through
+  MathJSON round trips, including in recursive functions.
+
+- Roots serialized with solidus or quotient notation now delimit a `Power` base
+  correctly.
+
+- Invalid multi-argument `Exp` and `Exp2` expressions remain well-formed inert
+  expressions with an arity error.
+
+#### Evaluation and functions
+
+- `At` reports incompatible dimensions when more indexes are supplied than a
+  collection can consume.
+
+- `match` inside a function uses the current call's parameters rather than
+  retaining values from the first call.
+
+- Seeded-random frames no longer incorrectly mark enclosing function literals or
+  `Map` callbacks as random.
+
+- Purity and effect results for recursive functions are stable and no longer
+  depend on which expression is queried first.
+
+- Compiled lambdas with unbound symbols, including symbols reached through
+  assigned values or function bodies, decline cleanly instead of throwing a
+  JavaScript `ReferenceError`. Interpreter fallback numericizes symbolic results
+  and is also available for failed interval compilation.
+
+- Numeric use of a list-valued function no longer widens its inferred result to
+  a scalar or causes compiled reductions to use scalar arithmetic on arrays.
+
+- `FindFit` and `FindRoot` observe ambient time limits during expensive
+  iterations and return their best result with `timedOut: True` when possible.
+
+- Differentiating control-flow or binding operators such as `Which`, `Sum`, and
+  `Integrate` stays symbolic instead of throwing or producing an invalid
+  slot-wise derivative.
+
+#### Collections
+
+- Bounded `Take` expressions are recognized as finite even when the source
+  length is unknown, allowing finite prefixes of infinite filtered collections
+  to materialize.
+
+- Bare `_` works as the identity function in function slots, and wildcard
+  predicate shorthand is accepted consistently by eager and lazy collection
+  operators.
+
+- Unary `Iterate` functions receive the accumulator, and indexed access now
+  agrees with iteration about the first emitted value.
+
+- Collection operators resolve evaluable numeric arguments such as `N-1`. They
+  remain symbolic, rather than using a default, when a required numeric argument
+  is unresolved.
+
+- `Partition` distinguishes unresolved integer sizes from predicates and no
+  longer throws on an unbound size.
+
+- Seeded comprehensions materialize consistently with other lazy collections.
+
+#### Numerical evaluation and types
+
+- Numeric roundoff cleanup is independent of `ce.tolerance`; comparison and
+  explicit `Chop` operations continue to honor the configured tolerance.
+  Compiled `Chop` now uses that tolerance, and exact operands remain exact.
+
+- The reported uncertainty of an iterated numeric integral includes inner-level
+  quadrature error. Previously only the outermost level's own estimate was
+  reported, which could present a result with inner error as exact.
+
+- Bignum `Sin` and `Cos` preserve small representable values near zero
+  crossings.
+
+- Static types for non-finite, complex, and out-of-domain results were corrected
+  across arithmetic, special functions, elliptic functions, inverse
+  trigonometric functions, and complex component operators.
+
+- Domain boundaries are classified with exact comparisons for exact literals.
+
+- Non-radian angle conversion preserves the imaginary component of complex
+  results.
+
+- `LCM(0, 0)` returns `0`, and `SigmaMinus1` preserves exact results under
+  `evaluate()`.
+
+#### Compilers
+
+- Compiled `Mod`, `Remainder`, division, and negation now parenthesize compound
+  operands correctly across JavaScript, GPU, and Python targets.
+
+- Impure operands used by compiled remainder, modulus, and selected GPU
+  functions are evaluated exactly once.
+
+- Broadcasts over literal lists emit target-appropriate code for JavaScript,
+  Python, GLSL, and WGSL instead of leaking JavaScript syntax into other
+  targets.
+
+- GPU compilation rejects unsupported alpha colour constructors, non-finite loop
+  bounds, mismatched shapes, and scalar-only operations on vectors or matrices
+  instead of emitting invalid or silently incorrect shaders.
+
+- GPU `Max` and `Min` over one collection reduce to a scalar instead of
+  returning the input vector.
+
+- JavaScript compilation now broadcasts `Sign`, `Arctan2`, `Hypot`, and `Sinc`
+  over lists.
+
+- Complex constant folding is consistent with `realOnly`: non-real constants
+  produce `NaN` in real-only mode and principal complex values when complex
+  compilation is supported.
+
+- Compiled `InverseHaversine` supports complex results on JavaScript and reports
+  an appropriate complex static type for symbolic inputs.
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool returned no usable result at that precision.
+
+| Expression | CE 0.100.0 | CE 0.99.0 | SymPy | math.js | Mathematica |
+| --- | --: | --: | --: | --: | --: |
+| $\pi^2$ | 8.2 | 8.7 | 201 | 190 | 3.7 |
+| $\sin 1$ | 25 | 23 | 253 | 599 | 5.8 |
+| $\cos 1$ | 24 | 23 | 240 | 668 | 7.6 |
+| $\ln 2$ | 15 | 15 | 375 | 4,939 | 4.1 |
+| $e^{\pi}$ | 15 | 15 | 238 | 5,375 | 5.1 |
+| $\zeta(3)$ | 1,707 | 1,716 | 290 | — | 54 |
+| $\Gamma(\tfrac13)$ | 915 | 933 | 382 | — | 233 |
+| $\psi(\tfrac13)$ | 797 | 786 | 3,051 | — | 192 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is `1×`). `—` means the engine can't do the case; `✓` means it solves a case Mathematica can't. Compare the **CE 0.100.0** and **CE 0.99.0** columns to see what is *new this release* (a `—` under `0.99.0` next to a number under the current build). The **CE + R/F** column is the current build with the opt-in Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` / `loadIdentities`), on the same minified bundle.
+
+| Operation | CE 0.100.0 | CE + R/F | CE 0.99.0 | SymPy | math.js | Mathematica |
+| --- | :--: | :--: | :--: | :--: | :--: | :--: |
+| **Antiderivatives** |  |  |  |  |  |  |
+| $\int\frac{1}{\sqrt x}\,dx$ | 3.5× | 1.8× | 2.8× | 0.4× | — | 1× |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$ | 6.4× | 1.0× | 5.7× | 0.08× | — | 1× |
+| $\int\frac{1}{x^3+1}\,dx$ | 3.3× | 0.4× | 2.7× | 0.3× | — | 1× |
+| $\int\frac{\sqrt x}{1+x}\,dx$ | — | 1.5× | — | 0.1× | — | 1× |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$ | — | 0.9× | — | 0.009× | — | 1× |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$ | — | 0.8× | — | 0.006× | — | 1× |
+| **Derivatives** |  |  |  |  |  |  |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$ | 0.03× | 0.03× | 0.03× | 0.001× | 0.003× | 1× |
+| **Simplification** |  |  |  |  |  |  |
+| $\sqrt{3+2\sqrt2}$ | 40× | 29× | 28× | — | — | 1× |
+| $\sqrt6\,x+\sqrt2\,x$ | 73× | 38× | 51× | 3.1× | 16× | 1× |
+| **Evaluation** |  |  |  |  |  |  |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$ | 36× | 17× | 34× | 3.0× | — | 1× |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$ | 4.9× | 3.6× | 4.7× | 2.2× | — | 1× |
+| $\int_1^2\tfrac1x\,dx$ | 18356× | 20053× | 17734× | 310× | — | 1× |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ | 258× | 110× | 251× | 2.6× | — | 1× |
+| **Solving** |  |  |  |  |  |  |
+| $x^4+x^2-1=0$ | 0.3× | 0.2× | 0.3× | 0.06× | — | 1× |
+| $x^3-x-1=0$ | 1.4× | 1.6× | 1.3× | 0.04× | — | 1× |
+
+Across the cases both solve, Compute Engine is a **median 3.5× faster than Mathematica** (up to 18356×) — in the browser, not a proprietary kernel.
+
+<sub>Measured 2026-08-02 · Compute Engine `0.100.0` (current build @ `14fc06c2`) · published `0.99.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica `14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically against an independent `mpmath` reference, never another tool. Reproduce with `npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+
+## 0.99.0 _2026-07-30_
+
+### New Features
+
+- **User-defined functions now compile to GLSL and WGSL.** A function declared
+  in the engine (`f(u,v) := …`) and called from a GPU-compiled expression is
+  emitted **once** as a real shader function and called by name — matching what
+  the JavaScript and interval targets already did — instead of failing as an
+  unknown operator and forcing callers to inline the body at every call site.
+  Definitions arrive on the compilation result's preamble alongside the `_gpu_*`
+  helpers, so existing shader assembly keeps working; when `f` calls `g`, `g` is
+  declared first. Signatures are synthesized statically (declared parameter
+  types, or the body's inferred shape: `float`, `bool`, `vec2`–`vec4`, complex
+  as `vec2`); anything a shader cannot express fails closed with a diagnostic
+  naming the parameter — including recursion (GLSL/WGSL forbid it; it still
+  compiles on the JavaScript target), collection-valued arguments beyond the
+  static `vec2`–`vec4` shapes, and argument shapes that disagree with the
+  declared parameter type. Undeclared parameters default to `float`.
+  Caller-declared types on `compileFunction` parameters and on shader
+  inputs/uniforms are authoritative for these checks, with element-aware
+  matching across both languages' spellings (`bvecN`, `ivecN`, `vec2<i32>`, …) —
+  a `vec2<bool>` argument no longer passes for a `vec2<f32>` parameter. A WGSL
+  body referencing a declared input now correctly emits `input.<name>`
+  (previously a bare, undeclared identifier).
+
+### Performance
+
+- **Compiled code now shares repeated subexpressions** (common-subexpression
+  elimination) on the `javascript`, `interval-js`, and `python` targets: a pure
+  subtree occurring several times inside one compiled expression is bound to a
+  temporary once and reused, instead of being recomputed at every site.
+  Corpus-extreme shapes (a 500-node subtree repeated 128×) compile ~50% faster
+  because the emitted source collapses, and run up to ~1.9× faster when the
+  repeats involve runtime helpers the JS engine cannot eliminate itself. Sharing
+  is conservative by construction: random draws, user-defined function
+  applications, named callbacks, caller-supplied custom lowerings, and anything
+  inside a conditionally-evaluated position (unselected `Which`/`If` arms,
+  short-circuited `And`/`Or` tails) are never merged, so values, draw streams,
+  and selection laziness are unchanged. Opt out per call with
+  `compile(expr, { cse: false })`. Design notes:
+  `docs/plans/2026-07-28-compile-cse-design.md`.
+
+- **Compiled output is now byte-for-byte deterministic on every target**:
+  compiler-generated temporaries (chained-relation operand bindings, loop
+  accumulators, complex power chains — and the new CSE temps) draw deterministic
+  `_tvN`/`_cseN` names from a per-compilation counter instead of
+  `Math.random()`, and the allocator avoids capture against every symbol in the
+  expression. Two compilations of the same expression now emit identical source,
+  on the GPU targets included.
+
+- **Random draws are up to 100x faster when the engine runs inside a secondary
+  JavaScript realm** — a `vm` context, a sandboxed worker, or an
+  embedder-supplied global. V8 compiles `Math.imul(...)` down to a single
+  machine instruction only when `Math` is the host realm's; reached through
+  another realm's global it becomes a property lookup plus a call, and the PCG3D
+  hash behind every draw performs six of them. Binding the function once at
+  module scope removes the lookup. Measured on node 22: 10 million draws went
+  from ~880 ms to ~40 ms in a `vm` context (and from ~36 s to ~0.5 s for a
+  10-million-sample Monte-Carlo integral under Jest). Draw values are unchanged
+  — the stability vectors are untouched.
+
+### Bug Fixes
+
+- **A Leibniz derivative no longer swallows the comparison that follows it.**
+  `\frac{d}{dx}x^2 > 0` parsed as `D(x^2 > 0, x)` — the derivative of a
+  _boolean_ — which then evaluated to an `incompatible-type` error. The operand
+  of `\frac{d}{dx}` / `\frac{\partial}{\partial x}` is now parsed as a term: it
+  still takes a trailing sum (`\frac{d}{dx}x^2 + 1`, matching the `\int … dx`
+  integrand convention), but stops before a relational, assignment or arrow
+  operator, so the expression parses as `D(x^2, x) > 0`.
+
+- **An undecidable comparison no longer discards its evaluated operands.**
+  `x^2 + x^2 > 0` evaluated to `0 < x^2 + x^2` and `\frac{d}{dx}x^2 > 0` to
+  `0 < D(x^2, x)`: `Equal`, `NotEqual`, `Less` and `LessEqual` evaluate their
+  own operands (they are lazy, so their `canonical` handlers can see raw
+  operands for chain decomposition), then threw that work away when the
+  comparison itself could not be decided. They now report the evaluated operands
+  — `0 < 2x^2` and `0 < 2x` — which is what the non-lazy relations (`Approx`,
+  `Tilde`, `Precedes`…) already did. The comparison itself is unchanged: an
+  undecidable one still stays inert, since `x^2 = 4` is a _condition_ rather
+  than a falsity, and decidable ones still fold to `True`/`False`.
+
+- **Monte-Carlo integration and stochastic equality now replay under
+  `WithRandomSeed()`.** Both sampled `Math.random()` directly, so a seeded block
+  did not reproduce: `WithRandomSeed(42, \int_0^1 \sin(1/x) dx)` returned a
+  different estimate on every evaluation, and a seeded `isEqual()` verdict could
+  not be replayed at all.
+
+  They now draw from a _derived sub-stream_ — a private stream seeded from the
+  ambient frame that consumes **none** of its indices. This matters because an
+  integral takes up to 1e7 samples and the sampling loop is deadline-truncated:
+  charging those to the frame would make adding an integral shift every later
+  `Random()` draw in the block, and would make replay depend on wall-clock time.
+  Adding or removing an integral now leaves sibling draws untouched, and the
+  same integral samples the same points wherever it appears in the frame.
+
+  Outside a frame both remain live, as before. `monteCarloEstimate()` (exported
+  from `@cortex-js/compute-engine/numerics`) gains an optional trailing `draw`
+  parameter defaulting to `Math.random`, so existing callers are unaffected.
+
+  **This applies to evaluation, not to compiled code.** An integral inside a
+  compiled function still samples live, even within a seed frame, and that is
+  deliberate: the generated code emits one independent quadrature call per
+  limit, so a sub-stream would restart at the same sample points on every outer
+  node of a nested integral — trading reproducibility for a biased estimate. In
+  practice a smooth integrand never reaches the stochastic estimator anyway (it
+  folds to a constant at compile time, or converges under deterministic
+  Gauss–Kronrod); only a pathological one does. Use `.N()` when a seeded
+  integral has to reproduce. See `docs/plans/2026-07-28-derived-substreams.md`
+  §5.1.
+
+  An integral that cannot finish inside a seed frame — a bound or parameter is
+  still unbound — now keeps the frame, so completing it later reproduces the
+  estimate the frame would have produced. Operator definitions gain a
+  `readsRandomFrame` flag for this: it means "reads the seed frame, consumes
+  none of its indices", and is inferred for a user function whose body reaches
+  an estimator. Unlike `drawsRandom`, it does not make the operator impure.
+
+- **A collection operator now resolves an unevaluated numeric argument.**
+  Collection handlers are consulted on the canonical expression — `.at()`,
+  `.each()` and `.count` are available on any canonical expression, and the
+  broadcast that zips `Add`/`Multiply` operands runs before they are evaluated.
+  An argument spelled `N-1` was therefore still an unevaluated sum at that
+  point, and each operator silently fell back to its default: with `N` assigned
+  `6`, `RotateLeft(S, N-1) + RotateLeft(S, N-2)` returned `2·RotateLeft(S, 1)`,
+  and `Take(S, N-2) + Take(S, N-2)` returned nothing at all. Literal arguments
+  were never affected. Fixed for `Take`, `Drop`, `RotateLeft`, `RotateRight`,
+  `Repeat`, `Fill`, `Partition`, `Tabulate`, `Insert`, `DeleteAt`, `ReplaceAt`,
+  `Slice`, `Permutations` and `Combinations`.
+
+- **`Take`, `Drop`, `RotateLeft`, `RotateRight` and `Slice` now stay symbolic
+  when their numeric argument has no value.** An argument that is absent and one
+  that is present but unresolved (a free variable) were treated alike, so each
+  operator answered a collection it does not denote: `Take(S, n)` returned `[]`,
+  `Drop(S, n)` returned all of `S`, and `RotateLeft(S, n)` and
+  `RotateRight(S, n)` rotated by one. They now report an unknown count and
+  evaluate to themselves until `n` has a value — matching `Repeat`, `Insert`,
+  `DeleteAt`, `ReplaceAt`, `Permutations`, `Combinations`, `Tabulate`, `Chunk`
+  and `Range`, which already did. An omitted argument still takes the operator's
+  default, so `RotateLeft(S)` still rotates by one; a `NaN` argument counts as
+  unresolved, not omitted. `Fill` joins them: `Fill(f, (n, 3))` used to produce
+  an empty matrix and `Fill(f, (2, n))` two empty rows. `IsEmpty` of such a
+  `Take` over an infinite collection no longer answers `False` either — a zero
+  count would make it empty.
+
+  Membership is deliberately unaffected: `Contains(RotateLeft(xs, n), x)` still
+  answers, because a rotation is a permutation.
+
+- **`Partition(xs, n)` with an unbound `n` no longer throws.** `Partition`
+  accepts either a chunk size or a predicate, and chose the arm by whether the
+  size read as an integer — so an argument that is _typed_ `integer` but has no
+  value yet was applied as a predicate, and the resulting exception escaped
+  `evaluate()`. The arm is now chosen by type, and an unresolved predicate (a
+  symbol declared `function` with no value) leaves the expression unevaluated as
+  well. A predicate that does resolve, to something other than a boolean, still
+  reports the error with its spelling hint.
+
+- **`WithRandomSeed(seed, [… for …])` draws again.** A comprehension is a lazy
+  view, like `Map`: its body draws per element when the collection is
+  materialized. The rule that keeps the seed frame around a body that could not
+  finish its draws (0.98.0) read the comprehension's unevaluated body as
+  unfinished work, so the expression evaluated to itself — the collection was
+  inert and yielded no elements, and nothing would ever complete it. A
+  comprehension now follows the same convention as `Map`: materialize it inside
+  the frame (`WithRandomSeed(1, ListFrom([Random() for k = [1...6]]))`) for
+  reproducible draws. A comprehension whose _clause_ still owes draws keeps the
+  frame, as before.
+
+- **A user-defined function now infers its `pure` and `drawsRandom` flags from
+  its body.** Previously every user function was born pure, so `f() := Random()`
+  reported `isConstant: true` while drawing from the random stream on every
+  call. Two things broke as a result: `N(f() + \pi)` consumed two draws where
+  `N(\mathrm{Random}() + \pi)` consumed one, and a partially evaluated
+  `WithRandomSeed()` body calling `f` lost its seed frame — silently resuming
+  with live, unseeded draws.
+
+  The flags are derived from the heads the body applies: a body reaching a
+  known-impure head is impure, and one reaching a stream-drawing head also
+  draws. A head with no definition at the point of definition — a higher-order
+  parameter (`f(g) := g()`), or a callee defined after its caller — is still
+  assumed pure; set the flag explicitly on the definition when that matters.
+
+- **`RandomPrime()` is now reproducible under `WithRandomSeed()`.** It declared
+  `drawsRandom: true`, but its draws bypassed the seed frame, so
+  `WithRandomSeed(42, RandomPrime(1000))` returned a different prime on every
+  evaluation. It now draws from the frame like the rest of the random family.
+
+- **`RandomExpression()` is now declared impure.** It was declared pure, which
+  made `isConstant` true for a generator that returns a different expression on
+  every call, and admitted it to common-subexpression elimination.
+
+### Improvements
+
+- **A loop-form `Sum`/`Product` can now be a sub-expression in GLSL and WGSL.**
+  A shader has no expression-level loop, so a `Sum` with a symbolic bound was
+  emitted as statements — valid as a whole function body, but nothing more:
+  `\sum_{k=0}^{n}kx` compiled while `1 + \sum_{k=0}^{n}kx` and
+  `0.03\sum_{k=0}^{n}kx` failed closed, which demoted the whole class to the CPU
+  path (corpus rows are almost never a bare sum). The loop is now **hoisted**
+  ahead of the value it feeds and referenced through its accumulator, so these
+  compose. Constant bounds still unroll to an expression as before, and a loop
+  nested inside an unrolled term hoists alongside it. Nested sums hoist into
+  their enclosing loop body, not out of it.
+
+  A loop inside a **conditionally-evaluated branch** (an `If`/`When`/`Which`/
+  `Match` arm) still fails closed, with a diagnostic that says so. A shader
+  conditional is an expression, not a statement, so hoisting the loop out of the
+  branch would run it unconditionally — and because a compiled `Random()`
+  advances a counter at run time, a loop stranded ahead of a branch it never
+  feeds would change the value of every later draw.
+
+  `Loop` and `Block` still fail closed as sub-expressions on these targets.
+
+- **A compile decline now names its actual cause.**
+  `Unknown operator \`X\`` was reported for three different situations, so a failing compile band could not be triaged by message. They are now distinct: an operator whose compile handler declined a particular _operand shape_ says which operand and why (`PointList: cannot compile — component 1 is collection-valued …`); a head the engine knows but the target cannot lower says so (`Integrate: cannot compile — the operator is known to the engine but target 'glsl' has no lowering for it.`); and `Unknown operator`is now reserved for a head with no operator definition at all. The reason reaches callers as`CompilationResult.error`on the`success: false` paths, and as the thrown message on the direct-target path.
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression         | CE (current) | CE 0.98.0 | SymPy | math.js | Mathematica |
+| ------------------ | -----------: | --------: | ----: | ------: | ----------: |
+| $\pi^2$            |          6.8 |       7.4 |   173 |     106 |         3.9 |
+| $\sin 1$           |           20 |        21 |   218 |     442 |         5.3 |
+| $\cos 1$           |           20 |        21 |   219 |     573 |         7.1 |
+| $\ln 2$            |           14 |        14 |   332 |   4,344 |         3.8 |
+| $e^{\pi}$          |           12 |        13 |   216 |   4,751 |         4.7 |
+| $\zeta(3)$         |        1,511 |     1,547 |   265 |       — |          49 |
+| $\Gamma(\tfrac13)$ |          831 |       812 |   346 |       — |         213 |
+| $\psi(\tfrac13)$   |          712 |       712 | 2,762 |       — |         171 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the
+case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is
+`1×`). `—` means the engine can't do the case; `✓` means it solves a case
+Mathematica can't. Compare the **CE (current)** and **CE 0.98.0** columns to see
+what is _new this release_ (a `—` under `0.98.0` next to a number under the
+current build). The **CE + R/F** column is the current build with the opt-in
+Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
+`loadIdentities`), on the same minified bundle.
+
+| Operation                              | CE (current) | CE + R/F | CE 0.98.0 | SymPy  | math.js | Mathematica |
+| -------------------------------------- | :----------: | :------: | :-------: | :----: | :-----: | :---------: |
+| **Antiderivatives**                    |              |          |           |        |         |             |
+| $\int\frac{1}{\sqrt x}\,dx$            |     4.6×     |   2.5×   |   3.5×    |  0.5×  |    —    |     1×      |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$       |     8.3×     |   1.5×   |   6.6×    | 0.09×  |    —    |     1×      |
+| $\int\frac{1}{x^3+1}\,dx$              |     5.3×     |   0.9×   |   4.2×    |  0.3×  |    —    |     1×      |
+| $\int\frac{\sqrt x}{1+x}\,dx$          |      —       |   1.9×   |     —     |  0.1×  |    —    |     1×      |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$        |      —       |   1.1×   |     —     | 0.01×  |    —    |     1×      |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$      |      —       |   1.1×   |     —     | 0.007× |    —    |     1×      |
+| **Derivatives**                        |              |          |           |        |         |             |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$            |    0.04×     |  0.04×   |   0.03×   | 0.001× | 0.004×  |     1×      |
+| **Simplification**                     |              |          |           |        |         |             |
+| $\sqrt{3+2\sqrt2}$                     |     41×      |   28×    |    31×    |   —    |    —    |     1×      |
+| $\sqrt6\,x+\sqrt2\,x$                  |     79×      |   45×    |    48×    |  3.1×  |   19×   |     1×      |
+| **Evaluation**                         |              |          |           |        |         |             |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$        |     39×      |   16×    |    34×    |  3.0×  |    —    |     1×      |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$      |     5.2×     |   4.0×   |   6.9×    |  2.1×  |    —    |     1×      |
+| $\int_1^2\tfrac1x\,dx$                 |    4458×     |  4875×   |   4193×   |  77×   |    —    |     1×      |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ |     316×     |   128×   |   274×    |  2.5×  |    —    |     1×      |
+| **Solving**                            |              |          |           |        |         |             |
+| $x^4+x^2-1=0$                          |     0.3×     |   0.3×   |   0.3×    | 0.07×  |    —    |     1×      |
+| $x^3-x-1=0$                            |     1.6×     |   1.8×   |   1.4×    | 0.04×  |    —    |     1×      |
+
+Across the cases both solve, Compute Engine is a **median 5.2× faster than
+Mathematica** (up to 4458×) — in the browser, not a proprietary kernel.
+
+<sub>Measured 2026-07-30 · Compute Engine `0.98.0` @ `ef394659` (current build)
+· published `0.98.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+
+## 0.98.0 _2026-07-28_
+
+### New Features
+
+- **`Which` and `If` now broadcast over list-valued conditions.** Selection is
+  performed element by element, with the first matching clause winning. Scalar
+  conditions and results are broadcast as needed, and list-valued inputs must
+  have the same length. Results are evaluated at most once and only when needed
+  by at least one element. A position with no matching clause returns `NaN`.
+
+  ```text
+  Which([3, 2, 1, 3] == 3, 1, True, 0) → [1, 0, 0, 1]
+  ```
+
+  JavaScript compilation supports the same behavior. GLSL and WGSL compilation
+  support fixed-size vectors of two to four elements.
+
+- **New operator-definition attribute `drawsRandom`** marks operators that
+  consume the engine's random stream (`Random`, `RandomShuffle`, …). It is
+  narrower than `pure: false`, which also covers side-effecting operators such
+  as `Assign`, and is used by `WithRandomSeed` to decide whether a partially
+  evaluated body still owes draws to its seed frame.
+
+### Breaking Changes
+
+- **Multiplying lists of different lengths now returns an
+  `incompatible-dimensions` error**, consistent with other element-wise
+  operations. Matrix multiplication is unchanged.
+
+- **Assigning a value to a builtin operator name now creates a symbol in the
+  current scope instead of replacing the builtin globally.** For example,
+  `ce.assign("Sin", 30)` changes the value of the symbol `Sin`, but `Sin(0)`
+  continues to call the builtin function.
+
+- **The unused `BindingSite.shield` field has been removed.** Setting it had no
+  effect.
+
+### Improvements
+
+- **JavaScript compilation now supports more collection-valued expressions:**
+  user-defined function calls, comparisons and logical operators, and indexed
+  `Sum`/`Product` bodies all broadcast element-wise. Length mismatches compile
+  to `NaN`.
+
+- **Unsupported collection-valued conditions and vector operations now fail
+  compilation with a diagnostic** instead of producing incorrect Python,
+  interval-js, GLSL, or WGSL code.
+
+- **`RandomChoice` now infers more precise result types**, including
+  `finite_real` for finite intervals and `finite_integer` for integer ranges.
+
+- **Repeated compilation with the same external target is now deterministic**
+  and produces identical generated code.
+
+- **Evaluating chained broadcast operations over lazy collections is faster:**
+  approximately 3× faster with `evaluate()` and 4× faster with `.N()` at default
+  precision in the benchmark used for this release.
+
+### Issues Resolved
+
+- **Partially evaluated `WithRandomSeed` expressions now retain their seed**, so
+  later substitutions produce the same result as substituting before evaluation.
+
+- **Nested `N` and `Evaluate` expressions now preserve numeric approximation and
+  precision.** For example, `N(Evaluate(pi))` now returns a numeric value
+  instead of the symbolic `pi`.
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression         | CE (current) | CE 0.97.0 | SymPy | math.js | Mathematica |
+| ------------------ | -----------: | --------: | ----: | ------: | ----------: |
+| $\pi^2$            |          7.9 |       8.5 |   203 |     288 |         4.5 |
+| $\sin 1$           |           23 |        23 |   253 |     598 |         6.0 |
+| $\cos 1$           |           21 |        22 |   253 |     781 |         8.1 |
+| $\ln 2$            |           16 |        16 |   386 |   5,471 |         4.7 |
+| $e^{\pi}$          |           15 |        15 |   273 |   7,477 |         5.9 |
+| $\zeta(3)$         |        1,738 |     1,702 |   337 |       — |          56 |
+| $\Gamma(\tfrac13)$ |          924 |       913 |   407 |       — |         268 |
+| $\psi(\tfrac13)$   |          781 |       790 | 3,496 |       — |         199 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the
+case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is
+`1×`). `—` means the engine can't do the case; `✓` means it solves a case
+Mathematica can't. Compare the **CE (current)** and **CE 0.97.0** columns to see
+what is _new this release_ (a `—` under `0.97.0` next to a number under the
+current build). The **CE + R/F** column is the current build with the opt-in
+Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
+`loadIdentities`), on the same minified bundle.
+
+| Operation                              | CE (current) | CE + R/F | CE 0.97.0 | SymPy  | math.js | Mathematica |
+| -------------------------------------- | :----------: | :------: | :-------: | :----: | :-----: | :---------: |
+| **Antiderivatives**                    |              |          |           |        |         |             |
+| $\int\frac{1}{\sqrt x}\,dx$            |     4.5×     |   2.2×   |   3.5×    |  0.5×  |    —    |     1×      |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$       |     8.1×     |   1.6×   |   6.8×    | 0.08×  |    —    |     1×      |
+| $\int\frac{1}{x^3+1}\,dx$              |     4.9×     |   0.6×   |   3.7×    |  0.3×  |    —    |     1×      |
+| $\int\frac{\sqrt x}{1+x}\,dx$          |      —       |   1.7×   |     —     | 0.08×  |    —    |     1×      |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$        |      —       |   1.0×   |     —     | 0.008× |    —    |     1×      |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$      |      —       |   1.0×   |     —     | 0.006× |    —    |     1×      |
+| **Derivatives**                        |              |          |           |        |         |             |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$            |    0.04×     |  0.03×   |   0.03×   | 0.001× | 0.004×  |     1×      |
+| **Simplification**                     |              |          |           |        |         |             |
+| $\sqrt{3+2\sqrt2}$                     |     37×      |   27×    |    31×    |   —    |    —    |     1×      |
+| $\sqrt6\,x+\sqrt2\,x$                  |     74×      |   42×    |    44×    |  3.1×  |   17×   |     1×      |
+| **Evaluation**                         |              |          |           |        |         |             |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$        |     41×      |   17×    |    38×    |  2.9×  |    —    |     1×      |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$      |     7.2×     |   4.6×   |   6.8×    |  1.9×  |    —    |     1×      |
+| $\int_1^2\tfrac1x\,dx$                 |    5778×     |  6836×   |   5520×   |  107×  |    —    |     1×      |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ |     352×     |   146×   |   298×    |  2.7×  |    —    |     1×      |
+| **Solving**                            |              |          |           |        |         |             |
+| $x^4+x^2-1=0$                          |     0.3×     |   0.3×   |   0.3×    | 0.05×  |    —    |     1×      |
+| $x^3-x-1=0$                            |     2.2×     |   2.4×   |   1.9×    | 0.05×  |    —    |     1×      |
+
+Across the cases both solve, Compute Engine is a **median 4.9× faster than
+Mathematica** (up to 5778×) — in the browser, not a proprietary kernel.
+
+<sub>Measured 2026-07-28 · Compute Engine `0.97.0` @ `bff3c3b1` (current build)
+· published `0.97.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+
+## 0.97.0 _2026-07-27_
+
+### Breaking Changes
+
+- **A broadcast operand is evaluated ONCE.** Broadcasting is an operation on
+  values (the NumPy/Julia/R model), so an operand that is lifted into every cell
+  is evaluated a single time and the operation then maps over the cells:
+
+  ```
+  L < Random()        // ONE draw, compared against every element of L
+  Map(L, l ↦ l < Random())   // a draw per element, written explicitly
+  ```
+
+  Comparisons and logical connectives used to re-evaluate a lifted operand per
+  element, so `[0.5, 0.5, 0.5] < Random()` could answer `[True, False, True]`.
+  Arithmetic (`L + Random()`) already drew once; the disagreement was an
+  implementation artifact of the element-wise zip, not a semantic. Only impure
+  _scalar_ operands under a broadcast are affected — an impure operand that IS
+  the traversed collection (`[Random(), Random()] < 0.5`) still draws per cell,
+  because those draws are the cells.
+
+- **A length mismatch in a broadcast is an error, not a truncation.** Zipping to
+  the shortest operand silently discarded the tail of the longer one:
+
+  ```
+  [1,2,3] < [2,2]     // was: [True, False]   now: incompatible-dimensions
+  ```
+
+  `Add` already answered `incompatible-dimensions` for this shape, so the engine
+  disagreed with itself depending on the head. One check now governs every
+  broadcast path — the eager zip, the arithmetic broadcast, and the lazy `Map`
+  form — so the ordering relations, the logical connectives,
+  `Divide`/`Power`/`Mod`, `Add`/`Multiply`, and `ElementMax`/`ElementMin`/
+  `Clamp` all answer alike. In particular the SIZE of a collection no longer
+  decides the semantics (a mismatch used to error below the eager threshold and
+  truncate above it), and neither does the shape of the source:
+  `Add(Filter(…), L)` used to truncate where `Less` on the same operands
+  errored.
+
+  An **unbounded** operand against a finite one is a mismatch too (`count` is
+  `Infinity`, which agrees with no finite length). A scalar operand is a LIFT,
+  not a participant, so it never mismatches; an operand whose length is not yet
+  known is not compared, since there is nothing to compare until it resolves. An
+  empty operand alongside a non-empty one is a mismatch, while a lone empty
+  operand still broadcasts to `Nothing` (`Not([])`).
+
+  `PointList` is deliberately unaffected: it ZIPS components rather than
+  broadcasting an operator over them, and its shortest-zip
+  (`PointList([1,2,3],[10,20])` → two points) is an existing consumer contract.
+  The general rule: an operator LIFTED over collections requires length
+  agreement, while an explicit PAIRING constructor (`Zip`, the variadic `Map`,
+  `PointList`) defines its length as the shortest input. See
+  `docs/BROADCAST-MODEL.md` for the full policy.
+
+### New Features
+
+- **Compiled comparisons and logical connectives broadcast element-wise.** The
+  ordering relations (`<`, `<=`, `>`, `>=`) and the connectives (`And`, `Or`,
+  `Not`) compile over collection-valued operands on the JavaScript target
+  instead of failing closed, so the Desmos filter form compiles rather than
+  falling back to the interpreter:
+
+  ```js
+  compile(ce.parse('[10,20,30][|[1...3]-k|>0]')).run(); // [10, 30]
+  ```
+
+  These heads lower to raw JS infix operators, which are silently wrong on an
+  array (`0 < [1,0,1]` stringifies it; an array is truthy, so `m1 && m2` returns
+  a whole operand). They now wrap the head's own scalar codegen in the
+  `_SYS.bcast` runtime helper, which recurses per POSITION — an empty or
+  mismatched position projects to NaN without poisoning its siblings
+  (`Not([[], [True]])` → `[NaN, [false]]`, matching the interpreter's
+  `[Nothing, [False]]`).
+
+  The scalar path is untouched: `x < 3` with an `unknown`-typed plot variable
+  still emits `_.x < 3`, with no runtime guard. Three shapes deliberately keep
+  failing closed, because the compiled answer would disagree with
+  interpretation: a CHAINED ordering (`0 < xs < 5`, whose pairwise `&&` is sound
+  only over scalars); `Equal`/`NotEqual` over two collections (whole- collection
+  equality, which keeps its `_SYS.eq` dispatch and stays element-wise for the
+  list-vs-scalar case); and an operand that types as a list but does not COMPILE
+  to one — notably a user-function application over a collection argument
+  (`q(L) < y`), since a user function's body compiles as scalar code and returns
+  NaN on an array, which a comparison would turn into a plausible `false`.
+
+### Issues Resolved
+
+- **`Covariance`/`Correlation` report a length mismatch as
+  `incompatible-dimensions`.** They were already strict — a ragged pair of data
+  collections errored — but with their own `unexpected-argument` ("collections
+  differ in length") rather than the `incompatible-dimensions` error every
+  broadcast path answers. One error tag now covers every length-mismatch
+  diagnosis (see `docs/BROADCAST-MODEL.md`). The other argument errors
+  (`at least 2 data points required`, the shape error, `zero variance`) are
+  unchanged.
+
+- **`Multiply` over operands of mixed collection kinds is element-wise again.**
+  A `List` literal packs as a tensor value while a `Range`/`Filter`/`Take`/
+  `Reverse` result does not, so the non-tensor operand was classified as a
+  SCALAR factor — and applying a scalar multiplies every CELL by it, turning
+  each cell into a list:
+
+  ```
+  [1...3] · [4,5,6]        // was: [[4,8,12],[5,10,15],[6,12,18]]   now: [4,10,18]
+  Range(1,3) · [1,2,3]     // was: [[1,2,3],[2,4,6],[3,6,9]]        now: [1,4,9]
+  Range(1,3) + [1,2,3]     // [2,4,6] — `Add` was always element-wise
+  ```
+
+  Not a length problem: it misfired at _matched_ lengths, and same-kind pairs
+  (`List`×`List`, `Range`×`Range`) were always element-wise, because neither
+  operand reached the scalar bucket. `Add` avoids it by declining its tensor
+  kernel when fewer than two operands pack; `Multiply` now declines when a
+  non-tensor collection would land among the scalars, and falls through to the
+  same element-wise broadcast — which also brings mixed-kind mismatches under
+  the length ruling above. Scalar×list scaling, matrix products, and
+  component-wise tuple scaling are unchanged.
+
+- **A symbol bound to a derived collection serializes as its name again.**
+  Regression in 0.96.0. `.latex` and `toString()` materialize a lazy collection
+  before serializing, and a symbol whose assigned value is a _derived_
+  collection (the result of evaluating a `Join`, a comprehension, …) delegates
+  `isLazyCollection` to that value — so the symbol serialized as its
+  materialized value while `.json` still answered the symbol's name:
+
+  ```js
+  ce.assign('L', ce.box(['List', 1, 2, 3]));
+  ce.assign('L', ce.box(['Join', 'L', ['List', 4]]).evaluate());
+  ce.symbol('L').json;   // 'L'
+  ce.symbol('L').latex;  // was: '\bigl\lbrack1, 2, 3, 4\bigr\rbrack'  now: 'L'
+  ```
+
+  A literal `List` value (eager, not lazy) never triggered it, which is what
+  made the failure value-provenance-dependent and hard to spot: a consumer that
+  serialized a symbol to persist a document wrote the value where the name
+  belonged. A symbol now never takes the materialize-before-serialize path — a
+  name's spelling does not depend on what the name currently holds. Lazy
+  collection _expressions_ (`Range`, `Map`, comprehensions) serialize as before.
+  Reported by the Tycho team.
+
+- **`Add` and `Multiply` fold a `Measurement` operand on the first `.N()`.**
+  Every unary/binary arithmetic head already folded a quadrature result
+  (`Power`, `Divide`, `Sqrt`, `Sin`, `Negate`, `Abs` of a `Measurement` yield
+  another `Measurement`), but the two n-ary heads checked for `Measurement`
+  operands against the _plainly evaluated_ operands. A quadrature operand only
+  becomes a `Measurement` under numeric approximation — `\int_0^1 \sin x\,dx`
+  evaluates to the exact `1 - \cos 1` — so the check saw nothing, and the first
+  `.N()` returned an inert `Add`/`Multiply` whose `.re` was `NaN` (the same dead
+  numeric read fixed for `Measurement` itself in 0.96.0, one level up). A second
+  `.N()` folded it:
+
+  ```js
+  const once = ce.parse('1 + \\int_0^1 \\sin(x) dx').N();
+  once.re;      // was: NaN     now: 1.4596976941318605
+  once.operator // was: 'Add'   now: 'Measurement'
+  ```
+
+  The handlers now re-dispatch the Measurement fold on the numericized result,
+  so the parse route agrees with the (already correct)
+  `ce.box(['Add', <measurement>, 1]).N()` route exactly — value and error bar.
+  The sibling `Quantity` check in the same handlers had the identical structural
+  gap (an operand that only becomes a `Quantity` under numeric approximation was
+  invisible to it); it is closed the same way. `evaluate()` is unaffected and
+  still returns the exact symbolic form. Reported by the Tycho team.
+
+- **Compiling a definite integral that cannot close symbolically is now
+  bounded.** The JavaScript compilation target first attempts to resolve an
+  `Integrate` to a closed form (so a plotted `∫₀ˣ f` costs ~µs per sample
+  instead of a quadrature); that attempt ran under whatever deadline the caller
+  had armed — and under none by default. An integrand with a _symbolic_ exponent
+  (`y^{k/2-1}` with `k` a free document parameter) sent the integration-by-parts
+  search into a cycle with no shrinking measure: bounded in depth but not in
+  cost, it did not return in over 5 minutes, synchronously, with no way to
+  interrupt it:
+
+  ```js
+  // χ² tail with shape parameter k left free: >5 min → ~2 s, success: true
+  ce.getCompilationTarget('javascript')
+    .compile(ce.parse('\\int_x^\\infty \\frac{e^{-y/2} y^{k/2-1}}{(k/2-1)!\\, 2^{k/2}} dy',
+             {strict: false}), {realOnly: true});
+  ```
+
+  The antiderivative-first attempt now arms its own 2-second span (an enclosing
+  caller span still tightens it, per the timeout model's `min()` nesting — it
+  can only shorten, never extend, a caller's bound) and degrades to the GK15
+  quadrature emitter on expiry, so the compiled integral samples numerically
+  with the parameter bound at run time — which is the desired behavior for a
+  non-elementary integrand. Note that `ce.timeLimit` was retired in 0.89.0: to
+  bound `evaluate()` itself, use `ce.withTimeLimit({ms, label}, () => …)`, which
+  this shape honors to the millisecond. Reported by the Tycho team.
+
+- **Compiled `Factorial` of a non-integer computes Γ(x+1) instead of NaN.** The
+  interpreter has always extended the factorial to the reals (`(\frac12-1)!` →
+  `Γ(\frac12)` = `√π`), but the compiled runtime used the integer-only helper,
+  so the same expression compiled successfully and returned `NaN` — silently
+  zeroing out, e.g., a χ² density's normalizing constant `(k/2-1)!` at odd `k`:
+
+  ```js
+  const f = ce.getCompilationTarget('javascript')
+              .compile(ce.parse('(\\frac{1}{2}-1)!'));
+  f.run({}); // was: NaN    now: 1.7724538509055159 (= √π, identical to .N())
+  ```
+
+  Non-integer arguments route through the same `gamma` the interpreter uses, so
+  compiled and interpreted values are bit-identical; the non-negative integer
+  fast path is unchanged, and a negative integer stays at the Γ pole (`NaN`, the
+  real projection of the interpreter's `ComplexInfinity`). The Python target
+  likewise now emits `scipy.special.gamma(x + 1)` instead of
+  `scipy.special.factorial` (which answers `0` for a negative non-integer). The
+  GPU targets already extended via `Γ`; the interval target remains deliberately
+  integer-only. Reported by the Tycho team.
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression         | CE (current) | CE 0.96.0 | SymPy | math.js | Mathematica |
+| ------------------ | -----------: | --------: | ----: | ------: | ----------: |
+| $\pi^2$            |          7.3 |       7.5 |   180 |     110 |         3.9 |
+| $\sin 1$           |           20 |        21 |   218 |     439 |         5.2 |
+| $\cos 1$           |           20 |        20 |   221 |     456 |         7.1 |
+| $\ln 2$            |           14 |        14 |   347 |   4,406 |         3.7 |
+| $e^{\pi}$          |           13 |        13 |   214 |   4,655 |         4.5 |
+| $\zeta(3)$         |        1,534 |     1,562 |   272 |       — |          49 |
+| $\Gamma(\tfrac13)$ |          840 |       834 |   350 |       — |         213 |
+| $\psi(\tfrac13)$   |          724 |       720 | 2,776 |       — |         174 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the
+case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is
+`1×`). `—` means the engine can't do the case; `✓` means it solves a case
+Mathematica can't. Compare the **CE (current)** and **CE 0.96.0** columns to see
+what is _new this release_ (a `—` under `0.96.0` next to a number under the
+current build). The **CE + R/F** column is the current build with the opt-in
+Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
+`loadIdentities`), on the same minified bundle.
+
+| Operation                              | CE (current) | CE + R/F | CE 0.96.0 | SymPy  | math.js | Mathematica |
+| -------------------------------------- | :----------: | :------: | :-------: | :----: | :-----: | :---------: |
+| **Antiderivatives**                    |              |          |           |        |         |             |
+| $\int\frac{1}{\sqrt x}\,dx$            |     4.6×     |   2.3×   |   3.4×    |  0.5×  |    —    |     1×      |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$       |     7.9×     |   1.5×   |   6.1×    | 0.08×  |    —    |     1×      |
+| $\int\frac{1}{x^3+1}\,dx$              |     5.2×     |   0.8×   |   4.0×    |  0.3×  |    —    |     1×      |
+| $\int\frac{\sqrt x}{1+x}\,dx$          |      —       |   1.9×   |     —     |  0.1×  |    —    |     1×      |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$        |      —       |   1.1×   |     —     | 0.01×  |    —    |     1×      |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$      |      —       |   1.1×   |     —     | 0.007× |    —    |     1×      |
+| **Derivatives**                        |              |          |           |        |         |             |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$            |    0.04×     |  0.03×   |   0.03×   | 0.001× | 0.003×  |     1×      |
+| **Simplification**                     |              |          |           |        |         |             |
+| $\sqrt{3+2\sqrt2}$                     |     42×      |   29×    |    29×    |   —    |    —    |     1×      |
+| $\sqrt6\,x+\sqrt2\,x$                  |     77×      |   45×    |    51×    |  3.0×  |   18×   |     1×      |
+| **Evaluation**                         |              |          |           |        |         |             |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$        |     15×      |   16×    |    33×    |  3.1×  |    —    |     1×      |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$      |     7.3×     |   4.9×   |   6.8×    |  2.2×  |    —    |     1×      |
+| $\int_1^2\tfrac1x\,dx$                 |    4819×     |  4740×   |   4259×   |  80×   |    —    |     1×      |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ |     293×     |   124×   |   250×    |  2.6×  |    —    |     1×      |
+| **Solving**                            |              |          |           |        |         |             |
+| $x^4+x^2-1=0$                          |     0.3×     |   0.3×   |   0.3×    | 0.06×  |    —    |     1×      |
+| $x^3-x-1=0$                            |     1.7×     |   1.9×   |   1.5×    | 0.04×  |    —    |     1×      |
+
+Across the cases both solve, Compute Engine is a **median 5.2× faster than
+Mathematica** (up to 4819×) — in the browser, not a proprietary kernel.
+
+<sub>Measured 2026-07-27 · Compute Engine `0.96.0` @ `9eb6538a` (current build)
+· published `0.96.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+
+## 0.96.0 _2026-07-26_
+
+### Breaking Changes
+
+- **The 0.95.0 random-family tombstones are deleted, completing the one-release
+  migration window.** In 0.95.0, evaluating a removed head (`RandomInteger`,
+  `RandomList`, `RandomSeed`, `Sample`, `Shuffle`) threw an `operator-removed`
+  error naming its replacement, and `ce.randomSeed` was a throwing accessor.
+  Those guards are now gone: the removed heads behave like any other
+  unrecognized operator — a valid, inert expression — and `randomSeed` is no
+  longer a property of the engine. Migrate on 0.95.0 (where every legacy call
+  site fails loudly with its replacement named) before adopting this release;
+  the migration table is in the 0.95.0 notes below.
+
+- **`evaluate()` on a symbol now resolves the free symbols of its stored
+  value.** A symbolic value was returned verbatim, so a symbol assigned _after_
+  it was stored never reached it:
+
+  ```
+  let d = 3x^2 + 1
+  let x = 2
+  d          // was: 3x^2 + 1     now: 13
+  N(d)       // 13 — unchanged
+  ```
+
+  `N()` and `compile()` already resolved it, so plain `evaluate()` was the
+  outlier and disagreed with both; a second `evaluate()` used to resolve one
+  more level ("one-evaluate-late"). Assignment remains **eager**, so declaration
+  order still decides what a value snapshots:
+  `let x = 2; let d = 3x^2 + 1; x = 3; N(d)` is `13`, while
+  `let d = 3x^2 + 1; let x = 2; x = 3; N(d)` is `28`. The residual for a cyclic
+  binding is unchanged (`s = s + 1; s` → `s + 1`).
+
+- **A stored value's free symbols are no longer captured by a same-named
+  parameter.** They now denote the binding they were canonicalized against, not
+  whatever an inner scope calls that name:
+
+  ```
+  let a = x + 1
+  g(x) = a
+  g(5)       // was: 6            now: x + 1
+  N(g(5))    // was: 6            now: x + 1
+  ```
+
+  With a global `x = 100`, `g(5)` is `101` — the lexically correct binding —
+  where it used to be `6`. This closes the same defect on three paths that
+  disagreed with each other: the parameter substitution applied after a call,
+  the constant dereference path, and the numeric (`N`) re-evaluation inside a
+  call frame. A dictionary-valued symbol is covered too. Behavior that was
+  already correct is unchanged: a block-local `let` does not leak into a stored
+  value, and a renamed parameter never captured.
+
+- **Only a value SHIELD hides a stored value's own binding.** Dereferencing a
+  symbol's stored value deferred to the ambient lookup whenever ANY valueless
+  shadow of a free symbol's name was in scope. That was a proxy for the shield
+  idiom — `Solve`, `D`, `Integrate`, `Limit` and `simplify()` all hide a
+  symbol's value by shadow-declaring it valueless — and it swept in ordinary
+  declarations, which shield nothing:
+
+  ```
+  a = x + 1                          // x still valueless: a captures the global x
+  x = 100
+  a + 5                              // 106 — unchanged
+  Block(Declare(x, "real"), a + 5)   // was: x + 6        now: 106
+  ```
+
+  `a` captured a _binding_; the inner `Declare` created a _different_ variable,
+  and a different variable has no business intercepting. The asymmetry that made
+  the old rule indefensible: give that shadow a value —
+  `Block(Declare(x, "real"), Assign(x, 7), a + 5)` — and it already did not
+  intercept, evaluating to `106` before and after. The genuine shields are
+  unaffected: with a global `x = 100`, `Solve(x + 1 = 0, x)` is still `[-1]`,
+  and `simplify()` remains value-blind.
+
+- **A union type is assignable only to a target that covers EVERY arm.**
+  `isSubtype()` (and therefore `type.matches()`) used the any-branch rule when
+  the target was a composite type and the all-branch rule when it was a
+  primitive, so the answer depended on the shape of the target:
+  `list<tuple<number,number,number>> | tuple<number,number,number>` matched
+  `tuple<number, number, number>`, while `number | list<number>` matched neither
+  `number` nor `collection`. Assignability is now all-branch throughout — the
+  dual of the intersection rule, where `A & B` is assignable as soon as one arm
+  is. A union still matches any target covering all its arms (`integer | real` ⊑
+  `real`, `number | list<number>` ⊑ `collection | number`).
+
+  Code that asked `unionType.matches(T)` to mean "could this be a `T`" was
+  asking the wrong question and now gets `false`; ask it the other way round
+  (`ce.type(T).matches(unionType)` — "would a `T` satisfy this"), which is how
+  the matrix-inference repair gate on union-typed parameters such as
+  `LinearSolve`'s `matrix | vector` is now spelled.
+
+### Issues Resolved
+
+- **Adaptive quadrature no longer reports a sharply-peaked integral as a
+  converged zero.** The adaptive loop started from a single 15-node panel over
+  the whole interval, and could never recover from a first panel that read as
+  zero: with every node returning ~0, the Gauss/Kronrod difference also
+  vanished, met the absolute tolerance, and the integral "converged" after 15
+  evaluations. The witness is a peak far narrower than the interval whose weight
+  vanishes at the center node:
+
+  ```js
+  ce.parse('\\int_{-50}^{50} x^2 \\frac{1}{\\sqrt{2\\pi}} e^{-x^2/2} dx').N();
+  // was: 3.2e-21 ± 5.1e-21     (true value: 1)
+  // now: 1.0000000000000002
+  ```
+
+  The whole Gaussian moment family failed this way (moments 1, 2, 4 and 6 were
+  each 100% wrong while claiming an error bar around `1e-21`); the bare `∫φ`
+  over the same interval was correct, because `φ(0)` is sampled. Quadrature now
+  starts from 16 equal panels, which fixes the family exactly and brings the
+  comb `∫₋₁₅¹⁵ φ(x)³⁵⁰` to 0.14% relative error. This is a mitigation, not a
+  guarantee — a peak narrower than a starting panel can still be missed, and the
+  error estimate still cannot report it — a peak-discovery strategy (shifted or
+  low-discrepancy probes) would close the family rather than move the threshold,
+  and is not attempted here. Iterated integrals reduce the per-level count so
+  the floor applies to the whole integral rather than multiplying per dimension.
+  The cost falls on integrals that used to converge on the first panel:
+  `∫₀¹ sin x` goes from 15 to 240 evaluations, so a compiled integral called per
+  plotted sample goes from ~40 µs to ~130 µs. Reported by the Tycho team.
+
+- **A definite integral whose integrand is identically non-finite now fails fast
+  instead of burning the full Monte-Carlo budget.** Adaptive quadrature can
+  never converge on a `NaN` integrand, so it fell through to the Monte-Carlo
+  estimator, which spent 1e7 samples — 250–450 ms per call — to return the `NaN`
+  that was decidable up front. The usual trigger is an unbound variable reaching
+  a compiled artifact as `undefined`; a plotted curve then froze the thread and
+  drew nothing. `monteCarloEstimate` now probes a few samples and returns `NaN`
+  immediately when they are all non-finite. Measured: 100 calls on such an
+  integrand went from 30.5 s to 22 ms. Integrands with a genuine endpoint
+  singularity are unaffected — the bail requires _every_ probe to be non-finite.
+  Reported by the Tycho team.
+
+- **`.N()` of a definite integral with a free symbol in the integrand no longer
+  throws a raw `ReferenceError` out of generated code.** The integrand was
+  handed to the implicit compiler regardless, and the generated body read the
+  free symbol from a scope slot the numeric caller never supplies:
+
+  ```js
+  ce.parse('\\int_0^1 (x+q)\\,dx').N();
+  // was: throws ReferenceError: _ is not defined
+  // now: stays symbolic
+  ```
+
+  A parameter with no value leaves nothing to integrate numerically, so the
+  expression now stays symbolic; it evaluates as before once the symbol has a
+  value. Both the single-limit and the iterated multi-limit paths are covered.
+
+- **A `Measurement` now answers the numeric accessors.**
+  `Measurement(value, error)` types as its nominal's scalar type, so
+  `Integrate(…).N()` reports `finite_real` and `isNumber === true` — but every
+  numeric read was dead, which silently poisoned any consumer reading `.re`, and
+  propagated, since `Measurement + 1` is another `Measurement`:
+
+  ```js
+  const n = ce.parse('\\int_0^1 \\sin(x) dx').N();
+  n.re;            // was NaN,       now 0.45969769413186023
+  n.numericValue;  // was undefined, now the nominal
+  n.valueOf();     // was the string '0.4596… ± 0.0000…', now the number
+  n.sgn;           // was undefined, now 'positive'
+  ```
+
+  `.re`, `.im`, `.bignumRe`, `.bignumIm`, `.sgn` and `valueOf()` project the
+  nominal — all of them on the public `Expression` type, so `.re` is the channel
+  and no cast is needed. The uncertainty stays reachable through the MathJSON,
+  or through `op2` after narrowing with `isFunction()`, and `toString()` still
+  shows `±`.
+
+  Three members are deliberately NOT projected, all for the same reason: a
+  `Measurement` is a **function expression**, and the number-literal surface
+  belongs behind the `isNumber()` guard, which narrows on expression kind.
+  `numericValue` stays `undefined` — it is declared only on
+  `NumberLiteralInterface`, and projecting it would advertise an exact numeric
+  representation that a quadrature result does not have; `isNumberLiteral` and
+  the `isNumber()` guard stay `false`; and `.value` stays `undefined` (it is the
+  expression for a literal and `undefined` for a symbolic expression).
+  `.re`/`.im` are sufficient for a `Measurement` precisely because its nominal
+  is never an exact number. Reported by the Tycho team.
+
+- **A shorthand-lambda placeholder in a pipeline stage no longer picks up a
+  same-named global.** `Pipe` is lazy, so it canonicalizes its right operand in
+  the caller's scope — before the operand is wrapped into the implicit lambda it
+  denotes. A global `_1` holding a value therefore captured the placeholder, and
+  the stage silently failed to canonicalize:
+
+  ```js
+  ce.box(['Assign', '_1', 7]).evaluate();
+  ce.parse('[1,2,3] \\rhd \\mathrm{Map}(\\_1, k \\mapsto k^2)').evaluate();
+  // was: Map([1,2,3], (k) |-> k^2)   now: [1,4,9]
+  ```
+
+  The placeholders (`_`, `_1`…`_9`) mentioned by the stage are now bound to
+  fresh, valueless locals for the duration of that canonicalization. A genuine
+  free variable in the stage still resolves — and auto-declares — in the
+  caller's scope, unchanged.
+
+- **The empty list is now a member of every list type.** `[]` typed
+  `list<nothing>`, which made `[] <: list<integer>` **false** — an empty list
+  satisfied no list type at all:
+
+  ```js
+  ce.parse('[]').type.toString(); // was: "list<nothing>"   now: "list<never>"
+  ce.parse('[]').type.matches('list<integer>'); // was: false        now: true
+  ```
+
+  The cause was in the type lattice rather than in lists: `widen()` (a join)
+  returned `nothing` for an empty input, where the join of no types is the
+  _bottom_ type. `nothing` is the unit type of the value `Nothing`, not the
+  bottom type — `never` is. With `never`, covariance does the rest, since
+  `never <: X` gives `list<never> <: list<X>`. `narrow()` had the mirror bug and
+  now returns the top type for an empty input.
+
+  Visible effects: the rendered type of an empty collection changes
+  (`list<nothing>` → `list<never>`, `list<list<nothing>>` →
+  `list<list<never>>`), and an empty list now satisfies a list-typed parameter
+  of any element type. Note that `couldMatch()` deliberately ignores the empty
+  list as a witness — `list<integer>.couldMatch('list<string>')` stays `false`,
+  since that question is about element shape.
+
+- **`nothing` and `missing` were reported as disjoint from any union containing
+  them** — `nothing` vs `boolean | nothing` claimed disjointness, refuted by the
+  value `Nothing`, which inhabits both. The unit-type short-circuit ran before
+  the union was examined and compared a type name against a composite type
+  object. This surfaced as an unsound `nothing <: !(boolean | nothing)`.
+
+- **A quantifier's variable is no longer captured by a same-named global
+  value.** `ForAll`, `Exists`, `NotExists`, `ExistsUnique` and `NotForAll`
+  declared a local scope that was created and then stayed empty, so the
+  quantified variable was bound wherever the caller had it. With `x` assigned,
+  the bound occurrence resolved the assigned value and the proposition was
+  discharged from it:
+
+  ```
+  x = 5
+  \forall x, x > 4      // was: True     now: ForAll(x, x > 4)
+  \exists x, x > 4      // was: True     now: Exists(x, x > 4)
+  ```
+
+  Quantification over a finite domain (`\forall x \in \{1,2,3\}, x > 0`) is
+  unchanged, and the global `x` is untouched in both cases. The quantifiers now
+  use the sanctioned binder mechanism (`scoped: limitsIndexSites(0)`).
+
+- **`Integrate`'s integration variable is bound by the integral.** The index of
+  a `Limits` operand was bound nowhere: it was left raw on the parse route and
+  carried the caller's binding on the `ce.function` route, so the same integral
+  written two ways did not compare equal.
+
+  ```js
+  const parsed = ce.parse('\\int_0^1 x^2 \\,dx');
+  const built = ce.function('Integrate', [
+    ce.parse('x^2'),
+    ce.function('Limits', [ce.symbol('x'), ce.number(0), ce.number(1)]),
+  ]);
+  parsed.isSame(built); // was: false    now: true
+  ```
+
+  `Integrate` now uses the sanctioned binder mechanism
+  (`scoped: indexingSetSites(1)`), so `expr.localScope` reports the integration
+  variable(s), and an indefinite integral's open result is re-bound to the
+  enclosing scope on the way out.
+
+- **`D`'s differentiation variables are bound by the derivative.** `D` declared
+  a local scope that was minted and then never populated, so its variable
+  operands were bound wherever the caller had them and the same derivative
+  written two ways did not compare equal:
+
+  ```js
+  const parsed = ce.parse('\\frac{d}{dx} x^2');
+  const built = ce.function('D', [ce.parse('x^2'), ce.symbol('x')]);
+  parsed.isSame(built); // was: false    now: true
+  ```
+
+  `D` now uses the sanctioned binder mechanism, with a new variadic selector
+  (`scoped: operandsFrom(1)`) for an operator whose bound variables are a
+  trailing list of arbitrary length. `expr.localScope` reports every
+  differentiation variable, and a derivative — an open expression in that
+  variable — is re-bound to the enclosing scope on the way out.
+
+  **Visible consequence**: a body handed to `D` already boxed is re-bound to the
+  derivative's own scope, so it stops comparing equal to the expression it was
+  built from — `ce.box(['D', body, 'x']).op1.isSame(body)` is now `false`, as it
+  has been for a `Sum`'s index since that operator was migrated. Code that lifts
+  a differentiand back OUT of a `D` node into the ambient scope has to re-bind
+  it; `expr.explain('D')`, which presents the differentiand as a free-standing
+  expression, now does.
+
+- **A `Function` literal's parameter operand denotes the literal's own
+  parameter.** The body `Block`'s binding was already the authority for
+  occurrences in the body, but the parameter operand itself was left raw on the
+  parse and `ce.box` routes and carried the CALLER's binding on the
+  `ce.function` route — the same route disagreement `Series` and `Integrate`
+  were migrated to fix. A canonical literal now has exactly one binding per
+  parameter, referenced from both the parameter operand and the body.
+
+- **A bound variable named after a library constant (`Pi`, `e`, `i`, ...) is now
+  bound like any other.** A binder's variable was resolved by NAME, and a name
+  owned by a constant short-circuits to the interned constant before the scope
+  chain is consulted — so the binder declared a binding that nothing referenced.
+  With an already-canonical body, the parameter was silently lost:
+
+  ```js
+  const f = ce.function('Function', [ce.parse('\\pi + 1'), ce.symbol('Pi')]);
+  ce.box(['Apply', f, 10]).evaluate(); // was: 1 + pi    now: 11
+  ```
+
+  The parse and `ce.box` routes gave `11` throughout, so this was also a route
+  disagreement. Bound variables are now built from the binder scope's own
+  binding, which fixes the binding identity for every binder that accepts a bare
+  symbol — including `D(Pi^2, Pi)`, whose value was already right while the
+  binding underneath was the constant's.
+
+- **`Interval` now survives a LaTeX round-trip.** A closed interval serialized
+  as `\lbrack a, b\rbrack`, which the parser reads as a two-element `List`, and
+  a fully-open one as `\lparen a, b\rparen`, read back as a parenthesized
+  `Sequence`. The substitution was silent and could be destructive: under
+  `RandomChoice` — the documented migration target for the removed
+  `RandomList(n)` — `RandomChoice(Interval(0, 1), n)` came back as
+  `RandomChoice(List(0, 1), n)`, demoting a uniform real draw to a Bernoulli
+  pick of the two _values_ 0 and 1, with nothing downstream able to detect it.
+
+  Serialization now depends on whether the position disambiguates the interval:
+
+  - In a **set position** of a set operator — the right side of `\in`/`\notin`,
+    either side of `\cup`, `\cap`, `\setminus`, `\subset`, `\subseteq`,
+    `\supset`, `\supseteq` — the conventional bracket notation is kept
+    (`x\in\lbrack0, 1\rbrack`), because the operator forces the set reading when
+    it is parsed back. This is unchanged, and stays the common display case.
+  - **Anywhere else** the serialization has to stand on its own: half-open
+    intervals use the unambiguous American spellings (`\lbrack a, b\rparen`,
+    `\lparen a, b\rbrack`), an open interval uses ISO reversed brackets
+    (`\rbrack a, b\lbrack`), and a **closed** interval uses the function form
+    `\mathrm{Interval}(a, b)` — `[a, b]` is also how a two-element list is
+    written, so no bracket spelling is available for it.
+
+  Consumers storing a uniform draw as LaTeX can now use the closed
+  `RandomChoice(Interval(0, 1), n)` from the migration table directly. The
+  half-open `Interval(0, Open(1))` remains the more precise spelling for what
+  `RandomList(n)` meant (upper-exclusive) and also round-trips.
+
+- **`ListFrom` now compiles.** It had no compile handler, so the one eager
+  materializer that works over an arbitrary collection body could not be used in
+  compiled code. That matters under `WithRandomSeed`: a frame around a _lazy_
+  comprehension does not make it replayable, because the view materializes after
+  the frame has exited and the draws escape it. `ListFrom` inside the frame
+  makes it eager, and the compiled form now agrees with the interpreter
+  draw-for-draw:
+
+  ```
+  WithRandomSeed(12345, ListFrom([Random() for k=[1...6]]))   // replays, compiles
+  ```
+
+  On the JavaScript and Python targets the splice is decided at runtime, per
+  operand, so an operand typing as `unknown` — a free symbol in a compiled body
+  — works. The GPU targets have no runtime splice (their lists are fixed-size
+  `vecN`/array literals), so an all-scalar `ListFrom` compiles exactly like the
+  equivalent `List` and anything with a provably collection operand fails
+  closed. Note that `Repeat(Random(), n)` is eager and round-trips but draws
+  **once**, yielding n copies of a single value — it is not a uniform batch.
+
+- **A cycle between symbol values no longer overflows the stack.** A pair of
+  bindings such as `a := b` with `b := a` is individually well-formed — each
+  value mentions no symbol of its own name — so the self-reference guard never
+  fired and any query that resolves a symbol's value and delegates to it
+  recursed until the stack blew. This reached far more than the reported
+  `isFiniteCollection`: `count`, `at`, `each`, `N()`, `isEqual`, `isSame`, and
+  the scalar predicates (`sgn`, `isFinite`, `isNaN`, `re`/`im`) all crashed on a
+  cyclic binding. Such a query now **fails closed** — `undefined`/`false`, never
+  a throw. An enumeration that traverses a cycle yields the elements it gathered
+  before closing it, matching what a direct self-reference (`d := Append(d, 1)`
+  → `[1]`) has always produced.
+
+- **Comparison, ordering and rationalization no longer numericize an argument
+  they are about to reject.** `isEqual`/`Equal`, `Sort`, `assume`,
+  `ApproxEqual`, `Rationalize` and the `.N()` trig path each called `.N()` on an
+  operand and then discarded the result when it turned out not to be a number
+  literal. An operand with unknowns can never become one, and over nested
+  applications of a user function that discarded walk is exponential in the
+  nesting depth: at depth 12, `isEqual` against such a chain took ~1.8 s and
+  `Sort` of five of them far longer; both are now milliseconds. Arguments that
+  _can_ numericize — including partially numericizable symbolic ones such as
+  `sin(2) + x` — are unaffected. (Same class as the elementwise-`Sin` fix below;
+  that one was the exact path, these are the `.N()` path.)
+
+- **`Round`/`Floor`/`Ceil`/`Truncate` of a symbolic term keeps its integer
+  type.** `Round(4Q)` typed `number` while both the less informative `Round(Q)`
+  and the fully known `Round(4.7)` typed `finite_integer`: an operand typed
+  `finite_number` reports `isReal === false`, which means "not provably real",
+  and the handler read it as "provably complex". Non-realness is now proven from
+  a number literal or from a type that excludes the reals, so an operand of
+  unknown realness keeps the generic-point convention. A wrap asserting
+  integrality (`RandomChoice(Interval(0,1), Round(4N))` with `N` unbound) now
+  type-checks.
+
+- **`sin`/`cos`/`tan`… of a deeply nested symbolic argument no longer blows
+  up.** The constructible-value lookup called `.N()` on every argument,
+  including one with free symbols that can never numericize; over nested
+  applications of a user function that wasted traversal re-walked shared
+  sub-chains and grew exponentially with the nesting depth. Evaluating
+  `sin(πR/8)` over a 17-element list whose element _k_ is a user function
+  applied _k_ times took 44 s and now takes ~0.1 s. Arguments that can
+  numericize — including a symbol with an assigned value — reduce exactly as
+  before.
+
+- **A function literal built around an already-canonical body now binds its
+  named parameters.** Canonicalizing an expression that is already canonical is
+  a no-op, so a body constructed _before_ the literal existed kept the bindings
+  it was built with — and its parameter occurrences went on denoting the
+  enclosing scope's variable of the same name instead of the literal's own
+  parameter. The repair previously covered only the anonymous placeholders (`_`,
+  `_1`, …) produced by the pipe/shorthand desugaring; it now covers named
+  parameters as well, so anything keyed on a symbol's binding — the
+  post-application substitution of a partially-symbolic result, symbol equality
+  — sees the parameter for what it is:
+
+  ```ts
+  const body = ce.box(['Add', 'y', 1]); // canonical: `y` is the caller's
+  const f = ce.function('Function', [body, ce.symbol('y', { canonical: false })]);
+  // the body's `y` is now this literal's parameter, not the caller's `y`
+  ```
+
+  Values are unchanged; what changes is which variable an occurrence refers to.
+
+- **An antiderivative is expressed in the caller's symbols.** `Integrate` binds
+  its integration variable, and an integrand's free coefficients are declared
+  alongside it — but the antiderivative machinery (and the Rubi rule driver
+  installed by `loadIntegrationRules`) works on the bare integrand and creates
+  its own occurrences of those names in the caller's scope. The two sets of
+  occurrences denoted different variables, so the result could compare unequal
+  to the same expression written by hand. The integrand is now re-bound as it is
+  lifted, matching how a Jacobian's body is lifted from its literal.
+
+### New Features
+
+- **An operator definition can now declare its bound variables.** The `scoped`
+  flag accepts a **binding-site selector** in addition to `true`:
+
+  ```ts
+  import { operandSites } from '@cortex-js/compute-engine';
+
+  ce.declare('MyBinder', {
+    lazy: true,
+    scoped: operandSites(1), // operand 1 is my bound variable
+    signature: '(expression, symbol) -> number',
+  });
+  ```
+
+  A selector implies a scope, so `scoped` remains the complete inventory of
+  scope-creating operators. When one is given, the engine declares each site's
+  symbol in the operator's own scope _before_ the `canonical` handler runs, and
+  binds every occurrence of those names to that scope afterwards — so the
+  `parse`, `ce.box()` and `ce.function()` routes agree about which binding a
+  bound variable denotes, whichever route built the expression. The prebuilt
+  selectors (`operandSites`, `indexingSetSites`, `limitsIndexSites`,
+  `lambdaParamSites`) and the `BindingSite`/`BindingSiteSelector` types are
+  exported from `@cortex-js/compute-engine`. `Sum`, `Product`, `Loop`,
+  `Comprehension`, `Series` and `NDSolveFunction` now use it in place of six
+  hand-rolled conventions.
+
+  An indexing-set selector marks its sites `clauseLocal`: later clauses see
+  earlier bindings, but an _earlier_ clause's collection resolves a name a later
+  clause binds in the enclosing scope
+  (`Comprehension(…, Element(i, [j, j+1]), Element(j, […]))` draws `i` from the
+  ambient `j`).
+
+- **`BoxedType.couldMatch()`** — "could a value of this type be a `target`?",
+  the predicate for classifying a value by shape. `matches()` answers the other
+  question — "is _every_ value of this type a `target`" — so it reports `false`
+  for a union whose members include exactly the shape being asked about, which
+  is the steady state for a variable declared with more than one admissible
+  shape:
+
+  ```ts
+  const t = ce.type('tuple<number, number> | list<tuple<number, number>>');
+  t.matches('list<tuple<number, number>>'); // false
+  t.couldMatch('list<tuple<number, number>>'); // true
+  ```
+
+  Unions are distributed at every depth, so a union nested inside a parameter is
+  handled too: `list<integer | tuple<number, number>>` could be a
+  `list<tuple<number, number>>` — witness `[(1,2)]`.
+
+  The relation is symmetric and decisive for the composite shapes it models: a
+  `tuple<number, number>` could not be a `list<tuple<number, number>>`,
+  `list<integer>` could not be a `list<string>`, and a `set<T>` could not be a
+  `list<T>`. List dimensions and tuple arity and element names are compared.
+  Shapes it does not model fall back to assignability in either direction, so
+  the answer is never narrower than `matches()` — with one deliberate exception:
+  `never` is uninhabited, so nothing could be a `never`. `unknown` could be
+  anything; consumers that treat an inconclusive type as "no" should check
+  `isUnknown` themselves.
+
+- **`BoxedType.unionMembers`** — the members of a union type, each boxed, or
+  `[this]` for any other type. Lets a consumer reason arm-by-arm without reading
+  the raw `Type` AST. It does not reach a union nested inside a parameter;
+  `couldMatch()` covers that case directly.
+
+- **`BoxedType.isDisjointFrom()`** — a type-overlap predicate for consumers that
+  classify an expression by comparing its type against a set of candidates.
+  `matches()` answers subtyping (`this <: other`), so two types that share
+  values without either containing the other look unrelated in both directions:
+
+  ```ts
+  const a = ce.type('integer | string');
+  const b = ce.type('integer | boolean');
+  a.matches(b); // false
+  b.matches(a); // false — yet they share `integer`
+  a.isDisjointFrom(b); // false: they may overlap
+  ```
+
+  The predicate is conservative in the safe direction: when disjointness cannot
+  be established the answer is `false` ("may overlap"), never a false claim of
+  disjointness. `unknown` — the type of an undeclared symbol — therefore
+  overlaps everything. It accepts a `Type`, a type string, or a `BoxedType`, and
+  throws on a string that is not a valid type.
+
+### Improvements
+
+- Disjointness now distributes over unions, so `integer | string` is recognized
+  as disjoint from `boolean` instead of falling through to "may overlap". This
+  also makes a union a subtype of a negation when no member meets the negated
+  type (`integer | boolean <: !string`).
+
+- Disjointness is now decided by comparing the primitive _categories_ of the two
+  types, so composite types are separated from each other and from primitives
+  instead of falling through to "may overlap": a `list<integer>` is not a
+  `string`, a `tuple<number, number>` is not a `list<tuple<number, number>>`, a
+  `set` is not a `list`, and a `record` is not a `dictionary`. Broad categories
+  still contain the narrow ones, so `integer` and `value`, or `list<integer>`
+  and `collection`, correctly report "may overlap". This generalizes and
+  replaces the narrower numeric-vs-non-numeric rule.
+
+  Two same-category composites whose parameters cannot coincide (`list<integer>`
+  vs `list<string>`) are deliberately _not_ claimed disjoint: `list<never>` is a
+  subtype of both, so the claim would rest on how the empty list is typed rather
+  than on the type lattice. `couldMatch()` answers that question decisively.
+
+## 0.95.0 _2026-07-25_
+
+### Breaking Changes
+
+- **The random family is redesigned around block-scoped seeding.** Seeding moves
+  out of argument lists and engine state entirely: there is no seed argument
+  anywhere in the family, and no ambient seed to set. A
+  `WithRandomSeed(seed, body)` frame makes every draw inside it — including
+  draws in user-function calls (dynamic scoping) and in compiled code —
+  deterministic and replayable, while draws outside any frame are live.
+
+  ```js
+  ce.box(['WithRandomSeed', 42, ['List', ['Random'], ['Random']]]).evaluate();
+  // → two DIFFERENT values, and the same two values on every re-evaluation
+  ```
+
+  The _n_-th draw of a frame is `hash(seed, n)` — PCG3D, a pure function of the
+  seed and the draw index, computed identically by the interpreter, the
+  JavaScript target, and (as f32) the GPU targets. Draws are IEEE float64
+  regardless of the engine's precision mode, and the seed→stream mapping is a
+  **cross-version contract** pinned by published test vectors. Frames nest
+  (innermost wins) with independent per-frame counters, so one document cell's
+  frame cannot perturb another's. See
+  [Random Numbers](/compute-engine/reference/arithmetic/#random-numbers) (and
+  `docs/RANDOMNESS-MODEL.md` in the repository) for the full contract, including
+  the draw-consumption table and the rule that **only evaluation consumes draw
+  indices** (an untaken branch, an unmaterialized lazy view, or a
+  canonicalized-away wrapper consumes none).
+
+  The surface changes:
+
+  - **`Random` is domain-only.** `Random()` draws a real in [0, 1);
+    `Random(Interval(a, b))` a real in [a, b); `Random(Range(…))` an element of
+    the (normalized, inclusive) range; `Random(xs)` an element of a finite
+    collection. The old `Random(seed)`/`Random(m, n)` forms — where the first
+    argument meant a _seed_ or a _bound_ depending on its numeric type — are
+    rejected by the signature.
+  - **`Sample` → `RandomSample`, `Shuffle` → `RandomShuffle`** — renamed,
+    seedless. `RandomSample`'s domain must be an indexed collection (a `Set` or
+    an `Interval` is now invalid), and `k < 0` or `k > n` is now an
+    `out-of-range` error rather than `undefined`. Without-replacement remains
+    over _positions_, not values: sampling a multiset can repeat a value.
+  - **`RandomInteger`, `RandomList`, and `RandomSeed` are removed**, along with
+    the **`ce.randomSeed`** property. For one release, evaluating a removed head
+    throws an `operator-removed` error naming its replacement, and
+    `ce.randomSeed` is a throwing accessor — nothing fails silently.
+
+  Migration: `Random(seed)` → `WithRandomSeed(seed, Random())`;
+  `Random(n)`/`Random(m, n)` → `Random(Range(0, n-1))`/`Random(Range(m, n-1))`
+  (for the non-degenerate ranges — the old bounds were upper-exclusive);
+  `RandomInteger(a, b)` → `Random(Range(a, b))`; `RandomList(n[, seed])` →
+  `RandomChoice(Interval(0, 1), n)`, framed if seeded;
+  `Shuffle(xs[, seed])`/`Sample(xs, k[, seed])` →
+  `RandomShuffle(xs)`/`RandomSample(xs, k)`, framed if seeded;
+  `RandomSeed(s)`/`ce.randomSeed = s` → `WithRandomSeed(s, …)` around the work.
+
+### New Features
+
+- **`RandomChoice(domain, k)`** — `k` independent draws **with** replacement,
+  the twin of `RandomSample` (without replacement). The domain may be a bounded
+  `Interval`, a `Range`, or any finite collection, and is never materialized:
+  `RandomChoice(Range(1, 10^9), 5)` is O(k). The count is typed `number` (a
+  computed count need not be pre-rounded; it is rounded on evaluation), and `k`
+  may exceed the domain size — that is what replacement means.
+
+- **Random draws now compile — including inside auto-compiled `Map` bodies and
+  in shaders.** Every compiled draw goes through the same engine primitive as
+  the interpreter, deciding framed-vs-unframed at **call time**, so a function
+  compiled outside any frame is deterministic when later called inside one,
+  bit-identical to the interpreter. On the GPU, `WithRandomSeed` frames compile
+  lexically (per-invocation counters): per-pixel seeding is
+  `WithRandomSeed(perPixelSeed, Random())`. Unsupported forms fail closed at
+  compile time rather than drawing silently.
+
+- **Overload sets: an intersection of function signatures is now resolved at the
+  call site.** A function that can be called in several different ways is
+  declared with `&`, and the arm whose parameters accept the arguments is
+  selected. When several arms accept them the **most specific** one wins;
+  incomparable arms are tried in declaration order.
+
+  ```js
+  ce.declare('Draw', {
+    signature: '((set<real>) -> real) & ((collection) -> any)',
+    evaluate: (ops) => {
+      /* dispatch on ops at run time */
+    },
+  });
+
+  ce.box(['Draw', ['Interval', 0, 1]]).type; // → "real"  (set<real> is the more specific arm)
+  ce.box(['Draw', ['List', 1, 2, 3]]).type; // → "any"
+  ce.box(['Draw', 5]).isValid; // → false
+  ```
+
+  Previously such a signature parsed but was inert: applications were never
+  arity- or type-checked and always typed `unknown`. Argument validation, result
+  typing and type inference now all understand overload sets, on the operator
+  definition and the symbol declaration routes alike.
+
+  When an argument's type is not yet known, it is inferred as the **union** of
+  the parameters the surviving arms accept at that position — the constraint the
+  call actually carries. Above, an unknown `x` in `Draw(x)` is inferred
+  `collection`, not `set<real>`: assuming the more specific arm would wrongly
+  reject a later list.
+
+  Note that `->` binds looser than `&`, so each arm must be parenthesized:
+  `(number) -> real & string` is a _single_ signature returning `real & string`.
+  See [Overload Sets](/compute-engine/guides/types/#overload-sets).
+
+### Issues Resolved
+
+- **`.N()` evaluated the operands of `Add` and `Multiply` twice.** The numeric
+  path evaluated every operand exactly, discarded the results, and re-evaluated
+  them numerically — observably wrong for impure operands (a framed `Random()`
+  consumed two draw indices under `N()` and one under `evaluate()`) and a 2×
+  evaluation tax otherwise. Impure operands now evaluate exactly once; pure
+  operands keep the substitute-once-guarded path.
+
+- **`Sample` materialized its whole source to draw a few elements.**
+  `Sample(Range(1, 1000000), 3)` allocated a million boxed numbers and ran a
+  full Fisher-Yates (~300 ms) to return three; large sources were an uncatchable
+  OOM. `RandomSample` now runs a sparse Fisher-Yates over the index space — O(k)
+  time and memory — and `RandomShuffle` refuses sources past the element cap
+  instead of exhausting the heap.
+
+- **Compiled random draws bypassed the engine's stream.** A compiled `Random()`
+  emitted a bare `Math.random()`, so a compiled `Map` silently stopped being
+  reproducible under a seed. Compiled and interpreted draws now share one code
+  path (and the auto-compile gate that excluded impure bodies from `Map`
+  compilation is gone — per-sample-point draws stay in the hot path).
+
+- **`compileShader` emitted shaders that referenced undefined helpers.** A
+  shader whose body used any `_gpu_*` helper (`Gamma`, the fractal helpers, and
+  now the random draw) compiled in CE but failed at GPU shader-compile time,
+  because the helper preamble was never spliced into the emitted source.
+  `compileShader` now derives the preamble from the compiled body and inserts it
+  ahead of the entry point, on both GLSL and WGSL.
+
+- **A function signature nested in a union or an intersection lost its
+  parentheses when serialized**, and re-parsed as a structurally different type
+  with an identical string. `((number) -> real) & ((string) -> boolean)` came
+  back as the single signature `(number) -> (real & ((string) -> boolean))`.
+  Type serialization now parenthesizes a signature wherever it is a member of a
+  union, intersection or negation.
+
+- **An intersection was not a subtype of its own members** when the members were
+  composite types. `((number) -> real) & ((string) -> boolean)` did not match
+  `(number) -> real`. `A & B` is now a subtype of `R` whenever _any_ arm is,
+  matching the behavior that already applied to primitive types.
+
+- **`ce.assume()` threw a `TypeError`** when applied to an operator whose
+  signature had no single result type.
+
+- **A function literal assigned to a symbol declared with an overload set was
+  not arity-checked**, so a two-parameter literal could be stored against
+  one-argument arms and every declared call would silently partial-apply.
+
+- **`Shuffle` and `Sample` were treated as pure functions.** Neither declared
+  `pure: false`, so `isPure` — and therefore `isConstant` — was `true` for a
+  random permutation or sample of a literal collection, and `Sample` was not
+  gated out of `Map` auto-compilation. Both are now declared impure.
+
+- **A masked GPU branch could draw.** The `When`/`Which` fall-through NaN
+  compiled to `0.0 / 0.0`, whose value is implementation-defined in GLSL: a
+  driver may fold it to a finite, renderable value. The `_gpu_nan()` helper now
+  returns `intBitsToFloat(0x7FC00000)`, a guaranteed quiet-NaN bit pattern.
+
+- **Desktop GLSL 4.x shaders were emitted with GLSL ES 1.00 syntax.**
+  `compileShader` chose `in`/`out` over `attribute`/`varying` by testing whether
+  the version string began with `3`, so `450 core` fell through to the ES 1.00
+  keywords. The version is now parsed rather than prefix-matched, and a version
+  below 300 is rejected: the emitted code uses ES 3.00 constructs throughout, so
+  a lower `#version` header could not have compiled.
+
+### Improvements
+
+- The result type of the bare `function` type is now reported as `unknown`
+  rather than `any`. `function` is shorthand for `(any*) -> unknown` and carries
+  no information about its result, so an application of an undeclared function
+  types `unknown`. This is visible in derived types — `[h(x)]` for an undeclared
+  `h` now types `list<unknown>` instead of `list<any>`.
+
+- The result type of a union or intersection of function signatures is now the
+  union of the arms' result types, instead of being undetermined.
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression         | CE (current) | CE 0.92.1 | SymPy | math.js | Mathematica |
+| ------------------ | -----------: | --------: | ----: | ------: | ----------: |
+| $\pi^2$            |          6.1 |       6.5 |   175 |     101 |         3.8 |
+| $\sin 1$           |           19 |        20 |   219 |     483 |         5.2 |
+| $\cos 1$           |           20 |        20 |   218 |     567 |         7.0 |
+| $\ln 2$            |           14 |        14 |   340 |   4,558 |         3.8 |
+| $e^{\pi}$          |           12 |        12 |   226 |   4,770 |         4.5 |
+| $\zeta(3)$         |        1,519 |     1,542 |   268 |       — |          49 |
+| $\Gamma(\tfrac13)$ |          831 |       827 |   348 |       — |         212 |
+| $\psi(\tfrac13)$   |          717 |       713 | 2,778 |       — |         169 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the
+case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is
+`1×`). `—` means the engine can't do the case; `✓` means it solves a case
+Mathematica can't. Compare the **CE (current)** and **CE 0.92.1** columns to see
+what is _new this release_ (a `—` under `0.92.1` next to a number under the
+current build). The **CE + R/F** column is the current build with the opt-in
+Rubi integrator + Fungrim identities loaded (`loadIntegrationRules` /
+`loadIdentities`), on the same minified bundle.
+
+| Operation                              | CE (current) | CE + R/F | CE 0.92.1 |  SymPy  | math.js | Mathematica |
+| -------------------------------------- | :----------: | :------: | :-------: | :-----: | :-----: | :---------: |
+| **Antiderivatives**                    |              |          |           |         |         |             |
+| $\int\frac{1}{\sqrt x}\,dx$            |     6.2×     |   2.9×   |   5.6×    |  0.5×   |    —    |     1×      |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$       |     11×      |   1.6×   |   8.8×    |  0.1×   |    —    |     1×      |
+| $\int\frac{1}{x^3+1}\,dx$              |     6.1×     |   0.9×   |   4.7×    |  0.3×   |    —    |     1×      |
+| $\int\frac{\sqrt x}{1+x}\,dx$          |      —       |   2.0×   |     —     |  0.1×   |    —    |     1×      |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$        |      —       |   1.2×   |     —     |  0.01×  |    —    |     1×      |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$      |      —       |   1.2×   |     —     | 0.007×  |    —    |     1×      |
+| **Derivatives**                        |              |          |           |         |         |             |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$            |    0.04×     |  0.04×   |   0.04×   | 0.0009× | 0.003×  |     1×      |
+| **Simplification**                     |              |          |           |         |         |             |
+| $\sqrt{3+2\sqrt2}$                     |     41×      |   29×    |    36×    |    —    |    —    |     1×      |
+| $\sqrt6\,x+\sqrt2\,x$                  |     83×      |   45×    |    58×    |  3.2×   |   15×   |     1×      |
+| **Evaluation**                         |              |          |           |         |         |             |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$        |     44×      |   18×    |    49×    |  3.1×   |    —    |     1×      |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$      |     8.5×     |   5.2×   |   8.5×    |  2.1×   |    —    |     1×      |
+| $\int_1^2\tfrac1x\,dx$                 |    6294×     |  6380×   |   6457×   |   92×   |    —    |     1×      |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ |     388×     |   143×   |   389×    |  2.4×   |    —    |     1×      |
+| **Solving**                            |              |          |           |         |         |             |
+| $x^4+x^2-1=0$                          |     0.3×     |   0.3×   |   0.3×    |  0.06×  |    —    |     1×      |
+| $x^3-x-1=0$                            |     1.7×     |   1.8×   |   1.5×    |  0.04×  |    —    |     1×      |
+
+Across the cases both solve, Compute Engine is a **median 6.2× faster than
+Mathematica** (up to 6294×) — in the browser, not a proprietary kernel.
+
+<sub>Measured 2026-07-26 · Compute Engine `0.95.0` @ `6c188402` (current build)
+· published `0.92.1` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
+
 ## 0.94.0 _2026-07-24_
 
 ### Breaking Changes
 
 - **`Nothing` now erases inside collections, as it already did inside operator
-  argument lists.** `Nothing` is the ERASURE marker — an empty-sequence splice
-  — so a `Nothing` element is spliced out of a `List`, `Set` or `Tuple` literal
+  argument lists.** `Nothing` is the ERASURE marker — an empty-sequence splice —
+  so a `Nothing` element is spliced out of a `List`, `Set` or `Tuple` literal
   instead of being retained. Length, arity, type and indexing all follow:
 
   ```js
@@ -28,9 +1824,9 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ```
 
   A key–value pair tuple is a NON-erasing position, so a dictionary/record entry
-  whose value is `Nothing` is dropped as a whole entry, but a caller that needs a
-  fixed-arity positional pair whose slot may hold an absent value must build it
-  with `ce._fn('Tuple', …)` and use `Missing` (below) for the hole. This also
+  whose value is `Nothing` is dropped as a whole entry, but a caller that needs
+  a fixed-arity positional pair whose slot may hold an absent value must build
+  it with `ce._fn('Tuple', …)` and use `Missing` (below) for the hole. This also
   applies to lazy iteration: an element that _evaluates_ to `Nothing` is dropped
   (`Map(xs, _ ↦ Nothing)` is the empty collection — the `mapMaybe` idiom).
 
@@ -43,8 +1839,8 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
   Absence is **domain-normalized at value construction**: absence flowing
   through an operator into a NUMERIC result cell becomes `NaN` (the numeric
-  absent element), while a non-numeric result cell keeps `Missing`. So a
-  numeric operator ABSORBS a `Missing` operand into `NaN` rather than carrying a
+  absent element), while a non-numeric result cell keeps `Missing`. So a numeric
+  operator ABSORBS a `Missing` operand into `NaN` rather than carrying a
   `missing` arm:
 
   ```js
@@ -63,10 +1859,10 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ce.box(['At', ['List', 'a', 'b'], 9]).evaluate(); // → Missing (non-numeric)
   ```
 
-  **Gather is now length-preserving** — `At([a, b], [1, 9, 2])` is `[a, hole, b]`
-  (length 3), where the baseline dropped the out-of-range entry — and a **boolean
-  mask whose length differs from the collection is now an error**, where the
-  baseline silently applied the prefix.
+  **Gather is now length-preserving** — `At([a, b], [1, 9, 2])` is
+  `[a, hole, b]` (length 3), where the baseline dropped the out-of-range entry —
+  and a **boolean mask whose length differs from the collection is now an
+  error**, where the baseline silently applied the prefix.
 
 - **The 15 data-consuming aggregates return `NaN` on an absent datum or empty
   input.** `Mean`, `Variance`, `PopulationVariance`, `StandardDeviation`,
@@ -106,31 +1902,31 @@ import ChangeLog from '@site/src/components/ChangeLog';
   ce.box(['Equal', 2, 2]).evaluate(); // → True             (unchanged)
   ```
 
-  Absence for **discharge** (`IsMissing`, `Coalesce`) and **aggregates**
-  (`Max`, `Mean`, …) is unaffected — a `NaN` is still absent there
+  Absence for **discharge** (`IsMissing`, `Coalesce`) and **aggregates** (`Max`,
+  `Mean`, …) is unaffected — a `NaN` is still absent there
   (`IsMissing(NaN) = True`, `Coalesce(NaN, d) = d`, `Max(1, NaN, 3) = NaN`).
   Broadcast comparisons apply the rule per cell. Because `NaN` follows IEEE,
   **compiled and interpreted comparisons now agree by construction** on numeric
   operands (plain `==` is the IEEE semantics — no guard is emitted, and
   `NaN == NaN` compiles to `false`). A **numeric-domain** `missing` arm
   (`number | missing`) does not widen a comparison's result type — that slot's
-  absence value is `NaN`, so the result is a plain `boolean`, a `Missing`
-  value read through such a slot compares as `NaN` (IEEE), and the comparison
+  absence value is `NaN`, so the result is a plain `boolean`, a `Missing` value
+  read through such a slot compares as `NaN` (IEEE), and the comparison
   **compiles on float-only targets (GLSL/WGSL)**. A `missing`-arm operand over
-  an object domain (e.g. `string | missing`) still types `boolean | missing`
-  and lowers via the guarded form
-  (`isAbsent(a) || isAbsent(b) ? null : a == b`) so a `Missing` becomes the
-  target null. A scalar `If`/`Which` condition that evaluates to **`Missing`**
-  yields a catchable **error expression** (`The condition is absent…`) rather
-  than crashing `evaluate()` — absence is a runtime data state, so it must be
-  renderable and catchable; discharge with `Coalesce`/`IsMissing` to branch on
-  possibly-absent data. (A condition that is not boolean at all, e.g.
-  `If(3, …)`, keeps the existing spell-check throw.) A `NaN`-comparison
-  condition yields a plain boolean (IEEE) and branches normally.
+  an object domain (e.g. `string | missing`) still types `boolean | missing` and
+  lowers via the guarded form (`isAbsent(a) || isAbsent(b) ? null : a == b`) so
+  a `Missing` becomes the target null. A scalar `If`/`Which` condition that
+  evaluates to **`Missing`** yields a catchable **error expression**
+  (`The condition is absent…`) rather than crashing `evaluate()` — absence is a
+  runtime data state, so it must be renderable and catchable; discharge with
+  `Coalesce`/`IsMissing` to branch on possibly-absent data. (A condition that is
+  not boolean at all, e.g. `If(3, …)`, keeps the existing spell-check throw.) A
+  `NaN`-comparison condition yields a plain boolean (IEEE) and branches
+  normally.
 
-- **Compiled `Max([])` / `Min([])` now return `NaN`, matching the
-  interpreter** (previously `-Infinity` / `+Infinity` from the identity-seeded
-  reduce). Non-empty folds are unchanged.
+- **Compiled `Max([])` / `Min([])` now return `NaN`, matching the interpreter**
+  (previously `-Infinity` / `+Infinity` from the identity-seeded reduce).
+  Non-empty folds are unchanged.
 
 ### New Features
 
@@ -140,52 +1936,51 @@ import ChangeLog from '@site/src/components/ChangeLog';
   envelope (`{ ok, diagnostics }` with severities, codes, messages, 0-based
   source offsets, 1-based line/column, and fix-its). The same structured
   diagnostics are available during evaluation with `--diagnostics json`.
-- **`cortex doc` — library documentation from the terminal.**
-  `cortex doc Sin` shows a definition's kind, signature or type, description,
-  keywords, and (for constants) value; a non-name argument searches the
-  library by identifier, description, curated keywords, and LaTeX commands
-  (`cortex doc greatest common divisor` → `GCD`, …). `--limit <n>` controls
-  the number of matches and `--json` emits a structured `{ query, matches }`
+- **`cortex doc` — library documentation from the terminal.** `cortex doc Sin`
+  shows a definition's kind, signature or type, description, keywords, and (for
+  constants) value; a non-name argument searches the library by identifier,
+  description, curated keywords, and LaTeX commands
+  (`cortex doc greatest common divisor` → `GCD`, …). `--limit <n>` controls the
+  number of matches and `--json` emits a structured `{ query, matches }`
   envelope.
 - **`Cortex for AI Agents` language card.** A condensed, machine-verified
   reference for LLMs and coding agents writing Cortex (`/cortex/for-agents/`):
-  core semantics, an operator-precedence summary, a table of
-  Python/JavaScript reflexes that don't transfer, and verified idioms. Every
-  example on the page is executed by the documentation test suite, so the
-  card cannot drift from the implementation.
+  core semantics, an operator-precedence summary, a table of Python/JavaScript
+  reflexes that don't transfer, and verified idioms. Every example on the page
+  is executed by the documentation test suite, so the card cannot drift from the
+  implementation.
 
-- **`cortex mcp` — a Model Context Protocol server for Cortex.** Starts an
-  MCP server on stdio (the default) or native Streamable HTTP, giving AI
-  agents structured access to the same operations as the CLI: an `evaluate`
-  tool (each call runs a complete, self-contained program in a fresh session
-  and returns the value as display text, Cortex source and MathJSON, plus
-  diagnostics), `check`, `doc`, `parse` and `serialize` tools, and the
-  `Cortex for AI Agents` language card as the
-  `cortex://docs/for-agents` resource. Register the stdio transport with,
-  e.g., `claude mcp add cortex -- npx -y @cortex-js/compute-engine mcp`, or
-  start the URL endpoint with
-  `cortex mcp --transport streamable-http`. The protocol implementation is
-  self-contained: the package gains no new dependencies.
+- **`cortex mcp` — a Model Context Protocol server for Cortex.** Starts an MCP
+  server on stdio (the default) or native Streamable HTTP, giving AI agents
+  structured access to the same operations as the CLI: an `evaluate` tool (each
+  call runs a complete, self-contained program in a fresh session and returns
+  the value as display text, Cortex source and MathJSON, plus diagnostics),
+  `check`, `doc`, `parse` and `serialize` tools, and the `Cortex for AI Agents`
+  language card as the `cortex://docs/for-agents` resource. Register the stdio
+  transport with, e.g.,
+  `claude mcp add cortex -- npx -y @cortex-js/compute-engine mcp`, or start the
+  URL endpoint with `cortex mcp --transport streamable-http`. The protocol
+  implementation is self-contained: the package gains no new dependencies.
 
-- **Spread arguments — `f(...t)` splices a tuple into a call's arguments.**
-  New Cortex prefix syntax `...` (call argument lists only) and engine `Spread`
+- **Spread arguments — `f(...t)` splices a tuple into a call's arguments.** New
+  Cortex prefix syntax `...` (call argument lists only) and engine `Spread`
   marker: the elements of a tuple become ordinary positional arguments, so a
   point can be fed to a component function without manual indexing —
-  `F(p) = (a(...p), b(...p), c(...p))` instead of `a(p[1], p[2], p[3])`.
-  Several spreads splice in order (`g(...p, ...q)`), variadic built-ins accept
-  them (`Max(...t)`), and the syntax round-trips through the Cortex
-  serializer. A literal tuple splices at canonicalization; a symbolic argument
-  defers — argument validation and the operator's canonical handler wait —
-  until evaluation resolves the tuple and re-validates the real arguments.
-  Tuples only: spreading a `List` or a scalar is an `incompatible-type` error,
-  and an unresolved argument leaves the call symbolic.
+  `F(p) = (a(...p), b(...p), c(...p))` instead of `a(p[1], p[2], p[3])`. Several
+  spreads splice in order (`g(...p, ...q)`), variadic built-ins accept them
+  (`Max(...t)`), and the syntax round-trips through the Cortex serializer. A
+  literal tuple splices at canonicalization; a symbolic argument defers —
+  argument validation and the operator's canonical handler wait — until
+  evaluation resolves the tuple and re-validates the real arguments. Tuples
+  only: spreading a `List` or a scalar is an `incompatible-type` error, and an
+  unresolved argument leaves the call symbolic.
 
   Spread also **compiles**, on every target: a literal tuple splices directly,
   and a tuple-typed argument (`p: tuple<number, number>`) is rewritten
   statically to positional accesses (`f(At(p,1), At(p,2))`). An argument whose
-  tuple arity is not statically known fails closed — a dynamic JS/Python
-  spread would silently mis-bind on an arity mismatch instead of erroring
-  like the interpreter.
+  tuple arity is not statically known fails closed — a dynamic JS/Python spread
+  would silently mis-bind on an arity mismatch instead of erroring like the
+  interpreter.
 
   ```js
   ce.box(['Add', ['Spread', ['Tuple', 1, 2, 3]]]).evaluate(); // → 6
@@ -204,24 +1999,24 @@ import ChangeLog from '@site/src/components/ChangeLog';
   In **compiled** code, a destructuring declare with a literal tuple value
   desugars to per-leaf declares (each element bound once, in order); a
   non-literal value or a shape mismatch fails closed so the interpreter takes
-  over. (This also fixes a silent divergence: the pattern previously compiled
-  as a single `let _ = …`, and every pattern name read as NaN behind
+  over. (This also fixes a silent divergence: the pattern previously compiled as
+  a single `let _ = …`, and every pattern name read as NaN behind
   `success: true`.)
 
   ```js
   ce.box(['Declare', ['Tuple', 'x', 'y'], d]).evaluate(); // d = {value: (3, 4)}
   ```
 
-- **`IsMissing` and `Coalesce` — absence testing and discharge.**
-  `IsMissing(x)` is `True` when `x` is absent (the `Missing` symbol OR a `NaN`,
-  R’s `is.na`); `IsNaN` remains a NaN-specific test. `Coalesce(a, b, …)` returns
-  the first non-absent operand, evaluated left-to-right with short-circuit; if
-  every operand is absent it returns the last one verbatim. Both discharge
-  primitives work identically in the interpreter and compiled (JS/Python) — a
-  numeric hole (`NaN`) and an object hole (`Missing`/null) are handled
-  uniformly. On a target that cannot observe its absent element (a GPU shader,
-  where fast-math may not preserve `isnan`), `IsMissing`/`Coalesce` fail closed
-  with a compile error; propagation still works natively.
+- **`IsMissing` and `Coalesce` — absence testing and discharge.** `IsMissing(x)`
+  is `True` when `x` is absent (the `Missing` symbol OR a `NaN`, R’s `is.na`);
+  `IsNaN` remains a NaN-specific test. `Coalesce(a, b, …)` returns the first
+  non-absent operand, evaluated left-to-right with short-circuit; if every
+  operand is absent it returns the last one verbatim. Both discharge primitives
+  work identically in the interpreter and compiled (JS/Python) — a numeric hole
+  (`NaN`) and an object hole (`Missing`/null) are handled uniformly. On a target
+  that cannot observe its absent element (a GPU shader, where fast-math may not
+  preserve `isnan`), `IsMissing`/`Coalesce` fail closed with a compile error;
+  propagation still works natively.
 
   ```js
   ce.box(['Coalesce', ['At', ['List', 10, 20], 9], 0]).evaluate(); // → 0
@@ -252,32 +2047,32 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Improvements
 
-- **The Cortex serializer reconstructs `let`/`const` syntax.** A `Declare`
-  node now serializes back to its statement form — `let x = 5`,
-  `const c = 6.28`, `let x: real`, and destructuring patterns
-  `let (x, y) = p` — instead of the generic `Declare(x, {value -> 5})`
-  function spelling, so declarations round-trip source → MathJSON → source.
-  Shapes with no `let` spelling (a `holdUntil` attribute, a computed name)
-  keep the generic form.
+- **The Cortex serializer reconstructs `let`/`const` syntax.** A `Declare` node
+  now serializes back to its statement form — `let x = 5`, `const c = 6.28`,
+  `let x: real`, and destructuring patterns `let (x, y) = p` — instead of the
+  generic `Declare(x, {value -> 5})` function spelling, so declarations
+  round-trip source → MathJSON → source. Shapes with no `let` spelling (a
+  `holdUntil` attribute, a computed name) keep the generic form.
 
 - **Compiled comparisons and connectives look through provably-scalar user
-  functions.** A helper declared with an open signature (`(unknown) -> unknown`, the shape that keeps list-broadcasting working) no longer makes a
-  scalar comparison uncompilable: `q(x) < y` with `q(t) = n·t+1` compiles when
-  every argument is scalar and the function's body provably maps scalar
-  parameters to a scalar result (arithmetic/transcendental operators,
-  scalar-typed captured symbols, and nested user helpers — analyzed
-  recursively, with self-recursion declining). A call whose argument may be a
-  collection (`q(L) < y`) still fails closed, so the sound half of the
-  0.93.0 rule is preserved — and unlike a `-> number` return annotation, the
-  look-through never mis-compiles the broadcast call. Element-wise compiled
-  comparisons over collections remain a separate roadmap item.
+  functions.** A helper declared with an open signature (`(unknown) -> unknown`,
+  the shape that keeps list-broadcasting working) no longer makes a scalar
+  comparison uncompilable: `q(x) < y` with `q(t) = n·t+1` compiles when every
+  argument is scalar and the function's body provably maps scalar parameters to
+  a scalar result (arithmetic/transcendental operators, scalar-typed captured
+  symbols, and nested user helpers — analyzed recursively, with self-recursion
+  declining). A call whose argument may be a collection (`q(L) < y`) still fails
+  closed, so the sound half of the 0.93.0 rule is preserved — and unlike a
+  `-> number` return annotation, the look-through never mis-compiles the
+  broadcast call. Element-wise compiled comparisons over collections remain a
+  separate roadmap item.
 
 - **`declare()` accepts `inferredSignature: true`, to vouch that a name is an
   operator without pinning its types.** Declaring a `signature` normally makes
   it a contract, so a wide placeholder such as `(unknown) -> unknown` keeps
   every call typed `unknown` even after a function literal is assigned. That is
   the right default for a fixed API, but not for a name that must be declared
-  *before* its body exists — most often so that `f(x)` parses as an application
+  _before_ its body exists — most often so that `f(x)` parses as an application
   rather than a multiplication:
 
   ```js
@@ -291,72 +2086,71 @@ import ChangeLog from '@site/src/components/ChangeLog';
   The flag was already honored at run time and is now part of the
   `OperatorDefinition` type, so it no longer needs a cast. A declaration that
   omits `signature` entirely behaves the same way.
+
 - **An unapplied `Derivative(f)` now evaluates to a named-parameter function
-  literal.** `Derivative(Sin)` evaluates to `x ↦ cos(x)` (`["Function", ["Cos","x"],"x"]`) instead of the hole-form `cos(_)`, which was typed
-  `finite_number` — so a stored derivative is now callable:
+  literal.** `Derivative(Sin)` evaluates to `x ↦ cos(x)`
+  (`["Function", ["Cos","x"],"x"]`) instead of the hole-form `cos(_)`, which was
+  typed `finite_number` — so a stored derivative is now callable:
   `let g = Derivative(f); g(2)` works instead of erroring with
   `incompatible-type`. Results with no closed form stay symbolic, and the
   multivariate mixed-partial form no longer throws
   `Function body must be a scoped Block expression` when applied.
 - **The Cortex CLI's `--json` output materializes finite lazy collections.**
-  `Range`, `Map`/`Filter` results, and loop-built `Join` chains now serialize
-  as their elements (`["List", 1, 2, …]`, up to 10,000) instead of their
+  `Range`, `Map`/`Filter` results, and loop-built `Join` chains now serialize as
+  their elements (`["List", 1, 2, …]`, up to 10,000) instead of their
   unevaluated recipe; infinite collections keep the structural form.
 - **Cortex trap lints and better "did you mean" suggestions.** Three common
-  cross-language reflexes that previously failed *silently* now produce an
+  cross-language reflexes that previously failed _silently_ now produce an
   advisory warning (the parse and value are unchanged): `=` inside a call
-  argument (`Solve(x^2 = 4, x)` is assignment, not an equation — use `==`),
-  a literal index `0` (indexing is 1-based; `xs[0]` is `NaN`), and a `//`
-  comment that reads as floor division (`7 // 2` is `7` followed by a
-  comment; use `Floor(a / b)`). Calling `print` (or `println`, `printf`,
-  `puts`, `echo`) now explains that a program's output is the value of its
-  last statement. The "did you mean" matcher gained a curated
-  cross-language tier: `split` → `StringSplit`, `push` → `Append`,
-  `ceiling` → `Ceil`. The agent language card gained a verified library
-  quick-roster, output-rendering notes (quoted booleans, list preview
-  elision), and binder-variable semantics for `D`/`Integrate`.
-- **`Pipe`/`Apply` reject or defer a non-function right operand more
-  sensibly.** `x |> f` (`Pipe`) now returns an `incompatible-type` error when
-  `f` is a number, string, or boolean literal (which can never be applied),
-  instead of staying silently inert; a symbol or unevaluated `f` still defers
-  (definitions may arrive later). `Apply` and `Pipe` no longer throw an
-  uncaught `Invalid function literal` when given a string function operand —
-  they decline gracefully. Applying a function-valued expression such as
-  `InverseFunction(f)` now stays symbolic (`Apply(InverseFunction(f), 2)`)
-  instead of misinterpreting it as a lambda body and substituting the argument
-  for `f`.
+  argument (`Solve(x^2 = 4, x)` is assignment, not an equation — use `==`), a
+  literal index `0` (indexing is 1-based; `xs[0]` is `NaN`), and a `//` comment
+  that reads as floor division (`7 // 2` is `7` followed by a comment; use
+  `Floor(a / b)`). Calling `print` (or `println`, `printf`, `puts`, `echo`) now
+  explains that a program's output is the value of its last statement. The "did
+  you mean" matcher gained a curated cross-language tier: `split` →
+  `StringSplit`, `push` → `Append`, `ceiling` → `Ceil`. The agent language card
+  gained a verified library quick-roster, output-rendering notes (quoted
+  booleans, list preview elision), and binder-variable semantics for
+  `D`/`Integrate`.
+- **`Pipe`/`Apply` reject or defer a non-function right operand more sensibly.**
+  `x |> f` (`Pipe`) now returns an `incompatible-type` error when `f` is a
+  number, string, or boolean literal (which can never be applied), instead of
+  staying silently inert; a symbol or unevaluated `f` still defers (definitions
+  may arrive later). `Apply` and `Pipe` no longer throw an uncaught
+  `Invalid function literal` when given a string function operand — they decline
+  gracefully. Applying a function-valued expression such as `InverseFunction(f)`
+  now stays symbolic (`Apply(InverseFunction(f), 2)`) instead of misinterpreting
+  it as a lambda body and substituting the argument for `f`.
 - **Rubi integrator: Euler-substitution lever for √(quadratic)-nested
   radicals.** The experimental Rubi integrator now closes nested radicals whose
   inner radical is a square root of a quadratic with a positive leading
   coefficient — e.g. `∫ 1/(√(x+√(x²+1))+1) dx` (Bondarenko #9) — via an Euler I
-  substitution
-  `t = √a·x + √Q` that rationalizes `√Q` and reduces the integrand to a form the
-  existing linear-radical machinery closes. This raises the Bondarenko benchmark
-  to CE+R/F 21/35.
-- **`simplify()` is value-blind for a symbol's sign and parity.**
-  `.simplify()` no longer reads an assigned symbol's *value* when applying a
-  sign- or parity-driven rewrite: with `w := 5`, `|w|.simplify()` now stays
-  `|w|` and `√(w²).simplify()` is `|w|` (previously both collapsed to `w`,
-  silently baking in `w ≥ 0` and evaluating wrong after a later `w := -3`).
-  Sign and parity are taken only from a symbol's declared type and in-scope
-  assumptions — so `assume(w > 0)` still licenses `|w| → w` — never from its
-  assigned value. `.evaluate()` and `.N()` are unchanged — they still substitute
-  the value.
+  substitution `t = √a·x + √Q` that rationalizes `√Q` and reduces the integrand
+  to a form the existing linear-radical machinery closes. This raises the
+  Bondarenko benchmark to CE+R/F 21/35.
+- **`simplify()` is value-blind for a symbol's sign and parity.** `.simplify()`
+  no longer reads an assigned symbol's _value_ when applying a sign- or
+  parity-driven rewrite: with `w := 5`, `|w|.simplify()` now stays `|w|` and
+  `√(w²).simplify()` is `|w|` (previously both collapsed to `w`, silently baking
+  in `w ≥ 0` and evaluating wrong after a later `w := -3`). Sign and parity are
+  taken only from a symbol's declared type and in-scope assumptions — so
+  `assume(w > 0)` still licenses `|w| → w` — never from its assigned value.
+  `.evaluate()` and `.N()` are unchanged — they still substitute the value.
 - **The `Simplify` operator now evaluates its argument before simplifying.**
   `Simplify(expr)` is now evaluate-then-simplify — the operator counterpart of
-  the `expr.evaluate().simplify()` recipe — so it computes handler-driven results
-  the value-blind `.simplify()` method never touches: `Simplify(Max(3, 5))` → `5`,
-  `Simplify(D(x²+ax, x))` → `a + 2x`, `Simplify(∫x² dx)` → `x³/3`. Because
-  evaluation substitutes assigned symbol values, the change is visible from
-  Cortex: `let x = 5; Simplify(x^2 + x)` now gives `30`. The other transformers
-  (`Expand`, `Factor`, `Together`, `Distribute`) are unchanged — they keep
-  reduce-not-evaluate.
+  the `expr.evaluate().simplify()` recipe — so it computes handler-driven
+  results the value-blind `.simplify()` method never touches:
+  `Simplify(Max(3, 5))` → `5`, `Simplify(D(x²+ax, x))` → `a + 2x`,
+  `Simplify(∫x² dx)` → `x³/3`. Because evaluation substitutes assigned symbol
+  values, the change is visible from Cortex: `let x = 5; Simplify(x^2 + x)` now
+  gives `30`. The other transformers (`Expand`, `Factor`, `Together`,
+  `Distribute`) are unchanged — they keep reduce-not-evaluate.
 - **The `.simplify()` method no longer evaluates structural operators.**
   `Determinant`, `Trace`, `Transpose` and `Length` are no longer reduced by the
   `.simplify()` method (an unreleased whitelist added earlier in this cycle):
-  the method is rule-driven and value-blind, and running an operator's `evaluate`
-  handler is `.evaluate()`'s job. Use `expr.evaluate()` (or the `Simplify`
-  operator, which now evaluates) to reduce them — e.g.
+  the method is rule-driven and value-blind, and running an operator's
+  `evaluate` handler is `.evaluate()`'s job. Use `expr.evaluate()` (or the
+  `Simplify` operator, which now evaluates) to reduce them — e.g.
   `Determinant([[a,b],[c,d]]).evaluate()` → `a·d − b·c`.
 
 ## 0.93.0 _2026-07-23_
@@ -553,51 +2347,50 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Bug Fixes
 
-- **`assume()` after `assign()` now records the assumption.** The predicate
-  was evaluated through the symbol's assigned value before the assumption
-  system saw it, so with `w := 5`, `assume(w > 0)` folded to `True`, returned
+- **`assume()` after `assign()` now records the assumption.** The predicate was
+  evaluated through the symbol's assigned value before the assumption system saw
+  it, so with `w := 5`, `assume(w > 0)` folded to `True`, returned
   `'tautology'`, and recorded **nothing** — the assumption was silently
   discarded on arrival (only the assume-before-assign order worked). Predicates
-  mentioning assigned symbols are now recorded *value-blind*, as facts about
-  the symbol: `assume(w > 0)` after `w := 5` returns `'ok'` and `|w|` then
+  mentioning assigned symbols are now recorded _value-blind_, as facts about the
+  symbol: `assume(w > 0)` after `w := 5` returns `'ok'` and `|w|` then
   simplifies to `w`. A predicate that contradicts the current value (e.g.
   `assume(w > 0)` with `w := -2`) still returns `'contradiction'` and is
   rejected. `'tautology'` now means tautological relative to types and existing
-  assumptions, never relative to an assigned value — re-asserting an equality
-  a symbol's value already satisfies returns `'ok'`, not `'tautology'`.
+  assumptions, never relative to an assigned value — re-asserting an equality a
+  symbol's value already satisfies returns `'ok'`, not `'tautology'`.
 
 - **`.N()` on a multi-limit `Integrate` no longer drops all but the first
   limit.** The numeric-approximation branch read only the first `Limits`
   operand, so `Integrate(f, Limits(x,0,3), Limits(y,0,2))` numericized as a
-  single-variable integral — `∫∫ 1` over `[0,3]×[0,2]` gave `3` (a wrong
-  value, not a decline) and a multivariate integrand gave `NaN`. Multiple
-  limits now perform iterated adaptive Gauss–Kronrod quadrature (Monte-Carlo
-  fallback per level, as for a single limit), following the Mathematica
-  iterator convention the symbolic path already used: the FIRST limit is the
-  OUTERMOST integral, so an inner bound may reference the outer variables —
-  `Integrate(1, Limits(x,0,1), Limits(y,0,x))` (the triangle) numericizes to
-  ½. A bound that references an inner integration variable or a foreign free
-  symbol declines (the integral stays inert) rather than integrating wrongly.
-  The same fix applies to `compile()`: a multi-limit integral that does not
-  close symbolically now compiles to nested quadrature calls — dependent
-  bounds included — where it previously truncated to the first limit.
+  single-variable integral — `∫∫ 1` over `[0,3]×[0,2]` gave `3` (a wrong value,
+  not a decline) and a multivariate integrand gave `NaN`. Multiple limits now
+  perform iterated adaptive Gauss–Kronrod quadrature (Monte-Carlo fallback per
+  level, as for a single limit), following the Mathematica iterator convention
+  the symbolic path already used: the FIRST limit is the OUTERMOST integral, so
+  an inner bound may reference the outer variables —
+  `Integrate(1, Limits(x,0,1), Limits(y,0,x))` (the triangle) numericizes to ½.
+  A bound that references an inner integration variable or a foreign free symbol
+  declines (the integral stays inert) rather than integrating wrongly. The same
+  fix applies to `compile()`: a multi-limit integral that does not close
+  symbolically now compiles to nested quadrature calls — dependent bounds
+  included — where it previously truncated to the first limit.
 
 - **`Transpose`/`ConjugateTranspose` report the transposed static type.** They
   had no type handler, so an unevaluated `Transpose(m)` typed as the generic
-  `value` and was rejected by matrix arithmetic: `Multiply(Transpose(J), J)`
-  for `J = JacobianMatrix(…)` — the Gram-matrix idiom JᵀJ — errored with
+  `value` and was rejected by matrix arithmetic: `Multiply(Transpose(J), J)` for
+  `J = JacobianMatrix(…)` — the Gram-matrix idiom JᵀJ — errored with
   `incompatible-type` unless `J` was evaluated first. Both now preserve the
   element type and swap the shape's axes (`matrix<T^(2x3)>` →
   `matrix<T^(3x2)>`).
 
 - **`simplify()` reaches trig identities inside a quotient.** Recursion into
-  `Divide` operands is deliberately withheld to preserve factored structure
-  for common-factor cancellation, but that also blocked operand-local trig
+  `Divide` operands is deliberately withheld to preserve factored structure for
+  common-factor cancellation, but that also blocked operand-local trig
   reductions: `(r·cosθ)/(r·sin²θ + r·cos²θ)` didn't simplify even though the
-  denominator alone reduces to `r`. Trig-bearing operands of a `Divide` now
-  get the full recursion (the same carve-out `Add`/`Multiply` already made),
-  so it simplifies to `cos(θ)`; factored-polynomial cancellation is
-  unaffected.
+  denominator alone reduces to `r`. Trig-bearing operands of a `Divide` now get
+  the full recursion (the same carve-out `Add`/`Multiply` already made), so it
+  simplifies to `cos(θ)`; factored-polynomial cancellation is unaffected.
 
 - **Value-resolution overreach in the lazy-operand fixes.** The machinery that
   lets `Solve`/`Simplify`/`JacobianMatrix` see through a held operand resolved

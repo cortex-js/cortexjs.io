@@ -197,12 +197,49 @@ ce.parse('[0, 1]').json;
 
 ### Interval Serialization
 
-Intervals are serialized using American notation with explicit LaTeX bracket commands:
+An interval is always serialized so that it reads back as an `Interval`. Which
+spelling is used depends on the position it appears in.
+
+**In a set position** — the right side of `\in`/`\notin`, either side of `\cup`,
+`\cap`, `\setminus`, `\subset`, `\subseteq`, `\supset`, `\supseteq` — the
+conventional bracket notation is used, because the operator forces the set
+reading when the LaTeX is parsed back (see **Contextual Interval Parsing**
+above):
+
+```js
+ce.expr(['Element', 'x', ['Interval', 0, 1]]).latex;
+// ➔ "x\\in\\lbrack0, 1\\rbrack"
+
+ce.expr(['Union', ['Interval', 0, 1], ['Interval', 2, 3]]).latex;
+// ➔ "\\lbrack0, 1\\rbrack\\cup\\lbrack2, 3\\rbrack"
+```
+
+**Anywhere else** nothing disambiguates the interval, so the serialization has
+to stand on its own. Half-open intervals use American notation and an open
+interval uses the ISO reversed brackets; both are unambiguous:
 
 ```js
 ce.expr(['Interval', 0, ['Open', 1]]).latex;
 // ➔ "\\lbrack0, 1\\rparen"
 
 ce.expr(['Interval', ['Open', 0], ['Open', 1]]).latex;
-// ➔ "\\lparen0, 1\\rparen"
+// ➔ "\\rbrack0, 1\\lbrack"
 ```
+
+A **closed** interval has no unambiguous bracket spelling — `[a, b]` is also how
+a two-element list is written, and that is how the parser reads it — so it uses
+the function form:
+
+```js
+ce.expr(['Interval', 0, 1]).latex;
+// ➔ "\\mathrm{Interval}(0, 1)"
+
+ce.parse('\\mathrm{Interval}(0, 1)').json;
+// ➔ ["Interval", 0, 1]
+```
+
+This matters wherever the list reading would also be valid. For example
+`["RandomChoice", ["Interval", 0, 1], n]` draws `n` uniform reals, while
+`["RandomChoice", ["List", 0, 1], n]` picks `n` times between the two *values*
+`0` and `1` — both produce a list of numbers in range, so a lossy round-trip
+would be undetectable downstream.

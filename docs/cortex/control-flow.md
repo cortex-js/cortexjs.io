@@ -11,7 +11,7 @@ date: Last Modified
 ## Functions
 
 A function can be defined in two forms, both lowering to the same shape:
-`["Assign", name, ["Function", body, …params]]`.
+`["DefineFunction", name, ["Function", body, …params]]`.
 
 The **math style** is a single expression:
 
@@ -20,7 +20,7 @@ f(x) = x + 1
 ```
 
 ```json
-["Assign", "f", ["Function", ["Add", "x", 1], "x"]]
+["DefineFunction", "f", ["Function", ["Add", "x", 1], "x"]]
 ```
 
 ```cortex
@@ -28,7 +28,7 @@ f(x, y) = x + y
 ```
 
 ```json
-["Assign", "f", ["Function", ["Add", "x", "y"], "x", "y"]]
+["DefineFunction", "f", ["Function", ["Add", "x", "y"], "x", "y"]]
 ```
 
 The **block style** wraps the body in a statement block, whose value is its
@@ -39,7 +39,7 @@ function f(x) { x + 1 }
 ```
 
 ```json
-["Assign", "f", ["Function", ["Block", ["Add", "x", 1]], "x"]]
+["DefineFunction", "f", ["Function", ["Block", ["Add", "x", 1]], "x"]]
 ```
 
 Parameters can carry a type annotation (`f(x: real) = …`), and the block
@@ -54,9 +54,67 @@ f(x: real) = x + 1
 ```
 
 ```json
-["Assign", "f",
+["DefineFunction", "f",
   ["Function", ["Add", "x", 1], ["Typed", "x", {"str": "real"}]]]
 ```
+
+### Multiple clauses (literal parameters)
+
+A parameter can be a **literal** — a number, string, boolean, `Infinity`,
+`-Infinity`, or `NaN` (the spellings that are literals in expression
+position; `oo` is an input alias for `Infinity`. A constant *name* like
+`Pi` is a symbol and stays a parameter name — writing `f(Pi) = …` binds a
+parameter named `Pi` and draws an advisory `parameter-shadows-constant`
+diagnostic). Definition statements **accumulate**: defining the same name again
+with a different parameter list adds a *clause* rather than replacing the
+function, and a call dispatches to the most specific clause that matches
+its arguments (declaration order only breaks ties between equally specific
+clauses). A non-finite literal clause matches only itself — `f(NaN) = 0`
+handles exactly `NaN`; a `f(x: real)` clause never captures it:
+
+```cortex
+f(NaN) = 0
+f(Infinity) = 1
+f(x: number) = x + 1
+f(Infinity) + f(NaN)
+// ➔ 1
+```
+
+```cortex
+fib(0) = 0
+fib(1) = 1
+fib(n: integer) = fib(n - 1) + fib(n - 2)
+fib(10)
+// ➔ 55
+```
+
+Redefining a clause with the *same* parameter list replaces just that
+clause — so re-running an edited definition behaves as expected. A plain
+assignment (`f = x |-> …`) still replaces the whole binding, clauses and
+all.
+
+A literal parameter lowers to an anonymous parameter constrained to that
+exact value (a *value type*):
+
+```json
+["DefineFunction", "fib",
+  ["Function", 0, ["Typed", "literalParam_1", {"str": "0"}]]]
+```
+
+If no clause matches the evaluated arguments, the call is a
+`no-matching-clause` error. To inspect the clause set of a function, use
+`About`:
+
+```cortex
+f(0) = 1
+f(n: integer) = n + 1
+About(f)
+```
+
+The listing shows one line per clause, in declaration order, and annotates
+clauses that overlap an earlier one of equal specificity as well as clauses
+made unreachable by more specific ones covering their whole (finite)
+domain.
 
 ### Anonymous functions
 
@@ -275,6 +333,117 @@ Alternatives must be **binding-free** — `_` is fine (`[0, _] | [_, 0]`), but a
 named binding inside an alternative (`a | 2 => …`) is a
 `match-alternative-binding` diagnostic, since there is no single value for
 the body to bind `a` to when the alternatives disagree on shape.
+
+### Range patterns
+
+`lo..hi` in pattern position is an **inclusive numeric membership test**: the
+case is selected when the subject is a real number and `lo ≤ subject ≤ hi`.
+The call spelling `Range(lo, hi)` means exactly the same thing — the pattern
+form keys on the operator, not on how it was written:
+
+```cortex
+match x {
+  0..9 => "digit"
+  10..99 => "two digits"
+  _ => "big"
+}
+```
+
+```json
+[
+  "Match",
+  "x",
+  ["MatchCase", ["Range", 0, 9], {"str": "digit"}],
+  ["MatchCase", ["Range", 10, 99], {"str": "two digits"}],
+  ["MatchCase", "_", {"str": "big"}]
+]
+```
+
+Both endpoints are included, and they are compared with the same tolerance
+`match` uses for every other number leaf, so a subject a hair outside an
+endpoint still selects the case. Only a **number** matches: a symbol, a
+collection, a string, a complex number and `NaN` all fall through to the next
+case.
+
+Bounds must be **numeric literals** — negated literals and `Infinity` /
+`-Infinity` included, so `0..Infinity` reads as "any nonnegative number":
+
+```cortex
+match x {
+  0..Infinity => "nonnegative"
+  _ => "negative"
+}
+```
+
+```json
+[
+  "Match",
+  "x",
+  ["MatchCase", ["Range", 0, "PositiveInfinity"], {"str": "nonnegative"}],
+  ["MatchCase", "_", {"str": "negative"}]
+]
+```
+
+A bound that is a bare identifier (which would otherwise *bind*, like any
+identifier in pattern position), a computed expression, or `NaN` is a
+`range-pattern-bounds` diagnostic; a stepped range is a `range-pattern-step`
+diagnostic; and a range whose lower bound exceeds its upper bound is a
+`range-pattern-empty` diagnostic (that case can never match). Use a guard when
+a bound is not a literal:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+match x {
+  0..limit => "in"
+  _ => "out"
+}
+```
+
+Write instead:
+
+```cortex
+match x {
+  n if n >= 0 && n <= limit => "in"
+  _ => "out"
+}
+```
+
+A range pattern binds nothing, so it is legal inside an or-alternative, and a
+guard on a range case can only reference names from the enclosing scope:
+
+```cortex
+match x {
+  0..9 | 100..109 => "in"
+  _ => "out"
+}
+```
+
+```json
+[
+  "Match",
+  "x",
+  [
+    "MatchCase",
+    ["Alternatives", ["Range", 0, 9], ["Range", 100, 109]],
+    {"str": "in"}
+  ],
+  ["MatchCase", "_", {"str": "out"}]
+]
+```
+
+Two consequences worth knowing. First, this is a **carve-out**: a `Range`
+*value* can no longer be matched structurally in pattern position — write
+`== Range(1, 10)` (a pin) to compare against the range value itself. Second,
+a range nested inside a list, tuple or dictionary pattern keeps its ordinary
+structural meaning; membership applies at the top level of a case pattern (or
+of an or-alternative). A `Range` whose bounds are not literals is likewise
+still an ordinary structural pattern.
+
+Because a run of operator characters lexes as one token, a **negative upper
+bound needs a space**: write `0 .. -1`, not `0..-1` (the same maximal-munch
+rule that makes `3! ^ 2` require its space). The formatter always spaces `..`
+in pattern position for this reason.
 
 ### Guards
 

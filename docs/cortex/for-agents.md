@@ -231,17 +231,19 @@ Verified operator names, so you don't have to guess (search for more with
 
 - **Numbers**: `Abs`, `Floor`, `Ceil` (not `Ceiling`), `Round`, `Sqrt`,
   `Max`, `Min` (each takes a list or varargs), `Mod`, `GCD`, `LCM`,
-  `IsPrime`, `RandomInteger(a, b)`.
+  `IsPrime`, `Random(Range(a, b))`.
 - **Lists**: `Length`, `First`, `Last`, `Rest`, `Take`, `Drop`, `Reverse`,
   `Sort` (optional comparator — see below), `IndexOf`, `Join`, `Append`,
   `Sum`, `Mean`, `StandardDeviation` (sample, n−1), `Map`, `Filter`,
+  `Count(xs)` / `Count(xs, v)` / `Count(xs, pred)`,
   `Reduce(list, f, init)`, `Range(a, b)` inclusive, `Range(a, b, step)`.
 - **Strings**: `Characters`, `StringJoin`, `StringSplit(s)` (splits on
   whitespace by default), `String(x)`.
 - **Dictionaries**: `Keys`, `Values`.
 - **Symbolic**: `Simplify`, `HoldValues(body)` (evaluate `body` with its
   assigned symbols kept symbolic), `Solve(eq == v, x)`, `D(expr, x)`,
-  `Derivative(f)`, `Integrate`, `N`, `Type`.
+  `Derivative(f)`, `Integrate`, `N`, `Type`, `IsError(x)` (true for an error
+  value, or an expression carrying one).
 
 Caution: `Head` and `Tail` exist but are **structural** operators
 (`Head([1,2,3])` is the *operator name* `"List"`, not the first element) —

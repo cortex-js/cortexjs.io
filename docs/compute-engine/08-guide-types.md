@@ -155,7 +155,7 @@ The Compute Engine supports the following primitive types:
 | `any`      | The universal type, it contains all possible values. It has the following sub-types: `error`, `nothing`,   `never`,  `unknown` and `expression`. No other type matches `any` |
 | `error` | The type of an **invalid expression**, such as `["Error"]` |
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
-| `never`       | The type that has no values; the empty type or **bottom type**                                             |
+| `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
 | `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown` |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
 | `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
@@ -327,6 +327,18 @@ The type of a list literal is **honest**: it reports the actual (widened)
 element type and the dimensions. Since element types are covariant, the
 honest type is a subtype of every broader form — `vector<finite_integer^3>`
 matches `vector<3>`, `vector`, `list<number>`, and `list`.
+
+The **empty list** has no elements, so its element type is the bottom type 
+`never`. Covariance then makes it a member of every list type, which is what 
+you want — an empty list is a valid list of anything.
+
+```js
+ce.parse("\\[\\]").type.toString();
+// ➔ "list<never>"
+
+ce.parse("\\[\\]").type.matches("list<integer>");
+// ➔ true
+```
 
 The shorthand **`list`** is equivalent to `list<any>`, a list of values of any type.
 
@@ -591,7 +603,217 @@ and it cannot be combined with optional arguments.
 
 ### Function Type
 
-The type `function` matches any function literal. It is a shorthand for `(any*) -> unknown`.
+The type `function` matches any function value — any parameter shape, any
+effects. It is a distinct primitive, **not** a shorthand for a signature such
+as `(any*) -> unknown`: a written signature constrains callbacks
+contravariantly (its parameter types are a promise about what callers may
+pass), so no signature spelling can accept every function. Use `function` for
+operator parameters that take a callback whose shape depends on other
+operands (e.g. `Map`), and a full signature only when the callback's shape is
+fixed.
+
+### Effect Specifiers
+
+A function signature can also state the **effects** of calling the function:
+what it does besides returning a value. The effects go in a slot between the
+argument list and the arrow.
+
+```js
+ce.type("(real) random -> real");     // may draw from the random stream
+ce.type("(string) network -> string"); // performs host network I/O
+ce.type("() scope -> nothing");       // mutates a binding that outlives the call
+```
+
+There are nine effect labels, a closed set:
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"14ch"}}>
+
+| Label | Meaning |
+| :------------ | :---------------------------------------------------------- |
+| `console` | Emits host console or diagnostic output |
+| `entropy` | Unseeded, non-replayable nondeterminism |
+| `environment` | Reads host environment data: navigator, locale, environment variables |
+| `fs_read` | Reads the host filesystem |
+| `fs_write` | Writes the host filesystem |
+| `network` | Performs host network I/O |
+| `random` | May draw from the ambient seeded random stream |
+| `scope` | May mutate a binding that outlives the call |
+| `time` | Reads the host clock |
+
+</div>
+
+Several labels may appear in the slot, separated by spaces. They may be written
+in any order; the canonical form orders them alphabetically.
+
+```js
+ce.type("(string) scope network -> string").toString();
+// ➔ "(string) network scope -> string"
+```
+
+Two keywords may appear in the slot instead of labels:
+
+- `any` means **unknown effects**. It is the top of the effect ordering: every
+  consumer treats it as though every label, present and future, were there. Use
+  it for an opaque function that cannot state what it does.
+- `pure` means **no effects**, stated explicitly.
+
+An **empty slot also means pure**. `(real) pure -> real` and `(real) -> real`
+describe the same set of effects (none) and are interchangeable everywhere a
+type is compared, but they are not spelled the same: `pure` is a *statement*,
+and it survives serialization so that re-declaring from a serialized signature
+keeps the purity contract. An empty slot states nothing, and leaves the effects
+to be inferred from the function's body.
+
+```js
+ce.type("(real) pure -> real").toString();
+// ➔ "(real) pure -> real"
+
+ce.type("(real) -> real").toString();
+// ➔ "(real) -> real"
+```
+
+The grammar fails closed. An unknown label, a repeated label, or `any` or `pure`
+combined with anything else is a type error rather than a silently weakened
+contract:
+
+```js
+ce.type("(real) rndm -> real");
+// ➔ throws: Unknown effect label `rndm`
+
+ce.type("(real) any random -> real");
+// ➔ throws: `any` cannot be combined with other effect labels
+```
+
+Because argument lists are always parenthesized, the slot is positionally
+isolated: an identifier there can only be an effect label, so adding a label in
+a future version can never change how an existing type string parses.
+
+#### Effects and Subtyping
+
+Signatures are **covariant** in their effect set: a function that does less is
+usable wherever a function that may do more is accepted. So `(real) -> real` is
+a subtype of `(real) random -> real`, which is a subtype of `(real) any ->
+real`.
+
+In argument position this flips, which is what makes an annotated parameter a
+*requirement*. A parameter typed with a bare arrow demands a **pure** callback,
+and the check happens at the call boundary like any other argument check:
+
+```js
+ce.declare("integ", { signature: "((any) -> number, real, real) -> real" });
+
+ce.box(["integ", ["Function", ["Add", "x", 1], "x"], 0, 1]).isValid;
+// ➔ true
+
+ce.box(["integ", ["Function", ["Random"], "x"], 0, 1]).isValid;
+// ➔ false  (incompatible-type: "(any) -> number" vs "(unknown) random -> number")
+```
+
+To tolerate an effect rather than forbid it, list it: a parameter typed `(any)
+random -> number` accepts both a drawing callback and a pure one. An operand
+typed `any` fails every bound — a function that will not state its effects
+cannot prove their absence.
+
+The `function` primitive is the escape hatch: it is effect-top, so it accepts
+any callable whatever its effects. That is why `Map(xs, x |-> Random())` is
+accepted; the effect is not rejected, it is simply carried onto the
+application.
+
+#### Inferred and Declared Effects
+
+For a function you define, effects are normally **inferred** from the body, and
+re-inferred every time you assign a new body. A bare arrow leaves them on that
+inferred track — it declares the parameter and result types without pinning the
+effects:
+
+```js
+ce.declare("counter", { type: "number", value: 0 });
+ce.declare("fib", { type: "(number) -> number" });
+
+// Accepted: the body writes an enclosing binding, and the inferred effects
+// are revised to `scope`.
+ce.assign("fib", ce.box(["Function",
+  ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"]));
+
+// Accepted too: a pure body revises them back.
+ce.assign("fib", ce.box(["Function", ["Add", "n", 1], "n"]));
+```
+
+Stating the effects explicitly — a non-empty specifier, or the `pure` keyword —
+turns them into a **contract** instead. Every body assigned to the symbol must
+stay within it. Over-declaring is allowed (a pure body satisfies a `scope`
+contract), but exceeding it is an `incompatible-type` error and the definition
+is not installed:
+
+```js
+ce.declare("g", { type: "(number) pure -> number" });
+
+ce.box(["Assign", "g", ce.box(["Function",
+  ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"])]).evaluate();
+// ➔ Error(ErrorCode("incompatible-type", "pure effects", "scope effects"))
+```
+
+This mirrors how the rest of the type system treats inference: an inferred type
+is flexible and revisable, a declared one is enforced.
+
+### Overload Sets
+
+A function that can be called in several different ways is described by an
+**intersection** of function signatures. The value inhabits every arm, that is,
+it is callable at each of them.
+
+```js
+ce.declare("Draw", {
+  signature: "((set<real>) -> real) & ((collection) -> any)",
+  evaluate: (ops) => {
+    /* dispatch on ops at run time */
+  },
+});
+
+ce.box(["Draw", ["Interval", 0, 1]]).type; // ➔ "real"
+ce.box(["Draw", ["List", 1, 2, 3]]).type; // ➔ "any"
+ce.box(["Draw", 5]).isValid; // ➔ false
+```
+
+Use an intersection (`&`), not a union (`|`). A union would say the value is
+callable in *one* of those ways without saying which, so a call site could rely
+on none of them individually.
+
+**Parenthesize each arm.** The `->` of a signature binds the loosest of all type
+operators: its return type extends as far right as possible and absorbs any
+following `&` or `|`. So `(number) -> real & string` is a *single* signature
+returning `real & string`, not an intersection of two signatures.
+
+When a call is made, the arm whose parameters accept the arguments is selected.
+If several arms accept them, the **most specific** one wins — above,
+`Interval(0,1)` is a `set<real>`, and since `set<real>` is a subtype of
+`collection` both arms accept it, so the first arm is chosen and the result type
+is `real` rather than `any`. Arms that are not comparable are tried in
+declaration order, so it is good practice to write the most specific arm first.
+If no arm accepts the arguments, the call is an error.
+
+An overload set is a subtype of each of its arms:
+
+```js
+ce.type("((number) -> real) & ((string) -> boolean)").matches("(number) -> real");
+// ➔ true
+```
+
+A symbol declared with an overload set behaves the same way:
+
+```js
+ce.declare("f", "((integer) -> integer) & ((string) -> string)");
+
+ce.box(["f", 3]).type; // ➔ "integer"
+ce.box(["f", "'a'"]).type; // ➔ "string"
+ce.box(["f", true]).isValid; // ➔ false
+```
+
+Note that a single `["Function"]` literal usually cannot implement an overload
+set: assigning `(x) -> x + 1` to the `f` above is rejected, because that one
+body must satisfy both `(integer) -> integer` and `(string) -> string`. Overload
+sets are intended for operators whose implementation dispatches on its arguments
+at run time.
 
 ### Typed Function Literals
 
@@ -616,6 +838,27 @@ mode, the arguments of a typed literal are checked against the declared
 parameter types when the function is applied — a mismatch produces an
 `incompatible-type` error. Assigning a typed literal to a symbol gives that
 symbol the annotated signature, including the return type.
+
+The return ascription may also be a **full signature carrying effects** — this
+is how a definition states its effect contract
+(`function roll(n) random -> integer { … }` lowers to a body ascribed
+`"(n: unknown) random -> integer"`). Because of that reading, ascribing an
+*effect-bearing function type* as a plain **return type** requires grouping
+parentheses around it:
+
+```js
+// The literal's own contract: `mk` draws from the random stream.
+ce.box(["Function", ["Typed", body, "'(real) random -> real'"], "x"]);
+
+// A pure literal whose RETURN VALUE is a drawing function: group the type.
+ce.box(["Function", ["Typed", body, "'((real) random -> real)'"], "x"]);
+```
+
+The same rule applies in Cortex: write
+`function mk(x) -> ((real) random -> real) { … }` for the effectful *return
+type*, and `function roll(n) random -> integer { … }` for the definition's own
+contract. An effect-free signature never needs the parentheses — it is always
+read as a return type.
 
 Two refinements apply to this check. A **collection argument against a scalar
 parameter broadcasts**: with `h` declared `(number) -> number`, `h([1, 2, 3])`
@@ -671,6 +914,10 @@ Intersections are most useful for extending or combining record types.
 
 For example, `record<length: integer> & record<size: integer>` is the type of values 
 that are records with both a `length` and a `size` key, that is `record<length: integer, size: integer>`.
+
+An intersection of **function signatures** describes a function that can be
+called in several different ways — see [Overload Sets](#overload-sets). Each arm
+must be parenthesized, since `->` binds looser than `&`.
 
 
 ### Negation
@@ -830,6 +1077,117 @@ ce.type("(x: integer) -> integer")
 // ➔ true
 ```
 
+### Could a Value Be of a Type?
+
+`matches()` asks whether **every** value of a type is a value of the target. 
+That is the right question for type checking, but not for classifying a value 
+by its shape — and the two answers differ on **union types**.
+
+A union matches a target only if *every* one of its members does, so a union 
+answers `false` even when one of its members is exactly the shape you asked 
+about:
+
+```js
+ce.type("integer | string").matches("integer");
+// ➔ false  (a `string` is not an `integer`)
+```
+
+**To check whether a value of a type could be of another type**, use 
+`type.couldMatch()`:
+
+```js
+ce.type("integer | string").couldMatch("integer");
+// ➔ true
+
+// Unions are distributed at every depth, including inside a parameter
+ce.type("list<integer | string>").couldMatch("list<integer>");
+// ➔ true  (witness: `[1, 2]`)
+```
+
+`couldMatch()` is symmetric, and decisive for the composite shapes it models — 
+list elements and dimensions, tuple arity and element names, and the element 
+type of sets and collections:
+
+```js
+ce.type("tuple<number, number>").couldMatch("list<tuple<number, number>>");
+// ➔ false  (a point is not a list of points)
+
+ce.type("list<integer>").couldMatch("list<string>");
+// ➔ false
+```
+
+The `never` type has no values, so nothing could be one — the one place 
+`couldMatch()` deliberately differs from `matches()`, for which `never` is a 
+subtype of everything. An `unknown` type could be anything: check `isUnknown` 
+if you want to treat an inconclusive type as a non-match.
+
+```js
+ce.type("never").couldMatch("integer");
+// ➔ false   (`ce.type("never").matches("integer")` is `true`)
+
+ce.type("unknown").couldMatch("integer");
+// ➔ true
+```
+
+**To examine the members of a union**, use `type.unionMembers`. Any other type 
+yields a single-element array, so the same code path works for both:
+
+```js
+ce.type("integer | string").unionMembers.map((t) => t.toString());
+// ➔ ["integer", "string"]
+
+ce.type("integer").unionMembers.map((t) => t.toString());
+// ➔ ["integer"]
+```
+
+Note that `unionMembers` does not reach a union nested inside a parameter — 
+`list<integer | string>` is a single member. Use `couldMatch()`, which handles 
+that case directly.
+
+**To check whether two types have no values in common**, use 
+`type.isDisjointFrom()`:
+
+```js
+ce.type("integer | string").isDisjointFrom("boolean");
+// ➔ true
+
+ce.type("integer | string").isDisjointFrom("integer | boolean");
+// ➔ false  (they share `integer`)
+```
+
+Types are separated by category, so a composite type is disjoint from a 
+primitive one and from a composite of another kind — a `list` is not a 
+`string`, a `tuple` is not a `list`. (A `record`, however, is NOT disjoint
+from a `dictionary`: a record is the named-shape subtype of dictionary in
+the type hierarchy, so a record value is a dictionary value.)
+
+```js
+ce.type("list<integer>").isDisjointFrom("string");
+// ➔ true
+
+ce.type("tuple<number, number>").isDisjointFrom("list<tuple<number, number>>");
+// ➔ true
+```
+
+:::warning
+`isDisjointFrom()` is conservative: when disjointness cannot be established the 
+answer is `false`, meaning "these may overlap", never a false claim of 
+disjointness.
+
+Because of that, `!isDisjointFrom()` is **not** the same as `couldMatch()` and 
+should not be used to classify a value by shape. Two collections whose element 
+types cannot coincide are the case to watch:
+
+```js
+ce.type("list<integer>").isDisjointFrom("list<string>");
+// ➔ false — "may overlap"
+
+ce.type("list<integer>").couldMatch("list<string>");
+// ➔ false — the answer you want
+```
+
+:::
+
 ### Checking the Type of a Numeric Value
 
 The properties `expr.isNumber`, `expr.isInteger`, `expr.isRational` and 
@@ -945,6 +1303,32 @@ ce.declareType(
 
 The type is defined in the current lexical scope.
 
+A program can declare its own types with the `["DeclareType"]` operator —
+the MathJSON mirror of `ce.declareType()` — or, in Cortex, with the `type`
+statement, which comes in two forms:
+
+```js
+type point = tuple<x: number, y: number>  // nominal
+type alias pair = tuple<number, number>   // structural alias
+let p = point(1, 2)
+let a: pair = (1, 2)
+```
+
+A bare `type` declares a **nominal** type (see below): a new, distinct type
+that no structural value inhabits — `let q: point = (1, 2)` is rejected,
+since the type of `(1, 2)` is a tuple, not a `point`. Values of a nominal
+type come from its **constructor** instead (`point(1, 2)`, see below). It
+lowers to `["DeclareType", "point", "'tuple<x: number, y: number>'"]`.
+
+`type alias` declares a **structural alias**: any value matching the
+definition is compatible with the type. It lowers to the same operator with
+the attributes dictionary `["Dictionary", ["KeyValuePair", "alias",
+"True"]]` — the surface mirror of `ce.declareType()`'s `{ alias: true }`
+option.
+
+The type-variable syntax `type point<T> = tuple<T, T>` is reserved for a
+future release and is reported as not yet supported (both forms).
+
 
 ### Nominal vs Structural Types
 
@@ -973,6 +1357,160 @@ ce.type("tuple<x: integer, y: integer>")
   .matches("pointData");
 // ➔ true
 ```
+
+### Type Constructors
+
+Declaring a type also declares a **constructor**: an operator of the same
+name, in the same scope, that builds values of that type. This is what makes
+a nominal type inhabitable — without it, the type would be a set with no
+members.
+
+```js
+ce.declareType("point", "tuple<x: integer, y: integer>");
+ce.expr(["point", 1, 2]).type;
+// ➔ "point"
+```
+
+The constructor's signature comes from the definition:
+
+- a `tuple` definition gives one argument per element, with the element names
+  as parameter names: `point: (x: integer, y: integer) -> point`;
+- any other definition gives a single argument:
+  `ce.declareType("meters", "number")` gives `meters: (number) -> meters`;
+- a `record` definition auto-declares **no** constructor. A record's field
+  order is documentation, not semantics, so building one positionally would
+  silently depend on it. Record types are inhabited through a **constructor
+  function** instead (below).
+
+Arguments are validated against that signature, so `["point", 1]` (too few)
+and `["point", "'a'", 2]` (wrong type) produce the usual error values.
+
+#### Constructor Functions
+
+Assigning a **function literal** to a nominal type's name — in the scope the
+type is declared in, after the declaration — installs it as the type's
+**constructor function**. The body computes the *payload*, a value that must
+satisfy the definition; the engine checks it (for a record: exactly the
+definition's keys, each field's value against its type) and tags it. This is
+the record inhabitation story, and, for any definition, the smart-constructor
+idiom (validation, normalization, alternate parameterizations):
+
+```js
+ce.declareType("circle", "record<x: number, y: number, r: number>");
+ce.assign("circle", ce.box(["Function",
+  ["Dictionary",
+    ["KeyValuePair", {str: "x"}, "x"],
+    ["KeyValuePair", {str: "y"}, "y"],
+    ["KeyValuePair", {str: "r"}, "r"]],
+  "x", "y", "r"]));
+
+ce.box(["circle", 1, 2, 3]).evaluate().type;
+// ➔ "circle"
+```
+
+In Cortex the same declaration is
+`function circle(x, y, r) { {x -> x, y -> y, r -> r} }`.
+
+The installed operator is an **overload set**: the user's arm plus an
+automatic **raw-injection** arm — a single argument that already satisfies
+the definition is checked and tagged directly, body skipped. Serialization
+emits that raw spelling (`["circle", {payload}]`), so a round trip injects
+the payload unchanged and a normalizing constructor's values compare equal
+after it. Because the raw arm must win on its own domain, a user arm whose
+parameters are not distinguishable from the payload (same arity, overlapping
+types — including unannotated parameters against a same-arity definition) is
+**rejected at install**; use a different arity or annotate the parameters
+with types disjoint from the definition body.
+
+A constructor function may call itself (a recursive normalizer); returning
+its own constructed value passes through un-nested. Assigning a function
+literal to an **alias** type's name replaces the identity constructor with an
+ordinary function — no tagging. Everything else about the constructor guard
+is unchanged: assigning a non-function value over any minted constructor
+still throws.
+
+A nominal constructor is **inert**: `["point", 1, 2]` evaluates to itself,
+and the tag is the value's identity — it survives canonicalization,
+serialization (`["point", 1, 2]` is ordinary MathJSON) and storage in a
+collection (`[p, q]` has type `list<point^2>`). It is pure, and it introduces
+no per-value metadata.
+
+An **alias** declaration mints a checked identity constructor instead: it
+validates its arguments against the definition and returns the plain
+structural value, so `["pointData", 1, 2]` evaluates to the ordinary tuple
+`(1, 2)`. It is a checked-cast spelling, not a tag.
+
+Pass `{ mint: false }` to declare a type without a constructor:
+
+```js
+ce.declareType("bare", "number", { mint: false });
+ce.operatorInfo("bare");
+// ➔ undefined
+```
+
+A type declaration claims **both** namespaces — the type name and the value
+name — atomically. If the current scope already has a value or operator of
+that name, the declaration fails and registers nothing; a name in an outer
+scope is shadowed, not conflicted. Re-declaring a type from a `["DeclareType"]`
+statement replaces its constructor along with its definition.
+
+### Nominal Types Are Opaque
+
+A value of a nominal type is **not** its representation: `point` is not a
+subtype of `tuple<x: integer, y: integer>`, so the operations that consume
+the underlying structure reject it, exactly as they would any other operand
+of the wrong type.
+
+```js
+ce.expr(["First", ["point", 1, 2]]).evaluate();
+// ➔ Error(ErrorCode("incompatible-type", "indexed_collection", "point"))
+
+ce.declareType("meters", "number");
+ce.expr(["Add", ["meters", 5], 1]).evaluate();
+// ➔ Error(ErrorCode("incompatible-type", "number", "meters"))
+```
+
+That is the point of a nominal type: a `meters` cannot be added to a bare
+number by accident. There are three sanctioned windows back in:
+
+- **field access** — the `Field` operator (`p.x` in Cortex) reads one named
+  field through the type's definition when the body has named fields (a
+  record body, or a named-tuple body): `ce.box(["Field", p, "'x'"])`. This
+  dispatches off the definition's field map and does **not** make the value
+  a collection — `First(p)` and `p["x"]` keep rejecting;
+- **pattern matching** — in Cortex, `match p { point(x, y) => x + y }`;
+- reading the operands of the MathJSON application directly from a host.
+
+A **structural alias** has no such reserve: an alias-typed operand unfolds to
+its definition, so `m + 1` with `m: meters` an alias of `number`, or
+`First(p)` with `p` an alias of a tuple, work as expected.
+
+### Equality of Nominal Values
+
+Two values built by the same constructor are equal when their arguments are;
+values built by different constructors — or a constructed value and a plain
+value of the same shape — are not:
+
+```js
+ce.declareType("polar", "tuple<r: integer, t: integer>");
+
+ce.expr(["Equal", ["point", 1, 2], ["point", 1, 2]]).evaluate();
+// ➔ "True"
+ce.expr(["Equal", ["point", 1, 2], ["Tuple", 1, 2]]).evaluate();
+// ➔ "False"
+ce.expr(["Equal", ["polar", 1, 2], ["point", 1, 2]]).evaluate();
+// ➔ "False"
+```
+
+### Compiling Nominal Values
+
+Nominal-ness is static information, fully checked before any code is
+emitted, so **compilation erases the tag**: a constructor application
+compiles exactly where the equivalent plain value compiles, to the same code.
+`meters(x)` compiles to the compiled `x`; `point(x, y)` compiles to whatever
+a `Tuple` compiles to on that target (a JavaScript pair, a GLSL `vec2`) — and
+declines identically where a `Tuple` would. A new type therefore costs
+nothing at run time.
 
 ### Recursive Types
 

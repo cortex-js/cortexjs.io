@@ -53,6 +53,12 @@ The `ce.assume()` method returns a status indicating the result of the assumptio
 - `'tautology'` - The assumption is redundant (already implied by existing assumptions)
 - `'contradiction'` - The assumption conflicts with existing assumptions
 - `'not-a-predicate'` - The expression is not a valid assumption proposition
+- `'internal-error'` - The assumption could not be processed
+
+Every outcome is reported as a return value; an expression that cannot be
+assumed does not throw. The `["Assume"]` operator reports the same outcomes as
+a string — see the
+[`Assume` reference](/compute-engine/reference/core/#Assume).
 
 ```js
 ce.assume(ce.parse("x > 4"));

@@ -211,7 +211,8 @@ that require evaluation, such as `\sin(\pi)`.
 | `lhs.isEqual(rhs)`                       | Mathematical equality (full evaluation). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
-| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)`                 |
+| `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`                |
+| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Structural identity of the **evaluated** operands (Cortex `===`). Unlike `isSame()`, each operand is evaluated first, so `["Same", ["Add", 1, 1], 2]` is `True`. Always decides. |
 
 </div>
 

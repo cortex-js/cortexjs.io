@@ -126,6 +126,23 @@ and necessary when working with infinite collections.
 
 Some operations like `Range`, `Cycle`, `Iterate`, `Repeat` create **lazy collections**.
 
+**Reading a lazy collection repeatedly is cheap.** The elements of a lazy
+collection are computed on first read and cached per instance: walking the
+same collection again — or reading it by index — serves the cached elements
+instead of re-evaluating them. The cache is invalidated precisely: it is
+refreshed when a symbol the collection (transitively) depends on is
+reassigned, when an assumption or definition changes, or when an engine
+setting such as `precision` or `tolerance` changes — but **not** by
+assignments to unrelated symbols, so an animation loop updating one variable
+does not force unrelated collections to recompute.
+
+One consequence for random-valued elements: a collection whose elements draw
+random values (`["Map", xs, ["Function", ["Random"], "x"]]`) draws **once
+per instance** — every reader of that instance sees the same values, like a
+list. A re-created instance draws fresh values. See the
+[`WithRandomSeed`](/compute-engine/reference/arithmetic/#withrandomseed)
+notes for making draws reproducible.
+
 Materializing a lazy collection involves evaluating all its elements and storing 
 them in memory, resulting in an **eager collection**. This is also known as 
 **realizing** the collection.
@@ -150,9 +167,9 @@ Common examples include:
 For example, let's say you want to express the first 10 prime numbers:
 
 ```json example
-["ListFrom", 
+["ListFrom",
   ["Take", 
-    ["Filter", "Integers", ["IsPrime", "_"]], 
+    ["Filter", ["Range", 1, "Infinity"], ["IsPrime", "_"]], 
     10
   ]
 ]
@@ -160,7 +177,20 @@ For example, let's say you want to express the first 10 prime numbers:
 ```
 
 In this expression, only the first 10 prime numbers are computed, 
-and only when the `ListFrom` function is called.
+and only as the elements are accessed. Without the `ListFrom`, the `Take` 
+stays a lazy collection: `["Take", ["Filter", ...], 10]` is finite (at most 
+10 elements), but its elements are only produced on demand.
+
+:::info[Use `Range`, not `Integers`, for an infinite indexed source]
+`Integers` and the other number domains are **sets**: unordered, so they have
+no indexes, and operators that require an indexed collection — `Take`, `Drop`,
+`At`, `First`, `Second`, `Third`, `Last`, `Rest`, `Most` — reject them with an
+`incompatible-type` error. `Filter` preserves the kind of its source, so
+filtering a set yields a set, and `Take` rejects that too.
+
+For an infinite source that _can_ be indexed and `Take`n, use
+`["Range", 1, "Infinity"]` (the positive integers in their natural order).
+:::
 
 Lazy collections are partially materialized when converting an expression to
 a string representation, such as when using the `expr.latex`, `expr.toString()` 
@@ -168,9 +198,9 @@ or `expr.print()` methods. A placeholder is inserted to indicate missing
 elements.
 
 ```js example
-const expr = ce.expr(["Map", "Integers", ["Square", "_"]]);
+const expr = ce.expr(["Map", ["Range", 1, "Infinity"], ["Square", "_"]]);
 expr.print();
-// ➔ [1, 4, 9, 16, 25...]
+// ➔ [1,4,9,16,25,...]
 ```
 
 #### Materialization Cap
@@ -276,9 +306,40 @@ Operations on indexed collections:
 - [**Take**](#take), [**Drop**](#drop), [**Most**](#most), [**Rest**](#rest): access a subset of a collection.
 - [**IndexOf**](#indexof): find the index of an element in a collection.
 - [**Extract**](#extract), [**Exclude**](#exclude): access a collection of elements at specific indexes.
-- [**Sort**](#sort), [**Shuffle**](#shuffle), [**Reverse**](#reverse): reorder a collection.
+- [**Sort**](#sort), [**RandomShuffle**](#randomshuffle), [**Reverse**](#reverse): reorder a collection.
 - [**Unique**](#unique): remove duplicates from a collection.
 - [**RotateLeft**](#rotateleft), [**RotateRight**](#rotateright): rotate a collection to the left or right.
+
+:::info[Predicate and key arguments accept a shorthand]
+Wherever an operation below takes a _predicate_ or a _key_ function, the
+argument can be written either as a full function literal —
+`["Function", ["Greater", "x", 5], "x"]` — or as a **shorthand function
+literal**: an expression whose wildcards (`_`, `_1`, `_2`, …) or free
+unknowns become its parameters. The two are equivalent:
+
+```json example
+["CountIf", ["List", 5, 2, 10, 18], ["Greater", "_", 5]]
+// ➔ 2
+```
+
+A bare `"_"` is the **identity function** — the shorthand of the shorthand:
+
+```json example
+["Map", ["List", 1, 2, 3], "_"]
+// ➔ ["List", 1, 2, 3]
+
+["ChunkBy", ["List", 1, 1, 2, 2, 3], "_"]
+// ➔ ["List", ["List", 1, 1], ["List", 2, 2], ["List", 3]]
+```
+
+Only the bare `"_"` means the identity: `"_1"`, `"_2"`, … are the positional
+parameters of an enclosing shorthand, and any other symbol may _name_ a
+function, so those are left alone.
+
+<ReadMore path="/compute-engine/reference/functions/#Function" >
+Read more about **shorthand function literals**<Icon name="chevron-right-bold" />
+</ReadMore>
+:::
 
 <ReadMore path="/compute-engine/reference/linear-algebra/" >
 See also the **Linear Algebra** section for operations on vectors, matrices, tensors which are a special kind of collection.<Icon name="chevron-right-bold" />
@@ -679,6 +740,57 @@ Unlike [`Fill`](#fill), `Tabulate` takes each dimension as a separate argument.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Table
+</nav>
+
+<FunctionDefinition name="Table">
+
+<Signature name="Table" returns="collection">_f_:function, _dimension_:integer, ...</Signature>
+
+<Signature name="Table" returns="collection">_body_, _spec-1_, ..._spec-n_</Signature>
+
+An alias for [`Tabulate`](#tabulate) that additionally accepts
+Mathematica-style **iterator specs**. Each spec names an index variable and its
+bounds, and `body` is evaluated once per index value.
+
+A spec may be written with braces or with parentheses — `{k, lo, hi}` (a
+`Set`) and `(k, lo, hi)` (a `Tuple`) are equivalent:
+
+```json example
+["Table", ["Square", "k"], ["Tuple", "k", 1, 5]]
+// ➔ ["List", 1, 4, 9, 16, 25]
+
+["Table", ["Square", "k"], ["Set", "k", 1, 5]]
+// ➔ ["List", 1, 4, 9, 16, 25]
+```
+
+A fourth element is a **step**, in either spelling:
+
+```json example
+["Table", "k", ["Tuple", "k", 1, 10, 4]]
+// ➔ ["List", 1, 5, 9]
+```
+
+Multiple specs iterate as nested loops, the first spec being the outermost, and
+produce a nested list:
+
+```json example
+["Table", ["Multiply", "i", "j"], ["Tuple", "i", 1, 2], ["Tuple", "j", 1, 3]]
+// ➔ ["List", ["List", 1, 2, 3], ["List", 2, 4, 6]]
+```
+
+With no iterator spec — for example `["Table", f, 5]` — `Table` behaves exactly
+like `Tabulate`.
+
+The tuple and brace spellings are interchangeable, step included:
+`["Sum", "k", ["Tuple", "k", 1, 10, 2]]` and
+`["Sum", "k", ["Set", "k", 1, 10, 2]]` both evaluate to `25`. `Integrate`
+has no step slot, so a 4-element spec is not recognized there in either
+spelling (the expression stays unevaluated).
+
+</FunctionDefinition>
+
 
 <nav className="hidden">
 ### Repeat
@@ -745,21 +857,31 @@ Use `Take` to get a finite number of elements.
 
 <Signature name="Iterate"  returns="indexed_collection">_f_:function, _initial_:any</Signature>
 
-An infinite collection of the results of applying `f` to the initial
-value.
+An infinite collection built by applying `f` repeatedly, starting from the
+_initial_ value: element _k_ is `f(k, element(k-1))`, and `element(0)` is
+_initial_. The initial value is **not** itself an element of the collection.
 
-If the `initial` value is not specified, it is assumed to be `0`
+If _initial_ is not specified, it is `Nothing`.
 
-```json example
-["Iterate", ["Multiply", "_", 2], 1]
-// ➔ ["List", 1, 2, 4, 8, 16, ...]
-```
+A `f` declared with **two** parameters receives the 1-based index and the
+previous element. A **unary** `f` — including the wildcard shorthand below —
+receives the previous element only.
 
 Use `Take` to get a finite number of elements.
 
 ```json example
-["Take", ["Iterate", ["Add", "_", 2]], 7], 5]
-// ➔ ["List", 7, 9, 11, 13, 15]
+["Take", ["Iterate", ["Multiply", "_", 2], 1], 5]
+// ➔ ["List", 2, 4, 8, 16, 32]
+
+["Take", ["Iterate", ["Add", "_", 2], 7], 5]
+// ➔ ["List", 9, 11, 13, 15, 17]
+```
+
+With the two-parameter form, the index is available — here the factorials:
+
+```json example
+["Take", ["Iterate", ["Function", ["Multiply", "n", "acc"], "n", "acc"], 1], 5]
+// ➔ ["List", 1, 2, 6, 24, 120]
 ```
 
 </FunctionDefinition>
@@ -906,6 +1028,37 @@ Return the dictionary values in dictionary iteration order.
 ["Values", ["Dictionary", ["KeyValuePair", "a", 1], ["KeyValuePair", "b", 2]]]
 // ➔ ["List", 1, 2]
 ```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Field
+</nav>
+
+<FunctionDefinition name="Field">
+
+<Signature name="Field">_value_: any, _field_: string</Signature>
+
+Access a **named field** of a value — `p.x` in Cortex.
+
+On a **record** or **dictionary** value, `["Field", d, "'x'"]` behaves
+exactly as `["At", d, "'x'"]`, including the position-preserving absence
+marker for a key a dictionary may not have.
+
+```json example
+["Field", ["Dictionary", ["KeyValuePair", "a", 10]], "'a'"]
+// ➔ 10
+```
+
+On a value of a **nominal type** whose definition body has named fields — a
+`record` body, or a named-tuple body — the field resolves through the type's
+definition. This is the sanctioned accessor window of the nominal-types
+design: it reads one named field off the definition's field map and does
+**not** make the value a collection (`First(p)` and `p["x"]` keep
+rejecting). A field name that is not in a record or named-tuple definition
+is an `unknown-field` error value.
+
+On an operand whose type is unknown, `Field` stays symbolic.
 
 </FunctionDefinition>
 
@@ -1319,19 +1472,34 @@ specified count.
 
 
 <nav className="hidden">
-### Shuffle
+### RandomShuffle
 </nav>
 
-<FunctionDefinition name="Shuffle">
+<FunctionDefinition name="RandomShuffle">
 
-<Signature name="Shuffle" returns="indexed_collection">_xs_: indexed_collection</Signature>
+<Signature name="RandomShuffle" returns="indexed_collection">_xs_: indexed_collection</Signature>
 
 Return the collection in random order.
 
 ```json example
-["Shuffle", ["List", 5, 2, 10, 18]]
-// ➔ ["List", 10, 18, 5, 5]
+["RandomShuffle", ["List", 5, 2, 10, 18]]
+// ➔ ["List", 10, 18, 5, 2]
 ```
+
+There is no seed argument: wrap the call in `WithRandomSeed(seed, …)` to make
+the permutation reproducible.
+
+```json example
+["WithRandomSeed", 42, ["RandomShuffle", ["List", 5, 2, 10, 18]]]
+// ➔ the same permutation on every evaluation
+```
+
+A permutation needs every element, so the collection is materialized; a
+collection larger than 1,000,000 elements is refused with an `out-of-range`
+error rather than attempted.
+
+`Shuffle` was renamed to `RandomShuffle`; the old name throws an
+`operator-removed` error for one release.
 
 </FunctionDefinition>
 
@@ -1368,7 +1536,7 @@ The optional function is interpreted by its **arity**:
   their original relative order.
 
   ```json example
-  ["Sort", ["List", -3, 1, -2], ["Function", ["Abs", "x"], "x"]]
+  ["Sort", ["List", -3, 1, -2], ["Abs", "_"]]
   // ➔ ["List", 1, -2, -3]
   ```
 
@@ -1549,6 +1717,44 @@ rows.
 // ➔ 4
 ```
 
+<Signature name="Count" returns="integer">_xs_: collection, _value_: any</Signature>
+
+With a second argument that is not a function, returns how many elements of
+_xs_ are equal to _value_. The value is compared using structural identity,
+like the [`Same`](/compute-engine/reference/core/#Same) operator — the same
+comparison [`Contains`](#contains) uses. Number leaves compare by exact value,
+so `0.5` counts as an occurrence of `1/2`.
+
+```json example
+["Count", ["List", 1, 2, 2, 3, 2], 2]
+// ➔ 3
+
+["Count", ["List", 1, 2, 2, 3], 5]
+// ➔ 0
+```
+
+<Signature name="Count" returns="integer">_xs_: collection, _pred_: function</Signature>
+
+With a second argument that is a function, returns how many elements satisfy
+the predicate. The predicate follows the [`Filter`](#filter) contract: it must
+return `True` or `False` for each element.
+
+```json example
+["Count", ["List", 1, 2, 3, 4, 5], ["Greater", "_", 2]]
+// ➔ 3
+```
+
+A shorthand predicate is told from a value by its wildcard: `["Greater", "_", 2]`
+carries one, so it is applied as a predicate, while `True` carries none and is
+counted as an occurrence.
+
+```json example
+["Count", ["List", "True", "False", "True"], "True"]
+// ➔ 2
+```
+
+Both two-argument forms require a finite collection; over an unbounded
+collection the expression remains unevaluated.
 
 </FunctionDefinition>
 
@@ -1581,7 +1787,9 @@ Returns the symbol `True` if the collection has no elements.
 <FunctionDefinition name="Contains">
 <Signature name="Contains" returns="boolean">_xs_: collection, _value_: any</Signature>
 
-Returns `True` if the collection contains the given value, `False` otherwise. The value is compared using the `IsSame` function.
+Returns `True` if the collection contains the given value, `False` otherwise. The value is compared using the `IsSame` function (structural identity, like the `Same` operator).
+
+`Contains(xs, v)` is the value-membership specialization of `Any`: it is equivalent to `Any(xs, (e) |-> e === v)`. To test an arbitrary predicate instead of a specific value, use **`Any`**.
 
 
 ```json example
@@ -1631,9 +1839,9 @@ Returns the 1-based index of the first element in the collection that satisfies 
 Returns the first element in the collection that satisfies the predicate, or `Nothing` if none found.
 
 ```json example
-["Find", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 9]]]
+["Find", ["List", 5, 2, 10, 18], ["Greater", "_", 9]]
 // ➔ 10
-["Find", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 100]]]
+["Find", ["List", 5, 2, 10, 18], ["Greater", "_", 100]]
 // ➔ "Nothing"
 ```
 </FunctionDefinition>
@@ -1655,35 +1863,77 @@ Returns the number of elements in the collection that satisfy the predicate.
 Returns a list of indexes of elements in the collection that satisfy the predicate.
 
 ```json example
-["Position", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+["Position", ["List", 5, 2, 10, 18], ["Greater", "_", 5]]
 // ➔ ["List", 3, 4]
 ```
 </FunctionDefinition>
 
-<FunctionDefinition name="Exists">
-<Signature name="Exists">_collection_, _predicate_:function</Signature>
-
-Returns `True` if any element of the collection satisfies the predicate, `False` otherwise.
+:::info[To test a predicate over a collection, use `Any`/`All`]
+`Exists` and `ForAll` are **logical quantifiers**, not collection operators.
+They take a _condition_ and a _proposition_ — not a collection and a
+predicate function — and they bind a variable. For "does any/every element of
+this collection satisfy this predicate?", reach for
+[`Any`](#any) and [`All`](#all) instead.
 
 ```json example
-["Exists", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 15]]]
+["Any", ["List", 5, 2, 10, 18], ["Greater", "_", 15]]
 // ➔ "True"
-["Exists", ["List", 5, 2, 10], ["Function", ["Greater", "_", 15]]]
+
+["All", ["List", 5, 2, 10, 18], ["Greater", "_", 0]]
+// ➔ "True"
+```
+:::
+
+<FunctionDefinition name="Exists">
+<Signature name="Exists">_condition_, _proposition_:boolean</Signature>
+
+The **existential quantifier**: `True` when the proposition holds for at
+least one value of the quantified variable.
+
+The variable is introduced by the first operand, either as a bare symbol or —
+so the engine can decide the proposition by enumeration — as an
+`["Element", _variable_, _domain_]` condition over a finite domain.
+
+```json example
+["Exists", ["Element", "x", ["Set", 5, 2, 10, 18]], ["Greater", "x", 15]]
+// ➔ "True"
+
+["Exists", ["Element", "x", ["Set", 5, 2, 10]], ["Greater", "x", 15]]
 // ➔ "False"
 ```
+
+`Exists` is a **binder**: the quantified variable is scoped to the
+proposition and shadows any outer symbol of the same name, so an assigned
+value never leaks into the quantified formula.
+
+See also `NotExists` and `ExistsUnique` in the
+[Logic reference](/compute-engine/reference/logic/).
+
 </FunctionDefinition>
 
 <FunctionDefinition name="ForAll">
-<Signature name="ForAll">_collection_, _predicate_:function</Signature>
+<Signature name="ForAll">_condition_, _proposition_:boolean</Signature>
 
-Returns `True` if all elements of the collection satisfy the predicate, `False` otherwise.
+The **universal quantifier**: `True` when the proposition holds for every
+value of the quantified variable. Like `Exists`, it binds the variable
+introduced by its first operand, and it is decided by enumeration when that
+operand is an `["Element", _variable_, _domain_]` condition over a finite
+domain.
 
 ```json example
-["ForAll", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 0]]]
+["ForAll", ["Element", "x", ["Set", 5, 2, 10, 18]], ["Greater", "x", 0]]
 // ➔ "True"
-["ForAll", ["List", 5, 2, 10, 18], ["Function", ["Greater", "_", 5]]]
+
+["ForAll", ["Element", "x", ["Set", 5, 2, 10, 18]], ["Greater", "x", 5]]
 // ➔ "False"
 ```
+
+Written in LaTeX, `\forall x \in \{1, 2, 3\}, x > 0` parses to
+`["ForAll", ["Element", "x", ["Set", 1, 2, 3]], ["Greater", "x", 0]]`.
+
+See also `NotForAll` in the
+[Logic reference](/compute-engine/reference/logic/).
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -1719,6 +1969,10 @@ predicate, so it can return a definite answer even for an infinite collection.
 
 `Any` of an empty collection is `False`. When the answer depends on symbolic or
 undetermined elements, the expression stays unevaluated.
+
+To test whether a collection contains a specific value, use **`Contains`** —
+`Contains(xs, v)` is equivalent to `Any(xs, (e) |-> e === v)` (structural
+identity, not the tolerant `==`).
 
 ```json example
 ["Any", ["List"]]
@@ -1783,7 +2037,7 @@ Returns a collection where _pred_ is applied to each element of the
 collection. Only the elements for which the predicate returns `"True"` are kept.
 
 ```json example
-["Filter", ["List", 5, 2, 10, 18], ["Function", ["Less", "_", 10]]]
+["Filter", ["List", 5, 2, 10, 18], ["Less", "_", 10]]
 // ➔ ["List", 5, 2]
 ```
 
@@ -2097,7 +2351,7 @@ To split a collection into a given _number_ of groups, use `Chunk` instead.
 // ➔ ["List", ["List", 1, 2], ["List", 3, 4], ["List", 5]]
 ["Partition", ["List", 1, 2, 3, 4, 5], 2, 1]
 // ➔ ["List", ["List", 1, 2], ["List", 2, 3], ["List", 3, 4], ["List", 4, 5]]
-["Partition", ["List", 1, 2, 3, 4, 5, 6], ["Function", ["Even", "_"]]]
+["Partition", ["List", 1, 2, 3, 4, 5, 6], ["IsEven", "_"]]
 // ➔ ["List", ["List", 2, 4, 6], ["List", 1, 3, 5]]
 ```
 </FunctionDefinition>
@@ -2121,7 +2375,7 @@ To split a collection into chunks of a given _size_, use `Partition` instead.
 Partitions the collection into groups according to the value of the grouping function applied to each element. Returns a dictionary mapping group keys to lists of elements. Dictionary keys are strings: the key value returned by the function is stringified.
 
 ```json example
-["GroupBy", ["List", 1, 2, 3, 4], ["Function", ["IsEven", "x"], "x"]]
+["GroupBy", ["List", 1, 2, 3, 4], ["IsEven", "_"]]
 // ➔ {"dict": {"False": [1, 3], "True": [2, 4]}}
 ```
 </FunctionDefinition>
