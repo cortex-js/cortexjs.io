@@ -468,12 +468,14 @@ as the `Equal` function.
 
 <Signature name="Same" returns="boolean">_expression1_, _expression2_, ...</Signature>
 
-Evaluate to `True` if every adjacent pair of operands is **structurally
-identical**, otherwise `False`. This is the `===` operator in Cortex.
+Evaluate to `True` if every adjacent pair of operands is **syntactically
+identical**, otherwise `False`. This is the `===` operator in Cortex, also
+written `≣` (U+2263). It is the operator counterpart of the `expr.isSame()`
+method.
 
-`Same` is **total**: it always decides. It evaluates its operands first, then
-compares the resulting values structurally — with no tolerance, and without
-numerically approximating an exact value.
+`Same` is **total**: it always decides. It compares the canonical form of its
+operands as written — with no tolerance, and without numerically approximating
+an exact value.
 
 ```json example
 ["Same", ["Sqrt", 2], 1.4142135623730951]
@@ -482,6 +484,11 @@ numerically approximating an exact value.
 ["Equal", ["Sqrt", 2], 1.4142135623730951]
 // ➔ "True"
 ```
+
+`Same` **never dereferences the value of a symbol**: two expressions that are
+written differently are not the same, even if they have the same value. With
+`x` assigned the value `5`, `["Same", "x", 5]` is `False` while
+`["Equal", "x", 5]` is `True`.
 
 `Equal` is the semantic, tolerant comparison: it may stay unevaluated when the
 answer is not known, since `x = y` is a *condition*. `Same` answers regardless:
@@ -502,13 +509,19 @@ Number leaves compare by **exact value**, not by notation:
 ```
 
 Totality also means `Same` has no IEEE exemption for `NaN`, where `Equal`
-does:
+does. This holds inside a collection as well:
 
 ```json example
 ["Same", "NaN", "NaN"]
 // ➔ "True"
 
 ["Equal", "NaN", "NaN"]
+// ➔ "False"
+
+["Same", ["List", "NaN"], ["List", "NaN"]]
+// ➔ "True"
+
+["Equal", ["List", "NaN"], ["List", "NaN"]]
 // ➔ "False"
 ```
 
@@ -519,10 +532,54 @@ a list of booleans.
 With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
 `True` — matching the Cortex spelling `a === b === c`.
 
-**`Same` vs `IsSame`.** [`IsSame`](#IsSame) holds its operands and compares
-them as written, while `Same` compares the values they evaluate to. So
-`["IsSame", ["Add", 1, 1], 2]` is `False` but `["Same", ["Add", 1, 1], 2]` is
-`True`.
+**`Same` vs `IsSame`.** [`IsSame`](#IsSame) compares its operands exactly as
+written, while `Same` compares their canonical forms. So
+`["IsSame", ["Add", 1, 1], 2]` is `False`, but `["Same", ["Add", 1, 1], 2]` is
+`True`, since canonicalization folds `1 + 1` to `2`.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### IdenticallyEqual
+</nav>
+<FunctionDefinition name="IdenticallyEqual">
+
+<Signature name="IdenticallyEqual" returns="boolean">_expression1_, _expression2_</Signature>
+
+Evaluate to `True` if the two expressions are **identically equal**, that is if
+they have the same value for every value of their free variables. This is the
+operator counterpart of the `expr.isIdenticallyEqual()` method.
+
+<Latex value="(x+1)^2 \equiv x^2 + 2x + 1" flow="column"/>
+
+```json example
+["IdenticallyEqual", ["Square", ["Add", "x", 1]],
+  ["Add", ["Square", "x"], ["Multiply", 2, "x"], 1]]
+// ➔ "True"
+```
+
+Unlike `Equal`, which compares the value of its operands, `IdenticallyEqual`
+proves an identity: it applies symbolic transformations (expansion and
+simplification) and evaluates both expressions at a number of pseudo-random
+sample points. A `True` answer that rests on sampling is a very strong
+indication rather than a formal proof — this is the only comparison operator
+that can answer from sampling.
+
+Like `Equal`, it is three-valued: `True`, `False`, or — when the identity can
+neither be established nor refuted — unevaluated. Note that expressions that
+merely *disagree* at the sampled points are undetermined, not `False`:
+
+```json example
+["IdenticallyEqual", 1, 2]
+// ➔ "False"
+
+["IdenticallyEqual", ["Sin", "x"], ["Cos", "x"]]
+// ➔ ["IdenticallyEqual", ["Sin", "x"], ["Cos", "x"]]  (unevaluated)
+```
+
+The LaTeX notation is `\equiv` (or the `≡` character). A `\equiv` followed by
+`\pmod{n}` is a congruence and parses as
+[`Congruent`](/compute-engine/reference/arithmetic/#Congruent) instead.
 
 </FunctionDefinition>
 

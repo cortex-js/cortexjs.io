@@ -58,6 +58,45 @@ f(x: real) = x + 1
   ["Function", ["Add", "x", 1], ["Typed", "x", {"str": "real"}]]]
 ```
 
+### Effect specifiers
+
+A definition can state the effects that calling it may perform. The specifier
+sits after the parameter list and before the return arrow:
+
+```cortex
+function roll(n) random -> integer { Random(n) }
+```
+
+```json
+["DefineFunction", "roll",
+  ["Function",
+    ["Typed", ["Block", ["Random", "n"]],
+      {"str": "(n: unknown) random -> integer"}],
+    "n"]]
+```
+
+The nine effect labels are `console`, `entropy`, `environment`, `fs_read`,
+`fs_write`, `network`, `random`, `scope`, and `time`. Several labels may be
+listed with spaces. `pure` explicitly promises no effects; `any` means the
+effects are unknown. `pure` and `any` must appear alone.
+
+Without a specifier, effects are inferred from the body and may change when
+the definition is replaced. A written specifier is a contract: the body's
+inferred effects must be a subset of it. A pure body may satisfy a broader
+contract, but a body that performs an undeclared effect is rejected.
+
+The block form may omit the return annotation (`function f() random { … }`),
+in which case its declared result is `unknown`. In the math form, a written
+effect specifier must be followed by a return arrow:
+
+```cortex
+roll(n) random -> integer = Random(n)
+```
+
+See [Effect Specifiers](/compute-engine/guides/types/#effect-specifiers) for
+subtyping, callback checks, and the distinction between inferred and declared
+effects.
+
 ### Multiple clauses (literal parameters)
 
 A parameter can be a **literal** — a number, string, boolean, `Infinity`,
@@ -198,6 +237,69 @@ if x > 0 { 1 } else if x < 0 { 2 } else { 3 }
 
 A `{ }` block's value is its last expression — the same `Block` semantics
 as a multi-statement program (see [Blocks](#blocks) below).
+
+### The conditional expression `a if c else b`
+
+When both branches are single expressions, the braces are noise. The
+conditional form spells the same `If` without them:
+
+```cortex
+let x = 5
+10 if x > 3 else 20
+// ➔ 10
+```
+
+```json
+["If", ["Greater", "x", 3], 10, 20]
+```
+
+It is the *same* `If` — only the branches differ: plain expressions instead of
+`Block`s, so the conditional introduces no scope and no statement can appear in
+a branch.
+
+Three rules follow from where it sits in the grammar:
+
+**The `else` is required.** It is what ends the condition, and a missing branch
+would leave the false case with no value to name. `1 if c` is an error; use the
+block form (`if c { 1 }`) when there is nothing to return.
+
+**It binds looser than every operator that computes, but tighter than the four
+that bind or pair — `=`, `|->`, `|>` and `->`.** So the whole conditional is the
+right-hand side of an assignment, the body of a function, or the value of a
+dictionary entry, and no parentheses are needed around a comparison:
+
+```cortex
+let scale = 2
+let tag = n |-> "big" if n * scale > 10 else "small"
+tag(6)
+// ➔ "big"
+```
+
+```cortex
+let n = 7
+{ "value" -> n, "parity" -> "odd" if n % 2 == 1 else "even" }
+// ➔ {"value" -> 7, "parity" -> "odd"}
+```
+
+Going the other way — a conditional used as an operand — does need
+parentheses, since `1 if c else 2 + 3` reads as `1 if c else (2 + 3)`:
+
+```cortex
+(10 if 3 > 0 else 20) + 5
+// ➔ 15
+```
+
+**Chains nest to the right,** so there is no `else if` spelling to learn:
+
+```cortex
+let n = 0
+"zero" if n == 0 else "negative" if n < 0 else "positive"
+// ➔ "zero"
+```
+
+One layout rule: the `if` must be on the **same line** as the value before it.
+A line break separates statements, so an `if` that starts a line always begins
+a new `if`-statement, never a continuation of the line above.
 
 ## `match`
 
@@ -733,10 +835,67 @@ counter |-> do { counter = counter + 1; counter }
 
 A `do` **not** followed by `{` is an `opening-bracket-expected` diagnostic.
 
-## `return` / `break` / `continue`
+## `break` and `continue`
 
-These three words are reserved but **not implemented**: Cortex's
-expression-oriented style (an `if` is a value, a block's value is its last
-expression) doesn't need an explicit `return` yet, and loops are for-effect
-only. Using them produces a `reserved-word` diagnostic rather than the
-control-transfer behavior their names suggest.
+`break` leaves the innermost enclosing loop; `continue` skips to its next
+iteration. Both lower to the engine's `Break()` / `Continue()` primitives.
+
+```cortex
+for x in [1, 2, 3, 4] {
+  if x > 3 { break }
+  if x == 2 { continue }
+  f(x)
+}
+```
+
+They are valid anywhere inside a loop body — directly, or nested in an `if`, a
+`match` case, or a `do` block:
+
+```cortex
+for x in xs {
+  match x {
+    0 => continue
+    _ => f(x)
+  }
+}
+```
+
+Outside a loop they are a `control-outside-loop` diagnostic:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+if x > 1 { break }
+```
+
+The loop context **resets at every function and lambda boundary**. A `break`
+written inside a function or lambda defined in a loop body does not target
+that loop — it is outside a loop, and diagnosed:
+
+<!-- cortex-test: expect-diagnostics -->
+
+```cortex
+for x in xs {
+  function h() { break }
+}
+```
+
+This boundary is not a style rule. The engine's `Block` short-circuits on
+`Break`/`Continue` structurally, so a `Break` returned out of a lambda body
+would otherwise transfer control to whatever loop happened to be running.
+
+Only the value-less forms are surface syntax. The engine's `Break(v)` — which
+makes the loop evaluate to `v` — has no Cortex spelling yet; it is bundled with
+the ruling on a general `return`.
+
+Serialized back from MathJSON, they appear in their call form (`Break()`,
+`Continue()`), like the `Loop` they belong to.
+
+## `return`
+
+`return` is **not implemented**: Cortex's expression-oriented style (an `if` is
+a value, a block's value is its last expression) doesn't need an explicit
+`return` yet. It is listed among the words the language reserves the right to
+claim later, but nothing claims it today — so `return` is an ordinary
+identifier and carries no control-flow meaning at all, rather than producing a
+diagnostic. Prefer not to use it as a name.

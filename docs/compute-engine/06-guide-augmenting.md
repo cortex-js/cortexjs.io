@@ -282,7 +282,7 @@ The signature of the `evaluate` handler is `(args[], options)`, where:
   argument is a expression. The array may be empty if there are no
   arguments.
 - `options`: an object literal which includes an `engine` property that is the
-  Compute Engine instance that is evaluating the expression and a `numericApproximation` property that is true if the result should be a numeric approximation.
+  Compute Engine instance that is evaluating the expression, a `numericApproximation` property that is true if the result should be a numeric approximation, and an `expression` property that is the expression being evaluated.
 
 Since `args` is an array, you can use destructuring to get the arguments:
 
@@ -291,6 +291,63 @@ ce.declare("double", { evaluate: (args) => args[0].mul(2) });
 
 // or
 ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+```
+
+### The `expression` option
+
+The `expression` option is the canonical expression node being evaluated. Its
+operands (`expression.ops`, `expression.op1`, ...) are the **raw** arguments:
+canonical and bound, but not yet evaluated. The `args` array, by contrast,
+holds the **evaluated** arguments — and when `numericApproximation` is true,
+those have already been turned into floating point numbers. When your handler
+needs to know something about an argument that evaluation destroys — above all
+whether it was *exact* — `expression` is where to look. Treat it as read-only.
+
+The `Power` operator uses it to pick the right branch for a negative base. The
+convention is that a rational exponent `p/q` in lowest terms with an **odd**
+`q` has a real value — `(-8)^(2/3) = 4` — while everything else takes the
+principal complex value. Under `.N()` the exponent reaches the handler as a
+double, from which `p/q` can only be guessed back; reading it from
+`expression.op2` instead keeps the exact terms, so `.N()`, the type and the
+compiled code all decide the same branch.
+
+`expression` is optional: a handler called outside the evaluation driver may
+not receive one, so guard for `undefined` and fall back to what `args` tells
+you. The operand accessors `op1`/`op2`/`ops` and the number properties such as
+`isExact` live on narrowed interfaces, so reach them through the `isFunction()`
+and `isNumber()` guards — the same narrowing the `Power` handler uses.
+
+**`expression.ops[i]` is not always the provenance of `args[i]`.** The
+evaluated arguments are produced by a pass that reindexes them: it flattens an
+**associative** operator (`f(a, f(b, c))` arrives as three arguments, one more
+than the node has), it unwraps `ReleaseHold` (so `expression.ops[i]` is the
+wrapper rather than what was evaluated), and it drops an argument whose
+evaluation yields nothing. The positional correspondence holds only for a
+non-associative operator with no `ReleaseHold` and no dropped argument. If your
+handler indexes into `expression.ops`, treat
+`expression.ops.length !== args.length` as "no provenance available" and fall
+back.
+
+**On a `lazy: true` operator the contrast does not exist**: held operands are
+passed through untouched, so `args` is raw and held as well. Such a handler
+must canonicalize each held operand it consumes — on the `ce.box()` and
+`ce.parse()` routes the held operands are not even canonical.
+
+```js
+import { isFunction, isNumber } from "@cortex-js/compute-engine";
+
+ce.declare("IsExactArgument", {
+  signature: "(number) -> boolean",
+  evaluate: ([x], { expression, engine }) => {
+    // `x` may have been numericized; the raw operand never is.
+    const raw =
+      expression !== undefined && isFunction(expression) ? expression.op1 : x;
+    return isNumber(raw) && raw.isExact ? engine.True : engine.False;
+  },
+});
+
+ce.box(["IsExactArgument", ["Rational", 1, 3]]).N();  // → True
+ce.box(["IsExactArgument", 0.3333]).N();              // → False
 ```
 
 In addition to the `evaluate` handler the function definition can include

@@ -240,7 +240,10 @@ otherwise error:
 | `\pmod{7}` | `["Mod", …, 7]` | Standalone `\pmod` places the modulus as the second argument of `Mod` |
 | `\sin a'` | `["Sin", ["Prime", "a"]]` | Primed variables type-check as arguments |
 
-`\not\equiv` (optionally with a trailing `\pmod n`) negates a congruence, and a
+A bare `\equiv` (or the `≡` character) parses as
+[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual); it is a
+congruence, `Congruent`, only when followed by `\pmod n`. `\not\equiv`
+(optionally with a trailing `\pmod n`) negates a congruence, and a
 chain of congruence steps such as
 `3^{27}\equiv 3^7\pmod{100}\equiv 87\pmod{100}` folds into a conjunction of the
 adjacent steps.

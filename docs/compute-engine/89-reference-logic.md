@@ -53,6 +53,11 @@ description: "Boolean logic in the Compute Engine: the True and False constants 
 
 </div>
 
+`Equivalent` serializes as `\iff`. Note that `\equiv` is not one of its
+notations: it parses as
+[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
+mathematical identity operator.
+
 ### Operator Precedence
 
 Logical operators have lower precedence than comparison and arithmetic operators,

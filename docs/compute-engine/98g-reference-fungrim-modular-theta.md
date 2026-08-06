@@ -21,7 +21,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Dedekind eta function
 
-$$36\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2-\frac{1}{\mathrm{DedekindEta}(\tau)}(24\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau))+\tau\mapsto\frac{1}{\mathrm{DedekindEta}(\tau)}(\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))^{\tripleprime}(\tau)=0$$
+$$36\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\prime}(\tau)^2-\frac{1}{\mathrm{DedekindEta}(\tau)}(24\tau\mapsto\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)/\mathrm{DedekindEta}(\tau)^{\doubleprime}(\tau)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))+\tau\mapsto\frac{1}{\mathrm{DedekindEta}(\tau)}(\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau))^{\tripleprime}(\tau)=0$$
 
 **Holds when** $\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -30,7 +30,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(16\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt[4]{2^{1/4}-1}\sqrt{(1+2^{1/2})^{1/2}-2^{5/8}}}{2^{\frac{113}{64}}\sqrt[16]{1+\sqrt{2}}}$$
+$$\mathrm{DedekindEta}(16\imaginaryI)=\frac{\sqrt[4]{2^{1/4}-1}\sqrt{\sqrt{1+2^{1/2}}-2^{5/8}}}{2^{\frac{113}{64}}\sqrt[16]{1+\sqrt{2}}}\mathrm{DedekindEta}(\imaginaryI)$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -46,7 +46,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{\pi}((\frac{1}{2}\imaginaryI)\mathrm{DedekindEta}(\tau)\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau))$$
+$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{\imaginaryI\mathrm{DedekindEta}(\tau)\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)}{2\pi}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
@@ -55,7 +55,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\exp(\frac{2\pi\imaginaryI}{3}))=\frac{\sqrt[8]{3}\exp(-((1/24\imaginaryI)\pi))\sqrt{\Gamma(1/3)}^{3}}{2\pi}$$
+$$\mathrm{DedekindEta}(\exp(\frac{2\pi\imaginaryI}{3}))=\frac{\exp(-((\pi\imaginaryI)/24))\sqrt[8]{3}\sqrt{\Gamma(1/3)}^{3}}{2\pi}$$
 
 Used by the Compute Engine for simplification.
 [`204acd` · Fungrim entry ↗](https://fungrim.org/entry/204acd)
@@ -77,7 +77,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(6\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt[6]{\frac{5-3^{1/2}}{2}-\frac{1}{2}(2^{1/2}\times3^{3/4})}}{6^{\frac{3}{8}}}$$
+$$\mathrm{DedekindEta}(6\imaginaryI)=\frac{\sqrt[6]{\frac{5-3^{1/2}}{2}-\frac{3^{3/4}}{2^{1/2}}}\mathrm{DedekindEta}(\imaginaryI)}{6^{\frac{3}{8}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -93,7 +93,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(7\imaginaryI)=\sqrt[4]{7^{1/2}-7/2+\frac{1}{2}((4\times7^{1/2}-7)^{1/2})}/\sqrt{7}\mathrm{DedekindEta}(\imaginaryI)$$
+$$\mathrm{DedekindEta}(7\imaginaryI)=(\sqrt[4]{\sqrt{7}-\frac{7}{2}+\frac{1}{2}(\sqrt{4\times7^{1/2}-7})}\mathrm{DedekindEta}(\imaginaryI))/\sqrt{7}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -101,7 +101,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{12}(\imaginaryI\pi\mathrm{DedekindEta}(\tau))\mathrm{EisensteinE}(2, \tau)$$
+$$\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)=\frac{1}{12}(\imaginaryI\pi\mathrm{DedekindEta}(\tau)\mathrm{EisensteinE}(2, \tau))$$
 
 **Holds when** $\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -139,7 +139,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\tau+\frac{1}{2})=\frac{\exp((1/24\imaginaryI)\pi)\mathrm{DedekindEta}(2\tau)^3}{\mathrm{DedekindEta}(\tau)\mathrm{DedekindEta}(4\tau)}$$
+$$\mathrm{DedekindEta}(\tau+\frac{1}{2})=\frac{\exp(\frac{\pi\imaginaryI}{24})\mathrm{DedekindEta}(2\tau)^3}{\mathrm{DedekindEta}(\tau)\mathrm{DedekindEta}(4\tau)}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -155,7 +155,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(8\imaginaryI)=\frac{\mathrm{DedekindEta}(\imaginaryI)\sqrt{2^{1/4}-1}}{2^{\frac{41}{32}}\sqrt[8]{1+\sqrt{2}}}$$
+$$\mathrm{DedekindEta}(8\imaginaryI)=\frac{\sqrt{2^{1/4}-1}\mathrm{DedekindEta}(\imaginaryI)}{2^{\frac{41}{32}}\sqrt[8]{1+\sqrt{2}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -180,7 +180,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DedekindEta}(\sqrt{3}\imaginaryI)=\frac{\sqrt[8]{3}\sqrt{\Gamma(1/3)}^{3}}{\pi\times2^{\frac{4}{3}}}$$
+$$\mathrm{DedekindEta}(\sqrt{3}\imaginaryI)=\frac{\sqrt[8]{3}\sqrt{\Gamma(1/3)}^{3}}{2^{\frac{4}{3}}\pi}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [math.stackexchange.com](https://math.stackexchange.com/questions/1334684/what-is-the-exact-value-of-eta6i/1334940)
@@ -207,7 +207,7 @@ Used by the Compute Engine for simplification.
 
 ## Illustrations of Eisenstein series
 
-$$\mathrm{EisensteinE}(2, \tau)=-(\frac{(12\imaginaryI)\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}{\pi\mathrm{DedekindEta}(\tau)})$$
+$$\mathrm{EisensteinE}(2, \tau)=-(\frac{12\imaginaryI\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)}{\pi\mathrm{DedekindEta}(\tau)})$$
 
 **Holds when** $\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -257,7 +257,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\sum_{m=1}^{\infty}\exp(2\imaginaryI\pi mn\tau)n^{2k-1})}{\mathrm{BernoulliB}(2k)}$$
+$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}(\sum_{m=1}^{\infty}n^{2k-1}\exp(2\pi\imaginaryI\tau)^{mn}))}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -378,7 +378,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\mathrm{DivisorSigma}(2k-1, n)\exp(2\imaginaryI\pi n\tau))}{\mathrm{BernoulliB}(2k)}$$
+$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}\mathrm{DivisorSigma}(2k-1, n)\exp(2\pi\imaginaryI\tau)^{n})}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -395,7 +395,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}(\exp(2\imaginaryI\pi n\tau)n^{2k-1})/(1-\exp(2\imaginaryI\pi n\tau)))}{\mathrm{BernoulliB}(2k)}$$
+$$\mathrm{EisensteinE}(2k, \tau)=1-\frac{4k(\sum_{n=1}^{\infty}(n^{2k-1}\exp(2\pi\imaginaryI\tau)^{n})/(1-\exp(2\pi\imaginaryI\tau)^{n}))}{\mathrm{BernoulliB}(2k)}$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -467,7 +467,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{EisensteinG}(2k, \tau)=2\Zeta(2k)+2(\sum_{m=1}^{\infty}\sum_{n\in \Z}((m\tau+n)^{2k})^{-1})$$
+$$\mathrm{EisensteinG}(2k, \tau)=2\Zeta(2k)+2(\sum_{m=1}^{\infty}(\sum_{n\in \Z}((m\tau+n)^{2k})^{-1}))$$
 
 **Holds when** $k\in\N^*\land\Im(\tau)\gt0$.
 **Symbols:** **EisensteinG** — Eisenstein series.
@@ -509,7 +509,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EisensteinG}(2, \tau)=-(\frac{1}{\mathrm{DedekindEta}(\tau)}((4\imaginaryI)\pi\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)))$$
+$$\mathrm{EisensteinG}(2, \tau)=-(\frac{1}{\mathrm{DedekindEta}(\tau)}(4\pi\imaginaryI\tau\mapsto\mathrm{DedekindEta}(\tau)^{\prime}(\tau)))$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **EisensteinG** — Eisenstein series.
@@ -552,7 +552,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -727,7 +727,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -767,7 +767,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -799,7 +799,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{JacobiTheta}(1, \frac{n}{4}, \imaginaryI)=\begin{cases}0&\mathrm{CongruentMod}(n, 0, 4)\\(-1)^{\lfloor n/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor n/4\rfloor}\frac{\sqrt{2^{1/2}-1}}{2^{7/16}}\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(1, \frac{n}{4}, \imaginaryI)=\begin{cases}0&\mathrm{CongruentMod}(n, 0, 4)\\(-1)^{\lfloor n/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor n/4\rfloor}\frac{\sqrt{2^{1/2}-1}\sqrt[4]{\sqrt{2}+1}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -815,7 +815,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{2})=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI){(2^{1/2}-1)}^{\frac{2}{3}}\sqrt[12]{4+3\sqrt{2}}}{2^{\frac{7}{24}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{2})=\frac{{(2^{1/2}-1)}^{\frac{2}{3}}\sqrt[12]{4+3\sqrt{2}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{\frac{7}{24}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -839,7 +839,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -847,7 +847,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau, s)^{\prime}(\tau)=\frac{\mathrm{JacobiTheta}(j, z, \tau, 2r+s)}{(4\imaginaryI\pi)^{r}}$$
+$$\tau\mapsto\mathrm{JacobiTheta}(j, z, \tau, s)^{\prime}(\tau)=\frac{\mathrm{JacobiTheta}(j, z, \tau, 2r+s)}{(4\pi\imaginaryI)^{r}}$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0\land r\in\N\land s\in\N$.
 Used by the Compute Engine for simplification.
@@ -863,7 +863,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+10\imaginaryI)=\frac{\sqrt{5}\mathrm{JacobiTheta}(3, 0, \imaginaryI)\times2^{\frac{7}{8}}}{5(\sqrt[4]{5}-1)\sqrt{1+\sqrt{5}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+10\imaginaryI)=\frac{2^{\frac{7}{8}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{(5^{1/4}-1)\sqrt{5\sqrt{5}+5}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -887,7 +887,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{(2^{1/2}+1)^{1/4}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(3, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{7/16}}&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -975,7 +975,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)/\sqrt{y}$$
+$$\mathrm{JacobiTheta}(2, 0, y\imaginaryI)=\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{y})/\sqrt{y}$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -991,7 +991,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\sqrt{5}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{5\sqrt{5^{1/2}-2}}$$
+$$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt{5\times5^{1/2}-10}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -1055,7 +1055,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+6\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{1+\sqrt{3}+\sqrt{2}\sqrt[4]{27}}}{2^{\frac{11}{24}}\times3^{\frac{3}{8}}\sqrt[6]{3^{1/2}-1}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+6\imaginaryI)=\frac{\sqrt[3]{1+\sqrt{3}+\sqrt{2}\sqrt[4]{27}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{\frac{11}{24}}\times3^{\frac{3}{8}}\sqrt[6]{\sqrt{3}-1}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -1159,7 +1159,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -1183,7 +1183,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 6\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{-4+2\sqrt{2}\times3^{3/4}+2\sqrt{3}+3\sqrt{2}-3^{3/4}+3^{5/4}}}{2\times3^{\frac{3}{8}}\sqrt[6]{(2^{1/2}-1)(3^{1/2}-1)}}$$
+$$\mathrm{JacobiTheta}(3, 0, 6\imaginaryI)=\frac{\sqrt[3]{(3\times2^{1/2}-4+3^{5/4}+2\sqrt{3})-3^{3/4}+2\sqrt{2}\times3^{\frac{3}{4}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2\times3^{\frac{3}{8}}\sqrt[6]{(\sqrt{2}-1)(\sqrt{3}-1)}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -1207,7 +1207,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+12\imaginaryI)=\frac{\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt[3]{2-3\times2^{1/2}+3^{5/4}+3^{3/4}}}{2^{19/48}\times3^{3/8}}}{\sqrt[3]{-1+\sqrt{2}\times3^{3/4}-\sqrt{3}}\sqrt[12]{2^{1/2}-1}\sqrt[6]{1+\sqrt{3}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 1+12\imaginaryI)=\frac{\frac{{(2-3\times2^{1/2}+3^{5/4}+3^{3/4})}^{1/3}}{2^{19/48}\times3^{3/8}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[12]{\sqrt{2}-1}\sqrt[6]{\sqrt{3}+1}\sqrt[3]{(-1)-\sqrt{3}+\sqrt{2}\times3^{\frac{3}{4}}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -1239,7 +1239,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 45\imaginaryI)=\frac{\sqrt{10}(3+\sqrt{5}+(\sqrt{3}+\sqrt{5}+\sqrt[4]{60})\sqrt[3]{2+\sqrt{3}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{30\sqrt{1+\sqrt{5}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 45\imaginaryI)=\frac{(3+\sqrt{5}+(\sqrt{3}+\sqrt{5}+\sqrt[4]{60})\sqrt[3]{2+\sqrt{3}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{3\sqrt{10+10\sqrt{5}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -1255,7 +1255,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+4\imaginaryI)=\frac{\sqrt[4]{\sqrt{2}+1}}{2^{\frac{7}{16}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
+$$\mathrm{JacobiTheta}(3, 0, 1+4\imaginaryI)=\frac{\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{\frac{7}{16}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -1295,7 +1295,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -1351,7 +1351,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -1390,7 +1390,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{4})=\frac{(1+\frac{1}{\sqrt[4]{2}})\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{1+\sqrt{2}}}{\sqrt{1+\sqrt{2}}}$$
+$$\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{4})=\frac{(1+2^{-(1/4)})\sqrt{\frac{2^{1/2}+1}{2}}\sqrt{2}}{\sqrt{1+\sqrt{2}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -1422,7 +1422,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -1462,7 +1462,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{JacobiTheta}(4, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{(2^{1/2}+1)^{1/4}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(4, \frac{n}{4}, \imaginaryI)=\begin{cases}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 2, 4)\\\frac{\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{7/16}}&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -1574,7 +1574,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -1614,7 +1614,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, 0, \tau)^2}{\mathrm{JacobiTheta}(4, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -1766,7 +1766,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, \sqrt{6}\imaginaryI)=\sqrt[4]{\frac{\sqrt{6}\Gamma(1/24)\Gamma(5/24)\Gamma(7/24)\Gamma(11/24)}{96(18-10\sqrt{3}-7\sqrt{6}+12\sqrt{2})\pi^3}}$$
+$$\mathrm{JacobiTheta}(3, 0, \sqrt{6}\imaginaryI)=\sqrt[4]{\frac{\sqrt{6}\Gamma(1/24)\Gamma(5/24)\Gamma(7/24)\Gamma(11/24)}{96\pi^3((18+12\times2^{1/2})-10\times3^{1/2}-7\times6^{1/2})}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [mathworld.wolfram.com](http://mathworld.wolfram.com/PolyasRandomWalkConstants.html)
@@ -1782,7 +1782,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{\mathrm{JacobiTheta}(2, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(2, z, \tau)}=4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\times(-1)^{n}\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})-\tan(\pi z)$$
+$$\frac{\mathrm{JacobiTheta}(2, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(2, z, \tau)}=4(\sum_{n=1}^{\infty}\frac{(-1)^{n}\exp(\pi\imaginaryI\tau)^{2n}\sin(2\pi nz)}{1-\exp(\pi\imaginaryI\tau)^{2n}})-\tan(\pi z)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land\cos(\pi z)\ne0$.
 Used by the Compute Engine for simplification.
@@ -1806,7 +1806,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(2, 0, \tau)^2}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -1814,7 +1814,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{5+2\sqrt{5}}}{5^{\frac{3}{4}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 5\imaginaryI)=\frac{\sqrt{5+2\sqrt{5}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{5^{\frac{3}{4}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -1901,7 +1901,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)\mathrm{JacobiTheta}(3, 0, \tau)^2}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
+$$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -1941,7 +1941,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, \frac{n}{4}, \imaginaryI)=\begin{cases}(-1)^{\lfloor(n+1)/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\0&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor(n+1)/4\rfloor}\frac{\sqrt{2^{1/2}-1}}{2^{7/16}}\sqrt[4]{\sqrt{2}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
+$$\mathrm{JacobiTheta}(2, \frac{n}{4}, \imaginaryI)=\begin{cases}(-1)^{\lfloor(n+1)/4\rfloor}\mathrm{JacobiTheta}(4, 0, \imaginaryI)&\mathrm{CongruentMod}(n, 0, 4)\\0&\mathrm{CongruentMod}(n, 2, 4)\\(-1)^{\lfloor(n+1)/4\rfloor}\frac{\sqrt{2^{1/2}-1}\sqrt[4]{\sqrt{2}+1}}{2^{7/16}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)&\top\end{cases}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -1957,7 +1957,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(1, z, \tau)}=\cot(\pi z)+4(\sum_{n=1}^{\infty}\frac{\sin(2\pi nz)\exp(2\imaginaryI\pi n\tau)}{1-\exp(2\imaginaryI\pi n\tau)})$$
+$$\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\pi\mathrm{JacobiTheta}(1, z, \tau)}=\cot(\pi z)+4(\sum_{n=1}^{\infty}\frac{\exp(\pi\imaginaryI\tau)^{2n}\sin(2\pi nz)}{1-\exp(\pi\imaginaryI\tau)^{2n}})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land\vert\Im(z)\vert\lt\vert\Im(\tau)\vert\land\sin(\pi z)\ne0$.
 Used by the Compute Engine for simplification.
@@ -1989,7 +1989,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(2, 0, 1+y\imaginaryI)=\frac{\sqrt{2}(1+\imaginaryI)\mathrm{JacobiTheta}(3, 0, \frac{\imaginaryI}{y}+1)}{2\sqrt{y}}$$
+$$\mathrm{JacobiTheta}(2, 0, 1+y\imaginaryI)=\frac{(1+\imaginaryI)\mathrm{JacobiTheta}(3, 0, 1+\frac{\imaginaryI}{y})}{\sqrt{2y}}$$
 
 **Holds when** $y\in\lparen0, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -1997,7 +1997,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 1+8\imaginaryI)=\frac{\sqrt[8]{16+15\sqrt[4]{2}+12\sqrt{2}+9\sqrt[4]{8}}}{2^{\frac{7}{8}}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)$$
+$$\mathrm{JacobiTheta}(3, 0, 1+8\imaginaryI)=\frac{\sqrt[8]{16+15\sqrt[4]{2}+12\sqrt{2}+9\sqrt[4]{8}}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{2^{\frac{7}{8}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -2093,7 +2093,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(3, 0, 3\imaginaryI)=\frac{\mathrm{JacobiTheta}(3, 0, \imaginaryI)\sqrt{1+\sqrt{3}}}{\sqrt[4]{2}\times3^{\frac{3}{8}}}$$
+$$\mathrm{JacobiTheta}(3, 0, 3\imaginaryI)=\frac{\sqrt{\sqrt{3}+1}\mathrm{JacobiTheta}(3, 0, \imaginaryI)}{\sqrt[4]{2}\times3^{\frac{3}{8}}}$$
 
 Used by the Compute Engine for simplification.
 **Reference:** [doi.org](https://doi.org/10.1016/j.jmaa.2003.12.009)
@@ -2231,7 +2231,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=\frac{(-2\imaginaryI)\pi\mathrm{EisensteinE}(6, \tau)\mathrm{ModularJ}(\tau)}{\mathrm{EisensteinE}(4, \tau)}$$
+$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=\frac{-2\pi\imaginaryI\mathrm{EisensteinE}(6, \tau)\mathrm{ModularJ}(\tau)}{\mathrm{EisensteinE}(4, \tau)}$$
 
 **Holds when** $\Im(\tau)\gt0\land\mathrm{EisensteinE}(4, \tau)\ne0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
@@ -2274,7 +2274,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\tau)={(\frac{\mathrm{DedekindEta}(\tau)}{\mathrm{DedekindEta}(2\tau)}^8+(256\mathrm{DedekindEta}(2\tau)^{16})/\mathrm{DedekindEta}(\tau)^{16})}^3$$
+$$\mathrm{ModularJ}(\tau)={(\frac{\mathrm{DedekindEta}(\tau)}{\mathrm{DedekindEta}(2\tau)}^8+2^8\frac{\mathrm{DedekindEta}(2\tau)}{\mathrm{DedekindEta}(\tau)}^{16})}^3$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
@@ -2358,7 +2358,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=((-2\imaginaryI)\pi\mathrm{EisensteinE}(14, \tau))/\mathrm{DedekindEta}(\tau)^{24}$$
+$$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=(-2\pi\imaginaryI\mathrm{EisensteinE}(14, \tau))/\mathrm{DedekindEta}(\tau)^{24}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
@@ -2413,7 +2413,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{3}(\pi\imaginaryI((\mathrm{EisensteinE}(2, \tau/2)+8\mathrm{EisensteinE}(2, 2\tau))-6\mathrm{EisensteinE}(2, \tau)))\mathrm{ModularLambda}(\tau)$$
+$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{3}(\pi\imaginaryI((\mathrm{EisensteinE}(2, \tau/2)+8\mathrm{EisensteinE}(2, 2\tau))-6\mathrm{EisensteinE}(2, \tau))\mathrm{ModularLambda}(\tau))$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
@@ -2448,7 +2448,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ModularJ}(\tau)=\frac{256{(-\mathrm{ModularLambda}(\tau)+\mathrm{ModularLambda}(\tau)^2+1)}^3}{(1-\mathrm{ModularLambda}(\tau))^2\mathrm{ModularLambda}(\tau)^2}$$
+$$\mathrm{ModularJ}(\tau)=\frac{256{(1-\mathrm{ModularLambda}(\tau)+\mathrm{ModularLambda}(\tau)^2)}^3}{\mathrm{ModularLambda}(\tau)^2(1-\mathrm{ModularLambda}(\tau))^2}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant; **ModularLambda** — Modular lambda function.
@@ -2465,7 +2465,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\Re(\tau)=-1), \tau\mapsto\mathrm{ModularLambda}(\tau))=\lparen-\infty, 0\rparen$$
+$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\Re(\tau)=-1), \tau\mapsto\mathrm{ModularLambda}(\tau))=\rbrack-\infty, 0\lbrack$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
@@ -2483,7 +2483,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{ModularLambda}(\tau)=(16\mathrm{DedekindEta}(2\tau)^{16}\mathrm{DedekindEta}(\tau/2)^8)/\mathrm{DedekindEta}(\tau)^{24}$$
+$$\mathrm{ModularLambda}(\tau)=(16\mathrm{DedekindEta}(\tau/2)^8\mathrm{DedekindEta}(2\tau)^{16})/\mathrm{DedekindEta}(\tau)^{24}$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
@@ -2561,7 +2561,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{\pi}((2\imaginaryI)(-6\mathrm{WeierstrassZeta}(\frac{1}{2}, \tau)+8\mathrm{WeierstrassZeta}(\frac{1}{2}, 2\tau)+\mathrm{WeierstrassZeta}(\frac{1}{2}, \frac{\tau}{2}))\mathrm{ModularLambda}(\tau))$$
+$$\tau\mapsto\mathrm{ModularLambda}(\tau)^{\prime}(\tau)=\frac{1}{\pi}(2\imaginaryI((\mathrm{WeierstrassZeta}(1/2, \tau/2)+8\mathrm{WeierstrassZeta}(1/2, 2\tau))-6\mathrm{WeierstrassZeta}(1/2, \tau))\mathrm{ModularLambda}(\tau))$$
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function; **WeierstrassZeta** — Weierstrass zeta function.
@@ -2570,7 +2570,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\vert\tau+1/2\vert=1/2), \tau\mapsto\mathrm{ModularLambda}(\tau))=\lparen1, \infty\rparen$$
+$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\vert\tau+1/2\vert=1/2), \tau\mapsto\mathrm{ModularLambda}(\tau))=\rbrack1, \infty\lbrack$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.

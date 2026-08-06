@@ -182,9 +182,20 @@ _prefix-expression_ → (**`-`** | **`!`**) _expression_
 
 _infix-expression_ → _expression_ _operator_ _expression_
 
-_parameter_ → _symbol_ \[**`:`** _type_\]
+_literal-parameter_ → _signed-number_ | _string_ | **`true`** | **`false`**
+&nbsp;&nbsp;&nbsp;&nbsp;— a string literal parameter cannot contain interpolation
+
+_parameter_ → _symbol_ \[**`:`** _type_\] | _literal-parameter_
 
 _parameters_ → **`(`** \[(_parameter_)#**`,`**\] **`)`**
+
+_effect-label_ → **`console`** | **`entropy`** | **`environment`** |
+**`fs_read`** | **`fs_write`** | **`network`** | **`random`** |
+**`scope`** | **`time`**
+
+_effect-specifier_ → **`pure`** | **`any`** | (_effect-label_)+
+&nbsp;&nbsp;&nbsp;&nbsp;— labels are space-separated; duplicates are rejected;
+**`pure`** and **`any`** cannot be combined with another word
 
 _declaration_ → (**`let`** | **`const`**) _symbol_
 \[**`:`** _type_\] \[**`=`** _expression_\] |
@@ -194,13 +205,32 @@ _symbol_ **`:`** _type_ \[**`=`** _expression_\]
 _tuple-pattern_ → **`(`** (_symbol_ | _tuple-pattern_)#**`,`** **`)`**
 &nbsp;&nbsp;&nbsp;&nbsp;— at least two elements; `_` skips a position
 
-_function-definition_ → _symbol_ _parameters_
-\[**`->`** _type_\] **`=`** _expression_ |
-**`function`** _symbol_ _parameters_ \[**`->`** _type_\] _block_
+_math-function-signature_ → **`->`** _type_ |
+_effect-specifier_ **`->`** _type_
 
-_type-declaration_ → **`type`** \[**`alias`**\] _symbol_
-\[**`<`** (_symbol_)#**`,`** **`>`**\] **`=`** _type_
-&nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` slot is reserved and rejected
+_type-parameter_ → _symbol_ \[**`:`** _type_\]
+&nbsp;&nbsp;&nbsp;&nbsp;— the bound must be a ground type (it may not mention
+another type parameter)
+
+_type-parameter-clause_ → **`<`** (_type-parameter_)#**`,`** **`>`**
+&nbsp;&nbsp;&nbsp;&nbsp;— at least one parameter (`<>` is rejected); duplicate
+names are rejected; the names scope over the definition's HEAD only (its
+parameters, effect specifier, and return type), not over its body
+
+_function-definition_ → _symbol_ _parameters_
+\[_math-function-signature_\] **`=`** _expression_ |
+**`function`** _symbol_ \[_type-parameter-clause_\] _parameters_
+\[_effect-specifier_\] \[**`->`** _type_\] _block_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` clause is claimed only by the
+**`function`** form: `f<T>(x) = x` is genuinely ambiguous with a relational
+expression, so the math form does not take it
+
+_type-declaration_ → **`type`** **`alias`** _symbol_
+\[_type-parameter-clause_\] **`=`** _type_ |
+**`type`** _symbol_ **`=`** _type_
+&nbsp;&nbsp;&nbsp;&nbsp;— only the **`alias`** form takes a clause; the
+`<…>` slot of the bare (nominal) form is reserved and rejected. The clause
+names scope over the definition only, and each must be used in it
 
 _while-statement_ → **`while`** _expression_ _block_
 

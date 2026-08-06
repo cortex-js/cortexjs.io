@@ -22,7 +22,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Bell numbers
 
-$$\mathrm{BellNumber}(n)=\frac{2\Im(\int_{0}^{\pi}\!\sin(nx)\exp(\exp(\exp(\imaginaryI x)))\, \mathrm{d}x)n!}{\exponentialE\pi}$$
+$$\mathrm{BellNumber}(n)=\frac{2n!\Im(\int_{0}^{\pi}\!\exp(\exp(\exp(\imaginaryI x)))\sin(nx)\, \mathrm{d}x)}{\pi\exponentialE}$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -42,7 +42,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BernoulliB}(2n)=\frac{2\Zeta(2n)(2n)!\times(-1)^{n+1}}{(2\pi)^{2n}}$$
+$$\mathrm{BernoulliB}(2n)=\frac{(-1)^{n+1}\times2(2n)!\Zeta(2n)}{(2\pi)^{2n}}$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -373,7 +373,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n})/\sqrt{5}\sinh(n(\ln(\varphi)+\frac{\pi}{2}\imaginaryI))$$
+$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n}\sinh(n(\ln(\varphi)+\frac{\pi\imaginaryI}{2})))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.

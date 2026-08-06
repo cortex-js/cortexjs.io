@@ -337,7 +337,8 @@ This partial canonicalization:
 Unlike the full canonical form, it does **not** evaluate numeric expressions:
 \\(3 \times 2\\) stays as `["Multiply", 2, 3]` rather than being folded to `6`.
 
-You can combine this with `isEqual()` to give differentiated feedback:
+You can combine this with `isIdenticallyEqual()` to give differentiated
+feedback:
 
 ```js
 const goodAnswer = ce.parse(answerLatex, { form: ['Flatten', 'Order'] });
@@ -345,12 +346,18 @@ const input = ce.parse(inputLatex, { form: ['Flatten', 'Order'] });
 
 if (goodAnswer.isSame(input)) {
   // Correct method — structurally equivalent
-} else if (goodAnswer.isEqual(input)) {
-  // Right numeric value but wrong method
+} else if (goodAnswer.isIdenticallyEqual(input)) {
+  // Right answer but wrong method
 } else {
   // Incorrect
 }
 ```
+
+Use `isIdenticallyEqual()` rather than `isEqual()` when the answer may contain
+unknowns: `isEqual()` compares values and returns `undefined` for a symbolic
+identity such as \\( (x+1)^2 \\) versus \\( x^2 + 2x + 1 \\), while
+`isIdenticallyEqual()` establishes it. See
+[Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions).
 
 If you only need binding (so that operator definitions are available and
 arithmetic methods like `.add()` and `.mul()` work) without any normalization,

@@ -341,6 +341,31 @@ wrapping its last statement, so the canonical form of the example above is:
   ["Typed", "x", "'integer'"]]
 ```
 
+**Generic literals**. A whole-signature annotation carrying a `forall` clause
+makes the literal **generic** (see [Generic Signatures](/compute-engine/guides/types/#generic-signatures)).
+It may be written as a signature string in place of the parameter list:
+
+```json example
+["Function", ["Add", "x", "x"], "'forall T: number. (x: T) -> T'"]
+```
+
+or as a full-signature `Typed` marker on the body — which is also the
+canonical form the sugar above lowers to:
+
+```json example
+["Function",
+  ["Block", ["Typed", ["Add", "x", "x"], "'forall T: number. (x: T) -> T'"]],
+  "x"]
+```
+
+The signature is the single source of truth for the parameter types: a
+parameter whose type mentions a type variable is **erased** to a bare symbol,
+while a ground one (`["Typed", "n", "'integer'"]`) keeps its annotation and is
+checked as usual. Each application solves the variables against the arguments,
+so `["Apply", _literal_, 21]` above evaluates to `42` and the bound `number`
+is enforced. A `forall` clause on an individual *parameter* annotation is not
+accepted — type variables are introduced by a whole-signature clause only.
+
 Type annotations round-trip through MathJSON but are dropped when serializing
 to LaTeX (there is no LaTeX notation for them).
 

@@ -23,7 +23,7 @@ exponentiation.
 1. **Indexing is 1-based.** `xs[1]` is the first element.
 2. **Arithmetic is exact and symbolic by default.** `1/3` is the rational one
    third, `Ln(2)` stays `ln(2)`. Floats happen only when you ask, with `N(…)`.
-3. **`//` is a comment, not floor division**, and `=` is assignment, never
+3. **`//` is a comment, not floor division**, and `=` assigns only as a whole statement — inside an expression it is `Equal`, never
    equality. Both fail *quietly* — see [Traps](#traps).
 
 There is no `print`. A program's value is the value of its **last statement**.
@@ -63,7 +63,7 @@ let double = x |-> 2x
 | `{1, 2, 3}` (set) | `{1, 2, 3}` |
 | `(1, 2)` (tuple) | `(1, 2)` |
 | `{"a": 1}` (dict) | `{"a" -> 1}`; empty dictionary is `{->}` |
-| `d["a"]` | `d["a"]` — never `d.a` |
+| `d["a"]` | `d["a"]`, or `d.a` when the key is an identifier |
 | `xs[0]` | `xs[1]` — **1-based** |
 | `xs[-1]` | `xs[-1]` |
 | `xs[1:3]` | `xs[2..3]` — 1-based, **inclusive** on both ends |
@@ -90,8 +90,10 @@ let counts = DictionaryFrom(Zip(["apples", "figs"], [3, 1]))
 // ➔ (3, ["apples","figs"], NaN)
 ```
 
-A missing dictionary key yields `NaN` rather than raising `KeyError` — see
-[Traps](#traps).
+A missing numeric dictionary field yields `NaN` rather than raising
+`KeyError`; a missing nonnumeric field remains `Missing`. `IsMissing`
+recognizes either representation, and `Coalesce(value, fallback)` supplies a
+default. See [Traps](#traps).
 
 ### Comprehensions
 
@@ -130,7 +132,7 @@ Sum(m)
 | `for x in xs:` | `for x in xs { … }` |
 | `for i in range(n):` | `for i in 1..n { … }` |
 | `while c:` | `while c { … }` |
-| `break`, `continue` | *(reserved, not implemented)* — loop on a condition instead |
+| `break`, `continue` | `break`, `continue` |
 | `match … case` (3.10+) | `match … { pattern => body }` |
 | `try/except` | *(none)* — errors are ordinary values |
 | `# comment` | `// comment` or `/* … */` |
@@ -293,11 +295,11 @@ still returns a plausible-looking value.
 |:--|:--|:--|
 | `7 // 2` | `//` starts a comment, so the statement is just `7` | `Floor(7 / 2)` |
 | `xs[0]` | Silently `NaN` — indexing is 1-based | `xs[1]` |
-| `Solve(x^2 = 4, x)` | Silently `[]` — `=` is assignment | `Solve(x^2 == 4, x)` |
-| `d["missing"]` | `NaN`, not a `KeyError` | Guard first: `IndexOf(Keys(d), k)` is `0` when the key is absent |
+| `f(a = 1)` as a keyword argument | There are no keyword arguments; inside an expression `=` is `Equal`, so this passes the boolean `a == 1` | pass positionally |
+| `d["missing"]` | An absence value, not a `KeyError` (`NaN` for a numeric field, otherwise `Missing`) | `Coalesce(d["missing"], fallback)` or test with `IsMissing` |
 | `xs[1:3]` | Python's half-open slice; `xs[2..3]` is 1-based and inclusive | check both ends |
 | `x^1/2` | `(x^1)/2` — `^` binds tighter than `/` | `Sqrt(x)` or `x^(1/2)` |
-| `while c: … break` | `break` is unimplemented; the loop runs to the iteration limit | make the condition do the work |
+| `x = 5` inside an expression | Compares, rather than assigning — only a whole statement assigns | `:=` to assign in place, `==` to be explicit |
 | `print(x)` | Inert, nothing is printed | the program's value is its last statement |
 | `Round(2.5)` | `3` (half away from zero), not Python's `2` | *(intentional)* |
 | `3!^2` | Diagnostic — the lexer reads `!^` as one token | `3! ^ 2` |

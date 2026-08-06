@@ -39,6 +39,12 @@ ce.parse('p \\leftrightarrow q'); // → ["Equivalent", "p", "q"]
 **Note:** `\to` is reserved for function/set mapping notation (e.g., `f: A \to B`)
 and parses as `To`, not `Implies`.
 
+**Note:** `\equiv` is *not* a spelling of `Equivalent`: it parses as
+[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
+mathematical identity operator. Use `\iff` or `\Leftrightarrow` for a
+biconditional. (Over boolean operands the two agree, since two propositions are
+identically equal exactly when they are equivalent.)
+
 ### Additional Operators
 
 The Compute Engine also supports exclusive OR, NAND, and NOR:

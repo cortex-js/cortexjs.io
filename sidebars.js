@@ -368,6 +368,16 @@ const sidebars = {
           id: "cortex/naming",
           className: "guide-icon",
         },
+        {
+          type: "doc",
+          id: "cortex/from-python",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
+          id: "cortex/from-mathematica",
+          className: "guide-icon",
+        },
         { type: "html", value: "<hr/>" },
         {
           type: "doc",

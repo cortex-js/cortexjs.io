@@ -67,6 +67,17 @@ of operations in the expression, and giving an increasing cost to:
 `costFunction` property of the compute engine to a function assigning a cost to
 an expression.
 
+The cost is applied strictly: a rewrite is kept only if the result does not
+cost more than what it replaces. `simplify()` therefore never returns
+something more complicated than what you gave it.
+
+Some rewrites are mathematically preferred yet score worse — combining powers
+takes \\(2 \cdot 2^x\\) from cost 4 to cost 5. Those do not rely on any
+numeric allowance; they are tagged `purpose: 'transform'`, which exempts them
+from the cost gate entirely. If you write a rule that should apply regardless
+of cost, tag it the same way — see
+[Patterns and Rules](/compute-engine/guides/patterns-and-rules/).
+
 ## Numeric Simplifications
 
 The `expr.simplify()` function will apply some numeric simplifications, such as

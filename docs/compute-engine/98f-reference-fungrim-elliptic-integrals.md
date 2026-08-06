@@ -35,7 +35,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)=\frac{(\pi a-2\mathrm{AGM}(a, b)\mathrm{EllipticE}((a-b)/(a+b)^2))\mathrm{AGM}(a, b)}{\pi a(a-b)}$$
+$$a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)=\frac{\mathrm{AGM}(a, b)(\pi a-2\mathrm{AGM}(a, b)\mathrm{EllipticE}((a-b)/(a+b)^2))}{\pi a(a-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land a\ne b\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
@@ -75,7 +75,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$x\mapsto\mathrm{AGM}(1, x)^{\prime}(1)=\frac{n!\mathrm{SloaneA}(60\,691, n)\times(-1)^{n}}{8^{n}}$$
+$$x\mapsto\mathrm{AGM}(1, x)^{\prime}(1)=\frac{(-1)^{n}n!\mathrm{SloaneA}(60\,691, n)}{8^{n}}$$
 
 **Holds when** $n\in\N$.
 **Symbols:** **SloaneA** — Sequence X in Sloane's OEIS.
@@ -251,7 +251,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(\sqrt{x/(x+y)})+(\frac{-1}{2}\imaginaryI)\pi}{\sqrt{x+y}}$$
+$$\mathrm{CarlsonRC}(x, -y)=\frac{\mathrm{artanh}(x/(x+y)^{1/2})-\frac{\pi\imaginaryI}{2}}{\sqrt{x+y}}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -272,7 +272,7 @@ $$\mathrm{CarlsonRG}(-x, -y, -z)=\imaginaryI\mathrm{CarlsonRG}(x, y, z)$$
 
 **Holds when** $x\in\lbrack0, \infty\rparen\land y\in\lbrack0, \infty\rparen\land z\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`092716` · Fungrim entry ↗](https://fungrim.org/entry/092716)
 
 ---
@@ -286,7 +286,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{x^{1/2}}{w})}{2(w-x)}&x\ne w\\x^{-(3/2)}&x=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, w, w, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-x^{1/2}/w)}{2(w-x)}&x\ne w\\x^{-(3/2)}&x=w\end{cases}$$
 
 **Holds when** $x\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -303,7 +303,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, 2x)=\frac{\sqrt{2}\Gamma(1/4)^2}{8\sqrt{\pi}\sqrt{x}}$$
+$$\mathrm{CarlsonRF}(0, x, 2x)=\frac{\Gamma(1/4)^2}{\sqrt{x}\times4\sqrt{2\pi}}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -415,7 +415,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-\frac{1}{x^{1/2}})}{x-w}&x\ne w\\w^{-(3/2)}&x=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, x, x, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, w)-1/x^{1/2})}{x-w}&x\ne w\\w^{-(3/2)}&x=w\end{cases}$$
 
 **Holds when** $x\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -458,7 +458,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, -(cx))=\begin{cases}\mathrm{EllipticK}(c+1)&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\2\imaginaryI\mathrm{EllipticK}(-c)+\mathrm{EllipticK}(c+1)&\top\end{cases}/\sqrt{x}$$
+$$\mathrm{CarlsonRF}(0, x, -(cx))=\begin{cases}\mathrm{EllipticK}(1+c)&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\\mathrm{EllipticK}(1+c)+2\imaginaryI\mathrm{EllipticK}(-c)&\top\end{cases}/\sqrt{x}$$
 
 **Holds when** $x\in\C\land c\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -484,7 +484,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, -1, 1)=\frac{3\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}(1+\imaginaryI)\pi^{1/2}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRD}(0, -1, 1)=\frac{3\Gamma(1/4)^2(1-\imaginaryI)}{8\sqrt{2\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}(1+\imaginaryI)}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -870,7 +870,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, -1, -2)=-(((2^{1/2}/8\imaginaryI)\Gamma(1/4)^2)/\sqrt{\pi})$$
+$$\mathrm{CarlsonRF}(0, -1, -2)=-(\frac{\Gamma(1/4)^2\imaginaryI}{4\sqrt{2\pi}})$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -922,7 +922,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{CarlsonRJ}(0, -1, 1, 1)=\frac{3\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{16\sqrt{\pi}}-\frac{3\sqrt{2}(1+\imaginaryI)\pi^{1/2}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRJ}(0, -1, 1, 1)=\frac{3\Gamma(1/4)^2(1-\imaginaryI)}{8\sqrt{2\pi}}-\frac{3\sqrt{2}\pi^{1/2}^{3}(1+\imaginaryI)}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
 Used by the Compute Engine for simplification.
@@ -1032,7 +1032,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(x, -(cx))=\frac{\begin{cases}\mathrm{artanh}((c+1)^{1/2})&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\\mathrm{artanh}((c+1)^{1/2})+\imaginaryI\pi&\top\end{cases}}{\sqrt{x}\sqrt{c+1}}$$
+$$\mathrm{CarlsonRC}(x, -(cx))=\frac{\begin{cases}\mathrm{artanh}((c+1)^{1/2})&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\\mathrm{artanh}((c+1)^{1/2})+\pi\imaginaryI&\top\end{cases}}{\sqrt{(c+1)x}}$$
 
 **Holds when** $x\in\C\land c\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -1049,7 +1049,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-\frac{1}{y^{1/2}})}{y-x}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
+$$\mathrm{CarlsonRD}(x, x, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(y, x)-1/y^{1/2})}{y-x}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1084,7 +1084,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, -x)=\frac{\sqrt{2}\begin{cases}1+\imaginaryI&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\1-\imaginaryI&\top\end{cases}\sqrt{\pi}^{3}\sqrt{x}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRG}(0, x, -x)=\frac{\sqrt{x}\sqrt{2}\sqrt{\pi}^{3}\begin{cases}1+\imaginaryI&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\1-\imaginaryI&\top\end{cases}}{2\Gamma(1/4)^2}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -1264,7 +1264,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, 1, -1)=\frac{\sqrt{2}(1+\imaginaryI)\sqrt{\pi}^{3}}{2\Gamma(1/4)^2}$$
+$$\mathrm{CarlsonRG}(0, 1, -1)=\frac{\sqrt{2}\sqrt{\pi}^{3}(1+\imaginaryI)}{2\Gamma(1/4)^2}$$
 
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
 Used by the Compute Engine for simplification.
@@ -1434,7 +1434,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(-x, y)=\frac{\frac{\pi}{2}-\imaginaryI\mathrm{artanh}(x/(x+y)^{1/2})}{\sqrt{x+y}}$$
+$$\mathrm{CarlsonRC}(-x, y)=\frac{\frac{\pi}{2}-\mathrm{artanh}(x/(x+y)^{1/2})\imaginaryI}{\sqrt{x+y}}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -1475,7 +1475,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
+$$\mathrm{CarlsonRD}(x, y, y)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-x^{1/2}/y)}{2(y-x)}&x\ne y\\x^{-(3/2)}&x=y\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1543,7 +1543,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-\frac{x^{1/2}}{y})}{2(y-x)}&y=w\land x\ne y\\x^{-(3/2)}&x=y=w\end{cases}$$
+$$\mathrm{CarlsonRJ}(x, y, y, w)=\begin{cases}\frac{3(\mathrm{CarlsonRC}(x, y)-\mathrm{CarlsonRC}(x, w))}{w-y}&y\ne w\\\frac{3(\mathrm{CarlsonRC}(x, y)-x^{1/2}/y)}{2(y-x)}&y=w\land x\ne y\\x^{-(3/2)}&x=y=w\end{cases}$$
 
 **Holds when** $x\in\C\land y\in\C\land w\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -1652,7 +1652,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, -x)=\frac{\sqrt{2}\begin{cases}1-\imaginaryI&0\le\Re(x)\land\Im(x)=0\lor\Im(x)\lt0\\1+\imaginaryI&\top\end{cases}\Gamma(1/4)^2}{8\sqrt{\pi}\sqrt{x}}$$
+$$\mathrm{CarlsonRF}(0, x, -x)=\frac{\Gamma(1/4)^2\begin{cases}1-\imaginaryI&\Im(x)\lt0\lor\Im(x)=0\land\Re(x)\ge0\\1+\imaginaryI&\top\end{cases}}{\sqrt{x}\times4\sqrt{2\pi}}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -1729,7 +1729,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, 1, -1)=\frac{\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{CarlsonRF}(0, 1, -1)=\frac{\Gamma(1/4)^2(1-\imaginaryI)}{4\sqrt{2\pi}}$$
 
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
 Used by the Compute Engine for simplification.
@@ -1766,7 +1766,7 @@ $$\mathrm{CarlsonRD}(-x, -y, -z)=\imaginaryI\mathrm{CarlsonRD}(x, y, z)$$
 
 **Holds when** $x\in\lparen0, \infty\rbrack\land y\in\lparen0, \infty\rbrack\land z\in\lparen0, \infty\rbrack$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`f68409` · Fungrim entry ↗](https://fungrim.org/entry/f68409)
 
 ---
@@ -2038,7 +2038,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(2)=\frac{\sqrt{2}(1+\imaginaryI)\sqrt{\pi}^{3}}{\Gamma(1/4)^2}$$
+$$\mathrm{EllipticE}(2)=\frac{\sqrt{2}\sqrt{\pi}^{3}(1+\imaginaryI)}{\Gamma(1/4)^2}$$
 
 Used by the Compute Engine for simplification.
 [`5d2c01` · Fungrim entry ↗](https://fungrim.org/entry/5d2c01)
@@ -2069,7 +2069,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(2)=\frac{\sqrt{2}(1-\imaginaryI)\Gamma(1/4)^2}{8\sqrt{\pi}}$$
+$$\mathrm{EllipticK}(2)=\frac{\Gamma(1/4)^2(1-\imaginaryI)}{4\sqrt{2\pi}}$$
 
 Used by the Compute Engine for simplification.
 [`630eca` · Fungrim entry ↗](https://fungrim.org/entry/630eca)
@@ -2135,7 +2135,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{IncompleteEllipticPi}(n, \phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)+\frac{n}{3}\sin(\phi)^3\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)$$
+$$\mathrm{IncompleteEllipticPi}(n, \phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)+\frac{1}{3}(n\sin(\phi)^3)\mathrm{CarlsonRJ}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1, 1-n\sin(\phi)^2)$$
 
 **Holds when** $n\in\C\land\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind; **IncompleteEllipticPi** — Legendre incomplete elliptic integral of the third kind.
@@ -2437,7 +2437,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{m}{3}\sin(\phi)^3\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
+$$\mathrm{IncompleteEllipticE}(\phi, m)=\sin(\phi)\mathrm{CarlsonRF}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)-\frac{1}{3}(m\sin(\phi)^3)\mathrm{CarlsonRD}(\cos(\phi)^2, 1-m\sin(\phi)^2, 1)$$
 
 **Holds when** $\phi\in\C\land m\in\C\land\frac{-\pi}{2}\le\Re(\phi)\le\frac{\pi}{2}$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind; **CarlsonRF** — Carlson symmetric elliptic integral of the first kind; **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
@@ -2456,7 +2456,7 @@ Used by the Compute Engine for simplification.
 
 ## Weierstrass elliptic functions
 
-$$\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{z\mathrm{JacobiTheta}(1, 0, \tau, 3)}{3\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
+$$\mathrm{WeierstrassZeta}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau, 1)}{\mathrm{JacobiTheta}(1, z, \tau)}-\frac{\frac{1}{3}(z\mathrm{JacobiTheta}(1, 0, \tau, 3))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassZeta** — Weierstrass zeta function.
@@ -2537,7 +2537,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{WeierstrassSigma}(z, \tau)=\frac{\mathrm{JacobiTheta}(1, z, \tau)\exp(-((\mathrm{JacobiTheta}(1, 0, \tau, 3)z^2)/(6\mathrm{JacobiTheta}(1, 0, \tau, 1))))}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
+$$\mathrm{WeierstrassSigma}(z, \tau)=\frac{\exp(\frac{-z^2/6\mathrm{JacobiTheta}(1, 0, \tau, 3)}{\mathrm{JacobiTheta}(1, 0, \tau, 1)})\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(1, 0, \tau, 1)}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
 **Symbols:** **WeierstrassSigma** — Weierstrass sigma function.

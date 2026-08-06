@@ -360,7 +360,7 @@ does not affect `replace()`, which always applies every rule.
 
 | `purpose`     |                                                                                                                   |
 | :------------ | :---------------------------------------------------------------------------------------------------------------- |
-| `'simplify'`  | **(default)** Subject to the cost gate: the rewrite is kept only if the result is "simpler" (lower cost).         |
+| `'simplify'`  | **(default)** Subject to the cost gate: the rewrite is kept only if the result is "simpler", that is, if it does not cost more than what it replaces. |
 | `'transform'` | A mathematically-preferred rewrite that is **exempt** from the cost gate — applied even if it does not lower cost. |
 | `'expand'`    | Grows the expression by design (e.g. expanding a definition). **Excluded** from `simplify()`'s scan, but still reachable through `expr.replace()`. |
 

@@ -31,7 +31,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\operatorname{Ai}(z)^{\prime}(z)=z\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Ai}(0))\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})$$
+$$z\mapsto\operatorname{Ai}(z)^{\prime}(z)=z\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9}))$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -40,7 +40,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\operatorname{Bi}(z)^{\prime}(z)=z\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Bi}(0))\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9})$$
+$$z\mapsto\operatorname{Bi}(z)^{\prime}(z)=z\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9}))$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -107,7 +107,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{1}{2}}(z)=\frac{1}{z}((\sqrt{2}\sin(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{J}_{\frac{1}{2}}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\sin(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -157,7 +157,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{\sqrt{2}(\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(-(\imaginaryI z))(-(\imaginaryI z))^{-1/2-\nu}+\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, -(2\imaginaryI z))\exp(\imaginaryI z)(\imaginaryI z)^{-1/2-\nu})z^{\nu}}{2\sqrt{\pi}}$$
+$$\operatorname{J}_{\nu}(z)=\frac{z^{\nu}((\imaginaryI z)^{-(1/2)-\nu}\exp(\imaginaryI z)\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, -(2\imaginaryI z))+(-(\imaginaryI z))^{-(1/2)-\nu}\exp(-(\imaginaryI z))\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z))}{\sqrt{2\pi}}$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -174,7 +174,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}((3z)/2^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -182,7 +182,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\frac{1}{2}}(z)=-(\frac{1}{z}((2^{1/2}\cos(z)z^{1/2})/\pi^{1/2}))$$
+$$\operatorname{Y}_{\frac{1}{2}}(z)=-(\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\cos(z)))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -206,7 +206,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\sin(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{Y}_{-(\frac{1}{2})}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\sin(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -230,7 +230,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\cosh(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{I}_{-(\frac{1}{2})}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\cosh(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -238,7 +238,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{-(\frac{1}{2})}(z)=\frac{1}{z}((\sqrt{2}\cos(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{J}_{-(\frac{1}{2})}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\cos(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -262,7 +262,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-(3z)/2^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-(3z)/2^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -279,7 +279,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\frac{(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -287,7 +287,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{-(\frac{1}{2})}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi z}}{2z}$$
+$$\operatorname{K}_{-(\frac{1}{2})}(z)=\frac{1}{z}(\sqrt{\frac{\pi z}{2}}\exp(-z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -295,7 +295,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t)\exp(z\cos(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(\nu t)-z\cosh(t))\, \mathrm{d}t)$$
+$$\operatorname{I}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\exp(z\cos(t))\cos(\nu t)\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(z\cosh(t))-\nu t)\, \mathrm{d}t)$$
 
 **Holds when** $\nu\in\C\land z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -303,7 +303,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\nu}(z)=\frac{\exp(-z)}{\sqrt{\frac{2z}{\pi}}}\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2z)$$
+$$\operatorname{K}_{\nu}(z)=\frac{\exp(-z)\mathrm{HypergeometricUStar}(\nu+\frac{1}{2}, 2\nu+1, 2z)}{\sqrt{\frac{2z}{\pi}}}$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -353,7 +353,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\nu}(z)=\frac{\pi(\frac{\mathrm{Hypergeometric0F1Regularized}(1-\nu, z^2/4)}{(z/2)^{\nu}}-\mathrm{Hypergeometric0F1Regularized}(\nu+1, z^2/4)(z/2)^{\nu})}{2\sin(\pi\nu)}$$
+$$\operatorname{K}_{\nu}(z)=\frac{\pi(\frac{\mathrm{Hypergeometric0F1Regularized}(1-\nu, z^2/4)}{z/2^{\nu}}-z/2^{\nu}\mathrm{Hypergeometric0F1Regularized}(1+\nu, z^2/4))}{2\sin(\pi\nu)}$$
 
 **Holds when** $\nu\in\C\setminus\Z\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric0F1Regularized** — Regularized confluent hypergeometric limit function.
@@ -362,15 +362,15 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{\mathrm{Hypergeometric1F_1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)\exp(-(\imaginaryI z))(\frac{z}{2})^{\nu}}{\Gamma(\nu+1)}$$
+$$\operatorname{J}_{\nu}(z)=\frac{\frac{z}{2}^{\nu}\exp(-(\imaginaryI z))\mathrm{Hypergeometric1F_1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)}{\Gamma(\nu+1)}$$
 
-**Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land\nu\notin-\infty..-1\land z\in\C\setminus\lbrace0\rbrace$.
+**Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land\nu\notin-\infty..(-1)\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
 [`9ad254` · Fungrim entry ↗](https://fungrim.org/entry/9ad254)
 
 ---
 
-$$\frac{(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2+z^2+r(r+4)+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
+$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -402,7 +402,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\frac{1}{2}}(z)=\frac{1}{z}((\sqrt{2}\sinh(z)\sqrt{z})/\sqrt{\pi})$$
+$$\operatorname{I}_{\frac{1}{2}}(z)=\frac{1}{z}(\sqrt{\frac{2z}{\pi}}\sinh(z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -426,7 +426,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\nu}(z)=\frac{\cos(\pi\nu)\mathrm{Hypergeometric0F1Regularized}(\nu+1, -(z^2/4))(z/2)^{\nu}-\frac{\mathrm{Hypergeometric0F1Regularized}(1-\nu, -(z^2/4))}{(z/2)^{\nu}}}{\sin(\pi\nu)}$$
+$$\operatorname{Y}_{\nu}(z)=\frac{\cos(\pi\nu)z/2^{\nu}\mathrm{Hypergeometric0F1Regularized}(\nu+1, -(z^2/4))-\frac{\mathrm{Hypergeometric0F1Regularized}(1-\nu, -(z^2/4))}{z/2^{\nu}}}{\sin(\pi\nu)}$$
 
 **Holds when** $\nu\in\C\setminus\Z\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **Hypergeometric0F1Regularized** — Regularized confluent hypergeometric limit function.
@@ -451,7 +451,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}(((3z)/2)^{1/3}^2)}{((3z)/2)^{2/3}})$$
+$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}((3z)/2^{1/3}^2)}{(3z)/2^{1/3}^2})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -459,7 +459,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t-z\sin(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(\nu t)-z\sinh(t))\, \mathrm{d}t)$$
+$$\operatorname{J}_{\nu}(z)=\frac{1}{\pi}(\int_{0}^{\pi}\!\cos(\nu t-z\sin(t))\, \mathrm{d}t)-\frac{1}{\pi}(\sin(\pi\nu)\int_{0}^{\infty}\!\exp(-(z\sinh(t))-\nu t)\, \mathrm{d}t)$$
 
 **Holds when** $\nu\in\C\land z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.
@@ -467,7 +467,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{1}{2}}(z)=\frac{\sqrt{2}\exp(-z)\sqrt{\pi z}}{2z}$$
+$$\operatorname{K}_{\frac{1}{2}}(z)=\frac{1}{z}(\sqrt{\frac{\pi z}{2}}\exp(-z))$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -475,7 +475,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-((3z)/2)^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-((3z)/2)^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-(3z)/2^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-(3z)/2^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -491,7 +491,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{n}(z)=\frac{1}{\pi}(-2(\operatorname{K}_{n}(\imaginaryI z)\imaginaryI^{n}+(\ln(\imaginaryI z)-\ln(z))\operatorname{J}_{n}(z)))$$
+$$\operatorname{Y}_{n}(z)=-\frac{2}{\pi}(\imaginaryI^{n}\operatorname{K}_{n}(\imaginaryI z)+(\ln(\imaginaryI z)-\ln(z))\operatorname{J}_{n}(z))$$
 
 **Holds when** $n\in\Z\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -499,7 +499,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\frac{(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2-z^2+r(r+4)+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -507,7 +507,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-((3z)/2)^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-((3z)/2)^{1/3}^2)}{2(\frac{3z}{2})^{\frac{2}{3}}}$$
+$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-(3z)/2^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-(3z)/2^{1/3}^2)}{2(3z)/2^{1/3}^2}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -515,7 +515,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)z^2}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(-\nu^2+z^2+r(r+4)+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
+$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -556,7 +556,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}(((3z)/2)^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}((3z)/2^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -602,7 +602,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z)z^{1-b})$$
+$$\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)z^{1-b}\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z))$$
 
 **Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0\land b\notin\Z$.
 **Symbols:** **HypergeometricU** — Tricomi confluent hypergeometric function.
@@ -655,7 +655,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\frac{\frac{\mathrm{HypergeometricUStar}(a, b, z)}{(-z)^{a}}}{\Gamma(b-a)}+\frac{1}{\Gamma(a)}(\mathrm{HypergeometricUStar}(b-a, b, -z)\exponentialE^{z}z^{a-b})$$
+$$\mathrm{Hypergeometric1F1Regularized}(a, b, z)=\frac{\frac{\mathrm{HypergeometricUStar}(a, b, z)}{(-z)^{a}}}{\Gamma(b-a)}+\frac{1}{\Gamma(a)}(z^{a-b}\exponentialE^{z}\mathrm{HypergeometricUStar}(b-a, b, -z))$$
 
 **Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **Hypergeometric1F1Regularized** — Regularized Kummer confluent hypergeometric function; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -684,7 +684,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombG}(\ell, \eta, z)-\frac{\mathrm{CoulombG}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}$$
+$$z\mapsto\mathrm{CoulombG}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombG}(\ell, \eta, z)-\frac{\sqrt{1+\ell+\imaginaryI\eta}\sqrt{(1+\ell)-\imaginaryI\eta}\mathrm{CoulombG}(\ell+1, \eta, z)}{\ell+1}$$
 
 **Holds when** $\ell\in\C\land\ell\ne-1\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CoulombG** — Irregular Coulomb wave function.
@@ -693,7 +693,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CoulombC}(\ell, \eta)=\frac{2^{\ell}\exp(\frac{1}{2}(-(\pi\eta)+\mathrm{GammaLn}(\ell+\imaginaryI\eta+1)+\mathrm{GammaLn}(\ell-\imaginaryI\eta+1)))}{\Gamma(2\ell+2)}$$
+$$\mathrm{CoulombC}(\ell, \eta)=\frac{2^{\ell}\exp(\frac{1}{2}((\mathrm{GammaLn}(1+\ell+\imaginaryI\eta)+\mathrm{GammaLn}((1+\ell)-\imaginaryI\eta))-\pi\eta))}{\Gamma(2\ell+2)}$$
 
 **Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})$.
 **Symbols:** **CoulombC** — Coulomb wave function Gamow factor.
@@ -720,7 +720,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombF}(\ell, \eta, z)-\frac{\mathrm{CoulombF}(\ell+1, \eta, z)\sqrt{\ell+\imaginaryI\eta+1}\sqrt{\ell-\imaginaryI\eta+1}}{\ell+1}$$
+$$z\mapsto\mathrm{CoulombF}(\ell, \eta, z)^{\prime}(z)=(\frac{\ell+1}{z}+\frac{\eta}{\ell+1})\mathrm{CoulombF}(\ell, \eta, z)-\frac{\sqrt{1+\ell+\imaginaryI\eta}\sqrt{(1+\ell)-\imaginaryI\eta}\mathrm{CoulombF}(\ell+1, \eta, z)}{\ell+1}$$
 
 **Holds when** $\ell\in\C\land\ell\ne-1\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CoulombF** — Regular Coulomb wave function.
@@ -738,7 +738,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\frac{\exp(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta)))}{(2z)^{\imaginaryI\eta}}\mathrm{HypergeometricUStar}(1+\ell+\imaginaryI\eta, 2\ell+2, -(2\imaginaryI z))+(2z)^{\imaginaryI\eta}\exp(-(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta))))\mathrm{HypergeometricUStar}((1+\ell)-\imaginaryI\eta, 2\ell+2, 2\imaginaryI z))$$
+$$\mathrm{CoulombG}(\ell, \eta, z)=\frac{1}{2}(\frac{\exp(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta)))\mathrm{HypergeometricUStar}(1+\ell+\imaginaryI\eta, 2\ell+2, -(2\imaginaryI z))}{(2z)^{\imaginaryI\eta}}+(2z)^{\imaginaryI\eta}\exp(-(\imaginaryI(z-(\ell\pi)/2+\mathrm{CoulombSigma}(\ell, \eta))))\mathrm{HypergeometricUStar}((1+\ell)-\imaginaryI\eta, 2\ell+2, 2\imaginaryI z))$$
 
 **Holds when** $\ell\in\C\land\eta\in\C\land(1+\ell+\imaginaryI\eta\notin\Z_{\le0}\land(1+\ell)-\imaginaryI\eta\notin\Z_{\le0})\land z\in\C\setminus\lbrace0\rbrace\land\Re(z)\gt0$.
 **Symbols:** **CoulombG** — Irregular Coulomb wave function; **CoulombSigma** — Coulomb wave function phase shift; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -790,7 +790,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2)\exp(-z^2))/\sqrt{\pi}$$
+$$\mathrm{Erf}(z)=(2z\exp(-z^2)\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -806,7 +806,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Erfc}(z)=\frac{\mathrm{HypergeometricUStar}(\frac{1}{2}, \frac{1}{2}, z^2)\exp(-z^2)}{z\sqrt{\pi}}$$
+$$\mathrm{Erfc}(z)=\frac{\exp(-z^2)\mathrm{HypergeometricUStar}(\frac{1}{2}, \frac{1}{2}, z^2)}{z\sqrt{\pi}}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -831,7 +831,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Erf}(z)=\frac{z}{\sqrt{z^2}}-\frac{\mathrm{HypergeometricUStar}(1/2, 1/2, z^2)\exp(-z^2)}{z\sqrt{\pi}}$$
+$$\mathrm{Erf}(z)=\frac{z}{\sqrt{z^2}}-\frac{\exp(-z^2)\mathrm{HypergeometricUStar}(1/2, 1/2, z^2)}{z\sqrt{\pi}}$$
 
 **Holds when** $z\in\C\land z\ne0$.
 **Symbols:** **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -848,7 +848,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{Erf}(z)^{\prime}(z)=(2\mathrm{HermitePolynomial}(n-1, z)\times(-1)^{n+1}\exp(-z^2))/\sqrt{\pi}$$
+$$z\mapsto\mathrm{Erf}(z)^{\prime}(z)=(2\times(-1)^{n+1}\mathrm{HermitePolynomial}(n-1, z))/\sqrt{\pi}\exp(-z^2)$$
 
 **Holds when** $z\in\C\land n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -882,7 +882,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, c-b, a-b+1, 1/(1-z))}{(1-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, c-a, -a+b+1, 1/(1-z))}{(1-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
+$$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, c-b, a-b+1, 1/(1-z))}{(1-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, c-a, b-a+1, 1/(1-z))}{(1-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack0, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
@@ -917,7 +917,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F1Regularized}(a, b, -n, z)=\frac{\mathrm{Hypergeometric2F_1}(a+n+1, b+n+1, n+2, z)\mathrm{RisingFactorial}(a, n+1)\mathrm{RisingFactorial}(b, n+1)z^{n+1}}{(n+1)!}$$
+$$\mathrm{Hypergeometric2F1Regularized}(a, b, -n, z)=\frac{\mathrm{RisingFactorial}(a, n+1)\mathrm{RisingFactorial}(b, n+1)z^{n+1}\mathrm{Hypergeometric2F_1}(a+n+1, b+n+1, n+2, z)}{(n+1)!}$$
 
 **Holds when** $a\in\C\land b\in\C\land n\in\N\land z\in\C\setminus\lbrace1\rbrace$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function; **RisingFactorial** — Rising factorial.
@@ -934,7 +934,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a-b+1, 1/z)}{(-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, b-c+1, -a+b+1, 1/z)}{(-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
+$$\frac{1}{\pi}(\sin(\pi(b-a))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a-b+1, 1/z)}{(-z)^{a}}}{\Gamma(b)\Gamma(c-a)}-\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(b, b-c+1, b-a+1, 1/z)}{(-z)^{b}}}{\Gamma(a)\Gamma(c-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lbrack0, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
@@ -960,7 +960,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}(\sin(\pi(-a-b+c))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, a+b-c+1, 1-1/z)}{z^{a}}}{\Gamma(c-a)\Gamma(c-b)}-\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, 1-a, -a-b+c+1, 1-1/z)z^{a-c}(1-z)^{-a-b+c}}{\Gamma(a)\Gamma(b)}$$
+$$\frac{1}{\pi}(\sin(\pi(c-a-b))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\frac{\mathrm{Hypergeometric2F1Regularized}(a, a-c+1, (a+b)-c+1, 1-1/z)}{z^{a}}}{\Gamma(c-a)\Gamma(c-b)}-\frac{z^{a-c}(1-z)^{c-a-b}\mathrm{Hypergeometric2F1Regularized}(c-a, 1-a, c-a-b+1, 1-1/z)}{\Gamma(a)\Gamma(b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.
@@ -969,7 +969,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}(\sin(\pi(-a-b+c))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\mathrm{Hypergeometric2F1Regularized}(a, b, a+b-c+1, 1-z)}{\Gamma(c-a)\Gamma(c-b)}-\frac{\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, -a-b+c+1, 1-z)(1-z)^{-a-b+c}}{\Gamma(a)\Gamma(b)}$$
+$$\frac{1}{\pi}(\sin(\pi(c-a-b))\mathrm{Hypergeometric2F1Regularized}(a, b, c, z))=\frac{\mathrm{Hypergeometric2F1Regularized}(a, b, (a+b)-c+1, 1-z)}{\Gamma(c-a)\Gamma(c-b)}-\frac{(1-z)^{c-a-b}\mathrm{Hypergeometric2F1Regularized}(c-a, c-b, c-a-b+1, 1-z)}{\Gamma(a)\Gamma(b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\land z\in\C\land z\notin\lparen-\infty, 0\rbrack\land z\notin\lbrack1, \infty\rparen$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.

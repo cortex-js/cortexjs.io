@@ -71,6 +71,7 @@ It is also said that type A **matches** type B.
 any
 ├── error
 ├── nothing
+├── missing
 ├── never
 ├── unknown
 └── expression
@@ -152,9 +153,10 @@ The Compute Engine supports the following primitive types:
 
 | Type          | Description                                                                                      |
 | :-------------- | :----------------------------------------------------------------------------------------------- |
-| `any`      | The universal type, it contains all possible values. It has the following sub-types: `error`, `nothing`,   `never`,  `unknown` and `expression`. No other type matches `any` |
+| `any`      | The universal or top type. Every type is a subtype of, and therefore matches, `any` |
 | `error` | The type of an **invalid expression**, such as `["Error"]` |
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
+| `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value |
 | `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
 | `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown` |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
@@ -162,7 +164,7 @@ The Compute Engine supports the following primitive types:
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
 | `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
 | `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `dictionary` or a `record` |
-| `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `list`, a `vector`, a `matrix` or a `tensor` |
+| `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `tuple`, a `list`, a `vector`, a `matrix` or a `tensor` |
 | `scalar`        | The type of a single value: a `boolean`, a `string`, or a `number` |
 | `boolean`       | The type of the symbol `True` or `False`|
 | `string`        | The type of a string of Unicode characters    |
@@ -400,10 +402,11 @@ and **`tensor<T>`** is a tensor of elements of type `T`.
 The **dictionary** and **record** types represent a collection of key-value pairs, 
 where each key is a string and each value can be any type.
 
-A **record** is a special case of a dictionary where the keys are fixed, 
-while a **dictionary** can have keys that are not defined in advance.
+A concrete **record value** has a known set of keys, while a **dictionary** can
+have keys that are not defined in advance. A record *type* lists the fields a
+value must have; it does not forbid additional fields.
 
-A **record** is used to represent objects and structured data with a fixed set of properties.
+A **record** is used to represent objects and structured data with known properties.
 A **dictionary** is well suited to represent hash tables or caches.
 
 **Keys** must be unique when compared in NFC form within a dictionary or record. Keys are not ordered.
@@ -421,11 +424,10 @@ For example: `record<red: integer, green: integer, blue: integer>` is a record t
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
 **Compatibility:**
-- A record of type `record<K1: T1, K2: T2, ...>` is compatible with a record of type
-  `record<K1: T1, K2: T2, ..., K3: T3, ...>` if:
-  - The keys of the first record are a subset of the keys of the second.
-  - The values of the first record are compatible with the values of the second.
-  - The order of the keys does not matter.
+- A record type `A` matches a record type `B` when every field required by `B`
+  is present in `A` with a compatible type. Thus a record with more fields is a
+  subtype of one with fewer fields (width subtyping). The order of the keys
+  does not matter.
 - A record is compatible with a dictionary `dictionary<T>` if each type `T1`, `T2`, ... is compatible with `T`.
 
 
@@ -569,8 +571,8 @@ one or two integers as input and returning an integer.
 If there are any optional arguments, they must be at the end of the argument list.
 
 ```js
-ce.type("(integer, integer?) -> number")
-  .matches("(integer) -> number");
+ce.type("(integer) -> number")
+  .matches("(integer, integer?) -> number");
 // ➔ true
 ```
 
@@ -582,8 +584,8 @@ A function signature can include a variable number of arguments, also known as
 **variadic arguments**. 
 
 Variadic arguments are indicated by a `+` or `*` 
-immediately after the type of the last argument. The `+` prefix indicates that
-the function accepts one or more arguments of that type, while the `*` prefix
+immediately after the type of the last argument. The `+` suffix indicates that
+the function accepts one or more arguments of that type, while the `*` suffix
 indicates that the function accepts zero or more arguments of that type.
 
 For example `(string, integer+) -> integer` is a function that accepts a 
@@ -870,6 +872,355 @@ parameter) is accepted provisionally and checked against its actual value
 when the operator evaluates; only a provable mismatch (a flat `list<number>`
 can never be a matrix) errors immediately at canonicalization.
 
+## Generic Signatures
+
+A signature such as `(list<number>) -> number` pins the types of a function
+once and for all. Many functions are not like that: reversing a collection
+returns the same kind of collection it was given, and swapping the components
+of a tuple returns those components in the other order, whatever they are. A
+**generic signature** states such a relation between the argument types and
+the result type directly, instead of giving up and returning `unknown`.
+
+A generic signature is a function signature prefixed by a **quantifier
+clause**: the keyword `forall`, a comma-separated list of **type variables**,
+and a dot.
+
+```js
+ce.type("forall T. (T) -> T");                              // identity
+ce.type("forall T, U. (tuple<T, U>) -> tuple<U, T>");       // swap
+ce.type("forall T: indexed_collection. (T) -> T");          // reverse
+ce.type("forall T, U. (list<T>, (T) any -> U) -> list<U>"); // map
+```
+
+Any identifier can be a type variable — there is no naming convention — and a
+variable is only a variable because the clause declares it. The names are the
+author's and they round-trip: `forall Elem. (list<Elem>) -> Elem` serializes
+back with `Elem`, not with a canonical letter.
+
+```js
+ce.type("forall Elem. (list<Elem>) -> Elem").toString();
+// ➔ "forall Elem. (list<Elem>) -> Elem"
+```
+
+The dot terminates the clause. It is load-bearing: a bound is a type, and
+types extend as far right as they can, so without the dot
+`forall T: (real) -> real (T) -> boolean` could not be read.
+
+Within a signature, every occurrence of a quantified name is the *same*
+variable, including inside a nested signature: in
+`forall T, U. (list<T>, (T) any -> U) -> list<U>` the callback's parameter
+type is the list's element type. Note the `any` in the callback's effect slot
+— a bare arrow demands a **pure** callback (see
+[Effects and Subtyping](#effects-and-subtyping)), so an operator that accepts
+arbitrary callbacks must write the effect-top form.
+
+A variable may appear in an argument or result position, in the element
+position of a constructed type (`list<T>`, `tuple<T, U>`, `set<T>`,
+`collection<T>`, `dictionary<T>`, `broadcastable<T>`, a vector or matrix
+element, a record field), and inside a nested signature. It may **not** appear
+in a union, an intersection or a negation:
+
+```js
+ce.type("forall T. (T | string) -> T");
+// ➔ throws: unsupported-variable-position: The type variable `T` cannot
+//   appear in a union, an intersection, a negation or a bound
+```
+
+`forall` is a reserved word in type strings: `ce.declareType("forall", …)` is
+a `reserved-type-name` error.
+
+A **type alias** can be parameterized the same way — see
+[Generic Type Aliases](#generic-type-aliases).
+
+### Instantiating at the Call Site
+
+Nothing stays generic once it is called. At each call the engine solves the
+variables against the types of the actual arguments and substitutes the
+solution into the result type, so the type of an application is always
+**ground** — no variable ever escapes into an expression's type.
+
+```js
+ce.declare("first", {
+  signature: "forall T. (indexed_collection<T>) -> T",
+  evaluate: ([xs]) => xs.at(1),
+});
+
+ce.box(["first", ["List", 1, 2, 3]]).type; // ➔ "finite_integer"
+ce.box(["first", ["List", "'a'", "'b'"]]).type; // ➔ "string"
+```
+
+A variable that occurs at several argument positions is solved to the **join**
+of what those positions contribute — the narrowest type that covers them all,
+the same rule the engine uses elsewhere to type a result from several
+operands:
+
+```js
+ce.declare("n", "integer");
+ce.declare("r", "real");
+ce.declare("pick", { signature: "forall T. (T, T) -> T" });
+
+ce.box(["pick", "n", "n"]).type; // ➔ "integer"
+ce.box(["pick", "n", "r"]).type; // ➔ "real"
+```
+
+Variables in element positions are solved by matching the argument's structure:
+
+```js
+ce.declare("swap", { signature: "forall T, U. (tuple<T, U>) -> tuple<U, T>" });
+
+ce.box(["swap", ["Tuple", 1, "'a'"]]).type;
+// ➔ "tuple<string, finite_integer>"
+```
+
+A callback's parameter type is instantiated too, which is what makes an
+annotated callback checkable and an unannotated one inferable at the right
+type:
+
+```js
+ce.declare("keep", {
+  signature: "forall T, U. (list<T>, (T) any -> U) -> list<U>",
+});
+
+ce.box(["keep", ["List", 1, 2, 3],
+  ["Function", ["Greater", "x", 0], "x"]]).type;
+// ➔ "list<boolean>"
+```
+
+If no solution satisfies every position, the call is an ordinary
+`incompatible-type` error; the expected type reported is the *instantiated*
+one, never variable syntax.
+
+### Bounds
+
+A variable can declare an **upper bound** with `T: <type>`. Only argument
+types that are a subtype of the bound are accepted, and the variable still
+binds the argument's type *verbatim* — so a bounded identity preserves the
+argument's kind and its dimensions:
+
+```js
+ce.declare("rev", { signature: "forall T: indexed_collection. (T) -> T" });
+
+ce.box(["rev", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]).type;
+// ➔ "matrix<finite_integer^(2x3)>"
+```
+
+Violating the bound is an error naming the bound:
+
+```js
+ce.box(["rev", ["Set", 1, 2]]).isValid; // ➔ false
+
+ce.box(["rev", ["Set", 1, 2]]).toString();
+// ➔ rev(Error(ErrorCode("incompatible-type", "indexed_collection",
+//      "set<finite_integer>")))
+```
+
+An unbounded variable has an implicit bound of `any`. A bound must be a
+**ground** type: it cannot mention a variable, its own or another's.
+
+```js
+ce.type("forall T, U: list<T>. (U) -> T");
+// ➔ throws: unsupported-variable-position: The bound of the type variable
+//   `U` must be a ground type: `list<T>` refers to a type variable
+```
+
+Several standard library operators are declared this way — `Identity` is
+`forall T. (T) -> T`, `Reverse` is
+`forall T: indexed_collection. (T) -> T`, `Inverse` is
+`forall T: matrix. (T) -> T` — so their results are typed from their
+arguments:
+
+```js
+ce.box(["Reverse", ["List", 1, 2, 3]]).type; // ➔ "vector<finite_integer^3>"
+```
+
+A **scalar** bound interacts with broadcasting. On an operator that
+broadcasts, a collection argument is admitted against a scalar parameter —
+the bound is checked against the scalar base, as it always was — and the
+variable binds the argument's **element** type; the call's ordinary broadcast
+wrap then puts the argument's shape back on the result. `Conjugate` and
+`Chop` are `forall T: number. (T) -> T`, `Remainder` is
+`forall T: number. (T, T) -> T`:
+
+```js
+ce.box(["Conjugate", ["List", 1, 2, 3]]).type;
+// ➔ "vector<finite_integer^3>"
+
+ce.box(["Remainder", ["List", ["List", 1, 2], ["List", 3, 4]], 7]).type;
+// ➔ "matrix<finite_integer^(2x2)>"
+```
+
+Broadcasting maps all the way down to the scalar leaves, so the variable is
+bound to a leaf type whatever the argument's rank. Only the kinds a broadcast
+actually maps are peeled: a `set` argument is admitted but never mapped
+(`Conjugate(Set(1, 2))` stays a `set<finite_integer>`), and a tuple is atomic
+(`Conjugate((1, 2))` is a `tuple<finite_integer, finite_integer>`).
+
+### Generic Overload Sets
+
+Each arm of an [overload set](#overload-sets) carries its own clause, and each
+arm must be parenthesized:
+
+```js
+ce.type("(forall T. (list<T>) -> T) & (forall T. (set<T>) -> boolean)");
+```
+
+The two `T`s are unrelated: a clause quantifies exactly one arm. A single
+clause spread over the whole intersection is not accepted, and neither is a
+clause nested inside another signature — quantification is top-level (or
+arm-level) only.
+
+```js
+ce.type("forall T. ((list<T>) -> T) & ((set<T>) -> boolean)");
+// ➔ throws: unsupported-variable-position: A `forall` clause can only be
+//   applied to a function signature
+
+ce.type("forall T. ((forall U. (U) -> U)) -> T");
+// ➔ throws: unsupported-variable-position: A `forall` clause can only
+//   quantify a top-level signature (or one arm of an overload set), not a
+//   nested one
+```
+
+### Generic Declarations and Function Literals
+
+A generic signature can be implemented by an ordinary function body — a
+`["Function"]` literal, a `x |-> …` lambda, a Cortex `function` definition —
+as long as the clause is stated on the *whole signature*. There are three
+spellings.
+
+**The `function f<T>(…)` definition form** (Cortex) puts a **type-parameter
+clause** between the name and the parameter list. A parameter may carry a
+ground bound, the effect specifier and the return type are unchanged, and the
+clause names are usable anywhere in the head:
+
+```plaintext
+function f<T>(x: T) -> T { x + x }
+function swap<T, U>(x: T, y: U) -> tuple<U, T> { (y, x) }
+function g<T: number, U>(x: T, k: (T) any -> U) -> list<U> { [k(x)] }
+function tick<T>(x: T) random -> T { x }
+function h<T: (real) -> real>(k: T, x: real) -> real { k(x) }
+```
+
+**A full-signature annotation** states the polytype where a type is expected
+and leaves the body a plain literal:
+
+```plaintext
+const f: forall T. (x: T) -> T = x |-> x
+```
+
+```js
+ce.box(["Function", ["Add", "x", "x"], "'forall T. (x: T) -> T'"]).type;
+// ➔ "forall T. (x: T) -> T"
+```
+
+**Declare, then assign** — the form to use for a generic **recursive**
+function, since the body can only call the symbol once it is declared:
+
+```js
+ce.declare("nest", "forall T. (x: T, n: integer) -> T");
+ce.assign("nest", ce.box(["Function",
+  ["If", ["LessEqual", "n", 0], "x", ["nest", "x", ["Subtract", "n", 1]]],
+  "x", "n"]));
+
+ce.box(["nest", 5, 3]).evaluate().toString(); // ➔ "5"
+ce.box(["nest", 5, 3]).type; // ➔ "finite_integer"
+ce.box(["nest", "'a'", 2]).type; // ➔ "string"
+```
+
+However it is written, the declaration is what every call sees: the arguments
+are checked against the clause, the bounds are enforced, and the result type
+is the *instantiated* one, exactly as for a generic `evaluate` handler.
+
+**What the body sees.** The clause quantifies the *signature*, not the body.
+Inside the body a quantified parameter is an ordinary unannotated parameter:
+`x: T` carries no type information there, a bound `T: number` does not make
+the body see a `number`, and two parameters sharing `T` are not known to have
+the same type. The clause is the **call-site contract**; the body is
+canonicalized once, exactly as an untyped literal's is.
+
+For the same reason the clause names scope over the definition's **head**
+only — its parameters, its effect specifier and its return type. A body-local
+type annotation naming a type variable is an unknown-type error:
+
+```plaintext
+function f<T>(x: T) -> T { let y: T = x; y }
+// ➔ Unknown type "T"
+```
+
+**The result is a trusted ascription.** Nothing verifies that the body
+actually returns a value of the argument's type — as with a
+[typed function literal](#typed-function-literals), the annotation *is* the
+type, it is not a run-time check:
+
+```js
+ce.declare("f", "forall T. (x: T) -> T");
+ce.assign("f", ce.box(["Function", 0, "x"]));
+
+ce.box(["f", "'a'"]).type; // ➔ "string"
+ce.box(["f", "'a'"]).evaluate().toString(); // ➔ "0"
+```
+
+**Reading a `forall` return annotation.** A polytype ascribed to the body of a
+literal is always the literal's **own** signature — the same reading as an
+effect-bearing annotation (see [Typed Function Literals](#typed-function-literals)).
+To ascribe a *return type* that is itself a generic function, group it:
+
+```js
+ce.box(["Function", ["Typed", body, "'forall T. (T) -> T'"], "x"]).type;
+// ➔ "forall T. (T) -> T"          (the literal is generic)
+
+ce.box(["Function", ["Typed", body, "'(forall T. (T) -> T)'"], "x"]).type;
+// ➔ "(unknown) -> forall T. (T) -> T"   (the literal RETURNS a generic function)
+```
+
+The same holds in Cortex: `function mk(x) -> forall T. (T) -> T { … }` defines
+a generic `mk`, while `function mk(x) -> (forall T. (T) -> T) { … }` defines a
+plain `mk` that returns one.
+
+**Broadcasting.** A generic literal broadcasts like any other function whose
+parameters are scalar: a collection argument is mapped, down to the scalar
+leaves, and the result carries the argument's shape. Since the variable binds
+an *element* (see [Bounds](#bounds)), a result that mentions it is the
+per-element answer:
+
+```js
+ce.declare("dup", "forall T. (x: T) -> tuple<T, T>");
+ce.assign("dup", ce.box(["Function", ["Tuple", "x", "x"], "x"]));
+
+ce.box(["dup", 5]).type;
+// ➔ "tuple<finite_integer, finite_integer>"
+
+ce.box(["dup", ["List", 1, 2]]).type;
+// ➔ "list<tuple<finite_integer, finite_integer>>"
+
+ce.box(["dup", ["List", 1, 2]]).evaluate().toString();
+// ➔ "[(1, 1),(2, 2)]"
+
+ce.box(["dup", ["List", ["List", 1, 2], ["List", 3, 4]]]).evaluate().toString();
+// ➔ "[[(1, 1),(2, 2)],[(3, 3),(4, 4)]]"
+```
+
+**Limits.** The first four are rejected, each with its own message:
+
+- **No partial application.** A generic function must be given all of its
+  arguments; currying one reports
+  `Partial application of a generic function is not supported`. (Solving the
+  supplied prefix and pruning the clause is future work.)
+- **No generic clause in a multi-clause set**, in either direction: neither a
+  second clause added to a generic definition nor a generic clause added to an
+  existing one (`generic-clause-unsupported`).
+- **No literal body for a generic overload set.** An intersection with a
+  generic arm still needs an `evaluate` handler — the same reason a single
+  literal cannot implement an ordinary [overload set](#overload-sets).
+- **The math definition form does not take a clause.** In Cortex,
+  `f<T>(x) = x` is an ordinary expression (`f < T > (x)`, then `= x`), not a
+  definition — only the `function` keyword form claims the `<…>` slot.
+- **Compilation declines.** A generic function is not compiled — `compile()`
+  falls back to the (correct) interpreted evaluation for any expression that
+  calls one. A compiled body could not reproduce behavior that depends on the
+  parameter types — a collection argument that would broadcast, in
+  particular — so the engine declines whole-fn rather than produce a wrong
+  value; per-instantiation compilation is future work.
+
 ## Literal Type
 
 A **literal type** is a type that represents a single value. 
@@ -1063,8 +1414,8 @@ input types are contravariant.
 
 
 ```js
-ce.type("(integer) -> integer")
-  .matches("(number) -> number");
+ce.type("(number) -> integer")
+  .matches("(integer) -> number");
 // ➔ true
 ```
 
@@ -1187,6 +1538,82 @@ ce.type("list<integer>").couldMatch("list<string>");
 ```
 
 :::
+
+### Generic Patterns
+
+A [generic signature](#generic-signatures) can be used as a pattern, and the 
+two predicates ask different questions about it — deliberately.
+
+`matches()` is an **existential** check: does *some* instantiation of the 
+pattern's variables make the subject a subtype? That is what "is this an 
+identity function?" usually means:
+
+```js
+ce.type("(number) -> number").matches("forall T. (T) -> T");
+// ➔ true  (instantiate `T` as `number`)
+
+ce.type("(integer) -> string").matches("forall T. (T) -> T");
+// ➔ false  (no single `T` is both `integer` and `string`)
+```
+
+The instantiation is consistent across every occurrence of a variable, and it 
+must satisfy the variable's bound:
+
+```js
+ce.type("(list<integer>) -> list<integer>")
+  .matches("forall T: indexed_collection. (T) -> T");
+// ➔ true
+
+ce.type("(set<integer>) -> set<integer>")
+  .matches("forall T: indexed_collection. (T) -> T");
+// ➔ false  (a `set` is not an `indexed_collection`)
+```
+
+`couldMatch()` solves nothing. It reads each occurrence of a variable as its 
+declared bound — `any` when the variable is unbounded — with no consistency 
+between occurrences. For a signature pattern that reading is decided by the 
+parameter position, which is contravariant, so the same identity probe answers 
+`false`:
+
+```js
+ce.type("(number) -> number").couldMatch("forall T. (T) -> T");
+// ➔ false  (the pattern reads as `(any) -> any`)
+
+ce.type("(number) -> number").couldMatch("(any) -> any");
+// ➔ false  (the ground row it reduces to)
+```
+
+So ask `matches()` when the *pattern* is generic. `couldMatch()` earns its keep 
+on the other side, when a generic type is the **subject** being classified — 
+and there the bound is what makes the answer informative. An unbounded variable 
+reads as `any` and cannot rule anything out:
+
+```js
+ce.type("forall T. (T) -> T").couldMatch("(any) -> string");
+// ➔ true  (`T` reads as `any`: vacuous)
+
+ce.type("forall T: number. (T) -> T").couldMatch("(any) -> string");
+// ➔ false  (`T` reads as `number`, which is not a `string`)
+
+ce.type("forall T: number. (T) -> T").couldMatch("(any) -> number");
+// ➔ true
+```
+
+A generic signature is a function value like any other, so it could be a 
+`function`, and a bound is read on the subject side too:
+
+```js
+ce.type("forall T. (T) -> T").couldMatch("function");
+// ➔ true
+
+ce.type("forall T: indexed_collection. (T) -> T")
+  .couldMatch("(indexed_collection) -> indexed_collection");
+// ➔ true
+
+ce.type("forall T. (T) -> T")
+  .couldMatch("(indexed_collection) -> indexed_collection");
+// ➔ false  (`T` reads as `any`, which is not an `indexed_collection`)
+```
 
 ### Checking the Type of a Numeric Value
 
@@ -1326,8 +1753,10 @@ the attributes dictionary `["Dictionary", ["KeyValuePair", "alias",
 "True"]]` — the surface mirror of `ce.declareType()`'s `{ alias: true }`
 option.
 
-The type-variable syntax `type point<T> = tuple<T, T>` is reserved for a
-future release and is reported as not yet supported (both forms).
+An **alias** can take type parameters — `type alias Pair<T> = tuple<T, T>`,
+see [Generic Type Aliases](#generic-type-aliases). A parameterized **nominal**
+type (`type point<T> = tuple<T, T>`) is reserved for a future release and is
+reported as not yet supported.
 
 
 ### Nominal vs Structural Types
@@ -1357,6 +1786,108 @@ ce.type("tuple<x: integer, y: integer>")
   .matches("pointData");
 // ➔ true
 ```
+
+### Generic Type Aliases
+
+An alias can take **type parameters**, declared in a clause between its name
+and its definition. The applied spelling is then usable anywhere a type is
+written, and it expands **transparently**: `Pair<integer>` *is*
+`tuple<integer, integer>`.
+
+```js
+ce.declareType("Pair", "tuple<T, T>", { alias: true, typeParams: ["T"] });
+
+ce.type("Pair<integer>").toString();
+// ➔ "tuple<integer, integer>"
+
+ce.box(["Tuple", 1, 2]).type.matches("Pair<integer>"); // ➔ true
+```
+
+The parameters may be given as names (each with an optional bound), as
+records (`[{ name: "T", bound: "number" }]`), or as a single clause string
+(`"T, U: number"`). In Cortex, the same declaration is a `type alias`
+statement with a type-parameter clause — the clause a
+[generic function definition](#generic-declarations-and-function-literals)
+takes:
+
+```plaintext
+type alias Pair<T> = tuple<T, T>
+let p: Pair<integer> = (1, 2)
+```
+
+An argument may be any type, including another application, and an alias may
+be applied inside another alias's definition:
+
+```js
+ce.type("list<Pair<integer>>").toString();
+// ➔ "list<tuple<integer, integer>>"
+
+ce.type("Pair<Pair<integer>>").toString();
+// ➔ "tuple<tuple<integer, integer>, tuple<integer, integer>>"
+
+ce.declareType("Wrap", "list<Pair<T>>", { alias: true, typeParams: ["T"] });
+ce.type("Wrap<integer>").toString();
+// ➔ "list<tuple<integer, integer>>"
+```
+
+**Bounds.** A parameter may declare a ground upper bound, exactly as a
+[`forall` variable](#bounds) does, and the bound is enforced wherever the
+alias is applied:
+
+```js
+ce.declareType("Keyed", "tuple<string, T>",
+  { alias: true, typeParams: ["T: number"] });
+
+ce.type("Keyed<integer>").toString(); // ➔ "tuple<string, integer>"
+
+ce.type("Keyed<string>");
+// ➔ throws: generic-alias-bound: The type argument `string` does not
+//   satisfy the bound `number` of the parameter `T` of "Keyed"
+```
+
+An argument may also be a type **variable** in scope — a `forall` clause's
+variable, or the enclosing alias's own parameter. Such an argument is
+admitted by comparing the two bounds: the variable's own declared bound must
+satisfy the parameter's (an unbounded variable is bounded by `any`, which
+satisfies only `any`).
+
+```js
+ce.type("forall T: integer. (Keyed<T>) -> T").toString();
+// ➔ "forall T: integer. (tuple<string, T>) -> T"
+
+ce.type("forall T. (Keyed<T>) -> T");
+// ➔ throws: generic-alias-bound: The type argument `T` does not satisfy the
+//   bound `number` of the parameter `T` of "Keyed" (an open argument is
+//   admitted by its own declared bound, `any`)
+```
+
+**Transparency.** The expansion happens when the type is resolved, so nothing
+downstream ever meets an applied reference: `.type`, `toString()`,
+`matches()` and error messages all show the expansion. The *source* keeps
+what was written — a Cortex program round-trips
+`let p: Pair<integer> = (1, 2)` verbatim — but the type it denotes displays
+as `tuple<integer, integer>`.
+
+**Limits.**
+
+- A generic alias must be **applied**: a bare `Pair`, an empty `Pair<>` and a
+  wrong number of arguments are all `generic-alias-arity` errors.
+- It may not refer to **itself** (`generic-alias-self-reference`): the
+  definition is expanded eagerly, so there is nothing to expand into yet.
+  A [recursive type](#recursive-types) is declared without a clause.
+- Every parameter must be **used** in the definition
+  (`generic-alias-unused-parameter`) — under transparency an unused
+  parameter could not affect anything.
+- Only the `alias` form takes a clause; a parameterized **nominal** type is
+  still reported as not yet supported.
+- No [constructor](#type-constructors) is declared for a generic alias, and
+  the name is not claimed in the value namespace at all: a function of the
+  same name is legal, before or after the alias.
+
+Re-running a `type` statement replaces the alias, clause included, but a
+dependent alias keeps the definition it **snapshotted** when it was declared
+— re-run it too (as re-running a whole notebook cell does) for it to pick up
+the new one.
 
 ### Type Constructors
 
@@ -1533,19 +2064,48 @@ For example, a definition of a JSON value could be:
 
 ```js
 ce.declareType("json", `
-    nothing
+    missing
   | boolean
-  | number
+  | finite_real
   | string
   | type json_array
   | type json_object
-`);
-ce.declareType("json_object", "dictionary<json>");
-ce.declareType("json_array", "list<json>");
+`, { alias: true });
+ce.declareType("json_object", "dictionary<json>", { alias: true });
+ce.declareType("json_array", "list<json>", { alias: true });
 ```
 
 When using `type json_array` or `type json_object`, the type is not yet defined, 
 but it will be defined later in the code. Using the `type` keyword allows you to use the type
 before declaring it. If the referenced type is already defined, the `type` keyword is optional.
 
+The declaration that fulfills a forward reference completes the record the
+reference already installed, so every type that mentioned the name resolves
+through to the definition. Only an unfulfilled reference can be completed this
+way: a name that already has a definition is a redeclaration, and still an
+error.
 
+Three details of the definition above are worth spelling out, because a
+plausible-looking variant of each does not describe JSON:
+
+- `{ alias: true }` on **every** type in the set. These are structural
+  aliases, so a plain list or dictionary *is* a `json`. Declared nominally
+  (the default), the types would be opaque — their only inhabitants are
+  constructor applications, and `ce.type("list<number>").matches("json")`
+  would be `false`.
+- `missing`, not `nothing`, for JSON `null`. `Nothing` means "no value here"
+  and is *erased* from collection literals — `[1, Nothing, 3]` has two
+  elements. `Missing` is position-preserving, so it survives inside an array
+  or as a dictionary value.
+- `finite_real`, not `number`. The engine's `number` admits complex and
+  non-finite values, so `2 + 3i` and `NaN` would both be accepted as JSON.
+
+The same set can be written as a single self-recursive alias, which needs no
+forward references at all:
+
+```js
+ce.declareType("json", `
+    missing | boolean | finite_real | string
+  | list<json> | dictionary<json>
+`, { alias: true });
+```

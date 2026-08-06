@@ -37,7 +37,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-(x^2-1)^{1/2})}^{n})$$
+$$\mathrm{ChebyshevT}(n, x)=\frac{1}{2}({(x+\sqrt{x^2-1})}^{n}+{(x-{(x^2-1)}^{1/2})}^{n})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -172,7 +172,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ChebyshevU}(n-1, x)\sqrt{x^2-1}=\frac{1}{2}({(x+(x^2-1)^{1/2})}^{n}-{(x-(x^2-1)^{1/2})}^{n})$$
+$$\mathrm{ChebyshevU}(n-1, x)\sqrt{x^2-1}=\frac{1}{2}({(x+{(x^2-1)}^{1/2})}^{n}-{(x-{(x^2-1)}^{1/2})}^{n})$$
 
 **Holds when** $n\in\Z\land x\in\C$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -181,7 +181,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(x)=\frac{\mathrm{Hypergeometric3F2Regularized}(1, -n, n, \frac{1}{2}, 1-r, \frac{1-x}{2})\sqrt{\pi}}{(x-1)^{r}}$$
+$$x\mapsto\mathrm{ChebyshevT}(n, x)^{\prime}(x)=\frac{\sqrt{\pi}\mathrm{Hypergeometric3F2Regularized}(1, -n, n, \frac{1}{2}, 1-r, \frac{1-x}{2})}{(x-1)^{r}}$$
 
 **Holds when** $n\in\Z\land r\in\N\land x\in\C\setminus\lbrace-1, 1\rbrace$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind.
@@ -416,7 +416,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(x)=\frac{(n+1)\mathrm{Hypergeometric3F2Regularized}(1, -n, n+2, \frac{3}{2}, 1-r, \frac{1-x}{2})\sqrt{\pi}}{2(x-1)^{r}}$$
+$$x\mapsto\mathrm{ChebyshevU}(n, x)^{\prime}(x)=\frac{\sqrt{\pi}(n+1)\mathrm{Hypergeometric3F2Regularized}(1, -n, n+2, \frac{3}{2}, 1-r, \frac{1-x}{2})}{2(x-1)^{r}}$$
 
 **Holds when** $n\in\Z\land r\in\N\land x\in\C\setminus\lbrace-1, 1\rbrace$.
 **Symbols:** **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -557,7 +557,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z)=\frac{t\mapsto{(t^2-1)}^{n}^{\prime}(z)}{n!\times2^{n}}$$
+$$\mathrm{LegendrePolynomial}(n, z)=\frac{t\mapsto{(t^2-1)}^{n}^{\prime}(z)}{2^{n}n!}$$
 
 **Holds when** $n\in\N$ &nbsp;_or_&nbsp; $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -565,7 +565,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, 0)=\frac{\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, 0)=\frac{(-1)^{n}\binom{2n}{n}}{4^{n}}$$
 
 **Holds when** $n\in\N$.
 Used by the Compute Engine for simplification.
@@ -573,7 +573,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n, z)=\frac{\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n, z)=\frac{(-1)^{n}\binom{2n}{n}\mathrm{Hypergeometric2F_1}(-n, n+\frac{1}{2}, \frac{1}{2}, z^2)}{4^{n}}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -581,7 +581,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{z(2n+1)\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)\binom{2n}{n}\times(-1)^{n}}{4^{n}}$$
+$$\mathrm{LegendrePolynomial}(2n+1, z)=\frac{(-1)^{n}(2n+1)\binom{2n}{n}}{4^{n}}z\mathrm{Hypergeometric2F_1}(-n, n+\frac{3}{2}, \frac{3}{2}, z^2)$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.

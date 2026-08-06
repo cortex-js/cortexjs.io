@@ -61,14 +61,29 @@ console.log(expr, '=', expr.simplify());
 
 ## Comparing Expressions
 
-There are two useful ways to compare symbolic expressions:
+There are three tiers of comparison, from the strictest and cheapest to the
+most powerful and most expensive:
 
-- structural equality
-- mathematical equality
+<div className="symbols-table first-column-header" style={{"--first-col-width":"16ch"}}>
 
-### Structural Equality: `isSame()`
+| Tier | Method | Operator | Notation | Answers |
+| :--- | :--- | :--- | :--- | :--- |
+| Syntactic | `isSame()` | `Same` | `===`, `≣` (Cortex) | Always `True` or `False` |
+| Arithmetic | `isEqual()` | `Equal` | `=`, `==` (Cortex) | `True`, `False`, or undetermined |
+| Identity | `isIdenticallyEqual()` | `IdenticallyEqual` | `\equiv`, `≡` | `True`, `False`, or undetermined |
 
-Structural equality (or syntactic equality) considers the **symbolic structure** used
+</div>
+
+Each tier answers a different question: "are these the same expression?",
+"do these have the same value?", and "are these the same function of their
+free variables?".
+
+The operator, its LaTeX/Cortex notation and its JavaScript method share the
+same semantics at each tier.
+
+### Syntactic Equality: `isSame()`
+
+Syntactic equality (or structural equality) considers the **symbolic structure** used
 to represent an expression. 
 
 The symbolic structure of an expression is the tree of symbols and functions
@@ -87,17 +102,23 @@ exactly identical, that is each sub-expression is recursively identical in `lhs`
 and `rhs`. The argument can be an `Expression` or a JavaScript primitive
 (`number`, `bigint`, `boolean`, `string`).
 
-This is a fast, exact check — no evaluation is performed.
+This is a fast, exact check — no evaluation is performed, and the answer is
+always `true` or `false`, never undetermined.
 
-- \\(1 + 1 \\) and \\( 2 \\) are not structurally equal, one is a sum of two
-  integers, the other is an integer
+`isSame()` is **strictly syntactic**: it compares the expressions as written
+(in canonical form) and never substitutes the value of a symbol. If `x` has
+been assigned the value `5`, `ce.symbol('x').isSame(5)` is `false` — one
+expression is a symbol, the other a number. Use `isEqual()` to compare values.
+
+- \\( x + x \\) and \\( 2x \\) are not structurally equal, one is a sum of two
+  terms, the other a product
 - \\( (x + 1)^2 \\) and \\( x^2 + 2x + 1 \\) are not structurally equal, one is a
   power of a sum, the other a sum of terms.
 
 
 ```live show-line-numbers
-const a = ce.parse('2 + 1');
-const b = ce.parse('3');
+const a = ce.parse('x + x');
+const b = ce.parse('2x');
 console.log('isSame?', a.isSame(b));
 ```
 
@@ -141,39 +162,81 @@ ce.expr(["CanonicalForm", ["Add", 1, "x"], "Order"]).isSame(
 
 
 
-### Mathematical Equality: `isEqual()`
+### Arithmetic Equality: `isEqual()`
 
-It turns out that comparing two arbitrary mathematical expressions is a complex
-problem. 
+The `lhs.isEqual(rhs)` function answers "do these two expressions have the same
+value?". It is the JavaScript counterpart of the `=` operator (`==` in Cortex).
 
-In fact, [Richardson's Theorem](https://en.wikipedia.org/wiki/Richardson%27s_theorem)
-proves that it is impossible to determine if two symbolic expressions are
-identical in general.
+The comparison is deliberately **cheap and predictable**:
 
-However, there are many cases where it is possible to make a comparison between
-two expressions to check if they represent the same mathematical object.
+1. Both operands are evaluated (so assigned symbol values are substituted).
+2. If the results are structurally identical, they are equal.
+3. Otherwise, if the difference between them has no unknowns, it is evaluated
+   numerically: they are equal if the absolute value of the difference is less
+   than `ce.tolerance`.
+4. Otherwise the answer is `undefined`.
 
-The `lhs.isEqual(rhs)` function returns true if `lhs` and `rhs` represent the
-same mathematical object. 
-
-If `lhs` and `rhs` are numeric expressions, they are evaluated before being 
-compared. They are considered equal if the absolute value of the difference 
-between them is less than `ce.tolerance`.
-
-The expressions \\( x^2 - 3x + 4 \\) and \\( 4 - 3x + x^2 \\) will be considered
-equal (`isEqual` returns true) because the difference between them is zero, 
-i.e. \\( (x^2 - 3x + 4) - (4 - 3x + x^2) \\) is zero once the expression has 
-been simplified.
+No expansion, no simplification and no sampling is attempted. In particular,
+`isEqual()` does **not** attempt to prove a symbolic identity: the expressions
+\\( (x+1)^2 \\) and \\( x^2 + 2x + 1 \\) have the same value for every \\( x
+\\), but `isEqual()` returns `undefined` for them. Use
+[`isIdenticallyEqual()`](#identity-isidenticallyequal) for that question.
 
 Note that unlike `expr.isSame()`, `expr.isEqual()` can return `true`, `false` or
 `undefined`. The latter value indicates that there is not enough information to
-determine if the two expressions are mathematically equal.
+determine if the two expressions have the same value.
+
+The corresponding `Equal` expression is **inert** when the answer is
+`undefined`: it stays unevaluated, since \\( x = y \\) is a *condition*, not a
+claim that is false until proven. This is what makes an equation usable as an
+argument to `Solve`.
 
 ```live show-line-numbers
 const a = ce.parse('1 + 2');
 const b = ce.parse('3');
 console.log('isEqual?', a.isEqual(b));
+
+// Undetermined: the `Equal` expression stays unevaluated
+console.log(ce.parse('x = y').evaluate());
 ```
+
+Following IEEE 754, `NaN` is not equal to anything, including itself: `NaN =
+NaN` is `False`, and so is the comparison of two collections that contain it,
+`["Equal", ["List", "NaN"], ["List", "NaN"]]`. Only the syntactic tier reports
+those as identical (`["Same", "NaN", "NaN"]` is `True`).
+
+### Identity: `isIdenticallyEqual()`
+
+Comparing two arbitrary symbolic expressions is a hard problem. In fact,
+[Richardson's Theorem](https://en.wikipedia.org/wiki/Richardson%27s_theorem)
+proves that it is impossible in general to determine if two symbolic
+expressions are identical.
+
+However, there are many cases where it is possible to decide it in practice.
+The `lhs.isIdenticallyEqual(rhs)` function asks whether `lhs` and `rhs` are the
+same function of their free variables, that is whether they have the same value
+for **every** value of those variables. It is the JavaScript counterpart of the
+`IdenticallyEqual` operator, written \\( \\equiv \\) in LaTeX.
+
+```live show-line-numbers
+console.log(ce.parse('(x+1)^2').isIdenticallyEqual(ce.parse('x^2+2x+1')));
+console.log(ce.parse('\\sin^2 x + \\cos^2 x \\equiv 1').evaluate());
+```
+
+Like `isEqual()`, it is three-valued: `true`, `false` or `undefined` when the
+question could not be settled, in which case an `IdenticallyEqual` expression
+stays unevaluated. A `false` requires a definite disagreement of values:
+expressions that merely differ at the sampled points, such as \\( x \\) and
+\\( x + 1 \\), are `undefined`, since an assumption could still constrain them
+to be equal.
+
+:::warning[Stochastic verdicts]
+To settle an identity, this tier uses symbolic transformations (expansion and
+simplification) **and** numerical sampling: the two expressions are evaluated
+at a number of pseudo-random points. A `true` answer obtained by sampling is
+therefore a very strong indication, not a formal proof. This is the only tier
+that can answer from sampling; `isSame()` and `isEqual()` never do.
+:::
 
 
 ### Smart Comparison: `is()`
@@ -206,23 +269,27 @@ that require evaluation, such as `\sin(\pi)`.
 |                                          |                                        |
 | :--------------------------------------- | :------------------------------------- |
 | `lhs === rhs`                            | If true, same box expression instances |
-| `lhs.isSame(rhs)`                        | Structural equality (fast, exact, no evaluation). Accepts primitives. |
+| `lhs.isSame(rhs)`                        | Syntactic equality (fast, exact, no evaluation). Accepts primitives. |
 | `lhs.is(rhs)`                            | Smart check: structural first, then numeric evaluation fallback for constant expressions (within `engine.tolerance`). For literal numbers, same as `isSame()`. |
-| `lhs.isEqual(rhs)`                       | Mathematical equality (full evaluation). May return `undefined`. |
+| `lhs.isEqual(rhs)`                       | Arithmetic equality (evaluation and tolerance compare). May return `undefined`. |
+| `lhs.isIdenticallyEqual(rhs)`            | Identity in all free variables (expansion, simplification, sampling). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
-| `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`                |
-| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Structural identity of the **evaluated** operands (Cortex `===`). Unlike `isSame()`, each operand is evaluated first, so `["Same", ["Add", 1, 1], 2]` is `True`. Always decides. |
+| `ce.expr(["IdenticallyEqual", lhs, rhs]).evaluate()` | Synonym for `lhs.isIdenticallyEqual(rhs)` |
+| `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`, comparing the operands as written (they are not canonicalized) |
+| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)` (Cortex `===`). Always decides. |
 
 </div>
 
 :::info[Choosing the Right Comparison]
-- Use **`isSame()`** when you know the exact value you're comparing against
+- Use **`isSame()`** when you know the exact expression you're comparing against
   (e.g., checking if an operand is `0` or `1` in a simplification rule).
 - Use **`is()`** when the expression might need evaluation to reveal its value
   (e.g., checking user input like `\cos(\pi/2)` against `0`).
-- Use **`isEqual()`** for full mathematical equality, including symbolic
-  expressions with unknowns.
+- Use **`isEqual()`** to compare values, including expressions that must be
+  evaluated first.
+- Use **`isIdenticallyEqual()`** to check a symbolic identity, i.e. an equality
+  that must hold for every value of the free variables.
 :::
 
 ## Replacing a Symbol in an Expression

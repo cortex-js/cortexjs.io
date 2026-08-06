@@ -28,7 +28,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletGroup}(q)=\mathrm{Map}(\mathrm{Filter}(1..\max(q, 2)-1, \ell\mapsto\gcd(\ell, q)=1), \ell\mapsto\mathrm{DirichletCharacter}(q, \ell))$$
+$$\mathrm{DirichletGroup}(q)=\mathrm{Map}(\mathrm{Filter}(1..(\max(q, 2)-1), \ell\mapsto\gcd(\ell, q)=1), \ell\mapsto\mathrm{DirichletCharacter}(q, \ell))$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletGroup** — Dirichlet characters with given modulus.
@@ -39,7 +39,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DirichletCharacter}(p^{e_{var}}, \ell, n)=\exp(\frac{2\pi\imaginaryI\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{e_{var}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{e_{var}})}{\mathrm{Totient}(p^{e_{var}})})$$
 
-**Holds when** $p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..p^{e_{var}}-1\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
+**Holds when** $p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..(p^{e_{var}}-1)\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
 **Symbols:** **ConreyGenerator** — Conrey generator; **DirichletCharacter** — Dirichlet character; **DiscreteLog** — Discrete logarithm.
 Used by the Compute Engine for simplification.
 [`4cf4e4` · Fungrim entry ↗](https://fungrim.org/entry/4cf4e4)
@@ -118,14 +118,14 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DirichletCharacter}(q, \ell)\lhd n=\mathrm{DirichletCharacter}(q, \ell, n)$$
 
-**Holds when** $q\in\N^*\land\ell\in1..\max(q, 2)-1\land\gcd(\ell, q)=1\land n\in\Z$.
+**Holds when** $q\in\N^*\land\ell\in1..(\max(q, 2)-1)\land\gcd(\ell, q)=1\land n\in\Z$.
 **Symbols:** **DirichletCharacter** — Dirichlet character.
 Used by the Compute Engine for simplification.
 [`d9a187` · Fungrim entry ↗](https://fungrim.org/entry/d9a187)
 
 ---
 
-$$\mathrm{PrimitiveDirichletCharacters}(q)=\mathrm{Filter}(\mathrm{DirichletGroup}(q), \chi\mapsto\forall d\in1..q-1, (d\mid q)\implies(\exists a\in0..q-1, \mathrm{CongruentMod}(a, 1, d)\land\gcd(a, q)=1\land\chi(a)\ne1))$$
+$$\mathrm{PrimitiveDirichletCharacters}(q)=\mathrm{Filter}(\mathrm{DirichletGroup}(q), \chi\mapsto\forall d\in1..(q-1), ((d\mid q)\implies(\exists a\in0..(q-1), (\mathrm{CongruentMod}(a, 1, d)\land\gcd(a, q)=1\land\chi(a)\ne1))))$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletGroup** — Dirichlet characters with given modulus; **PrimitiveDirichletCharacters** — Primitive Dirichlet characters with given modulus.
@@ -204,7 +204,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, \frac{1}{4})=\pi^2+8G$$
+$$\mathrm{HurwitzZeta}(2, \frac{1}{4})=\pi^2+8\operatorname{G}$$
 
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -255,7 +255,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Li}_{s}(z)=\frac{(\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((-1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{1-s}+\mathrm{HurwitzZeta}(1-s, \frac{1}{\pi}((1/2\imaginaryI)\ln(-z))+\frac{1}{2})\imaginaryI^{s-1})\Gamma(1-s)}{(2\pi)^{1-s}}$$
+$$\operatorname{Li}_{s}(z)=\frac{\Gamma(1-s)(\imaginaryI^{1-s}\mathrm{HurwitzZeta}(1-s, \frac{1}{2}+\frac{\ln(-z)}{2\pi\imaginaryI})+\imaginaryI^{s-1}\mathrm{HurwitzZeta}(1-s, 1/2-\ln(-z)/(2\pi\imaginaryI)))}{(2\pi)^{1-s}}$$
 
 **Holds when** $s\in\C\land z\in\C\land z\notin\lbrace0, 1\rbrace\land s\notin\N$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -344,7 +344,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(n, a)=\frac{\mathrm{PolyGamma}(n-1, a)\times(-1)^{n}}{(n-1)!}$$
+$$\mathrm{HurwitzZeta}(n, a)=\frac{(-1)^{n}\mathrm{PolyGamma}(n-1, a)}{(n-1)!}$$
 
 **Holds when** $n\in2..\infty\land a\in\C$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -378,7 +378,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, \frac{3}{4})=\pi^2-8G$$
+$$\mathrm{HurwitzZeta}(2, \frac{3}{4})=\pi^2-8\operatorname{G}$$
 
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
 Used by the Compute Engine for simplification.
@@ -603,7 +603,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(s, a)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n, a)\times(-1)^{n}(s-1)^{n})$$
+$$\mathrm{HurwitzZeta}(s, a)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}((-1)^{n}\mathrm{StieltjesGamma}(n, a)(s-1)^{n})$$
 
 **Holds when** $s\in\C\land a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function; **StieltjesGamma** — Stieltjes constant.
@@ -629,7 +629,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{StieltjesGamma}(1, \frac{1}{2})=\mathrm{StieltjesGamma}(1)-2\gamma\ln(2)-\ln(2)^2$$
+$$\mathrm{StieltjesGamma}(1, \frac{1}{2})=\mathrm{StieltjesGamma}(1)-2\operatorname{EulerGamma}\ln(2)-\ln(2)^2$$
 
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
@@ -645,7 +645,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(s)=(\sum_{k=1}^{N_{var}-1}\frac{1}{k^{s}}+\frac{N_{var}^{1-s}}{s-1}+\frac{\sum_{k=1}^{M}(\mathrm{RisingFactorial}(s, 2k-1)\mathrm{BernoulliB}(2k))/((2k)!N_{var}^{2k-1})+\frac{1}{2}}{N_{var}^{s}})-\int_{N_{var}}^{\infty}\!\frac{\mathrm{RisingFactorial}(s, 2M)\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)}{(2M)!t^{2M+s}}\, \mathrm{d}t$$
+$$\Zeta(s)=(\sum_{k=1}^{N_{var}-1}\frac{1}{k^{s}}+\frac{N_{var}^{1-s}}{s-1}+\frac{\frac{1}{2}+\sum_{k=1}^{M}(\mathrm{BernoulliB}(2k)\mathrm{RisingFactorial}(s, 2k-1))/((2k)!N_{var}^{2k-1})}{N_{var}^{s}})-\int_{N_{var}}^{\infty}\!\frac{\mathrm{BernoulliPolynomial}(2M, t-\lfloor t\rfloor)\mathrm{RisingFactorial}(s, 2M)}{(2M)!t^{s+2M}}\, \mathrm{d}t$$
 
 **Holds when** $s\in\C\land s\ne1\land N_{var}\in\Z\land M\in\Z\land\Re((s+2M)-1)\gt0\land N_{var}\ge1\land M\ge1$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial; **RisingFactorial** — Rising factorial.
@@ -657,7 +657,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{StieltjesGamma}(0, 1)=\mathrm{StieltjesGamma}(0)=\gamma$$
+$$\mathrm{StieltjesGamma}(0, 1)=\mathrm{StieltjesGamma}(0)=\operatorname{EulerGamma}$$
 
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
 Used by the Compute Engine for simplification.
@@ -672,7 +672,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(s)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}(\mathrm{StieltjesGamma}(n)\times(-1)^{n}(s-1)^{n})$$
+$$\Zeta(s)=\frac{1}{s-1}+\sum_{n=0}^{\infty}\frac{1}{n!}((-1)^{n}\mathrm{StieltjesGamma}(n)(s-1)^{n})$$
 
 **Holds when** $s\in\C$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
@@ -690,7 +690,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{KeiperLiLambda}(1)=(\frac{\gamma}{2}+1)-\frac{\ln(4\pi)}{2}$$
+$$\mathrm{KeiperLiLambda}(1)=(\frac{\operatorname{EulerGamma}}{2}+1)-\frac{\ln(4\pi)}{2}$$
 
 **Symbols:** **KeiperLiLambda** — Keiper-Li coefficient.
 Used by the Compute Engine for simplification.

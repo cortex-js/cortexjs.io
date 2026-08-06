@@ -48,6 +48,18 @@ annotation is recorded in the function's signature, but the current runtime
 does not reject a returned value merely because its inferred type differs from
 the annotation.
 
+Named functions can also declare their effects between the parameter list and
+the return type:
+
+```cortex
+function roll(n: integer) random -> integer { Random(n) }
+```
+
+Effect labels are part of the function type. See
+[Effect specifiers](/cortex/control-flow/#effect-specifiers) for declaration
+syntax and the [function type guide](/compute-engine/guides/types/#function-types)
+for subtyping rules.
+
 ## MathJSON representation
 
 The parser holds a type annotation as a MathJSON string. A declaration places
@@ -115,6 +127,32 @@ bare symbol as a boolean operand (`And`/`Or`/`Xor`/`Not`) infers that symbol
 `boolean` for the lifetime of the engine; a later numeric use of the same
 symbol in the same scope will then error. This is engine behavior, not
 something specific to Cortex.
+
+## Absence values
+
+Cortex distinguishes three related kinds of absence:
+
+- `Nothing` means “no value here” and is removed from function arguments and
+  collection literals.
+- `Missing` is a position-preserving missing value. Its type is `missing`.
+- `NaN` is the numeric form of an absent or undefined result. Numeric
+  operations and missing numeric fields generally normalize absence to `NaN`.
+
+`IsMissing(x)` recognizes both `Missing` and `NaN`, regardless of how the
+value arose. `Coalesce(a, b, ...)` evaluates from left to right and returns the
+first value that is not missing; if every argument is missing, it returns the
+last one unchanged.
+
+```cortex-live
+(Length([1, Missing, 3]), IsMissing(Missing), IsMissing(NaN),
+  Coalesce(Missing, 0), Missing + 1)
+// ➔ (3, True, True, 0, NaN)
+```
+
+A missing dictionary field follows the expected value domain: a numeric field
+produces `NaN`, while a string or other nonnumeric field produces `Missing`.
+Use `IsMissing` when the distinction between those representations is not
+important, and `Coalesce` to supply a fallback.
 
 ## Declaring a type
 
@@ -353,15 +391,61 @@ declares nothing.
 
 ### Type variables
 
-The syntax `type point<T> = tuple<T, T>` is **reserved** for a future
-release. It parses, and reports a dedicated `type-variables-unsupported`
-diagnostic, in both forms:
+A generic **type alias** takes a type-parameter clause between its name
+and the `=`. The applied spelling is usable anywhere a type is written,
+and expands **transparently** — `Pair<integer>` means exactly
+`tuple<integer, integer>`, and that expansion is what type displays and
+error messages show:
+
+```cortex
+type alias Pair<T> = tuple<T, T>
+let p: Pair<integer> = (1, 2)
+```
+
+A parameter may carry a ground bound, enforced wherever the alias is
+applied — including application to another clause's type variable, which
+is admitted when the variable's own bound satisfies the parameter's. One
+alias may therefore be built out of another:
+
+```cortex
+type alias Keyed<T: number> = tuple<string, T>
+type alias Table<T: integer> = list<Keyed<T>>
+let rows: Table<integer> = [("a", 1), ("b", 2)]
+```
+
+A generic alias may not refer to itself, every parameter must be used in
+the body, and applying one without its arguments (a bare `Pair`) is an
+error. Unlike a plain alias, a generic one declares **no**
+[constructor](#constructor-functions) and claims nothing in the value
+namespace: a `function` of the same name is an ordinary function,
+declared before or after. A dependent alias **snapshots** the
+definitions it was built from: re-running the `type` statement for
+`Keyed` leaves `Table` as it was until `Table`'s own statement is re-run
+too — which re-running the cell does.
+
+A parameterized **nominal** type — the bare form,
+`type point<T> = tuple<T, T>` — remains **reserved** and reports a
+dedicated `type-variables-unsupported` diagnostic:
 
 <!-- cortex-test: expect-diagnostics -->
 
 ```cortex
 type point<T> = tuple<T, T>
 ```
+
+Generic **functions** are supported: a `function` definition takes a
+type-parameter clause between its name and its parameter list, and the
+quantified names scope over the definition's head (its parameters, effect
+specifier, and return type):
+
+```cortex
+function swap<T, U>(x: T, y: U) -> tuple<U, T> { (y, x) }
+swap(1, "a")
+```
+
+A type parameter may carry a ground bound (`function g<T: number>(x: T) -> T`),
+which is enforced at every call. The equivalent full-type spelling is a
+`forall` annotation — `let f: forall T. (T) -> T = x |-> x`.
 
 ### Encoding
 
@@ -385,6 +469,19 @@ type alias pair = tuple<number, number>
 ```json
 ["DeclareType", "pair", {"str": "tuple<number, number>"},
   ["Dictionary", ["KeyValuePair", "alias", "True"]]]
+```
+
+A type-parameter clause rides the same dictionary, as the text of the
+clause:
+
+```cortex
+type alias Pair<T> = tuple<T, T>
+```
+
+```json
+["DeclareType", "Pair", {"str": "tuple<T, T>"},
+  ["Dictionary", ["KeyValuePair", "alias", "True"],
+    ["KeyValuePair", "typeParams", {"str": "T"}]]]
 ```
 
 A type is registered when its statement is canonicalized, which is why the

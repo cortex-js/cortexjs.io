@@ -872,16 +872,22 @@ of producing an empty one.
 
 | Function       | Notation         |                                                                       |
 | :------------- | :--------------- | :------------------------------------------------------------------------------ |
-| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value |
+| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value. Stays unevaluated when the answer is not known |
 | `NotEqual`     | $$ x \ne y $$  |                                                                                 |
 | `Greater`      | $$ x \gt y $$  | |
 | `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
 | `Less`         | $$ x \lt y $$  |                                                                                 |
 | `LessEqual`    | $$ x \leq y $$ |                                                                                 |
+| `IdenticallyEqual` | $$ x \equiv y $$ | Assert an identity: the two expressions have the same value for **every** value of their free variables |
 
 See below for additonal relational operators: `Congruent`, etc...
 
 </div>
+
+The three tiers of equality — `Same` (syntactic), `Equal` (same value) and
+`IdenticallyEqual` (same value for every value of the free variables) — are
+compared in
+[Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions).
 
 ## Polynomial Arithmetic
 
