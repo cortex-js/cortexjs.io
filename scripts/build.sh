@@ -78,6 +78,14 @@ cat ../compute-engine/src/api.md >> ./docs/compute-engine/api.md
 mkdir -p ./docs/cortex
 cp ../compute-engine/src/cortex/docs/*.md ./docs/cortex/
 
+# Cortex syntax highlighting: the highlight.js language definition is
+# maintained next to the grammar in the compute-engine repo (and pinned there by
+# test/cortex/reserved-words.test.ts), so it is synced rather than reimplemented
+# as a Prism grammar. src/theme/CodeBlock/Content adapts its output to the
+# Prism token shape Docusaurus renders. The copy is committed so `npm start`
+# works without a build.
+cp ../compute-engine/src/cortex/highlight-js-mode.js ./src/hljs/cortex-mode.js
+
 
 #
 # Build Docusaurus (.md -> .html)

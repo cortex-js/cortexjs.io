@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import useIsBrowser from "@docusaurus/useIsBrowser";
 import ConsoleMarkup from "@site/src/components/ConsoleMarkup";
+import CortexCode from "@site/src/components/CortexCode";
 import styles from "./styles.module.css";
 
 // The Cortex language lives in the `@cortex-js/compute-engine/cortex` entry
@@ -154,7 +155,7 @@ export default function CortexPlayground({
           {!result.error && result.cortex !== undefined && (
             <div className={styles.result}>
               <span className={styles.label}>Cortex</span>
-              <pre className={styles.cortex}>{result.cortex}</pre>
+              <CortexCode className={styles.cortex} code={result.cortex} />
             </div>
           )}
 

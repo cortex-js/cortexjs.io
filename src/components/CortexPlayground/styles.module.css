@@ -89,16 +89,28 @@
   color: var(--ifm-color-emphasis-600);
 }
 
+/* The syntax colors are a base16 palette built for a dark console — see
+ * `--base-00`..`--base-0f` in `src/css/code.css`, which is why doc code blocks
+ * are dark in the light theme too. On the page background the low-contrast
+ * tokens (operators and punctuation at `--base-06`) were nearly invisible, so
+ * this panel takes the same dark surface as the MathJSON panel below it. These
+ * declarations intentionally mirror `.console` in
+ * `src/components/ConsoleMarkup/styles.module.css` so the two results read as
+ * siblings; keep them in step. */
 .cortex {
+  display: block;
   margin: 0;
-  padding: 0;
-  background: transparent;
-  border: none;
-  font-family: var(--ifm-font-family-monospace);
-  font-size: 0.95em;
+  padding: 8px 8px 8px 1em;
+  border-radius: 8px;
+  border: var(--ui-border, 1px solid rgba(0, 0, 0, 0.2));
+  background: var(--base-00);
+  color: var(--base-05);
+  font-family: var(--monospace-font-family), "Berkeley Mono", "JetBrains Mono",
+    "IBM Plex Mono", "Fira Code", monospace;
+  font-size: 1em;
   line-height: 1.5;
   white-space: pre-wrap;
-  color: var(--ifm-font-color-base);
+  overflow: auto;
 }
 
 .badge {
