@@ -923,7 +923,7 @@ If the collection is nested, the indexes are applied in order.
 ```
 
 Applying `At` repeatedly is equivalent to supplying several indexes at once.
-In Cortex syntax, both `m[2][1]` and `m[2, 1]` select the same matrix element.
+In Epsil syntax, both `m[2][1]` and `m[2, 1]` select the same matrix element.
 Indexing a matrix once returns a row with its collection type preserved, so the
 result can be indexed again.
 
@@ -1039,7 +1039,7 @@ Return the dictionary values in dictionary iteration order.
 
 <Signature name="Field">_value_: any, _field_: string</Signature>
 
-Access a **named field** of a value — `p.x` in Cortex.
+Access a **named field** of a value — `p.x` in Epsil.
 
 On a **record** or **dictionary** value, `["Field", d, "'x'"]` behaves
 exactly as `["At", d, "'x'"]`, including the position-preserving absence

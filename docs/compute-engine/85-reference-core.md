@@ -154,7 +154,7 @@ statement declared **replaces** that definition — constructor included — so
 re-running a program on the same engine works; a name declared any other way
 (e.g. via `ce.declareType()`) reports an error value instead.
 
-In Cortex, the `type` statement lowers to this operator. The bare form
+In Epsil, the `type` statement lowers to this operator. The bare form
 declares a **nominal** type (no attributes); the `type alias` form declares a
 **structural alias** (the `alias -> True` attributes dictionary):
 
@@ -469,7 +469,7 @@ as the `Equal` function.
 <Signature name="Same" returns="boolean">_expression1_, _expression2_, ...</Signature>
 
 Evaluate to `True` if every adjacent pair of operands is **syntactically
-identical**, otherwise `False`. This is the `===` operator in Cortex, also
+identical**, otherwise `False`. This is the `===` operator in Epsil, also
 written `≣` (U+2263). It is the operator counterpart of the `expr.isSame()`
 method.
 
@@ -530,7 +530,7 @@ whole, so `["Same", ["List", 1, 2], ["List", 1, 2]]` is the scalar `True`, not
 a list of booleans.
 
 With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
-`True` — matching the Cortex spelling `a === b === c`.
+`True` — matching the Epsil spelling `a === b === c`.
 
 **`Same` vs `IsSame`.** [`IsSame`](#IsSame) compares its operands exactly as
 written, while `Same` compares their canonical forms. So

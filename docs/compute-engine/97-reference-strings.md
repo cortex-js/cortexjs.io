@@ -123,7 +123,7 @@ console.info(textExpr.latex);
 
 <Signature name="StringJoin" returns="string">..._strings_: string</Signature>
 
-Concatenate strings. In Cortex, the `<>` operator constructs `StringJoin`.
+Concatenate strings. In Epsil, the `<>` operator constructs `StringJoin`.
 
 ```json example
 ["StringJoin", "hello", " ", "world"]

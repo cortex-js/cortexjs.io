@@ -1,6 +1,6 @@
 // Wraps the default doc layout to advertise the page's raw markdown twin.
 //
-// The llms-txt plugin emits /cortex/mcp.md alongside /cortex/mcp/. Because
+// The llms-txt plugin emits /epsil/mcp.md alongside /epsil/mcp/. Because
 // GitHub Pages cannot negotiate content types, a client holding the HTML URL
 // has no way to ask for the markdown one — this link is how it finds out.
 

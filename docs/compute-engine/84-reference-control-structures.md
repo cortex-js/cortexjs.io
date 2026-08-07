@@ -258,7 +258,7 @@ tolerance. The bounds must be numeric literals; `Infinity` and `-Infinity`
 are allowed, so `["Range", 0, {"num": "+Infinity"}]` means "any non-negative
 number". A `Range` that is not a well-formed range pattern — a symbolic bound,
 or a third _step_ operand — is not a membership test and keeps its ordinary
-structural meaning. (In Cortex, those spellings are reported as parse
+structural meaning. (In Epsil, those spellings are reported as parse
 diagnostics instead.)
 
 A subject that is not a number falls through: a symbol (including a constant
@@ -279,7 +279,7 @@ The consequence is that a literal `Range` **value** can no longer be matched
 and is not re-read as a membership test. A `Range` nested inside a `List`,
 `Tuple` or `Dictionary` pattern also keeps its ordinary structural meaning.
 
-In Cortex, a range pattern is written `lo..hi`:
+In Epsil, a range pattern is written `lo..hi`:
 `match n { 0..9 => "digit"; _ => "more" }`.
 
 **Error subjects**. `["Match"]` also decides when the subject is an
@@ -334,7 +334,7 @@ comparison chain or a `switch` statement, and fixed-shape destructuring is
 supported; symbolic patterns (such as `["Add", "_a", 1]`) cannot be
 compiled and fail with an error rather than producing incorrect code.
 
-In Cortex, `["Match"]` is written with the `match` keyword:
+In Epsil, `["Match"]` is written with the `match` keyword:
 `match x { 0 => "zero"; 1 | 2 | == Pi => "small or pi"; _ => "other" }`.
 
 </FunctionDefinition>

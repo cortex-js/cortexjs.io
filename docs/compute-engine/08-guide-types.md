@@ -856,7 +856,7 @@ ce.box(["Function", ["Typed", body, "'(real) random -> real'"], "x"]);
 ce.box(["Function", ["Typed", body, "'((real) random -> real)'"], "x"]);
 ```
 
-The same rule applies in Cortex: write
+The same rule applies in Epsil: write
 `function mk(x) -> ((real) random -> real) { … }` for the effectful *return
 type*, and `function roll(n) random -> integer { … }` for the definition's own
 contract. An effect-free signature never needs the parentheses — it is always
@@ -1083,11 +1083,11 @@ ce.type("forall T. ((forall U. (U) -> U)) -> T");
 ### Generic Declarations and Function Literals
 
 A generic signature can be implemented by an ordinary function body — a
-`["Function"]` literal, a `x |-> …` lambda, a Cortex `function` definition —
+`["Function"]` literal, a `x |-> …` lambda, a Epsil `function` definition —
 as long as the clause is stated on the *whole signature*. There are three
 spellings.
 
-**The `function f<T>(…)` definition form** (Cortex) puts a **type-parameter
+**The `function f<T>(…)` definition form** (Epsil) puts a **type-parameter
 clause** between the name and the parameter list. A parameter may carry a
 ground bound, the effect specifier and the return type are unchanged, and the
 clause names are usable anywhere in the head:
@@ -1172,7 +1172,7 @@ ce.box(["Function", ["Typed", body, "'(forall T. (T) -> T)'"], "x"]).type;
 // ➔ "(unknown) -> forall T. (T) -> T"   (the literal RETURNS a generic function)
 ```
 
-The same holds in Cortex: `function mk(x) -> forall T. (T) -> T { … }` defines
+The same holds in Epsil: `function mk(x) -> forall T. (T) -> T { … }` defines
 a generic `mk`, while `function mk(x) -> (forall T. (T) -> T) { … }` defines a
 plain `mk` that returns one.
 
@@ -1211,7 +1211,7 @@ ce.box(["dup", ["List", ["List", 1, 2], ["List", 3, 4]]]).evaluate().toString();
 - **No literal body for a generic overload set.** An intersection with a
   generic arm still needs an `evaluate` handler — the same reason a single
   literal cannot implement an ordinary [overload set](#overload-sets).
-- **The math definition form does not take a clause.** In Cortex,
+- **The math definition form does not take a clause.** In Epsil,
   `f<T>(x) = x` is an ordinary expression (`f < T > (x)`, then `= x`), not a
   definition — only the `function` keyword form claims the `<…>` slot.
 - **Compilation declines.** A generic function is not compiled — `compile()`
@@ -1731,7 +1731,7 @@ ce.declareType(
 The type is defined in the current lexical scope.
 
 A program can declare its own types with the `["DeclareType"]` operator —
-the MathJSON mirror of `ce.declareType()` — or, in Cortex, with the `type`
+the MathJSON mirror of `ce.declareType()` — or, in Epsil, with the `type`
 statement, which comes in two forms:
 
 ```js
@@ -1805,7 +1805,7 @@ ce.box(["Tuple", 1, 2]).type.matches("Pair<integer>"); // ➔ true
 
 The parameters may be given as names (each with an optional bound), as
 records (`[{ name: "T", bound: "number" }]`), or as a single clause string
-(`"T, U: number"`). In Cortex, the same declaration is a `type alias`
+(`"T, U: number"`). In Epsil, the same declaration is a `type alias`
 statement with a type-parameter clause — the clause a
 [generic function definition](#generic-declarations-and-function-literals)
 takes:
@@ -1864,7 +1864,7 @@ ce.type("forall T. (Keyed<T>) -> T");
 **Transparency.** The expansion happens when the type is resolved, so nothing
 downstream ever meets an applied reference: `.type`, `toString()`,
 `matches()` and error messages all show the expansion. The *source* keeps
-what was written — a Cortex program round-trips
+what was written — a Epsil program round-trips
 `let p: Pair<integer> = (1, 2)` verbatim — but the type it denotes displays
 as `tuple<integer, integer>`.
 
@@ -1939,7 +1939,7 @@ ce.box(["circle", 1, 2, 3]).evaluate().type;
 // ➔ "circle"
 ```
 
-In Cortex the same declaration is
+In Epsil the same declaration is
 `function circle(x, y, r) { {x -> x, y -> y, r -> r} }`.
 
 The installed operator is an **overload set**: the user's arm plus an
@@ -2004,12 +2004,12 @@ ce.expr(["Add", ["meters", 5], 1]).evaluate();
 That is the point of a nominal type: a `meters` cannot be added to a bare
 number by accident. There are three sanctioned windows back in:
 
-- **field access** — the `Field` operator (`p.x` in Cortex) reads one named
+- **field access** — the `Field` operator (`p.x` in Epsil) reads one named
   field through the type's definition when the body has named fields (a
   record body, or a named-tuple body): `ce.box(["Field", p, "'x'"])`. This
   dispatches off the definition's field map and does **not** make the value
   a collection — `First(p)` and `p["x"]` keep rejecting;
-- **pattern matching** — in Cortex, `match p { point(x, y) => x + y }`;
+- **pattern matching** — in Epsil, `match p { point(x, y) => x + y }`;
 - reading the operands of the MathJSON application directly from a host.
 
 A **structural alias** has no such reserve: an alias-typed operand unfolds to

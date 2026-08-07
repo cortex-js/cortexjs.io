@@ -1,6 +1,6 @@
 // Maps a page permalink to the path of its raw markdown twin:
 //
-//   /cortex/mcp/  ->  /cortex/mcp.md
+//   /epsil/mcp/  ->  /epsil/mcp.md
 //   /             ->  /index.md
 //
 // Shared by the llms-txt plugin, which emits those files at build time, and

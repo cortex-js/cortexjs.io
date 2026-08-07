@@ -6,7 +6,7 @@ import llmsTxt from './plugins/llms-txt';
 import remarkMath from 'remark-math';
 
 import codePlaygroundRemarkPlugin from './plugins/code-playground';
-import cortexPlaygroundRemarkPlugin from './plugins/cortex-playground';
+import epsilPlaygroundRemarkPlugin from './plugins/epsil-playground';
 import remarkLatexDelimiters from './plugins/remark-latex-delimiters';
 import { getDocusaurusNavbarConfig, getDocusaurusFooterConfig } from './src/shared/utils/docusaurus-config';
 
@@ -64,7 +64,7 @@ const config: Config = {
           showLastUpdateTime: true,
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
-          remarkPlugins: [codePlaygroundRemarkPlugin, cortexPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
+          remarkPlugins: [codePlaygroundRemarkPlugin, epsilPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
 
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
@@ -72,7 +72,7 @@ const config: Config = {
           //   "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
         pages: {
-          remarkPlugins: [codePlaygroundRemarkPlugin, cortexPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
+          remarkPlugins: [codePlaygroundRemarkPlugin, epsilPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
         },
 
         blog: false,
@@ -220,6 +220,13 @@ const config: Config = {
             // Redirect from /docs/mathfield to /docs/mathlive
             return [
               existingPath.replace('/mathfield', '/mathlive'),
+            ];
+          }
+          if (existingPath.includes('/epsil')) {
+            // The language was renamed from Cortex to Epsil; keep the
+            // previously published /cortex/... URLs resolving.
+            return [
+              existingPath.replace('/epsil', '/cortex'),
             ];
           }
           return undefined; // Return a falsy value: no redirect created

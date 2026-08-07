@@ -26,7 +26,7 @@ methods and properties available.
 Expressions can be created from a LaTeX string or from a raw MathJSON
 expression.
 
-When using the Cortex language frontend, `%` is the infix `Mod` operator and a
+When using the Epsil language frontend, `%` is the infix `Mod` operator and a
 postfix `!` is `Factorial`:
 
 ```text
@@ -35,7 +35,7 @@ n!          // Factorial(n)
 ```
 
 The postfix `!` must immediately follow its operand. Prefix `!x` remains
-logical `Not`, and `x != y` remains `NotEqual`. Cortex also supports chained
+logical `Not`, and `x != y` remains `NotEqual`. Epsil also supports chained
 collection indexing: `m[2][1]` is equivalent to `m[2, 1]`.
 
 ## Creating Expressions

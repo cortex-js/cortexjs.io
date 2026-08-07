@@ -15,6 +15,18 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Breaking Changes
 
+- **The Cortex language has been renamed Epsil.** The experimental scripting
+  language previously called Cortex is now Epsil, and every public surface
+  follows: the CLI binary is `epsil` (was `cortex`), the conventional source
+  file extension is `.epsil` (was `.cortex` / `.cx`), the package subpath is
+  `@cortex-js/compute-engine/epsil` (was `…/cortex`), and the API entry points
+  are `parseEpsil()`, `serializeEpsil()` and `executeEpsil()` (with the
+  corresponding `ExecuteEpsilOptions`/`ExecuteEpsilResult` types). The npm
+  package name and `@cortex-js` scope are unchanged. There are no compatibility
+  aliases: update imports and scripts to the new names. A `./cli` package
+  export exposes the CLI entry point so the standalone `epsil` launcher
+  package (and other tools) can forward to it.
+
 - **The `structural: true` boolean is no longer part of `ce.function()`'s typed
   signature — use `{ form: 'structural' }`.** The `form` option has been the
   documented spelling for the creation modes since the structural tier was
@@ -63,6 +75,133 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### New Features
 
+- **Destructuring assignment — `(a, b) := (b, a)`.** A tuple pattern may now
+  appear on the left of a Cortex assignment, writing bindings that already
+  exist instead of declaring new ones. The pattern grammar is the destructuring
+  `let`'s — at least two elements, each a bare symbol, a `_` skipping that
+  position, or a nested tuple pattern — and a shape mismatch is the same
+  `incompatible-type` error value.
+
+  The right-hand side is evaluated **once, in full, before any target is
+  written**, which is what makes a swap mean what it reads: `(a, b) := (b, a)`
+  exchanges the two values rather than assigning `b` to both. The same holds
+  for a rotation (`(a, b, c) := (c, a, b)`) and for the pair-carrying loop step
+  that is the usual reason to want this — `(a, b) := (b, a + b)` is an entire
+  Fibonacci iteration, and `(a, b) := (b, a % b)` an entire Euclid step, with
+  no temporary.
+
+  Unlike a destructuring `let`, the targets keep their identity and their
+  declared type: a value that does not fit a target's type is an error value,
+  and assigning to a `const` fails. Those two are found only by attempting the
+  write, so they are not atomic — targets earlier in the pattern stay written.
+  A shape mismatch is atomic and writes nothing, including when it is nested
+  under a position that would have bound; the destructuring `let` gained the
+  same guarantee, which it did not previously have. Lowers to the `Assign`
+  primitive with a `Tuple` pattern in the target position, held raw
+  (canonicalizing it would fold a single-letter target such as `i` into the
+  constant of that name), and accepted on all routes.
+
+  In **compiled** code it lowers to per-leaf temporaries followed by per-leaf
+  writes — `(a, b) := (b, a + b)` becomes `let _tv1 = b; let _tv2 = a + b; a = _tv1; b = _tv2` — which is what keeps the compiled form honest: the
+  targets already exist, so the naive `a = b; b = a` would read the `a` it just
+  clobbered. Temporaries never capture a name the program already uses. Every
+  target — JavaScript, Python, GLSL and WGSL — compiles it in any statement
+  position, including a loop body, so the Fibonacci and Euclid steps above
+  compile. Value position (a block's last statement, whose value is the
+  block's) and a non-literal tuple value fail closed (D6) and the interpreter
+  takes over; a destructuring `let` in value position is now refused the same
+  way, explicitly, rather than by emitting source that happens not to parse.
+  (This also fixes a silent divergence in the same family as the
+  destructuring-declare one: a tuple target previously compiled
+  as `_ = …`, leaving every target at its old value behind `success: true`.)
+
+  ```js
+  ce.box(['Assign', ['Tuple', 'a', 'b'], ['Tuple', 'b', 'a']]).evaluate();
+  ```
+
+- **Cortex diagnoses a tuple pattern written with a bare `=`.** A parenthesized
+  left side is not a binding target, so `(a, b) = (b, a)` resolves — correctly,
+  under the positional-`=` rule — to a *comparison* of two tuples whose result
+  is discarded: the swap it looks like silently does nothing. That shape is
+  almost always a typo for the destructuring assignment above, so it now
+  reports `destructuring-bare-equal`; write `(a, b) := (b, a)` to destructure,
+  or `==` if the comparison was meant. The node is unchanged — the diagnostic
+  reports, it does not reinterpret.
+
+  The check is deliberately narrow: it fires only statement-leading, and only
+  when the left side is shaped exactly like a destructuring pattern (bare
+  names, `_`, nested tuples), so a genuine tuple equation with computed
+  components — `(x + 1, y) = t` — stays silent.
+
+- **Parameterized nominal types: `type tree<T> = tuple<value: T, children: list<tree<T>>>`.** A nominal `type` declaration now takes the same
+  type-parameter clause a generic alias takes, in Cortex as above and from the
+  host with
+  `ce.declareType('tree', '…', { typeParams: [{ name: 'T', variance: 'out' }] })`.
+  Unlike an alias, an application is **opaque** — `tree<integer>` is never
+  expanded — which is precisely what lets the definition refer to itself, so a
+  recursive parametric container (a rose tree, a JSON with a payload, a zipper)
+  is expressible for the first time. The arity, bound and unused-parameter rules
+  are the alias's, shared and generalized; self-reference, which an alias
+  forbids, is the point here.
+
+  A parameter carries a **variance** marker — `out` (covariant), `in`
+  (contravariant) or `inout` (invariant) — saying how two applications relate:
+  under `out`, a `tree<integer>` is usable where a `tree<number>` is expected.
+  **No marker means `out`**, declared rather than inferred and verified against
+  the definition like a written one: values are immutable, so covariance is
+  sound and is what a payload container wants, and only the consuming minority
+  pays an annotation. Because the default is declared, a definition that uses
+  its parameter in an input position does not quietly change the type's
+  subtyping contract — it is a `variance-violation` at the declaration, naming
+  the violated variance and where it came from, the offending occurrences by
+  path (`notify.(arg 1)`), and exactly the markers that would verify. `inout`
+  verifies against any definition. Variance and bounds do not interact.
+
+  A `tuple` definition mints a **quantified** constructor
+  (`tree: forall T. (T, list<tree<T>>) -> tree<T>`), so `tree(1, [])` solves
+  `T = finite_integer` from its arguments; a `record` definition is still
+  inhabited by a constructor function, whose own clause is independent of the
+  type's. Field access reads the definition **instantiated at the
+  application's arguments** — with `t: tree<number>`, `t.value` is a `number`.
+  `match` is a binding of values, not a projection of the annotation: each
+  capture takes the matched **value's own** type, usually narrower — on a `t`
+  built as `tree(1, [])`, `match t { tree(v, cs) => … }` binds `v: integer` and
+  `cs: list<never>`, not `number` and `list<tree<number>>`. Compilation
+  erases the tag at the instantiated definition, as it already did for an
+  unparameterized nominal type: `tree<integer>` compiles like the equivalent
+  tuple, and declines identically where that would. One documented limitation: a
+  construction solves its parameters from its arguments alone and an annotation
+  does not widen them, so an explicitly `inout`/`in` parameterized type can only
+  be constructed at exactly its argument type. See the new "Parameterized
+  Nominal Types" section of the types guide.
+
+- A type variable may now appear in one arm of a **union**: `type opt<T> = T | missing` and `forall T. (T | missing) -> list<T>` are accepted, and at a call
+  the argument takes exactly one arm — the open arm binds the variable
+  (refutation included), a ground arm binds `never`, the narrowest member of
+  the family. At most one arm of a union may mention a variable (`T | U` is
+  unsolvable by construction). Intersections and negations remain rejected
+  wherever the declaration mints a constructor — the minted signature is what
+  is checked, so a `record` body or a `mint: false` declaration goes
+  unchecked — and the intersection diagnostic now steers to the spelling that
+  replaces it, a bound (`forall T: number.`).
+
+- A Cortex `type` statement re-declaration (a notebook re-run, or an edited
+  definition) now UPDATES the existing type record in place instead of
+  installing a new one. Types that mention the name — and applied references
+  such as `box<integer>` already built — follow the new definition, so a node
+  parsed before the re-run and one parsed after can no longer give different
+  subtyping answers for the same pair of types, and a mutually recursive set
+  converges on the second run rather than the third. A re-declaration that
+  breaks a type depending on it now fails on the run that introduces it, rather
+  than silently leaving that type reading a stale definition: an edit that
+  changes the type-parameter count while a dependent still applies the old
+  arity is a `generic-alias-arity` error, and one that makes a dependent's
+  declared variance unsound is a `variance-violation`. Both are attributed to
+  the dependent and name the re-declaration as the trigger, and both roll the
+  statement back completely — definition, type-parameter clause, verified
+  variance and minted constructor all restored. Re-declaring a type through the
+  host `ce.declareType()` API still throws, unchanged.
+
 - **Cortex: `break` and `continue`.** They leave, or skip to the next iteration
   of, the innermost enclosing `while`/`for` loop, and lower to the engine's
   existing `Break()`/`Continue()` primitives. Valid anywhere in a loop body,
@@ -105,6 +244,23 @@ import ChangeLog from '@site/src/components/ChangeLog';
   position.
 
 ### Resolved Issues
+
+- **A shader loop body no longer emits a `return` inside the loop.** On the
+  GLSL and WGSL targets, a `for` body with more than one statement compiled as
+  a *value* — its last statement became `return <statement>`, so the shader
+  returned on the first iteration while reporting `success: true`. Two plain
+  scalar assignments (`a := a + k; b := b * 2`) were enough to hit it. A loop
+  body is now compiled as a statement list, which is also what lets a
+  destructuring assignment lower on those targets.
+
+- **An even root of an even power reduces, and no longer does so for complex
+  values.** `\sqrt[4]{x^2}` now returns `\sqrt{|x|}`. It did not before, because
+  the result is structurally larger and the cost check rejected it — which was
+  quietly masking a soundness bug: the rewrite had no real-domain guard, so for
+  a value declared complex it would have produced `\sqrt{|z|}`, where the
+  principal value of `\sqrt[4]{z^2}` at `z=i` is `e^{i\pi/4}`, not 1. The guard
+  is now in place and the reduction is kept for being the reduced real-domain
+  form rather than the smaller one. A complex-declared base is left alone.
 
 - **A closure returned from a function now resolves captured variables from
   inside a nested block.** `k ↦ (x ↦ if x > 1 { k } else { 0 })` applied at

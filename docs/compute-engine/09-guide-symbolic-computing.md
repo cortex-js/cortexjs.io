@@ -68,8 +68,8 @@ most powerful and most expensive:
 
 | Tier | Method | Operator | Notation | Answers |
 | :--- | :--- | :--- | :--- | :--- |
-| Syntactic | `isSame()` | `Same` | `===`, `≣` (Cortex) | Always `True` or `False` |
-| Arithmetic | `isEqual()` | `Equal` | `=`, `==` (Cortex) | `True`, `False`, or undetermined |
+| Syntactic | `isSame()` | `Same` | `===`, `≣` (Epsil) | Always `True` or `False` |
+| Arithmetic | `isEqual()` | `Equal` | `=`, `==` (Epsil) | `True`, `False`, or undetermined |
 | Identity | `isIdenticallyEqual()` | `IdenticallyEqual` | `\equiv`, `≡` | `True`, `False`, or undetermined |
 
 </div>
@@ -78,7 +78,7 @@ Each tier answers a different question: "are these the same expression?",
 "do these have the same value?", and "are these the same function of their
 free variables?".
 
-The operator, its LaTeX/Cortex notation and its JavaScript method share the
+The operator, its LaTeX/Epsil notation and its JavaScript method share the
 same semantics at each tier.
 
 ### Syntactic Equality: `isSame()`
@@ -165,7 +165,7 @@ ce.expr(["CanonicalForm", ["Add", 1, "x"], "Order"]).isSame(
 ### Arithmetic Equality: `isEqual()`
 
 The `lhs.isEqual(rhs)` function answers "do these two expressions have the same
-value?". It is the JavaScript counterpart of the `=` operator (`==` in Cortex).
+value?". It is the JavaScript counterpart of the `=` operator (`==` in Epsil).
 
 The comparison is deliberately **cheap and predictable**:
 
@@ -277,7 +277,7 @@ that require evaluation, such as `\sin(\pi)`.
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
 | `ce.expr(["IdenticallyEqual", lhs, rhs]).evaluate()` | Synonym for `lhs.isIdenticallyEqual(rhs)` |
 | `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`, comparing the operands as written (they are not canonicalized) |
-| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)` (Cortex `===`). Always decides. |
+| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)` (Epsil `===`). Always decides. |
 
 </div>
 

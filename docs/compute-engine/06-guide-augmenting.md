@@ -1066,7 +1066,7 @@ console.log(ce.box(['fib', 10]).evaluate().toString());
 ```
 
 A parameter constrained to a single value (`{ str: '0' }` above) uses a
-**value type**: the clause admits exactly that value. In Cortex, literal
+**value type**: the clause admits exactly that value. In Epsil, literal
 parameters provide the same thing directly: `fib(0) = 0`.
 
 The clause rules:

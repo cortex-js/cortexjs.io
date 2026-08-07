@@ -72,19 +72,19 @@ cat ../mathlive/src/api.md >> ./docs/mathfield/api.md
 cp ./docs/compute-engine/_api.md ./docs/compute-engine/api.md
 cat ../compute-engine/src/api.md >> ./docs/compute-engine/api.md
 
-# Cortex language docs: authored as Docusaurus MDX in the compute-engine repo
-# (src/cortex/docs), synced here verbatim. The presentation shell — sidebar
-# entries and the <CortexPlayground> REPL — lives in this repo.
-mkdir -p ./docs/cortex
-cp ../compute-engine/src/cortex/docs/*.md ./docs/cortex/
+# Epsil language docs: authored as Docusaurus MDX in the compute-engine repo
+# (src/epsil/docs), synced here verbatim. The presentation shell — sidebar
+# entries and the <EpsilPlayground> REPL — lives in this repo.
+mkdir -p ./docs/epsil
+cp ../compute-engine/src/epsil/docs/*.md ./docs/epsil/
 
-# Cortex syntax highlighting: the highlight.js language definition is
+# Epsil syntax highlighting: the highlight.js language definition is
 # maintained next to the grammar in the compute-engine repo (and pinned there by
-# test/cortex/reserved-words.test.ts), so it is synced rather than reimplemented
+# test/epsil/reserved-words.test.ts), so it is synced rather than reimplemented
 # as a Prism grammar. src/theme/CodeBlock/Content adapts its output to the
 # Prism token shape Docusaurus renders. The copy is committed so `npm start`
 # works without a build.
-cp ../compute-engine/src/cortex/highlight-js-mode.js ./src/hljs/cortex-mode.js
+cp ../compute-engine/src/epsil/highlight-js-mode.js ./src/hljs/epsil-mode.js
 
 
 #
@@ -136,7 +136,11 @@ then
 
     copy_kb_alias "llms-compute-engine.txt" "kb-compute-engine.md"
     copy_kb_alias "llms-mathfield.txt" "kb-mathlive.md"
-    copy_kb_alias "llms-cortex.txt" "kb-cortex.md"
+    copy_kb_alias "llms-epsil.txt" "kb-epsil.md"
+    # The language was renamed from Cortex to Epsil; keep the previously
+    # published Cortex URLs resolving.
+    copy_kb_alias "llms-epsil.txt" "kb-cortex.md"
+    copy_kb_alias "llms-epsil.txt" "llms-cortex.txt"
 
     output_file="./build/kb-compute-engineapi.d.ts"
     pattern='../compute-engine/dist/types/**/*.d.ts'

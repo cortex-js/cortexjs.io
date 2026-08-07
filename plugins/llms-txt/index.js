@@ -154,7 +154,7 @@ export default function llmsTxtPlugin(context, options = {}) {
             ? normalize(doc.frontMatter.description)
             : salvageDescription(doc.description),
           permalink: doc.permalink,
-          // `source` is site-relative, e.g. "@site/docs/cortex/mcp.md"
+          // `source` is site-relative, e.g. "@site/docs/epsil/mcp.md"
           sourcePath: path.join(siteDir, doc.source.replace(/^@site\//, "")),
           section:
             sectionById.get(doc.id) ?? dominantSection.get(topDir(doc)) ?? "Other",
@@ -227,7 +227,7 @@ export default function llmsTxtPlugin(context, options = {}) {
       const lines = [
         `# ${title}`,
         "",
-        `> ${siteConfig.tagline}. Documentation for MathLive (math input for the web), the Compute Engine (symbolic computation in JavaScript) and Cortex (a language for scientific computing).`,
+        `> ${siteConfig.tagline}. Documentation for MathLive (math input for the web), the Compute Engine (symbolic computation in JavaScript) and Epsil (a language for scientific computing).`,
         "",
         "Every page below is also available as HTML at the same URL without the `.md` suffix.",
         "",

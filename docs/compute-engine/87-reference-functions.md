@@ -428,7 +428,7 @@ The right-pointing form is a **pipeline operator**: `\rhd` (also
 feeds the expression on its left to the function on its right, and stages
 chain left to right.
 
-The corresponding expression is `Pipe(value, function)`. For example, Cortex
+The corresponding expression is `Pipe(value, function)`. For example, Epsil
 `x |> f` constructs `Pipe(x, f)` and evaluates by applying `f` to `x`:
 
 ```json example
