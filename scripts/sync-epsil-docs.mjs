@@ -26,6 +26,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { lintDocs, reportLint } from "./lint-epsil-docs.mjs";
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE_DIR = path.join(ROOT, "..", "compute-engine", "src", "epsil", "docs");
 const TARGET_DIR = path.join(ROOT, "docs", "epsil");
@@ -139,21 +141,24 @@ async function main() {
 
   const unknown = new Set();
   const routes = {};
+  const linted = [];
   for (const name of sources) {
     const source = await fs.readFile(path.join(SOURCE_DIR, name), "utf8");
     const onUnknown = (url) => unknown.add(`${name}: ${url}`);
+    let route = "/" + name.replace(/\.md$/, "") + "/";
     const onSlug = (before, after) => {
+      route = after;
       // The old mathlive.io section root is sent to the epsil.dev landing page
       // rather than to the introduction it used to render — a reader following
       // a stale bookmark for "the Epsil docs" wants the new site's front door.
       const isRoot = before === "/epsil" || before === "/epsil/";
       routes[before.replace(/\/?$/, "/")] = isRoot ? "/" : after;
     };
-    await fs.writeFile(
-      path.join(TARGET_DIR, name),
-      rewrite(source, { onUnknown, onSlug }),
-      "utf8"
-    );
+    const content = rewrite(source, { onUnknown, onSlug });
+    await fs.writeFile(path.join(TARGET_DIR, name), content, "utf8");
+    // Linted after the rewrite, so the routes and links checked are the ones
+    // that ship on epsil.dev rather than the `/epsil/`-rooted originals.
+    linted.push({ name, route, content });
   }
 
   await fs.mkdir(path.dirname(REDIRECTS_FILE), { recursive: true });
@@ -171,6 +176,10 @@ async function main() {
     "utf8"
   );
 
+  const shouldFail = reportLint(lintDocs(linted), {
+    strict: process.env.EPSIL_DOCS_LINT !== "warn",
+  });
+
   if (unknown.size > 0) {
     console.warn(
       `[sync-epsil-docs] ${unknown.size} absolute links are neither an Epsil page ` +
@@ -180,6 +189,16 @@ async function main() {
   }
 
   console.log(`[sync-epsil-docs] ${sources.length} pages -> docs/epsil/`);
+
+  // Reported last and exited on here rather than mid-loop, so the docs are
+  // written and every finding is printed before the build stops.
+  if (shouldFail) {
+    console.error(
+      `[sync-epsil-docs] Failing on the anchor findings above. Fix them in ` +
+        `../compute-engine/src/epsil/docs/, or set EPSIL_DOCS_LINT=warn to proceed.`
+    );
+    process.exit(1);
+  }
 }
 
 await main();

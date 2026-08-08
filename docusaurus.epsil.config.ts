@@ -55,8 +55,12 @@ const config: Config = {
   organizationName: 'cortex-js',
   projectName: 'epsil.dev',
 
-  onBrokenLinks: 'warn',
-  onBrokenAnchors: 'warn',
+  // This site builds clean — zero broken links, zero broken anchors — so these
+  // throw to keep it that way. mathlive.io still has a backlog of ~80 broken
+  // anchors and stays on 'warn' until that is cleared; the ratchet only works
+  // from zero.
+  onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
   onDuplicateRoutes: 'throw',
 
   markdown: {
@@ -175,6 +179,46 @@ const config: Config = {
     ],
   ],
 
+  // Search. mathlive.io uses Algolia DocSearch (see `docusaurus.config.ts`),
+  // whose `cortexjs` index crawls mathlive.io only and holds no epsil.dev URLs.
+  // Rather than commission a second crawler, this site indexes itself at build
+  // time: `docs/epsil` is 23 pages / ~230KB of markdown, small enough that the
+  // whole lunr index ships to the browser and search runs with no network
+  // round-trip and no service to keep in sync with the deploy.
+  themes: [
+    [
+      '@easyops-cn/docusaurus-search-local',
+      /** @type {import('@easyops-cn/docusaurus-search-local').PluginOptions} */
+      ({
+        // Docs are rooted at `/` here, so this has to match `routeBasePath`
+        // above. The landing page in `src/pages-epsil/` is still left out:
+        // it is not a doc permalink, and `indexPages` stays at its default.
+        docsRouteBasePath: '/',
+        // Only used to compute the content hash the index filename carries.
+        docsDir: 'docs/epsil',
+        indexBlog: false,
+
+        // This documents a programming language whose keywords are English
+        // stop words — `if`, `for`, `in`, `do`, `then`, `not`, `and`, `or`.
+        // Filtering those out would make them unsearchable.
+        removeDefaultStopWordFilter: true,
+
+        // Hash in the filename, not a query string, so `_headers` can cache
+        // the index immutably in `static-epsil/_headers`.
+        hashed: 'filename',
+
+        // No typo tolerance. The default edit distance of 1 is actively
+        // harmful on this corpus: `match` — a keyword — is one edit from
+        // `math`, `watch` and `catch`, and this is a site about math, so the
+        // false positives outnumber the rescued typos.
+        fuzzyMatchingDistance: 0,
+
+        highlightSearchTermsOnTargetPage: true,
+        explicitSearchResultPath: true,
+      }),
+    ],
+  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     {
@@ -191,9 +235,8 @@ const config: Config = {
         },
       },
 
-      // No `algolia` block: the shared `cortexjs` index crawls mathlive.io, and
-      // after this split it holds no epsil.dev URLs. Search stays off here
-      // until epsil.dev has its own DocSearch crawler.
+      // No `algolia` block: search is served by the local index declared in
+      // `themes` above, not by DocSearch.
 
       navbar: getDocusaurusNavbarConfig(epsilNavigation),
       footer: getDocusaurusFooterConfig(epsilNavigation),

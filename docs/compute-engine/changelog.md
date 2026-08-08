@@ -250,6 +250,27 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Improvements
 
+- **Element-wise (broadcast) failures are now self-diagnosing.** A user
+  function with scalar parameters is automatically applied element-wise over
+  an indexed-collection argument; when that fired unexpectedly, the resulting
+  per-element failures gave no hint a broadcast was in flight — the
+  motivating symptom read `Condition must evaluate to "True" or "False"`
+  with nothing tying it to a mapping. An error produced inside a broadcast
+  element now carries an `["ErrorBroadcast", name, index, length]` entry in
+  its `ErrorTrace` breadcrumb, rendered as
+  `(while applying 'skipWs' element-wise over 4 elements (element 2))`; an
+  error **thrown** out of an element (a non-boolean `if` condition, say) has
+  the same context appended to its message. Every failing element is
+  annotated with its own index. Errors that never went through a broadcast
+  are byte-identical to before, successful broadcasts pay nothing, and Epsil
+  `runtime-error` diagnostics report the context too.
+
+- **The Epsil debugger's variables pane marks broadcast behavior on function
+  signatures**: `(n: number) -> number [elementwise]` versus
+  `(xs: list<number>) -> integer [binds whole]`, so the derived vectorization
+  behavior is visible before anything runs. A function-typed (callback)
+  parameter does not suppress the marker, matching the eligibility rule.
+
 - **Membership in a value collection now types the tested function
   parameter.** `Element(c, digits)` — Epsil `c in digits` — inside a function
   body narrows a not-yet-typed parameter to the collection's element type
@@ -290,6 +311,33 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Resolved Issues
 
+- **Iterating over a function parameter now counts as collection evidence.** A
+  parameter whose only use was `for c in cs` stayed untyped, so the lambda
+  auto-broadcast mapped the function over the argument's elements instead of
+  binding the collection whole: a function that accumulated `t = t + c` over
+  `for c in cs` and was applied to `[1, 2, 3]` returned `[0, 0, 0]` instead of
+  `6`, and its inferred signature read `(unknown) -> …`. The iterated operand of a
+  `Loop`/`Comprehension` `Element` clause now narrows an as-yet-untyped symbol
+  to `collection`, matching what `Length(cs)` and `cs[i]` already did. Scalar
+  parameters are unaffected — `f(x) = x * 2` still broadcasts over a list.
+
+- **A function forward-declared with the bare `function` wildcard
+  (`ce.declare('clean', 'function')`) now participates in parameter
+  collection-inference.** Previously a caller such as
+  `proc(cs) = clean(cs) + 1` learned nothing from `clean` in **either**
+  definition order: the wildcard declaration carries no parameter types, and
+  assigning a function literal deliberately leaves the declared type alone
+  (so re-assignment at a different arity stays legal), leaving no signature
+  to narrow from. The application site now reads the assigned literal's own
+  signature — for argument narrowing and for the application's result type,
+  which used to be broadcast-typed (`list<unknown^3>`) where the value was a
+  scalar — and a caller canonicalized while the callee is still a bare
+  wildcard registers for re-derivation, so the later assignment repairs it:
+  `proc([10, 20, 30])` answers `11` instead of broadcasting into
+  `[proc(10), proc(20), proc(30)]`. The wildcard remains a widening:
+  re-assignment at a different arity or parameter type still works, and
+  applications are still not validated against the assigned signature.
+
 - **Compiled string comparisons fail closed instead of returning wrong
   values.** The JavaScript compile target is numeric at heart: `Equal` and
   `NotEqual` lower to a tolerance test (`Math.abs(a - b) <= tol`), which for
@@ -329,6 +377,42 @@ import ChangeLog from '@site/src/components/ChangeLog';
   shapes keep byte-identical codegen. (The Python target has the same
   broadcast-route defect — `np.less("a", [1, 2])` — recorded as a known open
   hole, not yet fixed.)
+
+- **The Python compile target now fails closed on the string and aggregate
+  comparisons it miscompiled.** Two shapes returned wrong values behind
+  `success: true`: an ordering that mixes strings with numbers, where NumPy
+  coerces the number to a string and compares as text
+  (`Less(["a", 10], ["b", 9])` ran to `[True, True]`, while the interpreter
+  answers `["True", "False"]` — `10 < 9` is False), and equality with a
+  `tuple` participant, where the tuple is looked inside instead of binding
+  atomically (`Equal(Tuple(1, 2), List(1, 2))` ran to `True` against the
+  interpreter's `False`). Both now decline (D6) and the interpreter fallback
+  answers correctly, as do `dictionary`/`record` comparisons (no positional
+  lowering at all) and scalar string equality (`abs("a" - "a")` raises).
+  Gating is at COMPILE time on static type evidence, not on the emitted code
+  raising: several mixed shapes are loud on NumPy 2.x but historically
+  returned a scalar `False` with a `FutureWarning`, and emitted code runs on
+  the user's NumPy. As on the JavaScript target, an `unknown`-typed operand is
+  never string evidence, so numeric and plot comparisons compile
+  byte-identically. What keeps compiling, each with executed-parity pins:
+  all-string orderings (scalar, chained, list-vs-list, list-vs-scalar),
+  tuple-vs-tuple equality, and — unlike the JavaScript target, whose kernels
+  are numeric there — `IndexOf` in every shape (including a tuple needle in a
+  point list) and all-string collection equality, both of which lower to
+  Python's own structural comparison and are faithful.
+
+- **Compiled `IndexOf` now distinguishes booleans from numbers, like the
+  interpreter.** `IndexOf([1, 2], True)` ran to `1` on both the JavaScript and
+  Python targets, where the interpreter's structural element test answers `0`
+  (and symmetrically, `IndexOf([True], 1)` ran to `1`): Python's `True == 1`
+  is `True`, and `Math.abs(true - 1)` is `0`. Both targets now compare
+  bool-ness first — Python through a new `_ce_indexof`/`_ce_same` runtime
+  adapter, JavaScript through a guard in the emitted element test. This is a
+  runtime adapter, not a compile-time gate, so boolean `IndexOf` keeps
+  compiling instead of declining. Non-boolean values are unchanged: numbers
+  still match across `int`/`float`, a tuple needle is still found in a point
+  list, a missing needle is still `0`, and the JavaScript target keeps its
+  numeric tolerance test.
 
 - **A destructuring `Declare` with a positional initial value now binds
   (tuple patterns).** `["Declare", ["Tuple", "x", "y"], "unknown", ["Tuple", 3, 4]]` — the positional-value spelling the `Declare` contract
@@ -388,6 +472,36 @@ import ChangeLog from '@site/src/components/ChangeLog';
   - `Length(x)` contributed nothing because its parameter is deliberately
     `any` (`Length(5)` stays symbolic); it now treats a not-yet-typed symbol
     operand as collection evidence, like an indexed read does.
+
+- **Collection evidence now survives definition order: a function defined
+  before its callee is re-derived when the callee arrives.** The narrowing
+  described above — a callee's collection parameter teaching the caller's
+  parameter — could only fire when the callee was already defined. Write the
+  caller first (`process(cs) = clean(cs) + 1` before
+  `clean(v: list<number>) = v[1]`) and `process` was canonicalized while
+  `clean` was still unknown: `cs` learned nothing, so
+  `process([10, 20, 30])` broadcast elementwise, handing `clean` one number
+  at a time — each call then failed against the declared `list<number>`
+  parameter, and the errored elements surfaced as inert
+  `[process(10), process(20), process(30)]`. Definition order changed
+  semantics, which the engine already refuses to accept for juxtaposition
+  (`g(t) := 2a(t)` written before `a` is defined re-reads as an application
+  when `a` arrives): the same repair machinery now covers forward-referenced
+  calls. While a function literal's body is canonicalized, a call whose
+  callee is undefined — or known only by a guessed signature — registers the
+  literal as a dependent of that name; when the name later gains a
+  definition (assigned a body, or merely declared with a signature), the
+  literal is re-derived from its raw operands and the parameter picks up the
+  evidence, so the caller binds the collection whole and answers `11`.
+  Helpers can now be written below their callers, and mutually recursive
+  pairs work in either order. A *scalar* callee defined later leaves the
+  caller vectorizing, exactly as if it had been defined first, and a
+  self-recursive function skips the pointless re-derivation of itself.
+  Chains repair transitively: re-deriving a forwarder is that forwarder's own
+  name gaining a definition, so `A → B → C` written in that order all bind
+  correctly once `C` arrives — including diamonds, where the apex is rebuilt
+  once, after every forwarder below it is current — and mutually recursive
+  forward references terminate instead of chasing each other.
 
 - **A `while` loop inside a zero-argument function now terminates.**
   `function f() { let j = 1; while j < 3 { j = j + 1 }; j }` hit the

@@ -15,6 +15,12 @@
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
+# The lunr search index carries a content hash in its filename, so a stale copy
+# can never be served for changed content. It is fetched on first use of the
+# search box, which makes caching it hard worth more than it does for /assets/.
+/search-index-*.json
+  Cache-Control: public, max-age=31536000, immutable
+
 # The machine-readable bundles are plain text, not downloads.
 /llms.txt
   Content-Type: text/plain; charset=utf-8
