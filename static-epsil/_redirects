@@ -1,0 +1,15 @@
+# Cloudflare Pages redirects for epsil.dev.
+# https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# On mathlive.io the language docs lived under /epsil/ (and /cortex/ before the
+# rename). Those paths are redirected to epsil.dev by the stubs that
+# `plugins/epsil-redirect` writes into the mathlive.io build — but anyone who
+# rewrites a bookmark by hand lands on epsil.dev/epsil/…, so absorb both
+# prefixes here too rather than 404.
+
+/epsil          /introduction/   301
+/epsil/         /introduction/   301
+/epsil/*        /:splat          301
+/cortex         /introduction/   301
+/cortex/        /introduction/   301
+/cortex/*       /:splat          301

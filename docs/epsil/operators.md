@@ -1,7 +1,7 @@
 ---
 title: Epsil Operators
 sidebar_label: Operators
-slug: /epsil/operators/
+slug: /operators/
 description: "Operators in Epsil: infix, prefix and postfix forms, precedence and associativity, and the whitespace rules that govern how operands are parsed."
 hide_title: true
 date: Last Modified
@@ -85,7 +85,7 @@ The conditional expression `a if c else b` is not an operator row either, but
 it has a place in this order: between `KeyValuePair` (30) and `Or` (40), so it
 binds looser than every operator that computes and tighter than the forms that
 bind or pair (`=`, `|->`, `|>`, `->`). See
-[Control Flow](/epsil/control-flow/#the-conditional-expression-a-if-c-else-b).
+[Control Flow](/control-flow/#the-conditional-expression-a-if-c-else-b).
 
 ## The whitespace rule
 
@@ -108,7 +108,7 @@ a +b
 Here `+` has whitespace before but not after: it is **not** treated as infix.
 The expression `a` ends there; `+b` is left over on the same line with no
 separator before it, which is a diagnostic (`unexpected-symbol`) rather than a
-silently-inferred sequence — see [Statements and Sequencing](/epsil/syntax/).
+silently-inferred sequence — see [Statements and Sequencing](/syntax/).
 On its own line (after a linebreak or `;`), `+b` is a valid new statement:
 unary `+` is the identity, so `a\n+b` parses as `["Block", "a", "b"]`.
 
@@ -360,7 +360,7 @@ Note that a symbol immediately followed by `(` is a **function call**, not an
 invisible multiplication: `x(2+1)` is `["x", ["Add", 2, 1]]`, and a
 parenthesized (or otherwise compound) callee produces `Apply`:
 `(a+b)(2+1)` is `["Apply", ["Add", "a", "b"], ["Add", 2, 1]]`. See
-[Calls and Indexing](/epsil/syntax/).
+[Calls and Indexing](/syntax/).
 
 Whitespace between the number and the symbol suppresses invisible
 multiplication and is instead a statement boundary: `2 1/2` is a diagnostic
@@ -463,7 +463,7 @@ whose result is discarded — the swap it looks like silently does nothing:
 ```
 
 Write `(a, b) := (b, a)` to
-[destructure](/epsil/declarations/#destructuring-assignment), or `==` if the
+[destructure](/declarations/#destructuring-assignment), or `==` if the
 comparison really was intended. The diagnostic is narrow: it fires only when
 the left side is shaped exactly like a destructuring pattern (bare names, `_`,
 nested tuples), so a genuine tuple equation with computed components —

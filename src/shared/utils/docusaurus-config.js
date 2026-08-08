@@ -2,10 +2,15 @@ import navigationConfig from '../config/navigation.json';
 
 /**
  * Convert shared navigation config to Docusaurus format
+ *
+ * Defaults to the mathlive.io navigation. The standalone epsil.dev site
+ * (`docusaurus.epsil.config.ts`) passes `navigation-epsil.json` instead, so
+ * both sites share this converter and the Header/Footer components built on
+ * the same JSON shape.
  */
-export function getDocusaurusNavbarConfig() {
-  const { navbar } = navigationConfig;
-  
+export function getDocusaurusNavbarConfig(config = navigationConfig) {
+  const { navbar } = config;
+
   // Convert dropdown items to Docusaurus format
   const items = navbar.items.map(item => {
     if (item.type === 'dropdown') {
@@ -41,7 +46,9 @@ export function getDocusaurusNavbarConfig() {
 
   return {
     title: navbar.title,
-    logo: navigationConfig.logo,
+    // Omitted rather than set to `undefined` so Docusaurus renders a
+    // title-only navbar on a site that has no logo asset yet.
+    ...(config.logo ? { logo: config.logo } : {}),
     items,
   };
 }
@@ -49,9 +56,9 @@ export function getDocusaurusNavbarConfig() {
 /**
  * Convert shared navigation config to Docusaurus footer format
  */
-export function getDocusaurusFooterConfig() {
-  const { footer } = navigationConfig;
-  
+export function getDocusaurusFooterConfig(config = navigationConfig) {
+  const { footer } = config;
+
   const links = footer.sections.map(section => ({
     title: section.title,
     items: section.items.map(item => {

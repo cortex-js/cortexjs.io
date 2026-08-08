@@ -1,7 +1,7 @@
 ---
 title: Epsil Naming
 sidebar_label: Naming Conventions
-slug: /epsil/naming/
+slug: /naming/
 description: "Naming conventions in Epsil: capitalized identifiers denote library and engine operators, lowercase identifiers denote user-defined variables and functions."
 hide_title: true
 date: Last Modified

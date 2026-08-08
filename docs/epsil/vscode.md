@@ -1,7 +1,7 @@
 ---
 title: Epsil in Visual Studio Code
 sidebar_label: VSCode
-slug: /epsil/vscode/
+slug: /vscode/
 description: "The Epsil extension for Visual Studio Code: syntax highlighting, live diagnostics, and running programs from the editor."
 hide_title: true
 date: Last Modified

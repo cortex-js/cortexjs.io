@@ -1,7 +1,7 @@
 ---
 title: Inside Epsil
 sidebar_label: Implementation
-slug: /epsil/implementation/
+slug: /implementation/
 description: "Epsil uses MathJSON as its intermediate representation and the Compute Engine as its runtime. The public language entry point exposes the three stages …"
 hide_title: true
 date: Last Modified

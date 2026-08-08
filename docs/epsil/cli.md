@@ -1,7 +1,7 @@
 ---
 title: Epsil CLI
 sidebar_label: CLI
-slug: /epsil/cli/
+slug: /cli/
 description: "The epsil command-line interface: run files, evaluate inline programs, or start an interactive REPL."
 hide_title: true
 date: Last Modified
@@ -198,7 +198,7 @@ between calls, so every program must be self-contained. The
 `evaluate` tool (default 10000; each call can override it with its
 `timeLimit` argument).
 
-<ReadMore path="/epsil/mcp/">
+<ReadMore path="/mcp/">
 See how to **connect ChatGPT, Claude Code, Claude Desktop, or another MCP
 client**, and what to expect once it is connected.
 </ReadMore>

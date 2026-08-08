@@ -1,7 +1,7 @@
 ---
 title: Epsil Syntax
 sidebar_label: Syntax
-slug: /epsil/syntax/
+slug: /syntax/
 description: "The complete Epsil grammar: the notation used for productions, and the syntactic categories covering expressions, statements, literals and operators."
 hide_title: true
 date: Last Modified
@@ -30,11 +30,11 @@ In the grammar below, the following notation is used:
 
 The productions below describe the source forms accepted by the current
 parser. The Unicode identifier rules are delegated to the
-[MathJSON symbol profile](/math-json/#symbols), and the type following a `:`
+[MathJSON symbol profile](https://mathlive.io/math-json/#symbols), and the type following a `:`
 or return arrow is parsed using the
-[Compute Engine type language](/compute-engine/guides/types/). Detailed
+[Compute Engine type language](https://mathlive.io/compute-engine/guides/types/). Detailed
 `match` patterns are documented under
-[Control Flow](/epsil/control-flow/#match).
+[Control Flow](/control-flow/#match).
 
 _quoted-text-item_ → U+0000-U+0009 U+000B-U+000C U+000E-U+0021 U+0023-U+2027
 U+202A-U+D7FF | U+E000-U+10FFFF
@@ -129,7 +129,7 @@ inside an extended string, so it can hold `"` and `\` literally.
 _string_ → _single-line-string_ | _multiline-string_ | _extended-string_
 
 String escapes, interpolation, multiline indentation and continuation are
-specified in [Literals](/epsil/literals/#strings).
+specified in [Literals](/literals/#strings).
 
 _parenthesized_ → **`(`** _expression_ **`)`**
 
@@ -248,7 +248,7 @@ _epsil_ → (\[_shebang_\] (_statement_)#_statement-separator_ \[_eof_\])
 The Pratt (precedence-climbing) grammar for `_infix-expression_`,
 `_prefix-expression_`, and `_postfix-expression_` — the operator set, its
 precedence, and its associativity — is documented as a table in
-[Operators](/epsil/operators/) rather than spelled out production by
+[Operators](/operators/) rather than spelled out production by
 production; the whitespace rule described there (an infix operator has
 whitespace on both sides or neither; a prefix operator has no whitespace after
 it, and a postfix operator none before it) is part of this grammar, not a
@@ -309,7 +309,7 @@ call/index applies to. The primary forms are:
 - a dictionary: `{one -> 1, two -> 2}`
 - a `do { … }` block expression: `do { let t = 3; t + 1 }`
 - a `$…$` LaTeX island: `$\frac{1}{2}$` — see
-  [LaTeX Islands](/epsil/literals/#latex-islands)
+  [LaTeX Islands](/literals/#latex-islands)
 - a function call: `f(x, y)`
 - an index expression: `xs[i]`
 - a field access: `p.x`
@@ -326,7 +326,7 @@ f()         // ["f"]
 
 An argument may be prefixed with `...` to spread a tuple's elements into the
 call's arguments (valid only in call argument lists — see
-[Spread](/epsil/operators/#spread)):
+[Spread](/operators/#spread)):
 
 ```epsil
 f(...p)      // ["f", ["Spread", "p"]]
@@ -362,7 +362,7 @@ p.x(2)      // ["Apply", ["Field", "p", "x"], 2]
 
 A number literal never takes a field: the lexer folds a trailing dot into
 the number, so `2.x` is the multiplication `2. * x`, and `1..5` stays a
-range. See [Types](/epsil/types/#values-of-a-new-type-are-opaque) for what
+range. See [Types](/types/#values-of-a-new-type-are-opaque) for what
 `p.x` means on values of declared types, records and dictionaries.
 
 In all three cases the `(`, `[` or `.` must directly abut the
@@ -393,7 +393,7 @@ A `{` in expression position is therefore **always** a collection literal (set
 or dictionary); to open a statement block in expression position, prefix it
 with `do`. `do { … }` is a block expression (the engine's `Block`) — a
 statement sequence whose value is its last statement — while a bare `{ … }`
-stays a set/dictionary. See [Blocks](/epsil/control-flow/#blocks).
+stays a set/dictionary. See [Blocks](/control-flow/#blocks).
 
 ```epsil
 { one -> 1, two -> 2 }
@@ -445,7 +445,7 @@ applying:
   the same expression.
 
 Comments are **not** preserved by a round-trip — see
-[Comments](/epsil/comments/).
+[Comments](/comments/).
 
 `If` and `Match` have dedicated expression spellings. Other MathJSON heads that
 do not have a special surface form serialize as ordinary function calls.

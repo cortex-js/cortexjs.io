@@ -21,7 +21,7 @@
       },
       {
         "label": "Epsil",
-        "href": "/epsil",
+        "href": "https://epsil.dev",
         "position": "left"
       },
       {
@@ -39,7 +39,8 @@
         "items": [
           { "label": "Mathfield", "href": "/mathfield" },
           { "label": "Compute Engine", "href": "/compute-engine" },
-          { "label": "MathJSON", "href": "/math-json" }
+          { "label": "MathJSON", "href": "/math-json" },
+          { "label": "Epsil", "href": "https://epsil.dev" }
         ]
       },
       {

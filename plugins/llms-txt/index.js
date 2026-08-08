@@ -88,6 +88,15 @@ export default function llmsTxtPlugin(context, options = {}) {
   const { siteConfig, siteDir } = context;
   const bundleExclude = options.bundleExclude ?? BUNDLE_EXCLUDE;
 
+  // One-line description under the llms.txt title. Sites that serve a single
+  // product (epsil.dev) say something different from the multi-product one.
+  const summary = options.summary ?? `${siteConfig.tagline}.`;
+
+  // Filename for a bundle holding *every* page, in sidebar order, in addition
+  // to the per-section bundles. Off unless a site asks for it: on a
+  // multi-product site it would be an unusable several-megabyte file.
+  const fullBundle = options.fullBundle ?? null;
+
   // Captured in allContentLoaded (which runs before postBuild) because that is
   // the only lifecycle where another plugin's loaded content is visible.
   let pages = [];
@@ -223,15 +232,37 @@ export default function llmsTxtPlugin(context, options = {}) {
         bundles.set(section, name);
       }
 
+      // --- whole-site bundle -------------------------------------------------
+      if (fullBundle) {
+        const included = emitted.filter(
+          (page) => !bundleExclude.some((re) => re.test(page.id))
+        );
+        const parts = included.map(
+          (page) =>
+            `# ${page.title}\n\nSource: ${absolute(page.permalink)}\n\n${page.body}`
+        );
+        await fs.writeFile(
+          path.join(outDir, fullBundle),
+          `# ${title} — complete documentation\n\n${parts.join("\n\n---\n\n")}\n`,
+          "utf8"
+        );
+      }
+
       // --- llms.txt ---------------------------------------------------------
       const lines = [
         `# ${title}`,
         "",
-        `> ${siteConfig.tagline}. Documentation for MathLive (math input for the web), the Compute Engine (symbolic computation in JavaScript) and Epsil (a language for scientific computing).`,
+        `> ${summary}`,
         "",
         "Every page below is also available as HTML at the same URL without the `.md` suffix.",
         "",
       ];
+
+      if (fullBundle)
+        lines.push(
+          `- [All documentation, concatenated](${absolute(fullBundle)})`,
+          ""
+        );
 
       for (const [section, sectionPages] of sections) {
         lines.push(`## ${section}`, "");
@@ -250,7 +281,7 @@ export default function llmsTxtPlugin(context, options = {}) {
       await fs.writeFile(path.join(outDir, "llms.txt"), lines.join("\n"), "utf8");
 
       console.log(
-        `[llms-txt] ${emitted.length} pages, ${bundles.size} bundles, llms.txt`
+        `[llms-txt] ${emitted.length} pages, ${bundles.size + (fullBundle ? 1 : 0)} bundles, llms.txt`
       );
     },
   };

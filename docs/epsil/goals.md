@@ -1,7 +1,7 @@
 ---
 title: Epsil Goals
 sidebar_label: Goals
-slug: /epsil/goals/
+slug: /goals/
 description: "The goals guiding Epsil's design: ergonomic code that is easy to read and write, and familiarity with existing scientific and programming notation."
 hide_title: true
 date: Last Modified

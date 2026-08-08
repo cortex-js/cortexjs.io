@@ -1,7 +1,7 @@
 ---
 title: Epsil for Python Users
 sidebar_label: From Python
-slug: /epsil/from-python/
+slug: /from-python/
 description: "A translation guide from Python to Epsil: idiom-by-idiom mappings for variables, collections, control flow, math and strings, plus the reflexes that silently do the wrong thing."
 hide_title: true
 date: Last Modified
@@ -314,17 +314,17 @@ the work done now.
 
 ## Next
 
-<ReadMore path="/epsil/examples/">
+<ReadMore path="/examples/">
 **~70 complete programs**, all verified — iteration, number theory, calculus,
 linear algebra, strings, and randomness.
 </ReadMore>
 
-<ReadMore path="/epsil/for-agents/">
+<ReadMore path="/for-agents/">
 The **condensed language card** — the same material at reference density, for
 AI agents and for skimming.
 </ReadMore>
 
-<ReadMore path="/epsil/control-flow/">
+<ReadMore path="/control-flow/">
 **Control flow** in full — `match` patterns, guards, pins, destructuring,
 blocks and loops.
 </ReadMore>

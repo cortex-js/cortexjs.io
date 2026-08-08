@@ -1,7 +1,7 @@
 ---
 title: Epsil Control Flow
 sidebar_label: Control Flow
-slug: /epsil/control-flow/
+slug: /control-flow/
 description: "Control flow in Epsil: function definitions in math and block style, conditionals, pattern matching and loops, and the MathJSON each form lowers to."
 hide_title: true
 date: Last Modified
@@ -93,7 +93,7 @@ effect specifier must be followed by a return arrow:
 roll(n) random -> integer = Random(n)
 ```
 
-See [Effect Specifiers](/compute-engine/guides/types/#effect-specifiers) for
+See [Effect Specifiers](https://mathlive.io/compute-engine/guides/types/#effect-specifiers) for
 subtyping, callback checks, and the distinction between inferred and declared
 effects.
 
@@ -698,7 +698,7 @@ pattern fails closed, naming the offending pattern in the error.
 If no case matches, `match` evaluates to an `Error` value tagged
 `'match-no-case'` carrying the subject, rather than throwing or silently
 producing `Nothing` — errors are ordinary values in Epsil (see
-[Evaluation](/epsil/evaluation/)):
+[Evaluation](/evaluation/)):
 
 ```epsil
 match 3 {

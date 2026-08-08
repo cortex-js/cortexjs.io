@@ -1,7 +1,7 @@
 ---
 title: Epsil
 sidebar_label: Introduction
-slug: /epsil/
+slug: /introduction/
 description: Epsil is a programming language for scientific computing built on the Compute Engine.
 hide_title: true
 date: Last Modified
@@ -62,72 +62,72 @@ answer = 0
 
 ## Start Here
 
-<ReadMore path="/epsil/getting-started/">
+<ReadMore path="/getting-started/">
 Follow the **five-minute getting-started guide** — try the REPL, run a source
 file, and embed Epsil in JavaScript.
 </ReadMore>
 
-<ReadMore path="/epsil/examples/">
+<ReadMore path="/examples/">
 Explore **complete Epsil programs** for symbolic computation, collections,
 calculus, linear algebra, strings, and more.
 </ReadMore>
 
-<ReadMore path="/epsil/cli/">
+<ReadMore path="/cli/">
 Use the **CLI and interactive REPL** from a terminal.
 </ReadMore>
 
-<ReadMore path="/epsil/from-python/">
+<ReadMore path="/from-python/">
 Coming from **Python**? Translate your idioms — and learn the three reflexes
 that silently do the wrong thing.
 </ReadMore>
 
-<ReadMore path="/epsil/from-mathematica/">
+<ReadMore path="/from-mathematica/">
 Coming from **Mathematica**? Most of the mental model carries over; here is
 what changes.
 </ReadMore>
 
-<ReadMore path="/epsil/for-agents/">
+<ReadMore path="/for-agents/">
 Writing Epsil with an LLM? Give it the **language card for AI agents** — a
 condensed, machine-verified reference.
 </ReadMore>
 
-<ReadMore path="/epsil/mcp/">
+<ReadMore path="/mcp/">
 Connect ChatGPT, Claude, or another AI assistant to Epsil with the built-in
 **MCP server** — exact math as a tool call.
 </ReadMore>
 
 ## Language Reference
 
-<ReadMore path="/epsil/syntax/">
+<ReadMore path="/syntax/">
 Read more about the **formal syntax of Epsil** — statements, primaries,
 calls and indexing.
 </ReadMore>
 
-<ReadMore path="/epsil/literals/">
+<ReadMore path="/literals/">
 **Literals** — numbers, strings, symbols, and `$…$` LaTeX islands.
 </ReadMore>
 
-<ReadMore path="/epsil/operators/">
+<ReadMore path="/operators/">
 **Operators** — arithmetic, logic, relational, and the pipeline operator.
 </ReadMore>
 
-<ReadMore path="/epsil/control-flow/">
+<ReadMore path="/control-flow/">
 **Control flow** — `if`/`else`, `match`, loops, blocks, and functions.
 </ReadMore>
 
-<ReadMore path="/epsil/declarations/">
+<ReadMore path="/declarations/">
 **Declarations** — binding names with `let` and `const`.
 </ReadMore>
 
-<ReadMore path="/epsil/types/">
+<ReadMore path="/types/">
 **Types** — annotations, named types, effects, and absence values.
 </ReadMore>
 
-<ReadMore path="/epsil/comments/">
+<ReadMore path="/comments/">
 **Comments** — line and block comments.
 </ReadMore>
 
-<ReadMore path="/epsil/pragmas/">
+<ReadMore path="/pragmas/">
 **Pragmas** — parser directives embedded in the code.
 </ReadMore>
 
@@ -153,7 +153,7 @@ Epsil has literal syntax for the Compute Engine's collections.
 {one -> 1, two -> 2}
 ```
 
-<ReadMore path="/epsil/syntax/#collections-tuples-and-dictionaries">
+<ReadMore path="/syntax/#collections-tuples-and-dictionaries">
 Read more about **lists, sets, tuples and dictionaries**.
 </ReadMore>
 

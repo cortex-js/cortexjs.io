@@ -1,7 +1,7 @@
 ---
 title: Epsil Comments
 sidebar_label: Comments
-slug: /epsil/comments/
+slug: /comments/
 description: "Line and nestable block comments in Epsil, documentation comments, and why comments are lossy — they do not survive the round trip through MathJSON."
 hide_title: true
 date: Last Modified

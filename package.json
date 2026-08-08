@@ -19,6 +19,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
+    "start:epsil": "docusaurus start --config docusaurus.epsil.config.ts --port 3001",
     "build": "bash scripts/build.sh",
     "swizzle": "docusaurus swizzle",
     "xdeploy": "docusaurus deploy",
@@ -27,8 +28,11 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
     "update": "bash scripts/update.sh",
+    "sync:epsil": "node scripts/sync-epsil-docs.mjs",
     "stage": "bash scripts/stage.sh",
-    "deploy": "bash scripts/deploy.sh"
+    "stage:epsil": "node scripts/sync-epsil-docs.mjs && docusaurus build --config docusaurus.epsil.config.ts --out-dir build-epsil",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:epsil": "bash scripts/deploy-epsil.sh"
   },
   "dependencies": {
     "@docusaurus/core": "^3.10.2",

@@ -1,7 +1,7 @@
 ---
 title: Epsil Literals
 sidebar_label: Literals
-slug: /epsil/literals/
+slug: /literals/
 description: "Literal forms in Epsil: symbols following the MathJSON Unicode UAX31 profile, numbers, strings and collections, and the MathJSON each produces."
 hide_title: true
 date: Last Modified
@@ -11,7 +11,7 @@ date: Last Modified
 ## Symbols
 
 **Symbols** are names that identify variables, constants and functions. The
-name of a symbol must be a valid [MathJSON symbol](/math-json/#symbols): a
+name of a symbol must be a valid [MathJSON symbol](https://mathlive.io/math-json/#symbols): a
 profile of [Unicode UAX31](https://unicode.org/reports/tr31/) — a letter or
 underscore followed by letters, digits and underscores, drawn from the
 Unicode recommended scripts (emoji are also allowed). The prohibited
@@ -92,7 +92,7 @@ them as names.
 
 The characters between the two backticks are taken literally: no escape
 sequences are applied. The name must still be a valid
-[MathJSON symbol](/math-json/#symbols) — the Verbatim Form does not allow
+[MathJSON symbol](https://mathlive.io/math-json/#symbols) — the Verbatim Form does not allow
 names that would otherwise be invalid, such as names containing whitespace,
 a backslash, or characters with the **Pattern_Syntax** Unicode property
 (`+`, `<`, `|`, ...).

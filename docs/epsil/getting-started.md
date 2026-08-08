@@ -1,7 +1,7 @@
 ---
 title: Getting Started with Epsil
 sidebar_label: Getting Started
-slug: /epsil/getting-started/
+slug: /getting-started/
 description: Install Epsil, try the interactive REPL, run a source file, and embed the language in JavaScript.
 hide_title: true
 date: Last Modified
@@ -112,26 +112,26 @@ engine when you want an isolated program.
 
 ## Where to Go Next
 
-<ReadMore path="/epsil/examples/">
+<ReadMore path="/examples/">
 Study **complete programs** covering control flow, collections, symbolic
 calculus, linear algebra, strings, and reproducible randomness.
 </ReadMore>
 
-<ReadMore path="/epsil/cli/">
+<ReadMore path="/cli/">
 Learn the **CLI and REPL** commands, output modes, diagnostics, and evaluation
 limits.
 </ReadMore>
 
-<ReadMore path="/epsil/syntax/">
+<ReadMore path="/syntax/">
 Use the **language reference** for syntax, operators, declarations, types, and
 control flow.
 </ReadMore>
 
-<ReadMore path="/epsil/from-python/">
+<ReadMore path="/from-python/">
 Already know **Python**? Start from the idiom-by-idiom translation guide.
 </ReadMore>
 
-<ReadMore path="/epsil/from-mathematica/">
+<ReadMore path="/from-mathematica/">
 Already know **Mathematica**? Start from the Wolfram Language translation
 guide.
 </ReadMore>

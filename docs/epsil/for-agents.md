@@ -1,7 +1,7 @@
 ---
 title: Epsil for AI Agents
 sidebar_label: For AI Agents
-slug: /epsil/for-agents/
+slug: /for-agents/
 description: "A condensed, machine-verified reference for AI agents writing Epsil: core semantics, syntax, and a table of the ways Epsil differs from Python and JavaScript reflexes."
 hide_title: true
 date: Last Modified
@@ -32,7 +32,7 @@ structured diagnostics (positions, fix-its). **Look up the library**:
 `npx epsil doc Mean`, or search by concept — `npx epsil doc "standard
 deviation"`. Add `--diagnostics json` to a run for machine-readable runtime
 diagnostics. Embed via `executeEpsil(ce, source)` from
-`@cortex-js/compute-engine/epsil`. See [CLI](/epsil/cli/).
+`@cortex-js/compute-engine/epsil`. See [CLI](/cli/).
 
 **Naming convention**: `Capitalized` names are library operators (`Sin`,
 `Map`, `Simplify`); `lowercase` names are your variables and functions.
@@ -301,6 +301,6 @@ Sort([3, 1, 4, 1, 5], (a, b) |-> a > b)
   — it binds a new variable named `Pi`. Pin values with `==`:
   `match x { == Pi => … }`.
 
-For the full reference start at [Epsil](/epsil/), the complete grammar in
-[Syntax](/epsil/syntax/), and ~70 more verified programs in
-[Examples](/epsil/examples/).
+For the full reference start at [Epsil](/introduction/), the complete grammar in
+[Syntax](/syntax/), and ~70 more verified programs in
+[Examples](/examples/).

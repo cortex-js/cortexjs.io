@@ -1,7 +1,7 @@
 ---
 title: Epsil MCP Server
 sidebar_label: MCP Server
-slug: /epsil/mcp/
+slug: /mcp/
 description: "Connect AI assistants to Epsil with the built-in Model Context Protocol server: exact arithmetic, symbolic computation, and library documentation as tools."
 hide_title: true
 date: Last Modified
@@ -148,7 +148,7 @@ and monitoring.
 | `parse`     | Convert Epsil source to MathJSON                              |
 | `serialize` | Convert MathJSON to Epsil source                              |
 
-The server also publishes the [language card for AI agents](/epsil/for-agents/)
+The server also publishes the [language card for AI agents](/for-agents/)
 as a resource (`epsil://docs/for-agents`), and its setup instructions tell
 the assistant to read it before writing Epsil — so the assistant learns the
 language's syntax and idioms on its own.
@@ -186,7 +186,7 @@ token by token.
   `--allow-origin <origin>` for browser clients that run on another origin.
   Binding to a public interface does not add authentication or TLS.
 
-<ReadMore path="/epsil/cli/">
+<ReadMore path="/cli/">
 The same package also provides a **command-line interface and interactive
 REPL** for using Epsil yourself.
 </ReadMore>

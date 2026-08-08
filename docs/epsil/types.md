@@ -1,7 +1,7 @@
 ---
 title: Epsil Types
 sidebar_label: Types
-slug: /epsil/types/
+slug: /types/
 description: "Epsil has no type system of its own — it reuses the Compute Engine's type language, the same syntax accepted by ce.declare(\"f\", \"(real) -> real\"), and adds a type statement to name new types."
 hide_title: true
 date: Last Modified
@@ -11,7 +11,7 @@ date: Last Modified
 Epsil does not have its own type system: it reuses the Compute Engine's
 type language, the same syntax accepted by
 `ce.declare("f", "(real) -> real")`. See the
-[Compute Engine type guide](/compute-engine/guides/types/) for the type
+[Compute Engine type guide](https://mathlive.io/compute-engine/guides/types/) for the type
 language itself. This page covers where a type
 annotation is written in Epsil source and what it means, and how a program
 declares type names of its own; the type grammar
@@ -56,8 +56,8 @@ function roll(n: integer) random -> integer { Random(n) }
 ```
 
 Effect labels are part of the function type. See
-[Effect specifiers](/epsil/control-flow/#effect-specifiers) for declaration
-syntax and the [function type guide](/compute-engine/guides/types/#function-types)
+[Effect specifiers](/control-flow/#effect-specifiers) for declaration
+syntax and the [function type guide](https://mathlive.io/compute-engine/guides/types/#function-types)
 for subtyping rules.
 
 ## MathJSON representation
@@ -307,10 +307,10 @@ let (a, b) = p          // error
 ```
 
 Each of those lines parses: the rejection happens when the program runs, as
-an [error value](/epsil/evaluation/#errors-are-values), not as a parse
+an [error value](/evaluation/#errors-are-values), not as a parse
 error.
 
-To read the parts back, [`match`](/epsil/control-flow/#match) on the
+To read the parts back, [`match`](/control-flow/#match) on the
 constructor — a constructor pattern is an ordinary operator pattern, and
 binds one variable per field:
 

@@ -1,7 +1,7 @@
 ---
 title: Epsil Source Code
 sidebar_label: Source Code
-slug: /epsil/source-code/
+slug: /source-code/
 description: "Source code requirements for Epsil: UTF-8 decoding, Unicode NFC normalization of identifiers, and how line terminators and whitespace are treated."
 hide_title: true
 date: Last Modified
@@ -18,7 +18,7 @@ required by the MathJSON symbol contract.
 The Epsil parser does not decode files or strip a byte-order mark. File I/O
 and decoding are the responsibility of the host. Inside a string literal,
 Unicode code points can also be written with
-[escape sequences](/epsil/literals/#escape-sequence).
+[escape sequences](/literals/#escape-sequence).
 
 ## File Extension
 
@@ -45,7 +45,7 @@ command applies a 10-second evaluation limit by default. Use
 `--time-limit <milliseconds>` to change it or `--time-limit 0` to disable it.
 Run `epsil --help` for the complete option list.
 
-See [Epsil CLI](/epsil/cli/) for installation, output modes, REPL commands,
+See [Epsil CLI](/cli/) for installation, output modes, REPL commands,
 diagnostics, and exit-status behavior.
 
 ## Hashbang Comment

@@ -8,6 +8,8 @@ import remarkMath from 'remark-math';
 import codePlaygroundRemarkPlugin from './plugins/code-playground';
 import epsilPlaygroundRemarkPlugin from './plugins/epsil-playground';
 import remarkLatexDelimiters from './plugins/remark-latex-delimiters';
+import epsilRedirect from './plugins/epsil-redirect';
+import epsilRedirects from './config/epsil-redirects.json';
 import { getDocusaurusNavbarConfig, getDocusaurusFooterConfig } from './src/shared/utils/docusaurus-config';
 
 import type { Config } from '@docusaurus/types';
@@ -64,6 +66,22 @@ const config: Config = {
           showLastUpdateTime: true,
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
+          // The Epsil language docs are still synced into `docs/epsil` (they
+          // are the content of the standalone epsil.dev site, built from
+          // `docusaurus.epsil.config.ts`), but they are no longer part of this
+          // site. Their old URLs are handled by the `epsil-redirect` plugin.
+          //
+          // Setting `exclude` REPLACES the plugin's defaults, so they are
+          // repeated here — without them the `_api.md` / `_changelog.md`
+          // templates that build.sh concatenates would be published as pages
+          // of their own.
+          exclude: [
+            '**/_*.{js,jsx,ts,tsx,md,mdx}',
+            '**/_*/**',
+            '**/*.test.{js,jsx,ts,tsx}',
+            '**/__tests__/**',
+            'epsil/**',
+          ],
           remarkPlugins: [codePlaygroundRemarkPlugin, epsilPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
 
           // Please change this to your repo.
@@ -222,21 +240,31 @@ const config: Config = {
               existingPath.replace('/mathfield', '/mathlive'),
             ];
           }
-          if (existingPath.includes('/epsil')) {
-            // The language was renamed from Cortex to Epsil; keep the
-            // previously published /cortex/... URLs resolving.
-            return [
-              existingPath.replace('/epsil', '/cortex'),
-            ];
-          }
+          // /epsil/... and the older /cortex/... are no longer routes of this
+          // site — the `epsil-redirect` plugin below sends both to epsil.dev.
           return undefined; // Return a falsy value: no redirect created
         },
       },
     ],
-  
+
 
     loadScripts,
-    llmsTxt,
+    [
+      llmsTxt,
+      {
+        summary:
+          'Scientific Web Computing. Documentation for MathLive (math input for the web) and the Compute Engine (symbolic computation in JavaScript). The Epsil language is documented at https://epsil.dev.',
+      },
+    ],
+    [
+      epsilRedirect,
+      {
+        redirects: epsilRedirects,
+        // The language was renamed from Cortex to Epsil, so the same pages
+        // were also published under /cortex/.
+        alsoUnder: ['/cortex'],
+      },
+    ],
     // [
     //   '@docusaurus/plugin-pwa',
     //   /** @type {import('@docusaurus/plugin-pwa').Options} */

@@ -1,7 +1,7 @@
 ---
 title: Epsil Pragmas
 sidebar_label: Pragmas
-slug: /epsil/pragmas/
+slug: /pragmas/
 description: "Pragmas in Epsil: source forms the parser evaluates, injecting environment variables and other host values into MathJSON before the program runs."
 hide_title: true
 date: Last Modified

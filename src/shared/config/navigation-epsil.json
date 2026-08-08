@@ -1,0 +1,86 @@
+{
+  "navbar": {
+    "title": "Epsil",
+    "items": [
+      {
+        "type": "docSidebar",
+        "sidebarId": "epsilSidebar",
+        "position": "left",
+        "label": "Docs"
+      },
+      {
+        "label": "Get Started",
+        "href": "/getting-started/",
+        "position": "left"
+      },
+      {
+        "label": "Examples",
+        "href": "/examples/",
+        "position": "left"
+      },
+      {
+        "label": "Reference",
+        "href": "/syntax/",
+        "position": "left"
+      },
+      {
+        "label": "MathLive",
+        "href": "https://mathlive.io",
+        "position": "right"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/cortex-js/compute-engine",
+        "position": "right",
+        "icon": "github"
+      }
+    ]
+  },
+  "footer": {
+    "sections": [
+      {
+        "title": "Learn",
+        "items": [
+          { "label": "Introduction", "href": "/introduction/" },
+          { "label": "Getting Started", "href": "/getting-started/" },
+          { "label": "Examples", "href": "/examples/" },
+          { "label": "From Python", "href": "/from-python/" }
+        ]
+      },
+      {
+        "title": "Reference",
+        "items": [
+          { "label": "Syntax", "href": "/syntax/" },
+          { "label": "Operators", "href": "/operators/" },
+          { "label": "Types", "href": "/types/" },
+          { "label": "For AI Agents", "href": "/for-agents/" }
+        ]
+      },
+      {
+        "title": "Ecosystem",
+        "items": [
+          { "label": "Compute Engine", "href": "https://mathlive.io/compute-engine/" },
+          { "label": "MathLive", "href": "https://mathlive.io" },
+          { "label": "MathJSON", "href": "https://mathlive.io/math-json/" }
+        ]
+      },
+      {
+        "title": "Community",
+        "items": [
+          {
+            "type": "github",
+            "label": "GitHub",
+            "href": "https://github.com/cortex-js/compute-engine",
+            "icon": "github"
+          },
+          {
+            "type": "discord",
+            "label": "Discord",
+            "href": "https://discord.gg/yhmvVeJ4Hd",
+            "icon": "discord"
+          }
+        ]
+      }
+    ]
+  }
+}

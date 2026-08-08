@@ -1,0 +1,141 @@
+/* Landing page for epsil.dev. Built on Infima's own custom properties so it
+   tracks the shared theme in `src/css/` rather than hardcoding a palette. */
+
+.main {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 1.5rem 6rem;
+}
+
+/* --- hero ---------------------------------------------------------------- */
+
+.hero {
+  text-align: center;
+  padding: 5rem 0 3.5rem;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin: 0 0 1.25rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(3rem, 12vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.tagline {
+  margin: 1.25rem auto 0;
+  max-width: 34rem;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--ifm-button-border-radius, 0.5rem);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.primaryButton {
+  background: var(--ifm-color-primary);
+  color: var(--ifm-button-color, #fff);
+}
+
+.primaryButton:hover {
+  background: var(--ifm-color-primary-dark);
+  color: var(--ifm-button-color, #fff);
+  text-decoration: none;
+}
+
+.secondaryButton {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  color: var(--ifm-font-color-base);
+}
+
+.secondaryButton:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+}
+
+/* --- sections ------------------------------------------------------------ */
+
+.sectionTitle {
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5rem;
+}
+
+.sectionLead {
+  margin: 0 0 1.5rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.playground,
+.install {
+  margin-top: 4rem;
+}
+
+/* --- features ------------------------------------------------------------ */
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1.5rem;
+  margin-top: 4rem;
+}
+
+.feature {
+  padding: 1.5rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: var(--ifm-card-border-radius, 0.75rem);
+  background: var(--ifm-card-background-color, transparent);
+}
+
+.featureTitle {
+  font-size: 1.125rem;
+  margin: 0 0 0.5rem;
+}
+
+.featureBody {
+  margin: 0 0 1rem;
+  color: var(--ifm-color-emphasis-700);
+  line-height: 1.6;
+}
+
+.featureLink {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+/* --- install ------------------------------------------------------------- */
+
+.installCode {
+  /* Long import lines must scroll inside the block, never widen the page. */
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}

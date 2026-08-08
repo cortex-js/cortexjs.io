@@ -1,7 +1,7 @@
 ---
 title: Epsil for Mathematica Users
 sidebar_label: From Mathematica
-slug: /epsil/from-mathematica/
+slug: /from-mathematica/
 description: "A translation guide from the Wolfram Language to Epsil: idiom-by-idiom mappings for expressions, lists, iterators, pattern matching and calculus, plus the surface forms that look alike but differ."
 hide_title: true
 date: Last Modified
@@ -204,7 +204,7 @@ captures its operands, the Wolfram `Plus[a_, b_]` idiom. Blank patterns are
 spelled differently: `_` is the wildcard, `name` is a named capture (Wolfram's
 `name_`), `name: type` adds a type guard (`name_Integer`), and `...rest`
 captures the remainder of a list (`___`). See
-[Control Flow](/epsil/control-flow/#match) for the full pattern grammar.
+[Control Flow](/control-flow/#match) for the full pattern grammar.
 
 Scoping constructs are blocks:
 
@@ -296,16 +296,16 @@ materialize its operands — `(Table(k, {k, 1, 3}), 5)` keeps the unevaluated
 
 ## Next
 
-<ReadMore path="/epsil/examples/">
+<ReadMore path="/examples/">
 **~70 complete programs**, all verified — number theory, calculus, linear
 algebra, units, strings, and reproducible randomness.
 </ReadMore>
 
-<ReadMore path="/epsil/control-flow/">
+<ReadMore path="/control-flow/">
 **Control flow** in full — the complete `match` pattern grammar, blocks,
 loops, and function forms.
 </ReadMore>
 
-<ReadMore path="/epsil/for-agents/">
+<ReadMore path="/for-agents/">
 The **condensed language card** — the same material at reference density.
 </ReadMore>

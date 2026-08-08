@@ -1,8 +1,10 @@
 node_modules
 /build
+/build-epsil
 /.docusaurus
 .DS_Store
 .npm
 .eslintcache
+.playwright-mcp
 .tgz
 .node_repl_history

@@ -1,7 +1,7 @@
 ---
 title: Epsil Evaluation
 sidebar_label: Evaluation
-slug: /epsil/evaluation/
+slug: /evaluation/
 description: "How executeEpsil evaluates an Epsil program: top-level statements run sequentially in the engine's current scope, and the last statement's value is the result."
 hide_title: true
 date: Last Modified
@@ -22,7 +22,7 @@ No scope is pushed around the whole program: declarations persist across
 statements (and across cells, in a notebook that chains calls to
 `executeEpsil` against the same engine), the same way variables persist
 across cells in a REPL. Blocks and function bodies still push their own
-lexical scopes (see [Control Flow](/epsil/control-flow/)).
+lexical scopes (see [Control Flow](/control-flow/)).
 
 ## Symbolic by default
 
@@ -70,7 +70,7 @@ operation (an aggregate, an index) at the point of definition.
 
 ## Errors are values
 
-Per [Principles](/epsil/principles/), "errors are values": a *runtime*
+Per [Principles](/principles/), "errors are values": a *runtime*
 problem — a type error, an out-of-domain argument, reassigning a `const` —
 flows as an embedded `["Error", …]` MathJSON value, not as a thrown
 exception. `executeEpsil` never throws for a runtime problem; it catches
@@ -106,7 +106,7 @@ in an unfamiliar environment, both are **gated off by default**:
 with the default options produces a `host-pragma-disabled` diagnostic and no
 host read — the pragma evaluates to `Nothing`. Passing
 `{ allowHostPragmas: true }` to `executeEpsil` opts back in and lets `#env`/
-`#navigator` read the host as documented in [Pragmas](/epsil/pragmas/).
+`#navigator` read the host as documented in [Pragmas](/pragmas/).
 
 The benign pragmas — `#line`, `#column`, `#url`, `#filename`, `#date`,
 `#time` — always work; they don't read anything sensitive from the host.
@@ -135,5 +135,5 @@ non-final statement).
 These limits are cooperative. A browser that evaluates untrusted or potentially
 unbounded programs should run Epsil in a Web Worker that the host can terminate
 from the outside. See
-[Execution Constraints](/compute-engine/guides/execution-constraints/) for the
+[Execution Constraints](https://mathlive.io/compute-engine/guides/execution-constraints/) for the
 complete cancellation model.

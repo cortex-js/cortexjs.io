@@ -340,130 +340,6 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Epsil",
-      items: [
-        {
-          type: "doc",
-          id: "epsil/epsil",
-          label: "Introduction",
-          className: "compass-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/getting-started",
-          className: "checklist-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/goals",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/principles",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/naming",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/from-python",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/from-mathematica",
-          className: "guide-icon",
-        },
-        { type: "html", value: "<hr/>" },
-        {
-          type: "doc",
-          id: "epsil/syntax",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/literals",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/operators",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/control-flow",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/declarations",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/evaluation",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/types",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/comments",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/pragmas",
-          className: "reference-icon",
-        },
-        { type: "html", value: "<hr/>" },
-        {
-          type: "doc",
-          id: "epsil/examples",
-          className: "flask-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/cli",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/vscode",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/mcp",
-          className: "guide-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/for-agents",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/source-code",
-          className: "reference-icon",
-        },
-        {
-          type: "doc",
-          id: "epsil/implementation",
-          className: "sdk-icon",
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Tutorials",
       collapsible: false,
       collapsed: false,
@@ -491,6 +367,12 @@ const sidebars = {
           id: "sdk",
           label: "SDKs",
           className: "sdk-icon",
+        },
+        {
+          type: "link",
+          label: "Epsil",
+          href: "https://epsil.dev",
+          className: "compass-icon",
         },
         {
           type: "link",

@@ -1,7 +1,7 @@
 ---
 title: Epsil Principles
 sidebar_label: Principles
-slug: /epsil/principles/
+slug: /principles/
 description: "The principles behind Epsil: an expression-oriented language where conditionals, matches and blocks produce values, while declarations remain statements."
 hide_title: true
 date: Last Modified

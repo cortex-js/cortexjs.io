@@ -1,7 +1,7 @@
 ---
 title: Epsil Declarations
 sidebar_label: Declarations
-slug: /epsil/declarations/
+slug: /declarations/
 description: "Declare symbols in Epsil: let for mutable bindings, const for immutable ones, with optional type annotations and lexical scoping rules."
 hide_title: true
 date: Last Modified
@@ -51,7 +51,7 @@ a + b + c
 ```
 
 The pattern is **irrefutable in form** — no literals, pins, or guards (use
-[`match`](/epsil/control-flow/) for conditional destructuring). The value is
+[`match`](/control-flow/) for conditional destructuring). The value is
 evaluated once; it must be a tuple of the same shape, otherwise the
 declaration yields an `incompatible-type` **error value** and binds nothing.
 With `const`, every bound name is a constant. An initializer is required, and
@@ -109,7 +109,7 @@ The assignment operator must be spelled `:=`. A statement-leading `(a, b) = …`
 is a **comparison**, not an assignment — a parenthesized left side is not a
 binding target, so the bare `=` reads as `Equal`. Because that is almost
 always a typo for the destructuring assignment, it is
-[diagnosed](/epsil/operators/).
+[diagnosed](/operators/).
 
 Destructuring assignment lowers to `Assign` with the pattern in the target
 position: `["Assign", ["Tuple", "a", "b"], ["Tuple", "b", "a"]]`.
@@ -130,7 +130,7 @@ let a: pair = (1, 2)
 an existing one, and takes a type-parameter clause if it needs one
 (`type alias Pair<T> = tuple<T, T>`). Unlike `let` and `const`, `type` is not
 a reserved word — only these statement shapes claim it. See
-[Declaring a type](/epsil/types/#declaring-a-type) for the whole story.
+[Declaring a type](/types/#declaring-a-type) for the whole story.
 
 ## Reassignment vs. declaration
 
@@ -150,7 +150,7 @@ unbound symbol, but `let` is the explicit and idiomatic way to introduce a
 mutable binding.
 
 Reassigning a symbol that was declared `const` produces an
-[error value](/epsil/evaluation/#errors-are-values), not a parse error or a
+[error value](/evaluation/#errors-are-values), not a parse error or a
 thrown exception:
 
 ```epsil

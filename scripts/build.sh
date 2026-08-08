@@ -73,10 +73,12 @@ cp ./docs/compute-engine/_api.md ./docs/compute-engine/api.md
 cat ../compute-engine/src/api.md >> ./docs/compute-engine/api.md
 
 # Epsil language docs: authored as Docusaurus MDX in the compute-engine repo
-# (src/epsil/docs), synced here verbatim. The presentation shell — sidebar
-# entries and the <EpsilPlayground> REPL — lives in this repo.
-mkdir -p ./docs/epsil
-cp ../compute-engine/src/epsil/docs/*.md ./docs/epsil/
+# (src/epsil/docs). They are the content of the standalone epsil.dev site, not
+# of this one, so the sync rewrites the `/epsil/`-rooted slugs and links the
+# upstream authors write into root-relative ones — see the script. It also
+# emits config/epsil-redirects.json, the route table this site uses to redirect
+# the old /epsil/ and /cortex/ URLs.
+node ./scripts/sync-epsil-docs.mjs
 
 # Epsil syntax highlighting: the highlight.js language definition is
 # maintained next to the grammar in the compute-engine repo (and pinned there by
@@ -93,6 +95,21 @@ cp ../compute-engine/src/epsil/highlight-js-mode.js ./src/hljs/epsil-mode.js
 echo -e "$BASENAME$DOT Building Docusaurus"
 npx docusaurus build
 echo -e "$BASENAME$CHECK Docusaurus built"
+
+#
+# Build the standalone epsil.dev site (.md -> .html)
+#
+# A second build of this same repo: shared components, theme and static assets,
+# but only the docs/epsil content, rooted at /. Deployed to Cloudflare Pages by
+# scripts/deploy-epsil.sh, independently of the mathlive.io submodule.
+#
+echo -e "$BASENAME$DOT Building epsil.dev"
+npx docusaurus build --config docusaurus.epsil.config.ts --out-dir build-epsil
+# `static/CNAME` names mathlive.io for GitHub Pages. It is copied along with the
+# rest of static/, and means nothing to Cloudflare Pages, but shipping another
+# site's domain in this one's root is only confusing.
+rm -f ./build-epsil/CNAME
+echo -e "$BASENAME$CHECK epsil.dev built"
 
 
 
@@ -136,11 +153,19 @@ then
 
     copy_kb_alias "llms-compute-engine.txt" "kb-compute-engine.md"
     copy_kb_alias "llms-mathfield.txt" "kb-mathlive.md"
-    copy_kb_alias "llms-epsil.txt" "kb-epsil.md"
-    # The language was renamed from Cortex to Epsil; keep the previously
-    # published Cortex URLs resolving.
-    copy_kb_alias "llms-epsil.txt" "kb-cortex.md"
-    copy_kb_alias "llms-epsil.txt" "llms-cortex.txt"
+
+    # The Epsil bundle now comes from the epsil.dev build — the language docs
+    # are no longer part of this site. Its pages redirect to epsil.dev, but a
+    # knowledge-base URL cannot: an agent fetching kb-cortex.md wants text, not
+    # a redirect stub, so the bundle keeps being published here as well.
+    # epsil.dev/llms-full.txt is the canonical copy.
+    if [ -f "./build-epsil/llms-full.txt" ]; then
+        for alias in "kb-epsil.md" "kb-cortex.md" "llms-epsil.txt" "llms-cortex.txt"; do
+            cp "./build-epsil/llms-full.txt" "./build/$alias"
+        done
+    else
+        echo -e "$BASENAME$ERROR Expected ./build-epsil/llms-full.txt for the Epsil knowledge base aliases"
+    fi
 
     output_file="./build/kb-compute-engineapi.d.ts"
     pattern='../compute-engine/dist/types/**/*.d.ts'

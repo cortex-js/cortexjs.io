@@ -1,0 +1,28 @@
+{
+  "target": "https://epsil.dev",
+  "routes": {
+    "/epsil/": "/",
+    "/epsil/cli/": "/cli/",
+    "/epsil/comments/": "/comments/",
+    "/epsil/control-flow/": "/control-flow/",
+    "/epsil/declarations/": "/declarations/",
+    "/epsil/evaluation/": "/evaluation/",
+    "/epsil/examples/": "/examples/",
+    "/epsil/for-agents/": "/for-agents/",
+    "/epsil/from-mathematica/": "/from-mathematica/",
+    "/epsil/from-python/": "/from-python/",
+    "/epsil/getting-started/": "/getting-started/",
+    "/epsil/goals/": "/goals/",
+    "/epsil/implementation/": "/implementation/",
+    "/epsil/literals/": "/literals/",
+    "/epsil/mcp/": "/mcp/",
+    "/epsil/naming/": "/naming/",
+    "/epsil/operators/": "/operators/",
+    "/epsil/pragmas/": "/pragmas/",
+    "/epsil/principles/": "/principles/",
+    "/epsil/source-code/": "/source-code/",
+    "/epsil/syntax/": "/syntax/",
+    "/epsil/types/": "/types/",
+    "/epsil/vscode/": "/vscode/"
+  }
+}
