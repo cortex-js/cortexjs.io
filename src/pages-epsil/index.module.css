@@ -9,9 +9,65 @@
 
 /* --- hero ---------------------------------------------------------------- */
 
+/* Two columns on desktop, stacked on narrow screens. `minmax(0, …)` on the
+   text column stops the long tagline from forcing the grid wider than .main. */
 .hero {
-  text-align: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+  align-items: center;
+  gap: 2.5rem;
   padding: 5rem 0 3.5rem;
+}
+
+.heroText {
+  text-align: left;
+}
+
+.heroArt {
+  /* hand-cube.jpg is a JPEG with a baked-in warm background rather than a
+     transparent cutout, so it cannot sit directly on the page: it would show
+     as a pale square, and epsil.dev honours prefers-color-scheme, so in dark
+     mode that square would glare. Presenting it as a rounded card with a
+     background sampled from the image itself (#f7ece6 at its top corners)
+     makes the edge deliberate and reads correctly in both themes. */
+  background: #f7ece6;
+  border-radius: 1rem;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.heroImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 3rem;
+    text-align: center;
+  }
+
+  .heroText {
+    text-align: center;
+  }
+
+  /* Keeps DOM order — heading first, art after — so the h1 stays at the top
+     of a phone screen. Capped and centred rather than filling the column. */
+  .heroArt {
+    max-width: 16rem;
+    margin: 0 auto;
+  }
+
+  .tagline {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .actions {
+    justify-content: center;
+  }
 }
 
 .eyebrow {
@@ -35,7 +91,9 @@
 }
 
 .tagline {
-  margin: 1.25rem auto 0;
+  /* Not `auto` side margins: the hero text column is left-aligned now, and the
+     media query below re-centres it when the layout stacks. */
+  margin: 1.25rem 0 0;
   max-width: 34rem;
   font-size: 1.25rem;
   line-height: 1.6;
@@ -46,7 +104,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  justify-content: center;
+  justify-content: flex-start;
   margin-top: 2.5rem;
 }
 

@@ -63,21 +63,36 @@ export default function Home() {
     >
       <main className={styles.main}>
         <header className={styles.hero}>
-          <p className={styles.eyebrow}>Experimental</p>
-          <Heading as="h1" className={styles.title}>
-            Epsil
-          </Heading>
-          <p className={styles.tagline}>
-            A programming language for scientific computing, built on the{" "}
-            <a href="https://mathlive.io/compute-engine/">Compute Engine</a>.
-          </p>
-          <div className={styles.actions}>
-            <a className={styles.primaryButton} href="/getting-started/">
-              Get Started
-            </a>
-            <a className={styles.secondaryButton} href="/syntax/">
-              Language Reference
-            </a>
+          <div className={styles.heroText}>
+            <p className={styles.eyebrow}>Experimental</p>
+            <Heading as="h1" className={styles.title}>
+              Epsil
+            </Heading>
+            <p className={styles.tagline}>
+              A programming language for scientific computing, built on the{" "}
+              <a href="https://mathlive.io/compute-engine/">Compute Engine</a>.
+            </p>
+            <div className={styles.actions}>
+              <a className={styles.primaryButton} href="/getting-started/">
+                Get Started
+              </a>
+              <a className={styles.secondaryButton} href="/syntax/">
+                Language Reference
+              </a>
+            </div>
+          </div>
+
+          {/* Decorative: the heading beside it already names the product, so
+              an alt text here would only repeat it to a screen reader. */}
+          <div className={styles.heroArt}>
+            <img
+              className={styles.heroImage}
+              src="/img/hand-cube.jpg"
+              alt=""
+              width="948"
+              height="948"
+              loading="eager"
+            />
           </div>
         </header>
 

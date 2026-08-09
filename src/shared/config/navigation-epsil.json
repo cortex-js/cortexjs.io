@@ -1,4 +1,8 @@
 {
+  "logo": {
+    "alt": "Epsil",
+    "src": "img/logo.svg"
+  },
   "navbar": {
     "title": "Epsil",
     "items": [
@@ -22,11 +26,6 @@
         "label": "Reference",
         "href": "/syntax/",
         "position": "left"
-      },
-      {
-        "label": "MathLive",
-        "href": "https://mathlive.io",
-        "position": "right"
       },
       {
         "label": "GitHub",

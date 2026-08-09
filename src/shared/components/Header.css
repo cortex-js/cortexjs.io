@@ -50,6 +50,64 @@
   margin-right: 8px;
 }
 
+/* Docusaurus sizes the search input at 12.5rem, which this navbar cannot
+   afford: neither items group is allowed to shrink (see the `flex` values
+   above) and `.navbar__inner` wraps, so an oversized search box does not
+   squeeze the links — it drops the whole right-hand group onto a second row.
+   At 12.5rem the desktop row measured 1183px inside a 1024px bar.
+
+   The font size matters as much as the width. This site sets
+   `--ifm-font-size-base: 125%`, so the root em is 20px and the input inherits
+   a 20px font with Infima's 2.25rem (45px) icon gutter — those are rem, so
+   they do not scale down on their own. At that size the placeholder needs
+   63px and the shortcut badge 59px, which do not both fit: the placeholder
+   was clipped mid-word. Size the search bar in its own terms instead.
+
+   This only affects epsil.dev, the site using the local search index.
+   mathlive.io searches through Algolia, which renders a collapsed
+   `.DocSearch-Button` (53px) rather than an input, so it never matches. */
+.shared-header .navbar__search-input {
+  /* 158px, not more: the bar caps at 1024px, so the slack at any wide viewport
+     is whatever this leaves — 170px left only 8px, thin enough that a fallback
+     font's metrics could tip the row into wrapping. This keeps ~20px, and
+     still leaves a 16px gap between the placeholder and the ⌘K badge. */
+  width: 158px;
+  font-size: 15px;
+  padding-left: 36px;
+  background-size: 15px 15px;
+  background-position: 11px center;
+}
+
+/* The ⌘K badge, scaled to match. */
+.shared-header .navbar__search kbd {
+  font-size: 12px;
+  padding: 2px 5px;
+}
+
+/* Between Docusaurus's navbar breakpoint (996px, below which the links move
+   into the mobile drawer) and ~1048px, the floating bar is `100% - 2em` and so
+   narrower than the 1024px cap — at a 1024px window it is 992px, against 1016px
+   of content. Nothing in the row is allowed to shrink, so the row wrapped onto
+   two lines across that whole range. Tighten the links and the search box for
+   it, and drop the shortcut badge, which is the least useful thing here.
+
+   The link padding is not specific to epsil.dev: mathlive.io's navbar measures
+   1016px too, so it wrapped in this same range before search existed. */
+@media (max-width: 1060px) {
+  .shared-header .navbar__link {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .shared-header .navbar__search-input {
+    width: 132px;
+  }
+
+  .shared-header .navbar__search kbd {
+    display: none;
+  }
+}
+
 .shared-header .navbar__item {
   color: var(--cortex-navbar-text, var(--ifm-navbar-link-color));
 }
