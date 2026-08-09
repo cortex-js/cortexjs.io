@@ -22,6 +22,7 @@
     "/epsil/principles/": "/principles/",
     "/epsil/source-code/": "/source-code/",
     "/epsil/syntax/": "/syntax/",
+    "/epsil/tour/": "/tour/",
     "/epsil/types/": "/types/",
     "/epsil/vscode/": "/vscode/"
   }

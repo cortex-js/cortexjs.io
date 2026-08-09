@@ -75,6 +75,112 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### New Features
 
+- **Inline callback lambdas now infer their parameter type from the call
+  site.** An unannotated function literal passed directly as an argument is
+  re-derived with its parameter typed, exactly as if you had annotated it by
+  hand, in two situations: when the callee — user-defined functions
+  included — declares a concrete function-typed parameter
+  (`function apply2(f: (number) -> number, x) { f(x) }` types the `n` of
+  `apply2(n |-> n + 1, 3)` as `number`), and when the callback of `Map` or
+  `Filter` is applied to a collection whose element type is a provable
+  **composite** (a tuple or a nested collection). The headline win:
+  point-list predicates now compile without annotation —
+  `Filter(points, pt |-> pt == (0, 0))` with `points: list<tuple<number, number>>` lowers to the same element-wise code as the hand-annotated
+  spelling, and the literal's signature reflects the element type
+  everywhere it is read.
+
+  The inference is per-application and behaves exactly like a hand-written
+  annotation, loud type errors included. It never touches a shared callback
+  (a lambda bound to a name keeps its own typing at every call site), never
+  overrides an explicit annotation, and does not fire for union element
+  types of `Map`/`Filter` — heterogeneous "errors are values" programs keep
+  their per-element behavior, and the vectorization default for
+  evidence-free lambdas is unchanged. Polymorphic (`forall`) callees are
+  excluded until generic instantiation lands; optional and variadic
+  callback positions are covered.
+
+- **Annotated lambda parameters no longer disable the Map fast paths.** The
+  Map-fusion and exact-compile gates previously required bare (unannotated)
+  parameters, so the hand-annotated spelling of a mapping function paid an
+  interpretation penalty. The gates now accept an annotated parameter
+  whenever the source collection's element type provably satisfies the
+  annotation — the per-element type check is a no-op in that case, so the
+  fused drain is unobservable — and still fall back to the enforcing path
+  (loud error included) when the annotation is narrower than the elements
+  or the source type is unknown. With this, the element-type inference
+  above extends to scalar element types too: `Map(Range(1, 200), x |-> Mod(x, 7))` infers `x: integer`, keeps fusion, and still compiles
+  through the exact tier. A fused result is also re-validated when an
+  inferred source type changes, so a collection that retracts to a wider
+  element type raises the annotation error instead of reusing a stale
+  fused pipeline.
+
+  One consequence of the annotation contract to be aware of: an expression
+  you *retain* (a lazy `Map`/`Filter` you hold and re-evaluate) keeps the
+  parameter type it inferred when it was created. If the source collection
+  is later reassigned to elements of a wider type (an inferred
+  `list<integer>` becomes floats), re-evaluating the retained expression
+  reports a per-element `incompatible-type` error — exactly as the
+  hand-annotated spelling would — rather than silently adapting. Boxing
+  the expression afresh after the reassignment infers the new element type
+  and evaluates normally.
+
+- **JavaScript target: string equality now compiles.** Scalar
+  `Equal`/`NotEqual` with a provably string participant — and no provably
+  numeric one — lowers to a strict `===`/`!==`, the interpreter's own string
+  semantics, instead of failing closed. All-string collection equality keeps
+  the `_SYS.eq`/`_SYS.neq` dispatch, whose scalar leaf gained a string
+  branch, so `Equal(["a","b"], ["a","b"])` is `True` and
+  `Equal(["a","b"], "a")` is the element-wise `[True, False]`. A mixed
+  provably-string/provably-number equality and the chained (n-ary) form
+  still fail closed. The Python target mirrors the scalar rule with a
+  structural `==`/`!=`. With this, character-scanner programs
+  (`skipWs(cs, i) = skipWs(cs, i+1) if i <= Length(cs) && isWs(cs[i]) else i`
+  over `Characters(text)`) compile end to end.
+
+- **JavaScript target: `Characters`, `GraphemeClusters` and `StringJoin` now
+  compile.** `Characters` segments UAX #29 grapheme clusters through the
+  same `Intl.Segmenter` the interpreter uses, so a combining sequence, a
+  ZWJ emoji or a flag is one element — matching interpretation element for
+  element (neither `[...s]` nor `split('')` is faithful; both are pinned as
+  counter-examples). `StringJoin` compiles the variadic all-string form and
+  the single string-collection form; shapes the interpreter leaves inert
+  fail closed. Known accepted divergence: compiled comparisons do not
+  Unicode-normalize a raw non-NFC string bound to a compiled parameter
+  (the interpreter stores every string in NFC; literals and
+  `Characters`/`StringJoin` results are normalized) — normalize at the host
+  boundary if you feed unnormalized user input into compiled predicates.
+
+- **`broadcastable<T>` as a parameter declaration is now an elementwise
+  contract.** A parameter declared `broadcastable<T>` (e.g.
+  `ce.declare('f', '(broadcastable<number>) -> unknown')`, or an Epsil
+  `function f(x: broadcastable<number>) { … }`) maps an indexed-collection
+  argument element-wise — even when `T` would admit the collection whole
+  (`broadcastable<value>`: the collection arm wins) — and the map descends
+  exactly **one** rank: each element binds to the parameter whole, even a
+  nested collection, unlike the unannotated default, which descends to the
+  scalar leaves. `T` is checked per element (a violating element produces a
+  loud per-element error carrying the broadcast context, and its siblings
+  still evaluate), and a scalar argument binds directly with no list
+  wrapper. Applications now also **type** like the inferred path — a
+  definite collection argument gives `list<R>`, a possibly-collection
+  argument `broadcastable<R>`, a scalar `R` — where the declared spelling
+  previously typed the strictly weaker bare declared result (an explicitly
+  *more* precise declaration yielded strictly *less* type information). A
+  collection- or tuple-declared sibling slot still binds its argument
+  whole, and the strict length-mismatch policy applies across the mapped
+  slots only. The unannotated vectorization default is unchanged. Design
+  record: `docs/plans/2026-08-08-broadcastable-param-semantics.md`.
+
+- Compiling an application of a function with a declared `broadcastable<T>`
+  parameter over a possibly-collection argument fails closed with a
+  diagnostic (interpreted evaluation handles it) instead of emitting scalar
+  code that returned garbage on arrays — the compiled broadcast helper
+  recurses into nested arrays, which is exactly the leaf descent the
+  one-rank contract rules out. The decline is per slot: an argument at a
+  slot the declaration binds whole, an atomic tuple the element type admits,
+  and a provably scalar argument all still compile. A multi-clause function
+  with one broadcastable arm declines conservatively for the whole set.
+
 - **Epsil debugging support in the engine.** Two additions that let a
   debugger (such as the VS Code Epsil extension's DAP adapter) pause and
   inspect Epsil programs at statement granularity:
@@ -310,6 +416,66 @@ import ChangeLog from '@site/src/components/ChangeLog';
   position.
 
 ### Resolved Issues
+
+- **Membership queries on derived collections no longer answer a definite
+  `False` when the underlying membership is undecidable.** Nine collection
+  `contains` handlers (`Filter`, `Join`, `Append`, `Reverse`, `RotateLeft`,
+  `RotateRight`, `Cycle`, `CartesianProduct`, `PowerSet`) collapsed an
+  undecided sub-query into `false` — so `Element((1, x), {1, 2} × ys)` with
+  `ys` a symbolic set evaluated to `"False"` instead of staying symbolic.
+  All nine are now three-valued: a definite refutation still answers
+  `False` immediately, and only a genuinely undecidable membership is left
+  undecided. In the same pass, a `Filter` whose predicate returns a
+  non-boolean now reports the malformed predicate from a membership query
+  exactly as it does from iteration, counting, and emptiness — it was the
+  one silent facet.
+
+- **An element that fails a callback's declared parameter type is now loud
+  everywhere.** Previously it could surface as a nonsensical
+  `Filter predicate must return "True" or "False". Unknown symbol …`
+  message (which spell-checked the lambda's own parameter), be silently
+  swallowed by `TakeWhile`/`DropWhile` (an Error treated as an ordinary
+  "stop"), or be laundered into `NaN` by a fused `Map` pipeline doing
+  arithmetic on the Error value. All three paths now surface the element's
+  own `incompatible-type` error: stream operators emit it in the element's
+  place, scalar operators (`CountIf`, `Find`, `Position`, `IndexWhere`,
+  `Partition`) return it as their result, and fused pipelines propagate it
+  exactly like the unfused evaluator.
+
+- **Compiled collection callbacks no longer ignore parameter type
+  annotations.** On both the JavaScript and Python targets, a callback such
+  as `(n: integer) |-> n > 0` compiled to a plain function with the
+  annotation dropped, so compiled `Filter`/`Map`/`TakeWhile`/… could
+  silently produce different values than the interpreter on elements that
+  violate the annotation. Compilation now admits an annotated callback only
+  when the collection's element type provably satisfies the annotation —
+  the same rule the evaluator's fast paths use — and declines to compile
+  otherwise, so the interpreter's per-element errors are preserved. Applies
+  to inline and named callbacks across all collection operators, including
+  `Reduce`/`Scan` and `Tabulate`/`Fill`.
+
+- **An ordering such as `j <= Length(cs)` no longer declines to compile when
+  the same local is also used as an index (`cs[j]`).** `At`'s index slot is
+  typed `boolean | indexed_collection | number | string` (a gather index may
+  be a collection, a dictionary key a string), which permanently widened the
+  local, and the `string` arm of that union was read as positive string
+  evidence by the mixed-string ordering gate. A type that admits a string
+  *and* a number *and* a boolean *and* an indexed collection — that exact
+  four-armed shape — says no more than the top type does, and is no longer
+  treated as evidence, so ordinary scanner loops
+  (`while j <= Length(cs) && isWs(cs[j]) { … }`) compile again, on both the
+  JavaScript and Python targets. A deliberately written union of scalar sorts
+  (`string | number | boolean`) is still evidence, and genuinely mixed shapes
+  (`Less("a", 1)`, a `number | string` participant, `Less("a", [1, 2])`) still
+  fail closed.
+
+- **An else-less `if` statement in a function body compiles (JavaScript
+  target).** `if cs[j] == "-" { sign = -1; j = j + 1 }` in statement position
+  lowers to a bare `if (…) { … }` instead of failing with
+  `If: wrong number of arguments`. Loop bodies already handled this; a plain
+  block's statements did not. An else-less `if` in *value* position still
+  fails closed — it has no value. The Python, interval-JavaScript and GPU
+  targets still decline the shape in a plain function body.
 
 - **Iterating over a function parameter now counts as collection evidence.** A
   parameter whose only use was `for c in cs` stayed untyped, so the lambda
@@ -814,6 +980,24 @@ import ChangeLog from '@site/src/components/ChangeLog';
   which is why only an irrational argument showed it. Poles
   (`\mathrm{B}(-1, 2) = \tilde\infty`), the finite negative cases
   (`\mathrm{B}(-2, 2) = 1/2`) and float arguments are unchanged.
+
+- **A collection rebound to a `Map` over itself no longer overflows the
+  stack.** Assigning `xs` the value `Map(xs, f)` — the shape an accumulator
+  loop produces — made any later query throw a raw
+  `RangeError: Maximum call stack size exceeded` out of `evaluate()`, rather
+  than being absorbed as an `Error` value; a host calling `evaluate()`
+  directly saw a hard crash. The self-referential-binding guard was in place
+  and firing (`xs.value` reads `undefined`, as designed), but `Map` is the one
+  lazy collection operator that answers `isFinite`/`isEmpty` from its
+  **source** rather than its own iterator, and that path reached the stored
+  value through `evaluate()` instead of the guarded `value`. Each turn —
+  `isFinite` → source resolution → `evaluate()` → `isFiniteCollection` →
+  `isFinite` — completed its dereference before the next began, so the
+  existing cycle guard, which is released when the dereference returns, never
+  observed the re-entry. Such a source is now left unresolved, putting `Map`
+  on the same symbolic residual that `Filter` and every other lazy operator
+  already produced. Eager and broadcast sources (`Map(X - 1, f)`) still
+  resolve exactly as before.
 
 ## 0.102.0 _2026-08-05_
 

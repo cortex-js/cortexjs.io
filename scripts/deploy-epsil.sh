@@ -16,8 +16,18 @@
 #      .dev is HSTS-preloaded, so the site is HTTPS-only from the first request.
 #
 # Usage:
+#   npm run stage          # builds BOTH sites: build/ and build-epsil/
+#   npm run deploy         # this script, then deploy.sh (mathlive.io)
+#
+# Or, to publish epsil.dev on its own:
 #   npm run stage:epsil    # build into build-epsil/
 #   npm run deploy:epsil   # upload build-epsil/ to Cloudflare Pages
+#
+# `npm run deploy` runs this script BEFORE deploy.sh. Two reasons: this is the
+# step that fails when the wrangler login has expired, and failing here leaves
+# nothing pushed; and deploy.sh is not re-runnable once it has succeeded (its
+# `git commit` exits non-zero with nothing to commit), so putting it last keeps
+# a retry of `npm run deploy` from aborting before it reaches this script.
 
 set -e  # exit immediately on error
 set -o nounset   # abort on unbound variable

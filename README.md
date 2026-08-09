@@ -34,15 +34,22 @@ npm start
 
 ```bash
 npm run stage
-# Make a clean production build.
-# Output goes inside submodules/cortex-js.github.io
+# Make a clean production build of both sites.
+# mathlive.io goes inside submodules/cortex-js.github.io, epsil.dev in build-epsil/
 
 npm run restart
 # Validate that everything works well in the browser then...
 
 npm run deploy
-# submodules/cortex-js.github.io (a git submodule) gets pushed to cortex-js.github.io
+# Publishes both sites:
+#  - build-epsil/ is uploaded to Cloudflare Pages, which serves epsil.dev
+#  - submodules/cortex-js.github.io (a git submodule) gets pushed to
+#    cortex-js.github.io, which GitHub Pages serves as mathlive.io
 ```
+
+Use `npm run deploy:epsil` or `npm run deploy:mathlive` to publish just one of
+the two. Deploying epsil.dev needs a Cloudflare login — run `npx wrangler login`
+once per machine, and `npx wrangler whoami` to check it is still valid.
 
 # Architecture
 

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# scripts/deploy.sh
+# Publish mathlive.io by pushing the submodules/cortex-js.github.io submodule,
+# which GitHub Pages serves. This is only half of a release: epsil.dev is a
+# separate Cloudflare Pages site published by scripts/deploy-epsil.sh.
+#
+# `npm run deploy` runs both, epsil.dev first — see the note there on why that
+# order. Use `npm run deploy:mathlive` to publish only this site.
+
 set -e  # exit immediately on error
 set -o nounset   # abort on unbound variable
 set -o pipefail  # don't hide errors within pipes

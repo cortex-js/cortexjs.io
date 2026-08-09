@@ -7,8 +7,9 @@
 
 ## Content Updates
 - `npm run update` - Update dependent modules and regenerate API docs
-- `npm run stage` - Create production build in submodules/cortex-js.github.io/
-- `npm run deploy` - Deploy staged changes to GitHub Pages
+- `npm run stage` - Production build of both sites (mathlive.io into submodules/cortex-js.github.io/, epsil.dev into build-epsil/)
+- `npm run deploy` - Deploy both sites: epsil.dev to Cloudflare Pages, then mathlive.io to GitHub Pages
+- `npm run deploy:mathlive` / `npm run deploy:epsil` - Deploy just one of the two
 
 ## Utility Commands
 - `npm run clear` - Clear Docusaurus cache

@@ -13,10 +13,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Content Updates
 - `npm run update` - Update dependent modules and regenerate API docs
 - `npm run sync:epsil` - Re-sync `docs/epsil/` from the compute-engine repo
-- `npm run stage` - Create production build in `submodules/cortex-js.github.io/`
-- `npm run deploy` - Deploy staged changes to GitHub Pages (mathlive.io)
-- `npm run stage:epsil` - Build epsil.dev into `build-epsil/`
-- `npm run deploy:epsil` - Upload `build-epsil/` to Cloudflare Pages (epsil.dev)
+- `npm run stage` - Production build of **both** sites (`build/` → `submodules/cortex-js.github.io/`, and `build-epsil/`)
+- `npm run deploy` - Deploy **both** sites: epsil.dev to Cloudflare Pages, then mathlive.io to GitHub Pages
+- `npm run deploy:mathlive` - Deploy only mathlive.io
+- `npm run stage:epsil` - Build only epsil.dev, into `build-epsil/`
+- `npm run deploy:epsil` - Deploy only epsil.dev
 
 ### Utility Commands
 - `npm run clear` - Clear Docusaurus cache
@@ -50,6 +51,12 @@ differ. See "The two-site split" below.
   `scripts/stage.sh` writes the `CNAME`; `scripts/deploy.sh` commits and pushes.
 - epsil.dev: `build-epsil/` is uploaded directly to a Cloudflare Pages project
   by `scripts/deploy-epsil.sh` (wrangler). Nothing is committed.
+
+A release is `npm run stage && npm run deploy`. `stage` builds both sites and
+`deploy` publishes both — epsil.dev first, because that is the step that fails
+on an expired wrangler login (failing there leaves nothing pushed), and because
+`deploy.sh` cannot be re-run once it has succeeded, so a retry of `npm run
+deploy` would otherwise abort before reaching Cloudflare.
 
 ### The two-site split
 

@@ -21,8 +21,10 @@ This guide provides essential knowledge for AI coding agents to be productive in
 - **Documentation update:**
   - Run `npm run update` to sync dependent modules and regenerate docs.
 - **Staging and deployment:**
-  - Use `npm run stage` for production build (outputs to submodule).
-  - Use `npm run deploy` to push updates to GitHub Pages.
+  - Use `npm run stage` for a production build of both sites (mathlive.io into
+    the submodule, epsil.dev into `build-epsil/`).
+  - Use `npm run deploy` to publish both: epsil.dev to Cloudflare Pages, then
+    mathlive.io to GitHub Pages.
 - **Build scripts:**
   - `scripts/build.sh` orchestrates changelog, API file generation, and Docusaurus build.
   - On macOS, use `sed -i '' ...` for in-place file edits; this also works on Linux.
