@@ -23,6 +23,7 @@ const sidebars = {
       items: [
         { type: "doc", id: "epsil", label: "Introduction", className: "compass-icon" },
         { type: "doc", id: "getting-started", className: "checklist-icon" },
+        { type: "doc", id: "tour", className: "tutorial-icon" },
         { type: "doc", id: "examples", className: "flask-icon" },
         { type: "html", value: "<hr/>" },
         { type: "doc", id: "goals", className: "guide-icon" },

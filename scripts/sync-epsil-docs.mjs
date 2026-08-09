@@ -39,6 +39,13 @@ const TARGET_DIR = path.join(ROOT, "docs", "epsil");
 const REDIRECTS_FILE = path.join(ROOT, "config", "epsil-redirects.json");
 const EPSIL_URL = "https://epsil.dev";
 
+// The sidebar lives here, but the pages it lists are authored upstream, so a
+// page added in the compute-engine repo arrives with no sidebar entry. It still
+// builds and is still reachable by URL — Docusaurus does not consider an
+// unlisted doc an error — so the only symptom is that nobody can navigate to
+// it. That is how `tour.md` shipped orphaned. See checkSidebarCoverage.
+const SIDEBAR_FILE = path.join(ROOT, "sidebars.epsil.js");
+
 const MATHLIVE_URL = "https://mathlive.io";
 
 // `/` on epsil.dev is the marketing landing page (`src/pages-epsil/index.js`),
@@ -63,6 +70,15 @@ function rewriteUrl(url, onUnknown) {
   if (!url.startsWith("/")) return url;
 
   if (url === "/epsil" || url === "/epsil/") return INTRODUCTION_PATH;
+
+  // The section root carrying a fragment or query — `/epsil/#language-reference`
+  // — is still the introduction page. Without this, the generic strip below
+  // turns it into `/#language-reference`: an anchor on the landing page, which
+  // is `src/pages-epsil/index.js` and has no headings to match, so the build
+  // fails on a broken anchor.
+  const rootSuffix = /^\/epsil\/?([#?].*)$/.exec(url);
+  if (rootSuffix) return INTRODUCTION_PATH + rootSuffix[1];
+
   if (url.startsWith("/epsil/")) return url.slice("/epsil".length);
 
   const section = url.split("/")[1];
@@ -111,6 +127,45 @@ function rewrite(source, { onUnknown, onSlug }) {
   );
 
   return (frontMatter ?? "") + body;
+}
+
+// Warn about synced pages the sidebar does not list, and sidebar entries whose
+// page no longer exists (an upstream rename leaves both at once).
+//
+// The sidebar is read as text and scanned for `id:` rather than imported: it is
+// an ES module Docusaurus loads with its own resolver, and a lint check is not
+// worth taking on that. The parse is therefore approximate — it is allowed to
+// miss an exotic entry, because a false "not listed" costs a glance while a
+// missed page costs a reader. Warns rather than fails for the same reason the
+// knowledge-base aliases in build.sh warn: an upstream page should not be able
+// to break a release here.
+async function checkSidebarCoverage(pageIds) {
+  let sidebar;
+  try {
+    sidebar = await fs.readFile(SIDEBAR_FILE, "utf8");
+  } catch {
+    return; // No sidebar to check against; not this script's business to insist.
+  }
+
+  const listed = new Set([...sidebar.matchAll(/\bid:\s*["']([^"']+)["']/g)].map((m) => m[1]));
+
+  const orphans = pageIds.filter((id) => !listed.has(id));
+  if (orphans.length > 0) {
+    console.warn(
+      `[sync-epsil-docs] ${orphans.length} page(s) are not in sidebars.epsil.js, so ` +
+        `nothing links to them from the navigation:\n  ` +
+        orphans.join("\n  ")
+    );
+  }
+
+  const missing = [...listed].filter((id) => !pageIds.includes(id));
+  if (missing.length > 0) {
+    console.warn(
+      `[sync-epsil-docs] sidebars.epsil.js lists ${missing.length} page(s) that no ` +
+        `longer exist upstream (the build will fail on these):\n  ` +
+        missing.join("\n  ")
+    );
+  }
 }
 
 async function main() {
@@ -175,6 +230,8 @@ async function main() {
     ) + "\n",
     "utf8"
   );
+
+  await checkSidebarCoverage(sources.map((name) => name.replace(/\.md$/, "")));
 
   const shouldFail = reportLint(lintDocs(linted), {
     strict: process.env.EPSIL_DOCS_LINT !== "warn",
