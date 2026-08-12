@@ -31,7 +31,7 @@
     "sync:epsil": "node scripts/sync-epsil-docs.mjs",
     "verify:snippets": "node scripts/verify-landing-snippets.mjs",
     "stage": "bash scripts/stage.sh",
-    "stage:epsil": "node scripts/sync-epsil-docs.mjs && docusaurus build --config docusaurus.epsil.config.ts --out-dir build-epsil",
+    "stage:epsil": "rm -rf build-epsil && node scripts/sync-epsil-docs.mjs && docusaurus build --config docusaurus.epsil.config.ts --out-dir build-epsil && rm -f build-epsil/CNAME",
     "deploy": "bash scripts/deploy-epsil.sh && bash scripts/deploy.sh",
     "deploy:mathlive": "bash scripts/deploy.sh",
     "deploy:epsil": "bash scripts/deploy-epsil.sh"
