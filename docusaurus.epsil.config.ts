@@ -38,6 +38,46 @@ const remarkPlugins = [
   remarkMath,
 ];
 
+// ──────────────────────────────────────────────────────────────────────────
+// Structured data. Two nodes in one graph:
+//
+//   1. The SoftwareApplication for Epsil itself, published by…
+//   2. …Farfield Studio, the umbrella studio behind Epsil, Graph Paper and the
+//      rest. That Organization node is a *stub*: the authoritative one lives on
+//      farfield.studio, which emits the same `@id`. Reusing the `@id` verbatim
+//      is what lets Google consolidate the properties into one business entity,
+//      so it is a cross-repo contract — do not change it here alone. The same
+//      pattern is used by graph-paper.io (~/dev/tycho, scripts/lib/site/
+//      landing-template.mjs) and by farfield.studio itself (~/dev/
+//      farfield-studio, src/layouts/Base.astro), which carries a mirror-image
+//      SoftwareApplication node for Epsil under the `@id` used below.
+//
+// Emitted site-wide via `headTags` rather than on the landing page only: both
+// nodes describe the site as a whole, and repeating identical `@id`s across
+// pages is harmless.
+const STUDIO_ORG_ID = 'https://farfield.studio/#organization';
+
+const STRUCTURED_DATA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      '@id': 'https://epsil.dev/#software',
+      name: 'Epsil',
+      url: 'https://epsil.dev/',
+      description: 'A programming language for scientific computing.',
+      applicationCategory: 'DeveloperApplication',
+      publisher: { '@id': STUDIO_ORG_ID },
+    },
+    {
+      '@type': 'Organization',
+      '@id': STUDIO_ORG_ID,
+      name: 'Farfield Studio',
+      url: 'https://farfield.studio/',
+    },
+  ],
+};
+
 /** @type {import('@docusaurus/types').Config} */
 const config: Config = {
   title: 'Epsil',
@@ -125,6 +165,11 @@ const config: Config = {
 
   // The Inter font is hosted on rsms.me
   headTags: [
+    {
+      tagName: 'script',
+      attributes: { type: 'application/ld+json' },
+      innerHTML: JSON.stringify(STRUCTURED_DATA),
+    },
     {
       tagName: 'link',
       attributes: { rel: 'preconnect', href: 'https://rsms.me/' },
