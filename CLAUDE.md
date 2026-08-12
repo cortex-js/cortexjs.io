@@ -22,6 +22,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Utility Commands
 - `npm run clear` - Clear Docusaurus cache
 - `npm run swizzle` - Eject Docusaurus components for customization
+- `npm run verify:snippets` - Execute the epsil.dev landing page code samples
+  against the engine in `../compute-engine` and check them against the results
+  the page prints. The playground loads the engine unversioned, so a release
+  can change what those samples do; run this after an engine bump and before a
+  release. `EPSIL_SNIPPETS=warn` reports without failing.
 
 ## High-Level Architecture
 
@@ -165,7 +170,10 @@ CSS follows CSS Modules pattern (`index.module.css` files).
 
 ## Testing
 
-No automated test suite exists. Validation consists of:
+There is no test suite. The one automated check is
+`npm run verify:snippets`, which executes the epsil.dev landing page code
+samples against the engine and fails if one stops producing the result the page
+prints. Everything else is manual:
 - Manual verification of build output
 - Link checking in generated site
 - Visual validation in browser before deployment
