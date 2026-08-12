@@ -214,6 +214,24 @@ const c = 6.28
     ["KeyValuePair", "constant", "True"]]]
 ```
 
+A **named literal function-type annotation binds the initializer's
+parameters** (the "lambda lift" — see
+[Declarations](/declarations/#function-type-annotations-bind-their-parameter-names)):
+before lowering, the parser wraps a non-lambda initializer in a `Function`
+whose parameters come from the annotation, so the declared value is exactly
+what the explicit `|->` spelling produces:
+
+```epsil
+const f : (x: number) -> number = x + 1
+```
+
+```json
+["Declare", "f", {"str": "(x: number) -> number"},
+  ["Dictionary",
+    ["KeyValuePair", "value", ["Function", ["Add", "x", 1], "x"]],
+    ["KeyValuePair", "constant", "True"]]]
+```
+
 Because declarations lower directly to the engine's own `Declare` primitive,
 there is no separate Epsil-side declaration logic at execution time — the
 program evaluates the `Declare` expression exactly like any other expression.
@@ -306,9 +324,12 @@ f(x: integer) -> real = x + 1
 ### Type declarations
 
 A `type` statement lowers to the engine's `DeclareType` operator — the
-MathJSON mirror of `ce.declareType()`. The body is carried as the source text
-of the type. The bare form has no attributes; the `alias` form adds an
-attributes dictionary with `alias -> True`:
+MathJSON mirror of `ce.declareType()`. Types are global, so the statement is
+only legal at the top level of a program: the parser rejects a nested one
+(`type-declaration-not-top-level`), and the engine's `DeclareType` handler
+enforces the same rule for MathJSON built directly. The body is carried as
+the source text of the type. The bare form has no attributes; the `alias`
+form adds an attributes dictionary with `alias -> True`:
 
 ```epsil
 type point = tuple<x: number, y: number>

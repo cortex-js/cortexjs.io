@@ -167,6 +167,18 @@ function g(x: integer) -> integer { x + 1 }
 (x: integer) |-> x + 1
 ```
 
+A declaration whose annotation is a function type **written out with named
+parameters** binds those names too — the initializer is then the function's
+body, no `|->` needed:
+
+```epsil
+const f : (x: real) -> real = x^2 + 2x + 1
+```
+
+The names bind only when the signature is spelled at the declaration site
+(an alias never binds). See
+[Function-type annotations](/declarations/#function-type-annotations-bind-their-parameter-names).
+
 Everything after the `:` is read as a **type**, not as an expression. That is
 why `<`, `>`, `|`, `&` and `->` mean something different there than they do in
 ordinary code — in `u: integer | boolean` the `|` is a union, not a logical
@@ -381,8 +393,8 @@ declared, calling the name reports a `type-not-callable` warning.
 
 ### Constructor functions
 
-A `function` with a declared type's name — in the same scope, after the
-`type` statement — is that type's **constructor function**. The body
+A `function` bearing a declared type's name — after the `type` statement —
+is that type's **constructor function**. The body
 computes the *payload*: a value that must satisfy the type's definition
 (for a record, exactly the definition's keys, each field matching its
 type). The engine checks the payload and tags it; the result is a value of
@@ -502,17 +514,30 @@ type polar = tuple<r: number, t: number>
 // ➔ (True, False, False)
 ```
 
-### Scope, and re-running a cell
+### Types are global, and re-running a cell
 
-A type declaration — both the type name and its constructor — lives in the
-current scope, like a `let`. One inside a block or a loop body stays there:
+A type declaration — both the type name and its constructor — is **global**:
+it belongs to the whole program (and to later cells on the same engine), not
+to any block. A type name means the same thing everywhere it appears.
+Consequently a `type` statement is only allowed at the top level of a
+program. Inside a `do` block, a function body, an `if` branch or a loop body
+it is an error:
 
-```epsil-live
-let origin = 0
+<!-- epsil-test: expect-diagnostics -->
+
+```epsil
 do {
-  type inner = tuple<number, number>
+  type inner = tuple<number, number> // ✘ type-declaration-not-top-level
   inner(3, 4)
 }
+```
+
+Declare the type at the top level instead, and use it anywhere — inside
+blocks and function bodies included:
+
+```epsil-live
+type inner = tuple<number, number>
+do { inner(3, 4) }
 // ➔ inner(3, 4)
 ```
 
@@ -578,8 +603,8 @@ Type(t)
 // ➔ "tree<finite_integer>"
 ```
 
-The constructor is **quantified** — `tree: forall T. (T, list<tree<T>>) ->
-tree<T>` — so `T` is solved at each construction, from the arguments.
+The constructor is **quantified** — `tree: (T, list<tree<T>>) -> tree<T>
+where T` — so `T` is solved at each construction, from the arguments.
 Applying the type at the wrong arity — including a bare `tree` — is the same
 error as for an alias, and a parameter bound is enforced the same way.
 
@@ -689,8 +714,26 @@ swap(1, "a")
 ```
 
 A type parameter may carry a ground bound (`function g<T: number>(x: T) -> T`),
-which is enforced at every call. The equivalent full-type spelling is a
-`forall` annotation — `let f: forall T. (T) -> T = x |-> x`.
+which is enforced at every call.
+
+The same clause can be written as a trailing **`where` clause** instead of the
+`<…>` binder. The two spellings are synonyms, and the clause always comes last
+— after the effect specifier and after the return type:
+
+```epsil
+function swap(x: T, y: U) -> tuple<U, T> where T, U { (y, x) }
+function g(x: T) -> T where T: number { x }
+function f(x: T) where T { x }                 // return type inferred
+function tick(x: T) random -> T where T { x }  // with an effect specifier
+f(x: T) -> T where T = x + x                   // math definition form
+```
+
+A declaration has **one binding site**: it may carry a `<…>` clause or a
+`where` clause, never both. `function f<T>(x: T) -> T where T: number` is an
+error, not a bounded `<T: number>`.
+
+A full-type annotation has no binder slot, so it always uses the `where`
+clause — `let f: (T) -> T where T = x |-> x`.
 
 Note that a function is generic only when it is **declared** generic. Nothing
 is silently generalized: `x |-> x` is a function on some inferred type, not an
@@ -759,7 +802,7 @@ This system deliberately trades those guarantees away, for two reasons.
 
 First, subtyping and principal types pull against each other. In
 Hindley–Milner, `integer` and `real` simply fail to unify; here, a
-function declared `forall T. (T, T) -> T` called with an `integer` and a
+function declared `(T, T) -> T where T` called with an `integer` and a
 `real` succeeds, solving `T` to their join (a `real`). That is the
 behavior mathematics wants — but once many types are valid for an
 expression, "the single most general one" stops being the useful answer,
