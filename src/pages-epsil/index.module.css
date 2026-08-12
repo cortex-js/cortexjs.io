@@ -68,6 +68,12 @@
   .actions {
     justify-content: center;
   }
+
+  /* Claim above its sample, rather than a column too narrow for either. */
+  .feature {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
 }
 
 .eyebrow {
@@ -161,21 +167,43 @@
 /* --- features ------------------------------------------------------------ */
 
 .features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   margin-top: 4rem;
 }
 
+/* Claim on the left, sample on the right. `minmax(0, …)` on both tracks so a
+   long line in the sample scrolls inside its own block instead of widening the
+   grid — a `1fr` track floors at min-content, which a <pre> will not shrink
+   below. `.featureWide` rows carry no sample and span the full width. */
 .feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 2rem;
+  align-items: center;
   padding: 1.5rem;
   border: 1px solid var(--ifm-color-emphasis-200);
   border-radius: var(--ifm-card-border-radius, 0.75rem);
   background: var(--ifm-card-background-color, transparent);
 }
 
+.featureWide {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.featureCode {
+  min-width: 0;
+}
+
+/* The docs give a code block a bottom margin to separate it from following
+   prose; here it is the last thing in its own grid cell. */
+.featureCode :global(.theme-code-block) {
+  margin-bottom: 0;
+}
+
 .featureTitle {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   margin: 0 0 0.5rem;
 }
 

@@ -6,20 +6,23 @@ import styles from "./styles.module.css";
 
 // The Epsil language lives in the `@cortex-js/compute-engine/epsil` entry
 // point, loaded lazily from the CDN so it only downloads on pages that embed a
-// playground. The version is pinned so the REPL is reproducible and doesn't
-// silently change when a new engine publishes — bump it when the synced Epsil
-// docs are updated for a new CE release. The import goes through `new Function`
-// so the bundler never sees it (webpack would otherwise try, and fail, to
-// resolve the absolute `https:` URL at build time). This only ever runs in the
-// browser (guarded by `useIsBrowser`), never during server-side rendering.
+// playground. The import goes through `new Function` so the bundler never sees
+// it (webpack would otherwise try, and fail, to resolve the absolute `https:`
+// URL at build time). This only ever runs in the browser (guarded by
+// `useIsBrowser`), never during server-side rendering.
 //
-// The language was renamed from Cortex to Epsil after 0.102.0 shipped, so the
-// latest published engine still exposes it as the `/cortex` entry point with
-// `executeCortex`/`serializeCortex` names — the destructuring below accepts
-// either spelling. When a release with the `/epsil` entry point publishes,
-// point this URL at `…/epsil` and bump the version.
-const EPSIL_MODULE_URL =
-  "https://esm.run/@cortex-js/compute-engine@0.102.0/cortex";
+// Deliberately unversioned: the REPL tracks whatever engine is `latest`, so it
+// matches the docs synced from the compute-engine repo without a bump here.
+// The trade-off is that a breaking engine release reaches the playground
+// immediately — if the REPL starts failing on every page, suspect a new
+// publish first and pin a version here to confirm.
+//
+// This URL used to be pinned to `@0.102.0/cortex`: the language was renamed
+// from Cortex to Epsil after that release, and until `/epsil` published, the
+// unpinned URL would have 404'd. Since 0.104.1 the entry point is `/epsil` and
+// exports `executeEpsil`/`serializeEpsil`/`parseEpsil`; the `/cortex` entry and
+// the `executeCortex` spelling are gone, so nothing here falls back to them.
+const EPSIL_MODULE_URL = "https://esm.run/@cortex-js/compute-engine/epsil";
 const nativeImport = new Function("url", "return import(url)") as (
   url: string
 ) => Promise<any>;
@@ -74,11 +77,7 @@ export default function EpsilPlayground({
     setStatus((s) => (s === "ready" ? s : "loading"));
     try {
       if (!apiRef.current) apiRef.current = await loadEpsil();
-      const { ComputeEngine } = apiRef.current;
-      const executeEpsil =
-        apiRef.current.executeEpsil ?? apiRef.current.executeCortex;
-      const serializeEpsil =
-        apiRef.current.serializeEpsil ?? apiRef.current.serializeCortex;
+      const { ComputeEngine, executeEpsil, serializeEpsil } = apiRef.current;
       if (!engineRef.current) engineRef.current = new ComputeEngine();
       const ce = engineRef.current;
       setStatus("ready");
