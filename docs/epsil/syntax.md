@@ -334,6 +334,69 @@ the result of another call, can be called too:
 (a + b)(2+1)
 ```
 
+### Named arguments
+
+An argument can be passed by the name of the parameter it is for, written
+`name: value`. Named arguments may be given in any order, and may follow
+positional arguments — but never precede them:
+
+```epsil
+function interest(principal: number, rate: number) -> number {
+  principal * rate
+}
+
+interest(principal: 1000, rate: 0.05)   // ➔ 50
+interest(rate: 0.05, principal: 1000)   // ➔ 50 — order-free
+interest(1000, rate: 0.05)              // ➔ 50 — positional prefix is fine
+interest(rate: 0.05, 1000)              // ✘ positional after named
+```
+
+The names checked are the ones the callee's **declaration** carries — a
+`function` definition's parameters, a
+[named function-type annotation](/declarations/#function-type-annotations-bind-their-parameter-names),
+an annotated lambda (including one assigned to a name,
+`f := (x: number, y: string) |-> x + 3` then `f(y: "ok", x: 1)`), or a
+protocol member's requirement (both the bare call
+`compare(other: y, self: x)` and the qualified
+`Comparable.compare(other: y, self: x)`, which dispatch on `self`
+wherever it is written). An inline lambda applied directly reads its
+names from the expression itself — `((x: number) |-> x + 1)(x: 5)` is
+`6`, and unannotated parameters work there too,
+`((x, y) |-> x - y)(y: 2, x: 10)` is `8`.
+
+A parameter without a declared name is positional-only, and a callee
+whose parameter names the engine cannot read cannot take named
+arguments at all: a forward reference (a call *before* the statement
+that pins the callee's signature), a value typed only as `function`,
+or an **unannotated** lambda reached through a binding —
+`h := (x, y) |-> …` then `h(x: 1, y: 2)` declines, because type
+inference drops the parameter names; annotate the parameters to call
+it by name. A misspelled name gets a "did you mean" pointing at the
+closest declared one.
+
+A call that names any argument is a **complete** call: optional
+parameters may simply be omitted, but a missing required parameter is an
+error — a named call never turns into a partial application — and a
+variadic tail cannot be filled (nor can `...` spread arguments mix with
+names). Partial application and spreads remain available through purely
+positional calls.
+
+When a function has several clauses or overloads, a named argument is
+also a **branch selector**: a clause that does not declare the written
+name is never chosen, even if the argument's value would have selected
+it. With clauses `(z: 0)`, `(o: 1)` and `(n: integer)`, the call
+`f(n: 0)` runs the general `n` clause with the argument `0`, while
+`f(0)` runs the `z: 0` base clause. Among the clauses that do declare
+the written names, selection works exactly as for a positional call. If
+the surviving overloads read the same names in different orders and
+nothing else tells them apart, the call is an error asking you to be
+explicit — call it positionally.
+
+Note the disambiguations: `f(a := 1)` passes the *assignment* `a := 1`
+as an ordinary argument (the token is `:=`, not `:`), and each
+diagnostic these rules produce has an extended explanation under
+`epsil doc <code>` (e.g. `epsil doc argument-name-unknown`).
+
 Indexing is a primary immediately followed — with no whitespace — by a
 bracketed index expression. Indexing is **1-based** (`xs[1]` is the first
 element):

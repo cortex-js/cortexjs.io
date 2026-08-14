@@ -458,6 +458,77 @@ set precision(p: number | "auto" | "machine"): void
 
 <MemberCard>
 
+##### ExpressionComputeEngine.~~declareProtocol()~~
+
+```ts
+declareProtocol(name, members): void
+```
+
+Declare a protocol (Appendix A "Host API"). Throws on error, including
+on re-declaration — the Epsil statement route replaces instead (P5).
+
+####### name
+
+`string`
+
+####### members
+
+[`ProtocolMembersInput`](#protocolmembersinput)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~declareProtocolImplementation()~~
+
+```ts
+declareProtocolImplementation(
+   type, 
+   protocol, 
+   impl, 
+   options?): void
+```
+
+Implement `protocol` for `type`, declaring the conformance edge if it is
+not already registered (Appendix A "Host API").
+
+THROWS on every error — the host channel; the Epsil statement route
+returns error VALUES instead. A second host implementation of the same
+(type, protocol) pair throws rather than replacing (P5).
+
+The callbacks are JavaScript functions, so they carry no signature the
+engine can check: they are trusted like host-declared operator handlers,
+and only member-name coverage, unknown members and a `set` handler on a
+`readonly` property are validated.
+
+`options.where` declares a CONDITIONAL conformance: `type` is then a HEAD
+PATTERN naming the variables (`'list<T>'`) and `where` is the clause SOURCE
+that binds them (`'where T is Comparable'`; the `where` word may be
+omitted). A malformed clause, or a head variable the clause does not bind,
+throws.
+
+####### type
+
+`string`
+
+####### protocol
+
+`string`
+
+####### impl
+
+[`ProtocolImplementationInput`](#protocolimplementationinput)
+
+####### options?
+
+####### where?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.~~withTimeLimit()~~
 
 ```ts
@@ -604,6 +675,17 @@ auto-declare and inference lands rooted there. Discarding the scope
 discards the writes. Use `ce.createScope()` to make one that can be read
 back.
 
+`options.speculative` leaves NO trace in the engine's type state: the
+parse runs inside a transient scope (auto-declares land there and are
+discarded with it), and every ambient symbol whose type is currently
+inferred is shadowed in that scope with its current type — so a
+narrowing use in `latex` refines the discarded shadow instead of
+persistently narrowing the ambient symbol. Use it for derive-style
+parses that only READ the result (its type, structure, or
+serialization): the result's bindings refer to the discarded scope, so
+do not retain, evaluate, or compare it against later expressions.
+Mutually exclusive with `scope`.
+
 ####### latex
 
 `string`
@@ -613,6 +695,7 @@ back.
 `Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
   `form`: [`FormOption`](#formoption);
   `scope`: `Scope`;
+  `speculative`: `boolean`;
  \}
 
 ###### parse(latex, options)
@@ -630,6 +713,7 @@ parse(latex, options?): Expression | null
 `Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
   `form`: [`FormOption`](#formoption);
   `scope`: `Scope`;
+  `speculative`: `boolean`;
  \}
 
 </MemberCard>
@@ -1261,6 +1345,7 @@ declare(id, def, scope?): IComputeEngine
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
+  `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -1351,6 +1436,7 @@ declare(id, def, scope?): IComputeEngine
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
+  `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
 
 ####### scope?
@@ -1476,6 +1562,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
+  `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -1566,6 +1653,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
+  `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
 
 ####### arg3?
@@ -3446,6 +3534,7 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   neq: (a, b) => boolean | undefined;
   collection: CollectionHandlers;
   canEnumerate: (expr) => boolean | undefined;
+  elementCount: (expr) => number | undefined;
 };
 ```
 
@@ -3702,8 +3791,25 @@ or a re-mapped `Add`/`Multiply`/`Power`/relational operator).
 It does NOT override the structural / control-flow heads, which have
 their own bespoke lowering: `Sequence`, `Sum`, `Product`, `Function`,
 `Declare`, `Assign`, `Return`, `Break`, `Continue`, `Loop`,
-`Comprehension`, `If`, `Which`, `When`, `Match`, `Block`. A handler
+`Comprehension`, `If`, `When`, `Match`, `Block`. A handler
 declared on one of those heads is ignored.
+
+Exception: `Which` IS overridable (it has no binding structure — its
+operands are plain condition/value pairs a handler can compile through
+the callback it is given). To customize how `Which` compiles while
+keeping its stock evaluation semantics, attach the handler to the
+engine's own definition rather than re-declaring the operator (a
+re-declaration replaces the stock `evaluate`/`canonical` handlers):
+
+```ts
+const def = ce.lookupDefinition('Which');
+if (def && 'operator' in def) def.operator.compile = myWhichHandler;
+```
+
+The override is per-engine (each `ComputeEngine` builds its own
+standard-library definitions), and the decline contract applies: a
+handler returning `undefined` falls back to the built-in `Which`
+lowering, coercion and frame-protocol wrapping included.
 
 Return `undefined` (or an empty string) to fall back to the
 default compilation (a `null` returned from untyped JavaScript is
@@ -3758,6 +3864,38 @@ This is the operator's own decline test — the guard at the top of its
 
 Ignored (never consulted) when the definition has `collection`
 handlers — those own enumerability via `collection.isEnumerable`.
+
+#### OperatorDefinition.elementCount?
+
+```ts
+optional elementCount?: (expr) => number | undefined;
+```
+
+For an operator that RETURNS a collection but has no `collection`
+handlers (an EAGER producer — `Sort`, `Chunk`, `Ordering`, …): how many
+elements would `evaluate()` produce?
+
+The `count` twin of [canEnumerate](#operatordefinition), and the honest replacement for
+the broadcast count fallback: `count` reads the operands' agreed length
+only for a `broadcastable` operator, where agreement IS the semantics
+(`docs/BROADCAST-MODEL.md`). A reshaping operator's length is its own
+business, so it must say so here or report `undefined`.
+
+Contract, mirroring `canEnumerate`:
+
+- MUST be O(1), evaluation-free and side-effect free. An impure producer
+  (`RandomShuffle`) answers from its operands' facets, consuming ZERO
+  draws.
+- The operands seen here are the CANONICAL ones. Anything not cheaply
+  knowable — a non-literal shape argument, an unknown source length —
+  must report `undefined` (decline), never a guess.
+- A returned number is a hard promise: it must equal
+  `expr.evaluate().count`. When evaluation would DECLINE (an infinite or
+  unknown-length source), report `undefined` — a count nobody can walk is
+  worse than no count (Tycho item-169 ruling).
+
+Consulted only when the definition has no `collection.count` handler —
+a declared `count` owns the answer, including its `undefined`.
 
 </MemberCard>
 
@@ -4241,6 +4379,39 @@ A definition can be either a value or an operator.
 It is collected in a tagged object literal, instead of being a simple union
 type, so that the type of the definition can be changed while keeping
 references to the definition in bound expressions.
+
+</MemberCard>
+
+<MemberCard>
+
+### TypeProvenanceEntry
+
+```ts
+type TypeProvenanceEntry = {
+  type: BoxedType;
+  kind: "declared" | "auto-declared" | "inferred" | "assumed" | "value-derived";
+  axis: "type" | "effects";
+  cause: Expression;
+  epoch: number;
+  span: {
+     start: number;
+     end: number;
+    };
+};
+```
+
+One recorded write to a definition's type (or an operator definition's
+signature): the type the write installed, the mechanism that installed it,
+and — for writes triggered by canonicalizing an expression — that
+expression.
+
+Provenance can never live on `Type`/`BoxedType` objects themselves: parsed
+types are interned, deep-frozen, and shared across engines (the
+`TYPE_CACHE` in `common/type/parse.ts`), so two occurrences of `boolean`
+are the same object. The history therefore lives on the per-engine
+definition, next to `inferredType`.
+
+Design: `docs/plans/2026-08-13-inference-provenance-journal.md`, phase 1.
 
 </MemberCard>
 
@@ -4738,6 +4909,19 @@ optional canEnumerate?: (expr) => boolean | undefined;
 
 The eager producer's enumerability precondition — see the
 `canEnumerate` contract on [OperatorDefinition](#operatordefinition).
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.elementCount?
+
+```ts
+optional elementCount?: (expr) => number | undefined;
+```
+
+The eager producer's element count — see the `elementCount` contract on
+[OperatorDefinition](#operatordefinition).
 
 </MemberCard>
 
@@ -8276,6 +8460,186 @@ antiderivative was found. The argument is backward-compatible: the plain
 
 </MemberCard>
 
+<MemberCard>
+
+### ProtocolMember
+
+```ts
+type ProtocolMember = 
+  | {
+  kind: "function";
+  signature: string;
+ }
+  | {
+  kind: "readonly" | "readwrite";
+  type: string;
+};
+```
+
+One requirement of a protocol. A `function` member's signature is stored
+VERBATIM, with `Self` unsubstituted: `Self` is a textual substitution token
+(ruling P12), never a type the registry can resolve.
+
+</MemberCard>
+
+<MemberCard>
+
+### InferenceWriteEvent
+
+```ts
+type InferenceWriteEvent = {
+  name: string;
+  binding: BoxedDefinition;
+  target:   | BoxedValueDefinition
+     | BoxedOperatorDefinition;
+  valueDef: BoxedValueDefinition;
+  from: BoxedType;
+  to: BoxedType;
+  kind: "inferred" | "assumed";
+};
+```
+
+One write of inference evidence onto a definition, as delivered to
+`IComputeEngine._noteInferenceWrite` — the single emission point whose
+subscribers are the provenance history, the fresh-inference set, and the
+narrowing sink. See `docs/plans/2026-08-13-inference-provenance-journal.md`
+(phase 1).
+
+</MemberCard>
+
+<MemberCard>
+
+### InferenceCauseContext
+
+```ts
+type InferenceCauseContext = {
+  operator: string;
+  ops: ReadonlyArray<ExpressionInput>;
+  expr: Expression;
+};
+```
+
+The ambient canonicalization context recorded as the `cause` of provenance
+entries: the operator expression being canonicalized when an inference
+write fires. Kept as the operator name + the operand array as the
+canonicalizer received it (possibly raw MathJSON — canonicalization has
+not run yet); `expr` is the non-canonical materialization, built lazily on
+the first write that records it (writes are rare — building an expression
+per canonicalization would not be).
+
+</MemberCard>
+
+<MemberCard>
+
+### JSImplementation
+
+```ts
+type JSImplementation = {
+  host: ProtocolHostHandler;
+};
+```
+
+A HOST (JavaScript) implementation of a protocol member. A callback carries
+no type information the engine can read, so — like a host-declared operator
+handler — it is TRUSTED: only member-name coverage is checked, never its
+signature. Boxed in a wrapper so it stays distinguishable from an Epsil
+function literal (design P10).
+
+</MemberCard>
+
+<MemberCard>
+
+### ProtocolHostHandler
+
+```ts
+type ProtocolHostHandler = (...args) => unknown;
+```
+
+A host callback implementing one protocol member. Its arguments arrive as
+boxed engine values (the receiver first, per P1); its result is boxed by the
+engine. The engine cannot type-check it — that is what "trusted" means
+here.
+
+</MemberCard>
+
+<MemberCard>
+
+### ConformanceRecord
+
+```ts
+type ConformanceRecord = {
+  target: Type;
+  targetKey: string;
+  where: TypeParameter[];
+  impl: Record<string, Expression | JSImplementation>;
+  _implOrigin: {
+     batch: number;
+     block: Expression;
+    };
+  pending: boolean;
+  declaredByStatement: boolean;
+};
+```
+
+One conformance edge: "this target type conforms to this protocol".
+Conformances are add-only (monotone); only their implementations replace.
+
+</MemberCard>
+
+<MemberCard>
+
+### ProtocolRecord
+
+```ts
+type ProtocolRecord = {
+  name: string;
+  members: Record<string, ProtocolMember>;
+  conformances: ConformanceRecord[];
+  declaredByStatement: boolean;
+};
+```
+
+A protocol declaration and every conformance registered against it.
+
+</MemberCard>
+
+<MemberCard>
+
+### ProtocolMembersInput
+
+```ts
+type ProtocolMembersInput = {
+  functions: Record<string, string>;
+  readonly: Record<string, string>;
+  readwrite: Record<string, string>;
+};
+```
+
+The host-API shape of a protocol's requirements. A flat
+`Record<string, string>` cannot represent properties, hence the three
+buckets (Appendix A "Host API").
+
+</MemberCard>
+
+<MemberCard>
+
+### ProtocolImplementationInput
+
+```ts
+type ProtocolImplementationInput = {
+  functions: Record<string, ProtocolHostHandler>;
+  getters: Record<string, ProtocolHostHandler>;
+  setters: Record<string, ProtocolHostHandler>;
+};
+```
+
+The host-API shape of an IMPLEMENTATION block. Property handlers are given
+under their surface names (`getters.hash`), not under the internal
+`__get__hash` mangling (Appendix A "Properties": the mangling is an
+implementation detail, not part of the public surface).
+
+</MemberCard>
+
 ### IComputeEngine
 
 #### Extended by
@@ -8671,6 +9035,77 @@ set precision(p: number | "auto" | "machine"): void
 
 <MemberCard>
 
+##### IComputeEngine.declareProtocol()
+
+```ts
+declareProtocol(name, members): void
+```
+
+Declare a protocol (Appendix A "Host API"). Throws on error, including
+on re-declaration — the Epsil statement route replaces instead (P5).
+
+####### name
+
+`string`
+
+####### members
+
+[`ProtocolMembersInput`](#protocolmembersinput)
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.declareProtocolImplementation()
+
+```ts
+declareProtocolImplementation(
+   type, 
+   protocol, 
+   impl, 
+   options?): void
+```
+
+Implement `protocol` for `type`, declaring the conformance edge if it is
+not already registered (Appendix A "Host API").
+
+THROWS on every error — the host channel; the Epsil statement route
+returns error VALUES instead. A second host implementation of the same
+(type, protocol) pair throws rather than replacing (P5).
+
+The callbacks are JavaScript functions, so they carry no signature the
+engine can check: they are trusted like host-declared operator handlers,
+and only member-name coverage, unknown members and a `set` handler on a
+`readonly` property are validated.
+
+`options.where` declares a CONDITIONAL conformance: `type` is then a HEAD
+PATTERN naming the variables (`'list<T>'`) and `where` is the clause SOURCE
+that binds them (`'where T is Comparable'`; the `where` word may be
+omitted). A malformed clause, or a head variable the clause does not bind,
+throws.
+
+####### type
+
+`string`
+
+####### protocol
+
+`string`
+
+####### impl
+
+[`ProtocolImplementationInput`](#protocolimplementationinput)
+
+####### options?
+
+####### where?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.withTimeLimit()
 
 ```ts
@@ -8817,6 +9252,17 @@ auto-declare and inference lands rooted there. Discarding the scope
 discards the writes. Use `ce.createScope()` to make one that can be read
 back.
 
+`options.speculative` leaves NO trace in the engine's type state: the
+parse runs inside a transient scope (auto-declares land there and are
+discarded with it), and every ambient symbol whose type is currently
+inferred is shadowed in that scope with its current type — so a
+narrowing use in `latex` refines the discarded shadow instead of
+persistently narrowing the ambient symbol. Use it for derive-style
+parses that only READ the result (its type, structure, or
+serialization): the result's bindings refer to the discarded scope, so
+do not retain, evaluate, or compare it against later expressions.
+Mutually exclusive with `scope`.
+
 ####### latex
 
 `string`
@@ -8826,6 +9272,7 @@ back.
 `Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
   `form`: [`FormOption`](#formoption);
   `scope`: `Scope`;
+  `speculative`: `boolean`;
  \}
 
 ###### parse(latex, options)
@@ -8843,6 +9290,7 @@ parse(latex, options?): Expression | null
 `Partial`\<[`ParseLatexOptions`](#parselatexoptions)\> & \{
   `form`: [`FormOption`](#formoption);
   `scope`: `Scope`;
+  `speculative`: `boolean`;
  \}
 
 </MemberCard>
@@ -9474,6 +9922,7 @@ declare(id, def, scope?): IComputeEngine
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
+  `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -9564,6 +10013,7 @@ declare(id, def, scope?): IComputeEngine
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
+  `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
 
 ####### scope?
@@ -9689,6 +10139,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
+  `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -9779,6 +10230,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
+  `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
 
 ####### arg3?
@@ -12518,6 +12970,21 @@ produce nothing:
   operator (`Characters(s)`, `UnicodeScalars(s)`) has no collection
   handlers until it is evaluated, yet `each()` walks it through the
   materialize-then-iterate path.
+
+An arithmetic **broadcast** (`x + [1, 2]`, `Sin(1..99)` — a
+`broadcastable` operator whose collection-ness is a lift over its
+operands) answers from its participants: `true` when they agree on a
+length, evaluation is draw-free, and every collection-typed participant
+is itself enumerable; `false` when a participant is definitively
+unwalkable (a valueless symbol, an application of an UNBOUND head —
+`x + Total([1, 2])` with `Total` undeclared binds vacuously and can
+never produce elements); `undefined` when the lengths disagree or an
+impure participant (`RandomShuffle(xs) + 1`) makes per-index reads
+unable to promise draw coherence — there `each()` still walks, but
+`at()` declines. Impurity confined to a *scalar* (lifted) operand does
+not demote the answer: `[1, 2] + RandomInteger(1, 10)` is `true` — its
+evaluation distributes structurally without consuming randomness, and
+both `each()` and `at()` serve the unevaluated elements.
 
 Independent of `count`: a collection can know its size and still not be
 enumerable (`Linspace(a, 1, 3)` has a count of 3 and no computable
@@ -15702,6 +16169,11 @@ type TypeReference = {
   args: Type[];
   _varianceState: "deferred" | "verified";
   _varianceBlockedOn: string[];
+  _sumOf: string;
+  _sumVariants: {
+     name: string;
+     typeParams: string[];
+    }[];
 };
 ```
 
@@ -15909,6 +16381,7 @@ type TypeResolver = {
   get names: string[];
   forward: (name) => TypeReference | undefined;
   resolve: (name) => TypeReference | undefined;
+  conformsTo: (type, protocol) => boolean;
 };
 ```
 

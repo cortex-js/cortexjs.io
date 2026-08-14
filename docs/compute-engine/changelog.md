@@ -13,10 +13,496 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
+### Epsil
+
+- **Pipeline stages are more concise: implicit first argument, inline
+  lambdas, and implicit `Map`.** Three pipe-stage sugars make
+  `1..oo |> Take(10) |> _^2 |> Sum` (and the spelled-out
+  `… |> Take(_, 10) |> Map(_, _^2) |> Sum`) evaluate to 385:
+
+  - a call stage missing required arguments receives the piped value as
+    its implicit **first argument** (`xs |> Take(10)` ≡
+    `xs |> Take(_, 10)`); a complete call keeps its old meaning, and an
+    explicit `_` still marks the slot the piped value fills;
+  - a `|->` lambda may be written **inline after `|>`** without
+    parentheses — in stage position the arrow binds tighter than the
+    pipe, and the body ends at the next `|>` (so
+    `xs |> x |-> x^2 |> Sum` is `xs |> (x |-> x^2) |> Sum`; previously
+    a `symbol-expected` parse error);
+  - a **one-parameter lambda stage over a collection maps** each
+    element (implicit `Map`), and an operator-written placeholder
+    expression (`_^2`, `_ + 1`) is such a lambda. Named-function stages
+    (`xs |> Sum`), string topics, and lambdas whose authored parameter
+    annotation accepts the whole collection still apply to the whole
+    value; in a call stage `_` remains the piped value
+    (`xs |> Take(_, 3)`).
+
+  The first and third rules live in the engine's `Pipe` operator, so
+  they hold on the MathJSON route too; the lambda-reading of `_^2` is
+  an Epsil-surface (parser) rule.
+
+- **`otherwise` is accepted as the wildcard case of a `match`.** The
+  keyword is a synonym for a bare `_` pattern — `otherwise => "other"`,
+  with or without a guard (`otherwise if c => …`) — and lowers to the
+  same `_` node, so serialization and the irrefutable-non-final-case
+  diagnostic are unchanged. It is contextual, not reserved: recognized
+  only when the bare word is the entire pattern of a case, it remains an
+  ordinary identifier everywhere else (including inside structured
+  patterns, where a bare name binds).
+
+- **A named call to a `:=`-assigned callee no longer draws false static
+  diagnostics.** `f := (x: number, y: string) |-> x + 3` followed by
+  `f(y: "ok", x: 1)` runs correctly (the assignment pins a signature
+  carrying the parameter names), but the static pre-pass — which
+  canonicalizes every statement before any evaluates — saw the callee
+  as an auto-declared symbol with no parameter names and emitted one
+  `argument-names-unavailable` diagnostic per argument for a program
+  that is not wrong. The pass now registers the signature such a
+  statement pins — `f := ⟨annotated literal⟩`, and
+  `let/const f : ⟨arrow type⟩` with or without an initializer — for
+  the later statements of the same program, under the pass's inference
+  rollback frame (checking still mutates nothing). Registration is
+  first-wins per name, mirroring the runtime, where a reassignment
+  never re-pins the binding's declared type. The diagnostic still
+  fires where it is a true prediction: a named call written before the
+  assignment, and an **unannotated** literal (whose inferred signature
+  drops its parameter names), both of which fail at runtime too.
+
+- **A diagnostic inside a reordered named call now underlines the
+  argument at fault, not a bystander.** With
+  `function f(x: number, y: string) {…}`, the call
+  `f(y: "ok", x: "bad")` produces `expected number, got string` — and
+  the underline previously landed on `y: "ok"`: the engine reports the
+  faulted argument by its position in DECLARATION order (named calls
+  are permuted into that order before validation), while the source
+  anchor was read from the argument list as WRITTEN, at the same
+  index. The locator now reconciles the two through the callee's
+  declared parameter names, so the underline lands on `x: "bad"` —
+  in both the static and runtime tiers, for mixed positional-and-named
+  calls, and for a final-statement error's `valueRange`. When the
+  names cannot be resolved, the anchor widens to the whole call
+  rather than guessing. Positional calls are unaffected.
+
+- **An inline function literal now takes named arguments.**
+  `((x: number) |-> x + 1)(x: 5)` evaluates to 6 instead of declining
+  with `argument-names-unavailable`, and the arguments may be written
+  in any order (`((x: number, y: number) |-> x - y)(y: 2, x: 10)` is
+  8). The parameter names are read from the literal expression itself,
+  so this works for **unannotated** literals too
+  (`((x, y) |-> x - y)(y: 2, x: 10)`), even though their inferred
+  signature carries no names — a literal bound to a name first
+  (`f := (x, y) |-> …; f(x: 1, y: 2)`) still requires annotations, as
+  before. All the named-call rules apply unchanged: unknown names get
+  `argument-name-unknown` with the literal's declared names, a
+  positional argument may not follow a named one, duplicates are
+  rejected, and a named call never curries. The same shapes work on
+  the MathJSON route (`["Apply", ⟨literal⟩, ["NamedArgument", …]]` and
+  a function-literal head applied directly).
+
+### Issues Resolved
+
+- **A `Take`-bounded infinite collection now compiles to JavaScript.**
+  `Sum(Take(Map(1..oo, _ |-> _^2), 10))` previously compiled to
+  `Array.from({length: Infinity}, …)` — code that compiled cleanly and
+  threw `RangeError: Invalid array length` the first time it ran. A
+  statically infinite pipeline — `Range` with an infinite bound, under
+  `Map`/`Filter`/`Drop`/`Rest` — now compiles to a lazy iterator
+  stream, materialized where `Take` or `TakeWhile` bounds it (the take
+  count may be a runtime variable). An infinite pipeline that is never
+  bounded fails closed at **compile** time with a clear error instead
+  of the runtime `RangeError`; the Python target likewise rejects a
+  non-finite `Range` bound at compile time (it previously emitted code
+  that raised `OverflowError` at run time). Also fixed while there: a
+  fractional `Take`/`Drop` count now rounds like the interpreter
+  (`Take([1,2,3,4], 2.5)` takes three elements; the compiled `slice`
+  used to truncate to two).
+
+  The lazy stream helpers enforce the interpreter's runtime guards
+  too: a scan that can never terminate — `Filter` with a never-true
+  predicate, `TakeWhile` with a never-false one — throws the
+  interpreter's `Iteration limit … exceeded` error at
+  `engine.iterationLimit` pulls instead of locking the thread, and an
+  invalid runtime count (`NaN`, `±∞`, or beyond the safe-integer
+  range) is treated as the interpreter treats it — an unresolved
+  parameter yielding an empty walk — rather than being coerced to a
+  default or iterated verbatim. A count that is *statically*
+  non-finite (`Take(1..oo, oo)`) fails closed at compile time, and
+  the range start may be a runtime variable
+  (`Take(Map(Range(n, oo), f), 10)` compiles).
+
+- **Statically checking an Epsil program no longer mutates the engine.**
+  The static checking pass (`epsil check`, and the pre-pass `executeEpsil`
+  runs) could permanently alter session state for a program that never
+  ran: type inference performed while checking wrote through to
+  pre-existing definitions (checking `u + 1` narrowed a previous cell's
+  `u` to `number` for good), and the forward-reference registry's
+  snapshot rollback had a one-shot defect — checking the same
+  forward-referencing program twice on one engine left the registry
+  corrupted. The pass now runs under an inference **rollback frame**, a
+  new engine-internal primitive that journals every inference-driven
+  mutation (type-slot writes, operator-signature writes, binding-half
+  swaps, declarations, forward-reference registry deltas, fresh-inference
+  membership, provenance history, narrowing-sink entries) and undoes them
+  all — in strict LIFO order, preserving definition identity — when the
+  check completes.
+
+## 0.106.1 _2026-08-13_
+
+### Issues Resolved
+
+- **Epsil no longer silently reads the equivalence glyphs as the wrong
+  equality tier: `≡`, `≢`, and `≣` are now rejected outright**
+  (`unexpected-symbol`). Previously a typed `≡` (IDENTICAL TO) silently
+  weakened to `==` — arithmetic `Equal`, not the identity prover the glyph
+  means in mathematics — `≣` quietly parsed as `===` (`Same`), and `≢` was
+  a broken mapping that errored confusingly. Rejecting all three is
+  deliberate (rather than assigning them tiers): the glyphs' bar counts
+  cross the `=`-run lengths (`≡` has three bars, `≣` four, while `===` has
+  three characters), so a visual transliteration in either direction lands
+  on a *different* comparison that silently answers a different question.
+  The equality tiers in Epsil are ASCII-only — `==` (arithmetic, tolerant,
+  may stay inert as a condition), `===` (`Same`, structural, total) — and
+  the identity-prover tier is spelled as a call, `IdenticallyEqual(a, b)`.
+  LaTeX is unaffected: `\equiv` still parses as `IdenticallyEqual`.
+
+- **`.toString()` no longer prints arithmetic equality in `Same`'s
+  spelling**: `Equal` now serializes as `==` (was `===`) and `NotEqual` as
+  `!=` (was `!==`). The old JS-flavored spellings predate Epsil, where `===`
+  parses as the structural `Same` tier — so the string view printed an
+  `Equal` in the exact spelling that reads back as the other operator.
+  `Same` now also serializes in operator form (`===`) instead of
+  function-call form; `IdenticallyEqual` stays in call form (the same
+  no-equivalence-glyphs ruling as the Epsil entry above). Compiled
+  JavaScript is unchanged (`Equal` still compiles to JS `===`, which is
+  correct there).
+
+- **An exact integer beyond the safe-integer range now has one storage form
+  too, completing the 0.106.0 normalization** (the item-178(b) residual,
+  filed by the Tycho team at their 0.106.0 adoption; witness `8e19` from
+  their seed corpus, minimal witness `1e16`). The 0.106.0 fix normalized a
+  bigint WITHIN the safe range to machine storage but left an integer-valued
+  machine number BEYOND it un-normalized, so `ce.box(1e16)` and the parse of
+  its own serialization were `isSame` with byte-equal MathJSON yet hashed
+  differently — the same `isSame ⇒ equal hash` break, past the boundary
+  (`2^53` itself was clean). The constructor now stores integer-valued
+  machine numbers outside the safe range as bigints — the storage the parse
+  route produces — so each side of `2^53` has one canonical form (machine
+  below, bigint above); the conversion is exact for every integer-valued
+  float64. Serialization follows the storage, so such literals now print in
+  the compact exponent form (`ce.box(1e16).toString()` is `"1e+16"`, no
+  longer `"10000000000000000"`); MathJSON output is unchanged.
+
+- **Assigning to a symbol auto-declared with type `unknown` now applies the
+  same literal-type promotion as a fresh declaration**, so the settled type
+  no longer depends on whether a boxing auto-declared the symbol before the
+  assignment (observed by the Tycho team's order-matrix probe at their
+  0.106.0 adoption). Boxing an expression can auto-declare a mentioned
+  symbol at type `unknown` when its uses record no type evidence (a bare
+  `List` sibling, a binder-body occurrence); assigning `5` to such a symbol
+  then adopted the value's raw type (`finite_integer`), while the same
+  assignment on a fresh symbol declares the promoted `integer`. The
+  `unknown`-incumbent case now takes the declaration promotion, so box-first
+  and assign-first orderings settle on the same type (`integer`). The
+  0.106.0 assignment-narrowing guards are unchanged: declared types are
+  never touched, assignment-derived incumbents stay widen-only, and the D11
+  incompatible-guess adoption keeps the value's raw type.
+
 ### New Features
 
-- **Protocols.** A protocol declares a set of functions and properties a
-  type implements to **conform**; conformance drives dynamic dispatch:
+- **Protocol dispatcher effects are now derived from the registered
+  conformers; a requirement's effect specifier is an opt-in ceiling.** A
+  protocol function requirement with a **bare** specifier no longer acts as
+  a pure ceiling: implementations may carry any effects, and the
+  dispatcher's effect set is the live union of the inferred effects of the
+  registered conforming implementations — pure while every conformer is
+  pure (calls through it stay cacheable and compile-eligible), widened the
+  moment a mutating or drawing conformance registers, with dependent
+  caches recomputing (a call boxed before the registration reports the new
+  effects, and an already-inferred user function whose body calls the
+  member re-derives). The dispatcher's serialized signature snapshots the
+  union as of serialization. A requirement **with** a specifier (including
+  the explicit `pure`) is a durable ceiling: a conformance whose
+  implementation *declares* or whose body *infers* effects beyond it is
+  rejected (`protocol-signature-mismatch` names the exceeded labels and
+  points at the ceiling as the fix site). Registering a conformance that
+  would widen a bare-requirement union past a standing **declared** effect
+  contract — a function annotated `pure` whose body dispatches through the
+  member — is itself rejected (`conformance-widens-declared-contract`,
+  naming every violated dependent and the exceeding labels) and leaves the
+  registry unchanged. Behavior change: an implementation declaring effects
+  against a bare requirement was previously rejected; it is now accepted,
+  by design (`docs/TYPE_SYSTEM_ROADMAP.md` Appendix B, "Changing a field
+  is an effect" — the bare-means-pure ceiling was explicitly rejected
+  there).
+
+## 0.106.0 _2026-08-13_
+
+### Breaking Changes
+
+- **The `Error` JSON shape gains an operand: argument-validation errors now
+  carry the FAULTED OPERAND as a site operand, before the trace.** An
+  `incompatible-type` error minted while validating an argument reports which
+  operand faulted:
+
+  ```
+  before   f("str")            ["Error", EC]
+           Sqrt("s").evaluate  ["Error", EC, ["ErrorTrace", …]]
+
+  now      f("str")            ["Error", EC, "'str'"]
+           Sqrt("s").evaluate  ["Error", EC, "'s'", ["ErrorTrace", …]]
+  ```
+
+  `ErrorTrace` stays LAST and is head-identified, as always — code that finds
+  the trace by scanning for the `ErrorTrace` head is unaffected. **Code that
+  reads the trace positionally as operand 2 now gets the faulted operand
+  instead** — a plausible-looking value rather than an error node, so that
+  failure mode is a silently wrong read, not a crash: grep for positional
+  `Error` operand reads before adopting. Rendered messages now name the site
+  ("… at `p`"). Two contract repairs ride with the change: `match`'s
+  `Error(c)` patterns ignore the site the way they already ignore the trace
+  (pattern arity decides — `Error(c, w)` binds the site), and
+  static-diagnostic deduplication keys on a SITE-LESS description so one
+  problem does not split into per-site diagnostics. Any stored/expected
+  MathJSON containing `Error` nodes (snapshots, seed corpora) will change
+  shape even where nothing is wrong — re-baseline those deliberately rather
+  than reading the churn as a regression.
+
+### Epsil
+
+- **Named-argument calls.** An Epsil call can pass arguments by parameter
+  name: `interest(principal: 1000, rate: 0.05)`. Named arguments may be
+  given in any order, may follow positional arguments (never precede
+  them), and are matched against the parameter names of the declaration
+  the call resolves through — including overloaded and multi-clause
+  functions (each overload is matched with its own parameter order; a
+  named argument is also a **branch selector** — a clause that does not
+  declare the written names is never chosen, so with clauses `(z: 0)`
+  and `(n: integer)`, `f(n: 0)` runs the general `n` clause while
+  `f(0)` runs the base clause) and
+  protocol members — bare (`tag(prefix: "→", self: s)`) and qualified
+  (`Tagged.tag(prefix: "→", self: s)`) alike, dispatching on `self`
+  wherever it is written. A call that uses any name is a complete call:
+  omitted optional parameters are fine, but it never curries, and it
+  cannot fill a variadic tail. New diagnostics: `argument-name-unknown`
+  (with a "did you mean"), `argument-order-invalid`,
+  `argument-name-duplicate`, `argument-names-unavailable`, and
+  `argument-optional-skipped`, all covered by `epsil doc <code>`.
+  Parameters without a declared name remain positional-only, as do
+  unannotated function literals. Design record:
+  `docs/plans/2026-08-12-named-arguments-design.md` (spec:
+  `docs/TYPE_SYSTEM_ROADMAP.md` Appendix C, rulings C1–C6).
+
+- **The VS Code extension shows what the engine makes of your file.**
+  **Epsil: Show Representation** (the `{}` button in the editor title bar)
+  opens a read-only pane beside an Epsil file showing one of five
+  representations: the **MathJSON** the parser produced (before
+  canonicalization), the **canonical form** of each top-level statement, or
+  the program as compiled by one of the engine's code-generation targets —
+  **JavaScript**, **Python** (NumPy), or **GLSL**. The pane tracks the buffer
+  as you type — unsaved and untitled buffers included — and nothing is
+  evaluated, so rendering a view never runs the program. A program a target
+  cannot compile (for now that includes any program defining a function,
+  since `DefineFunction` has no lowering in any target) reports the
+  compiler's explanation in the pane instead.
+
+### New Features
+
+- **A definition-level `compile` handler on `Which` is now honored** (Tycho
+  item 180). The per-operator compilation extension point excluded every
+  control-flow head; `Which` is now the carve-out, because it has no binding
+  structure — its operands are plain condition/value pairs a handler can
+  compile through the callback it is given (unlike a `Sum` index or a
+  `Function` parameter list, which remain non-overridable). The handler has
+  the same contract as every other operator `compile` handler: it takes
+  precedence over the built-in lowering, and returning `undefined` falls back
+  to the stock `Which` compilation, complex-branch coercion and
+  frame-protocol wrapping included. The override is **per-engine** — attach
+  it to the engine's own definition, which keeps the stock evaluation
+  semantics:
+
+  ```ts
+  const def = ce.lookupDefinition('Which');
+  if (def && 'operator' in def) def.operator.compile = myWhichHandler;
+  ```
+
+  (Do not `ce.declare('Which', {...})` for this: a re-declaration replaces
+  the stock `evaluate`/`canonical` handlers, so the operator would compile
+  with the custom handler but no longer evaluate correctly.)
+
+- **Speculative parsing: `ce.parse(latex, { speculative: true })` leaves no
+  trace in the engine's type state** (Tycho item 179). A normal parse has two
+  persistent side effects: an undeclared symbol is auto-declared into the
+  current scope, and a narrowing use moves the inferred type of an
+  already-declared symbol (`Fibonacci(u)` narrows an inferred `u: number` to
+  `integer`) — and the second one is not confined by parsing inside a child
+  scope, since the write lands on the resolved definition wherever it lives.
+  With `speculative: true` the parse runs in a transient scope that is
+  discarded on the way out, and every mentioned symbol whose ambient type is
+  inferred is shadowed in that scope with its current type, so narrowing
+  refines the discarded shadow instead of the ambient symbol. Symbols with a
+  declared (non-inferred) type, constants, and operators are not shadowed, so
+  the string parses exactly as it would without the option, and the result's
+  type and MathJSON are identical to a normal parse's. Intended for
+  derive-style parses that only read the result (its type, structure, or
+  serialization): the result's bindings refer to the discarded scope, so it
+  should not be retained, evaluated, or compared against later expressions.
+  Mutually exclusive with the `scope` option, which has the opposite
+  contract (the scope receives the writes, to be read back).
+
+### Issues Resolved
+
+- **A qualified protocol member now works as a collection callback.**
+  `Map([1, 2, 3], Negatable.negated)` used to answer
+  `["Missing", "Missing", "Missing"]`: the callback arrives at
+  canonicalization as the field expression `Field(Negatable, "negated")`,
+  and the shorthand-lambda lift read it as a lambda *body*, turning the
+  protocol name into the parameter — so every element was bound to the
+  protocol-name slot and read as the base of a field access. A qualified
+  protocol member is now recognized as a function *value* (the same
+  contract that already kept `Apply(InverseFunction(f), 2)` from
+  beta-reducing) and the callback dispatches per element. A protocol name
+  shadowed by a valued binding is not a protocol reference and reports the
+  ordinary not-a-function error instead of silently dispatching.
+
+- **A protocol dispatcher call inside a shorthand lambda body no longer
+  errors.** `Map([1, 2, 3], negated(_) * 10)` reported
+  `incompatible-type number/unknown` on the dispatcher call, while the
+  identical shape through a plain declared function worked. Cause: at an
+  undecided receiver, the requirement's `Self`-typed result substituted as
+  a type *reference* named "unknown" — printing exactly like the primitive
+  but defeating every gate that admits a primitive `unknown` operand as
+  "defer and infer later". The reference is now reduced to the primitive,
+  so the shorthand evaluates (`[-10, -20, -30]`) and an undecided receiver
+  defers symbolically as before.
+
+- **An assignment can now refine a use-inferred symbol type, so the inferred
+  type no longer depends on whether the first use or the assignment came
+  first.** Previously the inference direction rules were strictly one-way:
+  uses narrow, assignments widen. A symbol whose numeric use was seen before
+  its assignment therefore settled on a wider type than the same symbol
+  assigned first (`v` used in `x·v` then assigned `5` stayed `number`, while
+  assign-first gave `integer`) — a divergence between orderings, not a wrong
+  type under the rules. Now, when a symbol's current type came from USE
+  inference (not from a previous assignment or a declaration), an assignment
+  refines it to the assigned value's type, with three guards: the promoted
+  type installs only when it is a subtype of the current one; a symbol whose
+  latest type evidence is itself assignment-derived stays widen-only, so
+  alternating assignments (`v := 2.5` then `v := 5`) do not oscillate the
+  type; and the union-adoption path for declared unions is unchanged.
+  Declared types are never affected. If you probe type stability across
+  orderings (box-first vs assign-first), expect both orderings to converge on
+  the assignment's type now — a deliberate change, not drift.
+
+- **A parsed integral now binds its integrand's free symbols the same way as
+  boxing its canonical MathJSON does** (the residual surface of Tycho item
+  178(a), distinct from the first-boxing divergence below — it was
+  order-independent, and pre-declaring the symbol did not remove it).
+  `Integrate`'s canonical handler derived a shorthand integrand's `Function`
+  literal by inferring a parameter for each free body symbol — declaring
+  those parameters in the body scope, with the body's occurrences bound to
+  them — and then swapped the parameter list for the integration variables,
+  leaving the body's occurrences bound to the discarded parameters. A parsed
+  `\int_{-x}^{x} \cos(x)\,dn` therefore carried a body `x` bound to a
+  discarded parameter while the bounds' `x` bound the engine's definition,
+  and compared `isSame` false against `ce.box()` of its own `.json` (and
+  against the box route generally) with byte-equal MathJSON. The handler now
+  passes the integration variables to `canonicalFunctionLiteral` as the
+  intended parameter list, so the body canonicalizes with exactly those
+  parameters declared — the same binding structure the explicit-`Function`
+  route produces. A knock-on repair: a parenthesized explicit `Function`
+  integrand (`Delimiter`-wrapped) now keeps its user-supplied parameters
+  instead of having them overwritten by the integration variables. Values
+  were never affected — evaluation resolved identically on both routes —
+  and serialization is unchanged (zero snapshot churn).
+
+- **Boxing the same MathJSON twice now produces `isSame` expressions —
+  including the first-ever boxing of a shape** (Tycho items 178(a) and
+  178(c), two surfaces of one defect). A not-yet-declared symbol occurring
+  both inside a binder's scope and outside it (e.g.
+  `["List", ["Integrate", ["Function", … y_r …], …], "y_r"]`) made the
+  first boxing bind the two occurrences differently: the occurrence inside
+  the function body auto-declared into a scope local to that one
+  canonicalization, while the sibling outside declared into the surrounding
+  scope. Every later boxing found the surviving surrounding binding first
+  and resolved *both* occurrences to it — so on a fresh engine
+  `ce.box(J).isSame(ce.box(J))` was `false` (and a box and a parse of the
+  same integral disagreed), breaking the documented contract that `isSame`
+  is safe as a dedup/matching key. The boxing machinery now detects the
+  conflict — one construction both auto-declaring a name into a scope it
+  created and then declaring the same name into a scope that outlives it —
+  and rebuilds the construction once, so the first result is the same one
+  every later boxing produces. No resolution rule changed and nothing new
+  is declared: a function body's free symbols remain invisible to the
+  caller, and capture through assigned document variables is untouched.
+
+- **`.json` no longer reports a different operand order than the expression it
+  serializes** (Tycho item 178(d)). `.json` goes through the structural form,
+  which re-sorted a commutative operator's operands — but a CANONICAL
+  expression has already had its operands ordered, and that order is the one
+  `.ops`, `.toString()`, `isSame` and `hash` all read, so re-sorting could only
+  disagree with it. It did, because `order()` breaks a tie between two
+  same-operator applications on leaf count, and a complex literal is one atom
+  in canonical form (`i`) but a two-operand application in structural form
+  (`Complex(0, 1)`): the operands of `m(M_1, i, n)·m(M_2, n, j)` counted 6-vs-4
+  structurally where they counted 4-vs-4 canonically, so the tie broke the
+  other way and one object reported two different operand orders depending on
+  which accessor you asked. A canonical expression now keeps its own order;
+  a non-canonical one is still sorted, which is what puts it in structural form
+  at all. Four `arithmetic` snapshots record the corrected order — in each,
+  `.json` now matches `.ops` (`1.1 + 2 + 5 + 5/7 + 7/9 + √2 + π` serialized
+  `√2` before `1.1` while the tree held the reverse).
+
+- **An exact integer now has one storage form, so it hashes the same however it
+  was built** (Tycho item 178(b)). `ExactNumericValue` accepted an integer as
+  either a machine `number` or a `bigint` and kept whichever it was handed, but
+  `numberToString()` formats the two differently — a bigint with more than five
+  trailing zeros compacts to an exponent (`1e+11`) while the identical machine
+  integer prints in full (`100000000000`) — and `BoxedNumber.hash` hashes that
+  string. So `ce.box(100000000000)` and its own reparsed serialization were
+  `isSame` with byte-equal MathJSON yet hashed differently, breaking the
+  documented `isSame ⇒ equal hash` contract; any integer with more than five
+  trailing zeros was affected, `1000000` included. The constructor now applies
+  the same safe-integer normalization `reducedRational()` already used.
+  Magnitudes beyond the safe-integer range are untouched, so bignum results keep
+  their compact exponent form (`√(1234567e+19)` is unchanged).
+
+## 0.105.0 _2026-08-12_
+
+### Breaking Changes
+
+- **The prefix `forall` quantifier was replaced by a trailing `where` clause.**
+  A generic signature states its type variables *after* the signature instead of
+  before it: `forall T. (T) -> T` is written `(T) -> T where T`,
+  `forall T: indexed_collection. (T) -> T` is
+  `(T) -> T where T: indexed_collection`, and
+  `forall T, U. (list<T>, (T) any -> U) -> list<U>` is
+  `(list<T>, (T) any -> U) -> list<U> where T, U`. The clause is always **last**
+  — after the effect specifier and after the return type — and an omitted bound
+  means `any`, so `where T` is shorthand for `where T: any`. Semantics, solving
+  and bounds are unchanged. The prefix spelling is **removed**, not deprecated.
+
+  Consequences:
+
+  - `where` is now a reserved type name and `forall` is not:
+    `ce.declareType("where", …)` is a `reserved-type-name` error, and
+    `ce.declareType("forall", …)` now succeeds. A nominal type named `where`
+    must be renamed.
+  - A type string beginning with `forall` reports a targeted migration
+    diagnostic rather than a cascading parse error.
+  - `.toString()` emits the trailing shorthand (`(T) -> T where T`, never
+    `where T: any`), so a type has one canonical string. Variable names
+    round-trip as written.
+  - Per-arm quantification of an overload set now needs parentheses, since
+    `where` binds looser than `&`:
+    `((list<T>) -> T where T) & ((set<T>) -> boolean where T)`. The
+    unparenthesized form is rejected with a message naming the fix.
+
+### New Features
+
+#### Epsil: language
+
+- **Protocols.** A protocol declares a set of functions and properties a type
+  implements to **conform**; conformance drives dynamic dispatch:
 
   ```epsil
   protocol Comparable {
@@ -31,39 +517,24 @@ import ChangeLog from '@site/src/components/ChangeLog';
   Comparable.compare("a", "b") // qualified form
   ```
 
-  Includes: `readonly`/`readwrite` properties with getter/setter
-  implementations (`person.name`, and `person.name = v` as rebinding sugar
-  over the immutable value model); protocol constraints in `where` clauses
-  (`function sort(xs: list<T>) -> list<T> where T is Comparable` — the
-  `is` slot reserved by the `where`-clause release is now checked);
-  conditional conformance
-  (`type list<T> is Comparable where T is Comparable { … }`, recursive:
-  `list<list<string>>` conforms when `string` does); qualified property
-  disambiguation `person.(Protocol.name)`; and the host API
-  (`ce.declareProtocol`, `ce.declareProtocolImplementation`). Protocols
-  are engine-global, statement re-runs replace (host redeclaration
-  throws), and conformance is monotone — declared-but-unimplemented
-  conformance warns at the end of each batch until fulfilled. Protocol
-  names are not types (`protocol-in-type-position` steers to a
-  constrained variable). Design record:
-  `docs/plans/2026-08-12-protocols-design.md` (rulings P1–P46).
+  Includes `readonly`/`readwrite` properties with getter/setter implementations
+  (`person.name`, and `person.name = v` as rebinding sugar over the immutable
+  value model); protocol constraints in `where` clauses
+  (`function sort(xs: list<T>) -> list<T> where T is Comparable`); conditional
+  conformance (`type list<T> is Comparable where T is Comparable { … }`,
+  recursive — `list<list<string>>` conforms when `string` does); qualified
+  property disambiguation `person.(Protocol.name)`; and the host API
+  (`ce.declareProtocol`, `ce.declareProtocolImplementation`). Protocols are
+  engine-global, statement re-runs replace them (host redeclaration throws), and
+  conformance is monotone: a declared-but-unimplemented conformance warns at the
+  end of each batch until fulfilled. Protocol names are not types — using one in
+  type position steers you to a constrained type variable. A second
+  implementation block for the same (type, protocol) pair within one batch is a
+  `protocol-implementation-duplicate` error; the same statement re-run in a later
+  batch still replaces (the notebook pattern).
 
-- **Protocol dispatch compiles to JavaScript.** A protocol call — bare
-  (`compare(x, y)`), qualified (`Comparable.compare(x, y)`), and property
-  GET/SET (`p.name`, `p.name = v`) — now compiles on the JS target: a
-  statically resolved call becomes a direct call of the winning
-  implementation, and a dynamic one becomes a guard chain over the
-  receiver's reified runtime representation (`typeof` classes, tagged-sum
-  `_tag`s), most-specific-first. A receiver no conformance covers throws
-  `protocol-implementation-missing` at runtime (where the interpreter
-  yields the error value). Anything unprovable — conditional conformances,
-  host implementations, ambiguity-capable conformance sets, unguardable
-  targets — declines compilation (fail closed, D6), and Python/GPU/interval
-  targets keep failing closed. See
-  `docs/plans/2026-08-12-protocol-compilation.md`.
-
-- **Sum-type declaration sugar.** One statement now declares a tagged sum —
-  the variants and the union together:
+- **Sum-type declaration sugar.** One statement declares a tagged sum — the
+  variants and the union together:
 
   ```epsil
   type TrafficLight = red | green | yellow
@@ -71,79 +542,350 @@ import ChangeLog from '@site/src/components/ChangeLog';
   type tree<T> = leaf | node(value: T, children: list<tree<T>>)
   ```
 
-  desugaring to the equivalent N nominal variant declarations plus one
-  transparent `type alias` union (identical semantics — the sugar is a
-  declaration bundler). The sum's own name is usable in variant payloads
-  without a `type` forward-reference marker, a generic sum distributes its
-  type parameters to each variant by usage, and a variant name that collides
-  with an existing type, a reserved word, or a builtin (`type bad = Add(…)`,
-  whose constructor would be silently unreachable) rejects the whole
-  declaration atomically. Existing spellings are unchanged: `type X = A | B`
-  over known types stays the opaque nominal, `type alias X = A | B` stays the
-  transparent union. See
-  `docs/plans/2026-08-12-sum-type-sugar-and-compilation.md` and
-  `docs/TYPE_SYSTEM_ROADMAP.md` §2.3.
+  This is exactly N nominal variant declarations plus one transparent
+  `type alias` union. The sum's own name is usable in variant payloads without a
+  `type` forward-reference marker, a generic sum distributes its type parameters
+  to each variant by usage, and a variant name colliding with an existing type, a
+  reserved word, or a builtin rejects the whole declaration atomically. Existing
+  spellings are unchanged: `type X = A | B` over known types stays the opaque
+  nominal, `type alias X = A | B` stays the transparent union.
+
+#### Epsil: compilation
+
+- **Protocol dispatch compiles to JavaScript.** Bare (`compare(x, y)`),
+  qualified (`Comparable.compare(x, y)`) and property GET/SET (`p.name`,
+  `p.name = v`) calls all compile: a statically resolved call becomes a direct
+  call, a dynamic one a most-specific-first guard chain on the receiver. A
+  receiver no conformance covers throws `protocol-implementation-missing` at
+  runtime (the interpreter yields the corresponding error value). Anything
+  unprovable — conditional conformances, host implementations,
+  ambiguity-capable conformance sets — declines compilation and falls back to
+  the interpreter; Python and GPU targets keep failing closed.
 
 - **Sum types compile to JavaScript.** For sugar-declared sums, `match`
-  constructor patterns and variant constructors now compile (previously they
+  constructor patterns and variant constructors now compile (they previously
   failed closed). Per sum, the compiler picks a representation: when every
-  variant has a distinct JS shape (`jnull | jbool(boolean) | jnum(number) | jstr(string) | jarr(list<…>)`) values stay erased and dispatch uses
-  `typeof`/`Array.isArray`; otherwise constructors reify the tag as
-  `{ _tag, _ops }` and `match` tests it — amending the D11 erasure rule to
-  *"the tag is erased iff it is statically discharged"*. Tagged values do not
-  cross the compiled↔engine boundary (a unit whose *result* is a tagged sum
-  declines); Python/GPU/interval targets keep failing closed.
+  variant has a distinct JavaScript shape
+  (`jnull | jbool(boolean) | jnum(number) | jstr(string) | jarr(list<…>)`)
+  values stay erased and dispatch uses `typeof`/`Array.isArray`; otherwise
+  values carry their tag. Tagged values do not cross the compiled↔engine
+  boundary (a unit whose *result* is a tagged sum declines); Python, GPU and
+  interval targets keep failing closed.
+
+#### Epsil: tooling
+
+- **Calls to a function your program defines are now checked statically.**
+  `epsil check` (and the VS Code extension) reported wrong calls to library
+  functions but let wrong calls to your own functions through — so
+  `function foo(x: string, n: integer) { x }` followed by `foo("hello")` checked
+  clean and only failed at run time. Wrong arity, wrong argument type and extra
+  arguments are now all reported before anything runs, with the signature note
+  and the definition site. Multi-clause definitions accumulate clause by clause,
+  and a definition inside a block stays scoped to that block. A *generic*
+  definition (`function id<T>(x: T) -> T`) is still checked only when it runs.
+
+- **Signature errors explain the signature.** A call that does not match its
+  callee used to report only what went wrong ("a required argument is missing").
+  The report now carries the callee's signature and the faulted position, plus a
+  second annotated block pointing at the definition when the program defines it:
+
+  ```
+  error: Runtime error: a required argument is missing
+   --> example.epsil:3:1
+    |
+  3 | foo("hello")
+    | ^^^^^^^^^^^^
+    = note: `foo` has signature `(x: string, n: integer) -> string`; argument 2
+            (`n: integer`) was not supplied
+
+  note: `foo` is defined here
+   --> example.epsil:1:10
+    |
+  1 | function foo(x: string, n: integer) { x }
+    |          ^^^
+    = note: `epsil doc missing` explains this error
+  ```
+
+  The same notes reach `epsil check`, the REPL, and — machine-readable, with the
+  definition's location — `--diagnostics json` and `check --json`, where a
+  diagnostic may now carry a `notes` array. In the VS Code extension the
+  signature appears in the diagnostic's hover, and a note pointing at a second
+  place in the file is published as related information.
+
+- **The VS Code extension answers hovers.** Hovering a library name shows its
+  signature (or, for a symbol, its type and value) with its description — the
+  same entry `epsil doc <name>` prints, so the editor and the CLI cannot drift.
+  Hovering a name the file itself declares shows that declaration as written: a
+  function's header without its body, a `let`/`const`'s statement. A name inside
+  a string or a comment is not a hover target.
+
+#### Collections
+
+- **`isEnumerableCollection` now answers for arithmetic broadcasts.** A
+  broadcast node (`x + [1,2]`, `Sin(1..99)`) used to answer `undefined` for the
+  whole class; it now answers from its participants: `true` when they agree on a
+  length, evaluation is draw-free, and every collection-typed participant is
+  itself enumerable; `false` when a participant is definitively unwalkable —
+  including an application of an *unbound* head (`x + Total([1,2])` with `Total`
+  undeclared); `undefined` when participant lengths disagree or an impure
+  participant (`RandomShuffle(xs) + 1`) makes per-index coherence unpromisable.
+  `true` is a delivery promise: `each()` and `at()` will serve the elements.
+
+- **`at()` now works on impure broadcasts whose randomness is confined to a
+  lifted scalar.** `([1,2] + RandomInteger(1,10)).at(1)` answered `undefined`;
+  since such a broadcast distributes structurally without consuming randomness,
+  `at()` now serves the same unevaluated element `each()` yields
+  (`1 + RandomInteger(1,10)`), at any nesting depth. An impure *participant*
+  (`RandomShuffle(xs) + 1`) still declines, since per-index reads could mix draw
+  sets.
+
+- **Operators can declare an `elementCount` handler** (companion to
+  `canEnumerate`) to report their length without evaluating.
 
 ### Bug Fixes
 
-- **A nominal-typed argument no longer broadcasts at compiled call sites.**
-  With `type bag = list<number>` and `function size(b: bag) -> number`,
-  compiled `size(bag([1,2,3]))` answered `[42, 42, 42]` — the erased array
-  was mapped element-wise — where the interpreter answers `42`. Nominal
-  values are atomic (like tuples): the whole value binds. The same rule now
-  also lets a `broadcastable<bag>` slot accept a `bag` argument directly
-  where it previously refused to compile.
+#### Epsil
 
-### Breaking Changes
+- **A static diagnostic no longer underlines a whole function definition.**
+  `epsil check` and the VS Code extension anchored every canonicalization-time
+  error on the enclosing *statement*, so one wrong argument four lines inside a
+  definition flagged the entire definition. `IndexOf(digits, cs[i], 23)` now
+  underlines the `23`, and the message quotes the failing call. An ambiguous
+  match (two `IndexOf` calls in one statement) still falls back to the statement.
 
-- **The prefix `forall` quantifier was replaced by a trailing `where` clause.**
-  A generic signature now states its type variables *after* the signature
-  instead of before it: `forall T. (T) -> T` is written `(T) -> T where T`,
-  `forall T: indexed_collection. (T) -> T` is
-  `(T) -> T where T: indexed_collection`, and
-  `forall T, U. (list<T>, (T) any -> U) -> list<U>` is
-  `(list<T>, (T) any -> U) -> list<U> where T, U`. The clause is always **last**
-  — after the effect specifier and after the return type — and an omitted bound
-  means `any`, so `where T` is shorthand for `where T: any`. The prefix spelling
-  is **removed**, not deprecated: the feature is days old and the type language
-  is experimental, so carrying both spellings would cost more than migrating.
-  Semantics, solving, bounds and every existing restriction are unchanged. See
-  `docs/plans/2026-08-11-where-clause-type-constraints.md`.
+- **A statement that evaluates to an error now stops the enclosing block or
+  loop.** A non-final statement's value was discarded — including a refusal that
+  *is* the statement's value, such as a mistyped write or a rejected indexed
+  assignment — so execution continued past the fault. An `Error` result now
+  propagates like `Return`: it becomes the block's value, and a loop stops
+  iterating and surfaces it.
 
-  Three consequences for host code:
+- **A protocol-property write in a loop body no longer silently no-ops.**
+  `p.name = 10 * i` was refused because the *unevaluated* right-hand side types
+  wider than the property's declared type; the check now runs on the evaluated
+  value. Genuinely mistyped writes are still refused.
 
-  - **`where` is now a reserved type name and `forall` is not.**
-    `ce.declareType("where", …)` is a `reserved-type-name` error where it
-    previously succeeded, and `ce.declareType("forall", …)` now succeeds where
-    it previously errored. A consumer with a nominal type named `where` must
-    rename it.
-  - **Legacy input gets a targeted migration diagnostic.** A type string
-    beginning with `forall` followed by a name reports *"The `forall T. …`
-    prefix syntax was replaced by a trailing `where` clause"* rather than a
-    generic unknown-type or cascading parse error.
-  - **Serialization emits the trailing shorthand.** `.toString()` writes
-    `(T) -> T where T`, never `where T: any` — an explicitly written `: any` is
-    normalized away, so a type has one canonical string. Variable *names* still
-    round-trip exactly as the author wrote them.
+- **A loop index over an integer range is now integer-typed.** The index of
+  `for i in 1..3` was bound as `number`, so `10 * i` typed `finite_number` and
+  tripped integer-typed checks. The binding is now typed from the collection's
+  element type (`Range(1, 3)` → `integer`, a float list → `real`), including
+  through a type alias (`type ints = list<integer>`).
 
-  Per-arm quantification of an overload set now needs parentheses, since
-  `where` binds looser than `&`:
-  `((list<T>) -> T where T) & ((set<T>) -> boolean where T)`. The
-  unparenthesized form is rejected with a message naming the fix.
+- **A fully-known argument now always dispatches a multi-clause function.** With
+  clauses `a(t: integer)` and `a(t: real)`, `a(0.3)` stayed inert under
+  `evaluate()` while compiled code correctly selected the `real` clause — two
+  different answers for one input. Concrete values are now tested against each
+  clause for both admission and refutation, so interpreted and compiled dispatch
+  agree. Symbolic arguments keep their deliberate inertness.
+
+- **A cyclic type alias no longer overflows the stack.** A non-progressing
+  structural alias cycle (`type a = a | 0`) crashed with `RangeError` when a
+  concrete value was tested against it, from multi-clause dispatch and from
+  `typeAcceptsValue`. Genuinely recursive values against recursive aliases still
+  admit; a non-progressing back edge now answers definitively.
+
+#### Compilation
+
+- **A function declaration contradicted by its own body no longer compiles to
+  wrong results.** With `a` declared `(number) -> number` but assigned a
+  list-valued body (`a := t ↦ [cos t, sin t]`), compiled code trusted the
+  declaration wherever the result was consumed as a scalar: `Σᵢ a(h(i))` and
+  `a(u) + 1` returned strings, `2·a(u)` and `sin(a(u))` returned `NaN`,
+  comparisons returned a wrong boolean, `If` took the wrong branch — all behind
+  `success: true` — and the GPU targets emitted shader source that does not
+  compile. When the body provably constructs a collection while the declared
+  result type says scalar, compilation now fails closed with a message naming
+  both sides of the contradiction, and the interpreter answers instead.
+  Deliberately unchanged: a bare `a(u)` on JavaScript still compiles (it returns
+  the correct array today), open declarations (`-> unknown`) keep compiling
+  element-wise, and `boolean` / `broadcastable<T>` big-op bodies are untouched.
+
+- **A `Sum`/`Product` whose body applies a list-valued user function now
+  compiles correctly.** With `a(t) ≔ [cos t, sin t]` under an open
+  `(unknown) -> unknown` signature, `Σ_i a(h(i))` compiled `success: true` and
+  returned a JavaScript *string*. It now compiles to the element-wise broadcast
+  fold and returns the correct array. On the non-JavaScript targets the same
+  shape emitted shader source that does not even compile; GLSL, WGSL, Python and
+  interval now fail closed with an actionable message.
+
+- **A block-local introduced by bare assignment now compiles correctly.** A
+  multi-statement body binding a local with a plain assignment —
+  `t ↦ (w ≔ 2t; w + 1)` — compiled behind `success: true` but ran to `NaN` (on
+  GLSL the local was simply undeclared). Compiled results now match the
+  interpreter.
+
+- **Compiled writes to an outer binding now reach the same place reads look.**
+  A block assigning a name the enclosing scope already binds — including the
+  library-predeclared single letters `e`, `i`, `m`, `s` — wrote a stray global
+  and read `undefined`: `(s ≔ 0; s + 1)` compiled to `NaN` where the interpreter
+  answers 1, and a function body accumulating into `s` through a loop returned
+  `undefined` behind `success: true`. Where reads bake a folded value or a
+  constant, so no coherent write target exists, compilation declines.
+
+- **Complex-valued locals compile correctly.** A loop-body local bound to a
+  complex value miscompiled on JavaScript (`NaN` behind `success: true`; the
+  interpreter answered `3√10`), and a GPU function whose body merely *contained*
+  a complex local while returning a real produced invalid shader source. Loop
+  bodies now share the block compiler's complex inference, and the GPU return
+  type is derived from the body's value rather than from interior locals.
+
+- **The expression-only compilation routes now fail closed on statement
+  bodies.** `compileToSource()` (GPU and Python) and `compileShader()` promise a
+  single expression, but a statement block escaped into them —
+  `compileToSource(Block(s ≔ x; Return s))` returned `"s = x\nreturn return s"`
+  — behind a successful return. Both now throw, naming the expression-only
+  contract and pointing statement bodies at the statement-capable sibling
+  (`compile()` on GPU, `compileFunction()` on Python). Also gated per language
+  semantics: an assignment body on WGSL and Python (still allowed on GLSL, where
+  assignment is an expression), and a bare declaration body, which additionally
+  dropped its initializer silently. The function-emission siblings decline the
+  same shapes: Python `compileFunction` no longer emits `def f(x): return s = x`,
+  and `compileLambda` catches single-line statement bodies. Expression bodies are
+  byte-identical on every route.
+
+- **A `Return` in a GPU function body now emits valid source or declines.** A
+  final-statement `Return` emitted `return return …` and a `Return` inside a
+  conditional emitted `return` in expression position — neither is GLSL or WGSL
+  — both behind `success: true`. Two gates now hold: a shape gate (a `Return`
+  whose value shape disagrees with the function's signature declines, naming
+  both shapes) and a placement scan on the finished body. Early `Return`s of
+  matching shape in plain statement position compile unchanged, as does every
+  JavaScript path.
+
+- **Compiling an assignment to a non-variable target now fails closed.** A
+  sequence definition (`L_0 := 5`) inside a compiled body emitted the silent
+  no-op `_ = 5` behind `success: true` (and, in sloppy mode, wrote a stray
+  global). Such an assignment now declines and falls back to the interpreter.
+
+- **A nominal-typed argument no longer broadcasts at compiled call sites.** With
+  `type bag = list<number>` and `function size(b: bag) -> number`, compiled
+  `size(bag([1,2,3]))` answered `[42, 42, 42]` where the interpreter answers
+  `42`. Nominal values are atomic, like tuples: the whole value binds. A
+  `broadcastable<bag>` slot now also accepts a `bag` argument directly.
+
+- **Typed locals now compile inside loop bodies.** A `let q: Person = …`
+  declared in a loop body rides a different path than a block local, so a
+  protocol property GET/SET on it failed to compile — and an ordinary
+  named-tuple field read (`q.y`) on a typed local failed on every path. Both now
+  resolve, nested chains (`q.inner.y`) included.
+
+- **Contradiction gates hardened.** Multi-statement lambda bodies are judged by
+  their final statement (a body ending in a list no longer slips past the
+  declaration-contradiction gates), and `-> boolean` declarations over
+  collection-constructing bodies now decline everywhere a condition or logical
+  operand consumes them — an `If` no longer takes a branch off array
+  truthiness.
+
+#### LaTeX serialization and round-tripping
+
+- **`Block` expressions now round-trip.** Four shapes changed value on a round
+  trip and are fixed:
+
+  - A single-statement block (`Block(s ≔ 2)`) serialized as bare `s\coloneq2`,
+    which reparses as a plain assignment — the block-local leaked into the
+    enclosing scope. It now serializes with a trailing semicolon
+    (`s\coloneq2;`), and the parser no longer produces the vestigial `Nothing`
+    statement a trailing `;` used to add.
+  - A multi-statement block with no assignment (`Block(s+1, s+2)`) serialized as
+    `s+1; s+2`, which reparses as a 2-tuple. It now serializes as a one-column
+    `\begin{cases}…\end{cases}` (core amsmath), and such an environment parses
+    back as a `Block`. Real piecewise (`Which`) always serializes two columns and
+    is byte-identical.
+  - A block of bare equations (`Block(x=1, y=2)`) collided with the
+    system-of-equations reading and came back as a `List`; it now serializes as
+    explicit `\operatorname{Block}(x=1, y=2)`.
+  - A `Block` used as an argument — of any function call, a `Loop` body, or a
+    comprehension body — emitted a bare `;`-statement list, which binds looser
+    than the argument comma and the `for` clause, so the block swallowed what
+    followed and the value changed. Block operands are now fenced.
+
+- **A two-element list no longer turns into an interval — in any set-operator
+  position.** `Element(i, List(1,2))` ("i ranges over the two-point list")
+  serialized as `i\in\lbrack1, 2\rbrack`, which reparses as
+  `Element(i, Interval(1,2))` ("i is any real between 1 and 2"). The same
+  conversion fired on both operands of `Union`, `Intersection`, `SetMinus` and
+  the `Subset`/`Superset` families, including nested. A 2-element-list operand is
+  now spelled `\operatorname{List}(1, 2)` everywhere (membership, both sides of
+  every set operator, and the big-op subscript), and the parser applies the
+  interval reading only to operands actually written with brackets — an
+  explicitly named `List` head is never overridden. Authored bracket spellings
+  keep their interval meaning, including `\mathopen\lbrack a,b\mathclose\rbrack`
+  and `\mleft…\mright`. Other list lengths are unchanged.
+
+- **Miscellaneous parsing fixes.** An authored trailing `\mathrm{Nothing}`
+  statement survives parsing, a nested `Block(Block(…))` operand no longer
+  defeats the `cases`-environment fence, and `SymmetricDifference` reads and
+  writes its operands with the same interval/list conventions as the other set
+  operators.
+
+#### Evaluation
+
+- **`count` no longer invents a length for reshaping operators.** The broadcast
+  count read participants' lengths without checking that the operator actually
+  broadcasts, so `Chunk([1,2,3], 2).count` answered 3 (true count: 2), and a
+  dozen other reshaping operators (`BinCounts`, `Histogram`, `Tally`, `Shape`, …)
+  reported their operand's length. `Sort`, `Ordering` and `RandomShuffle` now
+  report their source's length (with zero draws), `Chunk(xs, k)` reports `k` for
+  a literal `k`, and operators whose length is not cheaply knowable answer
+  `undefined` instead of a wrong number.
+
+- **A parenthesized juxtaposition on a collection-valued symbol is a product
+  regardless of the argument's type.** With `A` a list and `B` a list, `A(B)` and
+  `A(t-B)` canonicalized to function *applications* of a non-function —
+  evaluating to `Error("incompatible-type", …)` — while `A(m)` with scalar `m`
+  correctly multiplied. The decision now keys on the head: a head whose value is
+  multiplicative (a number, matrix, list, collection, `broadcastable`, or numeric
+  tuple) always reads as a product. Undeclared and function-typed heads still
+  read as applications.
+
+- **A non-multiplicative value head applied to a scalar is now an illegal
+  application, not a product.** With `t := "hello"`, `t(2)` canonicalized to
+  `Multiply` and the type error blamed multiplication; string-, set- and
+  boolean-valued heads now take the application route, so the error blames the
+  actual mistake.
+
+- **A negated product no longer produces an unflattened `Multiply`.** `(b·-a)c`
+  built a node whose `.json` serialized flat (ordered `abc`) while `isSame` and
+  `hash` saw the nesting, violating the documented `isSame ⇒ equal hash`
+  contract; a negated rational coefficient with a `Power` factor hit the same
+  problem. `.json`, `isSame` and `hash` agree again.
 
 ## 0.104.1 _2026-08-11_
 
 ### Issues Resolved
+
+- **A compiled big op whose bound is a function parameter no longer folds
+  against a same-named library constant** (Tycho item 176). Compiling a
+  `Sum`/`Product` folds its bounds at compile time when both are constant, but
+  that fold read the bound's value through the ENGINE symbol, ignoring that the
+  name might be bound in the compilation context. A user function's parameter
+  named after a library constant therefore produced silently wrong code behind
+  `success: true`: in `F(i) = \sum_{m=1}^{i} m` the bound `i` resolved to the
+  imaginary unit, whose real part is `0`, so `lower 1 > upper 0` read as an
+  empty range and the entire body folded to the identity —
+  `const _fn_F = (i) => 0`, against an interpreted `6`. A parameter named `e`
+  picked up Euler's number and summed two terms (`3`). The same shape emitted
+  `float _fn_F(float i) { return 0.0; }` on the GPU targets. A bound that
+  mentions any compile-bound name — a function parameter, an enclosing binder's
+  index, a broadcast element — is now treated as symbolic and emitted as a loop
+  over the parameter, matching the interpreter on every parameter name. This
+  affected the javascript, GLSL, WGSL and interval-js targets; Python was
+  already immune. A bound naming a constant that is NOT shadowed still folds as
+  before.
+
+- **The derivative of a tuple-valued function differentiates componentwise**
+  (Tycho item 174). A `Tuple` is a container, not a function of its elements,
+  but it had no case in the differentiation rules, so it fell through to the
+  generic chain rule and differentiated the `Tuple` **operator**: with
+  `g(t) = (\cos 2\pi t, \sin 2\pi t, t)`, both `g'(t)` and `D(g(t), t)` left
+  inert `Apply(Derivative("Tuple", 0, 1, 0), …)` nodes. `Tuple` now takes the
+  same elementwise branch `List` already had, preserving the container head and
+  nesting — `d/dt (fₓ, f_y, f_z) = (fₓ', f_y', f_z')`, so
+  `g'(0.25)` is `(-2\pi, 0, 1)`. This closes the Frenet-frame idiom
+  (`F_0 = f'/|f'|`, `F_1 = F_0'/|F_0'|`), which never closed before because
+  `f'` stayed inert. Unregistered heads are unaffected: `Point` types
+  `unknown`, so it stays an opaque application rather than acquiring invented
+  componentwise semantics.
 
 - **`Equal`/`NotEqual` against a list no longer overflows the stack when the
   other operand is opaque.** `ce.parse('A(t) = [t]').evaluate()` — one line on a

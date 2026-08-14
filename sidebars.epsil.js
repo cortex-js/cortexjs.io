@@ -47,6 +47,7 @@ const sidebars = {
         { type: "doc", id: "declarations", className: "reference-icon" },
         { type: "doc", id: "evaluation", className: "reference-icon" },
         { type: "doc", id: "types", className: "reference-icon" },
+        { type: "doc", id: "protocols", className: "reference-icon" },
         { type: "doc", id: "comments", className: "reference-icon" },
         { type: "doc", id: "pragmas", className: "reference-icon" },
       ],
