@@ -710,7 +710,6 @@ And a lambda is automatically converted to a map:
 ```
 
 
-
 **Spread arguments.** In a call argument list, `...t` splices the elements of
 the tuple `t` in as positional arguments; several spreads splice in order:
 

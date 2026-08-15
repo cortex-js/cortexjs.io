@@ -75,6 +75,20 @@ import ChangeLog from '@site/src/components/ChangeLog';
   union such as `broadcastable<finite_integer | string>` was refused where
   `list<finite_integer | string>` was accepted.
 
+- **Dividing a point or vector no longer claims the components keep the
+  numerator's numeric tier.** `Divide` with a tuple-typed numerator (e.g. a
+  `PointList` quotient) echoed the numerator's type, so
+  `tuple<finite_integer, finite_integer>` divided by an integer-valued call
+  still claimed *integer* components even though `[6, 2]/4` is `[3/2, 1/2]`.
+  The quotient now keeps the tuple/vector structure while widening each
+  component with the same rules as scalar division (integer/integer →
+  `finite_rational`, real/real → `finite_real`, a possibly-`NaN` denominator →
+  `number`). The same widening lets `Divide` preserve the shape of a
+  broadcast-lifted numerator (`broadcastable<vector<n>>`, from the item-188
+  case above) instead of collapsing it: the quotient types
+  `broadcastable<vector<…>>` with honestly-widened components, matching what
+  `Add`, `Multiply`, `Subtract` and `Negate` already did for the shape.
+
 - **Assigning to a subscripted name now honors a declared joined name, and
   the ambiguous lambda case is an explicit error instead of a silent
   no-op.** Two related fixes to `⟨name⟩_⟨subscript⟩ \coloneq …`:
