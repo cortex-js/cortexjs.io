@@ -65,10 +65,90 @@ early:
   required `LanguageTarget` methods (`getOperators()`, `getFunctions()`,
   `createTarget()`, `compile()`).
 - `compile(expr, options)` validates option payload shape for `to`, `target`,
-  `operators`, `functions`, `vars`, `imports`, `preamble`, and `fallback`.
+  `operators`, `functions`, `vars`, `imports`, `preamble`, `fallback`, and
+  `constantFold`.
 
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
+
+### Constant Folding
+
+A **pure** subexpression with no free variables is evaluated at compile time
+and emitted as a literal instead of being lowered structurally — on every
+target:
+
+```javascript
+compile(ce.parse("\\mathrm{Sum}(\\mathrm{Take}(\\mathrm{Map}(\\_ \\mapsto \\_^2, 1..20), 10))")).code
+// ➔ "385"
+
+compile(ce.parse("x + \\mathrm{Sum}(\\mathrm{Map}(\\_ \\mapsto \\_^2, 1..5))")).code
+// ➔ "_.x + 55"
+```
+
+Numbers, booleans, and **constant collections** fold. A constant collection
+becomes a literal list, which matters most when the collection is constant but
+its consumer is not:
+
+```javascript
+compile(ce.box(['At', ['Map', ['Function', ['Square', 'y'], 'y'],
+                       ['Range', 1, 6]], 'k'])).code
+// ➔ "_SYS.at([1, 4, 9, 16, 25, 36], _.k)"
+```
+
+The index `k` is a run-time input, so the expression as a whole cannot fold —
+but its base is baked once at compile time instead of being rebuilt and
+mapped over on every call. Collection folding is bounded: it applies to a
+**finite, indexed** collection (a `Set` has no defined element order, so it
+never folds) of at most 50 **numeric** elements. A longer collection, or one
+holding strings, tuples or nested collections, compiles structurally.
+
+Folding declines — and the subtree compiles exactly as before — whenever any
+of the following holds:
+
+- the subtree is **impure** (`Random(…)` and friends keep drawing at run
+  time);
+- it mentions an **unknown**, a **`vars`-mapped input** (even one with an
+  engine value — `vars` pins it live), or a name bound by an enclosing lambda
+  or loop;
+- it mentions an operator whose emission you overrode with the `functions` or
+  `operators` options (folding would evaluate the engine's definition, not
+  yours);
+- it contains a `Sum` or `Product` over a **non-finite bound** (`Σ i,
+  i=1..∞`): for a divergent series the interpreter's numeric evaluation
+  silently returns an iteration-limit-truncated partial sum, and folding
+  would bake that wrong number as a constant — such expressions keep their
+  fail-closed structural behavior (a *bounded* infinite pipeline like
+  `Sum(Take(Map(_ ↦ _^2, 1..∞), 10))` still folds);
+- it is estimated to cost too much to evaluate at compile time, or exceeds
+  the engine's collection-size cap. The estimate is **deterministic** — it
+  reads the expression and nothing else, so the same input always compiles
+  to the same output, and folded code is safe to pin in a test. Constructs
+  that multiply work are priced by their counts: a `Sum` or `Product` by its
+  number of iterations, a `Map` or `Filter` by the size of its source. An
+  expression whose count cannot be determined statically is not folded —
+  though a bound supplied by a *consumer* still counts, which is why
+  `Sum(Take(Map(f, 1..∞), 10))` folds while `Sum(Map(f, 1..∞))` does not;
+- the compilation records a capture set (the `symbolDeps` option, used by the
+  engine's implicit-compilation cache): folding evaluates through engine
+  state transitively and would under-report the dependencies the cache is
+  keyed on, so such a compilation never folds.
+
+The folded value is the **interpreter's** (`.N()`), so a folded constant can
+differ in the last ulp from what the structural code would have computed in a
+different operation order — compiled output tracks `evaluate()` by design
+(`sin(π/6)` compiles to `0.5`, not `Math.sin(Math.PI / 6)`, which is
+`0.49999999999999994`).
+
+**To disable folding** — for example to inspect the structural lowering of a
+constant expression — pass `constantFold: false`:
+
+```javascript
+compile(expr, { constantFold: false });
+```
+
+The interval-arithmetic target (`interval-js`) never constant-folds: a folded
+point value would discard the outward-rounded enclosure that target exists to
+compute.
 
 ### Why a compilation declined
 
@@ -464,6 +544,71 @@ console.log(compile("(1 + 0i) * 5", { realOnly: true }).run());
 ```
 
 This avoids per-evaluation type checks in calling code.
+
+`realOnly` projects the compiled unit's **result** and nothing else — it never
+changes which lowering an operator picks, so it can only discard complexness,
+never produce it. To make a square root of a possibly negative value yield a
+complex result at all, see complex promotion below.
+
+### Complex Promotion
+
+`Sqrt`, `Ln` and `Log` compile to the **real** kernel — `Math.sqrt(t - 1)` —
+when their operand is a real number whose sign is not known at compile time.
+For a negative operand that yields `NaN`, where `evaluate()` promotes to a
+complex value:
+
+```live
+// import { ComputeEngine, compile } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+ce.parse("z(t) \\coloneq \\sqrt{t-1}").evaluate();
+
+// Interpreted — promotes to complex, then |·| brings it back to a real
+ce.assign("t", 0.3);
+console.log(ce.parse("|z(t)/2 - 1|").N().toString());   // 1.08397416943394
+
+// Compiled, by default — the real kernel yields NaN
+console.log(compile(ce.parse("|z(t)/2 - 1|")).run({ t: 0.3 }));  // NaN
+```
+
+That default is deliberate: it keeps radical chains such as `√(⌈x⌉²+⌈y⌉²)` on
+the fast path, and it is what lets an ordering comparison over a radical
+compile at all.
+
+Pass `{ complexPromotion: true }` when your expressions are genuinely
+complex-valued — a plotting front-end with a per-document "complex mode"
+switch maps that switch onto this option. Those heads then lower through the
+complex helpers and the compiled value matches `evaluate()`:
+
+```live
+// import { ComputeEngine, compile } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+ce.parse("z(t) \\coloneq \\sqrt{t-1}").evaluate();
+
+const fn = compile(ce.parse("|z(t)/2 - 1|"), { complexPromotion: true });
+console.log(fn.run({ t: 0.3 }));   // 1.08397416943394
+```
+
+A real-valued input is lifted automatically, so enabling the option does not
+change how you pass arguments.
+
+Two things to expect when you enable it:
+
+- **Affected chains get slower** — about 2.3× on a 200k-point sweep of
+  `|√(u+1)/2 − 1|`. An expression with no unknown-sign `Sqrt`/`Ln`/`Log`
+  compiles exactly as before and costs nothing.
+- **An ordering comparison over such a head fails closed.** `Less(Sqrt(x), 2)`
+  has no truth value once `Sqrt(x)` may be complex — the interpreter leaves it
+  symbolic — so the compiler declines rather than emitting a wrong answer.
+  This is the main reason the option is off by default.
+
+The option is honored by the `javascript` and `python` targets. The shader
+targets (`glsl`, `wgsl`) keep the real kernel unconditionally: they have no
+runtime-failure channel.
+
+`realOnly` and `complexPromotion` are independent and compose — promote
+internally, then project the result at the boundary.
 
 ## Custom Operators
 

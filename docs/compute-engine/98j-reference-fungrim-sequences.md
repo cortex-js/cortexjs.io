@@ -89,7 +89,7 @@ $$\mathrm{BernoulliPolynomial}(n, 1-x)=(-1)^{n}\mathrm{BernoulliPolynomial}(n, x
 
 **Holds when** $n\in\N\land x\in\C$.
 **Symbols:** **BernoulliPolynomial** — Bernoulli polynomial.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`c2dcfa` · Fungrim entry ↗](https://fungrim.org/entry/c2dcfa)
 
 ---
@@ -154,7 +154,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\frac{n\mathrm{Hypergeometric2F_1}(\frac{1-n}{2}, \frac{2-n}{2}, \frac{3}{2}, 5)}{2^{n-1}}$$
+$$\mathrm{Fibonacci}(n)=\frac{n\mathrm{Hypergeometric2F1}(\frac{1-n}{2}, \frac{2-n}{2}, \frac{3}{2}, 5)}{2^{n-1}}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -215,7 +215,7 @@ Used by the Compute Engine for simplification.
 $$\begin{pmatrix}\mathrm{Fibonacci}(n+m)\\ \mathrm{Fibonacci}((n+m)-1)\end{pmatrix}=\begin{pmatrix}1 & 1\\ 1 & 0\end{pmatrix}^{m}\begin{pmatrix}\mathrm{Fibonacci}(n)\\ \mathrm{Fibonacci}(n-1)\end{pmatrix}$$
 
 **Holds when** $n\in\Z\land m\in\Z$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`3a9c67` · Fungrim entry ↗](https://fungrim.org/entry/3a9c67)
 
 ---
@@ -292,7 +292,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=\mathrm{Hypergeometric2F_1}(\frac{1-n}{2}, \frac{2-n}{2}, 1-n, -4)$$
+$$\mathrm{Fibonacci}(n)=\mathrm{Hypergeometric2F1}(\frac{1-n}{2}, \frac{2-n}{2}, 1-n, -4)$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -300,7 +300,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\mathrm{Filter}(\N, n\mapsto\mathrm{Fibonacci}(n)^{1/2}\in\Z), n\mapsto\mathrm{Fibonacci}(n))=\lbrace\mathrm{Fibonacci}(0), \mathrm{Fibonacci}(1), \mathrm{Fibonacci}(2), \mathrm{Fibonacci}(12)\rbrace=\lbrace0, 1, 144\rbrace$$
+$$\mathrm{Map}(n\mapsto\mathrm{Fibonacci}(n), \mathrm{Filter}(\N, n\mapsto\mathrm{Fibonacci}(n)^{1/2}\in\Z))=\lbrace\mathrm{Fibonacci}(0), \mathrm{Fibonacci}(1), \mathrm{Fibonacci}(2), \mathrm{Fibonacci}(12)\rbrace=\lbrace0, 1, 144\rbrace$$
 
 Used by the Compute Engine for simplification.
 [`9d26d2` · Fungrim entry ↗](https://fungrim.org/entry/9d26d2)
@@ -534,7 +534,7 @@ Used by the Compute Engine for simplification.
 
 ## Stirling numbers
 
-$$\mathrm{StirlingS_1}(n, k)=(-1)^{n+k}\mathrm{StirlingCycle}(n, k)$$
+$$\mathrm{StirlingS1}(n, k)=(-1)^{n+k}\mathrm{StirlingCycle}(n, k)$$
 
 **Holds when** $n\in\N\land k\in\N$.
 **Symbols:** **StirlingCycle** — Unsigned Stirling number of the first kind; **StirlingS1** — Signed Stirling number of the first kind.
@@ -543,7 +543,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{StirlingS_1}(n+1, k)=\mathrm{StirlingS_1}(n, k-1)-n\mathrm{StirlingS_1}(n, k)$$
+$$\mathrm{StirlingS1}(n+1, k)=\mathrm{StirlingS1}(n, k-1)-n\mathrm{StirlingS1}(n, k)$$
 
 **Holds when** $n\in\N\land k\in\N^*$.
 **Symbols:** **StirlingS1** — Signed Stirling number of the first kind.

@@ -838,7 +838,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F_2}(1, 1, 2-z, 2, 2, 1)-\operatorname{EulerGamma}$$
+$$\mathrm{Digamma}(z)=(z-1)\mathrm{Hypergeometric3F2}(1, 1, 2-z, 2, 2, 1)-\operatorname{EulerGamma}$$
 
 **Holds when** $z\in\C\land\Re(z)\gt0$.
 Used by the Compute Engine for simplification.

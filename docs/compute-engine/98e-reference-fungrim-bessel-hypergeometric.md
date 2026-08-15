@@ -22,7 +22,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Airy functions
 
-$$\operatorname{Ai}(z)=\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})+zz\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})$$
+$$\operatorname{Ai}(z)=\operatorname{Ai}(0)\mathrm{Hypergeometric0F1}(\frac{2}{3}, \frac{z^3}{9})+zz\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F1}(\frac{4}{3}, \frac{z^3}{9})$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -31,7 +31,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\operatorname{Ai}(z)^{\prime}(z)=z\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Ai}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9}))$$
+$$z\mapsto\operatorname{Ai}(z)^{\prime}(z)=z\mapsto\operatorname{Ai}(z)^{\prime}(0)\mathrm{Hypergeometric0F1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Ai}(0)\mathrm{Hypergeometric0F1}(\frac{5}{3}, \frac{z^3}{9}))$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -40,7 +40,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\operatorname{Bi}(z)^{\prime}(z)=z\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{5}{3}, \frac{z^3}{9}))$$
+$$z\mapsto\operatorname{Bi}(z)^{\prime}(z)=z\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F1}(\frac{1}{3}, \frac{z^3}{9})+\frac{1}{2}(z^2\operatorname{Bi}(0)\mathrm{Hypergeometric0F1}(\frac{5}{3}, \frac{z^3}{9}))$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -73,7 +73,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Bi}(z)=\operatorname{Bi}(0)\mathrm{Hypergeometric0F_1}(\frac{2}{3}, \frac{z^3}{9})+zz\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F_1}(\frac{4}{3}, \frac{z^3}{9})$$
+$$\operatorname{Bi}(z)=\operatorname{Bi}(0)\mathrm{Hypergeometric0F1}(\frac{2}{3}, \frac{z^3}{9})+zz\mapsto\operatorname{Bi}(z)^{\prime}(0)\mathrm{Hypergeometric0F1}(\frac{4}{3}, \frac{z^3}{9})$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -140,7 +140,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HankelH_2}(\nu, z)=\operatorname{J}_{\nu}(z)-\imaginaryI\operatorname{Y}_{\nu}(z)$$
+$$\mathrm{HankelH2}(\nu, z)=\operatorname{J}_{\nu}(z)-\imaginaryI\operatorname{Y}_{\nu}(z)$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **HankelH2** — Hankel function of the second kind.
@@ -270,7 +270,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HankelH_1}(\nu, z)=\operatorname{J}_{\nu}(z)+\imaginaryI\operatorname{Y}_{\nu}(z)$$
+$$\mathrm{HankelH1}(\nu, z)=\operatorname{J}_{\nu}(z)+\imaginaryI\operatorname{Y}_{\nu}(z)$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace$.
 **Symbols:** **HankelH1** — Hankel function of the first kind.
@@ -362,7 +362,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{\frac{z}{2}^{\nu}\exp(-(\imaginaryI z))\mathrm{Hypergeometric1F_1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)}{\Gamma(\nu+1)}$$
+$$\operatorname{J}_{\nu}(z)=\frac{\frac{z}{2}^{\nu}\exp(-(\imaginaryI z))\mathrm{Hypergeometric1F1}(\nu+\frac{1}{2}, 2\nu+1, 2\imaginaryI z)}{\Gamma(\nu+1)}$$
 
 **Holds when** $\nu\in\N\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\land\nu\notin-\infty..(-1)\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -421,7 +421,7 @@ Used by the Compute Engine for simplification.
 $$\operatorname{I}_{-n}(z)=\operatorname{I}_{n}(z)$$
 
 **Holds when** $n\in\Z\land z\in\C$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`afbd22` · Fungrim entry ↗](https://fungrim.org/entry/afbd22)
 
 ---
@@ -575,7 +575,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric0F_1}(a, z)=\exp(-(2\sqrt{z}))\mathrm{Hypergeometric1F_1}(a-\frac{1}{2}, 2a-1, 4\sqrt{z})$$
+$$\mathrm{Hypergeometric0F1}(a, z)=\exp(-(2\sqrt{z}))\mathrm{Hypergeometric1F1}(a-\frac{1}{2}, 2a-1, 4\sqrt{z})$$
 
 **Holds when** $a\in\C\land z\in\C\land2a\notin-\infty..1$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -593,7 +593,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HypergeometricUStar}(a, b, z)=\mathrm{Hypergeometric2F_0}(a, a-b+1, -(\frac{1}{z}))$$
+$$\mathrm{HypergeometricUStar}(a, b, z)=\mathrm{Hypergeometric2F0}(a, a-b+1, -(\frac{1}{z}))$$
 
 **Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0$.
 **Symbols:** **Hypergeometric2F0** — Tricomi confluent hypergeometric function, alternative notation; **HypergeometricUStar** — Scaled Tricomi confluent hypergeometric function.
@@ -602,7 +602,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F_1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)z^{1-b}\mathrm{Hypergeometric1F_1}(a-b+1, 2-b, z))$$
+$$\mathrm{HypergeometricU}(a, b, z)=\frac{\Gamma(1-b)\mathrm{Hypergeometric1F1}(a, b, z)}{\Gamma(a-b+1)}+\frac{1}{\Gamma(a)}(\Gamma(b-1)z^{1-b}\mathrm{Hypergeometric1F1}(a-b+1, 2-b, z))$$
 
 **Holds when** $a\in\C\land b\in\C\land z\in\C\land z\ne0\land b\notin\Z$.
 **Symbols:** **HypergeometricU** — Tricomi confluent hypergeometric function.
@@ -629,7 +629,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric1F_1}(a, b, z)=\exponentialE^{z}\mathrm{Hypergeometric1F_1}(b-a, b, -z)$$
+$$\mathrm{Hypergeometric1F1}(a, b, z)=\exponentialE^{z}\mathrm{Hypergeometric1F1}(b-a, b, -z)$$
 
 **Holds when** $a\in\C\land b\in\C\setminus\Z_{\le0}\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -790,7 +790,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Erf}(z)=(2z\exp(-z^2)\mathrm{Hypergeometric1F_1}(1, \frac{3}{2}, z^2))/\sqrt{\pi}$$
+$$\mathrm{Erf}(z)=(2z\exp(-z^2)\mathrm{Hypergeometric1F1}(1, \frac{3}{2}, z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -798,7 +798,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F_1}(\frac{1}{2}, \frac{3}{2}, -z^2))/\sqrt{\pi}$$
+$$\mathrm{Erf}(z)=(2z\mathrm{Hypergeometric1F1}(\frac{1}{2}, \frac{3}{2}, -z^2))/\sqrt{\pi}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -858,7 +858,7 @@ Used by the Compute Engine for simplification.
 
 ## Gauss hypergeometric function
 
-$$\mathrm{Hypergeometric2F_1}(a, b, c, z)=\mathrm{Hypergeometric2F_1}(b, a, c, z)$$
+$$\mathrm{Hypergeometric2F1}(a, b, c, z)=\mathrm{Hypergeometric2F1}(b, a, c, z)$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C$.
 Used by the Compute Engine for expansion.
@@ -866,7 +866,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{Hypergeometric2F_1}(a, b, c, 0)=1$$
+$$\mathrm{Hypergeometric2F1}(a, b, c, 0)=1$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}$.
 Used by the Compute Engine for simplification.
@@ -874,7 +874,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F_1}(a, b, b, z)=(1-z)^{-a}$$
+$$\mathrm{Hypergeometric2F1}(a, b, b, z)=(1-z)^{-a}$$
 
 **Holds when** $a\in\C\land b\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrace0, 1\rbrace$.
 Used by the Compute Engine for simplification.
@@ -891,7 +891,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F_1}(a, b, c, z)=\mathrm{Hypergeometric2F_1}(a^\star, b^\star, c^\star, z^\star)^\star$$
+$$\mathrm{Hypergeometric2F1}(a, b, c, z)=\mathrm{Hypergeometric2F1}(a^\star, b^\star, c^\star, z^\star)^\star$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -917,7 +917,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F1Regularized}(a, b, -n, z)=\frac{\mathrm{RisingFactorial}(a, n+1)\mathrm{RisingFactorial}(b, n+1)z^{n+1}\mathrm{Hypergeometric2F_1}(a+n+1, b+n+1, n+2, z)}{(n+1)!}$$
+$$\mathrm{Hypergeometric2F1Regularized}(a, b, -n, z)=\frac{\mathrm{RisingFactorial}(a, n+1)\mathrm{RisingFactorial}(b, n+1)z^{n+1}\mathrm{Hypergeometric2F1}(a+n+1, b+n+1, n+2, z)}{(n+1)!}$$
 
 **Holds when** $a\in\C\land b\in\C\land n\in\N\land z\in\C\setminus\lbrace1\rbrace$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function; **RisingFactorial** — Rising factorial.
@@ -926,7 +926,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F_1}(a, b, c, 1)=\frac{\Gamma(c)\Gamma(c-a-b)}{\Gamma(c-a)\Gamma(c-b)}$$
+$$\mathrm{Hypergeometric2F1}(a, b, c, 1)=\frac{\Gamma(c)\Gamma(c-a-b)}{\Gamma(c-a)\Gamma(c-b)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land\Re(c-a-b)\gt0$.
 Used by the Compute Engine for simplification.
@@ -943,7 +943,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F_1}(1, 1, 2, z)=-(\frac{\ln(1-z)}{z})$$
+$$\mathrm{Hypergeometric2F1}(1, 1, 2, z)=-(\frac{\ln(1-z)}{z})$$
 
 **Holds when** $z\in\C\setminus\lbrace0, 1\rbrace$.
 Used by the Compute Engine for simplification.
@@ -978,7 +978,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(z(1-z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F_1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F_1}(a, b, c, z)=0$$
+$$(z(1-z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F1}(a, b, c, z)=0$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -986,7 +986,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F_1}(a, b, c, z)}{\Gamma(c)}$$
+$$\mathrm{Hypergeometric2F1Regularized}(a, b, c, z)=\frac{\mathrm{Hypergeometric2F1}(a, b, c, z)}{\Gamma(c)}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C$.
 **Symbols:** **Hypergeometric2F1Regularized** — Regularized Gauss hypergeometric function.

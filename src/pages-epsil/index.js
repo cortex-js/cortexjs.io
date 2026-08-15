@@ -26,12 +26,10 @@ const HERO_SOURCE = `// Fibonacci
 // Multi-clause function definition
 fib(0) = 0
 fib(1) = 1
+fib(n) = fib(n - 1) + fib(n - 2)
 
-// Type inference makes most type annotations optional
-fib(n: integer) = fib(n - 1) + fib(n - 2)
-
-// Numeric range, and pipe operators to chain operations
-5..10 |> Map(_, fib) |> Sum
+// Numeric range, auto-mapping, and pipe operators to chain operations
+5..10 |> fib |> Sum
 `;
 
 // Each `code` is lifted or adapted from a fence in `docs/epsil/`, noted per
@@ -50,8 +48,8 @@ const FEATURES = [
     title: "Expressive",
     body: "Pipelines, lambdas and multi-clause definitions carry a computation from input to result, in the order you would describe it out loud. Conditionals, matches and blocks all produce values, so any of them can feed the next step.",
     code: `1..10
-  |> Filter(_, n |-> n % 2 == 0)
-  |> Map(_, n |-> n^2)
+  |> Filter(n |-> n % 2 == 0)
+  |> n |-> n^2
   |> Sum
 // ➔ 220`,
     href: "/tour/",
@@ -98,9 +96,9 @@ N(UnitConvert(L * W, $\\mathrm{m^2}$))
     // wrapped alias parses, the dictionary conforms, and the lambda is a
     // static-type-error — i.e. reported before the program runs.
     title: "Types that describe your data",
-    body: "Inference covers most code, so annotations are for when the shape itself matters. Recursive unions, generics with bounds, structural aliases for convenience and nominal types so a celsius never passes for a fahrenheit — all checked before anything runs.",
+    body: "Type inference covers most code, so annotations are for when the shape itself matters. Recursive unions, generics with bounds, structural aliases for convenience and nominal types so a celsius never passes for a fahrenheit — all checked before anything runs.",
     code: `type alias json = number | string | boolean
-                | missing | list<json> | dictionary
+                | missing | list<json> | dictionary<json>
 
 let doc: json = {"tags" -> ["math", "computing"]}
 let bad: json = x |-> x  // rejected before it runs`,
@@ -169,8 +167,7 @@ export default function Home() {
               Epsil
             </Heading>
             <p className={styles.tagline}>
-              A programming language for scientific computing, built on the{" "}
-              <a href="https://mathlive.io/compute-engine/">Compute Engine</a>.
+              A programming language for scientific computing
             </p>
             <div className={styles.actions}>
               <a className={styles.primaryButton} href="/getting-started/">

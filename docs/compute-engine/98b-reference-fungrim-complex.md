@@ -187,7 +187,7 @@ Used by the Compute Engine for simplification.
 
 ## Complex plane
 
-$$\mathrm{BernsteinEllipse}(\rho)=\mathrm{Map}(\lbrack0, 2\pi\rparen, \theta\mapsto\frac{1}{2}(\rho\exp(\imaginaryI\theta)+\exp(-(\imaginaryI\theta))/\rho))$$
+$$\mathrm{BernsteinEllipse}(\rho)=\mathrm{Map}(\theta\mapsto\frac{1}{2}(\rho\exp(\imaginaryI\theta)+\exp(-(\imaginaryI\theta))/\rho), \lbrack0, 2\pi\rparen)$$
 
 **Holds when** $\rho\in\R\land\rho\gt1$.
 Used by the Compute Engine for simplification.

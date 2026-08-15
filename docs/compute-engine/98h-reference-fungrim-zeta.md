@@ -28,7 +28,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{DirichletGroup}(q)=\mathrm{Map}(\mathrm{Filter}(1..(\max(q, 2)-1), \ell\mapsto\gcd(\ell, q)=1), \ell\mapsto\mathrm{DirichletCharacter}(q, \ell))$$
+$$\mathrm{DirichletGroup}(q)=\mathrm{Map}(\ell\mapsto\mathrm{DirichletCharacter}(q, \ell), \mathrm{Filter}(1..(\max(q, 2)-1), \ell\mapsto\gcd(\ell, q)=1))$$
 
 **Holds when** $q\in\N^*$.
 **Symbols:** **DirichletCharacter** — Dirichlet character; **DirichletGroup** — Dirichlet characters with given modulus.
@@ -46,7 +46,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ConreyGenerator}(p)=\begin{cases}10&p=40\,487\\7&p=6\,692\,367\,337\\\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p))=p-1))&\top\end{cases}$$
+$$\mathrm{ConreyGenerator}(p)=\begin{cases}10&p=40\,487\\7&p=6\,692\,367\,337\\\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1))&\top\end{cases}$$
 
 **Holds when** $p\in\mathrm{Primes}\land p\ge3\land p\lt10^{12}$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
@@ -64,7 +64,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p))=p-1\land\mathrm{Count}(\mathrm{Map}(\N, k\mapsto a^{k}\bmod p^2))=p(p-1)))$$
+$$\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1\land\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p^2, \N))=p(p-1)))$$
 
 **Holds when** $p\in\mathrm{Primes}\land p\ge3$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
@@ -299,7 +299,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{HurwitzZeta}(2, a)=\mathrm{Hypergeometric3F_2}(1, a, a, a+1, a+1, 1)/a^2$$
+$$\mathrm{HurwitzZeta}(2, a)=\mathrm{Hypergeometric3F2}(1, a, a, a+1, a+1, 1)/a^2$$
 
 **Holds when** $a\in\C\setminus\Z_{\le0}$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
@@ -365,7 +365,7 @@ $$\mathrm{HurwitzZeta}(s, \frac{1}{4})+\mathrm{HurwitzZeta}(s, \frac{3}{4})=2^{s
 
 **Holds when** $s\in\C\land s\ne1$.
 **Symbols:** **HurwitzZeta** — Hurwitz zeta function.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`8bbb6f` · Fungrim entry ↗](https://fungrim.org/entry/8bbb6f)
 
 ---
@@ -685,7 +685,7 @@ $$\mathrm{StieltjesGamma}(0, a)=-\mathrm{Digamma}(a)$$
 
 **Holds when** $a\in\C\land a\notin\Z_{\le0}$.
 **Symbols:** **StieltjesGamma** — Stieltjes constant.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`b6808d` · Fungrim entry ↗](https://fungrim.org/entry/b6808d)
 
 ---

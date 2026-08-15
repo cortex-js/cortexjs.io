@@ -212,7 +212,7 @@ Used by the Compute Engine for expansion.
 $$\cos(\arctan(z))=\frac{1}{\sqrt{1+z^2}}$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`0b829e` · Fungrim entry ↗](https://fungrim.org/entry/0b829e)
 
 ---
@@ -264,7 +264,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z)=z\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -z^2)$$
+$$\arctan(z)=z\mathrm{Hypergeometric2F1}(1, \frac{1}{2}, \frac{3}{2}, -z^2)$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
 Used by the Compute Engine for simplification.
@@ -275,7 +275,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\arctan(z)^{\prime}(z)=\frac{(-1)^{n}(n-1)!(\frac{1}{(z+\imaginaryI)^{n}}-\frac{1}{(z-\imaginaryI)^{n}})}{2\imaginaryI}$$
 
 **Holds when** $n\in\N^*\land z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rbrack\cup\lbrack1, \infty\rparen$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`36171f` · Fungrim entry ↗](https://fungrim.org/entry/36171f)
 
 ---
@@ -298,7 +298,7 @@ Used by the Compute Engine for simplification.
 $$\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x(x+y))$$
 
 **Holds when** $x\in\R\land y\in\R$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`47331d` · Fungrim entry ↗](https://fungrim.org/entry/47331d)
 
 ---
@@ -507,7 +507,7 @@ Used by the Compute Engine for simplification.
 $$\sin(\arctan(z))=\frac{z}{\sqrt{1+z^2}}$$
 
 **Holds when** $z\in\C\setminus\lbrace-\imaginaryI, \imaginaryI\rbrace$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`d4b0b6` · Fungrim entry ↗](https://fungrim.org/entry/d4b0b6)
 
 ---
@@ -554,14 +554,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\rbrack-\infty, -\exponentialE^{-1}\lbrack, x\mapsto\operatorname{W}(x))=\mathrm{Map}(\rbrack0, \pi\lbrack, y\mapsto y\imaginaryI-y\cot(y))$$
+$$\mathrm{Map}(x\mapsto\operatorname{W}(x), \rbrack-\infty, -\exponentialE^{-1}\lbrack)=\mathrm{Map}(y\mapsto y\imaginaryI-y\cot(y), \rbrack0, \pi\lbrack)$$
 
 Used by the Compute Engine for simplification.
 [`44ad09` · Fungrim entry ↗](https://fungrim.org/entry/44ad09)
 
 ---
 
-$$\mathrm{Map}(\lbrace-\exponentialE^{-1}\rbrace, x\mapsto\operatorname{W}(x))=\lbrace-1\rbrace$$
+$$\mathrm{Map}(x\mapsto\operatorname{W}(x), \lbrace-\exponentialE^{-1}\rbrace)=\lbrace-1\rbrace$$
 
 Used by the Compute Engine for simplification.
 [`55498b` · Fungrim entry ↗](https://fungrim.org/entry/55498b)
@@ -637,7 +637,7 @@ Used by the Compute Engine for simplification and equation solving.
 
 ---
 
-$$\mathrm{Map}(\rbrack-\exponentialE^{-1}, \infty\lbrack, x\mapsto\operatorname{W}(x))=\rbrack-1, \infty\lbrack$$
+$$\mathrm{Map}(x\mapsto\operatorname{W}(x), \rbrack-\exponentialE^{-1}, \infty\lbrack)=\rbrack-1, \infty\lbrack$$
 
 Used by the Compute Engine for simplification.
 [`ee86fb` · Fungrim entry ↗](https://fungrim.org/entry/ee86fb)
@@ -748,21 +748,21 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F_1}(-(1/3), \frac{1}{3}, 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{9}(2\sqrt{3}\mathrm{Hypergeometric2F1}(-(1/3), \frac{1}{3}, 1, 1))$$
 
 Used by the Compute Engine for simplification.
 [`68b73d` · Fungrim entry ↗](https://fungrim.org/entry/68b73d)
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F_1}(\frac{1}{2}, -(1/2), 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{2}(\mathrm{Hypergeometric2F1}(\frac{1}{2}, -(1/2), 1, 1))$$
 
 Used by the Compute Engine for simplification.
 [`a7095f` · Fungrim entry ↗](https://fungrim.org/entry/a7095f)
 
 ---
 
-$$\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F_1}(-(1/2), -(1/2), 1, 1))$$
+$$\frac{1}{\pi}=\frac{1}{4}(\mathrm{Hypergeometric2F1}(-(1/2), -(1/2), 1, 1))$$
 
 Used by the Compute Engine for simplification.
 [`c6c108` · Fungrim entry ↗](https://fungrim.org/entry/c6c108)
@@ -798,7 +798,7 @@ Used by the Compute Engine for simplification.
 $$z^0=1$$
 
 **Holds when** $z\in\C$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`310f36` · Fungrim entry ↗](https://fungrim.org/entry/310f36)
 
 ---
@@ -891,7 +891,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto\mathrm{sinc}(z)^{\prime}(z)=-(\frac{1}{3}(z\mathrm{Hypergeometric0F_1}(5/2, -(z^2/4))))$$
+$$z\mapsto\mathrm{sinc}(z)^{\prime}(z)=-(\frac{1}{3}(z\mathrm{Hypergeometric0F1}(5/2, -(z^2/4))))$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -908,7 +908,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\max(\mathrm{Map}(\R, x\mapsto\mathrm{sinc}(x)))=1$$
+$$\max(\mathrm{Map}(x\mapsto\mathrm{sinc}(x), \R))=1$$
 
 Used by the Compute Engine for simplification.
 [`632d1c` · Fungrim entry ↗](https://fungrim.org/entry/632d1c)
@@ -977,14 +977,14 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\min(\mathrm{Map}(\R, x\mapsto\mathrm{sinc}(x)))=\mathrm{sinc}(\mathrm{BesselJZero}(\frac{3}{2}, 1))$$
+$$\min(\mathrm{Map}(x\mapsto\mathrm{sinc}(x), \R))=\mathrm{sinc}(\mathrm{BesselJZero}(\frac{3}{2}, 1))$$
 
 Used by the Compute Engine for simplification.
 [`da7fb1` · Fungrim entry ↗](https://fungrim.org/entry/da7fb1)
 
 ---
 
-$$\mathrm{sinc}(z)=\mathrm{Hypergeometric0F_1}(\frac{3}{2}, -(\frac{z^2}{4}))$$
+$$\mathrm{sinc}(z)=\mathrm{Hypergeometric0F1}(\frac{3}{2}, -(\frac{z^2}{4}))$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -996,7 +996,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{sinc}(-z)=\mathrm{sinc}(z)$$
 
 **Holds when** $z\in\C$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`f19e0a` · Fungrim entry ↗](https://fungrim.org/entry/f19e0a)
 
 ---
@@ -1069,7 +1069,7 @@ Used by the Compute Engine for simplification.
 $$\sin(\pi+z)=-\sin(z)$$
 
 **Holds when** $z\in\C$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`1c22f1` · Fungrim entry ↗](https://fungrim.org/entry/1c22f1)
 
 ---
@@ -1098,7 +1098,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\min(\mathrm{Map}(\R, x\mapsto\sin(x)))=-1$$
+$$\min(\mathrm{Map}(x\mapsto\sin(x), \R))=-1$$
 
 Used by the Compute Engine for simplification.
 [`27766c` · Fungrim entry ↗](https://fungrim.org/entry/27766c)
@@ -1132,7 +1132,7 @@ Used by the Compute Engine for simplification.
 $$\sin(z+\pi k)=(-1)^{k}\sin(z)$$
 
 **Holds when** $z\in\C\land k\in\Z$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`393b62` · Fungrim entry ↗](https://fungrim.org/entry/393b62)
 
 ---
@@ -1176,7 +1176,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\sin(z)=z\mathrm{Hypergeometric0F_1}(\frac{3}{2}, \frac{-z^2}{4})$$
+$$\sin(z)=z\mathrm{Hypergeometric0F1}(\frac{3}{2}, \frac{-z^2}{4})$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **Hypergeometric0F1** — Confluent hypergeometric limit function.
@@ -1233,7 +1233,7 @@ Used by the Compute Engine for simplification.
 $$\sin(z)-\cos(z)=\sqrt{2}\sin(z-\frac{\pi}{4})$$
 
 **Holds when** $z\in\C$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`6c3ba9` · Fungrim entry ↗](https://fungrim.org/entry/6c3ba9)
 
 ---
@@ -1321,12 +1321,12 @@ Used by the Compute Engine for expansion.
 $$\vert\sin(x+\imaginaryI y)\vert=\sqrt{\sin(x)^2+\sinh(y)^2}$$
 
 **Holds when** $x\in\R\land y\in\R$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`abaf91` · Fungrim entry ↗](https://fungrim.org/entry/abaf91)
 
 ---
 
-$$\mathrm{ArgMin}(x\mapsto\sin(x), \R)=\mathrm{Map}(\Z, n\mapsto\pi(2n-1/2))$$
+$$\mathrm{ArgMin}(x\mapsto\sin(x), \R)=\mathrm{Map}(n\mapsto\pi(2n-1/2), \Z)$$
 
 **Symbols:** **ArgMin** — Locations of minimum value.
 Used by the Compute Engine for simplification.
@@ -1365,7 +1365,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\max(\mathrm{Map}(\R, x\mapsto\sin(x)))=1$$
+$$\max(\mathrm{Map}(x\mapsto\sin(x), \R))=1$$
 
 Used by the Compute Engine for simplification.
 [`bfe28b` · Fungrim entry ↗](https://fungrim.org/entry/bfe28b)
@@ -1379,7 +1379,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ArgMax}(x\mapsto\sin(x), \R)=\mathrm{Map}(\Z, n\mapsto\pi(2n+\frac{1}{2}))$$
+$$\mathrm{ArgMax}(x\mapsto\sin(x), \R)=\mathrm{Map}(n\mapsto\pi(2n+\frac{1}{2}), \Z)$$
 
 **Symbols:** **ArgMax** — Locations of maximum value.
 Used by the Compute Engine for simplification.
@@ -1469,7 +1469,7 @@ Used by the Compute Engine for simplification.
 $$\sin(z)+\cos(z)=\sqrt{2}\sin(z+\frac{\pi}{4})$$
 
 **Holds when** $z\in\C$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`f183d0` · Fungrim entry ↗](https://fungrim.org/entry/f183d0)
 
 ---
@@ -1495,7 +1495,7 @@ Used by the Compute Engine for simplification.
 $$\sqrt{z}^2=z$$
 
 **Holds when** $z\in\C$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`0984ef` · Fungrim entry ↗](https://fungrim.org/entry/0984ef)
 
 ---
@@ -1534,7 +1534,7 @@ Used by the Compute Engine for simplification.
 $$\arg(\sqrt{z})=\frac{\arg(z)}{2}$$
 
 **Holds when** $z\in\C$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`22e0be` · Fungrim entry ↗](https://fungrim.org/entry/22e0be)
 
 ---

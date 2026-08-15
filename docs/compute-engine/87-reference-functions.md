@@ -112,11 +112,11 @@ function literal  shorthand.
 This expression will apply the `Sin` function to the elements of `xs`.
 
 ```json example
-["Map", "xs", "Sin"]
+["Map", "Sin", "xs"]
 ```
 
-It is equivalent to `["Map", "xs", ["Sin", "_"]]` which is desugared to 
-`["Map", "xs", ["Function", ["Sin", "_"], "_"]]`.
+It is equivalent to `["Map", ["Sin", "_"], "xs"]` which is desugared to 
+`["Map", ["Function", ["Sin", "_"], "_"], "xs"]`.
 
 
 
@@ -131,14 +131,14 @@ In the example below, the second argument of the `Map` function is an
 anonymous function expressed as a function literal that multiplies its argument by `2`.
 
 ```json example
-["Map", "xs", ["Function", ["Multiply", "x", 2], "x"]]
+["Map", ["Function", ["Multiply", "x", 2], "x"], "xs"]
 ```
 
 The same function can be expressed using a shorthand function literal, which
 uses `_` as a wildcard for the parameter.
 
 ```json example
-["Map", "xs", ["Multiply", "_", 2]]
+["Map", ["Multiply", "_", 2], "xs"]
 ```
 
 
@@ -341,12 +341,12 @@ wrapping its last statement, so the canonical form of the example above is:
   ["Typed", "x", "'integer'"]]
 ```
 
-**Generic literals**. A whole-signature annotation carrying a `forall` clause
+**Generic literals**. A whole-signature annotation carrying a `where` clause
 makes the literal **generic** (see [Generic Signatures](/compute-engine/guides/types/#generic-signatures)).
 It may be written as a signature string in place of the parameter list:
 
 ```json example
-["Function", ["Add", "x", "x"], "'forall T: number. (x: T) -> T'"]
+["Function", ["Add", "x", "x"], "'(x: T) -> T where T: number'"]
 ```
 
 or as a full-signature `Typed` marker on the body — which is also the
@@ -354,7 +354,7 @@ canonical form the sugar above lowers to:
 
 ```json example
 ["Function",
-  ["Block", ["Typed", ["Add", "x", "x"], "'forall T: number. (x: T) -> T'"]],
+  ["Block", ["Typed", ["Add", "x", "x"], "'(x: T) -> T where T: number'"]],
   "x"]
 ```
 
@@ -363,7 +363,7 @@ parameter whose type mentions a type variable is **erased** to a bare symbol,
 while a ground one (`["Typed", "n", "'integer'"]`) keeps its annotation and is
 checked as usual. Each application solves the variables against the arguments,
 so `["Apply", _literal_, 21]` above evaluates to `42` and the bound `number`
-is enforced. A `forall` clause on an individual *parameter* annotation is not
+is enforced. A `where` clause on an individual *parameter* annotation is not
 accepted — type variables are introduced by a whole-signature clause only.
 
 Type annotations round-trip through MathJSON but are dropped when serializing
@@ -452,6 +452,33 @@ value fills, so a stage can be a multi-argument call:
 ```json example
 ["Solve", ["Equal", ["Power", "x", 2], 4], "x"]
 ```
+
+(In Epsil, the topic marker is spelled `_`: `xs |> Take(_, 10)`.)
+
+The topic marker may be left out when it would fill the **first** slot: a
+call stage that is missing required arguments receives the piped value as an
+implicit first argument. A call that is already complete is never rewritten —
+the implicit argument only fills a hole.
+
+```json example
+["Pipe", ["Range", 1, 10], ["Take", 3]]
+// Evaluates as ["Take", ["Range", 1, 10], 3] ➔ [1, 2, 3]
+```
+
+A **unary function literal** on the right-hand side of a pipe maps over a
+collection topic instead of being applied to the collection as a whole (an
+implicit `Map`); in Epsil, `xs |> x |-> x^2` and `xs |> _^2` are both
+`Map(x ↦ x², xs)`.
+
+```json example
+["Pipe", ["List", 1, 2, 3], ["Function", ["Power", "x", 2], "x"]]
+// Evaluates as ["Map", …, ["List", 1, 2, 3]] ➔ [1, 4, 9]
+```
+
+A stage that is a function **symbol** always receives the whole value —
+`xs \rhd \operatorname{Sum}` sums the collection, it does not map — as do a
+string topic (a scalar in a pipeline) and a lambda whose annotated parameter
+accepts the whole collection.
 
 A bare function command such as `\ln`, `\lb` or `\sqrt` acts as a function
 reference (`12 \rhd \ln` is `ln(12)`), and the prefix form (`\rhd f`, with no

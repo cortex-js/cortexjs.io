@@ -191,7 +191,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{DedekindEtaEpsilon}(1, b, 0, 1)=\exp(\frac{\pi\imaginaryI b}{12})$$
 
 **Symbols:** **DedekindEtaEpsilon** — Root of unity in the functional equation of the Dedekind eta function.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`f04e01` · Fungrim entry ↗](https://fungrim.org/entry/f04e01)
 
 ---
@@ -218,7 +218,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(8, \tau)=\mathrm{EisensteinE}(4, \tau)^2$$
 
 **Holds when** $\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`044128` · Fungrim entry ↗](https://fungrim.org/entry/044128)
 
 ---
@@ -325,7 +325,7 @@ Used by the Compute Engine for simplification.
 $$\tau\mapsto\mathrm{EisensteinE}(6, \tau)^{\prime}(\tau)=\frac{1}{2}(2\pi\imaginaryI(\mathrm{EisensteinE}(2, \tau)\mathrm{EisensteinE}(6, \tau)-\mathrm{EisensteinE}(4, \tau)^2))$$
 
 **Holds when** $\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 **Reference:** B. C. Berndt and A. J. Yee (2002) Ramanujan's Contributions to Eisenstein Series, Especially in His Lost Notebook. In: Kanemitsu S., Jia C. (eds) Number Theoretic Methods. Developments in Mathematics, vol 8. Springer, Boston, MA. [https://doi.org/10.1007/978-1-4757-3675-5_3](https://doi.org/10.1007/978-1-4757-3675-5_3)
 [`3bfced` · Fungrim entry ↗](https://fungrim.org/entry/3bfced)
 
@@ -365,7 +365,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{EisensteinE}(8, \tau)=\frac{1}{2}(\mathrm{JacobiTheta}(2, 0, \tau)^{16}+\mathrm{JacobiTheta}(3, 0, \tau)^{16}+\mathrm{JacobiTheta}(4, 0, \tau)^{16})$$
 
 **Holds when** $\Im(\tau)\gt0$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`6d2880` · Fungrim entry ↗](https://fungrim.org/entry/6d2880)
 
 ---
@@ -555,7 +555,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`0373dc` · Fungrim entry ↗](https://fungrim.org/entry/0373dc)
 
 ---
@@ -730,7 +730,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`23077c` · Fungrim entry ↗](https://fungrim.org/entry/23077c)
 
 ---
@@ -770,7 +770,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`2853d4` · Fungrim entry ↗](https://fungrim.org/entry/2853d4)
 
 ---
@@ -842,7 +842,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`378949` · Fungrim entry ↗](https://fungrim.org/entry/378949)
 
 ---
@@ -858,7 +858,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(3, -z, \tau)=\mathrm{JacobiTheta}(3, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`380076` · Fungrim entry ↗](https://fungrim.org/entry/380076)
 
 ---
@@ -874,7 +874,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(2, z, \tau)^4-\mathrm{JacobiTheta}(1, z, \tau)^4}{\mathrm{JacobiTheta}(2, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`3a77e0` · Fungrim entry ↗](https://fungrim.org/entry/3a77e0)
 
 ---
@@ -986,7 +986,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z+\frac{1}{2}, \tau)=-\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`47f6dd` · Fungrim entry ↗](https://fungrim.org/entry/47f6dd)
 
 ---
@@ -1026,7 +1026,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau+4n)=(-1)^{n}\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`4cf228` · Fungrim entry ↗](https://fungrim.org/entry/4cf228)
 
 ---
@@ -1042,7 +1042,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, -z, \tau)=\mathrm{JacobiTheta}(4, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`4f939e` · Fungrim entry ↗](https://fungrim.org/entry/4f939e)
 
 ---
@@ -1162,7 +1162,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`64b65d` · Fungrim entry ↗](https://fungrim.org/entry/64b65d)
 
 ---
@@ -1282,7 +1282,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^4-\mathrm{JacobiTheta}(2, z, \tau)^4}{\mathrm{JacobiTheta}(4, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`7131cd` · Fungrim entry ↗](https://fungrim.org/entry/7131cd)
 
 ---
@@ -1298,7 +1298,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`713b6b` · Fungrim entry ↗](https://fungrim.org/entry/713b6b)
 
 ---
@@ -1354,7 +1354,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`775637` · Fungrim entry ↗](https://fungrim.org/entry/775637)
 
 ---
@@ -1425,7 +1425,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(2, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(1, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`89985a` · Fungrim entry ↗](https://fungrim.org/entry/89985a)
 
 ---
@@ -1457,7 +1457,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(4, 2z, \tau)=\frac{\mathrm{JacobiTheta}(4, z, \tau)^4-\mathrm{JacobiTheta}(1, z, \tau)^4}{\mathrm{JacobiTheta}(4, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`8b825c` · Fungrim entry ↗](https://fungrim.org/entry/8b825c)
 
 ---
@@ -1577,7 +1577,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)}^{\prime}(z)=-(\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(1, z, \tau)^2})$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`a0552b` · Fungrim entry ↗](https://fungrim.org/entry/a0552b)
 
 ---
@@ -1617,7 +1617,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(4, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(3, z, \tau)}{\mathrm{JacobiTheta}(4, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`a4eecf` · Fungrim entry ↗](https://fungrim.org/entry/a4eecf)
 
 ---
@@ -1737,7 +1737,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(1, z, \tau+2n)=\imaginaryI^{n}\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`b978f0` · Fungrim entry ↗](https://fungrim.org/entry/b978f0)
 
 ---
@@ -1745,7 +1745,7 @@ Used by the Compute Engine for expansion.
 $$\mathrm{JacobiTheta}(1, z, \tau+4n)=(-1)^{n}\mathrm{JacobiTheta}(1, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`b9c650` · Fungrim entry ↗](https://fungrim.org/entry/b9c650)
 
 ---
@@ -1809,7 +1809,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(2, 0, \tau)^2\mathrm{JacobiTheta}(3, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(2, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`cb493d` · Fungrim entry ↗](https://fungrim.org/entry/cb493d)
 
 ---
@@ -1873,7 +1873,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, z, \tau+2n)=\imaginaryI^{n}\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land n\in\Z$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`d11b7f` · Fungrim entry ↗](https://fungrim.org/entry/d11b7f)
 
 ---
@@ -1904,7 +1904,7 @@ Used by the Compute Engine for simplification.
 $$z\mapsto\frac{\mathrm{JacobiTheta}(1, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)}^{\prime}(z)=\frac{\pi\mathrm{JacobiTheta}(3, 0, \tau)^2\mathrm{JacobiTheta}(2, z, \tau)\mathrm{JacobiTheta}(4, z, \tau)}{\mathrm{JacobiTheta}(3, z, \tau)^2}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`d41a95` · Fungrim entry ↗](https://fungrim.org/entry/d41a95)
 
 ---
@@ -2032,7 +2032,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, 2z, \tau)=\frac{\mathrm{JacobiTheta}(3, z, \tau)^4-\mathrm{JacobiTheta}(4, z, \tau)^4}{\mathrm{JacobiTheta}(2, 0, \tau)^3}$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`e6dc09` · Fungrim entry ↗](https://fungrim.org/entry/e6dc09)
 
 ---
@@ -2168,7 +2168,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{JacobiTheta}(2, -z, \tau)=\mathrm{JacobiTheta}(2, z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`fb55cb` · Fungrim entry ↗](https://fungrim.org/entry/fb55cb)
 
 ---
@@ -2235,7 +2235,7 @@ $$\tau\mapsto\mathrm{ModularJ}(\tau)^{\prime}(\tau)=\frac{-2\pi\imaginaryI\mathr
 
 **Holds when** $\Im(\tau)\gt0\land\mathrm{EisensteinE}(4, \tau)\ne0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`348b26` · Fungrim entry ↗](https://fungrim.org/entry/348b26)
 
 ---
@@ -2278,7 +2278,7 @@ $$\mathrm{ModularJ}(\tau)={(\frac{\mathrm{DedekindEta}(\tau)}{\mathrm{DedekindEt
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`664b4c` · Fungrim entry ↗](https://fungrim.org/entry/664b4c)
 
 ---
@@ -2345,12 +2345,12 @@ $$\mathrm{ModularJ}(\tau)=\frac{\mathrm{EisensteinE}(4, \tau)^3}{\mathrm{Dedekin
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularJ** — Modular j-invariant.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`dc8251` · Fungrim entry ↗](https://fungrim.org/entry/dc8251)
 
 ---
 
-$$\mathrm{Map}(\mathrm{ModularGroupFundamentalDomain}, \tau\mapsto\mathrm{ModularJ}(\tau))=\C$$
+$$\mathrm{Map}(\tau\mapsto\mathrm{ModularJ}(\tau), \mathrm{ModularGroupFundamentalDomain})=\C$$
 
 **Symbols:** **ModularGroupFundamentalDomain** — Fundamental domain for action of the modular group; **ModularJ** — Modular j-invariant.
 Used by the Compute Engine for simplification.
@@ -2465,7 +2465,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\Re(\tau)=-1), \tau\mapsto\mathrm{ModularLambda}(\tau))=\rbrack-\infty, 0\lbrack$$
+$$\mathrm{Map}(\tau\mapsto\mathrm{ModularLambda}(\tau), \mathrm{Filter}(\mathrm{HH}, \tau\mapsto\Re(\tau)=-1))=\rbrack-\infty, 0\lbrack$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.
@@ -2478,7 +2478,7 @@ $$\mathrm{ModularLambda}(\tau)=\frac{\mathrm{JacobiTheta}(2, 0, \tau)^4}{\mathrm
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`5b9c02` · Fungrim entry ↗](https://fungrim.org/entry/5b9c02)
 
 ---
@@ -2510,7 +2510,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\mathrm{Interior}(\mathrm{ModularLambdaFundamentalDomain}), \tau\mapsto\mathrm{ModularLambda}(\tau))=\C\setminus(\lparen-\infty, 0\rbrack\cup\lbrack1, \infty\rparen)$$
+$$\mathrm{Map}(\tau\mapsto\mathrm{ModularLambda}(\tau), \mathrm{Interior}(\mathrm{ModularLambdaFundamentalDomain}))=\C\setminus(\lparen-\infty, 0\rbrack\cup\lbrack1, \infty\rparen)$$
 
 **Symbols:** **ModularLambda** — Modular lambda function; **ModularLambdaFundamentalDomain** — Fundamental domain of the modular lambda function.
 Used by the Compute Engine for simplification.
@@ -2523,12 +2523,12 @@ $$\frac{\mathrm{ModularLambda}(\tau)}{\mathrm{ModularLambda}(\tau)-1}=-(\frac{\m
 
 **Holds when** $\Im(\tau)\gt0$.
 **Symbols:** **ModularLambda** — Modular lambda function.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`903962` · Fungrim entry ↗](https://fungrim.org/entry/903962)
 
 ---
 
-$$\mathrm{Map}(\mathrm{HH}, \tau\mapsto\mathrm{ModularLambda}(\tau))=\mathrm{Map}(\mathrm{ModularLambdaFundamentalDomain}, \tau\mapsto\mathrm{ModularLambda}(\tau))=\C\setminus\lbrace0, 1\rbrace$$
+$$\mathrm{Map}(\tau\mapsto\mathrm{ModularLambda}(\tau), \mathrm{HH})=\mathrm{Map}(\tau\mapsto\mathrm{ModularLambda}(\tau), \mathrm{ModularLambdaFundamentalDomain})=\C\setminus\lbrace0, 1\rbrace$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function; **ModularLambdaFundamentalDomain** — Fundamental domain of the modular lambda function.
 Used by the Compute Engine for simplification.
@@ -2570,7 +2570,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Map}(\mathrm{Filter}(\mathrm{HH}, \tau\mapsto\vert\tau+1/2\vert=1/2), \tau\mapsto\mathrm{ModularLambda}(\tau))=\rbrack1, \infty\lbrack$$
+$$\mathrm{Map}(\tau\mapsto\mathrm{ModularLambda}(\tau), \mathrm{Filter}(\mathrm{HH}, \tau\mapsto\vert\tau+1/2\vert=1/2))=\rbrack1, \infty\lbrack$$
 
 **Symbols:** **HH** — Upper complex half-plane; **ModularLambda** — Modular lambda function.
 Used by the Compute Engine for simplification.

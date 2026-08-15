@@ -137,7 +137,7 @@ assignments to unrelated symbols, so an animation loop updating one variable
 does not force unrelated collections to recompute.
 
 One consequence for random-valued elements: a collection whose elements draw
-random values (`["Map", xs, ["Function", ["Random"], "x"]]`) draws **once
+random values (`["Map", ["Function", ["Random"], "x"], xs]`) draws **once
 per instance** — every reader of that instance sees the same values, like a
 list. A re-created instance draws fresh values. See the
 [`WithRandomSeed`](/compute-engine/reference/arithmetic/#withrandomseed)
@@ -198,7 +198,7 @@ or `expr.print()` methods. A placeholder is inserted to indicate missing
 elements.
 
 ```js example
-const expr = ce.expr(["Map", ["Range", 1, "Infinity"], ["Square", "_"]]);
+const expr = ce.expr(["Map", ["Square", "_"], ["Range", 1, "Infinity"]]);
 expr.print();
 // ➔ [1,4,9,16,25,...]
 ```
@@ -325,7 +325,7 @@ unknowns become its parameters. The two are equivalent:
 A bare `"_"` is the **identity function** — the shorthand of the shorthand:
 
 ```json example
-["Map", ["List", 1, 2, 3], "_"]
+["Map", "_", ["List", 1, 2, 3]]
 // ➔ ["List", 1, 2, 3]
 
 ["ChunkBy", ["List", 1, 1, 2, 2, 3], "_"]
@@ -397,6 +397,23 @@ a list may be repeated.
 
 The type of a list is `list<T>`, where `T` is the type of the elements in the list.
 The type `list` is a shorthand for `list<any>`, meaning the list can contain elements of any type.
+
+A `["Spread", xs]` element splices the elements of the collection `xs` into
+the list (in Epsil, `[...xs, c]`). The splice happens at canonicalization
+with `Join`'s semantics: a literal list splices immediately, a symbolic or
+lazy operand lowers to the equivalent `Join` expression (a lone spread
+`["List", ["Spread", "xs"]]` is `["Join", "xs"]`), and an infinite operand
+stays lazy. A **tuple** does not spread — tuples are units; use `ListFrom`
+to convert one explicitly — so a provably-tuple operand is a `spread-tuple`
+error, and a scalar or string operand is an `incompatible-type` error.
+`Set` literals accept `Spread` elements the same way (deduplicating), and a
+`Dictionary` literal merges spread dictionaries with later entries winning
+on key collisions.
+
+```json example
+["List", ["Spread", ["List", 1, 2]], 3]
+// ➔ ["List", 1, 2, 3]
+```
 
 The visual presentation of a `List` expression can be customized using the
 `Delimiter` function.
@@ -487,6 +504,17 @@ returned in an arbitrary order, and two successive enumerations may return the
 elements in a different order.
 
 The elements in a set are counted in constant time.
+
+A `["Spread", xs]` element splices the elements of the collection `xs` into
+the set, deduplicating as usual (in Epsil, `{1, ...s}`). The same rules as
+for a [`List` spread](#list) apply: tuples do not spread (a `spread-tuple`
+error; use `ListFrom` to convert), and a scalar or string operand is an
+`incompatible-type` error.
+
+```json example
+["Set", 1, ["Spread", ["List", 2, 2, 3]]]
+// ➔ ["Set", 1, 2, 3]
+```
 
 </FunctionDefinition>
 
@@ -2051,32 +2079,32 @@ collection. Only the elements for which the predicate returns `"True"` are kept.
 
 <FunctionDefinition name="Map">
 
-<Signature name="Map" returns="collection">_xs_:collection, _f_:function</Signature>
+<Signature name="Map" returns="collection">_f_:function, ..._xss_:collection</Signature>
 
-<Signature name="Map" returns="collection">..._xss_:collection, _f_:function</Signature>
-
-Returns a collection where _f_ is applied to each element of _xs_.
+Returns a collection where _f_ is applied to each element of _xs_. The
+mapping function is the **first** argument, followed by one or more source
+collections.
 
 ```json example
-["Map", ["List", 5, 2, 10, 18], ["Function", ["Add", "x", 1], "x"]]
+["Map", ["Function", ["Add", "x", 1], "x"], ["List", 5, 2, 10, 18]]
 // ➔ ["List", 6, 3, 11, 19]
 ```
 
 ```json example
-["Map", ["List", 5, 2, 10, 18], ["Multiply", "_", 2]]
+["Map", ["Multiply", "_", 2], ["List", 5, 2, 10, 18]]
 // ➔ ["List", 10, 4, 20, 36]
 ```
 
-`Map` is **variadic**: when several collections are given, _f_ is applied
-element-wise across them (a `zipWith`). The function is always the **last**
-argument, and it receives one element from each collection. The result has the
-length of the **shortest** input collection.
+`Map` is **variadic** over its sources: when several collections are given,
+_f_ is applied element-wise across them (a `zipWith`), receiving one element
+from each collection. The result has the length of the **shortest** input
+collection.
 
 ```json example
 ["Map",
+  ["Function", ["Add", "x", "y"], "x", "y"],
   ["List", 1, 2, 3],
-  ["List", 10, 20, 30],
-  ["Function", ["Add", "x", "y"], "x", "y"]]
+  ["List", 10, 20, 30]]
 // ➔ ["List", 11, 22, 33]
 ```
 
@@ -2134,7 +2162,7 @@ collects the results into a `List`.
 ```
 
 `Comprehension(body, Element(x, xs))` is equivalent to
-`Map(xs, x ↦ body)`. `Comprehension` additionally supports multiple,
+`Map(x ↦ body, xs)`. `Comprehension` additionally supports multiple,
 possibly dependent, clauses.
 
 Bindings are evaluated as nested loops, outermost = first `Element` clause.
@@ -2662,6 +2690,21 @@ a string.
 
 ["DictionaryFrom", ["List", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]]
 // ➔ ["Dictionary", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]
+```
+
+When the collection contains several pairs with the same key, the **last**
+one wins. This is what makes `DictionaryFrom` the engine of the dictionary
+**merge**: a `Dictionary` literal with `["Spread", d]` entries (in Epsil,
+`{...defaults, "verbose" -> True}`, or `{->, ...d1, ...d2}` for a pure
+merge) lowers to `DictionaryFrom` over the concatenated entries, so a later
+entry — literal or spread — overrides an earlier one. (Duplicate *literal*
+keys written side by side in one literal are treated as typos instead:
+first wins, with a diagnostic.)
+
+```json example
+["DictionaryFrom",
+  ["List", ["Tuple", "'a'", 1], ["Tuple", "'a'", 9], ["Tuple", "'b'", 2]]]
+// ➔ ["Dictionary", ["Tuple", "'a'", 9], ["Tuple", "'b'", 2]]
 ```
 
 </FunctionDefinition>

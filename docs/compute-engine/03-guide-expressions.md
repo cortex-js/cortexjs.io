@@ -324,7 +324,7 @@ ce.box(["Assign", "q", 1]).effects;              // ➔ ["scope"]
 ce.assign("rf", ce.box(["Function", ["Random"], "x"]));
 ce.box("rf").effects;                            // ➔ undefined (producing)
 ce.box("rf").type.effects;                       // ➔ ["random"] (invoking)
-ce.box(["Map", ["List", 1, 2], "rf"]).effects;   // ➔ ["random"]
+ce.box(["Map", "rf", ["List", 1, 2]]).effects;   // ➔ ["random"]
 ```
 
 ### Purity Is Computed, Not Looked Up
@@ -350,7 +350,7 @@ bindings. Four consequences are worth knowing:
   is pure — building the function draws nothing. The effect lives on its type,
   `(unknown) random -> number`, and fires when the function is applied.
 
-- **Callbacks are resolved through their bindings.** `Map(xs, f)` is pure
+- **Callbacks are resolved through their bindings.** `Map(f, xs)` is pure
   exactly when `f` is. If `f` is currently bound to a drawing function, the
   whole expression is impure; reassign `f` to a pure function and it becomes
   pure.
@@ -361,10 +361,10 @@ ce.box(["WithRandomSeed", 42, ["Random"]]).isPure;    // ➔ true
 ce.box(["Function", ["Random"], "x"]).isPure;         // ➔ true
 
 ce.assign("f", ce.box(["Function", ["Random"], "x"]));
-ce.box(["Map", ["List", 1, 2, 3], "f"]).isPure;       // ➔ false
+ce.box(["Map", "f", ["List", 1, 2, 3]]).isPure;       // ➔ false
 
 ce.assign("f", ce.box(["Function", ["Multiply", "x", 2], "x"]));
-ce.box(["Map", ["List", 1, 2, 3], "f"]).isPure;       // ➔ true
+ce.box(["Map", "f", ["List", 1, 2, 3]]).isPure;       // ➔ true
 ```
 
 ## Checking the Kind of Expression

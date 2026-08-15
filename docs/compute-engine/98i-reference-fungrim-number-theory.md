@@ -190,7 +190,7 @@ Used by the Compute Engine for simplification.
 $$\gcd(a, 2)=1+\frac{1+(-1)^{a}}{2}$$
 
 **Holds when** $a\in\Z$.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`5fb5e2` · Fungrim entry ↗](https://fungrim.org/entry/5fb5e2)
 
 ---
@@ -510,7 +510,7 @@ Used by the Compute Engine for simplification.
 $$\mathrm{Totient}(-n)=\mathrm{Totient}(n)$$
 
 **Holds when** $n\in\Z$.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`11a56b` · Fungrim entry ↗](https://fungrim.org/entry/11a56b)
 
 ---

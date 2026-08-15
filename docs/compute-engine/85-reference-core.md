@@ -102,9 +102,15 @@ since it changes the state of the Compute Engine.
 
 <Signature name="DeclareType">_name_, _type_, _attributes_</Signature>
 
-Declare a new type in the current scope — the MathJSON mirror of the
-`ce.declareType()` API. The _name_ is a symbol (or string) naming the type;
-the _type_ operand is a string holding a type expression.
+Declare a new type — the MathJSON mirror of the `ce.declareType()` API. The
+_name_ is a symbol (or string) naming the type; the _type_ operand is a
+string holding a type expression.
+
+Types are **engine-global**: the declaration registers the type for the whole
+engine (types are not lexically scoped — a type name means the same thing
+everywhere). Consequently a `DeclareType` is only valid at the **top level**
+of a program: inside a `["Block"]` or a function body it reports an error
+value and declares nothing.
 
 By default the declared type is **nominal**: only a value whose type is the
 named type itself is compatible. An optional trailing _attributes_ dictionary
@@ -118,7 +124,7 @@ any value whose type matches the definition is compatible.
 ```
 
 The declaration also declares a **value constructor** — an operator of the
-same name, in the same scope, which is what makes a nominal type inhabitable:
+same name, which is what makes a nominal type inhabitable:
 
 ```json example
 ["DeclareType", "point", "'tuple<x: number, y: number>'"]
@@ -141,14 +147,14 @@ instead — `["pair", 1, 2]` validates `(1, 2)` against the definition and
 evaluates to that plain tuple.
 
 Because the declaration claims both the type name and the value name, it is
-**atomic**: if the current scope already has a value or operator of that
-name, nothing is registered and an error value is returned. (A name in an
-outer scope is shadowed, not conflicted.) The host API's `mint` option has no
+**atomic**: if the global scope already has a value or operator of that
+name, nothing is registered and an error value is returned. (A system
+builtin is shadowed, not conflicted.) The host API's `mint` option has no
 `attributes` equivalent: a declaration through this operator always declares
 a constructor.
 
 Evaluates to `Nothing`. The declaration takes effect at canonicalization time,
-so later statements of the same `["Block"]` can use the type in their own
+so later statements of the same program can use the type in their own
 annotations. A `DeclareType` for a name that an earlier `DeclareType`
 statement declared **replaces** that definition — constructor included — so
 re-running a program on the same engine works; a name declared any other way

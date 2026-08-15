@@ -187,7 +187,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{AGM}(a, b)=\frac{a+b}{2\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, (a-b)/(a+b)^2)}$$
+$$\mathrm{AGM}(a, b)=\frac{a+b}{2\mathrm{Hypergeometric2F1}(\frac{1}{2}, \frac{1}{2}, 1, (a-b)/(a+b)^2)}$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
@@ -272,7 +272,7 @@ $$\mathrm{CarlsonRG}(-x, -y, -z)=\imaginaryI\mathrm{CarlsonRG}(x, y, z)$$
 
 **Holds when** $x\in\lbrack0, \infty\rparen\land y\in\lbrack0, \infty\rparen\land z\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`092716` · Fungrim entry ↗](https://fungrim.org/entry/092716)
 
 ---
@@ -356,11 +356,11 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(1, 1+y)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, -y)$$
+$$\mathrm{CarlsonRC}(1, 1+y)=\mathrm{Hypergeometric2F1}(1, \frac{1}{2}, \frac{3}{2}, -y)$$
 
 **Holds when** $y\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`157ebb` · Fungrim entry ↗](https://fungrim.org/entry/157ebb)
 
 ---
@@ -856,7 +856,7 @@ $$\mathrm{CarlsonRF}(-x, -y, -z)=-(\imaginaryI\mathrm{CarlsonRF}(x, y, z))$$
 
 **Holds when** $x\in\lbrack0, \infty\rparen\land y\in\lbrack0, \infty\rparen\land z\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`5ab6bf` · Fungrim entry ↗](https://fungrim.org/entry/5ab6bf)
 
 ---
@@ -1014,7 +1014,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(1, x)=\mathrm{Hypergeometric2F_1}(1, \frac{1}{2}, \frac{3}{2}, 1-x)$$
+$$\mathrm{CarlsonRC}(1, x)=\mathrm{Hypergeometric2F1}(1, \frac{1}{2}, \frac{3}{2}, 1-x)$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -1255,7 +1255,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, x, 1)=\frac{1}{4}(3\pi\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{3}{2}, 2, 1-x))$$
+$$\mathrm{CarlsonRD}(0, x, 1)=\frac{1}{4}(3\pi\mathrm{Hypergeometric2F1}(\frac{1}{2}, \frac{3}{2}, 2, 1-x))$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1382,7 +1382,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(0, x, 1)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, 1-x))$$
+$$\mathrm{CarlsonRF}(0, x, 1)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F1}(\frac{1}{2}, \frac{1}{2}, 1, 1-x))$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -1425,7 +1425,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 1, x)=\frac{3\pi\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 2, 1-x)}{4x}$$
+$$\mathrm{CarlsonRD}(0, 1, x)=\frac{3\pi\mathrm{Hypergeometric2F1}(\frac{1}{2}, \frac{1}{2}, 2, 1-x)}{4x}$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1669,7 +1669,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, 1-x))$$
+$$\mathrm{CarlsonRG}(0, x, 1)=\frac{1}{4}(\pi\mathrm{Hypergeometric2F1}(-(1/2), \frac{1}{2}, 1, 1-x))$$
 
 **Holds when** $x\in\C$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -1766,7 +1766,7 @@ $$\mathrm{CarlsonRD}(-x, -y, -z)=\imaginaryI\mathrm{CarlsonRD}(x, y, z)$$
 
 **Holds when** $x\in\lparen0, \infty\rbrack\land y\in\lparen0, \infty\rbrack\land z\in\lparen0, \infty\rbrack$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`f68409` · Fungrim entry ↗](https://fungrim.org/entry/f68409)
 
 ---
@@ -1872,7 +1872,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{1}{2}, 1, m))$$
+$$\mathrm{EllipticE}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F1}(-(1/2), \frac{1}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
 Used by the Compute Engine for simplification.
@@ -1947,7 +1947,7 @@ $$\mathrm{IncompleteEllipticE}(\frac{-\pi}{2}, m)=-\mathrm{EllipticE}(m)$$
 
 **Holds when** $m\in\C$.
 **Symbols:** **IncompleteEllipticE** — Legendre incomplete elliptic integral of the second kind.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`2ef763` · Fungrim entry ↗](https://fungrim.org/entry/2ef763)
 
 ---
@@ -2102,7 +2102,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(-(1/2), \frac{3}{2}, 1, m))$$
+$$2\mathrm{EllipticE}(m)-\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F1}(-(1/2), \frac{3}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
 Used by the Compute Engine for simplification.
@@ -2114,7 +2114,7 @@ $$\mathrm{IncompleteEllipticF}(\frac{-\pi}{2}, m)=-\mathrm{EllipticK}(m)$$
 
 **Holds when** $m\in\C$.
 **Symbols:** **IncompleteEllipticF** — Legendre incomplete elliptic integral of the first kind.
-Used by the Compute Engine for expansion.
+Used by the Compute Engine for simplification.
 [`81f7db` · Fungrim entry ↗](https://fungrim.org/entry/81f7db)
 
 ---
@@ -2265,7 +2265,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F_1}(\frac{1}{2}, \frac{1}{2}, 1, m))$$
+$$\mathrm{EllipticK}(m)=\frac{1}{2}(\pi\mathrm{Hypergeometric2F1}(\frac{1}{2}, \frac{1}{2}, 1, m))$$
 
 **Holds when** $m\in\C$.
 Used by the Compute Engine for simplification.
@@ -2478,7 +2478,7 @@ $$\mathrm{WeierstrassP}(-z, \tau)=\mathrm{WeierstrassP}(z, \tau)$$
 
 **Holds when** $z\in\C\land\Im(\tau)\gt0\land z\notin\mathrm{Lattice}(1, \tau)$.
 **Symbols:** **WeierstrassP** — Weierstrass elliptic function.
-Used by the Compute Engine for simplification.
+Used by the Compute Engine for expansion.
 [`12a9e8` · Fungrim entry ↗](https://fungrim.org/entry/12a9e8)
 
 ---

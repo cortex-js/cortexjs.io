@@ -10,8 +10,7 @@ date: Last Modified
 # Epsil
 
 <Intro>
-Epsil is a programming language for scientific computing, built on the
-Compute Engine.
+A programming language for scientific computing.
 </Intro>
 
 :::warning[Experimental]

@@ -52,7 +52,7 @@ body:
   expression — a local `let`, a `match`, a loop. It is also the only form that
   carries a name *and* a multi-statement body.
 - **Anonymous** (`x |-> …`) when the function is an argument to another
-  function and a name would add nothing: `Map(xs, x |-> x^2)`.
+  function and a name would add nothing: `Map(x |-> x^2, xs)`.
 
 An anonymous function can have a multi-statement body too, by making that body
 a [`do` block](#do-block-expressions) — but at that point a named `function` is
@@ -67,9 +67,9 @@ sits after the parameter list and before the return arrow:
 function roll(n) random -> integer { Random(n) }
 ```
 
-The nine effect labels are `console`, `entropy`, `environment`, `fs_read`,
-`fs_write`, `network`, `random`, `scope`, and `time`. Several labels may be
-listed with spaces. `pure` explicitly promises no effects; `any` means the
+The ten effect labels are `console`, `entropy`, `environment`, `fs_read`,
+`fs_write`, `network`, `random`, `scope`, `state`, and `time`. Several
+labels may be listed with spaces. `pure` explicitly promises no effects; `any` means the
 effects are unknown. `pure` and `any` must appear alone.
 
 Without a specifier, effects are inferred from the body and may change when
@@ -279,6 +279,21 @@ structurally, and `_` is the anonymous wildcard, matching anything — with a
 symbolic (unbound) `x` as the subject above, `match` selects the `_` case: `x`
 is structurally not `0`, even though it *could* be zero semantically. Use
 `if`/`Which` when you want that kind of semantic case-split instead.
+
+The final catch-all may also be spelled `otherwise`, a synonym for a bare
+`_` pattern (it takes a guard the same way, and binds nothing):
+
+```epsil
+match x {
+  0 => "zero"
+  otherwise => "other"
+}
+```
+
+`otherwise` is contextual, not reserved: it means the wildcard only when it
+is the entire pattern of a case. Anywhere else — including inside a
+structured pattern like `[otherwise, 2]` — it is an ordinary identifier, and
+a bare identifier in a nested pattern position *binds* (next section).
 
 ### Bindings
 
@@ -620,7 +635,7 @@ Nested calls:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-Mean(Map(Filter(scores, s |-> s >= 60), s |-> s + 5))
+Mean(Map(s |-> s + 5, Filter(scores, s |-> s >= 60)))
 // ➔ 337/4
 ```
 
@@ -629,7 +644,7 @@ Named intermediates:
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
 let passing = Filter(scores, s |-> s >= 60)
-let curved = Map(passing, s |-> s + 5)
+let curved = Map(s |-> s + 5, passing)
 Mean(curved)
 // ➔ 337/4
 ```
@@ -638,7 +653,7 @@ A pipeline:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-scores |> Filter(_, s |-> s >= 60) |> Map(_, s |-> s + 5) |> Mean
+scores |> Filter(_, s |-> s >= 60) |> Map(s |-> s + 5, _) |> Mean
 // ➔ 337/4
 ```
 
@@ -667,18 +682,25 @@ argument:
 // ➔ [1, 2]
 ```
 
-:::warning[The one trap]
-`xs |> Map(f)` does **not** partially apply `Map`. It pipes `xs` into the
-one-argument call `Map(f)`, which is not a computation Epsil knows how to
-perform — so the result is a symbolic `Map` expression, with no error to
-warn you. Whenever a stage is a call, write the `_`.
+The `_` may be left out entirely: a call that is missing required arguments
+receives the piped value in the first slot its type fits — first for a
+collection piped into `Take(3)`, second for one piped into the
+callback-first `Map(f)` — so these are the same pipeline:
 
 ```epsil
-[1, 2, 3] |> Map(_, n |-> n^2)      // ✅ [1, 4, 9]
-[1, 2, 3] |> Map(n |-> n^2)         // ❌ stays symbolic
+[1, 2, 3] |> Map(n |-> n^2, _)      // [1, 4, 9]
+[1, 2, 3] |> Map(n |-> n^2)         // [1, 4, 9] — implicit argument
 ```
 
-:::
+The implicit argument only fills a hole. A call that is already complete is
+never rewritten: `xs |> f(y)` applies the *value* of `f(y)` to `xs`, exactly
+as if the pipe were not there.
+
+A one-parameter **lambda** stage over a collection is applied to each
+element (an implicit `Map`), so the pipeline above can shed its `Map`
+entirely — `[1, 2, 3] |> n |-> n^2` and `[1, 2, 3] |> _^2` also produce
+`[1, 4, 9]`. See [the pipe operator](/operators/#pipe) for the exact
+rules.
 
 ### Choosing between a pipeline and a nested call
 

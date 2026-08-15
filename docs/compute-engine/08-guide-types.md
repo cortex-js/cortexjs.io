@@ -105,10 +105,25 @@ non-finite distinction for the numeric types.
 This hierarchy allows the Compute Engine to reason about compatibility and subtyping relationships between expressions.
 
 The `unknown` type is a placeholder for an expression whose type has not yet 
-been determined, typically during type inference or partial evaluation. It is 
-compatible with all types, and all types are compatible with it. It serves as 
-a wildcard in type matching and can be replaced or refined as more information 
-becomes available.
+been determined, typically during type inference or partial evaluation. It can 
+be replaced or refined as more information becomes available. In particular, 
+an `unknown` parameter or result slot in a declared function signature does 
+not constrain a later definition: the definition's inferred type refines the 
+placeholder, so declaring `(unknown) -> unknown` behaves like declaring no 
+signature at all.
+
+Two caveats bound the wildcard:
+
+- The absence types `nothing` and `missing` (and the `error` and `never` 
+  types) are **not** compatible with `unknown`. Absence is opt-in: a slot 
+  whose type has not yet been determined does not silently accept an absence 
+  marker — admit it explicitly with a union such as `number | missing`, or 
+  use `any`.
+- `unknown` is a placeholder, not a promise. Contrast it with `any`, which is 
+  a **contract**: `(any) -> any` — the signature of the identity function — 
+  promises a function that accepts every value, and a definition that cannot 
+  honor that promise is rejected. Use `unknown` when the type is simply not 
+  known yet; use `any` when you mean to accept everything.
 
 <div style={{visibility:"hidden"}}>
 <a href="#naming-constraints-for-elements-and-arguments" id="naming-constraints-for-elements-and-arguments"></a>
@@ -158,7 +173,7 @@ The Compute Engine supports the following primitive types:
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
 | `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value |
 | `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
-| `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown` |
+| `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown`, except the absence types `nothing` and `missing` (and `error`): absence is opt-in and must be admitted explicitly (e.g. `number \| missing`) |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
 | `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
@@ -717,7 +732,7 @@ typed `any` fails every bound — a function that will not state its effects
 cannot prove their absence.
 
 The `function` primitive is the escape hatch: it is effect-top, so it accepts
-any callable whatever its effects. That is why `Map(xs, x |-> Random())` is
+any callable whatever its effects. That is why `Map(x |-> Random(), xs)` is
 accepted; the effect is not rejected, it is simply carried onto the
 application.
 
@@ -881,34 +896,38 @@ of a tuple returns those components in the other order, whatever they are. A
 **generic signature** states such a relation between the argument types and
 the result type directly, instead of giving up and returning `unknown`.
 
-A generic signature is a function signature prefixed by a **quantifier
-clause**: the keyword `forall`, a comma-separated list of **type variables**,
-and a dot.
+A generic signature is a function signature followed by a **quantifier
+clause**: the keyword `where`, then a comma-separated list of **type
+variables**. The clause always comes last, after the effect specifier and the
+return type.
 
 ```js
-ce.type("forall T. (T) -> T");                              // identity
-ce.type("forall T, U. (tuple<T, U>) -> tuple<U, T>");       // swap
-ce.type("forall T: indexed_collection. (T) -> T");          // reverse
-ce.type("forall T, U. (list<T>, (T) any -> U) -> list<U>"); // map
+ce.type("(T) -> T where T");                              // identity
+ce.type("(tuple<T, U>) -> tuple<U, T> where T, U");       // swap
+ce.type("(T) -> T where T: indexed_collection");          // reverse
+ce.type("(list<T>, (T) any -> U) -> list<U> where T, U"); // map
 ```
 
 Any identifier can be a type variable — there is no naming convention — and a
 variable is only a variable because the clause declares it. The names are the
-author's and they round-trip: `forall Elem. (list<Elem>) -> Elem` serializes
+author's and they round-trip: `(list<Elem>) -> Elem where Elem` serializes
 back with `Elem`, not with a canonical letter.
 
 ```js
-ce.type("forall Elem. (list<Elem>) -> Elem").toString();
-// ➔ "forall Elem. (list<Elem>) -> Elem"
+ce.type("(list<Elem>) -> Elem where Elem").toString();
+// ➔ "(list<Elem>) -> Elem where Elem"
 ```
 
-The dot terminates the clause. It is load-bearing: a bound is a type, and
-types extend as far right as they can, so without the dot
-`forall T: (real) -> real (T) -> boolean` could not be read.
+Because the clause is last, nothing has to terminate it — a bound is a type,
+and types extend as far right as they can, which is exactly what the final
+position allows: `(T, x: real) -> boolean where T: (real) -> real` reads
+without punctuation. A comma starts the *next* variable, and each variable
+carries its own bound, so `where T, U: number` binds `T` unbounded and
+`U: number` — not both to `number`.
 
 Within a signature, every occurrence of a quantified name is the *same*
 variable, including inside a nested signature: in
-`forall T, U. (list<T>, (T) any -> U) -> list<U>` the callback's parameter
+`(list<T>, (T) any -> U) -> list<U> where T, U` the callback's parameter
 type is the list's element type. Note the `any` in the callback's effect slot
 — a bare arrow demands a **pure** callback (see
 [Effects and Subtyping](#effects-and-subtyping)), so an operator that accepts
@@ -917,17 +936,52 @@ arbitrary callbacks must write the effect-top form.
 A variable may appear in an argument or result position, in the element
 position of a constructed type (`list<T>`, `tuple<T, U>`, `set<T>`,
 `collection<T>`, `dictionary<T>`, `broadcastable<T>`, a vector or matrix
-element, a record field), and inside a nested signature. It may **not** appear
-in a union, an intersection or a negation:
+element, a record field), inside a nested signature, and in **one arm of a
+union**:
 
 ```js
-ce.type("forall T. (T | string) -> T");
-// ➔ throws: unsupported-variable-position: The type variable `T` cannot
-//   appear in a union, an intersection, a negation or a bound
+ce.type("(T | missing) -> list<T> where T"); // an optional argument
+ce.type("(list<T> | string) -> T where T");
 ```
 
-`forall` is a reserved word in type strings: `ce.declareType("forall", …)` is
+At a call, an argument matched against a union parameter takes exactly one
+arm. If it takes the **ground** arm, the argument says nothing about the
+variable, and the variable is solved to `never` — the narrowest member of the
+family — unless another argument constrains it. If it takes the **open** arm,
+that arm is matched as usual, refutation included: a `set<integer>` is not a
+`list<T> | string`.
+
+Only **one** arm of a union may mention a variable. With two open arms nothing
+at the call site says which arm a value took, so neither variable could be
+solved:
+
+```js
+ce.type("(T | U) -> tuple<T, U> where T, U");
+// ➔ throws: unsupported-variable-position: At most one arm of a union can
+//   refer to a type variable, but `T | U` has 2. Nothing at a call site says
+//   which arm a value took, so neither variable could be solved
+```
+
+A variable may **not** appear in an intersection or a negation. An
+intersection is usually a constraint written in the wrong place: constrain a
+variable with a **bound** in the clause instead.
+
+```js
+ce.type("(T & number) -> T where T");
+// ➔ throws: unsupported-variable-position: The type variable `T` cannot
+//   appear in an intersection. To constrain a type variable, declare a bound
+//   on it instead: `where T: number`
+
+ce.type("(T) -> T where T: number"); // …what that author meant
+```
+
+`where` is a reserved word in type strings: `ce.declareType("where", …)` is
 a `reserved-type-name` error.
+
+The prefix spelling `forall T. (T) -> T` was removed in favor of the trailing
+clause. A leftover prefix clause is reported with a migration message naming
+the replacement rather than a generic syntax error, and `forall` itself is now
+an ordinary, declarable type name.
 
 A **type alias** can be parameterized the same way — see
 [Generic Type Aliases](#generic-type-aliases).
@@ -941,7 +995,7 @@ solution into the result type, so the type of an application is always
 
 ```js
 ce.declare("first", {
-  signature: "forall T. (indexed_collection<T>) -> T",
+  signature: "(indexed_collection<T>) -> T where T",
   evaluate: ([xs]) => xs.at(1),
 });
 
@@ -957,7 +1011,7 @@ operands:
 ```js
 ce.declare("n", "integer");
 ce.declare("r", "real");
-ce.declare("pick", { signature: "forall T. (T, T) -> T" });
+ce.declare("pick", { signature: "(T, T) -> T where T" });
 
 ce.box(["pick", "n", "n"]).type; // ➔ "integer"
 ce.box(["pick", "n", "r"]).type; // ➔ "real"
@@ -966,7 +1020,7 @@ ce.box(["pick", "n", "r"]).type; // ➔ "real"
 Variables in element positions are solved by matching the argument's structure:
 
 ```js
-ce.declare("swap", { signature: "forall T, U. (tuple<T, U>) -> tuple<U, T>" });
+ce.declare("swap", { signature: "(tuple<T, U>) -> tuple<U, T> where T, U" });
 
 ce.box(["swap", ["Tuple", 1, "'a'"]]).type;
 // ➔ "tuple<string, finite_integer>"
@@ -978,7 +1032,7 @@ type:
 
 ```js
 ce.declare("keep", {
-  signature: "forall T, U. (list<T>, (T) any -> U) -> list<U>",
+  signature: "(list<T>, (T) any -> U) -> list<U> where T, U",
 });
 
 ce.box(["keep", ["List", 1, 2, 3],
@@ -998,7 +1052,7 @@ binds the argument's type *verbatim* — so a bounded identity preserves the
 argument's kind and its dimensions:
 
 ```js
-ce.declare("rev", { signature: "forall T: indexed_collection. (T) -> T" });
+ce.declare("rev", { signature: "(T) -> T where T: indexed_collection" });
 
 ce.box(["rev", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]).type;
 // ➔ "matrix<finite_integer^(2x3)>"
@@ -1014,19 +1068,21 @@ ce.box(["rev", ["Set", 1, 2]]).toString();
 //      "set<finite_integer>")))
 ```
 
-An unbounded variable has an implicit bound of `any`. A bound must be a
-**ground** type: it cannot mention a variable, its own or another's.
+An unbounded variable has an implicit bound of `any`: `where T` is shorthand
+for `where T: any`, and an explicitly written `: any` is normalized away when
+the type is serialized. A bound must be a **ground** type: it cannot mention a
+variable, its own or another's.
 
 ```js
-ce.type("forall T, U: list<T>. (U) -> T");
+ce.type("(U) -> T where T, U: list<T>");
 // ➔ throws: unsupported-variable-position: The bound of the type variable
 //   `U` must be a ground type: `list<T>` refers to a type variable
 ```
 
 Several standard library operators are declared this way — `Identity` is
-`forall T. (T) -> T`, `Reverse` is
-`forall T: indexed_collection. (T) -> T`, `Inverse` is
-`forall T: matrix. (T) -> T` — so their results are typed from their
+`(T) -> T where T`, `Reverse` is
+`(T) -> T where T: indexed_collection`, `Inverse` is
+`(T) -> T where T: matrix` — so their results are typed from their
 arguments:
 
 ```js
@@ -1038,8 +1094,8 @@ broadcasts, a collection argument is admitted against a scalar parameter —
 the bound is checked against the scalar base, as it always was — and the
 variable binds the argument's **element** type; the call's ordinary broadcast
 wrap then puts the argument's shape back on the result. `Conjugate` and
-`Chop` are `forall T: number. (T) -> T`, `Remainder` is
-`forall T: number. (T, T) -> T`:
+`Chop` are `(T) -> T where T: number`, `Remainder` is
+`(T, T) -> T where T: number`:
 
 ```js
 ce.box(["Conjugate", ["List", 1, 2, 3]]).type;
@@ -1061,29 +1117,32 @@ Each arm of an [overload set](#overload-sets) carries its own clause, and each
 arm must be parenthesized:
 
 ```js
-ce.type("(forall T. (list<T>) -> T) & (forall T. (set<T>) -> boolean)");
+ce.type("((list<T>) -> T where T) & ((set<T>) -> boolean where T)");
 ```
 
-The two `T`s are unrelated: a clause quantifies exactly one arm. A single
-clause spread over the whole intersection is not accepted, and neither is a
-clause nested inside another signature — quantification is top-level (or
-arm-level) only.
+The parentheses are load-bearing. `where` binds looser than `&`, so an
+unparenthesized clause attaches to the **whole** intersection rather than to
+the arm on its left — and an intersection is not something a clause can
+quantify. The two `T`s in the parenthesized form are unrelated: a clause
+quantifies exactly one arm. A clause nested inside another signature is not
+accepted either — quantification is top-level (or arm-level) only.
 
 ```js
-ce.type("forall T. ((list<T>) -> T) & ((set<T>) -> boolean)");
-// ➔ throws: unsupported-variable-position: A `forall` clause can only be
-//   applied to a function signature
+ce.type("((list<T>) -> T) & ((set<T>) -> boolean) where T");
+// ➔ throws: unsupported-variable-position: A `where` clause can only quantify
+//   a function signature. To constrain one arm of an overload set,
+//   parenthesize it: `((list<T>) -> T where T) & …`
 
-ce.type("forall T. ((forall U. (U) -> U)) -> T");
-// ➔ throws: unsupported-variable-position: A `forall` clause can only
+ce.type("(x: ((U) -> U where U)) -> integer");
+// ➔ throws: unsupported-variable-position: A `where` clause can only
 //   quantify a top-level signature (or one arm of an overload set), not a
-//   nested one
+//   nested one. Parenthesize a nested clause: `((A) -> B where A, B)`
 ```
 
 ### Generic Declarations and Function Literals
 
 A generic signature can be implemented by an ordinary function body — a
-`["Function"]` literal, a `x |-> …` lambda, a Epsil `function` definition —
+`["Function"]` literal, a `x |-> …` lambda, an Epsil `function` definition —
 as long as the clause is stated on the *whole signature*. There are three
 spellings.
 
@@ -1100,23 +1159,40 @@ function tick<T>(x: T) random -> T { x }
 function h<T: (real) -> real>(k: T, x: real) -> real { k(x) }
 ```
 
-**A full-signature annotation** states the polytype where a type is expected
-and leaves the body a plain literal:
+A definition may state the same clause with a trailing `where` instead. The
+two spellings are synonyms — `function f<T>(…)` is `function f(…) where T` —
+and the clause always comes **last**, after the effect specifier and after the
+return type, in every definition form:
 
 ```plaintext
-const f: forall T. (x: T) -> T = x |-> x
+function f(x: T) -> T where T { x + x }            // block, annotated
+function f(x: T) where T { x + x }                 // block, return inferred
+function tick(x: T) random -> T where T { x }      // block, with effects
+f(x: T) -> T where T = x + x                       // math definition form
+```
+
+**One binding site per declaration.** A declaration may carry a `<…>` clause
+or a `where` clause, never both: `function f<T>(x: T) -> T where T: number` is
+an error, not a bounded `<T: number>`.
+
+**A full-signature annotation** states the polytype where a type is expected
+and leaves the body a plain literal. There is no binder slot here, so the
+`where` clause is the only spelling:
+
+```plaintext
+const f: (x: T) -> T where T = x |-> x
 ```
 
 ```js
-ce.box(["Function", ["Add", "x", "x"], "'forall T. (x: T) -> T'"]).type;
-// ➔ "forall T. (x: T) -> T"
+ce.box(["Function", ["Add", "x", "x"], "'(x: T) -> T where T'"]).type;
+// ➔ "(x: T) -> T where T"
 ```
 
 **Declare, then assign** — the form to use for a generic **recursive**
 function, since the body can only call the symbol once it is declared:
 
 ```js
-ce.declare("nest", "forall T. (x: T, n: integer) -> T");
+ce.declare("nest", "(x: T, n: integer) -> T where T");
 ce.assign("nest", ce.box(["Function",
   ["If", ["LessEqual", "n", 0], "x", ["nest", "x", ["Subtract", "n", 1]]],
   "x", "n"]));
@@ -1152,29 +1228,38 @@ actually returns a value of the argument's type — as with a
 type, it is not a run-time check:
 
 ```js
-ce.declare("f", "forall T. (x: T) -> T");
+ce.declare("f", "(x: T) -> T where T");
 ce.assign("f", ce.box(["Function", 0, "x"]));
 
 ce.box(["f", "'a'"]).type; // ➔ "string"
 ce.box(["f", "'a'"]).evaluate().toString(); // ➔ "0"
 ```
 
-**Reading a `forall` return annotation.** A polytype ascribed to the body of a
+**Reading a polytype return annotation.** A polytype ascribed to the body of a
 literal is always the literal's **own** signature — the same reading as an
 effect-bearing annotation (see [Typed Function Literals](#typed-function-literals)).
-To ascribe a *return type* that is itself a generic function, group it:
+An ungrouped signature is the contract; grouping it makes it an ordinary
+*return type* instead:
 
 ```js
-ce.box(["Function", ["Typed", body, "'forall T. (T) -> T'"], "x"]).type;
-// ➔ "forall T. (T) -> T"          (the literal is generic)
+ce.box(["Function", ["Typed", body, "'(x: number) -> number'"], "x"]).type;
+// ➔ "(unknown) -> number"                  (the marker IS the contract)
 
-ce.box(["Function", ["Typed", body, "'(forall T. (T) -> T)'"], "x"]).type;
-// ➔ "(unknown) -> forall T. (T) -> T"   (the literal RETURNS a generic function)
+ce.box(["Function", ["Typed", body, "'((x: number) -> number)'"], "x"]).type;
+// ➔ "(unknown) -> (x: number) -> number"   (it RETURNS a function)
 ```
 
-The same holds in Epsil: `function mk(x) -> forall T. (T) -> T { … }` defines
-a generic `mk`, while `function mk(x) -> (forall T. (T) -> T) { … }` defines a
-plain `mk` that returns one.
+That grouping escape is not available for a polytype: a literal cannot declare
+that it *returns* a generic function, only that it *is* one, so a grouped
+`where` clause in the body slot is a signature-marker error.
+
+```js
+ce.box(["Function", ["Typed", body, "'(T) -> T where T'"], "x"]).type;
+// ➔ "(T) -> T where T"          (the literal is generic)
+```
+
+The same holds in Epsil: `function mk(x) -> (T) -> T where T { … }` defines
+a generic `mk`.
 
 **Broadcasting.** A generic literal broadcasts like any other function whose
 parameters are scalar: a collection argument is mapped, down to the scalar
@@ -1183,7 +1268,7 @@ an *element* (see [Bounds](#bounds)), a result that mentions it is the
 per-element answer:
 
 ```js
-ce.declare("dup", "forall T. (x: T) -> tuple<T, T>");
+ce.declare("dup", "(x: T) -> tuple<T, T> where T");
 ce.assign("dup", ce.box(["Function", ["Tuple", "x", "x"], "x"]));
 
 ce.box(["dup", 5]).type;
@@ -1549,10 +1634,10 @@ pattern's variables make the subject a subtype? That is what "is this an
 identity function?" usually means:
 
 ```js
-ce.type("(number) -> number").matches("forall T. (T) -> T");
+ce.type("(number) -> number").matches("(T) -> T where T");
 // ➔ true  (instantiate `T` as `number`)
 
-ce.type("(integer) -> string").matches("forall T. (T) -> T");
+ce.type("(integer) -> string").matches("(T) -> T where T");
 // ➔ false  (no single `T` is both `integer` and `string`)
 ```
 
@@ -1561,11 +1646,11 @@ must satisfy the variable's bound:
 
 ```js
 ce.type("(list<integer>) -> list<integer>")
-  .matches("forall T: indexed_collection. (T) -> T");
+  .matches("(T) -> T where T: indexed_collection");
 // ➔ true
 
 ce.type("(set<integer>) -> set<integer>")
-  .matches("forall T: indexed_collection. (T) -> T");
+  .matches("(T) -> T where T: indexed_collection");
 // ➔ false  (a `set` is not an `indexed_collection`)
 ```
 
@@ -1576,7 +1661,7 @@ parameter position, which is contravariant, so the same identity probe answers
 `false`:
 
 ```js
-ce.type("(number) -> number").couldMatch("forall T. (T) -> T");
+ce.type("(number) -> number").couldMatch("(T) -> T where T");
 // ➔ false  (the pattern reads as `(any) -> any`)
 
 ce.type("(number) -> number").couldMatch("(any) -> any");
@@ -1589,13 +1674,13 @@ and there the bound is what makes the answer informative. An unbounded variable
 reads as `any` and cannot rule anything out:
 
 ```js
-ce.type("forall T. (T) -> T").couldMatch("(any) -> string");
+ce.type("(T) -> T where T").couldMatch("(any) -> string");
 // ➔ true  (`T` reads as `any`: vacuous)
 
-ce.type("forall T: number. (T) -> T").couldMatch("(any) -> string");
+ce.type("(T) -> T where T: number").couldMatch("(any) -> string");
 // ➔ false  (`T` reads as `number`, which is not a `string`)
 
-ce.type("forall T: number. (T) -> T").couldMatch("(any) -> number");
+ce.type("(T) -> T where T: number").couldMatch("(any) -> number");
 // ➔ true
 ```
 
@@ -1603,14 +1688,14 @@ A generic signature is a function value like any other, so it could be a
 `function`, and a bound is read on the subject side too:
 
 ```js
-ce.type("forall T. (T) -> T").couldMatch("function");
+ce.type("(T) -> T where T").couldMatch("function");
 // ➔ true
 
-ce.type("forall T: indexed_collection. (T) -> T")
+ce.type("(T) -> T where T: indexed_collection")
   .couldMatch("(indexed_collection) -> indexed_collection");
 // ➔ true
 
-ce.type("forall T. (T) -> T")
+ce.type("(T) -> T where T")
   .couldMatch("(indexed_collection) -> indexed_collection");
 // ➔ false  (`T` reads as `any`, which is not an `indexed_collection`)
 ```
@@ -1728,11 +1813,18 @@ ce.declareType(
 );
 ```
 
-The type is defined in the current lexical scope.
+Types are **engine-global**: unlike value bindings, they are not lexically
+scoped. A declared type name means the same thing everywhere on the engine,
+for the engine's lifetime. Declaring a name that is already declared is an
+error (a `DeclareType` statement may replace an earlier `DeclareType`
+statement's definition — the notebook re-run flow — but never a host- or
+builtin-declared one).
 
 A program can declare its own types with the `["DeclareType"]` operator —
 the MathJSON mirror of `ce.declareType()` — or, in Epsil, with the `type`
-statement, which comes in two forms:
+statement. Because types are global, these statement forms are only valid at
+the **top level** of a program: inside a block or a function body they are an
+error and declare nothing. The statement comes in two forms:
 
 ```js
 type point = tuple<x: number, y: number>  // nominal
@@ -1753,10 +1845,11 @@ the attributes dictionary `["Dictionary", ["KeyValuePair", "alias",
 "True"]]` — the surface mirror of `ce.declareType()`'s `{ alias: true }`
 option.
 
-An **alias** can take type parameters — `type alias Pair<T> = tuple<T, T>`,
-see [Generic Type Aliases](#generic-type-aliases). A parameterized **nominal**
-type (`type point<T> = tuple<T, T>`) is reserved for a future release and is
-reported as not yet supported.
+Both forms can take type parameters — `type alias Pair<T> = tuple<T, T>`, see
+[Generic Type Aliases](#generic-type-aliases), and
+`type tree<T> = tuple<value: T, children: list<tree<T>>>`, see
+[Parameterized Nominal Types](#parameterized-nominal-types). They differ in
+what an application means: an alias *expands*, a nominal type stays opaque.
 
 
 ### Nominal vs Structural Types
@@ -1831,7 +1924,7 @@ ce.type("Wrap<integer>").toString();
 ```
 
 **Bounds.** A parameter may declare a ground upper bound, exactly as a
-[`forall` variable](#bounds) does, and the bound is enforced wherever the
+[`where` variable](#bounds) does, and the bound is enforced wherever the
 alias is applied:
 
 ```js
@@ -1845,17 +1938,17 @@ ce.type("Keyed<string>");
 //   satisfy the bound `number` of the parameter `T` of "Keyed"
 ```
 
-An argument may also be a type **variable** in scope — a `forall` clause's
+An argument may also be a type **variable** in scope — a `where` clause's
 variable, or the enclosing alias's own parameter. Such an argument is
 admitted by comparing the two bounds: the variable's own declared bound must
 satisfy the parameter's (an unbounded variable is bounded by `any`, which
 satisfies only `any`).
 
 ```js
-ce.type("forall T: integer. (Keyed<T>) -> T").toString();
-// ➔ "forall T: integer. (tuple<string, T>) -> T"
+ce.type("(Keyed<T>) -> T where T: integer").toString();
+// ➔ "(tuple<string, T>) -> T where T: integer"
 
-ce.type("forall T. (Keyed<T>) -> T");
+ce.type("(Keyed<T>) -> T where T");
 // ➔ throws: generic-alias-bound: The type argument `T` does not satisfy the
 //   bound `number` of the parameter `T` of "Keyed" (an open argument is
 //   admitted by its own declared bound, `any`)
@@ -1864,7 +1957,7 @@ ce.type("forall T. (Keyed<T>) -> T");
 **Transparency.** The expansion happens when the type is resolved, so nothing
 downstream ever meets an applied reference: `.type`, `toString()`,
 `matches()` and error messages all show the expansion. The *source* keeps
-what was written — a Epsil program round-trips
+what was written — an Epsil program round-trips
 `let p: Pair<integer> = (1, 2)` verbatim — but the type it denotes displays
 as `tuple<integer, integer>`.
 
@@ -1878,8 +1971,11 @@ as `tuple<integer, integer>`.
 - Every parameter must be **used** in the definition
   (`generic-alias-unused-parameter`) — under transparency an unused
   parameter could not affect anything.
-- Only the `alias` form takes a clause; a parameterized **nominal** type is
-  still reported as not yet supported.
+- A parameterized **nominal** type takes the same clause, and the arity and
+  unused-parameter rules apply to it verbatim. The self-reference rule does
+  not: a nominal type is opaque rather than expanded, so its definition may
+  refer to itself — and it does mint a constructor. See
+  [Parameterized Nominal Types](#parameterized-nominal-types).
 - No [constructor](#type-constructors) is declared for a generic alias, and
   the name is not claimed in the value namespace at all: a function of the
   same name is legal, before or after the alias.
@@ -1892,9 +1988,9 @@ the new one.
 ### Type Constructors
 
 Declaring a type also declares a **constructor**: an operator of the same
-name, in the same scope, that builds values of that type. This is what makes
-a nominal type inhabitable — without it, the type would be a set with no
-members.
+name that builds values of that type. Like the type itself, the constructor
+is global — its lifetime is the type's. This is what makes a nominal type
+inhabitable — without it, the type would be a set with no members.
 
 ```js
 ce.declareType("point", "tuple<x: integer, y: integer>");
@@ -1918,9 +2014,8 @@ and `["point", "'a'", 2]` (wrong type) produce the usual error values.
 
 #### Constructor Functions
 
-Assigning a **function literal** to a nominal type's name — in the scope the
-type is declared in, after the declaration — installs it as the type's
-**constructor function**. The body computes the *payload*, a value that must
+Assigning a **function literal** to a nominal type's name — after the
+declaration — installs it as the type's **constructor function**. The body computes the *payload*, a value that must
 satisfy the definition; the engine checks it (for a record: exactly the
 definition's keys, each field's value against its type) and tags it. This is
 the record inhabitation story, and, for any definition, the smart-constructor
@@ -1980,9 +2075,9 @@ ce.operatorInfo("bare");
 ```
 
 A type declaration claims **both** namespaces — the type name and the value
-name — atomically. If the current scope already has a value or operator of
-that name, the declaration fails and registers nothing; a name in an outer
-scope is shadowed, not conflicted. Re-declaring a type from a `["DeclareType"]`
+name — atomically. If the global scope already has a value or operator of
+that name, the declaration fails and registers nothing; a system builtin is
+shadowed, not conflicted. Re-declaring a type from a `["DeclareType"]`
 statement replaces its constructor along with its definition.
 
 ### Nominal Types Are Opaque
@@ -2109,3 +2204,182 @@ ce.declareType("json", `
   | list<json> | dictionary<json>
 `, { alias: true });
 ```
+
+### Parameterized Nominal Types
+
+A nominal type can take **type parameters**, declared in the same clause a
+[generic alias](#generic-type-aliases) takes. The parameters may be used
+anywhere in the definition — including in a **recursive** occurrence of the
+type being declared, which is what a generic alias cannot do:
+
+```js
+ce.declareType(
+  "tree",
+  "tuple<value: T, children: list<tree<T>>>",
+  { typeParams: ["T"] }
+);
+```
+
+In Epsil, the same declaration is a `type` statement with a clause:
+
+```plaintext
+type tree<T> = tuple<value: T, children: list<tree<T>>>
+```
+
+An application is **opaque**: unlike `Pair<integer>`, which *is* the tuple it
+expands to, `tree<integer>` is never expanded, and that is exactly what makes
+the recursion harmless. `tree<integer>` and `tree<string>` are two distinct
+types, related to nothing but other applications of `tree`.
+
+```js
+ce.type("tree<integer>").toString();
+// ➔ "tree<integer>"     (an alias would show its expansion here)
+```
+
+Applying at the wrong arity — including a bare `tree` — is the same
+`generic-alias-arity` error a generic alias gives, and a parameter bound
+(`{ typeParams: ["T: number"] }`) is enforced the same way.
+
+#### The Constructor
+
+The [constructor](#type-constructors) a `tuple` definition mints is
+**quantified**: `tree: (T, list<tree<T>>) -> tree<T> where T`. `T` is
+solved at each construction, from the arguments:
+
+```js
+ce.expr(["tree", 1, ["List"]]).type;
+// ➔ "tree<finite_integer>"
+```
+
+Nothing else is new: a `record` definition still mints no constructor and is
+inhabited through a [constructor function](#constructor-functions), which may
+carry a clause of its own — its variable names are its own and need not match
+the type's.
+
+#### Variance
+
+Variance says how two applications of one name relate. Every parameter has a
+declared variance, and it is **verified against the definition, never
+inferred**:
+
+| Marker | Meaning | Relation |
+| --- | --- | --- |
+| `out` | covariant (the default) | `tree<integer> <: tree<number>` |
+| `in` | contravariant | `sink<number> <: sink<integer>` |
+| `inout` | invariant | neither, unless the arguments are the same type |
+
+The marker sits on the parameter — `type tree<out T> = …`, or
+`{ typeParams: [{ name: "T", variance: "out" }] }` from a host — and belongs
+to the *declaration*: an application never carries one. `sink` above is a
+consumer, `type sink<in T> = tuple<accept: (T) -> nothing>`: something that
+accepts any number accepts an integer.
+
+**An unannotated parameter means `out`** — it is treated as if `out` had been
+written, and run through the same verification. In an immutable value
+language the common case is a payload container, and an invariant default
+would make `tree<integer>` unusable where a `tree<number>` is expected, which
+is the first thing anyone tries:
+
+```js
+ce.type("tree<integer>").matches("tree<number>"); // ➔ true
+ce.type("tree<number>").matches("tree<integer>"); // ➔ false
+```
+
+Because the default is *declared* rather than inferred, a definition whose
+parameter is used contravariantly does not silently change the type's
+subtyping contract — it is a loud `variance-violation` at the declaration.
+Consider a covariant `events`, then an innocent-looking edit that adds a
+subscription callback:
+
+```plaintext
+type events<T> = tuple<log: list<T>>   // `T` occurs only covariantly
+
+// … a later edit:
+type events<T> = tuple<log: list<T>, notify: (T) -> nothing>
+```
+
+```js
+ce.declareType("events", "tuple<log: list<T>, notify: (T) -> nothing>",
+  { typeParams: ["T"] });
+// ➔ throws: variance-violation: parameter `T` of `events` is covariant
+//   (`out` is the default when no marker is written), but `T` appears in
+//   both output (`log`) and input (`notify.(arg 1)`) positions, so it can
+//   only be invariant.
+//     • declare it `inout`:  type events<inout T> = …
+//     • or keep `events` covariant by moving the input occurrence out of
+//       the body — e.g. split it off into a type of its own
+```
+
+Under inference the edit would quietly re-infer invariance and every caller
+that passed an `events<integer>` where an `events<number>` was expected would
+break at its *use site*, with nothing at the declaration mentioning variance.
+Under the verified default, the author makes the contract change deliberately
+— by writing `inout` (or `in`, after splitting the type):
+
+```js
+ce.declareType("events", "tuple<log: list<T>, notify: (T) -> nothing>",
+  { typeParams: [{ name: "T", variance: "inout" }] });
+```
+
+The diagnostic is computed, not guessed: it names the violated variance and
+where it came from, the offending occurrences by path, and exactly the
+markers that would verify — `in` is never offered for `events`, because
+`log: list<T>` would fail it the same way. An `inout` annotation verifies
+against any definition: invariance promises nothing, so it is always sound,
+just less permissive.
+
+Variance and bounds do not interact — `{ typeParams: [{ name: "T",
+variance: "out", bound: "number" }] }` is sound: the bound says which
+arguments are admissible, the variance relates two admissible ones.
+
+**A limitation of the non-covariant markers.** A construction solves its
+parameters from its arguments alone; an annotation on the binding does not
+widen them. For a covariant parameter that is invisible, because the narrower
+construction is a subtype of the annotation anyway:
+
+```plaintext
+let t: tree<number> = tree(1, [])   // builds a tree<finite_integer>, which IS a tree<number>
+```
+
+For an explicitly `inout` or `in` parameter that step is not available, so
+such a type can only be constructed at exactly its argument type — a
+`box<finite_integer>` is not admissible where a `box<number>` is expected.
+Propagating the expected type inward is a future improvement.
+
+#### Reading a Value
+
+[Opacity](#nominal-types-are-opaque) is unchanged, and so are the windows back
+in. **Field access** now reads the definition **instantiated at the
+application's arguments**:
+
+```js
+const t = ce.expr(["tree", 1, ["List"]]);
+ce.box(["Field", t, { str: "value" }]).evaluate();
+// ➔ 1
+```
+
+```plaintext
+let t: tree<number> = tree(1, [])
+t.value                          // : number
+```
+
+**`match` is different**: it binds values, not the annotation's projection, so
+each capture comes back at the matched value's *own* type — usually narrower
+than the annotation's, since the value knows what it was built from:
+
+```plaintext
+let t: tree<number> = tree(1, [])
+match t { tree(v, cs) => v }     // v: integer, cs: list<never>
+```
+
+The substitution behind field access is one level deep: the nested
+`tree<number>` inside `children` stays an unexpanded application, so a
+recursive definition costs nothing here either.
+
+#### Compiling
+
+[Compilation erases the tag](#compiling-nominal-values) exactly as it does for
+an unparameterized nominal type, at the **instantiated** definition:
+`tree<integer>` erases to whatever `tuple<integer, list<…>>` compiles to on
+that target, and declines identically where that would. A parameterized type
+therefore costs nothing at run time either.

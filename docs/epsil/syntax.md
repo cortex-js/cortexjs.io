@@ -192,7 +192,7 @@ _parameters_ → **`(`** \[(_parameter_)#**`,`**\] **`)`**
 
 _effect-label_ → **`console`** | **`entropy`** | **`environment`** |
 **`fs_read`** | **`fs_write`** | **`network`** | **`random`** |
-**`scope`** | **`time`**
+**`scope`** | **`state`** | **`time`**
 
 _effect-specifier_ → **`pure`** | **`any`** | (_effect-label_)+
 &nbsp;&nbsp;&nbsp;&nbsp;— labels are space-separated; duplicates are rejected;
@@ -318,7 +318,8 @@ f()
 ```
 
 An argument may be prefixed with `...` to spread a tuple's elements into the
-call's arguments (valid only in call argument lists — see
+call's arguments (`...` is also valid in list, set, and dictionary
+literals, where it splices non-tuple collections — see
 [Spread](/operators/#spread)):
 
 ```epsil

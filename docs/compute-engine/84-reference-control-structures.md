@@ -211,6 +211,13 @@ structurally equal to a pattern falls through to the next case.
 // ➔ "other" — x could be 0 semantically, but is not structurally 0
 ```
 
+In Epsil, the wildcard case may also be spelled `otherwise`:
+`match x { 0 => "zero"; otherwise => "other" }`. It is a contextual synonym
+for a bare `_` pattern — it lowers to the same `"_"` node, may take a guard
+(`otherwise if c => …`), and binds nothing. Only the whole-pattern spelling
+is special: inside a structured pattern, `otherwise` is an ordinary
+identifier (and therefore a capture).
+
 A guard must evaluate to `True` for the case to be selected; `False` or an
 undecidable guard falls through to the next case:
 
