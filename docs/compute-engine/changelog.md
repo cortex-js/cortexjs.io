@@ -41,6 +41,19 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Issues Resolved
 
+- **Adding three or more collections no longer nests the result when one of
+  them is a lazy view** (Tycho item 189). `[1,2,3] + [4,5,6] + Range(1,3)`
+  returned `[[6,7,8],[8,9,10],[10,11,12]]` instead of `[6,9,12]`: the
+  element-wise tensor kernel treated an operand that is a collection but not a
+  materialized list — a `Range`, a `Reverse`/`Take` view, or the lazy result of
+  a broadcast over more than 100 elements — as a SCALAR, and added it whole to
+  every cell. Only the diagonal held the intended value and the result was
+  O(n²). Two or fewer operands, and any number of plain lists, were unaffected,
+  which is why the shape surfaced in the field (a 900-element colour grid whose
+  intermediate stayed lazy) rather than in small examples. The kernel now
+  declines such an operand and the sum falls through to the element-wise
+  broadcast that zips it, matching what `Multiply` already did.
+
 - **Canonicalizing a broadcast `At` over a comprehension-derived index range
   no longer takes minutes in a document scope** (Tycho item 186 — the
   surviving half of item 182's storm class). Parsing
