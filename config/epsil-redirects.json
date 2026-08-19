@@ -6,6 +6,7 @@
     "/epsil/comments/": "/comments/",
     "/epsil/control-flow/": "/control-flow/",
     "/epsil/declarations/": "/declarations/",
+    "/epsil/errors/": "/errors/",
     "/epsil/evaluation/": "/evaluation/",
     "/epsil/examples/": "/examples/",
     "/epsil/for-agents/": "/for-agents/",
@@ -25,7 +26,6 @@
     "/epsil/syntax/": "/syntax/",
     "/epsil/tour/": "/tour/",
     "/epsil/types/": "/types/",
-    "/epsil/vscode/": "/vscode/",
-    "/errors/": "/errors/"
+    "/epsil/vscode/": "/vscode/"
   }
 }

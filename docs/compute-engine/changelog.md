@@ -193,6 +193,20 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Improvements
 
+- **Declaration statements no longer pay for re-registering themselves.**
+  One Epsil `type` / `protocol` / conformance statement registers its
+  declarations up to three times per program run (the static pre-pass and
+  the evaluation loop each canonicalize it, then it evaluates). The second
+  same-statement registration used to take the full replacement path —
+  re-parsing the body, re-settling every conformance edge in the engine,
+  re-running the effect-widening checks — to rebuild exactly the state it
+  had just built. It is now recognized as a no-op from the statement's
+  declaration-origin stamp. Measured: a fresh `type` statement in an
+  engine holding 8 protocols dropped from ~1.7 ms to ~0.2 ms per program.
+  Notebook re-runs in a later program still replace, a duplicate
+  declaration in one program is still an error, and the raw MathJSON /
+  host API routes keep their idempotent replace semantics unchanged.
+
 - **Internal methods are now visibly internal.** Methods tagged `@internal`
   now start with `_`, including the compilation-target registry, expression
   inference/binding/cache-reset hooks, parser diagnostic helpers, operator
@@ -1591,8 +1605,7 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `tuple<x: integer, y: integer>` (element names are labels on positions, not
   keys) are unchanged. `record{}` and bare `record` / `object` are also
   unchanged. The old spelling is a parse error naming the brace form
-  (`A record type is written with braces: \`record{key: type,
-  …}\``); type strings serialize with braces, so `typeToString` output and
+  (``A record type is written with braces: `record{key: type, …}` ``); type strings serialize with braces, so `typeToString` output and
   anything that snapshots it changes accordingly.
 
   ```epsil

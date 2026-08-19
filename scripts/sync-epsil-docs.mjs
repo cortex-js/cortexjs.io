@@ -207,6 +207,13 @@ async function main() {
       // rather than to the introduction it used to render — a reader following
       // a stale bookmark for "the Epsil docs" wants the new site's front door.
       const isRoot = before === "/epsil" || before === "/epsil/";
+      // Only a slug that was `/epsil/`-rooted ever had a mathlive.io home to
+      // redirect. A page that authors its post-move epsil.dev slug directly has
+      // none, and recording it here would publish a stub on mathlive.io at that
+      // top-level path — squatting a URL the Epsil section never owned, and
+      // pointing it at the identical path on epsil.dev. `errors.md` shipped
+      // that way once (`slug: /errors/` produced a mathlive.io/errors/ stub).
+      if (!isRoot && !before.startsWith("/epsil/")) return;
       routes[before.replace(/\/?$/, "/")] = isRoot ? "/" : after;
     };
     const content = rewrite(source, { onUnknown, onSlug });
