@@ -347,7 +347,7 @@ After the insertion, the selection will be set according to the
 
 ###### options?
 
-[`InsertOptions`](#insertoptions)
+[`InsertOptions`](#insertoptions-1)
 
 </MemberCard>
 
@@ -368,7 +368,7 @@ LaTeX expression.
 
 ###### options?
 
-[`InsertOptions`](#insertoptions)
+[`InsertOptions`](#insertoptions-1)
 
 </MemberCard>
 
@@ -854,7 +854,7 @@ The default operation is `"set"`.
 
 ###### style
 
-`Readonly`\<[`Style`](#style-1)\>
+`Readonly`\<[`Style`](#style-2)\>
 
 ###### options?
 
@@ -883,7 +883,7 @@ the current style) matches the `style` argument, 'none' if it does not.
 
 ###### style
 
-`Readonly`\<[`Style`](#style-1)\>
+`Readonly`\<[`Style`](#style-2)\>
 
 </MemberCard>
 
@@ -1260,7 +1260,7 @@ setPromptValue(id, content, insertOptions): void
 
 ###### insertOptions
 
-`Omit`\<[`InsertOptions`](#insertoptions), `"insertionMode"`\>
+`Omit`\<[`InsertOptions`](#insertoptions-1), `"insertionMode"`\>
 
 </MemberCard>
 
@@ -2878,7 +2878,7 @@ letter shape and spacing (a bit more space after the "f" for example), so
 it's not equivalent to a `main` variant with `italic` variant style applied.
 
 **See Also**
-* [`Style`](#style-1)
+* [`Style`](#style-2)
 
 </MemberCard>
 
