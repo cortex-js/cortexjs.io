@@ -47,12 +47,16 @@ let x = 5                 // mutable declaration
 const tau = 6.28          // immutable; reassigning yields an Error value
 x = x + 3                 // assignment: a bare `=` assigns only as a STATEMENT
 f(x) = x^2                // function definition, math style
-square = x |-> x^2        // anonymous function ("|->" is the lambda arrow)
+square = x => x^2        // anonymous function ("=>" is the lambda arrow)
 cube : (x: number) -> number = x^3   // a named function-type annotation binds x
 function g(n) {           // function definition, block style
   let t = n + 1           // blocks are lexically scoped
   t * 2                   // a block's value is its last expression
 }
+hold h(e) = Head(e)       // hold: arguments arrive UNEVALUATED (h(x + 1) ➔ Add)
+hold mySum(body, bind i, n) = Sum(body, (i, 1, n))  // bind: a bound-variable slot; mySum(k^2, k, 3) ➔ 14
+function op(a, b) commutative associative -> number { a + b }  // algebraic words in the specifier slot
+/// A doc comment right before a definition is its description (About, hover)
 let parity = "even" if x % 2 == 0 else "odd"  // conditional expression; if is also an expression: if c { a } else { b }
 g(x) + f(2)
 // ➔ 22
@@ -90,7 +94,7 @@ g(x) + f(2)
 - **LaTeX islands**: `$\frac{1}{2}$` splices parsed LaTeX into the expression
   (available in the CLI and any host that injects a LaTeX parser).
 
-**Operator precedence**, loosest → tightest: `:=` · `|->` · `??` (coalesce) ·
+**Operator precedence**, loosest → tightest: `:=` · `=>` · `??` (coalesce) ·
 `|>` (pipe) · `->` (key-value) · `a if c else b` (conditional) · `||` · `&&` ·
 comparisons
 `== != < <= > >= === in !in is` (chainable: `1 < 2 < 3`) · `..` (range) ·
@@ -111,15 +115,15 @@ actually happens → write instead:**
 | `range(1, 5)` excludes end | Inert call + did-you-mean; `Range(1, 5)` **includes** 5: `[1,2,3,4,5]` | `Range(1, n)` or `1..n` for 1…n inclusive |
 | `x = 5` at top level | Assigns — `=` assigns only as a whole statement with a name on the left | `x == 5` for the equation |
 | `# comment` | Diagnostic (`#` introduces pragmas) | `// comment` or `/* … */` |
-| `def f(x):` / `(x) => …` / `lambda x: …` | Parse diagnostics; `(x) -> …` is recovered with a did-you-mean-`\|->` fixit | `f(x) = expr`, `x \|-> expr`, or `function f(x) { … }` |
+| `def f(x):` / `(x) => …` / `lambda x: …` | Parse diagnostics; `(x) -> …` is recovered with a did-you-mean-`=>` fixit | `f(x) = expr`, `x => expr`, or `function f(x) { … }` |
 | `cond ? a : b` | Parse diagnostic | `a if cond else b`, or `if cond { a } else { b }` — both are expressions |
 | `elif` | Parse diagnostic | `else if` |
 | `return` | Reserved word, **not implemented** | A block's value is its last expression |
 | `break` / `continue` | Work as expected inside a `while`/`for` body; the loop context resets at every function and lambda boundary | *(nothing to change)* |
 | `print(x)` | Inert unknown call; nothing prints | The program's value is its **last statement** |
 | `len(xs)` | Inert + did-you-mean | `Length(xs)` |
-| `s[i]` / `len(s)` on a string | Error value / inert — strings are **not** collections | `Characters(s)[i]`, `Length(Characters(s))` |
-| `"a" + "b"` | Error values inside an `Add` | `"\(a) and \(b)"` interpolation, or `StringJoin(a, b)` |
+| `s[0]` / `len(s)` on a string | Works — a string is a collection of its characters (grapheme clusters), 1-based | `s[1]`, `Length(s)` |
+| `"a" + "b"` | Error values inside an `Add` | `"\(a) and \(b)"` interpolation, or `Join(a, b)` |
 | `xs[2] = 9` | Runtime error value — no element assignment; collections are immutable values | Rebuild: `Map`, `Join(xs, [v])`, `Append(xs, v)` |
 | `and` / `or` / `not` | Parse diagnostics (reserved words) | `&&`, `\|\|`, `!` |
 | `x**0.5` habits: `x^1/2` | Parses as `(x^1)/2` — precedence, not a root | `Sqrt(x)` or `x^(1/2)` |
@@ -150,7 +154,7 @@ any number of recursive calls — `fib(n-1) + fib(n-2)` is fine), and closures:
 
 ```epsil
 fact(n) = 1 if n <= 1 else n * fact(n - 1)
-makeAdder(k) = x |-> x + k     // closures capture lexically
+makeAdder(k) = x => x + k     // closures capture lexically
 let add10 = makeAdder(10)
 add10(fact(5))
 // ➔ 130
@@ -160,12 +164,12 @@ Collections pipeline — `Map`/`Filter`/`Reduce` for value-producing iteration,
 `|>` to chain; `1..n` is an inclusive range:
 
 ```epsil
-1..10 |> Filter(_, k |-> k % 2 == 0) |> Map(k |-> k^2, _)
+1..10 |> Filter(_, k => k % 2 == 0) |> Map(k => k^2, _)
 // ➔ [4, 16, 36, 64, 100]
 ```
 
 ```epsil
-Reduce([1, 2, 3, 4], (acc, x) |-> acc + x, 0) + Sum(1..100)
+Reduce([1, 2, 3, 4], (acc, x) => acc + x, 0) + Sum(1..100)
 // ➔ 5060
 ```
 
@@ -249,8 +253,17 @@ Verified operator names, so you don't have to guess (search for more with
   `Sum`, `Mean`, `StandardDeviation` (sample, n−1), `Map`, `Filter`,
   `Count(xs)` / `Count(xs, v)` / `Count(xs, pred)`,
   `Reduce(list, f, init)`, `Range(a, b)` inclusive, `Range(a, b, step)`.
-- **Strings**: `Characters`, `StringJoin`, `StringSplit(s)` (splits on
-  whitespace by default), `String(x)`.
+- **Strings**: `Characters`, `StringSplit(s)` (splits on whitespace by
+  default), `String(x)`, `Join(a, b)` to concatenate strings,
+  `StringJoin(xs, sep?)` to join ONE collection with an optional separator
+  (a string subject means its characters, so `StringJoin("ab", "cd")` is
+  `"acdb"`, not `"abcd"` — use `Join` or `"\(a)\(b)"` to concatenate).
+  Substring search is `RangeOf(s, needle)` (a span, or `Nothing`),
+  `ContainsSequence`, `StartsWith`, `EndsWith` — `c in s` is *character*
+  membership. Also `StringReplace(s, target, replacement, count?)`,
+  `Trim`/`TrimStart`/`TrimEnd`, `StringRepeat`, `PadStart`/`PadEnd`,
+  `ToUpperCase`/`ToLowerCase`/`CaseFold`, `StringCompare(a, b)` (`-1/0/1`,
+  code-point order) and `NumberFrom(s, base?)`.
 - **Dictionaries**: `Keys`, `Values`.
 - **Absence**: `Missing` preserves a missing position; `Nothing` is omitted
   from arguments and collections; `IsMissing`, `Coalesce`.
@@ -264,7 +277,7 @@ Caution: `Head` and `Tail` exist but are **structural** operators
 for elements use `First`/`Rest`.
 
 ```epsil
-Sort([3, 1, 4, 1, 5], (a, b) |-> a > b)
+Sort([3, 1, 4, 1, 5], (a, b) => a > b)
 // ➔ [5,4,3,1,1]
 ```
 
@@ -282,6 +295,12 @@ Sort([3, 1, 4, 1, 5], (a, b) |-> a > b)
   lists) preview-elide above 10 elements (`[1,2,3,4,5,...,]`); the value is
   complete — the CLI's `--json` output materializes the full elements (up to
   10,000). Literals print in full.
+- **Arguments are evaluated before a call** — `f(a + 1)` receives the value
+  — except for a `hold` function (`hold f(e) = …`), which receives the
+  expression as written and evaluates it wherever the body reads it
+  (call-by-name: `hold twice(e) = e + e` evaluates `e` twice; `let v = e`
+  once). Every parameter of a hold function is held; there is no
+  per-parameter form.
 - **Binder variables stay symbolic**: `D(expr, x)` and `Integrate(expr, x)`
   treat `x` symbolically even if `x` has an assigned value; the *result*
   then evaluates with the value. So `let x = 2` followed by

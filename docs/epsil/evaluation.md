@@ -159,6 +159,27 @@ const c = 1
 c = 2
 ```
 
+## Arguments are values — unless the function holds them
+
+A call evaluates its arguments first and hands the function their values:
+with `let a = 3`, `f(a + 1)` receives `4`. A function declared with the
+`hold` prefix instead receives each argument **as written** — canonicalized
+and bound in the caller's scope, but not evaluated — and evaluates it only
+where its body reads it, so it can inspect the expression (`Head(e)`),
+transform it, or decide whether to evaluate it at all:
+
+```epsil
+let a = 3
+hold f(e) = Head(e)
+f(a + 1)
+// ➔ Add
+```
+
+Every parameter of a `hold` function is held (there is no per-parameter
+form), and a parameter read twice is evaluated twice — read it once into a
+`let` when that matters. See
+[Hold functions](/control-flow/#hold-functions).
+
 ## Collections: literals are values, pipelines are generators
 
 A collection **literal** — a list `[…]`, set `{…}`, tuple `(…)`, or
@@ -201,6 +222,39 @@ a `runtime-error` diagnostic — for example an indexed assignment
 (`xs[2] = 9`, which is rejected: element assignment is not supported), or
 reassigning a `const` in the middle of a program.
 
+## Console input and output
+
+`print` writes its operands to the host console — the terminal for the
+command-line tools, the developer console in a browser — separated by
+spaces and followed by a newline. Strings print their content, without the
+quotes; every other value prints its ordinary textual form. It evaluates to
+`Nothing`:
+
+```epsil
+let x = 6
+print("x is", x * 7)
+// prints: x is 42
+```
+
+`input` reads one line of text and evaluates to it as a string, without the
+trailing newline. An optional operand is a prompt, displayed before
+reading. In a terminal it reads from the terminal (piped standard input
+works too); in a browser it opens the `prompt()` dialog. At end-of-input —
+or when the dialog is canceled — it evaluates to `Nothing`; on a host with
+no interactive input at all, the call stays symbolic.
+
+```text
+> let name = input("Who? ")
+Who? Arno
+> print("Hello,", name)
+Hello, Arno
+```
+
+`print` and `input` follow the lowercase command convention. They are
+ordinary library aliases for the `Print` and `Input` operators — not
+keywords — so a local declaration of `print` shadows the command like any
+other library name.
+
 ## Pragma security
 
 `#env(...)` and `#navigator(...)` read state from the host process (or the
@@ -230,6 +284,35 @@ count-based bounds on iteration and recursion depth. A breached limit becomes
 an error value (or an `evaluation-canceled` diagnostic when it happens in a
 non-final statement) — see
 [Execution](/implementation/#execution) for how a host sets one.
+
+The two kinds of limit end differently:
+
+- An expired **time budget ends the program**. The budget is one deadline for
+  the whole run, so once it has passed no later statement could run either:
+  the statement that hit it becomes the last one executed, the program's
+  value is its `Error("Timeout exceeded", "timeout")`, and the statements
+  after it are not evaluated. Statements that completed before the expiry keep
+  their effects. The deadline is checked before every statement (and before
+  every statement of the static pass), so a program of many cheap statements
+  is bounded too, not only one whose single statement runs long.
+- A breached **count-based cap** (`iterationLimit`, `recursionLimit`) is
+  per-construct: the next statement gets a fresh allowance, so the program
+  continues past it. The statement that breached evaluates to the error value,
+  and — because a loop is imperative — whatever it assigned before the breach
+  stays assigned. A program that reads such a variable afterwards therefore
+  sees a *partial* result alongside the `evaluation-canceled` diagnostic:
+
+  <!-- epsil-test: expect-diagnostics -->
+
+  ```epsil
+  total = 0
+  for i in 1..5000 { total = total + i * 2 }   // stops at iterationLimit (1024)
+  total                                        // ➔ 1051650, not 25005000
+  ```
+
+  A host that displays `value` must also surface `diagnostics` (the loop's
+  breach is an `error`-severity `evaluation-canceled` there), or raise
+  `ce.iterationLimit` for programs expected to loop longer.
 
 These limits are cooperative. A browser that evaluates untrusted or potentially
 unbounded programs should run Epsil in a Web Worker it can terminate from the

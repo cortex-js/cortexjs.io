@@ -218,13 +218,23 @@ _type-parameter-clause_ → **`<`** (_type-parameter_)#**`,`** **`>`**
 names are rejected; the names scope over the definition's HEAD only (its
 parameters, effect specifier, and return type), not over its body
 
-_function-definition_ → _symbol_ _parameters_
+_function-definition_ → \[**`hold`**\] _symbol_ _parameters_
 \[_math-function-signature_\] **`=`** _expression_ |
-**`function`** _symbol_ \[_type-parameter-clause_\] _parameters_
+\[**`hold`**\] **`function`** _symbol_ \[_type-parameter-clause_\] _parameters_
 \[_effect-specifier_\] \[**`->`** _type_\] _block_
 &nbsp;&nbsp;&nbsp;&nbsp;— the `<…>` clause is claimed only by the
 **`function`** form: `f<T>(x) = x` is genuinely ambiguous with a relational
-expression, so the math form does not take it
+expression, so the math form does not take it; the **`hold`** prefix
+(a contextual keyword — `hold` is an ordinary identifier elsewhere) makes a
+definition whose arguments are bound unevaluated, see
+[Hold functions](/control-flow/#hold-functions); it does not combine
+with a type-parameter clause or a literal parameter. A parameter of a `hold`
+definition may be marked **`bind`** (`hold mySum(body, bind i, n)`): it
+receives a symbol, the bound variable. The _effect-specifier_ slot also
+accepts the algebraic words **`commutative`**, **`associative`**,
+**`idempotent`**, **`involution`** (definition attributes, not effects). A
+doc comment (`///` lines or `/** … */`) immediately before a definition is
+its description
 
 _type-declaration_ → **`type`** **`alias`** _symbol_
 \[_type-parameter-clause_\] **`=`** _type_ |
@@ -356,21 +366,21 @@ The names checked are the ones the callee's **declaration** carries — a
 `function` definition's parameters, a
 [named function-type annotation](/declarations/#function-type-annotations-bind-their-parameter-names),
 an annotated lambda (including one assigned to a name,
-`f := (x: number, y: string) |-> x + 3` then `f(y: "ok", x: 1)`), or a
+`f := (x: number, y: string) => x + 3` then `f(y: "ok", x: 1)`), or a
 protocol member's requirement (both the bare call
 `compare(other: y, self: x)` and the qualified
 `Comparable.compare(other: y, self: x)`, which dispatch on `self`
 wherever it is written). An inline lambda applied directly reads its
-names from the expression itself — `((x: number) |-> x + 1)(x: 5)` is
+names from the expression itself — `((x: number) => x + 1)(x: 5)` is
 `6`, and unannotated parameters work there too,
-`((x, y) |-> x - y)(y: 2, x: 10)` is `8`.
+`((x, y) => x - y)(y: 2, x: 10)` is `8`.
 
 A parameter without a declared name is positional-only, and a callee
 whose parameter names the engine cannot read cannot take named
 arguments at all: a forward reference (a call *before* the statement
 that pins the callee's signature), a value typed only as `function`,
 or an **unannotated** lambda reached through a binding —
-`h := (x, y) |-> …` then `h(x: 1, y: 2)` declines, because type
+`h := (x, y) => …` then `h(x: 1, y: 2)` declines, because type
 inference drops the parameter names; annotate the parameters to call
 it by name. A misspelled name gets a "did you mean" pointing at the
 closest declared one.
@@ -434,7 +444,7 @@ call/index/field — the same whitespace-sensitivity that governs operators.
 - **Tuple**: `(a, b)`. A single parenthesized element, `(a)`, is just the
   parenthesized expression `a`, not a one-element tuple; `()` is a diagnostic
   (`expression-expected`) — there is no empty tuple — **except** immediately
-  before a mapsto arrow, where `() |-> expr` is a zero-parameter lambda.
+  before a mapsto arrow, where `() => expr` is a zero-parameter lambda.
 - **Dictionary**: `{k -> v}`; an unquoted key becomes a string key. The empty
   dictionary is spelled `{->}`, not `{}` (which is the empty set).
 

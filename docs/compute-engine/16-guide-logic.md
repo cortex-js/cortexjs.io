@@ -127,6 +127,53 @@ ce.expr(['Nand', 'True', 'True']).evaluate();     // → False
 ce.expr(['Nor', 'False', 'False']).evaluate();    // → True
 ```
 
+### Short-Circuit Evaluation
+
+`And` and `Or` evaluate their operands **left to right, in the order
+written**, and stop at the first operand that decides the result: `And` stops
+at the first `False`, `Or` at the first `True`. The remaining operands are
+never evaluated — no side effect, error, or random draw is produced by them.
+This is the behavior of `&&` and `||` in most programming languages, and it
+is what a guard relies on:
+
+```js example
+// The out-of-range read never happens: `i <= 3` is False, so `And` stops.
+ce.assign('xs', ce.expr(['List', 1, 2, 3]));
+ce.assign('i', 5);
+ce.expr(['And', ['LessEqual', 'i', 3], ['Greater', ['At', 'xs', 'i'], 0]])
+  .evaluate();
+// → False
+```
+
+Because the written order is meaningful, `And` and `Or` are **not** sorted at
+canonicalization: `["And", "q", "p"]` stays `["And", "q", "p"]`. Nested
+conjunctions/disjunctions are still flattened (`And(And(a, b), c)` →
+`And(a, b, c)`), which preserves the order. Symbolic simplifications
+(duplicate removal, `A ∧ ¬A → False`, absorption) are unaffected — they do
+not depend on operand order.
+
+**Element-wise applications are the exception.** When an operand is a
+collection (by type — a list literal, a symbol bound to a list, or a call
+declared to return a `list<boolean>`), the conjunction or disjunction is
+applied cell by cell and the result is a list; every operand is then evaluated
+once, left to right, and there is no per-cell short-circuit:
+
+```js example
+ce.expr(['And', 'False', ['List', 'True', 'False']]).evaluate();
+// → ["List", "False", "False"]
+```
+
+An operand that evaluates to an error also stops the walk: the error is the
+result, and the operands after it do not run.
+
+`Nand`, `Nor` and `Implies` short-circuit the same way: `Nand` stops at the
+first `False` (result `True`), `Nor` at the first `True` (result `False`), and
+`Implies` does not evaluate its consequent when the antecedent is `False`.
+`Xor` and `Equivalent` cannot short-circuit — every operand affects the
+result — so every operand is evaluated. Chained comparisons are conjunctions
+of their adjacent pairs and short-circuit too: in `Less(a, b, c)` (`a < b < c`)
+the operand `c` is not evaluated once `a < b` is `False`.
+
 ## First-Order Logic
 
 First-Order Logic extends propositional logic with quantifiers and predicates,

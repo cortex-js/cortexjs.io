@@ -337,10 +337,39 @@ expression.
 </nav>
 <FunctionDefinition name="About">
 
-<Signature name="About">_symbol_</Signature>
+<Signature name="About">_expression_</Signature>
 
-Evaluate to a dictionary expression containing information about a symbol
-such as its type, its attributes, its value, etc...
+Evaluate to a dictionary containing information about the expression. The
+entries present depend on what the operand is; keys include:
+
+- `kind`: what the operand is — `"symbol"`, `"constant"`, `"function"`,
+  `"multi-clause function (n clauses)"`, `"hold function (arguments are bound
+  unevaluated)"`, `"number"`, `"string"` or `"expression"`
+- `type`: the static type of the expression, as a string (the same report as
+  ["Type"](#type))
+- `name`: the symbol name, when the operand is a symbol
+- `value`: the value the operand evaluates to, when it has one distinct from
+  itself
+- `signature`: the signature of a function
+- `clauses`: for a multi-clause function, the clause listing (a list of
+  strings, one per clause, in declaration order, with overlap/coverage
+  annotations)
+- `attributes`: algebraic attributes of a function
+  (e.g. `"commutative associative"`)
+- `description`, `wikidata`, `url`: documentation metadata, when the
+  definition carries any
+
+```json example
+["About", "Pi"]
+
+// ➔ {kind: "constant", name: "Pi", type: "finite_real",
+//    description: "The constant π ≈ 3.14159…", wikidata: "Q167"}
+```
+
+Since the result is a dictionary, individual entries are addressable:
+`["At", ["About", "Pi"], "'type'"]` evaluates to `"finite_real"`.
+
+To get just the type of an expression as a string, use ["Type"](#type).
 
 </FunctionDefinition>
 
@@ -360,6 +389,9 @@ Evaluate to the head of _expression_
 // ➔ "Add"
 ```
 
+A symbol operand is resolved through its binding: with `x := a + 1`,
+`["Head", "x"]` evaluates to `"Add"`. An unbound symbol has head `"Symbol"`.
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -375,6 +407,10 @@ Evaluate to a sequence of the arguments of _expression_.
 ["Tail", ["Add", 2, 3]]
 // ➔ ["Sequence", 2, 3]
 ```
+
+A symbol operand is resolved through its binding: with `x := a + 1`,
+`["Tail", "x"]` evaluates to `["Sequence", "a", 1]`. An unbound symbol (or any
+non-compound value) has no tail and evaluates to `Nothing`.
 
 `Tail` can be used to change the head of an expression, for example:
 

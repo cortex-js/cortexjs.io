@@ -778,12 +778,12 @@ readonly [`ExpressionInput`](#expressioninput)[]
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getCompilationTarget()~~
+##### ExpressionComputeEngine.~~\_getCompilationTarget()~~
 
-###### getCompilationTarget(name)
+###### \_getCompilationTarget(name)
 
 ```ts
-getCompilationTarget(name): 
+_getCompilationTarget(name):
   | JavaScriptCompilationTarget<Expression>
   | undefined
 ```
@@ -792,10 +792,10 @@ getCompilationTarget(name):
 
 `"javascript"`
 
-###### getCompilationTarget(name)
+###### \_getCompilationTarget(name)
 
 ```ts
-getCompilationTarget(name): 
+_getCompilationTarget(name):
   | LanguageTarget<Expression, string, unknown, number>
   | undefined
 ```
@@ -872,6 +872,30 @@ symbol(sym, options?): Expression
 ```ts
 string(s, metadata?): Expression
 ```
+
+####### s
+
+`string`
+
+####### metadata?
+
+[`Metadata`](#metadata-1)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~character()~~
+
+```ts
+character(s, metadata?): Expression
+```
+
+Create a boxed character — one user-perceived character.
+
+`s` must be exactly one grapheme cluster after NFC normalization; use the
+`CharacterFrom` operator when the content is not known to satisfy that, as
+it reports a diagnostic instead.
 
 ####### s
 
@@ -2448,6 +2472,42 @@ readonly unicodeScalars: number[];
 ```
 
 The Unicode scalar values (code points) of the string.
+
+</MemberCard>
+
+### CharacterInterface
+
+Narrowed interface for a character expression — one NFC-normalized grapheme
+cluster (UAX #29).
+
+Obtained via `isCharacter()`.
+
+`string` holds the cluster's content and is deliberately spelled the same as
+`StringInterface.string`, so a consumer that only needs the text (the
+`String` interpolation join, `StringJoin`) can read either kind through one
+property without first deciding which it has.
+
+<MemberCard>
+
+##### CharacterInterface.string
+
+```ts
+readonly string: string;
+```
+
+The content of the character: exactly one grapheme cluster.
+
+</MemberCard>
+
+<MemberCard>
+
+##### CharacterInterface.unicodeScalars
+
+```ts
+readonly unicodeScalars: number[];
+```
+
+The Unicode scalar values (code points) of the cluster.
 
 </MemberCard>
 
@@ -4296,13 +4356,17 @@ Return `undefined` if the membership cannot be determined.
 optional subsetOf?: (collection, other, strict) => boolean | undefined;
 ```
 
-Return `true` if all the elements of `other` are in `collection`.
-Both `collection` and `other` are collections.
+Return `true` if all the elements of `collection` are in `other` — that
+is, `collection` ⊆ `other`. The RECEIVER is the candidate subset, matching
+the public `Expression.subsetOf(other, strict)` method that dispatches
+here. Both `collection` and `other` are collections.
 
-If strict is `true`, the subset must be strict, that is, `collection` must
-have more elements than `other`.
+If strict is `true`, the subset must be strict, that is, `other` must have
+an element that `collection` does not.
 
-Return `undefined` if the subset relation cannot be determined.
+Return `undefined` if the subset relation cannot be determined. A handler
+that cannot see far enough to answer must return `undefined` rather than
+`false`: `false` is read as a proof that the relation does NOT hold.
 
 </MemberCard>
 
@@ -8624,11 +8688,13 @@ type ConformanceRecord = {
   targetKey: string;
   where: TypeParameter[];
   impl: Record<string, Expression | JSImplementation>;
+  _authored: Record<string, Expression | JSImplementation>;
   _implOrigin: {
      batch: number;
      block: Expression;
     };
   pending: boolean;
+  _pendingReason: string;
   declaredByStatement: boolean;
 };
 ```
@@ -9408,12 +9474,12 @@ readonly [`ExpressionInput`](#expressioninput)[]
 
 <MemberCard>
 
-##### IComputeEngine.getCompilationTarget()
+##### IComputeEngine.\_getCompilationTarget()
 
-###### getCompilationTarget(name)
+###### \_getCompilationTarget(name)
 
 ```ts
-getCompilationTarget(name): 
+_getCompilationTarget(name):
   | JavaScriptCompilationTarget<Expression>
   | undefined
 ```
@@ -9422,10 +9488,10 @@ getCompilationTarget(name):
 
 `"javascript"`
 
-###### getCompilationTarget(name)
+###### \_getCompilationTarget(name)
 
 ```ts
-getCompilationTarget(name): 
+_getCompilationTarget(name):
   | LanguageTarget<Expression, string, unknown, number>
   | undefined
 ```
@@ -9502,6 +9568,30 @@ symbol(sym, options?): Expression
 ```ts
 string(s, metadata?): Expression
 ```
+
+####### s
+
+`string`
+
+####### metadata?
+
+[`Metadata`](#metadata-1)
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.character()
+
+```ts
+character(s, metadata?): Expression
+```
+
+Create a boxed character — one user-perceived character.
+
+`s` must be exactly one grapheme cluster after NFC normalization; use the
+`CharacterFrom` operator when the content is not known to satisfy that, as
+it reports a diagnostic instead.
 
 ####### s
 
@@ -12861,6 +12951,47 @@ When `isCollection` is `true`, the expression:
 - has a `contains(other)` method that returns `true` if the `other`
   expression is in the collection.
 
+### `isCollection` is a CAPABILITY, `type.matches('collection')` is a SHAPE
+
+This is the single most common source of collection-handling bugs in the
+engine, so it is worth stating precisely. The two predicates answer
+different questions and neither implies the other:
+
+- `isCollection` — "can I enumerate this **now**?" It is `false` for a
+  symbol declared `list<number>`/`vector<2>` that has not been assigned
+  yet, and for an application whose head returns a collection (`L(1)`
+  under `L: (number) -> vector<2>`): both are collection-shaped, but
+  there is nothing to walk.
+- `type.matches('collection')` — "is this operand collection-**shaped**?"
+  It is `true` for those valueless cases, and `false` for a materialized
+  collection whose type is top (`unknown`/`any`), which `isCollection`
+  reports `true`.
+
+Pick by the question you are actually asking:
+
+- About to call `each()`, `contains()`, `at()`, or read `count` — that is
+  a capability question. Use `isCollection`.
+- Deciding whether an operand takes the SCALAR path or the
+  collection/broadcast path — that is a shape question. Test
+  `isCollection || type.matches('collection')`, or the operand class
+  alone with `isValuelessCollectionTyped()` (`collection-utils.ts`).
+
+Getting this wrong has a characteristic signature: the operator takes its
+scalar path for an operand that is not a scalar and commits an answer that
+the SAME expression contradicts once the symbol is assigned. A 2026-08-15
+audit of all 95 `isCollection` sites found seven operator families doing
+exactly that — `Sum(L)` answering `L`, `Union(L, Set(1))` collapsing `L`
+into a single element, `SetMinus` INVERTING a membership answer,
+`Mean(L)` committing `NaN`, `Which` throwing on a `list<boolean>`
+condition. Pinned in
+`test/compute-engine/valueless-collection-typed-operand.test.ts`, which is
+the place to add a case if you touch this.
+
+A third predicate covers a distinct case: `isPossiblyCollectionTyped()`
+(`collection-utils.ts`) is for an operand that MIGHT become a collection
+at runtime — a top-typed application, or a `broadcastable<T>` — where the
+honest answer is that the shape is not statically visible at all.
+
 </MemberCard>
 
 <MemberCard>
@@ -12955,7 +13086,11 @@ iterating over the collection.
 subsetOf(other, strict): boolean | undefined
 ```
 
-Check if this collection is a subset of another collection.
+Check if this collection is a subset of another collection, i.e.
+`this` ⊆ `other`.
+
+Returns `undefined` when the relation cannot be determined — including
+when this expression is not (yet) a collection.
 
 ####### other
 
@@ -15055,6 +15190,16 @@ static string: BoxedType;
 
 <MemberCard>
 
+##### BoxedType.character
+
+```ts
+static character: BoxedType;
+```
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedType.dictionary
 
 ```ts
@@ -15694,6 +15839,7 @@ type PrimitiveType =
   | "collection"
   | "indexed_collection"
   | "list"
+  | "range"
   | "set"
   | "dictionary"
   | "record"
@@ -15705,6 +15851,7 @@ type PrimitiveType =
   | "symbol"
   | "boolean"
   | "string"
+  | "character"
   | "color"
   | "expression"
   | "unknown"
@@ -15737,11 +15884,11 @@ A primitive type is a simple type that represents a concrete value.
    - `scalar`
      - `<number>`
      - `boolean`: a boolean value: `True` or `False`.
-     - `string`: a string of characters.
+     - `character`: exactly one user-perceived character (grapheme cluster).
    - `collection`
       - `set`: a collection of unique expressions, e.g. `set<string>`.
       - `record`: a collection of specific key-value pairs,
-         e.g. `record<x: number, y: boolean>`.
+         e.g. `record{x: number, y: boolean}`.
       - `dictionary`: a collection of arbitrary key-value pairs
          e.g. `dictionary<string, number>`.
       - `indexed_collection`: collections whose elements can be accessed
@@ -15752,6 +15899,8 @@ A primitive type is a simple type that represents a concrete value.
              tensor when the type of its elements is a number
           - `tuple`: a fixed-size collection of named or unnamed elements,
              e.g. `tuple<number, boolean>`, `tuple<x: number, y: boolean>`.
+          - `string`: a string of characters, i.e. an indexed collection of
+             `character`. A sibling of `list<character>`, not a subtype.
 
 </MemberCard>
 
@@ -16095,10 +16244,10 @@ same way (an ordered map from field name to field type), but they behave in
 opposite ways, and the difference is deliberate:
 
 - An object type is **nominal**. This shape is only ever the definition
-  (`def`) of a declared [TypeReference](#typereference): `type Person = object<…>`.
+  (`def`) of a declared [TypeReference](#typereference): `type Person = object{…}`.
   Two object types with identical layouts are unrelated, because a store
   through one view would break the other's declared field types (write
-  `1.5` into an `object<count: integer>` viewed as `object<count: number>`).
+  `1.5` into an `object{count: integer}` viewed as `object{count: number}`).
   The nominal reference is what supplies that opacity; this shape only
   carries the layout.
 - Every field is a read/write position, so a field type is **invariant**:

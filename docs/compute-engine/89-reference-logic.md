@@ -58,6 +58,16 @@ notations: it parses as
 [`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
 mathematical identity operator.
 
+`And`, `Or`, `Nand`, `Nor` and `Implies` are **short-circuit** operators:
+their operands are evaluated left to right, in the order written, and
+evaluation stops at the first operand that decides the result — the first
+`False` for `And`/`Nand`, the first `True` for `Or`/`Nor`, a `False`
+antecedent for `Implies`; the remaining operands are not evaluated. For that
+reason their operands are not reordered at canonicalization. (`Xor` and
+`Equivalent` cannot short-circuit: every operand affects the result.) An element-wise application (some operand is a collection)
+is the exception: every operand is evaluated once and the result is a list.
+See the [Logic guide](/compute-engine/guides/logic/).
+
 ### Operator Precedence
 
 Logical operators have lower precedence than comparison and arithmetic operators,

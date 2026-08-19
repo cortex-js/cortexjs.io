@@ -19,11 +19,23 @@ The most common types of collection are:
 | `list`       | Collection of elements accessible by their index, duplicates allowed    | [**List**](#list)        |
 | `set`        | Collection of unique elements                           | [**Set**](#set)          |
 | `tuple`      | Collection with a fixed size and optional names        | [**Tuple**](#tuple)      |
+| `range`      | An **index span**: a contiguous, ascending run of 1-based indexes | [**Range**](#range)      |
+| `string`     | An indexed collection of `character` — the string's grapheme clusters | [**Strings**](/compute-engine/reference/strings/) |
 | `dictionary` | Collection of key-value pairs with string keys        | [**Dictionary**](#dictionary) |
 | `record`     | Structured data with a fixed set of known string keys  |                          |
 
 Collections are **immutable**: they cannot be modified in place.  
 Instead, operations on collections produce new collections.
+
+A **string** is an indexed collection too: its elements are its characters
+(grapheme clusters), so `Length`, `At`, `Contains`, `Map`, `Filter` and the
+rest apply to it directly. Which operators give a `string` back rather than a
+list is covered by the string-preservation rule in the
+[Strings reference](/compute-engine/reference/strings/#which-operations-return-a-string);
+in short, operators that select or reorder the source's own characters
+(`Reverse`, `Take`, `Sort`, `Unique`, `Filter`, …) return a string, and
+element-transforming ones (`Map`, `FlatMap`, `Scan`, `Zip`) always return a
+list.
 
 
 Collections can be used to represent vectors, matrices, sets,
@@ -56,7 +68,7 @@ In addition, indexed collections support:
 ### Indexed Collections and Non-indexed Collections
 
 Collections fall into two broad categories:
-- **Indexed collections**, such as `List` and `Tuple`
+- **Indexed collections**, such as `List`, `Tuple` and a string
 
   → Elements can be accessed by an **index**, an integer that indicates the position of the element in the collection.
 
@@ -267,7 +279,7 @@ Some of the eager collections include:
     where each key is unique. 
     
     **Type:** either `dictionary<V>` where `V` is the 
-    type of the values, the keys are strings or `record<K1: T1, K2: T2, ..., Kn: Tn>` where `K1`, `K2`, ..., `Kn` are the keys and `T1`, `T2`, ..., `Tn` are the types of the values. The `dictionary` type is used when the 
+    type of the values, the keys are strings or `record{K1: T1, K2: T2, ..., Kn: Tn}` where `K1`, `K2`, ..., `Kn` are the keys and `T1`, `T2`, ..., `Tn` are the types of the values. The `dictionary` type is used when the 
     set of keys is not known in advance, for example when a dictionary 
     is used as a cache. The `record` type is used when the set of keys is known 
     in advance and fixed, for example to represent a structured data type.
@@ -305,7 +317,8 @@ Operations on indexed collections:
 - [**At**](#at), [**First**](#first), [**Second**](#second), [**Last**](#last): access a specific element of a collection.
 - [**Take**](#take), [**Drop**](#drop), [**Most**](#most), [**Rest**](#rest): access a subset of a collection.
 - [**IndexOf**](#indexof): find the index of an element in a collection.
-- [**Extract**](#extract), [**Exclude**](#exclude): access a collection of elements at specific indexes.
+- [**Slice**](#slice): access a contiguous span of a collection.
+- [**DeleteAt**](#deleteat), [**Insert**](#insert), [**ReplaceAt**](#replaceat): remove, insert or replace an element by index.
 - [**Sort**](#sort), [**RandomShuffle**](#randomshuffle), [**Reverse**](#reverse): reorder a collection.
 - [**Unique**](#unique): remove duplicates from a collection.
 - [**RotateLeft**](#rotateleft), [**RotateRight**](#rotateright): rotate a collection to the left or right.
@@ -405,7 +418,9 @@ lazy operand lowers to the equivalent `Join` expression (a lone spread
 `["List", ["Spread", "xs"]]` is `["Join", "xs"]`), and an infinite operand
 stays lazy. A **tuple** does not spread — tuples are units; use `ListFrom`
 to convert one explicitly — so a provably-tuple operand is a `spread-tuple`
-error, and a scalar or string operand is an `incompatible-type` error.
+error, and a scalar operand is an `incompatible-type` error. A **string** is
+an indexed collection of characters, so it spreads into its characters
+(`[..."ab"]` is `["a", "b"]`).
 `Set` literals accept `Spread` elements the same way (deduplicating), and a
 `Dictionary` literal merges spread dictionaries with later entries winning
 on key collisions.
@@ -422,10 +437,10 @@ The visual presentation of a `List` expression can be customized using the
 const xs = ce.expr(["List", 5, 2, 10, 18]);
 
 xs.latex
-// ➔ "\lbrack 5, 2, 10, 18 \rbrack"
+// ➔ "\bigl\lbrack5, 2, 10, 18\bigr\rbrack"
 
 ce.expr(["Delimiter", xs, "<;>"]).latex;
-// ➔ "\langle5; 2; 10; 18\rangle"
+// ➔ "\langle5;2;10;18\rangle"
 ```
 
 A **vector** is represented using a `List` of numbers.
@@ -508,8 +523,8 @@ The elements in a set are counted in constant time.
 A `["Spread", xs]` element splices the elements of the collection `xs` into
 the set, deduplicating as usual (in Epsil, `{1, ...s}`). The same rules as
 for a [`List` spread](#list) apply: tuples do not spread (a `spread-tuple`
-error; use `ListFrom` to convert), and a scalar or string operand is an
-`incompatible-type` error.
+error; use `ListFrom` to convert), a scalar operand is an
+`incompatible-type` error, and a string spreads into its characters.
 
 ```json example
 ["Set", 1, ["Spread", ["List", 2, 2, 3]]]
@@ -566,11 +581,11 @@ parenthesized form $(a_n)_{n\in\mathbb{N}}$ is unchanged.
 
 <FunctionDefinition name="Range">
 
-<Signature name="Range" returns="indexed_collection<integer>">_upper_:number</Signature>
+<Signature name="Range" returns="range | indexed_collection<integer>">_upper_:number</Signature>
 
-<Signature name="Range" returns="indexed_collection<integer>">_lower_:number, _upper_:number</Signature>
+<Signature name="Range" returns="range | indexed_collection<integer>">_lower_:number, _upper_:number</Signature>
 
-<Signature name="Range" returns="indexed_collection<number>">_lower_:number, _upper_:number, _step_:number</Signature>
+<Signature name="Range" returns="range | indexed_collection<number>">_lower_:number, _upper_:number, _step_:number</Signature>
 
 A sequence of numbers, starting with `lower`, ending with `upper`, and
 incrementing by `step`.
@@ -612,6 +627,29 @@ non-integer (e.g. `0.1`) or a symbolic expression, the result widens to
 // ➔ ["List", 0, 0.1, 0.2, 0.3, ..., 1.0]
 ```
 
+**A range that describes collection indexes has the `range` type.** When the
+bounds are integers, at least 1, ascending, and one apart — that is, when the
+value is a contiguous run of valid 1-based indexes — the result takes the
+narrower [`range`](/compute-engine/guides/types/) type, an **index span**.
+Every other case keeps the `indexed_collection` types above.
+
+```json example
+["Range", 2, 5]      // type: range        (an index span)
+["Range", 7]         // type: range        (the one-argument form means 1..7)
+["Range", 1, 10, 2]  // type: indexed_collection<integer>  (stepped: a gather, not a span)
+["Range", 5, 2]      // type: indexed_collection<integer>  (descending)
+["Range", 0, 5]      // type: indexed_collection<integer>  (0 is not an index)
+```
+
+The narrowing loses no information — a `range` is still an
+`indexed_collection<integer>`, so anything that accepted a `Range` before
+still does. What it adds is the ability for an operator that consumes an
+index span to require a usable one at the type level, rejecting a descending
+or stepped range at the call site instead of at run time. Note that `range`
+is an index span, not a mathematical interval — for those, see
+[`Interval`](/compute-engine/reference/sets/) — and not the statistical range
+of a data set, which is `Max` minus `Min`.
+
 ### LaTeX Syntax
 
 In addition to `\operatorname{range}(...)` and the `..` infix form, `Range`
@@ -641,11 +679,11 @@ Outside `[...]` brackets, the ellipsis tokens continue to parse as the
 
 <FunctionDefinition name="Linspace">
 
-<Signature name="Linspace" returns="indexed_collection<real>">_upper_:real</Signature>
+<Signature name="Linspace" returns="indexed_collection">_upper_:real</Signature>
 
-<Signature name="Linspace" returns="indexed_collection<real>">_lower_:real, _upper_:real</Signature>
+<Signature name="Linspace" returns="indexed_collection">_lower_:real, _upper_:real</Signature>
 
-<Signature name="Linspace" returns="indexed_collection<real>">_lower_:real, _upper_:real, _count_:integer</Signature>
+<Signature name="Linspace" returns="indexed_collection">_lower_:real, _upper_:real, _count_:integer</Signature>
 
 `Linspace` is short for "linearly spaced", from the [MATLAB function of the same
 name](https://mathworks.com/help/matlab/ref/linspace.html).
@@ -658,36 +696,20 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 
 ```json example
 ["Linspace", 3, 10]
-// ➔ ["List", 3, 3.142857142857143, 3.2857142857142856, 
-// 3.4285714285714284, 3.571428571428571, 3.714285714285714, 
-// 3.857142857142857, 4, 4.142857142857143, 4.285714285714286, 
-// 4.428571428571429, 4.571428571428571, 4.714285714285714,
-// 4.857142857142857, 5, 5.142857142857143, 5.285714285714286, 
-// 5.428571428571429, 5.571428571428571, 5.714285714285714, 
-// 5.857142857142857, 6, 6.142857142857143, 6.285714285714286, 
-// 6.428571428571429, 6.571428571428571, 6.714285714285714, 
-// 6.857142857142857, 7, 7.142857142857143, 7.285714285714286, 
-// 7.428571428571429, 7.571428571428571, 7.714285714285714, 
-// 7.8979591836734695, 8.061224489795919, 8.224489795918368, 
-// 8.387755102040817, 8.551020408163266, 8.714285714285714, 
-// 8.877551020408163, 9.040816326530612, 9.204081632653061, 
-// 9.36734693877551, 9.53061224489796, 9.693877551020408, 
-// 9.857142857142858, 10]
+// ➔ ["List", 3, 3.142857142857143, 3.2857142857142856,
+// 3.4285714285714284, ..., 9.714285714285715, 9.857142857142858, 10]
+// (50 elements, spaced by 7/49)
 
 ["Linspace", 2]
-// ➔ ["List", 1, 1.1428571428571428, 1.2857142857142858, 
-// 1.4285714285714286, 1.5714285714285714, 
-// 1.7142857142857142, 1.8571428571428572, 2]
+// ➔ ["List", 1, 1.0204081632653061, 1.0408163265306123,
+// 1.0612244897959184, ..., 1.9591836734693877, 1.9795918367346939, 2]
+// (50 elements from the default lower bound 1, spaced by 1/49)
 
 ["Linspace", 1, 10, 5]
 // ➔ ["List", 1, 3.25, 5.5, 7.75, 10]
 
 ["Linspace", 10, 1, 10]
-// ➔ ["List", 10, 9.11111111111111, 8.222222222222221, 
-// 7.333333333333333, 6.444444444444445, 
-// 5.555555555555555, 4.666666666666666, 3.7777777777777777, 
-// 2.888888888888889, 2]
-
+// ➔ ["List", 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 ```
 
 </FunctionDefinition>
@@ -700,41 +722,33 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 
 <FunctionDefinition name="Fill">
 
-<Signature name="Fill" returns="indexed_collection">_dimensions_, _value_:any</Signature>
+<Signature name="Fill" returns="list">_f_:function, _dimensions_:tuple</Signature>
 
-<Signature name="Fill" returns="indexed_collection">_dimensions_, _f_:function</Signature>
+<div className="tags"><span className="tag">lazy</span></div>
 
-Create an indexed collection of the specified dimensions.
-
-If a `value` is provided, the elements of the collection are all set to that value.
-
-If a `function` is provided, the elements of the collection are computed by applying
-the function to the index of the element.
-
-If `dimensions` is a number, a collection with that many elements is created.
-
-```json example
-["Fill", 3, 0]
-// ➔ ["List", 0, 0, 0]
-```
-
-If dimension is a tuple, a matrix of the specified dimensions is created.
-
-```json example
-["Fill", ["Tuple", 2, 3], 0]
-// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
-```
-
-If a `function` is specified, it is applied to the index of the element to
-compute the value of the element.
+Produce a matrix of the given `dimensions` by applying `f` to each pair of row
+and column indexes. The function comes **first** and the dimensions are a
+`Tuple`, so `["Fill", f, ["Tuple", 2, 3]]` is a 2×3 matrix whose element at row
+`i`, column `j` is `f(i, j)`.
 
 ```json example
 ["Fill", 
-  ["Tuple", 2, 3], 
-  ["Function", ["Add", "i", "j"], "i", "j"]
+  ["Function", ["Add", "i", "j"], "i", "j"], 
+  ["Tuple", 2, 3]
 ]
-// ➔ ["List", ["List", 0, 1, 2], ["List", 1, 2, 3]]
+// ➔ ["List", ["List", 2, 3, 4], ["List", 3, 4, 5]]
 ```
+
+A constant function fills every cell with the same value:
+
+```json example
+["Fill", ["Function", 0], ["Tuple", 2, 3]]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+```
+
+`Fill` always builds a two-dimensional result: the dimension tuple must carry
+both a row count and a column count. To build a one-dimensional collection from
+an index, use [`Tabulate`](#tabulate) instead.
 
 </FunctionDefinition>
 
@@ -935,7 +949,7 @@ Returns the element at the specified index.
 
 ```json example
 ["At", ["List", 5, 2, 10, 18], 2]
-// ➔ 10
+// ➔ 2
 
 ["At", ["List", 5, 2, 10, 18], -2]
 // ➔ 10
@@ -996,9 +1010,10 @@ another list of the same length (`L[d=4]` where `d` is a list), or a positional
 mask computed from a `Range`:
 
 ```js
-// Remove the i-th element of L:
-ce.parse("L[|[1...\\operatorname{length}(L)]-i|>0]");
-// ➔ ["At", "L", ["Less", 0, ["Abs", ["Add", ["Negate", "i"], ["Range", 1, ["Length", "L"]]]]]]
+// Remove the k-th element of L. (The index symbol here is `k`, not `i`:
+// a bare `i` parses as the imaginary unit.)
+ce.parse("L[|[1...\\operatorname{length}(L)]-k|>0]");
+// ➔ ["At", "L", ["Less", 0, ["Abs", ["Add", ["Negate", "k"], ["Range", 1, ["Length", "L"]]]]]]
 ```
 
 The mask is applied positionally and truncates to the shorter of the
@@ -1015,7 +1030,7 @@ automatically converted to `At` expressions:
 ce.declare('v', 'list<number>');
 ce.parse('v_n');      // → ["At", "v", "n"]
 ce.parse('v_{n+1}');  // → ["At", "v", ["Add", "n", 1]]
-ce.parse('v_{i,j}');  // → ["At", "v", ["Tuple", "i", "j"]]
+ce.parse('v_{p,q}');  // → ["At", "v", "p", "q"]
 ```
 
 You can also use bracket notation, which always produces `At` regardless
@@ -1177,7 +1192,7 @@ It's equivalent to `["At", xs, -1]`.
 
 <FunctionDefinition name="Most">
 
-<Signature name="Most" returns="indexed_collection">_xs_: indexed_collection</Signature>
+<Signature name="Most" returns="list">_xs_: indexed_collection</Signature>
 
 Return everything but the last element of the collection.
 
@@ -1197,7 +1212,7 @@ It's equivalent to `["Reverse", ["Drop", ["Reverse", xs], 1]]`.
 
 <FunctionDefinition name="Rest">
 
-<Signature name="Rest" returns="indexed_collection">_xs_: indexed_collection</Signature>
+<Signature name="Rest" returns="list">_xs_: indexed_collection</Signature>
 
 Return everything but the first element of the collection.
 
@@ -1224,14 +1239,17 @@ It's equivalent to `["Drop", xs, 1]`.
 
 Return a list of the first `n` elements of `xs`. The collection `xs` must be indexed.
 
-If `n` is negative, it returns the last `n` elements.
+A non-positive `n` is clamped to zero: `Take` never counts from the end, so
+`n <= 0` yields the empty collection whatever `xs` is. To take a suffix, drop
+the prefix before it (`["Drop", xs, ["Subtract", ["Length", xs], 2]]`) or slice
+with negative bounds (`["Slice", xs, -2, -1]`).
 
 ```json example
 ["Take", ["List", 5, 2, 10, 18], 2]
 // ➔ ["List", 5, 2]
 
 ["Take", ["List", 5, 2, 10, 18], -2]
-// ➔ ["List", 18, 10]
+// ➔ ["List"]
 ```
 
 See [**Drop**](#drop) for a function that returns everything but the first `n` elements.
@@ -1247,14 +1265,16 @@ See [**Drop**](#drop) for a function that returns everything but the first `n` e
 
 Return a list without the first `n` elements.
 
-If `n` is negative, it returns a list without the last `n` elements.
+A negative `n` drops nothing: the count is clamped to zero, so the collection
+comes back unchanged. To drop a suffix, take the prefix that remains
+(`["Take", xs, ["Subtract", ["Length", xs], 2]]`).
 
 ```json example
 ["Drop", ["List", 5, 2, 10, 18], 2]
 // ➔ ["List", 10, 18]
 
 ["Drop", ["List", 5, 2, 10, 18], -2]
-// ➔ ["List", 5, 2]
+// ➔ ["List", 5, 2, 10, 18]
 ```
 
 See [**Take**](#take) for a function that returns the first `n` elements.
@@ -1273,7 +1293,9 @@ See [**Take**](#take) for a function that returns the first `n` elements.
 <div className="tags"><span className="tag">lazy</span></div>
 
 Return the elements from the 1-based `start` index through the `end` index,
-inclusive. Negative indices are counted from the end of the collection.
+inclusive. Negative indices are counted from the end of the collection, and
+out-of-bounds indices are clamped (a `start` past the end yields an empty
+list).
 
 ```json example
 ["Slice", ["List", 5, 2, 10, 18], 2, 3]
@@ -1281,6 +1303,41 @@ inclusive. Negative indices are counted from the end of the collection.
 
 ["Slice", ["List", 5, 2, 10, 18], -3, -1]
 // ➔ ["List", 2, 10, 18]
+```
+
+<Signature name="Slice" returns="list">_xs_:indexed_collection, _span_:range</Signature>
+
+Return the elements at the indexes of an index span: `["Slice", xs, r]` is
+`["Slice", xs, ["First", r], ["Last", r]]`, with the same clamping.
+
+The argument must be a [`range`](#range) — an ascending, step-1, finite span of
+1-based indexes such as `["Range", 2, 3]`. A descending or stepped `Range`
+(`["Range", 3, 2]`, `["Range", 1, 9, 2]`) is not a `range` and is rejected as
+a type error: unpacking it into `(start, end)` bounds would contradict its own
+meaning (`["Slice", xs, 3, 2]` is empty, but the collection `["Range", 3, 2]`
+is the pair `[3, 2]`). To gather elements at arbitrary indexes, in any order or
+with any step, use [`At`](#at) with a collection of indexes.
+
+```json example
+["Slice", ["List", 5, 2, 10, 18], ["Range", 2, 3]]
+// ➔ ["List", 2, 10]
+
+["Slice", ["List", 5, 2, 10, 18], ["Range", 3, 9]]
+// ➔ ["List", 10, 18]
+```
+
+<Signature name="Slice" returns="list | nothing">_xs_:indexed_collection, _span_:range | nothing</Signature>
+
+A `Nothing` span passes through as `Nothing`. This arm exists so that a span
+produced by [`RangeOf`](#rangeof) — which answers `Nothing` when the needle is
+absent — can be sliced without a test in between:
+
+```json example
+["Slice", ["List", 9, 7, 5, 3], ["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 5]]]
+// ➔ ["List", 7, 5]
+
+["Slice", ["List", 9, 7, 5, 3], ["RangeOf", ["List", 9, 7, 5, 3], ["List", 1, 2]]]
+// ➔ "Nothing"
 ```
 
 </FunctionDefinition>
@@ -1349,115 +1406,23 @@ See [**TakeWhile**](#takewhile) for the complementary operation.
 
 <FunctionDefinition name="Reverse">
 
-<Signature name="Reverse">_xs_: indexed_collection</Signature>
+<Signature name="Reverse" returns="string">_xs_: string</Signature>
+<Signature name="Reverse" returns="list">_xs_: list</Signature>
+<Signature name="Reverse" returns="list">_xs_: indexed_collection</Signature>
 <div className="tags"><span className="tag">lazy</span></div>
 
 Return the collection in reverse order.
 
+A `list` operand keeps its type, shape included (a `vector<3>` reversed is a
+`vector<3>`), and a `string` operand gives back a string. Any other indexed
+collection — a tuple, a range, an opaque indexed collection — results in a
+`list` of the same elements: a reversed tuple's element types would come back
+in the wrong order, and a reversed range is descending, which the `range`
+type excludes.
+
 ```json example
 ["Reverse", ["List", 5, 2, 10, 18]]
 // ➔ ["List", 18, 10, 2, 5]
-```
-
-It's equivalent to `["Extract", xs, ["Tuple", -1, 1]]`.
-
-</FunctionDefinition>
-
-<nav className="hidden">
-### Extract
-</nav>
-
-<FunctionDefinition name="Extract">
-
-<Signature name="Extract" returns="indexed_collection">_xs_: indexed_collection, _index_:integer</Signature>
-
-<Signature name="Extract" returns="indexed_collection">_xs_: indexed_collection, ..._indexes_:integer</Signature>
-
-<Signature name="Extract" returns="indexed_collection">_xs_: indexed_collection, _range_:tuple&lt;integer, integer&gt;</Signature>
-
-Returns a list of the elements at the specified indexes.
-
-`Extract` always return an indexed collection, even if the result is a single element. If no
-elements match, an empty collection is returned.
-
-```json example
-["Extract", ["List", 5, 2, 10, 18], 2]
-// ➔ ["List", 10]
-
-["Extract", ["List", 5, 2, 10, 18], -2, 1]
-// ➔ ["List", 10, 5]
-
-
-["Extract", ["List", 5, 2, 10, 18], 17]
-// ➔ ["List"]
-```
-
-When using a range, it is specified as a `Tuple`.
-
-```json example
-// Elements 2 to 3
-["Extract", ["List", 5, 2, 10, 18], ["Tuple", 2, 4]]
-// ➔ ["List", 2, 10, 18]
-
-// From start to end, every other element
-["Extract", ["List", 5, 2, 10, 18], ["Tuple", 1, -1, 2]]
-// ➔ ["List", 5, 10]
-```
-
-The elements are returned in the order in which they're specified. Using
-negative indexes (or ranges) reverses the order of the elements.
-
-```json example
-// From last to first = reverse
-["Extract", ["List", 5, 2, 10, 18], ["Tuple", -1, 1]]
-// ➔ ["List", 18, 10, 2, 5]
-
-// From last to first = reverse
-["Extract", ""desserts"", ["Tuple", -1, 1]]
-// ➔ ""stressed""
-```
-
-An index can be repeated to extract the same element multiple times.
-
-```json example
-["Extract", ["List", 5, 2, 10, 18], 3, 3, 1]
-// ➔ ["List", 10, 10, 5]
-```
-
-</FunctionDefinition>
-
-
-<nav className="hidden">
-### Exclude
-</nav>
-
-<FunctionDefinition name="Exclude">
-
-<Signature name="Exclude" returns="indexed_collection">_xs_:indexed_collection,, _index_:integer</Signature>
-
-<Signature name="Exclude" returns="indexed_collection">_xs_:indexed_collection, _indexes_:tuple&lt;integer&gt;</Signature>
-
-`Exclude` is the opposite of `Extract`. It returns a list of the elements that
-are not at the specified indexes.
-
-The order of the elements is preserved.
-
-
-```json example
-["Exclude", ["List", 5, 2, 10, 18], 3]
-// ➔ ["List", 5, 2, 18]
-
-["Exclude", ["List", 5, 2, 10, 18], -2, 1]
-// ➔ ["List", 2, 18]
-```
-
-
-An index may be repeated, but the corresponding element will only be dropped
-once.
-
-```json example
-["Exclude", ["List", 5, 2, 10, 18], 3, 3, 1]
-// ➔ ["List", 2, 18]
 ```
 
 </FunctionDefinition>
@@ -1468,7 +1433,8 @@ once.
 
 <FunctionDefinition name="RotateLeft">
 
-<Signature name="RotateLeft" returns="indexed_collection">_xs_: indexed_collection, _count_: integer</Signature>
+<Signature name="RotateLeft" returns="list">_xs_: list, _count_: integer</Signature>
+<Signature name="RotateLeft" returns="list">_xs_: indexed_collection, _count_: integer</Signature>
 
 Returns a collection where the elements are rotated to the left by the specified
 count.
@@ -1486,7 +1452,8 @@ count.
 
 <FunctionDefinition name="RotateRight">
 
-<Signature name="RotateRight" returns="indexed_collection">_xs_: indexed_collection, _count_: integer</Signature>
+<Signature name="RotateRight" returns="list">_xs_: list, _count_: integer</Signature>
+<Signature name="RotateRight" returns="list">_xs_: indexed_collection, _count_: integer</Signature>
 
 Returns a collection where the elements are rotated to the right by the
 specified count.
@@ -1526,6 +1493,15 @@ A permutation needs every element, so the collection is materialized; a
 collection larger than 1,000,000 elements is refused with an `out-of-range`
 error rather than attempted.
 
+A permutation of a **string** is a string — the result is built from the
+source's own characters, so the kind is preserved, as it is for `Reverse` and
+`Take`. The same holds for `RandomSample`.
+
+```json example
+["RandomShuffle", {str: "abcdef"}]
+// ➔ "dbeafc"                (a string, not a list of characters)
+```
+
 `Shuffle` was renamed to `RandomShuffle`; the old name throws an
 `operator-removed` error for one release.
 
@@ -1537,14 +1513,18 @@ error rather than attempted.
 
 <FunctionDefinition name="Sort">
 
-<Signature name="Sort" returns="indexed_collection">_xs_: collection</Signature>
+<Signature name="Sort" returns="indexed_collection">_xs_: indexed_collection</Signature>
 
-<Signature name="Sort" returns="indexed_collection">_xs_: collection, _order-function_: function</Signature>
+<Signature name="Sort" returns="indexed_collection">_xs_: indexed_collection, _order-function_: function</Signature>
 
-Return the collection in sorted order.
+Return the collection in sorted order. The collection must be **indexed** — an
+unordered collection such as a `Set` has no positions to permute, and is an
+`incompatible-type` error. A **string** subject sorts its characters and comes
+back as a string (`["Sort", "dcba"]` is `"abcd"`), like every other
+element-preserving operator.
 
 ```json example
-["Sort", ["Set", 18, 5, 2, 10]]
+["Sort", ["List", 18, 5, 2, 10]]
 // ➔ ["List", 2, 5, 10, 18]
 ```
 
@@ -1588,15 +1568,15 @@ Return the indexes of the collection in sorted order.
 // ➔ ["List", 2, 1, 3, 4]
 ```
 
-To get the values in sorted order, use `Extract`:
+To get the values in sorted order, index the collection with the ordering —
+[`At`](#at) accepts a collection of indexes:
 
 ```json example
-["Assign", "xs", ["List", 5, 2, 10, 18]]
-["Extract", "xs", ["Ordering", "xs"]]
+["At", ["List", 5, 2, 10, 18], ["Ordering", ["List", 5, 2, 10, 18]]]
 // ➔ ["List", 2, 5, 10, 18]
 
 // Same as Sort:
-["Sort", "xs"]
+["Sort", ["List", 5, 2, 10, 18]]
 // ➔ ["List", 2, 5, 10, 18]
 ```
 
@@ -1804,7 +1784,7 @@ Returns the symbol `True` if the collection has no elements.
 // ➔ "True"
 
 ["IsEmpty", "x"]
-// ➔ "True"
+// ➔ ["IsEmpty", "x"]   (undecided: `x` is not known to be a collection)
 
 ["IsEmpty", {str: "Hello"}]
 // ➔ "False"
@@ -1827,6 +1807,10 @@ Returns `True` if the collection contains the given value, `False` otherwise. Th
 ["Contains", ["List", 5, 2, 10, 18], 42]
 // ➔ "False"
 ```
+
+`Contains` tests for **one element**. To test for a contiguous run of several
+elements — a sublist, or a substring — use
+[`ContainsSequence`](#containssequence).
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -1847,6 +1831,132 @@ present.
 ["IndexOf", ["List", 5, 2, 10, 2], 42]
 // ➔ 0
 ```
+
+`IndexOf` searches for **one element**. To search for a contiguous run of
+several elements — a sublist, or a substring — use [`RangeOf`](#rangeof).
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### RangeOf
+</nav>
+
+<FunctionDefinition name="RangeOf">
+
+<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
+<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
+
+The **span** of the first occurrence of _needle_ as a contiguous subsequence
+of _xs_, as a 1-based inclusive [`range`](#range), or `Nothing` when the
+needle does not occur.
+
+```json example
+["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 5]]
+// ➔ ["Range", 2, 3]
+
+["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 3]]
+// ➔ "Nothing"        (7 and 3 are not adjacent)
+```
+
+`RangeOf` and its three companions [`ContainsSequence`](#containssequence),
+[`StartsWith`](#startswith) and [`EndsWith`](#endswith) read their second
+argument as a **sequence of elements**, which is what distinguishes them from
+[`Contains`](#contains) and [`IndexOf`](#indexof):
+
+| Question | Operator |
+| :--- | :--- |
+| Is `v` one of the elements? | `Contains(xs, v)` |
+| At what index is the element `v`? | `IndexOf(xs, v)` |
+| Do these elements occur consecutively? | `ContainsSequence(xs, needle)` |
+| At what indexes? | `RangeOf(xs, needle)` |
+
+Keeping them apart is what avoids an ambiguity the collection library cannot
+resolve: with nested lists, a single overloaded operator could not tell
+`IndexOf([[1,2],[3,4]], [3,4])` — "the element equal to `[3,4]`" — from "the
+subsequence 3-then-4".
+
+The optional _from_ is the index to start searching at (default 1). The
+returned span is always in the **original** collection's indexes, so finding
+the next occurrence is `RangeOf(xs, needle, Last(r) + 1)` for non-overlapping
+matches (or `First(r) + 1` to allow overlaps), and finding all of them is that
+loop run until it answers `Nothing`.
+
+Domain rules:
+
+| Case | Result |
+| :--- | :--- |
+| Needle absent | `Nothing` |
+| _from_ past the end of _xs_ | `Nothing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
+| _from_ less than 1, or not an integer | An error value |
+| Empty needle | An error value — an empty span is not representable (`["Range", 1, 0]` is the *descending* range `[1, 0]`, not an empty one) |
+| Infinite or unknown-length subject or needle | The expression stays symbolic — searching one would not terminate when the needle is absent |
+
+The span composes with [`Slice`](#slice): when the needle is found,
+`Slice(xs, RangeOf(xs, needle))` has the same element sequence as the needle.
+
+```json example
+["Slice", ["List", 9, 7, 5, 3], ["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 5]]]
+// ➔ ["List", 7, 5]
+```
+
+`Slice` also accepts the `Nothing` that a failed search answers, and passes it
+through, so the two compose without a test in between.
+
+On a **string** the elements are characters, so the search is character-wise
+and the span is in character indexes; that case, including the grapheme
+guarantees it gives, is documented in the
+[strings reference](/compute-engine/reference/strings/#rangeof).
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ContainsSequence
+</nav>
+
+<FunctionDefinition name="ContainsSequence">
+
+<Signature name="ContainsSequence" returns="boolean">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
+
+Whether _needle_ occurs in _xs_ as a contiguous subsequence. For a non-empty
+needle this is [`RangeOf`](#rangeof) not answering `Nothing`.
+
+```json example
+["ContainsSequence", ["List", 1, 2, 3], ["List", 2, 3]]
+// ➔ "True"
+
+["ContainsSequence", ["List", 1, 2, 3], ["List", 3, 2]]
+// ➔ "False"
+```
+
+An **empty** needle is `True`: the empty sequence is a subsequence of
+everything. This is the one edge rule that diverges from `RangeOf`'s, which
+has to reject an empty needle because it must return a span.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### StartsWith
+</nav>
+
+<FunctionDefinition name="StartsWith">
+
+<Signature name="StartsWith" returns="boolean">_xs_:indexed_collection, _prefix_:indexed_collection</Signature>
+<Signature name="EndsWith" returns="boolean">_xs_:indexed_collection, _suffix_:indexed_collection</Signature>
+
+Whether _xs_ begins with _prefix_, or ends with _suffix_, as a contiguous
+subsequence. An empty prefix or suffix is `True`.
+
+```json example
+["StartsWith", ["List", 1, 2, 3], ["List", 1, 2]]
+// ➔ "True"
+
+["EndsWith", ["List", 1, 2, 3], ["List", 2, 3]]
+// ➔ "True"
+```
+
+`EndsWith` has to inspect the tail, so beyond the finiteness rule it needs a
+**known length**: over a collection whose length is not known the expression
+stays symbolic.
 
 </FunctionDefinition>
 
@@ -2064,6 +2174,10 @@ undetermined elements, the expression stays unevaluated.
 Returns a collection where _pred_ is applied to each element of the
 collection. Only the elements for which the predicate returns `"True"` are kept.
 
+An indexed source (a list, tuple or range) yields a `list` of the kept
+elements — never the source's own shape or arity, since filtering changes the
+length. A set source yields a set.
+
 ```json example
 ["Filter", ["List", 5, 2, 10, 18], ["Less", "_", 10]]
 // ➔ ["List", 5, 2]
@@ -2106,6 +2220,26 @@ collection.
   ["List", 1, 2, 3],
   ["List", 10, 20, 30]]
 // ➔ ["List", 11, 22, 33]
+```
+
+The number of source collections is the number of arguments _f_ receives.
+A function literal (or a symbol with a known, non-generic signature) whose
+parameter count cannot match it is a `callback-arity` error at
+canonicalization — the closures a partially applied callback would
+otherwise produce are never what was meant. This contract holds for every
+callback-taking collection operator: `Filter`, `Any`, `All`, `Count`,
+`TakeWhile`, `FlatMap` and their kin supply one argument (the element),
+`Reduce`, `Fold` and `Scan` supply two (the accumulator and the element),
+`Fill` supplies two (row and column), and `Sort`/`Ordering` (a key or a
+comparator) and `Iterate` (`f(previous)` or `f(index, previous)`) accept
+either of their two arities. A nullary literal such as `["Function", 42]`
+is a constant and is applied at any arity. To take a pair apart inside a
+callback, use a tuple-pattern parameter, `["Function", body, ["Tuple",
+"p", "q"]]` (Epsil `((p, q)) => …`), which is one parameter.
+
+```json example
+["Map", ["Function", ["Add", "p", "q"], "p", "q"], ["List", 1, 2, 3]]
+// ➔ ["Error", ["ErrorCode", "'callback-arity'", ...]]
 ```
 
 </FunctionDefinition>
@@ -2382,6 +2516,15 @@ To split a collection into a given _number_ of groups, use `Chunk` instead.
 ["Partition", ["List", 1, 2, 3, 4, 5, 6], ["IsEven", "_"]]
 // ➔ ["List", ["List", 2, 4, 6], ["List", 1, 3, 5]]
 ```
+
+For a **string** source every part — a chunk, a window or a predicate group —
+is itself a string, so the result is a `list<string>`. This holds for all
+three forms.
+
+```json example
+["Partition", {str: "abcd"}, 2]
+// ➔ ["ab", "cd"]
+```
 </FunctionDefinition>
 
 <FunctionDefinition name="Chunk">
@@ -2394,6 +2537,14 @@ To split a collection into chunks of a given _size_, use `Partition` instead.
 ```json example
 ["Chunk", ["List", 1, 2, 3, 4, 5], 2]
 // ➔ ["List", ["List", 1, 2, 3], ["List", 4, 5]]
+```
+
+For a **string** source each group is itself a string, so the result is a
+`list<string>`.
+
+```json example
+["Chunk", {str: "abcdef"}, 2]
+// ➔ ["abc", "def"]
 ```
 </FunctionDefinition>
 
@@ -2424,6 +2575,15 @@ elements that are adjacent.
 ["ChunkBy", ["List", 1, 1, 2, 2, 2, 1], ["Function", "x", "x"]]
 // ➔ ["List", ["List", 1, 1], ["List", 2, 2, 2], ["List", 1]]
 ```
+
+For a **string** source each run is itself a string, so the result is a
+`list<string>`. The same rule applies to `SlidingWindow`, `Permutations` and
+`Combinations`.
+
+```json example
+["ChunkBy", {str: "aabbc"}, ["Function", "x", "x"]]
+// ➔ ["aa", "bb", "c"]
+```
 </FunctionDefinition>
 
 
@@ -2448,6 +2608,7 @@ return a new collection.
 
 <Signature name="Join" returns="list">...collection</Signature>
 <Signature name="Join" returns="set">...set</Signature>
+<Signature name="Join" returns="string">...string</Signature>
 
 If the collections are of different types, the result is a `List` 
 containing the elements of the first collection followed
@@ -2459,14 +2620,39 @@ by the elements of the second collection.
 ```
 
 
-If the collections are all sets , the result is a `Set` of the
-elements of the collections.
+If **any** operand is a set, the result is a `Set` of the elements of the
+collections, and repeated elements are kept only once — a set holds distinct
+elements, however often its operands repeat one.
 
 
 ```json example
 ["Join", ["Set", 5, 2, 10, 18], ["Set", 1, 2, 3]]
 // ➔ ["Set", 5, 2, 10, 18, 1, 3]
+
+["Join", ["Set", 1, 2], ["List", 2, 3]]
+// ➔ ["Set", 1, 2, 3]
 ```
+
+If the arguments are **all strings**, the result is a `string` — this is the
+variadic string concatenation:
+
+```json example
+["Join", {str: "ab"}, {str: "cd"}]
+// ➔ "abcd"
+```
+
+The arm is chosen by the arguments, not by the surrounding types: as soon as
+one argument is not a string, the generic arm applies and a string operand
+contributes its characters.
+
+```json example
+["Join", {str: "ab"}, ["Characters", {str: "cd"}]]
+// ➔ ["a", "b", "c", "d"]        (a list<character>)
+```
+
+To join the elements of **one** collection of strings into a string —
+optionally with a separator — use `StringJoin`, described in the
+[strings reference](/compute-engine/reference/strings/#stringjoin).
 
 </FunctionDefinition>
 
@@ -2541,6 +2727,17 @@ Negative indices count from the end (`-1` is the last element).
 
 Collections are immutable; the input is not modified. An out-of-range or
 symbolic index leaves the expression unevaluated.
+
+The result keeps the kind of the source, so deleting from a **string** gives a
+string:
+
+```json example
+["DeleteAt", {str: "abcdef"}, 2]
+// ➔ "acdef"
+
+["DeleteAt", {str: "abcdef"}, -1]
+// ➔ "abcde"
+```
 
 </FunctionDefinition>
 
@@ -2668,29 +2865,37 @@ The collection `xs` should be a finite collection.
 ["TupleFrom", ["Range", 1, 3]]
 // ➔ ["Tuple", 1, 2, 3]
 ```
+
+A **string** is a collection of characters, so it materializes into its
+characters:
+
+```json example
+["ListFrom", {str: "abc"}]
+// ➔ ["List", "a", "b", "c"]
+```
 </FunctionDefinition>
 
 <nav className="hidden">
-### RecordFrom
 ### DictionaryFrom
 </nav>
 
 <FunctionDefinition>
-<Signature name="RecordFrom" returns="record">_xs_: collection</Signature>
 <Signature name="DictionaryFrom" returns="map">_xs_: collection</Signature>
 
-Returns a record or map containing the elements of the collection `xs`.
+Returns a dictionary containing the elements of the collection `xs`.
 
 The collection `xs` should be a finite collection of key-value pairs, each key being
 a string.
 
 ```json example
-["RecordFrom", ["List", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]]
-// ➔ ["Record", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]
-
 ["DictionaryFrom", ["List", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]]
-// ➔ ["Dictionary", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]
+// ➔ {"dict": {"a": 1, "b": 2}}
 ```
+
+When every key is a bare identifier, the resulting value's type is a
+`record{…}`, so `DictionaryFrom` is also how you build a record from pairs.
+There is no separate `RecordFrom`: a record and a dictionary differ only in
+the type world, and record-ness is derived from the value.
 
 When the collection contains several pairs with the same key, the **last**
 one wins. This is what makes `DictionaryFrom` the engine of the dictionary
@@ -2704,7 +2909,7 @@ first wins, with a diagnostic.)
 ```json example
 ["DictionaryFrom",
   ["List", ["Tuple", "'a'", 1], ["Tuple", "'a'", 9], ["Tuple", "'b'", 2]]]
-// ➔ ["Dictionary", ["Tuple", "'a'", 9], ["Tuple", "'b'", 2]]
+// ➔ {"dict": {"a": 9, "b": 2}}
 ```
 
 </FunctionDefinition>

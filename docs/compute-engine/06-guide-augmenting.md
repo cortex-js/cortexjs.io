@@ -1091,6 +1091,39 @@ in declaration order, and annotates overlapping equal-specificity clauses
 and clauses made unreachable by more specific ones covering their whole
 (finite) domain.
 
+**To define a function whose arguments are not evaluated** — the user-function
+counterpart of an operator definition's `lazy` flag — pass the attribute
+`{hold: True}` as `DefineFunction`'s third operand (in Epsil, the `hold`
+prefix: `hold f(e) = Head(e)`). The arguments are bound to the parameters as
+written, canonical and bound in the caller's scope but unevaluated; reading a
+parameter in the body evaluates the argument there, and a structural operator
+(`Head`, `Tail`, `Hold`) sees the expression itself. A hold definition is
+installed as a `lazy` operator and is single-clause: a second clause, or a
+value-typed (literal) parameter, is refused.
+
+```js
+ce.assign('a', 3);
+ce.box(['DefineFunction', 'f',
+  ['Function', ['Head', 'e'], 'e'],
+  { dict: { hold: 'True' } }]).evaluate();
+console.log(ce.box(['f', ['Add', 'a', 1]]).evaluate().toString());
+// ➔ Add            (without the attribute: Integer — f receives 4)
+```
+
+The same attributes dictionary carries the other definition attributes:
+
+- `bind: ["i"]` — with `hold`, the named parameters are **bound variables**:
+  the call must pass a symbol there, and the parameter is substituted by that
+  symbol in the body (`hold mySum(body, bind i, n) = Sum(body, i, 1, n)`),
+  the definition being installed as a binder (`scoped: operandSites(…)`), so
+  the call declares the symbol in its own scope like `Sum` does.
+- `commutative`, `associative`, `idempotent`, `involution` — the operator
+  flags of the same names, applied when a call is canonicalized. An
+  associative function is binary; a flattened n-ary call is folded pairwise.
+  Not with `hold`.
+- `description: "…"` — the definition's description (`About`, editor
+  hovers); in Epsil this is the doc comment written before the definition.
+
 
 ## Defining Multiple Functions and Symbols
 

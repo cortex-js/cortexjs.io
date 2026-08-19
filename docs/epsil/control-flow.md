@@ -51,8 +51,8 @@ body:
 - **Block style** (`function f(x) { … }`) once the body needs more than an
   expression — a local `let`, a `match`, a loop. It is also the only form that
   carries a name *and* a multi-statement body.
-- **Anonymous** (`x |-> …`) when the function is an argument to another
-  function and a name would add nothing: `Map(x |-> x^2, xs)`.
+- **Anonymous** (`x => …`) when the function is an argument to another
+  function and a name would add nothing: `Map(x => x^2, xs)`.
 
 An anonymous function can have a multi-statement body too, by making that body
 a [`do` block](#do-block-expressions) — but at that point a named `function` is
@@ -121,7 +121,7 @@ fib(10)
 
 Redefining a clause with the *same* parameter list replaces just that
 clause — so re-running an edited definition behaves as expected. A plain
-assignment (`f = x |-> …`) still replaces the whole binding, clauses and
+assignment (`f = x => …`) still replaces the whole binding, clauses and
 all.
 
 A literal parameter behaves as an anonymous parameter constrained to that exact
@@ -142,35 +142,169 @@ clauses that overlap an earlier one of equal specificity as well as clauses
 made unreachable by more specific ones covering their whole (finite)
 domain.
 
-### Anonymous functions
+### Hold functions
 
-An anonymous function uses the ASCII mapsto arrow `|->` (the engine's `↦`);
-`->` itself is taken by `KeyValuePair`, so this is a collision-free choice:
+By default a call **evaluates its arguments first**, and the function sees
+their values: with `let a = 3`, `f(a + 1)` receives `4`. A function that
+needs to see what the caller *wrote* — the expression `a + 1`, to inspect it,
+transform it, serialize it, or decide whether to evaluate it at all — is
+declared with the `hold` prefix, in either form:
 
 ```epsil
-x |-> x + 1
+hold f(e) = Head(e)
+hold function twice(e) { let v = e; v + v }
+```
+
+In a hold function every parameter is bound to its argument **as written**
+(canonicalized and bound in the caller's scope, but not evaluated — so
+`f(1 + 1)` receives the canonical `2`, while `f(a + 1)` receives `a + 1`).
+Reading
+the parameter in an ordinary position evaluates the argument *there*, so
+`hold twice(e) = e + e` computes `e` on each read (call-by-name); read it
+once into a local — `let v = e` — to evaluate once. A structural operator sees
+the expression itself:
+
+```epsil
+let a = 3
+hold f(e) = Head(e)
+f(a + 1)
+// ➔ Add          (an ordinary function would answer Integer: it receives 4)
+```
+
+Because the argument is never evaluated by the call, a hold function can
+decide whether it runs at all — here `Random()` draws only when the
+condition is false:
+
+```epsil
+hold unless(cond, body) = if !cond { body } else { Nothing }
+unless(a > 5, Random())
+```
+
+`hold` applies to the **whole definition** — every parameter is held — and
+it maps to the engine's `lazy` operator flag: the definition is installed as
+a `lazy` operator, and `DefineFunction` carries it as the attribute
+`{hold: True}`. Three consequences:
+
+- A hold function is **single-clause**: a literal parameter selects a clause
+  by an argument's *value*, which a hold function never has, so
+  `hold f(0) = …` is refused (`hold-literal-parameter`), and a second clause
+  of a hold function — hold or not — at a different parameter list is refused
+  (`hold-single-clause`). Redefining the lone clause replaces it as usual.
+- Parameter types are checked against the **argument expression's** type
+  (`hold k(e: integer) = …` admits `k(n + 1)` and refuses `k("s")`).
+- The effects of an argument are the caller's business: they contribute to
+  the call exactly as they would under an ordinary function, since the body
+  may evaluate the argument.
+
+`hold` is a contextual keyword, like `type`: it claims a statement only as
+the prefix of a function definition, and stays a legal identifier everywhere
+else (`let hold = 5`, `hold(2)`). Anonymous functions have no hold form.
+
+### Bound-variable parameters: `bind`
+
+A hold function can define its own **binder** — an operator like `Sum` or
+`D` that takes a variable to bind. Mark the parameter that receives the
+variable with `bind`:
+
+```epsil
+hold mySum(body, bind i, n) = Sum(body, (i, 1, n))
+mySum(k^2, k, 3)
+// ➔ 14
+```
+
+The caller passes a **symbol** at a `bind` position (anything else is a
+`bind-symbol-expected` error), and the function's parameter is *substituted*
+by that symbol throughout the body — including where the body's own binder
+uses it, so `Sum(body, (i, 1, n))` becomes `Sum(k^2, (k, 1, 3))` and the
+sum runs over the caller's `k`. The call declares that symbol in its own
+scope, exactly as `Sum` does with its index: a `let k = 5` outside the call
+does not leak in, and `mySum(k * j, j, 3)` with `k = 5` is `30`. `bind` is
+contextual (`f(bind) = …` declares an ordinary parameter named `bind`) and
+requires `hold` (`bind-requires-hold`): a bound variable can only be received
+unevaluated. Every parameter of the function is held; `bind` says which of
+them names a variable.
+
+The substitution is by **name**, and deliberately reaches inside the body's
+own binders (that is what ties `Sum`'s index to the caller's variable), so it
+also reaches any *other* use of that name in the body: do not reuse a `bind`
+parameter's name for an unrelated local or index inside the same function.
+
+### Algebraic properties
+
+A user-defined operator can declare the algebraic properties the engine
+uses when it canonicalizes a call, in the same slot as the effect specifier:
+
+```epsil
+function op(a, b) commutative associative -> number { a + b + 1 }
+op(2, op(1, 3))     // ➔ 8 — sorted, flattened to op(1, 2, 3), folded pairwise
+conj(z) involution -> number = -z
+conj(conj(w))       // ➔ w
+```
+
+- **`commutative`** — the operands of a call are sorted into canonical order.
+- **`associative`** — nested calls flatten (`op(a, op(b, c))` is `op(a, b,
+  c)`); the function is written binary and a longer call is folded from the
+  left, `op(op(a, b), c)`.
+- **`idempotent`** — `f(f(x))` is `f(x)`.
+- **`involution`** — `f(f(x))` is `x`.
+
+The words are contracts, not checks: declaring `commutative` on a body that
+is not commutative gives whatever the canonical order produces. In the math
+form the slot must be followed by a return arrow (`op(a, b) commutative ->
+number = …`), like an effect specifier. `commutative`/`associative` need at
+least two parameters (`associative` exactly two), `idempotent`/`involution`
+exactly one; a `hold` function cannot carry them (its calls are neither
+reordered nor flattened); every clause of a multi-clause function must state
+the same ones. `About(op)` lists them.
+
+### Documenting a function
+
+A **doc comment** — `///` lines or a `/** … */` block — written immediately
+before a definition becomes the function's *description*: it is shown by
+`About(f)`, by an editor hover, and it is the one comment that survives a
+serialization round trip (it comes back as `///` lines). Ordinary `//`
+comments are not attached.
+
+```epsil
+/// Doubles its argument.
+/// Accepts anything `*` accepts.
+twice(x) = 2x
+About(twice)
+```
+
+### Anonymous functions
+
+An anonymous function uses the ASCII mapsto arrow `=>` (`⇒` in fancy-symbol
+output, and `↦` is accepted as input too);
+`->` itself is taken by `KeyValuePair` and by function types in annotations,
+so the two arrows never collide. The same `=>` separates a `match` case from
+its body — one arrow, meaning "yields", in both places (see
+[Guards](#guards)):
+
+```epsil
+x => x + 1
 ```
 
 ```epsil
-(x, y) |-> x + y
+(x, y) => x + y
 ```
 
 A mapsto binds loosely enough to sit on the right-hand side of an
 assignment:
 
 ```epsil
-f = x |-> x + 1
+f = x => x + 1
 ```
 
 A lambda can take **no** parameters — an empty parameter list `()` before the
 arrow:
 
 ```epsil
-() |-> 42
+() => 42
 ```
 
 Writing `->` where a function was meant — `(x, y) -> x + y`,
-`(n: integer) -> n^2` — is a diagnosed typo: the parser suggests `|->` with a
+`(n: integer) -> n^2` — is a diagnosed typo: the parser suggests `=>` with a
 fixit and recovers as the intended function, so the program still runs. And
 when a declaration's annotation is a function type with named parameters, the
 lambda can be omitted entirely — `const f : (x: number) -> number = x^2 + 1`
@@ -223,13 +357,13 @@ would leave the false case with no value to name. `1 if c` is an error; use the
 block form (`if c { 1 }`) when there is nothing to return.
 
 **It binds looser than every operator that computes, but tighter than the four
-that bind or pair — `=`, `|->`, `|>` and `->`.** So the whole conditional is the
+that bind or pair — `=`, `=>`, `|>` and `->`.** So the whole conditional is the
 right-hand side of an assignment, the body of a function, or the value of a
 dictionary entry, and no parentheses are needed around a comparison:
 
 ```epsil
 let scale = 2
-let tag = n |-> "big" if n * scale > 10 else "small"
+let tag = n => "big" if n * scale > 10 else "small"
 tag(6)
 // ➔ "big"
 ```
@@ -469,6 +603,14 @@ If the guard is undecidable for a symbolic subject, the case falls through to
 the next one — consistent with `match`'s totality, a guard never leaves the
 whole expression inert.
 
+The case arrow `=>` is the same arrow that builds an anonymous function, so a
+guard ends at the first `=>` written at the case's own level: in
+`n if valid => n` the guard is `valid` and the body is `n`, never the lambda
+`valid => n`. A lambda genuinely wanted in a pattern or a guard is
+parenthesized — `n if (f => f)(n) => n` — which costs nothing, since a bare
+lambda as a guard is a function value and therefore always true. A case BODY
+has no such restriction: `0 => x => x + 1` is a case whose result is a lambda.
+
 ### Destructuring
 
 List, tuple, and dictionary patterns decompose the subject and bind their
@@ -613,6 +755,21 @@ while x > 0 { x }
 for x in xs { x }
 ```
 
+The loop variable may be a **tuple pattern**, using the same grammar as
+[`let (a, b) = v`](/declarations/#destructuring-declarations) — bare
+names, `_` to skip a position, nested `(…)` patterns:
+
+```epsil
+let s = 0
+for (p, q) in [(1, 2), (3, 4)] { s = s + p * q }
+s
+// ➔ 14
+```
+
+Each element must be a tuple of the pattern's shape; one that is not stops
+the loop with the `incompatible-type` error value as its result, the same one
+the destructuring `let` produces.
+
 `in` is contextual: only the loop-variable `in` introduces the iterator
 clause. A second, later `in` in the collection expression is still the
 ordinary membership operator, so `for x in a in b { … }` iterates over the
@@ -635,7 +792,7 @@ Nested calls:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-Mean(Map(s |-> s + 5, Filter(scores, s |-> s >= 60)))
+Mean(Map(s => s + 5, Filter(scores, s => s >= 60)))
 // ➔ 337/4
 ```
 
@@ -643,8 +800,8 @@ Named intermediates:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-let passing = Filter(scores, s |-> s >= 60)
-let curved = Map(s |-> s + 5, passing)
+let passing = Filter(scores, s => s >= 60)
+let curved = Map(s => s + 5, passing)
 Mean(curved)
 // ➔ 337/4
 ```
@@ -652,8 +809,7 @@ Mean(curved)
 A pipeline:
 
 ```epsil-live
-let scores = [88, 42, 95, 61, 73]
-scores |> Filter(_, s |-> s >= 60) |> Map(s |-> s + 5, _) |> Mean
+[88, 42, 95, 61, 73] |> Filter(s => s >= 60) |> s => s + 5 |> Mean
 // ➔ 337/4
 ```
 
@@ -688,8 +844,8 @@ collection piped into `Take(3)`, second for one piped into the
 callback-first `Map(f)` — so these are the same pipeline:
 
 ```epsil
-[1, 2, 3] |> Map(n |-> n^2, _)      // [1, 4, 9]
-[1, 2, 3] |> Map(n |-> n^2)         // [1, 4, 9] — implicit argument
+[1, 2, 3] |> Map(n => n^2, _)      // [1, 4, 9]
+[1, 2, 3] |> Map(n => n^2)         // [1, 4, 9] — implicit argument
 ```
 
 The implicit argument only fills a hole. A call that is already complete is
@@ -698,7 +854,7 @@ as if the pipe were not there.
 
 A one-parameter **lambda** stage over a collection is applied to each
 element (an implicit `Map`), so the pipeline above can shed its `Map`
-entirely — `[1, 2, 3] |> n |-> n^2` and `[1, 2, 3] |> _^2` also produce
+entirely — `[1, 2, 3] |> n => n^2` and `[1, 2, 3] |> _^2` also produce
 `[1, 4, 9]`. See [the pipe operator](/operators/#pipe) for the exact
 rules.
 
@@ -778,12 +934,12 @@ block:
 let y = do { let t = 3; t + 1 }
 ```
 
-Because a lambda body is an ordinary expression, `x |-> do { … }` gives a
+Because a lambda body is an ordinary expression, `x => do { … }` gives a
 lambda the same multi-statement body a named `function` has — so a closure
 whose body runs several statements is written with `do`:
 
 ```epsil
-counter |-> do { counter = counter + 1; counter }
+counter => do { counter = counter + 1; counter }
 ```
 
 A `do` **not** followed by `{` is an `opening-bracket-expected` diagnostic.

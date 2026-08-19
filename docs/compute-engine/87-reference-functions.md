@@ -59,6 +59,26 @@ To specify a function literal with LaTeX use the `\mapsto` command:
 ["Function", ["Add", ["Multiply", "x", 2], "y"], "x", "y"]
 ```
 
+A parameter may also be a **tuple pattern**: a `["Tuple", …]` of parameter
+names (or `_` to skip a position, or a nested pattern) in a parameter
+position. It is still **one** parameter — it takes one argument, which must
+be a tuple of the pattern's shape, and binds a name to each component. In
+Epsil it is written with a second pair of parentheses, `((p, q)) => p + q`,
+as opposed to the two-parameter `(p, q) => p + q`.
+
+```json example
+["Map",
+  ["Function", ["Add", "p", "q"], ["Tuple", "p", "q"]],
+  ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]]]
+// ➔ ["List", 3, 7]
+```
+
+An argument that is not a tuple of that shape yields the same
+`incompatible-type` error value a destructuring `["Declare", ["Tuple", …], …]`
+produces. Function literals with a tuple-pattern parameter are interpreted;
+the compile targets decline them rather than emit code that binds the wrong
+names.
+
 The examples in this section define functions as a simple expression, but 
 function literals can include more complex control structures, including blocks,
 local variables, loops and conditionals. 

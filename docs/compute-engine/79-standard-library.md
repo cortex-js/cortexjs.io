@@ -39,7 +39,7 @@ the documentation.
 | [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
 | [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
 | [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
-| [Strings and Text](/compute-engine/reference/strings/)              | `Text` `Annotated`...                                                 |
+| [Strings and Text](/compute-engine/reference/strings/)              | `Characters` `StringJoin` `RangeOf` `StringReplace` `ToUpperCase` `Text`... |
 | [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>

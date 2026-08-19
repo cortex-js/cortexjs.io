@@ -194,33 +194,69 @@ x.sign
 ```
 
 A `get` implementation takes `self` and returns the property's type. A
-`set` implementation takes `self` and the new value, and **returns the
-updated value** — Epsil values are immutable, so assigning to a property is
-sugar for rebinding the variable to what the setter returns:
+`set` implementation takes `self` and the new value, stores it, and
+**returns the receiver**:
 
 ```epsil-live
 protocol Nameable { readwrite name: string }
 
-type Person = tuple<first: string, last: string> is Nameable {
+type Person = object{first: string, last: string} is Nameable {
   get name(self) -> string { "\(self.first) \(self.last)" }
-  set name(self, value: string) -> Person { Person(value, self.last) }
+  set name(self, value: string) -> Person {
+    self.first = value
+    self
+  }
 }
 
-let p = Person("Ada", "Lovelace")
-p.name = "Augusta"        // rebinds p to the Person the setter returned
+let p = Person(first: "Ada", last: "Lovelace")
+p.name = "Augusta"        // stores into p — every reference to it sees the change
 p.name
 // ➔ "Augusta Lovelace"
 ```
 
-Because the assignment rebinds, the left-hand side must be an assignable
-variable: assigning through a `const` binding is the ordinary
-cannot-assign-a-constant error, and a target that is not a variable at
-all (`xs[1].name = …` — there is no binding to rebind) is
-`property-assignment-target-invalid`. Providing a `set` for a `readonly`
-property is `protocol-property-readonly-set`.
+### The mutability gate
+
+`Person` above is an **object** type, and that is required rather than
+incidental: a writable property is meaningful only on a mutable object,
+so a protocol that can modify state — one with at least one `readwrite`
+property, or a function member whose declared effects include `state` —
+can be conformed to only by object types. A protocol with only
+`readonly` properties and no declared `state` can be conformed to by any
+type, as `Signed` is by `number` above.
+
+```epsil
+protocol Identifiable { readwrite id: string }
+type Badge = record{id: string} is Identifiable
+// ➔ protocol-requires-object: the `Identifiable` protocol has settable
+//   properties. `Badge` is a record, and records are immutable; declare
+//   `Badge` as an object type to conform.
+```
+
+A **bare** requirement never gates — its effects are derived from
+whatever conformers exist, so a record may conform to a bare-function
+protocol with a pure implementation — and an explicit `pure` member never
+gates either, since the empty effect set is not `state`.
+
+Assigning to a property is a **store**, and the assignment evaluates to
+the value assigned. The target does not have to be a variable: any
+expression that evaluates to an object can be stored into, so
+`xs[1].name = "Ada"` works when the list holds objects, and a `const`
+binding is no obstacle either — the store writes the object, never the
+binding. On a record, a tuple or any other immutable value it is
+`immutable-value-assignment`, which names the two ways forward: build an
+updated copy, or declare the type as `object{…}`. Providing a `set`
+implementation for a `readonly` property is
+`protocol-property-readonly-set`, and so is a write through the read-only
+protocol view — the qualified `p.(Named.name) = v`, or the unqualified
+`p.name = v` when `name` is a computed property. A `readonly` requirement
+that a stored FIELD satisfies is a different matter: `readonly` constrains
+that protocol's view of the field, not the object, so a holder of the object
+can still write the field directly. That asymmetry is deliberate for now and
+is under review (see the `readonly` entry in `ROADMAP.md`).
 
 If two protocols declare a property with the same name, the qualified
-form disambiguates: `person.(Nameable.name)`.
+form disambiguates, for reads and for writes alike:
+`person.(Nameable.name)` and `person.(Nameable.name) = "Ada"`.
 
 ## Conditional conformance
 
@@ -234,7 +270,7 @@ type integer is Summable { function total(self) -> number { self } }
 
 type list<T> is Summable where T is Summable {
   function total(self: list<T>) -> number {
-    Reduce(self, (acc, x) |-> acc + total(x), 0)
+    Reduce(self, (acc, x) => acc + total(x), 0)
   }
 }
 
@@ -246,6 +282,43 @@ type list<T> is Summable where T is Summable {
 unless `string` is made `Summable` too. The conformance is recursive for
 free — `list<list<integer>>` conforms because `list<integer>` does, as the
 second call shows.
+
+### No effect specifiers on a conditional member
+
+A member of a **conditional** conformance may not carry an
+[effect specifier](/control-flow/#effect-specifiers). Its effects are
+inferred from its body instead:
+
+```epsil
+protocol Summable { function total(self: Self) -> number }
+
+type list<T> is Summable where T: number {
+  function total(self: Self) pure -> number { Sum(self) }
+}
+```
+
+That is refused when the conformance is declared, with
+`protocol-conditional-member-effects`. Drop the `pure` and the same block
+works — and `total([1, 2, 3])` answers `6`.
+
+The restriction is specific to the conditional form. A conformance to a
+ground type accepts specifiers on every member:
+
+```epsil-live
+protocol Summable { function total(self: Self) -> number }
+
+type Box = object{n: integer} is Summable {
+  function total(self: Self) pure -> number { self.n }
+}
+
+total(Box(n: 5))
+// ➔ 5
+```
+
+The reason is that a conditional conformance's `Self` stands for a whole
+family of types (`list<T>`, not one type), and a specifier has to be recorded
+against a concrete receiver. The restriction is expected to lift; until then
+the failure is reported at the declaration rather than at the call.
 
 ## Requiring conformance in a signature
 
@@ -291,10 +364,14 @@ grouped by when they fire:
   `protocol-target-unknown`, `protocol-conformance-overlap`,
   `protocol-implementation-split` (an implementation block on a
   multi-protocol `is A & B` — provide one block per protocol),
+  `protocol-requires-object` (the mutability gate: a protocol that can
+  modify state, conformed to by a non-object type),
   `protocol-implementation-pending` (a warning).
 - **Implementing**: `protocol-implementation-missing`,
   `protocol-implementation-duplicate`, `protocol-member-unknown`,
-  `protocol-signature-mismatch`, `protocol-property-readonly-set`.
+  `protocol-signature-mismatch`, `protocol-property-readonly-set`,
+  `protocol-conditional-member-effects` (an effect specifier on a member of a
+  conditional conformance).
 - **Calling**: `protocol-call-ambiguous`, `protocol-property-ambiguous`,
   `protocol-constraint-unsatisfied`, `protocol-in-type-position`,
-  `property-assignment-target-invalid`.
+  `immutable-value-assignment` (a property store on a value).

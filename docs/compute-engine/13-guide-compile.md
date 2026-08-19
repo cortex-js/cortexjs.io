@@ -189,6 +189,83 @@ scalar or a list, such as the result of a call whose return type is
 - **GLSL/WGSL**: such operands compile as scalar slots, unchanged — shader
   targets have no dynamic lists.
 
+### Out-of-Domain Operands to String Operators
+
+Several string operators take an operand whose domain the interpreter enforces
+by returning an **error value**: `RangeOf`'s `from` (an integer of 1 or more)
+and its needle (a non-empty sequence), `StringReplace`'s `target` (a non-empty
+string) and `count` (a positive integer), `StringRepeat`'s `n` (a non-negative
+integer), and `PadStart`/`PadEnd`'s `n` (a non-negative integer) and `pad` (a
+non-empty string). Compiled code has no representation for an error value, so
+each of those operands takes one of three routes.
+
+**A valid literal compiles bare.** The check happens once, at compile time, and
+nothing is emitted for it:
+
+```javascript
+compile(ce.box(['PadStart', 's', 5, { str: '0' }])).code
+// ➔ '_SYS.spad(_.s, 5, "0", true)'
+```
+
+**An invalid literal declines to compile**, and so does a computed operand the
+engine can already *prove* out of domain (`Negate(k)` for a `k` known positive,
+a symbol assigned `""`). The result is `success: false` with a message naming
+the operator and the rule; with the default fallback the interpreter runs the
+expression instead, and returns its error value:
+
+```javascript
+const r = compile(ce.box(['PadStart', 's', -1, { str: '0' }]));
+r.success;
+// ➔ false
+r.error;
+// ➔ "PadStart: cannot compile — `n` must be a non-negative integer of at most
+//    1000000, and this operand is the literal `-1`, which the interpreter
+//    answers with an error value. Fail closed (D6)."
+```
+
+This is the first row of the [decline table](#why-a-compilation-declined) — the
+head lowers, just not for this operand — so it is reported in `error` only;
+`CompilationResult.unsupported` stays empty, because `PadStart` itself is not a
+target gap.
+
+**A computed operand compiles and is guarded at run time.** The emitted code
+carries a domain check that **throws a `RangeError`** naming the operator and
+the rule when the value turns out to be out of domain:
+
+```javascript
+ce.declare('s', 'string');
+ce.declare('w', 'integer');
+
+const p = compile(ce.box(['PadStart', 's', 'w', { str: '0' }]));
+p.code;
+// ➔ '_SYS.spad(_.s, _SYS.domi(_.w, 0, 1000000, "PadStart: `n` must be a
+//    non-negative integer of at most 1000000"), "0", true)'
+
+p.run({ s: '7', w: 5 });
+// ➔ "00007"
+
+p.run({ s: '7', w: -1 });
+// ➔ throws RangeError: PadStart: `n` must be a non-negative integer of at
+//   most 1000000
+```
+
+Throwing is the deliberate divergence. The interpreter answers an out-of-domain
+operand with an error value; a compiled artifact returns a plain JavaScript
+value and cannot carry one, so it fails loudly rather than returning a wrong
+answer. `Slice` in the same target already sets that precedent — a non-literal
+span argument compiles and the emitted code throws
+`RangeError: Slice: the span argument is not an ascending index range at run
+time`.
+
+The upper bound in those messages is not arbitrary. The interpreter reads these
+counts with `asSmallInteger`, which answers `null` — hence an error value —
+above **1 000 000**, so the compiled guard uses the same ceiling; without it
+`StringRepeat(s, 2000001)` would build a multi-megabyte string where the
+interpreter errors. `RangeOf`'s `from` is the exception: it is read with
+`toInteger`, which has no ceiling, so a large `from` is not an error at all —
+just a search that starts past the end and answers `Nothing`.
+
+
 ## Implicit Compilation and the `jit` Setting
 
 Beyond explicit `compile()` calls, the engine **compiles automatically** in a
@@ -527,35 +604,65 @@ Conjugate(z) →  vec2(z.x, -z.y)
 The same complex value analysis used by the JavaScript target determines
 whether each subexpression needs complex or real code paths in GLSL.
 
-### Real-Only Mode
+### Result Convention
 
-If you don't need complex results (e.g., for plotting), pass `{ realOnly: true }`
-to automatically convert complex returns: the real part is returned when the
-imaginary part is zero, and `NaN` is returned otherwise.
+A compiled JavaScript unit returns a real value as a plain `number` and a
+non-real value as `{ re, im }` — and both directions are guaranteed at the
+`run()` boundary: a value whose imaginary part is **exactly** zero comes back
+as a `number`, and a returned `{ re, im }` always has `im !== 0`. So a
+consumer's per-sample test is the single `typeof v === 'number'`, and a
+`{ re, im }` with a non-zero imaginary part tells "outside the real domain"
+from a genuine `NaN`. Booleans are never coerced.
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
 
-// Without realOnly — returns { re: 5, im: 0 }
-console.log(compile("(1 + 0i) * 5").run());
-
-// With realOnly — returns 5 (plain number)
-console.log(compile("(1 + 0i) * 5", { realOnly: true }).run());
+console.log(compile("(1 + 0i) * 5").run());   // 5 (a plain number)
+console.log(compile("\\sqrt{x}").run({ x: 4 }));    // 2
+console.log(compile("\\sqrt{x}").run({ x: -1 }));   // { re: 0, im: 1 }
 ```
 
-This avoids per-evaluation type checks in calling code.
+The transcendental complex kernels chop their own roundoff dust at the
+machine scale (as the interpreter does), which is what lets the boundary test
+be exact: `arcsin(0.5)` compiled through the complex kernel is the number
+`0.5235…`, while `1 + 10^{-12} i` stays `{ re: 1, im: 1e-12 }` — nothing is
+chopped in ring arithmetic.
 
-`realOnly` projects the compiled unit's **result** and nothing else — it never
-changes which lowering an operator picks, so it can only discard complexness,
-never produce it. To make a square root of a possibly negative value yield a
-complex result at all, see complex promotion below.
+> **Deprecated:** `realOnly: true` (the old projection: `{ re, im }` → `NaN`
+> unless the imaginary part is at roundoff scale, boolean → `NaN`) is kept for
+> one release with a console warning. The convention above replaces it — the
+> `typeof v === 'number' ? v : NaN` test on the consumer's side is the whole
+> of what it did.
 
-### Complex Promotion
+### Modes: `auto`, `strict`, `complex`
 
-`Sqrt`, `Ln` and `Log` compile to the **real** kernel — `Math.sqrt(t - 1)` —
-when their operand is a real number whose sign is not known at compile time.
-For a negative operand that yields `NaN`, where `evaluate()` promotes to a
-complex value:
+JavaScript has no complex number: a compiled value is a `number` or a
+`{ re, im }` object, and the compiler decides which **statically, per node**.
+What a compile **mode** fixes is what a numeric binding whose static type is
+**wide** (`unknown`, `number`, an unannotated parameter, a `Block` local not
+declared real) is shaped as — and what happens when a complex-shaped value
+reaches one:
+
+- **`strict`** — the shader targets' model, on every target: shape follows the
+  static type. A `complex`-typed value, a `Complex(…)` literal, `i`, and a
+  radical of a **provably** negative operand are complex-shaped; a wide
+  binding is real; nothing promotes (`√x` at `x = −1` is `NaN`, as
+  `Math.sqrt` gives); and a complex-shaped value meeting a wide binding —
+  `b(z)` for `b(x) := 2x` and `z: complex` — **fails closed** with a
+  `LaneMismatch` decline naming the binding to declare complex. This is
+  today's real-kernel codegen byte for byte, plus that decline class.
+- **`complex`** — a wide binding is complex, lifted at its use; unknown-sign
+  radicals promote; user functions are emitted once. Always sound, only
+  slower (~2.3× on affected chains).
+- **`auto`** (the default on `javascript` and `python`) — `strict` shapes plus
+  **promotion**: an unknown-sign `Sqrt`/`Ln`/`Log`, and `x^{0.3}`-style
+  powers (a non-integer number exponent of an unknown-sign base), lower
+  through the complex kernels so the compiled value matches `evaluate()`; and
+  if — and only if — a promoted or typed complex value reaches a wide binding,
+  the compilation is redone **once** in `complex` mode. Nothing else
+  escalates. Radicals whose operand is non-negative under the compiler's own
+  "wide is real" premise — `√(x² + y²)`, `√((x−a)² + (y−b)²)`, `√|x|`,
+  `ln(x²)` — keep the real kernel and cost nothing.
 
 ```live
 // import { ComputeEngine, compile } from '@cortex-js/compute-engine';
@@ -565,50 +672,55 @@ ce.parse("z(t) \\coloneq \\sqrt{t-1}").evaluate();
 
 // Interpreted — promotes to complex, then |·| brings it back to a real
 ce.assign("t", 0.3);
-console.log(ce.parse("|z(t)/2 - 1|").N().toString());   // 1.08397416943394
+console.log(ce.parse("|z(t)/2 - 1|").N().toString());          // 1.08397416943394
 
-// Compiled, by default — the real kernel yields NaN
-console.log(compile(ce.parse("|z(t)/2 - 1|")).run({ t: 0.3 }));  // NaN
+// Compiled, by default (`auto`) — the same value; the radical was PROMOTED
+const r = compile(ce.parse("|z(t)/2 - 1|"));
+console.log(r.run({ t: 0.3 }), r.mode, r.promoted);              // 1.08397416943394 "strict" true
+
+// `strict` — today's real kernel, NaN
+console.log(compile(ce.parse("|z(t)/2 - 1|"), { mode: "strict" }).run({ t: 0.3 }));  // NaN
 ```
 
-That default is deliberate: it keeps radical chains such as `√(⌈x⌉²+⌈y⌉²)` on
-the fast path, and it is what lets an ordering comparison over a radical
-compile at all.
+Every result reports what was used, so a consumer can tell "this row would
+not be real on the shader lane" without guessing:
 
-Pass `{ complexPromotion: true }` when your expressions are genuinely
-complex-valued — a plotting front-end with a per-document "complex mode"
-switch maps that switch onto this option. Those heads then lower through the
-complex helpers and the compiled value matches `evaluate()`:
+- `result.mode` — `'strict'` or `'complex'`, the discipline the code was
+  compiled under (`auto` reports the attempt that produced the code);
+- `result.promoted` — whether a promotable head was lowered through a complex
+  kernel; a compile-time fact decided from the source, so the same source
+  always reports the same flag;
+- `result.escalation` — under `auto`, the `LaneMismatch` diagnostic of the
+  strict attempt when the compilation was redone in complex mode
+  (`boundary`, a user-legible `binding` such as "the parameter `x` of `b`",
+  and the offending `value`);
+- `result.diagnostic` — on any decline, the structured form of `error`
+  (`code`, `kind: 'capability' | 'correctness'`, `message`, and the
+  lane-mismatch payload above).
 
-```live
-// import { ComputeEngine, compile } from '@cortex-js/compute-engine';
+Ordering comparisons and the real-only heads (`Floor`, `Mod`, `Max`, `Erf`,
+…) over a value that **may** be complex — a `complex`-typed symbol, a promoted
+radical — compile under `auto` and `complex` with a **runtime rule**: the
+operand is bound once, and the comparison is `false` / the head `NaN` when the
+value's imaginary part is not exactly zero (`z < 2` is `true` at `z = 1`,
+`false` at `z = i`; `y > √x` compiles and is `false` where `x < 0`). A
+**statically** non-real operand (`i < 2`, `Floor(2i)`) has no compiled value
+and is a compile-time decline in every mode; `strict` declines every complex
+operand of such a head, as before.
 
-const ce = new ComputeEngine();
-ce.parse("z(t) \\coloneq \\sqrt{t-1}").evaluate();
+The single most effective lever is not a mode: **declare the narrowest type
+you can.** A symbol declared `real` is never a wide binding — `2a + 1`,
+`b(a)`, `a < 3` stay on the real kernel in every setting (its unknown-sign
+radical still promotes under `auto`, because promotion is about sign, not
+wideness); a symbol declared `complex` is complex-shaped in every setting and
+never a mismatch. `mode` is per compilation, on `CompileTarget` (the target
+default) or on `compile()`'s options; a mode a target does not offer
+(`complex` on `glsl`) is a `capability` decline, never a silent coercion. The
+shader targets and `interval-js` offer `strict` only.
 
-const fn = compile(ce.parse("|z(t)/2 - 1|"), { complexPromotion: true });
-console.log(fn.run({ t: 0.3 }));   // 1.08397416943394
-```
-
-A real-valued input is lifted automatically, so enabling the option does not
-change how you pass arguments.
-
-Two things to expect when you enable it:
-
-- **Affected chains get slower** — about 2.3× on a 200k-point sweep of
-  `|√(u+1)/2 − 1|`. An expression with no unknown-sign `Sqrt`/`Ln`/`Log`
-  compiles exactly as before and costs nothing.
-- **An ordering comparison over such a head fails closed.** `Less(Sqrt(x), 2)`
-  has no truth value once `Sqrt(x)` may be complex — the interpreter leaves it
-  symbolic — so the compiler declines rather than emitting a wrong answer.
-  This is the main reason the option is off by default.
-
-The option is honored by the `javascript` and `python` targets. The shader
-targets (`glsl`, `wgsl`) keep the real kernel unconditionally: they have no
-runtime-failure channel.
-
-`realOnly` and `complexPromotion` are independent and compose — promote
-internally, then project the result at the boundary.
+> **Deprecated:** `complexPromotion: true` maps to `mode: 'complex'` (a
+> console warning, once), and is ignored on a target without complex mode.
+> Since `auto` already promotes, most callers can simply drop it.
 
 ## Custom Operators
 
@@ -1216,7 +1328,7 @@ arithmetic only. Arbitrary-precision and symbolic calculations are not available
 expression involves complex-valued operands (e.g., `i`, complex-typed symbols).
 Complex results are returned as `{ re, im }` objects. See
 [Complex Numbers](#complex-numbers) for details and
-[Real-Only Mode](#real-only-mode) to convert complex results to `NaN`.
+[Result Convention](#result-convention): a real value is a plain `number`, so `typeof v === 'number' ? v : NaN` projects to the reals.
 
 **Unsupported functions:** Most standard mathematical functions are supported,
 but some cannot be compiled. When compilation fails, `compile()` returns a

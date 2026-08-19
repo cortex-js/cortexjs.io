@@ -25,6 +25,7 @@
     "/epsil/syntax/": "/syntax/",
     "/epsil/tour/": "/tour/",
     "/epsil/types/": "/types/",
-    "/epsil/vscode/": "/vscode/"
+    "/epsil/vscode/": "/vscode/",
+    "/errors/": "/errors/"
   }
 }

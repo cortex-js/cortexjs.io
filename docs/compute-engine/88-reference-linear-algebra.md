@@ -494,6 +494,15 @@ are flattened.
 // ➔ ["List", 42]
 ```
 
+**Strings are leaves**: a string is an indexed collection of characters, but
+`Flatten` does not descend into it — it is treated like a scalar, at any
+depth.
+
+```json example
+["Flatten", ["List", {str: "ab"}, {str: "cd"}]]
+// ➔ ["List", "ab", "cd"]
+```
+
 When a `depth` is given, only that many levels of nesting are flattened;
 without it, the collection is flattened completely.
 

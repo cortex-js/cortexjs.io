@@ -48,7 +48,7 @@ precedence (for example `+` and `-`, or `*` and `/`).
 | ---- | -------------------- | ------ | ----- | ------ | ------------- |
 | 10   | Assign                | `:=`   |       | infix  | right         |
 | —    | Assign _or_ Equal     | `=`    |       | infix  | positional    |
-| 15   | MapsTo                | `\|->` | `↦`   | infix  | right         |
+| 15   | MapsTo                | `=>`   | `⇒`   | infix  | right         |
 | 18   | Coalesce              | `??`   |       | infix  | right         |
 | 20   | Pipe                  | `\|>`  |       | infix  | left          |
 | 20   | Pipe                  | `~>`   |       | infix  | left          |
@@ -84,7 +84,7 @@ operator table, since they are not spelled with an operator symbol.
 The conditional expression `a if c else b` is not an operator row either, but
 it has a place in this order: between `KeyValuePair` (30) and `Or` (40), so it
 binds looser than every operator that computes and tighter than the forms that
-bind or pair (`=`, `|->`, `|>`, `->`). See
+bind or pair (`=`, `=>`, `|>`, `->`). See
 [Control Flow](/control-flow/#the-conditional-expression-a-if-c-else-b).
 
 ## The whitespace rule
@@ -135,7 +135,7 @@ A stage that takes more than one argument is written as a call, with `_` in the
 slot the piped value fills:
 
 ```epsil-live
-1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(n |-> n^2, _) |> Sum
+1..10 |> Filter(_, n => n % 2 == 1) |> Map(n => n^2, _) |> Sum
 // ➔ 165
 ```
 
@@ -159,7 +159,7 @@ such a lambda. The following three pipelines are equivalent:
 ```
 
 ```epsil
-1..oo |> Take(10) |> x |-> x^2 |> Sum
+1..oo |> Take(10) |> x => x^2 |> Sum
 1..oo |> Take(10) |> _^2 |> Sum
 ```
 
@@ -168,7 +168,30 @@ Note the two readings of `_`: in a **call** stage it is the piped value
 element of the implicit lambda. A **named** function stage always receives
 the whole value — `xs |> Sum` sums the collection, it does not map — as does
 a lambda whose annotated parameter accepts it
-(`xs |> (l: list<number>) |-> Length(l)`).
+(`xs |> (l: list<number>) => Length(l)`).
+
+A pipe hands its stage exactly **one** value, so a stage that declares more
+than one parameter is a `pipe-stage-arity` error rather than a partial
+application — a leftover function is never what a pipeline was written to
+produce:
+
+```epsil
+[100, 200] |> (x, y, z) => x + y + z
+// ✘ A pipe passes its stage exactly 1 value; `(x, y, z) => …` declares 3
+```
+
+The fix is the **call** form above, with `_` marking the piped value's slot
+(`xs |> Fold(f, 0, _)`). The same applies to a named stage: `xs |> add` on a
+two-parameter `add` is this error, not a partially applied `add`.
+
+When the piped value is a collection whose elements are tuples and you want to
+name their components, use a **tuple pattern** parameter — the extra
+parentheses are what make it one parameter taking a pair:
+
+```epsil-live
+[(1, 2), (3, 4)] |> ((p, q)) => p + q
+// ➔ [3, 7]
+```
 
 `|>` and `~>` are aliases for `Pipe` and sit at the **loosest** precedence
 tier, right below `Assign` — looser than arithmetic, relational, and boolean
@@ -205,12 +228,12 @@ It is right-associative, so a chain falls through left to right:
 a ?? b ?? c      // Coalesce(a, Coalesce(b, c))
 ```
 
-Its precedence (18) sits between `|->` and `|>`, which fixes the two groupings
+Its precedence (18) sits between `=>` and `|>`, which fixes the two groupings
 that matter:
 
 ```epsil
 xs |> f ?? 0     // (xs |> f) ?? 0 — the default is for the pipeline's RESULT
-x |-> x.a ?? 0   // x |-> (x.a ?? 0) — the default is inside the body
+x => x.a ?? 0   // x => (x.a ?? 0) — the default is inside the body
 ```
 
 Like `|>`, it is looser than `->`, so a dictionary value needs parentheses:
@@ -247,26 +270,103 @@ between an operand and a type name, so `let is = 5` and `f(is)` remain legal.
 Since `is` and `in` express the same membership test, a program written back
 out from its parsed form uses `in` for both.
 
-## Anonymous functions: `|->` {#anonymous-functions}
+## Anonymous functions: `=>` {#anonymous-functions}
 
 The mapsto operator constructs an anonymous function:
 
 ```epsil
-x |-> x^2
-(x, y) |-> x + y
+x => x^2
+(x, y) => x + y
 ```
 
-It is right-associative, so `x |-> y |-> x + y` constructs a function that
+It is right-associative, so `x => y => x + y` constructs a function that
 returns another function. It binds tighter than assignment but more loosely
-than the other expression operators, so `f = x |-> x + 1` assigns the complete
+than the other expression operators, so `f = x => x + 1` assigns the complete
 function to `f`. Typed parameters can be written in parentheses:
 
 ```epsil
-(x: integer) |-> x + 1
+(x: integer) => x + 1
 ```
+
+A parameter can instead be a **tuple pattern**, written with a second pair of
+parentheses. It is still ONE parameter — it takes one argument, a tuple, and
+binds a name to each component:
+
+```epsil
+[(True, True), (True, False)] |> Map(((p, q)) => p && q, _)
+// ➔ [True, False]
+```
+
+The doubled parentheses are the whole difference: `(p, q) => p && q` is the
+two-parameter function it has always been, and `((p, q)) => p && q` is the
+one-parameter function that takes a pair apart. Patterns mix with plain
+parameters and nest, exactly as in
+[`let (a, b) = v`](/declarations/#destructuring-declarations) — bare
+names, `_` to skip a position, nested `(…)` patterns, and nothing else (a
+literal or a per-element type annotation is a diagnostic):
+
+```epsil
+(x, (p, q)) => x + p + q   // two parameters, the second destructured
+((a, (b, c))) => a + b + c // one parameter, nested
+((p, _)) => p              // one parameter, second component discarded
+```
+
+The argument must be a tuple of the pattern's shape; anything else yields an
+`incompatible-type` error value, the same one the destructuring `let`
+produces. A destructuring lambda is interpreted, never compiled: no compile
+target lowers the tuple match, so a compiled context falls back rather than
+emit code that binds the wrong names.
+
+**Callbacks and arity.** An ordinary call with too few arguments partially
+applies the function — `f(1)` on a two-parameter `f` is a function awaiting
+the second argument. Inside a collection operator that never happens: the
+operator decides how many arguments the callback receives (`Map` supplies
+one element per source collection, `Filter`/`Any`/`All`/`Count`/`TakeWhile`
+supply one, `Reduce`/`Fold` supply the accumulator and the element), and a
+lambda whose parameter count cannot match is a `callback-arity` error at
+parse/canonicalization time rather than a list of leftover closures. The
+message names both sides and, for the pair case, the fix:
+
+```epsil
+Map((p, q) => p + q, [(1, 2), (3, 4)])
+// error: Map calls its callback with 1 argument (each element of the
+// collection); `(p, q) => p + q` declares 2 parameters. To take a pair
+// apart, use a tuple pattern parameter: ((p, q)) => …
+```
+
+`Sort` (a key or a comparator) and `Iterate` (`f(previous)` or
+`f(index, previous)`) accept either of their two arities; a `() => …`
+literal is a constant and fits any slot. A callback whose arity is not
+statically known — a value typed `function` or `callback<…>`, a generic
+function — is not checked here and is applied as before.
 
 The `MapsTo` name in the table is internal to parsing: it names the operator,
 not the function value the expression produces.
+
+The same arrow separates a `match` case's pattern from its body
+(`pattern [if guard] => body`) — one glyph meaning "yields", in both places.
+Nothing is ambiguous: a case reserves the first `=>` at its own level for
+itself, so a pattern and a guard always end there, while a case BODY is an
+ordinary expression in which `=>` builds a lambda:
+
+```epsil
+match n {
+  0 => x => x + 1   // body is the lambda `x => x + 1`
+  n if n > 0 => n   // guard is `n > 0`, body is `n`
+}
+```
+
+A lambda genuinely wanted inside a pattern or a guard is parenthesized:
+`n if (f => f)(n) => n`.
+
+The Unicode arrows `⇒` (U+21D2) and `↦` (U+21A6) are both accepted as input
+aliases for `=>`. `⇒` is the one the serializer emits — for a lambda and for a
+`match` case alike — in its fancy-symbol mode; `↦`, the traditional
+mathematical mapsto glyph, is accepted but never produced.
+
+Earlier versions spelled this arrow `|->`. That spelling now reports the
+`mapsto-arrow-legacy` diagnostic, with a fixit rewriting it to `=>`; the
+expression is still parsed as the function it meant.
 
 A `->` whose left side is shaped like a parameter list — `(x, y) -> x + y`,
 `(n: integer) -> n^2`, `f = x -> x + 1` — is diagnosed as a wrong-arrow typo
@@ -350,7 +450,7 @@ defaults idiom:
 ```epsil-live
 let defaults = {"verbose" -> false, "depth" -> 3}
 {...defaults, "verbose" -> true}
-// ➔ {"dict":{"verbose":true,"depth":3}}
+// ➔ {"verbose" -> "True", "depth" -> 3}
 ```
 
 (Duplicate **literal** keys are different: they are almost certainly typos,
@@ -492,17 +592,31 @@ a < b <= c
 
 means `a < b && b <= c`. A mixed chain is rewritten into that pairwise
 conjunction before it is evaluated, so both kinds of chain have the usual
-mathematical chained-comparison semantics.
+mathematical chained-comparison semantics. Both kinds also short-circuit like
+`&&`: the operands are evaluated left to right and evaluation stops at the
+first adjacent pair that is false, so in `a < b < c` the operand `c` is not
+evaluated when `a < b` is false.
 
 ## Logic operators
 
 - `&&` (`And`), `||` (`Or`), `!` (`Not`), with the fancy Unicode forms `⋀`,
   `⋁`, `¬`.
 - `&&` binds tighter than `||`, matching the tiers above.
+- Both **short-circuit**: the operands are evaluated left to right and
+  evaluation stops at the first operand that decides the result — the first
+  `false` for `&&`, the first `true` for `||`. The remaining operands do not
+  run, so `k <= n && xs[k] > 0` never reads `xs[k]` when `k` is out of range,
+  and `false && f()` never calls `f()`. Because the written order is
+  meaningful, `&&`/`||` operands are never reordered by canonicalization. The
+  exception is an element-wise application — an operand that is a list of
+  booleans (`[true, false] && xs`) makes the result a list, cell by cell, and
+  every operand is then evaluated once.
 
-The word forms `and`, `or`, and `not`, and the implication/equivalence infix
-operators `=>` and `<=>`, are reserved but not implemented. The token `=>` is
-used contextually to separate a `match` pattern from its result.
+The word forms `and`, `or`, and `not`, and the equivalence infix operator
+`<=>`, are reserved but not implemented. The token `=>` is not available as
+logical implication: it is the mapsto arrow (see
+[Anonymous functions](#anonymous-functions)), which is also what separates a
+`match` pattern from its result.
 
 ## Assignment vs. equality
 

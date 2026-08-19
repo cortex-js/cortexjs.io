@@ -80,7 +80,7 @@ any
     └── value
         ├── scalar
         │   ├── boolean
-        │   ├── string
+        │   ├── character
         │   └── number
         │     └── complex
         │         ├── imaginary
@@ -93,6 +93,8 @@ any
             |   └─ record
             └── indexed_collection
                 ├── tuple
+                ├── range
+                ├── string
                 └── list
                     ├─ vector
                     ├─ matrix
@@ -101,6 +103,14 @@ any
 
 **Note:** this diagram is simplified and does not accurately reflect the finite vs
 non-finite distinction for the numeric types.
+
+**Note:** a `string` is an indexed collection of `character` — it sits beside
+`list`, `tuple` and `range`, not under `scalar`. A `character` (exactly one
+user-perceived character) *is* a scalar, and is a disjoint sibling of
+`string`: neither matches the other. `string` is not `list<character>` either;
+the two are siblings with the same element type, because joining characters
+can merge them (an `e` and a combining acute join into the single character
+`é`). See the [Strings reference](/compute-engine/reference/strings/).
 
 This hierarchy allows the Compute Engine to reason about compatibility and subtyping relationships between expressions.
 
@@ -143,14 +153,14 @@ For example:
 
 ``tuple<`1st`: integer, `2nd`: integer, `3rd`: integer>``
 
-``record<`durée`: number, vitesse: number>``
+``record{`durée`: number, vitesse: number}``
 
 ``(`直径`: number) -> number``
 
 
 If the name contains a backtick or backslash, those characters must be escaped with a backslash:
 
-``record<`name\`with\`backticks\\and\\backslash`: integer>``
+``record{`name\`with\`backticks\\and\\backslash`: integer}``
 
 The backtick syntax is used instead of quotes to clearly distinguish identifiers from string values, following conventions from languages such as Swift and Kotlin
 
@@ -178,11 +188,13 @@ The Compute Engine supports the following primitive types:
 | `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
 | `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
-| `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `dictionary` or a `record` |
-| `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `tuple`, a `list`, a `vector`, a `matrix` or a `tensor` |
-| `scalar`        | The type of a single value: a `boolean`, a `string`, or a `number` |
+| `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `string`, a `dictionary` or a `record` |
+| `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `tuple`, a `range`, a `string`, a `list`, a `vector`, a `matrix` or a `tensor` |
+| `range`        | The type of an **index span**: a contiguous, ascending run of 1-based collection indexes, such as `["Range", 2, 5]`. A `Range` has this type only when its bounds are integers, at least 1, ascending and one apart — so `["Range", 1, 10, 2]` (stepped) and `["Range", 5, 2]` (descending) are `indexed_collection<integer>` instead. Not a mathematical interval (see `Interval`) |
+| `scalar`        | The type of a single value: a `boolean`, a `character`, or a `number`. A `string` is **not** a scalar — it is an indexed collection of characters |
 | `boolean`       | The type of the symbol `True` or `False`|
-| `string`        | The type of a string of Unicode characters    |
+| `character`     | The type of exactly one user-perceived character (one Unicode grapheme cluster), such as `["CharacterFrom", "'é'"]`. A scalar with no elements, and a disjoint sibling of `string`: a character is not a one-character string, and a string is not a character. A one-character string *literal* does narrow to a character where one is expected |
+| `string`        | The type of a string of Unicode characters. `string <: indexed_collection<character>`: a string can be counted, indexed (1-based) and iterated, and its elements are its grapheme clusters. It is **not** `list<character>` — the two are siblings, because joining characters can merge them |
 | `number`        | The type of a numeric value |
 
 </div>
@@ -314,14 +326,16 @@ arithmetic symbolically, and its components can be accessed with the
 `.x`/`.y`/`.z` member syntax (`P.x` is `First(P)`).
 
 
-For two tuples to be compatible, each element must have the same type and the names must match.
+For two tuples to be compatible, each element must have the same type and the
+names must match. Element names live in the type, not in the value — no literal
+spells them — so the comparison is made between two type expressions:
 
 ```js
-ce.parse("(x: 1, y: 2)")
-  .type.matches("tuple<x: integer, y: integer>");
+ce.type("tuple<x: integer, y: integer>")
+  .matches("tuple<x: integer, y: integer>");
 // ➔ true
-ce.parse("(x: 1, y: 2)")
-  .type.matches("tuple<a: integer, b: integer>");
+ce.type("tuple<x: integer, y: integer>")
+  .matches("tuple<a: integer, b: integer>");
 // ➔ false
 ```
 
@@ -357,17 +371,29 @@ ce.parse("\\[\\]").type.matches("list<integer>");
 // ➔ true
 ```
 
-The shorthand **`list`** is equivalent to `list<any>`, a list of values of any type.
+The shorthand **`list`** is equivalent to `list<unknown>` — "some list of
+values, element type not stated". The two spellings are synonyms and
+normalize to the bare form. The same convention applies to every bare
+element-taking constructor: `set` = `set<unknown>`, `dictionary` =
+`dictionary<unknown>`, `collection` = `collection<unknown>`,
+`indexed_collection` = `indexed_collection<unknown>`.
+
+An explicit **`list<any>`** is a different, strictly *wider* type: `any`
+additionally admits the absence markers (`Nothing`, `Missing`), so
+`list<any>` accepts a list with absence elements (e.g. a regex match result
+using `Missing` for an unmatched group) while the bare `list` — values only —
+does not. Consequently `list <: list<any>` but not the converse, and
+`list<nothing> <: list<any>` while `list<nothing> ⊄ list`.
 
 ```js
-ce.parse("\\[1, 2, 3\\]").matches("list");
+ce.parse("\\[1, 2, 3\\]").type.matches("list");
 // ➔ true
 ```
 
 The shorthand **`vector`** is a list of numbers, equivalent to `list<number>`.
 
 ```js
-ce.parse("\\[1, 2, 3\\]").matches("vector");
+ce.parse("\\[1, 2, 3\\]").type.matches("vector");
 // ➔ true
 ```
 
@@ -432,10 +458,10 @@ A **dictionary** is well suited to represent hash tables or caches.
 The type of a **dictionary** is represented by the type expression `dictionary<T>`
 where `T` is the type of the values.
 
-The type of a **record** is represented by the type expression `record<K1: T1, K2: T2, ...>`, 
+The type of a **record** is represented by the type expression `record{K1: T1, K2: T2, ...}`, 
 where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the values.
 
-For example: `record<red: integer, green: integer, blue: integer>` is a record that
+For example: `record{red: integer, green: integer, blue: integer}` is a record that
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
 **Compatibility:**
@@ -447,19 +473,19 @@ contains three elements with keys `red`, `green` and `blue`, and values of type 
 
 
 ```js
-ce.type("record<red: integer, green: integer>")
-  .matches("record<red: integer, green: integer>");
+ce.type("record{red: integer, green: integer}")
+  .matches("record{red: integer, green: integer}");
 // ➔ true
 
-ce.type("record<red: integer, green: integer>")
-  .matches("record<red: integer, green: integer, blue: integer>");
+ce.type("record{red: integer, green: integer}")
+  .matches("record{red: integer, green: integer, blue: integer}");
 // ➔ false
 
-ce.type("record<red: integer, green: integer, blue: integer>")
-  .matches("record<red: integer, green: integer>");
+ce.type("record{red: integer, green: integer, blue: integer}")
+  .matches("record{red: integer, green: integer}");
 // ➔ true
 
-ce.type("record<red: integer, green: integer, blue: integer>")
+ce.type("record{red: integer, green: integer, blue: integer}")
   .matches("dictionary<integer>");
 // ➔ true
 ```
@@ -469,11 +495,11 @@ The `record` type is compatible with any record, and the `dictionary` type
 is compatible with both records and dictionaries.
 
 ```js
-ce.type("record<red: integer, green: integer>")
+ce.type("record{red: integer, green: integer}")
   .matches("record");
 // ➔ true
 
-ce.type("record<red: integer, green: integer>")
+ce.type("record{red: integer, green: integer}")
   .matches("dictionary");
 // ➔ true
 ```
@@ -482,13 +508,18 @@ ce.type("record<red: integer, green: integer>")
 ### Collection
 
 The type `collection` represent any collection of values, such as a `list`, 
-a `set`, a `tuple`, a `record` or a `dictionary`.
+a `set`, a `tuple`, a `string`, a `record` or a `dictionary`.
 
 The type `collection<T>` is a collection of values of type `T`.
 
 The type `indexed_collection<T>` is an indexed collection of values of type `T`,
-such as a `list`, a `tuple`, or a `matrix`. It is a subtype of 
-`collection<T>`.
+such as a `list`, a `tuple`, a `string` (whose elements are `character`s), or 
+a `matrix`. It is a subtype of `collection<T>`.
+
+Because `string <: indexed_collection<character>`, a signature or a `where`
+constraint written over `collection<T>` or `indexed_collection<T>` accepts
+strings. To exclude them, intersect with a negation:
+`(T) -> T where T: collection & !string`.
 
 ### Broadcastable
 
@@ -515,8 +546,9 @@ of `T`":
 
 - `T <: broadcastable<T>` — a scalar is a valid broadcastable value
 - `list<T> <: broadcastable<T>`, `vector<n> <: broadcastable<number>` — any
-  indexed collection of `T` is too (`set` is not indexed and `tuple`s bind
-  atomically, so neither qualifies)
+  indexed collection of `T` is too (`set` is not indexed, and `tuple`s and
+  `string`s bind atomically, so none of them qualifies — a broadcasting
+  operator applied to a string receives the whole string, not its characters)
 - `broadcastable<S> <: broadcastable<T>` when `S <: T` (covariant)
 - `broadcastable<T>` is **not** a subtype of `T` or of `list<T>` — it may be
   either one, so it is neither
@@ -744,17 +776,41 @@ inferred track — it declares the parameter and result types without pinning th
 effects:
 
 ```js
+ce.declare("draw", { type: "(number) -> number" });
+
+// Accepted: the body draws from the random stream, and the inferred effects
+// are revised to `random`.
+ce.assign("draw", ce.box(["Function", ["Add", ["Random"], "n"], "n"]));
+
+// Accepted too: a pure body revises them back.
+ce.assign("draw", ce.box(["Function", ["Add", "n", 1], "n"]));
+```
+
+**`scope` is the one exception: it is opt-in.** A named definition that states
+no effects promises it does not write outside itself, so a body with a *proven*
+escaping write — an assignment to an enclosing binding, or an `Assume` — is
+refused rather than silently re-stamped. Declare the `scope` effect to allow it:
+
+```js
 ce.declare("counter", { type: "number", value: 0 });
 ce.declare("fib", { type: "(number) -> number" });
 
-// Accepted: the body writes an enclosing binding, and the inferred effects
-// are revised to `scope`.
+// Refused: the body assigns to the enclosing `counter`.
 ce.assign("fib", ce.box(["Function",
   ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"]));
+// ➔ throws: the body writes outside the function ... which requires
+//   declaring the `scope` effect
 
-// Accepted too: a pure body revises them back.
-ce.assign("fib", ce.box(["Function", ["Add", "n", 1], "n"]));
+// Accepted: `scope` opts in.
+ce.declare("bump", { type: "(number) scope -> number" });
+ce.assign("bump", ce.box(["Function",
+  ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"]));
 ```
+
+An **anonymous** literal is not gated — it has no annotation surface, and its
+arrow carries the inferred `scope` honestly — so a factory that returns a
+writing closure still installs under a bare arrow; the `scope` lives on the
+inner arrow.
 
 Stating the effects explicitly — a non-empty specifier, or the `pure` keyword —
 turns them into a **contract** instead. Every body assigned to the symbol must
@@ -1068,10 +1124,12 @@ ce.box(["rev", ["Set", 1, 2]]).toString();
 //      "set<finite_integer>")))
 ```
 
-An unbounded variable has an implicit bound of `any`: `where T` is shorthand
-for `where T: any`, and an explicitly written `: any` is normalized away when
-the type is serialized. A bound must be a **ground** type: it cannot mention a
-variable, its own or another's.
+An unbounded variable has an implicit bound of `unknown`: `where T` is
+shorthand for `where T: unknown` — "some value type" — and an explicitly
+written `: unknown` is normalized away when the type is serialized. An
+explicit `: any` bound is a different, wider contract (it additionally admits
+the absence markers) and survives serialization. A bound must be a **ground**
+type: it cannot mention a variable, its own or another's.
 
 ```js
 ce.type("(U) -> T where T, U: list<T>");
@@ -1348,8 +1406,8 @@ The type of an intersection is represented by the type expression `T1 & T2`, whe
 
 Intersections are most useful for extending or combining record types.
 
-For example, `record<length: integer> & record<size: integer>` is the type of values 
-that are records with both a `length` and a `size` key, that is `record<length: integer, size: integer>`.
+For example, `record{length: integer} & record{size: integer}` is the type of values 
+that are records with both a `length` and a `size` key, that is `record{length: integer, size: integer}`.
 
 An intersection of **function signatures** describes a function that can be
 called in several different ways — see [Overload Sets](#overload-sets). Each arm
@@ -1420,8 +1478,8 @@ Compatibility of complex types follows specific rules depending on the type of s
 Records are compatible if they have the same keys and the values are compatible.
 
 ```js
-ce.parse("\\{red: 1, green: 2\\}").type
-  .matches("record<red: integer, green: integer>");
+ce.box({ dict: { red: 1, green: 2 } }).type
+  .matches("record{red: integer, green: integer}");
 // ➔ true
 ```
 
@@ -1429,8 +1487,8 @@ ce.parse("\\{red: 1, green: 2\\}").type
 compatible with a record with fewer keys.
 
 ```js
-ce.parse("\\{red: 1, green: 2, blue: 3\\}").type
-  .matches("record<red: integer, green: integer>");
+ce.box({ dict: { red: 1, green: 2, blue: 3 } }).type
+  .matches("record{red: integer, green: integer}");
 // ➔ true
 ```
 
@@ -1439,7 +1497,7 @@ ce.parse("\\{red: 1, green: 2, blue: 3\\}").type
 Dictionaries are compatible if the values are compatible.
 
 ```js
-ce.parse("\\{red: 1, green: 2\\}").type 
+ce.box({ dict: { red: 1, green: 2 } }).type
   .matches("dictionary<integer>");
 // ➔ true
 ```
@@ -1448,10 +1506,10 @@ Records are compatible with dictionaries if all the values of the record are
 compatible with the dictionary's value type.
 
 ```js
-ce.parse("\\{red: 104, green: 2, blue: 37\\}").type
+ce.box({ dict: { red: 104, green: 2, blue: 37 } }).type
   .matches("dictionary<integer>");
 // ➔ true
-ce.parse("\\{user: \"Bob\", age: 24\\}").type
+ce.box({ dict: { user: { str: "Bob" }, age: 24 } }).type
   .matches("dictionary<integer>");
 // ➔ false
 ```
@@ -1471,11 +1529,11 @@ ce.parse("(1, 2, 3)").type
 If the elements of a tuple are named, the names must match.
 
 ```js
-ce.parse("(x: 1, y: 2)").type
+ce.type("tuple<x: integer, y: integer>")
   .matches("tuple<x: integer, y: integer>");
 // ➔ true
 
-ce.parse("(x: 1, y: 2)").type
+ce.type("tuple<x: integer, y: integer>")
   .matches("tuple<a: integer, b: integer>");
 // ➔ false
 ```
@@ -1671,11 +1729,11 @@ ce.type("(number) -> number").couldMatch("(any) -> any");
 So ask `matches()` when the *pattern* is generic. `couldMatch()` earns its keep 
 on the other side, when a generic type is the **subject** being classified — 
 and there the bound is what makes the answer informative. An unbounded variable 
-reads as `any` and cannot rule anything out:
+reads as `unknown` and cannot rule anything out:
 
 ```js
 ce.type("(T) -> T where T").couldMatch("(any) -> string");
-// ➔ true  (`T` reads as `any`: vacuous)
+// ➔ true  (`T` reads as `unknown`: vacuous)
 
 ce.type("(T) -> T where T: number").couldMatch("(any) -> string");
 // ➔ false  (`T` reads as `number`, which is not a `string`)
@@ -1785,6 +1843,47 @@ A type that has been inferred can be refined later, for example by
 assigning a value of a more specific type to the symbol or by using the
 symbol in a context that requires a more specific type.
 
+Use-driven refinement applies to symbols that do **not** hold a value: for
+a mathematical unknown, a use *declares* what the symbol must be. Once a
+symbol **has been assigned**, its type records what it actually holds —
+that is evidence, and a later use is a requirement *checked against* the
+evidence rather than a refinement of it:
+
+```js
+ce.declare("k", "(integer) -> integer");
+
+// Valueless symbol: the use DECLARES its type
+ce.expr(["k", "n"]);
+ce.expr("n").type;         // ➔ "integer"
+
+// Assigned symbol: the use CHECKS against the evidence
+ce.assign("x", 3.5);       // x: real (finite_real, widened per the table)
+ce.expr(["k", "x"]);       // ➔ incompatible-type error, at canonicalization
+ce.expr("x").type;         // ➔ still "real" — the use did not rewrite it
+```
+
+Without this distinction a use could silently overwrite what an assignment
+had established, deferring the mismatch to evaluation time.
+
+The same distinction is applied **statically** to a whole Epsil program:
+the pre-run check (`epsil check`, and the diagnostics phase of running a
+file) tracks the type effect of each top-level declaration and assignment
+in order — without evaluating anything — so the program
+
+```
+let x
+let f: () -> integer
+let g: () -> number
+let k: (integer) -> integer
+x = f()
+x = g()
+k(x)
+```
+
+reports `expected integer, got number at x` as a **static** diagnostic,
+before anything runs. Assignment is last-write-wins: swapping the two
+assignments makes the program correct, and the check accepts it.
+
 Continuing the example above:
 
 ```js
@@ -1795,7 +1894,152 @@ ce.expr("n").type;
 //    from "number" to "integer"
 ```
 
+### Declared vs Inferred: Contract vs Evidence
 
+A type reaches a symbol on one of two tracks, and they behave differently:
+
+- A **declared** type — written by you, in `ce.declare("a", "list")` or
+  `let a: list` — is a **contract**. It never moves: assigning `[1, 2, 3]`
+  to `a: list` leaves `a`'s type `list`, even though the value's own type is
+  the much more precise `vector<finite_integer^3>`. An assignment that
+  violates the contract (`a = 42`) is an `incompatible-type` error.
+- An **inferred** type — produced by the engine from evidence — is
+  **revisable**. It follows the value: after `b = [1, 2, 3]` an undeclared
+  `b` types `vector<finite_integer^3>`; after `b = ["x", "y"]` it types
+  `list<string^2>`. Inference is never a trap: a new assignment or a new use
+  re-infers.
+
+For a **bare collection annotation**, the contract is the *constructor*
+and the element slot is a placeholder that refines from evidence: `a: list`
+holding `[1, 2, 3]` reports `list<finite_integer>` — the element type came
+from the assignment, while rank and length stay open (you wrote `list`, so
+list-ness of any shape is what you chose). The refinement never hardens:
+`a = ["x"]` re-refines to `list<string>`, exactly as an unannotated
+variable would re-infer, and `a = 42` is still rejected against the `list`
+contract. An *explicit* element type (`list<integer>`, `list<any>`) is a
+full contract and never moves. For non-collection loose annotations the
+same principle applies at whole-type granularity: `x: unknown` behaves
+like no annotation at all, while `x: any` is a fixed contract.
+
+### When Inference Triggers
+
+Inference writes happen at these moments:
+
+1. **Assignment to an undeclared symbol** (or one declared `unknown`): the
+   value's type — widened per the table above — becomes the symbol's
+   inferred type, and each later assignment re-infers.
+2. **Argument positions**: passing an `unknown`-typed symbol to a typed
+   parameter narrows the symbol to the parameter's type (see the `f(n)`
+   examples above). This includes *forwarding* through user functions: in
+   `g(c) = pick(c)` where `pick`'s own body indexes its parameter, the
+   collection evidence inferred for `pick` propagates to `c`, so `g` binds
+   a list argument whole instead of broadcasting over it.
+3. **Function-literal bodies**: a bare (unannotated) lambda parameter starts
+   as `unknown` and is narrowed by how the body *uses* it — indexing
+   (`v[1]`) narrows it to `dictionary<any> | indexed_collection<any>`
+   through `At`'s signature, arithmetic infers numeric, boolean use infers
+   `boolean`. The lambda's stored signature carries what the body proved and
+   nothing more.
+4. **Declared placeholders refined by definitions**: a declared `unknown`
+   *slot* in a function type is a placeholder, not a constraint — assigning
+   a body to `f: (unknown) -> unknown` replaces each `unknown` slot with the
+   slot the body's inference produced, and the refined signature is what is
+   stored. (An explicit `any` slot is the opposite: a contract the body must
+   honor.)
+
+### `unknown` vs `any`, and What a Bare Type Means
+
+The two "loose" types divide the work (see also the primitive-types table):
+
+- **`unknown`** — "some *value*, not stated which". It is the top of the
+  value types: every value type is a subtype of it, but the absence markers
+  (`nothing`, `missing`) are **not** — absence is opt-in. An `unknown` in a
+  signature slot or an unbounded `where T` is a **placeholder** that later
+  evidence refines.
+- **`any`** — the true top type, admitting absence markers as well. An
+  explicit `any` is a deliberate, *wider* **contract**: `(any) -> any`
+  promises to accept everything; `list<any>` admits a list with absent
+  elements. `any` is strictly above `unknown` (`unknown ⊑ any`, but not the
+  converse).
+
+A **bare collection constructor is a synonym for its `<unknown>` form**:
+`list` *is* `list<unknown>` — "some list of values" — and likewise `set`,
+`dictionary`, `collection` and `indexed_collection`. The explicit
+`<unknown>` spelling normalizes to the bare name. `list<any>` is a
+different, strictly wider type. Practical consequences:
+
+```js
+ce.type("list<integer>").matches("list");        // ➔ true
+ce.type("list").matches("list<any>");            // ➔ true
+ce.type("list<any>").matches("list");            // ➔ false (may hold absences)
+ce.type("list<integer|missing>").matches("list") // ➔ false
+ce.type("list<integer|missing>").matches("list<any>") // ➔ true
+```
+
+If you write your own type tests, the distinction matters in one place:
+asking "is this operand collection-*shaped*?" must be asked against the
+`<any>` family top (`matches("collection<any>")`), because a bare name in
+that position now means "collection of values only" and would wrongly
+exclude a `list<any>`-declared symbol or a `Missing`-bearing list. Asking
+"does this fit a list of values?" is exactly what the bare name is for.
+
+### Which spelling, when
+
+Most code never needs to choose — inference handles the common cases. When
+you do write one of the loose spellings, pick by role:
+
+- **Declaring an operator or function that *consumes* a collection?** Spell
+  the parameter **`collection<any>`** (or `list<any>`,
+  `indexed_collection<any>`, …): "hand me any collection whatsoever and I
+  will deal with its contents." A structural operator can always answer its
+  question — membership against an element incomparable with the subject is
+  simply `False`, an absent slot is handled by the missing-value machinery —
+  so its parameter should not reject at the type gate what it can handle at
+  run time. This is how the standard library spells its own collection
+  parameters (`Element`, `At`, `Take`, …).
+- **Annotating *your own* data when you don't yet know the element type?**
+  Spell it bare — **`collection`**, **`list`** — or simply leave it off and
+  let inference track the values. The bare form says "some collection of
+  values, to be determined", which is almost always what you mean about
+  your own data.
+- **Expecting absent entries in your own data?** Say so: `list<number |
+  missing>` for a specific hole type, or `list<any>` to leave the door
+  fully open. Writing it down is what buys you checking — see below.
+
+### Why absence is not part of `unknown` (for the curious)
+
+The distinctions above rest on one deliberate choice that can surprise
+readers arriving from TypeScript, where `unknown` is the absolute top type
+and happily includes `null`/`undefined`. Here it is not: `unknown` means
+"some **value**, not yet determined *which*" — it is epistemic about which
+value a position holds, not about whether it holds one. `Missing` is not a
+value the position might turn out to contain; it is the positioned absence
+of one. "I don't know which value this is" and "there may be no value here
+at all" are different claims, and the type lattice keeps them apart: `any`
+is the genuine top (anything, absence included); `unknown` is the top of
+the values. (`error`, the type of an invalid expression, is likewise
+outside `unknown`: it is a subtype only of itself and `any`.)
+
+What this buys is that **absence is opt-in** — the `Option`/`Maybe`
+discipline rather than nullable-by-default. An absent case enters a type
+only when someone writes it down, and then every consumer is forced to see
+it:
+
+- `RangeOf` returns `range | nothing` — the not-found case is *in the
+  type*, so code that feeds the result to `Slice` is checked against it.
+- `[1, Missing]` types as `list<finite_integer | missing>` — the hole is
+  visible, and the missing-propagation machinery keys off exactly that
+  visibility.
+- A parameter, lambda slot, or inferred type that never mentions absence
+  genuinely never receives it silently.
+
+If `missing` were a subtype of `unknown`, every unannotated parameter and
+every inferred slot would admit `Missing` without anyone having said so —
+`| missing` annotations would become decoration, and `unknown` would be
+nullable-by-default. Structurally, the absence markers (with `error`) are
+also precisely what separates `any` from `unknown`: remove them from the
+gap and the two tops would denote the same set of values, collapsing the
+`list` / `list<any>` distinction along with them.
 
 ## Defining New Types
 
@@ -1826,7 +2070,7 @@ statement. Because types are global, these statement forms are only valid at
 the **top level** of a program: inside a block or a function body they are an
 error and declare nothing. The statement comes in two forms:
 
-```js
+```plaintext
 type point = tuple<x: number, y: number>  // nominal
 type alias pair = tuple<number, number>   // structural alias
 let p = point(1, 2)
@@ -2022,7 +2266,7 @@ the record inhabitation story, and, for any definition, the smart-constructor
 idiom (validation, normalization, alternate parameterizations):
 
 ```js
-ce.declareType("circle", "record<x: number, y: number, r: number>");
+ce.declareType("circle", "record{x: number, y: number, r: number}");
 ce.assign("circle", ce.box(["Function",
   ["Dictionary",
     ["KeyValuePair", {str: "x"}, "x"],

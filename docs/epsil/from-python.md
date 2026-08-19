@@ -37,8 +37,8 @@ There is no `print`. A program's value is the value of its **last statement**.
 | `x: int = 4` | `let n: integer = 4` |
 | `def f(x): return x**2` | `f(x) = x^2` |
 | `def f(x):` with a body | `function f(x) { … }` — value is the last expression |
-| `lambda x: x*2` | `x \|-> 2x` |
-| `lambda: 42` | `() \|-> 42` |
+| `lambda x: x*2` | `x => 2x` |
+| `lambda: 42` | `() => 42` |
 | `def f(x: float) -> float:` | `f(x: real) -> real = x^2` |
 | `return` | *(no `return`)* — the last expression is the value |
 | `math.floor(x)`, `np.mean(xs)` | `Floor(x)`, `Mean(xs)` — no modules, no imports |
@@ -50,7 +50,7 @@ symbolic, with a did-you-mean warning when a close library name exists
 
 ```epsil
 fact(n) = 1 if n <= 1 else n * fact(n - 1)
-let double = x |-> 2x
+let double = x => 2x
 (fact(5), double(21))
 // ➔ (120, 42)
 ```
@@ -69,7 +69,7 @@ let double = x |-> 2x
 | `xs[1:3]` | `xs[2..3]` — 1-based, **inclusive** on both ends |
 | `range(1, 6)` | `1..5` or `Range(1, 5)` — **inclusive** of the end |
 | `len(xs)` | `Length(xs)` |
-| `sorted(xs)` / `sorted(xs, reverse=True)` | `Sort(xs)` / `Sort(xs, (a, b) \|-> a > b)` |
+| `sorted(xs)` / `sorted(xs, reverse=True)` | `Sort(xs)` / `Sort(xs, (a, b) => a > b)` |
 | `sum`, `min`, `max`, `any`, `all` | `Sum`, `Min`, `Max`, `Any`, `All` |
 | `reversed(xs)` | `Reverse(xs)` |
 | `zip(a, b)` | `Zip(a, b)` |
@@ -109,7 +109,7 @@ sum(n**2 for n in range(1, 11) if n % 2 == 1)
 ```
 
 ```epsil
-1..10 |> Filter(_, n |-> n % 2 == 1) |> Map(n |-> n^2, _) |> Sum
+1..10 |> Filter(_, n => n % 2 == 1) |> Map(n => n^2, _) |> Sum
 // ➔ 165
 ```
 
@@ -120,7 +120,7 @@ time, so the same "late binding in a closure" surprise applies:
 
 ```epsil
 let n = 1
-let m = Map(k |-> k * n, 1..3)
+let m = Map(k => k * n, 1..3)
 n = 10
 Sum(m)
 // ➔ 60
@@ -223,7 +223,7 @@ is the one numeric answer that differs on values you are likely to type:
 Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 
 ```epsil
-([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(k |-> k^2, 1..4)))
+([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(k => k^2, 1..4)))
 // ➔ ([2,3,4], [4,10,18], 30)
 ```
 
@@ -232,11 +232,13 @@ Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 | Python | Epsil |
 |:--|:--|
 | `f"x is {x}"` | `"x is \(x)"` — works in any string literal |
-| `"a" + "b"` | `StringJoin("a", "b")` — `+` on strings is a **type error** |
-| `len(s)` | `Length(Characters(s))` — strings are not collections |
-| `s[0]` | `Characters(s)[1]` |
+| `"a" + "b"` | `Join("a", "b")` — `+` on strings is a **type error** |
+| `len(s)` | `Length(s)` — a string is a collection of its characters (grapheme clusters, not code points) |
+| `s[0]` | `s[1]` — 1-based; each element is a `character` |
+| `c in s` | `c in s` — character membership; substring search is a separate operation |
+| `"ab" in s` | `ContainsSequence(s, "ab")` — `in` never means substring |
 | `s.split()` / `s.split(",")` | `StringSplit(s)` / `StringSplit(s, ",")` |
-| `"".join(parts)` | `StringJoin(…)`, or `Fold` over the parts |
+| `"".join(parts)` / `sep.join(parts)` | `StringJoin(parts)` / `StringJoin(parts, sep)` |
 | `str(x)` | `String(x)` |
 | `"""…"""` | `"""…"""` — multi-line strings, same delimiter |
 | `r"raw\string"` | `#"raw\string"#` — extended string literal |
@@ -244,14 +246,33 @@ Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 ```epsil
 let name = "world"
 let parts = StringSplit("a b c")
-("hello \(name)", StringJoin("a", "b"), Length(Characters(name)), parts[2])
+("hello \(name)", Join("a", "b"), Length(name), parts[2])
 // ➔ ("hello world", "ab", 5, "b")
 ```
 
-There is no `.upper()`, `.replace()`, `.find()` or `.strip()`: the string
-library today is `Characters`, `GraphemeClusters`, `UnicodeScalars`,
-`StringSplit`, `StringJoin`, `StringFrom` and `String`. Decompose to a list of
-characters or code points, work there, and rebuild.
+`.upper()`, `.lower()`, `.replace()` and `.strip()` are `ToUpperCase`,
+`ToLowerCase`, `StringReplace(s, target, replacement)` and
+`Trim`/`TrimStart`/`TrimEnd`; `.zfill()`/`.rjust()` are `PadStart`/`PadEnd`,
+`s * n` is `StringRepeat(s, n)` and `float(s)`/`int(s)` are `NumberFrom(s)`
+(which answers an error value, never NaN, on text that is not a numeral).
+`.find()`/`.index()` is `RangeOf(s, needle)`, which answers the *span* of the
+first occurrence (a `range`) or `Nothing` — feed it straight to `Slice`;
+`needle in s` (substring) is `ContainsSequence(s, needle)`, and
+`.startswith()`/`.endswith()` are `StartsWith`/`EndsWith`. Note that Epsil's
+`c in s` is **character** membership, not substring search.
+
+`.casefold()` is `CaseFold(s)`, and `StringCompare(a, b)` gives the `-1/0/1`
+code-point ordering that `<` on two multi-character strings does not (it
+compares UTF-16 code units, which sorts the astral characters below
+U+E000–U+FFFF).
+
+A string is an indexed collection of `character`
+values, so the generic collection operators apply directly (`Length`,
+`Reverse`, `Filter`, `Sort`, `Contains`, `IndexOf`, `Map` — the
+element-preserving ones return a string, `Map` returns a list; rejoin with
+`String(...)`). For a specific decomposition use `Characters`,
+`UnicodeScalars`, `Utf8`/`Utf16`; `StringSplit`, `StringJoin`, `Join`,
+`StringFrom` and `String` round out the library.
 
 ## Errors
 
@@ -260,7 +281,7 @@ There are no exceptions. A runtime problem becomes an ordinary
 not abort the rest of the work:
 
 ```epsil
-Map(x |-> Sqrt(x), [16, -4, "banana", 81])
+Map(x => Sqrt(x), [16, -4, "banana", 81])
 // ➔ [4, 2i, NaN, 9]
 ```
 
