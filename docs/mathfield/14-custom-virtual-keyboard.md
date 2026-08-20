@@ -451,7 +451,7 @@ If you include more than one layout, it's a good idea to provide a label
 and tooltip so they get propertly displayed in the layout switcher.
 
 
-## Customizing the Appearance of the Virtual Keyboard
+## Customizing the Appearance of the Virtual Keyboard {#custom-appearance}
 
 **To customize the appearance of the virtual keyboard panel** set the following 
 CSS variables on a selector that applies to the container of the virtual 
