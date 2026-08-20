@@ -145,6 +145,68 @@ Use `Floor(a / b)` for the integer quotient.
 
 To stop a pipeline early, restructure with a condition or a Take/Filter stage instead of breaking out of a callback.
 
+## `symbol-expected`
+
+A name was required at this position — after `let` or `const`, as a `for` loop's variable, as a function's or parameter's name — but something else was found there (`let = 42`).
+
+A subtler cause: the word written there is one the grammar itself consumes. `for = 3` is not an assignment to a variable named `for` — the `for` starts a for-loop, and the loop machinery then finds no variable name. To use such a word as a name anyway, spell it verbatim, wrapped in backquote characters: "let `for` = 3" (see `epsil doc reserved-word`).
+
+## `reserved-word`
+
+A word the language reserves was used where it cannot be a plain identifier. Two cases share this code: an active keyword where an expression was expected — `y = while` reads as the start of a `while` loop, not as a value named `while` — and a literal word (`true`, `false`, `Infinity`, `oo`, `NaN`) used to NAME a binding (`let NaN = 1`): a literal can never be a binding name, in any position.
+
+Only the words the grammar actually consumes today are rejected. The longer documented reservation list (`set`, `with`, `label`, …) stays fully usable — a future construct claims its word contextually where possible (as `type` and `alias` do), so those words may never be taken at all.
+
+The verbatim form always works: the name wrapped in backquote characters, "let `while` = 3", is an ordinary symbol in every position. Note that a BINDING position may accept an active keyword bare (`let while = 3` binds), but the bound name is then unreachable in expressions — `while + 1` reads as a loop again — so the verbatim spelling is the only robust one.
+
+## `asymmetric-operator-whitespace`
+
+An operator was written with whitespace on one side only — `a+ b`. An operator with whitespace on both sides or neither is infix (`a + b`, `a+b`); one with whitespace only BEFORE it starts a new statement instead (`a +b` is the value `a`, then the prefix expression `+b`). The asymmetric middle case matches neither reading, so it is flagged — and recovered as infix, which is almost always what was meant. The quick fix restores the symmetry.
+
+The spacing rule is what lets line breaks alone separate statements: the parser decides where an expression ends from the spacing, so a program without semicolons still parses exactly one way. The same abutment idea splits postfix from prefix `!`: `x!` (abutting) is Factorial, while `x !y` ends the expression `x` and starts the prefix Not `!y`.
+
+## `duplicate-dictionary-key`
+
+A dictionary literal repeats a key: in `{"a" -> 1, "a" -> 2}` the second entry conflicts with the first. Within one uninterrupted run of literal entries, keys are unique by construction — a repeated key there is a typo or a leftover, never an override, so it is reported instead of silently picking one of the two values. (Under error recovery the FIRST entry is the one that remains.)
+
+A spread is an override boundary: `{"a" -> 1, ...d, "a" -> 2}` is legal, and the second `"a"` deliberately overrides whatever the spread brought in — last wins, no diagnostic. And only literal keys are checked: a key computed at runtime cannot collide until the dictionary is actually built.
+
+## `parameter-name-mismatch`
+
+A lambda and its type annotation name the same parameter differently — `const f: (a: number) -> number = (b) => b`. A parameter name binds wherever it is written, so the annotation's `a` and the lambda's `b` would both claim the same slot, and the engine will not guess which one the body meant.
+
+Rename one side so the two agree — the quick fix renames the annotation's parameters to match the lambda's — or leave the annotation's parameters unnamed (`(number) -> number`): an annotation's parameter names are optional documentation, while the lambda's are the real binding.
+
+## `function-redefinition`
+
+Two clauses of one function in a single program have the same dispatch domain, so the second would silently replace the first — `f(x) = x` followed by `f(x) = 2 * x`. Parameter NAMES are not part of a clause's identity: `g(n) = n` then `g(m) = 2 * m` collides all the same, so renaming a parameter never resolves this error.
+
+Only replacement is refused. Clauses that dispatch on genuinely different domains accumulate — a different arity (`k(x)` and `k(x, y)`), different parameter types (`h(x: integer)` and `h(x: string)`), or a literal pattern (`g(0) = 99` alongside `g(x) = x`). That is what multi-clause definitions are for.
+
+The boundary is the program (one file, one cell). Within it, a same-domain redefinition is a mistake with no possible intent. Interactively, re-running an edited definition as a SEPARATE program — a later notebook cell, the next REPL line — replaces the earlier one; that is the intended redefinition gesture, and is legal.
+
+## `type-redefinition`
+
+One program declares the same type name twice. A sum type's variant names count as names its statement declares, so a variant colliding with a later `type` statement reports this too.
+
+The boundary is the program (one file, one cell): within it, a second declaration of a name is a mistake with no possible intent. To redefine a type interactively, re-run the edited declaration as a SEPARATE program (a later cell) — across programs, redefinition is the intended gesture and is legal. `protocol` declarations follow the same rule (see `epsil doc protocol-redefinition`).
+
+## `protocol-redefinition`
+
+One program declares the same protocol name twice — the protocol counterpart of `epsil doc type-redefinition`, with the same rule and the same boundary.
+
+Within one program a redeclaration is a mistake; re-running an edited declaration as a separate program (a later notebook cell) replaces the earlier one and is the intended interactive gesture.
+
+## `type-declaration-not-top-level`
+
+A `type` statement appears inside a block or a function body. Types are engine-global — a type's name, constructor and conformances are visible to the whole session, never scoped to a block — so a nested declaration would promise a locality it cannot deliver. Declare the type at the top level of the program.
+
+`protocol` declarations follow the same rule (see `epsil doc protocol-declaration-not-top-level`).
+
+## `protocol-declaration-not-top-level`
+
+A `protocol` statement appears inside a block or a function body. Protocols, like types, are engine-global (see `epsil doc type-declaration-not-top-level`), so protocol declarations are legal only at the top level of a program.
+
 ## `runtime-error`
 
 Runtime problems in Epsil are VALUES, not exceptions: a failing subexpression evaluates to an Error value, which propagates outward through the enclosing expressions. Nothing is thrown, and the rest of the program keeps running.
@@ -158,3 +220,17 @@ Only the last statement's value is a program's result, so an error produced by a
 This problem was detected before anything ran, when the program was canonicalized — the same analysis `epsil check` performs.
 
 A static diagnostic never suppresses evaluation: the program still runs exactly as written (errors are values — see `epsil doc runtime-error`), so the same mistake may be reported a second time by the run itself. The label distinguishes the tiers: "Type error"/"Static error" for the pre-run analysis, "Runtime error" for the run.
+
+## `unknown-protocol`
+
+A conformance test named a protocol that does not exist: `Conforms(x, "Hashble")` where no `protocol Hashble` was ever declared. A name that does not exist is a mistake to surface, so it is an error — never a quiet `False`, which would make a typo indistinguishable from a genuine non-conformance.
+
+This error comes from the `Conforms` operator, whose protocol names ride as strings and so are only checkable when it runs. The `is` spelling of the same test (`x is Hashable`) resolves the name when the program is parsed, so a typo there is reported earlier, as a parse-time diagnostic, and never reaches this error.
+
+## `polytype-comparison-unsupported`
+
+A type comparison was given a QUANTIFIED type — a generic signature with a `where` clause, such as the type of a built-in like `Sort` — and comparing those is not supported: `Subtype`, the dynamic test (`x is T`, `MatchesType`), and `Conforms` all reject a quantified operand rather than guess.
+
+Deciding whether one generic signature is a subtype of another engages existential matching — "is there an instantiation that works" — which is a different, harder question than the ground-type compatibility these operators answer. A quantified type is still a legal VALUE (`Type(Sort)` observes one, prints it, and round-trips through `TypeFrom`/`StringFrom`); only comparing it is rejected.
+
+To ask about a SPECIFIC use of a generic, compare the instantiated ground type instead — the type of an actual call's argument or result.
