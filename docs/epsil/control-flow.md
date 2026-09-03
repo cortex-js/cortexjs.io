@@ -414,6 +414,13 @@ symbolic (unbound) `x` as the subject above, `match` selects the `_` case: `x`
 is structurally not `0`, even though it *could* be zero semantically. Use
 `if`/`Which` when you want that kind of semantic case-split instead.
 
+A list pattern matches a list *value* whatever produced it: `Rest(xs)`,
+`Drop(xs, 1)` or `Range(1, 3)` evaluate to a lazy collection rather than a
+list literal, and the case holding the list pattern reads it as a list —
+element by element for the positions the pattern names, with a copy only for
+a named `...rest`. (A lazy list of more than 100 000 elements is left as it
+is, and then matches only the wildcard.)
+
 The final catch-all may also be spelled `otherwise`, a synonym for a bare
 `_` pattern (it takes a guard the same way, and binds nothing):
 
@@ -511,7 +518,8 @@ the body to bind `a` to when the alternatives disagree on shape.
 ### Range patterns
 
 `lo..hi` in pattern position is an **inclusive numeric membership test**: the
-case is selected when the subject is a real number and `lo ≤ subject ≤ hi`.
+case is selected when the subject is a real number or an infinity and
+`lo ≤ subject ≤ hi`.
 The call spelling `Range(lo, hi)` means exactly the same thing — the pattern
 form keys on the operator, not on how it was written:
 
@@ -525,9 +533,9 @@ match x {
 
 Both endpoints are included, and they are compared with the same tolerance
 `match` uses for every other number leaf, so a subject a hair outside an
-endpoint still selects the case. Only a **number** matches: a symbol, a
-collection, a string, a complex number and `NaN` all fall through to the next
-case.
+endpoint still selects the case. Only a number **on the real line** matches: a
+symbol, a collection, a string, a complex number with a nonzero imaginary part
+and `NaN` all fall through to the next case.
 
 Bounds must be **numeric literals** — negated literals and `Infinity` /
 `-Infinity` included, so `0..Infinity` reads as "any nonnegative number":
@@ -700,6 +708,58 @@ match 3 {
 
 Evaluating this expression yields `Error("match-no-case", 3)`.
 
+### `if let` {#if-let}
+
+When one case is what matters and everything else is the fallback, `if let`
+spells the test as a conditional. The pattern is any `match` pattern; the
+block runs with the pattern's bindings in scope when the subject matches, and
+the `else` branch — optional, and chainable with `else if` — when it does not:
+
+```epsil-live
+let point = (2, 5)
+if let (x, y) = point { x * y } else { 0 }
+// ➔ 10
+```
+
+It is sugar over `match`: the statement above is
+`match point { (x, y) => do { x * y }; _ => do { 0 } }`, and the two forms
+lower to the same expression. Without an `else`, a subject that does not
+match evaluates to `Missing`, as a false `if` without an `else` does.
+
+The form earns its keep with a typed binding, which is how a result that may
+have failed is taken apart without a `match` block:
+
+```epsil-live
+function head(xs: list) {
+  match xs {
+    [h, ...] => h
+  }
+}
+if let h: !error = head([]) { h } else { "empty" }
+// ➔ "empty"
+```
+
+`head([])` has no matching case, so it evaluates to a `match-no-case` error
+value; the typed binding `h: !error` refuses it and the `else` branch runs.
+With `head([4, 5])`, `4` binds to `h`. The same test reads absence:
+`if let v: !missing = First(xs) { … }` binds `v` only when the list has a
+first element.
+
+`if let` chains with `else if` in either direction, and a plain `if` can
+follow an `if let`:
+
+```epsil-live
+let v = [1]
+if let [] = v { "empty" } else if let [x] = v { x } else { "many" }
+// ➔ 1
+```
+
+A pattern that cannot fail — a bare name or `_` with no type — makes the
+`else` branch dead code; that is what `let` is for, and it is reported as an
+`if-let-irrefutable` warning. There is no guard slot: to test a condition on
+the bound values, nest an `if` in the block. Bindings are scoped to the
+block, as in a `match` case.
+
 ### `if`, `a if c else b`, or `match`? {#choosing-a-conditional}
 
 All three produce a value, so the choice is about what you are branching *on*.
@@ -729,6 +789,10 @@ match v {
 // ➔ "several items"
 ```
 
+When only one shape matters — a non-empty list, a value that is not an
+error — [`if let`](#if-let) tests it as a conditional, and the `else` takes
+everything else.
+
 Two differences are worth remembering when the subject may be symbolic.
 `match` is **structural**: a symbolic `x` is not `0`, even though it might turn
 out to be zero, so it takes the wildcard case. And `match` is **total**: it
@@ -748,6 +812,29 @@ Value-producing iteration over a collection belongs to the library functions
 ```epsil
 while x > 0 { x }
 ```
+
+`while let pattern = subject { … }` is the loop form of [`if let`](#if-let):
+each turn matches the subject against the pattern and runs the body with the
+pattern's bindings in scope, and the first turn on which the subject does not
+match ends the loop. It consumes a list one element at a time:
+
+```epsil-live
+let xs = [1, 2, 3]
+let s = 0
+while let [h, ...t] = xs { s = s + h; xs = [t] }
+s
+// ➔ 6
+```
+
+The pattern is any `match` pattern, so a typed binding drains a function that
+may fail: `while let h: !error = head(xs) { … }` runs while `head(xs)` is not
+an error value. `break` and `continue` in the body apply to this loop. It is
+sugar over `while` and `match`: the loop above is
+`while true { match xs { [h, ...t] => do { s = s + h; xs = [t] }; _ => do { break } } }`,
+and the two forms lower to the same expression. A pattern that cannot fail —
+a bare name or `_` with no type — makes the loop end only on a `break`; that
+is `while true` with a `let` in the body, and it is reported as a
+`while-let-irrefutable` warning.
 
 `for x in xs { … }` binds the loop variable to each element in turn:
 

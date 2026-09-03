@@ -32,24 +32,42 @@ annotation. This page is about using them.
 ## Every value already has a type
 
 You never have to introduce types into a program: they are there from the
-start. `Type` reports the one a value has:
+start. `Type` reports the one a value has. For a number literal that is the
+most precise claim there is — the value itself:
 
 ```epsil-live
-(Type(42), Type(1/3), Type(2.5), Type("hi"), Type(True))
-// ➔ (TypeFrom("finite_integer"), TypeFrom("finite_rational"), TypeFrom("finite_real"), TypeFrom("string"), TypeFrom("boolean"))
+(Type(42), Type(2.5), Type("hi"), Type(True))
+// ➔ (TypeFrom("42"), TypeFrom("2.5"), TypeFrom("string"), TypeFrom("boolean"))
 ```
+
+A literal type sits inside its numeric tier — `42` is an `integer`, `2.5` a
+`real` — so a literal is accepted anywhere its tier is. An exact value no
+machine number holds — `1/3`, `√2`, an astronomically large integer — has no
+literal type to report, so it is typed by the narrowest safe claim instead:
+its tier, narrowed by a range that encloses the value. `Type(1/3)` reports
+`rational<0.33..0.34>` and `Type(Sqrt(2))` reports `real<1.4..1.5>` — bounds
+wide enough to be certainly true, which is also what fixes the sign. And
+anything *stored* carries the tier: `let n = 42` declares `n: integer`, and
+the `radius` example below infers `real`.
 
 Collections carry the type of what is in them, and how many:
 
 ```epsil-live
 (Type([1, 2, 3]), Type({1, 2}), Type((1, "a")), Type({x -> 1}))
-// ➔ (TypeFrom("vector<finite_integer^3>"), TypeFrom("set<finite_integer>"), TypeFrom("tuple<finite_integer, string>"), TypeFrom("record{x: finite_integer}"))
+// ➔ (TypeFrom("vector<integer^3>"), TypeFrom("set<integer>"), TypeFrom("tuple<integer, string>"), TypeFrom("record{x: integer}"))
 ```
 
 Numeric types form a tower — `integer ⊂ rational ⊂ real ⊂ complex ⊂ number` —
 and a value of a narrower type is accepted wherever a wider one is expected,
 with no conversion and no cast. An `integer` *is* a `real`, so a function
 declared `f(x: real)` takes `3` happily.
+
+Every name in that tower up to `complex` means a **finite** number. The
+infinities and `NaN` are not in any of them: they have types of their own,
+`infinity` and `nan`, and only the top of the tower covers all three —
+`number` is `complex`, `infinity` and `nan` together. So `f(x: real)` takes
+`3` and rejects `Infinity` and `NaN` with an `incompatible-type` error, while
+`f(x: number)` takes all of them.
 
 ## When to write an annotation
 
@@ -600,7 +618,7 @@ never expanded — which is exactly what lets its body mention itself:
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t = tree(1, [tree(2, [])])
 Type(t)
-// ➔ TypeFrom("tree<finite_integer>")
+// ➔ TypeFrom("tree<integer>")
 ```
 
 The constructor is **quantified** — `tree: (T, list<tree<T>>) -> tree<T>
@@ -666,7 +684,7 @@ always sound, just less permissive.
 
 One limitation follows from that. A construction solves its parameters from
 its arguments alone, and an annotation does not widen them: `let t:
-tree<number> = tree(1, [])` works only because the `tree<finite_integer>` it
+tree<number> = tree(1, [])` works only because the `tree<integer>` it
 builds *is* a `tree<number>` under `out`. For an explicitly `inout` or `in`
 parameter that step is not available, so such a type can only be constructed
 at exactly its argument type.
@@ -680,7 +698,7 @@ optional payload expressible:
 type opt<T> = T | missing
 let a = opt(1)
 Type(a)
-// ➔ TypeFrom("opt<finite_integer>")
+// ➔ TypeFrom("opt<integer>")
 ```
 
 Each construction takes exactly one arm. Taking the **ground** arm says
@@ -746,7 +764,8 @@ Epsil distinguishes three related kinds of absence:
 - `Nothing` means “no value here” and is removed from function arguments and
   collection literals.
 - `Missing` is a position-preserving missing value. Its type is `missing`.
-- `NaN` is the numeric form of an absent or undefined result. Numeric
+- `NaN` is the numeric form of an absent or undefined result. Its type is
+  `nan`, which sits outside `real` and `complex` and inside `number`. Numeric
   operations and missing numeric fields generally normalize absence to `NaN`.
 
 `IsMissing(x)` recognizes both `Missing` and `NaN`, regardless of how the
@@ -776,7 +795,9 @@ curious about why the system behaves the way it does.
 The foundation is **subtyping**: types are arranged in a hierarchy, and most
 questions the engine asks are of the form "is this type a subtype of that
 one?". The numeric tower — `integer ⊂ rational ⊂ real ⊂ complex ⊂ number` — is
-the familiar part. Around it the type language adds unions
+the familiar part; its one surprise is that every step up to `complex` is
+finite, so the infinities and `NaN` join only at `number`. Around it the type
+language adds unions
 (`integer | boolean`), range refinements (`integer<0..10>`), collections with
 element types (`list<integer>`, `set<string>`), tuples and records, and
 function signatures with effect labels.
@@ -828,7 +849,7 @@ signature.
 Subtyping also quietly absorbs a classic use of polymorphism: the empty
 list needs no "for all" type — it is simply `list<never>`, and since
 `never` is the bottom of the lattice (joining it with anything gives the
-other type back), `Join([], [1, 2])` comes out as `list<finite_integer>`
+other type back), `Join([], [1, 2])` comes out as `list<integer>`
 with no quantifier anywhere.
 
 For the representation a type declaration lowers to, see
