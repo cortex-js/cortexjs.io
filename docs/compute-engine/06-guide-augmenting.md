@@ -382,6 +382,78 @@ definition.
 See `FunctionDefinition` for more details on the other handlers and
 properties that can be provided when defining a function.
 
+### Validating custom canonical handlers
+
+A custom `canonical` handler participates in expression construction before an
+`evaluate` handler runs. It must not assume that signature validation has
+already produced every missing-argument or incompatible-type error needed by
+the function.
+
+For required operands, check arity first and return an expression containing
+the appropriate `engine.error("missing")` placeholders. For operands whose
+shape or type the handler consumes directly, validate them before reading
+specialized fields. Preserve the original head in the returned error
+expression so serialization, diagnostics, and later evaluation still identify
+the failed call.
+
+Keep validation at the narrowest layer that knows the contract:
+
+- Express ordinary arity and type requirements in the function signature.
+- Validate structural preconditions needed specifically by `canonical` inside
+  that handler.
+- Validate value-dependent conditions, such as a positive evaluated integer,
+  in `evaluate`.
+- Add tests for no arguments, each missing required argument, wrong types, and
+  the valid boundary cases.
+
+This separation avoids both silently accepting malformed calls and evaluating
+operands merely to canonicalize their syntax.
+
+### Deriving the Result Type of an Operator
+
+The `signature` of an operator states its result type once, for every call.
+When the result type depends on the operands — the sum of two integers is an
+integer, the norm of a point whose components are lists is a list — the
+definition can add a `type` handler. The handler receives one **operand
+descriptor** per operand, never the operand expression itself, and returns a
+type (a `Type`, a type string, or `undefined` to keep the signature's result).
+
+```js
+ce.declare("Halve", {
+  signature: "(number) -> number",
+  type: ([x]) => {
+    // The descriptor's `type` is the operand's type; a number literal's
+    // type carries its value (`21`), so a literal is exact here.
+    if (x.facts.finite !== true) return "number";
+    return x.facts.sgn === "zero" ? "0" : "real";
+  },
+  evaluate: ([x]) => x.div(2),
+});
+```
+
+A descriptor has three parts:
+
+- `type` — the operand's type.
+- `facts` — a small set of three-valued facts (`true`, `false`, or
+  `undefined` for "not known"): `finite`, `sgn`, `closed` (no free
+  variables), `collection`, `finiteCollection`, `indexed`, a static `shape`
+  and the `elementType` the operand's own collection handler proves.
+- `structureOf()` — an on-demand structural view: a `symbol` (with its name
+  and whether its type was inferred), a `string`, a `number` (with its exact
+  rational terms when it has them), an `application` (its head and child
+  descriptors), a `function-literal` (parameters and body), a `tuple` or a
+  `list-literal` (with element descriptors).
+
+The second argument is a context with a read-only view of the engine
+(`engine.type()`, `engine.lookupDefinition()`, `engine.tolerance`) and
+`derive(operator, operands)`, which returns the type of applying an operator
+to descriptors you build yourself — the way to type the body of a mapping
+literal over a collection's element type.
+
+Because a handler never holds an expression, it cannot declare, canonicalize,
+or evaluate anything while deriving a type, and the engine's type caches stay
+valid. Under test a handler that writes engine state throws.
+
 ### Declaring the Effects of a Function
 
 If your function does something besides returning a value — draws a random
@@ -1031,10 +1103,16 @@ ce.declare('Sqrt', {
   ...originalSqrtDefinition,
   evaluate: (x, options) => {
     const y = originalSqrtDefinition.evaluate!(x, options);
-    return y?.isReal ? y : ce.NaN;
+    return y?.isExtendedReal ? y : ce.NaN;
   },
 });
 ```
+
+`isExtendedReal` is the test for "lies on the real line", and it accepts
+$\pm\infty$ along with the finite reals; only a value with a non-zero imaginary
+part, or `NaN`, fails it. Use `isFinite` instead when the guard must also
+exclude the infinities — but note that `isFinite` accepts a finite *complex*
+value, so it is not a substitute here.
 
 In general, re-declaring a function in the same scope is not allowed and 
 will throw an error. However, the standard functions are in a `system` scope

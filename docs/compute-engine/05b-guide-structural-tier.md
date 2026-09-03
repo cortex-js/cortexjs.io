@@ -444,7 +444,8 @@ design:
 ce.declare('g', '(string) -> number');
 
 console.log(ce.expr(['g', 42]).isValid);
-// ➔ false  — ["g", ["Error", ["ErrorCode", "'incompatible-type'", "'string'", "'finite_integer'"]]]
+// ➔ false  — ["g", ["Error", ["ErrorCode", "'incompatible-type'", "'string'", "'42'"], 42]]
+//            the offending type is reported as the literal type `42`, not as `integer`
 
 console.log(ce.expr(['g', ['List', 1, 2]]).isValid);
 // ➔ true   — the lift makes it a broadcast application

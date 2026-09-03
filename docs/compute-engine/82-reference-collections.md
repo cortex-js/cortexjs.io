@@ -639,6 +639,22 @@ Every other case keeps the `indexed_collection` types above.
 ["Range", 1, 10, 2]  // type: indexed_collection<integer>  (stepped: a gather, not a span)
 ["Range", 5, 2]      // type: indexed_collection<integer>  (descending)
 ["Range", 0, 5]      // type: indexed_collection<integer>  (0 is not an index)
+["Range", 1, "PositiveInfinity"]
+                     // type: indexed_collection<integer>  (unbounded)
+```
+
+An **infinite upper bound** is allowed and produces a lazy, unbounded
+collection. It does not take the `range` type: an index span is a finite run of
+positions, and $\infty$ describes how far the range extends rather than being
+one of its values. The elements are still integers, and `Length` reports the
+extent:
+
+```js
+ce.expr(['Length', ['Range', 1, 'PositiveInfinity']]).evaluate().print();
+// ➔ +oo
+
+ce.expr(['Take', ['Range', 1, 'PositiveInfinity'], 3]).evaluate().print();
+// ➔ [1,2,3]
 ```
 
 The narrowing loses no information — a `range` is still an
@@ -990,6 +1006,35 @@ than `xs`, the iteration stops at the end of the mask.
 ["At", ["List", 10, 20, 30, 40], ["List", "True", "False", "True", "False"]]
 // ➔ ["List", 10, 30]
 ```
+
+#### Out-of-Range Index
+
+A single index that falls outside the collection — including the index `0`,
+since indexing is 1-based — is not an error. `At` answers an **absence marker**,
+and the marker is drawn from the element type: a numeric collection answers
+`NaN`, any other collection answers `Missing`.
+
+```js
+ce.expr(['At', ['List', 5, 2, 10, 18], 99]).evaluate().print();
+// ➔ NaN
+
+ce.expr(['At', ['List', "'a'", "'b'"], 99]).evaluate().print();
+// ➔ "Missing"
+```
+
+The marker is part of the static type of the access, because the engine cannot
+in general know that an index is in range:
+
+```js
+ce.expr(['At', ['List', 5, 2, 10, 18], 99]).type;
+// ➔ "integer | nan"
+
+ce.expr(['At', ['List', "'a'", "'b'"], 99]).type;
+// ➔ "missing | string"
+```
+
+For a numeric collection the union often collapses on its own, since `nan` is
+already part of `number`: indexing a `list<number>` has type `number`.
 
 #### Filtering with a Condition
 
@@ -1539,6 +1584,15 @@ The optional function is interpreted by its **arity**:
   // ➔ ["List", 3, 2, 1]
   ```
 
+  A comparator may also return a **boolean**, in which case `True` means the
+  first argument sorts first — the form a predicate such as `Less` or a body
+  like `a > b` naturally produces:
+
+  ```json example
+  ["Sort", ["List", 1, 2, 3], ["Function", ["Greater", "a", "b"], "a", "b"]]
+  // ➔ ["List", 3, 2, 1]
+  ```
+
 - A **one-argument key function** `f(x)` sorts the elements **ascending** by
   the key value `f(x)`. The sort is **stable**: elements with equal keys keep
   their original relative order.
@@ -1687,14 +1741,22 @@ comparison is undetermined.
 
 <FunctionDefinition name="Length">
 
-<Signature name="Length" returns="integer">_xs_:any</Signature>
+<Signature name="Length" returns="infinity | integer">_xs_:any</Signature>
 
-Return the number of elements in a finite collection. If the argument is not a
-collection or is infinite, the expression remains unevaluated.
+Return the number of elements in a collection. If the argument is not a
+collection, the expression remains unevaluated.
 
 ```json example
 ["Length", ["List", 5, 2, 10, 18]]
 // ➔ 4
+```
+
+An **unbounded** collection has an infinite length, which is why the return type
+is `infinity | integer` rather than `integer`: a bare `integer` is finite.
+
+```js
+ce.expr(['Length', ['Range', 1, 'PositiveInfinity']]).evaluate().print();
+// ➔ +oo
 ```
 
 For collections, `Length` and [`Count`](#count) produce the same result;

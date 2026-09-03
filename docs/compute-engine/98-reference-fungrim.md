@@ -7,17 +7,17 @@ slug: /compute-engine/reference/fungrim/
 
 The Compute Engine ships a library of **special-function identities** derived from the [Fungrim](https://fungrim.org/) "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation solving for functions such as the elliptic integrals, Jacobi theta functions, Bessel functions, the Riemann zeta function, and many more.
 
-This reference catalogues the **1435 identities** behind the engine's **1445 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
+This reference catalogues the **1434 identities** behind the engine's **1444 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Areas
 
-### [Elementary functions](/compute-engine/reference/fungrim-elementary/) (211)
+### [Elementary functions](/compute-engine/reference/fungrim-elementary/) (210)
 
-Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert W-function (15) · Natural logarithm (11) · Pi (4) · Powers (8) · Sinc function (24) · Sine (59) · Square roots (25)
+Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert W-function (15) · Natural logarithm (11) · Pi (4) · Powers (7) · Sinc function (24) · Sine (59) · Square roots (25)
 
 ### [Complex numbers](/compute-engine/reference/fungrim-complex/) (36)
 

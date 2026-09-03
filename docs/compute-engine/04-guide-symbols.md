@@ -90,6 +90,64 @@ console.log("pi = ", smallPi, "=", bigPi);
 // ➔ pi  = 3.1415 = 3.1415926535
 ```
 
+## Using `i` or `e` as a Variable Name
+
+`i` is the imaginary unit and `e` is Euler's number. Both are constants, and
+both are substituted during canonicalization — so a formula that uses one as an
+ordinary variable, most often as a list index, quietly computes with the
+constant instead:
+
+```js
+console.log(ce.parse("A_{i,j}").json);
+// ➔ ["Subscript", "A", ["Sequence", ["Complex", 0, 1], "j"]]
+```
+
+The index became $\imaginaryI$. Nothing errors; an indexed access built this
+way simply yields `NaN`.
+
+**To use one of these names as a variable, declare it before parsing anything
+that mentions it.** A declaration shadows the constant for that scope:
+
+```js
+ce.declare("i", "integer");
+
+console.log(ce.parse("A_{i,j}").json);
+// ➔ ["Subscript", "A", ["Sequence", "i", "j"]]
+
+ce.assign("L", ce.box(["List", 10, 20, 30]));
+ce.assign("i", 2);
+console.log(ce.parse("L_i").evaluate().toString());
+// ➔ 20
+console.log(ce.parse("L[i]").evaluate().toString());
+// ➔ 20
+```
+
+Four things are worth knowing before you do this:
+
+- **Declare before parsing.** An expression parsed before the declaration has
+  already had the constant substituted, and declaring afterwards does not
+  change it. Declare at engine setup.
+- **Prefer `integer` for an index.** `integer` rejects a fractional value at
+  assignment; a symbol declared `unknown` accepts `i = 1.5` and passes the
+  fractional index through to the access with no diagnostic.
+- **Arithmetic with that name changes meaning in that scope**, and only there:
+  with `i` declared and set to 2, `2i` is `4`, not the complex number. The
+  dedicated spelling still works — `\imaginaryI` (and `\mathrm{i}`) always
+  parses as the imaginary unit — and serialization is unaffected, because a
+  complex value is written as `\imaginaryI`, never as a bare `i`. A complex
+  result therefore survives a serialize-and-reparse round trip.
+- **Bound variables are unaffected.** `\sum_{i=1}^{3} i` is `6` whether or not
+  `i` is declared: a binder introduces its own index.
+
+Declaring `e` follows the same rules but costs more, because it takes
+$e^{x}$ with it. Write exponentials as `\exp(x)` instead — it canonicalizes to
+`["Power", "ExponentialE", "x"]`, referring to the constant directly, so it is
+unaffected by a variable named `e`.
+
+To limit either declaration to part of a computation, declare it inside a
+scope (see [Scope](#scope)); the constant is restored when the scope is
+exited.
+
 ## Automatic Declaration
 
 An unknown symbol is automatically declared when it is first used in an
@@ -103,10 +161,13 @@ const symbol = ce.expr("m"); // m for mystery
 console.log(symbol.type);
 // ➔ "unknown"
 
-symbol.value = 5;
-console.log(symbol.type);
-// ➔ "finite_integer"
+ce.assign("m", 5);
+console.log(ce.symbol("m").type);
+// ➔ "integer"
 ```
+
+The inferred type is `integer`, not `"finite_integer"`: the numeric types are
+finite by default, so bare `integer` already promises a finite whole number.
 
 If the type of a symbol is inferred from its usage, the type can be 
 adjusted later as further information is provided. However, if the type is

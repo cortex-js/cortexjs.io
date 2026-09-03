@@ -90,7 +90,10 @@ is inferred from the first argument:
 | `f'''(x)`             | Third derivative with nested `D` |
 | `\sin'(x)`            | `["D", ["Sin", "x"], "x"]` |
 
-When the prime notation is used without arguments, it represents a derivative operator:
+When the prime notation is used without arguments on a **function** — a
+symbol whose type is a function, such as one declared with `ce.declare("f",
+"(number) -> number")` or assigned a function literal — it represents a
+derivative operator:
 
 | LaTeX                 | MathJSON          |
 | :-------------------- | :---------------- |
@@ -99,6 +102,26 @@ When the prime notation is used without arguments, it represents a derivative op
 | `f^{\prime}`          | `["Derivative", "f"]` |
 | `f''`                 | `["Derivative", "f", 2]` |
 | `f^{(n)}`             | `["Derivative", "f", n]` |
+
+A symbolic order (`f^{(n)}` with `n` unassigned) stays symbolic until `n` is
+assigned, and `["Derivative", "f", 0]` is `f` itself.
+
+On anything that is **not** a function — an undeclared symbol, a number-valued
+symbol, a subscripted name whose subscript does not fold into the symbol
+(`\alpha_{i+1}`, `A_{i,j}`) — a prime without arguments is the **primed
+variable** `Prime`, a distinct value of the same kind as its base (`x'` as a
+coordinate, `A'` as a point in geometry, `\sin a'` as a function of a primed
+variable):
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `x'`                  | `["Prime", "x"]` |
+| `x''`                 | `["Prime", "x", 2]` |
+| `A_1'`                | `["Prime", "A_1"]` |
+| `\alpha_{i+1}'`       | `["Prime", ["Subscript", "alpha", ["Add", "i", 1]]]` |
+
+A parenthesized expression is always differentiated, with or without a
+subscript: `(x^2)'` is `["Derivative", ["Delimiter", ["Square", "x"]]]`.
 
 <b>Newton Notation (Dot Notation)</b>
 

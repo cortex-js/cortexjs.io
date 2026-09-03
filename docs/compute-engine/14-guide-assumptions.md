@@ -127,7 +127,7 @@ The type of a symbol is automatically inferred from assumptions:
 ```js
 ce.assume(ce.parse("x > 4"));
 ce.expr("x").type.toString();
-// ➔ 'real'
+// ➔ 'real<4<..>'
 
 ce.assume(ce.parse("n = 42"));
 ce.expr("n").type.toString();
@@ -138,8 +138,60 @@ ce.expr("z").type.toString();
 // ➔ 'real'
 ```
 
-Inequality assumptions (`>`, `<`, `>=`, `<=`) set the symbol's type to `real`.
-Equality assumptions infer the type from the value.
+Inequality assumptions (`>`, `<`, `>=`, `<=`) set the symbol's type to `real`,
+carrying the bound along when there is one. Equality assumptions infer the type
+from the value.
+
+### Assumptions and the Infinities
+
+`real` names the **finite** reals, so an inequality assumption rules the
+infinities out even when it leaves one side unbounded. A symbol assumed greater
+than 4 has an open upper end, but $+\infty$ is not a value it can take:
+
+```js
+ce.assume(ce.parse("x > 4"));
+ce.expr("x").isFinite;
+// ➔ true
+
+ce.expr("x").type.matches("infinity");
+// ➔ false
+```
+
+An equality assumption against an infinite value, on the other hand, infers one
+of the non-finite types — `infinity` for an infinity of any direction, `nan` for
+`NaN`. Neither is a subtype of `real`:
+
+```js
+ce.assume(ce.parse("m = \\infty"));
+ce.expr("m").type.toString();
+// ➔ 'infinity'
+```
+
+Assigning such a value directly declares the same type:
+
+```js
+ce.assign("p", ce.parse("\\infty"));
+ce.expr("p").type.toString();
+// ➔ 'infinity'
+
+ce.assign("r", ce.box(NaN));
+ce.expr("r").type.toString();
+// ➔ 'nan'
+```
+
+Because the two are disjoint, claiming a symbol already known to be infinite is
+a real number is not a narrowing — it is a **contradiction**, and `assume()`
+reports it as one rather than silently discarding either fact:
+
+```js
+ce.assign("a", ce.parse("\\infty"));
+
+ce.assume(ce.parse("a \\in \\R"));
+// ➔ 'contradiction'
+```
+
+Use `ExtendedRealNumbers` when you mean the extended real line — that set does
+contain $\pm\infty$, while `RealNumbers` does not.
 
 ## Assumptions Lifecycle
 
@@ -221,7 +273,7 @@ the following forms:
 | Operator                                                 |                                                                                                                     |
 | :--------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------ |
 | `Element`<br/>`NotElement`                            | Indicate the domain of a symbol                                                                                     |
-| `Less`<br/>`LessEqual`<br/>`Greater`<br/>`GreaterEqual` | Inequality. Both sides are assumed to be `RealNumbers`                                                               |
+| `Less`<br/>`LessEqual`<br/>`Greater`<br/>`GreaterEqual` | Inequality. Both sides are assumed to be `RealNumbers`, which are the **finite** reals — an inequality never admits $\pm\infty$ |
 | `Equal`<br/>`NotEqual`                                | Equality                                                                                                            |
 
 </div>
@@ -249,6 +301,15 @@ real) does not apply.
 ce.assume(ce.parse("\\Re(s) > 1"));    // real part of s
 ce.assume(ce.parse("\\Im(\\tau) > 0")); // imaginary part of τ (upper half-plane)
 ce.assume(["Less", ["Abs", "q"], 1]);   // |q| < 1 (inside the unit disk)
+```
+
+A bound on the magnitude says the symbol is finite without saying it is real, so
+it infers the type `complex` — the finite complex numbers:
+
+```js
+ce.assume(["Less", ["Abs", "q"], 1]);
+ce.expr("q").type.toString();
+// ➔ 'complex'
 ```
 
 The open upper half-plane has a LaTeX shorthand: `\mathbb{C}^+`. In a

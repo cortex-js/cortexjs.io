@@ -45,6 +45,61 @@ See also **Complex** for `ImaginaryUnit`<Icon name="chevron-right-bold" />
 
 </div>
 
+### Non-Finite Results
+
+Arithmetic can leave the finite numbers in two ways, and the engine keeps the
+two apart.
+
+**A pole** — a finite non-zero value divided by zero — evaluates to
+`ComplexInfinity` ($\tilde\infty$), an infinity of unspecified direction. The
+signed infinities `PositiveInfinity` and `NegativeInfinity` arise from
+arithmetic on infinite operands.
+
+**An indeterminate form** evaluates to `NaN`: $0/0$, $\infty - \infty$ and
+$\infty \times 0$ have no value that the surrounding expression could rely on.
+
+```json example
+["Divide", 1, 0]
+// ➔ "ComplexInfinity"
+["Divide", 0, 0]
+// ➔ "NaN"
+["Add", "PositiveInfinity", 1]
+// ➔ "PositiveInfinity"
+["Subtract", "PositiveInfinity", "PositiveInfinity"]
+// ➔ "NaN"
+["Multiply", "PositiveInfinity", 0]
+// ➔ "NaN"
+["Divide", 1, "PositiveInfinity"]
+// ➔ 0
+```
+
+These results are outside the bare numeric types. `integer`, `rational`, `real`
+and `complex` each denote a **finite** value, so an infinity matches neither
+`real` nor `complex`; it matches `infinity`, and `NaN` matches `nan`. All three
+are still `number`, which is the union of the finite numbers with the
+infinities and `NaN`.
+
+**`NaN` propagates.** Any numeric function of `NaN` is `NaN`, under plain
+`evaluate()` and not only under `N()` — `NaN` is not an exact value, so there is
+nothing to hold symbolically:
+
+```json example
+["Add", 1, "NaN"]
+// ➔ "NaN"
+["Sqrt", "NaN"]
+// ➔ "NaN"
+["Mod", "NaN", 2]
+// ➔ "NaN"
+["GCD", "NaN", 2]
+// ➔ "NaN"
+```
+
+An **infinity**, by contrast, *is* an exact value. A function of an infinity
+with no closed form therefore stays symbolic rather than numericizing:
+`["Sin", "PositiveInfinity"]` evaluates to itself. Heads whose result is
+required to be finite reject an infinite argument outright — see
+[Number Theory](/compute-engine/reference/number-theory/).
+
 ### Sums and Products
 
 <FunctionDefinition name="Sum">
@@ -430,21 +485,17 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 
 <FunctionDefinition name="Clamp">
 
-<Signature name="Clamp">_value_</Signature>
-
 <Signature name="Clamp">_value_, _lower_, _upper_</Signature>
 
 - If `value` is less than `lower`, evaluate to `lower`
 - If `value` is greater than `upper`, evaluate to `upper`
 - Otherwise, evaluate to `value`
 
-If `lower`and `upper`are not provided, they take the default values of -1 and
-+1.
+All three arguments are required. (A single-argument form with default
+bounds is on the roadmap; today `["Clamp", 0.42]` is an arity error.)
 
 ```json example
-["Clamp", 0.42]
-// ➔ 1
-["Clamp", 4.2]
+["Clamp", 4.2, -1, 1]
 // ➔ 1
 ["Clamp", -5, 0, "+Infinity"]
 // ➔ 0
@@ -460,17 +511,26 @@ If `lower`and `upper`are not provided, they take the default values of -1 and
 
 <Signature name="Max">_list_</Signature>
 
-If all the arguments are real numbers, excluding `NaN`, evaluate to the largest
-of the arguments.
+If all the arguments are numbers, evaluate to the largest of them. The
+infinities take part in the comparison like any other value, so
+`["Max", 1, "PositiveInfinity"]` is `PositiveInfinity`.
+
+If any argument is `NaN`, the whole expression is `NaN`. An undefined value
+absorbs the comparison, and it does so even when other arguments are still
+unknown — there is no ordering that could rule it out.
 
 Otherwise, simplify the expression by removing values that are smaller than or
-equal to the largest real number.
+equal to the largest known number.
 
 ```json example
 ["Max", 5, 2, -1]
 // ➔ 5
+["Max", 1, "PositiveInfinity"]
+// ➔ "PositiveInfinity"
+["Max", 0, 7.1, "x", 3]
+// ➔ ["Max", 7.1, "x"]
 ["Max", 0, 7.1, "NaN", "x", 3]
-// ➔ ["Max", 7.1, "NaN", "x"]
+// ➔ "NaN"
 ```
 
 </FunctionDefinition>
@@ -481,19 +541,24 @@ equal to the largest real number.
 
 <Signature name="Max">_list_</Signature>
 
-If all the arguments are real numbers, excluding `NaN`, evaluate to the smallest
-of the arguments.
+If all the arguments are numbers, evaluate to the smallest of them. As with
+`Max`, the infinities take part in the comparison, and a `NaN` argument makes
+the whole expression `NaN`.
 
 Otherwise, simplify the expression by removing values that are greater than or
-equal to the smallest real number.
+equal to the smallest known number.
 
 <Latex value=" \min(0, 7.1, 3) = 0"/>
 
 ```json example
 ["Min", 5, 2, -1]
 // ➔ -1
+["Min", 1, "NegativeInfinity"]
+// ➔ "NegativeInfinity"
 ["Min", 0, 7.1, "x", 3]
 // ➔ ["Min", 0, "x"]
+["Min", 0, 7.1, "NaN", "x", 3]
+// ➔ "NaN"
 ```
 
 
@@ -651,11 +716,23 @@ difference — `RandomChoice` returns a list.
 
 <FunctionDefinition name="WithRandomSeed">
 
-<Signature name="WithRandomSeed">_seed_: finite\_real | string, _body_: any</Signature>
+<Signature name="WithRandomSeed">_seed_: real | string, _body_: any</Signature>
 
 Evaluate _body_ with a random seed frame installed. Every draw inside the frame
 is deterministic, and the whole block replays identically on re-evaluation,
 while repeated draws **within** the frame still differ.
+
+The seed must be a **finite** real number: `real` excludes $\pm\infty$ and
+`NaN`, so an infinite or undefined seed is rejected with an `out-of-range`
+error rather than silently hashed. (Earlier releases spelled this parameter
+type `finite_real`. That name is retired; bare `real` now carries the same
+finiteness guarantee.)
+
+```json example
+["WithRandomSeed", "PositiveInfinity", ["Random"]]
+// ➔ ["Error", ["ErrorCode", "'out-of-range'",
+//              "'a finite real number or a string'", "'+oo'"]]
+```
 
 ```json example
 ["WithRandomSeed", 42, ["Random"]]

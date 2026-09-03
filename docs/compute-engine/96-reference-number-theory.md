@@ -8,6 +8,26 @@ slug: /compute-engine/reference/number-theory/
 The functions in this section provide tools for number-theoretic computations:  
 prime numbers and integer factorization, divisor functions, partitions, polygonal numbers, perfect/happy numbers, and special combinatorial counts (Eulerian, Stirling).
 
+## Finite Arguments
+
+The functions below are **finite-result** functions: there is no meaningful
+$φ(\infty)$ or $\sqrt{\mathrm{NaN}}$ to return. The parameter types in the
+signatures say so. `integer` and `real` denote **finite** values, so $\pm\infty$
+and `NaN` are not members of either. Where a signature declares one of them,
+passing a non-finite argument is a type error rather than a symbolic or
+infinite result:
+
+```json example
+["NthPrime", "PositiveInfinity"]
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'integer'", "'Infinity'"], …]
+
+["IntegerSqrt", "NaN"]
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'integer'", "'NaN'"], …]
+```
+
+This is the same check that rejects a non-integer — `["IntegerSqrt", 2.5]`
+reports `'incompatible-type'` in exactly the same way. The argument has to
+inhabit the declared type before the function is applied.
 
 ## Function Definitions
 

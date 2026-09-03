@@ -362,12 +362,19 @@ entries present depend on what the operand is; keys include:
 ```json example
 ["About", "Pi"]
 
-// ➔ {kind: "constant", name: "Pi", type: "finite_real",
+// ➔ {kind: "constant", name: "Pi",
+//    type: "real<3.141592653589793..3.141592653589794>",
 //    description: "The constant π ≈ 3.14159…", wikidata: "Q167"}
 ```
 
+The `type` entry is the constant's precise static type, so a numeric constant
+reports the `real` tier narrowed to the range that encloses its value, not a
+bare tier name. Note that `real` here means a **finite** real: the numeric
+types are finite by default, and the spelling `finite_real` has been retired.
+
 Since the result is a dictionary, individual entries are addressable:
-`["At", ["About", "Pi"], "'type'"]` evaluates to `"finite_real"`.
+`["At", ["About", "Pi"], "'type'"]` evaluates to the string
+`"real<3.141592653589793..3.141592653589794>"`.
 
 To get just the type of an expression as a string, use ["Type"](#type).
 
@@ -463,13 +470,18 @@ The following functions can be used to obtain information about an expression.
 
 <Signature name="Type">_expression_</Signature>
 
-Evaluate to the type of _expression_, as a string.
+Evaluate to the type of _expression_, as a type value.
 
 ```json example
 ["Type", 2.4531]
 
-// ➔ "finite_real"
+// ➔ ["TypeFrom", "'2.4531'"]
 ```
+
+The result is the expression's **literal type** — the most precise claim
+available about the value, here the number itself. Its widening tier is
+`real`, which since the finite-by-default flip denotes a *finite* real; the
+retired spelling `finite_real` is no longer produced.
 
 <ReadMore path="/compute-engine/guides/types" >Read more about the
 **type system**. </ReadMore>

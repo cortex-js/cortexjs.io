@@ -56,6 +56,27 @@ the duration of the inner block.
 // ➔ 10
 ```
 
+### Translating simultaneous assignments
+
+`Block` is sequential: a later assignment observes changes made by every
+earlier expression. A source language with simultaneous action tuples must
+therefore snapshot all right-hand sides before committing any left-hand side.
+
+For example, if `(a → 1, b → a + 1)` means that `b` reads the value of `a`
+from before the tuple, translate it as:
+
+```json example
+["Block",
+  ["Assign", "_next_a", 1],
+  ["Assign", "_next_b", ["Add", "a", 1]],
+  ["Assign", "a", "_next_a"],
+  ["Assign", "b", "_next_b"]]
+```
+
+The temporary names must be fresh. The first pass evaluates every right-hand
+side against the old state; the second pass commits the results. Commit order
+then does not matter because no temporary depends on a newly assigned value.
+
 ```json example
 ["Block",
   ["Declare", "counter", "integer"],
@@ -82,12 +103,31 @@ the duration of the inner block.
 <Signature name="If">_condition_, _expr-1_</Signature>
 
 If the value of `condition` is the symbol `True`, the value of the `["If"]`
-expression is `expr-1`, otherwise `Nothing`.
+expression is `expr-1`. Without an else-branch there is nothing to select when
+`condition` is `False`, and the value is the `Missing` marker.
+
+```json example
+["If", "False", 5]
+// ➔ Missing
+```
 
 <Signature name="If">_condition_, _expr-1_, _expr-2_</Signature>
 
 If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`, otherwise `expr-2`.
+
+Only the selected branch is evaluated. The branch that is not selected is
+**dead code**: if it contains an error, that error never reaches the value.
+
+```json example
+["If", "True", 5, ["Divide", "x"]]
+// ➔ 5           — the malformed branch is never evaluated
+```
+
+Only *evaluation* skips the branch. The boxed expression still carries the
+diagnostic — the JSON above boxes as
+`["If", "True", 5, ["Divide", "x", ["Error", "'missing'"]]]` — so the error is
+still reportable to the user.
 
 Here's an example of a function that returns the absolute value of a number:
 
@@ -105,7 +145,15 @@ Here's an example of a function that returns the absolute value of a number:
 _expr-n_</Signature>
 
 The value of the `["Which"]` expression is the value of the first expression
-`expr-n` for which the corresponding condition `condition-n` is `True`.
+`expr-n` for which the corresponding condition `condition-n` is `True`. When no
+condition is `True` — including the no-operand case `["Which"]` — there is
+nothing to select, and the value is the `Missing` marker.
+
+Only the selected expression is evaluated. The expressions that are not
+selected are **dead code**: an error in one of them never reaches the value.
+`["Which", "False", ["Divide", "x"], "True", 7]` evaluates to `7`. As with
+`["If"]`, only *evaluation* skips them; the boxed expression still carries the
+diagnostic.
 
 <Latex value="\begin{cases} x &amp; \text{if } x &gt; 0 \\ -x &amp; \text{if } x &lt; 0 \\ 0 &amp; \text{otherwise} \end{cases}"/>
 
@@ -124,7 +172,7 @@ A `["Which"]` expression is equivalent to the following `["If"]` expression:
     ["If", ["Equal", condition-2, "True"], _expr-2,
     ... ["If", ["Equal", condition-n, "True"],
           expr-n,
-          "Nothing"
+          "Missing"
     ]
   ]
 ]
@@ -608,4 +656,3 @@ iteration of the loop. `Continue` takes no argument.
 Outside a loop, `Continue` is inert.
 
 </FunctionDefinition>
-

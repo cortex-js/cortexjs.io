@@ -295,8 +295,9 @@ console.log(ce.parse("\\keyword{if} x > 0 \\keyword{then} x \\keyword{else} -x")
 // ➔ ["If", ["Greater", "x", 0], "x", ["Negate", "x"]]
 ```
 
-The `else` branch is optional. When omitted, the result is `Nothing` if the
-condition is false.
+The `else` branch is optional. When it is omitted and the condition is false,
+no branch is selected and the result is `Missing` — the marker for a value the
+expression never supplied.
 
 ### Local Bindings with `where`
 
@@ -511,6 +512,7 @@ parsing as for serialization.
 
 | Key | Description |
 | :--- | :--- |
+| `strict` | When `true`, parse conventional LaTeX syntax. When `false`, also accept the Compute Engine's loose input forms, including bare function names such as `sin(x)` and `sqrt(x)`, `*` multiplication, `**` powers, parenthesized superscripts/subscripts, and common infinity spellings. Loose mode is intended for interactive input similar to ASCIIMath or Typst; it is not a separate expression language. **Default:** `true`. |
 | `skipSpace` | If `true`, ignore space characters in a math zone. Default is `true`. |
 | `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: a repeating-decimal literal (e.g. `1.33(333)` or `0.\overline{3}`) always boxes to the exact `Rational` it represents, regardless of this setting. **Default**: `"auto"`|
 | `preserveLatex` | If `true`, the expression will be decorated with the LaTeX fragments corresponding to each element of the expression. The top-level expression, that is the one returned by `parse()`, will include the verbatim LaTeX input that was parsed. The sub-expressions may contain a slightly different LaTeX, for example with consecutive spaces replaced by one, with comments removed, and with some low-level LaTeX commands replaced, for example `\egroup` and `\bgroup`. **Default:** `false` |

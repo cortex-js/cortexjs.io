@@ -202,31 +202,64 @@ The Compute Engine supports the following primitive types:
 
 ### Numeric Types
 
-The type `number` represents all numeric values, including `NaN`. 
+The type `number` represents all numeric values. Below it, the numeric types
+are **finite by default**: `complex`, `real`, `rational`, `integer` and
+`imaginary` contain only finite values, and the values that are not finite
+numbers have types of their own. Every numeric value is a finite number, a
+number of infinite magnitude, or the not-a-number marker, and no value is two
+of those:
 
-More specific types of numeric values are represented by subtypes of `number`. 
+$$\texttt{number} = \texttt{complex} \sqcup \texttt{infinity} \sqcup \texttt{nan}$$
 
-Some numeric types have a variant that excludes non-finite values, such as 
-`PositiveInfinity`, `NegativeInfinity` and `ComplexInfinity`.
+So a declared `real` is a **promise of finiteness**: writing `real` as a
+result type says the value is never $\pm\infty$ and never $\mathrm{NaN}$.
 
 <div className="symbols-table first-column-header" style={{"--first-col-width":"17ch"}}>
 
 | Type          | Description                                                                                      |
 | :-------------- | :----------------------------------------------------------------------------------------------- |
-| `number`       | All numeric values: a real or complex number or $\mathrm{NaN}$ |
-| `non_finite_number` | The values $+\infty$ and $-\infty$ (`PositiveInfinity` and `NegativeInfinity`) |
-| `complex`      | A number with non-zero real and imaginary parts, such as $2 + 3i$, including $\tilde\infty$ (`ComplexInfinity`) |
-| `imaginary`    | A pure imaginary number, such as $3i$ |
-| `real`         | A real number, such as $-2.5$, including $\pm\infty$ |
-| `rational`     | A number that can be expressed as the quotient of two integers such as $-\nicefrac{3}{4}$, including $\pm\infty$. |
-| `integer`      | A whole number, such as $42$, including $\pm\infty$. |
-| `finite_number` | A real or complex number, except $\pm\infty$ and $\tilde\infty$ |
-| `finite_complex` | A complex number, except $\pm\infty$ and $\tilde\infty$ |
-| `finite_real` | A real number, except $\pm\infty$ |
-| `finite_rational` | A rational number, except $\pm\infty$ |
-| `finite_integer` | An integer, except $\pm\infty$ |
+| `number`       | Any numeric value: a finite number, a number of infinite magnitude, or $\mathrm{NaN}$ |
+| `complex`      | A finite complex number, such as $2 + 3i$. The union of `real` and `imaginary` |
+| `imaginary`    | A finite complex number with a real part of $0$, such as $3i$ |
+| `real`         | A finite real number, such as $-2.5$ |
+| `rational`     | A finite number that can be expressed as the quotient of two integers, such as $-\nicefrac{3}{4}$. Includes the integers |
+| `integer`      | A finite whole number, such as $42$ |
+| `infinity`     | A number of infinite magnitude, in any direction: $+\infty$, $-\infty$, the unsigned $\tilde\infty$ (`ComplexInfinity`), and mixed values such as $\infty + i$. Disjoint from `complex` |
+| `nan`          | The not-a-number marker $\mathrm{NaN}$. Its only supertype is `number` |
+
+When you need exactly the signed pair $+\infty$ and $-\infty$ — the values
+whose *sign* is promised, which `infinity` does not — write
+`signed_infinity`. It is precisely the union of the two value types, and
+`+oo | -oo` is an equivalent spelling of the same type; a union
+containing both signed infinities prints under the name
+(`real | signed_infinity`). The former name for this pair,
+`non_finite_number`, is **retired**: that name was misleading, since
+$\tilde\infty$ and $\infty + i$ are non-finite numbers yet were not
+members. It is still accepted on input for one release cycle and
+normalizes to `signed_infinity`, but it is never printed.
 
 </div>
+
+The extended real line — a real number that may be infinite — has no
+one-word name: write it out as `real | +oo | -oo`. Bare `real` does
+not admit $\pm\infty$, and `real | infinity` would also admit the unsigned
+$\tilde\infty$.
+
+:::warning **Deprecated: the `finite_` type names**
+
+The names `finite_number`, `finite_complex`, `finite_real`,
+`finite_rational` and `finite_integer` have been **retired**. The bare names
+above now carry those meanings, so each retired name denoted the same set of
+values as a bare one.
+
+For one release cycle the type parser still accepts them and normalizes each
+to its replacement — `finite_integer` to `integer`, `finite_rational` to
+`rational`, `finite_real` to `real`, `finite_complex` to `complex`, and
+`finite_number` to `complex` (since "any finite number" *is* the finite
+complex type). They are never produced by the engine, so a type you read back
+is always spelled with the bare name. Update your type strings before the
+aliases are removed.
+:::
 
 Numeric types can be constrained to a specific range within a lower and upper 
 bound
@@ -252,13 +285,55 @@ Here is the type of various numeric values:
 
 | Value               | Type                |
 | ------------------: | :------------------ |
-| $42$                | `finite_integer`    |
-| $-3.14$             | `finite_real`       |
-| $\nicefrac{1}{2}$   | `finite_rational`   |
+| $42$                | `42`                |
+| $-3.14$             | `-3.14`             |
+| $\nicefrac{1}{2}$   | `rational<0.5..0.5>` |
+| $\nicefrac{1}{3}$   | `rational<0.33..0.34>` |
+| $\sqrt2$            | `real<1.4..1.5>`     |
 | $3i$                | `imaginary`         |
-| $2 + 3i$            | `finite_complex`    |
-| $-\infty$           | `non_finite_number` |
-| $\mathrm{NaN}$      | `number`            |
+| $2 + 3i$            | `complex`           |
+| $-\infty$           | `-oo` (widens to `infinity`) |
+| $\tilde\infty$      | `~oo` (widens to `infinity`) |
+| $\mathrm{NaN}$      | `NaN` (widens to `nan`) |
+
+A number literal's type is the most precise claim available — its own value
+when a machine number holds it exactly, and otherwise its tier decorated
+with a range that encloses the value (see 
+[Literal Type](#literal-type)). Every one of these types is a subtype of
+the tier you would expect: `42` matches `integer`, 
+`rational<0.5..0.5>` matches `rational`, `real<1.4..1.5>`
+matches `real`, and so on — so code that
+asks *"is this an integer?"* with `.matches()` or `.isInteger` is
+unaffected by the extra precision.
+
+The last three rows are the values that are *not* finite numbers. They no
+longer match `real` or `integer`: since the bare tiers are finite,
+`ce.parse("-\\infty").type.matches("real")` is `false`. Ask
+`matches("real | +oo | -oo")` when you mean the extended real line.
+
+### Where Ranged Types Come From
+
+A ranged type can appear in four ways:
+
+- **You declare it**: `ce.declare("x", "real<-1..1>")` makes the range a
+  contract on `x`.
+- **An assumption refines it**: after `ce.assume(ce.parse("y > 0"))`, the
+  type of `y` is `(real<0..>) & !0`.
+- **An operator derives it**: some operations produce a result that is
+  provably sign-constrained, and their type says so — `|x|` for a real `x`
+  has type `real<0..>`, and `e^x` has type `(real<0..>) & !0`.
+- **A literal carries it**: an exact value that no machine number holds —
+  $\nicefrac{1}{3}$, $\sqrt2$, $10^{30}+1$ — is typed by its tier plus a
+  compact range that encloses the value, such as `real<1.4..1.5>`
+  for $\sqrt2$ (see [Literal Type](#literal-type)). Constants like
+  `Pi` and `ExponentialE` declare a value bracket
+  (`real<3.141592653589793..3.141592653589794>`), so their sign
+  and magnitude are type facts.
+
+Ranges are deliberately **not** propagated through arithmetic: the sum of
+two values in `real<-1..>` is not itself in `real<-1..>`, so `x + y` falls
+back to the bare tier. Carrying bounds through operations is interval
+arithmetic, which the type system does not attempt.
 
 The Compute Engine Standard Library includes definitions for sets that
 correspond to some numeric types.
@@ -283,7 +358,7 @@ is the type of the elements of the set.
 
 ```js
 ce.parse("\\{5, 7, 9\\}").type
-// ➔ "set<finite_integer>"
+// ➔ "set<integer>"
 ```
 
 A set can have an infinite number of elements.
@@ -298,7 +373,7 @@ where `T1`, `T2`, ... are the types of the elements of the tuple.
 
 ```js
 ce.parse("(7, 5, 7)").type
-// ➔ "tuple<finite_integer, finite_integer, finite_integer>"
+// ➔ "tuple<integer, integer, integer>"
 ```
 
 The elements of a tuple can be named: `tuple<x: integer, y: integer>`. 
@@ -351,12 +426,12 @@ The type of a list is represented by the type expression `list<T>`, where `T` is
 
 ```js
 ce.parse("\\[1, 2, 3\\]").type.toString();
-// ➔ "vector<finite_integer^3>"  (a list of 3 finite integers)
+// ➔ "vector<integer^3>"  (a list of 3 integers)
 ```
 
 The type of a list literal is **honest**: it reports the actual (widened)
 element type and the dimensions. Since element types are covariant, the
-honest type is a subtype of every broader form — `vector<finite_integer^3>`
+honest type is a subtype of every broader form — `vector<integer^3>`
 matches `vector<3>`, `vector`, `list<number>`, and `list`.
 
 The **empty list** has no elements, so its element type is the bottom type 
@@ -416,7 +491,7 @@ ce.parse("\\[1, 2, 3\\]").type.matches("vector<number^3>");
 
 // A list with a non-integer element widens accordingly:
 ce.parse("\\[1, 2.5, 3\\]").type.matches("vector<integer^3>");
-// ➔ false  (the widened element type is finite_real)
+// ➔ false  (the widened element type is real)
 ```
 
 Lists of non-numeric values type honestly too — a list of two colors types
@@ -441,7 +516,9 @@ and **`tensor<T>`** is a tensor of elements of type `T`.
 ### Dictionary and Record
 
 The **dictionary** and **record** types represent a collection of key-value pairs, 
-where each key is a string and each value can be any type.
+where each key is a non-empty string and each value can be any type. Building a
+dictionary with a key that is not a non-empty string — an empty string, a
+number, `Nothing` — is an error rather than a silently dropped entry.
 
 A concrete **record value** has a known set of keys, while a **dictionary** can
 have keys that are not defined in advance. A record *type* lists the fields a
@@ -617,8 +694,17 @@ one or two integers as input and returning an integer.
 
 If there are any optional arguments, they must be at the end of the argument list.
 
+A function type matches a signature only when it accepts **every call that
+signature permits** — its shortest and its longest. A signature with an
+optional argument permits two call shapes, so a function taking only one
+argument does not match it:
+
 ```js
 ce.type("(integer) -> number")
+  .matches("(integer, integer?) -> number");
+// ➔ false  (cannot serve the two-argument call)
+
+ce.type("(integer, integer?) -> number")
   .matches("(integer, integer?) -> number");
 // ➔ true
 ```
@@ -641,11 +727,24 @@ string as a first argument followed by one or more integers and returns an integ
 To indicate that the function accepts a variable number of arguments of any 
 type, use `any+` or `any*`.
 
+A variadic signature permits calls of *any* length, so no fixed-arity function
+matches one — only another variadic function can:
+
 ```js
 ce.type("(integer, integer) -> number")
   .matches("(integer, integer+) -> number");
-// ➔ true
+// ➔ false  (cannot serve a call with three or more integers)
+
+ce.type("(integer, integer*) -> number")
+  .matches("(integer, integer+) -> number");
+// ➔ true   (zero-or-more covers one-or-more)
 ```
+
+This matters when a function is **stored** under a declared type. The
+declaration is a contract: it tells callers which calls are legal, so whatever
+is stored must handle all of them, and assigning does not reshape the declared
+type. Passing a function as an **argument** to a callback slot is a different
+question — see [Function Type](#function-type) below.
 
 If a signature has a variadic argument, it must be the last argument in the list, 
 and it cannot be combined with optional arguments.
@@ -654,12 +753,32 @@ and it cannot be combined with optional arguments.
 
 The type `function` matches any function value — any parameter shape, any
 effects. It is a distinct primitive, **not** a shorthand for a signature such
-as `(any*) -> unknown`: a written signature constrains callbacks
-contravariantly (its parameter types are a promise about what callers may
-pass), so no signature spelling can accept every function. Use `function` for
-operator parameters that take a callback whose shape depends on other
-operands (e.g. `Map`), and a full signature only when the callback's shape is
-fixed.
+as `(any*) -> unknown`.
+
+Where types are **compared** — `.matches()`, subtyping — a written signature
+constrains callbacks contravariantly: its parameter types are a promise about
+what callers may pass, so `(number) -> boolean` is not a subtype of
+`(unknown) -> boolean`.
+
+Where a function value is passed as an **operand at an arrow-typed parameter
+slot**, admission is by **compatibility** instead: the operand is admitted
+unless it is provably unusable — not callable at all, unable to accept the
+number of arguments the operator supplies, provably disjoint in a parameter
+or the result, or violating the slot's effect bound. This is what lets
+`CountIf(xs, IsPrime)` work over an integer collection even though
+`IsPrime: (number) -> boolean` is no contravariant subtype of the
+instantiated slot, and what lets a mixed-type collection map a numeric
+function per element. A callback that could never work — a number-only
+predicate over a `list<string>`, a predicate that provably returns a
+non-boolean — is rejected when the expression is canonicalized, with a
+message naming both arrows. (Design ruling:
+`docs/plans/2026-08-18-compatibility-admission-callbacks.md`.)
+
+So: spell a callback slot as the arrow it supplies — the collection
+operators read `(T) any -> boolean` for a predicate, `(T) any -> unknown`
+for a key — and reserve the bare `function` for a slot whose contract the
+type language cannot express (`Iterate`'s parametric accumulator,
+`Tabulate`'s dimension-dependent arity).
 
 ### Effect Specifiers
 
@@ -1055,7 +1174,7 @@ ce.declare("first", {
   evaluate: ([xs]) => xs.at(1),
 });
 
-ce.box(["first", ["List", 1, 2, 3]]).type; // ➔ "finite_integer"
+ce.box(["first", ["List", 1, 2, 3]]).type; // ➔ "integer"
 ce.box(["first", ["List", "'a'", "'b'"]]).type; // ➔ "string"
 ```
 
@@ -1079,7 +1198,7 @@ Variables in element positions are solved by matching the argument's structure:
 ce.declare("swap", { signature: "(tuple<T, U>) -> tuple<U, T> where T, U" });
 
 ce.box(["swap", ["Tuple", 1, "'a'"]]).type;
-// ➔ "tuple<string, finite_integer>"
+// ➔ "tuple<string, integer>"
 ```
 
 A callback's parameter type is instantiated too, which is what makes an
@@ -1111,7 +1230,7 @@ argument's kind and its dimensions:
 ce.declare("rev", { signature: "(T) -> T where T: indexed_collection" });
 
 ce.box(["rev", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]).type;
-// ➔ "matrix<finite_integer^(2x3)>"
+// ➔ "matrix<integer^(2x3)>"
 ```
 
 Violating the bound is an error naming the bound:
@@ -1121,7 +1240,7 @@ ce.box(["rev", ["Set", 1, 2]]).isValid; // ➔ false
 
 ce.box(["rev", ["Set", 1, 2]]).toString();
 // ➔ rev(Error(ErrorCode("incompatible-type", "indexed_collection",
-//      "set<finite_integer>")))
+//      "set<integer>")))
 ```
 
 An unbounded variable has an implicit bound of `unknown`: `where T` is
@@ -1144,7 +1263,7 @@ Several standard library operators are declared this way — `Identity` is
 arguments:
 
 ```js
-ce.box(["Reverse", ["List", 1, 2, 3]]).type; // ➔ "vector<finite_integer^3>"
+ce.box(["Reverse", ["List", 1, 2, 3]]).type; // ➔ "vector<integer^3>"
 ```
 
 A **scalar** bound interacts with broadcasting. On an operator that
@@ -1157,17 +1276,17 @@ wrap then puts the argument's shape back on the result. `Conjugate` and
 
 ```js
 ce.box(["Conjugate", ["List", 1, 2, 3]]).type;
-// ➔ "vector<finite_integer^3>"
+// ➔ "vector<integer^3>"
 
 ce.box(["Remainder", ["List", ["List", 1, 2], ["List", 3, 4]], 7]).type;
-// ➔ "matrix<finite_integer^(2x2)>"
+// ➔ "matrix<integer^(2x2)>"
 ```
 
 Broadcasting maps all the way down to the scalar leaves, so the variable is
 bound to a leaf type whatever the argument's rank. Only the kinds a broadcast
 actually maps are peeled: a `set` argument is admitted but never mapped
-(`Conjugate(Set(1, 2))` stays a `set<finite_integer>`), and a tuple is atomic
-(`Conjugate((1, 2))` is a `tuple<finite_integer, finite_integer>`).
+(`Conjugate(Set(1, 2))` stays a `set<integer>`), and a tuple is atomic
+(`Conjugate((1, 2))` is a `tuple<integer, integer>`).
 
 ### Generic Overload Sets
 
@@ -1256,7 +1375,7 @@ ce.assign("nest", ce.box(["Function",
   "x", "n"]));
 
 ce.box(["nest", 5, 3]).evaluate().toString(); // ➔ "5"
-ce.box(["nest", 5, 3]).type; // ➔ "finite_integer"
+ce.box(["nest", 5, 3]).type; // ➔ "integer"
 ce.box(["nest", "'a'", 2]).type; // ➔ "string"
 ```
 
@@ -1330,10 +1449,10 @@ ce.declare("dup", "(x: T) -> tuple<T, T> where T");
 ce.assign("dup", ce.box(["Function", ["Tuple", "x", "x"], "x"]));
 
 ce.box(["dup", 5]).type;
-// ➔ "tuple<finite_integer, finite_integer>"
+// ➔ "tuple<integer, integer>"
 
 ce.box(["dup", ["List", 1, 2]]).type;
-// ➔ "list<tuple<finite_integer, finite_integer>>"
+// ➔ "list<tuple<integer, integer>>"
 
 ce.box(["dup", ["List", 1, 2]]).evaluate().toString();
 // ➔ "[(1, 1),(2, 2)]"
@@ -1379,6 +1498,114 @@ can be one of multiple values, for example:
 - `0 | 1` is the type of values that are either `0` or `1`.
 - `"red" | "green" | "blue"` is the type of values that are either of the 
   strings `"red"`, `"green"` or `"blue"`.
+
+### Number Literals Have Literal Types
+
+The type of a number literal **is** its literal type: the most precise
+claim the type system can make about it.
+
+```js
+console.info(ce.box(42).type);
+// ➔ "42"
+
+console.info(ce.box(-3.14).type);
+// ➔ "-3.14"
+```
+
+A literal type is a subtype of its numeric tier — `42` matches `integer`,
+`real`, and `number` — so a literal is accepted anywhere its tier is, with
+no conversion and no cast. To check what kind of number an expression is,
+use `.matches()` (or the `isInteger`/`isRational`/`isNumber` shortcuts),
+never a string comparison of the type's name:
+
+```js
+console.info(ce.box(42).type.matches("integer"));
+// ➔ true
+
+console.info(String(ce.box(42).type) === "integer");
+// ➔ false — the type's *name* is "42"
+```
+
+### How a Number Literal Is Typed
+
+Some exact values cannot be spelled as a plain value type. The engine
+therefore picks one of three forms:
+
+1. **A machine number holds the value exactly**: the type is that value.
+   `ce.box(21).type` is `21`, and `ce.box(0.5).type` is `0.5`.
+2. **A machine number holds the value exactly, but the value is an exact
+   rational**: the type is the `rational` tier with a **singleton
+   range**. $\nicefrac{1}{2}$ has type `rational<0.5..0.5>`. A bare
+   value type cannot be used here: the lattice does not class a bare
+   numeric value as rational, so `0.5` matches `real` but not `rational`.
+3. **No machine number holds the value** — $\nicefrac{1}{3}$, $\sqrt2$,
+   $10^{30}+1$: the type is a compact **closed range** on the tier of the
+   value. Both bounds are rounded *outward* to two significant digits.
+
+```js
+console.info(ce.parse("1/3").type);
+// ➔ "rational<0.33..0.34>"
+
+console.info(ce.parse("\\sqrt2").type);
+// ➔ "real<1.4..1.5>"
+
+console.info(ce.parse("10^{30}+1").evaluate().type);
+// ➔ "integer<9.9e+29..1.1e+30>"
+```
+
+The bounds of an enclosing range provably contain the exact value, so the
+type never claims a value the literal does not have. The bounds also
+exclude zero, which keeps the sign of the literal a type fact, and the
+range is never a singleton, so no operation can mistake a bound for the
+value itself.
+
+Domain checks read these bounds. The type of $\nicefrac{1}{3}$ proves that
+its magnitude is not more than $1$, so its arcsine stays real:
+
+```js
+console.info(ce.parse("\\arcsin(1/3)").evaluate().type);
+// ➔ "real"
+```
+
+When the magnitude of the value is outside the range of normal machine
+numbers, no sound compact range exists. The type then falls back to a
+claim about the sign only:
+
+```js
+console.info(ce.parse("10^{400}").evaluate().type);
+// ➔ "(integer<0..>) & !0"
+```
+
+### Literal Types Are Not Stored
+
+A literal type belongs to the literal itself. It lives at expression
+positions only. Whenever a type is **stored** — inferred for a
+declaration, solved for a generic type variable, synthesized for a
+collection, derived as the signature of a function literal, or recorded as
+the result of an operator — the literal widens to its tier:
+
+```js
+ce.assign("k", 42);
+console.info(ce.box("k").type);
+// ➔ "integer" — inference stores the tier, not the value
+
+ce.declare("identity", "(x: T) -> T where T");
+console.info(ce.box(["identity", 5]).type);
+// ➔ "integer" — the type variable binds the tier, never `5`
+
+console.info(ce.box(["List", 1, 2, 3]).type);
+// ➔ "vector<integer^3>" — cells widen to their tier
+
+console.info(ce.box(["Function", 21]).type);
+// ➔ "() -> integer" — a derived signature stores the tier
+```
+
+This is the same discipline as `const`/`let` literal types in TypeScript:
+maximum precision at the expression, a reusable contract in storage.
+
+One place the extra precision is directly useful: type errors name the
+offending value. A wrong argument reports "expected `integer`, got `2.5`"
+rather than "got `real`".
 
 
 ## Other Constructed Types
@@ -1454,12 +1681,13 @@ ce.parse("3.14").type.matches("real");
 Do not check for type compatibility by comparing the type strings directly.
 
 Type strings may represent refined or derived types 
-(e.g. `real` vs `finite_real`), so use `.matches()` for compatibility checks 
-instead of strict equality.
+(e.g. `real<0..>` where you expected `real`, or the literal type of a
+number), so use 
+`.matches()` for compatibility checks instead of strict equality.
 
 ```js
 ce.parse("3.14").type === "real";
-// ➔ false (the type is actually "finite_real")
+// ➔ false (the type is actually "3.14", the literal type)
 
 ce.parse("3.14").type.matches("real");
 // ➔ true
@@ -1545,7 +1773,7 @@ Lists are compatible if they have the same length and the elements are compatibl
 
 ```js
 ce.parse("\\[1, 2, 3\\]").type
-  .matches("list<finite_integer>");
+  .matches("list<integer>");
 // ➔ true
 ```
 
@@ -1760,22 +1988,36 @@ ce.type("(T) -> T where T")
 
 ### Checking the Type of a Numeric Value
 
-The properties `expr.isNumber`, `expr.isInteger`, `expr.isRational` and 
-`expr.isReal` are shortcuts to check if the type of an expression matches the 
-types  `"number"`, `"integer"`, `"rational"` and `"real"` respectively.
+The properties `expr.isNumber`, `expr.isInteger` and `expr.isRational` are
+shortcuts to check if the type of an expression matches the types
+`"number"`, `"integer"` and `"rational"` respectively. The last two tiers
+are finite, so $\pm\infty$ and $\mathrm{NaN}$ answer `false` to both while
+still answering `true` to `isNumber`.
+
+There is no shortcut for bare `real`. The related property
+`expr.isExtendedReal` asks the **extended** question — *is this a point of
+the extended real line?* — so it is `true` for a finite real **and** for
+$\pm\infty$. It is `false` for $\mathrm{NaN}$, for the unsigned
+$\tilde\infty$ and for a number with an imaginary part. It is exactly
+`type.matches("real | +oo | -oo")`. To ask the finite question
+instead, use `type.matches("real")`, or pair `isExtendedReal` with
+`expr.isFinite`.
 
 ```js
 console.info(ce.expr(3.14).type);
-// ➔ "finite_real"
-
-console.info(ce.expr(3.14).type.matches("finite_real")) 
-// ➔ true
+// ➔ "3.14" — a literal's type is its literal type (see Literal Type)
 
 console.info(ce.expr(3.14).type.matches("real")) 
 // ➔ true
 
-console.info(ce.expr(3.14).isReal) 
+console.info(ce.expr(3.14).isExtendedReal) 
 // ➔ true
+
+console.info(ce.parse("\\infty").isExtendedReal) 
+// ➔ true — infinite, but still on the extended real line
+
+console.info(ce.parse("\\infty").type.matches("real")) 
+// ➔ false — bare `real` is finite
 
 console.info(ce.expr(3.14).type.matches("integer")) 
 // ➔ false
@@ -1784,6 +2026,14 @@ console.info(ce.expr(3.14).isInteger)
 // ➔ false
 
 ```
+
+:::info **Renamed: `isReal` is now `isExtendedReal`**
+
+`isExtendedReal` was called `isReal` before the numeric types became
+finite by default. The rename is not cosmetic: the old name suggested the
+bare `real` tier, but the property has always admitted $\pm\infty$, which
+bare `real` no longer does.
+:::
 
 
 ## Type Inference
@@ -1804,9 +2054,11 @@ type:
 
 | Value Type         | Inferred Symbol Type |
 |:--------------------|:----------------------|
-| `complex`  <br/> `imaginary` <br/> `non_finite_number` <br/> `finite_number`          | `number`            |
-| `integer` <br/> `finite_integer`           | `integer`             |
-| `real` <br/> `finite_real` <br/> `rational` <br/> `finite_rational`          | `real`            |
+| `complex`  <br/> `imaginary`          | `number`            |
+| `integer`           | `integer`             |
+| `real` <br/> `rational`          | `real`            |
+| `infinity`          | `infinity`            |
+| `nan`          | `nan`            |
 
 </div>
 
@@ -1816,10 +2068,10 @@ Examples:
 
 | Value               | Value Type | Inferred Symbol Type |
 |:--------------------|:--------------------------|:--------------------------|
-| 34                  | `finite_integer` | `integer`                |
-| 3.14                | `finite_real` | `real`                   |
+| 34                  | `integer` | `integer`                |
+| 3.14                | `real` | `real`                   |
 | 4i                   | `imaginary` | `number`                   |
-| 1/2                  | `finite_rational` | `real`                   |
+| 1/2                  | `rational` | `real`                   |
 </div>
 
 ```js
@@ -1857,7 +2109,7 @@ ce.expr(["k", "n"]);
 ce.expr("n").type;         // ➔ "integer"
 
 // Assigned symbol: the use CHECKS against the evidence
-ce.assign("x", 3.5);       // x: real (finite_real, widened per the table)
+ce.assign("x", 3.5);       // x: real (widened per the table above)
 ce.expr(["k", "x"]);       // ➔ incompatible-type error, at canonicalization
 ce.expr("x").type;         // ➔ still "real" — the use did not rewrite it
 ```
@@ -1901,17 +2153,17 @@ A type reaches a symbol on one of two tracks, and they behave differently:
 - A **declared** type — written by you, in `ce.declare("a", "list")` or
   `let a: list` — is a **contract**. It never moves: assigning `[1, 2, 3]`
   to `a: list` leaves `a`'s type `list`, even though the value's own type is
-  the much more precise `vector<finite_integer^3>`. An assignment that
+  the much more precise `vector<integer^3>`. An assignment that
   violates the contract (`a = 42`) is an `incompatible-type` error.
 - An **inferred** type — produced by the engine from evidence — is
   **revisable**. It follows the value: after `b = [1, 2, 3]` an undeclared
-  `b` types `vector<finite_integer^3>`; after `b = ["x", "y"]` it types
+  `b` types `vector<integer^3>`; after `b = ["x", "y"]` it types
   `list<string^2>`. Inference is never a trap: a new assignment or a new use
   re-infers.
 
 For a **bare collection annotation**, the contract is the *constructor*
 and the element slot is a placeholder that refines from evidence: `a: list`
-holding `[1, 2, 3]` reports `list<finite_integer>` — the element type came
+holding `[1, 2, 3]` reports `list<integer>` — the element type came
 from the assignment, while rank and length stay open (you wrote `list`, so
 list-ness of any shape is what you chose). The refinement never hardens:
 `a = ["x"]` re-refines to `list<string>`, exactly as an unannotated
@@ -1955,7 +2207,14 @@ The two "loose" types divide the work (see also the primitive-types table):
   value types: every value type is a subtype of it, but the absence markers
   (`nothing`, `missing`) are **not** — absence is opt-in. An `unknown` in a
   signature slot or an unbounded `where T` is a **placeholder** that later
-  evidence refines.
+  evidence refines. A *value* typed `unknown` is a placeholder too: because
+  it claims nothing, no declaration can refute it, so assigning it to a
+  declared symbol is admitted unchecked — `let xs: list` accepts
+  `xs = f(0)` for an `f` with no signature, exactly as a `list` parameter
+  accepts the same argument, and neither is re-examined later. A declared
+  function *signature* is the exception: it keeps refusing an `unknown`
+  value, since admitting one would make the name callable under a contract
+  nothing proved.
 - **`any`** — the true top type, admitting absence markers as well. An
   explicit `any` is a deliberate, *wider* **contract**: `(any) -> any`
   promises to accept everything; `list<any>` admits a list with absent
@@ -2027,7 +2286,7 @@ it:
 
 - `RangeOf` returns `range | nothing` — the not-found case is *in the
   type*, so code that feeds the result to `Slice` is checked against it.
-- `[1, Missing]` types as `list<finite_integer | missing>` — the hole is
+- `[1, Missing]` types as `list<integer | missing>` — the hole is
   visible, and the missing-propagation machinery keys off exactly that
   visibility.
 - A parameter, lambda slot, or inferred type that never mentions absence
@@ -2405,7 +2664,7 @@ For example, a definition of a JSON value could be:
 ce.declareType("json", `
     missing
   | boolean
-  | finite_real
+  | real
   | string
   | type json_array
   | type json_object
@@ -2436,15 +2695,17 @@ plausible-looking variant of each does not describe JSON:
   and is *erased* from collection literals — `[1, Nothing, 3]` has two
   elements. `Missing` is position-preserving, so it survives inside an array
   or as a dictionary value.
-- `finite_real`, not `number`. The engine's `number` admits complex and
-  non-finite values, so `2 + 3i` and `NaN` would both be accepted as JSON.
+- `real`, not `number`. The engine's `number` admits complex and
+  non-finite values, so `2 + 3i`, `NaN` and $+\infty$ would all be accepted
+  as JSON, and none of them is representable in JSON. Bare `real` is finite
+  by definition, so it excludes them with no extra spelling.
 
 The same set can be written as a single self-recursive alias, which needs no
 forward references at all:
 
 ```js
 ce.declareType("json", `
-    missing | boolean | finite_real | string
+    missing | boolean | real | string
   | list<json> | dictionary<json>
 `, { alias: true });
 ```
@@ -2492,7 +2753,7 @@ solved at each construction, from the arguments:
 
 ```js
 ce.expr(["tree", 1, ["List"]]).type;
-// ➔ "tree<finite_integer>"
+// ➔ "tree<integer>"
 ```
 
 Nothing else is new: a `record` definition still mints no constructor and is
@@ -2582,12 +2843,12 @@ widen them. For a covariant parameter that is invisible, because the narrower
 construction is a subtype of the annotation anyway:
 
 ```plaintext
-let t: tree<number> = tree(1, [])   // builds a tree<finite_integer>, which IS a tree<number>
+let t: tree<number> = tree(1, [])   // builds a tree<integer>, which IS a tree<number>
 ```
 
 For an explicitly `inout` or `in` parameter that step is not available, so
 such a type can only be constructed at exactly its argument type — a
-`box<finite_integer>` is not admissible where a `box<number>` is expected.
+`box<integer>` is not admissible where a `box<number>` is expected.
 Propagating the expected type inward is a future improvement.
 
 #### Reading a Value

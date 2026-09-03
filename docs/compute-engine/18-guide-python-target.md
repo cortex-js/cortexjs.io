@@ -406,12 +406,54 @@ def euclidean_distance(x_1: float, y_1: float, x_2: float, y_2: float) -> float:
     return np.sqrt((x_2 - x_1) ** 2 + (y_2 - y_1) ** 2)
 ```
 
+## Non-Finite Values
+
+The engine tells the signed infinities $+\infty$ and $-\infty$ apart from
+complex infinity $\tilde\infty$, and both from `NaN`. NumPy floats have only
+`np.inf`, `-np.inf` and `np.nan`, so the generated code carries a **projection**
+of the interpreted value:
+
+```typescript
+const python = new PythonTarget();
+
+python.compile(ce.parse('\\infty'));   // → "np.inf"
+python.compile(ce.parse('-\\infty'));  // → "-np.inf"
+python.compile(ce.box(NaN));           // → "np.nan"
+```
+
+The signed infinities and `NaN` survive the trip unchanged. Complex infinity
+does not: it has no direction, and there is no NumPy float that means "infinite
+magnitude, direction unknown", so it projects onto `np.inf`. That is what you
+see at a pole, where the interpreter answers $\tilde\infty$ but the folded
+constant is positive:
+
+```typescript
+python.compile(ce.parse('\\frac{1}{0}'));  // → "np.inf"
+python.compile(ce.parse('\\ln(0)'));       // → "-np.inf"   (genuinely signed)
+```
+
+Absence markers project the same way. An unmatched `cases` expression evaluates
+to `Missing` in the interpreter, which is not a number; the generated Python
+falls through to `float('nan')`:
+
+```typescript
+python.compile(ce.parse('\\begin{cases} x^2 & x > 0 \\\\ -x & x < 0 \\end{cases}'));
+// → "((x ** 2) if (0 < x) else ((-x) if (x < 0) else float('nan')))"
+```
+
+Keep the projection in mind when reading a type off an expression before
+compiling it. Every bare numeric type name — `integer`, `real`, `complex` —
+denotes a **finite** value, so a symbol typed `real` never stands for `np.inf`;
+the non-finite values belong to the separate `infinity` and `nan` types.
+
 ## Limitations
 
 1. **Not Executable in JavaScript**: Python code must be run in a Python environment
 2. **Type Information Lost**: Generated code is untyped (can add hints manually)
 3. **Some Simplifications**: Expressions are canonicalized (e.g., `x/2` → `0.5 * x`)
 4. **Requires NumPy**: Most functions need NumPy to be installed
+5. **Complex Infinity Is Flattened**: $\tilde\infty$ compiles to `np.inf` — see
+   [Non-Finite Values](#non-finite-values)
 
 ## See Also
 

@@ -4,10 +4,25 @@ slug: /compute-engine/reference/special-functions/
 description: "Special functions in the Compute Engine: error and Gamma functions, Zeta, Beta, Lambert W, Fresnel integrals, Bessel and Airy functions, and elliptic integrals."
 ---
 
+The functions in this section take a `number` argument, the type that includes
+$\pm\infty$ and `NaN` alongside the finite numbers. They are not restricted to
+finite input the way the [number theory](/compute-engine/reference/number-theory/)
+functions are:
+
+- An **infinite** argument is accepted. Where the function has a limit there,
+  that limit is the value — $\operatorname{erf}(\infty) = 1$,
+  $\operatorname{erfc}(\infty) = 0$. Otherwise the expression stays symbolic,
+  as `["Gamma", "PositiveInfinity"]` does.
+- A **`NaN`** argument gives `NaN`. This happens under plain `evaluate()`, not
+  only under `N()`: `NaN` is not an exact value, so there is nothing to hold
+  symbolically.
+
+A function may still be infinite at a finite point — $K(1) = \infty$ — in which
+case the result is `PositiveInfinity`.
 
 <FunctionDefinition name="Erf">
 
-<Signature name="Erf">_z:complex_</Signature>
+<Signature name="Erf">_z:number_</Signature>
 
 Evaluate to the **error function** of a complex number.
 
@@ -25,7 +40,7 @@ where $$z$$ is a complex number.
 
 <FunctionDefinition name="Erfc">
 
-<Signature name="Erfc">_z:complex_</Signature>
+<Signature name="Erfc">_z:number_</Signature>
 
 Evaluate to the **complementary error function** of a complex number.
 
@@ -36,9 +51,12 @@ It is defined as $$ \operatorname{erfc} z = 1 - \operatorname {erf} z $$.
 
 <FunctionDefinition name="ErfInv">
 
-<Signature name="ErfInv">_x:real_</Signature>
+<Signature name="ErfInv">_x:number_</Signature>
 
 Evaluate to the **inverse error function** of a real number $$ -1 < x < 1 $$
+
+Outside that interval the value is not defined: `["ErfInv", 2]` and
+`["ErfInv", "PositiveInfinity"]` both evaluate to `NaN`.
 
 It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
 = x $$.

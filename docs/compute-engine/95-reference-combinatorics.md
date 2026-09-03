@@ -25,7 +25,7 @@ Step 1: Calculate factorials: $$5! = 120, 2! = 2, (5-2)! = 3! = 6$$
 Step 2: Apply formula: $$5! / (2! \times 3!) = 120 / (2 \times 6) = 10$$  
 So, there are 10 different ways to choose 2 items from 5.
 
-The function returns <code>NaN</code> if <code>n &lt; 0</code>, <code>m &lt; 0</code>, or <code>m &gt; n</code>.
+The function implements the generalized binomial coefficient: <code>m &lt; 0</code> or <code>m &gt; n</code> (for non-negative integer <code>n</code>) answers <code>0</code>, and a negative <code>n</code> follows the falling-factorial extension (for example <code>Choose(-1, 0)</code> is <code>1</code>).
 
 ```json
 ["Choose", 5, 2]

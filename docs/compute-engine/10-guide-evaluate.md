@@ -215,6 +215,20 @@ console.log(ce.parse('\\ln(\\text{a}) + 2').evaluate().json);
 A **collection** is the exception: an error among its elements stays in place,
 because a collection containing an error is still a well-formed collection.
 
+An operand that is never evaluated cannot propagate anything. In a selection —
+`["If"]`, `["Which"]` — or behind a short-circuit operator — `["And"]`,
+`["Or"]` — the branch that is not taken is **dead code**, and an error inside it
+never reaches the value:
+
+```ts
+console.log(ce.box(['If', 'True', 5, ['Divide', 'x']]).evaluate().json);
+// ➔ 5
+```
+
+The diagnostic is not lost, only unevaluated: the boxed expression still holds
+`["If", "True", 5, ["Divide", "x", ["Error", "'missing'"]]]`, so a tool that
+walks the expression still reports it.
+
 Errors do not spread past the tools that inspect them. `Type` reports
 `"error"`, [`IsError`](/compute-engine/reference/core/#IsError) answers
 `True`/`False`, and
@@ -222,9 +236,21 @@ Errors do not spread past the tools that inspect them. `Type` reports
 error subject — an `["Error", ...]` case destructures it, which is how a
 failure is rescued.
 
-`NaN` is **not** an error. It is an ordinary IEEE numeric value that inhabits
-the number domain, so it does not propagate this way: a function applied to
-`NaN` runs and receives it, and is free to inspect it.
+`NaN` is **not** an error. It is an ordinary IEEE numeric value — it has its
+own type, `nan`, under `number` — so it does not propagate this way: a
+function applied to `NaN` runs and receives it, and is free to inspect it.
+
+`NaN` is also **inexact**, so the exactness contract sends it down the numeric
+branch: a numeric function of `NaN` numericizes under plain `evaluate()`,
+without waiting for `.N()`, and the result is `NaN`.
+
+```ts
+console.log(ce.box(['Sin', NaN]).evaluate().json);
+// ➔ "NaN"
+
+console.log(ce.parse('\\ln(2)').evaluate().json);
+// ➔ ["Ln", 2]      — an exact argument stays symbolic
+```
 
 
 ## Lexical Scopes and Evaluation Contexts

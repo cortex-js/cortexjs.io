@@ -18,17 +18,30 @@ ce.parse("42 \\in \\Z").evaluate().print();
 ```
 
 `Element` and `NotElement` can also be used with a **type name** on the right
-hand side (e.g. `integer`, `real`, `finite_real`, `number`, `any`), in which
+hand side (e.g. `integer`, `real`, `complex`, `number`, `any`), in which
 case the check is done against the expression type.
 
 ```js
-ce.declare('x', 'finite_real');
+ce.declare('x', 'real');
 ce.expr(['Element', 'x', 'real']).evaluate().print();
 // ➔ True
 
 ce.expr(['Element', 'x', 'integer']).evaluate().print();
 // ➔ False
 ```
+
+Every bare numeric type name — `integer`, `rational`, `real`, `complex` — denotes
+a **finite** value. So a type-name membership test agrees with the set constant of
+the same name: neither `real` nor `RealNumbers` admits $\pm\infty$. To include the
+infinities, use an extended set (`ExtendedRealNumbers`) or the type `number`,
+which covers the finite numbers, the infinities and NaN.
+
+:::info[Deprecated spellings]
+The type names `finite_integer`, `finite_rational`, `finite_real`,
+`finite_complex` and `finite_number` are **retired**. They are still accepted on
+input for one release cycle and normalize to the bare name — `finite_real`
+becomes `real`, `finite_number` becomes `complex` — but they are never emitted.
+:::
 
 Checking if an element is in a set is equivalent to checking if the type of the
 element matches the type associated with the set.
@@ -37,7 +50,7 @@ element matches the type associated with the set.
 const x = ce.expr(42);
 
 x.type;
-// ➔ "finite_integer"
+// ➔ "42"  — the literal type of the number itself
 
 x.type.matches("integer");
 // ➔ true
@@ -60,8 +73,8 @@ ce.parse("42 \\in \\Z").evaluate().print();
 | Symbol     | Notation                                 | &nbsp; | Definition |
 | :--------- | :--------------------------------------- | :--------- | :--------- |
 | `EmptySet` | `\varnothing` or `\emptyset`| $$ \varnothing $$ or $$ \emptyset $$ | A set that has no elements           |
-| `Numbers`               | `\mathrm{Numbers}` | $$ \mathrm{Numbers} $$ | Any number, real, imaginary, or complex |
-| `ComplexNumbers`        | `\C` | $$ \C $$ | Real or imaginary numbers |
+| `Numbers`               | `\mathrm{Numbers}` | $$ \mathrm{Numbers} $$ | Any number — real, imaginary or complex — together with $$+\infty$$, $$-\infty$$, $$\tilde\infty$$ and $$\mathrm{NaN}$$. It corresponds to the type `number` |
+| `ComplexNumbers`        | `\C` | $$ \C $$ | Real or imaginary numbers (does not include the infinities or $$\mathrm{NaN}$$) |
 | `ExtendedComplexNumbers`        | `\overline\C` | $$ \overline\C $$ | Real or imaginary numbers, including $$+\infty$$, $$-\infty$$ and $$\tilde\infty$$ |
 | `ImaginaryNumbers`           | `\imaginaryI\R` | $$ \imaginaryI\R $$ | Complex numbers with a non-zero imaginary part and no real part |
 | `RealNumbers`           | `\R` | $$ \R $$ | Numbers that form the unique Dedekind-complete ordered field $$ \left( \mathbb{R} ; + ; \cdot ; \lt \right) $$, up to an isomorphism (does not include $\pm\infty$) |
@@ -178,10 +191,10 @@ constructed ring. They do carry a type, formed by joining the base ring's
 element type with the types of the adjoined elements:
 
 ```js
-ce.parse("\\Z[\\sqrt{2}]").type;   // ➔ set<finite_real>
-ce.parse("\\Z[i]").type;           // ➔ set<finite_complex>
+ce.parse("\\Z[\\sqrt{2}]").type;   // ➔ set<real>
+ce.parse("\\Z[i]").type;           // ➔ set<complex>
 ce.parse("\\Z[x]").type;           // ➔ set<unknown>
-ce.parse("\\Z_n").type;            // ➔ set<finite_integer>
+ce.parse("\\Z_n").type;            // ➔ set<integer>
 ```
 
 ## Relations
@@ -249,6 +262,35 @@ ce.parse('[0, 1)').json;
 
 ce.parse('(-\\infty, 0]').json;
 // ➔ ["Interval", ["Open", ["Negate", "PositiveInfinity"]], 0]
+```
+
+### Infinite Endpoints
+
+An interval is a set of **real** numbers, and the reals are finite. An infinite
+endpoint therefore describes how far the interval *extends* — it is never one of
+its members, whether it is written open or closed:
+
+```js
+ce.expr(['Contains', ['Interval', 0, 'PositiveInfinity'], 'PositiveInfinity']).evaluate().print();
+// ➔ False
+
+ce.expr(['Contains', ['Interval', 0, 'PositiveInfinity'], 1000000]).evaluate().print();
+// ➔ True
+
+ce.parse('-\\infty \\in (-\\infty, 0]').evaluate().print();
+// ➔ False
+```
+
+To talk about a set that does contain $\pm\infty$, use one of the extended set
+constants (`ExtendedRealNumbers`, `ExtendedIntegers`, `ExtendedRationalNumbers`,
+`ExtendedComplexNumbers`) rather than an interval:
+
+```js
+ce.expr(['Element', 'PositiveInfinity', 'ExtendedRealNumbers']).evaluate().print();
+// ➔ True
+
+ce.expr(['Element', 'PositiveInfinity', 'RealNumbers']).evaluate().print();
+// ➔ False
 ```
 
 ### Contextual Interval Parsing

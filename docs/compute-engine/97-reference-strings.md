@@ -1440,7 +1440,7 @@ value.
 
 The number denoted by the string _s_. Unlike
 [`DigitsFrom`](#digitsfrom), which is integer-only, `NumberFrom` accepts
-fractions, exponents and the non-finite spellings.
+fractions, exponents and the infinity and NaN spellings.
 
 ```json example
 ["NumberFrom", {str: "42"}]
@@ -1464,7 +1464,7 @@ fraction and an optional `e`/`E` exponent — or one of the exact spellings
 | `"42"`, `"-42"`, `"+7"`, `" 42 "` | `42`, `-42`, `7`, `42` | Integer numeral, sign and surrounding whitespace allowed |
 | `"3.14"`, `"1e-3"`, `"1.5e3"` | `3.14`, `0.001`, `1500` | Fraction and exponent |
 | `".5"` | `0.5` | A leading `.` needs no integer part |
-| `"oo"`, `"+oo"`, `"-oo"`, `"NaN"` | `+oo`, `+oo`, `-oo`, `NaN` | The engine's own spellings for the non-finite values |
+| `"oo"`, `"+oo"`, `"-oo"`, `"NaN"` | `+oo`, `+oo`, `-oo`, `NaN` | The engine's own spellings for the infinities and NaN |
 | `"5."` | Error `invalid-number` | A trailing `.` with no fraction digits is not a numeral |
 | `""` | Error `invalid-number` | The empty string denotes no number |
 | `"abc"`, `"12abc"` | Error `invalid-number` | The **whole** string must be a numeral — a numeric prefix is not enough |

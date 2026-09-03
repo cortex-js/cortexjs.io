@@ -65,6 +65,42 @@ the expression is automatically evaluated as a **numeric approximation**.
 console.log(parse('1/3 + 1/4 + 1.24').evaluate());
 ```
 
+### Infinity and NaN
+
+The two non-finite results fall on opposite sides of the exactness rule above,
+which is why they behave differently under `evaluate()`.
+
+$\pm\infty$ **is an exact value.** A function of an infinity is therefore
+treated like a function of any other exact argument: if there is a closed form
+it is used, and if there is not, the expression stays symbolic rather than
+numericizing.
+
+```live
+console.log(ce.parse('\\mathrm{Erf}(\\infty)').evaluate());
+// ➔ 1
+
+console.log(ce.parse('\\sin(\\infty)').evaluate());
+// ➔ sin(+oo)
+```
+
+`NaN` **is not an exact value.** It is the argument that triggers the automatic
+numeric approximation, so any numeric function of `NaN` evaluates to `NaN` —
+under plain `evaluate()`, not only under `N()`. There is no exact value to hold
+on to:
+
+```live
+console.log(ce.parse('\\sin(\\operatorname{NaN})').evaluate());
+// ➔ NaN
+```
+
+Note that this is a statement about *values*, not about types. In the type
+system the bare numeric types — `integer`, `rational`, `real`, `complex` —
+denote **finite** values only, so neither an infinity nor `NaN` inhabits them.
+Both are still `number`.
+
+<ReadMore path="/compute-engine/guides/types/" >Read more about **the numeric
+types** <Icon name="chevron-right-bold" /></ReadMore>
+
 ## Angular Units
 
 When a trigonometric function is given a unitless value, the Compute Engine

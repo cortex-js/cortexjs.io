@@ -202,13 +202,14 @@ form:
   - \\(x^\{\tilde\infty\} \to \operatorname\{NaN\}\\)
   - \\(x^0 \to 1\\)
   - \\(x^1 \to x\\)
-  - \\((\pm 1)^\{-1\} \to -1\\)
+  - \\((-1)^\{-1\} \to -1\\) (and \\(1^\{-1\} \to 1\\))
   - \\((\pm\infty)^\{-1\} \to 0\\)
-  - \\(0^\{\infty\} \to \tilde\infty\\)
+  - \\(0^\{\infty\} \to 0\\)
   - \\((\pm 1)^\{\pm \infty\} \to \operatorname\{NaN\}\\)
-  - \\(\infty^\{\infty\} \to \infty\\)
+  - \\(\infty^\{\infty\} \to \tilde\infty\\)
   - \\(\infty^\{-\infty\} \to 0\\)
-  - \\((-\infty)^\{\pm \infty\} \to \operatorname\{NaN\}\\)
+  - \\((-\infty)^\{\infty\} \to \tilde\infty\\)
+  - \\((-\infty)^\{-\infty\} \to 0\\)
 - `Square`: `["Power", "x", 2]` \\(\to\\) `["Square", "x"]`
 - `Sqrt`: `["Sqrt", "x"]` \\(\to\\)`["Power", "x", "Half"]`
 - `Root`:  `["Root", "x", 3]` \\(\to\\) `["Power", "x", ["Rational", 1, 3]]`

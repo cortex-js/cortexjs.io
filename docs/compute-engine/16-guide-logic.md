@@ -166,6 +166,22 @@ ce.expr(['And', 'False', ['List', 'True', 'False']]).evaluate();
 An operand that evaluates to an error also stops the walk: the error is the
 result, and the operands after it do not run.
 
+The converse matters just as much. An operand the walk never reaches is **dead
+code**: an error inside it never reaches the value. Because the walk follows
+the order written, the same two operands give different results depending on
+which comes first:
+
+```js example
+ce.expr(['And', 'False', ['Divide', 'x']]).evaluate();
+// → "False"    — the malformed operand is never reached
+
+ce.expr(['And', ['Divide', 'x'], 'False']).evaluate();
+// → Error      — the malformed operand is reached first
+```
+
+Only *evaluation* skips the operand — the boxed expression still carries the
+diagnostic, so nothing is lost to a tool that walks the expression.
+
 `Nand`, `Nor` and `Implies` short-circuit the same way: `Nand` stops at the
 first `False` (result `True`), `Nor` at the first `True` (result `False`), and
 `Implies` does not evaluate its consequent when the antecedent is `False`.

@@ -5,10 +5,10 @@ slug: /compute-engine/reference/fungrim-elementary/
 
 # Elementary functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **211 identities** for elementary functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **210 identities** for elementary functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -19,7 +19,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 - [Lambert W-function](#lambert-w-function) (15)
 - [Natural logarithm](#natural-logarithm) (11)
 - [Pi](#pi) (4)
-- [Powers](#powers) (8)
+- [Powers](#powers) (7)
 - [Sinc function](#sinc-function) (24)
 - [Sine](#sine) (59)
 - [Square roots](#square-roots) (25)
@@ -792,14 +792,6 @@ $$(xy)^{a}=x^{a}y^{a}\exp(2\pi\imaginaryI a\lfloor\frac{\pi-\arg(x)-\arg(y)}{2\p
 **Holds when** $x\in\C\setminus\lbrace0\rbrace\land y\in\C\setminus\lbrace0\rbrace\land a\in\C$.
 Used by the Compute Engine for simplification.
 [`2090c3` · Fungrim entry ↗](https://fungrim.org/entry/2090c3)
-
----
-
-$$z^0=1$$
-
-**Holds when** $z\in\C$.
-Used by the Compute Engine for simplification.
-[`310f36` · Fungrim entry ↗](https://fungrim.org/entry/310f36)
 
 ---
 

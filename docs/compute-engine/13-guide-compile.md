@@ -381,7 +381,19 @@ console.log(g.run({ x: 3 }));
 // ➔ 9
 ```
 
-When no condition matches, `Which` returns `NaN`.
+When no condition matches, compiled `Which` returns `NaN`. The interpreter
+answers `Missing` for the same input — the absence marker has no value in the
+target's floating-point model, so it projects to `NaN`. See
+[Non-Finite Results](#non-finite-results).
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+// No clause covers x = 0, and there is no fallback clause
+const h = compile("\\begin{cases} x^2 & x > 0 \\\\ -x & x < 0 \\end{cases}");
+console.log(h.run({ x: 0 }));
+// ➔ NaN
+```
 
 #### `Sum` and `Product`
 
@@ -628,11 +640,62 @@ be exact: `arcsin(0.5)` compiled through the complex kernel is the number
 `0.5235…`, while `1 + 10^{-12} i` stays `{ re: 1, im: 1e-12 }` — nothing is
 chopped in ring arithmetic.
 
-> **Deprecated:** `realOnly: true` (the old projection: `{ re, im }` → `NaN`
-> unless the imaginary part is at roundoff scale, boolean → `NaN`) is kept for
-> one release with a console warning. The convention above replaces it — the
-> `typeof v === 'number' ? v : NaN` test on the consumer's side is the whole
-> of what it did.
+### Non-Finite Results
+
+The engine distinguishes three kinds of non-finite number — the signed
+infinities $+\infty$ and $-\infty$, complex infinity $\tilde\infty$, and `NaN`.
+A floating-point target has only two: IEEE `Infinity`/`-Infinity` and `NaN`.
+Compiled code therefore reports a **projection** of the interpreted answer, and
+the two agree everywhere except at the direction-less infinity.
+
+The signed infinities and `NaN` round-trip. `\ln(0)` is $-\infty$ interpreted
+and `-Infinity` compiled; a `NaN` argument stays `NaN` through a compiled
+numeric head, exactly as it does through `evaluate()`:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+console.log(compile("\\ln(x)").run({ x: 0 }));
+// ➔ -Infinity
+
+console.log(compile("\\mathrm{Heaviside}(x)").run({ x: NaN }));
+// ➔ NaN
+```
+
+Complex infinity has no distinct floating-point value, so a pole projects onto
+the positive infinity. Interpreting $1/0$ gives $\tilde\infty$, which carries no
+direction; the compiled unit answers `Infinity`, and `-Infinity` for the
+negative-zero approach that IEEE arithmetic does distinguish:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const f = compile("\\frac{1}{x}");
+console.log(f.run({ x: 0 }));    // ➔ Infinity
+console.log(f.run({ x: -0 }));   // ➔ -Infinity
+```
+
+Absence markers project the same way. `Missing` — what an unmatched `Which`
+returns — is not a number, so the chained ternary ends in a literal `NaN` (see
+[`If` and `Which`](#if-and-which-conditionals)). The same value reaches `run()`
+when the expression was never compiled at all: an else-less `If` declines and
+falls back to interpretation, and its `Missing` crosses the boundary as `NaN`
+too.
+
+**Type guards follow the finite-by-default lattice.** Every bare numeric type
+name denotes a **finite** value, so the guard a compiled parameter test emits
+rejects `Infinity` and `NaN` exactly as the interpreter's signature check does:
+`real` lowers to `Number.isFinite`, `integer` to `Number.isInteger`, and
+`complex` to a test that a plain number is finite or that both parts of a
+`{ re, im }` pair are. `+oo | -oo` — the signed pair — is the guard for
+the infinities.
+
+The `infinity` and `nan` tiers have no faithful test in the target's value
+model, because the projection above is lossy in exactly the place those tiers
+distinguish. A definition whose parameters use either one therefore **declines
+as a whole** and runs interpreted, rather than dispatching on a test that would
+disagree with `evaluate()`. This is the usual fail-closed posture for a
+construct the target cannot represent.
 
 ### Modes: `auto`, `strict`, `complex`
 

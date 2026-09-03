@@ -68,6 +68,24 @@ reason their operands are not reordered at canonicalization. (`Xor` and
 is the exception: every operand is evaluated once and the result is a list.
 See the [Logic guide](/compute-engine/guides/logic/).
 
+An operand that is skipped is **dead code**: if it contains an error, that
+error never reaches the value. Because operands are evaluated in the order
+written, this is order-dependent.
+
+```json example
+["And", "False", ["Divide", "x"]]
+// ➔ False       — the malformed operand is never evaluated
+
+["And", ["Divide", "x"], "False"]
+// ➔ Error       — the malformed operand is reached first
+```
+
+Only *evaluation* skips the operand. The boxed expression still carries the
+diagnostic, so `ce.box(["And", "False", ["Divide", "x"]]).json` is
+`["And", "False", ["Divide", "x", ["Error", "'missing'"]]]` and the error is
+still reportable to the user. Operators that cannot short-circuit have no dead
+operands: `["Xor", "False", ["Divide", "x"]]` evaluates to an `Error`.
+
 ### Operator Precedence
 
 Logical operators have lower precedence than comparison and arithmetic operators,
