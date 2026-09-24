@@ -128,6 +128,61 @@ example, a one-sided delimiter group written with a TeX *null delimiter* —
 Read more about the **errors** that can be returned. <Icon name="chevron-right-bold" />
 </ReadMore>
 
+### Symbol Types and Ambiguous Applications
+
+The meaning of `f(x)` depends on what `f` represents. Declare known symbols
+before parsing expressions that use them:
+
+```js
+ce.declare('f', '(real) -> real');
+ce.declare('a', 'real');
+ce.declare('L', 'list<real>');
+
+ce.parse('f(x)').json;   // ["f", "x"]
+ce.parse('a(x+1)').json; // ["Multiply", "a", ["Add", "x", 1]]
+```
+
+Declarations also affect subscript parsing: a subscript can index a known
+collection rather than form a new symbol name. If a host discovers types after
+an initial parse, it should reparse the authored source under the final
+declarations. Reboxing an already chosen MathJSON structure cannot recover the
+original ambiguity.
+
+Use `resolveSymbol(name)` to supply facts held outside the engine:
+
+```js
+ce.latexOptions = {
+  ...ce.latexOptions,
+  resolveSymbol: (name) => name === 'g' ? { type: 'function' } : undefined,
+};
+```
+
+Explicit declarations and lexical parameters take precedence, including an
+explicit `unknown` declaration. Inferred, unassigned guesses can yield to the
+handler. Answers must be stable within a parse. The returned boxed expression
+retains these facts for deferred canonicalization without declaring them in the
+caller's scope; exporting only its MathJSON does not export that type environment.
+
+Use `resolveApplication(context)` for a notation policy that varies by
+occurrence. It runs only when declarations and symbol facts have not settled the
+parenthesized head. Return `'apply'`, `'multiply'`, or `undefined` to keep the
+engine's default reading:
+
+```js
+const raw = ce.parse('u(x+1)', {
+  form: 'raw',
+  resolveApplication: ({ head }) => head === 'u' ? 'multiply' : undefined,
+});
+raw.canonical.json; // ["Multiply", "u", ["Add", "x", 1]]
+```
+
+The context contains the head, parsed arguments, source offsets, and enclosing
+operators with one-based operand indices. A host can therefore distinguish a
+complete definition head from an occurrence inside its body. Offsets refer to
+the normalized LaTeX input. Explicit application decisions are encoded in raw
+MathJSON and survive later canonicalization or JSON transport; they do not
+declare the symbol. Both handlers can be set per parse or on `ce.latexOptions`.
+
 ### Geometry Notation
 
 Geometry commands parse to **inert structural heads**: they capture the notation
@@ -427,7 +482,9 @@ console.log(ce.parse("f(x)\\left\\{0 < x < 2\\right\\}").json);
 ```
 
 When `cond` evaluates to `True`, the expression evaluates to its left
-operand; when `False`, to `Undefined`. Indeterminate predicates hold.
+operand; when `False`, to `Missing`, the absent-value marker — the same
+value a `Which` with no matching clause gives. Indeterminate predicates
+hold.
 
 Stacked restrictions chain and canonicalize to a single `When` with an
 `And` predicate:

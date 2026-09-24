@@ -39,7 +39,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DirichletCharacter}(p^{e_{var}}, \ell, n)=\exp(\frac{2\pi\imaginaryI\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{e_{var}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{e_{var}})}{\mathrm{Totient}(p^{e_{var}})})$$
 
-**Holds when** $p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..(p^{e_{var}}-1)\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
+**Holds when** $p\in\mathbb{P}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..(p^{e_{var}}-1)\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
 **Symbols:** **ConreyGenerator** — Conrey generator; **DirichletCharacter** — Dirichlet character; **DiscreteLog** — Discrete logarithm.
 Used by the Compute Engine for simplification.
 [`4cf4e4` · Fungrim entry ↗](https://fungrim.org/entry/4cf4e4)
@@ -48,7 +48,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ConreyGenerator}(p)=\begin{cases}10&p=40\,487\\7&p=6\,692\,367\,337\\\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1))&\top\end{cases}$$
 
-**Holds when** $p\in\mathrm{Primes}\land p\ge3\land p\lt10^{12}$.
+**Holds when** $p\in\mathbb{P}\land p\ge3\land p\lt10^{12}$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
 Used by the Compute Engine for simplification.
 [`540931` · Fungrim entry ↗](https://fungrim.org/entry/540931)
@@ -64,9 +64,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1\land\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p^2, \N))=p(p-1)))$$
+$$\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1\land\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p^2, \N))=p\times(p-1)))$$
 
-**Holds when** $p\in\mathrm{Primes}\land p\ge3$.
+**Holds when** $p\in\mathbb{P}\land p\ge3$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
 Used by the Compute Engine for simplification.
 [`75231e` · Fungrim entry ↗](https://fungrim.org/entry/75231e)
@@ -594,7 +594,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{RiemannZetaZero}(-n)=\mathrm{RiemannZetaZero}(n)^\star$$
+$$\mathrm{RiemannZetaZero}(-n)=\overline{\mathrm{RiemannZetaZero}(n)}$$
 
 **Holds when** $n\in\Z\land n\ne0$.
 **Symbols:** **RiemannZetaZero** — Nontrivial zero of the Riemann zeta function.
@@ -621,7 +621,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(s^\star)=\Zeta(s)^\star$$
+$$\Zeta(\overline{s})=\overline{\Zeta(s)}$$
 
 **Holds when** $s\in\C\land s\ne1$.
 Used by the Compute Engine for expansion.

@@ -491,8 +491,8 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 - If `value` is greater than `upper`, evaluate to `upper`
 - Otherwise, evaluate to `value`
 
-All three arguments are required. (A single-argument form with default
-bounds is on the roadmap; today `["Clamp", 0.42]` is an arity error.)
+All three arguments are required: `["Clamp", 0.42]` is an arity error. There
+is no one-argument form with default bounds (decided 2026-09-21).
 
 ```json example
 ["Clamp", 4.2, -1, 1]

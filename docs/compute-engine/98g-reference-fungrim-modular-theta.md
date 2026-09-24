@@ -1630,7 +1630,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(j, z^\star, \tau)=\mathrm{JacobiTheta}(j, z, -\tau^\star)^\star$$
+$$\mathrm{JacobiTheta}(j, \overline{z}, \tau)=\overline{\mathrm{JacobiTheta}(j, z, -\overline{\tau})}$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -2181,7 +2181,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(j, z, -\tau^\star)=\mathrm{JacobiTheta}(j, z^\star, \tau)^\star$$
+$$\mathrm{JacobiTheta}(j, z, -\overline{\tau})=\overline{\mathrm{JacobiTheta}(j, \overline{z}, \tau)}$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.

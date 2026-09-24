@@ -1396,11 +1396,18 @@ For matrices, the default is the Frobenius norm: sqrt(sum of |aij|^2)
 // ➔ sqrt(30) ≈ 5.477
 ```
 
-- **Frobenius norm** (_p_ = 2 or `"Frobenius"`): Square root of sum of squared elements
+- **Frobenius norm** (_p_ = `"Frobenius"`, the default): Square root of the sum of the squared moduli of the entries
 
 ```json example
 ["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "Frobenius"]
 // ➔ sqrt(30) ≈ 5.477
+```
+
+- **Spectral norm** (_p_ = 2): The largest singular value, sqrt(λmax(Aᴴ A)). The result is exact for a matrix with one or two rows or columns, or with at most one nonzero entry in each row and column. Any other exact matrix stays unevaluated under `evaluate()` and gives a number under `N()`. On a tensor of rank 3 or more, _p_ = 2 is the Frobenius norm.
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
+// ➔ sqrt(15 + sqrt(221)) ≈ 5.465
 ```
 
 - **L1 norm** (_p_ = 1): Maximum column sum of absolute values

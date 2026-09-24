@@ -162,7 +162,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2+((3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)+a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a))\mathrm{AGM}(a, b)=0$$
+$$2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2+((3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)+a\times(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a))\mathrm{AGM}(a, b)=0$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
@@ -330,7 +330,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(-x, -y, z)=-(\imaginaryI\mathrm{CarlsonRD}(x, y, -z))^\star$$
+$$\mathrm{CarlsonRD}(-x, -y, z)=-\overline{\imaginaryI\mathrm{CarlsonRD}(x, y, -z)}$$
 
 **Holds when** $x\in\lparen0, \infty\rbrack\land y\in\lparen0, \infty\rbrack\land z\in\lparen0, \infty\rbrack$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -424,7 +424,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(-x, -y, z)=(\imaginaryI\mathrm{CarlsonRF}(x, y, -z))^\star$$
+$$\mathrm{CarlsonRF}(-x, -y, z)=\overline{\imaginaryI\mathrm{CarlsonRF}(x, y, -z)}$$
 
 **Holds when** $x\in\lbrack0, \infty\rparen\land y\in\lbrack0, \infty\rparen\land z\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -630,7 +630,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(-x, -y, z)=-(\imaginaryI\mathrm{CarlsonRG}(x, y, -z))^\star$$
+$$\mathrm{CarlsonRG}(-x, -y, z)=-\overline{\imaginaryI\mathrm{CarlsonRG}(x, y, -z)}$$
 
 **Holds when** $x\in\lbrack0, \infty\rparen\land y\in\lbrack0, \infty\rparen\land z\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -691,7 +691,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(-x, y)=(\imaginaryI\mathrm{CarlsonRC}(x, -y))^\star$$
+$$\mathrm{CarlsonRC}(-x, y)=\overline{\imaginaryI\mathrm{CarlsonRC}(x, -y)}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -758,7 +758,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticE}(1-z/y)-(z\mathrm{EllipticK}(1-z/y))/y)}{(z(1-z/y))/y}&z\ne0\land z\ne y\\\frac{3\pi}{4}&z=y\\\tilde\infty&z=0\end{cases}}{\sqrt{y}^{3}}$$
+$$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticE}(1-z/y)-(z\mathrm{EllipticK}(1-z/y))/y)}{(z\times(1-z/y))/y}&z\ne0\land z\ne y\\\frac{3\pi}{4}&z=y\\\tilde\infty&z=0\end{cases}}{\sqrt{y}^{3}}$$
 
 **Holds when** $y\in\C\setminus\lbrace0\rbrace\land z\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -767,7 +767,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda}, w+\mathrm{lamda})+\mathrm{CarlsonRJ}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}, w+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}(w^2(\mathrm{lamda}+\frac{xy}{\mathrm{lamda}}+x+y), w(w+\mathrm{lamda})(w+\frac{xy}{\mathrm{lamda}}))$$
+$$\mathrm{CarlsonRJ}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda}, w+\mathrm{lamda})+\mathrm{CarlsonRJ}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}, w+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}(w^2(\mathrm{lamda}+\frac{xy}{\mathrm{lamda}}+x+y), w\times(w+\mathrm{lamda})(w+\frac{xy}{\mathrm{lamda}}))$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land w\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -904,7 +904,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 1, z)=\begin{cases}\frac{3(\mathrm{EllipticE}(1-z)-z\mathrm{EllipticK}(1-z))}{z(1-z)}&z\ne0\land z\ne1\\\frac{3\pi}{4}&z=1\\\tilde\infty&z=0\end{cases}$$
+$$\mathrm{CarlsonRD}(0, 1, z)=\begin{cases}\frac{3(\mathrm{EllipticE}(1-z)-z\mathrm{EllipticK}(1-z))}{z\times(1-z)}&z\ne0\land z\ne1\\\frac{3\pi}{4}&z=1\\\tilde\infty&z=0\end{cases}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -1136,7 +1136,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(-x, -y, -z, w)=-(\imaginaryI\mathrm{CarlsonRJ}(x, y, z, -w))^\star$$
+$$\mathrm{CarlsonRJ}(-x, -y, -z, w)=-\overline{\imaginaryI\mathrm{CarlsonRJ}(x, y, z, -w)}$$
 
 **Holds when** $x\in\lparen0, \infty\rbrack\land y\in\lparen0, \infty\rbrack\land z\in\lparen0, \infty\rbrack\land w\in\lparen0, \infty\rbrack$.
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -2029,7 +2029,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(m)-(1-m)\mathrm{EllipticK}(m)=\frac{1}{3}(m(1-m)\mathrm{CarlsonRD}(0, 1, 1-m))$$
+$$\mathrm{EllipticE}(m)-(1-m)\mathrm{EllipticK}(m)=\frac{1}{3}(m\times(1-m)\mathrm{CarlsonRD}(0, 1, 1-m))$$
 
 **Holds when** $m\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -2094,7 +2094,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(m^\star)=\mathrm{EllipticK}(m)^\star$$
+$$\mathrm{EllipticK}(\overline{m})=\overline{\mathrm{EllipticK}(m)}$$
 
 **Holds when** $m\in\C\setminus\lparen1, \infty\rparen$.
 Used by the Compute Engine for expansion.
@@ -2127,7 +2127,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(m^\star)=\mathrm{EllipticE}(m)^\star$$
+$$\mathrm{EllipticE}(\overline{m})=\overline{\mathrm{EllipticE}(m)}$$
 
 **Holds when** $m\in\C\setminus\lparen1, \infty\rparen$.
 Used by the Compute Engine for expansion.

@@ -384,7 +384,15 @@ console.log(g.run({ x: 3 }));
 When no condition matches, compiled `Which` returns `NaN`. The interpreter
 answers `Missing` for the same input — the absence marker has no value in the
 target's floating-point model, so it projects to `NaN`. See
-[Non-Finite Results](#non-finite-results).
+[Non-Finite Results](#non-finite-results). A selection whose arms are all
+provably not numbers — strings, lists — answers the target's missing-object
+literal instead, `undefined` in JavaScript and `None` in Python, so that
+`IsMissing` and `Coalesce` work on a compiled string selection; an arm whose
+type is unknown counts as a number. An `If` with no else-branch is
+the one-clause `Which`: `If(c, t)` compiles on every target and returns
+`NaN` when `c` is false. An `If` whose branch is a statement — an
+assignment, a loop — is a guard statement, not a value, and keeps its own
+rules (see the statement sections below).
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
@@ -675,12 +683,12 @@ console.log(f.run({ x: 0 }));    // ➔ Infinity
 console.log(f.run({ x: -0 }));   // ➔ -Infinity
 ```
 
-Absence markers project the same way. `Missing` — what an unmatched `Which`
-returns — is not a number, so the chained ternary ends in a literal `NaN` (see
+Absence markers project the same way. `Missing` — what an unmatched `Which`,
+an else-less `If` and a false restriction `e\{c\}` return — is not a
+number, so the chained ternary ends in a literal `NaN` (see
 [`If` and `Which`](#if-and-which-conditionals)). The same value reaches `run()`
-when the expression was never compiled at all: an else-less `If` declines and
-falls back to interpretation, and its `Missing` crosses the boundary as `NaN`
-too.
+when the expression was never compiled at all and fell back to
+interpretation: its `Missing` crosses the boundary as `NaN` too.
 
 **Type guards follow the finite-by-default lattice.** Every bare numeric type
 name denotes a **finite** value, so the guard a compiled parameter test emits

@@ -447,6 +447,41 @@ A list of the function calls to the current evaluation context
 
 <MemberCard>
 
+##### ExpressionComputeEngine.~~effects~~ {#effects-3}
+
+```ts
+get effects(): EffectHandlers
+set effects(handlers: EffectHandlerOverrides): void
+```
+
+The host capabilities of this engine: the handlers the library operators
+use to reach the host. `Print` and `Input` use `effects.console`.
+
+The registry is an immutable object. Reading returns the registry that a
+new evaluation would use. Assigning installs a new registry: the assigned
+object is a COMPLETE description — a handler it does not mention returns
+to its default, so `ce.effects = {}` restores every default. A `null`
+handler denies the capability: an operator that needs it evaluates to an
+`Error("capability-denied", …)` value.
+
+```ts
+const lines: string[] = [];
+ce.effects = {
+  console: { log: (line) => lines.push(line), readLine: () => undefined },
+};
+```
+
+Each evaluation (`evaluate()`, `N()`, `evaluateAsync()`) uses the registry
+that was installed when it started. An assignment does not change the
+handlers of an evaluation that is already running.
+
+For a change that must last for one block of code only, use
+[`withEffects`](#witheffects).
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.~~precision~~ {#precision-1}
 
 ```ts
@@ -627,6 +662,51 @@ that point runs **outside** the deadline and is never cancelled (see
 
 <MemberCard>
 
+##### ExpressionComputeEngine.~~withEffects()~~ {#witheffects-1}
+
+```ts
+withEffects<T>(overrides, fn): T
+```
+
+Run `fn` with some host capabilities replaced or denied, then put the
+previous ones back. Evaluations that START inside `fn` use the changed
+registry.
+
+`overrides` is applied on top of the registry in effect when
+`withEffects` is called, so calls nest: a capability an inner call does
+not mention keeps the handler of the outer call. A `null` value denies the
+capability, even if it has a default handler — this is how to evaluate an
+expression that is not trusted:
+
+```ts
+const result = ce.withEffects({ console: null }, () => expr.evaluate());
+```
+
+The previous registry is put back when `fn` returns or throws. If `fn`
+returns a promise, it is put back when that promise settles (fulfilled or
+rejected), and `withEffects` returns a promise that settles the same way.
+
+An asynchronous evaluation keeps the registry it started with, so an
+evaluation that started BEFORE `withEffects` was called is not changed by
+it. But while the promise of an asynchronous `fn` is pending, the changed
+registry is the installed one: an unrelated evaluation that starts during
+that time, from other code, also uses it. Start such evaluations before
+calling `withEffects`, or use a separate engine.
+
+• T
+
+####### overrides
+
+[`EffectHandlerOverrides`](#effecthandleroverrides)
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.~~chop()~~ {#chop-1}
 
 ###### chop(n)
@@ -712,6 +792,59 @@ box(expr, options?): Expression
 ###### Deprecated
 
 Use `expr()` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~rebind()~~ {#rebind-1}
+
+```ts
+rebind(expr, options?): Expression
+```
+
+Rebuild `expr` as if `ce.expr(expr.json, { form, scope })` had been
+called — every symbol resolves afresh in `scope` (or the current scope)
+— without serializing `expr` to MathJSON.
+
+`ce.expr(expr, { scope })` on an already-boxed expression keeps the
+bindings the expression was boxed with; it never re-resolves a symbol.
+This is the operation that does. Use it when an expression built under
+one set of declarations must be read under another: a body boxed in a
+shadow scope, a row re-classified after a declaration changed.
+
+For the canonical and partial forms the MathJSON is built as a DAG — one
+array per DISTINCT function node, shared by every parent that reads it
+(a leaf contributes its own constant-size MathJSON) — where
+`expr.json` writes a tree, one copy of a shared node per path. That
+MathJSON is then boxed by the ordinary route, so the result matches
+`ce.expr(expr.json, …)` by construction, including for an expression
+that already holds an `Error` node. Canonical boxing still visits every
+path, as it does for any MathJSON. The raw and structural forms
+canonicalize nothing, so each distinct node is rebuilt once and a shared
+sub-expression stays shared in the result as well.
+
+- `form`: `'canonical'` (default), `'structural'`, `'raw'`, or a
+  partial form such as `['Flatten', 'Order']`.
+- `scope`: the lexical scope the rebuild resolves and declares in.
+
+Verbatim LaTeX and source positions are dropped, as the MathJSON route
+drops them. A mutable object is rebuilt as its record snapshot, as that
+route boxes it.
+
+####### expr
+
+[`Expression`](#expression-5)
+
+####### options?
+
+####### form?
+
+[`FormOption`](#formoption)
+
+####### scope?
+
+`Scope`
 
 </MemberCard>
 
@@ -1048,6 +1181,35 @@ tuple(...elements): Expression
 ####### elements
 
 ...readonly [`Expression`](#expression-5)[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~list()~~ {#list-1}
+
+```ts
+list(values): Expression
+```
+
+A `List` of numbers, built without boxing each element.
+
+The elements are copied into a frozen array of machine numbers that the
+list keeps as its store: `count`, `at`, `type`, `isSame` and `array`
+answer from it, and the boxed operands are built only if `ops` is read.
+The result is an ordinary canonical `List` in every other respect.
+
+`values` may be a `number[]`, a `Float64Array` or any array-like of
+numbers. Its `length` must be a non-negative safe integer and each
+element a JS number; anything else throws a `TypeError`. `-0` is stored
+as `+0`.
+
+Use it to hand a large numeric list to the engine cheaply, and read it
+back with `expr.array`.
+
+####### values
+
+`ArrayLike`\<`number`\>
 
 </MemberCard>
 
@@ -1465,6 +1627,9 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `inferOperandTypes`: (`ops`, `requirement`) => 
+     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -1536,6 +1701,9 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `inferOperandTypes`: (`ops`, `requirement`) => 
+     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| `undefined`;
  \}\>\>
   \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
 
@@ -2249,6 +2417,23 @@ readonly nops: number;
 
 <MemberCard>
 
+##### FunctionInterface.\_numericStore {#_numericstore}
+
+```ts
+readonly _numericStore: readonly number[] | undefined;
+```
+
+Internal. The numeric store of a `List` built by `ce.list()`: its
+elements as frozen machine numbers, from which the operands are boxed on
+the first read of `ops`. `undefined` for every other function
+expression. A walker that only looks for symbols or effects skips a node
+with a store instead of reading `ops`, which would box every element.
+The public view is `array`.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### FunctionInterface.op1 {#op1}
 
 ```ts
@@ -2274,6 +2459,21 @@ readonly op2: Expression;
 ```ts
 readonly op3: Expression;
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionInterface.\_isLiteralData() {#_isliteraldata}
+
+```ts
+_isLiteralData(): boolean
+```
+
+Internal. Is this node written-out DATA: a canonical `List` or `Tuple`
+bound to the standard library whose every element is a number literal,
+or such a `List` or `Tuple` in turn? Such a node holds no symbol and
+evaluates to itself. The answer is computed once per node.
 
 </MemberCard>
 
@@ -2941,6 +3141,7 @@ type CompiledExpression = {
 ```ts
 type OperatorCompileContext = {
   language: string;
+  typeOf: (expr) => Type;
 };
 ```
 
@@ -2998,6 +3199,7 @@ ce.declare('MyGcd', {
 type EvaluateHandlerOptions = Partial<EvaluateOptions> & {
   engine: ComputeEngine;
   expression: Expression;
+  effects: EffectHandlers;
 };
 ```
 
@@ -3041,6 +3243,23 @@ each held operand it consumes).
 
 Read-only: do not mutate it, and do not assume it is present (a handler
 invoked outside the evaluation driver may not receive one).
+
+#### EvaluateHandlerOptions.effects
+
+```ts
+effects: EffectHandlers;
+```
+
+The host capabilities of THIS evaluation: the `ce.effects` registry as it
+was when the evaluation started. A handler that reaches a host capability
+reads it from here, never from `ce.effects`, so that a change of registry
+made while the evaluation runs — or made for a different, concurrent
+asynchronous evaluation — has no effect on it.
+
+A handler may use a capability only if its operator declares the
+corresponding effect label: `options.effects.console` requires `console`
+in the signature. A `null` handler is a denial: return
+`ce.error(['capability-denied', '<capability>'])`.
 
 </MemberCard>
 
@@ -3535,6 +3754,7 @@ type OperandStructure =
   | {
   kind: "symbol";
   name: string;
+  system: boolean;
   inferred: boolean;
  }
   | {
@@ -3543,6 +3763,7 @@ type OperandStructure =
  }
   | {
   kind: "number";
+  tier: Type;
   literal: 0 | 1;
   rational: readonly [bigint, bigint];
  }
@@ -3556,6 +3777,7 @@ type OperandStructure =
   parameters: ReadonlyArray<{
      name: string;
      annotated: Type;
+     rest: boolean;
     }>;
   body: OperandStructure;
  }
@@ -3582,8 +3804,21 @@ holding an expression.
 \{
   `kind`: `"symbol"`;
   `name`: `string`;
+  `system`: `boolean`;
   `inferred`: `boolean`;
  \}
+
+#### OperandStructure.system?
+
+```ts
+optional system?: boolean;
+```
+
+Present (`true`) when the symbol resolves to the definition the
+engine's SYSTEM scope binds under this name — the library constant
+or operator, not a user or local declaration that shadows it. The
+ring arms of `At` and `Subscript` read it: `Integers[k]` is a
+quotient-ring adjunction only for the library `Integers`.
 
 #### OperandStructure.inferred?
 
@@ -3604,9 +3839,26 @@ to trust an operand's type. Lives on the structure node, not in
 
 \{
   `kind`: `"number"`;
+  `tier`: [`Type`](#type-3);
   `literal`: `0` \| `1`;
   `rational`: readonly \[`bigint`, `bigint`\];
  \}
+
+#### OperandStructure.tier
+
+```ts
+tier: Type;
+```
+
+The tier the literal contributes to a COMPOSITE type: `integer`,
+`rational`, `real`, `complex`, `imaginary`, `nan`, `infinity`, or
+the signed pair `+oo | -oo`. A literal's handler-visible type
+(`type` on the descriptor) carries its value or an enclosing range;
+a composite built from the literal — a tuple's component, a list's
+element, a record's field — is a stored contract and carries the
+tier instead, so a container handler reads it here and never
+builds the literal type only to widen it away. Read off the value
+(`numberLiteralTierType`, `boxed-expression/literal-tier.ts`).
 
 #### OperandStructure.rational?
 
@@ -3634,9 +3886,27 @@ non-finite literal.
   `parameters`: `ReadonlyArray`\<\{
      `name`: `string`;
      `annotated`: [`Type`](#type-3);
+     `rest`: `boolean`;
     \}\>;
   `body`: [`OperandStructure`](#operandstructure);
  \}
+
+#### OperandStructure.parameters
+
+```ts
+parameters: ReadonlyArray<{
+  name: string;
+  annotated: Type;
+  rest: boolean;
+}>;
+```
+
+One entry per parameter operand, in order. `rest` marks the REST
+parameter (`(a, ...rest) => …`): it is always the last entry, it
+takes no annotation, and it binds a tuple of every argument from its
+own position onwards rather than occupying one positional slot. A
+consumer reading arity must therefore treat the entries before it as
+the required count and admit any number after.
 
 \{
   `kind`: `"tuple"`;
@@ -3842,11 +4112,7 @@ It answers `undefined` for an unknown operator.
 ### OperatorTypeHandlerOnTypes {#operatortypehandlerontypes}
 
 ```ts
-type OperatorTypeHandlerOnTypes = (operands, context) => 
-  | Type
-  | TypeString
-  | BoxedType
-  | undefined;
+type OperatorTypeHandlerOnTypes = (operands, context) => BoxedType | undefined;
 ```
 
 The `type` handler of an operator definition: a function of operand
@@ -3856,6 +4122,10 @@ state-purity contract of
 `docs/plans/2026-08-22-type-handlers-on-types.md`. Under test, and with
 `CE_TYPE_PURITY_GUARD` set elsewhere, a handler that writes engine state
 throws.
+Return a `BoxedType` (for example `context.engine.type('real')`), or
+`undefined` to use the declared signature. Numeric literal cargo in a
+boxed result is widened at the application boundary; intentional ranges
+remain intact. Built-ins use `BoxedType.forResult()` to share that work.
 
 </MemberCard>
 
@@ -3902,8 +4172,12 @@ examples: string | string[];
 
 A list of examples of how to use this symbol or operator.
 
-Each example is a string, which can be a MathJSON expression or LaTeX, bracketed by `$` signs.
-For example, `["Add", 1, 2]` or `$\\sin(\\pi/4)$`.
+Each example is one line of Epsil source — `Rationalize(1.75)` — that
+evaluates on a fresh engine to a value worth showing. A trailing `//`
+comment is allowed and is replaced by the value the example evaluates
+to when the standard-library page is generated
+(`scripts/build-library-docs.ts`); that page executes every example, so
+one that stops evaluating fails the documentation build.
 
 </MemberCard>
 
@@ -4583,7 +4857,8 @@ type: BoxedType;
 The type known in the CURRENT state: declaredType narrowed by
 everything the assumptions in force prove about this definition. Reading
 it is what makes a fact visible; nothing derived from it may be STORED
-(see declaredType).
+(see declaredType). Writing it reports a `type-write` state
+event, so cached results that read this type are computed again.
 
 </MemberCard>
 
@@ -4987,6 +5262,21 @@ The eager producer's element count — see the `elementCount` contract on
 
 <MemberCard>
 
+##### BoxedOperatorDefinition.inferOperandTypes? {#inferoperandtypes}
+
+```ts
+optional inferOperandTypes?: (ops, requirement) => 
+  | readonly (Type | undefined)[]
+  | undefined;
+```
+
+Use-driven element inference — see the `inferOperandTypes` contract on
+[OperatorDefinition](#operatordefinition).
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedOperatorDefinition.canonical? {#canonical}
 
 ```ts
@@ -5186,6 +5476,131 @@ neq: (a, b) => boolean | undefined;
 ```ts
 type Hold = "none" | "all" | "first" | "rest" | "last" | "most";
 ```
+
+</MemberCard>
+
+## Host Capabilities
+
+### ConsoleHandler {#consolehandler}
+
+The host console, as the engine sees it: the implementation behind the
+`console` effect label. The `Print` operator calls `log`; the `Input`
+operator calls `readLine`.
+
+<MemberCard>
+
+##### ConsoleHandler.log() {#log}
+
+```ts
+log(line): void
+```
+
+Write one line of text. The line has no trailing newline; the handler
+adds the line break its output medium needs.
+
+####### line
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ConsoleHandler.readLine() {#readline}
+
+```ts
+readLine(prompt?): string | null | undefined
+```
+
+Read one line of text, synchronously. `prompt`, when given, is displayed
+before the read.
+
+The three results are distinct:
+- a string: the line, without its trailing newline;
+- `null`: end of input, or the user canceled the read — `Input`
+  evaluates to `Nothing`;
+- `undefined`: this host has no interactive input — `Input` stays
+  unevaluated.
+
+####### prompt?
+
+`string`
+
+</MemberCard>
+
+### EntropyHandler {#entropyhandler}
+
+The unseeded source of randomness of the host: the implementation behind
+the `entropy` effect label. `RandomExpression` draws from it, and so does
+every random operator (`Random`, `Shuffle`, `RandomChoice`, …) when it is
+evaluated OUTSIDE a `WithRandomSeed` frame — inside a frame the draws come
+from the seeded, deterministic stream and this handler is not consulted.
+
+<MemberCard>
+
+##### EntropyHandler.random() {#random}
+
+```ts
+random(): number
+```
+
+Return a uniformly distributed number in `[0, 1)`.
+
+</MemberCard>
+
+### EffectHandlers {#effecthandlers}
+
+The host capabilities of an engine: one handler for each capability the
+library operators can reach. This is the value of `ce.effects`.
+
+A handler is either an implementation or **`null`**. `null` is a denial:
+an operator that needs the capability evaluates to an
+`Error("capability-denied", …)` value instead of reaching the host.
+
+The object is immutable. To change a handler, install a new registry:
+assign `ce.effects`, or call `ce.withEffects()` for a change that lasts for
+one callback.
+
+Only `console` and `entropy` have a handler today, because the console
+operators and the random operators are the only library operators that
+reach a host capability. The other capability labels of the effect system
+(`network`, `fs_read`, `fs_write`, `time`, `environment`) get a handler when
+the first operator that needs one is added: a handler that no operator
+reads would accept an override and silently do nothing.
+
+<MemberCard>
+
+##### EffectHandlers.console {#console}
+
+```ts
+readonly console: ConsoleHandler | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### EffectHandlers.entropy {#entropy}
+
+```ts
+readonly entropy: EntropyHandler | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+### EffectHandlerOverrides {#effecthandleroverrides}
+
+```ts
+type EffectHandlerOverrides = { readonly [K in keyof EffectHandlers]?: EffectHandlers[K] };
+```
+
+A partial change to the host capabilities, for `ce.withEffects()` and the
+`ce.effects` setter. For each capability:
+- an implementation replaces the current handler;
+- `null` denies the capability, even when the default handler exists;
+- an absent key, or `undefined`, keeps the current handler.
 
 </MemberCard>
 
@@ -5855,6 +6270,7 @@ type ParseLatexOptions = NumberFormat & {
   skipSpace: boolean;
   parseNumbers: "auto" | "rational" | "decimal" | "never";
   resolveSymbol: (symbol) => SymbolResolution | undefined;
+  resolveApplication: (context) => "apply" | "multiply" | undefined;
   parseUnexpectedToken: (lhs, parser) => MathJsonExpression | null;
   preserveLatex: boolean;
   diagnostics: boolean;
@@ -5926,13 +6342,37 @@ a symbol declared with an `unknown` type is still declared (return
 `{ type: 'unknown' }` for it), which is distinct from returning
 `undefined`.
 
-Through `ce.parse()` this handler *supplements* the engine scope: it is
-consulted first, and a symbol it does not resolve (`undefined`) falls
-back to the scope's definitions. Use it to inject knowledge the scope
-cannot have yet — e.g. names a later pass of a multi-pass document load
-will declare.
+Lexical bindings and explicit engine declarations take precedence. This
+handler supplies facts for names without an authoritative declaration;
+speculative types inferred from earlier uses do not suppress it.
+Answers are cached by name for a single parse. Use `resolveApplication`
+for notation choices that depend on an occurrence's syntax or position.
+
+Supplied facts belong to the resulting expression: they are retained for
+deferred canonicalization, including per-call handlers, without declaring
+symbols in the caller's scope. Changing a handler later does not change
+the meaning of an already parsed expression.
 
 The `symbol` argument is a [valid symbol](#symbols).
+
+#### ParseLatexOptions.resolveApplication?
+
+```ts
+optional resolveApplication?: (context) => "apply" | "multiply" | undefined;
+```
+
+Interpret an unresolved symbol followed by parentheses.
+
+Called after structural parsing for heads without an authoritative type.
+Explicit declarations, external symbol facts and lexical parameters take
+precedence. Return `undefined` to retain the usual notation heuristics.
+Return `apply` or `multiply` to commit an occurrence's reading without
+declaring its head. The decision is retained in raw MathJSON and survives
+later canonicalization, including when this handler is supplied per-call.
+
+This is a pure syntax policy, not a definition recognizer: a host that uses
+`=` for definitions should discover headers and declare them before parsing
+bodies. The hook is not called for bare juxtaposition or square brackets.
 
 #### ParseLatexOptions.parseUnexpectedToken
 
@@ -6130,6 +6570,7 @@ resolveSymbol(id):
   | {
   type: BoxedType;
   subscriptEvaluate: boolean;
+  inferred: boolean;
  }
   | undefined
 ```
@@ -6139,7 +6580,7 @@ The single symbol oracle: everything the parser knows about `id`.
 Merges (in priority order) parser-local bindings — sum indices, `Block`/
 `Function` parameters, tracked in the parser's symbol table — over the
 [ParseLatexOptions.resolveSymbol](#parselatexoptions) handler (which `ce.parse()` wires
-to consult per-call/engine-wide handlers first, then the engine scope).
+to consult explicit engine declarations before external handlers).
 
 Returns `undefined` if `id` is undeclared. A declared symbol always gets
 a record — declaration *presence* is the `!== undefined` check, distinct
@@ -6312,7 +6753,7 @@ was expected.
 
 <MemberCard>
 
-##### Parser.sourceOffsets() {#sourceoffsets}
+##### Parser.sourceOffsets() {#sourceoffsets-1}
 
 ```ts
 sourceOffsets(startToken, endToken?): [number, number]
@@ -8515,6 +8956,32 @@ A prototype-free [SymbolTable.ids](#ids) map — see the note there.
 
 <MemberCard>
 
+### ApplicationContext {#applicationcontext}
+
+```ts
+type ApplicationContext = {
+  head: MathJsonSymbol;
+  arguments: ReadonlyArray<MathJsonExpression>;
+  sourceOffsets: readonly [number, number];
+  headSourceOffsets: readonly [number, number];
+  ancestors: ReadonlyArray<{
+     operator: MathJsonSymbol;
+     operandIndex: number;
+    }>;
+};
+```
+
+A syntactically ambiguous symbol followed by parentheses.
+
+The arguments and ancestry describe the parsed structure, not LaTeX tokens.
+Source offsets are half-open UTF-16 offsets in normalized LaTeX, as for parse
+diagnostics. Ancestry runs from the outermost expression to the nearest
+parent, with one-based operand indices; it includes written Delimiters.
+
+</MemberCard>
+
+<MemberCard>
+
 ### OperatorDefinition {#operatordefinition}
 
 ```ts
@@ -8542,6 +9009,9 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   collection: CollectionHandlers;
   canEnumerate: (expr) => boolean | undefined;
   elementCount: (expr) => number | undefined;
+  inferOperandTypes: (ops, requirement) => 
+     | ReadonlyArray<Type | undefined>
+     | undefined;
 };
 ```
 
@@ -8948,6 +9418,40 @@ Contract, mirroring `canEnumerate`:
 Consulted only when the definition has no `collection.count` handler —
 a declared `count` owns the answer, including its `undefined`.
 
+#### OperatorDefinition.inferOperandTypes?
+
+```ts
+optional inferOperandTypes?: (ops, requirement) => 
+  | ReadonlyArray<Type | undefined>
+  | undefined;
+```
+
+Use-driven element inference. Called when a type REQUIREMENT reaches
+an application of this operator: its result is an operand of a typed
+parameter (`k(xs[1])` with `k: (integer) -> integer` requires
+`integer`) or of an arithmetic operator, which requires a scalar
+numeric result (`xs[1] + 1` requires `real`). The handler answers the
+type each OPERAND must have for the result to satisfy the requirement:
+one entry per operand, `undefined` where that operand learns nothing,
+or `undefined` for the whole call to decline.
+
+The engine writes each entry onto the operand through the ordinary
+inference path, so only an operand whose type is inferred (or still
+unknown) moves, a declared type never does, and an operand that is
+itself an application forwards to its own operator's handler
+(`m[1][2] + 1` reaches `m`). A `widen` never reaches the handler: it
+carries a result possibility, not a constraint on the operands.
+
+Only a VALUE requirement reaches the handler: never `any`, `unknown`,
+`value`, `nothing`, an absence marker alone, or a function type. An
+absence arm (`real | missing`) is stripped before the call.
+
+`At` answers `dictionary<r> | indexed_collection<r>` for its base and
+`First`/`Second`/`Third`/`Last` answer `indexed_collection<r>`. The
+scalar reading is written on purpose: `xs[1] + 1` requires `number`
+of the element, exactly as `x + 1` infers a bare `x` as `number`.
+Design and rulings: `docs/INFERENCE_ROADMAP.md` §5.
+
 </MemberCard>
 
 <MemberCard>
@@ -9209,6 +9713,31 @@ Conformances are add-only (monotone); only their implementations replace.
 
 <MemberCard>
 
+### SumConformanceRecord {#sumconformancerecord}
+
+```ts
+type SumConformanceRecord = {
+  sum: string;
+  impl: Record<string, Expression | JSImplementation>;
+  block: Expression;
+};
+```
+
+A whole-SUM conformance, as the author wrote it: `type shape is Area { … }`
+where `shape` is a sum type (user ruling of 2026-09-22).
+
+The statement itself registers one ordinary edge per variant — a sum names a
+transparent alias of its variants, and an alias cannot conform — so this
+record is bookkeeping, not an edge: it is what lets a variant the sum gains
+in a LATER batch receive the same implementation block. The block is kept as
+the author wrote it, BEFORE `Self` is bound: each variant's edge substitutes
+`Self` with its own target, so the substituted block of one variant is the
+wrong body for another.
+
+</MemberCard>
+
+<MemberCard>
+
 ### ProtocolRecord {#protocolrecord}
 
 ```ts
@@ -9217,6 +9746,7 @@ type ProtocolRecord = {
   members: Record<string, ProtocolMember>;
   conformances: ConformanceRecord[];
   declaredByStatement: boolean;
+  _sumConformances: SumConformanceRecord[];
   _declOrigin: DeclarationOrigin;
 };
 ```
@@ -9680,6 +10210,41 @@ A list of the function calls to the current evaluation context
 
 <MemberCard>
 
+##### IComputeEngine.effects {#effects-2}
+
+```ts
+get effects(): EffectHandlers
+set effects(handlers: EffectHandlerOverrides): void
+```
+
+The host capabilities of this engine: the handlers the library operators
+use to reach the host. `Print` and `Input` use `effects.console`.
+
+The registry is an immutable object. Reading returns the registry that a
+new evaluation would use. Assigning installs a new registry: the assigned
+object is a COMPLETE description — a handler it does not mention returns
+to its default, so `ce.effects = {}` restores every default. A `null`
+handler denies the capability: an operator that needs it evaluates to an
+`Error("capability-denied", …)` value.
+
+```ts
+const lines: string[] = [];
+ce.effects = {
+  console: { log: (line) => lines.push(line), readLine: () => undefined },
+};
+```
+
+Each evaluation (`evaluate()`, `N()`, `evaluateAsync()`) uses the registry
+that was installed when it started. An assignment does not change the
+handlers of an evaluation that is already running.
+
+For a change that must last for one block of code only, use
+[`withEffects`](#witheffects).
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.precision {#precision}
 
 ```ts
@@ -9860,6 +10425,51 @@ that point runs **outside** the deadline and is never cancelled (see
 
 <MemberCard>
 
+##### IComputeEngine.withEffects() {#witheffects}
+
+```ts
+withEffects<T>(overrides, fn): T
+```
+
+Run `fn` with some host capabilities replaced or denied, then put the
+previous ones back. Evaluations that START inside `fn` use the changed
+registry.
+
+`overrides` is applied on top of the registry in effect when
+`withEffects` is called, so calls nest: a capability an inner call does
+not mention keeps the handler of the outer call. A `null` value denies the
+capability, even if it has a default handler — this is how to evaluate an
+expression that is not trusted:
+
+```ts
+const result = ce.withEffects({ console: null }, () => expr.evaluate());
+```
+
+The previous registry is put back when `fn` returns or throws. If `fn`
+returns a promise, it is put back when that promise settles (fulfilled or
+rejected), and `withEffects` returns a promise that settles the same way.
+
+An asynchronous evaluation keeps the registry it started with, so an
+evaluation that started BEFORE `withEffects` was called is not changed by
+it. But while the promise of an asynchronous `fn` is pending, the changed
+registry is the installed one: an unrelated evaluation that starts during
+that time, from other code, also uses it. Start such evaluations before
+calling `withEffects`, or use a separate engine.
+
+• T
+
+####### overrides
+
+[`EffectHandlerOverrides`](#effecthandleroverrides)
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.chop() {#chop}
 
 ###### chop(n)
@@ -9945,6 +10555,59 @@ box(expr, options?): Expression
 ###### Deprecated
 
 Use `expr()` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.rebind() {#rebind}
+
+```ts
+rebind(expr, options?): Expression
+```
+
+Rebuild `expr` as if `ce.expr(expr.json, { form, scope })` had been
+called — every symbol resolves afresh in `scope` (or the current scope)
+— without serializing `expr` to MathJSON.
+
+`ce.expr(expr, { scope })` on an already-boxed expression keeps the
+bindings the expression was boxed with; it never re-resolves a symbol.
+This is the operation that does. Use it when an expression built under
+one set of declarations must be read under another: a body boxed in a
+shadow scope, a row re-classified after a declaration changed.
+
+For the canonical and partial forms the MathJSON is built as a DAG — one
+array per DISTINCT function node, shared by every parent that reads it
+(a leaf contributes its own constant-size MathJSON) — where
+`expr.json` writes a tree, one copy of a shared node per path. That
+MathJSON is then boxed by the ordinary route, so the result matches
+`ce.expr(expr.json, …)` by construction, including for an expression
+that already holds an `Error` node. Canonical boxing still visits every
+path, as it does for any MathJSON. The raw and structural forms
+canonicalize nothing, so each distinct node is rebuilt once and a shared
+sub-expression stays shared in the result as well.
+
+- `form`: `'canonical'` (default), `'structural'`, `'raw'`, or a
+  partial form such as `['Flatten', 'Order']`.
+- `scope`: the lexical scope the rebuild resolves and declares in.
+
+Verbatim LaTeX and source positions are dropped, as the MathJSON route
+drops them. A mutable object is rebuilt as its record snapshot, as that
+route boxes it.
+
+####### expr
+
+[`Expression`](#expression-5)
+
+####### options?
+
+####### form?
+
+[`FormOption`](#formoption)
+
+####### scope?
+
+`Scope`
 
 </MemberCard>
 
@@ -10281,6 +10944,35 @@ tuple(...elements): Expression
 ####### elements
 
 ...readonly [`Expression`](#expression-5)[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.list() {#list}
+
+```ts
+list(values): Expression
+```
+
+A `List` of numbers, built without boxing each element.
+
+The elements are copied into a frozen array of machine numbers that the
+list keeps as its store: `count`, `at`, `type`, `isSame` and `array`
+answer from it, and the boxed operands are built only if `ops` is read.
+The result is an ordinary canonical `List` in every other respect.
+
+`values` may be a `number[]`, a `Float64Array` or any array-like of
+numbers. Its `length` must be a non-negative safe integer and each
+element a JS number; anything else throws a `TypeError`. `-0` is stored
+as `+0`.
+
+Use it to hand a large numeric list to the engine cheaply, and read it
+back with `expr.array`.
+
+####### values
+
+`ArrayLike`\<`number`\>
 
 </MemberCard>
 
@@ -10698,6 +11390,9 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `inferOperandTypes`: (`ops`, `requirement`) => 
+     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -10769,6 +11464,9 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `inferOperandTypes`: (`ops`, `requirement`) => 
+     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| `undefined`;
  \}\>\>
   \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
 
@@ -11746,6 +12444,49 @@ The contract:
 
 <MemberCard>
 
+##### Expression.digest {#digest}
+
+```ts
+readonly digest: string;
+```
+
+A 128-bit digest of this expression's **serialized structure** — the
+MathJSON `.json` writes — as 32 hexadecimal characters: an **in-memory
+cache key** that needs no compare on hit, computed without writing the
+MathJSON out.
+
+It replaces `JSON.stringify(expr.json)` as a key, and keys the same
+way: two expressions digest alike exactly when their MathJSON is the
+same tree (a collision between two distinct trees is not expected in
+practice — 128 bits from a non-cryptographic mixer, on the engine's own
+serializations), with two deliberate exceptions where the digest is
+coarser than the text — a dictionary's entry order does not enter it,
+and a character digests like the one-cluster string with the same
+content, as the two are the same value.
+
+It is therefore **not an `isSame` key**, in both directions, and
+`hash` remains the `isSame` companion:
+- two symbols of the same name digest alike whatever they are bound to
+  (a symbol serializes as its name), even when `isSame` — which reads
+  binding identity — says they differ;
+- the exact rational `1/2` and the float `0.5` are `isSame` but
+  serialize apart, and digest apart.
+
+- **Cost**: memoized per node, so it is linear in the DISTINCT nodes of
+  the expression — except at and above a mutable object, whose record
+  snapshot is read fresh like `.json`, so a store to it is seen by every
+  node that contains it. `JSON.stringify(expr.json)` is
+  linear in the PATHS, which on a value that shares its sub-expressions
+  is exponential in the depth.
+- **Stability**: deterministic within a release, across engine
+  instances and processes. **Not stable across releases** and not
+  cryptographic: never persist it, never use it to authenticate.
+- **Bound variables**: folds bound-variable names, as the MathJSON does.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### Expression.engine {#engine-1}
 
 ```ts
@@ -11879,7 +12620,7 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 
 <MemberCard>
 
-##### Expression.sourceOffsets? {#sourceoffsets-1}
+##### Expression.sourceOffsets? {#sourceoffsets-2}
 
 ```ts
 optional sourceOffsets?: [number, number];
@@ -12038,7 +12779,7 @@ effect channel: "no impurity label in `effectsOf(expr)`" (see
 
 <MemberCard>
 
-##### Expression.effects {#effects-2}
+##### Expression.effects {#effects-4}
 
 ```ts
 readonly effects: 
@@ -13395,6 +14136,64 @@ body — tuple, string and fixed-shape branches enumerate too), or
 
 <MemberCard>
 
+##### Expression.array {#array-1}
+
+```ts
+readonly array: readonly number[] | undefined;
+```
+
+The elements of a `List` as plain machine numbers, or `undefined`.
+
+Defined for a `List` whose every element is a machine number: an
+integer, a finite double, an infinity or `NaN`. A list built by
+`ce.list()` answers its own frozen array without boxing an element; an
+ordinary list answers a frozen array computed once from its elements.
+An element that is not a machine number — an exact rational such as
+`1/3`, a radical, a bignum with more digits than a double holds, a
+complex number, a symbol, a nested list — makes the answer `undefined`:
+the value is never approximated. Evaluate with `.N()` first to get the
+floats of an exact list.
+
+The array is frozen. It may be passed as is into a compiled function's
+argument bag.
+
+:category: Collections
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isMachineNumeric {#ismachinenumeric}
+
+```ts
+readonly isMachineNumeric: boolean;
+```
+
+Does `array` reproduce this expression, exactness included?
+
+For a `List`: `true` when `array` is defined and `ce.list(expr.array)`
+is this list element for element, as the interpreter computes with it.
+A list built by `ce.list()` answers `true` in constant time. An
+ordinary list answers `true` when every element is a float or an
+integer a double holds, and `false` when some element is an exact
+non-integer such as the rational `1/2`: `array` admits it, since a
+double holds `0.5` with no rounding, but re-boxing `0.5` gives a float,
+which computes as one (`0.5 / 3` is `0.1666…` where `1/2 ÷ 3` is
+`1/6`). A consumer that must keep exact values exact takes `array` only
+when this is `true`.
+
+For a number: `true` when the number is a float, an integer a double
+holds, `NaN` or an infinity; `false` for an exact non-integer, a
+radical or a complex number.
+
+`false` for every other expression.
+
+:category: Collections
+
+</MemberCard>
+
+<MemberCard>
+
 ##### Expression.isIndexedCollection {#isindexedcollection}
 
 ```ts
@@ -14407,6 +15206,7 @@ controlled by the `notation` / `avoidExponentsInRange` options.
 ```ts
 type JsonSerializationOptions = {
   prettify: boolean;
+  inferredAnnotations: boolean;
   exclude: string[];
   shorthands: ("all" | "number" | "symbol" | "function" | "string" | "dictionary")[];
   metadata: ("all" | "wikidata" | "latex" | "sourceOffsets")[];
@@ -15696,7 +16496,7 @@ static setInteger: BoxedType;
 ##### BoxedType.type {#type}
 
 ```ts
-type: Type;
+readonly type: Type;
 ```
 
 </MemberCard>
@@ -15716,6 +16516,14 @@ Computed ONCE, here, at construction: every per-call dispatch check
 (argument validation, result typing) reads this boolean and is O(1) — it
 must never become a tree walk. Polytypes are legal only as signatures, so
 the computation itself is a shallow field test.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.facts {#facts}
+
+Lazily shared facts of this type, independent of any expression.
 
 </MemberCard>
 
@@ -15772,6 +16580,141 @@ ce.type('number').effects;                 // ➔ undefined
 <MemberCard>
 
 ##### BoxedType.isUnknown {#isunknown}
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.from() {#from}
+
+```ts
+static from(type, resolver?): BoxedType
+```
+
+Box an ordinary type, sharing immutable type values within a resolver.
+
+####### type
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+
+####### resolver?
+
+[`TypeResolver`](#typeresolver)
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.forResult() {#forresult}
+
+###### forResult(type, resolver)
+
+```ts
+static forResult(type, resolver?): undefined
+```
+
+A type-handler result: widen numeric literal cargo to its stored tier,
+retaining intentional ranges and resolver context. Undefined declines.
+Normalization is shared only for immutable input types.
+
+####### type
+
+`undefined`
+
+####### resolver?
+
+[`TypeResolver`](#typeresolver)
+
+###### forResult(type, resolver)
+
+```ts
+static forResult(type, resolver?): BoxedType
+```
+
+A type-handler result: widen numeric literal cargo to its stored tier,
+retaining intentional ranges and resolver context. Undefined declines.
+Normalization is shared only for immutable input types.
+
+####### type
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+
+####### resolver?
+
+[`TypeResolver`](#typeresolver)
+
+###### forResult(type, resolver)
+
+```ts
+static forResult(type, resolver?): BoxedType | undefined
+```
+
+A type-handler result: widen numeric literal cargo to its stored tier,
+retaining intentional ranges and resolver context. Undefined declines.
+Normalization is shared only for immutable input types.
+
+####### type
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+  \| `undefined`
+
+####### resolver?
+
+[`TypeResolver`](#typeresolver)
 
 </MemberCard>
 

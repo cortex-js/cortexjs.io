@@ -21,7 +21,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 $$\gcd(p, q)=1$$
 
-**Holds when** $p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q$.
+**Holds when** $p\in\mathbb{P}\land q\in\mathbb{P}\land p\ne q$.
 Used by the Compute Engine for simplification.
 [`062423` · Fungrim entry ↗](https://fungrim.org/entry/062423)
 
@@ -158,7 +158,7 @@ Used by the Compute Engine for expansion.
 
 $$\gcd(p^{m}, q^{n})=1$$
 
-**Holds when** $p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q\land m\in\N\land n\in\N$.
+**Holds when** $p\in\mathbb{P}\land q\in\mathbb{P}\land p\ne q\land m\in\N\land n\in\N$.
 Used by the Compute Engine for simplification.
 [`499cfc` · Fungrim entry ↗](https://fungrim.org/entry/499cfc)
 
@@ -236,7 +236,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a, a-2)=\frac{1}{2}(\vert a(a-2)\vert(1+\frac{1-(-1)^{a}}{2}))$$
+$$\lcm(a, a-2)=\frac{1}{2}(\vert a\times(a-2)\vert(1+\frac{1-(-1)^{a}}{2}))$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -414,7 +414,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a, a-1)=a(a-1)$$
+$$\lcm(a, a-1)=a\times(a-1)$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -473,7 +473,7 @@ Used by the Compute Engine for simplification.
 
 ## Prime numbers
 
-$$\mathrm{PrimePi}(x)=\mathrm{Count}(\mathrm{Filter}(\mathrm{Primes}, p\mapsto p\le x))$$
+$$\mathrm{PrimePi}(x)=\mathrm{Count}(\mathrm{Filter}(\mathbb{P}, p\mapsto p\le x))$$
 
 **Holds when** $x\in\R$.
 Used by the Compute Engine for simplification.
@@ -517,7 +517,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{Totient}(p^{k})=p^{k-1}(p-1)$$
 
-**Holds when** $p\in\mathrm{Primes}\land k\in\N^*$.
+**Holds when** $p\in\mathbb{P}\land k\in\N^*$.
 Used by the Compute Engine for simplification.
 [`1d731f` · Fungrim entry ↗](https://fungrim.org/entry/1d731f)
 
@@ -557,7 +557,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Totient}(p)=p-1$$
 
-**Holds when** $p\in\mathrm{Primes}$.
+**Holds when** $p\in\mathbb{P}$.
 Used by the Compute Engine for simplification.
 [`cb410e` · Fungrim entry ↗](https://fungrim.org/entry/cb410e)
 

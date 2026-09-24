@@ -82,17 +82,18 @@ The conforming type must be a **named, concrete type**: a built-in
 type](/types/#nominal-type). A union, an anonymous tuple or
 record shape, or a `type alias` name cannot conform
 (`protocol-conformance-target-invalid`) — wrap the shape in a nominal type
-first. A new nominal type can declare its conformance in the same
-statement:
+first. A sum type is the one exception, and it is a spelling, not a new
+kind of conformer: see [Conforming a sum type](#conforming-a-sum-type). A
+new nominal type can declare its conformance in the same statement:
 
 ```epsil-live
 protocol Area { function area(self: Self) -> number }
 
 type Circle = tuple<radius: number> is Area {
-  function area(self: Circle) -> number { Pi * self.radius^2 }
+  function area(self: Circle) -> number { pi * self.radius^2 }
 }
 
-area(Circle(1)) == Pi
+area(Circle(1)) == pi
 // ➔ True
 ```
 
@@ -111,6 +112,50 @@ is `protocol-signature-mismatch`. Parameter types may be *wider* than the
 requirement and the result *narrower*; parameter names are not significant
 for matching. Implementing the same protocol twice for one type in a single
 program is `protocol-implementation-duplicate`; a later run replaces.
+
+### Conforming a sum type {#conforming-a-sum-type}
+
+A sum type (`type light = red | green | yellow`) is a name for the union of
+its variants, and a union cannot conform. Write the conformance for the sum
+anyway: it declares the conformance once **for each variant**, with the
+same implementation block, and `Self` is that variant in each of them. It
+is the same as writing the block once per variant:
+
+```epsil-live
+protocol Area { function area(self: Self) -> number }
+
+type shape = circle(r: number) | square(s: number)
+
+type shape is Area {
+  function area(self: Self) -> number {
+    match self {
+      circle(r) => 3 * r * r
+      square(s) => s * s
+    }
+  }
+}
+
+area(square(3))
+// ➔ 9
+```
+
+Because the conformance is per variant, dispatch is unchanged: a value of
+any variant finds the implementation, and each variant may still be given
+its own block instead.
+
+Three rules follow from that:
+
+- If a variant already has its own implementation of the protocol, the sum
+  block is a second implementation of that variant:
+  `protocol-implementation-duplicate`, naming the variant. Nothing is
+  registered — the sum spelling is all or nothing.
+- A variant the sum gains **later** — a second `type shape = … | triangle`
+  statement in a later program or notebook cell — is given the same
+  implementation as it is declared.
+- A generic sum (`type tree<T> = leaf | node(value: T, kids: list<tree<T>>)`)
+  cannot be written this way: each variant is declared with only the type
+  parameters its own payload uses, so there is no one spelling that fits
+  every variant. Write the conformance for each variant.
 
 ## Calling a protocol function
 
@@ -166,7 +211,7 @@ function is expected:
 protocol Negatable { function negated(self: Self) -> Self }
 type number is Negatable { function negated(self) -> number { -self } }
 
-Map(Negatable.negated, [1, 2, 3])
+map(Negatable.negated, [1, 2, 3])
 // ➔ [-1, -2, -3]
 ```
 
@@ -175,6 +220,53 @@ functions in both spellings, and the call dispatches on the argument bound
 to the declared first parameter wherever it is written:
 `tag(prefix: "n", self: 5)` and `Tagged.tag(prefix: "n", self: 5)` both
 dispatch on `5`.
+
+### The dot form: `c.area()` {#dot-call}
+
+A protocol function can also be called **with the dot**, the value first:
+`c.area()` is exactly `area(c)`, and `c.scale(2)` is `scale(c, 2)`. The
+value before the dot becomes the first argument, which is the argument the
+call dispatches on. Because any expression can be the receiver, calls
+chain from left to right:
+
+```epsil-live
+protocol Shape {
+  function area(self: Self) -> number
+  function scale(self: Self, k: number) -> Self
+}
+type Circle = tuple<r: number> is Shape {
+  function area(self: Circle) -> number { pi * self.r^2 }
+  function scale(self: Circle, k: number) -> Circle { Circle(self.r * k) }
+}
+
+let c = Circle(1)
+(c.area(), c.scale(2).area(), c.scale(k: 2))
+// ➔ (pi, 4pi, Circle(2))
+```
+
+The parentheses are what make the dot a call. Without them, `c.area` is a
+field or [property](#properties) read, and on a `function` member it is
+the `protocol-function-not-a-field` error; `c.area` is never a function
+value that remembers `c`. And the dot reaches **members** only: a field, a
+property, or a protocol function. A library function or a plain function is
+not a member of anything, so `xs.Sort()` is the error
+`dot-call-not-a-protocol-function`; write `sort(xs)`, or chain such calls
+with the [pipe](/operators/#pipe), `xs |> sort |> reverse`.
+
+Two details follow from the rest of the language. A field the receiver's
+type declares wins over a protocol function of the same name, so on a
+record or object whose field `f` holds a function, `v.f(2)` still calls the
+stored function. And a number literal never takes a dot (`5.name()` reads as
+`5.` followed by `name()`, the same rule that makes `2.x` a multiplication):
+bind the number to a name first.
+
+When two protocols the type conforms to declare the same member, the bare
+call and the dot form are both `protocol-call-ambiguous`; the qualified
+dot form names the protocol: `c.(Shape.area)()`. And because the dot names
+a member, it reaches the protocol even when a definition of your own has
+taken the bare name (see [above](#when-the-bare-name-is-taken-qualify)):
+with your own `area` in scope, `area(c)` calls yours and `c.area()` still
+calls the protocol's.
 
 ## Properties
 
@@ -270,7 +362,7 @@ type integer is Summable { function total(self) -> number { self } }
 
 type list<T> is Summable where T is Summable {
   function total(self: list<T>) -> number {
-    Reduce(self, (acc, x) => acc + total(x), 0)
+    reduce(self, (acc, x) => acc + total(x), 0)
   }
 }
 
@@ -293,7 +385,7 @@ inferred from its body instead:
 protocol Summable { function total(self: Self) -> number }
 
 type list<T> is Summable where T: number {
-  function total(self: Self) pure -> number { Sum(self) }
+  function total(self: Self) pure -> number { sum(self) }
 }
 ```
 
