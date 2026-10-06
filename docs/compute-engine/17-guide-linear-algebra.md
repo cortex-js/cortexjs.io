@@ -483,6 +483,10 @@ ce.expr(['Norm', ['List', 3, 4], 3]).evaluate();
 ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
 // → √30 ≈ 5.477
 
+// Spectral norm (order 2): the largest singular value
+ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 2]).evaluate();
+// → √(15 + √221) ≈ 5.465
+
 // L1 norm: max column sum = max(4, 6) = 6
 ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 1]).evaluate();
 // → 6

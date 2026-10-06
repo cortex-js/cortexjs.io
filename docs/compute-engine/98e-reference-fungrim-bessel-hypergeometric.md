@@ -49,7 +49,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\doubleprime}(z)-z(C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z))=0$$
+$$z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\doubleprime}(z)-z\times(C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z))=0$$
 
 **Holds when** $z\in\C\land C\in\C\land D_{var}\in\C$.
 Used by the Compute Engine for simplification.
@@ -174,7 +174,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}((3z)/2^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}({(3z)/2^{1/3}}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -190,7 +190,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\nu}(z)=\frac{z(\operatorname{I}_{\nu-1}(z)-\operatorname{I}_{\nu+1}(z))}{2\nu}$$
+$$\operatorname{I}_{\nu}(z)=\frac{z\times(\operatorname{I}_{\nu-1}(z)-\operatorname{I}_{\nu+1}(z))}{2\nu}$$
 
 **Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -262,7 +262,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-(3z)/2^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-(3z)/2^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-{(3z)/2^{1/3}}^2)+\sqrt{3}\operatorname{Bi}(-{(3z)/2^{1/3}}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -279,7 +279,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z\times(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r\times(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -370,7 +370,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
+$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z\times(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r\times(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -378,7 +378,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\nu}(z)=-(\frac{z(\operatorname{K}_{\nu-1}(z)-\operatorname{K}_{\nu+1}(z))}{2\nu})$$
+$$\operatorname{K}_{\nu}(z)=-(\frac{z\times(\operatorname{K}_{\nu-1}(z)-\operatorname{K}_{\nu+1}(z))}{2\nu})$$
 
 **Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -435,7 +435,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\nu}(z)=\frac{z(\operatorname{Y}_{\nu-1}(z)+\operatorname{Y}_{\nu+1}(z))}{2\nu}$$
+$$\operatorname{Y}_{\nu}(z)=\frac{z\times(\operatorname{Y}_{\nu-1}(z)+\operatorname{Y}_{\nu+1}(z))}{2\nu}$$
 
 **Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -451,7 +451,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}((3z)/2^{1/3}^2)}{(3z)/2^{1/3}^2})$$
+$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}({(3z)/2^{1/3}}^2)}{{(3z)/2^{1/3}}^2})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -475,7 +475,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-(3z)/2^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-(3z)/2^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-{(3z)/2^{1/3}}^2)-\sqrt{3}\operatorname{Bi}(-{(3z)/2^{1/3}}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -483,7 +483,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{z(\operatorname{J}_{\nu-1}(z)+\operatorname{J}_{\nu+1}(z))}{2\nu}$$
+$$\operatorname{J}_{\nu}(z)=\frac{z\times(\operatorname{J}_{\nu-1}(z)+\operatorname{J}_{\nu+1}(z))}{2\nu}$$
 
 **Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -499,7 +499,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z\times(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r\times(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -507,7 +507,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-(3z)/2^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-(3z)/2^{1/3}^2)}{2(3z)/2^{1/3}^2}$$
+$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-{(3z)/2^{1/3}}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-{(3z)/2^{1/3}}^2)}{2{(3z)/2^{1/3}}^2}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -515,7 +515,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
+$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z\times(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r\times(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -556,7 +556,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}((3z)/2^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}({(3z)/2^{1/3}}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -891,7 +891,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F1}(a, b, c, z)=\mathrm{Hypergeometric2F1}(a^\star, b^\star, c^\star, z^\star)^\star$$
+$$\mathrm{Hypergeometric2F1}(a, b, c, z)=\overline{\mathrm{Hypergeometric2F1}(\overline{a}, \overline{b}, \overline{c}, \overline{z})}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -978,7 +978,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(z(1-z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F1}(a, b, c, z)=0$$
+$$(z\times(1-z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F1}(a, b, c, z)=0$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.

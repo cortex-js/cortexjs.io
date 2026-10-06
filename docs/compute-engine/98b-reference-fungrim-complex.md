@@ -42,7 +42,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Re(z)=\frac{z+z^\star}{2}$$
+$$\Re(z)=\frac{z+\overline{z}}{2}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -83,7 +83,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert z^\star\vert=\vert z\vert$$
+$$\vert\overline{z}\vert=\vert z\vert$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -129,7 +129,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(x+y\imaginaryI)^\star=x-y\imaginaryI$$
+$$\overline{x+y\imaginaryI}=x-y\imaginaryI$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -153,7 +153,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$zz^\star=\vert z\vert^2$$
+$$z\overline{z}=\vert z\vert^2$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -177,7 +177,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(z)=\frac{z-z^\star}{2\imaginaryI}$$
+$$\Im(z)=\frac{z-\overline{z}}{2\imaginaryI}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -249,7 +249,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI^\star=-\imaginaryI$$
+$$\overline{\imaginaryI}=-\imaginaryI$$
 
 Used by the Compute Engine for simplification.
 [`44ae4a` · Fungrim entry ↗](https://fungrim.org/entry/44ae4a)

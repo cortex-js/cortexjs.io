@@ -68,7 +68,7 @@ can be made directly executable with a hashbang:
 #!/usr/bin/env epsil
 
 let radius = 3
-Pi * radius^2
+pi * radius^2
 ```
 
 ## Options
@@ -78,24 +78,36 @@ Pi * radius^2
 | `-e`, `--eval <source>` | Evaluate Epsil source supplied on the command line. |
 | `--json` | Write the result as formatted [MathJSON](/implementation/), the representation Epsil programs are evaluated in. Finite lazy collections (`Range`, `Map` results, …) are materialized into their elements, up to 10,000. |
 | `--epsil` | Write the result as serialized Epsil source. |
+| `--fancy-symbols` | With `--epsil`, write the Unicode notations instead of the ASCII spellings: `√x` for `sqrt(x)`, `∛x` and `∜x` for cube and fourth roots, `x²` for `x ^ 2`, and `×`, `÷`, `−`, `≠`, `⩽`, `⩾`, `∈`, `⇒` for the operators. Every notation reads back to the same expression. |
 | `--diagnostics <fmt>` | Write diagnostics as `text` (the default) or as a `json` array. |
 | `--time-limit <ms>` | Set the evaluation deadline in milliseconds. The default is `10000`; `0` disables it. |
 | `--no-color` | Disable color in diagnostics. The [`NO_COLOR`](https://no-color.org/) environment variable is also honored. |
 | `-h`, `--help` | Display command help. |
 | `-v`, `--version` | Display the package version. |
 
-`--json` and `--epsil` are mutually exclusive. With neither option, results
-use the ordinary textual representation of a value.
+`--json` and `--epsil` are mutually exclusive, and `--fancy-symbols` requires
+`--epsil`. With neither output option, results use the ordinary textual
+representation of a value.
+
+```bash
+$ npx epsil --epsil -e 'Sqrt(2) * x^2'
+Sqrt(2) * x ^ 2
+$ npx epsil --epsil --fancy-symbols -e 'Sqrt(2) * x^2'
+√2 × x²
+```
 
 ## Checking a Program Without Evaluating It
 
 `epsil check` parses a program and reports its diagnostics — syntax errors,
-malformed strings, invalid type annotations, `match` shape problems, and the
+malformed strings, invalid type annotations, `match` shape problems (a
+`match` over a sum type that leaves a variant uncovered included), and the
 trap lints (`=` inside a call argument, a literal index `0`, a `//` comment
 that reads as floor division) — without evaluating anything. It also prepares
 the program to run (still without running it) and reports the problems that
-surface there — type errors such as `"a" + 1`, but also a wrong argument
-count — as `static-type-error` diagnostics anchored to the offending statement.
+surface there — type errors such as `"a" + 1`, a wrong argument count, or a
+call whose argument cannot satisfy a parameter annotation of the function it
+names (`let k = (n: integer) => n + 1` then `k(1.5)`) — as
+`static-type-error` diagnostics anchored to the offending statement.
 An `Error(…)` value the program itself builds is not reported: errors are
 values. It accepts the same source forms as evaluation: a file,
 `--eval`, or standard input.
@@ -133,6 +145,37 @@ $ npx epsil check --eval 'a+ b' --json
 are 1-based. A `fixits` entry is a replacement (`value`) for the source range
 `[start, end)`. The same structured form is available during evaluation with
 `--diagnostics json`, which writes the array to standard error.
+
+### Reporting the effects of each function
+
+With `--effects`, `check` also reports what the engine inferred about the
+**effects** of each top-level function the program defines — a `function`
+statement (any of its spellings), or a `let`/`const` whose value is written
+as a lambda. The report goes to standard output, one line per function:
+
+```shell
+$ npx epsil check --effects --eval 'function f(x) { Print(x); x + 1 }
+function g(x) pure { x * 2 }
+let k = x => Random() + x'
+f (line 1): console
+g (line 2): pure (declared)
+k (line 3): random
+```
+
+The labels are the [effect labels](/control-flow/#effect-specifiers) the body
+reaches (`console`, `random`, `state`, …), `pure` when there are none, and
+`any` when the body calls something the engine does not know, so nothing can
+be ruled out. `(declared)` marks a contract the author wrote on the
+definition (`pure`, `random`, …); the labels are then what the author
+promised, which the check has verified against the body. A multi-clause
+function is one entry, the union of its clauses, at the line of its first
+clause. Functions defined inside a block are not listed.
+
+With `--json`, the same report is the `effects` array of the envelope:
+`name`, `effects` (a list of labels, or `"any"`, or `null` when nothing could
+be inferred), `declared`, and the position of the name (`start`/`end`
+offsets, `line`/`column`). The MCP `check` tool accepts `"effects": true` for
+the same array.
 
 Because `check` does not evaluate, it does not report runtime problems —
 unknown-function suggestions, type mismatches at call sites, or error values.

@@ -142,11 +142,11 @@ and monitoring.
 
 | Tool        | Purpose                                                        |
 | :---------- | :------------------------------------------------------------- |
-| `evaluate`  | Run an Epsil program and return its value — as display text, Epsil source, and [MathJSON](/implementation/) — along with any diagnostics |
-| `check`     | Validate a program's syntax without evaluating it              |
+| `evaluate`  | Run an Epsil program and return its value — as display text, Epsil source, and [MathJSON](/implementation/) — along with any diagnostics; `fancySymbols: true` writes the Epsil source with the Unicode notations (`√x`, `x²`, `×`, `⩽`, …) |
+| `check`     | Validate a program without evaluating it; `effects: true` adds the inferred effects of each top-level function |
 | `doc`       | Look up a library function by name, or search the library by keywords |
 | `parse`     | Convert Epsil source to MathJSON                              |
-| `serialize` | Convert MathJSON to Epsil source                              |
+| `serialize` | Convert MathJSON to Epsil source; `fancySymbols: true` for the Unicode notations |
 
 The server also publishes the [language card for AI agents](/for-agents/)
 as a resource (`epsil://docs/for-agents`), and its setup instructions tell
@@ -161,7 +161,7 @@ mention Epsil if it doesn't reach for the tools on its own:
 - _"Use Epsil to compute the exact value of the sum of 1/k² for k from 1
   to 100."_
 - _"Solve x³ − 6x² + 11x − 6 = 0 exactly with Epsil."_
-- _"What does the Epsil function `Reduce` do?"_
+- _"What does the Epsil function `reduce` do?"_
 
 The assistant writes a small Epsil program, runs it with the `evaluate`
 tool, and reports the result — exact fractions, radicals, and symbolic

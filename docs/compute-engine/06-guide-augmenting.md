@@ -588,6 +588,124 @@ ce.box(["assertPure", ["Assign", "q", 1]]).evaluate();
 //                 "'an operand with scope effects'"]]
 ```
 
+### Host Capabilities: Redirecting and Denying Console I/O
+
+Some operators reach outside the engine. `Print` writes to the console and
+`Input` reads a line from the terminal or from the browser's `prompt()` dialog.
+They do not call the host directly: they use a **handler** that the engine
+holds in `ce.effects`, and your application can replace that handler or deny it.
+
+**To redirect console output and supply input**, assign a `console` handler:
+
+```js
+const lines = [];
+
+ce.effects = {
+  console: {
+    log: (line) => lines.push(line),
+    readLine: (prompt) => "Ada",
+  },
+};
+
+ce.box(["Print", "'Hello'", ["Add", 1, 2]]).evaluate();
+// lines ➔ ["Hello 3"]
+
+ce.box(["Input", "'Name? '"]).evaluate();
+// ➔ "Ada"
+```
+
+`log(line)` receives each printed line, without a trailing newline.
+`readLine(prompt)` is synchronous and returns one of three things:
+
+- a string: the line that was read;
+- `null`: end of input, or the user canceled. `Input` evaluates to `Nothing`;
+- `undefined`: this host has no interactive input. `Input` stays unevaluated.
+
+The registry is per engine, and an assignment is a complete description:
+`ce.effects = {}` puts the default handler back.
+
+**To deny a capability**, set its handler to `null`. The operator then
+evaluates to an error value and does not reach the host. It does not throw.
+
+```js
+ce.effects = { console: null };
+
+ce.box(["Print", "'secret'"]).evaluate();
+// ➔ ["Error", ["ErrorCode", "'capability-denied'", "'console'"]]
+```
+
+**To make a change for one block of code only**, use `ce.withEffects()`. The
+previous handlers come back when the callback returns or throws, and, when the
+callback returns a promise, when that promise settles. This is how to evaluate
+an expression you do not trust:
+
+```js
+const result = ce.withEffects({ console: null }, () => expr.evaluate());
+```
+
+Calls nest: a capability that an inner call does not mention keeps the handler
+of the outer call.
+
+Each evaluation uses the handlers that were installed **when it started**.
+Assigning `ce.effects` while an evaluation runs does not change that
+evaluation, and a `withEffects()` call made for one asynchronous evaluation does
+not change another one that is suspended on the same engine. One consequence to
+know: while the promise of an asynchronous `withEffects()` callback is pending,
+its handlers are the installed ones, so an unrelated evaluation that *starts*
+during that time also uses them.
+
+**To use a capability in your own operator**, declare the effect label in the
+signature and read the handler from the `options` argument of the `evaluate`
+handler — not from `ce.effects`, so that your operator follows the rule above:
+
+```js
+ce.declare("Warn", {
+  signature: "(string) console -> nothing",
+  evaluate: ([message], { engine, effects }) => {
+    if (effects.console === null)
+      return engine.error(["capability-denied", "console"]);
+    effects.console.log("warning: " + message.string);
+    return engine.Nothing;
+  },
+});
+```
+
+An `evaluateAsync` handler that starts nested evaluations must hand the
+handlers on: pass the `options` it received to `evaluateAsync()`. To change
+one option, copy the others — `op.evaluateAsync({ ...options,
+numericApproximation: true })` — and do not build the object from nothing.
+
+**The `entropy` handler** is the unseeded source of randomness: an object with
+one method, `random()`, that returns a uniform number in `[0, 1)`
+(`Math.random` by default). `RandomExpression` draws from it, and so does every
+random operator — `Random`, `RandomShuffle`, `RandomChoice`, `RandomPrime`, the
+Monte-Carlo estimators — when it is evaluated **outside** a `WithRandomSeed`
+frame. Inside a frame the draws come from the seeded stream and the handler is
+not consulted. A constant handler makes unframed random results reproducible in
+a test; `entropy: null` makes each unframed random operator evaluate to a
+`capability-denied` error value that names the operator:
+
+```js
+ce.effects = { entropy: { random: () => 0.25 } };
+ce.box(["Random"]).evaluate();
+// ➔ 0.25
+
+ce.effects = { entropy: null };
+ce.box(["Random"]).evaluate();
+// ➔ ["Error", ["ErrorCode", "'capability-denied'", "'entropy'"], "'Random'"]
+
+ce.box(["WithRandomSeed", 42, ["Random"]]).evaluate();
+// ➔ 0.7367300395263549   (seeded: the handler is not used)
+```
+
+A compiled function draws from the same handler, but a denied handler makes it
+throw a `CapabilityDeniedError` at run time: compiled code has no error-value
+channel.
+
+Only `console` and `entropy` have a handler today. The other capability labels
+(`network`, `fs_read`, `fs_write`, `time`, `environment`) will get one together
+with the first library operator that needs it.
+
 ### Declaring an Operator that Binds a Variable
 
 Some operators own a **bound variable**: the `k` of a summation, the `x` of a

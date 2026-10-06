@@ -34,6 +34,12 @@ For example:
 console.log(ce.parse("3.14").type);
 ```
 
+The type of a number literal is its **literal type** — `3.14` here, the
+most precise claim about that one value (see [Literal Type](#literal-type)).
+A literal type belongs to the literal node only: a type built from the
+literal, such as the type of a tuple or list that holds it, carries the
+literal's tier instead (see [Literal Types Are Not Stored](#literal-types-are-not-stored)).
+
 The type of a symbol can be declared explicitly, or it can be inferred from 
 the context in which it is used, such as the value that is assigned to it
 or the operation that is performed on it.
@@ -379,6 +385,13 @@ ce.parse("(7, 5, 7)").type
 // ➔ "tuple<integer, integer, integer>"
 ```
 
+Each element type is the **tier** of the element, never a literal's own
+value type: `(7, 5, 7)` is a `tuple<integer, integer, integer>`, not
+`tuple<7, 5, 7>`, and `(\\sqrt2, 1/3)` is `tuple<real, rational>` even though
+`ce.parse("\\sqrt2").type` is the enclosure `real<1.4..1.5>`. A component
+that is not a literal keeps its own type, ranges included: with `r`
+declared `real`, `(|r|, 1)` is `tuple<real<0..>, integer>`.
+
 The elements of a tuple can be named: `tuple<x: integer, y: integer>`. 
 
 If an element is named, all elements must be named and the names must be unique
@@ -436,6 +449,12 @@ The type of a list literal is **honest**: it reports the actual (widened)
 element type and the dimensions. Since element types are covariant, the
 honest type is a subtype of every broader form — `vector<integer^3>`
 matches `vector<3>`, `vector`, `list<number>`, and `list`.
+
+The element type is the **tier** of the elements, never a literal's own
+value type: `[0.5, 1]` is a `vector<real^2>`, and `[\\sqrt2, 1/3]` is a
+`vector<real^2>` even though each element's own type is an enclosing range.
+The same rule types a set (`{\\sqrt2}` is `set<real>`) and a record
+(`{x: 1/3}` is `record{x: rational}`).
 
 The **empty list** has no elements, so its element type is the bottom type 
 `never`. Covariance then makes it a member of every list type, which is what 
@@ -1599,6 +1618,10 @@ console.info(ce.box(["identity", 5]).type);
 console.info(ce.box(["List", 1, 2, 3]).type);
 // ➔ "vector<integer^3>" — cells widen to their tier
 
+console.info(ce.parse("(\\sqrt2, 1/3)").type);
+// ➔ "tuple<real, rational>" — components carry their tier, never the
+//    enclosing range each literal reports on its own
+
 console.info(ce.box(["Function", 21]).type);
 // ➔ "() -> integer" — a derived signature stores the tier
 ```
@@ -2191,11 +2214,26 @@ Inference writes happen at these moments:
    a list argument whole instead of broadcasting over it.
 3. **Function-literal bodies**: a bare (unannotated) lambda parameter starts
    as `unknown` and is narrowed by how the body *uses* it — indexing
-   (`v[1]`) narrows it to `dictionary<any> | indexed_collection<any>`
-   through `At`'s signature, arithmetic infers numeric, boolean use infers
-   `boolean`. The lambda's stored signature carries what the body proved and
-   nothing more.
-4. **Declared placeholders refined by definitions**: a declared `unknown`
+   (`v[1]`) narrows it to a collection through `At`'s signature, arithmetic
+   infers numeric, boolean use infers `boolean`. The lambda's stored
+   signature carries what the body proved and nothing more.
+4. **Uses of an element**: a use of an element taken out of a collection
+   refines the collection's *element* type. `xs[1] + 1` makes an undeclared
+   `xs` an `indexed_collection<number>`, `xs["a"] + 1` a
+   `dictionary<number>`, `First(xs) + 1` an `indexed_collection<number>`,
+   and `k(xs[1])` with `k: (integer) -> integer` an
+   `indexed_collection<integer>`. A chained access reaches the outer
+   collection (`m[1][2] + 1` makes `m` an
+   `indexed_collection<indexed_collection<number>>`), and a lambda
+   parameter shows the refinement on its arrow: `(v) => v[1] + 1` types
+   `(v: indexed_collection<number>) -> broadcastable<number>`. The element
+   written is the scalar reading — `number`, exactly as `x + 1` infers a
+   bare `x` — and a boolean use commits `boolean` the same way, so a later
+   numeric use of that element is an `incompatible-type` error, as it is
+   for a scalar after `And(x, B)`. The write is inference: a later
+   assignment replaces it, and a *declared* type — a contract such as
+   `list<any>`, or the bare placeholder `list` — is never moved by a use.
+5. **Declared placeholders refined by definitions**: a declared `unknown`
    *slot* in a function type is a placeholder, not a constraint — assigning
    a body to `f: (unknown) -> unknown` replaces each `unknown` slot with the
    slot the body's inference produced, and the refined signature is what is

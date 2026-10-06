@@ -159,6 +159,16 @@ Use `Floor(a / b)` for the integer quotient.
 
 To stop a pipeline early, restructure with a condition or a Take/Filter stage instead of breaking out of a callback.
 
+## `match-not-exhaustive`
+
+A `match` whose subject has a CLOSED type — a sum declared with `type light = red | green | yellow`, or `boolean` — has no case for some of the values the subject can hold; the message spells each uncovered value as the pattern that would match it (`yellow()`, `node(_, _)`, `false`). Such a subject evaluates to the `match-no-case` error value, which is rarely what was meant.
+
+Add a case for each uncovered value, or a final `_` case if they share a result. A case covers a value only when it matches it UNCONDITIONALLY: a constructor pattern whose operands are all wildcards or bindings (`node(v, cs)`, `node(v, ...)`), a typed binding (`x: green`), a wildcard or bare binding, or an or-alternative of those. A case with an `if` guard, a literal operand (`lit(0)`) or a pin (`== value`) is conditional and counts for nothing, because the check does not reason about conditions.
+
+The check reads the subject's type from its annotation — a parameter (`function f(t: light)`), a typed `let`/`const`, or a typed `match` binding — and only ever reports a type it can enumerate from a declaration. A subject without an annotation, or of an open type (`integer`, `string`, a union with a member that is not a variant such as `light | nothing`), is never reported. It is a warning: the program still runs.
+
+No warning does not make the `match` total. A `boolean` subject that stays symbolic (an undecided comparison) is neither `true` nor `false`, and a declared name with no value (`let u: light` without an initializer) is not one of its constructors; both reach no case even when every alternative is covered. A final `_` case handles them.
+
 ## `symbol-expected`
 
 A name was required at this position — after `let` or `const`, as a `for` loop's variable, as a function's or parameter's name — but something else was found there (`let = 42`).
@@ -191,6 +201,14 @@ A lambda and its type annotation name the same parameter differently — `const 
 
 Rename one side so the two agree — the quick fix renames the annotation's parameters to match the lambda's — or leave the annotation's parameters unnamed (`(number) -> number`): an annotation's parameter names are optional documentation, while the lambda's are the real binding.
 
+## `variable-redeclaration`
+
+A `let` or `const` declares a name that the same scope already declares: an earlier `let`/`const` of the same block or program, a parameter of the function whose body this is, or the index of the loop whose body this is. In `function f(x) { let x = x + 1 … }` the second `x` is such a re-declaration.
+
+A second declaration in one scope is a mistake in practice — a `let` where an assignment was meant, or a copied line — and the language cannot tell it from a legitimate second run of the same statement (a loop body on its next turn), so it used to overwrite the binding without a word. To update a binding, assign to it: `x = x + 1`. To hold a second value, choose another name.
+
+A `let` in a NESTED block is not a re-declaration: `for k in xs { if c { let k = 1 … } }` and a closure body that declares a name its enclosing scope also has are ordinary shadowing, and stay legal. The initializer of such a shadowing `let` reads the OUTER name. Across programs — a re-run notebook cell, a later REPL line — a top-level `let` re-declares legally; only a repeat within one program is reported.
+
 ## `function-redefinition`
 
 Two clauses of one function in a single program have the same dispatch domain, so the second would silently replace the first — `f(x) = x` followed by `f(x) = 2 * x`. Parameter NAMES are not part of a clause's identity: `g(n) = n` then `g(m) = 2 * m` collides all the same, so renaming a parameter never resolves this error.
@@ -221,9 +239,17 @@ A `type` statement appears inside a block or a function body. Types are engine-g
 
 A protocol's `function` member was read with a dot, as if it were a field or a property.
 
-A protocol declares two kinds of member, and they are used differently. A `function` member is CALLED, with the receiver as its first argument: `span(b)`. A `readonly` or `readwrite` member is a PROPERTY, read with a dot: `b.area`. So `b.span` is a spelling mistake rather than a missing field — the name exists, on a protocol the value conforms to.
+A protocol declares two kinds of member, and they are used differently. A `function` member is CALLED, with the receiver as its first argument: `span(b)`, or with the dot and parentheses, `b.span()`. A `readonly` or `readwrite` member is a PROPERTY, read with a dot and no parentheses: `b.area`. So `b.span` — no parentheses — is a spelling mistake rather than a missing field — the name exists, on a protocol the value conforms to. The parentheses are what make the dot a call; `b.span` is never a function value bound to `b`.
 
 The mirror mistake, calling a property (`area(b)`), is reported as `protocol-property-not-callable`.
+
+## `dot-call-not-a-protocol-function`
+
+A function that is not a protocol member was called with a dot, as in `xs.Sort()`.
+
+The dot reaches the MEMBERS of a value: its fields, its protocol properties, and — with parentheses — its protocol functions. `c.area()` calls the protocol function `area` with `c` as its first argument, and is the same call as `area(c)`. A library function or a plain user function is not a member of anything, so it is not reached this way: write the call directly, `Sort(xs)`, or pipe the value into it, `xs |> Sort`. Pipelines are the spelling for chaining such functions: `xs |> Sort |> Reverse`.
+
+To make a function callable with the dot, declare it in a `protocol` and conform the type to that protocol.
 
 ## `protocol-declaration-not-top-level`
 
@@ -236,6 +262,16 @@ Runtime problems in Epsil are VALUES, not exceptions: a failing subexpression ev
 The parenthesized chain in the message ("in Characters argument 1, in Map argument 2") is the propagation path, innermost first — where the error was born, then the calls it traveled through. The caret in the report points at the innermost location the source can show.
 
 Only the last statement's value is a program's result, so an error produced by an EARLIER statement would vanish silently; that is why it is reported as a diagnostic. The final statement's error simply is the program's value.
+
+A program produces an error value of its own with `RuntimeError("code")` (or `RuntimeError(ErrorCode("code", details))`). Do not write `Error("code")` for that: a written `Error` is a STATIC diagnostic node and marks the expression around it as invalid, so a function whose body spells one is never defined.
+
+## `capability-denied`
+
+The program used a capability of the host — the quoted name, for example `console` for `print` and `input` — and the host that runs the program does not allow it. The call evaluates to this error value instead of reaching the host; nothing was printed or read.
+
+Which capabilities a program may use is a decision of the embedding application, not of the program: an application that runs programs it does not trust denies the capabilities they must not reach. There is nothing to fix in the program except to remove the call, or to run the program in a host that allows the capability.
+
+For the author of the host: capabilities are the handlers of `ce.effects`. A handler set to `null` is a denial; `ce.withEffects({ console: null }, () => …)` denies one for the duration of a callback.
 
 ## `static-type-error`
 

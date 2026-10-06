@@ -188,8 +188,17 @@ the `Which[]` function in Mathematica.
 <Signature name="When">_expr_, _condition_</Signature>
 
 Returns the value of `expr` when `condition` evaluates to `True`, and
-`Undefined` when `condition` evaluates to `False`. When `condition` cannot
-be determined, the expression holds unevaluated.
+`Missing` — the absent-value marker, the same value a `Which` with no
+matching clause and an `If` with no else-branch give — when `condition`
+evaluates to `False`. When `condition` cannot be determined, the
+expression holds unevaluated.
+
+The type of a `When` expression admits the absent case: `When(5, x > 0)`
+has type `integer | missing`, and a list that holds a restricted element has
+type `list<integer | missing>`. Only a restriction whose condition is the
+literal `True` keeps the bare type of `expr`. A consumer that tests
+`type.matches("number")` must set the `missing` member aside first, as it
+must for a `Which` with no default clause.
 
 `["When"]` is the AST head produced by **restriction-brace** syntax:
 `expr\{cond\}` parses to `["When", expr, cond]`. It is also useful directly
@@ -199,7 +208,7 @@ separated from the base expression by spacing commands
 
 ```json example
 ["When", ["Square", "x"], ["Greater", "x", 0]]
-// Evaluates to x^2 when x > 0, Undefined otherwise.
+// Evaluates to x^2 when x > 0, Missing otherwise.
 ```
 
 **Stacked restrictions canonicalize** to a single `When` with an `And`
@@ -215,8 +224,12 @@ Downstream simplification, interval intersection, and compilation operate on
 the canonical form, so source variants (stacked braces or a single brace
 with `\wedge`) are interchangeable.
 
-When compiled to JavaScript or GLSL, `When(e, cond)` emits a ternary
-`(cond ? e : NaN)`. This makes `When` suitable for plot-domain masking.
+When compiled, `When(e, cond)` emits a ternary whose masked branch is the
+absence marker of the value's domain: `(cond ? e : NaN)` for a number, on
+every target, and on JavaScript `(cond ? e : undefined)` for a value that is
+provably not a number, such as a string, so that a compiled `IsMissing`
+agrees with the interpreter. This makes `When` suitable for plot-domain
+masking.
 
 </FunctionDefinition>
 
@@ -566,7 +579,7 @@ f(x)\left\{0 < x < 2\right\}
 Parses to `["When", ["f", "x"], ["Less", 0, "x", 2]]`.
 
 When the condition is `True`, the expression evaluates to its left operand;
-when `False`, it evaluates to `Undefined`. This is distinct from a set
+when `False`, it evaluates to `Missing`. This is distinct from a set
 literal (standalone `\{1, 2, 3\}` continues to parse as a `Set`); the
 disambiguation is positional — trailing braces after a complete expression
 attach as a `When` restriction.

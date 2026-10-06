@@ -373,7 +373,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n}\sinh(n(\ln(\varphi)+\frac{\pi\imaginaryI}{2})))/\sqrt{5}$$
+$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n}\sinh(n\times(\ln(\varphi)+\frac{\pi\imaginaryI}{2})))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.

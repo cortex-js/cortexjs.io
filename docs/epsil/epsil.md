@@ -41,14 +41,14 @@ Epsil is **symbolic by default**: expressions stay exact unless you ask for a
 numeric approximation with `N()`.
 
 ```epsil-live
-Simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
+simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
 ```
 
 Values have a type, and strings support `\(…)` interpolation:
 
 ```epsil-live
 let x = 2^11 - 1
-"\(x) has type \(Type(x))"
+"\(x) has type \(type(x))"
 ```
 
 Errors are ordinary values, so a program never throws to its host — a problem
@@ -98,6 +98,11 @@ Understand **how Epsil evaluates** — exact values, mutable bindings, lazy
 collections, ordinary error values, and session scope.
 </ReadMore>
 
+<ReadMore path="/style/">
+Write **idiomatic Epsil** — the style guide: declarations, recursion,
+pipelines, building lists, errors as values, effects, and pattern matching.
+</ReadMore>
+
 ## Tools and Integrations
 
 <ReadMore path="/for-agents/">
@@ -126,6 +131,11 @@ calls and indexing.
 
 <ReadMore path="/operators/">
 **Operators** — arithmetic, logic, relational, and the pipeline operator.
+</ReadMore>
+
+<ReadMore path="/library/">
+**Standard library** — every function and constant by category, with
+signatures, summaries, and executable examples.
 </ReadMore>
 
 <ReadMore path="/control-flow/">

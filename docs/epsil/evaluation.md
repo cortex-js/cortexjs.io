@@ -29,16 +29,16 @@ Values stay **exact** unless you ask otherwise. A transcendental of an exact
 argument stays symbolic —
 
 ```epsil
-Ln(2)
+ln(2)
 ```
 
-evaluates to the symbolic `Ln(2)` (`ln(2)`), not a decimal approximation.
+evaluates to the symbolic `ln(2)` (`ln(2)`), not a decimal approximation.
 
 **Numeric approximation is explicit**, via `N(expr)` — it is a function
 call, not a language mode:
 
 ```epsil
-N(Ln(2))
+N(ln(2))
 ```
 
 evaluates to `0.6931471805599453…`.
@@ -68,17 +68,17 @@ Build the value you want and rebind the name:
 
 ```epsil
 let xs = [1, 2, 3]
-xs = Join([xs[1]], [9], [xs[3]])
+xs = join([xs[1]], [9], [xs[3]])
 xs
 // ➔ [1, 9, 3]
 ```
 
-Operators never modify what you hand them — `Append`, `Sort`, `Join`,
-`Map`, `Filter` all return a **new** collection:
+Operators never modify what you hand them — `append`, `sort`, `join`,
+`map`, `filter` all return a **new** collection:
 
 ```epsil
 let xs = [3, 1, 2]
-let ys = Sort(xs)
+let ys = sort(xs)
 (xs, ys)
 // ➔ ([3, 1, 2], [1, 2, 3])
 ```
@@ -171,12 +171,12 @@ A call evaluates its arguments first and hands the function their values:
 with `let a = 3`, `f(a + 1)` receives `4`. A function declared with the
 `hold` prefix instead receives each argument **as written** — canonicalized
 and bound in the caller's scope, but not evaluated — and evaluates it only
-where its body reads it, so it can inspect the expression (`Head(e)`),
+where its body reads it, so it can inspect the expression (`head(e)`),
 transform it, or decide whether to evaluate it at all:
 
 ```epsil
 let a = 3
-hold f(e) = Head(e)
+hold f(e) = head(e)
 f(a + 1)
 // ➔ Add
 ```
@@ -193,13 +193,19 @@ dictionary — evaluates its elements when the statement executes. Assigning
 one to a variable stores a snapshot of the element *values*:
 
 ```epsil
-let xs = []
-for k in 1..3 { xs = Join(xs, [k]) }
+let k = 1
+let xs = [k, k + 1]
+k = 10
 xs
-// ➔ [1, 2, 3]
+// ➔ [1, 2]
 ```
 
-Lazy collection **operators** — `Range`, `Map`, `Filter`, `Take`, `Join` —
+(A spread inside a literal, `[...xs, k]`, is the exception: it is the lazy
+`join` described next, not a snapshot — see the
+[Style Guide](/style/#building-a-list-one-element-at-a-time) before
+growing a list in a loop.)
+
+Lazy collection **operators** — `Range`, `map`, `filter`, `take`, `join` —
 are *generators*: their operands (bounds, sources, functions) are evaluated
 when the expression is, but enumeration is deferred until the collection is
 materialized (displayed, indexed, aggregated, or iterated). A deferred
@@ -213,8 +219,9 @@ operation (an aggregate, an index) at the point of definition.
 
 Per [Principles](/principles/), "errors are values": a *runtime*
 problem — a type error, an out-of-domain argument, reassigning a `const` —
-becomes an `Error` value embedded in the result, not a thrown exception. A
-program never throws to its host for a runtime problem.
+becomes an `Error` value that propagates outward through the enclosing
+expressions and becomes their result, not a thrown exception. A program never
+throws to its host for a runtime problem.
 
 *Parse*-time problems are different: a malformed program surfaces as a
 **diagnostic**, not as a value. So do the few execution-time problems that are
@@ -228,13 +235,36 @@ a `runtime-error` diagnostic — for example an indexed assignment
 (`xs[2] = 9`, which is rejected: element assignment is not supported), or
 reassigning a `const` in the middle of a program.
 
+A program constructs an error value of its own with `RuntimeError`:
+
+```epsil-live
+function reciprocal(x) {
+  if x == 0 { RuntimeError("zero-has-no-reciprocal") } else { 1 / x }
+}
+[reciprocal(4), reciprocal(0)]
+// ➔ [1/4, Error("zero-has-no-reciprocal")]
+```
+
+The call evaluates to `Error("zero-has-no-reciprocal")`, which a caller takes
+apart with [`if let`](/control-flow/#if-let) or
+[`match`](/control-flow/#match) like any other error value. The
+argument is a code string, or an `ErrorCode("code", details…)` when the
+error carries data.
+
+Do not write `Error("…")` for this. A written `Error(…)` is a *static*
+diagnostic — the node the engine itself inserts where a program is wrong,
+such as a type mismatch — and it marks the whole expression around it as
+invalid: a function whose body spells `Error("neg")` never gets defined. The
+two spellings make the distinction explicit: `Error` is a problem *with the
+program*, `RuntimeError` is a failure *produced by running it*.
+
 ## Console input and output
 
 `print` writes its operands to the host console — the terminal for the
 command-line tools, the developer console in a browser — separated by
 spaces and followed by a newline. Strings print their content, without the
 quotes; every other value prints its ordinary textual form. It evaluates to
-`Nothing`:
+`nothing`:
 
 ```epsil
 let x = 6
@@ -246,7 +276,7 @@ print("x is", x * 7)
 trailing newline. An optional operand is a prompt, displayed before
 reading. In a terminal it reads from the terminal (piped standard input
 works too); in a browser it opens the `prompt()` dialog. At end-of-input —
-or when the dialog is canceled — it evaluates to `Nothing`; on a host with
+or when the dialog is canceled — it evaluates to `nothing`; on a host with
 no interactive input at all, the call stays symbolic.
 
 ```text
@@ -256,10 +286,10 @@ Who? Arno
 Hello, Arno
 ```
 
-`print` and `input` follow the lowercase command convention. They are
-ordinary library aliases for the `Print` and `Input` operators — not
-keywords — so a local declaration of `print` shadows the command like any
-other library name.
+`print` and `input` are the lowercase spellings of the `Print` and `Input`
+operators, like `sin` for `sin` — not keywords — so a local declaration of
+`print` shadows the command like any other library name. See
+[Naming](/naming/).
 
 ## Pragma security
 
@@ -274,7 +304,7 @@ in an unfamiliar environment, both are **gated off by default**:
 ```
 
 by default produces a `host-pragma-disabled` diagnostic and no host read — the
-pragma evaluates to `Nothing`. A host can opt back in and let `#env`/
+pragma evaluates to `nothing`. A host can opt back in and let `#env`/
 `#navigator` read as documented in [Pragmas](/pragmas/).
 
 The benign pragmas — `#line`, `#column`, `#url`, `#filename`, `#date`,

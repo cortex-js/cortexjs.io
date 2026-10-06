@@ -52,7 +52,7 @@ body:
   expression — a local `let`, a `match`, a loop. It is also the only form that
   carries a name *and* a multi-statement body.
 - **Anonymous** (`x => …`) when the function is an argument to another
-  function and a name would add nothing: `Map(x => x^2, xs)`.
+  function and a name would add nothing: `map(x => x^2, xs)`.
 
 An anonymous function can have a multi-statement body too, by making that body
 a [`do` block](#do-block-expressions) — but at that point a named `function` is
@@ -64,7 +64,7 @@ A definition can state the effects that calling it may perform. The specifier
 sits after the parameter list and before the return arrow:
 
 ```epsil
-function roll(n) random -> integer { Random(n) }
+function roll(n) random -> integer { random(n) }
 ```
 
 The ten effect labels are `console`, `entropy`, `environment`, `fs_read`,
@@ -82,7 +82,7 @@ in which case its declared result is `unknown`. In the math form, a written
 effect specifier must be followed by a return arrow:
 
 ```epsil
-roll(n) random -> integer = Random(n)
+roll(n) random -> integer = random(n)
 ```
 
 See [Effect Specifiers](https://mathlive.io/compute-engine/guides/types/#effect-specifiers) for
@@ -129,12 +129,12 @@ value — the clause is selected only when the argument *is* that value.
 
 If no clause matches the evaluated arguments, the call is a
 `no-matching-clause` error. To inspect the clause set of a function, use
-`About`:
+`about`:
 
 ```epsil
 f(0) = 1
 f(n: integer) = n + 1
-About(f)
+about(f)
 ```
 
 The listing shows one line per clause, in declaration order, and annotates
@@ -151,7 +151,7 @@ transform it, serialize it, or decide whether to evaluate it at all — is
 declared with the `hold` prefix, in either form:
 
 ```epsil
-hold f(e) = Head(e)
+hold f(e) = head(e)
 hold function twice(e) { let v = e; v + v }
 ```
 
@@ -166,18 +166,18 @@ the expression itself:
 
 ```epsil
 let a = 3
-hold f(e) = Head(e)
+hold f(e) = head(e)
 f(a + 1)
 // ➔ Add          (an ordinary function would answer Integer: it receives 4)
 ```
 
 Because the argument is never evaluated by the call, a hold function can
-decide whether it runs at all — here `Random()` draws only when the
+decide whether it runs at all — here `random()` draws only when the
 condition is false:
 
 ```epsil
-hold unless(cond, body) = if !cond { body } else { Nothing }
-unless(a > 5, Random())
+hold unless(cond, body) = if !cond { body } else { nothing }
+unless(a > 5, random())
 ```
 
 `hold` applies to the **whole definition** — every parameter is held — and
@@ -202,12 +202,12 @@ else (`let hold = 5`, `hold(2)`). Anonymous functions have no hold form.
 
 ### Bound-variable parameters: `bind`
 
-A hold function can define its own **binder** — an operator like `Sum` or
+A hold function can define its own **binder** — an operator like `sum` or
 `D` that takes a variable to bind. Mark the parameter that receives the
 variable with `bind`:
 
 ```epsil
-hold mySum(body, bind i, n) = Sum(body, (i, 1, n))
+hold mySum(body, bind i, n) = sum(body, (i, 1, n))
 mySum(k^2, k, 3)
 // ➔ 14
 ```
@@ -215,9 +215,9 @@ mySum(k^2, k, 3)
 The caller passes a **symbol** at a `bind` position (anything else is a
 `bind-symbol-expected` error), and the function's parameter is *substituted*
 by that symbol throughout the body — including where the body's own binder
-uses it, so `Sum(body, (i, 1, n))` becomes `Sum(k^2, (k, 1, 3))` and the
+uses it, so `sum(body, (i, 1, n))` becomes `sum(k^2, (k, 1, 3))` and the
 sum runs over the caller's `k`. The call declares that symbol in its own
-scope, exactly as `Sum` does with its index: a `let k = 5` outside the call
+scope, exactly as `sum` does with its index: a `let k = 5` outside the call
 does not leak in, and `mySum(k * j, j, 3)` with `k = 5` is `30`. `bind` is
 contextual (`f(bind) = …` declares an ordinary parameter named `bind`) and
 requires `hold` (`bind-requires-hold`): a bound variable can only be received
@@ -225,7 +225,7 @@ unevaluated. Every parameter of the function is held; `bind` says which of
 them names a variable.
 
 The substitution is by **name**, and deliberately reaches inside the body's
-own binders (that is what ties `Sum`'s index to the caller's variable), so it
+own binders (that is what ties `sum`'s index to the caller's variable), so it
 also reaches any *other* use of that name in the body: do not reuse a `bind`
 parameter's name for an unrelated local or index inside the same function.
 
@@ -255,13 +255,13 @@ number = …`), like an effect specifier. `commutative`/`associative` need at
 least two parameters (`associative` exactly two), `idempotent`/`involution`
 exactly one; a `hold` function cannot carry them (its calls are neither
 reordered nor flattened); every clause of a multi-clause function must state
-the same ones. `About(op)` lists them.
+the same ones. `about(op)` lists them.
 
 ### Documenting a function
 
 A **doc comment** — `///` lines or a `/** … */` block — written immediately
 before a definition becomes the function's *description*: it is shown by
-`About(f)`, by an editor hover, and it is the one comment that survives a
+`about(f)`, by an editor hover, and it is the one comment that survives a
 serialization round trip (it comes back as `///` lines). Ordinary `//`
 comments are not attached.
 
@@ -269,7 +269,7 @@ comments are not attached.
 /// Doubles its argument.
 /// Accepts anything `*` accepts.
 twice(x) = 2x
-About(twice)
+about(twice)
 ```
 
 ### Anonymous functions
@@ -302,6 +302,46 @@ arrow:
 ```epsil
 () => 42
 ```
+
+The last parameter can be a **rest parameter**, written `...name`. It has no
+position of its own: it binds one name to a tuple of every argument after the
+parameters before it, and that tuple is empty when the call supplies none. So a
+lambda with a rest parameter accepts any number of arguments:
+
+```epsil
+(a, ...rest) => (a, rest)
+```
+
+Applied to `(1, 2, 3)` this yields `(1, (2, 3))`; applied to `(1)` it yields
+`(1, ())`. Spreading the tuple back into a call — the `...` of a call argument
+list — passes the collected arguments on unchanged, which is what a wrapper
+needs:
+
+```epsil
+(...args) => Conjugate(g(...args))
+```
+
+A named definition takes a rest parameter in the same position and with the
+same meaning, in the equation form and in the braced form alike:
+
+```epsil
+h(a, ...rest) = Length(rest)
+```
+
+```epsil
+function h(a, ...rest) {
+  Length(rest)
+}
+```
+
+Either one behaves exactly like `let h = (a, ...rest) => Length(rest)`, and the
+name it declares reports the arity it really accepts — `h` above has the type
+`(unknown, any*) -> integer`, "one argument or more".
+
+Only the last parameter may be a rest parameter, and it carries no type
+annotation. A rest parameter is an interpreted-only feature: `compile()`
+refuses a function that has one, because no compile target collects the
+trailing arguments.
 
 Writing `->` where a function was meant — `(x, y) -> x + y`,
 `(n: integer) -> n^2` — is a diagnosed typo: the parser suggests `=>` with a
@@ -414,12 +454,12 @@ symbolic (unbound) `x` as the subject above, `match` selects the `_` case: `x`
 is structurally not `0`, even though it *could* be zero semantically. Use
 `if`/`Which` when you want that kind of semantic case-split instead.
 
-A list pattern matches a list *value* whatever produced it: `Rest(xs)`,
-`Drop(xs, 1)` or `Range(1, 3)` evaluate to a lazy collection rather than a
+A list pattern matches a list *value* whatever produced it: `rest(xs)`,
+`drop(xs, 1)` or `Range(1, 3)` evaluate to a lazy collection rather than a
 list literal, and the case holding the list pattern reads it as a list —
-element by element for the positions the pattern names, with a copy only for
-a named `...rest`. (A lazy list of more than 100 000 elements is left as it
-is, and then matches only the wildcard.)
+element by element for the positions the pattern names, at any nesting, with
+a copy only for a named `...rest`. (A copy of more than 100 000 elements is
+refused, and the case then does not match.)
 
 The final catch-all may also be spelled `otherwise`, a synonym for a bare
 `_` pattern (it takes a guard the same way, and binds nothing):
@@ -440,7 +480,7 @@ a bare identifier in a nested pattern position *binds* (next section).
 
 A bare identifier in pattern position **binds** a new variable to the value
 at that position — for *any* name, including ones that happen to name an
-engine constant (`e`, `i`, `Pi`). A pattern is parsed as an ordinary
+engine constant (`e`, `i`, `pi`). A pattern is parsed as an ordinary
 expression first, so this applies inside nested patterns too:
 
 ```epsil
@@ -450,7 +490,7 @@ match p {
 ```
 
 Matching `(2, 7)` against this case binds `x` to `2` and `e` to `7` — the
-body's `e` is the captured value, not `ExponentialE`. Because a bare binding
+body's `e` is the captured value, not `exponentialE`. Because a bare binding
 matches unconditionally, a *non-final* case consisting of just a binding (or
 `_`) makes every case after it unreachable; this is flagged as a
 `match-irrefutable-case` diagnostic (a final catch-all is expected and not
@@ -465,10 +505,10 @@ match x {
 }
 ```
 
-This does **not** match the constant π — `Pi` in pattern position binds a new
-variable named `Pi`, shadowing the constant, and the diagnostic is the safety
+This does **not** match the constant π — `pi` in pattern position binds a new
+variable named `pi`, shadowing the constant, and the diagnostic is the safety
 net for that: it fires because the `Pi => 1` case is non-final and matches
-anything, not because `Pi` is a reserved name. To test against the value of
+anything, not because `pi` is a reserved name. To test against the value of
 the constant, use a pin.
 
 ### Pins
@@ -479,7 +519,7 @@ variable, since a bare identifier always binds instead:
 
 ```epsil
 match x {
-  == Pi => "is-pi"
+  == pi => "is-pi"
   _ => "no"
 }
 ```
@@ -505,7 +545,7 @@ matched:
 
 ```epsil
 match x {
-  1 | 2 | == Pi => "small"
+  1 | 2 | == pi => "small"
   _ => "big"
 }
 ```
@@ -691,13 +731,19 @@ match z {
 This is symbolic destructuring, evaluated by the engine's general pattern
 matcher — it works when evaluating a `match` expression, but such patterns
 are not supported by `compile()`; compiling a `match` with an operator
-pattern fails closed, naming the offending pattern in the error.
+pattern fails closed, naming the offending pattern in the error. A typed
+binding, by contrast, compiles when its type has a faithful test on the
+JavaScript value model — the machine numbers, strings and booleans, literal
+values, numeric ranges, unions of those, and the variants and sums a `type`
+statement declares when they are tagged and not generic; a binding typed
+`!error`, or with a collection, record, erased-sum or generic-sum type, keeps
+failing closed.
 
 ### No match
 
 If no case matches, `match` evaluates to an `Error` value tagged
 `'match-no-case'` carrying the subject, rather than throwing or silently
-producing `Nothing` — errors are ordinary values in Epsil (see
+producing `nothing` — errors are ordinary values in Epsil (see
 [Evaluation](/evaluation/)):
 
 ```epsil
@@ -707,6 +753,44 @@ match 3 {
 ```
 
 Evaluating this expression yields `Error("match-no-case", 3)`.
+
+### Exhaustiveness
+
+When the subject's type is **closed** — a sum declared with `type light = red |
+green | yellow` (see [Types](/types/)), or `boolean` — `epsil check` and
+a program run both report a `match-not-exhaustive` warning if some value of
+that type reaches no case, spelling each uncovered value as the pattern that
+would match it:
+
+```epsil
+type light = red | green | yellow
+function canGo(t: light) -> boolean {
+  match t {
+    green() => true
+  }
+}
+// warning: The "match" on a "light" value has no case for red(), yellow()
+```
+
+A case covers a value only when it matches it unconditionally: a constructor
+pattern whose operands are all bindings, `_` or `...` (`node(v, cs)`,
+`node(v, ...)`), a typed binding (`g: green`, or `x: light` for the whole
+sum), a wildcard or bare binding, or an or-alternative of those. A case with
+an `if` guard, a literal operand (`jnum(0)`) or a pin (`== value`) is
+conditional and counts for nothing, since the check does not reason about
+conditions. The subject's type is read from its annotation — a parameter, a
+typed `let`/`const`, or a typed `match` binding — and only a type the check
+can enumerate from a declaration is ever reported: an unannotated subject, an
+ordinary type like `integer`, or a union with a member that is not a variant
+(`light | nothing`) stays silent. It is a warning, not an error: the program
+still runs, and an uncovered subject evaluates to the `match-no-case` error
+value above.
+
+Silence is not a proof of totality. A `boolean` subject that stays symbolic
+(an undecided comparison such as `x < 3` with `x` unknown) is neither `true`
+nor `false`, and a declared name with no value (`let u: light` without an
+initializer) is not one of its constructors; both reach no case even when
+every alternative is covered. A final `_` case handles them.
 
 ### `if let` {#if-let}
 
@@ -724,7 +808,7 @@ if let (x, y) = point { x * y } else { 0 }
 It is sugar over `match`: the statement above is
 `match point { (x, y) => do { x * y }; _ => do { 0 } }`, and the two forms
 lower to the same expression. Without an `else`, a subject that does not
-match evaluates to `Missing`, as a false `if` without an `else` does.
+match evaluates to `missing`, as a false `if` without an `else` does.
 
 The form earns its keep with a typed binding, which is how a result that may
 have failed is taken apart without a `match` block:
@@ -744,6 +828,17 @@ value; the typed binding `h: !error` refuses it and the `else` branch runs.
 With `head([4, 5])`, `4` binds to `h`. The same test reads absence:
 `if let v: !missing = First(xs) { … }` binds `v` only when the list has a
 first element.
+
+A function that fails on purpose returns
+[`RuntimeError`](/evaluation/#errors-are-values):
+
+```epsil-live
+function reciprocal(x) {
+  if x == 0 { RuntimeError("zero-has-no-reciprocal") } else { 1 / x }
+}
+if let r: !error = reciprocal(0) { r } else { "no reciprocal" }
+// ➔ "no reciprocal"
+```
 
 `if let` chains with `else if` in either direction, and a plain `if` can
 follow an `if let`:
@@ -803,9 +898,9 @@ undecidable condition can stay inert. When you want the semantic question —
 ## Loops
 
 There is one loop keyword form for each of the two common shapes. Both are
-evaluated **for effect**, not for their value — a loop's value is `Nothing`.
+evaluated **for effect**, not for their value — a loop's value is `nothing`.
 Value-producing iteration over a collection belongs to the library functions
-`Map`/`Filter`/`Reduce`, not to a loop statement.
+`map`/`filter`/`reduce`, not to a loop statement.
 
 `while cond { … }` repeats its body until the condition becomes false:
 
@@ -868,7 +963,7 @@ for x in a in b { x }
 
 ## Pipelines
 
-`x |> f` means exactly `f(x)`. For a single call that is a wash — `Sqrt(2)`
+`x |> f` means exactly `f(x)`. For a single call that is a wash — `sqrt(2)`
 says it better than `2 |> Sqrt`. What the pipe buys you is **reading order**
 once several transformations are applied one after another.
 
@@ -879,7 +974,7 @@ Nested calls:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-Mean(Map(s => s + 5, Filter(scores, s => s >= 60)))
+mean(map(s => s + 5, filter(scores, s => s >= 60)))
 // ➔ 337/4
 ```
 
@@ -887,16 +982,16 @@ Named intermediates:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-let passing = Filter(scores, s => s >= 60)
-let curved = Map(s => s + 5, passing)
-Mean(curved)
+let passing = filter(scores, s => s >= 60)
+let curved = map(s => s + 5, passing)
+mean(curved)
 // ➔ 337/4
 ```
 
 A pipeline:
 
 ```epsil-live
-[88, 42, 95, 61, 73] |> Filter(s => s >= 60) |> s => s + 5 |> Mean
+[88, 42, 95, 61, 73] |> filter(s => s >= 60) |> s => s + 5 |> mean
 // ➔ 337/4
 ```
 
@@ -912,7 +1007,7 @@ naming two values that exist only to be handed to the next line.
 A stage that needs only the piped value is named bare:
 
 ```epsil-live
-16 |> Sqrt |> N
+16 |> sqrt |> N
 // ➔ 4
 ```
 
@@ -921,18 +1016,18 @@ marking the slot the piped value fills. It does not have to be the first
 argument:
 
 ```epsil-live
-[3, 1, 2] |> Sort |> Take(_, 2)
+[3, 1, 2] |> sort |> take(_, 2)
 // ➔ [1, 2]
 ```
 
 The `_` may be left out entirely: a call that is missing required arguments
 receives the piped value in the first slot its type fits — first for a
-collection piped into `Take(3)`, second for one piped into the
-callback-first `Map(f)` — so these are the same pipeline:
+collection piped into `take(3)`, second for one piped into the
+callback-first `map(f)` — so these are the same pipeline:
 
 ```epsil
-[1, 2, 3] |> Map(n => n^2, _)      // [1, 4, 9]
-[1, 2, 3] |> Map(n => n^2)         // [1, 4, 9] — implicit argument
+[1, 2, 3] |> map(n => n^2, _)      // [1, 4, 9]
+[1, 2, 3] |> map(n => n^2)         // [1, 4, 9] — implicit argument
 ```
 
 The implicit argument only fills a hole. A call that is already complete is
@@ -940,7 +1035,7 @@ never rewritten: `xs |> f(y)` applies the *value* of `f(y)` to `xs`, exactly
 as if the pipe were not there.
 
 A one-parameter **lambda** stage over a collection is applied to each
-element (an implicit `Map`), so the pipeline above can shed its `Map`
+element (an implicit `map`), so the pipeline above can shed its `map`
 entirely — `[1, 2, 3] |> n => n^2` and `[1, 2, 3] |> _^2` also produce
 `[1, 4, 9]`. See [the pipe operator](/operators/#pipe) for the exact
 rules.
@@ -954,9 +1049,9 @@ Reach for a pipeline when:
 - the intermediate values have no name worth inventing.
 
 Prefer a nested call when the expression is **mathematical** rather than a
-sequence of stages. `Sqrt(1 + x^2)` is how the formula is written on paper;
+sequence of stages. `sqrt(1 + x^2)` is how the formula is written on paper;
 `1 + x^2 |> Sqrt` is the same value spelled worse. One or two calls rarely
-benefit either way — `Mean(xs)` needs no pipe.
+benefit either way — `mean(xs)` needs no pipe.
 
 Prefer named intermediates when a value is **used twice**, deserves a name that
 explains what it is, or is worth inspecting while you develop. A pipeline is a
@@ -989,7 +1084,7 @@ introducing keyword is always the collection grammar, so `{ 1, 2 }` on its own
 is a set.
 
 Each block pushes its own lexical scope. A block's value is its last
-expression; an empty block's value is `Nothing`:
+expression; an empty block's value is `nothing`:
 
 ```epsil
 if a { }

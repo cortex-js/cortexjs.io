@@ -66,7 +66,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\exp(z^\star)=\exponentialE^{z}^\star$$
+$$\exp(\overline{z})=\overline{\exponentialE^{z}}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -256,9 +256,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(x+y)=\arctan(x)+\arctan((y)(1+x(x+y))^{-1})$$
+$$\arctan(x+y)=\arctan(x)+\arctan((y)(1+x\times(x+y))^{-1})$$
 
-**Holds when** $x\in\C\land y\in\C\land\vert x+y\vert\lt1\land\vert x\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land x(x+y)\gt-1$.
+**Holds when** $x\in\C\land y\in\C\land\vert x+y\vert\lt1\land\vert x\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land x\times(x+y)\gt-1$.
 Used by the Compute Engine for simplification.
 [`268c9e` · Fungrim entry ↗](https://fungrim.org/entry/268c9e)
 
@@ -295,7 +295,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x(x+y))$$
+$$\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x\times(x+y))$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for expansion.
@@ -319,7 +319,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z^\star)=\arctan(z)^\star$$
+$$\arctan(\overline{z})=\overline{\arctan(z)}$$
 
 **Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rparen\cup\lparen1, \infty\rparen$.
 Used by the Compute Engine for expansion.
@@ -662,7 +662,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\ln(z^\star)=\ln(z)^\star$$
+$$\ln(\overline{z})=\overline{\ln(z)}$$
 
 **Holds when** $z\in\C\setminus\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for expansion.
@@ -868,7 +868,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sinc}(z^\star)=\mathrm{sinc}(z)^\star$$
+$$\mathrm{sinc}(\overline{z})=\overline{\mathrm{sinc}(z)}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -1008,7 +1008,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{z(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+3)!}+\frac{(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+2)!}+\frac{zz\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+1)!}+\frac{1}{n!}(z\mapsto\mathrm{sinc}(z)^{\prime}(z))=0$$
+$$\frac{z\times(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+3)!}+\frac{(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+2)!}+\frac{zz\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+1)!}+\frac{1}{n!}(z\mapsto\mathrm{sinc}(z)^{\prime}(z))=0$$
 
 **Holds when** $z\in\C\land n\in\N$.
 Used by the Compute Engine for simplification.
@@ -1262,7 +1262,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sin(z^\star)=\sin(z)^\star$$
+$$\sin(\overline{z})=\overline{\sin(z)}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -1634,7 +1634,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sqrt{z^\star}=\sqrt{z}^\star$$
+$$\sqrt{\overline{z}}=\overline{\sqrt{z}}$$
 
 **Holds when** $z\in\C\setminus\lparen-\infty, 0\rparen$.
 Used by the Compute Engine for expansion.

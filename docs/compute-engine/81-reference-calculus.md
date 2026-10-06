@@ -864,9 +864,8 @@ This renders as:
 
 **Expansion of an unknown function.** If _f_ applies an undeclared function, the
 result is the textbook Taylor form with symbolic derivative coefficients
-$f(0), f'(0), \tfrac{1}{2}f''(0), \dots$ (use the MathJSON application
-`["f", "x"]` — the LaTeX `f(x)` parses as an implicit product when `f` is not a
-declared function):
+$f(0), f'(0), \tfrac{1}{2}f''(0), \dots$ (the LaTeX `f(x)` parses as the
+application `["f", "x"]` when `f` is undeclared):
 
 ```json example
 ["Series", ["f", "x"], "x", 0, 3]

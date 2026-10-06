@@ -90,21 +90,27 @@ full <code>Explanation</code> API <Icon name="chevron-right-bold" /></ReadMore>
 
 ## Options and the Load Report
 
-`loadIntegrationRules()` returns a report and accepts a per-integral time
-budget:
+`loadIntegrationRules()` returns a report and accepts a per-integral step
+budget and a wall-clock limit:
 
 ```js
 const report = loadIntegrationRules(ce, {
-  timeLimitMs: 10000, // per-Integrate wall-clock budget (default 10000)
+  stepBudget: 300000, // per-Integrate step budget (default 300000)
+  timeLimitMs: 30000, // per-Integrate wall-clock limit (default 30000)
 });
 
 console.log(report.ruleCount); // number of compiled rules registered (~2600)
 console.log(report.skipped);   // corpus rules skipped at compile time
 ```
 
-The `timeLimitMs` budget bounds each `Integrate` call, so a pathological
-integrand cannot hang the engine — if the rule driver exceeds the budget it
-yields and the built-in antiderivative is used instead.
+The `stepBudget` decides when the rule driver gives up on an integrand. A step
+is one internal checkpoint of the engine, so the same integrand gives up at
+the same point on every machine: the answer does not depend on the speed or
+the load of the machine. When the driver gives up, the built-in
+antiderivative is used instead.
+
+The `timeLimitMs` limit is only a guard against a hang in code that does not
+count steps, so a pathological integrand cannot hang the engine.
 
 ## Performance
 

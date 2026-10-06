@@ -30,7 +30,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(z^\star)=\mathrm{BarnesG}(z)^\star$$
+$$\mathrm{BarnesG}(\overline{z})=\overline{\mathrm{BarnesG}(z)}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **BarnesG** — Barnes G-function.
@@ -104,7 +104,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z^\star)=\begin{cases}\mathrm{LogBarnesG}(z)&z\in\lparen-\infty, 0\rbrack\\\mathrm{LogBarnesG}(z)^\star&\top\end{cases}$$
+$$\mathrm{LogBarnesG}(\overline{z})=\begin{cases}\mathrm{LogBarnesG}(z)&z\in\lparen-\infty, 0\rbrack\\\overline{\mathrm{LogBarnesG}(z)}&\top\end{cases}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -113,7 +113,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=(\frac{z^2}{4}+z\mathrm{GammaLn}(z+1))-(\frac{z(z+1)}{2}+\frac{1}{12})\ln(z)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n+2)}{2n(2n+1)(2n+2)z^{2n}}+\mathrm{LogBarnesGRemainder}(N_{var}, z)$$
+$$\mathrm{LogBarnesG}(z+1)=(\frac{z^2}{4}+z\mathrm{GammaLn}(z+1))-(\frac{z\times(z+1)}{2}+\frac{1}{12})\ln(z)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n+2)}{2n(2n+1)(2n+2)z^{2n}}+\mathrm{LogBarnesGRemainder}(N_{var}, z)$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack\land N_{var}\in\N^*$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function; **LogBarnesGRemainder** — Remainder term in asymptotic expansion of logarithmic Barnes G-function.
@@ -123,7 +123,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z\times(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z\times(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
 
 **Holds when** $z\in\C\land z\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -149,7 +149,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=(\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+z\mathrm{GammaLn}(z))-\int_{0}^{z}\!\mathrm{GammaLn}(x)\, \mathrm{d}x$$
+$$\mathrm{LogBarnesG}(z+1)=(\frac{z\times(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+z\mathrm{GammaLn}(z))-\int_{0}^{z}\!\mathrm{GammaLn}(x)\, \mathrm{d}x$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, -1\rbrack$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -159,7 +159,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+\int_{0}^{z}\!x\mathrm{Digamma}(x)\, \mathrm{d}x$$
+$$\mathrm{LogBarnesG}(z+1)=\frac{z\times(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+\int_{0}^{z}\!x\mathrm{Digamma}(x)\, \mathrm{d}x$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, -1\rbrack$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -558,7 +558,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyGamma}(m, z^\star)=\mathrm{PolyGamma}(m, z)^\star$$
+$$\mathrm{PolyGamma}(m, \overline{z})=\overline{\mathrm{PolyGamma}(m, z)}$$
 
 **Holds when** $m\in\N\land z\in\C$.
 Used by the Compute Engine for expansion.
@@ -707,7 +707,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(z^\star)=\mathrm{Digamma}(z)^\star$$
+$$\mathrm{Digamma}(\overline{z})=\overline{\mathrm{Digamma}(z)}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -929,7 +929,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\binom{z}{2}=\frac{z(z-1)}{2}$$
+$$\binom{z}{2}=\frac{z\times(z-1)}{2}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -1005,7 +1005,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$n!=n(n-1)!$$
+$$n!=n\times(n-1)!$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -1312,7 +1312,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Gamma(z^\star)=\Gamma(z)^\star$$
+$$\Gamma(\overline{z})=\overline{\Gamma(z)}$$
 
 **Holds when** $z\in\C\setminus\Z_{\le0}$.
 Used by the Compute Engine for expansion.

@@ -552,6 +552,50 @@ mutable state** — a type narrowing through either scope is visible in both.
 That aliasing is the intended semantics for sequential pass-seeding, and is
 documented rather than prevented.
 
+### Rebinding a Boxed Expression in Another Scope
+
+The `scope` option steers a **construction**. On an expression that is
+already boxed it changes nothing:
+
+```ts
+const a = ce.parse("x + 1", { scope: outer }); // `x` resolved in `outer`
+ce.expr(a, { scope: inner }); // returns `a` — the bindings stay `outer`'s
+```
+
+`ce.expr` on a boxed input returns its canonical form and never re-resolves
+a symbol. Until now, an expression that had to be read under other
+declarations was serialized and boxed again:
+
+```ts
+ce.expr(a.json, { scope: inner }); // works, but serializes `a`
+```
+
+`.json` writes a **tree**. An expression is a DAG — one sub-expression
+object can be an operand of many parents — and a value with substituted
+helper bodies can hold a few hundred thousand distinct nodes that a tree
+walk visits billions of times. `ce.rebind` is the operation that re-resolves
+without the serialization:
+
+```ts
+ce.rebind(a, { scope: inner }); // a fresh box of `a`, bound in `inner`
+ce.rebind(a, { form: "structural", scope: inner });
+ce.rebind(a, { form: "raw" });
+```
+
+The result is what `ce.expr(a.json, { form, scope })` would have returned.
+For the canonical form (and a partial form such as `["Flatten", "Order"]`),
+`rebind` builds the MathJSON as a DAG — one array per distinct node, shared
+by every parent that reads it, with operands taken from the node's
+structural form as `.json` takes them — and boxes that by the ordinary
+route. The match with the MathJSON route therefore holds by construction,
+including for an expression that already holds an `Error` node. Canonical
+boxing still visits every path, as it does for any MathJSON — what `rebind`
+removes is the tree-sized serialization. The raw and structural forms
+canonicalize nothing, so there each distinct node is rebuilt once and a
+shared sub-expression stays shared in the result too. Verbatim LaTeX and source positions are dropped, as the
+MathJSON route drops them; a mutable object is rebuilt as the record
+snapshot that route boxes as data.
+
 ### Reading Back What a Parse Declared
 
 `createScope()` returns an `InspectableScope` — structurally a `Scope`,

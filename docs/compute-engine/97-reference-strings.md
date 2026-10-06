@@ -594,10 +594,22 @@ Convert the argument to a string, using the specified _format_.
 
 | _format_ | Description |
 | :--- | :--- |
-| _(omitted)_ | The argument's default string representation |
+| _(omitted)_ | A finite non-negative integer, or a list of such integers, is read as Unicode scalars. Any other argument uses its default string representation |
+| `default` | The argument's default string representation |
 | `utf-8` | The argument is a collection of UTF-8 bytes |
 | `utf-16` | The argument is a collection of UTF-16 code units |
 | `unicode-scalars` | The argument is a collection of Unicode scalars (same as UTF-32), or a single Unicode scalar |
+
+When _format_ is omitted and the argument is a finite non-negative integer,
+or a list of such integers, the integers are decoded as Unicode scalars, as
+with the `unicode-scalars` format: `["StringFrom", 65]` is `"A"`. A number
+that cannot be a code point (`NaN`, an infinity, a non-integer, a negative
+number, a complex number) and any other argument — a string, a boolean, a
+symbol, an expression — keep their default string representation. To print
+an integer instead of decoding it, give the `default` format.
+
+A **tuple** of numbers is not decoded, because a tuple carries the coordinates
+of a point. Use a list, or give the `unicode-scalars` format.
 
 The three explicit formats require a collection of integers (or, for
 `unicode-scalars`, a single integer). A **string** argument is a type error:
@@ -608,6 +620,18 @@ bytes would be nonsense. Convert it with [`Utf8`](#utf8) /
 For example: 
 
 ```json example
+["StringFrom", 128287]
+// ➔ "🔟"
+
+["StringFrom", ["List", 127467, 127479]]
+// ➔ "🇫🇷"
+
+["StringFrom", 65]
+// ➔ "A"
+
+["StringFrom", 128287, {str: "default"}]
+// ➔ "128287"
+
 ["StringFrom", ["List", 72, 101, 108, 108, 111], {str: "utf-8"}]
 // ➔ "Hello"
 
