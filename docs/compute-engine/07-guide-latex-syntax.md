@@ -1244,6 +1244,18 @@ Each entry in the LaTeX dictionary is an object with the following properties:
   can have different triggers that produce the same expression. This is useful
   for synonyms, such as `\operatorname{floor}` and `\lfloor`...`\rfloor`.
 
+- `standaloneSymbol`
+
+  Set it to `true` when the LaTeX of this entry, written with no operands,
+  reads back as the symbol `name`. This is the case for a constant (`\pi`), a
+  set (`\emptyset`) and a function command (`\sin`).
+
+  When it is not `true`, a symbol with no operands is written
+  `\mathrm{Name}`, and the `serialize` handler of the entry is not used for
+  it. See [Serializing a Symbol](#serializing-a-symbol).
+
+  **Default**: `false`
+
 #### Expressions
 
 The most general type of entry is one of kind `expression`. If no `kind`
@@ -1587,6 +1599,62 @@ It is possible to have multiple definitions with the same triggers, but the
 `name` property must be unique. The record with the `name` property will be used
 to serialize the expression. A `serialize` handler is invalid if the `name`
 property is not provided.
+
+#### Serializing a Symbol
+
+An entry is used to serialize a symbol with no operands only when it sets
+`standaloneSymbol: true`. This applies to a constant such as `Pi`, and to an
+operator used as a value, such as the `Sin` in `["Map", "xs", "Sin"]`.
+
+The reason is that most entries describe a notation that needs operands. With
+no operands, the entry for `Factorial` gives `!` and the entry for `Abs` gives
+`\vert\vert`, and these do not read back as the symbol. So the default is the
+spelling that always reads back: `\mathrm{Name}`.
+
+```js
+const syntax = new LatexSyntax({
+  dictionary: [
+    ...LATEX_DICTIONARY,
+    { name: "PlasticRatio", latexTrigger: "\\rho", standaloneSymbol: true },
+  ],
+});
+const ce = new ComputeEngine({ latexSyntax: syntax });
+
+ce.parse("\\rho + 1").json;
+// ➔ ["Add", "PlasticRatio", 1]
+
+ce.parse("\\rho + 1").latex;
+// ➔ \rho+1
+```
+
+Without `standaloneSymbol: true`, `\rho` is still parsed as `PlasticRatio`,
+but the symbol is written `\mathrm{PlasticRatio}`.
+
+**To change the LaTeX of a symbol of the default dictionary**, remove its
+entry and add your own. The `name` of an entry must be unique, so the default
+entry is filtered out. For example, the constant `EulerGamma` is written
+`\operatorname{EulerGamma}` by default, because `\gamma` is often a variable.
+To write it `\gamma`:
+
+```js
+const syntax = new LatexSyntax({
+  dictionary: [
+    ...LATEX_DICTIONARY.filter((entry) => entry.name !== "EulerGamma"),
+    { name: "EulerGamma", latexTrigger: "\\gamma", standaloneSymbol: true },
+  ],
+});
+const ce = new ComputeEngine({ latexSyntax: syntax });
+
+ce.expr(["Add", "EulerGamma", 1]).latex;
+// ➔ 1+\gamma
+
+ce.parse("\\gamma + 1").json;
+// ➔ ["Add", 1, "EulerGamma"]
+```
+
+The four number symbols whose spelling is a serialization option
+(`positiveInfinity`, `negativeInfinity`, `notANumber` and `imaginaryUnit`) do
+not need the flag.
 
 ## Using a New Function with a Mathfield
 

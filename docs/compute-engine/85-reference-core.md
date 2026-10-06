@@ -855,8 +855,72 @@ Assumptions on the unknown (such as `assume(n > 0)`) filter the solutions the
 same way, conjunctively with any explicit domain.
 
 `Solve` is the operator form of the `expr.solve()` method, and uses the same
-solver for the two-argument symbolic case. The result is a `List` of the
-solutions, or an empty list when none are found.
+solver for the two-argument symbolic case.
+
+The result is a `List` that holds all the solutions in the domain. An empty
+`List` means that the engine has shown that there is no solution. When the
+engine cannot show that its list holds all the solutions, `Solve` stays
+unevaluated (and `expr.solve()` returns `null`): it never returns a part of
+the solutions as if it were the answer. For example,
+`Solve((x - 1)·BesselJ(0, x) = 0, x)` and `Solve((x - 2)(x + e^x) = 0, x)`
+stay unevaluated, because the solver finds `1` and `2`, but not the other
+solutions.
+
+**Real or complex solutions.** When the unknown has no declared type and no
+domain is given, a polynomial equation gives all its roots, complex roots
+included: `Solve(x^2 + 1 = 0, x)` is `[i, -i]`. Every other equation gives
+its real solutions only: `Solve(e^x = -1, x)` and `Solve(|x^2 + 1| = 0, x)`
+are `[]`, and `Solve(|x - 1| = 3, x)` is `[-2, 4]`. To solve such an equation
+over the complex numbers, declare the unknown complex
+(`ce.declare('x', 'complex')`). `Solve` then stays unevaluated when it cannot
+list all the complex solutions, for example when they are infinitely many.
+
+A symbol other than the unknown, with no value and no declared type (a
+parameter such as `a` in `|x - a| = 2`), counts as real: the result is
+`[a - 2, a + 2]`. When the parameter is declared complex, a result that is
+correct only for a real parameter is not given, and `Solve` stays
+unevaluated.
+
+A trigonometric equation has infinitely many solutions. With no domain, or
+over the real or the complex numbers, the result holds its principal
+solutions, one for each family of solutions: `Solve(sin(x) = 1/2, x)` is
+`[π/6, 5π/6]`, and each solution of the equation is one of them plus a
+multiple of `2π`. Over a bounded domain, such as an `Interval` or a `Range`,
+the result holds every solution in the domain.
+
+A root template that you add to `ce.solveRules` is your claim of a solution:
+its solutions are returned as they are, also for a function that the solver
+cannot invert.
+
+**Limits, and what to use instead.** Because `Solve` only answers when it can
+show that its list is complete, it stays unevaluated for many equations that
+have solutions:
+
+- an equation that mixes the unknown inside and outside a function the
+  solver cannot invert, such as `e^x = x + 2`, `cos(x) = x` or
+  `(x - 2)(x + e^x) = 0`;
+- an equation with a special function of the unknown, such as
+  `BesselJ(0, x) = 0` or `Sinc(x) = 1/2`;
+- a trigonometric function of an argument that is not linear in the unknown,
+  such as `sin(x^2) = 0`, with no bounded domain;
+- a polynomial of degree 3 or more with symbolic coefficients, such as
+  `x^3 + a x + 1 = 0`;
+- over a bounded domain, an equation whose solutions are too many to list,
+  or whose list the engine cannot check numerically (for example, a domain
+  very far from 0).
+
+When `Solve` stays unevaluated, you can:
+
+- give a **bounded domain**, `Solve(eq, x ∈ [a, b])`: the engine then uses
+  interval arithmetic to prove that the domain has no root other than the
+  listed ones, and returns the list when the proof succeeds;
+- use **`FindRoot`** to find one solution numerically near a starting value:
+  `FindRoot(e^x = x + 2, (x, 1))` returns a record whose `parameters` field
+  holds the solution near 1 (about 1.146), with `converged` and
+  `residualNorm` to show how good it is.
+
+A list from `Solve` is never a part of the solutions. So when you need any
+solution, and not all of them, `FindRoot` is the right tool.
 
 </FunctionDefinition>
 
@@ -1013,11 +1077,18 @@ Evaluate to a numerical approximation of the expression.
 Evaluate to a numerical approximation with the given number of significant
 digits.
 
-If _precision_ is greater than the engine's current working precision
-(`ce.precision`), the working precision is raised to match — and **kept** raised,
-since display precision is a global setting. If _precision_ is at or below the
-working precision, the result is rounded to that many significant digits without
-changing the working precision.
+The value is computed with _precision_ digits plus a few guard digits, then
+rounded to _precision_ digits, and it keeps these digits when it is
+displayed. The working precision of the engine (`ce.precision`) does not
+change. A later operation on the result is computed at the working precision.
+A value that does not change with the precision (a float of the operand, or
+the value of a kernel that computes with machine floats) shows only the digits
+it has.
+
+The result is a float, also when its value is an integer: `["N", 2]` is
+`2.0`, and `["Divide", ["N", 2], 3]` is `0.666…`. The elements of a list or
+tuple result are floats rounded to _precision_ digits. The constants of a
+symbolic result stay exact.
 
 ```json example
 ["N", "Pi", 20]
@@ -1025,6 +1096,26 @@ changing the working precision.
 
 ["N", ["Divide", 1, 3], 4]
 // ➔ 0.3333
+```
+
+<Signature name="N">_expression_, ["List", _p_, _a_]</Signature>
+
+Evaluate to a numerical approximation with a precision goal _p_ (correct
+significant digits) or an accuracy goal _a_ (an absolute error below
+10<sup>−_a_</sup>), whichever goal is met first. Either goal can be
+`"PositiveInfinity"`. The engine evaluates the expression at a precision that
+it doubles until two successive values agree within the goal, then rounds the
+value to the goal. When the goal needs more than 1000 digits, or cannot be
+checked, the expression stays unevaluated.
+
+```json example
+["N", ["Multiply", ["Power", 10, 10],
+  ["Subtract", ["Exp", 100], ["Exp", ["Divide", 999999999999, ["Power", 10, 10]]]]],
+  ["List", "PositiveInfinity", 20]]
+// ➔ 2.688117141681729591326298974395630530648558808379370953675983977e+43
+
+["N", ["Multiply", 1000, "Pi"], ["List", 10, 3]]
+// ➔ 3141.593
 ```
 
 </FunctionDefinition>

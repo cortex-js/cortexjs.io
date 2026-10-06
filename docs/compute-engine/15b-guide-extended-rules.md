@@ -101,6 +101,13 @@ ce.expr(["Add",
 // ➔ JacobiTheta(3, 0, tau)^4
 ```
 
+The identities are written for angles in radians. An identity that contains a
+trigonometric or inverse trigonometric function, `Arg` or `AbsArg` applies only
+when `ce.angularUnit` is `"rad"` (the default). In another unit, for example
+`"deg"`, `sin(π)` is the sine of π degrees, not 0, and these identities are not
+used. The other identities, which include the identities of the hyperbolic
+functions, apply in every unit.
+
 ## Simplification vs Transformation
 
 Rules whose right-hand side is *simpler* than their left-hand side are applied

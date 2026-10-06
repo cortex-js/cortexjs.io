@@ -1284,17 +1284,36 @@ It's equivalent to `["Drop", xs, 1]`.
 
 Return a list of the first `n` elements of `xs`. The collection `xs` must be indexed.
 
-A non-positive `n` is clamped to zero: `Take` never counts from the end, so
-`n <= 0` yields the empty collection whatever `xs` is. To take a suffix, drop
-the prefix before it (`["Drop", xs, ["Subtract", ["Length", xs], 2]]`) or slice
-with negative bounds (`["Slice", xs, -2, -1]`).
+A negative `n` counts from the end: `["Take", xs, -n]` is the last `n`
+elements of `xs`. If `n` is 0, the result is the empty collection.
+
+A count past the length of `xs` is clamped, in both directions: the result is
+all of `xs`.
+
+A negative count needs the length of `xs`. If that length is not known or is
+infinite (an infinite `Range`, a symbol with no value), the expression stays
+unevaluated.
+
+If `xs` is a string, the result is a string.
 
 ```json example
 ["Take", ["List", 5, 2, 10, 18], 2]
 // ➔ ["List", 5, 2]
 
 ["Take", ["List", 5, 2, 10, 18], -2]
-// ➔ ["List"]
+// ➔ ["List", 10, 18]
+
+["Take", ["List", 5, 2, 10, 18], 10]
+// ➔ ["List", 5, 2, 10, 18]
+
+["Take", ["List", 5, 2, 10, 18], -10]
+// ➔ ["List", 5, 2, 10, 18]
+
+["Take", "'hello'", -2]
+// ➔ "lo"
+
+["Take", ["Range", 1, "PositiveInfinity"], -2]
+// ➔ ["Take", ["Range", 1, "PositiveInfinity"], -2]
 ```
 
 See [**Drop**](#drop) for a function that returns everything but the first `n` elements.
@@ -1310,16 +1329,33 @@ See [**Drop**](#drop) for a function that returns everything but the first `n` e
 
 Return a list without the first `n` elements.
 
-A negative `n` drops nothing: the count is clamped to zero, so the collection
-comes back unchanged. To drop a suffix, take the prefix that remains
-(`["Take", xs, ["Subtract", ["Length", xs], 2]]`).
+A negative `n` counts from the end: `["Drop", xs, -n]` is `xs` without its
+last `n` elements. If `n` is 0, the result is all of `xs`.
+
+A count past the length of `xs` is clamped, in both directions: the result is
+the empty collection.
+
+A negative count needs the length of `xs`. If that length is not known or is
+infinite (an infinite `Range`, a symbol with no value), the expression stays
+unevaluated.
+
+If `xs` is a string, the result is a string.
 
 ```json example
 ["Drop", ["List", 5, 2, 10, 18], 2]
 // ➔ ["List", 10, 18]
 
 ["Drop", ["List", 5, 2, 10, 18], -2]
-// ➔ ["List", 5, 2, 10, 18]
+// ➔ ["List", 5, 2]
+
+["Drop", ["List", 5, 2, 10, 18], 10]
+// ➔ ["List"]
+
+["Drop", ["List", 5, 2, 10, 18], -10]
+// ➔ ["List"]
+
+["Drop", "'hello'", -2]
+// ➔ "hel"
 ```
 
 See [**Take**](#take) for a function that returns the first `n` elements.

@@ -126,6 +126,38 @@ Compiled functions honor the angular unit as well: with
 `ce.angularUnit = "deg"`, `ce.compile("\\sin(x)")` returns a function that
 interprets `x` in degrees, matching `evaluate()`.
 
+## Rounding Ties
+
+`Round` rounds a number to the nearest integer. A value exactly halfway
+between two integers (a tie) is rounded with the rule of `ce.roundingTies`
+(default: `"away-from-zero"`).
+
+| Rule | `Round(2.5)` | `Round(3.5)` | `Round(-2.5)` | Used by |
+| :--- | :---: | :---: | :---: | :--- |
+| `"away-from-zero"` | `3` | `4` | `-3` | the default |
+| `"to-even"` | `2` | `4` | `-2` | IEEE 754, Python, NumPy, Mathematica |
+| `"toward-zero"` | `2` | `3` | `-2` | |
+| `"toward-positive-infinity"` | `3` | `4` | `-2` | JavaScript `Math.round` |
+| `"toward-negative-infinity"` | `2` | `3` | `-3` | |
+
+```live
+ce.roundingTies = "to-even";
+console.log(ce.parse("\\operatorname{round}(2.5)").evaluate());
+// ➔ 2
+```
+
+The rule applies at every precision, to an exact rational (`Round(5/2)`), and
+to the form `Round(x, n)`, which rounds to `n` decimal places: with
+`"to-even"`, `Round(0.125, 2)` is `3/25`. A value that is not a tie is not
+affected.
+
+Compiled functions honor the rule as well: the code is made with the rule in
+effect when the expression is compiled, and a function compiled before a
+change keeps its rule.
+
+`Remainder` does not use this rule: its quotient is always rounded with a tie
+toward `+∞`.
+
 ## JavaScript Interoperability
 
 The result of `expr.evaluate()` and `expr.N()` is a expression. 

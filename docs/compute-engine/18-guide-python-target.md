@@ -155,7 +155,9 @@ trig_product = np.vectorize(_trig_product_scalar)
 - `abs` → `np.abs`
 - `floor` → `np.floor`
 - `ceiling` → `np.ceil`
-- `round` → `np.round`
+- `round` → `_ce_round(x, rule)`, a helper written before the code, which
+  rounds a tie with the rule of `ce.roundingTies` at compile time; with the
+  rule `"to-even"`, `round` → `np.round`
 
 ### Statistics
 - `sum` → `np.sum`

@@ -123,6 +123,11 @@ $$
 \arg z = \tan^{-1} \frac{\Im z}{\Re z}
 $$
 
+The angle is in the angular unit of the engine (`ce.angularUnit`), as the
+result of the inverse trigonometric functions is. The default unit is radians.
+With `ce.angularUnit = "deg"`, the argument of `3+4i` is `53.13…` and the
+argument of `-1` is `180`.
+
 ```json example
 ["Arg", ["Complex", 3, 4]]
 // ➔ 0.9272952180016122
@@ -137,7 +142,8 @@ $$
 
 <Signature name="AbsArg">_z_</Signature>
 
-Return a tuple of the magnitude and argument of a complex number.
+Return a tuple of the magnitude and argument of a complex number. The argument
+is in the angular unit of the engine, as for `Arg`.
 
 This corresponds to the polar representation of a complex number.
 

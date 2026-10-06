@@ -452,9 +452,14 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 | `Ceil`   | $$\lceil x \rceil $$ | Rounds a number up to the next largest integer                                   |
 | `Floor`  | $$\lfloor x \rfloor$$ | Round a number to the greatest integer less than the input value                 |
 | `Chop`   |              | Replace real numbers that are very close to 0 (less than $$10^{-10}$$) with 0  |
-| `Round`  |              |                                                                                  |
+| `Round`  |              | Rounds a number to the nearest integer. `Round(x, n)` rounds to `n` decimal places |
 
 </div>
+
+A value exactly halfway between two integers (a tie) is rounded with the rule
+of `ce.roundingTies`. The default rule rounds a tie away from zero:
+`Round(2.5)` is `3` and `Round(-2.5)` is `-3`. See
+[Rounding Ties](/compute-engine/guides/numeric-evaluation/#rounding-ties).
 
 ### Other Relational Operators
 

@@ -90,27 +90,31 @@ full <code>Explanation</code> API <Icon name="chevron-right-bold" /></ReadMore>
 
 ## Options and the Load Report
 
-`loadIntegrationRules()` returns a report and accepts a per-integral step
-budget and a wall-clock limit:
+`loadIntegrationRules()` returns a report and accepts two limits for each
+integral: a step budget and a wall-clock limit.
 
 ```js
 const report = loadIntegrationRules(ce, {
-  stepBudget: 300000, // per-Integrate step budget (default 300000)
-  timeLimitMs: 30000, // per-Integrate wall-clock limit (default 30000)
+  stepBudget: 300000, // steps of the rule driver per integral (default 300000)
+  timeLimitMs: 120000, // wall-clock guard per integral (default 120000)
 });
 
 console.log(report.ruleCount); // number of compiled rules registered (~2600)
 console.log(report.skipped);   // corpus rules skipped at compile time
 ```
 
-The `stepBudget` decides when the rule driver gives up on an integrand. A step
-is one internal checkpoint of the engine, so the same integrand gives up at
-the same point on every machine: the answer does not depend on the speed or
-the load of the machine. When the driver gives up, the built-in
-antiderivative is used instead.
+The **step budget** decides when the rule driver gives up on an integrand.
+Because it counts steps and not time, the same integral gives the same answer
+on a fast machine, a slow one and a loaded one: an integral that needs more
+steps stays unevaluated everywhere, and the built-in antiderivative is used
+instead.
 
-The `timeLimitMs` limit is only a guard against a hang in code that does not
-count steps, so a pathological integrand cannot hang the engine.
+The **wall-clock limit** is only a guard against a hang in code that does not
+count steps. The default (120 s) is about 8 times what the step budget allows
+on an idle machine, so on a machine up to about 8 times slower the step budget,
+not the clock, decides the result. On a slower or more loaded machine, raise
+`timeLimitMs`: when the clock stops a search that the step budget allows, the
+integral can stay unevaluated on that machine and close on a faster one.
 
 ## Performance
 

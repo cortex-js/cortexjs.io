@@ -282,23 +282,64 @@ I_{1-p}(n-k, k+1)$$.
 
 <Signature name="LambertW">_x_</Signature>
 
+<Signature name="LambertW">_x_, _k_</Signature>
+
 <Latex value="\operatorname{W}(x)"/>
+
+<Latex value="\operatorname{W}_{k}(x)"/>
 
 The [Lambert W function](https://en.wikipedia.org/wiki/Lambert_W_function),
 also called the product logarithm. It is the inverse function of
 $$ f(w) = w e^w $$.
 
-For a given value $x$, $W(x)$ is the value $w$ such that $w e^w = x$.
+For a given value $x$, $W_k(x)$ is the value $w$ on branch $k$ such that
+$w e^w = x$. The branch $k$ is an integer. When it is not given, it is $0$,
+the principal branch $W_0$.
+
+$W_k(x)$ is real only on the two real branches:
+
+- $W_0(x)$ for $x \ge -1/e$
+- $W_{-1}(x)$ for $-1/e \le x < 0$
+
+On all other branches, and for all other arguments, the value is complex.
+
+**Argument order.** The branch is the **second** argument:
+`["LambertW", x, k]`. This is the order of mpmath (`lambertw(z, k)`), SciPy,
+SymPy, Julia and Fungrim. Mathematica (`ProductLog[k, z]`, or `LambertW[k, z]`
+in Wolfram|Alpha), Maple, Sage and MATLAB put the branch **first**. When you copy an expression from one of these
+systems, swap the two arguments.
+
+A branch that is not an integer is a type error. For example,
+`["LambertW", -1, -0.1]` (the Wolfram order, copied without a swap) gives an
+`incompatible-type` error. But when both arguments are integers, a swap is not
+an error: `["LambertW", 1, 2]` is $W_2(1) \approx -2.4016 + 10.7763i$, and
+`["LambertW", 2, 1]` is $W_1(2) \approx -0.8343 + 4.5303i$.
+
+To make the order clear, name the branch. The parameters are named `z` and
+`branch`, and named arguments can be in any order:
+
+```json example
+["N", ["LambertW", -0.1, ["NamedArgument", "'branch'", -1]]]
+// ➔ -3.57715206395729721841
+
+["N", ["LambertW", ["NamedArgument", "'branch'", -1], ["NamedArgument", "'z'", -0.1]]]
+// ➔ -3.57715206395729721841
+```
+
+In Epsil, this is `lambertW(-0.1, branch: -1)`.
 
 The derivative of the Lambert W function is:
 
 $$
-\frac{d}{dx} W(x) = \frac{W(x)}{x(1 + W(x))}
+\frac{d}{dx} W_k(x) = \frac{W_k(x)}{x(1 + W_k(x))}
 $$
 
 ```json example
 ["LambertW", 1]
 // ➔ Ω ≈ 0.5671 (the Omega constant)
+
+["N", ["LambertW", -0.1, -1]]
+// ➔ -3.57715206395729721841
 ```
 
 - Wikidata: [Q429963](https://www.wikidata.org/wiki/Q429963)
