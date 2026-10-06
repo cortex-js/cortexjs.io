@@ -66,7 +66,7 @@ deploy` would otherwise abort before reaching Cloudflare.
 ### The two-site split
 
 The Epsil language docs are authored in the compute-engine repo
-(`../compute-engine/src/epsil/docs/*.md`) for a section rooted at `/epsil/`:
+(`../compute-engine/src/epsil/docs/**/*.md`) for a section rooted at `/epsil/`:
 slugs and internal links are all written as `/epsil/…`. On epsil.dev the
 language *is* the site, so `scripts/sync-epsil-docs.mjs` rewrites them on the
 way in:
@@ -81,7 +81,13 @@ way in:
   recognize is left alone and reported; add it to `MATHLIVE_SECTIONS` if it is
   a mathlive.io page.
 
-`docs/epsil/*.md` is **generated** — edit the upstream copies, never these.
+`docs/epsil/**/*.md` is **generated** — edit the upstream copies, never these.
+
+The sync copies subdirectories too (`reference/` holds one generated page per
+library of the standard library), but skips `*.intro.md`: those are fragments
+the upstream generator already merges into the page of the same name. The
+sidebar (`sidebars.epsil.js`) is maintained here by hand, so the sync warns
+about a synced page that the sidebar does not list.
 
 Old mathlive.io URLs (`/epsil/…`, and `/cortex/…` from before the rename) are
 redirected to epsil.dev by `plugins/epsil-redirect`, using the route table

@@ -1,8 +1,9 @@
 // Sync the Epsil language documentation from the compute-engine repo into
 // `docs/epsil/`, rewriting it for the standalone epsil.dev site.
 //
-// The docs are authored upstream (`../compute-engine/src/epsil/docs/*.md`) for
-// a section of a larger site, so every URL in them is rooted at `/epsil/`:
+// The docs are authored upstream (`../compute-engine/src/epsil/docs/`, and its
+// subdirectories such as `reference/`) for a section of a larger site, so every
+// URL in them is rooted at `/epsil/`:
 //
 //     slug: /epsil/syntax/
 //     [pattern matching](/epsil/control-flow/#match)
@@ -19,7 +20,7 @@
 // `/math-json/…`) resolve on mathlive.io and have no counterpart on epsil.dev,
 // so they are absolutized to https://mathlive.io.
 //
-// `docs/epsil/*.md` is GENERATED — edit the upstream copies in the
+// `docs/epsil/**/*.md` is GENERATED — edit the upstream copies in the
 // compute-engine repo, never the files this writes.
 
 import fs from "node:fs/promises";
@@ -168,10 +169,38 @@ async function checkSidebarCoverage(pageIds) {
   }
 }
 
+/**
+ * List the Markdown files under `dir`, subdirectories included, as sorted
+ * paths relative to `dir` with `/` separators (`syntax.md`,
+ * `reference/core.md`).
+ *
+ * The subdirectories matter: the per-library reference pages live in
+ * `reference/`, and `library.md` links to every one of them. When only the top
+ * level was synced, those pages were never published and the epsil.dev build
+ * stopped on 19 broken links.
+ */
+async function listMarkdown(dir, prefix = "") {
+  const files = [];
+  const entries = await fs.readdir(path.join(dir, prefix), { withFileTypes: true });
+  for (const entry of entries) {
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) files.push(...(await listMarkdown(dir, relative)));
+    else if (entry.name.endsWith(".md")) files.push(relative);
+  }
+  return files.sort();
+}
+
+// `<name>.intro.md` is not a page. It is the hand-written introduction that
+// the upstream generator (`scripts/build-library-reference.ts` in the
+// compute-engine repo) copies into the generated `<name>.md` next to it.
+// Publishing it would duplicate that text at a second URL, and because it has
+// no frontmatter the URL would be one nobody chose.
+const isPage = (name) => !name.endsWith(".intro.md");
+
 async function main() {
   let sources;
   try {
-    sources = (await fs.readdir(SOURCE_DIR)).filter((f) => f.endsWith(".md")).sort();
+    sources = (await listMarkdown(SOURCE_DIR)).filter(isPage);
   } catch (error) {
     console.error(
       `[sync-epsil-docs] Cannot read ${SOURCE_DIR}. The compute-engine repo is ` +
@@ -189,9 +218,8 @@ async function main() {
 
   // Remove stale pages: a doc deleted upstream would otherwise linger here and
   // keep being published.
-  for (const existing of await fs.readdir(TARGET_DIR)) {
-    if (existing.endsWith(".md") && !sources.includes(existing))
-      await fs.rm(path.join(TARGET_DIR, existing));
+  for (const existing of await listMarkdown(TARGET_DIR)) {
+    if (!sources.includes(existing)) await fs.rm(path.join(TARGET_DIR, existing));
   }
 
   const unknown = new Set();
@@ -217,6 +245,7 @@ async function main() {
       routes[before.replace(/\/?$/, "/")] = isRoot ? "/" : after;
     };
     const content = rewrite(source, { onUnknown, onSlug });
+    await fs.mkdir(path.dirname(path.join(TARGET_DIR, name)), { recursive: true });
     await fs.writeFile(path.join(TARGET_DIR, name), content, "utf8");
     // Linted after the rewrite, so the routes and links checked are the ones
     // that ship on epsil.dev rather than the `/epsil/`-rooted originals.

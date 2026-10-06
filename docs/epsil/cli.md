@@ -78,15 +78,18 @@ pi * radius^2
 | `-e`, `--eval <source>` | Evaluate Epsil source supplied on the command line. |
 | `--json` | Write the result as formatted [MathJSON](/implementation/), the representation Epsil programs are evaluated in. Finite lazy collections (`Range`, `Map` results, …) are materialized into their elements, up to 10,000. |
 | `--epsil` | Write the result as serialized Epsil source. |
+| `--latex` | Write the result as LaTeX. |
+| `--from <format>` | The notation of the source: `epsil` (the default) or `latex`, a single LaTeX expression. See [LaTeX Input and Output](#latex-input-and-output). |
 | `--fancy-symbols` | With `--epsil`, write the Unicode notations instead of the ASCII spellings: `√x` for `sqrt(x)`, `∛x` and `∜x` for cube and fourth roots, `x²` for `x ^ 2`, and `×`, `÷`, `−`, `≠`, `⩽`, `⩾`, `∈`, `⇒` for the operators. Every notation reads back to the same expression. |
 | `--diagnostics <fmt>` | Write diagnostics as `text` (the default) or as a `json` array. |
 | `--time-limit <ms>` | Set the evaluation deadline in milliseconds. The default is `10000`; `0` disables it. |
+| `--compile` | Compile the program to JavaScript and run the generated code instead of interpreting it. See [Running a Compiled Program](#running-a-compiled-program). |
 | `--no-color` | Disable color in diagnostics. The [`NO_COLOR`](https://no-color.org/) environment variable is also honored. |
 | `-h`, `--help` | Display command help. |
 | `-v`, `--version` | Display the package version. |
 
-`--json` and `--epsil` are mutually exclusive, and `--fancy-symbols` requires
-`--epsil`. With neither output option, results use the ordinary textual
+`--json`, `--epsil` and `--latex` are mutually exclusive, and
+`--fancy-symbols` requires `--epsil`. With neither output option, results use the ordinary textual
 representation of a value.
 
 ```bash
@@ -95,6 +98,85 @@ Sqrt(2) * x ^ 2
 $ npx epsil --epsil --fancy-symbols -e 'Sqrt(2) * x^2'
 √2 × x²
 ```
+
+## LaTeX Input and Output
+
+With `--from latex`, the source is a single LaTeX expression instead of an
+Epsil program. It can come from `--eval`, a file, or standard input, and
+combines with every output option:
+
+```shell
+$ npx epsil --from latex -e '\int_0^1 x^2\,dx'
+1/3
+$ npx epsil --from latex --latex -e '\frac{1}{2}+\frac{1}{3}'
+\frac{5}{6}
+$ echo '\frac{d}{dx} \sin(x^2)' | npx epsil --from latex
+2x * cos(x^2)
+```
+
+A LaTeX parse error is reported like a runtime error, quoting the LaTeX
+where the parser stopped:
+
+```shell
+$ npx epsil --from latex -e '1+'
+error: Runtime error: unexpected operator at `+`
+```
+
+In the REPL, `--from latex` makes each entry a LaTeX expression (`.load`
+still reads an Epsil file). `--latex` also applies to Epsil programs: it
+writes the value of the program as LaTeX.
+
+```shell
+$ npx epsil --latex -e 'Sqrt(8) / 2'
+\sqrt{2}
+```
+
+## Running a Compiled Program
+
+With `--compile`, the program is compiled to JavaScript and the generated
+code is run, instead of the program being interpreted:
+
+```shell
+npx epsil --compile program.epsil
+```
+
+The value of the compiled program is written the same way as an interpreted
+result, and every output option (`--json`, `--epsil`, `--latex`) and
+`--from latex` apply. Use this mode to see what a compiled program answers
+(a host that compiles Epsil, such as a graphing application, runs the same
+generated code) and to compare it with the interpreter.
+
+The compiled route differs from the interpreter in three ways:
+
+- **Arithmetic is machine arithmetic.** Every number is a float: `1/3` is
+  `0.3333333333333333`, `sqrt(2)` is `1.4142135623730951`, and `2 + 1` is the
+  float `3.0` (written `3`, and `{num: "3.0"}` with `--json`). A pole is
+  `+oo` or `NaN`, where the interpreter answers an exact value.
+- **Every symbol must have a value.** The interpreter keeps a symbol with no
+  value symbolic (`x + 1` evaluates to `x + 1`); compiled code has no
+  symbolic values, so such a program is a runtime error naming the symbol.
+- **A construct the JavaScript target does not compile is an error.** The
+  error names the construct (`Simplify`, a pattern the target has no lowering
+  for) instead of falling back to the interpreter.
+
+```bash
+$ npx epsil --compile -e 'f(x) = x^2 + 1
+f(3)'
+10
+$ npx epsil --compile -e 'x + 1'
+error: Runtime error: unbound symbol: `x` has no value; a compiled program cannot keep a symbol symbolic
+ --> 1:1
+  |
+1 | x + 1
+  | ^^^^^
+```
+
+A value the compiled code answers that cannot be printed (the program
+evaluates to a function) is a runtime error too. A color is answered in the
+OKLCh color space, the canonical space of the compiled targets, whichever
+constructor the program wrote. Parse errors and static type errors are
+reported as they are for an interpreted program. The `--time-limit` deadline
+covers parsing and compiling; the generated code then runs to completion.
 
 ## Checking a Program Without Evaluating It
 

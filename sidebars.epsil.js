@@ -29,6 +29,7 @@ const sidebars = {
         { type: "doc", id: "goals", className: "guide-icon" },
         { type: "doc", id: "principles", className: "guide-icon" },
         { type: "doc", id: "naming", className: "guide-icon" },
+        { type: "doc", id: "style", className: "guide-icon" },
         { type: "html", value: "<hr/>" },
         { type: "doc", id: "from-python", className: "guide-icon" },
         { type: "doc", id: "from-mathematica", className: "guide-icon" },
@@ -51,6 +52,41 @@ const sidebars = {
         { type: "doc", id: "pragmas", className: "reference-icon" },
         { type: "doc", id: "syntax", className: "reference-icon" },
         { type: "doc", id: "errors", className: "reference-icon" },
+        { type: "html", value: "<hr/>" },
+        { type: "doc", id: "library", className: "reference-icon" },
+        // One page per library of the standard library, in the order
+        // `library.md` lists them. The pages are generated upstream
+        // (`../compute-engine/src/epsil/docs/reference/`); when a library is
+        // added there, `scripts/sync-epsil-docs.mjs` warns that its page is
+        // not listed here. Collapsed by default because 19 entries would
+        // otherwise push the Tools section far down the sidebar.
+        {
+          type: "category",
+          label: "Library Reference",
+          collapsible: true,
+          collapsed: true,
+          items: [
+            { type: "doc", id: "reference/core", className: "reference-icon" },
+            { type: "doc", id: "reference/control-structures", className: "reference-icon" },
+            { type: "doc", id: "reference/logic", className: "reference-icon" },
+            { type: "doc", id: "reference/collections", className: "reference-icon" },
+            { type: "doc", id: "reference/colors", className: "reference-icon" },
+            { type: "doc", id: "reference/regexp", className: "reference-icon" },
+            { type: "doc", id: "reference/relop", className: "reference-icon" },
+            { type: "doc", id: "reference/arithmetic", className: "reference-icon" },
+            { type: "doc", id: "reference/fractals", className: "reference-icon" },
+            { type: "doc", id: "reference/trigonometry", className: "reference-icon" },
+            { type: "doc", id: "reference/calculus", className: "reference-icon" },
+            { type: "doc", id: "reference/polynomials", className: "reference-icon" },
+            { type: "doc", id: "reference/combinatorics", className: "reference-icon" },
+            { type: "doc", id: "reference/number-theory", className: "reference-icon" },
+            { type: "doc", id: "reference/special-functions", className: "reference-icon" },
+            { type: "doc", id: "reference/linear-algebra", className: "reference-icon" },
+            { type: "doc", id: "reference/statistics", className: "reference-icon" },
+            { type: "doc", id: "reference/units", className: "reference-icon" },
+            { type: "doc", id: "reference/physics", className: "reference-icon" },
+          ],
+        },
       ],
     },
     {

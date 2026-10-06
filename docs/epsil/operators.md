@@ -162,9 +162,13 @@ piped value goes.
 
 A stage may also be a **lambda**, written inline without parentheses — after
 `|>` the arrow binds tighter than the pipe, and the lambda's body ends at the
-next `|>`. When the piped value is a collection, a one-parameter lambda stage
-is applied **to each element** (an implicit `map`); `_^2` is shorthand for
-such a lambda. The following three pipelines are equivalent:
+next `|>`. A pipe is a call written the other way round: `xs |> f` is
+`f(xs)`, for a lambda as for a named function. So when the piped value is a
+list (or a range), a one-parameter lambda whose body uses its parameter as a
+**scalar** (`x^2`, `x + 1`) is applied **to each element**, at every depth of
+a nested list, as calling it on the list does; `_^2` is shorthand for such a
+lambda. A set, a tuple (a point) or a string is passed whole. The following
+three pipelines are equivalent:
 
 ```epsil-live
 1..oo |> take(_, 10) |> map(_^2, _) |> sum
@@ -178,10 +182,11 @@ such a lambda. The following three pipelines are equivalent:
 
 Note the two readings of `_`: in a **call** stage it is the piped value
 (`take(_, 10)`); in an **operator-written** stage (`_^2`, `_ + 1`) it is the
-element of the implicit lambda. A **named** function stage always receives
-the whole value — `xs |> sum` sums the collection, it does not map — as does
-a lambda whose annotated parameter accepts it
-(`xs |> (l: list<number>) => length(l)`).
+parameter of the lambda. A lambda that uses its parameter as a
+**collection** receives the whole value, as the same call would:
+`xs |> l => length(l)` and `xs |> (l: list<number>) => length(l)` are the
+length of `xs`. A named function stage is called the same way: `xs |> sum`
+sums the collection.
 
 A pipe hands its stage exactly **one** value, so a stage that declares more
 than one parameter is a `pipe-stage-arity` error rather than a partial
@@ -234,6 +239,18 @@ let first = xs[1] ?? 0
 
 `??` discharges **absence**. It does _not_ rescue an `Error`: an error operand
 is an error, not a missing value, and propagates.
+
+A function does not accept an absent value at a parameter annotated with a
+type, unless the type says so. With `function f(p: tuple<number, number>)`,
+the call `f(first(filter(xs, c => c[1] > 0)))` is reported by the static
+check, because a filter can find nothing, and it is an `incompatible-type`
+error when the value is absent. Write `f(first(filter(…)) ?? (0, 0))` to give
+a fallback, or annotate the parameter `tuple<number, number> | missing` and
+test `isMissing(p)` in the body. A parameter with no annotation receives the
+absent value, and a parameter annotated with a numeric type (`number`,
+`integer`, `real`) reads it as `NaN`, which such a parameter accepts.
+The first element of a list literal that has one (`first([(1, 2), (3, 4)])`)
+cannot be absent and needs no fallback.
 
 It is right-associative, so a chain falls through left to right:
 
@@ -722,7 +739,7 @@ logical implication: it is the mapsto arrow (see
 
 Three spellings, two meanings:
 
-- **`:=` always assigns.**
+- **`:=` always assigns.** It never compares.
 - **`==` always compares** (and `===` is `Same`, structural identity).
   A third comparison tier asks the prover whether the two sides are equal
   for **every** value of their free variables:
@@ -759,7 +776,12 @@ As a comparison, `=` binds at the relational tier (60) like `==`, so
 `if x = 5 && y` groups as `(x = 5) && y`. As an assignment it binds loosest
 (10), taking the whole right-hand side.
 
-Two consequences worth knowing:
+Three consequences worth knowing:
+
+**A function head defines the function.** As a statement, `f(x) = body`
+defines the function `f`, and `f(x) := body` is the same definition. This also
+applies to typed parameters, a return type and literal-pattern clauses
+(`f(0) := 1`).
 
 **A non-binding left side compares, even as a statement.** `x^2 = 4` on its own
 line is the equation, because `x^2` is not a name. A bare name always assigns,

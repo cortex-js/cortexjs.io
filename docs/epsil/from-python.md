@@ -105,30 +105,53 @@ default. See [Traps](#traps).
 
 ### Comprehensions
 
-Epsil has no comprehension syntax. Use the pipeline operator `|>` with
-`filter`/`map`; `_` is the placeholder for the piped value.
+List, set and dictionary comprehensions read as in Python, with two
+differences: several `for` clauses are separated by a **comma** instead of a
+repeated `for`, and a dictionary key is written with `->`.
 
 ```python
-sum(n**2 for n in range(1, 11) if n % 2 == 1)
+[n**2 for n in range(1, 11) if n % 2 == 1]
+{n % 3 for n in range(1, 11)}
+{s: len(s) for s in ["ab", "cde"]}
+[(x, y) for x in range(1, 4) for y in range(1, x + 1)]
 ```
+
+```epsil
+[n^2 for n in 1..10 if n % 2 == 1]        // ➔ [1, 9, 25, 49, 81]
+{n % 3 for n in 1..10}                     // ➔ {1, 2, 0}
+{s -> length(s) for s in ["ab", "cde"]}    // ➔ {"ab" -> 2, "cde" -> 3}
+[(x, y) for x in 1..3, y in 1..x]
+```
+
+There is no bare generator expression: `sum(n**2 for n in …)` is written with
+brackets, `sum([n^2 for n in 1..10 if n % 2 == 1])`, or as a pipeline. A list
+comprehension is lazy like a Python generator, so the brackets cost nothing
+until the list is read. The pipeline operator `|>` with `filter`/`map` remains
+available; `_` is the placeholder for the piped value.
 
 ```epsil
 1..10 |> filter(_, n => n % 2 == 1) |> map(n => n^2, _) |> sum
 // ➔ 165
 ```
 
-`Range`, `map`, `filter`, `take`, `drop` and `join` are **generators**, like
-Python's — they enumerate only when materialized (indexed, aggregated, or
-iterated). A deferred mapping function reads variables at *materialization*
-time, so the same "late binding in a closure" surprise applies:
+`Range`, `map`, `filter`, `take`, `drop`, `join` and a comprehension are
+**generators**, like Python's — they enumerate only when materialized
+(indexed, aggregated, or iterated). One difference from Python: an
+**assignment** of a finite generator that reads a variable stores the list
+of its elements, so the "late binding in a closure" surprise does not apply
+to a variable:
 
 ```epsil
 let n = 1
 let m = map(k => k * n, 1..3)
 n = 10
 sum(m)
-// ➔ 60
+// ➔ 6
 ```
+
+A generator that is not assigned (an argument, an operand) reads variables
+at *materialization* time, and so does an assigned generator with no last
+element (`filter(1..oo, k => k > n)`).
 
 ## Control Flow
 

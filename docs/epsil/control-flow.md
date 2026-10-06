@@ -22,6 +22,8 @@ f(x) = x + 1
 f(x, y) = x + y
 ```
 
+`:=` is a synonym of `=` here: `f(x) := x + 1` is the same definition.
+
 The **block style** wraps the body in a statement block, whose value is its
 last expression:
 
@@ -960,6 +962,17 @@ value of `a in b`:
 ```epsil
 for x in a in b { x }
 ```
+
+A `for` loop runs for its effects. To build a collection from an iteration,
+write a **comprehension** — the same clause inside a list or brace literal,
+optionally with an `if` guard:
+
+```epsil
+[x^2 for x in 1..10 if x % 2 == 1]
+// ➔ [1, 9, 25, 49, 81]
+```
+
+See [Comprehensions](/syntax/#comprehensions).
 
 ## Pipelines
 
