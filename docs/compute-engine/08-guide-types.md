@@ -272,12 +272,15 @@ by omitting the endpoint.
 For example: `real<..1.0>` is the type of real numbers less than $1.0$, 
 and is equivalent to `real< -oo..1.0 >`.
 
-To represent an open interval, use a negation and a literal type to exclude the endpoints.
-For example `real<0..> & !0` is the type of real numbers greater than $0$.
+To exclude an endpoint, write the inequality marker `<` next to it:
+`real<0<..>` is the type of real numbers greater than $0$ (`0<..` reads
+"$0 < x$"), `real<..<1>` the type of real numbers less than $1$, and
+`real<0<..<1>` the open interval $0 < x < 1$. A closed endpoint has no
+marker: `real<0..<1>` is $0 \le x < 1$.
 
-When using integers, you can adjust the endpoint instead, so for example 
-`integer<1..>` is the type of integers greater than or equal to $1$, which 
-is equivalent to `integer<0..> & !0`.
+On the integer tiers an open endpoint normalizes to the next closed one:
+`integer<0<..>` is the same type as `integer<1..>`, the integers greater than
+or equal to $1$.
 
 Note that `complex` and `imaginary` types do not support ranges, as they are not ordered types.
 
