@@ -142,6 +142,19 @@ ce.parse('f(x)').json;   // ["f", "x"]
 ce.parse('a(x+1)').json; // ["Multiply", "a", ["Add", "x", 1]]
 ```
 
+A name written in parentheses is a factor, not the head of a function
+application: `(k)(x - 1)` is `k·(x - 1)`, `(a)(b)` is `a·b` and `(k)(x, y)` is
+`k·(x, y)`. Only a name that the library or a declaration defines as a function
+keeps the application reading: `(\sin)(x)` is `sin(x)`, and `(f)(3)` is `f(3)`
+when `f` is declared a function. A function type that the engine only inferred
+from an earlier `f(x)` does not count.
+
+```js
+ce.parse('(k)(x-1)').json;  // ["Multiply", "k", ["Add", "x", -1]]
+ce.parse('(\\sin)(x)').json; // ["Sin", "x"]
+ce.parse('(f)(3)^2').json;  // ["Power", ["f", 3], 2], with f declared as above
+```
+
 Declarations also affect subscript parsing: a subscript can index a known
 collection rather than form a new symbol name. If a host discovers types after
 an initial parse, it should reparse the authored source under the final
@@ -569,10 +582,12 @@ parsing as for serialization.
 
 | Key | Description |
 | :--- | :--- |
-| `strict` | When `true`, parse conventional LaTeX syntax. When `false`, also accept the Compute Engine's loose input forms, including bare function names such as `sin(x)` and `sqrt(x)`, `*` multiplication, `**` powers, parenthesized superscripts/subscripts, and common infinity spellings. Loose mode is intended for interactive input similar to ASCIIMath or Typst; it is not a separate expression language. **Default:** `true`. |
+| `strict` | When `true`, parse conventional LaTeX syntax. When `false`, also accept the Compute Engine's loose input forms, including bare function names such as `sin(x)`, `sqrt(x)`, `mod(x, 2)`, `pow(x, 2)`, `trunc(x)`, `sgn(x)` and `Re(z)`; the operators `*`, `**`, `÷`, `=<` and `<>`; `+-` and `-+` for `\pm` and `\mp` when the two signs touch; the words `in` and `infinity`; parenthesized superscripts/subscripts; and an unbraced subscript or exponent read as one operand (`x_max` is `x_{max}`, `e^-x` is `e^{-x}`, `x^pi` is `x^{\pi}`). Loose mode is intended for interactive input similar to ASCIIMath or Typst; it is not a separate expression language. **Default:** `true`. |
 | `skipSpace` | If `true`, ignore space characters in a math zone. Default is `true`. |
 | `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: a repeating-decimal literal (e.g. `1.33(333)` or `0.\overline{3}`) always boxes to the exact `Rational` it represents, regardless of this setting. **Default**: `"auto"`|
 | `preserveLatex` | If `true`, the expression will be decorated with the LaTeX fragments corresponding to each element of the expression. The top-level expression, that is the one returned by `parse()`, will include the verbatim LaTeX input that was parsed. The sub-expressions may contain a slightly different LaTeX, for example with consecutive spaces replaced by one, with comments removed, and with some low-level LaTeX commands replaced, for example `\egroup` and `\bgroup`. **Default:** `false` |
+| `diagnostics` | When `true` and `strict` is `false`, the result has a `parseDiagnostics` array. Each entry reports a reading choice that has a second common reading, with a code that starts with `ambiguous-`, the source span (`start`, `end`) and a `detail` object. The reading does not change. Codes include `ambiguous-digit-groups` (`2 3` is read as `23`), `ambiguous-letter-run` (`eps` is read as `e·p·s`), `ambiguous-denominator` (`1/2x` is read as `1/(2x)`), `ambiguous-exponent-end` (`x^2y` is read as `x^2·y`), `ambiguous-implicit-subscript` (`x2` is read as `x_2`), `ambiguous-function-argument` (`sin x y` is read as `sin(x·y)`), `ambiguous-constant-name` (`e = 1.6e-19`), `ambiguous-log-base` (`log(x, 2)`) and `ambiguous-sign` (`x = ±1`). For example, `ce.parse('y = 2 3', { strict: false, diagnostics: true }).parseDiagnostics` is `[{ code: "ambiguous-digit-groups", start: 4, end: 7, detail: { digits: "23" } }]`. In strict mode the array is empty. **Default:** `false` |
+| `onAmbiguity` | `"report"` keeps the reading and reports the diagnostic when `diagnostics` is `true`. `"error"` replaces the smallest expression that holds the source span of each `ambiguous-*` diagnostic by an `Error` node whose code is the diagnostic code and whose argument is the source text: `ce.parse('y = 2 3', { strict: false, onAmbiguity: 'error' }).json` is `["Equal", "y", ["Error", "'ambiguous-digit-groups'", ["LatexString", "'2 3'"]]]`. It works without `diagnostics: true`. In strict mode the option has no effect. **Default:** `"report"` |
 
 ```js
 ce.parse('x + 0.5', { parseNumbers: "rational" }).print();
@@ -785,7 +800,8 @@ must be surrounded by curly brackets.
 | :--- | :--- |
 | `positiveInfinity` | The LaTeX string used to represent positive infinity. Default is `"\infty"` $ \infty $. |
 | `negativeInfinity` | The LaTeX string used to represent negative infinity. Default is `"-\infty"` $ -\infty $. |
-| `imaginaryUnit` | The LaTeX string used to represent the imaginary unit symbol. Default is `"\imaginaryI"` $ \imaginaryI $ |
+| `imaginaryUnit` | The LaTeX string used to represent the imaginary unit symbol, in complex numbers too. Default is `"\imaginaryI"` $ \imaginaryI $ |
+| `exponentialE` | The LaTeX string used to represent `ExponentialE` and the base of `Exp`. With `exponentialE: "e"`, `["Exp", "x"]` is written `e^{x}`. Default is `"\exponentialE"` $ \exponentialE $ |
 | `notANumber` | The LaTeX string to represent the number NaN. Default value is `"\operatorname{NaN}"` $ \operatorname{NaN} $. |
 | `prettify` | If `true`, the output will be formatted to be more human-readable. Default is `false`. |
 | `invisibleMultiply` | A LaTeX string to use as an invisible multiply operator between expressions. Use `"\cdot"` to use a $ \cdot $. Default is `""`. |
@@ -1652,9 +1668,32 @@ ce.parse("\\gamma + 1").json;
 // ➔ ["Add", 1, "EulerGamma"]
 ```
 
-The four number symbols whose spelling is a serialization option
-(`positiveInfinity`, `negativeInfinity`, `notANumber` and `imaginaryUnit`) do
-not need the flag.
+The five number symbols whose spelling is a serialization option
+(`positiveInfinity`, `negativeInfinity`, `notANumber`, `imaginaryUnit` and
+`exponentialE`) do not need the flag.
+
+**To add entries to a running engine**, call `ce.latexSyntax.addEntries(entries)`.
+The next parse or serialization uses them. The default dictionary and the array
+given as the `dictionary` option are not modified. An engine created without the
+`latexSyntax` option has its own `LatexSyntax`, so the entries apply to that
+engine only; a `LatexSyntax` instance given to several engines is shared, and
+the entries apply to all of them.
+
+```js
+ce.declare("Sq", "(number) -> number");
+ce.box(["Sq", 3]).latex;
+// ➔ \mathrm{Sq}(3)
+
+ce.latexSyntax.addEntries([
+  { name: "Sq", kind: "function", latexTrigger: "\\operatorname{sq}" },
+]);
+
+ce.box(["Sq", 3]).latex;
+// ➔ \operatorname{sq}(3)
+
+ce.parse("\\operatorname{sq}(3)").json;
+// ➔ ["Sq", 3]
+```
 
 ## Using a New Function with a Mathfield
 

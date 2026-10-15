@@ -200,10 +200,17 @@ xs
 // ➔ [1, 2]
 ```
 
-(A spread inside a literal, `[...xs, k]`, is the exception: it is the lazy
-`join` described next, not a snapshot — see the
-[Style Guide](/style/#building-a-list-one-element-at-a-time) before
-growing a list in a loop.)
+A spread inside a list literal, `[...xs, k]`, is a snapshot too: the literal
+holds the elements of each finite spread operand, also of a lazy one such as
+`take(xs, 2)`. Only an infinite spread (`[...1..oo]`) stays a lazy list. See
+the [Style Guide](/style/#building-a-list-one-element-at-a-time) before
+growing a list in a loop.
+
+```epsil
+let ys = [1, 2, 3, 4]
+[...take(ys, 1), 9, ...drop(ys, 2)]
+// ➔ [1, 9, 3, 4]
+```
 
 Lazy collection **operators** — `Range`, `map`, `filter`, `take`, `join` —
 are *generators*: their operands (bounds, sources, functions) are evaluated
@@ -351,19 +358,29 @@ The two kinds of limit end differently:
   continues past it. The statement that breached evaluates to the error value,
   and — because a loop is imperative — whatever it assigned before the breach
   stays assigned. A program that reads such a variable afterwards therefore
-  sees a *partial* result alongside the `evaluation-canceled` diagnostic:
+  sees a *partial* result alongside the `evaluation-canceled` diagnostic.
 
-  <!-- epsil-test: expect-diagnostics -->
+An Epsil program has **no iteration limit** by default: a loop runs until it
+ends, and a program that does not end is a valid program. The time budget is
+the bound a host should use. The engine's own default iteration limit (1024
+turns of a loop or of a lazy walk) is removed on an engine the first time it
+runs an Epsil program, and it stays removed for everything that engine
+evaluates afterwards, so that a lazy collection the program returns can be
+read in full.
 
-  ```epsil
-  total = 0
-  for i in 1..5000 { total = total + i * 2 }   // stops at iterationLimit (1024)
-  total                                        // ➔ 1051650, not 25005000
-  ```
+```epsil
+total = 0
+for i in 1..5000 { total = total + i * 2 }
+total
+// ➔ 25005000
+```
 
-  A host that displays `value` must also surface `diagnostics` (the loop's
-  breach is an `error`-severity `evaluation-canceled` there), or raise
-  `ce.iterationLimit` for programs expected to loop longer.
+A host that wants a count-based bound assigns `ce.iterationLimit` before it
+runs a program. An assigned limit is kept and applies to Epsil programs: a
+loop that exceeds it stops with `iteration-limit-exceeded`, and the host must
+then surface `diagnostics` with `value`, because the variables the loop
+assigned hold a partial result. The recursion limit (256 nested calls of user
+functions by default) always applies.
 
 These limits are cooperative. A browser that evaluates untrusted or potentially
 unbounded programs should run Epsil in a Web Worker it can terminate from the

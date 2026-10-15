@@ -107,7 +107,8 @@ required to be finite reject an infinite argument outright — see
 <Signature name="Sum">_xs_: collection</Signature>
 
 Evaluate to a sum of all the elements in _collection_. If all the elements are
-numbers, the result is a number. Otherwise it is an `["Add"]` expression.
+numbers, the result is a number. If some elements are symbolic, the result is
+an `["Add"]` expression.
 
 <Latex flow="column" value="\sum x_{i}"/>
 
@@ -117,6 +118,22 @@ numbers, the result is a number. Otherwise it is an `["Add"]` expression.
 
 ["Sum", ["List", 5, 7, "x" , "y"]]
 // ➔ ["Add", 12, "x", "y"]
+```
+
+A list of points (tuples) sums to a point, and a list of rows sums to the row
+of the column sums. An element that is not a number, a point or a row (a
+boolean, a dictionary) is an `incompatible-type` error, also when it is the
+only element.
+
+```json example
+["Sum", ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]]]
+// ➔ ["Tuple", 4, 6]
+
+["Sum", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List", 4, 6]
+
+["Sum", ["List", "True"]]
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'number'", "'boolean'"], "True"]
 ```
 
 Note this is equivalent to:
@@ -148,6 +165,25 @@ ce.parse('\\sum_{1 \\le i \\le 10} i^2').evaluate()
 
 // \sum_{i \le 10} i   (lower bound defaults to 1)
 ce.parse('\\sum_{i \\le 10} i').evaluate()
+// ➔ 55
+```
+
+Only the `\le`/`\ge` form implies a bound. A sum with one explicit bound in
+the `i=1`/superscript form, such as `\sum_{k=1} k` or `\sum_{k}^{10} k`,
+stays unevaluated: no default is chosen for the missing bound. The subscript
+`k=1` is the lower bound, `["Limits", "k", 1, "Nothing"]`. For an infinite
+sum, write the upper bound `\infty`.
+
+```js
+ce.parse('\\sum_{k=1} k').evaluate().json;
+// ➔ ["Sum", "k", ["Limits", "k", 1, "Nothing"]]  (unevaluated)
+```
+
+The bounds can also be written flat after the index, as for `Integrate`:
+the index, then the lower bound, then the upper bound.
+
+```json example
+["Sum", "k", "k", 1, 10]
 // ➔ 55
 ```
 
@@ -277,10 +313,26 @@ accelerated numerical approximation). The recognized families:
 | $$\sum_{k=1}^{\infty} k\,r^k, \; \|r\| < 1$$ | $$\frac{r}{(1-r)^2}$$ | First-moment geometric |
 | $$\sum_{k=1}^{\infty} \frac{r^k}{k}, \; \|r\| < 1$$ | $$-\ln(1-r)$$ | Logarithmic series |
 
+The body is compared with each pattern as a rational function of the index, so
+an equivalent spelling is recognized: $\sum_{k=1}^{\infty} \frac{k}{k^3}$ is
+$\frac{\pi^2}{6}$, $\sum_{k=1}^{\infty} \frac{1}{(k+1)^2}$ is
+$\frac{\pi^2}{6} - 1$, and the telescoping sum
+$\sum_{k=1}^{\infty} \frac{1}{k^2+k}$ is $1$. The comparison runs only for a
+body whose denominator, as written, is zero at no integer index of the domain.
+A pole there keeps the sum symbolic.
+
 For a **symbolic** ratio $r$, the families with a convergence region return a
 `When`-guarded value recording it — for example
-$\sum k x^k \to \frac{x}{(1-x)^2} \; \{\|x\| < 1\}$. Divergent numeric cases
-($\sum 1/k$, $\sum k \cdot 2^k$) stay symbolic.
+$\sum k x^k \to \frac{x}{(1-x)^2} \; \{\|x\| < 1\}$.
+
+A series whose divergence the engine can certify evaluates to its infinity,
+under `evaluate()` and `.N()`: $\sum_{n=1}^{\infty} \frac{1}{n}$ and
+$\sum_{k=1}^{\infty} k \cdot 2^k$ give `PositiveInfinity`, and
+$\sum_{n=1}^{\infty} \frac{-3}{n}$ gives `NegativeInfinity`. The certificate is
+the limit comparison with the harmonic series. A series with no value
+($\sum (-1)^n$) and a series the test cannot decide ($\sum \frac{1}{n \ln n}$)
+stay symbolic. `isEqual()` against an infinity answers `true` for a certified
+divergent series and `undefined` for a series left symbolic.
 
 </FunctionDefinition>
 
@@ -319,6 +371,14 @@ Return the product of `body` for each value in `bounds`.
 ```json example
 ["Product", ["Add", "x", 1], ["Tuple", "x", 1, 10]]
 // ➔ 39916800
+```
+
+A product with only one bound (`\prod_{k=1} k`) stays unevaluated, as a sum
+does. The bounds can also be written flat after the index:
+
+```json example
+["Product", "k", "k", 1, 5]
+// ➔ 120
 ```
 
 <Signature name="Product" returns="number">_body_: function, ..._bounds_: Element</Signature>
@@ -361,10 +421,25 @@ Edge cases:
 - Empty range (upper < lower): returns `1`
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 
+The Wallis-like product is also given its closed form by `evaluate()`, for any
+positive integer lower bound $a$: $\prod_{k=a}^{n} \left(1 - \frac{1}{k^2}\right)$
+evaluates to $\frac{(a-1)(n+1)}{a \cdot n}$, so $\prod_{k=2}^{n}$ is
+$\frac{n+1}{2n}$, $\prod_{k=3}^{n}$ is $\frac{2(n+1)}{3n}$, and
+$\prod_{k=1}^{n}$ is $0$. The body is compared as a rational function, so
+$\frac{k^2-1}{k^2}$ and $\frac{(k-1)(k+1)}{k^2}$ are recognized too.
+
 #### Infinite Products
 
-A `Product` over an **infinite** upper bound is evaluated exactly for these
-known convergent families (staying symbolic otherwise):
+A `Product` over an **infinite** upper bound is evaluated exactly when its body
+is one of these known convergent families, or the reciprocal of one. The body
+is compared with each pattern algebraically, so any spelling of the same
+rational function is recognized: $\prod_{n=1}^{\infty} \frac{4n^2}{4n^2-1}$ is
+$\frac{\pi}{2}$ (the reciprocal of the Wallis product),
+$2\prod_{n=1}^{\infty} \frac{4n^2}{4n^2-1}$ is $\pi$, and
+$\prod_{k=1}^{\infty} \frac{k^2}{k^2+1}$ is $\frac{\pi}{\sinh \pi}$. A body
+that matches no entry stays symbolic. A body with a float literal gives a
+float, and a body whose numerator and denominator share a factor stays
+symbolic.
 
 | Product | Value | Name |
 | :------ | :---- | :--- |
@@ -452,9 +527,30 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 | `Ceil`   | $$\lceil x \rceil $$ | Rounds a number up to the next largest integer                                   |
 | `Floor`  | $$\lfloor x \rfloor$$ | Round a number to the greatest integer less than the input value                 |
 | `Chop`   |              | Replace real numbers that are very close to 0 (less than $$10^{-10}$$) with 0  |
-| `Round`  |              | Rounds a number to the nearest integer. `Round(x, n)` rounds to `n` decimal places |
+| `Round`  |              | Rounds a number to the nearest integer. `Round(x, step)` rounds to the nearest multiple of the step |
 
 </div>
+
+`Floor`, `Ceil`, `Truncate` and `Round` take an optional second argument, a
+step: the value is rounded to a multiple of the step instead of an integer.
+`Floor(x, step)` is the greatest multiple of the step that is at most `x`,
+whatever the sign of the step, `Round(x, step)` is the nearest multiple, and
+a zero step gives `Indeterminate`. To round to `n` decimal places, use the
+step `10^-n`: `Round(3.14159, 1/100)` is `157/50`.
+
+```json example
+["Floor", 226, 10]
+// ➔ 220
+
+["Ceil", 226, 10]
+// ➔ 230
+
+["Floor", 2.7, ["Rational", 1, 2]]
+// ➔ 5/2
+
+["Round", 3.14159, ["Rational", 1, 100]]
+// ➔ 157/50
+```
 
 A value exactly halfway between two integers (a tie) is rounded with the rule
 of `ce.roundingTies`. The default rule rounds a tie away from zero:
@@ -527,6 +623,11 @@ unknown — there is no ordering that could rule it out.
 Otherwise, simplify the expression by removing values that are smaller than or
 equal to the largest known number.
 
+A dictionary is not a collection of numbers. `Max`, `Min`, `Supremum` and
+`Infimum` of a dictionary that has an entry give the `incompatible-type` error
+that `Sum` gives, and the error names the first entry. An empty dictionary
+contributes no value, as an empty list does.
+
 ```json example
 ["Max", 5, 2, -1]
 // ➔ 5
@@ -594,6 +695,14 @@ The result is always the same sign as `b`, or 0.
 
 ["Mod", -7, -5]
 // ➔ -2
+```
+
+`Mod` of exact operands is exact. A radical dividend is reduced without
+rounding, and `N()` gives the float.
+
+```json example
+["Mod", ["Sqrt", 2], 1]
+// ➔ ["Add", -1, ["Sqrt", 2]]   (√2 − 1; N() gives 0.4142…)
 ```
 
 </FunctionDefinition>
@@ -1113,6 +1222,17 @@ Distribute multiplication over addition in `expr`.
 ```
 
 </FunctionDefinition>
+
+The polynomial operators below (`PolynomialDegree`, `CoefficientList`,
+`PolynomialQuotient`, `PolynomialRemainder`, `PolynomialGCD`, `Resultant`,
+`Cancel`, `PartialFraction`, `Apart`, `PolynomialRoots` and `Discriminant`)
+receive their operands unevaluated. A symbol that holds a polynomial is
+replaced by its value, as `Expand` and `Factor` do, and the default variable is
+read from that value: with `p := x^3 - 2x^2 - 4` and `q := x - 3`,
+`["PolynomialQuotient", "p", "q", "x"]` is `x^2 + x + 3` and
+`["PolynomialRemainder", "p", "q", "x"]` is `5`. The variable named in the call
+is never substituted, even when it has a value: with `x := 5`,
+`["PolynomialDegree", ["Add", ["Power", "x", 2], 1], "x"]` is `2`.
 
 <FunctionDefinition name="PolynomialDegree">
 

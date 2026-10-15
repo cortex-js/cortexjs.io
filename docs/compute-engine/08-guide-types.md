@@ -134,7 +134,14 @@ Two caveats bound the wildcard:
   types) are **not** compatible with `unknown`. Absence is opt-in: a slot 
   whose type has not yet been determined does not silently accept an absence 
   marker — admit it explicitly with a union such as `number | missing`, or 
-  use `any`.
+  use `any`. At an operator parameter, a value typed `T | missing` — a lookup
+  with a computed key, such as `xs[i]` — and a collection of such values
+  (`list<missing | string>`) are accepted where `T` or a collection of `T` is
+  expected; whether an element is absent is decided when the program runs.
+  With `xs := ["a", "b"]`, `StringJoin(Map(i ↦ xs[i], [1, 2]), "")` is
+  `"ab"`, and with the index `5` the result is an `incompatible-type` error
+  that names the absent element. A collection whose cells can only be absent
+  (`list<missing>`) is refused.
 - `unknown` is a placeholder, not a promise. Contrast it with `any`, which is 
   a **contract**: `(any) -> any` — the signature of the identity function — 
   promises a function that accepts every value, and a definition that cannot 
@@ -338,6 +345,14 @@ A ranged type can appear in four ways:
   `Pi` and `ExponentialE` declare a value bracket
   (`real<3.141592653589793..3.141592653589794>`), so their sign
   and magnitude are type facts.
+- **A binder declares it**: the index of a `Sum`, `Product`, `Loop` or
+  comprehension whose bounds are integer literals is declared `integer<a..b>`
+  at its binding site, on the parse route (`\sum_{k=1}^{16}`) and on the box
+  route (`["Limits", "k", 1, 16]`, `["Element", "k", ["Range", 1, 16]]`)
+  alike. The range is used inside the body — `√((k − 0.5)/16)` is real
+  there, so `[√((k − 0.5)/16) for k in 1..16]` is a `list<real>` — but a
+  comprehension's list keeps the element type without the range:
+  `[k for k in 1..16]` is a `list<integer>`.
 
 Ranges are deliberately **not** propagated through arithmetic: the sum of
 two values in `real<-1..>` is not itself in `real<-1..>`, so `x + y` falls
@@ -529,6 +544,17 @@ Similarly, a **`matrix`** is a list of lists.
 - `matrix<nxm>`: A matrix of `n` rows and `m` columns (e.g. `matrix<3x3>`)
 - `matrix<T^nxm>`: A matrix of `n` rows and `m` columns of elements of type `T`
   (e.g. `matrix<boolean^3x3>`)
+
+A nested list type with fixed lengths is the same type as its flat shape:
+`list<list<integer^2>^2>` is `matrix<integer^(2x2)>`, so a symbol declared
+with it matches a `matrix<T^(NxN)>` constraint, and `x^2` of such a symbol is
+the matrix power, as it is for a matrix literal.
+
+A dimension can be `0`: `list<integer^(2x0)>` is `matrix<integer^(2x0)>`, a
+matrix of two empty rows, and `list<integer^(0x2)>` is a matrix with no rows
+and two columns. In a dimension, `0x` always separates a zero-length axis
+from the next dimension; it is never a hexadecimal prefix. The empty list
+`[]` is a value of every list type whose first axis has length `0`.
 
 And finally, a **`tensor`** is a multi-dimensional array of any values, of any rank,
 and **`tensor<T>`** is a tensor of elements of type `T`.
@@ -1002,9 +1028,14 @@ When a call is made, the arm whose parameters accept the arguments is selected.
 If several arms accept them, the **most specific** one wins — above,
 `Interval(0,1)` is a `set<real>`, and since `set<real>` is a subtype of
 `collection` both arms accept it, so the first arm is chosen and the result type
-is `real` rather than `any`. Arms that are not comparable are tried in
-declaration order, so it is good practice to write the most specific arm first.
-If no arm accepts the arguments, the call is an error.
+is `real` rather than `any`. When the type of an argument does not decide
+which arm applies — the argument is `unknown`, or its type is wider than the
+parameter of one arm — the result type is the union of the results of every
+arm that can apply. Declaration order does not decide. With
+`f: ((integer) -> integer) & ((real) -> string)`, `ce.box(["f", "x"]).type` is
+`integer | string` for `x: real` and for an undeclared `x`, while
+`ce.box(["f", 3]).type` is `integer`. If no arm accepts the arguments, the call
+is an error.
 
 An overload set is a subtype of each of its arms:
 
@@ -1050,8 +1081,14 @@ The annotations are **authoritative** (an ascription, not a whole-body type
 check): the declared types define the literal's signature directly. In strict
 mode, the arguments of a typed literal are checked against the declared
 parameter types when the function is applied — a mismatch produces an
-`incompatible-type` error. Assigning a typed literal to a symbol gives that
-symbol the annotated signature, including the return type.
+`incompatible-type` error. The value the body returns is checked against the
+declared return type when it is concrete (a number, a string, a character, a
+boolean, or a list or tuple of these): with `g` declared
+`(integer) -> integer` and the body `n / 2`, `g(4)` is `2` and `g(5)` is an
+`incompatible-type` error. A symbolic value, `Missing`, `Nothing`, `NaN` and
+an error pass unchanged; a real float passes under `integer` or `rational`.
+Compiled code does not make this check. Assigning a typed literal to a symbol
+gives that symbol the annotated signature, including the return type.
 
 The return ascription may also be a **full signature carrying effects** — this
 is how a definition states its effect contract
@@ -1280,12 +1317,26 @@ ce.type("(U) -> T where T, U: list<T>");
 
 Several standard library operators are declared this way — `Identity` is
 `(T) -> T where T`, `Reverse` is
-`(T) -> T where T: indexed_collection`, `Inverse` is
-`(T) -> T where T: matrix` — so their results are typed from their
+`(T) -> T where T: indexed_collection` — so their results are typed from their
 arguments:
 
 ```js
 ce.box(["Reverse", ["List", 1, 2, 3]]).type; // ➔ "vector<integer^3>"
+```
+
+`Inverse` is not generic: its signature is `(matrix) -> matrix`, and its type
+handler keeps the shape of the argument but gives the entries the type
+`rational`, because the inverse of an integer matrix has rational entries.
+`MatrixPower` with a negative exponent is typed the same way; a positive
+exponent keeps the element type.
+
+```js
+ce.box(["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]).type;
+// ➔ "matrix<rational^(2x2)>"
+
+ce.declare("m", "matrix<integer^(2x2)>");
+ce.parse("m^2").type;      // ➔ "matrix<integer^(2x2)>"
+ce.parse("m^{-1}").type;   // ➔ "matrix<rational^(2x2)>"
 ```
 
 A **scalar** bound interacts with broadcasting. On an operator that
@@ -2211,12 +2262,31 @@ Inference writes happen at these moments:
    examples above). This includes *forwarding* through user functions: in
    `g(c) = pick(c)` where `pick`'s own body indexes its parameter, the
    collection evidence inferred for `pick` propagates to `c`, so `g` binds
-   a list argument whole instead of broadcasting over it.
+   a list argument whole instead of broadcasting over it. A self-call is
+   evidence too: when a function calls itself and passes a collection (a
+   list literal, a range, a set, a comprehension, a `filter` result) at a
+   parameter's position, that parameter takes a whole collection. With
+   `f(n, s) = s if n == 0 else f(n - 1, [1, 2])`, `f(1, [0])` is `[1, 2]`
+   and the inferred signature is `(unknown, list<any>) -> unknown`. A
+   self-call that forwards a parameter unchanged, or passes a scalar, is no
+   evidence, so `f(x) = x * 2` still broadcasts: `f([1, 2, 3])` is
+   `[2, 4, 6]`. A type inferred as
+   a union by one use is narrowed again by a later use whose parameter admits
+   only some of its members: `ToUpperCase(s)` infers `s` as
+   `character | string`, and a later `Sort(s)` narrows it to `string` instead
+   of refusing the call. A *declared* union is checked, not narrowed.
 3. **Function-literal bodies**: a bare (unannotated) lambda parameter starts
    as `unknown` and is narrowed by how the body *uses* it — indexing
-   (`v[1]`) narrows it to a collection through `At`'s signature, arithmetic
+   (`v[1]`) narrows it to a collection, arithmetic
    infers numeric, boolean use infers `boolean`. The lambda's stored
-   signature carries what the body proved and nothing more.
+   signature carries what the body proved and nothing more. While every
+   read of the parameter uses a literal index, the parameter is a tuple
+   whose component at each index is what that read requires:
+   `p => !p[1] if p[2] % 2 == 0 else p[1]` types `p` as
+   `tuple<boolean, real>` and accepts `(true, 4)`. When some read uses a
+   non-literal index, the parameter is an `indexed_collection` whose element
+   type is the union of the read requirements. The inferred tuple is not
+   enforced at application.
 4. **Uses of an element**: a use of an element taken out of a collection
    refines the collection's *element* type. `xs[1] + 1` makes an undeclared
    `xs` an `indexed_collection<number>`, `xs["a"] + 1` a
@@ -2226,7 +2296,7 @@ Inference writes happen at these moments:
    collection (`m[1][2] + 1` makes `m` an
    `indexed_collection<indexed_collection<number>>`), and a lambda
    parameter shows the refinement on its arrow: `(v) => v[1] + 1` types
-   `(v: indexed_collection<number>) -> broadcastable<number>`. The element
+   `(v: tuple<number>) -> number` (a literal index, so a tuple; see item 3). The element
    written is the scalar reading — `number`, exactly as `x + 1` infers a
    bare `x` — and a boolean use commits `boolean` the same way, so a later
    numeric use of that element is an `incompatible-type` error, as it is

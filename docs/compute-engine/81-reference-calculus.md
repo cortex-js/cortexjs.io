@@ -308,6 +308,9 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 | `FresnelS(x)` | `sin(πx²/2)` | Fresnel sine integral |
 | `FresnelC(x)` | `cos(πx²/2)` | Fresnel cosine integral |
 | `LambertW(x)` | `W(x)/(x·(1+W(x)))` | Lambert W function |
+| `PolyLog(s, z)` | `PolyLog(s-1, z)/z` | In `z`; `PolyLog(2, z)` gives `-ln(1-z)/z`. No closed form in `s` |
+| `Gamma(s, z)` | `-e^(-z)·z^(s-1)` | Upper incomplete gamma, in `z`. No closed form in `s` |
+| `Arctan2(y, x)` | `-y/(x²+y²)` in `x`, `x/(x²+y²)` in `y` | Divided by the unit factor in a non-radian angular unit |
 | **Bessel Functions** | | |
 | `BesselJ(n, x)` | `(J_{n-1}(x) - J_{n+1}(x))/2` | First kind |
 | `BesselY(n, x)` | `(Y_{n-1}(x) - Y_{n+1}(x))/2` | Second kind |
@@ -317,7 +320,7 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 | `Floor(x)` | `0` | Derivative is 0 almost everywhere |
 | `Ceil(x)` | `0` | Derivative is 0 almost everywhere |
 | `Round(x)` | `0` | Derivative is 0 almost everywhere |
-| `Mod(x, n)` | `0` | Derivative is 0 almost everywhere |
+| `Mod(x, n)` | `0` | Derivative is 0 almost everywhere. In the modulus, `D(Mod(x, m), m)` is `-floor(x/m)` |
 | `GCD(x, n)` | `0` | Discrete function |
 | `LCM(x, n)` | `0` | Discrete function |
 
@@ -587,6 +590,60 @@ Double integrals can be computed by specifying more than one limit.
 ]
 ```
 
+The bounds can also be written flat after the variable. After the variable,
+an operand that is not a variable name starts the bounds, and the next operand
+is the upper bound.
+
+```json example
+["Integrate", ["Power", "y", 2], "y", 0, "Pi"]
+// ➔ ["Integrate", ["Function", ["Power", "y", 2], "y"], ["Limits", "y", 0, "Pi"]]
+// evaluates to 1/3 * pi^3
+```
+
+An integral with only one bound, such as `\int^2 y^2\,dy` or
+`["Limits", "y", "Nothing", 2]`, is neither an indefinite nor a definite
+integral. No default is chosen for the missing bound, and the integral stays
+unevaluated under `evaluate()` and `N()`.
+
+A definite integral whose integrand has a pole inside the interval has no
+finite value. When the integrand changes sign across the pole, the result is
+`Indeterminate` (`NaN` under `.N()`): `\int_{-1}^1 \frac{1}{t}\,dt` is
+`Indeterminate`. When the integrand keeps one sign, the result is `+∞` or
+`−∞`, also for a pole at a bound: `\int_0^1 t^{-2}\,dt` is `+∞`. When the
+position of a pole depends on a free symbol, as in `\int_0^4 (y-a)^{-2}\,dy`,
+the integral stays unevaluated unless the declared type of the symbol or an
+assumption puts the pole outside the interval. With
+`ce.assume(ce.parse("a > 4"))`, the same integral evaluates to
+`-1/a - 1/(4 - a)`.
+
+When the exponent of a power is a symbol, the closed form is the value only
+under a condition, and the result carries that condition:
+
+```javascript
+ce.parse('\\int_0^1 t^n\\,dt').evaluate()
+// → 1/(n + 1) {0 < n + 1}      (the integral diverges for n ≤ -1)
+
+ce.parse('\\int_{-1}^{1} t^{-n}\\,dt').evaluate()
+// → 1/(1 - n) - (-1)^(1 - n)/(1 - n) {0 < 1 - n}
+
+ce.parse('\\int_1^2 t^{-n}\\,dt').evaluate()
+// → (2^(1 - n) - 1)/(1 - n) {n ≠ 1}      (the value at n = 1 is ln 2)
+```
+
+An assumption such as `ce.assume(ce.parse("n > 2"))` discharges the
+condition. A numeric exponent, or a constant exponent such as `t^\pi`,
+carries no condition. The indefinite integral `\int t^{-n}\,dt` is
+`t^{1 - n}/(1 - n)` with no condition.
+
+At a finite bound where the antiderivative has no value, the value is the
+one-sided limit of the antiderivative from inside the interval, as at an
+infinite bound:
+
+```javascript
+ce.parse('\\int_0^1 \\ln t\\,dt').evaluate()
+// → -1      (t·ln t - t has no value at 0; its limit from the right is 0)
+```
+
 Some functions do not have a closed form for their antiderivative, and the integral cannot be computed symbolically. In this case, the `Integrate` function returns a symbolic representation of the integral. Use `NIntegrate` to compute a numerical approximation of the integral.
 
 
@@ -594,46 +651,39 @@ Some functions do not have a closed form for their antiderivative, and the integ
 </FunctionDefinition> 
 
 <FunctionDefinition name="NIntegrate">
-<Signature name="NIntegrate" returns="number">_f_:function, ..._limits_:tuple</Signature>
+<Signature name="NIntegrate" returns="number">_f_:function, _lower_:number, _upper_:number</Signature>
 
-Calculate a **numerical approximation** of the definite integral of a function.
+Calculate a **numerical approximation** of the definite integral of a function
+of one variable between `lower` and `upper`.
 
 <Latex flow="column" value="\int_{0}^{2} x^2 dx"/>
 
 ```json example
-["NIntegrate", ["Power", "x", 2], ["Tuple", 0, 2]]
+["NIntegrate", ["Power", "x", 2], 0, 2]
 // -> 2.6666666666666665
 ```
 
-The `limits` tuples indicate the variable of integration and the limits of integration.
-
-The first element of the tuple is the variable of integration, and the second 
-and third elements are the lower and upper limits of integration, respectively.
-
-The variable of integration can be omitted if it is the same as the argument of 
-the function.
+The integrand `f` is a function literal, as for `Integrate`: an expression
+with one unknown, a `["Function"]` expression, or the name of a function.
 
 ```json example
-["NIntegrate", ["Power", "x", 2], ["Tuple", 0, 2]]
-// -> 2.6666666666666665
+["NIntegrate", "Sin", 0, 2]
+// -> 1.4161468365471424
 ```
 
+The bounds are two numbers. A `Tuple` of bounds is an `incompatible-type`
+error operand. For a multiple integral, use `Integrate` with one `Limits`
+per variable and call `.N()` on it.
 
-
-A double integral can be computed by specifying more than one limit.
-
-<Latex flow="column" value="\int_1^3\int_0^2 x^2+y^2 dx dy"/>
+The value is computed with the same methods as `Integrate(…).N()`: adaptive
+Gauss–Kronrod quadrature, with an oscillatory rule on a semi-infinite interval.
+Monte Carlo sampling is used only when the quadrature does not converge. A
+divergent integral is `+∞`, `−∞` or `NaN`:
 
 ```json example
-["NIntegrate", 
-  ["Add", ["Power", "x", 2], ["Power", "y", 2]], 
-  ["Tuple", 0, 2], 
-  ["Tuple", 1, 3]
-]
-// -> 20.666666666666668
+["NIntegrate", ["Function", ["Divide", 1, "x"], "x"], 0, 1]
+// -> +∞
 ```
-
-The numerical approximation is computed using a **Monte Carlo** method.
 
 
 </FunctionDefinition>
@@ -698,6 +748,129 @@ ce.parse('\\int e^x \\cos(2x) dx').evaluate()
 The general formulas used are:
 - $\int e^x \sin(ax+b) \, dx = \frac{e^x}{a^2+1}(\sin(ax+b) - a\cos(ax+b)) + C$
 - $\int e^x \cos(ax+b) \, dx = \frac{e^x}{a^2+1}(a\sin(ax+b) + \cos(ax+b)) + C$
+
+#### Piecewise Integrands
+
+A definite integral over a finite real interval of an integrand that contains
+`If`, `Which`, `Min`, `Max`, `Floor`, `Ceil` or `Fract` is cut at the points
+where the integrand changes branch, and each piece is integrated:
+
+```javascript
+ce.parse('\\int_{-1}^{1} \\max(x, 0)\\,dx').evaluate()
+// → 1/2
+
+ce.parse('\\int_0^3 \\lfloor x\\rfloor\\,dx').evaluate()
+// → 3
+
+ce.parse('\\int_0^2 \\lfloor x^2\\rfloor\\,dx').evaluate()
+// → 5 - sqrt(3) - sqrt(2)
+
+ce.parse('\\int_0^{2\\pi} \\max(\\sin x, \\cos x)\\,dx').evaluate()
+// → 2sqrt(2)
+```
+
+The cut points are exact. They come from linear conditions, from `Solve` over
+the interval (polynomial and periodic conditions), and from the poles and
+domain limits of $1/u$, $\sqrt{u}$, $\ln u$ and $\tan u$. When a cut point is
+not known exactly, when a condition is not supported, or when there are more
+than 128 cuts, the integral stays unevaluated.
+
+An absolute value or a sign of a non-affine argument is cut at the exact
+roots of the argument in the same way:
+
+```javascript
+ce.parse('\\int_0^{2\\pi} |\\sin x| dx').evaluate()
+// → 4
+
+ce.parse('\\int_{-2}^{2} |x^2 - 1| dx').evaluate()
+// → 4
+```
+
+#### Special-Function Primitives
+
+`Erf`, `Erfc`, `BesselJ(1, u)`, `BesselI(1, u)`, `Digamma`, `Trigamma` and
+`PolyGamma` of an affine argument $u$ have antiderivatives.
+
+```javascript
+ce.parse('\\int \\operatorname{erf}(x) dx').evaluate()
+// → x·Erf(x) + e^(-x^2)/sqrt(pi)
+
+ce.box(['Integrate', ['Digamma', 'x'], 'x']).evaluate()
+// → LogGamma(x)
+```
+
+#### Integrals by Residues
+
+`Integrate` gives an exact value by the residue theorem for these definite
+integrals:
+
+- over $(-\infty, \infty)$: a rational function, or a rational function times
+  $\cos(ax)$, $\sin(ax)$ or $e^{iax}$;
+- over $[0, \infty)$: such an integrand when it is even;
+- over $[0, 2\pi]$ or $[0, \pi]$: a rational function of $\sin x$ and $\cos x$.
+
+```javascript
+ce.parse('\\int_{-\\infty}^{\\infty} \\frac{\\sin x}{x} dx').evaluate()
+// → pi
+
+ce.parse('\\int_{-\\infty}^{\\infty} \\frac{1}{1+x^2} dx').evaluate()
+// → pi
+
+ce.parse('\\int_{0}^{2\\pi} \\frac{1}{2+\\cos x} dx').evaluate()
+// → 2/3·sqrt(3)·pi
+```
+
+`.N()` uses the exact value. A pole on the path of the integral gives `+∞`,
+`−∞` or `Indeterminate`:
+
+```javascript
+ce.parse('\\int_{-\\infty}^{\\infty} \\frac{1}{x^2} dx').evaluate()
+// → +oo
+```
+
+A Cauchy principal value is never assumed. To ask for one, integrate over the
+real line with `ContourIntegrate` and the path `RealLineContour(True)`:
+
+```javascript
+ce.box(['ContourIntegrate',
+  ['Divide', 'x', ['Add', ['Power', 'x', 2], 1]], 'x',
+  ['RealLineContour', 'True']]).evaluate()
+// → 0   (the principal value of ∫ x/(x²+1) dx over the real line)
+```
+
+**Contour integrals.** The notation $\oint_{|z-c|=r} f(z)\,dz$, the operator
+`ContourIntegrate(f, z, contour)` and the method
+`ce.contourIntegrate(f, z, contour)` integrate over a closed path in the
+complex plane by the residue theorem. The path is a `CircleContour(c, r)`, a
+`RectangleContour` or a simple `PolygonContour`.
+
+```javascript
+ce.parse('\\oint_{|z|=2} \\frac{1}{z} dz').evaluate()
+// → 2i·pi
+
+ce.box(['ContourIntegrate', ['Divide', 1, 'z'], 'z', ['CircleContour', 0, 2]]).evaluate()
+// → 2i·pi
+
+ce.parse('\\oint_{|z|=2} \\frac{1}{z^2+1} dz').evaluate()
+// → 0
+```
+
+The method returns a report: each pole with its location, order, residue and
+leading Laurent coefficient, the sum of the residues, and the value.
+
+```javascript
+const report = ce.contourIntegrate(
+  ce.parse('\\frac{1}{z^2+1}'), 'z', ce.box(['CircleContour', 0, 2]));
+report.method   // → "residue-theorem"
+report.poles    // → one entry for i and one for -i, each with order 1 and residue ∓i/2
+```
+
+The supported integrands are rational functions, entire numerators, products
+of $\sin$ or $\cos$ of a real affine argument in the denominator, and
+$P(z)·e^{c/(z-a)}$ with an essential singularity. An integrand whose poles
+cannot be certified exactly stays unevaluated, and a pole on the contour
+gives `Indeterminate`. Each call has a step budget, so the point where it
+gives up does not depend on the machine.
 
 
 ## Limit
@@ -885,14 +1058,15 @@ ce.parse('\\operatorname{Series}(\\cot x, x)').evaluate()
 
 Special functions are expanded at their poles with exact coefficients (the
 Euler–Mascheroni constant $\gamma$ is `EulerGamma`, the Riemann zeta function is
-`Zeta`):
+`Zeta`, and the Stieltjes constants $\gamma_k$ of its Laurent series at $s = 1$
+are `StieltjesGamma(k)`):
 
 ```javascript
 ce.parse('\\operatorname{Series}(\\Gamma(x), x)').evaluate()
 // → 1/x - γ + (π²/12 + γ²/2)·x + … + O(x^6)
 
-ce.parse('\\operatorname{Series}(\\zeta(x), x, 1)').evaluate()
-// → 1/(x - 1) + γ + O(x - 1)
+ce.parse('\\operatorname{Series}(\\zeta(x), x, 1, 2)').evaluate()
+// → 1/(x - 1) + γ - γ₁·(x - 1) + γ₂/2·(x - 1)^2 + O((x - 1)^3)
 ```
 
 Poles at $\pm\infty$ are handled too:

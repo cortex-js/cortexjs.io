@@ -94,6 +94,19 @@ try {
 The `expr.evaluateAsync()` method returns a `Promise` that resolves to the result
 of the evaluation. It accepts the same `numericApproximation` options as `expr.evaluate()`.
 
+Several `evaluateAsync()` calls can run at the same time on one engine. Each
+evaluation keeps the scopes it opens (the index of a `Sum`, the locals of a
+`Block`) to itself, so two sums over the same index name evaluated together do
+not see each other's index. One engine per concurrent evaluation is not
+necessary.
+
+```js
+const a = ce.parse('\\sum_{k=1}^{100000} k').evaluateAsync();
+const b = ce.parse('\\sum_{k=1}^{1000} k^2').evaluateAsync();
+await Promise.all([a, b]);
+// ➔ [5000050000, 333833500]
+```
+
 It is also possible to interrupt an evaluation, for example by providing the user
 with a pause/cancel button.
 
@@ -250,6 +263,18 @@ console.log(ce.box(['Sin', NaN]).evaluate().json);
 
 console.log(ce.parse('\\ln(2)').evaluate().json);
 // ➔ ["Ln", 2]      — an exact argument stays symbolic
+```
+
+A float operand makes the result a float, also when the value is a whole
+number: the exact `0` divided by a float is the float `0.0`, and a float
+exponent is kept.
+
+```ts
+console.log(ce.parse('0/2.5').evaluate().json);
+// ➔ {"num": "0.0"}
+
+console.log(ce.parse('3x^{2.0}').evaluate().json);
+// ➔ ["Multiply", 3, ["Power", "x", {"num": "2.0"}]]   — not 3x^2
 ```
 
 

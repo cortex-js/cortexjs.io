@@ -418,6 +418,36 @@ console.log(ce.parse("\\sin(1 \\pm 0.1)").N().toLatex());
 // ➔ 0.841 ± 0.054
 ```
 
+The inverse trigonometric and hyperbolic functions, `Gamma`, `LogGamma`,
+`Erf`, `Erfc` and `Factorial` propagate the uncertainty the same way, with
+the derivative of the function: $|f'(a)|\,\sigma$. So do `Mean`, `Median`,
+`Variance` and `StandardDeviation` over a list that contains a measurement:
+
+```live
+console.log(ce.parse("\\operatorname{mean}([0.7468 \\pm 0.001, 0.5, 0.9])").N().toLatex());
+// ➔ 0.71560 ± 0.00033
+```
+
+A comparison decides by the nominal value: `0.7468 \pm 0.001 < 1` is `True`.
+The extremum operators (`Min`, `Max`, `Clamp`, `Sort`) also order a
+measurement by its nominal value, and return the chosen operand as it is,
+uncertainty included:
+
+```live
+console.log(ce.parse("\\min(0.1, 0.7468 \\pm 0.001)").N().toLatex());
+// ➔ 0.1
+
+console.log(ce.parse("\\max(0.1, 0.7468 \\pm 0.001)").N().toLatex());
+// ➔ 0.7468 ± 0.0010
+```
+
+A step function (`Floor`, `Ceil`, `Round`, `Mod`, `Truncate`) returns the
+bare value of the nominal, because its slope is zero almost everywhere:
+`\lfloor 0.7468 \pm 0.001 \rfloor` is `0`. At a point where the derivative is
+not finite, such as `\arcsin(1 \pm 0.01)`, the bare nominal is returned and
+the error bar is dropped. An exact nominal stays exact under `evaluate()`:
+`(\sqrt2 \pm 1/10) + 1` evaluates to `1 + \sqrt2 \pm 1/10`.
+
 ### Measured Quantities
 
 A measurement can carry a unit. The parenthesized and bare forms are

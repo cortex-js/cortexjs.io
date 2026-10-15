@@ -71,6 +71,125 @@ early:
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
 
+### The `run()` Contract: Shaped Inputs, Read-Only Results
+
+On the `javascript` target, `run()` requires inputs of the shape the compiled
+code reads, and treats its results as read-only. The runner does a constant
+amount of work per binding on each call, one `typeof`:
+
+- a `{re, im}` value bound to a real binding throws a `TypeError` that names
+  the binding (the unsigned pole `~oo` is projected to `Infinity` instead);
+- a plain number bound to a complex binding is lifted to `{re, im: 0}`;
+- a string or a typed array (`Float64Array`, …) bound to a binding the code
+  reads as an array is refused: the compiled code reads plain arrays only, so
+  convert a typed array once on your side with `Array.from(typed)`.
+
+The string refusal applies to a binding declared with a bare collection type
+(`indexed_collection`, `collection`, `list`), with a collection of non-text
+elements (`list<number>`), with `list<string>` or `list<character>`, or whose
+collection type the engine inferred from its uses. Compiled code would read
+the string as UTF-16 code units, not as characters, so the `TypeError` names
+the binding and says so. A binding whose type admits a string (`string`,
+`indexed_collection<character>`) is not refused. These entry checks are on by
+default; `compile(expr, { entryChecks: false })` turns them off, for a caller
+that validates its own inputs.
+
+```javascript
+ce.declare('S', 'indexed_collection');
+const f = compile(ce.box(['Length', ['Drop', 'S', 1]]));
+f.run({ S: 'abc' });
+// ➔ throws TypeError: "S" (type `indexed_collection`) is compiled as a
+//   JavaScript array, and compiled code does not accept a string for it: it
+//   would read the string as UTF-16 code units, not as characters. Pass an
+//   array, or declare the binding `string` to compile text.
+```
+
+A number bound to a binding declared as a list is not refused at entry, since
+some lowerings accept a scalar. When the compiled body then fails because it
+needed an array, the error names the binding and keeps the body's message as
+its `cause`:
+
+```javascript
+ce.declare('S', 'list<number>');
+compile(ce.box(['Sum', 'S'])).run({ S: 5 });
+// ➔ throws TypeError: "S" (type `list<number>`) received a number: compiled
+//   code reads such a binding as a JavaScript array, and the compiled body
+//   failed (_.S.reduce is not a function). Pass an array.
+```
+
+Nothing else is checked, converted, or copied:
+
+- the entries of a list input are never read. A `{re, im}` object, a string
+  or a typed array at an entry of a list the code reads on the real lane
+  computes with that value, as it would in plain JavaScript;
+- a returned collection or `{re, im}` object is the value the code built. It
+  may be a value the runner keeps for every later call (a hoisted constant
+  list, a bound symbol value), so do not write to a result: copy it first if
+  you need to change it.
+
+The result convention is kept: a value whose imaginary part is exactly zero
+comes back as a plain number, inside a collection too, and a collection is
+copied only when such a cell has to be rewritten. That check is one `typeof`
+per cell of a returned collection, with no allocation.
+
+The interpreter is the route that validates: evaluate the expression with
+`.evaluate()` or `.N()` to diagnose a wrong input shape.
+
+```typescript
+const fn = compile(expr, { to: 'javascript' }).run!;
+const T = Array.from(float64Board); // convert a typed array once
+const v = fn({ x, y, T });          // no per-call walk, copy or check of T
+```
+
+### Running Compiled Code Without the Engine
+
+The entry point `@cortex-js/compute-engine/runtime` exports
+`createJavaScriptRuntime(options)`: the helper bundle that `run()` uses, with
+no engine behind it. Store a `javascript` `CompilationResult` and run it on a
+page, in a worker or on a server with `runtime.load(result)`:
+
+```typescript
+import { compile } from '@cortex-js/compute-engine';
+import { createJavaScriptRuntime } from '@cortex-js/compute-engine/runtime';
+
+const result = compile(ce.parse('x^2 + 1'), { to: 'javascript' });
+
+const runtime = createJavaScriptRuntime({});
+const f = runtime.load(result);
+f({ x: 3 });
+// ➔ 10
+```
+
+`load()` reads the `code`, `entryPlan`, `reconstructionDigits` and
+`runtimeVersion` fields of the result, and the `preambleOnce`,
+`preamblePerCall` and `callCode` fields when the code has a preamble. It
+evaluates the definitions that read nothing per call (a constant list, a
+memo) once, and it applies the same input conversions as `run()`: a
+real given to a complex-declared symbol is lifted, and a `Float64Array` for a
+list symbol is copied. `load()` throws when `result.runtimeVersion` is not
+`runtime.runtimeVersion`, or when the stored code has none.
+
+The runtime exposes `load`, `frame`, `setFrame`, `iterationLimit`, `deadline`
+and `runtimeVersion`. The other helpers are internal and can change in any
+release. The options give the runtime the state it cannot read from an engine:
+
+- `random`: the source of random draws outside a `WithRandomSeed` frame, and
+  of the Monte-Carlo samples of the integrals. `null` denies draws; a draw
+  then throws an error whose `name` is `CapabilityDeniedError` (test `e.name`,
+  not `instanceof`: the class differs in each bundle).
+- `frame`, or `runtime.setFrame()`: the frame of an interpreted
+  `WithRandomSeed` that the code is called from (`{ seedLo, seedHi, next }` or
+  `{ seed, next }`). After the call, `runtime.frame.next` is the advanced
+  counter.
+- `iterationLimit`: the cap on the lazy-stream walks (default 1024; `0` or
+  less means no limit, as for `ce.iterationLimit`).
+- `deadline`: an optional time after which the shuffle and choice loops throw.
+
+A seeded program gives the same values interpreted, with `run()` and from the
+stored code. Functions passed in the `functions` or `imports` compile options
+are copied into the code as source, so a closure loses its enclosing scope,
+and a function given by name must exist where the code runs.
+
 ### Constant Folding
 
 A **pure** subexpression with no free variables is evaluated at compile time
@@ -90,14 +209,20 @@ becomes a literal list, which matters most when the collection is constant but
 its consumer is not:
 
 ```javascript
-compile(ce.box(['At', ['Map', ['Function', ['Square', 'y'], 'y'],
-                       ['Range', 1, 6]], 'k'])).code
-// ➔ "_SYS.at([1, 4, 9, 16, 25, 36], _.k)"
+const r = compile(ce.box(['At', ['Map', ['Function', ['Square', 'y'], 'y'],
+                                 ['Range', 1, 6]], 'k']));
+r.code         // ➔ "_SYS.at(_lit_1, _.k)"
+r.preambleOnce // ➔ "const _lit_1 = [1, 4, 9, 16, 25, 36];\n"
 ```
 
 The index `k` is a run-time input, so the expression as a whole cannot fold —
 but its base is baked once at compile time instead of being rebuilt and
-mapped over on every call. Collection folding is bounded: it applies to a
+mapped over on every call. The baked list is a preamble local that `run()`
+evaluates once per compiled function (it is in `preamble`, and in
+`preambleOnce` for a runtime that splits the two), so a caller that runs
+`code` itself must include the preamble, as for a bound symbol value
+(`_val_*`) or a user function (`_fn_*`). A written list literal of three or
+more numbers (`[1, 2, 3]`, a matrix of them) is hoisted the same way. Collection folding is bounded: it applies to a
 **finite, indexed** collection (a `Set` has no defined element order, so it
 never folds) of at most 50 **numeric** elements. A longer collection, or one
 holding strings, tuples or nested collections, compiles structurally.
@@ -257,6 +382,24 @@ span argument compiles and the emitted code throws
 `RangeError: Slice: the span argument is not an ascending index range at run
 time`.
 
+The integer operations `Mod`, `Remainder`, `GCD` and `LCM` use the same
+convention for magnitude. Compiled code works in doubles, so an operand beyond
+the safe integer range (±2^53) or an infinity throws a `RangeError` that names
+the operation and the value, instead of returning a different number. The
+Python target raises a `ValueError` with the same message. The `Mod(x, 1)`
+fractional-part forms are not checked. A plot kernel that samples
+`Mod(1/x, 2)` at `x = 0` throws at that sample. A constant operand is folded
+from the exact value, so `DigitSum(2^1000)` compiles to `1366`.
+
+```javascript
+ce.declare('x', 'integer');
+const m = compile(ce.box(['Mod', 'x', 10]));
+m.run({ x: 2 ** 60 + 1 });
+// ➔ throws RangeError: Mod: 1152921504606847000 is beyond the safe integer
+//   range of compiled code (±9007199254740991); evaluate with the interpreter
+//   for the exact result
+```
+
 The upper bound in those messages is not arbitrary. The interpreter reads these
 counts with `asSmallInteger`, which answers `null` — hence an error value —
 above **1 000 000**, so the compiled guard uses the same ceiling; without it
@@ -340,6 +483,28 @@ console.log(g.run(3, 4));
 Lambdas are useful when the variable name is user-specified rather than assumed
 by convention. A lambda like `\theta \mapsto 1 + \cos(\theta)` makes the
 parameter explicit, avoiding ambiguity.
+
+**Declared parameter types are checked.** A compiled call of a user function
+whose parameters have declared types checks the argument at run time when its
+static type does not prove the declared type. The compiled value is `NaN`
+where the interpreter answers an `incompatible-type` error:
+
+```js
+ce.declare("h", { signature: "(x: integer) -> integer" });
+ce.assign("h", ce.parse("x \\mapsto 2x"));
+ce.declare("y", "real");
+
+const f = compile(ce.parse("h(y)"));
+f.run({ y: 3 });    // ➔ 6
+f.run({ y: 2.5 });  // ➔ NaN  (the interpreter gives an incompatible-type error)
+
+compile(ce.box(["Map", "h", ["List", 1, 2.5]])).run();
+// ➔ [2, NaN]  (a function value handed to Map is checked per element)
+```
+
+An argument whose static type is already below the declared type needs no
+test, and a parameter typed `number` or `complex` has none. The declared
+result type is not checked in compiled code.
 
 ### Tuple Expressions
 
@@ -466,6 +631,27 @@ the result whenever the branch draws from the random stream.
 `Loop` and `Block` are not hoisted either — they remain valid only as a whole
 function body, and fail closed when used as a sub-expression.
 
+A shader has no dynamic array, so a literal `List`, `Tuple`, `PointList` or
+`Range` is written into the shader as a constant array constructor. The `glsl`
+and `wgsl` targets accept at most **256** elements this way. A larger constant
+collection is a `capability` decline with the diagnostic code
+`inline-collection-too-large`; the message names the element count and the
+limit. Ship such a collection as a texture (a `storage: sampler2D` input read
+with `At`) instead. The `javascript` and `interval-js` targets have no such
+limit: a list of any length is one array constant there.
+
+```javascript
+const big = ce.box(['List', ...Array.from({ length: 300 }, (_, i) => i)]);
+const r = compile(ce.box(['At', big, 'k']), { to: 'glsl' });
+r.diagnostic.code;
+// ➔ "inline-collection-too-large"
+r.error;
+// ➔ "Could not compile `List`: a constant collection of 300 elements is above
+//    the 256 elements a shader array constructor takes on this target. Ship
+//    the collection as a texture (a `storage: sampler2D` input, read with
+//    `At`) instead."
+```
+
 #### `Block` and `where`
 
 `Block` expressions create scoped variable bindings. The `where` syntax provides
@@ -530,11 +716,14 @@ complex-valued. This happens when:
 - An operation is applied to a complex-valued operand
 
 The detection is **static** — based on the expression's structure, not on
-runtime values. So `\sqrt{x}` compiles to real `Math.sqrt` because `x` has no
-declared complex type, even though `Math.sqrt(-1)` returns `NaN` at runtime.
-
-To get complex results from `\sqrt{x}`, you'd need to make the expression
-explicitly complex, e.g., `\sqrt{x + 0i}`.
+runtime values. What happens to a radical of a real operand whose sign is not
+known depends on the compile [mode](#modes-auto-strict-complex). Under the
+default `auto` mode, `\sqrt{x}` is **promoted**: it is lowered through the
+complex kernel, so `compile("\\sqrt{x}").run({ x: -4 })` is `{ re: 0, im: 2 }`,
+as `evaluate()` gives, and `2` at `x = 4`. Under `mode: "strict"` the
+radical compiles to the real `Math.sqrt`, because `x` has no declared complex
+type, and the same call returns `NaN`. To get a complex result in every mode,
+make the expression explicitly complex, e.g. `\sqrt{x + 0i}`.
 
 ### Result Format
 
@@ -735,6 +924,19 @@ reaches one:
   "wide is real" premise — `√(x² + y²)`, `√((x−a)² + (y−b)²)`, `√|x|`,
   `ln(x²)` — keep the real kernel and cost nothing.
 
+The special functions whose value is complex for some real operands —
+`HurwitzZeta`, `LerchPhi`, `PolyLog`, `EllipticK`, the complete `EllipticE`,
+`Hypergeometric2F1`, `LambertW` and `Gamma` — promote under `auto` and
+`complex` the same way. The complex kernel is used where the operand facts do
+not prove the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`,
+`m ≤ 1` for the elliptic integrals), so compiled `LambertW(x)` at `x = −1` is
+`{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled `LerchPhi(3, 2, 1)`
+is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The GLSL and WGSL
+targets have no complex lane for these heads and decline a provably complex
+value. `Arcsec` and `Arccsc` of a real operand of unknown magnitude are typed
+`complex | infinity | nan`, so with `x` declared `real` the compiled
+`Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }`.
+
 ```live
 // import { ComputeEngine, compile } from '@cortex-js/compute-engine';
 
@@ -784,7 +986,37 @@ you can.** A symbol declared `real` is never a wide binding — `2a + 1`,
 `b(a)`, `a < 3` stay on the real kernel in every setting (its unknown-sign
 radical still promotes under `auto`, because promotion is about sign, not
 wideness); a symbol declared `complex` is complex-shaped in every setting and
-never a mismatch. `mode` is per compilation, on `CompileTarget` (the target
+never a mismatch.
+
+A function's declared result is read the same way. A function declared
+`(real) -> real` whose body holds an unknown-sign radical or logarithm compiles
+its body on the real kernel in every mode, with `promoted: false`, and gives
+`NaN` outside the real domain. A body that is complex because of a
+complex-typed operand still declines.
+
+```javascript
+ce.declare('p', { signature: '(real) -> real' });
+ce.assign('p', ce.parse('k \\mapsto \\sin(2.4k)\\sqrt{(k-0.5)/16}'));
+ce.declare('k', 'real');
+const r = compile(ce.parse('p(k)'));
+r.preamble;
+// ➔ "const _fn_p = (k) => Math.sin(2.4 * k) * Math.sqrt(0.0625 * (k + -0.5));"
+r.promoted;
+// ➔ false
+r.run({ k: 0.1 });
+// ➔ NaN
+```
+
+Under `auto` on the JavaScript target, a user function called from a `Sum`,
+`Product` or comprehension whose index has literal integer bounds is compiled
+once more for the range of that index when the range proves the sign of such a
+head. With `p := k ↦ 1.45 √((k − 0.5)/16) cos(2.4k)`, a bare `p(t)` promotes
+the radical, but `\sum_{k=1}^{16} p(k) x` compiles the copy
+`_fn_p_integer_1___ = (k) => 1.45 * Math.cos(2.4 * k) * Math.sqrt(0.0625 * (k + -0.5))`
+on the real kernel, with `promoted: false`. A copy is made only when it removes
+a promoted head, so a function with no such head keeps one definition.
+
+`mode` is per compilation, on `CompileTarget` (the target
 default) or on `compile()`'s options; a mode a target does not offer
 (`complex` on `glsl`) is a `capability` decline, never a silent coercion. The
 shader targets and `interval-js` offer `strict` only.

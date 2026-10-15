@@ -123,6 +123,23 @@ The shorthand function literal `["Multiply", "x", 2]` which uses the unknown `x`
 is equivalent to the function literal `["Function", ["Multiply", "x", 2], "x"]`.
 When using this form, make sure that the symbol `x` is not defined in the current scope.
 
+An expression with no wildcard and no unknown is a constant function:
+`["Apply", 3, 5]` evaluates to `3`.
+
+The unknowns of an expression become its parameters only when the expression
+is known not to be a function. An expression whose type is `unknown` is kept
+as a **function value** instead, and is applied once its value is known. This
+is the case for a call of a function that has no definition yet: in
+`["Apply", ["g", "f"], "x"]` the callee `g(f)` is not read as the function
+`f ↦ g(f)`, because `g(f)` may itself be a function. The application stays
+`["Apply", ["g", "f"], "x"]`. Once `g` has a value, for example
+`["Function", ["Add", "a", "b"], "a", "b"]`, it evaluates to `f + x`: `g(f)` is
+then `g` applied to its first argument, a function of one argument.
+
+To apply a function with an unknown result type as a shorthand, use a
+wildcard: `["Map", ["f", "_"], "xs"]` maps `f` over `xs` whether or not `f`
+is defined.
+
 
 
 
@@ -233,9 +250,49 @@ ce.expr(['k', ['lst', 3]]).evaluate();  // lst(3) ➔ [3, -3]
 
 The static type of an application mirrors this: applied to a visible
 collection, the result types `list<R>`; applied to an argument that *may* be
-a collection (e.g. an unknown-return call), it types `broadcastable<R>` —
-where `R` is the function's return type. See the
+a collection (e.g. an unknown-return call), it types `broadcastable<R>`. For
+a function literal, `R` is the type of the body with each parameter typed as
+the element the call maps over, so a parameter that flows into the result
+unchanged does not read `unknown`:
+
+```js example
+ce.parse('f(x, y, z) := (-y, z, x)').evaluate();
+ce.box('f').type;
+// ➔ (unknown, unknown, unknown) -> tuple<number, unknown, unknown>
+
+ce.parse('f([1, 2], [3, 4], [5, 6])').type;
+// ➔ list<tuple<integer, integer, integer>>
+```
+
+For a function with a declared signature, `R` is the declared return type
+(`g: (number) -> integer` applied to `[1, 2]` types `vector<integer^2>`, a
+list of integers). See the
 [broadcastable type](/compute-engine/guides/types/) in the Types guide.
+
+#### Tuple Arguments
+
+A function whose parameter is declared with a **scalar** type (a number type
+or `boolean`) also maps over a tuple argument, as `Sin((a, b))` is
+`(sin(a), sin(b))`. The result is a tuple, typed `tuple<…>` with one component
+type per result. A component that does not match the declared type is an error
+in its own cell.
+
+```js example
+ce.assign('g', ce.parse('(u: \\mathrm{real}) \\mapsto 2u'));
+ce.parse('g((a, b))').evaluate();
+// ➔ ["Tuple", ["Multiply", 2, "a"], ["Multiply", 2, "b"]]
+
+ce.parse('g((a, b))').type;
+// ➔ tuple<real, real>
+
+// A list of tuples maps over the list, then over each tuple
+ce.expr(['g', ['List', ['Tuple', 1, 2], ['Tuple', 3, 4]]]).evaluate();
+// ➔ ["List", ["Tuple", 2, 4], ["Tuple", 6, 8]]
+```
+
+A parameter with no declared type, or declared `string`, binds the tuple
+whole: `Apply(u ↦ 7, (a, b))` is `7`. The compiled code gives the same tuple:
+an array on the `javascript` target, and a `vecN` on the GLSL and WGSL targets.
 
 #### Opting Out
 
@@ -254,7 +311,44 @@ ce.expr(['len', ['List', 1, 2, 3]]).evaluate();
 
 For lambdas defined with `\mapsto` without an explicit signature, the
 inferred parameter type is `unknown`, which is treated as scalar — so
-they broadcast by default.
+they broadcast by default, unless the body shows that the parameter is a
+collection.
+
+One such case needs no annotation. When the body hands the parameter to an
+operator that consumes a whole collection — `Mean`, `Median`, `Variance`,
+`StandardDeviation`, `Mode`, `Quartiles`, `Max`, `Min`, `Sum`, `Product`,
+`GCD`, `LCM`, `Flatten`, `ListFrom`, `SetFrom` or `TupleFrom` — a list
+argument binds whole. The parameter is followed through element-wise
+operators (`mean(v^2)`, `sin(v)`) and through a local of the body assigned
+from it.
+
+```js example
+ce.assign('h', ce.parse('v \\mapsto \\operatorname{mean}(v^2)'));
+ce.expr(['h', ['List', 1, 2, 3]]).evaluate();
+// ➔ 14/3  (the mean of [1, 4, 9]; not [1, 4, 9])
+
+ce.assign('s', ce.box(['Function', ['Sum', ['Power', 'v', 2]], 'v']));
+ce.expr(['s', ['List', 1, 2, 3]]).evaluate();
+// ➔ 14
+
+ce.assign('mx', ce.parse('v \\mapsto \\max(v)'));
+ce.expr(['mx', ['List', 1, 2, 3]]).evaluate();
+// ➔ 3
+
+// A body with no such operator still broadcasts
+ce.assign('q', ce.parse('v \\mapsto v^2 + 1'));
+ce.expr(['q', ['List', 1, 2, 3]]).evaluate();
+// ➔ ["List", 2, 5, 10]
+```
+
+A scalar argument gives the scalar value (`h(2)` is `4`). Compiled JavaScript
+follows the same rule.
+
+A function that passes a collection to itself at a parameter's position
+also receives that parameter whole: with
+`f(n, s) = s if n == 0 else f(n - 1, [1, 2])`, `f(1, [0])` is `[1, 2]`, and
+the parameter `s` is inferred as `list<any>`. See "When Inference Triggers"
+in the [Types guide](/compute-engine/guides/types/).
 
 
 ## Closures
@@ -352,7 +446,14 @@ expression:
 ```
 
 The annotation is authoritative: it sets the result type of the signature
-directly. Canonicalization moves the ascription **inside** the body `Block`,
+directly. When the function is applied, a concrete returned value (a number, a
+string, a character, a boolean, or a list or tuple of these) is checked
+against the declared result type: with `g` declared `(integer) -> integer`
+and the body `n / 2`, `g(4)` is `2` and `g(5)` is an `incompatible-type`
+error. A symbolic value, `Missing`, `Nothing`, `NaN` and an error value pass
+unchanged, and a real float passes under `integer` or `rational`, so `.N()`
+of such a function gives the float. Compiled code does not make this check.
+Canonicalization moves the ascription **inside** the body `Block`,
 wrapping its last statement, so the canonical form of the example above is:
 
 ```json example
@@ -420,7 +521,8 @@ expression or the shorthand function literal.
 <Signature name="Apply">_function_, _expr-1_, ..._expr-n_</Signature>
 
 [Apply](https://en.wikipedia.org/wiki/Apply) a list of arguments to a function.
-The _function_ is a function literal, or a symbol whose value is a function literal.
+The _function_ is a function literal, a symbol whose value is a function
+literal, or an expression whose value is a function.
 
 The _expr-n_ arguments are the arguments of the function literal.
 
@@ -432,6 +534,28 @@ The _expr-n_ arguments are the arguments of the function literal.
 ["Apply", ["Function", ["Multiply", "x", "x"], "x"], 3]
 // ➔ 9
 ```
+
+An expression that is not a function literal is read as a
+[shorthand function literal](#shorthand-function-literals): `["Apply",
+["Add", "x", 1], 2]` is `3`. An expression whose type is `unknown` is not:
+it is kept as a function value, and the application evaluates once the value
+is known. With `g` undefined, `["Apply", ["g", "f"], "x"]` stays as written,
+and the same expression written with a compound head, `[["g", "f"], "x"]`,
+is the same application. Once `g` is a function of two arguments, `g(f)` is
+that function applied to its first argument, and `["Apply", ["g", "f"], "x"]`
+is `g(f, x)`: a function applied to fewer arguments than it declares is a
+function of the remaining ones.
+
+```json example
+["Apply", ["Function", ["Add", "x", "y"], "x", "y"], 1]
+// ➔ ["Function", ["Add", "_1", 1], "_1"]
+
+["Apply", ["Apply", ["Function", ["Add", "x", "y"], "x", "y"], 1], 2]
+// ➔ 3
+```
+
+A function literal applied to more arguments than it declares evaluates to an
+`unexpected-argument` error.
 
 With LaTeX, the `\lhd` and `\rhd` commands can be used to apply a function to a single
 argument on the left or right respectively.

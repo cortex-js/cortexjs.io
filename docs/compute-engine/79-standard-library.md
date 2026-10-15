@@ -63,6 +63,10 @@ ce.assign("double(x)", ["Multiply", "x", 2]);
 ce.assign("half(x)", ce.parse("\\frac{x}{2}"));
 ```
 
+A set of definitions can also be packaged as a **library** and given to the
+engine with the `libraries` constructor option or with `ce.loadLibrary()`;
+see [Loading a Library](/compute-engine/guides/augmenting/#loading-a-library).
+
 
 
 <ReadMore path="/compute-engine/guides/augmenting/" >

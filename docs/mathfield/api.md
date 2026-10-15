@@ -1608,7 +1608,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version {#version}
 
 ```ts
-static version: string = '0.110.0';
+static version: string = '0.111.1';
 ```
 
 </MemberCard>
@@ -6325,27 +6325,6 @@ console.log(convertLatexToSpeakableText('\\frac{1}{2}'));
 
 <MemberCard>
 
-### convertMathJsonToLatex() {#convertmathjsontolatex}
-
-```ts
-function convertMathJsonToLatex(json): string
-```
-
-Convert a MathJSON expression to a LaTeX string.
-
-```js
-convertMathJsonToLatex(["Add", 1, 2]);
-// -> "1 + 2"
-```
-
-##### json
-
-[`Expression`](#expression)
-
-</MemberCard>
-
-<MemberCard>
-
 ### validateLatex() {#validatelatex}
 
 ```ts
@@ -6850,7 +6829,7 @@ const version: {
 };
 ```
 
-Current version: `0.110.0`
+Current version: `0.111.1`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 

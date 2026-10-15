@@ -65,6 +65,23 @@ the expression is automatically evaluated as a **numeric approximation**.
 console.log(parse('1/3 + 1/4 + 1.24').evaluate());
 ```
 
+An integer function of an exact integer argument gives the exact integer
+under `expr.N()` too, because an approximation of the argument would change
+the answer: `DigitSum`, `Binomial`, `Factorial`, `Fibonacci`, `Mod`, `GCD`,
+`LCM` and the integer predicates (`IsPrime`, `IsEven`, …) read an exact
+operand as written. Only an inexact (float) operand is read as a float.
+
+```js
+ce.box(['DigitSum', ['Power', 2, 1000]]).N();
+// ➔ 1366  (the same as evaluate())
+
+ce.box(['GCD', ['Power', 2, 100], ['Power', 6, 50]]).N();
+// ➔ 1125899906842624  (2^50)
+
+ce.box(['IsPrime', ['Subtract', ['Power', 2, 89], 1]]).N();
+// ➔ True
+```
+
 ### Infinity and NaN
 
 The two non-finite results fall on opposite sides of the exactness rule above,
@@ -126,6 +143,14 @@ Compiled functions honor the angular unit as well: with
 `ce.angularUnit = "deg"`, `ce.compile("\\sin(x)")` returns a function that
 interprets `x` in degrees, matching `evaluate()`.
 
+The symbolic integrator follows the angular unit as well. With
+`ce.angularUnit = "deg"`, `\int_0^{180} \sin x\,dx` evaluates to `360/\pi`
+and `\int \sin x\,dx` to `-(180/\pi)\cos x`. An integral with no
+trigonometric function, such as `\int_0^1 \frac{dx}{1 + x^2} = \pi/4`, has the
+same value in every unit. The same holds with the integration rules library
+loaded, and for the closed form the JavaScript target compiles for a definite
+integral.
+
 ## Rounding Ties
 
 `Round` rounds a number to the nearest integer. A value exactly halfway
@@ -147,8 +172,8 @@ console.log(ce.parse("\\operatorname{round}(2.5)").evaluate());
 ```
 
 The rule applies at every precision, to an exact rational (`Round(5/2)`), and
-to the form `Round(x, n)`, which rounds to `n` decimal places: with
-`"to-even"`, `Round(0.125, 2)` is `3/25`. A value that is not a tie is not
+to the step form `Round(x, step)`, which rounds to the nearest multiple of the
+step: with `"to-even"`, `Round(0.125, 1/100)` is `3/25`. A value that is not a tie is not
 affected.
 
 Compiled functions honor the rule as well: the code is made with the rule in
@@ -229,10 +254,14 @@ function with a precision argument: `["N", expr, digits]`.
 console.log(ce.box(['N', 'Pi', 50]).evaluate().toString());
 ```
 
-If the requested precision is greater than `ce.precision`, the working precision
-is raised to match and **kept** raised (display precision is global). If it is at
-or below `ce.precision`, the result is rounded to that many significant digits
-without changing the working precision.
+The value is computed with the requested digits plus a few guard digits, then
+rounded to the requested digits. The working precision of the engine
+(`ce.precision`) does not change: after `ce.box(['N', 'Pi', 30]).evaluate()`,
+`ce.precision` is still `21`. A later operation on the result is computed at the
+working precision, so `["Add", ["N", "Pi", 30], 1]` evaluates to
+`4.14159265358979323846`. The reference page for
+[`N`](/compute-engine/reference/core/#N) describes the precision and accuracy
+goals `["N", expr, ["List", p, a]]`.
 
 
 ### Machine Precision

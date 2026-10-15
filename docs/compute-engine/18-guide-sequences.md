@@ -146,6 +146,47 @@ ce.parse('F_k').evaluate();
 // ➔ F_k (unevaluated)
 ```
 
+A term is returned also when it is not a single number: an exact expression,
+or a term with a free symbol. `.N()` gives a float.
+
+```javascript
+ce.declareSequence('B', {
+  base: { 0: 1 },
+  recurrence: '\\pi B_{n-1} / n',
+});
+ce.parse('B_{10}').evaluate();
+// ➔ 1/3628800 · π^10
+ce.parse('B_{10}').N();
+// ➔ 0.0258068913900140600126
+
+ce.declareSequence('a', {
+  base: { 0: 1 },
+  recurrence: 'a_{n-1} + \\sqrt{2}',
+});
+ce.parse('a_{10}').evaluate();
+// ➔ 1 + 10√2
+
+ce.declareSequence('c', {
+  base: { 0: 1 },
+  recurrence: 'x c_{n-1} + 1',
+});
+ce.parse('c_{3}').evaluate();
+// ➔ x(x(x + 1) + 1) + 1
+```
+
+A term with more than 250 nodes, or whose type is not a number, stays
+unevaluated. A memoized term is computed again when a symbol that the
+recurrence or a base case reads changes: after `ce.assign('x', 2)`, `c_3` is
+`15`, and after `ce.assign('x', 3)` it is `40`.
+
+A large index is computed without a deep recursion: the lower terms are
+computed on demand, so `F_{2000}` of the Fibonacci recurrence gives its 418
+digits on a new engine. A read that needs more than 100,000 new terms is
+declined and the subscript stays unevaluated. The terms that earlier reads
+computed are kept, so a read of a lower index first makes a later read of a
+higher index possible. An index that is not a safe integer (`F_{10^{20}}`)
+stays unevaluated.
+
 ### Sum and Product
 
 Sequences work with `Sum` and `Product`:
@@ -175,6 +216,20 @@ ce.getSequenceTerms('F', 0, 10);
 // With step parameter (every other term)
 ce.getSequenceTerms('F', 0, 10, 2);
 // ➔ [0, 1, 3, 8, 21, 55]
+```
+
+`getSequenceTerms()` returns the exact terms, also when they are not single
+numbers. It returns `undefined` when a term in the range has no value, or when
+a term is not a number.
+
+```javascript
+ce.declareSequence('a', {
+  base: { 0: 1 },
+  recurrence: 'a_{n-1} + \\sqrt{2}',
+});
+
+ce.getSequenceTerms('a', 0, 3);
+// ➔ [1, 1 + √2, 1 + 2√2, 1 + 3√2]
 ```
 
 ## Custom Evaluation with subscriptEvaluate
@@ -307,6 +362,11 @@ ce.clearSequenceCache('F');
 // Clear all sequence caches
 ce.clearSequenceCache();
 ```
+
+`getSequenceCache()` returns the exact terms only, with the index as the key.
+The terms that `.N()` computes are kept apart, one set for each precision, and
+`clearSequenceCache()` clears them too. On a new engine, `F_6.N()` leaves the
+exact cache empty, and `F_6.evaluate()` fills it with the terms `F_2` … `F_6`.
 
 ## Interpreting Elliptical Notation
 

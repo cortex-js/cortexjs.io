@@ -270,10 +270,12 @@ For example, use `double` instead of `\operatorname{double}`.
 :::
 
 The evaluate handler can be either a MathJSON expression as above or 
-a JavaScript function.
+a JavaScript function. A name is declared once per scope, so to change the
+definition above, pass the fields to change with `{ extend: true }` (see
+below).
 
 ```js
-ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+ce.declare("double", { evaluate: ([x]) => x.mul(2) }, { extend: true });
 ```
 
 The signature of the `evaluate` handler is `(args[], options)`, where:
@@ -282,16 +284,39 @@ The signature of the `evaluate` handler is `(args[], options)`, where:
   argument is a expression. The array may be empty if there are no
   arguments.
 - `options`: an object literal which includes an `engine` property that is the
-  Compute Engine instance that is evaluating the expression, a `numericApproximation` property that is true if the result should be a numeric approximation, and an `expression` property that is the expression being evaluated.
+  Compute Engine instance that is evaluating the expression, a `numericApproximation` property that is true if the result should be a numeric approximation, an `expression` property that is the expression being evaluated, and a `precision` property with the number of significant digits requested: inside `N(x, p)` it is `p`, also when `p` is lower than `ce.precision`; under `.N()` it is `ce.precision`; in an exact evaluation it is `undefined`.
 
 Since `args` is an array, you can use destructuring to get the arguments:
 
 ```js
-ce.declare("double", { evaluate: (args) => args[0].mul(2) });
+ce.declare("double", { evaluate: (args) => args[0].mul(2) }, { extend: true });
 
 // or
-ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+ce.declare("double", { evaluate: ([x]) => x.mul(2) }, { extend: true });
 ```
+
+**A name is declared once per scope.** Declaring it again throws
+`The symbol "double" is already declared in this scope`. This also applies
+when the first declaration had no `signature`: an `evaluate` handler alone, a
+flag such as `lazy`, or a description is enough to make the name taken. To
+change an existing definition, pass a patch with only the fields to change and
+the option `{ extend: true }`:
+
+```js
+// On a new engine, the first declaration of the name
+ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+
+// Throws: The symbol "double" is already declared in this scope
+ce.declare("double", { evaluate: ([x]) => x.mul(3) });
+
+// Changes the handler of the existing definition
+ce.declare("double", { evaluate: ([x]) => x.mul(3) }, { extend: true });
+```
+
+A name first seen in use, such as `f` in `ce.parse("f(x)")`, is not declared
+yet and can be defined with `ce.declare("f", {...})`. See
+[Overloading Functions](#overloading-functions) for the fields a patch can
+carry.
 
 ### The `expression` option
 
@@ -360,7 +385,7 @@ ce.declare("double", {
   description: "Multiply a number by two",
   keywords: ["twice", "doubling"],
   evaluate: ([x]) => x.mul(2),
-});
+}, { extend: true });
 ```
 
 The optional `description` and `keywords` properties make a definition easier
@@ -378,6 +403,25 @@ ce.searchDefinitions("doubling", { limit: 5 });
 The optional `limit` setting limits the number of results and defaults to `10`.
 Pass a returned `id` to `ce.lookupDefinition(id)` to inspect the complete
 definition.
+
+A definition can give its own derivative with the `derivative` key. The value
+is an array with one function literal for each argument (each literal takes all
+the arguments as parameters), or a handler
+`(ops, { engine, argument }) => Expression | undefined` that returns the
+partial derivative with respect to argument number `argument` at `ops`. `D`
+applies the chain rule. A partial derivative that the key does not give stays
+symbolic.
+
+```js
+ce.declare("Sq", {
+  signature: "(number) -> number",
+  evaluate: ([x]) => (isNumber(x) ? x.mul(x) : undefined),
+  derivative: [["Function", ["Multiply", 2, "x"], "x"]],
+});
+
+ce.box(["D", ["Sq", "x"], "x"]).evaluate();                // ➔ 2x
+ce.box(["D", ["Sq", ["Power", "x", 2]], "x"]).evaluate();  // ➔ 4x^3
+```
 
 See `FunctionDefinition` for more details on the other handlers and
 properties that can be provided when defining a function.
@@ -675,6 +719,26 @@ handlers on: pass the `options` it received to `evaluateAsync()`. To change
 one option, copy the others — `op.evaluateAsync({ ...options,
 numericApproximation: true })` — and do not build the object from nothing.
 
+The `options` also carry the scopes of the evaluation, for example the scope
+of the index of an enclosing `Sum`. The engine installs them only while the
+evaluation's own synchronous code runs, because other code can run on the
+engine while a handler is suspended. Before the first `await` of an
+`evaluateAsync` handler they are in place. After it, synchronous work that
+reads the scope (canonicalizing a held operand with `x.canonical`,
+`ce.box()`, `ce.parse()`, `evaluate()`, `ce.assign()`) must run inside
+`ce.withEvaluationContext(options, fn)`:
+
+```js
+evaluateAsync: async ([x], options) => {
+  await somethingSlow();
+  return ce.withEvaluationContext(options, () => x.canonical).evaluateAsync(options);
+},
+```
+
+Outside it, an index of an enclosing `Sum` stays symbolic, and a global
+symbol with its name is declared. A nested `evaluateAsync(options)` call does
+not need it.
+
 **The `entropy` handler** is the unseeded source of randomness: an object with
 one method, `random()`, that returns a uniform number in `[0, 1)`
 (`Math.random` by default). `RandomExpression` draws from it, and so does every
@@ -798,7 +862,7 @@ the signature of the function as the second argument of `ce.declare()` or
 use the `"function"` type.
 
 ```js
-ce.declare("double", "function");
+ce.declare("triple", "function");
 ```
 
 
@@ -1112,6 +1176,10 @@ ce.clearSequenceCache('F');  // Clear cache for specific sequence
 ce.clearSequenceCache();     // Clear all sequence caches
 ```
 
+`getSequenceCache()` holds the exact terms only, with the index as the key.
+The terms that `.N()` computes are kept apart, one set for each precision;
+`clearSequenceCache()` clears both.
+
 ### Generating Sequence Terms
 
 Generate a list of sequence terms with `getSequenceTerms()`:
@@ -1221,21 +1289,74 @@ ce.declare('Sqrt', {
   ...originalSqrtDefinition,
   evaluate: (x, options) => {
     const y = originalSqrtDefinition.evaluate!(x, options);
-    return y?.isExtendedReal ? y : ce.NaN;
+    return y?.isExtendedReal === false ? ce.NaN : y;
   },
 });
+
+ce.parse('\\sqrt{-2.5}').evaluate();     // ➔ NaN
+ce.parse('\\sqrt{\\sin x}').evaluate();  // ➔ sqrt(sin(x))
 ```
 
 `isExtendedReal` is the test for "lies on the real line", and it accepts
 $\pm\infty$ along with the finite reals; only a value with a non-zero imaginary
-part, or `NaN`, fails it. Use `isFinite` instead when the guard must also
-exclude the infinities — but note that `isFinite` accepts a finite *complex*
-value, so it is not a substitute here.
+part, or `NaN`, fails it. For a symbolic result such as `sqrt(sin(x))` it is
+`undefined`, neither `true` nor `false`, so the guard compares with `false`:
+a plain truth test would turn every symbolic result into `NaN`. Use `isFinite`
+instead when the guard must also exclude the infinities — but note that
+`isFinite` accepts a finite *complex* value, so it is not a substitute here.
+An argument whose square root is reduced at canonicalization (`\sqrt{-4}` is
+`2i`) does not reach the `evaluate` handler.
 
-In general, re-declaring a function in the same scope is not allowed and 
-will throw an error. However, the standard functions are in a `system` scope
-so a new declaration in the `global` scope or a child scope will
-override the original declaration.
+A redeclaration that replaces a handler, as `evaluate` above, is a user
+definition. `compile()` cannot lower it as the library `Sqrt`: it reports
+`success: false` and `run()` uses the interpreter. `D` differentiates it as an
+unknown function. A copy that keeps the library handlers is still the library
+operator for differentiation and compilation: after
+`ce.declare('Sqrt', { ...ce.expr('Sqrt').operatorDefinition, description: '…' })`,
+`compile(ce.parse('\\sqrt{\\sin x}'))` succeeds and
+`D(sqrt(sin(x)), x)` is `cos(x) / (2sqrt(sin(x)))`. The rule: a definition of
+a library name is the library operator when its `evaluate`, `canonical`,
+`compile`, `derivative` and `evaluateAsync` handlers are the same function
+objects as the library's, and its `lazy` and `broadcastable` flags have the
+same values.
+
+A copy declared under another name keeps that name. After
+`const { name, ...sin } = ce.lookupDefinition('Sin').operator; ce.declare('MySin', sin)`,
+`ce.box(['MySin', 'x']).evaluate()` is `MySin(x)`, and `MySin(π)` is `0`.
+
+**To change part of a definition**, pass `{ extend: true }` as the third
+argument of `ce.declare()`. The engine builds a new definition from the visible
+one and the fields of the patch. A field the patch does not name keeps its
+value. A field the patch names replaces the old value. This works for a name
+declared in the same scope, where a plain `ce.declare()` throws, and for a
+standard operator.
+
+```js
+// Widen the signature and keep the evaluate handler
+ce.declare("SetMinus", { signature: "(value, value*) -> set" }, { extend: true });
+
+ce.box(["SetMinus", ["Set", 1, 2, 3], ["Set", 2]]).evaluate();  // ➔ {1, 3}
+ce.box(["SetMinus", 5, 2]);                                     // ➔ valid
+
+// Add a description and keep every handler: D still differentiates Sin
+ce.declare("Sin", { description: "The sine" }, { extend: true });
+ce.box(["D", ["Sin", "x"], "x"]).evaluate();                    // ➔ cos(x)
+```
+
+The patch can carry any field of the definition: `signature`, `evaluate`,
+`description`, `keywords`, `lazy`, … The field `addSignature` adds an overload
+instead of replacing the signature: the signature becomes `old & new`. The new
+signature must be a subtype of the old one, so that every call that was valid
+stays valid; otherwise the call throws. With
+`ce.declare("SetMinus", { addSignature: "(integer, integer) -> set" }, { extend: true })`,
+the signature is `((set<any>, value*) -> set) & ((integer, integer) -> set)`.
+It is an error to extend a name with no operator definition, a name declared as
+a value, or a function defined by clauses. An expression boxed before the
+extension keeps the old definition. The third argument can also be
+`{ scope, extend }`; a scope alone as the third argument works as before.
+
+The standard functions are in a `system` scope, so a new declaration in the
+`global` scope or a child scope replaces the original declaration.
 
 
 ## Multi-Clause Function Definitions
@@ -1353,4 +1474,47 @@ ce.assign({
   "f": ce.parse("x \\mapsto x^2 + x + 41"),
   "g": ce.parse("t \\mapsto t^3 + t^2 + 17"),
 });
+```
+
+## Loading a Library
+
+A set of definitions can be packaged as a **library**: an object with a `name`,
+a `definitions` dictionary (the same entries as `ce.declare()` takes), and an
+optional `requires` list with the names of the libraries it depends on.
+
+**To load a library when the engine is created**, give it in the `libraries`
+constructor option. **To load a library on a running engine**, call
+`ce.loadLibrary(library)`. The definitions go in the global scope, as with
+`ce.declare()`, and an expression boxed before the call uses them.
+
+```js
+ce.box(["Sq", 3]).evaluate();  // ➔ Sq(3)
+
+ce.loadLibrary({
+  name: "mine",
+  definitions: {
+    Sq: {
+      signature: "(number) -> number",
+      evaluate: ["Function", ["Square", "x"], "x"],
+    },
+  },
+});
+
+ce.box(["Sq", 3]).evaluate();  // ➔ 9
+```
+
+Each library in `requires` must already be loaded. The call throws, and
+declares nothing, for a library name that is already loaded, a missing required
+library, a standard library, or a definition that is invalid, repeated, or
+already declared in the global scope. A checkpoint taken before the call
+(`ce.checkpoint()`) undoes it.
+
+`ce.libraryOf(name)` returns the name of the library that defines `name`:
+`"trigonometry"` for `Sin`, the `name` of a loaded library for one of its
+definitions, and `undefined` for a name declared with `ce.declare()` or a name
+nothing defines.
+
+```js
+ce.libraryOf("Sq");   // ➔ "mine"
+ce.libraryOf("Sin");  // ➔ "trigonometry"
 ```

@@ -155,6 +155,23 @@ list. A re-created instance draws fresh values. See the
 [`WithRandomSeed`](/compute-engine/reference/arithmetic/#withrandomseed)
 notes for making draws reproducible.
 
+**A list or tuple literal is a value.** When a `List` or `Tuple` literal is
+evaluated, each element that is a finite lazy collection is listed in place.
+An element stays lazy when it is not known to be finite (`["Range", 1,
+"PositiveInfinity"]`, a `Filter` over an infinite source), when it is a lazy
+dictionary view, or when its elements would exceed `ce.maxCollectionSize`.
+
+```json example
+["List", ["Range", 1, 3], 4]
+// ➔ ["List", ["List", 1, 2, 3], 4]
+
+["Tuple", ["Range", 1, 3], 4]
+// ➔ ["Tuple", ["List", 1, 2, 3], 4]
+
+["List", ["Range", 1, "PositiveInfinity"], 4]
+// ➔ ["List", ["Range", 1, "PositiveInfinity"], 4]
+```
+
 Materializing a lazy collection involves evaluating all its elements and storing 
 them in memory, resulting in an **eager collection**. This is also known as 
 **realizing** the collection.
@@ -412,11 +429,15 @@ The type of a list is `list<T>`, where `T` is the type of the elements in the li
 The type `list` is a shorthand for `list<any>`, meaning the list can contain elements of any type.
 
 A `["Spread", xs]` element splices the elements of the collection `xs` into
-the list (in Epsil, `[...xs, c]`). The splice happens at canonicalization
-with `Join`'s semantics: a literal list splices immediately, a symbolic or
-lazy operand lowers to the equivalent `Join` expression (a lone spread
-`["List", ["Spread", "xs"]]` is `["Join", "xs"]`), and an infinite operand
-stays lazy. A **tuple** does not spread — tuples are units; use `ListFrom`
+the list (in Epsil, `[...xs, c]`). The splice happens at canonicalization:
+a literal list splices immediately, and a symbolic or lazy operand lowers to
+the equivalent `ListJoin` expression (a lone spread
+`["List", ["Spread", "xs"]]` is `["ListJoin", "xs"]`). When the literal is
+evaluated, the `ListJoin` becomes a plain `List` as soon as every spread
+operand is a finite collection and the total number of elements is within
+`ce.maxCollectionSize`. An infinite operand stays lazy, and so does a literal
+whose spread operands together exceed the cap. An element that is not spread
+is kept as written. A **tuple** does not spread — tuples are units; use `ListFrom`
 to convert one explicitly — so a provably-tuple operand is a `spread-tuple`
 error, and a scalar operand is an `incompatible-type` error. A **string** is
 an indexed collection of characters, so it spreads into its characters
@@ -428,6 +449,19 @@ on key collisions.
 ```json example
 ["List", ["Spread", ["List", 1, 2]], 3]
 // ➔ ["List", 1, 2, 3]
+```
+
+With `xs` assigned the list `["List", 1, 2]`:
+
+```json example
+["List", ["Spread", ["Take", "xs", 1]], 9, ["Spread", ["Drop", "xs", 1]]]
+// ➔ ["List", 1, 9, 2]
+
+["List", ["Spread", "xs"], ["Range", 1, 3]]
+// ➔ ["List", 1, 2, ["List", 1, 2, 3]]
+
+["List", ["Spread", ["Range", 1, "PositiveInfinity"]]]
+// ➔ ["ListJoin", ["Range", 1, "PositiveInfinity"]]  (stays lazy)
 ```
 
 The visual presentation of a `List` expression can be customized using the
@@ -581,11 +615,11 @@ parenthesized form $(a_n)_{n\in\mathbb{N}}$ is unchanged.
 
 <FunctionDefinition name="Range">
 
-<Signature name="Range" returns="range | indexed_collection<integer>">_upper_:number</Signature>
+<Signature name="Range" returns="range | list<integer>">_upper_:number</Signature>
 
-<Signature name="Range" returns="range | indexed_collection<integer>">_lower_:number, _upper_:number</Signature>
+<Signature name="Range" returns="range | list<integer>">_lower_:number, _upper_:number</Signature>
 
-<Signature name="Range" returns="range | indexed_collection<number>">_lower_:number, _upper_:number, _step_:number</Signature>
+<Signature name="Range" returns="range | list<real>">_lower_:number, _upper_:number, _step_:number</Signature>
 
 A sequence of numbers, starting with `lower`, ending with `upper`, and
 incrementing by `step`.
@@ -617,30 +651,43 @@ negative.
 ```
 
 **Element type narrows by step.** When the step is omitted or is an integer
-literal, the result is `indexed_collection<integer>`. When the step is
-non-integer (e.g. `0.1`) or a symbolic expression, the result widens to
-`indexed_collection<number>`.
+literal, the result is `list<integer>`. When the step is a non-integer number
+(e.g. `0.1`, `1/3`) or a constant expression (`π/4`), the result widens to
+`list<real>`. When the step is a symbol with no value, the result is
+`list<number>`.
 
 ```json example
 ["Range", 0, 1, 0.1]
-// type: indexed_collection<number>
+// type: list<real>
 // ➔ ["List", 0, 0.1, 0.2, 0.3, ..., 1.0]
+```
+
+**An exact rational bound or step gives exact elements.** A float bound or
+step, or a step that is a constant expression such as `π/4`, gives floats, and
+`.N()` of the range gives floats.
+
+```json example
+["Range", 0, 1, ["Rational", 1, 3]]
+// ➔ ["List", 0, ["Rational", 1, 3], ["Rational", 2, 3], 1]
+
+["Sum", ["Range", 0, 1, ["Rational", 1, 3]]]
+// ➔ 2
 ```
 
 **A range that describes collection indexes has the `range` type.** When the
 bounds are integers, at least 1, ascending, and one apart — that is, when the
 value is a contiguous run of valid 1-based indexes — the result takes the
 narrower [`range`](/compute-engine/guides/types/) type, an **index span**.
-Every other case keeps the `indexed_collection` types above.
+Every other case keeps the `list` types above.
 
 ```json example
 ["Range", 2, 5]      // type: range        (an index span)
 ["Range", 7]         // type: range        (the one-argument form means 1..7)
-["Range", 1, 10, 2]  // type: indexed_collection<integer>  (stepped: a gather, not a span)
-["Range", 5, 2]      // type: indexed_collection<integer>  (descending)
-["Range", 0, 5]      // type: indexed_collection<integer>  (0 is not an index)
+["Range", 1, 10, 2]  // type: list<integer>  (stepped: a gather, not a span)
+["Range", 5, 2]      // type: list<integer>  (descending)
+["Range", 0, 5]      // type: list<integer>  (0 is not an index)
 ["Range", 1, "PositiveInfinity"]
-                     // type: indexed_collection<integer>  (unbounded)
+                     // type: list<integer>  (unbounded)
 ```
 
 An **infinite upper bound** is allowed and produces a lazy, unbounded
@@ -857,13 +904,16 @@ spelling (the expression stays unevaluated).
 
 <FunctionDefinition name="Repeat">
 
-<Signature name="Repeat" returns="indexed_collection">_value_: any</Signature>
+<Signature name="Repeat" returns="list<T>">_value_: T</Signature>
 
 An infinite collection of the same element.
 
-<Signature name="Repeat" returns="indexed_collection">_value_: any, _count_: integer?</Signature>
+<Signature name="Repeat" returns="list<T>">_value_: T, _count_: integer?</Signature>
 
 A collection of the same element repeated `count` times.
+
+The result is typed `list<T>`, where `T` is the type of the value:
+`["Repeat", "False", 3]` is a `list<boolean>`.
 
 ```json example
 ["Repeat", 42, 5]
@@ -1823,6 +1873,25 @@ rows.
 // ➔ 4
 ```
 
+In LaTeX, `|S|`, `\#S`, `\operatorname{card}(S)` and `\operatorname{Card}(S)`
+of a set or a string parse to `Count(S)`, and `Count` of a set or a string
+serializes as `|S|`. For a list, `|L|` is the element-wise absolute value, and
+`\#` alone is the symbol `hash`.
+
+```js example
+ce.parse('|\\{1,2\\}|').evaluate();
+// ➔ 2
+
+ce.parse('|\\text{abc}|').evaluate();
+// ➔ 3
+
+ce.parse('\\#S');
+// ➔ ["Count", "S"]
+
+ce.box(['Count', ['Set', 1, 2]]).latex;
+// ➔ "\vert\lbrace1, 2\rbrace\vert"
+```
+
 <Signature name="Count" returns="integer">_xs_: collection, _value_: any</Signature>
 
 With a second argument that is not a function, returns how many elements of
@@ -2340,6 +2409,23 @@ callback, use a tuple-pattern parameter, `["Function", body, ["Tuple",
 // ➔ ["Error", ["ErrorCode", "'callback-arity'", ...]]
 ```
 
+An element that _f_ cannot accept is kept as an error cell. This holds for
+every spelling of the callback: a function literal, a named operator or a
+comprehension give the same cells. An absent element (`Missing`) under a
+numeric function gives `NaN`; under a text function such as `ToUpperCase` it
+gives the `incompatible-type` error.
+
+```json example
+["Map", ["Function", ["Sqrt", "x"], "x"], ["List", 16, -4, "'banana'", 81]]
+// ➔ ["List", 4, ["Complex", 0, 2], ["Error", ["ErrorCode", "'incompatible-type'", ...], "'banana'"], 9]
+
+["Map", ["Function", ["Sqrt", "x"], "x"], ["List", 16, "Missing", 81]]
+// ➔ ["List", 4, "NaN", 9]
+
+["Map", "ToUpperCase", ["List", "'a'", "Missing"]]
+// ➔ ["List", "'A'", ["Error", ["ErrorCode", "'incompatible-type'", ...], "Missing"]]
+```
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -2464,6 +2550,19 @@ When an `initial` value is provided, the reducing function is applied to the
 initial value and the first element of the collection, then to the result of the
 previous application and the next element, etc...
 
+The initial value is evaluated once, at the first step or when the collection
+is empty, under the same options as the fold. The reducing function always
+receives the value of the initial value, never the expression as written.
+Without an initial value, an empty collection gives `Nothing`.
+
+```json example
+["Reduce", ["List"], "Add", ["Add", 1, ["Mod", 4, 3]]]
+// ➔ 2
+
+["Fold", "Add", ["Sqrt", 2], ["List"]]
+// ➔ ["Sqrt", 2]   (and 1.414… under `.N()`)
+```
+
 ```json example
 [
   "Reduce",
@@ -2575,13 +2674,18 @@ Evaluate to a tuple of two lists:
 
 <FunctionDefinition name="Zip">
 
-<Signature name="Zip" return="indexed_collection">..._xss_: indexed_collection</Signature>
+<Signature name="Zip" returns="list<tuple<T1, ..., Tn>>">..._xss_: indexed_collection</Signature>
 
 Returns a collection of tuples where the first element of each tuple is the
 first element of the first collection, the second element of each tuple is the
 second element of the second collection, etc.
 
 The length of the resulting collection is the length of the shortest collection.
+
+The result is typed `list<tuple<T1, ..., Tn>>`, where each `Ti` is the
+element type of the matching source collection (`unknown` for a source with
+no element type): `["Zip", ["List", 1, 2], ["List", "'a'", "'b'"]]` is a
+`list<tuple<integer, string>>`.
 
 ```json example
 ["Zip", ["List", 1, 2, 3], ["List", 4, 5, 6]]

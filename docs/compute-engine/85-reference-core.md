@@ -354,8 +354,12 @@ entries present depend on what the operand is; keys include:
 - `clauses`: for a multi-clause function, the clause listing (a list of
   strings, one per clause, in declaration order, with overlap/coverage
   annotations)
-- `attributes`: algebraic attributes of a function
-  (e.g. `"commutative associative"`)
+- `attributes`: a list of strings with the algebraic attributes of a
+  function, followed by `"lazy"` when the operator receives its arguments
+  unevaluated (`["commutative", "associative", "idempotent", "lazy"]` for
+  `Add`, `["lazy"]` for `Hold`)
+- `examples`, `keywords`: the examples and the keywords of the definition,
+  each as a list of strings
 - `description`, `wikidata`, `url`: documentation metadata, when the
   definition carries any
 
@@ -866,9 +870,22 @@ the solutions as if it were the answer. For example,
 stay unevaluated, because the solver finds `1` and `2`, but not the other
 solutions.
 
+An equation that holds for every value of the unknown (`x = x`,
+`2(x + 1) = 2x + 2`) gives `[t]`: one solution for every value of the fresh
+parameter `t`, the same form as the parametric answers of the integer solver.
+An equation whose answer depends on another unknown (`Solve(a = 0, x)`) stays
+unevaluated.
+
 **Real or complex solutions.** When the unknown has no declared type and no
 domain is given, a polynomial equation gives all its roots, complex roots
-included: `Solve(x^2 + 1 = 0, x)` is `[i, -i]`. Every other equation gives
+included: `Solve(x^2 + 1 = 0, x)` is `[i, -i]`, and `Solve(x^3 = 8, x)` is
+`[2, -1 + √3i, -1 - √3i]`. A root is exact when the polynomial has a closed
+form that the engine knows: a rational root, a quadratic factor with
+rational coefficients, a pure power `x^n = c` (its `n` roots are
+`ⁿ√c·(cos(2kπ/n) + i·sin(2kπ/n))`), or a polynomial in `x^g`. The roots of a
+factor with no such closed form are floats: `x^5 + x + 1 = 0` is
+`(x^2 + x + 1)(x^3 - x^2 + 1) = 0`, and its roots are the exact
+`(-1 ± i√3)/2` and the three numeric roots of the cubic. Every other equation gives
 its real solutions only: `Solve(e^x = -1, x)` and `Solve(|x^2 + 1| = 0, x)`
 are `[]`, and `Solve(|x - 1| = 3, x)` is `[-2, 4]`. To solve such an equation
 over the complex numbers, declare the unknown complex
@@ -1305,14 +1322,25 @@ Ascribe a type to _expression_ for the benefit of the type system.
 The _type_ is a string such as `{"str": "integer"}`, or a type-name symbol
 such as `integer` (which is normalized to a string).
 
-`Typed` is an **ascription, not a runtime check**: it asserts the type without
-verifying the value, and it is transparent at evaluation — `Typed(x, type)`
-evaluates to the value of `x`.
+`Typed` sets the static type of the expression. At evaluation, a concrete
+value is checked against that type: `Typed(x, type)` evaluates to the value of
+`x` when the value conforms, and to an `incompatible-type` error when it does
+not.
 
 ```json example
 ["Typed", ["Add", 2, 3], "'integer'"]
 // The expression has type `integer`, and evaluates to 5
+
+["Typed", "'s'", "'integer'"]
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'integer'", "'string'"], "'s'"]
 ```
+
+Only a concrete value is checked: a number, a string, a character, a boolean,
+or a list or tuple of these. A symbolic value, `Missing`, `Nothing`, `NaN` and
+an error value pass unchanged. A real float conforms to every type that admits
+a real number, so the value of `.N()` passes under `integer` or `rational`. A
+character conforms where a `string` is declared, because the two are the same
+value.
 
 The main use of `Typed` is to annotate the parameters and return type of a
 [function literal](/compute-engine/reference/functions/#Function).

@@ -107,7 +107,9 @@ The **step budget** decides when the rule driver gives up on an integrand.
 Because it counts steps and not time, the same integral gives the same answer
 on a fast machine, a slow one and a loaded one: an integral that needs more
 steps stays unevaluated everywhere, and the built-in antiderivative is used
-instead.
+instead. The built-in antiderivative has its own fixed budget of 100,000
+steps, which does not depend on `stepBudget`; when it is spent too, the
+result is the unevaluated `Integrate` expression.
 
 The **wall-clock limit** is only a guard against a hang in code that does not
 count steps. The default (120 s) is about 8 times what the step budget allows

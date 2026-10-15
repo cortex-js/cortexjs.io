@@ -42,6 +42,43 @@ ce.angularUnit = 'deg';
 
 <MemberCard>
 
+### RoundingTies {#roundingties}
+
+```ts
+type RoundingTies = 
+  | "away-from-zero"
+  | "to-even"
+  | "toward-zero"
+  | "toward-positive-infinity"
+  | "toward-negative-infinity";
+```
+
+The rule that `Round` uses for a value that is exactly halfway between two
+integers (a tie). A value that is not a tie always rounds to the nearest
+integer.
+
+| Rule | `Round(2.5)` | `Round(3.5)` | `Round(-2.5)` | Description |
+|:-----|:------------:|:------------:|:-------------:|:------------|
+| `away-from-zero` | `3` | `4` | `-3` | the default |
+| `to-even` | `2` | `4` | `-2` | IEEE 754, Python, NumPy and Mathematica |
+| `toward-zero` | `2` | `3` | `-2` | |
+| `toward-positive-infinity` | `3` | `4` | `-2` | JavaScript `Math.round` |
+| `toward-negative-infinity` | `2` | `3` | `-3` | |
+
+The rule also applies to the step form `Round(x, step)`, which rounds to
+the nearest multiple of the step: the tie is at the half of the step
+(with the step `1/100`, `Round(0.125, 1/100)` is a tie).
+
+To change the rule used by the Compute Engine, use:
+
+```js
+ce.roundingTies = 'to-even';
+```
+
+</MemberCard>
+
+<MemberCard>
+
 ### AssignValue {#assignvalue}
 
 ```ts
@@ -370,6 +407,19 @@ tolerance: number;
 ```ts
 angularUnit: AngularUnit;
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~roundingTies~~ {#roundingties-2}
+
+```ts
+roundingTies: RoundingTies;
+```
+
+The rule that `Round` uses for a value halfway between two integers.
+ See [RoundingTies](#roundingties). Default: `'away-from-zero'`.
 
 </MemberCard>
 
@@ -803,6 +853,62 @@ calling `withEffects`, or use a separate engine.
 ####### overrides
 
 [`EffectHandlerOverrides`](#effecthandleroverrides)
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~withEvaluationContext()~~ {#withevaluationcontext-1}
+
+```ts
+withEvaluationContext<T>(options, fn): T
+```
+
+Run the synchronous `fn` in the evaluation context that `options`
+carries, then put the previous context back, and return the result of
+`fn`.
+
+For an `evaluateAsync` handler. The handler receives `options`, which
+carry the evaluation context of the evaluation that called it: the host
+capability registry, and the lexical scopes of the scoped operators that
+the evaluation is inside (the scope of the index of a `Sum`, for
+example). While the handler is suspended at an `await`, other code can
+run on the same engine, so the engine does not keep that context
+installed for the handler. Before the first `await`, the context is in
+place. After it, synchronous work that reads the scope — canonicalizing
+a held operand (`x.canonical`), `ce.box()`, `ce.parse()`, `evaluate()`,
+`ce.assign()` — sees the global scope unless it runs inside `fn`. An
+index of an enclosing `Sum` then stays symbolic, and a new global
+symbol with its name is declared.
+
+```ts
+ce.declare('Late', {
+  signature: '(integer) -> integer',
+  lazy: true,
+  evaluateAsync: async ([x], options) => {
+    await delay(1);
+    return ce
+      .withEvaluationContext(options, () => x.canonical)
+      .evaluateAsync(options);
+  },
+});
+```
+
+A nested `evaluateAsync(options)` call does not need it: the options
+carry the context to that evaluation.
+
+If `fn` returns a promise, only the synchronous part of `fn`, up to its
+first `await`, runs in the context.
+
+• T
+
+####### options
+
+`Partial`\<`EvaluateOptions`\> \| `undefined`
 
 ####### fn
 
@@ -2916,7 +3022,7 @@ readonly isCollection: true;
 ##### CollectionInterface.count {#count-2}
 
 ```ts
-readonly count: number | undefined;
+readonly count: number | bigint | undefined;
 ```
 
 </MemberCard>
@@ -3575,9 +3681,11 @@ The number of significant digits the caller asked for, when
   it is `ce.precision`, the precision of the engine.
 
 A handler can use it to compute to the requested number of digits
-without reading `ce.precision`. Note that `N(x, p)` with a `p` greater
-than the precision of the engine also sets `ce.precision` to `p`, and
-leaves it there after the call.
+without reading `ce.precision`. `N(x, p)` with a `p` greater than the
+precision of the engine computes at `p` digits plus guard digits for the
+time of the call and restores the precision of the engine after it; on
+the asynchronous route the raised precision travels with the evaluation
+(`EvaluateOptions._precisionWindow`).
 
 #### EvaluateHandlerOptions.effects
 
@@ -4792,12 +4900,19 @@ different order.
 ##### BaseCollectionHandlers.count {#count}
 
 ```ts
-count: (collection) => number | undefined;
+count: (collection) => number | bigint | undefined;
 ```
 
 Return the number of elements in the collection.
 
-An empty collection has a count of 0.
+An empty collection has a count of 0. An infinite collection has a count
+of `Infinity`. Return `undefined` when the count cannot be determined.
+
+A finite count that is not a safe integer (larger than
+`Number.MAX_SAFE_INTEGER`) cannot be held exactly by a `number`: return
+it as a `bigint`. A handler can also return a `bigint` for a smaller
+count: `expr.count` always converts a count that is a safe integer to a
+`number`.
 
 </MemberCard>
 
@@ -5399,6 +5514,7 @@ type OperatorDefinitionFlags = {
   threadsConditionals: boolean | number[];
   inspectsErrors: boolean;
   selectsOperands: boolean;
+  evaluatesOperands: boolean;
   namedArgumentsRequired: boolean;
   missingBehavior: "reject" | "propagate" | "handle";
   missingStrip: "all" | number[];
@@ -8647,7 +8763,9 @@ Spans for `undeclared-symbol`, `juxtaposition-as-multiply` and every
 `ambiguous-*` code except `ambiguous-percent` are offsets into CE's
 **normalized** LaTeX (the
 re-serialized token stream), which matches the original input only when
-the input round-trips unchanged.
+the input round-trips unchanged. A Unicode superscript or subscript is the
+exception: it is measured as written, not as its expansion, so `x²! + 1`
+reports the span `x²!` (offsets 0 to 3), not `x^{2}!`.
 `comment-discarded` is the exception: because the comment is precisely what
 was stripped before tokenization, its span is in **original-input**
 coordinates. `recovered` spans are a best-effort original-input range (equal
@@ -8897,6 +9015,29 @@ abstract N(): NumericValue
 ```
 
 Return a non-exact representation of the numeric value
+
+</MemberCard>
+
+<MemberCard>
+
+##### NumericValue.roundToPrecision() {#roundtoprecision}
+
+```ts
+roundToPrecision(_digits): NumericValue
+```
+
+This value with each part rounded to `digits` significant digits. A
+value that is already within `digits` (an exact value, a machine float,
+a big decimal with no more digits) is returned as it is.
+
+The `add` and `mul` of a big decimal are exact, so a running sum or
+product of big floats grows a digit count of the size of the exponent
+span, or of the number of factors: the numeric folds of `Sum` and
+`Product` round each partial result with this method.
+
+####### \_digits
+
+`number`
 
 </MemberCard>
 
@@ -10201,6 +10342,15 @@ optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
 
 An asynchronous version of `evaluate`.
 
+A handler that evaluates an operand with `evaluateAsync` passes its
+own `options` on (`x.evaluateAsync(options)`, or a copy that keeps the
+`_effects`, `_contextStack` and `_precisionWindow` fields): they carry
+the state of the evaluation across the handler's `await`s, among which
+the precision window of an enclosing `N(x, p)` call. An operand
+evaluation started with options of the handler's own inherits the
+window in force when it starts, but a handler that awaits BEFORE it
+evaluates its operand starts that evaluation outside the window.
+
 #### OperatorDefinition.evalDimension?
 
 ```ts
@@ -11176,6 +11326,19 @@ angularUnit: AngularUnit;
 
 <MemberCard>
 
+##### IComputeEngine.roundingTies {#roundingties-1}
+
+```ts
+roundingTies: RoundingTies;
+```
+
+The rule that `Round` uses for a value halfway between two integers.
+ See [RoundingTies](#roundingties). Default: `'away-from-zero'`.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.costFunction {#costfunction-1}
 
 ```ts
@@ -11604,6 +11767,62 @@ calling `withEffects`, or use a separate engine.
 ####### overrides
 
 [`EffectHandlerOverrides`](#effecthandleroverrides)
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.withEvaluationContext() {#withevaluationcontext}
+
+```ts
+withEvaluationContext<T>(options, fn): T
+```
+
+Run the synchronous `fn` in the evaluation context that `options`
+carries, then put the previous context back, and return the result of
+`fn`.
+
+For an `evaluateAsync` handler. The handler receives `options`, which
+carry the evaluation context of the evaluation that called it: the host
+capability registry, and the lexical scopes of the scoped operators that
+the evaluation is inside (the scope of the index of a `Sum`, for
+example). While the handler is suspended at an `await`, other code can
+run on the same engine, so the engine does not keep that context
+installed for the handler. Before the first `await`, the context is in
+place. After it, synchronous work that reads the scope — canonicalizing
+a held operand (`x.canonical`), `ce.box()`, `ce.parse()`, `evaluate()`,
+`ce.assign()` — sees the global scope unless it runs inside `fn`. An
+index of an enclosing `Sum` then stays symbolic, and a new global
+symbol with its name is declared.
+
+```ts
+ce.declare('Late', {
+  signature: '(integer) -> integer',
+  lazy: true,
+  evaluateAsync: async ([x], options) => {
+    await delay(1);
+    return ce
+      .withEvaluationContext(options, () => x.canonical)
+      .evaluateAsync(options);
+  },
+});
+```
+
+A nested `evaluateAsync(options)` call does not need it: the options
+carry the context to that evaluation.
+
+If `fn` returns a promise, only the synchronous part of `fn`, up to its
+first `await`, runs in the context.
+
+• T
+
+####### options
+
+`Partial`\<`EvaluateOptions`\> \| `undefined`
 
 ####### fn
 
@@ -15662,6 +15881,14 @@ If the collection is infinite, return `Infinity`.
 If the number of elements cannot be determined, return `undefined`, for
 example, if the collection is lazy and not finite and the size cannot
 be determined without iterating over the collection.
+
+The count is a `bigint` only when it is finite and is not a safe integer
+(larger than `Number.MAX_SAFE_INTEGER`), for example the count of
+`QuotientRing(Integers, 2^61 - 1)`. A count that is a safe integer is
+always a `number`, and an infinite count is `Infinity`. Do not mix the
+count with a `number` in arithmetic before you check its type:
+JavaScript throws a `TypeError` for `count + 1` when `count` is a
+`bigint`. A comparison (`count > 10`) is valid for both types.
 
 </MemberCard>
 

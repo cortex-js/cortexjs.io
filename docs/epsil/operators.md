@@ -403,6 +403,14 @@ A `->` whose left side is shaped like a parameter list — `(x, y) -> x + y`,
 (with a fixit) and recovered as the intended function: `->` builds a
 `key -> value` pair, and none of those shapes is a valid key.
 
+A bare name before `->` in a call argument is the key of a rule argument, in
+every argument position: `f(GridLines -> 1, Axes -> 2)` passes two
+`KeyValuePair` arguments, as `f(x, GridLines -> 1)` does. When the parameter
+at that position expects a function, the rule is reported as the same
+wrong-arrow typo, with a fixit to `=>`: `map(x -> x^2, xs)` passes a
+key-value pair where `map` expects a function. That call is not recovered as
+`map(x => x^2, xs)`; apply the fixit.
+
 ## Ranges: `..` {#ranges}
 
 The range operator is a compact spelling of a two-argument `Range`:
@@ -461,15 +469,18 @@ The splice happens at canonicalization: literal collections splice
 immediately, and a symbolic or lazy segment lowers to the equivalent
 `join` expression — a lone spread `[...xs]` is `join(xs)`, the list
 materialization of `xs`, and an infinite segment stays lazy
-(`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). Set literals deduplicate as
-usual.
+(`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). A literal is a value, so
+when it is evaluated, every finite segment is listed, also a lazy one:
+`[...take(xs, 1), 9]` is a plain list, not a `join` recipe. An element
+that is a finite lazy collection is listed too (`[1..3, 4]` is
+`[[1, 2, 3], 4]`). Set literals deduplicate as usual.
 
 **Tuples do not spread here** — a tuple is a unit (a point, a pair), and
 splicing it would quietly discard that; spreading one is a `spread-tuple`
 error. To use a tuple's elements, convert explicitly:
-`[...ListFrom(t), 3]`. A scalar or string operand is an
-`incompatible-type` error (a string is a scalar, not a character
-collection). Note the mirror-image rule in calls: argument lists are
+`[...ListFrom(t), 3]`. A scalar operand is one element (`[...5]` is
+`[5]`), and a string operand contributes its characters (`[..."ab", 1]` is
+`["a", "b", 1]`). Note the mirror-image rule in calls: argument lists are
 tuple-shaped, so there exactly tuples spread.
 
 In a **dictionary literal**, `...` merges the entries of a dictionary.

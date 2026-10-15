@@ -149,9 +149,11 @@ ce.parse('\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}');
 ce.parse('\\det\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
 // → ["Determinant", ["List", ["List", 1, 2], ["List", 3, 4]]]
 
-// Inverse using superscript -1
+// Inverse using superscript -1, for a symbol declared as a matrix
+ce.declare('A', 'matrix');
 ce.parse('A^{-1}');
 // → ["Inverse", "A"]
+// (for an undeclared symbol, A^{-1} is ["Divide", 1, "A"], the reciprocal)
 
 ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^{-1}');
 // → ["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
@@ -407,6 +409,13 @@ ce.parse('\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}').evaluate();
 ce.parse('\\det(A)');  // → ["Determinant", "A"]
 ```
 
+A matrix with a float entry is a float matrix: the determinant, and each entry
+of a matrix result, is then a float, also where the value is an integer.
+`ce.expr(['Determinant', ['List', ['List', 1.5, 0], ['List', 0, 2]]]).evaluate()`
+is the float `3.0`, not the exact `3`, and
+`Transpose([[2.0, 1.5], [3, 4]])` is `[[2.0, 3.0], [1.5, 4.0]]`. A matrix of
+exact entries gives exact results.
+
 ### Trace
 
 The trace is the sum of diagonal elements:
@@ -482,10 +491,6 @@ ce.expr(['Norm', ['List', 3, 4], 3]).evaluate();
 // Frobenius norm (default): √(1² + 2² + 3² + 4²) = √30
 ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
 // → √30 ≈ 5.477
-
-// Spectral norm (order 2): the largest singular value
-ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 2]).evaluate();
-// → √(15 + √221) ≈ 5.465
 
 // L1 norm: max column sum = max(4, 6) = 6
 ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 1]).evaluate();
@@ -856,6 +861,36 @@ ce.expr(['Power', ['List', ['List', 1, 2], ['List', 3, 4]], -1]).evaluate();
 `A^n` (an integer power) routes to `MatrixPower`. A non-square base returns an
 `expected-square-matrix` error. For an element-wise power of the entries, map
 `Power` over the matrix.
+
+The same reading applies to a symbol whose value is a square matrix of
+numbers, also when the power was built before the value was assigned: the
+`Power` evaluation reads an integer exponent over such a value as
+`MatrixPower`.
+
+```js example
+const e = ce.parse('B^2');
+ce.assign('B', ce.box(['List', ['List', 1, 2], ['List', 3, 4]]));
+e.evaluate();
+// → [[7,10],[15,22]]  (the matrix power, as for B^2 parsed after the assignment)
+```
+
+The exception is `B^{-1}` built before the assignment: with `B` undeclared,
+it canonicalizes to `Divide(1, B)`, so it evaluates to the element-wise
+reciprocal `[[1, 1/2], [1/3, 1/4]]`, not the inverse. Declare `B` as a
+`matrix` first, or parse `B^{-1}` after the assignment, to get `Inverse(B)`.
+
+A **non-integer** exponent is element-wise: `[[1, 2], [3, 4]]^{1/2}` is
+`[[1, √2], [√3, 2]]`, the square root of each entry, not the matrix square
+root. This is the reading Mathematica gives `M^(1/2)` too. There is no
+operator for the matrix square root or for a matrix function of a non-integer
+exponent.
+
+`simplify()` follows the same reading. For `A` declared a `matrix`,
+`ce.parse('A A').simplify()` is `MatrixPower(A, 2)`, and
+`\sqrt{A}\sqrt{A}` is `MatrixPower(\sqrt{A}, 2)`. The same-base rules for
+numbers do not apply to a matrix: `e^A e^B` is not combined into `e^{A+B}`
+(`Exp` of a matrix is element-wise, see below), and `A^a / A^b` is left as it
+is.
 
 :::warning[No matrix exponential]
 `Exp` applied to a matrix broadcasts **element-wise**: `["Exp", M]` computes

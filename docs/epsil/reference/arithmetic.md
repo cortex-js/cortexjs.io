@@ -206,6 +206,17 @@ host can choose another rule with the engine setting `roundingTies`):
 // ➔ [-3, -2, -2, -3]
 ```
 
+With a second argument, `floor`, `ceil`, `truncate` and `round` round to a
+multiple of that step instead of an integer. `floor(x, step)` is the greatest
+multiple of the step that is at most `x`, whatever the sign of the step, and
+`round(x, step)` the nearest multiple. To round to `n` decimal places, the
+step is `10^-n`:
+
+```epsil
+[floor(226, 10), ceil(226, 10), truncate(-226, 10), round(226, 10), round(3.14159, 1/100)]
+// ➔ [220, 230, -220, 230, 157/50]
+```
+
 There are two remainders. `a % b` (`Mod`) takes the sign of the divisor `b`.
 `remainder(a, b)` rounds the quotient to the nearest integer, so its result
 can be negative when `b` is positive:
@@ -458,13 +469,13 @@ N(catalanConstant)
 
 ### ceil
 
-MathJSON `Ceil` · `(real | signed_infinity) -> integer | signed_infinity`
+MathJSON `Ceil` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
 
-Rounds a number up to the next largest integer
+Rounds a number up to the next largest integer, or with a step to the least multiple of the step that is at least the number.
 
 ```epsil
-[ceil(2.3), ceil(-2.7)]
-// ➔ [3,-2]
+[ceil(2.3), ceil(-2.7), ceil(226, 10)]
+// ➔ [3,-2,230]
 ```
 
 ### chop
@@ -705,13 +716,13 @@ Double Factorial Function
 
 ### floor
 
-MathJSON `Floor` · `(real | signed_infinity) -> integer | signed_infinity`
+MathJSON `Floor` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
 
-Rounds a number down to the nearest integer.
+Rounds a number down to the nearest integer, or with a step to the greatest multiple of the step that is at most the number.
 
 ```epsil
-[floor(2.7), floor(-2.3)]
-// ➔ [2,-3]
+[floor(2.7), floor(-2.3), floor(226, 10)]
+// ➔ [2,-3,220]
 ```
 
 ### fract
@@ -1302,13 +1313,13 @@ n-th root of a value.
 
 ### round
 
-MathJSON `Round` · `(real | signed_infinity, integer?) -> real | signed_infinity`
+MathJSON `Round` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
 
-Rounds a number to the nearest integer, or (with a precision argument) to `n` decimal places.
+Rounds a number to the nearest integer, or with a step to the nearest multiple of the step.
 
 ```epsil
-[round(2.5), round(-2.5), round(3.14159, 2)]
-// ➔ [3,-3,157/50]
+[round(2.5), round(-2.5), round(226, 10), round(3.14159, 1/100)]
+// ➔ [3,-3,230,157/50]
 ```
 
 ### sign
@@ -1395,20 +1406,20 @@ N(trigamma(1))
 
 ### truncate
 
-MathJSON `Truncate` · `(real | signed_infinity) -> integer | signed_infinity`
+MathJSON `Truncate` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
 
-Rounds a number towards zero (removes the fractional part)
+Rounds a number towards zero (removes the fractional part), or with a step to the multiple of the step nearest to the number in the direction of zero.
 
 ```epsil
-[truncate(2.7), truncate(-2.7)]
-// ➔ [2,-2]
+[truncate(2.7), truncate(-2.7), truncate(-226, 10)]
+// ➔ [2,-2,-220]
 ```
 
 ### zeta
 
 MathJSON `Zeta` · `(complex | infinity, (complex | infinity)?) -> number`
 
-Riemann zeta function; with two arguments, the Hurwitz zeta function ζ(s,a) = Σ_&#123;n=0&#125;^∞ (n+a)^&#123;-s&#125;.
+Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ |n+a|^&#123;-s&#125; (a term with n+a = 0 omitted), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum.
 
 ```epsil
 [zeta(2), zeta(-1), N(zeta(3))]

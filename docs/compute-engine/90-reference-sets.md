@@ -68,31 +68,41 @@ ce.parse("42 \\in \\Z").evaluate().print();
 
 ## Constants
 
+The engine writes the number sets with `\mathbb{…}` (`\mathbb{Z}`,
+`\mathbb{R}_{>0}`). The short commands `\Z`, `\R`, `\Q`, `\C` and `\N`, which
+MathLive defines, are read as the same sets.
+
 <div className="symbols-table first-column-header" style={{"--first-col-width":"22ch"}}>
 
 | Symbol     | Notation                                 | &nbsp; | Definition |
 | :--------- | :--------------------------------------- | :--------- | :--------- |
 | `EmptySet` | `\varnothing` or `\emptyset`| $$ \varnothing $$ or $$ \emptyset $$ | A set that has no elements           |
 | `Numbers`               | `\mathrm{Numbers}` | $$ \mathrm{Numbers} $$ | Any number — real, imaginary or complex — together with $$+\infty$$, $$-\infty$$, $$\tilde\infty$$ and $$\mathrm{NaN}$$. It corresponds to the type `number` |
-| `ComplexNumbers`        | `\C` | $$ \C $$ | Real or imaginary numbers (does not include the infinities or $$\mathrm{NaN}$$) |
+| `ComplexNumbers`        | `\mathbb{C}` | $$ \mathbb{C} $$ | Real or imaginary numbers (does not include the infinities or $$\mathrm{NaN}$$) |
 | `ExtendedComplexNumbers`        | `\overline\C` | $$ \overline\C $$ | Real or imaginary numbers, including $$+\infty$$, $$-\infty$$ and $$\tilde\infty$$ |
 | `ImaginaryNumbers`           | `\imaginaryI\R` | $$ \imaginaryI\R $$ | Complex numbers with a non-zero imaginary part and no real part |
-| `RealNumbers`           | `\R` | $$ \R $$ | Numbers that form the unique Dedekind-complete ordered field $$ \left( \mathbb{R} ; + ; \cdot ; \lt \right) $$, up to an isomorphism (does not include $\pm\infty$) |
+| `RealNumbers`           | `\mathbb{R}` | $$ \mathbb{R} $$ | Numbers that form the unique Dedekind-complete ordered field $$ \left( \mathbb{R} ; + ; \cdot ; \lt \right) $$, up to an isomorphism (does not include $\pm\infty$) |
 | `ExtendedRealNumbers`           | `\overline\R` | $$ \overline\R $$ | Real numbers extended to include $\pm\infty$ |
-| `Integers`              | `\Z` | $$ \Z$$  | Whole numbers and their additive inverse $$\lbrace \ldots -3, -2, -1,0, 1, 2, 3\ldots\rbrace$$                                       |
+| `Integers`              | `\mathbb{Z}` | $$ \mathbb{Z}$$  | Whole numbers and their additive inverse $$\lbrace \ldots -3, -2, -1,0, 1, 2, 3\ldots\rbrace$$                                       |
 | `ExtendedIntegers`              | `\overline\Z` | $$ \overline\Z$$  | Integers extended to include $\pm\infty$ |
-| `RationalNumbers`       | `\Q` | $$ \Q $$  | Numbers which can be expressed as the quotient $$ \nicefrac{p}{q}$$ of two integers $$p, q \in \mathbb{Z}$$.                                  |
+| `RationalNumbers`       | `\mathbb{Q}` | $$ \mathbb{Q} $$  | Numbers which can be expressed as the quotient $$ \nicefrac{p}{q}$$ of two integers $$p, q \in \mathbb{Z}$$.                                  |
 | `ExtendedRationalNumbers`              | `\overline\Q` | $$ \overline\Q$$  | Rational numbers extended to include $\pm\infty$ |
-| `NegativeNumbers`       | `\R_{<0}` | $$ \R_{<0} $$       | Real numbers $$ \lt 0 $$ |
-| `NonPositiveNumbers`    | `\R_{\leq0}` | $$ \R_{\leq0} $$    | Real numbers $$ \leq 0 $$ |
-| `NonNegativeNumbers`    | `\R_{\geq0}` | $$ \R_{\geq0} $$    | Real numbers $$ \geq 0 $$ |
-| `PositiveNumbers`       | `\R_{>0}` | $$ \R_{>0} $$     | Real numbers $$ \gt 0$$ |
-| `NegativeIntegers`      | `\Z_{<0}` | $$ \Z_{<0} $$       | Integers $$ \lt 0$$, $$\lbrace \ldots -3, -2, -1\rbrace$$                                                                          |
-| `NonPositiveIntegers`   | `\Z_{\le0}` | $$ \Z_{\le0} $$    | Integers $$ \leq 0 $$, $$\lbrace \ldots -3, -2, -1, 0\rbrace$$                                                                     |
-| `NonNegativeIntegers`   | `\N` | $$ \N $$    | Integers $$ \geq 0 $$, $$\lbrace 0, 1, 2, 3\ldots\rbrace$$                                                                         |
-| `PositiveIntegers`      | `\N^*` | $$ \N^* $$     | Integers $$ \gt 0 $$, $$\lbrace 1, 2, 3\ldots\rbrace$$                                                                             |
+| `NegativeNumbers`       | `\mathbb{R}_{<0}` | $$ \mathbb{R}_{<0} $$       | Real numbers $$ \lt 0 $$ |
+| `NonPositiveNumbers`    | `\mathbb{R}_{\le0}` | $$ \mathbb{R}_{\le0} $$    | Real numbers $$ \leq 0 $$ |
+| `NonNegativeNumbers`    | `\mathbb{R}_{\geq0}` | $$ \mathbb{R}_{\geq0} $$    | Real numbers $$ \geq 0 $$ |
+| `PositiveNumbers`       | `\mathbb{R}_{>0}` | $$ \mathbb{R}_{>0} $$     | Real numbers $$ \gt 0$$ |
+| `NegativeIntegers`      | `\mathbb{Z}_{<0}` | $$ \mathbb{Z}_{<0} $$       | Integers $$ \lt 0$$, $$\lbrace \ldots -3, -2, -1\rbrace$$                                                                          |
+| `NonPositiveIntegers`   | `\mathbb{Z}_{\le0}` | $$ \mathbb{Z}_{\le0} $$    | Integers $$ \leq 0 $$, $$\lbrace \ldots -3, -2, -1, 0\rbrace$$                                                                     |
+| `NonNegativeIntegers`   | `\mathbb{N}` | $$ \mathbb{N} $$    | Integers $$ \geq 0 $$, $$\lbrace 0, 1, 2, 3\ldots\rbrace$$                                                                         |
+| `PositiveIntegers`      | `\mathbb{N}^*` | $$ \mathbb{N}^* $$     | Integers $$ \gt 0 $$, $$\lbrace 1, 2, 3\ldots\rbrace$$                                                                             |
 
 </div>
+
+The terse commands `\N`, `\Z`, `\Q`, `\R` and `\C` are shorthands for
+`\mathbb{N}`, `\mathbb{Z}`, `\mathbb{Q}`, `\mathbb{R}` and `\mathbb{C}`, and
+the Unicode double-struck letters `ℕ`, `ℤ`, `ℚ`, `ℝ` and `ℂ` are read the same
+way. A sign superscript on any of these spellings names the signed set:
+`\mathbb{Z}^+` and `ℤ^-` are `PositiveIntegers` and `NegativeIntegers`.
 
 `Union` and `Intersection` accept any finite collections, including lists. The
 result is a `Set`, so duplicate elements are removed:
@@ -123,6 +133,13 @@ New sets can be defined using one of the following operators.
 | `SymmetricDifference` | $$ \operatorname{A} \triangle \operatorname{B} $$ | Disjunctive union = $$ (\operatorname{A} \setminus \operatorname{B}) \cup (\operatorname{B} \setminus \operatorname{A})$$ [Q1147242](https://www.wikidata.org/wiki/Q1147242)                                      |
 
 </div>
+
+The number of elements of a set is its
+[`Count`](/compute-engine/reference/collections/#Count). In LaTeX it is
+written $$|\operatorname{A}|$$, `\#A` or `\operatorname{card}(A)`:
+`ce.parse('|\\{1,2\\}|').evaluate()` is `2`, `|\emptyset|` is `0` and
+`|\mathbb{Z}|` is `PositiveInfinity`. `Count` of a set serializes back as
+$$|\operatorname{A}|$$.
 
 ## Ring Constructions
 
@@ -185,17 +202,42 @@ A subscript that marks a **sign restriction** is not a quotient: $$\Z_+$$,
 $$\R_-$$ and $$\Z_{\geq 0}$$ still name `PositiveIntegers`, `NegativeNumbers`
 and `NonNegativeIntegers`, as before.
 
-Both operators are **inert**: they stay symbolic, and there is no membership
-test (`Element`), no enumeration of residues, and no arithmetic in the
-constructed ring. They do carry a type, formed by joining the base ring's
-element type with the types of the adjoined elements:
+`Adjoin` is **inert**: it stays symbolic, and there is no membership test
+(`Element`) and no arithmetic in the constructed ring. It does carry a type,
+formed by joining the base ring's element type with the types of the adjoined
+elements:
 
 ```js
 ce.parse("\\Z[\\sqrt{2}]").type;   // ➔ set<real>
 ce.parse("\\Z[i]").type;           // ➔ set<complex>
 ce.parse("\\Z[x]").type;           // ➔ set<unknown>
-ce.parse("\\Z_n").type;            // ➔ set<integer>
 ```
+
+`QuotientRing(Integers, n)` with a positive integer literal `n` is a finite
+collection of the `n` residue classes `ResidueClass(0, n)` …
+`ResidueClass(n−1, n)` (see
+[`ResidueClass`](/compute-engine/reference/number-theory/#ResidueClass) for
+the arithmetic of the classes). Its type is `set<value>`. An integer is not an
+element of the ring: the elements are the classes.
+
+```js
+ce.parse("\\operatorname{Count}(\\mathbb{Z}/5\\mathbb{Z})").evaluate();
+// ➔ 5
+
+ce.box(["Element", ["ResidueClass", 7, 5], ["QuotientRing", "Integers", 5]]).evaluate();
+// ➔ True
+
+ce.box(["Element", 7, ["QuotientRing", "Integers", 5]]).evaluate();
+// ➔ False
+
+ce.box(["ListFrom", ["QuotientRing", "Integers", 3]]).evaluate();
+// ➔ ["List", ["ResidueClass", 0, 3], ["ResidueClass", 1, 3], ["ResidueClass", 2, 3]]
+
+ce.parse("\\Z_n").type;            // ➔ set<value>
+```
+
+With a symbolic, zero or negative modulus, or a base other than `Integers`,
+the quotient ring stays symbolic, with no count and no membership test.
 
 ## Relations
 

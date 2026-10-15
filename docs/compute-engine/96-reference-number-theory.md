@@ -48,6 +48,17 @@ See also: [Euler's totient function - Wikipedia](https://en.wikipedia.org/wiki/E
 // ➔ 6
 ```
 
+`Totient(0)` is `0`, and `Totient(-n)` is `Totient(n)`. The Wolfram Language
+name `EulerPhi` is an alias: its canonical form is `Totient`.
+
+```json
+["Totient", -12]
+// ➔ 4
+
+["EulerPhi", 12]
+// ➔ 4
+```
+
 </FunctionDefinition>
 
 
@@ -441,6 +452,55 @@ See also: [Modular exponentiation - Wikipedia](https://en.wikipedia.org/wiki/Mod
 ["PowerMod", 2, 10, 1000]
 // ➔ 24
 ```
+
+<Signature name="PowerMod" returns="integer">a: integer, e: rational, m: integer</Signature>
+With a rational exponent $e = s/r$, returns the least $x$ in $[0, m)$ such
+that $x^r ≡ a^s \pmod m$, as in the Wolfram Language. When there is no such
+$x$, the expression stays unevaluated.
+
+```json
+["PowerMod", 4, ["Rational", 1, 2], 7]
+// ➔ 2
+```
+
+The function works on big integers. It stays unevaluated, rather than answer
+wrongly, when the modulus cannot be factored or a discrete logarithm is out of
+reach.
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### PowerModList
+</nav>
+
+<FunctionDefinition name="PowerModList">
+<Signature name="PowerModList" returns="list<integer>">a: integer, e: rational, m: integer</Signature>
+Lists, in increasing order, every $x$ in $[0, m)$ such that $x^r ≡ a^s \pmod m$,
+for $e = s/r$. Returns `[]` when there is no such $x$. Stays unevaluated when
+the modulus cannot be factored or the list would have more than 100000
+entries.
+
+```json
+["PowerModList", 3, ["Rational", 1, 2], 11]
+// ➔ [5, 6]
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### RationalReconstruction
+</nav>
+
+<FunctionDefinition name="RationalReconstruction">
+<Signature name="RationalReconstruction" returns="rational">a: integer, m: integer</Signature>
+Recovers the fraction $p/q$ such that $p ≡ a q \pmod m$ and
+$|p|, q ≤ \lfloor\sqrt{(m-1)/2}\rfloor$ (Wang's algorithm). Works on big
+integers.
+
+```json
+["RationalReconstruction", 6, 11]
+// ➔ 1/2
+```
 </FunctionDefinition>
 
 
@@ -497,6 +557,70 @@ See also: [Chinese remainder theorem - Wikipedia](https://en.wikipedia.org/wiki/
 ["ChineseRemainder", [2, 3, 2], [3, 5, 7]]
 // ➔ 23
 ```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### ResidueClass
+</nav>
+
+<FunctionDefinition name="ResidueClass">
+<Signature name="ResidueClass" returns="value">k: integer, n: integer</Signature>
+The residue class $\overline{k}$ of $k$ modulo $n$: an element of the ring
+$\mathbb{Z}/n\mathbb{Z}$. The modulus $n$ must be an exact integer $≥ 1$.
+
+In LaTeX, a class is written `\overline{k}_{n}` with integer literals $k$ and
+$n$, and it serializes back the same way. A bare `\overline{7}` is
+`Conjugate(7)`, and `\overline{z}_1` is the conjugate of $z_1$.
+
+The canonical form reduces $k$ to $[0, n)$. A rational $k$ whose denominator
+is coprime to $n$ is read as $u·v^{-1}$ in the ring. A float or a symbolic $k$
+or $n$ stays symbolic.
+
+```json
+["ResidueClass", 7, 5]
+// ➔ ["ResidueClass", 2, 5]
+
+["ResidueClass", -1, 7]
+// ➔ ["ResidueClass", 6, 7]
+
+["ResidueClass", ["Rational", 1, 3], 7]
+// ➔ ["ResidueClass", 5, 7]
+```
+
+Two classes with the same modulus and the same reduced $k$ are equal:
+`["Equal", ["ResidueClass", 7, 5], ["ResidueClass", 2, 5]]` is `True`.
+Classes are not ordered.
+
+Sums, differences, products and integer powers of classes with one modulus
+are classes. An exact integer, or a rational whose denominator is coprime to
+the modulus, is read in the ring. An inverse, a quotient or a negative power
+needs $\gcd(k, n) = 1$; otherwise the expression stays symbolic.
+
+```json
+["Add", ["ResidueClass", 5, 7], ["ResidueClass", 4, 7]]
+// ➔ ["ResidueClass", 2, 7]
+
+["Add", ["ResidueClass", 5, 7], 3]
+// ➔ ["ResidueClass", 1, 7]
+
+["Divide", 1, ["ResidueClass", 3, 7]]
+// ➔ ["ResidueClass", 5, 7]
+
+["Divide", 1, ["ResidueClass", 2, 4]]
+// ➔ ["Divide", 1, ["ResidueClass", 2, 4]]  (2 has no inverse modulo 4)
+```
+
+Classes of two different moduli, a float and an infinity are never combined
+with a class: the expression stays symbolic. The rules of the numbers do not
+apply to a class: `c/c` is not cancelled to `1` when the class `c` has no
+inverse. `Solve`, `D` and `Integrate` stay symbolic for an expression that
+holds a class.
+
+The ring itself, `QuotientRing(Integers, n)` (written $\mathbb{Z}/n\mathbb{Z}$
+or $\mathbb{Z}_n$), is the finite collection of its $n$ classes; see
+[Quotient rings](/compute-engine/reference/sets/). `Mod(a, n)` is the integer
+remainder, not a class: `["Mod", 7, 3]` is `1`.
 </FunctionDefinition>
 
 
@@ -756,6 +880,19 @@ See also: [Multiplicative order - Wikipedia](https://en.wikipedia.org/wiki/Multi
 ["MultiplicativeOrder", 2, 7]
 // ➔ 3
 ```
+
+The sign of $n$ is ignored, because the unit group modulo $-n$ is the unit
+group modulo $n$: `["MultiplicativeOrder", 3, -7]` is `6`. `n = 0` stays
+unevaluated.
+
+<Signature name="MultiplicativeOrder" returns="integer">a: integer, n: integer, residues: list</Signature>
+Returns the least $k ≥ 1$ such that $a^k ≡ r \pmod n$ for some $r$ in
+`residues`. Stays unevaluated when no element of the list is a power of $a$.
+
+```json
+["MultiplicativeOrder", 5, 7, ["List", 3, 11]]
+// ➔ 2
+```
 </FunctionDefinition>
 
 
@@ -765,13 +902,40 @@ See also: [Multiplicative order - Wikipedia](https://en.wikipedia.org/wiki/Multi
 
 <FunctionDefinition name="PrimitiveRoot">
 <Signature name="PrimitiveRoot" returns="integer">n: integer</Signature>
-Returns the smallest primitive root modulo $n$ (a generator of the multiplicative group of integers mod $n$), or undefined if none exists — which happens unless $n$ is 1, 2, 4, $p^k$, or $2p^k$ for an odd prime $p$.
+Returns the smallest primitive root modulo $n$ (a generator of the multiplicative group of integers mod $n$), or undefined if none exists — which happens unless $|n|$ is 1, 2, 4, $p^k$, or $2p^k$ for an odd prime $p$.
+
+The sign of $n$ is ignored, because the unit group modulo $-n$ is the unit
+group modulo $n$. `PrimitiveRoot(1)` is `0`. `PrimitiveRoot(0)` stays
+unevaluated.
 
 See also: [Primitive root modulo n - Wikipedia](https://en.wikipedia.org/wiki/Primitive_root_modulo_n)
 
 ```json
 ["PrimitiveRoot", 7]
 // ➔ 3
+
+["PrimitiveRoot", -7]
+// ➔ 3
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### PrimitiveRootList
+</nav>
+
+<FunctionDefinition name="PrimitiveRootList">
+<Signature name="PrimitiveRootList" returns="list<integer>">n: integer</Signature>
+Lists every primitive root modulo $n$, in increasing order. Returns `[]` when
+$n$ has none, and `[0]` for $n = 1$. The sign of $n$ is ignored.
+`PrimitiveRootList(0)` is `[]`.
+
+```json
+["PrimitiveRootList", 25]
+// ➔ [2, 3, 8, 12, 13, 17, 22, 23]
+
+["PrimitiveRootList", 8]
+// ➔ []
 ```
 </FunctionDefinition>
 
@@ -791,6 +955,15 @@ See also: [Eulerian number - Wikipedia](https://en.wikipedia.org/wiki/Eulerian_n
 ```json
 ["Eulerian", 4, 2]
 // ➔ 11
+```
+
+Outside the triangle, the value is `0`: `Eulerian(n, m)` is `0` for
+$m ≥ n > 0$. `Eulerian(0, 0)` is `1`. A negative or symbolic operand leaves
+the expression unevaluated.
+
+```json
+["Eulerian", 3, 5]
+// ➔ 0
 ```
 
 </FunctionDefinition>
@@ -813,6 +986,18 @@ See also: [Stirling number of the second kind - Wikipedia](https://en.wikipedia.
 // ➔ 15
 ```
 
+Outside the triangle ($m > n$), the value is `0`, as for `Binomial`:
+`["Stirling", 3, 5]` is `0`, and so is `["StirlingS1", 3, 5]`. A negative or
+symbolic operand leaves the expression unevaluated.
+
+The Wolfram Language name `StirlingS2` is an alias: its canonical form is
+`Stirling`.
+
+```json
+["StirlingS2", 6, 3]
+// ➔ 90
+```
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -830,6 +1015,14 @@ See also: [Partition function (number theory) - Wikipedia](https://en.wikipedia.
 ```json
 ["NPartition", 5]
 // ➔ 7
+```
+
+`NPartition(n)` is `0` for a negative $n$. The Wolfram Language name
+`PartitionsP` is an alias: its canonical form is `NPartition`.
+
+```json
+["NPartition", -3]
+// ➔ 0
 ```
 </FunctionDefinition>
 

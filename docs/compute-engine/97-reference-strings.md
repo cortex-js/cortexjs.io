@@ -130,6 +130,19 @@ stay disjoint regardless. Ordering is by the code-point sequence of the
 cluster; it is deliberately **not** locale-aware, and never will be — engine
 identity, membership and hashing must be deterministic on every host.
 
+**A string operator accepts a character.** Wherever a string operator takes a
+`string` — `ToUpperCase`, `ToLowerCase`, `CaseFold`, `StringRepeat`,
+`PadStart`, `PadEnd`, `Trim`, `TrimStart`, `TrimEnd`, `StringReplace`,
+`StringSplit`, `StringCompare`, `Characters`, `GraphemeClusters`,
+`UnicodeScalars`, `Utf8`, `Utf16`, `CharacterFrom`, `NumberFrom`,
+`DigitsFrom`, the separator of `StringJoin`, the subject of `IsMatch`,
+`StringMatch` and `StringMatchAll`, and the key of a dictionary lookup — it
+also accepts a `character`. The result is that of the one-character string:
+`["ToUpperCase", ["At", "'abc'", 1]]` is `"A"` and
+`["StringRepeat", ["CharacterFrom", "'a'"], 3]` is `"aaa"`. The types stay
+distinct. A symbol with no declared type that is used at such a parameter is
+inferred `character | string`.
+
 **Serialization.** MathJSON has string literals but no character literal, so
 a character's wire form is the call form `["CharacterFrom", "'x'"]`, which
 canonicalizes back to the identical character:
@@ -221,7 +234,9 @@ what the operator does, not from a list of exceptions:
 - Operators whose result is not a collection of the source's kind — `Length`,
   `IsEmpty`, `Contains`, `Count`, `Any`, `All`, `IndexOf`, `At`, `First`,
   `Last`, `Position`, `Find`, `Reduce`, `Fold` — behave on a string exactly
-  as they do on any other indexed collection.
+  as they do on any other indexed collection. In LaTeX, `|s|` of a string is
+  its `Count`: `ce.parse('|\\text{abc}|').evaluate()` is `3`, and
+  `Count` of a string serializes back as `|s|`.
 
 - Set operators read a string operand as *its characters*:
   `["Union", ["Set", 1], {str: "ab"}]` is `Set(1, "a", "b")`. `SetMinus` is

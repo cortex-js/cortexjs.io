@@ -301,6 +301,26 @@ For a scalar, `Shape` returns an empty tuple.
 // ➔ ["Tuple", 2, 4]
 ```
 
+An empty list keeps its axis: its shape is `(0)`, and a list of empty lists
+has the shape `(2, 0)`. A zero axis is never dropped.
+
+```json example
+["Shape", ["List"]]
+// ➔ ["Tuple", 0]
+
+["Shape", ["List", ["List"], ["List"]]]
+// ➔ ["Tuple", 2, 0]
+```
+
+A finite indexed collection such as `Range(1, 3)` gives the shape of the list
+with the same elements. A set, a dictionary, an infinite collection, or a
+symbol with a collection type and no value stays unevaluated.
+
+```json example
+["Shape", ["Range", 1, 3]]
+// ➔ ["Tuple", 3]
+```
+
 **Note:** The shape of a matrix is also sometimes called "dimensions".
 However, this terminology is ambiguous because the word "dimension" is also
 used to refer to the length of a matrix along a specific axis.
@@ -333,6 +353,22 @@ The rank is the length of the shape of the tensor.
 
 ["Rank", ["List", ["List", 5, 2, 10], ["List", 1, 2, 3]]]
 // ➔ 2
+```
+
+An empty list has rank 1, and a list of empty lists has rank 2: a zero axis
+counts. A finite indexed collection such as `Range(1, 3)` has the rank of the
+list with the same elements, `1`. A set, a dictionary, an infinite collection,
+or a symbol with a collection type and no value stays unevaluated.
+
+```json example
+["Rank", ["List"]]
+// ➔ 1
+
+["Rank", ["List", ["List"], ["List"]]]
+// ➔ 2
+
+["Rank", ["Range", 1, 3]]
+// ➔ 1
 ```
 
 </FunctionDefinition>
@@ -883,6 +919,10 @@ scalar itself.
 // ➔ 5
 ```
 
+The Wolfram Language name `Det` is an alias: its canonical form is
+`Determinant`. Only the one-operand form exists; a second operand is an
+`unexpected-argument` error.
+
 </FunctionDefinition>
 
 
@@ -1396,18 +1436,11 @@ For matrices, the default is the Frobenius norm: sqrt(sum of |aij|^2)
 // ➔ sqrt(30) ≈ 5.477
 ```
 
-- **Frobenius norm** (_p_ = `"Frobenius"`, the default): Square root of the sum of the squared moduli of the entries
+- **Frobenius norm** (_p_ = 2 or `"Frobenius"`): Square root of sum of squared elements
 
 ```json example
 ["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "Frobenius"]
 // ➔ sqrt(30) ≈ 5.477
-```
-
-- **Spectral norm** (_p_ = 2): The largest singular value, sqrt(λmax(Aᴴ A)). The result is exact for a matrix with one or two rows or columns, or with at most one nonzero entry in each row and column. Any other exact matrix stays unevaluated under `evaluate()` and gives a number under `N()`. On a tensor of rank 3 or more, _p_ = 2 is the Frobenius norm.
-
-```json example
-["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
-// ➔ sqrt(15 + sqrt(221)) ≈ 5.465
 ```
 
 - **L1 norm** (_p_ = 1): Maximum column sum of absolute values
@@ -1527,7 +1560,15 @@ The matrix must be square. For non-square matrices, an `expected-square-matrix` 
 - **Diagonal/triangular matrices**: Returns the diagonal elements (fast path)
 - **2×2 matrices**: Uses the quadratic formula on the characteristic polynomial
 - **3×3 matrices**: Uses Cardano's formula for the cubic characteristic polynomial
-- **Larger matrices**: Uses the QR algorithm for numerical computation
+- **Larger matrices**: Uses the QR algorithm. For a matrix of exact entries,
+  an eigenvalue close to a rational number that makes $A - \lambda I$ singular
+  is returned exact, and `Eigenvectors` then gives exact vectors. A matrix with
+  a float entry gives float results.
+
+```json example
+["Eigenvalues", ["List", ["List", 5, 4, 2, 1], ["List", 0, 1, -1, -1], ["List", -1, -1, 3, 0], ["List", 1, 1, -1, 2]]]
+// ➔ ["List", 4, 4, 2, 1]
+```
 
 **Symbolic matrices**: For symbolic matrices, the eigenvalue computation may be returned unevaluated if closed-form solutions cannot be determined.
 

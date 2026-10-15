@@ -78,6 +78,11 @@ from the cost gate entirely. If you write a rule that should apply regardless
 of cost, tag it the same way — see
 [Patterns and Rules](/compute-engine/guides/patterns-and-rules/).
 
+Powers with the same base are combined in a product as they are in a quotient,
+for a symbol with no assumptions: `ce.parse('x^a x^b').simplify()` is
+$x^{a+b}$ and `ce.parse('x^a x^{-a}').simplify()` is $1$. `evaluate()` leaves
+$x^a \cdot x^b$ as it is.
+
 ## Numeric Simplifications
 
 The `expr.simplify()` function will apply some numeric simplifications, such as
@@ -230,6 +235,27 @@ ce.parse('|y|').simplify().latex;
 // ➔ "-y"
 ```
 
+Logarithms are combined or split only when their arguments are known to be
+non-negative, because $\ln(x) + \ln(y)$ and $\ln(xy)$ differ for negative
+values. An argument counts as non-negative when it is a non-negative number, when
+its type or an assumption says so, or when it is an absolute value.
+
+```javascript
+// Without assumptions, the logarithms stay apart
+ce.parse('\\ln(x)+\\ln(y)').simplify().latex;
+// ➔ "\ln(x)+\ln(y)"
+
+// Numeric arguments combine
+ce.parse('\\ln(2)+\\ln(3)').simplify().latex;
+// ➔ "\ln(6)"
+
+// With positive assumptions
+ce.assume(ce.parse('x > 0'));
+ce.assume(ce.parse('y > 0'));
+ce.parse('\\ln(x)+\\ln(y)').simplify().latex;
+// ➔ "\ln(xy)"
+```
+
 <ReadMore path="/compute-engine/guides/assumptions/" > Read more about
 <strong>Assumptions</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
@@ -265,9 +291,18 @@ value's type.
 
 ### The method vs. the `Simplify` operator
 
-The `.simplify()` method applies rewrite rules only — it does not run an
-operator's evaluation. So a result that comes from a handler rather than a rule
-(a determinant, a derivative, an integral) is returned unchanged by the method:
+The `.simplify()` method applies rewrite rules and folds constants — it does
+not substitute the values assigned to symbols. A constant subexpression (one
+that is pure, has no unknowns and mentions no assigned variable) is folded to
+its value when that value is a number, whatever the `rules` option says: `3!`
+is `6`, `ln(e)` is `1`, and the determinant of a numeric matrix is a number.
+A relation whose sides fold to number literals simplifies to its truth value:
+`ce.parse('2 + 3 = 5').simplify()` is `True`, `ce.parse('3 < 4').simplify()`
+is `True`, and `ce.parse('2\\pi < 4\\pi').simplify()` is `True`. A relation
+with an unknown is unchanged: `x = x` stays as written.
+A result that comes from a handler rather than a rule and that has unknowns (a
+determinant of a symbolic matrix, a derivative, an integral) is returned
+unchanged by the method:
 
 ```javascript
 const m = ['List', ['List', 'a', 'b'], ['List', 'c', 'd']];
@@ -336,6 +371,27 @@ Each rule applies specific identities:
 - **Product-to-sum**: `sin(x)cos(y)` → `½[sin(x+y) + sin(x-y)]`
 - **Sum-to-product**: `sin(x) + sin(y)` → `2sin((x+y)/2)cos((x-y)/2)`
 - **Morrie's law**: `cos(x)cos(2x)cos(4x)` → `sin(8x)/(8sin(x))`
+
+**Odd and even functions.** When the argument is `-x` or a negative number,
+`simplify()` moves the sign out of an odd function (`Sin`, `Tan`, `Cot`,
+`Csc`, `Sinh`, `Tanh`, `Arcsin`, `Arctan`, `Arsinh`, `Erf`, `Erfi`,
+`SinIntegral`, `FresnelS`, `FresnelC`, …) and drops it for an even function
+(`Cos`, `Sec`, `Cosh`, `Sech`). Terms of a sum that differ only by this sign
+are then combined. `evaluate()` keeps `sin(-1)` as it is.
+
+```javascript
+ce.parse('\\sin(1) - \\sin(-1)').simplify();
+// ➔ 2sin(1)
+
+ce.parse('\\cos(-2) - \\cos(2)').simplify();
+// ➔ 0
+
+ce.parse('\\sinh(x) + \\sinh(-x)').simplify();
+// ➔ 0
+
+ce.parse('\\operatorname{erf}(-x) + \\operatorname{erf}(x)').simplify();
+// ➔ 0
+```
 
 ### Using the Fu Algorithm
 

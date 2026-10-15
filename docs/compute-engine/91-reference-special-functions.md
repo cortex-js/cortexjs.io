@@ -75,6 +75,26 @@ It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
 // -> 120
 ```
 
+For a non-integer `n`, $$ n! $$ is $$ \Gamma(n+1) $$. An exact non-integer
+argument stays symbolic under `evaluate()`, and `.N()` or a float argument
+gives the value to `ce.precision` digits:
+
+```json example
+["Factorial", ["Rational", 5, 2]]
+// -> (5/2)!
+
+["Factorial", 2.5]
+// -> 3.32335097044784255118
+```
+
+Above machine precision, a factorial too large for an exact integer is a big
+decimal under `.N()`:
+
+```json example
+["N", ["Factorial", ["Power", 10, 6]]]
+// -> 8.26393168833124006238e+5565708
+```
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Factorial2">
@@ -163,8 +183,80 @@ and fractional orders. The two-argument form is evaluated numerically with
 
 <Latex value="\ln(\Gamma(z))"/>
 
-This function is called `gammaln` in MatLab and SciPy and `LogGamma` in
-Mathematica.
+`GammaLn(z)` is the principal logarithm of $$ \Gamma(z) $$, as `gammaln` in
+MATLAB and SciPy. It is not the `LogGamma` of Mathematica: that function is
+the analytic continuation of $$ \ln\Gamma $$, which the Compute Engine
+provides as `LogGamma`. The two agree for a positive real argument and differ
+by a multiple of $$ 2\pi i $$ elsewhere:
+
+```json example
+["N", ["GammaLn", -1.5]]
+// -> 0.860047015376481014511
+
+["N", ["LogGamma", -1.5]]
+// -> 0.8600470153764792 - 6.283185307179586i
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="LogGamma">
+
+<Signature name="LogGamma">_z_</Signature>
+
+The analytic continuation of $$ \ln\Gamma(z) $$, with its branch cut on
+$$ (-\infty, 0] $$. This is the `LogGamma` of Mathematica and the `loggamma`
+of mpmath. It is exact where $$ \Gamma $$ is exact, and the poles at the
+non-positive integers are $$ +\infty $$. A real argument is computed to
+`ce.precision` digits. A complex argument is computed in double precision.
+
+```json example
+["LogGamma", 5]
+// -> 3ln(2) + ln(3)
+
+["LogGamma", ["Rational", 1, 2]]
+// -> 1/2 * ln(pi)
+
+["N", ["LogGamma", ["Complex", -2.5, 1.5]]]
+// -> -3.7175134511917927 - 7.713065525834192i
+```
+
+`PolyGamma(-1, z)` is `LogGamma(z)`.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="BarnesG">
+
+<Signature name="BarnesG">_z_</Signature>
+
+The Barnes G-function, with $$ G(z+1) = \Gamma(z)\,G(z) $$ and
+$$ G(1) = 1 $$. At a positive integer `n`, `BarnesG(n)` is the superfactorial
+$$ \prod_{k=0}^{n-2} k! $$, an exact integer. A real argument is computed to
+`ce.precision` digits. A complex argument is computed in double precision.
+
+```json example
+["BarnesG", 5]
+// -> 12
+
+["BarnesG", 10]
+// -> 5056584744960000
+
+["N", ["BarnesG", ["Rational", 1, 2]]]
+// -> 0.603244281209446206191
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="LogBarnesG">
+
+<Signature name="LogBarnesG">_z_</Signature>
+
+The logarithm of the Barnes G-function, continued with `LogGamma` as in
+Mathematica. `LogBarnesG(0)` is $$ -\infty $$.
+
+```json example
+["N", ["LogBarnesG", -2.5]]
+// -> -2.574748476853131 + 18.84955592153876i
+```
 
 </FunctionDefinition>
 
@@ -189,8 +281,196 @@ and extended to other values by analytic continuation.
 // ➔ π²/6
 ```
 
+<Signature name="Zeta">_s_, _a_</Signature>
+
+The two-argument form is the generalized zeta function, as Mathematica
+defines it:
+
+$$
+\zeta(s, a) = \sum_{n=0}^{\infty} \frac{1}{|n + a|^s}
+$$
+
+with the term where $n + a = 0$ omitted. For $a > 0$ it is equal to the
+Hurwitz zeta function `HurwitzZeta(s, a)`, which sums $(n + a)^{-s}$ with the
+principal power. For $a \le 0$ the two differ: `Zeta(2.976, -2.664)` is the
+real `29.9024`, while `HurwitzZeta(2.976, -2.664)` is `22.6003 - 0.2754i`.
+
 - Wikidata: [Q187235](https://www.wikidata.org/wiki/Q187235)
 - NIST: http://dlmf.nist.gov/25.2
+
+</FunctionDefinition>
+
+<FunctionDefinition name="DirichletEta">
+
+<Signature name="DirichletEta">_s_</Signature>
+
+<Latex value="\eta(s)"/>
+
+The Dirichlet eta function, the alternating form of $$ \zeta $$:
+
+$$
+\eta(s) = \sum_{n=1}^{\infty} \frac{(-1)^{n-1}}{n^s} = (1 - 2^{1-s})\,\zeta(s)
+$$
+
+It is entire. The values at the integers are exact. A real `s` is computed to
+`ce.precision` digits, also next to $$ s = 1 $$. A complex `s` is computed in
+double precision.
+
+```json example
+["DirichletEta", 2]
+// -> π²/12
+
+["DirichletEta", 1]
+// -> ln(2)
+
+["N", ["DirichletEta", ["Rational", 1, 2]]]
+// -> 0.604898643421630370247
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="DirichletBeta">
+
+<Signature name="DirichletBeta">_s_</Signature>
+
+<Latex value="\beta(s)"/>
+
+The Dirichlet beta function:
+
+$$
+\beta(s) = \sum_{n=0}^{\infty} \frac{(-1)^n}{(2n+1)^s}
+$$
+
+It is entire. The values at the integers are exact. A real `s` is computed to
+`ce.precision` digits. A complex `s` is computed in double precision.
+
+```json example
+["DirichletBeta", 1]
+// -> π/4
+
+["DirichletBeta", 2]
+// -> CatalanConstant
+
+["DirichletBeta", 5]
+// -> 5π⁵/1536
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="StieltjesGamma">
+
+<Signature name="StieltjesGamma">_n_</Signature>
+<Signature name="StieltjesGamma">_n_, _a_</Signature>
+
+<Latex value="\gamma_n(a)"/>
+
+The generalized Stieltjes constant $$ \gamma_n(a) $$, the coefficient of the
+Laurent series of the Hurwitz zeta function at its pole:
+
+$$
+\zeta(s, a) = \frac{1}{s - 1} + \sum_{n=0}^{\infty} \frac{(-1)^n}{n!}\,\gamma_n(a)\,(s - 1)^n
+$$
+
+`StieltjesGamma(n)` is $$ \gamma_n(1) $$, the Stieltjes constant of the
+Riemann zeta function. `StieltjesGamma(0)` is `EulerGamma`, and
+`StieltjesGamma(0, a)` is `-PolyGamma(0, a)`. A non-positive integer `a` is a
+pole. A real `a > 0` is computed to `ce.precision` digits. A complex `a` or a
+negative non-integer `a` is computed in double precision. An order above 30
+stays unevaluated.
+
+```json example
+["StieltjesGamma", 0]
+// -> EulerGamma
+
+["N", ["StieltjesGamma", 1]]
+// -> -0.0728158454836767248606
+
+["StieltjesGamma", 0, "a"]
+// -> -PolyGamma(0, a)
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ClausenCl">
+
+<Signature name="ClausenCl">_n_, _θ_</Signature>
+
+<Latex value="\operatorname{Cl}_n(\theta)"/>
+
+The Clausen function of integer order $$ n \ge 1 $$ and real $$ \theta $$:
+
+$$
+\operatorname{Cl}_n(\theta) = \sum_{k=1}^{\infty} \frac{\sin(k\theta)}{k^n}
+\text{ for even } n, \qquad
+\operatorname{Cl}_n(\theta) = \sum_{k=1}^{\infty} \frac{\cos(k\theta)}{k^n}
+\text{ for odd } n
+$$
+
+These are the `clsin` and `clcos` functions of mpmath. The values at the
+special points are exact. A real $$ \theta $$ is computed to `ce.precision`
+digits for an order up to 40. A non-integer or non-positive order, and a
+symbolic $$ \theta $$, stay unevaluated.
+
+```json example
+["ClausenCl", 2, ["Divide", "Pi", 2]]
+// -> CatalanConstant
+
+["ClausenCl", 3, 0]
+// -> Zeta(3)
+
+["N", ["ClausenCl", 2, 1]]
+// -> 1.01395913236076850429
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="DirichletCharacter">
+
+<Signature name="DirichletCharacter">_k_, _j_, _n_</Signature>
+
+The Dirichlet character $$ \chi_{k,j}(n) $$ modulo `k`, in the indexing of
+the Wolfram Language: `j = 1` is the principal character, and `j` runs up to
+$$ \varphi(k) $$. The value is `0` when $$ \gcd(n, k) > 1 $$. The function
+threads over a list.
+
+```json example
+["DirichletCharacter", 5, 2, 2]
+// -> i
+
+["DirichletCharacter", 7, 3, 3]
+// -> e^(2/3i * pi)
+
+["DirichletCharacter", 5, 2, 5]
+// -> 0
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="DirichletL">
+
+<Signature name="DirichletL">_k_, _j_, _s_</Signature>
+
+The Dirichlet L-function $$ L(s, \chi_{k,j}) $$ of the character
+`DirichletCharacter(k, j, ·)`. The value at a non-positive integer `s` is
+exact. For a real character, the value at $$ s = 1 $$ is exact (from the class
+number formula). The principal character has a pole at $$ s = 1 $$. A real `s`
+of a real character is computed to `ce.precision` digits. A character with
+complex values is computed in double precision. A modulus above 1000 stays
+unevaluated.
+
+```json example
+["DirichletL", 4, 2, 1]
+// -> π/4
+
+["DirichletL", 3, 2, 1]
+// -> sqrt(3)/9 * pi
+
+["DirichletL", 5, 1, 1]
+// -> ~oo
+
+["N", ["DirichletL", 3, 2, 1.5]]
+// -> 0.703968244868733261668
+```
 
 </FunctionDefinition>
 
@@ -417,6 +697,24 @@ $$
 
 They arise in problems with cylindrical or spherical symmetry.
 
+`BesselJ`, `BesselY`, `BesselI` and `BesselK` of an integer order evaluate
+numerically at a real or a complex argument under `.N()`, and under
+`evaluate()` when the argument is a float. On the negative real axis, their
+branch cut, `BesselY` and `BesselK` take the limit from above, as `Ln(-2)`
+does. A non-integer order stays symbolic. Compiled code computes these
+functions for a real argument only.
+
+```json example
+["N", ["BesselJ", 3, ["Complex", 0, 0.7]]]
+// ➔ -0.007367373607628006i
+
+["N", ["BesselY", 0, -2]]
+// ➔ 0.5103756726497453 + 0.44778155828247124i
+
+["N", ["BesselJ", ["Rational", 1, 2], 1]]
+// ➔ ["BesselJ", 0.5, 1]  (non-integer order: stays symbolic)
+```
+
 
 <FunctionDefinition name="BesselJ">
 
@@ -527,6 +825,12 @@ $$
 $$
 
 They arise in physics, particularly in quantum mechanics and optics.
+
+`AiryAi`, `AiryBi`, `AiryAiPrime` and `AiryBiPrime` evaluate numerically at a
+real or a complex argument under `.N()`, and under `evaluate()` when the
+argument is a float: `["N", ["AiryAi", ["Complex", 1, 1]]]` is
+`0.060458308371838146 - 0.15188956587718141i`. Compiled code computes them
+for a real argument only.
 
 
 <FunctionDefinition name="AiryAi">

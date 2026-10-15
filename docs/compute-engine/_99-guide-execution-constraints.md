@@ -178,6 +178,23 @@ with cause `"recursion-depth-exceeded"` is thrown instead.
 Setting `ce.iterationLimit` to `0` or a negative value disables the iteration
 limit; a span (if any) still applies.
 
+The built-in symbolic integrator and the variation-of-parameters step of
+`DSolve` each have a fixed budget of 100,000 steps. The budget counts each
+step of the search, the simplification rules tried included, so the result is
+the same on every machine. When the budget is spent, the result is the
+unevaluated `Integrate` or `DSolve` expression; no error is thrown. A
+`withTimeLimit()` span of the caller still applies, and its expiry reaches the
+caller.
+
+An Epsil program has no iteration limit. The first time an engine runs a
+program (`executeEpsil`, or the `epsil` command), the default limit is removed,
+and it stays removed for every later evaluation on that engine, Epsil or not,
+so that a lazy collection a program returns can be read in full. A limit you
+assign to `ce.iterationLimit` yourself is kept, and it applies to Epsil
+programs too. A host that shares one engine between Epsil and other evaluation,
+and wants the cap for the latter, assigns `ce.iterationLimit` after the program
+has run.
+
 ## Asynchronous Evaluation
 
 For long-running computations, `evaluateAsync()` evaluates without blocking the
