@@ -57,6 +57,16 @@ may occasionally result in surprising results.
 This section details how keyboard events are used to determine which
 keyboard shortcut to activate.
 
+```mermaid
+flowchart TD
+  ev["keydown event<br/>code: the physical key<br/>key: depends on the layout and the modifiers"] --> cur["current layout: set by the application,<br/>or guessed from the user locale<br/>(a French locale gives AZERTY)"]
+  cur --> ok{"code and key consistent<br/>with the current layout?"}
+  ok -- no --> better["look for a better matching known layout,<br/>and switch to it if confident enough"]
+  ok -- yes --> map
+  better --> map["map key to the key-cap label<br/>with the layout's table"]
+  map --> match["label plus modifiers, matched<br/>against the keybindings"]
+```
+
 
 Let's consider the keyboard shortcut <kbd>CONTROL/⌘</kbd>+<kbd>ALT/OPTION</kbd>+<kbd>A</kbd>
 

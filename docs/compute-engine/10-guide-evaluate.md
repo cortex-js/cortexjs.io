@@ -321,6 +321,19 @@ scope is searched, and so on until a definition is found.
 If no definition is found, the symbol is declared with a type of
 `unknown`, or a more specific type if the context allows it.
 
+```mermaid
+flowchart TD
+  sym["symbol to bind"] --> cur["current scope"]
+  cur -- "not found" --> parent["enclosing scopes,<br/>innermost first"]
+  parent -- "not found" --> global["global scope<br/>(user definitions)"]
+  global -- "not found" --> system["system scope<br/>(the standard library)"]
+  system -- "not found" --> auto["declared with type unknown,<br/>or a more specific type<br/>if the context allows it"]
+  cur -- found --> def["definition record"]
+  parent -- found --> def
+  global -- found --> def
+  system -- found --> def
+```
+
 If the symbol is found, the definition record is used to evaluate the
 expression. 
 

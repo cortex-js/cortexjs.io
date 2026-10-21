@@ -1131,6 +1131,15 @@ reaches one:
   "wide is real" premise — `√(x² + y²)`, `√((x−a)² + (y−b)²)`, `√|x|`,
   `ln(x²)` — keep the real kernel and cost nothing.
 
+```mermaid
+flowchart TD
+  c["compile(expr), mode 'auto'"] --> s["compile with strict shapes, plus promotion:<br/>an unknown-sign sqrt, ln, log or non-integer power<br/>lowers through the complex kernels"]
+  s --> reach{"a promoted or complex-typed value<br/>reaches a wide binding?"}
+  reach -- no --> done["result.mode = 'strict'<br/>result.promoted says whether a head was promoted"]
+  reach -- yes --> again["recompile once in complex mode:<br/>wide bindings are complex, lifted at their use"]
+  again --> done2["result.mode = 'complex'<br/>result.escalation holds the LaneMismatch<br/>diagnostic of the strict attempt"]
+```
+
 The special functions whose value is complex for some real operands —
 `HurwitzZeta`, `LerchPhi`, `PolyLog`, `EllipticK`, the complete `EllipticE`,
 `Hypergeometric2F1`, `LambertW` and `Gamma` — promote under `auto` and

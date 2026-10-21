@@ -178,6 +178,18 @@ The comparison is deliberately **cheap and predictable**:
    than `ce.tolerance`.
 5. Otherwise the answer is `undefined`.
 
+```mermaid
+flowchart TD
+  s["lhs.isEqual(rhs)"] --> ev["evaluate both operands"]
+  ev --> same{"structurally identical?"}
+  same -- yes --> t["true"]
+  same -- no --> exact{"both exact numbers?<br/>(integer, rational, or a rational<br/>multiple of a square root)"}
+  exact -- yes --> cmp["compared exactly:<br/>true or false"]
+  exact -- no --> unk{"the difference has<br/>no unknowns?"}
+  unk -- yes --> tol["the difference evaluated numerically:<br/>true if its magnitude is below ce.tolerance,<br/>false otherwise"]
+  unk -- no --> u["undefined"]
+```
+
 The tolerance is used only when a floating point number is involved. Two exact
 numbers are equal only if they have the same value, however close they are:
 
