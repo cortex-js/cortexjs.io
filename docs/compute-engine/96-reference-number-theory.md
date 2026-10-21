@@ -240,7 +240,7 @@ Modular **congruence** is written $a \equiv b \pmod{n}$, which parses to `Congru
 // ➔ "True"
 ```
 
-Note that `\bmod` is the binary modulo operator ($a \bmod n$ parses to `Mod(a, n)`), distinct from the `\pmod{n}` congruence annotation. The `Congruent` operator is described in the [Arithmetic reference](/compute-engine/reference/arithmetic/#Congruent).
+Note that `\bmod` is the binary modulo operator ($a \bmod n$ parses to `Mod(a, n)`), distinct from the `\pmod{n}` congruence annotation. The `Congruent` operator is described in the [Arithmetic reference](/compute-engine/reference/arithmetic/#congruent).
 
 ### Reduction of Large Integers
 
@@ -285,7 +285,7 @@ const sol = ce.box(['And',
 // ➔ { x: 105t + 23 }
 ```
 
-For a direct CRT computation from lists of residues and moduli, see [`ChineseRemainder`](#ChineseRemainder).
+For a direct CRT computation from lists of residues and moduli, see [`ChineseRemainder`](#chineseremainder).
 
 
 <nav className="hidden">

@@ -135,7 +135,7 @@ New sets can be defined using one of the following operators.
 </div>
 
 The number of elements of a set is its
-[`Count`](/compute-engine/reference/collections/#Count). In LaTeX it is
+[`Count`](/compute-engine/reference/collections/#count). In LaTeX it is
 written $$|\operatorname{A}|$$, `\#A` or `\operatorname{card}(A)`:
 `ce.parse('|\\{1,2\\}|').evaluate()` is `2`, `|\emptyset|` is `0` and
 `|\mathbb{Z}|` is `PositiveInfinity`. `Count` of a set serializes back as
@@ -216,7 +216,7 @@ ce.parse("\\Z[x]").type;           // ➔ set<unknown>
 `QuotientRing(Integers, n)` with a positive integer literal `n` is a finite
 collection of the `n` residue classes `ResidueClass(0, n)` …
 `ResidueClass(n−1, n)` (see
-[`ResidueClass`](/compute-engine/reference/number-theory/#ResidueClass) for
+[`ResidueClass`](/compute-engine/reference/number-theory/#residueclass) for
 the arithmetic of the classes). Its type is `set<value>`. An integer is not an
 element of the ring: the elements are the classes.
 

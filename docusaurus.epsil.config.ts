@@ -96,9 +96,7 @@ const config: Config = {
   projectName: 'epsil.dev',
 
   // This site builds clean — zero broken links, zero broken anchors — so these
-  // throw to keep it that way. mathlive.io still has a backlog of ~80 broken
-  // anchors and stays on 'warn' until that is cleared; the ratchet only works
-  // from zero.
+  // throw to keep it that way. mathlive.io does the same since 2026-10-21.
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'throw',
   onDuplicateRoutes: 'throw',

@@ -453,6 +453,10 @@ symbolic.
 
 ### Interpreting Elliptical Notation
 
+<nav className="hidden">
+### Interpret
+</nav>
+
 <FunctionDefinition name="Interpret">
 
 <Signature name="Interpret">_expr_</Signature>
@@ -558,6 +562,10 @@ of `ce.roundingTies`. The default rule rounds a tie away from zero:
 [Rounding Ties](/compute-engine/guides/numeric-evaluation/#rounding-ties).
 
 ### Other Relational Operators
+
+<nav className="hidden">
+### Congruent
+</nav>
 
 <FunctionDefinition name="Congruent">
 
@@ -828,6 +836,10 @@ inside it reproducible.
 draw, "with" and "without" replacement coincide. The wrapper is the only
 difference — `RandomChoice` returns a list.
 
+<nav className="hidden">
+### WithRandomSeed
+</nav>
+
 <FunctionDefinition name="WithRandomSeed">
 
 <Signature name="WithRandomSeed">_seed_: real | string, _body_: any</Signature>
@@ -967,6 +979,10 @@ An unbounded or empty `Interval`, an infinite `Range` or collection, and an
 empty collection are all errors.
 
 </FunctionDefinition>
+
+<nav className="hidden">
+### RandomChoice
+</nav>
 
 <FunctionDefinition name="RandomChoice">
 

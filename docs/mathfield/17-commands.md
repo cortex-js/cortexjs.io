@@ -16,7 +16,7 @@ For example, to insert a fraction when the user clicks a button.
 You can do this by dispatching **commands** to the mathfield, such as 
 `"select-all"`, `"move-to-next-char"`, `"delete-backward"`, etc...
 
-**To dispatch commands** use the [`mf.executeCommand()`](/docs/mathfield/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)) method.
+**To dispatch commands** use the [`mf.executeCommand()`](/mathfield/api/#executecommand) method.
 
 ```js
 mf.executeCommand("delete-backward");

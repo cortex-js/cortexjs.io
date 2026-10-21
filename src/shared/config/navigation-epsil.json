@@ -1,7 +1,9 @@
 {
   "logo": {
     "alt": "Epsil",
-    "src": "img/logo.svg"
+    "src": "img/logo.svg",
+    "width": 38,
+    "height": 42
   },
   "navbar": {
     "title": "Epsil",

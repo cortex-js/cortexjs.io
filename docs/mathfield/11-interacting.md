@@ -83,11 +83,13 @@ document.getElementById('formula').addEventListener('input',(ev) => {
 Reading the `value` property is equivalent to calling the `getValue()` method with 
 no argument. 
 
-**To control the format of the result**, pass options to [`getValue()`](/docs/mathfield/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
-For example to get the content as a MathJSON expression, use `mf.getValue('math-json')`.
+**To control the format of the result**, pass options to [`getValue()`](/mathfield/api/#getvalue).
+For example to get the content as ASCIIMath, use `mf.getValue('ascii-math')`.
+To get the content as MathJSON, read the `expression` property, described
+below: the `math-json` output format has been removed.
 
 
-**Try:** [Other formats](/docs/mathfield/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `"math-json"` to `"spoken-text"`.
+**Try:** [Other formats](/mathfield/api/#outputformat) are available: change `"ascii-math"` to `"spoken-text"`.
 
 ```live
 :::html
@@ -101,7 +103,7 @@ const mf = document.getElementById('formula');
 
 // `ev.target` is an instance of `MathfieldElement`
 mf.addEventListener('input',
-  (ev) => console.log(ev.target.getValue('math-json'))
+  (ev) => console.log(ev.target.getValue('ascii-math'))
 );
 ```
 
@@ -143,7 +145,7 @@ of the Compute Engine.
 
 **To read the content of a `<math-field>` element as a boxed MathJSON expression** use the mathfield `expression` property.
 
-Using `mf.expression` is equivalent to calling `MathfieldElement.computeEngine.parse(mf.value)` or `MathfieldElement.computeEngine.box(mf.getValue("math-json"))`.
+Using `mf.expression` is equivalent to calling `MathfieldElement.computeEngine.parse(mf.value)`.
 
 Once you have a boxed expression, you can perform operations on it using the
 Compute Engine.
@@ -214,17 +216,16 @@ to be dispatched.
 | `insertText` | Some content was added. It could be math content, plain text or raw latex. It could also be a row or column in matrix that was added. |
 | `insertLineBreak` | The <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key was pressed. Note that the actual content of the mathfield may not have changed. |
 | `insertFromPaste`| The content of the mathfield was changed because of a paste operation |
-| `deleteWordBackward`|  |
-| `deleteWordForward`|  |
-| `deleteWordForward`|  |
-| `deleteSoftLineBackward`|  |
-| `deleteSoftLineForward`|  |
-| `deleteHardLineBackward`|  |
-| `deleteHardLineForward`|  |
+| `deleteWordBackward`| The word before the caret was deleted |
+| `deleteWordForward`| The word after the caret was deleted |
+| `deleteSoftLineBackward`| The content from the caret to the start of the line was deleted |
+| `deleteSoftLineForward`| The content from the caret to the end of the line was deleted |
+| `deleteHardLineBackward`| The content from the caret to the start of the expression was deleted |
+| `deleteHardLineForward`| The content from the caret to the end of the expression was deleted |
 | `deleteByCut`| The content was changed because of a cut operation |
 | `deleteContent`| Some content was deleted, but no particular direction applied |
-| `deleteContentBackward`|  |
-| `deleteContentForward`|  |
+| `deleteContentBackward`| The content before the caret was deleted, for example with the <kbd>BACKSPACE</kbd> key |
+| `deleteContentForward`| The content after the caret was deleted, for example with the <kbd>DELETE</kbd> key |
 | `historyUndo`| The content was changed because of an undo command |
 | `historyRedo`| The content was changed because of a redo command |
 
@@ -242,7 +243,7 @@ have been done. This event is cancelable. Calling `preventDefault()` on the
 event will cause the modification to be prevented.
 
 If the `beforeinput` event is not canceled, the mathfield content is modified 
-and a `input` event is dispatched. The `input` event is not cancelable.
+and an `input` event is dispatched. The `input` event is not cancelable.
 
 ```mermaid
 sequenceDiagram

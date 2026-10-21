@@ -15,10 +15,10 @@ Understanding these stages can help you write more robust code.
 In most cases, this is something you don't have to pay much attention to. Just 
 remember these guidelines:
 * Once a component is attached to the DOM, attributes (key/value pairs 
-attached to the `<math-field>` tag and properties (key/value pairs attached
+attached to the `<math-field>` tag) and properties (key/value pairs attached
 to a `MathfieldElement` object) are kept in sync, or _reflected_, except for 
-the `value` attribute which only reflect the inital value, not the current one.
-You can also call the functions of `MathfieldElement` without limitations. 
+the `value` attribute which only reflects the initial value, not the current one.
+You can also call the functions of `MathfieldElement` without limitations.
 * To be notified when the component is attached to the DOM, listen for a `mount`
  event on the element.
 * Before the component is attached to the DOM or even before the `MathfieldElement`
@@ -110,20 +110,20 @@ If all goes well, the element will be constructed next.
 This stage occurs either after the previous one (i.e. an element created
 from markup) or when an element is created programmatically with `new MathfieldElement()`.
 
-The `HTMLElement` object exist, but it is not yet attached to the DOM. You can 
+The `HTMLElement` object exists, but it is not yet attached to the DOM. You can 
 interact with the element, but its operations are still limited.
 
 At this stage:
 * you can read and change the properties as before. However, doing so will
 be reflected on attributes as well. That is calling `mf.mathVirtualKeyboardPolicy = "manual"`
-will result in `mf.getAttribute('math-virtual-keyboard-policy')` to return `"manual"`.
+makes `mf.getAttribute('math-virtual-keyboard-policy')` return `"manual"`.
 * you can read and change the attributes as before, however they will now 
 be reflected on properties as well, that is calling `mf.setAttribute('math-virtual-keyboard-policy', 'manual')`
-will result in the value of `mf.mathVirtualKeyboardPolicy` to be `"manual"`.
+makes the value of `mf.mathVirtualKeyboardPolicy` `"manual"`.
 * you can change/add/remove attributes on the element
 * you can invoke all methods specific to `MathfieldElement`, however some may
 have some limitations. For example `setValue()` will ignore any options provided
-including formats other than LaTeX, `executeCommand()` will do anything, etc... 
+including formats other than LaTeX, and `executeCommand()` does nothing. 
 These commands require the element to be attached to the DOM to function properly.
 But no worries, that's what happens next.
 
@@ -136,7 +136,7 @@ The transition to this stage happens automatically for elements created from
 markup after the `MathfieldElement` class has been registered to handle the 
 `<math-field>` tag. 
 
-If the element was created programatically, this stage is reached when the 
+If the element was created programmatically, this stage is reached when the 
 element is explicitly attached to the DOM, for example using `appendChild()`.
 
 At this stage:
@@ -167,7 +167,7 @@ is immediately disposed of.
 Once this stage is reached, the same limitations as in the Constructed stage
 apply.
 
-Note that the next stage could be either for element to be disposed of 
+Note that the next stage could be either for the element to be disposed of
 or to be re-attached.
 
 **To be notified when this stage is reached**, listen for the `unmount` event on 

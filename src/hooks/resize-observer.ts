@@ -5,7 +5,12 @@ export function useResizeObserver<T extends HTMLElement>(
   callback: ResizeObserverCallback,
 ): void {
   useEffect(() => {
-    const tg = target && "current" in target ? target.current : target;
+    // `"current" in target` does not narrow a `T | RefObject<T>` union for
+    // TypeScript, because `T` is a type parameter, so the two sides are cast.
+    const tg: T | null =
+      target && "current" in target
+        ? (target as React.RefObject<T>).current
+        : (target as T | null);
     if (!tg) return () => {};
 
     let subscribed = true;

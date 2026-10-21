@@ -406,6 +406,10 @@ it (see the [Evaluation guide](/compute-engine/guides/evaluate/#function-calls-a
 
 ## Operating on Functions
 
+<nav className="hidden">
+### Function
+</nav>
+
 <FunctionDefinition name="Function">
 
 <Signature name="Function">_body_</Signature>
@@ -451,7 +455,7 @@ is normalized to a string).
 
 The literal then types as a **named signature** — the example above has type
 `(x: integer) -> integer` — and, in strict mode, its arguments are checked
-against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#Typed)).
+against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#typed)).
 
 **Return type**. To ascribe a return type, wrap the body in a `Typed`
 expression:

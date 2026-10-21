@@ -392,7 +392,15 @@ function renderJson(
   return { nodes: <>String(value)</>, itemCount: 1, lineCount: 1 };
 }
 
-export default function ConsoleMarkup({ value, style, quote = '"' }) {
+export default function ConsoleMarkup({
+  value,
+  style,
+  quote = '"',
+}: {
+  value: unknown;
+  style?: React.CSSProperties;
+  quote?: string;
+}) {
   return (
     <div style={style} className={styles.console}>
       {renderJson(value, { quote, ancestors: [] }).nodes}

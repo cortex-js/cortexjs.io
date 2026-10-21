@@ -11,7 +11,7 @@ In this section we'll discuss other options for adding a mathfield to a web page
 ## Using JavaScript Modules
 
 In addition to `MathfieldElement`, the Mathfield library provide some functions
-such as [`renderMathInDocument()`](/api/#rendermathindocument).
+such as [`renderMathInDocument()`](/mathfield/api/#rendermathindocument).
 
 **To access those functions**, import them from the MathLive module.
 
@@ -244,7 +244,7 @@ In JavaScript, the `\` in a string must be escaped and the escape character
 is also `\`. So, in JavaScript strings LaTeX commands start with a `\\`.
 :::
 
-<ReadMore path="/docs/mathfield/#(%22mathfield-element%22%3Amodule)">
+<ReadMore path="/mathfield/api/#mathfieldelement">
 Learn more about the attributes, properties, methods and events <kbd>ENTER</kbd> supported in the **`MathfieldElement`** documentation.
 </ReadMore>
 

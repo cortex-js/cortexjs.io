@@ -55,7 +55,7 @@ description: "Boolean logic in the Compute Engine: the True and False constants 
 
 `Equivalent` serializes as `\iff`. Note that `\equiv` is not one of its
 notations: it parses as
-[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
+[`IdenticallyEqual`](/compute-engine/reference/core/#identicallyequal), the
 mathematical identity operator.
 
 `And`, `Or`, `Nand`, `Nor` and `Implies` are **short-circuit** operators:

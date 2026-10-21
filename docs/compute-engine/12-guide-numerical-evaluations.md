@@ -266,7 +266,7 @@ rounded to the requested digits. The working precision of the engine
 `ce.precision` is still `21`. A later operation on the result is computed at the
 working precision, so `["Add", ["N", "Pi", 30], 1]` evaluates to
 `4.14159265358979323846`. The reference page for
-[`N`](/compute-engine/reference/core/#N) describes the precision and accuracy
+[`N`](/compute-engine/reference/core/#n) describes the precision and accuracy
 goals `["N", expr, ["List", p, a]]`.
 
 

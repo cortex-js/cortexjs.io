@@ -18,10 +18,10 @@ The most common types of collection are:
 |:-------------|:-------------------------------------------------------|--------------------------|
 | `list`       | Collection of elements accessible by their index, duplicates allowed    | [**List**](#list)        |
 | `set`        | Collection of unique elements                           | [**Set**](#set)          |
-| `tuple`      | Collection with a fixed size and optional names        | [**Tuple**](#tuple)      |
+| `tuple`      | Collection with a fixed size and optional names        | [**Tuple**](/compute-engine/guides/types/#tuple)      |
 | `range`      | An **index span**: a contiguous, ascending run of 1-based indexes | [**Range**](#range)      |
 | `string`     | An indexed collection of `character` — the string's grapheme clusters | [**Strings**](/compute-engine/reference/strings/) |
-| `dictionary` | Collection of key-value pairs with string keys        | [**Dictionary**](#dictionary) |
+| `dictionary` | Collection of key-value pairs with string keys        | [**Dictionary**](/compute-engine/guides/types/#dictionary-and-record) |
 | `record`     | Structured data with a fixed set of known string keys  |                          |
 
 Collections are **immutable**: they cannot be modified in place.  
@@ -287,12 +287,12 @@ Some of the eager collections include:
   
   **Type:** `set<T>` where `T` is the type of the elements.
 
-- [**Tuple**](#tuple): indexed collections of elements, but with a fixed number
+- [**Tuple**](/compute-engine/guides/types/#tuple): indexed collections of elements, but with a fixed number
   of elements that have a specific type and an optional name. 
   
   **Type:** `tuple<T1, T2, ..., Tn>` where `T1`, `T2`, ..., `Tn` are the types of the elements.
 
-- [**Dictionary**](#dictionary): non-indexed collections of key-value pairs, 
+- [**Dictionary**](/compute-engine/guides/types/#dictionary-and-record): non-indexed collections of key-value pairs, 
     where each key is unique. 
     
     **Type:** either `dictionary<V>` where `V` is the 
@@ -600,7 +600,7 @@ bound:
 `simplify()`, and round-trips through LaTeX (it does not yet carry collection
 semantics).
 
-Note that the bare braces $\{a_n\}$ remain a [`Set`](#Set), and the
+Note that the bare braces $\{a_n\}$ remain a [`Set`](#set), and the
 parenthesized form $(a_n)_{n\in\mathbb{N}}$ is unchanged.
 
 </FunctionDefinition>
@@ -1896,7 +1896,7 @@ ce.box(['Count', ['Set', 1, 2]]).latex;
 
 With a second argument that is not a function, returns how many elements of
 _xs_ are equal to _value_. The value is compared using structural identity,
-like the [`Same`](/compute-engine/reference/core/#Same) operator — the same
+like the [`Same`](/compute-engine/reference/core/#same) operator — the same
 comparison [`Contains`](#contains) uses. Number leaves compare by exact value,
 so `0.5` counts as an occurrence of `1/2`.
 
@@ -1958,6 +1958,10 @@ Returns the symbol `True` if the collection has no elements.
 ```
 
 </FunctionDefinition>
+
+<nav className="hidden">
+### Contains
+</nav>
 
 <FunctionDefinition name="Contains">
 <Signature name="Contains" returns="boolean">_xs_: collection, _value_: any</Signature>
@@ -2103,6 +2107,9 @@ has to reject an empty needle because it must return a span.
 
 <nav className="hidden">
 ### StartsWith
+</nav>
+<nav className="hidden">
+### EndsWith
 </nav>
 
 <FunctionDefinition name="StartsWith">
@@ -2729,6 +2736,10 @@ three forms.
 ```
 </FunctionDefinition>
 
+<nav className="hidden">
+### Chunk
+</nav>
+
 <FunctionDefinition name="Chunk">
 <Signature name="Chunk">_collection_, _count_:integer</Signature>
 
@@ -2749,6 +2760,10 @@ For a **string** source each group is itself a string, so the result is a
 // ➔ ["abc", "def"]
 ```
 </FunctionDefinition>
+
+<nav className="hidden">
+### GroupBy
+</nav>
 
 <FunctionDefinition name="GroupBy">
 <Signature name="GroupBy">_collection_, _function_:function</Signature>

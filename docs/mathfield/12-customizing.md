@@ -410,7 +410,7 @@ prevent the input of superscript and subscripts
 when typing "if x > 0"
 * [`smartSuperscript`](/mathfield/api/#smartsuperscript): automatically move out of a superscript when a digit is typed
 
-These properties can also be passed as an argument to [`new MathfieldElement()`](/docs/mathfield/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor) when programmatically creating mathfield elements.
+These properties can also be passed as an argument to [`new MathfieldElement()`](/mathfield/api/#constructor) when programmatically creating mathfield elements.
 
 In the interactive code playground below, try some of these options. For example, 
 in line 1 add the attribute `smart-mode=false`, then type some parentheses 

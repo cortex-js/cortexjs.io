@@ -234,7 +234,7 @@ ce.parse("P \\implies Q").json;
 ### Based Numerals
 
 A numeral with an **integer-literal subscript base**, e.g. `10111_2` or
-`2748_{16}`, parses to a numeric [`BaseForm`](/compute-engine/reference/strings/#BaseForm),
+`2748_{16}`, parses to a numeric [`BaseForm`](/compute-engine/reference/strings/#baseform),
 so arithmetic on based numerals works:
 
 ```javascript
@@ -249,7 +249,7 @@ The guard is strict: every digit must be valid for the base (`19_2` stays an
 inert `Subscript`), and a subscripted symbol (`x_2`) is unchanged. A **symbol**
 subscript base (e.g. `161_b`) parses to `BaseForm` of the digit polynomial in
 that base, so base equations solve symbolically. See
-[`BaseForm`](/compute-engine/reference/strings/#BaseForm) for details.
+[`BaseForm`](/compute-engine/reference/strings/#baseform) for details.
 
 ### Repeating Decimals
 
@@ -286,9 +286,9 @@ ce.parse("2 \\cdot 4 \\cdot \\dots \\cdot 2n").json;
 Subtraction-spelled ellipses (`1 - 2 + 4 - \dots + x`) stay inert too, and such
 products round-trip through LaTeX (an explicit `\times` is emitted around the
 ellipsis). To turn elliptical notation into a formal `Sum` or `Product`, use the
-[`Interpret`](/compute-engine/reference/arithmetic/#Interpret) operator. A
+[`Interpret`](/compute-engine/reference/arithmetic/#interpret) operator. A
 sequence written with braces, `\{a_n\}_{n=1}^{\infty}`, parses to the inert
-[`IndexedSequence`](/compute-engine/reference/collections/#IndexedSequence) head.
+[`IndexedSequence`](/compute-engine/reference/collections/#indexedsequence) head.
 
 ### Notation Recoveries
 
@@ -309,7 +309,7 @@ otherwise error:
 | `\sin a'` | `["Sin", ["Prime", "a"]]` | Primed variables type-check as arguments |
 
 A bare `\equiv` (or the `≡` character) parses as
-[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual); it is a
+[`IdenticallyEqual`](/compute-engine/reference/core/#identicallyequal); it is a
 congruence, `Congruent`, only when followed by `\pmod n`. `\not\equiv`
 (optionally with a trailing `\pmod n`) negates a congruence, and a
 chain of congruence steps such as

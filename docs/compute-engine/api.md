@@ -5674,7 +5674,7 @@ type BroadcastExemption =
 
 A shape of operand (or result) whose broadcast handling an operator's own
 handlers provide, exempting it from the generic broadcast machinery. See
-[OperatorDefinitionFlags.broadcastExemptions](#broadcastexemptions) for the meaning of
+[OperatorDefinitionFlags.broadcastExemptions](#operatordefinitionflags) for the meaning of
 each label.
 
 </MemberCard>
@@ -10098,7 +10098,7 @@ type SymbolTable = {
 function newSymbolIds(): {}
 ```
 
-A prototype-free [SymbolTable.ids](#ids) map — see the note there.
+A prototype-free [SymbolTable.ids](#symboltable) map — see the note there.
 
 </MemberCard>
 

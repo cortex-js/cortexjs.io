@@ -100,7 +100,7 @@ which means that the backslashes will need to be escaped as well.
 
 With the  `current` property of the ref, you can access and manipulate all the 
 properties and methods that are specific to the mathfield (`value`, `selection`, `insert()`,
-etc...). See [MathfieldElement](/docs/mathfield/#(MathfieldElement%3Aclass)).
+etc...). See [MathfieldElement](/mathfield/api/#mathfieldelement).
 
 ```jsx
 import "./App.css";

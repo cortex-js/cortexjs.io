@@ -21,7 +21,7 @@ import * from 'mathlive/ssr';
 ```
 
 **To convert LaTeX to HTML**, use the
-[`convertLatexToMarkup()`](/mathfield/api/#q=convertLatexToMarkup) function.
+[`convertLatexToMarkup()`](/mathfield/api/#convertlatextomarkup) function.
 
 ```javascript
 import { convertLatexToMarkup } from 'mathlive';
@@ -29,7 +29,7 @@ console.log(convertLatexToMarkup('x^2 + y^2 = z^2'));
 ```
 
 **To convert LaTeX to MathML**, use the
-[`latexToMathML()`](/mathfield/api/#q=latexToMathML) function.
+[`convertLatexToMathMl()`](/mathfield/api/#convertlatextomathml) function.
 
 ```javascript
 import { convertLatexToMathMl } from 'mathlive';
@@ -37,7 +37,7 @@ console.log(convertLatexToMathMl('x^2 + y^2 = z^2'));
 ```
 
 **To convert LaTeX to spoken text**, use the
-[`convertLatexToSpeakableText()`](/mathfield/api/#q=convertLatexToSpeakableText)
+[`convertLatexToSpeakableText()`](/mathfield/api/#convertlatextospeakabletext)
 function.
 
 ```javascript
@@ -46,7 +46,7 @@ console.log(convertLatexToSpeakableText('x^2 + y^2 = z^2'));
 ```
 
 **To convert LaTeX to AsciiMath**, use the
-[`convertLatexToAsciiMath()`](/mathfield/api/#q=convertLatexToAsciiMath)
+[`convertLatexToAsciiMath()`](/mathfield/api/#convertlatextoasciimath)
 function.
 
 ```javascript
@@ -56,16 +56,17 @@ console.log(convertLatexToAsciiMath('x^2 + y^2 = z^2'));
 
 ## Converting From Various Formats to LaTeX
 
-**To convert MathJson to LaTeX**, use the
-[`convertMathJsonToLatex()`](/mathfield/api/#convertmathjsontolatex) function.
+**To convert MathJSON to LaTeX**, box the expression with the Compute Engine
+and read its `latex` property. The `convertMathJsonToLatex()` function has
+been removed.
 
 ```javascript
-import { convertMathJsonToLatex } from 'mathlive';
-console.log(convertMathJsonToLatex(["Add", "x", "y"]));
+import { MathfieldElement } from 'mathlive';
+console.log(MathfieldElement.computeEngine.box(["Add", "x", "y"]).latex);
 ```
 
 **To convert AsciiMath to LaTeX**, use the
-[`convertAsciiMathToLatex()`](/mathfield/api/#q=convertAsciiMathToLatex)
+[`convertAsciiMathToLatex()`](/mathfield/api/#convertasciimathtolatex)
 function.
 
 ```javascript
@@ -189,7 +190,7 @@ The components are designed with accessibility in mind:
 ### Auto-rendering with renderMathInDocument()
 
 **To render math contained in a document as a static (non-editable) formula**,
-call [`renderMathInDocument()`](/mathfield/api/#q=renderMathInDocument) at the
+call [`renderMathInDocument()`](/mathfield/api/#rendermathindocument) at the
 end of your document, or in a `DOMContentLoaded` event handler.
 
 ```html
@@ -246,7 +247,7 @@ The following DOM elements are ignored for conversion: `<noscript>`, `<style>`,
 `<textarea>`, `<pre>`, `<code>`, `<annotation>` and `<annotation-xml>`.
 
 If you dynamically generate content, call
-[`renderMathInElement(element)`](/mathfield/api/#q=renderMathInElement) to
+[`renderMathInElement(element)`](/mathfield/api/#rendermathinelement) to
 render your element after the page has been loaded. This is a recursive call
 that will be applied to `element` and all its children.
 

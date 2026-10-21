@@ -511,7 +511,7 @@ evaluate to `False`.
 To compare two expressions for mathematical equality, use `Equal`.
 
 To compare two expressions structurally, but ignoring the order of the arguments
-of commutative functions, use [`CanonicalForm`](#CanonicalForm).
+of commutative functions, use [`CanonicalForm`](#canonicalform).
 
 
 See [Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions) for other options to compare two expressions, such 
@@ -590,7 +590,7 @@ a list of booleans.
 With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
 `True` — matching the Epsil spelling `a === b === c`.
 
-**`Same` vs `IsSame`.** [`IsSame`](#IsSame) compares its operands exactly as
+**`Same` vs `IsSame`.** [`IsSame`](#issame) compares its operands exactly as
 written, while `Same` compares their canonical forms. So
 `["IsSame", ["Add", 1, 1], 2]` is `False`, but `["Same", ["Add", 1, 1], 2]` is
 `True`, since canonicalization folds `1 + 1` to `2`.
@@ -637,7 +637,7 @@ merely *disagree* at the sampled points are undetermined, not `False`:
 
 The LaTeX notation is `\equiv` (or the `≡` character). A `\equiv` followed by
 `\pmod{n}` is a congruence and parses as
-[`Congruent`](/compute-engine/reference/arithmetic/#Congruent) instead.
+[`Congruent`](/compute-engine/reference/arithmetic/#congruent) instead.
 
 </FunctionDefinition>
 
@@ -1253,9 +1253,9 @@ collection.
 ```
 
 To inspect an error rather than merely detect it, use
-[`Type`](#Type) (which returns `"error"`), or destructure it with an
+[`Type`](#type) (which returns `"error"`), or destructure it with an
 `["Error", ...]` case in a
-[`Match`](/compute-engine/reference/control-structures/#Match) expression.
+[`Match`](/compute-engine/reference/control-structures/#match) expression.
 
 </FunctionDefinition>
 
@@ -1354,7 +1354,7 @@ character conforms where a `string` is declared, because the two are the same
 value.
 
 The main use of `Typed` is to annotate the parameters and return type of a
-[function literal](/compute-engine/reference/functions/#Function).
+[function literal](/compute-engine/reference/functions/#function).
 
 </FunctionDefinition>
 

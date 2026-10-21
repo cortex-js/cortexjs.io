@@ -211,7 +211,7 @@ taken so far, with a correspondingly larger error bound.
 
 ## Errors
 
-An [`["Error"]`](/compute-engine/reference/core/#Error) is a **value**, and it
+An [`["Error"]`](/compute-engine/reference/core/#error) is a **value**, and it
 propagates along the ordinary value path. If an operand that a function
 evaluates strictly turns out to be an error, the whole expression evaluates to
 that error — not to a frozen expression wrapped around it. The propagated
@@ -243,9 +243,9 @@ The diagnostic is not lost, only unevaluated: the boxed expression still holds
 walks the expression still reports it.
 
 Errors do not spread past the tools that inspect them. `Type` reports
-`"error"`, [`IsError`](/compute-engine/reference/core/#IsError) answers
+`"error"`, [`IsError`](/compute-engine/reference/core/#iserror) answers
 `True`/`False`, and
-[`Match`](/compute-engine/reference/control-structures/#Match) decides on an
+[`Match`](/compute-engine/reference/control-structures/#match) decides on an
 error subject — an `["Error", ...]` case destructures it, which is how a
 failure is rescued.
 

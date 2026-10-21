@@ -33,8 +33,14 @@ const config: Config = {
   deploymentBranch: 'master',
   trailingSlash: true,
 
-  onBrokenLinks: 'warn',
-  onBrokenAnchors: 'warn',
+  // The site builds with zero broken links and zero broken anchors since
+  // 2026-10-21, so these throw to keep it that way. Note that Docusaurus
+  // only knows the anchors that come from markdown headings, so a link to a
+  // reference entry must use the lowercase id of its hidden heading
+  // (`/compute-engine/reference/core/#assume`, not `#Assume`): the
+  // capitalized id that `<FunctionDefinition>` renders is invisible to it.
+  onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
   onDuplicateRoutes: 'warn',
 
   markdown: {
@@ -238,7 +244,15 @@ const config: Config = {
     [
       '@docusaurus/plugin-client-redirects',
       {
-        createRedirects(existingPath) {
+        redirects: [
+          // The Mathfield security guide was published under a
+          // compute-engine slug by mistake until 2026-10-21.
+          {
+            from: '/compute-engine/guides/security/',
+            to: '/mathfield/guides/security/',
+          },
+        ],
+        createRedirects(existingPath: string) {
           if (existingPath.includes('/mathfield')) {
             // Redirect from /docs/mathfield to /docs/mathlive
             return [

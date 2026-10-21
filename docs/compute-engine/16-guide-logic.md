@@ -40,7 +40,7 @@ ce.parse('p \\leftrightarrow q'); // → ["Equivalent", "p", "q"]
 and parses as `To`, not `Implies`.
 
 **Note:** `\equiv` is *not* a spelling of `Equivalent`: it parses as
-[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
+[`IdenticallyEqual`](/compute-engine/reference/core/#identicallyequal), the
 mathematical identity operator. Use `\iff` or `\Leftrightarrow` for a
 biconditional. (Over boolean operands the two agree, since two propositions are
 identically equal exactly when they are equivalent.)

@@ -58,7 +58,7 @@ The `ce.assume()` method returns a status indicating the result of the assumptio
 Every outcome is reported as a return value; an expression that cannot be
 assumed does not throw. The `["Assume"]` operator reports the same outcomes as
 a string — see the
-[`Assume` reference](/compute-engine/reference/core/#Assume).
+[`Assume` reference](/compute-engine/reference/core/#assume).
 
 ```js
 ce.assume(ce.parse("x > 4"));

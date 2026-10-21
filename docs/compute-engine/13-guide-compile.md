@@ -1440,7 +1440,7 @@ console.log(`SELECT * FROM table WHERE ${sql}`);
 // → SELECT * FROM table WHERE AND("x" > 10, "y" <= 20)
 ```
 
-For more examples of custom targets, see [`examples/compile-custom-target.js`](../examples/compile-custom-target.js).
+For more examples of custom targets, see [`examples/compile-custom-target.js`](https://github.com/cortex-js/compute-engine/blob/main/examples/compile-custom-target.js).
 
 ## Plugin Architecture: Registering Custom Targets
 
@@ -1811,7 +1811,7 @@ interface LanguageTarget {
 }
 ```
 
-For complete examples of custom targets including RPN (Reverse Polish Notation), Python, and more, see [`examples/compile-plugin-architecture.js`](../examples/compile-plugin-architecture.js).
+For complete examples of custom targets including RPN (Reverse Polish Notation), Python, and more, see [`examples/compile-plugin-architecture.js`](https://github.com/cortex-js/compute-engine/blob/main/examples/compile-plugin-architecture.js).
 
 ## Performance Benchmarks
 

@@ -233,6 +233,10 @@ masking.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Match
+</nav>
+
 <FunctionDefinition name="Match">
 
 <Signature name="Match">_subject_, _case-1_, ..._case-n_</Signature>
@@ -351,7 +355,7 @@ In Epsil, a range pattern is written `lo..hi`:
 `match n { 0..9 => "digit"; _ => "more" }`.
 
 **Error subjects**. `["Match"]` also decides when the subject is an
-[error](/compute-engine/reference/core/#Error) — it is the construct for
+[error](/compute-engine/reference/core/#error) — it is the construct for
 rescuing a failed computation. Matching stays total, but an error is never
 handed to a pattern that would pretend the failure has a shape: literal,
 range, pin, and structural cases all fail against an error subject, and it
@@ -378,8 +382,8 @@ error, binding its payload. This is the idiomatic rescue:
 ```
 
 A guard can inspect the subject with
-[`IsError`](/compute-engine/reference/core/#IsError) or
-[`Type`](/compute-engine/reference/core/#Type):
+[`IsError`](/compute-engine/reference/core/#iserror) or
+[`Type`](/compute-engine/reference/core/#type):
 
 ```json example
 ["Match", ["Ln", "'a'"],

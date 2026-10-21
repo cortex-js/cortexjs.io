@@ -160,6 +160,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "compute-engine/guide-execution-constraints",
+          className: "guide-icon",
+        },
+        {
+          type: "doc",
           id: "compute-engine/guide-canonical-form",
           className: "guide-icon",
         },

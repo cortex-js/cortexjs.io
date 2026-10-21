@@ -188,11 +188,9 @@ The first three exclude immediate `missing`, `nothing`, and `error`
 elements in subtype checks. These are not recursive absence restrictions:
 a list containing a missing datum is itself a collection value.
 
-<div style={{visibility:"hidden"}}>
-<a href="#naming-constraints-for-elements-and-arguments" id="naming-constraints-for-elements-and-arguments"></a>
-</div>
+### Naming Constraints for Elements and Arguments
 
-:::info **Naming Constraints for Elements and Arguments**
+:::info
 
 Element names (used in tuples, records, dictionaries) and function argument names should:
 

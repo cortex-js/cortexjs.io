@@ -71,8 +71,8 @@ default, which is the desirable behavior in most cases.
 of `ce.parse(s, {form: 'raw'})` or `ce.expr(expr, {form: 'raw'})`.
 
 You can further customize the canonical form of an expression by using the
-[`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
-or by specifying the form you want to use. See [below](#custom-canonical-form) for more details.
+[`["CanonicalForm"]`](/compute-engine/reference/core/#canonicalform) function 
+or by specifying the form you want to use. See [below](#custom-canonical-forms) for more details.
 
 The non-canonical version will be closer to the literal LaTeX input, which may
 be desirable to compare a "raw" user input with an expected answer.
@@ -246,7 +246,7 @@ console.log(ce.parse("2(0+x\\times x-1)").json);
 ```
 
 **To get a custom canonical form of an expression**, use the
-[`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
+[`["CanonicalForm"]`](/compute-engine/reference/core/#canonicalform) function 
 or specify the form you want to use with the `form` option of `ce.expr()`
 and `ce.parse()`.
 
@@ -265,7 +265,7 @@ the case in the full canonical form.
 
 There are other forms that can be used to customize the canonical form of an
 expression. See the documentation of
-[`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) for more details.
+[`["CanonicalForm"]`](/compute-engine/reference/core/#canonicalform) for more details.
 
 For example:
 
