@@ -26,7 +26,7 @@ Read more about adding new definitions to the Compute Engine.
 | **Function Signature**      | A type describing the function's inputs and outputs, e.g. `(real, integer) -> boolean` |
 | **Function Literal**        | A first-class function value, defined using a construct like `["Function", body, params...]`, which may or may not capture variables from its lexical scope. |
 | **Shorthand Function Literal** | A compact way to write a function literal using placeholders (e.g. `_` or `_2`) instead of explicitly listing parameters, e.g. `["Add", "_", 1]` desugared to `["Function", ["Add", "_", 1], "_"]`. |
-| **Closure**                 | A function literal that **captures** one or more free variables from its defining lexical scope, preserving their values at the time of definition. The capture happens by simply referencing the variables in the function body. |
+| **Closure**                 | A function literal that **captures** one or more free variables from its defining lexical scope: the function reads the binding of the variable where it was defined, with the value that binding holds when the function is called. The capture happens by simply referencing the variables in the function body. |
 | **Anonymous Function**      | A function that is not bound to a symbol, often used as an argument to other functions. |
 
 </div>
@@ -354,17 +354,32 @@ in the [Types guide](/compute-engine/guides/types/).
 ## Closures
 
 A **closure** is a function literal that **captures** one or more free variables
-from its defining lexical scope, preserving their values at the time of definition.
-The capture happens by simply referencing the variables in the function body.
-For example, the following function literal captures the variable `a` from its
-lexical scope:
+from its defining lexical scope. The capture happens by simply referencing the
+variables in the function body. For example, the following function literal
+captures the variable `a` from its lexical scope:
 
 ```json example
 ["Function", ["Add", "a", "_"], "_"]
 ```
 
-This function literal captures the value of `a` at the time of definition, and
-when the function is applied, it will use that value of `a` in the computation.
+The function captures the **binding** of `a` where it is defined, not the
+value of `a` at that time. When the function is applied, it reads the value
+that this binding holds then, so an assignment to the same `a` made after the
+definition is visible to the function:
+
+```json example
+["Block",
+  ["Declare", "a", "integer"],
+  ["Assign", "a", 10],
+  ["Assign", "f", ["Function", ["Add", "a", "_"], "_"]],
+  ["Assign", "a", 20],
+  ["f", 1]
+]
+// ➔ 21
+```
+
+A variable of the same name declared in **another** scope is a different
+binding, which the function does not read:
 
 ```json example
 ["Block"
@@ -382,12 +397,12 @@ when the function is applied, it will use that value of `a` in the computation.
 // ➔ 1 + 10
 ```
 
-Note that the value of `a` is `10` when the function is defined, and it
-is `100` when the function is applied. The function will always use the value of
-`a` that was in scope when the function was defined, not the value of `a` at the
-time the function is applied. In fact, the outer `a` is a different variable
-which is unrelated to the `a` in the scope of the function, but with the same
-name.
+The inner `a`, assigned `10`, is the binding the function captured. The
+outer `a`, assigned `100`, is a different variable with the same name, so the
+function does not read it. The same rule applies to a function **called** in
+the body: a call reads the function that its name denotes where the body is
+written, and a same-named function defined in another scope does not redirect
+it (see the [Evaluation guide](/compute-engine/guides/evaluate/#function-calls-are-bound-lexically)).
 
 ## Operating on Functions
 

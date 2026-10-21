@@ -39,6 +39,11 @@ $$x_i$$ is the $$i$$-th number in the list.
 // 21.02
 ```
 
+If the collection contains complex infinity (for example
+`["Multiply", "PositiveInfinity", "ImaginaryUnit"]`), the mean is `NaN`: a
+value with no direction has no mean, although `Sum` of the same collection is
+`ComplexInfinity`.
+
 <Signature name="Mean">_distribution_</Signature>
 
 When the argument is a [probability distribution](#probability-distributions),

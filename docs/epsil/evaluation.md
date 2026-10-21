@@ -153,7 +153,26 @@ let c2 = counter()
 `bump` itself. Writing to a binding outside the function is the `scope`
 effect, and it must be declared — without the specifier the definition is
 rejected and `counter()` never produces a callable. See
-[Effect specifiers](/control-flow#effect-specifiers).
+[Effect specifiers](/control-flow#effect-specifiers). An assignment to
+a name that no enclosing scope declares when the function is defined makes a
+local of the function body instead, also when the assignment is in a branch
+of an `if`, a loop body or a `do` block of the body: each call gets its own
+binding, a later
+declaration of the same name is not written, and it is not the `scope`
+effect (see
+[Reassignment vs. declaration](/declarations/#reassignment-vs-declaration)):
+
+```epsil
+function step(k) { s = k * 2; s + 1 }
+s = 10
+(step(1), step(2), s)
+// ➔ (3, 5, 10)
+```
+
+Each call starts with no value for such a local: a read of it before its
+first assignment in the call (`function step(k) { r = s; s = k; r }`, or
+`function g(c) { if c { t = 1 }; t }` called with `c` false) is the
+`read-before-declaration` error, not the bare symbol, as for a `let` local.
 
 Reach for `const` when a name should not move at all. Constness is a property
 of the *binding*, not of the value it holds — every value is immutable
@@ -237,6 +256,34 @@ that is not assigned (an argument, an operand) still reads program state
 **at materialization time**, like a generator in Python. An unbounded one
 that captures a variable reflects the later value of that variable.
 
+The test "reads a variable" looks at the expression as written, and does not
+look inside a named user function. An inline function that reads a variable
+makes the `map` read it, so the assignment stores the elements. A named
+function that reads the same variable does not: the `map` stays lazy, and
+its elements are computed when they are read, with the value the variable
+has then.
+
+```epsil
+let n = 1
+let v = map((k) => k * n, 1..3)
+n = 10
+v
+// ➔ [1, 2, 3]
+```
+
+```epsil
+let n = 1
+function scale(k) { k * n }
+let v = map(scale, 1..3)
+n = 10
+v
+// ➔ [10, 20, 30]
+```
+
+To get the elements with the value of `n` at the `let`, write the function
+inline, or make a list literal of the elements:
+`let v = [...map(scale, 1..3)]` gives `[1, 2, 3]` after `n = 10`.
+
 ## Errors are values
 
 Per [Principles](/principles/), "errors are values": a *runtime*
@@ -255,7 +302,21 @@ value produced by an earlier statement would otherwise vanish silently. Each
 *non-final* statement that evaluates to an error value therefore also emits
 a `runtime-error` diagnostic — for example an indexed assignment
 (`xs[2] = 9`, which is rejected: element assignment is not supported), or
-reassigning a `const` in the middle of a program.
+reassigning a library constant such as `Pi`. A problem that the static check
+already reported before the program ran, such as reassigning a `const` of the
+same program, is not reported a second time.
+
+The same applies inside a block: a statement of a loop body, a function body
+or an `if` branch whose value is discarded and holds an error is reported, once
+for each place in the source. So is the list of a `for` loop or comprehension
+header, which no statement holds: in `for x in [1, 1 / "a", 3] { n = n + 1 }`
+the loop runs three turns, and the list `[1, 1 / "a", 3]` is reported, also
+when the body does not use `x`. A header that is a variable (`for x in xs`) is
+not reported again: the statement that gave `xs` its value is. A comprehension
+is evaluated when its elements are read, so its header is reported only when
+the program reads the list. A `map` or `filter` also reads its list later, but
+a statement such as `let ys = map((u) => u, [1, 1 / "a", 3])` is reported at
+once, because each read of `ys` gives the error.
 
 A program constructs an error value of its own with `RuntimeError`:
 

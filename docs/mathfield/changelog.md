@@ -11,55 +11,6 @@ description: "Release notes for MathLive: new features, behavior changes, deprec
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## 0.111.1 _2026-10-09_
-
-### Security Advisories
-
-- Fixed a cross-site scripting (XSS) vulnerability in the `shadow` option of
-  the `\enclose` command. The value of the option was written into the markup
-  of the SVG overlay as raw attribute text, outside of any quoted attribute. A
-  value containing spaces could therefore add attributes, including event
-  handlers, to the `<svg>` element, and run script when the markup was inserted
-  in the document. The issue affected `convertLatexToMarkup()`, the editor and
-  the `<math-span>` / `<math-div>` static elements. No HTML in the input was
-  needed, so input-side HTML sanitizers did not catch it. The value is now
-  validated against a strict grammar (two or three CSS lengths and an optional
-  color) and emitted inside the quoted `style` attribute. Invalid values are
-  ignored. As a side effect, the `shadow` option, which never had any visible
-  effect, now works. This is the same class of issue as GHSA-qwj6-q94f-8425 and
-  GHSA-fm7p-gw32-828p.
-- Fixed a cross-site scripting (XSS) vulnerability in the handling of
-  `\htmlData` and `\href` values. A value consisting of a single quote
-  character was treated as an already quoted value and emitted as an
-  unterminated quote. The text of the following attributes then became part of
-  the value, and a crafted input could turn it into an event handler attribute.
-  Attribute values are now always escaped and quoted by the renderer. As part
-  of this change, `&` is now escaped in attribute values, so a character
-  reference such as `&copy;` in a URL is preserved literally.
-- Fixed a cross-site scripting (XSS) vulnerability in the MathML output of the
-  `\enclose` command. The notation names were written unescaped into the
-  `notation` attribute of the `<menclose>` element. A crafted first argument
-  could close the attribute and add elements, which ran script when the MathML
-  was inserted in the document by the `<math-span>` / `<math-div>` elements or
-  by `renderMathInElement()` (which generates MathML by default). Unknown
-  notation names are now dropped and the names are escaped.
-- The speakable text generated for accessibility by `renderMathInElement()` is
-  now inserted as text, not as HTML. In SSML mode, the text content is now XML
-  escaped.
-- Hardened the handling of CSS values that originate from the LaTeX input.
-  Colors that are not recognized by the color map, the border of `\bbox`, the
-  border and background options of `\enclose` and the argument of
-  `\fontfamily` are now validated against a strict grammar before being used
-  in a `style` attribute. Previously, a `;` in these values could add arbitrary
-  CSS declarations. Invalid values are ignored.
-
-### Issues Resolved
-
-- `\enclose{box}` now honors its border options instead of always rendering a
-  `1px solid red` border.
-- The `mathbackground` attribute of the MathML output of `\bbox` now contains
-  the color instead of `[object Object]`.
-
 ## 0.111.0 _2026-09-30_
 
 ### Breaking Changes

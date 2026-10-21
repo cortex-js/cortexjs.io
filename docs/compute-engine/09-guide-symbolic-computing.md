@@ -171,10 +171,27 @@ The comparison is deliberately **cheap and predictable**:
 
 1. Both operands are evaluated (so assigned symbol values are substituted).
 2. If the results are structurally identical, they are equal.
-3. Otherwise, if the difference between them has no unknowns, it is evaluated
+3. Otherwise, if both results are exact numbers (integers, rationals, or
+   rational multiples of a square root), they are compared exactly.
+4. Otherwise, if the difference between them has no unknowns, it is evaluated
    numerically: they are equal if the absolute value of the difference is less
    than `ce.tolerance`.
-4. Otherwise the answer is `undefined`.
+5. Otherwise the answer is `undefined`.
+
+The tolerance is used only when a floating point number is involved. Two exact
+numbers are equal only if they have the same value, however close they are:
+
+```live
+console.log(ce.parse('\\frac{1}{3} = \\frac{3333333333333}{10^{13}}').evaluate());
+// ➔ False
+
+console.log(ce.parse('\\frac{1}{10} = 0.1').evaluate());
+// ➔ True
+```
+
+The order comparisons (`isLess()`, `isGreater()`, …, and the `<`, `>`, `\le`,
+`\ge` operators) follow the same rule, so for two exact numbers exactly one of
+$a < b$, $a = b$ and $a > b$ is true.
 
 No expansion, no simplification and no sampling is attempted. In particular,
 `isEqual()` does **not** attempt to prove a symbolic identity: the expressions
@@ -203,7 +220,13 @@ console.log(ce.parse('x = y').evaluate());
 Following IEEE 754, `NaN` is not equal to anything, including itself: `NaN =
 NaN` is `False`, and so is the comparison of two collections that contain it,
 `["Equal", ["List", "NaN"], ["List", "NaN"]]`. Only the syntactic tier reports
-those as identical (`["Same", "NaN", "NaN"]` is `True`).
+those as identical (`["Same", "NaN", "NaN"]` is `True`). A pole has no value
+either: `1/0 = 1/0` is `False`. A value with no order decides an ordered
+comparison as `False`: `0 < \frac{1}{0}`, `0 < i` and `0 < \ln(-1)` are
+`False`, so a piecewise on such a comparison takes its next branch
+(`\{1/0 > 0: 1, 0\}` is `0`), as it does for `NaN`. Equality of complex
+numbers keeps its meaning (`i = i` is `True`), `\ne` is unchanged
+(`1/0 \ne 0` is `True`), and a free symbol leaves the comparison unevaluated.
 
 ### Identity: `isIdenticallyEqual()`
 
@@ -271,7 +294,7 @@ that require evaluation, such as `\sin(\pi)`.
 | `lhs === rhs`                            | If true, same box expression instances |
 | `lhs.isSame(rhs)`                        | Syntactic equality (fast, exact, no evaluation). Accepts primitives. |
 | `lhs.is(rhs)`                            | Smart check: structural first, then numeric evaluation fallback for constant expressions (within `engine.tolerance`). For literal numbers, same as `isSame()`. |
-| `lhs.isEqual(rhs)`                       | Arithmetic equality (evaluation and tolerance compare). May return `undefined`. |
+| `lhs.isEqual(rhs)`                       | Arithmetic equality (evaluation, then an exact compare of exact numbers or a tolerance compare). May return `undefined`. |
 | `lhs.isIdenticallyEqual(rhs)`            | Identity in all free variables (expansion, simplification, sampling). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |

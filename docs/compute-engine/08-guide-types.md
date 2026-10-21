@@ -72,43 +72,77 @@ better error checking and type inference.
 Type A is a **subtype** of type B if all values of type A are also values of type B.
 It is also said that type A **matches** type B.
 
+The following diagram shows selected relationships in the current
+implementation. Each child is a subtype of its parent. It is an overview,
+not a complete lattice of parameterized types, unions, and intersections.
 
 ```plaintext
 any
 ├── error
 ├── nothing
 ├── missing
-├── never
-├── unknown
-└── expression
-    ├── symbol
-    ├── function
-    └── value
-        ├── scalar
-        │   ├── boolean
-        │   ├── character
-        │   └── number
-        │     └── complex
-        │         ├── imaginary
-        │         └── real
-        │             └── rational
-        │                 └─ integer
-        └── collection
-            ├── set
-            ├── dictionary
-            |   └─ record
-            └── indexed_collection
-                ├── tuple
-                ├── range
-                ├── string
-                └── list
-                    ├─ vector
-                    ├─ matrix
-                    └─ tensor
+└── unknown
+    └── expression
+        ├── symbol
+        ├── function
+        └── value
+            ├── color
+            ├── regexp
+            ├── type
+            ├── object
+            ├── scalar
+            │   ├── boolean
+            │   ├── character
+            │   └── number
+            │       ├── infinity
+            │       ├── nan
+            │       └── complex
+            │           ├── imaginary
+            │           └── real
+            │               └── rational
+            │                   └── integer
+            └── collection
+                ├── set
+                ├── dictionary
+                │   └── record
+                └── indexed_collection
+                    ├── tuple
+                    ├── string
+                    └── list
+                        ├── range
+                        ├── vector
+                        └── matrix
+
+never is below EVERY type above (and every constructed type).
 ```
 
-**Note:** this diagram is simplified and does not accurately reflect the finite vs
-non-finite distinction for the numeric types.
+**`never` is the bottom type**, not a sibling of the other types under
+`any`. It has no values and is a subtype of every type, including `unknown`,
+`missing`, `nothing`, and `error`.
+
+**`unknown` currently has two roles.** It marks information that inference
+can refine, and it is a supertype of ordinary expression types:
+`integer <: value <: expression <: unknown <: any`.
+The reverse relationships do not hold. In particular, an unresolved
+`unknown` does not establish that an expression is a number or even that it
+satisfies the explicit `expression` contract. Inference and deferred
+argument checking are separate from these subtype relationships.
+
+The agreed design direction is to make `unknown` solely an inference
+marker, with no required position in the content-type lattice. That change
+is not implemented yet; the diagram and subtype examples here describe the
+current behavior. `value`, `expression`, and `any` are the explicit content
+contracts.
+
+**Numeric types distinguish finite values from markers and infinities.**
+`complex` and its subtypes contain finite numbers. `infinity` and `nan`
+are separate subtypes of `number`.
+
+**`vector`, `matrix`, and `tensor` are list spellings**, not separate
+primitive types. Bare `vector` and `matrix` specify numeric elements and
+rank one or two, respectively. Bare `tensor` normalizes to `list<number>`
+without a rank constraint, so it is not shown as a separate branch.
+`range` is a subtype of `list<integer>`.
 
 **Note:** a `string` is an indexed collection of `character` — it sits beside
 `list`, `tuple` and `range`, not under `scalar`. A `character` (exactly one
@@ -128,13 +162,14 @@ not constrain a later definition: the definition's inferred type refines the
 placeholder, so declaring `(unknown) -> unknown` behaves like declaring no 
 signature at all.
 
-Two caveats bound the wildcard:
+The following distinctions matter:
 
-- The absence types `nothing` and `missing` (and the `error` and `never` 
-  types) are **not** compatible with `unknown`. Absence is opt-in: a slot 
-  whose type has not yet been determined does not silently accept an absence 
-  marker — admit it explicitly with a union such as `number | missing`, or 
-  use `any`. At an operator parameter, a value typed `T | missing` — a lookup
+- The absence types `nothing` and `missing`, and the `error` type, are
+  **not subtypes** of `unknown`; neither is `any`. `never` **is** a subtype
+  of `unknown`, as it is of every type. To include absence in a type, write
+  it explicitly with a union such as `number | missing`, or use `any`.
+  Call admission is a different question: at an operator parameter, a value
+  typed `T | missing` — a lookup
   with a computed key, such as `xs[i]` — and a collection of such values
   (`list<missing | string>`) are accepted where `T` or a collection of `T` is
   expected; whether an element is absent is decided when the program runs.
@@ -147,6 +182,20 @@ Two caveats bound the wildcard:
   promises a function that accepts every value, and a definition that cannot 
   honor that promise is rejected. Use `unknown` when the type is simply not 
   known yet; use `any` when you mean to accept everything.
+
+Do not confuse the ordinary word “value” with the narrower type `value`.
+The current collection contracts distinguish:
+
+| Element annotation | What it accepts |
+| --- | --- |
+| `list<value>` | Data values, including scalars, collections, objects, and opaque values such as regular expressions; excludes functions and symbolic expressions typed as `symbol` or `expression` |
+| `list<expression>` | Data values, functions, and symbolic expressions |
+| `list<unknown>` | Elements whose types may still be unresolved; currently also a supertype of `list<expression>` and the normalized meaning of bare `list` |
+| `list<any>` | Unrestricted element types, including absence markers and errors |
+
+The first three exclude immediate `missing`, `nothing`, and `error`
+elements in subtype checks. These are not recursive absence restrictions:
+a list containing a missing datum is itself a collection value.
 
 <div style={{visibility:"hidden"}}>
 <a href="#naming-constraints-for-elements-and-arguments" id="naming-constraints-for-elements-and-arguments"></a>
@@ -196,11 +245,11 @@ The Compute Engine supports the following primitive types:
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
 | `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value |
 | `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
-| `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown`, except the absence types `nothing` and `missing` (and `error`): absence is opt-in and must be admitted explicitly (e.g. `number \| missing`) |
+| `unknown`       | An unresolved type that inference can refine. In the current subtype relation it is also above `expression`, `function`, `symbol`, and `value`; it excludes `any`, `nothing`, `missing`, and `error`. The bottom type `never` is below it. |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
 | `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
-| `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
+| `value`        | A data value: a scalar, collection, object, color, regular expression, or reified type. Excludes functions and symbolic expressions typed as `symbol` or `expression`. |
 | `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `string`, a `dictionary` or a `record` |
 | `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `tuple`, a `range`, a `string`, a `list`, a `vector`, a `matrix` or a `tensor` |
 | `range`        | The type of an **index span**: a contiguous, ascending run of 1-based collection indexes, such as `["Range", 2, 5]`. A `Range` has this type only when its bounds are integers, at least 1, ascending and one apart — so `["Range", 1, 10, 2]` (stepped) and `["Range", 5, 2]` (descending) are `indexed_collection<integer>` instead. Not a mathematical interval (see `Interval`) |
@@ -649,8 +698,8 @@ strings. To exclude them, intersect with a negation:
 ### Broadcastable
 
 The type `broadcastable<T>` represents a value that is either a scalar `T` or
-an indexed collection of `T` applied element-wise — the static type of an
-expression that may **broadcast** at evaluation.
+a list of `T` applied element-wise — the static type of an expression that
+may **broadcast** at evaluation. It is the union `T | list<T>`.
 
 Arithmetic in the Compute Engine broadcasts over collections at run time:
 `2 \cdot [1, 2, 3]` evaluates to `[2, 4, 6]`. When an operand is a visible
@@ -666,17 +715,25 @@ ce.parse('2h(x) - 1').type;
 // ➔ broadcastable<number>
 ```
 
-The subtyping rules follow from the meaning "a `T`, or an indexed collection
-of `T`":
+The subtyping rules follow from the meaning "a `T`, or a list of `T`":
 
 - `T <: broadcastable<T>` — a scalar is a valid broadcastable value
-- `list<T> <: broadcastable<T>`, `vector<n> <: broadcastable<number>` — any
-  indexed collection of `T` is too (`set` is not indexed, and `tuple`s and
-  `string`s bind atomically, so none of them qualifies — a broadcasting
-  operator applied to a string receives the whole string, not its characters)
+- `list<T> <: broadcastable<T>`, `vector<n> <: broadcastable<number>`,
+  `matrix<integer> <: broadcastable<integer>`, `range <: broadcastable<integer>`
+  — every list of `T` is too, and so is everything that is a list: a vector, a
+  matrix, a range
+- A `tuple`, a `string`, a `set` and a value typed only `indexed_collection<T>`
+  are **not** subtypes of `broadcastable<T>`. A tuple and a string bind
+  atomically (a broadcasting operator applied to a string receives the whole
+  string, not its characters), a set is not indexed, and the type
+  `indexed_collection<T>` also holds tuples, so it does not say that the value
+  is a list
+- The relation is transitive: whatever is a subtype of `list<T>` is a subtype
+  of `broadcastable<T>`
 - `broadcastable<S> <: broadcastable<T>` when `S <: T` (covariant)
 - `broadcastable<T>` is **not** a subtype of `T` or of `list<T>` — it may be
-  either one, so it is neither
+  either one, so it is neither. It is a subtype of `T | list<T>` and of
+  `T | indexed_collection<T>`
 
 A `broadcastable<T>` expression can be used anywhere the runtime can resolve
 the ambiguity: further arithmetic propagates the type, indexing with `At`
@@ -2308,15 +2365,25 @@ Inference writes happen at these moments:
    a body to `f: (unknown) -> unknown` replaces each `unknown` slot with the
    slot the body's inference produced, and the refined signature is what is
    stored. (An explicit `any` slot is the opposite: a contract the body must
-   honor.)
+   honor.) The refined result is the body's type with the parameters read as
+   the literal declares them: a bare parameter is read as `unknown` (item 3)
+   when the declared signature types it `any` or `broadcastable<T>`, which are
+   declaration-level contracts, not parameter types that are stamped on the
+   body. So `f: (any, any) -> unknown` assigned `(a, b) \mapsto a + 10b` reads
+   `(any, any) -> number`, the scalar reading of the body, while `f((1, 2),
+   (3, 4))` still evaluates to the point `(31, 42)` and the call itself types
+   `any`. A declared scalar or collection parameter type IS stamped on the
+   parameter before the body is read: `(real | nan) -> unknown` assigned
+   `t \mapsto t + 1` reads `-> nan | real`, not `-> number`.
 
 ### `unknown` vs `any`, and What a Bare Type Means
 
 The two "loose" types divide the work (see also the primitive-types table):
 
-- **`unknown`** — "some *value*, not stated which". It is the top of the
-  value types: every value type is a subtype of it, but the absence markers
-  (`nothing`, `missing`) are **not** — absence is opt-in. An `unknown` in a
+- **`unknown`** — an unresolved type. In the current subtype relation it
+  also sits above `expression`, including functions and symbols as well as
+  data values. It excludes `any`, `error`, and the absence markers
+  (`nothing`, `missing`); `never` remains below it. An `unknown` in a
   signature slot or an unbounded `where T` is a **placeholder** that later
   evidence refines. A *value* typed `unknown` is a placeholder too: because
   it claims nothing, no declaration can refute it, so assigning it to a

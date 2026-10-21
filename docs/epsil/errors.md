@@ -205,7 +205,7 @@ Rename one side so the two agree — the quick fix renames the annotation's para
 
 ## `absence-marker-binding`
 
-A binding names one of the absence markers `Nothing`, `Missing` or `Undefined`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable or a `match` pattern. The engine recognizes these markers by their name wherever they appear — `Nothing` is dropped from an argument list, and an arithmetic operand named `Missing` or `Undefined` is read as absent — so a binding of one of them could never behave like the value it holds. They are the only library names that cannot be rebound; every other one, including `Pi` and `Square`, is shadowed by a user binding.
+A binding names one of the absence markers `Nothing`, `Missing` or `Undefined`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable or a `match` pattern. The engine recognizes these markers by their name wherever they appear — `Nothing` is dropped from an argument list, and an arithmetic operand named `Missing` or `Undefined` is read as absent — so a binding of one of them could never behave like the value it holds. They are the only library names that cannot be rebound in any scope. Every other one, including `Pi` and `Square`, is shadowed by a user binding, with one exception: at the top level of a program, a `let` or `const` of a library constant that results carry by name (`Pi`, `ExponentialE`, `GoldenRatio`) is refused with a run-time error, because a result built with the library constant would read the user value when its MathJSON is boxed again.
 
 Choose another name. In a `match`, a bare name is a new variable, not a comparison: to test for the marker, write `== Missing`.
 
@@ -216,6 +216,26 @@ A `let` or `const` declares a name that the same scope already declares: an earl
 A second declaration in one scope is a mistake in practice — a `let` where an assignment was meant, or a copied line — and the language cannot tell it from a legitimate second run of the same statement (a loop body on its next turn), so it used to overwrite the binding without a word. To update a binding, assign to it: `x = x + 1`. To hold a second value, choose another name.
 
 A `let` in a NESTED block is not a re-declaration: `for k in xs { if c { let k = 1 … } }` and a closure body that declares a name its enclosing scope also has are ordinary shadowing, and stay legal. The initializer of such a shadowing `let` reads the OUTER name. Across programs — a re-run notebook cell, a later REPL line — a top-level `let` re-declares legally; only a repeat within one program is reported.
+
+## `read-before-declaration`
+
+A local of a block was read or assigned before its `let` or `const` statement ran. In `do { let a = k; let k = 2; a }` the first statement reads `k`, which the block declares only in the next statement. In `do { k = 5; let k = 2 }` the first statement assigns it: the assignment does not write a `k` of an enclosing scope, because the name `k` in the block is the local.
+
+Each run of a block — a function call, an iteration of a loop body, a run of an `if` or `do` block — gets its own bindings for the locals of the block when it starts, as in JavaScript. A closure created in the block before a `let` therefore reads the binding of its own run: in `for i in [1, 2] { fs = [...fs, () => k]; let k = i }` the two closures give `1` and `2`. Until the `let` runs, the binding has no value, and reading it or assigning it (directly, or by calling such a closure too early) is this error.
+
+Move the `let` before the first read or assignment, or give the local another name. The initializer of the `let` itself is not such a read: `let t = t * 2` in a nested block reads the OUTER `t`. Top-level statements of a program are not a block, so there a name declared later is an ordinary symbol until its `let` runs.
+
+In a function body, an assignment to a name that no enclosing scope declares where the function is written makes the name a local of the block, as a `let` does, and each call starts with no value for it. A read of such a local before its first assignment is this error too: `function g(k) { u = t; t = k; u }` reads `t` in the first statement, and `t = t + 1` as the first statement reads `t` before it assigns it. A call of the function that a local holds (`h(1)` before `h = (x) => x`, or before `let h = …`) and the collection of a `for` loop (`for i in t { … }` before `t` has a value) use the local too, and are this error; the loop then runs no iteration. Assign the local before the first read, or, to read a variable outside the function, declare it before the function. A closure that reads the local is not such a read until it is called, and in a block outside every function (a `do` block at the top level of a program) a read before the first assignment stays the bare symbol.
+
+## `constant-assignment`
+
+A value was assigned to a constant: a name bound by `const`, or a constant of the library such as `Pi`. In `const c = 1` followed by `c = 2`, the assignment is refused and `c` keeps the value `1`. The same holds for an assignment of a function literal (`const k = (n) => n + 1` then `k = (s) => s`) and for each name of a destructuring assignment (`(a, c) := (3, 4)` writes neither `a` nor `c`).
+
+`epsil check` reports an assignment to a `const` of the same program (at any depth, and each name of a destructuring `const`) before anything runs, wherever the assignment is: at the top level, in a block, a loop body or a function body. The run does not report it a second time. A function defined before a `const` of the same block is included, because the `const` of a block is declared when the block starts: an assignment in the function writes the constant when the call comes after the `const`. A function defined before a top-level `const` does not write it: an assignment in a function body to a name that no enclosing scope declares when the function is defined makes a local of the body. A constant that the check cannot see — one declared by an earlier program on the same engine, or a library constant — is reported when the assignment runs, as a `runtime-error` with this code.
+
+To change the value, declare the name with `let` instead of `const`. To hold a second value, choose another name, or declare a local that shadows the constant: `let c = 2` in a function body or a block makes a new binding, and an assignment to it is valid. An indexed assignment such as `c[1] = 2` is not an assignment to `c`, and is reported with another error.
+
+A host that calls `ce.assign()` on a constant gets a thrown error with the same message, whose `code` property is `constant-assignment`.
 
 ## `function-redefinition`
 

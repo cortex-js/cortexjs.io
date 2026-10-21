@@ -313,6 +313,15 @@ ce.declare("double", { evaluate: ([x]) => x.mul(3) });
 ce.declare("double", { evaluate: ([x]) => x.mul(3) }, { extend: true });
 ```
 
+A patch that changes a flag of a library operator keeps the library handlers
+that do not depend on that flag. Removing `commutative` from `Add` or
+`Multiply` (`ce.declare("Add", { commutative: false }, { extend: true })`)
+removes the library ordering handler, so the canonical form keeps the operand
+order (`b + a` stays `b + a`). But the library `evaluate` handler of `Add` and
+`Multiply` collects like terms, and it still reorders a symbolic sum: supply
+your own `evaluate` handler in the same patch if the order must also be kept
+when the expression is evaluated.
+
 A name first seen in use, such as `f` in `ce.parse("f(x)")`, is not declared
 yet and can be defined with `ce.declare("f", {...})`. See
 [Overloading Functions](#overloading-functions) for the fields a patch can

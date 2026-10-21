@@ -469,7 +469,7 @@ N(catalanConstant)
 
 ### ceil
 
-MathJSON `Ceil` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
+MathJSON `Ceil` · `(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
 
 Rounds a number up to the next largest integer, or with a step to the least multiple of the step that is at least the number.
 
@@ -716,7 +716,7 @@ Double Factorial Function
 
 ### floor
 
-MathJSON `Floor` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
+MathJSON `Floor` · `(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
 
 Rounds a number down to the nearest integer, or with a step to the greatest multiple of the step that is at most the number.
 
@@ -727,7 +727,7 @@ Rounds a number down to the nearest integer, or with a step to the greatest mult
 
 ### fract
 
-MathJSON `Fract` · `(real | signed_infinity) -> real<0..1>`
+MathJSON `Fract` · `(real | signed_infinity | ~oo) -> real<0..1>`
 
 Fractional part of a number: x - floor(x)
 
@@ -760,7 +760,7 @@ Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = 
 
 ```epsil
 N(gamma(2, 1))
-// ➔ 0.7357588823428847
+// ➔ 0.735758882342884643191
 ```
 
 ### gammaLn
@@ -866,7 +866,7 @@ Indeterminate, the exact answer to an indeterminate form such as 0/0: a number w
 
 MathJSON `Infimum` · `(value*) -> number`
 
-Like Min, but defined for open sets
+Like Min, but defined for open sets. Nothing data are omitted.
 
 ```epsil
 [infimum(1, 3, 2), infimum(interval(0, 1))]
@@ -1047,7 +1047,7 @@ N(machineEpsilon)
 
 MathJSON `Max` · `(value*) -> number`
 
-Maximum of two or more numbers
+Maximum of two or more numbers. Nothing data are omitted.
 
 ```epsil
 [max(3, 7, 2), max([3, 7, 2])]
@@ -1074,7 +1074,7 @@ N(measurement(5, 0.2) * measurement(3, 0.4))
 
 MathJSON `Min` · `(value+) -> number`
 
-Minimum of two or more numbers
+Minimum of two or more numbers. Nothing data are omitted.
 
 ```epsil
 [min(3, 7, 2), min([3, 7, 2])]
@@ -1228,7 +1228,7 @@ PreIncrement(5)
 
 MathJSON `Product` · `(any, tuple*) -> number`
 
-`Product(f, a, b)` computes the product of `f` from `a` to `b`
+`Product(f, a, b)` computes the product of `f` from `a` to `b`. Nothing factors are omitted.
 
 ```epsil
 product(k, (k, 1, 5))
@@ -1313,7 +1313,7 @@ n-th root of a value.
 
 ### round
 
-MathJSON `Round` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
+MathJSON `Round` · `(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
 
 Rounds a number to the nearest integer, or with a step to the nearest multiple of the step.
 
@@ -1324,7 +1324,7 @@ Rounds a number to the nearest integer, or with a step to the nearest multiple o
 
 ### sign
 
-MathJSON `Sign` · `(complex | signed_infinity) -> complex`
+MathJSON `Sign` · `(complex | signed_infinity | ~oo) -> complex`
 
 Sign of a number: -1, 0, or 1 for a real; `z/|z|`, the point of the unit circle in its direction, for a complex `z`.
 
@@ -1370,7 +1370,7 @@ Difference between two or more values.
 
 MathJSON `Sum` · `(any, tuple*) -> number`
 
-`Sum(f, [a, b])` computes the sum of `f` from `a` to `b`; `Sum(L)` sums the elements of a collection `L`
+`Sum(f, [a, b])` computes the sum of `f` from `a` to `b`; `Sum(L)` sums the elements of a collection `L`. Nothing terms are omitted.
 
 ```epsil
 sum(k^2, (k, 1, 10))
@@ -1386,7 +1386,7 @@ sum(1/k^2, (k, 1, oo))
 
 MathJSON `Supremum` · `(value*) -> number`
 
-Like Max, but defined for open sets
+Like Max, but defined for open sets. Nothing data are omitted.
 
 ```epsil
 [supremum(1, 3, 2), supremum(interval(0, 1))]
@@ -1406,7 +1406,7 @@ N(trigamma(1))
 
 ### truncate
 
-MathJSON `Truncate` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
+MathJSON `Truncate` · `(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
 
 Rounds a number towards zero (removes the fractional part), or with a step to the multiple of the step nearest to the number in the direction of zero.
 

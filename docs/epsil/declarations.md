@@ -181,6 +181,91 @@ x = 5
 Assigning to a name that was never declared does establish it, but `let` is
 the explicit and idiomatic way to introduce a mutable binding.
 
+In a function body, an assignment to a name that no enclosing scope
+declares makes a local of the function body, as a `let` does. This is also
+true when the assignment is in a nested block of the body — a branch of an
+`if`, the body of a loop, a `do` block —, as in Python. A function literal
+written in the body owns the names that its own body assigns, and a `let` in
+a nested block declares a local of that block only. The rule is the same
+for every function body that the engine makes from an expression: the term
+of a `Table` is applied as a function at each index, so it owns the names
+that its branches assign, while the term of a `Sum` or a `Product` is
+evaluated again at each index, as a loop body is. Which scope a name
+belongs to is decided where
+the function is **defined**, not where it is called: each call of the
+function gets its own local, and a declaration of the same name made later
+does not change what the function writes. Such an assignment does not write
+a variable outside the function, so it is not the `scope` effect, and the
+function needs no effect specifier:
+
+```epsil
+function g(k) { t = k + 1; t }
+let t = 0
+[g(1), g(2), t]
+// ➔ [2, 3, 0]
+```
+
+Each call starts with no value for such a local. A read of the local before
+its first assignment in the call is the `read-before-declaration` error, as a
+read of a `let` local before its `let`. The read is not the bare symbol `t`,
+and it does not read a `t` outside the function:
+
+```epsil
+function g(k) { u = t; t = k; u }
+g(1)
+// ➔ Error(ErrorCode("read-before-declaration", "t", "assignment"))
+```
+
+The same holds for a read in the value of the first assignment
+(`t = t + 1` as the first statement), and for a read that runs when no
+assignment ran before it, such as a read after an `if` that assigns the
+local in one branch only:
+
+```epsil
+function g(c) { if c { t = 1 }; t }
+[g(true), g(false)]
+// ➔ [1, Error(ErrorCode("read-before-declaration", "t", "assignment"))]
+```
+
+The same holds for `if c { t = 1 }; t = t + 1` with `c` false. A call of the function that the local holds (`h(1)` before
+`h = (x) => x`) and the collection of a `for` loop (`for i in t { … }`
+before `t = [1, 2]`) use the local too, and give the same error; the loop
+then runs no iteration, and the error is its value. A closure that reads
+the local reads it when it is called, so
+`f = () => t; t = 1; f()` gives `1`. The body of a loop keeps its locals
+from one iteration to the next in one call, so the second iteration can read
+the value that the first one assigned.
+
+`epsil check` reports the read before the program runs when the order is
+certain from the source: the read is in a statement before every statement
+that assigns the local, or it runs before the first assignment in the
+statement that holds it (in the value of the assignment, in the condition
+of an `if` or in a branch before the assignment of that branch, in the body
+of a loop before the assignment of the first iteration). It reports
+a read of a `let` local before its `let` in the same way. The run then does
+not report the same read a second time. A read that
+comes before the first assignment only on some paths (after an `if` that
+assigns the local in one branch) is reported when it happens, by the run.
+
+A block outside every function — a `do` block, an `if` or a loop body at the
+top level of a program — owns the names that its own statements assign, but
+not the names that its nested blocks assign: each nested block owns its
+own. There, a read before the first assignment stays the bare symbol, as a
+read of an undeclared name at the top level does.
+
+An assignment to a name that an enclosing scope declares when the function
+is defined — a top-level `let` or assignment written before the function, a
+parameter or a local of an enclosing function — writes that binding. In a
+function body, this is the `scope` effect, which must be declared (see
+[Effect specifiers](/control-flow#effect-specifiers)):
+
+```epsil
+let n = 0
+function bump() scope { n = n + 1; n }
+[bump(), bump(), n]
+// ➔ [1, 2, 2]
+```
+
 Reassigning a symbol that was declared `const` produces an
 [error value](/evaluation/#errors-are-values), not a parse error or a
 thrown exception:
@@ -191,7 +276,17 @@ c = 2
 ```
 
 `c = 2` still parses as a perfectly ordinary assignment; the failure happens at
-evaluation time, and its result is an error value.
+evaluation time, and its result is an error value. Because the `const` is in the
+same program, `epsil check` also reports the assignment before anything runs
+(`constant-assignment`), wherever it is: at the top level, in a block, a loop
+body or a function body. This holds for a `const` at any depth, and for each
+name of a destructuring `const`. A function defined before a `const` of the
+same block is included, because the `const` of a block is declared when the
+block starts: an assignment in the function writes the constant when the
+call comes after the `const`. A function defined before a top-level `const`
+does not write it: the assignment makes a local of the function body (see
+above). An assignment to a `let` or a parameter that shadows
+the constant is not reported.
 
 A declaration with no initializer declares the name without giving it a value:
 

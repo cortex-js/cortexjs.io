@@ -365,6 +365,62 @@ the free `a` resolves, the bound `x` does not.
 To use an assumption instead of a value (which *does* inform simplification and
 solving), use `ce.assume()` rather than `ce.assign()`.
 
+### Function Calls Are Bound Lexically
+
+A function call resolves its head (`f` in `f(3)`) through the binding the name
+had where the call was created, in the same way a symbol is bound to its
+definition during canonicalization. Declaring another function of the same
+name in a scope that is current when the call is evaluated does not redirect
+the call. Assigning a new function to the **original** binding does: a call
+reads the function that its binding holds when it runs.
+
+```js
+ce.assign('f', ce.parse('x \\mapsto 2x'));
+const call = ce.parse('f(3)');
+
+ce.pushScope();
+ce.declare('f', 'function');
+ce.assign('f', ce.parse('x \\mapsto 100x'));
+call.evaluate().print();
+// ➔ 6      (the call keeps the binding it was created with)
+ce.popScope();
+
+ce.assign('f', ce.parse('x \\mapsto 3x'));
+call.evaluate().print();
+// ➔ 9      (the original binding now holds another function)
+```
+
+A call written before its function is defined is a **forward reference**. It
+waits for a definition of the name in its own scope chain: evaluated while
+the name has no value, it stays symbolic; evaluated after the definition, it
+applies the function.
+
+Within one evaluation, the symbolic result of such a call is a value: it is
+not resolved again when the name is assigned later in the same evaluation.
+So `Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
+term `h(1)` was computed while `h` had no value, and the assignment at
+`k = 2` does not reach it. A later evaluation resolves the stored result
+again:
+
+```js
+const call = ce.parse('g(3)');
+const result = call.evaluate();
+// ➔ g(3)   ("g" has no definition yet)
+
+ce.assign('g', ce.parse('x \\mapsto x^2'));
+call.evaluate().print();
+// ➔ 9
+result.evaluate().print();
+// ➔ 9      (a later evaluation resolves the stored result)
+```
+
+In a `Block`, a `DefineFunction` statement (the Epsil `function g(k) { … }`)
+defines its name for the whole block, including the statements written before
+it. An `Assign` of a function literal takes effect when it runs. A `Block`
+evaluated directly by the host is a program: each of its statements is an
+evaluation of its own, so a result stored by one statement is resolved again
+when a later statement reads it.
+
 ### Default Scopes
 
 The Compute Engine has a set of default scopes that are used to look up

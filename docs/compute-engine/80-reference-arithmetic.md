@@ -1063,7 +1063,7 @@ of producing an empty one.
 
 | Function       | Notation         |                                                                       |
 | :------------- | :--------------- | :------------------------------------------------------------------------------ |
-| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value. Stays unevaluated when the answer is not known |
+| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value. Stays unevaluated when the answer is not known. `NaN` and a pole (`1/0`) are equal to nothing, including themselves |
 | `NotEqual`     | $$ x \ne y $$  |                                                                                 |
 | `Greater`      | $$ x \gt y $$  | |
 | `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
@@ -1074,6 +1074,14 @@ of producing an empty one.
 See below for additonal relational operators: `Congruent`, etc...
 
 </div>
+
+An ordered comparison (`Less`, `LessEqual`, `Greater`, `GreaterEqual`) with an
+operand that has no order answers `False`: `NaN`, a pole (`1/0`, which
+evaluates to $\tilde\infty$) and a non-real complex number (`i`, `\ln(-1)`).
+So a piecewise whose condition compares such a value takes its next branch:
+`\{1/0 > 0: 1, 0\}` is `0`. `NotEqual` is not affected (`1/0 \ne 0` is
+`True`), and a comparison with a free symbol stays unevaluated. Signed
+infinities are ordered as usual (`0 < \infty` is `True`).
 
 The three tiers of equality — `Same` (syntactic), `Equal` (same value) and
 `IdenticallyEqual` (same value for every value of the free variables) — are

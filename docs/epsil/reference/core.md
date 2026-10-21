@@ -489,7 +489,7 @@ characters("héllo")
 
 `(any+) -> unknown`
 
-Return the first operand that is not ABSENT (`Missing`, `Undefined` or `NaN`), evaluated left-to-right. If every operand is absent, the last operand’s value is returned verbatim (still absent). `Indeterminate` is a value and is not absent.
+Return the first operand that is not ABSENT (`Missing`, `Undefined`, `NaN`, or `Indeterminate`), evaluated left-to-right. If every operand is absent, the last operand’s value is returned verbatim (still absent). `Nothing` passes through without selecting a fallback.
 
 ```epsil
 Coalesce(missing, NaN, 3, 4)
@@ -846,7 +846,7 @@ isError(1 + 1)
 
 MathJSON `IsMissing` · `(any) -> boolean`
 
-True if the value is ABSENT — the `Missing` or `Undefined` symbol, or a `NaN` number (regardless of provenance). R’s `is.na` (`TRUE` for both `NA` and `NaN`). There is no NaN-specific test operator (R’s `is.nan`). `Indeterminate`, the exact answer to an indeterminate form such as `0/0`, is a value and is not absent.
+True for `Missing`, `Undefined`, `NaN`, or `Indeterminate`, regardless of provenance. `Nothing` is not an absent datum.
 
 ```epsil
 [isMissing(missing), isMissing(NaN), isMissing(0)]
@@ -920,6 +920,31 @@ N(1/3, 4)
 ```epsil
 N(exp(100), [positiveInfinity, 20])
 // ➔ 2.688117141816135448412625551580013587361111877374192241519160862e+43
+```
+
+### nSolve
+
+MathJSON `NSolve` · `(any, any*) -> list`
+
+NSolve(equation, unknown): the solutions of an equation as floats.
+
+It is Mathematica `NSolve`: it takes the same operands as `Solve`,
+
+including domain specs and systems of equations, and gives the `N` of
+
+each solution of `Solve`:
+
+`NSolve(x^2 == 2, x)` → `[1.414…, -1.414…]`. When `Solve` finds no
+
+solution set, `NSolve` stays unevaluated: for a polynomial `Solve`
+
+already gives numeric roots when there is no closed form, and
+
+`FindRoot` gives one local root from a start value.
+
+```epsil
+nSolve(x^2 == 2, x)
+// ➔ [1.4142135623730950488,-1.4142135623730950488]
 ```
 
 ### NamedArgument

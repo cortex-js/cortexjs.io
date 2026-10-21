@@ -29,12 +29,13 @@ element types.
 | range        | `1..10`                | Numbers from a start to an end, with an optional step.      |
 | string       | `"hello"`              | The characters of the text, in order.                       |
 
-A set literal removes duplicates. The empty set is `{}`, and the empty
-dictionary is `{->}`:
+A set literal removes duplicates and stores its elements in the canonical
+order, so two sets with the same elements are written, printed and walked
+alike. The empty set is `{}`, and the empty dictionary is `{->}`:
 
 ```epsil
 {3, 1, 3, 2}
-// ➔ Set(3, 1, 2)
+// ➔ Set(1, 2, 3)
 ```
 
 Collections are **immutable**. An operation never changes a collection: it
@@ -383,7 +384,7 @@ An index that is provably not an integer (`2.5`, `3/2`, `5 + √17`), as a scala
 
 ### chunk
 
-MathJSON `Chunk` · `((S, integer) -> list<string> where S: string) & ((collection, integer) -> list<list>)`
+MathJSON `Chunk` · `((S, integer) -> list<string> where S: string) & ((indexed_collection, integer) -> list<list>)`
 
 Split the collection into `k` nearly equal-sized groups. See `Partition` for splitting into fixed-size chunks.
 
@@ -394,7 +395,7 @@ chunk([1, 2, 3, 4, 5, 6], 3)
 
 ### chunkBy
 
-MathJSON `ChunkBy` · `((S, key: (character) any -> unknown) -> list<string> where S: string) & ((collection<T>, key: (T) any -> unknown) -> list<list<T>> where T)`
+MathJSON `ChunkBy` · `((S, key: (character) any -> unknown) -> list<string> where S: string) & ((indexed_collection<T>, key: (T) any -> unknown) -> list<list<T>> where T)`
 
 Split the collection into maximal runs of consecutive elements over which the key function yields the same value.
 
@@ -553,7 +554,7 @@ dictionaryFrom([("a", 1), ("b", 2)])
 
 ### differences
 
-MathJSON `Differences` · `(collection<any>) -> indexed_collection`
+MathJSON `Differences` · `(indexed_collection<any>) -> indexed_collection`
 
 Return the successive differences of a collection: a collection whose k-th element is `x(k+1) − xk`, of length one less than the input.
 
@@ -584,7 +585,7 @@ drop([1, 2, 3, 4, 5], -2)
 
 ### dropWhile
 
-MathJSON `DropWhile` · `(collection<T>, predicate: (T) any -> boolean) -> collection where T`
+MathJSON `DropWhile` · `(indexed_collection<T>, predicate: (T) any -> boolean) -> indexed_collection where T`
 
 Return the collection with its leading elements for which the predicate returns True removed; the remaining elements are returned unfiltered.
 
@@ -717,6 +718,10 @@ Return the elements of the collection for which the predicate function returns T
 
 Equivalent to `[x for x in xs if p(x)]`.
 
+Immediate `Nothing` inputs are dropped without calling the predicate.
+
+`Missing` and markers nested inside a datum still reach the predicate.
+
 ```epsil
 filter([1, 2, 3, 4, 5, 6], x => x % 2 == 0)
 // ➔ [2,4,6]
@@ -724,7 +729,7 @@ filter([1, 2, 3, 4, 5, 6], x => x % 2 == 0)
 
 ### find
 
-MathJSON `Find` · `(collection<T>, predicate: (T) any -> boolean) -> any where T`
+MathJSON `Find` · `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T`
 
 Return the first element of the collection satisfying the predicate, or Nothing if none found.
 
@@ -1002,7 +1007,7 @@ A tuple operand is included as a single element, and so is a scalar operand.
 
 ```epsil
 ListJoin(Set(3, 1), [0])
-// ➔ [3,1,0]
+// ➔ [1,3,0]
 ```
 
 ### map
@@ -1018,6 +1023,14 @@ multiple collections, combines them element-wise (like `zipWith`):
 `Map(f, xs, ys) = [f(x1, y1), f(x2, y2), …]`, with the length of the
 
 shortest input. The mapping function is always the FIRST argument.
+
+An immediate `Nothing` input bypasses the callback and remains `Nothing`
+
+at that position. With multiple sources, any `Nothing` coordinate bypasses
+
+the whole callback. Nested `Nothing` and `Missing` are passed to the callback.
+
+The view keeps its raw length; `ListFrom` materializes it and omits `Nothing`.
 
 ```epsil
 map(x => x^2, [1, 2, 3])
@@ -1223,7 +1236,7 @@ Pair(1, 2)
 
 ### partition
 
-MathJSON `Partition` · `(collection<T>, ((T) any -> boolean) | integer, integer?) -> list<list<T>> where T`
+MathJSON `Partition` · `(indexed_collection<T>, ((T) any -> boolean) | integer, integer?) -> list<list<T>> where T`
 
 Partition a collection into consecutive chunks each of size `n`; the trailing chunk may be shorter when `n` does not divide the length.
 
@@ -1296,7 +1309,7 @@ pointZ((3, 4, 5))
 
 ### position
 
-MathJSON `Position` · `(collection<T>, predicate: (T) any -> boolean) -> list<integer> where T`
+MathJSON `Position` · `(indexed_collection<T>, predicate: (T) any -> boolean) -> list<integer> where T`
 
 Return a list of indexes of elements in the collection satisfying the predicate.
 
@@ -1530,7 +1543,7 @@ rotateRight([1, 2, 3, 4])
 
 ### scan
 
-MathJSON `Scan` · `(collection<T>, reducer: (unknown, T) any -> unknown, initial: value?) -> indexed_collection where T`
+MathJSON `Scan` · `(indexed_collection<T>, reducer: (unknown, T) any -> unknown, initial: value?) -> indexed_collection where T`
 
 Return the cumulative fold of a collection: a same-length collection whose k-th element is the running result of applying a binary function left to right (optionally seeded by an initial value).
 
@@ -1558,7 +1571,7 @@ An unordered collection of distinct elements (a set).
 
 ```epsil
 {3, 1, 2, 1}
-// ➔ Set(3, 1, 2)
+// ➔ Set(1, 2, 3)
 ```
 
 ### setFrom
@@ -1699,11 +1712,11 @@ MathJSON `Table` · `(function, integer, integer?) -> collection`
 
 An alias for `Tabulate` (the preferred name) that additionally accepts
 
-Mathematica-style iterator specs, e.g. `Table(i^2, {i, 1, n})` or
+Mathematica-style iterator specs, e.g. `Table(i^2, {i, n})` (`i` from
 
-`Table(i, {i, lo, hi, step})`, and the equivalent tuple spelling
+1 to `n`), `Table(i^2, {i, 1, n})` or `Table(i, {i, lo, hi, step})`,
 
-`Table(i^2, (i, 1, n))`.
+and the equivalent tuple spelling `Table(i^2, (i, 1, n))`.
 
 ```epsil
 table(i^2, (i, 1, 5))
@@ -1743,7 +1756,7 @@ take([1, 2, 3, 4, 5], -2)
 
 ### takeWhile
 
-MathJSON `TakeWhile` · `(collection<T>, predicate: (T) any -> boolean) -> collection where T`
+MathJSON `TakeWhile` · `(indexed_collection<T>, predicate: (T) any -> boolean) -> indexed_collection where T`
 
 Return the leading elements of the collection for which the predicate returns True, stopping at the first element that does not.
 
@@ -1789,7 +1802,7 @@ Triple(1, 2, 3)
 
 `(any*) -> tuple`
 
-A fixed number of heterogeneous elements
+A fixed number of heterogeneous elements. Nothing retains its slot, and a tuple whose coordinates are all Missing remains a tuple.
 
 ```epsil
 (1, "a", True)
@@ -1844,7 +1857,7 @@ values({"a" -> 1, "b" -> 2})
 
 MathJSON `Zip` · `(indexed_collection<any>+) -> list`
 
-Combine multiple collections element-wise into a list of tuples. The result has the length of the shortest input.
+Combine multiple collections element-wise into a list of tuples. The result has the length of the shortest input. Nothing retains its coordinate and source position; a row whose coordinates are all Missing remains a tuple.
 
 ```epsil
 zip([1, 2, 3], ["a", "b", "c"])

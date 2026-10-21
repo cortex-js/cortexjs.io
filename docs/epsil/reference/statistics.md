@@ -54,13 +54,13 @@ Cumulative distribution function P(X ≤ x) of a distribution.
 
 MathJSON `Correlation` · `(collection<any>, collection<any>?) -> nan | real<-1..1>`
 
-Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs.
+Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs. An observation is skipped if either coordinate (or the whole row) is Nothing. Raw source lengths must match before omission; all terms use the same retained observations.
 
 ### covariance
 
 MathJSON `Covariance` · `(collection<any>, collection<any>?) -> nan | real`
 
-Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs.
+Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. An observation is skipped if either coordinate (or the whole row) is Nothing. Raw source lengths must match before omission; all terms use the same retained observations.
 
 ### erf
 
@@ -94,9 +94,9 @@ Exponential distribution with rate parameter λ.
 
 ### findFit
 
-MathJSON `FindFit` · `(any, any, any, any) -> dictionary`
+MathJSON `FindFit` · `(any, any, any, any, dictionary?) -> dictionary`
 
-Nonlinear least-squares fit of a model to data. FindFit(data, model, params, vars): fit `model` (an expression in `vars` and the parameters) to `data`, a list of (x…, y) tuples or a plain list of y values. Each parameter spec is a bare symbol, (a, a0), or (a, a0, lo, hi) with box constraints. Returns a record &#123;parameters, converged, residualNorm, iterations&#125;. The joint form takes a list of models and matching datasets sharing parameters.
+Nonlinear least-squares fit of a model to data. FindFit(data, model, params, vars): fit `model` (an expression in `vars` and the parameters) to `data`, a list of (x…, y) tuples or a plain list of y values. Each parameter spec is a bare symbol, (a, a0), or (a, a0, lo, hi) with box constraints. Returns a record &#123;parameters, converged, residualNorm, iterations&#125;. The joint form takes a list of models and matching datasets sharing parameters. An optional fifth argument is a dictionary of options: `{global: {b: [lo, hi]}}` searches the named parameters (at most two) over the given range for the lowest sum of squared residuals instead of returning the local minimum nearest the start; `iterations` is then the total over every solver run. The search samples each parameter on a grid: a parameter that scales the phase of a periodic function of a variable (`b` in `cos(b x + c)`) gets a point in every basin of the residual, about `π / (span of x)` apart; `{global: {b: [lo, hi, step]}}` sets the step of the grid instead (when the model is linear in the other parameters; otherwise the solver runs from each point of a coarse grid of 24 points, or 6 × 6). A step on the phase `c` of `a cos(b x + c)` keeps it on the grid; without a step the phase is solved by least squares. With more than 300 data rows the grid is scanned on a stratified sample of 300 rows, and the best grid points are then solved again and refined on every row. With a kernel pool on the engine (`ce.workers`), `evaluateAsync()` scans the grid on the workers and gives the record of `evaluate()`; the solver runs stay on the calling thread.
 
 ### gammaRegularized
 
@@ -119,13 +119,13 @@ histogram([1, 2, 2, 3], 3)
 
 MathJSON `InterquartileRange` · `((collection<any> | number)+) -> +oo | nan | real<0..>`
 
-Interquartile range (Q3 - Q1) of a collection.
+Interquartile range (Q3 - Q1) of a collection. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ### kurtosis
 
 MathJSON `Kurtosis` · `((collection<any> | number)+) -> nan | real`
 
-Kurtosis of a collection of numbers.
+Kurtosis of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ### linearRegression
 
@@ -137,13 +137,13 @@ Least-squares linear fit b0 + b1·x. Returns Tuple(b0, b1), or the fitted expres
 
 MathJSON `Mean` · `((collection<any> | distribution | number)+) -> number`
 
-Arithmetic mean (average) of a collection of numbers.
+Arithmetic mean (average) of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ### median
 
 MathJSON `Median` · `((collection<any> | number)+) -> nan | real | signed_infinity`
 
-Median of a collection of numbers.
+Median of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ```epsil
 median([3, 1, 4, 2])
@@ -154,7 +154,7 @@ median([3, 1, 4, 2])
 
 MathJSON `Mode` · `((collection<any> | number)+) -> nan | real | signed_infinity`
 
-Most frequently occurring value in a collection.
+Most frequently occurring value in a collection. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ```epsil
 mode([1, 2, 2, 3])
@@ -189,19 +189,19 @@ Least-squares polynomial fit of the given degree. Returns the ascending coeffici
 
 MathJSON `PopulationCovariance` · `(collection<any>, collection<any>?) -> nan | real`
 
-Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs.
+Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. An observation is skipped if either coordinate (or the whole row) is Nothing. Raw source lengths must match before omission; all terms use the same retained observations.
 
 ### populationStandardDeviation
 
 MathJSON `PopulationStandardDeviation` · `((collection<any> | number)+) -> nan | real<0..>`
 
-Population Standard Deviation of a collection of numbers.
+Population Standard Deviation of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ### populationVariance
 
 MathJSON `PopulationVariance` · `((collection<any> | number)+) -> nan | real<0..>`
 
-Population variance of a collection of numbers.
+Population variance of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ### quantile
 
@@ -213,7 +213,7 @@ Quantile (inverse CDF): the least x with CDF(x) ≥ p, for p in [0, 1]. The firs
 
 MathJSON `Quartiles` · `((collection<any> | number)+) -> tuple<lower: nan | real | signed_infinity, mid: nan | real | signed_infinity, upper: nan | real | signed_infinity>`
 
-Lower quartile, median, and upper quartile of a collection. Uses the Moore–McCabe (exclusive-hinges) convention: the sample is split at its median, and Q1/Q3 are the medians of the lower/upper halves with the overall median excluded from both halves when the sample size is odd.
+Lower quartile, median, and upper quartile of a collection. Uses the Moore–McCabe (exclusive-hinges) convention: the sample is split at its median, and Q1/Q3 are the medians of the lower/upper halves with the overall median excluded from both halves when the sample size is odd. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ```epsil
 quartiles([1, 2, 3, 4, 5])
@@ -230,7 +230,7 @@ RandomSample(xs, k): a list of k elements drawn from the indexed collection `xs`
 
 MathJSON `Skewness` · `((collection<any> | number)+) -> nan | real`
 
-Skewness of a collection of numbers.
+Skewness of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ### slidingWindow
 
@@ -252,7 +252,7 @@ slidingWindow("abcd", 2)
 
 MathJSON `StandardDeviation` · `((collection<any> | distribution | number)+) -> nan | real<0..>`
 
-Sample Standard Deviation of a collection of numbers.
+Sample Standard Deviation of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
 
 ### uniformDistribution
 
@@ -264,4 +264,4 @@ Continuous uniform distribution on the interval [a, b].
 
 MathJSON `Variance` · `((collection<any> | distribution | number)+) -> nan | real<0..>`
 
-Sample variance of a collection of numbers.
+Sample variance of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.

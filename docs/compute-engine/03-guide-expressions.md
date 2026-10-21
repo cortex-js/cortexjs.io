@@ -535,6 +535,7 @@ property.
 | `unexpected-argument`          | too many arguments provided                                                                                      |
 | `expected-argument`            | not enough arguments provided                                                                                    |
 | `expected-expression`          | an expression was expected inside an enclosure (parentheses)                                                     |
+| `expected-set-builder-separator` | a set builder `\{x \| …\}` uses a bar as the separator; write `\mid` or `:` instead                            |
 | `unexpected-command`           | the command is unknown, or not applicable in the current parsing context                                         |
 | `unexpected-token`             | the character does not apply to the current parsing context                                                      |
 | `incompatible-type`          | the type of the provided argument does not match the expected type                                                         |

@@ -190,6 +190,193 @@ stored code. Functions passed in the `functions` or `imports` compile options
 are copied into the code as source, so a closure loses its enclosing scope,
 and a function given by name must exist where the code runs.
 
+### Evaluating Many Points at Once: `broadcast()`
+
+A plotter samples a function once per pixel column, or once per cell of an
+implicit plot, and `run()` converts its argument object and wraps its result
+on every call. `broadcast(inputs, options)` takes the inputs of every cell at
+once and writes every result into one `Float64Array`: the conversions run once
+per batch, the compiled body once per cell. Measured 2026-10-20: 20 % faster
+than `run()` per cell on the main thread, and the batch is what a worker
+thread receives (below). It is present on a `javascript` result compiled from
+an expression (`calling: 'expression'`) and on an `interval-js` result.
+
+```javascript
+const f = compile(ce.parse('\\sin(x)\\cos(y) + a'));
+
+const xs = new Float64Array([0, 0.5, 1]);
+const ys = new Float64Array([0, 1]);
+
+// Six cells: the two arrays are the axes of a grid, `x` varying fastest.
+f.broadcast({ x: xs, y: ys, a: 0.5 }, { layout: 'grid' });
+// ➔ Float64Array [0.5, 0.979…, 1.341…, 0.5, 0.759…, 0.954…]
+
+// Three cells: every array holds one value per cell.
+f.broadcast({ x: xs, y: new Float64Array([1, 1, 1]), a: 0.5 });
+```
+
+**Inputs.** `inputs` maps each free variable to a `Float64Array` or to a
+number. A number is the same value for every cell (a document variable). With
+the default layout, `'cells'`, every array holds one value per cell (for
+`interval-js`, a `lo, hi` pair per cell) and all have the same cell count.
+With `layout: 'grid'` the arrays are the axes of a regular grid, in key order
+of `inputs`, the first varying fastest; the cell count is the product of their
+lengths and nothing is expanded on the caller's side. `options.out` is a
+caller-owned output array, filled and returned instead of a new one; it must
+hold at least `outputs` values per cell (below).
+
+**Shared inputs** (`javascript` only). An input can also be bound once for the
+whole batch and read by index in the expression, for example the field values
+of a grid that each cell reads around its own index:
+
+```javascript
+ce.declare('F', 'list<number>');
+ce.declare('i', 'integer');
+const f = compile(ce.parse('F_{i+1}'));
+
+f.broadcast({ i: new Float64Array([0, 1, 2]), F: [1, 2, 3, 4] });
+// ➔ Float64Array [1, 2, 3]
+```
+
+A variable is shared when the compiled code reads it as a list (its declared
+type is a list type), or when `options.shared` names it: `{ shared: ['G'] }`
+is the way to share a variable that has no declared type. Each name in
+`shared` must be a key of `inputs`. A shared input is a plain array of numbers
+or a `Float64Array`; the compiled code reads plain arrays only, so a
+`Float64Array` is copied into one, once per batch, before the cell loop. A
+shared input is not a column of the `cells` layout and not an axis of the
+`grid` layout: it does not count toward the cells. A plain array for any other
+variable throws.
+
+**Output of a `javascript` result.** One value per cell by default. A boolean
+is `1` or `0`; a complex value with a zero imaginary part is its real part; a
+cell whose evaluation throws, or gives any other non-number (a complex value
+with a non-zero imaginary part, a list), is `NaN`. Cell for cell, the value is
+the one `run()` gives: the same compiled body runs with the same conversions.
+A missing variable, a length mismatch or a wrong element type throws before
+the loop.
+
+**Several outputs per cell.** An expression whose type is a tuple of two or
+more elements that can be numbers writes that many values per cell into the
+same output array. An element typed `unknown` counts: `(x, y)` with undeclared
+`x` and `y` writes two values per cell. An element that cannot be a number,
+such as a string, gives one value per cell. With
+`m` values per cell, cell `c` is at `[m·c, m·c + m)`. The result reports the
+inferred `m` as `broadcastOutputs` (absent when it is 1), and
+`options.outputs` (a positive integer) overrides it.
+
+```javascript
+const g = compile(ce.parse('(i, 2i)'));
+g.broadcastOutputs;                                 // ➔ 2
+g.broadcast({ i: new Float64Array([1, 2, 3]) });
+// ➔ Float64Array [1, 2,  2, 4,  3, 6]
+```
+
+With more than one value per cell, the elements of an array answer go through
+the conversions above one by one; an element past the end of the array is
+`NaN`, and an answer that is not an array, or a cell that throws, is `NaN` in
+every slot. With one value per cell (`outputs: 1`), an array answer is `NaN`,
+as before. `shared` and `outputs` are `javascript` options: an `interval-js`
+result throws a `TypeError` for either.
+
+**Output of an `interval-js` result.** A `lo, hi, kind` triple per cell, at
+offsets `3·i`, `3·i + 1` and `3·i + 2`. The kinds are the `INTERVAL_KIND`
+codes, exported from the main entry and from
+`@cortex-js/compute-engine/interval`:
+
+| Code | Meaning | `lo`, `hi` |
+|------|---------|------------|
+| `interval` | an ordinary enclosure; a half-infinite bound is ordinary | the enclosure |
+| `empty` | no value on the input (`sqrt([-2, -1])`) | NaN |
+| `entire` | every real; nothing can be said | NaN |
+| `singularPole` | the input crosses a pole (`1/x` on `[-1, 1]`) | NaN |
+| `singularJump` | the input crosses a jump (`floor`) | the values on both sides |
+| `partial` | part of the input is outside the domain (`sqrt([-1, 4])`) | the values inside |
+| `boolTrue`, `boolFalse`, `boolMaybe` | a compiled comparison or logical expression | NaN |
+| `error` | this cell threw, or gave bounds that are not numbers or are reversed | NaN |
+
+A cell never rejects the batch. The `domainClipped` side of a `partial`
+result and the `at` and `continuity` of a `singular` result are not reported.
+
+```javascript
+const g = compile(ce.parse('\\sqrt{x}'), { to: 'interval-js' });
+g.broadcast({ x: new Float64Array([1, 4, -2, -1, -1, 4]) });
+// ➔ [1, 2, INTERVAL_KIND.interval,  NaN, NaN, INTERVAL_KIND.empty,  0, 2, INTERVAL_KIND.partial]
+```
+
+### Worker Threads: `broadcastAsync()` and the Kernel Pool
+
+`broadcastAsync(inputs, options)` takes the same inputs and `out` as
+`broadcast()`, plus a `signal` (an `AbortSignal`), a `deadline` (milliseconds
+of wall clock for the whole batch) and a `chunk` (cells per task). It resolves
+to `{ out, done }`, where `done` is the number of leading cells that are
+valid: every cell, or fewer when the deadline or the signal stopped the batch;
+the cells after `done` are untouched.
+
+`broadcastAsync()` takes `shared` and `outputs` as `broadcast()` does; `done`
+is still a count of cells, not of values. On a pool, the shared inputs go to
+each worker once per call, with the first slice of the call that the worker
+receives, and the worker keeps them until the call ends; each later slice
+carries only its own cells. A `Float64Array` shared input is copied for each
+worker and transferred, a plain array is cloned. The default stride travels
+with the stored result (`broadcastOutputs`), so a worker and
+`createJavaScriptRuntime().loadBroadcast(result)` lay out the cells the same
+way, and the runtime reads the shared inputs from the stored entry plan.
+
+Without a worker pool it runs the batch inline, in slices between yields to
+the event loop, so a deadline still applies and a long batch does not block a
+frame. With a pool it splits the cells into one slice per worker (or `chunk`
+cells per slice), ships them, and writes each returned slice into `out` as it
+arrives. A batch under a threshold runs inline in any case: the pool measures
+the cells per millisecond of each compiled function from its inline batches,
+and ships a batch only when its serial time would exceed about 10 ms (before
+the first measurement, 20 000 cells). Measured 2026-10-20 on an 18-core
+machine: an implicit plot of 512×512 interval cells takes 175 ms inline and 34
+ms on 8 workers; a 2000-column 1D plot takes under 2 ms and never ships.
+
+The engine creates no worker on its own. The host builds the pool and gives it
+to one or more engines:
+
+```javascript
+import { ComputeEngine, createKernelPool } from '@cortex-js/compute-engine';
+
+const pool = createKernelPool({
+  // The worker file ships as one self-contained ES module,
+  // `dist/esm-min/kernel-worker.js` (`@cortex-js/compute-engine/kernel-worker`).
+  // Copy it next to your own files when your bundler does not resolve the
+  // package at run time, and start it from its URL.
+  create: () => new Worker(new URL('./kernel-worker.js', import.meta.url), { type: 'module' }),
+  size: 4,        // default: one less than the hardware concurrency, at most 8
+  prewarm: true,  // create the workers on idle time now, not on the first batch
+});
+
+const ce = new ComputeEngine();
+ce.workers = pool;
+
+const f = compile(ce.parse('\\sin(x)\\cos(y) + x^2 - y^2 - 0.3'), { to: 'interval-js' });
+const { out, done } = await f.broadcastAsync(
+  { x: xAxis, y: yAxis },
+  { layout: 'grid', deadline: 30 }
+);
+```
+
+In Node the factory returns a `worker_threads` `Worker` on the same file. A
+worker reports the versions of the runtimes it holds; a stored result compiled
+by another release is refused by the worker, and its slices then run inline.
+`pool.dispose()` terminates the workers; a later batch creates them again. A
+Content Security Policy must allow the worker script (`worker-src`) and
+`new Function` in it (`'unsafe-eval'`): the worker rebuilds each function from
+its text, as `createJavaScriptRuntime().load()` does. `SharedArrayBuffer` is
+not needed; the arrays are transferred.
+
+The two standalone runtimes have the same batch forms:
+`createJavaScriptRuntime().loadBroadcast(result)` and
+`createIntervalRuntime().loadBroadcast(result)` (from
+`@cortex-js/compute-engine/interval`) rebuild a stored result as a
+`broadcast()` function, with no engine behind it. An `interval-js` result
+carries `runtimeVersion`, `preambleOnce` and `preamblePerCall` for them, as a
+`javascript` result does.
+
 ### Constant Folding
 
 A **pure** subexpression with no free variables is evaluated at compile time
@@ -872,6 +1059,13 @@ console.log(f.run({ x: 0 }));    // ➔ Infinity
 console.log(f.run({ x: -0 }));   // ➔ -Infinity
 ```
 
+This projection reaches a comparison in a branch. In the interpreter a pole
+has no order, so `1/x > 0` at `x = 0` is `False` and `\{1/x > 0: 1, 0\}` is
+`0` (user decision of 2026-10-21); the compiled unit compares `Infinity > 0`,
+which is `true`, and gives `1`. The two answers differ at the pole only. A
+closed form with no variable (`\{1/0 > 0: 1, 0\}`) is folded at compile time to
+the interpreter's answer, `0`.
+
 Absence markers project the same way. `Missing` — what an unmatched `Which`,
 an else-less `If` and a false restriction `e\{c\}` return — is not a
 number, so the chained ternary ends in a literal `NaN` (see
@@ -977,8 +1171,11 @@ radical — compile under `auto` and `complex` with a **runtime rule**: the
 operand is bound once, and the comparison is `false` / the head `NaN` when the
 value's imaginary part is not exactly zero (`z < 2` is `true` at `z = 1`,
 `false` at `z = i`; `y > √x` compiles and is `false` where `x < 0`). A
-**statically** non-real operand (`i < 2`, `Floor(2i)`) has no compiled value
-and is a compile-time decline in every mode; `strict` declines every complex
+**statically** non-real operand of a real-only head (`Floor(2i)`) has no
+compiled value and is a compile-time decline in every mode; a statically
+non-real operand of an ordering comparison (`i < 2`) folds to `false`, the
+interpreter's answer (a value with no order decides false, user decision of
+2026-10-21), while `i < x` with `x` free declines; `strict` declines every complex
 operand of such a head, as before.
 
 The single most effective lever is not a mode: **declare the narrowest type
@@ -1411,6 +1608,13 @@ const fnResult = compile('x^2 + y', { to: 'interval-js' });
 fnResult.run({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
 // → { kind: 'interval', value: { lo: 1, hi: 4.5 } }
 ```
+
+#### Many Cells at Once
+
+`result.broadcast()` evaluates an `interval-js` function over an array of
+cells in one call and encodes each result as a `lo, hi, kind` triple, and
+`result.broadcastAsync()` runs the batch on a worker pool. See *Evaluating
+Many Points at Once* and *Worker Threads* above.
 
 #### GLSL Interval Target (`interval-glsl`)
 

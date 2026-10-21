@@ -392,16 +392,6 @@ complex: (a, b?) => Complex;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~tolerance~~ {#tolerance-2}
-
-```ts
-tolerance: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ExpressionComputeEngine.~~angularUnit~~ {#angularunit-2}
 
 ```ts
@@ -508,6 +498,21 @@ compilation and latches to `'off'` engine-wide on the first CSP
 
 <MemberCard>
 
+##### ExpressionComputeEngine.~~workers~~ {#workers-1}
+
+```ts
+workers: KernelPool | undefined;
+```
+
+The worker pool that `broadcastAsync()` of a compiled result uses, built
+by the host with `createKernelPool()`. The engine creates no worker on
+its own: with no pool every batch runs on the calling thread. One pool
+can serve several engines, and it is read at each call.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.~~trace~~ {#trace-1}
 
 ```ts
@@ -561,6 +566,21 @@ For a change that must last for one block of code only, use
 get precision(): number
 set precision(p: number | "auto" | "machine"): void
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~tolerance~~ {#tolerance-2}
+
+```ts
+get tolerance(): number
+set tolerance(v: number | "auto"): void
+```
+
+The absolute tolerance of the comparisons that involve a float, and of
+`chop()`. A number is kept as set; `'auto'` is `10^(-precision + 2)`,
+recomputed at each precision change.
 
 </MemberCard>
 
@@ -1243,9 +1263,9 @@ as `ce.number(2)` is the exact `2`: a part is an integer when it is a
 exponent is at most `10^6` (also at machine precision, and also outside
 the double range). When a part has a fraction, is a `number` past the
 safe integers, or is a `BigDecimal` with a larger exponent (`1e2000000`),
-the result is a float. The same rule applies to a `Complex` given to
-`ce.number()` or `ce.box()`: `ce.number(new Complex(2, 3))` is the exact
-`2+3i`, `ce.number(new Complex(2.5, 3))` is a float.
+the result is a float. A `Complex` given to `ce.number()` or `ce.box()`
+does not follow this rule: it holds two doubles, so it is always a
+float (`ce.number(new Complex(2, 3))` is the float `2.0 + 3.0i`).
 
 ```js
 ce.precision = 30;
@@ -1931,7 +1951,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
-     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| readonly (
+     \| [`Type`](#type-3)
+     \| \{
+     `replace`: ...;
+    \}
+     \| `undefined`)[]
      \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
@@ -2006,7 +2031,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
-     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| readonly (
+     \| [`Type`](#type-3)
+     \| \{
+     `replace`: ...;
+    \}
+     \| `undefined`)[]
      \| `undefined`;
  \}\>\>
   \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
@@ -2152,6 +2182,9 @@ listSequences(): string[]
 List all defined sequences.
 Returns an array of sequence names.
 
+A name is listed when the definition it has in the current scope is a
+sequence, as for `isSequence()`.
+
 </MemberCard>
 
 <MemberCard>
@@ -2163,6 +2196,12 @@ isSequence(name): boolean
 ```
 
 Check if a symbol is a defined sequence.
+
+The answer is for the definition that the name has in the current
+scope. A sequence declared in an enclosing scope is a sequence. A
+sequence is no longer one after the scope that declared it is popped,
+after `undeclare()`, or after a checkpoint restore that removes its
+declaration.
 
 ####### name
 
@@ -2380,6 +2419,78 @@ forget(symbol?): void
 ####### symbol?
 
 `string` \| `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~undeclare()~~ {#undeclare-1}
+
+```ts
+undeclare(names): void
+```
+
+Remove the binding of one or more names from the current scope.
+
+The binding goes whatever it holds: a value, a function given with
+`ce.assign()` or `ce.declare()`, or a function defined by one or more
+clauses (`f(x) := …`, `DefineFunction`). This is different from
+`forget()`, which removes assumptions and keeps the declaration.
+
+After the call, the name is not declared in the current scope:
+
+- When an enclosing scope declares the name, that declaration applies
+  again. `undeclare()` does not change an enclosing scope.
+- Otherwise, the name is a free symbol: `f(2)` stays unevaluated as
+  `["f", 2]`, and `x + 1` stays symbolic.
+- A later `ce.declare()`, `ce.assign()`, `f(x) := …` or `DefineFunction`
+  of the name is a new declaration, and is accepted.
+
+An expression boxed before the call does not use the removed binding
+either. A symbol reads the value that the scope chain holds when the
+expression is evaluated. A call such as `f(2)` boxed before the call
+evaluates to `["f", 2]`, and after a new definition of `f` in the same
+scope it uses the new definition, as for a function given again with
+`ce.assign()`.
+
+Assumptions about the name are not removed: an assumption applies to
+the name, and so to a new declaration of it. Use `forget()` to remove
+them.
+
+A checkpoint taken before the call (`ce.checkpoint()`) undoes it.
+
+####### names
+
+`string` \| readonly `string`[]
+
+###### Throws
+
+if a name is not declared in the current scope. A name declared
+only in an enclosing scope is not declared in the current scope. To
+remove a name only when it is declared, test
+`ce.context.lexicalScope.bindings.has(name)` first.
+
+###### Throws
+
+if a name is defined by a library: a standard library, a library
+given to the constructor, or a library loaded with `ce.loadLibrary()`.
+Also throws for any name of the system scope, which holds the standard
+library.
+
+###### Throws
+
+if a name is the variable of an operator such as `Sum`, or a
+parameter of a function, while that expression is evaluated.
+
+When one name of a list is refused, no binding is removed.
+
+```ts
+ce.pushScope();
+ce.parse('f(n) := n + 1').evaluate();
+ce.parse('f(2)').evaluate();   // 3
+ce.undeclare('f');
+ce.parse('f(2)').evaluate();   // f(2)
+```
 
 </MemberCard>
 
@@ -2890,8 +3001,9 @@ _isLiteralData(): boolean
 
 Internal. Is this node written-out DATA: a canonical `List` or `Tuple`
 bound to the standard library whose every element is a number literal,
-or such a `List` or `Tuple` in turn? Such a node holds no symbol and
-evaluates to itself. The answer is computed once per node.
+a failed cell, or such a `List` or `Tuple` in turn? A failed cell is an
+`Error` node with no symbol in it, and is data too. Such a node holds no
+symbol and evaluates to itself. The answer is computed once per node.
 
 </MemberCard>
 
@@ -5049,6 +5161,29 @@ Return `undefined` if the membership cannot be determined.
 
 <MemberCard>
 
+##### BaseCollectionHandlers.countOf? {#countof}
+
+```ts
+optional countOf?: (collection, target) => number | bigint | undefined;
+```
+
+Return the number of elements of the collection that are structurally
+the same as `target` (the `isSame()` comparison), without a walk of the
+collection. `Count(xs, v)` reads it.
+
+Give this handler when the collection can have more elements than a
+walk can visit (a combinatorial generator such as `Permutations` has
+`n!` elements): without it, `Count(xs, v)` walks every element. A count
+that is not a safe integer is returned as a `bigint`.
+
+Return `undefined` when the count cannot be computed without a walk.
+The answer must be the one a walk that compares each element with
+`isSame()` gives.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BaseCollectionHandlers.subsetOf? {#subsetof}
 
 ```ts
@@ -5135,6 +5270,48 @@ indexWhere: (collection, predicate) => number | undefined;
 Return the index of the first element that matches the predicate.
 
 If no element matches the predicate, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### IndexedCollectionHandlers.atBigint? {#atbigint}
+
+```ts
+optional atBigint?: (collection, index) => Expression | undefined;
+```
+
+Return the element at a 1-based position given as a `bigint`.
+
+The position is positive. A negative position is converted before the
+call: it counts from the end, so it is `count + index + 1`.
+
+`at()` takes a `number`, which cannot hold a position larger than
+`Number.MAX_SAFE_INTEGER` exactly. Give this handler when the collection
+can have more elements than that (its `count` can be a `bigint`): it is
+used for such a position, and for a negative position when the count is
+a `bigint`. Without it, these positions have no element.
+
+If the position is outside the collection, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### IndexedCollectionHandlers.indexOf? {#indexof}
+
+```ts
+optional indexOf?: (collection, target) => number | bigint | undefined;
+```
+
+Return the 1-based position of the first element that is structurally
+the same as `target` (the `isSame()` comparison), without a walk of the
+collection. `IndexOf(xs, v)` reads it.
+
+Return `0` when no element is the same as `target`, and `undefined` when
+the position cannot be computed without a walk. A position that is not a
+safe integer is returned as a `bigint`. The answer must be the one a walk
+that compares each element with `isSame()` gives.
 
 </MemberCard>
 
@@ -5491,7 +5668,8 @@ type BroadcastExemption =
   | "collection-result"
   | "evaluated-operands"
   | "whole-collection-compare"
-  | "single-collection-join";
+  | "single-collection-join"
+  | "surplus-operands";
 ```
 
 A shape of operand (or result) whose broadcast handling an operator's own
@@ -5836,7 +6014,12 @@ The eager producer's element count — see the `elementCount` contract on
 
 ```ts
 optional inferOperandTypes?: (ops, requirement) => 
-  | readonly (Type | undefined)[]
+  | readonly (
+  | Type
+  | {
+  replace: Type;
+ }
+  | undefined)[]
   | undefined;
 ```
 
@@ -8279,9 +8462,11 @@ type ResolvedSerializeLatexOptions = Omit<SerializeLatexOptions,
   | "numericSetStyle"
   | "indexStyle"
   | "readsAsPointList"
-  | "readsAsCardinality"> & {
+  | "readsAsCardinality"
+  | "readsAsMatrixPowerBase"> & {
   readsAsPointList: ((operands) => boolean | undefined) | undefined;
   readsAsCardinality: ((operand) => boolean | undefined) | undefined;
+  readsAsMatrixPowerBase: ((base) => boolean | undefined) | undefined;
   applyFunctionStyle: (expr, level) => DelimiterScale;
   groupStyle: (expr, level) => DelimiterScale;
   rootStyle: (expr, level) => RootStyle;
@@ -8342,6 +8527,21 @@ This allows the serialized LaTeX to vary depending on the depth of the
 expression.
 
 For example use `\Bigl(` for the top level, and `\bigl(` or `(` for others.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Serializer.depth {#depth}
+
+```ts
+readonly depth: number;
+```
+
+How deeply the expression being written is nested: 0 for the expression
+`serialize()` was called on, 1 for one of its operands, and so on. Unlike
+`level`, no serializer adjusts it, so it tells whether the expression is
+an operand of another one.
 
 </MemberCard>
 
@@ -8456,6 +8656,30 @@ numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-buil
 ```ts
 indexStyle: (expr, level) => "subscript" | "bracket";
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Serializer.serializeAtDepth() {#serializeatdepth}
+
+```ts
+serializeAtDepth(expr, depth): string
+```
+
+Serialize `expr` as if it stood at nesting `depth` (0 for the root), for
+a serializer that writes the same expression again in another form, or
+for an operand whose parent already writes the parentheses it would add.
+
+####### expr
+
+  \| [`MathJsonExpression`](#mathjsonexpression)
+  \| `null`
+  \| `undefined`
+
+####### depth
+
+`number`
 
 </MemberCard>
 
@@ -10118,7 +10342,12 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   canEnumerate: (expr) => boolean | undefined;
   elementCount: (expr) => number | undefined;
   inferOperandTypes: (ops, requirement) => 
-     | ReadonlyArray<Type | undefined>
+     | ReadonlyArray<
+     | Type
+     | {
+     replace: Type;
+    }
+     | undefined>
      | undefined;
 };
 ```
@@ -10573,7 +10802,12 @@ a declared `count` owns the answer, including its `undefined`.
 
 ```ts
 optional inferOperandTypes?: (ops, requirement) => 
-  | ReadonlyArray<Type | undefined>
+  | ReadonlyArray<
+  | Type
+  | {
+  replace: Type;
+ }
+  | undefined>
   | undefined;
 ```
 
@@ -10597,11 +10831,19 @@ Only a VALUE requirement reaches the handler: never `any`, `unknown`,
 `value`, `nothing`, an absence marker alone, or a function type. An
 absence arm (`real | missing`) is stripped before the call.
 
+An entry can also be `{ replace: t }`: the handler has combined the
+operand's current inferred type with this requirement itself, and `t`
+replaces that type instead of being intersected with it. This is for a
+combination that is not an intersection, such as a tuple that gets one
+more component. The same guards apply: a declared type never moves.
+
 `At` answers `dictionary<r> | indexed_collection<r>` for its base and
 `First`/`Second`/`Third`/`Last` answer `indexed_collection<r>`. The
 scalar reading is written on purpose: `xs[1] + 1` requires `number`
 of the element, exactly as `x + 1` infers a bare `x` as `number`.
-Design and rulings: `docs/INFERENCE_ROADMAP.md` §5.
+For a base that is a bare function parameter, `At` answers a
+`replace` entry that records each index read separately (a tuple for
+literal indices). Design and rulings: `docs/INFERENCE_ROADMAP.md` §5.
 
 </MemberCard>
 
@@ -10619,6 +10861,41 @@ type SymbolDefinitions = Readonly<{}>;
 
 Minimal interface for a LaTeX parser/serializer.
  Structurally compatible with `LatexSyntax` without importing it.
+
+<MemberCard>
+
+##### ILatexSyntax.dictionary? {#dictionary-2}
+
+```ts
+readonly optional dictionary?: readonly Partial<OnlyFirst<
+  | ExpressionEntry
+  | MatchfixEntry
+  | InfixEntry
+  | PostfixEntry
+  | PrefixEntry
+  | SymbolEntry
+  | FunctionEntry
+  | EnvironmentEntry
+  | DefaultEntry, {} & 
+  | ExpressionEntry
+  | MatchfixEntry
+  | InfixEntry
+  | PostfixEntry
+  | PrefixEntry
+  | SymbolEntry
+  | FunctionEntry
+  | EnvironmentEntry
+  | DefaultEntry>>[];
+```
+
+The dictionary entries, including the entries added with
+ `addEntries()`. A call to `addEntries()` gives a new array, so a
+ different array means a different dictionary. Rule strings are parsed
+ with these entries plus the rule entries. Optional: a minimal injected
+ syntax may not have it, and then rule strings are parsed with the
+ default dictionary. See `LatexSyntax.dictionary`.
+
+</MemberCard>
 
 <MemberCard>
 
@@ -11306,16 +11583,6 @@ complex: (a, b?) => Complex;
 
 <MemberCard>
 
-##### IComputeEngine.tolerance {#tolerance-1}
-
-```ts
-tolerance: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
 ##### IComputeEngine.angularUnit {#angularunit-1}
 
 ```ts
@@ -11422,6 +11689,21 @@ compilation and latches to `'off'` engine-wide on the first CSP
 
 <MemberCard>
 
+##### IComputeEngine.workers {#workers}
+
+```ts
+workers: KernelPool | undefined;
+```
+
+The worker pool that `broadcastAsync()` of a compiled result uses, built
+by the host with `createKernelPool()`. The engine creates no worker on
+its own: with no pool every batch runs on the calling thread. One pool
+can serve several engines, and it is read at each call.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.trace {#trace}
 
 ```ts
@@ -11475,6 +11757,21 @@ For a change that must last for one block of code only, use
 get precision(): number
 set precision(p: number | "auto" | "machine"): void
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.tolerance {#tolerance-1}
+
+```ts
+get tolerance(): number
+set tolerance(v: number | "auto"): void
+```
+
+The absolute tolerance of the comparisons that involve a float, and of
+`chop()`. A number is kept as set; `'auto'` is `10^(-precision + 2)`,
+recomputed at each precision change.
 
 </MemberCard>
 
@@ -12157,9 +12454,9 @@ as `ce.number(2)` is the exact `2`: a part is an integer when it is a
 exponent is at most `10^6` (also at machine precision, and also outside
 the double range). When a part has a fraction, is a `number` past the
 safe integers, or is a `BigDecimal` with a larger exponent (`1e2000000`),
-the result is a float. The same rule applies to a `Complex` given to
-`ce.number()` or `ce.box()`: `ce.number(new Complex(2, 3))` is the exact
-`2+3i`, `ce.number(new Complex(2.5, 3))` is a float.
+the result is a float. A `Complex` given to `ce.number()` or `ce.box()`
+does not follow this rule: it holds two doubles, so it is always a
+float (`ce.number(new Complex(2, 3))` is the float `2.0 + 3.0i`).
 
 ```js
 ce.precision = 30;
@@ -12845,7 +13142,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
-     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| readonly (
+     \| [`Type`](#type-3)
+     \| \{
+     `replace`: ...;
+    \}
+     \| `undefined`)[]
      \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
@@ -12920,7 +13222,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
-     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| readonly (
+     \| [`Type`](#type-3)
+     \| \{
+     `replace`: ...;
+    \}
+     \| `undefined`)[]
      \| `undefined`;
  \}\>\>
   \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
@@ -13066,6 +13373,9 @@ listSequences(): string[]
 List all defined sequences.
 Returns an array of sequence names.
 
+A name is listed when the definition it has in the current scope is a
+sequence, as for `isSequence()`.
+
 </MemberCard>
 
 <MemberCard>
@@ -13077,6 +13387,12 @@ isSequence(name): boolean
 ```
 
 Check if a symbol is a defined sequence.
+
+The answer is for the definition that the name has in the current
+scope. A sequence declared in an enclosing scope is a sequence. A
+sequence is no longer one after the scope that declared it is popped,
+after `undeclare()`, or after a checkpoint restore that removes its
+declaration.
 
 ####### name
 
@@ -13294,6 +13610,78 @@ forget(symbol?): void
 ####### symbol?
 
 `string` \| `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.undeclare() {#undeclare}
+
+```ts
+undeclare(names): void
+```
+
+Remove the binding of one or more names from the current scope.
+
+The binding goes whatever it holds: a value, a function given with
+`ce.assign()` or `ce.declare()`, or a function defined by one or more
+clauses (`f(x) := …`, `DefineFunction`). This is different from
+`forget()`, which removes assumptions and keeps the declaration.
+
+After the call, the name is not declared in the current scope:
+
+- When an enclosing scope declares the name, that declaration applies
+  again. `undeclare()` does not change an enclosing scope.
+- Otherwise, the name is a free symbol: `f(2)` stays unevaluated as
+  `["f", 2]`, and `x + 1` stays symbolic.
+- A later `ce.declare()`, `ce.assign()`, `f(x) := …` or `DefineFunction`
+  of the name is a new declaration, and is accepted.
+
+An expression boxed before the call does not use the removed binding
+either. A symbol reads the value that the scope chain holds when the
+expression is evaluated. A call such as `f(2)` boxed before the call
+evaluates to `["f", 2]`, and after a new definition of `f` in the same
+scope it uses the new definition, as for a function given again with
+`ce.assign()`.
+
+Assumptions about the name are not removed: an assumption applies to
+the name, and so to a new declaration of it. Use `forget()` to remove
+them.
+
+A checkpoint taken before the call (`ce.checkpoint()`) undoes it.
+
+####### names
+
+`string` \| readonly `string`[]
+
+###### Throws
+
+if a name is not declared in the current scope. A name declared
+only in an enclosing scope is not declared in the current scope. To
+remove a name only when it is declared, test
+`ce.context.lexicalScope.bindings.has(name)` first.
+
+###### Throws
+
+if a name is defined by a library: a standard library, a library
+given to the constructor, or a library loaded with `ce.loadLibrary()`.
+Also throws for any name of the system scope, which holds the standard
+library.
+
+###### Throws
+
+if a name is the variable of an operator such as `Sum`, or a
+parameter of a function, while that expression is evaluated.
+
+When one name of a list is refused, no binding is removed.
+
+```ts
+ce.pushScope();
+ce.parse('f(n) := n + 1').evaluate();
+ce.parse('f(2)').evaluate();   // 3
+ce.undeclare('f');
+ce.parse('f(2)').evaluate();   // f(2)
+```
 
 </MemberCard>
 
@@ -15517,8 +15905,12 @@ If this is an equation, solve the equation for the variables in vars.
 Otherwise, solve the equation `this = 0` for the variables in vars.
 
 For univariate equations, returns an array of solutions (roots). For a
-trigonometric equation, the array holds the principal roots, which
-represent the periodic families of roots. Returns `null` when the solver
+trigonometric equation, the array holds the principal roots: one root of
+each family of roots in one period, with no free parameter
+(`sin(x) = 1/2` gives `[π/6, 5π/6]`). This is different from the `Solve`
+operator, which gives the families themselves with a fresh integer
+parameter `t` (`[π/6 + 2πt, 5π/6 + 2πt]`), so that its list holds every
+root. Returns `null` when the solver
 cannot solve the equation, and also when it can find only a part of the
 roots: when the unknown is in a function that the solver cannot invert
 and that is not periodic (`(x - 1)·BesselJ(0, x) = 0`), or in a factor of
@@ -16186,8 +16578,14 @@ isSame(rhs): boolean
 Fast exact structural/symbolic equality check.
 
 Returns `true` if the expression is structurally identical to `rhs`.
-For symbols with value bindings, follows the binding (e.g., if `one = 1`,
-then `ce.symbol('one').isSame(1)` is `true`).
+The value of a symbol is never followed: if `one` is assigned `1`,
+`ce.symbol('one').isSame(1)` is `false`.
+
+The elements of a set literal are not ordered, so two sets with the same
+elements in a different order are the same:
+`ce.box(['Set', 2, 1]).isSame(ce.box(['Set', 1, 2]))` is `true`. A
+set-builder (`Set(body, Element(k, S))`) compares its two operands by
+position.
 
 Accepts JavaScript primitives: `number`, `bigint`, `boolean`, `string`.
 
@@ -16877,6 +17275,25 @@ optional rank?: number;
 ```ts
 data: DataTypeMap[DT][];
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### TensorData.holdsFloat? {#holdsfloat}
+
+```ts
+optional holdsFloat?: boolean;
+```
+
+Is the tensor a float tensor? `true` when an entry of the matrix the
+tensor was packed from is a float (a number literal that is not exact,
+such as `1.5` or `2.0`), or when the tensor was computed from a float
+tensor. Every cell of a float tensor is read back as a float, even when
+its value is an integer: the determinant of `[[1.5, 0], [0, 2]]` is the
+float `3`, not the exact `3`. Only the numeric dtypes (`float64`,
+`complex128`, …) use it: a cell of the `expression` dtype keeps its own
+exactness.
 
 </MemberCard>
 
