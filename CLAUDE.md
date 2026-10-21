@@ -164,6 +164,14 @@ npm start       # Regenerates and serves locally
 - Use `<FunctionDefinition>` and `<Signature>` components for API docs
 - Include MathJSON examples and LaTeX examples with `<Latex value="..." />`
 
+**Diagrams:**
+- A ```` ```mermaid ```` fence renders as a diagram on both sites
+  (`@docusaurus/theme-mermaid`, enabled by `markdown.mermaid: true` in both
+  configs). The diagram is drawn in the browser; the static HTML holds only
+  an empty container, so the knowledge-base bundles keep the fence as text.
+- The theme follows the color mode: `neutral` in light mode, `dark` in dark
+  mode (`themeConfig.mermaid` in both configs).
+
 ### Component Patterns
 
 The codebase uses custom React components:

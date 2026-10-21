@@ -38,6 +38,11 @@ const config: Config = {
   onDuplicateRoutes: 'warn',
 
   markdown: {
+    // Turn a ```mermaid fence into a <mermaid> element, rendered in the
+    // browser by `@docusaurus/theme-mermaid` (listed under `themes` below).
+    // This transform runs before the custom remark plugins, so the fence
+    // never reaches the swizzled CodeBlock.
+    mermaid: true,
     hooks: {
         onBrokenMarkdownLinks: 'warn',
     },
@@ -321,7 +326,8 @@ const config: Config = {
     // ],
   ],
 
-  // themes: ['@docusaurus/theme-search-algolia'],
+  // Renders the <mermaid> elements produced by `markdown.mermaid` above.
+  themes: ['@docusaurus/theme-mermaid'],
 
 
   themeConfig:
@@ -376,6 +382,11 @@ const config: Config = {
   
       navbar: getDocusaurusNavbarConfig(),
       footer: getDocusaurusFooterConfig(),
+      // Mermaid picks the theme from the Docusaurus color mode, which follows
+      // the OS preference here (`colorMode.respectPrefersColorScheme`).
+      mermaid: {
+        theme: { light: 'neutral', dark: 'dark' },
+      },
       prism: {
         additionalLanguages: [
           // See https://prismjs.com/#supported-languages for a full list

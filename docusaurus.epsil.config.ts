@@ -104,6 +104,9 @@ const config: Config = {
   onDuplicateRoutes: 'throw',
 
   markdown: {
+    // Turn a ```mermaid fence into a <mermaid> element, rendered in the
+    // browser by `@docusaurus/theme-mermaid` (listed under `themes` below).
+    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: 'warn',
     },
@@ -231,6 +234,8 @@ const config: Config = {
   // whole lunr index ships to the browser and search runs with no network
   // round-trip and no service to keep in sync with the deploy.
   themes: [
+    // Renders the <mermaid> elements produced by `markdown.mermaid` above.
+    '@docusaurus/theme-mermaid',
     [
       '@easyops-cn/docusaurus-search-local',
       /** @type {import('@easyops-cn/docusaurus-search-local').PluginOptions} */
@@ -285,6 +290,11 @@ const config: Config = {
 
       navbar: getDocusaurusNavbarConfig(epsilNavigation),
       footer: getDocusaurusFooterConfig(epsilNavigation),
+      // Mermaid picks the theme from the Docusaurus color mode, which follows
+      // the OS preference here (`colorMode.respectPrefersColorScheme`).
+      mermaid: {
+        theme: { light: 'neutral', dark: 'dark' },
+      },
       prism: {
         additionalLanguages: [
           'markup',
