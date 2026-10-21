@@ -71,6 +71,19 @@ early:
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
 
+```mermaid
+flowchart TD
+  call["compile(expr, options)"] --> ok{"every operator lowers<br/>for this target?"}
+  ok -- yes --> success["success: true<br/>run() executes the generated code"]
+  ok -- no --> fb{"options.fallback"}
+  fb -- "false" --> throw["throws, with the reason"]
+  fb -- "default" --> fail["success: false<br/>error says why<br/>run() uses the interpreter"]
+  fail --> why["operand shape not supported,<br/>a target gap for a known operator,<br/>or an unknown operator"]
+```
+
+The three reasons are described under
+[Why a compilation declined](#why-a-compilation-declined).
+
 ### The `run()` Contract: Shaped Inputs, Read-Only Results
 
 On the `javascript` target, `run()` requires inputs of the shape the compiled

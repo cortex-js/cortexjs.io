@@ -23,6 +23,25 @@ pass and what the engine may change underneath them.
 
 ## The Three Tiers
 
+```mermaid
+flowchart TD
+  src["source / MathJSON"]
+  src -- "form: 'raw'" --> raw
+  src -- "form: 'structural'" --> structural
+  src -- "default" --> canonical
+  raw -- "box with form: 'structural'" --> structural
+  raw -- ".canonical" --> canonical
+  structural -- ".canonical" --> canonical
+  structural -- ".subs(), .map()<br/>shape preserved" --> structural
+  canonical -- ".subs(), .map()<br/>re-canonicalized" --> canonical
+  canonical -- ".evaluate(), .N()" --> value["canonical value"]
+  structural -. ".evaluate(), .N()<br/>via the canonical form" .-> value
+  raw -. ".evaluate(), .N()<br/>via the canonical form" .-> value
+```
+
+Nothing leads back from `canonical` to a parse shape: a tree that must stay
+in parse vocabulary has to be raw or structural from the parse onward.
+
 <div className="symbols-table first-column-header" style={{"--first-col-width":"22ch"}}>
 
 |  | raw <br/>`{ form: 'raw' }` | **structural** <br/>`{ form: 'structural' }` | canonical <br/>(default) |

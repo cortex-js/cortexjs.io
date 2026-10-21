@@ -73,47 +73,38 @@ Type A is a **subtype** of type B if all values of type A are also values of typ
 It is also said that type A **matches** type B.
 
 The following diagram shows selected relationships in the current
-implementation. Each child is a subtype of its parent. It is an overview,
-not a complete lattice of parameterized types, unions, and intersections.
+implementation, in three parts. Each child is a subtype of its parent. The
+dashed arrows show a sample of the edges into `never`, which every type has.
+It is an overview, not a complete lattice of parameterized types, unions,
+and intersections.
 
-```plaintext
-any
-├── error
-├── nothing
-├── missing
-└── unknown
-    └── expression
-        ├── symbol
-        ├── function
-        └── value
-            ├── color
-            ├── regexp
-            ├── type
-            ├── object
-            ├── scalar
-            │   ├── boolean
-            │   ├── character
-            │   └── number
-            │       ├── infinity
-            │       ├── nan
-            │       └── complex
-            │           ├── imaginary
-            │           └── real
-            │               └── rational
-            │                   └── integer
-            └── collection
-                ├── set
-                ├── dictionary
-                │   └── record
-                └── indexed_collection
-                    ├── tuple
-                    ├── string
-                    └── list
-                        ├── range
-                        ├── vector
-                        └── matrix
+```mermaid
+flowchart TD
+  any --> error & nothing & missing & unknown
+  unknown --> expression
+  expression --> symbol & function & value
+  value --> color & regexp & type & object & scalar & collection
+  error & nothing & missing & symbol & function -.-> never["never<br/>(below every type)"]
+```
 
-never is below EVERY type above (and every constructed type).
+The `scalar` branch:
+
+```mermaid
+flowchart TD
+  scalar --> boolean & character & number
+  number --> infinity & nan & complex
+  complex --> imaginary & real
+  real --> rational --> integer
+```
+
+The `collection` branch:
+
+```mermaid
+flowchart TD
+  collection --> set & dictionary & indexed_collection
+  dictionary --> record
+  indexed_collection --> tuple & string & list
+  list --> range & vector & matrix
 ```
 
 **`never` is the bottom type**, not a sibling of the other types under

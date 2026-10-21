@@ -294,6 +294,10 @@ const config: Config = {
       // the OS preference here (`colorMode.respectPrefersColorScheme`).
       mermaid: {
         theme: { light: 'neutral', dark: 'dark' },
+        // Mermaid wraps a node label at 200px by default, which turns a
+        // one-line step into a tall box. The docs column is about 750px
+        // wide, so a wider wrap keeps flowcharts compact.
+        options: { flowchart: { wrappingWidth: 360 } },
       },
       prism: {
         additionalLanguages: [

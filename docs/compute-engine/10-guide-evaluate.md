@@ -474,6 +474,20 @@ non-canonical expression.
 
 When a function is evaluated, the following steps are followed:
 
+```mermaid
+flowchart TD
+  start["evaluate f(a, b, …)"] --> canon{"canonical?"}
+  canon -- no --> err["error: canonicalize first"]
+  canon -- yes --> lazy{"f is lazy?"}
+  lazy -- yes --> assoc
+  lazy -- no --> args["evaluate each argument, left to right<br/>a held argument, or a Hold, stays symbolic<br/>a Sequence result is spliced in; an empty one is dropped"]
+  args --> assoc{"f is associative?"}
+  assoc -- yes --> flat["flatten: f(f(a, b), c) → f(a, b, c)"]
+  assoc -- no --> apply
+  flat --> apply["apply f to the arguments"]
+  apply --> result["return the result in canonical form"]
+```
+
 1. If the expression is not canonical, it cannot be evaluated and an error is
    thrown. The expression must be canonicalized first.
 

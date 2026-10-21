@@ -28,6 +28,24 @@ and the properties matching an attribute (`readOnly` for `read-only`, etc...)
 and related attributes are safe to set, but the values you read back may be 
 different once the component is mounted.
 
+```mermaid
+stateDiagram-v2
+  s1: ① Before Initialization
+  s2: ② Initialization
+  s3: ③ Constructed
+  s4: ④ Attached / Mounted
+  s5: ⑤ Detached / Unmounted
+  [*] --> s1: page loaded, markup only
+  s1 --> s2: scripts loaded
+  s2 --> s3: MathfieldElement registered (customElements.whenDefined)
+  [*] --> s3: new MathfieldElement()
+  s3 --> s4: attached to the DOM (appendChild), "mount" event
+  s4 --> s5: removed from the DOM (remove), "unmount" event
+  s5 --> s4: re-attached
+  s5 --> [*]: disposed
+  s4 --> [*]: page closed
+```
+
 ## ① Before Initialization
 
 When the page is loaded, before any code is loaded or executed, elements with a
@@ -130,7 +148,7 @@ vice versa).
 **To be notified when this stage is reached**, listen for the `mount` event on 
 the element:
 ```javascript
-md.addEventListener('mount', (ev) => {
+mf.addEventListener('mount', (ev) => {
   console.log('mf is mounted');
   // You can now read default options value for example, or 
   // call `setValue()` with format options other than LaTeX.
@@ -155,7 +173,7 @@ or to be re-attached.
 **To be notified when this stage is reached**, listen for the `unmount` event on 
 the element:
 ```javascript
-md.addEventListener('unmount')((ev) => {
+mf.addEventListener('unmount', (ev) => {
   console.log('mf is about to be unmounted');
   // Last chance to interact with the mathfield
   console.log(ev.target.getValue('ascii-math'));

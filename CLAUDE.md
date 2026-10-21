@@ -170,7 +170,12 @@ npm start       # Regenerates and serves locally
   configs). The diagram is drawn in the browser; the static HTML holds only
   an empty container, so the knowledge-base bundles keep the fence as text.
 - The theme follows the color mode: `neutral` in light mode, `dark` in dark
-  mode (`themeConfig.mermaid` in both configs).
+  mode (`themeConfig.mermaid` in both configs). Node labels wrap at 360px
+  instead of mermaid's 200px default, so a one-line step stays one line.
+- Prefer `flowchart TD` over `LR` for more than four steps: the content
+  column is about 750px wide and a wide diagram is scaled down until its
+  labels are unreadable. Keep a flowchart under about 8 levels; split a
+  large tree into parts, as the type hierarchy in guide 08 does.
 
 ### Component Patterns
 

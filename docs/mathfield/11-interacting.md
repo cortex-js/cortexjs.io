@@ -244,6 +244,24 @@ event will cause the modification to be prevented.
 If the `beforeinput` event is not canceled, the mathfield content is modified 
 and a `input` event is dispatched. The `input` event is not cancelable.
 
+```mermaid
+sequenceDiagram
+  actor User
+  participant MF as math-field
+  participant App as your listeners
+  User->>MF: types, pastes, deletes…
+  MF->>App: beforeinput (cancelable)
+  alt preventDefault() called
+    App-->>MF: canceled
+    Note over MF: content unchanged
+  else not canceled
+    Note over MF: content modified
+    MF->>App: input (not cancelable)
+  end
+  User->>MF: presses Return/Enter, or focus leaves
+  MF->>App: change (not in LaTeX editing mode)
+```
+
 ## Detecting When the User has Finished Editing a Mathfield
 
 **To detect when the user presses the <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key in a mathfield**,
