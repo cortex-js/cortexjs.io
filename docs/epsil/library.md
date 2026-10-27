@@ -11,7 +11,7 @@ date: Last Modified
 ---
 # Epsil Standard Library
 
-The 706 functions and constants of the standard library, by category.
+The 710 functions and constants of the standard library, by category.
 Each row gives a name, its signature (for a function) or its kind and type
 (for a constant or variable), and the first sentence of its description —
 the same description `epsil doc <name>` prints in full and the editor
@@ -22,18 +22,18 @@ To search the library by concept rather than by name, use
 `epsil doc <keywords>` (see the [CLI](/cli/)); the
 [guide for agents](/for-agents/) lists the names most often needed.
 
-- [Core](#core) — 114 definitions · [full reference](/reference/core/)
+- [Core](#core) — 115 definitions · [full reference](/reference/core/)
 - [Control structures](#control-structures) — 13 definitions · [full reference](/reference/control-structures/)
 - [Logic](#logic) — 27 definitions · [full reference](/reference/logic/)
 - [Collections](#collections) — 126 definitions · [full reference](/reference/collections/)
 - [Colors](#colors) — 20 definitions · [full reference](/reference/colors/)
 - [Regular expressions](#regular-expressions) — 4 definitions · [full reference](/reference/regexp/)
 - [Relations](#relations) — 30 definitions · [full reference](/reference/relop/)
-- [Arithmetic](#arithmetic) — 101 definitions · [full reference](/reference/arithmetic/)
+- [Arithmetic](#arithmetic) — 103 definitions · [full reference](/reference/arithmetic/)
 - [Fractals](#fractals) — 2 definitions · [full reference](/reference/fractals/)
 - [Trigonometry](#trigonometry) — 42 definitions · [full reference](/reference/trigonometry/)
 - [Calculus](#calculus) — 24 definitions · [full reference](/reference/calculus/)
-- [Polynomials](#polynomials) — 17 definitions · [full reference](/reference/polynomials/)
+- [Polynomials](#polynomials) — 18 definitions · [full reference](/reference/polynomials/)
 - [Combinatorics](#combinatorics) — 11 definitions · [full reference](/reference/combinatorics/)
 - [Number theory](#number-theory) — 60 definitions · [full reference](/reference/number-theory/)
 - [Special functions](#special-functions) — 19 definitions · [full reference](/reference/special-functions/)
@@ -54,6 +54,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `apply` | `Apply` | `(name: any, arguments: any*) -> unknown` | Apply a function to a list of arguments |
 | `applyWhole` | `ApplyWhole` | `(name: any, arguments: any*) -> unknown` | Apply a function to arguments, each bound whole (engine-internal). |
 | `arc` | `Arc` | `(any+) -> number` | Arc / wide-hat accent measure (`\widehat{ABC}`) — opaque typed head; not evaluated. |
+| — | `AssertPresent` | `(any) -> unknown` | Assert that a value is present: return it unchanged, or an `expected-present` error when it is ABSENT (`Missing`, `Undefined`, `NaN`, or `Indeterminate`). |
 | — | `Assign` | `(expression \| symbol, any) scope -> any` | Assign a value to a symbol or define a sequence. |
 | `assume` | `Assume` | `(any) scope -> string` | Record an assumption about a symbol. |
 | `baseForm` | `BaseForm` | `(T, (number \| string)?) -> T where T: number` | `BaseForm(expr, base=10)` |
@@ -78,7 +79,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `ErrorCode` | `(string, any*) -> error` | Structured error code with optional arguments. |
 | `evaluate` | `Evaluate` | `(any) -> unknown` | Evaluate an expression. |
 | `evaluateAt` | `EvaluateAt` | `(function, lower: expression, upper: expression) -> unknown` | Evaluate a function at one point or between two bounds. |
-| `findRoot` | `FindRoot` | `(any, any) -> dictionary` | FindRoot(equations, params): numerically find parameter values that |
+| `findRoot` | `FindRoot` | `(any, any, dictionary?) -> dictionary` | FindRoot(equations, params): numerically find parameter values that |
 | — | `Function` | `(expression, (function \| symbol)*) -> function` | A function literal |
 | `geometricVector` | `GeometricVector` | `(any, any) -> expression` | Geometric vector (directed segment between two points) — opaque typed head. |
 | `graphemeClusters` | `GraphemeClusters` | `(character \| string) -> list<character>` | A collection of grapheme clusters from a string. |
@@ -174,14 +175,14 @@ The [Control structures reference](/reference/control-structures/) has the full 
 | — | `Comprehension` | `(body: expression, iterators: expression+) -> list` | Value-producing comprehension: evaluate `body` in nested iteration over one or more `Element` clauses and collect the results into a list. |
 | — | `Condition` | `(expression, symbol?) -> boolean` | Test whether a value satisfies one or more conditions. |
 | — | `Continue` | `() -> nothing` | Skip to the next iteration of the enclosing loop. |
-| `fixedPoint` | `FixedPoint` | `(any) -> unknown` | Iterate a function until a fixed point is reached. |
-| — | `If` | `(expression, expression, expression?) -> any` | Conditional branch: evaluate one of two expressions. |
+| `fixedPoint` | `FixedPoint` | `(function, initial: any, maxIterations: integer?) -> unknown` | Apply a function repeatedly, starting from an initial value, until two successive values are the same: `FixedPoint(f, x)` is the first of `f(x)`, `f(f(x))`, … that `f` maps to itself. |
+| — | `If` | `(expression, expression, expression?) -> any` | `If(c, e1, e2)` evaluates to `e1` when `c` is `True` and to `e2` otherwise; without `e2` it is `Missing` when `c` is `False`. |
 | — | `Loop` | `(body: expression, iterators: expression*) -> any` | Imperative loop, evaluated **for effect**. |
 | — | `Match` | `(expression, expression+) -> unknown` | Structural pattern match. |
 | — | `MatchCase` | `(expression, expression, expression?) -> nothing` | A case of a `Match`: `MatchCase(pattern, body)` or `MatchCase(pattern, guard, body)`. |
 | — | `Pin` | `(expression) -> nothing` | Inside a `Match` pattern, `Pin(expr)` matches the value of `expr` (evaluated at match time) rather than its structure. |
 | `when` | `When` | `(expression, boolean) -> any` | Conditional/restriction value. |
-| — | `Which` | `(expression+) -> unknown` | Return the value for the first condition that is true. |
+| — | `Which` | `(expression+) -> unknown` | `Which(c1, e1, c2, e2, …)` evaluates to the value of the first `e` whose condition `c` is `True`, and to `Missing` when no condition is `True`. |
 
 ## Logic
 
@@ -231,7 +232,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `argMin` | `ArgMin` | `(indexed_collection<T>, key: ((T) any -> unknown)?) -> integer where T` | Return the 1-based index of the element that minimizes the given key function (or the element itself when no key is given). |
 | — | `At` | `(value: any, index: (boolean \| character \| indexed_collection<any> \| number \| string)+) -> unknown` | Access an element of an indexed collection. |
 | `chunk` | `Chunk` | `((S, integer) -> list<string> where S: string) & ((indexed_collection, integer) -> list<list>)` | Split the collection into `k` nearly equal-sized groups. |
-| `chunkBy` | `ChunkBy` | `((S, key: (character) any -> unknown) -> list<string> where S: string) & ((indexed_collection<T>, key: (T) any -> unknown) -> list<list<T>> where T)` | Split the collection into maximal runs of consecutive elements over which the key function yields the same value. |
+| `chunkBy` | `ChunkBy` | `((S, key: (character) any -> unknown) -> list<string> where S: string) & ((indexed_collection<T>, key: (T) any -> unknown) -> list<list<T>> where T: any)` | Split the collection into maximal runs of consecutive elements over which the key function yields the same value. |
 | `closed` | `Closed` | `(number) -> number` | Closed(x): the endpoint x of an Interval, marked as included. |
 | `complement` | `Complement` | `(set<any>+) -> set` | Return the elements of the first set that are not in any of the subsequent sets. |
 | `complexNumbers` | `ComplexNumbers` | constant `set<complex>` | The set of all finite complex numbers. |
@@ -241,11 +242,11 @@ The [Collections reference](/reference/collections/) has the full description an
 | `countIf` | `CountIf` | `(collection<T>, predicate: (T) any -> boolean) -> integer where T` | Return the number of elements in the collection satisfying the predicate. |
 | `cycle` | `Cycle` | `(list<any>) -> list` | Produce an infinite sequence by cycling through the elements of a finite collection. |
 | `dedup` | `Dedup` | `(collection<any>) -> collection` | Return the collection with consecutive duplicate elements collapsed to a single element. |
-| `deleteAt` | `DeleteAt` | `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T)` | Return a copy of the indexed collection with the element at the 1-based `index` removed. |
+| `deleteAt` | `DeleteAt` | `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T: any)` | Return a copy of the indexed collection with the element at the 1-based `index` removed. |
 | — | `Dictionary` | `(tuple<string, unknown>*) -> dictionary` | A collection of key -&gt; value entries with string keys (`{x -> 1, y -> 2}` in Epsil). |
 | `dictionaryFrom` | `DictionaryFrom` | `(collection<any>) -> dictionary` | Create a dictionary from the elements of a collection of (key, value) pairs. |
 | `differences` | `Differences` | `(indexed_collection<any>) -> indexed_collection` | Return the successive differences of a collection: a collection whose k-th element is `x(k+1) − xk`, of length one less than the input. |
-| `drop` | `Drop` | `((xs: T, count: number) -> T where T: string) & ((xs: indexed_collection<T>, count: number) -> list<T> where T)` | Return the indexed collection without its first `n` elements. |
+| `drop` | `Drop` | `((xs: T, count: number) -> T where T: string) & ((xs: indexed_collection<T>, count: number) -> list<T> where T: any)` | Return the indexed collection without its first `n` elements. |
 | `dropWhile` | `DropWhile` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> indexed_collection where T` | Return the collection with its leading elements for which the predicate returns True removed; the remaining elements are returned unfiltered. |
 | — | `Element` | `(any, any, boolean?) -> boolean` | Test whether a value is an element of a collection. |
 | `emptySet` | `EmptySet` | constant `set` | The empty set, a set containing no elements. |
@@ -257,7 +258,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `field` | `Field` | `(value: any, field: string) -> unknown` | Access a named field of a value: `p.x` in Epsil. |
 | `fill` | `Fill` | `(function, tuple) -> list` | Produce a 2D list (matrix) by applying a function to each pair of row and column indexes. |
 | `filter` | `Filter` | `(collection<T>, predicate: (T) any -> boolean) -> collection where T` | Return the elements of the collection for which the predicate function returns True. |
-| `find` | `Find` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T` | Return the first element of the collection satisfying the predicate, or Nothing if none found. |
+| `find` | `Find` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T: any` | Return the first element of the collection satisfying the predicate, or Nothing if none found. |
 | `first` | `First` | `(xs: indexed_collection<any>) -> any` | The first element of a collection. |
 | `flatMap` | `FlatMap` | `(collection<T>, mapping: (T) any -> U) -> list where T, U` | Map a function over a collection and concatenate the results into a single list, splicing collection-valued results and keeping scalar results as single elements. |
 | `fold` | `Fold` | `(reducer: (unknown, T) any -> unknown, initial: value, collection<T>) -> value where T` | Fold a collection to a single value, applying a binary function f(accumulator, element) left to right from an initial value. |
@@ -265,7 +266,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `imaginaryNumbers` | `ImaginaryNumbers` | constant `set<imaginary>` | The set of all imaginary numbers. |
 | `indexOf` | `IndexOf` | `(indexed_collection<any>, any) -> integer` | Return the 1-based index of the first occurrence of value in collection, or 0 if not found. |
 | `indexWhere` | `IndexWhere` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> integer where T` | Return the 1-based index of the first element satisfying the predicate, or 0 if not found. |
-| `insert` | `Insert` | `(indexed_collection<T>, integer, T) -> list<T> where T` | Return a copy of the indexed collection with `value` inserted before the 1-based `index`. |
+| `insert` | `Insert` | `(indexed_collection<T>, integer, T) -> list<T> where T: any` | Return a copy of the indexed collection with `value` inserted before the 1-based `index`. |
 | `integers` | `Integers` | constant `set<integer>` | The set of all finite integers. |
 | `intersection` | `Intersection` | `(any+) -> set` | Return the intersection of one or more collections as a set. |
 | `interval` | `Interval` | `(number, number) -> set<real>` | A set of real numbers between two endpoints. |
@@ -284,7 +285,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `maxBy` | `MaxBy` | `(collection<T>, key: (T) any -> unknown) -> value where T` | Return the element of the collection that maximizes the given key function. |
 | — | `MemberCall` | `(receiver: any, member: string, arguments: any*) -> unknown` | Call the member `name` of a value with the value as its first argument: `c.area(2)` in Epsil. |
 | `minBy` | `MinBy` | `(collection<T>, key: (T) any -> unknown) -> value where T` | Return the element of the collection that minimizes the given key function. |
-| `most` | `Most` | `((T) -> T where T: string) & ((indexed_collection<T>) -> list<T> where T)` | Return the collection without the last element. |
+| `most` | `Most` | `((T) -> T where T: string) & ((indexed_collection<T>) -> list<T> where T: any)` | Return the collection without the last element. |
 | `negativeIntegers` | `NegativeIntegers` | constant `set<integer>` | The set of all negative integers. |
 | `negativeNumbers` | `NegativeNumbers` | constant `set<real>` | The set of all negative real numbers. |
 | `nonNegativeIntegers` | `NonNegativeIntegers` | constant `set<integer>` | The set of all non-negative integers. |
@@ -297,39 +298,39 @@ The [Collections reference](/reference/collections/) has the full description an
 | — | `NotSupersetEqual` | `(lhs: any, rhs: any) -> boolean` | Test whether the first collection is not a superset (possibly equal) of the second. |
 | `numbers` | `Numbers` | constant `set<number>` | The set of all numbers. |
 | `open` | `Open` | `(number) -> number` | Open(x): the endpoint x of an Interval, marked as excluded. |
-| `ordering` | `Ordering` | `(indexed_collection<T>, order: (((T) any -> unknown) \| ((any, any) any -> boolean \| number))?) -> list<integer> where T` | Return the indexes that would sort the collection. |
+| `ordering` | `Ordering` | `(indexed_collection<T>, order: (((T) any -> unknown) \| ((any, any) any -> boolean \| number))?) -> list<integer> where T: any` | Return the indexes that would sort the collection. |
 | — | `Pair` | `(first: T, second: U) -> tuple<T, U> where T, U` | A tuple of two elements |
-| `partition` | `Partition` | `(indexed_collection<T>, ((T) any -> boolean) \| integer, integer?) -> list<list<T>> where T` | Partition a collection into consecutive chunks each of size `n`; the trailing chunk may be shorter when `n` does not divide the length. |
+| `partition` | `Partition` | `(indexed_collection<T>, ((T) any -> boolean) \| integer, integer?) -> list<list<T>> where T: any` | Partition a collection into consecutive chunks each of size `n`; the trailing chunk may be shorter when `n` does not divide the length. |
 | `pointList` | `PointList` | `(any+) -> any` | A list of points: zips collection components into a List of point-tuples (Desmos point-list idiom); a plain point when no component is a collection. |
 | `pointX` | `PointX` | `(xs: collection<any> \| tuple) -> any` | The x-coordinate of a point, broadcasting over a list of points. |
 | `pointY` | `PointY` | `(xs: collection<any> \| tuple) -> any` | The y-coordinate of a point, broadcasting over a list of points. |
 | `pointZ` | `PointZ` | `(xs: collection<any> \| tuple) -> any` | The z-coordinate of a point, broadcasting over a list of points. |
-| `position` | `Position` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> list<integer> where T` | Return a list of indexes of elements in the collection satisfying the predicate. |
+| `position` | `Position` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> list<integer> where T: any` | Return a list of indexes of elements in the collection satisfying the predicate. |
 | `positiveIntegers` | `PositiveIntegers` | constant `set<integer>` | The set of all positive integers. |
 | `positiveNumbers` | `PositiveNumbers` | constant `set<real>` | The set of all positive real numbers. |
 | `primes` | `Primes` | constant `set<integer>` | The set of all prime numbers. |
 | `quotientRing` | `QuotientRing` | `(set<any>, any) -> set` | The quotient of a ring by the ideal generated by the second argument. |
-| `randomShuffle` | `RandomShuffle` | `((T) random -> T where T: string) & ((indexed_collection<T>) random -> list<T> where T)` | Randomize the order of the elements in the collection. |
+| `randomShuffle` | `RandomShuffle` | `((T) random -> T where T: string) & ((indexed_collection<T>) random -> list<T> where T: any)` | Randomize the order of the elements in the collection. |
 | — | `Range` | `(number, number?, step: number?) -> list<number>` | A sequence of numbers from a start to an end value with an optional step. |
 | `rangeOf` | `RangeOf` | `(indexed_collection<T>, indexed_collection<T>, from: integer?) -> nothing \| range where T` | Return the 1-based inclusive index span of the first occurrence of `needle` as a contiguous subsequence of the indexed collection, or `Nothing` when it does not occur. |
 | `rationalNumbers` | `RationalNumbers` | constant `set<rational>` | The set of all finite rational numbers. |
 | `realNumbers` | `RealNumbers` | constant `set<real>` | The set of all finite real numbers. |
 | `reduce` | `Reduce` | `(collection<T>, reducer: (unknown, T) any -> unknown, initial: value?) -> value where T` | Reduce (fold) a collection to a single value by repeatedly applying a binary function, with an optional initial value. |
 | `repeat` | `Repeat` | `(value: any, count: integer?) -> list` | Produce a sequence by repeating a single value. |
-| `replaceAt` | `ReplaceAt` | `(indexed_collection<T>, integer, T) -> list<T> where T` | Return a copy of the indexed collection with the element at the 1-based `index` replaced by `value`. |
-| `residueClass` | `ResidueClass` | `(any, any) -> value` | An element of ℤ/nℤ: the class of the integer `k` modulo `n`. |
-| `rest` | `Rest` | `((T) -> T where T: string) & ((indexed_collection<T>) -> list<T> where T)` | Return the collection without the first element. |
-| `reverse` | `Reverse` | `((T) -> T where T: string) & ((T) -> T where T: list) & ((indexed_collection<T>) -> list<T> where T)` | Reverse the order of the elements of an indexed collection. |
-| `rotateLeft` | `RotateLeft` | `((T, integer?) -> T where T: string) & ((T, integer?) -> T where T: list) & ((indexed_collection<T>, integer?) -> list<T> where T)` | Rotate the elements of the collection to the left by n positions. |
-| `rotateRight` | `RotateRight` | `((T, integer?) -> T where T: string) & ((T, integer?) -> T where T: list) & ((indexed_collection<T>, integer?) -> list<T> where T)` | Rotate the elements of the collection to the right by n positions. |
+| `replaceAt` | `ReplaceAt` | `(indexed_collection<T>, integer, T) -> list<T> where T: any` | Return a copy of the indexed collection with the element at the 1-based `index` replaced by `value`. |
+| `residueClass` | `ResidueClass` | `(any, any) -> residue` | An element of ℤ/nℤ: the class of the integer `k` modulo `n`. |
+| `rest` | `Rest` | `((T) -> T where T: string) & ((indexed_collection<T>) -> list<T> where T: any)` | Return the collection without the first element. |
+| `reverse` | `Reverse` | `((T) -> T where T: string) & ((T) -> T where T: list) & ((indexed_collection<T>) -> list<T> where T: any)` | Reverse the order of the elements of an indexed collection. |
+| `rotateLeft` | `RotateLeft` | `((T, integer?) -> T where T: string) & ((T, integer?) -> T where T: list) & ((indexed_collection<T>, integer?) -> list<T> where T: any)` | Rotate the elements of the collection to the left by n positions. |
+| `rotateRight` | `RotateRight` | `((T, integer?) -> T where T: string) & ((T, integer?) -> T where T: list) & ((indexed_collection<T>, integer?) -> list<T> where T: any)` | Rotate the elements of the collection to the right by n positions. |
 | `scan` | `Scan` | `(indexed_collection<T>, reducer: (unknown, T) any -> unknown, initial: value?) -> indexed_collection where T` | Return the cumulative fold of a collection: a same-length collection whose k-th element is the running result of applying a binary function left to right (optionally seeded by an initial value). |
 | `second` | `Second` | `(xs: indexed_collection<any>) -> any` | The second element of a collection. |
 | — | `Set` | `(any*) -> set` | An unordered collection of distinct elements (a set). |
 | `setFrom` | `SetFrom` | `(value*) -> set` | Create a set from the elements of a collection. |
 | `setMinus` | `SetMinus` | `(set<any>, value*) -> set` | Return the set difference between the first set and subsequent values. |
 | — | `Single` | `(value: T) -> tuple<T> where T` | A tuple with a single element |
-| `slice` | `Slice` | `((value: T, span: range) -> T where T: string) & ((value: T, span: nothing \| range) -> T \| nothing where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T) & ((value: indexed_collection<T>, span: nothing \| range) -> list<T> \| nothing where T) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T)` | Return a contiguous run of elements from an indexed collection. |
-| `sort` | `Sort` | `((T, order: (((character) any -> unknown) \| ((character, character) any -> boolean \| number))?) -> T where T: string) & ((indexed_collection<T>, order: (((T) any -> unknown) \| ((any, any) any -> boolean \| number))?) -> list<T> where T)` | Return the elements of the collection sorted according to the given comparison function. |
+| `slice` | `Slice` | `((value: T, span: range) -> T where T: string) & ((value: T, span: nothing \| range) -> T \| nothing where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T: any) & ((value: indexed_collection<T>, span: nothing \| range) -> list<T> \| nothing where T: any) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T: any)` | Return a contiguous run of elements from an indexed collection. |
+| `sort` | `Sort` | `((T, order: (((character) any -> unknown) \| ((character, character) any -> boolean \| number))?) -> T where T: string) & ((indexed_collection<T>, order: (((T) any -> unknown) \| ((any, any) any -> boolean \| number))?) -> list<T> where T: any)` | Return the elements of the collection sorted according to the given comparison function. |
 | `startsWith` | `StartsWith` | `(indexed_collection<T>, prefix: indexed_collection<T>) -> boolean where T` | Return `True` when the indexed collection begins with `prefix` as a contiguous subsequence. |
 | `subset` | `Subset` | `(any, any*) -> boolean` | Test whether the first collection is a strict subset of the second. |
 | `subsetEqual` | `SubsetEqual` | `(any, any*) -> boolean` | Test whether the first collection is a subset (possibly equal) of the second. |
@@ -338,7 +339,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `symmetricDifference` | `SymmetricDifference` | `(set<any>, set<any>) -> set` | Return the symmetric difference of two sets (elements in either set but not both). |
 | `table` | `Table` | `(function, integer, integer?) -> collection` | An alias for `Tabulate` (the preferred name) that additionally accepts |
 | `tabulate` | `Tabulate` | `(generator: function, integer, integer?) -> list` | Create a collection by applying a function to each index in the specified dimensions. |
-| `take` | `Take` | `((xs: T, count: number) -> T where T: string) & ((xs: indexed_collection<T>, count: number) -> list<T> where T)` | Return the first `n` elements of an indexed collection. |
+| `take` | `Take` | `((xs: T, count: number) -> T where T: string) & ((xs: indexed_collection<T>, count: number) -> list<T> where T: any)` | Return the first `n` elements of an indexed collection. |
 | `takeWhile` | `TakeWhile` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> indexed_collection where T` | Return the leading elements of the collection for which the predicate returns True, stopping at the first element that does not. |
 | `tally` | `Tally` | `(collection<T>) -> tuple<list<T>, list<integer>> where T` | Return a tuple with the unique elements of the collection and their respective counts. |
 | `third` | `Third` | `(xs: indexed_collection<any>) -> any` | The third element of a collection. |
@@ -346,7 +347,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | — | `Tuple` | `(any*) -> tuple` | A fixed number of heterogeneous elements. |
 | `tupleFrom` | `TupleFrom` | `(value*) -> tuple` | Create a tuple from the elements of a collection. |
 | `union` | `Union` | `(any+) -> set` | Return the union of two or more collections as a set. |
-| `unique` | `Unique` | `((T) -> T where T: string) & ((collection<T>) -> list<T> where T)` | Return a list of the unique elements of the collection. |
+| `unique` | `Unique` | `((T) -> T where T: string) & ((collection<T>) -> list<T> where T: any)` | Return a list of the unique elements of the collection. |
 | `values` | `Values` | `(dictionary<any>) -> list` | Return a list of the values of a dictionary. |
 | `zip` | `Zip` | `(indexed_collection<any>+) -> list` | Combine multiple collections element-wise into a list of tuples. |
 
@@ -431,7 +432,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
-| `abs` | `Abs` | `(complex \| infinity) -> number` | Absolute value (magnitude) of a number. |
+| `abs` | `Abs` | `(complex \| infinity \| quantity) -> number` | Absolute value (magnitude) of a number. |
 | `absArg` | `AbsArg` | `(complex \| infinity) -> tuple<+oo \| real, real>` | Tuple of magnitude and argument of a complex number. |
 | — | `Add` | `(value+) -> value` | Sum of two or more values. |
 | `airyAi` | `AiryAi` | `(complex \| infinity) -> number` | Airy function of the first kind |
@@ -462,6 +463,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | — | `Divide` | `(complex \| infinity, (complex \| infinity)+) -> number` | Quotient of a numerator and one or more denominators. |
 | `elementMax` | `ElementMax` | `(real \| signed_infinity, (real \| signed_infinity)+) -> real \| signed_infinity` | Element-wise maximum: broadcasts scalars over collections (and zips collections), returning a collection; all-scalar arguments give a scalar. |
 | `elementMin` | `ElementMin` | `(real \| signed_infinity, (real \| signed_infinity)+) -> real \| signed_infinity` | Element-wise minimum: broadcasts scalars over collections (and zips collections), returning a collection; all-scalar arguments give a scalar. |
+| `enclosure` | `Enclosure` | `(nan \| real \| set<real> \| signed_infinity, (nan \| real \| signed_infinity)?) -> enclosure \| nan` | A closed interval [lo, hi] that encloses one real number, with interval arithmetic. |
 | `eulerGamma` | `EulerGamma` | constant `real<0.5772156649015328..0.5772156649015329>` = `0.577215664901532860607` | The Euler–Mascheroni constant γ ≈ 0.5772. |
 | `exp` | `Exp` | `(number) -> number` | Natural exponential function: e^x. |
 | `exp2` | `Exp2` | `(number) -> number` | Base-2 exponential: 2^x |
@@ -498,7 +500,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `log2` | `Log2` | `(number) -> number` | Base-2 Logarithm |
 | `machineEpsilon` | `MachineEpsilon` | constant `real` = `2.220446049250313e-16` | The difference between 1 and the next larger floating point number (machine epsilon). |
 | `max` | `Max` | `(value*) -> number` | Maximum of two or more numbers. |
-| `measurement` | `Measurement` | `(value, value) -> value` | A nominal value carrying a 1σ absolute uncertainty. |
+| `measurement` | `Measurement` | `(value, value) -> measurement` | A nominal value carrying a 1σ absolute uncertainty. |
 | `min` | `Min` | `(value+) -> number` | Minimum of two or more numbers. |
 | — | `Mod` | `(real, real) -> real` | Modulo: the remainder of the floored division of x by y. |
 | — | `Multiply` | `(number*) -> number` | Product of two or more values. |
@@ -522,6 +524,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `root` | `Root` | `(complex \| infinity, complex \| infinity) -> number` | n-th root of a value. |
 | `round` | `Round` | `(x: real \| signed_infinity \| ~oo, step: real?) -> real \| signed_infinity \| ~oo` | Rounds a number to the nearest integer, or with a step to the nearest multiple of the step. |
 | `sign` | `Sign` | `(complex \| signed_infinity \| ~oo) -> complex` | Sign of a number: -1, 0, or 1 for a real; `z/\|z\|`, the point of the unit circle in its direction, for a complex `z`. |
+| `smoothstep` | `Smoothstep` | `(real \| signed_infinity, real \| signed_infinity, real \| signed_infinity) -> nan \| real` | Smooth Hermite interpolation between 0 and 1 as x goes from e0 to e1: t²(3 − 2t) with t = Clamp((x − e0)/(e1 − e0), 0, 1). |
 | `sqrt` | `Sqrt` | `(complex \| infinity) -> complex \| infinity` | Square Root |
 | — | `Square` | `(number) -> number` | Square of a number: x^2. |
 | — | `Subtract` | `(number+) -> number` | Difference between two or more values. |
@@ -548,27 +551,27 @@ The [Trigonometry reference](/reference/trigonometry/) has the full description 
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
-| `arccos` | `Arccos` | `(complex) -> number` | Arccosine, the inverse cosine function. |
-| `arccot` | `Arccot` | `(complex \| signed_infinity) -> number` | Arccotangent, the inverse cotangent function. |
-| `arccsc` | `Arccsc` | `(complex \| infinity) -> number` | Arccosecant, the inverse cosecant function. |
-| `arcosh` | `Arcosh` | `(complex \| signed_infinity) -> number` | Inverse hyperbolic cosine (area hyperbolic cosine). |
-| `arcoth` | `Arcoth` | `(complex \| infinity) -> number` | Inverse hyperbolic cotangent (area hyperbolic cotangent). |
-| `arcsch` | `Arcsch` | `(complex \| infinity) -> number` | Inverse hyperbolic cosecant (area hyperbolic cosecant). |
-| `arcsec` | `Arcsec` | `(complex \| infinity) -> number` | Arcsecant, the inverse secant function. |
-| `arcsin` | `Arcsin` | `(complex) -> number` | Arcsine, the inverse sine function. |
-| `arctan` | `Arctan` | `(complex \| signed_infinity) -> number` | Inverse tangent. |
+| `arccos` | `Arccos` | `(complex \| quantity) -> number` | Arccosine, the inverse cosine function. |
+| `arccot` | `Arccot` | `(complex \| quantity \| signed_infinity) -> number` | Arccotangent, the inverse cotangent function. |
+| `arccsc` | `Arccsc` | `(complex \| infinity \| quantity) -> number` | Arccosecant, the inverse cosecant function. |
+| `arcosh` | `Arcosh` | `(complex \| quantity \| signed_infinity) -> number` | Inverse hyperbolic cosine (area hyperbolic cosine). |
+| `arcoth` | `Arcoth` | `(complex \| infinity \| quantity) -> number` | Inverse hyperbolic cotangent (area hyperbolic cotangent). |
+| `arcsch` | `Arcsch` | `(complex \| infinity \| quantity) -> number` | Inverse hyperbolic cosecant (area hyperbolic cosecant). |
+| `arcsec` | `Arcsec` | `(complex \| infinity \| quantity) -> number` | Arcsecant, the inverse secant function. |
+| `arcsin` | `Arcsin` | `(complex \| quantity) -> number` | Arcsine, the inverse sine function. |
+| `arctan` | `Arctan` | `(complex \| quantity \| signed_infinity) -> number` | Inverse tangent. |
 | `arctan2` | `Arctan2` | `(y: real \| signed_infinity, x: real \| signed_infinity) -> real` | Two-argument arctangent giving the angle of a vector. |
-| `arsech` | `Arsech` | `(complex \| signed_infinity) -> number` | Inverse hyperbolic secant (area hyperbolic secant). |
-| `arsinh` | `Arsinh` | `(complex \| signed_infinity) -> number` | Inverse hyperbolic sine (area hyperbolic sine). |
-| `artanh` | `Artanh` | `(complex \| signed_infinity) -> number` | Inverse hyperbolic tangent (area hyperbolic tangent). |
-| `cos` | `Cos` | `(complex) -> number` | Cosine of an angle. |
+| `arsech` | `Arsech` | `(complex \| quantity \| signed_infinity) -> number` | Inverse hyperbolic secant (area hyperbolic secant). |
+| `arsinh` | `Arsinh` | `(complex \| quantity \| signed_infinity) -> number` | Inverse hyperbolic sine (area hyperbolic sine). |
+| `artanh` | `Artanh` | `(complex \| quantity \| signed_infinity) -> number` | Inverse hyperbolic tangent (area hyperbolic tangent). |
+| `cos` | `Cos` | `(complex \| quantity) -> number` | Cosine of an angle. |
 | `cosIntegral` | `CosIntegral` | `(complex \| infinity) -> number` | Cosine integral: γ + ln(x) + ∫₀ˣ (cos(t)−1)/t dt. |
-| `cosh` | `Cosh` | `(complex \| signed_infinity) -> number` | Hyperbolic cosine. |
+| `cosh` | `Cosh` | `(complex \| quantity \| signed_infinity) -> number` | Hyperbolic cosine. |
 | `coshIntegral` | `CoshIntegral` | `(complex \| infinity) -> number` | Hyperbolic cosine integral: γ + ln\|x\| + ∫₀ˣ (cosh(t)−1)/t dt. |
-| `cot` | `Cot` | `(complex) -> number` | Cotangent, the reciprocal of tangent. |
-| `coth` | `Coth` | `(complex \| signed_infinity) -> number` | Hyperbolic cotangent, the reciprocal of hyperbolic tangent. |
-| `csc` | `Csc` | `(complex) -> number` | Cosecant, the reciprocal of sine. |
-| `csch` | `Csch` | `(complex \| signed_infinity) -> number` | Hyperbolic cosecant, the reciprocal of hyperbolic sine. |
+| `cot` | `Cot` | `(complex \| quantity) -> number` | Cotangent, the reciprocal of tangent. |
+| `coth` | `Coth` | `(complex \| quantity \| signed_infinity) -> number` | Hyperbolic cotangent, the reciprocal of hyperbolic tangent. |
+| `csc` | `Csc` | `(complex \| quantity) -> number` | Cosecant, the reciprocal of sine. |
+| `csch` | `Csch` | `(complex \| quantity \| signed_infinity) -> number` | Hyperbolic cosecant, the reciprocal of hyperbolic sine. |
 | `dms` | `DMS` | `(number, number?, number?) -> number` | Construct an angle from degrees, minutes, and seconds. |
 | `degrees` | `Degrees` | `(real) -> real` | Convert an angle in degrees. |
 | `fresnelC` | `FresnelC` | `(complex \| signed_infinity) -> complex` | Fresnel cosine integral. |
@@ -578,15 +581,15 @@ The [Trigonometry reference](/reference/trigonometry/) has the full description 
 | `inverseFunction` | `InverseFunction` | `(function) -> function` | Inverse of a function. |
 | `inverseHaversine` | `InverseHaversine` | `(real) -> number` | Inverse haversine function. |
 | `pi` | `Pi` | constant `real<3.141592653589793..3.141592653589794>` = `3.14159265358979323846` | The constant π ≈ 3.14159, the ratio of a circle's circumference to its diameter. |
-| `sec` | `Sec` | `(complex) -> number` | Secant, the reciprocal of cosine. |
-| `sech` | `Sech` | `(complex \| signed_infinity) -> number` | Hyperbolic secant, the reciprocal of hyperbolic cosine. |
-| `sin` | `Sin` | `(complex) -> number` | Sine of an angle. |
+| `sec` | `Sec` | `(complex \| quantity) -> number` | Secant, the reciprocal of cosine. |
+| `sech` | `Sech` | `(complex \| quantity \| signed_infinity) -> number` | Hyperbolic secant, the reciprocal of hyperbolic cosine. |
+| `sin` | `Sin` | `(complex \| quantity) -> number` | Sine of an angle. |
 | `sinIntegral` | `SinIntegral` | `(complex \| infinity) -> number` | Sine integral: ∫₀ˣ sin(t)/t dt. |
 | `sinc` | `Sinc` | `(complex \| signed_infinity) -> complex` | Unnormalized sinc function: sin(x)/x with sinc(0)=1. |
-| `sinh` | `Sinh` | `(complex \| signed_infinity) -> number` | Hyperbolic sine. |
+| `sinh` | `Sinh` | `(complex \| quantity \| signed_infinity) -> number` | Hyperbolic sine. |
 | `sinhIntegral` | `SinhIntegral` | `(complex \| infinity) -> number` | Hyperbolic sine integral: ∫₀ˣ sinh(t)/t dt. |
-| `tan` | `Tan` | `(complex) -> number` | Tangent of an angle. |
-| `tanh` | `Tanh` | `(complex \| signed_infinity) -> number` | Hyperbolic tangent. |
+| `tan` | `Tan` | `(complex \| quantity) -> number` | Tangent of an angle. |
+| `tanh` | `Tanh` | `(complex \| quantity \| signed_infinity) -> number` | Hyperbolic tangent. |
 | `trigExpand` | `TrigExpand` | `(value) -> value` | Expand trigonometric and hyperbolic functions of sums and integer multiples of angles. |
 | `trigReduce` | `TrigReduce` | `(value) -> value` | Rewrite products and integer powers of trigonometric and hyperbolic functions as a linear combination of functions of multiple angles (the inverse of TrigExpand). |
 | `trigToExp` | `TrigToExp` | `(value) -> value` | Rewrite trigonometric and hyperbolic functions in terms of the complex exponential, exactly. |
@@ -604,7 +607,7 @@ The [Calculus reference](/reference/calculus/) has the full description and the 
 | — | `D` | `(expression, variables: symbol*) -> expression` | Symbolic partial derivative with respect to one or more variables. |
 | `dSolve` | `DSolve` | `(expression, symbol, symbol) -> expression` | Symbolic differential equation solver. |
 | `derivative` | `Derivative` | `(function, order: number*) -> function` | Derivative operator that returns a derivative function. |
-| `integrate` | `Integrate` | `(function, limits+) -> list<number> \| list<tuple> \| number \| tuple` | Symbolic integral with optional bounds. |
+| `integrate` | `Integrate` | `(function, limits+) -> list<tuple> \| number \| tensor \| tuple` | Symbolic integral with optional bounds. |
 | `interpolatingFunction` | `InterpolatingFunction` | `(list<any>, number?) -> number` | Piecewise-quartic dense-output interpolant of a numeric ODE solution (produced by `NDSolveFunction`). |
 | `jacobianMatrix` | `JacobianMatrix` | `(any, any?) -> value` | JacobianMatrix(fs, vars): the matrix of partial derivatives |
 | `limit` | `Limit` | `(function, point: number, direction: number?) -> number` | Limit of a function |
@@ -628,6 +631,7 @@ The [Polynomials reference](/reference/polynomials/) has the full description an
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
+| `algebraicGenerator` | `AlgebraicGenerator` | `(list<number>) -> number` | An abstract generator of Q[t]/(m), specified by ascending rational coefficients of an irreducible polynomial m. |
 | `apart` | `Apart` | `(value, symbol?) -> value` | Alias for PartialFraction. |
 | `cancel` | `Cancel` | `(value, symbol?) -> value` | Cancel common polynomial factors in the numerator and denominator of a rational expression. |
 | `coefficientList` | `CoefficientList` | `(value, symbol?) -> list<value>` | Return the list of coefficients of a polynomial, from highest to lowest degree. |
@@ -635,7 +639,7 @@ The [Polynomials reference](/reference/polynomials/) has the full description an
 | `distribute` | `Distribute` | `(value) -> value` | Distribute multiplication over addition |
 | `expand` | `Expand` | `(value) -> value` | Expand out products and positive integer powers |
 | `expandAll` | `ExpandAll` | `(value) -> value` | Recursively expand out products and positive integer powers |
-| `factor` | `Factor` | `(value, symbol?) -> value` | Factor a polynomial expression into a product of irreducible factors. |
+| `factor` | `Factor` | `(value, symbol?, value?) -> value` | Factor a polynomial expression into a product of irreducible factors. |
 | `partialFraction` | `PartialFraction` | `(value, symbol?) -> value` | Decompose a rational expression into partial fractions. |
 | `polynomial` | `Polynomial` | `(list<value>, symbol) -> value` | Construct a polynomial from a list of coefficients (highest to lowest degree) and a variable. |
 | `polynomialDegree` | `PolynomialDegree` | `(value, symbol?) -> integer` | Return the degree of a polynomial with respect to a variable. |
@@ -789,10 +793,10 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `luDecomposition` | `LUDecomposition` | `(matrix) -> tuple` | LU decomposition of a square matrix. |
 | `linearSolve` | `LinearSolve` | `(matrix, matrix \| vector) -> value` | Solve the linear system A·x = b for x. |
 | `matrix` | `Matrix` | `(matrix, string?, string?) -> matrix` | Matrix constructor and canonicalizer. |
-| `matrixMultiply` | `MatrixMultiply` | `(matrix \| vector, matrix \| vector) -> matrix \| vector` | Matrix and vector multiplication. |
+| `matrixMultiply` | `MatrixMultiply` | `(matrix \| vector, matrix \| vector) -> matrix \| number \| vector` | Matrix and vector multiplication. |
 | `matrixPower` | `MatrixPower` | `(matrix, real) -> matrix` | Square matrix raised to a power. |
 | `matrixRank` | `MatrixRank` | `(value) -> integer` | Rank of a matrix (number of linearly independent rows/columns). |
-| `norm` | `Norm` | `(list<number> \| list<tuple> \| number \| tuple, (+oo \| real \| string)?) -> +oo \| nan \| real` | Vector or matrix norm. |
+| `norm` | `Norm` | `(list<tuple> \| number \| tensor \| tuple, (+oo \| real \| string)?) -> +oo \| nan \| real` | Vector or matrix norm. |
 | `onesMatrix` | `OnesMatrix` | `(integer, integer?) -> matrix` | Matrix filled with ones. |
 | `pseudoInverse` | `PseudoInverse` | `(matrix) -> matrix` | Moore-Penrose pseudoinverse of a matrix. |
 | `qrDecomposition` | `QRDecomposition` | `(matrix) -> tuple` | QR decomposition of a matrix. |
@@ -802,7 +806,7 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `svd` | `SVD` | `(matrix) -> tuple` | Singular value decomposition of a matrix. |
 | `shape` | `Shape` | `(value) -> tuple` | Return the shape tuple of an expression. |
 | `singularValues` | `SingularValues` | `(matrix) -> list` | The singular values of a matrix, sorted in descending order (including any zero values). |
-| `trace` | `Trace` | `(list<number> \| number, axis1: integer?, axis2: integer?) -> list<number> \| number` | Trace of a matrix or pair of tensor axes. |
+| `trace` | `Trace` | `(number \| tensor, axis1: integer?, axis2: integer?) -> number \| tensor` | Trace of a matrix or pair of tensor axes. |
 | `transpose` | `Transpose` | `(value, axis1: integer?, axis2: integer?) -> value` | Transpose a matrix or swap two tensor axes. |
 | `vector` | `Vector` | `(any+) -> vector` | Construct a column vector. |
 | `zeroMatrix` | `ZeroMatrix` | `(integer, integer?) -> matrix` | Matrix filled with zeros. |
@@ -814,11 +818,11 @@ The [Statistics reference](/reference/statistics/) has the full description and 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
 | `betaRegularized` | `BetaRegularized` | `(complex \| infinity, complex \| infinity, complex \| infinity) -> number` | Regularized incomplete beta function I_x(a, b) |
-| `binCounts` | `BinCounts` | `(collection<any>, list<number> \| number) -> list<number>` | Count the number of elements falling into each bin. |
+| `binCounts` | `BinCounts` | `(collection<nothing \| number>, list<number> \| number) -> list<number>` | Count the number of elements falling into each bin. |
 | `binomialDistribution` | `BinomialDistribution` | `(integer<0..>, real<0..1>) -> expression<BinomialDistribution>` | Binomial distribution: number of successes in n independent trials, each with success probability p. |
 | `cdf` | `CDF` | `(distribution, real \| signed_infinity) -> nan \| real<0..1>` | Cumulative distribution function P(X ≤ x) of a distribution. |
-| `correlation` | `Correlation` | `(collection<any>, collection<any>?) -> nan \| real<-1..1>` | Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
-| `covariance` | `Covariance` | `(collection<any>, collection<any>?) -> nan \| real` | Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `correlation` | `Correlation` | `(collection<nothing \| number \| tuple>, collection<nothing \| number>?) -> nan \| real<-1..1>` | Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `covariance` | `Covariance` | `(collection<nothing \| number \| tuple>, collection<nothing \| number>?) -> nan \| real` | Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
 | `erf` | `Erf` | `(complex \| signed_infinity) -> complex` | Gauss error function |
 | `erfInv` | `ErfInv` | `(complex \| infinity) -> number` | Inverse of the error function |
 | `erfc` | `Erfc` | `(complex \| signed_infinity) -> complex` | Complementary error function: 1 - Erf(x) |
@@ -826,28 +830,28 @@ The [Statistics reference](/reference/statistics/) has the full description and 
 | `exponentialDistribution` | `ExponentialDistribution` | `(real<0<..>) -> expression<ExponentialDistribution>` | Exponential distribution with rate parameter λ. |
 | `findFit` | `FindFit` | `(any, any, any, any, dictionary?) -> dictionary` | Nonlinear least-squares fit of a model to data. |
 | `gammaRegularized` | `GammaRegularized` | `(complex \| infinity, complex \| infinity) -> number` | Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a) |
-| `histogram` | `Histogram` | `(collection<any>, list<number> \| number) -> list<tuple<number, integer>>` | Compute a histogram of the values in a collection. |
-| `interquartileRange` | `InterquartileRange` | `((collection<any> \| number)+) -> +oo \| nan \| real<0..>` | Interquartile range (Q3 - Q1) of a collection. |
-| `kurtosis` | `Kurtosis` | `((collection<any> \| number)+) -> nan \| real` | Kurtosis of a collection of numbers. |
+| `histogram` | `Histogram` | `(collection<nothing \| number>, list<number> \| number) -> list<tuple<number, integer>>` | Compute a histogram of the values in a collection. |
+| `interquartileRange` | `InterquartileRange` | `((collection<nothing \| number> \| number)+) -> +oo \| nan \| real<0..>` | Interquartile range (Q3 - Q1) of a collection. |
+| `kurtosis` | `Kurtosis` | `((collection<nothing \| number> \| number)+) -> nan \| real` | Kurtosis of a collection of numbers. |
 | `linearRegression` | `LinearRegression` | `(any+) -> tuple<number, number>` | Least-squares linear fit b0 + b1·x. |
-| `mean` | `Mean` | `((collection<any> \| distribution \| number)+) -> number` | Arithmetic mean (average) of a collection of numbers. |
-| `median` | `Median` | `((collection<any> \| number)+) -> nan \| real \| signed_infinity` | Median of a collection of numbers. |
-| `mode` | `Mode` | `((collection<any> \| number)+) -> nan \| real \| signed_infinity` | Most frequently occurring value in a collection. |
+| `mean` | `Mean` | `((collection<nothing \| number> \| distribution \| number)+) -> number` | Arithmetic mean (average) of a collection of numbers. |
+| `median` | `Median` | `((collection<nothing \| number> \| number)+) -> nan \| real \| signed_infinity` | Median of a collection of numbers. |
+| `mode` | `Mode` | `((collection<nothing \| number> \| number)+) -> nan \| real \| signed_infinity` | Most frequently occurring value in a collection. |
 | `normalDistribution` | `NormalDistribution` | `(real, real<0<..>) -> expression<NormalDistribution>` | Normal (Gaussian) distribution with mean μ and standard deviation σ. |
 | `pdf` | `PDF` | `(distribution, real \| signed_infinity) -> nan \| real<0..>` | Probability density (continuous) or mass (discrete) function of a distribution, evaluated at x. |
 | `poissonDistribution` | `PoissonDistribution` | `(real<0<..>) -> expression<PoissonDistribution>` | Poisson distribution with rate parameter λ. |
 | `polynomialFit` | `PolynomialFit` | `(any+) -> list<number>` | Least-squares polynomial fit of the given degree. |
-| `populationCovariance` | `PopulationCovariance` | `(collection<any>, collection<any>?) -> nan \| real` | Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
-| `populationStandardDeviation` | `PopulationStandardDeviation` | `((collection<any> \| number)+) -> nan \| real<0..>` | Population Standard Deviation of a collection of numbers. |
-| `populationVariance` | `PopulationVariance` | `((collection<any> \| number)+) -> nan \| real<0..>` | Population variance of a collection of numbers. |
+| `populationCovariance` | `PopulationCovariance` | `(collection<nothing \| number \| tuple>, collection<nothing \| number>?) -> nan \| real` | Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `populationStandardDeviation` | `PopulationStandardDeviation` | `((collection<nothing \| number> \| number)+) -> nan \| real<0..>` | Population Standard Deviation of a collection of numbers. |
+| `populationVariance` | `PopulationVariance` | `((collection<nothing \| number> \| number)+) -> nan \| real<0..>` | Population variance of a collection of numbers. |
 | `quantile` | `Quantile` | `(collection<any> \| distribution, real<0..1>) -> nan \| real \| signed_infinity` | Quantile (inverse CDF): the least x with CDF(x) ≥ p, for p in [0, 1]. |
-| `quartiles` | `Quartiles` | `((collection<any> \| number)+) -> tuple<lower: nan \| real \| signed_infinity, mid: nan \| real \| signed_infinity, upper: nan \| real \| signed_infinity>` | Lower quartile, median, and upper quartile of a collection. |
+| `quartiles` | `Quartiles` | `((collection<nothing \| number> \| number)+) -> tuple<lower: nan \| real \| signed_infinity, mid: nan \| real \| signed_infinity, upper: nan \| real \| signed_infinity>` | Lower quartile, median, and upper quartile of a collection. |
 | `randomSample` | `RandomSample` | `((T, number) random -> T where T: string) & ((indexed_collection, number) random -> list)` | RandomSample(xs, k): a list of k elements drawn from the indexed collection `xs`, without replacement. "Without replacement" is over POSITIONS, not values: on a multiset, repeats are expected — RandomSample([1, 1, 2], 2) can return [1, 1]. |
-| `skewness` | `Skewness` | `((collection<any> \| number)+) -> nan \| real` | Skewness of a collection of numbers. |
+| `skewness` | `Skewness` | `((collection<nothing \| number> \| number)+) -> nan \| real` | Skewness of a collection of numbers. |
 | `slidingWindow` | `SlidingWindow` | `((S, integer, integer?) -> list<string> where S: string) & ((collection, integer, integer?) -> list<list>)` | Return overlapping sliding windows of fixed size over the collection. |
-| `standardDeviation` | `StandardDeviation` | `((collection<any> \| distribution \| number)+) -> nan \| real<0..>` | Sample Standard Deviation of a collection of numbers. |
+| `standardDeviation` | `StandardDeviation` | `((collection<nothing \| number> \| distribution \| number)+) -> nan \| real<0..>` | Sample Standard Deviation of a collection of numbers. |
 | `uniformDistribution` | `UniformDistribution` | `(real, real) -> expression<UniformDistribution>` | Continuous uniform distribution on the interval [a, b]. |
-| `variance` | `Variance` | `((collection<any> \| distribution \| number)+) -> nan \| real<0..>` | Sample variance of a collection of numbers. |
+| `variance` | `Variance` | `((collection<nothing \| number> \| distribution \| number)+) -> nan \| real<0..>` | Sample variance of a collection of numbers. |
 
 ## Units
 
@@ -856,7 +860,7 @@ The [Units reference](/reference/units/) has the full description and the exampl
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
 | `isCompatibleUnit` | `IsCompatibleUnit` | `(value, value) -> value` | Check if two units have the same dimension |
-| `quantity` | `Quantity` | `(value, value) -> value` | A value paired with a physical unit |
+| `quantity` | `Quantity` | `(value, value) -> quantity` | A value paired with a physical unit |
 | `quantityMagnitude` | `QuantityMagnitude` | `(value) -> value` | Extract the numeric value from a quantity |
 | `quantityUnit` | `QuantityUnit` | `(value) -> value` | Extract the unit from a quantity |
 | `unitConvert` | `UnitConvert` | `(value, value) -> value` | Convert a quantity to a different compatible unit |
@@ -869,14 +873,14 @@ The [Physics reference](/reference/physics/) has the full description and the ex
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
-| `avogadroConstant` | `AvogadroConstant` | constant `value` = `6.02214076e+23 mol^-1` | Avogadro constant |
-| `boltzmannConstant` | `BoltzmannConstant` | constant `value` = `1.380649e-23 J/K` | Boltzmann constant |
-| `elementaryCharge` | `ElementaryCharge` | constant `value` = `1.602176634e-19 C` | Elementary electric charge |
-| `gasConstant` | `GasConstant` | constant `value` = `8.314462618 J/(K⋅mol)` | Molar gas constant |
-| `gravitationalConstant` | `GravitationalConstant` | constant `value` = `6.6743e-11 m^3/(kg⋅s^2)` | Newtonian constant of gravitation |
-| `mu0` | `Mu0` | constant `value` = `0.00000125663706212 N/A^2` | Vacuum permeability |
-| `planckConstant` | `PlanckConstant` | constant `value` = `6.62607015e-34 J⋅s` | Planck constant |
-| `speedOfLight` | `SpeedOfLight` | constant `value` = `299792458 m/s` | Speed of light in vacuum |
-| `standardGravity` | `StandardGravity` | constant `value` = `9.80665 m/s^2` | Standard acceleration due to gravity |
-| `stefanBoltzmannConstant` | `StefanBoltzmannConstant` | constant `value` = `5.670374419e-8 W/(K^4⋅m^2)` | Stefan-Boltzmann constant |
-| `vacuumPermittivity` | `VacuumPermittivity` | constant `value` = `8.8541878128e-12 F/m` | Vacuum permittivity (electric constant) |
+| `avogadroConstant` | `AvogadroConstant` | constant `quantity` = `6.02214076e+23 mol^-1` | Avogadro constant |
+| `boltzmannConstant` | `BoltzmannConstant` | constant `quantity` = `1.380649e-23 J/K` | Boltzmann constant |
+| `elementaryCharge` | `ElementaryCharge` | constant `quantity` = `1.602176634e-19 C` | Elementary electric charge |
+| `gasConstant` | `GasConstant` | constant `quantity` = `8.314462618 J/(K⋅mol)` | Molar gas constant |
+| `gravitationalConstant` | `GravitationalConstant` | constant `quantity` = `6.6743e-11 m^3/(kg⋅s^2)` | Newtonian constant of gravitation |
+| `mu0` | `Mu0` | constant `quantity` = `0.00000125663706212 N/A^2` | Vacuum permeability |
+| `planckConstant` | `PlanckConstant` | constant `quantity` = `6.62607015e-34 J⋅s` | Planck constant |
+| `speedOfLight` | `SpeedOfLight` | constant `quantity` = `299792458 m/s` | Speed of light in vacuum |
+| `standardGravity` | `StandardGravity` | constant `quantity` = `9.80665 m/s^2` | Standard acceleration due to gravity |
+| `stefanBoltzmannConstant` | `StefanBoltzmannConstant` | constant `quantity` = `5.670374419e-8 W/(K^4⋅m^2)` | Stefan-Boltzmann constant |
+| `vacuumPermittivity` | `VacuumPermittivity` | constant `quantity` = `8.8541878128e-12 F/m` | Vacuum permittivity (electric constant) |

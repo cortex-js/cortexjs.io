@@ -28,6 +28,23 @@ have the same length.
 // ➔ [[1,3],[5,0]]
 ```
 
+A list of ranges of the same length keeps its ranges, but the functions of
+this library read each range as a row:
+
+```epsil
+determinant([1..2, 3..4])
+// ➔ -2
+```
+
+The operator `*` chooses from the type of its operands, and a list of ranges is
+not typed as a matrix, so `*` multiplies element by element. Use
+`matrixMultiply` for the matrix product:
+
+```epsil
+[1..2, 3..4] * [1..2, 3..4]
+// ➔ [[1,4],[9,16]]
+```
+
 Matrices are stored in **row-major** order: the first element of the outer
 list is the first row. An index reads an element. Indexes start at 1. The
 first index selects the row and the second index selects the column.
@@ -239,10 +256,14 @@ eigenvalues([[2, 1], [1, 2]])
 // ➔ [3,1]
 ```
 
-The decompositions `luDecomposition`, `qrDecomposition`,
-`choleskyDecomposition` and `svd` use numeric algorithms. Their factors can
-contain decimal values even when the argument is exact. Multiply the factors
-to check a decomposition:
+The decompositions `luDecomposition`, `qrDecomposition` and
+`choleskyDecomposition` of a matrix of exact rational entries give exact
+factors: rationals for `luDecomposition`, and rationals times square roots
+for `qrDecomposition` and `choleskyDecomposition`. The diagonal of the `R`
+factor of `qrDecomposition` is not negative. `svd`, and these decompositions
+of a matrix with a decimal entry or under `N`, use numeric algorithms, so
+their factors contain decimal values. Multiply the factors to check a
+decomposition:
 
 ```epsil
 let (P, L, U) = luDecomposition([[4, 3], [2, 1]])
@@ -531,7 +552,7 @@ LU decomposition of a square matrix.
 
 ```epsil
 luDecomposition([[4, 3], [2, 1]])
-// ➔ ([[1,0],[0,1]], [[1,0],[0.5,1]], [[4,3],[0,-0.5]])
+// ➔ ([[1,0],[0,1]], [[1,0],[1/2,1]], [[4,3],[0,-1/2]])
 ```
 
 ### linearSolve
@@ -558,7 +579,7 @@ matrix([[1, 2], [3, 4]])
 
 ### matrixMultiply
 
-MathJSON `MatrixMultiply` · `(matrix | vector, matrix | vector) -> matrix | vector`
+MathJSON `MatrixMultiply` · `(matrix | vector, matrix | vector) -> matrix | number | vector`
 
 Matrix and vector multiplication.
 
@@ -591,7 +612,7 @@ matrixRank([[1, 2], [2, 4]])
 
 ### norm
 
-MathJSON `Norm` · `(list<number> | list<tuple> | number | tuple, (+oo | real | string)?) -> +oo | nan | real`
+MathJSON `Norm` · `(list<tuple> | number | tensor | tuple, (+oo | real | string)?) -> +oo | nan | real`
 
 Vector or matrix norm.
 
@@ -635,7 +656,7 @@ QR decomposition of a matrix.
 
 ```epsil
 qrDecomposition([[0, 1], [1, 1]])
-// ➔ ([[0,1],[-1,0]], [[-1,-1],[0,1]])
+// ➔ ([[0,1],[1,0]], [[1,1],[0,1]])
 ```
 
 ### rank
@@ -706,7 +727,7 @@ singularValues([[3, 0], [0, 4]])
 
 ### trace
 
-MathJSON `Trace` · `(list<number> | number, axis1: integer?, axis2: integer?) -> list<number> | number`
+MathJSON `Trace` · `(number | tensor, axis1: integer?, axis2: integer?) -> number | tensor`
 
 Trace of a matrix or pair of tensor axes.
 

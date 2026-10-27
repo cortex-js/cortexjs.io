@@ -53,15 +53,32 @@ Skip to the next iteration of the enclosing loop.
 
 ### fixedPoint
 
-MathJSON `FixedPoint` · `(any) -> unknown`
+MathJSON `FixedPoint` · `(function, initial: any, maxIterations: integer?) -> unknown`
 
-Iterate a function until a fixed point is reached.
+Apply a function repeatedly, starting from an initial value, until two successive values are the same: `FixedPoint(f, x)` is the first of `f(x)`, `f(f(x))`, … that `f` maps to itself.
+
+Two values are the same when they are structurally identical, or when they are numbers, one of them a float, that agree to the working precision (their difference is at most a few units of the last digit, relative to their size), or when they are lists or tuples of the same length whose elements are the same. A sequence of exact values stops only when two of them are identical.
+
+Without a maximum, the call stays unevaluated when the iteration cannot converge: when a value contains the previous one (`FixedPoint(Cos, 1)`: `Cos(1)` is exact, and `Cos(Cos(1))` nests it), or when an exact number gains digits at each step. Start from a float (`FixedPoint(Cos, 1.0)`), or evaluate with `N`, for a numeric fixed point.
+
+The optional third argument is the maximum number of applications, a positive integer. It defaults to the engine iteration limit, and then the call stays unevaluated if the iteration has not converged by that limit (raise `ce.iterationLimit` for a slower one). An Epsil program has no iteration limit unless the host sets one, so there an iteration that does not converge stops only at a maximum or at a time limit. When an explicit maximum is reached, the last value is returned.
+
+```epsil
+fixedPoint(x => (x + 2 / x) / 2, 1.0)
+// ➔ 1.4142135623730950488
+```
+
+```epsil
+fixedPoint(cos, 1.0)
+// ➔ 0.739085133215160641631
+```
 
 ### If
 
 `(expression, expression, expression?) -> any`
 
-Conditional branch: evaluate one of two expressions.
+`If(c, e1, e2)` evaluates to `e1` when `c` is `True` and to `e2` otherwise; without `e2` it is `Missing` when `c` is `False`. Only the selected expression is evaluated.
+When `c` is a list of booleans (`L < 3` with `L` a list), the selection is made at each position and the value is a list: `If([True, False, True], 1, 0)` is `[1, 0, 1]`, and with `L = [1, 3, 5]`, `If(L < 3, L, 0)` is `[1, 0, 0]`. `If(c, e1, e2)` is then `Which(c, e1, True, e2)`: see `Which` for the rules of element-wise selection.
 
 ### Loop
 
@@ -102,4 +119,9 @@ Compiles to ternary `(cond) ? (e) : NaN` in JS and GLSL.
 
 `(expression+) -> unknown`
 
-Return the value for the first condition that is true.
+`Which(c1, e1, c2, e2, …)` evaluates to the value of the first `e` whose condition `c` is `True`, and to `Missing` when no condition is `True`. A last clause with the condition `True` is the default. Only the selected expression is evaluated.
+Element-wise selection: when a condition is a list of booleans (`L < 3` with `L` a list), the selection is made at each position, as `numpy.select` does, and the value is a list. At each position, the first clause whose condition is `True` there gives the value: an expression that is a list gives its element at that position, any other expression gives its own value. With `L = [1, 3, 5]`, `Which(L < 2, 10, L < 4, L, True, 0)` is `[10, 3, 0]`.
+  - A condition that is not a list applies to every position.
+  - Every list must have the length of the condition, else the value is an `incompatible-dimensions` error.
+  - A position that no clause selects holds `NaN` when every expression is a number, `Missing` otherwise.
+  - A condition that is a list of lists (a comparison of a matrix) selects at every level; an expression with fewer levels than the condition is an `incompatible-dimensions` error, one with more levels is taken whole at each position.

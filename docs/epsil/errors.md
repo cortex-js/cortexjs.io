@@ -31,6 +31,12 @@ The message reads "expected `T`, got `U`": T is what the context requires, U is 
 
 The check runs twice by design: once statically, when the program is canonicalized (reported before anything runs), and again during evaluation, where the mismatch becomes an error value that propagates outward (see `epsil doc runtime-error`).
 
+## `expected-present`
+
+A presence assertion `x?!` (`AssertPresent(x)`) was evaluated on an absent value: `missing`, `NaN`, or an indeterminate form such as `0/0`. The assertion says "this value is present, fail otherwise", and it failed; the error names the operand as written.
+
+An absent value is a data state, not a bug in itself: an index out of range (`xs[i]`), a `first(filter(…))` that found nothing, a restricted value whose condition did not hold. Decide what the program should do when it happens. Write `x ?? fallback` to replace the absent value, test it with `isMissing(x)` and branch, or keep the assertion where absence really is a violated precondition and let the error propagate (`if let v: !error = …` catches it). `Nothing` is an omission marker, not an absent datum, and passes the assertion.
+
 ## `no-product-between-points`
 
 Two points (tuples) were multiplied, and there is no implicit product between points. Multiplication of a point by a SCALAR is defined — it scales each component — and so is adding two points of the same arity, but `(1, 2) * (3, 4)` has no single meaning, so the engine rejects it rather than guessing.
@@ -44,6 +50,12 @@ Juxtaposition, `\cdot` and `\times` all parse to the same multiplication, so wri
 A point (tuple) was used as a divisor. Dividing a point BY a scalar is defined — it scales each component, so `(4, 6) / 2` is `(2, 3)` — but there is no reciprocal of a point, so neither `x / (1, 2)` nor `(1, 2) / (3, 4)` has a meaning to give them.
 
 If you meant to scale by the reciprocal of one component, index it: `p / q[1]`. If you meant a component-wise quotient, build it explicitly from the components.
+
+## `return-in-expression-body`
+
+A `Return` appears in an operand of `Sum`, `Product`, `Integrate`, `D`, `ND`, `NIntegrate`, `Limit` or `NLimit` (the operator is named in the error): in the body, a bound or a variable. These operands are expressions, computed once per index value or integration point, not statement blocks of the enclosing function, so a `Return` there has no function to end. Before, it stayed in the value: `Sum(1 + Return("q"), (k, 1, 2))` was `2 + 2Return("q")`.
+
+To leave a function early, test the condition outside the operator and return from the function body. A `Return` inside a function literal in the body (`Sum(Apply(x ↦ { return 2x }, k), (k, 1, 3))`) ends that function and is allowed.
 
 ## `missing`
 

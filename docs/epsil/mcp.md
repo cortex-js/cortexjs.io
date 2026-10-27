@@ -210,6 +210,18 @@ library defines, such as `Pi`, replaces that definition, and the result has a
 `warnings` entry that says so. A compilation has the same deadline as an
 evaluation (`timeLimit`).
 
+## Engine Version
+
+Every tool result says which version of the Compute Engine computed it:
+`engineVersion` in a JSON result, and a last line `Engine version: …` in an
+error message. The server loads the engine when it starts and keeps it while
+it runs, so after you install a new version of the package, a server that was
+already running still answers with the old one. When the version installed
+on disk is not the one the server loaded, the result also has an
+`engineWarning` (or a line in an error message) that says to restart the
+server. Restart the MCP server, or the client that started it, after an
+upgrade.
+
 ## Trying It Out
 
 Ask your assistant something that benefits from exact computation, and
@@ -251,6 +263,11 @@ sequenceDiagram
 - **Evaluations have a deadline.** By default a program is canceled after
   10 seconds. Start the server with `epsil mcp --time-limit <ms>` to change
   the default (`0` disables it); the assistant can also adjust it per call.
+- **Numeric work can run on worker threads.** Start the server with
+  `epsil mcp --workers <n>` to give the engines of the `evaluate` calls a
+  pool of `<n>` worker threads; a `findFit` with a global search then scans
+  on them. `--workers auto` uses the number of processor cores minus one,
+  from 1 to 8. The values are the same with or without the pool.
 - **The computation runs locally by default.** The server is part of the npm
   package, and programs evaluate in the Node.js process that runs
   `epsil mcp`. A ChatGPT connection still uses the configured Secure MCP

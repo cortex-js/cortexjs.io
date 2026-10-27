@@ -89,18 +89,18 @@ Assignable value for `ce.assign()`.
 
 </MemberCard>
 
-### ~~ExpressionComputeEngine~~ {#expressioncomputeengine}
+### ComputeEngine {#computeengine}
 
-Compute engine surface used by expression types.
+Compute engine surface used by the expression and definition types.
 
-This interface is augmented by `types-engine.ts` with the concrete
-`IComputeEngine` members to avoid type-layer circular dependencies.
-
-#### Deprecated
-
-Use `ComputeEngine` (the type exported from the package entry
-points) or `IComputeEngine` instead — the three are interchangeable, and
-this alias will be removed in a future release.
+This interface is empty here and augmented by `types-engine.ts` with the
+members of `IComputeEngine`. The expression types cannot import
+`IComputeEngine` directly: `types-engine.ts` imports this file, and the
+repository allows no import cycle, not even between type-only modules.
+`types-definitions.ts` imports this interface from here for the same
+reason. The package entry points export their own `ComputeEngine` type
+(`IComputeEngine`), which takes precedence over this one; the two are
+structurally identical.
 
 #### Extends
 
@@ -108,7 +108,7 @@ this alias will be removed in a future release.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~latexSyntax~~ {#latexsyntax-1}
+##### ComputeEngine.latexSyntax {#latexsyntax-1}
 
 ```ts
 readonly latexSyntax: ILatexSyntax | undefined;
@@ -129,7 +129,7 @@ The LatexSyntax instance used for LaTeX parsing/serialization.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~latexOptions~~ {#latexoptions-1}
+##### ComputeEngine.latexOptions {#latexoptions-1}
 
 ```ts
 latexOptions: Partial<ParseLatexOptions & SerializeLatexOptions>;
@@ -143,7 +143,7 @@ Engine-wide LaTeX parse/serialize options (e.g. `decimalSeparator`).
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~True~~ {#true-1}
+##### ComputeEngine.True {#true-1}
 
 ```ts
 readonly True: Expression;
@@ -153,7 +153,7 @@ readonly True: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~False~~ {#false-1}
+##### ComputeEngine.False {#false-1}
 
 ```ts
 readonly False: Expression;
@@ -163,7 +163,7 @@ readonly False: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Pi~~ {#pi-1}
+##### ComputeEngine.Pi {#pi-1}
 
 ```ts
 readonly Pi: Expression;
@@ -173,7 +173,7 @@ readonly Pi: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~E~~ {#e-1}
+##### ComputeEngine.E {#e-1}
 
 ```ts
 readonly E: Expression;
@@ -183,7 +183,7 @@ readonly E: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Nothing~~ {#nothing-1}
+##### ComputeEngine.Nothing {#nothing-1}
 
 ```ts
 readonly Nothing: Expression;
@@ -193,7 +193,7 @@ readonly Nothing: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Missing~~ {#missing-1}
+##### ComputeEngine.Missing {#missing-1}
 
 ```ts
 readonly Missing: Expression;
@@ -205,7 +205,7 @@ The `Missing` symbol: an absent value whose position is preserved.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Zero~~ {#zero-1}
+##### ComputeEngine.Zero {#zero-1}
 
 ```ts
 readonly Zero: Expression;
@@ -215,7 +215,7 @@ readonly Zero: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~One~~ {#one-1}
+##### ComputeEngine.One {#one-1}
 
 ```ts
 readonly One: Expression;
@@ -225,7 +225,7 @@ readonly One: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Half~~ {#half-1}
+##### ComputeEngine.Half {#half-1}
 
 ```ts
 readonly Half: Expression;
@@ -235,7 +235,7 @@ readonly Half: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~NegativeOne~~ {#negativeone-1}
+##### ComputeEngine.NegativeOne {#negativeone-1}
 
 ```ts
 readonly NegativeOne: Expression;
@@ -245,7 +245,7 @@ readonly NegativeOne: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Two~~ {#two-1}
+##### ComputeEngine.Two {#two-1}
 
 ```ts
 readonly Two: Expression;
@@ -255,7 +255,7 @@ readonly Two: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~I~~ {#i-1}
+##### ComputeEngine.I {#i-1}
 
 ```ts
 readonly I: Expression;
@@ -267,7 +267,7 @@ ImaginaryUnit
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~NaN~~ {#nan-2}
+##### ComputeEngine.NaN {#nan-2}
 
 ```ts
 readonly NaN: Expression;
@@ -277,7 +277,7 @@ readonly NaN: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Indeterminate~~ {#indeterminate-1}
+##### ComputeEngine.Indeterminate {#indeterminate-1}
 
 ```ts
 readonly Indeterminate: Expression;
@@ -292,7 +292,7 @@ Its numeric approximation (`.N()`) is `NaN`.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~PositiveInfinity~~ {#positiveinfinity-2}
+##### ComputeEngine.PositiveInfinity {#positiveinfinity-2}
 
 ```ts
 readonly PositiveInfinity: Expression;
@@ -302,7 +302,7 @@ readonly PositiveInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~NegativeInfinity~~ {#negativeinfinity-2}
+##### ComputeEngine.NegativeInfinity {#negativeinfinity-2}
 
 ```ts
 readonly NegativeInfinity: Expression;
@@ -312,7 +312,7 @@ readonly NegativeInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~ComplexInfinity~~ {#complexinfinity-1}
+##### ComputeEngine.ComplexInfinity {#complexinfinity-1}
 
 ```ts
 readonly ComplexInfinity: Expression;
@@ -322,7 +322,7 @@ readonly ComplexInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~context~~ {#context-1}
+##### ComputeEngine.context {#context-1}
 
 ```ts
 readonly context: EvalContext;
@@ -332,7 +332,7 @@ readonly context: EvalContext;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~contextStack~~ {#contextstack-1}
+##### ComputeEngine.contextStack {#contextstack-1}
 
 ```ts
 contextStack: readonly EvalContext[];
@@ -342,7 +342,7 @@ contextStack: readonly EvalContext[];
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~iterationLimit~~ {#iterationlimit-1}
+##### ComputeEngine.iterationLimit {#iterationlimit-1}
 
 ```ts
 iterationLimit: number;
@@ -352,7 +352,7 @@ iterationLimit: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~recursionLimit~~ {#recursionlimit-1}
+##### ComputeEngine.recursionLimit {#recursionlimit-1}
 
 ```ts
 recursionLimit: number;
@@ -362,7 +362,7 @@ recursionLimit: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~maxCollectionSize~~ {#maxcollectionsize-1}
+##### ComputeEngine.maxCollectionSize {#maxcollectionsize-1}
 
 ```ts
 maxCollectionSize: number;
@@ -372,7 +372,7 @@ maxCollectionSize: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~bignum~~ {#bignum-2}
+##### ComputeEngine.bignum {#bignum-2}
 
 ```ts
 bignum: (a) => BigDecimal;
@@ -382,7 +382,7 @@ bignum: (a) => BigDecimal;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~complex~~ {#complex-2}
+##### ComputeEngine.complex {#complex-2}
 
 ```ts
 complex: (a, b?) => Complex;
@@ -392,7 +392,7 @@ complex: (a, b?) => Complex;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~angularUnit~~ {#angularunit-2}
+##### ComputeEngine.angularUnit {#angularunit-2}
 
 ```ts
 angularUnit: AngularUnit;
@@ -402,7 +402,7 @@ angularUnit: AngularUnit;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~roundingTies~~ {#roundingties-2}
+##### ComputeEngine.roundingTies {#roundingties-2}
 
 ```ts
 roundingTies: RoundingTies;
@@ -415,7 +415,7 @@ The rule that `Round` uses for a value halfway between two integers.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~costFunction~~ {#costfunction-2}
+##### ComputeEngine.costFunction {#costfunction-2}
 
 ```ts
 costFunction: (expr) => number;
@@ -425,7 +425,7 @@ costFunction: (expr) => number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~simplificationRules~~ {#simplificationrules-1}
+##### ComputeEngine.simplificationRules {#simplificationrules-1}
 
 ```ts
 simplificationRules: Rule[];
@@ -439,7 +439,7 @@ The rules used by `.simplify()` when no explicit `rules` option is passed.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~solveRules~~ {#solverules-1}
+##### ComputeEngine.solveRules {#solverules-1}
 
 ```ts
 solveRules: Rule[];
@@ -458,7 +458,7 @@ The rules used by `solve()` to find roots of univariate expressions.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~harmonizationRules~~ {#harmonizationrules-1}
+##### ComputeEngine.harmonizationRules {#harmonizationrules-1}
 
 ```ts
 harmonizationRules: Rule[];
@@ -472,7 +472,7 @@ The rules used by `solve()` to transform an equation into equivalent,
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~strict~~ {#strict-1}
+##### ComputeEngine.strict {#strict-2}
 
 ```ts
 strict: boolean;
@@ -482,7 +482,7 @@ strict: boolean;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~jit~~ {#jit-1}
+##### ComputeEngine.jit {#jit-1}
 
 ```ts
 jit: "auto" | "off";
@@ -498,7 +498,7 @@ compilation and latches to `'off'` engine-wide on the first CSP
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~workers~~ {#workers-1}
+##### ComputeEngine.workers {#workers-1}
 
 ```ts
 workers: KernelPool | undefined;
@@ -513,7 +513,7 @@ can serve several engines, and it is read at each call.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~trace~~ {#trace-1}
+##### ComputeEngine.trace {#trace-1}
 
 ```ts
 trace: readonly string[];
@@ -525,7 +525,7 @@ A list of the function calls to the current evaluation context
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~effects~~ {#effects-3}
+##### ComputeEngine.effects {#effects-3}
 
 ```ts
 get effects(): EffectHandlers
@@ -560,7 +560,7 @@ For a change that must last for one block of code only, use
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~precision~~ {#precision-1}
+##### ComputeEngine.precision {#precision-1}
 
 ```ts
 get precision(): number
@@ -571,7 +571,7 @@ set precision(p: number | "auto" | "machine"): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~tolerance~~ {#tolerance-2}
+##### ComputeEngine.tolerance {#tolerance-3}
 
 ```ts
 get tolerance(): number
@@ -586,7 +586,7 @@ recomputed at each precision change.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~checkpoint()~~ {#checkpoint-1}
+##### ComputeEngine.checkpoint() {#checkpoint-1}
 
 ```ts
 checkpoint(label?): EngineCheckpoint
@@ -610,7 +610,7 @@ checkpoint was taken on.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~restore()~~ {#restore-1}
+##### ComputeEngine.restore() {#restore-1}
 
 ```ts
 restore(cp): void
@@ -630,7 +630,7 @@ artifacts, never as live boxed nodes.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~discard()~~ {#discard-1}
+##### ComputeEngine.discard() {#discard-1}
 
 ```ts
 discard(cp): void
@@ -648,7 +648,7 @@ OLDEST makes the state before the next-younger one unreachable.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declareProtocol()~~ {#declareprotocol-1}
+##### ComputeEngine.declareProtocol() {#declareprotocol-1}
 
 ```ts
 declareProtocol(name, members): void
@@ -669,7 +669,7 @@ on re-declaration — the Epsil statement route replaces instead (P5).
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declareProtocolImplementation()~~ {#declareprotocolimplementation-1}
+##### ComputeEngine.declareProtocolImplementation() {#declareprotocolimplementation-1}
 
 ```ts
 declareProtocolImplementation(
@@ -719,7 +719,7 @@ throws.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~conformsTo()~~ {#conformsto-1}
+##### ComputeEngine.conformsTo() {#conformsto-1}
 
 ```ts
 conformsTo(type, protocol): boolean
@@ -732,16 +732,16 @@ Inheritance included: a conformance registered for a supertype answers
 for its subtypes. A CONDITIONAL conformance (`list<T> is P where T is
 P`) recurses, deciding itself against `type`'s own arguments.
 
-`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-10)
+`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-11)
 parses one.
 
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -764,7 +764,7 @@ parses one.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~withTimeLimit()~~ {#withtimelimit-1}
+##### ComputeEngine.withTimeLimit() {#withtimelimit-1}
 
 ```ts
 withTimeLimit<T>(limit, fn): T
@@ -779,8 +779,12 @@ enclosing span preempts this limit; use the label and
 `finally`, so a `Promise`-returning (`async`) callback hands control back
 at its first `await` while the span is still open: work that resumes after
 that point runs **outside** the deadline and is never cancelled (see
-`docs/TIMEOUT-MODEL.md` §6.4). For asynchronous cancellation use
-`expr.evaluateAsync({ signal })` with an `AbortSignal` instead.
+`docs/TIMEOUT-MODEL.md` §6.4). An `expr.evaluateAsync()` call that `fn`
+makes before its first `await` is the exception: the evaluation keeps
+the span's deadline until it ends
+(`ce.withTimeLimit(20, () => { p = expr.evaluateAsync(); })`). For
+cancellation that is not a time limit, use
+`expr.evaluateAsync({ signal })` with an `AbortSignal`.
 
 • T
 
@@ -800,7 +804,7 @@ that point runs **outside** the deadline and is never cancelled (see
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~withStepBudget()~~ {#withstepbudget-1}
+##### ComputeEngine.withStepBudget() {#withstepbudget-1}
 
 ```ts
 withStepBudget<T>(limit, fn): T
@@ -837,7 +841,7 @@ and the span's `label` as its `attribution`.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~withEffects()~~ {#witheffects-1}
+##### ComputeEngine.withEffects() {#witheffects-1}
 
 ```ts
 withEffects<T>(overrides, fn): T
@@ -882,7 +886,7 @@ calling `withEffects`, or use a separate engine.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~withEvaluationContext()~~ {#withevaluationcontext-1}
+##### ComputeEngine.withEvaluationContext() {#withevaluationcontext-1}
 
 ```ts
 withEvaluationContext<T>(options, fn): T
@@ -938,7 +942,7 @@ first `await`, runs in the context.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~chop()~~ {#chop-1}
+##### ComputeEngine.chop() {#chop-1}
 
 ###### chop(n)
 
@@ -974,7 +978,7 @@ chop(n): number | BigDecimal
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~expr()~~ {#expr-3}
+##### ComputeEngine.expr() {#expr-3}
 
 ```ts
 expr(expr, options?): Expression
@@ -999,7 +1003,7 @@ expr(expr, options?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~box()~~ {#box-1}
+##### ComputeEngine.~~box()~~ {#box-1}
 
 ```ts
 box(expr, options?): Expression
@@ -1028,7 +1032,7 @@ Use `expr()` instead.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~rebind()~~ {#rebind-1}
+##### ComputeEngine.rebind() {#rebind-1}
 
 ```ts
 rebind(expr, options?): Expression
@@ -1081,7 +1085,7 @@ route boxes it.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~parse()~~ {#parse-2}
+##### ComputeEngine.parse() {#parse-2}
 
 ###### parse(latex, options)
 
@@ -1146,7 +1150,7 @@ parse(latex, options?): Expression | null
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~appliedNonFunctions()~~ {#appliednonfunctions-1}
+##### ComputeEngine.appliedNonFunctions() {#appliednonfunctions-1}
 
 ```ts
 appliedNonFunctions(latex): string[]
@@ -1172,7 +1176,7 @@ juxtaposition analysis.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~function()~~ {#function-1}
+##### ComputeEngine.function() {#function-1}
 
 ```ts
 function(name, ops, options?): Expression
@@ -1204,7 +1208,7 @@ readonly [`ExpressionInput`](#expressioninput)[]
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~\_getCompilationTarget()~~ {#_getcompilationtarget-1}
+##### ComputeEngine.\_getCompilationTarget() {#_getcompilationtarget-1}
 
 ###### \_getCompilationTarget(name)
 
@@ -1234,7 +1238,56 @@ _getCompilationTarget(name):
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~number()~~ {#number-2}
+##### ComputeEngine.registerCompilationTarget() {#registercompilationtarget-1}
+
+```ts
+registerCompilationTarget(name, target): void
+```
+
+Register a compilation target under `name`, so that
+`compile(expr, { to: name })` resolves it. A later registration under the
+same name replaces the earlier target. Throws when `name` is empty or the
+target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
+and `compile()`.
+
+Every engine has `javascript` and `interval-js`. Every engine also has
+`glsl`, `wgsl` and `python` once the full package entry,
+`@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
+the program, whichever entry made the engine and in whichever order. A
+program that loads only `@cortex-js/compute-engine/core` has the two
+built-in targets: import `GLSLTarget`, `WGSLTarget` or `PythonTarget`
+from `@cortex-js/compute-engine/compile` and register it here.
+
+####### name
+
+`string`
+
+####### target
+
+`LanguageTarget`\<[`Expression`](#expression-5)\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### ComputeEngine.unregisterCompilationTarget() {#unregistercompilationtarget-1}
+
+```ts
+unregisterCompilationTarget(name): void
+```
+
+Remove the compilation target registered under `name`. A name that is
+not registered is ignored.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ComputeEngine.number() {#number-2}
 
 ###### number(value, options)
 
@@ -1330,7 +1383,7 @@ number(value, options?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~symbol()~~ {#symbol-1}
+##### ComputeEngine.symbol() {#symbol-1}
 
 ```ts
 symbol(sym, options?): Expression
@@ -1358,7 +1411,7 @@ symbol(sym, options?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~string()~~ {#string-2}
+##### ComputeEngine.string() {#string-2}
 
 ```ts
 string(s, metadata?): Expression
@@ -1376,7 +1429,7 @@ string(s, metadata?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~character()~~ {#character-2}
+##### ComputeEngine.character() {#character-2}
 
 ```ts
 character(s, metadata?): Expression
@@ -1400,7 +1453,7 @@ it reports a diagnostic instead.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~error()~~ {#error-2}
+##### ComputeEngine.error() {#error-2}
 
 ```ts
 error(message, where?): Expression
@@ -1418,7 +1471,7 @@ error(message, where?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~typeError()~~ {#typeerror-1}
+##### ComputeEngine.typeError() {#typeerror-1}
 
 ```ts
 typeError(expectedType, actualType, where?): Expression
@@ -1442,7 +1495,7 @@ typeError(expectedType, actualType, where?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~hold()~~ {#hold-1}
+##### ComputeEngine.hold() {#hold-1}
 
 ```ts
 hold(expr): Expression
@@ -1456,7 +1509,7 @@ hold(expr): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~tuple()~~ {#tuple-1}
+##### ComputeEngine.tuple() {#tuple-1}
 
 ###### tuple(elements)
 
@@ -1482,7 +1535,7 @@ tuple(...elements): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~list()~~ {#list-1}
+##### ComputeEngine.list() {#list-1}
 
 ```ts
 list(values): Expression
@@ -1511,7 +1564,7 @@ back with `expr.array`.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~type()~~ {#type-11}
+##### ComputeEngine.type() {#type-12}
 
 ```ts
 type(type): BoxedType
@@ -1520,10 +1573,10 @@ type(type): BoxedType
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -1543,7 +1596,7 @@ type(type): BoxedType
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~rules()~~ {#rules-2}
+##### ComputeEngine.rules() {#rules-2}
 
 ```ts
 rules(rules, options?): BoxedRuleSet
@@ -1570,7 +1623,7 @@ Default purpose applied to any rule in the set that doesn't carry
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getRuleSet()~~ {#getruleset-1}
+##### ComputeEngine.getRuleSet() {#getruleset-1}
 
 ```ts
 getRuleSet(id?): BoxedRuleSet | undefined
@@ -1584,7 +1637,7 @@ getRuleSet(id?): BoxedRuleSet | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~pushScope()~~ {#pushscope-1}
+##### ComputeEngine.pushScope() {#pushscope-1}
 
 ```ts
 pushScope(scope?, name?): void
@@ -1602,7 +1655,7 @@ pushScope(scope?, name?): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~popScope()~~ {#popscope-1}
+##### ComputeEngine.popScope() {#popscope-1}
 
 ```ts
 popScope(): void
@@ -1612,7 +1665,7 @@ popScope(): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~createScope()~~ {#createscope-1}
+##### ComputeEngine.createScope() {#createscope-1}
 
 ```ts
 createScope(bindings?, parent?): InspectableScope
@@ -1622,10 +1675,10 @@ createScope(bindings?, parent?): InspectableScope
 
 `Record`\<`string`, 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -1650,7 +1703,7 @@ createScope(bindings?, parent?): InspectableScope
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~lookupDefinition()~~ {#lookupdefinition-2}
+##### ComputeEngine.lookupDefinition() {#lookupdefinition-2}
 
 ```ts
 lookupDefinition(id): BoxedDefinition | undefined
@@ -1664,7 +1717,7 @@ lookupDefinition(id): BoxedDefinition | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~assign()~~ {#assign-1}
+##### ComputeEngine.assign() {#assign-1}
 
 ###### assign(ids)
 
@@ -1673,6 +1726,8 @@ assign(ids): IComputeEngine
 ```
 
 ####### ids
+
+\{\}
 
 ###### assign(id, value)
 
@@ -1706,7 +1761,7 @@ assign(arg1, arg2?): IComputeEngine
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declareType()~~ {#declaretype-1}
+##### ComputeEngine.declareType() {#declaretype-1}
 
 ```ts
 declareType(name, type, options?): void
@@ -1719,10 +1774,10 @@ declareType(name, type, options?): void
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -1752,6 +1807,14 @@ declareType(name, type, options?): void
 
 `boolean`
 
+Whether the declaration also declares a value-level constructor
+of the same name (`point(1, 2)` for `type point = tuple<…>`). Default
+`true`. A VALUE KIND uses `false`: its type is a nominal type defined
+as exactly `value` (`ce.declareType('gf8', 'value', { mint: false })`),
+and its values are made by the head that declares its arithmetic
+(`GF8(3)`), so a second constructor with no arithmetic must not
+exist. See the `arithmetic` field of `OperatorDefinition`.
+
 ####### typeParams?
 
 [`TypeParamsOption`](#typeparamsoption)
@@ -1760,7 +1823,7 @@ declareType(name, type, options?): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declare()~~ {#declare-1}
+##### ComputeEngine.declare() {#declare-1}
 
 ###### declare(symbols)
 
@@ -1769,6 +1832,8 @@ declare(symbols): IComputeEngine
 ```
 
 ####### symbols
+
+\{\}
 
 ###### declare(id, type, scope)
 
@@ -1783,10 +1848,10 @@ declare(id, type, scope?): IComputeEngine
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -1862,10 +1927,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 ####### arg2?
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -1882,10 +1947,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
+     \| [`ListType`](#listtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
@@ -1912,10 +1977,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
+     \| [`ListType`](#listtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
@@ -1945,9 +2010,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `derivative`: [`OperatorDerivative`](#operatorderivative);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
+  `compileShippable`: `boolean`;
+  `compileHelpers`: `Readonly`\<`Record`\<`string`, (...`args`) => `unknown`\>\>;
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
@@ -1962,10 +2030,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
+     \| [`ListType`](#listtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
@@ -1992,10 +2060,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
+     \| [`ListType`](#listtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
@@ -2025,9 +2093,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `derivative`: [`OperatorDerivative`](#operatorderivative);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
+  `compileShippable`: `boolean`;
+  `compileHelpers`: `Readonly`\<`Record`\<`string`, (...`args`) => `unknown`\>\>;
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
@@ -2050,7 +2121,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~loadLibrary()~~ {#loadlibrary-1}
+##### ComputeEngine.loadLibrary() {#loadlibrary-1}
 
 ```ts
 loadLibrary(library): IComputeEngine
@@ -2069,7 +2140,7 @@ and its name is recorded (see `libraryOf()`). Each library in its
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~libraryOf()~~ {#libraryof-1}
+##### ComputeEngine.libraryOf() {#libraryof-1}
 
 ```ts
 libraryOf(name): string | undefined
@@ -2087,7 +2158,7 @@ that no library defines or that a declaration shadows.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~assume()~~ {#assume-1}
+##### ComputeEngine.assume() {#assume-1}
 
 ```ts
 assume(predicate): AssumeResult
@@ -2101,7 +2172,7 @@ assume(predicate): AssumeResult
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declareSequence()~~ {#declaresequence-1}
+##### ComputeEngine.declareSequence() {#declaresequence-1}
 
 ```ts
 declareSequence(name, def): IComputeEngine
@@ -2132,7 +2203,7 @@ ce.parse('F_{10}').evaluate();  // → 55
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getSequenceStatus()~~ {#getsequencestatus-1}
+##### ComputeEngine.getSequenceStatus() {#getsequencestatus-1}
 
 ```ts
 getSequenceStatus(name): SequenceStatus
@@ -2156,7 +2227,7 @@ ce.getSequenceStatus('F');
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getSequence()~~ {#getsequence-1}
+##### ComputeEngine.getSequence() {#getsequence-1}
 
 ```ts
 getSequence(name): SequenceInfo | undefined
@@ -2173,7 +2244,7 @@ Returns `undefined` if the symbol is not a sequence.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~listSequences()~~ {#listsequences-1}
+##### ComputeEngine.listSequences() {#listsequences-1}
 
 ```ts
 listSequences(): string[]
@@ -2189,7 +2260,7 @@ sequence, as for `isSequence()`.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~isSequence()~~ {#issequence-1}
+##### ComputeEngine.isSequence() {#issequence-1}
 
 ```ts
 isSequence(name): boolean
@@ -2211,7 +2282,7 @@ declaration.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~clearSequenceCache()~~ {#clearsequencecache-1}
+##### ComputeEngine.clearSequenceCache() {#clearsequencecache-1}
 
 ```ts
 clearSequenceCache(name?): void
@@ -2228,7 +2299,7 @@ If no name is provided, clears caches for all sequences.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getSequenceCache()~~ {#getsequencecache-1}
+##### ComputeEngine.getSequenceCache() {#getsequencecache-1}
 
 ```ts
 getSequenceCache(name): 
@@ -2250,7 +2321,7 @@ For multi-index sequences, keys are comma-separated strings (e.g., '5,2').
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getSequenceTerms()~~ {#getsequenceterms-1}
+##### ComputeEngine.getSequenceTerms() {#getsequenceterms-1}
 
 ```ts
 getSequenceTerms(
@@ -2298,7 +2369,7 @@ ce.getSequenceTerms('F', 0, 10);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~lookupOEIS()~~ {#lookupoeis-1}
+##### ComputeEngine.lookupOEIS() {#lookupoeis-1}
 
 ```ts
 lookupOEIS(terms, options?): Promise<OEISSequenceInfo[]>
@@ -2329,7 +2400,7 @@ const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~checkSequenceOEIS()~~ {#checksequenceoeis-1}
+##### ComputeEngine.checkSequenceOEIS() {#checksequenceoeis-1}
 
 ```ts
 checkSequenceOEIS(name, count?, options?): Promise<{
@@ -2370,7 +2441,7 @@ const result = await ce.checkSequenceOEIS('F', 10);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~interpret()~~ {#interpret-1}
+##### ComputeEngine.interpret() {#interpret-1}
 
 ```ts
 interpret(expr, options?): Promise<InterpretResult>
@@ -2410,7 +2481,7 @@ const { expression, candidates } = await ce.interpret(
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~forget()~~ {#forget-1}
+##### ComputeEngine.forget() {#forget-1}
 
 ```ts
 forget(symbol?): void
@@ -2424,7 +2495,7 @@ forget(symbol?): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~undeclare()~~ {#undeclare-1}
+##### ComputeEngine.undeclare() {#undeclare-1}
 
 ```ts
 undeclare(names): void
@@ -2496,7 +2567,7 @@ ce.parse('f(2)').evaluate();   // f(2)
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~ask()~~ {#ask-1}
+##### ComputeEngine.ask() {#ask-1}
 
 ```ts
 ask(pattern): BoxedSubstitution[]
@@ -2510,7 +2581,7 @@ ask(pattern): BoxedSubstitution[]
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~verify()~~ {#verify-1}
+##### ComputeEngine.verify() {#verify-1}
 
 ```ts
 verify(query): boolean | undefined
@@ -2524,7 +2595,7 @@ verify(query): boolean | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~operatorInfo()~~ {#operatorinfo-2}
+##### ComputeEngine.operatorInfo() {#operatorinfo-2}
 
 ```ts
 operatorInfo(head): OperatorInfo | undefined
@@ -2549,7 +2620,7 @@ maintaining a parallel list of "known" operators.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~normalizeIdentifier()~~ {#normalizeidentifier-1}
+##### ComputeEngine.normalizeIdentifier() {#normalizeidentifier-1}
 
 ```ts
 normalizeIdentifier(latex): string
@@ -2575,7 +2646,7 @@ name without the side-effect of auto-declaring the symbol.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~symbolInfo()~~ {#symbolinfo-2}
+##### ComputeEngine.symbolInfo() {#symbolinfo-2}
 
 ```ts
 symbolInfo(name): SymbolInfo | undefined
@@ -2601,7 +2672,7 @@ two methods are non-overlapping).
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~searchDefinitions()~~ {#searchdefinitions-1}
+##### ComputeEngine.searchDefinitions() {#searchdefinitions-1}
 
 ```ts
 searchDefinitions(query, options?): DefinitionSearchResult[]
@@ -2633,7 +2704,7 @@ call for full detail.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~suggestOperatorName()~~ {#suggestoperatorname-1}
+##### ComputeEngine.suggestOperatorName() {#suggestoperatorname-1}
 
 ```ts
 suggestOperatorName(name): string | undefined
@@ -2662,7 +2733,7 @@ ce.suggestOperatorName('foo');      // → undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~functionProperties()~~ {#functionproperties-2}
+##### ComputeEngine.functionProperties() {#functionproperties-2}
 
 ```ts
 functionProperties(name): FunctionProperties | undefined
@@ -2688,7 +2759,7 @@ residues that depend on parameters) are available via `entries`.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~contourIntegrate()~~ {#contourintegrate-1}
+##### ComputeEngine.contourIntegrate() {#contourintegrate-1}
 
 ```ts
 contourIntegrate(integrand, variable, contour): ContourIntegralResult
@@ -2716,7 +2787,7 @@ status `pole-on-contour`. See [ContourInput](#contourinput) for contour forms.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~toJSON()~~ {#tojson-3}
+##### ComputeEngine.toJSON() {#tojson-3}
 
 ```ts
 toJSON(): string
@@ -2816,7 +2887,7 @@ Obtained via `isNumber()`.
 
 <MemberCard>
 
-##### NumberLiteralInterface.numericValue {#numericvalue}
+##### NumberLiteralInterface.numericValue {#numericvalue-1}
 
 ```ts
 readonly numericValue: number | NumericValue;
@@ -2826,7 +2897,7 @@ readonly numericValue: number | NumericValue;
 
 <MemberCard>
 
-##### NumberLiteralInterface.isExact {#isexact-1}
+##### NumberLiteralInterface.isExact {#isexact-2}
 
 ```ts
 readonly isExact: boolean;
@@ -3334,7 +3405,6 @@ type ReplaceOptions = {
   useVariations: boolean;
   matchPermutations: boolean;
   iterationLimit: number;
-  canonical: CanonicalOptions;
   form: FormOption;
   direction: "left-right" | "right-left";
 };
@@ -3402,7 +3472,7 @@ Controls how expressions are created.
 type Metadata = {
   latex: string;
   wikidata: string;
-  sourceOffsets: [number, number];
+  sourceOffsets: [start: number, end: number];
 };
 ```
 
@@ -3632,6 +3702,102 @@ type AssumeResult =
 
 ## Compiling
 
+### ArithmeticCompile {#arithmeticcompile}
+
+The compiled form of a value kind (the `compile` field of an
+[ArithmeticDefinition](#arithmeticdefinition)).
+
+The hooks branch on `context.language`, like the `compile` handler of an
+operator definition. `undefined` from a hook declines: the compilation
+then fails with a diagnostic that names the kind type.
+
+<MemberCard>
+
+##### ArithmeticCompile.type? {#type-5}
+
+```ts
+type?: {
+  lowered: string | undefined;
+  add: string | undefined;
+  multiply: string | undefined;
+  apply: string | undefined;
+  entry: boolean;
+  shippable: boolean;
+  helpers: Readonly<Record<string, (...args) => unknown>>;
+  hostNames: readonly string[];
+};
+```
+
+The representation of the kind TYPE and its operations. It belongs to
+the kind type, not to one operator: the operators of one kind type that
+are declared at the same time must give the same object (or none, and
+then they use the one another operator gave).
+
+##### type.shippable?
+
+```ts
+shippable?: boolean;
+```
+
+Whether code from this lowering may be sent to a worker as text.
+Default `false`. A compilation result is shippable only when every
+kind contract it uses says `true` and lists no `hostNames`, and no
+input of the code is a value of a kind (its `entry` check is a
+function of the host, which a worker does not have).
+
+##### type.helpers?
+
+```ts
+helpers?: Readonly<Record<string, (...args) => unknown>>;
+```
+
+Functions that the code of this lowering calls by name. The engine
+copies the source of each one into the compiled code, as
+`const <name> = (<source>);`, so the code carries them to a worker
+and to a stored result. The rules are those of
+`OperatorDefinition.compileHelpers`: a helper must not read a
+variable from outside its own body, and its name is an identifier
+that does not start with `_`. Put a helper here, not in `hostNames`,
+when the code can carry it.
+
+##### type.hostNames?
+
+```ts
+hostNames?: readonly string[];
+```
+
+The functions of the host that the code of this lowering calls and
+that it does not carry (they are not in `helpers`). A worker does not
+have them, so a non-empty list makes the result not shippable,
+whatever `shippable` says.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticCompile.value()? {#value-4}
+
+```ts
+value(value, compile, context): string | undefined
+```
+
+The source of a literal value of THIS operator, in the representation of
+the kind type. An operator without it declines a literal of its own.
+
+####### value
+
+[`Expression`](#expression-5)
+
+####### compile
+
+(`expr`) => `string`
+
+####### context
+
+[`OperatorCompileContext`](#operatorcompilecontext)
+
+</MemberCard>
+
 <MemberCard>
 
 ### CompiledType {#compiledtype}
@@ -3739,7 +3905,7 @@ The `options` argument passed to an `evaluate` / `evaluateAsync` handler.
 #### EvaluateHandlerOptions.expression?
 
 ```ts
-optional expression?: Expression;
+expression?: Expression;
 ```
 
 The canonical expression node being evaluated.
@@ -3778,7 +3944,7 @@ invoked outside the evaluation driver may not receive one).
 #### EvaluateHandlerOptions.precision?
 
 ```ts
-optional precision?: number;
+precision?: number;
 ```
 
 The number of significant digits the caller asked for, when
@@ -3890,7 +4056,7 @@ value:
 #### ValueDefinition.subscriptEvaluate?
 
 ```ts
-optional subscriptEvaluate?: (subscript, options) => Expression | undefined;
+subscriptEvaluate?: (subscript, options) => Expression | undefined;
 ```
 
 Custom evaluation handler for subscripted expressions of this symbol.
@@ -3908,7 +4074,7 @@ Contains the compute engine and evaluation options
 
 ####### engine
 
-`ComputeEngine`
+[`ComputeEngine`](#computeengine)
 
 ####### numericApproximation?
 
@@ -3938,7 +4104,7 @@ ce.parse('F_{10}').evaluate();  // → 55
 ##### SequenceDefinition.variable? {#variable}
 
 ```ts
-optional variable?: string;
+variable?: string;
 ```
 
 Index variable name for single-index sequences, default 'n'.
@@ -3951,7 +4117,7 @@ For multi-index sequences, use `variables` instead.
 ##### SequenceDefinition.variables? {#variables}
 
 ```ts
-optional variables?: string[];
+variables?: string[];
 ```
 
 Index variable names for multi-index sequences.
@@ -4007,7 +4173,7 @@ Recurrence relation as LaTeX string or Expression
 ##### SequenceDefinition.memoize? {#memoize}
 
 ```ts
-optional memoize?: boolean;
+memoize?: boolean;
 ```
 
 Whether to memoize computed values (default: true)
@@ -4019,7 +4185,7 @@ Whether to memoize computed values (default: true)
 ##### SequenceDefinition.domain? {#domain-1}
 
 ```ts
-optional domain?: 
+domain?: 
   | {
   min: number;
   max: number;
@@ -4049,7 +4215,7 @@ domain: { n: { min: 0 }, k: { min: 0 } }
 ##### SequenceDefinition.constraints? {#constraints}
 
 ```ts
-optional constraints?: string | Expression;
+constraints?: string | Expression;
 ```
 
 Constraint expression for multi-index sequences.
@@ -4122,7 +4288,7 @@ For multi-index: string keys including patterns (e.g., ['0,0', 'n,0', 'n,n'])
 ##### SequenceStatus.variable? {#variable-1}
 
 ```ts
-optional variable?: string;
+variable?: string;
 ```
 
 Index variable name if recurrence is defined (single-index)
@@ -4134,7 +4300,7 @@ Index variable name if recurrence is defined (single-index)
 ##### SequenceStatus.variables? {#variables-1}
 
 ```ts
-optional variables?: string[];
+variables?: string[];
 ```
 
 Index variable names if recurrence is defined (multi-index)
@@ -4162,7 +4328,7 @@ The sequence name
 ##### SequenceInfo.variable? {#variable-2}
 
 ```ts
-optional variable?: string;
+variable?: string;
 ```
 
 Index variable name for single-index sequences (e.g., `"n"`)
@@ -4174,7 +4340,7 @@ Index variable name for single-index sequences (e.g., `"n"`)
 ##### SequenceInfo.variables? {#variables-2}
 
 ```ts
-optional variables?: string[];
+variables?: string[];
 ```
 
 Index variable names for multi-index sequences (e.g., `["n", "k"]`)
@@ -4309,9 +4475,12 @@ type OperandStructure =
   | {
   kind: "symbol";
   name: string;
+  lookupByName: false;
   system: boolean;
   inferred: boolean;
   local: boolean;
+  free: true;
+  captured: true;
  }
   | {
   kind: "string";
@@ -4326,6 +4495,7 @@ type OperandStructure =
   | {
   kind: "application";
   head: string;
+  callee: OperandDescriptor;
   children: ReadonlyArray<OperandDescriptor>;
  }
   | {
@@ -4360,15 +4530,29 @@ holding an expression.
 \{
   `kind`: `"symbol"`;
   `name`: `string`;
+  `lookupByName`: `false`;
   `system`: `boolean`;
   `inferred`: `boolean`;
   `local`: `boolean`;
+  `free`: `true`;
+  `captured`: `true`;
  \}
+
+#### OperandStructure.lookupByName?
+
+```ts
+lookupByName?: false;
+```
+
+False when resolving this name in the current engine context would
+select a different binding, or when this is a synthetic bound symbol.
+Type handlers must then use the descriptor's own type rather than
+derive a call or read a declaration by name.
 
 #### OperandStructure.system?
 
 ```ts
-optional system?: boolean;
+system?: boolean;
 ```
 
 Present (`true`) when the symbol resolves to the definition the
@@ -4380,7 +4564,7 @@ quotient-ring adjunction only for the library `Integers`.
 #### OperandStructure.inferred?
 
 ```ts
-optional inferred?: boolean;
+inferred?: boolean;
 ```
 
 Present (`true`) when the symbol's recorded type was INFERRED
@@ -4392,15 +4576,43 @@ to trust an operand's type. Lives on the structure node, not in
 #### OperandStructure.local?
 
 ```ts
-optional local?: boolean;
+local?: boolean;
 ```
 
 Present (`true`) when the symbol is a block-local binding a `Block`
 hoisted for a `let` or a block-introducing assignment, still waiting
-for the statement that gives it a value. The `List`-fold handler
-reads it to keep the generic-symbol fold (an unknown bare symbol is
-a number) for FREE symbols only: such a local is not a generic
-value, its type is simply not known yet.
+for the statement that gives it a value. Such a local is not a
+generic value, its type is simply not known yet: the handlers that
+ask whether an operand may hold a list read it.
+
+#### OperandStructure.free?
+
+```ts
+free?: true;
+```
+
+Present (`true`) when the symbol is free: it has no value, it is
+not a constant, not `Undefined` and not a pattern wildcard (a name
+that starts with `_`), and a scope of the current context other
+than the system scope binds it, but not as a parameter of a
+function literal, a local of a `Block` or the variable of a binder
+(a `Sum` index). The `List` type handler reads a symbol of type
+`unknown` as a number cell only when this is present: these are the
+symbols that the canonical form of a literal list infers as
+numbers.
+
+#### OperandStructure.captured?
+
+```ts
+captured?: true;
+```
+
+Present (`true`) when the body of a function literal reads the
+symbol, and the symbol has no value and is not a parameter of the
+literal or a `let` local of the body (`isCapturedValuelessSymbol`).
+When the body is evaluated, the symbol reads the value that an outer
+scope holds at that time. A call of a function literal reads such a
+symbol of type `unknown` as an operand that may hold a list.
 
 \{
   `kind`: `"string"`;
@@ -4433,7 +4645,7 @@ builds the literal type only to widen it away. Read off the value
 #### OperandStructure.rational?
 
 ```ts
-optional rational?: readonly [bigint, bigint];
+rational?: readonly [bigint, bigint];
 ```
 
 The literal's exact value as a REDUCED fraction, when it is a
@@ -4448,8 +4660,19 @@ non-finite literal.
 \{
   `kind`: `"application"`;
   `head`: `string`;
+  `callee`: [`OperandDescriptor`](#operanddescriptor);
   `children`: `ReadonlyArray`\<[`OperandDescriptor`](#operanddescriptor)\>;
  \}
+
+#### OperandStructure.callee?
+
+```ts
+callee?: OperandDescriptor;
+```
+
+The callable's own contract when ambient lookup would select a
+different binding. A held literal may also supply its body structure.
+Derive this call through Apply rather than resolving head by name.
 
 \{
   `kind`: `"function-literal"`;
@@ -4593,6 +4816,21 @@ near-match inside it).
 
 <MemberCard>
 
+##### PureEngineView.strict {#strict}
+
+```ts
+readonly strict: boolean;
+```
+
+True when the engine checks the types of operands when it boxes an
+expression (`ComputeEngine.strict`). A handler that answers `error` for
+an operand that the boxing check refuses reads it, so that a non-strict
+engine keeps the unevaluated application.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### PureEngineView.\_protocolRegistry {#_protocolregistry}
 
 ```ts
@@ -4619,10 +4857,10 @@ type(type): BoxedType
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -4793,7 +5031,7 @@ May contain Markdown.
 ##### BaseDefinition.keywords? {#keywords}
 
 ```ts
-optional keywords?: string[];
+keywords?: string[];
 ```
 
 Search keywords (synonyms, alternate names) used by
@@ -4852,7 +5090,7 @@ for the `Pi` constant.
 ##### BaseDefinition.isConstant? {#isconstant}
 
 ```ts
-readonly optional isConstant?: boolean;
+readonly isConstant?: boolean;
 ```
 
 If true, the value or type of the definition cannot be changed
@@ -4961,7 +5199,7 @@ Library identifier
 ##### LibraryDefinition.requires? {#requires}
 
 ```ts
-optional requires?: string[];
+requires?: string[];
 ```
 
 Libraries that must be loaded before this one
@@ -4973,7 +5211,7 @@ Libraries that must be loaded before this one
 ##### LibraryDefinition.definitions? {#definitions}
 
 ```ts
-optional definitions?: Readonly<{}> | Readonly<{}>[];
+definitions?: Readonly<{}> | Readonly<{}>[];
 ```
 
 Symbol and operator definitions
@@ -5033,7 +5271,7 @@ count: `expr.count` always converts a count that is a safe integer to a
 ##### BaseCollectionHandlers.isEmpty? {#isempty}
 
 ```ts
-optional isEmpty?: (collection) => boolean | undefined;
+isEmpty?: (collection) => boolean | undefined;
 ```
 
 Optional flag to quickly check if the collection is empty, without having to count exactly how may elements it has (useful for lazy evaluation).
@@ -5045,7 +5283,7 @@ Optional flag to quickly check if the collection is empty, without having to cou
 ##### BaseCollectionHandlers.isFinite? {#isfinite}
 
 ```ts
-optional isFinite?: (collection) => boolean | undefined;
+isFinite?: (collection) => boolean | undefined;
 ```
 
 Optional flag to quickly check if the collection is finite, without having to count exactly how many elements it has (useful for lazy evaluation).
@@ -5057,7 +5295,7 @@ Optional flag to quickly check if the collection is finite, without having to co
 ##### BaseCollectionHandlers.isEnumerable? {#isenumerable}
 
 ```ts
-optional isEnumerable?: (collection) => boolean | undefined;
+isEnumerable?: (collection) => boolean | undefined;
 ```
 
 Optional predicate answering whether `iterator()` will actually produce
@@ -5088,7 +5326,7 @@ cheaply" and does not fall back to the default.
 ##### BaseCollectionHandlers.isCollection? {#iscollection}
 
 ```ts
-optional isCollection?: (collection) => boolean;
+isCollection?: (collection) => boolean;
 ```
 
 Optional predicate for operators whose collection-ness depends on their
@@ -5107,7 +5345,7 @@ Default: `true` (an operator with a `collection` block is a collection).
 ##### BaseCollectionHandlers.isLazy? {#islazy}
 
 ```ts
-optional isLazy?: (collection) => boolean;
+isLazy?: (collection) => boolean;
 ```
 
 Return `true` if the collection is lazy, `false` otherwise.
@@ -5127,7 +5365,7 @@ this handler to opt in.
 ##### BaseCollectionHandlers.elementMemo? {#elementmemo}
 
 ```ts
-optional elementMemo?: boolean;
+elementMemo?: boolean;
 ```
 
 Opt this operator's instances into per-instance element memoization: a
@@ -5149,7 +5387,7 @@ Default: `false`
 ##### BaseCollectionHandlers.contains? {#contains}
 
 ```ts
-optional contains?: (collection, target) => boolean | undefined;
+contains?: (collection, target) => boolean | undefined;
 ```
 
 Return `true` if the target expression is in the collection,
@@ -5164,7 +5402,7 @@ Return `undefined` if the membership cannot be determined.
 ##### BaseCollectionHandlers.countOf? {#countof}
 
 ```ts
-optional countOf?: (collection, target) => number | bigint | undefined;
+countOf?: (collection, target) => number | bigint | undefined;
 ```
 
 Return the number of elements of the collection that are structurally
@@ -5187,7 +5425,7 @@ The answer must be the one a walk that compares each element with
 ##### BaseCollectionHandlers.subsetOf? {#subsetof}
 
 ```ts
-optional subsetOf?: (collection, other, strict) => boolean | undefined;
+subsetOf?: (collection, other, strict) => boolean | undefined;
 ```
 
 Return `true` if all the elements of `collection` are in `other` — that
@@ -5209,7 +5447,7 @@ that cannot see far enough to answer must return `undefined` rather than
 ##### BaseCollectionHandlers.eltsgn? {#eltsgn}
 
 ```ts
-optional eltsgn?: (collection) => Sign | undefined;
+eltsgn?: (collection) => Sign | undefined;
 ```
 
 Return the sign of all the elements of the collection.
@@ -5221,7 +5459,7 @@ Return the sign of all the elements of the collection.
 ##### BaseCollectionHandlers.elttype? {#elttype}
 
 ```ts
-optional elttype?: (collection) => Type | undefined;
+elttype?: (collection) => Type | undefined;
 ```
 
 Return the widest type of all the elements in the collection
@@ -5278,7 +5516,7 @@ If no element matches the predicate, return `undefined`.
 ##### IndexedCollectionHandlers.atBigint? {#atbigint}
 
 ```ts
-optional atBigint?: (collection, index) => Expression | undefined;
+atBigint?: (collection, index) => Expression | undefined;
 ```
 
 Return the element at a 1-based position given as a `bigint`.
@@ -5301,7 +5539,7 @@ If the position is outside the collection, return `undefined`.
 ##### IndexedCollectionHandlers.indexOf? {#indexof}
 
 ```ts
-optional indexOf?: (collection, target) => number | bigint | undefined;
+indexOf?: (collection, target) => number | bigint | undefined;
 ```
 
 Return the 1-based position of the first element that is structurally
@@ -5325,6 +5563,545 @@ type CollectionHandlers = BaseCollectionHandlers & Partial<IndexedCollectionHand
 
 The collection handlers are the primitive operations that can be
 performed on collections, such as lists, sets, tuples, etc...
+
+</MemberCard>
+
+### ArithmeticContext {#arithmeticcontext}
+
+The context passed to the hooks of an [ArithmeticDefinition](#arithmeticdefinition).
+
+<MemberCard>
+
+##### ArithmeticContext.engine {#engine-1}
+
+```ts
+readonly engine: ComputeEngine;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticContext.numericApproximation {#numericapproximation}
+
+```ts
+readonly numericApproximation: boolean;
+```
+
+`true` under `.N()`. The hook numericizes its own result: a kind whose
+values are exact (a residue class) computes the exact value anyway; a
+kind whose values carry a float (a measurement, an interval) returns the
+numeric form. The caller does not apply `.N()` to the result.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticContext.tolerance? {#tolerance-1}
+
+```ts
+readonly tolerance?: number;
+```
+
+For the `compare` hook only: the tolerance of the caller, when it
+compares within a tolerance. `.is()` gives the `tolerance` argument of
+the call, or `engine.tolerance` when the call has none (`.is()` is the
+comparison within a tolerance, also for two exact values). `undefined`
+for every other comparison (the relational operators, `isEqual()`,
+`isLess()`, `Max`, `Min`, `Sort`, …): the hook then applies its own
+rule, usually two exact values compared exactly and a float within
+`engine.tolerance`.
+
+</MemberCard>
+
+### KindOperands {#kindoperands}
+
+The operands of an `add`, `multiply` or `apply` hook of an
+[ArithmeticDefinition](#arithmeticdefinition).
+
+<MemberCard>
+
+##### KindOperands.evaluated {#evaluated}
+
+```ts
+readonly evaluated: readonly Expression[];
+```
+
+The evaluated operands.
+
+</MemberCard>
+
+<MemberCard>
+
+##### KindOperands.written {#written}
+
+```ts
+readonly written: readonly (Expression | undefined)[];
+```
+
+The operands as they were written before evaluation, aligned with
+`evaluated`. `undefined` for a value that an earlier fold made, which
+has no written form. A kind whose rule depends on how a term was
+written reads it here (a temperature with an offset reads `Negate(b)` in
+`a - b`).
+
+</MemberCard>
+
+<MemberCard>
+
+##### KindOperands.exact() {#exact}
+
+```ts
+exact(i): Expression
+```
+
+The exact value of operand `i`: `evaluated[i]` outside `.N()`. Under
+`.N()`, the operand evaluated again without the numeric approximation
+when it is transitively pure (evaluating it again cannot repeat a side
+effect), else `evaluated[i]`. The result is memoized.
+
+####### i
+
+`number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### KindOperands.elements() {#elements}
+
+```ts
+elements(i): readonly Expression[] | undefined
+```
+
+At an operator whose parameter is a collection type, the elements of
+collection operand `i`, enumerated once by the engine. `undefined` for an
+operand that is not a collection, or that was not enumerated (a
+collection larger than `engine.maxCollectionSize`, of unknown or
+infinite count, or whose element type cannot hold a value of a kind).
+
+####### i
+
+`number`
+
+</MemberCard>
+
+<MemberCard>
+
+### KindOperand {#kindoperand}
+
+```ts
+type KindOperand = {
+  evaluated: Expression;
+  written: Expression | undefined;
+  exact: Expression;
+};
+```
+
+One operand of a `negate`, `divide`, `power` or `compare` hook of an
+[ArithmeticDefinition](#arithmeticdefinition). The fields have the meaning of the fields of
+[KindOperands](#kindoperands) with the same name.
+
+</MemberCard>
+
+### KindFold {#kindfold}
+
+The result of an `add` or `multiply` hook of an
+[ArithmeticDefinition](#arithmeticdefinition): the operands that the hook combined, by their
+index in `ops.evaluated`, and the value they make.
+
+<MemberCard>
+
+##### KindFold.value {#value-3}
+
+```ts
+readonly value: Expression;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### KindFold.operands {#operands}
+
+```ts
+readonly operands: readonly number[];
+```
+
+</MemberCard>
+
+### ArithmeticDefinition {#arithmeticdefinition}
+
+The arithmetic of a VALUE KIND, given by the `arithmetic` field of the
+operator definition of the head that constructs its values.
+
+The fields marked PER TYPE belong to the kind type (the result type of the
+head), because a symbol of that type has no head to ask: `admittedAs`,
+`resultType` and `compile.type`. The other fields belong to the head.
+
+Rules for a hook:
+- The operands of `add` and `multiply` arrive in canonical order, and
+  `multiply` must commute.
+- A hook may build and evaluate expressions through the engine, including
+  expressions with values of another kind. A hook never calls
+  `.simplify()`.
+- A hook that throws propagates the error, as an `evaluate` handler does.
+- A fold that names an operand index out of range or twice is an error in
+  the definition of the kind and throws.
+
+<MemberCard>
+
+##### ArithmeticDefinition.admittedAs? {#admittedas}
+
+```ts
+admittedAs?: "number" | "real" | "none";
+```
+
+PER TYPE. Where a value of this kind is admitted beyond the arithmetic
+operators and the parameters that name its type or admit `value`.
+Default `'none'`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.compile? {#compile}
+
+```ts
+compile?: ArithmeticCompile;
+```
+
+The compiled form of the kind. Absent: every target declines an
+expression that holds a value of the kind.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.add()? {#add-1}
+
+```ts
+add(ops, context): readonly KindFold[] | undefined
+```
+
+The sum of the operands of which at least one is a value of this kind.
+`ops` are the evaluated operands. A fold names the operands it combined,
+by their index in `ops.evaluated`, and the value they make. A hook may
+return several folds and must not name an operand twice. A fold may name
+an operand of another kind only to absorb it into its own value. A
+fold's `value` may be a value of another kind or a plain number.
+`undefined`, or an empty list, folds nothing.
+
+####### ops
+
+[`KindOperands`](#kindoperands)
+
+####### context
+
+[`ArithmeticContext`](#arithmeticcontext)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.multiply()? {#multiply}
+
+```ts
+multiply(ops, context): readonly KindFold[] | undefined
+```
+
+The product of the operands of which at least one is a value of this
+kind. The contract is the one of `add`.
+
+####### ops
+
+[`KindOperands`](#kindoperands)
+
+####### context
+
+[`ArithmeticContext`](#arithmeticcontext)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.negate()? {#negate}
+
+```ts
+negate(x, context): Expression | undefined
+```
+
+`-x`. `undefined` declines.
+
+####### x
+
+[`KindOperand`](#kindoperand)
+
+####### context
+
+[`ArithmeticContext`](#arithmeticcontext)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.divide()? {#divide}
+
+```ts
+divide(a, b, context): Expression | undefined
+```
+
+`a / b`, at least one operand of this kind. `undefined` declines.
+
+####### a
+
+[`KindOperand`](#kindoperand)
+
+####### b
+
+[`KindOperand`](#kindoperand)
+
+####### context
+
+[`ArithmeticContext`](#arithmeticcontext)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.power()? {#power}
+
+```ts
+power(base, exponent, context): Expression | undefined
+```
+
+`base ^ exponent`, at least one operand of this kind. `Sqrt(x)` calls it
+with the exponent `1/2`, `Root(x, n)` with `1/n`, `Square(x)` with `2`.
+`undefined` declines.
+
+####### base
+
+[`KindOperand`](#kindoperand)
+
+####### exponent
+
+[`KindOperand`](#kindoperand)
+
+####### context
+
+[`ArithmeticContext`](#arithmeticcontext)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.compare()? {#compare}
+
+```ts
+compare(a, b, context): 0 | 1 | -1 | "<=" | ">=" | "unordered" | undefined
+```
+
+The order of two values of which at least one is of this kind, for the
+comparison operators, `Max`, `Min`, `ElementMax`, `ElementMin`, `Sort`,
+`Clamp` and the comparison methods:
+
+- `-1`, `0` or `1`: the order of the two values;
+- `'unordered'`: the two values are known and have no order (a value
+  with a complex or `NaN` nominal). The four order operators (`Less`,
+  `LessEqual`, `Greater`, `GreaterEqual`) answer `False`, as they do for
+  a complex number; `Equal` and `NotEqual` ask the `eq` handler of the
+  head definitions; `Max`, `Min` and `Sort` leave the call unevaluated;
+- `'<='`: `a` is less than or equal to `b`, and the hook cannot say
+  which (two enclosures that touch: `Enclosure(0, 1)` and
+  `Enclosure(1, 2)`). `LessEqual` answers `True` and `Greater` answers
+  `False`; `Less` and `GreaterEqual` stay unevaluated; `Equal` and
+  `NotEqual` ask the `eq` handlers. `'>='` is the mirror answer. A
+  reader that needs a total order (`Sort`, `Max` and `Min` without an
+  `extremum` hook) reads them as `undefined`;
+- `undefined`: the two values are not comparable (a value of another
+  kind, a symbol with no value). An order comparison stays unevaluated,
+  `Equal` and `NotEqual` ask the `eq` handlers.
+
+A kind without `compare` has no order.
+
+####### a
+
+[`KindOperand`](#kindoperand)
+
+####### b
+
+[`KindOperand`](#kindoperand)
+
+####### context
+
+[`ArithmeticContext`](#arithmeticcontext)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.extremum()? {#extremum}
+
+```ts
+extremum(which, ops, context): Expression | undefined
+```
+
+The maximum (`which` is `'max'`) or the minimum of the operands, of
+which at least one is a value of this kind, for `Max`, `Min`,
+`ElementMax`, `ElementMin` and `Clamp`. The engine asks this hook
+before it orders the operands with `compare`, so a kind whose values
+can overlap gives a value that is not one of the operands: the maximum
+of two enclosures is the enclosure of the larger ends
+(`Max(Enclosure(0, 2), Enclosure(1, 3))` is `Enclosure(1, 3)`).
+`undefined` declines, and the engine orders the operands with
+`compare`. Absent: the engine orders the operands with `compare`.
+
+####### which
+
+`"max"` \| `"min"`
+
+####### ops
+
+[`KindOperands`](#kindoperands)
+
+####### context
+
+[`ArithmeticContext`](#arithmeticcontext)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.isExact()? {#isexact-1}
+
+```ts
+isExact(value): boolean
+```
+
+Whether the value `value` of this kind is exact, for the rule that an
+inexact operand turns an `Indeterminate` answer into `NaN`
+(`Max(x, Indeterminate)` is `NaN` when `x` is inexact). Absent: a value
+of the kind is exact. A measurement is never exact.
+
+####### value
+
+[`Expression`](#expression-5)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.isNaN()? {#isnan-1}
+
+```ts
+isNaN(value): boolean
+```
+
+Whether the value `value` of this kind stands for no value, as the
+number `NaN` does: a measurement with a `NaN` nominal, a quantity with a
+`NaN` magnitude. Such a value follows the rule of `NaN` at `Max`, `Min`,
+`ElementMax`, `ElementMin` and `Clamp`: `Max(Quantity(NaN, m), 2 m)` is
+`NaN`, as `Max(NaN, 2)` is. Absent: no value of the kind is `NaN`.
+
+####### value
+
+[`Expression`](#expression-5)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.numericValue()? {#numericvalue}
+
+```ts
+numericValue(value): Expression | undefined
+```
+
+The number that the value `value` of this kind stands for, when the
+values of the kind stand for a number: the nominal of a measurement.
+The numeric accessors of the value read it: `re`, `im`, `bignumRe`,
+`bignumIm` and `valueOf()` (`Measurement(2.5, 0.1).re` is `2.5`, and a
+complex nominal gives its real and imaginary parts). Absent, or
+`undefined`: those accessors answer as for any other expression that
+is not a number (`re` is `NaN`).
+
+The FACT queries (`isPositive`, `sgn`, `isInteger`, `isFinite`, …) do
+not read it: they stay `undefined` for a value of a kind, so that no
+canonical fold of the numbers applies to it.
+
+####### value
+
+[`Expression`](#expression-5)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.apply()? {#apply}
+
+```ts
+apply(operator, ops, context): Expression | undefined
+```
+
+Called in place of the `evaluate` handler of `operator` when at least one
+operand is a value of this kind that the operator admitted only because
+of `admittedAs`. `undefined` leaves the expression unevaluated.
+
+####### operator
+
+`string`
+
+####### ops
+
+[`KindOperands`](#kindoperands)
+
+####### context
+
+[`ArithmeticContext`](#arithmeticcontext)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ArithmeticDefinition.resultType()? {#resulttype}
+
+```ts
+resultType(operator, operandTypes): 
+  | string
+  | ListType
+  | AlgebraicType
+  | NegationType
+  | CollectionType
+  | SetType
+  | BroadcastableType
+  | RecordType
+  | ObjectType
+  | DictionaryType
+  | TupleType
+  | SymbolType
+  | ExpressionType
+  | NumericType
+  | FunctionSignature
+  | ValueType
+  | TypeVariable
+  | TypeReference
+  | undefined
+```
+
+PER TYPE. The static result type of a cell of `operator` with an operand
+of this kind's type, from the operand types without their shapes, or
+`undefined` for the default. `operator` is the dispatched operator:
+`'Add'` for a sum or a difference, `'Power'` for `Sqrt`, `Root` and
+`Square`, with the type of the implied exponent among `operandTypes`.
+A type string is parsed in the engine (`'number | uq'`).
+
+####### operator
+
+`string`
+
+####### operandTypes
+
+readonly [`Type`](#type-3)[]
 
 </MemberCard>
 
@@ -5423,7 +6200,7 @@ Design: `docs/TYPE-SYSTEM.md`, phase 1.
 ##### BoxedBaseDefinition.examples? {#examples-1}
 
 ```ts
-optional examples?: string[];
+examples?: string[];
 ```
 
 The usage examples of the definition. A definition may give a single
@@ -5436,7 +6213,7 @@ string; the boxed definition always stores a list.
 ##### BoxedBaseDefinition.collection? {#collection-1}
 
 ```ts
-optional collection?: CollectionHandlers;
+collection?: CollectionHandlers;
 ```
 
 If this is the definition of a collection, the set of primitive operations
@@ -5483,7 +6260,7 @@ Some examples:
 
 <MemberCard>
 
-##### BoxedValueDefinition.value {#value-4}
+##### BoxedValueDefinition.value {#value-6}
 
 ```ts
 value: Expression | undefined;
@@ -5517,7 +6294,7 @@ overflowing the stack. Computed once when the value is assigned.
 ##### BoxedValueDefinition.eq? {#eq-1}
 
 ```ts
-optional eq?: (a) => boolean | undefined;
+eq?: (a) => boolean | undefined;
 ```
 
 </MemberCard>
@@ -5527,7 +6304,7 @@ optional eq?: (a) => boolean | undefined;
 ##### BoxedValueDefinition.neq? {#neq}
 
 ```ts
-optional neq?: (a) => boolean | undefined;
+neq?: (a) => boolean | undefined;
 ```
 
 </MemberCard>
@@ -5537,7 +6314,7 @@ optional neq?: (a) => boolean | undefined;
 ##### BoxedValueDefinition.cmp? {#cmp}
 
 ```ts
-optional cmp?: (a) => "<" | ">" | "=" | undefined;
+cmp?: (a) => "<" | ">" | "=" | undefined;
 ```
 
 </MemberCard>
@@ -5577,7 +6354,7 @@ accepted and re-stamped, never checked against the declaration.
 
 <MemberCard>
 
-##### BoxedValueDefinition.type {#type-6}
+##### BoxedValueDefinition.type {#type-7}
 
 ```ts
 type: BoxedType;
@@ -5596,7 +6373,7 @@ event, so cached results that read this type are computed again.
 ##### BoxedValueDefinition.subscriptEvaluate? {#subscriptevaluate-1}
 
 ```ts
-optional subscriptEvaluate?: (subscript, options) => Expression | undefined;
+subscriptEvaluate?: (subscript, options) => Expression | undefined;
 ```
 
 Custom evaluation handler for subscripted expressions of this symbol.
@@ -5755,7 +6532,8 @@ operator.
 
 #### Extends
 
-- [`BoxedBaseDefinition`](#boxedbasedefinition).[`OperatorDefinitionFlags`](#operatordefinitionflags)
+- [`BoxedBaseDefinition`](#boxedbasedefinition)
+- [`OperatorDefinitionFlags`](#operatordefinitionflags)
 
 <MemberCard>
 
@@ -5776,7 +6554,7 @@ binding-site selector.
 ##### BoxedOperatorDefinition.bindingSites? {#bindingsites}
 
 ```ts
-optional bindingSites?: BindingSiteSelector;
+bindingSites?: BindingSiteSelector;
 ```
 
 The binding-site selector of the declaration's `scoped` flag, when one
@@ -5919,10 +6697,10 @@ re-parsing or textually inlining its source.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.type? {#type-8}
+##### BoxedOperatorDefinition.type? {#type-9}
 
 ```ts
-optional type?: OperatorTypeHandlerOnTypes;
+type?: OperatorTypeHandlerOnTypes;
 ```
 
 If present, this handler determines the result type more precisely
@@ -5936,7 +6714,7 @@ structure — never the operand expressions).
 ##### BoxedOperatorDefinition.sgn? {#sgn-2}
 
 ```ts
-optional sgn?: (ops, options) => Sign | undefined;
+sgn?: (ops, options) => Sign | undefined;
 ```
 
 If present, this handler can be used to determine the sign of the
@@ -5965,7 +6743,7 @@ derivation is filling. Audit record: open item O7 of
 ##### BoxedOperatorDefinition.eq? {#eq-2}
 
 ```ts
-optional eq?: (a, b, prover?) => boolean | undefined;
+eq?: (a, b, prover?) => boolean | undefined;
 ```
 
 See `OperatorDefinition.eq` for the meaning of `prover`.
@@ -5977,7 +6755,7 @@ See `OperatorDefinition.eq` for the meaning of `prover`.
 ##### BoxedOperatorDefinition.neq? {#neq-1}
 
 ```ts
-optional neq?: (a, b) => boolean | undefined;
+neq?: (a, b) => boolean | undefined;
 ```
 
 </MemberCard>
@@ -5987,7 +6765,7 @@ optional neq?: (a, b) => boolean | undefined;
 ##### BoxedOperatorDefinition.canEnumerate? {#canenumerate}
 
 ```ts
-optional canEnumerate?: (expr) => boolean | undefined;
+canEnumerate?: (expr) => boolean | undefined;
 ```
 
 The eager producer's enumerability precondition — see the
@@ -6000,7 +6778,7 @@ The eager producer's enumerability precondition — see the
 ##### BoxedOperatorDefinition.elementCount? {#elementcount}
 
 ```ts
-optional elementCount?: (expr) => number | undefined;
+elementCount?: (expr) => number | undefined;
 ```
 
 The eager producer's element count — see the `elementCount` contract on
@@ -6013,7 +6791,7 @@ The eager producer's element count — see the `elementCount` contract on
 ##### BoxedOperatorDefinition.inferOperandTypes? {#inferoperandtypes}
 
 ```ts
-optional inferOperandTypes?: (ops, requirement) => 
+inferOperandTypes?: (ops, requirement) => 
   | readonly (
   | Type
   | {
@@ -6033,7 +6811,7 @@ Use-driven element inference — see the `inferOperandTypes` contract on
 ##### BoxedOperatorDefinition.canonical? {#canonical}
 
 ```ts
-optional canonical?: (ops, options) => Expression | null;
+canonical?: (ops, options) => Expression | null;
 ```
 
 </MemberCard>
@@ -6043,7 +6821,7 @@ optional canonical?: (ops, options) => Expression | null;
 ##### BoxedOperatorDefinition.evaluate? {#evaluate}
 
 ```ts
-optional evaluate?: (ops, options) => Expression | undefined;
+evaluate?: (ops, options) => Expression | undefined;
 ```
 
 </MemberCard>
@@ -6053,7 +6831,7 @@ optional evaluate?: (ops, options) => Expression | undefined;
 ##### BoxedOperatorDefinition.evaluateAsync? {#evaluateasync}
 
 ```ts
-optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
+evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
 ```
 
 </MemberCard>
@@ -6063,7 +6841,7 @@ optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
 ##### BoxedOperatorDefinition.evalDimension? {#evaldimension}
 
 ```ts
-optional evalDimension?: (ops, options) => Expression;
+evalDimension?: (ops, options) => Expression;
 ```
 
 </MemberCard>
@@ -6073,7 +6851,7 @@ optional evalDimension?: (ops, options) => Expression;
 ##### BoxedOperatorDefinition.derivative? {#derivative}
 
 ```ts
-optional derivative?: OperatorDerivative;
+derivative?: OperatorDerivative;
 ```
 
 The partial derivatives of the operator, as given by the `derivative`
@@ -6083,11 +6861,49 @@ key of its definition. See [OperatorDerivative](#operatorderivative).
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.compile? {#compile}
+##### BoxedOperatorDefinition.compile? {#compile-1}
 
 ```ts
-optional compile?: OperatorCompileHandler;
+compile?: OperatorCompileHandler;
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.compileShippable? {#compileshippable}
+
+```ts
+compileShippable?: boolean;
+```
+
+See `OperatorDefinition.compileShippable`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.compileHelpers? {#compilehelpers}
+
+```ts
+compileHelpers?: Readonly<Record<string, (...args) => unknown>>;
+```
+
+See `OperatorDefinition.compileHelpers`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.arithmetic? {#arithmetic}
+
+```ts
+arithmetic?: ArithmeticDefinition;
+```
+
+The arithmetic of the value kind this operator constructs, as given by
+the `arithmetic` field of its definition. See
+[ArithmeticDefinition](#arithmeticdefinition).
 
 </MemberCard>
 
@@ -6102,6 +6918,48 @@ stripsMissingAt(i): boolean
 True if a `missing` arm is stripped from parameter position `i` before
 validation (§3.A). Only `propagate`/`handle` operators strip; `missingStrip`
 selects the positions.
+
+####### i
+
+`number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.declaredParameterTypeAt() {#declaredparametertypeat}
+
+```ts
+declaredParameterTypeAt(i): Type | undefined
+```
+
+The declared type of parameter position `i` (0-based: the required
+parameters, then the optional ones, then the variadic one for every
+later position), or `undefined` for an overload set or a position past a
+non-variadic signature.
+
+####### i
+
+`number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.refusesAbsentOperandAt() {#refusesabsentoperandat}
+
+```ts
+refusesAbsentOperandAt(i): boolean
+```
+
+True when an absent scalar operand (`Missing`, `Undefined`) at position
+`i` is refused at evaluation with an `incompatible-type` error naming the
+parameter's type: a declared `reject`, or the default for an operator
+with no absence behavior of its own whose parameter at `i` excludes
+absence and is read as data (not a number, a collection, a function,
+`expression`, `symbol`, `any` or `unknown`). User decision P2 of
+`docs/plans/2026-10-21-presence-contracts-and-assertion.md`
+(2026-10-21).
 
 ####### i
 
@@ -6502,12 +7360,12 @@ type Delimiter =
   | ">"
   | "|"
   | "||"
-  | "\lceil"
-  | "\rceil"
-  | "\lfloor"
-  | "\rfloor"
-  | "\llbracket"
-  | "\rrbracket";
+  | "\\lceil"
+  | "\\rceil"
+  | "\\lfloor"
+  | "\\rfloor"
+  | "\\llbracket"
+  | "\\rrbracket";
 ```
 
 Open and close delimiters that can be used with [`MatchfixEntry`](#matchfixentry)
@@ -6880,7 +7738,7 @@ properties are required.
 #### MatchfixEntry.parse?
 
 ```ts
-optional parse?: MatchfixParseHandler;
+parse?: MatchfixParseHandler;
 ```
 
 When invoked, the parser is pointing after the close delimiter.
@@ -6915,7 +7773,7 @@ Example: `+`, `\times`.
 #### InfixEntry.associativity?
 
 ```ts
-optional associativity?: "right" | "left" | "none" | "any";
+associativity?: "right" | "left" | "none" | "any";
 ```
 
 - **`none`**: a ? b ? c -> syntax error
@@ -7009,7 +7867,7 @@ type SymbolEntry = BaseEntry & Trigger & {
 #### SymbolEntry.precedence?
 
 ```ts
-optional precedence?: Precedence;
+precedence?: Precedence;
 ```
 
 Used for appropriate wrapping (i.e. when to surround it with parens)
@@ -7040,7 +7898,7 @@ entry of kind `expression`.
 #### FunctionEntry.arguments?
 
 ```ts
-optional arguments?: "enclosure" | "implicit";
+arguments?: "enclosure" | "implicit";
 ```
 
 How arguments are parsed:
@@ -7181,7 +8039,7 @@ it will be parsed as a decimal number even if this setting is `"rational"`.
 #### ParseLatexOptions.resolveSymbol?
 
 ```ts
-optional resolveSymbol?: (symbol) => SymbolResolution | undefined;
+resolveSymbol?: (symbol) => SymbolResolution | undefined;
 ```
 
 The symbol oracle: invoked when the parser needs to know what the
@@ -7209,7 +8067,7 @@ The `symbol` argument is a [valid symbol](#symbols).
 #### ParseLatexOptions.resolveApplication?
 
 ```ts
-optional resolveApplication?: (context) => "apply" | "multiply" | undefined;
+resolveApplication?: (context) => "apply" | "multiply" | undefined;
 ```
 
 Interpret an unresolved symbol followed by parentheses.
@@ -7262,7 +8120,7 @@ commands replaced, for example `\egroup` and `\bgroup`.
 #### ParseLatexOptions.diagnostics?
 
 ```ts
-optional diagnostics?: boolean;
+diagnostics?: boolean;
 ```
 
 If true, collect opt-in parse-time diagnostics (see [ParseDiagnostic](#parsediagnostic))
@@ -7290,7 +8148,7 @@ This is purely additive: enabling it never changes the parse output.
 #### ParseLatexOptions.onAmbiguity?
 
 ```ts
-optional onAmbiguity?: "report" | "error";
+onAmbiguity?: "report" | "error";
 ```
 
 What the lenient grammar (`strict: false`) does with a reading that has
@@ -7445,6 +8303,120 @@ Return the next token, without advancing the index
 <MemberCard>
 
 ##### Parser.atBoundary {#atboundary}
+
+</MemberCard>
+
+<MemberCard>
+
+##### Parser.environmentName()? {#environmentname}
+
+```ts
+environmentName(): string | null
+```
+
+The name of the innermost environment (`\begin{name} … \end{name}`)
+whose body is being read, or `null` outside an environment. A row of a
+`cases` environment records a second reading of an assignment to a
+subscripted name (see `parseAssign()` in `definitions-core.ts`).
+
+</MemberCard>
+
+<MemberCard>
+
+##### Parser.\_recordBlockRowAlternative()? {#_recordblockrowalternative}
+
+```ts
+_recordBlockRowAlternative(expr, local): void
+```
+
+Record `local` as the second reading of the row expression `expr` of a
+`cases` environment: the declaration of a block local, which the block
+branch of `parseCasesEnvironment()` swaps in when the environment turns
+out to be a block.
+
+####### expr
+
+[`MathJsonExpression`](#mathjsonexpression)
+
+####### local
+
+[`MathJsonExpression`](#mathjsonexpression)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Parser.blockRowAlternative()? {#blockrowalternative}
+
+```ts
+blockRowAlternative(expr): MathJsonExpression | null
+```
+
+The recorded second reading of a row expression, or `null`.
+
+####### expr
+
+[`MathJsonExpression`](#mathjsonexpression)
+
+</MemberCard>
+
+<MemberCard>
+
+##### Parser.binderSymbol() {#bindersymbol}
+
+```ts
+binderSymbol(expr): string | null
+```
+
+The name that `expr` declares when it is read in a binder position: the
+index of a sum or a product, the variable of a comprehension, a function
+parameter, a local variable of a `where` clause. A symbol is its own
+name. An element access that the symbol parser made from a subscript on
+a symbol declared as an indexed collection (`n_{0}` when `n` is a list
+is read as `At(n, 0)` everywhere else) is the joined name, `n_0`: a
+binder is a new name, whatever its base is declared as. Any other
+expression gives `null`.
+
+A custom dictionary entry that binds a name (a `with` clause, a loop
+form) reads the binder with this method, not with `parseSymbol()`,
+which cannot read `n_{0}` as a new name when `n` is a list. Pass the
+expression that `parseExpression()` returned for the binding, or its
+left-hand side, and then rewrite the body with
+[rebindSubscripts](#rebindsubscripts).
+
+####### expr
+
+  \| [`MathJsonExpression`](#mathjsonexpression)
+  \| `null`
+  \| `undefined`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Parser.rebindSubscripts() {#rebindsubscripts}
+
+```ts
+rebindSubscripts(expr, names): MathJsonExpression
+```
+
+Replace, in `expr`, each element access that the symbol parser made from
+a subscript on an indexed collection (`At(n, 0)` from `n_{0}`) whose
+joined name is one of `names` with that name. A binder calls it on its
+body, and on the bindings that follow the declaration, so that the
+occurrences of the new name are the name and not an element of the base.
+The other parts of `expr` are not changed. The parse of a body that
+precedes the clause (`n_{0} + 1 \operatorname{with} n_{0} = 2`, an infix
+entry) is rewritten the same way, so a custom clause can bind a name
+after its body was read.
+
+####### expr
+
+[`MathJsonExpression`](#mathjsonexpression)
+
+####### names
+
+`ReadonlySet`\<`string`\>
 
 </MemberCard>
 
@@ -7643,7 +8615,7 @@ was expected.
 ##### Parser.sourceOffsets() {#sourceoffsets-1}
 
 ```ts
-sourceOffsets(startToken, endToken?): [number, number]
+sourceOffsets(startToken, endToken?): [start: number, end: number]
 ```
 
 Return source offsets for a token range, as zero-based, end-exclusive
@@ -8233,7 +9205,7 @@ Controls the materialization of the lazy collections.
 #### SerializeLatexOptions.exponentialE?
 
 ```ts
-optional exponentialE?: LatexString;
+exponentialE?: LatexString;
 ```
 
 LaTeX used to render the constant `ExponentialE`, the counterpart of
@@ -8373,7 +9345,7 @@ via `expr.toLatex({ dotNotation: true })`.
 #### SerializeLatexOptions.dmsFormat?
 
 ```ts
-optional dmsFormat?: boolean;
+dmsFormat?: boolean;
 ```
 
 When true, serialize angle quantities in degrees-minutes-seconds format.
@@ -8405,7 +9377,7 @@ ce.expr(['Quantity', 9.504166, 'deg'])
 #### SerializeLatexOptions.angleNormalization?
 
 ```ts
-optional angleNormalization?: "none" | "0...360" | "-180...180";
+angleNormalization?: "none" | "0...360" | "-180...180";
 ```
 
 Normalize angles to a specific range during serialization.
@@ -8826,7 +9798,7 @@ type ParseDiagnostic = {
 
 An opt-in parse-time diagnostic, collected when a LaTeX string is parsed
 with `ce.parse(latex, { diagnostics: true })` and exposed on the top-level
-result via `BoxedExpression.parseDiagnostics`.
+result via `Expression.parseDiagnostics`.
 
 Diagnostics flag *charitable* parse decisions that are usually errors in
 machine-generated LaTeX (LLM output, OCR): a name read as multiplication
@@ -9687,7 +10659,7 @@ First several terms of the sequence
 ##### OEISSequenceInfo.formula? {#formula}
 
 ```ts
-optional formula?: string;
+formula?: string;
 ```
 
 Formula or recurrence (if available) — the first formula line
@@ -9699,7 +10671,7 @@ Formula or recurrence (if available) — the first formula line
 ##### OEISSequenceInfo.formulas? {#formulas}
 
 ```ts
-optional formulas?: string[];
+formulas?: string[];
 ```
 
 All free-text formula lines, as returned by OEIS (if available)
@@ -9711,7 +10683,7 @@ All free-text formula lines, as returned by OEIS (if available)
 ##### OEISSequenceInfo.comments? {#comments}
 
 ```ts
-optional comments?: string[];
+comments?: string[];
 ```
 
 Comments about the sequence
@@ -9739,7 +10711,7 @@ Options for OEIS operations.
 ##### OEISOptions.timeout? {#timeout}
 
 ```ts
-optional timeout?: number;
+timeout?: number;
 ```
 
 Request timeout in milliseconds (default: 10000)
@@ -9751,7 +10723,7 @@ Request timeout in milliseconds (default: 10000)
 ##### OEISOptions.maxResults? {#maxresults}
 
 ```ts
-optional maxResults?: number;
+maxResults?: number;
 ```
 
 Maximum number of results to return for lookups (default: 5)
@@ -10336,9 +11308,12 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   evalDimension: (args, options) => Expression;
   derivative: OperatorDerivative;
   compile: OperatorCompileHandler;
+  compileShippable: boolean;
+  compileHelpers: Readonly<Record<string, (...args) => unknown>>;
   eq: (a, b, prover?) => boolean | undefined;
   neq: (a, b) => boolean | undefined;
   collection: CollectionHandlers;
+  arithmetic: ArithmeticDefinition;
   canEnumerate: (expr) => boolean | undefined;
   elementCount: (expr) => number | undefined;
   inferOperandTypes: (ops, requirement) => 
@@ -10355,7 +11330,7 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
 #### OperatorDefinition.type?
 
 ```ts
-optional type?: OperatorTypeHandlerOnTypes;
+type?: OperatorTypeHandlerOnTypes;
 ```
 
 The type of the result (return type) as a function of the operand
@@ -10369,7 +11344,7 @@ never `complex`.
 #### OperatorDefinition.signature?
 
 ```ts
-optional signature?: 
+signature?: 
   | Type
   | TypeString
   | BoxedType;
@@ -10384,7 +11359,7 @@ be a subtype of the return type in the signature.
 #### OperatorDefinition.inferredSignature?
 
 ```ts
-optional inferredSignature?: boolean;
+inferredSignature?: boolean;
 ```
 
 If `true`, the `signature` is a starting point to be refined, not a
@@ -10411,7 +11386,7 @@ A declaration that omits `signature` entirely behaves the same way.
 #### OperatorDefinition.sgn?
 
 ```ts
-optional sgn?: (ops, options) => Sign | undefined;
+sgn?: (ops, options) => Sign | undefined;
 ```
 
 Return the sign of the function expression.
@@ -10433,7 +11408,7 @@ contract on `OperatorDefinition.sgn`.
 #### OperatorDefinition.isPositive?
 
 ```ts
-readonly optional isPositive?: boolean;
+readonly isPositive?: boolean;
 ```
 
 The value of this expression is > 0, same as `isGreater(0)`
@@ -10441,7 +11416,7 @@ The value of this expression is > 0, same as `isGreater(0)`
 #### OperatorDefinition.isNonNegative?
 
 ```ts
-readonly optional isNonNegative?: boolean;
+readonly isNonNegative?: boolean;
 ```
 
 The value of this expression is >= 0, same as `isGreaterEqual(0)`
@@ -10449,7 +11424,7 @@ The value of this expression is >= 0, same as `isGreaterEqual(0)`
 #### OperatorDefinition.isNegative?
 
 ```ts
-readonly optional isNegative?: boolean;
+readonly isNegative?: boolean;
 ```
 
 The value of this expression is &lt; 0, same as `isLess(0)`
@@ -10457,7 +11432,7 @@ The value of this expression is &lt; 0, same as `isLess(0)`
 #### OperatorDefinition.isNonPositive?
 
 ```ts
-readonly optional isNonPositive?: boolean;
+readonly isNonPositive?: boolean;
 ```
 
 The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
@@ -10465,7 +11440,7 @@ The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
 #### OperatorDefinition.even?
 
 ```ts
-optional even?: (ops, options) => boolean | undefined;
+even?: (ops, options) => boolean | undefined;
 ```
 
 Return `true` if the function expression is even, `false` if it is odd
@@ -10475,7 +11450,7 @@ or if it is a complex number).
 #### OperatorDefinition.complexity?
 
 ```ts
-optional complexity?: number;
+complexity?: number;
 ```
 
 A number used to order arguments.
@@ -10500,7 +11475,7 @@ lower complexity when ordered canonically in commutative functions.
 #### OperatorDefinition.canonical?
 
 ```ts
-optional canonical?: (ops, options) => Expression | null;
+canonical?: (ops, options) => Expression | null;
 ```
 
 Return the canonical form of the expression with the arguments `args`.
@@ -10542,7 +11517,7 @@ canonical form, the handler should return `null`.
 #### OperatorDefinition.evaluate?
 
 ```ts
-optional evaluate?: 
+evaluate?: 
   | ((ops, options) => Expression | undefined)
   | Expression;
 ```
@@ -10566,7 +11541,7 @@ an `["Error"]` expression.
 #### OperatorDefinition.evaluateAsync?
 
 ```ts
-optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
+evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
 ```
 
 An asynchronous version of `evaluate`.
@@ -10583,7 +11558,7 @@ evaluates its operand starts that evaluation outside the window.
 #### OperatorDefinition.evalDimension?
 
 ```ts
-optional evalDimension?: (args, options) => Expression;
+evalDimension?: (args, options) => Expression;
 ```
 
 **`Experimental`**
@@ -10593,7 +11568,7 @@ Dimensional analysis
 #### OperatorDefinition.derivative?
 
 ```ts
-optional derivative?: OperatorDerivative;
+derivative?: OperatorDerivative;
 ```
 
 The partial derivatives of this operator, used by `D`, `Derivative`
@@ -10627,7 +11602,7 @@ key is used.
 #### OperatorDefinition.compile?
 
 ```ts
-optional compile?: OperatorCompileHandler;
+compile?: OperatorCompileHandler;
 ```
 
 A custom compilation handler for this operator: emit target-language
@@ -10716,10 +11691,84 @@ Return `undefined` (or an empty string) to fall back to the
 default compilation (a `null` returned from untyped JavaScript is
 tolerated and treated the same). See [OperatorCompileHandler](#operatorcompilehandler).
 
+The code a caller handler writes runs only on the thread that compiled
+it: the result is not shippable, so `broadcastAsync()` does not send
+it to the kernel pool (`reason: 'not-shippable'`). This holds also
+for a handler attached in place to a built-in definition. Set
+compileShippable when the code can run on a worker.
+
+#### OperatorDefinition.compileShippable?
+
+```ts
+compileShippable?: boolean;
+```
+
+Whether the code that the compile handler writes can run on
+a worker of the kernel pool. Default: `false`.
+
+A worker receives the compiled code as text and has none of the
+functions or global variables of the thread that compiled it. Set
+`true` only when the code calls nothing but the helpers of the
+compiled-code runtime, the operands that the handler compiled, and the
+functions given in compileHelpers. When the code calls a
+function of the compiling thread (`globalThis.myFn(…)`) and this flag
+is `true`, every cell that a worker evaluates throws, and its value is
+`NaN` (`BroadcastAsyncResult.failed` counts these cells).
+
+A compiled result is shippable only when every caller handler that
+wrote part of its code has this flag.
+
+#### OperatorDefinition.compileHelpers?
+
+```ts
+compileHelpers?: Readonly<Record<string, (...args) => unknown>>;
+```
+
+Functions that the code of the compile handler calls by name.
+The engine copies the source of each function (`fn.toString()`) into
+the code it compiles, as `const <name> = (<source>);`, so the code
+carries its helpers to a worker of the kernel pool and to a stored
+result. A helper is defined only when the handler wrote code for the
+`javascript` or `interval-javascript` target.
+
+Because only the source is copied, a helper must not read a variable
+from outside its own body (a closure variable or an import). Such a
+read throws when the compiled code runs, on every thread. A name must
+be a JavaScript identifier that does not start with `_` (the engine
+uses that prefix for its own names). Choose a name that a parameter of
+a compiled function cannot shadow, for example `myLibFloorIndex`.
+Two definitions may give a helper of the same name only with the same
+source.
+
+On the `interval-javascript` target, a compiled operand comes in one
+of two forms, and a helper must accept both: a bare enclosure
+`{ lo, hi }` (an input such as `_.x`), or the result of an interval
+function, `{ kind: 'interval', value: { lo, hi } }` (for example
+`_IA.sqrt(_.x)`, or any operand in a branch of an `If` whose
+condition narrows it). A result can also be `{ kind: 'partial',
+value: { lo, hi }, … }`, `{ kind: 'empty' }`, `{ kind: 'entire' }`
+or `{ kind: 'singular', … }`. A helper that reads only `x.lo` reads
+`undefined` from the second form, with no error. A helper can return
+either form.
+
+```ts
+ce.declare('Wrap', {
+  signature: '(number, number) -> number',
+  compileShippable: true,
+  compileHelpers: {
+    wrapIndex: (i: number, n: number) => ((i % n) + n) % n,
+  },
+  compile: (args, compile, { language }) =>
+    language === 'javascript'
+      ? `wrapIndex(${compile(args[0])}, ${compile(args[1])})`
+      : undefined,
+});
+```
+
 #### OperatorDefinition.eq?
 
 ```ts
-optional eq?: (a, b, prover?) => boolean | undefined;
+eq?: (a, b, prover?) => boolean | undefined;
 ```
 
 Custom equality handler.
@@ -10732,10 +11781,35 @@ prover-tier work (sampling, expand/simplify, identity questions in the
 free variables) must decline — return `undefined` — when
 `prover === false`.
 
+#### OperatorDefinition.arithmetic?
+
+```ts
+arithmetic?: ArithmeticDefinition;
+```
+
+Declares that the values this operator constructs are a VALUE KIND:
+values with their own arithmetic (a residue class, a measurement, an
+element of a finite field). See [ArithmeticDefinition](#arithmeticdefinition).
+
+The result type of every arm of the signature must be a KIND TYPE: a
+kind primitive (`residue`), or a nominal type whose definition is
+exactly `value`, declared with
+`ce.declareType(name, 'value', { mint: false })`. The marker arms
+`nan`, `missing`, `nothing` and `error` may be added. Any other result
+type (a number type, `boolean`, `string`, a collection, `value`,
+`any`, `expression`, a nominal type with another definition) is
+refused when the operator is declared. A definition that gives `add`
+must also give `negate`.
+
+The fields `admittedAs`, `resultType` and `compile.type` belong to the
+kind TYPE, not to this operator: the operators of one kind type that
+are declared at the same time must give equal values for them (or
+leave them out).
+
 #### OperatorDefinition.canEnumerate?
 
 ```ts
-optional canEnumerate?: (expr) => boolean | undefined;
+canEnumerate?: (expr) => boolean | undefined;
 ```
 
 For an operator that RETURNS a collection but has no `collection`
@@ -10769,7 +11843,7 @@ handlers — those own enumerability via `collection.isEnumerable`.
 #### OperatorDefinition.elementCount?
 
 ```ts
-optional elementCount?: (expr) => number | undefined;
+elementCount?: (expr) => number | undefined;
 ```
 
 For an operator that RETURNS a collection but has no `collection`
@@ -10801,7 +11875,7 @@ a declared `count` owns the answer, including its `undefined`.
 #### OperatorDefinition.inferOperandTypes?
 
 ```ts
-optional inferOperandTypes?: (ops, requirement) => 
+inferOperandTypes?: (ops, requirement) => 
   | ReadonlyArray<
   | Type
   | {
@@ -10867,7 +11941,7 @@ Minimal interface for a LaTeX parser/serializer.
 ##### ILatexSyntax.dictionary? {#dictionary-2}
 
 ```ts
-readonly optional dictionary?: readonly Partial<OnlyFirst<
+readonly dictionary?: readonly Partial<OnlyFirst<
   | ExpressionEntry
   | MatchfixEntry
   | InfixEntry
@@ -10876,7 +11950,7 @@ readonly optional dictionary?: readonly Partial<OnlyFirst<
   | SymbolEntry
   | FunctionEntry
   | EnvironmentEntry
-  | DefaultEntry, {} & 
+  | DefaultEntry, {} & (
   | ExpressionEntry
   | MatchfixEntry
   | InfixEntry
@@ -10885,7 +11959,7 @@ readonly optional dictionary?: readonly Partial<OnlyFirst<
   | SymbolEntry
   | FunctionEntry
   | EnvironmentEntry
-  | DefaultEntry>>[];
+  | DefaultEntry)>>[];
 ```
 
 The dictionary entries, including the entries added with
@@ -10938,7 +12012,7 @@ serialize(expr, options?): string
 ##### ILatexSyntax.getNamedTriggers()? {#getnamedtriggers}
 
 ```ts
-optional getNamedTriggers(): readonly {
+getNamedTriggers(): readonly {
   name: string;
   triggers: string[];
  }[]
@@ -10955,7 +12029,7 @@ Named dictionary entries with their LaTeX trigger strings, for reverse
 ##### ILatexSyntax.addEntries()? {#addentries}
 
 ```ts
-optional addEntries(entries): void
+addEntries(entries): void
 ```
 
 Add LaTeX dictionary entries. The next parse or serialization uses
@@ -10974,7 +12048,7 @@ readonly `Partial`\<`OnlyFirst`\<
   \| [`SymbolEntry`](#symbolentry)
   \| [`FunctionEntry`](#functionentry)
   \| [`EnvironmentEntry`](#environmententry)
-  \| [`DefaultEntry`](#defaultentry), \{\} & 
+  \| [`DefaultEntry`](#defaultentry), \{\} & (
   \| [`ExpressionEntry`](#expressionentry)
   \| [`MatchfixEntry`](#matchfixentry)
   \| [`InfixEntry`](#infixentry)
@@ -10983,7 +12057,7 @@ readonly `Partial`\<`OnlyFirst`\<
   \| [`SymbolEntry`](#symbolentry)
   \| [`FunctionEntry`](#functionentry)
   \| [`EnvironmentEntry`](#environmententry)
-  \| [`DefaultEntry`](#defaultentry)\>\>[]
+  \| [`DefaultEntry`](#defaultentry))\>\>[]
 
 </MemberCard>
 
@@ -11295,7 +12369,7 @@ restore). A dead checkpoint can never be restored again.
 
 #### Extended by
 
-- [`ExpressionComputeEngine`](#expressioncomputeengine)
+- [`ComputeEngine`](#computeengine)
 
 <MemberCard>
 
@@ -11663,7 +12737,7 @@ The rules used by `solve()` to transform an equation into equivalent,
 
 <MemberCard>
 
-##### IComputeEngine.strict {#strict}
+##### IComputeEngine.strict {#strict-1}
 
 ```ts
 strict: boolean;
@@ -11762,7 +12836,7 @@ set precision(p: number | "auto" | "machine"): void
 
 <MemberCard>
 
-##### IComputeEngine.tolerance {#tolerance-1}
+##### IComputeEngine.tolerance {#tolerance-2}
 
 ```ts
 get tolerance(): number
@@ -11923,16 +12997,16 @@ Inheritance included: a conformance registered for a supertype answers
 for its subtypes. A CONDITIONAL conformance (`list<T> is P where T is
 P`) recurses, deciding itself against `type`'s own arguments.
 
-`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-10)
+`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-11)
 parses one.
 
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -11970,8 +13044,12 @@ enclosing span preempts this limit; use the label and
 `finally`, so a `Promise`-returning (`async`) callback hands control back
 at its first `await` while the span is still open: work that resumes after
 that point runs **outside** the deadline and is never cancelled (see
-`docs/TIMEOUT-MODEL.md` §6.4). For asynchronous cancellation use
-`expr.evaluateAsync({ signal })` with an `AbortSignal` instead.
+`docs/TIMEOUT-MODEL.md` §6.4). An `expr.evaluateAsync()` call that `fn`
+makes before its first `await` is the exception: the evaluation keeps
+the span's deadline until it ends
+(`ce.withTimeLimit(20, () => { p = expr.evaluateAsync(); })`). For
+cancellation that is not a time limit, use
+`expr.evaluateAsync({ signal })` with an `AbortSignal`.
 
 • T
 
@@ -12425,6 +13503,55 @@ _getCompilationTarget(name):
 
 <MemberCard>
 
+##### IComputeEngine.registerCompilationTarget() {#registercompilationtarget}
+
+```ts
+registerCompilationTarget(name, target): void
+```
+
+Register a compilation target under `name`, so that
+`compile(expr, { to: name })` resolves it. A later registration under the
+same name replaces the earlier target. Throws when `name` is empty or the
+target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
+and `compile()`.
+
+Every engine has `javascript` and `interval-js`. Every engine also has
+`glsl`, `wgsl` and `python` once the full package entry,
+`@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
+the program, whichever entry made the engine and in whichever order. A
+program that loads only `@cortex-js/compute-engine/core` has the two
+built-in targets: import `GLSLTarget`, `WGSLTarget` or `PythonTarget`
+from `@cortex-js/compute-engine/compile` and register it here.
+
+####### name
+
+`string`
+
+####### target
+
+`LanguageTarget`\<[`Expression`](#expression-5)\>
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.unregisterCompilationTarget() {#unregistercompilationtarget}
+
+```ts
+unregisterCompilationTarget(name): void
+```
+
+Remove the compilation target registered under `name`. A name that is
+not registered is ignored.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.number() {#number-1}
 
 ###### number(value, options)
@@ -12702,7 +13829,7 @@ back with `expr.array`.
 
 <MemberCard>
 
-##### IComputeEngine.type() {#type-10}
+##### IComputeEngine.type() {#type-11}
 
 ```ts
 type(type): BoxedType
@@ -12711,10 +13838,10 @@ type(type): BoxedType
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -12813,10 +13940,10 @@ createScope(bindings?, parent?): InspectableScope
 
 `Record`\<`string`, 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -12865,6 +13992,8 @@ assign(ids): IComputeEngine
 
 ####### ids
 
+\{\}
+
 ###### assign(id, value)
 
 ```ts
@@ -12910,10 +14039,10 @@ declareType(name, type, options?): void
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -12943,6 +14072,14 @@ declareType(name, type, options?): void
 
 `boolean`
 
+Whether the declaration also declares a value-level constructor
+of the same name (`point(1, 2)` for `type point = tuple<…>`). Default
+`true`. A VALUE KIND uses `false`: its type is a nominal type defined
+as exactly `value` (`ce.declareType('gf8', 'value', { mint: false })`),
+and its values are made by the head that declares its arithmetic
+(`GF8(3)`), so a second constructor with no arithmetic must not
+exist. See the `arithmetic` field of `OperatorDefinition`.
+
 ####### typeParams?
 
 [`TypeParamsOption`](#typeparamsoption)
@@ -12961,6 +14098,8 @@ declare(symbols): IComputeEngine
 
 ####### symbols
 
+\{\}
+
 ###### declare(id, type, scope)
 
 ```ts
@@ -12974,10 +14113,10 @@ declare(id, type, scope?): IComputeEngine
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -13053,10 +14192,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 ####### arg2?
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -13073,10 +14212,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
+     \| [`ListType`](#listtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
@@ -13103,10 +14242,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
+     \| [`ListType`](#listtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
@@ -13136,9 +14275,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `derivative`: [`OperatorDerivative`](#operatorderivative);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
+  `compileShippable`: `boolean`;
+  `compileHelpers`: `Readonly`\<`Record`\<`string`, (...`args`) => `unknown`\>\>;
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
@@ -13153,10 +14295,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
+     \| [`ListType`](#listtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
@@ -13183,10 +14325,10 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
+     \| [`ListType`](#listtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
      \| [`RecordType`](#recordtype)
@@ -13216,9 +14358,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
   `derivative`: [`OperatorDerivative`](#operatorderivative);
   `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
+  `compileShippable`: `boolean`;
+  `compileHelpers`: `Readonly`\<`Record`\<`string`, (...`args`) => `unknown`\>\>;
   `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
   `neq`: (`a`, `b`) => `boolean` \| `undefined`;
   `collection`: [`CollectionHandlers`](#collectionhandlers);
+  `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
@@ -14083,7 +15228,7 @@ collapse to `"Number"`.
 ##### Expression.parseDiagnostics? {#parsediagnostics}
 
 ```ts
-optional parseDiagnostics?: readonly ParseDiagnostic[];
+parseDiagnostics?: readonly ParseDiagnostic[];
 ```
 
 Parse-time diagnostics collected when the expression was produced by
@@ -14272,7 +15417,7 @@ The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
 
 <MemberCard>
 
-##### Expression.isNaN {#isnan-1}
+##### Expression.isNaN {#isnan-2}
 
 ```ts
 readonly isNaN: boolean | undefined;
@@ -14375,6 +15520,12 @@ The contract:
   `Sum(j, j in 1..n)` hash differently, just as they are not `isSame()`.
   This clause co-evolves with `isSame()` semantics.
 
+- **Ranges and lists**: a finite `Range` whose bounds and step are
+  integer literals and that has at most 10,000 elements is `isSame()` to
+  the `List` of its integers, so it has the hash of that list:
+  `Range(1, 3)` and `[1, 2, 3]` have the same hash. A character and a
+  one-cluster string with the same content also have the same hash.
+
 </MemberCard>
 
 <MemberCard>
@@ -14422,10 +15573,10 @@ It is therefore **not an `isSame` key**, in both directions, and
 
 <MemberCard>
 
-##### Expression.engine {#engine-1}
+##### Expression.engine {#engine-2}
 
 ```ts
-readonly engine: ExpressionComputeEngine;
+readonly engine: ComputeEngine;
 ```
 
 The Compute Engine instance associated with this expression provides
@@ -14444,7 +15595,7 @@ toMathJson(options?): MathJsonExpression
 
 Serialize to a MathJSON expression with specified options.
 
-Use `{ fractionalDigits: 'auto' }` to round arbitrary-precision
+Use `{ digits: 'auto' }` to round arbitrary-precision
 numbers to `ce.precision` significant digits. The default
 (`'max'`) emits all available digits with no rounding.
 
@@ -14480,7 +15631,7 @@ For arbitrary-precision numbers, the full raw `BigDecimal` value is
 emitted with no rounding (same as `toJSON()`). This preserves data
 fidelity for round-tripping but may include trailing digits beyond
 `ce.precision` that are not meaningful. Use
-`toMathJson({ fractionalDigits: 'auto' })` for rounded output.
+`toMathJson({ digits: 'auto' })` for rounded output.
 
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
@@ -14545,7 +15696,7 @@ Note that lazy collections are eagerly evaluated when printed.
 ##### Expression.verbatimLatex? {#verbatimlatex}
 
 ```ts
-optional verbatimLatex?: string;
+verbatimLatex?: string;
 ```
 
 If the expression was constructed from a LaTeX string, the verbatim LaTeX
@@ -14558,7 +15709,7 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 ##### Expression.sourceOffsets? {#sourceoffsets-2}
 
 ```ts
-optional sourceOffsets?: [number, number];
+sourceOffsets?: [start: number, end: number];
 ```
 
 Source offsets in the original source string, when available.
@@ -14811,6 +15962,10 @@ const subexpressions = expr.getSubexpressions('Add');
 // -> `[['Add', 'a', 'b'], ['Add', 'c', 'd']]`
 ```
 
+The walk continues into the values of a dictionary. A function
+expression or a dictionary that occurs several times as the SAME object
+(a shared subexpression) is listed once.
+
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
 :::
@@ -14838,6 +15993,10 @@ const expr = ce.parse('a + b * c + d');
 const subexpressions = expr.subexpressions;
 // -> `[['Add', 'a', 'b'], ['Add', 'c', 'd'], 'a', 'b', 'c', 'd']`
 ```
+
+The walk continues into the values of a dictionary. A function
+expression or a dictionary that occurs several times as the SAME object
+(a shared subexpression) is listed once.
 
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
@@ -14934,10 +16093,13 @@ readonly referencedFunctions: readonly string[];
 
 The user functions **applied** in this expression: the operator head of
 a function application when that head is a user-definable symbol — `f` in
-`f(x)`, `g` in `g(x) := f(x) + 1`. Built-in operators (`Add`, `Sin`, …),
-constants, and names bound to a value or by an enclosing scope (function
-parameters, summation indices, `Block` locals) are excluded — the same
-predicate [freeVariables](#freevariables) applies to ordinary symbols.
+`f(x)`, `g` in `g(x) := f(x) + 1`. A user function is listed whether it
+is undefined, declared, or already defined (`f(x) := …`,
+`ce.assign("f", …)`). The operators of a library (`Add`, `Sin`, …: the
+standard library, a library given to the constructor, or one loaded with
+`ce.loadLibrary()`), constants, and names bound by an enclosing scope of
+the expression (function parameters, summation indices, `Block` locals) are
+excluded.
 
 Operator heads are not symbols of the expression, so they appear in
 neither [symbols](#symbols) nor [freeVariables](#freevariables). This accessor recovers
@@ -14958,9 +16120,15 @@ readonly references: readonly string[];
 ```
 
 The symbols this expression **references** but does not itself define:
-the union of [freeVariables](#freevariables) (referenced values) and
-[referencedFunctions](#referencedfunctions) (applied user functions), minus
-[defines](#defines).
+every user name it reads, as a value or as an applied function
+([referencedFunctions](#referencedfunctions)), minus [defines](#defines). A name is listed
+whether or not it already has a value or a definition: after
+`a := 5`, `g(x) := x + a` still references `a`. This is the difference
+with [freeVariables](#freevariables), which lists only the symbols that have no
+value. The names of a library (`Pi`, `Sin`, …: the standard library, a
+library given to the constructor, or one loaded with
+`ce.loadLibrary()`), constants, and names bound by the expression itself (parameters, indices, `Block`
+locals) are excluded.
 
 This is the complete in-edge set for a dependency graph keyed on cells
 (e.g. a notebook): pair it with [defines](#defines) for the out-edges.
@@ -15040,7 +16208,7 @@ Absolute value
 
 <MemberCard>
 
-##### Expression.add() {#add-3}
+##### Expression.add() {#add-4}
 
 ```ts
 add(rhs): Expression
@@ -15346,11 +16514,62 @@ If this expression has a local scope, return it.
 subs(sub, options?): Expression
 ```
 
-Replace all the symbols in the expression as indicated.
+Replace all the FREE occurrences of the symbols in the expression as
+indicated.
 
-Note the same effect can be achieved with `this.replace()`, but
+The occurrences replaced are exactly those that `freeVariables` reports
+as free. A name bound by a binder is not replaced where the binder binds
+it: the index of a `Sum`, `Product` or `Comprehension`, the parameter of
+a `Function` literal, the variable of a definite `Integrate`, a local of
+a `Block`. So `["Sum", "j", ["Limits", "j", 1, 3]]` is unchanged by
+`subs({j: 5})`, and in `["Add", "j", ["Sum", "j", ["Limits", "j", 1, 3]]]`
+only the first `j` is replaced. The bounds of a `Limits` clause of a
+`Sum`, `Product` or `Integrate` read the enclosing binding, so they are
+replaced: `["Sum", "j", ["Limits", "j", 1, "j"]]` with `j` replaced by
+`4` is `["Sum", "j", ["Limits", "j", 1, 4]]`.
+
+The variable of `D`, the expansion variable of `Series` and the variable
+of an indefinite `Integrate` are free: the value of the expression is a
+function of them. When such a variable is replaced, the expression keeps
+its variable, and the result is the value of the expression at the
+point: `["D", ["Power", "x", 2], "x"]` with `x` replaced by `3` is
+`["EvaluateAt", ["Function", ["D", ["Power", "x", 2], "x"], "x"], 3]`,
+written `\left.\left(\frac{\mathrm{d}x^2}{\mathrm{d}x}\right)\right|_{x=3}`,
+which evaluates to `6`. Only the variable itself is applied at a
+point. The replacement of another name is put in the derivative, the
+series or the integral before it is computed: `["D", ["Multiply", "y",
+["Power", "x", 2]], "x"]` with `y` replaced by `3` is `["D",
+["Multiply", 3, ["Power", "x", 2]], "x"]`, and `["D", ["Multiply", "x",
+"y"], "x"]` with `y` replaced by `x` is `["D", ["Multiply", "x", "x"],
+"x"]`, which evaluates to `2x`. When more than one such variable is
+replaced, the `Function` literal has one parameter per variable, the
+point is a `Tuple`, and all the variables are replaced at the same time:
+`\left.\left(…\right)\right|_{x=3, y=5}`. A replacement can contain the
+variable: with `x` replaced by `x + 1`, the `D` above evaluates to
+`2(x + 1)`, where the `x` of `x + 1` is the `x` of the enclosing scope.
+When the value has no
+closed form (`Series(e^{1/x}, x, 0, 3)`), the `EvaluateAt` stays
+unevaluated. The value of a `Series` at a point keeps its remainder:
+`Series(sin x, x, 0, 3)` with `x` replaced by `1/2` evaluates to
+`23/48 + BigO(1/32)`, and with `x` replaced by `0` to `BigO(0)`. A
+value that keeps a `BigO` term is `NaN` under `.N()` (the remainder has
+no numeric value): wrap the series in `Normal` to drop the remainder,
+before or after the substitution. `Normal(Series(sin x, x, 0, 3))` with
+`x` replaced by `0.5` evaluates to `0.479…` under `.N()`.
+
+The substitution does not avoid variable capture: a replacement that
+contains a name that a binder binds is inserted as it is, and the
+binder is not renamed. `["Sum", ["Add", "j", "k"], ["Limits", "k", 1, 3]]`
+with `j` replaced by `k` is `["Sum", ["Add", "k", "k"], ["Limits", "k",
+1, 3]]`, which evaluates to `12`. When the replacement can contain the
+index, rename the index first with a recursive `replace()` of the rule
+`k -> m`: the result is `["Sum", ["Add", "k", "m"], ["Limits", "m", 1,
+3]]`, which evaluates to `3k + 6`.
+
+Note a similar effect can be achieved with `this.replace()`, but
 using `this.subs()` is more efficient and simpler, but limited
-to replacing symbols.
+to replacing symbols. A recursive `replace()` does not skip bound
+variables.
 
 The free symbols of the result are bound in the CURRENT scope, not in the
 scope the receiver was built in. A node that owns a local scope keeps
@@ -15482,6 +16701,16 @@ has(v): boolean
 
 True if the expression includes a symbol `v` or a function operator `v`.
 
+When `v` is an array, true if the expression includes any of the names
+in `v`.
+
+A dictionary is a node with the operator `Dictionary`, and the test
+looks at the values of its entries. A key is a string, not a symbol, so
+a key never matches: for `{"a" -> u}`, `has("u")` and
+`has("Dictionary")` are `true` and `has("a")` is `false`. To test
+whether a dictionary has a key, use `hasKey()` of
+`DictionaryInterface`.
+
 :::info[Note]
 Applicable to canonical and non-canonical expressions.
 :::
@@ -15517,7 +16746,7 @@ return the empty substitution, `{}`.
   are filtered out. `useVariations` and `matchMissingTerms` default to
   `true`. Unprefixed keys are accepted in `substitution`.
 - A **MathJSON array** (e.g., `['Add', '_a', '_b']`): boxed automatically.
-- A **BoxedExpression**: used directly.
+- An **Expression**: used directly.
 
 Read more about [**patterns and rules**](/compute-engine/guides/patterns-and-rules/).
 
@@ -15852,6 +17081,19 @@ Asynchronous version of `evaluate()`.
 The `options` argument can include a `signal` property, which is an
 `AbortSignal` object. If the signal is aborted, a `CancellationError` is thrown.
 
+A call made inside a
+[`ComputeEngine.withTimeLimit`](#withtimelimit)
+(or `withStepBudget`) span keeps the span's limit for the whole
+evaluation, the parts that run after an `await` included: the limit is
+read when `evaluateAsync()` is called, not when the span closes. A
+limit that expires is reported as it is by `evaluate()`.
+A span around a nested `evaluateAsync(options)` call (from an
+asynchronous handler, with the options it received) applies to that
+call until it ends, when it ends sooner than the limit of the
+evaluation or adds a step budget; the other parts of the evaluation
+keep their own limit. Nested limits combine: the earlier time limit
+applies, and a step counts against every step budget in force.
+
 ####### options?
 
 `Partial`\<`EvaluateOptions`\>
@@ -15946,7 +17188,7 @@ console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y:
 
 <MemberCard>
 
-##### Expression.value {#value-5}
+##### Expression.value {#value-7}
 
 ```ts
 get value(): Expression | undefined
@@ -16036,10 +17278,10 @@ different questions and neither implies the other:
   `false` for a materialized collection whose type is top
   (`unknown`/`any`), which `isCollection` reports `true`.
 
-A shape test must spell the `<any>` FAMILY TOP, never the bare name:
-since the bare-synonym ruling (2026-08-17) bare `collection` is the
-values-only `collection<unknown>`, so `list<any>`, `list<nothing>` and
-`list<integer|missing>` — all collection-shaped — do NOT match it.
+A shape test should spell the `<any>` FAMILY TOP rather than the bare
+name. Since 0.160.0 the bare `collection` also matches `list<any>`,
+`list<nothing>` and `list<integer|missing>`, but the explicit top does
+not depend on how the bare name is read.
 (`COLLECTION_SHAPE_TYPE` and friends in `common/type/primitive.ts` are
 the same tops as `Type` constants, for `isSubtype` call sites.)
 
@@ -16515,7 +17757,7 @@ Note that lazy collections are *not* eagerly evaluated.
 The output preserves the full raw `BigDecimal` value with no rounding,
 ensuring lossless round-tripping via `ce.expr(expr.json)`. Digits beyond
 `ce.precision` may be present but are not guaranteed to be accurate.
-Use `toMathJson({ fractionalDigits: 'auto' })` for precision-rounded
+Use `toMathJson({ digits: 'auto' })` for precision-rounded
 MathJSON output.
 
 </MemberCard>
@@ -16551,6 +17793,13 @@ products, applying the multinomial theorem, etc.) and re-checks
 structural equality. This catches equivalences like `(x+1)^2` vs
 `x^2+2x+1` even when the expression has free variables.
 
+When one side is a value of a value kind (a value made by a head
+declared with an `arithmetic` field), the result is the result of
+`Equal` for the two sides when the kind type declares `compare` (the
+`compare` hook orders the two values within the tolerance: `tolerance`,
+else `engine.tolerance`, also for two exact values), and of `isSame()`
+otherwise.
+
 ####### other
 
 `string` \| `number` \| `bigint` \| `boolean` \| [`Expression`](#expression-5)
@@ -16562,6 +17811,8 @@ structural equality. This catches equivalences like `(x+1)^2` vs
 If provided, overrides `engine.tolerance` for the
 numeric comparison. Has no effect when the comparison is structural
 (i.e., when `isSame()` succeeds or the expression has free variables).
+When one side is a value of a value kind, it is given to the `compare`
+hook of the kind (`ArithmeticContext.tolerance`).
 
 </MemberCard>
 
@@ -16586,6 +17837,15 @@ elements in a different order are the same:
 `ce.box(['Set', 2, 1]).isSame(ce.box(['Set', 1, 2]))` is `true`. A
 set-builder (`Set(body, Element(k, S))`) compares its two operands by
 position.
+
+A finite `Range` whose bounds and step are integer literals and that has
+at most 10,000 elements is the same as the `List` of its integers, and
+has the same `hash`: `ce.box(['Range', 1, 3]).isSame(ce.box(['List', 1,
+2, 3]))` is `true`. A larger range is compared by its operands only.
+
+A character and a one-cluster string with the same content are the same,
+although their types are different: `ce.string('a')` is the same as
+`ce.character('a')`.
 
 Accepts JavaScript primitives: `number`, `bigint`, `boolean`, `string`.
 
@@ -16829,16 +18089,16 @@ singular values of a matrix.
 
 <MemberCard>
 
-##### Expression.type {#type-12}
+##### Expression.type {#type-13}
 
 ```ts
 get type(): BoxedType
 set type(type: 
   | string
+  | ListType
   | AlgebraicType
   | NegationType
   | CollectionType
-  | ListType
   | SetType
   | BroadcastableType
   | RecordType
@@ -17023,43 +18283,23 @@ get(key): Expression | undefined
 
 <MemberCard>
 
-##### DictionaryInterface.has() {#has-1}
+##### DictionaryInterface.hasKey() {#haskey}
 
 ```ts
-has(key): boolean
+hasKey(key): boolean
 ```
+
+True if the dictionary has an entry with the key `key`.
+
+This is the key test. The `has()` method of the expression is the
+symbol test: on a dictionary it looks for a symbol in the VALUES and
+never matches a key, because a key is a string, not a symbol. For
+`{"a" -> u}`, `hasKey("a")` is `true`, `has("a")` is `false` and
+`has("u")` is `true`.
 
 ####### key
 
 `string`
-
-</MemberCard>
-
-<MemberCard>
-
-### ~~BoxedExpression~~ {#boxedexpression}
-
-```ts
-type BoxedExpression = Expression;
-```
-
-#### Deprecated
-
-Use `Expression` instead.
-
-</MemberCard>
-
-<MemberCard>
-
-### ~~SemiBoxedExpression~~ {#semiboxedexpression}
-
-```ts
-type SemiBoxedExpression = ExpressionInput;
-```
-
-#### Deprecated
-
-Use `ExpressionInput` instead.
 
 </MemberCard>
 
@@ -17098,40 +18338,28 @@ These options control how numbers are parsed and serialized.
 ```ts
 type NumberSerializationFormat = NumberFormat & {
   digits: DisplayDigits;
-  fractionalDigits: "auto" | "max" | number;
   notation: "auto" | "engineering" | "scientific" | "adaptiveScientific";
-  avoidExponentsInRange: undefined | null | [number, number];
+  avoidExponentsInRange:   | undefined
+     | null
+     | [negativeExponent: number, positiveExponent: number];
 };
 ```
 
 #### NumberSerializationFormat.digits?
 
 ```ts
-optional digits?: DisplayDigits;
+digits?: DisplayDigits;
 ```
 
 Controls how many digits a number is displayed with. See
 [DisplayDigits](#displaydigits).
 
-When serializing via `.toLatex({ digits })`, rounding is applied at the
-MathJSON (kernel) layer; the LaTeX layer only lays out the already-rounded
-digits.
-
-#### NumberSerializationFormat.~~fractionalDigits~~
-
-```ts
-fractionalDigits: "auto" | "max" | number;
-```
-
-The maximum number of significant digits in serialized numbers.
-- `"max"`: all availabe digits are serialized.
-- `"auto"`: use the same precision as the compute engine.
-
-Default: `"auto"`
-
-##### Deprecated
-
-Use digits instead.
+The LaTeX serializer rounds a float number literal with
+`{ fractional: n }` and `{ significant: n }`, and writes an exact number
+in full. `"auto"` needs the engine precision, so only `toLatex()` and the
+`.latex` getter apply it, when they serialize the expression to MathJSON;
+the LaTeX serializer writes every digit of the MathJSON number for
+`"auto"` and `"max"`.
 
 </MemberCard>
 
@@ -17186,7 +18414,6 @@ type JsonSerializationOptions = {
   metadata: ("all" | "wikidata" | "latex" | "sourceOffsets")[];
   repeatingDecimal: boolean;
   digits: DisplayDigits;
-  fractionalDigits: "auto" | "max" | number;
 };
 ```
 
@@ -17263,7 +18490,7 @@ shape: number[];
 ##### TensorData.rank? {#rank}
 
 ```ts
-optional rank?: number;
+rank?: number;
 ```
 
 </MemberCard>
@@ -17283,7 +18510,7 @@ data: DataTypeMap[DT][];
 ##### TensorData.holdsFloat? {#holdsfloat}
 
 ```ts
-optional holdsFloat?: boolean;
+holdsFloat?: boolean;
 ```
 
 Is the tensor a float tensor? `true` when an entry of the matrix the
@@ -17644,7 +18871,7 @@ equals(lhs, rhs): boolean
 
 <MemberCard>
 
-##### TensorField.add() {#add-1}
+##### TensorField.add() {#add-2}
 
 ```ts
 add(lhs, rhs): T
@@ -18193,7 +19420,7 @@ map2(fn, rhs): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.add() {#add-2}
+##### Tensor.add() {#add-3}
 
 ```ts
 add(other): Tensor<DT>
@@ -18221,7 +19448,7 @@ subtract(other): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.multiply() {#multiply}
+##### Tensor.multiply() {#multiply-1}
 
 ```ts
 multiply(other): Tensor<DT>
@@ -18235,7 +19462,7 @@ multiply(other): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.divide() {#divide}
+##### Tensor.divide() {#divide-1}
 
 ```ts
 divide(other): Tensor<DT>
@@ -18249,7 +19476,7 @@ divide(other): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.power() {#power}
+##### Tensor.power() {#power-1}
 
 ```ts
 power(other): Tensor<DT>
@@ -18290,10 +19517,10 @@ new BoxedType(type, typeResolver?): BoxedType
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -18589,10 +19816,10 @@ Box an ordinary type, sharing immutable type values within a resolver.
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -18649,10 +19876,10 @@ Normalization is shared only for immutable input types.
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -18685,10 +19912,10 @@ Normalization is shared only for immutable input types.
 ####### type
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -18764,10 +19991,10 @@ polymorphic one.
 ####### other
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -18796,10 +20023,10 @@ is(other): boolean
 ####### other
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -18842,10 +20069,10 @@ Throws if `other` is a string that is not a valid type.
 ####### other
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -18868,7 +20095,7 @@ Throws if `other` is a string that is not a valid type.
 ##### BoxedType.couldMatch() {#couldmatch}
 
 ```ts
-couldMatch(other): boolean
+couldMatch(other, options?): boolean
 ```
 
 True when *some* value inhabits both this type and `other` — "could a
@@ -18891,7 +20118,23 @@ be a `list<tuple<number, number>>`, witness `[(1,2)]`.
 
 Symmetric, and decisive for the composite shapes it models: a
 `tuple<number, number>` could not be a `list<tuple<number, number>>`, and
-`list<integer>` could not be a `list<string>`. Shapes it does not model
+`list<integer^2>` could not be a `list<string^2>`. Two list types with no
+dimensions could always match, whatever their elements, because the empty
+list is a value of both: `list<integer>` could be a `list<string>`,
+witness `[]`. To ask whether a NON-EMPTY value could be both, pass
+`{ nonEmpty: true }`: a non-empty collection of both types has elements
+of both element types, so the element types are compared too.
+
+```ts
+const t = ce.type('list<number>');
+t.couldMatch('list<tuple<number, number>>');                     // true
+t.couldMatch('list<tuple<number, number>>', { nonEmpty: true }); // false
+t.couldMatch('list<integer>', { nonEmpty: true });               // true
+```
+
+Only the outer collection must be non-empty: `[[]]` is a value of both
+`list<list<number>>` and `list<list<string>>`. For a type that is not a
+collection, the option changes nothing. Shapes it does not model
 fall back to assignability in either direction, so the answer is never
 narrower than `matches()` — with one deliberate exception: `never` is
 uninhabited, so nothing could be a `never`.
@@ -18904,10 +20147,10 @@ Throws if `other` is a string that is not a valid type.
 ####### other
 
   \| `string`
+  \| [`ListType`](#listtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
-  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
   \| [`RecordType`](#recordtype)
@@ -18922,6 +20165,12 @@ Throws if `other` is a string that is not a valid type.
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
   \| [`BoxedType`](#boxedtype)
+
+####### options?
+
+####### nonEmpty?
+
+`boolean`
 
 </MemberCard>
 
@@ -18988,7 +20237,7 @@ type MathJsonAttributes = {
   openmathCd: string;
   sourceUrl: string;
   sourceContent: string;
-  sourceOffsets: [number, number];
+  sourceOffsets: [start: number, end: number];
 };
 ```
 
@@ -19169,6 +20418,10 @@ type PrimitiveType =
   | "character"
   | "regexp"
   | "color"
+  | "residue"
+  | "measurement"
+  | "quantity"
+  | "enclosure"
   | "type"
   | "expression"
   | "unknown"
@@ -19524,6 +20777,7 @@ type ValueType = {
 type RecordType = {
   kind: "record";
   elements: Record<string, Type>;
+  closed: true;
 };
 ```
 
@@ -19534,6 +20788,19 @@ The keys are strings. The set of keys is fixed.
 For a record type to be a subtype of another record type, it must contain
 every key required by the other type, and all their types must match (width
 subtyping). It may contain additional keys.
+
+A record type is OPEN: `record{a: integer}` holds every value that has a
+field `a` of type `integer`, and also other fields of any type. So it is a
+`dictionary<T>` only when `T` holds every value.
+
+The type of a dictionary VALUE is CLOSED (`closed: true`): the value has
+exactly the listed fields and no other. `{a: 1}` is typed
+`record{a: integer}` with `closed: true`, and that type is a subtype of
+`dictionary<integer>`. No type syntax spells a closed record: a closed
+record prints as the open record with the same fields, and the parser
+makes only open records. A closed record is a subtype of the open record
+with the same fields, and a record type is a subtype of a closed record
+only when it is closed and has the same set of keys.
 
 </MemberCard>
 
@@ -19624,7 +20891,7 @@ type CollectionType = {
 type ListType = {
   kind: "list";
   elements: Type;
-  dimensions: number[];
+  dimensions: number[] | null;
   dimensionVariables: readonly (string | undefined)[];
 };
 ```
@@ -19711,14 +20978,34 @@ type BroadcastableType = {
 };
 ```
 
-A `broadcastable<T>` is either a `T`, or an indexed collection of `T`
-applied element-wise (runtime broadcasting). It is the static type of an
-arithmetic result whose operand's collection-ness is not statically visible.
+A `broadcastable<T>` is either a `T`, or a collection of `T` to which an
+operation applies element-wise (runtime broadcasting). It is the static
+type of an arithmetic result whose operand's collection-ness is not
+statically visible. The node kind exists for every `T`, numeric or not.
+
+What the collection arm is depends on `T`:
+
+- When no value of `T` is a list (`T` is a number type, `boolean`,
+  `string`, a tuple, `integer | missing`, …; `cannotHoldAList` in
+  `subtype.ts`), the arm is `tensor<T>`, a tensor of any rank whose cells
+  are `T` (a list node with `dimensions` `null`). So a matrix of numbers
+  is a `broadcastable<number>`, a matrix of booleans is a
+  `broadcastable<boolean>`, and a plain list of numbers, of booleans or
+  of points is one too, read at rank 1. A `list<list<boolean>>` is not a
+  `broadcastable<boolean>`: its rows may differ in length, so it is not
+  a tensor.
+- When `T` can hold a list (`any`, `value`, a type variable), the arm is
+  the plain list `list<T>`, read by its elements: a `list<any>` is a
+  `broadcastable<any>`.
 
 A `T` (and any subtype of `T`) is a subtype of `broadcastable<T>`, and so is
-any indexed collection whose elements are subtypes of `T`. It is *not* a
-subtype of `T` (it may be a collection) nor of `list<T>` (it may be a
-scalar). See `subtype.ts` for the full relation.
+any subtype of the collection arm (a tuple, a string and an abstract
+`indexed_collection<T>` are not lists). It is *not* a subtype of `T` (it
+may be a collection) nor of its collection arm (it may be a scalar). See
+`subtype.ts` for the full relation (`broadcastCollectionArm` builds the
+arm). Decided by the user on 2026-10-21 (decision D4 of
+`docs/plans/2026-10-21-list-element-tensor-cell.md`, refined to keep the
+node for every `T`).
 
 </MemberCard>
 
@@ -19758,6 +21045,7 @@ type TypeReference = {
      typeParams: string[];
     }[];
   _declOrigin: DeclarationOrigin;
+  _minted: boolean;
 };
 ```
 
@@ -19773,7 +21061,7 @@ Nominal typing
 type DeclarationOrigin = {
   batch: number;
   statementId: unknown;
-  firstRange: [number, number];
+  firstRange: [start: number, end: number];
 };
 ```
 
@@ -19958,8 +21246,8 @@ Examples of types strings:
 - `"collection<(number, boolean)>"` -- a collection of tuples
 - `"collection<(value:number, seen:boolean)>"` -- a collection of named tuples
 - `"vector<boolean^32>"` -- a list type with a fixed size of 32 elements
-- `"matrix<integer^(2x3)>"` -- an integer matrix of 2 columns and 3 rows
-- `"list<integer^(2x3x4)>"` -- a tensor of dimensions 2x3x4
+- `"matrix<integer^(2x3)>"` -- an integer matrix of 2 rows and 3 columns
+- `"tensor<integer^(2x3x4)>"` -- a tensor of dimensions 2x3x4
 - `"number -> number"` -- a signature with a single argument
 - `"(x: number, number) -> number"` -- a signature with a named argument
 - `"(number, y:number?) -> number"` -- a signature with an optional named argument (can have several optional arguments, at the end)
@@ -20083,5 +21371,25 @@ identity.
 ##### v
 
 `unknown`
+
+</MemberCard>
+
+<MemberCard>
+
+### listTensorRank() {#listtensorrank}
+
+```ts
+function listTensorRank(t): number | undefined
+```
+
+The rank of the list type `t`: the number of its axes when `t` is a
+tensor with a dimension list (`vector<U>` is 1, `matrix<U>` is 2,
+`tensor<U^(2x3x4)>` is 3), and `undefined` for a plain list (`list<E>`,
+whose `dimensions` is absent) and for a tensor of unknown rank
+(`tensor<U>`, whose `dimensions` is `null`).
+
+##### t
+
+`Readonly`\<[`ListType`](#listtype)\>
 
 </MemberCard>

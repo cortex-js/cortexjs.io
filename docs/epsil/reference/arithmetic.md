@@ -304,7 +304,7 @@ category.
 
 ### abs
 
-MathJSON `Abs` · `(complex | infinity) -> number`
+MathJSON `Abs` · `(complex | infinity | quantity) -> number`
 
 Absolute value (magnitude) of a number.
 
@@ -646,6 +646,27 @@ Element-wise minimum: broadcasts scalars over collections (and zips collections)
 ```epsil
 elementMin([1, 5, 3], [4, 2, 6])
 // ➔ [1,2,3]
+```
+
+### enclosure
+
+MathJSON `Enclosure` · `(nan | real | set<real> | signed_infinity, (nan | real | signed_infinity)?) -> enclosure | nan`
+
+A closed interval [lo, hi] that encloses one real number, with interval arithmetic.
+
+```epsil
+enclosure(0, 1) + enclosure(1/3, 2)
+// ➔ Enclosure(1/3, 3)
+```
+
+```epsil
+sin(enclosure(0, pi))
+// ➔ Enclosure(0, 1)
+```
+
+```epsil
+N(enclosure(0, pi))
+// ➔ Enclosure(0, 3.1415926535897936)
 ```
 
 ### eulerGamma
@@ -1056,7 +1077,7 @@ Maximum of two or more numbers. Nothing data are omitted.
 
 ### measurement
 
-MathJSON `Measurement` · `(value, value) -> value`
+MathJSON `Measurement` · `(value, value) -> measurement`
 
 A nominal value carrying a 1σ absolute uncertainty.
 
@@ -1331,6 +1352,17 @@ Sign of a number: -1, 0, or 1 for a real; `z/|z|`, the point of the unit circle 
 ```epsil
 [sign(-3), sign(0), sign(3 + 4i)]
 // ➔ [-1,0,(3/5 + 4/5i)]
+```
+
+### smoothstep
+
+MathJSON `Smoothstep` · `(real | signed_infinity, real | signed_infinity, real | signed_infinity) -> nan | real`
+
+Smooth Hermite interpolation between 0 and 1 as x goes from e0 to e1: t²(3 − 2t) with t = Clamp((x − e0)/(e1 − e0), 0, 1). Broadcasts over collection arguments.
+
+```epsil
+[smoothstep(0, 1, -1), smoothstep(0, 1, 1/2), smoothstep(0, 1, 2)]
+// ➔ [0,1/2,1]
 ```
 
 ### sqrt
