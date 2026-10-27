@@ -1182,6 +1182,10 @@ Recursively expand out products and positive integer powers in `expr` and all su
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Factor
+</nav>
+
 <FunctionDefinition name="Factor">
 
 <Signature name="Factor">_expr_</Signature>
@@ -1314,6 +1318,10 @@ A polynomial that is irreducible over the field is returned unchanged:
 ["Factor", ["Subtract", ["Power", "x", 2], 3], "x", ["Sqrt", 2]]
 // ➔ x²-3
 ```
+
+<nav className="hidden">
+### AlgebraicGenerator
+</nav>
 
 <FunctionDefinition name="AlgebraicGenerator">
 
