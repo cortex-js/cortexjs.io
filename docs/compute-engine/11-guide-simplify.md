@@ -172,11 +172,37 @@ expand('(x+1)(x+2)').latex;
 ```
 
 The `Factor` function currently supports:
-- **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
-- **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
-- **Quadratics with rational roots**: $ x^2 + bx + c $ when roots are rational
-- **Degree 3+ with rational roots**: Uses the Rational Root Theorem (e.g., $ x^3 - 6x^2 + 11x - 6 \to (x-1)(x-2)(x-3) $)
+- **Univariate polynomials with rational coefficients**: a complete
+  factorization into factors that are irreducible over the rationals, within
+  the work limits of the engine, also when no root is rational (e.g.,
+  $ x^3 - 6x^2 + 11x - 6 \to (x-1)(x-2)(x-3) $ and
+  $ x^4 + 4 \to (x^2-2x+2)(x^2+2x+2) $)
 - **Content extraction**: Extracts GCD of integer coefficients first (e.g., $ 6x^2 + 12x + 6 \to 6(x+1)^2 $)
+- **Other expressions**: structural methods, such as perfect square trinomials
+  $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $ and differences of squares
+  $ a^2 - b^2 \to (a-b)(a+b) $
+
+### Factoring over a Number Field
+
+By default, `Factor` factors over the rational numbers: $ x^2 - 2 $ stays as
+it is. A third argument selects a larger coefficient field, the rationals
+extended by an algebraic number:
+
+```javascript
+ce.parse('\\operatorname{Factor}(x^2-2, x, \\sqrt{2})').evaluate().latex;
+// ➔ "(x-\\sqrt{2})(x+\\sqrt{2})"
+
+ce.parse('\\operatorname{Factor}(x^2+1, x, i)').evaluate().latex;
+// ➔ "(x-\\imaginaryI)(x+\\imaginaryI)"
+
+ce.parse('\\operatorname{Factor}(x^4+1, x, \\sqrt{2})').evaluate().latex;
+// ➔ "(x^2-\\sqrt{2}x+1)(x^2+\\sqrt{2}x+1)"
+```
+
+The field can be given by a root of a rational number (`\sqrt{2}`,
+`\sqrt[3]{2}`), by `i`, or by an `AlgebraicGenerator` for any other algebraic
+number. A request that the engine cannot answer stays unevaluated; it is never
+factored over the rationals instead.
 
 ### Partial Fraction Decomposition
 

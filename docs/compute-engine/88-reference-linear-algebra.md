@@ -61,6 +61,19 @@ Matrices are represented as lists of lists.
 
 Tensors (multi-dimensional matrices) are represented as nested lists.
 
+A list of ranges of the same length, such as `[1..2, 3..4]`, keeps its ranges:
+its type is `list<range>`, not `matrix`. The linear-algebra functions accept
+it where they expect a matrix, and read each range as a row:
+`Determinant([1..2, 3..4])` is `-2`, and `MatrixMultiply([1..2, 3..4], [1..2, 3..4])`
+is `[[7, 10], [15, 22]]`. Ranges of different lengths are refused.
+
+The notations `^{-1}` and `\cdot` choose between the matrix operation and the
+element-wise operation from the type of the operands. A list of ranges is not
+typed as a matrix, so they apply element by element: `[1..2, 3..4]^{-1}` is
+`[[1, 1/2], [1/3, 1/4]]`, and `[1..2, 3..4] \cdot [1..2, 3..4]` is
+`[[1, 4], [9, 16]]`. For the matrix operations, write `Inverse(...)` and
+`MatrixMultiply(...)`.
+
 :::info[Note]
 Tensors are represented internally using an optimized format that is more
 efficient than nested lists. Because of this, some operations on tensors
@@ -1771,7 +1784,8 @@ Returns a lower triangular matrix **L** such that: **A = LL^T**
 - Symmetric (A = A^T)
 - Positive definite (all eigenvalues > 0)
 
-Returns error `'expected-positive-definite-matrix'` if the matrix is not positive definite.
+Returns error `'expected-symmetric-matrix'` if the matrix is not symmetric, and
+error `'expected-positive-definite-matrix'` if it is not positive definite.
 
 ```json example
 ["CholeskyDecomposition", ["List", ["List", 1, 2], ["List", 2, 1]]]

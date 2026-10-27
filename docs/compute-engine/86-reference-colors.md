@@ -17,10 +17,14 @@ color space conversion, and color palettes.
 
 <Signature name="Color">_input: string_</Signature>
 
-Convert a color string or named color into a canonical sRGB tuple.
+Convert a color string or named color into a color value.
 
-The output is a tuple of 3 or 4 numbers between 0 and 1, representing
-the red, green, blue, and optional alpha components.
+The output is an `Oklch` expression with 3 or 4 operands: the lightness L (0
+to 1), the chroma C, the hue H in degrees, and an optional alpha (0 to 1). Use
+`AsRgb` to get its sRGB components.
+
+The string is read as 8 bits for each channel, so an alpha of `0.5` is read as
+`128/255`, about `0.502`.
 
 Supports various formats:
 - **Hex**: `#rgb`, `#rrggbb`, `#rrggbbaa` (e.g. `'#f00'`, `'#ff0000'`, `'#ff000080'`)
@@ -31,16 +35,19 @@ Supports various formats:
 
 ```json example
 ["Color", "'#f00'"]
-// ➔ ["Tuple", 1, 0, 0]
+// ➔ ["Oklch", 0.628, 0.258, 29.234]
 
 ["Color", "'rgba(255, 0, 0, 0.5)'"]
-// ➔ ["Tuple", 1, 0, 0, 0.5]
+// ➔ ["Oklch", 0.628, 0.258, 29.234, 0.502]
 
 ["Color", "'red'"]
-// ➔ ["Tuple", 0.843, 0.09, 0.043]
+// ➔ ["Oklch", 0.559, 0.22, 29.619]
+
+["AsRgb", ["Color", "'red'"]]
+// ➔ ["Rgb", 0.843, 0.09, 0.043]
 
 ["Color", "'blue'"]
-// ➔ ["Tuple", 0.051, 0.502, 0.949]
+// ➔ ["Oklch", 0.607, 0.194, 254.822]
 ```
 
 ### Named Colors
@@ -153,8 +160,16 @@ Convert a color to its components in a specified color space.
 
 Supported color spaces: `"rgb"`, `"hsl"`, `"oklch"`, `"oklab"`.
 
+An sRGB channel outside [0, 1] is extended sRGB: it describes a color outside
+the sRGB gamut (a Display-P3 display can show it), and it is kept by every
+conversion among `rgb`, `oklab` and `oklch`. HSV and HSL describe only the sRGB
+gamut, so their saturation, value and lightness are clamped to [0, 1] (an
+infinite value reads as its bound), and converting an extended sRGB color to
+HSV or HSL clips each channel. A NaN channel, an infinite hue, and an infinite
+sRGB, OKLab or OKLCh channel are an error.
+
 ```json example
-["ColorToColorspace", "'red'", "'hsl'"]
+["ColorToColorspace", "'#f00'", "'hsl'"]
 // ➔ ["Tuple", 0, 1, 0.5]
 ```
 
@@ -167,11 +182,15 @@ Supported color spaces: `"rgb"`, `"hsl"`, `"oklch"`, `"oklab"`.
 
 <Signature name="ColorFromColorspace">_components: tuple_, _colorspace: string_</Signature>
 
-Convert components from a specified color space back to a canonical sRGB tuple.
+Convert components in a specified color space to a color value. The result
+is the color expression of that space: `Rgb`, `Hsl`, `Oklch` or `Oklab`.
 
 ```json example
 ["ColorFromColorspace", ["Tuple", 0, 1, 0.5], "'hsl'"]
-// ➔ ["Tuple", 1, 0, 0]
+// ➔ ["Hsl", 0, 1, 0.5]
+
+["AsRgb", ["ColorFromColorspace", ["Tuple", 0, 1, 0.5], "'hsl'"]]
+// ➔ ["Rgb", 1, 0, 0]
 ```
 
 </FunctionDefinition>

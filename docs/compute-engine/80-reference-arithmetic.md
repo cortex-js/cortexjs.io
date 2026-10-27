@@ -614,6 +614,34 @@ is no one-argument form with default bounds (decided 2026-09-21).
 
 </FunctionDefinition>
 
+<FunctionDefinition name="Smoothstep">
+
+<Signature name="Smoothstep">_e0_, _e1_, _x_</Signature>
+
+Smooth Hermite interpolation from 0 to 1 as `x` goes from `e0` to `e1`:
+`t² (3 − 2t)`, with `t = Clamp((x − e0) / (e1 − e0), 0, 1)`. This is the
+formula of the GLSL and WGSL built-in `smoothstep`, with the operands in the
+same order. The result is exact for exact operands, and it broadcasts over
+collection arguments.
+
+- When `e0 = e1`, the result is the step function: 0 when `x < e0`, else 1.
+- When `e0 > e1`, the formula applies as written, and the result goes from 1
+  to 0.
+- Every compile target gives these results. The GLSL and WGSL built-in
+  `smoothstep` has no defined result when `e0 ≥ e1`, so the shader targets
+  write the formula out instead of calling it.
+
+```json example
+["Smoothstep", 0, 1, ["Rational", 1, 3]]
+// ➔ 7/27
+["Smoothstep", 0, 1, 2]
+// ➔ 1
+["Smoothstep", 1, 1, 0.5]
+// ➔ 0
+```
+
+</FunctionDefinition>
+
 <FunctionDefinition name="Max">
 
 <Signature name="Max">_x1_, _x2_, ...</Signature>
@@ -1115,6 +1143,7 @@ These functions operate on polynomial expressions.
 | `Expand`               | Expand products and positive integer powers                      |
 | `ExpandAll`            | Recursively expand products and positive integer powers          |
 | `Factor`               | Factor an expression into irreducible factors                    |
+| `AlgebraicGenerator`   | A root of an irreducible polynomial, to select a number field    |
 | `Together`             | Combine rational expressions into a single fraction              |
 | `Distribute`           | Distribute multiplication over addition                          |
 | `PolynomialDegree`     | Return the degree of a polynomial                                |
@@ -1159,17 +1188,25 @@ Recursively expand out products and positive integer powers in `expr` and all su
 
 <Signature name="Factor">_expr_, _var_</Signature>
 
+<Signature name="Factor">_expr_, _var_, _generator_</Signature>
+
 Factor a polynomial expression into a product of irreducible factors.
 
 Supports:
-- **Perfect square trinomials**: $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $
-- **Difference of squares**: $ a^2 - b^2 \to (a-b)(a+b) $
-- **Quadratic factoring**: $ ax^2 + bx + c $ (when roots are rational)
-- **Rational root factoring**: Degree 3+ polynomials with rational roots (via Rational Root Theorem)
+- **Univariate polynomials with rational coefficients**: a complete
+  factorization into factors that are irreducible over the rationals, within
+  the work limits of the engine, also when no root is rational:
+  $ x^4 + 4 \to (x^2-2x+2)(x^2+2x+2) $
 - **Content extraction**: $ 6x^2 + 12x + 6 \to 6(x+1)^2 $ (extracts GCD of integer coefficients first)
 - **Common factor extraction**: $ 2x + 4 \to 2(x+2) $
+- **Other expressions**: structural methods, such as perfect square trinomials
+  $ a^2 \pm 2ab + b^2 \to (a \pm b)^2 $ and differences of squares
+  $ a^2 - b^2 \to (a-b)(a+b) $
 
 The optional `var` parameter specifies which variable to factor over.
+
+The optional `generator` parameter selects the coefficient field: see
+[Factoring over a number field](#factoring-over-a-number-field) below.
 
 **Perfect square trinomial:**
 ```json example
@@ -1197,9 +1234,10 @@ rather than stopping at the first split:
 // ➔ (x-1)(x+1)(x²+x+1)(x²-x+1)
 ```
 
-The factors are always polynomials: `Factor` never introduces `Sqrt` or `Abs`
-(e.g. $$ x^3 - 1 \to (x-1)(x^2+x+1) $$, not the branch-dependent
-$$ (x\sqrt{x}-1)(x\sqrt{x}+1) $$).
+The factors are always polynomials in `var`: `Factor` never introduces `Sqrt`
+of the variable or `Abs` (e.g. $$ x^3 - 1 \to (x-1)(x^2+x+1) $$, not the
+branch-dependent $$ (x\sqrt{x}-1)(x\sqrt{x}+1) $$). Without a `generator`, the
+coefficients of the factors are rational.
 
 **With coefficients:**
 ```json example
@@ -1218,6 +1256,127 @@ $$ (x\sqrt{x}-1)(x\sqrt{x}+1) $$).
 ["Sqrt", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
 // ➔ ["Abs", ["Add", "x", 1]]  // |x+1| (auto-factors before applying sqrt rule)
 ```
+
+</FunctionDefinition>
+
+### Factoring over a number field
+
+With a third argument, `["Factor", expr, var, generator]` factors `expr` over
+the field $$ \mathbb{Q}(\alpha) $$: the rationals extended by the algebraic
+number $$ \alpha $$ that `generator` selects. A polynomial that is irreducible
+over the rationals can split over such a field.
+
+The generator can be:
+- an exact square root or other root of a rational number, such as
+  `["Sqrt", 2]`, `["Sqrt", -3]` or `["Root", 2, 3]`;
+- `"ImaginaryUnit"`;
+- an [`AlgebraicGenerator`](#algebraicgenerator), for any other algebraic
+  number, given by its defining polynomial.
+
+```json example
+["Factor", ["Subtract", ["Power", "x", 2], 2], "x", ["Sqrt", 2]]
+// ➔ (x-√2)(x+√2)
+
+["Factor", ["Add", ["Power", "x", 2], 1], "x", "ImaginaryUnit"]
+// ➔ (x-i)(x+i)
+
+["Factor", ["Add", ["Power", "x", 4], 1], "x", ["Sqrt", 2]]
+// ➔ (x²-√2x+1)(x²+√2x+1)
+
+["Factor", ["Subtract", ["Power", "x", 3], 2], "x", ["Root", 2, 3]]
+// ➔ (x²+∛2x+∛2²)(x-∛2)
+```
+
+In LaTeX:
+
+```latex
+\operatorname{Factor}(x^2-2, x, \sqrt{2})
+```
+
+The result is exact, also with `.N()`. The coefficients of `expr` must be
+exact rational numbers, the generator, and products and sums of these. The
+variable must be a symbol.
+
+A request stays unevaluated when the engine cannot answer it: a coefficient it
+cannot read (another symbol, a float, an unrelated radical), a generator that
+is not supported, or a request too large for the work limits. The engine never
+factors over the rationals instead, and **an unevaluated result is not a proof
+that the polynomial is irreducible**.
+
+```json example
+["Factor", ["Subtract", ["Power", "x", 2], "y"], "x", ["Sqrt", 2]]
+// ➔ ["Factor", ["Subtract", ["Power", "x", 2], "y"], "x", ["Sqrt", 2]]
+```
+
+A polynomial that is irreducible over the field is returned unchanged:
+
+```json example
+["Factor", ["Subtract", ["Power", "x", 2], 3], "x", ["Sqrt", 2]]
+// ➔ x²-3
+```
+
+<FunctionDefinition name="AlgebraicGenerator">
+
+<Signature name="AlgebraicGenerator">_coefficients_</Signature>
+
+A root $$ \alpha $$ of the polynomial
+$$ c_0 + c_1 t + \cdots + c_n t^n $$, where `coefficients` is the list
+$$ [c_0, c_1, \ldots, c_n] $$ in **ascending** order of degree. Use it as the
+third argument of [`Factor`](#factor) to factor over a field that a single
+radical does not describe, such as $$ \mathbb{Q}(\sqrt{2}+\sqrt{3}) $$, or the
+field of a root of $$ t^5 - t - 1 $$, which has no expression in radicals.
+
+The coefficients must be exact rational numbers, and the polynomial must be
+irreducible over the rationals, of degree 1 to 128. Otherwise the result is an
+`invalid-algebraic-generator` error.
+
+```json example
+// √2 + √3 is a root of t⁴ - 10t² + 1
+["Factor",
+  ["Add", ["Power", "x", 4], ["Multiply", -10, ["Power", "x", 2]], 1],
+  "x",
+  ["AlgebraicGenerator", ["List", 1, 0, -10, 0, 1]]]
+// ➔ four linear factors in α = AlgebraicGenerator([1, 0, -10, 0, 1])
+
+["AlgebraicGenerator", ["List", -1, 0, 1]]
+// ➔ ["Error", "'invalid-algebraic-generator'"]  // t² - 1 is reducible
+```
+
+The generator does not select **which** root of the polynomial it is: the
+polynomial $$ t^2 - 2 $$ has two roots, $$ \sqrt{2} $$ and $$ -\sqrt{2} $$,
+and `["AlgebraicGenerator", ["List", -2, 0, 1]]` is "one of them". Every root
+gives the same field, so the factors that `Factor` finds have the same degrees
+and multiplicities for each choice. The result is expressed in terms of the
+generator itself:
+
+```json example
+["Factor", ["Subtract", ["Power", "x", 2], 2], "x",
+  ["AlgebraicGenerator", ["List", -2, 0, 1]]]
+// ➔ (x - α)(x + α), where α is the AlgebraicGenerator expression
+```
+
+For this reason, an `AlgebraicGenerator` has no numeric value: `.N()` leaves it
+unchanged, and it cannot be compiled. To work with a specific value, such as
+the positive square root of 2, use `["Sqrt", 2]` instead.
+
+A power $$ \alpha^k $$ with $$ n \le k \le 128 $$, where $$ n $$ is the degree
+of the polynomial, is reduced modulo the polynomial, as $$ (\sqrt{2})^2 $$ is
+`2`. This holds for every root, so it does not choose one:
+
+```json example
+// α is a root of t² - 2
+["Power", ["AlgebraicGenerator", ["List", -2, 0, 1]], 2]
+// ➔ 2
+
+// β is a root of t³ - t - 1
+["Power", ["AlgebraicGenerator", ["List", -1, -1, 0, 1]], 3]
+// ➔ β + 1
+
+["Expand", ["Multiply", ["Subtract", "x", α], ["Add", "x", α]]]
+// ➔ x² - 2
+```
+
+A negative power, such as $$ \alpha^{-1} $$, is not reduced.
 
 </FunctionDefinition>
 
@@ -1298,7 +1457,7 @@ This function is also available as a method on expressions:
 
 ```javascript
 const coeffs = ce.parse('x^3 + 2x + 1').polynomialCoefficients('x');
-// ➔ [1, 0, 2, 1]  (as BoxedExpression[])
+// ➔ [1, 0, 2, 1]  (as Expression[])
 ```
 
 When the variable is omitted, it is auto-detected if the expression has exactly one unknown:

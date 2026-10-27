@@ -137,6 +137,11 @@ Here's an example of a function that returns the absolute value of a number:
 
 `["If"]` expressions can be nested as necessary.
 
+When `condition` is a list of booleans (for example `["Less", "L", 3]` with
+`L` a list), `["If"]` selects **element by element** and the value is a list:
+`["If", ["List", "True", "False", "True"], 1, 0]` is `[1, 0, 1]`. See
+[Element-wise selection](#element-wise-selection) below.
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Which">
@@ -159,17 +164,20 @@ diagnostic.
 
 ```json example
 ["Block",
-  ["Assign", "n", -10]
-  ["Which", ["Greater", "n", 0], "n", ["Negate", "n"], "n"]
+  ["Assign", "n", -10],
+  ["Which", ["Greater", "n", 0], "n", ["Less", "n", 0], ["Negate", "n"], "True", 0]
 ]
 // ➔ 10
 ```
+
+The last clause, with the condition `"True"`, is the default: it is selected
+when no other condition is `True`.
 
 A `["Which"]` expression is equivalent to the following `["If"]` expression:
 
 ```json example
 ["If", ["Equal", condition-1, "True"], expr-1,
-    ["If", ["Equal", condition-2, "True"], _expr-2,
+    ["If", ["Equal", condition-2, "True"], expr-2,
     ... ["If", ["Equal", condition-n, "True"],
           expr-n,
           "Missing"
@@ -180,6 +188,61 @@ A `["Which"]` expression is equivalent to the following `["If"]` expression:
 
 A `["Which"]` expression is equivalent to a `switch` statement in JavaScript or
 the `Which[]` function in Mathematica.
+
+### Element-wise selection
+
+A condition can also be a **list of booleans**, such as the result of a
+comparison of a list with a number: with `L` equal to `[1, 3, 5]`,
+`["Less", "L", 3]` is `[True, False, False]`. Then `["Which"]` and `["If"]`
+select **at each position of the list**, as `numpy.select` does, and the value
+is a list of the same length:
+
+```json example
+["If", ["List", "True", "False", "True"], 1, 0]
+// ➔ [1, 0, 1]
+
+["If", ["Less", "L", 3], "L", 0]
+// ➔ [1, 0, 0]          with L = [1, 3, 5]
+
+["Which", ["Less", "L", 2], 10, ["Less", "L", 4], "L", "True", 0]
+// ➔ [10, 3, 0]         with L = [1, 3, 5]
+```
+
+At each position, the first clause whose condition is `True` at that position
+gives the value of that position. The rules:
+
+- **An expression that is a list gives its element at the position**; an
+  expression that is not a list gives its own value at every position. In the
+  second example, position 1 takes element 1 of `L`, and the other positions
+  take `0`.
+- **A condition that is not a list applies to every position**:
+  `["Which", ["List", "True", "False"], 1, "True", 3]` is `[1, 3]`.
+- **Every list must have the length of the condition**, else the value is an
+  `incompatible-dimensions` error, as for `["Add"]`:
+  `["If", ["Less", "L", 3], ["List", 10, 20], 0]` is
+  `Error("incompatible-dimensions", "3 vs 2")`.
+- **A position that no clause selects** holds `NaN` when every expression is a
+  number, and `Missing` otherwise: `["If", ["Less", "L", 3], "L"]` is
+  `[1, NaN, NaN]`, and `["If", ["Less", "L", 3], "'small'"]` is
+  `["small", Missing, Missing]`.
+- **A position whose condition is `Missing`** holds an error, because an
+  absent condition cannot select: `["If", ["List", "True", "Missing", "False"],
+  1, 0]` is `[1, Error(…), 0]`. Use `["Coalesce"]` or `["IsMissing"]` on the
+  condition first.
+- **Only the selected expressions are evaluated**, each one once.
+
+The condition can be a list of lists, such as the comparison of a matrix with
+a number. The selection then applies at every level: with `M` equal to
+`[[1, 2], [3, 4]]`, `["If", ["Less", "M", 3], "M", 0]` is `[[1, 2], [0, 0]]`.
+An expression with fewer levels than the condition is refused, as `["Add"]`
+refuses it: `["If", ["Less", "M", 3], ["List", 10, 20], 0]` is
+`Error("incompatible-dimensions", "2x2 vs 2")`. An expression with more
+levels than the condition is taken whole at each position:
+`["If", ["List", "True", "False"], ["List", ["List", 1], ["List", 2]], 0]` is
+`[[1], 0]`.
+
+A condition that is a single `True` or `False` keeps the ordinary behavior,
+even when an expression is a list: `["If", "True", "L", 0]` is `L`.
 
 </FunctionDefinition>
 
@@ -223,6 +286,122 @@ predicate:
 Downstream simplification, interval intersection, and compilation operate on
 the canonical form, so source variants (stacked braces or a single brace
 with `\wedge`) are interchangeable.
+
+#### When the Arguments Are Lists
+
+When `expr` is a list and `condition` is a single condition, the whole list
+is the value: the result is the list when the condition is `True`, and
+`Missing` when it is `False`.
+
+```json example
+["When", ["List", 10, 20, 30], "True"]
+// ➔ ["List", 10, 20, 30]
+
+["When", ["List", 10, 20, 30], "False"]
+// ➔ "Missing"
+```
+
+When `condition` is a **list of conditions** (a mask), `expr` is paired with
+the conditions position by position, and the result is a list with one cell
+for each pair. A cell is the element when its condition is `True`. When its
+condition is `False`, the cell is the absence marker of the element: `NaN`
+for a number, and `Missing` for any other value, such as a point or a
+string.
+
+```json example
+["When", ["List", 10, 20, 30], ["List", "True", "False", "True"]]
+// ➔ ["List", 10, "NaN", 30]
+
+["When", ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]], ["List", "True", "False"]]
+// ➔ ["List", ["Tuple", 1, 2], "Missing"]
+```
+
+The list of conditions is usually a comparison over the list itself. With
+the restriction-brace syntax:
+
+<Latex value="\lbrack 10, 20, 30 \rbrack\{\lbrack 10, 20, 30 \rbrack > 15\}"/>
+
+```json example
+["When", ["List", 10, 20, 30], ["Greater", ["List", 10, 20, 30], 15]]
+// ➔ ["List", "NaN", 20, 30]
+```
+
+The result keeps the positions of the elements: a masked element is not
+removed. To remove the elements that do not satisfy a condition, use
+[`Filter`](/compute-engine/reference/collections/#filter).
+
+**What is paired.** An ordered collection is paired element by element: a
+list, a vector, a matrix (each cell is a row), a range, and a lazy
+collection such as a `Map` over a range. A finite `Set` is paired in its
+iteration order. A value that is not a collection is **one value**, repeated
+in each cell. A tuple and a string are also one value: a point
+`["Tuple", 1, 2]` is not split into its coordinates.
+
+```json example
+["When", 5, ["List", "True", "False"]]
+// ➔ ["List", 5, "NaN"]
+
+["When", ["Tuple", 1, 2], ["List", "True", "False"]]
+// ➔ ["List", ["Tuple", 1, 2], "Missing"]
+
+["When", {str: "hi"}, ["List", "True", "False"]]
+// ➔ ["List", "hi", "Missing"]
+```
+
+**Different lengths.** The result has the length of the shorter of the two
+operands.
+
+```json example
+["When", ["List", 10, 20, 30], ["List", "True", "False"]]
+// ➔ ["List", 10, "NaN"]
+
+["When", ["List", 10, 20], ["List", "True", "False", "True"]]
+// ➔ ["List", 10, "NaN"]
+```
+
+**A collection that is infinite or of unknown length.** The collection is
+paired with the conditions over the length of the list of conditions. Only
+the elements that are necessary are read.
+
+```json example
+["When", ["Range", 1, "PositiveInfinity"], ["List", "True", "False", "True"]]
+// ➔ ["List", 1, "NaN", 3]
+```
+
+**Elements that cannot be read yet.** If the elements of the collection
+cannot be computed, the restriction stays unevaluated. This is the case for
+a range with a bound that has no value, and for a symbol that is declared as
+a list and has no value. The restriction evaluates when the elements can be
+read.
+
+```json example
+["When", ["Range", 1, "n"], ["List", "True", "False"]]
+// ➔ ["When", ["Range", 1, "n"], ["List", "True", "False"]]
+// After n is assigned the value 5:
+// ➔ ["List", 1, "NaN"]
+```
+
+**A condition that cannot be determined.** A cell whose condition cannot be
+determined stays a restriction of that one element. The other cells are
+evaluated.
+
+```json example
+["When", ["List", 10, 20], ["List", "True", "c"]]
+// ➔ ["List", 10, ["When", 20, "c"]]
+```
+
+**Types.** The type of a restriction with a list of conditions is a list
+whose elements admit the absent case. For a collection of numbers the type
+is `list<number>`, because a masked number is `NaN`, which is a `number`.
+For other elements the type is `list<T | missing>`: a restriction of a list
+of points has the type `list<tuple<number, number> | missing>`. This is the
+type for every ordered collection, also when the collection is declared as
+`indexed_collection<T>` and its length is not known.
+
+A symbol whose declared type admits both one value and a list of values,
+such as `tuple<number, number> | list<tuple<number, number>>` (a point or a
+list of points), is paired according to the value it holds: a point is one
+value, and a list of points is paired element by element.
 
 When compiled, `When(e, cond)` emits a ternary whose masked branch is the
 absence marker of the value's domain: `(cond ? e : NaN)` for a number, on

@@ -507,6 +507,1058 @@ Because a handler never holds an expression, it cannot declare, canonicalize,
 or evaluate anything while deriving a type, and the engine's type caches stay
 valid. Under test a handler that writes engine state throws.
 
+### Declaring a Value Kind: Values with Their Own Arithmetic
+
+Some values are not numbers, but they take part in arithmetic with their own
+rules: an element of a finite field, a residue class, a measurement with an
+uncertainty. A **value kind** lets an operator that constructs such values
+give their arithmetic to the engine. Two declarations make a kind:
+
+- a **kind type**, the type of the values;
+- an operator, the **head** that constructs the values, declared with an
+  `arithmetic` field and with the kind type as its result type.
+
+The number rules are wrong for most kinds. In GF(8), `x + x` is `0`, not
+`2x`; for a measurement, `x - x` has an uncertainty and is not `0`. So the
+engine keeps the number rules away from any expression that holds a value of
+a kind: canonicalization, `evaluate()` and `simplify()` do not apply
+`x - x = 0`, `x/x = 1` or like terms to it. Only the hooks of the kind
+combine its values.
+
+#### The kind type
+
+A kind type is one of:
+
+- a **kind primitive**, a type name that the library defines: `residue`,
+  the type of a residue class, `measurement`, the type of a
+  `Measurement(value, error)`, and `quantity`, the type of a
+  `Quantity(magnitude, unit)` (see
+  [Measurements and Quantities](#measurements-and-quantities));
+- a **nominal type whose definition is exactly `value`**, declared with
+  `{ mint: false }`. This is the form you use for a kind of your own:
+
+```js
+ce.declareType("gf8", "value", { mint: false });
+```
+
+A kind type is a subtype of `value` and of `expression`, so a parameter typed
+`value`, `expression` or `any` accepts its values: `List`, `Hold`, `Equal`,
+and a symbol declared `value` can hold one. A kind type is disjoint from
+every other type except `value`, `expression`, `any` and `unknown`: a value
+of type `gf8` is never a number, a string or a collection, and a symbol
+declared `gf8` refuses a number.
+
+By default, `ce.declareType()` also declares a constructor of the same name
+(see [Type Constructors](/compute-engine/guides/types/#type-constructors)).
+A kind has its own head as its constructor, so its type must be declared
+with `{ mint: false }`: a minted `gf8(…)` would be a second head of the type
+with no arithmetic. The engine refuses an `arithmetic` field whose result
+type was declared without `{ mint: false }`.
+
+#### A complete example: GF(8)
+
+GF(8) is the field with 8 elements. An element is a polynomial of degree
+less than 3 over GF(2), held here as a 3-bit number: the sum of two elements
+is the bitwise XOR of their numbers, and the product is the product of the
+polynomials modulo $x^3 + x + 1$.
+
+```js
+// The product of two elements of GF(8), each held as a 3-bit number:
+// polynomials over GF(2), reduced modulo x³ + x + 1.
+function gfMul(a, b) {
+  let r = 0;
+  for (let i = 0; i < 3; i++) if (b & (1 << i)) r ^= a << i;
+  for (let i = 4; i >= 3; i--) if (r & (1 << i)) r ^= 0b1011 << (i - 3);
+  return r;
+}
+
+// The number of a `GF8(k)` value, or `undefined` for any other expression
+const gf = (x) =>
+  x.operator === "GF8" && Number.isInteger(x.op1.re) ? x.op1.re & 7 : undefined;
+
+// Combine every `GF8` operand of a sum or a product into one fold
+function fold(ops, engine, step, unit) {
+  const operands = [];
+  ops.evaluated.forEach((x, i) => {
+    if (gf(x) !== undefined) operands.push(i);
+  });
+  if (operands.length < 2) return undefined;
+  const k = operands.reduce((acc, i) => step(acc, gf(ops.evaluated[i])), unit);
+  return [{ value: engine.function("GF8", [k]), operands }];
+}
+
+ce.declareType("gf8", "value", { mint: false });
+
+ce.declare("GF8", {
+  signature: "(integer) -> gf8",
+  arithmetic: {
+    add: (ops, { engine }) => fold(ops, engine, (a, b) => a ^ b, 0),
+    multiply: (ops, { engine }) => fold(ops, engine, gfMul, 1),
+    // In characteristic 2, -x is x
+    negate: (x) => (gf(x.evaluated) !== undefined ? x.evaluated : undefined),
+    divide: (a, b, { engine }) => {
+      const [x, y] = [gf(a.evaluated), gf(b.evaluated)];
+      if (x === undefined || y === undefined || y === 0) return undefined;
+      let inverse = 1;
+      while (gfMul(y, inverse) !== 1) inverse += 1;
+      return engine.function("GF8", [gfMul(x, inverse)]);
+    },
+    power: (base, exponent, { engine }) => {
+      const x = gf(base.evaluated);
+      const n = exponent.exact();
+      if (x === undefined || n.isInteger !== true || n.isNonNegative !== true)
+        return undefined;
+      let r = 1;
+      for (let i = 0; i < n.re; i++) r = gfMul(r, x);
+      return engine.function("GF8", [r]);
+    },
+  },
+});
+```
+
+With these declarations:
+
+```js
+ce.box(["Add", ["GF8", 3], ["GF8", 5]]).evaluate();       // ➔ GF8(6)
+ce.box(["Multiply", ["GF8", 3], ["GF8", 5]]).evaluate();  // ➔ GF8(4)
+ce.box(["Subtract", ["GF8", 3], ["GF8", 3]]).evaluate();  // ➔ GF8(0)
+ce.box(["Divide", ["GF8", 3], ["GF8", 5]]).evaluate();    // ➔ GF8(6)
+ce.box(["Power", ["GF8", 3], 2]).evaluate();              // ➔ GF8(5)
+ce.box(["Add", "x", ["GF8", 1], ["GF8", 2]]).evaluate();  // ➔ x + GF8(3)
+
+// `divide` declines a zero divisor, and `power` an exponent of 1/2:
+// the expression stays as it is
+ce.box(["Divide", ["GF8", 3], ["GF8", 0]]).evaluate();    // ➔ GF8(3) / GF8(0)
+ce.box(["Sqrt", ["GF8", 3]]).evaluate();                  // ➔ sqrt(GF8(3))
+
+// A list of values is a list of the kind type
+ce.box(["List", ["GF8", 1], ["GF8", 2]]).type;            // ➔ list<gf8^2>
+
+// No other operator accepts a value of the kind
+ce.box(["Sin", ["GF8", 3]]).isValid;                      // ➔ false
+```
+
+A symbol declared with the kind type is protected before it has a value:
+
+```js
+ce.declare("g", "gf8");
+ce.box(["Subtract", "g", "g"]).simplify();  // ➔ g - g
+ce.box(["Divide", "g", "g"]).simplify();    // ➔ g / g
+```
+
+A symbol declared `value`, or not declared, can be a number, and the number
+rules apply to it: `w/w` is `1`. Declare a symbol that will hold a value of
+a kind with the kind type.
+
+Two values of a kind written next to each other are a product, as two
+numbers are: `\operatorname{GF8}(3)\operatorname{GF8}(5)` parses to
+`GF8(3) · GF8(5)`.
+
+#### The hooks
+
+The `arithmetic` field is an `ArithmeticDefinition`. Every hook is optional.
+A hook that answers `undefined` declines, and the expression stays as it is.
+
+| Hook | Called for | Answers |
+| :--- | :--- | :--- |
+| `add(ops, context)` | a sum (`Add`, `Subtract`) with a value of the kind | a list of folds |
+| `multiply(ops, context)` | a product with a value of the kind | a list of folds |
+| `negate(x, context)` | `-x` | an expression |
+| `divide(a, b, context)` | `a / b` | an expression |
+| `power(base, exponent, context)` | `base ^ exponent`; also `Sqrt(x)` (exponent `1/2`), `Root(x, n)` (exponent `1/n`), `Square(x)` (exponent `2`) | an expression |
+| `compare(a, b, context)` | the comparisons, `Max`, `Min`, `ElementMax`, `ElementMin`, `Sort`, `Clamp` | `-1`, `0`, `1`, `'<='`, `'>='`, `'unordered'` or `undefined` |
+| `extremum(which, ops, context)` | `Max`, `Min`, `ElementMax`, `ElementMin`, `Clamp`, before `compare` | an expression |
+| `apply(operator, ops, context)` | another operator that accepted the value as a number (see `admittedAs`) | an expression |
+
+Three optional fields describe a value of the kind:
+
+- `isExact(value)` answers whether `value` is exact. The engine reads it for
+  the rule that an inexact operand changes an `Indeterminate` answer to
+  `NaN`: `Max(x, Indeterminate)` is `NaN` when `x` is inexact, and
+  `Indeterminate` when `x` is exact. Without `isExact`, every value of the
+  kind is exact. The library `Measurement` answers `false` for every value,
+  and `Quantity` answers whether the magnitude is exact.
+- `isNaN(value)` answers whether `value` stands for no value, as the number
+  `NaN` does. Such a value follows the rule of `NaN`: `Max`, `Min`,
+  `ElementMax`, `ElementMin` and `Clamp` give `NaN`, it has no order
+  (`Less` and `Greater` are `False`), and it is equal to no value, itself
+  included (`Equal` is `False`, `NotEqual` is `True`). The `compare` hook
+  is not called for it. Without `isNaN`, no value of the kind is `NaN`. The
+  library `Measurement` answers `true` for a `NaN` nominal, and `Quantity`
+  for a `NaN` magnitude: `Max(Quantity(NaN, m), 2 m)` is `NaN`.
+- `numericValue(value)` gives the number that `value` stands for, for a kind
+  whose values stand for a number. The numeric accessors of the value read
+  it: `re`, `im`, `bignumRe`, `bignumIm` and `valueOf()`. The library
+  `Measurement` gives its nominal, so `Measurement(2.5, 0.1).re` is `2.5`.
+  Without `numericValue`, or when it answers `undefined`, `re` is `NaN`. The
+  fact queries (`isPositive`, `sgn`, `isInteger`, `isFinite`, …) do not read
+  it: they are `undefined` for every value of a kind, so that no canonical
+  rule of the numbers applies to it.
+
+**The operands.** `add`, `multiply` and `apply` receive the operands as a
+`KindOperands` object:
+
+- `ops.evaluated[i]` is the evaluated operand `i`;
+- `ops.written[i]` is the operand as it was written before evaluation, or
+  `undefined` for a value that the fold of another kind made. Under
+  `simplify()`, it is the operand as it was written before the
+  simplification of the operands, so it is the same on the three routes
+  (`evaluate()`, `.N()`, `simplify()`). A kind whose
+  rule depends on how a term was written reads it here: `a - b` is
+  canonically `Add(a, Negate(b))`, and the position of the `Negate` term
+  follows the canonical order, so search for it;
+- `ops.exact(i)` is the exact value of operand `i`. Outside `.N()` it is
+  `ops.evaluated[i]`. Under `.N()` it is the operand evaluated without the
+  numeric approximation, when this does not run a side effect again. A kind
+  whose values are exact reads `exact(i)` so that `(c + 1/3).N()` stays exact;
+- `ops.elements(i)`, at an operator whose parameter is a collection (`Mean`),
+  is the list of the elements of operand `i`, enumerated once by the engine.
+  It is `undefined` for an operand that is not a collection, and for a
+  collection that the engine did not enumerate: one larger than
+  `engine.maxCollectionSize`, one of unknown or infinite size, or one whose
+  element type cannot hold a value of a kind.
+
+`negate`, `divide`, `power` and `compare` receive each operand as a
+`KindOperand`, with the fields `evaluated`, `written` and `exact()`.
+
+**A payload that is costly to read.** The hooks of a kind receive the kind
+value as a call of its head, so a hook that reads a costly payload reads it
+again at each operation. `decodedPayload(expr, decode)` runs `decode` once
+for each boxed expression and returns the stored result after that; boxed
+expressions are immutable, so the result never needs to be refreshed.
+Define `decode` once (at the top level of a module), not as a closure in the
+call: `const { lo, hi } = decodedPayload(x, decodeEnclosure)`. The function
+is exported by the package:
+`import { decodedPayload } from "@cortex-js/compute-engine"`.
+
+The `context` has three fields:
+
+- `engine`;
+- `numericApproximation`, which is `true` under `.N()`. The hook makes its
+  own result numeric under `.N()`: a kind whose values are exact computes
+  the exact value anyway, and a kind whose values hold a float returns the
+  numeric form. The engine does not apply `.N()` to the result of a hook;
+- `tolerance`, for the `compare` hook only. When the caller compares within
+  a tolerance, it is that tolerance: `.is()` gives its `tolerance` argument,
+  or `engine.tolerance` when the call has none. For every other comparison
+  (the relational operators, `isEqual()`, `isLess()`, `Max`, `Min`, `Sort`,
+  …) it is `undefined`, and the hook applies its own rule: usually, two
+  exact values are compared exactly and a float within `engine.tolerance`.
+
+**Folds.** `add` and `multiply` answer a list of **folds**. A fold
+(`KindFold`) names the operands it combined, by their index in
+`ops.evaluated`, and the value they make: `{ value, operands: [0, 2] }`. A
+hook can answer several folds (one for each modulus, one for each
+dimension), and must not name an operand twice. A fold can name an operand
+of another kind only to make it part of its own value. The value of a fold
+can be a value of another kind or a number. An empty list folds nothing.
+
+**How a sum is evaluated.** For a sum (a product is the same):
+
+1. The operands are evaluated.
+2. The kinds of the operands are listed in the order of their first
+   occurrence, by the head of each value.
+3. Each kind, in that order, gets one call of its `add` hook, with the
+   operands that are left: the operands that no fold took, and the values
+   that the folds of the kinds before it made. Each fold replaces the
+   operands it names. A kind is not called a second time: a hook that must
+   repeat its rule until nothing changes does so before it answers.
+4. The operands that hold no value of a kind, and the folds whose value is
+   a number, are added as an ordinary sum. The other operands (the values of
+   a kind, and the symbols declared with a kind type) are placed beside that
+   sum, with no other change: like terms are not collected with them, and a
+   zero or an infinity does not absorb them.
+
+So `x + x + GF8(1) + GF8(2)` is `2x + GF8(3)`.
+
+`negate`, `divide` and `power` are called for the first kind among the
+operands whose hook answers. When no hook answers, the expression stays as
+it is.
+
+**Rules for a hook.**
+
+- The operands of `add` and `multiply` are in canonical order: the canonical
+  form sorts a sum and a product. So `multiply` must be commutative. A kind
+  whose product is not commutative (quaternions, matrices) cannot be
+  declared with this field.
+- A hook can make and evaluate expressions with `engine`, including
+  expressions with values of another kind; the engine then calls the hooks
+  of that kind. A hook must not call `.simplify()`: this can cause an
+  infinite recursion.
+- An error thrown by a hook is not caught, as for an `evaluate` handler.
+- A fold that names an operand index that does not exist, or names an
+  operand twice, is an error in the definition of the kind, and the engine
+  throws.
+- A kind that gives `add` must also give `negate`, because `a - b` is
+  `Add(a, Negate(b))`: without `negate`, a difference is never folded. The
+  engine refuses the declaration otherwise.
+
+**The methods.** `.add()`, `.mul()`, `.div()` and `.pow()` call the same
+hooks: `ce.box(["GF8", 3]).mul(ce.box(["GF8", 5]))` is `GF8(4)`. These
+methods do not evaluate their operands, so a hook receives what the caller
+built. `.neg()` does not call `negate`: `GF8(3).neg()` is `-GF8(3)`, and
+`Negate(GF8(3))` calls `negate` when it is evaluated. So `a.sub(b)` gives
+`add` the operands `a` and `Negate(b)`: the `GF8` hooks above do not read a
+`Negate(…)` operand, and `GF8(3).sub(GF8(3))` stays `-GF8(3) + GF8(3)`, while
+`["Subtract", ["GF8", 3], ["GF8", 3]]` evaluates to `GF8(0)`. A kind whose
+`add` reads a `Negate(…)` operand folds `a.sub(b)` too (`ResidueClass` does).
+
+#### Where a value of a kind is accepted
+
+A kind type is not a number type, so a parameter typed with a number type
+does not accept a value of a kind by subtyping. A value of a kind is
+accepted:
+
+1. **At the arithmetic operators**, when a head of the kind type gives the
+   hook that the operator calls: `Add` and `Subtract` need `add`, `Multiply`
+   needs `multiply`, `Negate` needs `negate`, `Divide` needs `divide`, and
+   `Power`, `Sqrt`, `Root` and `Square` need `power`. A kind without
+   `power` is refused by `Square(x)`. The rule also applies to the elements
+   of a collection: with `L: list<gf8>`, `L + L` adds the lists element by
+   element.
+2. **At a parameter that names the kind type or accepts `value`**: a
+   parameter typed `gf8`, `value`, `expression`, `any` or `unknown`. The
+   operator runs its own handler, which sees the value as it is: `List`,
+   `Hold`, `Equal`, `Max`, the comparisons.
+3. **As a number**, when the kind type says so with `admittedAs`:
+   - `"none"` (the default): no other parameter accepts it;
+   - `"real"`: every parameter that accepts a `real` accepts it (`real`,
+     `number`, `complex`, `complex | infinity`). A parameter typed `integer`
+     or a range of numbers does not;
+   - `"number"`: every parameter that accepts a `number` or a `real` accepts
+     it. Use it for a kind whose values can be complex.
+
+   Admission as a number is not subtyping: `umeasurement` is not a subtype
+   of `real`, and a symbol declared `real` refuses a value of the kind.
+
+**A function with a body** (a function literal, or a `ce.declare()` with a
+MathJSON or LaTeX body) accepts a value of a kind only when its parameter
+names the kind type, or is typed `value`, `any` or `unknown`: the third rule
+above does not apply to it. The body was canonicalized with the declared
+type of its parameter, and the canonical form of `x/x` is `1` for a
+parameter typed `real`, so the body cannot be used for a value of a kind.
+With `f: (real) -> real`, `f(UserMeasurement(2, 0.1))` is an
+`incompatible-type` error. Declare the parameter `real | umeasurement`
+instead. An untyped parameter (`unknown`) accepts the value, but the body
+may already have changed `x/x` to `1`.
+
+The element of a collection of values of a kind has the kind type, so the
+variable of `Map`, `Sum` and the other operators that bind a variable over
+such a collection has it too, and its body is protected:
+mapping `z ↦ z/z` over `[GF8(3), GF8(5)]` divides each element by itself
+through `divide` and gives `[GF8(1), GF8(1)]`.
+
+An expression is checked when it is boxed. An expression boxed before the
+head of the kind was declared is not checked again: with `r: gf8` declared
+before `GF8`, `r + 1` boxed before `GF8` is an `incompatible-type` error,
+and stays one.
+
+#### Comparisons
+
+A kind that has an order gives `compare`. It answers:
+
+- `-1`, `0` or `1`, the order of the two values;
+- `'unordered'` when the two values are known but have no order, as a
+  complex number has none. The library `Measurement` answers it for a
+  nominal that is complex or `NaN`. The four order operators (`Less`,
+  `LessEqual`, `Greater`, `GreaterEqual`) then answer `False`, as they do
+  for a complex number; `Equal` and `NotEqual` ask the `eq` handler of the
+  operator definition of each head; `Max`, `Min` and `Sort` stay
+  unevaluated;
+- `'<='` when the first value is less than or equal to the second, and the
+  hook cannot say which: two intervals that touch, such as
+  `Enclosure(0, 1)` and `Enclosure(1, 2)`, hold reals that are in this
+  order, and they may hold the same real `1`. `LessEqual` then answers
+  `True` and `Greater` answers `False`; `Less` and `GreaterEqual` stay
+  unevaluated; `Equal` and `NotEqual` ask the `eq` handlers. `'>='` is the
+  mirror answer. `Sort`, and `Max` and `Min` without an `extremum` hook,
+  need a total order, and read these two answers as `undefined`;
+- `undefined` when the two values cannot be compared (a value of another
+  kind, a symbol).
+
+A kind whose values can overlap gives `extremum(which, ops, context)` too.
+`Max`, `Min`, `ElementMax`, `ElementMin` and `Clamp` ask it BEFORE they
+order the operands with `compare`, for two operands at a time (`which` is
+`'max'` or `'min'`; `ops` is a `KindOperands` object). The hook can answer a
+value that is not one of the operands. When it answers `undefined`, or when
+the kind has no `extremum`, the engine orders the operands with `compare`.
+For example, the maximum of two intervals is the interval of the larger
+ends:
+
+```js
+ce.declareType("ivl", "value", { mint: false });
+
+// The endpoints of an `Ivl(lo, hi)`, or of a number read as a point
+const ends = (x) =>
+  x.operator === "Ivl" ? [x.op1.re, x.op2.re] : x.isNumberLiteral ? [x.re, x.re] : undefined;
+
+ce.declare("Ivl", {
+  signature: "(real, real) -> ivl",
+  arithmetic: {
+    admittedAs: "real",
+    compare: (a, b) => {
+      const [x, y] = [ends(a.evaluated), ends(b.evaluated)];
+      if (!x || !y) return undefined;
+      if (x[1] < y[0]) return -1;
+      if (x[0] > y[1]) return 1;
+      if (x[1] === y[0]) return "<=";
+      if (x[0] === y[1]) return ">=";
+      return undefined;
+    },
+    extremum: (which, ops, { engine }) => {
+      const xs = ops.evaluated.map(ends);
+      if (xs.some((x) => !x)) return undefined;
+      const pick = which === "max" ? Math.max : Math.min;
+      return engine.function("Ivl", [
+        engine.number(pick(...xs.map((x) => x[0]))),
+        engine.number(pick(...xs.map((x) => x[1]))),
+      ]);
+    },
+  },
+});
+
+ce.box(["LessEqual", ["Ivl", 0, 1], ["Ivl", 1, 2]]).evaluate(); // ➔ True
+ce.box(["Less", ["Ivl", 0, 1], ["Ivl", 1, 2]]).evaluate();      // ➔ unevaluated
+ce.box(["Max", ["Ivl", 0, 2], ["Ivl", 1, 3]]).evaluate();       // ➔ Ivl(1, 3)
+```
+
+One order is used for every comparison: the six relational operators,
+`Max`, `Min`, `ElementMax`, `ElementMin`, `Sort`, `Clamp`, and the methods
+`isEqual()`, `isLess()`, `isGreater()` and the others. `Max` and `Min` keep
+the first operand of a tie, and `Clamp(x, lo, hi)` returns `x` when `x` is
+equal to a bound.
+
+- A comparison of the same expression on both sides is decided first, for
+  every kind: `a < a` is `False` and `a ≤ a` is `True`.
+- An order comparison (`Less`, …) that is not decided stays unevaluated.
+- `Equal` and `NotEqual` use `compare` when it answers. If not, they use the
+  `eq` handler of the operator definition of each head, if there is one.
+  If no head has an `eq` handler: two values whose types are disjoint are not
+  equal (`GF8(1) == "abc"` is `False`), two identical values are equal, and
+  any other pair stays unevaluated. So, for a kind without `compare`,
+  `GF8(1) == GF8(2)` stays unevaluated: the engine does not know that the two
+  values are different elements of the field, and an answer of `False` would
+  be wrong for a kind whose values can be equal without being identical.
+- A kind without `compare` has no order: `GF8(1) < GF8(2)` stays unevaluated
+  (typed `boolean`), and `Max(GF8(1), GF8(2))` is an `incompatible-type`
+  error.
+- `.is()` uses the `Equal` rule for a value of a kind that has `compare`, and
+  `.isSame()` otherwise. `compare` receives the tolerance of `.is()` in
+  `context.tolerance`: the `tolerance` argument of the call, or
+  `engine.tolerance`.
+
+#### Other operators: `apply`
+
+An operator is an **apply site** for a kind when a value of the kind is one
+of its operands only because of `admittedAs` (the third rule above), and the
+operator has an `evaluate` handler and is not lazy. At an apply site, the
+engine calls the `apply` hook of the kind in place of the `evaluate` handler
+of the operator. When `apply` answers `undefined`, the expression stays
+unevaluated. When the kind has no `apply`, the handler of the operator runs
+and sees the value as it is.
+
+An operator that accepts the kind by its type (its parameter names the kind
+type, or is `value` or `any`) is never an apply site: its handler runs. Nor
+are the arithmetic operators and the comparisons, which use the other hooks.
+
+A function applied to a collection is applied to each element, so `apply`
+is called for each element: `Sin([U1, U2])` is a list of two results of
+`apply`. At an operator whose parameter is a collection (`Mean`), `apply`
+receives the collection, and `ops.elements(i)` gives its elements.
+
+The numeric facts of a value of a kind (`isPositive`, `sgn`, `isInteger`,
+…) are `undefined`, and `re` is `NaN` unless the kind gives `numericValue`.
+So the canonical rules that read them do not apply, and only `apply`
+decides.
+
+The example below is a measurement: a nominal value and a standard
+uncertainty, propagated to first order. It is accepted as a number
+(`admittedAs: "number"`), has an order (`compare`, by the nominal value),
+and gives `apply` for the functions whose derivative it knows.
+
+```js
+// A measurement `UserMeasurement(value, sigma)`: a nominal value and a
+// standard uncertainty. A number operand has an uncertainty of 0.
+const parts = (x) =>
+  x.operator === "UserMeasurement"
+    ? { value: x.op1, sigma: x.op2 }
+    : x.isNumberLiteral
+      ? { value: x, sigma: x.engine.Zero }
+      : undefined;
+
+const make = (engine, value, sigma, numericApproximation) =>
+  engine.function("UserMeasurement", [
+    value.evaluate({ numericApproximation }),
+    sigma.evaluate({ numericApproximation }),
+  ]);
+
+// √(a² + b²)
+const quadrature = (engine, a, b) =>
+  engine.function("Sqrt", [
+    engine.function("Add", [
+      engine.function("Square", [a]),
+      engine.function("Square", [b]),
+    ]),
+  ]);
+
+// Combine every measurement and number operand of a sum or a product into
+// one fold, when at least one of them is a measurement
+function fold(ops, { engine, numericApproximation }, step) {
+  const operands = [];
+  ops.evaluated.forEach((x, i) => {
+    if (parts(x)) operands.push(i);
+  });
+  if (operands.length < 2) return undefined;
+  if (!operands.some((i) => ops.evaluated[i].operator === "UserMeasurement"))
+    return undefined;
+  const p = operands
+    .map((i) => parts(ops.evaluated[i]))
+    .reduce((a, b) => step(a, b, engine));
+  return [
+    { value: make(engine, p.value, p.sigma, numericApproximation), operands },
+  ];
+}
+
+// The derivatives of the functions that this kind propagates an error through
+const DERIVATIVE = {
+  Sin: (x) => ["Cos", x],
+  Cos: (x) => ["Negate", ["Sin", x]],
+  Exp: (x) => ["Exp", x],
+};
+
+ce.declareType("umeasurement", "value", { mint: false });
+
+ce.declare("UserMeasurement", {
+  signature: "(number, real) -> umeasurement",
+  arithmetic: {
+    admittedAs: "number",
+
+    // A sum: the nominal values add, the uncertainties add in quadrature
+    add: (ops, context) =>
+      fold(ops, context, (a, b, engine) => ({
+        value: engine.function("Add", [a.value, b.value]),
+        sigma: quadrature(engine, a.sigma, b.sigma),
+      })),
+
+    // A product: the first-order propagation of two independent errors
+    multiply: (ops, context) =>
+      fold(ops, context, (a, b, engine) => ({
+        value: engine.function("Multiply", [a.value, b.value]),
+        sigma: quadrature(
+          engine,
+          engine.function("Multiply", [b.value, a.sigma]),
+          engine.function("Multiply", [a.value, b.sigma])
+        ),
+      })),
+
+    negate: (x, { engine, numericApproximation }) => {
+      const p = parts(x.evaluated);
+      if (!p) return undefined;
+      const value = engine.function("Negate", [p.value]);
+      return make(engine, value, p.sigma, numericApproximation);
+    },
+
+    // The order of the nominal values
+    compare: (a, b) => {
+      const [x, y] = [parts(a.exact())?.value, parts(b.exact())?.value];
+      if (!x?.isNumberLiteral || !y?.isNumberLiteral) return undefined;
+      if (x.isEqual(y) === true) return 0;
+      const less = x.isLess(y);
+      return less === undefined ? undefined : less ? -1 : 1;
+    },
+
+    // Every other operator that accepted the value as a number
+    apply: (operator, ops, { engine, numericApproximation }) => {
+      if (ops.evaluated.length !== 1) return undefined;
+      const p = parts(ops.exact(0));
+      if (!p) return undefined;
+      // A function whose value jumps uses the exact nominal value
+      if (operator === "Floor" || operator === "Ceil" || operator === "Round") {
+        const value = engine.function(operator, [p.value]);
+        return make(engine, value, p.sigma, numericApproximation);
+      }
+      const d = DERIVATIVE[operator];
+      if (!d) return undefined; // The expression stays unevaluated
+      const sigma = engine.function("Multiply", [
+        engine.function("Abs", [engine.box(d(p.value))]),
+        p.sigma,
+      ]);
+      const value = engine.function(operator, [p.value]);
+      return make(engine, value, sigma, numericApproximation);
+    },
+  },
+});
+```
+
+With these declarations, and `U` for `["UserMeasurement", 2, 0.1]`:
+
+```js
+ce.box(["Add", U, ["UserMeasurement", 3, 0.2]]).evaluate();
+// ➔ UserMeasurement(5, 0.2236…)
+ce.box(["Subtract", U, U]).simplify();
+// ➔ UserMeasurement(0, 0.1414…): the two errors are independent
+ce.box(["Multiply", 2, U]).evaluate();
+// ➔ UserMeasurement(4, 0.2)
+ce.box(["Sin", U]).evaluate();
+// ➔ UserMeasurement(sin(2), 0.0416…), through `apply`
+ce.box(["Floor", ["UserMeasurement", 2.5, 0.1]]).evaluate();
+// ➔ UserMeasurement(2, 0.1)
+ce.box(["Sin", ["List", U, ["UserMeasurement", 1, 0.1]]]).evaluate();
+// ➔ [UserMeasurement(sin(2), 0.0416…), UserMeasurement(sin(1), 0.0540…)]
+ce.box(["Tan", U]).evaluate();
+// ➔ tan(UserMeasurement(2, 0.1)): `apply` does not know `Tan`
+ce.box(["Less", U, 3]).evaluate();   // ➔ True
+ce.box(["Equal", U, 2]).evaluate();  // ➔ True
+ce.box(["Max", U, ["UserMeasurement", 3, 0.5]]).evaluate();
+// ➔ UserMeasurement(3, 0.5)
+```
+
+`Sqrt(U)` and `Square(U)` are `incompatible-type` errors, because this kind
+has no `power` hook (first rule above).
+
+An operator of your own declared over `real` with an `evaluate` handler is
+an apply site too. With `h: (real) -> real`, `h(U)` calls `apply`, which does
+not know `h`, so `h(U)` stays unevaluated. An operator that handles the kind
+itself names the kind type in its parameter: with
+`h2: (real | umeasurement) -> real | umeasurement`, the handler of `h2` runs.
+
+#### Result types
+
+The type of an expression with a value of a kind is found without
+evaluating it. For an arithmetic operator, an apply site, or an operator
+that names the kind type in a parameter, the default type is the kind type:
+`x + GF8(1)` is typed `gf8`, `Sin(U)` is typed `umeasurement`, and
+`GF8(3) · (1, 2)` is a `tuple<gf8, gf8>`. An operand that may hold a number
+keeps the number arm: with `u: real | umeasurement`, `-u` is typed
+`real | umeasurement`. An operator whose result type is not a number type
+keeps it: `Less(U, 3)` is a `boolean`. `Max` and `Min` with a kind that has
+`compare` are typed with the union of the types of their operands:
+`Max(U, 3)` can be `3` or a `umeasurement`.
+
+A kind whose hooks can give another type gives `resultType`. It receives
+the name of the operator and the types of the operands (without their
+shapes: a `list<uq^2>` operand is seen as `uq`), and answers a type, a type
+string, or `undefined` for the default. The operator is `"Add"` for a sum
+or a difference, and `"Power"` for `Sqrt`, `Root` and `Square`, with the
+type of the exponent among the operand types. For example, a quantity whose
+quotient by a quantity of the same unit is a number:
+
+```js
+ce.declareType("uq", "value", { mint: false });
+ce.declare("Q", {
+  signature: "(real, string) -> uq",
+  arithmetic: {
+    divide: (a, b, { engine }) => {
+      const [x, y] = [a.evaluated, b.evaluated];
+      if (x.operator !== "Q" || y.operator !== "Q") return undefined;
+      if (x.op2.string !== y.op2.string) return undefined;
+      return engine.number(x.op1.re / y.op1.re);
+    },
+    resultType: (operator) => (operator === "Divide" ? "number | uq" : undefined),
+  },
+});
+
+ce.box(["Divide", ["Q", 6, "'m'"], ["Q", 3, "'m'"]]).type;  // ➔ number | uq
+ce.box(["Divide", ["Q", 6, "'m'"], ["Q", 3, "'m'"]]).evaluate();  // ➔ 2
+```
+
+#### Fields that belong to the kind type
+
+A symbol declared with a kind type has no head to ask, so three fields
+belong to the kind TYPE, not to the head: `admittedAs`, `resultType` and
+`compile.type`. Several heads can have the same kind type (the library
+`ResidueClass` and your own head that returns `residue`). The heads of one
+kind type that are declared at the same time must agree on these fields: a
+head gives the same value or leaves the field out, and then uses the value
+that another head gave. `admittedAs` is compared by value; `resultType` and
+`compile.type` are compared by identity, so two heads share one function
+or object. The engine refuses a declaration that does not agree.
+
+The other fields (`add`, `multiply`, `negate`, `divide`, `power`, `compare`,
+`apply` and `compile.value`) belong to the head. A value calls the hooks of
+its own head: `MyMod(2, 4) + ResidueClass(1, 4)` stays as it is, because
+each head folds only its own values.
+
+#### The declaration checks
+
+`ce.declare()` refuses an `arithmetic` field, with an error that names the
+rule, when:
+
+- the result type of an arm of the signature is not a kind type. It can be
+  a kind type, a union of kind types, or one of these with the arms `nan`,
+  `missing`, `nothing` or `error`. `-> residue | integer` is refused: the
+  engine would keep the number rules away from every integer;
+- the result type is a nominal type that is defined as anything other than
+  exactly `value`, that has type parameters (`gf<7>`), that is defined as
+  another nominal type, or that was declared without `{ mint: false }`;
+- the field gives `add` but not `negate`;
+- the fields of the kind type do not agree with another head of the type;
+- the kind type is a library kind type (`residue`) and the field gives a
+  `resultType` or a `compile.type` that the library left out, or another
+  `admittedAs`. Such a field would change the arithmetic of every value and
+  every symbol of the library type.
+
+After a kind is declared, its type can be declared again only as a nominal
+type defined as exactly `value`, with no type parameters and with
+`{ mint: false }` (a `DeclareType` statement that runs again); any other
+declaration of that type name is refused.
+
+#### Scopes
+
+The kind types are engine-wide, as all types are. The hooks belong to the
+operator definition: a head declared with a kind in a nested scope keeps
+its hooks for its values after the scope is popped, and a head of the same
+name declared in another scope with other hooks does not change the values
+of the first one. When a head is declared again without `arithmetic`, its
+values have no hooks any more; its kind type remains a kind type, so its
+values and symbols are still protected from the number rules. A checkpoint
+restore puts the kinds back as they were at the checkpoint.
+
+#### Compiling a value of a kind
+
+By default, `compile()` declines an expression that holds a value of a kind,
+on every target: the number rules must never compute `c - c` as `0`. An
+expression that may hold a number or a value of a kind (a parameter typed
+`number | gf8`) compiles as a number.
+
+A kind type can give a compiled representation with `compile` in its
+`arithmetic` field (an `ArithmeticCompile`). `compile.type` belongs to the
+kind type; `compile.value` gives the source of a literal value of the head.
+Each hook receives `context.language` and answers `undefined` for a target
+it does not support:
+
+```js
+ce.declare("GF8", {
+  signature: "(integer) -> gf8",
+  arithmetic: {
+    // … the hooks of the example above …
+    compile: {
+      // The representation of the type `gf8`: `{ gf8: k }` in JavaScript
+      type: {
+        lowered: ({ language }) =>
+          language === "javascript" ? "gf8" : undefined,
+        add: (args, compile, { language }) =>
+          language === "javascript"
+            ? `({ gf8: ${args.map((x) => `(${compile(x)}).gf8`).join(" ^ ")} })`
+            : undefined,
+        // The check of a value passed for a symbol of type `gf8`
+        entry: (value) => Number.isInteger(value?.gf8),
+      },
+      // A literal `GF8(k)`
+      value: (expr) => `({ gf8: ${expr.op1.re & 7} })`,
+    },
+  },
+});
+
+ce.declare("g", "gf8");
+const f = compile(ce.parse("g + \\operatorname{GF8}(2)"), { to: "javascript" });
+f.run({ g: { gf8: 1 } });  // ➔ { gf8: 3 }
+f.run({ g: 1 });           // ➔ throws: the entry check refused the value
+f.freeSymbolTypes.g;       // ➔ { type: "gf8", lowered: "gf8", … }
+f.valueKinds;              // ➔ ["gf8"]
+```
+
+The fields of `compile.type`:
+
+- `lowered(context)`: the name of the representation on the target, as
+  `freeSymbolTypes[…].lowered` reports it. The name must not be one that the
+  JavaScript runner reads as a number, a complex number or a list
+  (`number`, `real`, `integer`, `complex`, `array`, `list`, `point`,
+  `color`): a result of a kind is returned as the code makes it, and the
+  host would read it wrongly;
+- `add(args, compile, context)` and `multiply(…)`: a sum and a product with
+  an operand of the kind. A number operand beside a value of the kind is
+  the hook's to convert;
+- `apply(operator, args, compile, context)`: the other arithmetic operators,
+  the comparisons and the other operators with an operand of the kind. The
+  structural operators (`If`, `Block`, `List`, `Tuple`, `Assign`, `Hold`, a
+  call of a user function) do not call it: they pass the representation as
+  it is;
+- `entry(value, context)`: the check of a host value given for a symbol of
+  the kind type, when the compiled code runs;
+- `shippable` and `hostNames`: see below.
+
+An operation that the contract does not define declines with a message
+that names the kind type: with the contract above, `g · GF8(2)` declines
+because there is no `multiply`.
+
+Limits:
+
+- An expression that holds a collection of values of a kind (`L + L` with
+  `L: list<gf8>`, or `[GF8(1), GF8(2)]`) declines on every target: `entry`
+  and `lowered` describe one value, not a collection.
+- Code compiled with a kind contract cannot be stored and loaded again with
+  `createJavaScriptRuntime().load()`: the `entry` check is a function of the
+  host that compiled the code, and stored code cannot carry it. Run it with
+  the `run()` of the compilation result. `CompilationResult.valueKinds` names
+  the kind types of the code, and `entryPlan.kinds` the symbols that need an
+  `entry` check.
+- The result is `shippable` (it can be sent to a worker of the kernel pool
+  as text) only when the contract of every kind in the code says
+  `shippable: true`, lists no `hostNames`, and no input of the code is a
+  value of a kind (its `entry` check could not run in the worker).
+- Of the library kinds, only `Enclosure` gives a `compile` contract, for
+  the `interval-js` target (see [Enclosures](#enclosures)). An expression
+  with a residue class, a measurement or a quantity declines on every
+  target.
+
+#### Residue classes
+
+A residue class, an element of $\mathbb{Z}/n\mathbb{Z}$, is the library kind
+of the type `residue`: `ResidueClass(k, n)` declares its arithmetic with this
+field, with `admittedAs: "none"` and no `compare` (classes have no order:
+`ResidueClass(1, 5) < ResidueClass(2, 5)` stays unevaluated, and `Max` of
+two classes is an error).
+
+A head of your own can return `residue` too, and give its own arithmetic.
+For example, a head for the classes of $\mathbb{Z}/n\mathbb{Z}$ whose `add`
+and `multiply` give one fold for each modulus:
+
+```js
+ce.declare("MyMod", {
+  signature: "(integer, integer) -> residue",
+  arithmetic: {
+    add: (ops, { engine }) => {
+      /* group the `MyMod` operands by modulus; one fold for each modulus */
+    },
+    multiply: (ops, { engine }) => {
+      /* the same, for a product */
+    },
+    negate: (x, { engine }) => {
+      /* the class of -k */
+    },
+  },
+});
+```
+
+`x + MyMod(2, 4) + MyMod(1, 4)` is then `x + MyMod(3, 4)`, and
+`MyMod(2, 4) - MyMod(2, 4)` is `MyMod(0, 4)`. The rules of the type
+`residue` apply to `MyMod`: `admittedAs` is `"none"`, and a head of your own
+cannot give `residue` a `resultType` or a `compile.type`.
+
+Do not extend `Add` or `Multiply` with an `evaluate` handler and
+`{ extend: true }` to give a kind its arithmetic: that replaces the library
+handler for the whole engine, and `x + x + 1 + 2` then stops combining to
+`2x + 3`.
+
+A `type` handler is not used for the protection from the number rules: an
+operator whose values are of a kind declares the kind type in its
+signature, even when it has a `type` handler.
+
+#### Measurements and Quantities
+
+`Measurement` and `Quantity` are two more library kinds. Use them as models
+for a kind of your own: each one uses the hooks above, and nothing else.
+
+**`Measurement(value, error)`** has the kind type `measurement`. It is a
+nominal value with a standard uncertainty.
+
+- It is accepted where a number is accepted (`admittedAs: "number"`), so
+  `Sin`, `Floor`, `Hypot` and `Mean` accept it and call its `apply` hook.
+  `apply` computes the value of the operator at the nominal, and
+  propagates the uncertainty to first order: `f(a) ± |f′(a)|·σ`, and
+  `√(Σ |∂f/∂xᵢ|²·σᵢ²)` for several uncertain operands. It uses the modulus
+  of each partial derivative, so a complex nominal propagates by the same
+  rule.
+- A propagated uncertainty of 0 gives the bare value: `Cos(0 ± 0.1)` is
+  `1`, and `Floor(2.5 ± 0.1)` is `2`. So the kind declares the result type
+  `number | measurement` (`resultType`) for the operators where this can
+  occur.
+- `apply` answers `undefined`, and the call stays unevaluated, when the
+  propagation has no answer: an infinite value or slope at the nominal
+  (`Sqrt(0 ± 0.1)`, `Arcsin(1 ± 0.1)`), a jump of a step function within one
+  σ of the nominal (`Floor(2.95 ± 0.1)`), an operator whose derivative the
+  engine does not know (`Zeta`, a user operator `h: (real) -> real`), and
+  an operator that uses an operand more than once in its formula
+  (`Binomial`, `Determinant`).
+- A complex nominal at a parameter that is real (`Floor`, `Mod`, `Hypot`)
+  is an `incompatible-type` error when the call is evaluated, not when it is
+  boxed: the type `measurement` does not tell a real nominal from a complex
+  one.
+- `compare` orders two measurements by their nominals, and answers
+  `'unordered'` for a complex nominal. `isExact` answers `false`, and
+  `numericValue` gives the nominal, so `Measurement(2.5, 0.1).re` is `2.5`.
+- The uncertainties of two occurrences of one measurement are independent:
+  `M − M` is `0 ± 0.141` for `M = 1 ± 0.1`, and `Sin(M)^2 + Cos(M)^2`
+  simplifies to `1 ± 0.13`.
+
+**`Quantity(magnitude, unit)`** has the kind type `quantity`. It is a value
+with a physical unit.
+
+- It is accepted only at the arithmetic operators, the comparisons, the
+  operators that name `quantity` in their parameter type and the operators
+  with a `value` parameter (`admittedAs: "none"`). The 24 trigonometric
+  functions and `Abs` name `quantity`: `Sin(30 deg)` is `1/2`, and
+  `Abs(-2 m)` is `2 m`. Every other operator refuses a quantity:
+  `Floor(2 m)` and `Mean([2 m, 4 m])` are `incompatible-type` errors.
+- `add` makes one fold for each physical dimension, in the unit with the
+  largest scale: `x + 2 m + 30 cm + 4 s` is `x + 2.3 m + 4 s`. `resultType`
+  answers `number | quantity` for `Multiply`, `Divide` and `Power`, since a
+  product whose unit has no dimension is a plain number (`6 m / 3 m` is
+  `2`).
+- `compare` converts the two values to the finer of their units, and
+  compares the magnitudes there; two values of different dimensions have no
+  order.
+- The value of a physical constant (`SpeedOfLight`) is a quantity.
+
+**Reading how a term was written.** A temperature with an offset (`degC`,
+`degF`) shows why a hook reads `ops.written[i]`. A difference of two
+temperatures is a temperature interval: `20 degC − 5 degC` is `15 K`. A sum
+of two temperatures adds their absolute values: `20 degC + 5 degC` is
+`571.3 K`. The negation `−(5 degC)` is not the temperature `−5 degC`, so the
+`negate` hook of `Quantity` declines a temperature with an offset, and the
+term stays `Negate(5 degC)`. The `add` hook then reads the sign of each term
+from the operand as it was written. A kind of your own can do the same:
+
+```js
+// A temperature in degrees Celsius. A difference of two temperatures is a
+// number of kelvins.
+const isCelsius = (x) => x?.operator === "Celsius";
+
+ce.declareType("celsius", "value", { mint: false });
+ce.declare("Celsius", {
+  signature: "(real) -> celsius",
+  arithmetic: {
+    // The negation of a temperature is not a temperature: decline, so that
+    // the term of a difference stays `Negate(Celsius(…))` on every route
+    // (`evaluate()`, `simplify()`, `.N()`)
+    negate: () => undefined,
+
+    // Fold `a - b`: `Add(a, Negate(b))`, in canonical order
+    add: (ops, { engine, numericApproximation }) => {
+      const plus = [];
+      const minus = [];
+      ops.evaluated.forEach((x, i) => {
+        const w = ops.written[i] ?? x;
+        if (w.operator === "Negate" && isCelsius(w.op1))
+          minus.push({ i, t: w.op1 });
+        else if (isCelsius(w)) plus.push({ i, t: w });
+      });
+      if (plus.length !== 1 || minus.length !== 1) return undefined;
+      const value = engine
+        .function("Subtract", [plus[0].t.op1, minus[0].t.op1])
+        .evaluate({ numericApproximation });
+      return [{ value, operands: [plus[0].i, minus[0].i] }];
+    },
+  },
+});
+
+ce.box(["Subtract", ["Celsius", 20], ["Celsius", 5]]).evaluate();
+// ➔ 15
+ce.box(["Add", "x", ["Subtract", ["Celsius", 20], ["Celsius", 5]]]).evaluate();
+// ➔ x + 15
+ce.box(["Negate", ["Celsius", 5]]).evaluate();
+// ➔ -Celsius(5)
+ce.box(["Add", ["Celsius", 20], ["Celsius", 5]]).evaluate();
+// ➔ Celsius(5) + Celsius(20): this hook does not fold a sum
+```
+
+When `negate` gives a value for such a term, the sum receives that value in
+`ops.evaluated[i]`, and `ops.written[i]` still holds `Negate(…)`. This is
+the same under `evaluate()`, `.N()` and `simplify()`: `simplify()` gives
+the hook the term as it was written before the simplification of the
+operands. So a kind whose `negate` gives `Celsius(−t)` also folds
+`Celsius(20) − Celsius(5)` to `15` on the three routes.
+
+#### Enclosures
+
+`Enclosure(lo, hi)` is one more library kind, with the kind type
+`enclosure`. It is a closed interval that holds ONE real number: the value
+is somewhere in `[lo, hi]`. It is not the set `Interval(lo, hi)`:
+`Abs(Enclosure(-1, 2))` is `Enclosure(0, 2)`, while `Abs` of the set is
+its cardinality. Its LaTeX is `\mathrm{Enclosure}(a, b)`.
+
+```js
+ce.box(["Add", ["Enclosure", 0, 1], ["Enclosure", ["Rational", 1, 3], 2]]).evaluate();
+// ➔ Enclosure(1/3, 3)
+ce.box(["Sin", ["Enclosure", 0, "Pi"]]).evaluate();
+// ➔ Enclosure(0, 1)
+ce.box(["Sin", ["Enclosure", 0, 1]]).evaluate();
+// ➔ Enclosure(0, sin(1))
+ce.box(["Sin", ["Enclosure", 0, 1]]).N();
+// ➔ Enclosure(0, 0.8414709848078966)
+ce.box(["Divide", 1, ["Enclosure", 0, 1]]).evaluate();
+// ➔ Enclosure(1, +oo)
+ce.box(["Ln", ["Enclosure", -2, -1]]).evaluate();
+// ➔ Indeterminate: the image is empty
+```
+
+- **The endpoints.** The canonical form orders them (`Enclosure(2, 1)` is
+  `Enclosure(1, 2)`), and reads one operand as a point (`Enclosure(3)` is
+  `Enclosure(3, 3)`) or converts a set `Interval` (`Enclosure(Interval(0,
+  1))` is `Enclosure(0, 1)`). An endpoint can be a number, `+oo`, `-oo`, or
+  an exact constant such as `Pi` or `Sin(1)`; an endpoint with a free
+  variable (`Enclosure(a, 2)`) is kept, and the hooks leave such a value
+  unevaluated until `a` has a value. A `NaN` endpoint, the same infinity
+  twice and an empty set give the indeterminate value. An endpoint that is
+  complex, or is a value of a kind, is an `incompatible-type` error.
+- **It is accepted where a real is accepted** (`admittedAs: "real"`): every
+  numeric function with a `real` parameter is an apply site, and `apply`
+  gives the image of the function over the interval, with the critical
+  points of the function (`Sin`, `Cos`, `Tan`, `Abs`, `Gamma`, …) and its
+  poles: a pole inside gives the whole line `Enclosure(-oo, +oo)`, a pole
+  or a domain boundary at an endpoint a half-line, and a domain that the
+  interval does not reach the indeterminate value. The trigonometric
+  functions read the angle in `ce.angularUnit`. An operator that the hook
+  does not know (`Factorial`) stays unevaluated.
+- **Exact and numeric endpoints.** Under `evaluate()`, when the endpoints are
+  exact, the result has exact endpoints. Under `.N()`, or with a float
+  endpoint, the endpoints are converted to machine doubles OUTWARD (the
+  largest double below `lo`, the smallest double above `hi`), and the
+  interval library of the engine computes the image:
+  `Enclosure(0, Pi).N()` is `Enclosure(0, 3.1415926535897936)`. The
+  endpoints are doubles at every `ce.precision`. They are rigorous for the
+  rational operations (`+`, `−`, `×`, `/`, integer powers, `Abs`, the step
+  functions); for the transcendental functions the outward step is the
+  smallest move, and can miss the true value by one unit in the last place.
+- **Two operands are independent.** `Enclosure(1, 2) − Enclosure(1, 2)` is
+  `Enclosure(-1, 1)`, not `0`: the two intervals may hold two different
+  reals.
+- **The order.** `compare` answers `-1` or `1` for two intervals that do not
+  overlap, `'<='` or `'>='` for two intervals that touch, and `undefined`
+  for two intervals that overlap: `Enclosure(0, 1) < Enclosure(2, 3)` is
+  `True`, `Enclosure(0, 1) <= Enclosure(1, 2)` is `True`, and
+  `Enclosure(0, 2) < Enclosure(1, 3)` stays unevaluated. `Enclosure(1, 1) =
+  1` is `True`. The `extremum` hook gives the interval of the larger (or
+  smaller) ends: `Max(Enclosure(0, 2), Enclosure(1, 3))` is
+  `Enclosure(1, 3)`.
+- **The result types.** The image of `Sin`, `Cos`, `Abs` and the other
+  functions whose image is never empty is typed `enclosure`; a sum or a
+  product is `enclosure` when no operand can be infinite (`x + 1` with
+  `x: enclosure`), and `enclosure | nan` otherwise; every other operator is
+  `enclosure | nan`, because its image can be empty.
+
+**An example of a kind that compiles.** `Enclosure` gives a `compile`
+contract for the `interval-js` target, and none for the other targets,
+which decline it. An enclosure is the `{ lo, hi }` interval of that
+target, and the hooks emit, for each operation, the same function of the
+interval library that `.N()` calls, so the compiled code and `.N()` give
+the same doubles:
+
+```js
+ce.declare("x", "enclosure");
+const f = compile(ce.parse("\\sin(x) + 1"), { to: "interval-js" });
+f.freeSymbolTypes.x;           // ➔ { type: "enclosure", lowered: "interval", … }
+f.run({ x: { lo: 0, hi: 1 } }); // ➔ { kind: "interval", value: { lo: 1, hi: 1.841470984807897 } }
+f.run({ x: { lo: 1, hi: 0 } }); // ➔ throws: the entry check refused the value
+compile(ce.parse("x + 1"), { to: "javascript", fallback: false });
+// ➔ throws: Could not compile an expression that holds a value of the kind
+//   type 'enclosure' to target 'javascript'
+```
+
+The runner checks the value of each input whose type can hold an
+enclosure, before the code runs: a record `{ lo, hi }` with `lo <= hi`, no
+`NaN` and not the same infinity twice, or a finite number (a point).
+`broadcast()` and `broadcastAsync()` check every cell before the loop. A
+compiled comparison answers `'true'`, `'false'` or `'maybe'`; it compares
+doubles exactly (without the engine tolerance), and it has no information
+about identical operands (`c <= c` is `'maybe'` for an interval that is not
+a point, where the interpreter answers `True`). An operator that the
+interpreter leaves unevaluated declines, and with `fallback: true` the
+compilation throws instead of running the interpreter, because the fallback
+of this target would give a number to `x`. The code cannot be loaded again
+from its stored form, and an input typed `list<enclosure>` declines.
+
 ### Declaring the Effects of a Function
 
 If your function does something besides returning a value — draws a random

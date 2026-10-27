@@ -565,7 +565,7 @@ See also: [Chinese remainder theorem - Wikipedia](https://en.wikipedia.org/wiki/
 </nav>
 
 <FunctionDefinition name="ResidueClass">
-<Signature name="ResidueClass" returns="value">k: integer, n: integer</Signature>
+<Signature name="ResidueClass" returns="residue">k: integer, n: integer</Signature>
 The residue class $\overline{k}$ of $k$ modulo $n$: an element of the ring
 $\mathbb{Z}/n\mathbb{Z}$. The modulus $n$ must be an exact integer $≥ 1$.
 

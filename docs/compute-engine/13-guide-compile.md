@@ -56,6 +56,40 @@ console.log(f.run());
 If the expression cannot be compiled, the `result.success` property will be
 `false`.
 
+### Which Targets Are Registered
+
+The `to` option of `compile()` names a target registered on the expression's
+engine. Which targets an engine has depends on the package entries the program
+loads:
+
+| Entries loaded in the program | Targets of every engine |
+|---|---|
+| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl`, `wgsl`, `python` |
+| `@cortex-js/compute-engine/core` only | `javascript`, `interval-js` |
+
+The `javascript` and `interval-js` targets are part of every engine: the engine
+uses them itself (the `Map` auto-compile, the numeric integration and
+differentiation kernels, the solver's domain enumeration). The GPU and Python
+targets are bundled in the full entry, not in `core`; once the full entry is
+loaded anywhere in the program, every engine resolves them, including an engine
+made earlier from `core`. In a program that loads only `core`, import the class
+of the target you need from `@cortex-js/compute-engine/compile` and register
+it:
+
+```javascript
+import { ComputeEngine } from '@cortex-js/compute-engine/core';
+import { compile, GLSLTarget, PythonTarget } from '@cortex-js/compute-engine/compile';
+
+const ce = new ComputeEngine();
+ce.registerCompilationTarget('glsl', new GLSLTarget());
+ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }));
+
+const shader = compile(ce.box(['Sin', 'x']), { to: 'glsl' });
+```
+
+A target name that is not registered fails with an error that lists the
+registered names. `ce.unregisterCompilationTarget(name)` removes a target.
+
 ### Validation and Fallback Behavior
 
 Compilation APIs enforce runtime contracts to catch malformed extension payloads
@@ -182,6 +216,39 @@ real given to a complex-declared symbol is lifted, and a `Float64Array` for a
 list symbol is copied. `load()` throws when `result.runtimeVersion` is not
 `runtime.runtimeVersion`, or when the stored code has none.
 
+To run the stored code on a worker pool, the runtime entry also exports
+`createKernelPool`, and `runtime.loadBroadcastAsync(result, { workers })`
+returns the `broadcastAsync()` of the result: the same options (`out`,
+`deadline`, `signal`, `chunk`, `inline`) and the same result (`done`, `route`,
+`reason`), with `willUsePool(cells)` and `shippable`. The pool workers run the
+entry `@cortex-js/compute-engine/kernel-worker`, so a worker that loads
+stored code does not import the engine bundle.
+
+```typescript
+import {
+  createJavaScriptRuntime,
+  createKernelPool,
+} from '@cortex-js/compute-engine/runtime';
+
+const workers = createKernelPool({
+  create: () =>
+    new Worker(
+      new URL('@cortex-js/compute-engine/kernel-worker', import.meta.url),
+      { type: 'module' }
+    ),
+});
+const run = createJavaScriptRuntime().loadBroadcastAsync(stored, { workers });
+const { out, done, route } = await run({ x: xs }, { deadline: 100 });
+```
+
+Store the whole result, for example as `JSON.stringify(result)`, not only
+the fields that `load()` reads. `loadBroadcastAsync()` sends a batch to a
+worker only when the stored result has `shippable: true`. A host that copies
+some fields and leaves out `shippable` gets every batch on the calling
+thread, with `reason: 'not-shippable'` and no error. `workers` must be a pool
+from `createKernelPool()`: another value throws a `TypeError`. The stored
+fields are copied when the code is loaded, so load it again after a change.
+
 The runtime exposes `load`, `frame`, `setFrame`, `iterationLimit`, `deadline`
 and `runtimeVersion`. The other helpers are internal and can change in any
 release. The options give the runtime the state it cannot read from an engine:
@@ -238,6 +305,32 @@ lengths and nothing is expanded on the caller's side. `options.out` is a
 caller-owned output array, filled and returned instead of a new one; it must
 hold at least `outputs` values per cell (below).
 
+**Index axes** (`grid` layout only). A variable that `options.indexes` names
+is an axis whose value at each cell is the cell's position along that axis.
+Its input is the axis length `n`, a non-negative integer, and the variable
+takes the values `0, 1, …, n − 1`. The axis has its place in key order of
+`inputs`, as a column `0 … n − 1` would, but no column is built, sent to a
+worker or read. A kernel that reads a shared list by cell position declares
+the index with a type such as `integer<0..>`; the values that the engine gives
+are then in range by construction:
+
+```javascript
+ce.declare('F', 'list<number>');
+ce.declare('m', 'integer<0..>');
+ce.declare('n', 'integer<0..>');
+const g = compile(ce.parse('F_{m + 4n + 1}'));
+
+// 3 × 2 cells, `m` varying fastest: the same values as the columns
+// m: [0, 1, 2] and n: [0, 1].
+const F = [10, 11, 12, 13, 14, 15, 16, 17];
+g.broadcast({ m: 3, n: 2, F }, { layout: 'grid', indexes: ['m', 'n'] });
+// ➔ Float64Array [10, 11, 12, 14, 15, 16]
+```
+
+For `interval-js`, an index axis gives the point interval of each index. A
+name in `indexes` must be a key of `inputs` and must not be a shared input;
+with the `cells` layout the option throws.
+
 **Shared inputs** (`javascript` only). An input can also be bound once for the
 whole batch and read by index in the expression, for example the field values
 of a grid that each cell reads around its own index:
@@ -255,11 +348,32 @@ A variable is shared when the compiled code reads it as a list (its declared
 type is a list type), or when `options.shared` names it: `{ shared: ['G'] }`
 is the way to share a variable that has no declared type. Each name in
 `shared` must be a key of `inputs`. A shared input is a plain array of numbers
-or a `Float64Array`; the compiled code reads plain arrays only, so a
-`Float64Array` is copied into one, once per batch, before the cell loop. A
-shared input is not a column of the `cells` layout and not an axis of the
-`grid` layout: it does not count toward the cells. A plain array for any other
-variable throws.
+or a `Float64Array`. A shared input is not a column of the `cells` layout and
+not an axis of the `grid` layout: it does not count toward the cells. A plain
+array for any other variable throws.
+
+**Batch body and declared types.** When the compiled code reads a shared list
+declared as a list of numbers at a scalar index (`F_{i+1}` with
+`F: list<number>`) and the caller compiled with `broadcast: true`, the result
+carries a second body for batches. The batch body is a second compilation of
+the same size as the first (it adds about 45 % to the compile time of such a
+kernel, measured 2026-10-25), so it is built only on request: a caller that
+only calls `run()` keeps the default, `false`, and a caller that broadcasts a
+kernel over many cells asks for it. Without it, `broadcast()`,
+`broadcastAsync()` and a kernel worker run the ordinary body for every cell,
+with the same values. The batch
+checks each such list once (a `Float64Array`, or a plain array whose elements
+are all numbers; a plain array that passed is not checked again while its
+length is the same), reads a `Float64Array` in place, and reads the list
+directly in each cell. A declared type of an input is a promise of the host,
+and the batch body trusts it: when the index type proves an integer of at least
+1 (for example `i + 1` with `i` declared `integer<0..>`), the read has no
+run-time test, and a read past the end gives `NaN`, as `At` does. When an input
+breaks its declared type (a fractional `i` for `integer<0..>`, a string in a
+list declared `list<number>` after it was checked), the result is not defined.
+When a list fails the check, the whole batch runs the ordinary body. Declare
+the index with its range: a kernel that reads `F_{i+1}` with `i: integer<0..>`
+runs about 1.7 times as fast as with `i: integer` (measured 2026-10-24, 250 000 cells, two reads per cell).
 
 **Output of a `javascript` result.** One value per cell by default. A boolean
 is `1` or `0`; a complex value with a zero imaginary part is its real part; a
@@ -321,10 +435,16 @@ g.broadcast({ x: new Float64Array([1, 4, -2, -1, -1, 4]) });
 
 `broadcastAsync(inputs, options)` takes the same inputs and `out` as
 `broadcast()`, plus a `signal` (an `AbortSignal`), a `deadline` (milliseconds
-of wall clock for the whole batch) and a `chunk` (cells per task). It resolves
-to `{ out, done }`, where `done` is the number of leading cells that are
-valid: every cell, or fewer when the deadline or the signal stopped the batch;
-the cells after `done` are untouched.
+of wall clock for the whole batch), a `chunk` (cells per task) and `inline`
+(see below). It resolves to `{ out, done, route, reason }`, where `done` is
+the number of leading cells that are valid: every cell, or fewer when the
+deadline or the signal stopped the batch; the cells after `done` are
+untouched. `route` is `'pool'` when workers ran the batch and
+`'calling-thread'` when it ran (or, with `inline: false`, would have run) on
+the calling thread; `reason` says why the pool did not take it:
+`'no-pool'` (`ce.workers` is not set), `'pool-unusable'` (the workers hold
+another runtime version), `'not-shippable'`, `'below-threshold'` or
+`'pool-declined'` (a worker failed during the batch).
 
 `broadcastAsync()` takes `shared` and `outputs` as `broadcast()` does; `done`
 is still a count of cells, not of values. On a pool, the shared inputs go to
@@ -338,7 +458,8 @@ way, and the runtime reads the shared inputs from the stored entry plan.
 
 Without a worker pool it runs the batch inline, in slices between yields to
 the event loop, so a deadline still applies and a long batch does not block a
-frame. With a pool it splits the cells into one slice per worker (or `chunk`
+frame. The first slice also runs after a yield: no cell is computed before
+`broadcastAsync()` returns. With a pool it splits the cells into one slice per worker (or `chunk`
 cells per slice), ships them, and writes each returned slice into `out` as it
 arrives. A batch under a threshold runs inline in any case: the pool measures
 the cells per millisecond of each compiled function from its inline batches,
@@ -346,6 +467,22 @@ and ships a batch only when its serial time would exceed about 10 ms (before
 the first measurement, 20 000 cells). Measured 2026-10-20 on an 18-core
 machine: an implicit plot of 512×512 interval cells takes 175 ms inline and 34
 ms on 8 workers; a 2000-column 1D plot takes under 2 ms and never ships.
+
+A host that must never compute on the calling thread (a live plot that
+repaints on every frame) has three tools:
+
+- `inline: false` refuses the calling thread: when the pool would not take the
+  batch, `broadcastAsync()` resolves at once with `done: 0`, computes nothing,
+  and leaves the threshold measurement unchanged. When a worker fails during
+  the batch, the cells the workers finished are kept and the rest is not
+  computed.
+- `result.willUsePool(cells)` says in advance whether a batch of that many
+  cells would go to the pool, with the current `ce.workers` and threshold (for
+  an `interval-js` result, `cells` counts intervals).
+- `result.shippable` says whether the compiled result can run on a worker at
+  all. It is `false` for code that draws random numbers, for a `vars` or
+  `functions` entry that names a host global, and for a caller preamble; such
+  a result always runs on the calling thread.
 
 The engine creates no worker on its own. The host builds the pool and gives it
 to one or more engines:
@@ -373,8 +510,24 @@ const { out, done } = await f.broadcastAsync(
 );
 ```
 
-In Node the factory returns a `worker_threads` `Worker` on the same file. A
-worker reports the versions of the runtimes it holds; a stored result compiled
+In Node the factory returns a `worker_threads` `Worker` on the same file.
+
+**An engine inside a worker.** When the engine itself runs in a dedicated
+worker (to keep the page responsive), the code in that worker makes the pool,
+with a factory that starts workers of its own (nested workers), and sets
+`ce.workers` as above. Nothing comes from the page: the pool reads
+`navigator.hardwareConcurrency`, which a worker has, and uses
+`requestIdleCallback` for `prewarm` only when it exists. The worker URL must
+be one that the worker can start, for example
+`new URL('./kernel-worker.js', import.meta.url)` in a module worker. This was
+checked on 2026-10-24 with a module worker that runs a batch and a `FindFit`
+scan on its own pool of two nested module workers: same values as on one
+thread, in Chromium 156, Firefox 157 and WebKit 27.2 (Playwright builds), and
+with Node `worker_threads`. A pool made on the page cannot serve an engine in
+a worker: the two threads would need a protocol between them, which does not
+exist.
+
+A worker reports the versions of the runtimes it holds; a stored result compiled
 by another release is refused by the worker, and its slices then run inline.
 `pool.dispose()` terminates the workers; a later batch creates them again. A
 Content Security Policy must allow the worker script (`worker-src`) and
@@ -969,6 +1122,12 @@ console.log(f.run({ x: 3 }));
 
 ### GLSL Target
 
+The GLSL target is registered on an engine made from the full package entry.
+An engine made from `@cortex-js/compute-engine/core` needs
+`ce.registerCompilationTarget('glsl', new GLSLTarget())` first, with
+`GLSLTarget` imported from `@cortex-js/compute-engine/compile` (see "Which
+Targets Are Registered" above).
+
 The GLSL target also supports complex arithmetic, but represents complex numbers
 as `vec2` values — the `.x` component is the real part, `.y` is the imaginary
 part:
@@ -1078,6 +1237,38 @@ has no order, so `1/x > 0` at `x = 0` is `False` and `\{1/x > 0: 1, 0\}` is
 which is `true`, and gives `1`. The two answers differ at the pole only. A
 closed form with no variable (`\{1/0 > 0: 1, 0\}`) is folded at compile time to
 the interpreter's answer, `0`.
+
+On the `glsl` and `wgsl` targets, an infinity or a `NaN` computed at run time
+is not guaranteed. The WGSL specification lets a GPU compiler assume that no
+infinity or `NaN` occurs at run time, and GPU drivers (Metal, for example)
+compile GLSL the same way. A division by zero in a shader can therefore give a
+finite value, and so can a function of its result. For example,
+`\sin(2\pi T/P)` at `P = 0` is `NaN` on the `javascript` target, but on an
+Apple GPU both shader targets returned the same finite number. The compiled
+shader does not test each divisor for zero, because that test would add work
+to every division. When the value at a zero divisor matters, write the test
+in the expression, for example `\{P = 0: \operatorname{NaN}, \sin(2\pi T/P)\}`:
+a comparison is reliable on a GPU.
+
+On `glsl` only, a product with a factor that the driver can prove is zero is
+`0`, even when the other factor is `NaN` or an infinity:
+`\operatorname{NaN} \cdot 0 \cdot \cos(x)` gives `0` on an Apple GPU (WebGL2
+over ANGLE Metal), and WebGPU gives `NaN`.
+
+`\max`, `\min`, `\operatorname{Clamp}`, `\operatorname{ElementMax}`,
+`\operatorname{ElementMin}`, `\sin`, `\cos`, `\sec`, `\csc`, `\cot`,
+`\operatorname{sgn}`, `\operatorname{Smoothstep}` and
+`\operatorname{Heaviside}` give `NaN` when an operand is `NaN` on both
+shader targets, as in the interpreter. On Apple GPUs the built-ins `max`,
+`min` and `clamp` return the other operand, and `sin`, `cos`, `sign` and
+`smoothstep` return 0, so the shader calls helpers that test the bit pattern
+of each operand.
+
+A `NaN` keeps its value through the other operations that were measured:
+addition, multiplication by a value that is not zero, `\tan`, `\sinh`,
+`\cosh`, `\tanh`, `\exp`, `\ln`, `\sqrt{}`, `\arcsin`, `\arccos`,
+`\arctan`, `\lfloor x \rfloor` and the other rounding functions, `\bmod`,
+`|x|`, `0/0` and `\infty - \infty`.
 
 Absence markers project the same way. `Missing` — what an unmatched `Which`,
 an else-less `If` and a false restriction `e\{c\}` return — is not a
@@ -1240,9 +1431,11 @@ default) or on `compile()`'s options; a mode a target does not offer
 (`complex` on `glsl`) is a `capability` decline, never a silent coercion. The
 shader targets and `interval-js` offer `strict` only.
 
-> **Deprecated:** `complexPromotion: true` maps to `mode: 'complex'` (a
-> console warning, once), and is ignored on a target without complex mode.
-> Since `auto` already promotes, most callers can simply drop it.
+> **Removed:** the `complexPromotion` option is gone, and a call that still
+> passes it gets no warning. `complexPromotion: true` used to select
+> `mode: 'complex'`; such a call now compiles in the default `auto` mode,
+> which promotes an unknown-sign radical but does not lift every wide binding
+> to complex. Pass `mode: 'complex'` to keep the old behavior.
 
 ## Custom Operators
 
@@ -1476,7 +1669,11 @@ console.log(glslResult.code); // → pow(x, 2.0) + pow(y, 2.0)
 
 ### Python/NumPy Target
 
-The Compute Engine includes a complete Python/NumPy compilation target for scientific computing:
+The Compute Engine includes a complete Python/NumPy compilation target for
+scientific computing. The full package entry registers it as `python` with its
+default options; register your own instance to change the options, or to add
+it to an engine made from `@cortex-js/compute-engine/core`, where it is not
+bundled:
 
 ```javascript
 import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine';

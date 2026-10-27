@@ -106,6 +106,11 @@ console.log(ce.parse('\\sin(\\infty)').evaluate());
 // ➔ sin(+oo)
 ```
 
+There is no inexact infinity. At machine precision, a float that is too large
+for a double, such as `1.0e800`, becomes $+\infty$, and that infinity is exact
+(`isExact` is `true`) like any other. At arbitrary precision the same literal
+stays a finite number.
+
 `NaN` **is not an exact value.** It is the argument that triggers the automatic
 numeric approximation, so any numeric function of `NaN` evaluates to `NaN` —
 under plain `evaluate()`, not only under `N()`. There is no exact value to hold
@@ -335,16 +340,17 @@ affects how results are displayed:
   significant digits. This hides noise digits that arise from internal
   rounding in division and transcendental functions.
 - **`.json`** and **`toJSON()`** emit the full unrounded value for lossless
-  data interchange. Use `expr.toMathJson({ fractionalDigits: 'auto' })` to
-  get precision-rounded MathJSON output.
+  data interchange. Use `expr.toMathJson({ digits: 'auto' })` to get
+  precision-rounded MathJSON output.
 
 **To explicitly control digits in MathJSON output**, use
-`expr.toMathJson()` with the `fractionalDigits` option:
+`expr.toMathJson()` with the `digits` option:
 
 ```ts
-expr.toMathJson({ fractionalDigits: 'auto' }); // rounded to ce.precision
-expr.toMathJson({ fractionalDigits: 'max' });  // all digits (default)
-expr.toMathJson({ fractionalDigits: 5 });      // 5 fractional digits
+expr.toMathJson({ digits: 'auto' });            // rounded to ce.precision
+expr.toMathJson({ digits: 'max' });             // all digits (default)
+expr.toMathJson({ digits: { fractional: 5 } }); // 5 fractional digits
+expr.toMathJson({ digits: { significant: 5 } }); // 5 significant digits
 ```
 
 A float keeps its digits in MathJSON, also when they repeat: the float

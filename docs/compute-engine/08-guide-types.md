@@ -73,18 +73,22 @@ Type A is a **subtype** of type B if all values of type A are also values of typ
 It is also said that type A **matches** type B.
 
 The following diagram shows selected relationships in the current
-implementation, in three parts. Each child is a subtype of its parent. The
-dashed arrows show a sample of the edges into `never`, which every type has.
-It is an overview, not a complete lattice of parameterized types, unions,
-and intersections.
+implementation, in four parts. Each child is a subtype of its parent. It
+is an overview, not a complete lattice of parameterized types, unions, and
+intersections.
 
 ```mermaid
 flowchart TD
-  any --> error & nothing & missing & unknown
-  unknown --> expression
+  any --> error & nothing & missing & expression
   expression --> symbol & function & value
-  value --> color & regexp & type & object & scalar & collection
-  error & nothing & missing & symbol & function -.-> never["never<br/>(below every type)"]
+```
+
+The `value` branch. `residue`, `measurement` and `quantity` are the kind
+types (see [Kind Types](#kind-types)):
+
+```mermaid
+flowchart LR
+  value --> color & regexp & residue & measurement & quantity & type & object & scalar & collection
 ```
 
 The `scalar` branch:
@@ -111,28 +115,24 @@ flowchart TD
 `any`. It has no values and is a subtype of every type, including `unknown`,
 `missing`, `nothing`, and `error`.
 
-**`unknown` currently has two roles.** It marks information that inference
-can refine, and it is a supertype of ordinary expression types:
-`integer <: value <: expression <: unknown <: any`.
-The reverse relationships do not hold. In particular, an unresolved
-`unknown` does not establish that an expression is a number or even that it
-satisfies the explicit `expression` contract. Inference and deferred
-argument checking are separate from these subtype relationships.
-
-The agreed design direction is to make `unknown` solely an inference
-marker, with no required position in the content-type lattice. That change
-is not implemented yet; the diagram and subtype examples here describe the
-current behavior. `value`, `expression`, and `any` are the explicit content
-contracts.
+**`unknown` is not in the diagram: it is an inference marker, not a content
+type.** It marks a type that is still to be inferred. As a set of values it
+restricts nothing, so every type is a subtype of it, `any`, `error` and the
+absence markers included, and `any` and `unknown` are mutual subtypes: the
+same set of values with two instructions (a contract, a request to infer).
+The reverse never holds: `unknown` is a subtype only of `any` and itself,
+so an unresolved `unknown` does not establish that an expression is a
+number or that it satisfies the `expression` contract. `value`,
+`expression`, and `any` are the explicit content contracts.
 
 **Numeric types distinguish finite values from markers and infinities.**
 `complex` and its subtypes contain finite numbers. `infinity` and `nan`
 are separate subtypes of `number`.
 
 **`vector`, `matrix`, and `tensor` are list spellings**, not separate
-primitive types. Bare `vector` and `matrix` specify numeric elements and
-rank one or two, respectively. Bare `tensor` normalizes to `list<number>`
-without a rank constraint, so it is not shown as a separate branch.
+primitive types. Bare `vector` and `matrix` specify numeric cells and
+rank one or two, respectively. Bare `tensor` is an array of numbers of any
+rank (1 or more), so it is not shown as a separate branch.
 `range` is a subtype of `list<integer>`.
 
 **Note:** a `string` is an indexed collection of `character` — it sits beside
@@ -155,10 +155,12 @@ signature at all.
 
 The following distinctions matter:
 
-- The absence types `nothing` and `missing`, and the `error` type, are
-  **not subtypes** of `unknown`; neither is `any`. `never` **is** a subtype
-  of `unknown`, as it is of every type. To include absence in a type, write
-  it explicitly with a union such as `number | missing`, or use `any`.
+- `unknown` restricts nothing: the absence types `nothing` and `missing`,
+  the `error` type and `any` are all subtypes of it, as `never` is. A
+  content contract is what excludes absence: `expression` and `value`
+  exclude the immediate markers, and `number | missing` admits one
+  explicitly. To state that absence is possible in a contract, write it
+  down, or use `any`.
   Call admission is a different question: at an operator parameter, a value
   typed `T | missing` — a lookup
   with a computed key, such as `xs[i]` — and a collection of such values
@@ -181,10 +183,10 @@ The current collection contracts distinguish:
 | --- | --- |
 | `list<value>` | Data values, including scalars, collections, objects, and opaque values such as regular expressions; excludes functions and symbolic expressions typed as `symbol` or `expression` |
 | `list<expression>` | Data values, functions, and symbolic expressions |
-| `list<unknown>` | Elements whose types may still be unresolved; currently also a supertype of `list<expression>` and the normalized meaning of bare `list` |
-| `list<any>` | Unrestricted element types, including absence markers and errors |
+| `list<unknown>` | An explicit request to infer the element type from each assignment; as a set of values the same as bare `list` and `list<any>` |
+| `list<any>` | Unrestricted element types, including absence markers and errors; a contract that never moves |
 
-The first three exclude immediate `missing`, `nothing`, and `error`
+The first two exclude immediate `missing`, `nothing`, and `error`
 elements in subtype checks. These are not recursive absence restrictions:
 a list containing a missing datum is itself a collection value.
 
@@ -234,7 +236,7 @@ The Compute Engine supports the following primitive types:
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
 | `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value |
 | `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
-| `unknown`       | An unresolved type that inference can refine. In the current subtype relation it is also above `expression`, `function`, `symbol`, and `value`; it excludes `any`, `nothing`, `missing`, and `error`. The bottom type `never` is below it. |
+| `unknown`       | An inference marker: a type still to be inferred, which each assignment or use refines. As a set of values it restricts nothing (every type is a subtype of it), and it proves no contract (it is a subtype only of `any` and itself). |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
 | `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
@@ -247,6 +249,9 @@ The Compute Engine supports the following primitive types:
 | `character`     | The type of exactly one user-perceived character (one Unicode grapheme cluster), such as `["CharacterFrom", "'é'"]`. A scalar with no elements, and a disjoint sibling of `string`: a character is not a one-character string, and a string is not a character. A one-character string *literal* does narrow to a character where one is expected |
 | `string`        | The type of a string of Unicode characters. `string <: indexed_collection<character>`: a string can be counted, indexed (1-based) and iterated, and its elements are its grapheme clusters. It is **not** `list<character>` — the two are siblings, because joining characters can merge them |
 | `number`        | The type of a numeric value |
+| `residue`       | The type of a residue class, an element of ℤ/nℤ, such as `["ResidueClass", 2, 5]`. A **kind type** (see [Kind Types](#kind-types)): a `value` that is not a number, disjoint from every other type except `value`, `expression`, `any` and `unknown` |
+| `measurement`   | The type of a measurement, a nominal value with a standard uncertainty, such as `["Measurement", 2.5, 0.1]`. A **kind type**, as `residue` is. An operator that accepts a number accepts a measurement, but a symbol declared `real` or `number` does not |
+| `quantity`      | The type of a quantity, a value with a physical unit, such as `["Quantity", 2, "m"]`. A **kind type**, as `residue` is. Only the arithmetic operators, the comparisons, the trigonometric functions, `Abs` and the operators with a `value` parameter accept it |
 
 </div>
 
@@ -521,26 +526,28 @@ ce.parse("\\[\\]").type.matches("list<integer>");
 // ➔ true
 ```
 
-The shorthand **`list`** is equivalent to `list<unknown>` — "some list of
-values, element type not stated". The two spellings are synonyms and
-normalize to the bare form. The same convention applies to every bare
-element-taking constructor: `set` = `set<unknown>`, `dictionary` =
-`dictionary<unknown>`, `collection` = `collection<unknown>`,
-`indexed_collection` = `indexed_collection<unknown>`.
+The shorthand **`list`** admits any list, whatever its elements: as a set
+of values it is `list<any>`, and as a declaration it asks inference to
+refine the element type from each assignment. The explicit `list<unknown>`
+is the same request spelled out. The same convention applies to every bare
+element-taking constructor (`set`, `dictionary`, `collection`,
+`indexed_collection`) and, for its slots and fields, to bare `tuple` and
+`record`.
 
-An explicit **`list<any>`** is a different, strictly *wider* type: `any`
-additionally admits the absence markers (`Nothing`, `Missing`), so
-`list<any>` accepts a list with absence elements (e.g. a regex match result
-using `Missing` for an unmatched group) while the bare `list` — values only —
-does not. Consequently `list <: list<any>` but not the converse, and
-`list<nothing> <: list<any>` while `list<nothing> ⊄ list`.
+An explicit **`list<any>`** denotes the same set of values, but as a
+declaration it is a contract that never moves: `b: list<any> := [1, 2]`
+reports `list<any>`, while `a: list := [1, 2]` reports `list<integer>`. A
+list with absent elements (a regex match result using `Missing` for an
+unmatched group) fits all three spellings; it does not fit
+`list<expression>`, the contract that excludes the immediate markers.
 
 ```js
 ce.parse("\\[1, 2, 3\\]").type.matches("list");
 // ➔ true
 ```
 
-The shorthand **`vector`** is a list of numbers, equivalent to `list<number>`.
+The shorthand **`vector`** is a list of numbers, equivalent to `list<number>`:
+the two types denote the same values, so each matches the other.
 
 ```js
 ce.parse("\\[1, 2, 3\\]").type.matches("vector");
@@ -554,7 +561,9 @@ ce.parse("\\[1, 2, 3\\]").type.matches("vector<3>");
 // ➔ true
 ```
 
-A **`vector<T^n>`** is a list of `n` elements of type `T`. A literal list's
+A **`vector<T^n>`** is a list of `n` elements of type `T`, where `T` is any
+type that is not a list (see [Elements and Cells](#elements-and-cells)); it is
+the same type as `list<T^n>`. A literal list's
 element type is the widened type of its actual elements, so a literal list of
 integers matches both the narrow and the broad forms:
 
@@ -571,31 +580,88 @@ ce.parse("\\[1, 2.5, 3\\]").type.matches("vector<integer^3>");
 
 Lists of non-numeric values type honestly too — a list of two colors types
 `list<color^2>`, not a numeric vector — so `type.matches("list<color>")` and
-similar element-type queries answer correctly.
+similar element-type queries answer correctly. A list with dimensions can hold
+values that are not numbers, if they are not lists: `[True, False]` is a
+`list<boolean^2>`, and `["a", "b"]` is a `list<string^2>`. The type
+`vector<string^2>` is valid too: it is the same type, and it prints as
+`list<string^2>`.
 
-Similarly, a **`matrix`** is a list of lists.
+Similarly, a **`matrix`** is a list of its rows, and the rows all have the
+same length: `matrix<integer>` is a `list<vector<integer>>`.
 
-- The shorthand `matrix` is `matrix<number^?x?>`, a matrix of elements of 
-  type `T`, a list of lists of numbers, of rank 2 but of any dimensions. The `?` 
-  symbol is a wildcard that matches any number of elements.
-- `matrix<T>`: A matrix of elements of type `T`, of any dimensions.
+- The shorthand `matrix` is `matrix<number^?x?>`, a matrix of numbers, of
+  rank 2 but of any dimensions. The `?` symbol is a wildcard that matches any
+  number of elements.
+- `matrix<T>`: A matrix whose cells have the type `T`, of any dimensions.
 - `matrix<nxm>`: A matrix of `n` rows and `m` columns (e.g. `matrix<3x3>`)
-- `matrix<T^nxm>`: A matrix of `n` rows and `m` columns of elements of type `T`
-  (e.g. `matrix<boolean^3x3>`)
+- `matrix<T^nxm>`: A matrix of `n` rows and `m` columns whose cells have the
+  type `T` (e.g. `matrix<integer^3x3>`)
 
-A nested list type with fixed lengths is the same type as its flat shape:
-`list<list<integer^2>^2>` is `matrix<integer^(2x2)>`, so a symbol declared
-with it matches a `matrix<T^(NxN)>` constraint, and `x^2` of such a symbol is
-the matrix power, as it is for a matrix literal.
+`T` is any type that is not a list: `matrix<boolean^(2x2)>` is a 2×2 array of
+booleans. The bare `matrix` has number cells. A list of rows is not always a
+matrix: a `list<vector<integer>>` can hold rows of different
+lengths, so it does not match `matrix<integer>`. A declaration that must be a
+matrix spells `matrix<integer^(2x2)>`. A nested spelling with an outer length,
+such as `list<list<integer^2>^2>`, is a parse error, because its cells would
+be lists.
 
-A dimension can be `0`: `list<integer^(2x0)>` is `matrix<integer^(2x0)>`, a
-matrix of two empty rows, and `list<integer^(0x2)>` is a matrix with no rows
-and two columns. In a dimension, `0x` always separates a zero-length axis
+A dimension can be `0`: `matrix<integer^(2x0)>` is a matrix of two empty
+rows, and `matrix<integer^(0x2)>` is a matrix with no rows and two columns. In a dimension, `0x` always separates a zero-length axis
 from the next dimension; it is never a hexadecimal prefix. The empty list
 `[]` is a value of every list type whose first axis has length `0`.
 
-And finally, a **`tensor`** is a multi-dimensional array of any values, of any rank,
-and **`tensor<T>`** is a tensor of elements of type `T`.
+And finally, a **`tensor`** is a multi-dimensional array of numbers, of any
+rank (1 or more), **`tensor<T>`** is an array of any rank whose cells have
+the type `T`, and **`tensor<T^(2x3x4)>`** is an array of that shape. The cells can be values that are not numbers, if they are
+not lists: `tensor<boolean>` is an array of booleans of any rank. A vector
+and a matrix are tensors: `[[1, 2], [3, 4]]` matches `tensor<integer>`. A
+signature that accepts a numeric array of any rank spells `tensor`, not
+`list<number>`.
+
+#### Elements and Cells
+
+A list type is read in one of two ways, by its form:
+
+| Form | Spelling | `T` is the type of | Example |
+| :--- | :--- | :--- | :--- |
+| A list | `list<T>`, `set<T>` | the elements: what indexing returns | `[[1, 2], [3]]` matches `list<list<integer>>`, not `matrix<integer>` |
+| A tensor of a known rank | `list<T^n>`, `vector<T>`, `matrix<T>`, `tensor<T^(dims)>` | the cells: the values at the depth of the rank | `[[1, 2], [3, 4]]` is typed `matrix<integer^(2x2)>` |
+| A tensor of any rank | `tensor<T>`, `tensor` | the cells | `[1, 2]` and `[[1, 2], [3, 4]]` both match `tensor<integer>` |
+
+The elements of a tensor of rank 1 are its cells; the elements of a matrix are
+its rows. So a matrix of integers is a `list<vector<integer>>` and a
+`list<list<integer>>`, but it is not a `list<integer>`:
+
+```js
+ce.parse("\\[\\[1, 2\\], \\[3, 4\\]\\]").type.matches("list<list<integer>>");
+// ➔ true
+ce.parse("\\[\\[1, 2\\], \\[3, 4\\]\\]").type.matches("list<integer>");
+// ➔ false
+ce.parse("\\[\\[1, 2\\], \\[3, 4\\]\\]").type.matches("tensor<integer>");
+// ➔ true
+```
+
+A list has elements and may have a length; `vector`, `matrix` and `tensor`
+have cells, of any type that is not a list, and may have a shape. The bare
+names `vector`, `matrix` and `tensor` mean number cells. Two rules follow:
+
+- The cells cannot be lists. The shape is written in one place: two rows of
+  three integers are `matrix<integer^(2x3)>`. `list<list<integer^3>^2>`,
+  `matrix<list<integer>>` and `tensor<list<integer>>` are not valid types,
+  and the error names the spelling to use (`matrix<integer^(2x3)>`). For rows
+  of any lengths, write `list<list<integer>>`.
+- A `list` has one axis at most, its length: `list<integer^3>` is valid,
+  `list<integer^(2x3)>` is not. Write `matrix<integer^(2x3)>` for two axes and
+  `tensor<integer^(2x3x4)>` for three or more; the error names that spelling.
+
+Every other cell type is valid with every head: `list<boolean^2>`,
+`list<string^2>`, `list<color^2>`, `list<tuple<number, number>^3>`,
+`matrix<boolean^(3x3)>`, `matrix<string>` and `tensor<boolean>` are valid
+types. A type prints with the head of its rank: `vector<…>` (or `list<…^n>`
+when the cells cannot be numbers) for rank 1, `matrix<…>` for rank 2, and
+`tensor<…>` for rank 3 or more. A comparison over a 2×2 matrix `M` is typed
+`matrix<boolean^(2x2)>`. A matrix of booleans is not a numeric matrix:
+`Determinant` refuses it.
 
 
 
@@ -687,8 +753,14 @@ strings. To exclude them, intersect with a negation:
 ### Broadcastable
 
 The type `broadcastable<T>` represents a value that is either a scalar `T` or
-a list of `T` applied element-wise — the static type of an expression that
-may **broadcast** at evaluation. It is the union `T | list<T>`.
+a collection of `T` applied element-wise — the static type of an expression
+that may **broadcast** at evaluation. It is the union `T | tensor<T>`: a `T`,
+or an array of any rank whose cells are `T`. `T` is a type that cannot hold a
+list: a number type, `boolean`, `string`, a tuple, `integer | missing`. For
+example `broadcastable<number>` is a number or an array of numbers,
+`broadcastable<boolean>` is a boolean or an array of booleans (the result of a
+comparison over a matrix is a matrix of booleans), and
+`broadcastable<tuple<number, number>>` is a point or an array of points.
 
 Arithmetic in the Compute Engine broadcasts over collections at run time:
 `2 \cdot [1, 2, 3]` evaluates to `[2, 4, 6]`. When an operand is a visible
@@ -704,34 +776,39 @@ ce.parse('2h(x) - 1').type;
 // ➔ broadcastable<number>
 ```
 
-The subtyping rules follow from the meaning "a `T`, or a list of `T`":
+The subtyping rules follow from the meaning "a `T`, or a tensor of `T`":
 
 - `T <: broadcastable<T>` — a scalar is a valid broadcastable value
 - `list<T> <: broadcastable<T>`, `vector<n> <: broadcastable<number>`,
   `matrix<integer> <: broadcastable<integer>`, `range <: broadcastable<integer>`
-  — every list of `T` is too, and so is everything that is a list: a vector, a
-  matrix, a range
+  — every list of `T` is too, and so is every array of cells of type `T`: a
+  vector, a matrix, a range, `matrix<boolean^(2x2)>` (a
+  `broadcastable<boolean>`)
 - A `tuple`, a `string`, a `set` and a value typed only `indexed_collection<T>`
   are **not** subtypes of `broadcastable<T>`. A tuple and a string bind
   atomically (a broadcasting operator applied to a string receives the whole
   string, not its characters), a set is not indexed, and the type
   `indexed_collection<T>` also holds tuples, so it does not say that the value
   is a list
+- A list of lists is **not** a `broadcastable<number>`, because its rows can
+  have different lengths: `list<list<number>>` does not match
+  `broadcastable<number>`, while `matrix<number>` does
 - The relation is transitive: whatever is a subtype of `list<T>` is a subtype
   of `broadcastable<T>`
 - `broadcastable<S> <: broadcastable<T>` when `S <: T` (covariant)
 - `broadcastable<T>` is **not** a subtype of `T` or of `list<T>` — it may be
-  either one, so it is neither. It is a subtype of `T | list<T>` and of
-  `T | indexed_collection<T>`
+  either one, so it is neither. It is a subtype of `T | tensor<T>`, and not of
+  `T | list<T>`, since a matrix is not a `list<T>`
 
 A `broadcastable<T>` expression can be used anywhere the runtime can resolve
 the ambiguity: further arithmetic propagates the type, indexing with `At`
-(`(2h(x)-1)[1]`) is valid with element type `T`, and compiled JavaScript
-handles both outcomes with a single compiled artifact.
+(`(2h(x)-1)[1]`) is valid, with the element type `T | tensor<T>` (a cell, or
+a row of a matrix), and compiled JavaScript handles both outcomes with a
+single compiled artifact.
 
 The type can also be used in declarations and signatures, e.g.
 `ce.declare('b', 'broadcastable<number>')` for a parameter that accepts a
-number or a list of numbers and is processed element-wise.
+number or an array of numbers of any rank and is processed element-wise.
 
 Note that a bare undeclared symbol does **not** type as broadcastable: in
 `2x`, the symbol `x` is inferred to be a number by the arithmetic itself.
@@ -1255,6 +1332,17 @@ ce.type("(T & number) -> T where T");
 ce.type("(T) -> T where T: number"); // …what that author meant
 ```
 
+A variable in a **cell position** reads the cells of a tensor, and a
+dimension variable reads its length: `(x: list<T^N>) -> T where T, N` and
+`(x: vector<T>) -> T where T` bind `T` to the cells of a tensor of rank 1, so
+`first([1, 2, 3])` is an `integer`. A matrix has rank 2 and is not a value of
+either pattern: `first([[1, 2], [3, 4]])` is an `incompatible-type` error. The
+plain `list<T>` is read by its elements, as every list type is (see
+[List, Vector, Matrix and Tensor](#list-vector-matrix-and-tensor)): a
+matrix is a list of its rows, so `(x: list<T>) -> T where T` applied to
+`[[1, 2], [3, 4]]` binds `T` to the row type and the result is a
+`vector<integer^2>`.
+
 `where` is a reserved word in type strings: `ce.declareType("where", …)` is
 a `reserved-type-name` error.
 
@@ -1348,11 +1436,11 @@ ce.box(["rev", ["Set", 1, 2]]).toString();
 //      "set<integer>")))
 ```
 
-An unbounded variable has an implicit bound of `unknown`: `where T` is
-shorthand for `where T: unknown` — "some value type" — and an explicitly
-written `: unknown` is normalized away when the type is serialized. An
-explicit `: any` bound is a different, wider contract (it additionally admits
-the absence markers) and survives serialization. A bound must be a **ground**
+An unbounded variable has no bound: `where T` is shorthand for
+`where T: unknown` — "a type to be inferred at each call" — and an
+explicitly written `: unknown` is normalized away when the type is
+serialized. An explicit `: any` bound admits the same arguments, is a
+contract rather than an inference request, and survives serialization. A bound must be a **ground**
 type: it cannot mention a variable, its own or another's.
 
 ```js
@@ -2296,6 +2384,34 @@ full contract and never moves. For non-collection loose annotations the
 same principle applies at whole-type granularity: `x: unknown` behaves
 like no annotation at all, while `x: any` is a fixed contract.
 
+**A declared type is a contract on every value, absence included.** `s:
+string` refuses `Missing` and `Undefined` as it refuses `5`, and `xs:
+list<string>` refuses `["a", Missing]`: the element contract excludes
+absence. Write the absence into the type when it is possible (`string |
+missing`, `list<string | missing>`), or use a refining declaration (`list`,
+`list<unknown>`). A `number` declaration admits `NaN`, the numeric absence
+marker (`real`, `integer` and `complex` hold finite values and refuse it;
+declare `real | nan`), so `n: number := 3 {a > 0}` binds (a numeric restriction masks to
+`NaN`), while `p: tuple<number, number> := (1, 2) {a > 0}` needs
+`tuple<number, number> | missing`. The reader of a declared symbol can then
+trust the declaration: a symbol declared `string` holds a string.
+
+**A possibly absent value at a contract that excludes absence** (`xs[i]`,
+typed `missing | string`, at a `string` parameter or as the initializer of
+`y: string`) is admitted by the engine and checked when the call runs; the
+Epsil static check reports it. Three discharges exist, and the check accepts
+each of them: a fallback (`xs[i] ?? "d"`), a guard (`isMissing(v)`, which
+narrows `v` in the present branch), and the presence assertion
+`xs[i]?!` (`AssertPresent`), which returns the value when present and an
+`expected-present` error when absent. The assertion's type is the present
+part of the operand's type. A library operator whose parameter excludes
+absence refuses an absent argument at evaluation with an `incompatible-type`
+error naming the parameter, as a user function does; numeric and collection
+operators answer the marker of their result instead (`Sin(Missing)` is
+`NaN`, `Reverse(Missing)` is `Missing`), and operators that own their
+absence semantics (`Length`, `Equal`, the reducers, `Coalesce`, `IsMissing`)
+keep their own answers.
+
 ### When Inference Triggers
 
 Inference writes happen at these moments:
@@ -2369,12 +2485,13 @@ Inference writes happen at these moments:
 
 The two "loose" types divide the work (see also the primitive-types table):
 
-- **`unknown`** — an unresolved type. In the current subtype relation it
-  also sits above `expression`, including functions and symbols as well as
-  data values. It excludes `any`, `error`, and the absence markers
-  (`nothing`, `missing`); `never` remains below it. An `unknown` in a
-  signature slot or an unbounded `where T` is a **placeholder** that later
-  evidence refines. A *value* typed `unknown` is a placeholder too: because
+- **`unknown`** — a type still to be inferred. As a set of values it
+  restricts nothing: every type is a subtype of it, `any`, `error` and the
+  absence markers included. It proves no contract: it is a subtype only of
+  `any` and itself. An `unknown` in a signature slot, in the element slot
+  of a collection (`list<unknown>`) or an unbounded `where T` is a
+  **placeholder** that later evidence refines. A *value* typed `unknown`
+  is a placeholder too: because
   it claims nothing, no declaration can refute it, so assigning it to a
   declared symbol is admitted unchecked — `let xs: list` accepts
   `xs = f(0)` for an `f` with no signature, exactly as a `list` parameter
@@ -2385,29 +2502,31 @@ The two "loose" types divide the work (see also the primitive-types table):
 - **`any`** — the true top type, admitting absence markers as well. An
   explicit `any` is a deliberate, *wider* **contract**: `(any) -> any`
   promises to accept everything; `list<any>` admits a list with absent
-  elements. `any` is strictly above `unknown` (`unknown ⊑ any`, but not the
-  converse).
+  elements and never refines. `any` and `unknown` are mutual subtypes: the
+  same set of values, two instructions.
 
-A **bare collection constructor is a synonym for its `<unknown>` form**:
-`list` *is* `list<unknown>` — "some list of values" — and likewise `set`,
-`dictionary`, `collection` and `indexed_collection`. The explicit
-`<unknown>` spelling normalizes to the bare name. `list<any>` is a
-different, strictly wider type. Practical consequences:
+A **bare collection constructor, its `<unknown>` form and its `<any>` form
+denote one set of values**: `list`, `list<unknown>` and `list<any>` all
+admit any list, and likewise for `set`, `dictionary`, `collection` and
+`indexed_collection`. They differ as declarations: the bare name and the
+explicit `<unknown>` ask inference to refine the element type from each
+assignment, `<any>` is a contract. `list<expression>` and `list<value>`
+are the contracts that exclude the immediate markers. Practical
+consequences:
 
 ```js
 ce.type("list<integer>").matches("list");        // ➔ true
 ce.type("list").matches("list<any>");            // ➔ true
-ce.type("list<any>").matches("list");            // ➔ false (may hold absences)
-ce.type("list<integer|missing>").matches("list") // ➔ false
-ce.type("list<integer|missing>").matches("list<any>") // ➔ true
+ce.type("list<any>").matches("list");            // ➔ true
+ce.type("list<any>").matches("list<unknown>");   // ➔ true
+ce.type("list<integer|missing>").matches("list") // ➔ true
+ce.type("list<integer|missing>").matches("list<expression>") // ➔ false
 ```
 
-If you write your own type tests, the distinction matters in one place:
-asking "is this operand collection-*shaped*?" must be asked against the
-`<any>` family top (`matches("collection<any>")`), because a bare name in
-that position now means "collection of values only" and would wrongly
-exclude a `list<any>`-declared symbol or a `Missing`-bearing list. Asking
-"does this fit a list of values?" is exactly what the bare name is for.
+If you write your own type tests, ask "is this operand collection-shaped?"
+against any of the three spellings (`matches("collection<any>")` or
+`matches("collection")`), and ask "does this fit a list of values?" against
+`list<expression>` or `list<value>`.
 
 ### Which spelling, when
 
@@ -2432,24 +2551,24 @@ you do write one of the loose spellings, pick by role:
   missing>` for a specific hole type, or `list<any>` to leave the door
   fully open. Writing it down is what buys you checking — see below.
 
-### Why absence is not part of `unknown` (for the curious)
+### Why absence is not part of `expression` (for the curious)
 
-The distinctions above rest on one deliberate choice that can surprise
-readers arriving from TypeScript, where `unknown` is the absolute top type
-and happily includes `null`/`undefined`. Here it is not: `unknown` means
-"some **value**, not yet determined *which*" — it is epistemic about which
-value a position holds, not about whether it holds one. `Missing` is not a
-value the position might turn out to contain; it is the positioned absence
-of one. "I don't know which value this is" and "there may be no value here
-at all" are different claims, and the type lattice keeps them apart: `any`
-is the genuine top (anything, absence included); `unknown` is the top of
-the values. (`error`, the type of an invalid expression, is likewise
-outside `unknown`: it is a subtype only of itself and `any`.)
+The distinctions above rest on one deliberate choice: a **content contract**
+(`expression`, `value`, `number`, `list<integer>`) never includes absence
+unless it says so. `Missing` is not a value a position might turn out to
+contain; it is the positioned absence of one. The inference marker
+`unknown` is a different kind of thing: it says nothing about the position
+yet, so it excludes nothing, and a declaration that uses it is refined by
+what is assigned (`xs: list<unknown> := [1, Missing]` reports
+`list<integer | missing>`, the hole included). An unresolved type is never
+read as evidence either way: a `Tuple` slot or a callback result typed
+`unknown` does not prove that it can hold `Nothing`, and it does not prove
+that it cannot.
 
-What this buys is that **absence is opt-in** — the `Option`/`Maybe`
-discipline rather than nullable-by-default. An absent case enters a type
-only when someone writes it down, and then every consumer is forced to see
-it:
+What this buys is that **absence is opt-in for a contract** — the
+`Option`/`Maybe` discipline rather than nullable-by-default. An absent case
+enters a contract only when someone writes it down, and then every consumer
+is forced to see it:
 
 - `RangeOf` returns `range | nothing` — the not-found case is *in the
   type*, so code that feeds the result to `Slice` is checked against it.
@@ -2459,13 +2578,10 @@ it:
 - A parameter, lambda slot, or inferred type that never mentions absence
   genuinely never receives it silently.
 
-If `missing` were a subtype of `unknown`, every unannotated parameter and
-every inferred slot would admit `Missing` without anyone having said so —
-`| missing` annotations would become decoration, and `unknown` would be
-nullable-by-default. Structurally, the absence markers (with `error`) are
-also precisely what separates `any` from `unknown`: remove them from the
-gap and the two tops would denote the same set of values, collapsing the
-`list` / `list<any>` distinction along with them.
+If `missing` were a subtype of `expression`, every parameter declared with
+a content contract would admit `Missing` without anyone having said so,
+and `| missing` annotations would become decoration. The inference marker
+is where "not said yet" lives; the contracts are where "said" lives.
 
 ## Defining New Types
 
@@ -2549,6 +2665,126 @@ ce.type("tuple<x: integer, y: integer>")
   .matches("pointData");
 // ➔ true
 ```
+
+### Kind Types
+
+A **kind type** is the type of the values of a **value kind**: values that
+are not numbers, but that have their own arithmetic, such as an element of a
+finite field or a measurement with an uncertainty. The operator that
+constructs the values gives that arithmetic with the `arithmetic` field of
+its definition (see
+[Declaring a Value Kind](/compute-engine/guides/augmenting/#declaring-a-value-kind-values-with-their-own-arithmetic)).
+
+A kind type is one of:
+
+- a primitive type of the library: `residue`, the type of a residue class,
+  `measurement`, the type of a `Measurement`, `quantity`, the type of a
+  `Quantity`, or `enclosure`, the type of an `Enclosure`;
+- a nominal type whose definition is exactly `value`, declared with
+  `{ mint: false }`:
+
+```js
+ce.declareType("gf8", "value", { mint: false });
+```
+
+A nominal type is otherwise opaque (see
+[Nominal Types Are Opaque](#nominal-types-are-opaque)). A nominal type
+whose definition is exactly `value` has two more rules, which the engine reads
+from the definition, before any operator of the kind is declared:
+
+- it is a subtype of `value`, and so of `expression` and `any`. A parameter
+  or a symbol typed `value` accepts its values:
+
+```js
+ce.type("gf8").matches("value");      // ➔ true
+ce.type("gf8").matches("expression"); // ➔ true
+ce.type("value").matches("gf8");      // ➔ false
+```
+
+- it is disjoint from every other type except `value`, `expression`, `any`
+  and `unknown`: a value of type `gf8` is never a number, a string, a
+  collection or a value of another kind type. A symbol declared `gf8` refuses
+  a number, and `gf8 | integer` is a union, not a number type:
+
+```js
+ce.declare("t", "gf8");
+ce.assign("t", 2);
+// ➔ throws: The value "2" of type "2" is not compatible with the type "gf8"
+ce.type("gf8 | integer").matches("number"); // ➔ false
+```
+
+These are the rules of `residue`, `measurement`, `quantity` and
+`enclosure`. The engine
+uses them to keep the number rules away from a value of the kind: `t/t` is
+not `1` when `t` has a kind type, and `M - M` is not `0` for a measurement
+`M`.
+
+```js
+ce.box(["Measurement", 2.5, 0.1]).type;       // ➔ measurement
+ce.box(["Quantity", 2, "m"]).type;            // ➔ quantity
+ce.type("measurement").matches("real");       // ➔ false
+ce.declare("s", "real");
+ce.assign("s", ce.box(["Measurement", 2, 0.1]));
+// ➔ throws: The value "2.00 ± 0.10" of type "measurement" is not compatible
+//   with the type "real"
+```
+
+The library kinds differ in where their values are accepted:
+
+- a measurement is accepted wherever a number is accepted (a parameter
+  typed `real`, `number` or `complex`), and the result of such an operator
+  is typed `number | measurement`: `Floor(2.5 ± 0.1)` is `2`, and
+  `Sin(2.5 ± 0.1)` is a measurement. A parameter typed `integer`, or a
+  range of numbers, refuses it;
+- a quantity is accepted only by the arithmetic operators, the
+  comparisons, the operators with a `value` parameter, and the operators
+  whose parameter type names `quantity`: the 24 trigonometric functions
+  (`(complex | quantity) -> number`) and `Abs`
+  (`(complex | infinity | quantity) -> number`). `Abs(-2 m)` is typed
+  `quantity`, and `Sin(30 deg)` is typed `number`. `Floor(2 m)` is an
+  `incompatible-type` error;
+- an enclosure is an interval that holds one real, and it is accepted
+  wherever a real is accepted (a parameter typed `real`, `number` or
+  `complex`, not `integer`). The result of an operator whose image can be
+  empty is typed `enclosure | nan` (`Ln(Enclosure(-2, -1))` is
+  indeterminate), and the image of `Sin`, `Cos`, `Abs` and the other
+  functions whose image is never empty is typed `enclosure`. Under `.N()`,
+  the endpoints of an enclosure are machine doubles, rounded outward,
+  whatever `ce.precision` is: `Enclosure(0, Pi).N()` is
+  `Enclosure(0, 3.1415926535897936)` also with `ce.precision = 50`.
+
+**Why `{ mint: false }`.** By default, a type declaration also declares a
+[constructor](#type-constructors) of the same name. The values of a kind are
+made by the operator that declares its arithmetic (`GF8(3)`), so a second
+constructor, `gf8(3)`, would make values of the kind that have no
+arithmetic. The engine refuses an `arithmetic` field whose result type was
+declared without `{ mint: false }`.
+
+`{ mint: false }` has two uses, and they do not conflict. The first is a
+kind type: a nominal type defined as exactly `value`, whose head declares
+the `arithmetic` field. Only this form can have that field. The second is a
+nominal type with another definition, such as
+`ce.declareType("perm", "tuple<images: list<integer>>", { mint: false })`,
+whose constructor is an operator of the same name that you write and that
+checks its arguments. Such a type cannot have an `arithmetic` field unless
+you declare it again as a nominal type defined as exactly `value`.
+
+**What is refused.** An operator with an `arithmetic` field must have a kind
+type as its result type, optionally with the arms `nan`, `missing`,
+`nothing` and `error`. The engine refuses the declaration of the operator
+when the result type is a number type, `value`, `any` or another type that
+can hold a number, a union such as `residue | integer`, a nominal type
+defined as anything other than exactly `value` (`ce.declareType("m",
+"integer", { mint: false })`), a nominal type with type parameters, or a
+nominal type defined as another nominal type. After an operator is declared
+with a kind type, that type name can be declared again only as a nominal
+type defined as exactly `value`, without type parameters and with
+`{ mint: false }`.
+
+A kind type is not a subtype of `real` or `number`, even for a kind whose
+values an operator accepts as numbers (the `admittedAs` option of the
+arithmetic). That option changes which operators accept the values, not the
+subtype relations: inference never reads a value of a kind as a number.
 
 ### Generic Type Aliases
 
@@ -2744,6 +2980,10 @@ ce.operatorInfo("bare");
 // ➔ undefined
 ```
 
+The type of a value kind is declared this way: its values are made by the
+operator that declares the arithmetic of the kind, not by a constructor of
+the type (see [Kind Types](#kind-types)).
+
 A type declaration claims **both** namespaces — the type name and the value
 name — atomically. If the global scope already has a value or operator of
 that name, the declaration fails and registers nothing; a system builtin is
@@ -2780,6 +3020,11 @@ number by accident. There are three sanctioned windows back in:
 A **structural alias** has no such reserve: an alias-typed operand unfolds to
 its definition, so `m + 1` with `m: meters` an alias of `number`, or
 `First(p)` with `p` an alias of a tuple, work as expected.
+
+Two kinds of nominal types are subtypes of a type that their definition
+names: a type defined as an object type is a subtype of `object`, and a type
+defined as exactly `value` is a subtype of `value` (a
+[kind type](#kind-types)).
 
 ### Equality of Nominal Values
 

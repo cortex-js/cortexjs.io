@@ -360,10 +360,14 @@ Use the `if`, `then`, and `else` keywords:
 
 ```live
 console.log(ce.parse("\\keyword{if} x > 0 \\keyword{then} x \\keyword{else} -x").json);
-// ➔ ["If", ["Greater", "x", 0], "x", ["Negate", "x"]]
+// ➔ ["If", ["Less", 0, "x"], "x", ["Negate", "x"]]
 ```
 
-The `else` branch is optional. When it is omitted and the condition is false,
+The canonical form writes `x > 0` as `["Less", 0, "x"]`; the `["Greater", "x", 0]`
+spelling appears only with `{canonical: false}`.
+
+The `else` branch is optional: `\keyword{if} x > 0 \keyword{then} x` parses to
+`["If", ["Less", 0, "x"], "x"]`. When it is omitted and the condition is false,
 no branch is selected and the result is `Missing` — the marker for a value the
 expression never supplied.
 
@@ -657,7 +661,6 @@ sections below.
 | Key | Description |
 | :--- | :--- |
 | `digits` | How many digits to display, and how they are counted. Use `"auto"` (round to the evaluation precision), `"max"` (all available digits), `{ significant: n }` (round to `n` significant figures), or `{ fractional: n }` (`n` digits after the decimal point). Default is `"auto"`. See [Significant Figures and Decimal Places](#significant-figures-and-decimal-places) below. |
-| `fractionalDigits` | **Deprecated — use `digits` instead.** The number of decimal places to use when formatting numbers. Use `"max"` to include all available digits and `"auto"` to use the same precision as for evaluation. Default is `"auto"`. A numeric value `n` is equivalent to `digits: { fractional: n }`. If both `digits` and `fractionalDigits` are provided, `digits` takes precedence. |
 | `notation` | The notation to use for numbers. Use `"auto"`, `"scientific"`, `"engineering"`, or `"adaptiveScientific"`. The `"adaptiveScientific"` mode uses scientific notation but avoids exponents within the range specified by `avoidExponentsInRange`. Default is `"auto"`. |
 | `avoidExponentsInRange` | A tuple of two values representing a range of exponents. If the exponent for the number is within this range, a decimal notation is used. Otherwise, the number is displayed with an exponent. Default is `[-6, 20]`. |
 | `digitGroupSeparator` | The LaTeX string used to separate groups of digits, for example thousands. Default is `"\,"`. To turn off group separators, set to `""`. If a string tuple is provided, the first string is used to group digits in the whole part and the second string to group digits in the fractional part. |
@@ -665,7 +668,7 @@ sections below.
 | `exponentProduct` | A LaTeX string inserted before an exponent, if necessary. Default is `"\cdot"`. |
 | `beginExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"10^{"`. |
 | `endExponentMarker` | A LaTeX string used as template to format an exponent. Default value is `"}"`. |
-| `truncationMarker` | A LaTeX string used to indicate that a number has more precision than what is displayed. Default is `"\ldots"`. |
+| `truncationMarker` | When parsing, a LaTeX string after the fractional digits that marks a number written with fewer digits than it has (`3.1415\ldots`). The serializer does not write it: use `digits` to choose how many digits are written. Default is `"\ldots"`. |
 | `repeatingDecimal` | The decoration around repeating digits. Valid values are `"auto"`, `"vinculum"`, `"dots"`, `"parentheses"`,  `"arc"` and `"none"`. Default is `"auto"`. |
 
 #### Notation Modes Comparison
@@ -704,7 +707,7 @@ The key difference: `"adaptiveScientific"` always computes the scientific notati
 
 ```live
 console.log(ce.parse("\\pi").N().toLatex({
-    fractionalDigits: 6,
+    digits: { fractional: 6 },
 }));
 ```
 
@@ -1570,6 +1573,80 @@ write:
 
 By using the `kind: "infix"` option, the parser will automatically insert the
 left-hand side of the operator as the first argument to the `parse` handler.
+
+### Binding a Name in a Custom Entry
+
+A custom entry that declares a name — a `with` clause, a loop form — reads
+its binder with `parser.binderSymbol()` and rewrites the body with
+`parser.rebindSubscripts()`, not with `parser.parseSymbol()`.
+
+The reason is the reading of a subscripted name. When `n` is declared as a
+list, `n_{0}` is the element access `At(n, 0)` everywhere, except in a
+binder position, where it is the new name `n_0`: the index of a sum, the
+variable of a comprehension, a local of a `where` clause. The built-in
+binders use the two methods below for that, and a custom entry needs them
+too, because `parseSymbol()` cannot read `n_{0}` as a new name when `n` is a
+list.
+
+- `parser.binderSymbol(expr)` gives the name that `expr` declares in a
+  binder position: a symbol is its own name, the `At(n, 0)` that the symbol
+  parser made from `n_{0}` is `"n_0"`, and any other expression gives
+  `null`.
+- `parser.rebindSubscripts(expr, names)` replaces, in `expr`, each such
+  element access whose name is in `names` with the name. A body that was
+  parsed before the clause (the left-hand side of an infix entry) is
+  rewritten the same way.
+
+```javascript
+// `expr \operatorname{with} a = v_1, b = v_2` parses to
+// `Block(Declare(a), Assign(a, v_1), Declare(b), Assign(b, v_2), expr)`
+{
+  symbolTrigger: "with",
+  kind: "infix",
+  associativity: "none",
+  precedence: 21,
+  parse: (parser, lhs, until) => {
+    const terminator = {
+      minPrec: 21,
+      condition: (p) => {
+        if (until.condition?.(p)) return true;
+        const saved = p.index;
+        p.skipVisualSpace();
+        const isComma = p.peek === ",";
+        p.index = saved;
+        return isComma;
+      },
+    };
+    const names = new Set();
+    const block = [];
+    do {
+      parser.skipVisualSpace();
+      // The binding is read as an expression: with `n` a list, the
+      // left-hand side of `n_{0} = 2` is `At(n, 0)`, which
+      // `binderSymbol()` reads as the new name `n_0`.
+      let binding = parser.parseExpression(terminator);
+      if (binding === null || binding[0] !== "Equal") return null;
+      binding = parser.rebindSubscripts(binding, names);
+      const name = parser.binderSymbol(binding[1]);
+      if (name === null) return null;
+      names.add(name);
+      block.push(["Declare", name], ["Assign", name, binding[2]]);
+      parser.skipVisualSpace();
+    } while (parser.match(","));
+    if (block.length === 0) return null;
+    // The body was parsed before the clause: its `n_{0}` is `At(n, 0)`
+    // until it is rebound to the local.
+    block.push(parser.rebindSubscripts(lhs, names));
+    return ["Block", ...block];
+  },
+}
+```
+
+With this entry and `n` declared `list<number>`,
+`n_{0}+1\operatorname{with}n_{0}=2` parses to
+`["Block", ["Declare", "n_0"], ["Assign", "n_0", 2], ["Add", "n_0", 1]]`
+and evaluates to `3`; `n_{1}` outside the clause is still the first element
+of `n`.
 
 ### Serializing
 
