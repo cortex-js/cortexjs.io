@@ -75,7 +75,8 @@ its declared type and any in-scope assumptions apply — an assigned value does
 Any *other* symbol in the expression is free and resolves normally: with
 `a := 3` as well, `["D", ["Multiply", "a", ["Power", "x", 2]], "x"]` is `6x`.
 To evaluate the result at the variable's value, evaluate it again or substitute
-explicitly.
+explicitly: `["D", ["Power", "x", 2], "x"]` with `subs({x: 5})` is the
+derivative at 5, an `EvaluateAt` expression which evaluates to `10`.
 :::
 
 <b>Lagrange Notation (Prime Notation)</b>

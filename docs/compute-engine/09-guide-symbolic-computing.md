@@ -346,6 +346,20 @@ console.log("Substitute x -> 3\n", expr.json);
 console.log("Numerical Evaluation:", expr.N());
 ```
 
+A substitution replaces the **free** occurrences of a symbol. A name bound by
+an operator is not replaced where that operator binds it: the index of a
+`Sum`, the parameter of a function literal, the variable of a definite
+integral, a local of a `Block`. So `j + \sum_{j=1}^{3} j` with `j` replaced by
+`10` is `10 + \sum_{j=1}^{3} j`.
+
+The variable of a derivative, of a series or of an indefinite integral is free
+in the result (the derivative of `x^2` is a function of `x`), so it is
+replaced, and the result is the value at that point rather than a derivative
+of a number: `\frac{d}{dx}x^2` with `x` replaced by `3` is
+`\left.\left(\frac{d}{dx}x^2\right)\right|_{x=3}` (an `EvaluateAt`
+expression), which evaluates to `6`. The replacement of any other symbol is
+put inside the derivative before it is computed.
+
 ## Other Symbolic Manipulation
 
 There are a number of operations that can be performed on an expression:

@@ -654,3 +654,51 @@ without naming the variable: `x^2 = 4 \rhd \operatorname{Solve}` solves for
 `x`.
 
 </FunctionDefinition>
+
+<FunctionDefinition name="EvaluateAt">
+
+<Signature name="EvaluateAt">_function_, _point_</Signature>
+
+<Signature name="EvaluateAt">_function_, _lower_, _upper_</Signature>
+
+The value of _function_ at _point_, or, with two points, the difference
+`function(upper) − function(lower)`, the bracket of the fundamental theorem of
+calculus.
+
+<Latex value="\left.\left(x^2\right)\right|_{x=3}"/>
+
+```json example
+["EvaluateAt", ["Function", ["Power", "x", 2], "x"], 3]
+// ➔ 9
+```
+
+<Latex value="\left.\left(\frac{x^3}{3}\right)\right|_{x=0}^{1}"/>
+
+```json example
+["EvaluateAt", ["Function", ["Divide", ["Power", "x", 3], 3], "x"], 0, 1]
+// ➔ 1/3
+```
+
+The _function_ is applied as `Apply` applies it: a function literal, a symbol
+whose value is a function, or an expression, which is read as a shorthand
+function literal of its free variables. A point that is a `Tuple` with one
+coordinate per parameter gives the value at that point of several variables:
+`\left.\left(xy\right)\right|_{x=1, y=2}` is
+`["EvaluateAt", ["Function", ["Multiply", "x", "y"], "x", "y"], ["Tuple", 1, 2]]`,
+which is `2`. A point is never a partial application: with fewer points than
+the function requires, the expression stays as written.
+
+When the bracket does not name the variable and the expression has several
+free variables, the point or the bounds are for `x`: `\left.kx\right|_{2}^{5}`
+is `3k`. Write `\left.\left(kt\right)\right|_{t=2}^{5}` to name another
+variable.
+
+The variable of a derivative, of a series or of an indefinite integral is
+free in its result, so `subs()` of that variable produces an `EvaluateAt`:
+`["D", ["Power", "x", 2], "x"]` with `x` replaced by `3` is the derivative
+at 3, `["EvaluateAt", ["Function", ["D", ["Power", "x", 2], "x"], "x"], 3]`,
+which evaluates to `6`. A value with no closed form stays an unevaluated
+`EvaluateAt`. The value of a series at a point keeps its `BigO` remainder,
+which is `NaN` under `.N()`: wrap the series in `Normal` to drop it.
+
+</FunctionDefinition>
