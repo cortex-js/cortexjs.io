@@ -333,6 +333,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "compute-engine/97a-reference-group-theory",
+          className: "reference-icon",
+        },
+        {
+          type: "doc",
           id: "compute-engine/reference-trigonometry",
           className: "reference-icon",
         },
