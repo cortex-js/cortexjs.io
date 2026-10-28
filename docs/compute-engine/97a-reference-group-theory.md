@@ -24,7 +24,7 @@ const ce = new ComputeEngine();
 const options: GroupTheoryLoadOptions = { maxChainWork: 50_000_000 };
 const report: GroupTheoryLoadReport = loadGroupTheory(ce, options);
 
-const group = ce.box([
+const group = ce.expr([
   'PermutationGroup',
   ['List',
     ['Permutation', ['List', 2, 1]],

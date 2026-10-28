@@ -11,6 +11,130 @@ description: "Release notes for the Compute Engine: new features, behavior chang
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### New Features
+
+- **Permutation groups, an optional entry:
+  `@cortex-js/compute-engine/group-theory`.** `loadGroupTheory(ce)` adds 26
+  operators to an engine: permutations and their products, inverses, powers,
+  conjugates (b⁻¹ab) and commutators (a⁻¹b⁻¹ab); groups given by generators
+  on an explicit action `PermutationAction(n)`; orbits and transversals; the
+  exact order, membership, point stabilizers, and the subgroup, index,
+  equality, normality and abelian queries. The order and membership queries
+  use an incremental Schreier–Sims algorithm: the order of S₁₀₀, generated
+  by a transposition and a 100-cycle, takes about 30 ms. The loader options
+  set resource limits, and a query can lower them with a named `options`
+  dictionary. A query that reaches a limit returns an error such as
+  `Error("permutation-chain-orbit-edge-limit")`, never a partial list or a
+  false answer. An engine that does not load the entry does not have these
+  operators. Contributed by @KingArth0r (#482).
+
+### Behavior Changes
+
+- **The join of types does not depend on the order of its operands.**
+  `widen(nan, real, missing)` gave `missing | number` and
+  `widen(missing, nan, real)` gave `missing | nan | real`. Both now give
+  `missing | nan | real`: `nan` beside another number type is kept as its
+  own arm (`widen(real, nan)` is `nan | real`, not `number`, which also admits
+  the complex numbers). A finite type joined with an infinity is still
+  `number`. The join of `+oo` and `-oo` is `signed_infinity`, not `infinity`
+  (which also admits `~oo`), and a union of `+oo` and `-oo` no longer drops
+  `-oo`. `[NaN, 1]` has the element type `integer | nan` whether it is built
+  with `ce.box()` or `ce.list()`.
+- **A shader compile refuses a `vars` entry that names a variable of the
+  compiled code.** On `glsl` and `wgsl`, `vars: { a: 'k' }` beside a `Block`
+  that declares `k` (or a `Sum` index, a loop variable, a function parameter
+  named `k`) compiled to code that read the local `k` instead of the uniform.
+  The compile now fails with a message that names the entry and the symbol.
+  A self-mapped entry (`vars: { T: 'T' }`) is not affected.
+- **A list argument at a declared point parameter is refused by the compiled
+  code, as by the interpreter.** With `h(p: tuple<real, real>) := p[1] + p[2]`
+  and `g(p) := h(p) + 1`, `g([x, y])` is an `incompatible-type` error in the
+  interpreter, and compiled to code that gave a value. It now declines on
+  every target.
+- **A recursive function declared `function` is typed as the same function
+  assigned without the declaration.** With `G`, `S` and `R` declared
+  `function` and then assigned `G(a,b,c) = |\sin a| - 0.1`,
+  `S(a,b,c) = \max(G(a,b,c), c - 3)` and
+  `R(i) = \{i = 0: 0, R(i-1) + S(1, 2, R(i-1))\}`, `R(3)` and `R(x)` were
+  typed `any` (with a simpler `S`, a union of numbers, tuples and lists).
+  They are now typed `number`. A recursive list builder declared `function`
+  is typed `list<number>`, not `collection<number>`. The signature of such a
+  function is derived as for a declaration `(unknown) -> unknown`, which
+  checks the recursion.
+
+### Performance
+
+- **On the shader targets, a call that several user functions repeat is
+  computed once in more cases.** A large expansion was kept by reference: in
+  Tycho's `voronoi-diagram` document, `B`, `H`, `u`, `v` and `Z` each called
+  `F(x, y)` and the same sixteen weight terms again, so WebGPU drew the row
+  about 2.1 times slower than WebGL. The function bodies are now written into
+  the main body, where each shared call is computed once per pixel. The
+  shader is also smaller (10.8 KB of WGSL instead of 12.3 KB). The size check
+  that counts the code written is unchanged.
+- **A common subexpression of a restriction's condition is shared with its
+  value.** `T_3(t)\{-0.8 < \cos(T_3(t))\}` (`When(T_3(t), …)`) computed
+  `T_3(t)` twice on every target; it is now computed once. On the shader
+  targets, a call that reads a uniform passed with a renamed `vars` entry
+  (`vars: { s: 'u_s' }`) can now be shared too.
+- **More shader operands use the built-in `sin`, `cos`, `sign`, `max`, `min`
+  and `clamp` instead of the NaN-safe helpers**: a product whose factors have
+  declared ranges (`sin(k t)` with `k: real<0..10>`, `t: real<-7..7>`), a
+  product with a `sin`, `cos` or `tanh` factor, a symbol with an assigned
+  value that is compiled as that value, and a `vec2` to `vec4` operand whose
+  components are all finite for certain (`sin([t, k, 1])` with `t`, `k`
+  declared `real`). A shader that calls only `gcd` no longer carries the
+  `lcm` helper.
+- **A function that reads a symbol holding a long symbolic expression is
+  faster to call** (ROADMAP CE-566). With `X(l) := C_0[l]` and `C_0` assigned
+  a `Sum` over a chain of lazy `Map` and `Unique` collections, each call of `X`
+  derived the type of that chain again, although nothing it reads had changed.
+  The type is now remembered until a binding it reads changes: 1 495 calls
+  took 350 ms instead of 1 746 ms.
+
+### Resolved Issues
+
+- **A shader compile no longer writes out a chain of user functions whose
+  branches all call the function below.** With
+  `h_k(x) = \{x > c_k: 2h_{k-1}(x), 3h_{k-1}(x)\}` (or a `Which` whose later
+  conditions call it), the `glsl` and `wgsl` targets wrote the function
+  bodies into the main body, where a call shared by two branches is written
+  once in each, so the shader doubled at each level: 2.5 MB of GLSL and
+  388 s of compilation at depth 14. Such a chain now stays a set of shader
+  functions that call each other.
+- **Compiled code gave wrong values for a user function called with a list
+  argument at a parameter that the interpreter binds whole.** With `R`
+  declared `function` and assigned `(V, θ) ↦ [Σ V·[cos θ, -sin θ], …]`,
+  `R([x, y] + [-0.57, 2.8], φ)` gave `NaN` on `javascript` and an empty
+  interval on `interval-js`; the interpreter gives the value. The compiler read
+  the parameter type that the body's use had narrowed (`number`), not the
+  function's own signature. `javascript` now gives the interpreter's value,
+  `glsl` and `wgsl` compile a copy of `R` with a `vec2` parameter, and
+  `interval-js` declines instead of giving a wrong interval.
+- **A recursive function inside `Mod` declined on `interval-js`.**
+  `f(x, n) := 1/\operatorname{mod}(f(x, n-1), 1)` with `f(x, 0) = x` declined
+  with "an object-domain absent ('missing') position". It compiles again.
+- **A call through a parameter typed only by index reads compiles.** In
+  `r(p) := (T + \lfloor p[1] \rfloor) \max(0, 0.5 - l(f(p)))` with
+  `f(q) := \operatorname{mod}(q, 1) - 0.5`, the reads `p[1]` typed `p` as a
+  point, and the compiler passed it to `f` as a point, which `Mod` minus a
+  number refuses. Such a type does not prove a point: the call is now compiled
+  for the argument's own type (a list), as the interpreter evaluates it.
+  `d(B(A(P(x, y))))` in the Tycho document `ra1p9naofs` compiles on
+  `javascript` and gives the interpreter's value.
+- **On `interval-js`, a user function whose invariant part is subtracted
+  computed it on every term.** In `\sum_{i=1}^{16} n(x, y, i)` with
+  `n(x, y, i) := \exp(\ldots - F(x, y))`, `F(x, y)` was computed 17 times per
+  sample instead of once.
+- **A letter that names a library operator is a free variable in an
+  expression parsed in a scope.** `ce.parse('y=x+N', { scope: ce.createScope() })`
+  had the unknowns `["x", "y"]`, and the same for `D`; read outside the scope,
+  the name `N` found the library operator `N`. It now has `["N", "x", "y"]`,
+  as the expression parsed without a scope, and as `evaluate()` and `subs()`
+  already treated it.
+
 ## 0.171.0 _2026-10-27_
 
 ### Behavior Changes
@@ -236,6 +360,15 @@ import ChangeLog from '@site/src/components/ChangeLog';
   midpoint of its interval, and would give a number to a symbol typed
   `enclosure`. The other value kinds (`Measurement`, `Quantity`) keep the
   fallback.
+- **The target of an `Assign` outside a `Block` is a free variable.** The
+  target is a write to a symbol of the enclosing scope, so `unknowns` and
+  `freeVariables` list it. Before, any `Assign`, `Declare` or `DefineFunction`
+  operand made its target local to the node that held it. Example:
+  `y=(k\coloneq2)` (`Equal(y, Assign(k, 2))`) had the free variables `["y"]`
+  and now has `["k", "y"]`, as `Assign(k, 2)` alone always had. A `Block`
+  still keeps the names it assigns or declares local: `(k\coloneq2; kx)` has
+  the free variable `x` only. `If(z > 0, Assign(z, 5), 0)` lists `z`. The
+  `subs()` of such a target is still open (ROADMAP CE-537).
 
 ### Features
 
