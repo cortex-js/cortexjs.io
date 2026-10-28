@@ -1558,6 +1558,31 @@ console.log(f.run({
 // ➔ [6, 7, 8]  // u*v + w - z = [2,3,4] + [5,6,7] - [1,2,3]
 ```
 
+### Runtime Helpers for Generated JavaScript
+
+The JavaScript that the `javascript` target writes calls helper functions on
+an object named `_SYS`. Most of them are internal: their names and behavior
+can change in any release. Two of them are a stable contract, for a host that
+writes its own code for an indexing operation (with a `compile` handler on an
+operator definition, or an `operators` override of `At`):
+
+<div className="symbols-table">
+
+| Helper | Description |
+| :--- | :--- |
+| `_SYS.atNoWrap(base, index)` | The element of `base` at the 1-based position `index`, or a list of elements when `index` is a list of positions. A position that is not an integer from 1 to the length of `base` reads `NaN` when `base` holds numbers (or is empty), and `undefined` otherwise: no wrap-around, and no negative index from the end. A `base` that is not an array reads `NaN`. |
+| `_SYS.atMask(base, mask)` | When `mask` is a list of booleans (a member can also be a hole: `undefined`, or `NaN` for a condition that could not be decided), the elements of `base` at the positions where `mask` is `true`, in order. A hole keeps nothing, and the two lists need not have the same length: only the positions they share are read. Any other `mask` (a position, a list of positions, an empty list) is read as by `_SYS.atNoWrap`, so one call serves an index that can be either at run time. A numeric typed array is accepted as `base`. |
+
+</div>
+
+```js
+// The code a compile handler for `At` could write for `L[k]`:
+`_SYS.atNoWrap(${compile(base)}, ${compile(index)})`
+```
+
+These two helpers keep their names and behavior. Do not call any other `_SYS`
+member from your own code.
+
 ## Advanced: Custom Compilation Targets
 
 For advanced use cases, you can create completely custom compilation targets by using the exported `CompileTarget` interface and `BaseCompiler` class.
@@ -1666,6 +1691,344 @@ console.log(jsResult.run({ x: 3, y: 4 })); // → 25
 const glslResult = compile(expr, { to: 'glsl' });
 console.log(glslResult.code); // → pow(x, 2.0) + pow(y, 2.0)
 ```
+
+### Lists in Shader Storage: the `storage` Option
+
+On the `glsl` and `wgsl` targets, a free symbol that holds a list of numbers
+is by default a shader array of a fixed length (`uniform float S[1600];`,
+`array<f32, 1600>`), which you declare and fill. The `storage` option says
+where the values of a list live instead, per symbol name. The option is
+checked on every target, but only the shader targets use it: an unknown
+kind, or a name that is not a free symbol of the expression, throws an error.
+
+| Kind | Targets | The list | Reads |
+| :--- | :--- | :--- | :--- |
+| `'sampler2D'` | `glsl`, `wgsl` | A fixed length (`list<number^1600>`), in a single-channel float texture that you declare and upload | `At(S, i)` |
+| `{ kind: 'storage-buffer', group, binding }` | `wgsl` | A length and contents that you change at run time, in a storage buffer that the compilation declares | `At(S, i)`, `Length(S)`, `Sum`, `Product`, `Max`, `Min`, `Mean` of `S` |
+
+#### Storage buffers (`'storage-buffer'`)
+
+A storage buffer holds a list whose contents and length change with no new
+compilation, for example the board of a game of life. Declare the symbol as
+a list of real numbers (`list<real>`), or of points of 2 to 4 real
+coordinates (`list<tuple<real, real>>`), and give the group and the binding
+of the buffer:
+
+```javascript
+ce.declare('S', 'list<real>');
+const r = compile(ce.parse('S_{N\\lfloor y\\rfloor + \\lfloor x\\rfloor + 1}'), {
+  to: 'wgsl',
+  storage: { S: { kind: 'storage-buffer', group: 1, binding: 0 } },
+});
+```
+
+The preamble of the result declares the buffer, and the code reads it
+through helpers that the preamble also declares:
+
+```wgsl
+struct CE_List_f32 { len: u32, data: array<f32> }
+@group(1) @binding(0) var<storage, read> S: CE_List_f32;
+```
+
+The struct is named by its element type (`CE_List_f32`, `CE_List_vec2f`,
+`CE_List_vec3f`, `CE_List_vec4f`), so the same name always has the same
+text. The `var` line is declared once per buffer. If you merge the
+preambles of several compilations into one shader, keep one copy of each
+struct and one `var` line per buffer.
+
+`r.storageBuffers` gives the layout of each buffer that the code reads:
+`{ symbol, name, struct, group, binding, element, components, lengthOffset,
+dataOffset, stride, minBindingSize }`. A `vars` mapping of the symbol to an
+identifier names the buffer (`vars: { S: 'board' }` declares `board`); a
+mapping to anything else is a decline, and so are two lists mapped to one
+name. `freeSymbolTypes.S.lowered` is the name of the struct.
+
+**The layout that you write.** The buffer starts with the logical length of
+the list, a `u32` at byte 0. The elements follow, at the offset that the
+WGSL layout rules give to `data`, and with the stride of the element type:
+
+| Element | Element type | `dataOffset` | `stride` | `minBindingSize` |
+| :--- | :--- | ---: | ---: | ---: |
+| real number | `f32` | 4 | 4 | 8 |
+| point of 2 coordinates | `vec2f` | 8 | 8 | 16 |
+| point of 3 coordinates | `vec3f` | 16 | 16 | 32 |
+| point of 4 coordinates | `vec4f` | 16 | 16 | 32 |
+
+Element `k` (0-based) is at byte `dataOffset + k * stride`; the bytes
+between `len` and `dataOffset` are padding. A `vec3f` takes 16 bytes, not 12:
+write the three coordinates and leave the fourth `f32` unused. WebGPU
+requires room for one element in the binding, so the smallest buffer is
+`minBindingSize` bytes, also for an empty list.
+
+**A change of length** is one 4-byte write at offset 0
+(`device.queue.writeBuffer(buffer, 0, new Uint32Array([len]))`), with no new
+buffer, bind group or compilation. The buffer can hold more elements than
+`len`; `len = 0` is the empty list.
+
+**Index rules.** `At(S, i)` is 1-based and a negative index counts from the
+end, as on the other targets. An index of 0, a non-integer, `NaN`, an
+infinity, or an index whose absolute value is above `len` gives `NaN` (a
+vector of `NaN` for a point). A `len` larger than the number of elements the
+buffer holds makes every read of the list give `NaN`, never a read outside
+the buffer; `Length(S)` is then the number of elements the buffer holds, so
+that a loop bounded by `Length(S)` stops after them (a wrong `len` of 2³¹
+would otherwise run until the GPU times out). The index and the length are
+`f32` values in the shader, which are exact integers up to 2²⁴, so a list
+can have at most 16,777,216 (about 16.7 million) elements.
+
+**What reads the buffer.** `At(S, i)`; `Length(S)` (the `len` header);
+`Sum`, `Product`, `Max`, `Min` and `Mean` of `S` alone (a list of numbers
+only); and a sum or product whose bound is the length, such as
+`\sum_{k=1}^{\operatorname{Length}(S)} f(S_k, k)`, which is a loop over
+`len`. Each reduction runs once per shader invocation: with 22,500 elements,
+a reduction in a fragment shader reads 22,500 values per pixel. On the empty
+list, the values are those of the `javascript` target: `Sum` is 0,
+`Product` is 1, and `Max`, `Min` and `Mean` are `NaN`. An expression that
+uses the whole list in another way (`S + 1`, `2S`, `Max(S, 3)`, `Map`) has no
+shader form, because its length is known only at run time, and declines.
+
+The `glsl` target declines a storage buffer (WebGL2 has none): use
+`'sampler2D'` there. A list of complex numbers, booleans, strings or lists
+declines too.
+
+#### Long lists on `wgsl` with no `storage` hint
+
+WGSL guarantees a shader function only 8,192 bytes of function-scope
+variables, and an index read of an array value copies the array into such a
+variable. So on `wgsl`, a read of a free list symbol whose copy would need
+more than 8,192 bytes (more than 2,048 numbers, 1,024 points of 2
+coordinates, or 512 points of 3 or 4 coordinates) indexes the list where it
+is declared, with no copy: `At(S, i)` is `_gpu_at_S_22500(i)`, a helper whose
+body reads `S`. The symbol, or the identifier that `vars` maps it to, must
+then be a `var<storage>` declaration, not a parameter or a local of your own
+function. A `var<private>` does not do: WGSL gives `private` variables the
+same 8,192-byte guarantee as function variables. Nor does a `const` array,
+whose constructor is guaranteed only 2,047 elements. A read that would copy
+more than 8,192 bytes and cannot read in place (for example a `vars`
+mapping to a struct field, `u.S`) declines, with a message that names
+`'storage-buffer'`. So does a body that writes such an input, because it
+reads and writes a local copy of it. A storage buffer is the recommended form for a long
+list. A shorter list keeps the copy, which is valid wherever you declare it.
+
+### WGSL Field Functions for Compute Shaders
+
+`WGSLTarget.compileFieldFunction()` compiles a scalar expression to a WGSL
+function that a compute shader of your own calls at each point of a grid, for
+example to sample an implicit surface `f(x, y, z) = 0` on a 3-D grid before
+meshing it. The Compute Engine supplies the function, the helper functions it
+calls and the layout of its parameters. You supply the entry point, the
+dispatch, the buffers and everything that reads the values.
+
+```javascript
+import { ComputeEngine, WGSLTarget } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+for (const s of ['x', 'y', 'z', 'c']) ce.declare(s, 'real');
+
+const wgsl = new WGSLTarget();
+const gyroid = wgsl.compileFieldFunction(
+  ce.parse('\\sin(x)\\cos(y) + \\sin(y)\\cos(z) + \\sin(z)\\cos(x) - c'),
+  { name: 'gyroid', coordinates: ['x', 'y', 'z'] }
+);
+```
+
+The result:
+
+- `function`: the declaration of the field function, with the coordinates as
+  `f32` arguments in the order of `coordinates`:
+
+  ```wgsl
+  fn gyroid(x: f32, y: f32, z: f32) -> f32 {
+    return -ce_params.c + sin(z) * cos(x) + sin(x) * cos(y) + sin(y) * cos(z);
+  }
+  ```
+
+- `paramsStructSource`: the declaration of the parameter struct type,
+  `struct CEParams { c: f32, }`. Every free symbol that is not a coordinate
+  is a **parameter**, a field of this struct, read as `ce_params.<name>`.
+- `params`: the fields of the struct, each with its `name`, `ceType`,
+  `wgslType`, byte `offset` and `size` (and `length` for a list).
+- `paramsSize`: the size of the parameter buffer in bytes, a multiple of 16.
+- `helpers`: the other declarations that the function needs, by name: the
+  shared helpers (`_gpu_sin`, `_gpu_pow2`, …), the readers of list
+  parameters, and the user-defined functions that the expression calls. A
+  user-defined function `h` is named `_fn_<k>_<name>_h`, where `k` is the
+  number of characters of `name` (`_fn_6_fieldA_h`), so that two field
+  functions never give one name.
+- `warnings`: as `compile()` gives them, for example
+  `float32-unsafe-argument`.
+- `storageBuffers`: when the function reads a list in a storage buffer, the
+  layout of each buffer, as `compile()` gives it (see
+  [Storage buffers](#storage-buffers-storage-buffer)).
+
+The names are options: `paramsStruct` (default `'CEParams'`) and
+`paramsVariable` (default `'ce_params'`). The options `storage` and
+`constantFold` are those of `compile()`. A symbol with a `storage` hint is
+not a parameter: you supply the storage that the hint names.
+
+**Lists in a storage buffer.** A list with a `'storage-buffer'` hint is not a
+field of the parameter struct. The field function, and the user-defined
+functions it calls, read it with `At`, `Length`, `Sum`, `Product`, `Max`,
+`Min`, `Mean`, or a `\sum` to `\operatorname{Length}(S)`. Its declarations
+are in `helpers`: the struct type under its name (`CE_List_f32`), and the
+`var<storage, read>` line under the name of the buffer (`S`), so the module
+recipe below declares the buffer with no extra step. Its layout is in
+`storageBuffers`: bind the buffer at its `group` and `binding`, and write the
+`len` header and the elements as for `compile()`.
+
+```javascript
+const wave = wgsl.compileFieldFunction(
+  ce.parse('c + \\sum_{k=1}^{\\operatorname{Length}(S)} S_k \\sin(k x)'),
+  {
+    name: 'wave', coordinates: ['x', 'y', 'z'],
+    storage: { S: { kind: 'storage-buffer', group: 1, binding: 0 } },
+  }
+);
+// wave.helpers.S === '@group(1) @binding(0) var<storage, read> S: CE_List_f32;\n'
+// wave.storageBuffers[0] gives the offsets of `len` and of the elements.
+```
+
+**Parameters.** A real or integer scalar parameter is an `f32`. A list of
+`n` numbers, `n` at most 1024, (`list<number^n>`) is `array<vec4f, k>` with
+`k = ⌈n/4⌉`: element `i` (1-based) is the `f32` at byte `offset + 4(i − 1)`
+of the buffer. The function reads such a list only by position, with the
+rules of `At`: a negative index counts from the end, and `0`, an index that
+is not an integer and an index out of range give `NaN`. The scalars come
+first in the struct, in name order, then the lists in name order, each at a
+multiple of 16 bytes (the stride of `array<vec4f, k>` is 16 bytes, which a
+uniform buffer requires).
+
+A symbol with a value (`c := 0.5`) is a parameter too: the field function
+does not read its value in the engine, and you write the value to the buffer.
+A constant (`\pi`, or a symbol declared constant) is folded into the code,
+and a symbol whose value is a function is a user-defined function.
+
+**A parameter change is a buffer write.** The compiled text does not depend
+on the parameter values: write the new values to the buffer, with no new
+compilation and no new pipeline.
+
+**The host module.** Declare the uniform variable with the struct type, then
+add the struct, the helpers and the function:
+
+```javascript
+const N = 64;  // grid points on each axis
+const module = [
+  gyroid.paramsStructSource,
+  '@group(0) @binding(0) var<uniform> ce_params: CEParams;',
+  '@group(0) @binding(1) var<storage, read_write> values: array<f32>;',
+  ...Object.values(gyroid.helpers),
+  gyroid.function,
+  '@compute @workgroup_size(4, 4, 4)',
+  'fn main(@builtin(global_invocation_id) id: vec3u) {',
+  `  if (any(id >= vec3u(${N}u))) { return; }`,
+  `  let p = vec3f(-4.712) + vec3f(id) * (9.424 / ${N - 1}.0);`,
+  `  values[id.x + ${N}u * (id.y + ${N}u * id.z)] = gyroid(p.x, p.y, p.z);`,
+  '}',
+].join('\n');
+```
+
+Write the parameter buffer from the `params` offsets:
+
+```javascript
+const paramsBuffer = device.createBuffer({
+  size: gyroid.paramsSize,
+  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+});
+
+function writeParams(values) {
+  const data = new Float32Array(gyroid.paramsSize / 4);
+  for (const p of gyroid.params) {
+    const v = values[p.name];
+    if (p.length === undefined) data[p.offset / 4] = v;
+    else data.set(v, p.offset / 4);   // a list: one f32 per element
+  }
+  device.queue.writeBuffer(paramsBuffer, 0, data);
+}
+
+writeParams({ c: 0.3 });   // then dispatch again: no recompilation
+```
+
+When the function has no parameter, `params` is empty, `paramsSize` is `0`
+and `paramsStructSource` is `''`: do not declare the uniform variable.
+
+**Several fields in one module.** A helper name always has the same source
+text, so you can merge the `helpers` of several field functions by name.
+Give each field function its own `name`, struct and variable, and bind one
+uniform buffer for each. Two fields can read one storage buffer: give it the
+same hint (the same `group` and `binding`) in both, and its two `helpers`
+entries are then the same text under the same names. This is the one
+exception to the rule that a helper name always has the same text: the
+declaration of a buffer, under the name of the buffer, has the same text only
+for the same hint and the same element type (a list of numbers is a
+`CE_List_f32`, a list of 2-D points a `CE_List_vec2f`). If two fields give two
+different texts under one key, their hints disagree: treat that as an error,
+and give the buffer one hint in every field.
+
+```javascript
+const a = wgsl.compileFieldFunction(exprA, {
+  name: 'fieldA', coordinates: ['x', 'y', 'z'],
+  paramsStruct: 'AParams', paramsVariable: 'a_params',
+});
+const b = wgsl.compileFieldFunction(exprB, {
+  name: 'fieldB', coordinates: ['x', 'y', 'z'],
+  paramsStruct: 'BParams', paramsVariable: 'b_params',
+});
+const helpers = { ...a.helpers, ...b.helpers };
+const module = [
+  a.paramsStructSource,
+  b.paramsStructSource,
+  '@group(0) @binding(0) var<uniform> a_params: AParams;',
+  '@group(0) @binding(1) var<uniform> b_params: BParams;',
+  ...Object.values(helpers),
+  a.function,
+  b.function,
+  // … the entry point calls fieldA(…) and fieldB(…)
+].join('\n');
+```
+
+**Declines.** The result is `success: false` with a `diagnostic`
+(`{ code, kind, message }`) in these cases:
+
+- `compile(expr, { to: 'wgsl' })` declines the expression: for example a
+  recursive function, a `Random()` outside `WithRandomSeed`, or `Integrate`.
+  The diagnostic is the diagnostic of `compile()`.
+- A parameter is a boolean, text, a complex number, a list of unknown length,
+  or a list of more than 1024 elements (`code: 'unsupported-parameter'`).
+  Give a longer list, or a list of unknown length, a `'storage-buffer'`
+  hint. A storage buffer cannot hold complex numbers, text, booleans or
+  lists of lists either.
+- The parameter struct takes more than 65,536 bytes, the size of a uniform
+  buffer binding that WebGPU guarantees (`maxUniformBufferBindingSize`):
+  read the largest lists from storage buffers instead.
+- A list parameter is used other than by position, for example in `\max(P)`.
+- The body assigns a coordinate or a parameter: a field function cannot write
+  its inputs. A name that only the body assigns is a local, not a parameter.
+- The body has no value to return (a lone declaration or assignment).
+- A user-defined function reads a coordinate that it does not take as a
+  parameter (`h(t) := t + x` called as `h(y)`): a user-defined function is
+  declared outside the field function, where the coordinates do not exist.
+  Pass the coordinate as an argument.
+- A user-defined function declares the name of `paramsVariable` (a parameter
+  `p` with `paramsVariable: 'p'`). Choose another name.
+- The value is not a real scalar: a complex number, a point, a boolean or a
+  list (`code: 'unsupported-result'`, `kind: 'capability'`). The value of
+  each `Return` in the body must be a real scalar too.
+
+A wrong option throws an error: a name that is not a WGSL identifier
+starting with a letter, a reserved word, a predeclared WGSL function or type
+(`sin`, `max`, `vec4f`), which would hide the built-in that the helpers call,
+a name that starts with `CE_List_` (the prefix of the storage-buffer
+structs), or a `storage` hint on a coordinate. A storage buffer whose name
+(or `vars` mapping) is a predeclared WGSL name declines, here and in
+`compile()`.
+
+**Numerical limits.** The function computes in `f32` (about 7 decimal
+digits; integers are exact up to 2²⁴). An infinity or a `NaN` computed at run
+time is not guaranteed on a GPU (see [Non-Finite Results](#non-finite-results)),
+and `sin` and `cos` of a large argument lose accuracy. A parameter declared
+`real` is a promise that you write a finite value: the function then calls
+the built-in `sin` and `cos` of an operand that reads it, with no `NaN`
+test.
 
 ### Python/NumPy Target
 

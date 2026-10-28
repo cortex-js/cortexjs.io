@@ -115,6 +115,55 @@ The numeric form `withTimeLimit(500, fn)` stays valid and produces an
 **unlabelled** span: any timeout it owns has `attribution: undefined` and does
 not appear in `spans`. Supply a label only when you can act on it.
 
+### Step budgets
+
+`ce.withStepBudget({ steps, label }, fn)` runs `fn` with at most `steps` steps
+of engine work. A step is one of the engine's cancellation checks. The count
+for one computation on one engine state is the same on every machine, so a
+step budget stops at the same point whatever the speed or the load of the
+machine. It is an opaque unit, not a cost, and it is not comparable across
+engine versions: tune the budget by measuring, and keep a `withTimeLimit` span
+outside it. A spent budget throws a `CancellationError` with
+`cause: "step-budget"` and the span's `label` as its `attribution`.
+
+### Reading the state of the current span
+
+The engine checks its deadline only inside its own work (evaluation,
+canonicalization). Two read-only properties tell your own code where the
+current span stands:
+
+<div className="symbols-table">
+
+| Property | Description |
+| :--- | :--- |
+| `ce.timeRemaining` | Milliseconds left before the earliest deadline of the active spans, `0` or less once it has passed. `Infinity` when no active span has a time limit (outside any span, or in a step budget with no time limit around it). A spent step budget does not change it. |
+| `ce.stepBudgetSpent` | `true` when a step budget of the current span, or of an enclosing one, is spent. Always `false` outside any span. |
+
+</div>
+
+Both properties describe the span that is active in the current synchronous
+code. Code that runs after an `await` is outside the span, even when the
+`await` is inside the `withTimeLimit` callback: it reads `Infinity` and
+`false`.
+
+A loop of your own that runs inside a span, and does work the engine does not
+see (walking expressions, building a list), reads `ce.timeRemaining` to stop
+on time:
+
+```js
+ce.withTimeLimit({ ms: 50, label: "my-app:layout" }, () => {
+  for (const item of items) {
+    if (ce.timeRemaining <= 0) break;
+    layOut(item);
+  }
+});
+```
+
+When a budget is spent, code between the throw and the end of the span can
+catch the `CancellationError` and return a value anyway. That value is
+partial. Before you store a value computed in the span in a cache, read
+`ce.stepBudgetSpent`, so that the cache does not keep a partial value.
+
 ### `ce.timeLimit` has been removed
 
 Earlier versions armed a global, implicit deadline around every

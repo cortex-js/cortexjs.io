@@ -125,6 +125,35 @@ import { ComputeEngine } from
   "https://unpkg.com/@cortex-js/compute-engine?module";
 ```
 
+**To find a Compute Engine that the page has already loaded**, without
+importing it yourself, read the global slot
+`Symbol.for("io.cortexjs.compute-engine")`. This is for a component, such as a
+web component in its own bundle, that must work with a copy of the Compute
+Engine loaded by the page. When the main entry point
+(`@cortex-js/compute-engine`) loads, it stores an object in this slot:
+
+```js
+const global = globalThis[Symbol.for("io.cortexjs.compute-engine")];
+if (global?.ComputeEngine) {
+  const ce = new global.ComputeEngine();
+  console.log(global.version, ce.parse("1+1").evaluate().toString());
+}
+```
+
+The object holds `ComputeEngine` (the class), `version`, `LatexSyntax`,
+`LATEX_DICTIONARY`, `compile`, the type guards (`isExpression`, `isNumber`,
+`isSymbol`, `isFunction`, `isString`, `isCharacter`, `isTensor`,
+`isDictionary`, `isObject`, `isCollection`, `isIndexedCollection`), and the
+helpers `numericValue` and `sym`. Its TypeScript type is
+`ComputeEngineGlobal`. The type guards test the structure of an expression,
+so they work on an expression made by another copy of the bundle.
+
+The contract is additive: a later version can add a member, but a member keeps
+its meaning and is not removed. Test each member before you use it, since an
+older version can lack a newer one. When several copies load, the last one to
+load owns the slot. The main entry point and the Epsil entry point
+(`/epsil`) store it; `/core` and the other entry points do not.
+
 
 
 ## MathJSON Standard Library

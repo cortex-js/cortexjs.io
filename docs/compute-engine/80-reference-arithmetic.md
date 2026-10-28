@@ -1255,6 +1255,25 @@ coefficients of the factors are rational.
 // ➔ ["Multiply", ["Add", "x", -1], ["Add", "x", -2], ["Add", "x", -3]]  // (x-1)(x-2)(x-3)
 ```
 
+**Several variables, and terms that are not polynomials:** without `var`,
+`Factor` takes out a factor common to every term of a sum, and it treats a
+term that is not a polynomial, such as $$\sin(t)$$, as a variable of its own.
+The like terms of the result are collected, as when the sum is evaluated.
+
+```json example
+["Factor", ["Add", ["Multiply", "a", "x"], ["Multiply", "a", "y"]]]
+// ➔ ["Multiply", "a", ["Add", "x", "y"]]  // a(x+y)
+
+["Factor", ["Add", ["Multiply", "x", ["Sin", "t"]], ["Multiply", "y", ["Sin", "t"]]]]
+// ➔ ["Multiply", ["Add", "x", "y"], ["Sin", "t"]]  // (x+y)sin(t)
+
+["Factor", ["Add", ["Sin", "t"], ["Sin", "t"]]]
+// ➔ ["Multiply", 2, ["Sin", "t"]]  // 2sin(t)
+```
+
+A call of a function that is not declared, such as $$f(t)$$, is not taken out
+as a common factor, because its value could be a matrix.
+
 **Automatic use in sqrt simplification:**
 ```json example
 ["Sqrt", ["Add", ["Power", "x", 2], ["Multiply", 2, "x"], 1]]
@@ -1397,6 +1416,14 @@ Combine rational expressions into a single fraction with a common denominator.
 ```json example
 ["Together", ["Add", ["Divide", 1, "x"], ["Divide", 1, "y"]]]
 // ➔ ["Divide", ["Add", "x", "y"], ["Multiply", "x", "y"]]
+```
+
+The like terms of the result are collected, as when the sum is evaluated, also
+when there is nothing to combine:
+
+```json example
+["Together", ["Add", "a", "a"]]
+// ➔ ["Multiply", 2, "a"]
 ```
 
 </FunctionDefinition>
@@ -1646,6 +1673,15 @@ to `x` when there are several free variables and one of them is `x`.
 ```
 
 This represents $$ \frac{x^2 - 1}{x - 1} = x + 1 $$ after canceling the common factor $$(x - 1)$$.
+
+The like terms of the result are collected, as when the sum is evaluated. With
+no `var` and no single free variable, nothing is canceled, but the like terms
+are still collected:
+
+```json example
+["Cancel", ["Add", "a", "a"]]
+// ➔ ["Multiply", 2, "a"]
+```
 
 </FunctionDefinition>
 
