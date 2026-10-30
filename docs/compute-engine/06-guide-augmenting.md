@@ -309,9 +309,28 @@ ce.declare("double", { evaluate: ([x]) => x.mul(2) });
 // Throws: The symbol "double" is already declared in this scope
 ce.declare("double", { evaluate: ([x]) => x.mul(3) });
 
-// Changes the handler of the existing definition
+// Replaces the definition with one that has the new handler
 ce.declare("double", { evaluate: ([x]) => x.mul(3) }, { extend: true });
 ```
+
+An extension applies only to expressions boxed or parsed after it. It makes a
+new definition, and an expression that was boxed before keeps the definition
+it was bound to, including an expression stored as the value of a symbol:
+
+```js
+ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+const before = ce.box(["double", 3]);
+ce.assign("v", ce.box(["double", 3]));
+
+ce.declare("double", { evaluate: ([x]) => x.mul(3) }, { extend: true });
+
+before.evaluate();                    // ➔ 6: boxed before the extension
+ce.box("v").evaluate();               // ➔ 6: stored before the extension
+ce.box(["double", 3]).evaluate();     // ➔ 9: boxed after the extension
+```
+
+To use the new definition, box or parse the expression again after the
+extension.
 
 A patch that changes a flag of a library operator keeps the library handlers
 that do not depend on that flag. Removing `commutative` from `Add` or
@@ -1617,6 +1636,39 @@ ce.declare("bad", { signature: "(number) -> number", pure: true, drawsRandom: tr
 
 ce.declare("bad", { signature: "(number) random -> number", pure: true });
 // ➔ throws: the declared effects and the 'pure'/'drawsRandom' flags disagree
+```
+
+**Caching.** The engine can keep the value of an operator and use it again:
+when an expression uses the same subexpression in several places, and when a
+function is applied again to the same arguments. For an operator that you
+declare (with `ce.declare()`, in a library passed to the constructor, or with
+`ce.loadLibrary()`), and for a JavaScript function that you assign with
+`ce.assign()`, this happens only when you state its purity: `pure: true`,
+`effects: []`, or the `pure` keyword in the signature
+(`"(number) pure -> number"`). `drawsRandom: false` alone does not state
+purity. An operator that states nothing is evaluated at each occurrence, and
+no result computed while its handler ran is kept. The same rule applies to the
+collection handlers of such an operator, to a `subscriptEvaluate` handler, and
+to the JavaScript callbacks of a protocol implementation.
+
+State `pure: true` only when the result depends on nothing but the operands. A
+handler that reads the value of a symbol by name, keeps its own state, or
+reads the clock must not state it:
+
+```js
+let n = 0;
+ce.declare("Count", { signature: "() -> integer", evaluate: () => ce.number(++n) });
+const c = ce.function("Count", []);
+ce.function("List", [c, c, c]).evaluate();
+// ➔ [1, 2, 3]: not cached, each occurrence is evaluated
+
+ce.declare("Twice", {
+  signature: "(number) -> number",
+  pure: true,
+  evaluate: ([x]) => x.mul(2),
+});
+// Cached: the value of a Twice(x) that appears several times in an
+// expression can be reused instead of calling the handler again.
 ```
 
 For a function defined by a body rather than a JavaScript handler, effects are

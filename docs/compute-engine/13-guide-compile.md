@@ -833,6 +833,13 @@ console.log(g.run(3, 4));
 // ➔ 25
 ```
 
+Pass one argument for each parameter. The compiled function does not check the
+number of arguments, so that a call costs nothing more than a plain JavaScript
+call. With fewer arguments, the result is not defined: for example
+`compile("x \\mapsto x > 0").run()` returns `false`, where the interpreter has
+no value. Inside compiled code, a call with too few arguments is refused when
+the expression is compiled, and the interpreter evaluates it instead.
+
 Lambdas are useful when the variable name is user-specified rather than assumed
 by convention. A lambda like `\theta \mapsto 1 + \cos(\theta)` makes the
 parameter explicit, avoiding ambiguity.
@@ -1847,7 +1854,8 @@ The result:
   `struct CEParams { c: f32, }`. Every free symbol that is not a coordinate
   is a **parameter**, a field of this struct, read as `ce_params.<name>`.
 - `params`: the fields of the struct, each with its `name`, `ceType`,
-  `wgslType`, byte `offset` and `size` (and `length` for a list).
+  `wgslType` (`f32`, `vec2f`, `vec3f`, `vec4f` or `array<vec4f, k>`), byte
+  `offset` and `size` (and `length` for a list).
 - `paramsSize`: the size of the parameter buffer in bytes, a multiple of 16.
 - `helpers`: the other declarations that the function needs, by name: the
   shared helpers (`_gpu_sin`, `_gpu_pow2`, …), the readers of list
@@ -1888,20 +1896,91 @@ const wave = wgsl.compileFieldFunction(
 // wave.storageBuffers[0] gives the offsets of `len` and of the elements.
 ```
 
-**Parameters.** A real or integer scalar parameter is an `f32`. A list of
+**Parameters.** A real or integer scalar parameter is an `f32`. A
+parameter declared `integer` is a promise that you write an integral value:
+the field function relies on it (`\lfloor a \rfloor` compiles to
+`ce_params.a`). A list of
 `n` numbers, `n` at most 1024, (`list<number^n>`) is `array<vec4f, k>` with
 `k = ⌈n/4⌉`: element `i` (1-based) is the `f32` at byte `offset + 4(i − 1)`
 of the buffer. The function reads such a list only by position, with the
 rules of `At`: a negative index counts from the end, and `0`, an index that
-is not an integer and an index out of range give `NaN`. The scalars come
-first in the struct, in name order, then the lists in name order, each at a
-multiple of 16 bytes (the stride of `array<vec4f, k>` is 16 bytes, which a
-uniform buffer requires).
+is not an integer and an index out of range give `NaN`.
 
-A symbol with a value (`c := 0.5`) is a parameter too: the field function
-does not read its value in the engine, and you write the value to the buffer.
-A constant (`\pi`, or a symbol declared constant) is folded into the code,
-and a symbol whose value is a function is a user-defined function.
+A **point**, a tuple of 2, 3 or 4 real numbers, is a `vec2f`, `vec3f` or
+`vec4f`. Its type comes from its declaration (`tuple<real, real, real>`) or,
+for a symbol that is not declared, from its value
+(`ce.assign('A', ['Tuple', 1, 2])`). A tuple of integers is a vector of `f32`
+too. A component declared `number` (`tuple<number, number>`) is read as a
+real number, as for a list of type `list<number^n>`: you can write only real
+values into the buffer. A component declared `complex` declines. The
+function reads the point as a WGSL vector, so you can use it whole or by
+component:
+
+```javascript
+// x, y, z and c are declared 'real', as in the first example. A coordinate
+// that is not declared is read with a NaN test: `_gpu_sin(y)`, not `sin(y)`.
+ce.assign('A', ce.box(['Tuple', 1, 2]));
+ce.assign('B', ce.box(['Tuple', 0.5, -1, 2]));
+const field = wgsl.compileFieldFunction(
+  ce.parse('c + \\operatorname{distance}((x,y,z),B) + A.x \\sin(y) - B.z'),
+  { name: 'field', coordinates: ['x', 'y', 'z'] }
+);
+// field.function:
+//   return ce_params.c + sin(y) * ce_params.A.x + -ce_params.B.z
+//     + distance(vec3f(x, y, z), ce_params.B);
+// field.paramsStructSource: struct CEParams { c: f32, A: vec2f, B: vec3f, }
+// offsets: c 0, A 8, B 16; paramsSize 32
+```
+
+`A.x` (or `A_1`) reads the first component, and `\operatorname{distance}`,
+`|A|`, `\operatorname{Norm}`, `\operatorname{Dot}`, the sum and difference of
+points, and `At(A, i)` work as in `compile()` for a symbol declared as a
+point. A point with 1 or more than 4 components, or with a component that is
+not a real number (a complex number, `NaN` or a list), declines.
+
+The scalars come first in the struct, in name order, then the points in name
+order, then the lists in name order. Each field starts at the next multiple
+of its alignment, as the WGSL layout rules require: an `f32` at a multiple of
+4 bytes, a `vec2f` (8 bytes) at a multiple of 8, a `vec3f` (12 bytes) and a
+`vec4f` (16 bytes) at a multiple of 16, and a list at a multiple of 16 bytes
+(the stride of `array<vec4f, k>` is 16 bytes, which a uniform buffer
+requires). Read the offsets from `params`: the padding between two fields is
+not written.
+
+A symbol whose value is a numeric constant is a parameter too: a number
+(`c := 0.5`), or a tuple or list of numbers (`A := (1, 2)`, `L := [1, 2, 3]`).
+The field function does not read its value in the engine, and you write the
+value to the buffer. A symbol whose value reads other symbols, or calls a
+user-defined function, is not a parameter: its value is written into the
+code, as `compile()` does. With
+`A := (x, 1)`, where `x` is a coordinate, `A.x` reads the coordinate `x`. With
+`a := 1`, `b := 2` and `A := (a, b)`, the parameters are `a` and `b`, and `A`
+is compiled as `vec2f(ce_params.a, ce_params.b)`. A value that reads itself
+through other symbols declines. A constant (`\pi`, or a symbol declared
+constant) is folded into the code, and a symbol whose value is a function is
+a user-defined function.
+
+**A user-defined function that reads a parameter.** Declare the parameter
+before its first assignment and before the function is defined:
+
+```javascript
+ce.declare('a', 'real');
+ce.assign('a', 5);
+ce.parse('h(t) := t + a').evaluate();   // reads ce_params.a
+```
+
+Without the declaration, the type of `a` is inferred from its value
+(`integer`), and the result type of `h` comes from that type. The field
+function reads `a` from the buffer as a real number, so that result type is
+not correct there: `\lfloor h(x) \rfloor` would lose its `floor`. The field
+function then declines, and its message names the declaration to add
+(`ce.declare('a', 'real')`, or `ce.declare('A', 'tuple<real, real>')` for a
+point). The same applies when the function reads the parameter through a
+symbol compiled in place (`c := a + 1`), and to a symbol compiled in place
+whose type comes from the parameter (`b := a`). A symbol compiled in place
+with a declared type that its value no longer fits (`b` declared `integer`,
+`b := a`, `a := 5`) declines too: declare `a` as `integer`, or `b` as `real`.
+A parameter with a real value (`a := 2.5`) needs no declaration.
 
 **A parameter change is a buffer write.** The compiled text does not depend
 on the parameter values: write the new values to the buffer, with no new
@@ -1939,8 +2018,8 @@ function writeParams(values) {
   const data = new Float32Array(gyroid.paramsSize / 4);
   for (const p of gyroid.params) {
     const v = values[p.name];
-    if (p.length === undefined) data[p.offset / 4] = v;
-    else data.set(v, p.offset / 4);   // a list: one f32 per element
+    if (p.wgslType === 'f32') data[p.offset / 4] = v;
+    else data.set(v, p.offset / 4);   // a point or a list: one f32 each
   }
   device.queue.writeBuffer(paramsBuffer, 0, data);
 }
@@ -1992,8 +2071,9 @@ const module = [
 - `compile(expr, { to: 'wgsl' })` declines the expression: for example a
   recursive function, a `Random()` outside `WithRandomSeed`, or `Integrate`.
   The diagnostic is the diagnostic of `compile()`.
-- A parameter is a boolean, text, a complex number, a list of unknown length,
-  or a list of more than 1024 elements (`code: 'unsupported-parameter'`).
+- A parameter is a boolean, text, a complex number, a tuple that is not a
+  point of 2, 3 or 4 real numbers, a list of unknown length, or a list of
+  more than 1024 elements (`code: 'unsupported-parameter'`).
   Give a longer list, or a list of unknown length, a `'storage-buffer'`
   hint. A storage buffer cannot hold complex numbers, text, booleans or
   lists of lists either.

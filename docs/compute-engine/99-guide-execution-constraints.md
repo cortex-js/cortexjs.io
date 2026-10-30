@@ -138,6 +138,7 @@ current span stands:
 | :--- | :--- |
 | `ce.timeRemaining` | Milliseconds left before the earliest deadline of the active spans, `0` or less once it has passed. `Infinity` when no active span has a time limit (outside any span, or in a step budget with no time limit around it). A spent step budget does not change it. |
 | `ce.stepBudgetSpent` | `true` when a step budget of the current span, or of an enclosing one, is spent. Always `false` outside any span. |
+| `ce.stepsLeft` | The steps left in the budget of the innermost `withStepBudget` span, negative once it is spent; `undefined` when no step budget is active. Inside the span, `steps - ce.stepsLeft` is the number of steps used, and `ce.stepsLeft < 0` tells that this span's budget, not an enclosing one, is spent. |
 
 </div>
 
