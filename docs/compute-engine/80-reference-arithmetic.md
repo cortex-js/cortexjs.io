@@ -57,6 +57,8 @@ arithmetic on infinite operands.
 
 **An indeterminate form** evaluates to `NaN`: $0/0$, $\infty - \infty$ and
 $\infty \times 0$ have no value that the surrounding expression could rely on.
+The symbol `Indeterminate` (`\operatorname{Indeterminate}` in LaTeX) is
+read as `NaN`.
 
 ```json example
 ["Divide", 1, 0]
@@ -268,6 +270,14 @@ Supported condition operators: `Greater`, `GreaterEqual`, `Less`, `LessEqual`, `
 
 When `simplify()` is called on a `Sum` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
 
+A bound that is not an integer gets no closed form, and the operator stays
+symbolic. This is a bound such as `2.5`, a bound that holds a symbol declared
+with a type that is not an integer type (for example `real`), or a bound whose
+symbols are all declared and whose type is not an integer type (`n/2` with `n`
+declared `integer`). The enumeration rounds such a bound down, and a closed
+form would not. An undeclared symbol is a generic value, and its bound gets the
+closed form.
+
 | Pattern | Simplifies to | Name |
 | :------ | :------------ | :--- |
 | $$\sum_{n=1}^{b} c$$ | $$b \cdot c$$ | Constant body |
@@ -292,7 +302,8 @@ When `simplify()` is called on a `Sum` expression with symbolic bounds, the foll
 | $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
-- Empty range (upper < lower): returns `0`
+- Empty range (upper < lower): returns `0`, or a vector of `0` when the
+  body is a vector of a known length (`[0, 0, 0]` for `vector<real^3>`)
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 - Nested sums: inner sums are simplified first, enabling cascading simplification
 
@@ -322,8 +333,8 @@ body whose denominator, as written, is zero at no integer index of the domain.
 A pole there keeps the sum symbolic.
 
 For a **symbolic** ratio $r$, the families with a convergence region return a
-`When`-guarded value recording it — for example
-$\sum k x^k \to \frac{x}{(1-x)^2} \; \{\|x\| < 1\}$.
+restriction `["If", condition, value]` that records it — for example
+$\sum k x^k \to \frac{x}{(1-x)^2}\text{ where }|x| < 1$.
 
 A series whose divergence the engine can certify evaluates to its infinity,
 under `evaluate()` and `.N()`: $\sum_{n=1}^{\infty} \frac{1}{n}$ and
@@ -404,6 +415,14 @@ See the `Sum` documentation above for details on supported collection types.
 
 When `simplify()` is called on a `Product` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
 
+A bound that is not an integer gets no closed form, and the operator stays
+symbolic. This is a bound such as `2.5`, a bound that holds a symbol declared
+with a type that is not an integer type (for example `real`), or a bound whose
+symbols are all declared and whose type is not an integer type (`n/2` with `n`
+declared `integer`). The enumeration rounds such a bound down, and a closed
+form would not. An undeclared symbol is a generic value, and its bound gets the
+closed form.
+
 | Pattern | Simplifies to | Name |
 | :------ | :------------ | :--- |
 | $$\prod_{n=1}^{b} c$$ | $$c^b$$ | Constant body |
@@ -418,7 +437,8 @@ When `simplify()` is called on a `Product` expression with symbolic bounds, the 
 | $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
-- Empty range (upper < lower): returns `1`
+- Empty range (upper < lower): returns `1`, or a vector of `1` when the
+  body is a vector of a known length (`[1, 1, 1]` for `vector<real^3>`)
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 
 The Wallis-like product is also given its closed form by `evaluate()`, for any
@@ -539,7 +559,7 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 step: the value is rounded to a multiple of the step instead of an integer.
 `Floor(x, step)` is the greatest multiple of the step that is at most `x`,
 whatever the sign of the step, `Round(x, step)` is the nearest multiple, and
-a zero step gives `Indeterminate`. To round to `n` decimal places, use the
+a zero step gives `NaN`. To round to `n` decimal places, use the
 step `10^-n`: `Round(3.14159, 1/100)` is `157/50`.
 
 ```json example
@@ -1126,6 +1146,18 @@ So a piecewise whose condition compares such a value takes its next branch:
 `\{1/0 > 0: 1, 0\}` is `0`. `NotEqual` is not affected (`1/0 \ne 0` is
 `True`), and a comparison with a free symbol stays unevaluated. Signed
 infinities are ordered as usual (`0 < \infty` is `True`).
+
+A comparison is always `True` or `False`. The absent value `Missing` is
+read like `NaN`: `["Greater", "Missing", 0]` is `False`, `["Less", 0,
+"Missing", 1]` is `False`, and `["NotEqual", "Missing", 0]` is `True`. A
+comparison of two lists with an absent element is `False`.
+
+Any other operator applied to the absent value gives `Missing`:
+`["Add", "Missing", 2]` and `["Sin", "Missing"]` are `Missing`, and
+`["Add", ["List", 1, "Missing"], 1]` is `["List", 2, "Missing"]`. `Sum`,
+`Product`, `Max` and `Mean` of a list with a `Missing` datum are `Missing` (an
+error datum still gives the error). Read the
+absent value with `IsMissing` or `Coalesce` before computing on it.
 
 The three tiers of equality — `Same` (syntactic), `Equal` (same value) and
 `IdenticallyEqual` (same value for every value of the free variables) — are

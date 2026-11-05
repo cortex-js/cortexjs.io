@@ -410,7 +410,9 @@ applies the function.
 
 Within one evaluation, the symbolic result of such a call is a value: it is
 not resolved again when the name is assigned later in the same evaluation.
-So `Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
+So with `h` declared by `ce.declare('h', 'function')` (a first assignment of
+a name in a branch of an `If` is the error `first-assignment-in-branch`),
+`Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
 term `h(1)` was computed while `h` had no value, and the assignment at
 `k = 2` does not reach it. A later evaluation resolves the stored result
 again:

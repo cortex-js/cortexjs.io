@@ -269,7 +269,7 @@ search by concept with `epsil doc <keywords>`.
   `StringJoin(xs, sep?)` to join ONE collection with an optional separator
   (a string subject means its characters, so `stringJoin("ab", "cd")` is
   `"acdb"`, not `"abcd"` — use `join` or `"\(a)\(b)"` to concatenate).
-  Substring search is `rangeOf(s, needle)` (a span, or `nothing`),
+  Substring search is `rangeOf(s, needle)` (a span, or `missing`),
   `containsSequence`, `startsWith`, `endsWith` — `c in s` is *character*
   membership. Also `StringReplace(s, target, replacement, count?)`,
   `trim`/`trimStart`/`trimEnd`, `stringRepeat`, `padStart`/`padEnd`,
@@ -278,8 +278,9 @@ search by concept with `epsil doc <keywords>`.
   string operation, and a dictionary lookup `d[c]`, accepts a character as the
   one-character string (`toUpperCase(s[1])`, no `String(c)` needed).
 - **Dictionaries**: `keys`, `values`.
-- **Absence**: `missing` preserves a missing position; `nothing` is omitted
-  from arguments and collections; `isMissing`, `Coalesce`.
+- **Absence**: `missing` preserves a missing position; `nothing` is the value
+  of an empty block, kept as an element like any other value; `isMissing`,
+  `Coalesce`.
 - **Symbolic**: `simplify`, `HoldValues(body)` (evaluate `body` with its
   assigned symbols kept symbolic), `solve(eq == v, x)`, `D(expr, x)`,
   `derivative(f)`, `integrate`, `N`, `type`, `isError(x)` (true for an error

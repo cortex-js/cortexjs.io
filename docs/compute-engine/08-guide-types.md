@@ -53,10 +53,11 @@ ce.parse("n").type;
 ```
 
 Alternatively, to declare the type of a symbol you can evaluate a 
-`["Declare"]` expression
+`["Declare"]` expression. A `["Declare"]` expression has a value: without one
+it is the error `declaration-without-value`.
 
 ```js
-ce.expr(["Declare", "n", "'integer'"]).evaluate();
+ce.expr(["Declare", "n", "'integer'", 0]).evaluate();
 ce.parse("n").type;
 // ➔ "integer"
 ```
@@ -158,14 +159,14 @@ The following distinctions matter:
 - `unknown` restricts nothing: the absence types `nothing` and `missing`,
   the `error` type and `any` are all subtypes of it, as `never` is. A
   content contract is what excludes absence: `expression` and `value`
-  exclude the immediate markers, and `number | missing` admits one
-  explicitly. To state that absence is possible in a contract, write it
-  down, or use `any`.
+  exclude the immediate markers. A declared type cannot name `missing`, so
+  a position that may hold an absent value is declared `any` or `unknown`,
+  or is not declared.
   Call admission is a different question: at an operator parameter, a value
-  typed `T | missing` — a lookup
-  with a computed key, such as `xs[i]` — and a collection of such values
-  (`list<missing | string>`) are accepted where `T` or a collection of `T` is
-  expected; whether an element is absent is decided when the program runs.
+  that may be absent — a lookup with a computed key, such as `xs[i]` — and a
+  collection of such values (`list<missing | string>`, an inferred type) are
+  accepted where `T` or a collection of `T` is expected; whether an element is
+  absent is decided when the program runs.
   With `xs := ["a", "b"]`, `StringJoin(Map(i ↦ xs[i], [1, 2]), "")` is
   `"ab"`, and with the index `5` the result is an `incompatible-type` error
   that names the absent element. A collection whose cells can only be absent
@@ -234,7 +235,7 @@ The Compute Engine supports the following primitive types:
 | `any`      | The universal or top type. Every type is a subtype of, and therefore matches, `any` |
 | `error` | The type of an **invalid expression**, such as `["Error"]` |
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
-| `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value |
+| `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value. It can be inferred, but a declaration cannot name it |
 | `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
 | `unknown`       | An inference marker: a type still to be inferred, which each assignment or use refines. As a set of values it restricts nothing (every type is a subtype of it), and it proves no contract (it is a subtype only of `any` and itself). |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
@@ -756,7 +757,7 @@ The type `broadcastable<T>` represents a value that is either a scalar `T` or
 a collection of `T` applied element-wise — the static type of an expression
 that may **broadcast** at evaluation. It is the union `T | tensor<T>`: a `T`,
 or an array of any rank whose cells are `T`. `T` is a type that cannot hold a
-list: a number type, `boolean`, `string`, a tuple, `integer | missing`. For
+list: a number type, `boolean`, `string`, or a tuple. For
 example `broadcastable<number>` is a number or an array of numbers,
 `broadcastable<boolean>` is a boolean or an array of booleans (the result of a
 comparison over a matrix is a matrix of booleans), and
@@ -880,6 +881,93 @@ ce.type("(integer, integer?) -> number")
 // ➔ true
 ```
 
+### Default Values
+
+A named argument can have a **default value**, written after its type with
+`=`: `(x: number, factor: number = 2) -> number`. An argument with a default
+value is optional, and it must come after the required arguments. Do not
+write `?` together with `=`: `number? = 2` is a syntax error.
+
+A default value is a constant, one of:
+
+- a number, including `-1`, `NaN` and `+oo`
+- a string, `true` or `false`
+- the empty list `[]` or the empty dictionary `{}`
+- a constant symbol:
+  - a constant of the standard library, for example `over: set = Integers`
+    or `k: real = Pi`;
+  - a symbol declared as a constant, for example
+    `weights: list<number> = DefaultWeights` after
+    `ce.declare("DefaultWeights", { isConstant: true, value: … })`;
+  - a symbol that the type of the argument lists, for example
+    `mode: symbol<Auto> | symbol<Manual> = Auto`.
+
+The default value is bound where the function is declared, not read where
+the function is called. A call that leaves out the argument receives the
+default as if the call had written it. A default that names a variable, for
+example `k: number = n` with `n` declared without `isConstant: true`, is an error:
+`ce.declare()` throws for such a signature, and a function literal with such
+a parameter is the error `expected-a-literal-default`. Write a constant, or
+pass the argument. For
+any other value, declare a constant and use its name as the default.
+
+In compiled code, a default that is a constant of the standard library or a
+symbol that the type lists is filled in. A default that names a constant
+that you declared is filled in with the value of the constant, read where the
+function is declared: after `ce.declare("W0", { isConstant: true, value: 5 })`
+and `f := (k = W0) ↦ k + 1`, the compiled `f()` gives `6`. The value must be
+a number, a string, a boolean, a list or tuple of such values, or `{}`. For
+any other value, and for an Epsil `const` in a program that is compiled
+before it runs, the compilation falls back to the interpreter. To compile
+such a call, write the value as the default, or pass the argument.
+
+The default value is filled in when the expression is made canonical. A call
+that leaves out the argument and a call that supplies the default value are
+the same expression, so the `evaluate` handler always receives every
+argument:
+
+```js
+ce.declare("Scaled", {
+  signature: "(x: number, factor: number = 2) -> number",
+  evaluate: ([x, factor]) => x.mul(factor),
+});
+
+ce.box(["Scaled", 3]).json;         // ➔ ["Scaled", 3, 2]
+ce.box(["Scaled", 3]).evaluate();   // ➔ 6
+```
+
+The default fills only an argument that the call leaves out. An absent value
+that the call supplies, written or computed, is passed as the argument, and
+the rules of `Missing` then apply. A default no longer fills a supplied absent
+value. To replace an absent argument, write `Coalesce` in the call:
+
+```js
+ce.box(["Scaled", 3, "Missing"]).json;                      // ➔ ["Scaled", 3, "Missing"]
+ce.box(["Scaled", 3, "Missing"]).evaluate();                // ➔ Missing
+ce.box(["Scaled", 3, ["Divide", 0, 0]]).evaluate();         // ➔ NaN
+ce.box(["Scaled", 3, ["Coalesce", "Missing", 2]]).evaluate(); // ➔ 6
+```
+
+Compiled code follows the same rule: see
+[Lambda Expressions](/compute-engine/guides/compiling/#lambda-expressions).
+
+For matching, an argument with a default value is optional: a function type
+with a default value matches a signature that does not have the argument,
+but not the reverse.
+
+```js
+ce.type("(x: integer, k: integer = 1) -> number")
+  .matches("(integer) -> number");
+// ➔ true
+
+ce.type("(integer) -> number")
+  .matches("(x: integer, k: integer = 1) -> number");
+// ➔ false
+```
+
+Default values are not accepted in an overloaded signature, on a generic
+parameter, or in a nested position such as the argument of a function-valued
+argument.
 
 
 ### Variadic Arguments
@@ -1097,6 +1185,13 @@ ce.assign("bump", ce.box(["Function",
   ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"]));
 ```
 
+The same refusal applies when the function is the `value` of a declaration in
+the global scope: `ce.declare("f", { type: "(number) -> number", value })`, or
+`{ value }` with no type, whether `value` is a boxed expression, MathJSON,
+LaTeX or a function that returns one. A literal that states its own effects
+(`(number) scope -> number` on the literal) is accepted when its body keeps to
+them.
+
 An **anonymous** literal is not gated — it has no annotation surface, and its
 arrow carries the inferred `scope` honestly — so a factory that returns a
 writing closure still installs under a bare arrow; the `scope` lives on the
@@ -1213,6 +1308,26 @@ an error pass unchanged; a real float passes under `integer` or `rational`.
 Compiled code does not make this check. Assigning a typed literal to a symbol
 gives that symbol the annotated signature, including the return type.
 
+When a function literal is assigned to a symbol declared with a signature,
+the declared result is ascribed to the body. A body whose inferred type is
+only wider than the declared result is accepted: `n ↦ n + 1` under
+`(integer) -> integer` is inferred `number`. A body whose type has no value in
+common with the declared result is refused, as a value of the wrong type is
+refused for a declared symbol:
+
+```js
+ce.declare("g", "(integer) -> integer");
+ce.assign("g", ce.box(["Function", "'hello'", "n"]));
+// ➔ throws: the value of type "(n: unknown) -> string" is not compatible
+//   with the type "(integer) -> integer"
+```
+
+`NaN`, `Missing` and `Nothing` in the type of the body are not part of this
+test. A body that gives a collection under a scalar result is accepted when a
+parameter can receive a collection whole, because the result can then be the
+broadcast of the declared result. A body with a `Return` before its last
+statement is not tested.
+
 The return ascription may also be a **full signature carrying effects** — this
 is how a definition states its effect contract
 (`function roll(n) random -> integer { … }` lowers to a body ascribed
@@ -1297,7 +1412,7 @@ element, a record field), inside a nested signature, and in **one arm of a
 union**:
 
 ```js
-ce.type("(T | missing) -> list<T> where T"); // an optional argument
+ce.type("(T | string) -> list<T> where T"); // T in one arm of a union
 ce.type("(list<T> | string) -> T where T");
 ```
 
@@ -1619,6 +1734,17 @@ ce.box(["f", "'a'"]).type; // ➔ "string"
 ce.box(["f", "'a'"]).evaluate().toString(); // ➔ "0"
 ```
 
+One test is made when the literal is assigned: when each type variable of the
+result has a bound, a body whose type has no value in common with the result
+read at those bounds is refused, as for a declared ground signature:
+
+```js
+ce.declare("f", "(x: T) -> T where T: number");
+ce.assign("f", ce.box(["Function", ["Greater", "x", 0], "x"]));
+// ➔ throws: the value of type "(x: unknown) -> boolean" is not compatible
+//   with the type "(x: T) -> T where T: number"
+```
+
 **Reading a polytype return annotation.** A polytype ascribed to the body of a
 literal is always the literal's **own** signature — the same reading as an
 effect-bearing annotation (see [Typed Function Literals](#typed-function-literals)).
@@ -1696,7 +1822,8 @@ A **literal type** is a type that represents a single value.
 
 The value can be:
 - a boolean: `true` or `false`
-- a number, such as `42`, `-3.14`, or `6.022e23`
+- a number, such as `42`, `-3.14`, or `6.022e23`. A hexadecimal (`0x1F`) or
+  binary (`0b101`) integer is also accepted: `0x1F` is the literal type `31`
 - a string, such as `"yellow"`, 
 
 Literal types can be used in conjunction with a union to represent a type that 
@@ -2372,6 +2499,41 @@ A type reaches a symbol on one of two tracks, and they behave differently:
   `list<string^2>`. Inference is never a trap: a new assignment or a new use
   re-infers.
 
+An assignment to a symbol with a declared type accepts a value whose type
+**overlaps** the declared type, as a function call accepts such an argument.
+The value is then tested each time the symbol is evaluated: a value that is
+not of the declared type is an `incompatible-type` error at that read. A
+value whose type has no value in common with the declared type, or a value
+made only of literals and constants that is not of the declared type, is
+still refused when it is assigned.
+
+```js
+ce.declare("a", "real");
+ce.declare("P", "tuple<real, real>");
+
+// The value is typed tuple<complex, real>: the square root of a negative
+// number is imaginary. The type overlaps tuple<real, real>, so the
+// assignment is accepted.
+ce.assign("P", ce.parse("(\\sqrt{1-a^2}, a)"));
+
+ce.assign("a", 0.6);
+ce.box("P").evaluate();
+// ➔ (0.8, 0.6)
+
+ce.assign("a", 2);
+ce.box("P").evaluate();
+// ➔ Error(ErrorCode("incompatible-type", "tuple<real, real>",
+//          "tuple<imaginary, integer>"), (sqrt(3)i, 2))
+
+ce.declare("s", "string");
+ce.assign("s", ce.parse("a + 1"));
+// ➔ throws: The value "a + 1" of type "real" is not compatible with the
+//   type "string"
+```
+
+Compiled code does not test the value: it reads the symbol as a value of its
+declared type, and a value outside that type gives an unspecified result.
+
 For a **bare collection annotation**, the contract is the *constructor*
 and the element slot is a placeholder that refines from evidence: `a: list`
 holding `[1, 2, 3]` reports `list<integer>` — the element type came
@@ -2384,33 +2546,44 @@ full contract and never moves. For non-collection loose annotations the
 same principle applies at whole-type granularity: `x: unknown` behaves
 like no annotation at all, while `x: any` is a fixed contract.
 
-**A declared type is a contract on every value, absence included.** `s:
-string` refuses `Missing` and `Undefined` as it refuses `5`, and `xs:
-list<string>` refuses `["a", Missing]`: the element contract excludes
-absence. Write the absence into the type when it is possible (`string |
-missing`, `list<string | missing>`), or use a refining declaration (`list`,
-`list<unknown>`). A `number` declaration admits `NaN`, the numeric absence
-marker (`real`, `integer` and `complex` hold finite values and refuse it;
-declare `real | nan`), so `n: number := 3 {a > 0}` binds (a numeric restriction masks to
-`NaN`), while `p: tuple<number, number> := (1, 2) {a > 0}` needs
-`tuple<number, number> | missing`. The reader of a declared symbol can then
-trust the declaration: a symbol declared `string` holds a string.
+**A declared type describes the present values; `Missing` sits outside
+it, as `NaN` sits outside `real`.** A declared type cannot name `missing`
+(`string | missing` and `list<string | missing>` are errors: `ce.declare`
+throws, and `Typed` and `Declare` give an error expression). An assignment
+still accepts the absent value: `s: string` accepts `Missing` (for example
+`s := xs[5]` with `xs = ["a", "b"]`) but refuses `5`, and
+`xs: list<string>` accepts `["a", Missing]` but refuses `[5, Missing]`.
+The absent value is read with `IsMissing` or `Coalesce`; a point whose
+coordinates are all `NaN` is absent for them. A `number`
+declaration admits `NaN`, the numeric absence marker (`real`, `integer` and
+`complex` hold finite values and refuse it; declare `real | nan`), so
+`n: number := 3 {a > 0}` binds (a numeric restriction masks to `NaN`).
 
 **A possibly absent value at a contract that excludes absence** (`xs[i]`,
-typed `missing | string`, at a `string` parameter or as the initializer of
-`y: string`) is admitted by the engine and checked when the call runs; the
-Epsil static check reports it. Three discharges exist, and the check accepts
-each of them: a fallback (`xs[i] ?? "d"`), a guard (`isMissing(v)`, which
-narrows `v` in the present branch), and the presence assertion
+typed `string`, at a `string` parameter) is admitted by the engine and
+checked when the call runs. Three discharges exist: a fallback
+(`xs[i] ?? "d"`), a guard (`isMissing(v)`, which narrows `v` in the present branch), and the presence assertion
 `xs[i]?!` (`AssertPresent`), which returns the value when present and an
 `expected-present` error when absent. The assertion's type is the present
 part of the operand's type. A library operator whose parameter excludes
 absence refuses an absent argument at evaluation with an `incompatible-type`
-error naming the parameter, as a user function does; numeric and collection
-operators answer the marker of their result instead (`Sin(Missing)` is
-`NaN`, `Reverse(Missing)` is `Missing`), and operators that own their
-absence semantics (`Length`, `Equal`, the reducers, `Coalesce`, `IsMissing`)
-keep their own answers.
+error naming the parameter, as a user function does for a parameter of another
+type; a call with `Missing` at a parameter declared as a number or a point
+gives `Missing` without running the body (`((x: integer) ↦ x + 1)(Missing)` is
+`Missing`), also when the parameter has a default value: a default fills only
+an argument that the call leaves out. Numeric and collection
+operators answer `Missing` instead (`Sin(Missing)` and `Reverse(Missing)` are
+`Missing`; a comparison is `False`), and operators that own their
+absence semantics (`Equal`, `Coalesce`, `IsMissing`) keep their own answers.
+`Length(Missing)`, and `Sum`, `Product`, `Max` and `Mean` of a collection with
+a `Missing` datum, are `Missing` (an error datum still gives the error). These are the interpreter's answers. Compiled code
+guarantees only the three discharges and the accessors
+that move an absent value without computing on it (`At`, `First`, `Last`,
+`Rest`, `Length`); any other operator over an absent operand gives the
+target's own value there (`undefined > 0` is `false` in JavaScript), so a
+program that is compiled discharges a possibly absent value before it
+computes on it. See
+[Values that are absent](/compute-engine/guides/compiling/#values-that-are-absent).
 
 ### When Inference Triggers
 
@@ -2547,15 +2720,16 @@ you do write one of the loose spellings, pick by role:
   let inference track the values. The bare form says "some collection of
   values, to be determined", which is almost always what you mean about
   your own data.
-- **Expecting absent entries in your own data?** Say so: `list<number |
-  missing>` for a specific hole type, or `list<any>` to leave the door
-  fully open. Writing it down is what buys you checking — see below.
+- **Expecting absent entries in your own data?** A type cannot name
+  `missing`. Use `list<any>` to leave the door fully open, or read each
+  entry with `IsMissing` or `Coalesce`. Inference still gives a list that
+  holds `Missing` the type `list<integer | missing>`.
 
 ### Why absence is not part of `expression` (for the curious)
 
 The distinctions above rest on one deliberate choice: a **content contract**
-(`expression`, `value`, `number`, `list<integer>`) never includes absence
-unless it says so. `Missing` is not a value a position might turn out to
+(`expression`, `value`, `number`, `list<integer>`) never includes absence.
+`Missing` is not a value a position might turn out to
 contain; it is the positioned absence of one. The inference marker
 `unknown` is a different kind of thing: it says nothing about the position
 yet, so it excludes nothing, and a declaration that uses it is refined by
@@ -2565,23 +2739,20 @@ read as evidence either way: a `Tuple` slot or a callback result typed
 `unknown` does not prove that it can hold `Nothing`, and it does not prove
 that it cannot.
 
-What this buys is that **absence is opt-in for a contract** — the
-`Option`/`Maybe` discipline rather than nullable-by-default. An absent case
-enters a contract only when someone writes it down, and then every consumer
-is forced to see it:
+What this buys is that **absence is outside a declared contract**, as `NaN`
+is outside `real`. A declaration cannot name `missing`, so a declared symbol
+never holds an absent value. A result type can still show an absent case:
 
-- `RangeOf` returns `range | nothing` — the not-found case is *in the
+- `RangeOf` returns `range | missing` — the not-found case is *in the
   type*, so code that feeds the result to `Slice` is checked against it.
 - `[1, Missing]` types as `list<integer | missing>` — the hole is
-  visible, and the missing-propagation machinery keys off exactly that
-  visibility.
-- A parameter, lambda slot, or inferred type that never mentions absence
-  genuinely never receives it silently.
+  visible in the inferred type, which cannot be written in a declaration.
+- A parameter or declared symbol genuinely never receives an absent value
+  silently.
 
 If `missing` were a subtype of `expression`, every parameter declared with
-a content contract would admit `Missing` without anyone having said so,
-and `| missing` annotations would become decoration. The inference marker
-is where "not said yet" lives; the contracts are where "said" lives.
+a content contract would admit `Missing`. The inference marker is where "not
+said yet" lives; the contracts are where "said" lives.
 
 ## Defining New Types
 
@@ -3103,10 +3274,11 @@ plausible-looking variant of each does not describe JSON:
   (the default), the types would be opaque — their only inhabitants are
   constructor applications, and `ce.type("list<number>").matches("json")`
   would be `false`.
-- `missing`, not `nothing`, for JSON `null`. `Nothing` means "no value here"
-  and is *erased* from collection literals — `[1, Nothing, 3]` has two
-  elements. `Missing` is position-preserving, so it survives inside an array
-  or as a dictionary value.
+- `missing`, not `nothing`, for JSON `null`. `Nothing` is the value of an
+  empty block or of a statement with no value, and an operator that needs a
+  value gives an `incompatible-type` error for it. `Missing` is the absent
+  datum: it keeps its position inside an array or as a dictionary value, and
+  `IsMissing` and `Coalesce` read it.
 - `real`, not `number`. The engine's `number` admits complex and
   non-finite values, so `2 + 3i`, `NaN` and $+\infty$ would all be accepted
   as JSON, and none of them is representable in JSON. Bare `real` is finite

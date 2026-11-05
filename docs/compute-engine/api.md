@@ -277,21 +277,6 @@ readonly NaN: Expression;
 
 <MemberCard>
 
-##### ComputeEngine.Indeterminate {#indeterminate-1}
-
-```ts
-readonly Indeterminate: Expression;
-```
-
-The exact answer to an indeterminate form such as `0/0`: a number with
-no value. Its double value is `NaN`, but it is a different value from
-`NaN`, which is the result of a floating-point computation that failed.
-Its numeric approximation (`.N()`) is `NaN`.
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ComputeEngine.PositiveInfinity {#positiveinfinity-2}
 
 ```ts
@@ -752,11 +737,33 @@ OLDEST makes the state before the next-younger one unreachable.
 ##### ComputeEngine.declareProtocol() {#declareprotocol-1}
 
 ```ts
-declareProtocol(name, members): void
+declareProtocol(name, members, options?): void
 ```
 
 Declare a protocol (Appendix A "Host API"). Throws on error, including
 on re-declaration — the Epsil statement route replaces instead (P5).
+
+`options.extends` lists the PARENTS of the protocol, protocols that must
+already be declared:
+
+```js
+ce.declareProtocol('PartialOrder', {
+  functions: { compare: '(self: Self, other: Self) -> integer' },
+});
+ce.declareProtocol('LinearOrder', {}, { extends: ['PartialOrder'] });
+```
+
+A type that conforms to `LinearOrder` then conforms to `PartialOrder`
+too: a conformance to a protocol registers a conformance to each of its
+ancestors that the type does not already conform to, and the
+implementation given to `declareProtocolImplementation` may implement
+the members of every ancestor. A protocol may not declare a member that
+one of its ancestors declares (`protocol-member-inherited`), and two
+parents whose ancestors declare the same member name cannot be extended
+together (`protocol-extends-member-conflict`). An `extends` value that is
+not an array of strings, or that lists a name twice, throws
+`invalid-protocol-declaration`; a name that is not a declared protocol
+throws `protocol-unknown`.
 
 ####### name
 
@@ -765,6 +772,12 @@ on re-declaration — the Epsil statement route replaces instead (P5).
 ####### members
 
 [`ProtocolMembersInput`](#protocolmembersinput)
+
+####### options?
+
+####### extends?
+
+readonly `string`[]
 
 </MemberCard>
 
@@ -2119,6 +2132,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `elementAt`: (`expr`, `index`) => [`Expression`](#expression-5) \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
      \| readonly (
      \| [`Type`](#type-3)
@@ -2202,6 +2216,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `elementAt`: (`expr`, `index`) => [`Expression`](#expression-5) \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
      \| readonly (
      \| [`Type`](#type-3)
@@ -3971,7 +3986,7 @@ broadcast lowering, so it can override how a built-in operator compiles
 relational operator). It does NOT override the structural / control-flow
 heads (`Sequence`, `Sum`, `Product`, `Function`, `Declare`, `Assign`,
 `Return`, `Break`, `Continue`, `Loop`, `Comprehension`, `If`, `Which`,
-`When`, `Match`, `Block`), which have their own bespoke lowering; a handler
+`Match`, `Block`), which have their own bespoke lowering; a handler
 declared on one of those heads is ignored.
 
 ```ts
@@ -4605,6 +4620,8 @@ type OperandStructure =
      name: string;
      annotated: Type;
      rest: boolean;
+     optional: boolean;
+     default: ParameterDefault;
     }>;
   body: OperandStructure;
  }
@@ -4693,7 +4710,7 @@ free?: true;
 ```
 
 Present (`true`) when the symbol is free: it has no value, it is
-not a constant, not `Undefined` and not a pattern wildcard (a name
+not a constant and not a pattern wildcard (a name
 that starts with `_`), and a scope of the current context other
 than the system scope binds it, but not as a parameter of a
 function literal, a local of a `Block` or the variable of a binder
@@ -4781,6 +4798,8 @@ Derive this call through Apply rather than resolving head by name.
      `name`: `string`;
      `annotated`: [`Type`](#type-3);
      `rest`: `boolean`;
+     `optional`: `boolean`;
+     `default`: [`ParameterDefault`](#parameterdefault);
     \}\>;
   `body`: [`OperandStructure`](#operandstructure);
  \}
@@ -4792,6 +4811,8 @@ parameters: ReadonlyArray<{
   name: string;
   annotated: Type;
   rest: boolean;
+  optional: boolean;
+  default: ParameterDefault;
 }>;
 ```
 
@@ -4800,7 +4821,11 @@ parameter (`(a, ...rest) => …`): it is always the last entry, it
 takes no annotation, and it binds a tuple of every argument from its
 own position onwards rather than occupying one positional slot. A
 consumer reading arity must therefore treat the entries before it as
-the required count and admit any number after.
+the required count and admit any number after. `optional` marks a
+parameter with a default value (`(x, k = 2) => x * k`), and
+`default` is that value: a call may leave the parameter out, and
+the parameter then receives its default. The parameters with a
+default come after the required ones.
 
 \{
   `kind`: `"tuple"`;
@@ -5431,7 +5456,7 @@ isCollection?: (collection) => boolean;
 ```
 
 Optional predicate for operators whose collection-ness depends on their
-operands, e.g. `When(value, cond)`, which is a collection exactly when
+operands, e.g. `If(cond, value)`, which is a collection exactly when
 `value` is one.
 
 Returning `false` reports the expression as a scalar, as if it had no
@@ -5478,6 +5503,31 @@ Set it on lazy operators that evaluate a function per element (`Map`,
 Leave it off structural reindexers (`Take`, `Reverse`, `Zip`, …), which
 re-serve their source's elements cheaply — when the source is itself a
 flagged instance, the source's own memo already absorbs the cost.
+
+Default: `false`
+
+</MemberCard>
+
+<MemberCard>
+
+##### BaseCollectionHandlers.callsCallbackOnRead? {#callscallbackonread}
+
+```ts
+callsCallbackOnRead?: boolean;
+```
+
+Set on a lazy operator that calls a function operand when its elements
+are read, not when it is evaluated (`Map`, `Filter`, `Tabulate`, `Fill`,
+…). An instance created during a function call keeps the evaluation
+context of that call, and each read of the instance runs in it, so that
+a name that the callback reads by its binding in the context (the symbol
+default `d` of a parameter `(x, k = d) => x * k`) has the value it had in
+the call, also when the instance is read after the call has returned
+(`boxed-expression/lazy-view-context.ts`).
+
+Leave it off an operator that calls its function operand when it is
+evaluated (`Reduce`, `Sort`), and off an operator with no function
+operand.
 
 Default: `false`
 
@@ -6073,20 +6123,26 @@ of two enclosures is the enclosure of the larger ends
 
 <MemberCard>
 
-##### ArithmeticDefinition.isExact()? {#isexact-1}
+##### ArithmeticDefinition.~~isExact()?~~ {#isexact-1}
 
 ```ts
 isExact(value): boolean
 ```
 
-Whether the value `value` of this kind is exact, for the rule that an
-inexact operand turns an `Indeterminate` answer into `NaN`
-(`Max(x, Indeterminate)` is `NaN` when `x` is inexact). Absent: a value
+Whether the value `value` of this kind is exact. Absent: a value
 of the kind is exact. A measurement is never exact.
+
+The engine does not read this hook now. It is kept for compatibility
+with kind definitions that declare it.
 
 ####### value
 
 [`Expression`](#expression-5)
+
+###### Deprecated
+
+The engine does not read it: an exact form with no value
+gives `NaN`, whether its operands are exact or not.
 
 </MemberCard>
 
@@ -6613,6 +6669,8 @@ type LambdaDefinition = {
   parameters: ReadonlyArray<{
      name: string;
      type: Type | undefined;
+     optional: boolean;
+     default: ParameterDefault;
     }>;
   body: Expression;
 };
@@ -6889,6 +6947,19 @@ The eager producer's element count — see the `elementCount` contract on
 
 <MemberCard>
 
+##### BoxedOperatorDefinition.elementAt? {#elementat}
+
+```ts
+elementAt?: (expr, index) => Expression | undefined;
+```
+
+The eager producer's element read — see the `elementAt` contract on
+[OperatorDefinition](#operatordefinition).
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedOperatorDefinition.inferOperandTypes? {#inferoperandtypes}
 
 ```ts
@@ -7053,7 +7124,7 @@ non-variadic signature.
 refusesAbsentOperandAt(i): boolean
 ```
 
-True when an absent scalar operand (`Missing`, `Undefined`) at position
+True when an absent scalar operand (`Missing`) at position
 `i` is refused at evaluation with an `incompatible-type` error naming the
 parameter's type: a declared `reject`, or the default for an operator
 with no absence behavior of its own whose parameter at `i` excludes
@@ -7078,7 +7149,7 @@ threadsConditionalsAt(i): boolean
 
 True if the `threadsConditionals` flag of
 [OperatorDefinitionFlags](#operatordefinitionflags) selects operand position `i`: a
-conditional value (`When`, `Which`) there moves out of the application at
+conditional value (a restriction, `Which`) there moves out of the application at
 evaluation. A broadcastable operator threads every position whatever this
 answers.
 
@@ -9284,7 +9355,11 @@ prettify: boolean;
 
 If true, prettify the LaTeX output.
 
-For example, render `\frac{a}{b}\frac{c}{d}` as `\frac{ac}{bd}`
+For example, render `x\cdot y^{-1}` as `\frac{x}{y}`, and
+`\frac{1}{a}\cdot\frac{1}{b}` as `\frac{1}{ab}`. A product whose only
+denominators are those of quotients with a numerator other than 1 keeps
+its factors, so that it reads back as the same expression:
+`90\frac{x}{y}` stays `90\times\frac{x}{y}`.
 
 #### SerializeLatexOptions.materialization
 
@@ -9536,10 +9611,12 @@ type ResolvedSerializeLatexOptions = Omit<SerializeLatexOptions,
   | "indexStyle"
   | "readsAsPointList"
   | "readsAsCardinality"
-  | "readsAsMatrixPowerBase"> & {
+  | "readsAsMatrixPowerBase"
+  | "readsAsFunctionSymbol"> & {
   readsAsPointList: ((operands) => boolean | undefined) | undefined;
   readsAsCardinality: ((operand) => boolean | undefined) | undefined;
   readsAsMatrixPowerBase: ((base) => boolean | undefined) | undefined;
+  readsAsFunctionSymbol: ((name) => boolean | undefined) | undefined;
   applyFunctionStyle: (expr, level) => DelimiterScale;
   groupStyle: (expr, level) => DelimiterScale;
   rootStyle: (expr, level) => RootStyle;
@@ -11417,6 +11494,7 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   arithmetic: ArithmeticDefinition;
   canEnumerate: (expr) => boolean | undefined;
   elementCount: (expr) => number | undefined;
+  elementAt: (expr, index) => Expression | undefined;
   inferOperandTypes: (ops, requirement) => 
      | ReadonlyArray<
      | Type
@@ -11456,6 +11534,35 @@ return type.
 
 If a `type` handler is provided, the return type of the function should
 be a subtype of the return type in the signature.
+
+**Default values.** An optional parameter can have a default value,
+written after its type: `(x: number, factor: number = 2) -> number`.
+A parameter with a default is optional (it is not also marked `?`).
+The parameters with a default come after the required parameters and
+before the optional parameters without a default.
+
+A default is a number (a finite number, `NaN`, `+oo` or `-oo`), a
+string, `true` or `false`, a symbol, the empty list `[]` or the empty
+dictionary `{}`. A symbol default is the symbol itself, not its value
+when the operator is declared: `over: set = Integers`,
+`mode: symbol<Auto> | symbol<Manual> = Auto`. The symbol need not be
+declared. For another value, declare a constant and give its name.
+
+When the operator is declared, each default is checked against the
+type of its parameter, and the declaration throws if it does not fit:
+a number, a string, a boolean, `[]` or `{}` must match the type, a
+declared symbol must be a valid argument at that parameter, and for a
+parameter typed with literal symbol types the symbol must be one of
+them. A default is refused in an overloaded signature (an intersection
+of signatures), on a parameter whose type mentions a type variable, and
+anywhere other than the parameters of the top-level signature (for
+example in the type of a parameter that is itself a function).
+
+A call that leaves out a parameter with a default receives the default
+when it is canonicalized: `Scaled(3)` is the same expression as
+`Scaled(3, 2)`, and the `evaluate` handler, the `type` handler and the
+compiler see two operands. The default is inserted only when every
+required parameter has an argument. The signature prints the default.
 
 #### OperatorDefinition.inferredSignature?
 
@@ -11715,7 +11822,7 @@ or a re-mapped `Add`/`Multiply`/`Power`/relational operator).
 It does NOT override the structural / control-flow heads, which have
 their own bespoke lowering: `Sequence`, `Sum`, `Product`, `Function`,
 `Declare`, `Assign`, `Return`, `Break`, `Continue`, `Loop`,
-`Comprehension`, `If`, `When`, `Match`, `Block`. A handler
+`Comprehension`, `If`, `Match`, `Block`. A handler
 declared on one of those heads is ignored.
 
 Exception: `Which` IS overridable (it has no binding structure — its
@@ -11982,6 +12089,30 @@ Contract, mirroring `canEnumerate`:
 
 Consulted only when the definition has no `collection.count` handler —
 a declared `count` owns the answer, including its `undefined`.
+
+#### OperatorDefinition.elementAt?
+
+```ts
+elementAt?: (expr, index) => Expression | undefined;
+```
+
+For an operator that RETURNS a collection but has no `collection`
+handlers: the element at the 1-based position `index` of the
+collection that `evaluate()` would produce, built from the operands
+with no evaluation. `PointX(L)` at `k` is `PointX(L.at(k))`.
+
+The `at()` twin of elementCount. Contract:
+
+- Called only for a valid, pure expression whose `count` is known, with
+  `1 ≤ index ≤ count`.
+- MUST NOT evaluate the expression. The element it returns can be
+  unevaluated, and its evaluation MUST equal
+  `expr.evaluate().at(index)`: `at()` returns that evaluation.
+- Anything not cheaply knowable must report `undefined` (decline):
+  `at()` then evaluates the expression and reads the element of the
+  result.
+
+Consulted only when the definition has no `collection.at` handler.
 
 #### OperatorDefinition.inferOperandTypes?
 
@@ -12352,6 +12483,8 @@ type ConformanceRecord = {
     };
   pending: boolean;
   _pendingReason: string;
+  _via: string;
+  _derived: true;
   declaredByStatement: boolean;
 };
 ```
@@ -12394,6 +12527,7 @@ wrong body for another.
 type ProtocolRecord = {
   name: string;
   members: Record<string, ProtocolMember>;
+  extends: string[];
   conformances: ConformanceRecord[];
   declaredByStatement: boolean;
   _sumConformances: SumConformanceRecord[];
@@ -12648,21 +12782,6 @@ ImaginaryUnit
 ```ts
 readonly NaN: Expression;
 ```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IComputeEngine.Indeterminate {#indeterminate}
-
-```ts
-readonly Indeterminate: Expression;
-```
-
-The exact answer to an indeterminate form such as `0/0`: a number with
-no value. Its double value is `NaN`, but it is a different value from
-`NaN`, which is the result of a floating-point computation that failed.
-Its numeric approximation (`.N()`) is `NaN`.
 
 </MemberCard>
 
@@ -13128,11 +13247,33 @@ OLDEST makes the state before the next-younger one unreachable.
 ##### IComputeEngine.declareProtocol() {#declareprotocol}
 
 ```ts
-declareProtocol(name, members): void
+declareProtocol(name, members, options?): void
 ```
 
 Declare a protocol (Appendix A "Host API"). Throws on error, including
 on re-declaration — the Epsil statement route replaces instead (P5).
+
+`options.extends` lists the PARENTS of the protocol, protocols that must
+already be declared:
+
+```js
+ce.declareProtocol('PartialOrder', {
+  functions: { compare: '(self: Self, other: Self) -> integer' },
+});
+ce.declareProtocol('LinearOrder', {}, { extends: ['PartialOrder'] });
+```
+
+A type that conforms to `LinearOrder` then conforms to `PartialOrder`
+too: a conformance to a protocol registers a conformance to each of its
+ancestors that the type does not already conform to, and the
+implementation given to `declareProtocolImplementation` may implement
+the members of every ancestor. A protocol may not declare a member that
+one of its ancestors declares (`protocol-member-inherited`), and two
+parents whose ancestors declare the same member name cannot be extended
+together (`protocol-extends-member-conflict`). An `extends` value that is
+not an array of strings, or that lists a name twice, throws
+`invalid-protocol-declaration`; a name that is not a declared protocol
+throws `protocol-unknown`.
 
 ####### name
 
@@ -13141,6 +13282,12 @@ on re-declaration — the Epsil statement route replaces instead (P5).
 ####### members
 
 [`ProtocolMembersInput`](#protocolmembersinput)
+
+####### options?
+
+####### extends?
+
+readonly `string`[]
 
 </MemberCard>
 
@@ -14495,6 +14642,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `elementAt`: (`expr`, `index`) => [`Expression`](#expression-5) \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
      \| readonly (
      \| [`Type`](#type-3)
@@ -14578,6 +14726,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `elementAt`: (`expr`, `index`) => [`Expression`](#expression-5) \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
      \| readonly (
      \| [`Type`](#type-3)
@@ -15636,38 +15785,14 @@ readonly isNaN: boolean | undefined;
 ```
 
 If true, the value of this expression is a number with no value: either
-`NaN` or `Indeterminate`.
+`NaN`.
 
 `NaN` ("Not a Number", from the floating point format standard IEEE-754)
-is the result of a floating-point computation with no value, such as
-`0.0/0.0`, and the marker of an absent numeric operand. `Indeterminate`
-is the result of an exact form with no value, such as `0/0`. Both report
-`isNaN === true`; `isIndeterminate` tells them apart.
+is the result of a computation with no value, such as `0.0/0.0` or
+`0/0`, and the marker of an absent numeric operand.
 
 Note that if `isNaN` is true, `isNumber` is also true (yes, `NaN` is a
 number).
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isIndeterminate {#isindeterminate}
-
-```ts
-readonly isIndeterminate: boolean;
-```
-
-If true, this expression is the `Indeterminate` number literal
-(`ce.Indeterminate`): the exact answer to an indeterminate form such as
-`0/0`, a number with no value.
-
-Its double value is `NaN`, so `isNaN` is also true. It differs from the
-`NaN` literal, which is the result of a floating-point computation that
-failed: the two are different values (`isSame` is false between them).
-A numeric approximation (`.N()`) of `Indeterminate` is `NaN`.
-
-`false` for every other expression, including an unevaluated expression
-whose value would be `Indeterminate`.
 
 </MemberCard>
 
@@ -16763,11 +16888,12 @@ When the value has no
 closed form (`Series(e^{1/x}, x, 0, 3)`), the `EvaluateAt` stays
 unevaluated. The value of a `Series` at a point keeps its remainder:
 `Series(sin x, x, 0, 3)` with `x` replaced by `1/2` evaluates to
-`23/48 + BigO(1/32)`, and with `x` replaced by `0` to `BigO(0)`. A
-value that keeps a `BigO` term is `NaN` under `.N()` (the remainder has
-no numeric value): wrap the series in `Normal` to drop the remainder,
-before or after the substitution. `Normal(Series(sin x, x, 0, 3))` with
-`x` replaced by `0.5` evaluates to `0.479…` under `.N()`.
+`23/48 + BigO(1/32)`, and with `x` replaced by `0` to `BigO(0)`. Under
+`.N()` the remainder stays a `BigO` term and the other terms are
+approximated: the first value is `0.479… + BigO(0.03125)`. Wrap the
+series in `Normal` to drop the remainder, before or after the
+substitution. `Normal(Series(sin x, x, 0, 3))` with `x` replaced by
+`0.5` evaluates to `0.479…` under `.N()`.
 
 The substitution does not avoid variable capture: a replacement that
 contains a name that a binder binds is inserted as it is, and the
@@ -17215,7 +17341,7 @@ Notes:
 getInterval(symbol): IntervalBounds | undefined
 ```
 
-For an expression representing a domain restriction (a `When` whose
+For an expression representing a domain restriction (a restriction whose
 condition is a comparison or `And` of comparisons over `symbol`, or
 a bare comparison expression), return the lower/upper bounds for
 `symbol`. Returns `undefined` if no bounds can be extracted.
@@ -17224,9 +17350,9 @@ Supported shapes:
 - Bare comparisons: `a < x`, `x < b`, etc.
 - Chained comparisons: `a < x < b` (parsed as `Less(a, x, b)`)
 - `And(c1, c2, ...)` where each `ci` is a supported shape
-- `When(e, cond)` — operates on `cond`
-- `Multiply(f, When(...), ...)` — the Desmos parse shape for
-  `f(x)\{a < x < b\}`; bounds from each `When` factor are merged
+- `If(cond, e)` — operates on `cond`
+- `Multiply(f, If(...), ...)` — the Desmos parse shape for
+  `f(x)\{a < x < b\}`; bounds from each restriction factor are merged
 
 `lowerStrict`/`upperStrict` are `true` for strict (`<`, `>`) bounds
 and `false` for non-strict (`≤`, `≥`).
@@ -20761,12 +20887,50 @@ release cycle and normalizes each to the name it denotes
 
 <MemberCard>
 
+### ParameterDefault {#parameterdefault}
+
+```ts
+type ParameterDefault = 
+  | {
+  kind: "value";
+  value: number | string | boolean;
+ }
+  | {
+  kind: "symbol";
+  name: string;
+ }
+  | {
+  kind: "empty-list";
+ }
+  | {
+  kind: "empty-dictionary";
+};
+```
+
+The default value of an optional function parameter, written after the
+parameter type in a signature: `(x: number, factor: number = 2) -> number`.
+
+- `value`: a number that a JavaScript `number` holds (a finite number,
+  `NaN`, `+oo` or `-oo`), a string, or a boolean.
+- `symbol`: a symbol, stored by name. The symbol itself is the default;
+  it is not evaluated when the signature is parsed.
+- `empty-list` and `empty-dictionary`: `[]` and `{}`.
+
+A default is part of the type: the serializer prints it, so two signatures
+that differ only by a default have different identity keys. Subtyping and
+matching ignore it, as they ignore the parameter name.
+
+</MemberCard>
+
+<MemberCard>
+
 ### NamedElement {#namedelement}
 
 ```ts
 type NamedElement = {
   name: string;
   type: Type;
+  default: ParameterDefault;
 };
 ```
 
@@ -21401,6 +21565,14 @@ spelling that round-trips through serialization. See {@link EffectSet}.)
            | <name> "..." <type>
 
 <optional_argument> ::= <argument> "?"
+           | <argument> "=" <default_value>
+
+<default_value> ::= <value> | <identifier> | "[" "]" | "{" "}"
+
+(An argument with a default value is optional; it is not combined with
+`?`. The arguments with a default come before the optional arguments
+without one. A default is not allowed on a rest argument, nor in a tuple
+type. See {@link ParameterDefault}.)
 
 <optional_arguments> ::= <optional_argument> ("," <optional_argument>)*
 
@@ -21525,30 +21697,6 @@ object identity is not a reliable test.
 
 </MemberCard>
 
-<MemberCard>
-
-### INDETERMINATE\_VALUE {#indeterminate_value}
-
-```ts
-const INDETERMINATE_VALUE: Readonly<{
-  indeterminate: true;
-}>;
-```
-
-The value carried by the type of the `Indeterminate` literal: the exact
-answer to an indeterminate form (such as `0/0`), a number with no value.
-Its double value is `NaN`, like the IEEE `NaN` literal, but the two are
-DIFFERENT values: `NaN` is the result of a floating-point failure and
-`Indeterminate` the result of an exact computation. A JavaScript `NaN`
-cannot tell them apart, so this frozen tagged object is the value of the
-`Indeterminate` value type. It widens to `nan`, like the `NaN` value
-type. Test for it with [`isIndeterminateValue`](#isindeterminatevalue), which reads the
-TAG, for the reason given for [`COMPLEX_INFINITY_VALUE`](#complex_infinity_value).
-
-Provenance: `docs/plans/2026-09-28-indeterminate-value.md`.
-
-</MemberCard>
-
 ----
 
 <MemberCard>
@@ -21561,24 +21709,6 @@ function isComplexInfinityValue(v): v is Readonly<{ complexInfinity: true }>
 
 True if `v` is the [`COMPLEX_INFINITY_VALUE`](#complex_infinity_value) sentinel, i.e. the
 value of the `~oo` value-literal type. Reads the tag, never the identity.
-
-##### v
-
-`unknown`
-
-</MemberCard>
-
-<MemberCard>
-
-### isIndeterminateValue() {#isindeterminatevalue}
-
-```ts
-function isIndeterminateValue(v): v is Readonly<{ indeterminate: true }>
-```
-
-True if `v` is the [`INDETERMINATE_VALUE`](#indeterminate_value) sentinel, i.e. the
-value of the `Indeterminate` value-literal type. Reads the tag, never the
-identity.
 
 ##### v
 

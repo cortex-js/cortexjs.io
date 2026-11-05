@@ -166,6 +166,10 @@ compile(ce.box(['Sum', 'S'])).run({ S: 5 });
 
 Nothing else is checked, converted, or copied:
 
+- a value of another type is not refused, and the result is undefined: it
+  can differ from the value of the interpreter, and between targets. With
+  `x` declared `real`, `x + 1` gives `2` for `x = true` and `"ab1"` for
+  `x = "ab"`. See [Supplying Inputs](#supplying-inputs);
 - the entries of a list input are never read. A `{re, im}` object, a string
   or a typed array at an entry of a list the code reads on the real lane
   computes with that value, as it would in plain JavaScript;
@@ -211,9 +215,11 @@ f({ x: 3 });
 `runtimeVersion` fields of the result, and the `preambleOnce`,
 `preamblePerCall` and `callCode` fields when the code has a preamble. It
 evaluates the definitions that read nothing per call (a constant list, a
-memo) once, and it applies the same input conversions as `run()`: a
-real given to a complex-declared symbol is lifted, and a `Float64Array` for a
-list symbol is copied. `load()` throws when `result.runtimeVersion` is not
+memo) once, and it applies the same input steps as `run()`: a number given
+for a complex binding is lifted, `~oo` given for a real binding is projected
+to `Infinity`, another `{re, im}` value given for a real binding is refused,
+and a string or a typed array given for a binding read as an array is
+refused. `load()` throws when `result.runtimeVersion` is not
 `runtime.runtimeVersion`, or when the stored code has none.
 
 To run the stored code on a worker pool, the runtime entry also exports
@@ -279,7 +285,8 @@ once and writes every result into one `Float64Array`: the conversions run once
 per batch, the compiled body once per cell. Measured 2026-10-20: 20 % faster
 than `run()` per cell on the main thread, and the batch is what a worker
 thread receives (below). It is present on a `javascript` result compiled from
-an expression (`calling: 'expression'`) and on an `interval-js` result.
+an expression (`calling: 'expression'`) and on an `interval-js` result
+compiled from an expression.
 
 ```javascript
 const f = compile(ce.parse('\\sin(x)\\cos(y) + a'));
@@ -380,8 +387,10 @@ is `1` or `0`; a complex value with a zero imaginary part is its real part; a
 cell whose evaluation throws, or gives any other non-number (a complex value
 with a non-zero imaginary part, a list), is `NaN`. Cell for cell, the value is
 the one `run()` gives: the same compiled body runs with the same conversions.
-A missing variable, a length mismatch or a wrong element type throws before
-the loop.
+A length mismatch throws before the loop. A variable left out, or a value
+outside its declared type (a boolean for a variable declared `real`), is not
+refused: the result is undefined. With `a` left out, the example above gives
+`NaN` in every cell.
 
 **Several outputs per cell.** An expression whose type is a tuple of two or
 more elements that can be numbers writes that many values per cell into the
@@ -643,6 +652,113 @@ three things happened:
 `CompilationResult.unsupported` lists the same heads declaratively, so a caller
 can branch on the condition without parsing the message.
 
+### Inputs With No Type and Values With No Settled Shape
+
+Compiled code settles the shape of every value (a number, a complex number, a
+string, a list, a point or a matrix) at compile time, and does not test it at
+run time. Two declines follow from this rule. Both occur on every target, and
+with the default fallback the interpreter computes the value.
+
+**An input with no type declines**, with `diagnostic.code` `'untyped-input'`.
+An input is a free symbol of the compiled code. When its type is `unknown` or
+`any`, `unsupported` holds its name:
+
+```javascript
+const r = compile(ce.box(['If', ['Less', 'M', 3], 'M', 0]));
+r.success          // ➔ false
+r.unsupported      // ➔ ['M']
+r.run({ M: [1, 5] }) // ➔ [1, 0], from the interpreter
+```
+
+Declare the input (`ce.declare('M', 'real')`). When the host can pass both
+shapes, declare a union such as `real | list<real>`: a union compiles. A
+parameter of a function is not an input, so `t ↦ 2t` compiles.
+
+**A value with no settled shape declines**, with `diagnostic.code`
+`'unsettled-shape'`, and `unsupported` holds the sub-expression:
+
+- A conditional whose branches have different shapes. With `x: real`,
+  `If(x > 0, [1, 2], 3)` declines.
+- A name that gets values of different shapes in one scope. A local has the
+  type of its first value, and an assignment of a value of another type is the
+  static error `assignment-type-mismatch`: `Block(p ≔ 0; p ≔ [1, 2]; p)` is
+  invalid, so it declines with `'compile-error'`. The shapes can differ only
+  when the declared type admits both, and a declared `any` does:
+  `Block(Declare(p, "any", 0), Assign(p, [1, 2]), p)` declines. The order of
+  the assignments is not examined, and the length of a list is not part of its
+  shape: `Block(p ≔ [1, 2]; p ≔ [1, 2, 3]; p)` compiles. A declared type that
+  is a union of shapes (`real | list<real>`) compiles with one body per
+  member.
+- A function literal that assigns a name of an enclosing scope (a callback, a
+  stored function, a user function that the code calls).
+  `Block(p ≔ 0; Filter(L, u ↦ Block(p ≔ 5, u > 1)); p)` declines. The root of
+  the compilation, and a function that `Apply` applies where it is written to
+  scalar arguments, still compile.
+- A list whose element type is a union of shapes. With
+  `CS: list<real | tuple<real, real>>` and `f := t ↦ 2t`, `Map(f, CS)`
+  declines, and `unsupported` holds `CS`. With the fallback, the interpreter
+  gives `[2, [6, 8]]` for `CS = [1, [3, 4]]`.
+- A node whose code a `compile` handler of its definition writes, when the
+  static type of the node admits values of different shapes and code that no
+  handler wrote reads its value. With `x: real` and `HostPair` declared with
+  the signature `(real) -> real | list<real>` and a `compile` handler that
+  returns a list, `HostPair(x)` compiles and gives `[3, 3]` for `x = 3`, but
+  `HostPair(x) + 1` declines. The node compiles as the value of the whole
+  expression, as an operand of another node whose code a handler writes, or
+  when its type has one shape (a `missing` member is not a shape). To compile
+  the consumer, give the node a type of one shape, or write the code of the
+  consumer with a handler too.
+
+**A call selects the variant of the function from the static type of its
+argument.** With `f := t ↦ 2t`, `f(L)` with `L: list<real>` compiles to a map
+of the scalar variant over the list, and `f(p)` with `p: tuple<real, real>`
+calls a variant compiled for a point. No test of the shape runs. An input
+declared with a union of shapes gets one test, where it is bound, and one
+body per member. With `y: real | tuple<real, real>`, `f(y)` compiles to
+`Array.isArray(y) ? f_point(y) : f(y)`, and gives `6` for `y = 3` and
+`[2, 4]` for `y = [1, 2]`. To avoid the test, declare one shape, or compile
+one function for each shape.
+
+### Supplying Inputs
+
+The compiled code assumes that each input holds a value of its declared type,
+and does not test it. So:
+
+- **Declare the type and the shape of each input that you will pass**:
+  `ce.declare("x", "real")`, `ce.declare("L", "list<real>")`,
+  `ce.declare("P", "tuple<real, real>")`. An input with no type declines.
+- **When an input can have two shapes**, compile one function for each
+  shape, or declare the union (`real | tuple<real, real>`). One function for
+  each shape has no run-time test. The union costs one test on each call,
+  where the input is bound.
+- **Supply every input** that `CompilationResult.freeSymbols` lists, with a
+  value of its declared type. `freeSymbolTypes` gives the type of each one.
+  The compiled code does not test for an input that is left out, so when a
+  value can be missing, test it before the call.
+- **A value outside its type gives an undefined result.** The result can
+  differ from the value of the interpreter, and it can differ between
+  targets. A declared `real` holds only finite values: to get a defined
+  result for `NaN` or `±Infinity`, declare the input
+  `real | signed_infinity | nan`.
+
+```javascript
+ce.declare("x", "real");
+ce.declare("L", "list<real>");
+
+const f = compile(ce.parse("x > 0"));
+f.code;      // ➔ "0 < _.x"
+f.run({});   // ➔ false: undefined result, x is left out
+             //   (the interpreter has no value for x > 0)
+
+compile(ce.box(["Sum", "L"])).run({});
+// ➔ throws TypeError: undefined result, L is left out
+```
+
+An absent value is not an input. A declared type cannot name `missing`, so an
+input cannot be declared `real | missing`.
+[Values That Are Absent](#values-that-are-absent) describes the absent values
+that a program produces.
+
 ### Values That May Be Lists
 
 An operand typed
@@ -840,14 +956,42 @@ call. With fewer arguments, the result is not defined: for example
 no value. Inside compiled code, a call with too few arguments is refused when
 the expression is compiled, and the interpreter evaluates it instead.
 
+A parameter with a default value (see
+[Default Values](/compute-engine/guides/types/#default-values)) can be left
+out of a compiled call, as in the interpreter. The default fills only an
+argument that the call leaves out. An absent value given at that position
+(`NaN` in JavaScript, for example) is passed to the body, and the result is
+not defined, as for any other operator that gets an absent operand (see
+[Values That Are Absent](#values-that-are-absent)):
+
+```js
+const f = compile(ce.box(["Function", "k",
+  ["Optional", ["Typed", "k", "'real'"], 2]]));
+f.code;        // ➔ "(k) => { if (k === undefined) k = 2; return k; }"
+f.run();       // ➔ 2
+f.run(5);      // ➔ 5
+f.run(NaN);    // ➔ NaN
+```
+
+Inside compiled code, every target (JavaScript, Python, GLSL, WGSL and
+interval-js) adds the default value to each call that leaves the argument out
+when the expression is compiled. With
+`g = (k: real = 2) ↦ k + 1`, `g()` compiles to `3`. With `L: list<real>`,
+`g(At(L, 100))` passes the `NaN` of a read past the end of the list to `g`,
+and the result is not defined (the JavaScript code gives `NaN`); the
+interpreter passes `Missing` and gives `Missing`. To replace an absent
+argument, write `Coalesce` in the call: `g(Coalesce(At(L, 100), 2))` gives `3`.
+
 Lambdas are useful when the variable name is user-specified rather than assumed
 by convention. A lambda like `\theta \mapsto 1 + \cos(\theta)` makes the
 parameter explicit, avoiding ambiguity.
 
-**Declared parameter types are checked.** A compiled call of a user function
-whose parameters have declared types checks the argument at run time when its
-static type does not prove the declared type. The compiled value is `NaN`
-where the interpreter answers an `incompatible-type` error:
+**Declared parameter types are not checked.** A compiled call of a user
+function does not test its arguments against the declared types of the
+parameters. An argument whose static type does not prove a parameter type
+that holds only some real numbers (`integer`, `real<0..>`) is assumed to hold
+it. Where the interpreter gives an `incompatible-type` error, the compiled
+value is not defined:
 
 ```js
 ce.declare("h", { signature: "(x: integer) -> integer" });
@@ -855,16 +999,69 @@ ce.assign("h", ce.parse("x \\mapsto 2x"));
 ce.declare("y", "real");
 
 const f = compile(ce.parse("h(y)"));
+f.code;             // ➔ "_fn_h(_.y)"
 f.run({ y: 3 });    // ➔ 6
-f.run({ y: 2.5 });  // ➔ NaN  (the interpreter gives an incompatible-type error)
+f.run({ y: 2.5 });  // ➔ 5  (the interpreter gives an incompatible-type error)
 
 compile(ce.box(["Map", "h", ["List", 1, 2.5]])).run();
-// ➔ [2, NaN]  (a function value handed to Map is checked per element)
+// ➔ [2, 5]
 ```
 
-An argument whose static type is already below the declared type needs no
-test, and a parameter typed `number` or `complex` has none. The declared
-result type is not checked in compiled code.
+An argument whose static type has no value of the parameter type declines.
+A body whose value cannot be of the declared result type is refused when the
+function is assigned, so no call of it is compiled: with `h` declared
+`(number) -> number`, `ce.assign("h", ce.parse("t \\mapsto [t, t]"))` throws
+an `incompatible-type` error (see
+[Typed Function Literals](/compute-engine/guides/types/#typed-function-literals)).
+
+### Function Values
+
+Compiled code calls a function only when it can see the function where the
+call is written. A call compiles when the function is:
+
+- a function defined with `ce.assign()` or `ce.declare()` with a value;
+- a local of a block declared with a function literal as its value;
+- a function literal written at the call site.
+
+The callbacks of `Map`, `Filter`, `Sort`, `Fold` and `Reduce` compile when they
+are one of these. A derivative of a defined function also compiles: with
+`p = x ↦ x^3`, `p'(u)` (`Apply(Derivative(p, 1), u)`) compiles to a call of
+the literal `x ↦ 3x^2`.
+
+```js
+ce.declare("L", "list<real>");
+ce.declare("u", "real");
+ce.assign("sq", ce.parse("t \\mapsto t^2"));
+ce.assign("p", ce.parse("x \\mapsto x^3"));
+
+compile(ce.box(["Map", "sq", "L"])).run({ L: [1, 2, 3] });  // ➔ [1, 4, 9]
+compile(ce.box(["Filter", "L", ["Function", ["Greater", "x", 1], "x"]]))
+  .run({ L: [1, 2, 3] });                                    // ➔ [2, 3]
+compile(ce.parse("p'(u)")).run({ u: 2 });                    // ➔ 12
+```
+
+These forms do not compile, and with the default fallback the interpreter
+evaluates them:
+
+- a partial application or a curried call: `Apply(f, 1)` with `f` a function
+  of two parameters, or `Apply(Apply(f, 1), u)`;
+- a function passed as an argument to a user function, for example
+  `h(x ↦ x + u)`, and a function with a parameter declared with a function
+  type, for example `h = (g: function) ↦ g(1)`;
+- a call whose value is a function: with `mk = a ↦ (x ↦ x + a)`,
+  `Apply(mk(1), u)`;
+- a call of a function stored in a local of a block that is assigned more than
+  once, assigned inside a nested statement, or assigned the result of a call.
+
+```js
+ce.assign("f", ce.box(["Function", ["Add", "x", "y"], "x", "y"]));
+const r = compile(ce.box(["Apply", ["Apply", "f", 1], "u"]));
+r.success;         // ➔ false
+r.run({ u: 2 });   // ➔ 3, from the interpreter
+```
+
+The interpreter keeps first-class functions: function literals, closures,
+currying, partial application and function values.
 
 ### Tuple Expressions
 
@@ -881,6 +1078,28 @@ console.log(x, y);
 
 This is particularly useful for parametric curves. Both `Tuple` and `List`
 expressions compile to arrays.
+
+### Dictionary Expressions
+
+A dictionary compiles to a JavaScript object literal, or a Python `dict`, with
+each value compiled. Each evaluation returns a new object:
+
+```js
+const f = compile(ce.box([
+  "Dictionary",
+  ["Tuple", "'x'", ["Cos", "t"]],
+  ["Tuple", "'y'", ["Sin", "t"]],
+]));
+console.log(f.code);
+// ➔ ({"x": Math.cos(_.t), "y": Math.sin(_.t)})
+console.log(f.run({ t: 0 }));
+// ➔ { x: 1, y: 0 }
+```
+
+The result has the same form as a `dictionary` input: a plain object whose
+own keys are the keys of the dictionary, including a key `__proto__`. A value
+whose type is `unknown` is not compiled. The GLSL, WGSL and interval targets
+have no dictionary value, so a dictionary does not compile on them.
 
 ### Control Structures
 
@@ -913,11 +1132,51 @@ target's floating-point model, so it projects to `NaN`. See
 provably not numbers — strings, lists — answers the target's missing-object
 literal instead, `undefined` in JavaScript and `None` in Python, so that
 `IsMissing` and `Coalesce` work on a compiled string selection; an arm whose
-type is unknown counts as a number. An `If` with no else-branch is
+type is unknown counts as a number. Under a list of conditions, a position
+that no clause selects is `NaN` for a number and `[NaN, NaN]` for a point,
+never `undefined`, and a string arm is refused (the compilation falls back
+to the interpreter). An `If` with no else-branch is
 the one-clause `Which`: `If(c, t)` compiles on every target and returns
-`NaN` when `c` is false. An `If` whose branch is a statement — an
+`NaN` when `c` is false (`[NaN, NaN]` for a point). An `If` whose branch is a statement — an
 assignment, a loop — is a guard statement, not a value, and keeps its own
 rules (see the statement sections below).
+
+### Values That Are Absent
+
+An absent value — the `NaN` or `undefined` of an unmatched `Which`, or of a read
+past the end of a list (`At`, `First`, `Last`) — is guaranteed at three kinds
+of places in compiled code:
+
+- **where it is produced**: the producer gives `NaN` for a numeric result, a
+  point of `NaN` coordinates (`[NaN, NaN]`) for a point, and the target's absent
+  object (`undefined` in JavaScript, `None` in Python) otherwise;
+- **where it is moved without computation**: `At`, `First`, `Last`, `Rest`,
+  `Length`, `Reverse`, and the binding of a `Map` callback parameter keep the
+  hole in its position (`Length([1, Missing])` is 2 everywhere);
+- **where it is discharged**: `IsMissing`, `Coalesce` (`??`) and
+  `AssertPresent` (`?!`) give the interpreter's value for an absent operand,
+  whatever its spelling. A point whose coordinates are all `NaN` is absent for
+  them, also when its type is `tuple<real, real>`. A default parameter is not
+  a discharge: it fills only an argument that the call leaves out.
+
+Every other operator applied to an absent operand gives the target's own
+value, and nothing is promised about it or about anything computed from it:
+`undefined + 1` is `NaN`, `undefined > 0` is `false`, `undefined[0]` throws,
+and Python's `None + 1` is a `TypeError`. The interpreter keeps its own
+propagation (`Missing + 1` is `Missing`, `Missing > 0` is `False`), so a program
+that computes on an absent value before discharging it can give one value in
+the interpreter and another when compiled. Discharge first:
+
+```javascript
+ce.declare("S", "list<string>");
+ce.declare("n", "integer");
+
+// Guaranteed on every route: the absent value is discharged first.
+compile(ce.parse("\\mathrm{IsMissing}(S[n])")).run({ S: ["a"], n: 5 });
+// ➔ true
+compile(ce.parse("\\mathrm{Coalesce}(S[n], \"d\")")).run({ S: ["a"], n: 5 });
+// ➔ "d"
+```
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
@@ -946,15 +1205,28 @@ console.log(f.run({ x: 1.0 }));
 `Loop` is imperative control flow, compiled for effect: bare `Loop(body)`
 compiles to a JavaScript `while (true) { ... }` loop, and `Loop(body,
 Element(...), ...)` compiles to plain `for`/`for-of` loops with no result
-collection — the compiled expression's value is `undefined`. `Break`,
-`Continue`, and `Return` compile to their JavaScript equivalents:
+collection. `Break`, `Continue`, and `Return` compile to their JavaScript
+equivalents.
+
+The value of a loop is `Nothing` (or the value of a `Break(v)`), and the
+compiled code has no form for it. So a loop whose value is used — the whole
+expression, the last statement of a block, the body of a function — does not
+compile, and `run()` uses the interpreter. This includes a search loop that
+ends with a `Return`, because it gives `Nothing` when no `Return` runs. A loop
+with no indexing set and no `Break`, which ends only through a `Return`, still
+compiles. Use the loop as a statement, and end the block with the value it
+should have:
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
 
-const f = compile("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2");
-console.log(f.run());
-// ➔ undefined (Loop is evaluated for effect)
+const loop = compile("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2");
+console.log(loop.success);
+// ➔ false (the value of the loop is used)
+
+const sum = compile("s \\coloneq 0; \\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} s \\coloneq s + i^2; s");
+console.log(sum.success, sum.run());
+// ➔ true 385
 ```
 
 #### `Comprehension`
@@ -982,8 +1254,8 @@ ahead of the value that consumes it, so it can appear anywhere in an
 expression — `0.03\sum_{k=0}^{n}kx` compiles, and a nested sum is hoisted into
 its enclosing loop body rather than out of it.
 
-A loop inside a **conditionally-evaluated branch** — an `If`, `When`, `Which` or
-`Match` arm — fails closed (`success: false`) instead. A shader conditional is
+A loop inside a **conditionally-evaluated branch** — an `If`, `Which` or `Match`
+arm — fails closed (`success: false`) instead. A shader conditional is
 an expression, not a statement, so there is no place to put the loop inside the
 branch; hoisting it out would run it whichever branch is selected, which changes
 the result whenever the branch draws from the random stream.
@@ -1024,6 +1296,59 @@ const f = compile("r^2 \\text{ where } r \\coloneq x^2 + y^2");
 console.log(f.run({ x: 3, y: 4 }));
 // ➔ 625
 ```
+
+An item of a `where` clause is a binding (`r \coloneq v`, or `r = v` with a
+symbol on the left) or a condition (any other relation). Each binding is a
+`Declare(r, "unknown", v)` statement of one `Block`, and the conditions wrap
+the body in a single-branch `If`, which gives `NaN` for a number when a
+condition is false, as a restriction `e\{c\}` does:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const g = compile("x^2 \\text{ where } a \\coloneq 2, x > a");
+console.log(g.run({ x: 3 }), g.run({ x: 1 }));
+// ➔ 9 NaN
+```
+
+The serializer writes such a `Block`, and every single-branch `If`, with
+`where`: `ce.parse("x^2\\{x>0\\}+1").latex` is
+`x^2+1\text{ where }0\lt x`.
+
+A local has a value from its declaration: `Declare(x, type, v)`, or the first
+assignment of the name at the level of the block. A `Declare` with no value,
+a first assignment in a branch or in a loop body, and a read of a local before
+its declaration are static errors (`declaration-without-value`,
+`first-assignment-in-branch`, `read-before-declaration`), so the compilation
+declines. An assignment is a statement, never an operand: `f(a \coloneq 2)` is
+the error `assignment-in-operand`. A later assignment must keep the type of the
+local, or it is the error `assignment-type-mismatch`.
+
+A compiled block writes only the locals that it declares, and the locals of an
+enclosing compiled block. A write to a symbol of the engine, to an input or to
+a `vars` name declines, because compiled code has no binding of the engine to
+change. Return the value and let the host assign it, or declare a local with a
+value and read the local:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const h = compile("m \\coloneq n + 1; 2m");
+console.log(h.run({ n: 1 }));
+// ➔ 4
+```
+
+A block with an assignment or a declaration compiles as a statement, as the
+body of a function, or as the compiled expression. As an operand it declines:
+`1 + Block(b ≔ x; 2b)` declines. A block whose last statement is an assignment
+has the value `Nothing`, so it declines where its value is used. End the block
+with the name.
+
+A `vars` entry is a value, the same at each read. A string entry is source
+text that the JavaScript code puts in at each read of the name: `x + 2x` with
+`vars: { x: 'q' }` is `q + 2 * q`. Use a plain read of a value (`'_.s'`, a
+name). An entry with an effect (`'nextValue()'`) runs once for each read, or
+not at all, and the result is then unspecified.
 
 ## Variable Names
 
@@ -1077,13 +1402,12 @@ complex-valued. This happens when:
 
 The detection is **static** — based on the expression's structure, not on
 runtime values. What happens to a radical of a real operand whose sign is not
-known depends on the compile [mode](#modes-auto-strict-complex). Under the
-default `auto` mode, `\sqrt{x}` is **promoted**: it is lowered through the
-complex kernel, so `compile("\\sqrt{x}").run({ x: -4 })` is `{ re: 0, im: 2 }`,
-as `evaluate()` gives, and `2` at `x = 4`. Under `mode: "strict"` the
-radical compiles to the real `Math.sqrt`, because `x` has no declared complex
-type, and the same call returns `NaN`. To get a complex result in every mode,
-make the expression explicitly complex, e.g. `\sqrt{x + 0i}`.
+known depends on the compile [mode](#modes-strict-complex). Under the
+default `strict` mode the radical compiles to the real `Math.sqrt`, because
+`x` has no declared complex type, so `compile("\\sqrt{x}").run({ x: -4 })` is
+`NaN`, and `2` at `x = 4`. Under `mode: "complex"`, `\sqrt{x}` is
+**promoted**: it is lowered through the complex kernel, and the same call
+returns `{ re: 0, im: 2 }`, as `evaluate()` gives.
 
 ### Result Format
 
@@ -1271,18 +1595,43 @@ shader targets, as in the interpreter. On Apple GPUs the built-ins `max`,
 `smoothstep` return 0, so the shader calls helpers that test the bit pattern
 of each operand.
 
+A helper costs more than the built-in. The shader calls the built-in
+`sin`, `cos`, `max`, `min` or `clamp` when the compiler can prove that the
+argument is finite in 32-bit floating point. The proof reads the declared
+types and ranges of the inputs, the declared result types and parameter
+ranges of the functions, the values that the calls of a function pass, the
+number literals and the operators of the expression. It does not read the
+body of a function to prove a call of it. To get the built-in, declare a
+range:
+
+- With `t` declared `real<-5.5..5.5>`, `\sin(10000(51.1\lfloor t\rfloor-3.9))`
+  calls the built-in `sin`: the range of `t` bounds the argument.
+- With `f(u) := \cos(u)/2` and no declared type, `\sin(f(x))` calls the
+  helper `_gpu_sin`. Declare `f` as `(real) -> real<-1..1>` to get the
+  built-in. A function whose value leaves its declared range gives an
+  undefined result.
+- With `x` declared `real<-1e15..1e15>` and `F(a) := \sin(a)`, the shader of
+  `F(x)` defines `_fn_F` with the built-in `sin(a)`: every call passes a
+  finite value. A call `F(e^y)` with `y` declared `real` makes it
+  `_gpu_sin(a)`, since `e^y` can overflow in 32-bit floating point.
+- With `G` declared `(real<-1..1>) -> real` and `G(a) := \sin(1000a)`,
+  `_fn_G` calls the built-in `sin(1000.0 * a)` for any argument. An argument
+  outside the declared range gives an undefined result.
+
 A `NaN` keeps its value through the other operations that were measured:
 addition, multiplication by a value that is not zero, `\tan`, `\sinh`,
 `\cosh`, `\tanh`, `\exp`, `\ln`, `\sqrt{}`, `\arcsin`, `\arccos`,
 `\arctan`, `\lfloor x \rfloor` and the other rounding functions, `\bmod`,
 `|x|`, `0/0` and `\infty - \infty`.
 
-Absence markers project the same way. `Missing` — what an unmatched `Which`,
-an else-less `If` and a false restriction `e\{c\}` return — is not a
-number, so the chained ternary ends in a literal `NaN` (see
+Absence markers project the same way. `Missing` — what an unmatched `Which`
+returns, and what an else-less `If` and a false restriction `e\{c\}` return
+for a value that is neither a number nor a point — is not a number, so the chained ternary ends in a literal `NaN` (see
 [`If` and `Which`](#if-and-which-conditionals)). The same value reaches `run()`
 when the expression was never compiled at all and fell back to
-interpretation: its `Missing` crosses the boundary as `NaN` too.
+interpretation: its `Missing` crosses the boundary as `NaN` too. What a
+further operator makes of that value is not specified; see
+[Values That Are Absent](#values-that-are-absent).
 
 **Type guards follow the finite-by-default lattice.** Every bare numeric type
 name denotes a **finite** value, so the guard a compiled parameter test emits
@@ -1299,7 +1648,7 @@ as a whole** and runs interpreted, rather than dispatching on a test that would
 disagree with `evaluate()`. This is the usual fail-closed posture for a
 construct the target cannot represent.
 
-### Modes: `auto`, `strict`, `complex`
+### Modes: `strict`, `complex`
 
 JavaScript has no complex number: a compiled value is a `number` or a
 `{ re, im }` object, and the compiler decides which **statically, per node**.
@@ -1308,130 +1657,134 @@ What a compile **mode** fixes is what a numeric binding whose static type is
 declared real) is shaped as — and what happens when a complex-shaped value
 reaches one:
 
-- **`strict`** — the shader targets' model, on every target: shape follows the
-  static type. A `complex`-typed value, a `Complex(…)` literal, `i`, and a
-  radical of a **provably** negative operand are complex-shaped; a wide
-  binding is real; nothing promotes (`√x` at `x = −1` is `NaN`, as
-  `Math.sqrt` gives); and a complex-shaped value meeting a wide binding —
-  `b(z)` for `b(x) := 2x` and `z: complex` — **fails closed** with a
-  `LaneMismatch` decline naming the binding to declare complex. This is
-  today's real-kernel codegen byte for byte, plus that decline class.
-- **`complex`** — a wide binding is complex, lifted at its use; unknown-sign
-  radicals promote; user functions are emitted once. Always sound, only
-  slower (~2.3× on affected chains).
-- **`auto`** (the default on `javascript` and `python`) — `strict` shapes plus
-  **promotion**: an unknown-sign `Sqrt`/`Ln`/`Log`, and `x^{0.3}`-style
-  powers (a non-integer number exponent of an unknown-sign base), lower
-  through the complex kernels so the compiled value matches `evaluate()`; and
-  if — and only if — a promoted or typed complex value reaches a wide binding,
-  the compilation is redone **once** in `complex` mode. Nothing else
-  escalates. Radicals whose operand is non-negative under the compiler's own
-  "wide is real" premise — `√(x² + y²)`, `√((x−a)² + (y−b)²)`, `√|x|`,
-  `ln(x²)` — keep the real kernel and cost nothing.
+- **`strict`** (the default on every target) — the shader targets' model, on
+  every target: the lane of a value follows its static type. A
+  `complex`-typed value, a `Complex(…)` literal, `i`, an operation whose
+  result type is complex, and a radical of a **provably** negative operand
+  are complex-shaped; everything else is real. Nothing promotes: an
+  operation whose exact value is complex on the real lane gives `NaN`
+  (`√x` at `x = −1` is `NaN`, as `Math.sqrt` gives). A complex-shaped value
+  meeting a wide binding — `b(z)` for `b(x) := 2x` and `z: complex` —
+  **fails closed** with a `LaneMismatch` decline naming the binding to
+  declare complex. A binding typed `number` is real under `strict`: the
+  value you give for it must be real. A complex value there gives an
+  unspecified result. With `L: list<tuple<number, real>>` at
+  `[(1 + i, 2)]` and `hr = (p: tuple<real, real>) ↦ p[1] + p[2]`,
+  `hr(L[1])` compiled under `strict` gives the string `"[object Object]2"`;
+  under `mode: 'complex'` it gives `{ re: 3, im: 1 }`, the value of
+  `evaluate()`. To pass complex values, compile with `mode: 'complex'` or
+  declare the binding `complex`.
+- **`complex`** — a wide binding is complex, lifted at its use; an
+  unknown-sign `Sqrt`/`Ln`/`Log`, and `x^{0.3}`-style powers (a non-integer
+  exponent of an unknown-sign base), **promote**: they lower through the
+  complex kernels, so the compiled value matches `evaluate()`. User
+  functions are emitted once. Always sound, only slower (~2.3× on affected
+  chains). A kernel whose value is real still returns a plain `number`: a
+  `{ re, im }` object comes back only when the imaginary part is not zero
+  (`(√x)²` at `x = −4` is the number `-4`).
 
-```mermaid
-flowchart TD
-  c["compile(expr), mode 'auto'"] --> s["compile with strict shapes, plus promotion:<br/>an unknown-sign sqrt, ln, log or non-integer power<br/>lowers through the complex kernels"]
-  s --> reach{"a promoted or complex-typed value<br/>reaches a wide binding?"}
-  reach -- no --> done["result.mode = 'strict'<br/>result.promoted says whether a head was promoted"]
-  reach -- yes --> again["recompile once in complex mode:<br/>wide bindings are complex, lifted at their use"]
-  again --> done2["result.mode = 'complex'<br/>result.escalation holds the LaneMismatch<br/>diagnostic of the strict attempt"]
-```
+The `auto` mode of version 0.177.0 and earlier (the former default: `strict`
+plus promotion, and a redo in `complex` mode after a lane mismatch) is
+removed. `compile(expr, { mode: 'auto' })` declines with the diagnostic code
+`'unsupported-mode'`; use `mode: 'complex'`, which gives the values `auto`
+gave.
+
+| Input                                       | Default (`strict`)            | `mode: 'complex'`  |
+| ------------------------------------------- | ----------------------------- | ------------------ |
+| `Sqrt(x)`, `x: real`, at `x = -4`           | `NaN`                         | `{ re: 0, im: 2 }` |
+| `Sqrt(x)^2`, `x: real`, at `x = -4`         | `NaN`                         | `-4`               |
+| `x + 2i`, `x: real`, at `x = 1`             | `{ re: 1, im: 2 }`            | `{ re: 1, im: 2 }` |
+| `compile(e, { mode: 'auto' })`              | `unsupported-mode` decline    |                    |
 
 The special functions whose value is complex for some real operands —
 `HurwitzZeta`, `LerchPhi`, `PolyLog`, `EllipticK`, the complete `EllipticE`,
-`Hypergeometric2F1`, `LambertW` and `Gamma` — promote under `auto` and
-`complex` the same way. The complex kernel is used where the operand facts do
-not prove the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`,
-`m ≤ 1` for the elliptic integrals), so compiled `LambertW(x)` at `x = −1` is
-`{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled `LerchPhi(3, 2, 1)`
-is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The GLSL and WGSL
-targets have no complex lane for these heads and decline a provably complex
-value. `Arcsec` and `Arccsc` of a real operand of unknown magnitude are typed
-`complex | infinity | nan`, so with `x` declared `real` the compiled
-`Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }`.
+`Hypergeometric2F1`, `LambertW` and `Gamma` — promote under `complex` the
+same way. The complex kernel is used where the operand facts do not prove
+the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`, `m ≤ 1` for
+the elliptic integrals), so under `mode: 'complex'` compiled `LambertW(x)` at
+`x = −1` is `{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled
+`LerchPhi(3, 2, 1)` is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The
+GLSL and WGSL targets have no complex lane for these heads and decline a
+provably complex value. `Arcsec` and `Arccsc` of a real operand of unknown
+magnitude are typed `complex | infinity | nan`, so with `x` declared `real`
+the compiled `Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }` in every
+mode.
 
 ```live
 // import { ComputeEngine, compile } from '@cortex-js/compute-engine';
 
 const ce = new ComputeEngine();
+ce.declare("t", "real");
 ce.parse("z(t) \\coloneq \\sqrt{t-1}").evaluate();
 
 // Interpreted — promotes to complex, then |·| brings it back to a real
-ce.assign("t", 0.3);
-console.log(ce.parse("|z(t)/2 - 1|").N().toString());          // 1.08397416943394
+console.log(ce.parse("|z(t)/2 - 1|").subs({ t: 0.3 }).N().toString());  // 1.08397416943394
 
-// Compiled, by default (`auto`) — the same value; the radical was PROMOTED
-const r = compile(ce.parse("|z(t)/2 - 1|"));
-console.log(r.run({ t: 0.3 }), r.mode, r.promoted);              // 1.08397416943394 "strict" true
+// Compiled with `mode: 'complex'` — the same value
+const r = compile(ce.parse("|z(t)/2 - 1|"), { mode: "complex" });
+console.log(r.run({ t: 0.3 }), r.mode);                          // 1.08397416943394 "complex"
 
-// `strict` — today's real kernel, NaN
-console.log(compile(ce.parse("|z(t)/2 - 1|"), { mode: "strict" }).run({ t: 0.3 }));  // NaN
+// Compiled by default (`strict`) — the real kernel, NaN
+console.log(compile(ce.parse("|z(t)/2 - 1|")).run({ t: 0.3 }));  // NaN
 ```
 
-Every result reports what was used, so a consumer can tell "this row would
-not be real on the shader lane" without guessing:
+Every result reports what was used:
 
-- `result.mode` — `'strict'` or `'complex'`, the discipline the code was
-  compiled under (`auto` reports the attempt that produced the code);
-- `result.promoted` — whether a promotable head was lowered through a complex
-  kernel; a compile-time fact decided from the source, so the same source
-  always reports the same flag;
-- `result.escalation` — under `auto`, the `LaneMismatch` diagnostic of the
-  strict attempt when the compilation was redone in complex mode
-  (`boundary`, a user-legible `binding` such as "the parameter `x` of `b`",
-  and the offending `value`);
+- `result.mode` — `'strict'`, `'complex'` or `'bigint'`, the mode the code
+  was compiled under (the requested mode, `'strict'` when none was
+  requested). It is not a test of the shape of a value: `x + 2i` compiled
+  under `strict` returns `{ re, im }`. Test a returned value with
+  `typeof v === 'number'`;
 - `result.diagnostic` — on any decline, the structured form of `error`
-  (`code`, `kind: 'capability' | 'correctness'`, `message`, and the
-  lane-mismatch payload above).
+  (`code`, `kind: 'capability' | 'correctness'`, `message`, and for a lane
+  mismatch its `boundary` and a user-legible `binding` such as "the
+  parameter `x` of `b`").
 
 Ordering comparisons and the real-only heads (`Floor`, `Mod`, `Max`, `Erf`,
 …) over a value that **may** be complex — a `complex`-typed symbol, a promoted
-radical — compile under `auto` and `complex` with a **runtime rule**: the
-operand is bound once, and the comparison is `false` / the head `NaN` when the
-value's imaginary part is not exactly zero (`z < 2` is `true` at `z = 1`,
-`false` at `z = i`; `y > √x` compiles and is `false` where `x < 0`). A
-**statically** non-real operand of a real-only head (`Floor(2i)`) has no
-compiled value and is a compile-time decline in every mode; a statically
-non-real operand of an ordering comparison (`i < 2`) folds to `false`, the
-interpreter's answer (a value with no order decides false, user decision of
-2026-10-21), while `i < x` with `x` free declines; `strict` declines every complex
-operand of such a head, as before.
+radical — compile under `complex` with a **runtime rule**: the operand is
+bound once, and the comparison is `false` / the head `NaN` when the value's
+imaginary part is not exactly zero (`z < 2` is `true` at `z = 1`, `false` at
+`z = i`; `y > √x` is `false` where `x < 0`). A **statically** non-real
+operand of a real-only head (`Floor(2i)`) has no compiled value and is a
+compile-time decline in every mode; a statically non-real operand of an
+ordering comparison (`i < 2`) folds to `false`, the interpreter's answer (a
+value with no order decides false, user decision of 2026-10-21), while
+`i < x` with `x` free declines; `strict` declines every complex operand of
+such a head.
 
 The single most effective lever is not a mode: **declare the narrowest type
 you can.** A symbol declared `real` is never a wide binding — `2a + 1`,
-`b(a)`, `a < 3` stay on the real kernel in every setting (its unknown-sign
-radical still promotes under `auto`, because promotion is about sign, not
-wideness); a symbol declared `complex` is complex-shaped in every setting and
+`b(a)`, `a < 3` stay on the real kernel in every mode (its unknown-sign
+radical still promotes under `complex`, because promotion is about sign, not
+wideness); a symbol declared `complex` is complex-shaped in every mode and
 never a mismatch.
 
 A function's declared result is read the same way. A function declared
 `(real) -> real` whose body holds an unknown-sign radical or logarithm compiles
-its body on the real kernel in every mode, with `promoted: false`, and gives
-`NaN` outside the real domain. A body that is complex because of a
-complex-typed operand still declines.
+its body on the real kernel in every mode, and gives `NaN` outside the real
+domain. A body that is complex because of a complex-typed operand still
+declines.
 
 ```javascript
 ce.declare('p', { signature: '(real) -> real' });
 ce.assign('p', ce.parse('k \\mapsto \\sin(2.4k)\\sqrt{(k-0.5)/16}'));
 ce.declare('k', 'real');
-const r = compile(ce.parse('p(k)'));
+const r = compile(ce.parse('p(k)'), { mode: 'complex' });
 r.preamble;
 // ➔ "const _fn_p = (k) => Math.sin(2.4 * k) * Math.sqrt(0.0625 * (k + -0.5));"
-r.promoted;
-// ➔ false
 r.run({ k: 0.1 });
 // ➔ NaN
 ```
 
-Under `auto` on the JavaScript target, a user function called from a `Sum`,
-`Product` or comprehension whose index has literal integer bounds is compiled
-once more for the range of that index when the range proves the sign of such a
-head. With `p := k ↦ 1.45 √((k − 0.5)/16) cos(2.4k)`, a bare `p(t)` promotes
-the radical, but `\sum_{k=1}^{16} p(k) x` compiles the copy
+Under `complex` on the JavaScript target, a user function called from a
+`Sum`, `Product` or comprehension whose index has literal integer bounds is
+compiled once more for the range of that index when the range proves the
+sign of such a head. With `p := k ↦ 1.45 √((k − 0.5)/16) cos(2.4k)`, a bare
+`p(t)` promotes the radical, but `\sum_{k=1}^{16} p(k) x` compiles the copy
 `_fn_p_integer_1___ = (k) => 1.45 * Math.cos(2.4 * k) * Math.sqrt(0.0625 * (k + -0.5))`
-on the real kernel, with `promoted: false`. A copy is made only when it removes
-a promoted head, so a function with no such head keeps one definition.
+on the real kernel. A copy is made only when it removes a promoted head, so
+a function with no such head keeps one definition.
 
 `mode` is per compilation, on `CompileTarget` (the target
 default) or on `compile()`'s options; a mode a target does not offer
@@ -1440,9 +1793,8 @@ shader targets and `interval-js` offer `strict` only.
 
 > **Removed:** the `complexPromotion` option is gone, and a call that still
 > passes it gets no warning. `complexPromotion: true` used to select
-> `mode: 'complex'`; such a call now compiles in the default `auto` mode,
-> which promotes an unknown-sign radical but does not lift every wide binding
-> to complex. Pass `mode: 'complex'` to keep the old behavior.
+> `mode: 'complex'`; such a call now compiles in the default `strict` mode.
+> Pass `mode: 'complex'` to keep the old behavior.
 
 ## Custom Operators
 
@@ -1813,8 +2165,8 @@ same 8,192-byte guarantee as function variables. Nor does a `const` array,
 whose constructor is guaranteed only 2,047 elements. A read that would copy
 more than 8,192 bytes and cannot read in place (for example a `vars`
 mapping to a struct field, `u.S`) declines, with a message that names
-`'storage-buffer'`. So does a body that writes such an input, because it
-reads and writes a local copy of it. A storage buffer is the recommended form for a long
+`'storage-buffer'`. A body that writes an input declines on every target,
+because compiled code writes only its own locals. A storage buffer is the recommended form for a long
 list. A shorter list keeps the copy, which is valid wherever you declare it.
 
 ### WGSL Field Functions for Compute Shaders
@@ -2232,6 +2584,20 @@ console.log(value);
 
 The function accepts an object where keys are variable names and values are
 `Interval` objects with `lo` and `hi` properties.
+
+A lambda expression compiles to a function of its arguments, as on the
+`javascript` target (`calling: 'lambda'`). Each argument is a number (a point
+interval) or an `Interval`:
+
+```javascript
+const g = compile("(x, y) \\mapsto x^2 + y", { to: 'interval-js' });
+g.run({ lo: 1, hi: 2 }, 0.5);
+// → { kind: 'interval', value: { lo: 1.5, hi: 4.5 } }
+```
+
+Such a function takes only its arguments, so a lambda whose body reads another
+variable (`x \mapsto a x`) does not compile (`success: false`), and it has no
+`broadcast()`.
 
 #### Result Types
 

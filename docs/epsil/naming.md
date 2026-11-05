@@ -77,7 +77,10 @@ resolve by **scope**, not by case.
 
 A user binding shadows a library name for the rest of its scope, whichever
 spelling the library name has: a `let`, a `const`, a parameter, a loop
-variable, a `match` pattern, or a `function` definition.
+variable, a `match` pattern, or a `function` definition. A function member
+of a `protocol` shadows a library name the same way, from the `protocol`
+statement onward; the library function stays reachable by its capitalized
+name (`Floor(x)`).
 
 ```epsil
 let sum = 0
@@ -154,10 +157,10 @@ definition of an operator that the language builds by name, such as `+`, `<`,
 (the compiler uses its `compile` handler when it has one); and any call of a
 user function on the Python target.
 
-The absence markers `Nothing`, `Missing` and `Undefined` are the exception:
+The markers `Nothing` and `Missing` are the exception:
 they cannot be rebound, and a binding of one of them is an error
-(`absence-marker-binding`). The engine recognizes them by their name — it
-drops `Nothing` from an argument list and reads a `Missing` operand as
+(`absence-marker-binding`). The engine recognizes them by their name — an
+empty block evaluates to `Nothing`, and a `Missing` operand is read as
 absent — so a binding could never behave like the value it holds. In a
 `match`, test for a marker with `== Missing`: a bare `Missing` there would
 be a new variable.

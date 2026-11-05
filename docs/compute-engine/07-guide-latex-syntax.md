@@ -368,19 +368,30 @@ spelling appears only with `{canonical: false}`.
 
 The `else` branch is optional: `\keyword{if} x > 0 \keyword{then} x` parses to
 `["If", ["Less", 0, "x"], "x"]`. When it is omitted and the condition is false,
-no branch is selected and the result is `Missing` — the marker for a value the
-expression never supplied.
+no branch is selected and the result is the absent value of the branch: `NaN`
+for a number, a point of `NaN` coordinates for a point, and `Missing` — the
+marker for a value the expression never supplied — for any other value. Test
+for it with `IsMissing` or supply a value with
+`Coalesce` (`??`) before computing on it: compiled code carries the marker to
+those operators, but what any other operator makes of it (`Missing + 1`,
+`Missing > 0`) is not specified there; see
+[Caveats of compiled code](/compute-engine/guides/compiling/#values-that-are-absent).
 
 ### Local Bindings with `where`
 
 The `where` keyword binds variables to values in an expression:
 
 ```live
-console.log(ce.parse("a + b \\keyword{where} a \\coloneq 1,\\; b \\coloneq 2").json);
-// ➔ ["Block", ["Declare", "a"], ["Assign", "a", 1],
-//             ["Declare", "b"], ["Assign", "b", 2],
+console.log(ce.parse("a + b \\keyword{where} a \\coloneq 1, b \\coloneq 2").json);
+// ➔ ["Block", ["Declare", "a", "'unknown'", 1],
+//             ["Declare", "b", "'unknown'", 2],
 //             ["Add", "a", "b"]]
 ```
+
+Each binding declares its name with a value. A binding is a statement, so it
+cannot be an operand: `f(a \coloneq 2)` is the error `assignment-in-operand`,
+and `a \coloneq b \coloneq 1` is the syntax error `chained-assignment`. Write
+two statements instead.
 
 ### Loops
 
@@ -394,13 +405,23 @@ console.log(ce.parse("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyw
 ### Semicolon Blocks
 
 Semicolons separate statements in a block. When any statement is an assignment,
-the result is wrapped in a `Block` with automatic variable declarations:
+the result is wrapped in a `Block`. The first assignment of a name is its
+declaration, and it has a value:
 
 ```live
-console.log(ce.parse("x \\coloneq 3;\\; x^2 + 1").json);
-// ➔ ["Block", ["Declare", "x"], ["Assign", "x", 3],
+console.log(ce.parse("x \\coloneq 3; x^2 + 1").json);
+// ➔ ["Block", ["Declare", "x", "'unknown'", 3],
 //             ["Add", ["Power", "x", 2], 1]]
 ```
+
+A block that ends with an assignment has the value `Nothing`: end the block
+with the name. The first assignment of a name must be at the level of the
+block. In a branch of an `If`, in a loop body or in a case of a `Match`, it is
+the error `first-assignment-in-branch`: assign a value to the name before the
+branch. A use of a name before its declaration is the error
+`read-before-declaration`. A later assignment must keep the type of the local
+(a number can become another number, not a string); otherwise it is the error
+`assignment-type-mismatch`.
 
 <ReadMore path="/compute-engine/reference/control-structures/" >
 Read more about the **control structure** operators.
@@ -491,28 +512,44 @@ notation — only arity-1 forms are affected.
 ### Restriction Braces
 
 Trailing `\{cond\}` after an expression masks the value by a predicate. This
-parses to the `["When", expr, cond]` head:
+parses to a single-branch `["If", cond, expr]`:
 
 ```live
 console.log(ce.parse("f(x)\\left\\{0 < x < 2\\right\\}").json);
-// ➔ ["When", ["f", "x"], ["Less", 0, "x", 2]]
+// ➔ ["If", ["Less", 0, "x", 2], ["f", "x"]]
 ```
 
-When `cond` evaluates to `True`, the expression evaluates to its left
-operand; when `False`, to `Missing`, the absent-value marker — the same
-value a `Which` with no matching clause gives. Indeterminate predicates
-hold.
+When `cond` evaluates to `True`, the expression evaluates to `expr`; when
+`False`, to the absent value of `expr`: `NaN` for a number, a point of `NaN`
+coordinates for a point, and `Missing` for any other value. An undecided predicate holds the expression
+unevaluated. Discharge an absent value with `IsMissing` or `Coalesce`
+before computing on it when the expression is compiled.
 
-Stacked restrictions chain and canonicalize to a single `When` with an
-`And` predicate:
+The restriction applies to the whole of the smallest group that holds it:
+the whole statement (a relation included), one side of `\to`, the body of
+`for` or `where`, one comma item, the content of a delimiter or of a LaTeX
+argument, a piecewise condition or arm, the body of a big operator, or one
+operand of a logical connective.
+
+```live
+console.log(ce.parse("y=x^2\\{x>0\\}").json);
+// ➔ ["If", ["Less", 0, "x"], ["Equal", "y", ["Power", "x", 2]]]
+```
+
+Stacked restrictions in one group merge into a single `If` with an `And`
+condition, in written order:
 
 ```live
 console.log(ce.parse("x\\left\\{x>0\\right\\}\\left\\{x<10\\right\\}").json);
-// ➔ ["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]
+// ➔ ["If", ["And", ["Less", 0, "x"], ["Less", "x", 10]], "x"]
 ```
 
-Standalone `\{1, 2, 3\}` (no preceding expression) continues to parse as a
-`Set` literal — the disambiguation is positional.
+A condition alone in braces, with no expression before it, is the value 1
+where the condition holds: `\{x>1\}` is `["If", ["Less", 1, "x"], 1]`.
+Standalone `\{1, 2, 3\}` continues to parse as a `Set` literal.
+
+The serializer does not write the brace: a single-branch `If` is written
+with `where`, for example `x^2\text{ where }0\lt x`.
 
 ### List Ranges
 
@@ -568,7 +605,7 @@ is parsed before the keyword fires. Bound names do not leak into the
 enclosing scope.
 
 <ReadMore path="/compute-engine/reference/control-structures/" >
-Read more about the `Loop` and `When` operators in the **control structures** reference.
+Read more about the `Loop` operator and restrictions in the **control structures** reference.
 </ReadMore>
 
 ## Customizing Parsing
@@ -1599,7 +1636,7 @@ list.
 
 ```javascript
 // `expr \operatorname{with} a = v_1, b = v_2` parses to
-// `Block(Declare(a), Assign(a, v_1), Declare(b), Assign(b, v_2), expr)`
+// `Block(Declare(a, "unknown", v_1), Declare(b, "unknown", v_2), expr)`
 {
   symbolTrigger: "with",
   kind: "infix",
@@ -1630,7 +1667,7 @@ list.
       const name = parser.binderSymbol(binding[1]);
       if (name === null) return null;
       names.add(name);
-      block.push(["Declare", name], ["Assign", name, binding[2]]);
+      block.push(["Declare", name, "unknown", binding[2]]);
       parser.skipVisualSpace();
     } while (parser.match(","));
     if (block.length === 0) return null;
@@ -1644,7 +1681,7 @@ list.
 
 With this entry and `n` declared `list<number>`,
 `n_{0}+1\operatorname{with}n_{0}=2` parses to
-`["Block", ["Declare", "n_0"], ["Assign", "n_0", 2], ["Add", "n_0", 1]]`
+`["Block", ["Declare", "n_0", "unknown", 2], ["Add", "n_0", 1]]`
 and evaluates to `3`; `n_{1}` outside the clause is still the first element
 of `n`.
 

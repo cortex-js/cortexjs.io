@@ -190,6 +190,25 @@ result — so every operand is evaluated. Chained comparisons are conjunctions
 of their adjacent pairs and short-circuit too: in `Less(a, b, c)` (`a < b < c`)
 the operand `c` is not evaluated once `a < b` is `False`.
 
+### Absent and undefined values
+
+Logic in the Compute Engine has two values. A comparison is `True` or
+`False`. A comparison with an operand that has no value — `NaN`, the absent
+value `Missing`, a pole such as `1/0`, or a complex number in an ordered
+comparison — is `False`. `NotEqual` is the negation of `Equal`, so it is
+`True` there. A connective reads an absent operand as `False`, and an `If` or
+a `Which` whose condition is absent takes its next branch:
+
+```js example
+ce.expr(['Greater', 'Missing', 0]).evaluate();          // → "False"
+ce.expr(['Not', ['Greater', 'Missing', 0]]).evaluate();  // → "True"
+ce.expr(['NotEqual', 'Missing', 0]).evaluate();          // → "True"
+ce.expr(['If', 'Missing', 1, 2]).evaluate();             // → 2
+```
+
+A comparison of free symbols, such as `x < 1` with no value for `x`, is not
+decided: it stays unevaluated.
+
 ## First-Order Logic
 
 First-Order Logic extends propositional logic with quantifiers and predicates,

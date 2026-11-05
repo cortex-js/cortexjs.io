@@ -223,6 +223,43 @@ When a `Divide` expression has a denominator already in factored form (a product
 <ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
 <strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
+## Undefined Points and Lists
+
+`simplify()` can remove the points where an expression has no value. For
+example, \\( y + 0 \cdot \frac\{1\}\{t\} \\) simplifies to \\( y \\), which has a
+value at \\( t = 0 \\). To keep the undefined points of an expression, do not
+simplify it.
+
+An operand that is a list is not a scalar. With `L` declared as a list, a zero
+times `L` or over `L` stays as it is, and it gives a list when `L` has a value:
+
+```live
+ce.declare('L', 'list<real>');
+const expr = ce.box(['Add', ['Multiply', 0, 'L'], 1]).simplify();
+ce.assign('L', ce.box(['List', 1, 2, 3]));
+expr.evaluate().json;
+// ➔ ["List", 1, 1, 1]
+```
+
+## Testing an Identity
+
+`simplify()` does not decide every identity: \\( \frac\{x^2\}\{x\} \\) simplifies
+to \\( x \\), but \\( \frac\{x^2\}\{x\} - x \\) stays as it is, and so does
+\\( x = x \\).
+
+To find that two expressions are equal wherever both are defined, use
+`isIdenticallyEqual()`. It compares them at random points. `true` is a very
+strong indication, and not a proof. `undefined` means that the identity is not
+established.
+
+```live
+ce.parse('\\frac{x^2}{x}').isIdenticallyEqual(ce.parse('x'));
+// ➔ true
+```
+
+Compare the two expressions, and not their difference with `0`: the rounding
+error of a difference can make the answer for a true identity `undefined`.
+
 ## Using Assumptions
 
 Assumptions are additional information available about some symbols, for example

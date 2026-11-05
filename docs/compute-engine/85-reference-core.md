@@ -18,14 +18,19 @@ value other than themselves.
 | :---------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `All`       | All the possible values apply                                                                                                                                                      |
 | `None`      | None of the possible values apply                                                                                                                                                  |
-| `Nothing`   | An **optional** expression is not present. Used in sparse list to indicate skipped elements.                                                                                       |
-| `Undefined` | The result is not defined.<br/>Note that for numbers, the equivalent is `NaN` (Not a Number) |
-
-<Latex value="\lbrack 2, ,3 \rbrack "/>
+| `Nothing`   | The value of an empty block or of a statement with no value. A collection keeps it as an element, and an operator that needs a value gives an `incompatible-type` error for it. |
 
 ```json example
 ["List", 2, "Nothing", 3]
+// ➔ ["List", 2, "Nothing", 3]     (three elements)
+
+["Add", 1, "Nothing"]
+// ➔ an incompatible-type error
 ```
+
+An empty slot in LaTeX, such as `\lbrack 2, ,3 \rbrack`, is a parse error:
+the slot holds `["Error", "'missing'"]`. A trailing comma, `\lbrack 1, 2, \rbrack`,
+is dropped.
 
 
 ## Declaring, Assigning and Assuming
@@ -44,19 +49,26 @@ that a variable is positive.
 </nav>
 <FunctionDefinition name="Declare">
 
-<Signature name="Declare">_symbol_, _type_</Signature>
-
 <Signature name="Declare">_symbol_, _type_, _value_</Signature>
 
 <Signature name="Declare">_symbol_, _attributes_</Signature>
 
-Declare a new symbol in the current scope, and optionally set its type and
-value.
+Declare a new symbol in the current scope, with a type and a value.
 
-If a _value_ is provided, `Declare` evaluates to that value; otherwise it
-evaluates to `Nothing`. If the symbol already has a definition in the current
-scope, evaluating the expression **throws** an error (it does not return an
-error value).
+A declaration has a value. `Declare` evaluates to that value. A `Declare` with
+no value (`["Declare", "x"]`, `["Declare", "x", "integer"]`, or an
+_attributes_ dictionary with no `value` key) is the error
+`declaration-without-value`, and an `["Assign"]` after it does not repair it.
+Write `["Declare", "x", "integer", 5]`. One exception: a `Declare` of a
+function type with no value is valid when a function definition of the same
+name is in the same block (it gives the signature of that function). To
+declare a symbol with a type and no value, use `ce.declare()`.
+
+In a block, a second `["Declare"]` of a name that the block already declares
+is the error `variable-redeclaration`:
+`["Block", ["Declare", "m", "integer", 3], ["Declare", "m", "integer", 4], "m"]`
+evaluates to that error. At the top level, a second `["Declare"]` of a name
+replaces its definition.
 
 This is equivalent to `let` in JavaScript or `var` in Python.
 
@@ -82,6 +94,10 @@ dictionary.
 
 **To change the value of an existing (non-constant) symbol**, use an
 `["Assign"]` expression.
+
+In a `["Block"]`, a `Declare` is a statement. A block whose last statement is
+a `Declare` has the value `Nothing`. A local cannot be read before its
+declaration (`read-before-declaration`).
 
 `Declare` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
 since it changes the state of the Compute Engine.
@@ -204,7 +220,19 @@ value is compatible with the type of the symbol: once set, the type of
 a symbol cannot be changed.
 
 If there is no definition for the symbol, add a new definition in the
-current scope, and use the `value` to infer the type of the symbol.
+current scope, and use the `value` to infer the type of the symbol. In a
+`["Block"]`, this first assignment of a name is its declaration, and it must
+be at the level of the block. In a branch of an `["If"]` or a `["Which"]`, in
+the body of a `["Loop"]` or in a case of a `["Match"]`, it is the error
+`first-assignment-in-branch`: assign a value to the name before the branch.
+
+A later assignment to a local keeps its type: the declared type, or the type
+of the first value (a number can become another number). A value of another
+type is the error `assignment-type-mismatch`.
+
+An assignment is a statement, never an operand. `["f", ["Assign", "a", 2]]` and
+`["Assign", "t", ["Assign", "u", 1]]` are the error `assignment-in-operand`.
+A block whose last statement is an `Assign` has the value `Nothing`.
 
 This is equivalent to `=` in many programming languages.
 
@@ -313,13 +341,12 @@ rules, `HoldValues` is how you keep an assigned symbol symbolic through a
 `Simplify` on the operator surface — e.g. `["HoldValues", ["Simplify", ["Abs", "w"]]]`
 with `w := 5` is `|w|`, not `5`.
 
-**Granular alternative.** To shield a single symbol with a specific type rather
-than blanket-shielding, compose `Block` and `Declare`: declaring the symbol
-afresh in a local scope shadows the outer value for the block's duration.
+**Granular alternative.** To shield a single symbol rather than every assigned
+symbol, name it in the second argument.
 
 ```json example
 // With w := 5
-["Block", ["Declare", "w", "'real'"], ["Simplify", ["Abs", "w"]]]
+["HoldValues", ["Simplify", ["Abs", "w"]], "w"]
 // ➔ ["Abs", "w"]
 ```
 
@@ -1100,6 +1127,10 @@ Evaluate to a numerical approximation of the expression.
 // ➔ 3.141592653589793
 ```
 
+The value of an exact rational is a float, so a rational is typed as a real:
+`["N", ["Rational", 1, 3]]` has the type `real<0.33..0.34>`. An integer stays
+an integer: `["N", 5]` has the type `integer`.
+
 <Signature name="N">_expression_, _precision_</Signature>
 
 Evaluate to a numerical approximation with the given number of significant
@@ -1313,10 +1344,10 @@ Evaluate to a new symbol made of a concatenation of the arguments.
 ```
 
 The symbol is not declared, it remains a free variable. To declare the symbol
-use `Declare`.
+use `Declare` with a value.
 
 ```json example
-["Declare", ["Symbol", "x", 2], "real"]
+["Declare", ["Symbol", "x", 2], "real", 0]
 ```
 
 </FunctionDefinition>

@@ -37,7 +37,9 @@ Read more about adding new definitions to the Compute Engine.
 
 A **function literal** is a first-class function value, defined using a
 `["Function"]` expression. It can be passed as an argument to other functions, 
-returned from a function, or assigned to a variable.
+returned from a function, or assigned to a variable. Compiled code calls a
+function only when it can see the function where the call is written (see
+[Function Values](/compute-engine/guides/compiling/#function-values)).
 
 The `["Function"]` expression takes a body and a list of parameters.
 
@@ -73,6 +75,48 @@ as opposed to the two-parameter `(p, q) => p + q`.
 // ➔ ["List", 3, 7]
 ```
 
+A parameter can have a **default value**. Write it as
+`["Optional", parameter, default]`, where `parameter` is a name or a
+`["Typed", name, type]`. In Epsil, write `(x, k = 2) => k * x` or
+`(x, k: number = 2) => k * x`. A parameter with a default value must come
+after the required parameters. A call with only the required arguments is a
+complete call, not a partial application:
+
+```json example
+["Apply",
+  ["Function", ["Multiply", "k", "x"], "x", ["Optional", ["Typed", "k", "'number'"], 2]],
+  3]
+// ➔ 6
+```
+
+The default fills only an argument that the call leaves out. An absent value
+supplied at that position (`Missing`, or `NaN`) is passed to the body as the
+argument. To replace an absent argument, write `Coalesce` in the call:
+
+```json example
+["Apply",
+  ["Function", ["Multiply", "k", "x"], "x", ["Optional", ["Typed", "k", "'number'"], 2]],
+  3, "Missing"]
+// ➔ Missing
+
+["Apply",
+  ["Function", ["Multiply", "k", "x"], "x", ["Optional", ["Typed", "k", "'number'"], 2]],
+  3, ["Coalesce", "Missing", 2]]
+// ➔ 6
+```
+
+The type of this literal is `(x: unknown, k: number = 2) -> number`. A
+default is a constant: a number, a boolean, a string, `[]`, `{}`, or a
+constant symbol. The accepted values are the same as in a signature (see
+[Default Values](/compute-engine/guides/types/#default-values)). The default
+is bound where the function is declared: a call that leaves out the argument
+receives it as if the call had written it. A default that names a variable,
+such as `["Optional", "k", "n"]` with `n` a variable, is the error
+`expected-a-literal-default`. A function literal with a rest parameter cannot
+have a default. The form
+`["Typed", "k", "'number?'"]` is not accepted for a parameter: it is the error
+`invalid-parameter-annotation`.
+
 An argument that is not a tuple of that shape yields the same
 `incompatible-type` error value a destructuring `["Declare", ["Tuple", …], …]`
 produces. Function literals with a tuple-pattern parameter are interpreted;
@@ -81,7 +125,9 @@ names.
 
 The examples in this section define functions as a simple expression, but 
 function literals can include more complex control structures, including blocks,
-local variables, loops and conditionals. 
+local variables, loops and conditionals. A local of a block is declared with a
+value, and an assignment is a statement of the block (see
+[Control Structures](/compute-engine/reference/control-structures/#sequential-control-structure)). 
 
 For example, here's a simple "clamp" function, using a `["Block"]` expression.
 
@@ -369,8 +415,7 @@ definition is visible to the function:
 
 ```json example
 ["Block",
-  ["Declare", "a", "integer"],
-  ["Assign", "a", 10],
+  ["Declare", "a", "integer", 10],
   ["Assign", "f", ["Function", ["Add", "a", "_"], "_"]],
   ["Assign", "a", 20],
   ["f", 1]
@@ -382,19 +427,17 @@ A variable of the same name declared in **another** scope is a different
 binding, which the function does not read:
 
 ```json example
-["Block"
+["Block",
   ["Assign", "f",
     ["Block",
-      ["Declare", "a", "integer"],
-      ["Assign", "a", 10],
+      ["Declare", "a", "integer", 10],
       ["Function", ["Add", "a", "_"], "_"]
     ]
-  ]
-  ["Declare", "a", "integer"],
-  ["Assign", "a", 100]
+  ],
+  ["Declare", "a", "integer", 100],
   ["f", 1]
 ]
-// ➔ 1 + 10
+// ➔ 11
 ```
 
 The inner `a`, assigned `10`, is the binding the function captured. The
@@ -457,6 +500,22 @@ The literal then types as a **named signature** — the example above has type
 `(x: integer) -> integer` — and, in strict mode, its arguments are checked
 against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#typed)).
 
+A call with `Missing` at a parameter declared as a number or a point gives
+`Missing`, and the body does not run. A default value does not change this: a
+default fills only an argument that the call leaves out. A `NaN` at a numeric
+parameter, and a point of `NaN`
+coordinates at a point parameter, are accepted: the body runs with them.
+
+```json example
+["Apply", ["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]], "Missing"]
+// ➔ Missing
+
+["Map",
+  ["Function", ["Greater", "x", 0], ["Typed", "x", "'integer'"]],
+  ["List", 1, "Missing"]]
+// ➔ ["List", "True", "Missing"]
+```
+
 **Return type**. To ascribe a return type, wrap the body in a `Typed`
 expression:
 
@@ -472,6 +531,10 @@ and the body `n / 2`, `g(4)` is `2` and `g(5)` is an `incompatible-type`
 error. A symbolic value, `Missing`, `Nothing`, `NaN` and an error value pass
 unchanged, and a real float passes under `integer` or `rational`, so `.N()`
 of such a function gives the float. Compiled code does not make this check.
+A literal assigned to a symbol declared with a signature takes the declared
+result as its return type, and is refused when the type of its body has no
+value in common with that result (see
+[Typed Function Literals](/compute-engine/guides/types/#typed-function-literals)).
 Canonicalization moves the ascription **inside** the body `Block`,
 wrapping its last statement, so the canonical form of the example above is:
 
@@ -575,6 +638,11 @@ function of the remaining ones.
 
 A function literal applied to more arguments than it declares evaluates to an
 `unexpected-argument` error.
+
+Compiled code does not build a function value. A partial application or a
+curried call, such as the second example above with `u` in place of `2`,
+does not compile, and the interpreter evaluates it instead (see
+[Function Values](/compute-engine/guides/compiling/#function-values)).
 
 With LaTeX, the `\lhd` and `\rhd` commands can be used to apply a function to a single
 argument on the left or right respectively.
@@ -699,6 +767,6 @@ free in its result, so `subs()` of that variable produces an `EvaluateAt`:
 at 3, `["EvaluateAt", ["Function", ["D", ["Power", "x", 2], "x"], "x"], 3]`,
 which evaluates to `6`. A value with no closed form stays an unevaluated
 `EvaluateAt`. The value of a series at a point keeps its `BigO` remainder,
-which is `NaN` under `.N()`: wrap the series in `Normal` to drop it.
+also under `.N()`: wrap the series in `Normal` to drop it.
 
 </FunctionDefinition>

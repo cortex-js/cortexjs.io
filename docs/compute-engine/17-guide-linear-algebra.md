@@ -212,6 +212,34 @@ console.log(M.toString());  // → [[1, 2, 3], [4, 5, 6]]
 ce.parse('\\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}');
 ```
 
+**Matrices of symbols.** A cell can be a symbol with no value. A symbol
+with no type, or a symbol whose type is a number type, is read as a number
+cell, so the list is a matrix and the matrix operations apply to it:
+
+```js example
+const S = ce.expr(['List', ['List', 'a', 'b'], ['List', 'c', 'd']]);
+S.type.toString();                            // → matrix<2x2>
+ce.expr(['Trace', S]).evaluate().toString();  // → a + d
+```
+
+A symbol whose type can hold a list (a `matrix`, a `tensor`, `number | tensor`)
+can be a matrix itself. Then the list can be a block matrix, so it is not
+typed as a matrix, and `Trace`, `Determinant` and `Inverse` of it stay
+unevaluated. A symbol gets such a type when it is declared with it, or when it is
+first used as the operand of a matrix operation: `Determinant(a)` gives `a`
+the type `matrix`, and `Trace(a)` gives it the type `number | tensor`
+(`Trace` also accepts a scalar and a tensor of any rank).
+
+```js example
+ce.expr(['Determinant', 'a']);
+ce.expr('a').type.toString();   // → matrix
+ce.expr(['List', ['List', 'a', 'b'], ['List', 'c', 'd']]).type.toString();
+// → list<list<unknown>>
+```
+
+To use a symbol both as a matrix and as a cell of a matrix, give the two uses
+different names.
+
 ### Tensors
 
 Higher-dimensional arrays (tensors) use deeper nesting:
@@ -427,6 +455,13 @@ ce.expr(['Trace', ['List',
   ['List', 7, 8, 9]
 ]]).evaluate();
 // → 15  (1 + 5 + 9)
+
+// Symbolic trace
+ce.expr(['Trace', ['List',
+  ['List', 'a', 'b'],
+  ['List', 'c', 'd']
+]]).evaluate();
+// → a + d
 ```
 
 **LaTeX:** Use `\operatorname{tr}` or `\mathrm{tr}`:

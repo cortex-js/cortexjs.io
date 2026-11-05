@@ -608,8 +608,7 @@ unevaluated under `evaluate()` and `N()`.
 
 A definite integral whose integrand has a pole inside the interval has no
 finite value. When the integrand changes sign across the pole, the result is
-`Indeterminate` (`NaN` under `.N()`): `\int_{-1}^1 \frac{1}{t}\,dt` is
-`Indeterminate`. When the integrand keeps one sign, the result is `+∞` or
+`NaN`: `\int_{-1}^1 \frac{1}{t}\,dt` is `NaN`. When the integrand keeps one sign, the result is `+∞` or
 `−∞`, also for a pole at a bound: `\int_0^1 t^{-2}\,dt` is `+∞`. When the
 position of a pole depends on a free symbol, as in `\int_0^4 (y-a)^{-2}\,dy`,
 the integral stays unevaluated unless the declared type of the symbol or an
@@ -822,7 +821,7 @@ ce.parse('\\int_{0}^{2\\pi} \\frac{1}{2+\\cos x} dx').evaluate()
 ```
 
 `.N()` uses the exact value. A pole on the path of the integral gives `+∞`,
-`−∞` or `Indeterminate`:
+`−∞` or `NaN`:
 
 ```javascript
 ce.parse('\\int_{-\\infty}^{\\infty} \\frac{1}{x^2} dx').evaluate()
@@ -870,7 +869,7 @@ The supported integrands are rational functions, entire numerators, products
 of $\sin$ or $\cos$ of a real affine argument in the denominator, and
 $P(z)·e^{c/(z-a)}$ with an essential singularity. An integrand whose poles
 cannot be certified exactly stays unevaluated, and a pole on the contour
-gives `Indeterminate`. Each call has a step budget, so the point where it
+gives `NaN`. Each call has a step budget, so the point where it
 gives up does not depend on the machine.
 
 
@@ -1163,13 +1162,20 @@ series, of order no larger than _u_. It is produced by `Series` and is
 
 <Latex flow="column" value="O\left(x^7\right)"/>
 
-Because the remainder is not a concrete value, a numeric approximation
-(`expr.N()`) of any expression that contains a `BigO` term is `NaN`:
+A numeric approximation (`expr.N()`) keeps a `BigO` term: its operand is
+approximated, and the other terms of a series are approximated. The result
+is a series with floating-point coefficients, as in Mathematica. Use `Normal`
+to drop the remainder and get a polynomial.
 
 ```json example
 ["BigO", ["Power", "x", 7]]
 // evaluate ➔ ["BigO", ["Power", "x", 7]]
-// .N()     ➔ NaN
+// .N()     ➔ ["BigO", ["Power", "x", 7]]
+```
+
+```javascript
+ce.parse('\\operatorname{Series}(\\sin x)').N().latex
+// → x-0.166\,666\,666\,666\,666\,666\,667x^3+0.008\,333\,333\,333\,333\,333\,333\,33x^5+O\left(x^7\right)
 ```
 
 `BigO` serializes to LaTeX as `O\left(u\right)`. It is **parsed** from

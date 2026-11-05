@@ -416,6 +416,15 @@ ce.declare("double", {
 }, { extend: true });
 ```
 
+An argument of the signature can have a default value, for example
+`"(x: number, factor: number = 2) -> number"`. A call that leaves out the
+argument gets the default value when it is made canonical, so the `evaluate`
+handler always receives every argument. The default fills only an argument
+that the call leaves out: an absent value that the call supplies (`Missing`,
+`NaN`) is passed as the argument. The default is a constant: a number, a
+boolean, a string, `[]`, `{}`, or a constant symbol. See
+[Default Values](/compute-engine/guides/types/#default-values).
+
 The optional `description` and `keywords` properties make a definition easier
 to discover with `ce.searchDefinitions()`. The search includes definition
 names, descriptions, synonyms, keywords, and associated LaTeX commands:
@@ -691,11 +700,8 @@ A hook that answers `undefined` declines, and the expression stays as it is.
 
 Three optional fields describe a value of the kind:
 
-- `isExact(value)` answers whether `value` is exact. The engine reads it for
-  the rule that an inexact operand changes an `Indeterminate` answer to
-  `NaN`: `Max(x, Indeterminate)` is `NaN` when `x` is inexact, and
-  `Indeterminate` when `x` is exact. Without `isExact`, every value of the
-  kind is exact. The library `Measurement` answers `false` for every value,
+- `isExact(value)` answers whether `value` is exact. Without `isExact`, every
+  value of the kind is exact. The library `Measurement` answers `false` for every value,
   and `Quantity` answers whether the magnitude is exact.
 - `isNaN(value)` answers whether `value` stands for no value, as the number
   `NaN` does. Such a value follows the rule of `NaN`: `Max`, `Min`,
@@ -1499,7 +1505,7 @@ ce.box(["Sin", ["Enclosure", 0, 1]]).N();
 ce.box(["Divide", 1, ["Enclosure", 0, 1]]).evaluate();
 // ➔ Enclosure(1, +oo)
 ce.box(["Ln", ["Enclosure", -2, -1]]).evaluate();
-// ➔ Indeterminate: the image is empty
+// ➔ NaN: the image is empty
 ```
 
 - **The endpoints.** The canonical form orders them (`Enclosure(2, 1)` is
@@ -1577,6 +1583,106 @@ interpreter leaves unevaluated declines, and with `fallback: true` the
 compilation throws instead of running the interpreter, because the fallback
 of this target would give a number to `x`. The code cannot be loaded again
 from its stored form, and an input typed `list<enclosure>` declines.
+
+### Declaring a Protocol
+
+A **protocol** names a set of functions that a type must implement. A type
+**conforms** to the protocol by giving an implementation of each function,
+and a call of the function then dispatches on the type of its first
+argument. Protocols are how a generic function says what it needs of its
+arguments without naming a type: "anything that can be compared", "anything
+that has a floor".
+
+`ce.declareProtocol()` declares the requirements. Each function takes the
+conforming type, written `Self`, as its first parameter:
+
+```js
+ce.declareProtocol("PartialOrder", {
+  functions: { compare: "(self: Self, other: Self) -> integer" },
+});
+```
+
+`ce.declareProtocolImplementation()` makes a type conform, with one
+JavaScript callback per function. The callbacks receive boxed expressions and
+return a value the engine boxes:
+
+```js
+ce.declareType("Money", "tuple<cents: integer>");
+
+ce.declareProtocolImplementation("Money", "PartialOrder", {
+  functions: {
+    compare: (a, b) => a.ops[0].re - b.ops[0].re,
+  },
+});
+
+const money = (cents) => ce.box(["Money", cents]);
+ce.box(["compare", money(250), money(100)]).evaluate().toString();
+// ➔ "150"
+```
+
+The callbacks are trusted like any host handler: the engine checks that every
+required function is given and that no unknown one is, but it cannot check
+the callbacks against the signatures. A second implementation of the same
+protocol for the same type throws (`protocol-implementation-duplicate`).
+
+`ce.conformsTo(type, protocol)` answers whether a type conforms, without
+calling anything. A conformance declared for a type holds for its subtypes:
+with an implementation for `number`, `ce.conformsTo("integer", "PartialOrder")`
+is `true`.
+
+#### Requiring conformance in a signature
+
+A generic function requires conformance with the `is` slot of a `where`
+clause. A call whose argument does not conform is rejected with
+`protocol-constraint-unsatisfied`:
+
+```js
+ce.declare("smallest", {
+  signature: "(a: T, b: T) -> T where T is PartialOrder",
+  evaluate: ([a, b]) =>
+    ce.box(["compare", a, b]).evaluate().re <= 0 ? a : b,
+});
+
+ce.box(["smallest", money(250), money(100)]).evaluate().toString();
+// ➔ "Money(100)"
+```
+
+#### Extending a protocol
+
+A protocol can **extend** others. It then has every requirement of its
+parents plus its own, and a type that conforms to it conforms to every
+parent. The parents must be declared first:
+
+```js
+ce.declareProtocol(
+  "FloorOrder",
+  { functions: { floor: "(self: Self) -> integer" } },
+  { extends: ["PartialOrder"] },
+);
+
+ce.declareProtocolImplementation("Money", "FloorOrder", {
+  functions: {
+    compare: (a, b) => a.ops[0].re - b.ops[0].re,
+    floor: (a) => Math.floor(a.ops[0].re / 100),
+  },
+});
+
+ce.conformsTo("Money", "PartialOrder"); // ➔ true
+ce.box(["floor", money(250)]).evaluate().toString(); // ➔ "2"
+```
+
+One implementation block supplies the inherited functions too; an inherited
+function that is left out is `protocol-implementation-missing`, unless the
+type already conforms to that parent. A member name is declared by one
+protocol of a hierarchy: a protocol cannot declare a function that a parent
+declares, and it cannot extend two parents that both declare a function of the
+same name. A protocol never loses a parent once declared.
+
+<ReadMore path="https://epsil.dev/protocols/" >
+Protocols are also declared in **Epsil**, with `protocol … { … }`,
+`type … is …` and `protocol A extends B, C`. The Epsil page describes the
+diagnostics, properties and conditional conformance. <Icon name="chevron-right-bold" />
+</ReadMore>
 
 ### Declaring the Effects of a Function
 
@@ -1883,6 +1989,95 @@ Only `console` and `entropy` have a handler today. The other capability labels
 (`network`, `fs_read`, `fs_write`, `time`, `environment`) will get one together
 with the first library operator that needs it.
 
+### Declaring the Role of Each Operand
+
+By default, an operator evaluates each of its operands before its `evaluate`
+handler runs, and a `lazy` operator evaluates none of them. The `operands`
+handler of a definition gives a **role** to each operand instead: it receives
+the operands of an application and returns one role per operand, in operand
+order. A position that the returned array leaves out has the default role:
+`value` for an operator that is not lazy, `raw` for a lazy operator.
+
+| Role | The operand is |
+| :--- | :--- |
+| `{ kind: "value" }` | a value: canonicalized, checked against the signature, and evaluated before the `evaluate` handler runs. In a `lazy` operator the operand is kept as written, and a bare `N` or `D` there is a variable, not the library operator. |
+| `{ kind: "held" }` | a value that the `evaluate` handler receives canonical but not evaluated, so that it can read the operand as written. The operand is checked against the signature and broadcast over a list as a `value` is. Not valid on a `lazy` operator. |
+| `{ kind: "statement" }` | a statement that the operator runs zero, one or several times (a loop body, a branch). An `Assign` or a `Declare` is valid there. The operand is canonicalized as a branch of an `If` is, and it is not evaluated before the handler. |
+| `{ kind: "raw" }` | kept as written, not canonicalized and not evaluated. Valid only on a `lazy` operator. |
+| `{ kind: "opaque" }` | kept as written, and an `Assign` or a `Declare` in it is valid (the expression of `Hold`). Valid only on a `lazy` operator. |
+| `{ kind: "bound", type? }` | a symbol that is a bound variable of the operator (the variable of `D`). See [Declaring an Operator that Binds a Variable](#declaring-an-operator-that-binds-a-variable). |
+| `{ kind: "clause", type? }` | an indexing set, such as `Limits(k, 1, 10)` or `Element(k, S)`, whose index is a bound variable of the operator (the clauses of `Sum`). See [Declaring an Operator that Binds a Variable](#declaring-an-operator-that-binds-a-variable). |
+
+An `Assign` or a `Declare` operand at a `value`, `held`, `raw`, `bound`
+or `clause` position is the error `assignment-in-operand`: an assignment is a
+statement, not a value.
+
+The roles should depend only on the number of operands and on their
+positions. When the operator is declared, the engine also calls the handler
+with zero to three `Nothing` operands, so that a role that is not valid for
+the operator is refused then: the handler must have no side effects.
+
+For example, `Do(body, n)` runs a statement `n` times. The count is a value,
+and the body is a statement:
+
+```js
+ce.declare("Do", {
+  signature: "(expression, integer) -> nothing",
+  operands: () => [{ kind: "statement" }, { kind: "value" }],
+  evaluate: ([body, n], { engine }) => {
+    for (let i = 0; i < n.re; i++) body.evaluate();
+    return engine.Nothing;
+  },
+});
+
+ce.box([
+  "Block",
+  ["Assign", "s", 0],
+  ["Do", ["Assign", "s", ["Add", "s", 1]], 5],
+  "s",
+]).evaluate();
+// ➔ 5
+```
+
+The body of `Do` is a branch: the engine cannot know how many times the
+operator runs it, so a first assignment there does not declare a variable. An
+assignment of a name that no enclosing scope declares is an error:
+
+```js
+ce.box(["Do", ["Assign", "t", 1], 3]);
+// ➔ ["Do", ["Error", ["ErrorCode", "'first-assignment-in-branch'", "'t'"]], 3]
+```
+
+A `held` operand lets a handler read an operand before it is evaluated, while
+the operator keeps the checks of an operator that is not lazy: the signature,
+the result type and the broadcast. This `ModP` computes `Fibonacci(n) mod p`
+without the value of `Fibonacci(n)`, which has more than 200,000 digits for
+`n = 10^6`:
+
+```js
+ce.declare("ModP", {
+  signature: "(integer, integer) -> integer",
+  operands: () => [{ kind: "held" }, { kind: "value" }],
+  evaluate: ([x, p], { engine }) => {
+    if (x.operator === "Fibonacci") {
+      const n = x.op1.evaluate().re;
+      const m = p.re;
+      let [a, b] = [0, 1];
+      for (let i = 0; i < n; i++) [a, b] = [b, (a + b) % m];
+      return engine.number(a);
+    }
+    return engine.function("Mod", [x.evaluate(), p]).evaluate();
+  },
+});
+
+ce.box(["ModP", ["Fibonacci", ["Power", 10, 6]], 1000]).evaluate();
+// ➔ 875
+ce.box(["ModP", ["Multiply", 3, 4], 5]).evaluate();
+// ➔ 2
+ce.box(["ModP", "'a'", 3]);
+// ➔ ["ModP", ["Error", ["ErrorCode", "'incompatible-type'", "'integer'", "'string'"], "'a'"], 3]
+```
+
 ### Declaring an Operator that Binds a Variable
 
 Some operators own a **bound variable**: the `k` of a summation, the `x` of a
@@ -1891,36 +2086,48 @@ must be a *new* variable belonging to the operator, shadowing any same-named
 symbol outside it, and it must stay symbolic even if a symbol of the same name
 has a value.
 
-**To declare a binder**, give the `scoped` property a **binding-site
-selector** instead of `true`. The selector tells the engine which operands are
-binding sites; the engine then declares those variables in the operator's own
-scope before your operands are canonicalized, and makes every occurrence in
-the other operands refer to that binding — consistently across the LaTeX,
+**To declare a binder**, give the operands that hold its bound variables the
+role `bound` or `clause` in the [`operands` handler](#declaring-the-role-of-each-operand).
+The engine then gives the operator its own scope, declares those variables in
+it before your operands are canonicalized, and makes every occurrence in the
+other operands refer to that binding — consistently across the LaTeX,
 MathJSON, and `ce.function()` routes.
 
-The prebuilt selectors cover the common shapes:
+- `{ kind: "bound", type? }` — the operand is a symbol that is a bound
+  variable (like the variables of `D`, or the expansion variable of
+  `Series`). An operand that is not a symbol declares nothing. As for `D`,
+  the variable stays a free variable of the expression: the value of
+  `D(x^2, x)` is a function of `x`.
+- `{ kind: "clause", type? }` — the operand is an indexing set whose index is
+  a bound variable: `["Limits", "k", 1, 10]`, `["Element", "k", collection]`
+  (`["Element", ["Tuple", "p", "q"], pairs]` binds both `p` and `q`), a tuple
+  `["Tuple", "k", 1, 10]`, or a symbol (like the clauses of `Sum`,
+  `Product`, `Integrate` or a comprehension). Consecutive `clause` operands
+  are read as the clauses of `Sum`: in `["MySum", body, "k", 1, "n"]`, the
+  operands after `k` are its bounds, so `k` is bound and `n` is not.
 
-- `operandSites(...indices)` — the operands at these positions are bare
-  bound-variable symbols (like `Series`' expansion variable).
-- `operandsFrom(first)` — every operand from position `first` on is a bound
-  variable (like `D`'s variadic differentiation variables).
-- `indexingSetSites(first)` — the first element of each `Element`- or
-  `Limits`-shaped operand from position `first` on is a bound variable (like
-  `Sum`, `Product`, or a comprehension: `["Element", "k", collection]`).
-- `limitsIndexSites(op)` — the index inside the single `Limits` operand at
-  position `op`.
+The optional `type` is the type of the variable (`unknown` when it is left
+out). For a `clause`, it applies to the index of a range such as `Limits`,
+narrowed to the range when the bounds are integer literals:
+`["Limits", "k", 1, 10]` with `type: "integer"` declares `k` as
+`integer<1..10>`. The index of an `Element` clause does not take `type`: it
+is `integer<1..16>` for `["Element", "k", ["Range", 1, 16]]`, and otherwise
+an inferred `unknown`. The index of a clause is not a free variable of the
+expression.
 
 For example, an operator that computes the maximum of an expression over an
 indexing set:
 
 ```js
-import { ComputeEngine, indexingSetSites } from "@cortex-js/compute-engine";
+import { ComputeEngine } from "@cortex-js/compute-engine";
 
 const ce = new ComputeEngine();
 
 ce.declare("MaxOver", {
   lazy: true,
-  scoped: indexingSetSites(1),
+  // The body is kept as written; the second operand is an indexing set
+  // whose index is the bound variable.
+  operands: () => [{ kind: "raw" }, { kind: "clause" }],
   signature: "(expression, expression) -> number",
   evaluate: (ops, { engine }) => {
     // A lazy operator receives its operands unevaluated: canonicalize
@@ -1959,9 +2166,19 @@ console.log(ce.parse("k").evaluate());
 
 A few notes:
 
-- `scoped: true` (without a selector) still means "this operator has a scope,
-  but no syntactic bound variables" — appropriate for `Block`-like operators
-  whose scope holds declarations.
+- The engine finds that an operator is a binder when the operator is
+  declared, from the calls of the `operands` handler with zero to three
+  `Nothing` operands. A handler that gives one role per position
+  (`(ops) => ops.map((_, i) => i === 0 ? { kind: "raw" } : { kind: "clause" })`)
+  or a fixed array does so. A `bound` or `clause` role that the handler
+  gives only for the operands of an application is an error.
+- `scoped: true` means "this operator has a scope, but no syntactic bound
+  variables" — appropriate for `Block`-like operators whose scope holds
+  declarations. The `scoped` flag is a boolean: a function as its value
+  throws an error.
+- A `statement` operand of a binder is canonicalized in the scope of the
+  operator, so an assignment of the bound variable there writes the bound
+  variable, not a same-named global.
 - With multiple indexing clauses, **later clauses see earlier bindings**: a
   collection expression in clause 2 may reference the index of clause 1, and a
   collection in clause 1 that mentions the *name* of clause 2's index refers
@@ -2545,8 +2762,9 @@ The same attributes dictionary carries the other definition attributes:
 - `bind: ["i"]` — with `hold`, the named parameters are **bound variables**:
   the call must pass a symbol there, and the parameter is substituted by that
   symbol in the body (`hold mySum(body, bind i, n) = Sum(body, i, 1, n)`),
-  the definition being installed as a binder (`scoped: operandSites(…)`), so
-  the call declares the symbol in its own scope like `Sum` does.
+  the definition being installed as a binder (the operand role `bound` at
+  each such position), so the call declares the symbol in its own scope like
+  `Sum` does.
 - `commutative`, `associative`, `idempotent`, `involution` — the operator
   flags of the same names, applied when a call is canonicalized. An
   associative function is binary; a flattened n-ary call is folded pairwise.

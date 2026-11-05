@@ -323,7 +323,7 @@ any([1, 3, 4], x => x % 2 == 0)
 
 ### append
 
-MathJSON `Append` · `(collection<any>, (missing | value)+) -> collection`
+MathJSON `Append` · `(collection<any>, any+) -> collection`
 
 Add one or more elements to the end of a collection.
 
@@ -718,10 +718,6 @@ Return the elements of the collection for which the predicate function returns T
 
 Equivalent to `[x for x in xs if p(x)]`.
 
-Immediate `Nothing` inputs are dropped without calling the predicate.
-
-`Missing` and markers nested inside a datum still reach the predicate.
-
 ```epsil
 filter([1, 2, 3, 4, 5, 6], x => x % 2 == 0)
 // ➔ [2,4,6]
@@ -731,7 +727,7 @@ filter([1, 2, 3, 4, 5, 6], x => x % 2 == 0)
 
 MathJSON `Find` · `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T: any`
 
-Return the first element of the collection satisfying the predicate, or Nothing if none found.
+Return the first element of the collection satisfying the predicate. When no element satisfies it, return the absent value of the domain of the elements: `NaN` for numbers, a point whose coordinates are all `NaN` for points, and `Missing` otherwise.
 
 ```epsil
 find([1, 4, 9, 16], x => x > 5)
@@ -1016,21 +1012,9 @@ MathJSON `Map` · `(mapping: (T) any -> U, collection<T>+) -> indexed_collection
 
 Return the collection where each element has been transformed by the mapping function.
 
-With a single collection, equivalent to `[f(x) for x in xs]`. With
+With a single collection, equivalent to `[f(x) for x in xs]`. With multiple collections, combines them element-wise (like `zipWith`): 
 
-multiple collections, combines them element-wise (like `zipWith`): 
-
-`Map(f, xs, ys) = [f(x1, y1), f(x2, y2), …]`, with the length of the
-
-shortest input. The mapping function is always the FIRST argument.
-
-An immediate `Nothing` input bypasses the callback and remains `Nothing`
-
-at that position. With multiple sources, any `Nothing` coordinate bypasses
-
-the whole callback. Nested `Nothing` and `Missing` are passed to the callback.
-
-The view keeps its raw length; `ListFrom` materializes it and omits `Nothing`.
+`Map(f, xs, ys) = [f(x1, y1), f(x2, y2), …]`, with the length of the shortest input. The mapping function is always the FIRST argument.
 
 ```epsil
 map(x => x^2, [1, 2, 3])
@@ -1396,11 +1380,11 @@ Range(1, 10, 3)
 
 ### rangeOf
 
-MathJSON `RangeOf` · `(indexed_collection<T>, indexed_collection<T>, from: integer?) -> nothing | range where T`
+MathJSON `RangeOf` · `(indexed_collection<T>, indexed_collection<T>, from: integer?) -> missing | range where T`
 
-Return the 1-based inclusive index span of the first occurrence of `needle` as a contiguous subsequence of the indexed collection, or `Nothing` when it does not occur.
+Return the 1-based inclusive index span of the first occurrence of `needle` as a contiguous subsequence of the indexed collection, or `Missing` when it does not occur.
 
-The search starts at index `from` (1 by default) and the span is always expressed in the original collection's indices, so `RangeOf(xs, needle, Last(r) + 1)` finds the next non-overlapping occurrence and the loop ends at `Nothing`.
+The search starts at index `from` (1 by default) and the span is always expressed in the original collection's indices, so `RangeOf(xs, needle, Last(r) + 1)` finds the next non-overlapping occurrence and the loop ends at `Missing`.
 
 On a string the needle is matched character by character, so a match never begins or ends inside a grapheme cluster.
 
@@ -1609,7 +1593,7 @@ Single(5)
 
 ### slice
 
-MathJSON `Slice` · `((value: T, span: range) -> T where T: string) & ((value: T, span: nothing | range) -> T | nothing where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T: any) & ((value: indexed_collection<T>, span: nothing | range) -> list<T> | nothing where T: any) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T: any)`
+MathJSON `Slice` · `((value: T, span: range) -> T where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T: any) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T: any)`
 
 Return a contiguous run of elements from an indexed collection.
 
@@ -1710,13 +1694,7 @@ symmetricDifference({1, 2, 3}, {2, 3, 4})
 
 MathJSON `Table` · `(function, integer, integer?) -> collection`
 
-An alias for `Tabulate` (the preferred name) that additionally accepts
-
-Mathematica-style iterator specs, e.g. `Table(i^2, {i, n})` (`i` from
-
-1 to `n`), `Table(i^2, {i, 1, n})` or `Table(i, {i, lo, hi, step})`,
-
-and the equivalent tuple spelling `Table(i^2, (i, 1, n))`.
+An alias for `Tabulate` (the preferred name) that additionally accepts Mathematica-style iterator specs, e.g. `Table(i^2, {i, n})` (`i` from 1 to `n`), `Table(i^2, {i, 1, n})` or `Table(i, {i, lo, hi, step})`, and the equivalent tuple spelling `Table(i^2, (i, 1, n))`.
 
 ```epsil
 table(i^2, (i, 1, 5))

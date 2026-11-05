@@ -529,7 +529,7 @@ This function can also be applied to any collection.
 
 Only elements with the same head as the collection are flattened.
 Matrices have a head of `List`, so only other `List` elements
-are flattened.
+(and a `Range`, which is a list) are flattened.
 
 ```json example
 ["Flatten", ["List", ["List", 5, 2, 10, 18], ["List", 1, 2, 3]]]
@@ -558,6 +558,27 @@ without it, the collection is flattened completely.
 ```json example
 ["Flatten", ["List", ["List", 1, ["List", 2]], ["List", 3]], 1]
 // ➔ ["List", 1, ["List", 2], 3]
+```
+
+**Tuples are leaves**: a tuple element stays whole, at any depth, so a point
+stays a point.
+
+```json example
+["Flatten", ["List", ["Tuple", 1, 2], ["List", 3, ["Tuple", 4, 5]]]]
+// ➔ ["List", ["Tuple", 1, 2], 3, ["Tuple", 4, 5]]
+```
+
+**Type**: when the type of the collection shows which elements are lists,
+the result is a list of the type of the elements that stay. When the type does
+not show it (an element of type `any`, a depth that is not a number literal),
+the result is a `list`.
+
+```js example
+ce.declare("xs", "list<list<list<integer>>>");
+ce.box(["Flatten", "xs"]).type.toString();
+// ➔ "list<integer>"
+ce.box(["Flatten", "xs", 1]).type.toString();
+// ➔ "list<list<integer>>"
 ```
 
 `Flatten` is similar to the APL `,` Ravel operator or `numpy.ravel`

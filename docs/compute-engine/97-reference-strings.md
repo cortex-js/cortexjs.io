@@ -892,10 +892,10 @@ comparison is between whole characters.
 
 ```json example
 ["RangeOf", {str: "x́y"}, {str: "x"}]
-// ➔ "Nothing"       — the subject's characters are [x́, y], and x ≠ x́
+// ➔ "Missing"       — the subject's characters are [x́, y], and x ≠ x́
 
 ["RangeOf", {str: "👨‍👩‍👧"}, {str: "👩"}]
-// ➔ "Nothing"       — the subject is ONE character (a ZWJ family cluster)
+// ➔ "Missing"       — the subject is ONE character (a ZWJ family cluster)
 
 ["RangeOf", {str: "ée"}, {str: "e"}]
 // ➔ ["Range", 2, 2] — the leading `e` is inside the `é` cluster
@@ -911,12 +911,12 @@ a match in all three.)
 
 <FunctionDefinition name="RangeOf">
 
-<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
-<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
+<Signature name="RangeOf" returns="range | missing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
+<Signature name="RangeOf" returns="range | missing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
 
 The **span** of the first occurrence of _needle_ as a contiguous subsequence
 of _xs_, as a 1-based inclusive index [`range`](/compute-engine/reference/collections/#range),
-or `Nothing` when the needle does not occur.
+or `Missing` when the needle does not occur.
 
 ```json example
 ["RangeOf", {str: "hello world"}, {str: "o w"}]
@@ -926,7 +926,7 @@ or `Nothing` when the needle does not occur.
 // ➔ ["Range", 2, 2]
 
 ["RangeOf", {str: "abc"}, {str: "z"}]
-// ➔ "Nothing"
+// ➔ "Missing"
 ```
 
 A span rather than a start index, because a span feeds slicing and
@@ -941,7 +941,7 @@ The optional _from_ is the index to start searching at (default 1). The
 returned span is always in the **original** subject's indices, so scanning for
 the next occurrence is `RangeOf(xs, needle, Last(r) + 1)` for non-overlapping
 matches (or `First(r) + 1` to allow overlaps), and finding every occurrence is
-that loop run until it answers `Nothing`:
+that loop run until it answers `Missing`:
 
 ```json example
 ["RangeOf", {str: "abcabc"}, {str: "bc"}]
@@ -951,15 +951,15 @@ that loop run until it answers `Nothing`:
 // ➔ ["Range", 5, 6]
 
 ["RangeOf", {str: "abcabc"}, {str: "bc"}, 6]
-// ➔ "Nothing"
+// ➔ "Missing"
 ```
 
 Domain rules, chosen to make that loop terminate cleanly:
 
 | Case | Result |
 | :--- | :--- |
-| Needle absent | `Nothing` |
-| _from_ past the end of _xs_ | `Nothing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
+| Needle absent | `Missing` |
+| _from_ past the end of _xs_ | `Missing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
 | _from_ less than 1, or not an integer | An error value |
 | Empty needle | An error value — an empty span is not representable (`["Range", 1, 0]` is the *descending* range `[1, 0]`, not an empty one) |
 | Infinite or unknown-length subject or needle | The expression stays symbolic |
@@ -1005,7 +1005,7 @@ search.
 <Signature name="ContainsSequence" returns="boolean">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
 
 Whether _needle_ occurs in _xs_ as a contiguous subsequence. For a non-empty
-needle this is `RangeOf(xs, needle)` not being `Nothing`.
+needle this is `RangeOf(xs, needle)` not being `Missing`.
 
 ```json example
 ["ContainsSequence", {str: "abc"}, {str: "bc"}]

@@ -42,6 +42,77 @@ value against that annotation.
 f(x: real) = x + 1
 ```
 
+### Default values {#default-values}
+
+A parameter can have a **default value**, written `= value` after its name
+and its optional type annotation. A call that leaves the argument out gets
+the default:
+
+```epsil
+function scaled(x: number, factor: number = 2) -> number { x * factor }
+```
+
+`scaled(3)` is `6` and `scaled(3, 5)` is `15`. The same spelling works in
+every form of definition, and in an anonymous function:
+
+```epsil
+scaled(x, factor = 2) = x * factor
+```
+
+```epsil
+(x, factor: number = 2) => x * factor
+```
+
+The call is completed when it is read, so `scaled(3)` and `scaled(3, 2)` are
+the same expression, and the signature of the function shows the default:
+`(x: number, factor: number = 2) -> number`. A named argument can skip a
+parameter that has a default: with
+`function f(x, density: number = 1, factor: number = 2)`, the call
+`f(3, factor: 5)` is `f(3, 1, 5)`.
+
+A default value is one of:
+
+- a number, with an optional sign (`2`, `-1`, `0.5`, `NaN`, `-oo`);
+- a string (`"auto"`), without interpolation;
+- `true` or `false`;
+- the empty list `[]` or the empty dictionary `{}` (in a parameter list, `{}`
+  is the empty dictionary, not the empty set);
+- a constant: a library constant (`pi`, `Integers`), or a symbol declared
+  constant before the function is defined: a constant that the host
+  declared, a `const` of an earlier program on the same engine, or a `const`
+  of the same program, in the same block or an enclosing one, written before
+  the function, with any value (`const W = 5; function f(k = W) { k + 1 }`
+  gives `f()` = 6, and `const L = [1]; function g(k = L) { k }` gives `g()`
+  = `[1]`);
+- a symbol that the parameter type lists
+  (`mode: symbol<Auto> | symbol<Manual> = Auto`).
+
+A default is a constant. A symbol that names a variable (a `let` of the
+program), or a symbol that is not declared and that no `symbol<…>` parameter
+type lists, is not a default value: write a constant, or pass the argument.
+A function statement is defined before the statements of its block run, so a
+`const` written after it is not a constant for its defaults:
+`function f(k = W) { k + 1 }; const W = 5` is an error. A known limitation:
+a constant declaration that the host canonicalizes and does not run makes its
+name a constant for a later default. On an engine where `W` is a variable,
+canonicalize `["Declare", "W", {"value": 5, "constant": "True"}]` without
+evaluating it: `(k = W) => k` is then accepted as a constant default, and a
+call of it reads the variable `W`. The parameters with a
+default come after the parameters without one. A function with a rest parameter (`...xs`) has no defaults.
+
+A default fills an argument that the call leaves out, and nothing else: an
+argument that the call supplies is passed to the body as it is, also when it
+is `missing` or `NaN`. Write `f(x ?? 2)` to replace an absent argument.
+
+Any other default is the diagnostic `default-value-invalid`, and so is a
+default that names a parameter of the same list (`(x, k = x) => …`), a
+default that is `Nothing`, and a default on a function with a rest
+parameter. A symbol default that is not constant is the static error
+`expected-a-literal-default`, reported when the function is defined. A default is not supported yet in a function with several
+clauses (a [literal parameter](#multiple-clauses-literal-parameters) makes
+one), on a [`bind` parameter](#bound-variable-parameters-bind), or in a
+[protocol](/protocols/) requirement.
+
 ### Which form to use
 
 The three spellings differ only in ergonomics, so pick by the shape of the

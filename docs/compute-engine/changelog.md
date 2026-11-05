@@ -13,7 +13,1761 @@ import ChangeLog from '@site/src/components/ChangeLog';
 <ChangeLog>
 ## Coming Soon
 
+### Breaking changes
+
+- **An operator declares its bound variables with operand roles, and the
+  `scoped` flag is a boolean.** The bound variables of an operator (the index
+  of a sum, the variable of a derivative) were declared with a binding-site
+  selector as the value of `scoped`, made with `operandSites`,
+  `operandsFrom`, `indexingSetSites`, `limitsIndexSites` or
+  `lambdaParamSites`. These functions and the types `BindingSite` and
+  `BindingSiteSelector` are no longer exported, and a function as the value
+  of `scoped` now throws an error that names `operands`. Give the bound
+  variables the `bound` role (a symbol, as `operandSites` and `operandsFrom`
+  declared) or the `clause` role (an indexing set such as `Limits(k, 1, 10)`
+  or `Element(k, S)`, as `indexingSetSites` and `limitsIndexSites` declared)
+  of the `operands` handler:
+
+  ```ts
+  // Before
+  ce.declare('MySum', {
+    lazy: true,
+    signature: '(any, any+) -> number',
+    scoped: indexingSetSites(1, 'integer'),
+  });
+  // Now
+  ce.declare('MySum', {
+    lazy: true,
+    signature: '(any, any+) -> number',
+    operands: (ops) =>
+      ops.map((_, i) =>
+        i === 0 ? { kind: 'raw' } : { kind: 'clause', type: 'integer' }
+      ),
+  });
+  ```
+
+  An operator with a `bound` or a `clause` role has its own scope, as with
+  `scoped: true`. The engine finds these roles when the operator is declared,
+  by calling the handler with zero to three `Nothing` operands, so the
+  handler must give them for those operands too; a handler that gives one
+  role per position, as above, does. A `bound` or `clause` operand of an
+  operator that is not `lazy` is no longer evaluated before the `evaluate`
+  handler. The library operators bind the same variables as before.
+
+### Resolved Issues
+
+- **Compiled JavaScript no longer defines a function twice with the same body.**
+  With `P: (tuple<real, real>) -> number`, a call `P((n, n + 1))` inside a `Sum`
+  and a call of `P` with another point gave two definitions in `preamble`, with
+  the same text. These calls now share one definition, `_fn_P`. The values do
+  not change.
+- **A zero times a list or over a list keeps the list.** With `L: list<real>`
+  and no value yet, `0·L` simplified to the scalar `0`, the canonical form of
+  `0/L` was `0`, and `0·L + 1` simplified to `1`. A broadcast that held such a
+  term changed length. These forms now stay as they are, and with
+  `L = [1, 2, 3]` they evaluate to `[0, 0, 0]`, `[0, 0, 0]` and `[1, 1, 1]`.
+- **`simplify()` keeps `|arcsin(x)|`, `|arccsc(x)|`, `|artanh(x)|` and
+  `|arcoth(x)|`.** It rewrote `|f(x)|` as `f(|x|)`, which is complex where `f`
+  is not real: `|arcsin(2)|` is `2.05`, and `arcsin(|2|)` is `1.57 - 1.32i`. The
+  result was also typed complex, so that a compiled comparison of it declined.
+  The rewrite stays for the functions that are real on the whole real axis, such
+  as `arctan` and `arsinh`.
+- **`evaluate()` and `simplify()` no longer overflow the stack on a lazy operator
+  over an operand that evaluates to itself.** A `Map` over
+  `Range(0, Length(At(u, i)) - 1)` with a length that is not known replaced the
+  operand with the same expression and evaluated the `Map` again, until the
+  stack overflowed.
+- **`simplify()` of a large sum respects `withTimeLimit()`.** The rule for
+  `g·sin²(u) + g·cos²(u)` examined each pair of terms with no check of the limit
+  and built the factors of a term again for each pair. A limit of 300 ms on
+  `(sin(3x) + cos(xπ²) + 2)^64 / M^64` ended after about 5,600 ms, and now ends
+  after about 500 ms.
+- **A `Map` that the engine compiles reads the current value of the symbols in
+  its function.** The compiled code kept the value of the first drain when the
+  symbol got a new value with no assignment: a parameter of a new call, a local
+  of a new call, or a loop index. With
+  `f(d) := Sum(Map(x => x + d, Range(1, 128)))`, `f(1); f(2); f(3)` was
+  `8384; 8384; 8384`. Now it is `8384; 8512; 8640`, as with `ce.jit = 'off'`.
+  `Sum(Sum(Map(x => x + k, Range(1, 128))), k, 1, 3)` was `25152`, and now it is
+  `25536`. The defect was in both the integer compilation and the compilation
+  under `N`. The engine now compiles the function again when such a value
+  changes.
+- **[#513](https://github.com/cortex-js/compute-engine/issues/513) An
+  operator definition can declare which of its operands are statements.**
+  An assignment is valid only as a statement, and the statement operands
+  were a fixed list of library operators, so a host operator such as
+  `Do(body, n)` could not take one: `Block(Assign(s, 0), Do(Assign(s, s + 1), 5), s)` was the error `assignment-in-operand`. The new `operands` handler
+  of an operator definition gives a role to each operand:
+  `operands: () => [{ kind: 'statement' }, { kind: 'value' }]`. Now the
+  block above evaluates to `5`. A statement operand is canonicalized as a
+  branch of an `If` is: a first assignment of a name that no enclosing scope
+  declares is the error `first-assignment-in-branch`, and a bare `Break` is
+  an error. An operator that is not `lazy` evaluates only its `value`
+  operands before its `evaluate` handler, so the handler receives the
+  statement as written and runs it when it needs to. The body of a
+  `MatchCase` is a statement too: `Block(Assign(a, 0), Match(x, MatchCase(1, Assign(a, 2))), a)` was the error `assignment-in-operand`, and now gives
+  `2` when `x` is `1`.
+- **[#437](https://github.com/cortex-js/compute-engine/issues/437) An
+  operator can hold one operand and keep the checks of the others.** To
+  compute `Mod(Fibonacci(10^6), p)` in ℤ/p, a `Mod` handler must see
+  `Fibonacci(10^6)` before it is evaluated. An operator that is not `lazy`
+  evaluated every operand before its `evaluate` handler, and a `lazy`
+  operator lost its type, its broadcast over a list, the check of its
+  operands against the signature and its `NaN` result: a lazy copy of `Mod`
+  typed `Mod(3*4, 5)` as `real`, left `Mod('a', 3)` unevaluated, and threw
+  on `Mod(1)`. The new `held` operand role of the `operands` handler keeps
+  one operand unevaluated in an operator that is not `lazy`:
+  `operands: () => [{ kind: 'held' }, { kind: 'value' }]`. Now the handler
+  receives `Fibonacci(10^6)` as written, under `evaluate()`, `N()` and
+  `evaluateAsync()`, and the operator keeps the checks, the type and the
+  broadcast of `Mod`: `Mod(3*4, 5)` is `2` typed `integer`, `Mod('a', 3)`
+  is the error `incompatible-type`, and `Mod([1, 2, 3], 2)` is `[1, 0, 1]`.
+  A literal list at a held position is broadcast, and the handler receives
+  each element unevaluated. The `held` role is refused on a `lazy`
+  operator, whose operands are all `raw`.
+- **A read through an alias of a record or a dictionary has the type of the
+  read of the named type.** With `Rec` an alias of `record{a: list<real>}` and
+  `x: Rec`, `At(x, "a")` was typed `tuple<string, any>`, and `At(x, "a", 1)` was
+  typed `string`, so `At(x, "a", 1) + 1` was an error. They are now typed
+  `list<real>` and `real`, and the sum has a value. The same applies to an alias
+  of a dictionary, and to an alias that is an arm of a union.
+- **A read with several indexes has the type of the same read written one index
+  at a time.** With `t: tuple<list<real>, real>`, `At(t, 1, 2)` was typed
+  `list<real>`, and its value is a real number; with
+  `L: list<record{a: real}>`, `At(L, 1, "a")` was typed `tuple<string, any>`.
+  Now each is typed `real`, as `At(At(t, 1), 2)` is, also for a step through a
+  dictionary. `At(t, 1, 2)` now compiles: it declined before. A read out of range
+  whose steps go through a record, a dictionary or a tuple now gives the marker
+  of the final value: `At(L, 9, "a")`, and `At(X, 9, 1)` with
+  `X: list<tuple<real, string>>`, are `NaN`, not `Missing`. A read with one index
+  too many (`At(t, 2, 1)`) is typed `error`, and its value is an error, as before.
+- **`Flatten` keeps a tuple element in every form of the call.** A list of
+  tuples of one shape kept them, but other forms opened them:
+  `Flatten([(1, 2), (3, 4)], 1)` was `[1, 2, 3, 4]`, and
+  `Flatten([(1, 2), (3, 4, 5)])` was `[1, 2, 3, 4, 5]`. Now each keeps the
+  tuples, as the reference page says, so a point stays a point:
+  `Flatten([(1, 2), (3, 4)], 1)` is `[(1, 2), (3, 4)]`. A tuple as the operand
+  is still opened: `Flatten(([1, 2], 3))` is `[1, 2, 3]`.
+- **The numeric evaluation of a rational is typed as a real.** `N(1/3)` was
+  typed `rational<0.33..0.34>`, and its value is a float, which is not a
+  rational. Now it is typed `real<0.33..0.34>`. `N([1/3, 2])` is a
+  `vector<real^2>`, and `Map(k ↦ N(k / 3), [1, 2])` is a `vector<real^2>`. An
+  integer stays an integer: `N(5)` is typed `integer`, and `N(5) / 3` is typed
+  `real`. With a precision, the type has no range, because the value is
+  rounded: `N(1/3, 1)` is `0.3`, and it is typed `real`. `Typed(N(1/3), 'rational')` still passes.
+- **[#512](https://github.com/cortex-js/compute-engine/issues/512) Collection
+  operators that keep the elements of their operand give the element type of
+  the operand.** `Flatten` of a `list<list<integer>>` was typed `list`, so an
+  element of it was typed `any`, and `Max(At(Flatten(xs), i), At(Flatten(xs), j))` did not compile. Now `Flatten(xs)` is a `list<integer>`, and the `Max`
+  compiles. With a depth, the type has the levels that stay:
+  `Flatten(xs, 1)` of a `list<list<list<integer>>>` is a
+  `list<list<integer>>`. A tuple element keeps its type:
+  `Flatten(xs)` of a list of points is a `list<tuple<integer, integer>>`. These
+  operators also keep the element type now:
+  `Chunk` (`list<list<integer>>`, was `list<list>`), `GroupBy`
+  (`dictionary<list<integer>>`, was `dictionary<list>`), `Cycle`, `Union`,
+  `Intersection`, `SetMinus`, `Complement`, `SymmetricDifference`, `Join` of
+  sets (`set<integer>`, was `set`), `Iterate` with a user function or a symbol
+  declared with a function type (`list<integer>`, was `list`), `Reshape`
+  (`matrix<integer^(2x2)>`, was `matrix<2x2>`), and `Tabulate` and `Table`
+  with a function literal (`vector<integer^5>`, was `vector<5>`). The
+  compiled JavaScript `Flatten` declines when it would open a tuple:
+  `Length(Flatten(xs))` with `xs` a list of points gave the number of
+  coordinates, not the number of points. `Flatten` now stays unevaluated when
+  an element is an infinite list (`Flatten([[1], Cycle([2])])`) or an
+  unevaluated read of a list (`Flatten([[1], At(xs, 1)])` with `xs` a list of
+  lists with no value).
+
+- **A series keeps its remainder under `N()`.** `Series(sin x).N()` and
+  `Series(exp x).N()` were `NaN`, because a `BigO` term was `NaN` under `N()`.
+  Now the `BigO` term stays, its operand is approximated, and the other terms
+  are approximated, as in Mathematica: `Series(sin x).N()` is
+  `x - 0.1666…x^3 + 0.008333…x^5 + O(x^7)`, and `BigO(x^7).N()` is
+  `BigO(x^7)`. The value of `Series(sin x, x, 0, 3)` at `x = 1/2` is
+  `0.479… + O(0.03125)` under `N()`. A host that tests `.N().isNaN` to find a
+  series no longer finds one: test for the `BigO` operator. Use `Normal` to
+  drop the remainder, as before.
+
+- **A power of `0` with a variable exponent is no longer folded with the value
+  that the variable has when the expression is boxed.** After
+  `ce.assign('x', 2)`, `ce.box(['Power', 0, 'x'])` was the number `0`, and it
+  stayed `0` after `ce.assign('x', -1)`. Now the expression stays `0^x`, and
+  `evaluate()` and `N()` use the value of that moment: `0` for `x := 2`,
+  `ComplexInfinity` for `x := -1`, `NaN` for `x := 0`. An exponent made only of
+  numbers and constants still folds when it is boxed (`0^{2\pi}` is `0`).
+- **`Sort` and `Ordering` of an empty list give the empty list.**
+  `Sort([])` and `Ordering([])` stayed unevaluated, also with a key function
+  or a comparator, and also for a source that evaluates to an empty list
+  (`Sort(Filter([1, 2], x ↦ x > 5))`). Now each gives `[]`. `Sort("")` gives
+  the empty string `""`.
+- **The application of a curried function to a list is typed as a list.**
+  With `mk := n ↦ (x ↦ x + n)`, `Apply(mk(1), [1, 2])` was typed `number`,
+  and its value is `[2, 3]`. Now it is typed `vector<2>`, as
+  `Apply(x ↦ x + 1, [1, 2])` is. A list of tuples, whose cells the body of
+  the inner function decides, gives the type `any`.
+- **The negation of a chained comparison compiles to the negation of the
+  whole chain.** `Not(Less(3, y, x))` compiled to `!(3.0 < y) && (y < x)` in
+  GLSL and WGSL, and to the same form in JavaScript and Python
+  (`not (3 < y) and (y < x)`), which negates only the first
+  comparison: at `y = 4`, `x = 1` the compiled code gave `false` and the
+  interpreter gives `True`. Now the code is `!((3.0 < y) && (y < x))`.
+
+## 0.180.0 _2026-11-04_
+
+### Breaking changes
+
+- **A function literal whose body cannot give the declared result type is
+  refused when it is assigned.** With `g` declared `(x: number) -> number`,
+  `ce.assign("g", t ↦ t > 0)` now throws an `incompatible-type` error, as
+  `ce.assign("v", True)` does for `v` declared `number`. The same holds for
+  `ce.declare()` with a value, and the `Assign` operator gives the error
+  value. Before, the assignment was accepted and each call gave the error. A
+  generic result is read at the bounds of its type variables: with
+  `(x: T) -> T where T: broadcastable<number>`, the bodies `t > 0` and
+  `(t, t^2)` are refused, and with `(x: T) -> boolean where T` the body
+  `x ↦ 1` is refused. An inferred type that is only wider than the
+  declared result is still accepted (`n ↦ n + 1` under
+  `(integer) -> integer`), and so is a character under a string result
+  (`(s: string) ↦ s[1]` under `(string) -> string`). Not tested: `NaN`,
+  `Missing` and `Nothing` in the type of the body, a collection body when a parameter can receive a
+  collection whole (the result can then be a broadcast), and a body with a
+  `Return` before its last statement.
+
+### Performance
+
+- **Adding symbolic terms with rational coefficients reuses unchanged products.**
+  Evaluating and reading the 1,000 elements of
+  `\sum_{n=0}^{3}2^{-n}|\sin(2^nx+[0...999]/1000)|` took about 494 ms
+  and now takes about 377 ms in an alternating five-run comparison.
+  The values and their types are unchanged.
+
+- **Reading the elements of an evaluated broadcast that holds `Abs` is
+  about twice as fast.** For
+  `\sum_{n=0}^{3}2^{-n}|\sin(2^nx+[0...999]/1000)|`, reading the 1,000
+  elements of the evaluated value took about 1,250 ms and now takes about
+  560 ms. Three changes: the coefficient of `Abs(u)` is read without
+  building a new `Abs` node when there is no coefficient to extract; an
+  evaluation no longer computes the type of its result to take back
+  incomplete walks when it recorded none; and the type of `Abs` of an
+  operand that may be NaN (`nan | real<0..> | signed_infinity`) is one
+  shared frozen type, so its facts are computed once. The values and the
+  types are the same (Tycho row 474).
+
+### Resolved Issues
+
+- **Arithmetic on a value declared as a point or a list of points keeps the
+  signed infinities in the component types.** With
+  `E = real | signed_infinity | nan` and
+  `P: list<tuple<E, E>> | tuple<E, E>`, the expressions `2P`, `P + P` and
+  `(6, 0) + P` were typed `list<tuple<infinity | nan | real, …>> | tuple<infinity | nan | real, …>`, while `-P` and `P/2` kept `E`. The type
+  `infinity` admits the complex infinity, which no such sum or product has,
+  so a symbol declared with the union refused the result. A sum and a
+  product are now typed for each arm of the union, and the result is the
+  union `list<tuple<E, E>> | tuple<E, E>`. The 3-D union is the same
+  (Tycho row 492).
+
+- **Compilation to JavaScript: a call mapped over a literal list of points
+  compiles when a point reads an input declared with a range.** With
+  `n: (tuple<number, number>, unknown, unknown) -> tuple<number, number>`,
+  `n := (q, D2, d2) ↦ q + C(D2, d2)` and `x`, `y` declared `real<-10..10>`,
+  `n([(1, 2), (x, y)], 4, 2)` now compiles and gives `[(2, 2), (4, 4)]` at
+  `x = 3`, `y = 4`. Before, it fell back to the interpreter, because the
+  element type of the list is a union of two tuples
+  (`tuple<integer, integer> | tuple<real<-10..10>, real<-10..10>>`), and the
+  map then used the definition of `n` with `D2` and `d2` typed `unknown`.
+  The map now uses the definition for one point whose coordinates join the
+  coordinates of the tuples (`tuple<real, real>`), as it did when `x` and `y`
+  were declared `real`.
+
+- **Compilation to GLSL and WGSL: the body of a user function calls the
+  built-in `sin`, `cos`, `sign`, `min`, `max` or `clamp` of a parameter that
+  every call bounds, or that the host declared with a range.** Since
+  0.179.0, such an operand called the NaN-safe helper (`_gpu_sin`, …). With
+  `x` declared `real<-1e15..1e15>` and `F(a) := sin(a)`, the GLSL of `F(x)`
+  now defines `_fn_F` as `sin(a)`, as in 0.178.0. A parameter is finite for
+  certain when every call of the function in the compiled expression passes
+  a value proven finite from the declarations, also through the body of
+  another function (`G(c) := F(c, 2c)` called as `G(k)` with
+  `k: real<0..10>` bounds both parameters of `F`). A declared range on a
+  parameter (`F: (real<-1..1>) -> real`) now also gives the built-in, for
+  any argument: before, the engine typed the parameter `number` and the
+  range was lost. One call with a value that can overflow in f32
+  (`F(exp(y))` with `y: real`) or be NaN (`y: real | signed_infinity | nan`)
+  keeps the helper. A call of a function whose declared result type has no
+  finite range keeps the helper: the body of a function is not read to prove
+  its result. No compiled value changes.
+- **A `Filter` predicate that reads a typed parameter of an enclosing
+  function, and then reads it again in a nested function, no longer throws**
+  ([#510](https://github.com/cortex-js/compute-engine/issues/510), reported by
+  [enumeratio](https://github.com/enumeratio)). With `v: list<integer>` the
+  parameter of the outer function, `Count(Filter(1..1, c ↦ v[3] = v[1] ∧ Min(Map(1..3, j ↦ v[j])) ≥ 0))` applied to `[1, 0, 1]` threw "Filter
+  predicate must return "True" or "False"" since 0.178.0: the nested function
+  `j ↦ v[j]` read `v` without its value. It now gives `1`.
+- **A fold whose callback appends to the accumulator on one branch of an `If`
+  and returns it unchanged on the other is typed as a list of numbers**
+  ([#511](https://github.com/cortex-js/compute-engine/issues/511), reported by
+  [enumeratio](https://github.com/enumeratio)). `Fold((t, m) ↦ If(m > l, t, Join(t, [x])), [1], 1..l)` was typed `list<any>`, so a second fold in `x`
+  that reads `t` by index declined to compile with "does not settle one
+  shape" since 0.178.0. It is now typed `list<number>`, and it compiles: in
+  the example of the issue, `n = 3` and `l = 4` give `[1, 1, 2, 4, 7]`, as
+  the interpreter does.
+- **A fold whose accumulator is read past its end compiles again**
+  ([#511](https://github.com/cortex-js/compute-engine/issues/511), reported by
+  [enumeratio](https://github.com/enumeratio)). The cumulative sums
+  `Fold((acc, c) ↦ Join(acc, [If(c = 1, 0, acc[c - 1]) + xs[c]]), [], 1..Count(xs))`, with `xs: list<integer>`, declined since 0.178.0 with
+  "the accumulator can be a collection (type `list<integer | missing>`)". The
+  read `acc[c - 1]` can be out of range, so the accumulator is typed
+  `list<integer | missing>`, and a declared type cannot name `missing`. It
+  compiles now, and `xs = [3, 1, 4, 1, 5]` gives `[3, 4, 8, 9, 14]`, as the
+  interpreter does. As for every compiled read, an element that is absent
+  gives `NaN` where the interpreter gives `Missing`.
+- **A compiled call of a user function whose body does not give its declared
+  result type declines, where it gave a wrong value.** The compiled code used
+  the declared result and did not check the body. With
+  `g: (x: number) -> number` and `g := t ↦ t > 0`, the compiled `g(b) + 1`
+  gave `2`, and the interpreter gives an `incompatible-type` error. With
+  `g: (x: T) -> T where T: broadcastable<number>`, `g := t ↦ (t, t^2)` and
+  `x: list<real>`, the compiled `Sum(Rest(g(x)))` gave the string
+  `"02,43,9"`, and the interpreter gives `(5, 13)`. Such a call now declines,
+  and `evaluate()` gives the value. This includes a call that maps the
+  function over a list argument. A body with a `Return` before its last
+  statement is not checked. Most such functions are now refused when they
+  are assigned (see "Breaking changes"); the decline covers the others.
+- **A fold whose callback gives a matrix is typed with a type that admits its
+  value.** `Fold((a, k) ↦ [[a[1], 2], [3, 4]], [1, 2, 3], 1..n)` was typed
+  `matrix<integer^(2x2)> | vector<integer^3>`, but for `n = 2` its value is
+  `[[[1, 2], 2], [3, 4]]`, which that type does not admit. It is now typed
+  `list<list<unknown>> | vector<integer^3>`.
+
+## 0.179.0 _2026-11-04_
+
+### Breaking changes
+
+- **Custom compile targets: two `CompileTarget` members are removed.**
+  `absence.object.isNull` is gone: the guard of an absent collection at a
+  position-preserving accessor (`At`, `First`, `Length`, ...) now tests it
+  with `absence.object.isAbsent`, which a target already declares.
+  `collectionEqualityOperand` is gone with no replacement: the compiled
+  `Equal` and `NotEqual` over collections now always give a boolean, so a
+  branch condition needs no classification of its operands.
+- **`BaseCompiler` static members of the condition analysis are removed**:
+  `isAbsenceSymbol`, `operandMayBeAbsent`, `ATOMIC_FRAGMENT`,
+  `mayBeUndecided`, `compileGuardTest`, `conditionDecidability`,
+  `conditionNode`, `connectiveNode`, `isDecidedByConstruction`,
+  `operandPresenceConjuncts`, `isNanLiteral`, `absentOnlyThroughNumericSlots`,
+  `peelNegations`, `kleeneCondition`, `kleeneConditionParts`,
+  `kleeneValueLeaf`, `kleeneRelationLeaf`, `kleeneConnective`,
+  `kleeneValueConnective`, `isDecidedBooleanValue`, `withConditionOperands`,
+  `exactSelect`, `compileExactCondition`, `conditionDialects` and
+  `conditionDialectOf`, and the exported `ConditionDialect`, `ConditionNode`
+  and `CONDITION_DIALECT_JS`. A custom target compiles a branch condition
+  with `BaseCompiler.compile`, or with `BaseCompiler.guardCondition` for the
+  check that the condition is a boolean.
+- **Custom compile targets: the code for an input that the compiled code
+  writes is removed.** A write to an input already declines ("is not a
+  local of the compiled expression"), so the `CompileTarget` fields
+  `inputWrites` and `inputLocals` are gone, and a target no longer makes a
+  local copy of an input or compiles the expression a second time. The
+  `BaseCompiler` static members `classifyLocalReads`, `loopRunsOnce`,
+  `localReadWithNoWrite`, `nestedOnlyLocals`, `chainedLocalDeclares`,
+  `chainedAmbientWrite`, `scopeChainBinds`, `splitChainedAssignments` and
+  `localVarsObjectStatement` are removed too: the forms that they handled
+  (a read of a local before it has a value, a chained assignment) are
+  static errors since 0.178.0. No compiled value changes.
+- **Custom compile targets: `CompileTarget.reboundFunctions` is a set of
+  names.** A call of a block-local function whose value can change while
+  its block runs (assigned more than once, inside a nested statement, or
+  from the result of a call) already declines, so the field no longer holds
+  a function literal or a decline reason for each name: it is a
+  `ReadonlySet<string>`. The `BaseCompiler` static members change with it:
+  `reboundLocalNames` returns the set, and `reboundFunctionScope` and
+  `noteLocalFunction` take it. Such a call now declines with one reason,
+  also when the values of the local have different signatures or one of
+  them is not a function literal. No compiled value changes.
+- **Custom compile targets: `CompileTarget.reset` is removed.** The
+  compiler never called it: a compilation is not done again on the same
+  target. A target object that still has the field is accepted; the field
+  is no longer read or checked, and TypeScript reports it as an unknown
+  property in an object literal typed `CompileTarget`. No compiled value
+  changes.
+- **`BaseCompiler` static members of the promotion record are removed**:
+  `_promoted`, `notePromoted`, `recordPromotion`, `recordFoldedPromotions`
+  and `hasPromotedDefinition`. They recorded the values that the `auto`
+  mode promoted to complex. That mode and the `promoted` result field were
+  removed in 0.178.0, so nothing read the record. No compiled value
+  changes.
+- **`BaseCompiler` static members of the `Nothing` and decidability proofs
+  are removed**: `callbackExcludesNothing`, `isElementReadWithoutNothing`
+  and `isCompiledIndex`. `assertCollectionOmissionSupported` is renamed
+  `assertNoNothingElement`, and takes no `target` argument: it reads only
+  static types. `withScalarFedLiteral` takes no kind argument (its
+  `'finite'` kind gave the same code as `'scalar'`), and
+  `scalarFedLiterals` is a `Set` of the marked literals.
+- **Custom compile targets: `CompileTarget.gpuParameterFacts` is removed.**
+  The shader targets no longer record facts about the parameters of a user
+  function or the index of a loop, so nothing read the field.
+
+### Behavior Changes
+
+- **Compilation to JavaScript: a fold over elements whose shape the type
+  does not settle declines.** A `Sum` or a `Product` of one collection, and
+  a `Reduce` or a `Scan` by `Add` or `Multiply`, now declines with the code
+  `unsettled-shape` when an element can be a number or a list: `Sum(L)`
+  with `L: list<unknown>`, `L: list<real | list<real>>`,
+  `L: list<broadcastable<real>>` or `L: collection<expression>`, and
+  `Sum(g(x))` with `g: (real) -> unknown`. A source typed `any`, `unknown`
+  or `value` declines too. The interpreter evaluates these folds. Declare the element type to compile them: with `L: list<real>` or
+  `L: list<list<real>>`, `Sum(L)` compiles. A fold whose element type is
+  settled tests no shape of an element at run time, nor the shape of a
+  source that is an input, a list literal, element-wise arithmetic over one, `Map` over one, or an element of an input or a literal: with
+  `L: list<tuple<real, real>>`, `Sum(L)` compiles to
+  `(_.L).reduce((_a, _b) => _SYS.add(_a, _b), 0)`, where it tested each
+  element and the source with `Array.isArray`. Its values do not change.
+
+- **Compilation: `Max`, `Min` and the interval fold decline over a value
+  that can be a number or a list, and three consumers of a list test no
+  shape at run time.** On JavaScript, `Max` or `Min` of an operand whose
+  type is a union of a number and a list, a `broadcastable<T>` or `unknown`
+  (`Min(Distance(S, (1, 2)))` with `S: indexed_collection`, `Max(√x, f())`
+  with a block-local `f`) now declines with the code `unsettled-shape`,
+  alone or beside other operands. On `interval-js`, a `Sum`, `Product`,
+  `Max` or `Min` of such a value (`Max(2b)` with `b: broadcastable<real>`,
+  a `Which` with a list branch and a number branch) declines too. The
+  interpreter evaluates these expressions. Declare the type of the value
+  (`S: list<list<real>>`) to compile them. An input or a parameter
+  declared with a union of a number and a list keeps its one test.
+  Code that compiled before and still compiles tests no shape where the
+  type settles it: the loop of an indexed `Sum` or `Product` whose term is
+  a list (`Sum(L·i, i, 1, n)` with `L: list<real>`), `Max` or `Min` of one
+  list operand (`Min(P·(1 − v) + Q·v)` with `P, Q: list<real>`), and the
+  `interval-js` fold of an input typed as a list of numbers (`Sum(L)`).
+  Their values do not change: a length mismatch still gives `NaN` on
+  JavaScript and the absence marker on `interval-js`. A list value that is
+  not an input, a list literal, element-wise arithmetic over one, `Map` over one, or an element of an input or a literal keeps its test,
+  because an indexed `Sum` over a list of unknown length is the number `0`
+  for an empty range (`Max(2·Sum(L·i, i, 1, n))` at `n = 0` is `0`). The
+  term of an indexed `Sum` or `Product`, and a `PointList` component, whose
+  type is a union of a number and a list keep their run-time test
+  (`docs/COMPILATION-MODEL.md`, R3).
+
+- **Compilation to GLSL and WGSL: a call is proven finite from the
+  declarations and the expression only.** A call of `sin`, `cos`, `sign`,
+  `min`, `max` or `clamp` uses the built-in when its argument is proven
+  finite in f32 from the declared types and ranges of the inputs, the
+  declared ranged result types of the user functions, the literals and the
+  operators of the argument, and calls the NaN-safe helper (`_gpu_sin`, …)
+  otherwise. The compiler no longer reads the body of a user function, the
+  values that the calls of a function pass, or the bounds of a loop to
+  prove it. These forms now call the helper where they called the
+  built-in: an operand that reads a parameter of a user function, also
+  when every call passes a finite value or the signature declares a range
+  (`F(a, b) := sin(a) + cos(b) + min(a, b)` called as `F(x, y)` gives
+  `_gpu_sin(a) + _gpu_cos(b) + _gpu_min(a, b)` in `_fn_F`); an operand
+  that reads the index of a `Sum`, a `Product` or a loop that the shader
+  does not unroll; a call of a user function whose result type has no
+  declared range (`sin(f(x))` with `f(u) := cos(u)/2` gives
+  `_gpu_sin(_fn_f(x))`); and a quotient by `cos(u)` with `u` in a bounded
+  interval. The helper gives the same value as the built-in on a finite
+  argument, so no compiled value changes; the helper costs a bit test and a
+  selection per call. To get the built-in, declare the range of an input
+  (`t: real<-5.5..5.5>`) or a result type with a range for the function:
+  with `f: (real) -> real<-1..1>`, `sin(f(x))` gives `sin(_fn_f(x))`, and
+  `sin(1000·f(x))` gives `sin(1000.0 * _fn_f(x))`. A result type with no
+  range (`(real) -> real`) keeps the helper: the body is computed in f32
+  and can overflow. A body whose f32 value leaves its declared range gives a
+  value outside its type, for which the compiled value is unspecified.
+- **An assignment to a symbol with a declared type accepts a value whose type
+  overlaps the declared type, and each read of the symbol tests the value.**
+  A function call already accepts such an argument. Before, the type of the
+  value had to match the declared type. With `E = real | signed_infinity | nan`, `a` declared `real` and `P` declared `tuple<E, E>`,
+  `ce.assign("P", ce.parse("(-\\sqrt{1-a^2}, a)"))` threw "not compatible
+  with the type", because the value is typed `tuple<complex, real>`. It is
+  now accepted: `P` evaluates to `(-0.866…, 0.5)` when `a = 0.5`, and to an
+  `incompatible-type` error when `a = 5`, where the first component is
+  imaginary. This applies to `ce.assign()`, `Assign`, `ce.declare()` with a
+  value, `Declare` and a typed Epsil `let`. These are still refused when
+  assigned: a value whose type has no value in common with the declared type
+  (`ce.declare("t", "gf8"); ce.assign("t", 2)`), and a value made only of
+  literals and constants that is not of the declared type. Compiled code does
+  not test the value: it reads the symbol as a value of its declared type,
+  and a value outside that type gives an unspecified result. A compilation
+  that reads such a symbol declines when the stored value can be complex
+  (`r: real` assigned `z: complex`), so a valid input such as `z = 2 + 0i`
+  gives the interpreter's value (Tycho row 483).
+- **`Find` with no matching element gives the absent value of the element
+  type, not `Nothing`.** `Find([1, 2, 3], x ↦ x > 5)` is `NaN`, typed
+  `integer | nan` (it was `Nothing`), so `Coalesce(Find(xs, p), 0)` gives
+  `0` and `Find(xs, p) + 1` is `NaN` (it was an `incompatible-type` error).
+  Over a list of points the value is the point of `NaN` coordinates, and
+  over strings or other elements it is `Missing`:
+  `Find(["a"], x ↦ x = "b")` is `Missing`, typed `missing | string`. This
+  is the value that a read out of range of the same list gives. Compiled
+  JavaScript and Python give `NaN` for numbers and the `NaN` point for
+  points (compiled JavaScript gave a scalar `NaN` for points).
+- **A sequence search that finds nothing gives `Missing`, not `Nothing`.**
+  `RangeOf([1, 2, 3], [9])` is `Missing` (it was `Nothing`), and `RangeOf`
+  is typed `range | missing`. `Slice(xs, RangeOf(xs, needle))` is still
+  absent when the needle does not occur: it is `Missing`, as every operator
+  over `Missing` is, and `Coalesce(Slice(xs, RangeOf(xs, needle)), [])`
+  gives `[]`. `Slice` gives `Missing` for a `Missing` operand in any
+  position (`Slice(Missing, 2, 3)` was an `incompatible-type` error), and
+  `Slice([1, 2, 3], Nothing)` is now an `incompatible-type` error (it was
+  `Nothing`). Test a failed search with `IsMissing` or `Coalesce` (`??` in
+  Epsil), not with a comparison to `Nothing`.
+- **Compilation: a parameter default that names a constant declared by the
+  host compiles.** With `ce.declare('W0', { isConstant: true, value: 5 })`
+  and `f := (k = W0) ↦ k + 1`, the compiled `f()` is `f(5)` and gives 6, as
+  the interpreter does. Before, the compilation declined on every target
+  (#490). Compiled code fills the value of the constant, read where the
+  function is declared, not its name, so a local of the same name or a
+  `vars` entry where the call is made does not change it. The value must be
+  a number, a string, a boolean, a list or tuple of such values, or `{}`;
+  any other value still declines. A default that names an Epsil `const`
+  still declines when the program is compiled before it runs: the constant
+  has no value at compile time. To compile such a function, write the value
+  as the default, or pass the argument.
+- **Compilation: a value that can be `Nothing` declines with one
+  diagnostic code, read from static types.** Compiled code has no
+  representation of `Nothing` as a value. The symbol `Nothing` read as an
+  operand declines with the code `possible-nothing`. A `Tuple`
+  coordinate, an element of a collection operation (`Map`, `Filter`,
+  `Sum`, …), the result of the callback of `Map`, `Tabulate` or `Scan`,
+  the operand of `IsMissing`, `Coalesce` or `AssertPresent` and a
+  dictionary value decline with the same code when their static type has
+  an explicit `nothing` arm: `nothing`, `real | nothing`,
+  `list<real | nothing>`. A type such as `any` or `unknown` has no such
+  arm. Compiled code produces `Nothing` only from the symbol `Nothing` or
+  from a statement read as a value, and both decline where they occur; a
+  `Nothing` that the host supplies for a value typed `any` is outside its
+  type. The compiler no longer analyzes the body of a callback, and some
+  expressions over values typed `any` that declined now compile: with a
+  local function `h := k ↦ k + 1`, `Map(h, 1..3)` gives `[2, 3, 4]`.
+  Before, these declines had the generic code `compile-error`. A `Sum` or
+  a `Product` of a collection, or a `Reduce` or a `Scan` by `Add` or
+  `Multiply`, whose element type is `any` declines with the code
+  `unsettled-shape`: such an element can be a number or a list, and
+  compiled code does not test the shape of a value at run time. With
+  `w: collection<any>`, `Sum(w)` declines; declare `w: collection<real>`
+  to compile it.
+- **Compilation to JavaScript: a condition that can be a value other than a
+  boolean declines.** Compiled code no longer tests at run time that the
+  condition of `If`, `Which` or `Boole` is a boolean. When the static
+  type of the condition admits another value (`boolean | integer`,
+  `unknown`), the compilation declines with the code `unsettled-shape`,
+  where the compiled code threw at run time for such a value: with
+  `c: boolean | integer`, `If(c, 1, 2)` and, with an untyped parameter
+  `c`, `(c ↦ If(c, 1, 2))(b)` now decline. The interpreter evaluates them.
+  To compile them, give the condition a boolean type. A condition that can
+  be absent still reads as `false`.
+
+- **Compilation: in the default `strict` mode, a value of type `number`
+  must be real.** The compiled code reads a binding typed `number` (an
+  input, a parameter, a `number` element or tuple component) as a real
+  number, and a complex value there gives an unspecified result: with
+  `L: list<tuple<number, real>>` at `[(1 + i, 2)]` and
+  `hr = (p: tuple<real, real>) ↦ p[1] + p[2]`, `hr(L[1])` gives
+  `"[object Object]2"`. This is the behavior since 0.178.0, now stated as
+  a rule; no compiled value changes. To pass complex values, compile with
+  `mode: 'complex'` (which gives `3 + i` here) or declare the binding
+  `complex`.
+- **A compiled element-wise selection declines for a branch that can be a
+  point or a list of points.** With a host function `W` declared
+  `(real) -> tuple<real, real> | list<tuple<real, real>>` and `F` a list of
+  booleans, `If(F, W(t), (0, 0))` now uses the interpreter (diagnostic code
+  `unsettled-shape`): the compiled JavaScript tested the value of `W(t)` at
+  run time to lift a point whole or to index a list. Declare the result of
+  `W` with one shape, or declare and compile one function for each shape.
+  An input declared with this union (`P: tuple<real, real> | list<tuple<real, real>>`) still compiles as a branch: the compiled code
+  tests it once where it is bound and has one body for each shape.
+
+- **A compiled sum of a list of points and a value that can be a point or
+  a list of points declines.** With `W` declared as above and
+  `L: list<tuple<real, real>>`, `W(t) + L` now uses the interpreter
+  (diagnostic code `unsettled-shape`), where the compiled JavaScript
+  tested the value of `W(t)` at run time. Declare the result of `W` with
+  one shape. An input declared with the union (`P + L`) still compiles.
+
+- **An input declared with a union of shapes declines when the code for one
+  shape declines.** The compiled code has one body for each shape of such
+  an input. When one body could not be compiled, the code was one body for
+  all the shapes, which tested the shape of the input at run time. It now
+  declines with the reason of that body: with `U: real | list<real>`,
+  `Sum(U)` uses the interpreter (`Sum` of a number has no indexing set), and
+  so does `If(x > 0, U, x)` (in the body for `list<real>`, the branches are
+  a list and a number). Declare the input with the one shape that you pass,
+  or compile one function for each shape.
+
+- **A compiled sum of a point and a value that can be a point or another
+  shape declines, and so does its absolute value.** With `P` a list of
+  points, `Sum(P)` has the type `integer | tuple<real, real>` (the sum of
+  an empty list is `0`), and `Sum(P) + (1, 1)` now uses the interpreter
+  (diagnostic code `unsettled-shape`), where the compiled JavaScript tested
+  the value of `Sum(P)` at run time. The same applies to a function whose
+  parameter is declared `list<tuple<number, number>> | tuple<number, number>` when the code has one body for both shapes: `|P − (4, 0) − (1, 2)|` declines there. The absolute value of a value of type
+  `list<number> | tuple<number, number>` declines too, on every target: the
+  compiled JavaScript gave `[3, 4]` for the point `(3, -4)`, where the
+  interpreter gives `5`. Declare one shape, or compile one function for
+  each shape; a call whose argument has one shape still compiles
+  (`g((x, y))`, `g(Q)` with `Q` a list of points and `g(P) = |P − (4, 0)|`).
+
+- **A compiled `PointList` declines for a coordinate of a value that can
+  be a point or a list of points.** With `p` undeclared, `PointList(p.y, p.x)` infers the type `collection<any> | tuple` for `p`, and now uses the
+  interpreter (diagnostic code `unsettled-shape`), where the compiled
+  JavaScript tested the value of `p` at run time. Declare `p`:
+  `ce.declare("p", "tuple<real, real> | list<tuple<real, real>>")` compiles
+  one body for each shape. A function literal applied where it is written
+  (`(v ↦ PointList(v.y, v.x))(P)`) still compiles: its parameter has the
+  type of the argument.
+
+- **Compiled code gives no special value for a condition or a comparison
+  over an absent value.** A compiled `If` or `Which` whose condition is
+  absent takes its next branch, where it gave `NaN`: `If(At(B, 9), 1, 2)`,
+  with `B` a list of 2 booleans, is `2`. A compiled `Equal` over
+  collections gives booleans: `Equal([1, Missing], 1)` was `[true, NaN]`
+  and is now `[true, false]`. These values are unspecified by the caveats
+  of compiled code (`docs/COMPILATION-MODEL.md`, "Caveats of compiled
+  code"). These expressions now compile, where they used the interpreter
+  before: `Any` and `All` over elements that may be absent; `IndexOf`,
+  `Contains` and `Element` with a searched value that may be absent; a
+  chained `Equal` with an absent operand before an impure one
+  (`Equal(x, Which(t > 0, 1), Random())`); and, on Python, `Dot` and
+  `Cross` with an operand that may be absent.
+
+### Resolved Issues
+
+- **A compiled `Sum`, `Product`, `Max` or `Min` of a list computed by an
+  empty indexed `Sum` gives the value of the interpreter.** An indexed
+  `Sum` or `Product` over a list of unknown length is the number `0` or `1`
+  for an empty range, so a value typed as a list can be a number. With
+  `L: list<real>` and `n: integer`, at `n = 0`, the compiled JavaScript of
+  `Sum(Sum(L·i, i, 1, n))`, `Sum(2·Sum(L·i, i, 1, n))` and
+  `Max(Sum(L·i, i, 1, n))` threw `.reduce is not a function`, and
+  `Max(2·Sum(L·i, i, 1, n), 1)` threw `is not iterable`. They now give `0`,
+  `0`, `0` and `1`, as `evaluate()` does. The fold and the extremum of a
+  list that can be a number at run time test its shape when they run, and
+  a number is the fold or the extremum of itself. No test is added for an
+  input, a declared parameter or `Declare` local, a list literal,
+  arithmetic over one, a `Take` or `TakeWhile`, or an `If` or `Which` of
+  such values. The code for an input (`Sum(L)`,
+  `Max(L, 1)`) does not change.
+- **An element read of a symbol that holds a list of numbers is a number in
+  compiled JavaScript, whatever the declared type of the symbol.** With `C`
+  declared as the bare type `list` and holding `[c_1, …, c_10]` over symbols
+  of type `real`, the term of `\sum_{i=0}^{\mathrm{Length}(C)-1} C[i+1] x^i`
+  is typed `any`, and the loop tested the shape of every term at run time
+  (`Array.isArray` and `_SYS.bcast`). The compiled code folds the held list
+  into a constant, so the read is a number, and the loop adds numbers with no
+  test. No value changes. The type of the expression in the interpreter does
+  not change.
+- **A list of points plus a point keeps the signed infinities in the
+  component types.** With `E = real | signed_infinity | nan`,
+  `L: list<tuple<E, E>>` and `P: tuple<E, E>`, the sums `L + (1, 1)` and
+  `L + P` were typed `list<tuple<infinity | nan | real, …>>`. The type
+  `infinity` admits the complex infinity, which no such sum has, so a symbol
+  declared `list<tuple<E, E>>` refused the result. The sum is now typed
+  `list<tuple<E, E>>`, as the sum of two points has been since 0.178.0
+  (Tycho row 483).
+- **The accumulator of a fold inside a function literal is typed from the
+  seed when the callback body is a block**
+  ([#506](https://github.com/cortex-js/compute-engine/issues/506), reported by
+  [enumeratio](https://github.com/enumeratio)). `Function(Block(Reduce(1..3, (f, v) ↦ Block(If(f = 0 ∧ us[v] = 1, v, f)), 0)), us: list<integer>)` was
+  typed `(us: list<integer>) -> unknown`, and is now typed
+  `(us: list<integer>) -> number`, as it was without the `Block` wrappers. The
+  canonical MathJSON of a function literal has these wrappers, and the
+  compiler rebuilds a fold callback whose accumulator is a list from this
+  MathJSON. So a fold seeded with a list literal, whose callback holds a
+  second fold that reads the accumulator, declined with "does not settle one
+  shape" since 0.176.0. It compiles again: in the example of the issue,
+  `run({ n: 2 })` gives `[0, 0, 0]`, as `evaluate()` does. The cause: while
+  one expression is canonicalized, each raw node is canonicalized once per
+  lexical scope, and the canonical form is used again. The fold refinement
+  canonicalizes the same raw callback once for each accumulator type that
+  it tries, so every try after the first got the body of the first try,
+  where the accumulator is `unknown`. The body of a function literal now has
+  its own memo.
+- **`serializeEpsil` takes linear time in the indentation of its output**
+  ([#508](https://github.com/cortex-js/compute-engine/issues/508), contributed
+  by [enumeratio](https://github.com/enumeratio)). The formatter trimmed the
+  padding at the end of each stacked fragment with a `/[…]+$/` regex, which is
+  quadratic in the length of each run of indentation inside the fragment. A
+  chain of 160 function literals applied to arguments, indented up to column
+  2242, took 4.2 s and now takes 0.56 s; the output is unchanged.
+- **A partial `cost` option of `serializeEpsil` overrides only the costs it
+  names** ([#508](https://github.com/cortex-js/compute-engine/issues/508),
+  contributed by [enumeratio](https://github.com/enumeratio)).
+  `{ cost: { linebreak: 3 } }` replaced every cost, left the others
+  `undefined`, and threw `TypeError: Cannot read properties of undefined (reading 'cost')` on any output that needs a layout choice.
+- **A function literal that calls itself no longer reads a value computed
+  while its parameter had no value**
+  ([#507](https://github.com/cortex-js/compute-engine/issues/507), reported by
+  [enumeratio](https://github.com/enumeratio)). A regression in 0.176.0. The
+  type of a call such as `self(self, Take(f, Len(f) - 1))` asks whether the
+  `Take` is finite, which evaluates its count with `f` unbound. With a pure
+  host `Len` that gives 0 for a symbol, the count was `-1`, and the memo of
+  shared nodes gave that `-1` to the call that followed: counting the
+  elements of `[7, 8, 9, 10]` gave 3. The memo of shared nodes and the lazy
+  value memo are now neither read nor written inside a type computation
+  during a call.
+- **`Trace` of a matrix of free symbols no longer changes the type of the
+  symbols** ([#505](https://github.com/cortex-js/compute-engine/issues/505),
+  reported by [enumeratio](https://github.com/enumeratio)). A regression in
+  0.176.0. Boxing `Trace([[a, b], [c, d]])` gave `a`, `b`, `c` and `d` the
+  type `number | tensor`, the element type of the parameter `tensor`. A cell
+  of that type can be a list, so `[[a, b], [c, d]]` was then typed
+  `list<list<number | tensor>>`, not `matrix<2x2>`, for the rest of the
+  session, and `Trace`, `Determinant` and `Inverse` of it stayed
+  unevaluated. Now a parameter that is a tensor of unknown rank gives no type
+  to the cells of a list literal, as the parameter `matrix | vector` of
+  `MatrixMultiply` does. `Trace([[a, b], [c, d]])` is `a + d`, and
+  `Determinant` and `Inverse` evaluate after it in the same engine.
+
+## 0.178.0 _2026-11-03_
+
+This is the language release. It narrows the language that compiled code
+accepts, and it changes some results of the interpreter, so it has breaking
+changes: a restriction `e\{c\}` parses to `If(c, e)` and the `When` operator
+is gone; a comparison is `True` or `False`; `Missing` is a result only;
+`Indeterminate` is `NaN`; a local of a block is declared with a value, and an
+assignment is a statement; compiled code calls only a function it can see,
+and a parameter default fills only an argument the call leaves out; the
+compile mode `'auto'` is gone and `'strict'` is the default. Each entry under
+"Behavior Changes" gives the form that no longer works and what replaces it.
+A removed form in compiled code is a decline or a static error, not a
+different value; where the interpreter's result changed, the entry gives the
+old and the new value. Hosts that build expressions for `compile()` should
+read these entries before they update.
+
 ### New Features
+
+- **Finite-group maps, quotients, matrix groups and polycyclic coordinates.**
+  The optional group-theory library (`@cortex-js/compute-engine/group-theory`)
+  adds checked homomorphisms, quotient projections, structural queries on
+  finite groups (series, Sylow and Hall subgroups, Fitting and Frattini
+  subgroups, socle, automorphisms), exact matrix groups over the rationals
+  and over prime fields, and finite polycyclic sequences. A collected
+  polycyclic presentation (`PcGroup`) supports exact arithmetic without
+  listing the elements of the group, for example in a group of order 2^36.
+  The general finite model holds at most 256 elements, and every limit gives
+  an `Error` expression, never a partial answer. (Contributed by
+  [KingArth0r](https://github.com/KingArth0r) in #484.)
+
+### Behavior Changes
+
+- **A local of a block is declared with a value, and an assignment is a
+  statement.** A declaration gives its name a value, and an assignment is a
+  statement of a block, never an operand, so a local always has a value when
+  it is read. The interpreter no longer gives the
+  `read-before-declaration` error value at run time, and no longer keeps a
+  read of a local with no value as a symbol: each form below is a static
+  error in place in the canonical form, `epsil check` reports it before the
+  program runs, and a compilation declines it.
+  - `Declare(x, "integer")` then `Assign(x, 5)` is the error
+    `declaration-without-value`: write `Declare(x, "integer", 5)`. In Epsil,
+    `let x: integer` is the same error: write `let x: integer = 0`. A
+    function type with no value stays valid when a `function` statement of
+    the same name is in the same block: it gives the signature of that
+    function (`let f: (integer) -> integer; function f(x) { x + 1 }`). In
+    LaTeX, `\operatorname{let} k \coloneq v` is now `Declare(k, "unknown", v)`.
+  - `f(a := 2)` is the error `assignment-in-operand`: write `a := 2; f(a)`.
+  - `a := b := v` is the syntax error `chained-assignment`, in Epsil and in
+    LaTeX: write two statements, `b := v; a := b`.
+  - A first assignment of a name in a branch of an `if`, in a case of a
+    `match` or in a loop body is the error `first-assignment-in-branch`: declare the name with a value
+    before the branch (`t = 0; if c { t = 1 }`). This applies also at the
+    top level of an Epsil program and to an `If`, `Which`, `Loop` or
+    `Match` boxed outside a block: `if c { a = 1 }; a` was valid and gave
+    the symbol `a`. An assignment in a branch to a name that the session
+    already declares writes that name, as before.
+  - A use of a local before the statement that declares it is the static
+    error `read-before-declaration`.
+  - A reassignment with a value of another type
+    (`Block(Assign(a, 1), Assign(a, "x"), a)`) is the error
+    `assignment-type-mismatch`. The type of a local is its declared type, or
+    the type of its first value widened to `number`, `string` or `boolean`.
+  - A block whose last statement is an assignment or a declaration has the
+    value `Nothing` (`Block(Assign(b, 2))` was `2`): end the block with the
+    name.
+  - A function whose declared result type does not admit `nothing`, and
+    whose body ends in an assignment or a declaration
+    (`function f() -> integer { x = 2 }`), gives the `incompatible-type`
+    error when it is called, as a body with a value of another type does. It
+    gave `Nothing`.
+
+  In compiled code (every target):
+  - A write to a symbol that the compiled code does not declare (a symbol
+    declared in the engine, an input, a `vars` name) declines. It wrote the
+    vars object, or a local copy of the input. Return the value and let the
+    host assign it, or declare a local with a value and read the local.
+  - A block with a statement other than a declaration with a value (an
+    assignment, a loop) declines as an operand
+    (`1 + Block(Assign(b, x), 2b)`, the value of an assignment). It compiles
+    as a statement, as the body of a function, of the compiled expression or
+    of a binder such as `Sum`. Assign the value to a local declared before
+    the block, and read the local. A block whose statements before the last
+    are only declarations with a value (a `where` clause,
+    `1 + (a - floor(a) where a := 3.7x)`) is a value, and compiles as an
+    operand.
+  - A block that ends in an assignment or a declaration declines where its
+    value is used: its value is `Nothing`. The JavaScript code of
+    `[1, Block(b := 2)]` gave `[1, 2]`. End the block with the name.
+  - A loop whose value is used declines, as before (`y := Loop(…)`): assign
+    the result to a local declared before the loop, and end the block with
+    the local.
+
+- **Compiled code calls only a function it can see, and a parameter default
+  fills only an argument that the call leaves out.** A compiled call compiles
+  when the callee is a defined function, a declared function with a value,
+  or a function literal at the call site; the callbacks of `Map`, `Filter`,
+  `Sort`, `Fold` and `Reduce` compile when they are such a callee, and
+  `Apply(Derivative(f, n), x)` with `f` defined compiles as before. The
+  interpreter keeps first-class functions: lambdas, closures, currying,
+  partial application and function values. Breaking changes, each with its
+  replacement:
+  - In compiled code, a curried call or a partial application
+    (`Apply(Apply(f, 1), u)`, `Apply(f, 1)`), a function passed as an
+    argument or through a parameter of function type
+    (`h = (g: function) ↦ g(1)`, `h(x ↦ x + u)`), a function returned from
+    a call (`Apply(mk(1), u)`) and a function stored in a local that is
+    assigned more than once decline: the compilation falls back to the
+    interpreter. Write the call with every argument (`f(1, u)`), call the
+    function directly in the body, or define one function per case.
+  - A default no longer fills a supplied absent value, in the interpreter
+    and in compiled code: this reverses the change of 0.177.0. With
+    `g = (k: real = 2) ↦ k + 1`, `g()` is still `3` (the default is filled
+    at canonicalization, and every target, GLSL, WGSL and `interval-js`
+    included, completes the call when it compiles it), but `g(Missing)` and
+    `g(First([]))` pass `Missing` to the body and give `Missing`, and
+    `g(0/0)` gives `NaN`. In compiled code, `g(At(L, 100))` with
+    `L: list<real>` passes `NaN`, a value outside `real`, so its result is
+    not specified. To replace an absent argument, write it in the call:
+    `g(Coalesce(At(L, 100), 2))` is `3`. A default parameter is no longer
+    one of the operators that read an absent value; `interval-js` no longer
+    declines a call that supplies a number at a defaulted parameter.
+  - A default is a constant: a number, a string, a boolean, `[]`, `{}`, a
+    library constant (`over: set = Integers`, `k: real = Pi`), a symbol
+    declared with `isConstant: true` (`weights: list<number> = DefaultWeights`), a `const` of an Epsil program, or a symbol that the
+    parameter type lists (`mode: symbol<Auto> | symbol<Manual> = Auto`).
+    The default is bound where the function is declared: a local of the
+    same name at the call site does not change it. A default that names a
+    variable (`(k = n) ↦ k` with `n` declared without `isConstant`, or
+    assigned) is the static error `expected-a-literal-default` in a
+    function literal, and makes `ce.declare()` throw for a signature (in
+    0.176.0 and 0.177.0 the symbol was read at the call site): declare the
+    symbol constant, write the value, or pass the argument. In compiled
+    code, a default that is a library constant or a symbol that the type
+    lists is filled; a default that names a constant declared by the host
+    or by the program declines (write the value as the default, or pass the
+    argument).
+  - A function literal with a rest parameter has no default: a default on
+    such a literal is a static error. Pass the argument.
+  - In the JavaScript `bigint` mode, a supplied `NaN` or `null` at a
+    parameter with a default throws the entry `TypeError` of a supplied
+    value that is not an integer; only a left-out argument (`undefined`)
+    takes the default.
+
+- **The compile mode `'auto'` is removed; `'strict'` is the default of
+  every target.** The lane of a compiled value follows its static type: it
+  is complex for a declared `complex` input or parameter, a complex literal
+  or an operation whose result type is complex, and real otherwise.
+  Breaking changes, each with its replacement:
+  - `compile(expr, { mode: 'auto' })` declines with
+    `diagnostic.code === 'unsupported-mode'` on every target. Use
+    `mode: 'complex'` where complex values are wanted: an unknown-sign
+    radical or logarithm is computed on the complex lane, and a kernel
+    whose value is real still returns a JavaScript number (`Sqrt(x)^2` at
+    `x = -4` is `-4`). A value that is not a number can come back in its
+    complex form (`0^x` at `x = -1` is `{re: Infinity, im: Infinity}`, the
+    interpreter's `ComplexInfinity`, where `'auto'` gave `Infinity`).
+  - The default mode of the `javascript` and `python` targets is `'strict'`
+    (it was `'auto'`). On the real lane an operation whose exact value is
+    complex gives `NaN` on every target, as on the shader targets: with
+    `x: real`, `compile(Sqrt(x))` at `x = -4` gives `NaN` (it gave
+    `{re: 0, im: 2}`); with `mode: 'complex'` it gives `{re: 0, im: 2}`. A
+    complex value that reaches a binding compiled real declines with
+    `'lane-mismatch'`, and the compilation is no longer redone in complex
+    mode. `x + 2i` with `x: real` is complex in every mode, as before.
+  - The compile result has no `promoted` and no `escalation` field.
+    `result.mode` is the requested mode, `'strict'` when none is requested.
+    A host that kept a promoted kernel off a shader target reads
+    `result.mode === 'complex'`, or compiles `'strict'` for the shader.
+  - The `reset()` hook of a custom compile target is no longer called, and
+    `supportedModes` no longer accepts `'auto'`.
+  - An escalation of a compilation to `mode: 'bigint'` when a run-time value
+    passes `2^53` will not be added: `'bigint'` is used only when it is
+    requested.
+  - The engine's own compilations (the `Map` drain, `Reduce`, the
+    stochastic equality probes, the numeric integration and series
+    kernels) compile in `'strict'`, and their values do not change: the
+    `Map` drain and `Reduce` compute a `NaN` element again with the
+    interpreter, an integrand is computed in `'complex'` at a `NaN` sample,
+    and the stochastic equality probes use the compiled code only for an
+    expression of heads that give `NaN` for a `NaN` operand (arithmetic,
+    powers, roots, logarithms, the trigonometric and hyperbolic functions,
+    rounding, `Max`, `Min`); any other expression is sampled with the
+    interpreter.
+  - In `mode: 'complex'`, five cases where the compiled code mixed a
+    complex object with real arithmetic, and gave `NaN` or a string where
+    the interpreter gives a real number, are fixed: a power of a call whose
+    value is complex (`f(x)^2` with `f: (real) -> unknown`); an element-wise
+    operation over a list (`r·10^i` with `i: list<integer>`,
+    `Sqrt(L^2)` with `L: list<real>`); `Sqrt`, `Ln` and `Log` of a value
+    whose type admits a complex value but which is not negative
+    (`\sqrt{x^2+y^2}` with `x, y: real | signed_infinity`); a `Product`
+    over a shared `Map` (`Sum(Map(f, P)) + Product(Map(f, P))`); and a
+    fold over an empty list or one element (`Product(Map(Sqrt, P)) + 1`
+    with `P = []` is `2`). The negation of a real value keeps a `+0`
+    imaginary part, so `Ln(-x)` at `x = 2` is `ln 2 + iπ`, as in the
+    interpreter (it was `ln 2 − iπ`).
+  - In `mode: 'complex'`, a call of a user function no longer sends a
+    complex object to a parameter that the definition reads as a real
+    number. With `u: real`, `s(x) := x - \lfloor x \rfloor` and
+    `g := t ↦ s(t) + 1`, `g(u)` at `u = 0.25` gave the string
+    `"[object Object]NaN1"`; it is now `1.25`, as in the interpreter. The
+    call passes the real part of a real argument, and `NaN` for an argument
+    with an imaginary part (`g(w)` with `w: complex` at `1.5 + i`; the
+    interpreter gives an `incompatible-type` error).
+  See `docs/COMPILATION-MODEL.md`, "Compile modes".
+
+- **One static error, one dynamic non-value per domain.** An `Error` is the
+  one static failure, `NaN` is the one numeric non-value, and `Missing` is
+  the absent datum of the other domains. `Indeterminate` is no longer a
+  value: the exact route gives `NaN` for a form with no value, as `.N()` and
+  every compiled target already did. `Nothing` is the value of an empty
+  block or of a statement with no value, and it is kept as an element
+  wherever it appears. Compiled code does not change. Breaking changes,
+  each with its replacement:
+  - `ce.Indeterminate`, `INDETERMINATE_VALUE` and `isIndeterminateValue`
+    are removed. Use `ce.NaN`.
+  - `Expression.isIndeterminate` is removed. Use `isNaN`.
+  - The `isExact` hook of an `ArithmeticDefinition` (a value kind) is
+    deprecated: the engine no longer reads it.
+  - A form with no value gives `NaN` on the exact route (it gave
+    `Indeterminate`): `0/0`, `∞ − ∞`, `0^0`, `Mod(5, 0)` and
+    `Variance([3])` are `NaN`, and an operator over `NaN` gives `NaN`:
+    `Mean([1, 0/0])` and `Max(1, 0/0)` are `NaN` (they were the exact
+    `Indeterminate`). `NaN` keeps its IEEE behavior, `IsMissing(0/0)` is
+    still `True` and `Coalesce(0/0, 5)` is still `5`. `Indeterminate` is
+    now an input spelling of `NaN`: the MathJSON symbol `"Indeterminate"`,
+    `\operatorname{Indeterminate}` and `\mathrm{Indeterminate}`, the Epsil
+    name, `NumberFrom("Indeterminate")` and the word in a type string read
+    as `NaN`. The serializer writes `NaN` (`\operatorname{NaN}`), and
+    `String(0/0)` is `"NaN"`.
+  - A `Nothing` element is no longer removed from a list, an argument list
+    or a dictionary: `[1, Nothing]` has length 2, `f(1, Nothing)` has two
+    arguments, and `{a: Nothing}` keeps the key `a`. An operator that needs
+    a value gives an `incompatible-type` error for it: `Add(1, Nothing)` is
+    an error (it was `1`). Write the list without the element, or use
+    `Filter` with an explicit predicate: with `d: list<integer | nothing>`
+    at `[1, Nothing, 3]`, `Filter(d, y ↦ y ≠ Nothing)` is `[1, 3]`.
+  - `Map` calls its callback on a `Nothing` element and keeps a `Nothing`
+    result: `ListFrom(Map(x ↦ If(x > 1, x, Nothing), [1, 2]))` is
+    `[Nothing, 2]` (it was `[2]`). Use `Filter` after `Map`:
+    `Filter(Map(x ↦ If(x > 1, x, Nothing), [1, 2, 3]), y ↦ y ≠ Nothing)` is
+    `[2, 3]`.
+  - `Filter` no longer drops a `Nothing` element without calling its
+    predicate. Use a predicate that tests for it, as above.
+  - `Sum`, `Product`, `Min`, `Max`, `Mean`, the statistics and the
+    covariance family no longer skip a `Nothing` element: `Sum([1, Nothing])` and `Mean([1, Nothing, 3])` are `incompatible-type` errors
+    (they were `1` and `2`), and the error outranks `NaN`: `Max([NaN, Nothing])` is an error. Filter the data first, as above.
+  - An empty slot in LaTeX is a parse error: `(3,,4)`, `[3,,4]` and
+    `f(3,,4)` hold `["Error", "'missing'"]` in the slot (the slot was
+    `Nothing`, which was removed). Write every slot. A trailing comma,
+    `[1, 2,]`, is still dropped. In `cases`, an empty row and a trailing
+    comma in a condition cell give `Which(c, v)`, the parse of a piecewise
+    with no default: `\{x>0: x,\}` is `Which(0 < x, x)`. `\partial f` is
+    `["PartialDerivative", "f"]`.
+  - An empty `Sequence()` stays `Sequence()` in canonical form and prints
+    as `Sequence()` (it printed as `Nothing`). A list or an argument list still splices it
+    out: `[1, Sequence(), 2]` is `[1, 2]`. In Epsil, the rest capture `t` of
+    `[h, ...t]` over a list of one element is the empty `Sequence`, so
+    `[t]` is `[]`.
+  See `docs/ERROR-MODEL.md`, "One static error, one dynamic non-value per
+  domain".
+
+- **`Missing` is a result only.** `Missing` is produced by a selection with
+  no match, an accessor out of range and the written symbol, and it can no
+  longer be declared. Breaking changes, each with its replacement:
+  - A declared type that names `missing`, at any depth, is an error:
+    `ce.declare("w", "real | missing")` and `ce.declare("f", "(real | missing) -> real")` throw, an operator definition whose signature has
+    such a parameter throws, a parameter annotation of a function literal
+    (`["Typed", "x", "'real | missing'"]`) or a signature string is an
+    `invalid-type-annotation` error, a `Declare` statement is an
+    `invalid-type-declaration` error, and Epsil reports a
+    `type-annotation-error` (`let x: real | missing = 1`). Declare the
+    type of the present value, and read an absent value with `IsMissing`
+    or `Coalesce` (`??`). The result type of a signature may still name
+    `missing`.
+  - `"Undefined"` is no longer an absent value: it is an ordinary symbol
+    with no value (`IsMissing(Undefined)` is `False`, `Undefined + 1` stays
+    `Undefined + 1`). Use `"Missing"`. The engine writes `Missing` where
+    it wrote `Undefined` (an operand that is not given when an expression
+    is serialized, a `dynamic` value with no result).
+  - An operator over `Missing` gives `Missing` (it gave `NaN` in a
+    numeric domain): `Missing + 2`, `Sin(Missing)`, `1 / Missing`,
+    `Max(1, Missing)`, `Sum([1, Missing])`, `Mean([1, Missing])`,
+    `Norm((1, Missing))` and `ce.box("Missing").add(1)` are `Missing`, and
+    `[1, Missing] + 1` is `[2, Missing]`. `Missing + 2` is typed
+    `missing`. An aggregate over `NaN` or over no data is still `NaN`.
+    Read the absence with `IsMissing` or `Coalesce` before computing.
+  - `At`, `First` and `Last` over a list of points, out of range, give a
+    point whose coordinates are all `NaN` (they gave `Missing`):
+    `At([(1, 2), (3, 4)], 5)` is `(NaN, NaN)`, in the interpreter and in
+    compiled JavaScript and Python. Over numbers the value is `NaN`, and
+    over other values `Missing`, as before.
+  - A false restriction of a point gives a point whose coordinates are all
+    `NaN` (it gave `Missing`, and `undefined` in compiled JavaScript):
+    `If(c, (1, 2))` with `c` false is `(NaN, NaN)`, in the interpreter and
+    in compiled JavaScript and Python, so `Sin(If(c, (0, 1)))` is
+    `(NaN, NaN)` and `Norm(If(c, (3, 4)))` is `NaN`. `First` of a false
+    restricted list of points is `(NaN, NaN)` too, while the restricted list
+    itself stays `Missing`. `IsMissing` and `Coalesce` read the `NaN` point
+    as absent, as before.
+  - Compiled code tests every point for absence at a parameter default and
+    at `AssertPresent`, also a point typed `tuple<real, real>`: a read out
+    of range gives the `NaN` point whatever the type of the point says.
+    `AssertPresent(At(qs, 9))` with `qs: list<tuple<real, real>>` now
+    raises the `expected-present` error in compiled JavaScript, as in the
+    interpreter (it gave `[NaN, NaN]`).
+  - The result type of an accessor has no marker arm: with `ss: list<string>`, `At(ss, i)` is typed `string` (it was `string | missing`), and with `ys: list<real>`, `At(ys, i)` is typed `real` (it
+    was `real | nan`). The value out of range is still the marker. A read
+    whose position is proved not to exist keeps the marker type
+    (`At([1, 2], 5)` is typed `nan`).
+  - The signature of `Append` is `(collection<any>, any+) -> collection`
+    (it was `(collection<any>, (value | missing)+) -> collection`): an
+    appended `Missing` is still kept as a cell (`Append([1], Missing)` is
+    `[1, Missing]`).
+  - A symbol whose value holds `Missing` compiles under its declared type.
+    The declaration cannot name `missing`, so the compiler removes the
+    `missing` parts of the value's type before it compares it with the
+    declared type, as an assignment does. With `cd: list<color>` at
+    `[Missing, Rgb(0, 1, 0)]` (a selection with no match in the first cell),
+    `AsOklab(cd)` failed to compile ("its value has the type
+    `list<color | missing>`, which is not the type `list<color>`") and now
+    compiles to JavaScript: the second cell is the interpreter's Oklab
+    color, and the first cell is the `NaN` color (where the interpreter
+    gives an `incompatible-type` error). With `ss: list<string>` at
+    `[Missing, "b"]`, `At(ss, 2)` compiles to `"b"` and `At(ss, 1)` to
+    `undefined`. A function literal that reads such a symbol gets the same
+    reading in the interpreter: `((x) ↦ At(ss, 2))(1)` is `"b"` (it was an
+    `incompatible-type` error). A value that is wrong where it is present
+    (`[5, Missing]` for `ss`) is still refused, in both. (CE-791.)
+  See `docs/ERROR-MODEL.md`, "`Missing` is a result only".
+- **A comparison is two-valued: `True` or `False`.** An operand that does
+  not decide a comparison makes it `False` (`NotEqual`: `True`, since `≠`
+  is `Not(=)`): `NaN`, a pole, a value with no order, and now also an
+  absent value (`Missing`, `Undefined`). The connectives and the
+  quantifiers read an absent value as `False`, and so does the condition of
+  an `If` or a `Which`: the branch takes its next arm, as in Desmos, where
+  `\{u<1:5,7\}` is 7 with `u` undefined and `\{L<2:5,7\}` with
+  `L=[1,0/0,3]` is `[5,7,7]` (measured by Tycho on 2026-11-02). This
+  extends the rule of 2026-10-20 for a `NaN` operand (Tycho rows 411 and 413)
+  to `Missing`, to the connectives and to the conditions. Breaking
+  changes: `Missing > 0` is `False` (it was `Missing`); `Not(Missing > 0)`
+  and `Not(Missing)` are `True` (they were `Missing`); `And(Missing, True)`
+  is `False`; `If(Missing, 1, 2)` is `2` and `If(Missing, 1)` is `NaN`:
+  the absent-condition error is gone; `0 < Missing < 1` is `False`;
+  `Equal([1, Missing], [1, Missing])` is `False` and `Equal([1, Missing], 1)` is `[True, False]`; `Any([1, Missing], x ↦ x > 2)` is `False`. A
+  boolean predicate of the collection and set libraries over an absent
+  operand is `False` too (it was `Missing`): `Any(Missing, p)`,
+  `All(Missing, p)`, `Element(2, Missing)`, `Contains(Missing, 3)`,
+  `IsEmpty(Missing)`, `StartsWith`, `EndsWith`, `ContainsSequence`,
+  `Subset` and its relatives; the negated forms `NotElement`, `NotSubset`,
+  `NotSuperset` and `NotSupersetEqual` are `True`. So a predicate over a
+  restricted collection, `Element(2, If(c, L))`, gives the same value when
+  it is evaluated fresh and when it is evaluated again from its held form.
+  The number-theory predicates (`IsPrime(Missing)`) are still `Missing`. The
+  type of a comparison, a connective or such a predicate has no `missing`
+  arm: with `L: list<integer> | missing`, `L < 3` is typed
+  `boolean | list<boolean>` (it was `list<boolean> | missing`). A selection
+  whose condition is a list of booleans is never absent as a whole, so a
+  comparison over it is a list of its length: with `q: list<real^4>`,
+  `Which(q < 0.1, 2, True, 1) < 2` is typed `list<boolean^4>` (it was
+  `boolean | list<boolean^4>`), and a selection over that comparison has one
+  shape and compiles. The corpus row art/njncrg9fkv declined on JavaScript
+  and now gives the interpreter's four points. No interpreter value changes.
+  (CE-792.) Under a list
+  of conditions, a relation position that is not selected is `False` (it
+  was `Missing`), and a colour position is `Rgb(NaN, NaN, NaN)`, which a
+  plotter reads as "no colour here" (Tycho item 189). A restriction of a
+  relation by a scalar condition is `False` where the condition is false,
+  so the condition `If(c_2 < 1, 0 < If(c_1 < 1, 1))` of the corpus row
+  neyret/xhlkk7k9aq gives the interpreter's value in compiled code. A
+  scalar `Which` with no match is still `Missing`. In compiled code a
+  value computed from an absent value is still not specified. See
+  `docs/ERROR-MODEL.md`, "A comparison is two-valued".
+- **A restriction `e\{c\}` covers its whole group and parses to `If(c, e)`.**
+  The parser no longer produces `When`. The restriction applies to the whole
+  of the smallest group that holds it: the statement (the relation
+  included), one side of `\to`, the body of `for` or `where`, one comma
+  item, the content of a delimiter or of a LaTeX argument, the body of a
+  big operator, or one operand of a logical connective (`\land`, `\lor`,
+  the operand of `\neg`). A restriction binds tighter than a connective and
+  looser than a relation: `x>0\{x<1\}\lor x>2\{x<3\}` is
+  `Or(If(x<1, x>0), If(x<3, x>2))`. In 0.177.0 it applied to the factor
+  just before it. Examples
+  from Tycho's two Desmos corpora (rows out of 8,231, of which 761 hold a
+  restriction, `docs/plans/2026-11-02-restriction-binding.md`):
+  `y=0\{x\le0\}` is `If(x\le0, Equal(y, 0))`, where it was
+  `Equal(y, When(0, x\le0))` (133 rows of this shape); `x^2+y^2<9\{c\}` is
+  `If(c, Less(…, 9))` (111 rows); `H(x)=3x^2-2x^3\{c\}` is
+  `If(c, Equal(H(x), 3x^2-2x^3))`, where only `2x^3` was restricted (34
+  rows); `-a\{c\}` is `If(c, -a)` (25 rows); `(1,2)\{c\}` is
+  `If(c, Tuple(1, 2))` (79 rows). A restriction inside a group stays in it:
+  `x^{3.1\{c\}}` is `Power(x, If(c, 3.1))` (3 rows), `(a\{c\}, b)` is
+  `Tuple(If(c, a), b)` (15 rows), `\sum_{n=1}^{N} a_n\{c\}` is
+  `Sum(If(c, a_n), …)` (6 rows). `a\{\}` is still a parse error. A false
+  single-branch `If(c, e)` with a scalar condition gives the value that
+  `When(e, c)` gives: `NaN` for a number, `Missing` otherwise (in 0.177.0
+  every false single-branch `If` gave `Missing`). The type of a
+  single-branch `If(c, e)` is the type of `e`, with no `nan` or `missing`
+  arm: the type of `If(c, 1)` is `integer`, where it was
+  `integer | missing`, and a symbol declared `number` accepts the value
+  `If(0 < t, 3)`. Compiled code gives the same values as before.
+  `x \coloneq 1\{c\}` is `Assign(x, If(c, 1))`: the restriction is in the
+  value.
+- **Stacked restrictions in one group merge.** `a\{c_1\}\{c_2\}` is
+  `If(And(c_1, c_2), a)` in written order, up to 4 deep (76 corpus rows),
+  and `a\{c_1\}+b\{c_2\}` is `If(And(c_1, c_2), a+b)`. A restriction of a
+  single-branch piecewise merges too: `\{c_1: a\}\{c_2\}` is
+  `If(And(c_1, c_2), a)`; `\{c_1: a, b\}\{c_2\}` is
+  `If(c_2, Which(c_1, a, True, b))` (14 rows). A comma group in the braces is
+  still `Or` (7 rows). The condition before a piecewise `:` and the arm after
+  it are each a group of their own, and a condition group accepts a condition
+  that has its own restriction: `\{x>0\{y<1\}: a, b\}` is
+  `Which(If(y<1, x>0), a, True, b)`, where it was a `Set` (Tycho row
+  neyret/xhlkk7k9aq #1752170633), and
+  `|y+3|\le.2\{x>0\{x<1\}, x>2\{x<3\}\}` is
+  `If(Or(If(x<1, x>0), If(x<3, x>2)), |y+3|\le 0.2)`, where it was a
+  `Tuple` (row neyret/akconkhexx #721856020).
+- **`\{c\}` alone is `If(c, 1)`**, Desmos's value 1 where `c` holds. In
+  0.177.0, `\{x>1\}` was the set `Set(x>1)`.
+- **The items of a `where` clause are bindings and conditions.** In
+  `e \text{ where } item, item, …` (also `\operatorname{where}`), an item is
+  a binding, `a \coloneq v`, `a = v` with a symbol on the left (it can have
+  a subscript) or `\text{let } a \coloneq v`, or a condition, every other
+  relation. A binding is one statement `Declare(a, "unknown", v)` (with a
+  function literal, `Declare(f, "function", v)`), in written order, and the
+  conditions, joined with `And`, wrap the body in `If(c, e)`:
+  `e \text{ where } a \coloneq 1, b = 2, 0\le t\le 1` is
+  `Block(Declare(a, "unknown", 1), Declare(b, "unknown", 2), If(0\le t\le 1, e))`.
+  With conditions only, the value is the `If`:
+  `(\cos t, \sin t) \text{ where } 0\le t\le\pi` is
+  `If(0\le t\le\pi, Tuple(…))`, where it was a `Block` with the bound as a
+  statement. In 0.177.0 `a \text{ where } b = 2` gave `Block(Equal(b, 2), a)`
+  and bound nothing. Every comma starts another item: a comma followed by
+  text that is not an item is a parse error, and so is a `let` with no
+  value. Witnesses: Graph Paper's stored documents and help pages, and the
+  58 Tycho Desmos rows with `\operatorname{with}`, which Tycho's importer
+  turns into `where` (`docs/plans/2026-11-02-where-binding.md`).
+- **A `for` after a `where` clause applies to the whole clause.**
+  `i \operatorname{where} n \coloneq 3 \operatorname{for} i = \operatorname{Range}(n)`
+  is now `Comprehension(Block(Declare(n, "unknown", 3), i), Element(i, Range(n)))`,
+  so the `n` of `Range(n)` is free; in 0.177.0 the `Block` was outside the
+  comprehension. Tycho's 24 comprehension rows whose binding reads the index
+  need this order. `i \operatorname{for} i = \operatorname{Range}(n) \operatorname{where} n \coloneq 3`
+  keeps its value.
+- **A `;` block declares a local with its value in one statement.**
+  `a \coloneq 2; a+1` is `Block(Declare(a, "unknown", 2), a+1)`, where it was
+  `Block(Declare(a), Assign(a, 2), a+1)`. A later `\coloneq` of the same name
+  is still an `Assign`.
+- **A binding `Block` and a single-branch `If` serialize with `where`.** A
+  `Block` of `Declare(a, "unknown", v)` statements followed by one
+  expression is written `e \text{ where } a \coloneq v, …`, where it was
+  `a\coloneq v; e`, and when the expression is a single-branch `If`, its
+  condition is the last item. Every single-branch `If(c, e)` is written
+  `e \text{ where } c`, where it was `\mathrm{If}(c, e)`. The clause is in
+  parentheses when it is not the whole expression:
+  `2\left(p \text{ where } p \coloneq 3\right)`. The serializer never writes
+  the brace `\{c\}`. `If(c, e)` keeps the function form when `c` is not a
+  relation, when `c` is an `=` with a symbol on the left (`If(a=1, e)`,
+  which `where` would read as a binding), and when `e` is an assignment, a
+  declaration or a function literal, which would read the clause into its
+  value. Every other `Block` keeps the `;` form. The text parses back to the
+  same canonical expression.
+
+- **The `When` operator is removed.** A restriction is the single-branch
+  `If`: write `["If", c, e]` where you wrote `["When", e, c]` (the operands
+  are in the other order). `["When", …]` in a MathJSON document is now an
+  unknown operator: it has no type, does not evaluate and does not compile.
+  `\mathrm{When}(e, c)` parses to that unknown operator, not to a
+  restriction. Stacked restrictions written as nested `If`s are not merged
+  into one `And`; stacked braces `e\{c_1\}\{c_2\}` still parse to one
+  `If(And(c_1, c_2), e)`. A held restriction prints as `If(0 < t, 3)` in
+  the ASCII form, where it printed `3 {0 < t}`. Witness: the parser has
+  produced only `If` since the restriction rule above; Tycho, the only known
+  builder of `When`, builds `If` from its next release.
+- **A held restriction over a list presents as a list.** With `t` free,
+  `If(0<t, [1, 2, 3])` is an indexed collection of 3 elements
+  (`isCollection`, `count` and `each()` agree with its type). An operation
+  applied to each element keeps the condition outside:
+  `\sin([1,2,3]\{0<t\})` is `If(0<t, [\sin(1), \sin(2), \sin(3)])`, and with
+  `t = -1` it is `Missing`, as before. With a `True` or `False` condition the
+  value is unchanged.
+- **The type of a restriction has no `missing` or `nan` arm.** `If(c, e)` has
+  the type of `e`, and an accessor of it has the element type:
+  `At(If(0<t, (1, 2)), 1)` is `integer`, where `When` gave `integer | nan`.
+  The absent value (`NaN`, a `NaN` point, `Missing`) is outside the declared
+  type, as `NaN` is outside `real`. `Insert`, `ReplaceAt`, `Append`,
+  `Distance`, `Norm` and `Midpoint` of a restricted value lose the
+  `missing` arm that the restriction gave them.
+- **Element-wise selection takes a flat list of booleans, and a position with
+  no match is `NaN` or a `NaN` point.** `If` and `Which` select element by
+  element only when the static type of a condition is a list:
+  - A position that no clause selects is `NaN` for a number and a point whose
+    coordinates are `NaN` for a point:
+    `If([True, False], (1, 2))` is `[(1, 2), (NaN, NaN)]` (it was
+    `[(1, 2), Missing]`), and compiled JavaScript gives `[NaN, NaN]` (it gave
+    `undefined`). The type of a restriction of a list of points is
+    `list<tuple<number, number>>`, with no `missing` arm. `IsMissing` and
+    `Coalesce` no longer read such a cell as absent. A plot skips a `NaN`
+    point.
+  - These are errors found from the types (`incompatible-type`), and a
+    compilation declines them: a condition that is a list of lists
+    (`If([[True], [False, True]], 7, 0)`, `If(M < 3, M, 0)` with `M` a
+    matrix), a condition with a `Missing` element, a condition typed
+    `collection<boolean>`, `set<boolean>`, `list` or `list<any>`, an arm whose
+    elements are lists, a string or a set under a list of conditions, and a
+    number arm beside a point arm. Two lengths that the types give and that
+    differ are `incompatible-dimensions`: `If([True, False], [1, 2, 3], 0)`
+    (a single-branch restriction such as `[1,2,3]\{[True, False]\}` was
+    truncated to the shorter length). A length known only from the value is
+    still truncated.
+  - A relation arm, such as the region `1>0 \text{ where } x^2+y^2 \le (0..0.2..1)^2`, is accepted under a list of conditions, as before.
+  - A condition whose type does not settle the number of dimensions
+    (`tensor<boolean>`, `boolean | list<boolean>`) is accepted, and is
+    checked on its value: a nested list there is an `incompatible-type`
+    error, and `NaN` in compiled code.
+  - The no-match value of `Which` with a scalar condition is unchanged:
+    `Missing`.
+
+  Witness: the 757 documents of Tycho's corpus. Only one value changes, the
+  unmatched points of a 3-D point list (art/njncrg9fkv, `undefined` →
+  `[NaN, NaN, NaN]`), and no document gains a decline. No document holds a
+  nested condition, an uneven condition or a string arm under a list of
+  conditions.
+
+- **Compiled code no longer tests for an input that the caller leaves out.**
+  The host supplies every input with a value of its declared type; the
+  result for an input left out is undefined and can differ per target
+  (`docs/COMPILATION-MODEL.md`, "Caveats of compiled code"). So `run()`,
+  `broadcast()` and the `interval-js` runner no longer refuse a run that
+  leaves out a collection input that the code reads: with `L: list<real>`
+  left out, `Sum(L)` gave `NaN` on JavaScript and the empty interval on
+  `interval-js` in 0.177.0; it now throws a `TypeError` on JavaScript and
+  gives `undefined` on `interval-js`. The functions that `compileFunction()` and
+  `compileLambda()` emit for Python no longer start with a test of such an
+  input. A comparison whose value is the result is the plain comparison:
+  `x > 0` compiles to `0 < _.x`, which is `false` for an `x` left out, where
+  0.177.0 gave `undefined`. A branch over a comparison is the plain
+  comparison too: `If(x > 0, 1, -1)` compiles to `((0 < _.x) ? (1) : (-1))`
+  and takes the else arm for an `x` left out, where 0.177.0 gave `NaN`. An
+  `Equal` of two variables is the plain `===` (`(_.a) === (_.b)`), with no
+  test for `undefined`. A symbol declared `boolean` is read by its
+  truthiness in a branch condition and in `And`, `Or` and `Not`:
+  `And(p, q)` compiles to `_.p && _.q`; a symbol declared `boolean | missing` keeps the three-valued test. The stored entry plan of a result has no
+  `required` field, and the `interval-js` `listInputs` are the inputs
+  declared with a collection type that has no `missing` arm.
+- **Compiled code no longer tests an absent argument of a function, or the
+  shape of a point input.** A function applied to an absent value has no
+  specified value in compiled code. So a call of a function whose parameter
+  is annotated with a type that is not numeric and has no `missing` arm no
+  longer stops the run with a `TypeError` that names the parameter (the
+  `_SYS.present` helper is removed). An absent point in a list of points
+  (`list<tuple<real, real> | missing>`) given to a function, by a call, by
+  `Map`, `Filter` or another callback, or by `Apply` of a literal, goes to
+  the definition compiled for one point: with `f := t ↦ 2t` and
+  `L = [(1, 2), Missing]`, `Map(f, L)` gave the interpreter's value
+  `[(2, 4), Missing]` in 0.177.0 and now throws a `TypeError` on
+  JavaScript. Some of these programs declined
+  before and now compile. The arithmetic of a point input (`P + (1, 2)`
+  with `P: tuple<real, real>`) is written component by component,
+  `[(_.P[0] + 1), (_.P[1] + 2)]`, with no run-time test that `P` is an
+  array of two numbers.
+- **A compiled `Sum` or `Product` over an empty range of a body of known
+  vector width gives the identity of that shape.** With `x, y, z: real` and
+  `n: integer<0..10>`, `Sum(i * [x, y, z], i, 1, n)` at `n = 0` compiles to
+  `[0, 0, 0]` on JavaScript (`[1, 1, 1]` for `Product`), the zero of its
+  static type `vector<real^3>`. The interpreter gives the scalar `0` (`1`)
+  for this case. Inside a broadcast both give the same value:
+  `0.5 * Sum(…) + [x, y, z]` is `[x, y, z]` on both.
+- **Compiled code tests no value against its declared type.** The compiler
+  assumes that every value holds its static type, a value given by the host
+  included, and a value outside that type gives an undefined result. These
+  run-time tests are removed:
+  - the test of an argument against the declared type of its parameter, for
+    a user function, a block-local function and an annotated function
+    literal applied directly, on `javascript` (the `_fn_f$t` shim, which
+    gave `NaN` or `undefined`) and on `interval-js` (`_IA.checkedCall`,
+    which clipped an interval to a bounded type; `checkedCall` is no longer
+    exported from the interval library). With `f` declared
+    `(real) -> number`, `f(y)` compiled to `_fn_f$t(_.y)` and now compiles
+    to `_fn_f(_.y)`. An argument whose static type does not prove a
+    parameter type that admits only some real numbers (`integer`,
+    `real<0..>`, `rational`) is assumed to hold it: with `g` declared
+    `(integer) -> integer` and `y: real`, `g(y)` declined on Python and
+    GLSL and now compiles on every target, with no test, and a recursive
+    call such as `f(n - 1)` at an `integer` parameter compiles. Only an
+    argument whose static type has no value of the parameter type declines.
+    A complex-lane argument at a real parameter is still passed as its real
+    part (`_SYS.creal`), so `p(√y)` at `y = 4` gives the value of `p(2)`;
+    a function value that a consumer gives such elements declines: with
+    `h` declared `(real) -> real`, `Map(h, [√y, 1])` compiled and now
+    declines;
+  - the refusals of `run()` and `load()`: an array, a boolean or a string
+    for a binding declared with a number type, and any value but a string
+    for a binding declared `string`. A `{re, im}` value other than `~oo`
+    for a binding read as real, and a string and a typed array for a
+    binding read as a list, are still refused: they are values of some
+    types (`number`, some collection types) that compiled code cannot
+    read. `broadcast()` no longer refuses a boolean for a number
+    binding, or any input for a `string` binding. The stored entry plan has
+    no `scalars` and no `texts` field (a stored plan that has them still
+    loads, and the fields are ignored);
+  - the shape test of a reduction or an inner product over a declared
+    width: `\sum(V)` with `V: list<real^3>` compiled to
+    `((_tv1) => Array.isArray(_tv1) && _tv1.length === 3 ? (0 + _tv1[0] + _tv1[1] + _tv1[2]) : (_tv1).reduce((_a, _b) => _a + _b, 0))(_.V)`
+    and now compiles to the term-by-term fold alone, and `Dot` of two
+    points whose width the type states has no `_SYS.matmul` fallback;
+  - on JavaScript, the test that a list of points is an array, in its sum
+    with a point and its product with a list of numbers: with
+    `P: list<tuple<real, real>>`, `P + (1, 2)` compiled to
+    `((_tv3, _tv4) => (Array.isArray(_tv3) ? _tv3.map((_tv5) => …) : NaN))(_.P, [1, 2])`
+    and now compiles to `((_tv3, _tv4) => _tv3.map((_tv5) => …))(_.P, [1, 2])`.
+    In the product, the other operand is tested only when it is typed
+    `broadcastable<…>`;
+  - on JavaScript, the `RangeError` "PointList: source component … is not
+    an array at run time" for a `PointList` source typed as a list (or as a
+    list or `missing`);
+  - on JavaScript, the test that the source of a counted reduction over a
+    range of positions (`Sum(At(L, 2..5))`) is an array, when its type has
+    no `missing` arm. The test of the `Repeat` count and of the `Slice` span
+    no longer tests the type of the value; they give the same values.
+- **A declared scalar result binds the body of the function.** With `h`
+  declared `(number) -> number` and `h := t ↦ [t, t]`, `h(3)` evaluated to
+  `[3, 3]`, typed `number`, and now gives an `incompatible-type` error, as
+  does `(t ↦ Typed([t, t], number))(5)`. A function computed once per
+  element of a list argument still returns the list of its results: with
+  `d` declared `(point | list<point>) -> number`, `d([(1, 2), (4, 6)])` is
+  a list of numbers. The compiler declines every call of such a function on
+  `javascript`, `interval-js` and Python, a bare call `h(u)` included, which
+  compiled and returned the list before, and a function value of such a
+  function given to a consumer (`Map(h, xs)`). (GitHub issue #488.)
+- **Group-theory queries have one name for every representation.** The
+  permutation-only queries of 0.172.0 are removed. Use the generic names,
+  which accept a permutation group or a matrix group:
+  `PermutationGroupOrder` → `GroupOrder`, `PermutationGroupContains` →
+  `GroupContains`, `PermutationIsSubgroup` → `GroupIsSubgroup`,
+  `PermutationIsNormal` → `GroupIsNormal`, `PermutationGroupIsAbelian` →
+  `GroupIsAbelian`, `PermutationGroupElements` → `GroupElements`,
+  `PermutationGroupGenerators` → `GroupGenerators`,
+  `PermutationGroupEqual` → `GroupEqual`, `PermutationGroupIdentity` →
+  `GroupIdentity` and `PermutationSubgroupIndex` → `GroupIndex`. A permutation group still uses the
+  stabilizer-chain algorithms and their limit options. The operations
+  specific to permutations (`PermutationCompose`, `PermutationCycles`,
+  `PermutationOrbit`, ...) keep their names. (#484.)
+
+### Resolved Issues
+
+- **A product with a quotient factor reads back as the same expression.**
+  `\sin(90\frac{x}{\sin(k)})` was written `\sin(\frac{90x}{\sin(k)})`, which
+  reads back as `Sin(Divide(Multiply(90, x), Sin(k)))`, not as the product
+  `Sin(Multiply(90, Divide(x, Sin(k))))`. A product whose only denominators
+  are those of quotients with a numerator other than 1 is now written factor
+  by factor: `\sin(90\times\frac{x}{\sin(k)})`, and `\frac{a}{b}\frac{c}{d}`
+  stays `\frac{a}{b}\frac{c}{d}`. A product with a reciprocal or a negative
+  power is still one fraction: `2\cdot\frac{1}{a}` is `\frac{2}{a}`. The
+  prettified MathJSON (`toMathJson({ prettify: true })`) follows the same
+  rule. (CE-787.)
+
+- **A returned closure calls a local function that a nested block declares.**
+  `Apply(Apply(w ↦ (x ↦ If(x > 0, Block(Declare(g, "unknown", z ↦ 3), x + g(0)), 0)), 1), 5)` gave `5 + g(0)`; it now gives `8`. When a call
+  ends, the nested block of a closure that the call returns is rebuilt on a
+  new scope, and the call `g(0)` did not find the local `g` in that scope.
+  (CE-794.)
+
+- **In `mode: 'complex'`, a block local with a real value compiles on the
+  real lane.** With `x: real`, the compiled
+  `Block(Declare(k, "unknown", Floor(x)), Cos(k)) + Floor(x)` gave the
+  string `"[object Object]1"` at `x = 1.3`; it now gives `1.5403`, the
+  interpreter's value. The same fault made the dot product of a point
+  returned by a function with a `where` local (`p(x) := (\cos θ, \sin θ) \operatorname{where} θ := \operatorname{mod}(x, 1)`) give `NaN`. A local
+  whose type is real holds the real part of each value assigned to it, and
+  `NaN` for a value that is not real.
+
+- **An evaluation of a block does not change the type of its locals.** A
+  local declared with no type (`Declare(k, "unknown", v)`, `let k = v`) has
+  the type that the canonical form gives it, also after a run of the block.
+  Before, a run gave the local the type of its value in that run, and a copy
+  made by `subs()` shares the locals of the block. With `x: real` and
+  `e = Block(Declare(k, "unknown", Sqrt(x)), k + 1)`, after
+  `e.subs({x: 4}).evaluate()` the type of `k` was `integer`, and `e`
+  compiled in `mode: 'complex'` gave `NaN` at `x = -4`. It now gives
+  `1 + 2i`, the interpreter's value. (CE-796.)
+
+- **The `sgn` of a power with an exponent that is not provably real is
+  `undefined`.** A positive base raised to a complex exponent can be any
+  non-zero complex number: `ce.parse('2^{\ln(-3)}').sgn` gave `'positive'`,
+  but the value is about `-1.2211 + 1.7592i`; the sign is now `undefined`.
+  `(|\pi|)^{\ln(-3)}` gave `'non-negative'` and now gives `undefined`. A
+  real exponent keeps the sign: `2^{\sqrt{2}}` is `'positive'`.
+
+- **A `Sum` or `Product` over an empty range of a vector body gives a vector.**
+  With `x, y, z: real` and `n: integer<0..10>`, `Sum(i·[x, y, z], i, 1, n)`
+  has the type `vector<real^3>`. At `n = 0`, `evaluate()` gave the scalar
+  `0` and now gives `[0, 0, 0]`; the `Product` gave `1` and now gives
+  `[1, 1, 1]`, as compiled code does. `simplify()` of a range that is empty
+  by its numeric bounds gives the same vectors. So
+  `Norm(Product(i·[x, y, z], i, 1, n))` at `n = 0` is `√3` (before: `1`). A
+  body of another type, a matrix included, keeps the scalar identity.
+  (CE-786.)
+- **The sum of two lists of points is typed as a list of points when only one
+  length is known.** With `P: list<tuple<real, real, real>>` and
+  `Q: list<tuple<real, real, real>^10>`, `P + Q` and `P - Q` were typed
+  `list<list<tuple<real, real, real>>>`; they are now typed
+  `list<tuple<real, real, real>>`, which is the shape of the value. With
+  `n := [1...10]`, `n · PointList(m, m, v)` is a list of points too. The point
+  type of such a sum is the component-wise sum of the two point types: with
+  `A: list<tuple<integer, integer, real>>` and
+  `C: list<tuple<real, real, integer>^2>`, `A + C` is
+  `list<tuple<real, real, real>>`, where its cell was the union of the two
+  point types. (CE-789.)
+- **The sum of a point-or-list operand and a list is typed as a list.** With
+  `U: tuple<real, real> | list<real>` and `W: list<real>`, `U + W` was typed
+  `list<list<real> | tuple<real, real>>`, a type that does not hold the value
+  `[11, 22]` of `U := [1, 2]`, `W := [10, 20]`. It is now typed `list<real>`.
+  The same holds for `U - W`; with `W` declared `vector<2>`, `U + W` is
+  `vector<2>`. (CE-790.)
+
+## 0.177.0 _2026-11-01_
+
+### Behavior Changes
+
+- **Compiled code guarantees an absent value only where it is produced,
+  moved or discharged.** An absent value (`Missing`, the `NaN` of a read
+  past the end of a numeric list, the `undefined` a host passes for an input
+  declared `real | missing`) keeps the interpreter's value in compiled code
+  at its producers (`At`, `First`, `Last` past the end, an unmatched `Which`
+  cell), through the accessors that move it without computing on it (`At`,
+  `First`, `Last`, `Rest`, `Length`, a `Map` binding), and at a discharge
+  (`IsMissing`, `Coalesce`, `AssertPresent`, a default parameter). Every
+  other operator applied to an absent operand gives the target's own value
+  in compiled code, and nothing computed from it is specified: with
+  `w: real | missing` absent, `If(IsMissing(w), 1, 0)` is 1 on every route,
+  while `If(IsMissing(w > 0), 1, 0)` is 1 in the interpreter and 0 on
+  JavaScript (`undefined > 0` is `false`). In 0.176.0 the compiler carried
+  the three-valued comparison to the `IsMissing`, so both gave 1. The
+  interpreter does not change. A host passes `undefined`, never `null`, for
+  an absent input. The rule and its record: `docs/COMPILATION-MODEL.md`,
+  "Caveats of compiled code", and
+  `docs/plans/2026-11-01-absent-value-contract.md`.
+- **A default parameter fills a supplied absent value as well as an
+  argument left out.** `(k: real | missing = 2) ↦ k` gives 2 for `f()`,
+  `f(Missing)` and `f(At(L, 100))` with `L` a list of two elements; in
+  0.176.0 the second gave `Missing` and the third an `incompatible-type`
+  error. The test of absence is the one of `Coalesce`, so `NaN` and
+  `Indeterminate` take the default too: `(k: real = 2) ↦ k` gives 2 for
+  `f(0/0)`. A caller that needs to pass an absent value through a parameter
+  declares no default for it. Compiled code fills the default in the
+  function with the same absence test as `Coalesce` (`undefined`, `null` or
+  `NaN` in JavaScript; `None` or a float or complex `NaN` in Python), not
+  with a native default parameter, which fills only an argument that is
+  left out. On `interval-js`, where an empty interval is either an absent
+  value or a pole, a call that supplies a number at a defaulted parameter
+  declines.
+
+- **Compiled code no longer guards an absent operand of an operator that is
+  not a discharge.** The three-valued comparisons and connectives, the
+  absence levels of broadcasts and point arithmetic, and the `missing` flag
+  of `interval-js` results are removed, as the rule above allows. With
+  `w: real | missing` absent, `If(IsMissing(w > 0), 1, 0)` is now 0 on
+  JavaScript. On JavaScript, `Equal(s, t)` with `s` and `t` both declared
+  `string | missing` now declines, and the interpreter fallback gives its
+  value. The public `CompileTarget.absence.numeric` has no `readInput`
+  member any more: compiled Python reads an input as it is, so an input of
+  `None` in arithmetic raises a `TypeError` where it gave `nan`.
+
+- **`IsMissing`, `Coalesce` and `AssertPresent` read every spelling of an
+  absent value in compiled code.** On JavaScript they read `NaN`, `undefined`
+  and `null` as absent for a value of any type; before, the test for a
+  point, a string or a boolean read only `undefined`. On Python they read
+  `None` and a float or complex `NaN` (NumPy scalars included) as absent and
+  every other value as present; before, `IsMissing(u)` with
+  `u: real | string | missing` holding `"ab"` raised a `TypeError`, and
+  `IsMissing(At(["a", Missing], 2))` gave `False`. The unmatched cell of an
+  element-wise `When` with a complex value is now a plain `NaN`, as `Which`
+  gives it: with `z: complex` and `v = [1, -1]`,
+  `IsMissing(At(When(z, v > 0), 2))` is now `true` (before: `false`), and
+  `Coalesce(At(When(z, v > 0), 2), 0)` is now `0`. An unmatched point or
+  string cell stays `undefined`.
+
+- **A destructuring `Declare` whose pattern repeats a name declines in
+  compiled code.** In 0.176.0, the MathJSON
+  `["Block", ["Declare", ["Tuple", "a", "a"], "'unknown'", ["Tuple", 1, 2]], "a"]`
+  compiled on every target and `a` got the value at its last position, `2`.
+  Now the compilation declines on every target, with a message that names
+  the repeated symbol, and the interpreter evaluates the expression (it gives
+  `2`). A nested pattern such as `(a, (b, a))` declines in the same way. Only
+  MathJSON input can contain such a pattern: the Epsil parser rejects it, and
+  LaTeX does not give a destructuring `Declare`.
+- **A compiled `Sum` or `Product` whose body writes its index declines.** In
+  0.176.0, `Sum(Block(j ≔ j + 1; j), Limits(j, 1, n))` compiled on every
+  target, and each target kept a separate loop counter to give the
+  interpreter's value (14 at `n = 4`). Now the compilation declines on every
+  target, with a message that names the index, and `compile()` falls back to
+  the interpreter, which gives the same value. The decline comes before the
+  `Sum` handler of the target, so a custom target with its own `Sum` handler
+  declines too. A body that assigns or declares another variable by name
+  still compiles. A body that holds a destructuring `Declare` also declines,
+  because the check cannot tell which names such a pattern writes.
+- **A compiled read of a `Block` local that only some paths assign
+  declines on every target.** A local that its `Declare` gives no value, and
+  that a statement reads when it may not have a value yet (after an
+  assignment in one branch of an `If`, or after an early `Return`), now makes
+  the compilation decline on JavaScript, interval JavaScript and Python, as it
+  already did on GLSL and WGSL. In 0.176.0, JavaScript checked the read at run
+  time and threw `read-before-declaration`, and Python gave the local the
+  start value `_ce_unset(name)`. An input that the caller can leave out no
+  longer counts as a path on which no branch runs: with `x: real`,
+  `Block(Declare(n), If(x > 5, n ≔ 1, n ≔ 2), n + 1)` compiles on JavaScript
+  with no check, and gives `3` at `x = 1`.
+- **Compiled `Take` and `Drop` test every run-time count for `NaN`, and
+  compiled Python raises for a `NaN` count.** In 0.176.0 the compiler tested
+  a count only when its type showed it could be `NaN`. Now compiled
+  JavaScript tests every count that is not a compile-time number and gives
+  `undefined` for a `NaN` count, as before; an operator that reads the slice
+  still has no value (`Length(Take(xs, k))` is `NaN`). Compiled Python no
+  longer tests the count: a `NaN` count raises `ValueError`, as before
+  0.176.0 (it gave `None`). The interpreter has no value for a `NaN` count.
+- **On GLSL and WGSL, `First`, `Second`, `Third` and `Last` of `Missing` or
+  `Undefined` decline.** In 0.176.0 they compiled to the shader `NaN`. The
+  interpreter gives `Missing`, and a decline falls back to it.
+- **Compiled arithmetic over a symbol declared `any` or `value` declines.**
+  On the JavaScript target, an element-wise site, `Max`, `Min`, `Sum` and
+  `Product` over a parameter declared `any` or `value`, over an input
+  declared `value`, or over a symbol declared `any` or `value` that has a
+  value, no longer emit a run-time test of whether the value is a list. The
+  compilation declines with the code `unsettled-shape` and the symbol in
+  `unsupported`, and the interpreter computes the value:
+  `Function(p + q, p: any, q: any)` gives `success: false`, and
+  `run([1, 2], [3, 4])` still gives `[4, 6]`. Declare the shape of the symbol
+  (`real`, `list<real>`) to compile it. An input declared `any` with no value
+  is still refused with `untyped-input`.
+
+### Resolved Issues
+
+- **Compiled Python groups a `vars` source that is not a primary
+  expression.** With `p: real` and `vars: { p: '2+3' }`, `2p` compiled to
+  `2 * 2+3`, which is 7; it is now `2 * (2+3)`, which is 10. A negative
+  constant is grouped too: `p^2` with `vars: { p: -3 }` is `(-3) ** 2`, which
+  is 9 (before: −9).
+- **On `interval-js`, `PointX` and `PointY` of a list whose every point is
+  absent keep the list.** `PointX([Missing, Missing])` gave one `empty`
+  result; it now gives a list of two, as the interpreter gives
+  `[Missing, Missing]`. The same applies to a list of restricted points
+  whose conditions are all false.
+
+- **On the `interval-js` target, a `Break` condition in a `Loop` that is
+  always false no longer stops the loop.** With `k ∈ 1..5`,
+  `Block(s ≔ 0; Loop(Block(If(k > 20, Break()), s ≔ s + k), k ∈ 1..5); s)`
+  gave the interval `[0, 0]`; it now gives `[15, 15]`, as `evaluate()` gives
+  15. The same applies to a condition written `False`.
+- **`Solve` finds the real cube root of a quotient.** With `t` and `x`
+  declared `real`, `Solve(t^3 x = 1, t)` stayed unevaluated; it now gives
+  `[Root(1/x, 3)]`. An odd root of a base whose values are real numbers,
+  infinities or NaN now has the type `real` together with the infinities
+  and NaN of the base, not `number`: `Root(1/x, 3)` is
+  `infinity | nan | real`.
+- **A compiled power of a list of extended reals no longer tests the shape
+  of the list at run time.** With `P` declared
+  `list<tuple<C, C>>` and `C` the type `real | signed_infinity | nan`, the
+  JavaScript code of `PointY(P)^2` called `_SYS.matrixPowerShape` to check
+  at run time whether the list was a matrix. It now gives the same
+  element-wise power as for `C = real`. The same applies to a
+  `list<real | signed_infinity | nan>`. The value is unchanged.
+- **A compiled call over a list of points compiles again when the function
+  passes a parameter declared `unknown` to another function.** With
+  `C := (D, d) ↦ ((D − d)/2, 0)` and `n := (q, D2, d2) ↦ q + C(D2, d2)`
+  declared `(tuple<number, number>, unknown, unknown) -> tuple<number, number>`,
+  the compilation of `n([(1, 2), (3, 4)], 4, 2)` declined in 0.176.0 with the
+  code `unsettled-shape`, although `n((1, 2), 4, 2)` compiled. Each call of the
+  compiled map now types `D2` and `d2` from their arguments, as the call on
+  one point does, and the result is `[(2, 2), (4, 4)]`, as `evaluate()` gives.
+- **The variable of a compiled derivative takes the type of its declaration
+  outside the derivative.** With `x` declared `real` and
+  `F := t ↦ Max(Abs(t), Abs(t - 1))`, `compile(D(F(x), x))` declined in
+  0.176.0 with the diagnostic code `'untyped-input'`, and
+  `freeSymbolTypes.x` was `unknown`. It now compiles to a numeric derivative
+  at `x`, `freeSymbolTypes.x` is `real` with the provenance `declared`, and
+  `run({ x: 2 })` gives 1. This is the rule that already applies to the
+  variable of an indefinite integral.
+- **The code of a `compile` handler on the definition of `Which` is used
+  when the branches have different shapes.** In 0.176.0, with `x` declared
+  `real` and a handler that returns `x > 0 ? [0, 0] : [1, 2]` for
+  `Which(x > 0, 0, True, [1, 2])`, the compilation declined with
+  `unsettled-shape`, because the branches are a number and a list. The
+  check of the shapes of the branches applies to the stock lowering of a
+  conditional, and a handler takes precedence over that lowering, so the
+  compilation now uses the code of the handler, as it did in 0.175.0. The
+  node then has its static type (here `integer | vector<integer^2>`). The
+  same rule applies to every node whose code a `compile` handler wrote,
+  conditional or not: when its type admits values of shapes that conflict
+  (a number and a list), the node compiles only where no code of the stock
+  lowering reads its value. It compiles as the whole expression, as the
+  value of the whole expression (the last statement of a root `Block`, a
+  branch of a root `If`, the body of a root function literal), and as an
+  operand of another node whose code a handler wrote. This holds for each
+  occurrence of a node that occurs more than once: the compilation writes
+  the code of one occurrence and uses it for the others, so
+  `At(W, 1) + At(W, 2)` with `W` that `Which` and a handler on `At` too
+  compiles. Under a stock
+  consumer, such as `Which(x > 0, 0, True, [1, 2]) + 1`, the compilation
+  declines with `unsettled-shape`: give the node a type of one shape (for
+  example with a type handler on the definition) or write the code of the
+  consumer with a handler too. As the body of a user function that the
+  code calls, such a node also declines, and so does a case of a `Match`
+  whose value is used. A type `broadcastable<T>`, alone or in a union
+  (`broadcastable<real> | missing`), admits several shapes. A handler node
+  whose type has one shape compiles anywhere; a `missing` member does not
+  count as a shape, so `Which(x > 0, 1, x < 0, 2) + 1`, of type
+  `integer | missing`, compiles. A handler that returns no code gives the stock lowering, which still
+  declines. The admission check also no longer calls the handler a second
+  time for a node that the compilation already gave to it.
+- **Shader targets: `floor`, `fract` and `mod` of a bounded value no longer
+  keep the NaN-safe helper.** On `glsl` and `wgsl`, `sin`, `cos` and the other
+  guarded calls use the built-in only when their operand cannot overflow f32,
+  and each factor of a product must then have a known size. `floor`, `ceil`,
+  `round` and `trunc` of an operand had no size, so with `t` declared
+  `real<-5.5..5.5>`, `\sin(10000(51.1\lfloor t\rfloor-3.9))` compiled to
+  `_gpu_sin(…)`, while the same formula without `\lfloor\rfloor` compiled to
+  `sin(…)`. Now `floor`, `ceil`, `round` and `trunc` of an operand of size
+  `s` have the size `s + 1`, a fractional part (`Fract`, `Mod(a, 1)`) has the
+  size 1, and `Mod(a, d)` has about the size of `d` when `a` has a size. So
+  `\sin(10000(51.1\lfloor t\rfloor-3.9))`, `\sin(1000(t-\lfloor t\rfloor))`
+  and, with `T` declared `real<0..120>`,
+  `\cos(\frac{T}{40}+\frac{\pi\lfloor T\bmod 7\rfloor}{7})` call the built-in.
+  An operand with no size (`x` declared `real` with no range) keeps the
+  helper, as before.
+- **A function with a point parameter maps over a list of points that one
+  point of the same type would satisfy.** With `E = real | signed_infinity | nan`, `g` declared `(tuple<E, E>) -> unknown` and assigned
+  `p ↦ p.x + p.y`, and `L` declared `list<tuple<number, number>>`, `g(L)`
+  had the type `error`, while `g(T)` was accepted for `T` declared
+  `tuple<number, number>`. Now a list, a matrix, or a union of one point and
+  a list of points is accepted when its point type would be accepted as the
+  whole argument: `g(L)` has the type `list<E>`, evaluates to one value per
+  point, and compiles to a call per point. The value of each point is
+  checked when it is bound to the parameter.
+- **Arithmetic on points whose components may be infinite keeps the signed
+  infinities in the component types.** With `P` and `Q` declared
+  `tuple<real | signed_infinity | nan, real | signed_infinity | nan>`, the
+  type of `P + Q`, `P - Q`, `2P` and `P / 2` was
+  `tuple<infinity | nan | real, infinity | nan | real>` (`P / 2` was
+  `tuple<number, number>`). The `infinity` type admits the complex infinity,
+  so a symbol declared with the type of `P` could not be assigned these
+  results. Now each component has the type `real | signed_infinity | nan`, as
+  the same arithmetic on scalars of that type has. A scalar quotient such as
+  `x / p`, with `x: real | signed_infinity` and `p` a finite real that is not
+  zero, is now `real | signed_infinity` (it was `infinity | nan | real`), and
+  with `a: real | signed_infinity | nan`, `a / p` is now
+  `real | signed_infinity | nan` (it was `number`).
+- **Reading `.latex` of an expression no longer changes the type of a call
+  to a recursive function.** With
+  `F := n ↦ Which(n = 9, [(0, 0, -n)], True, ListJoin([(0, 0, -n)], F(n + 1)))`,
+  `C := F(0)` and `N` declared `(tuple<number, number, number>) -> number`, a
+  read of `.latex` of `N(C)` changed the type of `F(0)` from
+  `list<tuple<integer, integer, number>>` to
+  `list<tuple<integer, integer, unknown>>`, and a later `compile()` of
+  `N(C)` declined. The type now stays
+  `list<tuple<integer, integer, number>>`, and the compile succeeds in
+  both orders.
+
+## 0.176.0 _2026-11-01_
+
+### New Features
+
+- **An optional parameter can have a default value.** Write it after the type
+  in a signature: `ce.declare("Scaled", { signature: "(x: number, factor: number = 2) -> number", evaluate: … })`. A call that leaves the parameter
+  out gets the default when it is made canonical, so `Scaled(3)` and
+  `Scaled(3, 2)` are the same expression: the `evaluate` handler, the type
+  handlers and the compiler receive two operands, and `def.signature` prints
+  `(x: number, factor: number = 2) -> number`. Before, `= 2` was a parse error
+  and each handler had to supply the value of a missing operand itself. A
+  default is a number (`-1`, `NaN`, `+oo`), a string, `true` or `false`, a
+  symbol, `[]` or `{}`. A symbol default is the symbol itself, read as if it
+  were written in the call (`over: set = Integers`,
+  `mode: symbol<Auto> | symbol<Manual> = Auto`); it need not be declared. For
+  another value, declare a constant and name it as the default. A named
+  argument can skip a parameter that has a default:
+  `F(3, factor: 5)` with `(x, density: number = 1, factor: number = 2)` is
+  `F(3, 1, 5)`. A variable declared with such a signature fills its calls the
+  same way, and accepts a function that requires the parameter. In a function
+  literal, a parameter with a default is `["Optional", param, default]`; in
+  Epsil it is written `function f(x: number, k: number = 2)`,
+  `(x, k = 2) => x * k` or `(x, k: number = 2) => x * k`. A call of the
+  literal with the required arguments is a full call, not a partial
+  application: `((x, k = 2) => x * k)(3)` is `6`. Compiled code fills the
+  default on every target (JavaScript and Python default parameters, call-site
+  completion on GLSL, WGSL and interval-js). A default that does not match its
+  parameter type, a default in an overloaded signature or a multi-clause
+  function, and a default on a parameter whose type uses a type variable are
+  refused when the function is declared. The operand descriptor and
+  `LambdaDefinition.parameters` report `optional` and `default` for such a
+  parameter. The annotation `["Typed", "k", "'number?'"]`, which was ignored
+  before (the call was a partial application), is now the error
+  `invalid-parameter-annotation`. (#490, requested by
+  [enumeratio](https://github.com/enumeratio))
+
+- **A `bigint` compile mode on the JavaScript target computes integers
+  exactly past `2^53`.** `compile(expr, { mode: 'bigint' })` computes every
+  integer value as a JavaScript `bigint`. With `n: integer`, the Catalan form
+  `Binomial(2n, n) − Binomial(2n, n + 1)` at `n = 40n` gives
+  `2622127042276492108820n`, and `Mod(n, 10)` at `n = 2^60 + 1` gives `7n`;
+  in the default mode the first is rounded and the second throws a
+  `RangeError`. The mode compiles integer arithmetic, `Abs`, `Min`, `Max`,
+  `Sign`, `Mod`, `Remainder`, `GCD`, `LCM`, `Factorial`, `Factorial2`,
+  `Binomial`, `Fibonacci`, `Sum`, `Product`, `Fold`, `Reduce`, `Range`,
+  `Map`, `At`, `Take`, `Drop`, `Length`, `If`, `Which`, the comparisons,
+  `IsPrime` and user functions with integer parameters. `Floor`, `Ceil`,
+  `Round` and `Truncate` of a quotient (`Floor(n/3)`, `Floor(n(n + 1)/2)`,
+  `Floor(2^(−n))`) or of `Sqrt(n)` are exact. Any other expression declines
+  with the new diagnostic code `bigint-lane` and runs on the interpreter:
+  `DigitSum(n)`, `String(n)`, `n/2` outside a rounding function, a `real`
+  input, a constant such as `π`. An input is a `bigint` or a safe-integer
+  `number`. The result is a `bigint` for an integer, a `boolean`, or a
+  `number` (`NaN` or `Infinity`) when a sub-expression has no finite value:
+  `n!` at `n = −1n` gives `Infinity`. A `number` result has no defined
+  relation to the value of `evaluate()`. A result with more than 1,000,000
+  decimal digits from `Power`, `Factorial`, `Factorial2`, `Binomial` or
+  `Fibonacci` throws a `RangeError` (`Fibonacci(n)` at `n = 10n ** 9n`),
+  where the interpreter leaves the expression unevaluated. `broadcast()`,
+  `broadcastAsync()` and the batch loaders of `createJavaScriptRuntime()`
+  refuse code compiled in the mode. The mode is never selected by `'auto'`.
+  The `compile` tool of the MCP server accepts `mode: "bigint"`. The exported
+  types change: `CompileMode` is now `'strict' | 'complex' | 'auto' | 'bigint'`, the `mode` of a compilation result and of stored JavaScript can
+  be `'bigint'`, and `CompiledValue` and the variable values of the runners
+  admit `bigint`. A custom target with an exhaustive `switch` on
+  `CompileMode` must add the new case. Only the built-in `javascript` target
+  offers the mode: on any other target, also a custom target that lists
+  `'bigint'` in its `supportedModes`, a request for the mode declines with
+  `unsupported-mode`. (#503, requested by
+  [enumeratio](https://github.com/enumeratio))
+
+- **A protocol can extend other protocols.** In Epsil, `protocol FloorOrder extends PartialOrder { function floor(self: Self) -> integer }`; the parents
+  are separated by commas. With the host API, `ce.declareProtocol("FloorOrder", { functions: { floor: "(self: Self) -> integer" } }, { extends: ["PartialOrder"] })`. In MathJSON, `["DeclareProtocol", name, members, ["List", parent, …]]`. A type that conforms to `FloorOrder` conforms to
+  `PartialOrder` too, and one implementation block supplies the members of
+  the whole hierarchy: `type Money is FloorOrder { function compare(…) {…} function floor(…) {…} }`, or one `ce.declareProtocolImplementation("Money", "FloorOrder", { functions: { compare, floor } })`. Before, each ancestor
+  needed its own declaration, and nothing stopped a type from conforming to
+  `FloorOrder` without `PartialOrder`. The conformance registers an ordinary
+  conformance on each ancestor, so `ce.conformsTo("Money", "PartialOrder")`
+  is still a direct lookup, and dispatch is unchanged. Code that declares
+  every ancestor by hand, parents first, keeps working. A parent must be
+  declared first (`protocol-unknown`); a member name can be declared by only
+  one protocol of a hierarchy (`protocol-member-inherited`,
+  `protocol-extends-member-conflict`); running a `protocol` statement again
+  can add a parent but cannot remove one (`protocol-extends-removal`); a
+  cycle is `protocol-extends-cycle`. A qualified name names the protocol that
+  declares the member: `FloorOrder.compare` is `protocol-member-unknown`,
+  with the hint "write `PartialOrder.compare`". `extends` is a soft keyword: a
+  symbol named `extends` stays legal. (#491)
 
 - **The `broadcast()` of an `interval-js` result accepts a list input, as its
   `run()` does.** With `L` declared `list<number>`, the code of `x + Sum(L)`
@@ -73,6 +1827,199 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Behavior Changes
 
+- **A power of a float and an infinity whose value is 0 is now the float
+  `0`**, as `2.5/∞` already was. For example, `0.5^∞` was the exact `0` and
+  is now `0.0`, and `∞^{-2.5}` was `0` and is now `0.0`. With exact operands
+  the result stays the exact `0`: `(1/2)^∞` and `3^{-∞}` are `0`.
+
+- **A compiled `Loop` whose value is used falls back to the interpreter.** The
+  value of a loop is `Nothing`, or the value of a `Break(v)`, and compiled
+  code has no form for either. Before, `compile()` of
+  `\keyword{for} i \keyword{from} 1 \keyword{to} 10 \keyword{do} i^2` gave a
+  function whose `run()` returned `undefined` (JavaScript) or `None`
+  (Python), and a loop left with `Break(30)` also returned `undefined`. Now
+  such a loop does not compile (`success: false`, diagnostic code
+  `unsettled-shape`) on every target. This includes a search loop that ends
+  with a `Return`, such as `(x) ↦ Loop(If(k > x, Return(k)), k ∈ 1..5)`,
+  which gives `Nothing` when no `Return` runs. A loop used as a statement
+  still compiles: `s ≔ 0; \keyword{for} i … \keyword{do} s ≔ s + i^2; s`
+  gives 385. A loop with no indexing set and no `Break`, which ends only
+  through a `Return`, also still compiles.
+
+- **Two calls of a function declared with the `random` effect are two
+  independent draws** (CE-606). For example with `r` declared
+  `(number) random -> number`, an equality comparison no longer reads `r(t)`
+  and `r(t)` as one value because their trees are the same.
+  `Equal(r(t), r(t))` evaluated to `True` and now stays inert;
+  `NotEqual(r(t), r(t))` evaluated to `False` and now stays inert;
+  `r(t).isEqual(r(t))` and `r(t).isIdenticallyEqual(r(t))` returned `true` and
+  now return `undefined`. The same applies to two sets that hold such a call
+  (`Equal(Set(r(t), 1), Set(1, r(t)))` stays inert). A call of a pure function
+  or of an undeclared function is still equal to itself, `isSame()` still
+  compares the trees, and a list with a `NaN` element is still not equal to
+  itself.
+
+- **Limits at infinity no longer read the sign of a base from a sample.** The
+  rules `f^g → exp(g·ln f)` and `ln u − ln v → ln(u/v)`, and the conjugate
+  rewrites of a difference of radicals, need operands that are positive for
+  every large `x`. They took a positive value at `x = 120` as a proof.
+  `Limit(ln(x) − ln(130 − x), x, +∞)` gave `ln(−1) = iπ`, but the limit is
+  `−iπ`, and `Limit((sin(x) + 0.9)^{1/x}, x, +∞)` gave `1`, but there is no
+  limit. Both now stay unevaluated. The sign is now proved from the form of
+  the operand only: a polynomial with a positive leading term, a sum of
+  positive terms, a product, a power or a root of operands with a proved
+  sign, `e^g`, `ln b` with `b − 1` proved positive, and `cos(1/x)`. Some
+  limits that were correct now stay unevaluated, because the sign of their
+  base is not proved from its form: `Limit((1 + sin²x)^{1/x}, x, +∞)` and
+  `Limit((2 + sin x)^{1/x}, x, +∞)` (both `1`), and
+  `Limit((ln(ln x))^{1/x}, x, +∞)` (`1`).
+
+- **`ce.declare()` with a function value refuses a function that writes
+  outside itself** (CE-58). A named definition that states no effects must not
+  write outside itself (the `scope` effect is opt-in), but
+  `ce.declare('f', { type: '() -> number', value })`, and `{ value }` with no
+  type, installed a function literal that assigns to an outer variable. In the
+  global scope this call now throws the same effect-contract error as
+  `ce.declare('f', '() -> number')` followed by `ce.assign('f', value)`,
+  whether the value is an expression, MathJSON, LaTeX or a function that makes
+  it. Declare the `scope` effect (`'() scope -> number'`, or on the literal
+  itself) to allow the write; a literal that states its effects must keep to
+  them. A `Declare` statement (an Epsil `let`) and a declaration in a nested
+  scope are not changed: block-local writer closures stay installable.
+
+- **A compiled expression declines when an input has no type, and the
+  result names the input.** An input (a free symbol of the compiled code)
+  whose type is `unknown` or `any` now declines on every target, and
+  `unsupported` holds its name. With `M` not declared,
+  `compile(If(M < 3, M, 0))` emitted code that read `M` as a number:
+  `run({ M: [1, 5] })` gave `0`,
+  where the interpreter gives `[1, 0]`. Now the compilation declines with
+  `unsupported: ["M"]` and the diagnostic code `'untyped-input'`, and the
+  interpreter fallback gives `[1, 0]`. Declare the input
+  (`ce.declare("M", "real")`), or declare a union such as `real | list<real>`
+  when the host can pass both shapes: a union is not refused. A parameter of
+  a function is not an input: `t ↦ 2t` still compiles, and a list passed to
+  its untyped parameter gives an unspecified result. An input declared `any`
+  that the JavaScript target tested at run time for a list now declines too.
+  When the expression also declines for another reason, that reason stays
+  the error and the diagnostic, and `unsupported` also holds the names of the
+  inputs with no type. A name that the code only writes, outside every scope
+  of the expression, is an input too. A transparent alias of `unknown` or
+  `any` is that type. A name that only a branch of an `If` in a block
+  assigns is an input, outside a function body: with `b` undeclared,
+  `Block(If(a < 1, b ≔ 1); b)` declines. The variable of an indefinite integral
+  (`\int x^2 dx`) takes the type of its declaration outside the integral. A
+  value that the code assigns to an input must have the shape of the type of
+  the input, declared or inferred: with `x: real` and `p` undeclared,
+  `Block(If(x > 0, p ≔ [1, 2], p ≔ [3, 4]), 2p)` gave `null` where the
+  interpreter gives `[2, 4]`, because the read `2p` gave `p` the inferred
+  type `number`. It now declines with the code `'unsettled-shape'`.
+
+- **A compiled conditional whose branches have different shapes declines.**
+  An `If`, a `Which` or a `Match` whose branches have conflicting shapes (a
+  number and a list, a point and a list of points) declines on every target,
+  and two points of different sizes decline on `glsl` and `wgsl`,
+  with the code `'unsettled-shape'`, and `unsupported` holds the conditional
+  as `toString()` writes it. `If(x > 0, [1, 2], 3) + 1` compiled on
+  `javascript` with a test of the shape at run time. `If(x > 0, [1, 2], 3)`
+  gave `((0.0 < x) ? (vec2(1.0, 2.0)) : (3.0))` on `glsl`, which is not valid
+  GLSL, and `If(x > 0, [x, 2], 3)` on `interval-js` took the hull of a list
+  and an interval when the condition was not decided. The check also applies
+  to a conditional in the body of a user function that the code calls. The
+  values that a function body can give (each `Return` value and its last
+  value) and the `Break` values of a `Loop` are compared in the same way:
+  with `M: list<real>`,
+  `At(Apply(a ↦ Block(If(Length(a) > 1, Return(First(a))), Reverse(a)), M), 1)`,
+  whose compiled code threw at run time when the early `Return` gave a
+  number, now declines. A
+  branch whose type has no single shape (`unknown`, a union, the result of a
+  call that is tested at run time) is not compared, and a conditional over a
+  list condition, which selects element by element, still compiles when its
+  branches assign no name and have no `Return`, `Break` or `Continue`. A branch
+  that a condition known at compile time excludes is not compared either:
+  `Which(2 < 3, [1, 2], True, 0)` compiles to `[1, 2]`, and
+  `If(False, [1, 2], 0)` to `0`. On `glsl` and `wgsl`, the branches that the
+  shader code keeps are compared: `If(2 < 3, (1, 2), 0)` still compiles to
+  `vec2(1.0, 2.0)`, but `If(False, (1, 2), 0)`, which gave the invalid
+  `((false) ? (vec2(1.0, 2.0)) : (0.0))`, declines. A branch that the code
+  drops is not checked: `If(2 < 3, 0, If(x > 0, [1, 2], 3))` compiles to
+  `0`, and with `z` undeclared, `If(2 < 3, 0, z)` compiles too, because the
+  code does not read `z`. A name that also occurs in the code that is kept
+  stays an input, also where a binder binds it there:
+  `List(If(2 < 3, 0, z), Sum(z, Limits(z, 1, 3)))` declines. On the targets
+  that are not shaders, a conditional whose value the code discards (a
+  statement of a block that is not its last one, a loop body) is not
+  checked: `Block(p ≔ (0, 0); n ≔ 0; If(x > 0, p ≔ (1, 2), n ≔ 3); n)`
+  compiles. A written `NaN` is a number, so `If(c, (x, y), NaN)` declines:
+  its value is a point or a number. When the target declines for a more
+  specific reason, that reason stays the error.
+
+- **A compiled name that gets values of different shapes declines.** In one
+  scope, the values that the code assigns to a name, and the type of the
+  name, must now have one shape class: a number, a complex number, a string,
+  a list, a point or a matrix. Otherwise the compilation declines with the
+  code `'unsettled-shape'` on every target. With `x: real`,
+  `t ↦ Block(If(x > 0, p ≔ [1, 2], p ≔ 3), 2p)` compiled to code that read
+  `p` in one shape. The rule does not examine the order of the assignments:
+  `Block(p ≔ 0; p ≔ [1, 2]; p)`, where the interpreter gives `[1, 2]`, also
+  declines, and the interpreter fallback gives `[1, 2]`. The length of a list
+  is not part of its shape: `[1, 2]` and then `[1, 2, 3]` compile. A declared
+  type settles the shape of a local, so
+  `Block(Declare(p, "real"); p ≔ (x, 2); p)` declines on every target, where
+  `glsl` declared `p` a
+  `vec2`. A parameter of a function literal has the type of the parameter:
+  at `p = 2`, `p ↦ Block(Loop(p ≔ [i, i], i ∈ [1, 2, 3]); 2p)` gave `null`
+  where the interpreter gives `[6, 6]`, and now declines. A type that a
+  `Declare` states and that admits several shapes
+  (`real | list<real>`, `broadcastable<number>`) is not checked. A name that
+  a `Declare` of a nested block declares is another variable; two locals of
+  the same name with no `Declare` are compared as one.
+
+- **A compiled call selects the variant of a function from the static type of
+  its argument, and emits no run-time test of the shape.** With
+  `f := t ↦ 2t`, a call of `f`, a `Map(f, L)` or an `Apply` of a literal now
+  compiles to the variant that the declared or inferred type of the argument
+  selects: a direct call of the scalar variant for a `real`, a map over the
+  list levels for a `list<real>` or a `list<list<real>>`, and a variant
+  compiled for a point (`_fn_f_tuple_real__real_`) for a
+  `tuple<real, real>`, a list of points or an alias of a point type. Before,
+  the JavaScript and interval-js targets tested the shape of each argument
+  at run time (`_SYS.bcastFn`, `_IA.bcastFn`). In the Tycho corpus of 757
+  documents, no record holds `bcastFn` now (320 JavaScript and 27
+  interval-js records before), the records that hold `Array.isArray` fall
+  from 510 to 269, and no record declines that compiled before. Some values
+  change because the old test was wrong:
+  - A point at a parameter with no declared type is bound whole, as in the
+    interpreter. With `f7 := t ↦ 7` and
+    `LP: list<tuple<real, real>> | missing` holding `[(1, 2), (3, 4)]`,
+    `f7(LP)` gave `[[7, 7], [7, 7]]`; it now gives `[7, 7]`.
+  - An absent element (`Missing`, compiled as `undefined`) is passed to the
+    function, as in the interpreter: with
+    `PM: list<tuple<real, real> | missing>` holding `[(1, 2), Missing]`,
+    `Map(f7, PM)` gave `[[7, 7], 7]`; it now gives `[7, 7]`.
+
+  An input or a parameter declared with a union of shapes
+  (`real | tuple<real, real>`) gets one test at that binding and one body per
+  member. These cases decline with the code `'unsettled-shape'`, where the
+  value has no single shape or a route cannot give the interpreter's value:
+  - a list whose element type is a union of shapes:
+    `Map(f2, CS)` with `CS: list<real | tuple<real, real>>`, and a list of
+    points of two widths;
+  - a callback whose body reads an absent point, other than through a
+    function defined on the engine with one parameter: `Map(t ↦ t[1], PM)`,
+    `Find(PM, t ↦ Length(t) > 1)` (JavaScript gave the right value only when
+    the match came before the absent element, and threw otherwise);
+  - an absent element beside an argument that may hold a point:
+    `Reduce(L, g, S)` with `g := (a, x) ↦ 2a`,
+    `L: list<tuple<real, real> | missing>` and
+    `S: tuple<real, real> | missing`;
+  - an absent element at a callback with a parameter that has a default
+    value;
+  - on Python, an `Apply` of a literal whose body reads a point that may be
+    absent (`Apply(t ↦ Max(t, 0), PD)`).
+
+  The interpreter fallback gives the value of each case that declines.
+
 - **MCP clients cannot remove or extend the server's deadline, and a public
   listener must be authenticated.** With a nonzero server `--time-limit`, a
   tool argument of `timeLimit: 0` now uses that server limit instead of
@@ -82,7 +2029,1039 @@ import ChangeLog from '@site/src/components/ChangeLog';
   whose value has no leading or trailing whitespace; requests must send its
   value as a Bearer token.
 
+- **In Epsil, a protocol function member shadows the library function of the
+  same lowercase name in the program that declares it.** After `protocol F { function floor(self: Self) -> integer }` and a conformance of `Money` that
+  implements `floor`, a bare `floor(Money(3))` in the same program was the
+  library `Floor` and gave a static `incompatible-type` error; in a later
+  program it gave `3`. It now gives `3` in both. The library function stays
+  reachable by its capitalized name: `Floor(2.5)` gives `2`. A `function floor` or `let floor` of the program still wins over the member for a bare
+  call; `F.floor(x)` calls the member.
+
 ### Bug Fixes
+
+- **A variable raised to an infinity is no longer folded with a value it may
+  not have.** With `z` declared `real`, `z^∞` was `0`, and `z^∞` with `z`
+  replaced by `2` stayed `0`; it now stays `z^∞` and gives `+∞` for `z = 2`.
+  With `x := 0.5`, `x^∞` was folded to `0` when it was boxed and stayed `0`
+  after `x := 2.5`; it now evaluates to `0.0`, then to `+∞`. A float base
+  computed during evaluation, such as `(z + 0.5)^∞` with `z = 2`, now gives
+  `+∞` instead of `NaN`.
+
+- **A number base near 1 raised to an infinity gives its limit.** The base is
+  compared with 1 by its exact value. `1.00000000001^∞` and
+  `1.000000000000000000001^∞` were `0` and are now `+∞`;
+  `0.99999999999^{-∞}` was `0` and is now `+∞`. Under `N()`,
+  `(1 + 10^{-30})^∞` was `NaN` and is now `+∞`.
+
+- **The derivative of a function literal no longer reads the value of a
+  variable that has the name of its parameter, and its application to a list
+  is typed as a list.** With a global `a := [1, 2]`, `Derivative(a ↦ a^2)`
+  gave the constant function `a ↦ [2, 4]`, and is now `a ↦ 2a`. In the same
+  way, `((a: list<real>) ↦ Apply(Derivative(a ↦ a^2), a))([1, 2])` gave
+  `[[2, 4], [2, 4]]` with the type `number`, and is now `[2, 4]` with the type
+  `vector<2>`; a partial derivative such as `Derivative((a, b) ↦ a^2 b, 1, 0)`
+  is fixed too. The application of a derivative maps over a list argument:
+  `Apply(Derivative(x ↦ x^2), [1, 2])` and `Apply(Derivative(Sin), [1, 2])`
+  were typed `number`, and are now typed as a list with the depth of the
+  argument. A tuple argument, whose shape the body decides, gives the type
+  `any`.
+
+- **A lazy view stored out of a loop iteration at the top level reads a
+  symbol default of its callback in that iteration.** In Epsil, with
+  `let f = (x, k = d) => x * k`,
+  `for d in [3, 6] { if d == 3 { h = Map(f, Range(1, Infinity)) } }` then
+  `ListFrom(Take(h, 2))` gave `[d, 2d]`; it now gives `[3, 6]`. The view names
+  no `d`: the call `f(x)` fills `k` with the `d` of the context of the call,
+  which was the context of the reader, after the loop. The assignment now
+  records, for the view, the loop and block scopes that the variable
+  outlives, with their values at the assignment, and each read of the view
+  calls `f` in them, as for a view made in a function call. A view made
+  outside the loop (`let v = Map(f, R); for d in [3] { h = v }`) is still
+  read in the context of its reader. So is a view that leaves its block as
+  the value of the block (`h = do { let z = 0; Map(f, R) }` in the loop): its
+  elements stay `d` and `2d`.
+
+- **A lazy view assigned to a subscripted name out of a loop iteration reads
+  the values of that iteration.** With
+  `for d in [3, 6] { if d == 3 { L_0 := Map(x => x + d, R) } }`, a base case
+  of the sequence `L` (also `P_{0,0} := …`), or the same assignment to a
+  declared name `h_1` (`h_1 := …`), the elements read after the loop were
+  `7, 8`, the value of `d` after the loop. They are now `4, 5`, as for an
+  assignment to a variable. The assignment to a declared `h_1` also lists a
+  finite lazy view that reads a variable and copies the variables of a call,
+  as an assignment to `h_1` written without the subscript does.
+
+- **A lazy `Map` in the callback of a `Map`, or in the body of a function,
+  now gives the values of each application under `.N()`.**
+  `Map(k ↦ Map(j ↦ k + j, [10, 20]), [1, 2])` with
+  `evaluate({ numericApproximation: true })`, `.N()` or `evaluate().N()` gave
+  `[[11, 21], [11, 21]]`, and is now `[[11, 21], [12, 22]]`, as `evaluate()`
+  and `evaluateAsync()` give. Also
+  `Block(c := 5, g(k) := Map(j ↦ c + k + j, [10]), Map(k ↦ g(k), [1, 2]))`
+  gave `[[16], [16]]`, and is now `[[16], [17]]`; and with
+  `f(h) := Map(j ↦ h(j), [10])`, `[f(x ↦ x + 1), f(x ↦ 2x)]` gave
+  `[[11], [h(10)]]`, and is now `[[11], [20]]`. The numeric form of the inner
+  `Map` was kept after the first application and read again in the later
+  ones; it is now kept only when the `Map` reads no name, and calls no
+  function, of a frame or of a block.
+
+- **`evaluateAsync({ numericApproximation: true })` of a block whose lazy `Map`
+  calls a function that the block defines now reads the locals of the block.**
+  `Block(Declare(c, 'real', 5), DefineFunction(h, k ↦ c + k), Map(k ↦ h(k) + 1, [1, 2]))`
+  gave `[c + 2, c + 3]`, and is now `[7, 8]`, as with
+  `evaluate({ numericApproximation: true })` and `evaluateAsync()`. The callback
+  with the numeric marker substitutes its arguments in its body without a call
+  frame, and it evaluated that body in the scope of the reader of the `Map`, so
+  `h` did not find the run of the block that holds `c`. The body is now
+  evaluated in a scope whose parent is the scope where the callback was
+  defined, as a call frame is.
+
+- **A function called with a block-local valueless symbol reads that local.**
+  A function called in a `Block` with an argument that holds a valueless
+  local of the block read a binding of the same name from the scope that
+  defined the function in place of the local. With a global `y := 5` and
+  `g := x ↦ x + 0.5`, `Block(Declare(y, 'real'), g(y))` gave `5.5`, and with
+  `f := x ↦ NumericApproximation(x)`, `evaluateAsync()` of
+  `Block(Declare(y, 'real'), f(y))` or of
+  `Block(Declare(y, 'real'), Apply(f, y))` gave `5`. These now give `y + 0.5`
+  and `y`, on the synchronous and the asynchronous routes, also when the block
+  is the body of a function (`F := n ↦ Block(Declare(y, 'real'), g(y))`,
+  recursive or not), when the argument is passed on to another call, and when
+  a lazy view made in the block (`L := Map(g, [y])`) is read in a nested block
+  that declares its own `y`. A function that closes over a private `y` no
+  longer gives its value to a `y` of the caller that has no binding.
+
+- **`ArgMax(f, xs)` in the body of a function is applied to the list, not to
+  each element.** `Apply(xs ↦ 1 + ArgMax(x ↦ 2x, xs), [1, 4])` gave a list of
+  two `incompatible-type` errors, one per element, where
+  `1 + ArgMax(x ↦ 2x, [1, 4])` gives one. The domain of the optimization form
+  `ArgMax(f, domain)` (and `ArgMin(f, domain)`) gave the parameter `xs` no
+  type, and a function whose parameter has no type is applied to each element
+  of a list argument. The parameter is now typed `collection`: a set bound to
+  it keeps the optimization form (`Apply(xs ↦ ArgMax(f, xs), Set(1, 4))` stays
+  `ArgMax(f, Set(1, 4))`), and a list gives the error of the collection form.
+
+- **A lazy operator whose canonical handler gives up is canonical and
+  invalid.** A call such as `Tail(xs, 2)`, `Head(xs, Sin)` or
+  `Interval("bad", 1)`, with an operand that the handler does not accept, was
+  kept as written: not canonical, and reported valid. As an operand of a sum
+  (`1 + Tail(xs, 2)`), its evaluation printed "Assertion failed" on the
+  console. An operand left over is now `Error("unexpected-argument")`
+  (`Tail(xs, Error("unexpected-argument", "2"))`). With a valid number of
+  operands, the operands are checked against the signature, so the refused
+  operand is a typed error:
+  `Interval(Error(ErrorCode("incompatible-type", "number", "string"), "bad"), 1)`.
+  An invalid call has no `count` any more: `Interval("bad", 1)` had the count
+  `Infinity` of a valid interval. A call whose operands all pass the check
+  (`Series(1)`, which has no variable, or any call when `ce.strict` is false)
+  is canonical and inert: `evaluate()` and `N()` return it unchanged. A
+  top-level `Sequence` operand supplies its elements
+  (`Interval(Sequence(1, 2))` is `Interval(1, 2)`). A handler that throws, and
+  an operator whose signature is inferred, still keep the call as written.
+
+- **Every collection operator reads a `FlatMap` whose finiteness is known only
+  after its callback is applied.** With `v = FlatMap([1, 2], x ↦ Range(1, x))`,
+  only `ListFrom`, `Count`, `Length`, `IsEmpty`, `Sum`, `Product`, `Max`,
+  `Min` and `Reduce` listed `v`. `Mean(v)`, `Median(v)`, `Sort(v)`,
+  `Unique(v)`, `Contains(v, 2)`, `SetFrom(v)`, `MaxBy(v, k ↦ k)` and the other
+  consumers stayed unevaluated, and so did a consumer of a view over `v`:
+  `ListFrom(Reverse(v))` was not `[2, 1, 1]`. Each of them now gives its value
+  over the elements `[1, 1, 2]`, under `evaluate()` and `evaluateAsync()`.
+  The callback is applied once for each element of the source, and an
+  operator that reads a prefix (`First`, `Take`) still applies it only to the
+  elements that it reads. A `FlatMap` with an infinite inner result
+  (`x ↦ Range(1, ∞)`) stays unevaluated in these operators. Also,
+  `IsEmpty(FlatMap([1, 2], x ↦ Map(slowF, Range(1, x))))`, where `slowF` has
+  only an `evaluateAsync` handler, is now `False`: the callback of a `Map`
+  does not change the number of its elements.
+
+- **The pop of a scope no longer disposes a definition that another live
+  evaluation context holds**, also when that context is on another stack (an
+  asynchronous evaluation, a lazy view), and the debug check of dead bindings
+  (`CE_DEBUG_BINDINGS`) now reports a read of the index of a `Sum` or
+  `Product` after `evaluateAsync()`, as it does after `evaluate()`. In
+  `u(u(b))` with `u := (l) => [l[i] for i in 1..n]`, and in a recursive
+  call that runs the same loop, the inner pop disposed a definition that
+  the outer evaluation still read. The values were correct, but an
+  assumption about a disposed definition is ignored. The pop of an
+  asynchronous evaluation of a `Sum` did not mark the definitions of its
+  local scope as dead, so a later read of its index was not reported. Two
+  overlapping `evaluateAsync()` calls of a node with a `const` in its body
+  no longer report a read of the constant.
+
+- **`Sort` with a sort key or a comparator, `Iterate` and `Pipe` compile on
+  `javascript`.** Before, `Sort([3, y, 2], x ↦ -x)`,
+  `Take(Iterate(x ↦ x + 1, y), 3)` and `Pipe([1, y], Map(x ↦ 2x))` declined
+  and ran in the interpreter. Each now compiles and gives the interpreter's
+  value: for `y = 5`, `[5, 3, 2]`, `[6, 7, 8]` and `[2, 10]`.
+  - As in the interpreter, a function that takes one argument is a sort key,
+    and any other function is a comparator, which returns a boolean or a
+    number. The sort is stable, and `NaN` and `Missing` sort last. A key whose
+    result is not a real number, and a comparator whose result is neither a
+    boolean nor a number, decline.
+  - `Iterate` compiles under `Take`, `TakeWhile`, and under `First` and `At`
+    with a constant positive index, also through a `Drop` or a `Rest`. A
+    `Map` or a `Filter` over an `Iterate` still declines. Only a sequence
+    of real numbers with an initial value compiles, and only when the function
+    is pure: the interpreter computes the elements before a position again
+    for each read, so the effects of a function that is not pure would run
+    more often there than in compiled code. `First` and `At` with a constant
+    positive index now compile over the other infinite collections too
+    (`First(Map(f, 1..∞))`).
+  - `Pipe` compiles as the expression it evaluates, on `javascript` and
+    `python`: a call missing one argument receives the piped value
+    (`Pipe(xs, Take(2))` is `Take(xs, 2)`), a function literal is applied to
+    it, and the name of an operator is called with it.
+  - An applied function literal that receives a value that can be complex at
+    a parameter that it compiles as a real number is a lane mismatch. In the
+    mode `auto`, the expression is compiled again in the mode `complex`. With
+    `y: real`, `Apply(x ↦ 2x, √y)` gave `NaN` at `y = −4` under `auto`, and
+    now gives `4i`, as the interpreter does. In the mode `strict`, a complex
+    argument (`z: complex`) declines, and `√y` stays a real number (`NaN` for
+    a negative `y`), as for a call of a named function. A point with a
+    coordinate that can be complex, given to a literal with scalar
+    parameters (`Apply(t ↦ 2t, (y + i, 1))`), declines in every mode: the
+    compiled literal would read the point as one number. A call of a named
+    function with such a point (`dbl((y + i, 1))` with `dbl := t ↦ 2t`)
+    compiles, and gives the interpreter's value `(2y + 2i, 2)` under `auto`.
+    A literal parameter declared with a type now gets the same check of each
+    position as a parameter of a named function: with
+    `P: tuple<complex, real>`, `Apply((p: tuple<number, real>) ↦ p[1] + 1, P)`
+    gave the string `"[object Object]1"`, and now gives `2 + i` under
+    `auto`; `strict` declines. The check compares types, not the positions
+    that the body reads, so `strict` also declines
+    `Apply((p: tuple<number, real>, a) ↦ p[2] + a, P, y)`, which reads only
+    the real coordinate; `auto` gives the interpreter's value.
+  - The same check applies to a call of a named function with scalar
+    parameters whose argument is a list of lists of complex numbers. With
+    `f := (x: number) ↦ 2x` and `W: list<list<complex>>`, `f(W)` gave `NaN`
+    for each element, and so did `Apply(t ↦ 2t, W)`; both now give the
+    interpreter's value under `auto`, and `strict` declines. The check also reads the type of the argument at the call site:
+    with `g: (real) -> any` assigned `u ↦ Block(w ≔ u + i, w)`, the call
+    `g(y)` has the type `any`, and `Apply(t ↦ 2t, g(y))` and `h(g(y))`
+    with `h := t ↦ 2t` gave `NaN` under `auto`, and now give `2y + 2i`.
+
+- **In Epsil, an unknown call that is not in the result of a statement gets
+  its did-you-mean warning.** `for i in range(1, 3) { i }` gave `Nothing` and
+  no diagnostic: the loop ran zero times over the inert call `range(1, 3)`,
+  and the `unknown-function` warning ("did you mean `Range`") was found only
+  in the result of a statement. The canonical form of each statement is now
+  scanned too, so a call in the source of a loop, a condition, a function
+  body or a branch that is not taken is reported, once for each name. A name
+  that the program binds (a parameter, a local function, a `let` of a
+  function in a later statement) and a function bound by the host or by an
+  earlier program are not reported. The value of the program does not
+  change.
+
+- **A point passed to a function with an untyped parameter gives the
+  interpreter's value.** With `P: list<tuple<real, real>>` and
+  `gm = (p) ↦ Max(p) + 1`, the compiled `gm(P[1])` gave `NaN` (shown as
+  `null`) where the interpreter gives 3; `Min(p)`, `Map(gm, P)`,
+  `Reduce(P, (a, v) ↦ a + gm(v), 0)`, a function local to a `Block`, and a
+  function with a trailing default parameter (`(p, k = 1) ↦ Max(p) + k`) gave
+  `NaN` too. The call now uses the function compiled for one point. Where
+  that is not possible (Python, GLSL, WGSL, or a point that may be missing at
+  a callback), the expression falls back to the interpreter.
+
+- **A multi-index `At` compiles.** `At(R, 1, 2)` (`R[1, 2]`) with `R` a
+  matrix, a list of lists or a tensor declined on every target with "only the
+  single-index form compiles"; it now compiles as `At(At(R, 1), 2)` and gives
+  the interpreter's value, also as a function argument (`h(R[1, 1])`). A
+  chained access whose static type does not match the nested reads (a tuple
+  or record base) still falls back to the interpreter. On Python, an index
+  that is a list (a gather or a mask) now falls back to the interpreter;
+  before, `At(R, [2, 1])` compiled and raised a `TypeError` when it ran.
+
+- **A destructuring `let` as a loop body compiles on Python, GLSL and WGSL.**
+  `Loop(Declare((a, b), "unknown", (k, 2)), Element(k, Range(1, 3)))` compiled
+  on JavaScript and declined on the other targets with "destructuring
+  declaration in value position"; Python also declined a destructuring `let`
+  in every loop body. A destructuring `let` whose value reads a name that the
+  pattern declares, such as `let (a, b) = (k, a)`, now falls back to the
+  interpreter on every target: the compiled code read the new `a`, so
+  JavaScript gave 6 where the interpreter gives 300 for
+  `a = 100; s = 0; for k in 1..3 { let (a, b) = (k, a); s = s + b }; s`.
+
+- **Compiled `Sum`/`Product`: a bound that reads a variable with the name of the
+  index, and a bound with a known effect.** In JavaScript,
+  `Function(Sum(j, Limits(j, 1, j + 2)), j)` applied to 2 gave 6 instead of 10:
+  the upper bound read the loop counter, not the parameter `j`. A lower bound
+  `j` (`Sum(j, Limits(j, j, 5))` with an outer `j`) threw
+  `Cannot access 'j' before initialization`. The loop now steps a separate
+  counter when a bound has no compile-time value, and only the loop body
+  declares the index. In GLSL and WGSL, the loop condition read the integer
+  counter for an upper bound `j` (`for (int j = 1; j <= int(floor(j)); j++)`):
+  such a bound is now evaluated into a local before the loop. In Python, a bound
+  of a later clause that reads an outer variable with the name of an index
+  (`Sum(j + k, Limits(j, 1, 2), Limits(k, 1, k))`) raised an `UnboundLocalError`
+  in the generator expression: the later clauses now get fresh index names. On
+  every target, a `Sum` or `Product` with a bound that has a known effect
+  (`Sum(j, Limits(j, 1, Random(Range(2, 3))))`, a call of a function declared
+  not pure) now declines, as the interpreter leaves it unevaluated; before, the
+  JavaScript and GLSL code evaluated the bound. A call of a function that is
+  declared with a type, has no definition and is supplied by the host (the
+  `functions` option) still compiles: the interpreter evaluates that bound
+  once the function has a value.
+
+- **An indefinite integral computed through a second integral uses the
+  variable of the enclosing scope.** With `g(f) := \int f\,dx`, the result
+  `1/2 * x^2` of `g(x)` held an `x` of the scope of the integral, which was
+  discarded when the integral returned. That `x` was not the global `x`: the
+  result was not `isSame` to `1/2 * x^2` written directly, and after `x := 3`
+  it did not evaluate to `9/2`. Now it does both. The same applies when the
+  integrand calls a user function that reads a symbol with the name of the
+  variable (`\int g(k)\,dk` with `g(a) := a k x` gives `x * k^2`, or
+  `1/2 * k * x * "k_1"^2` when `k` has no value), when it calls a user
+  function named like a library function, and when the integrand is a list or
+  a tuple (`\int [x, x^2]\,dx` gives `[9/2, 9]` after `x := 3`).
+
+- **The debug check of dead bindings (`CE_DEBUG_BINDINGS`) reports no live
+  read.** It reported a read of a discarded scope in two correct cases: the
+  index of a `Sum` or `Product` evaluated with `evaluateAsync()` after an
+  `evaluate()`, and the index of a lazy comprehension that a function call
+  returned, read through another call of the same function (`u(u(b))` with
+  `u := (l) => [l[i] for i in 1..n]`). The values were correct; only the
+  check threw.
+
+- **`Count`, `Length`, `ListFrom`, `Sum` and the other consumers that read a
+  whole `FlatMap` list it when its callback gives an asynchronous-only
+  function as data.** An asynchronous-only function has only an
+  `evaluateAsync` handler. With `slowF` such a function,
+  `Count(FlatMap([1, 2], x ↦ [x, slowF]))` stayed unevaluated under
+  `evaluate()` and `evaluateAsync()`, although the view is
+  `[1, slowF, 2, slowF]`. The count is now `4`, and `IsEmpty` is `False`. The
+  symbol `slowF` is an element and is not applied. The same applies to a
+  named user function `f(x) := [x, slowF]` given as the callback. A symbol
+  counts as data only at a position known to hold data: an element of a
+  `List`, `Tuple` or `Set`, a value of a dictionary, a branch of an `If` or
+  the last statement of a `Block`, each in the result of the callback. At any
+  other position an operator can apply it, and a view whose walk can apply
+  such a function stays unevaluated, because the walk of `FlatMap` is
+  synchronous: `x ↦ slowRange(x)`, `x ↦ Map(slowF, Range(1, x))`,
+  `x ↦ Sort([x, 3, 1], slowLess)`, `x ↦ Tabulate(slowF, x)`, or a source
+  `Map(slowF, Set(1, 2))`.
+
+- **A collection-first callback operator with a function as its collection
+  operand is a type error.** `Filter`, `Reduce`, `Scan`, `TakeWhile`,
+  `DropWhile`, `FlatMap`, `MaxBy` and the other operators that take the
+  collection first now refuse a function at the collection position, as
+  `Sort` does: `Filter(x ↦ x > 0, [1, 4])` is
+  `Filter(Error(ErrorCode("incompatible-type", "collection", "(x: unknown) -> boolean"), x ↦ x > 0), [1, 4])`,
+  canonical, invalid and typed `error`. Before, the call was kept as written
+  and was not canonical. As an operand of a sum, its evaluation printed
+  "Assertion failed" messages on the console (`Apply(xs ↦ 1 + Filter(x ↦ x > 0, xs), [1, 4])`),
+  and in the body of a function it was applied to each element of the list
+  instead of to the list. A callback-first operator with a function at its
+  collection position is refused the same way, whatever its callback
+  position holds: `Fold(xs, 0, (a, x) ↦ a + x)`, `Map(t, f)` with `t`
+  undeclared, and `Map(Sin, Cos)`. A function is never a collection. `Map`
+  keeps its own report of the wrong order (`Map([1, 4], f)`). The
+  optimization form `ArgMax(f, domain)` and `ArgMin(f, domain)` now accepts
+  any function, not only a function literal (an operator such as `Sin`,
+  a symbol declared with a function type, or a call whose value is a
+  function, such as `Derivative(Sin)`), with a set or an undeclared domain.
+  `ArgMax(Sin, RealNumbers)`, `ArgMax(g, D)` with `g: (real) -> real` and
+  `D: set<real>`, and `ArgMax(g, RealNumbers)` with a variable `g` declared
+  `function` that holds `Sin` are valid and stay unevaluated, as
+  `ArgMax(x ↦ sin(x), RealNumbers)` does. An undeclared domain symbol is
+  not declared by the call.
+
+- **The generic `Sum`/`Product` loop of a custom compile target reads a
+  symbolic bound.** A custom target with no `Sum` or `Product` of its own (for
+  example one whose `functions` is `() => undefined`) replaced a bound with no
+  numeric value by a default: `Sum(j, Limits(j, 1, n))` with `n` an `integer`
+  compiled to `while (j <= 10001)`, so the compiled value for `n = 4` was
+  `50015001` instead of `10`. A bound is now compiled as an expression (`n`,
+  `m + 1`, `2n`) and evaluated once, before the loop. A bound that names an
+  outer variable with the name of the index (`Sum(j, Limits(j, j, 5))`) reads
+  that variable; before, the compiled code threw a `ReferenceError`. A run-time
+  bound that is not a safe integer answers `NaN`, as the JavaScript target
+  does, instead of a loop that does not end. The compilation now declines,
+  with a reason, for a bound that has no compile-time value and is not typed
+  `integer`, an infinite bound, a bound that is not pure (`Random(…)`, which
+  the interpreter leaves unevaluated), and an indexing set other than `Limits`
+  (`Element(j, L)`). With no indexing set, `Sum(x)` of a number `x` compiles to
+  `x`, and `Sum(L)` of a list of real numbers compiles to a reduction (before,
+  the compilation threw a `TypeError`); any other operand, such as a nested
+  list or a list of complex numbers, declines.
+
+- **Python compilation: the name of an operator or a function used as a value
+  declines.** The interpreter gives the symbol itself, and Python code has no
+  form for a symbol value. `Head(List(1))` and `Head(Dictionary())` compiled to
+  the Python code `List` and `Dictionary`, and a bare `Sqrt` or user function
+  `f` to its name, which raise a `NameError` when the code runs; `Head(x + 1)`
+  and a bare `Add` compiled to the JavaScript source `(a,b) => a + b`, which is
+  a Python syntax error. These compilations now decline with a reason, and the
+  default `fallback: true` uses the interpreter. A parameter or a `vars` key
+  spelled like an operator (`Add`) is an input and still compiles. This change
+  does not affect the callback operand of a higher-order operator: as
+  before, `Add`, `Subtract`, `Multiply` and `Divide` compile as the combiner
+  of `Reduce` (which also accepts `Min` and `Max`), and another operator or
+  function name, such as `Sqrt` in `Map(Sqrt, v)`, declines.
+
+- **`N()` of a definite integral evaluates a `D` in the integrand whose
+  variable is not the integration variable.** Before,
+  `Integrate(D(y·z², y), Limits(z, 0, 1)).N()` stayed unevaluated, because the
+  numeric route read `y` as a free symbol with no value, while `evaluate()`
+  gave `1/3`. When the integrand has a free symbol, the numeric route now
+  evaluates each held `Integrate`, `Sum`, `Product` or `D` first, as the exact
+  route does, and integrates the result when no free symbol is left: the
+  example gives `0.3333…`. A `Sum` or `Product` with a bound that reads an
+  integration variable stays held, and the content of a `Hold` is not
+  evaluated.
+
+- **A `Sum` or `Product` whose bound is a call of a host function with a real
+  result type that is not an integer type stays symbolic.** With
+  `g(t) := \begin{cases} 0.5 & t < 1 \end{cases}`, `\sum_{k=g(n)}^{3} k`
+  simplified to `1/2·(−g(n)^2 + g(n) + 12)`, which is 6.125 at `n = 0`, while
+  the sum, which rounds the bound 0.5 down, is 6. The undeclared `n` in the
+  argument no longer lets the closed form through: the result type of a host
+  function without a type handler (here `missing | real`) does not depend on
+  its arguments. A host function whose result type is `number`
+  (`h(t) := 2t`) or an integer type, and a library operator such as
+  `\sqrt{n}`, keep the closed form, as the same bound written inline (`2n`)
+  does.
+
+- **`simplify()` keeps the binding of the index of a `Sum` or a `Product` when
+  it rewrites a bound and keeps the body as it is.** With
+  `g(t) := \begin{cases} 0.5 & t < 1 \end{cases}`,
+  `Sum(k, Limits(k, g(0), 3)).simplify()` printed as
+  `Sum(k, Limits(k, 0.5, 3))`, but its value was `4k`, not 6: the index `k` in
+  the body was read as a free symbol. Its value is now 6.
+
+- **A type is computed again at once when an inferred type of a symbol it
+  uses widens** (CE-36). When an inferred type widens while a type is being
+  computed (for example `x`, inferred `integer`, becomes `real`, as a `for`
+  index widened by a later assignment in the loop of a signature derivation),
+  a type cached before the widening was served until the outermost
+  computation ended, so `x + 1` could stay `integer` after `x` became `real`,
+  and a derived result type could be too narrow. A narrowing of an inferred
+  type still takes effect when the outermost computation ends: until then a
+  cached type can be wider than it could be, but it is never wrong.
+
+- **A set no longer merges two random draws into one.** The canonical form of
+  `Set(Random(), Random())` was `Set(Random())`, so
+  `Count(Set(Random(), Random()))` was always `1`. Two elements with a known
+  effect (a call of `Random()`, or of a function declared with the `random`
+  effect) are now both kept in a set literal, in a set comprehension, and in
+  the results of `Union`, `Intersection` and `SymmetricDifference`, also when
+  an unevaluated `Union` is counted or walked. Pure elements are still
+  deduplicated.
+
+- **A call of a function literal over an operand whose type is a union with
+  a tuple arm and no list arm has a type that holds its value** (CE-546).
+  With `T := a ↦ 2a`, `T(y)` for `y := (3, 4)` is `(6, 8)`, and these calls
+  were typed `number`. Now `y: number | tuple<real, real>` gives
+  `number | tuple<number, number>`, the union of the results of the arms;
+  `y: tuple<real, real> | tuple<real, real, real>` gives
+  `tuple<number, number, number> | tuple<number, number>`; and
+  `y: string | tuple<real, real>`, `boolean | tuple<real, real>` and
+  `number | missing | tuple<real, real>` give `any`. A call with one of these
+  unions and a second operand that can be a list that the call maps gives
+  `any`. A transparent alias of such a union is typed the same way.
+
+- **A call of a function that maps a list whose elements may be tuples has a
+  type that holds its value.** The call binds each tuple element whole, and
+  the body decides the shape of the result. With `T := a ↦ 2a` and `y`
+  declared `number | tuple<real, real>`, `T([y, y])` was typed `list<number>`,
+  but for `y := (3, 4)` its value is `[(6, 8), (6, 8)]`; it is now typed
+  `list<number | tuple<number, number>>`. `T([(1, 2), (3, 4)])` was typed
+  `vector<2>` and is now `list<tuple<number, number>>`. When an element type
+  has a tuple beside another kind of value, or the body does not compute the
+  tuple component by component (`a ↦ |a|`), the result is typed `any` or
+  `list<any>`.
+
+- **The type of `D` and of an indefinite `Integrate` holds the values that the
+  enclosing binding of a variable gives them** (CE-139). The value of
+  `D(a^2, a)` is `2a`, and outside the derivative `a` reads the binding that
+  encloses it. When that binding holds a list, the value is a list, but the
+  type was `number`: `(a: list<real>) ↦ D(a^2, a)` was typed
+  `(a: list<real>) -> number`, and applied to `[1, 2]` it gave `[2, 4]`. It is
+  now typed `(a: list<real>) -> list<number> | number` (the number is for a
+  closed form without the variable: `D(3a, a)` is `3`). A global or a block
+  local of a list type gives the same type. When the binding can hold a value
+  that is not a tensor of numbers, or the derivative is not a number
+  (`D([a^2, a^3], a)` gives a nested list), the type is `any`. A binding of
+  type `real` or `unknown` keeps the type `number`. Compiled JavaScript
+  evaluated the closed form with the variable read as a number (`NaN` for a
+  list); the compilation now declines for a `D` whose closed form holds a
+  variable with a list binding that is a parameter or a block local, and for
+  an `Integrate` whose variable has a list binding. A `D` over a global list
+  is still compiled, as a broadcast.
+
+- **A list or a set that holds a failed cell evaluates its other cells**
+  (CE-670). Before, the literal was kept as it was, so with
+  `I = ∫_0^1 x^x dx`, `(y·[I, "a"]).N()` gave `[y·I, Error(…)]` with the
+  integral not computed, and `[a, Error(…)]` stayed `[a, Error(…)]` after
+  `a := 5`. Now `(y·[I, "a"]).N()` gives `[0.78343…·y, Error(…)]`,
+  `[a, Error(…)]` evaluates to `[5, Error(…)]`, `{5, a, Error(…)}` to
+  `{5, Error(…)}`, and a finite `Map` cell becomes a list, as in a literal
+  with no failed cell. The failed cell stays as it is: `[a, ln("b")]`
+  evaluates to `[5, ln(Error(…))]`. A set comprehension with a failed cell
+  stays as it is.
+
+- **A subscript with several indices is serialized with its commas.**
+  `ce.parse('A_{n,m}').latex` was `A_{n m}`, which parses back as the symbol
+  `A_nm`, and `ce.parse('A_{i,j}').latex` was `A_{\imaginaryI j}`, which
+  parses back as the symbol `A_ImaginaryUnitj`. The indices of
+  `Subscript(A, Sequence(n, m))` are now written `A_{n, m}`, which parses back
+  as the same expression. A subscript with one index is not changed.
+
+- **`subs()` and `freeVariables` read the index of a raw `Sum`, `Product`,
+  `Integrate` or `NDSolveFunction` as the canonical form does.** With
+  `e = ce.expr(['Sum', ['Add', 'x', 1], ['Limits', 'x', 1, ['Add', 'x', 1]]], {form: 'raw'})`,
+  `e.subs({x: 2})` kept the upper bound `x + 1`, and `e.freeVariables` was
+  `[]`. Now the upper bound is `2 + 1` and `e.freeVariables` is `["x"]`: the
+  bounds of a clause read the outer `x`. The `Tuple` and bare-symbol
+  spellings of a clause now bind their index: raw `["Sum", "k", "k"]` with
+  `subs({k: 7})` gave `["Sum", 7, 7]`, and now stays `["Sum", "k", "k"]`. A
+  bound of a `Tuple` clause or of a flat clause reads the outer value of the
+  index, in the raw and the structural forms: `["Sum", "k", ["Tuple", "k", 1, "k"]]` with `subs({k: 7})` gives `["Sum", "k", ["Tuple", "k", 1, 7]]`, as
+  `Limits` does. The variable of an indefinite `Tuple` or `Hold` clause of an
+  `Integrate` is free: `["Integrate", "x", ["Tuple", "x"]]` has the free
+  variables `["x"]`.
+
+- **A `Sum` or `Product` whose bound is a call of a user function with a
+  real result type that is not an integer type stays symbolic.** With
+  `g(t) := \begin{cases} 0.5 & t < 1 \end{cases}`, `\sum_{k=g(n)}^{3} k`
+  simplified to `1/2·(−g(n)^2 + g(n) + 12)`, which is 6.125 at `n = 0`, while
+  the sum, which rounds the bound 0.5 down, is 6. The undeclared `n` in the
+  argument no longer lets the closed form through: the result type of a user
+  function without a type handler (here `missing | real`) does not depend on
+  its arguments. A user function whose result type is `number`
+  (`h(t) := 2t`) or an integer type, and a library operator such as
+  `\sqrt{n}`, keep the closed form, as the same bound written inline (`2n`)
+  does.
+
+- **A `Sum` or `Product` keeps the binding of its index when `simplify()`
+  rewrites a bound or the body.** With `g(t) := {0.5 if t < 1}`,
+  `ce.box(['Sum', 'k', ['Limits', 'k', ['g', 0], 3]]).simplify()` printed
+  `Sum(k, Limits(k, 0.5, 3))`, but its `N()` and `evaluate()` gave `4k`, not
+  `6`: the rebuilt `Sum` had no local scope, so the index `k` in the body was
+  read as a free symbol. A nested sum gave a wrong number:
+  `Sum(Sum(k, Limits(k, g(0), j)), Limits(j, 1, 3)).simplify()` gave `18`, not
+  `10`, because the inner sum read the index `j` of the outer sum before the
+  simplification. The rebuilt `Sum` and `Product` now keep their local scope.
+
+- **A limit at 0 of a root or a power with a symbolic degree or exponent no
+  longer gives a wrong value.** With `n` assumed negative,
+  `ce.box(['Limit', ['Root', 'x', 'n'], 'x', 0]).evaluate()` gave `Root(0, n)`,
+  although `Root(x, n) = x^{1/n}` grows without bound as `x` tends to 0 from
+  above. With `m` of unknown sign, `Limit(x^m, x, 0)` gave `0^m`,
+  `Limit(x·x^m, x, 0)` gave `0`, and `Limit(e^{m ln x}, x, 0)` gave
+  `e^{-∞·m}`, although each limit is infinite for some negative `m`. These
+  limits now stay unevaluated. A degree or an exponent known to be positive
+  still gives the value at 0.
+
+- **A `Sum` or a `Product` whose bound is a derivative with a constant value
+  is evaluated.** The variable of a derivative is free in it (`D(x, x)` is the
+  derivative at `x`), so a bound such as `D(x, x) + 2` was read as a symbolic
+  bound. The bound is now evaluated, and its value is used when it has no free
+  variable. `\sum_{k=1}^{D(x,x)+2} k` stayed unevaluated and is now `6`.
+  `\prod_{k=1}^{D(x,x)+2} k` was `(D(x,x)+2)!` and is now `6`. A bound whose
+  value still has a free variable (`D(x^2, x)`, which is `2x`) keeps the
+  operator symbolic, and `simplify()` gives no closed form for a bound whose
+  value is not an integer.
+
+- **In a function body, the asynchronous evaluation of an arithmetic
+  operator or a user function applied to a lazy `Map` or `Filter` of a
+  parameter gives the value of `evaluate()`.**
+  `(xs ↦ 1 + Map(x ↦ 2x, xs))([1, 4])` gave `[]` under `evaluateAsync()`,
+  and `(xs ↦ -Map(x ↦ 2x, xs))([1, 4])` did not end; they now give `[3, 9]`
+  and `[-2, -8]`. The code that runs after each `await` of a broadcast now
+  runs in the context of the evaluation, where the parameter has its value.
+
+- **A compiled `Sum` or `Product` whose body writes its index gives the value
+  of the interpreter.** The interpreter binds the index to its next value at
+  each iteration, whatever the body wrote: `Σ_{j=1}^{n} (j ≔ j + 1; j)` at
+  `n = 4` is 2 + 3 + 4 + 5 = 14. The JavaScript loop stepped the variable
+  that the body wrote, so it skipped iterations and gave 6 (and a write such
+  as `j ≔ −j` looped forever). With constant bounds, the JavaScript target
+  declined the write, and the Python, interval, GLSL and WGSL targets
+  declined it with any bounds. Now the loop steps a separate counter, and
+  each iteration gives the index the value of the counter, on the JavaScript,
+  Python, interval, GLSL and WGSL targets and on a custom target with no
+  `Sum` of its own; a body that writes its index is not unrolled. With
+  several independent clauses, a write to an outer index lasts for one tuple
+  of indices, as in the interpreter; when a bound reads another index, the
+  clauses nest, and the write lasts until the next value of that index.
+
+- **A limit at infinity of a root of `1/x`.**
+  `Limit(Root(1/x, -2)/Ln(x), x, +∞)` stayed unevaluated. Its canonical form
+  is `1/(ln(x)·√(1/x))`, and `Root(1/x, -2) = √x` grows faster than `ln x`, so
+  the limit is `+∞`. As `x → +∞`, `√(1/x)` and `ⁿ√(1/x^m)` are now rewritten
+  to `x^(-1/2)` and `x^(-m/n)`, and a quotient of quotients `(a/b)/(c/d)` is
+  compared as `(a·d)/(b·c)`. Before, the factor `√(1/x)` and a quotient in the
+  denominator had no growth order, and the numeric comparison does not
+  separate `ln x` from `√x`.
+
+- **The asynchronous numeric evaluation of a lazy `Map` that a call makes
+  reads the names of that call.** With `f := (x, k = d) => x * k` and
+  `g := (d, xs) => Map(f, xs)`,
+  `await ce.box(['g', 10, ['List', 1, 2]]).evaluateAsync({ numericApproximation: true })`
+  gave `Map(…NumericApproximation(f(_1, d))…, [1, 2])`, read as `[d, 2d]`; it
+  now gives `[10, 20]`, as `evaluate()` and `N()` do. An asynchronous
+  evaluation keeps its own stack of contexts, and two steps used the stack of
+  the engine instead: the numeric rewrite of the callback of `Map`, and the
+  read of a lazy view in the context of the call that made it.
+
+- **A closure made in a function call no longer reports a "discarded scope"
+  error under the debug check of bindings (`ce._debugBindings`)** when it
+  reads a name of that call after the call has returned. With
+  `f := (x, k = d) => x * k` and `o1 := d => (xs => ListFrom(Map(f, xs)))`,
+  `o1(7)([1, 2])` threw 'The binding of "d" belongs to the discarded scope
+  "call"'. The same happened for a closure that the call assigns to an outer
+  variable. The frame of a call that makes such a closure is now kept alive,
+  as for a lazy view. The same holds for a closure made in a loop body, a
+  block, a comprehension or a big operator (`Sum`, `Product`), and for a
+  recursive call that runs the same loop as its caller, which reported a read
+  of a discarded scope between two live runs of the loop. The values were
+  already correct without the debug check.
+
+- **A function literal that a comprehension element assigns to an outer
+  variable captures the index of its element** and the parameters of the
+  enclosing call, as a literal made in a `for` loop body does. In Epsil,
+  `let h = (x) => x` then `ListFrom([do { h = (x => x + d); 0 } for d in [3]])`
+  then `h(1)` gave `d + 1`; it now gives `4`. Inside a function `b(n)`, with
+  `x + d * n`, the result was `d·n + 1`.
+
+- **A lazy view that a loop iteration or a block stores outside it reads the
+  values of that iteration.** In Epsil,
+  `let h = []; for d in [3, 6] { if d == 3 { h = Map(x => x + d, Range(1, Infinity)) } }`
+  then `ListFrom(Take(h, 2))` gave `[7, 8]`, the value of `d` after the loop;
+  inside a function it gave `[d + 1, d + 2]`. It now gives `[4, 5]`. A lazy
+  operator keeps its callback unevaluated, so the callback was never captured
+  as a closure is. Now, when a `Map`, `Filter`, `Scan` or other lazy
+  collection is assigned to a variable outside the loop or block, to a
+  destructured target or to an object field, the loop indices and block
+  locals that it reads are replaced by their values at the assignment. This
+  also applies to a view inside a list, a dictionary or a branch of an `If`,
+  and to a local that holds another view. A view read in its own scope, or
+  stored in a variable of that scope, still reads the current values. A view
+  reads a `let` local by its value at the assignment, while a closure reads
+  it by binding (`docs/SCOPING-MODEL.md`).
+
+- **`N()` of a definite integral evaluates a `D` whose variable is not the
+  integration variable.** `Integrate(D(y·z², y), Limits(z, 0, 1)).N()` stayed
+  unevaluated: the numeric route read `y` as a free symbol with no value,
+  while `evaluate()` gave `1/3`. When the integrand has a free symbol, the
+  numeric route now evaluates each `Integrate`, `Sum`, `Product` or `D` in it
+  first, as the exact route does, and integrates the result when no free
+  symbol is left: the example gives `0.3333…`. This is done only when it can
+  remove every free symbol: the integrand has no effect (also through the
+  value of a symbol), and no free symbol is outside these operators.
+  `∫_0^1 a·Σ_{k=1}^{3} k·z\,dz` stays symbolic, and its `Sum` is not
+  evaluated. A `Sum` or `Product` with a bound that reads an integration
+  variable stays held, and the content of a `Hold` is not evaluated.
+
+- **A `Sum` or `Product` bound that is not an integer is not put into a closed
+  form.** `evaluate()` and `simplify()` put such a bound into a closed form,
+  but the enumeration of the same operator rounds a numeric bound down. So the
+  value depended on whether the closed form was made before or after the
+  substitution. With `y` declared `real`,
+  `\sum_{k=1}^{y}\left(\frac{1}{k}-\frac{1}{k+1}\right)` evaluated to
+  `1 - 1/(y+1)`, about `0.714` at `y = 2.5`, while the sum at `y = 2.5` is
+  `2/3`. `\prod_{k=1}^{y} k` gave `y!` (`3.32` at `y = 2.5`; the product is
+  `2`). The operator now stays symbolic in these cases: a bound that is not an
+  integer (`2.5`), a bound that holds a symbol declared with a type that is not
+  an integer type (`real`, `number`, `complex`), and a bound whose symbols are
+  all declared and whose type is not an integer type (`n/2` or `n + 1/2` with
+  `n` declared `integer`). A bound declared `integer` (`n`, `2n`, `n!`) and an
+  undeclared symbol keep the closed forms.
+
+- **`FlatMap` with a callback that names a user function gives the same
+  result as the same callback written inline.** With `f := x ↦ [x, x]`,
+  `ListFrom(FlatMap([1, 2], f))` is now `[1, 1, 2, 2]`, and `Count`, `Sum`
+  and `Length` over it are `4`, `6` and `4`. Before, they stayed unevaluated,
+  because the type of `FlatMap([1, 2], f)` came from the inferred signature
+  of `f`, `(x: unknown) -> list<unknown>`, which has no fixed length. The type
+  now comes from the call of `f` on one element of the source:
+  `FlatMap([1, 2], f)` is `list<integer>`, as for the inline callback. A
+  callback that returns a tuple also gives a finite result now:
+  `ListFrom(FlatMap([1, 2], x ↦ (x, x)))` is `[1, 1, 2, 2]`.
+
+- **`ListFrom`, `Count`, `Length`, `IsEmpty`, `Sum`, `Product`, `Max`, `Min`,
+  `Reduce` and `Fold` give a value for a `FlatMap` over a finite source whose
+  callback result has no fixed length.** `Sum(FlatMap([1, 2], x ↦ Range(1, x)))`
+  is now `4`; before, it stayed unevaluated, because the type `list<integer>`
+  of `Range(1, x)` does not show whether the inner result is finite. These
+  operators now list the view with the same bounded walk as
+  `evaluate({ materialization: true })`. When an inner result is infinite,
+  `ListFrom` gives the `out-of-range` error "a finite collection", `Count` and
+  `Length` give `+∞`, and the others stay unevaluated, as for any other
+  infinite collection. When the evaluation of the view is another error (a
+  callback symbol that holds an error value), each of them gives that error. A
+  `FlatMap` over an empty source is finite. `Take` and `First` still apply the
+  callback only to the elements they read. The materialization of a `FlatMap`
+  now stays lazy when an inner result is a `Filter` that stops at the
+  iteration limit, or applies an operator that has only an `evaluateAsync`
+  handler. Before, the first threw an iteration-limit error, and the second
+  listed the unevaluated calls as elements.
+
+- **A non-canonical `Integrate` binds the variable of its canonical form**
+  (CE-699). `subs()` on a non-canonical `Integrate` whose limits name no
+  variable now keeps the variables that the canonical form binds. For example,
+  `ce.box(['Integrate', ['Multiply', 'x', 'y'], ['Limits', 0, 1]], { form: 'raw' }).subs({ x: 3 })`
+  replaced `x`, and the integral was `3/2`; now `x` stays the variable of
+  integration, and the integral is `y/2`, as for the canonical form. The free
+  variables of the two forms are the same (`["y"]`). The limit can be written
+  `Limits(Nothing, a, b)`, `Limits(a, b)`, `Range(a, b)` or the
+  `Tuple(Nothing, a, b)` of `ce.parse('\int_0^1 xy', { form: 'raw' })`.
+
+- **An integral evaluates a `Sum`, a `Product` or a `D` in its integrand
+  before it integrates** (CE-616), as it already did for an inner
+  `Integrate`. `\int_0^1 \frac{d}{dx}x^3\,dx` and
+  `\int_0^1 2\left(\sum_{k=1}^3 kx\right)dx` gave an unevaluated `Integrate`
+  under `evaluate()`; they are now `1` and `6`, the values that `N()` gave.
+  The index of a `Sum` stays bound, and the variable of `D` is the
+  integration variable. A sum whose value is conditional (an infinite series
+  such as `Σ_{n=0}^∞ n·x^n`), a sum whose bound reads the integration
+  variable (`∫_0^3 Σ_{k=1}^{x} … dx`, a step function), and an operator inside
+  `Hold` are not replaced.
+
+- **`Limit` at infinity of a power whose base tends to 0 and whose exponent
+  is negative.** With `n < 0`, `Limit(Root(1/x, n), x, +∞)` gave
+  `ComplexInfinity`; `x^{-1/n}` is real and positive, and the limit is now
+  `+∞`. The rule gives `±∞` only when the base is proved positive (or
+  negative, with an exact integer exponent, by parity) for large `x` from its
+  form, and the limit of the base is exactly 0: `Root((130 − x)/x², n)` and
+  `Root(sin(x)/x, n)` stay unevaluated, and `Root(10^{-30} + 1/x, n)` gives
+  the finite `(10^{-30})^{1/n}`.
+
+- **With `evaluateAsync()`, a function literal that a block returns, applied
+  inside a function body, reads the locals of the block.**
+  `Apply(Function(Apply(Block(Declare(c, 'real', 5), k ↦ c + k), n), n), 1)`
+  gave `c + 1` with `evaluateAsync()` and `6` with `evaluate()`; it now gives
+  `6` on both routes, also when the literal calls a function that the block
+  defines, and for two asynchronous evaluations that run at the same time.
+
+- **A `Map` callback that calls a block local holding a function is
+  evaluated.** `Block(Declare(c, 'real', 5), Assign(h, k ↦ c + k), Map(k ↦ h(k), [1, 2]))`,
+  and the same with `Declare(g, 'unknown', x ↦ c + x)`, gave `[h(1), h(2)]`
+  with `evaluate()` and `evaluateAsync()`. They now give `[6, 7]`, as a
+  function defined with `DefineFunction` does. A function value assigned in
+  the global scope is not changed.
+
+- **With `evaluateAsync()`, a function literal that leaves a `Block` and
+  calls a function that the block defines reads the locals of the block.**
+  `Apply(Block(Declare(c, 'real', 5), DefineFunction(h, k ↦ c + k), k ↦ h(k)), 1)`
+  gave `c + 1` with `evaluateAsync()` and `6` with `evaluate()`, and
+  `Map(k ↦ h(k), [1, 2])` or `Map(k ↦ k + h(1), [1, 2])` as the value of the
+  same block kept `c` free. Both routes now give the value of `evaluate()`.
+  Under `.N()`, a `Map` whose callback calls a function defined in a block
+  now evaluates its elements exactly first.
+
+- **`Limit` at infinity: a root with a negative degree and a radicand that
+  decays.** The growth ranking gave every root with a constant negative
+  degree the rank of a bounded term, whatever the radicand. With `n < 0`,
+  `Root(1/x, n) = x^{-1/n}` grows like a power of `x`, so
+  `Limit(Root(1/x, n)/ln(x), x, +∞)` returned `0`. A negative degree now
+  gives the bounded rank only when the radicand tends to infinity; otherwise
+  the rank is not known, and the limit stays unevaluated instead of giving a
+  wrong value.
+
+- **The product of a scalar and a list with a failed cell gives the same
+  result on every route** (CE-671). The failed cell is the error with one
+  `Multiply` frame, as `3·Error("missing")` is: `3·[Error("missing"), 2]`
+  evaluates to `[Error("missing"), 6]`. Before, `evaluate()` added a `Divide`
+  frame to the trace of the error, and `.N()` kept the cell as the
+  unevaluated product `3·Error("missing")`. The same holds for a scalar times
+  a matrix and for the element-wise product of two vectors.
+
+- **With `evaluateAsync()`, a lazy collection that leaves a `Block` reads the
+  locals of the block, as with `evaluate()`.** The function literal of the
+  collection read a local as a free symbol after the block ended:
+  `Block(Declare(c, 'real', 5), Map(k ↦ c + k, [1, 2]))` gave `[c + 1, c + 2]`
+  instead of `[6, 7]`. This also holds for a function defined in the block and
+  passed to the collection (`h(k) := c + k`, then `Map(h, [1, 2])`), for a
+  function literal returned as the value of the block, and for nested blocks
+  in a function body.
+
+- **An exact integer power or binomial near the 1,000,000-digit limit is
+  computed.** The interpreter leaves an exact `Power` or `Binomial` with more
+  than 1,000,000 decimal digits unevaluated, and two estimates of the number
+  of digits were wrong. `Power(999999999999999, 66000)` (990,000 digits)
+  stayed unevaluated; it now gives the integer.
+  `Binomial(10^100, 30000)` built an integer of about 2.9 million digits; it
+  now stays unevaluated at once.
+
+- **A power of `0`, `1` or `−1` to a large integer exponent is evaluated.**
+  `(−1)^(10^7)` stayed unevaluated, because the size limit of an exact power
+  multiplies the digits of the base by the exponent; it now gives `1`. Under
+  `N()`, `(−1)^(10^30 + 1)` gave `1`, from the double of the exponent; it now
+  gives `−1`. A float exponent still gives a float result.
+
+- **A power of `i` or `−i` to a large integer exponent is evaluated.**
+  `i^(10^30 + 1)` stayed unevaluated under `evaluate()` and `simplify()`; it
+  now gives `i`, from the exponent modulo 4. `(−i)^(10^30 + 3)` gives `i`. A
+  base that is only close to `i`, such as `((10^30 + 1)/10^30)·i`, is not
+  taken as `i`.
+
+- **A compiled name equal to a name of the emitted code is renamed.** The
+  compiled JavaScript calls its runtime helpers through `_SYS` and uses other
+  fixed names, such as `_upper` for the bound of a `Sum` loop. A parameter of
+  a top-level function literal, a block local or a loop index with one of
+  these names kept it and hid the emitted one: `(_SYS) ↦ _SYS!` threw a
+  `TypeError`, and `(n, _upper) ↦ Sum(k·_upper, k = 1..n)` at `(3, 10)` gave
+  `18` for `60`. Such a name is now emitted under another name. The same
+  applies to the names `_f`, `_v`, `_c`, `_pt` and `result` of the
+  JavaScript target and `result` and `_r` of the interval target: a list
+  parameter `_f` in `Map(y ↦ y + 2, _f)` threw `_f.map is not a function`,
+  and `Coalesce(At(L, 5), _c)` gave `null` for the value of `_c`. In a
+  complex `Reduce`, a user function named `_a` or `_x` used as the combiner
+  no longer declines.
+
+- **A destructuring `Declare` whose pattern repeats a name compiles.** The
+  MathJSON `["Declare", ["Tuple", "a", "a"], "'unknown'", ["Tuple", 1, 2]]`
+  gives `a` the value at its last position, `2`, in the interpreter. The
+  JavaScript target emitted `let a = 1; let a = 2`, which is not valid
+  JavaScript, so `compile(…, { fallback: false })` threw a `SyntaxError`. It
+  now compiles on every target, and the name gets the value at its last
+  position, also in a nested pattern, a loop body or a `Sum` body.
+
+- **A block-local function that receives complex values compiles in the
+  complex lane.** In `Block(g ≔ (a, b) ↦ a + b, Reduce(L, g, 0))` with
+  `L: list<complex>`, the compiled code used the real `+` for `g` and gave
+  the string `"[object Object]…"` for `[1 + i, 2]`; the interpreter gives
+  `3 + i`. A call of a block-local function, as a `Reduce`, `Fold` or `Scan`
+  combiner, as a `Map` callback or directly, with a complex argument (or a
+  point with a complex coordinate) at a parameter that is not typed complex
+  now restarts the compilation in `mode: 'complex'`, which gives the
+  interpreter's value. With `mode: 'strict'` the compilation declines, with a
+  message that asks for a `complex` annotation on the parameter of the
+  function literal. The same applies to a function defined with
+  `ce.assign()` that receives a point with a complex coordinate: with
+  `h = (p) ↦ p[1] + 1` and `P: list<tuple<complex, real>>`, `h(P[1])` gave
+  `"[object Object]1"`; it now gives `2 + i`. The argument and the parameter
+  types are compared position by position, and a position with no type
+  (`any`, `unknown`) counts as real: in `mode: 'strict'`,
+  `(L) ↦ Length(L)` applied to such a point now declines.
+
+- **A Leibniz derivative in the integrand of an integral leaves the closing
+  differential to the integral** (CE-617). `\int_0^1 \frac{d}{dx}x^3\,dx`
+  parsed as the derivative of `x^3·d·x`, so the integral had no variable and
+  its value still held `x`. The operand of `\frac{d}{dx}`,
+  `\frac{\partial}{\partial x}` and `\partial_x` now stops where the enclosing
+  expression stops: the integral reads `dx` as its variable, and with
+  `E = [1, 2]`, `\int_0^1 \frac{d}{dx}x^3 \cdot E\,dx` evaluates to `[1, 2]`,
+  as the MathJSON form does. A derivative operand that starts with a function
+  (`\sin \frac{d}{dx}\cos x`) still takes that function.
+
+- **A LaTeX `value` of `ce.declare()` is parsed** (CE-58). A value such as
+  `'$1+2$'` gave an `unexpected-token` error, because the `$` delimiters were
+  passed to the parser. It now gives `3`.
+
+- **A statistics operator applied to a list literal infers the free symbols of
+  the list as numbers** (CE-663). After `Mean([p, q])`, `p` and `q` are typed
+  `number` (they were `unknown`), so a later `p ∧ q` is an error, and
+  `Mean([p, q])` compiles. This applies to `Mean`, `Median`, `Mode`,
+  `Variance`, `StandardDeviation`, `PopulationVariance`,
+  `PopulationStandardDeviation`, `Skewness`, `Kurtosis`, `Quartiles` and
+  `InterquartileRange`: their parameter is a union
+  (`collection<nothing | number> | number`, with a `distribution` arm for
+  some), and only its collection arm admits a list. A parameter with two arms
+  that admit a list, such as `matrix | vector` at `MatrixMultiply`, still
+  infers nothing. A symbol with no value is typed `number`, not
+  `nothing | number`; a symbol that holds `Nothing` keeps the type `nothing`.
+  A transparent alias of such a union
+  (`declareType('nums', 'list<number> | boolean', { alias: true })`) infers
+  the cells in the same way.
+
+- **In a block that declares a local named `Pi`, a result built with the
+  library π keeps its value when it is assigned** (CE-103). With `Pi` a block
+  local of value `3`, `s := Sum(1/n², n, 1, ∞); s` gave `3²/6 = 3/2`: the
+  assignment replaced each symbol that reads a block local with its value, and
+  it read the library `Pi` of `π²/6` as the local. It now gives `π²/6`, as the
+  evaluation of the same symbol does. A JSON round trip of such a result inside
+  that block still reads `"Pi"` as the local.
+
+- **The type of a call of a function with an early `Return` includes the
+  value of the `Return`** (CE-737). With `x: real` and
+  `g := y ↦ Block(If(y > 1, Return((y, y))), y + 1)`, `g(x)` was typed
+  `number`, although `g(2)` is the point `(2, 2)`, so `2·g(x)` was typed as a
+  number too. `g(x)` is now typed `number | tuple<number, number>`. The
+  signature that is derived when a function literal is assigned to a name now
+  joins the types of its early `Return` values, as the type of the literal
+  already did.
+
+- **A compiled element-wise `If` whose branch assigns a name declines.** With
+  `L: list<real>`, `Block(p ≔ 0; If(L > 0, p ≔ 5); 2p)` compiled on
+  `javascript` to code that ran the branch when the list `L > 0` had any
+  element: for `L = [-1, -2]` it gave `10`, where the interpreter gives `0`.
+  With `M: list<any>`, `Block(p ≔ 0; If(M[1], p ≔ 5); 2p)` gave `0` for
+  `M = [[True, False]]`, where the interpreter gives `10`. An `If` or a
+  `Which` whose condition is or can be a collection, and whose branch assigns
+  a name or has a `Return`, a `Break` or a `Continue`, now declines with the
+  code `'unsettled-shape'` on every target. An `Equal` or a `NotEqual`
+  condition compares whole values, and is not such a condition. An
+  element-wise conditional whose branches change nothing compiles as before.
+
+- **A compiled `Comprehension`, `Sum`, `Product` or `Integrate` with an
+  assignment where the interpreter does not change the outer name
+  declines.** `Block(p ≔ 0; Comprehension(Block(p ≔ 5, i), i ∈ [1]); p)`
+  compiled to code that gave `5`, where the interpreter gives `0`. An
+  assignment of a name of an enclosing scope, a `Return`, a `Break` or a
+  `Continue` in the body or a clause of a `Comprehension` (except the source
+  of its first clause), in a clause of a `Sum` or a `Product`, or in the
+  integrand or a bound of an `Integrate` now declines with the code
+  `'unsettled-shape'`. A `Return`, a `Break` or a `Continue` in the body of a
+  `Sum` or a `Product`, which gave JavaScript code with a syntax error
+  (`Illegal break statement`), declines too. A local that a block of such a
+  part assigns with no `Declare` counts as a name of an enclosing scope:
+  `Comprehension(Block(q ≔ 2i, q + 3), i ∈ [1, 2, 3])`, which compiled to
+  `[5, 7, 9]`, now declines; with `Declare(q, "real")` in the block it
+  compiles.
+
+- **A compiled function that assigns a name of an enclosing scope
+  declines.** `Block(p ≔ 0; Filter(L, u ↦ Block(p ≔ 5, u > 1)); p)` compiled
+  to code that gave `5`, where the interpreter, which does not run the
+  callback when the result is not used, gives `0`. For `Limit` the compiled
+  code gave `0` where the interpreter gives `5`. Because a function can reach
+  such an operator in many ways (stored and passed by name, behind an `If`,
+  returned by another function), every function literal that assigns a name
+  of an enclosing scope (or an element of one), or that a `Break` or a
+  `Continue` leaves, now declines with the code `'unsettled-shape'`: a
+  callback, the value of a `Declare` or an `Assign`, a function returned by
+  another one, and the body of a user function that the code calls. This
+  includes cases where the two agreed: a stored function `g` that writes `p`
+  and that the code only calls as `g(1)`, and the curried
+  `Apply(Apply(Apply((y, w) ↦ (x ↦ Block(y ≔ 2, x + y)), 0), 1), u)`, which
+  the interpreter fallback now computes. The root of the compilation, and a
+  function that `Apply` applies where it is written to scalar arguments,
+  still compile.
+
+- **A compiled function literal that assigns the index of an enclosing loop
+  declines.**
+  `Block(n ≔ 0; Loop(Block(Apply(u ↦ k ≔ 5, 0), n ≔ n + 1), k ∈ 1..3); n)`
+  gave `1` where the interpreter gives `3`. It now declines
+  with the code `'unsettled-shape'`. A direct assignment of the index in a
+  loop body is handled as before.
+
+- **A compiled `Return` inside a `Loop` that has code after it declines.**
+  With `L = [1, 2, 3]`,
+  `p ↦ Block(q ≔ 0; Loop(If(i > 1, Block(q ≔ 7, Return(5))), i ∈ L); 100 + q)`
+  gave `107` where the interpreter gives `5`: the compiled loop is a
+  function of its own, so the `Return` ended only the loop. It now declines
+  with the code `'unsettled-shape'`, also in the root and in a stored
+  function. A `Return` inside a loop that is the last statement of the
+  function, where the value of the loop is the value of the function,
+  compiles as before.
+
+- **A local that only a loop body assigns is not reported as an input.** In
+  a function declared with the `scope` effect whose loop body assigns
+  `p ≔ (t, 2t)`, a compilation of a call of the function reported `p` in
+  `freeSymbols`, with the type `unknown`, although the generated code
+  declares `p` as a local of the function body. The same is true for a name
+  that only a branch or a nested block of a function body assigns.
+
+- **A local of a function in a case of a `Match` is not reported as an
+  input.** With `x: real` and `L: list<real>`, the compilation of
+  `Match(x, 1 -> Map(L, v ↦ Block(q ≔ 2v, q)), _ -> L)` reported `q` in
+  `freeSymbols`, with the type `unknown`, although `q` is a local of the
+  function. The reference analysis now reads the canonical form of each case
+  body, made in the same scope as the compiled code makes it, and reports
+  only `x` and `L`.
+
+- **`freeSymbols` does not list the variable of an outer integral that the
+  bound of an inner integral reads.**
+  `Integrate(e^(y^2), Limits(x, 0, 1), Limits(y, 0, x))` reported `x` as an
+  input, although the compiled code binds it.
+
+- **Compiled JavaScript is valid in strict-mode code when a binding has a
+  reserved name.** `compile()` of `["Function", ["Multiply", 2, "arguments"], ["Typed", "arguments", "'real'"]]` gave the `code` string
+  `(arguments) => 2 * arguments`, which is a syntax error in strict-mode code,
+  so a host that evaluated `code` in a module failed. A parameter, a block
+  local or a loop index named with a reserved word (`if`, `class`, `let`)
+  made the compilation fall back to the interpreter, and one named after a
+  global that the compiled code reads (`Math`, `undefined`) gave a wrong
+  result or threw ("Math.sin is not a function"). Now such a binding is
+  emitted under a fresh name on the `javascript` and `interval-js` targets,
+  as a binding named `_SYS` is: the example above compiles to
+  `(_p) => 2 * _p`. This applies to function parameters, block locals and the
+  locals of a loop body, `Sum`, `Product`, `Loop` and `Comprehension`
+  indexes, and integration variables. A body that assigns such a parameter
+  also compiles, in a nested function literal and in an engine-defined
+  function too. A free symbol keeps its name, because the compiled code reads
+  it as `_.arguments`.
+
+- **A function-valued expression compiled for `interval-js` can be called.**
+  `compile(x ↦ 2x, { to: 'interval-js' })` reported `success: true`, but
+  `run(3)` gave the compiled JavaScript function over enclosures, which a
+  caller cannot call with numbers and which is not an interval value. Now a
+  root whose value is a function (a `Function` literal, a block whose value
+  is one, a symbol whose value is one, a partial application) has
+  `calling: 'lambda'`, as on the JavaScript target: `run(3)` gives
+  `{ kind: 'interval', value: { lo: 6, hi: 6 } }`, and each argument can be
+  a number, an `Interval` or a boolean. Such a result has no `broadcast()`.
+  A function-valued root declines with the reason when it reads a free symbol
+  (`x ↦ a·x`), because there is no vars object to read the symbol from; when
+  its value is a function (`x ↦ (y ↦ x + y)`), because the inner function
+  would take enclosures. A function-valued `If` or `When` whose condition is
+  decided at compile time is compiled as the function it selects:
+  `If(1 > 0, x ↦ 2x, x ↦ 3x)` gives `6` for `run(3)`. Such a root declines
+  when its condition is not decided (`Random() > 2`), because the interval
+  lowering of `If` and `When` does not give a function, and when the
+  `functions` option maps the `If` head or a head in its condition. The
+  interpreter fallback of such a root also has `calling: 'lambda'`: it applies
+  the expression to the arguments, each boxed with the type of its parameter,
+  and a function value gives `{ kind: 'entire' }`. The standalone runtime
+  (`createIntervalRuntime().load()`) calls a stored result with
+  `calling: 'lambda'` with the same arguments, and its batch evaluators
+  refuse such a result.
+
+- **A dictionary compiles on the JavaScript and Python targets.**
+  `compile(ce.box(["Dictionary"]), { to: "javascript" })` failed with "Could
+  not compile expression: `{->}`", and so did every dictionary with entries.
+  Thus a function literal with the parameter default `{}`, such as
+  `(m: dictionary<integer> = {}) => m`, did not compile, while a default `[]`
+  did. Now a dictionary compiles to an object literal in JavaScript
+  (`{a -> x + 1}` is `({"a": _.x + 1})`) and to a `dict` display in Python
+  (`{"a": x + 1}`), with each value compiled. The result has the form of a
+  `dictionary` input: a plain object or a `dict`. A key `__proto__` is an own
+  key of the object (the JavaScript literal writes it as the computed key
+  `["__proto__"]`), not its prototype. Each evaluation makes a new object, so
+  a call that changes the default dictionary does not change the default of
+  the next call. A value whose type is `unknown`, and a value that can be
+  `Nothing` (the interpreter leaves out its entry), do not compile; an
+  untyped input in a value is refused by name, as elsewhere. A dictionary
+  does not compile on the interval-js, GLSL and WGSL targets, which have no
+  dictionary value; the error message gives the reason. A dictionary result
+  with the keys `re` and `im` is returned as it is: `{re -> x, im -> 0}` gave
+  the number `x`. A `dictionary` input with these keys, such as
+  `{ re: 1, im: 0 }`, is accepted: it was refused as a complex number given
+  for a real input.
+
+- **A hexadecimal or binary number in a type string has its value.**
+  `ce.type("0x10")`, `ce.type("-0x10")` and `ce.type("0b10")` gave the value
+  type `0`, and `integer<0x0..0xff>` gave `integer<0..0>`. Now they give `16`,
+  `-16`, `2` and `integer<0..255>`. A parameter default value such as
+  `(x: number, k: number = 0x10) -> number` is decoded the same way, instead of
+  being refused. A radix prefix with no digits (`0x`) is a parse error. In a
+  dimension, `0x2` is still the shape `0 x 2`, a zero-length axis, and the
+  length of a vector cannot be hexadecimal: `vector<0x2>` is a parse error
+  (it was `vector<2>`). A length that is not an integer (`vector<2.5>`, which
+  was truncated to `vector<2>`) or that is negative (`vector<-2>`, which was
+  read as an unknown length) is now a parse error, and so is a length larger
+  than `2^53 - 1` (`vector<1e300>`). `-1` is still accepted as an unknown
+  length, as in `list<any^-1>`.
+
+- **A lazy collection that a function returns calls its callback where it was
+  created.** With `f := (x, k = d) => x * k` and
+  `g := (d, xs) => Map(f, xs)`, the elements of `g(10, [1, 2])` were `d` and
+  `2d`: they are computed when the collection is read, after `g` has returned,
+  and the default `d` was read where the collection was read. They are now
+  `10` and `20`, as in the compiled function and as with
+  `ListFrom(Map(f, xs))` inside `g`. This applies to `Map`, `Filter`, `Scan`,
+  `TakeWhile`, `DropWhile`, `FlatMap`, `Tabulate` (and `Table`, which
+  evaluates to `Tabulate`), `Iterate` and `Fill` created during a function
+  call, also in a `Block`, an `If` branch or a loop of its body, and also
+  when the collection is in a list or a dictionary that the function
+  returns, in another lazy collection (`Dedup(Map(f, xs))`), or in a
+  variable that a returned function reads. A lazy collection created outside
+  every function call is read as before, in the context of its reader. An
+  operator of the host whose collection calls a function operand when it is
+  read can set the new collection handler flag `callsCallbackOnRead` to get
+  the same behavior.
 
 - **The parameter of a function literal that is applied at once has the type
   of its argument in compiled code** (GitHub issue #498). With `n` declared
@@ -1085,6 +4064,39 @@ import ChangeLog from '@site/src/components/ChangeLog';
   source text is the caller's own value and is not checked, as before.
 
 ### Performance
+
+- **A tuple or a list whose operands share a node evaluates that node once.**
+  With `a0 := Map(x => x + d, Range(1, 1000))`, `a1 := (a0, a0)`, `a2 := (a1, a1)`, …, each read of the last variable evaluated the shared operand
+  again for each path to it, so the time doubled with each level: about 8 s
+  at 14 levels in a loop and 30 s at 16 levels. The result also held a
+  separate copy of each path. Now the evaluation of a `Tuple` or `List`
+  serves its result until the next value write, so 20 levels take about 0.2 s
+  and the result keeps the sharing. A write to a variable that the tuple reads
+  still gives the new value. A tuple or list that reads an impure value (a
+  symbol whose value is `Random()`) is evaluated again at each read. The fix
+  is on the synchronous route of `evaluate()` only: `N()` and
+  `evaluateAsync()` are not changed. A chain where a level uses the two
+  levels below it (`a2 := (a1, a0)`) is still slow, and so is a chain over an
+  infinite view with an element memo (`Map(f, Range(1, Infinity))`): a
+  result that holds such a view is not kept, because the view keeps each
+  element that is read.
+
+- **`subs()` substitutes a node that an expression uses more than once only
+  once.** On a non-canonical expression, `subs()` substituted a shared node
+  again for each path from the root, so its time doubled with each level of
+  sharing: with `e = x` and then `e = ce.function('Add', [e, e], { form: 'raw' })` repeated 18 times, `e.subs({ x: 3 })` took about 0.5 s, and 30
+  levels did not finish. Now the time grows with the number of distinct nodes
+  (18 or 20 levels take less than a millisecond), and a node that is shared
+  in the input is shared in the result. A shared node below a binder that
+  binds a substituted name (the parameter of a `Function`, the index of a
+  `Sum`, a local of a `Block`) still keeps that name there.
+
+- **An assignment whose value shares one list or tuple at several positions
+  takes linear time.** In a block `a1 := (a0, a0)`, `a2 := (a1, a1)`, …, the
+  value of `a_k` has `k + 1` distinct nodes but `2^k` paths, and the
+  assignment listed each node once per path: a depth of 22 took about 0.6 s,
+  and a depth of 40 did not finish. The assignment now lists each distinct
+  node once, and both depths take a few milliseconds.
 
 - **Compiling a callback whose body shares subexpressions takes linear
   time** (a follow-up of GitHub issue #488). A boxed expression can hold the

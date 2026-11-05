@@ -279,7 +279,7 @@ Some of the eager collections include:
 
 - **Sequence**: a sequence is a list but it is handled differently in the
   Compute Engine. It is used to splice elements into an expression where an element
-  is expected. The `Nothing` symbol is a synonym for the empty sequence.
+  is expected. The empty sequence `["Sequence"]` splices to no element.
   
 - [**Set**](#set): non-indexed collections of unique elements. The elements in a set are
   not accessed by index, they are enumerated. A set can contain an infinite number
@@ -397,13 +397,20 @@ is expected, the elements of the sequence are spliced into the expression.
 // ➔ ["List", 1, 2, 3, 4]
 ```
 
-The `Nothing` symbol is a synonym for the empty sequence `["Sequence"]`.
-When the `Nothing` symbol is used in a context where an element is expected, it is ignored.
+The empty sequence `["Sequence"]` splices to no element:
 
+```json example
+["List", 1, ["Sequence"], 2]
+// ➔ ["List", 1, 2]
+```
+
+The `Nothing` symbol is not an empty sequence. It is the value of an empty
+block or of a statement with no value, and a collection keeps it as an
+element:
 
 ```json example
 ["List", 1, "Nothing", 2]
-// ➔ ["List", 1, 2]
+// ➔ ["List", 1, "Nothing", 2]     (three elements)
 ```
 
 </FunctionDefinition>
@@ -515,7 +522,7 @@ See also the **Linear Algebra** section for operations on vectors, matrices and 
 | MathJSON                        | LaTeX                              |
 | :------------------------------ | :--------------------------------- |
 | `["List", "x", "y", 7, 11]`     | $$ \lbrack x, y, 7, 11\rbrack $$ |
-| `["List", "x", "Nothing", "y"]` | $$ \lbrack x,,y\rbrack $$        |
+| `["List", "x", "Nothing", "y"]` | $$ \lbrack x, \mathrm{Nothing}, y\rbrack $$ |
 
 </FunctionDefinition>
 
@@ -1062,7 +1069,9 @@ than `xs`, the iteration stops at the end of the mask.
 A single index that falls outside the collection — including the index `0`,
 since indexing is 1-based — is not an error. `At` answers an **absence marker**,
 and the marker is drawn from the element type: a numeric collection answers
-`NaN`, any other collection answers `Missing`.
+`NaN`, a collection of points answers a point whose coordinates are all `NaN`,
+and any other collection answers `Missing`. `First` and `Last` of an empty collection are out of
+range too.
 
 ```js
 ce.expr(['At', ['List', 5, 2, 10, 18], 99]).evaluate().print();
@@ -1070,21 +1079,40 @@ ce.expr(['At', ['List', 5, 2, 10, 18], 99]).evaluate().print();
 
 ce.expr(['At', ['List', "'a'", "'b'"], 99]).evaluate().print();
 // ➔ "Missing"
+
+ce.expr(['At', ['List', ['Tuple', 1, 2], ['Tuple', 3, 4]], 5]).evaluate().print();
+// ➔ (NaN, NaN)
 ```
 
-The marker is part of the static type of the access, because the engine cannot
-in general know that an index is in range:
+The marker is not part of the static type of the access. The engine cannot in
+general know that an index is in range, and the type describes the values that
+are present, as `NaN` is outside `real`:
 
 ```js
-ce.expr(['At', ['List', 5, 2, 10, 18], 99]).type;
-// ➔ "integer | nan"
+ce.expr(['At', ['List', 5, 2, 10, 18], 'n']).type;
+// ➔ "integer"
 
-ce.expr(['At', ['List', "'a'", "'b'"], 99]).type;
-// ➔ "missing | string"
+ce.expr(['At', ['List', "'a'", "'b'"], 'n']).type;
+// ➔ "string"
 ```
 
-For a numeric collection the union often collapses on its own, since `nan` is
-already part of `number`: indexing a `list<number>` has type `number`.
+When the index is a literal that the engine can prove to be out of range, the
+type is the type of the marker alone: `At([5, 2, 10, 18], 99)` has type `nan`
+and `At(["a", "b"], 99)` has type `missing`.
+
+Read an absent value with `IsMissing`, or replace it with `Coalesce`, before
+computing on it:
+
+```js
+ce.expr(['Coalesce', ['At', ['List', "'a'", "'b'"], 99], "'none'"]).evaluate().print();
+// ➔ "none"
+```
+
+`IsMissing`, `Coalesce` and `AssertPresent` read a point whose coordinates are
+all `NaN` as absent, as they read `NaN` and `Missing`: with the list of points
+`ps` equal to `[(1, 2)]`, `IsMissing(At(ps, 5))` is `True`,
+`Coalesce(At(ps, 9), (0, 0))` is `(0, 0)`, and `AssertPresent(At(ps, 5))` is an
+`expected-present` error. The `x` coordinate of an absent point is `NaN`.
 
 #### Filtering with a Condition
 
@@ -1457,18 +1485,16 @@ with any step, use [`At`](#at) with a collection of indexes.
 // ➔ ["List", 10, 18]
 ```
 
-<Signature name="Slice" returns="list | nothing">_xs_:indexed_collection, _span_:range | nothing</Signature>
-
-A `Nothing` span passes through as `Nothing`. This arm exists so that a span
-produced by [`RangeOf`](#rangeof) — which answers `Nothing` when the needle is
-absent — can be sliced without a test in between:
+An absent span gives `Missing`, as every operator over `Missing` does. So a
+span produced by [`RangeOf`](#rangeof), which answers `Missing` when the
+needle is absent, can be sliced without a test in between:
 
 ```json example
 ["Slice", ["List", 9, 7, 5, 3], ["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 5]]]
 // ➔ ["List", 7, 5]
 
 ["Slice", ["List", 9, 7, 5, 3], ["RangeOf", ["List", 9, 7, 5, 3], ["List", 1, 2]]]
-// ➔ "Nothing"
+// ➔ "Missing"
 ```
 
 </FunctionDefinition>
@@ -1848,6 +1874,10 @@ ce.expr(['Length', ['Range', 1, 'PositiveInfinity']]).evaluate().print();
 For collections, `Length` and [`Count`](#count) produce the same result;
 `Count` is restricted to collection arguments by its signature.
 
+`Length(Missing)`, and `Length` of a restricted list whose condition is
+`False`, are `Missing`. A list that holds `Missing` keeps its length:
+`Length([1, Missing])` is `2`.
+
 </FunctionDefinition>
 
 
@@ -1979,6 +2009,20 @@ Returns `True` if the collection contains the given value, `False` otherwise. Th
 // ➔ "False"
 ```
 
+The comparison is structural, not by value. A symbol with no value is a
+different expression from a number, even when the symbol could hold that
+number. With `a` and `b` declared `integer` and no value, `Contains` answers
+`False`. To leave the answer open until the symbols have values, use
+[`Element`](/compute-engine/reference/sets/), which stays unevaluated:
+
+```json example
+["Contains", ["List", "a", "b"], 3]
+// ➔ "False"
+
+["Element", 3, ["List", "a", "b"]]
+// ➔ ["Element", 3, ["List", "a", "b"]]
+```
+
 `Contains` tests for **one element**. To test for a contiguous run of several
 elements — a sublist, or a substring — use
 [`ContainsSequence`](#containssequence).
@@ -2014,11 +2058,11 @@ several elements — a sublist, or a substring — use [`RangeOf`](#rangeof).
 
 <FunctionDefinition name="RangeOf">
 
-<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
-<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
+<Signature name="RangeOf" returns="range | missing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
+<Signature name="RangeOf" returns="range | missing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
 
 The **span** of the first occurrence of _needle_ as a contiguous subsequence
-of _xs_, as a 1-based inclusive [`range`](#range), or `Nothing` when the
+of _xs_, as a 1-based inclusive [`range`](#range), or `Missing` when the
 needle does not occur.
 
 ```json example
@@ -2026,7 +2070,7 @@ needle does not occur.
 // ➔ ["Range", 2, 3]
 
 ["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 3]]
-// ➔ "Nothing"        (7 and 3 are not adjacent)
+// ➔ "Missing"        (7 and 3 are not adjacent)
 ```
 
 `RangeOf` and its three companions [`ContainsSequence`](#containssequence),
@@ -2050,14 +2094,14 @@ The optional _from_ is the index to start searching at (default 1). The
 returned span is always in the **original** collection's indexes, so finding
 the next occurrence is `RangeOf(xs, needle, Last(r) + 1)` for non-overlapping
 matches (or `First(r) + 1` to allow overlaps), and finding all of them is that
-loop run until it answers `Nothing`.
+loop run until it answers `Missing`.
 
 Domain rules:
 
 | Case | Result |
 | :--- | :--- |
-| Needle absent | `Nothing` |
-| _from_ past the end of _xs_ | `Nothing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
+| Needle absent | `Missing` |
+| _from_ past the end of _xs_ | `Missing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
 | _from_ less than 1, or not an integer | An error value |
 | Empty needle | An error value — an empty span is not representable (`["Range", 1, 0]` is the *descending* range `[1, 0]`, not an empty one) |
 | Infinite or unknown-length subject or needle | The expression stays symbolic — searching one would not terminate when the needle is absent |
@@ -2070,8 +2114,9 @@ The span composes with [`Slice`](#slice): when the needle is found,
 // ➔ ["List", 7, 5]
 ```
 
-`Slice` also accepts the `Nothing` that a failed search answers, and passes it
-through, so the two compose without a test in between.
+`Slice` gives `Missing` for the `Missing` that a failed search answers, so the
+two compose without a test in between. Use `Coalesce` or `IsMissing` to test
+the result.
 
 On a **string** the elements are characters, so the search is character-wise
 and the span is in character indexes; that case, including the grapheme
@@ -2089,7 +2134,7 @@ guarantees it gives, is documented in the
 <Signature name="ContainsSequence" returns="boolean">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
 
 Whether _needle_ occurs in _xs_ as a contiguous subsequence. For a non-empty
-needle this is [`RangeOf`](#rangeof) not answering `Nothing`.
+needle this is [`RangeOf`](#rangeof) not answering `Missing`.
 
 ```json example
 ["ContainsSequence", ["List", 1, 2, 3], ["List", 2, 3]]
@@ -2148,13 +2193,21 @@ Returns the 1-based index of the first element in the collection that satisfies 
 <FunctionDefinition name="Find">
 <Signature name="Find">_xs_: indexed_collection, _predicate_:function</Signature>
 
-Returns the first element in the collection that satisfies the predicate, or `Nothing` if none found.
+Returns the first element in the collection that satisfies the predicate.
+When no element satisfies it, `Find` returns the absent value of the domain
+of the elements, the value of a read out of range of the same collection:
+`NaN` for numbers, a point whose coordinates are all `NaN` for points, and
+`Missing` otherwise. Use `Coalesce` to give a default.
 
 ```json example
 ["Find", ["List", 5, 2, 10, 18], ["Greater", "_", 9]]
 // ➔ 10
 ["Find", ["List", 5, 2, 10, 18], ["Greater", "_", 100]]
-// ➔ "Nothing"
+// ➔ "NaN"
+["Find", ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]], ["Greater", ["First", "_"], 9]]
+// ➔ ["Tuple", "NaN", "NaN"]
+["Find", ["List", {str: "a"}, {str: "b"}], ["Equal", "_", {str: "z"}]]
+// ➔ "Missing"
 ```
 </FunctionDefinition>
 
@@ -2419,18 +2472,23 @@ callback, use a tuple-pattern parameter, `["Function", body, ["Tuple",
 An element that _f_ cannot accept is kept as an error cell. This holds for
 every spelling of the callback: a function literal, a named operator or a
 comprehension give the same cells. An absent element (`Missing`) under a
-numeric function gives `NaN`; under a text function such as `ToUpperCase` it
-gives the `incompatible-type` error.
+numeric function gives `Missing`; under a text function such as `ToUpperCase` it
+gives the `incompatible-type` error. A function with a parameter declared as a
+number or a point gives `Missing` for an absent element, without running its
+body.
 
 ```json example
 ["Map", ["Function", ["Sqrt", "x"], "x"], ["List", 16, -4, "'banana'", 81]]
 // ➔ ["List", 4, ["Complex", 0, 2], ["Error", ["ErrorCode", "'incompatible-type'", ...], "'banana'"], 9]
 
 ["Map", ["Function", ["Sqrt", "x"], "x"], ["List", 16, "Missing", 81]]
-// ➔ ["List", 4, "NaN", 9]
+// ➔ ["List", 4, "Missing", 9]
 
 ["Map", "ToUpperCase", ["List", "'a'", "Missing"]]
 // ➔ ["List", "'A'", ["Error", ["ErrorCode", "'incompatible-type'", ...], "Missing"]]
+
+["Map", ["Function", ["Greater", "x", 0], ["Typed", "x", "'integer'"]], ["List", 1, "Missing"]]
+// ➔ ["List", "True", "Missing"]
 ```
 
 </FunctionDefinition>

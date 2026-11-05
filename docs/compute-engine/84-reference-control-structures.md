@@ -36,7 +36,16 @@ variables defined in the `["Block"]` expression are not accessible outside of
 the `["Block"]` expression.
 
 The value of the `["Block"]` expression is the value of the last expression
-`expr-n`.
+`expr-n`. When the last expression is an `["Assign"]` or a `["Declare"]`, the
+value of the block is `Nothing`: end the block with the name.
+
+```json example
+["Block", ["Assign", "b", 2]]
+// ➔ Nothing
+
+["Block", ["Assign", "b", 2], "b"]
+// ➔ 2
+```
 
 If one of the expression in the block is a `["Return"]` expression, a
 `["Break"]` expression or a `["Continue"]` expression, no more expressions are
@@ -48,6 +57,29 @@ body — can read the enclosing block's variables, and assigning to a variable
 declared in an enclosing block updates that binding. A `["Declare"]` in the
 inner block instead introduces a new variable that shadows the outer one for
 the duration of the inner block.
+
+A local always has a value when it is read. These rules make that so, and each
+form that breaks one is a static error in the canonical form:
+
+- A declaration has a value: `["Declare", "x", "integer", 5]`, or the first
+  `["Assign", "x", 5]` of the name at the level of the block. A `["Declare"]`
+  with no value (`["Declare", "x"]`, `["Declare", "x", "integer"]`) is the
+  error `declaration-without-value`, and a later `["Assign"]` does not repair
+  it. One exception: a `["Declare"]` of a function type with no value is valid
+  when a function definition of the same name is in the same block.
+- The first assignment of a name must not be in a branch of an `["If"]` or a
+  `["Which"]`, in the body of a `["Loop"]`, or in a case of a `["Match"]`. It
+  is the error `first-assignment-in-branch`. Assign a value to the name before
+  the branch. A name that is already declared is not a first assignment: the
+  assignment writes that name.
+- A local is not read before its declaration. It is the error
+  `read-before-declaration`.
+- An assignment is a statement, never an operand. `["f", ["Assign", "a", 2]]`
+  and `["Assign", "t", ["Assign", "u", 1]]` are the error
+  `assignment-in-operand`. Write `["Block", ["Assign", "a", 2], ["f", "a"]]`.
+- A later assignment keeps the type of the local: its declared type, or the
+  type of its first value (a number can become another number). Another type
+  is the error `assignment-type-mismatch`.
 
 ```json example
 ["Block", ["Assign", "c", 5], ["Multiply", "c", 2]]
@@ -61,6 +93,7 @@ the duration of the inner block.
 `Block` is sequential: a later assignment observes changes made by every
 earlier expression. A source language with simultaneous action tuples must
 therefore snapshot all right-hand sides before committing any left-hand side.
+The names `a` and `b` below are declared with a value before the block.
 
 For example, if `(a → 1, b → a + 1)` means that `b` reads the value of `a`
 from before the tuple, translate it as:
@@ -79,8 +112,7 @@ then does not matter because no temporary depends on a newly assigned value.
 
 ```json example
 ["Block",
-  ["Declare", "counter", "integer"],
-  ["Assign", "counter", 0],
+  ["Declare", "counter", "integer", 0],
   ["Loop",
     ["Block",
       ["If", ["Not", ["Less", "counter", 5]], ["Break"]],
@@ -104,17 +136,35 @@ then does not matter because no temporary depends on a newly assigned value.
 
 If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`. Without an else-branch there is nothing to select when
-`condition` is `False`, and the value is the `Missing` marker.
+`condition` is `False`, and the value is the absent value of `expr-1`: `NaN`
+for a number, a point whose coordinates are all `NaN` for a point, and the
+`Missing` marker for any other value. The type of the expression is the type
+of `expr-1`.
 
 ```json example
 ["If", "False", 5]
+// ➔ NaN
+
+["If", "False", ["Tuple", 1, 2]]
+// ➔ (NaN, NaN)
+
+["If", "False", "'a'"]
 // ➔ Missing
 ```
+
+A single-branch `If` is the parse of the restriction `expr\{cond\}` and of a
+`where` condition. It is written with `where`: `["If", ["Greater", "x", 0],
+["Square", "x"]]` is `x^2\text{ where }0\lt x`.
 
 <Signature name="If">_condition_, _expr-1_, _expr-2_</Signature>
 
 If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`, otherwise `expr-2`.
+
+A condition with no value is `False`: the absent value `Missing`, and a
+comparison with an operand that has no value (`NaN`, `Missing`, `1/0`).
+`["If", "Missing", 1, 2]` and `["If", ["Greater", "Missing", 0], 1, 2]` are
+`2`. A `Which` reads its conditions the same way.
 
 Only the selected branch is evaluated. The branch that is not selected is
 **dead code**: if it contains an error, that error never reaches the value.
@@ -221,99 +271,110 @@ gives the value of that position. The rules:
   `incompatible-dimensions` error, as for `["Add"]`:
   `["If", ["Less", "L", 3], ["List", 10, 20], 0]` is
   `Error("incompatible-dimensions", "3 vs 2")`.
-- **A position that no clause selects** holds `NaN` when every expression is a
-  number, and `Missing` otherwise: `["If", ["Less", "L", 3], "L"]` is
-  `[1, NaN, NaN]`, and `["If", ["Less", "L", 3], "'small'"]` is
-  `["small", Missing, Missing]`.
-- **A position whose condition is `Missing`** holds an error, because an
-  absent condition cannot select: `["If", ["List", "True", "Missing", "False"],
-  1, 0]` is `[1, Error(…), 0]`. Use `["Coalesce"]` or `["IsMissing"]` on the
-  condition first.
+- **All expressions have one kind of element**: numbers, or points
+  (`["Tuple", x, y]`). A number beside a point is an error. Other values
+  are accepted. A position that no clause selects is `False` for a relation
+  (a region is not drawn there) and a color with `NaN` channels for a color:
+  `["If", ["List", "True", "False"], ["Greater", "x", 0]]` is
+  `[0 < x, False]`, and `["If", ["List", "True", "False"], ["Rgb", 1, 0, 0]]`
+  is `[Rgb(1, 0, 0), Rgb(NaN, NaN, NaN)]`. For any other value it is
+  `Missing`.
+- **A position that no clause selects** holds `NaN` for a number, and a point
+  whose coordinates are `NaN` for a point:
+  `["If", ["Less", "L", 3], "L"]` is `[1, NaN, NaN]`, and
+  `["If", ["List", "True", "False"], ["Tuple", 1, 2]]` is
+  `[(1, 2), (NaN, NaN)]`. A plot skips a `NaN` point. A number cell or a point cell is never
+  `Missing`.
 - **Only the selected expressions are evaluated**, each one once.
 
-The condition can be a list of lists, such as the comparison of a matrix with
-a number. The selection then applies at every level: with `M` equal to
-`[[1, 2], [3, 4]]`, `["If", ["Less", "M", 3], "M", 0]` is `[[1, 2], [0, 0]]`.
-An expression with fewer levels than the condition is refused, as `["Add"]`
-refuses it: `["If", ["Less", "M", 3], ["List", 10, 20], 0]` is
-`Error("incompatible-dimensions", "2x2 vs 2")`. An expression with more
-levels than the condition is taken whole at each position:
-`["If", ["List", "True", "False"], ["List", ["List", 1], ["List", 2]], 0]` is
-`[[1], 0]`.
+These are errors, found from the types before any evaluation (an
+`incompatible-type` error, or `incompatible-dimensions` for two lengths):
+
+- a condition that is a list of lists, such as the comparison of a matrix
+  with a number: with `M` equal to `[[1, 2], [3, 4]]`,
+  `["If", ["Less", "M", 3], "M", 0]` is an error;
+- a condition with a `Missing` element:
+  `["If", ["List", "True", "Missing", "False"], 1, 0]` is an error;
+- an expression whose elements are lists:
+  `["If", ["List", "True", "False"], ["List", ["List", 1], ["List", 2]], 0]`
+  is an error;
+- a string, or a list of strings, under a list of conditions, because a
+  string has no value for a position that is not selected:
+  `["If", ["Less", "L", 3], "'small'"]` is an error;
+- a set under a list of conditions.
+
+A relation, such as `["Greater", "x", 0]`, is accepted under a list of
+conditions: it is the region of a plot restricted at each position.
 
 A condition that is a single `True` or `False` keeps the ordinary behavior,
-even when an expression is a list: `["If", "True", "L", 0]` is `L`.
+even when an expression is a list: `["If", "True", "L", 0]` is `L`, and
+`["If", "False", ["List", 10, 20, 30]]` is `Missing`. A list is selected
+element by element only when the condition is a list.
 
 </FunctionDefinition>
 
-<FunctionDefinition name="When">
+### Restriction
 
-<Signature name="When">_expr_, _condition_</Signature>
-
-Returns the value of `expr` when `condition` evaluates to `True`, and
-`Missing` — the absent-value marker, the same value a `Which` with no
-matching clause and an `If` with no else-branch give — when `condition`
-evaluates to `False`. When `condition` cannot be determined, the
-expression holds unevaluated.
-
-The type of a `When` expression admits the absent case: `When(5, x > 0)`
-has type `integer | missing`, and a list that holds a restricted element has
-type `list<integer | missing>`. Only a restriction whose condition is the
-literal `True` keeps the bare type of `expr`. A consumer that tests
-`type.matches("number")` must set the `missing` member aside first, as it
-must for a `Which` with no default clause.
-
-`["When"]` is the AST head produced by **restriction-brace** syntax:
-`expr\{cond\}` parses to `["When", expr, cond]`. It is also useful directly
-for masking values where a predicate does not hold. The braces may be
-separated from the base expression by spacing commands
-(`(1-t)^2(1+2t)\ \{t\ge0\}\{t\le1\}` attaches both restrictions).
+A single-branch `["If", condition, expr]` is a **restriction**: the value of
+`expr` where `condition` is `True`, and the absent value of `expr` where it is
+`False` (`NaN` for a number, a point of `NaN` coordinates for a point,
+`Missing` for any other value). It is the parse of
+`expr\{condition\}` and of `expr \text{ where } condition`. When `condition`
+cannot be determined, the restriction stays unevaluated.
 
 ```json example
-["When", ["Square", "x"], ["Greater", "x", 0]]
-// Evaluates to x^2 when x > 0, Missing otherwise.
+["If", ["Greater", "x", 0], ["Square", "x"]]
+// Evaluates to x^2 when x > 0, NaN when x ≤ 0.
 ```
 
-**Stacked restrictions canonicalize** to a single `When` with an `And`
-predicate:
+The type of a restriction is the type of `expr`. The absent value is outside
+that type, as `NaN` is outside `real`: `["If", ["Greater", "x", 0], 5]` has
+the type `integer`.
 
-```json example
-["When", ["When", "x", ["Greater", "x", 0]], ["Less", "x", 10]]
-// Canonicalizes to:
-["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]
-```
+Stacked restriction braces parse to one `If` whose condition is an `And`, in
+the order written: `x\{x>0\}\{x<10\}` is
+`["If", ["And", ["Less", 0, "x"], ["Less", "x", 10]], "x"]`.
 
-Downstream simplification, interval intersection, and compilation operate on
-the canonical form, so source variants (stacked braces or a single brace
-with `\wedge`) are interchangeable.
+Up to version 0.177.0 a restriction was the operator `["When", expr,
+condition]`. `["When"]` is removed: in a MathJSON document it is now an
+unknown operator, which does not evaluate. Write `["If", condition, expr]`
+instead (the operands are in the other order).
 
-#### When the Arguments Are Lists
+#### A Restriction of a Collection
 
 When `expr` is a list and `condition` is a single condition, the whole list
 is the value: the result is the list when the condition is `True`, and
 `Missing` when it is `False`.
 
 ```json example
-["When", ["List", 10, 20, 30], "True"]
+["If", "True", ["List", 10, 20, 30]]
 // ➔ ["List", 10, 20, 30]
 
-["When", ["List", 10, 20, 30], "False"]
+["If", "False", ["List", 10, 20, 30]]
 // ➔ "Missing"
 ```
+
+An operation that applies to each element of the list applies to the whole
+restricted list: the condition stays on the outside. With `t` free,
+`\sin([1,2,3]\{0<t\})` evaluates to
+`["If", ["Less", 0, "t"], ["List", ["Sin", 1], ["Sin", 2], ["Sin", 3]]]`,
+which presents as a list of three elements. When `t` is `-1`, it evaluates to
+`Missing`, as `[1,2,3]\{0<t\}` and `2[1,2,3]\{0<t\}` do. `Length` of a false
+restricted list is `Missing` too. `First` of a false restricted list of points
+is the point `(NaN, NaN)`, while the restricted list itself is `Missing`.
 
 When `condition` is a **list of conditions** (a mask), `expr` is paired with
 the conditions position by position, and the result is a list with one cell
 for each pair. A cell is the element when its condition is `True`. When its
-condition is `False`, the cell is the absence marker of the element: `NaN`
-for a number, and `Missing` for any other value, such as a point or a
-string.
+condition is `False`, the cell is `NaN` for a number, and a point whose
+coordinates are `NaN` for a point.
 
 ```json example
-["When", ["List", 10, 20, 30], ["List", "True", "False", "True"]]
+["If", ["List", "True", "False", "True"], ["List", 10, 20, 30]]
 // ➔ ["List", 10, "NaN", 30]
 
-["When", ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]], ["List", "True", "False"]]
-// ➔ ["List", ["Tuple", 1, 2], "Missing"]
+["If", ["List", "True", "False"], ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]]]
+// ➔ ["List", ["Tuple", 1, 2], ["Tuple", "NaN", "NaN"]]
 ```
 
 The list of conditions is usually a comparison over the list itself. With
@@ -322,7 +383,7 @@ the restriction-brace syntax:
 <Latex value="\lbrack 10, 20, 30 \rbrack\{\lbrack 10, 20, 30 \rbrack > 15\}"/>
 
 ```json example
-["When", ["List", 10, 20, 30], ["Greater", ["List", 10, 20, 30], 15]]
+["If", ["Greater", ["List", 10, 20, 30], 15], ["List", 10, 20, 30]]
 // ➔ ["List", "NaN", 20, 30]
 ```
 
@@ -330,33 +391,28 @@ The result keeps the positions of the elements: a masked element is not
 removed. To remove the elements that do not satisfy a condition, use
 [`Filter`](/compute-engine/reference/collections/#filter).
 
-**What is paired.** An ordered collection is paired element by element: a
-list, a vector, a matrix (each cell is a row), a range, and a lazy
-collection such as a `Map` over a range. A finite `Set` is paired in its
-iteration order. A value that is not a collection is **one value**, repeated
-in each cell. A tuple and a string are also one value: a point
-`["Tuple", 1, 2]` is not split into its coordinates.
+**What is paired.** An ordered collection of numbers or points is paired
+element by element: a list, a vector, a range, and a lazy collection such as
+a `Map` over a range. A number or a point is **one value**, repeated in each
+cell: a point `["Tuple", 1, 2]` is not split into its coordinates. A matrix
+(a list of lists), a set and a string are errors under a list of conditions.
 
 ```json example
-["When", 5, ["List", "True", "False"]]
+["If", ["List", "True", "False"], 5]
 // ➔ ["List", 5, "NaN"]
 
-["When", ["Tuple", 1, 2], ["List", "True", "False"]]
-// ➔ ["List", ["Tuple", 1, 2], "Missing"]
-
-["When", {str: "hi"}, ["List", "True", "False"]]
-// ➔ ["List", "hi", "Missing"]
+["If", ["List", "True", "False"], ["Tuple", 1, 2]]
+// ➔ ["List", ["Tuple", 1, 2], ["Tuple", "NaN", "NaN"]]
 ```
 
-**Different lengths.** The result has the length of the shorter of the two
-operands.
+**Different lengths.** When the types give both lengths and they differ, the
+restriction is an `incompatible-dimensions` error, as for `["Add"]`. When a
+length is known only from the value, the result has the length of the shorter
+of the two operands.
 
 ```json example
-["When", ["List", 10, 20, 30], ["List", "True", "False"]]
-// ➔ ["List", 10, "NaN"]
-
-["When", ["List", 10, 20], ["List", "True", "False", "True"]]
-// ➔ ["List", 10, "NaN"]
+["If", ["List", "True", "False"], ["List", 10, 20, 30]]
+// ➔ Error("incompatible-dimensions", "2 vs 3")
 ```
 
 **A collection that is infinite or of unknown length.** The collection is
@@ -364,7 +420,7 @@ paired with the conditions over the length of the list of conditions. Only
 the elements that are necessary are read.
 
 ```json example
-["When", ["Range", 1, "PositiveInfinity"], ["List", "True", "False", "True"]]
+["If", ["List", "True", "False", "True"], ["Range", 1, "PositiveInfinity"]]
 // ➔ ["List", 1, "NaN", 3]
 ```
 
@@ -375,8 +431,8 @@ a list and has no value. The restriction evaluates when the elements can be
 read.
 
 ```json example
-["When", ["Range", 1, "n"], ["List", "True", "False"]]
-// ➔ ["When", ["Range", 1, "n"], ["List", "True", "False"]]
+["If", ["List", "True", "False"], ["Range", 1, "n"]]
+// ➔ ["If", ["List", "True", "False"], ["Range", 1, "n"]]
 // After n is assigned the value 5:
 // ➔ ["List", 1, "NaN"]
 ```
@@ -386,31 +442,27 @@ determined stays a restriction of that one element. The other cells are
 evaluated.
 
 ```json example
-["When", ["List", 10, 20], ["List", "True", "c"]]
-// ➔ ["List", 10, ["When", 20, "c"]]
+["If", ["List", "True", ["Less", 0, "t"]], ["List", 10, 20]]
+// ➔ ["List", 10, ["If", ["Less", 0, "t"], 20]]
 ```
 
-**Types.** The type of a restriction with a list of conditions is a list
-whose elements admit the absent case. For a collection of numbers the type
-is `list<number>`, because a masked number is `NaN`, which is a `number`.
-For other elements the type is `list<T | missing>`: a restriction of a list
-of points has the type `list<tuple<number, number> | missing>`. This is the
-type for every ordered collection, also when the collection is declared as
-`indexed_collection<T>` and its length is not known.
+**Types.** The type of a restriction with a list of conditions is a list of
+the element type, found from the types of the operands: `list<number>` for
+numbers, because a masked number is `NaN`, and `list<tuple<number, number>>`
+for points, because a masked point is a point of `NaN` coordinates.
 
 A symbol whose declared type admits both one value and a list of values,
 such as `tuple<number, number> | list<tuple<number, number>>` (a point or a
 list of points), is paired according to the value it holds: a point is one
 value, and a list of points is paired element by element.
 
-When compiled, `When(e, cond)` emits a ternary whose masked branch is the
-absence marker of the value's domain: `(cond ? e : NaN)` for a number, on
-every target, and on JavaScript `(cond ? e : undefined)` for a value that is
-provably not a number, such as a string, so that a compiled `IsMissing`
-agrees with the interpreter. This makes `When` suitable for plot-domain
-masking.
-
-</FunctionDefinition>
+When compiled, a restriction with one condition emits a ternary whose masked
+branch is the absent value of the value's domain: `(cond ? e : NaN)` for a
+number, on every target. On JavaScript, a restriction with a list of
+conditions gives `NaN` for a masked number and `[NaN, NaN]` for a masked
+point: with `V` equal to `[-1, 2]`,
+`["If", ["Greater", "V", 0], ["Tuple", 1, 2]]` runs to
+`[[NaN, NaN], [1, 2]]`.
 
 <nav className="hidden">
 ### Match
@@ -640,6 +692,19 @@ Inside `body`:
 
 Bound names do not leak into the enclosing scope.
 
+A name that the body assigns must be declared with a value before the loop.
+The first assignment of a name in the body is the error
+`first-assignment-in-branch`. End the enclosing block with the name to use the
+result:
+
+```json example
+["Block",
+  ["Assign", "s", 0],
+  ["Loop", ["Assign", "s", ["Add", "s", "i"]], ["Element", "i", ["Range", 1, 4]]],
+  "s"]
+// ➔ 10
+```
+
 <ReadMore path="/compute-engine/reference/collections/#comprehension" >
 To build a **list** from a per-combination computation, use
 **`Comprehension`** instead (or **`Map`** / **`Filter`** for the
@@ -759,22 +824,24 @@ A trailing `\{cond\}` after an expression masks the value by a predicate:
 f(x)\left\{0 < x < 2\right\}
 ```
 
-Parses to `["When", ["f", "x"], ["Less", 0, "x", 2]]`.
+Parses to `["If", ["Less", 0, "x", 2], ["f", "x"]]`, a
+[restriction](#restriction).
 
 When the condition is `True`, the expression evaluates to its left operand;
-when `False`, it evaluates to `Missing`. This is distinct from a set
-literal (standalone `\{1, 2, 3\}` continues to parse as a `Set`); the
-disambiguation is positional — trailing braces after a complete expression
-attach as a `When` restriction.
+when `False`, it evaluates to the absent value (`NaN` for a number,
+a point of `NaN` coordinates for a point, `Missing` otherwise). This is distinct from a set literal (standalone
+`\{1, 2, 3\}` continues to parse as a `Set`); the disambiguation is
+positional: trailing braces after a complete expression are a restriction.
 
-Stacked restrictions chain and canonicalize:
+Stacked restrictions merge into one condition, in the order written:
 
 ```latex
 x\left\{x > 0\right\}\left\{x < 10\right\}
 ```
 
-Parses to `["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]`.
-The serializer round-trips this canonical form back to stacked braces.
+Parses to `["If", ["And", ["Less", 0, "x"], ["Less", "x", 10]], "x"]`.
+The serializer writes a restriction with `where`, never with braces:
+`x\text{ where }0\lt x, x\lt10`, which parses back to the same expression.
 
 ### Semicolon Blocks
 
@@ -782,10 +849,11 @@ Semicolons (`;` or `\;`) act as statement separators to build `Block`
 expressions:
 
 ```latex
-x \coloneq 3;\; x^2 + 1
+x \coloneq 3; x^2 + 1
 ```
 
-Parses to `["Block", ["Declare", "x"], ["Assign", "x", 3], ["Add", ["Power", "x", 2], 1]]`.
+Parses to `["Block", ["Declare", "x", "'unknown'", 3], ["Add", ["Power", "x", 2], 1]]`.
+The first assignment of a name is its declaration, with a value.
 
 <ReadMore path="/compute-engine/guides/compiling/" >
 Read more about **compiling** control structures to JavaScript.
