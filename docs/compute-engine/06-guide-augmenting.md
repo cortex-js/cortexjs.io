@@ -2441,9 +2441,22 @@ ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
 ce.parse('F_{10}').evaluate();  // → 55
 
 // Factorial via LaTeX
-ce.parse('D_0 := 1').evaluate();
-ce.parse('D_n := n \\cdot D_{n-1}').evaluate();
-ce.parse('D_{5}').evaluate();  // → 120
+ce.parse('T_0 := 1').evaluate();
+ce.parse('T_n := n \\cdot T_{n-1}').evaluate();
+ce.parse('T_{5}').evaluate();  // → 120
+```
+
+**Library names:** The name of the sequence cannot be the name of a library
+function, such as `N`, `D` or `\Gamma`. The recurrence
+`N_n := N_{n-1} + 1` is the syntax error `assignment-to-library-function`,
+because the sequence would replace the function `N` for the whole engine. Use
+another letter, or declare the name first:
+
+```js
+ce.declare('N', 'unknown');
+ce.parse('N_0 := 1').evaluate();
+ce.parse('N_n := N_{n-1} + 1').evaluate();
+ce.parse('N_{3}').evaluate();  // → 4
 ```
 
 **Order independence:** Base cases and recurrence can be defined in any order.

@@ -11,7 +11,376 @@ description: "Release notes for the Compute Engine: new features, behavior chang
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
-## Coming Soon
+## 0.182.0 _2026-11-06_
+
+### Breaking Changes
+
+- **A named function that writes outside itself must state the `scope` effect
+  in a top-level `let` or `const`, in a `Declare` statement, and in a scope from
+  `ce.pushScope()`.** With `c` a top-level variable,
+  `let f = () => do { c = c + 1; c }` installed `f`, and it now gives an
+  `incompatible-type` error and declares nothing. Write
+  `let f: () scope -> number = () => do { c = c + 1; c }`. After
+  `ce.pushScope()`, `ce.declare('f', { value: writer })` now throws, as it does
+  in the global scope. A `let` in a block or in a function body is not refused,
+  and neither is a value that a call returns (`let counter = makeCounter()`).
+- **A LaTeX assignment can no longer replace a function of a library.** After
+  `ce.parse('a+b\\coloneq 5').evaluate()`, `Add(1, 2)` gave `5` for the whole
+  engine, and `\sin(x)\coloneq 5` made `Sin(0)` give `5`. These now give the
+  error `assignment-to-library-function`, in a block too, and `Add(1, 2)` keeps
+  its value. The error also applies to a function name that is one letter:
+  `N(x)\coloneq x+1` and `D(x, k)\coloneq x+k` were valid and now give the error.
+  To define such a function, declare the name first:
+  `ce.declare('D', 'function')`. A value that is not a function stays valid
+  (`N\coloneq 5`), and so do the MathJSON form `["Assign", "Add", …]` and
+  `\mathrm{Assign}(\operatorname{Add}, x\mapsto 5)`. A subscript on a library
+  function gives the same error when the assignment would define the function
+  or a sequence with its name: after `N_n\coloneq n+1`, `N(1/4)` gave `5/4`,
+  and the recurrence `D_n := n \cdot D_{n-1}` replaced `D`. Use another letter
+  for the sequence, or declare the name first. A term alone (`N_0\coloneq 1`)
+  and a local of a block (`N_n\coloneq 5; N_n+1`) stay valid.
+
+### Improvements
+
+- **An assignment to a list element rebinds the list, in LaTeX and in Epsil.**
+  `L[k]\coloneq v` is `Assign(L, ReplaceAt(L, k, v))`, and the Epsil statement
+  `xs[i] = v` is `xs = ReplaceAt(xs, i, v)`. With `L = [10, 20, 30]`,
+  `L[2]\coloneq 5` gives `L = [10, 5, 30]`. A matrix element is
+  `M[j, i]\coloneq v` or `M[j][i]\coloneq v`, which is
+  `Assign(M, ReplaceAt(M, j, i, v))`. Lists keep value semantics: after
+  `A\coloneq L`, the assignment `L[1]\coloneq 5` does not change `A`. The target
+  must be a variable that the program can assign: in Epsil,
+  `const c = [1, 2]; c[1] = 5` is the error `constant-assignment`, and in LaTeX
+  `N[1]\coloneq 5` is the error `assignment-to-library-function`. A string or a
+  tuple target gives the list that `ReplaceAt` gives. In a compiled loop,
+  `xs[i] = v` on a block local is written in place on JavaScript.
+- **A compiled loop that copies a list on each pass is reported.** When
+  `xs = ReplaceAt(xs, i, v)` in a `Loop` cannot write the list in place on the
+  JavaScript target, for example because the loop also has `ys = xs`,
+  `CompilationResult.warnings` now holds an entry with the code
+  `copying-list-update` and the name of the local in `binding`, one for each
+  such local of a block. An editor can show the author that the loop copies the
+  list. The emitted code does not change. An update that is not in a loop, and
+  the Python target, which always copies, are not reported.
+- **`checkEpsil(ce, source)` checks an Epsil program without running it.** It
+  is exported from `@cortex-js/compute-engine/epsil` and gives the parse errors
+  and static type errors that `executeEpsil` reports before it runs a
+  statement. It assigns no value, defines no function and declares no type on
+  `ce`, and a type that `ce` already knows is not an error.
+- **Two more forms keep the in-place write of a compiled block local.** With
+  `xs = ReplaceAt(xs, i, v)` in a loop, `const r = xs[1]` before the loop, or a
+  `ReplaceAt(xs, 1, 0)` that is not assigned to `xs`, made the loop copy the list
+  on each pass. Now only the unassigned `ReplaceAt` makes a copy. A write with
+  more than one position keeps the copying form in these cases, because a row
+  would be shared.
+- **The compile option `iterationBudget` also limits `Loop` on the JavaScript
+  and `interval-js` targets.** `compile(expr, { iterationBudget: 1e6 })` with
+  `Block(k := 0, Loop(k := k + 1))` did not return, and `run({})` now throws a
+  `CancellationError` with the cause `iteration-limit-exceeded`. Each iteration
+  of a `Loop` adds to one total for a call, including nested loops and loops in
+  user functions, and the next call starts at 0. `broadcast()` gives `NaN` for a
+  cell over the limit, and a batch costs up to cells × budget. On Python, a
+  program with a `Loop` declines when the option is set. A compiled value that
+  is a function declines when it counts passes, unless it is a function literal.
+  Without the option, the code of a `Loop` is unchanged.
+- **`ReplaceAt` takes more than one position, and a write keeps a known
+  length.** `ReplaceAt([[1, 2], [3, 4]], 2, 1, 9)` gives `[[1, 2], [9, 4]]`, and
+  `ReplaceAt` over a `vector<3>` now has the type `vector<3>`. The form with
+  more than one position compiles to JavaScript when the type of the collection
+  shows a list at each level it writes.
+- **A `Loop` compiled to GLSL or WGSL can stop early with `Break` and skip a
+  pass with `Continue`.** `Loop(Block(If(a > 3, Break()), a := a + 1), k ∈ 1..8)`
+  declined with "wrong number of arguments", and it now compiles to
+  `if (3.0 < a) { break; }` in the `for` statement. So an escape-time formula
+  no longer has to run every pass on every pixel. The jump must be a statement
+  of the `Loop` body, alone or as the branch of an `If` with no else (or with
+  the else branch `Nothing`). `If(c, a := 1, Nothing)` in a statement position
+  also compiles now.
+
+### Behavior Changes
+
+- **An assignment to a list element in Epsil rebinds the list.** `xs[2] = 9`
+  gave the error `incompatible-type`, and is now `xs = ReplaceAt(xs, 2, 9)`
+  (see Improvements). An assignment with a string index, `xs["a"] = 9`, is the
+  parse error `assignment-to-list-element`, and the statement changes nothing.
+  In LaTeX, the same error is given for a string index, for a list that is not
+  a symbol, for an element target in a `\operatorname{let}` statement or a
+  `where` item, which declare a new name, and for the subscript spelling
+  `n_{1}\coloneq 7` outside a block: only `n[1]\coloneq 7` rebinds the list. In
+  a block, `n_{1}\coloneq 7` still declares the local `n_1`.
+- **An assignment that rebinds a list to a `ReplaceAt` of itself checks the
+  write, and keeps the old value when it fails.** This applies to
+  `Assign(L, ReplaceAt(L, …, v))` however it is written: `L[k]\coloneq v`, the
+  Epsil `xs[k] = v`, or MathJSON. With `L = [1, 2]`, `L[5]\coloneq 1` gave the
+  unevaluated `ReplaceAt([1, 2], 5, 1)` as the new value of `L`, and it is now
+  the error `out-of-range`, as is a position of zero or one that is not an
+  integer. A name with no value as the target is the error
+  `assignment-to-list-element`, and an error that `ReplaceAt` gives, such as
+  `incompatible-type` for a number as the target, is returned. In each case `L`
+  keeps its value. A symbolic position, `L[k]\coloneq 1` with `k` unknown, still
+  gives the unevaluated `ReplaceAt`. Any other `ReplaceAt`, such as `y\coloneq \operatorname{ReplaceAt}(L, 5, 1)`, keeps its documented behavior.
+- **Epsil warns when a body that is only `name = value` compares and nothing
+  reads the result.** `let a = 0; match 1 { 1 => a = 2 }; a` gave `0` with no
+  message, and it still gives `0`, now with the warning
+  `equation-not-assignment` from `epsil check` and from a program run. Write
+  `1 => do { a = 2 }` to assign, or `1 => a == 2` to compare. The warning also
+  applies to a branch of a conditional expression and to a function whose every
+  read is a call with a discarded value. A body whose value is read, and an
+  equation of a free name, a constant, a parameter or a pattern variable, get no
+  warning.
+- **The type of a function literal no longer reads a variable that has the name
+  of its parameter.** With `n := [1, 2]`, `n ↦ n + 1` was typed
+  `(n: unknown) -> list<number>`, and it is now `(n: unknown) -> number`, as with
+  a parameter of another name. With `mk := n ↦ (x ↦ x + n)`, `mk(1)` is now typed
+  `(x: unknown) -> number`, and `Apply(mk(1), [10, 20])` is typed `vector<2>`, not
+  `list<number>`. Its value is still `[11, 21]`. A body taken out of the literal
+  and evaluated outside a call still reads the variable.
+- **A tuple beside a list of another length is an `incompatible-dimensions`
+  error under an operator that reads the tuple by position.**
+  `Power((1, 2), [3, 4, 5])` was `[1, 16]`, and it now gives
+  `Error("incompatible-dimensions", "2 vs 3")`, as `Power([1, 2], [3, 4, 5])`
+  does. `Arctan2`, `Mod`, `Less`, `ElementMax` and the other element-wise
+  operators do the same. `Power((1, 2), [3, 4])` is still `[1, 16]`, and
+  `Multiply((1, 2), [3, 4, 5])` is still a list of three points.
+- **A function with a declared signature checks an argument when a later value
+  decides it.** With `h` declared `(integer) -> integer` and the body `2k`, and
+  `m` with no value, `h(m)` gave `2m`, so after `m := 1.5` its value was `3`.
+  `h(m)` now stays `h(m)`, and after `m := 1.5` it gives an `incompatible-type`
+  error. With `m` declared `integer`, `h(m)` still gives `2m`. At a `real` or
+  `number` parameter, the body is still applied to a symbol with no declared
+  type: `f(x)` gives `x^2` for `f` declared `(real) -> real`. But `f(x + 1)`
+  stays while `x` has no type. Declare `x` as `real` to apply the body.
+- **A parameter annotated on a function checks an argument when a later value
+  decides it.** With `function h(k: integer) { 2*k }` and `m` with no value,
+  `h(m)` gave `2m`, so after `m = 1.5` its value was `3`. `h(m)` now stays `h(m)`,
+  and after `m = 1.5` it gives an `incompatible-type` error. A function literal
+  applied directly or given as a callback stays as an `Apply` of the literal:
+  `((k: integer) => 2*k)(m)`. The cases where the body is still applied are those
+  of a declared signature above. A symbol at a parameter whose type admits it is
+  also applied, on a declared signature too: with `f` declared
+  `(symbol) -> symbol`, `f(q)` gives `q`.
+- **The index of a `Subscript` is canonical, and an index read by value keeps its
+  parentheses.** `A_{n-1}` was `["Subscript", "A", ["Subtract", "n", 1]]` and is
+  now `["Subscript", "A", ["Add", "n", -1]]`. A free `i` in an index is now the
+  imaginary unit, as it already was in `A_{i,j}`: `A_{i+1}` holds
+  `["Complex", 1, 1]`. Declare `i` to use it as a variable. `A_{(n)}` and
+  `A_{n+0}` are now `["Subscript", "A", ["Delimiter", "n"]]`, written `A_{(n)}`.
+  The form `["Subscript", "A", "n"]` read back as the symbol `A_n`, so that
+  `\sum_{n=1}^{3} A_{(n)}` gave `3A_n` after `simplify()`. It now stays a sum,
+  whose value is `A_1+A_2+A_3`. A product index is now written in
+  parentheses, `A_{(mn)}`, because `A_{mn}` reads back as the symbol `A_mn`.
+  `A_{(3)}` is now the symbol `A_3`. `ce.function('Subscript', [ce.symbol('A'), ce.symbol('n')])` now reads the value of `n`: use
+  `ce.symbol('A_n')` for the compound symbol. `["Subscript", "ExponentialE", "n"]`
+  is now the symbol `e_n`, and `i_{k+1}` with `k := 3` is now the symbol `i_4`,
+  as `e_{k+1}` is `e_4`.
+
+### Resolved Issues
+
+- **An Epsil `let` whose name is a library name is a local in the static
+  check too.** `let i = 1` followed by `let y: integer = i` ran and gave `1`,
+  but `executeEpsil` and `checkEpsil` reported the `static-type-error` "The
+  value `i` of type `imaginary` is not compatible with the declared type
+  `integer`": the check read `i` as the imaginary unit. A loop with `i` as the
+  position of an element assignment, `xs[i] = 10 * i`, got the same false error.
+  The check now reads `i`, `e` or `pi` declared by a `let` as the local, as the
+  run does.
+- **The Epsil guide no longer shows `random(n)` with an integer.** The
+  examples of an effect specifier in the pages "Epsil Control Flow", "Epsil
+  Types" and "Inside Epsil" were
+  `function roll(n) random -> integer { random(n) }`.
+  `random` draws from a collection, so `roll(6)` gave an `incompatible-type`
+  error. The examples now use `random(1..n)`, and `roll(6)` gives an integer
+  from 1 to 6.
+- **The error of a numeric integral now includes an inner integral in the body
+  of a function that the integrand calls.** With
+  `F = y ↦ ∫₀¹ e^(−xy)/x^0.99 dx`, `∫₀¹ F(y) dy` gave
+  `99.575857194449625 ± 0.000000000000088`, for a true error of `1.2e-12`. It
+  now gives `99.57585719445 ± 0.00000000011`, as with the inner integral written
+  in the integrand. A result of such an integrand that does not converge no
+  longer uses Monte Carlo, which ran a quadrature for each sample. It stays the
+  quadrature result, or `NaN` when this result has no finite error.
+- **The error of a numeric integral now follows a factor of an inner integral.**
+  The error of the inner integral was added with no factor, so a small factor
+  gave an error much larger than the true one.
+  `∫₀^∞ e^(−y) ∫₀¹ e^(−xy)/x^0.99 dx dy` gave `99.315 ± 0.031` and now gives
+  `99.3149882729 ± 0.0000000086`. `∫₀¹ 10⁻¹² ∫₀¹ e^(−xy)/x^0.99 dx dy` gave an
+  error of `1.1e-10` for the value `9.96e-11`, and now gives an error of
+  `1.1e-22`. An integrand that changes faster than its inner integral, such as
+  its square, now gets a larger error. The error is not changed for an
+  integrand with an effect (`Random()`, an assignment), or with more than four
+  inner integrals.
+- **A later global no longer changes a local of a function when the function is
+  built again.** After `h = n ↦ Block(g := z ↦ 0, z ↦ g(z) + n)`, `g := t ↦ 9`
+  and `Apply(h(1), 0)` each gave the error `incompatible-type` about the `scope`
+  effect. The assignment now succeeds, `Apply(h(1), 0)` gives `1`, and `g(0)`
+  gives `9`. A global that exists when the function is written stays an outer
+  variable of the function, and writing it still needs the `scope` effect.
+- **A closure stored under a declared signature keeps the variables of the call
+  that made it.** With `h = n ↦ Block(g := z ↦ 0, z ↦ g(z) + n)`,
+  `Declare(q, "(real) -> real", h(1))` and `q(0)` gave `1 + g(0)`, and
+  `ce.declare('q', { type: '(real) -> real', value: closure })` did the same;
+  both now give `1`. With `k = n ↦ Block(Declare(g, "(real) -> real", h(n)), z ↦ g(z) + n)`, `k(1)(0)` gave the error `Recursion limit exceeded`, and it
+  now gives `2`. A signature with a `where` clause, such as
+  `(T) -> T where T`, had the same failures. The same programs with the type
+  `unknown` already gave these values.
+- **`Integrate` of a block of several statements no longer reads only the first
+  statement.** `Integrate(Block(c := 2, c * x), Limits(x, 0, 1)).evaluate()` was
+  the error `assignment-in-operand`, and it is now `1`, the value of `.N()`. A
+  block that only assigns local variables before its value is integrated through
+  that value. Any other block, such as one with an `If` statement or one that
+  assigns a variable outside the block, stays unevaluated under `evaluate()`, and
+  `.N()` still gives its numeric value. `toString()` of an integral now shows
+  every statement of the block. `D` now reduces the same blocks:
+  `D(Block(c := 2, c * x), x)` was unevaluated and is now `2`.
+- **A `Which` or an `If` over a list of conditions no longer copies an arm that
+  is a list with no elements to read.** With `L = [1, 3, 5]` and `foo`
+  undeclared, `Which(L < 2, foo(L), True, 0)` was `[foo([1, 3, 5]), 0, 0]`, so a
+  list of 500 elements gave 500 copies of the list at each read. It now stays
+  `Which([True, False, False], foo([1, 3, 5]), True, 0)`, and it selects when
+  `foo` has a definition. An operator that reads the whole list stays around
+  such a selection: with `M` declared `list<number>` and no value,
+  `Length(Which(L < 2, M, True, 0))` was `3` from the wrong list `[M, 0, 0]`, and
+  it now stays `Length(Which([True, False, False], M, True, 0))` until `M` has a
+  value. The same applies to a `Which` whose list condition is not decided:
+  `Length(Which(L < k, L, True, 0))` was a `Which` with an error in an arm.
+- **An assignment to a list element no longer replaces the function `At`.**
+  With `L` a list, `L[k]\coloneq 5` replaced `At` for the whole engine, so that
+  `L[2]` gave `[5, 5, 5]`, and `L[2]\coloneq 5` gave `expected-a-symbol`. Both
+  now rebind `L` with `ReplaceAt` (see Improvements), and `At` keeps its
+  meaning.
+- **`N()` of an integral now reports the error of `evaluate()` when a call head
+  is defined later as a data symbol.** Parse `\int_0^1 g(x)\,dx`, then run
+  `ce.declare('g', 'real')`. `evaluate()` gave the `expected-function` error
+  and `N()` kept the integral unevaluated. `N()` now gives the same error. An
+  integral whose call is in a branch that is not reached keeps its value:
+  `If(x > 2, g(x), x^x)` over `[0, 1]` is still `0.783...` under `N()`.
+- **`D`, `Limit` and `NIntegrate` now report the `expected-function` error when
+  a call head is defined later as a data symbol.** Parse `\frac{d}{dx} g(x)`,
+  then run `ce.declare('g', 'real')` and `ce.assign('g', 5)`. `evaluate()` gave
+  `Apply(Derivative(g, 1), x)`. In the same way, `Limit(x ↦ g(x), 0)` stayed
+  unevaluated and `NIntegrate(x ↦ g(x), 0, 1)` gave `NaN`. All three now give
+  the `expected-function` error, which the same expression gives when it is
+  boxed after the declaration. A call in a branch that no sample reaches keeps
+  the value: `NIntegrate(x ↦ If(x > 2, g(x), x^x), 0, 1)` is still `0.783...`.
+- **The derivative of a function literal no longer takes a free name of a
+  called function for its parameter.** With `a := 3` and `h := x ↦ a·x`,
+  `Apply(Derivative(a ↦ a·h(a)), 2)` was `14`, and it is now `12`. The result
+  renames a parameter when it holds a free name equal to that parameter:
+  `Derivative(a ↦ h(a))` with no value for `a` was `a ↦ a + a`, and it is now
+  `a_1 ↦ a`. When the body also binds that name, as in
+  `a ↦ h(a) + Sum(a, Limits(a, 1, 3))`, the derivative stays unevaluated and
+  `N()` gives its value numerically.
+- **A `Break` or a `Continue` that a shader cannot run now declines on GLSL and
+  WGSL.** `Block(Break(), 1)`, with no loop, reported success with the code
+  `break; return 1.0;`, which the driver refuses. A `Break` in a `Match` case
+  in a `Loop` did the same with `(c ? (break) : (s = k))`. Both now decline, and
+  `run()` uses the interpreter. `Break(f(k))` in a shader `Loop` also declines:
+  the compiled `break` did not evaluate its operand.
+- **A closure assigned to a name keeps reading its own binding of that name.**
+  With `h = n ↦ Block(g := z ↦ 0, z ↦ g(z) + n)` and
+  `k = n ↦ Block(g := h(n), z ↦ g(z) + n)`, `k(1)(0)` gave the error "Recursion
+  limit exceeded", and it now gives `2`. The assignment made the `g` of the
+  closure read the variable being assigned. A function that calls the name it
+  is assigned to is still recursive when that name is the variable being
+  assigned.
+- **A compilation to Python or `interval-js` declines arithmetic over a symbol
+  declared `any` or `value`, as a compilation to JavaScript does.** Such a symbol
+  can hold a list, and compiled code does not test the shape of a value at run
+  time. `Function(2t, t: any)` compiled to `lambda t: 2 * t` on Python, which gives
+  `[1, 2, 1, 2]` for `[1, 2]`, and on `interval-js` it gave an `empty` interval.
+  The compilation now declines with the code `unsettled-shape`, with `t` in
+  `unsupported`, and the interpreter gives `[2, 4]`. This includes programs that
+  gave the correct value, such as `Function(Sin(t), t: any)` on Python and a call
+  with a number. Declare the shape, such as `real` or `list<real>`, to compile
+  them.
+- **A `let` or `const` that is refused keeps the value of the name from an
+  earlier run on the same engine.** `let f = 5` in one run, then
+  `let f: string = 1` in the next, gave an error and left `f` with no value. `f`
+  is now still 5.
+- **`\implies`, `\iff`, `\veebar` and `\barwedge` beside the colon of a brace
+  group stay in the condition, as `\land` and `\lor` do since 0.181.1.**
+  `\{x > 0 \veebar y > 0: 2, 3\}` was a set with `Xor` over a `Colon`, with no
+  diagnostic, and it is now a `Which`. `\{x: x > 0 \implies x > 1\}` is now a
+  set-builder with the condition `x > 0 \implies x > 1`. A brace group with no
+  colon, such as `\{a \implies b\}`, stays a set of one element.
+- **`simplify()` keeps a factor in a `Sum` or a `Product` when the factor reads a
+  library-named index in a nested scope.**
+  `\sum_{i=0}^{n}\sin(\sum_{k=1}^{i}\sin(0.3k))\exp(-i)` moved the sine out of the
+  outer sum, which left `i` free and changed the value at `n = 3` from 0.2594 to
+  1.5489. An index named `i` shadows the imaginary unit, and `simplify()` gave the
+  outer index and the inner bound two different opaque names.
+- **`compile()` lists in `freeSymbols` a name that a called function reads when
+  a local at the call has the same name.** With `ok(c) := 1 / c ≥ minR` defined
+  on the engine and `minR` declared `real`, `Block(let minR = 0.008, ok(4))`
+  compiled with `freeSymbols: []`, although the compiled `ok` reads the input
+  `minR` and not the local. The list is now `["minR"]`, as for `ok(4)` alone.
+  With `minR` not declared, the block compiled, and it now declines with the
+  code `untyped-input`. The same applies when the name is the index of a `Sum`,
+  a `Product` or a `Loop` around the call.
+- **`compile()` no longer lists `DefineFunction` and the name of a local
+  function in `unsupported` for a program that compiled.** The Epsil program
+  `function f(x) { x + 1 }` then `f(2)` compiled to JavaScript with
+  `success: true` and `unsupported: ["DefineFunction", "f"]`, and so did a call
+  of a local bound to a function literal (`const g = (k) => k + 1`). The list of
+  a compilation with `success: true` is now always empty, as documented. When a
+  compilation declines, the list no longer has a name that the expression binds
+  (a local function, a parameter, an index): `(f) ↦ f(2)` gave `["f"]`, and now
+  gives `[]`. It can still name `DefineFunction` beside the operator that caused
+  the decline.
+- **`compile()` no longer lists in `freeSymbols` the names that an engine
+  function reads when a local function of the program has its name.** With
+  `f(t) := t·w` defined on the engine, the program `function f(t) { t + 1 }` then
+  `f(x)` calls its own `f`, and `freeSymbols` was `["w", "x"]`. It is now
+  `["x"]`.
+- **`And`, `Or`, `Nand`, `Nor` and `Implies` of a computed list and a list
+  symbol now give a list.** With `u = [1, 2, 3]` and `c = [True, False, True]`,
+  `And(u > 0, c)` gave the unevaluated
+  `And([True, True, True], [True, False, True])`, and now gives
+  `[True, False, True]`. `And(False, c, u > 0)` gave the scalar `False`, and now
+  gives `[False, False, False]`. When the two lists have different lengths, the
+  result is now the error `incompatible-dimensions`.
+- **The type of a block no longer reads a variable outside the block that has
+  the name of a local of the block.** With `n = [1, 2]`, the type of
+  `Block(Declare(n, "real", 2), n + 1)` was `list<real>`, and its value is `3`.
+  The type is now `real`. In Epsil, with the same `n`, the type of
+  `function f() { let n: real = 2; n + 1 }` was `() -> list<real>` and is now
+  `() -> real`. The values did not change.
+- **The type of an element-wise `If` or `Which` now holds the values of a
+  branch whose elements have an unknown type.** With `L = [1, 3, 5]` and `f`
+  not defined yet, the type of `Which(L < 2, f(L), True, 0)` was
+  `vector<integer^3>`, the type of the other branch alone. When `f` is later
+  defined as `x ↦ x / 2`, the value is `[1/2, 0, 0]`. The type is now
+  `list<unknown^3>`. The same applies to a branch that is a symbol with no
+  type, and to a branch declared `list<unknown>`.
+- **`evaluateAsync()` of a block now reads a local of the block, not a global
+  of the same name, when it tests whether an operand is a list.** With
+  `n := [1, 2]`, `Block(Declare(n, "real", 2), n + 1).evaluateAsync()` did not
+  end, and the process stopped when its memory was full. It now gives `3`, as
+  `evaluate()` does. In the same block, `n = 2` did not end either and now
+  gives `True`.
+
+## 0.181.1 _2026-11-05_
+
+### Resolved Issues
+
+- **`Mandelbrot` and `Julia` give a smooth value that is continuous across
+  iteration boundaries.** The escape test `|z|² > 4` stopped too early for the
+  smoothing formula, so the count jumped by a median of 0.15 at each boundary,
+  which a cyclic color formula shows as arcs. The test still decides inside or
+  outside. The smoothing then iterates further, at most 16 times, until
+  `|z|² > 65536`. This costs about 3 iterations per escaping point, and the
+  values change by a small amount. This applies to `evaluate`, `javascript`,
+  `glsl` and `wgsl`. A jump remains in one case: a slow orbit that does not reach
+  the larger radius in 16 iterations takes the value of its first iterate, which
+  a deep zoom near `c = -2` can show.
+- **A `\land` or a `\lor` beside the colon of a brace group stays in the
+  condition.** `\{m = 1 \land z < 1: 2, 3\}` was the set of
+  `And(m = 1, Colon(z < 1, 2))` and `3`, with no diagnostic, and it is now a
+  `Which` with the condition `m = 1 \land z < 1`. In the same way,
+  `\{x : x > 0 \land x < 1\}` is now a set-builder with the condition
+  `x > 0 \land x < 1`. Outside a brace group, the colon still binds tighter.
+
+## 0.181.0 _2026-11-05_
 
 ### Breaking changes
 
@@ -62,16 +431,19 @@ import ChangeLog from '@site/src/components/ChangeLog';
   the same text. These calls now share one definition, `_fn_P`. The values do
   not change.
 - **A zero times a list or over a list keeps the list.** With `L: list<real>`
-  and no value yet, `0·L` simplified to the scalar `0`, the canonical form of
-  `0/L` was `0`, and `0·L + 1` simplified to `1`. A broadcast that held such a
-  term changed length. These forms now stay as they are, and with
-  `L = [1, 2, 3]` they evaluate to `[0, 0, 0]`, `[0, 0, 0]` and `[1, 1, 1]`.
+  and no value yet, `0·L` and `L - L` simplified to the scalar `0`, the
+  canonical form of `0/L` was `0`, and `0·L + 1` simplified to `1`. A broadcast
+  that held such a term changed length. These forms now stay as a product or a
+  quotient, and with `L = [1, 2, 3]` they evaluate to `[0, 0, 0]`, `[0, 0, 0]`,
+  `[0, 0, 0]` and `[1, 1, 1]`. A type that only may hold a list still folds to
+  `0`: `sin(f(x)) - sin(f(x))` with `f` undeclared is `0`.
 - **`simplify()` keeps `|arcsin(x)|`, `|arccsc(x)|`, `|artanh(x)|` and
   `|arcoth(x)|`.** It rewrote `|f(x)|` as `f(|x|)`, which is complex where `f`
   is not real: `|arcsin(2)|` is `2.05`, and `arcsin(|2|)` is `1.57 - 1.32i`. The
   result was also typed complex, so that a compiled comparison of it declined.
   The rewrite stays for the functions that are real on the whole real axis, such
-  as `arctan` and `arsinh`.
+  as `arctan` and `arsinh`, and it no longer applies to a symbol declared
+  complex: `|sinh(i)|` is `0.84`, and `sinh(|i|)` is `1.18`.
 - **`evaluate()` and `simplify()` no longer overflow the stack on a lazy operator
   over an operand that evaluates to itself.** A `Map` over
   `Range(0, Length(At(u, i)) - 1)` with a length that is not known replaced the

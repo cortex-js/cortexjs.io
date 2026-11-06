@@ -535,6 +535,8 @@ property.
 | `unexpected-argument`          | too many arguments provided                                                                                      |
 | `expected-argument`            | not enough arguments provided                                                                                    |
 | `expected-expression`          | an expression was expected inside an enclosure (parentheses)                                                     |
+| `assignment-to-list-element`   | `d["x"] := v` with a string index, `L[k] := v` in a `let` statement or a `where` item, and `n_{k} := v` outside a block are not supported; `L[k] := v` alone is `L := ReplaceAt(L, k, v)`, and gives this error at evaluation when `L` has no value |
+| `assignment-to-library-function` | `a+b := v`, `\sin(x) := v` and `N_n := v` are not supported: the assignment would replace a function of a library; declare the name first with `ce.declare()` to replace it |
 | `expected-set-builder-separator` | a set builder `\{x \| …\}` uses a bar as the separator; write `\mid` or `:` instead                            |
 | `unexpected-command`           | the command is unknown, or not applicable in the current parsing context                                         |
 | `unexpected-token`             | the character does not apply to the current parsing context                                                      |

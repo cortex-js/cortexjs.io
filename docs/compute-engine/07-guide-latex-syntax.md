@@ -391,7 +391,22 @@ console.log(ce.parse("a + b \\keyword{where} a \\coloneq 1, b \\coloneq 2").json
 Each binding declares its name with a value. A binding is a statement, so it
 cannot be an operand: `f(a \coloneq 2)` is the error `assignment-in-operand`,
 and `a \coloneq b \coloneq 1` is the syntax error `chained-assignment`. Write
-two statements instead.
+two statements instead. A binding declares a new name, so a list element is not
+a binding: `L[k] \coloneq 5` in a `where` item is the syntax error
+`assignment-to-list-element`.
+
+A target that is a function of a library, such as `a + b \coloneq 5`,
+`\sin(x) \coloneq 5` or `N(x) \coloneq x + 1`, is the syntax error
+`assignment-to-library-function`: the assignment would change every later use of
+the function. To replace a library function, declare the name first, with
+`ce.declare('N', 'function')`. A value that is not a function is a variable:
+`N \coloneq 5` gives `5`.
+
+A subscript on a library function is the same error when the assignment would
+define the function or a sequence with its name: `N_n \coloneq n + 1` and the
+recurrence `N_n \coloneq N_{n-1} + 1`. A term of a sequence alone
+(`N_0 \coloneq 1`) stays valid, and so does a local with such a name in a block:
+`N_n \coloneq 5; N_n + 1` gives `6`.
 
 ### Loops
 
@@ -422,6 +437,49 @@ branch. A use of a name before its declaration is the error
 `read-before-declaration`. A later assignment must keep the type of the local
 (a number can become another number, not a string); otherwise it is the error
 `assignment-type-mismatch`.
+
+An assignment to a list element, `L[k] \coloneq v`, gives the list a new value
+with the element replaced: it is `Assign(L, ReplaceAt(L, k, v))`. It does not
+declare a local, so it changes the list that is in scope:
+
+```live
+console.log(ce.parse("L \\coloneq [10, 20, 30]; L[2] \\coloneq 5; L").json);
+// ➔ ["Block", ["Declare", "L", "'unknown'", ["List", 10, 20, 30]],
+//             ["Assign", "L", ["ReplaceAt", "L", 2, 5]],
+//             "L"]
+
+console.log(ce.parse("L \\coloneq [10, 20, 30]; L[2] \\coloneq 5; L").evaluate().json);
+// ➔ ["List", 10, 5, 30]
+```
+
+A matrix element is `M[j, i] \coloneq v` or `M[j][i] \coloneq v`, which is
+`Assign(M, ReplaceAt(M, j, i, v))`. Lists have value semantics: after
+`A \coloneq L`, the assignment `L[1] \coloneq 5` does not change `A`. A string
+index (`d["x"] \coloneq 5`) is the syntax error `assignment-to-list-element`,
+because `ReplaceAt` refuses a string index, and a list that is a function of a
+library (`N[1] \coloneq 5`) is the syntax error `assignment-to-library-function`.
+
+A write that cannot give a list is an error, and the variable keeps its value.
+An index that is zero, not an integer or past the end is the error
+`out-of-range`:
+
+```live
+console.log(ce.parse("L \\coloneq [10, 20, 30]; L[5] \\coloneq 1; L").evaluate().json);
+// ➔ ["Error", ["ErrorCode", "'out-of-range'", "'an index in 1..3 or -3..-1'", "'5'"]]
+```
+
+A variable with no value as the target is the error
+`assignment-to-list-element`, and a number as the target is the error
+`incompatible-type` that `ReplaceAt` gives. A string or a tuple is written as
+`ReplaceAt` writes it, and gives a list. An index with no
+numeric value (`L[k] \coloneq 5` with `k` unknown) leaves the write
+unevaluated, and `L` holds it.
+
+The subscript spelling of an element is not an assignment to the list: in a
+block, `n_{1} \coloneq 7` declares the local `n_1`, also when `n` is a list,
+and `n_{1}[1] \coloneq 9` changes that local. Outside a block,
+`n_{1} \coloneq 7` is the syntax error `assignment-to-list-element`: write
+`n[1] \coloneq 7` to change the list `n`.
 
 <ReadMore path="/compute-engine/reference/control-structures/" >
 Read more about the **control structure** operators.

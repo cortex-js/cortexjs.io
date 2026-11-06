@@ -1185,12 +1185,18 @@ ce.assign("bump", ce.box(["Function",
   ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"]));
 ```
 
-The same refusal applies when the function is the `value` of a declaration in
-the global scope: `ce.declare("f", { type: "(number) -> number", value })`, or
-`{ value }` with no type, whether `value` is a boxed expression, MathJSON,
-LaTeX or a function that returns one. A literal that states its own effects
+The same refusal applies when the function is the `value` of a declaration, in
+any scope, including a scope from `ce.pushScope()`:
+`ce.declare("f", { type: "(number) -> number", value })`, or `{ value }` with no
+type, whether `value` is a boxed expression, MathJSON, LaTeX or a function that
+returns one. A literal that states its own effects
 (`(number) scope -> number` on the literal) is accepted when its body keeps to
 them.
+
+A `Declare` statement, which is also a top-level `let` or `const` in Epsil,
+gives an `incompatible-type` error value for such a literal when the literal is
+written in the statement and the binding is in the global scope or in a scope
+from `ce.pushScope()`. A local of a `Block` or of a function body is not refused.
 
 An **anonymous** literal is not gated — it has no annotation surface, and its
 arrow carries the inferred `scope` honestly — so a factory that returns a
@@ -1307,6 +1313,33 @@ boolean, or a list or tuple of these): with `g` declared
 an error pass unchanged; a real float passes under `integer` or `rational`.
 Compiled code does not make this check. Assigning a typed literal to a symbol
 gives that symbol the annotated signature, including the return type.
+
+A function assigned to a symbol declared with a signature checks each argument
+against the declared parameter type when it is called. When an argument has no
+value yet and its type does not decide the check, the call stays unevaluated,
+and a later evaluation checks the value:
+
+```js
+ce.declare("h", "(integer) -> integer");
+ce.assign("h", ce.box(["Function", ["Multiply", 2, "k"], "k"]));
+
+const call = ce.box(["h", "m"]).evaluate();
+call.json;                 // ➔ ["h", "m"]
+ce.assign("m", 1.5);
+call.evaluate();           // ➔ incompatible-type error
+```
+
+The same rule applies to a parameter annotated on the literal, with
+`["Typed", "k", "'integer'"]` as the parameter. A literal applied directly, or
+given as a callback, stays as an inert `Apply` of the literal.
+
+Declare the argument to apply the body: with `n` declared `integer`, `h(n)` gives
+`2n`. At a parameter that admits every real number (`real`, `number`), the body
+is also applied to a symbol with no declared type: with `f` declared
+`(real) -> real` and the body `x^2`, `f(x)` gives `x^2`. A later value outside
+the parameter type is not checked in that result. An expression whose type does
+not fit the parameter stays: `f(x + 1)` stays while `x` has neither a declared
+nor an inferred type, because the type of `x + 1` is then `number`.
 
 When a function literal is assigned to a symbol declared with a signature,
 the declared result is ascribed to the body. A body whose inferred type is

@@ -3024,6 +3024,8 @@ string:
 
 <Signature name="ReplaceAt" returns="collection">_collection_, _index_:integer, _value_:any</Signature>
 
+<Signature name="ReplaceAt" returns="collection">_collection_, ..._indexes_:integer, _value_:any</Signature>
+
 Return a new collection with the element at the 1-based `index` replaced by
 `value`. Negative indices count from the end (`-1` is the last element).
 
@@ -3035,8 +3037,30 @@ Return a new collection with the element at the 1-based `index` replaced by
 // ➔ ["List", 1, 2, 99]
 ```
 
+With more than one position, as `At` takes them, the last operand is the value
+and each position selects one level of a nested collection:
+
+```json example
+["ReplaceAt", ["List", ["List", 1, 2], ["List", 3, 4]], 2, 1, 9]
+// ➔ ["List", ["List", 1, 2], ["List", 9, 4]]
+
+["ReplaceAt", ["List", ["List", 1, 2], ["List", 3, 4]], -1, -1, 9]
+// ➔ ["List", ["List", 1, 2], ["List", 3, 9]]
+```
+
 Collections are immutable; the input is not modified. An out-of-range or
-symbolic index leaves the expression unevaluated.
+symbolic index, at any level, leaves the expression unevaluated. More positions
+than the collection has levels give an `incompatible-type` error.
+
+A write does not change the length of a list: when the value fits the element
+type, the result has the type of the operand, so `ReplaceAt` over a `vector<3>`
+is a `vector<3>`. Otherwise the element type widens to include the value, and
+the result type has no length.
+
+The form with more than one position compiles to JavaScript only, and only when
+the type of the collection shows a list at each level it writes: a
+`list<list<number>>` or a `matrix` compiles, and a `list<any>` or a list that
+can hold a string or `Missing` as a row does not.
 
 </FunctionDefinition>
 

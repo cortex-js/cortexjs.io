@@ -223,6 +223,43 @@ When a `Divide` expression has a denominator already in factored form (a product
 <ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
 <strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
+## Sums and Products with a Symbolic Bound
+
+`simplify()` gives the closed form of a sum or a product whose upper bound is a
+symbol, as in Mathematica:
+
+```live
+ce.parse('\\sum_{k=1}^n 3').simplify().latex;
+// ➔ "3n"
+
+ce.parse('\\prod_{k=1}^n 3').simplify().latex;
+// ➔ "3^{n}"
+
+ce.parse('\\sum_{k=1}^n k').simplify().latex;
+// ➔ "\frac{n^2+n}{2}"
+```
+
+The closed form is the value of the sum when \\(n\\) is an integer and
+\\( n \ge 0 \\). For another value it can differ from `evaluate()`, which gives
+\\(0\\) for the empty sum of a reversed range, and rounds a bound that is not an
+integer down:
+
+```live
+const sum = ce.parse('\\sum_{k=1}^n 3');
+sum.subs({ n: -4 }).evaluate().json;
+// ➔ 0
+sum.simplify().subs({ n: -4 }).evaluate().json;
+// ➔ -12
+
+sum.subs({ n: 2.5 }).evaluate().json;
+// ➔ 6
+sum.simplify().subs({ n: 2.5 }).evaluate().json;
+// ➔ 7.5
+```
+
+If \\(n\\) can be negative or not an integer, do not simplify the sum. A bound
+that is a number is decided: \\( \sum_\{k=1\}^\{-4\} 3 \\) simplifies to \\(0\\).
+
 ## Undefined Points and Lists
 
 `simplify()` can remove the points where an expression has no value. For

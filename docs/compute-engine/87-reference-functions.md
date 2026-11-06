@@ -500,6 +500,19 @@ The literal then types as a **named signature** — the example above has type
 `(x: integer) -> integer` — and, in strict mode, its arguments are checked
 against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#typed)).
 
+An argument with no value yet, whose type does not show that it fits, leaves
+the application unevaluated, and a later evaluation checks the value. At a
+parameter that admits every real number, the body is applied to a symbol with no
+declared type.
+
+```json example
+["Apply", ["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]], "m"]
+// ➔ ["Apply", ["Function", ["Block", ["Add", "x", 1]], ["Typed", "x", "'integer'"]], "m"]
+
+["Apply", ["Function", ["Power", "x", 2], ["Typed", "x", "'real'"]], "y"]
+// ➔ ["Power", "y", 2]
+```
+
 A call with `Missing` at a parameter declared as a number or a point gives
 `Missing`, and the body does not run. A default value does not change this: a
 default fills only an argument that the call leaves out. A `NaN` at a numeric

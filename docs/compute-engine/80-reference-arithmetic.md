@@ -302,10 +302,20 @@ closed form.
 | $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
-- Empty range (upper < lower): returns `0`, or a vector of `0` when the
-  body is a vector of a known length (`[0, 0, 0]` for `vector<real^3>`)
+- Empty range (upper < lower, with number bounds): returns `0`, or a vector of
+  `0` when the body is a vector of a known length (`[0, 0, 0]` for
+  `vector<real^3>`)
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 - Nested sums: inner sums are simplified first, enabling cascading simplification
+
+A closed form with a symbolic upper bound is the generic answer, as in
+Mathematica. It applies with no proof that the range is not reversed, and it
+gives the value of the sum when the upper bound is an integer that is at least
+the lower bound minus 1. For another value it can differ from `evaluate()`:
+`\sum_{k=1}^n 3` simplifies to `3n`, which is `-12` at `n = -4` where the sum is
+the empty sum `0`, and `7.5` at `n = 2.5` where the sum is `6`. If the bound can
+have such a value, do not simplify the sum. `Product` works in the same way:
+`\prod_{k=1}^n 3` simplifies to `3^n`.
 
 #### Infinite Series
 
@@ -437,8 +447,9 @@ closed form.
 | $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
-- Empty range (upper < lower): returns `1`, or a vector of `1` when the
-  body is a vector of a known length (`[1, 1, 1]` for `vector<real^3>`)
+- Empty range (upper < lower, with number bounds): returns `1`, or a vector of
+  `1` when the body is a vector of a known length (`[1, 1, 1]` for
+  `vector<real^3>`)
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 
 The Wallis-like product is also given its closed form by `evaluate()`, for any

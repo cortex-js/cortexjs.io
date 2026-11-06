@@ -1477,6 +1477,21 @@ Complex subscripts (containing operators, commas, or parentheses) create
 | `a_{n+1}` | `["Subscript", "a", ["Add", "n", 1]]` | Expression subscript |
 | `a_{n,m}` | `["Subscript", "a", ["Sequence", "n", "m"]]` | Multi-index |
 | `A_{(n+1)}` | `["Subscript", "A", ["Add", "n", 1]]` | Parentheses indicate expression |
+| `A_{(n)}` | `["Subscript", "A", ["Delimiter", "n"]]` | The index is the value of `n`, not the name `n` |
+| `A_{n+0}` | `["Subscript", "A", ["Delimiter", "n"]]` | The canonical form of the index is the symbol `n` |
+| `A_{(3)}` | `A_3` | The canonical form of the index is a number |
+
+The index is in canonical form, so a free `i` is the imaginary unit:
+`A_{i+1}` holds `["Complex", 1, 1]`. Declare `i` to use it as a variable.
+
+`A_{(n)}` keeps its parentheses because `["Subscript", "A", "n"]` is the
+compound symbol `A_n`. The two forms have different values in a sum:
+`\sum_{n=1}^{3} A_{(n)}` gives `A_1+A_2+A_3`, and `\sum_{n=1}^{3} A_{n}` gives
+`3A_{n}`. When you read the index of this form with `.op2`, you get
+`Delimiter(n)`, and its value is the value of `n`.
+
+A product index is written in parentheses, `A_{(mn)}`, because `A_{mn}` is the
+compound symbol `A_mn`.
 
 These `Subscript` expressions can be used in arithmetic operations:
 

@@ -552,6 +552,35 @@ The two standalone runtimes have the same batch forms:
 carries `runtimeVersion`, `preambleOnce` and `preamblePerCall` for them, as a
 `javascript` result does.
 
+### Limiting Loops: `iterationBudget`
+
+A compiled `Loop` has no time check, so a loop that does not end stops the page
+that runs it, also under `ce.withTimeLimit()`. When you run a document that you
+did not write, set a limit when you compile it:
+
+```js
+const expr = ce.box(['Block', ['Assign', 'k', 0],
+  ['Loop', ['Assign', 'k', ['Add', 'k', 1]]], 'k']);
+const { run } = compile(expr, { iterationBudget: 1e6 });
+run({}); // throws a CancellationError, cause 'iteration-limit-exceeded'
+```
+
+Each iteration of a `Loop` adds one to one total for a call of the compiled
+code, including nested loops and loops in the bodies of user functions. The next
+call starts at 0. The limit is a count and not a time, so it stops at the same
+pass on every machine. To get a time limit, measure the cost of a pass.
+
+- `javascript` and `interval-js` throw. Stored code that you run with
+  `createJavaScriptRuntime()` or `createIntervalRuntime()` keeps the limit.
+- `broadcast()` gives `NaN` for a cell over the limit, as for any error of a
+  cell. Each cell has its own count, so a batch costs up to cells × budget.
+- `python` declines a program with a `Loop` when the option is set.
+- `glsl` and `wgsl` do not change: the bounds of a shader loop are known when the
+  shader is compiled.
+- A `Sum` or `Product` over the budget gives `NaN` and does not throw.
+
+Without the option, the compiled code has no check.
+
 ### Constant Folding
 
 A **pure** subexpression with no free variables is evaluated at compile time
@@ -650,7 +679,10 @@ three things happened:
 | ``Unknown operator `X` ``                                     | No operator definition for `X` at all — a typo, or a symbol never declared as a function   |
 
 `CompilationResult.unsupported` lists the same heads declaratively, so a caller
-can branch on the condition without parsing the message.
+can branch on the condition without parsing the message. The list is empty when
+`success` is `true`. A name that the expression binds (a local function, a
+parameter of a function literal, an index) is never in the list: when a call of
+such a name declines, only the message names it.
 
 ### Inputs With No Type and Values With No Settled Shape
 
@@ -689,6 +721,11 @@ parameter of a function is not an input, so `t ↦ 2t` compiles.
   shape: `Block(p ≔ [1, 2]; p ≔ [1, 2, 3]; p)` compiles. A declared type that
   is a union of shapes (`real | list<real>`) compiles with one body per
   member.
+- Arithmetic over a symbol declared `any` or `value`, on the `javascript`,
+  `python` and `interval-js` targets. Such a symbol can hold a number or a list.
+  `(t: any) ↦ 2t` declines, and `unsupported` holds `t`. With the fallback, the
+  interpreter gives `[2, 4]` for `[1, 2]`. Declare the shape, such as `real` or
+  `list<real>`, to compile it.
 - A function literal that assigns a name of an enclosing scope (a callback, a
   stored function, a user function that the code calls).
   `Block(p ≔ 0; Filter(L, u ↦ Block(p ≔ 5, u > 1)); p)` declines. The root of
@@ -1228,6 +1265,47 @@ const sum = compile("s \\coloneq 0; \\keyword{for} i \\keyword{from} 1 \\keyword
 console.log(sum.success, sum.run());
 // ➔ true 385
 ```
+
+On JavaScript, a loop that updates a block local with `xs = ReplaceAt(xs, i, v)`
+copies the list once, at the first update, and then writes it in place. This is
+not possible when the list has another name or is used in a way that could see
+a write, for example `ys = xs` in the loop or a function literal that reads
+`xs`. Each pass of the loop then copies the whole list, and the result reports
+it in `warnings`, with the code `'copying-list-update'` and the name of the
+local in `binding`. The code does not change. An update that is not in a loop,
+which copies once, is not reported; nor is the Python target, which always
+copies a block local.
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+ce.declare('L', 'list<real>');
+const double = ['Assign', 'xs',
+  ['ReplaceAt', 'xs', 'i', ['Multiply', 2, ['At', 'xs', 'i']]]];
+const loop = ['Loop', double, ['Element', 'i', ['Range', 1, ['Length', 'L']]]];
+
+const inPlace = compile(ce.box(['Block',
+  ['Declare', 'xs', "'list<real>'", 'L'], loop, 'xs']));
+console.log(inPlace.run({ L: [1, 2, 3] }), inPlace.warnings);
+// ➔ [2, 4, 6] undefined
+
+const copying = compile(ce.box(['Block',
+  ['Declare', 'xs', "'list<real>'", 'L'],
+  ['Declare', 'f', "'function'", ['Function', ['Sum', 'xs']]],
+  loop, ['f']]));
+console.log(copying.run({ L: [1, 2, 3] }));
+// ➔ 12
+console.log(copying.warnings.map((w) => [w.code, w.binding]));
+// ➔ [["copying-list-update", "xs"]]
+```
+
+On GLSL and WGSL, `Break` and `Continue` compile as a statement of a `Loop`
+body, alone or as the branch of an `If` with no else. So
+`If(a > 3, Break())` in the body gives `if (3.0 < a) { break; }`, and a formula
+can stop as soon as its value is known. Any other position declines: an `If`
+with an else branch, a `Break` with a value, a jump in a value, a jump in a
+`Match` case, and a jump with no enclosing `Loop`. A `Return` in a loop on these
+targets also declines.
 
 #### `Comprehension`
 

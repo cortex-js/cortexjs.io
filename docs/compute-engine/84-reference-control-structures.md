@@ -264,7 +264,10 @@ gives the value of that position. The rules:
 - **An expression that is a list gives its element at the position**; an
   expression that is not a list gives its own value at every position. In the
   second example, position 1 takes element 1 of `L`, and the other positions
-  take `0`.
+  take `0`. When a selected expression has the type of a list but its elements
+  cannot be read yet, the selection stays symbolic: with `foo` undeclared,
+  `["Which", ["Less", "L", 2], ["foo", "L"], "True", 0]` stays
+  `["Which", ["List", "True", "False", "False"], ["foo", ["List", 1, 3, 5]], "True", 0]`.
 - **A condition that is not a list applies to every position**:
   `["Which", ["List", "True", "False"], 1, "True", 3]` is `[1, 3]`.
 - **Every list must have the length of the condition**, else the value is an
