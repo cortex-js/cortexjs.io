@@ -882,6 +882,63 @@ Both _m_ and _n_ must be positive integers.
 </FunctionDefinition>
 
 <nav className="hidden">
+### Zeros
+</nav>
+<FunctionDefinition name="Zeros">
+
+<Signature name="Zeros">_d1_, _d2_, ...</Signature>
+
+Creates a list or a tensor filled with zeros. Each argument is the length of
+one axis: one argument gives a list, two arguments give a matrix, three
+arguments give a tensor of rank 3. In Epsil, the function is written `zeros`.
+
+```json example
+["Zeros", 3]
+// ➔ ["List", 0, 0, 0]
+
+["Zeros", 2, 3]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+
+["Zeros", 2, 2, 2]
+// ➔ ["List", ["List", ["List", 0, 0], ["List", 0, 0]], ["List", ["List", 0, 0], ["List", 0, 0]]]
+```
+
+With one argument, `Zeros` gives a list: `["Zeros", 3]` has 3 elements, while
+`["ZeroMatrix", 3]` is a 3×3 matrix.
+
+An argument of 0 or less gives an empty axis: `["Zeros", 0]` is
+`["List"]`. With a symbolic argument, the expression stays unevaluated. A
+tensor with more than 10,000 elements is returned as a lazy collection: its
+elements are not created before they are read.
+
+`Zeros` is the same as
+[`Fill`](/compute-engine/reference/collections/#fill) with the value 0.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Ones
+</nav>
+<FunctionDefinition name="Ones">
+
+<Signature name="Ones">_d1_, _d2_, ...</Signature>
+
+Creates a list or a tensor filled with ones. The arguments are the same as
+for [`Zeros`](#zeros). In Epsil, the function is written `ones`. `Ones` is
+the same as [`Fill`](/compute-engine/reference/collections/#fill) with the
+value 1.
+
+```json example
+["Ones", 3]
+// ➔ ["List", 1, 1, 1]
+
+["Ones", 2, 3]
+// ➔ ["List", ["List", 1, 1, 1], ["List", 1, 1, 1]]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### OnesMatrix
 </nav>
 <FunctionDefinition name="OnesMatrix">
