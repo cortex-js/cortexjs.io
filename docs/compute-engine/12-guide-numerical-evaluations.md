@@ -274,6 +274,26 @@ working precision, so `["Add", ["N", "Pi", 30], 1]` evaluates to
 [`N`](/compute-engine/reference/core/#n) describes the precision and accuracy
 goals `["N", expr, ["List", p, a]]`.
 
+:::warning[Use one engine per program]
+The precision of the arbitrary-precision arithmetic is shared by every
+`ComputeEngine` instance in the program. Each time an engine is created, or
+the `precision` of an engine is set, that precision applies to all the
+engines. A program that creates two engines with different precisions gets
+the precision of the last write in both:
+
+```js
+const a = new ComputeEngine();
+a.precision = 60;
+const b = new ComputeEngine();
+b.precision = 21;
+a.parse('\\sqrt{2}').N().toString();
+// ➔ 1.4142135623730950488 (20 digits, not 60)
+```
+
+Use one engine per program, and change its `precision` when a computation
+needs more digits.
+:::
+
 
 ### Machine Precision
 
