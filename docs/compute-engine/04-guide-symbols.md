@@ -16,9 +16,10 @@ an expression.
 **To change the value or type of a symbol**, use the `value` and `type`
 properties of the symbol.
 
-A symbol does not have to be declared before it can be used. The type of a
-symbol will be inferred based on its usage or its value. If its type cannot be
-inferred, the type will be `unknown`.
+A symbol does not have to be declared before it can be used. The type of an
+undeclared symbol in an expression is the type that its use in that expression
+requires, and the type of a symbol with a value is inferred from its value.
+Otherwise the type is `unknown`.
 
 ```live show-line-numbers
 const n = ce.expr("n");
@@ -148,30 +149,65 @@ To limit either declaration to part of a computation, declare it inside a
 scope (see [Scope](#scope)); the constant is restored when the scope is
 exited.
 
-## Automatic Declaration
+## Undeclared Symbols
 
-An unknown symbol is automatically declared when it is first used in an
-expression.
-
-The symbol has a type of `unknown` and no value associated with it,
-so the symbol will be an **unknown**.
+Parsing or boxing an expression does not declare its symbols. A symbol with
+no definition has no value, so it is an **unknown**, and it is evaluated with
+the definition that the symbol has when the expression is evaluated.
 
 ```js
 const symbol = ce.expr("m"); // m for mystery
 console.log(symbol.type);
 // ➔ "unknown"
+console.log(ce.lookupDefinition("m"));
+// ➔ undefined
 
 ce.assign("m", 5);
 console.log(ce.symbol("m").type);
 // ➔ "integer"
 ```
 
-The inferred type is `integer`, not `"finite_integer"`: the numeric types are
-finite by default, so bare `integer` already promises a finite whole number.
+The inferred type is `integer`: the numeric types are finite by default, so
+`integer` promises a finite whole number.
 
-If the type of a symbol is inferred from its usage, the type can be 
-adjusted later as further information is provided. However, if the type is
-provided in the declaration, the type cannot be changed later.
+The type that the uses of a symbol require is kept with the expression. The
+`x` of `x + 1` has the type `number`, but the expression declares nothing, so
+another expression does not read that type:
+
+```js
+const expr = ce.parse("x + 1");
+console.log(expr.op1.type.toString());
+// ➔ "number"
+console.log(ce.box("x").type.toString());
+// ➔ "unknown"
+```
+
+**To declare the symbols of some expressions with the types that their uses
+require**, use `ce.infer()`. It declares each symbol that has no declared type
+in the scope where a declaration of the name would go, marked as inferred, and
+returns what it declared and what it skipped:
+
+```js
+const a = ce.parse("x + 1");
+const b = ce.parse("x > 1");
+ce.infer([a, b]);
+// ➔ { declared: [{ name: "x", type: number, … }], skipped: [] }
+console.log(ce.box("x").type.toString());
+// ➔ "number"
+```
+
+The order of the expressions does not change the result. A symbol whose uses
+conflict is not declared and is reported in `skipped`, with the reason
+`"conflict"`: in `x + 1` and `x(3)`, `x` is a number and a function. The
+other reasons are `"untyped"` (no use requires a type), `"defined"` (the
+symbol has a declared type) and `"out-of-scope"`.
+
+An expression reads a declaration made after it was created: after
+`ce.declare("x", "string")`, the `x` of `expr` above has the type `string`.
+
+An inferred type can be adjusted later as further information is provided.
+However, if the type is provided in the declaration, the type cannot be
+changed later.
 
 
 

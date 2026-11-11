@@ -222,6 +222,7 @@ through, so the failure site is still recoverable.
 console.log(ce.parse('\\ln(\\text{a}) + 2').evaluate().json);
 // ➔ ["Error",
 //      ["ErrorCode", "'incompatible-type'", "'number'", "'string'"],
+//      "'a'",
 //      ["ErrorTrace", ["ErrorFrame", "'Ln'", 1], ["ErrorFrame", "'Add'", 1]]]
 ```
 
@@ -318,8 +319,11 @@ To bind a symbol to a definition, the Compute Engine looks up the bindings table
 of the current scope. If the symbol is not found in the table, the parent 
 scope is searched, and so on until a definition is found.
 
-If no definition is found, the symbol is declared with a type of
-`unknown`, or a more specific type if the context allows it.
+If no definition is found, the symbol is not declared: it stays unbound, and
+it is bound again each time the expression is evaluated, so it reads a
+definition made later. Its type in the expression is the type that its uses
+there require (`number` for the `x` of `x + 1`), or `unknown`. `ce.infer()`
+declares such symbols with those types.
 
 ```mermaid
 flowchart TD
@@ -327,7 +331,7 @@ flowchart TD
   cur -- "not found" --> parent["enclosing scopes,<br/>innermost first"]
   parent -- "not found" --> global["global scope<br/>(user definitions)"]
   global -- "not found" --> system["system scope<br/>(the standard library)"]
-  system -- "not found" --> auto["declared with type unknown,<br/>or a more specific type<br/>if the context allows it"]
+  system -- "not found" --> auto["no definition: the symbol<br/>is bound when it is evaluated"]
   cur -- found --> def["definition record"]
   parent -- found --> def
   global -- found --> def
@@ -377,6 +381,45 @@ the free `a` resolves, the bound `x` does not.
 
 To use an assumption instead of a value (which *does* inform simplification and
 solving), use `ce.assume()` rather than `ce.assign()`.
+
+### Temporary Values
+
+`ce.withValues(values, fn)` gives symbols a value only while `fn` runs. When
+`fn` returns or throws, each symbol gets back its earlier value and type.
+While `fn` runs, every expression reads the values: an expression created
+before the call, an expression created inside `fn`, and the body of a stored
+function.
+
+```js
+ce.declare('a', 'real');
+const expr = ce.parse('a + 1');
+ce.withValues({ a: 3 }, () => expr.evaluate()).print();
+// ➔ 4
+expr.evaluate().print();
+// ➔ a + 1
+
+ce.parse('f(x) := x + a').evaluate();
+ce.withValues({ a: 1 }, () => ce.parse('f(2)').evaluate()).print();
+// ➔ 3
+```
+
+A value is checked as `ce.assign()` checks it: a value that the declared type
+of the symbol does not admit throws. The value `undefined` gives the symbol no
+value while `fn` runs, but a value that an assumption gives
+(`ce.assume(ce.parse('a = 3'))`) still applies. A constant, a symbol bound to a
+function definition, a value that is a function, and a value that `ce.assign()`
+refuses throw before any symbol gets a value.
+
+Unlike `ce.checkpoint()` and `ce.restore()`, which are deprecated,
+`ce.withValues()` can be called
+during an evaluation, for example in the `evaluate` handler of an operator.
+`fn` must be synchronous: the earlier values are put back when `fn` returns,
+before a promise that it returns settles.
+
+When putting back an earlier value fails, the error is thrown after every
+other value is put back. If `fn` threw too, `ce.withValues()` throws an
+`AggregateError`: its `errors` are the error of `fn` and the error of the
+restore, in this order, and its `cause` is the error of `fn`.
 
 ### Function Calls Are Bound Lexically
 

@@ -122,7 +122,8 @@ ce.parse("x").isGreater(0);
 
 ## Type Inference from Assumptions
 
-The type of a symbol is automatically inferred from assumptions:
+The type of a symbol is automatically inferred from assumptions.
+`ce.assume()` declares the symbols that it constrains:
 
 ```js
 ce.assume(ce.parse("x > 4"));

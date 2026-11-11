@@ -520,6 +520,33 @@ example:
 - prefer using `"Sum"` rather than **U+2211 `∑` N-ARY SUMMATION**, which can
   be visually confused with **U+03A3 `Σ` GREEK CAPITAL LETTER SIGMA**.
 
+### Library Names Shadowed by a Local Definition
+
+A symbol reads the definition of its name in the scope where it is read. A
+local definition can shadow a name of the standard library: in a block where
+`Pi` is declared and assigned `3`, the symbol `"Pi"` is `3`.
+
+The expression `["Module", name]` is the definition of `name` in the standard
+library, whatever the scope defines. A call of a library function is
+`["Apply", ["Module", name], ...arguments]`:
+
+```json
+["Add", ["Module", "Pi"], "Pi"]
+// ➔ π + 3 in the block above
+
+["Apply", ["Module", "Floor"], 2.5]
+// ➔ 2, also where a user function `Floor` is defined
+```
+
+The Compute Engine writes these forms in the MathJSON of an expression (`.json`
+and `toMathJson()`) only in a scope where the bare name would read another
+definition. So the MathJSON of a result, read again in that scope, has the same
+value. Outside such a scope, the bare name is written. A name that the library
+does not define is the error `["Error", "'not-a-library-name'", name]`. Where
+a user function shadows the name of a library function, a qualified call of it
+is the call of the library function, and the library rules apply to it, also
+for a library function that holds or binds its arguments (`Sum`, `If`).
+
 ---
 
 The following naming convention for wildcards, variables, constants and function

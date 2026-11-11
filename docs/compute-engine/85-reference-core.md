@@ -401,7 +401,7 @@ entries present depend on what the operand is; keys include:
 The `type` entry is the constant's precise static type, so a numeric constant
 reports the `real` tier narrowed to the range that encloses its value, not a
 bare tier name. Note that `real` here means a **finite** real: the numeric
-types are finite by default, and the spelling `finite_real` has been retired.
+types are finite by default.
 
 Since the result is a dictionary, individual entries are addressable:
 `["At", ["About", "Pi"], "'type'"]` evaluates to the string
@@ -511,8 +511,7 @@ Evaluate to the type of _expression_, as a type value.
 
 The result is the expression's **literal type** — the most precise claim
 available about the value, here the number itself. Its widening tier is
-`real`, which since the finite-by-default flip denotes a *finite* real; the
-retired spelling `finite_real` is no longer produced.
+`real`, which denotes a *finite* real.
 
 <ReadMore path="/compute-engine/guides/types" >Read more about the
 **type system**. </ReadMore>
@@ -899,6 +898,33 @@ the solutions as if it were the answer. For example,
 stay unevaluated, because the solver finds `1` and `2`, but not the other
 solutions.
 
+**An equation with a decimal number.** The engine compares two numbers within
+its tolerance (`ce.tolerance`, `1e-10` by default), so `10 = 10.0000000000001`
+is `True`. Over the real or the complex numbers (an `Interval`,
+`RealNumbers`, a declared `real` type, or no domain), `Solve` does not use
+this tolerance: the solutions are the exact roots of the equation, with its
+decimal numbers as they are written. A value at which the equation is only
+`True` within the tolerance is not a solution. Thus, when the domain or the
+real type removes every exact root, the result is the empty list:
+
+```json example
+["Solve",
+  ["Equal", "x", 10.0000000000001],
+  ["Element", "x", ["Interval", -10, 10]]]
+// -> ["List"]   (the root 10.0000000000001 is not in the interval)
+
+["Solve",
+  ["Equal", ["Power", "x", 2], -1e-20],
+  ["Element", "x", "RealNumbers"]]
+// -> ["List"]   (the roots are ±10⁻¹⁰i; the equation is True at x = 0)
+```
+
+Over a discrete domain (integers, rationals, a `Range` or a finite list of
+values), an equation with a decimal number is checked at each element of the
+domain, with the tolerance: `Solve(x = 10.0000000000001, x ∈ Range(-10, 10))`
+is `[10]`. When the domain has too many elements to check one by one,
+`Solve` stays unevaluated, for example `Solve(x = 2.5, x ∈ ℤ)`.
+
 An equation that holds for every value of the unknown (`x = x`,
 `2(x + 1) = 2x + 2`) gives `[t]`: one solution for every value of the fresh
 parameter `t`, the same form as the parametric answers of the integer solver.
@@ -1214,6 +1240,7 @@ breadcrumb recording the operators it passed through. The breadcrumb is an
 ["Add", ["Ln", "'a'"], 2]
 // ➔ ["Error",
 //      ["ErrorCode", "'incompatible-type'", "'number'", "'string'"],
+//      "'a'",
 //      ["ErrorTrace", ["ErrorFrame", "'Ln'", 1], ["ErrorFrame", "'Add'", 1]]]
 ```
 
@@ -1307,6 +1334,65 @@ Evaluate to the inverse function of its argument for example `Arcsin` for `Sin`.
 
 In the mathematical sense, this is an operator (a function that takes a function
 as an argument and returns a function).
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Module
+</nav>
+<FunctionDefinition name="Module">
+
+<Signature name="Module">_symbol_</Signature>
+
+The definition of a name in the standard library, also in a scope where a
+local definition shadows the name.
+
+The canonical form is the symbol bound to the library definition. Where nothing
+shadows the name, it is the symbol itself:
+
+```json example
+["Module", "Pi"]
+
+// ➔ "Pi"
+```
+
+A call of a library function is written with `Apply`:
+
+```json example
+["Apply", ["Module", "Floor"], 2.5]
+
+// ➔ 2
+```
+
+The canonical form of such a call is the plain call, `["Floor", 2.5]`, bound to
+the library function, also where a user function `Floor` is defined. The rules
+of the library function apply to it: it is simplified symbolically, a library
+function that holds or binds its arguments (`Sum`, `If`, `Hold`) reads them as
+the library does, and a named argument is valid. The arguments read the
+definitions of the scope, so a call of the user function `Floor` in an argument
+stays a call of the user function.
+
+The name `Module` itself cannot be declared or assigned: such a statement is
+an error (`module-binding` for an assignment or a declaration with a value)
+and defines nothing, so no definition of a program changes what
+`["Module", name]` reads.
+
+In a scope where `Pi` is declared and assigned `3`, the expression
+`["Add", ["Module", "Pi"], "Pi"]` is `π + 3`. In such a scope, the MathJSON of
+an expression (`.json` and `toMathJson()`) writes a symbol bound to the library
+definition as `["Module", "Pi"]`, so that the MathJSON, read again in that
+scope, has the same value.
+
+A name that the library does not define is an error:
+
+```json example
+["Module", "Floo"]
+
+// ➔ ["Error", "'not-a-library-name'", "Floo"]
+```
+
+A second operand, the name of another module, is reserved, and is an error.
+LaTeX has no spelling of `Module`: `["Module", "Pi"]` is written `\pi`.
 
 </FunctionDefinition>
 
@@ -1485,10 +1571,19 @@ The index is in canonical form, so a free `i` is the imaginary unit:
 `A_{i+1}` holds `["Complex", 1, 1]`. Declare `i` to use it as a variable.
 
 `A_{(n)}` keeps its parentheses because `["Subscript", "A", "n"]` is the
-compound symbol `A_n`. The two forms have different values in a sum:
-`\sum_{n=1}^{3} A_{(n)}` gives `A_1+A_2+A_3`, and `\sum_{n=1}^{3} A_{n}` gives
-`3A_{n}`. When you read the index of this form with `.op2`, you get
-`Delimiter(n)`, and its value is the value of `n`.
+compound symbol `A_n`. When you read the index of this form with `.op2`, you
+get `Delimiter(n)`, and its value is the value of `n`.
+
+In the body of a sum or a product, a subscript that is the index is read by
+value: `\sum_{n=1}^{3} A_{n}` and `\sum_{n=1}^{3} A_{(n)}` both give
+`A_1+A_2+A_3`, and the canonical term is
+`["Subscript", "A", ["Delimiter", "n"]]` in both. The same applies to the
+variable of a comprehension over integers. The variable of `D` or `Integrate`
+is not an index: in `["D", ["Subscript", "c", "x"], "x"]`, `c_x` is a compound
+symbol. A compound symbol that you declared or assigned stays that symbol:
+after `ce.assign("A_n", 5)`, `\sum_{n=1}^{3} A_{n}` gives `15`. The name of a
+function in a call also stays one name: `\sum_{k=1}^{2} f_k(x)` gives
+`2f_k(x)`.
 
 A product index is written in parentheses, `A_{(mn)}`, because `A_{mn}` is the
 compound symbol `A_mn`.

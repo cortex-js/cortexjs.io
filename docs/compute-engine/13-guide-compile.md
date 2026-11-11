@@ -64,7 +64,7 @@ loads:
 
 | Entries loaded in the program | Targets of every engine |
 |---|---|
-| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl`, `wgsl`, `python` |
+| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl`, `python` |
 | `@cortex-js/compute-engine/core` only | `javascript`, `interval-js` |
 
 The `javascript` and `interval-js` targets are part of every engine: the engine
@@ -552,6 +552,133 @@ The two standalone runtimes have the same batch forms:
 carries `runtimeVersion`, `preambleOnce` and `preamblePerCall` for them, as a
 `javascript` result does.
 
+### Parallel Loops on Worker Threads: `runAsync()`
+
+A `parallel for` loop (`ParallelLoop` in MathJSON) says that its passes are
+independent. `run()` still runs them in order, on the calling thread.
+`runAsync(inputs, options)` runs the same program and sends each
+`parallel for` that can run on the pool to the workers of `ce.workers`: each
+worker gets one range of consecutive passes and adds the terms of its passes
+to zero, then the calling thread adds these sums to the accumulators, in the
+order of the ranges. The statements outside these loops run on the calling
+thread. `runAsync()` is on a `javascript` result called with an object of
+variables (the default `calling: 'expression'`).
+
+```javascript
+import { ComputeEngine, compile, createKernelPool } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+ce.workers = createKernelPool({
+  create: () => new Worker(new URL('./kernel-worker.js', import.meta.url), { type: 'module' }),
+  size: 3,
+});
+ce.declare('H', 'list<integer>');
+ce.declare('n', 'integer');
+
+// let L = H
+// parallel for k in 1..n { L[k % 3 + 1] += 1 }
+// L
+const count = compile(
+  ce.box([
+    'Block',
+    ['Assign', 'L', 'H'],
+    [
+      'ParallelLoop',
+      ['AddTo', ['At', 'L', ['Add', ['Mod', 'k', 3], 1]], 1],
+      ['Element', 'k', ['Range', 1, 'n']],
+    ],
+    'L',
+  ])
+);
+
+count.willParallelize(900_000);
+// ➔ true
+
+const L = await count.runAsync(
+  { H: [0, 0, 0], n: 900_000 },
+  { onLoop: (report) => console.log(report) }
+);
+// onLoop: { passes: 900000, route: 'pool' }
+// L ➔ [300000, 300000, 300000], the value of count.run(…)
+```
+
+The promise resolves to the value of `run(inputs)`, except for the order of
+the additions (below). The inputs are checked and the value converted as
+`run()` does. An error of the program rejects the promise; `runAsync()` never
+throws. The input list `H` is not changed. The calling thread is free only
+while the program waits for the workers, and the host must not change the
+values of `inputs` until the promise settles.
+
+**The options.**
+
+- `signal`: an `AbortSignal`. A signal that is already aborted rejects the
+  promise with `signal.reason` before any statement runs. An abort while the
+  program waits for the workers rejects it with `signal.reason`; the workers
+  that still run a range are terminated and replaced after the grace period of
+  the pool. An abort while the calling thread runs statements is seen at the
+  next loop that can run on the pool.
+- `minPasses`: the smallest count of passes that goes to the pool, a positive
+  integer. Default: 20 000. With `n: 1000`, the loop above runs on the calling
+  thread and `onLoop` receives
+  `{ passes: 1000, route: 'calling-thread', reason: 'below-threshold' }`;
+  with `minPasses: 100`, it runs on the pool.
+- `onLoop(report)`: called once for each run of a loop that can run on the
+  pool, with `{ passes, route, reason }`. `route` is `'pool'` or
+  `'calling-thread'`; `reason` says why the pool did not take the loop:
+  `'no-pool'` (`ce.workers` is not set), `'pool-unusable'` (the workers hold
+  another runtime version), `'below-threshold'`, `'too-large'` (the private
+  lists of all the workers would hold more than 16 million numbers together)
+  or `'pool-declined'` (a worker did not complete its range, and the calling
+  thread ran it again).
+
+`result.willParallelize(passes?)` is `true` when the program has a loop that
+can run on the pool (also inside a function that it calls), `ce.workers` is a
+usable pool, and `passes`, when it is given, is at least 20 000. It does not
+know the range of a loop and does not read `minPasses`:
+`count.willParallelize(1000)` is `false`, and without a pool
+`count.willParallelize()` is `false`.
+
+**When a loop runs in order.** A loop runs on the calling thread, with the
+code of `run()`, and does not call `onLoop`, unless:
+
+- its domain is a range (`1..n`), not a list;
+- each accumulator is a local variable of the function or block that holds
+  the loop, a number (`s += e`) or a list of numbers with one index
+  (`L[i] += e`), and the loop reads it nowhere else;
+- the body writes no other outer variable and does not leave the loop
+  (`break`, `return`);
+- the body reads only numbers, booleans, strings and lists or tuples of these
+  from outside, calls no function value, makes no random draw, and calls no
+  function of the `functions` or `operators` option;
+- the program is compiled in the default mode, with no `iterationBudget`;
+- the loop is a statement of the program or of a user function (also inside
+  an `if`, a `for` or a `while`), and the program calls that function as a
+  statement, as the value of a declaration or an assignment, or as its last
+  value. A call in an operand (`total(H, 4) + 1`), an argument
+  (`max(total(H, 4), 1)`), a callback (`map`) or `WithRandomSeed` runs the
+  loop in order. Write `let t = total(H, 4)`, then `t + 1`. When the program
+  uses a function in such a position, the loops of that function run in
+  order at all its calls.
+
+The rules, with an example for each, are in `docs/COMPILATION-MODEL.md` of the
+repository ("The worker pool and `parallel for`: `runAsync()`").
+
+**The values.** The pool adds the terms of each range to zero, then adds the
+sums in the order of the ranges, where `run()` adds each term in the order of
+the passes. An accumulator of integers whose value and partial sums stay
+within ±2^53 has the value of `run()`. An accumulator of real numbers can
+differ in the last bits, and the difference depends on the size of the pool:
+the sum of `1/k` for `k` in `1..1000000` gave `14.392726722864989` with
+`run()` and `14.392726722865703` with `runAsync()` on 3 workers. An element of
+a list accumulator that holds `-0` keeps `-0` when the sum of each range is
+exactly 0, where `run()` gives `+0` if a pass adds `+0` to it.
+
+**Errors.** When a worker does not complete its range (an error of a pass, a
+worker that fails), the calling thread runs that range again, and `onLoop`
+receives `reason: 'pool-declined'`. A range that fails there too rejects the
+promise with the error that `run()` throws. Each worker uses the engine's
+`iterationLimit`.
+
 ### Limiting Loops: `iterationBudget`
 
 A compiled `Loop` has no time check, so a loop that does not end stops the page
@@ -575,11 +702,374 @@ pass on every machine. To get a time limit, measure the cost of a pass.
 - `broadcast()` gives `NaN` for a cell over the limit, as for any error of a
   cell. Each cell has its own count, so a batch costs up to cells × budget.
 - `python` declines a program with a `Loop` when the option is set.
-- `glsl` and `wgsl` do not change: the bounds of a shader loop are known when the
-  shader is compiled.
-- A `Sum` or `Product` over the budget gives `NaN` and does not throw.
+- `glsl` cannot throw: over the limit, the loops of the shader stop and the
+  value is `NaN`. On this target the limit also applies to `Sum` and
+  `Product`, and it is 10,000 passes when the option is not set (see "What
+  the GLSL Target Compiles: `canCompile()`").
+- A `Sum` or `Product` over the budget gives `NaN` and does not throw. On
+  `interval-js` it gives the `entire` interval.
 
 Without the option, the compiled code has no check.
+
+### The `numeric-kernel` Profile (Experimental)
+
+The option `profile: 'numeric-kernel'` compiles a numeric program with the
+structured compiler of the `javascript` target. It admits scalar
+arithmetic of reals, integers and complex numbers, `If` and the comparisons
+(`Less`, `LessEqual`, `Equal`, `NotEqual`),
+powers and roots of real numbers, powers of a complex base with a number
+literal exponent, `Sqrt`, `Ln`, `Log`, `Exp`, the
+trigonometric and hyperbolic functions and their inverses (`Sin`, `Cos`,
+`Tan`, `Cot`, `Sec`, `Csc`, `Sinh`, `Cosh`, `Tanh`, `Arcsin`, `Arccos`,
+`Arctan`, `Arctan2`, `Arsinh`, `Arcosh`, `Artanh`), `Abs`, `Sign`, `Gamma`,
+`Erf`, `Erfc`, `Digamma`, `Haversine`, `Conjugate`, `Min`, `Max`, `Floor`, `Ceil`,
+`Round`, `Mod`, captured numbers, function literals with typed parameters
+and local variables, `Loop` over an integer range with `Break` in a branch
+of an `If`, `Sum` and `Product` of a real or integer body over integer
+ranges (`Limits`), `Which` and an `If` with no else branch whose values are
+real or integer numbers, calls of user functions
+with or without a declared signature, and lists of numbers read with `At` and `Length`,
+made with a comprehension over a range and updated with `ReplaceAt`,
+list literals of numbers and tuples of reals.
+A block of statements can be the compiled expression itself: its free
+symbols are then the inputs. A power or a root of two number literals is
+written as the value that the ordinary compiler folds it to.
+
+A block can hold another block, and a block whose statements declare names
+with a value can be an operand. A local declared `unknown` with a value has
+the type of its value, and a first write to a new name of a block declares
+a local, as in the ordinary compiler. In the `strict` mode, a local function
+of the block (a `Declare` of a function literal, or `DefineFunction`) and a
+user function declared `function` are compiled once; a local function reads
+the names of the block at each call, as a closure does. A local function in
+a branch or a loop, a recursive one, a local function in the `complex` mode,
+and a local of a nested block with the name of an outer one decline:
+
+```js
+const o = compile(
+  ce.box(['Add',
+    ['Block', ['Declare', 'a', "'real'", ['Multiply', 3.7, 'x']],
+      ['Subtract', 'a', ['Floor', 'a']]],
+    1]),
+  { profile: 'numeric-kernel' }
+);
+o.code;          // ➔ "(() => { const _tv1 = 3.7 * _.x; return _tv1 + -Math.floor(_tv1) + 1; })()"
+o.run({ x: 1 }); // ➔ 1.7000000000000002
+
+const l = compile(
+  ce.box(['Block',
+    ['Assign', 'a', ['Multiply', 2, 'x']],
+    ['Declare', 'g', "'function'", ['Function', ['Add', 't', 'a'], 't']],
+    ['Assign', 'a', 10],
+    ['g', 3]]),
+  { profile: 'numeric-kernel' }
+);
+l.run({ x: 5 }); // ➔ 13
+```
+
+```js
+import { compile, canCompile } from '@cortex-js/compute-engine/compile';
+
+ce.declare('x', 'real');
+ce.declare('y', 'real');
+const r = compile(ce.box(['Add', ['Sin', 'x'], ['Multiply', 'x', 'y']]), {
+  profile: 'numeric-kernel',
+});
+r.code;      // ➔ "_.x * _.y + Math.sin(_.x)"
+r.profile;   // ➔ "numeric-kernel"
+r.pure;      // ➔ true
+r.shippable; // ➔ true
+r.run({ x: 0, y: 2 }); // ➔ 0
+
+const f = compile(
+  ce.box(['Function', ['Block', ['Multiply', 'a', ['Sqrt', 'a']]],
+    ['Typed', 'a', "'real'"]]),
+  { profile: 'numeric-kernel' }
+);
+f.code;      // ➔ "(a) => { return a * Math.sqrt(a); }"
+f.run(4);    // ➔ 8
+f.shippable; // ➔ true
+
+const b = compile(
+  ce.box(['Block', ['Declare', 'a', "'real'", ['Add', 'x', 1]],
+    ['Multiply', 'a', 'a']]),
+  { profile: 'numeric-kernel' }
+);
+b.code;          // ➔ "(() => { const _tv1 = _.x + 1; return _tv1 * _tv1; })()"
+b.run({ x: 2 }); // ➔ 9
+
+const g = compile(ce.box(['Exp', ['Multiply', 'ImaginaryUnit', 'x']]), {
+  profile: 'numeric-kernel',
+});
+g.code;          // ➔ "_SYS.cexp(({ re: 0, im: _.x }))"
+g.run({ x: 1 }); // ➔ { re: 0.5403023058681398, im: 0.8414709848078965 }
+```
+
+A product, a quotient or a power with a complex operand, and most functions
+of a complex operand, are written as the ordinary compiler writes them. A
+real operand of a product is not converted to a complex number, so
+`x·(a + bi)` is `x·a + x·b·i`, as in the ordinary compiler. Some forms
+decline: a power whose exponent is not a number literal (`z^x`), `Abs` of a
+complex operand that is not a name, and `Sinh`, `Cosh`, `Tanh` and `Exp` of
+a complex operand that reads `Pi`.
+
+A bound of a `Sum` or a `Product` is floored, as in the ordinary compiler;
+with an `iterationBudget`, a range of more terms than the budget gives
+`NaN`. A `Which` with no `True` clause gives `NaN` when no condition holds.
+A complex body of a `Sum` or a `Product`, and a complex value of a `Which`,
+decline:
+
+```js
+const s = compile(
+  ce.box(['Function', ['Block', ['Sum', ['Divide', 1, 'k'], ['Limits', 'k', 1, 'n']]],
+    ['Typed', 'n', "'integer'"]]),
+  { profile: 'numeric-kernel' }
+);
+s.run(4); // ➔ 2.083333333333333
+
+const w = compile(ce.box(['Which', ['Less', 'x', 0], 0, ['Less', 'x', 1], 'x']), {
+  profile: 'numeric-kernel',
+});
+w.code;          // ➔ "_.x < 0 ? 0 : _.x < 1 ? _.x : NaN"
+w.run({ x: 2 }); // ➔ NaN
+```
+
+A list of reals or of integers (an input, a parameter, a literal such as
+`[x, y, 1]`, or the result of a comprehension or of a user function) and a
+tuple of reals (`(x, y)`, an input or a parameter declared
+`tuple<real, real>`) are values of the program and can be its result, a
+JavaScript array. `Sum`, `Product`, `Max` and `Min` of one list or tuple
+fold its elements; `Max` and `Min` of an empty list are `NaN`. Arithmetic of
+a list and numbers applies to each element (`2·L + 1`). Two lists are
+combined only when their lengths are equal by construction, such as `L` and
+`2·L`: `L + M` of two inputs declines, because the ordinary compiler gives
+`NaN` for lists of different lengths. A comprehension can have a guard that
+does not draw, with bounds that are integer literals or a `Length`:
+
+```js
+ce.declare('L', 'list<real>');
+const e = compile(ce.box(['Add', ['Multiply', 2, 'L'], 1]), {
+  profile: 'numeric-kernel',
+});
+e.run({ L: [1, 2.5] }); // ➔ [3, 6]
+
+const m = compile(ce.box(['Max', 'L']), { profile: 'numeric-kernel' });
+m.run({ L: [1, 7, 3] }); // ➔ 7
+m.run({ L: [] });        // ➔ NaN
+
+const t = compile(
+  ce.box(['Function', ['Block', ['Tuple', ['Sum', 'P'], ['Product', 'P']]],
+    ['Typed', 'P', "'tuple<real, real>'"]]),
+  { profile: 'numeric-kernel' }
+);
+t.run([3, 4]); // ➔ [7, 12]
+
+const stones = compile(
+  ce.box(['Function',
+    ['Block', ['Comprehension', 'k',
+      ['Element', 'k', ['Range', 1, ['Length', 'B']], ['Equal', ['At', 'B', 'k'], 'p']]]],
+    ['Typed', 'B', "'list<integer>'"], ['Typed', 'p', "'integer'"]]),
+  { profile: 'numeric-kernel' }
+);
+stones.run([1, 0, 1, -1], 1); // ➔ [1, 3]
+```
+
+A list of lists, a list or a tuple of booleans or of complex numbers,
+`Power` or a function of a list (`L^2`, `sin(L)`), arithmetic on a tuple,
+`First`, `Last`, `Count` and a captured list decline. A fold that the
+ordinary compiler writes as a complex value declines too: the fold of an
+expression whose type is not real (`Sum(I/2.5)`), and in the `complex`
+mode the `Sum` or `Product` of a local list. So does a product or a
+quotient with the call of a user function that has a list argument, whose
+type admits a list and a number (`10·(2/f(L))`).
+
+The result reports two facts about the compiled program:
+
+- `pure`: two calls, with any arguments, give the same results whether they
+  run one after the other or at the same time in two workers, and a call
+  changes nothing that the host can observe. A list argument is only read.
+- `shippable`: the code can run on a worker of the kernel pool. Under the
+  profile, a function literal has this field too.
+
+Neither fact starts a parallel execution.
+
+The profile admits random draws: `Random()`, `Random` of an `Interval` or a
+`Range` whose bounds are number literals, `WithRandomSeed`, and calls of
+user functions whose body draws. The code draws the same numbers as the
+ordinary compiler, in the same order and the same number of times, and a
+compiled function called inside an interpreted `WithRandomSeed` draws from
+its frame. A draw makes the program not `pure`, unless it is inside a
+`WithRandomSeed`; a program that draws or seeds the random stream is not
+`shippable`. A draw in a comprehension declines, because the interpreter
+draws the elements of a comprehension when they are read. A program that
+draws more than once declines when one of its draws is in a complex value
+(`Random() + Sqrt(Random(Range(-2, 8, 2)))` in the `complex` mode), because
+the ordinary compiler evaluates a complex operand first. `RandomChoice`,
+`RandomSample`, `RandomShuffle` and `Random` of a domain with a variable
+decline too:
+
+```js
+const u = compile(ce.box(['Add', 'x', ['Random', ['Interval', -1, 1]]]), {
+  profile: 'numeric-kernel',
+});
+u.pure;      // ➔ false
+u.shippable; // ➔ false
+
+const s = compile(ce.box(['WithRandomSeed', 42, ['Add', 'x', ['Random']]]), {
+  profile: 'numeric-kernel',
+});
+s.pure;          // ➔ true
+s.shippable;     // ➔ false
+s.run({ x: 1 }); // ➔ 1.7367300395263547, at each call
+```
+
+A parameter or a free symbol with no declared type is a real number in the
+`strict` mode and a complex number in the `complex` mode. The result lists
+these names in `defaultedSymbols`, so that you can find a name you did not
+mean to leave undeclared. Declare a name that is a list, a boolean or an
+integer (a loop bound, an index), or call `ce.infer()` before `compile()`.
+
+`ce.infer()` declares each free symbol of the expressions you give it with
+the type that they require of it, and the profile reads that type as a
+declared type. So does a type that `ce.assume()` writes (`x > 0` gives `x`
+the type `real<0<..>`), and the type of a value assigned with `ce.assign()`.
+Boxing, evaluating or compiling an expression writes no type, so the type
+of a name does not depend on what you boxed before:
+
+```js
+ce.infer([ce.box(['Mod', 'v', 2])]); // `v` is real
+const k = compile(ce.box(['Sin', 'v']), {
+  profile: 'numeric-kernel',
+  mode: 'complex',
+});
+k.code;             // ➔ "Math.sin(_.v)"
+k.defaultedSymbols; // ➔ undefined
+```
+
+The same rule applies to a user function with no declared signature that
+the code calls: a parameter with no type is a real number in the `strict`
+mode and a complex number in the `complex` mode, and the result has the type
+of the body. A call with an argument of another type (a list, a boolean, a
+complex value in the `strict` mode) declines. `defaultedSymbols` lists the
+name of the function:
+
+```js
+ce.parse('f(t) := t^2 + 1').evaluate();
+const g = compile(ce.box(['Function', ['Block', ['f', 'x']], 'x']), {
+  profile: 'numeric-kernel',
+});
+g.defaultedSymbols; // ➔ ["x", "f"]
+g.run(3);           // ➔ 10
+```
+
+A name declared `number` (an input, a parameter, a parameter of a user
+function) has the type it has in the ordinary compiler: a real number in the
+`strict` mode, a complex number in the `complex` mode, where the code
+accepts a number or a complex value for an input or a parameter. A name
+declared a union of a real type with `nan` or `signed_infinity` is a real
+number in both modes. A user function declared with the result `number`
+returns the type of its body, and a name declared `number` whose value is a
+number is captured as that number. `defaultedSymbols` does not list these
+names, since their type is declared:
+
+```js
+ce.declare('w', 'number');
+const n = compile(ce.box(['Sin', 'w']), {
+  profile: 'numeric-kernel',
+  mode: 'complex',
+});
+n.code;                        // ➔ "_SYS.csin(_SYS.cplx(_.w))"
+n.run({ w: { re: 0, im: 1 } }); // ➔ { re: 0, im: 1.1752011936438014 }
+n.run({ w: 2 });               // ➔ 0.9092974268256817
+n.defaultedSymbols;            // ➔ undefined
+```
+
+A program outside the profile declines with the diagnostic code
+`outside-profile`. The diagnostic names the first node outside the profile:
+its head in `operator`, or a name in `binding`. The `fallback` option applies
+as for any other decline, and the ordinary compiler is never used for a part
+of the program.
+
+```js
+ce.declare('L', 'list<real>');
+const d = compile(ce.box(['RandomChoice', 'L', 2]), {
+  profile: 'numeric-kernel',
+});
+d.success;    // ➔ false
+d.diagnostic; // ➔ { code: "outside-profile", kind: "capability",
+              //     message: "Could not compile with the profile 'numeric-kernel': unsupported head RandomChoice",
+              //     operator: "RandomChoice", value: "RandomChoice(L, 2)" }
+```
+
+`canCompile()` answers for the profile with the same options: `ok: true`
+exactly when `compile()` gives code, with `pure` and `shippable`, and
+otherwise the diagnostic that `compile()` gives. It runs the whole
+compilation, so it costs as much as `compile()`.
+
+```js
+canCompile(ce.box(['Add', 'x', ['Sin', 'x']]), { profile: 'numeric-kernel' });
+// ➔ { ok: true, pure: true, shippable: true }
+```
+
+Under the profile:
+
+- `cse` and `constantFold` are ignored: the structured compiler does neither.
+- The modes are `strict` and `complex`.
+- The options `vars`, `functions`, `operators`, `imports` and `preamble`
+  give the code of the ordinary compiler. The functions of the host run the
+  same number of times, in the same order, on both compilers:
+  - A `vars` entry that reads the vars object under another name
+    (`u: '_.w'`) makes the name an input.
+  - Another source that is one operand (a name, a call, a member access, an
+    expression in parentheses: `t: 'next()'`) is read once at each
+    occurrence of the name. The result is then neither `pure` nor
+    `shippable`.
+  - A call of a `functions` entry, or of an `operators` entry whose operator
+    is a name, is a call of the host. It is `pure` only when the entry is
+    declared pure (`{ source, pure: true }`). The result is never
+    `shippable`, because a worker does not have the function.
+  - `imports` and `preamble` work as on the ordinary compiler. A preamble
+    that is not blank runs on every call, so the result is not `pure`.
+- `broadcast` is ignored: the result has no `batch`, and the values are those
+  of `broadcast: false`.
+- These decline with `outside-profile`, each with a message that names the
+  cause:
+  - the function form of `operators`, and an infix `operators` entry;
+  - an entry for an operator or a constant of the library
+    (`functions: { Sin: … }`);
+  - a `vars` source that is not one operand (`'Math.PI / 4'`);
+  - a read or a call of the host in the `complex` mode;
+  - a `functions` source that is not a name, a dotted path of names or a
+    function expression with a pure arithmetic body (`'_.getTransform()'`):
+    the ordinary compiler evaluates it before the arguments;
+  - a source with a line terminator or a comment;
+  - a `Sum` or a `Product` that calls a function declared pure (the
+    ordinary compiler skips such calls after a sum of `NaN`);
+  - `mode: 'bigint'`.
+- An empty object of `functions`, `operators` or `vars` is the same as an
+  absent option.
+
+```javascript
+ce.declare('x', 'real');
+ce.declare('f', '(real, real) -> real');
+const r = compile(ce.box(['Add', ['f', 'x', 1], 1]), {
+  profile: 'numeric-kernel',
+  functions: { f: { source: 'Math.hypot', pure: true } },
+});
+r.code;      // ➔ "(() => { const _tv1 = Math.hypot(_.x, 1); return _tv1 + 1; })()"
+r.pure;      // ➔ true
+r.shippable; // ➔ false
+r.run({ x: 3 }); // ➔ 4.16227766016838
+```
+- A program of more than 100,000 operations declines with
+  `outside-profile`, also one with no repeated subexpression (a sum of
+  30,000 terms `sin(x + c)`); the diagnostic names no node.
+- With another target than `javascript`, or in the `compile()` method of a
+  target object (`new JavaScriptTarget().compile(expr, { profile })`), the
+  option is an error, thrown whatever `fallback` says.
+
+The profile is experimental: the list of what it admits will grow, and its
+options can change.
 
 ### Constant Folding
 
@@ -706,6 +1196,36 @@ Declare the input (`ce.declare('M', 'real')`). When the host can pass both
 shapes, declare a union such as `real | list<real>`: a union compiles. A
 parameter of a function is not an input, so `t ↦ 2t` compiles.
 
+An input with no declared type has the type that the compiled expression
+requires of it: in `x + 1`, `x` is a `number`, and `freeSymbolTypes` reports
+it. A type that only another expression requires is not used, because
+parsing an expression declares nothing. Declare the inputs, or call
+`ce.infer()` with the expressions that use them, before you compile:
+
+```javascript
+const a = ce.parse('x + 1');
+const b = ce.parse('x > 1');
+compile(b).success;   // ➔ false: `x > 1` requires no type of `x`
+ce.infer([a, b]);     // declares x: number
+compile(b).success;   // ➔ true
+```
+
+The result of an operation such as `subs()` does not carry the types that the
+operation required of a symbol that you made before it. Declare such a
+symbol before you compile the result:
+
+```javascript
+const q = ce.symbol('q0');
+const r = ce.parse('a \\cos(x)').subs({ a: q });
+compile(r).success;   // ➔ false: `q0` has no type
+ce.declare('q0', 'real');
+compile(r).success;   // ➔ true
+```
+
+A name of the library that an expression reads as a variable (`N` in
+`N + 1`) has no type until it is declared: `compile(ce.parse('N + 1'))`
+declines, and compiles after `ce.declare('N', 'real')`.
+
 **A value with no settled shape declines**, with `diagnostic.code`
 `'unsettled-shape'`, and `unsupported` holds the sub-expression:
 
@@ -735,6 +1255,15 @@ parameter of a function is not an input, so `t ↦ 2t` compiles.
   `CS: list<real | tuple<real, real>>` and `f := t ↦ 2t`, `Map(f, CS)`
   declines, and `unsupported` holds `CS`. With the fallback, the interpreter
   gives `[2, [6, 8]]` for `CS = [1, [3, 4]]`.
+- An integer power of a list whose type admits both a matrix and a list of
+  points (a bare `list`, `list<unknown>`, `list<any>`), and the product of
+  such a list with another list. Compiled code holds a point as an array, so
+  `[[1, 2], [3, -4]]` can be a matrix, whose square is the matrix power, or
+  two points, whose square is the square of each coordinate. With
+  `p: list`, `p^2` declines, and `unsupported` holds `p`. With the fallback,
+  the interpreter gives `[[7, -6], [-9, 22]]` for `p = [[1, 2], [3, -4]]`.
+  Declare `p` as `list<list<real>>` (a matrix) or `list<tuple<real, real>>`
+  (points) to compile it. `p^{0.5}` and `3p` compile.
 - A node whose code a `compile` handler of its definition writes, when the
   static type of the node admits values of different shapes and code that no
   handler wrote reads its value. With `x: real` and `HostPair` declared with
@@ -764,6 +1293,9 @@ and does not test it. So:
 - **Declare the type and the shape of each input that you will pass**:
   `ce.declare("x", "real")`, `ce.declare("L", "list<real>")`,
   `ce.declare("P", "tuple<real, real>")`. An input with no type declines.
+  An undeclared input has only the type that the compiled expression
+  requires of it; `ce.infer()` declares the types that several expressions
+  require.
 - **When an input can have two shapes**, compile one function for each
   shape, or declare the union (`real | tuple<real, real>`). One function for
   each shape has no run-time test. The union costs one test on each call,
@@ -817,8 +1349,8 @@ scalar or a list, such as the result of a call whose return type is
   broadcasting, so scalar code would silently compute the wrong value.
   Function heads that lower to NumPy calls (`np.sin`, …) are unaffected —
   NumPy broadcasts natively.
-- **GLSL/WGSL**: such operands compile as scalar slots, unchanged — shader
-  targets have no dynamic lists.
+- **GLSL**: such operands compile as scalar slots, unchanged — the shader
+  target has no dynamic lists.
 
 ### Out-of-Domain Operands to String Operators
 
@@ -1010,7 +1542,7 @@ f.run(5);      // ➔ 5
 f.run(NaN);    // ➔ NaN
 ```
 
-Inside compiled code, every target (JavaScript, Python, GLSL, WGSL and
+Inside compiled code, every target (JavaScript, Python, GLSL and
 interval-js) adds the default value to each call that leaves the argument out
 when the expression is compiled. With
 `g = (k: real = 2) ↦ k + 1`, `g()` compiles to `3`. With `L: list<real>`,
@@ -1135,7 +1667,7 @@ console.log(f.run({ t: 0 }));
 
 The result has the same form as a `dictionary` input: a plain object whose
 own keys are the keys of the dictionary, including a key `__proto__`. A value
-whose type is `unknown` is not compiled. The GLSL, WGSL and interval targets
+whose type is `unknown` is not compiled. The GLSL and interval targets
 have no dictionary value, so a dictionary does not compile on them.
 
 ### Control Structures
@@ -1267,8 +1799,9 @@ console.log(sum.success, sum.run());
 ```
 
 On JavaScript, a loop that updates a block local with `xs = ReplaceAt(xs, i, v)`
-copies the list once, at the first update, and then writes it in place. This is
-not possible when the list has another name or is used in a way that could see
+copies the list once, at the first update, and then writes it in place. A result
+type on the function that holds the loop (`-> list<real>`) does not change
+this. This is not possible when the list has another name or is used in a way that could see
 a write, for example `ys = xs` in the loop or a function literal that reads
 `xs`. Each pass of the loop then copies the whole list, and the result reports
 it in `warnings`, with the code `'copying-list-update'` and the name of the
@@ -1299,13 +1832,21 @@ console.log(copying.warnings.map((w) => [w.code, w.binding]));
 // ➔ [["copying-list-update", "xs"]]
 ```
 
-On GLSL and WGSL, `Break` and `Continue` compile as a statement of a `Loop`
-body, alone or as the branch of an `If` with no else. So
+On GLSL, `Break` compiles as a statement of the body of a counted `Loop`,
+alone or as the branch of an `If` with no else. So
 `If(a > 3, Break())` in the body gives `if (3.0 < a) { break; }`, and a formula
 can stop as soon as its value is known. Any other position declines: an `If`
-with an else branch, a `Break` with a value, a jump in a value, a jump in a
-`Match` case, and a jump with no enclosing `Loop`. A `Return` in a loop on these
-targets also declines.
+with an else branch, a `Break` with a value, a jump in a value, and a jump with
+no enclosing `Loop`. `Continue` and `Return` decline on GLSL in every position.
+
+On `interval-js`, the condition of an `If` in a `Loop` body is compared with
+interval arithmetic, and a pass of the loop runs one branch only. When the
+input intervals decide the condition, the loop gives the value that the
+interpreter gives: with `x` declared `real`,
+`n ≔ 0; Loop(Block(n ≔ i; If(i > x, Break())), i ∈ 1..5); n + 1` gives
+`[4, 4]` for `x = 2` and for `x = [2.2, 2.8]`. When the condition is true at
+some points of an input interval and false at others, the pass where the loop
+stops is not known, and the result is `{ kind: 'entire' }` (`x = [1.5, 2.5]`).
 
 #### `Comprehension`
 
@@ -1320,32 +1861,32 @@ console.log(f.run());
 // ➔ [1, 4, 9, 16, 25]
 ```
 
-`Comprehension` is not compilable to GLSL or WGSL (shaders have no dynamic
-arrays). Imperative `Loop` is still compilable to GLSL/WGSL.
+On `glsl`, a comprehension over constant ranges is written out when the
+expression is compiled: `x^2 \keyword{for} x = [1...5]` compiles to
+`float[5](1.0, 4.0, 9.0, 16.0, 25.0)`. A comprehension whose range reads an
+input declines, because a shader has no array of a length known only at run
+time. A `Loop` over an integer range compiles to `glsl` in a block.
 
 #### Multi-statement constructs on the shader targets
 
-A shader has no expression-level loop or IIFE, so on GLSL and WGSL a `Sum` or
+A shader has no expression-level loop or IIFE, so on GLSL a `Sum` or
 `Product` with a symbolic bound is emitted as **statements** (with constant
 bounds it unrolls into an ordinary expression instead). Such a loop is hoisted
 ahead of the value that consumes it, so it can appear anywhere in an
-expression — `0.03\sum_{k=0}^{n}kx` compiles, and a nested sum is hoisted into
-its enclosing loop body rather than out of it.
+expression: with `n` declared `integer`, `0.03\sum_{k=0}^{n}kx` compiles, and
+a nested sum is hoisted into its enclosing loop body rather than out of it.
+A bound with no declared or inferred type declines (see "What the GLSL
+Target Compiles: `canCompile()`").
 
-A loop inside a **conditionally-evaluated branch** — an `If`, `Which` or `Match`
-arm — fails closed (`success: false`) instead. A shader conditional is
-an expression, not a statement, so there is no place to put the loop inside the
-branch; hoisting it out would run it whichever branch is selected, which changes
-the result whenever the branch draws from the random stream.
+A `Block`, with the `Loop` statements in it, is valid as the whole
+expression and as the body of a user function, and declines when used as a
+sub-expression.
 
-`Loop` and `Block` are not hoisted either — they remain valid only as a whole
-function body, and fail closed when used as a sub-expression.
-
-A shader has no dynamic array, so a literal `List`, `Tuple`, `PointList` or
-`Range` is written into the shader as a constant array constructor. The `glsl`
-and `wgsl` targets accept at most **256** elements this way. A larger constant
-collection is a `capability` decline with the diagnostic code
-`inline-collection-too-large`; the message names the element count and the
+A shader has no dynamic array, so a literal `List`, `Tuple` or `PointList` is
+written into the shader as a constant array constructor. The `glsl` target
+accepts at most **256** elements this way. A larger constant collection is
+outside the GLSL fragment: the compilation declines with the diagnostic code
+`outside-fragment`, and the message names the type of the list and the
 limit. Ship such a collection as a texture (a `storage: sampler2D` input read
 with `At`) instead. The `javascript` and `interval-js` targets have no such
 limit: a list of any length is one array constant there.
@@ -1354,12 +1895,13 @@ limit: a list of any length is one array constant there.
 const big = ce.box(['List', ...Array.from({ length: 300 }, (_, i) => i)]);
 const r = compile(ce.box(['At', big, 'k']), { to: 'glsl' });
 r.diagnostic.code;
-// ➔ "inline-collection-too-large"
+// ➔ "outside-fragment"
+r.diagnostic.operator;
+// ➔ "List"
 r.error;
-// ➔ "Could not compile `List`: a constant collection of 300 elements is above
-//    the 256 elements a shader array constructor takes on this target. Ship
-//    the collection as a texture (a `storage: sampler2D` input, read with
-//    `At`) instead."
+// ➔ "The value of `[0,1,2,…,299]` has the type `list<real, 300>`, which the
+//    GLSL target cannot hold (a list needs a static count of at most the
+//    array limit)."
 ```
 
 #### `Block` and `where`
@@ -1647,13 +2189,12 @@ which is `true`, and gives `1`. The two answers differ at the pole only. A
 closed form with no variable (`\{1/0 > 0: 1, 0\}`) is folded at compile time to
 the interpreter's answer, `0`.
 
-On the `glsl` and `wgsl` targets, an infinity or a `NaN` computed at run time
-is not guaranteed. The WGSL specification lets a GPU compiler assume that no
-infinity or `NaN` occurs at run time, and GPU drivers (Metal, for example)
-compile GLSL the same way. A division by zero in a shader can therefore give a
+On the `glsl` target, an infinity or a `NaN` computed at run time
+is not guaranteed. GPU drivers (Metal, for example) can assume that no
+infinity or `NaN` occurs at run time. A division by zero in a shader can therefore give a
 finite value, and so can a function of its result. For example,
 `\sin(2\pi T/P)` at `P = 0` is `NaN` on the `javascript` target, but on an
-Apple GPU both shader targets returned the same finite number. The compiled
+Apple GPU the shader returned a finite number. The compiled
 shader does not test each divisor for zero, because that test would add work
 to every division. When the value at a zero divisor matters, write the test
 in the expression, for example `\{P = 0: \operatorname{NaN}, \sin(2\pi T/P)\}`:
@@ -1782,7 +2323,7 @@ the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`, `m ≤ 1
 the elliptic integrals), so under `mode: 'complex'` compiled `LambertW(x)` at
 `x = −1` is `{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled
 `LerchPhi(3, 2, 1)` is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The
-GLSL and WGSL targets have no complex lane for these heads and decline a
+GLSL target has no complex lane for these heads and decline a
 provably complex value. `Arcsec` and `Arccsc` of a real operand of unknown
 magnitude are typed `complex | infinity | nan`, so with `x` declared `real`
 the compiled `Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }` in every
@@ -2126,419 +2667,242 @@ console.log(jsResult.run({ x: 3, y: 4 })); // → 25
 
 // Compile to GLSL
 const glslResult = compile(expr, { to: 'glsl' });
-console.log(glslResult.code); // → pow(x, 2.0) + pow(y, 2.0)
+console.log(glslResult.code); // → (x * x) + (y * y)
+```
+
+### What the GLSL Target Compiles: `canCompile()`
+
+A shader draws pixels, in 32-bit floats, on each frame. The `glsl` target
+therefore compiles a fixed list of forms, the **GLSL fragment**, and checks
+an expression against it before it writes code:
+
+- **Values**: real numbers, integers, booleans, complex numbers (a `vec2`),
+  points and vectors of 2 to 4 real components, colors, constant lists of at
+  most 256 numbers or points, and list inputs. A list input of at most 256
+  elements is a uniform array; a longer one must be in a texture (the
+  `storage` option below). Every free symbol has one of these types,
+  declared or inferred from its use.
+- **Operations**: arithmetic, the elementary and special functions of the
+  shader library, the parts of a complex number, points and vectors (`Dot`,
+  `Cross`, `Norm`, `Normalize`, `Distance`, `Length`, which is the number of
+  components), colors, comparisons and logic on numbers and booleans, `If`
+  and `Which` when every branch has the same type. An `If` with no else
+  branch gives `NaN` where its condition is false (`false` for a boolean
+  value): `If(x > 0, x)` compiles to `((0.0 < x) ? (x) : (_gpu_nan()))`.
+- **Sums and indexing**: `Sum` and `Product` over one or more integer ranges
+  (their bounds can read an input), `Sum` and `Product` of a point, of a
+  list of 2 to 4 numbers or of a list literal of at most 256 numbers, and
+  `At` with an integer index on a list or a point.
+- **Functions and blocks**: calls of user functions with no recursion, whose
+  body is an expression or a block of number, point or complex locals with
+  `for` loops over integer ranges, `break`, `if` and `+=`. A block can also
+  be the whole expression. A `parallel for` with number accumulators runs
+  its passes in order.
+- **Work done when compiling**: constant folding, derivatives with a closed
+  form, and comprehensions or `Map` over constant ranges, which are written
+  out (`x^2 \keyword{for} x = [1...5]` compiles to
+  `float[5](1.0, 4.0, 9.0, 16.0, 25.0)`).
+
+Random draws, matrices, `Match`, `Integrate`, symbolic operations, strings,
+dictionaries, function values, recursion and collections whose length is
+not known when compiling are outside the fragment.
+
+`canCompile(expr, options)` tells whether `compile(expr, options)` gives
+code, without writing any. It takes the options of `compile()` and answers
+`{ ok: true }`, or `{ ok: false, diagnostic }` with the first node outside
+the fragment. The diagnostic has the code `outside-fragment`, the operator
+of that node in `operator`, or the name of a symbol in `binding`. It never
+throws.
+
+```javascript
+import { ComputeEngine } from '@cortex-js/compute-engine';
+import { compile, canCompile } from '@cortex-js/compute-engine/compile';
+
+const ce = new ComputeEngine();
+
+canCompile(ce.parse('\\sin(x) + x^2'), { to: 'glsl' });
+// ➔ { ok: true }
+
+canCompile(ce.parse('\\int_0^x \\sin(t)\\,dt'), { to: 'glsl' });
+// ➔ { ok: false, diagnostic: {
+//      code: 'outside-fragment', kind: 'capability',
+//      message: 'The head `Integrate` is outside the GLSL fragment.',
+//      value: 'int_(0)^(x)(sin(t) dt)', operator: 'Integrate' } }
+```
+
+When the cause is a symbol, `binding` names it, and a declaration repairs
+it. The bound `n` of this sum has no type:
+
+```javascript
+canCompile(ce.parse('0.03\\sum_{k=0}^{n}kx'), { to: 'glsl' }).diagnostic.message;
+// ➔ "The symbol `n` has the type `unknown`, which has no type in the GLSL
+//    fragment: declare a numeric type for `n`."
+
+ce.declare('n', 'integer');
+canCompile(ce.parse('0.03\\sum_{k=0}^{n}kx'), { to: 'glsl' });
+// ➔ { ok: true }
+```
+
+A long list input names the option that puts it in a texture:
+
+```javascript
+ce.declare('H', 'list<number^1600>');
+canCompile(ce.box(['At', 'H', 'n']), { to: 'glsl' }).diagnostic.message;
+// ➔ "The list `H` has 1600 elements, more than the limit of 256 elements of
+//    a shader array: name it in the `storage` option
+//    (`storage: { H: 'sampler2D' }`) to read it from a texture."
+
+canCompile(ce.box(['At', 'H', 'n']), { to: 'glsl', storage: { H: 'sampler2D' } });
+// ➔ { ok: true }
+```
+
+A parameter of a user function with no declared type takes the type of its
+argument at the first call. A call with an argument of another type is
+refused:
+
+```javascript
+ce.declare('x', 'real');
+ce.declare('z', 'complex');
+ce.assign('sq', ce.box(['Function', ['Power', 'u', 2], 'u']));
+
+compile(ce.box(['sq', 'x']), { to: 'glsl' }).preamble;
+// ➔ "float _fn_sq(float u) {\n  return (u * u);\n}\n"
+
+canCompile(ce.box(['Add', ['sq', 'x'], ['Real', ['sq', 'z']]]), { to: 'glsl' })
+  .diagnostic.message;
+// ➔ "The parameter `u` of `sq` has no declared type in the GLSL fragment,
+//    and it has the type `real` of its argument at the first call; the
+//    argument `z` has the type `complex`. Declare the type of the
+//    parameter, or call the function with arguments of one type."
+```
+
+A parameter whose type is a list with no length, as the engine infers it
+from the `At` reads of the body, takes the type of its argument the same
+way: a list of 2 to 4 numbers, or a point, gives a `vecN` parameter.
+
+```javascript
+ce.declare('y', 'real');
+ce.declare('d', '(list<number>, list<number>) -> number');
+ce.assign('d', ce.box(['Function',
+  ['Add', ['Multiply', ['At', 'a', 1], ['At', 'b', 1]],
+          ['Multiply', ['At', 'a', 2], ['At', 'b', 2]]],
+  'a', 'b']));
+
+compile(ce.parse('d([x, y], [1, 2])'), { to: 'glsl' }).code;
+// ➔ "_fn_d(vec2(x, y), vec2(1.0, 2.0))"
+```
+
+A call of a user function with a list of 2 to 4 reals has the value that
+the interpreter gives. When every parameter of the function is scalar, the
+interpreter applies the function to each element of the list, and the
+shader code calls the function on each component with a wrapper. Otherwise
+the list binds its parameter whole: a parameter with no declared type, or a
+point parameter that the body reads by index, is a `vec2` to `vec4`.
+
+```javascript
+ce.assign('f', ce.box(['Function', ['Mod', 'u', 1], 'u']));
+compile(ce.box(['f', ['List', ['Negate', 'x'], ['Negate', 'y']]]), { to: 'glsl' })
+  .code;
+// ➔ "_fn_f_each2_1(vec2(-x, -y))"
+// The preamble has `float _fn_f(float u)` and the wrapper
+// `vec2 _fn_f_each2_1(vec2 a0) { return vec2(_fn_f(a0.x), _fn_f(a0.y)); }`
+
+ce.assign('R', ce.box(['Function',
+  ['List',
+    ['Sum', ['Multiply', 'V', ['List', ['Cos', 't'], ['Negate', ['Sin', 't']]]]],
+    ['Sum', ['Multiply', 'V', ['List', ['Sin', 't'], ['Cos', 't']]]]],
+  'V', 't']));
+compile(ce.box(['R', ['List', 'x', 'y'], 0.5]), { to: 'glsl' }).code;
+// ➔ "_fn_R_vector_real_2_number(vec2(x, y), 0.5)"
+```
+
+A longer list is refused, and so are lists of two lengths in one call of a
+scalar function, and a list at a point parameter that is declared or that a
+call in the body requires (the interpreter refuses the list there).
+
+`compile()` to `glsl` runs the same check first. For a node outside the
+fragment it declines with the same diagnostic: `success` is `false` and `run()` uses the
+interpreter, or, with `fallback: false`, it throws an error with the
+message. `compileFunction()`, `compileShader()` and `compileToSource()` of
+the GLSL target run the check too, and throw.
+
+```javascript
+const r = compile(ce.parse('\\int_0^x \\sin(t)\\,dt'), { to: 'glsl' });
+r.success;           // ➔ false
+r.diagnostic.code;   // ➔ "outside-fragment"
+r.diagnostic.operator; // ➔ "Integrate"
+```
+
+The answer depends only on the expression, the options and the declarations
+that the expression reaches (the types of its symbols, the definitions of the
+functions it calls). A program can keep it until one of those declarations
+changes. Only the `glsl` target has a fragment: for another target,
+`canCompile()` answers `ok: false`, and the program calls `compile()`. The
+exception is `javascript` with the option `profile: 'numeric-kernel'` (see
+"The `numeric-kernel` Profile (Experimental)").
+
+**A limit on the loops of a shader.** A shader cannot throw, and a loop with
+a large bound can stop the GPU long enough for the browser to lose the WebGL
+context. The code of `compile()` to `glsl` counts the passes of every loop
+(`Sum`, `Product`, `Loop`, `parallel for`, also in user functions), with one
+count for each evaluation. Over the limit, the loops stop and the value is
+`NaN` (`false` for a boolean). The limit is the `iterationBudget` option,
+10,000 by default; `Infinity` removes the counter. With
+`iterationBudget: 100`, `\sum_{k=1}^{n} kx` compiles to:
+
+```glsl
+_gpu_passes = 0;
+float _tv1 = 0.0;
+for (int k = 1; k <= int(floor(n)); k++) {
+  if (++_gpu_passes > 100) break;
+  _tv1 += float(k) * x;
+}
+float _tv2 = _tv1;
+return _gpu_passes > 100 ? _gpu_nan() : _tv2;
 ```
 
 ### Lists in Shader Storage: the `storage` Option
 
-On the `glsl` and `wgsl` targets, a free symbol that holds a list of numbers
-is by default a shader array of a fixed length (`uniform float S[1600];`,
-`array<f32, 1600>`), which you declare and fill. The `storage` option says
-where the values of a list live instead, per symbol name. The option is
-checked on every target, but only the shader targets use it: an unknown
+On the `glsl` target, a free symbol that holds a list of numbers is by
+default a shader array of a fixed length (`uniform float S[1600];`), which you
+declare and fill. The `storage` option says where the values of a list live
+instead, per symbol name. The option is checked on every target, but only the
+shader target uses it: an unknown
 kind, or a name that is not a free symbol of the expression, throws an error.
+
+A free symbol whose type gives no length (`list<number>`, `list`,
+`set<number>`, `matrix`) has no shader declaration, so a compilation that
+reads it declines and falls back to the interpreter. Declare the length in
+the type (`list<number^8>`).
 
 | Kind | Targets | The list | Reads |
 | :--- | :--- | :--- | :--- |
-| `'sampler2D'` | `glsl`, `wgsl` | A fixed length (`list<number^1600>`), in a single-channel float texture that you declare and upload | `At(S, i)` |
-| `{ kind: 'storage-buffer', group, binding }` | `wgsl` | A length and contents that you change at run time, in a storage buffer that the compilation declares | `At(S, i)`, `Length(S)`, `Sum`, `Product`, `Max`, `Min`, `Mean` of `S` |
+| `'sampler2D'` | `glsl` | A fixed length (`list<number^1600>`), in a single-channel float texture that you declare and upload | `At(S, i)` |
 
-#### Storage buffers (`'storage-buffer'`)
-
-A storage buffer holds a list whose contents and length change with no new
-compilation, for example the board of a game of life. Declare the symbol as
-a list of real numbers (`list<real>`), or of points of 2 to 4 real
-coordinates (`list<tuple<real, real>>`), and give the group and the binding
-of the buffer:
+A shader function has no parameter for a list. When a user-defined function
+receives a list input of the expression as an argument, the call uses a
+definition of the function with no parameter for the list, whose body reads
+the input itself, from the uniform array or the texture:
 
 ```javascript
-ce.declare('S', 'list<real>');
-const r = compile(ce.parse('S_{N\\lfloor y\\rfloor + \\lfloor x\\rfloor + 1}'), {
-  to: 'wgsl',
-  storage: { S: { kind: 'storage-buffer', group: 1, binding: 0 } },
+ce.declare('H', 'list<number^1600>');
+ce.declare('g', '(list<real>, real) -> real');
+ce.assign('g', ce.box(['Function', ['Multiply', ['At', 'L', 1600], 'x'], 'L', 'x']));
+const r = compile(ce.box(['g', 'H', 'x']), {
+  to: 'glsl',
+  storage: { H: 'sampler2D' },
 });
+// r.code: "_fn_g_bind0_H(x)"
+// r.preamble holds:
+// float _fn_g_bind0_H(float x) {
+//   return x * _gpu_texat1600(H, 1600.0);
+// }
 ```
 
-The preamble of the result declares the buffer, and the code reads it
-through helpers that the preamble also declares:
-
-```wgsl
-struct CE_List_f32 { len: u32, data: array<f32> }
-@group(1) @binding(0) var<storage, read> S: CE_List_f32;
-```
-
-The struct is named by its element type (`CE_List_f32`, `CE_List_vec2f`,
-`CE_List_vec3f`, `CE_List_vec4f`), so the same name always has the same
-text. The `var` line is declared once per buffer. If you merge the
-preambles of several compilations into one shader, keep one copy of each
-struct and one `var` line per buffer.
-
-`r.storageBuffers` gives the layout of each buffer that the code reads:
-`{ symbol, name, struct, group, binding, element, components, lengthOffset,
-dataOffset, stride, minBindingSize }`. A `vars` mapping of the symbol to an
-identifier names the buffer (`vars: { S: 'board' }` declares `board`); a
-mapping to anything else is a decline, and so are two lists mapped to one
-name. `freeSymbolTypes.S.lowered` is the name of the struct.
-
-**The layout that you write.** The buffer starts with the logical length of
-the list, a `u32` at byte 0. The elements follow, at the offset that the
-WGSL layout rules give to `data`, and with the stride of the element type:
-
-| Element | Element type | `dataOffset` | `stride` | `minBindingSize` |
-| :--- | :--- | ---: | ---: | ---: |
-| real number | `f32` | 4 | 4 | 8 |
-| point of 2 coordinates | `vec2f` | 8 | 8 | 16 |
-| point of 3 coordinates | `vec3f` | 16 | 16 | 32 |
-| point of 4 coordinates | `vec4f` | 16 | 16 | 32 |
-
-Element `k` (0-based) is at byte `dataOffset + k * stride`; the bytes
-between `len` and `dataOffset` are padding. A `vec3f` takes 16 bytes, not 12:
-write the three coordinates and leave the fourth `f32` unused. WebGPU
-requires room for one element in the binding, so the smallest buffer is
-`minBindingSize` bytes, also for an empty list.
-
-**A change of length** is one 4-byte write at offset 0
-(`device.queue.writeBuffer(buffer, 0, new Uint32Array([len]))`), with no new
-buffer, bind group or compilation. The buffer can hold more elements than
-`len`; `len = 0` is the empty list.
-
-**Index rules.** `At(S, i)` is 1-based and a negative index counts from the
-end, as on the other targets. An index of 0, a non-integer, `NaN`, an
-infinity, or an index whose absolute value is above `len` gives `NaN` (a
-vector of `NaN` for a point). A `len` larger than the number of elements the
-buffer holds makes every read of the list give `NaN`, never a read outside
-the buffer; `Length(S)` is then the number of elements the buffer holds, so
-that a loop bounded by `Length(S)` stops after them (a wrong `len` of 2³¹
-would otherwise run until the GPU times out). The index and the length are
-`f32` values in the shader, which are exact integers up to 2²⁴, so a list
-can have at most 16,777,216 (about 16.7 million) elements.
-
-**What reads the buffer.** `At(S, i)`; `Length(S)` (the `len` header);
-`Sum`, `Product`, `Max`, `Min` and `Mean` of `S` alone (a list of numbers
-only); and a sum or product whose bound is the length, such as
-`\sum_{k=1}^{\operatorname{Length}(S)} f(S_k, k)`, which is a loop over
-`len`. Each reduction runs once per shader invocation: with 22,500 elements,
-a reduction in a fragment shader reads 22,500 values per pixel. On the empty
-list, the values are those of the `javascript` target: `Sum` is 0,
-`Product` is 1, and `Max`, `Min` and `Mean` are `NaN`. An expression that
-uses the whole list in another way (`S + 1`, `2S`, `Max(S, 3)`, `Map`) has no
-shader form, because its length is known only at run time, and declines.
-
-The `glsl` target declines a storage buffer (WebGL2 has none): use
-`'sampler2D'` there. A list of complex numbers, booleans, strings or lists
-declines too.
-
-#### Long lists on `wgsl` with no `storage` hint
-
-WGSL guarantees a shader function only 8,192 bytes of function-scope
-variables, and an index read of an array value copies the array into such a
-variable. So on `wgsl`, a read of a free list symbol whose copy would need
-more than 8,192 bytes (more than 2,048 numbers, 1,024 points of 2
-coordinates, or 512 points of 3 or 4 coordinates) indexes the list where it
-is declared, with no copy: `At(S, i)` is `_gpu_at_S_22500(i)`, a helper whose
-body reads `S`. The symbol, or the identifier that `vars` maps it to, must
-then be a `var<storage>` declaration, not a parameter or a local of your own
-function. A `var<private>` does not do: WGSL gives `private` variables the
-same 8,192-byte guarantee as function variables. Nor does a `const` array,
-whose constructor is guaranteed only 2,047 elements. A read that would copy
-more than 8,192 bytes and cannot read in place (for example a `vars`
-mapping to a struct field, `u.S`) declines, with a message that names
-`'storage-buffer'`. A body that writes an input declines on every target,
-because compiled code writes only its own locals. A storage buffer is the recommended form for a long
-list. A shorter list keeps the copy, which is valid wherever you declare it.
-
-### WGSL Field Functions for Compute Shaders
-
-`WGSLTarget.compileFieldFunction()` compiles a scalar expression to a WGSL
-function that a compute shader of your own calls at each point of a grid, for
-example to sample an implicit surface `f(x, y, z) = 0` on a 3-D grid before
-meshing it. The Compute Engine supplies the function, the helper functions it
-calls and the layout of its parameters. You supply the entry point, the
-dispatch, the buffers and everything that reads the values.
-
-```javascript
-import { ComputeEngine, WGSLTarget } from '@cortex-js/compute-engine';
-
-const ce = new ComputeEngine();
-for (const s of ['x', 'y', 'z', 'c']) ce.declare(s, 'real');
-
-const wgsl = new WGSLTarget();
-const gyroid = wgsl.compileFieldFunction(
-  ce.parse('\\sin(x)\\cos(y) + \\sin(y)\\cos(z) + \\sin(z)\\cos(x) - c'),
-  { name: 'gyroid', coordinates: ['x', 'y', 'z'] }
-);
-```
-
-The result:
-
-- `function`: the declaration of the field function, with the coordinates as
-  `f32` arguments in the order of `coordinates`:
-
-  ```wgsl
-  fn gyroid(x: f32, y: f32, z: f32) -> f32 {
-    return -ce_params.c + sin(z) * cos(x) + sin(x) * cos(y) + sin(y) * cos(z);
-  }
-  ```
-
-- `paramsStructSource`: the declaration of the parameter struct type,
-  `struct CEParams { c: f32, }`. Every free symbol that is not a coordinate
-  is a **parameter**, a field of this struct, read as `ce_params.<name>`.
-- `params`: the fields of the struct, each with its `name`, `ceType`,
-  `wgslType` (`f32`, `vec2f`, `vec3f`, `vec4f` or `array<vec4f, k>`), byte
-  `offset` and `size` (and `length` for a list).
-- `paramsSize`: the size of the parameter buffer in bytes, a multiple of 16.
-- `helpers`: the other declarations that the function needs, by name: the
-  shared helpers (`_gpu_sin`, `_gpu_pow2`, …), the readers of list
-  parameters, and the user-defined functions that the expression calls. A
-  user-defined function `h` is named `_fn_<k>_<name>_h`, where `k` is the
-  number of characters of `name` (`_fn_6_fieldA_h`), so that two field
-  functions never give one name.
-- `warnings`: as `compile()` gives them, for example
-  `float32-unsafe-argument`.
-- `storageBuffers`: when the function reads a list in a storage buffer, the
-  layout of each buffer, as `compile()` gives it (see
-  [Storage buffers](#storage-buffers-storage-buffer)).
-
-The names are options: `paramsStruct` (default `'CEParams'`) and
-`paramsVariable` (default `'ce_params'`). The options `storage` and
-`constantFold` are those of `compile()`. A symbol with a `storage` hint is
-not a parameter: you supply the storage that the hint names.
-
-**Lists in a storage buffer.** A list with a `'storage-buffer'` hint is not a
-field of the parameter struct. The field function, and the user-defined
-functions it calls, read it with `At`, `Length`, `Sum`, `Product`, `Max`,
-`Min`, `Mean`, or a `\sum` to `\operatorname{Length}(S)`. Its declarations
-are in `helpers`: the struct type under its name (`CE_List_f32`), and the
-`var<storage, read>` line under the name of the buffer (`S`), so the module
-recipe below declares the buffer with no extra step. Its layout is in
-`storageBuffers`: bind the buffer at its `group` and `binding`, and write the
-`len` header and the elements as for `compile()`.
-
-```javascript
-const wave = wgsl.compileFieldFunction(
-  ce.parse('c + \\sum_{k=1}^{\\operatorname{Length}(S)} S_k \\sin(k x)'),
-  {
-    name: 'wave', coordinates: ['x', 'y', 'z'],
-    storage: { S: { kind: 'storage-buffer', group: 1, binding: 0 } },
-  }
-);
-// wave.helpers.S === '@group(1) @binding(0) var<storage, read> S: CE_List_f32;\n'
-// wave.storageBuffers[0] gives the offsets of `len` and of the elements.
-```
-
-**Parameters.** A real or integer scalar parameter is an `f32`. A
-parameter declared `integer` is a promise that you write an integral value:
-the field function relies on it (`\lfloor a \rfloor` compiles to
-`ce_params.a`). A list of
-`n` numbers, `n` at most 1024, (`list<number^n>`) is `array<vec4f, k>` with
-`k = ⌈n/4⌉`: element `i` (1-based) is the `f32` at byte `offset + 4(i − 1)`
-of the buffer. The function reads such a list only by position, with the
-rules of `At`: a negative index counts from the end, and `0`, an index that
-is not an integer and an index out of range give `NaN`.
-
-A **point**, a tuple of 2, 3 or 4 real numbers, is a `vec2f`, `vec3f` or
-`vec4f`. Its type comes from its declaration (`tuple<real, real, real>`) or,
-for a symbol that is not declared, from its value
-(`ce.assign('A', ['Tuple', 1, 2])`). A tuple of integers is a vector of `f32`
-too. A component declared `number` (`tuple<number, number>`) is read as a
-real number, as for a list of type `list<number^n>`: you can write only real
-values into the buffer. A component declared `complex` declines. The
-function reads the point as a WGSL vector, so you can use it whole or by
-component:
-
-```javascript
-// x, y, z and c are declared 'real', as in the first example. A coordinate
-// that is not declared is read with a NaN test: `_gpu_sin(y)`, not `sin(y)`.
-ce.assign('A', ce.box(['Tuple', 1, 2]));
-ce.assign('B', ce.box(['Tuple', 0.5, -1, 2]));
-const field = wgsl.compileFieldFunction(
-  ce.parse('c + \\operatorname{distance}((x,y,z),B) + A.x \\sin(y) - B.z'),
-  { name: 'field', coordinates: ['x', 'y', 'z'] }
-);
-// field.function:
-//   return ce_params.c + sin(y) * ce_params.A.x + -ce_params.B.z
-//     + distance(vec3f(x, y, z), ce_params.B);
-// field.paramsStructSource: struct CEParams { c: f32, A: vec2f, B: vec3f, }
-// offsets: c 0, A 8, B 16; paramsSize 32
-```
-
-`A.x` (or `A_1`) reads the first component, and `\operatorname{distance}`,
-`|A|`, `\operatorname{Norm}`, `\operatorname{Dot}`, the sum and difference of
-points, and `At(A, i)` work as in `compile()` for a symbol declared as a
-point. A point with 1 or more than 4 components, or with a component that is
-not a real number (a complex number, `NaN` or a list), declines.
-
-The scalars come first in the struct, in name order, then the points in name
-order, then the lists in name order. Each field starts at the next multiple
-of its alignment, as the WGSL layout rules require: an `f32` at a multiple of
-4 bytes, a `vec2f` (8 bytes) at a multiple of 8, a `vec3f` (12 bytes) and a
-`vec4f` (16 bytes) at a multiple of 16, and a list at a multiple of 16 bytes
-(the stride of `array<vec4f, k>` is 16 bytes, which a uniform buffer
-requires). Read the offsets from `params`: the padding between two fields is
-not written.
-
-A symbol whose value is a numeric constant is a parameter too: a number
-(`c := 0.5`), or a tuple or list of numbers (`A := (1, 2)`, `L := [1, 2, 3]`).
-The field function does not read its value in the engine, and you write the
-value to the buffer. A symbol whose value reads other symbols, or calls a
-user-defined function, is not a parameter: its value is written into the
-code, as `compile()` does. With
-`A := (x, 1)`, where `x` is a coordinate, `A.x` reads the coordinate `x`. With
-`a := 1`, `b := 2` and `A := (a, b)`, the parameters are `a` and `b`, and `A`
-is compiled as `vec2f(ce_params.a, ce_params.b)`. A value that reads itself
-through other symbols declines. A constant (`\pi`, or a symbol declared
-constant) is folded into the code, and a symbol whose value is a function is
-a user-defined function.
-
-**A user-defined function that reads a parameter.** Declare the parameter
-before its first assignment and before the function is defined:
-
-```javascript
-ce.declare('a', 'real');
-ce.assign('a', 5);
-ce.parse('h(t) := t + a').evaluate();   // reads ce_params.a
-```
-
-Without the declaration, the type of `a` is inferred from its value
-(`integer`), and the result type of `h` comes from that type. The field
-function reads `a` from the buffer as a real number, so that result type is
-not correct there: `\lfloor h(x) \rfloor` would lose its `floor`. The field
-function then declines, and its message names the declaration to add
-(`ce.declare('a', 'real')`, or `ce.declare('A', 'tuple<real, real>')` for a
-point). The same applies when the function reads the parameter through a
-symbol compiled in place (`c := a + 1`), and to a symbol compiled in place
-whose type comes from the parameter (`b := a`). A symbol compiled in place
-with a declared type that its value no longer fits (`b` declared `integer`,
-`b := a`, `a := 5`) declines too: declare `a` as `integer`, or `b` as `real`.
-A parameter with a real value (`a := 2.5`) needs no declaration.
-
-**A parameter change is a buffer write.** The compiled text does not depend
-on the parameter values: write the new values to the buffer, with no new
-compilation and no new pipeline.
-
-**The host module.** Declare the uniform variable with the struct type, then
-add the struct, the helpers and the function:
-
-```javascript
-const N = 64;  // grid points on each axis
-const module = [
-  gyroid.paramsStructSource,
-  '@group(0) @binding(0) var<uniform> ce_params: CEParams;',
-  '@group(0) @binding(1) var<storage, read_write> values: array<f32>;',
-  ...Object.values(gyroid.helpers),
-  gyroid.function,
-  '@compute @workgroup_size(4, 4, 4)',
-  'fn main(@builtin(global_invocation_id) id: vec3u) {',
-  `  if (any(id >= vec3u(${N}u))) { return; }`,
-  `  let p = vec3f(-4.712) + vec3f(id) * (9.424 / ${N - 1}.0);`,
-  `  values[id.x + ${N}u * (id.y + ${N}u * id.z)] = gyroid(p.x, p.y, p.z);`,
-  '}',
-].join('\n');
-```
-
-Write the parameter buffer from the `params` offsets:
-
-```javascript
-const paramsBuffer = device.createBuffer({
-  size: gyroid.paramsSize,
-  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-});
-
-function writeParams(values) {
-  const data = new Float32Array(gyroid.paramsSize / 4);
-  for (const p of gyroid.params) {
-    const v = values[p.name];
-    if (p.wgslType === 'f32') data[p.offset / 4] = v;
-    else data.set(v, p.offset / 4);   // a point or a list: one f32 each
-  }
-  device.queue.writeBuffer(paramsBuffer, 0, data);
-}
-
-writeParams({ c: 0.3 });   // then dispatch again: no recompilation
-```
-
-When the function has no parameter, `params` is empty, `paramsSize` is `0`
-and `paramsStructSource` is `''`: do not declare the uniform variable.
-
-**Several fields in one module.** A helper name always has the same source
-text, so you can merge the `helpers` of several field functions by name.
-Give each field function its own `name`, struct and variable, and bind one
-uniform buffer for each. Two fields can read one storage buffer: give it the
-same hint (the same `group` and `binding`) in both, and its two `helpers`
-entries are then the same text under the same names. This is the one
-exception to the rule that a helper name always has the same text: the
-declaration of a buffer, under the name of the buffer, has the same text only
-for the same hint and the same element type (a list of numbers is a
-`CE_List_f32`, a list of 2-D points a `CE_List_vec2f`). If two fields give two
-different texts under one key, their hints disagree: treat that as an error,
-and give the buffer one hint in every field.
-
-```javascript
-const a = wgsl.compileFieldFunction(exprA, {
-  name: 'fieldA', coordinates: ['x', 'y', 'z'],
-  paramsStruct: 'AParams', paramsVariable: 'a_params',
-});
-const b = wgsl.compileFieldFunction(exprB, {
-  name: 'fieldB', coordinates: ['x', 'y', 'z'],
-  paramsStruct: 'BParams', paramsVariable: 'b_params',
-});
-const helpers = { ...a.helpers, ...b.helpers };
-const module = [
-  a.paramsStructSource,
-  b.paramsStructSource,
-  '@group(0) @binding(0) var<uniform> a_params: AParams;',
-  '@group(0) @binding(1) var<uniform> b_params: BParams;',
-  ...Object.values(helpers),
-  a.function,
-  b.function,
-  // … the entry point calls fieldA(…) and fieldB(…)
-].join('\n');
-```
-
-**Declines.** The result is `success: false` with a `diagnostic`
-(`{ code, kind, message }`) in these cases:
-
-- `compile(expr, { to: 'wgsl' })` declines the expression: for example a
-  recursive function, a `Random()` outside `WithRandomSeed`, or `Integrate`.
-  The diagnostic is the diagnostic of `compile()`.
-- A parameter is a boolean, text, a complex number, a tuple that is not a
-  point of 2, 3 or 4 real numbers, a list of unknown length, or a list of
-  more than 1024 elements (`code: 'unsupported-parameter'`).
-  Give a longer list, or a list of unknown length, a `'storage-buffer'`
-  hint. A storage buffer cannot hold complex numbers, text, booleans or
-  lists of lists either.
-- The parameter struct takes more than 65,536 bytes, the size of a uniform
-  buffer binding that WebGPU guarantees (`maxUniformBufferBindingSize`):
-  read the largest lists from storage buffers instead.
-- A list parameter is used other than by position, for example in `\max(P)`.
-- The body assigns a coordinate or a parameter: a field function cannot write
-  its inputs. A name that only the body assigns is a local, not a parameter.
-- The body has no value to return (a lone declaration or assignment).
-- A user-defined function reads a coordinate that it does not take as a
-  parameter (`h(t) := t + x` called as `h(y)`): a user-defined function is
-  declared outside the field function, where the coordinates do not exist.
-  Pass the coordinate as an argument.
-- A user-defined function declares the name of `paramsVariable` (a parameter
-  `p` with `paramsVariable: 'p'`). Choose another name.
-- The value is not a real scalar: a complex number, a point, a boolean or a
-  list (`code: 'unsupported-result'`, `kind: 'capability'`). The value of
-  each `Return` in the body must be a real scalar too.
-
-A wrong option throws an error: a name that is not a WGSL identifier
-starting with a letter, a reserved word, a predeclared WGSL function or type
-(`sin`, `max`, `vec4f`), which would hide the built-in that the helpers call,
-a name that starts with `CE_List_` (the prefix of the storage-buffer
-structs), or a `storage` hint on a coordinate. A storage buffer whose name
-(or `vars` mapping) is a predeclared WGSL name declines, here and in
-`compile()`.
-
-**Numerical limits.** The function computes in `f32` (about 7 decimal
-digits; integers are exact up to 2²⁴). An infinity or a `NaN` computed at run
-time is not guaranteed on a GPU (see [Non-Finite Results](#non-finite-results)),
-and `sin` and `cos` of a large argument lose accuracy. A parameter declared
-`real` is a promise that you write a finite value: the function then calls
-the built-in `sin` and `cos` of an operand that reads it, with no `NaN`
-test.
+The argument must be an input. For a list argument that is a local
+variable, a list literal or a computed list, the function still has no
+shader definition: the compilation declines, unless it can fold or inline
+the call.
 
 ### Python/NumPy Target
 
@@ -2725,13 +3089,13 @@ Many Points at Once* and *Worker Threads* above.
 #### GLSL Interval Target (`interval-glsl`)
 
 :::warning[Deprecated]
-The `interval-glsl` target (and the never-rebuilt `interval-wgsl` sibling) is
+The `interval-glsl` target is
 deprecated and will be removed in a future release. GPU interval evaluation only
 pays off when the entire pipeline stays on the GPU; a compile → GPU framebuffer →
 `readPixels` → CPU round-trip is net-negative versus CPU `interval-js`, and the
 target cannot compile any relational operator (so it cannot host
 restriction/masking conditions). Use **`interval-js`** (CPU interval arithmetic)
-or the scalar **`glsl`**/**`wgsl`** targets instead.
+or the scalar **`glsl`** target instead.
 :::
 
 For GPU-based plotting, compile to GLSL interval arithmetic:

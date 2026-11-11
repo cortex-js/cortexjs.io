@@ -102,6 +102,71 @@ with no closed form therefore stays symbolic rather than numericizing:
 required to be finite reject an infinite argument outright — see
 [Number Theory](/compute-engine/reference/number-theory/).
 
+### Powers
+
+A power of exact numbers evaluates to an exact number. When the result would
+be too large, the power stays unevaluated, and `.N()` gives its floating-point
+value. The engine estimates the size of the result as the number of decimal
+digits of the base times the exponent, and the limit is 1,000,000 digits:
+
+```json example
+["Power", 2, 10]
+// ➔ 1024
+["Power", 999999999999999, 66000]
+// ➔ an integer of 990,000 digits
+["Power", 2, 10000000]
+// ➔ ["Power", 2, 10000000]  (unevaluated)
+// .N() ➔ 9.0498173063608003014e+3010299
+```
+
+A power of `0`, `1`, `−1`, `ImaginaryUnit` or `−ImaginaryUnit` to an integer
+exponent of any size is evaluated. A power of `ImaginaryUnit` uses the exponent
+modulo 4:
+
+```json example
+["Power", -1, 10000000]
+// ➔ 1
+["Power", "ImaginaryUnit", ["Add", ["Power", 10, 30], 1]]
+// ➔ ["Complex", 0, 1]
+```
+
+A power with an infinite operand gives its limit. A base whose absolute value
+is more than 1 raised to `PositiveInfinity` gives `PositiveInfinity`, and a
+base whose absolute value is less than 1 gives `0`. The engine compares the
+base with 1 by its exact value, so a base very near 1 also gives the limit.
+When an operand is a floating-point number, the result `0` is the
+floating-point `0.0`, as for `2.5/∞`. When the operands are exact, it is the
+exact `0`.
+
+```json example
+["Power", 2, "PositiveInfinity"]
+// ➔ "PositiveInfinity"
+["Power", 1.00000000001, "PositiveInfinity"]
+// ➔ "PositiveInfinity"
+["Power", 0.5, "NegativeInfinity"]
+// ➔ "PositiveInfinity"
+["Power", 0.5, "PositiveInfinity"]
+// ➔ 0.0  (a floating-point number)
+["Power", ["Rational", 1, 2], "PositiveInfinity"]
+// ➔ 0
+["Power", 1, "PositiveInfinity"]
+// ➔ "NaN"
+```
+
+A symbolic base raised to an infinity stays unevaluated until the base has a
+value, because the limit depends on that value:
+
+```js
+ce.declare('z', 'real');
+const expr = ce.parse('z^{\\infty}');
+expr.evaluate().json;
+// ➔ ["Power", "z", "PositiveInfinity"]
+expr.subs({ z: 2 }).evaluate().json;
+// ➔ "PositiveInfinity"
+expr.subs({ z: 0.5 }).evaluate().json;
+// ➔ { num: "0.0" }
+```
+
 ### Sums and Products
 
 <FunctionDefinition name="Sum">
@@ -142,6 +207,19 @@ Note this is equivalent to:
 
 ```json example
 ["Reduce", ["List", 5, 7, 11], "Add"]
+```
+
+An operand that is not a collection, with no indexing set, is one term. If it
+has no free variable, it is its own sum. If it has a free variable, the sum
+stays unevaluated, because no index is given: in `\sum x^k`, the index can be
+`x` or `k`. Write the index to sum over it: `\sum_{k} x^k`.
+
+```json example
+["Sum", 5]
+// ➔ 5
+
+["Sum", ["Power", "x", "k"]]
+// ➔ ["Sum", ["Power", "x", "k"]]
 ```
 
 
@@ -243,6 +321,12 @@ Mixed indexing sets (Element + Limits) can be used together:
 // ➔ 12  (n iterates {1,2}, m iterates 1 to 2)
 ```
 
+In LaTeX, the items of the superscript are the upper bounds, in order, of the
+ranges that have no upper bound in the subscript. A clause `n \in S` and its
+conditions take no superscript item, and neither does a range that gives its
+own upper bound, such as `n=0..10` or `1 \le n \le 10`. So
+`\sum_{n \in \{1,2\}, m=1}^{2} (n+m)` is the sum above, and gives `12`.
+
 #### Condition Filtering
 
 A condition can be attached to an Element expression to filter values from the set.
@@ -264,7 +348,16 @@ The condition is the optional 4th operand of the Element expression.
 // ➔ 8  (only (-2) × (-4))
 ```
 
-Supported condition operators: `Greater`, `GreaterEqual`, `Less`, `LessEqual`, `NotEqual`.
+The condition can be any boolean expression. In LaTeX, the item after
+`n \in S` is read as its condition when it is a relation (`n > 0`,
+`n \ne 2`), a logical expression (`n > 1 \land n < 5`), a predicate
+(`\mathrm{IsPrime}(n)`), an equation (`n \bmod 2 = 0`, `n = 3`) or a membership
+of the same index (`n \in T`). Every such item that follows the clause is a
+condition of it, and two or more are joined with `And`:
+`\sum_{n \in \{1,2,3\}, n > 1, n < 3} n` gives `2`. An item that binds another
+index, such as `m \in T` or `m = 1`, starts a new indexing set. The LaTeX of a sum with a
+condition writes the condition after the set, in parentheses when it could be
+read as a new indexing set: `\sum_{n\in S, (x=1)}n`.
 
 #### Simplification
 
@@ -380,6 +473,18 @@ Note this is equivalent to:
 
 ```json example
 ["Reduce", ["List", 5, 7, 11], "Multiply"]
+```
+
+An operand that is not a collection, with no indexing set, is one factor. If
+it has no free variable, it is its own product. If it has a free variable, the
+product stays unevaluated, because no index is given.
+
+```json example
+["Product", 5]
+// ➔ 5
+
+["Product", ["Power", "x", "k"]]
+// ➔ ["Product", ["Power", "x", "k"]]
 ```
 
 
@@ -651,16 +756,16 @@ is no one-argument form with default bounds (decided 2026-09-21).
 
 Smooth Hermite interpolation from 0 to 1 as `x` goes from `e0` to `e1`:
 `t² (3 − 2t)`, with `t = Clamp((x − e0) / (e1 − e0), 0, 1)`. This is the
-formula of the GLSL and WGSL built-in `smoothstep`, with the operands in the
+formula of the GLSL built-in `smoothstep`, with the operands in the
 same order. The result is exact for exact operands, and it broadcasts over
 collection arguments.
 
 - When `e0 = e1`, the result is the step function: 0 when `x < e0`, else 1.
 - When `e0 > e1`, the formula applies as written, and the result goes from 1
   to 0.
-- Every compile target gives these results. The GLSL and WGSL built-in
-  `smoothstep` has no defined result when `e0 ≥ e1`, so the shader targets
-  write the formula out instead of calling it.
+- Every compile target gives these results. The GLSL built-in
+  `smoothstep` has no defined result when `e0 ≥ e1`, so the shader target
+  writes the formula out instead of calling it.
 
 ```json example
 ["Smoothstep", 0, 1, ["Rational", 1, 3]]
@@ -909,9 +1014,7 @@ while repeated draws **within** the frame still differ.
 
 The seed must be a **finite** real number: `real` excludes $\pm\infty$ and
 `NaN`, so an infinite or undefined seed is rejected with an `out-of-range`
-error rather than silently hashed. (Earlier releases spelled this parameter
-type `finite_real`. That name is retired; bare `real` now carries the same
-finiteness guarantee.)
+error rather than silently hashed.
 
 ```json example
 ["WithRandomSeed", "PositiveInfinity", ["Random"]]

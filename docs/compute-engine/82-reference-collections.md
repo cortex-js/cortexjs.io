@@ -311,13 +311,57 @@ Examples of function evaluating to a lazy collection include:
 - [**Cycle**](#cycle): infinite collections that repeat a finite collection.
 - [**Iterate**](#iterate): infinite collections that apply a function to an initial value repeatedly.
 - [**Repeat**](#repeat): infinite collections that repeat a single value.
-- [**Fill**](#fill) and [**Tabulate**](#tabulate): collections of a specified
-  size, where each element is computed by a function or set to a specific value.
+- [**Tabulate**](#tabulate): collections of a specified size, where each
+  element is computed by a function.
 
 ### Types
 
 - The type `collection` represents any collection, whether indexed or not, finite or infinite.
 - The type `indexed_collection` applies to collections that support index-based access, such as `List`, and `Tuple`.
+
+### The Shape of an Expression Before Evaluation
+
+In JavaScript, two properties of an expression tell different things:
+
+- `expr.isCollection` (and `expr.count`, `expr.each()`, `expr.at()`) tells
+  whether a collection value is present that can be walked **now**.
+- `expr.staticShape` tells which collection shape the expression
+  **promises**, read from its type without evaluating it. It is
+  `{ indexed, count, elementType }`, or `undefined` when the expression
+  promises no collection.
+
+A call of a function that returns a list has no value before it is evaluated,
+but its type gives its shape:
+
+```js
+ce.assign('f', ce.parse('n \\mapsto [n, n+1, n+2, \\frac{n}{2}]'));
+const call = ce.parse('f(3)');
+
+call.isCollection;
+// ➔ false
+call.count;
+// ➔ undefined
+call.staticShape;
+// ➔ { indexed: true, count: 4, elementType: 'rational' }
+call.evaluate().toString();
+// ➔ [3,4,5,3/2]
+
+ce.declare('g', '(integer) -> list<real>');
+ce.parse('g(3)').staticShape;
+// ➔ { indexed: true, count: undefined, elementType: 'real' }
+
+ce.parse('\\sin(x)').staticShape;
+// ➔ undefined
+```
+
+A symbol declared with a collection type and no value (`L: vector<2>`) gives
+its declared shape. A call of a name that was never declared gives
+`undefined`: its type is a guess, not a promise. An `If` with an else branch
+whose branches are collections gives the shape they agree on.
+
+The elements still come from the value: when the value does not have the
+declared type, `each()` can give another number of elements than
+`staticShape.count`.
 
 
 
@@ -764,6 +808,19 @@ If the `count` is not specified, it is assumed to be `50`.
 
 If there is a single argument, it is assumed to be the `upper` bound, and the `lower` bound is assumed to be `1`.
 
+If a bound is an infinity or `NaN`, the samples cannot be computed and the
+collection has no value: its reads (`Sum`, `Count`, `Max`, `At`, `Element`)
+stay unevaluated, and compiled code gives `NaN`. With a `count` of `0` there
+are no samples, so `["Linspace", 0, "PositiveInfinity", 0]` is the empty list.
+
+```json example
+["Count", ["Linspace", 0, "PositiveInfinity", 3]]
+// ➔ ["Count", ["Linspace", 0, "PositiveInfinity", 3]]
+
+["Count", ["Linspace", 0, "PositiveInfinity", 0]]
+// ➔ 0
+```
+
 ```json example
 ["Linspace", 3, 10]
 // ➔ ["List", 3, 3.142857142857143, 3.2857142857142856,
@@ -792,33 +849,42 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 
 <FunctionDefinition name="Fill">
 
-<Signature name="Fill" returns="list">_f_:function, _dimensions_:tuple</Signature>
+<Signature name="Fill" returns="list">_value_, _d1_:integer, _d2_:integer, ...</Signature>
 
-<div className="tags"><span className="tag">lazy</span></div>
-
-Produce a matrix of the given `dimensions` by applying `f` to each pair of row
-and column indexes. The function comes **first** and the dimensions are a
-`Tuple`, so `["Fill", f, ["Tuple", 2, 3]]` is a 2×3 matrix whose element at row
-`i`, column `j` is `f(i, j)`.
+Create a list or a tensor with each element equal to `value`. Each argument
+after the value is the length of one axis: one gives a list, two give a
+matrix, three give a tensor of rank 3. In Epsil, the function is written
+`fill`.
 
 ```json example
-["Fill", 
-  ["Function", ["Add", "i", "j"], "i", "j"], 
-  ["Tuple", 2, 3]
-]
-// ➔ ["List", ["List", 2, 3, 4], ["List", 3, 4, 5]]
+["Fill", 7, 3]
+// ➔ ["List", 7, 7, 7]
+
+["Fill", 7, 2, 3]
+// ➔ ["List", ["List", 7, 7, 7], ["List", 7, 7, 7]]
 ```
 
-A constant function fills every cell with the same value:
+The value is evaluated once: `["Fill", ["Random"], 3]` holds three copies of
+one number. A function value is an element and is not called; to compute
+each element from its indexes, use [`Tabulate`](#tabulate).
+
+An extent of 0 or less gives an empty axis, and a symbolic extent leaves the
+expression unevaluated:
 
 ```json example
-["Fill", ["Function", 0], ["Tuple", 2, 3]]
-// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+["Fill", 7, 2, 0]
+// ➔ ["List", ["List"], ["List"]]
 ```
 
-`Fill` always builds a two-dimensional result: the dimension tuple must carry
-both a row count and a column count. To build a one-dimensional collection from
-an index, use [`Tabulate`](#tabulate) instead.
+A tensor with more than 10,000 elements is returned as a lazy collection: its
+elements are not created before they are read.
+
+[`Zeros`](/compute-engine/reference/linear-algebra/#zeros) and
+[`Ones`](/compute-engine/reference/linear-algebra/#ones) are the same as
+`Fill` with the value 0 or 1.
+
+Up to version 0.184.0, `Fill(f, (m, n))` built an m×n matrix of `f(i, j)`.
+That form is now an `incompatible-type` error: write `Tabulate(f, m, n)`.
 
 </FunctionDefinition>
 
@@ -848,7 +914,7 @@ and the result is a nested list.
 // ➔ ["List", ["List", 2, 3, 4], ["List", 3, 4, 5]]
 ```
 
-Unlike [`Fill`](#fill), `Tabulate` takes each dimension as a separate argument.
+To give every element the same value, use [`Fill`](#fill).
 
 </FunctionDefinition>
 
@@ -2457,7 +2523,7 @@ otherwise produce are never what was meant. This contract holds for every
 callback-taking collection operator: `Filter`, `Any`, `All`, `Count`,
 `TakeWhile`, `FlatMap` and their kin supply one argument (the element),
 `Reduce`, `Fold` and `Scan` supply two (the accumulator and the element),
-`Fill` supplies two (row and column), and `Sort`/`Ordering` (a key or a
+`Tabulate` supplies one index per dimension, and `Sort`/`Ordering` (a key or a
 comparator) and `Iterate` (`f(previous)` or `f(index, previous)`) accept
 either of their two arities. A nullary literal such as `["Function", 42]`
 is a constant and is applied at any arity. To take a pair apart inside a
@@ -3013,6 +3079,23 @@ string:
 ["DeleteAt", {str: "abcdef"}, -1]
 // ➔ "abcde"
 ```
+
+<Signature name="DeleteAt" returns="dictionary">_dictionary_, _key_:string</Signature>
+
+On a dictionary or a record, return a copy without the entry of the string
+`key`. A key that is not there gives the value unchanged.
+
+```json example
+["DeleteAt", {dict: {a: 1, b: "x"}}, {str: "b"}]
+// ➔ {dict: {a: 1}}
+
+["DeleteAt", {dict: {a: 1, b: "x"}}, {str: "zz"}]
+// ➔ {dict: {a: 1, b: "x"}}
+```
+
+The type of a record loses the field: `record{a: integer, b: string?}` gives
+`record{a: integer}`. With a key known only at evaluation, every field of the
+record becomes optional.
 
 </FunctionDefinition>
 

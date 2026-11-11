@@ -36,13 +36,6 @@ the same name: neither `real` nor `RealNumbers` admits $\pm\infty$. To include t
 infinities, use an extended set (`ExtendedRealNumbers`) or the type `number`,
 which covers the finite numbers, the infinities and NaN.
 
-:::info[Deprecated spellings]
-The type names `finite_integer`, `finite_rational`, `finite_real`,
-`finite_complex` and `finite_number` are **retired**. They are still accepted on
-input for one release cycle and normalize to the bare name — `finite_real`
-becomes `real`, `finite_number` becomes `complex` — but they are never emitted.
-:::
-
 Checking if an element is in a set is equivalent to checking if the type of the
 element matches the type associated with the set.
 

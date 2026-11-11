@@ -225,14 +225,19 @@ ce.expr(['Trace', S]).evaluate().toString();  // → a + d
 A symbol whose type can hold a list (a `matrix`, a `tensor`, `number | tensor`)
 can be a matrix itself. Then the list can be a block matrix, so it is not
 typed as a matrix, and `Trace`, `Determinant` and `Inverse` of it stay
-unevaluated. A symbol gets such a type when it is declared with it, or when it is
-first used as the operand of a matrix operation: `Determinant(a)` gives `a`
-the type `matrix`, and `Trace(a)` gives it the type `number | tensor`
-(`Trace` also accepts a scalar and a tensor of any rank).
+unevaluated. A symbol gets such a type when it is declared with it. In an
+expression, the operand of a matrix operation has such a type:
+`Determinant(a)` gives `a` the type `matrix`, and `Trace(a)` gives it the
+type `number | tensor` (`Trace` also accepts a scalar and a tensor of any
+rank). That type belongs to the expression; `ce.infer()` declares it:
 
 ```js example
-ce.expr(['Determinant', 'a']);
-ce.expr('a').type.toString();   // → matrix
+const det = ce.expr(['Determinant', 'a']);
+det.op1.type.toString();        // → matrix
+ce.expr(['List', ['List', 'a', 'b'], ['List', 'c', 'd']]).type.toString();
+// → matrix<2x2>: `a` is not declared
+
+ce.infer([det]);                // declares a: matrix
 ce.expr(['List', ['List', 'a', 'b'], ['List', 'c', 'd']]).type.toString();
 // → list<list<unknown>>
 ```

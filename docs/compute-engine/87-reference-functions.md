@@ -61,6 +61,19 @@ To specify a function literal with LaTeX use the `\mapsto` command:
 ["Function", ["Add", ["Multiply", "x", 2], "y"], "x", "y"]
 ```
 
+In the body, a parameter with no type followed by a parenthesized argument is
+a **call** of the parameter, so a function can take another function as an
+argument. The exception is an argument that contains the parameter:
+`q \mapsto q(2q)` is the product `2q^2`. A parameter with a number type is a
+value, and the juxtaposition is a product:
+
+```js example
+ce.parse('(g \\mapsto \\int_0^1 g(x)\\,dx)(t \\mapsto t^2)').evaluate();
+// ➔ 1/3
+ce.parse('((x\\colon \\mathrm{real}) \\mapsto x(2))(3)').evaluate();
+// ➔ 6
+```
+
 A parameter may also be a **tuple pattern**: a `["Tuple", …]` of parameter
 names (or `_` to skip a position, or a nested pattern) in a parameter
 position. It is still **one** parameter — it takes one argument, which must
@@ -122,6 +135,20 @@ An argument that is not a tuple of that shape yields the same
 produces. Function literals with a tuple-pattern parameter are interpreted;
 the compile targets decline them rather than emit code that binds the wrong
 names.
+
+A function literal with a tuple pattern, a rest parameter (`["Spread", name]`)
+or a default value has no `\mapsto` notation in LaTeX: `(x, y) \mapsto xy` is
+a function of two parameters, not of one pair. The LaTeX of such a literal is
+`\mathrm{Function}(…)` with its MathJSON operands, and `ce.parse()` reads that
+text back as the same literal:
+
+```js example
+ce.box(["Function", ["Multiply", "x", "y"], ["Tuple", "x", "y"]]).latex;
+// ➔ "\mathrm{Function}(xy, \mathrm{Tuple}(x, y))"
+
+ce.box(["Function", ["Multiply", "k", "x"], "x", ["Optional", "k", 2]]).latex;
+// ➔ "\mathrm{Function}(kx, x, \mathrm{Optional}(k, 2))"
+```
 
 The examples in this section define functions as a simple expression, but 
 function literals can include more complex control structures, including blocks,
@@ -338,7 +365,7 @@ ce.expr(['g', ['List', ['Tuple', 1, 2], ['Tuple', 3, 4]]]).evaluate();
 
 A parameter with no declared type, or declared `string`, binds the tuple
 whole: `Apply(u ↦ 7, (a, b))` is `7`. The compiled code gives the same tuple:
-an array on the `javascript` target, and a `vecN` on the GLSL and WGSL targets.
+an array on the `javascript` target, and a `vecN` on the GLSL target.
 
 #### Opting Out
 
@@ -365,8 +392,10 @@ operator that consumes a whole collection — `Mean`, `Median`, `Variance`,
 `StandardDeviation`, `Mode`, `Quartiles`, `Max`, `Min`, `Sum`, `Product`,
 `GCD`, `LCM`, `Flatten`, `ListFrom`, `SetFrom` or `TupleFrom` — a list
 argument binds whole. The parameter is followed through element-wise
-operators (`mean(v^2)`, `sin(v)`) and through a local of the body assigned
-from it.
+operators (`mean(v^2)`, `sin(v)`), through a local of the body assigned
+from it, and through a call to another function whose parameter binds whole,
+also when the body assigns that function to a local before the call
+(`h = t \mapsto \operatorname{mean}(t)`, then `h(v)`).
 
 ```js example
 ce.assign('h', ce.parse('v \\mapsto \\operatorname{mean}(v^2)'));
@@ -687,6 +716,19 @@ definition is not an error — the pipe stays symbolic and evaluates once the
 symbol is defined. Note that `Pipe` is stricter here than `Apply`, which
 treats a non-function operand as a constant: `["Apply", 3, 5]` evaluates
 to `3` (this shorthand is relied on by operators such as `Map`).
+
+One function operand is read as the name of a term, not as a value: a
+subscript on the index of a sum or a product. The LaTeX
+`\sum_{k=1}^{2} f_k(x)` is
+`["Sum", ["Apply", ["Subscript", "f", "k"], "x"], ["Limits", "k", 1, 2]]`,
+and it evaluates to `f_1(x) + f_2(x)`. Each term is read as the term written
+alone: `f_1(x)` is a call when `f_1` is a function or has no definition, and
+a product when `f_1` has a value. With `w_1 = 2` and `w_2 = 3`:
+
+```json example
+["Sum", ["Apply", ["Subscript", "w", "i"], 4], ["Limits", "i", 1, 2]]
+// ➔ 20
+```
 
 A `\square` topic marker in the right-hand side names the position the piped
 value fills, so a stage can be a multi-argument call:

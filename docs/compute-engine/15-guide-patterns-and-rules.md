@@ -280,6 +280,33 @@ console.log(ce.expr(["Add", 1, "x"]).match(ce.expr(["_f", "__args"])));
 // ➔ { _f: "Add", __args: ["Sequence", [1, "x"]] }
 ```
 
+### Library Names in a Pattern
+
+A function name in a pattern that is the name of a library function, such as
+`Sqrt`, means the library function. In a scope where a user function `Sqrt`
+is declared, a call of the user function does not match the pattern, and a
+rewrite rule for the library function does not apply to it. A name that is not
+the name of a library function matches by name, and a wildcard head captures
+the name.
+
+```js
+const L = ce.box(['Sqrt', 'y']);    // the library square root
+ce.pushScope();
+ce.declare('Sqrt', 'function');
+ce.assign('Sqrt', ce.box(['Function', ['Add', 'x', 100], 'x']));
+const U = ce.box(['Sqrt', 'y']);    // the user function
+console.log(L.match(['Sqrt', '_x']));
+// ➔ { _x: "y" }
+console.log(U.match(['Sqrt', '_x']));
+// ➔ null
+console.log(U.match(['_f', '_x']));
+// ➔ { _f: "Sqrt", _x: "y" }
+ce.popScope();
+```
+
+A repeated named wildcard matches only parts that are `isSame`: the pattern
+`["Tuple", "_x", "_x"]` does not match `["Tuple", L, U]`.
+
 
 ## Substitution
 

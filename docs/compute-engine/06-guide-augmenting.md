@@ -25,13 +25,15 @@ When a symbol such as `Pi` or `Sin` is encountered in an expression, the
 Compute Engine will look up its definition in the set of known 
 symbols, including the Standard Library.
 
-### Automatic Declaration
+### Undeclared Symbols
 
 If a matching definition is found, it will be bound to the symbol and 
 used later to evaluate the expression.
 
-If no definition is found, an automatic declaration will be made of the
-symbol with a type `unknown` or a more specific type if the context allows it.
+If no definition is found, the symbol is not declared. It stays unbound
+until the expression is evaluated, and it reads the definition that the symbol
+has then. Its type in the expression is the type that its uses there require,
+or `unknown`. `ce.infer()` declares such symbols with those types.
 
 <ReadMore path="/compute-engine/guides/types" >
 Learn more about **types**.<Icon name="chevron-right-bold" />
@@ -294,6 +296,31 @@ ce.declare("double", { evaluate: (args) => args[0].mul(2) }, { extend: true });
 // or
 ce.declare("double", { evaluate: ([x]) => x.mul(2) }, { extend: true });
 ```
+
+**A handler must not evaluate the expression that contains its call**, for
+example an expression that your code keeps in a variable. The engine does not
+detect this, and the result is not specified. With `evaluateAsync()`, the
+promise never settles:
+
+```js
+let node;
+ce.declare("g", {
+  signature: "() -> integer",
+  pure: true,
+  evaluateAsync: async () => {
+    await node.evaluateAsync();   // Do not do this
+    return ce.number(5);
+  },
+});
+node = ce.box(["Reverse", ["List", 1, ["g"]]]);
+await node.evaluateAsync();
+// ➔ never settles
+```
+
+The nested call waits for the evaluation of `node` that is in progress, and
+that evaluation waits for the handler. When `g` is not declared `pure`, each
+nested call starts a new evaluation of `node`, which calls the handler again,
+without end.
 
 **A name is declared once per scope.** Declaring it again throws
 `The symbol "double" is already declared in this scope`. This also applies
@@ -1237,7 +1264,7 @@ name declared in another scope with other hooks does not change the values
 of the first one. When a head is declared again without `arithmetic`, its
 values have no hooks any more; its kind type remains a kind type, so its
 values and symbols are still protected from the number rules. A checkpoint
-restore puts the kinds back as they were at the checkpoint.
+restore (deprecated) puts the kinds back as they were at the checkpoint.
 
 #### Compiling a value of a kind
 
@@ -2851,7 +2878,7 @@ Each library in `requires` must already be loaded. The call throws, and
 declares nothing, for a library name that is already loaded, a missing required
 library, a standard library, or a definition that is invalid, repeated, or
 already declared in the global scope. A checkpoint taken before the call
-(`ce.checkpoint()`) undoes it.
+(`ce.checkpoint()`, deprecated) undoes it.
 
 `ce.libraryOf(name)` returns the name of the library that defines `name`:
 `"trigonometry"` for `Sin`, the `name` of a loaded library for one of its

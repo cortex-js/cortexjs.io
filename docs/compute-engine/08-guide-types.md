@@ -42,7 +42,11 @@ literal's tier instead (see [Literal Types Are Not Stored](#literal-types-are-no
 
 The type of a symbol can be declared explicitly, or it can be inferred from 
 the context in which it is used, such as the value that is assigned to it
-or the operation that is performed on it.
+or the operation that is performed on it. A type inferred from an operation
+belongs to the expression that holds the operation: parsing or boxing an
+expression declares no symbol. `ce.infer()` declares the symbols of some
+expressions with the types that their uses require (see
+[Type Inference](#type-inference)).
 
 **To explicitly declare the type of a symbol**, use the `ce.declare()` function.
 
@@ -289,11 +293,7 @@ whose *sign* is promised, which `infinity` does not — write
 `signed_infinity`. It is precisely the union of the two value types, and
 `+oo | -oo` is an equivalent spelling of the same type; a union
 containing both signed infinities prints under the name
-(`real | signed_infinity`). The former name for this pair,
-`non_finite_number`, is **retired**: that name was misleading, since
-$\tilde\infty$ and $\infty + i$ are non-finite numbers yet were not
-members. It is still accepted on input for one release cycle and
-normalizes to `signed_infinity`, but it is never printed.
+(`real | signed_infinity`).
 
 </div>
 
@@ -301,22 +301,6 @@ The extended real line — a real number that may be infinite — has no
 one-word name: write it out as `real | +oo | -oo`. Bare `real` does
 not admit $\pm\infty$, and `real | infinity` would also admit the unsigned
 $\tilde\infty$.
-
-:::warning **Deprecated: the `finite_` type names**
-
-The names `finite_number`, `finite_complex`, `finite_real`,
-`finite_rational` and `finite_integer` have been **retired**. The bare names
-above now carry those meanings, so each retired name denoted the same set of
-values as a bare one.
-
-For one release cycle the type parser still accepts them and normalizes each
-to its replacement — `finite_integer` to `integer`, `finite_rational` to
-`rational`, `finite_real` to `real`, `finite_complex` to `complex`, and
-`finite_number` to `complex` (since "any finite number" *is* the finite
-complex type). They are never produced by the engine, so a type you read back
-is always spelled with the bare name. Update your type strings before the
-aliases are removed.
-:::
 
 Numeric types can be constrained to a specific range within a lower and upper 
 bound
@@ -694,12 +678,24 @@ where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the valu
 For example: `record{red: integer, green: integer, blue: integer}` is a record that
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
+A record type is **closed**: a value of the type has exactly the keys that the
+type lists. A key that a value can leave out is an **optional field**, written
+with a `?` after its type: `record{red: integer, green: integer, alpha: real?}`.
+A read of an optional field that the value leaves out gives the absent value of
+the field type (`Missing`, or `NaN` for a numeric field). A read of a key that
+the type does not list is an `unknown-field` error.
+
 **Compatibility:**
-- A record type `A` matches a record type `B` when every field required by `B`
-  is present in `A` with a compatible type. Thus a record with more fields is a
-  subtype of one with fewer fields (width subtyping). The order of the keys
-  does not matter.
+- A record type `A` matches a record type `B` when every key of `A` is a key of
+  `B`, every key that `B` requires is also required by `A`, and each field type
+  of `A` is compatible with the field type of `B`. A record with more fields is
+  not a subtype of one with fewer fields: there is no width subtyping. The order
+  of the keys does not matter.
+- A record without an optional field, or with it, matches the record type with
+  the field optional: `record{a: integer}` and `record{a: integer, b: string}`
+  match `record{a: integer, b: string?}`.
 - A record is compatible with a dictionary `dictionary<T>` if each type `T1`, `T2`, ... is compatible with `T`.
+- A program that must accept other keys takes a `dictionary<T>`.
 
 
 ```js
@@ -713,6 +709,10 @@ ce.type("record{red: integer, green: integer}")
 
 ce.type("record{red: integer, green: integer, blue: integer}")
   .matches("record{red: integer, green: integer}");
+// ➔ false
+
+ce.type("record{red: integer, green: integer}")
+  .matches("record{red: integer, green: integer, blue: integer?}");
 // ➔ true
 
 ce.type("record{red: integer, green: integer, blue: integer}")
@@ -2082,12 +2082,17 @@ ce.box({ dict: { red: 1, green: 2 } }).type
 // ➔ true
 ```
 
-**Width subtyping** is supported for records, meaning that a record with more keys is
-compatible with a record with fewer keys.
+Record types are closed: a record with more keys is **not** compatible with a
+record type with fewer keys. A key that a value can leave out is declared as an
+optional field.
 
 ```js
 ce.box({ dict: { red: 1, green: 2, blue: 3 } }).type
   .matches("record{red: integer, green: integer}");
+// ➔ false
+
+ce.box({ dict: { red: 1, green: 2 } }).type
+  .matches("record{red: integer, green: integer, blue: integer?}");
 // ➔ true
 ```
 
@@ -2452,12 +2457,19 @@ ce.expr("n").type;
 ```
 
 When a symbol is used in a function expression, the expected type of the
-arguments is used to infer the type of the symbol.
+arguments is used to infer the type of the symbol in that expression. The
+expression declares nothing: a symbol boxed on its own keeps the type
+`unknown` until `ce.infer()` declares it.
 
 ```js
-ce.declare("n", "unknown");
 ce.declare("f", "(number) -> number");
-ce.expr(["f", "n"]);
+const expr = ce.expr(["f", "n"]);
+expr.op1.type;
+// ➔ "number"
+ce.expr("n").type;
+// ➔ "unknown"
+
+ce.infer([expr]);
 ce.expr("n").type;
 // ➔ "number"
 ```
@@ -2467,7 +2479,7 @@ assigning a value of a more specific type to the symbol or by using the
 symbol in a context that requires a more specific type.
 
 Use-driven refinement applies to symbols that do **not** hold a value: for
-a mathematical unknown, a use *declares* what the symbol must be. Once a
+a mathematical unknown, a use *requires* what the symbol must be. Once a
 symbol **has been assigned**, its type records what it actually holds —
 that is evidence, and a later use is a requirement *checked against* the
 evidence rather than a refinement of it:
@@ -2475,9 +2487,8 @@ evidence rather than a refinement of it:
 ```js
 ce.declare("k", "(integer) -> integer");
 
-// Valueless symbol: the use DECLARES its type
-ce.expr(["k", "n"]);
-ce.expr("n").type;         // ➔ "integer"
+// Valueless symbol: the use REQUIRES its type, in this expression
+ce.expr(["k", "n"]).op1.type;  // ➔ "integer"
 
 // Assigned symbol: the use CHECKS against the evidence
 ce.assign("x", 3.5);       // x: real (widened per the table above)
@@ -2507,13 +2518,14 @@ reports `expected integer, got number at x` as a **static** diagnostic,
 before anything runs. Assignment is last-write-wins: swapping the two
 assignments makes the program correct, and the check accepts it.
 
-Continuing the example above:
+`ce.infer()` combines the requirements of several expressions. Continuing
+the example of `f` above:
 
 ```js
 ce.declare("g", "(integer) -> number");
-ce.expr(["g", "n"]);
+ce.infer([ce.expr(["g", "n"])]);
 ce.expr("n").type;
-// ➔ "integer": "n" has been narrowed 
+// ➔ "integer": the inferred "n" has been narrowed
 //    from "number" to "integer"
 ```
 
@@ -2626,7 +2638,7 @@ Inference writes happen at these moments:
    value's type — widened per the table above — becomes the symbol's
    inferred type, and each later assignment re-infers.
 2. **Argument positions**: passing an `unknown`-typed symbol to a typed
-   parameter narrows the symbol to the parameter's type (see the `f(n)`
+   parameter requires the parameter's type of the symbol (see the `f(n)`
    examples above). This includes *forwarding* through user functions: in
    `g(c) = pick(c)` where `pick`'s own body indexes its parameter, the
    collection evidence inferred for `pick` propagates to `c`, so `g` binds
@@ -2639,10 +2651,10 @@ Inference writes happen at these moments:
    self-call that forwards a parameter unchanged, or passes a scalar, is no
    evidence, so `f(x) = x * 2` still broadcasts: `f([1, 2, 3])` is
    `[2, 4, 6]`. A type inferred as
-   a union by one use is narrowed again by a later use whose parameter admits
+   a union by one use is narrowed again by another use whose parameter admits
    only some of its members: `ToUpperCase(s)` infers `s` as
-   `character | string`, and a later `Sort(s)` narrows it to `string` instead
-   of refusing the call. A *declared* union is checked, not narrowed.
+   `character | string`, and a `Sort(s)` in the same expression narrows it to
+   `string` instead of refusing the call. A *declared* union is checked, not narrowed.
 3. **Function-literal bodies**: a bare (unannotated) lambda parameter starts
    as `unknown` and is narrowed by how the body *uses* it — indexing
    (`v[1]`) narrows it to a collection, arithmetic
@@ -2656,7 +2668,8 @@ Inference writes happen at these moments:
    type is the union of the read requirements. The inferred tuple is not
    enforced at application.
 4. **Uses of an element**: a use of an element taken out of a collection
-   refines the collection's *element* type. `xs[1] + 1` makes an undeclared
+   refines the collection's *element* type, in the expression that holds
+   the use. `xs[1] + 1` makes an undeclared
    `xs` an `indexed_collection<number>`, `xs["a"] + 1` a
    `dictionary<number>`, `First(xs) + 1` an `indexed_collection<number>`,
    and `k(xs[1])` with `k: (integer) -> integer` an

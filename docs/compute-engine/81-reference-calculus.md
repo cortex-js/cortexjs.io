@@ -234,6 +234,19 @@ A variable can be repeated to compute the second derivative of a function.
 ["D", "f", "x", "x"]
 ```
 
+In the body of a sum or a product, a variable with the index as subscript
+follows the index, so each term differentiates with respect to its own
+variable. The variable `["Subscript", "x", 1]` is the symbol `x_1`.
+
+<Latex value="\sum_{i=1}^{2} \frac{\partial}{\partial x_i} x_i^2"/>
+
+```json example
+    ["Sum", ["D", ["Power", ["Subscript", "x", "i"], 2], ["Subscript", "x", "i"]],
+      ["Limits", "i", 1, 2]]
+evaluates to
+    ["Add", ["Multiply", 2, "x_1"], ["Multiply", 2, "x_2"]]
+```
+
 Differentiating an application of an **unknown** function keeps the result
 symbolic. The partial with respect to each argument is carried as a multi-index
 `Derivative` (see the `Derivative` function below):
@@ -321,7 +334,7 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 | `Floor(x)` | `0` | Derivative is 0 almost everywhere |
 | `Ceil(x)` | `0` | Derivative is 0 almost everywhere |
 | `Round(x)` | `0` | Derivative is 0 almost everywhere |
-| `Mod(x, n)` | `0` | Derivative is 0 almost everywhere. In the modulus, `D(Mod(x, m), m)` is `-floor(x/m)` |
+| `Mod(x, n)` | `1` | Derivative is 1 almost everywhere. In the modulus, `D(Mod(x, m), m)` is `-floor(x/m)` |
 | `GCD(x, n)` | `0` | Discrete function |
 | `LCM(x, n)` | `0` | Discrete function |
 
@@ -330,6 +343,30 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 :::info[Chain Rule]
 For all supported functions, the chain rule is automatically applied. For example,
 `d/dx sin(x²) = cos(x²)·2x`.
+:::
+
+:::info[Definite Integrals]
+The derivative of a definite integral is the derivative of its closed form
+when the integral has one: `\frac{d}{dy}\int_0^1 xy\,dx` evaluates to `1/2`.
+Otherwise the derivative is taken under the integral sign (the Leibniz rule),
+with a term for each bound that depends on the variable:
+`\frac{d}{dx}\int_0^x e^{t^3}\,dt` evaluates to `e^(x^3)`, and
+`\frac{d}{dy}\int_0^1 e^{x^3 y}\,dx` to `int_(0)^(1)(x^3 * e^(y * x^3) dx)`.
+The derivative stays unevaluated when the integrand has a step, a condition or
+a singularity that depends on the variable (`\lfloor x + y \rfloor`,
+`\ln|x - y|`), and for an integral over an infinite range with no closed form.
+:::
+
+:::info[Indefinite Integrals]
+The derivative of an indefinite integral with respect to its own variable is
+the integrand (the fundamental theorem of calculus), also when the integrand
+has no antiderivative in closed form: `\frac{d}{dx}\int x^2\,dx` evaluates to
+`x^2`, and `\frac{d}{dx}\int e^{x^3}\,dx` to `e^(x^3)`. With respect to
+another variable, it is the derivative of the antiderivative, or the integral
+of the derivative of the integrand when there is no antiderivative in closed
+form: `\frac{d}{dy}\int x^2 y^3\,dx` evaluates to `x^3 * y^2`, and
+`\frac{d}{dy}\int e^{x^2 y}\,dx` to `int(x^2 * e^(y * x^2) dx)`. These
+results hold up to a constant of integration.
 :::
 
 
@@ -580,16 +617,35 @@ the function.
 ]
 ```
 
-Double integrals can be computed by specifying more than one limit.
+Double integrals can be computed by specifying more than one limit. The first
+limit is the outermost integral, as in `Sum` and `Product`. In LaTeX, the
+first integral sign is the outermost integral and the differentials are
+written innermost first, so the first limit is the variable of the last
+differential.
 <Latex flow="column" value="\int_1^3\int_0^2 x^2+y^2 dx dy"/>
 
 ```json example
 ["Integrate", 
   ["Add", ["Power", "x", 2], ["Power", "y", 2]], 
-  ["Tuple", "x", 0, 2], 
-  ["Tuple", "y", 1, 3]
+  ["Tuple", "y", 1, 3], 
+  ["Tuple", "x", 0, 2]
 ]
+// evaluates to 68/3
 ```
+
+The order is important when a bound of an inner integral uses the variable of
+an outer integral:
+
+```json example
+["Integrate", ["Multiply", "x", "y"],
+  ["Limits", "y", 0, 1],
+  ["Limits", "x", 0, ["Multiply", 2, "y"]]
+]
+// evaluates to 1/2
+```
+
+The double integral sign gives the same order: the first limit of
+`\iint f(x, y)\,dx\,dy` is `y` and the second is `x`.
 
 The bounds can also be written flat after the variable. After the variable,
 an operand that is not a variable name starts the bounds, and the next operand
@@ -683,6 +739,20 @@ divergent integral is `+∞`, `−∞` or `NaN`:
 ```json example
 ["NIntegrate", ["Function", ["Divide", 1, "x"], "x"], 0, 1]
 // -> +∞
+```
+
+Some convergent integrals cannot be told apart from divergent ones by
+quadrature, because most of their value is closer to a bound than the
+floating-point numbers can sample. Their value is also `NaN`. For example,
+$\int_0^{1/2} \frac{dt}{t(-\ln t)^{1.001}}$ converges to $1000.37$:
+
+```json example
+["NIntegrate",
+  ["Function",
+    ["Divide", 1, ["Multiply", "t", ["Power", ["Negate", ["Ln", "t"]], 1.001]]],
+    "t"],
+  0, 0.5]
+// -> NaN
 ```
 
 

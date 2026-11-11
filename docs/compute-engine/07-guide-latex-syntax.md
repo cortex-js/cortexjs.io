@@ -147,7 +147,7 @@ application: `(k)(x - 1)` is `k·(x - 1)`, `(a)(b)` is `a·b` and `(k)(x, y)` is
 `k·(x, y)`. Only a name that the library or a declaration defines as a function
 keeps the application reading: `(\sin)(x)` is `sin(x)`, and `(f)(3)` is `f(3)`
 when `f` is declared a function. A function type that the engine only inferred
-from an earlier `f(x)` does not count.
+(`ce.infer()` of an `f(x)`) does not count.
 
 ```js
 ce.parse('(k)(x-1)').json;  // ["Multiply", "k", ["Add", "x", -1]]

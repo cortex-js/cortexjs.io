@@ -110,6 +110,26 @@ always `true` or `false`, never undetermined.
 been assigned the value `5`, `ce.symbol('x').isSame(5)` is `false` — one
 expression is a symbol, the other a number. Use `isEqual()` to compare values.
 
+Two symbols, or two function calls, with the same name are the same only when
+they denote the same definition. A call `Sqrt(y)` boxed before a user
+function `Sqrt` is declared in a scope is a call of the library square root; a
+call `Sqrt(y)` boxed in that scope is a call of the user function. The two are
+not `isSame`:
+
+```js
+const L = ce.box(['Sqrt', 'y']);
+ce.pushScope();
+ce.declare('Sqrt', 'function');
+ce.assign('Sqrt', ce.box(['Function', ['Add', 'x', 100], 'x']));
+const U = ce.box(['Sqrt', 'y']);
+console.log(L.isSame(U));
+// ➔ false
+ce.popScope();
+```
+
+Two calls of a library function are `isSame`, also when they come from two
+engines.
+
 - \\( x + x \\) and \\( 2x \\) are not structurally equal, one is a sum of two
   terms, the other a product
 - \\( (x + 1)^2 \\) and \\( x^2 + 2x + 1 \\) are not structurally equal, one is a

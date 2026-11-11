@@ -124,9 +124,13 @@ structural expression. A pipeline that must stay on the structural tier
 should not route through `.evaluate()`.
 :::
 
-Also note that `.subs()` is not capture-avoiding on **any** tier. If a
-substitution reaches into a binder body, avoiding name collisions is the
-caller's responsibility.
+Also note that `.subs()` avoids variable capture on every tier. When a
+replacement contains a name that a binder binds, the binder renames that name
+first: `\sum_{k=1}^{3} (j+k)`, parsed in the structural form, with `j`
+replaced by `k` gives `["Sum", ["Delimiter", ["Add", "k", "k_1"]], ["Tuple",
+"k_1", 1, 3]]`, which evaluates to `3k + 6`. The target of an `Assign` in a
+held `Block`, and a `Declare` or an `Assign` in a branch of an `If` of a held
+`Block`, are not renamed: see the documentation of `subs()`.
 
 ## Parse Vocabulary vs Canonical Vocabulary
 
@@ -342,20 +346,24 @@ console.log(ce.lookupDefinition('myHead')); // ➔ undefined
 The head is simply not bound — the node is inert. This is the intended
 behavior, and it is covered by the notice guarantee above.
 
-The **canonical** route does the opposite: it auto-declares the head as a
-`function` with an inferred type, a write to the current lexical scope.
+The **canonical** route declares nothing either: the node is a call of
+`myHead`, and the head is resolved when the call is evaluated. The type that
+the call requires of the head (`function`) is kept with the expression;
+`ce.infer()` declares it:
 
 ```ts
 const ce2 = new ComputeEngine();
-ce2.expr(['myHead', 1, 2]);   // canonical
+const call = ce2.expr(['myHead', 1, 2]);   // canonical
+console.log(ce2.lookupDefinition('myHead')); // ➔ undefined
 
+ce2.infer([call]);
 const def = ce2.lookupDefinition('myHead');
 console.log(def.value.type.toString());   // ➔ "function"
 console.log(def.value.inferredType);      // ➔ true
 ```
 
-Inert versus declaring is precisely the structural/canonical split. If the
-head *is* declared as an operator, the structural box binds it normally:
+If the head *is* declared as an operator, the structural box binds it
+normally:
 
 ```ts
 ce.expr(['Sin', 1], { form: 'structural' }).operatorDefinition?.name;
@@ -498,9 +506,8 @@ ce.expr(['k', ['List', 1, 2]]).type.toString(); // ➔ "vector<2>"
 Validity itself is compositional, and `Error` nodes attach at the offending
 operator, so a subtree probe (`ce.expr(changedSubtreeJson).isValid`, then
 discard the tree) costs work proportional to the change rather than to the
-whole expression. Note that a canonical probe **writes to scope** — it
-auto-declares undeclared heads and free symbols. Contain those writes with a
-per-call scope (below), or with `ce.pushScope()`/`ce.popScope()`.
+whole expression. A canonical probe declares no symbol and no head, so it
+does not change the types that another expression reads.
 
 ## Per-Call Scope Control
 
@@ -510,11 +517,12 @@ here as a contract; the spellings are subject to the notice guarantee only
 once it ships. Check the CHANGELOG for the release that carries it.
 :::
 
-Canonical parsing and boxing write to the engine's current lexical scope:
-free symbols are declared by usage inference, undeclared call heads are
-auto-declared, the subscript fold resolves names, and an `Assign` left-hand
-side is pre-declared. A consumer parsing untrusted or out-of-order input
-needs to contain those writes.
+Canonical parsing and boxing read the engine's current lexical scope: the
+subscript fold resolves names, and each symbol is bound to the definition that
+its name has there. They declare nothing: a symbol with no definition keeps
+its name and the scope it was boxed in, and `ce.infer()` declares it there. A
+consumer parsing untrusted or out-of-order input chooses the scope that both
+read.
 
 ### The `scope` Option
 
@@ -524,9 +532,10 @@ ce.expr(json,   { scope });
 ```
 
 When a `scope` is supplied, the parse or box runs with it as the current
-lexical scope. Lookups walk `scope → parents`, and **all auto-declares and
-inference land rooted at the supplied scope**. Discarding the scope discards
-the writes.
+lexical scope. Lookups walk `scope → parents`, and a symbol with no
+definition belongs to the supplied scope: `ce.infer()` declares it there,
+when that scope is current (`ce.pushScope(scope)`). Discarding the scope
+discards those declarations.
 
 :::warning[Behavior change]
 `ce.expr`'s existing `scope` option steers *lookup only* today —
@@ -644,9 +653,9 @@ interface InspectableScope extends Scope {
 ```
 
 `declarations()` reports the scope's own bindings — the initializer's entries
-with their post-inference types, alongside anything auto-declared during the
-call. `inferred` is true when the type was auto-declared or inferred from
-usage rather than stated by the caller; an initializer entry declared with an
+with their post-inference types, alongside the declarations that `ce.infer()`
+made in the scope. `inferred` is true when the type was inferred from usage
+rather than stated by the caller; an initializer entry declared with an
 explicit type reports `false` even if inference later narrowed it. For an
 operator definition, `type` is its signature. Types are answered as
 `BoxedType` — the same boxed form as `expr.type` — so `entry.type.toString()`
@@ -658,6 +667,9 @@ independently of the order in which declares interleaved; a fingerprint over
 ```ts
 const scope = ce.createScope(heads);
 const expr = ce.parse(row, { scope });
+ce.pushScope(scope);
+ce.infer([expr]);
+ce.popScope();
 const harvested = scope.declarations();
 // … read inferred parameter types; drop `scope` when done
 ```
@@ -687,13 +699,9 @@ A hand-rolled `{ parent, bindings }` object literal still satisfies `Scope`
 and works as the `scope` option, but only `createScope()` products are
 inspectable.
 
-### Known Residual: Outer-Scope Narrowing
+### Outer-Scope Declarations
 
-An ephemeral scope contains new *declarations*; it does not contain
-*narrowing* of declarations that already exist. Type inference during a
-contained parse can still narrow a symbol declared in an **outer** scope.
-
-That residual is observable rather than silent: `narrowings()` reports every
-outer definition the contained parse narrowed, with its before and after
-type. A caller that needs containment rather than observation can compare or
-restore from that listing.
+A contained parse does not narrow a symbol declared in an **outer** scope:
+parsing and boxing change no definition, also an inferred one. So
+`narrowings()` has nothing to report after a parse. The type that the parse
+requires of such a symbol is kept with the expression.
