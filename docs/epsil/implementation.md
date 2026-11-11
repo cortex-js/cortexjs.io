@@ -80,6 +80,60 @@ library name it stands for (`Sin`, `Pi`) while leaving names the program or
 the engine binds alone — `executeEpsil` does this itself. See
 [Naming](/naming/).
 
+### Variables of a call
+
+`binderSitesOf(ce, node, source)` tells which names of a call to a library
+operator are the call's own variables, and which ones the call reads from
+outside. It gives one site per bound variable: the name, and the operands
+that see it (`"all"`, or the zero-based indices of the arguments; the head is
+not counted):
+
+```js
+import {
+  ComputeEngine,
+  binderSitesOf,
+  parseEpsil,
+} from "@cortex-js/compute-engine/epsil";
+
+const ce = new ComputeEngine();
+const source = "sum(k^2, k, 1, n)";
+const [call] = parseEpsil(source);
+binderSitesOf(ce, call, source);
+// ➔ [{ name: "k", operands: [0, 1, 2, 3] }]
+```
+
+Here `k` is bound and `n` is read. The result is `[]` for a library operator
+that binds nothing in the call (`max(pi, pi)`), and `undefined` for a call of
+a name that is not a library operator. The function does not see the
+bindings of the program: call it only for a call whose callee the program
+does not define. A `limit`, `nLimit`, `nd` or `nIntegrate` that does not
+write its variable binds the variable that the engine chooses, in its first
+operand only: `limit(sin(h)/h, 0)` gives `[{ name: "h", operands: [0] }]`.
+The engine reads the value of a name that the program binds, so its choice
+can depend on that value: after `let L = [1, 2]`, the variable of
+`limit(total(L)*t, 0)` is `t`, because `L` is a list, and the engine does not
+choose a `const` name. A host that knows the names the program binds at the
+call gives them as a fifth argument,
+`binderSitesOf(ce, call, source, undefined, (name) => …)`: when such a name
+comes first and other names follow, the result is `[]`. Without it, the
+result for this call is `[{ name: "L", operands: [0] }]`. A host that also
+knows how the program declares such a name gives a sixth argument, a
+function that returns a `ProgramDeclaration` for the name, or `undefined`:
+`{ constant, annotated, value, boxedEarly }`, for a `let` or `const` at the
+top level of the program that no other statement writes. `constant` is
+`true` for a `const`, `annotated` is `true` when the statement has a type
+annotation, `value` is the raw initializer, and `boxedEarly` is `true` when
+the call is in the body of a `function` statement that the program can call
+above that statement. With it, a `let` whose initializer is a number, a
+string, a list or a function literal, and a `const`, give the variable that
+the engine chooses: after `let L = [1, 2]` the result for
+`limit(total(L)*t, 0)` is `[{ name: "t", operands: [0] }]`, and after
+`const h = 5` the result for `limit(sin(h)/h, 0)` is `[]`. In the body of a
+function that the program can call above its `function` statement, the
+engine can box the body before the declaration runs, so a `const` whose
+initializer is a number, and a name with a type annotation, are not decided
+there.
+
 ### Execution
 
 `executeEpsil(ce, source, options?)` parses a program and evaluates its

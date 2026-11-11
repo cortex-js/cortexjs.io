@@ -410,9 +410,8 @@ value while `fn` runs, but a value that an assumption gives
 function definition, a value that is a function, and a value that `ce.assign()`
 refuses throw before any symbol gets a value.
 
-Unlike `ce.checkpoint()` and `ce.restore()`, which are deprecated,
-`ce.withValues()` can be called
-during an evaluation, for example in the `evaluate` handler of an operator.
+`ce.withValues()` can be called during an evaluation, for example in the
+`evaluate` handler of an operator.
 `fn` must be synchronous: the earlier values are put back when `fn` returns,
 before a promise that it returns settles.
 

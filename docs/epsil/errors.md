@@ -240,9 +240,15 @@ Rename one side so the two agree — the quick fix renames the annotation's para
 
 ## `absence-marker-binding`
 
-A binding names one of the absence markers `Nothing` or `Missing`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable or a `match` pattern. The engine recognizes these markers by their name wherever they appear — an arithmetic operand named `Nothing` is refused as a non-number, and an arithmetic operand named `Missing` is read as absent — so a binding of one of them could never behave like the value it holds. They are the only library names that cannot be rebound in any scope. Every other one, including `Pi` and `Square`, is shadowed by a user binding, with one exception: at the top level of a program, a `let` or `const` of a library constant that results carry by name (`Pi`, `ExponentialE`, `GoldenRatio`) is refused with a run-time error, because a result built with the library constant would read the user value when its MathJSON is boxed again.
+A binding names one of the absence markers `Nothing` or `Missing`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable or a `match` pattern. The engine recognizes these markers by their name wherever they appear — an arithmetic operand named `Nothing` is refused as a non-number, and an arithmetic operand named `Missing` is read as absent — so a binding of one of them could never behave like the value it holds. With `Module` (see `epsil doc module-binding`), they are the only library names that cannot be rebound in any scope. Every other one, including `Pi` and `Square`, is shadowed by a user binding, with one exception: at the top level of a program, a `let` or `const` of a library constant that results carry by name (`Pi`, `ExponentialE`, `GoldenRatio`) is refused with a run-time error, because a result built with the library constant would read the user value when its MathJSON is boxed again.
 
 Choose another name. In a `match`, a bare name is a new variable, not a comparison: to test for the marker, write `== Missing`.
+
+## `module-binding`
+
+A binding names `Module`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable, a `match` pattern or the index of a `sum`. `Module` is the operator of every qualified name: `std::pi` is `["Module", "Pi"]` in MathJSON. It cannot be rebound in any scope. The static check reports every such binding. A `let`, a `const`, an assignment or a `function` statement also defines nothing when it runs, and it evaluates to a `module-binding` error value. A parameter, a loop variable, a pattern or an index named `Module` is still bound when the program runs, but no binding changes what a qualified name reads: the head of a qualified name always reads the library operator `Module`.
+
+Choose another name.
 
 ## `variable-redeclaration`
 
@@ -266,6 +272,14 @@ A `let` or a `const` declares a name without a value: `let x: integer`. A declar
 
 The first assignment of a name is in a branch of an `if`, in a branch of a `match` or in the body of a loop. In `if c { t = 1 }; t`, the name `t` has no value when `c` is false. A first assignment declares a local only at the own level of a block that is not in a branch or a loop body. Declare the name with a value before the branch, `let t = 0; if c { t = 1 }; t`, or with a `let` in the branch when the name is a local of the branch only.
 
+## `assignment-to-library-function`
+
+A definition in math style, `Sin(x) := 5` or `Sin(x) = 5`, has the name of a function of the library. At the top level of a program it would replace that function for every later computation on the engine: a later LaTeX `\sin(0)` would give `5`. The statement is refused there and in a block or a function body too, and it defines no function.
+
+To define a function of your own, give it another name: `mySin(x) := 5`. A name with an initial lowercase letter, `sin(x) := 5`, is a name of the program: it hides the library function `Sin` only where the program writes `sin`. To replace the library function on purpose, write a `function` statement: `function Sin(x) { 5 }`. A math-style definition after that statement in the same block adds to that function: `function Sin(x) { 5 }` then `Sin(0) := 7`. In a block inside it, the definition is accepted too, and defines a local function that hides it.
+
+`At(xs, k) := v` is not a definition: it assigns to the element `k` of the list `xs`, as `xs[k] := v` does.
+
 ## `assignment-to-list-element`
 
 An assignment to a list element, `xs[i] = v`, gives `xs` a new list with the element replaced, as `xs = replaceAt(xs, i, v)` does. This error is a write that cannot give a list, and the variable keeps its value.
@@ -274,9 +288,55 @@ The target is a name with no value (`ys[1] = 9` with `ys` not declared). The pos
 
 A string and a tuple are written as `replaceAt` writes them, and give a list: with `s = "abc"`, `s[1] = "z"` gives the list of characters `["z", "b", "c"]`. A position past the end, zero or not an integer is the error `out-of-range`; the length of a string is its number of characters. A target that is a number, or a position that selects a number (`xs[1, 1] = 5` when `xs` is a flat list), is the error `incompatible-type` of `replaceAt`.
 
+## `add-to-target`
+
+The target of `+=` is not a variable or a list element. `s += e` is `s = s + e`, and `L[i] += e` is `L[i] = L[i] + e`, with the positions that `L[i] = v` accepts: `m[j, i] += e` and `m[j][i] += e` are the same element.
+
+A field (`p.x += 1`), a call (`f(x) += 1`) and a string position (`d["a"] += 1`) are not accepted. Write the assignment in full, `p.x = p.x + 1`, where that form is valid.
+
+## `parallel-clause-not-first`
+
+In a comprehension, only the first clause can be `parallel`: `[f(x, y) parallel for x in xs, y in ys]`. The first clause gives the passes, which can run in any order; the other clauses run in order inside each pass, so they cannot be parallel.
+
+To run the inner clause in parallel instead, make it the first clause, or write a parallel comprehension inside the body: `[[f(x, y) parallel for y in ys] for x in xs]`.
+
+## `parallel-outer-write`
+
+The body of a `parallel for` loop changes a variable that is declared outside the loop, and the change is not a `+=`. The passes of a parallel loop can run in any order, so a write such as `L[c] = v`, `s = s + 1` or `L = replaceAt(L, c, v)` would give a result that depends on that order.
+
+Write the change as `+=`: `L[c] += 1`, `s += x`. A variable that the body changes with `+=` is an accumulator: each pass adds its contributions, and the final value is the value before the loop plus all the contributions. The body can declare and change its own locals with `let` and `=`.
+
+## `parallel-accumulator-read`
+
+The body of a `parallel for` loop reads a variable that it also changes with `+=` (an accumulator). While the loop runs, the value of an accumulator depends on which passes have run, so a read of it in the body gives an unspecified value. (This is the rule of the Dex language and of OpenMP.)
+
+`epsil check` reports a read written by name in the body, also in a function literal written in the body: `L[c] += L[d]` and `if s > 3 { … }`. A read by another route cannot be found before the program runs, and is not reported: a function that the body calls (`s += total(k)` with `function total(x) { s + x }`), `parse("s")`, a function of the host. Its value is still unspecified. The interpreter and the JavaScript target run the passes in order and give the value that this order gives, but a target that runs the passes in parallel declines such a loop, and a later version can give another value.
+
+Read the value after the loop. To use a value of the list from before the loop, copy it first: `let H = L` before the loop, then `L[c] += H[d]` in the body.
+
+## `parallel-effect`
+
+The body of a parallel loop or a parallel comprehension can have only the `random` effect. Its passes can run in any order, so an effect such as `console` (`print`) or `state` would happen in an order that is not specified. The message lists the effects that the engine inferred for the body, also for the functions that it calls: a function of the program has the effects of its body, and a loop variable or a parameter whose type is a function type has the effects of that type. `any` means that the body calls a function that can have any effect.
+
+Move the effect out of the loop: collect the values with a parallel comprehension, then print them after it. A random draw is accepted: inside `WithRandomSeed`, each pass draws from its own frame, so the values do not depend on the order of the passes.
+
+A call of a function value whose type is not known, such as a function that an unannotated parameter holds, is inferred `pure`: in `function run(fs) { parallel for f in fs { f() } }`, a `print` in a function of `fs` is not seen. Annotate the parameter with the effects that it admits (`fs: list<() any -> any>`) to have such a loop checked.
+
+## `parallel-exit`
+
+A `break`, `continue` or `return` in the body of a parallel loop would leave the loop, or skip the rest of a pass, in an order that depends on how the passes run. A parallel loop always runs every pass.
+
+An inner loop of the body can use `break` and `continue`: they leave or skip that inner loop only. To skip the rest of a pass, put it in an `if`.
+
+## `parallel-comprehension-write`
+
+The body of a parallel comprehension changes a variable that is declared outside it. A parallel comprehension gives one element for each pass and changes nothing else, also with `+=`.
+
+To add to a variable in each pass, use the statement form: `parallel for x in xs { s += f(x) }`. The body of the comprehension can declare and change its own locals in a `do { … }` block.
+
 ## `assignment-in-operand`
 
-An assignment is a statement, not a value. In `f(a := 2)` and in `x = (a := 2) + 1` the assignment is an operand of another expression. Write the assignment as a statement of its own, then use the name: `a := 2; f(a)`.
+An assignment is a statement, not a value. In `f(a := 2)` and in `x = (a := 2) + 1` the assignment is an operand of another expression. Write the assignment as a statement of its own, then use the name: `a := 2; f(a)`. The compound assignment `+=` is an assignment too: write `s += 1; f(s)`, not `f(s += 1)`.
 
 ## `assignment-type-mismatch`
 
@@ -299,6 +359,8 @@ Two clauses of one function in a single program have the same dispatch domain, s
 Only replacement is refused. Clauses that dispatch on genuinely different domains accumulate — a different arity (`k(x)` and `k(x, y)`), different parameter types (`h(x: integer)` and `h(x: string)`), or a literal pattern (`g(0) = 99` alongside `g(x) = x`). That is what multi-clause definitions are for.
 
 The boundary is the program (one file, one cell). Within it, a same-domain redefinition is a mistake with no possible intent. Interactively, re-running an edited definition as a SEPARATE program — a later notebook cell, the next REPL line — replaces the earlier one; that is the intended redefinition gesture, and is legal.
+
+The rule applies in a function body and in a block too: two clauses with the same domain in one block are this error, as two `let` of one name are `variable-redeclaration`. `epsil check` reports it, and the block is invalid: in `function g() { f(y) = 1; f(x) = 3; f(0) }`, `g` is not defined. A clause in a nested block, or in a function body, with the domain of a clause of an enclosing scope is not a redefinition: it makes a local function that shadows the outer one. A statement that runs more than once, such as a definition in a loop body, does not collide with itself.
 
 ## `type-redefinition`
 
@@ -325,6 +387,16 @@ A protocol's `function` member was read with a dot, as if it were a field or a p
 A protocol declares two kinds of member, and they are used differently. A `function` member is CALLED, with the receiver as its first argument: `span(b)`, or with the dot and parentheses, `b.span()`. A `readonly` or `readwrite` member is a PROPERTY, read with a dot and no parentheses: `b.area`. So `b.span` — no parentheses — is a spelling mistake rather than a missing field — the name exists, on a protocol the value conforms to. The parentheses are what make the dot a call; `b.span` is never a function value bound to `b`.
 
 The mirror mistake, calling a property (`area(b)`), is reported as `protocol-property-not-callable`.
+
+## `unknown-field`
+
+A field was read, with a dot (`r.b`) or with a key (`r["b"]`), and the value has no field of that name.
+
+A record type lists every field of its values: `record{a: integer, b: string}` holds the values with the keys `a` and `b`, and no other key. So with `r: record{a: integer}`, `r.b` is refused before the program runs. A field that a value can leave out is declared optional, with a `?` after its type: with `r: record{a: integer, b: string?}`, `r.b` is a `string`, and it reads as `Missing` when the value has no key `b` (as `NaN` for a numeric field).
+
+A value that can have any keys is a dictionary: declare it `dictionary<V>`, and read a key with `d["b"]`.
+
+An object, or a value of a declared type, also has a fixed list of fields; the message names them.
 
 ## `dot-call-not-a-protocol-function`
 
@@ -361,6 +433,24 @@ For the author of the host: capabilities are the handlers of `ce.effects`. A han
 This problem was detected before anything ran, when the program was canonicalized — the same analysis `epsil check` performs.
 
 A static diagnostic never suppresses evaluation: the program still runs exactly as written (errors are values — see `epsil doc runtime-error`), so the same mistake may be reported a second time by the run itself. The label distinguishes the tiers: "Type error"/"Static error" for the pre-run analysis, "Runtime error" for the run.
+
+## `unknown-module`
+
+A qualified name `m::x` names a module that does not exist. The only module is `std`, the standard library: `std::pi` is the library constant `Pi`, and `std::floor(2.5)` calls the library function `Floor`, also where the program binds `pi` or `floor` to something else.
+
+A qualified name reads a name of a module, and `.` reads a field of a value: to read a field of a variable `m`, write `m.x`.
+
+## `not-a-library-name`
+
+A qualified name `std::x` names a definition of the standard library, and the library defines no `x`. Both spellings of a library name are valid after `std::`: `std::pi` and `std::Pi` are the constant `Pi`. A name of the program is never a library name, so `std::` cannot reach a variable or a function that the program defines.
+
+The program still runs, and the qualified name evaluates to a `not-a-library-name` error value.
+
+## `qualified-call-arguments-canonical`
+
+A call of a library function was made with arguments that were already canonical, where the program binds the name of the function, and the library function holds or binds an argument: the index `k` of a sum, the branches of an `If`. The MathJSON `["Apply", ["Module", "Sum"], "k", ["Limits", "k", 1, 3]]` (the Epsil `std::sum(k, k in 1..3)`) is valid: the engine reads the arguments as written. A callee in another form that becomes the library function only when it is canonicalized, such as `["Apply", ["Sequence", ["Module", "Sum"]], …]`, gets the arguments after they were canonicalized in the scope of the call, where the index `k` is a variable of that scope. So the call is an error.
+
+Write the callee as `["Module", name]`, in parentheses (`["Delimiter", ["Module", name]]`) or not. A library function whose arguments are all values (`Floor`, `Equal`, `List`) accepts canonical arguments, and is called with any form of the callee.
 
 ## `unknown-protocol`
 

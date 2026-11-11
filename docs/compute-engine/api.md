@@ -852,13 +852,13 @@ parses one.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -1365,11 +1365,11 @@ target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
 and `compile()`.
 
 Every engine has `javascript` and `interval-js`. Every engine also has
-`glsl`, `wgsl` and `python` once the full package entry,
+`glsl` and `python` once the full package entry,
 `@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
 the program, whichever entry made the engine and in whichever order. A
 program that loads only `@cortex-js/compute-engine/core` has the two
-built-in targets: import `GLSLTarget`, `WGSLTarget` or `PythonTarget`
+built-in targets: import `GLSLTarget` or `PythonTarget`
 from `@cortex-js/compute-engine/compile` and register it here.
 
 ####### name
@@ -1687,13 +1687,13 @@ type(type): BoxedType
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -1789,13 +1789,13 @@ createScope(bindings?, parent?): InspectableScope
 
 `Record`\<`string`, 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -1875,6 +1875,30 @@ assign(arg1, arg2?): IComputeEngine
 
 <MemberCard>
 
+##### ComputeEngine.withValues() {#withvalues-1}
+
+```ts
+withValues<T>(values, fn): T
+```
+
+Run `fn` with each symbol of `values` bound to the given value, and
+put back the earlier value and type of each symbol when `fn` returns or
+throws. `fn` must be synchronous.
+
+• T
+
+####### values
+
+\{\}
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ComputeEngine.declareType() {#declaretype-1}
 
 ```ts
@@ -1888,13 +1912,13 @@ declareType(name, type, options?): void
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -1962,13 +1986,13 @@ declare(id, type, scope?): IComputeEngine
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -2041,13 +2065,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 ####### arg2?
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -2061,13 +2085,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -2091,13 +2115,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -2145,13 +2169,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -2175,13 +2199,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -2995,6 +3019,23 @@ Lower and upper bounds for a symbol extracted from a domain restriction.
 
 </MemberCard>
 
+<MemberCard>
+
+### StaticShape {#staticshape}
+
+```ts
+type StaticShape = {
+  indexed: boolean;
+  count: number | bigint | undefined;
+  elementType: Type | undefined;
+};
+```
+
+The collection shape that an expression promises before it is evaluated.
+See `Expression.staticShape`.
+
+</MemberCard>
+
 ### NumberLiteralInterface {#numberliteralinterface}
 
 Narrowed interface for number literal expressions.
@@ -3318,7 +3359,7 @@ readonly isCollection: true;
 
 <MemberCard>
 
-##### CollectionInterface.count {#count-2}
+##### CollectionInterface.count {#count-3}
 
 ```ts
 readonly count: number | bigint | undefined;
@@ -4983,13 +5024,13 @@ type(type): BoxedType
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -5129,6 +5170,12 @@ of two forms:
 In both forms the derivative of `F(g₁, …, gₙ)` with respect to `v` is
 given by the chain rule: `Σᵢ ∂ᵢF(g₁, …, gₙ) · ∂gᵢ/∂v`. A partial
 derivative is requested only for an argument that depends on `v`.
+
+For an argument that is a point (a tuple or a list of tuples), the
+product `∂ᵢF · ∂gᵢ/∂v` multiplies each coordinate. It is correct only
+when the partial derivative is a number `c` (the Jacobian is `c·I`). When
+the partial derivative is a point (a gradient) or is not given, the
+derivative of the application stays unevaluated.
 
 </MemberCard>
 
@@ -5517,8 +5564,8 @@ callsCallbackOnRead?: boolean;
 ```
 
 Set on a lazy operator that calls a function operand when its elements
-are read, not when it is evaluated (`Map`, `Filter`, `Tabulate`, `Fill`,
-…). An instance created during a function call keeps the evaluation
+are read, not when it is evaluated (`Map`, `Filter`, `Tabulate`, …).
+An instance created during a function call keeps the evaluation
 context of that call, and each read of the instance runs in it, so that
 a name that the callback reads by its binding in the context (the symbol
 default `d` of a parameter `(x, k = d) => x * k`) has the value it had in
@@ -6225,13 +6272,13 @@ of `admittedAs`. `undefined` leaves the expression unevaluated.
 ```ts
 resultType(operator, operandTypes): 
   | string
-  | ListType
+  | RecordType
   | AlgebraicType
   | NegationType
   | CollectionType
+  | ListType
   | SetType
   | BroadcastableType
-  | RecordType
   | ObjectType
   | DictionaryType
   | TupleType
@@ -8659,7 +8706,11 @@ occurrences of the new name are the name and not an element of the base.
 The other parts of `expr` are not changed. The parse of a body that
 precedes the clause (`n_{0} + 1 \operatorname{with} n_{0} = 2`, an infix
 entry) is rewritten the same way, so a custom clause can bind a name
-after its body was read.
+after its body was read. A `Subscript` that the parser made from a
+joined name in the body of an inner sum or product
+(`\sum_{m_{n_0}=1}^{3}\sum_{n_0=1}^{2} m_{n_0}`, where the inner sum
+reads `m_{n_0}` as `m` indexed by `n_0`) is replaced the same way: here
+it is the name `m_n_0`, the index of the outer sum.
 
 ####### expr
 
@@ -11844,6 +11895,12 @@ If the expression cannot be evaluated, due to the values, types, or
 assumptions about its arguments, return `undefined` or
 an `["Error"]` expression.
 
+The handler must not evaluate an expression that contains the call
+that it evaluates, for example an expression that the host code keeps
+in a variable. The engine does not detect this, and the result is not
+specified. Under `evaluateAsync()` the promise of the outer evaluation
+can never settle (see `evaluateAsync`).
+
 #### OperatorDefinition.evaluateAsync?
 
 ```ts
@@ -11860,6 +11917,17 @@ the precision window of an enclosing `N(x, p)` call. An operand
 evaluation started with options of the handler's own inherits the
 window in force when it starts, but a handler that awaits BEFORE it
 evaluates its operand starts that evaluation outside the window.
+
+The handler must not evaluate an expression that contains the call
+that it evaluates. If it does, the promise of the outer evaluation can
+never settle. For example, with `g` a host operator whose handler is
+`async () => { await node.evaluateAsync(); return ce.number(5); }`
+and `node` the expression `Reverse(List(1, g()))`, the call
+`node.evaluateAsync()` never settles. When `g` is declared `pure`, the
+nested call waits for the evaluation of `node` that is in progress,
+and that evaluation waits for the handler. Otherwise, each nested call
+starts a new evaluation of `node`, which calls the handler again,
+without end. The engine does not detect either case.
 
 #### OperatorDefinition.evalDimension?
 
@@ -13460,13 +13528,13 @@ parses one.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -13973,11 +14041,11 @@ target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
 and `compile()`.
 
 Every engine has `javascript` and `interval-js`. Every engine also has
-`glsl`, `wgsl` and `python` once the full package entry,
+`glsl` and `python` once the full package entry,
 `@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
 the program, whichever entry made the engine and in whichever order. A
 program that loads only `@cortex-js/compute-engine/core` has the two
-built-in targets: import `GLSLTarget`, `WGSLTarget` or `PythonTarget`
+built-in targets: import `GLSLTarget` or `PythonTarget`
 from `@cortex-js/compute-engine/compile` and register it here.
 
 ####### name
@@ -14295,13 +14363,13 @@ type(type): BoxedType
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -14397,13 +14465,13 @@ createScope(bindings?, parent?): InspectableScope
 
 `Record`\<`string`, 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -14483,6 +14551,30 @@ assign(arg1, arg2?): IComputeEngine
 
 <MemberCard>
 
+##### IComputeEngine.withValues() {#withvalues}
+
+```ts
+withValues<T>(values, fn): T
+```
+
+Run `fn` with each symbol of `values` bound to the given value, and
+put back the earlier value and type of each symbol when `fn` returns or
+throws. `fn` must be synchronous.
+
+• T
+
+####### values
+
+\{\}
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.declareType() {#declaretype}
 
 ```ts
@@ -14496,13 +14588,13 @@ declareType(name, type, options?): void
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -14570,13 +14662,13 @@ declare(id, type, scope?): IComputeEngine
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -14649,13 +14741,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 ####### arg2?
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -14669,13 +14761,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -14699,13 +14791,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -14753,13 +14845,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -14783,13 +14875,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -16504,8 +16596,9 @@ readonly defines: readonly string[];
 
 The symbols **defined** by this expression: the target of a top-level
 `["Assign", …]` or `["Declare", …]` (e.g. `a` in `a := 3`, `f` in
-`f(x) := …`), recursing through `["Block", …]` sequences. Empty for
-expressions that define nothing.
+`f(x) := …`), recursing through `["Block", …]` sequences. A
+destructuring target defines each name of its pattern: `a` and `b` in
+`(a, b) := (1, 2)`. Empty for expressions that define nothing.
 
 Complements [freeVariables](#freevariables) (the symbols an expression
 *references*). A tool that builds a dependency graph keyed on cells —
@@ -16993,19 +17086,59 @@ series in `Normal` to drop the remainder, before or after the
 substitution. `Normal(Series(sin x, x, 0, 3))` with `x` replaced by
 `0.5` evaluates to `0.479…` under `.N()`.
 
-The substitution does not avoid variable capture: a replacement that
-contains a name that a binder binds is inserted as it is, and the
-binder is not renamed. `["Sum", ["Add", "j", "k"], ["Limits", "k", 1, 3]]`
-with `j` replaced by `k` is `["Sum", ["Add", "k", "k"], ["Limits", "k",
-1, 3]]`, which evaluates to `12`. When the replacement can contain the
-index, rename the index first with a recursive `replace()` of the rule
-`k -> m`: the result is `["Sum", ["Add", "k", "m"], ["Limits", "m", 1,
-3]]`, which evaluates to `3k + 6`.
+A `Block` that assigns a variable of an enclosing scope, and can read it
+before the first assignment, reads its value from outside the block, so
+the variable is free. A replacement of each occurrence would give an
+invalid assignment, so the block keeps its occurrences and gets a first
+statement that assigns the replacement: with `a` declared outside the
+block, `["Block", ["Assign", "a", ["Add", "a", 1]], "a"]` with `a`
+replaced by `2` is `["Block", ["Assign", "a", 2], ["Assign", "a", ["Add",
+"a", 1]], "a"]`, which evaluates to `3`. When it is evaluated, the block
+writes the variable of the enclosing scope, as the block it replaces
+does. With several such variables, the first statement assigns them all
+at the same time: `["Assign", ["Tuple", "a", "b"], ["Tuple", "b",
+"a"]]` for `a` replaced by `b` and `b` replaced by `a`. A replacement of
+another name that reads such a variable (`x` replaced by `a` with `a`
+replaced by `3`) is inserted as it is, and reads the value that the
+first statement assigns.
 
-Note a similar effect can be achieved with `this.replace()`, but
-using `this.subs()` is more efficient and simpler, but limited
-to replacing symbols. A recursive `replace()` does not skip bound
-variables.
+The substitution avoids variable capture. When a replacement contains a
+free name that a binder binds, and the substitution replaces an
+occurrence in the scope of that name, the binder renames the name to a
+fresh name first: `k` becomes `k_1`, or `k_2` when `k_1` is used in the
+binder or in a replacement.
+`["Sum", ["Add", "j", "k"], ["Limits", "k", 1, 3]]` with `j` replaced by
+`k` is `["Sum", ["Add", "k", "k_1"], ["Limits", "k_1", 1, 3]]`, which
+evaluates to `3k + 6`, and `["Function", ["Power", "y", "x"], "x"]` with
+`y` replaced by `x` is the function `x_1 ↦ x^(x_1)`. A named argument of a
+call of such a renamed function uses the new name of the parameter. A
+binder with no such name is not renamed and keeps its identity.
+
+In two cases a bound name cannot be renamed before the block runs, and
+the replacement is inserted as it is, so the held block captures the
+name:
+- the target of an `Assign` in a `Block` that is not canonical (a held
+  block), when no `Declare` of the block declares it. The `Assign` makes
+  a local only when the name is not declared where the block is released.
+  With `s` declared, `["Hold", ["Block", ["Assign", "s", 3], ["Add", "y",
+  "s"]]]` with `y` replaced by `s` is `["Hold", ["Block", ["Assign", "s",
+  3], ["Add", "s", "s"]]]`, and its released value is `6`;
+- a `Declare` or an `Assign` in an operand of a statement of a held
+  block (a branch of an `If`): the later reads denote the local only when
+  that branch runs.
+
+The replacement is also inserted as it is in a few other rare cases
+where a correct rename cannot be decided before the expression runs.
+
+`this.replace()` can give a similar result, and it can replace more
+than symbols, but `this.subs()` is more efficient and simpler. A
+recursive `replace()` does not skip bound variables and does not rename
+a binder: it rewrites the structure of the expression. A rule whose
+match is the symbol `j` replaces the `j` of
+`["Sum", ["Add", "j", "k"], ["Limits", "k", 1, 3]]` by `k` with no
+rename, and its result evaluates to `12`. The values of the wildcards of
+a rule are inserted in its replacement the same way: a binder that the
+replacement writes binds the names in them.
 
 The free symbols of the result are bound in the CURRENT scope, not in the
 scope the receiver was built in. A node that owns a local scope keeps
@@ -17708,7 +17841,9 @@ different questions and neither implies the other:
   symbol declared `list<number>`/`vector<2>` that has not been assigned
   yet, and for an application whose head returns a collection (`L(1)`
   under `L: (number) -> vector<2>`): both are collection-shaped, but
-  there is nothing to walk.
+  there is nothing to walk. To ask what shape an expression promises
+  before evaluation (`L(1)` promises an indexed collection of 2
+  elements), read `staticShape`.
 - `type.matches('collection<any>')` — "is this operand
   collection-**shaped**?" It is `true` for those valueless cases, and
   `false` for a materialized collection whose type is top
@@ -17757,6 +17892,55 @@ union predicates in `collection-utils.ts` as well:
 `unionMayHoldACollection()` for an ENUMERATION gate (a big op folding its
 body — tuple, string and fixed-shape branches enumerate too), or
 `scalarOrCollectionUnionBranches()` for a BROADCAST gate.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.staticShape {#staticshape-1}
+
+```ts
+readonly staticShape: StaticShape | undefined;
+```
+
+The collection shape that this expression promises, read without
+evaluating it, or `undefined` when it promises no collection.
+
+`staticShape` answers the SHAPE question: "what does this expression
+promise to be?". `isCollection` answers the CAPABILITY question: "is a
+collection value present that I can walk now?". The two differ for an
+expression that has no value yet:
+
+```js
+ce.assign('f', ce.parse('n \\mapsto [n, n+1, n+2, n/2]'));
+const e = ce.box(['f', 3]);
+e.isCollection;  // false: nothing to walk before evaluation
+e.count;         // undefined
+e.staticShape;   // { indexed: true, count: 4, elementType: 'rational' }
+```
+
+The answer comes from:
+
+- the collection facets, when `isCollection` is `true` (a list, a
+  string, a dictionary, a symbol that holds a collection);
+- the declared type of a symbol with no collection value
+  (`L: vector<2>` gives a count of 2). A type that the engine inferred
+  from the uses of an undeclared name is not a promise;
+- the static type of an application whose head is bound: a library
+  operator, a function literal assigned to a name, or a declared
+  signature. A call of an undeclared name (`foo([1, 2])`) promises
+  nothing, although its type lifts over the collection argument. A
+  broadcast (`x + 1`) promises a collection only when one of its
+  operands promises one. A `missing` or `nothing` arm of the type is an
+  absence of the whole value and is set aside; a type with a scalar arm
+  or a string type promises nothing;
+- the arms of a selection (`If(c, a, b)`, `Which`), when every arm
+  promises a collection and no arm is a point or a string.
+
+`each()` and `at()` give the elements of the VALUE. When the value
+does not have the declared type, `each()` can give another number of
+elements than `staticShape.count`; the host must supply values of the
+declared types.
 
 </MemberCard>
 
@@ -17884,6 +18068,14 @@ for (const e of expr.each()) {
 }
 ```
 
+`each()` gives the elements of the value, and `staticShape.count` gives
+the number of elements that the expression promises before evaluation.
+The two can differ when the value does not have the declared type: a
+call of a function declared `(integer) -> vector<3>` whose body gives
+two elements has a `staticShape.count` of 3, but its value gives two
+elements. The host must supply values of the declared types. Read
+`staticShape` for the promised shape and `each()` for the elements.
+
 </MemberCard>
 
 <MemberCard>
@@ -17936,7 +18128,7 @@ If true, the subset relation is strict (i.e., proper subset).
 
 <MemberCard>
 
-##### Expression.count {#count-1}
+##### Expression.count {#count-2}
 
 If this is a collection, return the number of elements in the collection.
 
@@ -17951,6 +18143,9 @@ If the collection is infinite, return `Infinity`.
 If the number of elements cannot be determined, return `undefined`, for
 example, if the collection is lazy and not finite and the size cannot
 be determined without iterating over the collection.
+
+For the length that an expression with no value yet promises (a call of
+a function that returns a list), read `staticShape.count`.
 
 The count is a `bigint` only when it is finite and is not a safe integer
 (larger than `Number.MAX_SAFE_INTEGER`), for example the count of
@@ -18268,6 +18463,15 @@ Returns `true` if the expression is structurally identical to `rhs`.
 The value of a symbol is never followed: if `one` is assigned `1`,
 `ce.symbol('one').isSame(1)` is `false`.
 
+Two symbols, or two calls, with the same name are the same only when
+they denote the same binding. A call of the library `Sqrt`, boxed before
+a user function `Sqrt` is declared in a scope, and a call `Sqrt(y)`
+boxed in that scope are not the same: they are calls of two different
+functions. Two calls of the library function are the same, also when
+they come from two engines. A raw call (boxed with `form: 'raw'`, or
+held by `Hold`) has no binding: two raw calls are compared by their
+names, and a raw call is not the same as a canonical call.
+
 The elements of a set literal are not ordered, so two sets with the same
 elements in a different order are the same:
 `ce.box(['Set', 2, 1]).isSame(ce.box(['Set', 1, 2]))` is `true`. A
@@ -18278,6 +18482,10 @@ A finite `Range` whose bounds and step are integer literals and that has
 at most 10,000 elements is the same as the `List` of its integers, and
 has the same `hash`: `ce.box(['Range', 1, 3]).isSame(ce.box(['List', 1,
 2, 3]))` is `true`. A larger range is compared by its operands only.
+The range and the list are the same only when both are calls of the
+library functions, or both are raw calls: a raw `Range(1, 3)` is not the
+same as a canonical `[1, 2, 3]`, and a call of a user function named
+`Range` is not the same as a list.
 
 A character and a one-cluster string with the same content are the same,
 although their types are different: `ce.string('a')` is the same as
@@ -18531,13 +18739,13 @@ singular values of a matrix.
 get type(): BoxedType
 set type(type: 
   | string
-  | ListType
+  | RecordType
   | AlgebraicType
   | NegationType
   | CollectionType
+  | ListType
   | SetType
   | BroadcastableType
-  | RecordType
   | ObjectType
   | DictionaryType
   | TupleType
@@ -19953,13 +20161,13 @@ new BoxedType(type, typeResolver?): BoxedType
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -20252,13 +20460,13 @@ Box an ordinary type, sharing immutable type values within a resolver.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -20312,13 +20520,13 @@ Normalization is shared only for immutable input types.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -20348,13 +20556,13 @@ Normalization is shared only for immutable input types.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -20427,13 +20635,13 @@ polymorphic one.
 ####### other
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -20459,13 +20667,13 @@ is(other): boolean
 ####### other
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -20505,13 +20713,13 @@ Throws if `other` is a string that is not a valid type.
 ####### other
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -20583,13 +20791,13 @@ Throws if `other` is a string that is not a valid type.
 ####### other
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -21251,30 +21459,37 @@ type ValueType = {
 type RecordType = {
   kind: "record";
   elements: Record<string, Type>;
-  closed: true;
+  optional: readonly string[];
 };
 ```
 
 A record is a collection of key-value pairs.
 
-The keys are strings. The set of keys is fixed.
+The keys are strings. A record type is CLOSED: a value of
+`record{a: integer, b: string}` has exactly the keys `a` and `b`, and no
+other key. A field can be OPTIONAL (`record{a: integer, b: string?}`): a
+value can leave the key `b` out, and when the key is there, its value is a
+`string`. A read of an optional field that the value leaves out gives the
+absent value of a read (`Missing`, or `NaN` for a numeric field), as an
+index out of range does.
 
-For a record type to be a subtype of another record type, it must contain
-every key required by the other type, and all their types must match (width
-subtyping). It may contain additional keys.
+Subtyping:
 
-A record type is OPEN: `record{a: integer}` holds every value that has a
-field `a` of type `integer`, and also other fields of any type. So it is a
-`dictionary<T>` only when `T` holds every value.
+- Depth subtyping: `record{a: integer}` is a subtype of `record{a: real}`.
+- No width subtyping: `record{a: integer, b: string}` is NOT a subtype of
+  `record{a: integer}`, because the second type has no key `b`.
+- A record type is a subtype of a record type that has every one of its
+  keys, when each key that the second type requires is also required by
+  the first: `record{a: integer}` and `record{a: integer, b: string}` are
+  subtypes of `record{a: integer, b: string?}`.
+- A record type is a subtype of `dictionary<V>` when every field type,
+  optional fields too, is a subtype of `V`.
 
-The type of a dictionary VALUE is CLOSED (`closed: true`): the value has
-exactly the listed fields and no other. `{a: 1}` is typed
-`record{a: integer}` with `closed: true`, and that type is a subtype of
-`dictionary<integer>`. No type syntax spells a closed record: a closed
-record prints as the open record with the same fields, and the parser
-makes only open records. A closed record is a subtype of the open record
-with the same fields, and a record type is a subtype of a closed record
-only when it is closed and has the same set of keys.
+A program that must accept other keys takes a `dictionary`. The bare
+primitive `record` holds every record.
+
+Build a record type with [makeRecordType](#makerecordtype), which keeps the list of
+optional keys in its normal form.
 
 </MemberCard>
 
@@ -21811,6 +22026,88 @@ value of the `~oo` value-literal type. Reads the tag, never the identity.
 ##### v
 
 `unknown`
+
+</MemberCard>
+
+<MemberCard>
+
+### isOptionalField() {#isoptionalfield}
+
+```ts
+function isOptionalField(t, key): boolean
+```
+
+Whether `key` is an optional field of the record type `t`. A key that
+`t` does not list is not optional: it is not a field.
+
+##### t
+
+`Readonly`\<[`RecordType`](#recordtype)\>
+
+##### key
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+### hasRecordField() {#hasrecordfield}
+
+```ts
+function hasRecordField(t, key): boolean
+```
+
+Whether `key` is a field of the record type `t`, required or optional.
+An own-property test: `Object.prototype` member names (`toString`) are
+valid keys, and `key in` would find them on the prototype.
+
+##### t
+
+`Readonly`\<[`RecordType`](#recordtype)\>
+
+##### key
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+### requiredFieldKeys() {#requiredfieldkeys}
+
+```ts
+function requiredFieldKeys(t): string[]
+```
+
+The keys of the record type `t` that every value has.
+
+##### t
+
+`Readonly`\<[`RecordType`](#recordtype)\>
+
+</MemberCard>
+
+<MemberCard>
+
+### makeRecordType() {#makerecordtype}
+
+```ts
+function makeRecordType(elements, optional?): RecordType
+```
+
+A record type with the fields `elements`, of which the keys in `optional`
+are optional. The list of optional keys is sorted, keeps only keys of
+`elements`, and is left out when it is empty, so that two spellings of
+one type have one structure.
+
+##### elements
+
+`Record`\<`string`, [`Type`](#type-3)\>
+
+##### optional?
+
+`Iterable`\<`string`, `any`, `any`\>
 
 </MemberCard>
 

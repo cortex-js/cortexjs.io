@@ -232,8 +232,7 @@ a promise that it never changes.
    To ask whether a name *would* resolve to a constant — and to get the
    answer for the current scope chain, so a user redeclaration is respected —
    use `ce.lookupDefinition(name)`. It returns `undefined` for an undeclared
-   name and has no auto-declare side effect, so it is safe to call
-   speculatively:
+   name and declares nothing, so it is safe to call speculatively:
 
    ```ts
    const v = ce.lookupDefinition('i')?.value;
@@ -332,7 +331,7 @@ ce.parse('\\int_0^1 x^2 dx').json;
 ## Undeclared Call Heads Bind Vacuously
 
 A structural box of a function expression whose head is **undeclared**
-succeeds. There is no error, no auto-declare, and no operator definition:
+succeeds. There is no error, no declaration, and no operator definition:
 
 ```ts
 const expr = ce.expr(['myHead', 1, 2], { form: 'structural' });
@@ -536,13 +535,6 @@ lexical scope. Lookups walk `scope → parents`, and a symbol with no
 definition belongs to the supplied scope: `ce.infer()` declares it there,
 when that scope is current (`ce.pushScope(scope)`). Discarding the scope
 discards those declarations.
-
-:::warning[Behavior change]
-`ce.expr`'s existing `scope` option steers *lookup only* today —
-auto-declares still land in the engine's current scope. Receiving the writes
-is a semantic change to a shipped option, and lands as a called-out BREAKING
-CHANGELOG entry.
-:::
 
 ### `ce.createScope()`
 

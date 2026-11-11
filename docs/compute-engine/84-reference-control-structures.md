@@ -716,6 +716,10 @@ single-collection case).<Icon name="chevron-right-bold" />
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### ParallelLoop
+</nav>
+
 <FunctionDefinition name="ParallelLoop">
 
 <Signature name="ParallelLoop">_body_, _element_</Signature>
@@ -757,6 +761,10 @@ The other compile targets decline the loop.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### ParallelComprehension
+</nav>
+
 <FunctionDefinition name="ParallelComprehension">
 
 <Signature name="ParallelComprehension">_body_, _element-1_, _element-2_, ...</Signature>
@@ -774,6 +782,10 @@ evaluated at once to a `List`. This is the MathJSON form of the Epsil
 ```
 
 </FunctionDefinition>
+
+<nav className="hidden">
+### AddTo
+</nav>
 
 <FunctionDefinition name="AddTo">
 

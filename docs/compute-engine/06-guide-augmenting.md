@@ -1263,8 +1263,7 @@ its hooks for its values after the scope is popped, and a head of the same
 name declared in another scope with other hooks does not change the values
 of the first one. When a head is declared again without `arithmetic`, its
 values have no hooks any more; its kind type remains a kind type, so its
-values and symbols are still protected from the number rules. A checkpoint
-restore (deprecated) puts the kinds back as they were at the checkpoint.
+values and symbols are still protected from the number rules.
 
 #### Compiling a value of a kind
 
@@ -2877,8 +2876,7 @@ ce.box(["Sq", 3]).evaluate();  // ➔ 9
 Each library in `requires` must already be loaded. The call throws, and
 declares nothing, for a library name that is already loaded, a missing required
 library, a standard library, or a definition that is invalid, repeated, or
-already declared in the global scope. A checkpoint taken before the call
-(`ce.checkpoint()`, deprecated) undoes it.
+already declared in the global scope.
 
 `ce.libraryOf(name)` returns the name of the library that defines `name`:
 `"trigonometry"` for `Sin`, the `name` of a loaded library for one of its

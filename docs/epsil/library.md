@@ -11,7 +11,7 @@ date: Last Modified
 ---
 # Epsil Standard Library
 
-The 711 functions and constants of the standard library, by category.
+The 718 functions and constants of the standard library, by category.
 Each row gives a name, its signature (for a function) or its kind and type
 (for a constant or variable), and the first sentence of its description —
 the same description `epsil doc <name>` prints in full and the editor
@@ -22,10 +22,10 @@ To search the library by concept rather than by name, use
 `epsil doc <keywords>` (see the [CLI](/cli/)); the
 [guide for agents](/for-agents/) lists the names most often needed.
 
-- [Core](#core) — 117 definitions · [full reference](/reference/core/)
-- [Control structures](#control-structures) — 12 definitions · [full reference](/reference/control-structures/)
+- [Core](#core) — 118 definitions · [full reference](/reference/core/)
+- [Control structures](#control-structures) — 16 definitions · [full reference](/reference/control-structures/)
 - [Logic](#logic) — 27 definitions · [full reference](/reference/logic/)
-- [Collections](#collections) — 126 definitions · [full reference](/reference/collections/)
+- [Collections](#collections) — 125 definitions · [full reference](/reference/collections/)
 - [Colors](#colors) — 20 definitions · [full reference](/reference/colors/)
 - [Regular expressions](#regular-expressions) — 4 definitions · [full reference](/reference/regexp/)
 - [Relations](#relations) — 30 definitions · [full reference](/reference/relop/)
@@ -37,7 +37,7 @@ To search the library by concept rather than by name, use
 - [Combinatorics](#combinatorics) — 11 definitions · [full reference](/reference/combinatorics/)
 - [Number theory](#number-theory) — 60 definitions · [full reference](/reference/number-theory/)
 - [Special functions](#special-functions) — 19 definitions · [full reference](/reference/special-functions/)
-- [Linear algebra](#linear-algebra) — 43 definitions · [full reference](/reference/linear-algebra/)
+- [Linear algebra](#linear-algebra) — 46 definitions · [full reference](/reference/linear-algebra/)
 - [Statistics](#statistics) — 35 definitions · [full reference](/reference/statistics/)
 - [Units](#units) — 7 definitions · [full reference](/reference/units/)
 - [Physics](#physics) — 11 definitions · [full reference](/reference/physics/)
@@ -99,6 +99,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `LatexString` | `(string) -> string` | Value preserving type conversion/tag indicating the string is a LaTeX string |
 | — | `MatchesType` | `(subject: any, type: string \| type) -> boolean` | True iff the first operand, EVALUATED, is a value of the given type — the engine form of the Epsil `x is T` test and of `match` type patterns, which both lower here. |
 | `missing` | `Missing` | variable `missing` | A value that is absent but whose position is preserved (Julia `missing`, R `NA`); the sole member of the `missing` type. |
+| — | `Module` | `(symbol) -> unknown` | The definition of a name in the standard library, also where a local definition shadows the name |
 | — | `N` | `(any, (integer \| list<number>)?) -> unknown` | N(expr): numerically evaluate an expression |
 | `nSolve` | `NSolve` | `(any, any*) -> list` | NSolve(equation, unknown): the solutions of an equation as floats. |
 | — | `NamedArgument` | `(string, any) -> nothing` | NamedArgument(name, value): one named argument of a call (Epsil |
@@ -172,6 +173,7 @@ The [Control structures reference](/reference/control-structures/) has the full 
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
+| — | `AddTo` | `(expression, any) scope -> any` | Compound assignment: `AddTo(s, e)` is `Assign(s, Add(s, e))`, and `AddTo(At(L, i, …), e)` is `Assign(L, ReplaceAt(L, i, …, Add(At(L, i, …), e)))`, with each position evaluated once, before `e`. |
 | — | `Alternatives` | `(expression+) -> nothing` | Inside a `Match` pattern, `Alternatives(p1, p2, …)` matches if any alternative matches. |
 | — | `Break` | `(value: any?) -> nothing` | Exit the enclosing loop immediately, optionally with a value (`Break(v)`) that becomes the loop value. |
 | — | `Comprehension` | `(body: expression, iterators: expression+) -> list` | Value-producing comprehension: evaluate `body` in nested iteration over one or more `Element` clauses and collect the results into a list. |
@@ -182,6 +184,9 @@ The [Control structures reference](/reference/control-structures/) has the full 
 | — | `Loop` | `(body: expression, iterators: expression*) -> any` | Imperative loop, evaluated **for effect**. |
 | — | `Match` | `(expression, expression+) -> unknown` | Structural pattern match. |
 | — | `MatchCase` | `(expression, expression, expression?) -> nothing` | A case of a `Match`: `MatchCase(pattern, body)` or `MatchCase(pattern, guard, body)`. |
+| — | `ParallelComprehension` | `(body: expression, iterators: expression+) random -> list` | Parallel comprehension: `ParallelComprehension(body, Element(x, xs), …)` is the list that `Comprehension` with the same operands gives, but the passes of the first clause can run in any order. |
+| `parallelDomain` | `ParallelDomain` | `(collection: any) random -> any` | The domain of the passes of a parallel loop (engine-internal). |
+| — | `ParallelLoop` | `(body: expression, iterators: expression+) random -> any` | Parallel loop, evaluated **for effect**: `ParallelLoop(body, Element(x, coll))` evaluates `body` once for each element of `coll` (a pass), and the passes can run in any order. |
 | — | `Pin` | `(expression) -> nothing` | Inside a `Match` pattern, `Pin(expr)` matches the value of `expr` (evaluated at match time) rather than its structure. |
 | — | `Which` | `(expression+) -> unknown` | `Which(c1, e1, c2, e2, …)` evaluates to the value of the first `e` whose condition `c` is `True`, and to `Missing` when no condition is `True`. |
 
@@ -243,7 +248,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `countIf` | `CountIf` | `(collection<T>, predicate: (T) any -> boolean) -> integer where T` | Return the number of elements in the collection satisfying the predicate. |
 | `cycle` | `Cycle` | `(list<any>) -> list` | Produce an infinite sequence by cycling through the elements of a finite collection. |
 | `dedup` | `Dedup` | `(collection<any>) -> collection` | Return the collection with consecutive duplicate elements collapsed to a single element. |
-| `deleteAt` | `DeleteAt` | `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T: any)` | Return a copy of the indexed collection with the element at the 1-based `index` removed. |
+| `deleteAt` | `DeleteAt` | `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T: any) & ((dictionary<V>, string) -> dictionary<V> where V: any)` | Return a copy of the indexed collection with the element at the 1-based `index` removed. |
 | — | `Dictionary` | `(tuple<string, unknown>*) -> dictionary` | A collection of key -&gt; value entries with string keys (`{x -> 1, y -> 2}` in Epsil). |
 | `dictionaryFrom` | `DictionaryFrom` | `(collection<any>) -> dictionary` | Create a dictionary from the elements of a collection of (key, value) pairs. |
 | `differences` | `Differences` | `(indexed_collection<any>) -> indexed_collection` | Return the successive differences of a collection: a collection whose k-th element is `x(k+1) − xk`, of length one less than the input. |
@@ -257,7 +262,6 @@ The [Collections reference](/reference/collections/) has the full description an
 | `extendedRationalNumbers` | `ExtendedRationalNumbers` | constant `set<rational \| signed_infinity>` | The set of all rational numbers, including infinities. |
 | `extendedRealNumbers` | `ExtendedRealNumbers` | constant `set<real \| signed_infinity>` | The set of all real numbers, including infinities. |
 | `field` | `Field` | `(value: any, field: string) -> unknown` | Access a named field of a value: `p.x` in Epsil. |
-| `fill` | `Fill` | `(function, tuple) -> list` | Produce a 2D list (matrix) by applying a function to each pair of row and column indexes. |
 | `filter` | `Filter` | `(collection<T>, predicate: (T) any -> boolean) -> collection where T` | Return the elements of the collection for which the predicate function returns True. |
 | `find` | `Find` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T: any` | Return the first element of the collection satisfying the predicate. |
 | `first` | `First` | `(xs: indexed_collection<any>) -> any` | The first element of a collection. |
@@ -782,6 +786,7 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `eigen` | `Eigen` | `(matrix) -> tuple` | Eigenvalue-eigenvector decomposition of a square matrix. |
 | `eigenvalues` | `Eigenvalues` | `(matrix) -> list` | Eigenvalues of a square matrix. |
 | `eigenvectors` | `Eigenvectors` | `(matrix) -> list` | Eigenvectors of a square matrix. |
+| `fill` | `Fill` | `(value: any, integer+) -> list` | List or tensor with each element equal to a value. |
 | `flatten` | `Flatten` | `(value, integer?) -> list` | Flatten a tensor or collection into a list. |
 | `hadamardProduct` | `HadamardProduct` | `(matrix \| vector, matrix \| vector) -> matrix \| vector` | Hadamard (element-wise) product of two vectors or matrices of the same shape. |
 | `hom` | `Hom` | `(value*) -> value` | Hom-set of morphisms between objects |
@@ -798,6 +803,7 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `matrixPower` | `MatrixPower` | `(matrix, real) -> matrix` | Square matrix raised to a power. |
 | `matrixRank` | `MatrixRank` | `(value) -> integer` | Rank of a matrix (number of linearly independent rows/columns). |
 | `norm` | `Norm` | `(list<tuple> \| number \| tensor \| tuple, (+oo \| real \| string)?) -> +oo \| nan \| real` | Vector or matrix norm. |
+| `ones` | `Ones` | `(integer+) -> list` | List or tensor filled with ones. |
 | `onesMatrix` | `OnesMatrix` | `(integer, integer?) -> matrix` | Matrix filled with ones. |
 | `pseudoInverse` | `PseudoInverse` | `(matrix) -> matrix` | Moore-Penrose pseudoinverse of a matrix. |
 | `qrDecomposition` | `QRDecomposition` | `(matrix) -> tuple` | QR decomposition of a matrix. |
@@ -811,6 +817,7 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `transpose` | `Transpose` | `(value, axis1: integer?, axis2: integer?) -> value` | Transpose a matrix or swap two tensor axes. |
 | `vector` | `Vector` | `(any+) -> vector` | Construct a column vector. |
 | `zeroMatrix` | `ZeroMatrix` | `(integer, integer?) -> matrix` | Matrix filled with zeros. |
+| `zeros` | `Zeros` | `(integer+) -> list` | List or tensor filled with zeros. |
 
 ## Statistics
 

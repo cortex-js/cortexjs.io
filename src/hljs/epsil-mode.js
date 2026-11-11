@@ -127,6 +127,9 @@ export const KEYWORDS_LIST = [
   'where',
   'readonly',
   'readwrite',
+  // `parallel` heads the `parallel for` loop and comprehension clause; it is
+  // an identifier everywhere else, like `type`.
+  'parallel',
   // ACTIVE_WORDS — the heads and word operators the parser claims.
   'break',
   'const',
@@ -150,6 +153,16 @@ const KEYWORD = {
 const TYPE = {
   className: 'type',
   match: concat(/\b/, either(...DOMAINS_LIST), /\b/),
+};
+
+// The module qualifier of a qualified name (`std::pi`, `std::floor(x)`):
+// `std` is the name of the standard library, and `std::name` names the
+// library definition of `name` even where the program binds `name`. The
+// `std::` prefix is styled as a built-in; the name after it is styled as any
+// other name. It must come before `OPERATOR`, which would take the `::`.
+const QUALIFIER = {
+  className: 'built_in',
+  match: /\bstd::/,
 };
 
 const BUILT_INS_LIST = ['Add', 'Multiply', 'Divide', 'Evaluate'];
@@ -457,6 +470,7 @@ export default function (hljs) {
       CONSTANT,
       TYPE,
       BUILT_IN,
+      QUALIFIER,
       BIG_OPERATOR,
       SCRIPT,
       OPERATOR,

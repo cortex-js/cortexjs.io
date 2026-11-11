@@ -11,6 +11,2349 @@ description: "Release notes for the Compute Engine: new features, behavior chang
 import ChangeLog from '@site/src/components/ChangeLog';
 
 <ChangeLog>
+## Coming Soon
+
+### Breaking Changes
+
+- **Boxing an expression no longer declares its symbols.** `ce.parse()`,
+  `ce.box()`, `ce.expr()` and `ce.function()` declare no name, and they do not
+  change the type of a name that has no declared type. A symbol with no
+  definition keeps its name and evaluates through the definition that the name
+  has when the expression is evaluated. The type that the uses of a symbol
+  require (`x + 1` requires a number) is kept with the expression, not on a
+  definition that every expression shares.
+
+  ```js
+  const a = ce.parse('x + 1');
+  ce.lookupDefinition('x');   // was a definition of type number, is undefined
+  ce.box('x').type;           // was number, is unknown
+  a.op1.type;                 // number, as before: the `x` of `x + 1`
+  ce.assign('x', 3);
+  a.evaluate();               // 4, as before
+  ```
+
+  What changes for a host:
+
+  - `ce.lookupDefinition(name)`, `expr.valueDefinition` and the inspection of
+    a scope do not see a name that was only boxed. Declare the name
+    (`ce.declare()`, `ce.assign()`), or call `ce.infer()`, described below.
+  - To read the type that an expression requires of a symbol, read the type of
+    the symbol in that expression (`a.op1.type`), or
+    `freeSymbolTypes` in the result of `compile()`. A symbol boxed alone
+    (`ce.box('x')`) has no use, so its type is `unknown`.
+  - An expression that the host keeps reads a declaration made later: after
+    `ce.declare('x', 'string')`, `a.op1.type` is `string`.
+  - An operation on an expression (`evaluate()`, `simplify()`, `subs()`,
+    `compile()`, …) does not change the types that the expression reads.
+  - `narrowings()` of an inspectable scope has nothing to report.
+
+- **The reading of an expression no longer depends on the expressions boxed
+  before it.** A type inferred from one expression is not used to read
+  another one.
+
+  ```js
+  ce.parse('x + 1');
+  ce.parse('x(3)').json;      // was ["Multiply", 3, "x"], is ["x", 3]
+  ```
+
+- **`compile()` types an input from the expression that it compiles.** An
+  input with no declared type has the type that the compiled expression
+  requires of it, including the assigned values and the function bodies that
+  the code reads. A type that only another expression requires is not used:
+  the compilation declines with `untyped-input`, until the input is declared
+  or `ce.infer()` commits the type.
+
+  ```js
+  const a = ce.parse('x + 1');
+  const b = ce.parse('x > 1');
+  compile(b).success;         // was true, is false: `x > 1` requires no type
+  ce.infer([a, b]);           // declares x: number
+  compile(b).success;         // true
+  ```
+
+  A name of the library that an expression reads as a variable (`N` in
+  `N + 1`) has no type until it is declared: `compile(ce.parse('N + 1'))`
+  declines, and compiles after `ce.declare('N', 'real')`.
+
+  The result of an operation does not carry the types that the operation
+  required of a symbol that the host made before it. Declare such a symbol
+  before compiling the result:
+
+  ```js
+  const q = ce.symbol('q0');
+  const r = ce.parse('a \\cos(x)').subs({ a: q });
+  compile(r).success;         // was true, is false: `q0` has no type
+  ce.declare('q0', 'real');
+  compile(r).success;         // true
+  ```
+
+- **In an Epsil program, an assignment in a branch to a name that an earlier
+  statement only reads is a first assignment.** A read does not declare the
+  name, so `y = x + 1; if y > 0 { x = 2 }; x` reports
+  `first-assignment-in-branch`. Assign or declare `x` before the branch.
+
+- **`ce.checkpoint()`, `ce.restore()` and `ce.discard()` are deprecated.**
+  They keep working in this release. Use `ce.withValues()` to evaluate with
+  temporary values, and `ce.pushScope()` / `ce.popScope()` for temporary
+  declarations. A `restore()` does not undo a type that an expression boxed
+  before the checkpoint came to require after it.
+
+### New Features
+
+- **`ce.infer(exprs)` declares the symbols of expressions with the types that
+  their uses require.** For each symbol of `exprs` that has no declared type,
+  it combines the types that the expressions require and declares the symbol
+  with the result, marked as inferred, in the scope where a declaration of the
+  name would go. The order of `exprs` does not change the result. A symbol
+  whose uses conflict is not declared and is reported:
+
+  ```js
+  const a = ce.parse('x + 1');
+  const c = ce.parse('x(3)');
+  ce.infer([a]);      // { declared: [{ name: 'x', type: number, … }], skipped: [] }
+  ce.infer([a, c]);   // in a new engine: skipped: [{ name: 'x', reason: 'conflict', … }]
+  ```
+
+  The reasons of `skipped` are `'conflict'`, `'untyped'` (no use requires a
+  type), `'defined'` (the name has a declared type) and `'out-of-scope'`.
+
+- **Experimental: the `numeric-kernel` profile of the JavaScript target.**
+  `compile(expr, { to: 'javascript', profile: 'numeric-kernel' })` compiles
+  the expression with the structured compiler of the JavaScript target. It
+  admits scalar arithmetic of real and complex numbers (with a complex
+  operand: products, quotients, powers with a number literal exponent and
+  the elementary functions, `e^(i·x)`, `1/(t·ln t)`), conditionals, calls of user functions with
+  declared signatures, captured numbers, loops over an integer range (with
+  `Break` at the end of a branch of an `If`),
+  lists of numbers made with a comprehension and updated with `ReplaceAt`,
+  and random draws: `Random()`, `Random` of a literal `Interval` or
+  `Range`, `WithRandomSeed`, and calls of user functions whose body draws.
+  The code draws the numbers of the ordinary compiler, in the same order
+  and the same number of times; a draw in a comprehension declines, as do
+  `RandomChoice`, `RandomSample`, `RandomShuffle` and `Random` of a domain
+  known only at run time.
+  A block of statements can be the compiled expression itself, with its free
+  symbols as the inputs, and a power or a root of two number literals is
+  written as the value that the ordinary compiler folds it to. A block can
+  hold a block (a statement whose locals are not visible after it, or the
+  value of the body, the form of an Epsil program), and a block whose
+  statements declare names with a value can be an operand
+  (`{ a ⩴ 3.7x; a − ⌊a⌋ } + 1`, the body of a `Sum`). A local declared
+  `unknown` with a value (`m \coloneq x + 1`) has the type of its value, and
+  a first write to a new name of a block (`s ⩴ x^2`) declares a local, as
+  in the ordinary compiler. In the `strict` mode, a local function of the
+  block (`g(t) \coloneq t + a`, `DefineFunction`) and a user function
+  declared `function` are compiled once as a function of the program; a
+  local function takes the names of the block that it reads as arguments,
+  at each call, so it reads their values there, as a closure does. A local
+  function in a branch, a loop or the `complex` mode, a recursive one, and a
+  local of a nested block with the name of an outer one decline.
+  A program outside the profile declines with the diagnostic code
+  `outside-profile`, which names the first node outside it (`operator` or
+  `binding`); `fallback` applies as for any other decline, and the ordinary
+  compiler is never used for a part of the program. A parameter or a free
+  symbol with no declared type is a real number in the `strict` mode and a
+  complex number in the `complex` mode, whatever type boxing inferred for
+  it; the result and the positive answer of `canCompile()` list such names
+  in the new field `defaultedSymbols`. A type that the host wrote for a
+  free symbol with `ce.infer()`, `ce.assume()` or `ce.assign()` is read as
+  a declared type, so a host declares each name or calls `ce.infer()`
+  before `compile()`: after `ce.infer([ce.box(['Mod', 'x', 2])])`, `x` is
+  real in both modes, as on the ordinary compiler, and is not listed in
+  `defaultedSymbols`. With `CE_BINDING_UNITS=0`, where boxing writes
+  inferred types, no inferred type is read. A free symbol boxed before the
+  host assigned it a number is captured with that number; it was compiled
+  as an input. A call boxed before the host assigned its function
+  (`g(x) + 1`, then `ce.assign('g', …)`) calls that function, as on the
+  ordinary compiler; it declined. The same rule applies to a
+  call of a user function with no declared signature (`f(x) := x^2 + 1`):
+  each parameter with no annotation has the default type, the result is
+  the type of the body, an argument of another type declines, and
+  `defaultedSymbols` lists the name of the function. A name declared
+  `number` (an input, a parameter, a parameter of a user function) has the
+  same type as on the ordinary compiler: real in the `strict` mode, complex
+  in the `complex` mode; a name declared a union of a real type with `nan`
+  or `signed_infinity` is real. A user function declared with the result
+  `number` returns the type of its body, and a name declared `number` with
+  a number value is captured. `defaultedSymbols` does not list these names:
+  their type is declared. A local declared with a type keeps that type: an
+  integer value of a `real` local and a list of integers of a `list<real>`
+  local are admitted, and a value of another kind declines with
+  `outside-profile` (`let t: real = 1 + 2i`, `let t: real = sqrt(x)` in the
+  `strict` mode, a number of a list local). A product with a quotient
+  factor whose numerator is a product with an exact rational
+  (`q·((0.1/3)/w)`) gives the doubles of the ordinary compiler; it gave a
+  value that differed in the last place before. The options `cse` and
+  `constantFold` are ignored under the profile. The options `vars`,
+  `functions`, `operators`, `imports` and `preamble` give the code of the
+  ordinary compiler, and the host functions run the same number of times, in
+  the same order. A `vars` entry that reads the vars object under another
+  name (`u: '_.w'`) is an input. Another source (`t: 'next()'`) is read once
+  at each occurrence of the name, and makes the result not `pure` and not
+  `shippable`. A call of a `functions` or `operators` entry is a call of the
+  host: it is `pure` when the entry is declared pure, and never `shippable`.
+  A `preamble` that is not blank makes the result not `pure`, because it
+  runs on every call. `broadcast` is ignored: the result has no `batch`.
+  These forms decline with `outside-profile`, each with its own message:
+  - the function form of `operators`;
+  - an infix `operators` entry;
+  - an entry for an operator or a constant of the library;
+  - a `vars` source that is not one operand;
+  - a `functions` source that is not a name, a dotted path of names or a
+    pure arithmetic function expression (`_.getTransform()`);
+  - a source with a line terminator or a comment;
+  - a read or a call of the host in the `complex` mode;
+  - a `Sum` or a `Product` that calls a function declared pure.
+
+  `mode: 'bigint'` declines too. A program of more than 100,000 operations
+  declines with `outside-profile` too, also one with no repeated
+  subexpression (a sum of 30,000 terms `sin(x + c)`). With another target,
+  or in the `compile()` method of a target object, the option is an error.
+  Without the option, nothing changes.
+
+  A result compiled with the profile reports `profile: 'numeric-kernel'`,
+  the new field `pure` (two calls give the same results in any order or at
+  the same time, and a call changes nothing that the host can observe), and
+  `shippable` (the code can run on a worker of the pool), also for a
+  `Function` literal. A draw makes a program not pure, unless it is inside a
+  `WithRandomSeed`; a program that draws or seeds the random stream is not
+  shippable. `canCompile()` answers for the profile, with the same
+  diagnostic as `compile()`, and its positive answer carries `pure` and
+  `shippable`:
+
+  ```js
+  ce.declare('x', 'real');
+  ce.declare('y', 'real');
+  canCompile(ce.box(['Add', 'x', ['Sin', 'y']]), {
+    to: 'javascript',
+    profile: 'numeric-kernel',
+  });
+  // ➔ { ok: true, pure: true, shippable: true }
+  ```
+
+## 0.186.0 _2026-11-10_
+
+### Breaking Changes
+
+- **The `BaseCompiler` static member `compileMatchTernary` is removed**, with
+  the type `MatchStatementClause` of its `statement` option. It compiled a
+  `Match` to nested conditional expressions for the GLSL target, and GLSL now
+  declines every `Match` before it writes code: `Match` is not in the GLSL
+  fragment. A custom target that compiles `Match` writes its own lowering in
+  its `functions` table.
+
+- **The `CompileTarget` field `checkOperandShapes` is removed, and the type
+  `GPUShapeRules` keeps only `scalarGenTypeSlots`.** The hook ran on the
+  code of each lowering and could refuse it for its operand shapes; no
+  built-in target sets it since the GLSL fragment check refuses those
+  shapes before any code is written. A custom target that set the hook
+  checks its operand types before it calls `compile()`. The fields
+  `mandatoryScalarSlots`, `vectorOnlySlots`, `matrixArithmetic` and
+  `matrixNegate` of the value returned by `getShapeRules()` had no reader: a
+  subclass of `GPUShaderTarget` or `GLSLTarget` that overrides
+  `getShapeRules()` removes them from the object it returns.
+
+- **The GLSL target no longer compiles a random draw on any route.**
+  `Random`, `WithRandomSeed`, `RandomChoice`, `RandomSample` and
+  `RandomShuffle` are not in the GLSL fragment, so `compile()` to `glsl`
+  already declined them. A GLSL target object passed to `compile()` as the
+  `target` option compiled a draw to a PCG3D hash in the shader; it now
+  declines too. A seeded frame with a constant value
+  (`WithRandomSeed(42, Random())`) still folds to the number it draws.
+
+- **A GLSL target object passed to `compile()` as the `target` option runs
+  the GLSL fragment check.** An object made by `GLSLTarget.createTarget()`
+  skipped the check of `compile(expr, { to: 'glsl' })`, and the code that
+  checked operand shapes after emission is removed. On that route,
+  `compile()` now declines what `canCompile()` refuses, with the same
+  diagnostic: for `v` of type `list<real^3>` and `x` of type `real`,
+  `Arctan2(v, x)` declines instead of writing `atan(v, x)`, which no shader
+  compiler accepts. Forms that this route accepted before and that the
+  fragment refuses now decline there too, as they do with `to: 'glsl'`: for
+  example `Log(v, 10)`, the negation of a matrix, and a list of more than
+  256 elements read as a uniform array.
+
+- **On GLSL, code that the caller supplies is computed into a temporary
+  before its statement.** This is a `vars` entry whose source is not a plain
+  read (`nextValue()`, `vec3(u + v)`), a `functions` entry not declared
+  `pure: true`, and an operator's own `compile` handler. Such code can count
+  its calls or draw a number. Each occurrence now runs once, in the order of
+  the interpreter, so the code of an expression that holds it is a list of
+  statements that ends with `return`: with `vars: { W: 'nextValue()' }`,
+  `W + 1` was `nextValue() + 1.0` and is now
+  `float _tv1 = nextValue();` then `return _tv1 + 1.0;`. A piece of such code
+  in a branch is computed at the start of its branch, so an `If` or a
+  `Which` whose branch holds it is written as an `if` statement, not with
+  `?:`. A plain read (`u_t`, `params.x`) is not caller code and stays in
+  place, unless caller code comes after it in the statement: the caller's
+  code could write the variable that it reads, so it is then read first.
+  Expressions with no such code compile as before.
+
+### Resolved Issues
+
+- **The type of a derivative no longer keeps the range of its operand.**
+  `D(|x|, x)` had the type `real<0..> | signed_infinity`, the type of `|x|`,
+  although the derivative is `-1` for a negative `x`. The type of `D(f, x)`
+  is now the numeric type of `f` without its range: `real | infinity` here.
+
+- **`ce.withValues()` reports a failed restore when its callback threw.**
+  When `fn` threw and putting back the earlier value of a symbol failed too,
+  only the error of `fn` was thrown, and the symbol could keep its temporary
+  value with no report. The method now throws an `AggregateError` whose
+  `errors` are the error of `fn` and the restore error, in this order, and
+  whose `cause` is the error of `fn`. When `fn` returns, a restore failure
+  is thrown as before (CE-1192).
+
+- **On GLSL, `canCompile()` and `compile()` agree on an applied
+  derivative.** An application of a derivative, `Apply(Derivative(f), x)`,
+  is now replaced by the closed form of the derivative before the check,
+  so `canCompile()` checks the code that is written:
+  - With a list argument, `Apply(Derivative(u ↦ 7u), [x, y]) + 1` is
+    typed as a `vec2`, as its code is; the check typed it as a `float`.
+  - With an argument that has an effect,
+    `Apply(Derivative(u ↦ u^2), x + Random())`, `canCompile()` answered
+    `{ ok: true }` and `compile()` declined; both now decline.
+  - With an argument that is not valid, the closed form could leave out the
+    argument (the derivative of `u ↦ u` is `1`), so the code gave `1.0`
+    where the interpreter gives an error; it now declines.
+  - With an argument that runs code that the caller supplies (a `vars`
+    entry such as `t: 'nextValue()'`, or a `functions` entry that is not
+    declared pure), the application now declines: the closed form can read
+    the argument several times, in another order, or not at all, so the
+    code cannot run once, in the order of the interpreter.
+
+- **On GLSL, `canCompile()` and `compile()` agree on a call of a function
+  with a parameter named by a reserved GLSL word** (`f(discard) := discard^2`). Such a call is written in place, and it is now written before
+  the check, so the check sees the code that is written. `f(f(u))` and a call
+  inside the body of a function that is written as a shader function were
+  accepted by `canCompile()` and declined by `compile()`; the first now
+  compiles, and the second declines in both. A call whose argument or whose
+  function body runs code that the caller supplies, or whose argument type
+  is not the declared parameter type, now declines in both: written in place,
+  such code could run a different number of times than in the interpreter.
+
+- **On GLSL, `compile()` no longer declines expressions with caller code that
+  `canCompile()` accepts.** With
+  `vars: { W: 'nextValue()', V: 'vec3(nextValue())' }`, `W + Max(V)`,
+  `(W, Max(V))`, `W + Sum(V^2)`, `W + Sum(W + k, k, 1, n)` and
+  `If(c, Max(V), 0)` declined, because the shader code would have computed
+  `V` or the loop before `W`, or a branch would have held statements. They
+  now compile, with `W` and `V` each computed once, in the order of the
+  interpreter: the `W` of the loop body once per iteration, and the `V` of
+  the branch only when the branch is taken. Forms that wrote an operand with
+  caller code more than once now compile too, with the operand computed once:
+  `Cot(W)` is `float _tv1 = nextValue();` then
+  `return (_gpu_cos(_tv1) / _gpu_sin(_tv1));`, and so are `Remainder(W, 2)`,
+  `Binomial(W, 3)`, `x < W < 3` and `Cot(F(x))` with `functions: { F: 'myF' }`.
+  `W + W` calls `nextValue()` twice, as the interpreter evaluates `W` twice.
+  (CE-1176)
+
+- **On GLSL, the code can no longer call a user function that its preamble
+  does not define.** A check of the emitted code built a preamble in the
+  middle of the compilation, and that step removed the definitions of user
+  functions that its partial code did not name. In one document of the
+  Desmos corpus, the row `l(I(x, y) mod 2 - 1) - 0.99` compiled to a call of
+  `_fn_l` with no definition of `_fn_l`, which no shader compiler accepts;
+  the definition is now in the preamble. The check is removed: the GLSL
+  fragment check refuses the same operand shapes before any code is written.
+
+- **On GLSL, `canCompile()` and `compile()` agree on a block used as a
+  value, and on a call of a function whose body is a block, next to code
+  that the caller supplies or next to each other.** These nodes write only
+  their own locals, but the GLSL emitter counted them as random draws, whose
+  order it checked. With `vars: { W: 'nextValue()' }`,
+  `W + Block(a := x², a)` was accepted by `canCompile()` and declined by
+  `compile()`; so was `(f(x), Cot(f(y)))` with `f` a function whose body
+  is a block. They now compile. A selection whose clauses call such a
+  function can now take its statement form (`if`/`else`) where it took the
+  conditional expression; the values do not change.
+
+- **On GLSL, a `functions` entry declared `pure: true` is no longer treated
+  as code with side effects.** The declaration had an effect on JavaScript
+  only. With `F: (real) -> real` and
+  `functions: { F: { source: 'myFn', pure: true } }`, `Cot(F(x))` declined
+  on GLSL and now computes `myFn(x)` once; `F(x) + Sum(F(x) + k, k, 1, n)`
+  was accepted by `canCompile()` and declined by `compile()`, and now
+  compiles. An entry with no such declaration (`functions: { F: 'myFn' }`)
+  still declines in these expressions.
+
+- **An edit of a document that pops and pushes a scope no longer takes
+  longer than the edit before it.** A function such as `f(x) := h(x) + 1`,
+  defined while `h` has no definition, is re-derived when `h` gets one. Since
+  0.185.0 the engine releases such a definition after `ce.popScope()`
+  discarded its scope, but only when the garbage collector runs. Until then,
+  `ce.declare('h', 'function')` followed by `ce.assign('h', …)` in a new
+  scope re-derived the `f` of every discarded scope, although none of them
+  can see the new `h`. In a host that pops and pushes a scope at each edit,
+  ten edits of a document took 0.3, 0.4, 0.7 … 1.9 seconds. A definition is
+  now re-derived only when the new definition is in its scope or in a scope
+  above it, and the ten edits take about 0.2 seconds each. (CE-1102)
+
+- **A recursive function that passes a local function by name to its
+  recursive call gives a value.** With
+  `f := (n, g) ↦ Block(q := (y ↦ n + g(y)), If(n = 0, q, f(n − 1, q)))`,
+  `f(1, y ↦ 0)(0)` stayed `Apply(f(1, y ↦ 0), 0)`; it is now `1`, as when
+  the function literal is written in place of `q`. The same function with
+  the local defined by `DefineFunction(q, y ↦ n + g(y))` ended with
+  "Recursion limit exceeded" and now gives the same values. (CE-1185)
+
+- **A selection on the equality of two points compiles to `glsl`.** With `p`
+  and `q` declared `tuple<real, real>`, `If(p = q, 1, 2)` declined with "a
+  tuple operand in an element-wise condition has no element-wise reading",
+  although `canCompile()` accepted it. It now compiles to
+  `((p == q) ? (1.0) : (2.0))`: GLSL `==` on two `vec2` values is true when
+  every component is equal, as the interpreter compares two points.
+  `NotEqual` and a condition such as `p = q ∧ x < 1` compile too.
+
+- **A tuple assignment to locals with a declared type compiles when the
+  type of each value proves the declared type.** With `a` and `b` declared
+  `real`, the loop `Loop((a, b) := (b, a + b), k ∈ 1..5)` was accepted by
+  `canCompile()` on `glsl`, and then `compile()` declined it on `glsl` and
+  on `javascript`. It now compiles on both and gives `5`, as the
+  interpreter. A value whose type does not prove the declared type (`b`, of
+  type `real`, assigned to `a` declared `integer`) still declines, because
+  the interpreter checks it before it writes any target; on `glsl`,
+  `canCompile()` now refuses it too. (CE-1189)
+
+## 0.185.1 _2026-11-09_
+
+### Resolved Issues
+
+- **A call of a `functions` entry whose operator returns a color, a point, a
+  complex number or a boolean compiles to `glsl` again.** Since 0.185.0 the
+  GLSL compilation read every such call as a real, so a color operator
+  applied to it was refused: with `g` declared `(any, any) -> color`,
+  `compile(AsOklab(g(0, x)), { to: 'glsl', functions: { g: 'hostG' } })`
+  failed with "No signature of `AsOklab` in the GLSL fragment takes operands
+  of the types (real)". The call now has the declared result type of its
+  operator. A call of an operator with no declaration, or one that returns a
+  number or an integer, is still read as a real. (CE-1183)
+
+- **A call of a function whose parameter has a name that GLSL reserves
+  compiles to `glsl` when `canCompile()` accepts it.** With
+  `f := filter ↦ filter + 1` and `x: real`, `canCompile(f(x), { to: 'glsl' })`
+  answered `{ ok: true }`, and `compile()` then failed with "`filter` is a
+  reserved word in glsl". The call is now written in place (`x + 1.0`), as it
+  already was when the parameter has a declared type. GLSL also reserves
+  `input`, `output` and `sample`. (CE-1184)
+
+## 0.185.0 _2026-11-09_
+
+### Breaking Changes
+
+- **The `wgsl` compilation target is removed.**
+  `compile(expr, { to: 'wgsl' })` now fails with an unknown-target error, and
+  the `WGSLTarget` class, `WGSLTarget.compileFieldFunction()` and its types
+  (`FieldFunctionOptions`, `FieldFunctionParameter`, `FieldFunctionResult`)
+  are no longer exported. The `'storage-buffer'` storage kind of the
+  `storage` option, its types (`StorageBufferBinding`, `StorageBufferLayout`)
+  and `CompilationResult.storageBuffers` are removed with it: a hint
+  `{ kind: 'storage-buffer', group, binding }` is now an invalid option on
+  every target, as an unknown kind is, and the `StorageKind` and
+  `StorageHint` types admit only `'sampler2D'`. A custom target loses these
+  members, which only the WGSL target used: `storageRead`, `hostInputVars`,
+  `storageBufferBindings` and `storageBuffersRead` of `CompileTarget`, and
+  the protected methods `withTargetExtension()` and
+  `emittedUserFunctionNames()` of `GPUShaderTarget`. To compile for a shader,
+  compile to `glsl`; a program that needs WGSL output can stay on version
+  0.184.0.
+
+- **`Fill` fills a tensor with one value.** `Fill(value, d1, d2, …)` is a
+  list or a tensor with one axis per extent, each element equal to `value`
+  (see New Features). The old form `Fill(f, (m, n))`, which called `f(i, j)`
+  for each cell of an m×n matrix, is removed: it now gives an
+  `incompatible-type` error, because a tuple is not an integer extent. Write
+  `Tabulate(f, m, n)` instead; it gives the same values, also in compiled
+  code. The old form also gave a cell for `At(Fill(f, (2, 3)), 2)` (`12`),
+  where its length and its walk gave rows; `Tabulate` gives the row
+  `[21, 22, 23]`.
+
+- **The `glsl` target compiles only the forms of the GLSL fragment.** Before
+  it writes code, `compile(expr, { to: 'glsl' })` checks the expression
+  against a fixed list of forms: real, integer, boolean and complex scalars,
+  points of 2 to 4 components, colors, lists of at most 256 elements or in a
+  texture, the arithmetic and the functions of the shader library, `Sum` and
+  `Product` over integer ranges, `At`, user functions without recursion, and
+  blocks of scalar, point or complex locals. Outside the list, the
+  compilation declines with the diagnostic code `outside-fragment` (see
+  `canCompile()` in New Features), and `compileFunction()`,
+  `compileShader()` and `compileToSource()` throw. These forms compiled
+  before and now decline:
+  - random draws: `x + Random()` and `WithRandomSeed(5, x + Random())`;
+  - matrices: `Matrix([[1, 2], [3, 4]])` gave
+    `mat2(vec2(1.0, 3.0), vec2(2.0, 4.0))`;
+  - `Apply` of a function literal: `Apply(v ↦ v·x, 2)` gave `(2.0 * x)`;
+  - `Match`: `Match(x, 1 → 2, _ → 3)`;
+  - a list local of a block: `Block(Assign(P, [1, 2, 3, 4, 5]), P[2])`;
+  - a symbol whose type is not numeric: `e + 1` with `e` declared
+    `expression` gave `e + 1.0`. The diagnostic names the symbol in
+    `binding`: declare a numeric type for it;
+  - a list input of more than 256 elements without the `storage` option:
+    `At(H, 2)` with `H: list<real^1600>` gave `H[1]` over a uniform array of
+    1,600 floats, which a GPU can refuse to link. The diagnostic now gives
+    the length, the limit and the option to use,
+    `storage: { H: 'sampler2D' }`;
+  - a user function with a parameter of no declared type, called with
+    arguments of two types: with `sq(u) := u^2`, `sq(x) + Re(sq(z))` for a
+    real `x` and a complex `z` compiled two versions of `sq`. Such a
+    parameter now takes the type of its argument at the first call, and the
+    diagnostic names the parameter and the two types. Declare the type of the
+    parameter, or call the function with arguments of one type. A call with
+    one type compiles as before (`sq(x)` with a `float` parameter, `sq(z)`
+    with a `vec2` parameter). A parameter whose type is a collection with
+    no length (`dictionary<number> | indexed_collection<number>`, the type
+    that the engine infers for `a` from the read `a[k]` of
+    `h(a, k) := a[k] k`) is read the same way: an argument `[x, y]` or
+    `(x, y)` gives a `vec2` parameter.
+
+  These forms are in the fragment and compile as before:
+  - a block at the root of the expression;
+  - an `If` with no else branch used as a value: `If(x > 0, x)` gives
+    `((0.0 < x) ? (x) : (_gpu_nan()))`. The missing branch is `NaN` (a
+    `NaN` in each lane of a point or a complex number), and `false` for a
+    boolean value. A color value, or a list of more than 4 elements, has no
+    `NaN` in GLSL, and such an `If` declines;
+  - the sum or the product of a list of known length: `Sum(L)` with
+    `L: list<real^3>` gives `((L.x) + (L.y) + (L.z))`. The list is a point,
+    a list of 2 to 4 numbers, or a list literal of at most 256 elements;
+  - a number added to a name that `compileShader()` or `compileFunction()`
+    declares as a GLSL vector (`gl_FragCoord + 1`);
+  - a call of a user function with a list of 2 to 4 reals, with the value
+    that the interpreter gives. When every parameter of the function is
+    scalar, the interpreter applies the function to each element, and so
+    does the shader code: with `f(u) := u mod 1`, `f([-x, -y])` gives
+    `_fn_f_each2_1(vec2(-x, -y))`, a wrapper that calls `float _fn_f(float u)`
+    on each component. Otherwise the list binds its parameter whole: a
+    parameter with no declared type, or whose type the engine infers from
+    the index reads of the body, is a `vec2` to `vec4`. With
+    `R(V, t) := [Sum(V·[cos t, -sin t]), Sum(V·[sin t, cos t])]`,
+    `R([x, y], 0.5)` gives `_fn_R_vector_real_2_number(vec2(x, y), 0.5)`. A
+    longer list, lists of two lengths in one element-wise call, a complex
+    parameter beside a mapped list, and a list at a point parameter that
+    the body passes to a declared point parameter decline.
+
+- **A loop of a `glsl` compilation stops after 10,000 passes.** The code of
+  `compile()` to `glsl` counts the passes of every loop that the shader runs
+  (a `Sum`, a `Product`, a `Loop`, a `parallel for`, also in the body of a
+  user function), with one count for each evaluation. Over the cap, the
+  loops stop and the value is `NaN` (`false` for a boolean value), where a
+  shader with a large bound could before take so long that the browser lost
+  the WebGL context. The `iterationBudget` option sets the cap, as it sets
+  the limit of a `Loop` on the JavaScript target; `iterationBudget: Infinity`
+  removes the cap and the counter. `Sum(k·x, k, 1, n)` now compiles to:
+
+  ```glsl
+  _gpu_passes = 0;
+  float _tv1 = 0.0;
+  for (int k = 1; k <= int(floor(n)); k++) {
+    if (++_gpu_passes > 10000) break;
+    _tv1 += float(k) * x;
+  }
+  float _tv2 = _tv1;
+  return _gpu_passes > 10000 ? _gpu_nan() : _tv2;
+  ```
+
+  The preamble declares the counter `int _gpu_passes` under the guard
+  `_GPU_PASSES_DECLARED`. `compileFunction()`, `compileShader()` and
+  `compileToSource()` count no pass.
+
+### New Features
+
+- **`canCompile(expr, options)` tells whether an expression compiles to
+  `glsl`, without writing code.** It is exported from
+  `@cortex-js/compute-engine/compile` beside `compile()` and takes the same
+  options. It answers `{ ok: true }`, or `{ ok: false, diagnostic }` with the
+  code `outside-fragment` and the first node outside the GLSL fragment: its
+  head in the new field `CompileDiagnostic.operator`, or the name of a symbol
+  in `binding`. It never throws, and when it names a node outside the
+  fragment, `compile()` declines with the same diagnostic.
+
+  ```js
+  canCompile(ce.parse('\\sin(x) + x^2'), { to: 'glsl' });
+  // ➔ { ok: true }
+  canCompile(ce.parse('\\int_0^x \\sin(t)\\,dt'), { to: 'glsl' });
+  // ➔ { ok: false, diagnostic: { code: 'outside-fragment',
+  //     message: 'The head `Integrate` is outside the GLSL fragment.',
+  //     operator: 'Integrate', … } }
+  ```
+
+  The answer depends on the expression, the options and the declarations
+  that the expression reaches, so a host can keep it until one of those
+  declarations changes. For a target other than `glsl` the answer is
+  `ok: false`.
+
+- **`Fill(value, d1, d2, …)`, `Zeros(d1, d2, …)` and `Ones(d1, d2, …)`
+  create a list or a tensor with each element equal to one value.** Each
+  operand after the value is the length of one axis: `Fill(7, 3)` is
+  `[7, 7, 7]`, `Zeros(2, 3)` is a 2×3 matrix of zeros and `Ones(2, 2, 2)` a
+  tensor of rank 3 of ones. One extent gives a list, not the square matrix of
+  `ZeroMatrix(n)` and `OnesMatrix(n)`. In Epsil, the functions are written
+  `fill`, `zeros` and `ones`.
+  - The value of `Fill` is evaluated once: `Fill(Random(), 2, 2)` holds four
+    copies of one number. A function value is an element; it is not called.
+  - An extent of 0 or less gives an empty axis, as `Repeat(x, 0)` does:
+    `Fill(7, 0)` is `[]` and `Fill(7, 2, 0)` is `[[], []]`. The axes after an
+    empty axis are not reached: `Fill(7, 2, 0, 3)` is also `[[], []]`. A
+    symbolic extent leaves the expression unevaluated.
+  - The result type is `list<T^(d1×d2×…)>`, with `T` the type of the value,
+    when every extent is an integer literal and the value is a scalar.
+  - A tensor with more than 10,000 elements is a lazy nested `Repeat`, so its
+    elements are not created before they are read.
+
+- **A `parallel for` runs on the worker pool with `runAsync()`.** A
+  `javascript` result called with an object of variables has
+  `runAsync(inputs, options)`, a promise of the value of `run(inputs)`. It
+  sends each `parallel for` that can run on the pool to the workers of
+  `ce.workers`, one range of consecutive passes for each worker, and adds the
+  sums of the ranges to the accumulators in their order. For
+  `let L = H; parallel for k in 1..n { L[k % 3 + 1] += 1 }; L` with
+  `n = 900000` and 3 workers, `await result.runAsync({ H: [0, 0, 0], n })`
+  gives `[300000, 300000, 300000]`, and `onLoop` receives
+  `{ passes: 900000, route: 'pool' }`. A loop runs on the pool when its
+  domain is a range, each accumulator is a local number or list of numbers
+  changed only with `+=`, the body reads no accumulator, writes no other
+  outer variable, makes no random draw and calls no function value, and the
+  loop is a statement of the program or of a function that the program calls
+  as a statement or as the value of a declaration or an assignment. Every
+  other loop runs in order, with the code of `run()`. At run time the loop
+  goes to the pool when it has at least `minPasses` passes (default 20 000)
+  and the private lists of the workers hold at most 16 million numbers. An
+  accumulator of integers gives the value of `run()`; one of real numbers can
+  differ in the last bits, because the terms are added in another grouping.
+  `willParallelize(passes)` tells in advance whether the pool would take a
+  loop, `options.signal` stops the run, and `onLoop` reports the route of each
+  loop. The new types are `RunAsyncOptions`, `ParallelLoopReport` and
+  `ParallelLoopReason`. `run()` does not change. The rules are in
+  `docs/COMPILATION-MODEL.md`, "The worker pool and `parallel for`:
+  `runAsync()`" (CE-1163).
+- **`staticShape` gives the collection shape that an expression promises
+  before evaluation.** The new accessor `expr.staticShape` is
+  `{ indexed, count, elementType }`, or `undefined` when the expression
+  promises no collection. With `f := n ↦ [n, n+1, n+2, n/2]`, the
+  unevaluated `f(3)` has `isCollection: false` and `count: undefined`, and
+  its `staticShape` is `{ indexed: true, count: 4, elementType: 'rational' }`.
+  A collection value answers from its collection facets, a symbol with no
+  value from its declared type (`L: vector<2>` gives a count of 2), and an
+  application whose head is bound (a library operator, an assigned function
+  literal, a declared signature) from its static type, with a `missing` or
+  `nothing` arm set aside. A call of an undeclared name promises nothing: its
+  type is the lift of a vacuous binding. An `If` with an else branch or a
+  `Which` whose arms agree gives their shape: `If(c, [1, 2], [3, 4])` has a
+  count of 2. A host can read the shape of an expression without evaluating
+  it. The getters `isCollection`, `isIndexedCollection`, `count`,
+  `isFiniteCollection`, `isEmptyCollection`, `each()` and `at()` are
+  unchanged: they tell whether a collection value is present to walk now.
+  The rule is in `docs/COLLECTIONS-MODEL.md`, "The shape of an unevaluated
+  application" (CE-1150).
+
+### Improvements
+
+- **A shader loop reads a bound at run time.** On the `glsl` target, a `for`
+  loop over `1..e`, where `e` is a local of the function or an input of the
+  shader, reads `e` into an integer temporary before the
+  loop. Before, it declined: "the bounds of the `Range` must be numbers
+  known at compile time". A bound read at run time must have the static
+  type `integer`.
+- **On the shader targets, an else-less `if` whose branch holds a `for`
+  loop is an `if` statement.** `if e > 0 { for m in 1..e { … } }` compiles to
+  `glsl`; before, it declined with "Could not compile `If`: wrong
+  number of arguments".
+- **More sums, products and point operations compile to `glsl`.** Each of
+  these declined before:
+  - a sum or product over two or more index ranges, as nested loops:
+    `Sum(i·j·x, i, 1, n, j, 1, n)` ("multi-index (2 indexing sets) is not
+    supported in GPU targets");
+  - a sum or product whose index set is a range, `Sum(k·x, k ∈ 1..n)`
+    ("expected Limits indexing set");
+  - a `parallel for` over an integer range whose accumulators are scalar
+    locals, as a loop that runs its passes in order, which gives the value
+    of the interpreter:
+    `Block(s := 0, ParallelLoop(AddTo(s, k·x), k ∈ 1..10), s)` ("the
+    `parallel for` construct compiles only to the JavaScript target");
+  - `Length` of a point, which is its number of components: `Length(p)` with
+    `p: tuple<real, real, real>` is `3.0` (before: "the 'glsl' 'length()'
+    builtin is the Euclidean norm");
+  - an operation on the result of `Normalize`: `Dot(Normalize(p), p)` is
+    `dot(normalize(p), p)` (before: "the shader builtin `dot` requires
+    MATCHING genType arguments", because the result of `Normalize` was read
+    as a number).
+
+### Resolved Issues
+
+- **`Repeat(f, n)` no longer takes the effects of a function value that it
+  never calls.** `Repeat` holds its value as an element and never calls it, as
+  `List` does, but it took the effects of the body of `f`:
+  `Repeat((k) => Random(), 2)` was reported as not pure, while
+  `[(k) => Random(), (k) => Random()]` was pure. A value with an effect of
+  its own, `Repeat(Random(), 2)`, still makes the call impure. (CE-1174)
+
+- **A factor or a minus sign before an integral with its differential in a
+  fraction no longer applies to the terms after the integral.**
+  `2\int_0^1 \frac{dx}{1+x^2} + 1` was `2(∫ + 1) ≈ 3.5708` and is now
+  `2∫ + 1 = 1 + π/2`, as `2\int_0^1 \frac{1}{1+x^2}\,dx + 1` is.
+  `-\int_3^4 \frac{dx}{x} + 5` was `-5 - ln(4/3)` and is now `5 - ln(4/3)`.
+  A brace group around an inner integral and a term after it now keeps that
+  term in the group: `\int_1^2 1-{\int_3^4 \frac{dx\,dy}{xy} + 5}` subtracts
+  the 5 inside the integral over `y`. With `diagnostics: true`, a variable
+  after such an integral, with the name of its integration variable, is now
+  reported as undeclared also after a minus sign
+  (`\int \frac{dx}{x} - x`).
+
+- **A double integral with one differential in a fraction and the other after
+  the integrand is read as a double integral.**
+  `\int_3^4\int_1^2 \frac{dx}{x}\,dy` gave `7/2` (the `d` of `dx` was a
+  variable) and now gives `ln 2`, as `\int_3^4\int_1^2 \frac{1}{x}\,dx\,dy`
+  does. `\iint_1^2 \frac{dx}{x}\,dy` now integrates over `x` and `y`, where it
+  gave `d`. An integral with one differential for each sign and no enclosing
+  integral still reads a `d` in its integrand as a coefficient:
+  `\int_0^1 \frac{ax+by}{cx+dy}\,dx` is unchanged.
+
+- **The differential operator `\differentialD` of MathLive is read inside a
+  fraction.** `\int_1^2 \frac{\differentialD x}{x}` gave an
+  `unexpected-command` error and now gives `ln 2`, and
+  `\frac{\differentialD}{\differentialD x}x^2` is now the derivative `2x`.
+
+- **With `diagnostics: true`, a variable after an integral in a brace group is
+  reported.** In `\int {\frac{x\,dx}{2} + x}`, the last `x` is outside the
+  integral, and is now reported as undeclared; a variable of the integrand
+  after a sign inside a fraction (`\frac{x\,dx}{1+x}`) is not.
+
+- **`compileShader()` and `compileFunction()` of the GLSL target refuse a
+  declared type that is not GLSL.** An input, output or uniform declared
+  `{ name: 'u', type: 'vec3f' }` (or `f32`, `vec3<f32>`, `mat2x2f`,
+  `array<f32, 5>`) gave `uniform vec3f u;` and reported success, and
+  `compileFunction(x + 1, 'f', 'f32', [['x', 'f32']])` gave
+  `f32 f(f32 x) { … }`, but such a shader did not compile on the GPU. Both
+  now throw an error that names the declaration and the GLSL spellings to use
+  (`float`, `vec3`, `ivec3`, `mat2`, `float[5]`).
+
+- **A `parallel for` whose body ends with an inner loop compiles to
+  JavaScript.** In `parallel for k in 1..n { if k > 0 { for m in 1..3 { L[m] += 1 } } }`, the compilation declined with "the value of this `Loop`
+  is used", and the program ran on the interpreter. The body of a
+  `parallel for` is now a statement list, as the body of a `for`, so the
+  same body compiles under both. (CE-1164)
+- **A sum or product over a set and a range keeps the upper bound of the
+  range.** `\sum_{k\in \lbrace1,2,3\rbrace, j=1}^{3} jk` was parsed with no
+  upper bound for `j`, so it had no value; it now gives `36`. The LaTeX of
+  `["Sum", ["Multiply", "k", "j"], ["Element", "k", ["Set", 1, 2, 3]], ["Limits", "j", 1, 3]]` is that LaTeX, so it now parses back to the same
+  sum. The items of the superscript are the upper bounds, in order, of the
+  ranges that have none in the subscript: a clause `k\in S`, its conditions
+  and a range such as `n=0..10` or `1\le n\le 10` take none. So
+  `\sum_{n=0..10, m=1}^{2}(n+m)` now gives `m` the upper bound `2`, where it
+  had none before.
+- **Two integral signs with both differentials in the numerator of a
+  fraction give the right value when a term is before the inner integral.**
+  `\int_1^2 1+\int_3^4 \frac{dx\,dy}{xy}` was parsed with no variable for
+  the outer integral and evaluated to about 1.1111. It is now parsed as
+  `\int_1^2 1+\int_3^4 \frac{1}{xy}\,dx\,dy` is, the integral over `y` of
+  `1 + \int_3^4 \frac{dx}{xy}`, and evaluates to `1 + 2ln(2)^2 - ln(2)ln(3)`,
+  about 1.1994. The same holds for a difference
+  (`\int_1^2 1-\int_3^4 \frac{dx\,dy}{xy}`), and a term after the inner
+  integrand (`… + 5`) is outside both integrals.
+- **A function declared through a type alias of a signature types its calls
+  from that signature.** With `ce.declareType('Fn', '(integer) -> list<real>', { alias: true })` and `ce.declare('g', 'Fn')`, `g(3)` was
+  typed `unknown`, `g("a")` was not refused, and `g([1, 2])` was typed as a
+  call of an undeclared name, where the same declaration written out gives
+  `list<real>`, an `incompatible-type` error and a broadcast over the list.
+  The typing of a call, the check of its arguments, the broadcast decision
+  and the arity of a callback now unfold a transparent alias of the declared
+  type. The symbol `g` keeps the type `Fn`, and `staticShape` of the call
+  gives the shape that the signature promises.
+- **A function whose parameter accepts a point of integers or a string
+  refuses a point with a fractional coordinate.** With
+  `F: (tuple<integer, integer> | string) -> unknown` and the body `p ↦ p`,
+  `F((1.5, 2))` was valid and gave `(1.5, 2)`, while the same point at a
+  parameter declared `tuple<integer, integer>` alone is an
+  `incompatible-type` error. The check of the components of a point now
+  reads each arm of a union parameter: the point is refused when a tuple
+  arm of its arity refutes a component and no other arm accepts a value of
+  its type. A symbol that holds such a point is refused when the call is
+  boxed, as the point literal is, instead of when the call is evaluated. A
+  union with an arm that the point fits (`tuple<integer, integer> | tuple<real, real>`, or `collection`) still accepts it.
+- **Two reads of the same element of a random list give the same value.**
+  With `let v = [j for j in 1..10 if random() < 0.5]`, the tuple
+  `(v[2], v[2], v)` gave three different second elements, and the same
+  for a `Map`, a `Filter` or a `Tabulate` whose function draws: each read
+  by position drew again, and each evaluation of `v` made a new view with
+  no memory of the draws. One instance of a lazy collection has one set of
+  draws (`docs/RANDOMNESS-MODEL.md` §6): a read by position of such a
+  collection now walks it once, and every read of its elements, by position
+  or as a whole, is served from that walk. A view over an infinite source,
+  one with more than 100,000 elements, or one whose elements the memo does
+  not keep (an element that holds a mutable object, an element function
+  that also runs host code which states no purity) still draws at each read
+  by position.
+- **In the VS Code extension, the highlight and the rename of a variable no
+  longer take the index of a `sum`, or the variable of a `limit`, that has
+  the same name.** After `let k = 2`, the cursor on `k` highlighted the
+  three `k` of `sum(k^2, k, 1, 3)` too, and a rename of the `let k` changed
+  them, although the sum binds its own `k`. Highlight, Find All References
+  and Rename now give the `let k` alone, and the two `k` of the sum
+  together. The same applies to `let h = 5` followed by
+  `limit(sin(h)/h, 0)`, and to the variable of every library call that
+  binds one (`integrate`, `product`, `nd`, ...). A rename that would change
+  which variable such a call binds is refused: the implicit variable of a
+  `limit` or an `nd` is chosen by name, so `h` cannot become `Pi`, and the
+  `x` of `limit(sin(x)/x + y, 0)` cannot become `z`, which sorts after `y`.
+- **A shader loop whose bound is a local assigned after its declaration ran
+  the number of turns of the declaration.** On the `glsl` target,
+  `let e = 0; for m in 1..5 { if m > 2 { e = m; break } }; for j in 1..e { s = s + j }` gave `s = 3`: the second loop ran to the value that the
+  compiler read from the declaration of `e`. It now reads `e` at run time and
+  gives `6`, the value of the interpreter.
+- **A loop that writes to the elements of a large list no longer exceeds the
+  call stack.** In Epsil, a loop such as
+  `for k in 1..5000 { xs[k % 200 + 1] = xs[k % 200 + 1] + 1 }` over a list of
+  more than 100 elements, or the same loop with `replaceAt`, `insert` or
+  `deleteAt`, gave the error "Maximum call stack size exceeded" after some
+  thousands of writes. It now gives the list. The same applies to
+  `ReplaceAt`, `Insert` and `DeleteAt` applied again and again to their
+  previous result in MathJSON, for a list of at most `maxCollectionSize`
+  elements.
+- **A sum or product over a set with two or more conditions keeps every
+  condition.** In `\sum_{k\in \lbrace1,2,3\rbrace, k>1, k<3} k`, only the
+  first condition after the `k\in` clause was read; the second was dropped
+  with no message, so the sum gave `5`. Every condition that follows the
+  clause is now kept, joined with `And`, and the sum gives `2`.
+- **A function defined in a block and used with a string now gives the
+  interpreter's value in compiled JavaScript.** With `t: string`, the
+  compiled `["Block", ["Assign", "g", ["Function", ["Length", "s"], "s"]], ["g", "t"]]` threw `RangeError: Length: the operand is not a list or a set` at `t = "abc"`; it now gives `3`. With `S: list<string>`, the same
+  block with `["Map", "g", "S"]` threw at `S = ["xy", "z"]`; it now gives
+  `[2, 1]`, and so do `Filter`, `Count`, `Any` and `All` with `g` as their
+  predicate. The compilation declines, and the interpreter gives the value,
+  when the body of `g` reads another variable of the block, calls another
+  function of the block or calls `g` itself.
+- **Compiling a built-in function mapped over a list of complex numbers no
+  longer declares the symbol `_x` in the engine.** With `zs: list<complex>`,
+  the compilation of `["Map", "Abs", "zs"]` to JavaScript declared `_x`, so
+  that `ce.box(["Add", "_x", 1]).type` was `complex | infinity` afterwards;
+  it is now `number`, as without the compilation. When the program had
+  declared `_x` as a `string`, the compiled code gave `[NaN]` at
+  `zs = [3 + 4i]`; it now gives `[5]`.
+- **A spacing command before a `+` or a `-` that a number follows no longer
+  makes the sign a multiplication.** `a\, - 1` was parsed as the product of
+  `a` and `-1` and gave `-a`, and `x^2\, + 1` gave `x^2`. They are now
+  `a - 1` and `x^2 + 1`, as `a\, - b` already was `a - b`. The same holds
+  for the other spacing commands (`\;`, `\quad`, `\!`, `\hspace{1em}`, …) and
+  after a function with no parentheses: `\sin x\, - 1` was `\sin(-x)` and is
+  now `\sin(x) - 1`. With `form: 'raw'`, `\int \frac{dx}{x}\, - 1` now keeps
+  the spacing command as a `HorizontalSpacing` operand next to the integral,
+  as `\int \frac{1}{x}\,dx\, - 1` does.
+- **A spacing command at the start of an expression, before a sign or another
+  prefix operator, no longer gives an error.** `x = \, -b` was parsed as
+  `x = \mathrm{space} - b` and gave `x == -b + Error(…)`; it is now `x == -b`.
+  `\frac{\,-b}{2}` and `\sqrt{\quad -b}` are now `-b/2` and `sqrt(-b)`, and
+  `\,\neg p` is `Not(p)`. With `form: 'raw'`, the spacing command is not
+  kept in these cases, and `\, -1` is `["Negate", 1]`, as `-1` is (it was
+  the number `-1`).
+- **A spacing command directly after a minus sign or after `\neg` no longer
+  gives an error.** `x = -\,b` gave `x == (-Error(…), b)`; it is now
+  `x == -b`. `-\,\frac12` is now `-1/2`, and `\neg\,p` is `Not(p)`. With
+  `form: 'raw'`, the spacing command is not kept in these cases. After an
+  infix operator nothing changes: `a-\,b` was and is `a - b`.
+
+### Performance
+
+- **The parse of a long list after a symbol is linear in the length of the
+  list.** `ce.parse('G=\\left[1,2,\\dots\\right]')` with thousands of
+  numbers took a time proportional to the square of their count: with
+  40,000 numbers about 5 s, where the same list without `G=` took about
+  0.2 s. Each number of the list was tested as the base of a script, and the
+  test copied every token since the symbol `G` before it looked at the
+  number. The test now looks at the number first, and the parse with `G=`
+  takes about the same time as the parse without it.
+- **The definitions of a discarded scope are released, also when their
+  bodies apply a name that has no definition.** A function such as
+  `f(x) := h(x) + 1`, defined while `h` has no definition, is re-derived when
+  `h` gets one, so that `h(x)` reads as a call and not as a product. The
+  engine kept every such definition for its whole life, also after
+  `ce.popScope()` discarded the scope that held it, and each later
+  declaration of `h` walked them all. A host that pushed a scope, defined a
+  hundred such functions and popped the scope at each edit of a document
+  grew by about 1.5 MB per edit, and the tenth edit took about nine times
+  as long as the first. The engine now holds these definitions weakly: a
+  definition that nothing reaches is collected, and a definition in a scope
+  that the host keeps and pushes again later is re-derived as before. A
+  definition is released only after the end of the synchronous task that
+  made it, and `ce.withValues()` refuses a value for a name that only
+  collected bodies applied until the garbage collector has run.
+- **A compiled loop that updates the elements of a local list tests nothing
+  at each update.** In `let L = H; for k in 1..n { L = replaceAt(L, c, L[c] + 1) }`, each update tested that `L` still held the copy the block had
+  made, and kept a call to make that copy in the loop. When the local is
+  declared with a value and every other write of it is such an update, the
+  declaration now copies the list (`let L = _SYS.ownedCopy(_.H)`) and each
+  update writes it directly (`L = _SYS.replaceAtInPlace(L, c, …)`). The
+  input list is never changed, as before. A loop of 1,000,000 passes with
+  two updates each takes 1.15 to 1.25 times as long as the same loop
+  written by hand with `L[c - 1] += 1`, against 1.32 to 1.44 before
+  (CE-1098). A list that is updated only outside loops keeps the copy at
+  its first update, so a block that does not update it does not copy it.
+- **On the `interval-js` target, a conditional writes the code of its
+  second branch once.** `\begin{cases} A & c \\ B & \top \end{cases}` was
+  compiled to `(t = c) === 'true' ? _IA.res(A) : t === 'false' ? _IA.res(B) : _IA.hull(A, B)`, which holds the code of `B` twice. When `B`
+  is longer than a short call, the code is now
+  `(t = c) === 'true' ? _IA.res(A) : _IA.elseArm(t === 'false', t === 'false' ? null : A, B)`, with the same values. A plot expression that sums
+  20 such terms is 20,580 characters of code and preamble instead of 28,567,
+  and holds 45 arrow functions instead of 89, so it loads faster (CE-1167).
+
+## 0.184.0 _2026-11-08_
+
+### Breaking Changes
+
+- **Record types are closed, and a field can be optional.** A value of
+  `record{a: integer, b: string}` has exactly the keys `a` and `b`. There is
+  no width subtyping any more: `record{a: integer, b: string}` is not a
+  subtype of `record{a: integer}`, and a dictionary literal with an extra key
+  is not a value of the narrower record type. Depth subtyping stays. A field
+  written `b: string?` is optional: a value can leave its key out, and
+  `record{a: integer}` is a subtype of `record{a: integer, b: string?}`. A
+  field that holds `Missing` keeps its key. Dictionaries stay open: a record
+  type is a subtype of `dictionary<V>` when the type of each field, optional
+  fields too, is a subtype of `V`, and the empty dictionary `{->}` is a value
+  of every record type whose fields are all optional.
+  - The join of two record types has the keys of both; a key that only one
+    side lists, or that one side makes optional, is optional. The meet is
+    `never` when one side requires a key that the other does not list.
+  - `Values(r)`, the element type of a record and the type of its entries
+    are the join of the types of its fields.
+  - `Field(r, "zz")` and `At(r, "zz")` are the error `unknown-field` when `r`
+    is a variable declared with a record type that does not list `zz`. A
+    dictionary literal, a variable whose type is inferred and a constant
+    still give the absence value for a key they do not hold. Reading an
+    optional field that the value leaves out gives the absence value of the
+    field type (`Missing` for `b: string?`).
+  - `RecordType.closed` is removed from the type representation, and
+    `RecordType.optional` lists the optional keys.
+  - The result types of `FindRoot` and `FindFit` list `timedOut`, `phase`,
+    `route` and `reason` as optional fields.
+
+### New Features
+
+- **`DeleteAt(d, key)` removes a key from a dictionary or a record.**
+  `DeleteAt({"a" -> 1, "b" -> 2}, "b")` is `{"a" -> 1}`. The value is a copy:
+  the dictionary that the operand holds does not change. A key that the
+  dictionary does not hold gives the dictionary. For a record type the result
+  type has the field removed: with `r: record{a: integer, b: string}`, the
+  type of `DeleteAt(r, "b")` is `record{a: integer}`. A key that is not a
+  string is an error.
+
+- **Epsil: `parallel for` loops, parallel comprehensions and `+=`.**
+  `parallel for k in 1..n { L[c] += 1 }` runs its passes in an order that is
+  not specified (the MathJSON `ParallelLoop`), and `[f(k) parallel for k in 1..n]` is the list of a comprehension whose passes are independent
+  (`ParallelComprehension`). The body can change a variable declared outside
+  the loop only with `+=`, and can have no effect other than `random`; a read
+  of such an accumulator in a pass gives an unspecified value. `epsil check`
+  reports each rule with its own code (`parallel-outer-write`,
+  `parallel-accumulator-read`, `parallel-effect`, `parallel-exit`,
+  `parallel-comprehension-write`, `parallel-clause-not-first`). `epsil check`
+  reports a read of an accumulator written by name in the body; a read by
+  another route (a function that the body calls, `parse("s")`, a function of
+  the host) is not reported. The interpreter and the JavaScript target give
+  such a read the value that the passes, run in order, give; a target that
+  runs the passes in parallel declines a pass that reads an accumulator.
+  Inside `WithRandomSeed`, the loop consumes one
+  draw index of the frame and each pass draws from its own frame, so the
+  direct draws of a pass do not depend on how the passes are split
+  (`docs/RANDOMNESS-MODEL.md` §3); the draws of a lazy view inside a pass,
+  such as `[random() for j in 1..2]`, are unspecified. The interpreter runs the passes in order,
+  and the JavaScript target compiles them with the same values; the other
+  targets decline them. `s += e` (`AddTo`) is new everywhere: it is
+  `s = s + e`, and `L[i] += e` is `L[i] = L[i] + e`, with each position
+  evaluated once. `parallel` is now a contextual keyword: it is read as one
+  only before `for`, so a program that uses `parallel` as a name keeps its
+  meaning.
+- **`Module` reads the library definition of a name that a local definition
+  shadows.** `["Module", "Pi"]` is the constant π of the standard library,
+  also in a scope where `Pi` is declared and assigned `3`, and
+  `["Apply", ["Module", "Floor"], x]` calls the library function `Floor`
+  where a user function `Floor` exists. The canonical form of `Module(Pi)` is
+  the symbol bound to the library definition. A qualified call is the plain
+  call `[f, …]` bound to the library definition, also where `f` is shadowed:
+  the library rules simplify it (`["Apply", ["Module", "Sqrt"], ["Power", "y", 2]]` with a user function `Sqrt` and a real `y` simplifies to
+  `["Abs", "y"]`), a library function that holds or binds an operand reads
+  it as the library does (`Sum`, `If`), and a named argument is valid. The
+  arguments read the definitions of the scope: with a user function `Not`
+  that returns its argument, `["Apply", ["Module", "Not"], ["Not", "False"]]` is `True`. A callee written in parentheses,
+  `["Apply", ["Delimiter", ["Module", f]], …]`, is the same library call; a
+  callee of another form applied to a library function that holds or binds
+  an operand gives the error `qualified-call-arguments-canonical`. A name
+  that the library does not define gives
+  `["Error", "'not-a-library-name'", name]`. A second operand is reserved
+  for the name of another module. LaTeX has no spelling of the qualifier:
+  `["Module", "Pi"]` is written `\pi`.
+- **Epsil: the qualified name `std::name`.** `std::pi` (or `std::Pi`) is the
+  library constant π and `std::floor(2.5)` calls the library function
+  `Floor`, whatever the program binds: after `function Floor(x) { x + 100 }`
+  and `let floor = 7`, `std::floor(2.5)` is `2`. Where a function or a
+  parameter of the program has the name, a qualified call is still the call
+  of the library function, also of a library function that holds or binds
+  an argument, or with a named argument: after `function Sum(x) { 0 }`,
+  `std::sum(k, k in 1..3)` is `6`. `std` is not a reserved
+  word, so `let std = 5` is still valid. A name other than `std` before `::`
+  is the error `unknown-module`, and a name that the library does not define
+  after `std::` is the error `not-a-library-name`. The serializer writes
+  `["Module", "Pi"]` as `std::pi`. A bare name keeps its spelling, because
+  it reads what the name reads where the text is read. `Module` cannot be
+  rebound, as `Nothing` and `Missing` cannot: it is the form of every
+  qualified name. A `let`, a `const`, an assignment or a function named
+  `Module` (in MathJSON, a `Declare`, an `Assign` or a `DefineFunction` of
+  `Module`, in any scope) defines nothing and gives the error
+  `module-binding` when it runs; the static check of Epsil reports every
+  binding of `Module`, also a parameter, a loop variable, a `match` pattern
+  and the index of a `sum`. A qualified name reads the library in every
+  case: the head `Module` always reads the library operator, whatever the
+  program or the host binds.
+
+### Behavior Changes
+
+- **Some divergent integrals of `1/(t·(−ln t)^p)` with `p` near 1 are `NaN`,
+  not `+∞`.** The numerical integration cannot tell these integrals from the
+  convergent ones with `p` slightly above 1 (see Resolved Issues). A
+  divergent integral of this kind in one variable is still `+∞` when its
+  antiderivative is known: `\int_0^{1/2} \frac{dt}{t(-\ln t)}` stays `+∞`.
+  Otherwise it is now `NaN`: `\int_0^{1/2} \frac{dt}{t(-\ln t)^{0.995}}`,
+  `\int_0^{1/2} \frac{dt}{t(-\ln t)(1+t)}` and an `Integrate` with the
+  limits of `t` and of a second variable `x` gave `+∞`.
+
+- **In a scope that shadows a library name, the MathJSON of a result writes
+  `Module`.** `.json` and `toMathJson()` write a symbol bound to the library
+  definition as `["Module", name]`, and a call as
+  `["Apply", ["Module", name], …]`, when the name reads another definition
+  where the result is read again: in the current scope, or in a local scope
+  of a `Function` or a `Block` of the result that encloses the node. So a
+  result read again in that scope keeps its value: in a block with `Declare(Pi, real)` and `Assign(Pi, 3)`, the result
+  `π²/6` of `Sum(1/n², n, 1, ∞)` is written
+  `["Divide", ["Power", ["Module", "Pi"], 2], 6]`, and boxed in the block it
+  gives 1.6449, not 1.5. Outside such a scope, the output does not change.
+- **`isSame()` and `match()` compare the function that a call is bound to,
+  not only its name.** Take `L = ce.box(['Sqrt', 'y'])`, then push a scope
+  where a user function `Sqrt` is declared (`ce.declare('Sqrt', 'function')`
+  and `ce.assign()`), and box `U = ce.box(['Sqrt', 'y'])` there:
+  - `L.isSame(U)` was `true`; it is now `false`, as for two symbols of the
+    same name bound to different definitions.
+  - `U.match(['Sqrt', '_x'])` was `{_x: y}`; it is now `null`. A library name
+    in a pattern means the library function, so `replace()` and the rules do
+    not apply a library rule to a call of a user function of that name. A
+    pattern head that is not a library name still matches by name.
+  - `ce.function('Tuple', [L, U]).match(['Tuple', '_x', '_x'])` was a match;
+    it is now `null`.
+
+  Two calls of a library function are still `isSame`, also when they come
+  from two engines, or when one was made after `ce.declare(name, …, { extend: true })` kept the library handlers. A raw call is still compared
+  by name with another raw call, but it is not `isSame` to a canonical call:
+  `ce.box(['Hold', ['Sqrt', 'y']]).op1.isSame(ce.box(['Sqrt', 'y']))` was
+  `true`; it is now `false`. The same holds for a finite `Range` and the list
+  of its integers: a canonical `Range(1, 3)` and a canonical `[1, 2, 3]` are
+  still `isSame`, but a raw `Range(1, 3)` or a raw `[1, 2, 3]` is no longer
+  `isSame` to a canonical `Range(1, 3)`. The `hash` of a call does not
+  change.
+
+### Resolved Issues
+
+- **A formula made before the user defines a function with the name of a
+  built-in function keeps the built-in function when it is evaluated after
+  that definition.** With `e = ce.box(["Add", "x", ["Sin", "x"]])`, then a
+  pushed scope where `Sin` is assigned `t ↦ t + 100`, `e.evaluate()` gave a
+  call of the user's `Sin`: at `x = 1` the result was `102`. It now gives
+  `x + sin(x)` with the built-in `Sin` (written
+  `["Apply", ["Module", "Sin"], "x"]` in that scope), which is `1.8415` at
+  `x = 1`. A `Hold` made before a user `Hold` stays held. In the other
+  direction, the call of a user function declared with no value, evaluated
+  after its scope ends, stays a call of the user function: a user `Sqrt(4)`
+  is no longer `2`. `evaluateAsync()`, and a host function that is declared
+  again in an inner scope, still read the new definition.
+
+- **A function that a function body defines reads the variables of the body
+  when a closure calls it after the call has ended.** With the body
+  `Block(Declare(c, "real", 5), DefineFunction(h, k ↦ c + k), Assign(g, x ↦ h(x)))`
+  applied to `1`, the call `g(10)` gave `c + 10`; it now gives `15`. A
+  closure that the body returns (`k ↦ h(k)`) had the same defect, with
+  `evaluate()` and with `evaluateAsync()`, and so did a function of the body
+  that reads a parameter of the body. Each call keeps its own values: a
+  closure of an earlier call still reads the values of that call.
+
+- **A function whose body defines a helper with `let` or `=` and calls it
+  with a parameter takes a list argument whole when the helper does.**
+  With `function f(xs) { let h = (t) => count(t); h(xs) }`, `f([1, 2])`
+  applied `f` to each element and gave two `incompatible-type` errors; it
+  now gives `2`, as when the helper is declared with
+  `function h(t) { count(t) }`. The slot of `xs` in the type of `f` is now
+  `collection<any> | value`, not `unknown`. This also applies to a helper
+  written `h = (t) => count(t)` and to a chain of helpers written with `=`.
+  A helper that reads its parameter element by element (`(t) => t + 1`)
+  still maps over the list.
+
+- **In an Epsil function body or block, a second clause of a function with
+  the same parameters is the error `function-redefinition`.** At the top level
+  of a program this was already an error. In a body, the second clause gave no
+  message, and a call used one clause or the other: with
+  `function g(a) { f(y) = y + 1; f(x) = x + 3; f(a) }`, `[g(5), g(6)]` was
+  `[6, 9]`. Now `epsil check` reports `function-redefinition`, and `g` is not
+  defined, as with two `let` of one name in a body. Clauses with different
+  parameters (`f(0) = 1` and `f(x) = 3`) still make one function.
+
+- **The derivative of an expression that holds a named point is computed.**
+  The derivative of a symbol that holds a point is the zero point, not the
+  number `0`. With `p := (1, 2)`, `D(p + (\sin u, u^2), u)` was an
+  `incompatible-type` error, and `D(PointY(p + (\sin u, u^2)), u)`,
+  `D(PointY(u^2 p), u)` and, with `g(t, z) := t^2 z`, `D(PointY(g(u, p)), u)`
+  stayed unevaluated. They are now `(\cos u, 2u)`, `2u`, `4u` and `4u`. A
+  named list of points gives a list of zero points: with
+  `S := [(1, 2), (3, 4)]`, `D(PointY(u^2 S), u)` is `[4u, 8u]`. A symbol that
+  holds a number or a list of numbers keeps the derivative `0`. The
+  derivative of a function applied to a point, such as
+  `D(Norm(p - (\sin u, u)), u)` or `D(f((u, u^2)), u)`, gave a point, a wrong
+  shape: the partial derivative with respect to a point is a gradient. It now
+  stays unevaluated, except for an operator whose `derivative` key gives a
+  number for that partial derivative.
+
+- **On the GLSL and WGSL targets, a function can take a list input as an
+  argument.** With the input `H: list<real^1600>` and
+  `g: (list<integer>, real) -> real`, the compilation of `g(H, x)` failed:
+  `parameter "H" has no static GLSL type`. It now compiles to a call of a
+  definition of `g` with no parameter for the list, whose body reads the input
+  `H` itself, through the texture of a `sampler2D` storage hint, the buffer of
+  a `storage-buffer` hint, or the uniform array. The argument must be an input
+  of the expression: for a list that is a local, a literal or a computed
+  list, the function still has no shader definition.
+
+- **The derivative of a list made by a spread or a join is computed.** The
+  derivative of `ListJoin` (the form of a list literal with a spread,
+  `[...a, b]`) is the `ListJoin` of the derivatives of its operands. With
+  `a = (u, u^2)` and `b = (u, u^3)`, `D(PointY(ListJoin(a, b)), u)` stayed
+  unevaluated; it is now `[2u, 3u^2]`. An operand that is a list, or an
+  expression whose value is a list, gives the derivatives of its elements.
+  A `ListJoin` with a set or a string operand still stays unevaluated.
+
+- **Above machine precision, a real number plus an imaginary number keeps
+  every digit of the imaginary part.** At precision 30,
+  `1+0.123456789012345678901234567i` was the complex number
+  `1 + 0.12345678901234568i`; it is now
+  `1 + 0.123456789012345678901234567i`. This also applies to the MathJSON
+  `["Add", 1, ["Complex", 0, {"num": "0.123456789012345678901234567"}]]`
+  and to a sum of several imaginary numbers.
+
+- **In a block, a function that calls a function defined later in the block
+  takes a list argument whole when the later function does.**
+  `Block(Assign(q, a ↦ h(a)), Assign(h, t ↦ Count(t)), q([1, 2]))` applied
+  `q` to each element and gave two `incompatible-type` errors; it now gives
+  `2`, as when `h` is assigned before `q`. This also applies to a chain of
+  such functions. The result of a function with a typed parameter still
+  depends on the order of the two assignments.
+
+- **In the Epsil editor model, a `limit` that does not name its variable
+  binds the variable that the engine chooses also when that name is a `let`
+  or a `const` of the program.** After `let a = 5`, the program
+  `limit(a + h, 1)` gives `h + 1`: the engine binds `a`. A rename of `let a`
+  changed the `a` of the limit too; it now changes only the `let`. After
+  `const h = 5`, `limit(sin(h)/h, 0)` gives `sin(5)/5`, and a rename of
+  `const h` now changes the `h` of the limit too. `binderSitesOf()` takes an
+  optional sixth argument, a function that gives the `ProgramDeclaration` of
+  a name (exported type): with it, after `let L = [1, 2]`, the result for
+  `limit(total(L)*t, 0)` is `[{ name: "t", operands: [0] }]`, where it was
+  `[]`. The same applies to `nLimit`, `nd` and `nIntegrate`.
+
+- **A convergent integral of `1/(t·(−ln t)^p)` with `p` slightly above 1 is
+  no longer `+∞`.** `\int_0^{1/2} \frac{dt}{t(-\ln t)^{1.005}}` with `.N()`
+  gave `+∞`; it now gives `200.354 ± 0.042` (the exact value is `200.367`),
+  and `p = 1.008` gives `125.362 ± 0.016`. When the exponent is so close to
+  1 that the quadrature cannot tell a convergent integral from a divergent
+  one, the result is `NaN`: `p = 1.001` (exact value `1000.37`) gave `+∞`,
+  and now gives `NaN`. `NIntegrate`, an integral with more than one
+  variable and compiled code give the same results.
+
+- **In Epsil, an error in the argument of `Exp` or in the numerator of a
+  division underlines the argument.** With `w` a variable that holds the
+  string `"s"`, the error of `let v = Exp(w) + 1` underlined `Exp(w)`, and
+  that of `let v = w/2` underlined the whole statement. Both now underline
+  `w`.
+
+- **A number made at a higher precision gives the same digits in a list as
+  alone, after the engine is set to machine precision.** With `b` the
+  number `0.3` made at precision 30 and the engine then set to `"machine"`,
+  `3b` is `0.9`, but `3·[b, 1.5]` and `3·[[b, 1], [2, 3]]` gave
+  `0.8999999999999999` for the element of `b`. They now give `0.9`, and so
+  do the element-wise product, `Dot` and the matrix product. A list of
+  machine numbers is computed on doubles as before, at the same speed.
+
+- **In Epsil, an error in the body of a called function underlines the
+  call.** With `function g(x) { Ln(x) + 1 }` and `let y = 5`, the error of
+  `let v = y + g("a")` underlined `y`, because the sum in the body of `g`
+  was matched to the sum of the statement. It now underlines `g("a")`. The
+  same applies to an error that a variable holds from an earlier statement:
+  with `w2` the error of `Sin(q)`, `let v = w2 * Sin(x)` underlined `x`, and
+  it now underlines `w2`.
+
+- **In a sum or a product, each derivative with respect to a subscripted
+  variable uses its own variable.**
+  `\sum_{i=1}^{2} \frac{\partial}{\partial x_i} x_i^2` gave `4x_i`, and it
+  now gives `2x_1 + 2x_2`. In MathJSON, `["D", ["Power", "x_1", 2], ["Subscript", "x", 1]]` is the derivative with respect to `x_1`, `2x_1`;
+  it stayed unevaluated before.
+
+- **A function with a local variable, mapped over the rows of a matrix,
+  gives a row for each row.** A function made with `ce.box()` before the
+  call, such as `f = row ↦ (q ≔ 1; q·row/row)`, read `row` as a number, so
+  `ce.function('Map', [f, [[1, 2], [3, 4]]])` gave `[1, 1]` and was typed
+  `vector<2>`. It now gives `[[1, 1], [1, 1]]`, typed `matrix<2x2>`, as the
+  same function written in the call does. The same applies to a function
+  whose body holds another function literal, and to the other operators
+  that apply a function to the elements of a collection, such as `Reduce`.
+
+- **A function mapped over residue classes reads the variables of the scope
+  where it was made.** With `k = 1`, a function `f = x ↦ k·x` made with
+  `ce.box()`, and an inner scope that declares another `k = 2`,
+  `Map(f, [ResidueClass(2, 5), ResidueClass(3, 5)])` gave
+  `[ResidueClass(4, 5), ResidueClass(1, 5)]`, although `f(ResidueClass(2, 5))`
+  gave `ResidueClass(2, 5)`. The map now gives
+  `[ResidueClass(2, 5), ResidueClass(3, 5)]`. The same applies to the other
+  operators that apply a function to the elements of a collection, such as
+  `Reduce`.
+
+- **A numeric double integral whose integrand grows like `1/r` near two,
+  three or four points of the box now gives its value.** The potential of two
+  point charges over the unit square,
+  `\int_0^1\int_0^1 \frac{1}{\sqrt{(x-0.5)^2+(y-0.5)^2}}+\frac{1}{\sqrt{(x-0.25)^2+(y-0.25)^2}} dy\,dx`,
+  gave `0 ± 50000000` under `.N()`, and it now gives
+  `6.68863997708 ± 0.00000000038`. Since the previous release, this worked
+  for one such point only. The box is now cut at each point, and each part is
+  integrated with at most one point, at a corner. This applies to a sum and
+  to a product of such divisors. With five or more points, or with two
+  divisors that are zero at the same point, the box is still integrated
+  whole.
+- **The error of a call that returns a value of the wrong type, as a term of
+  a sum or a factor of a product, now names that operand.** With
+  `w = ["a"]`, the value of `["Multiply", ["At", "w", 1], ["Cos", "x"]]` was
+  the `incompatible-type` error with no `ErrorFrame`, so an Epsil program
+  `let v = w[1] * Cos(x)` underlined the whole statement. The error now has
+  the frame of the operand `w[1]`, and Epsil underlines `w[1]`. The same
+  applies to `Add`. The frame names the operand whose value the sum or
+  product refused, also when an operand assigns a variable: with a function
+  `F` that assigns `"a"` to `s` and returns `"b"`, the error of `s * F()`
+  names `F()`. Before, such a product had no frame.
+
+- **A function that calls a parameter with no declared signature does not
+  claim a list type for that call.** The type of
+  `["Apply", ["Function", ["h", ["List", ["List", 0, 0], 5]], "h"], ["Function", ["Count", "t"], "t"]]`
+  was `list<list<unknown^2> | unknown>`, but its value is `2`. The call of
+  `h` is now typed `unknown`, and the function literal is typed
+  `(h: unknown) -> unknown`, because the function that `h` receives can read
+  the whole list. A parameter declared with a signature, such as
+  `(list) -> integer`, keeps the result type of the signature.
+
+- **In Epsil, the location of an error in a subtraction does not select a
+  variable of another sum.** With `let s: any = "a"` and `let y = 5`, the
+  error of `let v = Sqrt(y + 2) - s` underlined the `y` of `y + 2`, which did
+  not make the error. Now it underlines the whole subtraction
+  `Sqrt(y + 2) - s`, as it does for the sum `Sqrt(y + 2) + s`: the error of a
+  subtraction names a sum, and the `y + 2` inside `Sqrt` is another sum. The
+  location of an error in `x + Ln(y) + Ln(2)`, when no operand is sure, is
+  now that sum, not the whole statement.
+
+- **The LaTeX of a sum or a product over a set with a condition keeps the
+  condition.** `["Sum", "k", ["Element", "k", ["Set", 1, 2, 3], ["Greater", "k", 1]]]` gave the LaTeX `\sum_{k\in \lbrace1, 2, 3\rbrace}k`, which parsed
+  again gives 6 instead of 5. Now the LaTeX is
+  `\sum_{k\in \lbrace1, 2, 3\rbrace, 1\lt k}k`. The parser also reads more
+  conditions after `k\in S`: a predicate (`\mathrm{IsPrime}(k)`), an equation
+  (`k\bmod 2=0`, `k=3`) and a membership of the same index (`k\in T`). Before,
+  it ignored a predicate and read an equation or a membership as one more
+  index range of the sum.
+
+- **Two integral signs with both differentials in the numerator of a fraction
+  give the right value when a term follows the fraction or a factor comes
+  before the inner sign.** `\int_1^2\int_3^4 \frac{dx\,dy}{xy} + 1` gave
+  `1 - 2ln(2)ln(3) - 2ln(2) + 4ln(2)^2 + ln(3)` and
+  `\int_1^2 2\int_3^4 \frac{dx\,dy}{xy}` gave
+  `-4ln(2)ln(3) - 4ln(2) + 2ln(3) + 8ln(2)^2`: the outer integral had no
+  variable. Now each parses as the same expression written with the
+  differentials after the integrand (`\int_1^2\int_3^4 \frac{1}{xy}\,dx\,dy + 1`), and gives `1 + 2ln(2)^2 - ln(2)ln(3)` and `-2ln(2)ln(3) + 4ln(2)^2`.
+  The term after the fraction is outside both integrals. A negation before
+  the inner sign (`\int_1^2 -\int_3^4 \frac{dx\,dy}{xy}`) is also fixed.
+
+- **An integral whose differential is in a factor before another factor is
+  an error, not a wrong value.** In `\int_1^2 \frac{dx}{x}\cdot 2`, the
+  parser searched only the end of the product and its last factor for the
+  differential, found none, and took the `d` of `dx` as the integration
+  variable: the integral evaluated to 3, not 2 ln 2. Now a factor before the
+  last one that holds a differential (`\frac{dx}{x}\cdot 2`,
+  `\frac{dx}{x} 2`, `(x\,dx) 3`, `\iint \frac{dx}{x}\frac{dy}{y}`) is replaced
+  by an `unexpected-differential` error, as a differential at the end of a
+  denominator already is. Write the differential last:
+  `\int_1^2 2\frac{dx}{x}` or `\int_1^2 \frac{2}{x}\,dx`. Parentheses that
+  hold only the differential after a symbol (`f(dx)\cdot 2`) are not changed:
+  they can be a function call.
+
+- **The derivative of a long list is computed when the derivative of each
+  element is.** The size limit of a derivative (25 000 nodes) applied to the
+  whole list, so a list of many small elements stayed unevaluated: `D` of the
+  x coordinate of a list of 14 or more cubic Bezier pieces, each read from a
+  list of 31 points with `At(P, 3⌈u⌉ + j)`, stayed `D(…)`, although each piece
+  alone was differentiated. The limit now applies to each element of a `List`
+  and to each operand of a `Join` whose value is a list, and the result is the
+  list of the derivatives. An element whose derivative passes the limit still
+  makes the whole derivative stay unevaluated.
+
+- **`toMathJson()` writes a pattern, and every other operand that its
+  operator keeps as written, as authored, so that `ce.box()` reads the
+  MathJSON back.** The readability rewrites of `toMathJson()` write a `Tuple`
+  of two elements as `Pair` and `["Add", "x", -1]` as `["Subtract", "x", 1]`.
+  Applied to a pattern, they gave another pattern: the function
+  `["Function", ["Match", "u", ["MatchCase", ["Tuple", "_a", "_b"], ["Add", "a", "b"]], ["MatchCase", "_", 0]], "u"]`
+  was written with `["Pair", "_a", "_b"]`, and read back, it gave `0` for
+  the pair `(1, 2)` where the original gave `3`;
+  `["Match", ["Subtract", "y", 1], ["MatchCase", ["Add", "_x", -1], "x"]]`
+  was written with `["Subtract", "_x", 1]`, and read back, it gave a
+  `match-no-case` error where the original gave `y`. The pattern and the
+  guard of a `MatchCase`, the two sides of a `Rule`, a destructuring
+  parameter of a `Function`, the destructuring target of an `Assign` or a
+  `Declare`, and the operand of `Hold` are now written as authored. A value,
+  for example the value of the `Assign` or the subject of the `Match`, is
+  still written with the rewrites: `["Tuple", 1, 2]` is `["Pair", 1, 2]`.
+  Before this release, the destructuring `Tuple` of a `Function`, an `Assign`
+  or a `Declare` was written `Pair`, and `ce.box()` of that gave an
+  `expected-a-symbol` error in place of the parameter.
+
+- **A call of a user function with the name of a library function is no
+  longer read as the library function when it is used in another scope.** A
+  call keeps the function it was bound to where it was made, and the library
+  rules (canonical forms, simplification, derivatives, compilation) now apply
+  to a call only when it is bound to the library function. With a user `Sqrt`
+  defined as `x ↦ x + 100` in a pushed scope, a call `Sqrt(y^2)` made there
+  and simplified after the scope ends gave `|y|`; it now keeps its form. With
+  a user `Add` that multiplies, the call `Add(2, 3)` made in its scope and
+  then used as an operand of the library `Add` (`Add(u, 1)`) was merged into
+  the library sum and gave 6; it gives 7. The same holds for the operands of
+  `And`, `Or`, `Xor`, `Union`, `Intersection` and `Chop`, and an assignment
+  operator of the same name as a user function (`AddTo`, `Assign`) is no
+  longer reported as an assignment inside an operand. A library call made
+  before the declaration of a user function of the same name is now
+  simplified in that scope: `Sqrt(y^2)` gives `|y|` there too. The
+  derivative of such a library call in that scope stays unevaluated, because
+  its result would name the user function: in a scope with a user
+  `Sin(t) = t + 100`, the derivative of a library `Sin(x)` was
+  `Apply(Derivative(Sin, 1), x)`, which reads `Sin` by name; it is now the
+  unevaluated `D(Sin(x), x)`, which holds the library `Sin`: after the scope
+  ends, its numeric value is `cos(x)`. A compiled
+  call whose function is not the one its name reads where it is compiled now
+  declines, and the interpreter gives the value.
+
+- **A user function given by its name as the callback of `Map`, `Filter`,
+  `Count`, `Any` or `All` over a list of strings now gives the interpreter's
+  value in compiled JavaScript.** With `S: list<string>` and
+  `f := s ↦ Length(s)`, the compiled `["Map", "f", "S"]` threw
+  `RangeError: Length: the operand is not a list or a set` at
+  `S = ["xy", "z"]`; it now gives `[2, 1]`, as the interpreter does. The
+  callback now calls the copy of `f` with its parameter typed `string`, as
+  the call `["f", "t"]` with a string `t` already did.
+
+- **Above machine precision, the arithmetic of lists and matrices keeps all
+  the digits of each element.** A number times a list or a matrix, the sum
+  and the element-wise product of two lists, and the matrix product
+  (`Multiply`, `Add`, `MatrixMultiply`) kept only about 16 digits of an
+  element with more digits than a machine number holds. At precision 30,
+  `2\cdot\lbrack 0.123456789012345678901234567, 1.5\rbrack` was
+  `[0.24691357802469136, 3]`; it is now
+  `[0.246913578024691357802469134, 3]`, as the product of the two numbers
+  is. The same holds for a complex element, and for `Determinant`, `Inverse`,
+  `Trace`, `Transpose` and the other matrix operators. So at the default
+  precision of 21 digits, the matrix operators on the `N()` of a matrix give
+  21 digits, and they take more time: on a 12×12 matrix, `Determinant` went
+  from 0.4 ms to 3.6 ms and `Inverse` from 0.6 ms to 9.2 ms in one
+  measurement. Two other results change with such an element. An integer
+  cell of a matrix product that does not depend on it is exact, as beside an
+  exact rational: `4`, not `4.0`. A matrix that is singular in exact
+  arithmetic has a small determinant, the rounding residue of its digits, in
+  place of `0`: `Determinant(N([[1/3, 2/3], [1/7, 2/7]]))` is about
+  `-1.4e-22`, and its `Inverse` has very large entries. Machine numbers, and
+  big numbers that a machine number holds exactly, give the same results as
+  before.
+- **The length of a random list is the number of its elements.** A
+  comprehension whose guard or domain draws a random number, such as
+  `[j for j in 1..10 if random() < 0.5]`, computed its length with draws of
+  its own, so the length and the elements could disagree:
+  `(length(v), sum(v), v)` gave `(4, 23, [1,3,5,6,8])`. Now the length, the
+  emptiness and the elements of one list come from the same draws:
+  `(4, 11, [1,2,3,5])`.
+- **A function declared to take a point checks each coordinate of the point.**
+  With `U` declared `(tuple<integer, integer>) -> integer` and defined as
+  `U(p) := p.x`, `U((1.5, 2))` was valid, typed `integer`, and gave `1.5`.
+  Now it is an `incompatible-type` error, as `U([(1.5, 2)])` already was for
+  the point in the list. The same check applies to a variable that holds the
+  point, and to an argument whose value is such a point when the call is
+  evaluated.
+
+### Performance
+
+- **A compiled minimum or maximum of a `Map` over a list of known length runs
+  as fast as the written-out form.** `Min(Map(k ↦ (x − k)² + (2k)², L))`, where
+  `L` is a list of up to 64 elements whose length is known at compile time,
+  compiles to `Math.min(…)` of one written-out body per element, on every
+  target. The JavaScript code built the mapped list at each call and folded
+  it, which took 2.5 to 6 times as long per call (73 ns against 29 ns for
+  `L = x + [0, 4, 2]`, 202 ns against 31 ns for a list of 24 numbers). A
+  nested `Max` of a `Map` in the function is written out too. The values do
+  not change. A `Map` whose function has an effect, or whose value is a list,
+  keeps its fold.
+- **More copies of a sub-expression read the value of the first copy in one
+  `evaluate()`.** Two cases computed each copy again: a copy that is a branch
+  of `Which` (or of another operator that evaluates its operands itself), and
+  a copy next to an element-wise operation on a list of more than 100
+  elements, such as `Abs(L)` or `Real(L)`. A formula of a host document holds
+  13 copies of three `Which` expressions over a list of 500 points, under
+  `Real`, `Imaginary` and `Abs`. Its evaluation computed a `Which` 13 times,
+  and now computes one 5 times; the value does not change.
+- **A higher derivative of a user function continues from the lower orders
+  already computed.** After `Derivative(f, 2)`, the evaluation of
+  `Derivative(f, 3)` computed the first and second derivatives of `f` again.
+  It now differentiates the second derivative once more, while the state that
+  it depends on is unchanged. For `f(x) = √(x + √(x + … + √(x + 1)))` nested
+  8 times, `Derivative(f, 3)` after `Derivative(f, 2)` took 3.4 s and now
+  takes 1.9 s; the result does not change.
+- **Compiled JavaScript reads its run-time helpers faster, and a loop that
+  updates list elements runs about 4 times faster.** The helpers of a
+  compiled function were held in an object that V8 searched as a hash table
+  at each read. For a loop of 1,000,000 passes that adds 1 to two elements of
+  a list (`L = ReplaceAt(L, c, L[c] + 1)`), `run()` took 15 ms and now takes
+  3.5 ms. The emitted code and the values do not change.
+- **A definite integral is about 11% faster.** To know whether an expression
+  that applies a function literal (`x ↦ …`) has effects, such as a random
+  draw, the engine computed the full type of the literal, with the type of
+  its body. It now computes only the effects of the literal when its type is
+  not known yet. `∫₁² 1/x dx` took about 138 µs and now takes about 122 µs
+  (medians of seven rounds). The values and the effects do not change.
+  (CE-351)
+- **The `latex` of a product with a rational coefficient is about 10 times
+  faster to compute.** To write `Multiply(1/8, Abs(Sin(8x + 1/1000)))`, the
+  serializer split the product into a numerator and a denominator, which
+  built and typed new expressions, and then wrote the product as it was. It
+  now writes such a product with no split. The serializer also no longer
+  computes the type of each sub-expression to find a dictionary. For the
+  1,000 elements of `\sum_{n=0}^{3}\frac{1}{2^n}|\sin(2^nx+\frac{[0...999]}{1000})|`,
+  reading `latex` took about 600 ms and now takes about 50 ms. The LaTeX
+  and the MathJSON do not change. (CE-1018)
+
+## 0.183.0 _2026-11-07_
+
+### Breaking Changes
+
+- **An Epsil definition in math style can no longer replace a function of the
+  library.** `Sin(x) := 5` or `Sin(x) = 5` replaced `Sin` for every later
+  computation on the engine, so that LaTeX `\sin(0)` gave `5`. It is now the
+  error `assignment-to-library-function`, as the LaTeX `\sin(x)\coloneq 5` is,
+  and it defines no function. One-letter names of the library are included:
+  `N(x) := x + 1` and `D(x) := 2x` now give the error. Use another name, or
+  write `function Sin(x) { 5 }` to replace the function on purpose. A
+  lowercase name (`sin(x) := 5`) is a name of the program and stays valid, and
+  so does a definition of a function that the host declared or that an earlier
+  `function` statement defined. `At(xs, k) := 5` now assigns to an element of
+  the list, as `xs[k] := 5` does: it replaced the function `At`, so that
+  `[7, 8][2]` gave `5`.
+- **`expr.subs()` now avoids variable capture.** When a replacement contains
+  a name that a binder of the expression binds, the binder renames that name
+  first: `["Sum", ["Add", "j", "k"], ["Limits", "k", 1, 3]]` with `j`
+  replaced by `k` is now `["Sum", ["Add", "k", "k_1"], ["Limits", "k_1", 1, 3]]`, which evaluates to `3k + 6`. Before, the result was `["Sum", ["Add", "k", "k"], ["Limits", "k", 1, 3]]`, which evaluates to `12`. The same
+  applies to `Product`, a definite `Integrate`, `Comprehension`, a `Function`
+  literal and a local of a `Block`. A substitution where no name collides
+  gives the same result as before. In two cases a bound name cannot be renamed
+  before the block runs, and the result is the same as before: the target of
+  an `Assign` in a held `Block`, and a `Declare` or an `Assign` in a branch of
+  an `If` of a held `Block`. `replace()` is not changed: it rewrites the
+  structure and renames no binder.
+- **A parameter with no type followed by a parenthesized argument is a call of
+  the parameter.** A function can now take another function as an argument:
+  `(g \mapsto \int_0^1 g(x)\,dx)(t \mapsto t^2)` is `1/3`; it was an
+  `incompatible-type` error, because `g(x)` was the product `g \cdot x`. After
+  `h(p, a) \coloneq p(a)`, `h(t \mapsto t^2, 0.5)` is `0.25`; it was the
+  product `0.5 \cdot (t \mapsto t^2)`. This reverses an earlier rule:
+  `(x, N) \mapsto x(N+1)` now calls `x`, and a product needs an explicit
+  multiplication (`x \cdot (N+1)`), a number type on the parameter
+  (`(x\colon \mathrm{real}, N) \mapsto x(N+1)`), or a declared signature for
+  the function that `\coloneq` defines (`ce.declare('b', '(real, real) -> real')`, then `b(x, t) \coloneq t(x+1)`). An argument that contains the
+  parameter stays a product: `q \mapsto q(2q)` is `q \mapsto 2q^2`. The
+  variable of an integral, of a limit and of a sum is not a parameter:
+  `\int_0^1 x(2)\,dx` is still `1`.
+
+### New Features
+
+- **`binderSitesOf()` and its `BinderSite` type are now exported from
+  `@cortex-js/compute-engine/epsil`.** For a call of a library operator in a
+  parsed Epsil program, the function gives the variables that the call binds
+  and the operands that see each one, with the rules the engine uses. A host
+  can then tell the names that a call reads from outside it:
+  `binderSitesOf(ce, call, 'sum(k^2, k, 1, n)')` gives
+  `[{ name: 'k', operands: [0, 1, 2, 3] }]`, so `k` is bound and `n` is read.
+- **New `ce.withValues(values, fn)` gives symbols a value only while `fn`
+  runs.** When `fn` returns or throws, each symbol gets back its earlier value
+  and type. Every expression reads the values while `fn` runs, also one
+  created before the call and the body of a stored function. Before, this
+  needed `ce.checkpoint()`, `ce.assign()` and `ce.restore()`, and a checkpoint
+  is refused during an evaluation:
+
+  ```js
+  ce.declare('a', 'real');
+  ce.parse('f(x) := x + a').evaluate();
+  const expr = ce.parse('f(2)');
+  ce.withValues({ a: 1 }, () => expr.evaluate()); // -> 3
+  expr.evaluate(); // -> a + 2
+  ```
+
+  These throw before any symbol gets a value: a constant, a symbol bound to a
+  function definition, a value that is a function, a value that `ce.assign()`
+  refuses, and a symbol that the body of a stored function applies while the
+  symbol has no definition (`a` in `f(t) := a(t+1)`: declare `a` first).
+
+### Behavior Changes
+
+- **A conditional whose branch calls a function that is not defined yet has
+  the type `unknown`.** With `q` declared `real`, `If(q < 2, g(1), 0)` was
+  typed `integer` before `g` was defined; after `g := x ↦ x / 2` and `q = 1`,
+  its value is `1/2`. It is now typed `unknown`, and the element-wise
+  `Which(L < 2, g(1), True, 0)` with `L = [1, 3, 5]` is a `list<unknown^3>`
+  (it was a `vector<integer^3>`). The same applies to a call of a function
+  whose result type is `unknown`, and to the signature of a function whose
+  body holds such a conditional. A recursive function is still typed by its
+  base case: `r := n ↦ If(n = 0, 1, r(n − 1))` is `(n: unknown) -> integer`.
+  Two functions that call each other can get a wider type than before, when
+  one of them is assigned before the other exists: with `F` and `G` declared
+  `function`, `F := n ↦ If(n = 0, x > 0, G(n − 1))` and then `G := n ↦ F(n)`,
+  `F(m)` is now typed `unknown`; it was `boolean`.
+
+- **A `Linspace` with an endpoint that is an infinity or `NaN` has no value.**
+  Its samples cannot be computed, and its reads disagreed: for
+  `Linspace(0, +∞, 3)`, `Sum` gave `0`, `Count` gave `3`, `Max` gave `+∞` and
+  `Element(5, …)` gave `True`. Each of these now stays unevaluated, as for an
+  endpoint with no value yet (`Linspace(a, 1, 3)`). Compiled JavaScript and
+  Python give `NaN` for such a `Linspace`, also when an input endpoint is
+  `±∞` or `NaN` at run time. With a count of 0 there are no samples, so
+  `Linspace(0, +∞, 0)` is still the empty list.
+- **A compiled integer power or product of a list declared with a type that
+  admits both a matrix and a list of points (the bare `list`,
+  `list<unknown>`, `list<any>`, `indexed_collection`) now fails to compile
+  on the JavaScript target, where it gave the power of each entry.** With `p`
+  declared `list` and the value `[[1, 2], [3, -4]]`, compiled `p^2` gave
+  `[[1, 4], [9, 16]]`, where `evaluate()` gives the matrix power
+  `[[7, -6], [-9, 22]]`. Compiled code holds a point as an array, so the same
+  value can be a matrix or two points, whose square is the square of each
+  coordinate. The compilation now fails with the diagnostic
+  `unsettled-shape`, also for a list of points, and with the fallback on the
+  result is the value of `evaluate()`. The same holds for `p·q` with `q` a
+  list, and for an integer power of a value of type `any`, which can also be
+  a matrix: an element `p[1]^2` of such a list (also in a sum such as
+  `\sum_k p_k^2`), and `g(t)^2` for `g` declared `(real) -> any`. Declare `p` as `list<list<real>>` (a matrix) or
+  `list<tuple<real, real>>` (points) to compile it. A non-integer power
+  (`p^{0.5}`) and a product by a number (`3p`) still compile.
+- **A sum or a product with no index and a free variable now stays
+  unevaluated.** `\sum x^k` evaluated to the single term `x^k`, which looks
+  like a correct value; it now stays `["Sum", ["Power", "x", "k"]]`, because
+  no index is given and the index can be `x` or `k`. The same applies to
+  `\prod x^k` and to `["Sum", "r"]` for a symbol `r` declared `real`. Write the
+  index and its bounds to sum over it: `\sum_{k=1}^{n} x^k` (`\sum_{k} x^k`
+  sums from `k = 1` to infinity). An operand with no free variable is
+  still its own value: `["Sum", 5]` is `5`, and `\sum x^k` is `8` when `x` is
+  `2` and `k` is `3`. The absent value `Missing` is not a free variable:
+  `["Sum", "Missing"]` and `["Product", "Missing"]` are still `Missing`. A sum
+  over a collection, `\sum [1, 2, 3]`, is not changed.
+- **An assigned lazy collection that stays lazy no longer changes when a
+  variable that it reads changes later.** In Epsil, after `k = 3` and
+  `let big = filter(1..oo, c => c > k)`, the assignment `k = 10` changed
+  `first(big)` from `4` to `11`; it now stays `4`. An `Assign` or a `Declare`
+  stores such a collection with the values that its variables have at the
+  statement, also the variables read by an inline function. The same applies
+  to a `Filter` over a dictionary, and to a `Filter` over a set held by a
+  variable typed `collection<any>`. A variable that the collection writes, and
+  the variables read by a function that a variable holds
+  (`let p = c => c > k`, then `filter(1..oo, p)`), are still read when the
+  elements are read. A finite collection that reads a variable is still stored
+  as the list of its elements. A finite collection made from a stored lazy one
+  (`let t = take(big, 2)`) reads no variable, so it now stays lazy, and its
+  callback runs each time its elements are read. `ce.assign()` is not changed:
+  it stores the value it is given.
+- **`\iint` and `\iiint` now give the limits in the order that the evaluation
+  uses: the first limit is the outermost integral.** `\iint xy\,dx\,dy`
+  parsed to `["Integrate", …, ["Limits", "x", …], ["Limits", "y", …]]`, which
+  makes `x` the outer variable, and now parses to
+  `["Integrate", …, ["Limits", "y", …], ["Limits", "x", …]]`. The bounds of
+  the sign go with the first limit: `\iint_0^1 xy\,dx\,dy` was `1/4 * y^2`
+  and is now `1/4 * x^2`. The same applies to `\oiint` and `\oiiint`. The
+  LaTeX of an `Integrate` with several limits now writes the integral sign
+  of the first limit first, and the differentials innermost first:
+  `["Integrate", ["Multiply", "x", "y"], ["Limits", "x", 0, ["Multiply", 2, "y"]], ["Limits", "y", 0, 1]]`
+  (value `y^2`) serialized to `\int_{0}^{1}\int_{0}^{2y}\!xy\,dx\,dy`, which
+  parses back with the value `1/2`. It now serializes to
+  `\int_{0}^{2y}\int_{0}^{1}\!xy\,dy\,dx`. The plain-text form
+  (`toString()`) writes the differentials in the same order, with the
+  variables of the limits: that integral is now
+  `int_(0)^(2y)_(0)^(1)(x * y dy  dx)`. An integral with no limit still
+  writes one differential for each parameter of its integrand:
+  `["Integrate", ["Square", "x"], ["Tuple", "x", 0, 1, 5]]`, whose limit with
+  four elements is not recognized, is `int(x^2 dx)`.
+
+### Resolved Issues
+
+- **At machine precision, the numeric value of a function of a long list of
+  complex numbers is correct when the function reads the real or the
+  imaginary part.** With `B` a list of 101 complex numbers `0.5 + 1.25i`,
+  `["Conjugate", "B"]` with `.N()` gave the list itself: each element was
+  `0.5 + 1.25i`, and it is now `0.5 - 1.25i`, as `.evaluate()` gives. The
+  same applies to `["Map", ["Function", ["N", ["Real", "z"]], "z"], "B"]`,
+  which gave `0.5 + 1.25i` and now gives `0.5`, and to
+  `["Map", ["Function", ["N", ["Add", ["Imaginary", "z"], 0.5]], "z"], "B"]`,
+  which gave `0.5` and now gives `1.75`, for a list of any length.
+  `["Conjugate", "B"]` of a list of 100 elements or fewer, and every value at
+  the default precision, were already correct.
+
+- **`simplify()` now cancels the like logarithm terms of a sum for every
+  base, when each term is a logarithm alone, negated, or with a number
+  coefficient.** `\log(x^3) - 3\log(x)` stayed unchanged, while
+  `\ln(x^3) - 3\ln(x)` simplified to `0`. It now simplifies to `0`, and so do
+  `\log_2(x^3) - 3\log_2(x)`, `3\ln(x) - \ln(x^3)` and
+  `2\ln(x^3) - 6\ln(x)`. The terms still stay when `x` is declared complex or
+  is negative. In the same way, `simplify()` of `\log_{10.0}(x)` now keeps
+  the float base `10.0`, as the other rules of `Log` do: it gave `\log(x)`.
+
+- **A `Sum`, a `Product`, a quantifier or a set-builder whose condition reads
+  a symbol with no value stays unevaluated.** With `x` not assigned,
+  `["Sum", "k", ["Element", "k", ["Set", 1, 2, 3], ["Greater", "x", 0]]]`
+  gave `0`, and `\{k \mid k \in \{1, 2, 3\}, k > x\}` gave the empty set,
+  because a value whose condition was neither `True` nor `False` was dropped
+  as if the condition were `False`. Both now stay unevaluated; with `x := 1`
+  they give `6` and `\{2, 3\}`. A condition whose value is `Missing` still
+  drops the value, as the condition of an `If` does.
+
+- **A function made in the body of a `Sum` or a `Product` keeps the value
+  that the index has in the iteration where the function is made**, as a
+  function made in a `Loop` does. After
+  `["Sum", ["Block", ["If", ["Equal", "i", 1], ["Assign", "g", ["Function", ["Add", "x", "i"], "x"]], "Nothing"], "i"], ["Limits", "i", 1, 3]]`,
+  `g(1)` gave `4`, because the function read the last value of the index,
+  and with `evaluateAsync()` it gave `["Add", "i", 1]`. It now gives `2` in
+  both cases.
+
+- **A function that calls a function that the same block assigned before it
+  takes a list argument whole when the called function does.** The value of
+  `Block(Assign(h, t ↦ Count(t)), Assign(q, a ↦ h(a)), q([1, 2]))` was a
+  list of two `incompatible-type` errors, because `q` was applied to each
+  element of the list; it is now `2`, as it is when `ce.assign()` defines the
+  two functions. The called function must be assigned before the function
+  that calls it: with `Assign(q, …)` first, `q` is still applied to each
+  element.
+
+- **The plain-text form of a negated sum in a sum keeps its parentheses.**
+  `ce.parse('1-t').subs({ t: ce.parse('1-t') }).toString()` was
+  `1 - 1 - t`, which reads as `-t`; it is now `1 - (1 - t)`. In the same way,
+  `["Add", "c", ["Negate", ["Add", "a", "b"]]]` printed `-a + b + c` and now
+  prints `-(a + b) + c`. The value and the LaTeX form were already correct.
+
+- **A function with a point parameter maps over a list of points of different
+  tuple types.** With `X = nan | real | signed_infinity`,
+  `W: (tuple<X, X, X>, unknown) -> tuple<number, X, X>` assigned
+  `(p, s) ↦ (s p.x, p.y, p.z)`, and `a`, `b` not declared,
+  `W([(a, b, 0), (1, a, b)], 2)` was an `incompatible-type` error, and with
+  `K` declared to return
+  `list<tuple<integer, unknown, unknown> | tuple<unknown, unknown, integer>>`,
+  `W(K(a, b), 2)` had the type `error | list<tuple<…>>`, while `W((a, b, 0), 2)`
+  was accepted. Both calls are now valid and have the type `list<tuple<…>>`: a
+  list is accepted when each of its point types is accepted alone. The
+  evaluation of such a call gave an `incompatible-type` error for each point
+  whose type only shares values with the parameter, such as `(a, b, 0)`. It now
+  binds such a point, as a direct call does, and
+  `W([(a, b, 0), (1, a, b)], 2)` evaluates to `[(2a, b, 0), (2, a, b)]`. A
+  point with a component whose value is outside its type, such as `(1.5, a)`
+  at `tuple<integer, integer>`, is still an error in its cell.
+
+- **In the Epsil editor, a rename or a highlight of a variable no longer
+  changes the variable of a `limit` that does not name its variable.** After
+  `let h = 5`, the `h` of `limit(sin(h)/h, 0)` is the variable of the limit,
+  and the program gives `1`; a rename of `let h` changed it too. The same
+  applies to `nLimit`, `nd` and `nIntegrate`. `binderSitesOf()` now gives
+  `[{ name: "h", operands: [0] }]` for this call, where it gave `[]`. It takes
+  an optional fifth argument, a function that tells whether the program binds
+  a name at the call: the engine reads the value of such a name, so when that
+  name comes first in sorted order and other names follow, the result is `[]`.
+
+- **A convergent integral from a large number to infinity now has a numeric
+  value.** `\int_{10^{10}}^{\infty} \frac{dx}{x^{1.5}}` gave `NaN` with `.N()`
+  and `NIntegrate`; it now gives `0.00002 ± 3·10⁻¹⁶`.
+  `\int_{10^{6}}^{\infty} \frac{dx}{x(\ln x)^2}` now gives
+  `0.072382410 ± 2·10⁻⁸` (exact `1/(6 ln 10)`). The numeric value was found
+  divergent when the area is very far from the lower bound. A lower bound
+  larger than about `10^{13}` still gives `NaN`.
+
+- **`simplify()` of a sum or a product gives the same result before and after
+  `evaluate()`.** The evaluation of a `Sum` or a `Product` kept the last value
+  of its index in the scope of the expression: after
+  `["Sum", "j", ["Limits", "j", 1, 3]]` was evaluated, `j` had the value 3. A
+  later `simplify()` of the same expression then read the index as an
+  assigned variable. With
+  `nest = ["Sum", ["Sum", ["Subtract", ["Sin", ["Add", "k", "j", 1]], ["Sin", ["Add", "k", "j"]]], ["Limits", "k", 1, "n"]], ["Limits", "j", 1, 3]]`,
+  `nest.simplify()` gave `\sum_{j=1}^{3}(\sin(j+n+1)-\sin(j+1))` before
+  `nest.evaluate()` and kept the inner sum after it. The index now gets back
+  its value from before the evaluation when the iteration stops, also when a
+  time limit or an abort signal stops it.
+
+- **A limit of a function that calls one of its parameters now gives the value
+  of the call.** With `g := t ↦ t²` and `h := (p, a) ↦ p(a)`,
+  `["Limit", ["Function", ["h", "g", "x"], "x"], 2]` gave `["p", 2]`, with
+  the name of the parameter in place of `g`. It now gives `4`, the value of
+  `h(g, 2)`. `["Expand", ["h", "g", "x"]]` gave `["p", "x"]`; it now keeps
+  the call `["h", "g", "x"]`, and the indefinite integral of `h(g, x)` keeps
+  the call where it held `p(x)`.
+
+- **An integral over an infinite range of a function that oscillates with a
+  symbolic frequency now stays unevaluated.** `\int_0^\infty \cos(xy)\,dx`
+  gave `\frac{\sin(\infty y)}{y}`, a formula with an infinity in it, although
+  the integral has no value. It now stays unevaluated, as
+  `\int_0^\infty \cos(2x)\,dx` already did. A value at the infinite bound
+  that is arithmetic on an infinity (`\int_0^\infty y\,dx` is `\infty y`), or
+  a function with a limit at infinity (`\int_0^\infty \frac{\sin(ax)}{x}\,dx`
+  is `\mathrm{SinIntegral}(\infty a)`), is kept, as before.
+
+- **A function boxed before a call of `Scan`, `Reduce`, `Map` or another
+  operator with a function argument now gets the type of the elements when
+  they are not numbers.** With `f = ce.box(["Function", ["Add", "a", "t"], "a", "t"])` and `m = [[1, 2], [3, 4]]`, `ce.function("Scan", [m, f, 0])` was
+  typed `vector<2>`, a list of numbers, and `ce.function("Reduce", [m, f, 0])`
+  was typed `number`, although their values are rows. They are now typed
+  `matrix<2x2>` and `vector<2>`, as when the function is written in the call.
+  The same applies to a body that the reading as a number simplified:
+  `ce.function("Map", [ce.box(["Function", ["Divide", "x", "x"], "x"]), m])`
+  gave `[1, 1]` and now gives `[[1, 1], [1, 1]]`. A function boxed in a scope
+  and called in a scope that declares again a name the function reads, or a
+  function with a local variable or a function inside it, is used as it was
+  boxed, as before.
+
+- **The derivative of an indefinite integral is now evaluated.**
+  `\frac{d}{dx}\int x^2\,dx` stayed unevaluated; it is now `x^2`, also for an
+  integrand with no antiderivative in closed form (`\frac{d}{dx}\int e^{x^3}\,dx` is `e^{x^3}`). The derivative with respect to another variable
+  is the derivative of the antiderivative, or the integral of the derivative
+  of the integrand when there is no antiderivative in closed form:
+  `\frac{d}{dy}\int x^2 y^3\,dx` is `x^3 y^2`. The derivative of an iterated
+  indefinite integral with respect to one of its variables stays unevaluated.
+
+- **A `d` with no variable after it, at the end of the body of an integral,
+  is no longer lost.** The parser read it as the start of a differential and
+  dropped it when no variable followed: `\int_0^1 \frac{x\,dx}{2} + 1 \cdot d`
+  evaluated to `5/4`, and `\int_0^1 x\,d` to the integral of `x`. Such a `d` is
+  now the symbol `d`: the first gives `1/4 + d`, and the second is the
+  integral of `x\,d`. A `d` followed by a variable (`dx`, `\cdot dx`,
+  `d\theta`) is a differential, as before.
+
+- **The error of a variable that holds a value of the wrong type, as a term
+  of a sum or a factor of a product, now names that operand.** With
+  `s = "a"`, the value of `["Multiply", "s", ["Cos", "x"]]` was the
+  `incompatible-type` error with no `ErrorFrame`, so an Epsil program
+  `let v = s * Cos(x)` underlined the whole statement. The error now has the
+  frame `Multiply argument 1`, and Epsil underlines `s`. The same applies to
+  `Add`. In the body of a called function, the error keeps no frame, as
+  before.
+- **The error of `Sin`, `Cos`, `Exp`, `Power` and the other numeric functions
+  for an argument that is not a number now names that function.** With
+  `w = "s"`, the error of `["Subtract", 3, ["Sin", "w"]]` had the frames
+  `Negate argument 1, Add argument 1`, and an Epsil program
+  `let v = Sin(w) * 2` underlined `Sin(w)`. The error now has the frame
+  `Sin argument 1` first, as the error of `Ln` already had, and Epsil
+  underlines `w`. `Exp(w)` gives the frame `Power argument 2`, because its
+  canonical form is `Power(ExponentialE, w)`. In the body of a called
+  function, the error keeps no frame of its own, as before.
+- **An expansion no longer turns one random draw into several.** With `r`
+  declared with the `random` effect, `Expand((r(t) + 1)^2)` gave
+  `r(t)^2 + 2r(t) + 1`, three independent draws where the input has one; it
+  now stays `(r(t) + 1)^2`. A factor that draws is not distributed over a sum
+  (`Expand(r(t)·(x + 1))` and `r(t).mul(x + 1)` give `(x + 1)·r(t)`, not
+  `x·r(t) + r(t)`), a denominator that draws is not distributed over the
+  terms of the numerator, and `Binomial(r(t), 2)` stays as it is. The same
+  applies to `Random()`. In the same way, `simplify()` no longer reads two
+  draws as one value in `r(t)!/(r(t) − 1)!`, `r(t)!/(k!·(r(t) − k)!)`,
+  `\log_{r(t)}(r(t)^x y)` and `r(t)^{\log_{r(t)}(x)}`: each one now stays as
+  it is.
+- **`simplify()` no longer adds a base of 10 to a common logarithm.**
+  `\log(x^2)` simplified to `2\log_{10}(|x|)`, which is not the same
+  expression as the simplified form of `2\log(|x|)`; it now simplifies to
+  `2\log(|x|)`. In the same way, `\log(10^x y)` now simplifies to
+  `x + \log(y)`, not `x + \log_{10}(y)`. A base of `10.0`, a float, stays.
+- **The `unknowns` and `freeVariables` of a `Block` now include a variable of
+  an enclosing scope that the block reads before it assigns it.** With `a`
+  declared outside the block, `["Block", ["Assign", "a", ["Add", "a", 1]], "a"]` gave `[]`, and now gives `["a"]`: the value of the block depends on
+  the value of `a` before the block. A variable that the block assigns before
+  it reads it is still not listed: `["Block", ["Assign", "y", 5], ["Add", "x", "y"]]` gives `["x"]`.
+- **`subs()` now replaces a variable of an enclosing scope that a `Block`
+  reads before it assigns it.** With `a` declared outside the block,
+  `["Block", ["Assign", "a", ["Add", "a", 1]], "a"]` with `a` replaced by `2`
+  stayed unchanged and evaluated to `a + 1`. It now gives `["Block", ["Assign", "a", 2], ["Assign", "a", ["Add", "a", 1]], "a"]`, which
+  evaluates to `3`: the block gets a first statement that assigns the
+  replacement, because a replacement of each `a` would give the invalid
+  `["Assign", 2, 3]`. As before, the block writes the variable `a` of the
+  enclosing scope when it is evaluated.
+- **`Hypergeometric2F1` at machine precision is now accurate to about the
+  last digit for z < −1 and 0.5 < z < 1.** For these arguments some values
+  were wrong from the 12th digit:
+  `["Hypergeometric2F1", 2.461, 6.281, 8.033, 0.718]` gave
+  `9.193355757971403` and now gives `9.193355757939432`, and
+  `["Hypergeometric2F1", 10.214, 8.842, 11.991, -4.788]` gave
+  `1.137211485608755e-6` and now gives `1.1372114856110883e-6`. Some
+  arguments that gave no numeric value now have one.
+
+- **`simplify()` now gives the closed form of a telescoping sum, of a known
+  infinite series and of a known infinite product, as `evaluate()` does.**
+  `\sum_{k=2}^n (\sin(k+1)-\sin k)` stayed a sum under `simplify()`; it is now
+  `sin(n+1) - sin(2)`. `\sum_{k=1}^\infty \frac{1}{k^2}` is now `1/6 * pi^2`,
+  `\sum_{k=0}^\infty x^k` is now `If(|x| < 1, 1 / (1 - x))`, and
+  `\sum_{k=1}^\infty \frac{x^k}{k}` is now `If(|x| < 1, -ln(1 - x))`.
+  `\prod_{k=1}^\infty (1+1/k^2)` is now `sinh(pi)/pi`, and
+  `\prod_{k=1}^\infty \frac{k}{k+1}` is now `0`. A sum or a product that holds
+  a symbol with an assigned value, or a function whose purity is not known,
+  keeps its form. An infinite series whose body holds another sum or an
+  integral also keeps its form, unless it telescopes. A divergent series whose
+  divergence `evaluate()` proves with a limit, such as
+  `\sum_{k=1}^\infty \frac1k`, keeps its form under `simplify()`; `evaluate()`
+  gives `+oo`.
+- **The error of a numeric integral with a power singularity close to `1/x`
+  now covers its true error.** `.N()` of `\int_0^1 x^{-0.9999}\,dx` gave
+  `10000.00000106 ± 0.00000035`, whose true error is `0.00000106`; the error
+  is now `0.000015`. For `\int_0^1 x^{-0.9998}\,dx`, the error was
+  `0.000000015` for a true error of `0.00000034`; it is now `0.00000087`.
+  For such exponents, the reported error is larger than before.
+- **A numeric integral of a narrow peak at a bound of the interval no longer
+  gives 0.** `.N()` of `\int_0^1 e^{-10^8 x}\,dx` gave `0` with an error of
+  `0`, because the integrand was 0 at every point that the quadrature
+  sampled. It now gives `1e-8`. `.N()` of
+  `\int_0^1 \frac{e^{-10^8 x}}{x^{0.99}}\,dx` gave `0`, and now gives
+  `82.63 ± 0.12` (the value is `82.704`). The peak is found when the
+  integrand is 0 or constant at the sample points nearest to the bound: a
+  narrow peak on an integrand that varies there (`e^x + e^{-10^8 x}`) is still
+  not found.
+- **In a product of a list of more than 100 numbers, an element that is an
+  exact `0` now gives the exact `0`, also beside a float.** With `A` a list
+  of 300 numbers that holds the exact `0`, the element of `2.5·A` was the
+  float `0.0`; it is now `0`, as `2.5·0` is.
+- **Under `evaluateAsync()`, `FlatMap` awaits its callback, and `Max`, `Min`,
+  `Supremum`, `Infimum` and `Sum` of a `FlatMap` read the awaited
+  elements.** With `slowF` an operator that has only an `evaluateAsync`
+  handler and gives `10x`, `await ce.box(["Max", ["FlatMap", ["List", 1, 2], ["Function", ["List", "x", ["slowF", "x"]], "x"]]]).evaluateAsync()` gave
+  `max(2, slowF(1), slowF(2))`, and it now gives `20`; `Min` gives `1` and
+  `Sum` gives `33`. `evaluateAsync({ materialization: true })` of the
+  `FlatMap` now gives `[1, 10, 2, 20]`. When the callback gives a list of a
+  length that is not known from such an operator (`x ↦ slowRange(x)`),
+  `Count`, `Reduce` and `ListFrom` of the `FlatMap` read the awaited elements
+  too: `Count` of it stayed unevaluated, and it now gives the count.
+  `evaluate()` is not changed. `ListFrom` of the first `FlatMap` above still
+  gives the unevaluated calls. `Max`, `Min`, `Supremum` and `Infimum` of a
+  `FlatMap` whose source is a `Map` or another lazy view that applies such an
+  operator stay unevaluated.
+
+- **The type of a call of a function that a block defines with an assignment
+  or a `let` no longer claims a list for a list argument.** The type of
+  `["Block", ["Assign", "f", ["Function", ["Count", "t"], "t"]], ["f", ["List", ["List", 0, 0], 5]]]`
+  was `list<list<unknown^2> | unknown>`, but its value is `2`. The type is now
+  `unknown`: the block is typed before it runs, when `f` has no value yet. A
+  function defined with `DefineFunction` keeps the result type of its
+  definition (`integer | signed_infinity` here), and a call of a function
+  that is not declared keeps its type: `foo([1, 3, 5])` is
+  `list<unknown^3>`.
+
+- **A numeric double integral whose integrand grows like `1/r` near one point
+  of the box now gives its value.**
+  `\int_0^1\int_0^1 ((x-1/64)^2+(y-1/64)^2)^{-1/2} dy\,dx` gave `NaN` under
+  `.N()`, and it now gives `1.945131639720 ± 0.000000000014`. With the point
+  at `(0.3, 0.3)` the result was `0 ± 1800000000`, and it is now
+  `3.295843662862 ± 0.000000000025`. This applies when a divisor of the
+  integrand is a positive definite quadratic polynomial of the two variables,
+  such as `(x − a)² + (y − b)²`, that is zero at one point of the box. The box
+  is cut at that point, and each part is integrated with the point at a
+  corner. A divergent integral, such as one of `((x − a)² + (y − b)²)^{-1}`,
+  still gives `NaN`.
+- **In `mode: 'complex'` on the `javascript` target, a function literal that
+  receives a square root as its argument now gives the correct value when its
+  body uses the parameter as a real number.** With `y: real`,
+  `Block(Assign(f, x ↦ Mod(x, 3)), f(Sqrt(y)))` and
+  `Apply(x ↦ Mod(x, 3), Sqrt(y))` gave `NaN` at `y = 16`, and
+  `x ↦ If(x > 0, Mod(x, 3), x)` gave `4`; they now give `1`, as the
+  interpreter does. `Floor`, `Ceil`, `Round` and `Remainder` had the same
+  defect. The argument is passed as its real part, and as `NaN` when it is not
+  real, as for a call of a function defined with `ce.assign()`.
+- **A numeric integral with a slow logarithmic singularity at a bound that is
+  not 0 now gives its value.** `\int_{1/2}^{1} \frac{dt}{(1-t)(-\ln(1-t))^{1.1}}`
+  gave `3 ± 36` under `.N()`, and it now gives `10.373294 ± 0.000066` (the
+  exact value is `10·(ln 2)^(−0.1) = 10.37331…`). `NIntegrate` gives the same
+  value. The divergent `\int_{1/2}^{1} \frac{-1}{(1-t)\ln(1-t)}dt` gave
+  `0 ± 72000`, and it now gives `+∞`. When the quadrature cannot resolve the
+  singularity at the bound, the integral is computed again on the two halves
+  of the interval, each written in the distance to its bound, so that the
+  factor `1 − t` is computed without rounding next to the bound.
+- **On the `interval-js` target, a `Loop` that stops or skips a pass when its
+  index passes an input or a constant now gives the correct value.** The
+  condition of an `If` statement in the body of the loop was always false when
+  it compared the index with an input or with a constant such as `Pi`: with
+  `x = 2`, `n ≔ 0; Loop(Block(n ≔ i; If(i > x, Break)), i ∈ 1..5); n + 1` gave
+  the interval `[6, 6]`, and it now gives `[4, 4]`, as the interpreter does. A
+  boolean input in such a condition is also read correctly. When the input
+  interval makes the condition true at some of its points and false at others
+  (`x` in `[1.5, 2.5]`), the result is `{ kind: 'entire' }`, because the pass
+  where the loop stops is not known; `broadcast()` gives the kind `entire` for
+  such a cell. A condition that the `interval-js` target cannot compute, such
+  as a comparison of two strings, now makes the compilation decline, and the
+  interpreter evaluates the loop.
+- **A sum or a product over a set whose condition reads a subscript of the
+  index now gives a value.** `\sum_{k\in\{1,2,3\}, a_{k+1}>0} a_k` gave an
+  `incompatible-type` error; with `a_1 = 1`, `a_2 = -1`, `a_3 = 2` and
+  `a_4 = 3`, it now gives `1`. A subscript on the index in the condition is
+  read by value, as in the body: `\sum_{k\in\{1,2,3\}, a_k>0} a_k` gave `0`,
+  because `a_k` was one name in the condition, and it now gives `3`. The
+  `incompatible-type` error of a condition that is not a boolean now names the
+  type of the condition, not the type of the set.
+- **Epsil: a program run again on the same engine with another signature for
+  a function now uses the new signature.** After a first program
+  `let f: (integer) -> integer` and `function f(n) { 2*n }`, a second program
+  `let f: (real) -> real`, `function f(n) { 2*n }` and `f(2.5)` on the same
+  engine gave the error `no-matching-clause`: the function kept the parameter
+  type `integer`. It now gives `5`, as on a new engine.
+- **The limit at infinity of a logarithm in base 10, or in another base, now
+  reads the base.** The limit was computed as if the logarithm were natural:
+  `\lim_{x\to\infty} \log(\frac{2x+1}{x})` gave `\ln 2`, and
+  `\lim_{x\to\infty} \log_{\frac{x}{x+1}}(x)` gave `+\infty`. They now give
+  `\frac{\ln 2}{\ln 10}` and `-\infty` (the base tends to 1 from below).
+- **A multiple integral with its differentials in the numerator of a fraction
+  now has the correct value.** In `\iint \frac{dx\,dy}{xy}` the space between
+  the differentials stopped the search, so the integral was over `y` only and
+  gave `d\ln|y|`; it is now `\ln|x|\ln|y|`. With one sign per integral, each
+  sign now takes one differential, as it does for differentials after the
+  integrand: `\int_1^2\int_1^2 \frac{dx\,dy}{xy}` gave `\frac{3}{2}\ln 2`, and
+  `\int_1^2\int_3^4 \frac{dxdy}{xy}` put the bounds `3` and `4` on `y`. The
+  first is now `(\ln 2)^2`, and the bounds of each sign go with its own
+  variable.
+- **With the integration rules of `loadIntegrationRules()`, an integral of a
+  polynomial in `x^2` times a power of `a+bx^2+cx^4` no longer runs until the
+  time limit.** `\int \frac{d+gx^2}{\sqrt{fx}\sqrt{a+bx^2+cx^4}}\,dx` ran for
+  30 seconds and stayed unevaluated; it now gives a sum of two `AppellF1`
+  terms in a fraction of a second. The rules for a polynomial in `x^2` read
+  its degree in `x` (2 instead of 1), applied a reduction that does not apply,
+  and doubled the degree of the polynomial at each step.
+- **With the integration rules of `loadIntegrationRules()`, an antiderivative
+  no longer contains a division by 0.** `\int \frac{-b-cx}{x(a+bx+cx^2)}\,dx`
+  gave a result with the term `b/0`; it now gives a sum of `artanh` and `ln`
+  terms. A rule whose result divides by 0 is now skipped, and the next rule
+  is tried.
+- **An integral whose differential is in the last factor of a product now has
+  the correct value.** `\int_1^2 2\frac{dx}{x}` gave `3`, because the `d` of
+  `dx` was read as the integration variable; it is now `2\ln(2)`, as
+  `\int_1^2 \frac{2\,dx}{x}` is. `\int 2\frac{dx}{x}` gave `d^2` and is now
+  `2\ln|x|`, and `\int_0^1 3(x\,dx)` is now `\frac{3}{2}`.
+- **Epsil: an error in one of two calls of the same function is underlined on
+  the argument of the call that failed.** In `let v = Ln("a") + Ln(2)`, the
+  run-time error underlined the whole sum and the static type error
+  underlined the whole statement; both now underline `"a"`. The value that a
+  type error names selects the call: the `2` of `Ln(2)` is not the value
+  `"a"`. When the argument of more than one call can be the value, as in
+  `Ln("a") + Ln(x)`, the static error still underlines the whole statement;
+  the run-time error underlines `"a"`, because its breadcrumb names the
+  operand of the sum that failed. The run-time error of an extra argument,
+  `let v = Sqrt(2, 3)`, now underlines the `3`, as the static error does, not
+  the whole statement.
+
+- **The error of an argument whose value an operator refuses now names the
+  call of that operator.** With `w` declared `any` and assigned the string
+  `"s"`, the breadcrumb of the error of `3 - Ln(w)` was `Negate` argument 1,
+  `Add` argument 1, with no call of `Ln`. It now starts with `Ln` argument 1,
+  as the error of `Ln("s")` does. The same applies to `Sqrt`, `Log`, `Not` and
+  the other operators that check the value of an argument against their
+  signature when they are evaluated, and to a function declared with a
+  signature. In Epsil, the run-time error of `let v = 3 - ln(w)` now
+  underlines `w`, not `ln(w)`. When more than one operand of a sum or a
+  product holds a call of the function that failed, the run-time error now
+  underlines the operand whose evaluation failed, not the whole sum:
+  `let v = Sqrt(2, 3) + Sqrt(2, 4)` underlines `3`, and
+  `(if n == 1 { g("a") } else { 0 }) + (if n == 2 { 2 } else { 3 })`
+  underlines `{ g("a") }`.
+
+- **`Hypergeometric2F1` at machine precision no longer gives a wrong number
+  for parameters near 100.** A product of two values of the Gamma function
+  in its formulas went past the largest double, and the result had the wrong
+  sign and size: with `ce.precision = 'machine'`,
+  `["Hypergeometric2F1", -75.504, 20.616, 69.652, 0.5708]` gave `-1.5e-50`
+  and is now `1.7048020435584845e-5`, and
+  `["Hypergeometric2F1", -75.504, 20.616, 69.652, 1]` gave `0` and is now
+  `3.725952279179266e-8`. When the Gamma values are too large to give an
+  accurate result (`["Hypergeometric2F1", 0.5, 0.5, 1e10, 1]`), the
+  expression stays unevaluated.
+- **The WGSL code of an `Or` with an `And` operand is now valid.** WGSL does
+  not let `&&` and `||` appear together without parentheses, so the code that
+  `compile(expr, { to: 'wgsl' })` gave for `Or(Less(3, y, x), Less(x, 5))`,
+  `(3.0 < y) && (y < x) || x < 5.0`, did not compile in a shader. It is now
+  `((3.0 < y) && (y < x)) || x < 5.0`. The same applies to an `And` operand:
+  `Or(And(p, q), r)` gives `(p && q) || r`. The GLSL code does not change.
+- **The limit at infinity of a quotient of an exponential and a power is now
+  correct when the exponent grows slowly.** `\lim_{x\to\infty} e^{\sqrt{x}}/x^5`
+  gave `0` and is now `+∞`; `\lim_{x\to\infty} x^5/e^{\sqrt{x}}` gave `+∞` and
+  is now `0`. The same applies to `e^{\sqrt[3]{x}}/x^{20}`, `2^{\sqrt{x}}/x^5`
+  and `e^{\ln(x)\ln(x+1)}/x^9` (`+∞`, was `0`). The order of growth of two
+  terms is now decided from their form, never from sample values. When it
+  cannot be decided, the limit stays unevaluated: for example
+  `\Gamma(x+1)/(x\Gamma(x))` and `x(\frac{\pi}{2}-\arctan x)`, which gave `1`,
+  now stay unevaluated.
+- **The limit at infinity of a product with a difference of logarithms is now
+  correct.** `\lim_{x\to\infty} x(\ln(x-1)-\ln(x+1))` gave `0` and is now
+  `-2`.
+
+- **The derivative of a definite integral is now evaluated.** `D` of an
+  `Integrate` with bounds stayed unevaluated: `\frac{d}{dy}\int_0^1 xy\,dx`
+  gave `D(int_(0)^(1)(x * y dx), y)`, and now gives `1/2`. When the integral
+  has a closed form, its closed form is differentiated. Otherwise the
+  derivative is taken under the integral sign, with a term for each bound
+  that depends on the variable: `\frac{d}{dx}\int_0^x e^{t^3}\,dt` gives
+  `e^(x^3)`, and `\frac{d}{dy}\int_0^1 e^{x^3 y}\,dx` gives
+  `int_(0)^(1)(x^3 * e^(y * x^3) dx)`. The derivative stays unevaluated when
+  the integrand has a step, a condition or a singularity that depends on the
+  variable (`\lfloor x + y \rfloor`, `\ln|x - y|`), and for an integral over
+  an infinite range with no closed form.
+- **A numeric integral over an infinite bound whose integrand decreases
+  slowly finds its divergence or its value.** `\int_2^\infty \frac{dx}{x\ln x}`
+  diverges: `.N()` gave `3.97 ± 71060` and `NIntegrate` gave `3.97`; both now
+  give `+∞`. `\int_2^\infty \frac{dx}{x(\ln x)^{1.1}} = 10.3733` gave
+  `3.4 ± 36` under `.N()`; it now gives `10.37326 ± 0.00017`. The same applies
+  to a bound at `-\infty` and to compiled code.
+- **An `Apply` whose callee is not a function now falls back to the
+  interpreter in compiled code.** The canonical form of
+  `Apply(D(x ↦ sin(n·x), x), 1)` applies the derivative of the body, a number,
+  not a function. Its JavaScript compilation gave `success: true`, and the
+  compiled function threw "is not a function" when it ran; the Python
+  compilation emitted the same call of a number. Both compilations now
+  decline, and the result comes from the interpreter. Write
+  `Apply(Derivative(x ↦ sin(n·x)), 1)` to apply the derivative as a function:
+  that form compiles.
+
+- **A GLSL or WGSL compilation that reads a list input of unknown length now
+  falls back to the interpreter.** With `L` declared `list<real>`, compiling
+  `L` to GLSL gave the code `L` with `success: true`, but no shader can
+  declare an input of unknown length. The same applies to an input typed
+  `list`, `set<real>`, `collection<real>`, `dictionary<real>` or `matrix`,
+  and to a list of no element (`list<real^0>`). Declare the length in
+  the type (`list<real^8>`), or, on WGSL, give the input a `'storage-buffer'`
+  hint.
+- **The compiled JavaScript of a function literal applied to a string now
+  reads the string as text.** With `t` declared `string`,
+  `["Apply", ["Function", ["Length", "s"], "s"], "t"]` compiled, and at
+  `t = "abc"` its code threw a `RangeError` ("the operand is not a list or a
+  set"); it now gives `3`, as `evaluate()` does. The same applies to `Count`,
+  `IsEmpty`, `Reverse` and `Join` of the parameter. `Last` gave `null`, and
+  `Take(s, 2)` of `"a😀b"` gave half of the emoji; they now give `"b"` and
+  `"a😀"`. `Max` of a string now falls back to the interpreter instead of
+  giving `NaN`.
+- **The compiled JavaScript of a user function called with a string now
+  reads the string as text.** With `t` declared `string` and
+  `f := s ↦ Length(s)`, the call `["f", "t"]` compiled, and at `t = "abc"`
+  its code threw a `RangeError` ("the operand is not a list or a set"); it
+  now gives `3`, as `evaluate()` does. The same applies when `f` is declared
+  `(collection) -> integer` or `(string) -> integer`. `Last(s)` gave `NaN`,
+  `Take(s, 2)` of `"a😀b"`
+  gave half of the emoji and `Reverse(s)` threw; they now give `"b"`,
+  `"a😀"` and `"b😀a"`.
+- **With `diagnostics: true`, the `d` of a differential inside a fraction or
+  parentheses no longer reports `undeclared-symbol`.** `\int \frac{dx}{x}`,
+  `\int \frac{\mathrm{d}x}{x}` and `\int (3x + 2\,dx)` reported the symbol `d`
+  (or `d_upright`), and now report nothing. When the result also holds a
+  free `d`, as in `\int \frac{d\,dx}{x}` (`Divide(d, x)`), each `d` is still
+  reported.
+- **With `diagnostics: true`, the variable of a set-builder no longer reports
+  `undeclared-symbol` inside the braces.** `B = \{x \mid -x \in A\}` reported
+  `B`, `x` twice and `A`, and now reports `B` and `A`, the names that
+  `freeVariables` lists. The variable is the body (`x`), the symbol of a body
+  `x \in S`, or the symbol of a membership `k \in S` of the condition that
+  the body reads (`k` in `\{2k \mid k \in \Z\}`). A use of the name outside
+  the braces is still reported. When the domain of a membership uses the
+  name, as in `\{x \mid x \in [0, x]\}`, each `x` is still reported.
+- **`subs()` no longer replaces the variable of a set-builder or of a
+  quantifier, and `unknowns` no longer lists it.** The variable of
+  `\{x^2 \mid x \in S\}` was in `unknowns` (`["S", "x"]`), and `subs({x: 3})`
+  gave `["Set", 9, ["Condition", ["Element", 3, "S"]]]`. Now `unknowns` is
+  `["S"]` and `subs({x: 3})` keeps the set as it is. The same applies to
+  `\{x \mid x > 0\}`, to `\{x + y \mid x \in S, y \in S\}`, and to
+  `["Set", ["Square", "x"], ["Element", "x", "S"]]`. The domain of the
+  variable still reads the enclosing `x`: in
+  `["Set", ["Square", "x"], ["Element", "x", ["Range", 1, "x"]]]`, `x` is in
+  `unknowns`, and `subs({x: 3})` gives the set of the squares of `1..3`. A
+  non-canonical `["ForAll", "x", ["Greater", "x", "y"]]` (`{form: "raw"}`)
+  now binds `x`, as the canonical form does. In
+  `["Exists", ["Less", "y", "x"], ["Element", "x", "S"]]`, the first operand
+  is not a variable, so `x` is now in `unknowns`, as `evaluate()` reads it.
+
+- **`subs()` no longer replaces a local of a `Block` that a destructuring
+  assignment declares.** In
+  `["Block", ["Assign", ["Tuple", "a", "b"], ["Tuple", 1, 2]], ["Add", "a", "b"]]`,
+  `unknowns` was already `[]`, but `subs({a: 5})` replaced each `a`, and the
+  result evaluated to an `incompatible-type` error. It now keeps the block as
+  it is, which evaluates to `3`. The same applies to a statement wrapped in
+  `Typed`: `["Block", ["Typed", ["Assign", "z", 3], "'integer'"], "z"]` with
+  `z` replaced by `9` is now unchanged.
+
+- **`simplify()` cancels the Gauss hypergeometric terms of a definite integral
+  of a rational function.** The definite integral
+  `∫_{1/2}^{2} (1+x²)/(x²+x⁹) dx` with the Rubi rules gives
+  `3/2 + 2·₂F₁(1, 1/7; 8/7; −128) − 32/3·₂F₁(1, 6/7; 13/7; −128) − 1/2·₂F₁(1, 1/7; 8/7; −1/128) + 1/384·₂F₁(1, 6/7; 13/7; −1/128)`, which
+  `simplify()` left unchanged. `simplify()` now gives `3/2`. In a sum that
+  holds `₂F₁(1, a; a + 1; w)` with exact rational numbers `a` (not an integer)
+  and `w < −1`, and also `₂F₁(1, 1 − a; 2 − a; 1/w)`, it writes the first
+  function with the argument `1/w`:
+  `₂F₁(1, a; a + 1; −z) = πa·z^(−a)/sin(πa) − a/(1 − a)·z^(−1)·₂F₁(1, 1 − a; 2 − a; −1/z)`
+  for `z > 0`. The result is kept when it is simpler than the sum.
+
+- **The LaTeX of a function with a pair, a rest or a default parameter reads
+  back as the same function.** The LaTeX of
+  `["Function", ["Multiply", "x", "y"], ["Tuple", "x", "y"]]`, a function of
+  one pair, was `(x,y)\mapsto xy`, which parses as a function of two
+  parameters. It is now `\mathrm{Function}(xy, \mathrm{Tuple}(x, y))`. A rest
+  parameter was written `\mathrm{Spread}(x)\mapsto 2x` and a default value
+  `(x, k=2)\mapsto kx`, which did not parse as functions; they are now
+  `\mathrm{Function}(2x, \mathrm{Spread}(x))` and
+  `\mathrm{Function}(kx, x, \mathrm{Optional}(k, 2))`. `ce.parse()` reads
+  each of these texts back as the same function. A function with plain or
+  typed parameters keeps the `\mapsto` notation.
+
+- **The error of an operand of a sum or a product names that operand.** With
+  `s = "a"`, the error of `["Multiply", ["Sin", "s"], ["Cos", "x"]]` had the
+  frame `Multiply` argument 2, which is `Cos(x)`; it now has the frame
+  `Multiply` argument 1, which is `Sin(s)`. The same applies to `Add`, to a
+  variable that holds an error, and to a variable that holds an expression
+  whose value is an error. In Epsil, `let v = Sin(s) * Cos(x)` now underlines
+  `Sin(s)`, not the whole product, and `Ln(w) + Ln(w)` underlines the first
+  `Ln(w)`.
+
+- **A subscript on the index of a sum or a product reads the index.**
+  `\sum_{k=1}^{3} a_k` evaluated to `3a_k`, as if `a_k` were one symbol; it
+  now evaluates to `a_1 + a_2 + a_3`. The same applies to `\prod`, to the
+  MathJSON form `["Sum", ["Subscript", "a", "k"], ["Limits", "k", 1, 3]]`,
+  and to a comprehension over integers. The canonical term is
+  `["Subscript", "a", ["Delimiter", "k"]]`, and its LaTeX is `a_{(k)}`. The
+  parse with `canonical: false` changes too: the body is
+  `["Subscript", "a", "k"]`, not the symbol `"a_k"`. These are still a part
+  of the name: a subscript outside a binder (`a_k` alone is the symbol
+  `a_k`), a subscript on a variable that is not an integer index (the
+  variable of `D` or `Integrate`), a joined name that the host declared or
+  assigned (after `ce.assign("a_k", 5)`, the sum is `15`).
+
+- **A function subscripted by the index of a sum or a product is a function
+  for each term.** `\sum_{k=1}^{2} f_k(x)` evaluated to `2f_k(x)`; it now
+  evaluates to `f_1(x) + f_2(x)`, and `\sum_{k=1}^{3} c_k\phi_k(x)` to
+  `c_1\phi_1(x) + c_2\phi_2(x) + c_3\phi_3(x)`. The canonical term is
+  `["Apply", ["Subscript", "f", ["Delimiter", "k"]], "x"]`. Each term reads
+  as the term written alone: `\sum_{i=1}^{2} x_i(x_i-1)` is
+  `x_1(x_1-1) + x_2(x_2-1)`, a sum of products, and after
+  `ce.assign("w_1", 2)` the term `w_1(4)` is the product `8`. A power after
+  the group is a power series: `\sum_{k=0}^{3} a_k(x-1)^k` is
+  `a_0 + a_1(x-1) + a_2(x-1)^2 + a_3(x-1)^3`, as before. The MathJSON form
+  follows the same rule: with `w_1 = 2` and `w_2 = 3`,
+  `["Sum", ["Apply", ["Subscript", "w", "i"], 4], ["Limits", "i", 1, 2]]` is
+  `20`; it was `5`, because `Apply` read the number `2` as a constant
+  function. With a `resolveApplication` hook, the hook still receives the
+  written name (`a_k`). The LaTeX of an `Apply` whose function is not a name, with no
+  argument or with several arguments, is now `\operatorname{apply}(f_{(k)}, x, y)`, which parses back to the same `Apply`; it was
+  `\operatorname{apply}(\mathrm{Subscript}, [f_{(k)}, x, y])`, and an empty
+  string with no argument.
+
+- **The `unknowns` of a block no longer list the names that a destructuring
+  assignment of the block defines.**
+  `Block(Assign(Tuple(a, b), Tuple(1, 2)), Add(a, b))` evaluates to `3`, but
+  its `unknowns` and `freeVariables` were `["a", "b"]`; they are now `[]`. The
+  same applies to a nested pattern and to a `Declare` with a `Tuple` target.
+  The `_` position of a pattern binds nothing and is no longer listed. The
+  `defines` of `(a, _, b) := v` is now `["a", "b"]` (it was `[]`), and its
+  `references` is `["v"]` (it was `["_", "a", "b", "v"]`).
+
+- **The type of a `Scan` over a list with absent elements includes
+  `missing`.** With `xs = Map(x ↦ If(x > 1, Missing, x), [1, 2, 3])`,
+  `Scan(xs, Add)` gives `[1, Missing, Missing]`, but it was typed
+  `vector<integer^3>`. It is now typed `list<integer | missing^3>`, with or
+  without an initial value and with a callback. Types computed from the
+  result change with it: `At(Scan(xs, Add), 2) + 1` is typed
+  `integer | missing`, not `integer`.
+- **The compile option `iterationBudget` limits a `Sum` and a `Product` on the
+  `interval-js` target.** With `iterationBudget: 1e6`,
+  `Sum(i, Limits(i, 1, 1e12))` compiled to `interval-js` ran every pass, where
+  the `javascript` code gave `NaN` at once. The interval loop now gives the
+  `entire` interval before its first pass when the range has more passes than
+  the budget. Without the option the code is unchanged. (Tycho row 509)
+- **`compile(…).freeSymbols` no longer reports `Nothing`.**
+  `If(k > 2, Break(), Nothing)` compiles to `if (2 < k) { break }`, which reads
+  no such value, and `freeSymbols` held `"Nothing"`, so a host that checks each
+  free symbol against its inputs read it as an input with no value.
+  `expr.symbols` still lists it. (Tycho row 506)
+- **A fold whose pair accumulator takes a value that can be `Missing` compiles
+  again** ([#514](https://github.com/cortex-js/compute-engine/issues/514),
+  reported by [enumeratio](https://github.com/enumeratio)).
+  `Fold((p, x) ↦ If(x > 1, [p[1] + At([], x), x], p), [1, 2], 1..n)` typed
+  the accumulator `p` as `tuple<number>`, so the two branches of the `If` had
+  different shapes, and the JavaScript target refused the fold since 0.178.0.
+  The accumulator is now typed `vector<integer^2>`, the fold
+  `list<integer | missing^2>`, and the fold compiles: `n = 3` gives
+  `[Missing, 3]` on the interpreter and `[NaN, 3]` in compiled code.
+- **A result type on a function no longer makes a compiled list update copy
+  the list.** In
+  `function g(H: list<number>, n: integer) -> list<number> { let L = H; for k in 1..n { L = replaceAt(L, k, L[k] + 1) }; L }`,
+  the compiled JavaScript copied the whole list on each pass of the loop and
+  warned `copying-list-update`; without `-> list<number>` it wrote the list
+  in place. Both forms now write in place, with no warning. A `Fold` step
+  with a result type is written in place on the Python target too. The
+  values do not change. (CE-1009, Tycho row FG)
+- **`Hypergeometric2F1` at machine precision is correct to about 15 digits
+  when its series cancels.** With `ce.precision = 'machine'`,
+  `Hypergeometric2F1(-6.937, -4.123, 4.354, -0.662)` gave
+  `0.0011253975813495531`, with a relative error of 3.7e-11; it now gives
+  `0.0011253975813080236`. For z between −1 and 0 the kernel uses the form
+  of the series that cancels least, and a series whose largest term is more
+  than 100 times its sum is summed again with about 32 digits. Over 4548
+  random points with z from −1 to 0.5, the largest relative error fell from
+  6.9e-11 to 2.4e-14. Compiled JavaScript uses the same kernel. (CE-192)
+- **In compiled JavaScript and interval JavaScript, a `Return` inside a nested
+  `Block` that is a statement ends the function.** It ended only the nested
+  block, and the statements after the block still ran. The function
+  `["Function", ["Block", ["Declare", "s", {"dict": {"value": 0}}], ["Block", ["Assign", "s", ["Add", "s", "m"]], ["If", ["Greater", "s", 5], ["Return", ["Multiply", 2, "s"]]]], "s"], ["Typed", "m", "'integer'"]]` gave `8` for
+  `m = 8` in compiled code, and the interpreter gives `16`. The compiled code
+  now gives `16`. A `Which` that is a statement and has a `Return` in a
+  branch is no longer compiled: it gave a wrong value for the same reason, and
+  the interpreter evaluates it. (CE-1073)
+
+- **The LaTeX of an integral with no limit writes a differential for each
+  variable of its integrand**, so that a parse of the LaTeX gives the same
+  variables. The LaTeX of `["Integrate", ["Function", ["Multiply", "x", "y"], "x", "y"]]` was `\int\,xy\!`, which reads back as an integral over `x` only.
+  It is now `\iint\!xy\, \mathrm{d}y \mathrm{d}x`. The LaTeX of
+  `["Integrate", ["Square", "x"]]` is now `\int\!x^2\, \mathrm{d}x`. (CE-1049)
+
+### Performance
+
+- **The compilation of an expression that reads a symbol whose value is a
+  list of tuples of numbers is about twice as fast.** `compile()` writes
+  such a value into the code, and it spent about 60 µs on each tuple. For a
+  symbol whose value is a list of 224 tuples of four numbers, `compile()` of
+  the symbol took about 14 ms and now takes about 6 ms. The emitted code
+  does not change.
+- **A finite product that telescopes and has a free variable evaluates to its
+  closed form.** `["Product", ["Divide", ["Add", "x", "n", 1], ["Add", "x", "n"]], ["Limits", "n", 1, 1000]]` took about four minutes and gave a
+  quotient of two polynomials of degree 1000. It now gives `(x + 1001)/(x + 1)` at once, and its integral over `[0, 1]`, which timed out, is `1 + 1000 ln(2)`. Small products are reduced too: the product from 1 to 2 was
+  `(x^2 + 5x + 6)/(x^2 + 3x + 2)` and is now `(x + 3)/(x + 1)`.
+- **A call of a user function does fewer type computations.** Each call
+  declares the parameters of the function, so the types of the expressions in
+  its body are computed again at each call. Four tests that read such a type
+  at each call now read a cheaper fact first when that fact gives the answer:
+  a `Declare` with attributes (`let m = n * 2` in Epsil), a comparison of two
+  operands, and the broadcast and tuple tests of `And`, `Or` and of the
+  operators with broadcast exemptions. For example,
+  `count(filter(1..20000, f))` with `f(n) = do { let m = n * 2; m % 3 == 0 }`
+  took about 1.1 s and now takes about 0.8 s. The values do not change.
+- **At machine precision, a sum, a difference or a product of two lists of
+  more than 100 numbers, and a quotient with such a list as an operand, are
+  now computed at once.** With `L` a list of 2,000 points,
+  `PointX(L) + PointY(L)` took about 2 µs per element and now takes about
+  0.6 µs; `PointZ(L) / PointX(L)` was a lazy list whose elements cost about
+  4 µs each, and is now a list computed in about 0.4 µs per element. The
+  values do not change. A quotient of two integers that is not an integer
+  is still the exact rational (`7/2`), computed element by element.
+- **At machine precision, arithmetic on lists of more than 100 numbers that
+  hold complex numbers is now computed at once.** With `L` a list of 2,000
+  points, `Conjugate(PointZ(L) / (PointX(L) + i·PointY(L)))` took about
+  15 µs per element and now takes about 4 µs, and `i·PointY(L)` took about
+  6 µs and now takes about 1.7 µs. A quotient, a negation and a conjugate
+  of such lists were lazy lists, and are now lists. This applies to `Add` and
+  `Multiply` of two operands, `Divide`, `Negate` and `Conjugate`; the values
+  do not change. Under `N()`, and for a list that holds an exact rational or
+  a big-number float, the computation stays element by element.
+- **An expression that holds several copies of the same sub-expression now
+  computes it at most twice in one `evaluate()`.** A copy is a separate
+  expression with the same operators, numbers and symbols, as a host makes
+  when it writes a function body in place of each call. For example, a
+  `Which` over a list of 500 numbers that appears nine times in one formula
+  was computed nine times (about 170 ms) and is now computed twice (about
+  80 ms); the value does not change. A copy that holds a local scope
+  (`Block`, `Function`, `Sum`), a call of a user function or an impure
+  operator (`Random`) is still computed at each place.
+- **The condition of `Filter`, `Any` and `All` is now compiled when it
+  compares integers, as the function of `Map` already was.** With
+  `isEven(n) := n % 2 == 0`, `Sum(Filter(1..20000, isEven))` took about
+  480 ms and now takes about 50 ms; `Any(1..20000, k ↦ k % 2 == 7)` went from
+  about 360 ms to about 10 ms. The condition must be a comparison of integer
+  arithmetic (`+`, `-`, `×`, small powers, `Mod`, `Floor`, `Abs`, `Min`,
+  `Max`), or `And`, `Or` and `Not` of such comparisons, and the collection a
+  range or a list of integers of 64 elements or more. Other conditions are
+  evaluated as before. The values do not change. (CE-880)
+
+- **When a derivative of a function is too large to compute symbolically,
+  the higher derivatives of the same function no longer try again.** For
+  `f(x) = \sqrt{x+\sqrt{x+\cdots+\sqrt{x+1}}}` nested 37 times, each of
+  `f'(0.5)`, `f''(0.5)` and `f'''(0.5)` spent about one second before it used
+  the numeric approximation, and compiling their sum took about 3 s. Now
+  only the first derivative that is too large takes that time: compiling the
+  sum takes about 1.2 s, and each of the other orders takes a few
+  milliseconds. The values do not change. (CE-346)
+
+- **Above machine precision, a sum, a product or a negation over a list of
+  more than a hundred floats is computed at once, about 3 times faster.**
+  `Add(L, 2)`, `Multiply(-2, L)` and `Negate(L)`, where `L` is a list of
+  floats, now evaluate to a `List` of floats. Before, the sum and the
+  negation gave a lazy `Map`, whose elements were computed each time they
+  were read. Each element has the digits that the same operation on the
+  element gives. At the default precision, `Min(1, 2 - 2·PointZ(C))` over ten
+  thousand points took about 175 ms and now takes about 51 ms. A list of
+  exact integers keeps the lazy `Map`. (CE-337)
+- **Boxing nested folds whose accumulator types cannot be refined takes
+  about 20% less time.** When the accumulator of a `Fold`, `Reduce` or `Scan`
+  cannot be given a more precise type, the folds in its callback are no longer
+  typed a second time from the start. Boxing the RSK row insertion of issue
+  #487 (8 nested folds, 4 deep) took about 92 ms and now takes about 71 ms
+  (fastest of 12 runs from source). The types and values do not change.
+  (CE-689)
+- **The type of a product of scalar factors is found faster, so boxing,
+  simplifying and integrating take up to 18% less time.** A product whose
+  factors are plain numbers no longer goes through the tests for points,
+  lists, tensors and NaN arms first. Boxing `√6·x + √2·x` took about 20 µs
+  and now takes about 16.5 µs; its simplification takes 9% less time and
+  `∫1/(x³+1) dx` 8% less (medians of seven rounds, one warm process). The
+  types do not change. (CE-351)
+- **Definite integrals are evaluated up to 11% faster.** The evaluation lifts
+  the integrand out of its function literal once, not once for each test, and
+  it reads the type of the result before it computes a numeric value to find
+  an imaginary part. `∫₁² 1/x dx` took about 187 µs and now takes about
+  173 µs, and `∫₀^π x·sin x dx` about 449 µs and now 397 µs (medians of five
+  runs, from source). The values do not change. (CE-351)
+- **Boxing an arithmetic expression is up to 10% faster.** The type of an
+  exact literal such as `√6` is kept for each value, so a second boxing of
+  the same value does not compute it again; a number literal is not tested
+  for an inferred type, which it never takes; and the type of a product of
+  fewer than two operands that can be lists skips the test for a matrix
+  product. Boxing `√6x + √2x` took about 11.8 µs and now takes about
+  10.6 µs, the simplification of `√(3+2√2)` 5% less time, and
+  `∫1/(x³+1) dx` 4% less (medians of five runs, from source). The types and
+  values do not change. (CE-351)
+- **Evaluating the same derivative again no longer differentiates again.**
+  A `D` expression keeps its closed form while nothing that it reads changes:
+  the value of a symbol, the definition of a function that it calls, an
+  assumption, the type of its variable or the configuration of the engine.
+  For `h(t)`, a path of 29 linear pieces read from a list of points, a second
+  `evaluate()` of the same `["D", ["PointY", ["h", "u"]], "u"]` took about
+  80 ms and now takes about 18 ms (the first evaluation still takes about
+  190 ms; one run from source). In `x ↦ D(x^2, x)`, each call still puts its
+  own argument in `2x`. A derivative that uses the `derivative` handler of an
+  operator declared by the caller is still worked out at each evaluation,
+  because that handler can read any state. The values do not change. (CE-442)
+- **A symbol that holds a list of symbolic elements keeps its evaluated value
+  while nothing that the list reads changes.** Each `evaluate()` of the symbol
+  evaluated every element of the list again after an assignment to any other
+  symbol. For `h(t)`, a path of 29 linear pieces read from a list of points,
+  a symbol `d` assigned the value of `["D", ["PointY", ["h", "u"]], "u"]`
+  took about 46 ms to evaluate after `ce.assign("z", 1)`, and now takes less
+  than 0.1 ms (one run from source). An assignment to a symbol that an
+  element reads still gives the new value. A list of numbers and strings was
+  already its own value and is not changed. The values do not change. (CE-313)
+- **Compiled JavaScript loops that are statements run up to two times
+  faster.** The code of a `Loop` was an arrow function that is called at once,
+  `(() => { for (…) { … } })()`, also where the loop is a statement of a block
+  or of a loop body. A loop that writes a local of the code around it then
+  kept that local in a slower kind of storage. Such a loop is now the block
+  `{ for (…) { … } }`, and so is a loop in a branch of an `if … else`
+  statement. A `do { … }` block that is a statement is a block statement too,
+  not an arrow function: in `do { let u = 3; for k in 1..n { s = s + k % u } }`
+  with `n = 2000000`, the loop took about 6 ms and now takes 3 to 5.5 ms. On
+  the `interval-js` target a loop that is a statement is a block as well. The
+  Buddhabrot step of Tycho (three nested loops, 5,000 samples)
+  took about 2.1 ms per call and now takes about 1.1 ms; the loops of
+  `for k in 1..n { let a = 0; for m in 1..20 { … } }` with `n = 200000` went
+  from about 0.9 ms to 0.7 ms (medians of 50 calls, from source). A loop that
+  is an operand, or that has a `Return` in its body, keeps the arrow function.
+  The values do not change. (CE-1073)
+
 ## 0.182.0 _2026-11-06_
 
 ### Breaking Changes
