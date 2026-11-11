@@ -306,7 +306,7 @@ Grapheme segmentation is not available on every compilation target, so each
 target either implements a string operation grapheme-correctly or **fails
 closed** with a diagnostic — never by silently counting code units.
 
-| Operation | JavaScript | Python | GLSL/WGSL |
+| Operation | JavaScript | Python | GLSL |
 | :--- | :--- | :--- | :--- |
 | `Length(s)`, `At(s, i)` / `s[i]` | Compiled grapheme-aware (never the host `.length`) | Not supported | Not supported |
 | Iteration-derived (`Map`, `Filter`, `Reduce`, `Any`, `All`, `Contains`, `IndexOf`, … over a string) | Segmented, then the ordinary list lowering | Not supported | Not supported |
@@ -316,8 +316,8 @@ closed** with a diagnostic — never by silently counting code units.
 
 Python has no grapheme segmentation in its standard library (`len()` counts
 code points), so string collection operations report a target-capability
-diagnostic rather than compiling to something subtly wrong. GLSL and WGSL
-have no string support at all, and string-typed operands are rejected as
+diagnostic rather than compiling to something subtly wrong. GLSL
+has no string support at all, and string-typed operands are rejected as
 before.
 
 <ReadMore path="/compute-engine/guides/compiling/" >
