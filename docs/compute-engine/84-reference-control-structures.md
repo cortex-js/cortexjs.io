@@ -716,6 +716,85 @@ single-collection case).<Icon name="chevron-right-bold" />
 
 </FunctionDefinition>
 
+<FunctionDefinition name="ParallelLoop">
+
+<Signature name="ParallelLoop">_body_, _element_</Signature>
+
+A loop whose passes are independent: `body` is evaluated once for each
+element of the `Element` clause (a pass), and the passes can run in any order.
+The value is `Nothing`. This is the MathJSON form of the Epsil
+`parallel for x in xs { … }` statement.
+
+The body can change a variable declared outside the loop only with
+[`AddTo`](#addto): such a variable is an accumulator, and the value after the
+loop is the value before it plus the contributions of all the passes. A read
+of an accumulator in a pass (directly, in a function that the body calls, in a
+function of the host) gives an unspecified value. The Epsil checker reports a
+read written by name in the body (`parallel-accumulator-read`), a body that
+breaks the other rules, and one with an effect other than `random`; a read by
+another route is not reported.
+
+Inside a `WithRandomSeed` frame, the loop consumes one draw index of the frame,
+and each pass draws from its own frame, so the values do not depend on how the
+passes are run. The interpreter runs the passes in order, and the compiled
+JavaScript gives the same values, also for a pass that reads an accumulator.
+This applies to the direct draws of a pass (a `Random` that the pass
+evaluates). The draws of a lazy collection inside a pass (a `Comprehension`
+or a `Map` whose function draws) are not specified, because the caches of a
+collection are shared by the passes. To get the draws of each pass, build the
+list directly, for example as `["List", ["Random"], ["Random"]]`.
+The other compile targets decline the loop.
+
+```json example
+["Block",
+  ["Assign", "L", ["List", 0, 0]],
+  ["ParallelLoop",
+    ["AddTo", ["At", "L", ["Add", ["Mod", "i", 2], 1]], "i"],
+    ["Element", "i", ["Range", 1, 5]]],
+  "L"]
+// ➔ [6, 9]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ParallelComprehension">
+
+<Signature name="ParallelComprehension">_body_, _element-1_, _element-2_, ...</Signature>
+
+The list that `Comprehension` with the same operands gives, but the passes of
+the first clause are independent, as in a [`ParallelLoop`](#parallelloop): the
+other clauses run in order inside each pass, and the body changes no variable
+declared outside it. Unlike `Comprehension`, which is a lazy collection, it is
+evaluated at once to a `List`. This is the MathJSON form of the Epsil
+`[f(x) parallel for x in xs]`.
+
+```json example
+["ParallelComprehension", ["Square", "k"], ["Element", "k", ["Range", 1, 4]]]
+// ➔ [1, 4, 9, 16]
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="AddTo">
+
+<Signature name="AddTo">_symbol_, _value_</Signature>
+
+<Signature name="AddTo">["At", _list_, _position-1_, ...], _value_</Signature>
+
+The compound assignment: `["AddTo", "s", v]` is
+`["Assign", "s", ["Add", "s", v]]`, and `["AddTo", ["At", "L", i], v]` is
+`["Assign", "L", ["ReplaceAt", "L", i, ["Add", ["At", "L", i], v]]]`, with
+each position evaluated once, before `v`. In the body of a
+[`ParallelLoop`](#parallelloop), it adds a contribution to an accumulator.
+This is the MathJSON form of the Epsil `s += v` and `L[i] += v`.
+
+```json example
+["Block", ["Assign", "L", ["List", 1, 2, 3]], ["AddTo", ["At", "L", 2], 10], "L"]
+// ➔ [1, 12, 3]
+```
+
+</FunctionDefinition>
+
 <FunctionDefinition name="FixedPoint">
 
 <Signature name="FixedPoint">_body_, _initial-value_</Signature>
