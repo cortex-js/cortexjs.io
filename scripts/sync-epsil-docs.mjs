@@ -16,9 +16,10 @@
 // at sync time, rather than in a remark plugin, because `slug` is read from
 // frontmatter before any remark plugin runs.
 //
-// Links that point at the *other* products (`/compute-engine/…`, `/mathfield/…`,
-// `/math-json/…`) resolve on mathlive.io and have no counterpart on epsil.dev,
-// so they are absolutized to https://mathlive.io.
+// Links to the Compute Engine and MathJSON docs (`/compute-engine/…`,
+// `/math-json/…`) stay relative: those pages are published on epsil.dev too.
+// Links to the other products (`/mathfield/…`) resolve on mathlive.io only, so
+// they are absolutized to https://mathlive.io.
 //
 // `docs/epsil/**/*.md` is GENERATED — edit the upstream copies in the
 // compute-engine repo, never the files this writes.
@@ -57,7 +58,10 @@ const INTRODUCTION_PATH = "/introduction/";
 // Sections that live on mathlive.io, not on epsil.dev. Anything else that is
 // still absolute after the /epsil strip is reported so a new cross-product
 // link is noticed here rather than by a reader hitting a 404.
-const MATHLIVE_SECTIONS = ["compute-engine", "mathfield", "mathlive", "math-json", "about", "sdk"];
+// The Compute Engine and MathJSON docs are published on epsil.dev too, at the
+// same paths, so links to them stay relative and the build checks them.
+const EPSIL_SECTIONS = ["compute-engine", "math-json"];
+const MATHLIVE_SECTIONS = ["mathfield", "mathlive", "about", "sdk"];
 
 /**
  * Rewrite one URL as it should appear on epsil.dev. Returns the URL unchanged
@@ -83,6 +87,7 @@ function rewriteUrl(url, onUnknown) {
   if (url.startsWith("/epsil/")) return url.slice("/epsil".length);
 
   const section = url.split("/")[1];
+  if (EPSIL_SECTIONS.includes(section)) return url;
   if (MATHLIVE_SECTIONS.includes(section)) return MATHLIVE_URL + url;
 
   onUnknown(url);
@@ -148,7 +153,11 @@ async function checkSidebarCoverage(pageIds) {
     return; // No sidebar to check against; not this script's business to insist.
   }
 
-  const listed = new Set([...sidebar.matchAll(/\bid:\s*["']([^"']+)["']/g)].map((m) => m[1]));
+  // Doc ids there are relative to `docs/` (`epsil/syntax`): the epsil.dev
+  // docs plugin reads `docs/` for the Compute Engine pages as well.
+  const listed = new Set(
+    [...sidebar.matchAll(/\bid:\s*["']epsil\/([^"']+)["']/g)].map((m) => m[1])
+  );
 
   const orphans = pageIds.filter((id) => !listed.has(id));
   if (orphans.length > 0) {
@@ -219,6 +228,30 @@ async function syncSearchSymbols(unknown) {
   for (const symbol of symbols)
     symbol.url = rewriteUrl(symbol.url, (url) => unknown.add(`search-symbols.json: ${url}`));
   await fs.writeFile(SEARCH_SYMBOLS_FILE, JSON.stringify(symbols) + "\n", "utf8");
+}
+
+// The Compute Engine card for AI agents is authored upstream next to the
+// engine (`src/compute-engine/docs/for-agents.md`, served by the MCP server as
+// `epsil://docs/compute-engine-api`) and published on epsil.dev at
+// `/compute-engine/for-agents/`. Its links are rewritten like those of the
+// Epsil pages. It is the one generated page in `docs/compute-engine/`, which is
+// otherwise edited here; mathlive.io excludes it (`docusaurus.config.ts`).
+const CE_CARD_SOURCE = path.join(ROOT, "..", "compute-engine", "src", "compute-engine", "docs", "for-agents.md");
+const CE_CARD_TARGET = path.join(ROOT, "docs", "compute-engine", "for-agents.md");
+
+async function syncComputeEngineCard(unknown) {
+  let source;
+  try {
+    source = await fs.readFile(CE_CARD_SOURCE, "utf8");
+  } catch (error) {
+    console.warn(`[sync-epsil-docs] No Compute Engine agent card (${error.code ?? error.message}).`);
+    return;
+  }
+  const content = rewrite(source, {
+    onUnknown: (url) => unknown.add(`compute-engine/for-agents.md: ${url}`),
+    onSlug: () => {},
+  });
+  await fs.writeFile(CE_CARD_TARGET, content, "utf8");
 }
 
 async function main() {
@@ -292,6 +325,7 @@ async function main() {
   );
 
   await syncSearchSymbols(unknown);
+  await syncComputeEngineCard(unknown);
 
   await checkSidebarCoverage(sources.map((name) => name.replace(/\.md$/, "")));
 

@@ -29,14 +29,17 @@ export default function epsilSearch(context, options = {}) {
       return path.join(HERE, 'theme');
     },
     configureWebpack(_config, isServer) {
-      if (isServer || process.env.NODE_ENV === 'production') return {};
+      if (isServer || process.env.NODE_ENV === 'production') return undefined;
       const dirs = ['pagefind', 'search'].filter((d) => existsSync(path.join(buildDir, d)));
-      if (dirs.length === 0) return {};
-      return {
+      if (dirs.length === 0) return undefined;
+      // Docusaurus merges `devServer` into its dev server config
+      // (@docusaurus/core lib/commands/start/webpack.js), but its
+      // `ConfigureWebpackResult` type does not declare the key.
+      return /** @type {any} */ ({
         devServer: {
           static: dirs.map((d) => ({ directory: path.join(buildDir, d), publicPath: `/${d}`, watch: false })),
         },
-      };
+      });
     },
     async postBuild({ outDir }) {
       execFileSync(process.execPath, [path.join(HERE, 'build-index.mjs'), outDir], {

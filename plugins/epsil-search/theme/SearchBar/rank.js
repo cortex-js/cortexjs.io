@@ -89,23 +89,36 @@ export function rankSymbols(data, query, limit = 4) {
       (a.key < b.key ? -1 : a.key > b.key ? 1 : 0)
   );
 
+  // A definition gives up to two options: its entry in the Epsil library
+  // reference and its entry in the MathJSON reference of the Compute Engine.
+  // The MathJSON one comes first when the query is that spelling exactly
+  // (`Sqrt`, not `sqrt`).
   const seen = new Set();
   const out = [];
+  let shown = 0;
   for (const { entry, alias } of ranked) {
     if (seen.has(entry.url)) continue;
     seen.add(entry.url);
-    out.push(
-      alias
-        ? { kind: 'alias', title: entry.title, subtitle: 'Language', summary: entry.summary, url: entry.url }
-        : {
-            kind: 'symbol',
-            title: entry.epsil ?? entry.id,
-            subtitle: entry.epsil && entry.epsil !== entry.id ? `${entry.library} · MathJSON ${entry.id}` : entry.library,
-            summary: entry.summary,
-            url: entry.url,
-          }
-    );
-    if (out.length === limit) break;
+    if (alias) {
+      out.push({ kind: 'alias', title: entry.title, subtitle: 'Language', summary: entry.summary, url: entry.url });
+    } else {
+      const epsil = {
+        kind: 'symbol',
+        title: entry.epsil ?? entry.id,
+        subtitle: entry.epsil && entry.epsil !== entry.id ? `${entry.library} · MathJSON ${entry.id}` : entry.library,
+        summary: entry.summary,
+        url: entry.url,
+      };
+      const mathJson = entry.mathjson && {
+        kind: 'mathjson',
+        title: entry.id,
+        subtitle: 'MathJSON reference · Compute Engine',
+        url: entry.mathjson,
+      };
+      const mathJsonFirst = mathJson && query.trim() === entry.id && entry.epsil && entry.epsil !== entry.id;
+      out.push(...(mathJsonFirst ? [mathJson, epsil] : [epsil, mathJson]).filter(Boolean));
+    }
+    if (++shown === limit) break;
   }
   return out;
 }

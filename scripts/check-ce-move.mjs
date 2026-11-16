@@ -44,11 +44,24 @@ async function idsOf(buildDir, url) {
   }
 }
 
+// A redirect stub (`/compute-engine/guides/security/` sends readers to the
+// Mathfield docs) is not a page of the section: it is left out of the
+// baseline, and the redirect is the site's own concern.
+const isRedirectStub = (html) => /http-equiv="refresh"/i.test(html);
+
 async function baseline(buildDir) {
   const pages = {};
+  const stubs = [];
   for (const section of SECTIONS)
-    for (const url of (await pagesUnder(buildDir, section)).sort())
+    for (const url of (await pagesUnder(buildDir, section)).sort()) {
+      const html = await fs.readFile(path.join(buildDir, url, "index.html"), "utf8");
+      if (isRedirectStub(html)) {
+        stubs.push(url);
+        continue;
+      }
       pages[url] = [...(await idsOf(buildDir, url))].sort();
+    }
+  if (stubs.length > 0) console.log(`[check-ce-move] redirect stubs left out: ${stubs.join(", ")}`);
   await fs.writeFile(BASELINE, JSON.stringify({ pages }, null, 0) + "\n");
   const ids = Object.values(pages).reduce((n, v) => n + v.length, 0);
   console.log(`[check-ce-move] baseline: ${Object.keys(pages).length} pages, ${ids} ids -> ${path.relative(ROOT, BASELINE)}`);

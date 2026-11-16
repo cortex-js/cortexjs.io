@@ -30,6 +30,7 @@ import * as pagefind from 'pagefind';
 const SITE_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const SYMBOLS_FILE = path.join(SITE_DIR, 'config', 'epsil-search-symbols.json');
 const ALIASES_FILE = path.join(SITE_DIR, 'config', 'search-aliases.json');
+const CE_DOCS_DIR = path.join(SITE_DIR, 'docs', 'compute-engine');
 
 // Directories of the build that are not pages, and pages whose text would
 // drown the rest: a changelog has a heading for nearly every topic.
@@ -84,6 +85,52 @@ async function readJson(file) {
   return JSON.parse(await fs.readFile(file, 'utf8'));
 }
 
+// The heading anchor Docusaurus gives a Markdown heading (github-slugger).
+const slug = (s) =>
+  s
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+    .replace(/\s/g, '-');
+
+/**
+ * The entry of each MathJSON name in the Compute Engine reference pages
+ * (docs/compute-engine, slugs under /compute-engine/reference/): Map<name, url>.
+ * A `<FunctionDefinition name="X">` is an entry at its `#X` section (an anchor
+ * the build checks); a name that is only a row of a table (`| \`Sqrt\` | …`)
+ * points at the heading above the table. The first page that documents a name,
+ * in file order, wins: `Add` is a row of the arithmetic page before it is
+ * matrix addition on the linear-algebra page.
+ */
+async function mathJsonReference() {
+  const entries = new Map();
+  let files;
+  try {
+    files = (await fs.readdir(CE_DOCS_DIR)).filter((f) => f.endsWith('.md')).sort();
+  } catch {
+    return entries;
+  }
+  for (const file of files) {
+    const src = await fs.readFile(path.join(CE_DOCS_DIR, file), 'utf8');
+    const pageSlug = /^slug:\s*(\S+)/m.exec(src)?.[1];
+    if (!pageSlug?.startsWith('/compute-engine/reference/')) continue;
+    const page = pageSlug.replace(/\/?$/, '/');
+    let heading;
+    for (const [i, line] of src.split('\n').entries()) {
+      const h = /^#{2,4}\s+(.+?)\s*$/.exec(line);
+      if (h) heading = slug(h[1].replace(/`/g, ''));
+      const def = /<FunctionDefinition name="([^"]+)"/.exec(line);
+      if (def) {
+        if (!entries.has(def[1])) entries.set(def[1], `${page}#${def[1]}`);
+        continue;
+      }
+      const row = /^\|\s*`([A-Z][A-Za-z0-9]*)`\s*\|/.exec(line);
+      if (row && heading && !entries.has(row[1])) entries.set(row[1], `${page}#${heading}`);
+    }
+  }
+  return entries;
+}
+
 async function buildSymbols(outDir) {
   let symbols = [];
   try {
@@ -105,8 +152,11 @@ async function buildSymbols(outDir) {
         `or an anchor that the build does not have:\n  ${brokenAliases.join('\n  ')}`
     );
 
+  const mathJson = await mathJsonReference();
   const kept = [];
   const broken = [];
+  let withMathJson = 0;
+  const brokenMathJson = [];
   for (const s of symbols) {
     if (!(await urlExists(outDir, s.url))) {
       broken.push(`${s.id}: ${s.url}`);
@@ -118,12 +168,25 @@ async function buildSymbols(outDir) {
     if (s.summary) record.summary = s.summary;
     if (s.keywords) record.keywords = s.keywords;
     if (s.latex) record.latex = s.latex;
+    const mj = mathJson.get(s.id);
+    if (mj) {
+      if (await urlExists(outDir, mj)) {
+        record.mathjson = mj;
+        withMathJson++;
+      } else brokenMathJson.push(`${s.id}: ${mj}`);
+    }
     kept.push(record);
   }
   if (broken.length > 0)
     warn(
       `${broken.length} library entries point to a missing page or anchor and ` +
         `were left out of the search:\n  ${broken.slice(0, 20).join('\n  ')}`
+    );
+
+  if (brokenMathJson.length > 0)
+    warn(
+      `${brokenMathJson.length} MathJSON reference entries point to a missing ` +
+        `anchor and were left out:\n  ${brokenMathJson.slice(0, 20).join('\n  ')}`
     );
 
   const target = path.join(outDir, 'search', 'symbols.json');
@@ -135,7 +198,10 @@ async function buildSymbols(outDir) {
       aliases: aliases.map(({ terms, title, summary, url }) => ({ terms, title, summary, url })),
     })
   );
-  log(`${kept.length} library entries and ${aliases.length} aliases -> search/symbols.json`);
+  log(
+    `${kept.length} library entries (${withMathJson} with a MathJSON reference entry) ` +
+      `and ${aliases.length} aliases -> search/symbols.json`
+  );
 }
 
 /**

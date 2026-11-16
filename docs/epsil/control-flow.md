@@ -206,7 +206,7 @@ effect specifier must be followed by a return arrow:
 roll(n) random -> integer = random(1..n)
 ```
 
-See [Effect Specifiers](https://mathlive.io/compute-engine/guides/types/#effect-specifiers) for
+See [Effect Specifiers](/compute-engine/guides/types/#effect-specifiers) for
 subtyping, callback checks, and the distinction between inferred and declared
 effects.
 
@@ -1263,7 +1263,7 @@ count([0, 0, 0], 9)
 The other conditions, the threshold of 20 000 passes, and the values (an
 accumulator of integers gives the value of `run()`, one of real numbers can
 differ in rounding) are in the
-[compile guide](https://mathlive.io/compute-engine/guides/compiling/#parallel-loops-on-worker-threads-runasync).
+[compile guide](/compute-engine/guides/compiling/#parallel-loops-on-worker-threads-runasync).
 
 ## Pipelines
 

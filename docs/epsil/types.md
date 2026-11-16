@@ -24,7 +24,7 @@ about types at all:
 - **Your intent is written down.** A signature is documentation that cannot go
   stale.
 
-Types come from the [Compute Engine type language](https://mathlive.io/compute-engine/guides/types/),
+Types come from the [Compute Engine type language](/compute-engine/guides/types/),
 so anything expressible there — unions, intersections, tuples, records,
 function signatures, generic collections — can be written in an Epsil
 annotation. This page is about using them.
@@ -258,7 +258,7 @@ function roll(n: integer) random -> integer { random(1..n) }
 
 Effect labels are part of the function type. See
 [Effect specifiers](/control-flow/#effect-specifiers) for the syntax and
-the [function type guide](https://mathlive.io/compute-engine/guides/types/#function-types) for how
+the [function type guide](/compute-engine/guides/types/#effects-and-subtyping) for how
 they affect subtyping.
 
 ## When a type doesn't fit

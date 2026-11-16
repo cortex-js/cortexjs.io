@@ -32,7 +32,7 @@ The productions below describe the source forms accepted by the current
 parser. The Unicode identifier rules are described under
 [Symbols](/literals/#symbols), and the type following a `:` or return
 arrow is parsed using the
-[Compute Engine type language](https://mathlive.io/compute-engine/guides/types/). Detailed
+[Compute Engine type language](/compute-engine/guides/types/). Detailed
 `match` patterns are documented under
 [Control Flow](/control-flow/#match).
 

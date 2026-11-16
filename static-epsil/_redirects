@@ -13,3 +13,8 @@
 /cortex         /introduction/   301
 /cortex/        /introduction/   301
 /cortex/*       /:splat          301
+
+# The Compute Engine docs moved here from mathlive.io with their paths. One of
+# their old paths was already a redirect there, to the Mathfield docs, which
+# stay on mathlive.io.
+/compute-engine/guides/security/  https://mathlive.io/mathfield/guides/security/  301

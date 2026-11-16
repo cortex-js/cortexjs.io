@@ -43,13 +43,13 @@ work without it.
 
 <hr/>
 
-**To input math using an interactive mathfield**, use the [Mathfield](/mathfield/) library.
+**To input math using an interactive mathfield**, use the [Mathfield](https://mathlive.io/mathfield/) library.
 
 A `<math-field>` DOM element works like a `<textarea>` in HTML, but for
 math. It provides its content as a LaTeX string, ready to be used with the 
 Compute Engine.
 
-<ReadMore path="/mathfield/" >
+<ReadMore path="https://mathlive.io/mathfield/" >
   Read more about the **mathfield element**<Icon name="chevron-right-bold" />
 </ReadMore>
 
@@ -1911,7 +1911,7 @@ mfe.inlineShortcuts = {
 };
 ```
 
-<ReadMore path="/mathfield/guides/shortcuts/" > 
+<ReadMore path="https://mathlive.io/mathfield/guides/shortcuts/" > 
 Learn more about **Key Bindings and Inline Shortcuts**<Icon name="chevron-right-bold" />
 </ReadMore>
 

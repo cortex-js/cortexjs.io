@@ -1,9 +1,11 @@
 /**
  * Sidebar for the standalone epsil.dev site.
  *
- * The docs plugin for that site is rooted at `docs/epsil` with
- * `routeBasePath: '/'`, so doc ids here have no `epsil/` prefix — unlike
- * `sidebars.js`, where the same pages were addressed as `epsil/syntax`.
+ * The docs plugin of that site reads `docs/` and includes `epsil/` and
+ * `compute-engine/` (one plugin instance, because both sections are rooted at
+ * `/`), so doc ids are relative to `docs/`: `epsil/syntax`,
+ * `compute-engine/guide-evaluate`. The Compute Engine sidebar is the category
+ * that mathlive.io also uses (`sidebars.compute-engine.js`).
  *
  * Top-level category labels double as bundle names for the llms-txt plugin
  * (`llms-guide.txt`, `llms-reference.txt`, `llms-tools.txt`); renaming one
@@ -12,8 +14,25 @@
 
 // @ts-check
 
+import computeEngineCategory from "./sidebars.compute-engine.js";
+
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
+  computeEngineSidebar: [
+    {
+      ...computeEngineCategory,
+      collapsible: false,
+      collapsed: false,
+      // The agent card is published on epsil.dev only (it is synced with
+      // links rewritten for this site), so it is not in the shared category.
+      items: [
+        // An array in sidebars.compute-engine.js; its declared type also
+        // allows the object shorthand.
+        .../** @type {any[]} */ (computeEngineCategory.items),
+        { type: "doc", id: "compute-engine/for-agents", className: "sdk-icon" },
+      ],
+    },
+  ],
   epsilSidebar: [
     {
       type: "category",
@@ -21,18 +40,18 @@ const sidebars = {
       collapsible: false,
       collapsed: false,
       items: [
-        { type: "doc", id: "epsil", label: "Introduction", className: "compass-icon" },
-        { type: "doc", id: "getting-started", className: "checklist-icon" },
-        { type: "doc", id: "tour", className: "tutorial-icon" },
-        { type: "doc", id: "examples", className: "flask-icon" },
+        { type: "doc", id: "epsil/epsil", label: "Introduction", className: "compass-icon" },
+        { type: "doc", id: "epsil/getting-started", className: "checklist-icon" },
+        { type: "doc", id: "epsil/tour", className: "tutorial-icon" },
+        { type: "doc", id: "epsil/examples", className: "flask-icon" },
         { type: "html", value: "<hr/>" },
-        { type: "doc", id: "goals", className: "guide-icon" },
-        { type: "doc", id: "principles", className: "guide-icon" },
-        { type: "doc", id: "naming", className: "guide-icon" },
-        { type: "doc", id: "style", className: "guide-icon" },
+        { type: "doc", id: "epsil/goals", className: "guide-icon" },
+        { type: "doc", id: "epsil/principles", className: "guide-icon" },
+        { type: "doc", id: "epsil/naming", className: "guide-icon" },
+        { type: "doc", id: "epsil/style", className: "guide-icon" },
         { type: "html", value: "<hr/>" },
-        { type: "doc", id: "from-python", className: "guide-icon" },
-        { type: "doc", id: "from-mathematica", className: "guide-icon" },
+        { type: "doc", id: "epsil/from-python", className: "guide-icon" },
+        { type: "doc", id: "epsil/from-mathematica", className: "guide-icon" },
       ],
     },
     {
@@ -41,19 +60,19 @@ const sidebars = {
       collapsible: false,
       collapsed: false,
       items: [
-        { type: "doc", id: "comments", className: "reference-icon" },
-        { type: "doc", id: "literals", className: "reference-icon" },
-        { type: "doc", id: "types", className: "reference-icon" },
-        { type: "doc", id: "declarations", className: "reference-icon" },
-        { type: "doc", id: "operators", className: "reference-icon" },
-        { type: "doc", id: "evaluation", className: "reference-icon" },
-        { type: "doc", id: "control-flow", className: "reference-icon" },
-        { type: "doc", id: "protocols", className: "reference-icon" },
-        { type: "doc", id: "pragmas", className: "reference-icon" },
-        { type: "doc", id: "syntax", className: "reference-icon" },
-        { type: "doc", id: "errors", className: "reference-icon" },
+        { type: "doc", id: "epsil/comments", className: "reference-icon" },
+        { type: "doc", id: "epsil/literals", className: "reference-icon" },
+        { type: "doc", id: "epsil/types", className: "reference-icon" },
+        { type: "doc", id: "epsil/declarations", className: "reference-icon" },
+        { type: "doc", id: "epsil/operators", className: "reference-icon" },
+        { type: "doc", id: "epsil/evaluation", className: "reference-icon" },
+        { type: "doc", id: "epsil/control-flow", className: "reference-icon" },
+        { type: "doc", id: "epsil/protocols", className: "reference-icon" },
+        { type: "doc", id: "epsil/pragmas", className: "reference-icon" },
+        { type: "doc", id: "epsil/syntax", className: "reference-icon" },
+        { type: "doc", id: "epsil/errors", className: "reference-icon" },
         { type: "html", value: "<hr/>" },
-        { type: "doc", id: "library", className: "reference-icon" },
+        { type: "doc", id: "epsil/library", className: "reference-icon" },
         // One page per library of the standard library, in the order
         // `library.md` lists them. The pages are generated upstream
         // (`../compute-engine/src/epsil/docs/reference/`); when a library is
@@ -66,25 +85,25 @@ const sidebars = {
           collapsible: true,
           collapsed: true,
           items: [
-            { type: "doc", id: "reference/core", className: "reference-icon" },
-            { type: "doc", id: "reference/control-structures", className: "reference-icon" },
-            { type: "doc", id: "reference/logic", className: "reference-icon" },
-            { type: "doc", id: "reference/collections", className: "reference-icon" },
-            { type: "doc", id: "reference/colors", className: "reference-icon" },
-            { type: "doc", id: "reference/regexp", className: "reference-icon" },
-            { type: "doc", id: "reference/relop", className: "reference-icon" },
-            { type: "doc", id: "reference/arithmetic", className: "reference-icon" },
-            { type: "doc", id: "reference/fractals", className: "reference-icon" },
-            { type: "doc", id: "reference/trigonometry", className: "reference-icon" },
-            { type: "doc", id: "reference/calculus", className: "reference-icon" },
-            { type: "doc", id: "reference/polynomials", className: "reference-icon" },
-            { type: "doc", id: "reference/combinatorics", className: "reference-icon" },
-            { type: "doc", id: "reference/number-theory", className: "reference-icon" },
-            { type: "doc", id: "reference/special-functions", className: "reference-icon" },
-            { type: "doc", id: "reference/linear-algebra", className: "reference-icon" },
-            { type: "doc", id: "reference/statistics", className: "reference-icon" },
-            { type: "doc", id: "reference/units", className: "reference-icon" },
-            { type: "doc", id: "reference/physics", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/core", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/control-structures", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/logic", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/collections", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/colors", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/regexp", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/relop", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/arithmetic", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/fractals", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/trigonometry", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/calculus", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/polynomials", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/combinatorics", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/number-theory", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/special-functions", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/linear-algebra", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/statistics", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/units", className: "reference-icon" },
+            { type: "doc", id: "epsil/reference/physics", className: "reference-icon" },
           ],
         },
       ],
@@ -95,13 +114,13 @@ const sidebars = {
       collapsible: false,
       collapsed: false,
       items: [
-        { type: "doc", id: "cli", className: "guide-icon" },
-        { type: "doc", id: "vscode", className: "guide-icon" },
-        { type: "doc", id: "mcp", className: "guide-icon" },
-        { type: "doc", id: "for-agents", className: "reference-icon" },
+        { type: "doc", id: "epsil/cli", className: "guide-icon" },
+        { type: "doc", id: "epsil/vscode", className: "guide-icon" },
+        { type: "doc", id: "epsil/mcp", className: "guide-icon" },
+        { type: "doc", id: "epsil/for-agents", className: "reference-icon" },
         { type: "html", value: "<hr/>" },
-        { type: "doc", id: "source-code", className: "reference-icon" },
-        { type: "doc", id: "implementation", className: "sdk-icon" },
+        { type: "doc", id: "epsil/source-code", className: "reference-icon" },
+        { type: "doc", id: "epsil/implementation", className: "sdk-icon" },
       ],
     },
     {

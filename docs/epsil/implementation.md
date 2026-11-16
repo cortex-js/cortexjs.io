@@ -14,8 +14,8 @@ terms. Read this page if you are embedding Epsil in a host application,
 building tooling over it, or curious about what a construct actually does
 underneath.
 
-Epsil is a surface syntax over [MathJSON](https://mathlive.io/math-json/), and its runtime is the
-[Compute Engine](https://mathlive.io/compute-engine/). A program is parsed into a MathJSON
+Epsil is a surface syntax over [MathJSON](/math-json/), and its runtime is the
+[Compute Engine](/compute-engine/). A program is parsed into a MathJSON
 expression, and that expression is evaluated by the engine. There is no
 separate Epsil interpreter, no Epsil-specific declaration logic, and no
 Epsil-side type checker — each language form maps onto a primitive the engine
@@ -1097,7 +1097,7 @@ importing it directly. Without an injected parser, an island produces a
 
 ### Symbol names and normalization
 
-A symbol name must be a valid [MathJSON symbol](https://mathlive.io/math-json/#symbols). When
+A symbol name must be a valid [MathJSON symbol](/math-json/#symbols). When
 expressions are boxed for execution, symbol bindings are normalized to
 [Unicode Normalization Form Canonical Composition (NFC)](http://www.macchiato.com/unicode/nfc-faq)
 and stored and compared in that form. So `Å` written as **U+00C5 LATIN CAPITAL

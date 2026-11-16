@@ -514,5 +514,5 @@ functions by default) always applies.
 These limits are cooperative. A browser that evaluates untrusted or potentially
 unbounded programs should run Epsil in a Web Worker it can terminate from the
 outside. See
-[Execution Constraints](https://mathlive.io/compute-engine/guides/execution-constraints/) for the
+[Execution Constraints](/compute-engine/guides/execution-constraints/) for the
 complete cancellation model.

@@ -151,8 +151,16 @@ const config: Config = {
           filename: 'sitemap.xml',
         },
 
+        // One docs instance for both sections of the site, the Epsil
+        // language (`docs/epsil`, slugs rooted at `/`) and the Compute Engine
+        // with MathJSON (`docs/compute-engine`, slugs `/compute-engine/…` and
+        // `/math-json/`, the same paths as on mathlive.io). Two instances
+        // cannot share `routeBasePath: '/'`, and `/math-json/` is outside
+        // `/compute-engine/`. The default `exclude` still applies, so the
+        // `_changelog.md` template that build.sh fills in is not a page.
         docs: {
-          path: 'docs/epsil',
+          path: 'docs',
+          include: ['epsil/**/*.{md,mdx}', 'compute-engine/**/*.{md,mdx}'],
           routeBasePath: '/',
           sidebarPath: './sidebars.epsil.js',
           showLastUpdateTime: true,

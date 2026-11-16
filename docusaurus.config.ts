@@ -92,6 +92,9 @@ const config: Config = {
             '**/*.test.{js,jsx,ts,tsx}',
             '**/__tests__/**',
             'epsil/**',
+            // Synced from the compute-engine repo for epsil.dev, with links
+            // rewritten for that site (scripts/sync-epsil-docs.mjs).
+            'compute-engine/for-agents.md',
           ],
           remarkPlugins: [codePlaygroundRemarkPlugin, epsilPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
 

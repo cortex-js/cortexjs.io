@@ -42,7 +42,7 @@ This repo builds **two** Docusaurus sites for the CortexJS ecosystem:
 | Site | Config | Content | Output | Host |
 |---|---|---|---|---|
 | **mathlive.io** | `docusaurus.config.ts` | `docs/` minus `docs/epsil` | `build/` → `submodules/cortex-js.github.io/` | GitHub Pages |
-| **epsil.dev** | `docusaurus.epsil.config.ts` | `docs/epsil` only, rooted at `/` | `build-epsil/` | Cloudflare Pages |
+| **epsil.dev** | `docusaurus.epsil.config.ts` | `docs/epsil` (rooted at `/`) and `docs/compute-engine` (same paths as on mathlive.io) | `build-epsil/` | Cloudflare Pages |
 
 They share everything else: `src/components`, `src/theme` (including the
 swizzled `CodeBlock` that renders Epsil syntax highlighting), `src/css`,
@@ -89,6 +89,9 @@ way in:
   a mathlive.io page.
 
 `docs/epsil/**/*.md` is **generated** — edit the upstream copies, never these.
+So is `docs/compute-engine/for-agents.md`, the Compute Engine card for AI
+agents (upstream `src/compute-engine/docs/for-agents.md`); it is published on
+epsil.dev only, and mathlive.io excludes it.
 
 The sync copies subdirectories too (`reference/` holds one generated page per
 library of the standard library), but skips `*.intro.md`: those are fragments
@@ -103,6 +106,25 @@ Pages cannot issue a real 301, so these are stub pages carrying a canonical
 link, a meta refresh and a `location.replace`. Because they are stubs and not
 routes, the Epsil pages must stay out of the mathlive.io build (`docs.exclude`)
 — otherwise client-side navigation would render them and never redirect.
+
+### The Compute Engine docs on epsil.dev
+
+The Compute Engine and MathJSON docs are moving from mathlive.io to epsil.dev
+with their paths unchanged (`/compute-engine/…`, `/math-json/`), so a redirect
+only changes the host. While both sites publish them:
+
+- One docs plugin instance on epsil.dev reads `docs/` and includes
+  `epsil/**` and `compute-engine/**`: two instances cannot share
+  `routeBasePath: '/'`, and `/math-json/` is outside `/compute-engine/`.
+  Doc ids are therefore relative to `docs/` in `sidebars.epsil.js`
+  (`epsil/syntax`).
+- The Compute Engine sidebar is one object, `sidebars.compute-engine.js`,
+  used by both `sidebars.js` and `sidebars.epsil.js`.
+- Epsil links to `/compute-engine/…` and `/math-json/…` stay relative
+  (`EPSIL_SECTIONS` in the sync), so the epsil.dev build checks them.
+- `node scripts/check-ce-move.mjs check build-epsil` checks that every page
+  and anchor of `config/ce-move-baseline.json` (the mathlive.io pages before
+  the move) exists in a build. Delete both once the move has shipped.
 
 ### Search on epsil.dev
 

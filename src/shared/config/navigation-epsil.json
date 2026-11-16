@@ -12,22 +12,18 @@
         "type": "docSidebar",
         "sidebarId": "epsilSidebar",
         "position": "left",
-        "label": "Docs"
-      },
-      {
-        "label": "Get Started",
-        "href": "/getting-started/",
-        "position": "left"
-      },
-      {
-        "label": "Examples",
-        "href": "/examples/",
-        "position": "left"
+        "label": "Language"
       },
       {
         "label": "Reference",
         "href": "/syntax/",
         "position": "left"
+      },
+      {
+        "type": "docSidebar",
+        "sidebarId": "computeEngineSidebar",
+        "position": "left",
+        "label": "Compute Engine"
       },
       {
         "label": "GitHub",
@@ -60,9 +56,9 @@
       {
         "title": "Ecosystem",
         "items": [
-          { "label": "Compute Engine", "href": "https://mathlive.io/compute-engine/" },
+          { "label": "Compute Engine", "href": "/compute-engine/" },
           { "label": "MathLive", "href": "https://mathlive.io" },
-          { "label": "MathJSON", "href": "https://mathlive.io/math-json/" }
+          { "label": "MathJSON", "href": "/math-json/" }
         ]
       },
       {

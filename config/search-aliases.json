@@ -26,6 +26,8 @@
     { "terms": ["type alias", "alias"], "title": "type alias", "summary": "A new name for an existing type.", "url": "/types/#type-alias" },
     { "terms": ["nominal type", "newtype"], "title": "Nominal types", "summary": "A type distinct from its representation.", "url": "/types/#nominal-type" },
     { "terms": ["generic", "generics"], "title": "Generic functions", "summary": "Functions with type parameters.", "url": "/types/#generic-functions" },
+    { "terms": ["mathjson", "math json", "math-json"], "title": "MathJSON", "summary": "The JSON format of mathematical expressions that the Compute Engine reads and writes.", "url": "/math-json/" },
+    { "terms": ["compute engine", "computeengine", "engine"], "title": "Compute Engine", "summary": "The JavaScript library for symbolic computing and numeric evaluation that Epsil runs on.", "url": "/compute-engine/" },
     { "terms": ["trig", "trigonometry", "trigonometric"], "title": "Trigonometry", "summary": "The trigonometric functions and their inverses.", "url": "/reference/trigonometry/" },
     { "terms": ["$", "latex island", "latex"], "title": "$…$ LaTeX islands", "summary": "LaTeX inside Epsil source: $\\frac{1}{n}$.", "url": "/literals/#latex-islands" },
     { "terms": ["string interpolation", "interpolated string"], "title": "Interpolated strings", "summary": "Strings with embedded expressions.", "url": "/literals/#interpolated-strings" },
