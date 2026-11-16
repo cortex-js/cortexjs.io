@@ -12,7 +12,7 @@ date: Last Modified
 ---
 # Number theory
 
-The 60 definitions of the number theory library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
+The 62 definitions of the number theory library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
 
 Each definition is listed under its Epsil spelling (the MathJSON name when
 it has none), with its signature in the engine's type syntax. The
@@ -45,57 +45,82 @@ carmichaelLambda(15)
 
 ### catalanNumber
 
-MathJSON `CatalanNumber` · `(integer) -> integer`
+MathJSON `CatalanNumber` · `(real) -> number`
 
-Return the nth Catalan number `C(n) = (2n)! / ((n+1)! · n!)`: 1, 1, 2, 5, 14, 42, … Defined for `n ≥ 0`.
+Return the nth Catalan number `C(n) = (2n)! / ((n+1)! · n!)`: 1, 1, 2, 5, 14, 42, … Defined for `n ≥ 0`. A positive rational `n` is taken through the Gamma function, `C(n) = Γ(2n+1) / (Γ(n+1) Γ(n+2))`: `CatalanNumber(1/2)` is `8/(3π)`.
 
 ```epsil
 catalanNumber(5)
 // ➔ 42
 ```
 
+```epsil
+catalanNumber(1/2)
+// ➔ 8 / (3pi)
+```
+
 ### chineseRemainder
 
-MathJSON `ChineseRemainder` · `(collection<any>, collection<any>) -> integer`
+MathJSON `ChineseRemainder` · `(collection<any>, collection<any>, integer?) -> integer`
 
-Solve a system of simultaneous congruences: return the smallest non-negative integer `x` such that `x ≡ residues[i] (mod moduli[i])` for every `i`. Undefined if the system is inconsistent or the two lists differ in length.
+Solve a system of simultaneous congruences: return the smallest non-negative integer `x` such that `x ≡ residues[i] (mod moduli[i])` for every `i`. With a third argument `d`, return the smallest solution `x ≥ d`. Undefined if the system is inconsistent or the two lists differ in length.
 
 ```epsil
 chineseRemainder([2, 3, 2], [3, 5, 7])
 // ➔ 23
 ```
 
+```epsil
+chineseRemainder([2, 3, 2], [3, 5, 7], 100)
+// ➔ 128
+```
+
 ### continuedFraction
 
-MathJSON `ContinuedFraction` · `(real, integer?) -> list<integer>`
+MathJSON `ContinuedFraction` · `(real, integer?) -> list<integer | list<integer>>`
 
-Return the continued-fraction expansion of `x` as a list of integer terms `[a0, a1, …]`. An exact rational is expanded fully; an inexact value is expanded as its best rational approximation at working precision (see `Rationalize`), truncated to the optional `n` terms (default 20).
+Return the continued-fraction expansion of `x` as a list of integer terms `[a0, a1, …]`. An exact rational is expanded fully. An exact quadratic irrational (`Sqrt(2)`) is expanded to its periodic form `[a0, …, [period]]` (`[1, [2]]`), or to the optional `n` terms. Another exact real (`ExponentialE`) is expanded to `n` terms (default 20), each computed at a precision that vouches for it. An inexact value is expanded as its best rational approximation at working precision (see `Rationalize`), truncated to `n` terms (default 20).
 
 ```epsil
 continuedFraction(43/19)
 // ➔ [2,3,1,4]
 ```
 
+```epsil
+continuedFraction(sqrt(2))
+// ➔ [1,[2]]
+```
+
 ### digitCount
 
-MathJSON `DigitCount` · `(integer, integer?, integer?) -> integer | list<integer>`
+MathJSON `DigitCount` · `(integer, integer?, integer?, integer?) -> integer | list<integer>`
 
-Count digits of `n` in the given `base` (default 10); the sign of `n` is ignored. With a third argument `digit`, return how many times that digit occurs. Otherwise return a list `[count of 1, count of 2, …, count of base-1, count of 0]`.
+Count digits of `n` in the given `base` (default 10); the sign of `n` is ignored. With a third argument `digit`, return how many times that digit occurs. Otherwise return a list `[count of 1, count of 2, …, count of base-1, count of 0]`. With a fourth argument `length`, the digits are first zero-padded on the left (or cut to their last `length`), so `DigitCount(5, 2, 0, 8)` is 6.
 
 ```epsil
 digitCount(122, 10, 2)
 // ➔ 2
 ```
 
+```epsil
+digitCount(5, 2, 0, 8)
+// ➔ 6
+```
+
 ### digitSum
 
-MathJSON `DigitSum` · `(integer, integer?) -> integer`
+MathJSON `DigitSum` · `(integer, integer?, integer?) -> integer`
 
-Return the sum of the digits of `n` in the given `base` (default 10). The sign of `n` is ignored.
+Return the sum of the digits of `n` in the given `base` (default 10). The sign of `n` is ignored. With a third argument `k`, sum only the first `k` digits (most-significant first), or the last `|k|` when `k` is negative; `k` past the digit count sums them all.
 
 ```epsil
 digitSum(1234)
 // ➔ 10
+```
+
+```epsil
+digitSum(1234, 10, 2)
+// ➔ 3
 ```
 
 ### dirichletCharacter
@@ -148,13 +173,18 @@ divides(3, 12)
 
 ### divisorSigma
 
-MathJSON `DivisorSigma` · `(integer, integer) -> integer`
+MathJSON `DivisorSigma` · `(integer, integer) -> rational`
 
-The divisor function σ_k(n) = Σ_&#123;d | n&#125; dᵏ over the positive divisors of `n`. σ₀ counts divisors, σ₁ sums them. The sign of `n` is ignored, as for `Divisors` and `PrimeOmega`; `DivisorSigma(k, 0)` is undefined.
+The divisor function σ_k(n) = Σ_&#123;d | n&#125; dᵏ over the positive divisors of `n`. σ₀ counts divisors, σ₁ sums them. A negative `k` sums reciprocal powers, a rational: `DivisorSigma(-1, 12)` is 7/3. The sign of `n` is ignored, as for `Divisors` and `PrimeOmega`; `DivisorSigma(k, 0)` is undefined.
 
 ```epsil
 divisorSigma(2, 6)
 // ➔ 50
+```
+
+```epsil
+divisorSigma(-1, 12)
+// ➔ 7/3
 ```
 
 ### divisors
@@ -166,6 +196,22 @@ Return the sorted list of positive divisors of an integer `n`. The sign of `n` i
 ```epsil
 divisors(12)
 // ➔ [1,2,3,4,6,12]
+```
+
+### eulerE
+
+MathJSON `EulerE` · `(integer, number?) -> number`
+
+Return the nth Euler number Eₙ (1, 0, -1, 0, 5, 0, -61, …) for `EulerE(n)`, or the Euler polynomial Eₙ(x) for `EulerE(n, x)`. Odd-index Euler numbers are 0. Eₙ = 2ⁿ·Eₙ(1/2). A negative or non-integer `n` stays symbolic.
+
+```epsil
+eulerE(4)
+// ➔ 5
+```
+
+```epsil
+eulerE(2, x)
+// ➔ x^2 - x
 ```
 
 ### eulerPhi
@@ -187,46 +233,71 @@ Eulerian number A(n, m): number of permutations of &#123;1..n&#125; with exactly
 
 ### extendedGCD
 
-MathJSON `ExtendedGCD` · `(integer, integer) -> tuple<integer, integer, integer>`
+MathJSON `ExtendedGCD` · `(integer, integer, integer*) -> tuple`
 
-Return the extended GCD of `a` and `b` as a tuple `(g, x, y)` where `g = gcd(a, b)` is non-negative and `a·x + b·y = g` (Bézout coefficients).
+Return the extended GCD of `a` and `b` as a tuple `(g, x, y)` where `g = gcd(a, b)` is non-negative and `a·x + b·y = g` (Bézout coefficients). With more operands, `ExtendedGCD(a₁, …, aₙ)` is the tuple `(g, x₁, …, xₙ)` with `g = gcd(a₁, …, aₙ)` and `Σ aᵢ·xᵢ = g`.
 
 ```epsil
 extendedGCD(12, 18)
 // ➔ (6, -1, 1)
 ```
 
+```epsil
+extendedGCD(12, 18, 27)
+// ➔ (3, 4, -4, 1)
+```
+
 ### factorInteger
 
-MathJSON `FactorInteger` · `(integer) -> list<tuple<integer, integer>>`
+MathJSON `FactorInteger` · `(rational) -> list<tuple<integer, integer>>`
 
-Return the prime factorization of an integer `n` as a list of `[prime, exponent]` tuples, ordered by ascending prime. For a negative `n`, a leading `[-1, 1]` tuple carries the sign.
+Return the prime factorization of an integer `n` as a list of `[prime, exponent]` tuples, ordered by ascending prime. For a negative `n`, a leading `[-1, 1]` tuple carries the sign. A rational `p/q` is factored as `p` and `q`, the exponents of the primes of `q` being negative.
 
 ```epsil
 factorInteger(360)
 // ➔ [(2, 3),(3, 2),(5, 1)]
 ```
 
+```epsil
+factorInteger(12/35)
+// ➔ [(2, 2),(3, 1),(5, -1),(7, -1)]
+```
+
 ### fromContinuedFraction
 
 MathJSON `FromContinuedFraction` · `(collection<any>) -> number`
 
-Reconstruct the (rational) value of a continued fraction given its list of integer terms `[a0, a1, …]`.
+Reconstruct the value of a continued fraction given its list of integer terms `[a0, a1, …]`. A last element that is a list is the repeating period, `[1, [2]]`: the quadratic irrational `Sqrt(2)`.
 
 ```epsil
 fromContinuedFraction([2, 3, 1, 4])
 // ➔ 43/19
 ```
 
+```epsil
+fromContinuedFraction([1, [2]])
+// ➔ sqrt(2)
+```
+
 ### fromDigits
 
-MathJSON `FromDigits` · `(collection<any>, integer?) -> integer`
+MathJSON `FromDigits` · `(collection<any>, number?) -> number`
 
-Reconstruct an integer from its list of digits (most-significant first) in the given `base` (default 10). The inverse of `IntegerDigits`. Digits outside `[0, base)` are combined positionally (Horner evaluation).
+Reconstruct a number from its digits (most-significant first) in the given `base` (default 10). The inverse of `IntegerDigits`. Digits outside `[0, base)` are combined positionally, and the base may be any number or symbol: `FromDigits([1, 1, 0], -2)` is 2 and `FromDigits([a, b, c], x)` is `a x^2 + b x + c`.
 
 ```epsil
 fromDigits([1, 2, 3, 4])
 // ➔ 1234
+```
+
+```epsil
+fromDigits([1, 1, 0], -2)
+// ➔ 2
+```
+
+```epsil
+fromDigits([a, b, c], x)
+// ➔ a * x^2 + b * x + c
 ```
 
 ### integerDigits
@@ -300,12 +371,17 @@ True if n is a perfect square.
 
 ### isSquareFree
 
-MathJSON `IsSquareFree` · `(integer) -> boolean`
+MathJSON `IsSquareFree` · `(rational) -> boolean`
 
-Return `"True"` if `n` is square-free (not divisible by any perfect square &gt; 1). The sign of `n` is ignored.
+Return `"True"` if `n` is square-free (not divisible by any perfect square &gt; 1). The sign of `n` is ignored. A rational is square-free when its numerator and denominator are.
 
 ```epsil
 isSquareFree(30)
+// ➔ "True"
+```
+
+```epsil
+isSquareFree(6/35)
 // ➔ "True"
 ```
 
@@ -405,9 +481,9 @@ Number of integer partitions of n, for n ≥ 0; it is 0 for n &lt; 0.
 
 ### nextPrime
 
-MathJSON `NextPrime` · `(integer, integer?) -> integer`
+MathJSON `NextPrime` · `(real, integer?) -> integer`
 
-Return the smallest prime greater than `n`. With a second argument `k`, return the kth prime after `n` (`k < 0` returns the |k|th prime before `n`).
+Return the smallest prime greater than `n`. With a second argument `k`, return the kth prime after `n` (`k < 0` returns the |k|th prime before `n`). A non-integer real or rational `n` is allowed: `NextPrime(7/2)` is 5.
 
 ```epsil
 nextPrime(10)
@@ -417,6 +493,11 @@ nextPrime(10)
 ```epsil
 nextPrime(10, -1)
 // ➔ 7
+```
+
+```epsil
+nextPrime(7/2)
+// ➔ 5
 ```
 
 ### notDivides
@@ -447,11 +528,22 @@ partitionsP(5)
 // ➔ 7
 ```
 
+### partitionsQ
+
+MathJSON `PartitionsQ` · `(integer) -> integer`
+
+Number of partitions of n into distinct parts (equivalently, into odd parts), q(n); it is 0 for n &lt; 0. The Wolfram Language `PartitionsQ`.
+
+```epsil
+partitionsQ(10)
+// ➔ 10
+```
+
 ### powerMod
 
-MathJSON `PowerMod` · `(integer, rational, integer) -> integer`
+MathJSON `PowerMod` · `(list<rational> | rational, list<rational> | rational, integer | list<integer>) -> integer | list<integer>`
 
-Return `a^b mod m` (modular exponentiation). A negative `b` uses the modular inverse of `a`; the result is undefined when that inverse does not exist (i.e. when `a` and `m` are not coprime). The result is in the range [0, m). A rational exponent `s/r` gives the least `x` with `x^r ≡ a^s (mod m)`, the first entry of `PowerModList(a, s/r, m)`. It is undefined when there is none, when `m` cannot be factored, or when there are too many roots to list and none of them is less than 100000.
+Return `a^b mod m` (modular exponentiation). A negative `b` uses the modular inverse of `a`; the result is undefined when that inverse does not exist (i.e. when `a` and `m` are not coprime). The result is in the range [0, m). A rational base `p/q` is `p` times the modular inverse of `q`, so `PowerMod(1/2, 2, 7)` is 2. A rational exponent `s/r` gives the least `x` with `x^r ≡ a^s (mod m)`, the first entry of `PowerModList(a, s/r, m)`. It is undefined when there is none, when `m` cannot be factored, or when there are too many roots to list and none of them is less than 100000. A list operand threads: `PowerMod([2, 3], 2, 7)` is `[4, 2]`.
 
 ```epsil
 powerMod(2, 10, 1000)
@@ -463,11 +555,16 @@ powerMod(4, 1/2, 7)
 // ➔ 2
 ```
 
+```epsil
+powerMod(1/2, 2, 7)
+// ➔ 2
+```
+
 ### powerModList
 
-MathJSON `PowerModList` · `(integer, rational, integer) -> list<integer>`
+MathJSON `PowerModList` · `(list<rational> | rational, list<rational> | rational, integer | list<integer>) -> list<integer> | list<list<integer>>`
 
-Return the sorted list of every `x` in [0, m) with `x^r ≡ a^s (mod m)`, for the exponent `s/r`. An integer exponent gives the single value `a^s mod m`, a negative one using the modular inverse of `a`. The list is empty when `a^s` is not an `r`-th power mod `m`. Undefined for a modulus `m < 1`, when the inverse of `a` does not exist, or when `m` cannot be factored or there are too many roots to list.
+Return the sorted list of every `x` in [0, m) with `x^r ≡ a^s (mod m)`, for the exponent `s/r`. An integer exponent gives the single value `a^s mod m`, a negative one using the modular inverse of `a`. A rational base is read as `p` times the inverse of `q`. A list operand threads: `PowerModList([2, 3], 2, 7)` is `[[4], [2]]`. The list is empty when `a^s` is not an `r`-th power mod `m`. Undefined for a modulus `m < 1`, when the inverse of `a` does not exist, or when `m` cannot be factored or there are too many roots to list.
 
 ```epsil
 powerModList(3, 1/2, 11)

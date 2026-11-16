@@ -172,115 +172,137 @@ those an explicit lambda.
 ## Reassignment vs. declaration
 
 A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not
-declaration syntax: it is an **assignment**:
+declaration syntax: it is an **assignment**, and it writes a variable that is
+already declared:
 
 ```epsil
+let x = 0
 x = 5
 ```
 
-Assigning to a name that was never declared does establish it, but `let` is
-the explicit and idiomatic way to introduce a mutable binding.
+An assignment never declares a name. An assignment to a name that no `let`,
+`const` or parameter declares, and that no earlier program or the host
+declared, is an error (`assignment-to-undeclared-variable`), at the top level
+of a program as in a block or a function body. `let` introduces a mutable
+binding.
 
-## The rules of block locals
+## Variable bindings {#the-rules-of-block-locals}
 
-Two rules make sure that a local always has a value when it is read:
+The same declaration and assignment rules apply to a program and to block
+locals. Two rules make sure a declared variable has a value when it is read:
 
-1. **A declaration has a value.** `let x = v`, `let x: integer = v`, or a
-   first assignment `x = v` at the own level of a block, declares `x` with
-   its value. `let x: integer` with no value is an error
-   (`declaration-without-value`). One declaration needs no value: a
-   function type, when a `function` statement (or a definition
-   `f(x) = …`) of the same name is in the same block. The definition gives
-   the name its value from the start of the block, so the declaration only
-   gives the signature of the function:
-   `let f: (integer) -> integer; function f(x) { x + 1 }; f(2)` is `3`. A
-   definition in an enclosing block does not count: with no definition in
-   the same block, the error asks to define `f` with a function statement
-   in the same block, or to give the declaration a value. A first assignment of a name in a branch of
-   an `if` or a `match`, or in the body of a loop, is an error too
-   (`first-assignment-in-branch`): declare the name with a value before the
+1. **A declaration has a value.** `let x = v` or `let x: integer = v`
+   declares `x` with its value. `let x: integer` with no value is an error
+   (`declaration-without-value`). One declaration needs no value: at the
+   top level of a program, a function type, when a `function` statement (or
+   a definition `f(x) = …`) of the same name is in the program. The
+   definition gives the name its value from the start of the program, so
+   the declaration only gives the signature of the function:
+   `let f: (integer) -> integer; function f(x) { x + 1 }; f(2)` is `3`. In
+   a function body or a block, a function statement declares a local
+   ([local functions](/control-flow#local-functions)), so the two
+   statements are two declarations of `f` (`variable-redeclaration`): give
+   the type with the value, `let f: (integer) -> integer = (x) => x + 1`.
+   An assignment to
+   a name that is not declared is an error
+   (`assignment-to-undeclared-variable`), also in a branch of an `if` or a
+   `match` and in the body of a loop: declare the name with a value before
+   the branch. A `let` in a branch declares a local of the block of that
    branch. A use of a local in a statement before the statement that
    declares it is an error (`read-before-declaration`). A use of the local
    in the body of a function literal is not checked, because the body runs
-   when the function is called, and the check does not follow calls: in `function g() { f = () => t; v = f(); t = 1; v }`, the call
-   `f()` reads `t` before its declaration, and `g()` gives `1`.
+   when the function is called, and the check does not follow calls: in
+   `function g() { let f = () => t; let v = f(); let t = 1; v }`, the call
+   `f()` reads `t` before its declaration.
 2. **An assignment is a statement, not a value.** `f(a := 2)` is an error
    (`assignment-in-operand`), and `a := b := 5` is a syntax error
    (`chained-assignment`): write two statements. A block whose last statement
    is an assignment or a declaration has the value `Nothing`; end the block
    with the name to give its value.
 
-A local can be assigned again after its declaration, also in a branch, a
-loop body or a nested block. The type of the new value must be able to be
-the type of the local: its declared type, or else the type of its first
-value, widened. A number
-widens to `number`, a string or a character to `string`, a boolean to
-`boolean`, and the elements of a list, a set or a tuple widen the same way.
-So `s = 0` then `s = s + 0.5` is valid, and `s = 0` then `s = "x"` is an
-error (`assignment-type-mismatch`). A local whose first value has no known
-type (an untyped parameter) accepts a value of any type.
+A mutable variable can be assigned again after its declaration, also in a
+branch, a loop body or a nested block. Assignment preserves the binding's
+type. An explicit annotation is its contract; otherwise the initializer's
+type is widened: a number gives `number`, a string or character gives
+`string`, a boolean gives `boolean`, and the elements of a list, set or
+tuple widen the same way. So `let s = 0` then `s = s + 0.5` is valid, while
+`let s = 0` then `s = "x"` is `assignment-type-mismatch`. A variable whose
+initializer has no known type keeps `unknown`.
 
-All these errors are found before the program runs: `epsil check` reports
-them, and a statement that holds one gives the error as its value.
+An unannotated variable initialized with a function, or with a name known to
+hold a function, has type `function`. Each function value retains its own
+parameter annotations, defaults, closure and effects. Those properties do
+not become a permanent contract for the variable:
 
-The top level of a program is not a block: its statements run one at a
-time, and a name assigned there is a name of the session. A first
-assignment in a branch or a loop body is an error at the top level too:
-`if c { a = 1 }; a` is `first-assignment-in-branch`. An assignment in a
-branch to a name of the session (assigned by an earlier top-level
-statement, or declared by the host) is not a first assignment:
-`a = 1; if c { a = 2 }; a` is valid. The rules of a use before the
-declaration and of the type of a new value apply only in a block
-(`do { … }`) and in a function body: at the top level, `a = 1; a = "x"; a`
-is valid and gives `"x"`.
+```epsil
+let f = (n: integer) => n + 1
+f = (s: string) => s
+f("a")
+// ➔ "a"
+```
+
+A later function assignment is checked against `function`, and a call is
+checked against the function value being called. A nonfunction value cannot
+replace it. To require one signature for every replacement, annotate the
+variable explicitly, for example `let f: (integer) -> integer = (x) => x + 1`.
+A `const` still rejects every assignment, including a replacement function.
+
+`epsil check` reports declaration errors and statically known incompatible
+writes before evaluation. It does not run a program to discover an unknown
+value. A statement rejected during preparation gives an error value.
+
+At the top level, `let` and `const` create names in the session scope. All
+statements are prepared before any executes: types and protocols come
+first, then function definitions with their paired signature declarations,
+then the remaining statements in source order. A direct use before a later
+`let` or `const` is an error here too. Assignment preserves the declared
+contract: `let a = 1; a = "x"; a` reports `assignment-type-mismatch` and
+finishes with `1`, because the failed assignment leaves `a` unchanged.
 
 | Program                                    | Result                                 |
 | ------------------------------------------ | -------------------------------------- |
-| `let a = 1; b = a + 1; b`                  | `2`                                    |
-| `s = 0; for i in 1..3 { s = s + i }; s`    | `6`                                    |
-| `a = 1; if c { a = 2 }; a`                 | `2` when `c` is true, else `1`         |
+| `let a = 1; let b = a + 1; b`              | `2`                                    |
+| `let a = 1; b = a + 1; b`                  | error: `assignment-to-undeclared-variable` |
+| `let s = 0; for i in 1..3 { s = s + i }; s` | `6`                                   |
+| `let a = 1; if c { a = 2 }; a`             | `2` when `c` is true, else `1`         |
 | `let a: integer; if c { a = 1 }; a`        | error: `declaration-without-value`     |
 | `let f: (integer) -> integer; function f(x) { x + 1 }; f(2)` | `3` |
 | `let f: (integer) -> integer; f(2)`        | error: `declaration-without-value`     |
-| `if c { a = 1 }; a`                        | error: `first-assignment-in-branch`    |
-| `do { if c { a = 1 }; a }`                 | error: `first-assignment-in-branch`    |
-| `do { a = 1; a = "x"; a }`                 | error: `assignment-type-mismatch`      |
-| `f(a := 2) + a`                            | error: `assignment-in-operand`         |
-| `do { b = 2 }`                             | `Nothing`                              |
+| `if c { a = 1 }; a`                        | error: `assignment-to-undeclared-variable` |
+| `do { if c { a = 1 }; a }`                 | error: `assignment-to-undeclared-variable` |
+| `do { let a = 1; a = "x"; a }`             | error: `assignment-type-mismatch`      |
+| `let a = 0; f(a := 2) + a`                 | error: `assignment-in-operand`         |
+| `do { let b = 2 }`                         | `Nothing`                              |
 
-What an assignment writes depends on where it is written, and on what is
-declared when the function around it is defined. In a function body, an
-assignment to a name that no enclosing scope declares, at the own level of
-the body or of a nested block, declares a local of that block, as a `let`
-does. Which scope a name belongs to is decided where the function is
-**defined**, not where it is called: each call of the function gets its own
-local, and a declaration of the same name made later does not change what
-the function writes. Such an assignment does not write a variable outside
-the function, so it is not the `scope` effect, and the function needs no
-effect specifier:
+An assignment in a function body writes the variable that is in scope where
+the function is **defined**: a parameter, a local of the body, a local of an
+enclosing function, or a name of the program. A local of a function body is
+declared with `let` or `const`, and each call of the function gets its own
+local. Such a local is not a variable outside the function, so a write to it
+is not the `scope` effect, and the function needs no effect specifier:
 
 ```epsil
-function g(k) { t = k + 1; t }
+function g(k) { let t = k + 1; t }
 let t = 0
 [g(1), g(2), t]
 // ➔ [2, 3, 0]
 ```
 
-A use of such a local before its first assignment is an error that is found
+A use of such a local before its declaration is an error that is found
 before the program runs:
 
 ```epsil
-function g(k) { u = t; t = k; u }
+function g(k) { let u = t; let t = k; u }
 ```
 
 A closure that reads a local reads it when it is called, so
-`f = () => t; t = 1; f()` gives `1`. The body of a loop keeps the locals of
-an enclosing block from one iteration to the next, so the second iteration
-reads the value that the first one assigned.
+`do { let f = () => t; let t = 1; f() }` gives `1`. The body of a loop keeps
+the locals of an enclosing block from one iteration to the next, so the
+second iteration reads the value that the first one assigned.
 
 An assignment to a name that an enclosing scope declares when the function
-is defined — a top-level `let` or assignment written before the function, a
-parameter or a local of an enclosing function — writes that binding. In a
+is defined — a top-level `let`, a parameter or a
+local of an enclosing function — writes that binding. In a
 function body, this is the `scope` effect, which must be declared (see
 [Effect specifiers](/control-flow#effect-specifiers)):
 
@@ -291,9 +313,18 @@ function bump() scope { n = n + 1; n }
 // ➔ [1, 2, 2]
 ```
 
-The same rule holds for an anonymous function that a top-level `let` or
-`const` names: the type states the effect. Without `scope` in the type, the
-statement gives an `incompatible-type` error and declares nothing:
+The declarations of a program are known when its function bodies are
+prepared, including variables declared later in the text. A function can
+therefore assign such a variable when called after its initialization:
+
+```epsil
+function g(k) scope { t = k + 1; t }
+let t = 0
+[g(1), t]
+// ➔ [2, 2]
+```
+
+An explicit function-type annotation must admit the function's effects:
 
 ```epsil
 let n = 0
@@ -302,9 +333,16 @@ let bump: () scope -> number = () => do { n = n + 1; n }
 // ➔ [1, 2, 2]
 ```
 
-A `let` in a block does not need the specifier, and neither does a `let` whose
-value is computed, such as the closure that a call returns
-(`let c1 = counter()`).
+An unannotated function-valued variable has type `function`; the value
+carries its inferred effects. It does not need a separate `scope`
+annotation on the variable, whether it is declared in a program or a block:
+
+```epsil
+let n = 0
+let bump = () => do { n = n + 1; n }
+[bump(), bump(), n]
+// ➔ [1, 2, 2]
+```
 
 Reassigning a symbol that was declared `const` produces an
 [error value](/evaluation/#errors-are-values), not a parse error or a
@@ -323,20 +361,13 @@ body or a function body. This holds for a `const` at any depth, and for each
 name of a destructuring `const`. A function defined before a `const` of the
 same block is included, because the `const` of a block is declared when the
 block starts: an assignment in the function writes the constant when the
-call comes after the `const`. A function defined before a top-level `const`
-does not write it: the assignment makes a local of the function body (see
-above). An assignment to a `let` or a parameter that shadows
+call comes after the `const`. An assignment to a `let` or a parameter that shadows
 the constant is not reported.
 
-A declaration with no initializer declares the name without giving it a value:
-
-```epsil
-let x: real
-let y
-```
-
-Without an annotation, the type is inferred from the initializer — `let x = 5`
-declares `x` as an `integer`.
+A declaration without an initializer is an error, except for the paired
+top-level function signature described above. For a mutable variable
+without an annotation, the initializer determines a widened binding type:
+`let x = 5` declares `x` as `number`, allowing later numeric assignments.
 
 Constness is a property of the **binding**, not of the type: `const` says that
 *this name* will not be written again, and says nothing about the value it
@@ -352,9 +383,10 @@ introduced by `if`/`else`/`while`/`for`, or a function body, pushes its own
 lexical scope, so a `let`/`const` inside a block does not leak into the
 enclosing scope.
 
-A `function` statement defines its name for the **whole** program or block
-it is written in, including the statements before it: a call written before
-the definition runs the function.
+A top-level `function` statement defines its name for the **whole program**,
+including statements before its definition. In a block or function body,
+a function statement declares a local from that statement onward; see
+[Local functions](/control-flow/#local-functions).
 
 ```epsil
 let a = g(3)
@@ -363,24 +395,21 @@ a
 // ➔ 9
 ```
 
-An assignment of a function literal (`g = (k) => k^2`, `let g = (k) => k^2`)
-takes effect when it runs. A call before it stays the symbolic `g(3)`. A
-value that holds such a call is resolved again when a later statement reads
-it, so the same program with `g = (k) => k^2` in place of the `function`
-statement also answers `9`. Within one statement, the result is not resolved
-again: `do { u = h(1); h = (x) => x; u }` answers `h(1)`, because the
-assignment of `h` runs in the same evaluation as the call.
+A variable initialized with a function follows the ordinary declaration
+order. In `let a = h(1); let h = (x) => x + 1; a`, the first statement is
+`read-before-declaration`; a later function-valued initializer does not make
+that earlier call valid. Reassigning an already declared function variable
+takes effect when the assignment executes.
 
 A call reads the function that its name denotes **where the call is
 written**. A function of the same name defined in another scope does not
 change which function the call runs; assigning another function to that same
 name does.
 
-A name is declared **once per scope**. A `let`/`const` of a name that the same
-scope already declares — an earlier `let`/`const` of the same block or
-program, a parameter of the function whose body this is, or the index of the
-loop whose body this is — is the `variable-redeclaration` error, reported
-before the program runs:
+A name is declared **once within a program or block**. A second `let` or
+`const` of the same name, or a declaration that repeats a parameter or loop
+index of the same scope, is `variable-redeclaration`. At the top level the
+first declaration stands and later sibling statements still run:
 
 ```epsil
 function f(x) {
@@ -404,8 +433,12 @@ for k in 1..3 {
 }
 ```
 
-Across programs — a re-run notebook cell, a later REPL line — a top-level
-`let` re-declares legally; only a repeat within one program is reported.
+Across programs — a rerun notebook cell or a later REPL line — a top-level
+`let` or `const` may replace an earlier declaration and establish a new
+type. For example, a later `let value = "text"` can replace an earlier
+`let value = 1`. A subsequent assignment `value = 2` keeps the new `string`
+contract, fails, and leaves `value` equal to `"text"`. Redeclaration creates
+a new contract; assignment writes a value under the existing contract.
 
 [Type declarations](/types/) are the exception: types (and their
 constructors) are **global** — a `type` statement is only allowed at the top

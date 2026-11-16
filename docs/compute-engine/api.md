@@ -327,6 +327,34 @@ contextStack: readonly EvalContext[];
 
 <MemberCard>
 
+##### ComputeEngine.\_delegatedEvaluations {#_delegatedevaluations-1}
+
+```ts
+_delegatedEvaluations: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ComputeEngine.macroNames {#macronames-1}
+
+```ts
+readonly macroNames: ReadonlySet<string>;
+```
+
+The names that were declared as a macro on this engine
+(`ce.declare(name, { macro })`), in any scope. The set never shrinks: a
+name stays in it after the scope of its declaration is popped, and after
+a later declaration of the name that is not a macro. So a name that is
+not in the set is not a macro in any scope, and a name that is in the set
+may be one: `ce.lookupDefinition(name)` gives the definition that the
+current scope reads. The set of an engine with no macro is empty.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ComputeEngine.timeRemaining {#timeremaining-1}
 
 ```ts
@@ -646,94 +674,6 @@ recomputed at each precision change.
 
 <MemberCard>
 
-##### ComputeEngine.checkpoint() {#checkpoint-1}
-
-```ts
-checkpoint(label?): EngineCheckpoint
-```
-
-Take a checkpoint of the engine's state at a quiescent point — between
-statements, at any scope depth — so a later [restore](#restore) can rewind
-to it. Legal on a freshly constructed engine, which is how a client gets
-a `cp[0]` covering an edit of the first cell, and inside a host-pushed
-scope, which is how a notebook takes per-cell checkpoints within a pass.
-A checkpoint taken inside a scope dies when that scope pops. Throws a
-`CheckpointError` when the engine is mid-evaluation or mid-pre-pass;
-[restore](#restore) additionally requires the same scope stack the
-checkpoint was taken on.
-
-####### label?
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.restore() {#restore-1}
-
-```ts
-restore(cp): void
-```
-
-Rewind to `cp`, invalidating every checkpoint taken after it; `cp` itself
-stays live and can be restored again.
-
-The definitions that existed when `cp` was taken are rewritten in place,
-and the version counters advance, so every expression that reads them,
-whether it was built before or during the rewound window, reads the
-restored state afterwards and its cached answers are computed again.
-The structure of an expression (`ops`, `json`, `digest`, `hash`) is not
-affected, with one exception: the fields of a mutable object are
-rewound in place, so the `json` and `digest` of that object, and of
-every expression that holds it, can change.
-
-The definitions CREATED during the window are removed from their scope
-and disposed. This includes a symbol that was declared or assigned for
-the first time there, and a free symbol that was boxed for the first
-time there (boxing declares it). An expression built during the window
-that names such a symbol keeps the disposed definition, and the symbol
-is inert: it reads no value and counts as unknown (`unknowns`, a
-compile reads it as an input), also after a later declaration or
-assignment of the same name, and its type is the one its record had
-before the declaration (usually `unknown`). The index of a `Sum` and the
-locals of a `Block` built during the window are not affected: they
-still take their values when the expression runs. Nor is a symbol
-declared in a scope that is not on the scope chain when `restore()`
-runs (a scope pushed and popped during the window): it still resolves
-by name, so it reads a later declaration of the same name in that scope
-with its old type (ROADMAP CE-590). `isSame` with the
-same expression built after the
-restore is false. Do not keep such an expression: build it again to
-read the new definition, and cache a cell output as a serialized
-artifact rather than as a live boxed node.
-
-####### cp
-
-[`EngineCheckpoint`](#enginecheckpoint)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.discard() {#discard-1}
-
-```ts
-discard(cp): void
-```
-
-Release `cp`'s restore capability. Restoring past a discarded INTERIOR
-checkpoint stays possible through any earlier live one; discarding the
-OLDEST makes the state before the next-younger one unreachable.
-
-####### cp
-
-[`EngineCheckpoint`](#enginecheckpoint)
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ComputeEngine.declareProtocol() {#declareprotocol-1}
 
 ```ts
@@ -846,7 +786,7 @@ Inheritance included: a conformance registered for a supertype answers
 for its subtypes. A CONDITIONAL conformance (`list<T> is P where T is
 P`) recurses, deciding itself against `type`'s own arguments.
 
-`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-10)
+`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-11)
 parses one.
 
 ####### type
@@ -1181,6 +1121,11 @@ Verbatim LaTeX and source positions are dropped, as the MathJSON route
 drops them. A mutable object is rebuilt as its record snapshot, as that
 route boxes it.
 
+To give a name a value for one evaluation, or to hide its value, use
+`withValues()`, not a declaration in a pushed scope followed by
+`rebind()`: a stored function that the expression calls reads the names
+of the scope it was defined in, which a pushed scope does not change.
+
 ####### expr
 
 [`Expression`](#expression-5)
@@ -1215,13 +1160,13 @@ but uses the engine's symbol definitions for better parsing accuracy.
 `options.scope` RECEIVES the parse's writes: the whole parse runs with
 that scope as the current lexical scope, so name resolution (including
 the parser's symbol oracle) walks `scope → parents`, and every
-auto-declare and inference lands rooted there. Discarding the scope
-discards the writes. Use `ce.createScope()` to make one that can be read
+declaration and inference made while it runs lands rooted there. Boxing
+itself declares no name. Discarding the scope discards the writes. Use `ce.createScope()` to make one that can be read
 back.
 
 `options.speculative` leaves NO trace in the engine's type state: the
-parse runs inside a transient scope (auto-declares land there and are
-discarded with it), and every ambient symbol whose type is currently
+parse runs inside a transient scope (declarations and inferences land
+there and are discarded with it), and every ambient symbol whose type is currently
 inferred is shadowed in that scope with its current type — so a
 narrowing use in `latex` refines the discarded shadow instead of
 persistently narrowing the ambient symbol. Use it for derive-style
@@ -1365,11 +1310,11 @@ target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
 and `compile()`.
 
 Every engine has `javascript` and `interval-js`. Every engine also has
-`glsl` and `python` once the full package entry,
+`glsl` once the full package entry,
 `@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
 the program, whichever entry made the engine and in whichever order. A
 program that loads only `@cortex-js/compute-engine/core` has the two
-built-in targets: import `GLSLTarget` or `PythonTarget`
+built-in targets: import `GLSLTarget`
 from `@cortex-js/compute-engine/compile` and register it here.
 
 ####### name
@@ -1678,7 +1623,7 @@ back with `expr.array`.
 
 <MemberCard>
 
-##### ComputeEngine.type() {#type-11}
+##### ComputeEngine.type() {#type-12}
 
 ```ts
 type(type): BoxedType
@@ -2107,6 +2052,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
+  `macro`: [`MathJsonExpression`](#mathjsonexpression);
   `eq`: (`a`) => `boolean` \| `undefined`;
   `neq`: (`a`) => `boolean` \| `undefined`;
   `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
@@ -2191,6 +2137,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
+  `macro`: [`MathJsonExpression`](#mathjsonexpression);
   `eq`: (`a`) => `boolean` \| `undefined`;
   `neq`: (`a`) => `boolean` \| `undefined`;
   `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
@@ -2312,6 +2259,43 @@ assume(predicate): AssumeResult
 
 <MemberCard>
 
+##### ComputeEngine.infer() {#infer-1}
+
+```ts
+infer(exprs): InferResult
+```
+
+**`Experimental`**
+
+Declare the names that `exprs` use, with the types that their uses
+require.
+
+Each name is declared, marked as inferred, in its home scope: the scope
+that a declaration of the name would go in when the expression that uses
+it was boxed. When the home scope already holds an inferred definition
+of the name, that definition is narrowed instead. The type is the meet of
+the types that the uses in `exprs` require, met with the type of that
+inferred definition. The order of `exprs` does not change the result.
+
+A name is not changed, and is reported in `skipped`, when the uses
+require types that have no common subtype (`x + 1` and `x(3)`), when
+they require no type, when the home scope holds a definition of the name
+that is not inferred, and when the home scope is not the current scope
+or one of its ancestors. Each expression then keeps the type that its
+own uses require.
+
+A library name used as a value (`N` in `N + 1`) is declared as a
+variable, which shadows the library definition in the home scope. A
+call head (`f` in `f(x)`) is declared with a function type.
+
+####### exprs
+
+readonly [`Expression`](#expression-5)[]
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ComputeEngine.declareSequence() {#declaresequence-1}
 
 ```ts
@@ -2411,8 +2395,7 @@ Check if a symbol is a defined sequence.
 The answer is for the definition that the name has in the current
 scope. A sequence declared in an enclosing scope is a sequence. A
 sequence is no longer one after the scope that declared it is popped,
-after `undeclare()`, or after a checkpoint restore that removes its
-declaration.
+or after `undeclare()`.
 
 ####### name
 
@@ -2668,8 +2651,6 @@ Assumptions about the name are not removed: an assumption applies to
 the name, and so to a new declaration of it. Use `forget()` to remove
 them.
 
-A checkpoint taken before the call (`ce.checkpoint()`) undoes it.
-
 ####### names
 
 `string` \| readonly `string`[]
@@ -2868,6 +2849,63 @@ ce.suggestOperatorName('foo');      // → undefined
 ####### name
 
 `string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ComputeEngine.temporaryName() {#temporaryname-1}
+
+```ts
+temporaryName(hint, ...avoid): string
+```
+
+Return a name for a temporary symbol: `<hint>_tmp<n>`, with `n` the
+smallest integer from 1 such that the name
+- has no definition that `ce.lookupDefinition()` finds from the current
+  scope, and
+- is not a name of `avoid`, and does not occur in an expression of
+  `avoid`, as a symbol (free or bound) or as the operator of a call.
+
+Each item of `avoid` is a boxed expression, a string (one name, not text
+to search) or a set of names. An array throws: an array of strings is
+also a MathJSON call, so box it or pass the set of its names. An
+expression is walked as it is written, each shared subtree once; the
+walk does not enter the values or the bodies of the names it reads.
+
+Pass in `avoid` every expression that the name will be put in or
+combined with, the bodies and stored values that the computation reads,
+and the names returned by earlier calls that are not declared yet: two
+calls in a row with the same hint return the same name otherwise. A name
+that an expression uses with no definition is not seen by the lookup.
+
+The hint is cleaned: the `_` at its start and at its end are removed and
+each `__` becomes `_`; `tmp` is used if nothing is left. A hint that is
+not a valid symbol name, or for which `<hint>_tmp1` is not one (an
+emoji), throws.
+
+The function keeps no state and declares nothing: the same call in the
+same state returns the same name. The caller declares the name if it
+needs a definition, and the definition ends with its scope.
+
+A name that ends with `_tmp` and a positive integer is reserved for this
+function. The engine does not enforce it. A host can remove
+`/_tmp[1-9]\d*$/` from the name to get the hint.
+
+```ts
+ce.temporaryName('t');                                // → 't_tmp1'
+ce.temporaryName('t', ce.box(['Add', 't_tmp1', 'x'])); // → 't_tmp2'
+ce.temporaryName('s', new Set(['s_tmp1']));           // → 's_tmp2'
+ce.temporaryName('_x');                               // → 'x_tmp1'
+```
+
+####### hint
+
+`string`
+
+####### avoid
+
+...(`string` \| `ReadonlySet`\<`string`\> \| [`Expression`](#expression-5))[]
 
 </MemberCard>
 
@@ -4156,6 +4194,7 @@ type ValueDefinition = BaseDefinition & {
   value:   | LatexString
      | ExpressionInput
      | ((ce) => Expression | null);
+  macro: MathJsonExpression;
   eq: (a) => boolean | undefined;
   neq: (a) => boolean | undefined;
   cmp: (a) => "=" | ">" | "<" | undefined;
@@ -4209,6 +4248,25 @@ value:
 `value` can be a JS function since for some constants, such as
 `Pi`, the actual value depends on the `precision` setting of the
 `ComputeEngine` and possible other environment settings
+
+#### ValueDefinition.macro
+
+```ts
+macro: MathJsonExpression;
+```
+
+The raw MathJSON body of a macro: `ce.declare('A', { macro: body })`.
+
+A macro has no value and the type `unknown`. A name of the input
+(MathJSON or LaTeX) that resolves to the macro where it is boxed in a
+canonical or a structural form is replaced by the body, boxed at that
+place, in the scope of the occurrence and in the same form. A position
+that takes a name (a parameter, an index, the variable of `D`, the
+target of `Assign`) is not an occurrence, and a symbol made with
+`ce.symbol()` is not expanded. A parameter, an index or a local of the
+same name hides the macro.
+
+A definition with `macro` takes no other field.
 
 #### ValueDefinition.subscriptEvaluate?
 
@@ -6365,7 +6423,6 @@ type TypeProvenanceEntry = {
   kind: "declared" | "auto-declared" | "inferred" | "value-derived";
   axis: "type" | "effects";
   cause: Expression;
-  epoch: number;
   span: {
      start: number;
      end: number;
@@ -6464,6 +6521,20 @@ Some examples:
 
 <MemberCard>
 
+##### BoxedValueDefinition.macro? {#macro}
+
+```ts
+readonly macro?: MathJsonExpression;
+```
+
+The raw body of a macro definition (`ce.declare(name, { macro })`),
+`undefined` for every other value definition. A macro definition has no
+value and the type `unknown`.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedValueDefinition.value {#value-6}
 
 ```ts
@@ -6535,6 +6606,16 @@ True if the type has been inferred. An inferred type can be updated as
 more information becomes available.
 
 A type that is not inferred, but has been set explicitly, cannot be updated.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedValueDefinition.\_programVariable {#_programvariable}
+
+```ts
+_programVariable: boolean;
+```
 
 </MemberCard>
 
@@ -6675,14 +6756,15 @@ of the operator runs.
   operand unevaluated (`raw`).
 - `statement`: the operand is a statement that the operator runs, zero,
   one or several times (the body of a loop, a branch of a conditional). An
-  `Assign` or a `Declare` there is valid. The operand is not evaluated
+  `Assign` there is valid. The operand is not evaluated
   before the `evaluate` handler runs: the handler evaluates it when and as
   often as it needs to. The engine canonicalizes the operand as a branch,
   except in a `lazy` operator with a `canonical` handler, which receives
-  it as written and canonicalizes it itself. In a branch, a first
-  assignment of a name that no enclosing scope declares is the error
-  `first-assignment-in-branch`, an assignment of a declared name writes
-  that name, and a bare `Break` or `Continue` symbol is an error.
+  it as written and canonicalizes it itself. In a branch, a `Declare` is
+  the error `declaration-below-statement`, an assignment of a name that
+  no enclosing scope declares is the error
+  `assignment-to-undeclared-variable`, an assignment of a declared name
+  writes that name, and a bare `Break` or `Continue` symbol is an error.
 - `raw`: the operand is kept as written, not canonicalized and not
   evaluated. The default of a `lazy` operator. Valid only on a `lazy`
   operator.
@@ -7401,6 +7483,52 @@ The options of `ce.declare(id, def, options)`.
 - `extend`: when `true`, `def` is a PATCH applied to the operator definition
   currently visible for `id`, not a new definition. See
   [OperatorDefinitionPatch](#operatordefinitionpatch).
+
+</MemberCard>
+
+<MemberCard>
+
+### InferResult {#inferresult}
+
+```ts
+type InferResult = {
+  declared: {
+     name: string;
+     scope: Scope;
+     type: Type;
+    }[];
+  skipped: {
+     name: string;
+     scope: Scope;
+     reason: "conflict" | "untyped" | "defined" | "out-of-scope";
+    }[];
+};
+```
+
+The result of `ce.infer()`.
+
+- `declared`: each name that `ce.infer()` declared in its home scope, or
+  whose inferred definition it narrowed there, with the type it has now.
+- `skipped`: each symbol of the expressions that it did not change, with
+  the reason:
+  - `'conflict'`: the expressions require types that have no common
+    subtype (`x + 1` and `x(3)`), or a type that has none in common with
+    the inferred definition of the name;
+  - `'untyped'`: no use requires a type of the name (`q` in `[q]`), or the
+    requirements give the type `unknown`;
+  - `'defined'`: the home scope holds a definition of the name with a
+    declared type (`ce.declare('x', 'real')`). A definition with the
+    declared type `unknown` states no type: `ce.infer()` gives it the type
+    that the uses require;
+  - `'out-of-scope'`: the home scope is not the current scope or one of its
+    ancestors (it was popped).
+
+A symbol whose type is already the type that the uses require, a symbol
+of the library (`Pi`), a parameter of a function literal, the variable of
+a binder (the index of a `Sum`) and a symbol declared in a scope that was
+popped are in neither list.
+
+Each list is sorted by name, then by the depth of the scope.
 
 </MemberCard>
 
@@ -12601,6 +12729,50 @@ per canonicalization would not be).
 
 <MemberCard>
 
+### ParameterRequirement {#parameterrequirement}
+
+```ts
+type ParameterRequirement = {
+  type: BoxedType;
+  cause: InferenceCauseContext;
+  numeric: boolean;
+};
+```
+
+What the uses of a parameter of a function literal required while the
+literal is boxed (decision D18 of
+`docs/plans/2026-11-11-bound-once-spec.md`): the type that a read of the
+parameter gives, and the cause of the use that last changed it, recorded
+as the provenance of the type when it is written on the definition.
+
+</MemberCard>
+
+<MemberCard>
+
+### ParameterRecord {#parameterrecord}
+
+```ts
+type ParameterRecord = {
+  requirements: Map<BoxedValueDefinition, ParameterRequirement>;
+  env: UnitEnvironment;
+  collectorDepth: number;
+  memoStarts: number;
+  created: Set<BoxedValueDefinition>;
+};
+```
+
+The record of a function literal while it is boxed: the requirement of
+each parameter, keyed by its value definition, and the environment of the
+literal, which holds the entries that the uses of its parameters write
+(outside a trial) and that a later use reads. The environment is made with
+the record: a read of it is recorded only by the caches whose computation
+started after that (`collectorDepth`, `objectDepCollectorDepth()`), as a
+computation that started before boxes the literal again.
+
+</MemberCard>
+
+<MemberCard>
+
 ### JSImplementation {#jsimplementation}
 
 ```ts
@@ -12739,40 +12911,6 @@ The host-API shape of an IMPLEMENTATION block. Property handlers are given
 under their surface names (`getters.hash`), not under the internal
 `__get__hash` mangling (Appendix A "Properties": the mangling is an
 implementation detail, not part of the public surface).
-
-</MemberCard>
-
-### EngineCheckpoint {#enginecheckpoint}
-
-A handle on a saved engine state, from [IComputeEngine.checkpoint](#checkpoint).
-Deliberately opaque: `id` is for logging and `live` is the only state a
-client can act on. Declared here rather than in `checkpoint.ts` because it
-is part of the engine's public type surface — and because importing it from
-the implementation would make this file depend on it, closing a cycle
-through the sequence registry.
-
-<MemberCard>
-
-##### EngineCheckpoint.id {#id-4}
-
-```ts
-readonly id: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### EngineCheckpoint.live {#live}
-
-```ts
-readonly live: boolean;
-```
-
-False once invalidated — by a restore to an EARLIER checkpoint, by
-`discard()`, or by popping a scope this checkpoint was taken inside
-(the pop disposes the scope's bindings, so there is no world left to
-restore). A dead checkpoint can never be restored again.
 
 </MemberCard>
 
@@ -12998,6 +13136,34 @@ readonly context: EvalContext;
 ```ts
 contextStack: readonly EvalContext[];
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.\_delegatedEvaluations {#_delegatedevaluations}
+
+```ts
+_delegatedEvaluations: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.macroNames {#macronames}
+
+```ts
+readonly macroNames: ReadonlySet<string>;
+```
+
+The names that were declared as a macro on this engine
+(`ce.declare(name, { macro })`), in any scope. The set never shrinks: a
+name stays in it after the scope of its declaration is popped, and after
+a later declaration of the name that is not a macro. So a name that is
+not in the set is not a macro in any scope, and a name that is in the set
+may be one: `ce.lookupDefinition(name)` gives the definition that the
+current scope reads. The set of an engine with no macro is empty.
 
 </MemberCard>
 
@@ -13322,94 +13488,6 @@ recomputed at each precision change.
 
 <MemberCard>
 
-##### IComputeEngine.checkpoint() {#checkpoint}
-
-```ts
-checkpoint(label?): EngineCheckpoint
-```
-
-Take a checkpoint of the engine's state at a quiescent point — between
-statements, at any scope depth — so a later [restore](#restore) can rewind
-to it. Legal on a freshly constructed engine, which is how a client gets
-a `cp[0]` covering an edit of the first cell, and inside a host-pushed
-scope, which is how a notebook takes per-cell checkpoints within a pass.
-A checkpoint taken inside a scope dies when that scope pops. Throws a
-`CheckpointError` when the engine is mid-evaluation or mid-pre-pass;
-[restore](#restore) additionally requires the same scope stack the
-checkpoint was taken on.
-
-####### label?
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### IComputeEngine.restore() {#restore}
-
-```ts
-restore(cp): void
-```
-
-Rewind to `cp`, invalidating every checkpoint taken after it; `cp` itself
-stays live and can be restored again.
-
-The definitions that existed when `cp` was taken are rewritten in place,
-and the version counters advance, so every expression that reads them,
-whether it was built before or during the rewound window, reads the
-restored state afterwards and its cached answers are computed again.
-The structure of an expression (`ops`, `json`, `digest`, `hash`) is not
-affected, with one exception: the fields of a mutable object are
-rewound in place, so the `json` and `digest` of that object, and of
-every expression that holds it, can change.
-
-The definitions CREATED during the window are removed from their scope
-and disposed. This includes a symbol that was declared or assigned for
-the first time there, and a free symbol that was boxed for the first
-time there (boxing declares it). An expression built during the window
-that names such a symbol keeps the disposed definition, and the symbol
-is inert: it reads no value and counts as unknown (`unknowns`, a
-compile reads it as an input), also after a later declaration or
-assignment of the same name, and its type is the one its record had
-before the declaration (usually `unknown`). The index of a `Sum` and the
-locals of a `Block` built during the window are not affected: they
-still take their values when the expression runs. Nor is a symbol
-declared in a scope that is not on the scope chain when `restore()`
-runs (a scope pushed and popped during the window): it still resolves
-by name, so it reads a later declaration of the same name in that scope
-with its old type (ROADMAP CE-590). `isSame` with the
-same expression built after the
-restore is false. Do not keep such an expression: build it again to
-read the new definition, and cache a cell output as a serialized
-artifact rather than as a live boxed node.
-
-####### cp
-
-[`EngineCheckpoint`](#enginecheckpoint)
-
-</MemberCard>
-
-<MemberCard>
-
-##### IComputeEngine.discard() {#discard}
-
-```ts
-discard(cp): void
-```
-
-Release `cp`'s restore capability. Restoring past a discarded INTERIOR
-checkpoint stays possible through any earlier live one; discarding the
-OLDEST makes the state before the next-younger one unreachable.
-
-####### cp
-
-[`EngineCheckpoint`](#enginecheckpoint)
-
-</MemberCard>
-
-<MemberCard>
-
 ##### IComputeEngine.declareProtocol() {#declareprotocol}
 
 ```ts
@@ -13522,7 +13600,7 @@ Inheritance included: a conformance registered for a supertype answers
 for its subtypes. A CONDITIONAL conformance (`list<T> is P where T is
 P`) recurses, deciding itself against `type`'s own arguments.
 
-`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-10)
+`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-11)
 parses one.
 
 ####### type
@@ -13857,6 +13935,11 @@ Verbatim LaTeX and source positions are dropped, as the MathJSON route
 drops them. A mutable object is rebuilt as its record snapshot, as that
 route boxes it.
 
+To give a name a value for one evaluation, or to hide its value, use
+`withValues()`, not a declaration in a pushed scope followed by
+`rebind()`: a stored function that the expression calls reads the names
+of the scope it was defined in, which a pushed scope does not change.
+
 ####### expr
 
 [`Expression`](#expression-5)
@@ -13891,13 +13974,13 @@ but uses the engine's symbol definitions for better parsing accuracy.
 `options.scope` RECEIVES the parse's writes: the whole parse runs with
 that scope as the current lexical scope, so name resolution (including
 the parser's symbol oracle) walks `scope → parents`, and every
-auto-declare and inference lands rooted there. Discarding the scope
-discards the writes. Use `ce.createScope()` to make one that can be read
+declaration and inference made while it runs lands rooted there. Boxing
+itself declares no name. Discarding the scope discards the writes. Use `ce.createScope()` to make one that can be read
 back.
 
 `options.speculative` leaves NO trace in the engine's type state: the
-parse runs inside a transient scope (auto-declares land there and are
-discarded with it), and every ambient symbol whose type is currently
+parse runs inside a transient scope (declarations and inferences land
+there and are discarded with it), and every ambient symbol whose type is currently
 inferred is shadowed in that scope with its current type — so a
 narrowing use in `latex` refines the discarded shadow instead of
 persistently narrowing the ambient symbol. Use it for derive-style
@@ -14041,11 +14124,11 @@ target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
 and `compile()`.
 
 Every engine has `javascript` and `interval-js`. Every engine also has
-`glsl` and `python` once the full package entry,
+`glsl` once the full package entry,
 `@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
 the program, whichever entry made the engine and in whichever order. A
 program that loads only `@cortex-js/compute-engine/core` has the two
-built-in targets: import `GLSLTarget` or `PythonTarget`
+built-in targets: import `GLSLTarget`
 from `@cortex-js/compute-engine/compile` and register it here.
 
 ####### name
@@ -14354,7 +14437,7 @@ back with `expr.array`.
 
 <MemberCard>
 
-##### IComputeEngine.type() {#type-10}
+##### IComputeEngine.type() {#type-11}
 
 ```ts
 type(type): BoxedType
@@ -14783,6 +14866,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
+  `macro`: [`MathJsonExpression`](#mathjsonexpression);
   `eq`: (`a`) => `boolean` \| `undefined`;
   `neq`: (`a`) => `boolean` \| `undefined`;
   `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
@@ -14867,6 +14951,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
+  `macro`: [`MathJsonExpression`](#mathjsonexpression);
   `eq`: (`a`) => `boolean` \| `undefined`;
   `neq`: (`a`) => `boolean` \| `undefined`;
   `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
@@ -14988,6 +15073,43 @@ assume(predicate): AssumeResult
 
 <MemberCard>
 
+##### IComputeEngine.infer() {#infer}
+
+```ts
+infer(exprs): InferResult
+```
+
+**`Experimental`**
+
+Declare the names that `exprs` use, with the types that their uses
+require.
+
+Each name is declared, marked as inferred, in its home scope: the scope
+that a declaration of the name would go in when the expression that uses
+it was boxed. When the home scope already holds an inferred definition
+of the name, that definition is narrowed instead. The type is the meet of
+the types that the uses in `exprs` require, met with the type of that
+inferred definition. The order of `exprs` does not change the result.
+
+A name is not changed, and is reported in `skipped`, when the uses
+require types that have no common subtype (`x + 1` and `x(3)`), when
+they require no type, when the home scope holds a definition of the name
+that is not inferred, and when the home scope is not the current scope
+or one of its ancestors. Each expression then keeps the type that its
+own uses require.
+
+A library name used as a value (`N` in `N + 1`) is declared as a
+variable, which shadows the library definition in the home scope. A
+call head (`f` in `f(x)`) is declared with a function type.
+
+####### exprs
+
+readonly [`Expression`](#expression-5)[]
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.declareSequence() {#declaresequence}
 
 ```ts
@@ -15087,8 +15209,7 @@ Check if a symbol is a defined sequence.
 The answer is for the definition that the name has in the current
 scope. A sequence declared in an enclosing scope is a sequence. A
 sequence is no longer one after the scope that declared it is popped,
-after `undeclare()`, or after a checkpoint restore that removes its
-declaration.
+or after `undeclare()`.
 
 ####### name
 
@@ -15344,8 +15465,6 @@ Assumptions about the name are not removed: an assumption applies to
 the name, and so to a new declaration of it. Use `forget()` to remove
 them.
 
-A checkpoint taken before the call (`ce.checkpoint()`) undoes it.
-
 ####### names
 
 `string` \| readonly `string`[]
@@ -15544,6 +15663,63 @@ ce.suggestOperatorName('foo');      // → undefined
 ####### name
 
 `string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.temporaryName() {#temporaryname}
+
+```ts
+temporaryName(hint, ...avoid): string
+```
+
+Return a name for a temporary symbol: `<hint>_tmp<n>`, with `n` the
+smallest integer from 1 such that the name
+- has no definition that `ce.lookupDefinition()` finds from the current
+  scope, and
+- is not a name of `avoid`, and does not occur in an expression of
+  `avoid`, as a symbol (free or bound) or as the operator of a call.
+
+Each item of `avoid` is a boxed expression, a string (one name, not text
+to search) or a set of names. An array throws: an array of strings is
+also a MathJSON call, so box it or pass the set of its names. An
+expression is walked as it is written, each shared subtree once; the
+walk does not enter the values or the bodies of the names it reads.
+
+Pass in `avoid` every expression that the name will be put in or
+combined with, the bodies and stored values that the computation reads,
+and the names returned by earlier calls that are not declared yet: two
+calls in a row with the same hint return the same name otherwise. A name
+that an expression uses with no definition is not seen by the lookup.
+
+The hint is cleaned: the `_` at its start and at its end are removed and
+each `__` becomes `_`; `tmp` is used if nothing is left. A hint that is
+not a valid symbol name, or for which `<hint>_tmp1` is not one (an
+emoji), throws.
+
+The function keeps no state and declares nothing: the same call in the
+same state returns the same name. The caller declares the name if it
+needs a definition, and the definition ends with its scope.
+
+A name that ends with `_tmp` and a positive integer is reserved for this
+function. The engine does not enforce it. A host can remove
+`/_tmp[1-9]\d*$/` from the name to get the hint.
+
+```ts
+ce.temporaryName('t');                                // → 't_tmp1'
+ce.temporaryName('t', ce.box(['Add', 't_tmp1', 'x'])); // → 't_tmp2'
+ce.temporaryName('s', new Set(['s_tmp1']));           // → 's_tmp2'
+ce.temporaryName('_x');                               // → 'x_tmp1'
+```
+
+####### hint
+
+`string`
+
+####### avoid
+
+...(`string` \| `ReadonlySet`\<`string`\> \| [`Expression`](#expression-5))[]
 
 </MemberCard>
 
@@ -17903,8 +18079,13 @@ body — tuple, string and fixed-shape branches enumerate too), or
 readonly staticShape: StaticShape | undefined;
 ```
 
-The collection shape that this expression promises, read without
-evaluating it, or `undefined` when it promises no collection.
+The collection shape that this expression promises, or `undefined` when
+it promises no collection.
+
+It does not evaluate an application or a symbol. For a collection value
+it reads the collection facets, and the `count` of a lazy view over an
+eager source (`Join(f(1), [4])`, a `Filter`) evaluates that source: it
+calls `f`, or runs the filter's function once per element.
 
 `staticShape` answers the SHAPE question: "what does this expression
 promise to be?". `isCollection` answers the CAPABILITY question: "is a
@@ -18733,7 +18914,7 @@ singular values of a matrix.
 
 <MemberCard>
 
-##### Expression.type {#type-12}
+##### Expression.type {#type-13}
 
 ```ts
 get type(): BoxedType

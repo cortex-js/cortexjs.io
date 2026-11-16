@@ -374,6 +374,18 @@ MathJSON `ApplyWhole` · `(name: any, arguments: any*) -> unknown`
 
 Apply a function to arguments, each bound whole (engine-internal).
 
+### arbitraryConstant
+
+MathJSON `ArbitraryConstant` · `(integer) -> number`
+
+ArbitraryConstant(k): an arbitrary number, the k-th of a result: a constant of integration, the free parameter of an identity. Inside one result, two calls with the same index are the same value, and two calls with different indexes are independent. It has no value.
+
+### arbitraryInteger
+
+MathJSON `ArbitraryInteger` · `(integer) -> integer`
+
+ArbitraryInteger(k): an arbitrary integer, the k-th of a result: the parameter of a family of roots, of a diophantine or a congruence solution. Inside one result, two calls with the same index are the same value, and two calls with different indexes are independent. It has no value.
+
 ### arc
 
 MathJSON `Arc` · `(any+) -> number`
@@ -537,7 +549,6 @@ True iff the subject conforms to EVERY named protocol. A `type` VALUE subject as
 protocol Copyable {}
 type string is Copyable
 conforms("abc", "Copyable")
-// ➔ "True"
 ```
 
 ### Declare
@@ -561,7 +572,6 @@ Declare that a type CONFORMS to one or more protocols — the lowering of the Ep
 protocol Copyable {}
 type string is Copyable
 "abc" is Copyable
-// ➔ "True"
 ```
 
 ### DeclareProtocol
@@ -817,9 +827,9 @@ Read one line of text from the host: the terminal in a command-line host, the `p
 
 ### integerString
 
-MathJSON `IntegerString` · `(integer, integer?) -> string`
+MathJSON `IntegerString` · `(integer, integer?, integer?) -> string`
 
-`IntegerString(n, base=10)`       return a string representation of the integer `n` in base `base`.
+`IntegerString(n, base=10, length)`       return a string representation of the integer `n` in base `base`.       With `length`, the digits of |n| are padded on the left with zeros,       or cut to the last `length` digits.
 
 ```epsil
 integerString(255, 16)
@@ -829,6 +839,11 @@ integerString(255, 16)
 ```epsil
 integerString(10, 2)
 // ➔ "1010"
+```
+
+```epsil
+integerString(5, 2, 8)
+// ➔ "00000101"
 ```
 
 ### InvisibleOperator
@@ -1152,6 +1167,12 @@ Print the operands to the host console, separated by spaces and followed by a ne
 print("Hello", 42)
 ```
 
+### program
+
+MathJSON `Program` · `(unknown*) -> unknown`
+
+Evaluate a program in the caller scope, continuing after statement errors.
+
 ### ProtocolMember
 
 `(protocol: string, member: string, arguments: any*) -> unknown`
@@ -1162,7 +1183,6 @@ Invoke a protocol member on a value — the lowering of a QUALIFIED protocol cal
 protocol Negatable { function negated(self: Self) -> Self }
 type number is Negatable { function negated(self) -> number { -self } }
 Negatable.negated(5)
-// ➔ -5
 ```
 
 ### ProtocolProperty
@@ -1634,7 +1654,7 @@ trimStart("007", "0")
 
 MathJSON `Type` · `(any) -> type`
 
-The STATIC type of an expression, as a type value: `Type(3)` is `TypeFrom("integer")`. The observer does not evaluate its operand. Recover the text with `StringFrom(Type(x))`; in a string interpolation a type value renders as its text directly. BREAKING (2026-08-19, ruling R3 of `docs/TYPE-SYSTEM.md`): the result used to be a STRING, and `Type(x) == "some text"` is now always `False` — use `x is T`, `Subtype(Type(x), u)`, or compare `StringFrom` text.
+The STATIC type of an expression, as a type value: `Type(3)` is `TypeFrom("integer")`. The observer does not evaluate its operand, except a name with no declared type, which gives the widened type of the value it holds. Recover the text with `StringFrom(Type(x))`; in a string interpolation a type value renders as its text directly. BREAKING (2026-08-19, ruling R3 of `docs/TYPE-SYSTEM.md`): the result used to be a STRING, and `Type(x) == "some text"` is now always `False` — use `x is T`, `Subtype(Type(x), u)`, or compare `StringFrom` text.
 
 ```epsil
 type("hi")

@@ -689,7 +689,7 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 - Export to **typst** format. Use `mf.getValue("typst")` to get the value of the
   mathfield in typst format.
-- **#2731** The keybinding `alt+shift+V` now inserts a n<sup>th</sup> root. The
+- **#2731** The keybinding `alt+shift+V` now inserts a n\<sup>th\</sup> root. The
   existing `alt+V` keybinding continues to insert a square root.
 
 ### Resolved Issues

@@ -342,7 +342,7 @@ Airy function of the first kind
 
 ```epsil
 N(airyAi(1))
-// ➔ 0.13529241631288141
+// ➔ 0.135292416312881415524
 ```
 
 ### airyAiPrime
@@ -364,7 +364,7 @@ Airy function of the second kind
 
 ```epsil
 N(airyBi(0))
-// ➔ 0.6149266274460007
+// ➔ 0.614926627446000735151
 ```
 
 ### airyBiPrime
@@ -408,7 +408,7 @@ Modified Bessel function of the first kind
 
 ```epsil
 N(besselI(0, 1))
-// ➔ 1.2660658777520084
+// ➔ 1.2660658777520083356
 ```
 
 ### besselJ
@@ -419,7 +419,7 @@ Bessel function of the first kind
 
 ```epsil
 N(besselJ(0, 1))
-// ➔ 0.7651976865579666
+// ➔ 0.76519768655796655145
 ```
 
 ### besselK
@@ -430,7 +430,7 @@ Modified Bessel function of the second kind (Macdonald function)
 
 ```epsil
 N(besselK(0, 1))
-// ➔ 0.42102443824070834
+// ➔ 0.421024438240708333336
 ```
 
 ### besselY
@@ -441,18 +441,28 @@ Bessel function of the second kind (Neumann function)
 
 ```epsil
 N(besselY(0, 1))
-// ➔ 0.088256964215677
+// ➔ 0.0882569642156769579829
 ```
 
 ### beta
 
-MathJSON `Beta` · `(complex | infinity, complex | infinity) -> number`
+MathJSON `Beta` · `(complex | infinity, complex | infinity, (complex | infinity)?, (complex | infinity)?) -> number`
 
 Euler beta function
 
 ```epsil
 [beta(2, 3), N(beta(1/2, 1/2))]
 // ➔ [1/12,3.14159265358979323846]
+```
+
+```epsil
+beta(1/2, 2, 3)
+// ➔ 11/192
+```
+
+```epsil
+beta(1/4, 1/2, 2, 3)
+// ➔ 109/3072
 ```
 
 ### catalanConstant
@@ -479,12 +489,17 @@ Rounds a number up to the next largest integer, or with a step to the least mult
 
 ### chop
 
-MathJSON `Chop` · `(T) -> T where T: number`
+MathJSON `Chop` · `(T, real<0..>?) -> T where T: number`
 
 Replace tiny numeric values with zero.
 
 ```epsil
 chop([1e-20, 0.5, 3 + 1e-15i])
+// ➔ [0,0.5,3]
+```
+
+```epsil
+chop([0.004, 0.5, 3 + 0.002i], 0.01)
 // ➔ [0,0.5,3]
 ```
 
@@ -578,7 +593,7 @@ Digamma function, the logarithmic derivative of the gamma function
 
 ```epsil
 [digamma(1), N(digamma(1))]
-// ➔ [Digamma(1),-0.577215664901532860607]
+// ➔ [-"EulerGamma",-0.577215664901532860607]
 ```
 
 ### dirichletBeta
@@ -769,18 +784,23 @@ Greatest Common Divisor
 
 ### gamma
 
-MathJSON `Gamma` · `(complex | infinity, (complex | infinity)?) -> number`
+MathJSON `Gamma` · `(complex | infinity, (complex | infinity)?, (complex | infinity)?) -> number`
 
-Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt.
+Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt; with three, Γ(s, z0) − Γ(s, z1).
 
 ```epsil
 [gamma(1/2), N(gamma(1/2)), N(gamma(5))]
-// ➔ [Gamma(1/2),1.7724538509055160273,24]
+// ➔ [sqrt(pi),1.7724538509055160273,24]
 ```
 
 ```epsil
 N(gamma(2, 1))
 // ➔ 0.735758882342884643191
+```
+
+```epsil
+N(gamma(2, 1, 3))
+// ➔ 0.536610608871428871274
 ```
 
 ### gammaLn
@@ -814,6 +834,17 @@ The rational number one half (1/2).
 ```epsil
 [half, half + 1]
 // ➔ [1/2,3/2]
+```
+
+### harmonicNumber
+
+MathJSON `HarmonicNumber` · `(complex | infinity, (complex | infinity)?) -> number`
+
+Harmonic number H_n = Σ_&#123;k=1&#125;^n 1/k, exact at a non-negative integer and continued by ψ(n+1) + γ; with a second argument r, the generalized H_n^(r) = Σ_&#123;k=1&#125;^n 1/k^r = ζ(r) − ζ(r, n+1).
+
+```epsil
+[harmonicNumber(10), harmonicNumber(10, 2), N(harmonicNumber(1/2))]
+// ➔ [7381/2520,1968329/1270080,0.613705638880109381166]
 ```
 
 ### heaviside
@@ -1200,6 +1231,11 @@ N(polyGamma(2, 1))
 // ➔ -2.4041138063191885708
 ```
 
+```epsil
+N(polyGamma(1))
+// ➔ -0.577215664901532860607
+```
+
 ### positiveInfinity
 
 MathJSON `PositiveInfinity` · constant `+oo` = `+oo`
@@ -1450,7 +1486,7 @@ Rounds a number towards zero (removes the fractional part), or with a step to th
 
 MathJSON `Zeta` · `(complex | infinity, (complex | infinity)?) -> number`
 
-Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ |n+a|^&#123;-s&#125; (a term with n+a = 0 omitted), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum.
+Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ |n+a|^&#123;-s&#125; (a term with n+a = 0 omitted, except at s = 0, where ζ(0,a) = 1/2 - a), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum.
 
 ```epsil
 [zeta(2), zeta(-1), N(zeta(3))]

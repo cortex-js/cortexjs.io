@@ -15,6 +15,2472 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Breaking Changes
 
+- **`parseEpsil()` always returns a `Program`, including for empty or
+  single-statement source.** For example, `parseEpsil("2x + 1")[0]` has the
+  form `["Program", ["Add", ["Multiply", 2, "x"], 1]]`, omitting source metadata.
+  Whole-program boxing and direct evaluation now preserve the caller scope;
+  nested `Block` expressions still introduce a scope. Types and protocols
+  are prepared first, then function definitions, then the other statements
+  in source order. Invalid top-level siblings do not stop later statements.
+  A host-evaluated `Block` now consistently has local scope and one enclosing
+  evaluation; use `Program` for caller-scoped statement execution.
+- **Epsil program variables retain their declaration's type on assignment.**
+  `let a = 1; a = "x"; a` previously returned `"x"`; it now reports
+  `assignment-type-mismatch` and returns `1`. Unannotated function-valued
+  variables have type `function`, rather than inheriting the initializer's
+  full signature. They accept successive function values, whose own
+  annotations still check calls; an explicit variable signature remains its
+  contract. A later program may redeclare a name with a new type.
+- **A program ending in a declaration or assignment returns `Nothing`.**
+  `executeEpsil(ce, "let x = 1")` previously returned `1`; append `x` to
+  obtain the stored value. Property stores still return their assigned value
+  when evaluated directly, while a Program assignment statement is valueless.
+- **The Python compilation target is removed.** `compile(expr, { to: 'python' })` now answers as for any target that is not registered
+  ("Compilation target "python" is not registered"), and `PythonTarget` is
+  no longer exported. There were no known users; the target may come back
+  later on the new compiler. A host can still register a target of its own
+  through `LanguageTarget`, under any name. A host target whose `language`
+  is `'python'` no longer gets the behaviours that the engine keyed on that
+  name (for example the lowered type names `float` and `int`, and the
+  refusal of an element-wise operation on a list). The MCP `compile` tool no
+  longer offers `python`. Removed with it, from `BaseCompiler`: the statics
+  `assertAssignmentIsStatement`, `compileExprBroadcastPython`,
+  `tryCompilePythonElementwise`, `withFreshBlockLocals` and
+  `freshBlockLocalName`; `tailValue()` takes one argument; the result of
+  `spellTuplePattern()` has no `pyPattern`.
+- **The experimental profile `'numeric-kernel'` of `compile()` is removed**,
+  with the structured compiler behind it. `profile` now accepts `'ir'`
+  only: `compile(expr, { profile: 'numeric-kernel' })` throws `Invalid compilation option "profile": expected "ir"`, whatever `fallback` says.
+  The fields `pure` and `defaultedSymbols` of a compilation result and of a
+  `canCompile()` answer, which only that profile set, are gone, and so is
+  the value `'numeric-kernel'` of the `profile` field of stored code. From
+  the exported `JavaScriptTarget`, the protected hook `bodyEmitter()` is
+  removed (an override in a subclass is no longer called), and from
+  `BaseCompiler` the statics `assertCapturedCallableBindings`,
+  `resetCompilationMemos` and `resetSharedCompilationBudgets`. The
+  environment values `CE_JS_PROFILE=numeric-kernel` and
+  `CE_JS_PROFILE_SHADOW=1` no longer turn anything on.
+
+### Behavior Changes
+
+- **Runtime-local self-quotients evaluate before cancellation.**
+  `const x = 0; x/x` returned `1`; it now returns `NaN`. Nonzero library
+  constants retain their ordinary self-quotient simplification.
+
+- **A limit with no eligible numeric variable keeps nonnumeric bindings
+  constant.** `function f() { let L = [1, 2]; limit(sum(L), 1) }; f()`
+  returned `1`; it now returns `3`.
+
+- **In the experimental profile `'ir'`, a list or tuple result on JavaScript
+  is no longer a copy.** `run()` returns the value as the code built it, as
+  the default compiler does and as the contract of `run()` states (results
+  are read-only): with `Q: list<real>`, `compile(Q, { profile: 'ir' }).run({ Q })` is the array `Q` itself, where it was a `structuredClone` of it, and
+  `List(A, B)` of two point inputs holds the two input arrays. A list of 16
+  or more constants is built once when the code is loaded, not at each call,
+  and a result can be that shared list. Compiled code still never writes to
+  an input. Measured on the programs of a host's documents: a list or point
+  result took 6 to 13 times the default compiler's time and now takes the
+  same; a program that reads a table of 9,500 numbers took 150 times and now
+  takes 0.7 times. `to: 'interval-js'` still returns a copy.
+- **The experimental profile `'ir'` refuses an input that has no type.** An
+  input typed `unknown` or `any` was read as a real number. It is now
+  refused, on every target and in every mode, with the diagnostic of the
+  default compiler: `compile(List(w, v), { profile: 'ir' })` with `w` and `v`
+  undeclared answers `untyped-input` ("the inputs `w`, `v` have no type…"),
+  with the names in `value`. A name read through `vars` follows the same
+  rule. A name whose use gives it a type (`x` in `x + 1`), a parameter of a
+  function with no declared type, and an input typed by the option `inputs`
+  compile as before.
+- **In the experimental profile `'ir'`, a `Sum` or a `Product` with a
+  constant bound beyond 2^53 − 1 declines**, as the default compiler does
+  (the interpreter gives `out-of-range`). An element-wise operation on a
+  list now counts its passes for a step budget and checks a deadline, as a
+  loop does: `2L + 1` over 100,000 elements inside
+  `ce.withStepBudget({ steps: 3 }, …)` stops with `step-budget`.
+- **Compiled JavaScript: a `_` position of a loop pattern no longer takes a
+  temporary name**, so the temporaries after it in such a loop
+  (`Comprehension(…, Element(Tuple(_, j), Q))`) have other names. The values
+  are the same.
+
+### Bug Fixes
+
+- **A second engine with another precision no longer changes the digits of
+  numbers computed by the first**
+  ([#556](https://github.com/cortex-js/compute-engine/issues/556)). With an
+  engine `a` at precision 30, creating an engine `b` at
+  `precision = 'machine'` made `a.expr(['Sqrt', 2]).N().toString()` give
+  `1.4142135623731` instead of `1.41421356237309504880168872421`. `.N()` of a
+  number, the arithmetic methods of an expression (`add`, `mul`, `div`,
+  `pow`, `root`, `sqrt`, `inv`), the numeric values of `Sqrt`, `Root`, `Ln`
+  and `Power`, and the display of a number now use the precision of their own
+  engine. Trigonometric and special functions still use the precision of the
+  engine that was created or configured last: for them, keep using one engine
+  per program.
+- **A numeric constant tested against a `Set` of numbers is decided by
+  value** ([#593](https://github.com/cortex-js/compute-engine/issues/593)).
+  `Contains(Set(1, 2, 3), ExponentialE)`, `Element(ExponentialE, Set(1, 2))`
+  and `Element(Pi, Set(1, 2))` stayed unevaluated; they are now `False`. A
+  `Filter` whose predicate made that test threw "Filter predicate must
+  return "True" or "False"": `Length(Filter(List(Set(1, 2, 3), Set(3)), b ↦ Contains(b, ExponentialE)))` is now `0`. A value with an unknown is
+  still undecided: `Contains(Set(1, 2), x)` stays unevaluated. `Contains`
+  over a `List` is unchanged: it compares by structure, so
+  `Contains(List(1, 2), x)` is `False`; use `Element` for a membership test
+  with an unknown.
+- **`EllipticF(φ, m)` and the two-operand `EllipticE(φ, m)` no longer overflow
+  far from the real axis.** `EllipticF(0.3 + 400i, 0.5)` was
+  `ComplexInfinity` (1.8540746773i), `EllipticF(355i, 2)` was `0`
+  (1.3110287771i), `EllipticE(0.3 + 300i, 0.5)` was `ComplexInfinity`
+  (2.03e129 + 6.56e129i), and `F(φ|0)` and `E(φ|0)`, which are `φ`, lost
+  digits from `Im φ ≈ −10` and went to infinity from about `Im φ = −20`. `cos φ`, its square and `sin³ φ` left the
+  double range at `|Im φ|` near 355 (F) and 236 (E), long before the value does.
+  Above `|Im φ| = 20` the Carlson arguments are now rescaled by the positive
+  real `e^(−2 Im φ)`, which keeps their phases and so the branch cuts, and
+  `Im φ < 0` follows by oddness. `F(φ|0) = E(φ|0) = φ`. `EllipticE` stays
+  unevaluated where its value leaves the double range, near `|Im φ| = 709`
+  for `m = 1` and later for a smaller `|m|`: `EllipticE(708i, 1)` is
+  `i·sinh(708)`, and `EllipticE(0.3 + 715i, 10^(-8))` is
+  `4.899e305 + 1.584e306i`. Against mpmath over 3,200 points (`|Im φ|` from 1
+  to 1e4, `Re φ` across several periods, real and complex `m` on both sides of
+  0 and 1) the relative error is under 6e-16 for F and 7e-15 for E. (#605,
+  PR #606, contributed by [enumeratio](https://github.com/enumeratio))
+
+- **`Arccot` of a complex number next to a negative real number is next to
+  the value at that real number** ([#563](https://github.com/cortex-js/compute-engine/issues/563)).
+  `Arccot(-3)` is `2.8198…`, in the range `(0, π)` of the engine, but
+  `N(Arccot(-3 + 10^-12 i))` was `-0.3217… - 10^-13 i`: the complex value
+  was `Arctan(1/z)`, which differs by `π` when the real part is negative.
+  The complex value is now `π/2 - Arctan(z)`, also in compiled JavaScript
+  code: it is continuous across the real line, and its branch cuts are those
+  of `Arctan`, the imaginary axis above `i` and below `-i`
+  (`N(Arccot(-2i))` is `π + 0.549i`, and `N(Arccot(0.5i))` is
+  `π/2 - 0.549i`). No value at a real argument changes. `simplify()` now
+  also rewrites `Arccot(-x)` as `π - Arccot(x)`.
+- **`LogIntegral(x)` at machine precision is accurate for a large `x`.** It
+  was computed as `ExpIntegralEi(ln(x))`, so the rounding error of `ln(x)`
+  was multiplied by `ln(x)`: `LogIntegral(1e300)` was
+  `1.4497500526693022e+297`, with a relative error of `2.3e-14` (about 100
+  units in the last place). The largest error measured from `7.5` to the
+  largest double is now 1.6 units in the last place: `LogIntegral(1e300)` is
+  `1.4497500526693365e+297`, and the correctly rounded value is
+  `1.4497500526693362e+297`. Compiled JavaScript code gets the same values.
+- **`BesselY(n, x)` at machine precision is `-oo` or `+oo` when its value
+  overflows a double.** `BesselY(200, 1)` was `NaN`: the recurrence on the
+  order reached an infinite value and the next step computed `∞ − ∞`. It is
+  now `-oo` (its value is about `-2.02e432`), and `BesselY(-201, 1)` is
+  `+oo`.
+- **`Rationalize(x, tolerance)` keeps a tolerance below double precision.**
+  The convergents were computed with doubles, so
+  `Rationalize(0.12345678901234567890123, 10^-25)` gave `4115227/33333339`,
+  which is `1.9e-16` from `x`. The convergents are now computed exactly, and
+  the result is `24324377007729/197027455535852`. An exact rational `x` or
+  tolerance is read as its numerator and denominator, any other value at
+  working precision. A positive tolerance below the smallest double
+  (`10^-400`) is now a tolerance too.
+- **`IntegerString(n)` of a symbol with no value stays unevaluated.** It was
+  the error `incompatible-type` with the same type, `integer`, given as the
+  expected type and as the actual type. The same applies to the base:
+  `IntegerString(5, b)` stays unevaluated. A value that is not an integer is
+  still a type error. A base that is an integer too large for a small integer
+  (`IntegerString(5, 10^30)`) is now `out-of-range`, as a base above 36 is.
+- **`EulerE(n, z)` of a complex `z` has a value**
+  ([#598](https://github.com/cortex-js/compute-engine/issues/598)). It stayed
+  unevaluated. `EulerE(3, 1+2i)` is now the exact `-25/4 - 8i`, and a complex
+  with float parts gives a float, with the precision of a bignum part. A
+  complex with a radical (`EulerE(2, √2·i)`) gives the polynomial at that
+  point, `-2 - √2·i`.
+- **The derivatives of `EllipticK`, `EllipticE`, `LambertW`, `PolyLog` and
+  `LerchPhi` have a value at 0, and their series at 0 is computed**
+  ([#591](https://github.com/cortex-js/compute-engine/issues/591)).
+  `Apply(Derivative(EllipticK), 0)` gave `NaN` and now gives `π/8`;
+  `Apply(Derivative(EllipticK, 2), 0)` gives `9π/64`, and
+  `Apply(Derivative(EllipticE, 2), 0)` gives `-3π/64`, not `~oo`. The
+  derivative in `z` of `x ↦ PolyLog(s, x)` and `x ↦ LerchPhi(x, s, a)` at 0
+  has a value too. `Series(EllipticK(m), m, 0, 3)` is
+  `π/2 + πm/8 + 9πm²/128 + 25πm³/512 + O(m⁴)`, and the series of
+  `EllipticE`, `PolyLog(2, x)` and `LambertW(x)` at 0 are no longer left
+  unevaluated. The value of the closed form `D(EllipticK(m), m)` after the
+  substitution `m = 0` is still `NaN`, and so is the compiled
+  `Apply(Derivative(EllipticK), x)` at `x = 0`.
+- **`Beta(a, b)` is 0 where `a + b` is a pole of Γ and `a`, `b` are not
+  integers**
+  ([#590](https://github.com/cortex-js/compute-engine/issues/590)).
+  `Beta(-1/2, -1/2)` and `Beta(-5/2, 1/2)` stayed unevaluated under
+  `evaluate()`, and their `.N()` and `Beta(-2.5, 0.5)` gave `NaN`; they now
+  give `0`, also at a precision above the machine precision and in compiled
+  code. `Beta(1/3, -4/3).N()` gives `0`, not `-2.4e-30`. Compiled
+  `Beta(x, y)` at a negative integer and a positive integer whose poles
+  cancel gives the value of the interpreter, not `NaN`: `1/6` at
+  `x = 2, y = -3` and at `x = -3, y = 2`, `-1` at `x = -1, y = 1`.
+
+- **`.N()` of a divergent infinite sum whose terms overflow in doubles
+  returns.** `\sum_{k=0}^{\infty} \frac{k + k!}{k!}`, whose terms tend to 1,
+  did not return in minutes: each term computed the exact `k!` up to
+  `k = 32768`. Such a sum now stays unevaluated after about 0.2 s. The walk
+  also stops at once when a term is not a finite number (a pole, such as
+  the term at `k = 0` of `\sum_{k=0}^{\infty} \frac{(k+1)!}{k! k^2}`), and
+  the sum stays unevaluated, as before.
+- **The LaTeX of a derivative of negative order reads back as the same
+  expression.** `["Derivative", "f", -1]` gave `f^{(-1)}`, which reads back
+  as `1/f` when `f` is not declared a function; it now gives
+  `\operatorname{Derivative}(f, -1)`. Applied to an argument it gives
+  `\operatorname{Apply}(\operatorname{Derivative}(f, -1), x)`.
+- **Epsil text for a product nested in a product reads back as the same
+  expression when a factor is `%` or `/`.** `serializeEpsil(["Multiply", "a", ["Multiply", ["Mod", "x", 2], "b"]])` gave `a * x % 2 * b`, which
+  reads back as `((a * x) % 2) * b`; it now gives `a * (x % 2 * b)`. A sum
+  nested in a sum is written the same way: `a + (x - y + b)`.
+- **`EisensteinE` of a high weight is correct when the imaginary part of τ
+  is small.** `EisensteinE(100, 0.4 + 0.87i)` gave `80080.27 + 104512.03i`
+  (the value is `49.3281 − 59.3508i`), and `EisensteinE(400, 0.4 + 0.87i)`
+  gave `ComplexInfinity` (the value is `−31507089.95 + 13619148.95i`). For a
+  weight of 4 or more, τ is now first moved into the fundamental domain, and
+  a weight of 20 or more is computed by the lattice sum. A value too large
+  for a double stays unevaluated, and so does a value whose rounding error,
+  multiplied by the factor (cτ + d)^\{−s\} of the reduction, is more than 10⁻⁸
+  of it: this happens near a zero of `EisensteinE`, as at
+  `EisensteinE(102, 0.5 + 0.5i)`, whose value is 0.
+- **A function returned by another function no longer gets a `scope` effect
+  in its type for a loop that assigns its own index.** With
+  `mk := y ↦ (x ↦ Block(Loop(Assign(i, i + 1), Element(i, [1, 2])), x + y))`,
+  the type of `mk(q)` was `(x: unknown) scope -> number`, as if the loop
+  wrote a variable outside the function. It is `(x: unknown) -> number`.
+- **In the experimental profile `'ir'`, a sum whose bounds reach 2^53 at run
+  time never returned.** `Sum(Sin(x + k), k = n..n + 2)` at `n = 2^53` ran
+  forever: the index could not advance. A loop now counts its passes and
+  always ends; its value for such bounds is not specified.
+- **In the experimental profile `'ir'`, `Floor(x/49)` at `x = 49` gave 0.**
+  A product by a rational constant was compiled as a product by the double
+  of the constant (`0.0204… · x`), so a `Floor`, `Ceil`, `Round`, `Mod` or a
+  comparison of a quotient that is an integer could be off by one. A rational
+  factor whose denominator is not a power of two is now a division
+  (`x / 49`), also when a name holds the rational, on JavaScript and on GLSL
+  (where a helper gives the exact quotient when it is an integer or a half,
+  for a dividend below 2^23).
+- **In the experimental profile `'ir'`, a product of two matrices, of a
+  matrix and a list, and a power of a matrix were computed element by
+  element.** They now decline: the interpreter's value is the matrix product
+  or power.
+- **In the experimental profile `'ir'`, an improper integral whose integrand
+  overflows gave a wrong number that changed at each run**
+  (`∫₀^∞ x^100·e^−x dx`). It is now `NaN`. An integral that the quadrature
+  cannot settle and whose integrand is finite keeps its estimate, as with
+  the default compiler.
+- **In the experimental profile `'ir'`, an assignment in a bound of a `Sum`
+  or a `Product` took effect.** Such a sum now declines.
+- **On `interval-js`, `GCD` with a zero operand or two equal negative
+  operands is no longer negative.** `GCD(0, -2)` gave `[-2, -2]`; it is
+  `[2, 2]`. The kernel `gcd` of the interval library is fixed, so the
+  existing target and the profile `'ir'` both give it.
+- **In the experimental profile `'ir'`, `broadcast()` with
+  `entryChecks: false` refused a list input** that every cell shares.
+
+### Improvements
+
+- **`BigDecimal` operations take an optional precision argument.** Each
+  operation that rounds (`div`, `inv`, `pow`, `sqrt`, `cbrt`, `nthRoot`,
+  `exp`, `ln`, `log`, and the trigonometric and hyperbolic functions) or
+  bounds its result (`add`, `sub`, `addBounded`, `subBounded`, `mulBounded`)
+  takes a last argument `prec`, the number of significant digits. It defaults
+  to `BigDecimal.precision`. `BigDecimal.pi(prec)` and
+  `BigDecimal.eulerGamma(prec)` return the constants at a given precision.
+  For example, `new BigDecimal(2).sqrt(40)` is rounded to 40 significant
+  digits whatever the value of `BigDecimal.precision`.
+- **`Hypergeometric2F1` has a derivative in `z`, and `Series` of it
+  expands.** `D(₂F₁(a, b; c; z), z)` is `(ab/c)·₂F₁(a + 1, b + 1; c + 1; z)`
+  (DLMF 15.5.1; the parameters keep the inert partial), so the chain rule
+  works through the argument, and `Series(₂F₁(1, 1; 3; x), x, 0, 3)` was
+  unevaluated and is `1 + x/3 + x²/6 + x³/10 + O(x⁴)`, the coefficients
+  `(a)ₖ(b)ₖ/((c)ₖ k!)`. A terminating `₂F₁` (`a` or `b` a non-positive
+  integer) is its polynomial and expands exactly about any point:
+  `Series(₂F₁(−2, 3; 4; x), x, 0, 5)` is `1 − 3x/2 + 3x²/5` with no `O(·)`
+  term, and about 1 it is `1/10 − 3(x − 1)/10 + 3(x − 1)²/5`. The expansion
+  of a non-terminating `₂F₁` still declines where it is not a Taylor series:
+  at an argument that is a real number `≥ 1` (the branch point and the cut),
+  an exact one such as `π` included, at an argument with no value at the
+  point (`(1 − cos x)/x²` at 0), and at ±∞. Any `₂F₁` declines when `c`
+  is a non-positive integer `−m` and the series does not terminate at a
+  degree `≤ m`, where the function is not defined. (#597, PR #603,
+  contributed by [enumeratio](https://github.com/enumeratio))
+
+- **`HarmonicNumber(r)` evaluates at a rational with an exact digamma**
+  ([#598](https://github.com/cortex-js/compute-engine/issues/598)).
+  `HarmonicNumber(1/2)` stayed unevaluated and is `2 − 2 ln 2`,
+  `HarmonicNumber(1/3)` is `3 − (3/2) ln 3 − π√3/6`: for a rational `r` whose
+  `Digamma(r + 1)` has an exact value (denominators 1 to 4),
+  `H(r) = ψ(r + 1) + γ` (DLMF 5.15.2). Another rational (`1/5`) and the
+  generalized `HarmonicNumber(r, 2)` stay unevaluated under `evaluate()`;
+  `N()` is unchanged. (PR #604, contributed by
+  [enumeratio](https://github.com/enumeratio))
+
+- **`Series` of a function whose derivative is algebraic (`Arctan`, `Arcsin`,
+  `Arccos`, `Arccot`, `Arsinh`, `Arcosh`, `Artanh`, `Arcoth`, `Arsech`, `Ln`)
+  no longer takes time exponential in the order.**
+  `Series(Arctan(x), x, 0, 9)` took about 6 s and now takes about 0.1 s; at
+  order 11 it took about 20 s. The expansion differentiated the function once
+  per order, and the derivatives of `Arctan` grow with the order. When the
+  derivative of the function is built from arithmetic operators and powers,
+  its series is now expanded and integrated term by term. The coefficients
+  have the same values, but some are written in another form
+  (`Series(Arctan(x), x, a, 3)` has the cubic coefficient
+  `(4a²/(a² + 1)³ − 1/(a² + 1)²)/3`). `Series(Arcsin(√x), x, 0, 5)`, which
+  stayed unevaluated, now gives `√x + x^(3/2)/6 + 3x^(5/2)/40 + …`. (#588,
+  PR #589, contributed by [enumeratio](https://github.com/enumeratio))
+- **The experimental profile `'ir'` compiles `Apply` of a function literal
+  over a list, and more list operators.** `Apply(k ↦ body, L)` of a literal of
+  one parameter over a flat list of numbers is compiled as `Map` is, as the
+  interpreter evaluates it: with `x: real`, `m: real`,
+  `compile(Min(Apply(k ↦ Which(k = m, 10^9, True, k), List(x^2, (x − 1)^2, (x − 2)^2))), { profile: 'ir' })`
+  gives 0.49 at `x = 0.3`, `m = 0.09` on JavaScript, and compiles for GLSL
+  and for `interval-js`.
+  On GLSL a `Map` over a list of 1 to 64 elements whose length is known at
+  compile time now compiles (the body is written once per element). `Min(x)`
+  and `Max(x)` of one number are `x`. On JavaScript the profile also compiles
+  `ListJoin`, `Zip`, a `Comprehension` of several clauses whose lists do not
+  read an earlier index, `Choose` and `Binomial` of integers,
+  `RandomShuffle` and `RandomChoice(Interval(0, 1), n)` (under
+  `WithRandomSeed` they give the interpreter's numbers), and `If` with a
+  boolean arm and no else arm (`False` where the condition is false, also on
+  GLSL). A nested list, a tuple or a list of points as the argument of
+  `Apply`, and a literal of several parameters with a list argument, are not
+  compiled by the profile.
+- **The experimental profile `'ir'` compiles a call of a user function with
+  a list argument** when every parameter of the function is a scalar: the
+  function is mapped over the list, as the interpreter evaluates it, on
+  JavaScript, on GLSL (a list of a length known at compile time) and for
+  `interval-js`. With `h(x, b) := b^x`, `h(0.5, List(2, 4, 8, 16))` gives
+  `[1.414…, 2, 2.828…, 4]`; lists of one length are taken element by element
+  together, and a scalar argument is passed to each call. A nested list, lists
+  of different lengths, a list for a function whose result is a list, and a
+  recursive call with a list argument are not compiled by the profile.
+- **Code of the experimental profile `'ir'` runs lists and loops faster.**
+  A list is built in one preallocated array, two element-wise operations
+  in a row are one loop, and a loop checks its deadline once per 1,024
+  passes, not at each pass. Measured per call: `2L + 1` over 1,000 elements
+  41 µs before, 0.85 µs now (the default compiler: 6.1 µs);
+  `Sum(Sin(L)·x)` over 1,000 elements 47 µs, 5.6 µs (6.0 µs);
+  `Sum(k·x, k = 1..200)` 240 ns, 126 ns (155 ns). The values are the same.
+- **Code of the experimental profile `'ir'` computes the invariant part of a
+  loop once.** A part of the body of a `Sum`, a `Product`, a `Loop`, a `Map`
+  or a `Filter` that does not depend on the index is computed before the
+  loop, on JavaScript, on GLSL and in the interval mode: in
+  `Sum(Max(Max(L), k), k = 1..n)`, `Max(L)` is computed once. A part that
+  can fail (a call of a user function, an inner loop, a `Filter`) moves only
+  out of a loop of constant bounds that runs at least once, so a loop of no
+  pass at run time calls no function; a loop or a `Map` over the elements of
+  a list that exists (`Max(L)`) moves out of any loop and then runs once
+  where the loop has no pass (in the interval mode with an
+  `iterationBudget`, a loop over a list does not move).
+  Measured per call: that sum with 1,000 elements in `L`
+  and `n = 1000`, 449 µs before, 2.0 µs now (the default compiler: 5.4 µs);
+  Tycho's `voronoi-diagram`, whose `B(x, y)` called three functions that do
+  not read its index in a sum of 16 terms, 0.43 ms, 0.054 ms on JavaScript
+  (0.014 ms), and 41 ms, 4.2 ms in the interval mode (the existing interval
+  target: 0.72 ms). The values are the same, except under an
+  `iterationBudget`: a moved call counts the passes of its `Loop`s once, so
+  `Sum(f(x)·k, k = 1..3)`, whose `f` runs a `Loop` of 100 passes, gives its
+  value under a budget of 150, where it threw.
+- **The experimental profile `'ir'` compiles an input that is a list of
+  points on JavaScript.** An input of type `list<tuple<real, real>>` (or of
+  three or more numbers per tuple, with a stated or a run-time length) is
+  given as an array of arrays: with `P: list<tuple<real, real>>`,
+  `Sum(Abs(P))` at `P = [[3, 4], [6, 8]]` is 15, and `P − T` subtracts the
+  point `T` from each point. `At` with a constant index, `PointX`, `Length`,
+  `Map`, `Filter`, `Comprehension`, `Distance`, and a product or a quotient
+  by a list of numbers of the same length apply to it; a user function can
+  take such a list and return one. GLSL declines a list of points. The rows
+  are not checked at the entry: a row of another length gives an unspecified
+  result.
+- **The experimental profile `'ir'` compiles for `interval-js`.**
+  `compile(expr, { to: 'interval-js', profile: 'ir' })` compiles scalar
+  arithmetic, the elementary functions, powers, comparisons, `If`, `Which`,
+  `And`, `Or`, `Not`, locals of a `Block`, `Sum` and `Product` with `Limits`,
+  `Random()` (the interval `[0, 1]`) and calls of user functions that are
+  not recursive, with the result shapes of the target (an `IntervalResult`,
+  or the verdict `'true'`, `'false'` or `'maybe'`). Where a condition is
+  undecided over the input box, both arms are evaluated and the result is
+  their hull; a local assigned in both arms has the hull of both values.
+  Lists and tuples compile too, as arrays of such values: `At` (an index
+  that is an interval gives the hull of the elements it can select),
+  element-wise operations, `Sum`, `Product`, `Max`, `Min` and `Length` of a
+  list, `Map`, a comprehension over a `Range`, `Filter`, and list or point
+  inputs and results. A list whose length is not one number over the input
+  box (a `Filter` with an undecided condition, a `Range` with a wide bound)
+  is `entire`. A decimal literal is the point at its double, as in the
+  JavaScript code (`x + 1.8` adds the point `[1.8, 1.8]`), and a float
+  exponent is read as the interpreter reads it: `x^0.2` is the real root of
+  a negative `x`, `x^1.5` has no value there. A difference is one
+  `_IA.sub`, and a rational exponent whose denominator is a power of 2
+  (`x^(3/2)`) is the power of its double, as on the existing target, with
+  its bounds. `Binomial` and `Choose` of
+  real operands compile (`_IA.binomial`). A comparison that the engine
+  decides for every value of its inputs (`(x + 1)^2 < 0` or `Equal(x, x)`
+  of a real `x`) is that verdict, as on the existing target. A value that
+  reads no input is computed once: each constant when the code is loaded
+  (`preambleOnce`), and a call of constant arguments that runs at every
+  call (`b(3π)`) at the first call; if it throws there, every call is
+  `entire`, as when it is computed at each call. A `Sum` or a `Product` of
+  integer constant bounds and at most 100 passes is written out, term by
+  term in ascending order, so that a part that reads only the index is
+  computed once: `2/π · Sum((-1)^i/i · sin(i·x), i = 1..100) + 3` takes 34 µs per
+  call, where it took 75 µs in a loop (the existing target: 32 µs). A body
+  with a random draw, with a `Loop` or with a call of a recursive function
+  keeps the loop. An integral of one
+  variable (`Integrate` with one `Limits`, `NIntegrate`) is the enclosure
+  of the existing target, with the same number of pieces, or the closed
+  form of the engine's antiderivative where the existing target uses one
+  (an indefinite integral is its closed form); with an angular unit other
+  than radians it is the enclosure only. A `Loop` over a `Range` or a list
+  compiles: a local that its passes assign holds the hull of both arms of
+  an undecided `If` (the existing target answers `entire`), a bound that is
+  not one integer over the box gives `entire`, and with an
+  `iterationBudget` each pass counts one pass of the call, as on the
+  existing target, and a call over the budget throws the same
+  `CancellationError`. A value computed once at the first call (a call of
+  constant arguments) counts its passes apart, so a program that the
+  existing target cancels can give a value, and the first call can run up
+  to twice the budget. Any other program declines, and
+  with `fallback` the existing target then compiles it: an integral of
+  several `Limits`, a `Loop` with a `Break`, a `Continue` or a `Return`, a
+  recursive function, a `Range` of real operands. Without the option
+  `profile`, nothing changes.
+- **With the profile `'ir'`, two calls of a user function with the same
+  arguments are one call** on every target (JavaScript, GLSL,
+  `interval-js`), when the function draws no random number, directly or
+  through a call, and is not recursive. A function `a_1(x)` that calls
+  `a_0(x)` five times calls it once, so a chain of such functions runs in a
+  time proportional to its length, not exponential in it.
+- **With the profile `'ir'`, equal sub-expressions are compiled once** on
+  every target, also when the expression writes them as separate copies (as
+  a MathJSON tree does): two copies are equal when they have the same
+  operators, operands and numbers, and each name resolves to the same
+  definition. A recurrence of points in which each of five levels reads the
+  level below five times compiled in 4.5 s to code of 4.2 MB that took 36 ms
+  per call; it now compiles in 43 ms to code of 11 KB that takes 2.7 µs per
+  call (the default compiler: 10 µs). A sub-expression that draws a random
+  number is still computed at each place it is written.
+- **The interval library has the kernels `atLeast(v, c)` and
+  `atMost(v, c)`** (the value `v` with its lower end raised to that of `c`,
+  or its upper end lowered to that of `c`), **`number(x)`** (the number of
+  a point that is an integer, an `UndecidedConditionError` otherwise) and
+  **`undecided(message)`**, which throws that error, and
+  **`rangeCount(lo, hi, step)`**, the number of elements of a `Range` of
+  numbers. They are members of `IntervalArithmetic`.
+- **The interval library has a kernel `powReal(base, exponent, digits?)`**,
+  also a member of `IntervalArithmetic`: the power for an exponent given as
+  an interval. A point exponent that is not an integer is read as the
+  interpreter reads a float exponent, to `digits` significant digits (by
+  default those of the working precision): a rational of odd denominator
+  gives the real root of a negative base (`powReal([-8, -8], [0.2, 0.2])` is
+  about `-1.5157`), any other float has no real value there
+  (`powReal([-8, -8], [1.5, 1.5])` is `empty`).
+- **The experimental profile `'ir'` compiles a name whose value is an
+  expression**, on JavaScript, GLSL and `interval-js`: the value is lowered
+  where the name is read, as the existing compiler does. With `x_1` and `x_2`
+  inputs and `P := (x_1, 2x_2)`, `At(P, 2) + x_1` reads both inputs; a list
+  computed from constants (`R := Map(t ↦ 2t, Range(0, 100))`) and a list of
+  exact constants (`k := (1, e^(2/5))`, enclosed in the interval mode) compile
+  too, where they declined. The name stays in `symbolDeps`. Such a value
+  still declines when it reads the name again, has an effect (a draw, a name
+  of `vars`), or does not fit the declared type of the name, and when a name
+  that it reads may be a local, a parameter or an index where the name is
+  read: with `R := (n, 2n)`, `Sum(At(R, 1) + n, n = 1..3)` declines, since
+  `R` reads the global `n` (the same read already lowered outside the `Sum`
+  is reused, with the global `n`). A value of a library constant that is not
+  a number (`GoldenRatio`) still declines.
+
+## 0.192.0 _2026-11-15_
+
+This is the content first numbered 0.191.0, a version that was not published.
+
+### Breaking Changes
+
+- The field `epoch` of `TypeProvenanceEntry` is removed. No part of the
+  engine read it. The entries are reached through the internal field
+  `_typeProvenance` of a definition.
+- **A copy of a parameter into a local is no longer a use of the
+  parameter.** Whether a function with an untyped parameter takes a list
+  argument whole or is applied to each element is decided by the direct uses
+  of the parameter only. `function h(xs) { let ys = xs; mean(ys) }` with
+  `h([1, 2, 3])` gives `[1, 2, 3]`, where it gave `2`; the same holds for a
+  component of a tuple local (`let q = (s, 0)`, then `take(q[1], 2)`) and a
+  leaf of a destructuring (`let (a, b) = (s, 0)`). Declare the parameter to
+  take the list whole: `function h(xs: list) { … }`.
+- **A parameter with no written type that the body reads by index takes a
+  list argument whole.** `h(v) = v[1] + v[2]` is still typed
+  `(v: tuple<number, number>) -> number`, but that type no longer makes a
+  call over a list of points one call per point: `h([(1, 2), (3, 4)])` is
+  `(4, 6)` (the first point plus the second), where it was `[3, 7]`. The
+  direct application `Apply(v ↦ v[1] + v[2], [(1, 2), (3, 4)])` already gave
+  `(4, 6)`, and both now agree. Compiled JavaScript gives `[4, 6]`, the
+  same point as an array. On `interval-js` the call declines, as `L[1]` does
+  that is a row or a point and is used as a value (it gave the whole real
+  line); GLSL declines it too. A list at another
+  parameter is still applied element by element, as before. To apply the
+  function to each point, declare the parameter:
+  `h2(v: tuple<number, number>) = v[1] + v[2]` gives `[3, 7]`.
+
+### Improvements
+
+- **`ce.macroNames`** is the read-only set of the names that were declared
+  as a macro on the engine (`ce.declare(name, { macro })`), in any scope. The
+  set of an engine with no macro is empty, so a host can skip its own macro
+  handling. The set never shrinks: a name that is not in it is not a macro in
+  any scope, and for a name that is in it `ce.lookupDefinition(name)` gives
+  the definition that the current scope reads (CE-1324).
+- **The experimental profile `'ir'` compiles to GLSL.**
+  `compile(expr, { to: 'glsl', profile: 'ir' })` compiles with the new
+  compiler a real, integer, boolean, complex or colour result, or a list of
+  stated length, of scalar inputs and of inputs that are tuples or lists of a stated length,
+  and gives a GLSL result. A point, or a list of 2 to 4 numbers, is a `vec2`,
+  `vec3` or `vec4`, as a result and as an input: `Tuple(Cos(t), Sin(t))` is
+  `vec2(cos(t), sin(t))`, and an input `P: tuple<real, real>` has
+  `freeSymbolTypes.P.lowered` equal to `vec2`, as with the existing GLSL
+  target; a list of another length is a `float[n]`, as a result and as an
+  input (`L: list<real^6>` is `float[6]`). `At(L, k)` with an index known
+  only at run time reads the element from 1, from the end when `k` is
+  negative, and is NaN for an index that is 0, not an integer or out of
+  range. A `Sum` or a `Product` of more passes than `iterationBudget`
+  (10,000 by default, as on the existing GLSL target) is NaN; a program
+  whose loops, nested ones included, can run more passes in all declines. A parameter of a user function declared
+  `tuple<real, real>` is a `vec2` (an array on JavaScript), and so is a
+  result declared `tuple<real, real>`; a result declared `list<real^3>` is a
+  `vec3`. A user function can read an input that is a point, a list in
+  storage, or a list of at most 4 elements (GLSL would copy a longer array
+  at each call). A list parameter of a user function declared with no length
+  (`H: list<integer>`) takes on GLSL the stated length of its argument: with
+  `H_1: list<integer^90001>`, `c(H_1, x)` compiles, and a second call of `c`
+  with a list of another length declines. An element-wise operation over a list of more than 64
+  elements declines. With `storage: { S: 'sampler2D' }`, the list input `S`
+  is read from a texture that the host uploads as for the existing GLSL
+  target (one value per texel of a single-channel float texture, row-major
+  from texel (0, 0), of any width): `At(S, k)`, a `Sum`, `Max` or
+  element-wise operation over `S`, and a user function that reads `S` or
+  takes it as a list argument read its texels; `S` as a value (the result,
+  an arm of an `If`, the result of a function) declines. `callerLocals` is
+  accepted and changes nothing: a user function always takes the inputs
+  that its body reads as parameters. A `Mod` or
+  `Fract` of a trigonometric value amplified by a constant of magnitude 1000
+  or more (a sine hash) has the warning `float32-unsafe-argument` in
+  `warnings`, also where the existing target compiles an exact form. `code`
+  is an expression, or statements that end in `return`, in which an input is
+  its name; `preamble` holds the helpers, named `_gpu_ir_…`, and the user
+  functions, named `_fn_ir_…`; `freeSymbols` and `freeSymbolTypes` list the
+  inputs. With `vars`, a name is read as the host's text, which must be a
+  name, or a member or an element of one (`u_x`, `u.P`, `u[0]`), and the
+  name stays in `freeSymbols`. Declined: a list input of a run-time length,
+  a list result of a user function of a run-time length, a result declared
+  with complex elements, a `Function` literal, a `vars`
+  text of another form or a `vars` name that has a value, and the options
+  `functions`, `operators`, `imports`, `preamble`, `strictTypes`,
+  `broadcast` and the mode `'bigint'`; with `fallback`, the existing
+  GLSL target then compiles the expression. On JavaScript the profile now
+  compiles an input of a tuple type such as `tuple<real, real>`, given as an
+  array (`run({ P: [1, 2] })`), a user function that returns a point or a
+  list of a stated length, and one that reads a list or point input.
+- **The experimental profile `'ir'` compiles complex numbers and colours to
+  GLSL.** A complex value is a `vec2` (real part, imaginary part), as an
+  input, a result, a local, and a parameter or a result of a user function:
+  with `z: complex`, `Sqrt(z)·x` is `_gpu_ir_cmul(vec2(x, 0.0), _gpu_ir_csqrt(z))` and `freeSymbolTypes.z.lowered` is `vec2`. The
+  arithmetic, `Real`, `Imaginary`, `Conjugate`, `Abs`, `Argument`, `Exp`,
+  `Ln`, `Sqrt`, `Power`, the six trigonometric and hyperbolic functions
+  `Sin` to `Tanh`, a `Sum` and a `Product` compile, and `mode: 'complex'` is
+  accepted; the inverse functions, `Root`, `Log`, the reciprocal functions
+  and a list of complex numbers decline. A colour is an OKLCh `vec3`:
+  `Rgb`, `Hsl`, `Hsv`, `Oklab`, `Oklch` and `AsOklch` compile, and `AsOklab`
+  or `AsRgb` when it is the result of the expression, so
+  `AsOklab(Hsv(h, 1, 1))` compiles; on JavaScript a colour is the object
+  `{ space, c0, c1, c2, alpha }` of the default compiler. On both targets a
+  name that holds a colour of three numbers (`C` with the value
+  `Hsv(270, 0.4, 0.95)`) compiles as that colour, and a user function can
+  return a colour. An alpha, a colour input or parameter and a list of
+  colours decline. A GLSL number is now written with the fewest digits that
+  give the same single float (`0.1`, where it was `0.10000000149011612`).
+- **The experimental profile `'ir'` compiles arithmetic on points, sums with
+  bounds that are not integers, and `Apply` of a function literal.** With
+  `P` and `Q` of type `tuple<real, real>`: `P + 2Q` is a point, `Abs(P)` is
+  its length (5 at `P = (3, 4)`), `Distance(P, Q)` is the length of `P − Q`,
+  on JavaScript and on GLSL; on JavaScript a point can be added to a list of
+  points, `Abs` and `PointX` apply to a list of points, and
+  `PointList(L1, L2)` of two lists is a list of points as long as the
+  shorter one. A product of two points and a point plus a number decline, as
+  the interpreter refuses them. A user function with no declared types can
+  take and return points: a parameter with no declared type is a point when
+  the argument of the function's first call is one, and a later call with
+  an argument of another shape declines. A name that holds a point written
+  as `PointList(0.7, -0.4)` compiles as that point. A bound of a `Sum` or a
+  `Product` of a real type is floored, as the interpreter does:
+  `Sum(k, Limits(k, 1, n))` at `n = 3.7` is 6. On JavaScript a `Range` takes
+  real operands (`Range(0.5, 3.7)` is `[0.5, 1.5, 2.5, 3.5]`). A bound or an
+  operand of `Range` that is a constant infinity or `NaN` declines.
+  `Apply(Function(body, p), a)` with scalar arguments compiles as the body
+  with the parameter bound; a list or tuple argument declines, since the
+  interpreter may map the function over it.
+- **The code of the experimental profile `'ir'` can be stored, loaded and
+  sent to a worker.** A result of `compile(expr, { profile: 'ir' })` now has
+  `runtimeVersion`, `preambleOnce` and `entryPlan`, as a result of the
+  default compiler has: `createJavaScriptRuntime().load()` and
+  `loadBroadcast()` run a copy of it, and a kernel pool runs it on its
+  workers (`FindFit.evaluateAsync()` scans on the pool). In 0.190.0 the
+  loaders refused such code. `shippable` is `false` for code that draws a
+  random number or computes an integral, as for the default compiler. The
+  `run()` of the result checks its inputs and returns its value as a loaded
+  copy does: `Multiply(Z, 2)` with `Z: complex` at `Z = 1.5` gives `3`, where
+  it gave `{ re: 3, im: 0 }`.
+- **The experimental profile `'ir'` compiles `mode: 'bigint'`.** Every
+  integer is a JavaScript `bigint`, so a program of integers is exact at any
+  size: with `n: integer`, `compile(Mod(n, 10), { profile: 'ir', mode: 'bigint' })` gives `7n` at `n = 2n ** 60n + 1n`. The inputs, the results
+  and the value at a pole (`NaN` or `Infinity`) are those of the default
+  compiler's `bigint` mode. A program with a value that is not an integer or
+  a boolean declines with `outside-profile`: a real input or literal, `n/2`,
+  `Floor(n/3)`, `Floor(Sqrt(n))`, `n < 7/2`, `n^m` (the exponent can be
+  negative), `Floor(n)`, `If` with no else, `Max` of a list, and the option
+  `vars`.
+- **A result of the experimental profile `'ir'` runs batches and
+  `runAsync()`.** A result of `compile(expr, { profile: 'ir' })` has
+  `broadcast()`, `broadcastAsync()`, `willUsePool()`, `runAsync()` and
+  `willParallelize()`, as a result of the default compiler has, and the
+  option `broadcast: true` no longer declines. Each cell of a batch is the
+  value of `run()` at that cell, with the layouts, `out` and shared lists of
+  the default compiler, and `broadcastAsync()` sends a large batch of
+  shippable code to the engine's worker pool. `runAsync()` runs `run()`:
+  the profile sends no loop to the pool. In `mode: 'bigint'` a batch is
+  refused, as with the default compiler. A result with a `vars` text that
+  reads the inputs object (`vars: { E: '_.E' }`) is now shippable, as with
+  the default compiler.
+- **In the experimental profile `'ir'`, a square root or a logarithm of an
+  operand that the engine proves negative is complex in the default mode.**
+  With `x: real`, `compile(Sqrt(-x^2 - 1), { profile: 'ir' })` gives
+  `{ re: 0, im: 1.8027756377319946 }` at `x = 1.5`, where it gave `NaN`, as
+  the interpreter and the default compiler do; `Sqrt(x)` stays `NaN` at
+  `x = -4`. An operator whose library definition a host gave a `compile`
+  handler or `compileHelpers` (`ce.lookupDefinition('At').operator.compile = …`) now declines with `outside-profile`, since the profile does not call
+  that handler: before, it compiled the operator's stock value.
+
+### Behavior Changes
+
+- **The end of a function call no longer rebuilds the function literals of
+  its result.** A function literal becomes a function value when it is
+  evaluated, and that value keeps the variables of the call that made it;
+  the result of a call was walked a second time, to rebuild each function
+  literal on the call, and it is not any more. Two results change, both for
+  a function literal that the call did not evaluate, such as a branch of an
+  `If` or a `Which` whose condition has no value yet. With
+  `mk := n ↦ If(c > 0, () ↦ Block(n := n + 1, n), 0)` and `c` with no
+  value, `mk(5)` stays `mk(5)`, where it gave the `If`; evaluated once `c`
+  has a value, it gives the counter, as before. With
+  `f := a ↦ Block(Declare(k, "unknown", a), If(c, x ↦ k + x, x ↦ 0))`, the
+  function of the branch of `f(5)` no longer reads the local `k` once `c`
+  has a value: applied to `1` it gives `k + 1`, where it gave `6`, as the
+  same branch written as an expression (`k + 1`) already did (CE-1330). A
+  parameter of the call in the same place is replaced with its value, as
+  before.
+
+- **A function parameter that a collection operator reads is a collection,
+  also when an arithmetic use comes first.** `x ↦ (x + x, Length(x))` was
+  typed `(x: unknown) -> tuple<number, …>` and called once per element of a
+  list argument: on `[1, 2, 3]` it gave a list of three tuples with
+  `incompatible-type` errors. It is now typed `(x: collection) -> …`, binds
+  the list whole and gives `([2, 4, 6], 3)`. The same holds for `Sort`,
+  `Count`, `Contains`, `At`, `Filter`, `Join`, a spread `[...x, 0]`, `Sum`
+  and the other operators that read a collection; `Reverse`, `First`, `Last`,
+  `Take`, `Drop`, `Rest`, `Unique` and `IndexOf` after `x + x` type `x` as
+  `indexed_collection<any>` or `collection<any>`, where it was `matrix`. A
+  use that requires one number and does not map (`Range(n)`) still makes the
+  parameter a number.
+- **A fold of an arithmetic canonical form reads only the declared facts of
+  a variable.** The folds of `Power` (an integer exponent, a base that is not
+  negative, a finite base) and of `Divide` (an infinity, the sign of a
+  divisor) read, of a variable that is not a constant, its declared type and
+  the assumptions, not the value it holds or a type inferred from that
+  value. With `ce.assign('k', 4)` and no declaration, `(x^2)^k` is no longer
+  boxed as `x^(2k)`, also in `subs()` and `simplify()`; with `p` holding 2,
+  `(p^2)^{1/2}` is `Sqrt(p^2)`, not `p`; with `a` holding `∞`, `2/a` is not
+  `0`; with `z` undeclared and holding 0, `z^0` stays `z^0`, whose value is
+  that of `0^0`. A declared type keeps the folds: with `k: integer`,
+  `(x^2)^k` is `x^(2k)`; with `p: real<0..>`, `(p^2)^{1/2}` is `p`; with
+  `z: real`, `z^0` is `1`. A variable whose type was inferred gives no fact
+  to a fold, also after its value is cleared, and so does a constant whose
+  value reads a variable.
+- **A function that calls a function defined later gets the result type
+  and the inferred effects of that function once it is defined.** With
+  `honest := () ↦ later()` and then `later := () ↦ Random()`, `honest` is
+  typed `() random -> real` and its effects are `random`, where it stayed
+  `() any -> unknown` with the effects `any`; with a pure `later`, `honest`
+  is pure. `R := M ↦ G(M − [0, 0, Y])` before
+  `G := M ↦ [M[1], M[2], M[3]]` is typed
+  `(M: dictionary<any> | indexed_collection<any> | value) -> vector<3>`
+  once `G` is defined, where it was
+  `(M: unknown) any -> list<unknown^3>`: the same type as with `G` defined
+  first. A declared
+  effects contract over a function that is not defined yet stays trusted,
+  and is not checked again when the function is defined; a contract
+  installed while the function is defined is checked again when it is
+  redefined.
+
+### Resolved Issues
+
+- **A function passed by name as a callback calls the function of the
+  scope it was written in.** `Map(h, [1, 2])` boxed before `h` is defined,
+  then `h(t) := t`, then a scope pushed later that declares
+  `h := t ↦ 100`: `ListFrom` of the `Map` gave `[100, 100]` in that scope,
+  and gives `[1, 2]`, as the call `h(1)` boxed with it does. A callback
+  whose name has no definition there stays unevaluated.
+
+- **A GLSL compilation refuses every reserved word of GLSL as an input
+  name.** The list of reserved words lacked 53 words of GLSL ES 3.00
+  (`active`, `common`, `resource`, `partition`, `sampler1D`, ...). With
+  `active` declared `real`, `compile(expr, { to: 'glsl' })` of `active + 1`
+  gave the code `active + 1.0`, which a WebGL compiler rejects ("Illegal use
+  of reserved word"). It now declines with "`active` is a reserved word of
+  GLSL, and the shader cannot name a variable so: rename it, or map it with
+  the `vars` option."
+
+- **An Epsil `while` whose condition is undecided stops.** In
+  `let i = 1; while i <= n { i = i + 1 }` with `n` free, the condition
+  `i <= n` is neither `true` nor `false`, and `executeEpsil` never returned.
+  The loop now ends with an `incompatible-type` error (expected `boolean`, at
+  the condition), reported as a runtime error, and `i` keeps the value `1`.
+  The condition must be decided at each turn, the first one included: an
+  undecided condition ends the loop before the body runs, so initialize each
+  variable that the condition reads. A host `Loop(Block(If(c, Break), body))`,
+  the form of a `while`, gets the same treatment: with `x` declared `integer`
+  and no value, `Loop(Block(If(Not(x ≠ 5), Break), Block(x := 5)))` assigned
+  `x` and ended, and now gives the error with `x` unassigned. An `If(c, Break)` in a `Loop` of another form is held as before (CE-1303).
+- **The value of a function does not depend on the order in which its body
+  uses an untyped parameter.** `(A, B) ↦ (A·B − B·A, Determinant(A), Determinant(B))` applied to `[[1, 2], [3, 4]]` and `[[0, 1], [1, 0]]` gave
+  the zero matrix as its first element: the products were built while `A`
+  and `B` were still numbers, and cancelled. It now gives
+  `([[-1, -3], [3, 1]], -2, -1)`, as the body with the determinants first
+  does. When a later use changes the type of a parameter from a number type
+  to another type, the body is boxed once more with the parameter starting at
+  that type. `x ↦ (x + x, Length(x))` on `[1, 2, 3]` called the function on
+  each element and gave three errors; `x` is now typed `collection`, and the
+  result is `([2, 4, 6], 3)`, as for `x ↦ (Length(x), x + x)`.
+  `x ↦ Sin(x) + Length(x)` on `[0, 0]` gives `[2, 2]`. A product of untyped
+  parameters with no other use is still a product of numbers:
+  `(A, B) ↦ A·B − B·A` gives the zero matrix (CE-1270).
+- **A timeout inside a cell of a batch stops the batch.** When the time limit
+  of `ce.withTimeLimit()`, or the `deadline` of a task on a worker, expired
+  inside a cell of `broadcast()` or `broadcastAsync()` (an integral, a long
+  sum), the cell was `NaN` and the batch went on, so `done` counted cells
+  with no value. `broadcast()` now throws the `CancellationError`, as
+  `run()` does, and a slice stops at that cell: the cells before `done` are
+  all valid. A cell over its `iterationBudget` is still `NaN`.
+- **A variable that held a list and is given a number has the type
+  `integer`.** After `L := [1, 2]` and then `L := 7`, the type of `L` was the
+  literal type `7`, so `L = 7` was typed `true` and code compiled in that
+  state returned the branch for `7` for any input value. It is `integer`, as
+  after a first `L := 7` (CE-1304).
+
+- **`.N()` of an exact sum whose terms cancel gives the correct digits.** When
+  the terms of a sum are exact (`\pi`, `e^{20}`, `\sqrt{2}`, a large integer)
+  and their sum is much smaller than the largest term, the sum is computed again
+  at a higher precision. The remainder
+  `81129638414606663681390495662081 \bmod \sqrt{2}` evaluates to
+  `81129638414606663681390495662081 - 57367317478180994538678159693372\sqrt{2}`,
+  whose numeric value was `9500000000`; it is `1.05464095093706286692`.
+  `\pi\cdot10^{30} - 3141592653589793238462643383279` was `2643000000`; it is
+  `0.502884197169399375106`. The float of `1/(\sqrt{10^{40}+1} - 10^{20})` was
+  `~oo`; it is `200000000000000000000`. `\lfloor x \rfloor`, `\lceil x \rceil`,
+  `\operatorname{sign}(x)` and the other functions whose result jumps still use
+  the exact value of `x` under `.N()`.
+
+- **A form boxed while a variable holds a value stays right after the value
+  changes.** After `ce.assign('k', 4)`, `(x^2)^k` was boxed as `x^(2k)`, so
+  after `k := 0.5` it gave `-3` at `x = -3` where `(x^2)^k` is `3`; a
+  function `f(x) := (x^2)^k` defined then, and the compiled code of the
+  expression, gave the same wrong value. With `p := 2`, `(p^2)^{1/2}` was
+  boxed as `p` and gave `-2` after `p := -2`, also for `p` declared `real`
+  and for an Epsil `let p: real = 2`. The form is now `(x^2)^k` and
+  `Sqrt(p^2)` (CE-1280).
+
+## 0.190.0 _2026-11-14_
+
+### Breaking Changes
+
+- **`ContinuedFraction` of a quadratic irrational is its periodic form, and
+  every term it gives for an exact real is correct.**
+  `ContinuedFraction(Sqrt(2))` was twenty terms `[1, 2, 2, …]`; it is
+  `[1, [2]]`, where the last list is the period, as
+  `ContinuedFraction((3 + Sqrt(7))/5)` is `[1, 7, [1, 2, 1, 8, 13, 8]]`.
+  The result type is `list<integer | list<integer>>`. With a count `n`, the
+  result is exactly `n` terms: `ContinuedFraction(ExponentialE, 40)` was 19
+  terms ending in a wrong `…, 12, 2`, and `ContinuedFraction(Sqrt(23))`
+  ended in a wrong `…, 1, 4`. Another exact real is expanded at a
+  precision that is doubled to check its terms, or stays unevaluated.
+  `FromContinuedFraction([1, [2]])` reads the period back and is `Sqrt(2)`.
+  (PR #571, contributed by [enumeratio](https://github.com/enumeratio),
+  fixes [#570](https://github.com/cortex-js/compute-engine/issues/570))
+
+### Improvements
+
+- **`canCompile()` is exported by the main package.** A program that loads
+  `@cortex-js/compute-engine` can ask whether an expression compiles to GLSL
+  before it compiles it, without the `@cortex-js/compute-engine/compile`
+  sub-path. It takes a LaTeX string, a MathJSON expression or an expression,
+  as the free function `compile()` does. It is also on the object that the
+  main bundle stores under `Symbol.for('io.cortexjs.compute-engine')`.
+
+- **A call of a function with a declared scalar result keeps that result when
+  the body ends after a loop.** With the Epsil function
+  `f(B: list<integer>, k: integer) -> integer` that counts in a loop and
+  returns the count, `f(L, 3)` with `L` declared `list<integer>` had the type
+  `integer | list<any>`, and `if f(B, k) > 0 { out = 1 }` did not compile.
+  The call is now `integer`, and the condition compiles, when each argument
+  is a value of the type annotated on its parameter.
+
+- **`Integrate` gives a closed form for a polynomial of degree up to 200
+  times `e^{ax+b}`, `\sin(ax+b)` or `\cos(ax+b)`.** `\int x^{10} e^{-x}\,dx`
+  was left unevaluated after about 1.5 s; it is
+  `-x^{10}e^{-x} - 10x^9e^{-x} - \cdots - 3628800e^{-x}`, and
+  `\int_0^\infty x^{10} e^{-x}\,dx` evaluates to `3628800`. The same holds for
+  `\int x^{10}\sin(x)\,dx` and for a symbolic coefficient `a`.
+
+- **A block local whose value reads the outer variable of the same name
+  compiles.** `compile()` of `Block(Declare(z, 'unknown', z + Z), 3z)`, the
+  form of `z \coloneq z + Z; 3z`, declined with "reads the block local "z"
+  before any statement gives it a value", and the expression ran in the
+  interpreter. It compiles on the JavaScript, GLSL, Python and interval
+  targets, and the value reads the outer `z`, as in the interpreter: with
+  `z = 2` and `Z = 10` the compiled function gives `36`.
+
+### Behavior Changes
+
+- **A static error of an Epsil program has its engine error code in a `code`
+  field, and a read before a declaration has the range of the name.** A
+  `static-type-error` diagnostic of `checkEpsil()` and `executeEpsil()` has
+  the field `code`, for example `assignment-to-undeclared-variable` or
+  `read-before-declaration`, so a host does not read the message to tell
+  which error it has. For `let a = b1 + 1` then `let b1 = 2`, the range of
+  the `read-before-declaration` diagnostic was the whole statement
+  `let a = b1 + 1`; it is the name `b1`, and each statement that reads the
+  name before its declaration gets a diagnostic.
+
+- **In an Epsil program, each assignment to an undeclared name is reported, in
+  a block as at the top level.** `checkEpsil()` and `executeEpsil()` reported
+  only the first assignment of each name in a block, a loop body or a function
+  body: `for k in 1..3 { t = 1; u = 2; t = 3 }` gave two
+  `assignment-to-undeclared-variable` diagnostics and `t = 1`, `u = 2`, `t = 3`
+  at the top level gave three. Both give three now, each at its assignment.
+
+### Performance
+
+- **`compileShader()` refuses a body whose code would be too large before it
+  analyzes the body.** A body statement that reads a point whose value is a deep
+  graph of shared subexpressions (`u = u + sin(u)` repeated 24 times) took about
+  14 s to report that the code would have more than 50,000 nodes; it reports it
+  in about 20 ms.
+
+### Resolved Issues
+
+- **A copy of a compile result can be given to `runtime.load()` in
+  TypeScript again.** Since 0.188.0, `{ ...result }` passed to `load()` or
+  `loadBroadcast()` of `createJavaScriptRuntime()` was a type error
+  (`Types of property 'profile' are incompatible`): the `profile` of a
+  compile result admits `'ir'`, and the stored code admitted only
+  `'numeric-kernel'`. The stored code now admits both. The loaders refuse
+  code of the experimental profile `'ir'` with an error that names it, also
+  when the copy sets a `runtimeVersion`: run such code with the `run()` of
+  the compile result.
+
+- **`ce.assign(name, undefined)` removes the value of a variable, as its
+  documentation says.** It threw `Invalid definition for symbol "v"`. Now
+  the declaration and the type of `v` stay, and `v + 1` evaluates to
+  `v + 1`. A name with no definition stays undeclared; a constant and a name
+  defined as a function throw an error.
+
+- **A series at −∞ of a root of a square has the right sign, and a series at
+  ±∞ of a function with an absolute value or a step stays unevaluated.**
+  `Series(1/(Sqrt(x^2) + 1), x, -oo, 3)` was `1/x - 1/x^2 + 1/x^3 + O(x^-4)`;
+  it is `-1/x - 1/x^2 - 1/x^3 + O(x^-4)`, because `√(x²) = −x` for `x < 0`.
+  `√(x² + x) − x` at −∞ is `−2x − 1/2 + …`, not `1/2 − …`. `1/|x|` and
+  `1/⌊x⌋` at +∞ were `O(x^-4)`, without their term `1/x`; a series at ±∞
+  of a function with `Abs`, `Sign`, `Floor`, `Ceil`, `Round` or another step
+  of `x` stays unevaluated.
+
+- **A compiled function literal reads a number passed to a parameter whose
+  uses make it `complex`.** The compiled `t ↦ LerchPhi(0.3, t, 2)` gave
+  `Φ(0.3, 0, 2) ≈ 1.4286` at every `t`, so the compiled
+  `D(LerchPhi(0.3, x, 2), x)` and `ND(t ↦ LerchPhi(0.3, t, 2), 2)` were
+  about `0`; they are `-0.219975`. A literal compiled with
+  `entryChecks: false` now also lifts a number passed to a parameter
+  declared `complex`, and in `mode: 'complex'` a parameter whose uses make
+  it `real` (`t ↦ Mod(t, 1)`) receives a number, where it gave `NaN`.
+
+- **`EllipticF` and the incomplete `EllipticPi` are accurate at machine
+  precision for an amplitude near `π/2` and a parameter near 1.** At
+  `ce.precision = 'machine'`, `EllipticF(1.57079632679, 1)` was
+  `27.428776665347943`, off by about `ln 2`; it is `26.73562948478799`
+  (`artanh(sin φ)`). At `m = 1 - 10^{-12}`, `EllipticF(1.5707963, m)` was
+  `15.175049215835525` and is `15.175023992482723` (a relative error of
+  `1.7·10^{-6}`, now under `10^{-15}`). `EllipticPi(n, φ, m)` had the same
+  error at the same operands. Compiled JavaScript gives the corrected values.
+  At other operands a value changes at most in its last digit; precision above
+  machine precision is unchanged.
+
+- **`HurwitzZeta(s, m)` at a large order no longer evaluates to a closed form
+  whose numeric value is 0.** `HurwitzZeta(21, 15).evaluate().N()` was `0`; it
+  is `2.73172211187533517712e-25`, the value of `HurwitzZeta(21, 15).N()`.
+  When `ζ(s) − Σ_{k<m} k^−s` would lose more than 6 digits under `.N()`,
+  `evaluate()` keeps the call. The same holds for the two-operand `Zeta`.
+  `HurwitzZeta(3, 2)` is still `Zeta(3) - 1`.
+
+- **`DigitsFrom` reads a `0x` or `0b` numeral past 2^53 exactly.**
+  `DigitsFrom("0x1fffffffffffffffff")` was `590295810358705700000`; it is
+  `590295810358705651711`.
+
+- **A compiled `Chop` of a complex value falls back to the interpreter.**
+  With `z` declared `complex`, the compiled `Chop(z)` at `3 + 10^{-12}i`
+  returned the value unchanged; the interpreter gives `3`, and the
+  compilation now declines.
+
+## 0.189.0 _2026-11-14_
+
+### Breaking Changes
+
+- **An expression boxed before its function is defined calls the
+  definition of the scope it was boxed in, or of a parent of that scope.**
+  A function of that name declared in a scope pushed later is not called.
+  With `c = ce.box(['Add', ['h', 2], 1])` at the top, then
+  `h := t ↦ 10t` at the top, then a pushed scope that declares
+  `h := t ↦ t·Random()`, `c.evaluate()` called the `h` of the pushed scope
+  and drew; it is `21`, and `c.isPure` is true. The compiled code of such a
+  call calls the same `h`. To call the function of the pushed scope, box the
+  expression in that scope.
+- **The type of an expression no longer depends on the values that its
+  symbols hold.** It depends on the declared or inferred types of the
+  symbols, and on the values of constants. With `x` declared `real` and
+  `x := 4`, `Sqrt(x)` was `real` and is now `complex`, the type for every
+  real `x`. With `P` declared
+  `collection<number>` and `P := [1, 2]`, `Sin(P)` was `list<number>` and
+  is now `broadcastable<number>`, as for a `P` with no value. With
+  `Q := Map(x ↦ 2x, P)`, `Sin(Q)` was `list<number>` and is now
+  `broadcastable<number>`.
+- **A symbol whose value reads other symbols has the type of that value as
+  their types give it, not as their values give it.** With `y := x + 1`,
+  then `x := 2`, `y` was `number` and is now `integer`: it follows the type
+  of `x`, which the assignment of `x` sets. With `x` declared `real`,
+  `x := 4` and `r := Sqrt(x)`, `r` was `real` and is now `number`, the type
+  of `Sqrt` of a real. A change of the type of a symbol that the value reads
+  is followed: with `L := [3, 1, 3, 2]` and `C := Map(k ↦ k + 1, L)`, `C` is
+  `vector<integer^4>`, and `vector<integer^2>` after `L := [1, 2]`.
+
+### New Features
+
+- **Epsil execution can report individual statements.** `executeEpsil()` and
+  `executeEpsilAsync()` accept `onStatement`, called after each top-level
+  statement with its value, expression, original source index and range.
+  `statementTimeLimitMs` sets an independent time limit for each statement.
+
+- **`Zeta(s, -k)` evaluates exactly for an integer `s > 1` and a negative
+  integer `-k`.** It is `ζ(s)` plus the `k` terms before the omitted one:
+  `Zeta(2, -1)` is `1 + π²/6` and `Zeta(3, -1)` is `1 + ζ(3)`; past
+  `k = 1000` the call stays unevaluated (PR #529, contributed by
+  [enumeratio](https://github.com/enumeratio)).
+
+- **`Beta`, `BetaRegularized`, `Erf`, `ErfInv`, `Gamma` and
+  `GammaRegularized` take the incomplete and generalized call forms, and
+  `PolyGamma(z)` is `PolyGamma(0, z)`.** `Beta(1/2, 2, 3)` was an
+  `unexpected-argument` error and is `11/192`, the incomplete beta function
+  `B_z(a, b)`; `Erf(z0, z1)` is `Erf(z1) - Erf(z0)`, `Gamma(a, z0, z1)` is
+  `Γ(a, z0) - Γ(a, z1)`, `BetaRegularized(z0, z1, a, b)` is
+  `I_z1(a, b) - I_z0(a, b)` and `ErfInv(z0, z)` is `ErfInv(z + Erf(z0))`.
+  A difference of close endpoints keeps its digits: `N(Erf(1, 1 + 10^-100))`
+  is `4.1510749742059470334e-101`. The new forms decline in compiled code
+  (PR #567, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#566](https://github.com/cortex-js/compute-engine/issues/566)).
+
+- **`UniformDistribution` takes Wolfram's other two forms.**
+  `UniformDistribution([1, 3])` is `UniformDistribution(1, 3)` and
+  `UniformDistribution()` is `UniformDistribution(0, 1)`;
+  `Mean(UniformDistribution([1, 3]))` was a `missing` error and is `2`.
+  (PR #569, contributed by [enumeratio](https://github.com/enumeratio),
+  fixes [#568](https://github.com/cortex-js/compute-engine/issues/568))
+
+- **`Chop` takes a tolerance.** `Chop(0.004, 0.01)` was an
+  `unexpected-argument` error; the second operand is now the tolerance, as
+  in Wolfram's `Chop[x, tol]`: a real or imaginary part whose magnitude is at
+  most the tolerance becomes 0. `Chop(0.004, 0.01)` is `0`,
+  `Chop(3 + 0.002i, 0.01)` is `3` and `Chop([0.004, 0.5], 0.01)` is
+  `[0, 0.5]`. Without it the engine's `tolerance` applies, as before. The
+  JavaScript target compiles the tolerance; the interval target compiles a
+  numeric tolerance and declines a symbolic one. (PR #541, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#540](https://github.com/cortex-js/compute-engine/issues/540))
+
+- **`EulerE(n)` is the Euler number Eₙ and `EulerE(n, x)` the Euler
+  polynomial Eₙ(x).** They are Mathematica's `EulerE`. `EulerE(n)` is an exact
+  integer for a non-negative integer `n` (`EulerE(4)` is `5`, an odd `n` gives
+  `0`) and stays unevaluated past the same work limit as `BernoulliB`.
+  `EulerE(n, x)` is exact at a rational `x` (`EulerE(4, 1/3)` is `22/81`), a
+  float at a float `x`, and the expanded polynomial otherwise (`EulerE(2, x)`
+  is `x^2 - x`). A negative `n` stays unevaluated. (PR #522, contributed by
+  [enumeratio](https://github.com/enumeratio))
+
+- **`HarmonicNumber(n)` is the harmonic number Hₙ = Σ 1/k, and
+  `HarmonicNumber(n, r)` the generalized harmonic number Σ 1/kʳ.** They are
+  Wolfram's `HarmonicNumber`. A non-negative integer `n` with an integer `r`
+  gives an exact rational (`HarmonicNumber(10)` is `7381/2520`), left
+  unevaluated past a work limit. Under `N()` or with an inexact operand, the
+  value is the continuation ψ(n + 1) + γ, or ζ(r) − ζ(r, n + 1) for `r` other
+  than 1, for a real or complex `n` (`N(HarmonicNumber(1/2))` is
+  `0.6137056388…`). A negative integer `n` is the pole `~oo`. It compiles to
+  JavaScript and GLSL, and its derivative in `n` is `Trigamma(n + 1)`.
+  (PR #519, contributed by [enumeratio](https://github.com/enumeratio))
+
+- **`IntegerPartitions(n, kspec, parts, m)` lists the partitions of an
+  integer.** As in Mathematica, each partition is a list of positive parts in
+  non-increasing order, and the partitions are in reverse lexicographic order:
+  `IntegerPartitions(4)` is `[[4], [3, 1], [2, 2], [2, 1, 1], [1, 1, 1, 1]]`.
+  `kspec` is a largest number of parts (`k`), an exact one (`[k]`) or a range
+  (`[kmin, kmax]`, `[kmin, kmax, step]`, with `Infinity` or `All` for no
+  limit); `parts` limits the sizes to a list of positive integers; `m` keeps
+  the first `m` partitions. It is a lazy collection like `Combinations`:
+  `Count(IntegerPartitions(n))` is `NPartition(n)` with no walk, and `At`
+  reads a position from a table of counts. A count that needs more than a
+  bounded amount of work is unknown. Parts that are not positive integers,
+  and the `[m]` and `[m1, m2]` forms of `m`, are not supported: the call stays
+  unevaluated. (PR #520, contributed by
+  [enumeratio](https://github.com/enumeratio))
+
+- **`PartitionsQ(n)` is the number of partitions of `n` into distinct
+  parts.** It is the Wolfram Language `PartitionsQ` and, by Euler's theorem,
+  also the number of partitions into odd parts. Like `NPartition`, it is 0 for a
+  negative integer, applies to each element of a list, gives a float for a
+  float operand and stays unevaluated for an `n` too large to compute.
+  `PartitionsQ(10)` is `10`. (PR #521, contributed by
+  [enumeratio](https://github.com/enumeratio))
+
+- **The compile option `inputs` gives the types of the inputs at the call.**
+  `compile(expr, { inputs: { x: 'real', P: 'tuple<real, real>' } })` reads
+  `x` and `P` as inputs of these types, whatever the scopes declare for them
+  and whatever values they hold, in the expression and in the functions it
+  calls. No declaration and no pushed scope are needed, and nothing is
+  declared after the call. With `g(t) := t x` and no declaration of `x`,
+  `compile(g(2) + x, { inputs: { x: 'real' } })` is `_.x + _fn_g(2)`. With
+  `n := [1, 2, 3]`, `n x` compiles to a broadcast over the stored list, and
+  to `_.n * _.x` with `inputs: { n: 'real' }`. The other names of the
+  expression keep the definitions they were boxed with. `canCompile()`
+  takes the option too. The expression keeps the canonical form it was
+  boxed with: give a type that is the type at boxing or a subtype of it, or
+  box the expression in a scope that declares the name with the wider type.
+  A name of `inputs` that a called function reads as a constant declines.
+
+### Improvements
+
+- **`evaluate()` gives the closed form of `PolyLog`, `HurwitzZeta`, `Zeta`,
+  `LerchPhi`, the upper incomplete `Gamma`, `BetaRegularized`, the Airy
+  functions at 0, `Hypergeometric1F1` and `Hypergeometric2F1` at exact
+  arguments that have a standard one.** `PolyLog(2, 1/2)` was unevaluated
+  and is now `π²/12 - ln²2/2`; `PolyLog(2, 2)` is `π²/4 - iπ ln 2`,
+  `HurwitzZeta(s, 1/2)` is `(2^s - 1)ζ(s)` for any exact `s`,
+  `HurwitzZeta(2, 1/4)` is `π² + 8G`, `LerchPhi(-1, 3, 1/2)` is `π³/4`,
+  `Gamma(2, x)` is `(x + 1)e^-x`, `Gamma(1/2, z)` is `√π erfc(√z)`,
+  `BetaRegularized(1/2, 2, 3)` is `11/16`, `AiryAi(0)` is
+  `1/(3^(2/3) Γ(2/3))`, `Hypergeometric1F1(a, a, z)` is `e^z` and
+  `Hypergeometric2F1(a, b, b, z)` is `(1 - z)^-a` (not on the cut `z > 1`)
+  (PR #536, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#533](https://github.com/cortex-js/compute-engine/issues/533)).
+
+- **`evaluate()` gives the closed form of `Gamma`, `GammaLn`, `LogGamma`,
+  `Digamma`, `Trigamma`, `PolyGamma` and `Beta` at exact arguments that have
+  a standard one.** `Gamma(1/2)` was unevaluated and is now `√π`;
+  `Gamma(-1/2)` is `-2√π`, `Digamma(1/4)` is `-γ - π/2 - 3 ln 2`,
+  `Trigamma(1/4)` is `π² + 8G`, `PolyGamma(2, 3)` is `9/4 - 2ζ(3)`,
+  `GammaLn(4)` is `ln 6`, `LogGamma(-3/2)` is `ln(4√π/3) - 2πi` and
+  `Beta(3/2, 5/2)` is `π/16`. The arguments covered: a half-integer for
+  `Gamma`, a rational with denominator 1, 2, 3 or 4 for `Digamma`, an
+  integer, a half-integer or (for order 1) a quarter for `PolyGamma` and
+  `Trigamma`, a positive integer or a half-integer for `GammaLn` and
+  `LogGamma`, two half-integers for `Beta`. Past a size limit, or when the
+  closed form would lose digits under `.N()`, the call stays unevaluated.
+  `.N()` is unchanged (PR #535, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#532](https://github.com/cortex-js/compute-engine/issues/532)).
+
+- **A circular or hyperbolic function of its own inverse folds under
+  `evaluate()`, `.N()` and `simplify()`.** `Sin(Arcsin(x))` is `x` for the
+  twelve pairs, and `N(Sin(Arcsin(5)))` was `5 - 3.0e-16i` and is `5`. For an
+  exact real `y`, `Arcsin(Sin(3))` is `π - 3` and `Arccos(Cos(5))` is
+  `2π - 5`; `Arcsin(Sin(x))` stays. `simplify()` also gives
+  `Arccos(-x) = π - Arccos(x)`, `Cos(Arcsin(x)) = √(1 - x²)`,
+  `Cos(i·t) = Cosh(t)`, `Sin(x)/Cos(x) = Tan(x)` and
+  `Cosh(x)² - Sinh(x)² = 1`, and `Arcsin(Sin(4)).simplify()` no longer
+  overflows the stack (PR #565, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#564](https://github.com/cortex-js/compute-engine/issues/564)).
+
+### Behavior Changes
+
+- **Inside a run, the type of an expression over a `const` local of a block
+  does not come from the value that the local holds in that run.** In
+  `do { const h = (k) => k + 1; map(h, [1, 2]) }`, the type of the `map`
+  node read during the run (by an `evaluate` handler of the host) was
+  `vector<2>` and is `list<unknown^2>`, the type it has before and after
+  the run. The value is `[2, 3]` as before.
+- **`Series` of a library function whose derivatives the engine cannot
+  evaluate stays unevaluated.** `Series(Hypergeometric2F1(1, 1, 3, x), x, 1, 3)` was a sum of `Apply(Derivative(Hypergeometric2F1, …), 1, 1, 3, 1)`
+  terms, which are not the coefficients: the function has a logarithmic
+  branch point at `x = 1`. The same holds at a regular point:
+  `Series(Zeta(x), x, 0, 3)`, which was `−1/2 + x·Apply(Derivative(Zeta, 1), 0) + …`, and the series of `LambertW`, `PolyLog` and `Hypergeometric2F1`
+  at 0 stay unevaluated. A function the engine does not define (`f`) keeps
+  its symbolic Taylor form `f(0) + f′(0)·x + …`. (PR #573, contributed by
+  [enumeratio](https://github.com/enumeratio))
+
+### Resolved Issues
+
+- **`DedekindEta` of a complex `τ` carries the precision asked for.** At
+  `ce.precision = 40`, `DedekindEta(0.3 + i)` was `0.7678448651091705 + 0.05906109778250378i`, a double's digits; it is
+  `0.7678448651091705567421299051799721144743 + 0.05906109778250378247292565345689206690519i`. Above machine precision a
+  `τ` with `Im τ < 0.001` stays unevaluated instead of returning a double:
+  `DedekindEta(0.3 + 0.0005i)` at 30 digits was `0.0750263045067908 + 0.005904698221439741i` and is `DedekindEta(0.3 + 0.0005i)`. Machine
+  precision is unchanged. (PR #561, contributed by
+  [enumeratio](https://github.com/enumeratio); fixes
+  [#555](https://github.com/cortex-js/compute-engine/issues/555)).
+
+- **`AiryAi`, `AiryBi`, `ExpIntegralEi` and `LogIntegral` of a real argument
+  carry the precision asked for.** At `ce.precision = 30`,
+  `ExpIntegralEi(2)` was the double `4.95423435600189`; it is
+  `4.95423435600189016337950513023`. `AiryAi(1/3)` was `0.2706826474593453`
+  and is `0.270682647459345282887346318096`. A value the engine cannot compute
+  to the digits asked for stays unevaluated: `ExpIntegralEi(5000)` and
+  `AiryBi(200)` were `+∞`. Complex arguments, the Airy derivatives and machine
+  precision are unchanged. (PR #562, contributed by
+  [enumeratio](https://github.com/enumeratio); fixes
+  [#554](https://github.com/cortex-js/compute-engine/issues/554)).
+
+- **`BesselJ`, `BesselY`, `BesselI` and `BesselK` of a real argument carry
+  the precision asked for, and a real non-integer order has a value.** At
+  `ce.precision = 30`, `BesselJ(1, 1/3)` was the double `0.16436254381427073`;
+  it is `0.164362543814270735363798698286`. `BesselJ(0.5, 2)` stayed
+  unevaluated; under `.N()` it is `0.5130161365618278` at machine precision,
+  and the same holds for `BesselY`, `BesselI` and `BesselK` at a positive
+  argument. Above machine precision a value the engine cannot compute to the
+  digits asked for stays unevaluated: `BesselI(0, 5000)` was `+∞` and is
+  `BesselI(0, 5000)`. Integer orders at machine precision and compiled code
+  are unchanged. (PR #560, contributed by
+  [enumeratio](https://github.com/enumeratio); fixes
+  [#553](https://github.com/cortex-js/compute-engine/issues/553)).
+
+- **A call that returns a function keeps its type after it is evaluated.**
+  With `f := y ↦ (x ↦ x + y)`, the node `f(q)` of `Apply(f(q), 5)` was
+  typed `(x: unknown) -> number` before `evaluate()` and `any` after it. It
+  is `(x: unknown) -> number` in both: the evaluation no longer writes on
+  the operand `q` of the call.
+- **`Zeta(s)` at a complex `s` gives its value to the precision of a
+  double, or stays unevaluated.** `Zeta(0.5 + 1000i).N()` was
+  `0.35633436719464573 - 0.9319978312332674i`, 3.7e-13 off, and
+  `Zeta(0.5 + 10⁶i).N()` was 1.6e-9 off, both printed with sixteen digits.
+  The first is now `0.35633436719439365 - 0.9319978312329936i` (2.4e-15
+  off); measured against mpmath, the relative error is at most 3e-13 for
+  `|Im s|` up to about 12 868.
+  Above that `Zeta(s)` stays unevaluated, as `HurwitzZeta(s, 1)` does, also
+  where the value was correct: `Zeta(20 + 15000i).N()` had sixteen correct
+  digits. The result is a double at every precision, as for the other
+  complex special functions. (PR #559, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#552](https://github.com/cortex-js/compute-engine/issues/552))
+
+- **`BetaRegularized(x, a, b)` has a value at a real `x` outside `[0, 1]`
+  where that value is real and a finite sum.** `BetaRegularized(2, 2, 3).N()`
+  stayed unevaluated; it is `8`. For positive integers `a` and `b` the
+  function is the polynomial `Σ_{j=a}^{a+b-1} C(a+b-1, j) xʲ (1-x)^(a+b-1-j)`,
+  for any real `x` (`I_3(2, 3)` is `81`, `I_{-1/2}(2, 2)` is `1`); for `x > 1`,
+  a real `a > 0` and an integer `b` up to 30 it is `B_x(a, b)/B(a, b)`
+  (`BetaRegularized(2, 5/2, 3).N()` is `16.2634559672905930612…`). Both are
+  computed at the working precision. A non-integer `b` with `x > 1`, a
+  non-integer `a` with `x < 0`, a degree `a + b - 1` above 200, and a value
+  that cancels to `0` stay unevaluated. `evaluate()` of an exact operand is
+  unchanged. (PR #558, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#551](https://github.com/cortex-js/compute-engine/issues/551))
+
+- **`Beta(a, b)` has a value at a complex operand under `N()`.**
+  `Beta(1+i, 2).N()` stayed `Beta(1+i, 2)`; it is
+  `0.10000000000000012 - 0.3000000000000001i` (exactly `0.1 - 0.3i`), the value of
+  `Γ(a)Γ(b)/Γ(a+b)`. It is `0` where `a + b` is a non-positive integer, and
+  `~oo` at a non-positive integer `a` or `b` with a complex partner, as with a
+  real one. Measured against mpmath, the relative error is at most 3e-13
+  for `|Im a|` and `|Im b|` up to 300, and grows with them (2e-10 at
+  `Beta(1 + 10⁵i, 1/2)`). The result is a double at every precision, as for the other complex
+  special functions. `evaluate()` of an exact operand stays symbolic.
+  (PR #558, contributed by [enumeratio](https://github.com/enumeratio))
+
+- **`EllipticF(φ, m)`, `EllipticE(φ, m)`, `EllipticPi(n, φ, m)` and
+  `EllipticPi(n, m)` give `N()` at the working precision for real operands
+  with a real value.** At a precision of 30, `EllipticE(0.5, 0.3).N()` was
+  the double `0.4939911447289684`; it is
+  `0.493991144728968428148069987960`. `EllipticPi` where `1 - n sin²φ < 0`
+  (`n > 1` for the complete form) is the Cauchy principal value, as at
+  machine precision. A call stays unevaluated when the digits asked cannot
+  be computed, for example `EllipticE(φ, 1)` at a precision of 100 with `φ`
+  the first 420 digits of `π/2`, and when `m = 1` and `|φ| > π/2`, where the
+  value is not finite. A value that is not real, such as
+  `EllipticF(2, 2)`, is still a double complex number. Exact operands are
+  read with guard digits under `N()`, as for `EllipticE(φ, m)` before;
+  `evaluate()` of an exact operand is unchanged, and so are the values at
+  machine precision. (PR #557, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#550](https://github.com/cortex-js/compute-engine/issues/550))
+
+- **`Series` at `DirectedInfinity` and `ComplexInfinity` expands in `1/x`
+  or stays unevaluated.** `Series(sin(x)/x, x, DirectedInfinity(1), 3)`
+  was a Taylor sum with `sin(DirectedInfinity(1))` in its coefficients; it
+  stays unevaluated, as at `+∞`. `DirectedInfinity(1)` is read as `+∞` and
+  `DirectedInfinity(-1)` as `−∞`: `Series(1/(x + 1), x, DirectedInfinity(1), 3)` stayed unevaluated and is
+  `1/x − 1/x² + 1/x³ + O(x⁻⁴)`. At `ComplexInfinity` or
+  `DirectedInfinity(i)`, the expansion is given only when it is the same at
+  `+∞` and `−∞` and the function is analytic (`1/(x + 1)`).
+  `Series(arctan(x), x, ComplexInfinity, 3)` was the expansion at `+∞`,
+  `π/2 − 1/x + …`, which is wrong in the other directions; it stays
+  unevaluated, as do `exp(x)` and `√x`. (PR #573, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#572](https://github.com/cortex-js/compute-engine/issues/572))
+
+- **`MatrixRank` of a matrix of symbols is its full rank when the rank at
+  one integer point is full.** `MatrixRank([[a, b], [c, d]])` and
+  `MatrixRank([[x, 1], [1, x]])` stayed unevaluated; they are `2`, the rank
+  for generic values of the symbols (a minor that is nonzero at one point
+  is not identically zero), as `MatrixRank([[a, b], [a, b]])` was already
+  `1`. A matrix whose rank is lower at every point tried, such as
+  `[[a, b, c], [2a, 2b, 2c], [d, p, q]]`, and a matrix of entries that are
+  not rational at integer points, such as `[[sin t, cos t], [cos t, sin t]]`,
+  stay unevaluated. (PR #581, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#580](https://github.com/cortex-js/compute-engine/issues/580))
+
+- **A sum of `kⁿ·rᵏ/k!` over an infinite range is a closed form.**
+  `Sum(k^3/k!, k, 1, ∞)` stayed a `Sum`; it is `5e` (Dobiński's formula,
+  `e` times the Bell number). `Sum(k^2·x^k/k!, k, 0, ∞)` is `(x² + x)·eˣ`,
+  and a lower bound above 0 subtracts the terms below it. A polynomial over
+  `k!` is the sum of its terms: `Sum((k^2 + k)/k!, k, 0, ∞)` is `3e`. The
+  power `n` and the lower bound are at most 200. (PR #577, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#576](https://github.com/cortex-js/compute-engine/issues/576))
+
+- **`Integrate` of a product of powers of `sin` and `cos` of a linear
+  argument is a closed form.** `∫ sin³x dx`, `∫ cos⁵x dx`,
+  `∫ sin³x cos²x dx` and `∫ sin⁴x dx` stayed `Integrate`. `∫ sin³x dx` is
+  now `cos³x/3 − cos x`, and `∫ sin⁴x dx` is
+  `3x/8 − 3 sin(2x)/16 − cos x·sin³x/4`. A constant factor and an argument
+  `a·x + b` are read (`∫ 3 sin³(2x + 1) dx`), for powers up to 40. (PR #579,
+  contributed by [enumeratio](https://github.com/enumeratio), fixes
+  [#578](https://github.com/cortex-js/compute-engine/issues/578))
+
+- **`Zeta(0, a)` is `1/2 - a` for every `a`.** The two-argument `Zeta` omits
+  the term where `n + a = 0`, but at `s = 0` every term is 1 and the omitted
+  term counts, as in Mathematica: `Zeta(0, -1)` is `3/2` (was `1/2`) and
+  `Zeta(0, 0)` is `1/2` (was `-1/2`). `.N()` and the compiled `Zeta`
+  (JavaScript and GLSL) give the same value. For `s ≠ 0` the term stays
+  omitted (PR #529, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#524](https://github.com/cortex-js/compute-engine/issues/524)).
+
+- **The hyperbolic functions of `Ln(q)` for an exact rational `q`, and
+  `Arsech` of a rational above 1, evaluate exactly.** `Sinh(Ln(2))` stayed
+  unevaluated and is `3/4`, and `Tanh(Ln(3))` is `4/5`; `Arsech(2)` is
+  `iπ/3`, the value `.N()` gives (PR #537, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#534](https://github.com/cortex-js/compute-engine/issues/534)).
+
+- **A float parameter or point of a distribution gives a float under
+  `evaluate()`.** `PDF(NormalDistribution(0, 1), 0.5)` was
+  `0.6240… / √π`, exact on one side and a float on the other, and
+  `PDF(NormalDistribution(0.0, 1), 1/2)` was exact; both are now
+  `0.3520653267642995`. The rule applies to `PDF`, `CDF` and `Quantile` of
+  the continuous distributions, to `Mean`, `Variance` and
+  `StandardDeviation` of a distribution (`Mean(UniformDistribution(0.0, 4))`
+  was `2` and is `2.0`), and to `PDF` of a discrete distribution at an
+  integer-valued point (`PDF(PoissonDistribution(2), 3.0)` is
+  `0.1804470443154836`). As in Wolfram, a discrete `CDF` reads a float point
+  as its floor and stays exact (`CDF(PoissonDistribution(2), 2.5)` is
+  `5 / e^2`), and the mass at a non-integer point is the exact `0`. The
+  variance of `NormalDistribution(0.0, 1)` is `1`: it does not depend on the
+  mean. (PR #569, contributed by [enumeratio](https://github.com/enumeratio),
+  fixes [#568](https://github.com/cortex-js/compute-engine/issues/568))
+
+- **`Tabulate` takes any number of dimensions.** `Tabulate(Add, 2, 2, 2)`
+  was boxed as `Tabulate(Add, 2, 2)`, which dropped the third dimension; it
+  is now a `tensor<integer^(2x2x2)>`, and `Table(f, 2, 2, 2)` follows. The
+  JavaScript and Python targets compile any number of dimensions. A
+  dimension of 0 gives an empty list, as in Wolfram's `Array`:
+  `Tabulate(f, 2, 0)` is `[[], []]` once materialized.
+  (PR #530, contributed by [enumeratio](https://github.com/enumeratio),
+  fixes [#525](https://github.com/cortex-js/compute-engine/issues/525))
+- **`All` and `Any` report an operand they do not take.** `All(xs, p, 2)`
+  was boxed as `All(xs, p)` and the `2` was ignored; it is now an
+  `unexpected-argument` error, as the signature of `All` and `Any` says.
+  (PR #530, contributed by [enumeratio](https://github.com/enumeratio),
+  fixes [#525](https://github.com/cortex-js/compute-engine/issues/525))
+- **The `Shape` of a list of applications of an unknown function is read
+  from its nesting.** `Shape([[a(1), a(2)]])` was `()` and is `(1, 2)`; a
+  ragged list still has no shape. (PR #530, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#525](https://github.com/cortex-js/compute-engine/issues/525))
+
+- **`First` and `Last` take the value of an empty collection, `Flatten` takes
+  an infinite depth, `Fold` needs no seed, `Count` takes levels and `Unique`
+  takes a test.** These are the call forms of Wolfram's `First[expr, def]`,
+  `Flatten[list, Infinity]`, `Fold[f, list]`,
+  `Count[expr, pattern, levelspec]` and `DeleteDuplicates[list, test]`; each
+  was an error (`unexpected-argument`, `incompatible-type` or `missing`).
+  `First([], 0)` is `0` and `First([1, 2], 9)` is `1`; the type of the call is
+  the type of the element or of the default. `Flatten(xs, +oo)` flattens
+  completely. `Fold(Add, [1, 2, 3])` is `Reduce([1, 2, 3], Add)`, `6`.
+  `Count([[1, 1], 1], 1, 2)` counts the parts at levels 1 to 2, `3`; `[n]`
+  names one level and `[from, to]` a range. A level specification that is
+  not a positive integer, `+oo` or such a list, a predicate, or a lazy
+  collection such as `Reverse(xs)` leaves the call unevaluated.
+  `Unique([1, 2, 3, 4], (a, b) => a mod 2 == b mod 2)` is `[1, 2]`, and
+  `Unique` of a string with a test is a string. The JavaScript and Python
+  targets do not compile the new forms of `First`, `Last`, `Count` and
+  `Unique`, and fall back to the interpreter. (PR #539, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#538](https://github.com/cortex-js/compute-engine/issues/538))
+
+- **`PowerMod` and `PowerModList` take a rational base and a list, and
+  `ChineseRemainder` takes a lower bound.** `PowerMod(1/2, 2, 7)` was an
+  `incompatible-type` error and is now `2`: the base `p/q` is `p` times the
+  inverse of `q` modulo `m`, and a base whose denominator has no inverse
+  stays unevaluated (`PowerMod(1/2, 2, 4)`). `PowerMod([2, 3], 2, 7)` is
+  `[4, 2]` and `PowerModList([2, 3], 2, 7)` is `[[4], [2]]`: a list operand
+  threads, a scalar is held fixed, and lists of different lengths stay
+  unevaluated. `ChineseRemainder([2, 3, 2], [3, 5, 7], 100)` is `128`, the
+  smallest solution that is at least `100` (it was an `unexpected-argument`
+  error). (PR #547, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#546](https://github.com/cortex-js/compute-engine/issues/546))
+
+- **`NextPrime`, `DivisorSigma`, `FactorInteger`, `IsSquareFree`,
+  `CatalanNumber` and `IsPerfect` take a rational or a non-positive
+  operand.** `NextPrime(7/2)` was an `incompatible-type` error and is now
+  `5`; `NextPrime(7/2, -1)` is `3`. `DivisorSigma(-1, 12)` stayed unevaluated
+  and is now `7/3`: a negative order `-j` gives `σ_j(n) / n^j`, and a huge
+  order stays unevaluated. `FactorInteger(12/35)` is
+  `[(2, 2), (3, 1), (5, -1), (7, -1)]`, the primes of the denominator with
+  negative exponents, and `IsSquareFree(6/35)` is `True` (both were
+  `incompatible-type` errors). `CatalanNumber(1/2)` is `8/(3π)`: a positive
+  half-integer is exact, and another positive real is computed from
+  `Γ(2n+1) / (Γ(n+1) Γ(n+2))` for a float or under `N()`. `IsPerfect(-6)` and
+  `IsPerfect(0)` are `False` (they stayed unevaluated). Integer operands are
+  unchanged. (PR #543, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#542](https://github.com/cortex-js/compute-engine/issues/542))
+
+- **`D` gives a closed form for the derivatives of `ErfInv`, `Beta`,
+  `BarnesG`, `LogBarnesG`, the complete `EllipticK` and `EllipticE`,
+  `HurwitzZeta` and `LerchPhi` in `a`, `LerchPhi` in `z`, and `ClausenCl` of
+  a literal order.** Each was the inert `Apply(Derivative(f, …), …)`.
+  `D(ErfInv(x), x)` is `½√π·e^(ErfInv(x)²)`, `D(HurwitzZeta(s, x), x)` is
+  `−s·HurwitzZeta(s + 1, x)`, `D(Beta(a, b), a)` is
+  `Beta(a, b)(ψ(a) − ψ(a + b))`, and `D(EllipticK(m), m)` is
+  `(E(m) − (1 − m)K(m))/(2m(1 − m))`. An operand with no closed form keeps
+  the inert form (`HurwitzZeta`, `LerchPhi` and `ClausenCl` in `s` or `n`).
+  The coefficients of a `Series` follow: `Series(ErfInv(x), x, 0, 5)` is
+  `½√π x + π^(3/2) x³/24 + 7π^(5/2) x⁵/960 + O(x⁷)`, and the error of
+  `Beta(2.5 ± 0.1, 3)` is propagated. (PR #575, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#574](https://github.com/cortex-js/compute-engine/issues/574))
+
+- **`D(f, [x, n])` is the `n`-th derivative of `f` in `x`, as
+  `D(f, {x, n})` is.** `D(x^5, [x, 3])` is `60x²`; it stayed unevaluated. A
+  pair of a variable and a number is read as an order: a negative order is
+  an error, and a fractional or symbolic order, or an order above 1000,
+  leaves the derivative inert. (PR #575, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#574](https://github.com/cortex-js/compute-engine/issues/574))
+
+- **`FromDigits` takes any base, and `IntegerString`, `DigitCount` and
+  `DigitSum` take a length or a position.** The base of `FromDigits` was an
+  integer of at least 2: `FromDigits([1, 1, 0], -2)` is now `2`,
+  `FromDigits([1, 2, 3], 1/2)` is `17/4` and `FromDigits([a, b, c], x)` is
+  `a x^2 + b x + c` (all three stayed unevaluated). A digit or a base that is
+  not an integer gives the sum of `d * base^k`, exact under `evaluate()` and
+  numeric under `N()`, so `FromDigits([1.5, 2])` is now `17.0` instead of
+  staying unevaluated, and the result type of `FromDigits` is `number` unless
+  the digits are integers and the base is an integer. `IntegerString(5, 2, 8)`
+  is `"00000101"`: with a length, the digits of `|n|` are padded with zeros
+  or cut to the last digits. `DigitCount(5, 2, 0, 8)` is `6`: the digits are
+  padded first. `DigitSum(1234, 10, 2)` is `3`, the sum of the first two
+  digits, and `DigitSum(1234, 10, -2)` is `7`, the sum of the last two (these
+  three calls were `unexpected-argument` errors). The length of
+  `IntegerString`, `IntegerDigits` and `DigitCount` is at most 1,000,000:
+  `IntegerDigits(5, 2, 10^9)` used to run until it ran out of memory, and
+  now stays unevaluated. (PR #583, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#582](https://github.com/cortex-js/compute-engine/issues/582))
+
+- **`Transpose` with axes is written as a call, so its LaTeX reads back.**
+  `["Transpose", "a", 2, 1]` was written `a^T`, which reads back as
+  `["Transpose", "a"]`; it is `\operatorname{Transpose}(a, 2, 1)`. Only the
+  one-argument form is written `a^T` (PR #518, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes item 2 of
+  [#517](https://github.com/cortex-js/compute-engine/issues/517)).
+- **A `Derivative` with a symbolic order, or with one order per argument,
+  reads back from its LaTeX.** `["Derivative", "f", "k"]` was written
+  `f^{\prime}`, a first derivative; it is `f^{(k)}`. With `f` a function,
+  `f^{(0,1)}` parses as `["Derivative", "f", 0, 1]`, the form written for that
+  expression; it was an `incompatible-type` error (PR #518, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes items 3 and 4 of
+  [#517](https://github.com/cortex-js/compute-engine/issues/517)).
+- **A factorial before `=` is written so that it does not read as `\ne`.**
+  `Equal(Factorial(5), 5)` was written `5!=5`, which reads back as
+  `NotEqual(5, 5)`; it is `5! =5` (PR #518, contributed by
+  [enumeratio](https://github.com/enumeratio)).
+- **`Arcsec(x)` is written `\operatorname{arcsec}(x)`.** It was written
+  `\mathrm{arcsec}(x)`, which reads back as the arcsecond unit, or as an
+  unknown function `arcsec` once canonical (PR #518, contributed by
+  [enumeratio](https://github.com/enumeratio)).
+
+- **`A \setminus B \setminus C` is `SetMinus(A, B, C)`, the difference read
+  from left to right.** It was read as `SetMinus(A, SetMinus(B, C))`, a
+  different set: `\{1,2,3,4\} \setminus \{2\} \setminus \{4\}` evaluated to
+  `{1, 3, 4}`; it is `{1, 3}`. `SetMinus(A, B, C)` was already written as
+  that chain, and it now reads back. `\backslash` reads the same way, and a
+  parenthesized operand stays nested: `A \setminus (B \setminus C)` (PR #585,
+  contributed by [enumeratio](https://github.com/enumeratio), fixes
+  [#584](https://github.com/cortex-js/compute-engine/issues/584)).
+
+- **`\triangle` (`SymmetricDifference`) binds as tightly as `\cup` and
+  `\cap`.** It had the precedence of `=`, so `a \triangle b = c` was read as
+  `a \triangle (b = c)`, an `incompatible-type` error once canonical. It is
+  now `Equal(SymmetricDifference(a, b), c)`, and a set identity such as
+  `A \triangle B = (A \setminus B) \cup (B \setminus A)` parses as an
+  equation. A mix with `\cup` or `\cap` without parentheses now nests to the
+  right, as `\cup` and `\cap` do with each other: `A \cup B \triangle C` is
+  `Union(A, SymmetricDifference(B, C))` (PR #587, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#586](https://github.com/cortex-js/compute-engine/issues/586)).
+
+- **`ExtendedGCD` takes any number of integers, and `Fibonacci` and
+  `BellNumber` take a second operand, the variable of their polynomial.**
+  `ExtendedGCD(12, 18, 27)` was an `unexpected-argument` error; it is
+  `(3, 4, -4, 1)`, the GCD and one Bézout coefficient per operand
+  (`12·4 + 18·(-4) + 27·1 = 3`). `Fibonacci(10, x)` is the Fibonacci
+  polynomial `x^9 + 8x^7 + 21x^5 + 20x^3 + 5x` and `BellNumber(4, x)` the Bell
+  polynomial `x^4 + 6x^3 + 7x^2 + x`; an index past 1000 stays unevaluated.
+  `Binomial(n, n)` and `Binomial(n, n - 1)` for a symbolic `n` evaluate to `1`
+  and `n`. Compiled code declines `Fibonacci(n, x)`. (PR #545, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#544](https://github.com/cortex-js/compute-engine/issues/544))
+
+- **The effects of a function literal are read from the scope it was boxed
+  in.** A name that the literal calls resolves from the scope of its body
+  and the scopes around it, not from the scope that is current when the
+  effects are read, so the answer no longer changes with the reader. The
+  effect slots that change:
+  - In `Block(Declare(g, 'unknown', s ↦ Length(s)), Map(x ↦ g(x) + 1, S))`
+    the literal was `(x: string) -> …` inside a run of the block and
+    `(x: string) any -> …` after it. It is `(x: string) -> …` in both: a
+    local that its block declares once with a literal, and writes nowhere
+    else, has the effects of that literal. A local that the block writes
+    again is `any`.
+  - In the Epsil program `function g() { Random() }  function h(x) { g() + x }`, `h` was `(x: unknown) any -> …`; it is
+    `(x: unknown) random -> …`.
+  - A function that calls itself, or a function of the same block that
+    calls it back, is no longer `any` for that call: `function f(n, acc) { let out = acc; if n > 0 { out = [...out, n]; out = f(n - 1, out) }; out }` is `(n: unknown, acc: collection<any>) -> collection<any>`, and
+    `even`/`odd` defined in the body of a function are pure inside a call
+    of that function and outside it.
+  - In `Function(Function(1 + Return(), x), Return)`, the inner literal
+    was `(x: unknown) any -> …`. It is `(x: unknown) -> …`: `Return` is the
+    unannotated parameter of the enclosing literal, which is optimistically
+    pure, as for a direct call. The same holds for
+    `Function(Apply(Function(1 + Return(), x), 5), Return)`.
+  - With `h` defined in a scope that a reader pushes, a literal boxed
+    outside that scope keeps the effects of the `h` it reads: with a pure
+    global `h` and a pushed scope that declares a drawing `h`, `x ↦ h(x) + 1` stays `(x: unknown) -> number`, and a literal boxed in the pushed
+    scope stays `(x: unknown) random -> number` after the scope is popped.
+- **The value of a `vars` or `symbolic` input is hidden in a function body
+  that was written before the input was declared.** With `f(x) := |a| x`
+  defined first, then `a: real` holding 4, then a scope that declares `a`
+  again with no value, `compile(f(x), { symbolic: ['a'] })` emitted
+  `x * _.a` for the function: the name had no definition when the body was
+  boxed, and the declaration it reads now was not among those whose value
+  the compilation hides. It emits `x * Math.abs(_.a)`.
+- **A compilation target called directly reads the `symbolic` option.**
+  `new JavaScriptTarget().compile(expr, { symbolic: ['a'] })`, and the same
+  call on the shader targets and the Python target, ignored the option and
+  folded the value of `a`. Only `compile()` and the interval target read
+  it.
+- **A name of `symbolic` or `vars` that the compilation does not read has no
+  effect.** A name that the expression, the functions it calls and the
+  values it reads never use is no longer refused (a constant, a function, a
+  name with an inferred type), and it no longer keeps the compilation from
+  running in the scope of the expression: with `a` holding 10, `a + x`
+  boxed, and a pushed scope that declares `a` again and `b`,
+  `compile(expr, { symbolic: ['b'] })` declined, and is `10 + _.x`. A host
+  can list every name that its scopes declare with no value.
+- **A `symbolic` name that is a function declines.** A name defined with
+  `g(t) := …` was silently left as a function. The compilation now declines
+  with the name in `binding`, as for a name that holds a function literal.
+
+- **`IntegerString` and `DigitsFrom` keep an integer past 2^53 exact.**
+  `IntegerString` read its operand as a double, so a large integer lost
+  digits and, in base 10, came out in exponent notation:
+  `IntegerString(Factorial(30))` was `"2.65252859812191058636e+32"` and is
+  now `"265252859812191058636308480000000"`, and
+  `IntegerString(Factorial(50), 16)` was
+  `"49eebc961ed2780000000000000000000000000000000000000000"` and is now
+  `"49eebc961ed279b02b1ef4f28d19a84f5973a1d2c7800000000000"`. `DigitsFrom`
+  summed the digits in a double too:
+  `DigitsFrom(IntegerString(Factorial(50), 16), 16)` was
+  `3.0414093201713376e+64` and is now 50! exactly. Small and negative values
+  are unchanged. (PR #528, contributed by
+  [enumeratio](https://github.com/enumeratio), fixes
+  [#523](https://github.com/cortex-js/compute-engine/issues/523))
+
+### Performance
+
+- **A run keeps the cached types.** The end of a call, of a block or of a
+  loop step no longer makes the engine compute the types of the
+  expressions again: the pop of a scope changes no type, and only a pop
+  that reverts an assumption invalidates them. One call of a program of
+  nested functions over a list of 64 cells (the shape of a board-game
+  prelude) computed 13,184 types and took about 230 ms; it computes 8 and
+  takes about 102 ms. A loop of 200 steps, and a recursive function called
+  50 times, no longer invalidate the types at each step or call.
+
+## 0.188.1 _2026-11-13_
+
+### New Features
+
+- **The compile option `symbolic` names the symbols that are inputs of the
+  compiled code.** `compile(expr, { symbolic: ['a'] })` reads `a` as an
+  input wherever the compilation reads its name: in the expression, in the
+  bodies of the functions that the expression calls and in the values of the
+  symbols that it reads. Its stored value is not folded, and no analysis of
+  the compiler reads it: with `a: real` holding 4 and `f(x) := |a| x`,
+  `f(x) + a` compiles to `4 + _fn_f(_.x)` without the option and to
+  `_.a + _fn_f(_.x)`, with `x * Math.abs(_.a)` for `_fn_f`, with it. Unlike
+  `vars`, the option gives no source text: the name is emitted as any other
+  input of the target. A host that declares a name in a scope pushed around
+  a compilation (an axis, a parameter of a kernel) names it in `symbolic`,
+  so that a function defined outside that scope reads the input too. A name
+  whose type was only inferred from an assigned value, and a constant, make
+  the compilation decline.
+
+### Resolved Issues
+
+- **A compilation reads each name from the scope the expression was boxed
+  in, as its evaluation does.** With `a := 10`, `x + a` boxed, and then a
+  pushed scope that declares `a` again with the value 1, the compiled code
+  of `x + a` was `1 + _.x` on every target, where `evaluate()` reads 10; it
+  is now `10 + _.x`. A user function that the expression calls is the one it
+  was boxed with. An expression boxed in a scope that was popped compiles
+  with the definitions of that scope. An expression built from operands
+  boxed in scopes that give a name different definitions
+  (`ce.function('Add', [a, b])`) declines with the code `compile-error` and
+  the name in `binding`, and falls back to the interpreter (CE-1273).
+
+- **The value of a `vars` input is hidden in the body of a function that the
+  compiled expression calls.** With a slider `a: real` that holds 4,
+  `f(x) := |a| x`, a scope that declares `a` again with no value and
+  `compile(f(x), { vars: { a: '_.a' } })`, the emitted function was
+  `x * _.a`: the compiler read the outer value 4 in the body and dropped the
+  absolute value, so `a = -3`, `x = 2` gave −6. It is now
+  `x * Math.abs(_.a)`, which gives 6. The value is hidden on every
+  definition that an occurrence of the name reads, in the expression, in the
+  bodies of the functions it calls and in the values of the names it reads.
+  A name that `vars` maps is an input wherever it is read, and takes no part
+  in the choice of the scope of the compilation.
+
+## 0.188.0 _2026-11-13_
+
+### Breaking Changes
+
+- **The parameter of a family of roots is `["ArbitraryInteger", k]`, and a
+  constant of integration is `["ArbitraryConstant", k]`.** They were the
+  symbols `t`, `t_1`, … and `c_1`, `c_2`, …. The free parameter of an
+  identity is `["ArbitraryConstant", 1]`, where it was `t`.
+  `Solve(sin(x) = 0, x)` was `[π·t]` and is now
+  `["List", ["Multiply", "Pi", ["ArbitraryInteger", 1]]]`; `DSolve(y' = y, y, x)` was `y = c_1·eˣ` and is now `y = ArbitraryConstant(1)·eˣ`.
+- **The constants are not in `unknowns`, `symbols` or `freeVariables`.** A
+  host finds them by their operator.
+- **`subs()` and `ce.assign()` no longer reach a constant.** `r.subs({ t: 2 })`
+  and `ce.assign('c_1', 2)` leave a result as it is. Replace the constant
+  instead:
+  `r.replace({ match: ce.box(['ArbitraryInteger', 1]), replace: 2 }, { recursive: true })`.
+- **A solve for the parameter of a result needs that replacement first.** An
+  unknown of `Solve` is a symbol, and a constant is not one: to solve
+  `π·ArbitraryInteger(1) = 3π` for the parameter, replace the constant with
+  a symbol, then solve for that symbol.
+- **A solve declares nothing.** `t` stays free for the user: after a solve,
+  `ce.assign('t', 0.5)` is accepted, where it threw a type error, and an
+  expression in `t` made after a solve no longer has the type `integer`.
+  The result of a solve no longer depends on the names that were declared or
+  used before it: after `ce.parse('t + 1')`, `Solve(sin(x) = 0, x)` was
+  `[π·t_1]`, and is now the same as in a new engine.
+- **A compilation of a result with a constant declines.** It took `t` or
+  `c_1` as an input; the result now names the operator in `unsupported`. A
+  host replaces the constant with a symbol of its own first.
+- **The LaTeX of a constant is `\constant{n_{1}}` or `\constant{c_{1}}`.**
+  A family is `\pi\constant{n_{1}}`, shown as `π n_1`, where it was
+  `\pi t`. A renderer needs the macro `\constant`, which shows its argument
+  (`\newcommand{\constant}[1]{#1}`); without it, the formula is an error.
+- **A constant is never inferred as a variable.** `Solve` and `D` with no
+  stated variable infer it from the free names: a result that held `t` could
+  make `Solve` of that result infer `t`.
+
+- **`ce.checkpoint()`, `ce.restore()` and `ce.discard()` are removed**, with
+  the type `EngineCheckpoint` and the class `CheckpointError`; they were
+  deprecated since 0.187.0. To give names values for one computation, use
+  `ce.withValues()`; to make declarations that are undone together, declare
+  them in a scope pushed with `ce.pushScope()` and remove them with
+  `ce.popScope()`. The internal `_restoreCheckpointSnapshot()` of an operator
+  definition is removed too, so a test that injected a failure of a restore
+  through it has nothing to call. `ce.loadLibrary()` no longer depends on a
+  checkpoint: when a declaration of the library fails, the declarations made
+  before it are removed, also during an evaluation, where before they stayed.
+  The environment variable `CE_CHECKPOINT_CANARY` has no effect.
+- **The environment variable `CE_BINDING_UNITS` and the internal field
+  `ce._bindingUnits` are removed.** Boxing declares no name, as it does by
+  default since 0.187.0, and no setting gives the earlier behavior:
+  `CE_BINDING_UNITS=0` and `ce._bindingUnits = false` have no effect. A host
+  that set either one declares its names, or calls `ce.infer()` on the
+  expressions that use them.
+- **The helper of a user function that shadows a library operator has a new
+  name in compiled code.** A document that defines `Gamma` compiles a call of
+  it as a call of a private copy: the copy was named `GammaUser` (emitted as
+  `_fn_GammaUser`), and is now named by `ce.temporaryName()`, `Gamma_tmp1`
+  (emitted as `_fn_Gamma_tmp1`). The values are the same. A host that
+  compares emitted code, or that reads the helper name, sees the new name.
+- **A local of a block is made only by a `Declare`, and an `Assign` never
+  makes one.** An `Assign` writes the variable that is in scope. In a block,
+  a function body, a binder body, a branch or a loop body, an `Assign` to a
+  name that no scope declares is the error `assignment-to-undeclared-variable`:
+  `["Block", ["Assign", "c", 5], ["Multiply", 2, "c"]]` with no `c` in scope
+  was `10` and is now that error. Declare the local:
+  `["Block", ["Declare", "c", "'unknown'", 5], ["Multiply", 2, "c"]]` is `10`.
+  In Epsil a local is written with `let`, also at the top level of a program:
+  `c = 5; 2c` is the error, `let c = 5; 2c` is `10`. In LaTeX, the first `:=`
+  of a name in a `;` block is already a `Declare`, so `c := 5; 2c` is still
+  `10`. Outside every block (`ce.assign()`, an `Assign` that the host
+  evaluates), an assignment declares the variable in the current scope, as
+  before.
+- **A `Declare` is allowed only at the top level of a block.** A `Declare` in
+  a branch of an `If` or in a loop body is the error
+  `declaration-below-statement`: `["Block", ["If", "True", ["Declare", "t", "'integer'", 3]], "t"]` was `3`. The error `first-assignment-in-branch` is
+  removed: a first assignment in a branch is now
+  `assignment-to-undeclared-variable`.
+- **A function statement in a block or a function body declares a local
+  variable that holds a function, and the errors of a block local apply to
+  it.** A call before the statement is `read-before-declaration`: in Epsil,
+  `do { let a = g(2); function g(x) { x + 1 }; a }` was `3`. A second
+  function statement of the same name, or a `let` or `Declare` of that name
+  in the same block, is `variable-redeclaration`:
+  `do { function g(x) { x + 1 }; function g(x) { x + 2 }; g(2) }` was the
+  error `function-redefinition`, and `["Block", ["Declare", "g", "'unknown'", 1], ["DefineFunction", "g", …], ["g", 2]]` was `invalid-clause-definition`.
+  The type of the local is the signature that the statement writes, and
+  `function` when it writes none: `do { function g(x) { x + 1 }; type(g) }`
+  was `(x: unknown) -> number` and is `function`. A function statement at
+  the top level of a program, and a `let` of a function literal anywhere,
+  are unchanged.
+- **The top level of an Epsil program follows the rules of a block.** A
+  read before a `let` is `read-before-declaration`: `let a = q + 1; let q = 2; a` was `3`. An assignment in a value operand to a name that is not declared
+  (`["Sum", ["Assign", "s", ["Add", "s", "i"]], ["Limits", "i", 1, 3]]`) is
+  `assignment-in-operand`, as before.
+- **An expression reads its names from the scope it was boxed in.** A
+  declaration or an assignment in a scope pushed after the expression was
+  boxed is not read: with `e = ce.parse('x+1')`, then `ce.pushScope()` and
+  `ce.assign('x', 3)`, `e.evaluate()` was `4` and is `x + 1`, and with
+  `ce.declare('x', 'integer')` in the pushed scope `e.type` was `integer`
+  and is `number`. A declaration made later in the scope the expression was
+  boxed in, or in one of its parents, is read, as before: without the
+  `pushScope()`, `e.evaluate()` is `4`. To read the current scope, bind the
+  expression again: `ce.rebind(e).evaluate()` is `4`. A scope that was
+  popped keeps its definitions for the expressions boxed in it: with
+  `ce.pushScope()`, `ce.declare('x', 'integer')`, `ce.assign('x', 5)`,
+  `e = ce.parse('x+1')` and `ce.popScope()`, `e.evaluate()` was `x + 1` and
+  is `6`. To give a name a value for one evaluation, or to hide its value,
+  use `ce.withValues({ x: 3 }, () => e.evaluate())` in place of a
+  declaration in a pushed scope: it writes on the definition that the
+  expression reads, so it also reaches a stored function that the
+  expression calls, which `ce.rebind()` does not.
+- **`Type(x)` of a name with no declared type is the type of the value it
+  holds, and of a declared name its declared type, in a block as at the top
+  level.** `do { let v = [1, 2, 3]; v = [4]; type(v) }` was
+  `vector<integer>` and is `vector<integer^1>`, as at the top level.
+  `function f(x: list) { type(x) }; f([1, 2])` was `list<integer>` and is
+  `list`. An untyped parameter gives the type of its argument, as before:
+  `function f(x) { type(x) }; f(1)` is `integer`.
+- **A lazy list stored in a variable is a closure.** A lazy collection that
+  stays lazy when it is assigned (a `filter` or a `map` of an endless range,
+  a lazy comprehension) reads the variables of its callback when an element
+  is computed, as a function does; it no longer stores their values at the
+  assignment. With `let k = 3; let big = filter(1..oo, c => c > k); k = 10`,
+  `first(big)` was `4` and is now `11`. To keep the elements at a statement,
+  list them there: `let firsts = listFrom(take(big, 3))` before `k = 10`
+  gives `[4, 5, 6]`. A variable that is an operand of the collection
+  (`xs` in `xs = filter(xs, p)`) still gives the value it holds at the
+  assignment.
+- **A `const` local of a block is ordered as a constant in a sum or a
+  product, as a global constant is.** In Epsil,
+  `function h(x: real) -> real { const i = floor(x); 30001 + i }` compiles to
+  JavaScript that returned `i + 30001` and now returns `30001 + i`. The value
+  is the same. A `let` local and a parameter are ordered as variables, as
+  before: with `let i = floor(x)`, the code returns `i + 30001`.
+- **A name with no definition in the body of a function literal or of a
+  `Block` is the free name of the scope that the expression is written in.**
+  Boxing no longer declares a copy of it in the scope of the body. The `f` of
+  `ce.box(['Function', ['Block', 'f'], 'x'])` and a later `ce.box('f')` were
+  not `isSame` and now are; the same holds for
+  `ce.box(['Block', ['Add', 'f', 1]])`. Values are unchanged: after
+  `f := 5`, the literal applied to `3` is `5`, as before. A library operator
+  name used as a value in a body (`N` in `x ↦ N + x`) is a free name too,
+  as it is at the top level.
+- **An assignment or a declaration with a value no longer types the symbol
+  that is its value.** With `ce.declare('q', 'integer')` and
+  `ce.declare('uu', 'unknown')`, `ce.assign('q', ce.symbol('uu'))` typed `uu`
+  as `integer`; `uu` now keeps the type `unknown`. The same holds for
+  `ce.declare('r', { type: 'real', value: ce.symbol('zz') })` with `zz`
+  declared `unknown`. Declare the type of the symbol to give it one.
+
+### New Features
+
+- **The GLSL target passes the inputs that are locals of the caller to the
+  shader functions that read them.** A host that runs the code inside a
+  function of its own, `float userFn(float x, float y) { … }`, names those
+  inputs in the new compile option `callerLocals`. A user function that
+  reads one of them, directly or through another user function, takes it as
+  a trailing parameter, in the sorted order of the names. With
+  `g(u) := u + x` and `callerLocals: ['x']`, `g(1)` was `_fn_g(1.0)`, with
+  the definition `float _fn_g(float u) { return u + x; }`, which reads a
+  global `x`; it is now `_fn_g(1.0, x)`, with
+  `float _fn_g(float u, float _in_x) { return u + _in_x; }`. A call passes
+  the `vars` source of the name when it has one, and in
+  `GLSLTarget.compileFunction()`, which takes the option too, a declared
+  parameter by its name. A name with no GLSL value type that a function
+  reads declines. Without the option, the code is unchanged; the other
+  targets ignore it.
+
+- **Two operators stand for the arbitrary constants of a result.**
+  `["ArbitraryConstant", k]` is any number (a constant of integration, the
+  free parameter of an identity) and `["ArbitraryInteger", k]` is any integer
+  (the parameter of a family of roots, of a diophantine or a congruence
+  solution). The index `k` is a positive integer literal; any other operand
+  is an error. A call has no value: `evaluate()` and `N()` keep it. Inside
+  one result, two calls with the same index are the same value, and two
+  calls with different indexes are independent:
+  `ArbitraryConstant(1) − ArbitraryConstant(1)` simplifies to `0`, and
+  `ArbitraryConstant(1) − ArbitraryConstant(2)` stays. The indexes are given
+  for one evaluation of `Solve`, `DSolve` or `RSolve`, from the smallest one
+  that its input does not use: a solve whose equation holds
+  `ArbitraryInteger(1)` gives its new parameter the index 2. Two results of
+  two solves both use the index 1, so an expression that combines them
+  identifies their constants; replace the indexes of one result first.
+
+- **`\constant{c_{k}}` and `\constant{n_{k}}` read and write the
+  constants in LaTeX.** `\constant{c_{1}}` is `["ArbitraryConstant", 1]`
+  and `\constant{n_{1}}` is `["ArbitraryInteger", 1]`. Any other argument of
+  `\constant` is an error. Without the command, `c_1` is a symbol, as
+  before.
+
+- **A macro: `ce.declare(name, { macro: body })`.** A macro keeps a raw
+  MathJSON body and has no value and no type of its own. Where a name of the
+  input (MathJSON or LaTeX) resolves to a macro, boxing replaces it by the
+  body, boxed at that place, in the scope of the occurrence and in the same
+  form (canonical, partial or structural). So a parameter or an index of the
+  reader binds the names of the body, and an operator gives the value it
+  gives for the body written in place of the name (`D(A, x)`,
+  `\int A\,dx`):
+
+  ```ts
+  ce.declare('A', { macro: ['Multiply', 'k', 'x'] });
+  ce.parse('\\sum_{k=1}^{3} A').evaluate(); // 6x
+  ce.declare('B', { macro: ['Add', ['Power', 'x', 2], ['Power', 'y', 2]] });
+  ce.assign('f', ['Function', ['Add', 'B', 1], 'x']);
+  ce.box(['f', 3]).evaluate(); // y^2 + 10
+  ```
+
+  A parameter, an index or a local of the same name hides the macro. A
+  position that takes a name (a parameter, an index, the variable of `D` or
+  `Solve`, the target of `Assign` or `Declare`) is not an occurrence, and a
+  symbol made with `ce.symbol()` is not expanded. The raw form keeps the
+  name, and so does a held operand, also when `ReleaseHold` releases it.
+  Nothing is expanded during an evaluation (`evaluate()`, `N()`,
+  `simplify()`, `compile()`, `replace()`, ...): a name boxed then, such as
+  the replacement of a rule or a `ce.parse()` in a host callback, is the
+  plain name. A macro that reaches itself is `Error('macro-cycle', name)`. A macro is declared before
+  the expressions that name it are boxed: an expression boxed earlier keeps
+  the name, which has no value. `ce.assign()`, an evaluated `Assign` and
+  `ce.withValues()` on a macro throw; a definition with `macro` takes no
+  other field. In LaTeX, `A(x+1)` is a product.
+
+- **Experimental: the `ir` profile of the JavaScript target.**
+  `compile(expr, { profile: 'ir' })` compiles the expression with a new
+  compiler; it can change or be removed without notice. A program or an
+  option outside the profile declines with `outside-profile`, and `fallback`
+  applies as for any other decline; without the option, nothing changes.
+
+- **`ce.temporaryName(hint, ...avoid)` gives a name for a temporary symbol.**
+  It returns `<hint>_tmp<n>`, with `n` the smallest integer from 1 for which
+  the name has no definition from the current scope and does not occur in
+  `avoid`: boxed expressions (each symbol, free or bound, and each operator
+  name), single names, and sets of names. It keeps no state and declares
+  nothing, so the same call in the same state gives the same name. A name
+  that ends with `_tmp` and a positive integer is reserved for this method.
+  The series, residue and contour-integration code, the solvers of `DSolve`
+  and `RSolve`, and the compiler use it for their own auxiliary names.
+
+  ```js
+  ce.temporaryName('t'); // ➔ "t_tmp1"
+  ce.temporaryName('t', ce.box(['Add', 't_tmp1', 'x'])); // ➔ "t_tmp2"
+  ```
+
+- **The `numeric-kernel` profile compiles user functions that read the
+  inputs of the program.** A user function whose body reads a name that is
+  not one of its parameters declined (`unsupported helper capture`). It now
+  compiles when the name is an input of the program (`g(t) := t + x`): the
+  function reads the input where it runs, as the existing compiler does, so
+  a function of the host that changes the inputs object gives the same
+  value. It also compiles when the name has a value that is an expression
+  (`lv := x + 1`): the value is computed once per call and passed to the
+  function. Both hold also where the function is applied to each element of
+  a list (`g(L)`). Such a function still declines with a root `Function`
+  literal, and, for a value that is an expression, as a function operand
+  (`Map(h, L)`), in a local function, or under a binder of the name.
+
+  ```js
+  ce.declare('x', 'real');
+  ce.assign('g', ce.box(['Function', ['Add', 't', 'x'], 't']));
+  compile(ce.box(['g', 2]), { profile: 'numeric-kernel' }).run({ x: 1.5 });
+  // ➔ 3.5
+  ```
+
+- **The `numeric-kernel` profile compiles more statement and loop forms.**
+  These forms declined and now compile, with the values of the existing
+  compiler:
+  - a `Loop` over several index sets, nested with the first one outermost;
+  - a `Loop` with no index set, which a `Break` ends;
+  - a `Loop` over a list value (`Element(c, Reverse(L))`) or over a range
+    with a step;
+  - a `Comprehension` with several generators, with filters, over a list
+    value, or over a range with a step, when its body, its filters and
+    its later sources are pure;
+  - a destructuring declaration or write of a literal tuple, or of the
+    tuple value of a user function (`(a, b) ≔ (b, a + b)`), in the
+    `strict` mode;
+  - `Return(v)` in tail position;
+  - `Continue` at the end of a branch of an `If` of a loop body;
+  - a user function with a parameter that has a default value.
+
+  These forms still decline, each with its cause in the message:
+  - a `Break` in a loop over several index sets, which the existing
+    compiler also declines;
+  - a `Return` or a `Continue` elsewhere;
+  - a default value of a parameter of the root `Function`.
+
+  ```js
+  ce.declare('n', 'integer');
+  const fib = compile(
+    ce.box([
+      'Block',
+      ['Declare', 'a', "'real'", 0],
+      ['Declare', 'b', "'real'", 1],
+      ['Loop', ['Assign', ['Tuple', 'a', 'b'], ['Tuple', 'b', ['Add', 'a', 'b']]],
+        ['Element', 'k', ['Range', 1, 'n']]],
+      'a',
+    ]),
+    { profile: 'numeric-kernel' }
+  );
+  fib.run({ n: 10 }); // ➔ 55
+  const pairs = compile(
+    ce.box(['Comprehension', ['Tuple', 'i', 'j'],
+      ['Element', 'i', ['Range', 1, 3]],
+      ['Element', 'j', ['Range', 'i', 3], ['Less', 'i', 'j']]]),
+    { profile: 'numeric-kernel' }
+  );
+  pairs.run({}); // ➔ [[1, 2], [1, 3], [2, 3]]
+  ```
+
+- **The `numeric-kernel` profile compiles a user function applied to each
+  element of a list, sums of lists, and `Max`, `Min` and `Equal` with
+  lists.** These forms declined with `outside-profile` and now compile, with
+  the values of the existing compiler: a user function
+  with real or integer parameters (declared, inferred, a local function, or
+  through `Apply`) called with a list of reals or of integers (`f(L)`,
+  `g(L, x)`, `g(L, L)`, `f(A)` of a list of lists), whose value is the list
+  of its values, one call per element in order, also when the function's
+  value is a list; a `Sum` or a `Product` whose body is a list
+  (`Sum(L·k, k, 1, 3)`, `Sum([k, 2k], k, 1, 3)`) with number literal bounds
+  and a range that is not empty, or a body whose type states its width
+  (`Sum(V·k, k, 1, 0)` of `V: vector<3>` is `[0, 0, 0]`); `Max` and `Min` of
+  lists and numbers (one number); `Equal` and `NotEqual` of two lists of
+  numbers (one boolean). Still declined: two list arguments of lengths that
+  only the values decide (`g(L, M)`: declare one width), a list at an
+  integer parameter, a sum of a list body with a bound such as `n`
+  (`Sum(L·k, k, 1, n)`: the existing compiler gives a number, not a list, for
+  an empty range or a bound that is not a safe integer), and `Equal` of two
+  lists in the `complex` mode.
+
+  ```js
+  ce.declare('f', '(real) -> real');
+  ce.assign('f', ce.box(['Function', ['Add', ['Square', 't'], 1], 't']));
+  const u = compile(ce.box(['f', 'L']), { profile: 'numeric-kernel' });
+  u.run({ L: [1, 2, 3] }); // ➔ [2, 5, 10]
+  ```
+
+- **The `numeric-kernel` profile compiles the scalar functions of a list,
+  the comparisons of a list and the selections on them.** In the `strict`
+  mode these forms declined with `outside-profile` and now compile, with the
+  values of the existing compiler: a scalar function applied to each element
+  of a list and real operands (`L^3`, `Exp(L)`, `Sqrt(L + 1)`, `Log(L, 2)`,
+  `Mod(L, 3)`, `Hypot(L, x)`, `Round(L)`, `Gamma(L)`, `BesselJ(n, L)`, …),
+  and of two lists whose lengths are equal by construction (one name, an
+  element-wise result of it, two comprehensions over one range) or whose
+  types state one width (`vector<3>`, `list<real^3>`); a comparison of a list
+  (`L < 0`, `L == 3`) and `Not`, `And`, `Or` of such lists, whose value is a
+  list of booleans, and `At` and `Length` of one; `If` and `Which` whose
+  conditions are such lists, with arms that are reals or lists of the same
+  length (`NaN` where no condition holds). Two lists of unstated lengths
+  still decline (`L + M`, `Hypot(L, M)`): declare one width. Also declined:
+  every element-wise function in the `complex` mode, `Arcsin` and the other
+  inverse functions whose scalar value can be complex, `Beta`, `AGM`,
+  `CosIntegral` and `GammaRegularized` of a list, `Sin(π·L)`, a power of a
+  list by an exact fraction of odd denominator (`L^(2/3)`), a selection arm
+  that draws, calls the host or can throw (`If(L > 0, Random(), 0)`,
+  `If(L > 0, Length(Range(1, n)), 0)`),
+  a list of booleans as an input, a local or the value of a helper, a list
+  whose elements the existing compiler reads as complex numbers
+  (`Arctan([√k for k in 1..n])`), `Max(L, x)` and `Equal(L, M)`.
+
+  ```js
+  ce.declare('L', 'list<real>');
+  const f = compile(ce.box(['If', ['Less', 'L', 0], 0, ['Sqrt', 'L']]), {
+    profile: 'numeric-kernel',
+  });
+  f.run({ L: [-1, 4, 9] }); // ➔ [0, 2, 3]
+  ```
+
+- **The `numeric-kernel` profile compiles names whose value is an
+  expression, captured lists of lists and captured complex numbers.** These
+  names declined with `unsupported binding` and now compile, with the
+  values of the existing compiler. A name whose value is a pure expression
+  of the inputs (`lv := x + 1`, a list `[x, 2y]`, a chain of such values)
+  is computed once per call, before the body, as the existing compiler
+  computes `_val_lv`; the name and each name whose value it reads are in
+  `symbolDeps`. A value that is not pure, that reads the host, that a user
+  function reads, whose names a parameter or an index binds where it is
+  read, or that is real for a name declared `complex`, still declines. A
+  captured list of lists (`rows := [[1, 2], [3]]`) is one array, made once,
+  which no call writes: a result that can hold it or one of its rows is a
+  copy, so a host that writes into the result does not change the next
+  call; a result of rank 3 or more in such a program (`[rows, rows]`)
+  declines. A captured complex
+  number (`z0 := -0.5 + 2i`) is read as the existing compiler reads it. An
+  input of a union of a number and a list (`u: list<real> | real`) still
+  declines, with the union in the message.
+
+  ```js
+  ce.declare('x', 'real');
+  ce.assign('lv', ce.box(['Add', 'x', 1]));
+  ce.assign('rows', ce.box(['List', ['List', 1, 2], ['List', 3, 4]]));
+  const f = compile(ce.box(['Add', ['Multiply', 2, 'lv'], ['Sin', 'lv']]), {
+    profile: 'numeric-kernel',
+  });
+  f.run({ x: 0 }); // ➔ 2.8414709848078967
+  const g = compile(ce.box(['Multiply', 'x', 'rows']), {
+    profile: 'numeric-kernel',
+  });
+  g.run({ x: 2 }); // ➔ [[2, 4], [6, 8]]
+  ```
+
+- **The `numeric-kernel` profile compiles the functions of flat lists of
+  numbers and the index operands that are not one integer.** These forms
+  declined with `outside-profile` and now compile, with the values of the
+  existing compiler: `Ordering`, `Unique`, `IndexOf`, `Contains`, `Second`,
+  `Third`, `Most`, `IsEmpty`, `Append(L, x)`, `Repeat(x, n)` with an integer
+  count, `Linspace` with finite literal bounds, `Slice`, the statistics
+  `PopulationVariance`, `StandardDeviation`, `PopulationStandardDeviation`,
+  `Skewness`, `Kurtosis`, `Mode`, `InterquartileRange`, `Covariance` and
+  `Correlation`; `CountIf`, `Any`, `All`, `Find`, `IndexWhere`, `Position`,
+  `TakeWhile` and `DropWhile` with a predicate literal (each stops at the
+  element that decides, as the existing compiler does), and `Tabulate(f, n)`
+  of one dimension; `At(L, x)` with a real index (`NaN` for a fraction),
+  `At(L, I)` and `At(L, Range(a, b))` (a gather, `NaN` at an index out of
+  range), and `Take` and `Drop` with a real count (rounded). A list of tuples
+  or of lists still declines for most of these heads, and so do `Repeat`
+  with a real count, `Linspace` with a bound that is not a finite literal,
+  `Quartiles`, `Element(x, L)`, `DeleteAt`, `Insert`, `Partition`, `Chunk`
+  and `Zip`.
+
+  ```js
+  ce.declare('L', 'list<real>');
+  ce.declare('a', 'integer');
+  ce.declare('b', 'integer');
+  const f = compile(ce.box(['Sum', ['At', 'L', ['Range', 'a', 'b']]]), {
+    profile: 'numeric-kernel',
+  });
+  f.run({ L: [1, 2, 3, 4], a: 2, b: 3 }); // ➔ 5
+  ```
+
+- **The `numeric-kernel` profile compiles the special functions and the
+  number-theory heads of real operands.** These heads declined with
+  `outside-profile` ("unsupported head") and now compile, with the values of
+  the existing compiler: `GammaRegularized`, `StieltjesGamma`, `PolyGamma`,
+  `Zeta`, `Beta`, `Binomial`, `Choose`, `GammaLn`, `Trigamma`, `Sinc`,
+  `Erfi`, `ErfInv`, `FresnelS`, `FresnelC`, `SinIntegral`, `CosIntegral`,
+  `ExpIntegralEi`, `LogIntegral`, `DirichletEta`, `DirichletBeta`,
+  `ClausenCl`, `EllipticF`, `BesselJ`, `BesselY`, `BesselI`, `BesselK`,
+  `AGM`, `Chop`, `Heaviside`, `Remainder`, `GCD`, `LCM`, `KroneckerDelta`,
+  `Clamp`, `Boole`, and `Real`, `Imaginary` and `Argument` of a real
+  operand. `HurwitzZeta`, `PolyLog`, `LambertW`, `EllipticK`, `EllipticE` and
+  `Gamma` of two operands compile too; in the `complex` mode only where the
+  value is proved real (`HurwitzZeta(k, y)` with `k` an integer), as the
+  existing compiler writes the complex kernel elsewhere. A complex operand
+  of these heads, the heads of three operands (`BetaRegularized`,
+  `LerchPhi`), and `CosIntegral` of an operand that can be negative (the
+  existing compiler gives the real part of a complex value there) still
+  decline, and so do `GammaRegularized(a, z)` and `Gamma(s, z)` with a `z`,
+  `AGM` with an operand, that is not provably non-negative, and `Beta` with
+  an operand that is not provably positive: the existing kernels give `NaN`
+  there, where the interpreter has a finite value for some arguments.
+
+  ```js
+  ce.declare('x', 'real<0..>');
+  ce.declare('k', 'integer');
+  const f = compile(ce.box(['Add', ['GammaRegularized', 3, 'x'], ['GCD', 'k', 6]]), {
+    profile: 'numeric-kernel',
+  });
+  f.code; // ➔ "_SYS.gcd(_.k, 6) + _SYS.gammaQ(3, _.x)"
+  ```
+
+- **The `numeric-kernel` profile compiles an `If` or a `Which` whose
+  conditions are constant.** A condition whose type is `true` or `false`
+  selects its branch, and the code is that branch alone, as the existing
+  compiler writes it: `If(2 < 3, x, Sqrt(x))` compiles to `_.x`. As an
+  operand, the selection compiles only when the branch is a symbol with no
+  value. An `If` of
+  three operands whose selected branch is not a symbol or a number still
+  declines: the existing compiler writes that branch with no parentheses
+  (`2 · If(2 < 3, x + 1, 0)` is `2 * _.x + 1` there). A selection whose
+  other branches widen its type beyond a number (a name with no declared
+  type) declines too.
+
+- **The `numeric-kernel` profile compiles a rounding function of a
+  parameter that has the name of a symbol with a value.** With
+  `ce.assign('t', 1/3)`, `Function(Floor(t), t)` compiles to
+  `(t) => { return Math.floor(t); }`, where it declined with "Floor of an
+  operand with the exact constant t".
+
+- **The `numeric-kernel` profile compiles lists of lists.** In the `strict`
+  mode, a value of the type `list<list<real>>`, `list<list<integer>>`,
+  `matrix` or `matrix<m×n>` (rows of different lengths too) can be an input,
+  a parameter, a local or a result, with the values of the existing
+  compiler: literals of rows, comprehensions of rows, `At(M, i)` (a row,
+  `undefined` out of range), `At(M, i, j)` (`NaN` out of range), `Length` of
+  each level, `First`, `Last`, `Take`, `Drop`, `Rest`, `Reverse`, `Join`, the
+  rotations and `ReplaceAt` of a row or of an element. The inputs are never
+  written.
+
+  ```js
+  ce.declare('M', 'list<list<real>>');
+  ce.declare('x', 'real');
+  const f = compile(ce.box(['ReplaceAt', 'M', 1, 2, 'x']), {
+    profile: 'numeric-kernel',
+  });
+  f.run({ M: [[1, 2], [3]], x: 9 }); // ➔ [[1, 9], [3]]
+  ```
+
+  A `tensor`, complex cells and the `complex` and `bigint` modes still
+  decline. So do a product and a power of lists of lists (`M·M`): with
+  `list<list<real>>` the value decides whether the product is a matrix
+  product; declare a matrix as `matrix`.
+
+- **The `numeric-kernel` profile compiles matrix functions, arithmetic and
+  folds of lists of lists.** In the `strict` mode these forms compile, with
+  the values of the existing compiler:
+  - `Determinant`, `Trace`, `Inverse`, `MatrixPower` with an integer
+    exponent, `MatrixMultiply`, `Dot` with a matrix operand, `Transpose`,
+    `RowReduce`, `Diagonal`, `Flatten` and `Norm` (also with a numeric order);
+  - element-wise `Add`, `Subtract`, `Multiply` by a number, `Negate` and
+    `Divide` of a list of lists, and the sum of two whose lengths are equal at
+    every depth by construction (`A + 2A`, `matrix<2x2> + matrix<2x2>`);
+  - `Sum` and `Product` of the rows of a `matrix`, and `Map` of a function
+    literal over the rows;
+  - the product `A·B` of two `matrix` values, or of a matrix and a list.
+
+  ```js
+  ce.declare('A', 'matrix<2x2>');
+  ce.declare('v', 'vector<2>');
+  const f = compile(ce.box(['Add', ['Multiply', 'A', 'v'], 'v']), {
+    profile: 'numeric-kernel',
+  });
+  f.run({ A: [[1, 2], [3, 4]], v: [1, 1] }); // ➔ [4, 8]
+  ```
+
+  A matrix that can have no value (the inverse of a singular matrix, a
+  product whose dimensions do not agree: `NaN` in place of the matrix) is
+  admitted only as the result, as the operand of a matrix function or as the
+  list of `At`; elsewhere the compilation declines. A product of lists of
+  lists that are not declared `matrix`, a product of more than two factors,
+  the sum of two `matrix` inputs of no stated dimensions, `Max`, `Filter`,
+  `Reduce` and `Scan` of rows still decline.
+
+- **The `numeric-kernel` profile compiles captured lists, folded constants
+  and unread parameters.** Four forms that declined with `outside-profile`
+  now compile, with the values of the existing compiler:
+  - a name whose value is a list of finite real numbers (`ce.declare('L', { type: 'list<integer>', value: [10, 20, 30] })`): the list is one array
+    of the code, made once when the compiled function is made, and the name
+    is in `symbolDeps`;
+  - a name read in the frame of a call that the interpreter is making
+    (`d` in `f(d) := Sum(Map(x ↦ x + d, Range(1, 128)))`);
+  - a rounding, a sign, a remainder or a comparison of exact operands that
+    read no input (`Floor((25! − 1)/24!)`, `Less(a, b)` of two captured
+    rationals), written as the literal of its value; and `Mod(x, 1)` of a
+    dividend that is not integer-valued;
+  - a parameter of the root `Function` that the body never reads, whatever
+    its type.
+
+  ```js
+  ce.declare('x', 'real');
+  ce.declare('k', 'integer');
+  ce.declare('L', { type: 'list<integer>', value: ['List', 10, 20, 30] });
+  const deps = new Set();
+  const f = compile(ce.parse('L_{k} + x'), {
+    profile: 'numeric-kernel',
+    symbolDeps: deps,
+  });
+  f.code; // ➔ "_.x + _SYS.atNumeric(_tv1, _.k, \"integer\")"
+  f.preambleOnce; // ➔ "const _tv1 = [10, 20, 30];\n"
+  f.run({ k: 2, x: 0.5 }); // ➔ 20.5
+  [...deps]; // ➔ ["L"]
+  ```
+
+  A `ParallelLoop`, an `If` whose condition has a constant type, `Mod(k, 1)`
+  of an integer `k`, and a captured value that is an expression of the
+  inputs still decline.
+
+- **The `numeric-kernel` profile of `compile()` admits integrals and
+  derivatives that have a closed form.** An `Integrate`, `D`, `ND` or
+  `Derivative` node, and an applied derivative (`f'(x)`), declined with
+  `outside-profile` ("unsupported head Integrate"). In the `strict` mode
+  the profile now compiles such a node when the engine finds its closed
+  form at compile time, as the compiler without the profile does: the code
+  is the code of the closed form, with the same values.
+
+  ```js
+  ce.declare('a', 'real');
+  ce.declare('x', 'real');
+  const f = compile(ce.parse('\\int_0^a e^{-t^2} dt'), { profile: 'numeric-kernel' });
+  f.run({ a: 1 }); // ➔ 0.746824132812427
+  const g = compile(ce.parse('\\frac{d}{dx} \\sin(x^2)'), { profile: 'numeric-kernel' });
+  g.run({ x: 1 }); // ➔ 1.0806046117362795
+  ```
+
+  An integrand that draws, the `complex` mode and `NIntegrate` still
+  decline with `outside-profile`; a derivative with no closed form and
+  `Limit` compile numerically (below).
+
+- **The `numeric-kernel` profile of `compile()` integrates numerically a
+  definite integral that has no closed form.** Such an integral declined
+  with `outside-profile`. In the `strict` mode the profile now writes the
+  call of the compiler without the profile, `_SYS.integrate`, with the
+  integrand as a function of its variable, one call per `Limits` clause
+  (the first clause outermost) and the same starting panel count: the
+  integrand is evaluated at the same points, in the same order, and the
+  result is the same number. The integrand can read inputs, captured
+  numbers, the locals of a block and a loop index, and call user
+  functions; the integral can be in a branch, a `Loop`, a `Map`,
+  another integral or the body of a user function. Such a result reports
+  `pure: false` and `shippable: false`.
+
+  ```js
+  ce.declare('a', 'real');
+  const f = compile(ce.parse('\\int_0^a \\sqrt{1+t^4} dt'), { profile: 'numeric-kernel' });
+  f.run({ a: 1 }); // ➔ 1.0894294132248226
+  ```
+
+  Still declined: a bound
+  that reads the variable of its own clause (`∫₀ˣ √(1 + x⁴) dx`), an
+  integrand that reads or calls a function of the host, a `Sum` or a
+  `Product` whose terms hold such an integral (below), and an indefinite
+  integral with no closed form. A rounding of such an integral
+  (`⌊∫₀ᵃ √(1 + t⁴) dt⌋`) compiles, and so does a rounding of the variable
+  in the integrand when the variable also has a value of its own.
+
+- **The `numeric-kernel` profile computes derivatives and limits
+  numerically, integrals in log space, and the Monte Carlo estimator.**
+  These declined with `outside-profile`; in the `strict` mode each one now
+  writes the call of the compiler without the profile (with
+  `constantFold: false`), with the body as a function of its variable,
+  evaluated at the same points, in the same order:
+
+  - a derivative with no closed form, `D(body, v)` of one symbol,
+    `ND(f, x)` and `Apply(Derivative(f, n), x)` of a function literal of one
+    parameter or of a user function whose result is a number: the stencil
+    `_SYS.nd`;
+  - `Limit(f, x)` and `Limit(f, x, d)` of a function literal: `_SYS.limit`,
+    with no symbolic attempt, so a constant limit gives the value of the
+    extrapolation (`1.0000000000000002` for `sin t / t` at 0, where the
+    compiler without the profile folds it to `1` by default);
+  - an integrand that the compiler without the profile computes again in
+    log space where its value is not finite (`∫₀ᵃ t^b e^{-t} dt`): the same
+    second function and `_SYS.finiteOr`;
+  - the option `quadrature: 'monte-carlo'`: `_SYS.integrateMC`, which draws
+    from the entropy source of the engine as before.
+
+  ```js
+  ce.declare('x', 'real');
+  const d = compile(ce.box(['D', ['Zeta', 'x'], 'x']), { profile: 'numeric-kernel' });
+  d.run({ x: 0.7 }); // ➔ -11.035491244462525
+  const l = compile(
+    ce.box(['Limit', ['Function', ['Divide', ['Sin', 't'], 't'], 't'], 0]),
+    { profile: 'numeric-kernel' }
+  );
+  l.run({}); // ➔ 1.0000000000000002
+  ```
+
+  A derivative or a limit of a pure body reports `pure: true`. Still
+  declined: a derivative of a function whose value is a point or a list, of
+  several variables, or that the compiler without the profile computes with
+  Taylor jets; a limit of a function that is not a literal, at `-∞` with no
+  direction or at an infinity from the other side (the compiler without the
+  profile then gives the limit at the other infinity) or at a point whose
+  type admits an infinity (`real | signed_infinity`, `number`), or in a
+  `Sum` or a `Product` (it can throw the timeout of a deadline); a body
+  that draws or reads the host; the `complex` mode.
+
+- **The `numeric-kernel` profile declines a `Sum` or a `Product` whose
+  terms can throw.** The compiler without the profile stops a sum or a
+  product at the first term that is `NaN`, and the profile evaluated every
+  term: `Sum(Mod(1, j/k), Limits(j, 0, n))` at `k = 0` gave `NaN` without
+  the profile and threw a `RangeError` with it (the second term divides by
+  zero, and `Mod` of an infinite operand throws). A sum or a product
+  declines with `outside-profile` when a term can throw where an earlier
+  term is `NaN`, or integrates numerically, also through a user function
+  or a function that `Map` or `Reduce` calls. `Mod` throws only for an
+  operand beyond ±(2^53 − 1), so a `Mod` whose operands are each an index
+  of the sum, an integer literal or the same value in every term stays
+  admitted: `Sum(Mod(k, 3), Limits(k, 1, n))`, `Product(1 + Mod(k, 2), Limits(k, 1, n))`, `Sum(Mod(k, m), Limits(k, 1, n))` with an input `m`. A
+  term that reads or calls a function of the host is ordered and counted
+  as before, and so is every term of a sum or a product of fewer than four
+  written-out terms, which the compiler without the profile evaluates in
+  full.
+
+- **The `numeric-kernel` profile compiles lists of the type `list<number>`
+  in the `strict` mode.** An input or a parameter of the type
+  `list<number>`, `vector<n>` or `vector` declined (`outside-profile`: "the
+  input L has the type list\<number>"). In the `strict` mode, the default, it
+  is now a list of real numbers, as without the profile: `At`, `Length`,
+  the folds, element-wise arithmetic and the functions of lists read it,
+  with the values of the compilation without the profile. In the `complex`
+  mode it still declines.
+
+  ```js
+  ce.declare('L', 'list<number>');
+  const f = compile(ce.box(['Sum', ['Add', 'L', 1]]), { profile: 'numeric-kernel' });
+  f.run({ L: [1, 2, 3] }); // ➔ 9
+  ```
+
+- **The `numeric-kernel` profile compiles a call of a user function declared
+  with a parameter of the type `unknown`.** With
+  `ce.declare('g', '(unknown) -> number')` and a function literal with no
+  annotation as its value, a call `g(x)` declined ("the parameter t of the
+  helper g has no type annotation"). Such a parameter now has the default
+  kind of the mode, as for a function whose signature the engine inferred:
+  a real number in the `strict` mode.
+
+  ```js
+  ce.declare('g', '(unknown) -> number');
+  ce.assign('g', ce.box(['Function', ['Add', ['Multiply', 't', 't'], 1], 't']));
+  ce.declare('x', 'real');
+  compile(ce.box(['g', 'x']), { profile: 'numeric-kernel' }).run({ x: 3 }); // ➔ 10
+  ```
+
+### Resolved Issues
+
+- **A call of a function literal with an annotated parameter no longer types
+  the body of the literal to check its arguments.** The check reads the
+  parameter types only. An interpreted call of a typed function that runs a
+  loop is faster: one call of `legal(B, B[65])` in Tycho's othello prelude
+  went from a median of 1,160 ms to 670 ms. An
+  operator whose declared result is a union of types that cannot hold a
+  function (`Floor`) is no longer typed at each evaluation to look for the
+  effects of a function it could return (CE-1210).
+
+- **A parameter named `c_1` in the initial conditions of `DSolve` or
+  `RSolve` is a parameter.** It was taken for a constant of integration and
+  solved for: `DSolve([y'' = y, y(0) = c_1, y'(0) = 0], y, x)` was `y = 0`,
+  and is now `y = (c_1/2)·eˣ + (c_1/2)·e⁻ˣ`, as with any other name.
+
+- **A compilation with the `numeric-kernel` profile of a deeply shared tree
+  ends.** When one node object is an operand several times
+  (`t₁ = Beta(x, x)`, `t₂ = Beta(t₁, t₁)`, …), the admission of the profile
+  read each node once per path: a root `Block` that assigns such a tower of
+  depth 30 did not finish, also when it then declines. The reads of the free
+  symbols, of the bound names and of the values of a body, the sign of an
+  operand of `Sqrt`, `Ln` and `Power`, the complex part of a calculus node,
+  the reads of a local function and the reason of a loop now read each node
+  object once, and a tower of depth 40 compiles or declines in milliseconds.
+  The code and the values are the same as before.
+
+- **A name whose value is a deeply shared tree compiles with the
+  `numeric-kernel` profile.** For `H + 1`, where `H` was assigned such a
+  tower over a name with no type, the test of whether the existing compiler
+  lifts the value of `H` to a complex number read the tower once per path:
+  at depth 36 the compilation did not finish. It now reads each node object
+  once, and compiles or declines in milliseconds. The code is the same as
+  before.
+
+- **The `numeric-kernel` profile declines `x·Conjugate(Haversine(2y))`.**
+  The compilation failed with an internal error (`compile-error`): the
+  profile writes `Conjugate` of a real operand as the operand, and did not
+  check the grouping of the haversine in the product, as it does for
+  `x·Haversine(2y)`. Both now decline with `outside-profile`.
+
+- **`ce.infer()` gives a type to a symbol declared with the type
+  `unknown`.** After `ce.declare('x', 'unknown')`, `ce.infer([ce.parse('x + 1')])` changed nothing and reported `x` in `skipped` with the reason
+  `'defined'`. It now gives `x` the type `number`, as it does for a symbol
+  with no declaration: a declaration with the type `unknown` states no type.
+- **`ce.infer()` reports each symbol that it did not change.** `skipped` was
+  empty for a symbol that no use gives a type to (`q` in `[q]`) and for a
+  symbol with a declared type. It now lists the first with the reason
+  `'untyped'` and the second with the reason `'defined'`, as the
+  documentation of `InferResult` states. A symbol of the library (`Pi`), a
+  parameter of a function literal and the index of a `Sum` are not listed.
+- **A parameter that `Solve` generates does not take the name of a symbol
+  that an expression already uses.** With `t + 1` made before
+  `Solve(sin(x) = 0, x)`, the family of roots was `π t`, and the `t` of
+  `t + 1` then had the type `integer` of the parameter. The family is now
+  `π t_1`. With no earlier use of `t`, the parameter is `t`, as before.
+- **Epsil: a type error on an undeclared name of the top level says where
+  its type came from.** Since 0.187.0, the error of `let b = p && q` followed
+  by `let y = p + 1` had no note. It has the note "`p` was inferred to have
+  type `boolean` from its use in `p && q`" again.
+- **A compiled derivative used as an operand gives the right value.** The
+  closed form of `D`, `ND` or `Derivative` was written with no parentheses,
+  so `\frac{1}{\frac{d}{dx}(x^3+x)}` compiled to
+  `0.3333333333333333 * (_.x * _.x) + 1` and gave `2.333…` at `x = 2`. It
+  now compiles to `1 / (3 * (_.x * _.x) + 1)` and gives `1/13`, the value of
+  `evaluate()`. The same holds for a negation, a product, a difference and a
+  power of a derivative, on every target. The code of a compiled derivative
+  has one more pair of parentheses (`(2 * _.x)` for `D(x^2, x)`). (CE-1216)
+
+## 0.187.1 _2026-11-11_
+
+### New Features
+
+- **The `numeric-kernel` profile compiles in the mode `bigint`.**
+  `compile(expr, { profile: 'numeric-kernel', mode: 'bigint' })` compiled
+  nothing (`outside-profile`: "the option `mode: 'bigint'` is not in the
+  profile"). It now compiles a program of `integer` inputs made of
+  arithmetic, `Mod`, `Remainder`, `GCD`, `LCM`, `Factorial`, `Factorial2`,
+  `Binomial`, `Fibonacci`, `IsPrime`, `Abs`, `Sign`, `Min`, `Max`, `Boole`,
+  `If`, `Which`, the comparisons and the connectives, and `Floor`, `Ceil`,
+  `Round`, `Truncate` and an integer `Typed` of a quotient, a power or a
+  square root. A `bigint` or `boolean` result is the result of the mode
+  without the profile; a pole gives `NaN` or `Infinity`. The result reports
+  `pure: true` and `shippable: true`, and `canCompile()` gives the same
+  answer.
+
+  ```js
+  ce.declare('n', 'integer');
+  ce.declare('m', 'integer');
+  const q = compile(ce.box(['Floor', ['Divide', 'n', 'm']]), {
+    profile: 'numeric-kernel',
+    mode: 'bigint',
+  });
+  q.run({ n: 2n ** 64n + 7n, m: 3 }); // ➔ 6148914691236517207n
+  q.run({ n: 5n, m: 0n });            // ➔ Infinity
+  ```
+
+  It also compiles `Sum` and `Product`, calls of user functions, the lists
+  of integers (`list<integer>` inputs, `List`, `Range`, `At`, `First`,
+  `Last`, `Length`, `Count`, `Take`, `Drop`, `ReplaceAt`, and a list
+  result) and a `Function` literal at the root. Each element of a list
+  result is the element of the mode without the profile, an index of `At`
+  out of range gives `NaN`, and the call does not change an input list.
+
+  ```js
+  ce.declare('L', 'list<integer>');
+  const s = compile(ce.box(['Sum', ['Factorial', 'k'], ['Limits', 'k', 0, 'n']]), {
+    profile: 'numeric-kernel',
+    mode: 'bigint',
+  });
+  s.run({ n: 25 }); // ➔ 16158688114800553828940314n
+  const a = compile(ce.box(['Add', ['At', 'L', 'n'], ['Length', 'L']]), {
+    profile: 'numeric-kernel',
+    mode: 'bigint',
+  });
+  a.run({ L: [2n ** 64n, 5n], n: 1 }); // ➔ 18446744073709551618n
+  a.run({ L: [1n], n: 3 });            // ➔ NaN
+  ```
+
+  `Map`, `Reduce` and `Fold` (a function operand), a recursive user
+  function, a user function that reads an input, a nested list and the
+  options `vars`, `functions`, `operators`, `imports` and `preamble` still
+  decline with `outside-profile` in the mode.
+
+- **The `numeric-kernel` profile of `compile()` admits functions of lists
+  and function operands.** It admits the functions of lists `Norm`, `Mean`, `Median`, `Variance`,
+  `Dot`, `Take`, `Drop`, `Rest`, `Reverse`, `Sort`, `Join`, `First`,
+  `Last`, `Count` and `Range(a, b)` as a value, `Map`, `Filter` and
+  `Count` with a function literal (`Map((t) ↦ t·x + 1, L)`,
+  `Count(L, (t) ↦ t < x)`), `Map` of a library operator (`Map(Sin, L)`),
+  `Reduce` and `Scan` by `Add`, `Multiply`, `Max`, `Min` or a function
+  literal of two parameters, and `Apply` of a function literal; the body
+  of a function literal is written inline and runs once per element, in
+  order, and must be pure. A comparison of three operands or more
+  (`0 < x < 1`, `a = b = c`) evaluates each operand once and stops at the
+  first pair that is false. `Factorial`, `Factorial2`, `Arccot`, `Arccsc`,
+  `Arcsec`, `Arcoth`, `Arsech`, `Arcsch`, `Coth`, `Truncate`, `Fract` of an
+  arithmetic operand, `Hypot` of two operands, `Sech` and `Csch` of a
+  complex operand, and a power with a complex base or exponent and an
+  exponent that is not a number literal (`z^x`, `2^z`) are admitted. A
+  parameter of a user function with a declared
+  signature that has no annotation (`g: (real) -> real`, `g := t ↦ 2t`)
+  has the type of the signature when that type is `real`, `integer`,
+  `number`, `complex` or `boolean`; it declined. In the `strict` mode a
+  local declared `number` is a real local. A product, a quotient or a
+  power of an arithmetic expression of a call of a local function, and in
+  the `strict` mode a call of a local function whose value is complex,
+  decline: the ordinary compiler writes them in another form.
+  An element of a list whose type is not real (`At(Comprehension(√y, …), 2)`)
+  declines in the `strict` mode too, and the sum of a number and a block
+  operand whose value is a complex literal (`x + { b0 ⩴ 1; i }`) gives the
+  real part `0` at `x = -0`, as the ordinary compiler does; it gave `-0`.
+
+- **The `numeric-kernel` profile of `compile()` admits more programs of
+  lists.** In the `strict` mode a user function can be the function operand
+  of `Map`, `Filter`, `Count`, `Reduce`, `Scan` and `Apply` (`Map(f, L)`,
+  `Reduce(L, g, 0)`): the compiled code calls the function once per element,
+  in order. `Range(a, b, step)` is admitted as a value, and `RotateLeft` and
+  `RotateRight` of a list, also as operands of an element-wise sum. A list
+  of tuples of one size (`list<tuple<real, real>>`, and in the `strict` mode
+  `list<tuple<number, number, number, integer>>`) is admitted as an input, a
+  parameter and a declared local (`let out: list<tuple<real, real>> = []`),
+  with list literals and comprehensions of tuples, `At`, `First`, `Last`,
+  `Length`, `Count`, `Take`, `Drop`, `Reverse`, `Join`, `ListJoin`, a
+  rotation, and `Map`, `Filter` and `Count` with a function literal. A
+  `Loop` can visit the elements of a list that a name holds
+  (`for c in all { … }`). Each such program gives the values and the shapes
+  of the ordinary compiler (`cse: false`, `constantFold: false`).
+
+  ```js
+  ce.declare('LP', 'list<tuple<real, real>>');
+  ce.declare('x', 'real');
+  const f = compile(
+    ce.box(['Filter', 'LP', ['Function', ['Less', ['At', 'e', 1], 'x'], 'e']]),
+    { profile: 'numeric-kernel' }
+  );
+  f.run({ LP: [[0, 1], [2, 3], [-1, 5]], x: 1 });  // [[0, 1], [-1, 5]]
+  ```
+
+### Resolved Issues
+
+- **`expr.subs(map)` reads `map` only for the names of `expr`.** Since
+  0.187.0, `subs()` listed every key of the substitution and read each
+  value, also the keys that the expression does not name. A host whose
+  substitution computes a value when it is read (a `Proxy`, a getter)
+  computed every value at each call. `subs()` again reads only the keys of
+  the symbols and the operators of the expression.
+
+## 0.187.0 _2026-11-11_
+
+### Breaking Changes
+
 - **Boxing an expression no longer declares its symbols.** `ce.parse()`,
   `ce.box()`, `ce.expr()` and `ce.function()` declare no name, and they do not
   change the type of a name that has no declared type. A symbol with no
@@ -97,6 +2563,11 @@ import ChangeLog from '@site/src/components/ChangeLog';
   temporary values, and `ce.pushScope()` / `ce.popScope()` for temporary
   declarations. A `restore()` does not undo a type that an expression boxed
   before the checkpoint came to require after it.
+- **The engine needs `WeakRef`.** The engine makes a `WeakRef` in ordinary
+  use (the type of an expression with an undeclared symbol), so a runtime
+  without `WeakRef` cannot use it. Earlier releases made one only on some
+  routes. A Cloudflare Worker with an old compatibility date needs the
+  compatibility flag `enable_weak_ref`.
 
 ### New Features
 
@@ -126,6 +2597,12 @@ import ChangeLog from '@site/src/components/ChangeLog';
   declared signatures, captured numbers, loops over an integer range (with
   `Break` at the end of a branch of an `If`),
   lists of numbers made with a comprehension and updated with `ReplaceAt`,
+  list literals of numbers (`[x, y, 1]`) and tuples of reals (`(x, y)`) as
+  values, inputs, parameters and results, `Sum`, `Product`, `Max` and `Min`
+  of a list or a tuple, arithmetic of a list and numbers applied to each
+  element (`L + 1`, `2·L`, `x/L`; two lists only when their lengths are
+  equal by construction), a comprehension with a pure guard
+  (`[k for k in 1..64 if B[k] == p]`, with literal or `Length` bounds),
   and random draws: `Random()`, `Random` of a literal `Interval` or
   `Range`, `WithRandomSeed`, and calls of user functions whose body draws.
   The code draws the numbers of the ordinary compiler, in the same order
@@ -14221,7 +16698,7 @@ they are given expanded, also with a negative leading coefficient
   every target, as it evaluates: `x^{\frac{1}{2.2}}` (5/11) at x = −1 is −1 on
   `javascript`, `interval-js` (`_IA.powRational(x, 5, 11)`; it answered an empty
   interval), `glsl`, `wgsl` and `python`, and `\sqrt[2.2]{x}` gives the same (it
-  compiled to `Math.pow`, NaN for a negative x), and `\sqrt[2.5]{x}` (x^{2/5},
+  compiled to `Math.pow`, NaN for a negative x), and `\sqrt[2.5]{x}` (x^\{2/5\},
   an even numerator) compiles to the positive real `|x|^{0.4}`. The compiled
   code uses the exponent reading of the interpreter, so an exponent such as
   `0.3` keeps its complex value. On `interval-js` the rational power is used
@@ -37361,8 +39838,6 @@ ce.simplificationRules.push({
   - Function mapping for common math + linear algebra
   - Helpers for full functions, lambdas, and vectorized code
 
-  See the [Python/NumPy Target Guide](/compute-engine/guides/python-target/) for
-  complete documentation and examples.
 
 - **GLSL Compilation Target**: New built-in GLSL (OpenGL Shading Language)
   target for compiling mathematical expressions to WebGL shaders.

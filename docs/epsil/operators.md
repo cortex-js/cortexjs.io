@@ -224,7 +224,7 @@ operators (Elixir-style). It is left-associative, so `a |> f |> g` is `g(f(a))`:
 ```epsil
 a + b |> f       // (a + b) |> f
 a || b |> f      // (a || b) |> f
-x = a |> f       // x = (a |> f)
+let x = a |> f   // let x = (a |> f)
 ```
 
 <ReadMore path="/control-flow/#pipelines">
@@ -316,7 +316,7 @@ operator run is one token: write `x?! + 1`, not `x?!+1` (as `3! + 1`, not
 serialized: `(n!)?!`, `(x?!)!`.
 
 Compiled code raises on the absent branch (JavaScript, the interval
-JavaScript target, Python) with the
+JavaScript target) with the
 message `expected-present: <operand> is absent`; the check is left out when
 the operand's type already excludes absence (a declared length with a literal
 index, a type without `nan`). A shader target (GLSL) cannot raise:
@@ -842,7 +842,8 @@ Three spellings, two meanings:
 So a statement assigns:
 
 ```epsil
-x = 5
+let count = 0
+count = 5
 count = count + 1
 ```
 
@@ -874,6 +875,7 @@ line is the equation, because `x^2` is not a name. A bare name always assigns,
 so write `==` when you mean the equation:
 
 ```epsil
+let y = 0
 y == 2 * x + 1           // the equation
 y = 2 * x + 1            // assigns to y
 ```

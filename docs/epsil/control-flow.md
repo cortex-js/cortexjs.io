@@ -90,8 +90,9 @@ A default value is one of:
 A default is a constant. A symbol that names a variable (a `let` of the
 program), or a symbol that is not declared and that no `symbol<…>` parameter
 type lists, is not a default value: write a constant, or pass the argument.
-A function statement is defined before the statements of its block run, so a
-`const` written after it is not a constant for its defaults:
+At the top level of a program, a function statement is defined before the
+other statements run, so a `const` written after it is not a constant for its
+defaults:
 `function f(k = W) { k + 1 }; const W = 5` is an error. A known limitation:
 a constant declaration that the host canonicalizes and does not run makes its
 name a constant for a later default. On an engine where `W` is a variable,
@@ -130,6 +131,53 @@ body:
 An anonymous function can have a multi-statement body too, by making that body
 a [`do` block](#do-block-expressions) — but at that point a named `function` is
 usually clearer.
+
+### Local functions {#local-functions}
+
+A function statement in a function body or a block declares a **local** of
+that block, as `let` does: a variable whose value is the function, from the
+statement on. It can be called after its statement, and two local functions
+can call each other, since a call in a body runs when the function is called:
+
+```epsil
+function area(r) {
+  function sq(x) { x * x }
+  3 * sq(r)
+}
+area(2)
+// ➔ 12
+```
+
+```epsil
+function parity(n) {
+  function isEven(k) { if k == 0 { true } else { isOdd(k - 1) } }
+  function isOdd(k) { if k == 0 { false } else { isEven(k - 1) } }
+  isEven(n)
+}
+parity(10)
+// ➔ True
+```
+
+A call of a local function before its statement is the error
+`read-before-declaration`, as a read of a `let` before its declaration. A
+second function statement of the same name in the block, or a `let` of that
+name, is the error `variable-redeclaration`: a local function has one clause,
+and the [clauses](#multiple-clauses-literal-parameters) of a function, and a
+signature declared before its definition (`let f: (integer) -> integer`
+then `function f(x) { … }`), are for the top level of a program. In a block,
+give the type with the value:
+
+```epsil
+function g() {
+  let h: (integer) -> integer = (x) => x + 1
+  h(2)
+}
+g()
+// ➔ 3
+```
+
+The type of a local function is its declared type, or `function` when it has
+none, and a call of it is typed from that type.
 
 ### Effect specifiers
 
@@ -366,7 +414,7 @@ A mapsto binds loosely enough to sit on the right-hand side of an
 assignment:
 
 ```epsil
-f = x => x + 1
+let f = x => x + 1
 ```
 
 A lambda can take **no** parameters — an empty parameter list `()` before the
@@ -981,6 +1029,13 @@ Value-producing iteration over a collection belongs to the library functions
 while x > 0 { x }
 ```
 
+A condition that is neither `true` nor `false` ends the loop with an
+`incompatible-type` error, reported as a runtime error: in
+`let i = 1; while i <= n { i = i + 1 }` with `n` free, `i <= n` has no
+value, and the loop stops with `i` still `1`. The condition must be decided at
+each turn, the first one included: the body does not run to give a name its
+value, so initialize each variable that the condition reads.
+
 `while let pattern = subject { … }` is the loop form of [`if let`](#if-let):
 each turn matches the subject against the pattern and runs the body with the
 pattern's bindings in scope, and the first turn on which the subject does not
@@ -1100,7 +1155,8 @@ these rules. `epsil check` reports each one with its own code:
   function it holds. So `function run(fs) { parallel for f in fs { f() } }`
   is accepted. Annotate the parameter with the effects that it admits
   (`function run(fs: list<() any -> any>) { … }`) to have the loop refused.
-  A function that the program defines after the loop is not seen either.
+  A top-level `function` statement is prepared before the loop, even when
+  its definition is written after it, so its effects are checked too.
 - No `break`, `continue` or `return` leaves the loop (`parallel-exit`). An
   inner loop of the body can use `break` and `continue`.
 
@@ -1315,7 +1371,7 @@ pipeline is the whole right-hand side of an assignment:
 ```epsil
 a + b |> f        // (a + b) |> f
 a || b |> f       // (a || b) |> f
-x = a |> f        // x = (a |> f)
+let x = a |> f    // let x = (a |> f)
 ```
 
 It is left-associative, so `a |> f |> g` is `g(f(a))`, which is what reading it
@@ -1332,7 +1388,10 @@ introducing keyword is always the collection grammar, so `{ 1, 2 }` on its own
 is a set.
 
 Each block pushes its own lexical scope. A block's value is its last
-expression; an empty block's value is `nothing`:
+expression; an empty block's value is `nothing`. An error stops the block.
+A whole program uses `Program` instead: it stays in its caller's scope,
+prepares types/protocols and functions first, and continues with the next
+top-level statement after an ordinary error:
 
 ```epsil
 if a { }
