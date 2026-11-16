@@ -14,7 +14,7 @@ are expressions that define how a sequence of expressions is evaluated.
 
 There are three kind of control structures:
 
-- **Sequential**: `Block`, the most common where expressions are evaluated one
+- **Sequential**: `Program` and `Block`, where expressions are evaluated one
   after the other
 - **Conditional** `If`, `Which` or `Match`, where expressions are evaluated
   depending on the value of a condition or the structure of a value
@@ -22,6 +22,40 @@ There are three kind of control structures:
   repeatedly
 
 ## Sequential Control Structure
+
+<FunctionDefinition name="Program">
+
+<Signature name="Program">_statement-1_, ..._statement-n_</Signature>
+
+A `["Program"]` evaluates statements in the caller's scope. Its declarations
+remain available after evaluation. Epsil parsing always returns a `Program`,
+including for empty source and single expressions; a braced local sequence
+uses `Block`.
+
+Canonicalization processes type and protocol declarations first, then global
+function statements and their paired signatures, then other statements in
+source order. The complete sequence is canonical before evaluation. Global
+function statements support forward calls and function clauses. A variable
+initialized with a function follows ordinary declaration order instead.
+
+A declaration establishes the variable's assignment contract. Without an
+annotation, a mutable numeric variable has type `number`, and a callable
+variable has type `function`. The stored function retains its own argument
+checks, defaults and closure. Replacing it does not make a new contract for
+later replacements. Explicit annotations remain contracts, and constants reject
+assignment. Two declarations in one Program are an error; a declaration in a
+later Program may replace an earlier declaration and establish a new type.
+
+The result is the last statement's value, or `Nothing` for an empty Program or
+one ending in a declaration or assignment. Ordinary statement errors are
+reported and evaluation continues; cancellation stops the Program.
+
+```json example
+["Program", ["Declare", "b", "'unknown'", 2], "b"]
+// ➔ 2, and b remains declared in the caller's scope
+```
+
+</FunctionDefinition>
 
 <FunctionDefinition name="Block">
 
@@ -40,10 +74,10 @@ The value of the `["Block"]` expression is the value of the last expression
 value of the block is `Nothing`: end the block with the name.
 
 ```json example
-["Block", ["Assign", "b", 2]]
+["Block", ["Declare", "b", "'unknown'", 2]]
 // ➔ Nothing
 
-["Block", ["Assign", "b", 2], "b"]
+["Block", ["Declare", "b", "'unknown'", 2], "b"]
 // ➔ 2
 ```
 
@@ -58,35 +92,63 @@ declared in an enclosing block updates that binding. A `["Declare"]` in the
 inner block instead introduces a new variable that shadows the outer one for
 the duration of the inner block.
 
-A local always has a value when it is read. These rules make that so, and each
-form that breaks one is a static error in the canonical form:
+A local of a block is made only by a `["Declare"]`. An `["Assign"]` writes the
+variable that is in scope and never makes one. Declaration and initialization
+are separate:
 
-- A declaration has a value: `["Declare", "x", "integer", 5]`, or the first
-  `["Assign", "x", 5]` of the name at the level of the block. A `["Declare"]`
-  with no value (`["Declare", "x"]`, `["Declare", "x", "integer"]`) is the
-  error `declaration-without-value`, and a later `["Assign"]` does not repair
-  it. One exception: a `["Declare"]` of a function type with no value is valid
-  when a function definition of the same name is in the same block.
-- The first assignment of a name must not be in a branch of an `["If"]` or a
-  `["Which"]`, in the body of a `["Loop"]`, or in a case of a `["Match"]`. It
-  is the error `first-assignment-in-branch`. Assign a value to the name before
-  the branch. A name that is already declared is not a first assignment: the
-  assignment writes that name.
+- A declaration may supply a value or reserve an uninitialized slot. An explicit
+  annotation fixes its contract. Otherwise preparation uses its initializer, or
+  a unique later initialization in the same straight-line sequence before any
+  use. Branches, loops and calls are not searched. Without that evidence the
+  contract stays `unknown`; later writes never refine it. Runtime reads of an
+  uninitialized slot report `read-before-initialization`.
+- Mutable numeric initializers establish `number`. Lists lose fixed lengths and
+  widen their element types; tuples retain arity with widened components;
+  callable initializers establish `function`. An empty unannotated list has
+  unknown elements. Assignments validate against these fixed contracts.
+
+Deferred initialization inference also stops at a runtime application, either
+between the declaration and the proposed initialization or inside its right side.
+For example, `let x; x=1` infers `number`, while `let x; x=1+2` keeps `unknown`.
+Use `let x=1+2` or an explicit annotation when that precision is needed.
+- A `["Declare"]` is a statement of the block itself. In a branch of an
+  `["If"]` or a `["Which"]`, in the body of a `["Loop"]` or in a case of a
+  `["Match"]`, it is the error `declaration-below-statement`: declare the name
+  before the branch.
+- An `["Assign"]` to a name that no scope declares is the error
+  `assignment-to-undeclared-variable`, at any depth of the block, in a
+  function body and in the body of a binder. An `["Assign"]` outside every
+  Block and Program (one that the host evaluates, or `ce.assign()`) declares the name in
+  the current scope.
 - A local is not read before its declaration. It is the error
-  `read-before-declaration`.
+  `read-before-declaration`. The initial value of a `["Declare"]` reads the
+  name outside the block: with a global `z` of value `9`,
+  `["Block", ["Declare", "z", "'unknown'", ["Add", "z", 1]], "z"]` is `10`.
+- A second declaration of a name in one block is the error
+  `variable-redeclaration`.
 - An assignment is a statement, never an operand. `["f", ["Assign", "a", 2]]`
   and `["Assign", "t", ["Assign", "u", 1]]` are the error
-  `assignment-in-operand`. Write `["Block", ["Assign", "a", 2], ["f", "a"]]`.
+  `assignment-in-operand`. Write
+  `["Block", ["Declare", "a", "'unknown'", 2], ["f", "a"]]`.
 - A later assignment keeps the type of the local: its declared type, or the
-  type of its first value (a number can become another number). Another type
-  is the error `assignment-type-mismatch`.
+  type of its initial value (a number can become another number). Another
+  type is the error `assignment-type-mismatch`.
 
 ```json example
-["Block", ["Assign", "c", 5], ["Multiply", "c", 2]]
-
-
+["Block", ["Declare", "c", "'unknown'", 5], ["Multiply", "c", 2]]
 // ➔ 10
+
+["Block", ["Assign", "c", 5], ["Multiply", "c", 2]]
+// ➔ the error assignment-to-undeclared-variable, when no "c" is declared
+//   outside the block. With a global "c", the block writes it, and is 10.
 ```
+
+A function statement (`["DefineFunction", "g", ...]`, the Epsil
+`function g(x) { … }`) in a block or a function body declares a local variable
+that holds the function, with the rules above: a call before the statement is
+`read-before-declaration`, and a second function statement or a `["Declare"]`
+of the same name is `variable-redeclaration`. The type of the local is the
+signature that the statement writes, or `function`.
 
 ### Translating simultaneous assignments
 
@@ -100,13 +162,13 @@ from before the tuple, translate it as:
 
 ```json example
 ["Block",
-  ["Assign", "_next_a", 1],
-  ["Assign", "_next_b", ["Add", "a", 1]],
+  ["Declare", "_next_a", "'unknown'", 1],
+  ["Declare", "_next_b", "'unknown'", ["Add", "a", 1]],
   ["Assign", "a", "_next_a"],
   ["Assign", "b", "_next_b"]]
 ```
 
-The temporary names must be fresh. The first pass evaluates every right-hand
+The temporary names must be fresh locals of the block. The first pass evaluates every right-hand
 side against the old state; the second pass commits the results. Commit order
 then does not matter because no temporary depends on a newly assigned value.
 
@@ -214,7 +276,7 @@ diagnostic.
 
 ```json example
 ["Block",
-  ["Assign", "n", -10],
+  ["Declare", "n", "'unknown'", -10],
   ["Which", ["Greater", "n", 0], "n", ["Less", "n", 0], ["Negate", "n"], "True", 0]
 ]
 // ➔ 10
@@ -696,13 +758,14 @@ Inside `body`:
 Bound names do not leak into the enclosing scope.
 
 A name that the body assigns must be declared with a value before the loop.
-The first assignment of a name in the body is the error
-`first-assignment-in-branch`. End the enclosing block with the name to use the
-result:
+An assignment in the body to a name that no scope declares is the error
+`assignment-to-undeclared-variable`, and a `["Declare"]` in the body is the
+error `declaration-below-statement`. End the enclosing block with the name to
+use the result:
 
 ```json example
 ["Block",
-  ["Assign", "s", 0],
+  ["Declare", "s", "'unknown'", 0],
   ["Loop", ["Assign", "s", ["Add", "s", "i"]], ["Element", "i", ["Range", 1, 4]]],
   "s"]
 // ➔ 10
@@ -751,7 +814,7 @@ The other compile targets decline the loop.
 
 ```json example
 ["Block",
-  ["Assign", "L", ["List", 0, 0]],
+  ["Declare", "L", "'unknown'", ["List", 0, 0]],
   ["ParallelLoop",
     ["AddTo", ["At", "L", ["Add", ["Mod", "i", 2], 1]], "i"],
     ["Element", "i", ["Range", 1, 5]]],
@@ -801,7 +864,7 @@ each position evaluated once, before `v`. In the body of a
 This is the MathJSON form of the Epsil `s += v` and `L[i] += v`.
 
 ```json example
-["Block", ["Assign", "L", ["List", 1, 2, 3]], ["AddTo", ["At", "L", 2], 10], "L"]
+["Block", ["Declare", "L", "'unknown'", ["List", 1, 2, 3]], ["AddTo", ["At", "L", 2], 10], "L"]
 // ➔ [1, 12, 3]
 ```
 

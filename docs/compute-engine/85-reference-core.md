@@ -55,14 +55,26 @@ that a variable is positive.
 
 Declare a new symbol in the current scope, with a type and a value.
 
-A declaration has a value. `Declare` evaluates to that value. A `Declare` with
-no value (`["Declare", "x"]`, `["Declare", "x", "integer"]`, or an
-_attributes_ dictionary with no `value` key) is the error
-`declaration-without-value`, and an `["Assign"]` after it does not repair it.
-Write `["Declare", "x", "integer", 5]`. One exception: a `Declare` of a
-function type with no value is valid when a function definition of the same
-name is in the same block (it gives the signature of that function). To
-declare a symbol with a type and no value, use `ce.declare()`.
+In a Program or Block, a declaration can reserve an uninitialized variable.
+An explicit annotation fixes its type. Otherwise preparation infers a contract
+from its initializer or a unique later initialization in the same straight-line
+sequence before any use. It does not search branches, loops or calls. Without
+that evidence the contract remains `unknown`, including after execution assigns
+a value. A read before initialization reports `read-before-initialization`.
+Later assignments validate against the fixed contract without widening it.
+
+Deferred initialization inference also stops at a runtime application, either
+between the declaration and the proposed initialization or inside its right side.
+For example, `let x; x=1` infers `number`, while `let x; x=1+2` keeps `unknown`.
+Use `let x=1+2` or an explicit annotation when that precision is needed.
+
+Outside those sequence routes, a `Declare` without a value still reports
+`declaration-without-value`; use `ce.declare()` to make an uninitialized host
+binding. A standalone `Declare` with a value evaluates to that value.
+
+In a `["Block"]`, a local is made only by a `Declare`, and a `Declare` is a
+statement of the block itself: in a branch of an `["If"]`, in a loop body or
+in a case of a `["Match"]`, it is the error `declaration-below-statement`.
 
 In a block, a second `["Declare"]` of a name that the block already declares
 is the error `variable-redeclaration`:
@@ -219,15 +231,18 @@ If a definition is found, change the value of the symbol to `value` if the
 value is compatible with the type of the symbol: once set, the type of
 a symbol cannot be changed.
 
-If there is no definition for the symbol, add a new definition in the
-current scope, and use the `value` to infer the type of the symbol. In a
-`["Block"]`, this first assignment of a name is its declaration, and it must
-be at the level of the block. In a branch of an `["If"]` or a `["Which"]`, in
-the body of a `["Loop"]` or in a case of a `["Match"]`, it is the error
-`first-assignment-in-branch`: assign a value to the name before the branch.
+If there is no definition for the symbol, and the assignment is outside every
+block (an `Assign` that the host evaluates, or `ce.assign()`), add a new
+definition in the current scope, and use the `value` to infer the type of the
+symbol. In a `["Block"]`, a function body or the body of a binder, an `Assign`
+never makes a variable: an `Assign` to a name that no scope declares is the
+error `assignment-to-undeclared-variable`. Declare the local with a
+`["Declare"]`:
+`["Block", ["Assign", "x", 5], "x"]` is that error, and
+`["Block", ["Declare", "x", "'unknown'", 5], "x"]` is `5`.
 
 A later assignment to a local keeps its type: the declared type, or the type
-of the first value (a number can become another number). A value of another
+of its initial value (a number can become another number). A value of another
 type is the error `assignment-type-mismatch`.
 
 An assignment is a statement, never an operand. `["f", ["Assign", "a", 2]]` and
@@ -512,6 +527,11 @@ Evaluate to the type of _expression_, as a type value.
 The result is the expression's **literal type** — the most precise claim
 available about the value, here the number itself. Its widening tier is
 `real`, which denotes a *finite* real.
+
+For a name with a declared type, `Type` gives that type. For a name with no
+declared type (an untyped parameter or local), it gives the type of the value
+the name holds, widened: in Epsil, `function f(x) { type(x) }` gives `integer`
+for `f(1)`, and `function f(x: list) { type(x) }` gives `list` for `f([1, 2])`.
 
 <ReadMore path="/compute-engine/guides/types" >Read more about the
 **type system**. </ReadMore>
@@ -864,7 +884,9 @@ reaches answers enumeration cannot: solving \\(x^2 - 29y^2 = 1\\) over
 
 When the unknowns are declared with an `integer` type and no domain is given,
 the result is the general **parametric family**, expressed with fresh integer
-parameters (`t`, `t_1`, …) that range over all integers:
+parameters (`t`, `t_1`, …) that range over all integers. A name that is
+declared, or that an expression already uses, is not taken: when `t` is in
+use, the first parameter is `t_1`.
 
 ```json example
 // with n and m declared as integers:
@@ -955,8 +977,8 @@ unevaluated.
 
 A trigonometric equation has infinitely many solutions. With no domain, or
 over the real or the complex numbers, the result is a list of families of
-solutions with the fresh integer parameter `t` (the names of the integer
-solver: `t`, `t_1`, …): `Solve(sin(x) = 1/2, x)` is
+solutions with an arbitrary integer, the call `["ArbitraryInteger", 1]`,
+written `t` in this paragraph: `Solve(sin(x) = 1/2, x)` is
 `[π/6 + 2πt, 5π/6 + 2πt]`, and each solution is a member of one family.
 Families with the same solutions become one family (`Solve(sin(x) = 0, x)` is
 `[πt]`), and the solution of each family is in `(−T/2, T/2]`, where `T` is its
@@ -1002,6 +1024,51 @@ When `Solve` stays unevaluated, you can:
 
 A list from `Solve` is never a part of the solutions. So when you need any
 solution, and not all of them, `FindRoot` is the right tool.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ArbitraryConstant">
+
+<Signature name="ArbitraryConstant" returns="number">_k_: integer</Signature>
+
+<Signature name="ArbitraryInteger" returns="integer">_k_: integer</Signature>
+
+An arbitrary value in the result of `Solve`, `DSolve` or `RSolve`:
+`ArbitraryConstant(k)` is any number (a constant of integration, the free
+parameter of an identity), and `ArbitraryInteger(k)` is any integer (the
+parameter of a family of solutions). The index _k_ is a positive integer.
+
+```json example
+["Solve", ["Equal", ["Sin", "x"], 0], "x"]
+// ➔ ["List", ["Multiply", "Pi", ["ArbitraryInteger", 1]]]
+```
+
+Inside one result, two calls with the same index are the same value, and two
+calls with different indexes are independent: `C(1) − C(1)` is `0`, and
+nothing is known about `C(1) = C(2)`. A call has no value: it is not an
+unknown of the expression, it is not declared in any scope, and an expression
+that holds one does not compile.
+
+The indexes of a result start at the first index that its input does not use.
+Two results of two separate calls both use the index 1: before you combine
+them, replace the indexes of one.
+
+**To give a value to an arbitrary constant**, replace the call:
+
+```js
+const [family] = ce.box(["Solve", ["Equal", ["Sin", "x"], 0], "x"]).evaluate().ops;
+family.replace(
+  { match: ["ArbitraryInteger", 1], replace: 3 },
+  { recursive: true }
+).evaluate().json;
+// ➔ ["Multiply", 3, "Pi"]
+```
+
+In LaTeX, a call is written inside the command `\constant`, which shows only
+its argument: `\constant{c_{1}}` is `ArbitraryConstant(1)` and
+`\constant{n_{1}}` is `ArbitraryInteger(1)`. Without the command, `c_1` is an
+ordinary symbol. A renderer that does not know the command needs
+`\newcommand{\constant}[1]{#1}`.
 
 </FunctionDefinition>
 

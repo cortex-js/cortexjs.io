@@ -231,6 +231,19 @@ the following differences:
   (for example `{ "num": "0.(3)" }` boxes to `["Rational", 1, 3]`), rather than
   a truncated decimal float.
 
+- A string with no decimal point represents an exact integer, also when it has
+  an exponent: `{ "num": "7e+60" }` is the integer 7 followed by 60 zeros. The
+  Compute Engine writes a large integer this way when it ends with more than
+  five zeros. The JavaScript `BigInt()` constructor does not accept an
+  exponent; the function `bigint()` of `@cortex-js/compute-engine/numerics`
+  does, and returns `null` for a string that is not an integer:
+
+```js
+import { bigint } from '@cortex-js/compute-engine/numerics';
+bigint('184763904e+8');   // 18476390400000000n
+bigint('1.5e+20');        // null
+```
+
 - The following characters in a string representing a number are ignored:
 
 <div className="symbols-table first-column-header" style={{'--first-col-width': '9ch'}}>

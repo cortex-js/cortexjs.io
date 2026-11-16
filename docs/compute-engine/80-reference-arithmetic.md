@@ -424,6 +424,7 @@ accelerated numerical approximation). The recognized families:
 | $$\sum_{k=1}^{\infty} \frac{1}{(2k-1)^s}, \; s > 1$$ | $$(1 - 2^{-s})\,\zeta(s)$$ | Odd p-series ($\pi^2/8$ for $s=2$) |
 | $$\sum_{k=0}^{\infty} \frac{(-1)^k}{(2k+1)^s}$$ | $$\beta(s)$$ | Dirichlet beta ($\pi/4$, Catalan's constant, $\pi^3/32$, $5\pi^5/1536$ for $s = 1, 2, 3, 5$) |
 | $$\sum_{k=a}^{\infty} \frac{r^k}{k!}$$ | $$e^r - \sum_{k<a} \frac{r^k}{k!}$$ | Exponential series (symbolic $r$ allowed) |
+| $$\sum_{k=a}^{\infty} \frac{k^n r^k}{k!}$$ | $$e^r\,T_n(r) - \sum_{k<a} \frac{k^n r^k}{k!}$$ | Touchard / Dobiński ($T_n$ the Touchard polynomial; $\sum k^n/k! = B_n\,e$, $B_n$ the Bell number; $n \le 200$) |
 | $$\sum_{k=1}^{\infty} k\,r^k, \; \|r\| < 1$$ | $$\frac{r}{(1-r)^2}$$ | First-moment geometric |
 | $$\sum_{k=1}^{\infty} \frac{r^k}{k}, \; \|r\| < 1$$ | $$-\ln(1-r)$$ | Logarithmic series |
 
@@ -433,7 +434,8 @@ $\frac{\pi^2}{6}$, $\sum_{k=1}^{\infty} \frac{1}{(k+1)^2}$ is
 $\frac{\pi^2}{6} - 1$, and the telescoping sum
 $\sum_{k=1}^{\infty} \frac{1}{k^2+k}$ is $1$. The comparison runs only for a
 body whose denominator, as written, is zero at no integer index of the domain.
-A pole there keeps the sum symbolic.
+A pole there keeps the sum symbolic. A polynomial in $k$ over $k!$ is summed
+term by term: $\sum_{k=0}^{\infty} \frac{k^2 + k}{k!}$ is $3e$.
 
 For a **symbolic** ratio $r$, the families with a convergence region return a
 restriction `["If", condition, value]` that records it — for example
@@ -666,7 +668,7 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 | `Abs`    | $$\|x\| $$ | Absolute value, [magnitude](https://www.wikidata.org/wiki/Q3317982)              |
 | `Ceil`   | $$\lceil x \rceil $$ | Rounds a number up to the next largest integer                                   |
 | `Floor`  | $$\lfloor x \rfloor$$ | Round a number to the greatest integer less than the input value                 |
-| `Chop`   |              | Replace real numbers that are very close to 0 (less than $$10^{-10}$$) with 0  |
+| `Chop`   |              | Replace the real and imaginary parts whose magnitude is at most the tolerance with 0. The tolerance is the optional second operand, `Chop(x, 0.01)`, or the engine's `tolerance` (default $$10^{-10}$$); a symbolic tolerance leaves the call unevaluated  |
 | `Round`  |              | Rounds a number to the nearest integer. `Round(x, step)` rounds to the nearest multiple of the step |
 
 </div>

@@ -254,6 +254,89 @@ ce.declare("m_e", {
 });
 ```
 
+### Declaring a Macro
+
+A symbol with a value keeps the meaning that its value had where it was
+defined: in `f(x) = A + 1`, an `A` defined as `x^2 + y^2` reads the global `x`,
+not the parameter of `f`.
+
+A **macro** is the other kind of name. It has no value and no type of its own.
+Wherever the name is written, the engine puts the body of the macro in its
+place when it boxes the expression. The names of the body then mean what they
+mean at that place: a parameter or an index of the surrounding expression
+binds them.
+
+**To declare a macro** use `ce.declare()` with a `macro` property. Its value is
+the body, as MathJSON.
+
+```js
+ce.declare("A", { macro: ["Add", ["Power", "x", 2], ["Power", "y", 2]] });
+
+ce.parse("A + 1").json;
+// ➔ ["Add", ["Power", "x", 2], ["Power", "y", 2], 1]
+
+ce.assign("f", ce.parse("x \\mapsto A + 1"));
+ce.parse("f(3)").evaluate().latex;
+// ➔ "y^2+10": the `x` of the macro is the parameter of `f`
+
+ce.declare("B", { macro: ["Multiply", "k", "x"] });
+ce.parse("\\sum_{k=1}^{3} B").evaluate().json;
+// ➔ ["Multiply", 6, "x"]: the `k` of the macro is the index of the sum
+```
+
+The expanded expression is an ordinary expression: `ce.box(["D", "A", "x"])`
+evaluates to `2x`, and compiled code contains the body, not the name.
+
+A function is not a macro: the body of `f` above is expanded once, when `f` is
+defined, and a call of `f` never takes a name from its caller.
+
+The rules:
+
+- **Declare a macro before the expressions that use it.** An expression that
+  was boxed earlier keeps the name, which has no value:
+
+  ```js
+  const early = ce.parse("C + 1");
+  ce.declare("C", { macro: ["Power", "x", 2] });
+  early.evaluate().json;             // ➔ ["Add", "C", 1]
+  ce.parse("C + 1").evaluate().json; // ➔ ["Add", ["Power", "x", 2], 1]
+  ```
+
+- **A macro is declared once in a scope and has no value to assign.** A second
+  `ce.declare()` of the name in the same scope and `ce.assign()` both throw. To
+  change a macro, declare your macros again in a new scope and box the
+  expressions again.
+- **A parameter, an index or a local variable of the same name hides the
+  macro.** With a macro named `k`, `\sum_{k=1}^{3} k` is still `6`.
+- **A position that takes a name is not expanded**: a parameter, an index, the
+  variable of `D` or `Solve`, the target of an assignment.
+- **A macro can use another macro.** A macro that uses itself gives the error
+  `macro-cycle` in place of the name.
+- **The raw form keeps the name**: `ce.parse("A + 1", { form: "raw" }).json` is
+  `["Add", "A", 1]`. The canonical and the structural form expand it. A symbol
+  made with `ce.symbol("A")` is not expanded.
+- **Nothing is expanded during an evaluation.** An expression that is boxed
+  while `evaluate()`, `simplify()` or `compile()` runs (for example in a
+  callback) keeps the name. `Hold(A)` keeps the name, also when it is released.
+- **A macro has no parameters.** `A(x+1)` in LaTeX is a product.
+
+**To know whether a name can be a macro** read `ce.macroNames`, the set of the
+names that were declared as a macro on the engine, in any scope:
+
+```js
+ce.macroNames.size;      // ➔ 0 on an engine with no macro
+ce.declare("A", { macro: ["Add", ["Power", "x", 2], ["Power", "y", 2]] });
+ce.macroNames.has("A");  // ➔ true
+ce.macroNames.has("x");  // ➔ false
+```
+
+The set never shrinks: a name stays in it after the scope of its declaration is
+popped. A name that is not in the set is not a macro in any scope; for a name
+that is in the set, `ce.lookupDefinition(name)` gives the definition that the
+current scope reads.
+
+`ce.lookupDefinition("A").value.macro` is the body of a macro.
+
 
 ### Declaring a Function
 
@@ -2058,7 +2141,7 @@ ce.declare("Do", {
 
 ce.box([
   "Block",
-  ["Assign", "s", 0],
+  ["Declare", "s", "'unknown'", 0],
   ["Do", ["Assign", "s", ["Add", "s", 1]], 5],
   "s",
 ]).evaluate();
@@ -2066,12 +2149,13 @@ ce.box([
 ```
 
 The body of `Do` is a branch: the engine cannot know how many times the
-operator runs it, so a first assignment there does not declare a variable. An
+operator runs it, so a `Declare` there is the error
+`declaration-below-statement`. An assignment never declares a variable: an
 assignment of a name that no enclosing scope declares is an error:
 
 ```js
 ce.box(["Do", ["Assign", "t", 1], 3]);
-// ➔ ["Do", ["Error", ["ErrorCode", "'first-assignment-in-branch'", "'t'"]], 3]
+// ➔ ["Do", ["Error", ["ErrorCode", "'assignment-to-undeclared-variable'", "'t'"]], 3]
 ```
 
 A `held` operand lets a handler read an operand before it is evaluated, while

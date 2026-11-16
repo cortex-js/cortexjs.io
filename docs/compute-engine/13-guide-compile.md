@@ -56,6 +56,14 @@ console.log(f.run());
 If the expression cannot be compiled, the `result.success` property will be
 `false`.
 
+A boxed `Program` from Epsil parsing can be passed directly to `compile()`.
+Its declarations and global function signatures are already canonical; compilation
+uses the existing sequence compiler. For example, a paired declaration
+`let g: (integer) -> integer; function g(k) { k + 1 }; g(1)` compiles to a
+JavaScript result of `2`. Invalid subexpressions still prevent compilation.
+Compilation returns the final result; it does not provide interpreted Program
+statement callbacks or publish variable values back to the caller's scope.
+
 ### Which Targets Are Registered
 
 The `to` option of `compile()` names a target registered on the expression's
@@ -64,13 +72,13 @@ loads:
 
 | Entries loaded in the program | Targets of every engine |
 |---|---|
-| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl`, `python` |
+| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl` |
 | `@cortex-js/compute-engine/core` only | `javascript`, `interval-js` |
 
 The `javascript` and `interval-js` targets are part of every engine: the engine
 uses them itself (the `Map` auto-compile, the numeric integration and
-differentiation kernels, the solver's domain enumeration). The GPU and Python
-targets are bundled in the full entry, not in `core`; once the full entry is
+differentiation kernels, the solver's domain enumeration). The GPU targets
+are bundled in the full entry, not in `core`; once the full entry is
 loaded anywhere in the program, every engine resolves them, including an engine
 made earlier from `core`. In a program that loads only `core`, import the class
 of the target you need from `@cortex-js/compute-engine/compile` and register
@@ -78,11 +86,10 @@ it:
 
 ```javascript
 import { ComputeEngine } from '@cortex-js/compute-engine/core';
-import { compile, GLSLTarget, PythonTarget } from '@cortex-js/compute-engine/compile';
+import { compile, GLSLTarget } from '@cortex-js/compute-engine/compile';
 
 const ce = new ComputeEngine();
 ce.registerCompilationTarget('glsl', new GLSLTarget());
-ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }));
 
 const shader = compile(ce.box(['Sin', 'x']), { to: 'glsl' });
 ```
@@ -581,7 +588,7 @@ ce.declare('n', 'integer');
 const count = compile(
   ce.box([
     'Block',
-    ['Assign', 'L', 'H'],
+    ['Declare', 'L', "'unknown'", 'H'],
     [
       'ParallelLoop',
       ['AddTo', ['At', 'L', ['Add', ['Mod', 'k', 3], 1]], 1],
@@ -686,7 +693,7 @@ that runs it, also under `ce.withTimeLimit()`. When you run a document that you
 did not write, set a limit when you compile it:
 
 ```js
-const expr = ce.box(['Block', ['Assign', 'k', 0],
+const expr = ce.box(['Block', ['Declare', 'k', "'unknown'", 0],
   ['Loop', ['Assign', 'k', ['Add', 'k', 1]]], 'k']);
 const { run } = compile(expr, { iterationBudget: 1e6 });
 run({}); // throws a CancellationError, cause 'iteration-limit-exceeded'
@@ -701,7 +708,6 @@ pass on every machine. To get a time limit, measure the cost of a pass.
   `createJavaScriptRuntime()` or `createIntervalRuntime()` keeps the limit.
 - `broadcast()` gives `NaN` for a cell over the limit, as for any error of a
   cell. Each cell has its own count, so a batch costs up to cells × budget.
-- `python` declines a program with a `Loop` when the option is set.
 - `glsl` cannot throw: over the limit, the loops of the shader stop and the
   value is `NaN`. On this target the limit also applies to `Sum` and
   `Product`, and it is 10,000 passes when the option is not set (see "What
@@ -710,366 +716,6 @@ pass on every machine. To get a time limit, measure the cost of a pass.
   `interval-js` it gives the `entire` interval.
 
 Without the option, the compiled code has no check.
-
-### The `numeric-kernel` Profile (Experimental)
-
-The option `profile: 'numeric-kernel'` compiles a numeric program with the
-structured compiler of the `javascript` target. It admits scalar
-arithmetic of reals, integers and complex numbers, `If` and the comparisons
-(`Less`, `LessEqual`, `Equal`, `NotEqual`),
-powers and roots of real numbers, powers of a complex base with a number
-literal exponent, `Sqrt`, `Ln`, `Log`, `Exp`, the
-trigonometric and hyperbolic functions and their inverses (`Sin`, `Cos`,
-`Tan`, `Cot`, `Sec`, `Csc`, `Sinh`, `Cosh`, `Tanh`, `Arcsin`, `Arccos`,
-`Arctan`, `Arctan2`, `Arsinh`, `Arcosh`, `Artanh`), `Abs`, `Sign`, `Gamma`,
-`Erf`, `Erfc`, `Digamma`, `Haversine`, `Conjugate`, `Min`, `Max`, `Floor`, `Ceil`,
-`Round`, `Mod`, captured numbers, function literals with typed parameters
-and local variables, `Loop` over an integer range with `Break` in a branch
-of an `If`, `Sum` and `Product` of a real or integer body over integer
-ranges (`Limits`), `Which` and an `If` with no else branch whose values are
-real or integer numbers, calls of user functions
-with or without a declared signature, and lists of numbers read with `At` and `Length`,
-made with a comprehension over a range and updated with `ReplaceAt`,
-list literals of numbers and tuples of reals.
-A block of statements can be the compiled expression itself: its free
-symbols are then the inputs. A power or a root of two number literals is
-written as the value that the ordinary compiler folds it to.
-
-A block can hold another block, and a block whose statements declare names
-with a value can be an operand. A local declared `unknown` with a value has
-the type of its value, and a first write to a new name of a block declares
-a local, as in the ordinary compiler. In the `strict` mode, a local function
-of the block (a `Declare` of a function literal, or `DefineFunction`) and a
-user function declared `function` are compiled once; a local function reads
-the names of the block at each call, as a closure does. A local function in
-a branch or a loop, a recursive one, a local function in the `complex` mode,
-and a local of a nested block with the name of an outer one decline:
-
-```js
-const o = compile(
-  ce.box(['Add',
-    ['Block', ['Declare', 'a', "'real'", ['Multiply', 3.7, 'x']],
-      ['Subtract', 'a', ['Floor', 'a']]],
-    1]),
-  { profile: 'numeric-kernel' }
-);
-o.code;          // ➔ "(() => { const _tv1 = 3.7 * _.x; return _tv1 + -Math.floor(_tv1) + 1; })()"
-o.run({ x: 1 }); // ➔ 1.7000000000000002
-
-const l = compile(
-  ce.box(['Block',
-    ['Assign', 'a', ['Multiply', 2, 'x']],
-    ['Declare', 'g', "'function'", ['Function', ['Add', 't', 'a'], 't']],
-    ['Assign', 'a', 10],
-    ['g', 3]]),
-  { profile: 'numeric-kernel' }
-);
-l.run({ x: 5 }); // ➔ 13
-```
-
-```js
-import { compile, canCompile } from '@cortex-js/compute-engine/compile';
-
-ce.declare('x', 'real');
-ce.declare('y', 'real');
-const r = compile(ce.box(['Add', ['Sin', 'x'], ['Multiply', 'x', 'y']]), {
-  profile: 'numeric-kernel',
-});
-r.code;      // ➔ "_.x * _.y + Math.sin(_.x)"
-r.profile;   // ➔ "numeric-kernel"
-r.pure;      // ➔ true
-r.shippable; // ➔ true
-r.run({ x: 0, y: 2 }); // ➔ 0
-
-const f = compile(
-  ce.box(['Function', ['Block', ['Multiply', 'a', ['Sqrt', 'a']]],
-    ['Typed', 'a', "'real'"]]),
-  { profile: 'numeric-kernel' }
-);
-f.code;      // ➔ "(a) => { return a * Math.sqrt(a); }"
-f.run(4);    // ➔ 8
-f.shippable; // ➔ true
-
-const b = compile(
-  ce.box(['Block', ['Declare', 'a', "'real'", ['Add', 'x', 1]],
-    ['Multiply', 'a', 'a']]),
-  { profile: 'numeric-kernel' }
-);
-b.code;          // ➔ "(() => { const _tv1 = _.x + 1; return _tv1 * _tv1; })()"
-b.run({ x: 2 }); // ➔ 9
-
-const g = compile(ce.box(['Exp', ['Multiply', 'ImaginaryUnit', 'x']]), {
-  profile: 'numeric-kernel',
-});
-g.code;          // ➔ "_SYS.cexp(({ re: 0, im: _.x }))"
-g.run({ x: 1 }); // ➔ { re: 0.5403023058681398, im: 0.8414709848078965 }
-```
-
-A product, a quotient or a power with a complex operand, and most functions
-of a complex operand, are written as the ordinary compiler writes them. A
-real operand of a product is not converted to a complex number, so
-`x·(a + bi)` is `x·a + x·b·i`, as in the ordinary compiler. Some forms
-decline: a power whose exponent is not a number literal (`z^x`), `Abs` of a
-complex operand that is not a name, and `Sinh`, `Cosh`, `Tanh` and `Exp` of
-a complex operand that reads `Pi`.
-
-A bound of a `Sum` or a `Product` is floored, as in the ordinary compiler;
-with an `iterationBudget`, a range of more terms than the budget gives
-`NaN`. A `Which` with no `True` clause gives `NaN` when no condition holds.
-A complex body of a `Sum` or a `Product`, and a complex value of a `Which`,
-decline:
-
-```js
-const s = compile(
-  ce.box(['Function', ['Block', ['Sum', ['Divide', 1, 'k'], ['Limits', 'k', 1, 'n']]],
-    ['Typed', 'n', "'integer'"]]),
-  { profile: 'numeric-kernel' }
-);
-s.run(4); // ➔ 2.083333333333333
-
-const w = compile(ce.box(['Which', ['Less', 'x', 0], 0, ['Less', 'x', 1], 'x']), {
-  profile: 'numeric-kernel',
-});
-w.code;          // ➔ "_.x < 0 ? 0 : _.x < 1 ? _.x : NaN"
-w.run({ x: 2 }); // ➔ NaN
-```
-
-A list of reals or of integers (an input, a parameter, a literal such as
-`[x, y, 1]`, or the result of a comprehension or of a user function) and a
-tuple of reals (`(x, y)`, an input or a parameter declared
-`tuple<real, real>`) are values of the program and can be its result, a
-JavaScript array. `Sum`, `Product`, `Max` and `Min` of one list or tuple
-fold its elements; `Max` and `Min` of an empty list are `NaN`. Arithmetic of
-a list and numbers applies to each element (`2·L + 1`). Two lists are
-combined only when their lengths are equal by construction, such as `L` and
-`2·L`: `L + M` of two inputs declines, because the ordinary compiler gives
-`NaN` for lists of different lengths. A comprehension can have a guard that
-does not draw, with bounds that are integer literals or a `Length`:
-
-```js
-ce.declare('L', 'list<real>');
-const e = compile(ce.box(['Add', ['Multiply', 2, 'L'], 1]), {
-  profile: 'numeric-kernel',
-});
-e.run({ L: [1, 2.5] }); // ➔ [3, 6]
-
-const m = compile(ce.box(['Max', 'L']), { profile: 'numeric-kernel' });
-m.run({ L: [1, 7, 3] }); // ➔ 7
-m.run({ L: [] });        // ➔ NaN
-
-const t = compile(
-  ce.box(['Function', ['Block', ['Tuple', ['Sum', 'P'], ['Product', 'P']]],
-    ['Typed', 'P', "'tuple<real, real>'"]]),
-  { profile: 'numeric-kernel' }
-);
-t.run([3, 4]); // ➔ [7, 12]
-
-const stones = compile(
-  ce.box(['Function',
-    ['Block', ['Comprehension', 'k',
-      ['Element', 'k', ['Range', 1, ['Length', 'B']], ['Equal', ['At', 'B', 'k'], 'p']]]],
-    ['Typed', 'B', "'list<integer>'"], ['Typed', 'p', "'integer'"]]),
-  { profile: 'numeric-kernel' }
-);
-stones.run([1, 0, 1, -1], 1); // ➔ [1, 3]
-```
-
-A list of lists, a list or a tuple of booleans or of complex numbers,
-`Power` or a function of a list (`L^2`, `sin(L)`), arithmetic on a tuple,
-`First`, `Last`, `Count` and a captured list decline. A fold that the
-ordinary compiler writes as a complex value declines too: the fold of an
-expression whose type is not real (`Sum(I/2.5)`), and in the `complex`
-mode the `Sum` or `Product` of a local list. So does a product or a
-quotient with the call of a user function that has a list argument, whose
-type admits a list and a number (`10·(2/f(L))`).
-
-The result reports two facts about the compiled program:
-
-- `pure`: two calls, with any arguments, give the same results whether they
-  run one after the other or at the same time in two workers, and a call
-  changes nothing that the host can observe. A list argument is only read.
-- `shippable`: the code can run on a worker of the kernel pool. Under the
-  profile, a function literal has this field too.
-
-Neither fact starts a parallel execution.
-
-The profile admits random draws: `Random()`, `Random` of an `Interval` or a
-`Range` whose bounds are number literals, `WithRandomSeed`, and calls of
-user functions whose body draws. The code draws the same numbers as the
-ordinary compiler, in the same order and the same number of times, and a
-compiled function called inside an interpreted `WithRandomSeed` draws from
-its frame. A draw makes the program not `pure`, unless it is inside a
-`WithRandomSeed`; a program that draws or seeds the random stream is not
-`shippable`. A draw in a comprehension declines, because the interpreter
-draws the elements of a comprehension when they are read. A program that
-draws more than once declines when one of its draws is in a complex value
-(`Random() + Sqrt(Random(Range(-2, 8, 2)))` in the `complex` mode), because
-the ordinary compiler evaluates a complex operand first. `RandomChoice`,
-`RandomSample`, `RandomShuffle` and `Random` of a domain with a variable
-decline too:
-
-```js
-const u = compile(ce.box(['Add', 'x', ['Random', ['Interval', -1, 1]]]), {
-  profile: 'numeric-kernel',
-});
-u.pure;      // ➔ false
-u.shippable; // ➔ false
-
-const s = compile(ce.box(['WithRandomSeed', 42, ['Add', 'x', ['Random']]]), {
-  profile: 'numeric-kernel',
-});
-s.pure;          // ➔ true
-s.shippable;     // ➔ false
-s.run({ x: 1 }); // ➔ 1.7367300395263547, at each call
-```
-
-A parameter or a free symbol with no declared type is a real number in the
-`strict` mode and a complex number in the `complex` mode. The result lists
-these names in `defaultedSymbols`, so that you can find a name you did not
-mean to leave undeclared. Declare a name that is a list, a boolean or an
-integer (a loop bound, an index), or call `ce.infer()` before `compile()`.
-
-`ce.infer()` declares each free symbol of the expressions you give it with
-the type that they require of it, and the profile reads that type as a
-declared type. So does a type that `ce.assume()` writes (`x > 0` gives `x`
-the type `real<0<..>`), and the type of a value assigned with `ce.assign()`.
-Boxing, evaluating or compiling an expression writes no type, so the type
-of a name does not depend on what you boxed before:
-
-```js
-ce.infer([ce.box(['Mod', 'v', 2])]); // `v` is real
-const k = compile(ce.box(['Sin', 'v']), {
-  profile: 'numeric-kernel',
-  mode: 'complex',
-});
-k.code;             // ➔ "Math.sin(_.v)"
-k.defaultedSymbols; // ➔ undefined
-```
-
-The same rule applies to a user function with no declared signature that
-the code calls: a parameter with no type is a real number in the `strict`
-mode and a complex number in the `complex` mode, and the result has the type
-of the body. A call with an argument of another type (a list, a boolean, a
-complex value in the `strict` mode) declines. `defaultedSymbols` lists the
-name of the function:
-
-```js
-ce.parse('f(t) := t^2 + 1').evaluate();
-const g = compile(ce.box(['Function', ['Block', ['f', 'x']], 'x']), {
-  profile: 'numeric-kernel',
-});
-g.defaultedSymbols; // ➔ ["x", "f"]
-g.run(3);           // ➔ 10
-```
-
-A name declared `number` (an input, a parameter, a parameter of a user
-function) has the type it has in the ordinary compiler: a real number in the
-`strict` mode, a complex number in the `complex` mode, where the code
-accepts a number or a complex value for an input or a parameter. A name
-declared a union of a real type with `nan` or `signed_infinity` is a real
-number in both modes. A user function declared with the result `number`
-returns the type of its body, and a name declared `number` whose value is a
-number is captured as that number. `defaultedSymbols` does not list these
-names, since their type is declared:
-
-```js
-ce.declare('w', 'number');
-const n = compile(ce.box(['Sin', 'w']), {
-  profile: 'numeric-kernel',
-  mode: 'complex',
-});
-n.code;                        // ➔ "_SYS.csin(_SYS.cplx(_.w))"
-n.run({ w: { re: 0, im: 1 } }); // ➔ { re: 0, im: 1.1752011936438014 }
-n.run({ w: 2 });               // ➔ 0.9092974268256817
-n.defaultedSymbols;            // ➔ undefined
-```
-
-A program outside the profile declines with the diagnostic code
-`outside-profile`. The diagnostic names the first node outside the profile:
-its head in `operator`, or a name in `binding`. The `fallback` option applies
-as for any other decline, and the ordinary compiler is never used for a part
-of the program.
-
-```js
-ce.declare('L', 'list<real>');
-const d = compile(ce.box(['RandomChoice', 'L', 2]), {
-  profile: 'numeric-kernel',
-});
-d.success;    // ➔ false
-d.diagnostic; // ➔ { code: "outside-profile", kind: "capability",
-              //     message: "Could not compile with the profile 'numeric-kernel': unsupported head RandomChoice",
-              //     operator: "RandomChoice", value: "RandomChoice(L, 2)" }
-```
-
-`canCompile()` answers for the profile with the same options: `ok: true`
-exactly when `compile()` gives code, with `pure` and `shippable`, and
-otherwise the diagnostic that `compile()` gives. It runs the whole
-compilation, so it costs as much as `compile()`.
-
-```js
-canCompile(ce.box(['Add', 'x', ['Sin', 'x']]), { profile: 'numeric-kernel' });
-// ➔ { ok: true, pure: true, shippable: true }
-```
-
-Under the profile:
-
-- `cse` and `constantFold` are ignored: the structured compiler does neither.
-- The modes are `strict` and `complex`.
-- The options `vars`, `functions`, `operators`, `imports` and `preamble`
-  give the code of the ordinary compiler. The functions of the host run the
-  same number of times, in the same order, on both compilers:
-  - A `vars` entry that reads the vars object under another name
-    (`u: '_.w'`) makes the name an input.
-  - Another source that is one operand (a name, a call, a member access, an
-    expression in parentheses: `t: 'next()'`) is read once at each
-    occurrence of the name. The result is then neither `pure` nor
-    `shippable`.
-  - A call of a `functions` entry, or of an `operators` entry whose operator
-    is a name, is a call of the host. It is `pure` only when the entry is
-    declared pure (`{ source, pure: true }`). The result is never
-    `shippable`, because a worker does not have the function.
-  - `imports` and `preamble` work as on the ordinary compiler. A preamble
-    that is not blank runs on every call, so the result is not `pure`.
-- `broadcast` is ignored: the result has no `batch`, and the values are those
-  of `broadcast: false`.
-- These decline with `outside-profile`, each with a message that names the
-  cause:
-  - the function form of `operators`, and an infix `operators` entry;
-  - an entry for an operator or a constant of the library
-    (`functions: { Sin: … }`);
-  - a `vars` source that is not one operand (`'Math.PI / 4'`);
-  - a read or a call of the host in the `complex` mode;
-  - a `functions` source that is not a name, a dotted path of names or a
-    function expression with a pure arithmetic body (`'_.getTransform()'`):
-    the ordinary compiler evaluates it before the arguments;
-  - a source with a line terminator or a comment;
-  - a `Sum` or a `Product` that calls a function declared pure (the
-    ordinary compiler skips such calls after a sum of `NaN`);
-  - `mode: 'bigint'`.
-- An empty object of `functions`, `operators` or `vars` is the same as an
-  absent option.
-
-```javascript
-ce.declare('x', 'real');
-ce.declare('f', '(real, real) -> real');
-const r = compile(ce.box(['Add', ['f', 'x', 1], 1]), {
-  profile: 'numeric-kernel',
-  functions: { f: { source: 'Math.hypot', pure: true } },
-});
-r.code;      // ➔ "(() => { const _tv1 = Math.hypot(_.x, 1); return _tv1 + 1; })()"
-r.pure;      // ➔ true
-r.shippable; // ➔ false
-r.run({ x: 3 }); // ➔ 4.16227766016838
-```
-- A program of more than 100,000 operations declines with
-  `outside-profile`, also one with no repeated subexpression (a sum of
-  30,000 terms `sin(x + c)`); the diagnostic names no node.
-- With another target than `javascript`, or in the `compile()` method of a
-  target object (`new JavaScriptTarget().compile(expr, { profile })`), the
-  option is an error, thrown whatever `fallback` says.
-
-The profile is experimental: the list of what it admits will grow, and its
-options can change.
 
 ### Constant Folding
 
@@ -1176,6 +822,13 @@ such a name declines, only the message names it.
 
 ### Inputs With No Type and Values With No Settled Shape
 
+Program and Block locals keep the contracts established during preparation.
+Runtime writes cannot give an unknown local, or an empty unannotated list's
+elements, a known static type. Supply annotations when compilation needs that
+information. Declarations without an initializer conservatively decline
+compilation, including a declaration followed by a straight-line initialization;
+that form remains valid for interpreted execution.
+
 Compiled code settles the shape of every value (a number, a complex number, a
 string, a list, a point or a matrix) at compile time, and does not test it at
 run time. Two declines follow from this rule. Both occur on every target, and
@@ -1241,8 +894,8 @@ declines, and compiles after `ce.declare('N', 'real')`.
   shape: `Block(p ≔ [1, 2]; p ≔ [1, 2, 3]; p)` compiles. A declared type that
   is a union of shapes (`real | list<real>`) compiles with one body per
   member.
-- Arithmetic over a symbol declared `any` or `value`, on the `javascript`,
-  `python` and `interval-js` targets. Such a symbol can hold a number or a list.
+- Arithmetic over a symbol declared `any` or `value`, on the `javascript` and
+  `interval-js` targets. Such a symbol can hold a number or a list.
   `(t: any) ↦ 2t` declines, and `unsupported` holds `t`. With the fallback, the
   interpreter gives `[2, 4]` for `[1, 2]`. Declare the shape, such as `real` or
   `list<real>`, to compile it.
@@ -1284,6 +937,121 @@ body per member. With `y: real | tuple<real, real>`, `f(y)` compiles to
 `Array.isArray(y) ? f_point(y) : f(y)`, and gives `6` for `y = 3` and
 `[2, 4]` for `y = [1, 2]`. To avoid the test, declare one shape, or compile
 one function for each shape.
+
+### Which Definitions the Compiled Code Reads
+
+A compilation reads each name from the scope the expression was boxed in,
+as `evaluate()` does. A declaration of the same name in a scope that is
+pushed later does not change the compiled code:
+
+```js
+ce.declare("x", "real");
+ce.declare("a", "real");
+ce.assign("a", 10);
+const expr = ce.parse("x + a");
+
+ce.pushScope();
+ce.declare("a", "real");
+ce.assign("a", 1);
+
+compile(expr).run({ x: 2 });
+// ➔ 12
+
+compile(ce.rebind(expr)).run({ x: 2 });
+// ➔ 3: `rebind()` gives the expression bound in the current scope
+```
+
+The same holds for a function that the expression calls: its body reads
+the names of the scope the function was defined in.
+
+An expression built from parts that were boxed in scopes that define a name
+differently has no single scope to compile in. Its compilation declines,
+with the name in `binding`, and the result falls back to the interpreter:
+
+```js
+const mixed = ce.function("Add", [expr, ce.parse("a")]);
+const result = compile(mixed);
+result.success;
+// ➔ false
+result.run({ x: 2 });
+// ➔ 13: the interpreter reads 10 for the first `a` and 1 for the second
+```
+
+Box the expression in one scope, or bind it again with `ce.rebind()`.
+
+#### Naming the Inputs: the `symbolic` Option
+
+A symbol that holds a value is folded into the compiled code. To keep it as
+an input, name it in the `symbolic` option. The name is then an input
+wherever the compilation reads it, also inside the functions that the
+expression calls, and its value is supplied at each run:
+
+```js
+ce.declare("x", "real");
+ce.declare("a", "real");
+ce.assign("a", 4);
+ce.parse("f(x) := |a| x").evaluate();
+const expr = ce.parse("f(x) + a");
+
+compile(expr).run({ x: 2 });
+// ➔ 12: `a` is folded as 4
+
+compile(expr, { symbolic: ["a"] }).run({ x: 2, a: -3 });
+// ➔ 3: `a` is an input, in the expression and in the body of `f`
+```
+
+The symbol needs a declared type (`ce.declare("a", "real")`). A symbol
+whose type was only inferred from an assigned value makes the compilation
+decline. Use `vars` when the input must have a given spelling in the
+emitted code.
+
+#### Giving the Types of the Inputs: the `inputs` Option
+
+The `inputs` option names the inputs and gives their types at the call. No
+declaration is needed, and nothing is declared after the call:
+
+```js
+ce.parse("g(t) := t x").evaluate();
+const expr = ce.parse("g(2) + x");
+
+compile(expr, { inputs: { x: "real" } }).run({ x: 3 });
+// ➔ 9: `x` is an input in the expression and in the body of `g`
+```
+
+The given type wins over a declaration and over a stored value, for that
+compilation only:
+
+```js
+ce.declare("x", "real");
+ce.assign("n", ce.parse("[1, 2, 3]"));
+const row = ce.parse("n x");
+
+compile(row, { inputs: { n: "real" } }).run({ n: 2, x: 5 });
+// ➔ 10: `n` is one number here, not the stored list
+```
+
+The expression keeps the canonical form it was boxed with, so give a type
+that is the type the name had when the expression was boxed, or a subtype of
+it (`list<real>` for a list, a range for `real`). A rewrite that was right
+for the type at boxing is not undone by a wider type:
+
+```js
+ce.declare("x", "real");
+ce.declare("k", "integer");
+const power = ce.parse("(x^2)^k");
+power.json;
+// ➔ ["Power", "x", ["Multiply", 2, "k"]]: right for an integer `k`
+
+compile(power, { inputs: { k: "real" } }).run({ x: -3, k: 0.5 });
+// ➔ -3, and (x^2)^k is 3: the rewrite is wrong for k = 0.5
+```
+
+For a wider type, parse the expression in a scope that declares the name
+with that type.
+
+A name of `inputs` that a function of the expression reads as a constant is
+not an input: the compilation declines, and `diagnostic.binding` is the name.
+Compile again without the name to read the constant.
 
 ### Supplying Inputs
 
@@ -1344,11 +1112,6 @@ scalar or a list, such as the result of a call whose return type is
   more possibly-list operands (a run-time matrix would require the matrix
   product, not an element-wise one), `Equal`/`NotEqual` over a possibly-list
   operand, and complex-element broadcasts.
-- **Python**: arithmetic over a possibly-list operand always fails closed —
-  Python's `*` and `+` repeat or concatenate a plain `list` rather than
-  broadcasting, so scalar code would silently compute the wrong value.
-  Function heads that lower to NumPy calls (`np.sin`, …) are unaffected —
-  NumPy broadcasts natively.
 - **GLSL**: such operands compile as scalar slots, unchanged — the shader
   target has no dynamic lists.
 
@@ -1423,8 +1186,7 @@ time`.
 The integer operations `Mod`, `Remainder`, `GCD` and `LCM` use the same
 convention for magnitude. Compiled code works in doubles, so an operand beyond
 the safe integer range (±2^53) or an infinity throws a `RangeError` that names
-the operation and the value, instead of returning a different number. The
-Python target raises a `ValueError` with the same message. The `Mod(x, 1)`
+the operation and the value, instead of returning a different number. The `Mod(x, 1)`
 fractional-part forms are not checked. A plot kernel that samples
 `Mod(1/x, 2)` at `x = 0` throws at that sample. A constant operand is folded
 from the exact value, so `DigitSum(2^1000)` compiles to `1366`.
@@ -1542,7 +1304,7 @@ f.run(5);      // ➔ 5
 f.run(NaN);    // ➔ NaN
 ```
 
-Inside compiled code, every target (JavaScript, Python, GLSL and
+Inside compiled code, every target (JavaScript, GLSL and
 interval-js) adds the default value to each call that leaves the argument out
 when the expression is compiled. With
 `g = (k: real = 2) ↦ k + 1`, `g()` compiles to `3`. With `L: list<real>`,
@@ -1650,8 +1412,8 @@ expressions compile to arrays.
 
 ### Dictionary Expressions
 
-A dictionary compiles to a JavaScript object literal, or a Python `dict`, with
-each value compiled. Each evaluation returns a new object:
+A dictionary compiles to a JavaScript object literal, with each value
+compiled. Each evaluation returns a new object:
 
 ```js
 const f = compile(ce.box([
@@ -1699,7 +1461,7 @@ answers `Missing` for the same input — the absence marker has no value in the
 target's floating-point model, so it projects to `NaN`. See
 [Non-Finite Results](#non-finite-results). A selection whose arms are all
 provably not numbers — strings, lists — answers the target's missing-object
-literal instead, `undefined` in JavaScript and `None` in Python, so that
+literal instead, `undefined` in JavaScript, so that
 `IsMissing` and `Coalesce` work on a compiled string selection; an arm whose
 type is unknown counts as a number. Under a list of conditions, a position
 that no clause selects is `NaN` for a number and `[NaN, NaN]` for a point,
@@ -1718,7 +1480,7 @@ of places in compiled code:
 
 - **where it is produced**: the producer gives `NaN` for a numeric result, a
   point of `NaN` coordinates (`[NaN, NaN]`) for a point, and the target's absent
-  object (`undefined` in JavaScript, `None` in Python) otherwise;
+  object (`undefined` in JavaScript) otherwise;
 - **where it is moved without computation**: `At`, `First`, `Last`, `Rest`,
   `Length`, `Reverse`, and the binding of a `Map` callback parameter keep the
   hole in its position (`Length([1, Missing])` is 2 everywhere);
@@ -1730,8 +1492,8 @@ of places in compiled code:
 
 Every other operator applied to an absent operand gives the target's own
 value, and nothing is promised about it or about anything computed from it:
-`undefined + 1` is `NaN`, `undefined > 0` is `false`, `undefined[0]` throws,
-and Python's `None + 1` is a `TypeError`. The interpreter keeps its own
+`undefined + 1` is `NaN`, `undefined > 0` is `false`, and `undefined[0]`
+throws. The interpreter keeps its own
 propagation (`Missing + 1` is `Missing`, `Missing > 0` is `False`), so a program
 that computes on an absent value before discharging it can give one value in
 the interpreter and another when compiled. Discharge first:
@@ -1806,8 +1568,7 @@ a write, for example `ys = xs` in the loop or a function literal that reads
 `xs`. Each pass of the loop then copies the whole list, and the result reports
 it in `warnings`, with the code `'copying-list-update'` and the name of the
 local in `binding`. The code does not change. An update that is not in a loop,
-which copies once, is not reported; nor is the Python target, which always
-copies a block local.
+which copies once, is not reported.
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
@@ -1935,12 +1696,13 @@ The serializer writes such a `Block`, and every single-branch `If`, with
 `where`: `ce.parse("x^2\\{x>0\\}+1").latex` is
 `x^2+1\text{ where }0\lt x`.
 
-A local has a value from its declaration: `Declare(x, type, v)`, or the first
-assignment of the name at the level of the block. A `Declare` with no value,
-a first assignment in a branch or in a loop body, and a read of a local before
-its declaration are static errors (`declaration-without-value`,
-`first-assignment-in-branch`, `read-before-declaration`), so the compilation
-declines. An assignment is a statement, never an operand: `f(a \coloneq 2)` is
+A local has a value from its declaration: `Declare(x, type, v)`, or, in
+LaTeX, the first assignment of the name at the level of the block, which
+parses as a `Declare`. A `Declare` with no value, a `Declare` in a branch or in
+a loop body, an `Assign` to a name that no scope declares, and a read of a
+local before its declaration are static errors (`declaration-without-value`,
+`declaration-below-statement`, `assignment-to-undeclared-variable`,
+`read-before-declaration`), so the compilation declines. An assignment is a statement, never an operand: `f(a \coloneq 2)` is
 the error `assignment-in-operand`. A later assignment must keep the type of the
 local, or it is the error `assignment-type-mismatch`.
 
@@ -2648,7 +2410,6 @@ The Compute Engine comes with these compilation targets:
 
 - **`javascript`** (default) - Compiles to executable JavaScript functions
 - **`glsl`** - Compiles to GLSL (OpenGL Shading Language) for WebGL shaders
-- **`python`** - Compiles to Python/NumPy code for scientific computing (requires registration)
 - **`interval-js`** - Compiles to JavaScript using interval arithmetic for reliable function plotting
 - **`interval-glsl`** - _(Deprecated)_ Compiles to GLSL using interval arithmetic for GPU-based plotting
 
@@ -2713,6 +2474,17 @@ code, without writing any. It takes the options of `compile()` and answers
 the fragment. The diagnostic has the code `outside-fragment`, the operator
 of that node in `operator`, or the name of a symbol in `binding`. It never
 throws.
+
+`canCompile` is also exported by the main package, beside `compile`, where
+it takes a LaTeX string, a MathJSON expression or an expression, as the
+free function `compile` does:
+
+```javascript
+import { canCompile } from '@cortex-js/compute-engine';
+
+canCompile('\\sin(x) + x^2', { to: 'glsl' });
+// ➔ { ok: true }
+```
 
 ```javascript
 import { ComputeEngine } from '@cortex-js/compute-engine';
@@ -2837,9 +2609,7 @@ The answer depends only on the expression, the options and the declarations
 that the expression reaches (the types of its symbols, the definitions of the
 functions it calls). A program can keep it until one of those declarations
 changes. Only the `glsl` target has a fragment: for another target,
-`canCompile()` answers `ok: false`, and the program calls `compile()`. The
-exception is `javascript` with the option `profile: 'numeric-kernel'` (see
-"The `numeric-kernel` Profile (Experimental)").
+`canCompile()` answers `ok: false`, and the program calls `compile()`.
 
 **A limit on the loops of a shader.** A shader cannot throw, and a loop with
 a large bound can stop the GPU long enough for the browser to lose the WebGL
@@ -2904,92 +2674,70 @@ variable, a list literal or a computed list, the function still has no
 shader definition: the compilation declines, unless it can fold or inline
 the call.
 
-### Python/NumPy Target
+### Inputs That Are Local to Your Shader Code: the `callerLocals` Option
 
-The Compute Engine includes a complete Python/NumPy compilation target for
-scientific computing. The full package entry registers it as `python` with its
-default options; register your own instance to change the options, or to add
-it to an engine made from `@cortex-js/compute-engine/core`, where it is not
-bundled:
+A user-defined function is emitted as a shader function in the preamble, at
+file scope. When its body reads an input of the expression, the shader
+function names that input:
 
 ```javascript
-import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine';
+ce.declare('x', 'real');
+ce.declare('y', 'real');
+ce.parse('g(u) := u + x').evaluate();
+const r = compile(ce.parse('g(1)'), { to: 'glsl' });
+// r.code: "_fn_g(1.0)"
+// r.preamble:
+// float _fn_g(float u) {
+//   return u + x;
+// }
+```
 
-const ce = new ComputeEngine();
+This works when `x` is a global of your shader (a uniform). It does not when
+you place the code in a function of your own, such as
+`float userFn(float x, float y) { … }`: `x` is then a parameter of `userFn`,
+and `_fn_g` cannot see it.
 
-// Register the Python target with NumPy support
-ce.registerCompilationTarget(
-    'python', new PythonTarget({ includeImports: true })
-);
+The `callerLocals` option names the symbols that are local to the code that
+runs the compiled expression. A shader function that reads one of them,
+directly or through a shader function it calls, takes it as a parameter after
+its own, and each call passes it:
 
-// Compile expressions to Python/NumPy code
-const f = compile("\\sin(x) + \\cos(y)", { to: 'python' });
-console.log(f.code);
-// → import numpy as np
+```javascript
+ce.parse('h(x) := g(x) \\cdot y').evaluate();
+const r = compile(ce.parse('h(3)'), {
+  to: 'glsl',
+  callerLocals: ['x', 'y'],
+});
+// r.code: "_fn_h(3.0, x, y)"
+// r.preamble:
+// float _fn_g(float u, float _in_x) {
+//   return u + _in_x;
+// }
 //
-//   np.sin(x) + np.cos(y)
+// float _fn_h(float x, float _in_x, float _in_y) {
+//   return _in_y * _fn_g(x, _in_x);
+// }
 ```
 
-#### Generating Python Functions
+- The entries are symbol names, not shader text. A call in the code passes
+  the `vars` source of the name when there is one (`vars: { x: 'p.x' }`
+  gives `_fn_g(1.0, p.x)`), and the name otherwise.
+- The added parameters follow the function's own, in the sorted order of the
+  symbol names. They depend on the function and the option only, so two
+  compilations with the same option emit the same text for the same function.
+- A name that is not in the option is read by its name, as before. With the
+  option absent or empty, the emitted text does not change. The other
+  targets ignore the option.
+- A variable bound in the expression does not reach into the body of a
+  function. In `\sum_{x=1}^{300} (x + g(x))` the `x` that `g` reads is the
+  input, so the code copies the input to a temporary before the loop
+  (`float _tv2 = x;`) and passes the temporary. The code is then a list of
+  statements that ends with a `return`.
 
-The `PythonTarget` can generate complete Python functions:
-
-```javascript
-import { PythonTarget } from '@cortex-js/compute-engine';
-
-const python = new PythonTarget({ includeImports: true });
-
-const func = python.compileFunction(
-  "\\sqrt{x^2 + y^2}",
-  'euclidean_distance',
-  ['x', 'y'],
-  'Calculate Euclidean distance between two points'
-);
-
-console.log(func);
-```
-
-Generates:
-
-```python
-import numpy as np
-
-def euclidean_distance(x, y):
-    """Calculate Euclidean distance between two points"""
-    return np.sqrt(x ** 2 + y ** 2)
-```
-
-#### Use Cases
-
-The Python target is ideal for:
-
-- **Scientific Computing**: Generate NumPy code for numerical analysis
-- **Machine Learning**: Create feature engineering functions
-- **Data Analysis**: Convert formulas to Pandas/NumPy operations
-- **Education**: Show Python equivalents of mathematical notation
-- **Code Generation**: Automated function creation from LaTeX
-
-#### Lambda Functions
-
-Generate Python lambda expressions:
-
-```javascript
-const lambda = python.compileLambda("x^2 + 2x + 1", ['x']);
-console.log(lambda);
-// → lambda x: x ** 2 + 2 * x + 1
-```
-
-#### Supported Functions
-
-The Python target maps to NumPy functions:
-
-- **Trigonometric**: `sin` → `np.sin`, `cos` → `np.cos`, etc.
-- **Exponential**: `exp` → `np.exp`, `ln` → `np.log`
-- **Power**: `x^n` → `x ** n`, `sqrt` → `np.sqrt`
-- **Statistics**: `sum` → `np.sum`, `mean` → `np.mean`
-- **Linear Algebra**: `dot` → `np.dot`, `cross` → `np.cross`
-
-For complete documentation, see the [Python Target Guide](https://cortexjs.io/compute-engine/guides/python-target/).
+The compilation declines when a shader function reads a caller local that has
+no GLSL value type (only scalars, booleans, complex values and vectors of 2
+to 4 components have one), or when a call must pass a caller local whose
+`vars` source is not a read of a variable (`vars: { x: 'next()' }`).
 
 ### Interval Arithmetic Targets
 
@@ -3263,22 +3011,13 @@ For complete examples of custom targets including RPN (Reverse Polish Notation),
 
 ## Performance Benchmarks
 
-### JavaScript vs Python/NumPy
+### JavaScript Benchmarks
 
-To compare performance across compilation targets, the project includes benchmark scripts:
+To measure the performance of compiled code, the project includes a benchmark script:
 
 **JavaScript Benchmarks** (Node.js):
 ```bash
 npm run test compute-engine/compile-performance
-```
-
-**Python Benchmarks** (generated):
-```bash
-# Generate the Python benchmark script
-npm run test compute-engine/compile-python-generate
-
-# Run Python benchmarks (requires NumPy)
-python benchmarks/python-performance.py
 ```
 
 ### Expected Results
@@ -3288,12 +3027,10 @@ The benchmarks test the same mathematical expressions across different targets:
 | Target | Performance | Use Case |
 |--------|------------|----------|
 | **JavaScript Compiled** | 40-2900x faster than eval | CPU computation, real-time calculations |
-| **Python/NumPy** | Fast for arrays, some overhead for scalars | Scientific computing, data analysis |
 | **GLSL** | Massively parallel on GPU | Graphics, WebGL shaders |
 
 **Key Insights**:
 - JavaScript compilation is excellent for single-threaded CPU performance
-- Python/NumPy excels at vectorized array operations
 - GLSL enables GPU parallelism for millions of simultaneous operations
 
 ## Limitations

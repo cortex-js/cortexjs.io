@@ -103,9 +103,10 @@ derivative operator:
 | `f^{\prime}`          | `["Derivative", "f"]` |
 | `f''`                 | `["Derivative", "f", 2]` |
 | `f^{(n)}`             | `["Derivative", "f", n]` |
+| `f^{(1,0)}`           | `["Derivative", "f", 1, 0]` |
 
 A symbolic order (`f^{(n)}` with `n` unassigned) stays symbolic until `n` is
-assigned, and `["Derivative", "f", 0]` is `f` itself.
+assigned, and is written `f^{(n)}`. `["Derivative", "f", 0]` is `f` itself.
 
 On anything that is **not** a function — an undeclared symbol, a number-valued
 symbol, a subscripted name whose subscript does not fold into the symbol
@@ -234,6 +235,15 @@ A variable can be repeated to compute the second derivative of a function.
 ["D", "f", "x", "x"]
 ```
 
+`["D", f, ["List", "x", n]]` and `["D", f, ["Set", "x", n]]` are the `n`-th
+derivative of _f_ in `x`. A negative order is an error; a fractional or
+symbolic order, or an order above 1000, leaves the derivative unevaluated.
+
+```json example
+["D", ["Power", "x", 5], ["List", "x", 3]]
+// ➔ 60x^2
+```
+
 In the body of a sum or a product, a variable with the index as subscript
 follows the index, so each term differentiates with respect to its own
 variable. The variable `["Subscript", "x", 1]` is the symbol `x_1`.
@@ -324,6 +334,16 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 | `LambertW(x)` | `W(x)/(x·(1+W(x)))` | Lambert W function |
 | `PolyLog(s, z)` | `PolyLog(s-1, z)/z` | In `z`; `PolyLog(2, z)` gives `-ln(1-z)/z`. No closed form in `s` |
 | `Gamma(s, z)` | `-e^(-z)·z^(s-1)` | Upper incomplete gamma, in `z`. No closed form in `s` |
+| `ErfInv(x)` | `(√π/2)·e^(ErfInv(x)²)` | Inverse error function |
+| `Beta(a, b)` | `Beta(a, b)·(ψ(a) − ψ(a+b))` in `a`, `Beta(a, b)·(ψ(b) − ψ(a+b))` in `b` | |
+| `LogBarnesG(z)` | `(z−1)ψ(z) − z + ½(1 + ln 2π)` | |
+| `BarnesG(z)` | `BarnesG(z)·((z−1)ψ(z) − z + ½(1 + ln 2π))` | |
+| `HurwitzZeta(s, a)` | `−s·HurwitzZeta(s+1, a)` | In `a`. No closed form in `s` |
+| `LerchPhi(z, s, a)` | `(LerchPhi(z, s−1, a) − a·LerchPhi(z, s, a))/z` in `z`, `−s·LerchPhi(z, s+1, a)` in `a` | No closed form in `s` |
+| `EllipticK(m)` | `(E(m) − (1−m)K(m))/(2m(1−m))` | Complete, parameter `m` |
+| `EllipticE(m)` | `(E(m) − K(m))/(2m)` | Complete, parameter `m` |
+| `Hypergeometric2F1(a, b, c, z)` | `(ab/c)·Hypergeometric2F1(a+1, b+1, c+1, z)` | In `z`. No closed form in `a`, `b`, `c` |
+| `ClausenCl(n, θ)` | `−½cot(θ/2)` for `n = 1`; `ClausenCl(n−1, θ)` for an even `n`, `−ClausenCl(n−1, θ)` for an odd `n` | Literal order; `θ` in radians |
 | `Arctan2(y, x)` | `-y/(x²+y²)` in `x`, `x/(x²+y²)` in `y` | Divided by the unit factor in a non-radian angular unit |
 | **Bessel Functions** | | |
 | `BesselJ(n, x)` | `(J_{n-1}(x) - J_{n+1}(x))/2` | First kind |
@@ -343,6 +363,16 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 :::info[Chain Rule]
 For all supported functions, the chain rule is automatically applied. For example,
 `d/dx sin(x²) = cos(x²)·2x`.
+:::
+
+:::info[Removable Points]
+The closed forms of the derivatives of `EllipticK`, `EllipticE`, `LambertW`,
+`PolyLog` (in `z`) and `LerchPhi` (in `z`) are `0/0` at 0. An application of
+the derivative at 0 gives the value from the Maclaurin series of the function:
+`["Apply", ["Derivative", "EllipticK"], 0]` evaluates to `π/8`, and
+`["Apply", ["Derivative", "EllipticK", 2], 0]` to `9π/64`. The closed form
+itself, `["D", ["EllipticK", "m"], "m"]`, is still `NaN` after the
+substitution `m = 0`.
 :::
 
 :::info[Definite Integrals]
@@ -428,7 +458,8 @@ $\partial^2 f / \partial x^2$. This follows the convention of Mathematica's
 `Derivative[n₁, n₂, …][f]`.
 
 When applied to plain symbols, a multi-index derivative serializes in Leibniz
-notation; unapplied it uses the parenthesized index list $f^{(1,0)}$.
+notation; unapplied it uses the parenthesized index list $f^{(1,0)}$, which
+parses back to the same `Derivative`.
 
 <Latex value="\frac{\partial}{\partial x} f(x, y)"/>
 
@@ -819,6 +850,20 @@ The general formulas used are:
 - $\int e^x \sin(ax+b) \, dx = \frac{e^x}{a^2+1}(\sin(ax+b) - a\cos(ax+b)) + C$
 - $\int e^x \cos(ax+b) \, dx = \frac{e^x}{a^2+1}(a\sin(ax+b) + \cos(ax+b)) + C$
 
+#### Powers of Sine and Cosine
+
+A product $c \sin^m(u) \cos^n(u)$ with a linear $u$ and integers $m$, $n$ is
+integrated with the odd-power substitution, or with the reduction formulas when
+both powers are even:
+
+```javascript
+ce.parse('\\int \\sin^3 x dx').evaluate()
+// → 1/3·cos(x)^3 - cos(x)
+
+ce.parse('\\int \\sin^3(2x)\\cos^2(2x) dx').evaluate()
+// → -1/6·cos(2x)^3 + 1/10·cos(2x)^5
+```
+
 #### Piecewise Integrands
 
 A definite integral over a finite real interval of an integrand that contains
@@ -1088,6 +1133,53 @@ ce.parse('\\operatorname{Series}(\\arctan x, x, +\\infty)').evaluate()
 // → π/2 - 1/x + 1/(3x^3) - 1/(5x^5) + O(1/x^7)
 ```
 
+At $-\infty$ the expansion holds for $x < 0$: $\sqrt{x^2}$ is $-x$ there.
+
+```javascript
+ce.parse('\\operatorname{Series}(\\frac{1}{\\sqrt{x^2}+1}, x, -\\infty, 3)').evaluate()
+// → -1/x - 1/x^2 - 1/x^3 + O(1/x^4)
+```
+
+At $\pm\infty$, `Series` stays unevaluated when _x_ is the operand of an
+absolute value, a step or another function that is not smooth (`Abs`, `Sign`,
+`Floor`, `Ceil`, `Round`, `Max`, …), as in
+$\operatorname{Series}(1/|x|, x, +\infty)$.
+
+`["DirectedInfinity", 1]` and `["DirectedInfinity", -1]` are the same points
+as $+\infty$ and $-\infty$. At `ComplexInfinity` or another direction, the
+expansion is given only when _f_ is built from analytic operations, so that it
+does not depend on the direction (a rational function such as $1/(x+1)$);
+otherwise `Series` stays unevaluated. `Series` of a library function whose
+derivatives the engine cannot evaluate (`Zeta`, `PolyLog`, `LambertW`) stays
+unevaluated. `Hypergeometric2F1` expands where it is a Taylor series, with
+the coefficients $(a)_k(b)_k/((c)_k\,k!)$; a terminating one (`a` or `b` a
+non-positive integer) is its polynomial, exact about any point, with no
+$O(\cdot)$ term. A non-terminating one stays unevaluated at an argument that
+is a real number $\ge 1$ (the branch point and the cut) and at $\pm\infty$.
+At 0, where the closed
+form of the derivative of some special functions is `0/0`, the coefficients
+come from the Maclaurin series of the function: `PolyLog(s, x)`,
+`LambertW(x)`, `LerchPhi(x, s, a)`, `EllipticK(m)` and `EllipticE(m)` expand
+there.
+
+```json example
+["Series", ["EllipticK", "m"], "m", 0, 3]
+// ➔ π/2 + π/8 m + 9π/128 m^2 + 25π/512 m^3 + O(m^4)
+```
+
+```json example
+["Series", ["Hypergeometric2F1", 1, 1, 3, "x"], "x", 0, 3]
+// ➔ 1 + x/3 + x^2/6 + x^3/10 + O(x^4)
+
+["Series", ["Hypergeometric2F1", -2, 3, 4, "x"], "x", 0, 5]
+// ➔ 1 - 3x/2 + 3x^2/5
+```
+
+```json example
+["Series", ["Divide", 1, ["Add", "x", 1]], "x", "ComplexInfinity", 3]
+// ➔ 1/x - 1/x^2 + 1/x^3 + O(1/x^4)
+```
+
 <Signature name="Series" returns="expression">_f_: expression, _x_: symbol, _x0_: value, _n_: integer</Signature>
 
 The fourth argument _n_ is the highest power retained (it defaults to `5`). The
@@ -1321,12 +1413,13 @@ to the independent variable _x_.
 
 ```json example
 ["DSolve", ["Equal", ["D", ["y", "x"], "x"], ["y", "x"]], "y", "x"]
-// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", "c_1", ["Power", "ExponentialE", "x"]]]]
+// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", ["ArbitraryConstant", 1], ["Power", "ExponentialE", "x"]]]]
 ```
 
 `DSolve` returns a `List` of solutions, each an `Equal` expression giving
-_y(x)_. Integration constants are introduced as needed, named `c_1`, `c_2`, …
-(different names are chosen if those are already in use).
+_y(x)_. A constant of integration is the call `["ArbitraryConstant", k]`: an
+arbitrary number, the _k_-th of the result. The tables below write it
+$c_k$. See [`ArbitraryConstant`](/compute-engine/reference/core/#ArbitraryConstant).
 
 `DSolve` solves the following classes of equations.
 

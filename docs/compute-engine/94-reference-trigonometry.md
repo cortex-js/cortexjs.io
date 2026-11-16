@@ -31,7 +31,26 @@ ce.parse("\\operatorname{arsinh}(1+i)").N();
 ```
 
 Exact arguments remain symbolic with `evaluate()` unless an exact value is
-known.
+known. A hyperbolic function of `Ln(q)` is a rational function of `q`:
+`Cosh(Ln(2))` evaluates to `5/4`.
+
+A function of its own inverse is its argument: `Sin(Arcsin(x))` evaluates to
+`x`, for each circular and hyperbolic function. An inverse of its own function
+gives the principal value for an exact real argument: `Arcsin(Sin(3))`
+evaluates to `π - 3`; `Arcsin(Sin(x))` stays, as it is not `x` outside
+$[-\pi/2, \pi/2]$. `simplify()` also rewrites `Cos(Arcsin(x))` as
+`√(1 - x²)`, `Arccos(-x)` as `π - Arccos(x)` and `Arccot(-x)` as
+`π - Arccot(x)`.
+
+`Arccot` takes its values in $(0, \pi)$ on the real line: `Arccot(-1)` is
+$\frac{3\pi}{4}$ and `Arccot(0)` is $\frac{\pi}{2}$. For a complex argument,
+$\operatorname{Arccot}(z) = \frac{\pi}{2} - \operatorname{Arctan}(z)$. It is
+continuous across the real line (`N(Arccot(-3 + 10^{-12}i))` is
+`2.819842099193151 - 10^{-13}i`, next to `N(Arccot(-3))`), and its branch
+cuts are those of `Arctan`: the imaginary axis above $i$ and below $-i$. On
+the cut, `Arccot(2i)` is $-0.549i$ and `Arccot(-2i)` is $\pi + 0.549i$. Some
+systems (Mathematica, mpmath) use $\operatorname{Arctan}(1/z)$ instead, an odd
+function that differs from this one by $\pi$ when $\operatorname{Re} z < 0$.
 
 ## Trigonometric Functions
 

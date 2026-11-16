@@ -326,9 +326,12 @@ In JavaScript, two properties of an expression tell different things:
 - `expr.isCollection` (and `expr.count`, `expr.each()`, `expr.at()`) tells
   whether a collection value is present that can be walked **now**.
 - `expr.staticShape` tells which collection shape the expression
-  **promises**, read from its type without evaluating it. It is
-  `{ indexed, count, elementType }`, or `undefined` when the expression
-  promises no collection.
+  **promises**. It is `{ indexed, count, elementType }`, or `undefined` when
+  the expression promises no collection. It reads a call or a symbol from its
+  type, without evaluating it. For a collection value it reads the
+  collection's own `count`: for a lazy view over a computed source, such as
+  `Join(f(1), [4])` or a `Filter`, that count evaluates the source, which
+  calls `f` or runs the filter's function once per element.
 
 A call of a function that returns a list has no value before it is evaluated,
 but its type gives its shape:
@@ -898,6 +901,8 @@ That form is now an `incompatible-type` error: write `Tabulate(f, m, n)`.
 
 <Signature name="Tabulate" returns="collection">_f_:function, _rows_:integer, _columns_:integer</Signature>
 
+<Signature name="Tabulate" returns="collection">_f_:function, _dimension_:integer, ...</Signature>
+
 Create a collection by applying a function to every index in the specified
 dimensions. Indices start at 1.
 
@@ -913,6 +918,10 @@ and the result is a nested list.
 ["Tabulate", ["Function", ["Add", "i", "j"], "i", "j"], 2, 3]
 // ➔ ["List", ["List", 2, 3, 4], ["List", 3, 4, 5]]
 ```
+
+Any number of dimensions is accepted: `["Tabulate", "Add", 2, 2, 3]` is a
+2×2×3 tensor, `[[[3, 4, 5], [4, 5, 6]], [[4, 5, 6], [5, 6, 7]]]`. A dimension
+of 0 gives an empty list: `["Tabulate", f, 2, 0]` is `[[], []]`.
 
 To give every element the same value, use [`Fill`](#fill).
 
@@ -1314,6 +1323,11 @@ Return the first element of the collection.
 
 It's equivalent to `["At", xs, 1]`.
 
+<Signature name="First">_xs_: indexed_collection, _default_</Signature>
+
+With a second operand, the value when the collection is empty:
+`["First", ["List"], 0]` is `0`.
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -1372,6 +1386,11 @@ Return the last element of the collection.
 ```
 
 It's equivalent to `["At", xs, -1]`.
+
+<Signature name="Last">_xs_: indexed_collection, _default_</Signature>
+
+With a second operand, the value when the collection is empty:
+`["Last", ["List"], 0]` is `0`.
 
 </FunctionDefinition>
 
@@ -2004,6 +2023,17 @@ so `0.5` counts as an occurrence of `1/2`.
 // ➔ 0
 ```
 
+<Signature name="Count" returns="integer">_xs_: collection, _value_: any, _levels_</Signature>
+
+With a third argument, counts the parts equal to _value_ at the given levels:
+`n` is levels 1 to `n`, `[n]` level `n` only, `[from, to]` a range of levels,
+and `PositiveInfinity` every level.
+
+```json example
+["Count", ["List", ["List", 1, 1], 1], 1, 2]
+// ➔ 3
+```
+
 <Signature name="Count" returns="integer">_xs_: collection, _pred_: function</Signature>
 
 With a second argument that is a function, returns how many elements satisfy
@@ -2062,9 +2092,9 @@ Returns the symbol `True` if the collection has no elements.
 <FunctionDefinition name="Contains">
 <Signature name="Contains" returns="boolean">_xs_: collection, _value_: any</Signature>
 
-Returns `True` if the collection contains the given value, `False` otherwise. The value is compared using the `IsSame` function (structural identity, like the `Same` operator).
+Returns `True` if the collection contains the given value, `False` otherwise. Over a list or a tuple, the value is compared using the `IsSame` function (structural identity, like the `Same` operator); over a `Set`, see below.
 
-`Contains(xs, v)` is the value-membership specialization of `Any`: it is equivalent to `Any(xs, (e) |-> e === v)`. To test an arbitrary predicate instead of a specific value, use **`Any`**.
+Over a list or a tuple, `Contains(xs, v)` is the value-membership specialization of `Any`: it is equivalent to `Any(xs, (e) |-> e === v)`. To test an arbitrary predicate instead of a specific value, use **`Any`**.
 
 
 ```json example
@@ -2087,6 +2117,18 @@ number. With `a` and `b` declared `integer` and no value, `Contains` answers
 
 ["Element", 3, ["List", "a", "b"]]
 // ➔ ["Element", 3, ["List", "a", "b"]]
+```
+
+Over a `Set`, `Contains` is a membership test, as `Element` is: two numbers
+with no unknowns are compared by value (with the engine's tolerance when one
+of them is inexact), and a value with an unknown leaves the answer open:
+
+```json example
+["Contains", ["Set", 1, 2, 3], "ExponentialE"]
+// ➔ "False"
+
+["Contains", ["Set", 1, 2, 3], "x"]
+// ➔ ["Contains", ["Set", 1, 2, 3], "x"]
 ```
 
 `Contains` tests for **one element**. To test for a contiguous run of several
@@ -3159,6 +3201,16 @@ function-first form of a left fold.
 // ➔ 10
 ```
 
+<Signature name="Fold">_function_, _collection_</Signature>
+
+Without an initial value, start from the first element: `["Fold", f, xs]` is
+`["Reduce", xs, f]`.
+
+```json example
+["Fold", "Add", ["List", 1, 2, 3, 4]]
+// ➔ 10
+```
+
 </FunctionDefinition>
 
 
@@ -3187,6 +3239,17 @@ This is equivalent to the first element of the result of `Tally`:
 ```json example
 ["Unique", ["List", 5, 2, 10, 18, 5, 2, 5]]
 // ➔ ["List", 5, 2, 10, 18]
+```
+
+<Signature name="Unique" returns="collection">_xs_: collection, _test_: function</Signature>
+
+With a test, keeps an element unless the test holds between an earlier kept
+element and it. A string with a test gives a string.
+
+```json example
+["Unique", ["List", 1, 2, 3, 4],
+  ["Function", ["Equal", ["Mod", "a", 2], ["Mod", "b", 2]], "a", "b"]]
+// ➔ ["List", 1, 2]
 ```
 
 </FunctionDefinition>

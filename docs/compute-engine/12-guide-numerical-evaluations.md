@@ -511,7 +511,9 @@ equal**, set the `tolerance` property of a `ComputeEngine` instance.
 By default, the tolerance is $ 10^{-10} $.
 
 The tolerance is accounted for by the `Chop` function to determine when to
-replace a number of a small magnitude with the exact integer 0.
+replace a number of a small magnitude with 0 (the float `0.0` for a float
+operand: `Chop(1e-12)` is `0.0`). A second
+operand gives another tolerance for one call: `Chop(x, 0.01)`.
 
 It is also used when doing some comparison to zero: a number whose absolute
 value is smaller than the tolerance will be considered equal to 0.

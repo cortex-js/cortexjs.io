@@ -431,9 +431,11 @@ console.log(ce.parse("x \\coloneq 3; x^2 + 1").json);
 
 A block that ends with an assignment has the value `Nothing`: end the block
 with the name. The first assignment of a name must be at the level of the
-block. In a branch of an `If`, in a loop body or in a case of a `Match`, it is
-the error `first-assignment-in-branch`: assign a value to the name before the
-branch. A use of a name before its declaration is the error
+block. In a branch of an `If`, in a loop body or in a case of a `Match`, an
+assignment is an `Assign`, which never declares a name: when no scope declares
+the name, it is the error `assignment-to-undeclared-variable`. Assign a value
+to the name before the branch. A use of a name before its declaration is the
+error
 `read-before-declaration`. A later assignment must keep the type of the local
 (a number can become another number, not a string); otherwise it is the error
 `assignment-type-mismatch`.

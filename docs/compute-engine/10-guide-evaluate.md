@@ -450,10 +450,62 @@ waits for a definition of the name in its own scope chain: evaluated while
 the name has no value, it stays symbolic; evaluated after the definition, it
 applies the function.
 
+The scope chain is the scope the call was written in and the scopes around
+it. A function of the same name that a scope pushed later declares is not
+called. To call it, parse the expression in that scope:
+
+```js
+const call = ce.parse('h(2) + 1');
+call.evaluate().print();
+// ➔ 1 + h(2)   ("h" has no definition yet)
+
+ce.assign('h', ce.parse('t \\mapsto 10t'));
+call.evaluate().print();
+// ➔ 21
+
+ce.pushScope();
+ce.declare('h', 'function');
+ce.assign('h', ce.parse('t \\mapsto t + 1000'));
+call.evaluate().print();
+// ➔ 21         (the call reads the scope it was written in)
+ce.parse('h(2) + 1').evaluate().print();
+// ➔ 1003       (written in the pushed scope)
+ce.popScope();
+```
+
+Compiled code calls the same function as the evaluation.
+
+A function passed by name as a callback follows the same rule: written
+before the function is defined, it reads the definition of the scope it was
+written in, and with no definition there it stays symbolic.
+
+```js
+const squares = ce.parse('\\operatorname{Map}(h, [1, 2])');
+ce.function('ListFrom', [squares]).evaluate().print();
+// ➔ [h(1),h(2)]
+
+ce.assign('h', ce.parse('t \\mapsto t^2'));
+ce.function('ListFrom', [squares]).evaluate().print();
+// ➔ [1,4]
+
+ce.pushScope();
+ce.declare('h', 'function');
+ce.assign('h', ce.parse('t \\mapsto 100'));
+ce.function('ListFrom', [squares]).evaluate().print();
+// ➔ [1,4]      (the callback reads the scope it was written in)
+ce.popScope();
+```
+
+A function whose body calls a function that is not defined yet gets its
+result type and its effects again when that function is defined: with
+`honest := () ↦ later()` and then `later := () ↦ Random()`, `honest` is
+typed `() random -> real`.
+
 Within one evaluation, the symbolic result of such a call is a value: it is
 not resolved again when the name is assigned later in the same evaluation.
-So with `h` declared by `ce.declare('h', 'function')` (a first assignment of
-a name in a branch of an `If` is the error `first-assignment-in-branch`),
+So with `h` declared by `ce.declare('h', 'function')` (an assignment in a
+branch of an `If` to a name that no scope declares is the error
+`assignment-to-undeclared-variable`),
 `Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
 term `h(1)` was computed while `h` had no value, and the assignment at
 `k = 2` does not reach it. A later evaluation resolves the stored result
@@ -472,8 +524,9 @@ result.evaluate().print();
 ```
 
 In a `Block`, a `DefineFunction` statement (the Epsil `function g(k) { … }`)
-defines its name for the whole block, including the statements written before
-it. An `Assign` of a function literal takes effect when it runs. A `Block`
+declares a local variable that holds the function. A call before the
+statement is the error `read-before-declaration`. An `Assign` of a function
+literal takes effect when it runs. A `Block`
 evaluated directly by the host is a program: each of its statements is an
 evaluation of its own, so a result stored by one statement is resolved again
 when a later statement reads it.
@@ -501,17 +554,44 @@ Additional scopes can be created using the `ce.pushScope()` method.
 ```ts
 ce.assign('x', 100); // "x" is defined in the current scope
 ce.pushScope();
-ce.assign('x', 500); // "x" is defined in the new scope
-console.log(ce.expr('x')); // 500
+ce.declare('x', 'integer'); // "x" is defined in the new scope
+ce.assign('x', 500);
+console.log(ce.expr('x').evaluate()); // 500
 ce.popScope();
-console.log(ce.expr('x')); // 100
+console.log(ce.expr('x').evaluate()); // 100
 ```
+
+Without the `ce.declare()`, `ce.assign('x', 500)` in the new scope writes the
+`x` of the outer scope, and `x` is `500` after the `ce.popScope()` too.
 
 **To exit a scope** use `ce.popScope()`.
 
-This will invalidate any definitions associated with the scope, and restore the
-symbol table from previous scopes that may have been shadowed by the current
-scope.
+The names of an expression boxed after the `ce.popScope()` resolve in the
+scopes that remain. An expression boxed while the scope was current keeps the
+definitions of that scope.
+
+### An Expression Reads the Scope It Was Boxed In
+
+An expression resolves each name from the scope it was boxed in, for its type
+and for its value. The scope that is current when the expression is evaluated
+plays no part. A declaration made later in the scope the expression was boxed
+in, or in one of its parents, is read; a declaration in a scope pushed after
+the expression was boxed is not. To read the current scope, bind the
+expression again with `ce.rebind()`:
+
+```ts
+ce.assign('x', 100);
+const e = ce.expr(['Add', 'x', 1]);
+ce.pushScope();
+ce.declare('x', 'integer');
+ce.assign('x', 500);
+console.log(e.evaluate()); // 101
+console.log(ce.rebind(e).evaluate()); // 501
+const inner = ce.expr(['Add', 'x', 1]);
+ce.popScope();
+console.log(inner.evaluate()); // 501: it keeps the definitions of the popped scope
+console.log(e.evaluate()); // 101
+```
 
 
 ## Evaluation Loop

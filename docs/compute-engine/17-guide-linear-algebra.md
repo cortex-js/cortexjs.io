@@ -76,6 +76,41 @@ Matrix multiplication is **not commutative** — operand order is preserved, and
 `vector·vector` product reduces to the dot product. For detailed information,
 see the [Matrix Multiplication](#matrix-multiplication) section below.
 
+The order is preserved when the engine knows that an operand is a matrix: a
+matrix literal, a symbol declared as a matrix, or a symbol that holds a matrix
+when the expression is created. A symbol with no type is read as a number,
+and a product of numbers is put in a standard order. So declare the symbols of
+a matrix expression, or use `MatrixMultiply`, when the expression is created
+before the symbols get their values:
+
+```js example
+const A = ['List', ['List', 1, 2], ['List', 3, 4]];
+const B = ['List', ['List', 0, 1], ['List', 1, 0]];
+
+// `p` and `q` have no type: the product is ordered as a product of numbers
+const e = ce.expr(['Multiply', 'q', 'p']);
+e.json;
+// → ["Multiply", "p", "q"]
+ce.assign('p', ce.expr(A));
+ce.assign('q', ce.expr(B));
+e.evaluate();
+// → [[2,1],[4,3]]  (this is p·q; q·p is [[3,4],[1,2]])
+
+// Declared as matrices: the order is kept
+ce.declare('r', 'matrix');
+ce.declare('s', 'matrix');
+ce.expr(['Multiply', 's', 'r']).json;
+// → ["Multiply", "s", "r"]
+
+// `MatrixMultiply` keeps the order of symbols with no type
+ce.expr(['MatrixMultiply', 'q', 'p']).evaluate();
+// → [[3,4],[1,2]]
+```
+
+The same holds for the parameters of a function: `(A, B) ↦ A * B - B * A`
+with no parameter types is a function of two numbers, and gives the zero
+matrix for two matrices. Write `(A: matrix, B: matrix) ↦ A * B - B * A`.
+
 ## LaTeX Matrix Notation
 
 The Compute Engine supports standard LaTeX matrix environments. Here's a quick

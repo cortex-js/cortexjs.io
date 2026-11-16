@@ -306,18 +306,15 @@ Grapheme segmentation is not available on every compilation target, so each
 target either implements a string operation grapheme-correctly or **fails
 closed** with a diagnostic — never by silently counting code units.
 
-| Operation | JavaScript | Python | GLSL |
-| :--- | :--- | :--- | :--- |
-| `Length(s)`, `At(s, i)` / `s[i]` | Compiled grapheme-aware (never the host `.length`) | Not supported | Not supported |
-| Iteration-derived (`Map`, `Filter`, `Reduce`, `Any`, `All`, `Contains`, `IndexOf`, … over a string) | Segmented, then the ordinary list lowering | Not supported | Not supported |
-| String-preserving operators (`Reverse`, `Take`, …) | Segment, operate, rejoin | Not supported | Not supported |
-| `character` values, `String(c)`, `==`, `<` | A one-character host string; equality is `===`, ordering by code point | Not supported | Not supported |
-| `CharacterFrom(x)` for a non-literal `x` | Not supported (needs a runtime cluster count) | Not supported | Not supported |
+| Operation | JavaScript | GLSL |
+| :--- | :--- | :--- |
+| `Length(s)`, `At(s, i)` / `s[i]` | Compiled grapheme-aware (never the host `.length`) | Not supported |
+| Iteration-derived (`Map`, `Filter`, `Reduce`, `Any`, `All`, `Contains`, `IndexOf`, … over a string) | Segmented, then the ordinary list lowering | Not supported |
+| String-preserving operators (`Reverse`, `Take`, …) | Segment, operate, rejoin | Not supported |
+| `character` values, `String(c)`, `==`, `<` | A one-character host string; equality is `===`, ordering by code point | Not supported |
+| `CharacterFrom(x)` for a non-literal `x` | Not supported (needs a runtime cluster count) | Not supported |
 
-Python has no grapheme segmentation in its standard library (`len()` counts
-code points), so string collection operations report a target-capability
-diagnostic rather than compiling to something subtly wrong. GLSL
-has no string support at all, and string-typed operands are rejected as
+GLSL has no string support at all, and string-typed operands are rejected as
 before.
 
 <ReadMore path="/compute-engine/guides/compiling/" >
@@ -1411,9 +1408,16 @@ ce.box(['Less', ce.string('\uE000'), ce.string('\u{1F600}')]).evaluate();
 
 <Signature name="IntegerString" returns="string">_n_:integer</Signature>
 <Signature name="IntegerString" returns="string">_n_:integer, _base_:integer</Signature>
+<Signature name="IntegerString" returns="string">_n_:integer, _base_:integer, _length_:integer</Signature>
 
 A string representation of the integer _n_ in the given _base_ (2 to 36,
-default 10). The sign is preserved.
+default 10). The sign is preserved. An integer past $2^{53}$ is kept exact.
+A symbol with no value, as _n_ or as _base_, leaves the call unevaluated. A
+base outside 2 to 36 is an `out-of-range` error.
+
+With _length_, the digits of $|n|$ are padded with zeros on the left, or cut
+to the last _length_ digits; the sign is dropped. _length_ is at most
+1,000,000; a larger length leaves the call unevaluated.
 
 ```json example
 ["IntegerString", 42]
@@ -1424,6 +1428,12 @@ default 10). The sign is preserved.
 
 ["IntegerString", -42]
 // ➔ "-42"
+
+["IntegerString", ["Factorial", 30]]
+// ➔ "265252859812191058636308480000000"
+
+["IntegerString", 5, 2, 8]
+// ➔ "00000101"
 ```
 
 `IntegerString` is broadcastable: applied to a list of integers it returns a
@@ -1446,7 +1456,7 @@ list of strings.
 The integer denoted by the digits of the string _s_, read in the given _base_
 (2 to 36, default 10). Leading and trailing whitespace is ignored, and a
 leading sign is honored. A `0x` or `0b` prefix selects base 16 or 2
-regardless of the _base_ argument.
+regardless of the _base_ argument. An integer past $2^{53}$ is kept exact.
 
 ```json example
 ["DigitsFrom", {str: "42"}]
@@ -1850,7 +1860,7 @@ string replacement compile to JavaScript. `StringMatch`, `StringMatchAll`, a
 function replacement and a computed pattern do not — they report character
 positions or records that compiled code has no representation for — and fail
 closed rather than answering differently from the interpreter. No regular
-expression compiles to Python or to the shader targets.
+expression compiles to the shader targets.
 
 <nav className="hidden">
 ### Annotated

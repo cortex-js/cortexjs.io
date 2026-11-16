@@ -551,6 +551,17 @@ numeric approximation (`.N()`) works at machine or arbitrary precision.
 // 1/2 + Erf(x / sqrt(2)) / 2
 ```
 
+A float parameter or point gives a float. A discrete `CDF` reads a float point
+as its floor and stays exact.
+
+```json example
+["PDF", ["NormalDistribution", 0, 1], 0.5]
+// 0.352065326764299477774
+
+["CDF", ["PoissonDistribution", 2], 2.5]
+// 5/e^2
+```
+
 <nav className="hidden">
 ### NormalDistribution
 </nav>
@@ -597,8 +608,21 @@ when events occur independently at a mean rate of $$\lambda > 0$$.
 
 <Signature name="UniformDistribution">_a_, _b_</Signature>
 
+<Signature name="UniformDistribution">_[a, b]_</Signature>
+
+<Signature name="UniformDistribution"></Signature>
+
 A **continuous uniform distribution** on the interval $$[a, b]$$, with
-$$a < b$$.
+$$a < b$$. `UniformDistribution([a, b])` is `UniformDistribution(a, b)`, and
+`UniformDistribution()` is on $$[0, 1]$$.
+
+```json example
+["Mean", ["UniformDistribution", ["List", 2, 4]]]
+// 3
+
+["Variance", ["UniformDistribution"]]
+// 1/12
+```
 
 </FunctionDefinition>
 

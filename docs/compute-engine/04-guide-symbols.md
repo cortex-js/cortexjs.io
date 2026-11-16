@@ -202,6 +202,23 @@ conflict is not declared and is reported in `skipped`, with the reason
 other reasons are `"untyped"` (no use requires a type), `"defined"` (the
 symbol has a declared type) and `"out-of-scope"`.
 
+```js
+ce.declare("g", "real");
+ce.infer([ce.box(["List", "g", "q"])]);
+// ➔ { declared: [],
+//     skipped: [{ name: "g", reason: "defined", … },
+//               { name: "q", reason: "untyped", … }] }
+```
+
+A symbol declared with the type `unknown` has no declared type: `ce.infer()`
+gives it the type that its uses require.
+
+```js
+ce.declare("u", "unknown");
+ce.infer([ce.parse("u + 1")]);
+// ➔ { declared: [{ name: "u", type: number, … }], skipped: [] }
+```
+
 An expression reads a declaration made after it was created: after
 `ce.declare("x", "string")`, the `x` of `expr` above has the type `string`.
 
@@ -231,3 +248,47 @@ Note that only symbols in the current scope are forgotten. If assumptions about
 the symbol existed in a previous scope, those assumptions will be in effect when
 returning to the previous scope.
 :::
+
+## Temporary Names
+
+A program sometimes needs a name of its own: a dummy variable, the parameter
+of a function it builds, an input or a helper function it adds to a
+compilation. The name must not be a name that the expressions at hand already
+use.
+
+**To get such a name**, use `ce.temporaryName()`. It returns
+`<hint>_tmp<n>`, with `n` the smallest number such that the name has no
+definition visible from the current scope and is not in the expressions or
+the names given after the hint.
+
+```js
+ce.temporaryName('t');
+// ➔ "t_tmp1"
+
+const expr = ce.parse('t_{tmp1} + x');
+ce.temporaryName('t', expr);
+// ➔ "t_tmp2"
+
+const a = ce.temporaryName('p');
+ce.temporaryName('p', a);
+// ➔ "p_tmp2"
+```
+
+The result is the name of an ordinary symbol. Declare it, assign it, or use it
+as the parameter of a function, as any other name:
+
+```js
+const u = ce.temporaryName('u');
+ce.declare(u, 'real');
+
+ce.temporaryName('u');
+// ➔ "u_tmp2"
+```
+
+The function keeps no state and declares nothing. Pass it every expression
+that the name will be combined with, and the names you got earlier and have
+not declared yet: a name that an expression only uses, without a declaration,
+is seen only when that expression or that name is passed.
+
+A name that ends with `_tmp` and a positive integer is reserved for
+`ce.temporaryName()`. To get the hint back from a name, remove that suffix.

@@ -1625,8 +1625,9 @@ A **scalar** bound interacts with broadcasting. On an operator that
 broadcasts, a collection argument is admitted against a scalar parameter —
 the bound is checked against the scalar base, as it always was — and the
 variable binds the argument's **element** type; the call's ordinary broadcast
-wrap then puts the argument's shape back on the result. `Conjugate` and
-`Chop` are `(T) -> T where T: number`, `Remainder` is
+wrap then puts the argument's shape back on the result. `Conjugate` is
+`(T) -> T where T: number`, `Chop` is `(T, real<0..>?) -> T where T: number`,
+`Remainder` is
 `(T, T) -> T where T: number`:
 
 ```js
@@ -2531,7 +2532,9 @@ ce.expr("n").type;
 
 ### Declared vs Inferred: Contract vs Evidence
 
-A type reaches a symbol on one of two tracks, and they behave differently:
+For host-created bindings, a type reaches a symbol on one of two tracks,
+and they behave differently. Program and Block variables instead use the fixed
+initialization contracts described below:
 
 - A **declared** type — written by you, in `ce.declare("a", "list")` or
   `let a: list` — is a **contract**. It never moves: assigning `[1, 2, 3]`
@@ -2539,10 +2542,63 @@ A type reaches a symbol on one of two tracks, and they behave differently:
   the much more precise `vector<integer^3>`. An assignment that
   violates the contract (`a = 42`) is an `incompatible-type` error.
 - An **inferred** type — produced by the engine from evidence — is
-  **revisable**. It follows the value: after `b = [1, 2, 3]` an undeclared
-  `b` types `vector<integer^3>`; after `b = ["x", "y"]` it types
+  **revisable**. It follows each assignment: after `b = [1, 2, 3]` an
+  undeclared `b` types `vector<integer^3>`; after `b = ["x", "y"]` it types
   `list<string^2>`. Inference is never a trap: a new assignment or a new use
   re-infers.
+
+A Program or Block variable has a fixed contract even when its type was inferred.
+Preparation uses its initialization without executing it: mutable numeric values
+give `number`, lists lose fixed lengths and widen their element types, tuples keep
+their arity with widened components, and callable values give `function`. Constants
+may retain more precision. An empty unannotated list keeps unknown elements; later
+assignments do not infer them. Write `let xs: list<real> = []` when a known element
+type is required.
+
+A unique later initialization in the same straight-line sequence before any use
+can establish the contract of `let x`; `let x; x = 1` establishes `number` during
+preparation but initializes the slot only when the assignment executes. Branches,
+loops and called functions are not searched for initialization. Without an explicit
+annotation or such an initialization, the type stays `unknown` even after a runtime
+write. Reading an uninitialized slot reports `read-before-initialization`.
+Assignments check the fixed contract; evaluation and `N()` never revise it.
+
+Deferred initialization inference also stops at a runtime application, either
+between the declaration and the proposed initialization or inside its right side.
+For example, `let x; x=1` infers `number`, while `let x; x=1+2` keeps `unknown`.
+Use `let x=1+2` or an explicit annotation when that precision is needed.
+
+An unannotated function parameter assigned in its body keeps an unknown contract;
+its uses and later assigned values do not establish a type. Annotate such a
+parameter when compilation needs its shape.
+
+The type of an expression does not depend on the values that its symbols
+hold. It depends on their declared or inferred types, and on the values of
+constants. With `x` declared `real` and holding 4, `\sqrt{x}` is typed
+`complex`, the type for every real `x`, and its value is 2.
+
+A symbol whose value reads other symbols has the type of that value, as the
+types of those symbols give it:
+
+```js
+ce.assign("y", ce.parse("x + 1"));
+ce.expr("y").type;
+// ➔ "number"
+
+ce.assign("x", 2);
+ce.expr("y").type;
+// ➔ "integer": the type of x + 1 for an integer x
+
+ce.assign("x", ce.parse("[1, 2]"));
+ce.expr("y").type;
+// ➔ "vector<integer^2>"
+ce.expr("y").evaluate();
+// ➔ [2, 3]
+
+ce.assign("x", ce.parse("[5, 6]"));
+ce.expr("y").type;
+// ➔ "vector<integer^2>": a new value of the same type changes no type
+```
 
 An assignment to a symbol with a declared type accepts a value whose type
 **overlaps** the declared type, as a function call accepts such an argument.
@@ -2666,7 +2722,11 @@ Inference writes happen at these moments:
    `tuple<boolean, real>` and accepts `(true, 4)`. When some read uses a
    non-literal index, the parameter is an `indexed_collection` whose element
    type is the union of the read requirements. The inferred tuple is not
-   enforced at application.
+   enforced at application, and it is not a point parameter: a list
+   argument, a list of points included, is taken whole. With
+   `h(v) = v[1] + v[2]`, `h([(1, 2), (3, 4)])` is `(4, 6)`, the first
+   point plus the second. To apply `h` to each point, declare the
+   parameter: `h(v: tuple<number, number>) = v[1] + v[2]` gives `[3, 7]`.
 4. **Uses of an element**: a use of an element taken out of a collection
    refines the collection's *element* type, in the expression that holds
    the use. `xs[1] + 1` makes an undeclared

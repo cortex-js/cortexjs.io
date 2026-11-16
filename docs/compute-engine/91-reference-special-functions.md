@@ -36,6 +36,16 @@ $$ \operatorname{erf} z = \frac{2}{\sqrt{\pi}} \int_0^z e^{-t^2} dt$$
 
 where $$z$$ is a complex number.
 
+<Signature name="Erf">_z0_, _z1_</Signature>
+
+With two arguments, the **generalized error function**
+$$ \operatorname{erf} z_1 - \operatorname{erf} z_0 $$.
+
+```json example
+["N", ["Erf", 0.1, 0.5]]
+// -> 0.408036961794761645479
+```
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Erfc">
@@ -60,6 +70,16 @@ Outside that interval the value is not defined: `["ErfInv", 2]` and
 
 It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
 = x $$.
+
+<Signature name="ErfInv">_z0_, _z_</Signature>
+
+With two arguments, the $$x$$ with $$ \operatorname{erf} x - \operatorname{erf} z_0 = z $$,
+that is `ErfInv(z + Erf(z0))`.
+
+```json example
+["N", ["ErfInv", 0.5, 0.2]]
+// -> 0.764695648017466677088
+```
 
 
 </FunctionDefinition>
@@ -151,6 +171,13 @@ $$
 // 24
 ```
 
+A half-integer argument gives a rational multiple of $$ \sqrt{\pi} $$:
+
+```json example
+["Gamma", ["Rational", 1, 2]]
+// -> √π
+```
+
 <Signature name="Gamma">_s_, _z_</Signature>
 
 <Latex value="\Gamma(s, z)"/>
@@ -164,15 +191,33 @@ $$
 $$
 
 The order `s` and the lower limit `z` may be real or complex, including negative
-and fractional orders. The two-argument form is evaluated numerically with
-`.N()` and otherwise stays symbolic; $$ \Gamma(s, 0) $$ reduces to $$ \Gamma(s) $$.
+and fractional orders. For a positive integer order the value is a closed form,
+and $$ \Gamma(\frac12, z) $$ is $$ \sqrt{\pi}\operatorname{erfc}\sqrt{z} $$.
+Other exact arguments stay symbolic and are evaluated numerically with `.N()`;
+$$ \Gamma(s, 0) $$ reduces to $$ \Gamma(s) $$.
 (This matches the `Gamma[s, z]` convention of Mathematica.)
 
 - NIST: http://dlmf.nist.gov/8.2.E2
 
 ```json example
+["Gamma", 2, 1]
+// -> 2/e
+
+["Gamma", 2, "x"]
+// -> (x + 1) e^(-x)
+
 ["N", ["Gamma", 2, 1]]
 // 0.7357588823428849
+```
+
+<Signature name="Gamma">_s_, _z0_, _z1_</Signature>
+
+With three arguments, the **generalized incomplete Gamma function**
+$$ \Gamma(s, z_0) - \Gamma(s, z_1) $$, the integral from $$z_0$$ to $$z_1$$.
+
+```json example
+["N", ["Gamma", 2, 1, 3]]
+// -> 0.536610608871428871274
 ```
 
 </FunctionDefinition>
@@ -260,6 +305,36 @@ Mathematica. `LogBarnesG(0)` is $$ -\infty $$.
 
 </FunctionDefinition>
 
+<FunctionDefinition name="HarmonicNumber">
+
+<Signature name="HarmonicNumber">_n_</Signature>
+<Signature name="HarmonicNumber">_n_, _r_</Signature>
+
+The harmonic number $$ H_n = \sum_{k=1}^{n} \frac{1}{k} $$, and the
+generalized harmonic number $$ H_n^{(r)} = \sum_{k=1}^{n} \frac{1}{k^r} $$.
+For a non-negative integer `n` and an integer `r` the value is an exact
+rational. For a rational `n` with a denominator from 2 to 4 (and `r = 1`)
+the value is exact, from $$ H_n = \psi(n+1) + \gamma $$; another rational
+stays unevaluated. Elsewhere `N()` gives the continuation
+$$ \psi(n+1) + \gamma $$, or $$ \zeta(r) - \zeta(r, n+1) $$ for
+$$ r \ne 1 $$. A negative integer `n` is a pole (`ComplexInfinity`).
+
+```json example
+["HarmonicNumber", 10]
+// -> 7381/2520
+
+["HarmonicNumber", 3, 2]
+// -> 49/36
+
+["HarmonicNumber", ["Rational", 1, 2]]
+// -> 2 - 2 ln(2)
+
+["N", ["HarmonicNumber", 0.5]]
+// -> 0.613705638880109381166
+```
+
+</FunctionDefinition>
+
 
 <FunctionDefinition name="Zeta">
 
@@ -276,6 +351,9 @@ $$
 
 and extended to other values by analytic continuation.
 
+At a complex `s`, `N()` gives a double. Above $$|\operatorname{Im} s| \approx
+12\,868$$ the call stays unevaluated.
+
 ```json example
 ["Zeta", 2]
 // ➔ π²/6
@@ -290,10 +368,19 @@ $$
 \zeta(s, a) = \sum_{n=0}^{\infty} \frac{1}{|n + a|^s}
 $$
 
-with the term where $n + a = 0$ omitted. For $a > 0$ it is equal to the
+with the term where $n + a = 0$ omitted, except at $s = 0$, where every term
+is 1 and $\zeta(0, a) = \frac12 - a$ for every numeric $a$. For $a > 0$ it is equal to the
 Hurwitz zeta function `HurwitzZeta(s, a)`, which sums $(n + a)^{-s}$ with the
 principal power. For $a \le 0$ the two differ: `Zeta(2.976, -2.664)` is the
 real `29.9024`, while `HurwitzZeta(2.976, -2.664)` is `22.6003 - 0.2754i`.
+
+```json example
+["Zeta", 2, -1]
+// ➔ 1 + π²/6
+
+["Zeta", 0, 3]
+// ➔ -5/2
+```
 
 - Wikidata: [Q187235](https://www.wikidata.org/wiki/Q187235)
 - NIST: http://dlmf.nist.gov/25.2
@@ -493,9 +580,27 @@ $$
 \operatorname{B}(a, b) = \int_0^1 t^{a-1}(1-t)^{b-1} \, dt
 $$
 
+At a complex operand, `N()` gives $$\Gamma(a)\Gamma(b)/\Gamma(a+b)$$ as a
+double.
+
 ```json example
 ["Beta", 2, 3]
 // ➔ 1/12
+
+["N", ["Beta", ["Complex", 1, 1], 2]]
+// ➔ 0.10000000000000012 - 0.3000000000000001i
+```
+
+<Signature name="Beta">_z_, _a_, _b_</Signature>
+<Signature name="Beta">_z0_, _z1_, _a_, _b_</Signature>
+
+The **incomplete beta function** $$ \operatorname{B}_z(a, b) $$, and the
+generalized form $$ \operatorname{B}_{z_1}(a, b) - \operatorname{B}_{z_0}(a, b) $$.
+For a rational `z` and positive integers `a`, `b` the value is exact.
+
+```json example
+["Beta", ["Rational", 1, 2], 2, 3]
+// ➔ 11/192
 ```
 
 - Wikidata: [Q192828](https://www.wikidata.org/wiki/Q192828)
@@ -513,8 +618,10 @@ $$
 Q(a, z) = \frac{\Gamma(a, z)}{\Gamma(a)} = \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t} \, dt
 $$
 
-Exact arguments stay symbolic, and special values fold:
-`GammaRegularized(a, 0)` is $$1$$ and `GammaRegularized(1, z)` is $$e^{-z}$$.
+Special values fold: `GammaRegularized(a, 0)` is $$1$$ and
+`GammaRegularized(1, z)` is $$e^{-z}$$. For a positive integer `a` and an
+exact `z` the value is a closed form (`GammaRegularized(3, 5)` is
+$$\frac{37}{2e^5}$$); other exact arguments stay symbolic.
 Use `N()` for a numeric value, at machine or arbitrary precision.
 
 The cumulative distribution function of a Poisson distribution evaluates to
@@ -524,6 +631,15 @@ Q(k+1, \lambda)$$.
 ```json example
 ["N", ["GammaRegularized", 3, 5]]
 // ➔ 0.12465201948308115
+```
+
+<Signature name="GammaRegularized">_a_, _z0_, _z1_</Signature>
+
+With three arguments, $$ Q(a, z_0) - Q(a, z_1) $$.
+
+```json example
+["N", ["GammaRegularized", 3, 1, 5]]
+// ➔ 0.795046583445524662701
 ```
 
 - NIST: http://dlmf.nist.gov/8.2
@@ -540,9 +656,15 @@ $$
 I_x(a, b) = \frac{1}{\operatorname{B}(a, b)}\int_0^x t^{a-1}(1-t)^{b-1} \, dt
 $$
 
-Exact arguments stay symbolic, and the endpoints fold:
-`BetaRegularized(0, a, b)` is $$0$$ and `BetaRegularized(1, a, b)` is $$1$$.
+The endpoints fold: `BetaRegularized(0, a, b)` is $$0$$ and
+`BetaRegularized(1, a, b)` is $$1$$. For a rational `x` and positive integers
+`a`, `b` the value is an exact rational; other exact arguments stay symbolic.
 Use `N()` for a numeric value, at machine or arbitrary precision.
+
+Outside $$[0, 1]$$, `N()` gives the real value where it is a finite sum: for
+positive integers $$a$$ and $$b$$ at any real $$x$$
+(`BetaRegularized(2, 2, 3)` is `8`), and for $$x > 1$$ with an integer $$b$$
+up to 30. Elsewhere the call stays unevaluated.
 
 The cumulative distribution function of a binomial distribution evaluates to
 this function: $$\operatorname{CDF}(\operatorname{Binomial}(n, p), k) =
@@ -551,6 +673,18 @@ I_{1-p}(n-k, k+1)$$.
 ```json example
 ["N", ["BetaRegularized", 0.5, 2, 3]]
 // ➔ 0.6875
+
+["BetaRegularized", ["Rational", 1, 2], 2, 3]
+// ➔ 11/16
+```
+
+<Signature name="BetaRegularized">_z0_, _z1_, _a_, _b_</Signature>
+
+With four arguments, $$ I_{z_1}(a, b) - I_{z_0}(a, b) $$.
+
+```json example
+["N", ["BetaRegularized", 0.2, 0.5, 2, 3]]
+// ➔ 0.5067
 ```
 
 - NIST: http://dlmf.nist.gov/8.17
@@ -701,7 +835,10 @@ They arise in problems with cylindrical or spherical symmetry.
 numerically at a real or a complex argument under `.N()`, and under
 `evaluate()` when the argument is a float. On the negative real axis, their
 branch cut, `BesselY` and `BesselK` take the limit from above, as `Ln(-2)`
-does. A non-integer order stays symbolic. Compiled code computes these
+does. A real non-integer order evaluates at a positive real argument; at a
+negative or complex argument it stays symbolic. Above machine precision, a
+real argument gives `ce.precision` digits; a call that cannot reach them, such
+as `BesselI(0, 5000)`, stays unevaluated. Compiled code computes these
 functions for a real argument only.
 
 ```json example
@@ -712,7 +849,7 @@ functions for a real argument only.
 // ➔ 0.5103756726497453 + 0.44778155828247124i
 
 ["N", ["BesselJ", ["Rational", 1, 2], 1]]
-// ➔ ["BesselJ", 0.5, 1]  (non-integer order: stays symbolic)
+// ➔ 0.671396707141803090416
 ```
 
 
@@ -831,6 +968,10 @@ real or a complex argument under `.N()`, and under `evaluate()` when the
 argument is a float: `["N", ["AiryAi", ["Complex", 1, 1]]]` is
 `0.060458308371838146 - 0.15188956587718141i`. Compiled code computes them
 for a real argument only.
+
+Above machine precision, `AiryAi` and `AiryBi` of a real argument are
+computed to `ce.precision` digits; past $$|x| = 10^4$$, and for `AiryBi` past
+about $$x = 130$$, the call stays unevaluated.
 
 
 <FunctionDefinition name="AiryAi">
@@ -1035,7 +1176,8 @@ $K(m) = \frac{\pi}{2} \, {}_2F_1\big(\frac12, \frac12; 1; m\big)$.
 If $a$ or $b$ is a non-positive integer the series terminates and the
 function is a polynomial in $z$, evaluable for any $z$. Otherwise the
 function evaluates numerically for $z \le 1$ (real) and for complex $z$
-within the unit disk and the Pfaff-transform region.
+within the unit disk and the Pfaff-transform region. With a repeated
+parameter, `Hypergeometric2F1(a, b, b, z)` is $(1 - z)^{-a}$.
 
 ```json example
 ["Hypergeometric2F1", 1, 1, 2, 0.5]
@@ -1062,7 +1204,7 @@ $$
 $$
 
 It is an entire function of $z$ and evaluates numerically for any real or
-complex $z$.
+complex $z$. With a repeated parameter, `Hypergeometric1F1(a, a, z)` is $e^z$.
 
 ```json example
 ["Hypergeometric1F1", 1, 2, 2]
@@ -1128,9 +1270,13 @@ $$
 It is a modular form of weight $\frac12$, central to the theory of modular
 functions and integer partitions.
 
+Under `N()`, a complex $$\tau$$ with $$\operatorname{Im}\tau \ge 0.001$$ is
+computed to `ce.precision` digits. Above machine precision, a $$\tau$$ closer
+to the real axis stays unevaluated.
+
 ```json example
-["DedekindEta", "ImaginaryUnit"]
-// ➔ 0.768225422326057  (= Γ(1/4)/(2π^(3/4)))
+["N", ["DedekindEta", "ImaginaryUnit"]]
+// ➔ 0.768225422326056659003  (= Γ(1/4)/(2π^(3/4)))
 ```
 
 - Wikidata: [Q1187208](https://www.wikidata.org/wiki/Q1187208)

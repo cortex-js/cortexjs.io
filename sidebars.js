@@ -205,12 +205,6 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "compute-engine/guide-python-target",
-          className: "guide-icon",
-          label: "Python/NumPy Target",
-        },
-        {
-          type: "doc",
           id: "compute-engine/guide-assumptions",
           className: "guide-icon",
         },

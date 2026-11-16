@@ -145,9 +145,9 @@ See also: [Prime number - Wikipedia](https://en.wikipedia.org/wiki/Prime_number)
 </nav>
 
 <FunctionDefinition name="NextPrime">
-<Signature name="NextPrime" returns="integer">n: integer</Signature>
-<Signature name="NextPrime" returns="integer">n: integer, k: integer</Signature>
-Returns the smallest prime number greater than $n$.
+<Signature name="NextPrime" returns="integer">n: real</Signature>
+<Signature name="NextPrime" returns="integer">n: real, k: integer</Signature>
+Returns the smallest prime number greater than $n$. A non-integer $n$ is allowed: `NextPrime(7/2)` is 5.
 
 With a second argument $k$, returns the $k$th prime after $n$. A negative $k$ returns the $|k|$th prime before $n$, so `NextPrime(n, -1)` is the largest prime less than $n$.
 
@@ -171,7 +171,7 @@ See also: [Prime number - Wikipedia](https://en.wikipedia.org/wiki/Prime_number)
 </nav>
 
 <FunctionDefinition name="FactorInteger">
-<Signature name="FactorInteger" returns="list<tuple<integer, integer>>">n: integer</Signature>
+<Signature name="FactorInteger" returns="list<tuple<integer, integer>>">n: rational</Signature>
 Returns the prime factorization of $n$ as a list of `[prime, exponent]` tuples, ordered by ascending prime.
 
 For example, $360 = 2^3 \times 3^2 \times 5$, so the factorization is the list of tuples $(2, 3)$, $(3, 2)$, and $(5, 1)$. The sign of a negative $n$ is carried in a leading $(-1, 1)$ tuple.
@@ -181,6 +181,13 @@ See also: [Integer factorization - Wikipedia](https://en.wikipedia.org/wiki/Inte
 ```json
 ["FactorInteger", 360]
 // ➔ [(2, 3), (3, 2), (5, 1)]
+```
+
+A rational $p/q$ is factored as $p$ and $q$, with negative exponents for the primes of $q$.
+
+```json
+["FactorInteger", ["Rational", 12, 35]]
+// ➔ [(2, 2), (3, 1), (5, -1), (7, -1)]
 ```
 </FunctionDefinition>
 
@@ -261,17 +268,17 @@ The floored-sign convention of `Mod` (the result follows the sign of the divisor
 
 ### Solving Congruences
 
-Passing a **linear congruence** to `solve` returns the parametric residue family with a fresh integer parameter $t ∈ ℤ$; an unsolvable congruence returns an empty result, and a gcd-divisible congruence is reduced:
+Passing a **linear congruence** to `solve` returns the parametric residue family with an arbitrary integer, `ArbitraryInteger(1)`, written $t$ below; an unsolvable congruence returns an empty result, and a gcd-divisible congruence is reduced:
 
 ```javascript
 ce.parse('6n \\equiv 4 \\pmod 7').solve('n');
-// ➔ [7t + 3]
+// ➔ [3 + 7t]   t = ["ArbitraryInteger", 1]
 
 ce.parse('2x \\equiv 1 \\pmod 4').solve('x');
 // ➔ []   (no solution)
 
 ce.parse('4x \\equiv 2 \\pmod 6').solve('x');
-// ➔ [3t + 2]
+// ➔ [2 + 3t]
 ```
 
 A **system of simultaneous congruences** in one unknown (an `And` of congruences) is combined via the Chinese Remainder Theorem — including non-coprime moduli — into a single family. An inconsistent system reports no solution.
@@ -376,8 +383,8 @@ See also: [Möbius function - Wikipedia](https://en.wikipedia.org/wiki/M%C3%B6bi
 </nav>
 
 <FunctionDefinition name="IsSquareFree">
-<Signature name="IsSquareFree" returns="boolean">n: integer</Signature>
-Returns `"True"` if $n$ is square-free, i.e. not divisible by any perfect square greater than 1.
+<Signature name="IsSquareFree" returns="boolean">n: rational</Signature>
+Returns `"True"` if $n$ is square-free, i.e. not divisible by any perfect square greater than 1. A rational is square-free when its numerator and denominator are: `IsSquareFree(2/3)` is `"True"`, `IsSquareFree(2/9)` is `"False"`.
 
 ```json
 ["IsSquareFree", 30]
@@ -453,6 +460,17 @@ See also: [Modular exponentiation - Wikipedia](https://en.wikipedia.org/wiki/Mod
 // ➔ 24
 ```
 
+<Signature name="PowerMod" returns="integer">a: rational, b: integer, m: integer</Signature>
+A rational base $p/q$ is read as $p$ times the inverse of $q$ modulo $m$; when $q$ has no inverse, the expression stays unevaluated. A list operand threads.
+
+```json
+["PowerMod", ["Rational", 1, 2], 2, 7]
+// ➔ 2
+
+["PowerMod", ["List", 2, 3], 2, 7]
+// ➔ [4, 2]
+```
+
 <Signature name="PowerMod" returns="integer">a: integer, e: rational, m: integer</Signature>
 With a rational exponent $e = s/r$, returns the least $x$ in $[0, m)$ such
 that $x^r ≡ a^s \pmod m$, as in the Wolfram Language. When there is no such
@@ -483,6 +501,13 @@ entries.
 ```json
 ["PowerModList", 3, ["Rational", 1, 2], 11]
 // ➔ [5, 6]
+```
+
+As for `PowerMod`, a rational base $p/q$ is read as $p$ times the inverse of $q$ modulo $m$, and a list operand threads.
+
+```json
+["PowerModList", ["List", 2, 3], 2, 7]
+// ➔ [[4], [2]]
 ```
 </FunctionDefinition>
 
@@ -532,6 +557,7 @@ See also: [Modular multiplicative inverse - Wikipedia](https://en.wikipedia.org/
 
 <FunctionDefinition name="ExtendedGCD">
 <Signature name="ExtendedGCD" returns="tuple<integer, integer, integer>">a: integer, b: integer</Signature>
+<Signature name="ExtendedGCD" returns="tuple">a: integer, b: integer, ...rest: integer</Signature>
 Returns the extended GCD of $a$ and $b$ as a tuple $(g, x, y)$, where $g = \gcd(a, b)$ is non-negative and $a·x + b·y = g$ (the Bézout coefficients).
 
 See also: [Extended Euclidean algorithm - Wikipedia](https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm)
@@ -539,6 +565,13 @@ See also: [Extended Euclidean algorithm - Wikipedia](https://en.wikipedia.org/wi
 ```json
 ["ExtendedGCD", 12, 18]
 // ➔ (6, -1, 1)
+```
+
+With more than two operands, `ExtendedGCD(a₁, …, aₙ)` is $(g, x_1, …, x_n)$ with $\sum a_i x_i = g$.
+
+```json
+["ExtendedGCD", 12, 18, 27]
+// ➔ (3, 4, -4, 1)
 ```
 </FunctionDefinition>
 
@@ -549,6 +582,7 @@ See also: [Extended Euclidean algorithm - Wikipedia](https://en.wikipedia.org/wi
 
 <FunctionDefinition name="ChineseRemainder">
 <Signature name="ChineseRemainder" returns="integer">residues: collection, moduli: collection</Signature>
+<Signature name="ChineseRemainder" returns="integer">residues: collection, moduli: collection, d: integer</Signature>
 Returns the smallest non-negative integer $x$ such that $x ≡ \mathrm{residues}_i \pmod{\mathrm{moduli}_i}$ for every $i$. The moduli need not be coprime. Undefined if the system is inconsistent or the two lists differ in length.
 
 See also: [Chinese remainder theorem - Wikipedia](https://en.wikipedia.org/wiki/Chinese_remainder_theorem)
@@ -556,6 +590,13 @@ See also: [Chinese remainder theorem - Wikipedia](https://en.wikipedia.org/wiki/
 ```json
 ["ChineseRemainder", [2, 3, 2], [3, 5, 7]]
 // ➔ 23
+```
+
+With a third argument $d$, returns the smallest solution that is at least $d$.
+
+```json
+["ChineseRemainder", [2, 3, 2], [3, 5, 7], 100]
+// ➔ 128
 ```
 </FunctionDefinition>
 
@@ -680,8 +721,10 @@ See also: [Lucas number - Wikipedia](https://en.wikipedia.org/wiki/Lucas_number)
 </nav>
 
 <FunctionDefinition name="CatalanNumber">
-<Signature name="CatalanNumber" returns="integer">n: integer</Signature>
+<Signature name="CatalanNumber" returns="number">n: real</Signature>
 Returns the $n$th Catalan number $C_n = \frac{(2n)!}{(n+1)!\,n!}$: 1, 1, 2, 5, 14, 42, … Defined for $n ≥ 0$.
+
+A positive half-integer gives an exact value (`CatalanNumber(1/2)` is $\frac{8}{3\pi}$); another positive real is evaluated numerically from $\frac{Γ(2n+1)}{Γ(n+1)\,Γ(n+2)}$. A negative non-integer stays unevaluated.
 
 See also: [Catalan number - Wikipedia](https://en.wikipedia.org/wiki/Catalan_number)
 
@@ -710,21 +753,50 @@ See also: [Bernoulli number - Wikipedia](https://en.wikipedia.org/wiki/Bernoulli
 
 
 <nav className="hidden">
+### EulerE
+</nav>
+
+<FunctionDefinition name="EulerE">
+<Signature name="EulerE" returns="integer">n: integer</Signature>
+<Signature name="EulerE" returns="number">n: integer, x: number</Signature>
+`EulerE(n)` is the $n$th Euler number $E_n$ (1, 0, -1, 0, 5, 0, -61, …): an exact integer for a non-negative integer $n$, 0 for an odd $n$.
+
+`EulerE(n, x)` is the Euler polynomial $E_n(x)$: exact at an exact $x$, a float at a float $x$ (real or complex in both cases), and the expanded polynomial otherwise. A negative $n$ stays unevaluated.
+
+See also: [Euler numbers - Wikipedia](https://en.wikipedia.org/wiki/Euler_numbers)
+
+```json
+["EulerE", 4]
+// ➔ 5
+
+["EulerE", 2, "x"]
+// ➔ x^2 - x
+
+["EulerE", 3, ["Complex", 1, 2]]
+// ➔ -25/4 - 8i
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
 ### ContinuedFraction
 </nav>
 
 <FunctionDefinition name="ContinuedFraction">
-<Signature name="ContinuedFraction" returns="list<integer>">x: number</Signature>
-<Signature name="ContinuedFraction" returns="list<integer>">x: number, n: integer</Signature>
+<Signature name="ContinuedFraction" returns="list<integer | list<integer>>">x: number</Signature>
+<Signature name="ContinuedFraction" returns="list<integer | list<integer>>">x: number, n: integer</Signature>
 Returns the continued-fraction expansion of $x$ as a list of integer terms $[a_0, a_1, …]$.
 
-An exact rational is expanded fully. For an inexact value the expansion is truncated to the optional $n$ terms (default 20); note that floating-point round-off can introduce spurious large terms in the tail.
+An exact rational is expanded fully. An exact quadratic irrational is expanded to its periodic form, whose last element is the period: `["ContinuedFraction", ["Sqrt", 2]]` is `[1, [2]]`; with $n$, to exactly $n$ terms (`[1, 2, 2, 2, 2]` for $n = 5$). Another exact real (`ExponentialE`, `Pi`) is expanded to $n$ terms (default 20), each checked at a doubled precision, or stays unevaluated. For an inexact value the expansion is truncated to the optional $n$ terms (default 20); note that floating-point round-off can introduce spurious large terms in the tail.
 
 See also: [Continued fraction - Wikipedia](https://en.wikipedia.org/wiki/Continued_fraction)
 
 ```json
 ["ContinuedFraction", ["Rational", 43, 19]]
 // ➔ [2, 3, 1, 4]
+
+["ContinuedFraction", ["Sqrt", 2]]
+// ➔ [1, [2]]
 ```
 </FunctionDefinition>
 
@@ -735,7 +807,7 @@ See also: [Continued fraction - Wikipedia](https://en.wikipedia.org/wiki/Continu
 
 <FunctionDefinition name="FromContinuedFraction">
 <Signature name="FromContinuedFraction" returns="number">terms: collection</Signature>
-Reconstructs the (rational) value of a continued fraction from its list of integer terms $[a_0, a_1, …]$.
+Reconstructs the value of a continued fraction from its list of integer terms $[a_0, a_1, …]$. A last element that is a list is the repeating period: `["FromContinuedFraction", ["List", 1, ["List", 2]]]` is $\sqrt{2}$.
 
 ```json
 ["FromContinuedFraction", [2, 3, 1, 4]]
@@ -754,7 +826,7 @@ Reconstructs the (rational) value of a continued fraction from its list of integ
 <Signature name="IntegerDigits" returns="list<integer>">n: integer, base: integer, length: integer</Signature>
 Returns the digits of $n$ in the given `base` (default 10), most-significant first. The sign of $n$ is ignored.
 
-With a third argument `length`, the result is zero-padded on the left (or truncated to its least-significant digits) to that length.
+With a third argument `length`, the result is zero-padded on the left (or truncated to its least-significant digits) to that length. `length` is at most 1,000,000; a larger length leaves the call unevaluated.
 
 ```json
 ["IntegerDigits", 255, 16]
@@ -770,13 +842,19 @@ With a third argument `length`, the result is zero-padded on the left (or trunca
 <FunctionDefinition name="DigitCount">
 <Signature name="DigitCount" returns="list<integer>">n: integer, base: integer</Signature>
 <Signature name="DigitCount" returns="integer">n: integer, base: integer, digit: integer</Signature>
+<Signature name="DigitCount" returns="integer">n: integer, base: integer, digit: integer, length: integer</Signature>
 Counts digits of $n$ in the given `base` (default 10); the sign of $n$ is ignored.
 
 With a third argument `digit`, returns how many times that digit occurs. Otherwise returns a list `[count of 1, count of 2, …, count of base-1, count of 0]`.
 
+With `length`, the digits are first padded with zeros on the left or cut to the last `length` digits. `length` is at most 1,000,000.
+
 ```json
 ["DigitCount", 122, 10, 2]
 // ➔ 2
+
+["DigitCount", 5, 2, 0, 8]
+// ➔ 6
 ```
 </FunctionDefinition>
 
@@ -786,15 +864,21 @@ With a third argument `digit`, returns how many times that digit occurs. Otherwi
 </nav>
 
 <FunctionDefinition name="FromDigits">
-<Signature name="FromDigits" returns="integer">digits: collection</Signature>
-<Signature name="FromDigits" returns="integer">digits: collection, base: integer</Signature>
+<Signature name="FromDigits" returns="number">digits: collection</Signature>
+<Signature name="FromDigits" returns="number">digits: collection, base: number</Signature>
 Reconstructs an integer from its list of digits (most-significant first) in the given `base` (default 10). The inverse of `IntegerDigits`.
 
-Digits outside $[0, base)$ are combined positionally (Horner evaluation), so `FromDigits` is well-defined for any integer terms.
+Digits outside $[0, base)$ are combined positionally. The base may be any number or symbol: an integer base of any sign gives an exact integer, and another base gives the sum $\sum d_k\, base^k$ (exact under `evaluate()`, numeric under `N()`).
 
 ```json
 ["FromDigits", [1, 2, 3, 4]]
 // ➔ 1234
+
+["FromDigits", [1, 1, 0], -2]
+// ➔ 2
+
+["FromDigits", ["List", "a", "b", "c"], "x"]
+// ➔ a x^2 + b x + c
 ```
 </FunctionDefinition>
 
@@ -806,11 +890,17 @@ Digits outside $[0, base)$ are combined positionally (Horner evaluation), so `Fr
 <FunctionDefinition name="DigitSum">
 <Signature name="DigitSum" returns="integer">n: integer</Signature>
 <Signature name="DigitSum" returns="integer">n: integer, base: integer</Signature>
+<Signature name="DigitSum" returns="integer">n: integer, base: integer, k: integer</Signature>
 Returns the sum of the digits of $n$ in the given `base` (default 10). The sign of $n$ is ignored.
+
+With `k`, sums the first `k` digits, or the last $|k|$ digits when `k` is negative.
 
 ```json
 ["DigitSum", 1234]
 // ➔ 10
+
+["DigitSum", 1234, 10, 2]
+// ➔ 3
 ```
 </FunctionDefinition>
 
@@ -820,8 +910,8 @@ Returns the sum of the digits of $n$ in the given `base` (default 10). The sign 
 </nav>
 
 <FunctionDefinition name="DivisorSigma">
-<Signature name="DivisorSigma" returns="integer">k: integer, n: integer</Signature>
-Returns the divisor function $σ_k(n) = \sum_{d \mid n} d^k$ over the positive divisors of $n$. $σ_0$ counts divisors (like `Sigma0`) and $σ_1$ sums them (like `Sigma1`). Defined for $n ≥ 1$.
+<Signature name="DivisorSigma" returns="rational">k: integer, n: integer</Signature>
+Returns the divisor function $σ_k(n) = \sum_{d \mid n} d^k$ over the positive divisors of $n$. $σ_0$ counts divisors (like `Sigma0`) and $σ_1$ sums them (like `Sigma1`). The sign of $n$ is ignored; undefined for $n = 0$. A negative $k$ gives $σ_k(n) = σ_{-k}(n)/n^{-k}$, a rational: `DivisorSigma(-1, 12)` is 7/3.
 
 See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_function)
 
@@ -1024,6 +1114,23 @@ See also: [Partition function (number theory) - Wikipedia](https://en.wikipedia.
 ["NPartition", -3]
 // ➔ 0
 ```
+
+To list the partitions themselves, see `IntegerPartitions` in the [combinatorics reference](/compute-engine/reference/combinatorics/).
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### PartitionsQ
+</nav>
+
+<FunctionDefinition name="PartitionsQ">
+<Signature name="PartitionsQ" returns="integer">n: integer</Signature>
+Returns the number of partitions of $n$ into distinct parts, which by Euler's theorem is also the number of partitions of $n$ into odd parts (OEIS A000009). It is `0` for a negative $n$.
+
+```json
+["PartitionsQ", 10]
+// ➔ 10
+```
 </FunctionDefinition>
 
 
@@ -1128,7 +1235,7 @@ See also: [Centered square number - OEIS A001844](https://oeis.org/A001844)
 
 <FunctionDefinition name="IsPerfect">
 <Signature name="IsPerfect" returns="boolean">n: integer</Signature>
-Returns `"True"` if $n$ is a perfect number.
+Returns `"True"` if $n$ is a perfect number. For $n < 1$ the result is `"False"`: a perfect number is positive.
 
 A perfect number is one that equals the sum of its positive divisors excluding itself. For example, 28 is perfect since 1 + 2 + 4 + 7 + 14 = 28.
 

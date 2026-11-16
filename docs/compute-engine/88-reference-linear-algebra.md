@@ -334,6 +334,10 @@ symbol with a collection type and no value stays unevaluated.
 // ➔ ["Tuple", 3]
 ```
 
+A regular nested list whose cells are not lists, including unevaluated
+applications of an unknown function, has the shape of its nesting:
+`["Shape", ["List", ["List", ["a", 1], ["a", 2]]]]` is `["Tuple", 1, 2]`.
+
 **Note:** The shape of a matrix is also sometimes called "dimensions".
 However, this terminology is ambiguous because the word "dimension" is also
 used to refer to the length of a matrix along a specific axis.
@@ -405,6 +409,17 @@ axes of a tensor.
 // ➔ 2
 
 ["MatrixRank", ["List", ["List", 1, 2], ["List", 2, 4]]]
+// ➔ 1
+```
+
+For a matrix of symbols, `MatrixRank` is the rank for generic values of the
+symbols. When the rank cannot be decided, `MatrixRank` stays unevaluated.
+
+```json example
+["MatrixRank", ["List", ["List", "a", "b"], ["List", "c", "d"]]]
+// ➔ 2
+
+["MatrixRank", ["List", ["List", "a", "b"], ["List", "a", "b"]]]
 // ➔ 1
 ```
 
@@ -553,7 +568,8 @@ depth.
 ```
 
 When a `depth` is given, only that many levels of nesting are flattened;
-without it, the collection is flattened completely.
+without it, or with a depth of `PositiveInfinity`, the collection is flattened
+completely.
 
 ```json example
 ["Flatten", ["List", ["List", 1, ["List", 2]], ["List", 3]], 1]

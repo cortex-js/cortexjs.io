@@ -392,10 +392,13 @@ operator that consumes a whole collection — `Mean`, `Median`, `Variance`,
 `StandardDeviation`, `Mode`, `Quartiles`, `Max`, `Min`, `Sum`, `Product`,
 `GCD`, `LCM`, `Flatten`, `ListFrom`, `SetFrom` or `TupleFrom` — a list
 argument binds whole. The parameter is followed through element-wise
-operators (`mean(v^2)`, `sin(v)`), through a local of the body assigned
-from it, and through a call to another function whose parameter binds whole,
-also when the body assigns that function to a local before the call
-(`h = t \mapsto \operatorname{mean}(t)`, then `h(v)`).
+operators (`mean(v^2)`, `sin(v)`) and through a call to another function
+whose parameter binds whole, also when the body assigns that function to a
+local before the call (`h = t \mapsto \operatorname{mean}(t)`, then `h(v)`).
+Only a use of the parameter itself counts: a local of the body assigned
+from it (`w = v`, then `\operatorname{mean}(w)`) is not followed, and the
+function is applied to each element. Declare the parameter as a collection
+to take the list whole.
 
 ```js example
 ce.assign('h', ce.parse('v \\mapsto \\operatorname{mean}(v^2)'));

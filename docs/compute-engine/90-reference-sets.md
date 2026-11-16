@@ -127,6 +127,13 @@ New sets can be defined using one of the following operators.
 
 </div>
 
+A chain `A \setminus B \setminus C` is `SetMinus(A, B, C)`, which removes
+`B` and then `C`. `\cup`, `\cap` and `\triangle` have the same precedence:
+they bind more tightly than a relation and less tightly than `\setminus`, and
+an unparenthesized mix nests to the right. `A \triangle B = C` is
+`Equal(SymmetricDifference(A, B), C)`, and `A \cup B \triangle C` is
+`Union(A, SymmetricDifference(B, C))`.
+
 The number of elements of a set is its
 [`Count`](/compute-engine/reference/collections/#count). In LaTeX it is
 written $$|\operatorname{A}|$$, `\#A` or `\operatorname{card}(A)`:

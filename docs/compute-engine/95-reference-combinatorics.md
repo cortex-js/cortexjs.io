@@ -43,6 +43,7 @@ See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binom
 </nav>
 <FunctionDefinition name="Fibonacci">
 <Signature name="Fibonacci" returns="integer">n: integer</Signature>
+<Signature name="Fibonacci" returns="number">n: integer, x: number</Signature>
 Returns the <b>n<sup>th</sup> Fibonacci number</b>, a sequence defined by the sum of the two preceding numbers starting with 0 and 1. 
 
 For negative indices, the function returns <code>-Fibonacci(-n)</code>, following the standard extension of Fibonacci numbers to negative integers.
@@ -59,6 +60,13 @@ Hence, the 7th Fibonacci number is 13.
 // -> 13
 ```
 
+With a second operand, <code>Fibonacci(n, x)</code> is the <b>Fibonacci polynomial</b> $$F_n(x)$$, with $$F_n = x F_{n-1} + F_{n-2}$$, $$F_0 = 0$$, $$F_1 = 1$$. An index above 1000 stays unevaluated.
+
+```json
+["Fibonacci", 5, "x"]
+// -> x^4 + 3x^2 + 1
+```
+
 See also: [Fibonacci number - Wikipedia](https://en.wikipedia.org/wiki/Fibonacci_number)
 
 <Latex>{`
@@ -71,7 +79,7 @@ See also: [Fibonacci number - Wikipedia](https://en.wikipedia.org/wiki/Fibonacci
 </nav>
 <FunctionDefinition name="Binomial">
 <Signature name="Binomial" returns="integer">n: integer, k: integer</Signature>
-Calculates the <b>binomial coefficient</b> $$ C(n, k) $$, the number of ways to choose <b>k</b> elements from a set of <b>n</b> elements. Returns <b>0</b> if <code>k &lt; 0</code> or <code>k &gt; n</code>, and <b>1</b> if <code>k = 0</code> or <code>k = n</code>.
+Calculates the <b>binomial coefficient</b> $$ C(n, k) $$, the number of ways to choose <b>k</b> elements from a set of <b>n</b> elements. Returns <b>0</b> if <code>k &lt; 0</code> or <code>k &gt; n</code>, and <b>1</b> if <code>k = 0</code> or <code>k = n</code>. For a symbolic <code>n</code>, <code>Binomial(n, n)</code> is <code>1</code> and <code>Binomial(n, n - 1)</code> is <code>n</code>.
 
 This function is similar to <code>Choose</code> but specialized for integer inputs and returns integer results. It is widely used in combinatorics, probability, and algebra.
 
@@ -183,6 +191,31 @@ See also: [Combination - Wikipedia](https://en.wikipedia.org/wiki/Combination)
 </FunctionDefinition>
 
 <nav className="hidden">
+### IntegerPartitions
+</nav>
+<FunctionDefinition name="IntegerPartitions">
+<Signature name="IntegerPartitions" returns="list&lt;list&lt;integer&gt;&gt;">n: integer, kspec?: any, parts?: list&lt;integer&gt;, m?: integer</Signature>
+Returns the <b>partitions</b> of <code>n</code>, each a list of positive parts in non-increasing order, in reverse lexicographic order.
+
+- <code>kspec</code>: <code>k</code> keeps the partitions of at most <code>k</code> parts, <code>[k]</code> exactly <code>k</code> parts, <code>[kmin, kmax]</code> or <code>[kmin, kmax, step]</code> a range of numbers of parts; <code>PositiveInfinity</code> or <code>All</code> is no limit.
+- <code>parts</code>: the allowed part sizes, positive integers.
+- <code>m</code>: keep the first <code>m</code> partitions.
+
+A non-integer bound or part size leaves the call unevaluated. The result is a lazy collection: <code>["Count", ["IntegerPartitions", 100]]</code> is <code>NPartition(100)</code>, 190569292, without enumerating the partitions, and <code>At</code> reads a position directly.
+
+```json
+["IntegerPartitions", 4]
+// -> [[4], [3, 1], [2, 2], [2, 1, 1], [1, 1, 1, 1]]
+
+["IntegerPartitions", 6, ["List", 2]]
+// -> [[5, 1], [4, 2], [3, 3]]
+```
+
+See also: [Integer partition - Wikipedia](https://en.wikipedia.org/wiki/Integer_partition)
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### Multinomial
 </nav>
 <FunctionDefinition name="Multinomial">
@@ -233,6 +266,7 @@ See also: [Derangement - Wikipedia](https://en.wikipedia.org/wiki/Derangement)
 </nav>
 <FunctionDefinition name="BellNumber">
 <Signature name="BellNumber" returns="integer">n: integer</Signature>
+<Signature name="BellNumber" returns="number">n: integer, x: number</Signature>
 Computes the <b>Bell number</b> $$ B(n) $$, which counts the number of ways to partition a set of <code>n</code> elements into any number of non-empty, disjoint subsets.
 
 Bell numbers appear in combinatorics and partition theory.
@@ -243,6 +277,13 @@ $$\{ \{1,2,3\}, \{1,2\},\{3\}, \{1,3\},\{2\}, \{2,3\},\{1\}, \{1\},\{2\},\{3\} }
 ```json
 ["BellNumber", 3]
 // -> 5
+```
+
+With a second operand, <code>BellNumber(n, x)</code> is the <b>Bell (Touchard) polynomial</b> $$\sum_k S(n, k)\, x^k$$.
+
+```json
+["BellNumber", 4, "x"]
+// -> x^4 + 6x^3 + 7x^2 + x
 ```
 
 See also: [Bell number - Wikipedia](https://en.wikipedia.org/wiki/Bell_number)
