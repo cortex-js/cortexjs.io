@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from './styles.css';
+import './styles.css';
 
 // Define stop words outside of the component to avoid reinitialization
 const STOP_WORDS = [

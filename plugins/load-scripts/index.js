@@ -58,8 +58,6 @@ loadScripts([
   "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js",
-  // "https://cdn.jsdelivr.net/npm/@cortex-js/compute-engine@latest/dist/compute-engine.umd.js",
-  "https://unpkg.com/@cortex-js/compute-engine",
   "https://cdn.jsdelivr.net/npm/mathlive",
   "https://cdn.jsdelivr.net/npm/@ui-js/code-playground@1.13.2/dist/code-playground.min.js@module",
   ]
@@ -67,6 +65,15 @@ loadScripts([
 })();
 `;
 
+// The Compute Engine is published as ES modules only (no UMD build), so it
+// cannot be loaded by a classic <script>: that fails with "Cannot use import
+// statement outside a module". Import it from the URL the playground's
+// moduleMap uses, so the page holds one copy, and expose it as a global for
+// the components that read `window.ComputeEngine` (DocMetadata).
+const loadComputeEngine = `
+import * as ComputeEngine from "https://esm.run/@cortex-js/compute-engine";
+window.ComputeEngine = ComputeEngine;
+`;
 
 export default function (context, options) {
   return {
@@ -87,6 +94,11 @@ export default function (context, options) {
           {
             tagName: "script",
             innerHTML: loadScripts,
+          },
+          {
+            tagName: "script",
+            attributes: { type: "module" },
+            innerHTML: loadComputeEngine,
           },
         ],
       };

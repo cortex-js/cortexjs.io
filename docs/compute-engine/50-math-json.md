@@ -8,7 +8,7 @@ sidebar_class_name: "sdk-icon"
 import Mathfield from '@site/src/components/Mathfield';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
 import {useState, useEffect} from 'react';
-import {BrowserOnly} from '@docusaurus/BrowserOnly';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import ErrorBoundary from '@site/src/components/ErrorBoundary';
 
 export function setupComputeEngine() {
