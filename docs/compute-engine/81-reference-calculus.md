@@ -1419,7 +1419,7 @@ to the independent variable _x_.
 `DSolve` returns a `List` of solutions, each an `Equal` expression giving
 _y(x)_. A constant of integration is the call `["ArbitraryConstant", k]`: an
 arbitrary number, the _k_-th of the result. The tables below write it
-$c_k$. See [`ArbitraryConstant`](/compute-engine/reference/core/#ArbitraryConstant).
+$c_k$. See [`ArbitraryConstant`](/compute-engine/reference/core/#arbitraryconstant).
 
 `DSolve` solves the following classes of equations.
 

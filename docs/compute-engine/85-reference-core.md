@@ -1027,6 +1027,9 @@ solution, and not all of them, `FindRoot` is the right tool.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### ArbitraryConstant
+</nav>
 <FunctionDefinition name="ArbitraryConstant">
 
 <Signature name="ArbitraryConstant" returns="number">_k_: integer</Signature>

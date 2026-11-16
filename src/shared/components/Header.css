@@ -25,8 +25,13 @@
   box-sizing: content-box;
 }
 
+/* `nowrap`: Infima's `.navbar__inner` wraps, and a wrapped row moves the whole
+   right-hand group (GitHub, search) onto a second line under the floating
+   bar. If the row is ever a few pixels too wide (browser zoom, another build
+   of Inter), it should overflow the bar's padding instead. */
 .shared-header .navbar__inner {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   width: 100%;
 }
@@ -93,10 +98,21 @@
 
    The link padding is not specific to epsil.dev: mathlive.io's navbar measures
    1016px too, so it wrapped in this same range before search existed. */
+/* The desktop row has to fit with room to spare: text widths vary by a few
+   pixels with browser zoom and the installed build of Inter. At Infima's 15px
+   link padding the row left 8px of slack in the 1024px bar; 12px leaves ~38px.
+   (Below 997px the links are in the mobile drawer, which keeps its padding.) */
+@media (min-width: 997px) {
+  .shared-header .navbar__link {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
 @media (max-width: 1060px) {
   .shared-header .navbar__link {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .shared-header .navbar__search-input {

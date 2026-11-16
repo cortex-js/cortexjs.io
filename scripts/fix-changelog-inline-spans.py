@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Collapse newlines inside inline code (`...`) and inline math ($...$) spans.
+"""Collapse newlines inside inline code (`...`) and inline math ($...$) spans,
+and escape `{`, `}` and a `<` that follows a word character in the prose
+around them.
 
 The changelog is concatenated from an upstream CHANGELOG.md whose prose is
 hard-wrapped to ~80 columns. When that wrapping falls *inside* an inline
@@ -30,16 +32,30 @@ def collapse(span: str) -> str:
     return re.sub(r"[ \t]*\n[ \t]*", " ", span)
 
 
+def escape_prose(text: str) -> str:
+    # MDX reads `{...}` in prose as a JavaScript expression, so a plain-text
+    # exponent such as `(cτ + d)^{−s}` fails the build ("Could not parse
+    # expression with acorn"). Escape braces that are not already escaped.
+    # The same for a type written in prose, as in `list<number>`: MDX reads
+    # `<number>` as an unclosed JSX tag. A `<` right after a letter or digit
+    # never opens an HTML tag, so `<sub>` and the like are left alone.
+    # Only prose is passed here: not code, and not the interior of $math$.
+    text = re.sub(r"(?<!\\)([{}])", r"\\\1", text)
+    return re.sub(r"(?<=\w)<", r"\\<", text)
+
+
 def fix_math(text: str) -> str:
     # Pair single-dollar math delimiters by splitting on unescaped '$'.
     # Odd-indexed segments are the interior of a $...$ span. Only collapse when
     # the dollar count is balanced (even number of segments-1), so a stray '$'
     # in prose can never flip pairing and merge unrelated text.
     if "$$" in text:
-        return text  # display math — leave untouched (none in practice)
+        return escape_prose(text)  # display math: none in practice
     segs = re.split(r"(?<!\\)\$", text)
-    if len(segs) % 2 == 0:  # odd number of '$' → unbalanced, don't touch
-        return text
+    if len(segs) % 2 == 0:  # odd number of '$' → unbalanced, don't pair
+        return escape_prose(text)
+    for i in range(0, len(segs), 2):
+        segs[i] = escape_prose(segs[i])
     for i in range(1, len(segs), 2):
         if "\n" in segs[i]:
             segs[i] = collapse(segs[i])
@@ -98,7 +114,7 @@ def main():
         if fixed != src:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(fixed)
-            print(f"fixed inline spans in {path}")
+            print(f"fixed inline spans and braces in {path}")
 
 
 if __name__ == "__main__":
