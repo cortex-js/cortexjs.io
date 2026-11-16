@@ -303,7 +303,7 @@ category.
 
 ### abs
 
-MathJSON `Abs` · `(complex | infinity | quantity) -> number`
+`(complex | infinity | quantity) -> number`
 
 Absolute value (magnitude) of a number.
 
@@ -311,6 +311,12 @@ Absolute value (magnitude) of a number.
 [abs(-3), abs(3 - 4i)]
 // ➔ [3,5]
 ```
+
+<MathJson name="Abs">
+
+LaTeX: `|`
+
+</MathJson>
 
 ### absArg
 
@@ -334,9 +340,15 @@ Sum of two or more values.
 // ➔ 2x + 3
 ```
 
+<MathJson name="Add">
+
+LaTeX: `+`
+
+</MathJson>
+
 ### airyAi
 
-MathJSON `AiryAi` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Airy function of the first kind
 
@@ -344,6 +356,12 @@ Airy function of the first kind
 N(airyAi(1))
 // ➔ 0.135292416312881415524
 ```
+
+<MathJson name="AiryAi">
+
+LaTeX: `\operatorname{Ai}`
+
+</MathJson>
 
 ### airyAiPrime
 
@@ -358,7 +376,7 @@ N(airyAiPrime(0))
 
 ### airyBi
 
-MathJSON `AiryBi` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Airy function of the second kind
 
@@ -366,6 +384,12 @@ Airy function of the second kind
 N(airyBi(0))
 // ➔ 0.614926627446000735151
 ```
+
+<MathJson name="AiryBi">
+
+LaTeX: `\operatorname{Bi}`
+
+</MathJson>
 
 ### airyBiPrime
 
@@ -391,7 +415,7 @@ MathJSON `Arg` · `(complex | infinity) -> number`
 
 ### argument
 
-MathJSON `Argument` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Complex argument (phase angle) of a number, in the engine's angular unit.
 
@@ -400,9 +424,15 @@ Complex argument (phase angle) of a number, in the engine's angular unit.
 // ➔ [1/4 * pi,pi]
 ```
 
+<MathJson name="Argument">
+
+LaTeX: `\arg`
+
+</MathJson>
+
 ### besselI
 
-MathJSON `BesselI` · `(order: complex, complex | infinity) -> number`
+`(order: complex, complex | infinity) -> number`
 
 Modified Bessel function of the first kind
 
@@ -411,9 +441,15 @@ N(besselI(0, 1))
 // ➔ 1.2660658777520083356
 ```
 
+<MathJson name="BesselI">
+
+LaTeX: `\operatorname{I}`
+
+</MathJson>
+
 ### besselJ
 
-MathJSON `BesselJ` · `(order: complex, complex | infinity) -> number`
+`(order: complex, complex | infinity) -> number`
 
 Bessel function of the first kind
 
@@ -422,9 +458,15 @@ N(besselJ(0, 1))
 // ➔ 0.76519768655796655145
 ```
 
+<MathJson name="BesselJ">
+
+LaTeX: `\operatorname{J}`
+
+</MathJson>
+
 ### besselK
 
-MathJSON `BesselK` · `(order: complex, complex | infinity) -> number`
+`(order: complex, complex | infinity) -> number`
 
 Modified Bessel function of the second kind (Macdonald function)
 
@@ -433,9 +475,15 @@ N(besselK(0, 1))
 // ➔ 0.421024438240708333336
 ```
 
+<MathJson name="BesselK">
+
+LaTeX: `\operatorname{K}`
+
+</MathJson>
+
 ### besselY
 
-MathJSON `BesselY` · `(order: complex, complex | infinity) -> number`
+`(order: complex, complex | infinity) -> number`
 
 Bessel function of the second kind (Neumann function)
 
@@ -444,9 +492,15 @@ N(besselY(0, 1))
 // ➔ 0.0882569642156769579829
 ```
 
+<MathJson name="BesselY">
+
+LaTeX: `\operatorname{Y}`
+
+</MathJson>
+
 ### beta
 
-MathJSON `Beta` · `(complex | infinity, complex | infinity, (complex | infinity)?, (complex | infinity)?) -> number`
+`(complex | infinity, complex | infinity, (complex | infinity)?, (complex | infinity)?) -> number`
 
 Euler beta function
 
@@ -465,9 +519,15 @@ beta(1/4, 1/2, 2, 3)
 // ➔ 109/3072
 ```
 
+<MathJson name="Beta">
+
+LaTeX: `\Beta`
+
+</MathJson>
+
 ### catalanConstant
 
-MathJSON `CatalanConstant` · constant `real<0.915965594177219..0.9159655941772191>` = `0.915965594177219015055`
+constant `real<0.915965594177219..0.9159655941772191>` = `0.915965594177219015055`
 
 Catalan's constant G ≈ 0.9160.
 
@@ -476,9 +536,15 @@ N(catalanConstant)
 // ➔ 0.915965594177219015055
 ```
 
+<MathJson name="CatalanConstant">
+
+LaTeX: `\operatorname{G}`
+
+</MathJson>
+
 ### ceil
 
-MathJSON `Ceil` · `(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
+`(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
 
 Rounds a number up to the next largest integer, or with a step to the least multiple of the step that is at least the number.
 
@@ -487,9 +553,15 @@ Rounds a number up to the next largest integer, or with a step to the least mult
 // ➔ [3,-2,230]
 ```
 
+<MathJson name="Ceil">
+
+LaTeX: `\lceil`, `\rceil`
+
+</MathJson>
+
 ### chop
 
-MathJSON `Chop` · `(T, real<0..>?) -> T where T: number`
+`(T, real<0..>?) -> T where T: number`
 
 Replace tiny numeric values with zero.
 
@@ -502,6 +574,12 @@ chop([1e-20, 0.5, 3 + 1e-15i])
 chop([0.004, 0.5, 3 + 0.002i], 0.01)
 // ➔ [0,0.5,3]
 ```
+
+<MathJson name="Chop">
+
+LaTeX: `chop`
+
+</MathJson>
 
 ### clamp
 
@@ -527,7 +605,7 @@ Construct a complex number from real and imaginary parts. Converted directly to 
 
 ### complexInfinity
 
-MathJSON `ComplexInfinity` · constant `number` = `~oo`
+constant `number` = `~oo`
 
 Complex infinity, a single unsigned infinity in the complex plane.
 
@@ -535,6 +613,12 @@ Complex infinity, a single unsigned infinity in the complex plane.
 [1/0, complexInfinity + 1]
 // ➔ [~oo,~oo]
 ```
+
+<MathJson name="ComplexInfinity">
+
+LaTeX: `\tilde\infty`
+
+</MathJson>
 
 ### complexRoots
 
@@ -554,7 +638,7 @@ complexRoots(8, 3)
 
 ### conjugate
 
-MathJSON `Conjugate` · `(T) -> T where T: number`
+`(T) -> T where T: number`
 
 Complex conjugate of a number, or the pointwise conjugate of a function.
 
@@ -562,6 +646,12 @@ Complex conjugate of a number, or the pointwise conjugate of a function.
 conjugate(3 + 4i)
 // ➔ (3 - 4i)
 ```
+
+<MathJson name="Conjugate">
+
+LaTeX: `\overline`
+
+</MathJson>
 
 ### ContinuationPlaceholder
 
@@ -573,6 +663,12 @@ This symbol indicates that some elements in a collection have been omitted, for 
 [1, 2, ContinuationPlaceholder, 10]
 // ➔ [1,2,...,10]
 ```
+
+<MathJson name="ContinuationPlaceholder">
+
+LaTeX: `\dots`
+
+</MathJson>
 
 ### denominator
 
@@ -620,7 +716,7 @@ Dirichlet eta function η(s) = Σ_&#123;n≥1&#125; (−1)^(n−1)/n^s = (1 − 
 
 ### distance
 
-MathJSON `Distance` · `(list<list<number>> | list<number> | list<tuple> | tuple, list<list<number>> | list<number> | list<tuple> | tuple) -> number`
+`(list<list<number>> | list<number> | list<tuple> | tuple, list<list<number>> | list<number> | list<tuple> | tuple) -> number`
 
 Euclidean distance between two points, broadcasting over a list of points.
 
@@ -628,6 +724,12 @@ Euclidean distance between two points, broadcasting over a list of points.
 [distance((0, 0), (3, 4)), distance([1, 2, 3], [4, 6, 3])]
 // ➔ [5,5]
 ```
+
+<MathJson name="Distance">
+
+LaTeX: `\operatorname{distance}`
+
+</MathJson>
 
 ### Divide
 
@@ -639,6 +741,12 @@ Quotient of a numerator and one or more denominators.
 [6 / 4, x / 2]
 // ➔ [3/2,1/2 * x]
 ```
+
+<MathJson name="Divide">
+
+LaTeX: `\frac`
+
+</MathJson>
 
 ### elementMax
 
@@ -685,7 +793,7 @@ N(enclosure(0, pi))
 
 ### eulerGamma
 
-MathJSON `EulerGamma` · constant `real<0.5772156649015328..0.5772156649015329>` = `0.577215664901532860607`
+constant `real<0.5772156649015328..0.5772156649015329>` = `0.577215664901532860607`
 
 The Euler–Mascheroni constant γ ≈ 0.5772.
 
@@ -693,6 +801,12 @@ The Euler–Mascheroni constant γ ≈ 0.5772.
 N(eulerGamma)
 // ➔ 0.577215664901532860607
 ```
+
+<MathJson name="EulerGamma">
+
+LaTeX: `\gamma`
+
+</MathJson>
 
 ### exp
 
@@ -718,7 +832,7 @@ Base-2 exponential: 2^x
 
 ### exponentialE
 
-MathJSON `ExponentialE` · constant `real<2.718281828459045..2.718281828459046>` = `2.71828182845904523536`
+constant `real<2.718281828459045..2.718281828459046>` = `2.71828182845904523536`
 
 Euler's number e ≈ 2.71828, the base of the natural logarithm.
 
@@ -726,6 +840,12 @@ Euler's number e ≈ 2.71828, the base of the natural logarithm.
 [ln(exponentialE^2), N(exponentialE)]
 // ➔ [2,2.71828182845904523536]
 ```
+
+<MathJson name="ExponentialE">
+
+LaTeX: `\exponentialE`
+
+</MathJson>
 
 ### Factorial
 
@@ -738,9 +858,15 @@ Factorial function: the product of all positive integers less than or equal to n
 // ➔ [120,2432902008176640000]
 ```
 
+<MathJson name="Factorial">
+
+LaTeX: `!`
+
+</MathJson>
+
 ### factorial2
 
-MathJSON `Factorial2` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Double Factorial Function
 
@@ -749,9 +875,15 @@ Double Factorial Function
 // ➔ [105,384]
 ```
 
+<MathJson name="Factorial2">
+
+LaTeX: `!!`
+
+</MathJson>
+
 ### floor
 
-MathJSON `Floor` · `(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
+`(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
 
 Rounds a number down to the nearest integer, or with a step to the greatest multiple of the step that is at most the number.
 
@@ -759,6 +891,12 @@ Rounds a number down to the nearest integer, or with a step to the greatest mult
 [floor(2.7), floor(-2.3), floor(226, 10)]
 // ➔ [2,-3,220]
 ```
+
+<MathJson name="Floor">
+
+LaTeX: `\lfloor`, `\rfloor`
+
+</MathJson>
 
 ### fract
 
@@ -773,7 +911,7 @@ Fractional part of a number: x - floor(x)
 
 ### gcd
 
-MathJSON `GCD` · `(any*) -> number`
+`(any*) -> number`
 
 Greatest Common Divisor
 
@@ -782,9 +920,15 @@ Greatest Common Divisor
 // ➔ [6,3]
 ```
 
+<MathJson name="GCD">
+
+LaTeX: `\gcd`
+
+</MathJson>
+
 ### gamma
 
-MathJSON `Gamma` · `(complex | infinity, (complex | infinity)?, (complex | infinity)?) -> number`
+`(complex | infinity, (complex | infinity)?, (complex | infinity)?) -> number`
 
 Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt; with three, Γ(s, z0) − Γ(s, z1).
 
@@ -803,6 +947,12 @@ N(gamma(2, 1, 3))
 // ➔ 0.536610608871428871274
 ```
 
+<MathJson name="Gamma">
+
+LaTeX: `\Gamma`
+
+</MathJson>
+
 ### gammaLn
 
 MathJSON `GammaLn` · `(complex | infinity) -> number`
@@ -816,7 +966,7 @@ N(gammaLn(100))
 
 ### goldenRatio
 
-MathJSON `GoldenRatio` · constant `real<1.618033988749894..1.618033988749895>` = `1/2 * (1 + sqrt(5))`
+constant `real<1.618033988749894..1.618033988749895>` = `1/2 * (1 + sqrt(5))`
 
 The golden ratio φ = (1+√5)/2 ≈ 1.618.
 
@@ -824,6 +974,12 @@ The golden ratio φ = (1+√5)/2 ≈ 1.618.
 N(goldenRatio)
 // ➔ 1.6180339887498948482
 ```
+
+<MathJson name="GoldenRatio">
+
+LaTeX: `\varphi`
+
+</MathJson>
 
 ### half
 
@@ -849,7 +1005,7 @@ Harmonic number H_n = Σ_&#123;k=1&#125;^n 1/k, exact at a non-negative integer 
 
 ### heaviside
 
-MathJSON `Heaviside` · `(real | signed_infinity) -> rational<0..1>`
+`(real | signed_infinity) -> rational<0..1>`
 
 Heaviside step function.
 
@@ -857,6 +1013,12 @@ Heaviside step function.
 [heaviside(-2), heaviside(0), heaviside(3)]
 // ➔ [0,1/2,1]
 ```
+
+<MathJson name="Heaviside">
+
+LaTeX: `Heaviside`
+
+</MathJson>
 
 ### hurwitzZeta
 
@@ -882,7 +1044,7 @@ im(3 + 4i)
 
 ### imaginary
 
-MathJSON `Imaginary` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Imaginary part of a complex number.
 
@@ -891,9 +1053,15 @@ imaginary(3 + 4i)
 // ➔ 4
 ```
 
+<MathJson name="Imaginary">
+
+LaTeX: `\Im`
+
+</MathJson>
+
 ### imaginaryUnit
 
-MathJSON `ImaginaryUnit` · constant `imaginary` = `i`
+constant `imaginary` = `i`
 
 The imaginary unit, whose square is −1.
 
@@ -901,6 +1069,12 @@ The imaginary unit, whose square is −1.
 [imaginaryUnit^2, sqrt(-9)]
 // ➔ [-1,3i]
 ```
+
+<MathJson name="ImaginaryUnit">
+
+LaTeX: `\imaginaryI`
+
+</MathJson>
 
 ### Indeterminate
 
@@ -915,7 +1089,7 @@ An input spelling of NaN.
 
 ### infimum
 
-MathJSON `Infimum` · `(value*) -> number`
+`(value*) -> number`
 
 Like Min, but defined for open sets.
 
@@ -923,6 +1097,12 @@ Like Min, but defined for open sets.
 [infimum(1, 3, 2), infimum(interval(0, 1))]
 // ➔ [1,0]
 ```
+
+<MathJson name="Infimum">
+
+LaTeX: `\inf`
+
+</MathJson>
 
 ### interpret
 
@@ -992,7 +1172,7 @@ Least Common Multiple
 
 ### lambertW
 
-MathJSON `LambertW` · `(z: complex | infinity, branch: integer?) -> number`
+`(z: complex | infinity, branch: integer?) -> number`
 
 Lambert W function (product logarithm)
 
@@ -1006,9 +1186,15 @@ N(lambertW(-0.1, branch: -1))
 // ➔ -3.57715206395729721841
 ```
 
+<MathJson name="LambertW">
+
+LaTeX: `\operatorname{W}`
+
+</MathJson>
+
 ### lb
 
-MathJSON `Lb` · `(number) -> number`
+`(number) -> number`
 
 Base-2 Logarithm
 
@@ -1016,6 +1202,12 @@ Base-2 Logarithm
 [lb(8), N(lb(3))]
 // ➔ [3,1.58496250072115618145]
 ```
+
+<MathJson name="Lb">
+
+LaTeX: `\lb`
+
+</MathJson>
 
 ### lerchPhi
 
@@ -1025,7 +1217,7 @@ Lerch transcendent Φ(z,s,a) = Σ_&#123;k=0&#125;^∞ zᵏ(k+a)^&#123;-s&#125;
 
 ### lg
 
-MathJSON `Lg` · `(number) -> number`
+`(number) -> number`
 
 Base-10 Logarithm
 
@@ -1034,9 +1226,15 @@ Base-10 Logarithm
 // ➔ [2,0.301029995663981195214]
 ```
 
+<MathJson name="Lg">
+
+LaTeX: `\lg`
+
+</MathJson>
+
 ### ln
 
-MathJSON `Ln` · `(complex | infinity, base: (complex | infinity)?) -> complex | infinity`
+`(complex | infinity, base: (complex | infinity)?) -> complex | infinity`
 
 Natural Logarithm
 
@@ -1050,9 +1248,15 @@ ln(8, 2)
 // ➔ 3
 ```
 
+<MathJson name="Ln">
+
+LaTeX: `\ln`
+
+</MathJson>
+
 ### log
 
-MathJSON `Log` · `(complex | infinity, base: (complex | infinity)?) -> number`
+`(complex | infinity, base: (complex | infinity)?) -> number`
 
 Log(z, b = 10) = Logarithm of base b
 
@@ -1060,6 +1264,12 @@ Log(z, b = 10) = Logarithm of base b
 [log(1000), log(8, 2)]
 // ➔ [3,3]
 ```
+
+<MathJson name="Log">
+
+LaTeX: `\log`
+
+</MathJson>
 
 ### log10
 
@@ -1096,7 +1306,7 @@ N(machineEpsilon)
 
 ### max
 
-MathJSON `Max` · `(value*) -> number`
+`(value*) -> number`
 
 Maximum of two or more numbers.
 
@@ -1105,9 +1315,48 @@ Maximum of two or more numbers.
 // ➔ [7,7]
 ```
 
+If all the arguments are numbers, `max` is the largest of them. The
+infinities take part in the comparison like any other value. A `NaN`
+argument makes the whole expression `NaN`, even when other arguments are
+still unknown: no ordering could rule it out.
+
+Otherwise the expression is simplified: the values smaller than or equal to
+the largest known number are removed.
+
+A dictionary is not a collection of numbers. `max`, `min`, `supremum` and
+`infimum` of a dictionary that has an entry give the `incompatible-type`
+error that `sum` gives, and the error names the first entry.
+
+```epsil
+[max(5, 2, -1), max(1, ∞)]
+// ➔ [5,+oo]
+[max(0, 7.1, x, 3), max(0, 7.1, NaN, x, 3)]
+// ➔ [max(7.1, x),NaN]
+```
+
+<MathJson name="Max">
+
+LaTeX: `\max`
+
+`["Max", x1, x2, ...]` or `["Max", list]`. An empty dictionary contributes
+no value, as an empty list does.
+
+```json example
+["Max", 5, 2, -1]
+// ➔ 5
+["Max", 1, "PositiveInfinity"]
+// ➔ "PositiveInfinity"
+["Max", 0, 7.1, "x", 3]
+// ➔ ["Max", 7.1, "x"]
+["Max", 0, 7.1, "NaN", "x", 3]
+// ➔ "NaN"
+```
+
+</MathJson>
+
 ### measurement
 
-MathJSON `Measurement` · `(value, value) -> measurement`
+`(value, value) -> measurement`
 
 A nominal value carrying a 1σ absolute uncertainty.
 
@@ -1121,9 +1370,15 @@ N(measurement(5, 0.2) * measurement(3, 0.4))
 // ➔ 15.0 ± 2.1
 ```
 
+<MathJson name="Measurement">
+
+LaTeX: `\pm`
+
+</MathJson>
+
 ### min
 
-MathJSON `Min` · `(value+) -> number`
+`(value+) -> number`
 
 Minimum of two or more numbers.
 
@@ -1131,6 +1386,39 @@ Minimum of two or more numbers.
 [min(3, 7, 2), min([3, 7, 2])]
 // ➔ [2,2]
 ```
+
+If all the arguments are numbers, `min` is the smallest of them. As with
+`max`, the infinities take part in the comparison, and a `NaN` argument makes
+the whole expression `NaN`.
+
+Otherwise the expression is simplified: the values greater than or equal to
+the smallest known number are removed.
+
+```epsil
+[min(5, 2, -1), min(1, -∞), min(0, 7.1, x, 3)]
+// ➔ [-1,-oo,min(0, x)]
+```
+
+<MathJson name="Min">
+
+LaTeX: `\min`
+
+`["Min", x1, x2, ...]` or `["Min", list]`.
+
+<Latex value=" \min(0, 7.1, 3) = 0"/>
+
+```json example
+["Min", 5, 2, -1]
+// ➔ -1
+["Min", 1, "NegativeInfinity"]
+// ➔ "NegativeInfinity"
+["Min", 0, 7.1, "x", 3]
+// ➔ ["Min", 0, "x"]
+["Min", 0, 7.1, "NaN", "x", 3]
+// ➔ "NaN"
+```
+
+</MathJson>
 
 ### Mod
 
@@ -1143,6 +1431,47 @@ Modulo: the remainder of the floored division of x by y. The sign of the result 
 // ➔ [1,2]
 ```
 
+`Mod(a, b)` is the modulus of `a` by `b`. The operator `a % b` is the same
+function. The result has the sign of `b`, or is `0`.
+
+When `a` and `b` are positive integers, this is the remainder of the
+division of `a` by `b`, as with the `%` operator of JavaScript. When they are
+not, the result differs: in Epsil `(-7) % 5` is `3`, in JavaScript `-2`.
+
+```epsil
+[Mod(7, 5), Mod(-7, 5), Mod(7, -5), Mod(-7, -5)]
+// ➔ [2,3,-3,-2]
+```
+
+`Mod` of exact operands is exact. A radical dividend is reduced without
+rounding, and `N()` gives the floating-point value.
+
+```epsil
+Mod(sqrt(2), 1)
+// ➔ -1 + sqrt(2)
+```
+
+<MathJson name="Mod">
+
+LaTeX: `\bmod`
+
+`["Mod", a, b]`.
+
+```json example
+["Mod", 7, 5]
+// ➔ 2
+["Mod", -7, 5]
+// ➔ 3
+["Mod", 7, -5]
+// ➔ -3
+["Mod", -7, -5]
+// ➔ -2
+["Mod", ["Sqrt", 2], 1]
+// ➔ ["Add", -1, ["Sqrt", 2]]
+```
+
+</MathJson>
+
 ### Multiply
 
 `(number*) -> number`
@@ -1153,6 +1482,12 @@ Product of two or more values.
 2 * x * 3 * x
 // ➔ 6x^2
 ```
+
+<MathJson name="Multiply">
+
+LaTeX: `\times`
+
+</MathJson>
 
 ### NaN
 
@@ -1175,6 +1510,12 @@ Additive Inverse
 -(x - 1)
 // ➔ 1 - x
 ```
+
+<MathJson name="Negate">
+
+LaTeX: `-`
+
+</MathJson>
 
 ### negativeInfinity
 
@@ -1258,6 +1599,60 @@ Exponentiation: raise a base to a power.
 // ➔ [1024,sqrt(2),x^5]
 ```
 
+`a^b` raises `a` to the power `b`. A power of exact numbers evaluates to an
+exact number. When the result would be too large, the power stays
+unevaluated, and `N()` gives its floating-point value. The engine estimates
+the size of the result as the number of decimal digits of the base times the
+exponent, and the limit is 1,000,000 digits.
+
+```epsil
+[2^10, 2^10000000, N(2^10000000)]
+// ➔ [1024,2^(10000000),9.0498173063608003014e+3010299]
+```
+
+A power of `0`, `1`, `-1`, `i` or `-i` to an integer exponent of any size is
+evaluated. A power of `i` uses the exponent modulo 4.
+
+```epsil
+[(-1)^10000000, i^(10^30 + 1)]
+// ➔ [1,i]
+```
+
+A power with an infinite operand gives its limit. A base whose absolute value
+is more than 1 raised to `∞` gives `∞`, and a base whose absolute value is
+less than 1 gives `0`. The engine compares the base with 1 by its exact
+value, so a base very near 1 also gives the limit. A symbolic base raised to
+an infinity stays unevaluated until the base has a value, because the limit
+depends on that value.
+
+```epsil
+[2^∞, 0.5^(-∞), (1/2)^∞, 1^∞, z^∞]
+// ➔ [+oo,+oo,0,NaN,z^(+oo)]
+```
+
+<MathJson name="Power">
+
+LaTeX: `^`
+
+`["Power", a, b]`. When an operand is a floating-point number, the limit `0`
+is the floating-point `0.0`, as for `2.5/∞`. When the operands are exact, it
+is the exact `0`.
+
+```json example
+["Power", 2, 10]
+// ➔ 1024
+["Power", 2, 10000000]
+// ➔ ["Power", 2, 10000000]  (unevaluated)
+["Power", "ImaginaryUnit", ["Add", ["Power", 10, 30], 1]]
+// ➔ ["Complex", 0, 1]
+["Power", 0.5, "PositiveInfinity"]
+// ➔ 0.0  (a floating-point number)
+["Power", ["Rational", 1, 2], "PositiveInfinity"]
+// ➔ 0
+```
+
+</MathJson>
+
 ### PreDecrement
 
 `(number) -> number`
@@ -1282,7 +1677,7 @@ PreIncrement(5)
 
 ### product
 
-MathJSON `Product` · `(any, tuple*) -> number`
+`(any, tuple*) -> number`
 
 `Product(f, a, b)` computes the product of `f` from `a` to `b`.
 
@@ -1295,6 +1690,12 @@ product(k, (k, 1, 5))
 product(1 - 1/k^2, (k, 2, 10))
 // ➔ 11/20
 ```
+
+<MathJson name="Product">
+
+LaTeX: `\prod`
+
+</MathJson>
 
 ### rational
 
@@ -1336,7 +1737,7 @@ re(3 + 4i)
 
 ### real
 
-MathJSON `Real` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Real part of a complex number.
 
@@ -1344,6 +1745,12 @@ Real part of a complex number.
 real(3 + 4i)
 // ➔ 3
 ```
+
+<MathJson name="Real">
+
+LaTeX: `\Re`
+
+</MathJson>
 
 ### remainder
 
@@ -1369,7 +1776,7 @@ n-th root of a value.
 
 ### round
 
-MathJSON `Round` · `(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
+`(x: real | signed_infinity | ~oo, step: real?) -> real | signed_infinity | ~oo`
 
 Rounds a number to the nearest integer, or with a step to the nearest multiple of the step.
 
@@ -1378,9 +1785,15 @@ Rounds a number to the nearest integer, or with a step to the nearest multiple o
 // ➔ [3,-3,230,157/50]
 ```
 
+<MathJson name="Round">
+
+LaTeX: `round`
+
+</MathJson>
+
 ### sign
 
-MathJSON `Sign` · `(complex | signed_infinity | ~oo) -> complex`
+`(complex | signed_infinity | ~oo) -> complex`
 
 Sign of a number: -1, 0, or 1 for a real; `z/|z|`, the point of the unit circle in its direction, for a complex `z`.
 
@@ -1388,6 +1801,12 @@ Sign of a number: -1, 0, or 1 for a real; `z/|z|`, the point of the unit circle 
 [sign(-3), sign(0), sign(3 + 4i)]
 // ➔ [-1,0,(3/5 + 4/5i)]
 ```
+
+<MathJson name="Sign">
+
+LaTeX: `sgn`
+
+</MathJson>
 
 ### smoothstep
 
@@ -1402,7 +1821,7 @@ Smooth Hermite interpolation between 0 and 1 as x goes from e0 to e1: t²(3 − 
 
 ### sqrt
 
-MathJSON `Sqrt` · `(complex | infinity) -> complex | infinity`
+`(complex | infinity) -> complex | infinity`
 
 Square Root
 
@@ -1410,6 +1829,12 @@ Square Root
 [sqrt(8), sqrt(-4), N(sqrt(2))]
 // ➔ [2sqrt(2),2i,1.4142135623730950488]
 ```
+
+<MathJson name="Sqrt">
+
+LaTeX: `\sqrt`
+
+</MathJson>
 
 ### Square
 
@@ -1433,9 +1858,15 @@ Difference between two or more values.
 // ➔ 2 - x
 ```
 
+<MathJson name="Subtract">
+
+LaTeX: `-`
+
+</MathJson>
+
 ### sum
 
-MathJSON `Sum` · `(any, tuple*) -> number`
+`(any, tuple*) -> number`
 
 `Sum(f, [a, b])` computes the sum of `f` from `a` to `b`; `Sum(L)` sums the elements of a collection `L`.
 
@@ -1449,9 +1880,15 @@ sum(1/k^2, (k, 1, oo))
 // ➔ pi^2 / 6
 ```
 
+<MathJson name="Sum">
+
+LaTeX: `\sum`
+
+</MathJson>
+
 ### supremum
 
-MathJSON `Supremum` · `(value*) -> number`
+`(value*) -> number`
 
 Like Max, but defined for open sets.
 
@@ -1459,6 +1896,12 @@ Like Max, but defined for open sets.
 [supremum(1, 3, 2), supremum(interval(0, 1))]
 // ➔ [3,1]
 ```
+
+<MathJson name="Supremum">
+
+LaTeX: `\sup`
+
+</MathJson>
 
 ### trigamma
 
@@ -1484,7 +1927,7 @@ Rounds a number towards zero (removes the fractional part), or with a step to th
 
 ### zeta
 
-MathJSON `Zeta` · `(complex | infinity, (complex | infinity)?) -> number`
+`(complex | infinity, (complex | infinity)?) -> number`
 
 Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ |n+a|^&#123;-s&#125; (a term with n+a = 0 omitted, except at s = 0, where ζ(0,a) = 1/2 - a), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum.
 
@@ -1492,6 +1935,12 @@ Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a rea
 [zeta(2), zeta(-1), N(zeta(3))]
 // ➔ [1/6 * pi^2,-1/12,1.2020569031595942854]
 ```
+
+<MathJson name="Zeta">
+
+LaTeX: `\Zeta`
+
+</MathJson>
 
 ### e
 

@@ -16,6 +16,7 @@ import Signature from "@site/src/components/Signature";
 import Intro from "@site/src/components/Intro";
 import EpsilPlayground from "@site/src/components/EpsilPlayground";
 import GraphPaperBanner from "@site/src/components/GraphPaperBanner";
+import MathJson from "@site/src/components/MathJson";
 
 export default {
   // Re-use the default mapping
@@ -33,4 +34,5 @@ export default {
   Signature,
   EpsilPlayground,
   GraphPaperBanner,
+  MathJson,
 };

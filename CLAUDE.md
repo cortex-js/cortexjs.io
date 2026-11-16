@@ -93,6 +93,15 @@ So is `docs/compute-engine/for-agents.md`, the Compute Engine card for AI
 agents (upstream `src/compute-engine/docs/for-agents.md`); it is published on
 epsil.dev only, and mathlive.io excludes it.
 
+The library reference pages (`docs/epsil/reference/<library>.md`) are
+generated upstream from the library definitions, which stay short because they
+ship in the engine bundle. Their long text is written here, in
+`reference-details/<library>.md`: one `## <MathJSON name>` section per entry,
+Epsil first, with the MathJSON part after a `### MathJSON` line. The sync
+splices each section after its entry and puts the MathJSON part, with the
+LaTeX commands, in a closed `<MathJson>` disclosure (a native `<details>`, so
+find-in-page opens it). The Compute Engine team edits these files here.
+
 The sync copies subdirectories too (`reference/` holds one generated page per
 library of the standard library), but skips `*.intro.md`: those are fragments
 the upstream generator already merges into the page of the same name. The

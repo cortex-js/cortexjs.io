@@ -1,0 +1,27 @@
+.mathjson {
+  margin: 0 0 var(--ifm-spacing-vertical);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+}
+
+.mathjson > summary {
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: var(--ifm-font-weight-semibold);
+  color: var(--ifm-color-emphasis-700);
+}
+
+.mathjson[open] > summary {
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.mathjson > summary:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.body {
+  padding: 0.75rem 0.75rem 0;
+}
