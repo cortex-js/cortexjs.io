@@ -104,6 +104,29 @@ link, a meta refresh and a `location.replace`. Because they are stubs and not
 routes, the Epsil pages must stay out of the mathlive.io build (`docs.exclude`)
 — otherwise client-side navigation would render them and never redirect.
 
+### Search on epsil.dev
+
+`plugins/epsil-search/` replaces the search box of epsil.dev only (mathlive.io
+keeps Algolia). Its `postBuild` writes two things into `build-epsil/`. The
+dev server serves them from the last `npm run stage:epsil`, so its results
+are those of that build, and it has no search until one exists:
+
+- `search/symbols.json`: the library definitions, from
+  `config/epsil-search-symbols.json` (**generated** upstream by
+  `scripts/build-search-symbols.ts` in compute-engine, copied by
+  `npm run sync:epsil`), and the operators and keywords of
+  `config/search-aliases.json`, maintained here. The box shows these first.
+  A broken alias URL fails the build; a broken library URL is dropped with a
+  warning.
+- `pagefind/`: a Pagefind index with one record per section (a heading with
+  an id, or a `FunctionDefinition`), because ranking whole pages finds the
+  right page but the wrong part of it.
+
+To try a change without the full build, run
+`node plugins/epsil-search/build-index.mjs build-epsil` on an existing build
+and serve `build-epsil/`. A query that lands in the wrong place is usually
+fixed with an alias, or with `keywords` on the definition upstream.
+
 The knowledge-base bundles (`kb-epsil.md`, `kb-cortex.md`, `llms-epsil.txt`,
 `llms-cortex.txt`) are still published on mathlive.io, copied from
 `build-epsil/llms-full.txt`: an agent fetching one wants text, not a redirect.
@@ -127,6 +150,8 @@ The knowledge-base bundles (`kb-epsil.md`, `kb-cortex.md`, `llms-epsil.txt`,
 - `static/` - Assets shared by both sites; `static-epsil/` adds the Cloudflare
   Pages `_headers`/`_redirects` for epsil.dev
 - `config/epsil-redirects.json` - **Generated** old-URL → epsil.dev route table
+- `config/epsil-search-symbols.json` - **Generated** symbol table of the epsil.dev search
+- `config/search-aliases.json` - Operators and keywords of the epsil.dev search (hand-maintained)
 - `build/` - mathlive.io output, plus knowledge base files
 - `build-epsil/` - epsil.dev output
 - `scripts/` - Build automation scripts

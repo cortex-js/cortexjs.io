@@ -197,6 +197,30 @@ async function listMarkdown(dir, prefix = "") {
 // no frontmatter the URL would be one nobody chose.
 const isPage = (name) => !name.endsWith(".intro.md");
 
+// The symbol table of the site search: one record per library definition,
+// written upstream by `scripts/build-search-symbols.ts` with `/epsil/`-rooted
+// URLs, rewritten here like every other link. `scripts/build-search.mjs` reads
+// it after the build. A checkout of compute-engine from before the file
+// existed only loses the symbol results, so a missing file is a warning.
+const SEARCH_SYMBOLS_SOURCE = path.join(SOURCE_DIR, "search-symbols.json");
+const SEARCH_SYMBOLS_FILE = path.join(ROOT, "config", "epsil-search-symbols.json");
+
+async function syncSearchSymbols(unknown) {
+  let symbols;
+  try {
+    symbols = JSON.parse(await fs.readFile(SEARCH_SYMBOLS_SOURCE, "utf8"));
+  } catch (error) {
+    console.warn(
+      `[sync-epsil-docs] No search symbols (${error.code ?? error.message}): run ` +
+        `\`npm run doc\` in ../compute-engine. The search will have no symbol results.`
+    );
+    return;
+  }
+  for (const symbol of symbols)
+    symbol.url = rewriteUrl(symbol.url, (url) => unknown.add(`search-symbols.json: ${url}`));
+  await fs.writeFile(SEARCH_SYMBOLS_FILE, JSON.stringify(symbols) + "\n", "utf8");
+}
+
 async function main() {
   let sources;
   try {
@@ -266,6 +290,8 @@ async function main() {
     ) + "\n",
     "utf8"
   );
+
+  await syncSearchSymbols(unknown);
 
   await checkSidebarCoverage(sources.map((name) => name.replace(/\.md$/, "")));
 
