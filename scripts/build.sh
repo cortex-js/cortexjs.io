@@ -104,7 +104,10 @@ echo -e "$BASENAME$CHECK Docusaurus built"
 # scripts/deploy-epsil.sh, independently of the mathlive.io submodule.
 #
 echo -e "$BASENAME$DOT Building epsil.dev"
-npx docusaurus build --config docusaurus.epsil.config.ts --out-dir build-epsil
+# epsil.dev gets its own generated-files directory: with the default
+# `.docusaurus/` shared by both configs, a dev server of one site picks up the
+# routes the other writes there and compiles the wrong docs.
+DOCUSAURUS_GENERATED_FILES_DIR_NAME=.docusaurus-epsil npx docusaurus build --config docusaurus.epsil.config.ts --out-dir build-epsil
 # `static/CNAME` names mathlive.io for GitHub Pages. It is copied along with the
 # rest of static/, and means nothing to Cloudflare Pages, but shipping another
 # site's domain in this one's root is only confusing.

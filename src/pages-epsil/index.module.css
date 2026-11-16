@@ -1,7 +1,12 @@
 /* Landing page for epsil.dev. Built on Infima's own custom properties so it
    tracks the shared theme in `src/css/` rather than hardcoding a palette. */
 
+/* `width: 100%`: the parent is a column flexbox, and an item with auto side
+   margins is not stretched but sized to its content — at phone width the
+   widest code sample made the whole page 681px wide in a 390px window. */
 .main {
+  width: 100%;
+  box-sizing: border-box;
   max-width: 60rem;
   margin: 0 auto;
   padding: 0 1.5rem 6rem;

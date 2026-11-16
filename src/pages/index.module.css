@@ -321,3 +321,10 @@ body {
 .fadeOut {
   z-index: 1;
 }
+
+/* The container has no side padding at phone width: keep a 16px gutter
+   around the Graph Paper card, and center it once there is room. */
+.graphPaper {
+  margin-left: max(16px, (100% - 560px) / 2);
+  margin-right: max(16px, (100% - 560px) / 2);
+}

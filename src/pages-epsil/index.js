@@ -10,6 +10,7 @@ import Heading from "@theme/Heading";
 import CodeBlock from "@theme/CodeBlock";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import EpsilPlayground from "@site/src/components/EpsilPlayground";
+import GraphPaperBanner from "@site/src/components/GraphPaperBanner";
 import styles from "./index.module.css";
 
 // Runs on mount (EpsilPlayground autoruns), so it has to evaluate cleanly on
@@ -192,6 +193,8 @@ export default function Home() {
             />
           </div>
         </header>
+
+        <GraphPaperBanner />
 
         <section className={styles.playground} aria-label="Try Epsil">
           <h2 className={styles.sectionTitle}>Try it</h2>

@@ -15,6 +15,7 @@ import Signature from "@site/src/components/Signature";
 
 import Intro from "@site/src/components/Intro";
 import EpsilPlayground from "@site/src/components/EpsilPlayground";
+import GraphPaperBanner from "@site/src/components/GraphPaperBanner";
 
 export default {
   // Re-use the default mapping
@@ -31,4 +32,5 @@ export default {
   FunctionDefinition,
   Signature,
   EpsilPlayground,
+  GraphPaperBanner,
 };

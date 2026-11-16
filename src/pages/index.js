@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
 import Heading from "@theme/Heading";
+import GraphPaperBanner from "@site/src/components/GraphPaperBanner";
 import styles from "./index.module.css";
 
 function HomepageHeader() {
@@ -90,6 +91,8 @@ function HomepageHeader() {
         </a>
 
       </div>
+
+      <GraphPaperBanner className={styles.graphPaper} />
 
       {/* <div className={styles.posterContainer}>
         <img

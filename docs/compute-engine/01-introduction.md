@@ -17,6 +17,8 @@ A JavaScript library for symbolic computing and numeric evaluation of
 mathematical expressions.
 </Intro>
 
+<GraphPaperBanner />
+
 
 <div style={{height:"1rem"}}></div>
 

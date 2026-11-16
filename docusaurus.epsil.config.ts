@@ -78,6 +78,24 @@ const STRUCTURED_DATA = {
   ],
 };
 
+// Docusaurus names its webpack cache `<client|server>-<mode>-<locale>`
+// (node_modules/.cache/webpack/), with nothing that depends on the config, so
+// this site and mathlive.io would share one cache. A dev server of one site
+// then restores modules of the other and compiles mathlive.io's docs with
+// this site's remark plugins, which fails. Give this site a cache of its own.
+// `DOCUSAURUS_GENERATED_FILES_DIR_NAME=.docusaurus-epsil`, set by every
+// command that runs this config, does the same for the generated files.
+function separateWebpackCache() {
+  return {
+    name: 'epsil-webpack-cache',
+    configureWebpack(webpackConfig) {
+      const cache = webpackConfig.cache;
+      if (!cache || typeof cache !== 'object' || !('name' in cache)) return {};
+      return { cache: { ...cache, name: `epsil-${cache.name}` } };
+    },
+  };
+}
+
 /** @type {import('@docusaurus/types').Config} */
 const config: Config = {
   title: 'Epsil',
@@ -211,6 +229,7 @@ const config: Config = {
   clientModules: ['./modules/route-update.js'],
 
   plugins: [
+    separateWebpackCache,
     loadScripts,
     [
       llmsTxt,

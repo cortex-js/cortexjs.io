@@ -7,6 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Development
 - `npm start` - Start local development server for mathlive.io (Docusaurus dev mode)
 - `npm run start:epsil` - Start local dev server for epsil.dev (port 3001)
+- The two dev servers can run at the same time. epsil.dev keeps its generated
+  files in `.docusaurus-epsil/` and its webpack cache under an `epsil-` name
+  (`separateWebpackCache` in `docusaurus.epsil.config.ts`); with the defaults
+  shared, one site's server compiles the other site's docs and fails. A new
+  command that runs the epsil config sets
+  `DOCUSAURUS_GENERATED_FILES_DIR_NAME=.docusaurus-epsil`, as `start:epsil`,
+  `stage:epsil` and `scripts/build.sh` do.
 - `npm run build` - Build **both** sites (runs `bash scripts/build.sh`)
 - `npm run serve` - Serve the built site locally
 
