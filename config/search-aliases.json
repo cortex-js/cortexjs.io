@@ -26,6 +26,7 @@
     { "terms": ["type alias", "alias"], "title": "type alias", "summary": "A new name for an existing type.", "url": "/types/#type-alias" },
     { "terms": ["nominal type", "newtype"], "title": "Nominal types", "summary": "A type distinct from its representation.", "url": "/types/#nominal-type" },
     { "terms": ["generic", "generics"], "title": "Generic functions", "summary": "Functions with type parameters.", "url": "/types/#generic-functions" },
+    { "terms": ["trig", "trigonometry", "trigonometric"], "title": "Trigonometry", "summary": "The trigonometric functions and their inverses.", "url": "/reference/trigonometry/" },
     { "terms": ["$", "latex island", "latex"], "title": "$…$ LaTeX islands", "summary": "LaTeX inside Epsil source: $\\frac{1}{n}$.", "url": "/literals/#latex-islands" },
     { "terms": ["string interpolation", "interpolated string"], "title": "Interpolated strings", "summary": "Strings with embedded expressions.", "url": "/literals/#interpolated-strings" },
     { "terms": ["comment", "comments", "//"], "title": "Comments", "summary": "Line, block and documentation comments.", "url": "/comments/" },

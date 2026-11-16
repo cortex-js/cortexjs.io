@@ -47,8 +47,14 @@ export function prepareSymbols(data) {
  * The entries to show before the full-text results:
  * [{ kind: 'alias' | 'symbol', title, subtitle, summary, url }].
  */
+// A name written as a call or a method, as people paste it from code:
+// `.solve()`, `solve(`, `ce.parse`, `sin(x)`. Gives the bare name.
+const CALL = /^(?:ce\.|\.)?([A-Za-z_]\w*)\s*(?:\(.*)?$/s;
+
 export function rankSymbols(data, query, limit = 4) {
-  const phrase = normalize(query);
+  const trimmed = query.trim();
+  const call = /[(.]/.test(trimmed) ? CALL.exec(trimmed) : null;
+  const phrase = normalize(call ? call[1] : query);
   if (!phrase) return [];
   const tokens = [...new Set(phrase.split(' '))];
   const probes = [...new Set([...tokens, ...(tokens.length > 1 ? [phrase] : [])])];
