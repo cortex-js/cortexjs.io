@@ -5,194 +5,23 @@ date: Last Modified
 description: "Trigonometry in the Compute Engine: the Pi and Degrees constants, trigonometric and hyperbolic functions, and the principal values their inverses return."
 ---
 
-## Constants
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/trigonometry.md. This stub keeps the old anchors and
+sends each one to its new place: see reference-details/README.md.
+-->
 
-<div className="symbols-table first-column-header">
-
-| Symbol    | Value                                                         |
-| :-------- | :------------------------------------------------------------ |
-| `Degrees` | $$ \frac{\pi}{180} = 0.017453292519943295769236907\ldots $$ |
-| `Pi`      | $$ \pi \approx 3.14159265358979323\ldots $$                 |
-
-</div>
-
-With `expr.N()`, inverse trigonometric and inverse hyperbolic functions return
-their complex principal value when no real value exists. Complex arguments are
-also supported:
-
-```js
-ce.parse("\\arcsin(2)").N();
-// ➔ 1.571 − 1.317i
-
-ce.parse("\\operatorname{arcosh}(0.5)").N();
-// ➔ 1.047i
-
-ce.parse("\\operatorname{arsinh}(1+i)").N();
-```
-
-Exact arguments remain symbolic with `evaluate()` unless an exact value is
-known. A hyperbolic function of `Ln(q)` is a rational function of `q`:
-`Cosh(Ln(2))` evaluates to `5/4`.
-
-A function of its own inverse is its argument: `Sin(Arcsin(x))` evaluates to
-`x`, for each circular and hyperbolic function. An inverse of its own function
-gives the principal value for an exact real argument: `Arcsin(Sin(3))`
-evaluates to `π - 3`; `Arcsin(Sin(x))` stays, as it is not `x` outside
-$[-\pi/2, \pi/2]$. `simplify()` also rewrites `Cos(Arcsin(x))` as
-`√(1 - x²)`, `Arccos(-x)` as `π - Arccos(x)` and `Arccot(-x)` as
-`π - Arccot(x)`.
-
-`Arccot` takes its values in $(0, \pi)$ on the real line: `Arccot(-1)` is
-$\frac{3\pi}{4}$ and `Arccot(0)` is $\frac{\pi}{2}$. For a complex argument,
-$\operatorname{Arccot}(z) = \frac{\pi}{2} - \operatorname{Arctan}(z)$. It is
-continuous across the real line (`N(Arccot(-3 + 10^{-12}i))` is
-`2.819842099193151 - 10^{-13}i`, next to `N(Arccot(-3))`), and its branch
-cuts are those of `Arctan`: the imaginary axis above $i$ and below $-i$. On
-the cut, `Arccot(2i)` is $-0.549i$ and `Arccot(-2i)` is $\pi + 0.549i$. Some
-systems (Mathematica, mpmath) use $\operatorname{Arctan}(1/z)$ instead, an odd
-function that differs from this one by $\pi$ when $\operatorname{Re} z < 0$.
-
-## Trigonometric Functions
-
-<div className='equal-width-columns'>
-
-| Function | Inverse                                                                                                   | Hyperbolic | Area Hyperbolic |
-| :------- | :-------------------------------------------------------------------------------------------------------- | :--------- | :-------------- |
-| `Sin`    | `Arcsin`                                                                                                  | `Sinh`     | `Arsinh`        |
-| `Cos`    | `Arccos`                                                                                                  | `Cosh`     | `Arcosh`        |
-| `Tan`    | [`Arctan`](https://www.wikidata.org/wiki/Q2257242)<br/> [`Arctan2`](https://www.wikidata.org/wiki/Q776598) | `Tanh`     | `Artanh`        |
-| `Cot`    | `Arccot`                                                                                                  | `Coth`     | `Arcoth`        |
-| `Sec`    | `Arcsec`                                                                                                  | `Sech`     | `Arsech`        |
-| `Csc`    | `Arccsc`                                                                                                  | `Csch`     | `Arcsch`        |
-
-</div>
-
-<div className="symbols-table first-column-header" style={{"--first-col-width":"20ch"}}>
-
-| Function               |                                                                                                                                                                                                                                                                                                                                                                                     |
-| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FromPolarCoordinates` | Converts $$ (\operatorname{radius}, \operatorname{angle}) \longrightarrow (x, y)$$                                                                                                                                                                                                                                                                                                |
-| `ToPolarCoordinates`   | Converts $$(x, y) \longrightarrow (\operatorname{radius}, \operatorname{angle})$$                                                                                                                                                                                                                                                                                                 |
-| `Hypot`                | $$\operatorname{Hypot}(x,y) = \sqrt{x^2+y^2}$$                                                                                                                                                                                                                                                                                                   |
-| `Haversine`            | $$ \operatorname{Haversine}(z) = \sin(\frac{z}{2})^2 $$ <br/>The [Haversine function](https://www.wikidata.org/wiki/Q2528380) was important in navigation because it appears in the haversine formula, which is used to reasonably accurately compute distances on an astronomic spheroid given angular positions (e.g., longitude and latitude). |
-| `InverseHaversine`     | $$\operatorname{InverseHaversine}(z) = 2 \operatorname{Arcsin}(\sqrt{z})$$                                                                                                                                                                                                                                                                       |
-
-</div>
-
-## Cardinal Sine and Fresnel Functions
-
-<div className="symbols-table first-column-header" style={{"--first-col-width":"20ch"}}>
-
-| Function               |                                                                                                                                                                                                                                                                                                                                                                                     |
-| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Sinc`                 | $$\operatorname{sinc}(x) = \frac{\sin x}{x}$$ with $$\operatorname{sinc}(0) = 1$$. The unnormalized [cardinal sine](https://en.wikipedia.org/wiki/Sinc_function) function. |
-| `FresnelS`             | $$S(x) = \int_0^x \sin\!\left(\tfrac{\pi t^2}{2}\right) dt$$ The [Fresnel S integral](https://en.wikipedia.org/wiki/Fresnel_integral). Odd function with $$S(\infty) = \tfrac{1}{2}$$. |
-| `FresnelC`             | $$C(x) = \int_0^x \cos\!\left(\tfrac{\pi t^2}{2}\right) dt$$ The [Fresnel C integral](https://en.wikipedia.org/wiki/Fresnel_integral). Odd function with $$C(\infty) = \tfrac{1}{2}$$. |
-
-</div>
-
-## Trigonometric Transformations
-
-`TrigExpand`, `TrigToExp` and `TrigReduce` are transformation verbs for
-trigonometric and hyperbolic expressions, in the spirit of `Expand` and
-`Factor` for polynomials. They preserve **exactness**: an exact input produces
-an exact result, and no numeric approximation is introduced unless you request
-one with `.N()`.
-
-<nav className="hidden">
-### TrigExpand
-</nav>
-
-<FunctionDefinition name="TrigExpand">
-<Signature name="TrigExpand" returns="value">expr: value</Signature>
-Expands trigonometric and hyperbolic functions of **sums** and **integer
-multiples** of angles into products and powers of functions of the individual
-angles. This is the trigonometric analog of `Expand`.
-
-Hyperbolic functions are expanded with their own addition formulas, and
-`Sec`, `Csc` and `Cot` are handled as reciprocals of the expanded `Cos`, `Sin`
-and `Tan`.
-
-```json
-["TrigExpand", ["Sin", ["Add", "a", "b"]]]
-// ➔ sin(a)cos(b) + cos(a)sin(b)
-
-["TrigExpand", ["Cos", ["Multiply", 2, "x"]]]
-// ➔ cos(x)^2 - sin(x)^2
-
-["TrigExpand", ["Sinh", ["Add", "a", "b"]]]
-// ➔ sinh(a)cosh(b) + cosh(a)sinh(b)
-```
-</FunctionDefinition>
-
-<nav className="hidden">
-### TrigReduce
-</nav>
-
-<FunctionDefinition name="TrigReduce">
-<Signature name="TrigReduce" returns="value">expr: value</Signature>
-Rewrites products and integer powers of trigonometric and hyperbolic functions
-as a linear combination of functions of **multiple angles**. This is the
-inverse of `TrigExpand`, and the trigonometric analog of `Factor`.
-
-```json
-["TrigReduce", ["Power", ["Sin", "x"], 2]]
-// ➔ (1 - cos(2x)) / 2
-
-["TrigReduce", ["Multiply", ["Sin", "x"], ["Cos", "x"]]]
-// ➔ sin(2x) / 2
-```
-</FunctionDefinition>
-
-<nav className="hidden">
-### TrigToExp
-</nav>
-
-<FunctionDefinition name="TrigToExp">
-<Signature name="TrigToExp" returns="value">expr: value</Signature>
-Rewrites trigonometric and hyperbolic functions in terms of the complex
-exponential $e^{ix}$, exactly. Useful for manipulating expressions
-algebraically or for exposing the underlying exponential structure.
-
-```json
-["TrigToExp", ["Sin", "x"]]
-// ➔ -(i/2) e^{ix} + (i/2) e^{-ix}
-
-["TrigToExp", ["Cos", "x"]]
-// ➔ (e^{ix} + e^{-ix}) / 2
-```
-</FunctionDefinition>
-
-## Trigonometric Simplification
-
-The `trigSimplify()` method applies the Fu algorithm to simplify trigonometric
-expressions. This systematic approach uses transformation rules to find simpler
-equivalent forms.
-
-```javascript
-const expr = ce.parse("\\sin^2(x) + \\cos^2(x)");
-expr.trigSimplify();  // Returns: 1
-
-const expr2 = ce.parse("2\\sin(x)\\cos(x)");
-expr2.trigSimplify(); // Returns: sin(2x)
-```
-
-Alternatively, use the `strategy` option with `simplify()`:
-
-```javascript
-expr.simplify({ strategy: 'fu' });
-```
-
-### Supported Identities
-
-The Fu algorithm recognizes and applies:
-
-- **Pythagorean identities**: `sin²(x) + cos²(x) = 1`, `1 + tan²(x) = sec²(x)`
-- **Reciprocal identities**: `sec(x) = 1/cos(x)`, `csc(x) = 1/sin(x)`
-- **Double angle formulas**: `sin(2x) = 2sin(x)cos(x)`, `cos(2x) = cos²(x) - sin²(x)`
-- **Product-to-sum**: `sin(x)cos(y) = ½[sin(x+y) + sin(x-y)]`
-- **Sum-to-product**: `sin(x) + sin(y) = 2sin((x+y)/2)cos((x-y)/2)`
-- **Morrie's law**: Products of cosines with doubled angles
-
-<ReadMore path="/compute-engine/guides/simplify/" > Read more about
-<strong>Simplification</strong> <Icon name="chevron-right-bold" /></ReadMore>
+<ReferenceMoved
+  to="/reference/trigonometry/"
+  names={[
+    "TrigExpand", "TrigReduce", "TrigToExp",
+  ]}
+  anchors={{
+    "constants": "/reference/trigonometry/#pi",
+    "trigonometric-functions": "/reference/trigonometry/#trigonometric-functions",
+    "cardinal-sine-and-fresnel-functions": "/reference/trigonometry/#sinc",
+    "trigonometric-transformations": "/reference/trigonometry/#trigonometric-transformations",
+    "trigonometric-simplification": "/reference/trigonometry/#trigonometric-simplification",
+    "supported-identities": "/reference/trigonometry/#supported-identities",
+  }}
+/>

@@ -99,7 +99,7 @@ type of a value with `is`:
 
 ```epsil
 [5 is integer, 1/2 is integer, 1/3 is rational, sqrt(2) is rational, sqrt(2) is real]
-// ➔ [True, False, True, False, True]
+// ➔ [true, false, true, false, true]
 ```
 
 The types `integer`, `rational`, `real` and `complex` hold **finite** values
@@ -107,7 +107,7 @@ only. An infinity is a `number`, but it is not a `real`:
 
 ```epsil
 [oo is real, oo is number]
-// ➔ [False, True]
+// ➔ [false, true]
 ```
 
 A complex number is written with the imaginary unit `i`. The square root of a
@@ -294,6 +294,25 @@ A constant is exact. `N` gives its numeric value:
 The constant `pi` and the trigonometric functions are in the
 [Trigonometry](/reference/trigonometry/) library.
 
+## Complex numbers
+
+The imaginary unit `i` (MathJSON `ImaginaryUnit`) is a solution of
+$x^2 + 1 = 0$. A complex number $z = a + bi$ has a real part `a` and an
+imaginary part `b`, which `real` and `imaginary` return. `abs` and
+`argument` give its polar form: the distance from the origin to the
+point that represents it in the complex plane, and the angle from the
+positive real axis to that point.
+
+```epsil
+[i^2, e^(i * pi)]
+// ➔ [-1,-1]
+let z = 3 + 4i
+real(z) + imaginary(z) * i
+// ➔ (3 + 4i)
+abs(1 + i) * e^(i * argument(1 + i))
+// ➔ (1 + i)
+```
+
 ## Definitions
 
 Each definition is listed under its Epsil spelling (the MathJSON name when
@@ -312,11 +331,41 @@ Absolute value (magnitude) of a number.
 // ➔ [3,5]
 ```
 
-<MathJson name="Abs" latex={["|"]} />
+The magnitude of a complex number is the distance from the origin to the
+point that represents it in the complex plane:
+
+$$
+|z| = \sqrt{(\Re z)^2 + (\Im z)^2}
+$$
+
+```epsil
+[abs(-3 + 4i), sqrt((-3)^2 + 4^2)]
+// ➔ [5,5]
+[abs(1 + i), abs(i), abs(oo)]
+// ➔ [sqrt(2),1,+oo]
+```
+
+`abs` of a list is the list of the magnitudes of its elements:
+
+```epsil
+abs([3, -4])
+// ➔ [3,4]
+```
+
+<MathJson name="Abs" latex={["|"]}>
+
+`["Abs", z]`. In LaTeX: `|z|` or `\operatorname{abs}(z)`.
+
+```json example
+["Abs", ["Complex", 3, 4]]
+// ➔ 5
+```
+
+</MathJson>
 
 ### absArg
 
-MathJSON `AbsArg` · `(complex | infinity) -> tuple<+oo | real, real>`
+`(complex | infinity) -> tuple<+oo | real, real>`
 
 Tuple of magnitude and argument of a complex number.
 
@@ -324,6 +373,35 @@ Tuple of magnitude and argument of a complex number.
 [absArg(1 + i), absArg(-2)]
 // ➔ [(sqrt(2), 1/4 * pi),(2, pi)]
 ```
+
+The tuple `(abs(z), argument(z))` is the polar representation of `z`. The
+argument is in the angular unit of the engine, as for `argument`.
+
+$$
+3 + 4i = 5 (\cos \theta + i \sin \theta) = 5 e^{i\theta},
+\quad \theta = \arctan \tfrac{4}{3} \approx 0.9273
+$$
+
+```epsil
+absArg(3 + 4i)
+// ➔ (5, arctan(4/3))
+N(absArg(3 + 4i))
+// ➔ (5, 0.927295218001612232427)
+let (r, t) = absArg(3 + 4i)
+r
+// ➔ 5
+```
+
+<MathJson name="AbsArg">
+
+`["AbsArg", z]` evaluates to a `Tuple`.
+
+```json example
+["AbsArg", ["Complex", 3, 4]]
+// ➔ ["Tuple", 5, ["Arctan", ["Rational", 4, 3]]]
+```
+
+</MathJson>
 
 ### Add
 
@@ -601,7 +679,38 @@ Complex argument (phase angle) of a number, in the engine's angular unit.
 // ➔ [1/4 * pi,pi]
 ```
 
-<MathJson name="Argument" latex={["\\arg"]} />
+The argument of a complex number is the angle between the positive real
+axis and the line from the origin to the point that represents it in the
+complex plane. It is `arctan2(imaginary(z), real(z))`, between `-pi` and
+`pi`, with `pi` included. An exact argument stays exact; `N` gives its
+numeric value.
+
+```epsil
+[argument(3 + 4i), N(argument(3 + 4i))]
+// ➔ [arctan(4/3),0.927295218001612232427]
+argument(3 + 4i) == arctan2(4, 3)
+// ➔ "True"
+[argument(-1), argument(-i), argument(-1 - i), argument(0)]
+// ➔ [pi,-1/2 * pi,-3/4 * pi,0]
+```
+
+The angle is in the angular unit of the engine, as the result of the
+inverse trigonometric functions is. The unit is radians unless the program
+that hosts the engine sets another one: see
+[Angular units](/compute-engine/guides/numeric-evaluation/#angular-units).
+
+<MathJson name="Argument" latex={["\\arg"]}>
+
+`["Argument", z]`, and its alias `["Arg", z]`. In LaTeX: `\arg(z)`.
+
+```json example
+["Argument", ["Complex", 3, 4]]
+// ➔ ["Arctan", ["Rational", 4, 3]]
+["N", ["Arg", ["Complex", 3, 4]]]
+// ➔ 0.927295218001612232427
+```
+
+</MathJson>
 
 ### besselI
 
@@ -989,7 +1098,7 @@ Complex infinity, a single unsigned infinity in the complex plane.
 
 ### complexRoots
 
-MathJSON `ComplexRoots` · `(complex, integer) -> list<number>`
+`(complex, integer) -> list<number>`
 
 All n-th complex roots of a number.
 
@@ -1003,6 +1112,47 @@ complexRoots(8, 3)
 // ➔ [2,-1 + sqrt(3)i,-1 - sqrt(3)i]
 ```
 
+The `n` roots of `z` are the `n` solutions `w` of $w^n = z$. The first one
+is the principal root, and the others follow it counterclockwise around
+the origin. The roots of unity, `complexRoots(1, n)`, are the vertices of
+a regular polygon with `n` sides.
+
+```epsil
+complexRoots(1, 3)
+// ➔ [1,-1/2 + sqrt(3)/2i,-1/2 - sqrt(3)/2i]
+[complexRoots(16, 4), complexRoots(-4, 2)]
+// ➔ [[2,2i,-2,-2i],[2i,-2i]]
+complexRoots(-8, 3)
+// ➔ [1 + sqrt(3)i,-2,1 - sqrt(3)i]
+```
+
+`n` must be a positive integer. When `z` is a complex number that is not
+real, the roots are floating-point numbers. A symbolic `z` stays
+unevaluated.
+
+```epsil
+complexRoots(1, 0)
+// ➔ error: Runtime error: evaluation error: the arguments do not satisfy the precondition of ComplexRoots
+complexRoots(i, 2)
+// ➔ [(0.7071067811865476 + 0.7071067811865475i),(-0.7071067811865477 - 0.7071067811865475i)]
+complexRoots(x, 2)
+// ➔ ComplexRoots(x, 2)
+```
+
+See also: [n-th root](https://en.wikipedia.org/wiki/Nth_root),
+[Root of unity](https://en.wikipedia.org/wiki/Root_of_unity),
+[n-th root (MathWorld)](http://mathworld.wolfram.com/nthRoot.html).
+
+<MathJson name="ComplexRoots">
+
+`["ComplexRoots", z, n]`. In LaTeX: `\operatorname{ComplexRoots}(z, n)`.
+
+```json example
+["ComplexRoots", 1, 3]
+```
+
+</MathJson>
+
 ### conjugate
 
 `(T) -> T where T: number`
@@ -1014,7 +1164,39 @@ conjugate(3 + 4i)
 // ➔ (3 - 4i)
 ```
 
-<MathJson name="Conjugate" latex={["\\overline"]} />
+The conjugate of a complex number is its mirror image across the real
+axis:
+
+$$
+\overline{z} = \Re z - i \Im z
+$$
+
+The product of a number and its conjugate is the square of its magnitude,
+and the conjugate of a product is the product of the conjugates:
+
+```epsil
+[conjugate(3 + 4i), conjugate(5), conjugate(2i)]
+// ➔ [(3 - 4i),5,-2i]
+let z = 3 + 4i
+z * conjugate(z) == abs(z)^2
+// ➔ "True"
+conjugate((1 + 2i) * (3 - i))
+// ➔ (5 - 5i)
+conjugate(1 + 2i) * conjugate(3 - i)
+// ➔ (5 - 5i)
+```
+
+<MathJson name="Conjugate" latex={["\\overline"]}>
+
+`["Conjugate", z]`. In LaTeX: `\overline{z}`. `z^\ast` is read as
+`ConjugateTranspose`, which is the conjugate for a number.
+
+```json example
+["Conjugate", ["Complex", 3, 4]]
+// ➔ ["Complex", 3, -4]
+```
+
+</MathJson>
 
 ### ContinuationPlaceholder
 
@@ -1067,7 +1249,7 @@ Digamma function, the logarithmic derivative of the gamma function
 
 ```epsil
 [digamma(1), N(digamma(1))]
-// ➔ [-"EulerGamma",-0.577215664901532860607]
+// ➔ [-eulerGamma,-0.577215664901532860607]
 ```
 
 ### dirichletBeta
@@ -1680,7 +1862,27 @@ imaginary(3 + 4i)
 // ➔ 4
 ```
 
-<MathJson name="Imaginary" latex={["\\Im"]} />
+The imaginary part of a real number is 0.
+
+```epsil
+[imaginary(3 + 4i), imaginary(pi), imaginary(sqrt(-4))]
+// ➔ [4,0,2]
+imaginary(e^(i * pi / 3))
+// ➔ sqrt(3)/2
+```
+
+<MathJson name="Imaginary" latex={["\\Im"]}>
+
+`["Imaginary", z]`. In LaTeX: `\Im(z)`.
+
+```json example
+["Imaginary", ["Complex", 3, 4]]
+// ➔ 4
+["Imaginary", "Pi"]
+// ➔ 0
+```
+
+</MathJson>
 
 ### imaginaryUnit
 
@@ -1777,7 +1979,7 @@ MathJSON `IsComposite` · `(number) -> boolean`
 
 ```epsil
 [isComposite(21), isComposite(7)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 ### isEven
@@ -1788,7 +1990,7 @@ MathJSON `IsEven` · `(number) -> boolean`
 
 ```epsil
 [isEven(7), isEven(8)]
-// ➔ ["False","True"]
+// ➔ [false,true]
 ```
 
 ### isOdd
@@ -1799,7 +2001,7 @@ MathJSON `IsOdd` · `(number) -> boolean`
 
 ```epsil
 [isOdd(7), isOdd(8)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 ### isPrime
@@ -1810,7 +2012,7 @@ MathJSON `IsPrime` · `(number) -> boolean`
 
 ```epsil
 [isPrime(17), isPrime(21)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 ### lcm
@@ -2242,7 +2444,7 @@ Negative infinity (−∞).
 
 ```epsil
 [negativeInfinity - 1, negativeInfinity < -10^100]
-// ➔ [-oo,"True"]
+// ➔ [-oo,true]
 ```
 
 ### numerator
@@ -2342,7 +2544,7 @@ Positive infinity (+∞).
 
 ```epsil
 [positiveInfinity + 1, positiveInfinity > 10^100]
-// ➔ [+oo,"True"]
+// ➔ [+oo,true]
 ```
 
 ### Power
@@ -2600,7 +2802,26 @@ real(3 + 4i)
 // ➔ 3
 ```
 
-<MathJson name="Real" latex={["\\Re"]} />
+A real number is its own real part. The real part of a symbol of unknown
+type stays unevaluated.
+
+```epsil
+[real(3 + 4i), real(pi), real(2i), real(x)]
+// ➔ [3,pi,0,Real(x)]
+real(e^(i * pi / 3))
+// ➔ 1/2
+```
+
+<MathJson name="Real" latex={["\\Re"]}>
+
+`["Real", z]`. In LaTeX: `\Re(z)`.
+
+```json example
+["Real", ["Complex", 3, 4]]
+// ➔ 3
+```
+
+</MathJson>
 
 ### remainder
 

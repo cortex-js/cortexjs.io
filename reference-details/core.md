@@ -48,6 +48,248 @@ was excluded, and a range includes both ends. The rows hold only in the
 stated cases. Rewrite the other old calls (`n ≤ 0`, `m ≥ n`) by hand, because
 a range with reversed bounds is a descending range, not an empty one.
 
+## Section: Functions
+
+A function is a value: it can be an argument of a function, the result of a
+function, or the value of a variable. Its type is a function signature, such
+as `(real, integer) -> boolean`.
+
+### Function literals
+
+A **function literal** is written with `=>`: `x => 2 * x`,
+`(x, y) => 2 * x + y`. Its parameters can have a type, a default value, a
+rest parameter or a tuple pattern: see
+[Anonymous functions](/operators/#anonymous-functions) and
+[Functions](/control-flow/#functions). The body can be a `do` block, with
+locals, loops and conditionals.
+
+```epsil
+function clamp(x, lo, hi) { min(max(x, lo), hi) }
+[clamp(5, 0, 3), clamp(-1, 0, 3)]
+// ➔ [3,0]
+```
+
+Compiled code calls a function only when it can see the function where the
+call is written (see
+[Function values](/compute-engine/guides/compiling/#function-values)).
+
+### Shorthand function literals
+
+A **shorthand function literal** is an expression whose parameters are not
+listed. They are its wildcards, `_`, `_2`, …, or, when it has none, its
+unknowns: the symbols that have no value.
+
+```epsil
+[apply(_ * _, 3), apply(_ + _2, 1, 2), apply(x * y, 2, 3)]
+// ➔ [9,3,6]
+```
+
+When an unknown is the parameter, make sure that the symbol has no value in
+the current scope. An expression with no wildcard and no unknown is a
+constant function:
+
+```epsil
+apply(3, 5)
+// ➔ 3
+```
+
+The unknowns of an expression become its parameters only when the
+expression is known not to be a function. An expression whose type is
+`unknown`, such as a call of a function with no definition, is kept as a
+function value, and is applied once its value is known. Here `g(f)` is not
+read as the function `f => g(f)`, because `g(f)` may itself be a function:
+
+```epsil
+apply(g(f), x)
+// ➔ Apply(g(f), x)
+let g = (a, b) => a + b
+apply(g(f), x)
+// ➔ f + x
+```
+
+Once `g` has a value, `g(f)` is `g` applied to its first argument, a
+function of one argument. To apply a function whose result type is not
+known as a shorthand, use a wildcard: `map(f(_), xs)` maps `f` over `xs`
+whether or not `f` is defined.
+
+The name of a library function is also a function value:
+
+```epsil
+[map(sin, [0, pi]), apply(max, 2, 3)]
+// ➔ [[0,0],3]
+```
+
+### Anonymous functions
+
+A function that is not bound to a name is an **anonymous function**. It is
+often the argument of another function: `map(x => 2 * x, xs)`, or with a
+wildcard, `map(_ * 2, xs)`. See
+[Anonymous functions](/control-flow/#anonymous-functions).
+
+### Evaluating a function literal
+
+A function literal is applied by a call, or by [`apply`](#apply):
+
+```epsil
+[(x => x + 2)(11), apply(_ + 2, 4)]
+// ➔ [13,6]
+```
+
+### Closures
+
+A **closure** is a function literal that reads a variable of the scope
+where it is defined. It captures the **binding** of the variable, not its
+value at that time: when the function is applied, it reads the value that
+the binding holds then, so an assignment made after the definition is
+visible to the function.
+
+```epsil
+let a = 10
+let f = (x) => a + x
+a = 20
+f(1)
+// ➔ 21
+```
+
+A variable of the same name declared in **another** scope is another
+binding, which the function does not read. Here the function captured the
+inner `a`:
+
+```epsil
+let f = do { let a = 10; (x) => a + x }
+let a = 100
+f(1)
+// ➔ 11
+```
+
+The same rule applies to a function called in the body: a call reads the
+function that its name denotes where the call is written (see
+[Scoping](/declarations/#scoping)).
+
+### Broadcasting over collections
+
+When a function whose parameters have scalar types is applied to a finite
+list or range, the call is **broadcast**: the function is applied to each
+element, and the result is a list. A function with several parameters is
+applied element by element (zip semantics), and a scalar argument is
+repeated for each element.
+
+```epsil
+f(x) = x^2 + 1
+[f([1, 2, 3]), f(1..3)]
+// ➔ [[2,5,10],[2,5,10]]
+h(x, y) = x + y
+[h([1, 2, 3], 10), h([1, 2, 3], [10, 20, 30])]
+// ➔ [[11,12,13],[11,22,33]]
+```
+
+Broadcasting is decided by the **evaluated** argument, not by its written
+form: an argument that evaluates to a list, such as a call of a function
+that returns a list, broadcasts too.
+
+```epsil
+lst(n) = [n, -n]
+k(x) = 1 if x > 0 else -1
+k(lst(3))
+// ➔ [1,-1]
+```
+
+The type of an application follows the same rule: applied to a list, the
+result is a list of the result type; applied to an argument that may be a
+list, such as a call whose result type is not known, it is
+`broadcastable<R>`. For a function literal, `R` is the type of the body,
+with each parameter typed as the element that the call maps over:
+
+```epsil
+f(x, y, z) = (-y, z, x)
+type(f([1, 2], [3, 4], [5, 6]))
+// ➔ TypeFrom("list<tuple<integer, integer, integer>>")
+```
+
+For a function with a declared signature, `R` is the declared result type.
+
+### Tuple arguments
+
+A function whose parameter has a **scalar** type (a number type or
+`boolean`) is also applied to each component of a tuple argument, as
+`sin((a, b))` is `(sin(a), sin(b))`. The result is a tuple, with one
+component type for each component. A component that does not have the
+parameter type is an error in its own component.
+
+```epsil
+g(u: real) = 2 * u
+[g((a, b)), g([(1, 2), (3, 4)])]
+// ➔ [(2a, 2b),[(2, 4),(6, 8)]]
+```
+
+A list of tuples is mapped over the list, then over each tuple. A parameter
+with no type, or of type `string`, takes the tuple whole:
+
+```epsil
+((u) => 7)((a, b))
+// ➔ 7
+```
+
+Compiled code gives the same tuple: an array on the `javascript` target,
+and a `vecN` on the GLSL target.
+
+### Opting out
+
+To write a function that takes a list whole instead of each element,
+declare the type of its parameter as `list<…>` or another collection type:
+
+```epsil
+len(L: list<number>) = length(L)
+len([1, 2, 3])
+// ➔ 3
+```
+
+The parameter of a function literal with no type annotation has the type
+`unknown`, which is read as a scalar, so the function broadcasts unless its
+body shows that the parameter is a collection.
+
+The body shows it when it passes the parameter to an operator that takes a
+whole collection: `mean`, `median`, `variance`, `standardDeviation`,
+`mode`, `quartiles`, `max`, `min`, `sum`, `product`, `gcd`, `lcm`,
+`flatten`, `listFrom`, `setFrom` or `tupleFrom`. A list argument then binds
+whole. The parameter is followed through element-wise operators
+(`mean(v^2)`, `sin(v)`), and through a call of another function whose
+parameter binds whole, also a function assigned to a local of the body. A
+scalar argument gives the scalar result.
+
+```epsil
+h(v) = mean(v^2)
+[h([1, 2, 3]), h(2)]
+// ➔ [14/3,4]
+[((v) => sum(v^2))([1, 2, 3]), ((v) => max(v))([1, 2, 3])]
+// ➔ [14,3]
+function w(v) { let m = (t) => mean(t); m(v) }
+w([1, 2, 3])
+// ➔ 2
+```
+
+Only a use of the parameter itself counts. A local assigned from the
+parameter is not followed, and the function is applied to each element:
+
+```epsil
+function w(v) { let u = v; mean(u) }
+w([1, 2, 3])
+// ➔ [1,2,3]
+```
+
+Declare the parameter as a collection to take the list whole. Compiled
+JavaScript follows the same rule.
+
+A function that passes a collection to itself at the position of a
+parameter also takes that parameter whole, and the parameter is inferred as
+`list<any>`:
+
+```epsil
+f(n, s) = s if n == 0 else f(n - 1, [1, 2])
+f(1, [0])
+// ➔ [1,2]
+```
+
 ## WithRandomSeed
 
 The seed must be a finite real number or a string. An infinite or undefined
@@ -319,6 +561,17 @@ x = 2.5
 // ➔ error: Static error: `x` has the type `integer`, and the value has the type `2.5` in `x := 2.5`
 ```
 
+A function is assigned like any other value, `let double = x => 2 * x`, or
+defined with `double(x) = 2 * x` (see
+[Functions](/control-flow/#functions)). An assignment is not pure: it
+changes the state of the engine.
+
+```epsil
+let double = x => 2 * x
+double(4)
+// ➔ 8
+```
+
 ### MathJSON
 
 `["Assign", symbol, value]`. A symbol with no value stays symbolic in the
@@ -340,6 +593,14 @@ is the error `assignment-in-operand`. A block whose last statement is an
 // ➔ an assignment-to-undeclared-variable error
 ["Block", ["Declare", "x", "'unknown'", 5], "x"]
 // ➔ 5
+```
+
+The value can be a function literal or a shorthand function literal. In
+LaTeX, `\operatorname{double}(x) \coloneq 2x` and
+`\operatorname{double} \coloneq x \mapsto 2x` are both:
+
+```json example
+["Assign", "double", ["Function", ["Multiply", "x", 2], "x"]]
 ```
 
 ## Assume
@@ -2703,3 +2964,327 @@ The first assignment of a name is its declaration, with a value. A `where`
 clause gives bindings to an expression:
 `x^2 + y^2 \keyword{where} x \coloneq 3,\; y \coloneq 4` parses to a `Block` that declares `x` and `y`
 and ends with `["Add", ["Power", "x", 2], ["Power", "y", 2]]`.
+
+## Function
+
+#### Typed parameters
+
+A parameter with a type makes the literal a function with a named
+signature, and the arguments are checked against the types when the
+function is applied.
+
+```epsil
+type((x: integer) => x + 1)
+// ➔ TypeFrom("(x: integer) -> integer")
+((x: integer) => x + 1)(2.5)
+// ➔ error: Type error: expected `integer`, got `2.5` at `2.5` in `apply((x: integer) => x + 1, 2.5)`
+```
+
+An argument with no value, whose type does not show that it fits, leaves
+the application unevaluated, and a later evaluation checks the value. At a
+parameter that admits every real number, the body is applied to a symbol
+with no declared type.
+
+```epsil
+((x: integer) => x + 1)(m)
+// ➔ Apply((x) => x + 1, m)
+((x: real) => x^2)(y)
+// ➔ y^2
+```
+
+`missing` at a parameter of a number type or a point type gives `missing`,
+and the body does not run. A default value does not change this: a default
+fills only an argument that the call leaves out. A `NaN` at a numeric
+parameter, and a point of `NaN` coordinates at a point parameter, are
+accepted: the body runs with them.
+
+```epsil
+map((x: integer) => x > 0, [1, missing])
+// ➔ ["True","Missing"]
+((x: integer) => x + 1)(NaN)
+// ➔ NaN
+```
+
+#### Return type
+
+A return type sets the result type of the signature. When the function is
+applied, a concrete result (a number, a string, a character, a boolean, or
+a list or tuple of these) is checked against it. A symbolic value,
+`missing`, `nothing`, `NaN` and an error value pass unchanged, and a real
+float passes under `integer` or `rational`, so `N` of such a function gives
+the float. Compiled code does not make this check.
+
+```epsil
+function g(n: integer) -> integer { n / 2 }
+g(5)
+// ➔ error: Runtime error: expected `integer`, got `rational<2.5..2.5>` at `5 / 2`
+function g(n: integer) -> integer { n / 2 }
+N(g(5))
+// ➔ 2.5
+```
+
+A literal assigned to a name declared with a signature takes the declared
+result as its return type, and is refused when the type of its body has no
+value in common with that result (see
+[Typed function literals](/compute-engine/guides/types/#typed-function-literals)).
+
+#### Generic literals
+
+A signature with a `where` clause makes the literal **generic** (see
+[Generic functions](/types/#generic-functions)). A parameter whose type
+names a type variable is checked against the bound of the variable, and
+each application solves the variables from the arguments:
+
+```epsil
+let f: (T) -> T where T: number = (x) => x + x
+f(21)
+// ➔ 42
+```
+
+A `where` clause on the annotation of one parameter is not accepted: type
+variables are introduced only by a clause on the whole signature.
+
+### MathJSON
+
+`["Function", body, param1, param2, …]`. `Function` is lazy: neither the
+body nor the parameters are evaluated until the function is applied. In
+LaTeX, `x \mapsto 2x` is `["Function", ["Multiply", "x", 2], "x"]`, and
+`(x, y) \mapsto 2x + y` is
+`["Function", ["Add", ["Multiply", "x", 2], "y"], "x", "y"]`.
+
+A typed parameter is `["Typed", symbol, type]`, with the type a string
+(`"'integer'"`) or a type-name symbol, which is normalized to a string.
+
+```json example
+["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]]
+["Apply", ["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]], "m"]
+// ➔ ["Apply", ["Function", ["Block", ["Add", "x", 1]], ["Typed", "x", "'integer'"]], "m"]
+```
+
+A parameter with a default value is `["Optional", parameter, default]`, and
+a tuple pattern is a `["Tuple", …]` of parameter names, `_` to skip a
+position, or nested patterns. A tuple pattern is one parameter:
+
+```json example
+["Apply",
+  ["Function", ["Multiply", "k", "x"], "x",
+    ["Optional", ["Typed", "k", "'number'"], 2]],
+  3]
+// ➔ 6
+["Map",
+  ["Function", ["Add", "p", "q"], ["Tuple", "p", "q"]],
+  ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]]]
+// materializes to ["List", 3, 7]
+```
+
+A default that names a variable, such as `["Optional", "k", "n"]` with `n`
+a variable, is the error `expected-a-literal-default`. The form
+`["Typed", "k", "'number?'"]` is not accepted for a parameter: it is the
+error `invalid-parameter-annotation`.
+
+A return type is a `Typed` around the body. Canonicalization moves it inside
+the body `Block`, around its last statement:
+
+```json example
+["Function", ["Typed", ["Add", "x", 1], "'integer'"], ["Typed", "x", "'integer'"]]
+// canonical form:
+["Function",
+  ["Block", ["Typed", ["Add", "x", 1], "'integer'"]],
+  ["Typed", "x", "'integer'"]]
+```
+
+A generic signature can be written as a signature string in place of the
+parameter list, or as a whole-signature `Typed` on the body, which is the
+canonical form. A parameter whose type names a type variable is erased to a
+bare symbol; a ground one keeps its annotation.
+
+```json example
+["Function", ["Add", "x", "x"], "'(x: T) -> T where T: number'"]
+["Function",
+  ["Block", ["Typed", ["Add", "x", "x"], "'(x: T) -> T where T: number'"]],
+  "x"]
+```
+
+In LaTeX, a parameter with no type followed by a parenthesized argument is
+a call of the parameter, so a function can take a function as argument:
+`(g \mapsto \int_0^1 g(x)\,dx)(t \mapsto t^2)` is `1/3`. The exception is an
+argument that contains the parameter: `q \mapsto q(2q)` is the product
+`2q^2`. A parameter with a number type is a value, and the juxtaposition is
+a product: `((x\colon \mathrm{real}) \mapsto x(2))(3)` is `6`.
+
+A literal with a tuple pattern, a rest parameter (`["Spread", name]`) or a
+default value has no `\mapsto` notation: `(x, y) \mapsto xy` is a function
+of two parameters, not of one pair. Its LaTeX is `\mathrm{Function}(…)` with
+its MathJSON operands, which parses back to the same literal:
+`\mathrm{Function}(xy, \mathrm{Tuple}(x, y))`. The other type annotations
+are dropped in LaTeX. Wildcards in LaTeX are `\_` and `\operatorname{\_2}`:
+`\_ + \operatorname{\_2}` is `["Add", "_", "_2"]`.
+
+## Apply
+
+The function is a function literal, a name whose value is a function, or an
+expression whose value is a function. An expression that is not a function
+is read as a [shorthand function literal](#shorthand-function-literals).
+
+A function applied to fewer arguments than it declares is a function of
+the remaining ones:
+
+```epsil
+((x, y) => x + y)(1)
+// ➔ (_) => Apply((x, y) => x + y, 1, _)
+[((x, y) => x + y)(1)(2), apply(apply((x, y) => x + y, 1), 2)]
+// ➔ [3,3]
+```
+
+A function applied to more arguments than it declares is an
+`unexpected-argument` error:
+
+```epsil
+((x) => x)(1, 2)
+// ➔ error: Runtime error: unexpected argument
+```
+
+Compiled code does not build a function value: a partial application or a
+curried call does not compile, and the interpreter evaluates it instead
+(see [Function values](/compute-engine/guides/compiling/#function-values)).
+
+### MathJSON
+
+`["Apply", function, arg1, …]`. An expression with a compound head,
+`[["g", "f"], "x"]`, is the same application as
+`["Apply", ["g", "f"], "x"]`.
+
+```json example
+["Apply", ["Multiply", "_", "_"], 3]
+// ➔ 9
+["Apply", ["Function", ["Multiply", "x", "x"], "x"], 3]
+// ➔ 9
+["Apply", "Power", 2, 3]
+// ➔ 8
+["Apply", ["Apply", ["Function", ["Add", "x", "y"], "x", "y"], 1], 2]
+// ➔ 3
+```
+
+In LaTeX, `\lhd` and `\rhd` apply a function to one argument on the left
+or on the right: `f\lhd g \lhd x` and `x \rhd g \rhd f` are both
+`["f", ["g", "x"]]`. `\rhd` is the [pipeline operator](#pipe).
+
+A function operand that is a subscript on the index of a sum or a product
+is read as the name of a term: `\sum_{k=1}^{2} f_k(x)` is
+`["Sum", ["Apply", ["Subscript", "f", "k"], "x"], ["Limits", "k", 1, 2]]`,
+which evaluates to `f_1(x) + f_2(x)`. Each term is read as the term written
+alone: `f_1(x)` is a call when `f_1` is a function or has no definition, and
+a product when `f_1` has a value. With `w_1 = 2` and `w_2 = 3`:
+
+```json example
+["Sum", ["Apply", ["Subscript", "w", "i"], 4], ["Limits", "i", 1, 2]]
+// ➔ 20
+```
+
+## Pipe
+
+The pipeline `|>` is described in [Pipe](/operators/#pipe) and
+[Pipelines](/control-flow/#pipelines). The right-hand side must be a
+function: a number, a string or a boolean is an `incompatible-type` error.
+A name with no definition is not an error: the pipe gives a call, which
+evaluates once the name has a definition. This differs from `apply`, which
+reads a value that is not a function as a constant function.
+
+```epsil
+5 |> 3
+// ➔ error: Type error: expected `function`, got `3` at `3` in `5 |> 3`
+x |> f
+// ➔ f(x)
+```
+
+A function whose variable can be inferred, such as `solve`, `D`, `series`
+and the polynomial functions, can be a stage without the variable:
+
+```epsil
+x^2 == 4 |> solve
+// ➔ [2,-2]
+```
+
+### MathJSON
+
+`["Pipe", value, function]` evaluates to `[function, value]`. A call stage
+missing required arguments receives the value as its first argument, and a
+unary function literal maps over a list:
+
+```json example
+["Pipe", ["Range", 1, 10], ["Take", 3]]
+// ➔ ["Take", ["Range", 1, 10], 3]
+["Pipe", ["List", 1, 2, 3], ["Function", ["Power", "x", 2], "x"]]
+// ➔ ["List", 1, 4, 9]
+```
+
+In LaTeX, the pipe is `\rhd`, `\triangleright`, `\vartriangleright`, `⊳`
+or `|>`. A `\square` in the right-hand side is the position of the piped
+value (`_` in Epsil): `x^2 = 4 \rhd \operatorname{Solve}(\square, x)` is
+`["Solve", ["Equal", ["Power", "x", 2], 4], "x"]`. A function command with
+no argument, such as `\ln`, `\lb` or `\sqrt`, is a function value:
+`12 \rhd \ln` is `\ln(12)`. The prefix form, `\rhd f` with no left-hand
+side, is the function of one argument that applies `f` to it.
+
+## EvaluateAt
+
+The function is applied as `apply` applies it: a function literal, a name
+whose value is a function, or an expression, which is read as a shorthand
+function literal of its free variables. A point that is a tuple, with one
+coordinate for each parameter, gives the value at that point of a function
+of several variables. A point is never a partial application: with fewer
+points than the function requires, the expression stays as written.
+
+```epsil
+evaluateAt(x => x^3 / 3, 0, 1)
+// ➔ 1/3
+evaluateAt((x, y) => x * y, (1, 2))
+// ➔ 2
+evaluateAt((x, y) => x * y, 1)
+// ➔ ((x, y) => x * y)|_(1)
+```
+
+When the expression has several free variables, the point or the bounds are
+for `x`. Write a function literal to name another variable:
+
+```epsil
+[evaluateAt(k * x, 2, 5), evaluateAt(t => k * t, 2, 5)]
+// ➔ [3k,3k]
+```
+
+The value of a derivative at a point is the derivative evaluated there. The
+value of a series at a point keeps its `BigO` remainder, also under `N`:
+apply `normal` to the series to drop it. A value with no closed form stays
+an unevaluated `evaluateAt`.
+
+```epsil
+evaluateAt(x => D(x^2, x), 3)
+// ➔ 6
+evaluateAt(x => series(sin(x), x, 0), 1)
+// ➔ 101/120 + BigO(1)
+```
+
+### MathJSON
+
+`["EvaluateAt", function, point]`, `["EvaluateAt", function, lower, upper]`.
+
+```json example
+["EvaluateAt", ["Function", ["Power", "x", 2], "x"], 3]
+// ➔ 9
+["EvaluateAt", ["Function", ["Divide", ["Power", "x", 3], 3], "x"], 0, 1]
+// ➔ ["Rational", 1, 3]
+```
+
+In LaTeX, `\left.\left(x^2\right)\right|_{x=3}` is the value at 3, and
+`\left.\left(\frac{x^3}{3}\right)\right|_{x=0}^{1}` the difference between
+two bounds. `\left.\left(xy\right)\right|_{x=1, y=2}` is
+`["EvaluateAt", ["Function", ["Multiply", "x", "y"], "x", "y"], ["Tuple", 1, 2]]`.
+When the bracket does not name the variable, it is `x`:
+`\left.kx\right|_{2}^{5}` is `3k`; write
+`\left.\left(kt\right)\right|_{t=2}^{5}` for another variable.
+
+The variable of a derivative, of a series or of an indefinite integral is
+free in its result, so substituting a value for that variable gives an
+`EvaluateAt`: `["D", ["Power", "x", 2], "x"]` with `x` replaced by `3` is
+`["EvaluateAt", ["Function", ["D", ["Power", "x", 2], "x"], "x"], 3]`,
+which evaluates to `6`.
