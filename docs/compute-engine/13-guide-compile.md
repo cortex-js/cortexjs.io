@@ -2312,11 +2312,13 @@ results:
 - an expression: it is compiled in place of the node, on every target. A
   node of the expression that the handler created is compiled with no handler
   consulted, whatever its operator, so an `At` in the result of a handler of
-  `At` is the library's `At`. The operands the handler received are compiled
-  as usual, handlers consulted, when the result holds them as the same
-  objects: reuse the operand objects you are given. An operand rebuilt (for
-  example from its JSON) is a created node, and an operator inside it no
-  longer gets its handler.
+  `At` is the library's `At`. The operands the handler received, and the
+  nodes inside them, are compiled as usual, handlers consulted, where the
+  result holds them as the same objects (also when canonicalization merges
+  an operand into a new node, as `Add(Add(a, b), c)` becomes `Add(a, b, c)`):
+  reuse the objects you are given. An operand rebuilt (for example from its
+  JSON) is a created node, and an operator inside it no longer gets its
+  handler.
 - target source, as a string, which can use `compile()` for the source of an
   operand.
 
@@ -2340,7 +2342,8 @@ f.run({ i: 0.5 });  // ➔ NaN
 ```
 
 The handler changes the compiled code only: `evaluate()` of `At([10, 20,
-30], 2.9)` is still `NaN`. The experimental profile `'ir'` accepts the
+30], 2.9)` is still `NaN`. A handler on a control-flow head (`If`, `Sum`,
+`Product`, `Block`, `Function`, `Loop`, …) is ignored, except on `Which`. The experimental profile `'ir'` accepts the
 results `undefined` and expression; a handler that returns text or calls
 `compile` makes it decline, and the program is then compiled by the existing
 compiler on `glsl` and `interval-js`, and evaluated by the interpreter on
