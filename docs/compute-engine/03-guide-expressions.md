@@ -438,6 +438,52 @@ if (sym(expr) === 'Pi') {
 const val = numericValue(ce.parse("3.14"));  // number | NumericValue | undefined
 ```
 
+### The Shape of an Expression Before Evaluation
+
+Two properties of an expression tell different things about a collection:
+
+- `expr.isCollection` (and `expr.count`, `expr.each()`, `expr.at()`) tells
+  whether a collection value is present that can be walked **now**.
+- `expr.staticShape` tells which collection shape the expression
+  **promises**. It is `{ indexed, count, elementType }`, or `undefined` when
+  the expression promises no collection. It reads a call or a symbol from its
+  type, without evaluating it. For a collection value it reads the
+  collection's own `count`: for a lazy view over a computed source, such as
+  `Join(f(1), [4])` or a `Filter`, that count evaluates the source, which
+  calls `f` or runs the filter's function once per element.
+
+A call of a function that returns a list has no value before it is evaluated,
+but its type gives its shape:
+
+```js
+ce.assign('f', ce.parse('n \\mapsto [n, n+1, n+2, \\frac{n}{2}]'));
+const call = ce.parse('f(3)');
+
+call.isCollection;
+// ➔ false
+call.count;
+// ➔ undefined
+call.staticShape;
+// ➔ { indexed: true, count: 4, elementType: 'rational' }
+call.evaluate().toString();
+// ➔ [3,4,5,3/2]
+
+ce.declare('g', '(integer) -> list<real>');
+ce.parse('g(3)').staticShape;
+// ➔ { indexed: true, count: undefined, elementType: 'real' }
+
+ce.parse('\\sin(x)').staticShape;
+// ➔ undefined
+```
+
+A symbol declared with a collection type and no value (`L: vector<2>`) gives
+its declared shape. A call of a name that was never declared gives
+`undefined`: its type is a guess, not a promise. An `If` with an else branch
+whose branches are collections gives the shape they agree on.
+
+The elements still come from the value: when the value does not have the
+declared type, `each()` can give another number of elements than
+`staticShape.count`.
 
 ## Accessing the Value of an Expression
 

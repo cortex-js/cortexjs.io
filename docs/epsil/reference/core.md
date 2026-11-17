@@ -1262,6 +1262,33 @@ IndexedSequence(1/n, n, 1, oo)
 // ➔ {1 / n : n = 1..+oo}
 ```
 
+The indexed family whose term is `term`, with the index ranging from `lower`,
+up to `upper` when it is given. It is **inert**: `evaluate` and `simplify`
+leave it unchanged, and it has no collection operations yet.
+
+```epsil
+IndexedSequence(1/n, n, 0)
+// ➔ {1 / n : n = 0..}
+simplify(IndexedSequence(1/n, n, 1, oo))
+// ➔ {1 / n : n = 1..+oo}
+```
+
+<MathJson name="IndexedSequence">
+
+`["IndexedSequence", term, index, lower]`,
+`["IndexedSequence", term, index, lower, upper]`.
+
+The LaTeX sequence-braces notation `\{a_n\}_{n=1}^{\infty}` parses to
+`["IndexedSequence", ["a_", "n"], "n", 1, "PositiveInfinity"]`. The term is in
+the operator-call form `["a_", "n"]`, so that the binding of the index is
+kept. A set-membership subscript gives the least element of the set as the
+lower bound: `\{a_n\}_{n\in\mathbb{N}}` is
+`["IndexedSequence", ["a_", "n"], "n", 0]`. The bare braces `\{a_n\}` are
+still a `Set`, and the parenthesized form `(a_n)_{n\in\mathbb{N}}` is not an
+`IndexedSequence`. The expression round-trips through LaTeX.
+
+</MathJson>
+
 ### input
 
 MathJSON `Input` · `(prompt: string?) console -> nothing | string`
@@ -1975,6 +2002,44 @@ Ordered sequence of expressions.
 [0, Sequence(1, 2), 3]
 // ➔ [0,1,2,3]
 ```
+
+When a sequence is used where an element is expected, its elements are
+spliced into the enclosing expression. The empty sequence splices to no
+element.
+
+```epsil
+let s = Sequence(2, 3); [1, s, 4]
+// ➔ [1,2,3,4]
+[1, Sequence(), 2]
+// ➔ [1,2]
+```
+
+`Nothing` is not an empty sequence. It is the value of an empty block or of a
+statement with no value, and a collection keeps it as an element:
+
+```epsil
+[1, Nothing, 2]
+// ➔ [1,"Nothing",2]
+length([1, Nothing, 2])
+// ➔ 3
+```
+
+<MathJson name="Sequence">
+
+`["Sequence", ...elements]`.
+
+```json example
+["List", 1, ["Sequence", 2, 3], 4]
+// ➔ ["List", 1, 2, 3, 4]
+
+["List", 1, ["Sequence"], 2]
+// ➔ ["List", 1, 2]
+
+["List", 1, "Nothing", 2]
+// ➔ ["List", 1, "Nothing", 2]
+```
+
+</MathJson>
 
 ### Signature
 
