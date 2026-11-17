@@ -2710,3 +2710,33 @@ bare `\overline{7}` is `["Conjugate", 7]`, and `\overline{z}_1` is
 ["Mod", 7, 3]
 // ➔ 1
 ```
+
+## Interval
+
+An interval is a set of real numbers. Each bound is included unless it is
+wrapped in `Open`. `Closed` marks an included bound explicitly. An infinite
+bound is never included: `+oo` is not a real number. The integers between two
+bounds are a range instead, written `a..b`.
+
+```epsil
+[0 in interval(0, 1), 1.5 in interval(1, 2), 1.5 in 1..2]
+// ➔ [true,true,false]
+[0 in interval(Open(0), 1), 1 in interval(0, Open(1))]
+// ➔ [false,false]
+[5 in interval(0, oo), oo in interval(0, oo)]
+// ➔ [true,false]
+type(interval(0, 1))
+// ➔ TypeFrom("set<real>")
+```
+
+An interval cannot be enumerated. A quantifier over one is not decided by
+trying its elements: see
+[Quantifier evaluation](/reference/logic/#quantifier-evaluation).
+
+### MathJSON
+
+`["Interval", a, b]`, with `["Open", a]` or `["Closed", a]` for a bound:
+`["Interval", ["Open", 0], 1]` is the interval from 0 to 1 without 0. In
+LaTeX, `[a, b]` is closed, `(a, b)` and `]a, b[` are open, and `[a, b)` and
+`(a, b]` are half-open. See the notation table of the
+[Sets](/compute-engine/reference/sets/) reference.

@@ -79,7 +79,10 @@ async function main() {
     for (const program of extractPrograms(text, file)) {
       count++;
       const { io, stdout, stderr } = makeIo();
-      const code = await cli(["-e", program.code], io);
+      // The CLI reads an `-e` argument that starts with `-` as an option
+      // (CE-1393); a leading space keeps a program such as `-5 % 3` a program.
+      const source = program.code.startsWith("-") ? " " + program.code : program.code;
+      const code = await cli(["-e", source], io);
       const out = stdout().trim();
       const firstError = stderr().trim().split("\n")[0] ?? "";
       const actual = out !== "" ? out : firstError;

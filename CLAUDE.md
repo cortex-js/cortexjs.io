@@ -109,11 +109,13 @@ LaTeX commands, in a closed `<MathJson>` disclosure (a native `<details>`, so
 find-in-page opens it). The Compute Engine team edits these files here.
 `reference-details/README.md` gives the format and the rules for examples.
 `npm run verify:details` runs every `epsil` fence of these files with the
-`epsil` CLI of `../compute-engine` and checks its `// ➔` result. When every
-entry of a hand-written MathJSON reference page
-(`docs/compute-engine/*-reference-*.md`) has moved, the page becomes a
-`<ReferenceMoved>` stub that keeps its anchors and redirects each one; the
-Arithmetic page is the first.
+`epsil` CLI of `../compute-engine` and checks its `// ➔` result; the CLI runs
+from that checkout's working tree, so another session's uncommitted engine
+change can fail many examples at once. The hand-written MathJSON reference
+pages (`docs/compute-engine/*-reference-*.md`) whose entries moved here are
+`<ReferenceMoved>` stubs that keep their anchors and redirect each one. The
+pages with no function entries (Sets, Group Theory, the Fungrim identity
+tables) are kept as they are.
 
 The sync copies subdirectories too (`reference/` holds one generated page per
 library of the standard library), but skips `*.intro.md`: those are fragments
