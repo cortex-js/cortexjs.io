@@ -80,7 +80,7 @@ when it is `false`.
 If(true, [10, 20, 30])
 // ➔ [10,20,30]
 If(false, [10, 20, 30])
-// ➔ "Missing"
+// ➔ missing
 ```
 
 An operation that applies to each element of the list applies to the whole
@@ -94,10 +94,10 @@ sin(If(0 < t, [1, 2, 3]))
 // ➔ If(0 < t, [sin(1),sin(2),sin(3)])
 let t = -1
 sin(If(0 < t, [1, 2, 3]))
-// ➔ "Missing"
+// ➔ missing
 let t = -1
 length(If(0 < t, [1, 2, 3]))
-// ➔ "Missing"
+// ➔ missing
 let t = -1
 first(If(0 < t, [(1, 2), (3, 4)]))
 // ➔ (NaN, NaN)
@@ -171,7 +171,7 @@ read.
 
 ```epsil
 If([true, false], 1..n)
-// ➔ If(["True","False"], Range(1, n))
+// ➔ If([true,false], Range(1, n))
 let n = 5
 If([true, false], 1..n)
 // ➔ [1,NaN]
@@ -520,7 +520,7 @@ if false { 5 }
 if false { (1, 2) }
 // ➔ (NaN, NaN)
 if false { "a" }
-// ➔ "Missing"
+// ➔ missing
 type(If(x > 0, 5))
 // ➔ TypeFrom("integer")
 ```
@@ -1034,9 +1034,9 @@ let n = -10
 Which(n > 0, n, n < 0, -n, true, 0)
 // ➔ 10
 Which(false, 1, false, 2)
-// ➔ "Missing"
+// ➔ missing
 Which()
-// ➔ "Missing"
+// ➔ missing
 type(Which(x > 0, 1, x < 0, -1))
 // ➔ TypeFrom("integer | missing")
 ```
@@ -1094,14 +1094,14 @@ position gives the value of that position. The rules:
 ```epsil
 let L = [1, 3, 5]
 Which(L < 2, foo(L), true, 0)
-// ➔ Which(["True","False","False"], foo([1,3,5]), "True", 0)
+// ➔ Which([true,false,false], foo([1,3,5]), true, 0)
 Which([true, false], 1, true, 3)
 // ➔ [1,3]
 let L = [1, 3, 5]
 If(L < 3, [10, 20], 0)
 // ➔ error: Static error: incompatible dimensions at `3 vs 2` in `[10, 20] if L < 3 else 0`
 If([true, false], x > 0)
-// ➔ [0 < x,"False"]
+// ➔ [0 < x,false]
 If([true, false], Rgb(1, 0, 0))
 // ➔ [Rgb(1, 0, 0),Rgb(NaN, NaN, NaN)]
 let L = [1, 3, 5]
@@ -1142,7 +1142,7 @@ only when the condition is a list.
 If(true, [1, 3, 5], 0)
 // ➔ [1,3,5]
 If(false, [10, 20, 30])
-// ➔ "Missing"
+// ➔ missing
 ```
 
 <MathJson name="Which" latex={["cases"]}>

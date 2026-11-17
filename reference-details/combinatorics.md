@@ -96,7 +96,7 @@ a symbolic `n`, `binomial(n, n)` is 1 and `binomial(n, n - 1)` is `n`.
 [binomial(6, 2), binomial(6, 7), binomial(6, -1), binomial(6, 6)]
 // ➔ [15,0,0,1]
 binomial(6, 2) == 6! / (2! * 4!)
-// ➔ "True"
+// ➔ true
 [binomial(n, n), binomial(n, n - 1)]
 // ➔ [1,n]
 ```
@@ -129,7 +129,7 @@ the elements, and the spread `...` lists them:
 [count(cartesianProduct({1, 2}, {3, 4}, {5, 6, 7}))]
 // ➔ [12]
 (1, 3) in cartesianProduct({1, 2}, {3, 4})
-// ➔ "True"
+// ➔ true
 cartesianProduct([1, 2], [3, 4])
 // ➔ error: Type error: expected `set`, got `vector<integer^2>` at `[1, 2]` in `cartesianProduct([1, 2], [3, 4])`
 ```
@@ -160,7 +160,7 @@ whatever the order of its elements:
 [count(powerSet({1, 2, 3})), count(powerSet({}))]
 // ➔ [8,1]
 [{2, 1} in powerSet({1, 2, 3}), {4} in powerSet({1, 2, 3})]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 See also: [Power set](https://en.wikipedia.org/wiki/Power_set).
@@ -303,7 +303,7 @@ $$
 [multinomial(2, 1), multinomial(2, 2, 1), multinomial(1, 1, 1)]
 // ➔ [3,30,6]
 multinomial(2, 2, 1) == 5! / (2! * 2! * 1!)
-// ➔ "True"
+// ➔ true
 ```
 
 See also: [Multinomial theorem](https://en.wikipedia.org/wiki/Multinomial_theorem).
@@ -331,7 +331,7 @@ $$
 [subfactorial(4), subfactorial(5), subfactorial(0), subfactorial(1)]
 // ➔ [9,44,1,0]
 subfactorial(5) == 5! * (1 - 1 + 1/2 - 1/6 + 1/24 - 1/120)
-// ➔ "True"
+// ➔ true
 ```
 
 A negative or symbolic `n` stays unevaluated:

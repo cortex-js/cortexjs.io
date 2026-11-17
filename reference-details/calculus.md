@@ -685,7 +685,7 @@ are handled too.
 series(cot(x), x, 0, 3)
 // ➔ 1 / x - 1/3 * x - 1/45 * x^3 + BigO(x^5)
 series(zeta(x), x, 1, 2)
-// ➔ 1 / (x - 1) + "EulerGamma" - (x - 1) * StieltjesGamma(1) + 1/2 * StieltjesGamma(2) * (x - 1)^2 + BigO((x - 1)^3)
+// ➔ 1 / (x - 1) + eulerGamma - (x - 1) * StieltjesGamma(1) + 1/2 * StieltjesGamma(2) * (x - 1)^2 + BigO((x - 1)^3)
 series(x^2/(x - 1), x, oo, 3)
 // ➔ x + 1 + 1 / x + x^(-2) + x^(-3) + BigO(x^(-4))
 ```

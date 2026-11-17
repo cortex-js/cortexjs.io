@@ -33,7 +33,7 @@ its three operands are integers.
 
 ```epsil
 congruent(7, 1, 3)
-// ➔ "True"
+// ➔ true
 congruent(x, 1, 3)
 // ➔ Congruent(x, 1, 3)
 ```
@@ -52,7 +52,7 @@ negations and factorials are reduced this way:
 2^(3^20) % 100
 // ➔ 52
 congruent(2^(3^20), 52, 100)
-// ➔ "True"
+// ➔ true
 2 * 3^5000000 % 7
 // ➔ 4
 50! % 101
@@ -306,9 +306,9 @@ negation, `a ∤ b`.
 
 ```epsil
 [divides(4, 10), notDivides(4, 10)]
-// ➔ ["False","True"]
+// ➔ [false,true]
 [divides(5, 0), divides(0, 0), divides(0, 5)]
-// ➔ ["True","True","False"]
+// ➔ [true,true,false]
 ```
 
 A symbolic operand keeps the relation unevaluated. A number that is not an
@@ -418,7 +418,7 @@ See also: [Möbius function](https://en.wikipedia.org/wiki/M%C3%B6bius_function)
 
 ```epsil
 [isSquareFree(2/3), isSquareFree(2/9)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 ### MathJSON
@@ -437,7 +437,7 @@ See also: [Möbius function](https://en.wikipedia.org/wiki/M%C3%B6bius_function)
 
 ```epsil
 [isPerfectPower(-8), isPerfectPower(-4), isPerfectPower(1)]
-// ➔ ["True","False","False"]
+// ➔ [true,false,false]
 [n for n in 1..70 if isPerfectPower(n)]
 // ➔ [4,8,9,16,25,27,32,36,49,64]
 ```
@@ -1255,7 +1255,7 @@ them.
 nPartition(5)
 // ➔ 7
 nPartition(5) == length(integerPartitions(5))
-// ➔ "True"
+// ➔ true
 [nPartition(100), nPartition(-3)]
 // ➔ [190569292,0]
 ```
@@ -1311,7 +1311,7 @@ triangle with `k` rows: 15 is 5 · 6 / 2. 0 is not counted.
 [n for n in 1..60 if isTriangular(n)]
 // ➔ [1,3,6,10,15,21,28,36,45,55]
 [isTriangular(15), isTriangular(16), isTriangular(0)]
-// ➔ ["True","False","False"]
+// ➔ [true,false,false]
 ```
 
 Like the other predicates of this library, `isTriangular` applies to each
@@ -1335,7 +1335,7 @@ square, and a negative number is not.
 
 ```epsil
 isSquare([0, 2, 4, 9, -4])
-// ➔ ["True","False","True","True","False"]
+// ➔ [true,false,true,true,false]
 isSquare(x)
 // ➔ IsSquare(x)
 ```
@@ -1360,7 +1360,7 @@ octahedron: 19 is 3 · 19 / 3.
 [n for n in 1..200 if isOctahedral(n)]
 // ➔ [1,6,19,44,85,146]
 [isOctahedral(19), isOctahedral(20)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 See also: [Octahedral number](https://en.wikipedia.org/wiki/Octahedral_number).
@@ -1381,7 +1381,7 @@ the square layers of dots around it.
 
 ```epsil
 [isCenteredSquare(5), isCenteredSquare(6)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 See also: [Centered square numbers, OEIS A001844](https://oeis.org/A001844).
@@ -1402,7 +1402,7 @@ is 1 + 2 + 4 + 7 + 14. For `n < 1` the result is `False`.
 
 ```epsil
 [isPerfect(28), isPerfect(12), isPerfect(-6)]
-// ➔ ["True","False","False"]
+// ➔ [true,false,false]
 [n for n in 1..10000 if isPerfect(n)]
 // ➔ [6,28,496,8128]
 ```
@@ -1447,7 +1447,7 @@ result is `False`.
 
 ```epsil
 [isAbundant(12), isAbundant(6), isAbundant(945)]
-// ➔ ["True","False","True"]
+// ➔ [true,false,true]
 ```
 
 See also: [Abundant number](https://en.wikipedia.org/wiki/Abundant_number).

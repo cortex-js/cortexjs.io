@@ -32,7 +32,7 @@ whole subject, anchor the pattern with `^` and `$`.
 
 ```epsil
 [isMatch("abc123", regExp("[0-9]+")), isMatch("abc123", regExp("^[0-9]+$"))]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 <MathJson name="IsMatch">
@@ -72,9 +72,9 @@ the same matches.
 
 ```epsil
 isMatch("abab", regExp(#"(ab)\1"#))
-// ➔ "True"
+// ➔ true
 isMatch("price: 42", regExp(#"(?<=: )\d+"#))
-// ➔ "True"
+// ➔ true
 ```
 
 :::warning[A pattern can take unbounded time, and cannot be interrupted]
@@ -124,9 +124,9 @@ on its last match. Use [`stringMatchAll`](#stringmatchall) for every match.
 
 ```epsil
 isMatch("ABC", regExp("b", "i"))
-// ➔ "True"
+// ➔ true
 isMatch("a\nb", regExp("a.b", "s"))
-// ➔ "True"
+// ➔ true
 regExp("a", "g")
 // ➔ error: Runtime error: invalid value: the 'g' flag carries mutable match state and is not allowed on a value; use StringMatchAll at `"g"`
 ```
@@ -136,7 +136,7 @@ the same.
 
 ```epsil
 regExp("a.c") == regExp("a.c")
-// ➔ "True"
+// ➔ true
 ```
 
 #### Patterns with stringSplit and stringReplace
@@ -212,9 +212,9 @@ stringMatch("abc123", regExp(#"[0-9]+"#))
 stringMatch("2026-11", regExp(#"(?<y>\d+)-(?<m>\d+)"#))["names"]
 // ➔ {"y" -> "2026", "m" -> "11"}
 stringMatch("ab", regExp(#"(x)?b"#))["groups"]
-// ➔ ["Missing"]
+// ➔ [missing]
 stringMatch("abc", regExp(#"[0-9]+"#)) == Nothing
-// ➔ "True"
+// ➔ true
 ```
 
 The `range` field is what makes a match work with the other string
@@ -238,7 +238,7 @@ reading it gives `Missing`. The `match` field still holds the text. Test
 ```epsil
 let m = stringMatch("👨‍👩‍👧", regExp("👩"))
 [m["match"], isMissing(m["range"])]
-// ➔ ["👩","True"]
+// ➔ ["👩",true]
 ```
 
 <MathJson name="StringMatch">

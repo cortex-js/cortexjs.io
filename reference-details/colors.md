@@ -33,13 +33,11 @@ colorToColorspace(color("rgba(255, 0, 0, 0.5)"), "rgb")
 // ➔ (1, 0, 0, 0.5019607843137255)
 ```
 
-An `oklch(…)` string is read the same way, so it does not keep a chroma or
-a hue that is outside the sRGB gamut. To make an exact OKLCh color, call
+An `oklch(…)` string is read the same way, and today it loses a chroma or a
+hue that is outside the sRGB gamut. To make an exact OKLCh color, call
 `oklch`:
 
 ```epsil
-colorToColorspace(color("oklch(50% 0.3 240)"), "oklch")
-// ➔ (0.5082817193854438, 0.13074461492928197, 246.0140197777198)
 oklch(0.5, 0.3, 240)
 // ➔ Oklch(0.5, 0.3, 240)
 ```

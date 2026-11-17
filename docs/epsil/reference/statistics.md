@@ -400,7 +400,7 @@ Q(k+1, \lambda)$.
 
 ```epsil
 cdf(poissonDistribution(lambda), k)
-// ➔ Which(k < 0, 0, "True", GammaRegularized(floor(k) + 1, lambda))
+// ➔ Which(k < 0, 0, true, GammaRegularized(floor(k) + 1, lambda))
 cdf(poissonDistribution(2), 3)
 // ➔ 19 / (3e^2)
 ```
@@ -814,9 +814,9 @@ Fisher–Yates shuffle of the indexes draws exactly `k` elements, so
 randomSample([1, 2, 3], 4)
 // ➔ error: Runtime error: out of range: a count in 0..3, 4
 randomSample([1, 1, 2], 2) in [[1, 1], [1, 2], [2, 1]]
-// ➔ "True"
+// ➔ true
 withRandomSeed(42, randomSample(1..100, 3)) == withRandomSeed(42, randomSample(1..100, 3))
-// ➔ "True"
+// ➔ true
 randomSample(interval(0, 1), 2)
 // ➔ error: Type error: expected `indexed_collection`, got `set<real>` at `interval(0, 1)` in `randomSample(interval(0, 1), 2)`
 ```

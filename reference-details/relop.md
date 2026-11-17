@@ -10,15 +10,15 @@ free symbol stays unevaluated. The signed infinities are ordered as usual.
 
 ```epsil
 1/0 > 0
-// ➔ "False"
+// ➔ false
 if 1/0 > 0 { 1 } else { 0 }
 // ➔ 0
 i > 0
-// ➔ "False"
+// ➔ false
 1/0 != 0
-// ➔ "True"
+// ➔ true
 0 < oo
-// ➔ "True"
+// ➔ true
 x > 0
 // ➔ 0 < x
 ```
@@ -32,9 +32,9 @@ compute with it: see [Absent values](/reference/core/#absent-values).
 
 ```epsil
 [missing < 0, missing != 0, [1, missing] == [1, missing]]
-// ➔ ["False","True","False"]
+// ➔ [false,true,false]
 [sum([1, missing]), max([1, missing]), mean([1, missing])]
-// ➔ ["Missing","Missing","Missing"]
+// ➔ [missing,missing,missing]
 ```
 
 The three kinds of equality, `===` (the same expression), `==` (the same
@@ -48,7 +48,7 @@ variables), are compared in
 
 ```epsil
 congruent(26, 11, 5)
-// ➔ "True"
+// ➔ true
 ```
 
 ### MathJSON
@@ -69,7 +69,7 @@ function, compare their `canonicalForm(…, "Order")`.
 
 ```epsil
 [isSame(2 + 3, 2 + 3), isSame(1 + 1, 2)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 ### MathJSON
@@ -87,10 +87,10 @@ chain: `a === b === c`.
 
 ```epsil
 [sqrt(2) === 1.4142135623730951, sqrt(2) == 1.4142135623730951, 0.5 === 1/2]
-// ➔ ["False","True","True"]
+// ➔ [false,true,true]
 let x = 5
 [x === 5, x == 5]
-// ➔ ["False","True"]
+// ➔ [false,true]
 ```
 
 `==` is the comparison of values: it can stay unevaluated when the answer is
@@ -100,9 +100,9 @@ as a whole, not element by element.
 
 ```epsil
 [x === y, x == y]
-// ➔ ["False",x == y]
+// ➔ [false,x == y]
 [NaN === NaN, NaN == NaN, [NaN] === [NaN], [NaN] == [NaN]]
-// ➔ ["True","False","True","False"]
+// ➔ [true,false,true,false]
 ```
 
 `isSame` compares the operands as written, and `===` their canonical forms:
@@ -132,7 +132,7 @@ only differ at the sample points.
 
 ```epsil
 [identicallyEqual((x + 1)^2, x^2 + 2x + 1), identicallyEqual(1, 2)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 identicallyEqual(sin(x), cos(x))
 // ➔ IdenticallyEqual(sin(x), cos(x))
 ```

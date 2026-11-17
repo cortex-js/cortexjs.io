@@ -340,7 +340,7 @@ complex argument, $\operatorname{arccot}(z) = \frac{\pi}{2} -
 [arccot(-1), arccot(0)]
 // ➔ [3/4 * pi,1/2 * pi]
 N(arccot(1 + i)) == N(pi/2 - arctan(1 + i))
-// ➔ "True"
+// ➔ true
 ```
 
 `arccot` is continuous across the real line: next to `-3`, its value is

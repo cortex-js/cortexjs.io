@@ -1105,7 +1105,7 @@ precision, a complex `s` in double precision.
 
 ```epsil
 [dirichletBeta(2), dirichletBeta(5)]
-// ➔ ["CatalanConstant",5/1536 * pi^5]
+// ➔ [catalanConstant,5/1536 * pi^5]
 [dirichletBeta(0), dirichletBeta(-1)]
 // ➔ [1/2,0]
 N(dirichletBeta(1 + i))
@@ -1628,7 +1628,7 @@ and the conjugate of a product is the product of the conjugates:
 // ➔ [(3 - 4i),5,-2i]
 let z = 3 + 4i
 z * conjugate(z) == abs(z)^2
-// ➔ "True"
+// ➔ true
 conjugate((1 + 2i) * (3 - i))
 // ➔ (5 - 5i)
 conjugate(1 + 2i) * conjugate(3 - i)
@@ -1689,7 +1689,7 @@ numeric value.
 [argument(3 + 4i), N(argument(3 + 4i))]
 // ➔ [arctan(4/3),0.927295218001612232427]
 argument(3 + 4i) == arctan2(4, 3)
-// ➔ "True"
+// ➔ true
 [argument(-1), argument(-i), argument(-1 - i), argument(0)]
 // ➔ [pi,-1/2 * pi,-3/4 * pi,0]
 ```

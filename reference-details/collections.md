@@ -372,7 +372,10 @@ integrate(x, (x, 0, 1, 2))
 ## Repeat
 
 The result has the type `list<T>`, where `T` is the type of the value.
-`repeat(x)` is `cycle([x])`; see [`cycle`](#cycle).
+For a pure `x`, `repeat(x)` is `cycle([x])`; see [`cycle`](#cycle).
+A value that is not pure, such as `random()`, is evaluated once per element,
+in order: `repeat(random(), 3)` is three different numbers. A pure value is
+evaluated once.
 
 ```epsil
 type(repeat(False, 3))
@@ -380,7 +383,7 @@ type(repeat(False, 3))
 repeat(1)
 // ➔ [1,1,1,1,1,...]
 take(repeat(7), 3) == take(cycle([7]), 3)
-// ➔ "True"
+// ➔ true
 ```
 
 ### MathJSON
@@ -429,7 +432,7 @@ take(iterate((n, acc) => n * acc, 1), 5)
 take(iterate(_ * 2, 1), 5)
 // ➔ [2,4,8,16,32]
 take(iterate(x => [x]), 2)
-// ➔ [["Nothing"],[["Nothing"]]]
+// ➔ [[nothing],[[nothing]]]
 ```
 
 ### MathJSON
@@ -515,11 +518,11 @@ are out of range too.
 [5, 2, 10, 18][99]
 // ➔ NaN
 ["a", "b"][99]
-// ➔ "Missing"
+// ➔ missing
 [(1, 2), (3, 4)][5]
 // ➔ (NaN, NaN)
 first([])
-// ➔ "Missing"
+// ➔ missing
 ```
 
 The marker is not part of the static type of an access: the engine cannot in
@@ -548,7 +551,7 @@ point whose coordinates are all `NaN` as absent, as they read `NaN` and
 Coalesce(["a", "b"][99], "none")
 // ➔ "none"
 let ps = [(1, 2)]; [isMissing(ps[5]), Coalesce(ps[9], (0, 0))]
-// ➔ ["True",(0, 0)]
+// ➔ [true,(0, 0)]
 let ps = [(1, 2)]; AssertPresent(ps[5])
 // ➔ error: Runtime error: expected present at `At("ps", 5)`
 let ps = [(1, 2)]; pointX(ps[5])
@@ -563,7 +566,7 @@ is a mask, so `L[L > 0]` keeps the positive elements.
 
 ```epsil
 let L = [-1, 2, -3, 4]; L > 0
-// ➔ ["False","True","False","True"]
+// ➔ [false,true,false,true]
 let L = [-1, 2, -3, 4]; L[L > 0]
 // ➔ [2,4]
 ```
@@ -584,7 +587,7 @@ values.
 
 ```epsil
 [1, 2, 3] == [1, 2, 3]
-// ➔ "True"
+// ➔ true
 ```
 
 #### Indexing a matrix or a tensor
@@ -936,7 +939,7 @@ the needle is absent, can therefore be sliced with no test in between:
 slice([9, 7, 5, 3], rangeOf([9, 7, 5, 3], [7, 5]))
 // ➔ [7,5]
 slice([9, 7, 5, 3], rangeOf([9, 7, 5, 3], [1, 2]))
-// ➔ "Missing"
+// ➔ missing
 ```
 
 ### MathJSON
@@ -1184,7 +1187,7 @@ comparison of keys cannot be decided.
 [maxBy([-3, 1, -2], abs), maxBy([2, -2, 1], abs)]
 // ➔ [-3,2]
 maxBy([a, b], abs)
-// ➔ MaxBy([a,b], "Abs")
+// ➔ MaxBy([a,b], abs)
 ```
 
 ### MathJSON
@@ -1278,7 +1281,7 @@ length.
 
 ```epsil
 length(Missing)
-// ➔ "Missing"
+// ➔ missing
 length([1, Missing])
 // ➔ 2
 ```
@@ -1382,7 +1385,7 @@ string is a collection of characters.
 
 ```epsil
 [isEmpty([5, 2, 10, 18]), isEmpty("Hello"), isEmpty("")]
-// ➔ ["False","False","True"]
+// ➔ [false,false,true]
 isEmpty(x)
 // ➔ IsEmpty(x)
 ```
@@ -1409,7 +1412,7 @@ the answer open until the symbols have values, use `in`
 
 ```epsil
 contains([a, b], 3)
-// ➔ "False"
+// ➔ false
 3 in [a, b]
 // ➔ Element(3, [a,b])
 ```
@@ -1420,7 +1423,7 @@ is inexact), and a value with an unknown leaves the answer open.
 
 ```epsil
 [contains({1, 2, 3}, e), contains({1, 2, 3}, 2.0)]
-// ➔ ["False","True"]
+// ➔ [false,true]
 contains({1, 2, 3}, x)
 // ➔ Contains(Set(1, 2, 3), x)
 ```
@@ -1431,7 +1434,7 @@ elements, a sublist or a substring, use
 
 ```epsil
 [contains("abc", "ab"), containsSequence("abc", "ab")]
-// ➔ ["False","True"]
+// ➔ [false,true]
 ```
 
 ### MathJSON
@@ -1479,7 +1482,7 @@ rangeOf([9, 7, 5, 3], [7, 5])
 [rangeOf("hello world", "o w"), rangeOf("hello", "e")]
 // ➔ [Range(5, 7),Range(2, 2)]
 rangeOf([9, 7, 5, 3], [7, 3])
-// ➔ "Missing"
+// ➔ missing
 ```
 
 `rangeOf` and its three companions [`containsSequence`](#containssequence),
@@ -1522,7 +1525,7 @@ rangeOf(xs, [1, 2], last(r) + 1)
 
 ```epsil
 rangeOf([9, 7, 5, 3], [3], 5)
-// ➔ "Missing"
+// ➔ missing
 rangeOf([9, 7, 5, 3], [7], 0)
 // ➔ error: Runtime error: out of range: an index of 1 or more, 0
 rangeOf([9, 7, 5, 3], [])
@@ -1543,7 +1546,7 @@ with [`isMissing`](/reference/core/#ismissing) or replace it with
 slice([9, 7, 5, 3], rangeOf([9, 7, 5, 3], [7, 5]))
 // ➔ [7,5]
 slice([9, 7, 5, 3], rangeOf([9, 7, 5, 3], [1]))
-// ➔ "Missing"
+// ➔ missing
 ```
 
 On a string the elements are characters, so the search is character by
@@ -1569,7 +1572,7 @@ slice("hello world", rangeOf("hello world", "o w"))
 rangeOf("abcabc", "bc", 4)
 // ➔ [5,6]
 rangeOf("abcabc", "bc", 6)
-// ➔ "Missing"
+// ➔ missing
 ```
 
 The needle can be a collection of another kind than the subject: a string
@@ -1620,9 +1623,9 @@ it returns a span.
 
 ```epsil
 containsSequence([1, 2, 3], [3, 2])
-// ➔ "False"
+// ➔ false
 containsSequence([1, 2, 3], [])
-// ➔ "True"
+// ➔ true
 ```
 
 `containsSequence` is not [`contains`](#contains), which tests for one
@@ -1631,9 +1634,9 @@ the characters of the string.
 
 ```epsil
 [containsSequence("abc", "bc"), containsSequence("abc", "ac")]
-// ➔ ["True","False"]
+// ➔ [true,false]
 containsSequence("abc", "")
-// ➔ "True"
+// ➔ true
 ```
 
 ### MathJSON
@@ -1657,7 +1660,7 @@ unevaluated.
 
 ```epsil
 startsWith("hello", "he")
-// ➔ "True"
+// ➔ true
 startsWith(1..oo, [1, 2])
 // ➔ StartsWith(Range(1, +oo), [1,2])
 ```
@@ -1667,9 +1670,9 @@ and only character of `"👨‍👩‍👧"` is the whole family, not `👨`.
 
 ```epsil
 startsWith("👨‍👩‍👧", "👨")
-// ➔ "False"
+// ➔ false
 startsWith("hello", "")
-// ➔ "True"
+// ➔ true
 ```
 
 ### MathJSON
@@ -1701,9 +1704,9 @@ character of `"e\u{301}"` is `é`, which is not the combining accent.
 
 ```epsil
 endsWith("hello", "lo")
-// ➔ "True"
+// ➔ true
 endsWith("e\u{301}", "\u{301}")
-// ➔ "False"
+// ➔ false
 ```
 
 ### MathJSON
@@ -1748,7 +1751,7 @@ find([5, 2, 10, 18], _ > 100)
 find([(1, 2), (3, 4)], p => first(p) > 9)
 // ➔ (NaN, NaN)
 find(["a", "b"], s => s == "z")
-// ➔ "Missing"
+// ➔ missing
 Coalesce(find([5, 2, 10, 18], _ > 100), 0)
 // ➔ 0
 ```
@@ -1795,9 +1798,9 @@ infinite collection.
 
 ```epsil
 any([False, True, False])
-// ➔ "True"
+// ➔ true
 any(1..oo, x => x > 5)
-// ➔ "True"
+// ➔ true
 ```
 
 `any` of an empty collection is `False`. When the answer depends on
@@ -1805,7 +1808,7 @@ elements that cannot be decided, `any` stays unevaluated.
 
 ```epsil
 any([])
-// ➔ "False"
+// ➔ false
 any([a, b], x => x > 0)
 // ➔ Any([a,b], (x) => 0 < x)
 ```
@@ -1834,9 +1837,9 @@ infinite collection.
 
 ```epsil
 all([1, 2, 3], x => x > 2)
-// ➔ "False"
+// ➔ false
 all(1..oo, x => x < 5)
-// ➔ "False"
+// ➔ false
 ```
 
 `all` of an empty collection is `True`. When the answer depends on elements
@@ -1844,7 +1847,7 @@ that cannot be decided, `all` stays unevaluated.
 
 ```epsil
 all([])
-// ➔ "True"
+// ➔ true
 all([a, b], x => x > 0)
 // ➔ All([a,b], (x) => 0 < x)
 ```
@@ -1951,9 +1954,9 @@ gives `Missing` for an absent element, without running its body.
 
 ```epsil
 map(x => sqrt(x), [16, Missing, 81])
-// ➔ [4,"Missing",9]
+// ➔ [4,missing,9]
 map((x: integer) => x > 0, [1, Missing])
-// ➔ ["True","Missing"]
+// ➔ [true,missing]
 ```
 
 ### MathJSON
@@ -2017,7 +2020,7 @@ reduce([1, 2, 3], (a, b) => a - b, 10)
 reduce([], (a, b) => a + b, 1 + 4 % 3)
 // ➔ 2
 reduce([], (a, b) => a + b) == Nothing
-// ➔ "True"
+// ➔ true
 ```
 
 The name of a function of two arguments can stand for the function.
@@ -2121,7 +2124,7 @@ collection (`unknown` for a collection with no element type).
 
 ```epsil
 zip([1, 2], ["a", "b"], [True, False, True])
-// ➔ [(1, "a", "True"),(2, "b", "False")]
+// ➔ [(1, "a", true),(2, "b", false)]
 type(zip([1, 2], ["a", "b"]))
 // ➔ TypeFrom("list<tuple<integer, string>>")
 ```
@@ -2574,7 +2577,7 @@ dictionaries. The same key written twice in one literal is an error instead.
 ```epsil
 let defaults = {"verbose" -> False, "depth" -> 2}
 {...defaults, "verbose" -> True}
-// ➔ {"verbose" -> "True", "depth" -> 2}
+// ➔ {"verbose" -> true, "depth" -> 2}
 {"a" -> 1, "a" -> 2}
 // ➔ error: duplicate dictionary key: a
 ```
@@ -2620,7 +2623,7 @@ Classes are not ordered.
 
 ```epsil
 residueClass(7, 5) == residueClass(2, 5)
-// ➔ "True"
+// ➔ true
 residueClass(1, 3) < residueClass(2, 3)
 // ➔ ResidueClass(1, 3) < ResidueClass(2, 3)
 ```

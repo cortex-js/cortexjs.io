@@ -329,7 +329,7 @@ with `let`. Multiply the factors to check the identity:
 let A = [[2, 1, 1], [4, 3, 3], [8, 7, 9]]
 let (P, L, U) = luDecomposition(A)
 P * A == L * U
-// ➔ "True"
+// ➔ true
 ```
 
 ## Definitions
@@ -774,7 +774,7 @@ at once does less work than two calls. Destructure the tuple with `let`:
 let A = [[4, 2], [1, 3]]
 let (values, vectors) = eigen(A)
 A * vectors[1] == values[1] * vectors[1]
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="Eigen">
@@ -1202,7 +1202,7 @@ Whether the matrix is diagonal (all off-diagonal entries are zero).
 
 ```epsil
 isDiagonal([[1, 0], [0, 5]])
-// ➔ "True"
+// ➔ true
 ```
 
 Every element off the main diagonal must be zero. The elements of the
@@ -1210,9 +1210,9 @@ diagonal can be symbols. A matrix that is not square is not diagonal.
 
 ```epsil
 [isDiagonal([[5, 1], [0, 3]]), isDiagonal([[a, 0], [0, b]])]
-// ➔ ["False","True"]
+// ➔ [false,true]
 isDiagonal([[1, 0, 0], [0, 2, 0]])
-// ➔ "False"
+// ➔ false
 ```
 
 <MathJson name="IsDiagonal">
@@ -1234,7 +1234,7 @@ Whether the value is a square matrix.
 
 ```epsil
 isSquareMatrix([[1, 2], [3, 4]])
-// ➔ "True"
+// ➔ true
 ```
 
 A vector, a scalar, and a matrix whose number of rows is not its number of
@@ -1242,9 +1242,9 @@ columns are not square matrices.
 
 ```epsil
 [isSquareMatrix([1, 2]), isSquareMatrix(5)]
-// ➔ ["False","False"]
+// ➔ [false,false]
 isSquareMatrix([[1, 2, 3], [4, 5, 6]])
-// ➔ "False"
+// ➔ false
 ```
 
 <MathJson name="IsSquareMatrix">
@@ -1266,7 +1266,7 @@ Whether the matrix is symmetric (A equals its transpose).
 
 ```epsil
 isSymmetric([[1, 2], [2, 3]])
-// ➔ "True"
+// ➔ true
 ```
 
 A matrix `A` is symmetric when it is equal to its transpose,
@@ -1275,9 +1275,9 @@ symmetric.
 
 ```epsil
 [isSymmetric([[1, 2], [3, 1]]), isSymmetric([[a, b], [b, c]])]
-// ➔ ["False","True"]
+// ➔ [false,true]
 isSymmetric([[1, 2, 3], [4, 5, 6]])
-// ➔ "False"
+// ➔ false
 ```
 
 <MathJson name="IsSymmetric">
@@ -2147,7 +2147,7 @@ lengths is not a tensor: its shape is the empty shape of a scalar.
 
 ```epsil
 [shape({1, 2}), shape(1..oo), shape(xs)]
-// ➔ [Shape(Set(1, 2)),Shape(Range(1, +oo)),Shape("xs")]
+// ➔ [Shape(Set(1, 2)),Shape(Range(1, +oo)),Shape(xs)]
 shape([[5, 2, 10, 18], [1, 2, 3]])
 // ➔ ()
 ```

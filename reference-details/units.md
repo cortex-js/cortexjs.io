@@ -122,7 +122,7 @@ unitConvert(quantity(2, µg), mg)
 unitConvert(quantity(1, keV), eV)
 // ➔ 1000 eV
 isError(unitConvert(quantity(2, ug), g))
-// ➔ "True"
+// ➔ true
 ```
 
 ### Non-SI units
@@ -363,7 +363,7 @@ Quantities of the same dimension compare by their values in a common unit:
 
 ```epsil
 [quantity(100, cm) == quantity(1, m), quantity(10, m) > quantity(5, ft)]
-// ➔ ["True","True"]
+// ➔ [true,true]
 ```
 
 ### MathJSON
@@ -458,7 +458,7 @@ unitConvert(quantity(36, km/h), m/s)
 unitConvert(quantity(100, degC), degF)
 // ➔ 212 degF
 isError(unitConvert(quantity(5, m), s))
-// ➔ "True"
+// ➔ true
 ```
 
 An exact magnitude stays exact when the conversion multiplies it by an
@@ -516,9 +516,9 @@ units, written as names.
 
 ```epsil
 [isCompatibleUnit(m, km), isCompatibleUnit(m, s), isCompatibleUnit(J, eV)]
-// ➔ ["True","False","True"]
+// ➔ [true,false,true]
 isCompatibleUnit(m/s, km/h)
-// ➔ "True"
+// ➔ true
 ```
 
 ### MathJSON

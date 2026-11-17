@@ -11,9 +11,9 @@ negation of `||`.
 
 ```epsil
 [xor(true, false), nand(true, true), nor(false, false)]
-// ➔ ["True","False","True"]
+// ➔ [true,false,true]
 xor(true, true, true)
-// ➔ "True"
+// ➔ true
 ```
 
 `&&`, `||`, `nand`, `nor` and `implies` **short-circuit**: their operands
@@ -28,10 +28,10 @@ makes the result an error.
 ```epsil
 function g(x) { 1/x }
 [implies(false, g("a") > 0), nand(false, g("a") > 0)]
-// ➔ ["True","True"]
+// ➔ [true,true]
 function g(x) { 1/x }
 nor(true, g("a") > 0)
-// ➔ "False"
+// ➔ false
 function g(x) { 1/x }
 equivalent(true, g("a") > 0)
 // ➔ error: Runtime error: expected `number`, got `string` at `a`
@@ -44,7 +44,7 @@ list of booleans makes the result a list.
 
 ```epsil
 [true, false] && [true, true]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 ### Boolean simplification
@@ -69,7 +69,7 @@ A boolean expression is simplified with these laws when it is evaluated:
 [A && (A || B), A || (A && B), A && A && B]
 // ➔ [A,A,A && B]
 [A && !A, A || !A, A && true, A || false, A && false, A || true, !!A]
-// ➔ ["False","True",A,A,"False","True",A]
+// ➔ [false,true,A,A,false,true,A]
 ```
 
 ## Section: First-order logic
@@ -100,22 +100,22 @@ is False.
 
 ```epsil
 [forAll(x in {1, 2, 3}, x > 0), exists(x in [1, 2, 3], x > 2)]
-// ➔ ["True","True"]
+// ➔ [true,true]
 forAll(n in 1..10, n < 10)
-// ➔ "False"
+// ➔ false
 exists(n in 1..1000, n == 1000)
-// ➔ "True"
+// ➔ true
 exists(n in 1..2000, n == 1500)
 // ➔ Exists(Element(n, Range(1, 2000)), n == 1500)
 [forAll(n in 1..2000, n > 0), forAll(n in 1..2000, n < 1500)]
-// ➔ ["True",ForAll(Element(n, Range(1, 2000)), n < 1500)]
+// ➔ [true,ForAll(Element(n, Range(1, 2000)), n < 1500)]
 ```
 
 Over an empty domain, `forAll` is true and `exists` is false.
 
 ```epsil
 [forAll(x in {}, x > 0), exists(x in {}, x > 0)]
-// ➔ ["True","False"]
+// ➔ [true,false]
 ```
 
 Nested quantifiers of the same kind are evaluated over the Cartesian
@@ -123,9 +123,9 @@ product of their domains.
 
 ```epsil
 forAll(x in {1, 2}, forAll(y in {1, 2}, x + y > 0))
-// ➔ "True"
+// ➔ true
 exists(x in {1, 2}, exists(y in {1, 2}, x + y == 4))
-// ➔ "True"
+// ➔ true
 ```
 
 When the domain is not finite, or there is no domain, these simplifications
@@ -136,9 +136,9 @@ proposition can be decided for every value.
 
 ```epsil
 [forAll(x, true), exists(x, false), forAll(x, y > 0)]
-// ➔ ["True","False",0 < y]
+// ➔ [true,false,0 < y]
 forAll(x, x + 1 > x)
-// ➔ "True"
+// ➔ true
 exists(x, x^2 == 1)
 // ➔ Exists(x, x^2 == 1)
 ```
@@ -151,7 +151,7 @@ exists(x, x^2 == 1)
 
 ```epsil
 [notForAll(x in {1, 2, 3}, x > 1), notExists(x in {1, 2, 3}, x > 5)]
-// ➔ ["True","True"]
+// ➔ [true,true]
 !forAll(x, x > 1)
 // ➔ !ForAll(x, 1 < x)
 ```
@@ -265,9 +265,9 @@ finite `S`, the proposition is decided by trying each element.
 
 ```epsil
 exists(x in {5, 2, 10, 18}, x > 15)
-// ➔ "True"
+// ➔ true
 exists(x in {5, 2, 10}, x > 15)
-// ➔ "False"
+// ➔ false
 exists(x, x > 15)
 // ➔ Exists(x, 15 < x)
 ```
@@ -279,7 +279,7 @@ proposition.
 ```epsil
 let x = 100
 exists(x in {5, 2, 10}, x > 15)
-// ➔ "False"
+// ➔ false
 ```
 
 See also [`notExists`](/reference/logic/#notexists) and
@@ -321,9 +321,9 @@ a predicate, use [`all`](/reference/collections/#all).
 
 ```epsil
 forAll(x in {5, 2, 10, 18}, x > 0)
-// ➔ "True"
+// ➔ true
 forAll(x in {5, 2, 10, 18}, x > 5)
-// ➔ "False"
+// ➔ false
 ```
 
 See also [`notForAll`](/reference/logic/#notforall).
@@ -332,7 +332,7 @@ A proposition that holds for every value is decided without a domain:
 
 ```epsil
 forAll(x, x + 1 > x)
-// ➔ "True"
+// ➔ true
 ```
 
 ### MathJSON
@@ -369,9 +369,9 @@ satisfies `p`. It is evaluated over a finite domain like
 
 ```epsil
 existsUnique(x in {1, 2, 3}, x == 2)
-// ➔ "True"
+// ➔ true
 existsUnique(x in {1, 2, 3}, x > 1)
-// ➔ "False"
+// ➔ false
 existsUnique(x, x > 1)
 // ➔ ExistsUnique(x, 1 < x)
 ```
@@ -397,10 +397,10 @@ predicate can be any function of the program:
 ```epsil
 function P(x) { x > 0 }
 forAll(x in {1, 2}, P(x))
-// ➔ "True"
+// ➔ true
 function P(x) { x > 0 }
 exists(x in {-1, -2}, P(x))
-// ➔ "False"
+// ➔ false
 ```
 
 `Predicate(P, x)` is the predicate `P` applied to `x`, kept as a formula: it
@@ -519,11 +519,11 @@ than 20 variables, they stay unevaluated.
 
 ```epsil
 isSatisfiable(A && !A)
-// ➔ "False"
+// ➔ false
 isSatisfiable(A || B)
-// ➔ "True"
+// ➔ true
 isSatisfiable(A || !A)
-// ➔ "True"
+// ➔ true
 ```
 
 A contradiction is not satisfiable; a tautology is.
@@ -544,15 +544,15 @@ tries every assignment, and stays unevaluated with more than 20 variables.
 
 ```epsil
 isTautology(A || !A)
-// ➔ "True"
+// ➔ true
 isTautology(equivalent(!!A, A))
-// ➔ "True"
+// ➔ true
 isTautology(equivalent(!(A && B), !A || !B))
-// ➔ "True"
+// ➔ true
 isTautology(implies(A && implies(A, B), B))
-// ➔ "True"
+// ➔ true
 isTautology(A)
-// ➔ "False"
+// ➔ false
 ```
 
 ### MathJSON
@@ -574,9 +574,9 @@ from all `False` to all `True`. With more than 10 variables (1024 rows),
 
 ```epsil
 truthTable(A && B)
-// ➔ [["A","B","Result"],["False","False","False"],["False","True","False"],["True","False","False"],["True","True","True"]]
+// ➔ [["A","B","Result"],[false,false,false],[false,true,false],[true,false,false],[true,true,true]]
 truthTable(!A)
-// ➔ [["A","Result"],["False","True"],["True","False"]]
+// ➔ [["A","Result"],[false,true],[true,false]]
 ```
 
 ### MathJSON
@@ -670,7 +670,7 @@ minimalDNF((A && B) || (A && !B))
 minimalDNF((A && B) || (!A && C) || (B && C))
 // ➔ !A && C || A && B
 minimalDNF(A || !A)
-// ➔ "True"
+// ➔ true
 ```
 
 ### MathJSON

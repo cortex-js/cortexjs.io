@@ -99,7 +99,7 @@ Membership works on every collection:
 
 ```epsil
 3 in {1, 2, 3}
-// ➔ True
+// ➔ true
 ```
 
 ## Nested collections
@@ -294,7 +294,7 @@ Inert: the adjunction is not expanded, and membership in it is not decided.
 
 ```epsil
 adjoin(integers, sqrt(2))
-// ➔ Adjoin("Integers", sqrt(2))
+// ➔ Adjoin(integers, sqrt(2))
 ```
 
 ### all
@@ -305,7 +305,7 @@ Return True if the predicate holds for every element of the collection (or if ev
 
 ```epsil
 all([2, 4, 6], x => x % 2 == 0)
-// ➔ "True"
+// ➔ true
 ```
 
 Without a predicate, the elements are read as booleans. `all` stops at the
@@ -314,9 +314,9 @@ infinite collection.
 
 ```epsil
 all([1, 2, 3], x => x > 2)
-// ➔ "False"
+// ➔ false
 all(1..oo, x => x < 5)
-// ➔ "False"
+// ➔ false
 ```
 
 `all` of an empty collection is `True`. When the answer depends on elements
@@ -324,7 +324,7 @@ that cannot be decided, `all` stays unevaluated.
 
 ```epsil
 all([])
-// ➔ "True"
+// ➔ true
 all([a, b], x => x > 0)
 // ➔ All([a,b], (x) => 0 < x)
 ```
@@ -353,7 +353,7 @@ To test membership of a specific value, use `Contains(xs, v)` — the structural
 
 ```epsil
 any([1, 3, 4], x => x % 2 == 0)
-// ➔ "True"
+// ➔ true
 ```
 
 Without a predicate, the elements are read as booleans. `any` stops at the
@@ -362,9 +362,9 @@ infinite collection.
 
 ```epsil
 any([False, True, False])
-// ➔ "True"
+// ➔ true
 any(1..oo, x => x > 5)
-// ➔ "True"
+// ➔ true
 ```
 
 `any` of an empty collection is `False`. When the answer depends on
@@ -372,7 +372,7 @@ elements that cannot be decided, `any` stays unevaluated.
 
 ```epsil
 any([])
-// ➔ "False"
+// ➔ false
 any([a, b], x => x > 0)
 // ➔ Any([a,b], (x) => 0 < x)
 ```
@@ -581,11 +581,11 @@ are out of range too.
 [5, 2, 10, 18][99]
 // ➔ NaN
 ["a", "b"][99]
-// ➔ "Missing"
+// ➔ missing
 [(1, 2), (3, 4)][5]
 // ➔ (NaN, NaN)
 first([])
-// ➔ "Missing"
+// ➔ missing
 ```
 
 The marker is not part of the static type of an access: the engine cannot in
@@ -614,7 +614,7 @@ point whose coordinates are all `NaN` as absent, as they read `NaN` and
 Coalesce(["a", "b"][99], "none")
 // ➔ "none"
 let ps = [(1, 2)]; [isMissing(ps[5]), Coalesce(ps[9], (0, 0))]
-// ➔ ["True",(0, 0)]
+// ➔ [true,(0, 0)]
 let ps = [(1, 2)]; AssertPresent(ps[5])
 // ➔ error: Runtime error: expected present at `At("ps", 5)`
 let ps = [(1, 2)]; pointX(ps[5])
@@ -629,7 +629,7 @@ is a mask, so `L[L > 0]` keeps the positive elements.
 
 ```epsil
 let L = [-1, 2, -3, 4]; L > 0
-// ➔ ["False","True","False","True"]
+// ➔ [false,true,false,true]
 let L = [-1, 2, -3, 4]; L[L > 0]
 // ➔ [2,4]
 ```
@@ -650,7 +650,7 @@ values.
 
 ```epsil
 [1, 2, 3] == [1, 2, 3]
-// ➔ "True"
+// ➔ true
 ```
 
 #### Indexing a matrix or a tensor
@@ -783,7 +783,7 @@ Closed(x): the endpoint x of an Interval, marked as included. A marker with no v
 
 ```epsil
 1 in interval(0, closed(1))
-// ➔ "True"
+// ➔ true
 ```
 
 ### complement
@@ -807,7 +807,7 @@ The set of all finite complex numbers.
 
 ```epsil
 2 + 3i in complexNumbers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="ComplexNumbers" latex={["\\mathbb{C}"]} />
@@ -822,7 +822,7 @@ Equivalent to `Any(xs, (e) => e === v)`; use `Any` to test an arbitrary predicat
 
 ```epsil
 contains([1, 2, 3], 2)
-// ➔ "True"
+// ➔ true
 ```
 
 Over a list or a tuple, the comparison is structural identity, as for
@@ -836,7 +836,7 @@ the answer open until the symbols have values, use `in`
 
 ```epsil
 contains([a, b], 3)
-// ➔ "False"
+// ➔ false
 3 in [a, b]
 // ➔ Element(3, [a,b])
 ```
@@ -847,7 +847,7 @@ is inexact), and a value with an unknown leaves the answer open.
 
 ```epsil
 [contains({1, 2, 3}, e), contains({1, 2, 3}, 2.0)]
-// ➔ ["False","True"]
+// ➔ [false,true]
 contains({1, 2, 3}, x)
 // ➔ Contains(Set(1, 2, 3), x)
 ```
@@ -858,7 +858,7 @@ elements, a sublist or a substring, use
 
 ```epsil
 [contains("abc", "ab"), containsSequence("abc", "ab")]
-// ➔ ["False","True"]
+// ➔ [false,true]
 ```
 
 <MathJson name="Contains">
@@ -885,7 +885,7 @@ Unlike `Contains`, which tests membership of a single element, the needle is rea
 
 ```epsil
 containsSequence([1, 2, 3, 4], [2, 3])
-// ➔ "True"
+// ➔ true
 ```
 
 For a needle that is not empty, `containsSequence` is `True` when
@@ -896,9 +896,9 @@ it returns a span.
 
 ```epsil
 containsSequence([1, 2, 3], [3, 2])
-// ➔ "False"
+// ➔ false
 containsSequence([1, 2, 3], [])
-// ➔ "True"
+// ➔ true
 ```
 
 `containsSequence` is not [`contains`](#contains), which tests for one
@@ -907,9 +907,9 @@ the characters of the string.
 
 ```epsil
 [containsSequence("abc", "bc"), containsSequence("abc", "ac")]
-// ➔ ["True","False"]
+// ➔ [true,false]
 containsSequence("abc", "")
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="ContainsSequence">
@@ -1207,7 +1207,7 @@ dictionaries. The same key written twice in one literal is an error instead.
 ```epsil
 let defaults = {"verbose" -> False, "depth" -> 2}
 {...defaults, "verbose" -> True}
-// ➔ {"verbose" -> "True", "depth" -> 2}
+// ➔ {"verbose" -> true, "depth" -> 2}
 {"a" -> 1, "a" -> 2}
 // ➔ error: duplicate dictionary key: a
 ```
@@ -1376,7 +1376,7 @@ Type-style membership works with:
 
 ```epsil
 3 in {1, 2, 3}
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="Element" latex={["\\in"]} />
@@ -1389,7 +1389,7 @@ The empty set, a set containing no elements.
 
 ```epsil
 isEmpty(emptySet)
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="EmptySet" latex={["\\emptyset"]} />
@@ -1404,7 +1404,7 @@ On a string the suffix is matched character by character, so a suffix that would
 
 ```epsil
 endsWith([1, 2, 3], [2, 3])
-// ➔ "True"
+// ➔ true
 ```
 
 An empty suffix is `True`. `endsWith` reads the end of the collection, so it
@@ -1420,9 +1420,9 @@ character of `"e\u{301}"` is `é`, which is not the combining accent.
 
 ```epsil
 endsWith("hello", "lo")
-// ➔ "True"
+// ➔ true
 endsWith("e\u{301}", "\u{301}")
-// ➔ "False"
+// ➔ false
 ```
 
 <MathJson name="EndsWith">
@@ -1449,7 +1449,7 @@ The set of all complex numbers, including infinities.
 
 ```epsil
 complexInfinity in extendedComplexNumbers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="ExtendedComplexNumbers" latex={["\\overline\\C"]} />
@@ -1462,7 +1462,7 @@ The set of all integers, including infinities.
 
 ```epsil
 Infinity in extendedIntegers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="ExtendedIntegers" latex={["\\overline\\Z"]} />
@@ -1475,7 +1475,7 @@ The set of all rational numbers, including infinities.
 
 ```epsil
 -Infinity in extendedRationalNumbers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="ExtendedRationalNumbers" latex={["\\overline\\Q"]} />
@@ -1488,7 +1488,7 @@ The set of all real numbers, including infinities.
 
 ```epsil
 -Infinity in extendedRealNumbers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="ExtendedRealNumbers" latex={["\\overline\\R"]} />
@@ -1612,7 +1612,7 @@ find([5, 2, 10, 18], _ > 100)
 find([(1, 2), (3, 4)], p => first(p) > 9)
 // ➔ (NaN, NaN)
 find(["a", "b"], s => s == "z")
-// ➔ "Missing"
+// ➔ missing
 Coalesce(find([5, 2, 10, 18], _ > 100), 0)
 // ➔ 0
 ```
@@ -1774,7 +1774,7 @@ The set of all imaginary numbers.
 
 ```epsil
 3i in imaginaryNumbers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="ImaginaryNumbers" latex={["\\imaginaryI\\R"]} />
@@ -1892,7 +1892,7 @@ The set of all finite integers.
 
 ```epsil
 -7 in integers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="Integers" latex={["\\mathbb{Z}"]} />
@@ -1918,7 +1918,7 @@ A set of real numbers between two endpoints. The endpoints may or may not be inc
 
 ```epsil
 0.5 in interval(0, 1)
-// ➔ "True"
+// ➔ true
 ```
 
 ### isEmpty
@@ -1929,7 +1929,7 @@ Return True if the collection is empty, False otherwise.
 
 ```epsil
 isEmpty([])
-// ➔ "True"
+// ➔ true
 ```
 
 A symbol that is not known to be a collection leaves the answer open. A
@@ -1937,7 +1937,7 @@ string is a collection of characters.
 
 ```epsil
 [isEmpty([5, 2, 10, 18]), isEmpty("Hello"), isEmpty("")]
-// ➔ ["False","False","True"]
+// ➔ [false,false,true]
 isEmpty(x)
 // ➔ IsEmpty(x)
 ```
@@ -1982,7 +1982,7 @@ take(iterate((n, acc) => n * acc, 1), 5)
 take(iterate(_ * 2, 1), 5)
 // ➔ [2,4,8,16,32]
 take(iterate(x => [x]), 2)
-// ➔ [["Nothing"],[["Nothing"]]]
+// ➔ [[nothing],[[nothing]]]
 ```
 
 <MathJson name="Iterate">
@@ -2198,7 +2198,7 @@ length.
 
 ```epsil
 length(Missing)
-// ➔ "Missing"
+// ➔ missing
 length([1, Missing])
 // ➔ 2
 ```
@@ -2500,9 +2500,9 @@ gives `Missing` for an absent element, without running its body.
 
 ```epsil
 map(x => sqrt(x), [16, Missing, 81])
-// ➔ [4,"Missing",9]
+// ➔ [4,missing,9]
 map((x: integer) => x > 0, [1, Missing])
-// ➔ ["True","Missing"]
+// ➔ [true,missing]
 ```
 
 <MathJson name="Map">
@@ -2548,7 +2548,7 @@ comparison of keys cannot be decided.
 [maxBy([-3, 1, -2], abs), maxBy([2, -2, 1], abs)]
 // ➔ [-3,2]
 maxBy([a, b], abs)
-// ➔ MaxBy([a,b], "Abs")
+// ➔ MaxBy([a,b], abs)
 ```
 
 <MathJson name="MaxBy">
@@ -2640,7 +2640,7 @@ The set of all negative integers.
 
 ```epsil
 -3 in negativeIntegers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NegativeIntegers" latex={["\\mathbb{Z}_{<0}"]} />
@@ -2653,7 +2653,7 @@ The set of all negative real numbers.
 
 ```epsil
 -0.5 in negativeNumbers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NegativeNumbers" latex={["\\mathbb{R}_{<0}"]} />
@@ -2666,7 +2666,7 @@ The set of all non-negative integers.
 
 ```epsil
 0 in nonNegativeIntegers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NonNegativeIntegers" latex={["\\mathbb{N}"]} />
@@ -2679,7 +2679,7 @@ The set of all non-negative real numbers.
 
 ```epsil
 0 in nonNegativeNumbers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NonNegativeNumbers" latex={["\\mathbb{R}_{\\geq0}"]} />
@@ -2692,7 +2692,7 @@ The set of all non-positive integers.
 
 ```epsil
 0 in nonPositiveIntegers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NonPositiveIntegers" latex={["\\mathbb{Z}_{\\le0}"]} />
@@ -2705,7 +2705,7 @@ The set of all non-positive real numbers.
 
 ```epsil
 0 in nonPositiveNumbers
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NonPositiveNumbers" latex={["\\mathbb{R}_{\\le0}"]} />
@@ -2718,7 +2718,7 @@ Test whether a value is not an element of a collection.
 
 ```epsil
 4 !in {1, 2, 3}
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NotElement" latex={["\\notin"]} />
@@ -2731,7 +2731,7 @@ Test whether the first collection is not a strict subset of the second.
 
 ```epsil
 NotSubset({1, 4}, {1, 2, 3})
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NotSubset" latex={["\\nsubset"]} />
@@ -2744,7 +2744,7 @@ Test whether the first collection is not a strict superset of the second.
 
 ```epsil
 NotSuperset({1, 2}, {1, 2, 3})
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="NotSuperset" latex={["\\nsupset"]} />
@@ -2757,7 +2757,7 @@ Test whether the first collection is not a superset (possibly equal) of the seco
 
 ```epsil
 NotSupersetEqual({1, 2}, {1, 2, 3})
-// ➔ "True"
+// ➔ true
 ```
 
 ### numbers
@@ -2768,7 +2768,7 @@ The set of all numbers.
 
 ```epsil
 2 + 3i in numbers
-// ➔ "True"
+// ➔ true
 ```
 
 ### open
@@ -2779,7 +2779,7 @@ Open(x): the endpoint x of an Interval, marked as excluded. A marker with no val
 
 ```epsil
 0 in interval(open(0), 1)
-// ➔ "False"
+// ➔ false
 ```
 
 ### ordering
@@ -2964,7 +2964,7 @@ The set of all positive integers.
 
 ```epsil
 0 in positiveIntegers
-// ➔ "False"
+// ➔ false
 ```
 
 <MathJson name="PositiveIntegers" latex={["\\mathbb{N}^*"]} />
@@ -2977,7 +2977,7 @@ The set of all positive real numbers.
 
 ```epsil
 0 in positiveNumbers
-// ➔ "False"
+// ➔ false
 ```
 
 <MathJson name="PositiveNumbers" latex={["\\mathbb{R}_{>0}"]} />
@@ -3009,7 +3009,7 @@ The elements of ℤ/nℤ are `ResidueClass(0, n)` … `ResidueClass(n - 1, n)`, 
 
 ```epsil
 quotientRing(integers, 5)
-// ➔ QuotientRing("Integers", 5)
+// ➔ QuotientRing(integers, 5)
 ```
 
 ### randomShuffle
@@ -3211,7 +3211,7 @@ rangeOf([9, 7, 5, 3], [7, 5])
 [rangeOf("hello world", "o w"), rangeOf("hello", "e")]
 // ➔ [Range(5, 7),Range(2, 2)]
 rangeOf([9, 7, 5, 3], [7, 3])
-// ➔ "Missing"
+// ➔ missing
 ```
 
 `rangeOf` and its three companions [`containsSequence`](#containssequence),
@@ -3254,7 +3254,7 @@ rangeOf(xs, [1, 2], last(r) + 1)
 
 ```epsil
 rangeOf([9, 7, 5, 3], [3], 5)
-// ➔ "Missing"
+// ➔ missing
 rangeOf([9, 7, 5, 3], [7], 0)
 // ➔ error: Runtime error: out of range: an index of 1 or more, 0
 rangeOf([9, 7, 5, 3], [])
@@ -3275,7 +3275,7 @@ with [`isMissing`](/reference/core/#ismissing) or replace it with
 slice([9, 7, 5, 3], rangeOf([9, 7, 5, 3], [7, 5]))
 // ➔ [7,5]
 slice([9, 7, 5, 3], rangeOf([9, 7, 5, 3], [1]))
-// ➔ "Missing"
+// ➔ missing
 ```
 
 On a string the elements are characters, so the search is character by
@@ -3301,7 +3301,7 @@ slice("hello world", rangeOf("hello world", "o w"))
 rangeOf("abcabc", "bc", 4)
 // ➔ [5,6]
 rangeOf("abcabc", "bc", 6)
-// ➔ "Missing"
+// ➔ missing
 ```
 
 The needle can be a collection of another kind than the subject: a string
@@ -3352,7 +3352,7 @@ The set of all finite rational numbers.
 
 ```epsil
 sqrt(2) in rationalNumbers
-// ➔ "False"
+// ➔ false
 ```
 
 <MathJson name="RationalNumbers" latex={["\\mathbb{Q}"]} />
@@ -3365,7 +3365,7 @@ The set of all finite real numbers.
 
 ```epsil
 i in realNumbers
-// ➔ "False"
+// ➔ false
 ```
 
 <MathJson name="RealNumbers" latex={["\\mathbb{R}"]} />
@@ -3395,7 +3395,7 @@ reduce([1, 2, 3], (a, b) => a - b, 10)
 reduce([], (a, b) => a + b, 1 + 4 % 3)
 // ➔ 2
 reduce([], (a, b) => a + b) == Nothing
-// ➔ "True"
+// ➔ true
 ```
 
 The name of a function of two arguments can stand for the function.
@@ -3431,7 +3431,7 @@ such as `"Add"`, stands for the function of two arguments.
 
 `(value: any, count: integer?) -> list`
 
-Produce a sequence by repeating a single value. With 1 argument, returns an infinite sequence; with 2 arguments (value, count), returns a finite list of `count` copies.
+Produce a sequence by repeating a single value. With 1 argument, returns an infinite sequence; with 2 arguments (value, count), returns a finite list of `count` copies. A value that is not pure (`Random()`) is evaluated once per element, in order, and each read of an element of a lazy `Repeat` evaluates it again.
 
 ```epsil
 repeat(0, 3)
@@ -3439,7 +3439,10 @@ repeat(0, 3)
 ```
 
 The result has the type `list<T>`, where `T` is the type of the value.
-`repeat(x)` is `cycle([x])`; see [`cycle`](#cycle).
+For a pure `x`, `repeat(x)` is `cycle([x])`; see [`cycle`](#cycle).
+A value that is not pure, such as `random()`, is evaluated once per element,
+in order: `repeat(random(), 3)` is three different numbers. A pure value is
+evaluated once.
 
 ```epsil
 type(repeat(False, 3))
@@ -3447,7 +3450,7 @@ type(repeat(False, 3))
 repeat(1)
 // ➔ [1,1,1,1,1,...]
 take(repeat(7), 3) == take(cycle([7]), 3)
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="Repeat">
@@ -3573,7 +3576,7 @@ Classes are not ordered.
 
 ```epsil
 residueClass(7, 5) == residueClass(2, 5)
-// ➔ "True"
+// ➔ true
 residueClass(1, 3) < residueClass(2, 3)
 // ➔ ResidueClass(1, 3) < ResidueClass(2, 3)
 ```
@@ -4014,7 +4017,7 @@ the needle is absent, can therefore be sliced with no test in between:
 slice([9, 7, 5, 3], rangeOf([9, 7, 5, 3], [7, 5]))
 // ➔ [7,5]
 slice([9, 7, 5, 3], rangeOf([9, 7, 5, 3], [1, 2]))
-// ➔ "Missing"
+// ➔ missing
 ```
 
 <MathJson name="Slice">
@@ -4109,7 +4112,7 @@ On a string the prefix is matched character by character, so a prefix that would
 
 ```epsil
 startsWith([1, 2, 3], [1, 2])
-// ➔ "True"
+// ➔ true
 ```
 
 An empty prefix is `True`. Over an infinite collection, `startsWith` stays
@@ -4117,7 +4120,7 @@ unevaluated.
 
 ```epsil
 startsWith("hello", "he")
-// ➔ "True"
+// ➔ true
 startsWith(1..oo, [1, 2])
 // ➔ StartsWith(Range(1, +oo), [1,2])
 ```
@@ -4127,9 +4130,9 @@ and only character of `"👨‍👩‍👧"` is the whole family, not `👨`.
 
 ```epsil
 startsWith("👨‍👩‍👧", "👨")
-// ➔ "False"
+// ➔ false
 startsWith("hello", "")
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="StartsWith">
@@ -4156,7 +4159,7 @@ Test whether the first collection is a strict subset of the second.
 
 ```epsil
 subset({1, 2}, {1, 2, 3})
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="Subset" latex={["\\subset"]} />
@@ -4169,7 +4172,7 @@ Test whether the first collection is a subset (possibly equal) of the second.
 
 ```epsil
 subsetEqual({1, 2, 3}, {1, 2, 3})
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="SubsetEqual" latex={["\\subseteq"]} />
@@ -4182,7 +4185,7 @@ Test whether the first collection is a strict superset of the second.
 
 ```epsil
 superset({1, 2, 3}, {1, 2})
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="Superset" latex={["\\supset"]} />
@@ -4195,7 +4198,7 @@ Test whether the first collection is a superset (possibly equal) of the second.
 
 ```epsil
 supersetEqual({1, 2}, {1, 2})
-// ➔ "True"
+// ➔ true
 ```
 
 <MathJson name="SupersetEqual" latex={["\\supseteq"]} />
@@ -4478,7 +4481,7 @@ A fixed number of heterogeneous elements. Nothing retains its slot, and a tuple 
 
 ```epsil
 (1, "a", True)
-// ➔ (1, "a", "True")
+// ➔ (1, "a", true)
 ```
 
 ### tupleFrom
@@ -4607,7 +4610,7 @@ collection (`unknown` for a collection with no element type).
 
 ```epsil
 zip([1, 2], ["a", "b"], [True, False, True])
-// ➔ [(1, "a", "True"),(2, "b", "False")]
+// ➔ [(1, "a", true),(2, "b", false)]
 type(zip([1, 2], ["a", "b"]))
 // ➔ TypeFrom("list<tuple<integer, string>>")
 ```

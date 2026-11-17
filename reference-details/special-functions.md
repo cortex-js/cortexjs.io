@@ -190,7 +190,7 @@ Some values at special points are exact:
 
 ```epsil
 [clausenCl(2, pi/2), clausenCl(2, pi), clausenCl(4, pi/2)]
-// ➔ ["CatalanConstant",0,DirichletBeta(4)]
+// ➔ [catalanConstant,0,DirichletBeta(4)]
 ```
 
 A real θ is computed to the engine precision for an order up to 40. An

@@ -328,25 +328,25 @@ block, with `listFrom`, and it replays:
 let a = withRandomSeed(3, [random() for k in 1..3])
 let b = withRandomSeed(3, [random() for k in 1..3])
 a[1] == b[1]
-// ➔ "False"
+// ➔ false
 let a = withRandomSeed(3, listFrom([random() for k in 1..3]))
 let b = withRandomSeed(3, listFrom([random() for k in 1..3]))
 a[1] == b[1]
-// ➔ "True"
+// ➔ true
 ```
 
 Reading the elements of the same lazy collection twice gives the same values:
 the elements of one collection are cached. That is consistent reading, not
 replay: the values are unseeded draws, and a new collection draws new ones.
 
-`repeat(random(), n)` is evaluated at once and replays, but it draws
-**once**, and gives `n` copies of one value. For `n` draws, use
-`randomChoice(interval(0, 1), n)`.
+`repeat(random(), n)` draws a new value for each element: a value that is
+not pure is evaluated once per element (see
+[`repeat`](/reference/collections/#repeat)).
 
 ```epsil
 let r = repeat(random(), 3)
 r[1] == r[2]
-// ➔ "True"
+// ➔ false
 ```
 
 ### MathJSON
@@ -432,7 +432,7 @@ gives an `incompatible-type` error for it:
 
 ```epsil
 [2, nothing, 3]
-// ➔ [2,"Nothing",3]
+// ➔ [2,nothing,3]
 1 + nothing
 // ➔ error: Type error: expected `number`, got `nothing` at `nothing` in `1 + nothing`
 ```
@@ -712,7 +712,7 @@ A symbol is read through its value: with `x` assigned `a + 1`, `head(x)` is
 ```epsil
 let x = a + 1
 [head(x), head(y)]
-// ➔ ["Add","Symbol"]
+// ➔ [Add,symbol]
 ```
 
 ### MathJSON
@@ -735,7 +735,7 @@ tail(2 + x)
 // ➔ 2 x
 let x = a + 1
 [tail(x), tail(y)]
-// ➔ [a,1,"Nothing"]
+// ➔ [a,1,nothing]
 ```
 
 ### MathJSON
@@ -911,7 +911,7 @@ too many solutions to list. Then:
 
 ```epsil
 findRoot(e^x == x + 2, [(x, 1)])["converged"]
-// ➔ "True"
+// ➔ true
 ```
 
 ### MathJSON
@@ -1088,7 +1088,7 @@ that holds an error is still a collection. `NaN` is not an error.
 
 ```epsil
 [isError(1 + 1), isError(x), isError([1, ln("a")]), isError(NaN)]
-// ➔ ["False","False","False","False"]
+// ➔ [false,false,false,false]
 ```
 
 To read an error rather than detect it, use `type`, which gives `error`, or
@@ -1195,7 +1195,7 @@ The symbol is not declared: it is a free variable.
 
 ```epsil
 symbol(x, 2)
-// ➔ "x2"
+// ➔ x2
 ```
 
 ### MathJSON
@@ -1272,7 +1272,7 @@ statement with no value, and a collection keeps it as an element:
 
 ```epsil
 [1, Nothing, 2]
-// ➔ [1,"Nothing",2]
+// ➔ [1,nothing,2]
 length([1, Nothing, 2])
 // ➔ 3
 ```
@@ -1342,7 +1342,7 @@ made of three scalars, eleven UTF-8 bytes and five UTF-16 code units.
 
 ```epsil
 ["e\u{301}" == "é", length("e\u{301}")]
-// ➔ ["True",1]
+// ➔ [true,1]
 length("👨‍🚀")
 // ➔ 1
 unicodeScalars("👨‍🚀")
@@ -1363,11 +1363,11 @@ second argument as a sequence of characters.
 ```epsil
 isDigit(c) = c in "0123456789"
 isDigit("7")
-// ➔ "True"
+// ➔ true
 [contains("abc", "b"), contains("abc", "ab")]
-// ➔ ["True","False"]
+// ➔ [true,false]
 containsSequence("abc", "ab")
-// ➔ "True"
+// ➔ true
 ```
 
 **Every string is well-formed Unicode.** A host string can hold an unpaired
@@ -1437,9 +1437,9 @@ values must be the same on every host.
 
 ```epsil
 [characterFrom("a") == "a", "abc"[1] == "a", indexOf("abc", "b")]
-// ➔ ["True","True",2]
+// ➔ [true,true,2]
 characterFrom("é") < characterFrom("z")
-// ➔ "False"
+// ➔ false
 ```
 
 A string function also accepts a character, as [Strings](#strings)
@@ -1481,9 +1481,9 @@ characters are compared.
 
 ```epsil
 rangeOf("x\u{301}y", "x")
-// ➔ "Missing"
+// ➔ missing
 rangeOf("👨‍👩‍👧", "👩")
-// ➔ "Missing"
+// ➔ missing
 rangeOf("e\u{301}e", "e")
 // ➔ [2]
 ```
@@ -1628,7 +1628,7 @@ argument. This follows from grapheme segmentation:
 
 ```epsil
 String(characters("héllo")) == "héllo"
-// ➔ "True"
+// ➔ true
 [length(["e", "\u{301}"]), length(String(["e", "\u{301}"]))]
 // ➔ [2,1]
 characters(reverse("\u{301}a"))
@@ -1731,7 +1731,7 @@ characters is an error, never a truncation.
 characterFrom("👨‍👩‍👧")
 // ➔ "👨‍👩‍👧"
 characterFrom("e\u{301}") == characterFrom("é")
-// ➔ "True"
+// ➔ true
 characterFrom("ab")
 // ➔ error: Type error: expected `character`, got `string` at `"ab"` in `characterFrom("ab")`
 characterFrom("")
@@ -1744,7 +1744,7 @@ for every character `c`.
 ```epsil
 let c = characterFrom("x")
 characterFrom(String(c)) == c
-// ➔ "True"
+// ➔ true
 ```
 
 A string literal also becomes a character where a `character` is expected:
@@ -2309,9 +2309,9 @@ with the sigma `σ`, so the folded forms of both spellings are equal.
 [toLowerCase("ΟΔΟΣ"), caseFold("ΟΔΟΣ")]
 // ➔ ["οδος","οδοσ"]
 caseFold("ΟΔΟΣ") == caseFold("οδοσ")
-// ➔ "True"
+// ➔ true
 toLowerCase("ΟΔΟΣ") == toLowerCase("οδοσ")
-// ➔ "False"
+// ➔ false
 ```
 
 #### An approximation of Unicode case folding
@@ -2364,7 +2364,7 @@ code points.
 stringCompare("\u{E000}", "\u{1F600}")
 // ➔ -1
 "\u{E000}" < "\u{1F600}"
-// ➔ "False"
+// ➔ false
 ```
 
 ### MathJSON
@@ -2510,7 +2510,7 @@ reading `"NaN"`, so it cannot also mean that the reading failed.
 
 ```epsil
 isError(numberFrom("12abc"))
-// ➔ "True"
+// ➔ true
 ```
 
 A numeral with no fraction and no exponent gives an exact integer. A numeral
@@ -2569,7 +2569,7 @@ parse("19_2")
 // ➔ Subscript(19, 2)
 let q = parse("11_8 - 3_8 = 6_8")
 q
-// ➔ "True"
+// ➔ true
 ```
 
 A symbol subscript, such as `161_b`, is parsed as `BaseForm` of the
@@ -3000,7 +3000,7 @@ accepted: the body runs with them.
 
 ```epsil
 map((x: integer) => x > 0, [1, missing])
-// ➔ ["True","Missing"]
+// ➔ [true,missing]
 ((x: integer) => x + 1)(NaN)
 // ➔ NaN
 ```
