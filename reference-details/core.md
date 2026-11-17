@@ -2406,3 +2406,300 @@ the second argument.
 ```
 
 In LaTeX, this is `\mathrm{circumference} = 2 \cdot \textcolor{blue}{\pi} \cdot r`.
+
+## Program
+
+The source of an Epsil program, a file or the text of `epsil -e`, is a
+`Program`. It evaluates its statements in the caller's scope, so its
+declarations stay available after it: each entry of the REPL is a program,
+and the next entry sees its declarations. A braced sequence inside a
+program is a [`Block`](/reference/core/#block), whose declarations are
+local.
+
+Type and protocol declarations are prepared first, then the `function`
+statements and the signatures that go with them, then the other statements
+in source order. So a `function` statement can be called before it is
+written, and its clauses can be spread over the program. A variable whose
+value is a function follows the order of the statements instead.
+
+```epsil
+g(2)
+function g(x) { x + 1 }
+// ➔ 3
+h(2)
+let h = x => x + 1
+// ➔ error: Static error: `h` is used before the statement that declares it in this block in `h(2)`
+```
+
+A declaration sets the contract of its variable. Without an annotation, a
+variable whose value is a number has the type `number`, and one whose
+value is a function has the type `function`. A function stored in a
+variable keeps its own argument checks, defaults and closure, and a new
+function assigned to the variable does not make a new contract. An
+annotation is a contract too, and a `const` rejects every assignment.
+
+```epsil
+let x = 1
+x = 2.5
+x
+// ➔ 2.5
+let f = x => x + 1
+f = x => x * 2
+f(3)
+// ➔ 6
+let f = x => x + 1
+f = 3
+// ➔ error: Static error: `f` has the type `function`, and the value has the type `3` in `f := 3`
+const c = 1
+c = 2
+// ➔ error: Static error: cannot assign a value to the constant `c` in `c := 2`
+```
+
+Two declarations of one name in one program are an error. A declaration
+in a later program, such as the next entry of the REPL, can replace an
+earlier declaration and give the name a new type.
+
+```epsil
+let a = 1
+let a = 2
+// ➔ error: Static error: variable redeclaration: a in `let a = 2`
+```
+
+The value of a program is the value of its last statement, or `nothing`
+for an empty program and for one that ends with a declaration or an
+assignment. An ordinary error in a statement is reported, and the next
+statement is evaluated: the CLI then prints the error and exits with
+status 1. A cancellation, such as the time limit, stops the program.
+
+An assignment to a name that the program does not declare is an error:
+
+```epsil
+c = 5
+c
+// ➔ error: Static error: `c` is not declared: write `let c = …` in `c := 5`
+```
+
+### MathJSON
+
+`["Program", statement-1, …, statement-n]`. The Epsil parser always returns
+a `Program`, also for an empty source and for a single expression.
+
+```json example
+["Program", ["Declare", "b", "'unknown'", 2], "b"]
+// ➔ 2, and b remains declared in the caller's scope
+```
+
+## Block
+
+In Epsil, a block is the `{ … }` after `if`, `else`, `for`, `while` and
+`function`, and `do { … }` in an expression. A block creates a scope: its
+declarations are not visible after it.
+
+```epsil
+do { let b = 2; b }
+b
+// ➔ b
+```
+
+The value of a block is the value of its last expression. When the last
+statement is a declaration or an assignment, the value is `nothing`: end
+the block with the name.
+
+```epsil
+do { let b = 2; b }
+// ➔ 2
+```
+
+When a statement of the block evaluates to a `break`, a `continue` or a
+`Return`, the block stops there, and its value is that statement.
+
+Scoping is lexical. A nested scope (an inner block, a branch of an `if`, a
+loop body) reads the variables of the enclosing block, and an assignment to
+a variable of an enclosing block updates it. A `let` in the inner block
+declares a new variable, which hides the outer one in the inner block.
+
+```epsil
+let a = 1
+do { a = 2 }
+a
+// ➔ 2
+let a = 1
+do { let a = 2; a } + a
+// ➔ 3
+```
+
+#### Declarations and assignments
+
+A local of a block is made only by a declaration: `let`, `const`, or a
+`function` statement. An assignment `x = v` writes the variable that is in
+scope, and never makes one. An assignment to a name that no scope declares
+is an error, at any depth of the block, in a function body, and in the body
+of a binder.
+
+```epsil
+do { c = 5; c * 2 }
+// ➔ error: Static error: `c` is not declared: write `let c = …` in `do {c := 5; c * 2}`
+let c = 1
+do { c = 5; c * 2 }
+// ➔ 10
+```
+
+A `let` gives its variable a value. A `let` without a value is an error.
+
+```epsil
+do { let x; x }
+// ➔ error: Static error: `x` is declared without a value: write `let x = …` in `do {let x; x}`
+```
+
+A local is not read before its declaration. The initial value of a
+declaration reads the name outside the block:
+
+```epsil
+do { y; let y = 1 }
+// ➔ error: Static error: `y` is used before the statement that declares it in this block in `do {y; let y = 1}`
+let z = 9
+do { let z = z + 1; z }
+// ➔ 10
+```
+
+A second declaration of a name in one block is an error.
+
+```epsil
+do { let a = 1; let a = 2; a }
+// ➔ error: Static error: variable redeclaration: a in `do {let a = 1; let a = 2; a}`
+```
+
+An assignment is a statement, never an operand: assignments do not chain.
+
+```epsil
+let a = 1
+a = a = 2
+// ➔ error: An assignment is a statement, not a value, so assignments do not chain; write two statements, "b := 5; a := b", or "a := (b == 5)" if the comparison was meant
+```
+
+A later assignment keeps the type of the local: its declared type, or the
+type of its initial value. A number can become another number. A list
+loses its fixed length and keeps the type of its elements; a tuple keeps
+its number of components, whose types are widened. An empty list has
+elements of an unknown type. Another type is an error.
+
+```epsil
+do { let x = 1; x = "a" }
+// ➔ error: Static error: `x` has the type `number`, and the value has the type `string` in `do {let x = 1; x := "a"}`
+let L = [1, 2]
+L = [1, 2, 3]
+L
+// ➔ [1,2,3]
+let L = [1, 2]
+L = ["a"]
+// ➔ error: Static error: `L` has the type `list<number>`, and the value has the type `list<string^1>` in `L := ["a"]`
+let p = (1, 2)
+p = (3, 4.5)
+p
+// ➔ (3, 4.5)
+let p = (1, 2)
+p = (1, 2, 3)
+// ➔ error: Static error: `p` has the type `tuple<number, number>`, and the value has the type `tuple<integer, integer, integer>` in `p := (1, 2, 3)`
+let L = []
+L = ["a"]
+L
+// ➔ ["a"]
+```
+
+#### Local functions
+
+A `function` statement in a block or in a function body declares a local
+variable that holds the function, with the rules above: a call before the
+statement is an error, and a second `function` statement or a `let` of the
+same name is a redeclaration. The type of the local is the signature that
+the statement writes, or `function`.
+
+```epsil
+function outer() { function inner(x) { x * 3 }; inner(2) }
+outer()
+// ➔ 6
+do { g(2); function g(x) { x + 1 } }
+// ➔ error: Static error: `g` is used before the statement that declares it in this block in `do {g(2); function g(x) {x + 1}}`
+type(do { function g(x: integer) -> integer { x + 1 }; g })
+// ➔ TypeFrom("(x: integer) -> integer")
+```
+
+#### Translating simultaneous assignments
+
+A block is sequential: a later assignment sees the changes made by every
+earlier statement. A source language with simultaneous assignments, such as
+the Desmos action `(a → 1, b → a + 1)`, in which `b` reads the value of `a`
+from before the action, cannot be translated statement by statement:
+
+```epsil
+let a = 5
+let b = 0
+do { a = 1; b = a + 1 }
+(a, b)
+// ➔ (1, 2)
+```
+
+Evaluate every right-hand side against the old values first, into fresh
+locals of the block, then assign the results. The order of the assignments
+then does not matter, because no temporary depends on a new value.
+
+```epsil
+let a = 5
+let b = 0
+do { let na = 1; let nb = a + 1; a = na; b = nb }
+(a, b)
+// ➔ (1, 6)
+```
+
+### MathJSON
+
+`["Block", expr-1, …, expr-n]`.
+
+```json example
+["Block", ["Declare", "b", "'unknown'", 2]]
+// ➔ Nothing
+
+["Block", ["Declare", "b", "'unknown'", 2], "b"]
+// ➔ 2
+
+["Block", ["Declare", "c", "'unknown'", 5], ["Multiply", "c", 2]]
+// ➔ 10
+
+["Block", ["Assign", "c", 5], ["Multiply", "c", 2]]
+// ➔ the error assignment-to-undeclared-variable, when no "c" is declared
+//   outside the block. With a global "c", the block writes it, and is 10.
+```
+
+The error codes of the rules above are `assignment-to-undeclared-variable`,
+`read-before-declaration`, `variable-redeclaration`,
+`assignment-in-operand` and `assignment-type-mismatch`. A `["Declare"]`
+without a value is the error `declaration-without-value`, except for the
+signature of a function that a `["DefineFunction"]` of the same statement
+list defines. A `["Declare"]` is a statement of the block itself: one that
+is directly a branch of an `["If"]` or a `["Which"]`, the body of a
+`["Loop"]` or a case of a `["Match"]` is the error
+`declaration-below-statement`. An assignment in an operand,
+`["f", ["Assign", "a", 2]]` or `["Assign", "t", ["Assign", "u", 1]]`, is
+`assignment-in-operand`: write
+`["Block", ["Declare", "a", "'unknown'", 2], ["f", "a"]]`. An `["Assign"]`
+outside every `Block` and `Program`, one that the host evaluates, declares
+the name in the current scope.
+
+The function statement is `["DefineFunction", "g", …]`. The simultaneous
+assignment above, with `a` and `b` declared before the block:
+
+```json example
+["Block",
+  ["Declare", "_next_a", "'unknown'", 1],
+  ["Declare", "_next_b", "'unknown'", ["Add", "a", 1]],
+  ["Assign", "a", "_next_a"],
+  ["Assign", "b", "_next_b"]]
+```
+
+In LaTeX, semicolons (`;` or `\;`) separate the statements of a `Block`:
+`x \coloneq 3; x^2 + 1` parses to
+`["Block", ["Declare", "x", "'unknown'", 3], ["Add", ["Power", "x", 2], 1]]`.
+The first assignment of a name is its declaration, with a value. A `where`
+clause gives bindings to an expression:
+`x^2 + y^2 \keyword{where} x \coloneq 3,\; y \coloneq 4` parses to a `Block` that declares `x` and `y`
+and ends with `["Add", ["Power", "x", 2], ["Power", "y", 2]]`.
