@@ -2298,6 +2298,56 @@ console.log(f.run({
 // ➔ [6, 7, 8]  // u*v + w - z = [2,3,4] + [5,6,7] - [1,2,3]
 ```
 
+### Compile Handlers on an Operator Definition
+
+An operator definition can have a `compile` handler, which changes how that
+operator compiles. To change a library operator, attach the handler to the
+engine's own definition (a new declaration of the operator replaces its
+`evaluate` and `canonical` handlers). The handler receives the operands, a
+`compile` callback and a context whose `language` is the target
+(`'javascript'`, `'glsl'`, `'interval-javascript'`). It returns one of three
+results:
+
+- `undefined`: the operator compiles as if it had no handler.
+- an expression: it is compiled in place of the node, on every target. A
+  node of the expression that the handler created is compiled with no handler
+  consulted, whatever its operator, so an `At` in the result of a handler of
+  `At` is the library's `At`. The operands the handler received are compiled
+  as usual, handlers consulted, when the result holds them as the same
+  objects: reuse the operand objects you are given. An operand rebuilt (for
+  example from its JSON) is a created node, and an operator inside it no
+  longer gets its handler.
+- target source, as a string, which can use `compile()` for the source of an
+  operand.
+
+```js
+const ce = new ComputeEngine();
+ce.declare('i', 'real');
+
+const def = ce.lookupDefinition('At');
+def.operator.compile = (args, _compile, { language }) => {
+  if (args.length !== 2) return undefined;
+  // Read at the floor of the index; a position below 1 has no element.
+  return ce.function('At', [
+    args[0],
+    ce.function('Max', [ce.function('Floor', [args[1]]), 0]),
+  ]);
+};
+
+const f = compile(ce.box(['At', ['List', 10, 20, 30], 'i']));
+f.run({ i: 2.9 });  // ➔ 20
+f.run({ i: 0.5 });  // ➔ NaN
+```
+
+The handler changes the compiled code only: `evaluate()` of `At([10, 20,
+30], 2.9)` is still `NaN`. The experimental profile `'ir'` accepts the
+results `undefined` and expression; a handler that returns text or calls
+`compile` makes it decline, and the program is then compiled by the existing
+compiler on `glsl` and `interval-js`, and evaluated by the interpreter on
+`javascript` (`success: false`). A handler can be called
+more than once for one node in one compilation: it must be a pure function
+of its operands and context for the duration of a `compile()` call.
+
 ### Runtime Helpers for Generated JavaScript
 
 The JavaScript that the `javascript` target writes calls helper functions on

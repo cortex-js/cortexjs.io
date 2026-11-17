@@ -1131,11 +1131,24 @@ positions are silently filtered.
 <Signature name="At">_xs_: indexed_collection, _mask_: indexed_collection&lt;boolean&gt;</Signature>
 
 When the index is a collection of `True`/`False` values, `At` returns
-the elements of `xs` where the mask is `True`. If the mask is shorter
-than `xs`, the iteration stops at the end of the mask.
+the elements of `xs` where the mask is `True`, in order. The mask is read over
+the positions up to the shorter of the mask and `xs`: a mask shorter than `xs`
+keeps nothing past its end, and a mask longer than `xs` is read only as far as
+`xs` goes. A `Missing` or `NaN` member of the mask keeps nothing, as `False`
+does (a list of `Missing` and `NaN` members only is not a mask: it reads an
+absence marker for each entry). Compiled JavaScript gives the same list.
 
 ```json example
 ["At", ["List", 10, 20, 30, 40], ["List", "True", "False", "True", "False"]]
+// ➔ ["List", 10, 30]
+
+["At", ["List", 10, 20, 30, 40], ["List", "True", "False", "True"]]
+// ➔ ["List", 10, 30]
+
+["At", ["List", 10, 20, 30], ["List", "False", "True", "False", "True", "True"]]
+// ➔ ["List", 20]
+
+["At", ["List", 10, 20, 30, 40], ["List", "True", "Missing", "True", "NaN"]]
 // ➔ ["List", 10, 30]
 ```
 
@@ -1204,8 +1217,9 @@ ce.parse("L[L>0]").evaluate();
 ```
 
 The condition does not have to reference the filtered list itself — it can be
-another list of the same length (`L[d=4]` where `d` is a list), or a positional
-mask computed from a `Range`:
+another list (`L[d=4]` where `d` is a list; with `L = [1, 2, 3, 4, 5]` and
+`K = [1, 0, 1]`, `L[K=1]` is `[1, 3]`), or a positional mask computed from a
+`Range`:
 
 ```js
 // Remove the k-th element of L. (The index symbol here is `k`, not `i`:
