@@ -2480,3 +2480,111 @@ entries is evaluated as a `DictionaryFrom` of the joined entries.
 ["DictionaryFrom", ["List", ["Tuple", "'a'", 1], ["Tuple", "'b'", 2]]]
 // ➔ {"dict": {"a": 1, "b": 2}}
 ```
+
+## ResidueClass
+
+The canonical form reduces `k` into `[0, n)`. A rational `k` whose
+denominator is coprime to `n` is read as `u · v⁻¹` in the ring. A float, a
+symbolic `k` or `n`, or a modulus less than 1 stays inert.
+
+```epsil
+[residueClass(7, 5), residueClass(-1, 7)]
+// ➔ [ResidueClass(2, 5),ResidueClass(6, 7)]
+residueClass(1/3, 7)
+// ➔ ResidueClass(5, 7)
+[residueClass(2.5, 5), residueClass(x, 5)]
+// ➔ [ResidueClass(2.5, 5),ResidueClass(x, 5)]
+```
+
+Two classes with the same modulus and the same reduced `k` are equal.
+Classes are not ordered.
+
+```epsil
+residueClass(7, 5) == residueClass(2, 5)
+// ➔ "True"
+residueClass(1, 3) < residueClass(2, 3)
+// ➔ ResidueClass(1, 3) < ResidueClass(2, 3)
+```
+
+#### Arithmetic
+
+Sums, differences, products and integer powers of classes with one modulus
+are classes. An exact integer, or a rational whose denominator is coprime to
+the modulus, is read in the ring. An inverse, a quotient or a negative power
+needs `gcd(k, n) = 1`; otherwise the expression stays symbolic.
+
+```epsil
+residueClass(5, 7) + residueClass(4, 7)
+// ➔ ResidueClass(2, 7)
+residueClass(5, 7) + 3
+// ➔ ResidueClass(1, 7)
+residueClass(3, 7)^100
+// ➔ ResidueClass(4, 7)
+1 / residueClass(3, 7)
+// ➔ ResidueClass(5, 7)
+1 / residueClass(2, 4)
+// ➔ 1 / ResidueClass(2, 4)
+```
+
+A class of another modulus, a float or an infinity is never combined with a
+class: the expression stays symbolic. The rules of the numbers do not apply
+to a class: `c / c` is not cancelled to 1 when `c` has no inverse.
+
+```epsil
+residueClass(1, 5) + residueClass(1, 7)
+// ➔ ResidueClass(1, 5) + ResidueClass(1, 7)
+residueClass(3, 7) * 1.5
+// ➔ 1.5 * ResidueClass(3, 7)
+let c = residueClass(2, 4)
+c / c
+// ➔ ResidueClass(2, 4) / ResidueClass(2, 4)
+```
+
+`solve`, `D` and `integrate` stay symbolic for an expression that holds a
+class.
+
+```epsil
+D(residueClass(3, 7) * x, x)
+// ➔ D(x * ResidueClass(3, 7), x)
+```
+
+The ring itself, `quotientRing(Integers, n)`, is the finite collection of
+its `n` classes; see
+[`quotientRing`](/reference/collections/#quotientring). `a % n` is the
+integer remainder, not a class: `7 % 3` is 1.
+
+```epsil
+[k for k in quotientRing(Integers, 3)]
+// ➔ [ResidueClass(0, 3),ResidueClass(1, 3),ResidueClass(2, 3)]
+```
+
+### MathJSON
+
+`["ResidueClass", k, n]`. In LaTeX, a class is written `\overline{k}_{n}`
+with integer literals `k` and `n`, and it serializes back the same way. A
+bare `\overline{7}` is `["Conjugate", 7]`, and `\overline{z}_1` is
+`["Subscript", ["Conjugate", "z"], 1]`. The ring is written
+`\mathbb{Z}/n\mathbb{Z}` or `\mathbb{Z}_n`.
+
+```json example
+["ResidueClass", 7, 5]
+// ➔ ["ResidueClass", 2, 5]
+
+["ResidueClass", -1, 7]
+// ➔ ["ResidueClass", 6, 7]
+
+["ResidueClass", ["Rational", 1, 3], 7]
+// ➔ ["ResidueClass", 5, 7]
+
+["Equal", ["ResidueClass", 7, 5], ["ResidueClass", 2, 5]]
+// ➔ "True"
+
+["Add", ["ResidueClass", 5, 7], ["ResidueClass", 4, 7]]
+// ➔ ["ResidueClass", 2, 7]
+
+["Divide", 1, ["ResidueClass", 2, 4]]
+// ➔ ["Divide", 1, ["ResidueClass", 2, 4]]
+
+["Mod", 7, 3]
+// ➔ 1
+```
