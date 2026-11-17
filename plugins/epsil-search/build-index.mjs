@@ -270,6 +270,9 @@ async function buildPagefind(outDir, exclude) {
     if (exclude.some((prefix) => url.startsWith(prefix))) continue;
     const $ = await loadPage(outDir, url);
     if (!$) continue;
+    // A page whose content moved (`ReferenceMoved`) lists the old names with
+    // links: indexed, it would compete with the entries it points to.
+    if ($('[data-moved-to]').length > 0) continue;
     // `Epsil Syntax · Epsil`: the page's own title, without the site name.
     const pageTitle = $('title').first().text().replace(/\s*[·|]\s*Epsil\s*$/, '').trim();
     const sections = splitSections($);

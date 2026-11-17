@@ -258,7 +258,9 @@ async function syncComputeEngineCard(unknown) {
 // definitions stay short: they ship in the engine bundle and feed `epsil doc`).
 // `reference-details/<library>.md` has one `## <MathJSON name>` section per
 // entry; the text before its `### MathJSON` is shown under the entry, the text
-// after goes in the entry's MathJSON disclosure. On a page with a detail file,
+// after goes in the entry's MathJSON disclosure, headed by the MathJSON name
+// and the LaTeX commands. A `## Section: <Heading>`
+// is added to the page's overview, before "## Definitions". On a page with a detail file,
 // every entry that has LaTeX commands or MathJSON detail gets the disclosure,
 // headed by its MathJSON name, and its "MathJSON `X` ·" line is reduced to the
 // signature: the page is Epsil first. An entry with neither keeps that line.
@@ -266,16 +268,26 @@ const DETAILS_DIR = path.join(ROOT, "reference-details");
 
 function parseDetails(text, file, warnings) {
   const sections = new Map();
+  const overview = [];
   const body = text.replace(/<!--[\s\S]*?-->/g, "");
   for (const part of body.split(/^## /m).slice(1)) {
     const newline = part.indexOf("\n");
     const name = part.slice(0, newline).trim();
+    // `## Section: <Heading>` is a section of the page's overview, not of an
+    // entry: it is inserted as `## <Heading>` before "## Definitions".
+    const heading = /^Section:\s*(.+)$/.exec(name)?.[1];
+    if (heading) {
+      if (/^#{1,2} /m.test(part.slice(newline + 1)))
+        warnings.push(`${file} ${name}: use ### or deeper in a section`);
+      overview.push(`## ${heading}\n\n${part.slice(newline + 1).trim()}`);
+      continue;
+    }
     const [shown, mathJson = ""] = part.slice(newline + 1).split(/^### MathJSON\s*$/m);
     if (/^#{1,3} /m.test(shown)) warnings.push(`${file} ${name}: use #### for a subsection`);
     if (/^#{1,6} /m.test(mathJson)) warnings.push(`${file} ${name}: no heading in the MathJSON part`);
     sections.set(name, { shown: shown.trim(), mathJson: mathJson.trim() });
   }
-  return sections;
+  return { sections, overview };
 }
 
 async function spliceDetails(content, library, latex, warnings) {
@@ -286,7 +298,7 @@ async function spliceDetails(content, library, latex, warnings) {
   } catch {
     return content;
   }
-  const details = parseDetails(text, `reference-details/${file}`, warnings);
+  const { sections: details, overview } = parseDetails(text, `reference-details/${file}`, warnings);
   const used = new Set();
   const lines = content.split("\n");
   const start = lines.findIndex((l) => l === "## Definitions");
@@ -294,7 +306,17 @@ async function spliceDetails(content, library, latex, warnings) {
     warnings.push(`reference/${file}: no "## Definitions" section to splice into`);
     return content;
   }
-  const out = lines.slice(0, start + 1);
+  // The generated paragraph that introduces the definitions ("Each
+  // definition is listed under its Epsil spelling…") moves under the
+  // "## Definitions" heading, so that it does not end an overview section.
+  let at = start;
+  const intro = lines.slice(0, start).findLastIndex((l) => l.startsWith("Each definition is listed under"));
+  if (intro >= 0 && start - intro < 8) at = intro;
+  const paragraph = lines.slice(at, start).join("\n").trim();
+  const out = lines.slice(0, at);
+  for (const section of overview) out.push(section, "");
+  out.push(lines[start], "");
+  if (paragraph) out.push(paragraph);
   let i = start + 1;
   while (i < lines.length) {
     if (!lines[i].startsWith("### ")) {
@@ -312,16 +334,18 @@ async function spliceDetails(content, library, latex, warnings) {
     while (entry.length > 1 && entry.at(-1).trim() === "") entry.pop();
     const detail = details.get(id);
     if (detail) used.add(id);
-    const parts = [];
-    const commands = (latex.get(id) ?? []).filter((c) => !c.includes("`"));
-    if (commands.length > 0) parts.push(`LaTeX: ${commands.map((c) => `\`${c}\``).join(", ")}`);
-    if (detail?.mathJson) parts.push(detail.mathJson);
-    // An entry with nothing to disclose keeps its "MathJSON `X` ·" line.
-    if (named && parts.length > 0) entry[shape] = named[2];
+    // The LaTeX commands go in the heading of the MathJSON part, as a JSON
+    // array, so that a backslash or a quote needs no escaping.
+    const commands = latex.get(id) ?? [];
+    const attributes = `name="${id}"` + (commands.length > 0 ? ` latex={${JSON.stringify(commands)}}` : "");
+    const hasPart = commands.length > 0 || Boolean(detail?.mathJson);
+    // An entry with nothing for the MathJSON part keeps its "MathJSON `X` ·"
+    // line.
+    if (named && hasPart) entry[shape] = named[2];
     out.push(...entry, "");
     if (detail?.shown) out.push(detail.shown, "");
-    if (parts.length > 0)
-      out.push(`<MathJson name="${id}">`, "", ...parts.flatMap((p) => [p, ""]), "</MathJson>", "");
+    if (detail?.mathJson) out.push(`<MathJson ${attributes}>`, "", detail.mathJson, "", "</MathJson>", "");
+    else if (hasPart) out.push(`<MathJson ${attributes} />`, "");
     i = end;
   }
   for (const name of details.keys())

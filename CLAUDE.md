@@ -101,6 +101,13 @@ Epsil first, with the MathJSON part after a `### MathJSON` line. The sync
 splices each section after its entry and puts the MathJSON part, with the
 LaTeX commands, in a closed `<MathJson>` disclosure (a native `<details>`, so
 find-in-page opens it). The Compute Engine team edits these files here.
+`reference-details/README.md` gives the format and the rules for examples.
+`npm run verify:details` runs every `epsil` fence of these files with the
+`epsil` CLI of `../compute-engine` and checks its `// ➔` result. When every
+entry of a hand-written MathJSON reference page
+(`docs/compute-engine/*-reference-*.md`) has moved, the page becomes a
+`<ReferenceMoved>` stub that keeps its anchors and redirects each one; the
+Arithmetic page is the first.
 
 The sync copies subdirectories too (`reference/` holds one generated page per
 library of the standard library), but skips `*.intro.md`: those are fragments
@@ -252,10 +259,11 @@ CSS follows CSS Modules pattern (`index.module.css` files).
 
 ## Testing
 
-There is no test suite. The one automated check is
-`npm run verify:snippets`, which executes the epsil.dev landing page code
-samples against the engine and fails if one stops producing the result the page
-prints. Everything else is manual:
+There is no test suite. Two checks run Epsil code against the engine:
+`npm run verify:snippets` runs the code samples of the epsil.dev landing page,
+and `npm run verify:details` the examples of `reference-details/`. Each fails
+when a sample stops producing the result the page prints. Everything else is
+manual:
 - Manual verification of build output
 - Link checking in generated site
 - Visual validation in browser before deployment

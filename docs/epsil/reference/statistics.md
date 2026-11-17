@@ -14,12 +14,12 @@ date: Last Modified
 
 The 35 definitions of the statistics library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
 
+## Definitions
+
 Each definition is listed under its Epsil spelling (the MathJSON name when
 it has none), with its signature in the engine's type syntax. The
 [Standard Library](/library/) page is the one-page index of every
 category.
-
-## Definitions
 
 ### betaRegularized
 
@@ -135,13 +135,15 @@ Least-squares linear fit b0 + b1·x. Returns Tuple(b0, b1), or the fitted expres
 
 ### mean
 
-MathJSON `Mean` · `((collection<number> | distribution | number)+) -> number`
+`((collection<number> | distribution | number)+) -> number`
 
 Arithmetic mean (average) of a collection of numbers.
 
+<MathJson name="Mean" latex={["mean"]} />
+
 ### median
 
-MathJSON `Median` · `((collection<number> | number)+) -> nan | real | signed_infinity`
+`((collection<number> | number)+) -> nan | real | signed_infinity`
 
 Median of a collection of numbers.
 
@@ -149,6 +151,8 @@ Median of a collection of numbers.
 median([3, 1, 4, 2])
 // ➔ 5/2
 ```
+
+<MathJson name="Median" latex={["median"]} />
 
 ### mode
 
@@ -222,9 +226,26 @@ quartiles([1, 2, 3, 4, 5])
 
 ### randomSample
 
-MathJSON `RandomSample` · `((T, number) random -> T where T: string) & ((indexed_collection, number) random -> list)`
+`((T, number) random -> T where T: string) & ((indexed_collection, number) random -> list)`
 
 RandomSample(xs, k): a list of k elements drawn from the indexed collection `xs`, without replacement. "Without replacement" is over POSITIONS, not values: on a multiset, repeats are expected — RandomSample([1, 1, 2], 2) can return [1, 1]. Sampling a string yields a string. Wrap the call in `WithRandomSeed(seed, ...)` to make it deterministic.
+
+Unlike `randomChoice`, the count may not be more than the size of the
+collection: there are only that many positions to draw. A count equal to the
+size gives a permutation.
+
+```epsil
+randomSample([1, 2, 3], 4)
+// ➔ error: Runtime error: out of range: a count in 0..3, 4
+randomSample([1, 1, 2], 2) in [[1, 1], [1, 2], [2, 1]]
+// ➔ "True"
+```
+
+<MathJson name="RandomSample">
+
+`["RandomSample", xs, k]`.
+
+</MathJson>
 
 ### skewness
 
