@@ -189,16 +189,16 @@ simplify(1 + tan(x)^2)
 // ➔ sec(x)^2
 ```
 
+## Definitions
+
 Each definition is listed under its Epsil spelling (the MathJSON name when
 it has none), with its signature in the engine's type syntax. The
 [Standard Library](/library/) page is the one-page index of every
 category.
 
-## Definitions
-
 ### arccos
 
-MathJSON `Arccos` · `(complex | quantity) -> number`
+`(complex | quantity) -> number`
 
 Arccosine, the inverse cosine function.
 
@@ -212,9 +212,11 @@ N(arccos(1/3))
 // ➔ 1.23095941734077468213
 ```
 
+<MathJson name="Arccos" latex={["\\arccos"]} />
+
 ### arccot
 
-MathJSON `Arccot` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Arccotangent, the inverse cotangent function.
 
@@ -228,9 +230,11 @@ N(arccot(-1))
 // ➔ 2.35619449019234492885
 ```
 
+<MathJson name="Arccot" latex={["arcctg"]} />
+
 ### arccsc
 
-MathJSON `Arccsc` · `(complex | infinity | quantity) -> number`
+`(complex | infinity | quantity) -> number`
 
 Arccosecant, the inverse cosecant function.
 
@@ -244,9 +248,11 @@ N(arccsc(3))
 // ➔ 0.339836909454121937096
 ```
 
+<MathJson name="Arccsc" latex={["arccsc"]} />
+
 ### arcosh
 
-MathJSON `Arcosh` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Inverse hyperbolic cosine (area hyperbolic cosine).
 
@@ -260,9 +266,11 @@ N(arcosh(2))
 // ➔ 1.31695789692481670863
 ```
 
+<MathJson name="Arcosh" latex={["arcosh"]} />
+
 ### arcoth
 
-MathJSON `Arcoth` · `(complex | infinity | quantity) -> number`
+`(complex | infinity | quantity) -> number`
 
 Inverse hyperbolic cotangent (area hyperbolic cotangent).
 
@@ -271,9 +279,11 @@ N(arcoth(2))
 // ➔ 0.549306144334054845698
 ```
 
+<MathJson name="Arcoth" latex={["arcoth"]} />
+
 ### arcsch
 
-MathJSON `Arcsch` · `(complex | infinity | quantity) -> number`
+`(complex | infinity | quantity) -> number`
 
 Inverse hyperbolic cosecant (area hyperbolic cosecant).
 
@@ -282,9 +292,11 @@ N(arcsch(1))
 // ➔ 0.881373587019543025232
 ```
 
+<MathJson name="Arcsch" latex={["arcsch"]} />
+
 ### arcsec
 
-MathJSON `Arcsec` · `(complex | infinity | quantity) -> number`
+`(complex | infinity | quantity) -> number`
 
 Arcsecant, the inverse secant function.
 
@@ -298,9 +310,11 @@ N(arcsec(3))
 // ➔ 1.23095941734077468214
 ```
 
+<MathJson name="Arcsec" latex={["arcsec"]} />
+
 ### arcsin
 
-MathJSON `Arcsin` · `(complex | quantity) -> number`
+`(complex | quantity) -> number`
 
 Arcsine, the inverse sine function.
 
@@ -314,9 +328,11 @@ N(arcsin(2))
 // ➔ (1.57079632679489661923 - 1.31695789692481670863i)
 ```
 
+<MathJson name="Arcsin" latex={["\\arcsin"]} />
+
 ### arctan
 
-MathJSON `Arctan` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Inverse tangent.
 
@@ -329,6 +345,8 @@ arctan(1)
 N(arctan(2))
 // ➔ 1.10714871779409050302
 ```
+
+<MathJson name="Arctan" latex={["\\arctan"]} />
 
 ### arctan2
 
@@ -348,7 +366,7 @@ arctan2(-1, -1)
 
 ### arsech
 
-MathJSON `Arsech` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Inverse hyperbolic secant (area hyperbolic secant).
 
@@ -362,9 +380,11 @@ N(arsech(1/2))
 // ➔ 1.31695789692481670863
 ```
 
+<MathJson name="Arsech" latex={["arsech"]} />
+
 ### arsinh
 
-MathJSON `Arsinh` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Inverse hyperbolic sine (area hyperbolic sine).
 
@@ -378,9 +398,11 @@ N(arsinh(1))
 // ➔ 0.881373587019543025232
 ```
 
+<MathJson name="Arsinh" latex={["arsinh"]} />
+
 ### artanh
 
-MathJSON `Artanh` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Inverse hyperbolic tangent (area hyperbolic tangent).
 
@@ -394,9 +416,11 @@ N(artanh(1/2))
 // ➔ 0.549306144334054845698
 ```
 
+<MathJson name="Artanh" latex={["artanh"]} />
+
 ### cos
 
-MathJSON `Cos` · `(complex | quantity) -> number`
+`(complex | quantity) -> number`
 
 Cosine of an angle.
 
@@ -409,6 +433,8 @@ cos(pi / 3)
 N(cos(1))
 // ➔ 0.540302305868139717401
 ```
+
+<MathJson name="Cos" latex={["\\cos"]} />
 
 ### cosIntegral
 
@@ -423,7 +449,7 @@ N(cosIntegral(1))
 
 ### cosh
 
-MathJSON `Cosh` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Hyperbolic cosine.
 
@@ -436,6 +462,8 @@ cosh(0)
 N(cosh(1))
 // ➔ 1.54308063481524377848
 ```
+
+<MathJson name="Cosh" latex={["\\cosh"]} />
 
 ### coshIntegral
 
@@ -450,7 +478,7 @@ N(coshIntegral(1))
 
 ### cot
 
-MathJSON `Cot` · `(complex | quantity) -> number`
+`(complex | quantity) -> number`
 
 Cotangent, the reciprocal of tangent.
 
@@ -464,9 +492,11 @@ N(cot(1))
 // ➔ 0.642092615934330703005
 ```
 
+<MathJson name="Cot" latex={["\\cot"]} />
+
 ### coth
 
-MathJSON `Coth` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Hyperbolic cotangent, the reciprocal of hyperbolic tangent.
 
@@ -475,9 +505,11 @@ N(coth(1))
 // ➔ 1.31303528549933130364
 ```
 
+<MathJson name="Coth" latex={["\\coth"]} />
+
 ### csc
 
-MathJSON `Csc` · `(complex | quantity) -> number`
+`(complex | quantity) -> number`
 
 Cosecant, the reciprocal of sine.
 
@@ -491,9 +523,11 @@ N(csc(1))
 // ➔ 1.18839510577812121626
 ```
 
+<MathJson name="Csc" latex={["\\csc"]} />
+
 ### csch
 
-MathJSON `Csch` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Hyperbolic cosecant, the reciprocal of hyperbolic sine.
 
@@ -501,6 +535,8 @@ Hyperbolic cosecant, the reciprocal of hyperbolic sine.
 N(csch(1))
 // ➔ 0.850918128239321545136
 ```
+
+<MathJson name="Csch" latex={["\\csch"]} />
 
 ### dms
 
@@ -520,7 +556,7 @@ N(dms(30, 15))
 
 ### degrees
 
-MathJSON `Degrees` · `(real) -> real`
+`(real) -> real`
 
 Convert an angle in degrees.
 
@@ -534,9 +570,11 @@ sin(degrees(30))
 // ➔ 1/2
 ```
 
+<MathJson name="Degrees" latex={["\\degree"]} />
+
 ### fresnelC
 
-MathJSON `FresnelC` · `(complex | signed_infinity) -> complex`
+`(complex | signed_infinity) -> complex`
 
 Fresnel cosine integral.
 
@@ -550,9 +588,11 @@ N(fresnelC(1))
 // ➔ 0.779893400376822829474
 ```
 
+<MathJson name="FresnelC" latex={["FresnelC"]} />
+
 ### fresnelS
 
-MathJSON `FresnelS` · `(complex | signed_infinity) -> complex`
+`(complex | signed_infinity) -> complex`
 
 Fresnel sine integral.
 
@@ -565,6 +605,8 @@ fresnelS(+oo)
 N(fresnelS(1))
 // ➔ 0.438259147390354766077
 ```
+
+<MathJson name="FresnelS" latex={["FresnelS"]} />
 
 ### haversine
 
@@ -600,7 +642,7 @@ hypot(1, 1)
 
 ### inverseFunction
 
-MathJSON `InverseFunction` · `(function) -> function`
+`(function) -> function`
 
 Inverse of a function.
 
@@ -613,6 +655,24 @@ inverseFunction(sin)
 inverseFunction(tan)(1)
 // ➔ 1/4 * pi
 ```
+
+`inverseFunction(f)` is the inverse of the function `f`, such as `arcsin` for
+`sin`. It is an operator: it takes a function and gives a function.
+
+```epsil
+inverseFunction(sin)(x)
+// ➔ arcsin(x)
+```
+
+<MathJson name="InverseFunction" latex={["^{-1"]}>
+
+`["InverseFunction", f]`. In LaTeX: `\sin^{-1}(x)`.
+
+```json example
+[["InverseFunction", "Sin"], "x"]
+```
+
+</MathJson>
 
 ### inverseHaversine
 
@@ -632,7 +692,7 @@ N(inverseHaversine(1/4))
 
 ### pi
 
-MathJSON `Pi` · constant `real<3.141592653589793..3.141592653589794>` = `3.14159265358979323846`
+constant `real<3.141592653589793..3.141592653589794>` = `3.14159265358979323846`
 
 The constant π ≈ 3.14159, the ratio of a circle's circumference to its diameter.
 
@@ -646,9 +706,11 @@ cos(pi)
 // ➔ -1
 ```
 
+<MathJson name="Pi" latex={["\\pi"]} />
+
 ### sec
 
-MathJSON `Sec` · `(complex | quantity) -> number`
+`(complex | quantity) -> number`
 
 Secant, the reciprocal of cosine.
 
@@ -662,9 +724,11 @@ N(sec(1))
 // ➔ 1.85081571768092561791
 ```
 
+<MathJson name="Sec" latex={["\\sec"]} />
+
 ### sech
 
-MathJSON `Sech` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Hyperbolic secant, the reciprocal of hyperbolic cosine.
 
@@ -678,9 +742,11 @@ N(sech(1))
 // ➔ 0.648054273663885399574
 ```
 
+<MathJson name="Sech" latex={["sech"]} />
+
 ### sin
 
-MathJSON `Sin` · `(complex | quantity) -> number`
+`(complex | quantity) -> number`
 
 Sine of an angle.
 
@@ -698,6 +764,8 @@ sin(1)
 N(sin(1))
 // ➔ 0.841470984807896506653
 ```
+
+<MathJson name="Sin" latex={["\\sin"]} />
 
 ### sinIntegral
 
@@ -717,7 +785,7 @@ N(sinIntegral(1))
 
 ### sinc
 
-MathJSON `Sinc` · `(complex | signed_infinity) -> complex`
+`(complex | signed_infinity) -> complex`
 
 Unnormalized sinc function: sin(x)/x with sinc(0)=1.
 
@@ -731,9 +799,11 @@ N(sinc(1))
 // ➔ 0.841470984807896506653
 ```
 
+<MathJson name="Sinc" latex={["sinc"]} />
+
 ### sinh
 
-MathJSON `Sinh` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Hyperbolic sine.
 
@@ -746,6 +816,8 @@ sinh(0)
 N(sinh(1))
 // ➔ 1.17520119364380145688
 ```
+
+<MathJson name="Sinh" latex={["\\sinh"]} />
 
 ### sinhIntegral
 
@@ -765,7 +837,7 @@ N(sinhIntegral(1))
 
 ### tan
 
-MathJSON `Tan` · `(complex | quantity) -> number`
+`(complex | quantity) -> number`
 
 Tangent of an angle.
 
@@ -779,9 +851,11 @@ N(tan(1))
 // ➔ 1.55740772465490223051
 ```
 
+<MathJson name="Tan" latex={["\\tan"]} />
+
 ### tanh
 
-MathJSON `Tanh` · `(complex | quantity | signed_infinity) -> number`
+`(complex | quantity | signed_infinity) -> number`
 
 Hyperbolic tangent.
 
@@ -794,6 +868,8 @@ tanh(0)
 N(tanh(1))
 // ➔ 0.761594155955764888119
 ```
+
+<MathJson name="Tanh" latex={["\\tanh"]} />
 
 ### trigExpand
 

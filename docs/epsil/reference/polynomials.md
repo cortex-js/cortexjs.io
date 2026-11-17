@@ -245,6 +245,13 @@ level of an expression; `expandAll` does it in every subexpression too.
 // ➔ [x^2 + 2x + 1,sin((x + 1)^2),sin(x^2 + 2x + 1)]
 ```
 
+A fraction is expanded into a sum of fractions:
+
+```epsil
+[expand((x + 1)^2 / y), expandAll(((x + 1) * 3)^2)]
+// ➔ [x^2 / y + (2x) / y + 1 / y,9x^2 + 18x + 9]
+```
+
 <MathJson name="Expand">
 
 `["Expand", expr]`.

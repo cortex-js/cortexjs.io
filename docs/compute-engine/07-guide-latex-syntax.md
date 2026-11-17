@@ -319,6 +319,177 @@ adjacent steps.
 Note that when a European `decimalSeparator: '{,}'` is configured, that
 convention takes precedence, so `3{,}14` parses as `3.14` in that mode.
 
+## Subscripts and Superscripts
+
+The superscript and subscript functions below are inert: they evaluate to
+themselves.
+
+<div className="symbols-table first-column-header">
+
+| Function      |                  | Description                                                    |
+| :------------ | :--------------- | :------------------------------------------------------------- |
+| `Subminus`    | $$ x_- $$      |                                                                |
+| `Subplus`     | $$ x_+$$       |                                                                |
+| `Subscript`   | $$ x_{n} $$    | See below for details on subscript handling.                   |
+| `Substar`     | $$ x_*$$       |                                                                |
+| `Superdagger` | $$ x^\dagger$$ |                                                                |
+| `Superminus`  | $$ x^-$$       |                                                                |
+| `Superplus`   | $$ x^+$$       |                                                                |
+| `Superstar`   | $$ x^*$$       | When the argument is a complex number, indicate the conjugate. |
+
+</div>
+
+### Subscript Handling
+
+When a symbol has a subscript, the Compute Engine uses the symbol's declared
+type to determine how to interpret the subscript.
+
+#### Subscripts on Regular Symbols
+
+For symbols that are not declared as collections, simple subscripts become
+part of the symbol name:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `A_1` | `A_1` | Numeric subscript becomes part of symbol name |
+| `A_{n}` | `A_n` | Single-letter subscript becomes part of symbol name |
+| `A_{max}` | `A_max` | Multi-letter subscript becomes part of symbol name |
+| `x_{ij}` | `x_ij` | Common for matrix indices |
+| `T_{max}` | `T_max` | Common for named subscripts |
+
+Complex subscripts (containing operators, commas, or parentheses) create
+`Subscript` expressions that can be used in arithmetic:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `a_{n+1}` | `["Subscript", "a", ["Add", "n", 1]]` | Expression subscript |
+| `a_{n,m}` | `["Subscript", "a", ["Sequence", "n", "m"]]` | Multi-index |
+| `A_{(n+1)}` | `["Subscript", "A", ["Add", "n", 1]]` | Parentheses indicate expression |
+| `A_{(n)}` | `["Subscript", "A", ["Delimiter", "n"]]` | The index is the value of `n`, not the name `n` |
+| `A_{n+0}` | `["Subscript", "A", ["Delimiter", "n"]]` | The canonical form of the index is the symbol `n` |
+| `A_{(3)}` | `A_3` | The canonical form of the index is a number |
+
+The index is in canonical form, so a free `i` is the imaginary unit:
+`A_{i+1}` holds `["Complex", 1, 1]`. Declare `i` to use it as a variable.
+
+`A_{(n)}` keeps its parentheses because `["Subscript", "A", "n"]` is the
+compound symbol `A_n`. When you read the index of this form with `.op2`, you
+get `Delimiter(n)`, and its value is the value of `n`.
+
+In the body of a sum or a product, a subscript that is the index is read by
+value: `\sum_{n=1}^{3} A_{n}` and `\sum_{n=1}^{3} A_{(n)}` both give
+`A_1+A_2+A_3`, and the canonical term is
+`["Subscript", "A", ["Delimiter", "n"]]` in both. The same applies to the
+variable of a comprehension over integers. The variable of `D` or `Integrate`
+is not an index: in `["D", ["Subscript", "c", "x"], "x"]`, `c_x` is a compound
+symbol. A compound symbol that you declared or assigned stays that symbol:
+after `ce.assign("A_n", 5)`, `\sum_{n=1}^{3} A_{n}` gives `15`. The name of a
+function in a call also stays one name: `\sum_{k=1}^{2} f_k(x)` gives
+`2f_k(x)`.
+
+A product index is written in parentheses, `A_{(mn)}`, because `A_{mn}` is the
+compound symbol `A_mn`.
+
+These `Subscript` expressions can be used in arithmetic operations:
+
+```javascript
+ce.parse('a_{n+1} + 1');   // → ["Add", ["Subscript", "a", ...], 1]
+ce.parse('2 * a_{n+1}');   // → ["Multiply", 2, ["Subscript", "a", ...]]
+```
+
+#### Subscripts on Collection-Typed Symbols
+
+When a symbol is declared as a collection type (`list`, `tuple`, `matrix`, etc.),
+**all subscripts** are converted to [`At()`](/compute-engine/reference/collections/#at)
+indexing operations:
+
+```javascript
+ce.declare('v', 'list<number>');
+ce.parse('v_n');      // → ["At", "v", "n"]
+ce.parse('v_{n+1}');  // → ["At", "v", ["Add", "n", 1]]
+ce.parse('v_{i,j}');  // → ["At", "v", ["Tuple", "i", "j"]]
+```
+
+The type of the resulting `At()` expression is inferred from the collection's
+element type. For example, if `v` is declared as `list<number>`, then `v_n`
+has type `number` and can be used in arithmetic:
+
+```javascript
+ce.declare('v', 'list<number>');
+ce.parse('v_n + 1');      // → ["Add", ["At", "v", "n"], 1]
+ce.parse('2 * v_{n+1}');  // → ["Multiply", 2, ["At", "v", ...]]
+```
+
+This behavior allows natural mathematical notation for sequences and arrays
+while maintaining type safety.
+
+#### Custom Subscript Evaluation
+
+For mathematical sequences like Fibonacci numbers ($F_n$) or indexed coefficients
+($a_n$), you can define a custom `subscriptEvaluate` handler that evaluates
+subscripted expressions:
+
+```javascript
+ce.declare('F', {
+  subscriptEvaluate: (subscript, { engine }) => {
+    const n = subscript.re;
+    if (!Number.isInteger(n) || n < 0) return undefined;
+    // Calculate Fibonacci...
+    return engine.number(fibValue);
+  },
+});
+
+ce.parse('F_{10}').evaluate();  // → 55
+ce.parse('F_5').evaluate();     // → 5
+ce.parse('F_n').evaluate();     // → stays as Subscript(F, n)
+```
+
+Both simple subscripts (`F_5`) and complex subscripts (`F_{10}`) are kept as
+`Subscript` expressions when the base symbol has a `subscriptEvaluate` handler.
+This allows the handler to be called during evaluation.
+
+The handler should return `undefined` when the subscript is symbolic or outside
+the valid domain, causing the expression to remain unevaluated.
+
+Subscripted expressions with `subscriptEvaluate` have type `number` and can be
+used in arithmetic operations:
+
+```javascript
+ce.parse('F_{5} + F_{3}').evaluate();  // → 8 (5 + 3)
+```
+
+<ReadMore path="/compute-engine/guides/augmenting/#declaring-a-sequence-with-subscript-evaluation" >
+Learn more about **declaring sequences with subscript evaluation**. <Icon name="chevron-right-bold" />
+</ReadMore>
+
+#### Styled Subscripts
+
+To apply a specific style to a subscript (italic, bold, etc.), use the
+appropriate LaTeX command:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `A_{\mathit{max}}` | `A_max_italic` | Italic subscript |
+| `A_{\mathbf{max}}` | `A_max_bold` | Bold subscript |
+| `A_{\mathrm{max}}` | `A_max` | Upright (roman) subscript |
+
+The style suffix (`_italic`, `_bold`, etc.) becomes part of the symbol name,
+allowing you to distinguish between differently styled versions of the same
+subscript if needed.
+
+#### Bracket Notation for Indexing
+
+Regardless of the symbol's type, you can use bracket notation to explicitly
+create an `At` indexing expression:
+
+| LaTeX | Result | Notes |
+| :---- | :----- | :---- |
+| `v[n]` | `["At", "v", "n"]` | Explicit indexing |
+| `A[i,j]` | `["At", "A", "i", "j"]` | Multi-dimensional indexing |
+
+This is useful when you want to index into a symbol without declaring its type,
+or when you need to be explicit about the indexing operation.
+
 ## Serializing to LaTeX
 
 **To serialize an expression to a LaTeX string**, read the `expr.latex`

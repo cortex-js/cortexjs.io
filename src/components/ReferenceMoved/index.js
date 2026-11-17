@@ -16,8 +16,8 @@ const ENTRY = new Map(symbols.map((s) => [s.id, s.url]));
  * It keeps every anchor of the old page, as an element that the build's
  * broken-anchor check sees, so the links to them stay valid. On load it sends
  * the reader to the new place of the anchor in the URL: a MathJSON name in
- * `names` goes to its entry, another anchor to its path in `anchors`, and
- * anything else to `to`. Without JavaScript, it is a list of links.
+ * `names`, or its lowercase form, goes to its entry, another anchor to its
+ * path in `anchors`, and anything else to `to`. Without JavaScript, it is a list of links.
  *
  * The search index skips the page (`data-moved-to`).
  */
@@ -26,8 +26,14 @@ export default function ReferenceMoved({ to, names = [], anchors = {} }) {
   const links = useBrokenLinks();
   const host = siteConfig.url === EPSIL_URL ? "" : EPSIL_URL;
 
+  // A name has two anchors on a hand-written page: its `FunctionDefinition`
+  // (`Sum`) and the hidden heading before it (`sum`).
   const targets = new Map();
-  for (const name of names) targets.set(name, ENTRY.get(name) ?? to);
+  for (const name of names) {
+    const entry = ENTRY.get(name) ?? to;
+    targets.set(name, entry);
+    targets.set(name.toLowerCase(), entry);
+  }
   for (const [id, path] of Object.entries(anchors)) targets.set(id, path);
   for (const id of targets.keys()) links.collectAnchor(id);
 
@@ -49,9 +55,11 @@ export default function ReferenceMoved({ to, names = [], anchors = {} }) {
           </li>
         ))}
       </ul>
-      {Object.entries(anchors).map(([id, path]) => (
-        <span key={id} id={id} data-moved-anchor={path} />
-      ))}
+      {[...targets]
+        .filter(([id]) => !names.includes(id))
+        .map(([id, path]) => (
+          <span key={id} id={id} data-moved-anchor={path} />
+        ))}
     </div>
   );
 }

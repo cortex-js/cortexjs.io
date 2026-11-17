@@ -14,6 +14,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   command that runs the epsil config sets
   `DOCUSAURUS_GENERATED_FILES_DIR_NAME=.docusaurus-epsil`, as `start:epsil`,
   `stage:epsil` and `scripts/build.sh` do.
+- A build of a site while that site's dev server runs shares its generated
+  files: when a doc changes during the build, the dev server rewrites them,
+  and the build fails with broken links to default paths
+  (`/epsil/reference/…`). Stop the dev server, or build with
+  `DOCUSAURUS_GENERATED_FILES_DIR_NAME` set to an absolute path outside the
+  repo.
 - `npm run build` - Build **both** sites (runs `bash scripts/build.sh`)
 - `npm run serve` - Serve the built site locally
 
