@@ -65,9 +65,71 @@ category.
 
 ### betaRegularized
 
-MathJSON `BetaRegularized` · `(complex | infinity, complex | infinity, complex | infinity, (complex | infinity)?) -> number`
+`(complex | infinity, complex | infinity, complex | infinity, (complex | infinity)?) -> number`
 
 Regularized incomplete beta function I_x(a, b); with four arguments, I_z1(a, b) − I_z0(a, b)
+
+$$
+I_x(a, b) = \frac{1}{\operatorname{B}(a, b)}\int_0^x t^{a-1}(1-t)^{b-1} \, dt
+$$
+
+The endpoints fold for a numeric `a` and `b`: `betaRegularized(0, a, b)`
+is 0 and `betaRegularized(1, a, b)` is 1. For a rational `x` and positive
+integers `a` and `b` the value is an exact rational. Other exact arguments
+stay symbolic; `N` gives their value, at machine or arbitrary precision.
+
+```epsil
+[betaRegularized(0, 2, 3), betaRegularized(1, 2, 3)]
+// ➔ [0,1]
+betaRegularized(1/2, 2, 3)
+// ➔ 11/16
+betaRegularized(1/3, 1/2, 2)
+// ➔ BetaRegularized(1/3, 1/2, 2)
+```
+
+Outside $[0, 1]$, `N` gives the real value where it is a finite sum: for
+positive integers `a` and `b` at any real `x`, and for $x > 1$ with an
+integer `b` up to 30. Elsewhere the call stays unevaluated.
+
+```epsil
+[N(betaRegularized(2, 2, 3)), N(betaRegularized(2, 1/2, 2))]
+// ➔ [8,0.707106781186547524401]
+N(betaRegularized(-1, 1/2, 2))
+// ➔ BetaRegularized(-1, 0.5, 2)
+```
+
+The cumulative distribution function of a binomial distribution evaluates
+to this function: $\operatorname{CDF}(\operatorname{Binomial}(n, p), k) =
+I_{1-p}(n-k, k+1)$.
+
+```epsil
+cdf(binomialDistribution(10, 1/2), 3)
+// ➔ 11/64
+```
+
+With four arguments, `betaRegularized(z0, z1, a, b)` is
+$I_{z_1}(a, b) - I_{z_0}(a, b)$.
+
+```epsil
+N(betaRegularized(0.2, 0.5, 2, 3))
+// ➔ 0.5067
+```
+
+See also: [DLMF 8.17](http://dlmf.nist.gov/8.17).
+
+<MathJson name="BetaRegularized">
+
+`["BetaRegularized", x, a, b]` and `["BetaRegularized", z0, z1, a, b]`.
+
+```json example
+["N", ["BetaRegularized", 0.5, 2, 3]]
+// ➔ 0.6875
+
+["BetaRegularized", ["Rational", 1, 2], 2, 3]
+// ➔ ["Rational", 11, 16]
+```
+
+</MathJson>
 
 ### binCounts
 
@@ -175,21 +237,108 @@ populationCovariance([1, 2, 3, 4, 5], [2, 4, 5, 4, 5])
 
 ### erf
 
-MathJSON `Erf` · `(complex | signed_infinity, (complex | signed_infinity)?) -> complex`
+`(complex | signed_infinity, (complex | signed_infinity)?) -> complex`
 
 Gauss error function; with two arguments, Erf(z1) − Erf(z0)
 
+The error function is used in statistics to compute probabilities of
+normally distributed events. For a complex `z`,
+
+$$
+\operatorname{erf} z = \frac{2}{\sqrt{\pi}} \int_0^z e^{-t^2} dt
+$$
+
+It is an odd function, $\operatorname{erf}(-z) = -\operatorname{erf} z$:
+`simplify` applies this.
+
+```epsil
+[erf(0), erf(-x), simplify(erf(-x))]
+// ➔ [0,Erf(-x),-Erf(x)]
+N(erf(1 + i))
+// ➔ (1.3161512816979477 + 0.19045346923783446i)
+```
+
+With two arguments, `erf(z0, z1)` is the **generalized error function**
+$\operatorname{erf} z_1 - \operatorname{erf} z_0$.
+
+```epsil
+N(erf(0.1, 0.5))
+// ➔ 0.408036961794761645479
+```
+
+<MathJson name="Erf">
+
+`["Erf", z]` and `["Erf", z0, z1]`.
+
+```json example
+["N", ["Erf", 0.1, 0.5]]
+// ➔ 0.408036961794761645479
+```
+
+</MathJson>
+
 ### erfInv
 
-MathJSON `ErfInv` · `(complex | infinity, (complex | infinity)?) -> number`
+`(complex | infinity, (complex | infinity)?) -> number`
 
 Inverse of the error function; with two arguments, the x with Erf(z0, x) = z, that is ErfInv(z + Erf(z0))
 
+`erfInv(x)` is the inverse error function,
+$\operatorname{erf}(\operatorname{erf}^{-1} x) = x$, of a real number
+$-1 < x < 1$. At $\pm 1$ it is $\pm\infty$. Outside that interval the value
+is not defined: `erfInv(+oo)` is `NaN`, and `erfInv(2)` stays unevaluated,
+also with `N`.
+
+```epsil
+[erfInv(0), erfInv(1), erfInv(-1), N(erfInv(1/2))]
+// ➔ [0,+oo,-oo,0.476936276204469873381]
+[N(erfInv(2)), erfInv(+oo)]
+// ➔ [ErfInv(2),NaN]
+```
+
+With two arguments, `erfInv(z0, z)` is the $x$ with
+$\operatorname{erf} x - \operatorname{erf} z_0 = z$, that is
+`erfInv(z + erf(z0))`.
+
+```epsil
+N(erfInv(0.5, 0.2))
+// ➔ 0.764695648017466677088
+```
+
+<MathJson name="ErfInv">
+
+`["ErfInv", x]` and `["ErfInv", z0, z]`.
+
+```json example
+["N", ["ErfInv", 0.5, 0.2]]
+// ➔ 0.764695648017466677088
+```
+
+</MathJson>
+
 ### erfc
 
-MathJSON `Erfc` · `(complex | signed_infinity) -> complex`
+`(complex | signed_infinity) -> complex`
 
 Complementary error function: 1 - Erf(x)
+
+$\operatorname{erfc} z = 1 - \operatorname{erf} z$, for a complex `z`.
+
+```epsil
+[erfc(0), N(erfc(1)), 1 - N(erf(1))]
+// ➔ [1,0.157299207050285130659,0.157299207050285130659]
+```
+
+<MathJson name="Erfc">
+
+`["Erfc", z]`.
+
+```json example
+["N", ["Erfc", 1]]
+// ➔ 0.157299207050285130659
+```
+
+</MathJson>
 
 ### erfi
 
@@ -225,9 +374,57 @@ Nonlinear least-squares fit of a model to data. FindFit(data, model, params, var
 
 ### gammaRegularized
 
-MathJSON `GammaRegularized` · `(complex | infinity, complex | infinity, (complex | infinity)?) -> number`
+`(complex | infinity, complex | infinity, (complex | infinity)?) -> number`
 
 Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a); with three arguments, Q(a, z0) − Q(a, z1)
+
+$$
+Q(a, z) = \frac{\Gamma(a, z)}{\Gamma(a)} = \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t} \, dt
+$$
+
+Special values fold: for a numeric `a`, `gammaRegularized(a, 0)` is 1, and
+`gammaRegularized(1, z)` is $e^{-z}$. For a positive integer `a` and an
+exact `z` the value is a closed form. Other exact arguments stay symbolic;
+`N` gives their value, at machine or arbitrary precision.
+
+```epsil
+[gammaRegularized(2, 0), gammaRegularized(1, z), gammaRegularized(3, 5)]
+// ➔ [1,e^(-z),37 / (2e^5)]
+[gammaRegularized(1/2, 2), N(gammaRegularized(1/2, 2))]
+// ➔ [GammaRegularized(1/2, 2),0.0455002638963584144006]
+```
+
+The cumulative distribution function of a Poisson distribution evaluates to
+this function: $\operatorname{CDF}(\operatorname{Poisson}(\lambda), k) =
+Q(k+1, \lambda)$.
+
+```epsil
+cdf(poissonDistribution(lambda), k)
+// ➔ Which(k < 0, 0, "True", GammaRegularized(floor(k) + 1, lambda))
+cdf(poissonDistribution(2), 3)
+// ➔ 19 / (3e^2)
+```
+
+With three arguments, `gammaRegularized(a, z0, z1)` is
+$Q(a, z_0) - Q(a, z_1)$.
+
+```epsil
+N(gammaRegularized(3, 1, 5))
+// ➔ 0.795046583445524662701
+```
+
+See also: [DLMF 8.2](http://dlmf.nist.gov/8.2).
+
+<MathJson name="GammaRegularized">
+
+`["GammaRegularized", a, z]` and `["GammaRegularized", a, z0, z1]`.
+
+```json example
+["N", ["GammaRegularized", 3, 5]]
+// ➔ 0.124652019483081141288
+```
+
+</MathJson>
 
 ### histogram
 

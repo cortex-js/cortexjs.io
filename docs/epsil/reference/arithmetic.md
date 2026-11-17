@@ -409,11 +409,73 @@ N(airyAi(1))
 // ➔ 0.135292416312881415524
 ```
 
-<MathJson name="AiryAi" latex={["\\operatorname{Ai}"]} />
+$\operatorname{Ai}$ is the solution of the Airy equation that decays
+exponentially for a positive $x$ and oscillates for a negative $x$. Its
+value at 0 is exact:
+
+```epsil
+airyAi(0)
+// ➔ 1 / (Gamma(2/3) * 3^(2/3))
+[N(airyAi(-2)), airyAi(+oo), airyAi(-oo)]
+// ➔ [0.227407428201685575992,0,0]
+```
+
+#### Airy functions
+
+Airy functions are solutions of the Airy differential equation:
+
+$$
+\frac{d^2 y}{dx^2} - xy = 0
+$$
+
+They arise in physics, in particular in quantum mechanics and optics.
+
+`airyAi`, `airyBi`, `airyAiPrime` and `airyBiPrime` evaluate numerically
+at a real or a complex argument with `N`, and without `N` when the argument
+is a float. Compiled code computes them for a real argument only.
+
+```epsil
+[airyAi(0.0), airyAi(1.0)]
+// ➔ [0.35502805388781723926,0.135292416312881415524]
+N(airyAi(1 + i))
+// ➔ (0.060458308371838146 - 0.15188956587718141i)
+```
+
+Above machine precision, `airyAi` and `airyBi` of a real argument are
+computed to the engine precision. Past $|x| = 10^4$, and for `airyBi` past
+about $x = 130$, the call stays unevaluated.
+
+```epsil
+[N(airyAi(20000)), N(airyBi(140))]
+// ➔ [AiryAi(20000),AiryBi(140)]
+N(airyBi(100))
+// ➔ 6.04122399667020139901e+288
+```
+
+The derivative of an Airy function stays within the Airy family:
+
+```epsil
+[D(airyAi(x), x), D(airyAiPrime(x), x), D(airyBiPrime(x), x)]
+// ➔ [AiryAiPrime(x),x * AiryAi(x),x * AiryBi(x)]
+```
+
+See also: [Airy function](https://en.wikipedia.org/wiki/Airy_function),
+[DLMF 9.2](http://dlmf.nist.gov/9.2).
+
+<MathJson name="AiryAi" latex={["\\operatorname{Ai}"]}>
+
+`["AiryAi", x]`. In LaTeX: `\operatorname{Ai}(x)`.
+
+```json example
+["N", ["AiryAi", ["Complex", 1, 1]]]
+// ➔ 0.060458308371838146 - 0.15188956587718141i
+```
+
+</MathJson>
 
 ### airyAiPrime
 
-MathJSON `AiryAiPrime` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Derivative of the Airy function of the first kind
 
@@ -421,6 +483,29 @@ Derivative of the Airy function of the first kind
 N(airyAiPrime(0))
 // ➔ -0.2588194037928068
 ```
+
+$\operatorname{Ai}'$ satisfies $\operatorname{Ai}''(x) = x\operatorname{Ai}(x)$,
+so the derivative of an Airy expression stays within the Airy family. Its
+value at 0 is exact:
+
+```epsil
+[airyAiPrime(0), D(airyAiPrime(x), x)]
+// ➔ [-1 / (Gamma(1/3) * root(3)(3)),x * AiryAi(x)]
+```
+
+See also: [Airy function](https://en.wikipedia.org/wiki/Airy_function),
+[DLMF 9.2](http://dlmf.nist.gov/9.2).
+
+<MathJson name="AiryAiPrime">
+
+`["AiryAiPrime", x]`. In LaTeX: `\operatorname{Ai}'(x)`.
+
+```json example
+["N", ["AiryAiPrime", 0]]
+// ➔ -0.2588194037928068
+```
+
+</MathJson>
 
 ### airyBi
 
@@ -433,11 +518,37 @@ N(airyBi(0))
 // ➔ 0.614926627446000735151
 ```
 
-<MathJson name="AiryBi" latex={["\\operatorname{Bi}"]} />
+$\operatorname{Bi}$ is the solution of the Airy equation that grows
+exponentially for a positive $x$ and oscillates for a negative $x$. Its
+value at 0 is exact:
+
+```epsil
+airyBi(0)
+// ➔ 1 / (Gamma(2/3) * root(6)(3))
+[N(airyBi(-2)), airyBi(+oo)]
+// ➔ [-0.412302587956398488083,+oo]
+```
+
+See [Airy functions](/reference/arithmetic/#airy-functions) for the
+evaluation of the four Airy functions.
+
+See also: [Airy function](https://en.wikipedia.org/wiki/Airy_function),
+[DLMF 9.2](http://dlmf.nist.gov/9.2).
+
+<MathJson name="AiryBi" latex={["\\operatorname{Bi}"]}>
+
+`["AiryBi", x]`. In LaTeX: `\operatorname{Bi}(x)`.
+
+```json example
+["N", ["AiryBi", 0]]
+// ➔ 0.614926627446000735151
+```
+
+</MathJson>
 
 ### airyBiPrime
 
-MathJSON `AiryBiPrime` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Derivative of the Airy function of the second kind
 
@@ -445,6 +556,28 @@ Derivative of the Airy function of the second kind
 N(airyBiPrime(0))
 // ➔ 0.4482883573538264
 ```
+
+$\operatorname{Bi}'$ satisfies $\operatorname{Bi}''(x) = x\operatorname{Bi}(x)$.
+Its value at 0 is exact:
+
+```epsil
+[airyBiPrime(0), D(airyBiPrime(x), x)]
+// ➔ [root(6)(3) / Gamma(1/3),x * AiryBi(x)]
+```
+
+See also: [Airy function](https://en.wikipedia.org/wiki/Airy_function),
+[DLMF 9.2](http://dlmf.nist.gov/9.2).
+
+<MathJson name="AiryBiPrime">
+
+`["AiryBiPrime", x]`. In LaTeX: `\operatorname{Bi}'(x)`.
+
+```json example
+["N", ["AiryBiPrime", 0]]
+// ➔ 0.4482883573538264
+```
+
+</MathJson>
 
 ### arg
 
@@ -481,7 +614,34 @@ N(besselI(0, 1))
 // ➔ 1.2660658777520083356
 ```
 
-<MathJson name="BesselI" latex={["\\operatorname{I}"]} />
+The modified Bessel function of the first kind of order $n$. Its
+derivative with respect to $x$ is
+
+$$
+\frac{d}{dx} I_n(x) = \frac{1}{2}(I_{n-1}(x) + I_{n+1}(x))
+$$
+
+```epsil
+D(besselI(n, x), x)
+// ➔ 1/2 * BesselI(n - 1, x) + 1/2 * BesselI(n + 1, x)
+```
+
+See [Bessel functions](/reference/arithmetic/#bessel-functions) for the
+evaluation of the four Bessel functions.
+
+See also: [Modified Bessel functions](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions),
+[DLMF 10.25](http://dlmf.nist.gov/10.25).
+
+<MathJson name="BesselI" latex={["\\operatorname{I}"]}>
+
+`["BesselI", n, x]`. In LaTeX: `I_n(x)`.
+
+```json example
+["N", ["BesselI", 0, 1]]
+// ➔ 1.2660658777520083356
+```
+
+</MathJson>
 
 ### besselJ
 
@@ -494,7 +654,85 @@ N(besselJ(0, 1))
 // ➔ 0.76519768655796655145
 ```
 
-<MathJson name="BesselJ" latex={["\\operatorname{J}"]} />
+The Bessel function of the first kind of order $n$. Its derivative with
+respect to $x$ is
+
+$$
+\frac{d}{dx} J_n(x) = \frac{1}{2}(J_{n-1}(x) - J_{n+1}(x))
+$$
+
+```epsil
+D(besselJ(n, x), x)
+// ➔ -1/2 * BesselJ(n + 1, x) + 1/2 * BesselJ(n - 1, x)
+```
+
+#### Bessel functions
+
+Bessel functions are solutions of Bessel's differential equation:
+
+$$
+x^2 \frac{d^2 y}{dx^2} + x \frac{dy}{dx} + (x^2 - n^2)y = 0
+$$
+
+They arise in problems with cylindrical or spherical symmetry.
+
+`besselJ`, `besselY`, `besselI` and `besselK` of an integer order evaluate
+numerically at a real or a complex argument with `N`, and without `N` when
+the argument is a float:
+
+```epsil
+[besselJ(0, 1), besselJ(0, 1.0)]
+// ➔ [BesselJ(0, 1),0.76519768655796655145]
+N(besselJ(3, 0.7i))
+// ➔ -0.007367373607628006i
+```
+
+The negative real axis is their branch cut. There, `besselY` and `besselK`
+take the limit from above, as `ln(-2)` does:
+
+```epsil
+N(besselY(0, -2))
+// ➔ (0.5103756726497453 + 0.44778155828247124i)
+N(ln(-2))
+// ➔ (0.693147180559945309417 + 3.14159265358979323846i)
+```
+
+A real non-integer order evaluates at a positive real argument. At a
+negative or a complex argument it stays symbolic.
+
+```epsil
+N(besselJ(1/2, 1))
+// ➔ 0.671396707141803090416
+[N(besselJ(1/2, -1)), N(besselJ(1/2, i))]
+// ➔ [BesselJ(0.5, -1),BesselJ(0.5, i)]
+```
+
+Above machine precision, a real argument gives the digits of the engine
+precision. A call that cannot reach them stays unevaluated:
+
+```epsil
+N(besselI(0, 5000))
+// ➔ BesselI(0, 5000)
+```
+
+Compiled code computes these functions for a real argument only.
+
+See also: [Bessel function](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_first_kind),
+[DLMF 10.2](http://dlmf.nist.gov/10.2).
+
+<MathJson name="BesselJ" latex={["\\operatorname{J}"]}>
+
+`["BesselJ", n, x]`. In LaTeX: `J_n(x)`.
+
+```json example
+["N", ["BesselJ", 0, 1]]
+// ➔ 0.76519768655796655145
+
+["N", ["BesselJ", 3, ["Complex", 0, 0.7]]]
+// ➔ -0.007367373607628006i
+```
+
+</MathJson>
 
 ### besselK
 
@@ -507,7 +745,38 @@ N(besselK(0, 1))
 // ➔ 0.421024438240708333336
 ```
 
-<MathJson name="BesselK" latex={["\\operatorname{K}"]} />
+The modified Bessel function of the second kind of order $n$, also called
+the Macdonald function. Its derivative with respect to $x$ is
+
+$$
+\frac{d}{dx} K_n(x) = -\frac{1}{2}(K_{n-1}(x) + K_{n+1}(x))
+$$
+
+```epsil
+D(besselK(n, x), x)
+// ➔ -1/2 * BesselK(n - 1, x) - 1/2 * BesselK(n + 1, x)
+[besselK(0, 0), N(besselK(1/2, 2))]
+// ➔ [+oo,0.119937771968061447368]
+N(besselK(0, -2))
+// ➔ (0.11389387274953343 - 7.161528439050256i)
+```
+
+See [Bessel functions](/reference/arithmetic/#bessel-functions) for the
+evaluation of the four Bessel functions.
+
+See also: [Modified Bessel functions](https://en.wikipedia.org/wiki/Bessel_function#Modified_Bessel_functions),
+[DLMF 10.25](http://dlmf.nist.gov/10.25).
+
+<MathJson name="BesselK" latex={["\\operatorname{K}"]}>
+
+`["BesselK", n, x]`. In LaTeX: `K_n(x)`.
+
+```json example
+["N", ["BesselK", 0, 1]]
+// ➔ 0.421024438240708333336
+```
+
+</MathJson>
 
 ### besselY
 
@@ -520,7 +789,36 @@ N(besselY(0, 1))
 // ➔ 0.0882569642156769579829
 ```
 
-<MathJson name="BesselY" latex={["\\operatorname{Y}"]} />
+The Bessel function of the second kind of order $n$, also called the
+Neumann function. Its derivative with respect to $x$ is
+
+$$
+\frac{d}{dx} Y_n(x) = \frac{1}{2}(Y_{n-1}(x) - Y_{n+1}(x))
+$$
+
+```epsil
+D(besselY(n, x), x)
+// ➔ -1/2 * BesselY(n + 1, x) + 1/2 * BesselY(n - 1, x)
+besselY(0, 0)
+// ➔ -oo
+```
+
+See [Bessel functions](/reference/arithmetic/#bessel-functions) for the
+evaluation of the four Bessel functions.
+
+See also: [Bessel function of the second kind](https://en.wikipedia.org/wiki/Bessel_function#Bessel_functions_of_the_second_kind),
+[DLMF 10.2](http://dlmf.nist.gov/10.2).
+
+<MathJson name="BesselY" latex={["\\operatorname{Y}"]}>
+
+`["BesselY", n, x]`. In LaTeX: `Y_n(x)`.
+
+```json example
+["N", ["BesselY", 0, -2]]
+// ➔ 0.5103756726497453 + 0.44778155828247124i
+```
+
+</MathJson>
 
 ### beta
 
@@ -543,7 +841,48 @@ beta(1/4, 1/2, 2, 3)
 // ➔ 109/3072
 ```
 
-<MathJson name="Beta" latex={["\\Beta"]} />
+$$
+\operatorname{B}(a, b) = \frac{\Gamma(a)\Gamma(b)}{\Gamma(a+b)}
+= \int_0^1 t^{a-1}(1-t)^{b-1} \, dt
+$$
+
+At a complex argument, `N` gives $\Gamma(a)\Gamma(b)/\Gamma(a+b)$ as a
+double.
+
+```epsil
+N(beta(1 + i, 2))
+// ➔ (0.10000000000000012 - 0.3000000000000001i)
+```
+
+#### Incomplete beta function
+
+`beta(z, a, b)` is the incomplete beta function $\operatorname{B}_z(a, b)$,
+and `beta(z0, z1, a, b)` the generalized form
+$\operatorname{B}_{z_1}(a, b) - \operatorname{B}_{z_0}(a, b)$. For a
+rational `z` and positive integers `a` and `b` the value is exact.
+
+```epsil
+[beta(0, 1/2, 2, 3), N(beta(0.1, 0.5, 2, 3))]
+// ➔ [11/192,0.0529333333333333333333]
+```
+
+See also: [Beta function](https://en.wikipedia.org/wiki/Beta_function),
+[DLMF 5.12](http://dlmf.nist.gov/5.12).
+
+<MathJson name="Beta" latex={["\\Beta"]}>
+
+`["Beta", a, b]`, `["Beta", z, a, b]` and `["Beta", z0, z1, a, b]`. In
+LaTeX: `\Beta(a, b)`.
+
+```json example
+["Beta", 2, 3]
+// ➔ ["Rational", 1, 12]
+
+["Beta", ["Rational", 1, 2], 2, 3]
+// ➔ ["Rational", 11, 192]
+```
+
+</MathJson>
 
 ### catalanConstant
 
@@ -733,7 +1072,7 @@ Digamma function, the logarithmic derivative of the gamma function
 
 ### dirichletBeta
 
-MathJSON `DirichletBeta` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Dirichlet beta function β(s) = Σ_&#123;n≥0&#125; (−1)^n/(2n+1)^s = 4^(−s) (ζ(s, 1/4) − ζ(s, 3/4)), entire; β(1) = π/4, β(2) = G, β(+∞) = 1.
 
@@ -742,9 +1081,35 @@ Dirichlet beta function β(s) = Σ_&#123;n≥0&#125; (−1)^n/(2n+1)^s = 4^(−s
 // ➔ [1/4 * pi,1/32 * pi^3,0.667691457189609176659]
 ```
 
+The values at the integers are exact. A real `s` is computed to the engine
+precision, a complex `s` in double precision.
+
+```epsil
+[dirichletBeta(2), dirichletBeta(5)]
+// ➔ ["CatalanConstant",5/1536 * pi^5]
+[dirichletBeta(0), dirichletBeta(-1)]
+// ➔ [1/2,0]
+N(dirichletBeta(1 + i))
+// ➔ (0.8616306241992917 + 0.1764491519835i)
+```
+
+<MathJson name="DirichletBeta">
+
+`["DirichletBeta", s]`. In LaTeX: `\beta(s)`.
+
+```json example
+["DirichletBeta", 1]
+// ➔ ["Multiply", ["Rational", 1, 4], "Pi"]
+
+["DirichletBeta", 2]
+// ➔ "CatalanConstant"
+```
+
+</MathJson>
+
 ### dirichletEta
 
-MathJSON `DirichletEta` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Dirichlet eta function η(s) = Σ_&#123;n≥1&#125; (−1)^(n−1)/n^s = (1 − 2^(1−s)) ζ(s), entire; η(1) = ln 2, η(+∞) = 1.
 
@@ -752,6 +1117,31 @@ Dirichlet eta function η(s) = Σ_&#123;n≥1&#125; (−1)^(n−1)/n^s = (1 − 
 [dirichletEta(2), dirichletEta(1), N(dirichletEta(1/2))]
 // ➔ [1/12 * pi^2,ln(2),0.604898643421630370247]
 ```
+
+The values at the integers are exact. A real `s` is computed to the engine
+precision, also next to $s = 1$. A complex `s` is computed in double
+precision.
+
+```epsil
+[dirichletEta(0), dirichletEta(-1), N(dirichletEta(1.001))]
+// ➔ [1/2,1/4,0.693307016778961202313]
+N(dirichletEta(1 + i))
+// ➔ (0.7265597750624632 + 0.15809586390120733i)
+```
+
+<MathJson name="DirichletEta">
+
+`["DirichletEta", s]`. In LaTeX: `\eta(s)`.
+
+```json example
+["DirichletEta", 2]
+// ➔ ["Multiply", ["Rational", 1, 12], ["Power", "Pi", 2]]
+
+["DirichletEta", 1]
+// ➔ ["Ln", 2]
+```
+
+</MathJson>
 
 ### distance
 
@@ -889,7 +1279,46 @@ Factorial function: the product of all positive integers less than or equal to n
 // ➔ [120,2432902008176640000]
 ```
 
-<MathJson name="Factorial" latex={["!"]} />
+For a non-integer `n`, `n!` is `gamma(n + 1)`. An exact non-integer
+argument stays symbolic, and `N` or a float argument gives the value to the
+engine precision:
+
+```epsil
+[(5/2)!, N((5/2)!), 2.5!]
+// ➔ [(5/2)!,3.32335097044784255118,3.32335097044784255118]
+```
+
+At a negative integer, `n!` is a pole:
+
+```epsil
+[0!, (-1)!]
+// ➔ [1,~oo]
+```
+
+Above machine precision, a factorial too large for an exact integer is a
+big decimal under `N`:
+
+```epsil
+N((10^6)!)
+// ➔ 8.26393168833124006238e+5565708
+```
+
+<MathJson name="Factorial" latex={["!"]}>
+
+`["Factorial", n]`. In LaTeX: `n!`.
+
+```json example
+["Factorial", 5]
+// ➔ 120
+
+["Factorial", ["Rational", 5, 2]]
+// ➔ (5/2)!
+
+["Factorial", 2.5]
+// ➔ 3.32335097044784255118
+```
+
+</MathJson>
 
 ### factorial2
 
@@ -902,7 +1331,43 @@ Double Factorial Function
 // ➔ [105,384]
 ```
 
-<MathJson name="Factorial2" latex={["!!"]} />
+The double factorial of `n` is $n!! = n \cdot (n-2) \cdot (n-4) \cdots$,
+the product of the positive integers up to `n` that have the same parity
+as `n`. It can also be written with the $\Gamma$ function:
+
+$$
+n!! = 2^{\frac{n}{2}+\frac{1}{4}(1-\cos(\pi n))}\pi^{\frac{1}{4}(\cos(\pi
+n)-1)}\Gamma\left(\frac{n}{2}+1\right)
+$$
+
+It is not the factorial of the factorial of `n`:
+
+```epsil
+[factorial2(6), (3!)!]
+// ➔ [48,720]
+[factorial2(0), factorial2(-1), factorial2(-3)]
+// ➔ [1,1,-1]
+```
+
+Epsil has no `!!` operator: write `factorial2(n)`.
+
+```epsil
+5!!
+// ➔ error: Unexpected symbol "!!"
+```
+
+See also: [Double factorial](https://en.wikipedia.org/wiki/Double_factorial).
+
+<MathJson name="Factorial2" latex={["!!"]}>
+
+`["Factorial2", n]`. In LaTeX: `n!!`.
+
+```json example
+["Factorial2", 5]
+// ➔ 15
+```
+
+</MathJson>
 
 ### floor
 
@@ -987,11 +1452,84 @@ N(gamma(2, 1, 3))
 // ➔ 0.536610608871428871274
 ```
 
-<MathJson name="Gamma" latex={["\\Gamma"]} />
+The gamma function extends the factorial, with its argument shifted by 1,
+to real and complex numbers:
+
+$$
+\Gamma(z) = \int_0^{\infty} t^{z-1} e^{-t} \, \mathrm{d}t
+$$
+
+A half-integer argument gives a rational multiple of $\sqrt{\pi}$, and the
+non-positive integers are poles:
+
+```epsil
+[gamma(5), gamma(-3/2), gamma(0)]
+// ➔ [24,4/3 * sqrt(pi),~oo]
+```
+
+#### Incomplete gamma function
+
+With two arguments, `gamma(s, z)` is the **upper incomplete gamma
+function**: the lower limit of the integral is `z` instead of 0.
+
+$$
+\Gamma(s, z) = \int_z^{\infty} t^{s-1} e^{-t} \, \mathrm{d}t
+$$
+
+The order `s` and the lower limit `z` can be real or complex, including
+negative and fractional orders. For a positive integer order the value is
+a closed form, $\Gamma(\frac12, z)$ is $\sqrt{\pi}\operatorname{erfc}\sqrt{z}$,
+and $\Gamma(s, 0)$ is $\Gamma(s)$. This is the `Gamma[s, z]` convention of
+Mathematica.
+
+```epsil
+[gamma(2, 1), gamma(2, x), gamma(s, 0)]
+// ➔ [2 / e,(x + 1) * e^(-x),Gamma(s)]
+gamma(1/2, z)
+// ➔ Erfc(sqrt(z)) * sqrt(pi)
+```
+
+Other exact arguments stay symbolic; `N` gives their value:
+
+```epsil
+N(gamma(-1/2, 1))
+// ➔ 0.178147711781560690193
+N(gamma(1 + i, 2))
+// ➔ (0.06463204417295909 + 0.11284029404942608i)
+```
+
+With three arguments, `gamma(s, z0, z1)` is the **generalized incomplete
+gamma function** $\Gamma(s, z_0) - \Gamma(s, z_1)$, the integral from $z_0$
+to $z_1$.
+
+See also: [Gamma function](https://en.wikipedia.org/wiki/Gamma_function),
+[DLMF 5.2.E1](http://dlmf.nist.gov/5.2.E1),
+[DLMF 8.2.E2](http://dlmf.nist.gov/8.2.E2).
+
+<MathJson name="Gamma" latex={["\\Gamma"]}>
+
+`["Gamma", z]`, `["Gamma", s, z]` and `["Gamma", s, z0, z1]`. In LaTeX:
+`\Gamma(z)` and `\Gamma(s, z)`. `\Gamma(n)` is `(n-1)!`.
+
+```json example
+["Gamma", 5]
+// ➔ 24
+
+["Gamma", ["Rational", 1, 2]]
+// ➔ ["Sqrt", "Pi"]
+
+["Gamma", 2, 1]
+// ➔ ["Divide", 2, "ExponentialE"]
+
+["N", ["Gamma", 2, 1, 3]]
+// ➔ 0.536610608871428871274
+```
+
+</MathJson>
 
 ### gammaLn
 
-MathJSON `GammaLn` · `(complex | infinity) -> number`
+`(complex | infinity) -> number`
 
 Natural logarithm of the gamma function.
 
@@ -999,6 +1537,33 @@ Natural logarithm of the gamma function.
 N(gammaLn(100))
 // ➔ 359.134205369575398776
 ```
+
+`gammaLn(z)` is the principal logarithm of $\Gamma(z)$, as `gammaln` in
+MATLAB and SciPy. It is not the `LogGamma` of Mathematica, the analytic
+continuation of $\ln\Gamma$, which is
+[`logGamma`](/reference/special-functions/#loggamma) here. The two agree
+for a positive real argument and differ by a multiple of $2\pi i$
+elsewhere:
+
+```epsil
+[N(gammaLn(5)), N(logGamma(5))]
+// ➔ [3.17805383034794561965,3.17805383034794561965]
+N(gammaLn(-1.5))
+// ➔ 0.860047015376481014511
+N(logGamma(-1.5))
+// ➔ (0.8600470153764792 - 6.283185307179586i)
+```
+
+<MathJson name="GammaLn">
+
+`["GammaLn", z]`. In LaTeX: `\ln(\Gamma(z))`.
+
+```json example
+["N", ["GammaLn", -1.5]]
+// ➔ 0.860047015376481014511
+```
+
+</MathJson>
 
 ### goldenRatio
 
@@ -1026,7 +1591,7 @@ The rational number one half (1/2).
 
 ### harmonicNumber
 
-MathJSON `HarmonicNumber` · `(complex | infinity, (complex | infinity)?) -> number`
+`(complex | infinity, (complex | infinity)?) -> number`
 
 Harmonic number H_n = Σ_&#123;k=1&#125;^n 1/k, exact at a non-negative integer and continued by ψ(n+1) + γ; with a second argument r, the generalized H_n^(r) = Σ_&#123;k=1&#125;^n 1/k^r = ζ(r) − ζ(r, n+1).
 
@@ -1034,6 +1599,40 @@ Harmonic number H_n = Σ_&#123;k=1&#125;^n 1/k, exact at a non-negative integer 
 [harmonicNumber(10), harmonicNumber(10, 2), N(harmonicNumber(1/2))]
 // ➔ [7381/2520,1968329/1270080,0.613705638880109381166]
 ```
+
+For a non-negative integer `n` and an integer `r`, the value is an exact
+rational. For a rational `n` with a denominator from 2 to 4, and `r = 1`,
+the value is exact, from $H_n = \psi(n+1) + \gamma$. Another rational stays
+unevaluated.
+
+```epsil
+[harmonicNumber(3, 2), harmonicNumber(4, -1), harmonicNumber(1/2)]
+// ➔ [49/36,10,2 - 2ln(2)]
+[harmonicNumber(1/4), harmonicNumber(1/5)]
+// ➔ [4 - 3ln(2) - 1/2 * pi,HarmonicNumber(1/5)]
+```
+
+Elsewhere `N` gives the continuation $\psi(n+1) + \gamma$, or
+$\zeta(r) - \zeta(r, n+1)$ for $r \ne 1$. A negative integer `n` is a pole.
+
+```epsil
+[N(harmonicNumber(0.5)), N(harmonicNumber(2, 1/2)), harmonicNumber(-2)]
+// ➔ [0.613705638880109381166,1.7071067811865475244,~oo]
+```
+
+<MathJson name="HarmonicNumber">
+
+`["HarmonicNumber", n]` and `["HarmonicNumber", n, r]`.
+
+```json example
+["HarmonicNumber", 10]
+// ➔ ["Rational", 7381, 2520]
+
+["HarmonicNumber", 3, 2]
+// ➔ ["Rational", 49, 36]
+```
+
+</MathJson>
 
 ### heaviside
 
@@ -1241,7 +1840,96 @@ N(lambertW(-0.1, branch: -1))
 // ➔ -3.57715206395729721841
 ```
 
-<MathJson name="LambertW" latex={["\\operatorname{W}"]} />
+The Lambert W function, also called the product logarithm, is the inverse
+of $f(w) = w e^w$. For a value $x$, $W_k(x)$ is the value $w$ on branch $k$
+such that $w e^w = x$. The branch $k$ is an integer. When it is not given,
+it is 0, the principal branch $W_0$.
+
+$W_k(x)$ is real only on the two real branches:
+
+- $W_0(x)$ for $x \ge -1/e$
+- $W_{-1}(x)$ for $-1/e \le x < 0$
+
+On the other branches, and for other arguments, the value is complex.
+
+```epsil
+[lambertW(-1/e), N(lambertW(-0.3)), N(lambertW(-0.3, -1))]
+// ➔ [-1,-0.489402227180214969036,-1.78133702342162761197]
+N(lambertW(-1))
+// ➔ (-0.3181315052047641 + 1.3372357014306895i)
+N(lambertW(-0.3, 1))
+// ➔ (-3.3002378364383755 + 7.436294411632747i)
+```
+
+`lambertW(-1/e)` is exact. Other values with a simple closed form, such as
+W(0) = 0 and W(e) = 1, are given by `N`:
+
+```epsil
+[lambertW(0), N(lambertW(0)), N(lambertW(e))]
+// ➔ [LambertW(0),0,1]
+```
+
+#### Argument order
+
+The branch is the **second** argument: `lambertW(x, k)`. This is the order
+of mpmath (`lambertw(z, k)`), SciPy, SymPy, Julia and Fungrim. Mathematica
+(`ProductLog[k, z]`, or `LambertW[k, z]` in Wolfram|Alpha), Maple, Sage and
+MATLAB put the branch **first**. When you copy an expression from one of
+these systems, swap the two arguments.
+
+A branch that is not an integer is a type error. When both arguments are
+integers, a swap is not an error: `lambertW(1, 2)` is $W_2(1)$ and
+`lambertW(2, 1)` is $W_1(2)$.
+
+```epsil
+lambertW(-1, -0.1)
+// ➔ error: Type error: expected `integer`, got `-0.1` at `-0.1` in `lambertW(-1, -0.1)`
+N(lambertW(1, 2))
+// ➔ (-2.401585104868003 + 10.77629951611507i)
+N(lambertW(2, 1))
+// ➔ (-0.83431036663111 + 4.5302659985550084i)
+```
+
+To make the order clear, name the branch. The parameters are named `z` and
+`branch`, and named arguments can be in any order:
+
+```epsil
+N(lambertW(branch: -1, z: -0.1))
+// ➔ -3.57715206395729721841
+```
+
+#### Derivative
+
+$$
+\frac{d}{dx} W_k(x) = \frac{W_k(x)}{x(1 + W_k(x))}
+$$
+
+```epsil
+D(lambertW(x), x)
+// ➔ LambertW(x) / (x * (LambertW(x) + 1))
+```
+
+See also: [Lambert W function](https://en.wikipedia.org/wiki/Lambert_W_function),
+[DLMF 4.13](http://dlmf.nist.gov/4.13).
+
+<MathJson name="LambertW" latex={["\\operatorname{W}"]}>
+
+`["LambertW", z]` and `["LambertW", z, k]`, with the branch second. In
+LaTeX: `\operatorname{W}(x)` and `\operatorname{W}_{k}(x)`.
+
+```json example
+["N", ["LambertW", -0.1, -1]]
+// ➔ -3.57715206395729721841
+
+["N", ["LambertW", -0.1, ["NamedArgument", "'branch'", -1]]]
+// ➔ -3.57715206395729721841
+
+["N", ["LambertW", ["NamedArgument", "'branch'", -1],
+  ["NamedArgument", "'z'", -0.1]]]
+// ➔ -3.57715206395729721841
+```
+
+</MathJson>
 
 ### lb
 
@@ -2346,7 +3034,69 @@ Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a rea
 // ➔ [1/6 * pi^2,-1/12,1.2020569031595942854]
 ```
 
-<MathJson name="Zeta" latex={["\\Zeta"]} />
+For a complex `s` with a real part greater than 1, the Riemann zeta
+function is
+
+$$
+\zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s}
+$$
+
+and it is extended to other values by analytic continuation. At a complex
+`s`, `N` gives a double. Above $|\operatorname{Im} s| \approx 12\,868$ the
+call stays unevaluated.
+
+```epsil
+[zeta(0), zeta(-2), zeta(1)]
+// ➔ [-1/2,0,~oo]
+N(zeta(1/2 + 12000i))
+// ➔ (-0.03313149368569025 - 0.11149640109324212i)
+N(zeta(1/2 + 13000i))
+// ➔ Zeta((0.5 + 13000i))
+```
+
+#### Generalized zeta function
+
+`zeta(s, a)` is the generalized zeta function as Mathematica defines it:
+
+$$
+\zeta(s, a) = \sum_{n=0}^{\infty} \frac{1}{|n + a|^s}
+$$
+
+with the term where $n + a = 0$ omitted, except at $s = 0$, where every
+term is 1 and $\zeta(0, a) = \frac12 - a$ for every numeric $a$.
+
+```epsil
+[zeta(2, -1), zeta(0, 3), zeta(s, 1)]
+// ➔ [1 + 1/6 * pi^2,-5/2,Zeta(s)]
+```
+
+For $a > 0$ it is equal to the Hurwitz zeta function
+[`hurwitzZeta(s, a)`](/reference/arithmetic/#hurwitzzeta), which sums
+$(n + a)^{-s}$ with the principal power. For $a \le 0$ the two differ:
+
+```epsil
+N(zeta(2.976, -2.664))
+// ➔ 29.9024396938557276849
+N(hurwitzZeta(2.976, -2.664))
+// ➔ (22.600262690249576 - 0.275416075811198i)
+```
+
+See also: [Riemann zeta function](https://en.wikipedia.org/wiki/Riemann_zeta_function),
+[DLMF 25.2](http://dlmf.nist.gov/25.2).
+
+<MathJson name="Zeta" latex={["\\Zeta"]}>
+
+`["Zeta", s]` and `["Zeta", s, a]`. In LaTeX: `\zeta(s)`.
+
+```json example
+["Zeta", 2]
+// ➔ ["Multiply", ["Rational", 1, 6], ["Power", "Pi", 2]]
+
+["Zeta", 0, 3]
+// ➔ ["Rational", -5, 2]
+```
+
+</MathJson>
 
 ### e
 

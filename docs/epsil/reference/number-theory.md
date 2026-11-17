@@ -410,7 +410,7 @@ digitSum(255, 16)
 
 ### dirichletCharacter
 
-MathJSON `DirichletCharacter` · `(integer, integer, integer) -> number`
+`(integer, integer, integer) -> number`
 
 The Dirichlet character χ_j(n) modulo `k`, the `j`-th of the φ(k) characters (Wolfram's indexing, `j = 1` the principal character). Zero where gcd(n, k) &gt; 1; otherwise a root of unity.
 
@@ -424,9 +424,33 @@ dirichletCharacter(7, 3, 3)
 // ➔ e^(2/3i * pi)
 ```
 
+`j` runs from 1, the principal character, to $\varphi(k)$. An index outside
+that range stays unevaluated. The function threads over a list:
+
+```epsil
+dirichletCharacter(5, 2, [1, 2, 3, 4, 5])
+// ➔ [1,i,-i,-1,0]
+[dirichletCharacter(4, 1, [1, 2, 3]), dirichletCharacter(5, 5, 2)]
+// ➔ [[1,0,1],DirichletCharacter(5, 5, 2)]
+```
+
+<MathJson name="DirichletCharacter">
+
+`["DirichletCharacter", k, j, n]`.
+
+```json example
+["DirichletCharacter", 5, 2, 2]
+// ➔ "ImaginaryUnit"
+
+["DirichletCharacter", 5, 2, 5]
+// ➔ 0
+```
+
+</MathJson>
+
 ### dirichletL
 
-MathJSON `DirichletL` · `(integer, integer, number) -> number`
+`(integer, integer, number) -> number`
 
 The Dirichlet L-function L(s, χ) = Σ χ(n)/nˢ (n ≥ 1) of the character χ_j modulo `k` (`DirichletCharacter(k, j, ·)`): `k^(−s) Σ_{r=1}^{k} χ(r) ζ(s, r/k)`. Entire for a non-principal character; the principal one is `ζ(s) Π_{p|k} (1 − p^(−s))`.
 
@@ -444,6 +468,42 @@ dirichletL(3, 2, -2)
 dirichletL(5, 2, 0)
 // ➔ (3/5 + 1/5i)
 ```
+
+The value at a non-positive integer `s` is exact. For a real character, the
+value at $s = 1$ is exact, from the class number formula. The principal
+character has a pole at $s = 1$.
+
+```epsil
+[dirichletL(4, 2, 1), dirichletL(3, 2, 1), dirichletL(5, 1, 1)]
+// ➔ [1/4 * pi,sqrt(3)/9 * pi,~oo]
+```
+
+A real `s` of a real character is computed to the engine precision. A
+character with complex values is computed in double precision. A modulus
+above 1000 stays unevaluated.
+
+```epsil
+N(dirichletL(3, 2, 1.5))
+// ➔ 0.703968244868733261668
+N(dirichletL(5, 2, 2))
+// ➔ (0.9587161227168831 + 0.1455658767850896i)
+dirichletL(1009, 2, 2)
+// ➔ DirichletL(1009, 2, 2)
+```
+
+<MathJson name="DirichletL">
+
+`["DirichletL", k, j, s]`.
+
+```json example
+["DirichletL", 4, 2, 1]
+// ➔ ["Multiply", ["Rational", 1, 4], "Pi"]
+
+["N", ["DirichletL", 3, 2, 1.5]]
+// ➔ 0.703968244868733261668
+```
+
+</MathJson>
 
 ### divides
 
