@@ -187,8 +187,6 @@ Some pairs of delimiters are written with a LaTeX environment:
 - `{}`: `Bmatrix`, $\begin{Bmatrix} a & b \\ c & d \end{Bmatrix}$
 - `||`: `vmatrix`, $\begin{vmatrix} a & b \\ c & d \end{vmatrix}$
 - `‖‖`: `Vmatrix`, $\begin{Vmatrix} a & b \\ c & d \end{Vmatrix}$
-- `{.`: `dcases`
-- `.}`: `rcases`
 
 Other delimiters are written as `\left` and `\right` around an `array`
 environment.
@@ -1200,12 +1198,15 @@ norm([[1, 2], [3, 4]], 2)
 
 ### MathJSON
 
-`["Norm", value]`, `["Norm", value, p]`. _p_ is a number,
-`"PositiveInfinity"`, or the string `"Frobenius"`; the string `"Infinity"`
-is read as `PositiveInfinity`. In LaTeX, `\Vert v \Vert` or `\|v\|`, and
-`\Vert v \Vert_1` for a value of _p_.
+`["Norm", value]`, `["Norm", value, p]`. _p_ is a number, the symbol
+`"PositiveInfinity"` (or `"Infinity"`), or the string `"'Frobenius'"`; the
+symbol `"Frobenius"` leaves `Norm` unevaluated. In LaTeX, `\Vert v \Vert` or
+`\|v\|`, and `\Vert v \Vert_1` for a value of _p_.
 
 ```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "'Frobenius'"]
+// ➔ ["Sqrt", 30]
+
 ["Norm", ["List", 3, 4]]
 // ➔ 5
 
@@ -1290,11 +1291,15 @@ matrixPower([[1, 2], [3, 4]], 1/2)
 ```
 
 `A ^ n` with an integer `n` is `matrixPower(A, n)`. With an exponent that is
-not an integer, `^` applies to each element, as does `map`:
+not an integer, `^` applies to each element, as does `map`. For a symbolic
+exponent, write `matrixPower(A, n)`, which stays unevaluated until `n` has a
+value:
 
 ```epsil
 [[1, 2], [3, 4]] ^ (1/2)
 // ➔ [[1,sqrt(2)],[sqrt(3),2]]
+matrixPower([[1, 2], [3, 4]], n)
+// ➔ MatrixPower([[1,2],[3,4]], n)
 map(x => x^2, [[1, 2], [3, 4]])
 // ➔ [[1,4],[9,16]]
 ```
@@ -1575,6 +1580,15 @@ svd([[4, 0], [3, -5]])
 let (U, S, V) = N(svd([[1, 2, 3], [4, 5, 6]]))
 [shape(U), shape(S), shape(V)]
 // ➔ [(2, 2),(2, 3),(3, 3)]
+```
+
+To multiply the factors back together, use `matrixMultiply`:
+
+```epsil
+let A = [[4, 0], [3, -5]]
+let (U, S, V) = N(svd(A))
+round(matrixMultiply(matrixMultiply(U, S), transpose(V)))
+// ➔ [[4,0],[3,-5]]
 ```
 
 The singular values of a diagonal matrix are the absolute values of its

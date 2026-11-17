@@ -587,6 +587,28 @@ values.
 // ➔ "True"
 ```
 
+#### Indexing a matrix or a tensor
+
+A matrix has one index per axis: the first selects the row and the second
+the column, and a tensor of rank 3 takes three indexes. A negative index
+counts from the end of its own axis, so `A[2, -1]` is the last element of
+the second row, and `A[-1]` is the last row.
+
+```epsil
+let A = [[5, 2, 10, 18], [1, 2, 3, 4]]
+[A[2, -1], A[-1]]
+// ➔ [4,[1,2,3,4]]
+[[[1, 2], [3, 4]], [[5, 6], [7, 8]]][2, 1, 2]
+// ➔ 6
+```
+
+To read a column, index the transpose:
+
+```epsil
+transpose([[1, 2], [3, 4]])[2]
+// ➔ [2,4]
+```
+
 ### MathJSON
 
 `["At", xs, index]`, `["At", xs, ...indexes]`, `["At", xs, indexes]` (a
@@ -611,6 +633,13 @@ is `["At", "v", "p", "q"]`. The type of the `At` expression is the element
 type of the collection, so `v_n` has type `number` and can be used in
 arithmetic. In LaTeX, a bare `i` is the imaginary unit: use another index
 symbol, such as `k`.
+
+```json example
+["At", ["List", ["List", 5, 2, 10, 18], ["List", 1, 2, 3, 4]], 2, -1]
+// ➔ 4
+```
+
+In LaTeX, `\mathbf{A}\lbrack 2, 3\rbrack` is `["At", "A_bold", 2, 3]`.
 
 ## Keys
 

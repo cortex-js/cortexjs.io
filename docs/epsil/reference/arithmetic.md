@@ -336,7 +336,67 @@ Sum of two or more values.
 // ➔ 2x + 3
 ```
 
-<MathJson name="Add" latex={["+"]} />
+#### Vectors, matrices and tensors
+
+With a vector, a matrix or a tensor, `+` adds the elements at the same
+position, and a scalar is added to every element. A sum can mix several
+matrices and scalars. The operands that are not scalars must have the same
+shape. See
+[Arithmetic and broadcasting](/reference/linear-algebra/#arithmetic-and-broadcasting).
+
+```epsil
+[[1, 2], [3, 4]] + 10 + [[5, 6], [7, 8]]
+// ➔ [[16,18],[20,22]]
+[7, 11] + 3
+// ➔ [10,14]
+[1, 2] + [1, 2, 3]
+// ➔ error: Runtime error: incompatible dimensions at `2 vs 3`
+```
+
+The elements can be symbols, and exact elements, such as rationals and
+radicals, stay exact:
+
+```epsil
+[[a, b], [c, d]] + [[1, 2], [3, 4]]
+// ➔ [[a + 1,b + 2],[c + 3,d + 4]]
+[[1/2, sqrt(2)]] + [[1/3, sqrt(2)]]
+// ➔ [[5/6,2sqrt(2)]]
+```
+
+A tuple of numbers is added element by element too, and the sum is a tuple.
+A tuple and a list cannot be added:
+
+```epsil
+(1, 2, 3) + (3, 5, 6)
+// ➔ (4, 7, 9)
+(1, 2) + [3, 4]
+// ➔ error: Type error: expected `tuple`, got `list<number>` in `(1, 2) + [3, 4]`
+```
+
+<MathJson name="Add" latex={["+"]}>
+
+```json example
+["Add",
+  ["List", ["List", 1, 2], ["List", 3, 4]],
+  10,
+  ["List", ["List", 5, 6], ["List", 7, 8]]]
+// ➔ ["List", ["List", 16, 18], ["List", 20, 22]]
+
+["Add",
+  ["List", ["List", ["Rational", 1, 2], ["Rational", 1, 3]]],
+  ["List", ["List", ["Rational", 1, 2], ["Rational", 1, 3]]]]
+// ➔ ["List", ["List", 1, ["Rational", 2, 3]]]
+
+["Add",
+  ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]],
+  ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["Error", "'incompatible-dimensions'", "'2x2 vs 2x3'"]
+```
+
+In LaTeX, a vector can be written `(1, 2, 3)` or `[1, 2, 3]`:
+`(1,2,3)+(3,5,6)` is `(4, 7, 9)`.
+
+</MathJson>
 
 ### airyAi
 
