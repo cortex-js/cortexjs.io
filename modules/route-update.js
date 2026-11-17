@@ -38,11 +38,32 @@ function setupComputeEngine(delay) {
   }), 20);
 }
 
+// MathLive replaces the math elements of the page, nodes that React owns. On
+// the first load the content of the page is a chunk that React hydrates after
+// its first pass: if MathLive (often from the cache) rewrites those nodes
+// before that hydration, React finds a different tree and the page crashes
+// ("This page crashed.", a removeChild NotFoundError). So the first render
+// waits until the page has loaded and the browser is idle, which is after
+// the hydration.
+function afterHydration(fn) {
+  if (document.readyState !== "complete") {
+    window.addEventListener("load", () => afterHydration(fn), { once: true });
+    return;
+  }
+  if ("requestIdleCallback" in window)
+    window.requestIdleCallback(fn, { timeout: 2000 });
+  else setTimeout(fn, 200);
+}
+
 function renderMath(delay) {
   if (!("MathLive" in window)) {
     setTimeout(() => renderMath(Math.max(1000, 2 * delay)), delay);
     return;
   }
+  afterHydration(renderMathNow);
+}
+
+function renderMathNow() {
   MathLive.renderMathInDocument({
     renderAccessibleContent: false,
     skipTags: [
