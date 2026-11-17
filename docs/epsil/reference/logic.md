@@ -100,11 +100,17 @@ is local to the proposition.
 ### Quantifier evaluation
 
 A quantifier is decided by trying each value when the condition is
-`x in S` and `S` is finite: a set, a list, a range `a..b`, or an
-`interval(a, b)` with integer bounds, which is read as the integers from `a`
-to `b`. The domain has at most 1000 elements. Over a larger range, the
-elements are not tried: the quantifier is decided only from the bounds of the
-range, when they decide it, and otherwise stays unevaluated.
+`x in S` and `S` is finite: a set, a list, or a range `a..b`, the integers
+from `a` to `b`. The domain has at most 1000 elements. Over a larger range,
+the elements are not tried: the quantifier is decided only from the bounds of
+the range, when they decide it, and otherwise stays unevaluated.
+
+An `interval(a, b)` is a set of real numbers, with bounds that are open or
+closed, so its elements cannot be tried. For the integers from `a` to `b`,
+write the range `a..b`. The engine still tries the integers of an interval
+with integer bounds, which gives a wrong answer when the condition holds only
+for a value that is not an integer: `exists(x in interval(1, 2), x == 1.5)`
+is False.
 
 ```epsil
 [forAll(x in {1, 2, 3}, x > 0), exists(x in [1, 2, 3], x > 2)]
