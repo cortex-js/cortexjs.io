@@ -494,7 +494,7 @@ If the index is negative, it is counted from the end.
 
 Multiple indices can be provided to access nested collections (e.g., matrices).
 
-If the index is a finite collection of booleans, returns the elements where the mask is True (a mask is a filter, and its length must match the collection length; otherwise it is an error).
+If the index is a finite collection of booleans, returns the elements where the mask is True (a mask is a filter over the positions up to the shorter of the mask and the collection; a `Missing` or `NaN` member keeps nothing).
 
 If the index is a finite collection of integers, returns the elements at those indices, preserving position: an out-of-range index yields the absence marker, it is not dropped.
 
@@ -542,14 +542,31 @@ place.
 ```
 
 When the index is a list of booleans, it is a mask: the result is the
-elements where the mask is `True`, in order. The mask must have the length of
-the collection.
+elements where the mask is `True`, in order. The mask is read up to the
+shorter of its length and the length of the collection: a shorter mask keeps
+nothing past its end, and a longer one is read only as far as the collection
+goes. A `Missing` or `NaN` member keeps nothing, as `False` does.
 
 ```epsil
 [10, 20, 30, 40][[True, False, True, False]]
 // ➔ [10,30]
 [10, 20, 30, 40][[True, False, True]]
-// ➔ error: Runtime error: The mask (length 3) must have the same length as the collection (length 4)
+// ➔ [10,30]
+[10, 20, 30][[False, True, False, True, True]]
+// ➔ [20]
+[10, 20, 30, 40][[True, Missing, True, NaN]]
+// ➔ [10,30]
+```
+
+An index with a member that is neither a boolean nor `Missing` or `NaN` is a
+list of indexes. So is an index of `Missing` and `NaN` members only: it gives
+an absence marker for each member.
+
+```epsil
+[10, 20, 30][[1, Missing]]
+// ➔ [10,NaN]
+[10, 20, 30][[Missing, NaN]]
+// ➔ [NaN,NaN]
 ```
 
 #### Out-of-range index
@@ -617,12 +634,12 @@ let L = [-1, 2, -3, 4]; L[L > 0]
 // ➔ [2,4]
 ```
 
-The condition need not be about the filtered list. It can test another list of
-the same length, or the positions, computed from a range; here, all the
-elements but the `k`-th:
+The condition need not be about the filtered list. It can test another list,
+which is read as a mask up to the shorter of the two lengths, or the
+positions, computed from a range; here, all the elements but the `k`-th:
 
 ```epsil
-let L = [1, 2, 3]; let K = [1, 0, 1]; L[K == 1]
+let L = [1, 2, 3, 4, 5]; let K = [1, 0, 1]; L[K == 1]
 // ➔ [1,3]
 let L = [1, 2, 3, 4, 5]; let k = 2; L[abs((1..length(L)) - k) > 0]
 // ➔ [1,3,4,5]
