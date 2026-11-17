@@ -901,12 +901,28 @@ containsSequence([1, 2, 3], [])
 // ➔ "True"
 ```
 
+`containsSequence` is not [`contains`](#contains), which tests for one
+element: `contains("abc", "ab")` is `False`, because `"ab"` is not one of
+the characters of the string.
+
+```epsil
+[containsSequence("abc", "bc"), containsSequence("abc", "ac")]
+// ➔ ["True","False"]
+containsSequence("abc", "")
+// ➔ "True"
+```
+
 <MathJson name="ContainsSequence">
 
 `["ContainsSequence", xs, needle]`.
 
 ```json example
 ["ContainsSequence", ["List", 1, 2, 3], ["List", 2, 3]]
+// ➔ "True"
+```
+
+```json example
+["ContainsSequence", {str: "abc"}, {str: "bc"}]
 // ➔ "True"
 ```
 
@@ -1399,12 +1415,27 @@ endsWith(1..oo, [2, 3])
 // ➔ EndsWith(Range(1, +oo), [2,3])
 ```
 
+A suffix that would begin inside a grapheme cluster does not match: the only
+character of `"e\u{301}"` is `é`, which is not the combining accent.
+
+```epsil
+endsWith("hello", "lo")
+// ➔ "True"
+endsWith("e\u{301}", "\u{301}")
+// ➔ "False"
+```
+
 <MathJson name="EndsWith">
 
 `["EndsWith", xs, suffix]`.
 
 ```json example
 ["EndsWith", ["List", 1, 2, 3], ["List", 2, 3]]
+// ➔ "True"
+```
+
+```json example
+["EndsWith", {str: "hello"}, {str: "lo"}]
 // ➔ "True"
 ```
 
@@ -2016,6 +2047,27 @@ join("ab", characters("cd"))
 To join the elements of one collection of strings into a string, with an
 optional separator, use [`stringJoin`](/reference/core/#stringjoin).
 
+When every argument is a string, the result is their concatenation, a
+string. The result is segmented again, so it can have fewer characters than
+the arguments together (see
+[The re-segmentation caveat](/reference/core/#the-re-segmentation-caveat)).
+
+```epsil
+join("ab", "cd", "ef")
+// ➔ "abcdef"
+[join("e", "\u{301}"), length(join("e", "\u{301}"))]
+// ➔ ["é",1]
+```
+
+String interpolation also concatenates a few strings: `"\(a)\(b)"`. It
+converts each value to text, where `join` concatenates strings only and
+reads any other argument as a collection or an element.
+
+```epsil
+join("ab", 1)
+// ➔ ["a","b",1]
+```
+
 <MathJson name="Join">
 
 `["Join", xs, ys, …]`.
@@ -2029,6 +2081,14 @@ optional separator, use [`stringJoin`](/reference/core/#stringjoin).
 
 ["Join", {str: "ab"}, {str: "cd"}]
 // ➔ "abcd"
+```
+
+```json example
+["Join", {str: "ab"}, {str: "cd"}, {str: "ef"}]
+// ➔ "abcdef"
+
+["Join", {str: "ab"}, ["Characters", {str: "cd"}]]
+// ➔ ["List", ["CharacterFrom", "'a'"], ["CharacterFrom", "'b'"], ["CharacterFrom", "'c'"], ["CharacterFrom", "'d'"]]
 ```
 
 </MathJson>
@@ -3142,11 +3202,14 @@ rangeOf([10, 20, 30, 40], [30, 40])
 // ➔ [3,4]
 ```
 
-The span is a 1-based inclusive range, printed as a list of its two ends.
+The span is a 1-based inclusive range of indexes. Printed by itself, it shows
+each of its indexes; inside a list, it shows as a `Range`.
 
 ```epsil
 rangeOf([9, 7, 5, 3], [7, 5])
 // ➔ [2,3]
+[rangeOf("hello world", "o w"), rangeOf("hello", "e")]
+// ➔ [Range(5, 7),Range(2, 2)]
 rangeOf([9, 7, 5, 3], [7, 3])
 // ➔ "Missing"
 ```
@@ -3225,6 +3288,39 @@ rangeOf("hello", "ll")
 // ➔ [3,4]
 ```
 
+On a string, the comparison is between whole characters, so a needle never
+matches across the boundary of a grapheme cluster (see
+[Searching for a substring](/reference/core/#searching-for-a-substring)).
+The span prints as the list of its indexes.
+
+```epsil
+rangeOf("hello world", "o w")
+// ➔ [5,6,7]
+slice("hello world", rangeOf("hello world", "o w"))
+// ➔ "o w"
+rangeOf("abcabc", "bc", 4)
+// ➔ [5,6]
+rangeOf("abcabc", "bc", 6)
+// ➔ "Missing"
+```
+
+The needle can be a collection of another kind than the subject: a string
+searched with a list of characters gives a span in the character indexes of
+the string.
+
+```epsil
+rangeOf("abc", characters("bc"))
+// ➔ [2,3]
+slice("abc", rangeOf("abc", characters("bc")))
+// ➔ "bc"
+```
+
+When the needle is found, `slice(xs, rangeOf(xs, needle))` has the elements
+of the needle, in order. It is not `== needle` in every case: `slice` keeps
+the kind of `xs`, so with a string subject and a list of characters as the
+needle, one side is a string and the other a list, which are never equal.
+When the needle and the subject are of the same kind, they are equal.
+
 <MathJson name="RangeOf">
 
 `["RangeOf", xs, needle]`, `["RangeOf", xs, needle, from]`. The span is a
@@ -3236,6 +3332,14 @@ rangeOf("hello", "ll")
 
 ["Slice", ["List", 9, 7, 5, 3], ["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 5]]]
 // ➔ ["List", 7, 5]
+```
+
+```json example
+["RangeOf", {str: "hello world"}, {str: "o w"}]
+// ➔ ["Range", 5, 7]
+
+["RangeOf", {str: "abc"}, {str: "z"}]
+// ➔ "Missing"
 ```
 
 </MathJson>
@@ -4018,12 +4122,27 @@ startsWith(1..oo, [1, 2])
 // ➔ StartsWith(Range(1, +oo), [1,2])
 ```
 
+A prefix that would end inside a grapheme cluster does not match: the first
+and only character of `"👨‍👩‍👧"` is the whole family, not `👨`.
+
+```epsil
+startsWith("👨‍👩‍👧", "👨")
+// ➔ "False"
+startsWith("hello", "")
+// ➔ "True"
+```
+
 <MathJson name="StartsWith">
 
 `["StartsWith", xs, prefix]`.
 
 ```json example
 ["StartsWith", ["List", 1, 2, 3], ["List", 1, 2]]
+// ➔ "True"
+```
+
+```json example
+["StartsWith", {str: "hello"}, {str: "he"}]
 // ➔ "True"
 ```
 

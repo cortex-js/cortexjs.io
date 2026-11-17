@@ -365,6 +365,407 @@ was excluded, and a range includes both ends. The rows hold only in the
 stated cases. Rewrite the other old calls (`n ≤ 0`, `m ≥ n`) by hand, because
 a range with reversed bounds is a descending range, not an empty one.
 
+## Working with strings
+
+A string is an indexed collection of its characters. It can be counted,
+indexed from 1, iterated and searched with the functions of the
+[collections](/reference/collections/) library, as a list can.
+
+```epsil
+[length("shop"), "abc"[2], first("abc"), last("abc")]
+// ➔ [4,"b","a","c"]
+```
+
+A character is not the same thing as a Unicode scalar (a code point), and
+neither is the same thing as a byte of an encoding. A string gives all three
+views: the collection view is the characters, and the other two are reached
+with the conversions of [Views of a string](#views-of-a-string).
+
+Strings are normalized to Unicode **NFC** when they are made. The character
+`é` written as one scalar (U+00E9) or as two (`e` and U+0301 COMBINING ACUTE
+ACCENT) is the same string, of length 1. The emoji `👨‍🚀` is one character
+made of three scalars, eleven UTF-8 bytes and five UTF-16 code units.
+
+```epsil
+["e\u{301}" == "é", length("e\u{301}")]
+// ➔ ["True",1]
+length("👨‍🚀")
+// ➔ 1
+unicodeScalars("👨‍🚀")
+// ➔ [128104,8205,128640]
+utf8("👨‍🚀")
+// ➔ [240,159,145,168,226,128,141,240,159,154,128]
+utf16("👨‍🚀")
+// ➔ [55357,56424,8205,55357,56960]
+```
+
+**Membership is character membership, not substring search.** `c in s` and
+`contains(s, c)` ask whether `c` is one of the characters of `s`, as they do
+for a list. `"ab"` is a substring of `"abc"`, not one of its characters. A
+substring is searched with the functions of
+[Searching for a substring](#searching-for-a-substring), which read their
+second argument as a sequence of characters.
+
+```epsil
+isDigit(c) = c in "0123456789"
+isDigit("7")
+// ➔ "True"
+[contains("abc", "b"), contains("abc", "ab")]
+// ➔ ["True","False"]
+containsSequence("abc", "ab")
+// ➔ "True"
+```
+
+**Every string is well-formed Unicode.** A host string can hold an unpaired
+UTF-16 surrogate, on which segmentation, UTF-8 encoding and equality are not
+defined. Each string that enters the engine is scanned once, and each
+unpaired surrogate is replaced with U+FFFD REPLACEMENT CHARACTER, so every
+operation on a string has a result. In Epsil, an escape for a surrogate code
+point is an error:
+
+```epsil
+unicodeScalars("\u{D800}")
+// ➔ error: invalid unicode codepoint value: U+D800
+```
+
+### The `character` type
+
+A **character** is exactly one user-perceived character: one NFC-normalized
+grapheme cluster. It is a `scalar`, as `boolean` and `number` are.
+
+`character` and `string` are **disjoint**: a character is not a
+one-character string, and a string is not a character. A character has no
+elements, so a function that descends into collections stops at a character.
+
+`string` is not an alias of `list<character>` either. The two types have the
+same element type and the same iteration, and neither is a subtype of the
+other. They differ because grapheme segmentation is not stable under
+concatenation: joining an `e` and a lone combining acute accent makes the
+single character `é`, so a list of two characters becomes a string of one.
+
+| Type | Relationship |
+| :--- | :--- |
+| `character` | `character <: scalar` |
+| `string` | `string <: indexed_collection<character>` |
+| `string` and `scalar` | Not a subtype: a `scalar` is a `boolean`, a `character` or a `number` |
+| `string` and `list<character>` | Siblings: neither matches the other |
+| `string` and `character` | Disjoint: neither matches the other |
+
+**To get a character**, use [`characterFrom`](#characterfrom), or write a
+string literal where a `character` is expected. A literal that is exactly one
+grapheme cluster becomes that character, and any other literal is a type
+error. Only a literal is converted: an expression of type `string` is not,
+so write `characterFrom(s)`.
+
+```epsil
+let c: character = "a"
+type(c)
+// ➔ TypeFrom("character")
+let d: character = "ab"
+// ➔ error: Type error: The value ""ab"" of type "string" is not compatible with the declared type "character" in `let d: character = "ab"`
+function f(c: character) { c }
+let s = "a"
+f(s)
+// ➔ error: Type error: expected `character`, got `string` at `s` in `f(s)`
+function f(c: character) { c }
+let s = "a"
+f(characterFrom(s))
+// ➔ "a"
+```
+
+**Equality and ordering.** Two characters are equal when their NFC scalar
+sequences are the same. A character is also equal to the one-character
+string with the same content, which is why `c == "a"`, `"a" in "abc"` and
+`indexOf("abc", "b")` need no conversion. The two types stay disjoint.
+Characters are ordered by the code points of the cluster. The order is not
+locale-aware, and will not be: the identity, membership and hashing of
+values must be the same on every host.
+
+```epsil
+[characterFrom("a") == "a", "abc"[1] == "a", indexOf("abc", "b")]
+// ➔ ["True","True",2]
+characterFrom("é") < characterFrom("z")
+// ➔ "False"
+```
+
+A string function also accepts a character, as [Strings](#strings)
+describes. A symbol with no declared type that is used where a string
+function expects its string is inferred `character | string`.
+
+### Views of a string
+
+The default view of a string is its characters. For another decomposition,
+ask for it:
+
+| View | Function | Element | When to use it |
+| :--- | :--- | :--- | :--- |
+| Characters | [`characters`](#characters) (synonym `graphemeClusters`) | `character` | The decomposition that iteration and indexing use. Use it to freeze the segmentation into a list. Not guaranteed to be stable across Unicode versions; the slowest to compute. |
+| Unicode scalars | [`unicodeScalars`](#unicodescalars) | `integer` code point | Stable and fast. For work on code points. Not for substring search or display. |
+| UTF-8 | [`utf8`](#utf8) | `integer` byte | Work on an encoding: byte buffers, input and output, hashing. |
+| UTF-16 | [`utf16`](#utf16) | `integer` code unit | Work on an encoding, with a UTF-16 host. |
+| Substrings | [`stringSplit`](#stringsplit) | `string` | Splitting on whitespace or on a separator. `stringSplit(s, "")` splits into one-character strings, not characters, with the segmentation that `characters` uses. |
+
+Unicode scalars are not an encoding: one character can be several scalars,
+and each scalar is a different sequence of code units in each encoding.
+
+### Searching for a substring
+
+Substring search is the search for a contiguous subsequence, and the same
+four functions do it for every indexed collection:
+[`rangeOf`](/reference/collections/#rangeof),
+[`containsSequence`](/reference/collections/#containssequence),
+[`startsWith`](/reference/collections/#startswith) and
+[`endsWith`](/reference/collections/#endswith). A string is the case where
+the elements are characters.
+
+They differ from [`contains`](/reference/collections/#contains) and
+[`indexOf`](/reference/collections/#indexof), which search for one element:
+their second argument is a sequence of elements, and both sides are compared
+character by character. This is what makes them safe with grapheme clusters:
+a needle cannot match across the boundary of a cluster, because whole
+characters are compared.
+
+```epsil
+rangeOf("x\u{301}y", "x")
+// ➔ "Missing"
+rangeOf("👨‍👩‍👧", "👩")
+// ➔ "Missing"
+rangeOf("e\u{301}e", "e")
+// ➔ [2]
+```
+
+The characters of `"x\u{301}y"` are `x́` and `y`, and `x` is not `x́` (U+0301
+after `x` has no precomposed NFC form). `"👨‍👩‍👧"` is one character, a family
+joined with zero-width joiners. In `"e\u{301}e"` the first `e` is part of
+the character `é`, so the match is at index 2. A search on UTF-16 code units
+would find a match in all three.
+
+### Transforming a string
+
+A string is not changed in place: these functions return a new string.
+[`stringReplace`](#stringreplace) replaces substrings,
+[`trim`](#trim), [`trimStart`](#trimstart) and [`trimEnd`](#trimend) remove
+characters at the ends, [`stringRepeat`](#stringrepeat) repeats a string,
+and [`padStart`](#padstart) and [`padEnd`](#padend) pad it to a length.
+
+### Case
+
+[`toUpperCase`](#touppercase) and [`toLowerCase`](#tolowercase) map a whole
+string with the Unicode default mappings, which do not depend on a locale.
+For a comparison that ignores case, compare the results of
+[`caseFold`](#casefold).
+
+### Strings stay whole under broadcast and flattening
+
+A string is one value for the functions that spread over a collection:
+
+- **Broadcast.** A function that broadcasts over a collection gets a string
+  whole, not its characters. Otherwise every such function, `String`
+  included, would map over the characters, and a function with a scalar
+  parameter would be mapped instead of applied.
+- **`flatten`.** A function that descends into nested collections stops at
+  a string.
+
+```epsil
+String("ab", 1)
+// ➔ "ab1"
+String("x", [1, 2])
+// ➔ ["x1","x2"]
+[flatten(["ab", "cd"]), flatten("ab")]
+// ➔ [["ab","cd"],["ab"]]
+```
+
+### Which operations return a string
+
+Whether a collection function returns a `string` or a `list` for a string
+follows from what the function does:
+
+- A function whose result is a part or a reordering of the characters of
+  its argument returns a **string**: `reverse`, `rest`, `most`, `take`,
+  `drop`, `slice`, `unique`, `sort`, `rotateLeft`, `rotateRight`, `filter`,
+  `takeWhile`, `dropWhile`, `dedup`, `deleteAt`, `randomShuffle`,
+  `randomSample`.
+
+  ```epsil
+  [deleteAt("abcdef", 2), reverse("abc"), sort("banana")]
+  // ➔ ["acdef","cba","aaabnn"]
+  [unique("banana"), dedup("aabbbc"), filter("a1b2", c => c in "0123456789")]
+  // ➔ ["ban","abc","12"]
+  type(randomShuffle("abcdef"))
+  // ➔ TypeFrom("string")
+  ```
+
+- A function whose result is a list of runs, each a stretch, a reordering
+  or a part of the characters, returns a **`list<string>`**: `chunk`,
+  `partition` (all its forms), `chunkBy`, `slidingWindow`, `permutations`,
+  `combinations`. `tally` is not one of them: its first component holds the
+  distinct elements, so they stay characters.
+
+  ```epsil
+  [chunk("abcdef", 2), partition("abcdef", 2)]
+  // ➔ [["abc","def"],["ab","cd","ef"]]
+  [slidingWindow("abcd", 2), combinations("abc", 2)]
+  // ➔ [["ab","bc","cd"],["ab","ac","bc"]]
+  tally("banana")
+  // ➔ (["b","a","n"], [1,3,2])
+  ```
+
+- `map`, `flatMap`, `scan` and `zip` return a **list**, even when the
+  function returns characters. Join the result with
+  [`String`](#string) or [`stringJoin`](#stringjoin).
+
+  ```epsil
+  map(c => toUpperCase(c), "abc")
+  // ➔ ["A","B","C"]
+  String(map(c => toUpperCase(c), "abc"))
+  // ➔ "ABC"
+  ```
+
+- A function whose result is not a collection of the same kind (`length`,
+  `isEmpty`, `contains`, `count`, `any`, `all`, `indexOf`, `at`, `first`,
+  `last`, `position`, `find`, `reduce`, `fold`) does on a string what it
+  does on any indexed collection. In LaTeX, `|s|` of a string is its
+  `count`, and the `count` of a string is serialized as `|s|`.
+
+  ```epsil
+  let n = parse(#"|\text{abc}|"#)
+  n
+  // ➔ 3
+  Latex(parse(#"|\text{abc}|"#))
+  // ➔ "\vert\text{abc}\vert"
+  ```
+
+- A set function reads a string argument as its characters. `setMinus` is
+  the exception: its other arguments are the values to remove, so
+  `setMinus(S, "ab")` removes the string `"ab"` from `S`, not the characters
+  `a` and `b`.
+
+  ```epsil
+  union({1}, "ab")
+  // ➔ Set(1, "b", "a")
+  setMinus({1, "ab"}, "ab")
+  // ➔ Set(1)
+  ```
+
+- A numeric function (`sum`, `product`, `mean`, `max`, `gcd`, …) does not
+  read a string as its characters. A character is not a number, so the
+  result is an error or stays unevaluated, never a wrong number.
+
+  ```epsil
+  sum("abc")
+  // ➔ error: Runtime error: expected `number`, got `character`
+  max("abc")
+  // ➔ max("abc")
+  ```
+
+#### The re-segmentation caveat
+
+A function that returns a string splits it into characters, works on the
+characters, then joins them and splits the result again. The join can merge
+two characters into one, so the result can have fewer characters than the
+argument. This follows from grapheme segmentation:
+
+- `String(characters(s)) == s`, always.
+- `characters(String(cs))` can have fewer elements than `cs`: the character
+  `e` and a lone combining acute accent, each a character, join into the one
+  character `é`.
+- So `reverse` can change the number of characters: a combining mark that
+  followed one character can end up after another one.
+
+```epsil
+String(characters("héllo")) == "héllo"
+// ➔ "True"
+[length(["e", "\u{301}"]), length(String(["e", "\u{301}"]))]
+// ➔ [2,1]
+characters(reverse("\u{301}a"))
+// ➔ ["á"]
+```
+
+To keep a segmentation that later operations cannot change, take it as a
+list with [`characters`](#characters).
+
+### Unicode-version stability
+
+The boundaries of grapheme clusters are defined by
+[Unicode Standard Annex #29](https://unicode.org/reports/tr29/), and can
+change when the Unicode data of the host (ICU) is updated:
+
+- The number of characters of an unusual cluster can differ between hosts.
+  A test that checks such a count should name the Unicode version it
+  assumes.
+- A literal is converted to a `character` by the same segmentation, so an
+  ICU update that changes the cluster count of a literal changes whether the
+  program type-checks.
+
+Unicode scalars and their UTF-8, UTF-16 and UTF-32 encodings are fixed and
+stable. Only the character view can change.
+
+### Compiling string operations
+
+A string operation that cannot be compiled to a target with the same
+character counts fails to compile, with a diagnostic, rather than counting
+code units: see [Compiling](/compute-engine/guides/compiling/).
+
+### Annotated expressions
+
+An **annotated expression** carries metadata that does not change what the
+expression means: the color or size of its text, a tooltip, a link. It can
+annotate a string, and also a variable, an operator or a function, for
+instance to highlight part of a formula. In LaTeX, `\textcolor` makes an
+annotated expression. Annotated expressions are like the attributed strings
+of other systems. See [`Annotated`](#annotated).
+
+```epsil
+parse(#"\textcolor{blue}{\pi}"#)
+// ➔ Annotated(pi, {"color" -> "blue"})
+Latex(parse(#"\textcolor{blue}{\pi}"#))
+// ➔ "\textcolor{blue}{\pi}"
+```
+
+When `\textcolor` (or `\color`) wraps an operator alone, such as `=` in
+`x \textcolor{red}{=} y`, the operator is parsed as usual and the color is
+dropped: an annotation cannot be attached to an operator alone. A colored
+operand, such as `\textcolor{red}{x + 1}`, is still annotated.
+
+```epsil
+parse(#"x \textcolor{red}{=} y"#)
+// ➔ x == y
+parse(#"\textcolor{red}{x + 1}"#)
+// ➔ Annotated(x + 1, {"color" -> "red"})
+```
+
+### Text expressions
+
+A `Text` expression is a sequence of strings, annotated expressions and other
+`Text` expressions: formatted text, such as the result of parsing
+`\text{Hello \textbf{world}}`. In LaTeX, the elements of a `Text` expression
+are serialized one by one, each with the commands of its formatting.
+
+```epsil
+parse(#"\text{Hello \textcolor{blue}{world}}"#)
+// ➔ Text("Hello ", Annotated("world", {"color" -> "blue"}))
+Latex(parse(#"\text{Hello \textcolor{blue}{world}}"#))
+// ➔ "\text{Hello }\textcolor{blue}{\text{world}}"
+```
+
+A `String` converts each of its arguments to text and joins them, so the
+formatting of an annotated argument is lost. Evaluating a `Text` expression
+gives the same plain string:
+
+```epsil
+String("Hello ", Annotated("world", {"color" -> "blue"}))
+// ➔ "Hello world"
+Text("Hello ", Annotated("world", {"color" -> "blue"}))
+// ➔ "Hello world"
+```
+
+### Text and LaTeX
+
+[`LatexString`](#latexstring) marks a string as a LaTeX fragment;
+[`Latex`](#latex) serializes an expression to LaTeX, and [`parse`](#parse)
+parses LaTeX. The functions of the [collections](/reference/collections/)
+library apply to strings.
+
 ## Definitions
 
 Each definition is listed under its Epsil spelling (the MathJSON name when
@@ -442,6 +843,50 @@ Attach metadata or style annotations to an expression.
 Annotated(x^2, {"color" -> "blue"})
 // ➔ x^2
 ```
+
+`Annotated(expr, attributes)` behaves as `expr` and carries metadata in the
+dictionary `attributes`. The metadata has no effect on evaluation:
+`Annotated` is inert and evaluates to `expr`. Use it to attach style or
+meaning for display, such as a color, a tooltip or a highlight. See
+[Annotated expressions](#annotated-expressions).
+
+```epsil
+Annotated(1 + 1, {"color" -> "red"})
+// ➔ 2
+```
+
+#### Attributes
+
+The LaTeX serializer reads these keys:
+
+- `color`: a color name or a hex code, written with `\textcolor`.
+- `backgroundColor`: a color name or a hex code, written with `\colorbox`.
+- `mathStyle`: `"normal"` (display math), `"compact"` (inline math),
+  `"script"` or `"scriptscript"`.
+- `size`: a number from 1 to 10, where 5 is the normal size.
+- `fontFamily`: `"monospace"` or `"sans-serif"`.
+- `fontWeight`: `"bold"`.
+- `fontStyle`: `"italic"` or `"normal"`.
+- `border`: `True` for a box around the expression.
+
+Other keys, such as `tooltip`, `link`, `language`, `cssClass` and `cssId`,
+are kept with the expression for the application that displays it.
+
+<MathJson name="Annotated">
+
+`["Annotated", expr, ["Dictionary", …]]`, or with a `{dict: …}` object as
+the second argument.
+
+```json example
+["Equal",
+  "circumference",
+  ["Multiply", 2, ["Annotated", "Pi", {"dict": {"color": "blue"}}], "r"]
+]
+```
+
+In LaTeX, this is `\mathrm{circumference} = 2 \cdot \textcolor{blue}{\pi} \cdot r`.
+
+</MathJson>
 
 ### apply
 
@@ -626,9 +1071,61 @@ an argument that is not a predicate is not an error.
 
 ### baseForm
 
-MathJSON `BaseForm` · `(T, (number | string)?) -> T where T: number`
+`(T, (number | string)?) -> T where T: number`
 
 `BaseForm(expr, base=10)`
+
+`baseForm` evaluates to the number it represents, so a number written in a
+base takes part in arithmetic. The base is an integer from 2 to 36, 10 by
+default.
+
+```epsil
+baseForm(23, 2) + 1
+// ➔ 24
+baseForm(11, 2) * baseForm(5, 2)
+// ➔ 55
+```
+
+#### Parsing
+
+In LaTeX, a numeral with an integer subscript, such as `10111_2` or
+`2748_{16}`, is parsed as `BaseForm` when every digit is valid in the base.
+Otherwise it stays a `Subscript`.
+
+```epsil
+parse("10111_2")
+// ➔ BaseForm(23, 2)
+parse("19_2")
+// ➔ Subscript(19, 2)
+let q = parse("11_8 - 3_8 = 6_8")
+q
+// ➔ "True"
+```
+
+A symbol subscript, such as `161_b`, is parsed as `BaseForm` of the
+polynomial of the digits in that base, so an equation in an unknown base can
+be solved:
+
+```epsil
+parse("161_b")
+// ➔ BaseForm(b^2 + 6b + 1, b)
+let e = parse("161_b + 134_b = 315_b")
+solve(e, b)
+// ➔ [0,8]
+```
+
+<MathJson name="BaseForm">
+
+`["BaseForm", value]`, `["BaseForm", value, base]`. In LaTeX, `BaseForm` is
+written `value_{base}`, with the digits in the base, and a digit above 9 as
+a letter: `["BaseForm", 42, 16]` is `\mathrm{2a}_{16}`.
+
+```json example
+["BaseForm", 23, 2]
+// ➔ 23
+```
+
+</MathJson>
 
 ### Block
 
@@ -708,7 +1205,7 @@ The `canonical` option of `ce.parse()` and `ce.expr()` takes the same forms.
 
 ### caseFold
 
-MathJSON `CaseFold` · `(character | string) -> string`
+`(character | string) -> string`
 
 CaseFold(s): a case-folded form of `s`, for case-insensitive comparison — `CaseFold(a) == CaseFold(b)` tests equality ignoring case. An approximation of Unicode full case folding.
 
@@ -722,9 +1219,46 @@ caseFold("Hello") == caseFold("HELLO")
 // ➔ "True"
 ```
 
+The folded form is a key for comparison, not text to display. `caseFold`
+and `toLowerCase` differ where lower case depends on the context: the
+lower case of `"ΟΔΟΣ"` ends with the final sigma `ς`, and its folded form
+with the sigma `σ`, so the folded forms of both spellings are equal.
+
+```epsil
+[toLowerCase("ΟΔΟΣ"), caseFold("ΟΔΟΣ")]
+// ➔ ["οδος","οδοσ"]
+caseFold("ΟΔΟΣ") == caseFold("οδοσ")
+// ➔ "True"
+toLowerCase("ΟΔΟΣ") == toLowerCase("οδοσ")
+// ➔ "False"
+```
+
+#### An approximation of Unicode case folding
+
+The host has no case-folding function, so the fold is the lower case of the
+upper case, with the final sigma (U+03C2) replaced by the sigma (U+03C3).
+This gives the result of Unicode full case folding for Latin, Greek and
+Cyrillic text, `ß` and `SS` included. It differs for a few characters that
+Unicode's `CaseFolding.txt` maps in a special way, among them Cherokee and
+some Turkic and Lithuanian sequences.
+
+<MathJson name="CaseFold">
+
+`["CaseFold", s]`.
+
+```json example
+["CaseFold", {str: "Straße"}]
+// ➔ "strasse"
+
+["Equal", ["CaseFold", {str: "ΟΔΟΣ"}], ["CaseFold", {str: "οδοσ"}]]
+// ➔ "True"
+```
+
+</MathJson>
+
 ### characterFrom
 
-MathJSON `CharacterFrom` · `(character | string) -> character`
+`(character | string) -> character`
 
 CharacterFrom(s): the character `s` denotes. `s` must be exactly one user-perceived character (one grapheme cluster) after NFC normalization; an empty or multi-character string is an error.
 
@@ -733,9 +1267,55 @@ characterFrom("é")
 // ➔ "é"
 ```
 
+One character means one grapheme cluster, not one code point: a
+precomposed or a decomposed `é`, an emoji sequence joined with zero-width
+joiners and a flag each qualify. An empty string or a string of several
+characters is an error, never a truncation.
+
+```epsil
+characterFrom("👨‍👩‍👧")
+// ➔ "👨‍👩‍👧"
+characterFrom("e\u{301}") == characterFrom("é")
+// ➔ "True"
+characterFrom("ab")
+// ➔ error: Type error: expected `character`, got `string` at `"ab"` in `characterFrom("ab")`
+characterFrom("")
+// ➔ error: Type error: expected `character`, got `string` at `""` in `characterFrom("")`
+```
+
+One cluster always segments to itself, so `characterFrom(String(c)) == c`
+for every character `c`.
+
+```epsil
+let c = characterFrom("x")
+characterFrom(String(c)) == c
+// ➔ "True"
+```
+
+A string literal also becomes a character where a `character` is expected:
+see [The `character` type](#the-character-type).
+
+<MathJson name="CharacterFrom">
+
+`["CharacterFrom", s]`. MathJSON has string literals but no character
+literal, so `["CharacterFrom", "'x'"]` is also the form in which a character
+is written: a character serializes to it, and it canonicalizes back to the
+same character. A string literal converted to a character in Epsil is
+written in this form too.
+
+```json example
+["CharacterFrom", {str: "x"}]
+// ➔ ["CharacterFrom", "'x'"]
+
+["Characters", {str: "abc"}]
+// ➔ ["List", ["CharacterFrom", "'a'"], ["CharacterFrom", "'b'"], ["CharacterFrom", "'c'"]]
+```
+
+</MathJson>
+
 ### characters
 
-MathJSON `Characters` · `(character | string) -> list<character>`
+`(character | string) -> list<character>`
 
 Characters(s): split a string into a list of user-perceived characters (grapheme clusters). Synonym: GraphemeClusters. For stable integer decompositions see UnicodeScalars, Utf8 and Utf16. A non-string argument leaves the expression unevaluated.
 
@@ -743,6 +1323,57 @@ Characters(s): split a string into a list of user-perceived characters (grapheme
 characters("héllo")
 // ➔ ["h","é","l","l","o"]
 ```
+
+A **grapheme cluster** is the smallest unit of text that a reader sees as
+one character. It can be one Unicode scalar or several. The character `é`
+can be one scalar (U+00E9, the precomposed form of NFC) or two (`e` U+0065
+and the combining acute accent U+0301, the decomposed form of NFD), and both
+are one grapheme cluster. An emoji such as `👩‍🚀` or a flag such as `🇫🇷` is
+one grapheme cluster of several scalars.
+
+| String | Characters | Unicode scalars |
+| :--- | :--- | :--- |
+| `é` (NFC) | `["é"]` | `[233]` |
+| `é` (NFD) | `["é"]` | `[101, 769]` before NFC normalization, `[233]` after |
+| `👩‍🎓` | `["👩‍🎓"]` | `[128105, 8205, 127891]` |
+
+```epsil
+[characters("e\u{301}"), characters("🇫🇷")]
+// ➔ [["é"],["🇫🇷"]]
+unicodeScalars("👩‍🎓")
+// ➔ [128105,8205,127891]
+```
+
+The boundaries of grapheme clusters are defined by the Unicode Standard
+([UAX #29](https://unicode.org/reports/tr29/)) and can change as characters,
+scripts and emoji sequences are added. Unicode scalars and their UTF-8,
+UTF-16 and UTF-32 encodings are fixed across Unicode versions (see
+[Unicode-version stability](#unicode-version-stability)).
+
+Iterating or indexing a string gives the same characters, so `characters` is
+needed only for the list itself: to keep the segmentation from changing when
+the characters are joined again (see
+[The re-segmentation caveat](#the-re-segmentation-caveat)).
+`String(characters(s)) == s` always holds; `characters(String(cs))` can have
+fewer elements than `cs`.
+
+`graphemeClusters` is a synonym, the original name of this function.
+
+See also [`characterFrom`](#characterfrom), [`stringSplit`](#stringsplit),
+[`utf8`](#utf8), [`utf16`](#utf16) and [`unicodeScalars`](#unicodescalars).
+
+<MathJson name="Characters">
+
+`["Characters", s]`, and its synonym `["GraphemeClusters", s]`. The elements
+of the result are characters, so they are written in the `CharacterFrom`
+form.
+
+```json example
+["Characters", {str: "ab"}]
+// ➔ ["List", ["CharacterFrom", "'a'"], ["CharacterFrom", "'b'"]]
+```
+
+</MathJson>
 
 ### Coalesce
 
@@ -974,9 +1605,38 @@ Delimiter(1 + 2)
 // ➔ 3
 ```
 
+`Delimiter` is inert: `Delimiter(expr)` evaluates to `expr`. It holds the
+delimiters and separators with which `expr` is displayed. `expr` is a
+function expression, usually a `Sequence`, not a symbol or a number.
+
+The optional second argument is a string:
+
+- One character: the separator.
+- Two characters: the opening and the closing delimiters.
+- Three characters: the opening delimiter, the separator and the closing
+  delimiter.
+
+The opening and closing delimiters are each one of the characters
+`()[]{}<>|‖⌈⌉⌊⌋⌜⌝⌞⌟⎰⎱"`, and do not have to match: `")]"` is a valid pair. A
+`.` as a delimiter means no delimiter. The separator is one of `,;.&:|-`,
+U+00B7 MIDDLE DOT, U+2022 BULLET or U+2026 HORIZONTAL ELLIPSIS.
+
+With no second argument, the delimiters depend on `expr`: `(,)` for a
+`Sequence`, a tuple, `Single`, `Pair` or `Triple`, `[,]` for a list and
+`{,}` for a set.
+
+<MathJson name="Delimiter">
+
+`["Delimiter", expr]`, `["Delimiter", expr, delim]`. In LaTeX, `expr` is
+written between the delimiters, with the separator between its elements:
+`["Delimiter", ["Sequence", 1, 2, 3], "'{;}'"]` is
+`\lbrace1;2;3\rbrace`.
+
+</MathJson>
+
 ### digitsFrom
 
-MathJSON `DigitsFrom` · `(character | string, (character | integer | string)?) -> integer`
+`(character | string, (character | integer | string)?) -> integer`
 
 Return an integer representation of the string `s` in base `base`.
 
@@ -989,6 +1649,47 @@ digitsFrom("ff", 16)
 digitsFrom("1010", 2)
 // ➔ 10
 ```
+
+The base is from 2 to 36, 10 by default. Whitespace before and after the
+digits is ignored, and a sign is read. A `0x` or `0b` prefix selects base 16
+or 2, whatever the base argument. An integer greater than $2^{53}$ stays
+exact.
+
+```epsil
+[digitsFrom(" -42 "), digitsFrom("0xff"), digitsFrom("0b101", 10)]
+// ➔ [-42,255,5]
+digitsFrom("z", 36)
+// ➔ 35
+digitsFrom("123456789012345678901234567890")
+// ➔ 123456789012345678901234567890
+```
+
+A digit that is not valid in the base is an `unexpected-digit` error, and a
+base outside 2 to 36 an `unexpected-base` error.
+
+```epsil
+digitsFrom("12", 2)
+// ➔ error: Runtime error: unexpected digit: 2 at `2`
+digitsFrom("12", 37)
+// ➔ error: Runtime error: unexpected base: 37 at `37`
+```
+
+See also [`integerString`](#integerstring), [`baseForm`](#baseform) and
+[`numberFrom`](#numberfrom).
+
+<MathJson name="DigitsFrom">
+
+`["DigitsFrom", s]`, `["DigitsFrom", s, base]`.
+
+```json example
+["DigitsFrom", {str: "-42"}]
+// ➔ -42
+
+["DigitsFrom", {str: "0xff"}]
+// ➔ 255
+```
+
+</MathJson>
 
 ### error
 
@@ -1297,7 +1998,7 @@ Read one line of text from the host: the terminal in a command-line host, the `p
 
 ### integerString
 
-MathJSON `IntegerString` · `(integer, integer?, integer?) -> string`
+`(integer, integer?, integer?) -> string`
 
 `IntegerString(n, base=10, length)`       return a string representation of the integer `n` in base `base`.       With `length`, the digits of |n| are padded on the left with zeros,       or cut to the last `length` digits.
 
@@ -1315,6 +2016,56 @@ integerString(10, 2)
 integerString(5, 2, 8)
 // ➔ "00000101"
 ```
+
+The base is from 2 to 36, 10 by default. The sign is kept, and an integer
+greater than $2^{53}$ stays exact. A base outside 2 to 36 is an
+`out-of-range` error. A symbol with no value, as the integer or as the base,
+leaves the call unevaluated.
+
+```epsil
+integerString(-42)
+// ➔ "-42"
+integerString(30!)
+// ➔ "265252859812191058636308480000000"
+integerString(5, 37)
+// ➔ error: Runtime error: out of range: 2, 36, 37 at `37`
+[integerString(x), integerString(5, b)]
+// ➔ [IntegerString(x),IntegerString(5, b)]
+```
+
+With a length, the digits of the absolute value are padded with zeros on the
+left, or cut to their last digits, and the sign is dropped. The length is at
+most 1,000,000; a greater length leaves the call unevaluated.
+
+```epsil
+[integerString(-5, 2, 8), integerString(1234, 10, 2)]
+// ➔ ["00000101","34"]
+```
+
+`integerString` broadcasts: applied to a list of integers, it returns a list
+of strings.
+
+```epsil
+integerString([1, 2, 10], 2)
+// ➔ ["1","10","1010"]
+```
+
+See also [`digitsFrom`](#digitsfrom) and [`baseForm`](#baseform).
+
+<MathJson name="IntegerString">
+
+`["IntegerString", n]`, `["IntegerString", n, base]`,
+`["IntegerString", n, base, length]`.
+
+```json example
+["IntegerString", 255, 16]
+// ➔ "ff"
+
+["IntegerString", 5, 2, 8]
+// ➔ "00000101"
+```
+
+</MathJson>
 
 ### InvisibleOperator
 
@@ -1605,7 +2356,7 @@ tags of the MathJSON format, with no value other than themselves.
 
 ### numberFrom
 
-MathJSON `NumberFrom` · `(character | string, base: (character | integer | string)?) -> number`
+`(character | string, base: (character | integer | string)?) -> number`
 
 NumberFrom(s): the number the string `s` denotes — optional surrounding whitespace, an optional sign, then ASCII digits with an optional "." fraction and an optional e/E exponent, or one of "oo", "+oo", "-oo", "NaN", "Indeterminate". The integer part may be omitted before a fraction (".5" is 0.5); a trailing "." with no fraction digits ("5.") is not accepted. Any other text, including "", is an error value (never NaN).
 
@@ -1620,6 +2371,79 @@ numberFrom("3.25")
 numberFrom("ff", 16)
 // ➔ 255
 ```
+
+Unlike [`digitsFrom`](#digitsfrom), which reads integers only, `numberFrom`
+reads fractions, exponents and the spellings of the infinities and `NaN`.
+
+The grammar is fixed, so that hosts cannot differ: any amount of Unicode
+`White_Space` before and after, an optional `+` or `-` sign, then either a
+decimal numeral (ASCII digits, an optional `.` and fraction, an optional `e`
+or `E` exponent) or one of the spellings `oo`, `+oo`, `-oo`, `NaN`,
+`Indeterminate`.
+
+| Input | Result | Why |
+| :--- | :--- | :--- |
+| `"42"`, `"-42"`, `"+7"`, `" 42 "` | `42`, `-42`, `7`, `42` | An integer numeral, with a sign and whitespace around it |
+| `"3.14"`, `"1e-3"`, `"1.5e3"` | `3.14`, `0.001`, `1500` | A fraction and an exponent |
+| `".5"` | `0.5` | A leading `.` needs no integer part |
+| `"oo"`, `"+oo"`, `"-oo"`, `"NaN"`, `"Indeterminate"` | `+oo`, `+oo`, `-oo`, `NaN`, `NaN` | The spellings of Epsil for the infinities and NaN |
+| `"5."` | `invalid-number` error | A `.` with no fraction digits after it is not a numeral |
+| `""` | `invalid-number` error | The empty string is not a number |
+| `"abc"`, `"12abc"` | `invalid-number` error | The **whole** string must be a numeral, not only its start |
+| `"1/3"` | `invalid-number` error | Not a numeral: make the fraction with arithmetic |
+| `"0x1f"`, `"1_000"`, `"Infinity"`, `"nan"` | `invalid-number` error | Not in the grammar: the spellings are exact, and case-sensitive |
+| `"٣"` (Arabic-Indic three) | `invalid-number` error | ASCII digits only, so that digits that look alike cannot pass |
+
+```epsil
+[numberFrom(" +7 "), numberFrom("1e-3"), numberFrom(".5")]
+// ➔ [7,0.001,0.5]
+[numberFrom("oo"), numberFrom("-oo"), numberFrom("NaN")]
+// ➔ [+oo,-oo,NaN]
+numberFrom("5.")
+// ➔ error: Runtime error: invalid number: 5. at `"5."`
+numberFrom("٣")
+// ➔ error: Runtime error: invalid number: ٣ at `"٣"`
+```
+
+A failure is always an error value, never `NaN`: `NaN` is the result of
+reading `"NaN"`, so it cannot also mean that the reading failed.
+
+```epsil
+isError(numberFrom("12abc"))
+// ➔ "True"
+```
+
+A numeral with no fraction and no exponent gives an exact integer. A numeral
+with a fraction or an exponent gives an exact decimal, which `N`
+approximates.
+
+With a base (2 to 36), as for `digitsFrom`, only integer numerals are read:
+
+```epsil
+numberFrom("1010", 2)
+// ➔ 10
+numberFrom("1.5", 16)
+// ➔ error: Runtime error: invalid number: 1.5 at `"1.5"`
+numberFrom("11", 37)
+// ➔ error: Runtime error: unexpected base: 37 at `37`
+```
+
+See also [`digitsFrom`](#digitsfrom), [`integerString`](#integerstring) and
+[`String`](#string).
+
+<MathJson name="NumberFrom">
+
+`["NumberFrom", s]`, `["NumberFrom", s, base]`.
+
+```json example
+["NumberFrom", {str: "-1.5e2"}]
+// ➔ -150
+
+["NumberFrom", {str: "ff"}, 16]
+// ➔ 255
+```
+
+</MathJson>
 
 ### numericApproximation
 
@@ -1674,7 +2498,7 @@ padEnd("abc", 6, ".")
 
 ### padStart
 
-MathJSON `PadStart` · `(character | string, n: integer, pad: (character | string)?) -> string`
+`(character | string, n: integer, pad: (character | string)?) -> string`
 
 PadStart(s, n, pad=" "): `s` padded at the START to `n` characters by repeating `pad` (its final copy truncated on a character boundary). Returned unchanged when `s` already has `n` or more characters. `n` must be a non-negative integer; an empty `pad` is an error; a non-string `pad` leaves the expression unevaluated.
 
@@ -1682,6 +2506,53 @@ PadStart(s, n, pad=" "): `s` padded at the START to `n` characters by repeating 
 padStart("42", 5, "0")
 // ➔ "00042"
 ```
+
+`padStart` adds copies of the padding before the string and `padEnd` after
+it, until the string has the given number of **characters**. A string that
+already has that many characters or more is returned unchanged.
+
+```epsil
+[padStart("7", 3, "0"), padEnd("7", 3, "0"), padStart("abc", 2, "0")]
+// ➔ ["007","700","abc"]
+```
+
+The padding is a space by default. A padding of several characters is
+repeated, and its last copy is cut at a character boundary to fit exactly.
+
+```epsil
+padStart("ab", 3)
+// ➔ " ab"
+padEnd("ab", 7, "123")
+// ➔ "ab12312"
+padStart("ab", 4, "👨‍👩‍👧x")
+// ➔ "👨‍👩‍👧xab"
+```
+
+The length must be a non-negative integer. An empty padding is an error:
+it cannot reach the length, and returning the string unchanged would hide
+the mistake.
+
+```epsil
+padStart("ab", 4, "")
+// ➔ error: Runtime error: unexpected argument
+```
+
+Padding counts characters, not display columns: it does not align text in a
+terminal or in a proportional font.
+
+<MathJson name="PadStart">
+
+`["PadStart", s, n]`, `["PadStart", s, n, pad]`, and likewise `PadEnd`.
+
+```json example
+["PadStart", {str: "7"}, 3, {str: "0"}]
+// ➔ "007"
+
+["PadEnd", {str: "ab"}, 7, {str: "123"}]
+// ➔ "ab12312"
+```
+
+</MathJson>
 
 ### parallel
 
@@ -2280,15 +3151,58 @@ String(x, 2)
 // ➔ "x2"
 ```
 
+```epsil
+String("Hello", ", ", "🌍", "!")
+// ➔ "Hello, 🌍!"
+String(42, " is the answer")
+// ➔ "42 is the answer"
+```
+
+With exactly one argument that is a finite collection, `String` joins the
+elements of the collection instead of broadcasting over them. This is what
+makes `String(characters(s)) == s` hold. With one infinite collection, it
+stays unevaluated.
+
+```epsil
+[String(characters("abc")), String([1, 2, 3])]
+// ➔ ["abc","123"]
+String(characterFrom("x"))
+// ➔ "x"
+String(1..oo)
+// ➔ String(Range(1, +oo))
+```
+
+With more than one argument, `String` broadcasts over a collection argument,
+and a string argument stays whole (see
+[Strings stay whole under broadcast and flattening](#strings-stay-whole-under-broadcast-and-flattening)).
+
+```epsil
+String("x", [1, 2])
+// ➔ ["x1","x2"]
+String("ab", 1)
+// ➔ "ab1"
+```
+
 <MathJson name="String" latex={["\\text"]}>
 
 `["String", expr1, expr2, ...]`.
+
+```json example
+["String", {str: "Hello"}, {str: ", "}, {str: "🌍"}, {str: "!"}]
+// ➔ "Hello, 🌍!"
+
+["String", ["Characters", {str: "abc"}]]
+// ➔ "abc"
+
+["String", {str: "x"}, ["List", 1, 2]]
+// ➔ ["List", "'x1'", "'x2'"]
+```
 
 </MathJson>
 
 ### stringCompare
 
-MathJSON `StringCompare` · `(character | string, character | string) -> integer`
+`(character | string, character | string) -> integer`
 
 StringCompare(a, b): -1 when `a` sorts before `b`, 0 when they are equal, 1 when `a` sorts after `b`. The order compares Unicode scalar sequences code point by code point (NOT UTF-16 code units, which would sort astral characters below U+E000..U+FFFF).
 
@@ -2297,9 +3211,53 @@ stringCompare("apple", "banana")
 // ➔ -1
 ```
 
+The order is the order of the Unicode code points of the NFC forms, compared
+one position at a time. A string that is a proper prefix of another comes
+first. The order is not locale-aware, so that the identity of values, keys
+and match plans is the same on every host. A locale-aware collation would be
+a new argument, not a change to this order.
+
+```epsil
+stringCompare("ab", "abc")
+// ➔ -1
+stringCompare("e\u{301}", "é")
+// ➔ 0
+```
+
+#### Where this differs from `<` {#where-this-differs-from}
+
+`<` and the other comparison operators compare two strings by their UTF-16
+code units. That puts the characters from U+10000 up, which are encoded with
+surrogates from U+D800, before the characters from U+E000 to U+FFFF.
+`stringCompare` puts them after, as their code points do. For all other
+text, every character below U+D800 (Latin, Greek, Cyrillic, CJK), the two
+orders are the same. Use `stringCompare` when the order must be that of the
+code points.
+
+```epsil
+stringCompare("\u{E000}", "\u{1F600}")
+// ➔ -1
+"\u{E000}" < "\u{1F600}"
+// ➔ "False"
+```
+
+<MathJson name="StringCompare">
+
+`["StringCompare", a, b]`.
+
+```json example
+["StringCompare", {str: "a"}, {str: "b"}]
+// ➔ -1
+
+["StringCompare", {str: "ab"}, {str: "abc"}]
+// ➔ -1
+```
+
+</MathJson>
+
 ### stringFrom
 
-MathJSON `StringFrom` · `(any, format: string?) -> string`
+`(any, format: string?) -> string`
 
 StringFrom(value, format?): create a string from `value`. With no format, a number or a list of numbers is read as Unicode scalar values (`StringFrom(65)` is `"A"`), and any other value is printed (`StringFrom(True)` is `"True"`). The formats are `"default"` (print the value), `"unicode-scalars"`, `"utf-8"` and `"utf-16"`.
 
@@ -2312,6 +3270,73 @@ stringFrom(65)
 stringFrom([72, 105])
 // ➔ "Hi"
 ```
+
+| Format | The argument is |
+| :--- | :--- |
+| (none) | A finite non-negative integer, or a list of them, is read as Unicode scalars. Any other value is printed. |
+| `"default"` | Printed, as the default string representation of the value |
+| `"utf-8"` | A collection of UTF-8 bytes |
+| `"utf-16"` | A collection of UTF-16 code units |
+| `"unicode-scalars"` | A collection of Unicode scalars (the same as UTF-32), or one Unicode scalar |
+
+With no format, a number that cannot be a code point (`NaN`, an infinity, a
+number that is not an integer, a negative number, a complex number) is
+printed, as is any value that is not a number: a string, a boolean, a
+symbol, an expression. To print an integer instead of decoding it, give the
+`"default"` format.
+
+```epsil
+[stringFrom(128287), stringFrom([127467, 127479])]
+// ➔ ["🔟","🇫🇷"]
+stringFrom(128287, "default")
+// ➔ "128287"
+[stringFrom(-1), stringFrom(1.5), stringFrom(NaN)]
+// ➔ ["-1","1.5","NaN"]
+```
+
+A **tuple** of numbers is not decoded, because a tuple holds the coordinates
+of a point. Use a list, or give the `"unicode-scalars"` format.
+
+```epsil
+stringFrom((65, 66))
+// ➔ "(65, 66)"
+stringFrom((65, 66), "unicode-scalars")
+// ➔ "AB"
+```
+
+The three encoding formats take a collection of integers (or, for
+`"unicode-scalars"`, one integer). A string argument is an error: a string
+is a collection of characters, not of code units. Convert it first with
+[`utf8`](#utf8), [`utf16`](#utf16) or [`unicodeScalars`](#unicodescalars).
+
+```epsil
+stringFrom([72, 101, 108, 108, 111], "utf-8")
+// ➔ "Hello"
+stringFrom([55357, 56607], "utf-16")
+// ➔ "🔟"
+stringFrom("abc", "utf-8")
+// ➔ error: Runtime error: expected `indexed_collection<integer>`, got `string`
+```
+
+<MathJson name="StringFrom">
+
+`["StringFrom", value]`, `["StringFrom", value, format]`.
+
+```json example
+["StringFrom", 128287]
+// ➔ "🔟"
+
+["StringFrom", ["List", 127467, 127479]]
+// ➔ "🇫🇷"
+
+["StringFrom", 128287, {str: "default"}]
+// ➔ "128287"
+
+["StringFrom", ["List", 72, 101, 108, 108, 111], {str: "utf-8"}]
+// ➔ "Hello"
+```
+
+</MathJson>
 
 ### stringJoin
 
@@ -2326,11 +3351,84 @@ stringJoin(["a", "b", "c"], "-")
 // ➔ "a-b-c"
 ```
 
-<MathJson name="StringJoin" latex={["\\lt\\gt"]} />
+`stringJoin` is the inverse of [`stringSplit`](#stringsplit), and does what
+Python's `separator.join(parts)` does.
+
+```epsil
+stringJoin(["a", "b", "c"], ", ")
+// ➔ "a, b, c"
+[stringJoin([]), stringJoin(["a"]), stringJoin(characters("abc"))]
+// ➔ ["","a","abc"]
+```
+
+Unlike [`String`](#string), which converts any argument to text,
+`stringJoin` is strict: an element that is neither a string nor a character
+is a type error when the type of the collection shows it. A collection that
+is not finite leaves the expression unevaluated.
+
+```epsil
+stringJoin(["a", 1])
+// ➔ error: Type error: expected `collection<character | string>`, got `list<integer | string>` at `["a", 1]` in `stringJoin(["a", 1])`
+stringJoin(repeat("a"))
+// ➔ StringJoin(Repeat("a"))
+```
+
+A string is the collection of its characters, so joining a string with a
+separator puts the separator between its characters, as Python's
+`sep.join(s)` does. A character is not a collection: put it in a list, or
+use `String`.
+
+```epsil
+stringJoin("abc", "-")
+// ➔ "a-b-c"
+stringJoin(characterFrom("a"))
+// ➔ error: Type error: expected `collection<character | string>`, got `character` at `characterFrom("a")` in `stringJoin(characterFrom("a"))`
+```
+
+#### Migrating from the variadic stringJoin
+
+`stringJoin` used to take any number of strings and concatenate them:
+`stringJoin("ab", "cd")` was `"abcd"`. It now takes one collection, and the
+same call is still accepted with another meaning: the characters of `"ab"`
+joined with the separator `"cd"`. There is no error, only a different
+result, so check every call of `stringJoin` with more than one argument.
+
+```epsil
+stringJoin("ab", "cd")
+// ➔ "acdb"
+```
+
+To concatenate a fixed number of strings, use
+[`join`](/reference/collections/#join) or string interpolation, and keep
+`stringJoin` for a collection to join.
+
+```epsil
+let a = "ab"
+let b = "cd"
+[join(a, b), "\(a)\(b)"]
+// ➔ ["abcd","abcd"]
+```
+
+<MathJson name="StringJoin" latex={["\\lt\\gt"]}>
+
+`["StringJoin", xs]`, `["StringJoin", xs, separator]`.
+
+```json example
+["StringJoin", ["List", {str: "a"}, {str: "b"}, {str: "c"}], {str: ", "}]
+// ➔ "a, b, c"
+
+["StringJoin", ["List"]]
+// ➔ ""
+
+["StringJoin", {str: "abc"}, {str: "-"}]
+// ➔ "a-b-c"
+```
+
+</MathJson>
 
 ### stringRepeat
 
-MathJSON `StringRepeat` · `(character | string, n: integer) -> string`
+`(character | string, n: integer) -> string`
 
 StringRepeat(s, n): `n` copies of the string `s`, concatenated. StringRepeat(s, 0) is "". A negative or non-integer `n` is an error.
 
@@ -2339,9 +3437,37 @@ stringRepeat("ab", 3)
 // ➔ "ababab"
 ```
 
+The count must be a non-negative integer: a negative count is an error, and
+a count that is not an integer is a type error. Like every concatenation,
+the result is segmented again, so repeating a lone combining mark does not
+multiply the number of characters.
+
+```epsil
+stringRepeat("ab", 0)
+// ➔ ""
+stringRepeat("ab", -1)
+// ➔ error: Runtime error: unexpected argument
+length(stringRepeat("\u{301}", 3))
+// ➔ 1
+```
+
+The name is `stringRepeat`, not `repeat`, because
+[`repeat`](/reference/collections/#repeat) makes an infinite collection.
+
+<MathJson name="StringRepeat">
+
+`["StringRepeat", s, n]`.
+
+```json example
+["StringRepeat", {str: "ab"}, 3]
+// ➔ "ababab"
+```
+
+</MathJson>
+
 ### stringReplace
 
-MathJSON `StringReplace` · `((character | string, character | string, character | string, count: integer?) -> string) & ((character | string, regexp, character | string, count: integer?) -> string) & ((character | string, regexp, function, count: integer?) -> string)`
+`((character | string, character | string, character | string, count: integer?) -> string) & ((character | string, regexp, character | string, count: integer?) -> string) & ((character | string, regexp, function, count: integer?) -> string)`
 
 StringReplace(s, target, replacement): replace every non-overlapping occurrence of `target` in `s`, scanning left to right over whole characters.
 
@@ -2361,9 +3487,66 @@ stringReplace("banana", "a", "o", 1)
 // ➔ "bonana"
 ```
 
+The occurrences of the target are found as [`rangeOf`](/reference/collections/#rangeof)
+finds them, character by character, from left to right and without overlap.
+The search moves past each match in the original string, so the text of a
+replacement is never matched again.
+
+```epsil
+stringReplace("banana", "na", "")
+// ➔ "ba"
+stringReplace("aa", "a", "aa")
+// ➔ "aaaa"
+```
+
+A target cannot match part of a character:
+
+```epsil
+stringReplace("x\u{301}y", "x", "z")
+// ➔ "x́y"
+```
+
+Every occurrence is replaced, unless a count limits the replacements, from
+the left; the count must be a positive integer. An empty target is an error:
+inserting the replacement at every boundary, as the host's
+`replaceAll("", x)` does, is not done. An empty replacement deletes the
+target. When the string is not a string, such as a symbol with no value, the
+expression stays unevaluated.
+
+```epsil
+stringReplace("a-b-c", "-", "+", 1)
+// ➔ "a+b-c"
+stringReplace("abc", "", "x")
+// ➔ error: Runtime error: unexpected argument
+stringReplace("abc", "a", "x", 0)
+// ➔ error: Runtime error: unexpected argument
+stringReplace(x, "a", "b")
+// ➔ StringReplace(x, "a", "b")
+```
+
+A string target is always a literal sequence of characters. To replace the
+matches of a regular expression, or to compute each replacement with a
+function, see
+[Patterns with stringSplit and stringReplace](/reference/regexp/#patterns-with-stringsplit-and-stringreplace).
+
+<MathJson name="StringReplace">
+
+`["StringReplace", s, target, replacement]`,
+`["StringReplace", s, target, replacement, count]`.
+
+```json example
+["StringReplace", {str: "a-b-c"}, {str: "-"}, {str: "+"}]
+// ➔ "a+b+c"
+
+["StringReplace", {str: "a-b-c"}, {str: "-"}, {str: "+"}, 1]
+// ➔ "a+b-c"
+```
+
+</MathJson>
+
 ### stringSplit
 
-MathJSON `StringSplit` · `((character | string, (character | string)?) -> list<string>) & ((character | string, regexp) -> list<string>)`
+`((character | string, (character | string)?) -> list<string>) & ((character | string, regexp) -> list<string>)`
 
 StringSplit(s): split a string on runs of whitespace (the Unicode White_Space code points), dropping empty parts.
 
@@ -2380,6 +3563,56 @@ stringSplit("a,b,c", ",")
 stringSplit("  one two  three ")
 // ➔ ["one","two","three"]
 ```
+
+With no separator, the string is split on runs of whitespace and empty parts
+are dropped. Whitespace is the code points with the Unicode `White_Space`
+property (U+0009 to U+000D, U+0020, U+0085, U+00A0, U+1680, U+2000 to
+U+200A, U+2028, U+2029, U+202F, U+205F, U+3000), whatever the host's `\s`
+matches.
+
+```epsil
+stringSplit("the quick  brown fox")
+// ➔ ["the","quick","brown","fox"]
+stringSplit("a\u{a0}b\tc")
+// ➔ ["a","b","c"]
+```
+
+With a separator, the string is split at each occurrence of the separator,
+and empty parts are kept.
+
+```epsil
+stringSplit("a,b,,c", ",")
+// ➔ ["a","b","","c"]
+```
+
+An empty separator splits into grapheme clusters, as
+[`characters`](#characters) does, but the parts are one-character
+**strings**, not characters. To split into characters, use `characters`, or
+iterate or index the string.
+
+```epsil
+stringSplit("abc", "")
+// ➔ ["a","b","c"]
+type(stringSplit("abc", "")[1])
+// ➔ TypeFrom("string")
+```
+
+To split on the matches of a regular expression, see
+[Patterns with stringSplit and stringReplace](/reference/regexp/#patterns-with-stringsplit-and-stringreplace).
+
+<MathJson name="StringSplit">
+
+`["StringSplit", s]`, `["StringSplit", s, separator]`.
+
+```json example
+["StringSplit", {str: "the quick  brown fox"}]
+// ➔ ["List", "'the'", "'quick'", "'brown'", "'fox'"]
+
+["StringSplit", {str: "a,b,,c"}, {str: ","}]
+// ➔ ["List", "'a'", "'b'", "''", "'c'"]
+```
+
+</MathJson>
 
 ### Subscript
 
@@ -2516,7 +3749,7 @@ toLowerCase("Hello World")
 
 ### toUpperCase
 
-MathJSON `ToUpperCase` · `(character | string) -> string`
+`(character | string) -> string`
 
 ToUpperCase(s): the string `s` mapped to upper case using the Unicode default (locale-independent) mappings. The character count can change ("ß" uppercases to "SS").
 
@@ -2524,6 +3757,45 @@ ToUpperCase(s): the string `s` mapped to upper case using the Unicode default (l
 toUpperCase("straße")
 // ➔ "STRASSE"
 ```
+
+`toUpperCase` and `toLowerCase` map the whole string, not each character on
+its own, because case mapping depends on the context:
+
+- **The number of characters can change.** The German `ß` is two characters
+  in upper case.
+- **The Greek final sigma depends on its position.** A `Σ` at the end of a
+  word is `ς` in lower case, not `σ`.
+
+```epsil
+[length("straße"), length(toUpperCase("straße"))]
+// ➔ [6,7]
+toLowerCase("ΟΔΟΣ")
+// ➔ "οδος"
+```
+
+There is no locale argument, so the Turkish dotless i is not available:
+`toLowerCase("I")` is `"i"` on every host, which keeps canonical forms and
+keys the same everywhere. To compare strings without regard to case, use
+[`caseFold`](#casefold), not `toLowerCase`.
+
+```epsil
+toLowerCase("I")
+// ➔ "i"
+```
+
+<MathJson name="ToUpperCase">
+
+`["ToUpperCase", s]`, `["ToLowerCase", s]`.
+
+```json example
+["ToUpperCase", {str: "hello"}]
+// ➔ "HELLO"
+
+["ToLowerCase", {str: "HELLO"}]
+// ➔ "hello"
+```
+
+</MathJson>
 
 ### triangle
 
@@ -2540,7 +3812,7 @@ triangle(A, B, C)
 
 ### trim
 
-MathJSON `Trim` · `(character | string, chars: (character | collection<character | string> | string)?) -> string`
+`(character | string, chars: (character | collection<character | string> | string)?) -> string`
 
 Trim(s): remove leading and trailing whitespace (the Unicode White_Space characters).
 
@@ -2555,6 +3827,43 @@ trim("  hi  ")
 trim("--hi--", "-")
 // ➔ "hi"
 ```
+
+`trim` removes characters at both ends, `trimStart` at the start only and
+`trimEnd` at the end only. With no second argument, they remove the Unicode
+`White_Space` characters, as [`stringSplit`](#stringsplit) defines them.
+
+```epsil
+[trim("  hi  "), trimStart("  hi  "), trimEnd("  hi  ")]
+// ➔ ["hi","hi  ","  hi"]
+trim("\u{a0}hi\u{3000}")
+// ➔ "hi"
+```
+
+The second argument is a **set** of characters to remove, not a prefix or a
+suffix. A string stands for the set of its characters.
+
+```epsil
+trim("abcba", "ab")
+// ➔ "c"
+trim("--hi..", ["-", "."])
+// ➔ "hi"
+```
+
+To remove a literal prefix or suffix, test it with
+[`startsWith`](/reference/collections/#startswith) or
+[`endsWith`](/reference/collections/#endswith), and
+[`drop`](/reference/collections/#drop) it.
+
+<MathJson name="Trim">
+
+`["Trim", s]`, `["Trim", s, chars]`, and likewise `TrimStart` and `TrimEnd`.
+
+```json example
+["Trim", {str: "xxhixx"}, {str: "x"}]
+// ➔ "hi"
+```
+
+</MathJson>
 
 ### trimEnd
 
@@ -2678,7 +3987,7 @@ Prevent an expression from being evaluated
 
 ### unicodeScalars
 
-MathJSON `UnicodeScalars` · `(character | string) -> list<integer>`
+`(character | string) -> list<integer>`
 
 A collection of Unicode scalars from a string, same as UTF-32
 
@@ -2687,9 +3996,41 @@ unicodeScalars("A😀")
 // ➔ [65,128512]
 ```
 
+A **Unicode scalar** is a Unicode code point from U+0000 to U+10FFFF,
+except the surrogates U+D800 to U+DFFF. Unicode scalars are the code units
+of UTF-32.
+
+A character can be several scalars: the emoji `👩‍🎓` is one character and
+three scalars. The scalars are those of the NFC form of the string, so a
+decomposed `é` gives the one scalar of the precomposed form. To make a
+string from Unicode scalars, use [`stringFrom`](#stringfrom).
+
+```epsil
+unicodeScalars("👩‍🎓")
+// ➔ [128105,8205,127891]
+[unicodeScalars("é"), unicodeScalars("e\u{301}")]
+// ➔ [[233],[233]]
+stringFrom(unicodeScalars("👩‍🎓"))
+// ➔ "👩‍🎓"
+```
+
+See also [`utf8`](#utf8), [`utf16`](#utf16) and
+[`characters`](#characters).
+
+<MathJson name="UnicodeScalars">
+
+`["UnicodeScalars", s]`.
+
+```json example
+["UnicodeScalars", {str: "👩‍🎓"}]
+// ➔ ["List", 128105, 8205, 127891]
+```
+
+</MathJson>
+
 ### utf16
 
-MathJSON `Utf16` · `(character | string) -> list<integer>`
+`(character | string) -> list<integer>`
 
 A collection of UTF-16 code units from a string.
 
@@ -2698,9 +4039,34 @@ utf16("A😀")
 // ➔ [65,55357,56832]
 ```
 
+The values are UTF-16 code units, not Unicode scalars: a scalar above
+U+FFFF is two code units. To make a string from UTF-16 code units, use
+[`stringFrom(units, "utf-16")`](#stringfrom).
+
+```epsil
+utf16("👩‍🎓")
+// ➔ [55357,56425,8205,55356,57235]
+stringFrom(utf16("👩‍🎓"), "utf-16")
+// ➔ "👩‍🎓"
+```
+
+See also [`utf8`](#utf8), [`unicodeScalars`](#unicodescalars) and
+[`characters`](#characters).
+
+<MathJson name="Utf16">
+
+`["Utf16", s]`.
+
+```json example
+["Utf16", {str: "Hello"}]
+// ➔ ["List", 72, 101, 108, 108, 111]
+```
+
+</MathJson>
+
 ### utf8
 
-MathJSON `Utf8` · `(character | string) -> list<integer>`
+`(character | string) -> list<integer>`
 
 A collection of UTF-8 code units from a string.
 
@@ -2708,6 +4074,30 @@ A collection of UTF-8 code units from a string.
 utf8("A€")
 // ➔ [65,226,130,172]
 ```
+
+The values are UTF-8 bytes, not Unicode scalars. To make a string from
+UTF-8 bytes, use [`stringFrom(bytes, "utf-8")`](#stringfrom).
+
+```epsil
+utf8("👩‍🎓")
+// ➔ [240,159,145,169,226,128,141,240,159,142,147]
+stringFrom(utf8("👩‍🎓"), "utf-8")
+// ➔ "👩‍🎓"
+```
+
+See also [`utf16`](#utf16), [`unicodeScalars`](#unicodescalars) and
+[`characters`](#characters).
+
+<MathJson name="Utf8">
+
+`["Utf8", s]`.
+
+```json example
+["Utf8", {str: "Hello"}]
+// ➔ ["List", 72, 101, 108, 108, 111]
+```
+
+</MathJson>
 
 ### Wildcard
 
