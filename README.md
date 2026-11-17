@@ -28,6 +28,9 @@ npm run update
 
 # Generate .md files for API and launch local server
 npm start
+
+# Verify that the code in the documentation is valid
+npm run verify:details
 ```
 
 ## To stage and deploy an update
