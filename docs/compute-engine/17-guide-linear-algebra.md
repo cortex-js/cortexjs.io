@@ -960,6 +960,25 @@ root. This is the reading Mathematica gives `M^(1/2)` too. There is no
 operator for the matrix square root or for a matrix function of a non-integer
 exponent.
 
+A **symbolic** exponent that is not known to be an integer or a non-integer
+keeps the power as it is, and the power evaluates when the exponent gets a
+value. An exponent declared `integer` gives `MatrixPower`:
+
+```js example
+const e = ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}^n');
+e.evaluate();
+// → [[1,2],[3,4]]^n
+
+ce.declare('k', 'integer');
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}^k').evaluate();
+// → MatrixPower([[1,2],[3,4]], k)
+
+ce.declare('n', 'integer');
+ce.assign('n', 2);
+e.evaluate();
+// → [[7,10],[15,22]]
+```
+
 `simplify()` follows the same reading. For `A` declared a `matrix`,
 `ce.parse('A A').simplify()` is `MatrixPower(A, 2)`, and
 `\sqrt{A}\sqrt{A}` is `MatrixPower(\sqrt{A}, 2)`. The same-base rules for
