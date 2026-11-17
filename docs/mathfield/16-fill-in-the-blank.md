@@ -122,7 +122,7 @@ const answer = ce.parse(
 const correctAnswer = ce.parse("x^2 - 1", { canonical: false });
 ```
 
-<ReadMore path="/compute-engine/guides/symbolic-computing/#comparing-expressions">
+<ReadMore path="https://epsil.dev/compute-engine/guides/symbolic-computing/#comparing-expressions">
 Read more about **Comparing Expressions** using the Compute Engine.
 </ReadMore>
 

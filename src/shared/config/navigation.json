@@ -16,7 +16,7 @@
       },
       {
         "label": "Compute Engine",
-        "href": "/compute-engine",
+        "href": "https://epsil.dev/compute-engine/",
         "position": "left"
       },
       {
@@ -38,8 +38,8 @@
         "title": "SDKs",
         "items": [
           { "label": "Mathfield", "href": "/mathfield" },
-          { "label": "Compute Engine", "href": "/compute-engine" },
-          { "label": "MathJSON", "href": "/math-json" },
+          { "label": "Compute Engine", "href": "https://epsil.dev/compute-engine/" },
+          { "label": "MathJSON", "href": "https://epsil.dev/math-json/" },
           { "label": "Epsil", "href": "https://epsil.dev" }
         ]
       },

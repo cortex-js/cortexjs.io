@@ -47,8 +47,8 @@ This repo builds **two** Docusaurus sites for the CortexJS ecosystem:
 
 | Site | Config | Content | Output | Host |
 |---|---|---|---|---|
-| **mathlive.io** | `docusaurus.config.ts` | `docs/` minus `docs/epsil` | `build/` → `submodules/cortex-js.github.io/` | GitHub Pages |
-| **epsil.dev** | `docusaurus.epsil.config.ts` | `docs/epsil` (rooted at `/`) and `docs/compute-engine` (same paths as on mathlive.io) | `build-epsil/` | Cloudflare Pages |
+| **mathlive.io** | `docusaurus.config.ts` | `docs/mathfield` and the top-level pages of `docs/` | `build/` → `submodules/cortex-js.github.io/` | GitHub Pages |
+| **epsil.dev** | `docusaurus.epsil.config.ts` | `docs/epsil` (rooted at `/`) and `docs/compute-engine` (the paths it had on mathlive.io) | `build-epsil/` | Cloudflare Pages |
 
 They share everything else: `src/components`, `src/theme` (including the
 swizzled `CodeBlock` that renders Epsil syntax highlighting), `src/css`,
@@ -133,22 +133,24 @@ routes, the Epsil pages must stay out of the mathlive.io build (`docs.exclude`)
 
 ### The Compute Engine docs on epsil.dev
 
-The Compute Engine and MathJSON docs are moving from mathlive.io to epsil.dev
-with their paths unchanged (`/compute-engine/…`, `/math-json/`), so a redirect
-only changes the host. While both sites publish them:
+The Compute Engine and MathJSON docs (`docs/compute-engine/`) are published
+on epsil.dev only, at the paths they had on mathlive.io (`/compute-engine/…`,
+`/math-json/`):
 
 - One docs plugin instance on epsil.dev reads `docs/` and includes
   `epsil/**` and `compute-engine/**`: two instances cannot share
   `routeBasePath: '/'`, and `/math-json/` is outside `/compute-engine/`.
   Doc ids are therefore relative to `docs/` in `sidebars.epsil.js`
-  (`epsil/syntax`).
-- The Compute Engine sidebar is one object, `sidebars.compute-engine.js`,
-  used by both `sidebars.js` and `sidebars.epsil.js`.
+  (`epsil/syntax`). The Compute Engine sidebar is `sidebars.compute-engine.js`.
+- mathlive.io excludes `compute-engine/**`, and links to these pages from
+  mathlive.io are absolute (`https://epsil.dev/compute-engine/…`). A second
+  instance of `plugins/epsil-redirect` writes a stub for each old mathlive.io
+  URL, from the route table `config/ce-redirects.json`; the stub keeps the
+  `#anchor` of the URL, so an old link reaches the same anchor on epsil.dev. A
+  page added to the Compute Engine docs now needs no entry there: mathlive.io
+  never published it.
 - Epsil links to `/compute-engine/…` and `/math-json/…` stay relative
   (`EPSIL_SECTIONS` in the sync), so the epsil.dev build checks them.
-- `node scripts/check-ce-move.mjs check build-epsil` checks that every page
-  and anchor of `config/ce-move-baseline.json` (the mathlive.io pages before
-  the move) exists in a build. Delete both once the move has shipped.
 
 ### Search on epsil.dev
 

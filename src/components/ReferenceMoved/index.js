@@ -17,7 +17,9 @@ const ENTRY = new Map(symbols.map((s) => [s.id, s.url]));
  * broken-anchor check sees, so the links to them stay valid. On load it sends
  * the reader to the new place of the anchor in the URL: a MathJSON name in
  * `names`, or its lowercase form, goes to its entry, another anchor to its
- * path in `anchors`, and anything else to `to`. Without JavaScript, it is a list of links.
+ * path in `anchors`, the name of another function of the library to that
+ * function's entry, and anything else to `to`. Without JavaScript, it is a
+ * list of links.
  *
  * The search index skips the page (`data-moved-to`).
  */
@@ -37,9 +39,12 @@ export default function ReferenceMoved({ to, names = [], anchors = {} }) {
   for (const [id, path] of Object.entries(anchors)) targets.set(id, path);
   for (const id of targets.keys()) links.collectAnchor(id);
 
+  // An anchor that the page did not have, but that names a function of the
+  // library (`#Add` on a page that listed Add only in a table), still goes
+  // to that function's entry.
   useEffect(() => {
     const id = decodeURIComponent(window.location.hash.slice(1));
-    window.location.replace(host + (targets.get(id) ?? to));
+    window.location.replace(host + (targets.get(id) ?? ENTRY.get(id) ?? to));
   }, []);
 
   return (

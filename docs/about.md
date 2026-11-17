@@ -65,7 +65,7 @@ A few years later, I had the privilege of helping bring the Mac user interface t
 
 Today, through [Farfield Studio⁠￼](https://farfield.studio), I’m returning to where it all began: building better tools for scientific computing.
 
-That includes [mathfield](/mathfield), a web component for editing beautifully typeset math equations, and the [Compute Engine](/compute-engine/), a JavaScript library for symbolic computing and numeric evaluation.
+That includes [mathfield](/mathfield), a web component for editing beautifully typeset math equations, and the [Compute Engine](https://epsil.dev/compute-engine/), a JavaScript library for symbolic computing and numeric evaluation.
 
 Both projects are available under an open source license.
 

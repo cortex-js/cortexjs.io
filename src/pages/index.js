@@ -66,7 +66,7 @@ function HomepageHeader() {
           </div>
         </a>
 
-        <a href="/compute-engine/">
+        <a href="https://epsil.dev/compute-engine/">
           <div className={clsx(styles.pod, styles.computeEnginePod)}>
             <Heading as="h2" className={styles.title}>
               Compute Engine

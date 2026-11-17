@@ -11,7 +11,7 @@ MathLive provides several SDKs to help you build scientific and technical applic
 The **MathJSON SDK** is a JavaScript/TypeScript library to represent and manipulate mathematical expressions in the MathJSON format.
 
 
-<ReadMore path="/math-json/">
+<ReadMore path="https://epsil.dev/math-json/">
 Learn more about the **MathJSON** <Icon name="chevron-right-bold" />
 </ReadMore>
 
@@ -29,6 +29,6 @@ Learn more about **Mathfields** <Icon name="chevron-right-bold" />
 ## Compute Engine
 The **Compute Engine SDK** is a JavaScript/TypeScript library for symbolic computing and numeric evaluation of mathematical expressions. It can parse and manipulate MathJSON expressions, perform symbolic computations, and evaluate expressions numerically.
 
-<ReadMore path="/compute-engine/">
+<ReadMore path="https://epsil.dev/compute-engine/">
 Learn more about the **Compute Engine** <Icon name="chevron-right-bold" />
 </ReadMore>

@@ -110,7 +110,7 @@ mf.addEventListener('input',
 
 ## Using a Mathfield with the Compute Engine
 
-The [MathJSON](/math-json) format is a lightweight mathematical notation interchange format. 
+The [MathJSON](https://epsil.dev/math-json/) format is a lightweight mathematical notation interchange format. 
 
 The Compute Engine is a JavaScript library that can perform
 mathematical operations on MathJSON expressions.
@@ -151,11 +151,11 @@ Once you have a boxed expression, you can perform operations on it using the
 Compute Engine.
 
 For example, you can:
-- [evaluate it](/compute-engine/guides/evaluate/) using `mf.expression.evaluate()`
+- [evaluate it](https://epsil.dev/compute-engine/guides/evaluate/) using `mf.expression.evaluate()`
 - simplify it using `mf.expression.simplify()`
-- [compare it to another expression](/compute-engine/guides/symbolic-computing/#comparing-expressions) using `mf.expression.isEqual()` and
+- [compare it to another expression](https://epsil.dev/compute-engine/guides/symbolic-computing/#comparing-expressions) using `mf.expression.isEqual()` and
    `mf.expression.isSame()`
-- [compile it](/compute-engine/guides/compiling/) to JavaScript
+- [compile it](https://epsil.dev/compute-engine/guides/compiling/) to JavaScript
 
 :::info[Note]
 
@@ -166,12 +166,12 @@ can request non-canonical forms.
 :::
 
 
-<ReadMore path="/compute-engine/guides/canonical-form/">
+<ReadMore path="https://epsil.dev/compute-engine/guides/canonical-form/">
 Learn more about **canonical forms**.<Icon name="chevron-right-bold" />
 </ReadMore>
 
 
-You can also extend the definitions of the Compute Engine [by adding your own](/compute-engine/guides/augmenting/).
+You can also extend the definitions of the Compute Engine [by adding your own](https://epsil.dev/compute-engine/guides/augmenting/).
 
 ```live
 :::html
@@ -189,7 +189,7 @@ console.log(mf.expression.evaluate());
 ```
 
 
-<ReadMore path="/compute-engine/guides/symbolic-computing/" >
+<ReadMore path="https://epsil.dev/compute-engine/guides/symbolic-computing/" >
 Learn more about **symbolic computing** with the Compute Engine<Icon name="chevron-right-bold" />
 </ReadMore>
 

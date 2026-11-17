@@ -10,6 +10,7 @@ import epsilPlaygroundRemarkPlugin from './plugins/epsil-playground';
 import remarkLatexDelimiters from './plugins/remark-latex-delimiters';
 import epsilRedirect from './plugins/epsil-redirect';
 import epsilRedirects from './config/epsil-redirects.json';
+import ceRedirects from './config/ce-redirects.json';
 import { getDocusaurusNavbarConfig, getDocusaurusFooterConfig } from './src/shared/utils/docusaurus-config';
 
 import type { Config } from '@docusaurus/types';
@@ -77,10 +78,12 @@ const config: Config = {
           showLastUpdateTime: true,
           routeBasePath: '/',
           sidebarPath: './sidebars.js',
-          // The Epsil language docs are still synced into `docs/epsil` (they
-          // are the content of the standalone epsil.dev site, built from
-          // `docusaurus.epsil.config.ts`), but they are no longer part of this
-          // site. Their old URLs are handled by the `epsil-redirect` plugin.
+          // The Epsil language docs (`docs/epsil`) and the Compute Engine and
+          // MathJSON docs (`docs/compute-engine`) are the content of epsil.dev,
+          // built from `docusaurus.epsil.config.ts`; they are no longer part of
+          // this site. Their old URLs are handled by the `epsil-redirect`
+          // plugin. They must not be routes here: client-side navigation would
+          // render them and never redirect.
           //
           // Setting `exclude` REPLACES the plugin's defaults, so they are
           // repeated here — without them the `_api.md` / `_changelog.md`
@@ -92,9 +95,7 @@ const config: Config = {
             '**/*.test.{js,jsx,ts,tsx}',
             '**/__tests__/**',
             'epsil/**',
-            // Synced from the compute-engine repo for epsil.dev, with links
-            // rewritten for that site (scripts/sync-epsil-docs.mjs).
-            'compute-engine/for-agents.md',
+            'compute-engine/**',
           ],
           remarkPlugins: [codePlaygroundRemarkPlugin, epsilPlaygroundRemarkPlugin, remarkLatexDelimiters, remarkMath],
 
@@ -275,7 +276,7 @@ const config: Config = {
       llmsTxt,
       {
         summary:
-          'Scientific Web Computing. Documentation for MathLive (math input for the web) and the Compute Engine (symbolic computation in JavaScript). The Epsil language is documented at https://epsil.dev.',
+          'Scientific Web Computing. Documentation for MathLive (math input for the web). The Compute Engine (symbolic computation in JavaScript), MathJSON and the Epsil language are documented at https://epsil.dev.',
       },
     ],
     [
@@ -285,6 +286,14 @@ const config: Config = {
         // The language was renamed from Cortex to Epsil, so the same pages
         // were also published under /cortex/.
         alsoUnder: ['/cortex'],
+      },
+    ],
+    [
+      epsilRedirect,
+      {
+        id: 'compute-engine',
+        redirects: ceRedirects,
+        what: 'Compute Engine documentation',
       },
     ],
     // [

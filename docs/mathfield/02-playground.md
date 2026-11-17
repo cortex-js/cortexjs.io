@@ -601,7 +601,7 @@ export function MathfieldDemo({children}) {
 <div id='result'></div>
 
 
-<ReadMore path="/compute-engine/" >
+<ReadMore path="https://epsil.dev/compute-engine/" >
 Read more about using the **Compute Engine** to evaluate and simplify expression.<Icon name="chevron-right-bold" />
 </ReadMore>
 
@@ -623,7 +623,7 @@ Read more about the supported **LaTeX commands**.<Icon name="chevron-right-bold"
 <h4>MathJSON</h4>
 <pre className="console" id="math-json"></pre>
 
-<ReadMore path="/compute-engine/demo/" >
+<ReadMore path="https://epsil.dev/compute-engine/demo/" >
 Learn more about MathJSON and try a demo of the **Compute Engine**.<Icon name="chevron-right-bold" />
 </ReadMore>
 

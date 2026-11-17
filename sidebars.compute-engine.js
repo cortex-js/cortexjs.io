@@ -2,10 +2,9 @@
  * The Compute Engine section of the docs sidebar: the guides, the MathJSON
  * format and the reference of the standard library.
  *
- * One object for both sites while the section moves from mathlive.io to
- * epsil.dev: `sidebars.js` lists it in the mathlive.io sidebar, and
- * `sidebars.epsil.js` gives it a sidebar of its own on epsil.dev. Doc ids are
- * relative to `docs/` on both sites.
+ * Used by `sidebars.epsil.js`, which gives it a sidebar of its own on
+ * epsil.dev; mathlive.io no longer publishes these docs. Doc ids are relative
+ * to `docs/`.
  */
 
 // @ts-check
@@ -145,53 +144,12 @@ const computeEngineCategory = {
         className: "compass-icon",
       },
       {
-        type: "doc",
-        id: "compute-engine/reference-arithmetic",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-calculus",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-collections",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-colors",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-complex",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-control-structures",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-core",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-functions",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-linear-algebra",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-logic",
+        // The reference of each library moved to the Epsil library
+        // reference: one entry per function, Epsil first, with its MathJSON
+        // form. The old pages are redirect stubs, so they are not listed.
+        type: "link",
+        label: "Library reference",
+        href: "/library/",
         className: "reference-icon",
       },
       {
@@ -201,42 +159,7 @@ const computeEngineCategory = {
       },
       {
         type: "doc",
-        id: "compute-engine/reference-special-functions",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-statistics",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-combinatorics",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-number-theory",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-strings",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
         id: "compute-engine/97a-reference-group-theory",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-trigonometry",
-        className: "reference-icon",
-      },
-      {
-        type: "doc",
-        id: "compute-engine/reference-units",
         className: "reference-icon",
       },
     ],

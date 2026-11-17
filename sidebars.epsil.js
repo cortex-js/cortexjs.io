@@ -4,8 +4,8 @@
  * The docs plugin of that site reads `docs/` and includes `epsil/` and
  * `compute-engine/` (one plugin instance, because both sections are rooted at
  * `/`), so doc ids are relative to `docs/`: `epsil/syntax`,
- * `compute-engine/guide-evaluate`. The Compute Engine sidebar is the category
- * that mathlive.io also uses (`sidebars.compute-engine.js`).
+ * `compute-engine/guide-evaluate`. The Compute Engine sidebar is in
+ * `sidebars.compute-engine.js`.
  *
  * Top-level category labels double as bundle names for the llms-txt plugin
  * (`llms-guide.txt`, `llms-reference.txt`, `llms-tools.txt`); renaming one
@@ -130,7 +130,7 @@ const sidebars = {
         {
           type: "link",
           label: "Compute Engine",
-          href: "https://mathlive.io/compute-engine/",
+          href: "/compute-engine/",
           className: "sdk-icon",
         },
         {

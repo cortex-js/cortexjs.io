@@ -11,7 +11,6 @@
 
 // @ts-check
 
-import computeEngineCategory from "./sidebars.compute-engine.js";
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
@@ -118,7 +117,13 @@ const sidebars = {
         },
       ],
     },
-    computeEngineCategory,
+    {
+      // The Compute Engine and MathJSON docs are published on epsil.dev.
+      type: "link",
+      label: "Compute Engine",
+      href: "https://epsil.dev/compute-engine/",
+      className: "compass-icon",
+    },
     {
       type: "category",
       label: "Tutorials",

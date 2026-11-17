@@ -628,7 +628,7 @@ div.figure {
     Render complex formulas and let users symbolically manipulate equations.
 
 
-    <ReadMore path="/compute-engine/guides/symbolic-computing/" >
+    <ReadMore path="https://epsil.dev/compute-engine/guides/symbolic-computing/" >
     Use mathfields with the <strong>Compute Engine</strong><Icon name="chevron-right-bold" />
     </ReadMore>
   </div>
@@ -643,7 +643,7 @@ div.figure {
 
     <p>Build real-time calculators that evaluate math expressions dynamically</p>
     
-    <ReadMore path="/compute-engine/guides/numeric-evaluation/" >
+    <ReadMore path="https://epsil.dev/compute-engine/guides/numeric-evaluation/" >
     Use the <strong>Compute Engine</strong> to evaluate the user's input<Icon name="chevron-right-bold" />
     </ReadMore>  
   </div>

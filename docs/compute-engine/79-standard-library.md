@@ -20,27 +20,29 @@ It includes definitions such as:
 
 ## Topics
 
-The **MathJSON Standard Library** is organized by topics, each topic is a separate page in
-the documentation.
+The **MathJSON Standard Library** is organized by topics. Each topic is a
+library of the [library reference](/library/), where each entry gives the Epsil
+spelling of a function and, in its MathJSON section, its MathJSON form and its
+LaTeX commands.
 
 <div className="symbols-table" style={{"--first-col-width":"21ch"}}>
 
 | Topic                                                               |                                                       |
 | :------------------------------------------------------------------ | :--------------------------------------------------------------------- |
-| [Arithmetic](/compute-engine/reference/arithmetic/)                 | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`... |
-| [Calculus](/compute-engine/reference/calculus/)                     | `D` `Derivative` `Integrate`...                                                |
-| [Collections](/compute-engine/reference/collections/)               | `List` `Reverse` `Filter`...                                           |
-| [Colors](/compute-engine/reference/colors/)                         | `Color` `ColorToString` `ColorMix` `ColorContrast` `ContrastingColor` `Colormap` `ColorToColorspace` `ColorFromColorspace` |
-| [Complex](/compute-engine/reference/complex/)                       | `Real` `Conjugate`, `ComplexRoots`...                                  |
-| [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` ...                                          |
-| [Core](/compute-engine/reference/core/)                             | `Declare` `Assign` `Error` `LatexString`...                       |
-| [Functions](/compute-engine/reference/functions/)                   | `Function` `Apply` `Return` ...                                        |
-| [Logic](/compute-engine/reference/logic/)                           | `And` `Or` `Not` `True` `False` `ForAll` ...                            |
+| [Arithmetic](/reference/arithmetic/)                 | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`... |
+| [Calculus](/reference/calculus/)                     | `D` `Derivative` `Integrate`...                                                |
+| [Collections](/reference/collections/)               | `List` `Reverse` `Filter`...                                           |
+| [Colors](/reference/colors/)                         | `Color` `ColorToString` `ColorMix` `ColorContrast` `ContrastingColor` `Colormap` `ColorToColorspace` `ColorFromColorspace` |
+| [Complex](/reference/arithmetic/#complex-numbers)                       | `Real` `Conjugate`, `ComplexRoots`...                                  |
+| [Control Structures](/reference/control-structures/) | `If` `Block` `Loop` ...                                          |
+| [Core](/reference/core/)                             | `Declare` `Assign` `Error` `LatexString`...                       |
+| [Functions](/reference/core/#functions)                   | `Function` `Apply` `Return` ...                                        |
+| [Logic](/reference/logic/)                           | `And` `Or` `Not` `True` `False` `ForAll` ...                            |
 | [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
-| [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
-| [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
-| [Strings and Text](/compute-engine/reference/strings/)              | `Characters` `StringJoin` `RangeOf` `StringReplace` `ToUpperCase` `Text`... |
-| [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
+| [Special Functions](/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
+| [Statistics](/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
+| [Strings and Text](/reference/core/#working-with-strings)              | `Characters` `StringJoin` `RangeOf` `StringReplace` `ToUpperCase` `Text`... |
+| [Trigonometry](/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>
 
