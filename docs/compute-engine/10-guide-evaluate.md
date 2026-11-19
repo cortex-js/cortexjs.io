@@ -379,6 +379,27 @@ Every **other** symbol in the expression is **free**: its value always applies
 under evaluation. So with `a := 3` as well, `\frac{d}{dx}(a\,x^2)` is `6x` —
 the free `a` resolves, the bound `x` does not.
 
+`D`, `Integrate`, `Limit` and `Series` work on a formula, and their variable is
+a variable of that formula. When a free symbol holds a formula in that
+variable, they work on its value, and the variable's name in the value denotes
+their variable. `Sum`, `Product` and the other operators that iterate over an
+index do not: their index does not reach into the value of another symbol.
+
+```js
+ce.assign('G', ce.parse('\\sin(x)'));
+ce.parse('\\frac{d}{dx} G').evaluate().print();
+// ➔ cos(x)
+
+ce.parse('\\int G \\,dx').evaluate().print();
+// ➔ -cos(x)
+
+ce.parse('\\lim_{x \\to 0} G').evaluate().print();
+// ➔ 0
+
+ce.parse('\\sum_{x=1}^{3} G').evaluate().print();
+// ➔ 3sin(x)
+```
+
 To use an assumption instead of a value (which *does* inform simplification and
 solving), use `ce.assume()` rather than `ce.assign()`.
 

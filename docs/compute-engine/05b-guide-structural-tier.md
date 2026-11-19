@@ -200,7 +200,9 @@ a promise that it never changes.
 
 5. **Generic-symbol folds.** `x/x` becomes `1` and `1^x` becomes `1` at
    canonicalization. This is a documented engine convention, not a bug: the
-   operands are gone entirely.
+   operands are gone entirely. A constant whose value may be zero is not
+   folded: with `z` declared `{ value: 0, isConstant: true }`, `z/z` stays a
+   quotient, and its value is `NaN`, as for `0/0`.
 
    ```ts
    ce.parse('\\frac{x}{x}', { form: 'raw' }).json; // ➔ ["Divide", "x", "x"]

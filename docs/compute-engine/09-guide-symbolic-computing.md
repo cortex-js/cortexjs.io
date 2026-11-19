@@ -332,7 +332,7 @@ that require evaluation, such as `\sin(\pi)`.
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
 | `ce.expr(["IdenticallyEqual", lhs, rhs]).evaluate()` | Synonym for `lhs.isIdenticallyEqual(rhs)` |
 | `ce.expr(["IsSame", lhs, rhs]).evaluate()` | Synonym for `lhs.isSame(rhs)`, comparing the operands as written (they are not canonicalized) |
-| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)` (Epsil `===`). Always decides. |
+| `ce.expr(["Same", lhs, rhs]).evaluate()`  | Synonym for `lhs.isSame(rhs)` (Epsil `===`). Always decides. In the body of a function literal or a binder (`Sum`, a loop), a parameter or a binder variable is replaced by its argument first, so `["Any", ["List", 1, 2, 3], ["Function", ["Same", "e", 2], "e"]]` is `True`. |
 
 </div>
 

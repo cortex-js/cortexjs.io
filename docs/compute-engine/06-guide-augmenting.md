@@ -1299,18 +1299,17 @@ ce.box(["Divide", ["Q", 6, "'m'"], ["Q", 3, "'m'"]]).evaluate();  // ➔ 2
 
 #### Fields that belong to the kind type
 
-A symbol declared with a kind type has no head to ask, so three fields
-belong to the kind TYPE, not to the head: `admittedAs`, `resultType` and
-`compile.type`. Several heads can have the same kind type (the library
+A symbol declared with a kind type has no head to ask, so two fields
+belong to the kind TYPE, not to the head: `admittedAs` and `resultType`.
+Several heads can have the same kind type (the library
 `ResidueClass` and your own head that returns `residue`). The heads of one
 kind type that are declared at the same time must agree on these fields: a
 head gives the same value or leaves the field out, and then uses the value
-that another head gave. `admittedAs` is compared by value; `resultType` and
-`compile.type` are compared by identity, so two heads share one function
-or object. The engine refuses a declaration that does not agree.
+that another head gave. `admittedAs` is compared by value; `resultType` is
+compared by identity, so two heads share one function. The engine refuses a declaration that does not agree.
 
-The other fields (`add`, `multiply`, `negate`, `divide`, `power`, `compare`,
-`apply` and `compile.value`) belong to the head. A value calls the hooks of
+The other fields (`add`, `multiply`, `negate`, `divide`, `power`, `compare`
+and `apply`) belong to the head. A value calls the hooks of
 its own head: `MyMod(2, 4) + ResidueClass(1, 4)` stays as it is, because
 each head folds only its own values.
 
@@ -1329,8 +1328,7 @@ rule, when:
 - the field gives `add` but not `negate`;
 - the fields of the kind type do not agree with another head of the type;
 - the kind type is a library kind type (`residue`) and the field gives a
-  `resultType` or a `compile.type` that the library left out, or another
-  `admittedAs`. Such a field would change the arithmetic of every value and
+  `resultType` that the library left out, or another `admittedAs`. Such a field would change the arithmetic of every value and
   every symbol of the library type.
 
 After a kind is declared, its type can be declared again only as a nominal
@@ -1350,91 +1348,28 @@ values and symbols are still protected from the number rules.
 
 #### Compiling a value of a kind
 
-By default, `compile()` declines an expression that holds a value of a kind,
-on every target: the number rules must never compute `c - c` as `0`. An
+`compile()` declines an expression that holds a value of a kind, on every
+target: the number rules must never compute `c - c` as `0`. With the default
+`fallback`, `run()` evaluates the expression with the interpreter. An
 expression that may hold a number or a value of a kind (a parameter typed
 `number | gf8`) compiles as a number.
 
-A kind type can give a compiled representation with `compile` in its
-`arithmetic` field (an `ArithmeticCompile`). `compile.type` belongs to the
-kind type; `compile.value` gives the source of a literal value of the head.
-Each hook receives `context.language` and answers `undefined` for a target
-it does not support:
-
 ```js
-ce.declare("GF8", {
-  signature: "(integer) -> gf8",
-  arithmetic: {
-    // … the hooks of the example above …
-    compile: {
-      // The representation of the type `gf8`: `{ gf8: k }` in JavaScript
-      type: {
-        lowered: ({ language }) =>
-          language === "javascript" ? "gf8" : undefined,
-        add: (args, compile, { language }) =>
-          language === "javascript"
-            ? `({ gf8: ${args.map((x) => `(${compile(x)}).gf8`).join(" ^ ")} })`
-            : undefined,
-        // The check of a value passed for a symbol of type `gf8`
-        entry: (value) => Number.isInteger(value?.gf8),
-      },
-      // A literal `GF8(k)`
-      value: (expr) => `({ gf8: ${expr.op1.re & 7} })`,
-    },
-  },
-});
-
 ce.declare("g", "gf8");
-const f = compile(ce.parse("g + \\operatorname{GF8}(2)"), { to: "javascript" });
-f.run({ g: { gf8: 1 } });  // ➔ { gf8: 3 }
-f.run({ g: 1 });           // ➔ throws: the entry check refused the value
-f.freeSymbolTypes.g;       // ➔ { type: "gf8", lowered: "gf8", … }
-f.valueKinds;              // ➔ ["gf8"]
+const f = compile(ce.parse("g + \\operatorname{GF8}(2)"));
+f.success;  // ➔ false
+f.error;    // ➔ "Could not compile: g: the input g of type gf8"
 ```
 
-The fields of `compile.type`:
+Of the library kinds, only `Enclosure` compiles, on the `interval-js` target
+only (see [Enclosures](#enclosures)). An expression with a residue class, a
+measurement or a quantity declines on every target.
 
-- `lowered(context)`: the name of the representation on the target, as
-  `freeSymbolTypes[…].lowered` reports it. The name must not be one that the
-  JavaScript runner reads as a number, a complex number or a list
-  (`number`, `real`, `integer`, `complex`, `array`, `list`, `point`,
-  `color`): a result of a kind is returned as the code makes it, and the
-  host would read it wrongly;
-- `add(args, compile, context)` and `multiply(…)`: a sum and a product with
-  an operand of the kind. A number operand beside a value of the kind is
-  the hook's to convert;
-- `apply(operator, args, compile, context)`: the other arithmetic operators,
-  the comparisons and the other operators with an operand of the kind. The
-  structural operators (`If`, `Block`, `List`, `Tuple`, `Assign`, `Hold`, a
-  call of a user function) do not call it: they pass the representation as
-  it is;
-- `entry(value, context)`: the check of a host value given for a symbol of
-  the kind type, when the compiled code runs;
-- `shippable` and `hostNames`: see below.
-
-An operation that the contract does not define declines with a message
-that names the kind type: with the contract above, `g · GF8(2)` declines
-because there is no `multiply`.
-
-Limits:
-
-- An expression that holds a collection of values of a kind (`L + L` with
-  `L: list<gf8>`, or `[GF8(1), GF8(2)]`) declines on every target: `entry`
-  and `lowered` describe one value, not a collection.
-- Code compiled with a kind contract cannot be stored and loaded again with
-  `createJavaScriptRuntime().load()`: the `entry` check is a function of the
-  host that compiled the code, and stored code cannot carry it. Run it with
-  the `run()` of the compilation result. `CompilationResult.valueKinds` names
-  the kind types of the code, and `entryPlan.kinds` the symbols that need an
-  `entry` check.
-- The result is `shippable` (it can be sent to a worker of the kernel pool
-  as text) only when the contract of every kind in the code says
-  `shippable: true`, lists no `hostNames`, and no input of the code is a
-  value of a kind (its `entry` check could not run in the worker).
-- Of the library kinds, only `Enclosure` gives a `compile` contract, for
-  the `interval-js` target (see [Enclosures](#enclosures)). An expression
-  with a residue class, a measurement or a quantity declines on every
-  target.
+Before 0.194.0, a kind could give a compiled representation with a
+`compile` field in its `arithmetic` field (an `ArithmeticCompile`, with
+`compile.type` and `compile.value`). That field was removed: a declaration
+that gives it throws an error that says so. See the migration note in the
+0.194.0 changelog entry.
 
 #### Residue classes
 
@@ -1468,7 +1403,7 @@ ce.declare("MyMod", {
 `x + MyMod(2, 4) + MyMod(1, 4)` is then `x + MyMod(3, 4)`, and
 `MyMod(2, 4) - MyMod(2, 4)` is `MyMod(0, 4)`. The rules of the type
 `residue` apply to `MyMod`: `admittedAs` is `"none"`, and a head of your own
-cannot give `residue` a `resultType` or a `compile.type`.
+cannot give `residue` a `resultType`.
 
 Do not extend `Add` or `Multiply` with an `evaluate` handler and
 `{ extend: true }` to give a kind its arithmetic: that replaces the library
@@ -1662,22 +1597,22 @@ ce.box(["Ln", ["Enclosure", -2, -1]]).evaluate();
   `x: enclosure`), and `enclosure | nan` otherwise; every other operator is
   `enclosure | nan`, because its image can be empty.
 
-**An example of a kind that compiles.** `Enclosure` gives a `compile`
-contract for the `interval-js` target, and none for the other targets,
-which decline it. An enclosure is the `{ lo, hi }` interval of that
-target, and the hooks emit, for each operation, the same function of the
-interval library that `.N()` calls, so the compiled code and `.N()` give
-the same doubles:
+**An example of a kind that compiles.** `Enclosure` compiles on the
+`interval-js` target, and the other targets decline it. An enclosure is the
+`{ lo, hi }` interval of that target, and the compiled code calls, for each
+operation, the same function of the interval library that `.N()` calls, so
+the compiled code and `.N()` give the same doubles.
 
 ```js
 ce.declare("x", "enclosure");
 const f = compile(ce.parse("\\sin(x) + 1"), { to: "interval-js" });
-f.freeSymbolTypes.x;           // ➔ { type: "enclosure", lowered: "interval", … }
-f.run({ x: { lo: 0, hi: 1 } }); // ➔ { kind: "interval", value: { lo: 1, hi: 1.841470984807897 } }
-f.run({ x: { lo: 1, hi: 0 } }); // ➔ throws: the entry check refused the value
+f.run({ x: { lo: 0, hi: 1 } });
+// ➔ { kind: "interval", value: { lo: 1, hi: 1.841470984807897 } }
+ce.box(["Add", ["Sin", ["Enclosure", 0, 1]], 1]).N();
+// ➔ Enclosure(1, 1.841470984807897)
 compile(ce.parse("x + 1"), { to: "javascript", fallback: false });
-// ➔ throws: Could not compile an expression that holds a value of the kind
-//   type 'enclosure' to target 'javascript'
+// ➔ throws a CompileDeclineError: Could not compile: x: the input x of
+//   type enclosure
 ```
 
 The runner checks the value of each input whose type can hold an

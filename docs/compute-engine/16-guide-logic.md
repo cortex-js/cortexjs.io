@@ -366,7 +366,9 @@ ce.expr(['Exists',
 
 ### Nested Quantifiers
 
-Nested quantifiers are evaluated over the Cartesian product of their domains:
+A nested quantifier is evaluated once for each value of the variable of the
+outer quantifier. When both quantifiers are of the same kind, this checks every
+pair of the Cartesian product of their domains:
 
 ```js example
 // For all pairs (x, y) in {1,2} × {1,2}: x + y > 0
@@ -384,6 +386,26 @@ ce.expr(['Exists', ['Element', 'x', ['Set', 1, 2, 3]],
   ]
 ]).evaluate();
 // → True (x=2, y=3 or x=3, y=2)
+```
+
+When the quantifiers are of different kinds, their order matters:
+
+```js example
+// For each x in {1,2,3}, there is a y in {1,2,3,4} with y > x
+ce.expr(['ForAll', ['Element', 'x', ['Set', 1, 2, 3]],
+  ['Exists', ['Element', 'y', ['Set', 1, 2, 3, 4]],
+    ['Greater', 'y', 'x']
+  ]
+]).evaluate();
+// → True
+
+// There is a y in {1,2,3} with y > x for each x in {1,2,3}
+ce.expr(['Exists', ['Element', 'y', ['Set', 1, 2, 3]],
+  ['ForAll', ['Element', 'x', ['Set', 1, 2, 3]],
+    ['Greater', 'y', 'x']
+  ]
+]).evaluate();
+// → False (no y is greater than 3)
 ```
 
 ### Symbolic Simplification

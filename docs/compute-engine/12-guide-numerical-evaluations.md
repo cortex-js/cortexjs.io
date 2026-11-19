@@ -243,6 +243,27 @@ const expr = box(1.5);
 console.log(expr.valueOf());
 ```
 
+A JavaScript `number` that is a safe integer (`Number.isSafeInteger()`, at
+most $2^{53} - 1$ in magnitude) is an exact integer. Any other `number` is a
+float. Above machine precision, a float holds its shortest decimal, the digits
+that `String(x)` prints, not the exact binary value of the double:
+`ce.number(0.1)` is the decimal $0.1$, so `0.1 + 0.2` is `0.3`, and
+`ce.number(2 ** 60)` is `1152921504606847000`, not
+$2^{60} = 1152921504606846976$. At machine precision, a float is the double
+itself.
+
+**To give an integer beyond $2^{53} - 1$ exactly**, pass a `bigint` or a
+string of digits.
+
+```js
+ce.box(['Remainder', 2 ** 60, 7]).evaluate();
+// ➔ -3 (the remainder of 1152921504606847000)
+ce.function('Remainder', [ce.number(2n ** 60n), ce.number(7)]).evaluate();
+// ➔ 1
+ce.number('1152921504606846976').isExact;
+// ➔ true
+```
+
 
 ## Numeric Precision
 

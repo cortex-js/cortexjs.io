@@ -84,6 +84,19 @@ The DSL supports:
 second. Use `"m*s"` for the product.
 :::
 
+The target unit of `UnitConvert` and the unit operands of `IsCompatibleUnit`
+and `UnitDimension` accept a string too:
+
+```json example
+["UnitConvert", ["Quantity", 2, "h"], "'min'"]
+// evaluates to:
+["Quantity", 120, "min"]
+```
+
+In Epsil, a string is the way to write a unit whose name is also the name of
+a function, such as `min` (minute) or `lb` (pound): a bare `min` is the
+function `Min`. Write `unitConvert(quantity(2, h), "min")`.
+
 
 ## Parsing LaTeX with Units
 
@@ -159,8 +172,17 @@ console.log(evaluate(['Add', ['Quantity', 12, 'cm'], ['Quantity', 1, 'm']]));
 // → ["Quantity", 1.12, "m"]
 ```
 
-Adding quantities with incompatible dimensions (e.g., meters + seconds) returns
-the expression unevaluated.
+A sum of quantities with incompatible dimensions (e.g., meters + seconds) is an
+`incompatible-type` error that names the two units:
+
+```live
+console.log(evaluate(['Add', ['Quantity', 5, 'm'], ['Quantity', 3, 's']]));
+// → ["Error", ["ErrorCode", "'incompatible-type'", "'m'", "'s'"]]
+```
+
+The sum stays unevaluated when one of its operands is not a quantity, because
+that operand can hold a value that makes the sum valid: `x + 2 m + 3 s` and
+`2 m + 3` stay as they are.
 
 ### Multiplication and Division
 
@@ -258,11 +280,28 @@ console.log(evaluate(['UnitConvert', ['Quantity', 0, 'K'], 'degC']));
 // → ["Quantity", -273.15, "degC"]
 ```
 
-Converting incompatible units returns an `Error` expression:
+### Logarithmic Units
+
+The decibel (`dB`) and the neper (`Np`) are units of a level, the logarithm
+of a ratio. They convert into each other with 1 dB = ln(10)/20 Np ≈ 0.1151 Np
+(ISO 80000-3). This factor is the same for a field level and for a power
+level.
+
+```live
+console.log(evaluate(['UnitConvert', ['Quantity', 10, 'dB'], 'Np']));
+// → ["Quantity", 1.151292546497023, "Np"]
+```
+
+A level is not a ratio: a quantity in `dB` or `Np` does not convert to
+`percent`, `ppm`, `rad` or a plain number, and `IsCompatibleUnit` of `dB` and
+`percent` is `False`.
+
+Converting incompatible units returns an `incompatible-type` error, which
+names the target unit and the unit of the quantity:
 
 ```live
 console.log(evaluate(['UnitConvert', ['Quantity', 5, 'm'], 's']));
-// → Error
+// → ["Error", ["ErrorCode", "'incompatible-type'", "'s'", "'m'"]]
 ```
 
 ## Unit Simplification
