@@ -23,26 +23,36 @@ The string is one of:
   (`"hsl(0, 100%, 50%)"`);
 - an OKLCh color: `oklch(l% c h)` or `oklch(l% c h / a)`
   (`"oklch(50% 0.3 240)"`);
+- an OKLab color: `oklab(l% a b)` or `oklab(l% a b / a)`
+  (`"oklab(50% 0.1 -0.2)"`);
 - a named color (see below), or `"transparent"`.
 
-The string is read as an sRGB color with 8 bits for each channel, so an
-alpha of `0.5` is read as `128/255`, about `0.502`:
+A hex, RGB or HSL string is read as an sRGB color with 8 bits for each
+channel, so an alpha of `0.5` is read as `128/255`, about `0.502`:
 
 ```epsil
 colorToColorspace(color("rgba(255, 0, 0, 0.5)"), "rgb")
 // ➔ (1, 0, 0, 0.5019607843137255)
 ```
 
-An `oklch(…)` string is read the same way, and today it loses a chroma or a
-hue that is outside the sRGB gamut. To make an exact OKLCh color, call
+An `oklch(…)` or `oklab(…)` string keeps its channels, also a chroma or a
+hue that is outside the sRGB gamut. It is the same color as a call of
 `oklch`:
 
 ```epsil
-oklch(0.5, 0.3, 240)
-// ➔ Oklch(0.5, 0.3, 240)
+[color("oklch(50% 0.3 240)"), oklch(0.5, 0.3, 240)]
+// ➔ [Oklch(0.5, 0.3, 240),Oklch(0.5, 0.3, 240)]
+color("oklch(50% 0.3 240 / 0.5)")
+// ➔ Oklch(0.5, 0.3, 240, 0.5)
 ```
 
-A string that is not a color is an `incompatible-type` error.
+A string that is not a color, such as a name that is not in the table
+below, is an `incompatible-type` error:
+
+```epsil
+color("pink")
+// ➔ error: Runtime error: expected `color`, got `"pink"`
+```
 
 #### Named colors
 
@@ -89,14 +99,19 @@ are not names. Case is ignored.
 ## Colormap
 
 - With only a name, the result is the list of the colors of the palette.
-- With an integer `n` of 2 or more, it is a list of `n` colors at evenly
-  spaced positions, from the first color of the palette to the last.
+- With an integer `n` of 2 or more, it is a list of `n` colors. For a
+  sequential or a diverging palette, they are at evenly spaced positions,
+  from the first color of the palette to the last. For a categorical
+  palette, they are its first `n` colors; when `n` is larger than the
+  palette, its colors repeat from the start.
 - With a number `t` between 0 and 1, it is the color at position `t`. A
   position below 0 is read as 0, and one above 1 as 1.
 
-Between two colors of the palette, the color is interpolated in OKLCh. This
-applies to the categorical palettes too: `colormap("tycho11", 3)` is the
-first, middle and last colors, not the first three.
+In a sequential or a diverging palette, a position between two colors of
+the palette gives a color interpolated in OKLCh. A categorical palette is
+not interpolated: a position gives the nearest color of the palette, the
+one at index `round(t × (n − 1))` (counting from 0) in a palette of `n`
+colors.
 
 ```epsil
 map(colorToString, colormap("viridis", 3))
@@ -104,9 +119,13 @@ map(colorToString, colormap("viridis", 3))
 colorToString(colormap("viridis", 0.5))
 // ➔ "#21918d"
 map(colorToString, colormap("tycho11", 3))
-// ➔ ["#4e79a7","#9c755f","#c07bc4"]
+// ➔ ["#4e79a7","#f28e2b","#59a14f"]
+[colorToString(colormap("tycho11", 0.05)), colorToString(colormap("tycho11", 0.5))]
+// ➔ ["#f28e2b","#9c755f"]
 count(colormap("tycho11"))
 // ➔ 11
+colorToString(colormap("tycho11", 12)[12])
+// ➔ "#4e79a7"
 ```
 
 An unknown palette name is an `expected-value` error. A request for more
@@ -148,7 +167,7 @@ These palettes are symmetric around a neutral midpoint. Each one also has a
 ##### Categorical
 
 These palettes are for discrete categories with no order. They have no
-`-reversed` variant.
+`-reversed` variant, and `colormap` does not interpolate them.
 
 | Name | |
 | :--- | :--- |

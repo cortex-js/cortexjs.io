@@ -184,6 +184,16 @@ N(cdf(normalDistribution(0, 1), 1))
 // ➔ 0.841344746068542948585
 ```
 
+`D` and `integrate` read the closed form of `pdf` and `cdf` of a
+continuous distribution:
+
+```epsil
+[D(cdf(normalDistribution(0, 1), x), x), integrate(pdf(normalDistribution(0, 1), x), x)]
+// ➔ [(sqrt(2) * e^(-1/2 * x^2)) / (2sqrt(pi)),1/2 * Erf(sqrt(2)/2 * x)]
+integrate(pdf(normalDistribution(0, 1), x), (x, -oo, oo))
+// ➔ 1
+```
+
 <MathJson name="CDF">
 
 `["CDF", distribution, x]`.
@@ -735,14 +745,14 @@ Quantile (inverse CDF): the least x with CDF(x) ≥ p, for p in [0, 1]. The firs
 
 The **quantile** of a distribution, its inverse CDF: the smallest `x` such
 that `cdf(x) ≥ p`, for `0 ≤ p ≤ 1`. `quantile(d, 1/2)` is the median. For a
-continuous distribution, the result is a closed form. For a discrete one, it
-is found by search, under `N`.
+continuous distribution, the result is a closed form. For a discrete one
+with numeric parameters, it is found by an exact search of the support.
 
 ```epsil
 quantile(normalDistribution(mu, sigma), p)
 // ➔ mu + sqrt(2) * sigma * ErfInv(2p - 1)
-N(quantile(poissonDistribution(9), 0.95))
-// ➔ 14
+[quantile(poissonDistribution(9), 0.95), quantile(binomialDistribution(10, 1/2), 1/2)]
+// ➔ [14,5]
 ```
 
 Of a collection, it is the **empirical quantile**, which interpolates the
@@ -841,7 +851,7 @@ $\frac{1}{n} \sum_{i=1}^n \left(\frac{x_i - \mu}{\sigma}\right)^3$.
 
 ```epsil
 skewness([1, 2, 3, 10])
-// ➔ 18/25sqrt(2)
+// ➔ 18/25 * sqrt(2)
 ```
 
 <MathJson name="Skewness">

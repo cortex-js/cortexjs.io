@@ -421,7 +421,7 @@ dirichletCharacter(5, 2, 2)
 
 ```epsil
 dirichletCharacter(7, 3, 3)
-// ➔ e^(2/3i * pi)
+// ➔ e^(2/3 * i * pi)
 ```
 
 `j` runs from 1, the principal character, to $\varphi(k)$. An index outside
@@ -466,7 +466,7 @@ dirichletL(3, 2, -2)
 
 ```epsil
 dirichletL(5, 2, 0)
-// ➔ (3/5 + 1/5i)
+// ➔ (3/5 + 1/5 * i)
 ```
 
 The value at a non-positive integer `s` is exact. For a real character, the
@@ -1016,14 +1016,16 @@ See also: [Abundant number](https://en.wikipedia.org/wiki/Abundant_number).
 
 `(integer) -> boolean`
 
-True if n is a centered square number.
+True if n is a centered square number, n = t² + (t + 1)² for an integer t ≥ 0: 1, 5, 13, 25, 41, ...
 
 The `k`th centered square number is `k² + (k+1)²`: a dot in the center and
 the square layers of dots around it.
 
 ```epsil
-[isCenteredSquare(5), isCenteredSquare(6)]
-// ➔ [true,false]
+[isCenteredSquare(5), isCenteredSquare(6), isCenteredSquare(25)]
+// ➔ [true,false,true]
+filter(1..100, isCenteredSquare)
+// ➔ [1,5,13,25,41,61,85]
 ```
 
 See also: [Centered square numbers, OEIS A001844](https://oeis.org/A001844).

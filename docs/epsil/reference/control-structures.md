@@ -1099,7 +1099,7 @@ Which([true, false], 1, true, 3)
 // ➔ [1,3]
 let L = [1, 3, 5]
 If(L < 3, [10, 20], 0)
-// ➔ error: Static error: incompatible dimensions at `3 vs 2` in `[10, 20] if L < 3 else 0`
+// ➔ error: Runtime error: incompatible dimensions at `3 vs 2`
 If([true, false], x > 0)
 // ➔ [0 < x,false]
 If([true, false], Rgb(1, 0, 0))

@@ -349,7 +349,7 @@ axis above `i` and below `-i`.
 
 ```epsil
 N(arccot(-3 + 10^(-12) * i))
-// ➔ (2.819842099193151 - 9.999999999999999e-14i)
+// ➔ (2.819842099193151 - 9.999999999999999e-14 * i)
 N(arccot(-3))
 // ➔ 2.81984209919315104506
 N([arccot(2i), arccot(-2i)])
@@ -1177,6 +1177,16 @@ trigReduce(sinh(x)^2)
 // ➔ 1/2 * cosh(2x) - 1/2
 trigReduce(cos(x) * cos(2x) * cos(4x))
 // ➔ 1/4 * cos(x) + 1/4 * cos(3x) + 1/4 * cos(5x) + 1/4 * cos(7x)
+```
+
+`trigExpand`, `trigReduce` and `trigToExp` rewrite the formula that a
+variable holds, and the result of another rewrite:
+
+```epsil
+let f = sin(3x)
+let g = trigExpand(f)
+[g, trigReduce(g), trigToExp(f)]
+// ➔ [-sin(x)^3 + 3sin(x) * cos(x)^2,sin(3x),-1/2 * i * e^(3i * x) + 1/2 * i * e^(-3i * x)]
 ```
 
 <MathJson name="TrigReduce">

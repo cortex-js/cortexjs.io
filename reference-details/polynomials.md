@@ -118,7 +118,7 @@ Evaluation alone leaves the square root as it is.
 
 ```epsil
 [simplify(sqrt(x^2 + 2x + 1)), sqrt(x^2 + 2x + 1)]
-// ➔ [|x + 1|,sqrt(x^2 + 2x + 1)]
+// ➔ [abs(x + 1),sqrt(x^2 + 2x + 1)]
 ```
 
 #### Factoring over a number field
