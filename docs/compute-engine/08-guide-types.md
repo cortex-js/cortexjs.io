@@ -361,8 +361,6 @@ A ranged type can appear in four ways:
 
 - **You declare it**: `ce.declare("x", "real<-1..1>")` makes the range a
   contract on `x`.
-- **An assumption refines it**: after `ce.assume(ce.parse("y > 0"))`, the
-  type of `y` is `(real<0..>) & !0`.
 - **An operator derives it**: some operations produce a result that is
   provably sign-constrained, and their type says so — `|x|` for a real `x`
   has type `real<0..>`, and `e^x` has type `(real<0..>) & !0`.
@@ -381,6 +379,10 @@ A ranged type can appear in four ways:
   there, so `[√((k − 0.5)/16) for k in 1..16]` is a `list<real>` — but a
   comprehension's list keeps the element type without the range:
   `[k for k in 1..16]` is a `list<integer>`.
+
+A bound recorded by `ce.assume()` is available to reasoning. For example,
+if `q` is declared `real`, after `ce.assume("q > 4")` its type is still
+`real` and `ce.verify("q > 0")` returns `true`.
 
 Ranges are deliberately **not** propagated through arithmetic: the sum of
 two values in `real<-1..>` is not itself in `real<-1..>`, so `x + y` falls

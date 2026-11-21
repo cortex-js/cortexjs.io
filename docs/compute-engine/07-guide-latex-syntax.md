@@ -251,6 +251,18 @@ subscript base (e.g. `161_b`) parses to `BaseForm` of the digit polynomial in
 that base, so base equations solve symbolically. See
 [`BaseForm`](/compute-engine/reference/strings/#baseform) for details.
 
+A numeral with a **letter digit** (a base above 10, up to 36) is written as
+text with the base as a subscript. It parses to the number, and a `BaseForm`
+with a letter digit is serialized in this form:
+
+```javascript
+ce.parse("\\text{2a}_{16}").json;
+// ➔ 42
+
+ce.box(["BaseForm", 42, 16]).latex;
+// ➔ \text{2a}_{16}
+```
+
 ### Repeating Decimals
 
 A repeating-decimal literal — vinculum (`0.\overline{3}`), dots

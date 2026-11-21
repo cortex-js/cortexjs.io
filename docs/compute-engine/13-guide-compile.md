@@ -269,7 +269,10 @@ release. The options give the runtime the state it cannot read from an engine:
 - `deadline`: an optional time after which the shuffle and choice loops throw.
 
 A seeded program gives the same values interpreted, with `run()` and from the
-stored code. A `vars` entry that is not a read of the inputs object (for
+stored code. A name that holds draws over literals under a number as the seed,
+such as `a := WithRandomSeed(7, RandomChoice([0, 1), 3))`, compiles as its
+value, a constant list, also on `glsl`; a seeded value that reads another name
+or calls a user function declines. A `vars` entry that is not a read of the inputs object (for
 example `vars: { c: 'Math.PI' }`) is copied into the code as text, so the
 name it reads must exist where the code runs.
 
@@ -535,11 +538,15 @@ carries `runtimeVersion` for them, as a `javascript` result does.
 ### Parallel Loops: `runAsync()`
 
 A `parallel for` loop (`ParallelLoop` in MathJSON) says that its passes are
-independent. In 0.194.0 a program with a `parallel for` does not compile: the
-compilation declines (`success: false`), and `run()` evaluates the program
-with the interpreter, which runs the passes in order on the calling thread.
-Such a result has no `runAsync()` and no `willParallelize()`. A later release
-will run these loops on the worker pool again.
+independent. On `javascript` it compiles as a `for` loop: the passes run in
+order on the calling thread, and give the interpreter's values. The body may
+change a variable declared outside the loop only with `+=` (`AddTo`). The
+compilation declines (`success: false`, and `run()` evaluates the program
+with the interpreter) when the body assigns such a variable another way, when
+it has a `break` or a `continue` of the loop itself (one of an inner loop is
+allowed), and when the program draws a random number or sets a random seed:
+the interpreter runs each pass in a random frame of its own, which compiled
+code does not have. On `glsl` and `interval-js` it declines.
 
 ```javascript
 ce.declare('H', 'list<integer>');
@@ -560,17 +567,38 @@ const count = compile(
     'L',
   ])
 );
-count.success;                      // ➔ false
-count.run({ H: [0, 0, 0], n: 100 }); // ➔ [33, 34, 33], from the interpreter
+count.success;                      // ➔ true
+count.run({ H: [0, 0, 0], n: 100 }); // ➔ [33, 34, 33]; H is unchanged
 ```
 
-The interpreter stops a loop at `ce.iterationLimit` passes, so a program with
-a long loop throws a `CancellationError` (`'iteration-limit-exceeded'`) on
-this route.
+A `javascript` result has `runAsync(inputs, options)`: the promise resolves
+to the value of `run(inputs)`, and sends a `parallel for` to the engine's
+worker pool (`ce.workers`, see the kernel pool above) when its passes only
+add: to numbers (`s += e`) and to the elements of a list declared outside the
+loop (`L[i] += e`), with no other read of them. The passes are split into one
+range per worker, and the calling thread adds the partial sums in order. An
+integer accumulator gets the value of `run()`; a real one can differ from it
+in the last digits (the terms are added in another grouping). A loop that
+does not qualify, and one of fewer passes than `options.minPasses` (default
+20,000), runs in order on the calling thread. `options.onLoop` reports where
+each loop ran, and `willParallelize()` says whether a loop would go to the
+pool now:
 
-A `javascript` result that compiles still has `runAsync(inputs, options)`: the
-promise resolves to the value of `run(inputs)`, and
-`result.willParallelize()` is `false`.
+```javascript
+ce.workers = pool;
+const routes = [];
+await count.runAsync(
+  { H: [0, 0, 0], n: 30000 },
+  { onLoop: (r) => routes.push(r) }
+);                          // ➔ [10000, 10000, 10000]
+routes;                     // ➔ [{ passes: 30000, route: 'pool' }]
+count.willParallelize();    // ➔ true
+```
+
+A worker stops at the deadline of a `ce.withTimeLimit()` around the call of
+`runAsync()`, and the promise then rejects with its `CancellationError`. An
+error of a pass rejects with the error that `run()` gives. Do not change
+`inputs` until the promise settles: the program reads them after it waits.
 
 ### Limiting Loops: `iterationBudget`
 
@@ -600,6 +628,8 @@ pass on every machine. To get a time limit, measure the cost of a pass.
   the GLSL Target Compiles: `canCompile()`").
 - A `Sum` or `Product` over the budget gives `NaN` and does not throw. On
   `interval-js` it gives the `entire` interval.
+- On `interval-js`, a `Loop` over a `Range` of 2^32 elements or more gives the
+  `entire` interval before its first pass, whatever the budget.
 
 Without the option, the compiled code has no check.
 
@@ -780,8 +810,8 @@ declines, and compiles after `ce.declare('N', 'real')`.
   two points, whose square is the square of each coordinate. With
   `p: list`, `p^2` declines, and `unsupported` holds `p`. With the fallback,
   the interpreter gives `[[7, -6], [-9, 22]]` for `p = [[1, 2], [3, -4]]`.
-  Declare `p` as `list<list<real>>` (a matrix) or `list<tuple<real, real>>`
-  (points) to compile it. `p^{0.5}` and `3p` compile.
+  Declare `p` as a matrix of a stated size, `matrix<real^2x2>`, to compile
+  it: `p^2` is then the matrix power. `p^{0.5}` and `3p` compile.
 
 **A call selects the variant of the function from the static type of its
 argument.** With `f := t ↦ 2t`, `f(L)` with `L: list<real>` compiles to a map
@@ -919,6 +949,12 @@ and does not test it. So:
   An undeclared input has only the type that the compiled expression
   requires of it; `ce.infer()` declares the types that several expressions
   require.
+- **A declared range is a promise too.** The compiler uses the range of the
+  declared type to simplify the code: with `ce.declare("k", "real<0..5>")`,
+  `|k|` compiles to `k`, and in `mode: "complex"` `\sqrt{k}` is a real square
+  root. A value outside the range gives an unspecified result: the code of
+  `|k|` returns `-2` for `k = -2`. An assumption (`ce.assume(...)`) does not
+  change a type, so the compiler does not read it.
 - **When an input can have two shapes**, compile one function for each
   shape, or declare the union (`real | tuple<real, real>`). One function for
   each shape has no run-time test. The union costs one test on each call,
@@ -971,27 +1007,129 @@ Declare one shape (`real` or `list<real>`), or a union of shapes
 
 ### String Operators and Integer Operations
 
-The string operators that check the domain of an operand (`RangeOf`,
-`StringReplace`, `StringRepeat`, `PadStart`, `PadEnd`) do not compile in
-0.194.0. The compilation declines, and with the default fallback the
-interpreter evaluates the expression. An operand outside the domain then
-gives the interpreter's error value, which crosses the `run()` boundary as
-`NaN`:
+A string compiles to `javascript` as a JavaScript string: an input declared
+`string`, a string literal, and the text operators `Length` (of a string),
+`ToUpperCase`, `ToLowerCase`, `CaseFold`, `Trim`, `TrimStart`, `TrimEnd`,
+`StringRepeat`, `PadStart`, `PadEnd`, `StringReplace` (also with a literal
+`RegExp`), `StartsWith`, `EndsWith`, `StringCompare`, `String` of strings,
+`StringJoin` of a string, and `Equal`, `NotEqual` and `KroneckerDelta` of two
+strings. The compiled value is the interpreter's: the
+operators count characters (grapheme clusters), and a string input is read
+as the engine reads one (NFC, a lone surrogate replaced with U+FFFD).
+
+A list of strings compiles as an input declared `list<string>`, a list
+literal, `Characters(s)` (also `GraphemeClusters(s)`) or the result of a list
+operator: `Characters(s)` gives an array of strings, `StringJoin(L)` and
+`StringJoin(L, sep)` join a list, `Length(Characters(s))` is the number of
+characters, and `Map`, `Filter`, `Count`, `Any`, `All`, `Reverse`, `Take`,
+`Drop`, `Rest`, `Most` and the rotations read its elements. Each element is
+read with the interpreter's text (NFC), also an element of an input list.
+`At(L, i)`, `First(L)` and `Last(L)` compile as the result, which is
+`undefined` out of range, and in `IsMissing`, `Coalesce` and `AssertPresent`;
+another use of such a read does not compile, and `Coalesce` is the remedy.
+`Sort` and `Unique` of a list of strings or of characters compile, and so do
+`Less`, `LessEqual`, `Greater` and `GreaterEqual` of two strings or of two
+characters, in the interpreter's order: two strings by UTF-16 code units, two
+characters by code points. `Max`, `Contains`, `Reduce` and the other operators
+that combine strings do not compile, and the interpreter computes them:
 
 ```javascript
 ce.declare('s', 'string');
+ce.declare('L', 'list<string>');
+ce.declare('i', 'integer');
+compile(ce.box(['Characters', 's'])).run({ s: 'he\u0301llo' });
+// ➔ ["h", "é", "l", "l", "o"]
+compile(ce.box(['StringJoin', 'L', { str: '-' }])).run({ L: ['a', 'b', 'c'] });
+// ➔ "a-b-c"
+compile(
+  ce.box(['Count', ['Characters', 's'], ['Function', ['Equal', 'c', { str: 'a' }], 'c']])
+).run({ s: 'banana' });
+// ➔ 3
+compile(ce.box(['Map', 'ToUpperCase', 'L'])).run({ L: ['a', 'b'] });
+// ➔ ["A", "B"]
+compile(ce.box(['At', 'L', 'i'])).run({ L: ['a', 'b'], i: 5 });
+// ➔ undefined
+compile(
+  ce.box(['ToUpperCase', ['Coalesce', ['At', 'L', 'i'], { str: 'z' }]])
+).run({ L: ['a', 'b'], i: 5 });
+// ➔ "Z"
+compile(ce.box(['ToUpperCase', ['At', 'L', 'i']])).success;  // ➔ false
+compile(ce.box(['Sort', 'L'])).run({ L: ['pear', 'fig', 'apple', 'fig'] });
+// ➔ ["apple", "fig", "fig", "pear"]
+compile(ce.box(['Unique', 'L'])).run({ L: ['pear', 'fig', 'apple', 'fig'] });
+// ➔ ["pear", "fig", "apple"]
+compile(ce.box(['Max', 'L'])).success;                        // ➔ false
+```
+
+`ColorToString(c)` and `ColorToString(c, format)` with a literal format
+compile to `javascript` when `c` is a color constructor (`Rgb`, `Hsl`,
+`Hsv`, `Oklab`, `Oklch`), a name whose value is one, a conversion of one to
+its own space (`AsRgb(Rgb(…))`) or a tuple of three numbers, and give the
+interpreter's string. Another color (`ColorMix`, a conversion to another
+space) does not compile.
+
+`RangeOf` and `At` of a string, an order of a character and a string, and `String`
+of a number do not compile, and no string compiles to `glsl` or `interval-js`. Code with a
+string input or a string result reports `strings: true` and has no batch
+form: `broadcast()` and `broadcastAsync()` throw, and so do the batch
+loaders of the runtime.
+
+An operand that the interpreter answers with an error value (a negative
+count, an empty pad) declines when it is a literal: with the default
+fallback the interpreter evaluates the expression, and its error value
+crosses the `run()` boundary as `NaN`. A computed operand compiles, and the
+code throws a `RangeError` for a value outside the domain:
+
+```javascript
+ce.declare('s', 'string');
+ce.declare('n', 'integer');
 const p = compile(ce.box(['PadStart', 's', 5, { str: '0' }]));
-p.success;          // ➔ false
-p.unsupported;      // ➔ ["PadStart"]
-p.run({ s: '7' });  // ➔ "00007", from the interpreter
+p.success;          // ➔ true
+p.run({ s: '7' });  // ➔ "00007"
 
 compile(ce.box(['PadStart', 's', -1, { str: '0' }])).run({ s: '7' });
-// ➔ NaN: the interpreter gives
+// ➔ NaN: the compilation declines, and the interpreter gives
 //   Error("unexpected-argument", "PadStart: n must be a non-negative integer")
+
+compile(ce.box(['PadStart', 's', 'n', { str: '0' }])).run({ s: '7', n: -1 });
+// ➔ throws RangeError: PadStart: n must be a non-negative integer
 ```
 
 The integer operations `Mod` and `GCD` compile, and compute with doubles: an
 operand beyond the safe integer range (±2^53) is not checked.
+
+### Rows of Different Lengths: `Chunk` and `Partition`
+
+`Chunk(L, k)` and `Partition(L, n)` of a list whose length is known only at
+run time, and `Partition(L, p)` of a predicate, give rows that can have
+different lengths. On `javascript` they compile when `L` is an input or a
+literal list of numbers or booleans. As the result of the expression, `run()`
+returns an array of plain arrays, and the compilation result reports
+`rows: true`: such code has no batch form, so `broadcast()`,
+`broadcastAsync()` and the batch loaders of the runtime throw a `TypeError`,
+and `shippable` is `false`. An expression that reduces each row, or that
+reads the number of rows or one row at a constant index, compiles with no
+such restriction:
+
+```javascript
+ce.declare('L', 'list<real>');
+ce.declare('k', 'integer');
+const c = compile(ce.box(['Chunk', 'L', 2]));
+c.rows;                     // ➔ true
+c.run({ L: [1, 2, 3] });    // ➔ [[1, 2], [3]]
+
+const sums = compile(ce.box(['Map', ['Function', ['Sum', 'r'], 'r'], ['Chunk', 'L', 'k']]));
+sums.run({ L: [1, 2, 3, 4, 5], k: 2 });  // ➔ [6, 9]
+sums.run({ L: [1, 2, 3], k: 0 });
+// ➔ throws RangeError: Chunk: expected a count in 1..10000, got 0
+```
+
+A count known at run time throws a `RangeError` where the interpreter leaves
+the expression unevaluated (a count below 1, a count of `Chunk` above
+10,000). Other uses of such rows, and `Chunk` or `Partition` of a computed
+list (a `Range`, a `Map`), are evaluated by the interpreter. Rows of one
+length (a list of a stated length that the count divides) are a list of
+lists, with no such restriction.
 
 ## Implicit Compilation and the `jit` Setting
 
@@ -1248,7 +1386,14 @@ that no clause selects is `NaN` for a number and `[NaN, NaN]` for a point,
 never `undefined`, and a string arm is refused (the compilation falls back
 to the interpreter). An `If` with no else-branch is
 the one-clause `Which`: `If(c, t)` compiles on every target and returns
-`NaN` when `c` is false (`[NaN, NaN]` for a point). An `If` whose branch is a statement — an
+`NaN` when `c` is false (`[NaN, NaN]` for a point). When `t` is a list of
+numbers or of points and the `If` is the result of the expression, as a
+restriction of a list of curves `(x L)\{x > 0\}`, the value where `c` is false
+is the list of `NaN` (of points of `NaN`) of the length of `t`; where an
+operator reads that value (`IsMissing`, `Length`), the compilation falls back
+to the interpreter, whose value is `Missing`. Under a list of conditions,
+`If(c, L)` with a list `L` reads `L` to the shorter of the two lists, as the
+interpreter does. An `If` whose branch is a statement — an
 assignment, a loop — is a guard statement, not a value, and keeps its own
 rules (see the statement sections below).
 
@@ -1275,7 +1420,13 @@ of places in compiled code:
   refused. On interval-js the three compile, and the test is a verdict over
   the box: `'maybe'` where the operand is absent over part of it, where
   `Coalesce` gives the hull of its operands; `AssertPresent` of a value absent
-  over the whole box gives `entire`. They are refused in the `bigint` mode,
+  over the whole box gives `entire`. `IsMissing` of a colour is refused on
+  every target, and so is a discharge of a colour read whose index can be
+  out of range; a `Coalesce` or `AssertPresent` of a colour that is present
+  compiles. A string read out of range (`S[n]` with `S: list<string>`) is
+  `undefined` on JavaScript, and its discharges compile (`IsMissing(S[n])`
+  is `true` for `n` past the end). They
+  are refused in the `bigint` mode,
   and for an operand computed as a real number that can have a complex value
   (`Coalesce(Sqrt(x), 0)` with `x: real`; with `mode: 'complex'` it
   compiles). A refused compilation falls back to the interpreter.
@@ -1327,20 +1478,19 @@ console.log(f.run({ x: 1.0 }));
 
 #### `Loop`, `Break`, `Continue`, `Return`
 
-`Loop` is imperative control flow, compiled for effect: bare `Loop(body)`
-compiles to a JavaScript `while (true) { ... }` loop, and `Loop(body,
-Element(...), ...)` compiles to plain `for`/`for-of` loops with no result
-collection. `Break`, `Continue`, and `Return` compile to their JavaScript
-equivalents.
+`Loop` is imperative control flow, compiled for effect. `Loop(body,
+Element(...), ...)` compiles to plain `for` loops with no result collection.
+A bare `Loop(body)`, with no indexing set, compiles on JavaScript only (GLSL
+and `interval-js` decline it): a `Break` ends it, and so does the
+`iterationBudget` option or a deadline of the engine (`ce.withTimeLimit()`).
+`Break` and `Continue` compile to their JavaScript equivalents; `Return` has
+no compiled form, so an expression that holds one runs on the interpreter.
 
 The value of a loop is `Nothing` (or the value of a `Break(v)`), and the
 compiled code has no form for it. So a loop whose value is used — the whole
 expression, the last statement of a block, the body of a function — does not
-compile, and `run()` uses the interpreter. This includes a search loop that
-ends with a `Return`, because it gives `Nothing` when no `Return` runs. A loop
-with no indexing set and no `Break`, which ends only through a `Return`, still
-compiles. Use the loop as a statement, and end the block with the value it
-should have:
+compile, and `run()` uses the interpreter. Use the loop as a statement, and
+end the block with the value it should have:
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
@@ -1354,15 +1504,17 @@ console.log(sum.success, sum.run());
 // ➔ true 385
 ```
 
-On JavaScript, a loop that updates a block local with `xs = ReplaceAt(xs, i, v)`
-copies the list once, at the first update, and then writes it in place. A result
-type on the function that holds the loop (`-> list<real>`) does not change
-this. This is not possible when the list has another name or is used in a way that could see
-a write, for example `ys = xs` in the loop or a function literal that reads
-`xs`. Each pass of the loop then copies the whole list, and the result reports
-it in `warnings`, with the code `'copying-list-update'` and the name of the
-local in `binding`. The code does not change. An update that is not in a loop,
-which copies once, is not reported.
+On JavaScript, a block local that holds a list of reals, integers or booleans
+can be changed element by element, with `xs = ReplaceAt(xs, i, v)` or
+`xs[i] += v` (`AddTo(At(xs, i), v)`). The declaration copies the value, so an
+input is never changed, and each update then writes the element in place. A
+negative index counts from the end; an index that is 0, not an integer or out
+of range throws `out-of-range` when the code runs. The compilation declines when
+the list has another name or is used in a way that could see a write (`ys = xs`,
+a function literal that reads `xs`, `f(xs)`), when an update writes a value of
+another type (`0.5` into a list of integers), and when the local is a constant.
+The other reads of the list are `xs[i]`, `Length(xs)` and the result of the
+block. On `glsl` and `interval-js` such a local declines.
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
@@ -1374,17 +1526,37 @@ const loop = ['Loop', double, ['Element', 'i', ['Range', 1, ['Length', 'L']]]];
 
 const inPlace = compile(ce.box(['Block',
   ['Declare', 'xs', "'list<real>'", 'L'], loop, 'xs']));
-console.log(inPlace.run({ L: [1, 2, 3] }), inPlace.warnings);
-// ➔ [2, 4, 6] undefined
+console.log(inPlace.success, inPlace.run({ L: [1, 2, 3] }));
+// ➔ true [2, 4, 6]
 
-const copying = compile(ce.box(['Block',
+// `f` reads `xs`: the compilation declines, and the interpreter runs it
+const aliased = compile(ce.box(['Block',
   ['Declare', 'xs', "'list<real>'", 'L'],
   ['Declare', 'f', "'function'", ['Function', ['Sum', 'xs']]],
   loop, ['f']]));
-console.log(copying.run({ L: [1, 2, 3] }));
-// ➔ 12
-console.log(copying.warnings.map((w) => [w.code, w.binding]));
-// ➔ [["copying-list-update", "xs"]]
+console.log(aliased.success, aliased.run({ L: [1, 2, 3] }));
+// ➔ false 12
+```
+
+A block local that holds a list can also be replaced as a whole, `xs = value`,
+when every write of it has that form: a list of reals, integers or booleans,
+or a list of points. Its length can change at each write, in a loop or in the
+arms of an `If`, and the list can be read in any way (`ys = xs`, `f(xs)`). A
+written value of another type (a point of three numbers into a list of
+pairs), a local that is also changed element by element, and an empty list of
+no stated type decline. On `glsl` and `interval-js` such a local declines.
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+ce.declare('L', 'list<real>');
+const grow = compile(ce.box(['Block',
+  ['Declare', 'xs', "'unknown'", 'L'],
+  ['Loop', ['Assign', 'xs', ['ListJoin', 'xs', ['List', ['Multiply', 2, 'i']]]],
+    ['Element', 'i', ['Range', 1, 3]]],
+  'xs']));
+console.log(grow.success, grow.run({ L: [0.5] }));
+// ➔ true [0.5, 2, 4, 6]
 ```
 
 On GLSL, a `Loop` over a constant integer range compiles in a block, and a
@@ -1799,7 +1971,11 @@ reaches one:
   `hr(L[1])` compiled under `strict` gives the string `"[object Object]2"`;
   under `mode: 'complex'` it gives `{ re: 3, im: 1 }`, the value of
   `evaluate()`. To pass complex values, compile with `mode: 'complex'` or
-  declare the binding `complex`.
+  declare the binding `complex`. A call of a user function declared with an
+  `unknown` result, such as `F: (real) -> unknown` assigned
+  `w ↦ sin(w)·√(1 − e²)`, has the lane of its compiled body, also when the
+  engine reports the result type `complex`: with `e: real`, `F(t)` is real,
+  and `NaN` at `t = 0.7, e = 2`. A result declared `complex` is complex.
 - **`complex`** — a wide binding is complex, lifted at its use; an
   unknown-sign `Sqrt`/`Ln`/`Log`, and `x^{0.3}`-style powers (a non-integer
   exponent of an unknown-sign base), **promote**: they lower through the
@@ -1997,8 +2173,13 @@ results:
   JSON) is a created node, and an operator inside it no longer gets its
   handler.
 
-A handler that returns text, or that calls the `compile` callback, makes the
-compilation decline (`success: false`), and `run()` uses the interpreter.
+A handler that throws an error makes the compilation decline
+(`success: false`), and `run()` uses the interpreter, which calls the
+operator's `evaluate` handler; the diagnostic names the handler and the
+error's message. Throw to refuse a node whose arguments the handler cannot
+express as library operators. A `CancellationError` is not a decline: it
+stops the compilation. A handler that returns text, or that calls the
+`compile` callback, also makes the compilation decline.
 Before 0.194.0 a handler could return the code of the target as a string;
 write the same computation as an expression of library operators instead.
 The operator-definition fields `compileHelpers` and `compileShippable` were
@@ -2058,8 +2239,11 @@ compiles:
 - **Values**: real numbers, integers, booleans, complex numbers (a `vec2`),
   points and vectors of 2 to 4 real components, constant lists, and list
   inputs whose type gives a length (`list<number^1600>`). A list input is a
-  uniform array, or a texture with the `storage` option (below). Every free
-  symbol has one of these types, declared or inferred from its use.
+  uniform array, or a texture with the `storage` option (below). A list of
+  points of a stated length is an array of vectors: `[(x, y), (y, x)]` is
+  `vec2[2](vec2(x, y), vec2(y, x))`, and an input of type
+  `list<tuple<real, real>^3>` is a `vec2[3]` uniform. Every free symbol has
+  one of these types, declared or inferred from its use.
 - **Operations**: arithmetic, the elementary and special functions of the
   shader library, the parts of a complex number, comparisons and logic on
   numbers and booleans, `If` and `Which` when every branch has the same type.
@@ -2070,14 +2254,16 @@ compiles:
 - **List operators** of a list whose length is stated or a point: `First`,
   `Second`, `Third`, `Last`, `Count`, `IsEmpty`, `Rest`, `Most`, `Reverse`,
   `Take` and `Drop` (with a constant count), `RotateLeft`, `RotateRight`,
-  `Mean`, `Dot` and `Norm`.
+  `Mean`, `Dot`, `Norm`, `ArgMax`, `ArgMin`, `MaxBy` and `MinBy` (with or
+  without a key function), and `Cross` of two vectors of three components.
 - **Functions**: calls of user functions with no recursion.
 - **Work done when compiling**: constant folding and derivatives with a
   closed form.
 
-Random draws, matrices, `Integrate`, `Median`, `Sort`, `Ordering`, `Unique`,
-lists whose length is known only at run time, colors, compound
-assignments (`AddTo`), comprehensions, `parallel for`, symbolic operations,
+Random draws, matrices (other than a list of rows of 2 to 4 numbers, an
+array of vectors), `Integrate`, `Median`, `Sort`, `Ordering`, `Unique`,
+lists whose length is known only at run time, colors, a list
+local changed element by element, comprehensions, `parallel for`, symbolic operations,
 strings, dictionaries, function values and recursion do not compile to
 `glsl` in 0.194.0.
 
@@ -2494,18 +2680,26 @@ console.log(compileOrEvaluate("\\frac{\\sqrt{5}+1}{2}"));
 console.log(compileOrEvaluate("\\operatorname{Expand}((x+1)^2)"));
 ```
 
+**A limit compiles when it reads no input.** `Limit(t ↦ sin(t)/t, 0)` compiles
+to its value, `1`, computed when the expression is compiled. A limit at a point
+that is an input, or of a body that reads an input, declines: the interpreter
+computes a symbolic limit at each point first, which compiled code does not.
+`ND(f, x)` of a function literal compiles to JavaScript, with the numeric
+derivative that `.N()` computes.
+
 **Target coverage varies.** Not every function that compiles to JavaScript also
 compiles to GLSL or interval-js. The interval-js target covers the
 arithmetic, the elementary functions (roots, exponentials, logarithms,
 trigonometric and hyperbolic functions and their inverses), `Abs`, `Floor`,
-`Factorial`, `Gamma`, `Erf`, `Erfc`, `Sinc`, `FresnelS`, `FresnelC` and `Chop`
+`Factorial`, `Gamma`, `Erf`, `Erfc`, `Sinc`, `FresnelS`, `FresnelC`, `Chop`
 (with a constant tolerance: `Chop(x)` takes the engine's tolerance at compile
-time), and of the list operators `First`, `Second`, `Third`, `Last`, `Count`,
+time), `Argument` of a real and `EvaluateAt` of a function literal, and of the
+list operators `First`, `Second`, `Third`, `Last`, `Count`,
 `IsEmpty`, `Rest`, `Most`, `Reverse`, `Take`, `Drop`, `RotateLeft`,
-`RotateRight`, `Mean`, `Dot` and `Norm`. `Rest`, `Most`, `Take` and `Drop`
+`RotateRight`, `Mean`, `Dot`, `Norm` and `Cross`. `Rest`, `Most`, `Take` and `Drop`
 need an input of a stated length (`list<real^3>`) and a constant count;
 `Reverse`, the rotations and `Mean` also take a list of any length; `Median`,
-`Sort`, `Ordering` and `Unique` decline there. An input with no declared type is read as a real, so `\Gamma(x)`
+`Sort`, `Ordering`, `Unique`, `ArgMax`, `ArgMin`, `MaxBy` and `MinBy` decline there. An input with no declared type is read as a real, so `\Gamma(x)`
 compiles with `x` undeclared; an input declared `complex` declines. `Zeta`,
 `LambertW`, `BesselJ`, `Digamma` and complex values decline. On each target,
 `canCompile()` tells whether an expression compiles; see
