@@ -200,9 +200,10 @@ ce.parse('\\operatorname{Factor}(x^4+1, x, \\sqrt{2})').evaluate().latex;
 ```
 
 The field can be given by a root of a rational number (`\sqrt{2}`,
-`\sqrt[3]{2}`), by `i`, or by an `AlgebraicGenerator` for any other algebraic
-number. A request that the engine cannot answer stays unevaluated; it is never
-factored over the rationals instead.
+`\sqrt[3]{2}`), by `i`, or, for any other algebraic number, by an abstract root
+`PolynomialRoot(p, t)` of an irreducible polynomial `p`. A request that the
+engine cannot answer stays unevaluated; it is never factored over the
+rationals instead.
 
 ### Partial Fraction Decomposition
 

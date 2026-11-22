@@ -1124,11 +1124,20 @@ scalar or a list, such as the result of a call whose return type is
 
 The rows of a `list<list<integer>>` or a `list<list<real>>` can have
 different lengths. On the `javascript` target, an input or a parameter of
-one of these types is the host's array of arrays, and compiled code reads it
-in two ways only: the element `g[i][j]` (`At(At(g, i), j)`), which is `NaN`
-where an index is out of range, and an argument of a user function at a
-parameter of the same type, which takes it whole. Every other read, such as
-`Length(g)`, the row `g[1]` or a `Map` over `g`, declines:
+one of these types is the host's array of arrays. So is such a list read by a
+user function as a free input, a part of a tuple input
+(`tuple<integer, list<list<integer>>>`) and a typed parameter of `Apply`.
+Compiled code reads it in four ways: the element `g[i][j]`
+(`At(At(g, i), j)`), which is `NaN` where an index is out of range; row by
+row, by `Length(g)`, `Count(g)`, `IsEmpty(g)`, `IndexWhere`, `Fold` and
+`Reduce` over `g`, and a `Map` over `g` whose value for each row is a number;
+the row `g[i]` at an index known at run time (negative from the end), read
+by a reader of a list; and an argument of a user function at a parameter of
+the same type, which takes it whole. Out of range the interpreter's row is
+`Missing`: compiled, `Length(g[i])` and `First(g[i])` are `NaN`,
+`IsMissing(g[i])` is `True`, and a sum of the row is unspecified. Every other
+read declines: the row `g[i]` as the result, `AssertPresent(g[i])`, a `Map`
+or a `Filter` that gives a list of rows, `g` as a value:
 
 ```js
 ce.declare("g", "list<list<integer>>");
@@ -1138,7 +1147,19 @@ ce.declare("j", "integer");
 const f = compile(ce.box(["At", ["At", "g", "i"], "j"]));
 f.run({ g: [[1, 2, 3], [4]], i: 2, j: 1 });  // ➔ 4
 f.run({ g: [[1, 2, 3], [4]], i: 2, j: 3 });  // ➔ NaN
-compile(ce.box(["Length", "g"])).success;   // ➔ false
+
+const sums = compile(
+  ce.box(["Map", ["Function", ["Reduce", "r", "Add", 0], "r"], "g"])
+);
+sums.run({ g: [[1, 2, 3], [4]] });                     // ➔ [6, 4]
+
+const row = compile(ce.box(["Sum", ["At", "g", "i"]]));
+row.run({ g: [[1, 2, 3], [4]], i: -1 });               // ➔ 4
+
+const len = compile(ce.box(["Coalesce", ["Length", ["At", "g", "i"]], -1]));
+len.run({ g: [[1, 2, 3], [4]], i: 1 });                // ➔ 3
+len.run({ g: [[1, 2, 3], [4]], i: 3 });                // ➔ -1
+compile(ce.box(["At", "g", "i"])).success;             // ➔ false
 ```
 
 A user function whose result has such a type compiles when its body is a
@@ -1426,7 +1447,23 @@ evaluates them:
 - a call whose value is a function: with `mk = a ↦ (x ↦ x + a)`,
   `Apply(mk(1), u)`;
 - a call of a function stored in a local of a block that is assigned more than
-  once, assigned inside a nested statement, or assigned the result of a call.
+  once, assigned inside a nested statement, or assigned the result of a call;
+- a function literal applied to itself, `Apply(f, f, L)` with
+  `f = (self, t) ↦ …self(self, Rest(t))…`: the argument `self` is a function
+  passed as an argument.
+
+A recursive function compiles when it is defined by name with a declared
+signature; on JavaScript it is a recursive JavaScript function:
+
+```js
+ce.declare("T", "list<integer>");
+ce.declare("s", "(list<integer>) -> integer");
+ce.assign("s", ce.box(["Function",
+  ["If", ["Equal", ["Length", "t"], 0], 0,
+    ["Add", ["First", "t"], ["s", ["Rest", "t"]]]],
+  "t"]));
+compile(ce.box(["s", "T"])).run({ T: [1, 2, 3] });  // ➔ 6
+```
 
 ```js
 ce.assign("f", ce.box(["Function", ["Add", "x", "y"], "x", "y"]));
@@ -1510,6 +1547,28 @@ console.log(x, y);
 
 This is particularly useful for parametric curves. Both `Tuple` and `List`
 expressions compile to arrays.
+
+On JavaScript, an input can be a tuple whose parts are strings and numbers,
+such as `tuple<string, integer>`. The host passes an array, and the compiled
+code reads each part at a constant index:
+
+```javascript
+ce.declare('T', 'tuple<string, integer>');
+const f = compile(
+  ce.box([
+    'If',
+    ['Equal', ['At', 'T', 1], "'A'"],
+    ['Multiply', 2, ['At', 'T', 2]],
+    ['Add', ['At', 'T', 2], 1],
+  ])
+);
+f.run({ T: ['A', 3] }); // ➔ 6
+f.run({ T: ['B', 3] }); // ➔ 4
+```
+
+Any other read of such a tuple (`T` as a whole, `Length(T)`, `T[n]` at an index
+known only at run time, an argument of a function) declines, and so does the
+input on GLSL, in the interval mode and in the `bigint` mode.
 
 ### Dictionary Expressions
 

@@ -174,11 +174,14 @@ In LaTeX: `\operatorname{Factor}(x^2-2, x, \sqrt{2})`.
 
 ## AlgebraicGenerator
 
-`algebraicGenerator(coefficients)` is a root `α` of the polynomial
-`c0 + c1 t + … + cn t^n`, where `coefficients` is the list `[c0, c1, …, cn]`
-in **ascending** order of degree. Use it as the third argument of `factor`
-to factor over a field that a single radical does not describe, such as the
-rationals extended by `sqrt(2) + sqrt(3)`, a root of `t^4 - 10t^2 + 1`.
+`algebraicGenerator(coefficients)` is deprecated: it is
+`polynomialRoot(c0 + c1 t + … + cn t^n, t)`, the abstract root of the
+polynomial whose coefficients `coefficients` lists in **ascending** order of
+degree, and it is replaced by that root at once (see
+[`polynomialRoot`](/reference/number-theory/#polynomialroot)). Use the root
+as the third argument of `factor` to factor over a field that a single
+radical does not describe, such as the rationals extended by
+`sqrt(2) + sqrt(3)`, a root of `t^4 - 10t^2 + 1`.
 
 The coefficients must be exact rational numbers, and the polynomial must be
 irreducible over the rationals, of degree 1 to 128. Otherwise the result is
@@ -187,18 +190,20 @@ an `invalid-algebraic-generator` error.
 ```epsil
 algebraicGenerator([-1, 0, 1])
 // ➔ error: Runtime error: invalid algebraic generator
+algebraicGenerator([-2, 0, 1])
+// ➔ PolynomialRoot(t^2 - 2, t)
 factor(x^2 - 2, x, algebraicGenerator([-2, 0, 1]))
-// ➔ (x - AlgebraicGenerator([-2,0,1])) * (x + AlgebraicGenerator([-2,0,1]))
+// ➔ (x - PolynomialRoot(t^2 - 2, t)) * (x + PolynomialRoot(t^2 - 2, t))
 ```
 
-The generator does not select **which** root of the polynomial it is:
+The abstract root does not select **which** root of the polynomial it is:
 `t^2 - 2` has two roots, `sqrt(2)` and `-sqrt(2)`, and
-`algebraicGenerator([-2, 0, 1])` is one of them. Every root gives the same
+`polynomialRoot(t^2 - 2, t)` is one of them. Every root gives the same
 field, so the factors that `factor` finds have the same degrees and
-multiplicities for each choice. For the same reason, an algebraic generator
-has no numeric value: `N` leaves it unchanged, and it cannot be compiled. To
-work with a specific value, such as the positive square root of 2, use
-`sqrt(2)`.
+multiplicities for each choice. For the same reason, an abstract root has no
+numeric value: `N` leaves it unchanged, and it cannot be compiled. To work
+with a specific value, such as the positive square root of 2, use `sqrt(2)`
+or the numbered root `polynomialRoot(t^2 - 2, t, 2)`.
 
 A power `α^k`, with `n ≤ k ≤ 128` where `n` is the degree of the polynomial,
 is reduced modulo the polynomial, as `sqrt(2)^2` is `2`. This holds for every
@@ -208,21 +213,22 @@ root, so it does not choose one. A negative power is not reduced.
 algebraicGenerator([-2, 0, 1])^2
 // ➔ 2
 algebraicGenerator([-1, -1, 0, 1])^3
-// ➔ 1 + AlgebraicGenerator([-1,-1,0,1])
+// ➔ PolynomialRoot(t^3 - t - 1, t) + 1
 N(algebraicGenerator([-2, 0, 1]))
-// ➔ AlgebraicGenerator([-2,0,1])
+// ➔ PolynomialRoot(t^2 - 2, t)
 ```
 
 ### MathJSON
 
-`["AlgebraicGenerator", ["List", c0, c1, ...]]`.
+`["AlgebraicGenerator", ["List", c0, c1, ...]]`, which canonicalizes to
+`["PolynomialRoot", p, "t"]`.
 
 ```json example
 ["Factor",
   ["Add", ["Power", "x", 4], ["Multiply", -10, ["Power", "x", 2]], 1],
   "x",
   ["AlgebraicGenerator", ["List", 1, 0, -10, 0, 1]]]
-// ➔ four linear factors in α = AlgebraicGenerator([1, 0, -10, 0, 1])
+// ➔ four linear factors in α = PolynomialRoot(t^4 - 10t^2 + 1, t)
 ["Power", ["AlgebraicGenerator", ["List", -2, 0, 1]], 2]
 // ➔ 2
 ```

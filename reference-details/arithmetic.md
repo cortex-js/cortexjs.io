@@ -193,7 +193,10 @@ sum((-1)^n, (n, 1, oo))
 
 `["Sum", xs]`, `["Sum", body, ...bounds]`, where a bound is
 `["Limits", index, lower, upper]` (or a `Tuple`) or
-`["Element", index, collection]`.
+`["Element", index, collection]`. A `Limits` bound can have a step as its
+fourth operand, as the Wolfram iterator `{i, imin, imax, di}` does:
+`["Limits", index, lower, upper, step]` is the bound
+`["Element", index, ["Range", lower, upper, step]]`.
 
 ```json example
 ["Sum", ["List", 5, 7, 11]]
@@ -204,6 +207,8 @@ sum((-1)^n, (n, 1, oo))
 // ➔ 65
 ["Sum", "k", "k", 1, 10]
 // ➔ 55
+["Sum", "k", ["Limits", "k", 1, 10, 3]]
+// ➔ 22
 ["Sum", ["Power", "n", 2], ["Element", "n", ["Set", 1, 2, 3]]]
 // ➔ 14
 ```
