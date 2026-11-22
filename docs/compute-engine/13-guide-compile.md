@@ -903,7 +903,9 @@ declines, and compiles after `ce.declare('N', 'real')`.
   stored function, a user function that the code calls).
   `Block(p ≔ 0; Filter(L, u ↦ Block(p ≔ 5, u > 1)); p)` declines. The root of
   the compilation, and a function that `Apply` applies where it is written to
-  scalar arguments, still compile.
+  scalar arguments, still compile. A function literal at the root that assigns
+  a variable of the engine compiles to JavaScript (see
+  [Variables That a Function Assigns](#variables-that-a-function-assigns)).
 - A list whose element type is a union of shapes. With
   `CS: list<real | tuple<real, real>>` and `f := t ↦ 2t`, `Map(f, CS)`
   declines, and `unsupported` holds `CS`. With the fallback, the interpreter
@@ -915,8 +917,11 @@ declines, and compiles after `ce.declare('N', 'real')`.
   two points, whose square is the square of each coordinate. With
   `p: list`, `p^2` declines, and `unsupported` holds `p`. With the fallback,
   the interpreter gives `[[7, -6], [-9, 22]]` for `p = [[1, 2], [3, -4]]`.
-  Declare `p` as `list<list<real>>` (a matrix) or `list<tuple<real, real>>`
-  (points) to compile it. `p^{0.5}` and `3p` compile.
+  Declare `p` as `list<tuple<real, real>>` (points) to compile it: `p^2` then
+  gives `[[1, 4], [9, 16]]`. An input declared `list<list<real>>` (a matrix)
+  declines too, because compiled code reads it only by its elements (see
+  [Lists of Lists](#lists-of-lists)), and the interpreter gives the matrix
+  power. `p^{0.5}` and `3p` compile.
 - A node whose code a `compile` handler of its definition writes, when the
   static type of the node admits values of different shapes and code that no
   handler wrote reads its value. With `x: real` and `HostPair` declared with
@@ -1114,6 +1119,45 @@ scalar or a list, such as the result of a call whose return type is
   operand, and complex-element broadcasts.
 - **GLSL**: such operands compile as scalar slots, unchanged — the shader
   target has no dynamic lists.
+
+### Lists of Lists
+
+The rows of a `list<list<integer>>` or a `list<list<real>>` can have
+different lengths. On the `javascript` target, an input or a parameter of
+one of these types is the host's array of arrays, and compiled code reads it
+in two ways only: the element `g[i][j]` (`At(At(g, i), j)`), which is `NaN`
+where an index is out of range, and an argument of a user function at a
+parameter of the same type, which takes it whole. Every other read, such as
+`Length(g)`, the row `g[1]` or a `Map` over `g`, declines:
+
+```js
+ce.declare("g", "list<list<integer>>");
+ce.declare("i", "integer");
+ce.declare("j", "integer");
+
+const f = compile(ce.box(["At", ["At", "g", "i"], "j"]));
+f.run({ g: [[1, 2, 3], [4]], i: 2, j: 1 });  // ➔ 4
+f.run({ g: [[1, 2, 3], [4]], i: 2, j: 3 });  // ➔ NaN
+compile(ce.box(["Length", "g"])).success;   // ➔ false
+```
+
+A user function whose result has such a type compiles when its body is a
+list of lists whose lengths the body settles, such as a `Map` of a `Map`
+over a `Range` of constant bounds. One step of the Game of Life compiles
+this way, and `run()` returns an array of arrays:
+
+```js
+ce.declare("step", { signature: "(list<list<integer>>) -> list<list<integer>>" });
+ce.assign("step", ce.box(["Function",
+  ["Map", ["Function",
+    ["Map", ["Function", ["Add", ["At", ["At", "G", "a"], "b"], 1], "b"],
+      ["Range", 1, 2]], "a"], ["Range", 1, 2]],
+  ["Typed", "G", "'list<list<integer>>'"]]));
+
+const s = compile(ce.box(["Function", ["step", "H"],
+  ["Typed", "H", "'list<list<integer>>'"]]));
+s.run([[1, 2], [3, 4]]);  // ➔ [[2, 3], [4, 5]]
+```
 
 ### Out-of-Domain Operands to String Operators
 
@@ -1394,6 +1438,63 @@ r.run({ u: 2 });   // ➔ 3, from the interpreter
 The interpreter keeps first-class functions: function literals, closures,
 currying, partial application and function values.
 
+### Variables That a Function Assigns
+
+A function literal that you compile to JavaScript can assign a variable of
+the engine that it closes over, such as the state of an animation. The
+variable must have a declared type of real, integer or boolean values:
+
+```js
+ce.declare("s", "real");
+ce.assign("s", 0.5);
+const advance = compile(ce.box(["Function",
+  ["Assign", "s", ["Add", "s", ["Divide", "t", 1000]]],
+  ["Typed", "t", "'real'"]]));
+
+advance.assigns;    // ➔ ["s"]
+advance.run(16);    // ➔ NaN: the body ends in an assignment
+ce.box("s").evaluate().re;  // ➔ 0.516
+```
+
+Each call of `run()` reads the value of each variable of `assigns` in the
+engine, runs the code, and writes the new values back, as an evaluation of
+the call does: after three calls of `advance.run(16)`, `s` is `0.548`. The
+`code` reads no engine: it takes the value of each variable after the
+arguments, and returns the value of the function followed by the new value
+of each variable (`[NaN, 0.516]` for the call above). Such a result is not
+`shippable`. These decline, and fall back to the interpreter: another
+target, a variable whose type is only inferred from its value, a constant, a
+list, a string or a complex variable, a variable with no value, a user
+function called by the body that reads or assigns the variable, a callback
+in the body (of a `Map`, for example) that assigns it, and an expression that
+is not a function literal, such as `Block(Assign(s, s + 1))`.
+
+### Functions of the Host
+
+Compiled JavaScript calls a function that the host declared with an
+`evaluate` function. Each call in the code evaluates the call in the engine,
+at each evaluation and in the order of the program:
+
+```js
+const log = [];
+ce.declare("hostDraw", {
+  signature: "(real) -> nothing",
+  evaluate: (ops) => { log.push(ops[0].re); return ce.symbol("Nothing"); },
+});
+const tick = compile(ce.box(["Function",
+  ["hostDraw", ["Divide", "t", 1000]], ["Typed", "t", "'real'"]]));
+
+tick.hostCalls;  // ➔ ["hostDraw"]
+tick.run(16);    // ➔ NaN: the value Nothing
+log;             // ➔ [0.016]
+```
+
+The arguments must be real numbers, integers, booleans or strings (at most
+four), and the result type `real`, `integer`, `boolean` or `nothing`: with
+the signature `(real) -> any`, the call declines. The code calls the engine,
+so the result is not `shippable` and cannot be loaded without the engine. A
+call in a function that assigns a variable of the engine declines.
+
 ### Tuple Expressions
 
 A tuple expression like `(\cos(t), \sin(t))` compiles to a function that returns
@@ -1468,7 +1569,30 @@ that no clause selects is `NaN` for a number and `[NaN, NaN]` for a point,
 never `undefined`, and a string arm is refused (the compilation falls back
 to the interpreter). An `If` with no else-branch is
 the one-clause `Which`: `If(c, t)` compiles on every target and returns
-`NaN` when `c` is false (`[NaN, NaN]` for a point). An `If` whose branch is a statement — an
+`NaN` when `c` is false (`[NaN, NaN]` for a point).
+
+When the branch is a list, such as a restriction of a list of curves, the
+`If` compiles on `javascript` and `interval-js` (and on GLSL for a list of
+stated length) where `At`, `First` or `Last` reads an element, where `Max`,
+`Min` or `Sum` reduces the list, or where arithmetic changes it before one of
+these reads it. The element is `NaN` where `c` is false. This holds also when
+a user function returns the `If`, and when a name holds it as its value (the
+name alone then gives a list of `NaN`). `Length`, `Rest`, `IsMissing`,
+`Coalesce` and the other readers of the list decline: the interpreter gives
+`Missing` there, and a compiled list is never absent.
+
+```js
+ce.declare("x", "real");
+ce.assign("C", ce.box(["Function",
+  ["If", ["LessEqual", 0, "w", 6], ["Add", "w", ["List", 0, 4, 2]]], "w"]));
+
+const f = compile(ce.box(["At", ["C", "x"], 1]));
+f.run({ x: 1.5 });  // ➔ 1.5
+f.run({ x: 7 });    // ➔ NaN
+compile(ce.box(["Length", ["C", "x"]])).success;  // ➔ false
+```
+
+An `If` whose branch is a statement — an
 assignment, a loop — is a guard statement, not a value, and keeps its own
 rules (see the statement sections below).
 

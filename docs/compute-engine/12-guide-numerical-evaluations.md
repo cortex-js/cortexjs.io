@@ -147,7 +147,9 @@ The angular unit applies to the trigonometric functions (`Sin`…`Csc`,
 `Haversine`), whose argument is an angle, and to the inverse trigonometric
 functions (`Arcsin`…`Arccsc`, `Arctan2`, `InverseHaversine`), whose result is
 an angle — in degree mode `\arcsin(1)` evaluates to the exact value `90`.
-Hyperbolic functions and their inverses are **not** affected: their argument
+The numeric value of an `Arctan2` with exact operands is the exact angle in the
+unit, rounded once: in degree mode, `\arg(i)` and `\operatorname{Arctan2}(1, 0)`
+give `90` under `N()`. Hyperbolic functions and their inverses are **not** affected: their argument
 is a dimensionless number, not an angle.
 
 Compiled functions honor the angular unit as well: with

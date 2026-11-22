@@ -1217,6 +1217,29 @@ ce.box(["Assign", "g", ce.box(["Function",
 // ➔ Error(ErrorCode("incompatible-type", "pure effects", "scope effects"))
 ```
 
+The contract also covers the functions that the body calls. A new body for one
+of them is refused when it would break the declared effects of a function that
+calls it, and the function keeps its previous body:
+
+```js
+ce.declare("h", { type: "(number) -> number" });
+ce.declare("g", { type: "(number) pure -> number" });
+ce.assign("h", ce.box(["Function", ["Multiply", 2, "n"], "n"]));
+ce.assign("g", ce.box(["Function", ["h", "n"], "n"]));
+
+// Refused: `g` calls `h`, and the new body of `h` draws from the random stream.
+ce.assign("h", ce.box(["Function", ["Add", ["Random"], "n"], "n"]));
+// ➔ throws: Operator Definition "g": the body infers the effects `random`,
+//   which the declared effects `pure` do not cover
+ce.box(["g", 2]).evaluate().print();
+// ➔ 4
+
+// Accepted: the new body keeps `g` pure.
+ce.assign("h", ce.box(["Function", ["Add", "n", 1], "n"]));
+ce.box(["g", 2]).evaluate().print();
+// ➔ 3
+```
+
 This mirrors how the rest of the type system treats inference: an inferred type
 is flexible and revisable, a declared one is enforced.
 

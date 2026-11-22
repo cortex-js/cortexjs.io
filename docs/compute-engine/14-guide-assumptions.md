@@ -32,6 +32,21 @@ ce.parse("\\sqrt{x^2}").simplify().print();
 Assumptions can be used for other operations as well, such as solving equations or
 integrating.
 
+For example, a real solution of \\(x^2 = a\\) is a square root of \\(a\\) only
+when \\(a \\ge 0\\). Without an assumption about \\(a\\), each solution carries
+that condition; with the assumption \\(a > 0\\), the condition is gone, and
+with \\(a < 0\\) there is no real solution (`[]`).
+
+```js
+const solve = ce.parse("\\operatorname{Solve}(x^2 = a, x \\in \\R)");
+solve.evaluate().print();
+// ➔ [If(0 <= a, sqrt(a)),If(0 <= a, -sqrt(a))]
+
+ce.assume(ce.parse("a > 0"));
+solve.evaluate().print();
+// ➔ [sqrt(a),-sqrt(a)]
+```
+
 
 ## Defining New Assumptions
 
@@ -43,7 +58,17 @@ For example, to indicate \\(\beta \neq 0\\):
 ce.assume(ce.parse("\\beta \\neq 0"));
 ```
 
-Each call to `ce.assume()` replaces the previous assumptions about the symbol.
+Each call to `ce.assume()` adds to the assumptions about the symbol. An
+assumption that contradicts them is refused: `ce.assume()` returns
+`"contradiction"` and changes nothing. To replace the assumptions about a
+symbol, call `ce.forget()` first.
+
+```js
+ce.assume(ce.parse("a > 0"));   // ➔ "ok"
+ce.assume(ce.parse("a < 0"));   // ➔ "contradiction"
+ce.forget("a");
+ce.assume(ce.parse("a < 0"));   // ➔ "ok"
+```
 
 ### Return Values
 
