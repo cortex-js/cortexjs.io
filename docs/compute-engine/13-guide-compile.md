@@ -2007,7 +2007,10 @@ the elliptic integrals), so under `mode: 'complex'` compiled `LambertW(x)` at
 `x = −1` is `{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled
 `LerchPhi(3, 2, 1)` is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The
 GLSL target has no complex lane for these heads and decline a
-provably complex value. `Arcsec` and `Arccsc` of a real operand of unknown
+provably complex value. `Zeta` of a complex operand, such as
+`|ζ(1/2 + it)|` with `t` declared `real`, compiles on JavaScript under
+`strict` and `complex`, with the interpreter's kernel; the GLSL target
+declines it. `Arcsec` and `Arccsc` of a real operand of unknown
 magnitude are typed `complex | infinity | nan`, so with `x` declared `real`
 the compiled `Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }` under
 `mode: 'complex'`.

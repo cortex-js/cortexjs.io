@@ -2705,7 +2705,10 @@ Inference writes happen at these moments:
    list literal, a range, a set, a comprehension, a `filter` result) at a
    parameter's position, that parameter takes a whole collection. With
    `f(n, s) = s if n == 0 else f(n - 1, [1, 2])`, `f(1, [0])` is `[1, 2]`
-   and the inferred signature is `(unknown, list<any>) -> unknown`. A
+   and the inferred signature is `(unknown, list<any>) -> unknown`. The
+   parameter with no type still maps a list, one call per element, with the
+   whole collection passed to each call: `f([0, 1], [9])` is
+   `[[9], [1, 2]]`. A
    self-call that forwards a parameter unchanged, or passes a scalar, is no
    evidence, so `f(x) = x * 2` still broadcasts: `f([1, 2, 3])` is
    `[2, 4, 6]`. A type inferred as

@@ -878,7 +878,7 @@ The `context` has three fields:
   or `engine.tolerance` when the call has none. For every other comparison
   (the relational operators, `isEqual()`, `isLess()`, `Max`, `Min`, `Sort`,
   …) it is `undefined`, and the hook applies its own rule: usually, two
-  exact values are compared exactly and a float within `engine.tolerance`.
+  values are compared exactly, as the engine compares two numbers.
 
 **Folds.** `add` and `multiply` answer a list of **folds**. A fold
 (`KindFold`) names the operands it combined, by their index in
@@ -1620,7 +1620,7 @@ enclosure, before the code runs: a record `{ lo, hi }` with `lo <= hi`, no
 `NaN` and not the same infinity twice, or a finite number (a point).
 `broadcast()` and `broadcastAsync()` check every cell before the loop. A
 compiled comparison answers `'true'`, `'false'` or `'maybe'`; it compares
-doubles exactly (without the engine tolerance), and it has no information
+doubles exactly (not the values at the working precision), and it has no information
 about identical operands (`c <= c` is `'maybe'` for an interval that is not
 a point, where the interpreter answers `True`). An operator that the
 interpreter leaves unevaluated declines, and with `fallback: true` the

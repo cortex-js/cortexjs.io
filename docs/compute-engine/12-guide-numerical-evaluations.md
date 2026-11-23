@@ -520,37 +520,35 @@ In some cases, it may be advantageous to invoke `expr.simplify()` before using
 
 ## Tolerance
 
-Two numbers that are sufficiently close to each other are considered equal.
-
-**To control how close two numbers have to be before they are considered
-equal**, set the `tolerance` property of a `ComputeEngine` instance.
+The `tolerance` property of a `ComputeEngine` instance says how small a number
+must be to count as 0 for `Chop`, for `expr.is()`, for `ApproxEqual` and for
+the numeric algorithms (`Solve` accepts a computed root whose residual is
+within the tolerance).
 
 By default, the tolerance is $ 10^{-10} $.
 
-The tolerance is accounted for by the `Chop` function to determine when to
-replace a number of a small magnitude with 0 (the float `0.0` for a float
-operand: `Chop(1e-12)` is `0.0`). A second
-operand gives another tolerance for one call: `Chop(x, 0.01)`.
+The `Chop` function replaces a number of a small magnitude with 0 (the float
+`0.0` for a float operand: `Chop(1e-12)` is `0.0`). A second operand gives
+another tolerance for one call: `Chop(x, 0.01)`.
 
-It is also used when doing some comparison to zero: a number whose absolute
-value is smaller than the tolerance will be considered equal to 0.
-
-Two numbers whose difference is smaller than the tolerance are considered
-equal. This applies only when a floating point number is involved: two exact
-numbers (integers, rationals, or rational multiples of a square root) are
-compared exactly, so $\frac{1}{3}$ and $\frac{3333333333333}{10^{13}}$ are not
-equal, while $\frac{1}{10}$ and $0.1$ are.
+**The comparisons do not use the tolerance.** `=`, `\ne`, `<`, `\le`, `>`,
+`\ge` and the methods `isEqual()`, `isLess()` and the others compare two
+numbers exactly: a floating point number as it is, and an exact number at the
+working precision. So $10^{-12} > 0$ is `True`, $\frac{1}{10} = 0.1$ is
+`True`, and $\frac{1}{3}$ and $\frac{3333333333333}{10^{13}}$ are not equal.
+To compare two computed values within a tolerance, use `ApproxEqual(a, b)`,
+`Chop(a - b) = 0`, or `a.is(b)`.
 
 The tolerance is an absolute value, and it does not change with the precision:
-at 40 digits, two values that differ by $10^{-12}$ still compare as equal. A
-tolerance you set is kept when the precision changes.
+at 40 digits, `Chop` still removes a value of $10^{-12}$. A tolerance you set
+is kept when the precision changes.
 
 **To make the tolerance follow the precision**, set it to `"auto"`. The
 tolerance is then $10^{-(\text{precision} - 2)}$, two digits short of the
 working precision, and it is recomputed at each precision change: $10^{-19}$ at
 the default 21 digits, $10^{-38}$ at 40 digits. This mode is meant for
-big-decimal work: a value computed in machine floats (about 16 digits) then
-compares as different from its exact value.
+big-decimal work: `Chop` and `is()` then keep a value that is small only next
+to the default tolerance.
 
 ```js
 const ce = new ComputeEngine({ precision: 40, tolerance: "auto" });
