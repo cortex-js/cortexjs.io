@@ -213,7 +213,7 @@ without prescribing a computation, so they evaluate to themselves.
 
 ### Notation Changes
 
-Two parsing rules changed recently and may affect existing input:
+These parsing rules changed recently and may affect existing input:
 
 - **`\parallel`** is now the geometric relation `Parallel` (as shown above),
   consistent with `\perp` → `Perpendicular`. For logical disjunction, use `\lor`
@@ -222,6 +222,15 @@ Two parsing rules changed recently and may affect existing input:
   `f: \mathbb{R} \rightarrow \mathbb{R}` reads as a function signature. For
   logical implication, use `\Rightarrow`, `\implies` or `\Longrightarrow`, which
   parse to `Implies` (unchanged).
+- **`\text{...}`** that names a unit is a unit only after a number or as an
+  operand of a product, a quotient, a power or a root (`5\,\text{A}`,
+  `\text{V}/\sqrt{\text{Hz}}`). Elsewhere it is a string, so
+  `\{\text{A}, \text{B}, \text{C}\}` is a set of strings. Write `\mathrm{...}`
+  for a unit by itself.
+- **`\psi^{(m)}(z)`** is the polygamma function `PolyGamma`, and **`\Phi`**
+  with three arguments, `\Phi(z, s, a)`, is the Lerch transcendent `LerchPhi`.
+  `\psi(z)` and `\Phi(x)` are still applications of the functions `psi` and
+  `Phi`, and a declaration of `psi` or `Phi` keeps its own reading.
 
 ```javascript
 ce.parse("x \\rightarrow y").json;
@@ -229,6 +238,15 @@ ce.parse("x \\rightarrow y").json;
 
 ce.parse("P \\implies Q").json;
 // ➔ ["Implies", "P", "Q"]
+
+ce.parse("\\{\\text{A}, \\text{B}, \\text{C}\\}").json;
+// ➔ ["Set", "'C'", "'B'", "'A'"]
+
+ce.parse("\\psi^{(1)}(1)").json;
+// ➔ ["PolyGamma", 1, 1]
+
+ce.parse("\\Phi(z, s, a)").json;
+// ➔ ["LerchPhi", "z", "s", "a"]
 ```
 
 ### Based Numerals

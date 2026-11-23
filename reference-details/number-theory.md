@@ -1522,3 +1522,198 @@ dirichletL(1009, 2, 2)
 ["N", ["DirichletL", 3, 2, 1.5]]
 // ➔ 0.703968244868733261668
 ```
+
+## Section: Algebraic numbers
+
+`minimalPolynomial`, `isAlgebraicInteger`, `algebraicNumberNorm`,
+`algebraicNumberTrace` and the three `numberField…` functions read their
+argument as a polynomial in one generator, with rational coefficients. The
+generator is a radical of a rational (`sqrt(2)`, `root(2, 3)`, `2^(1/5)`),
+`i`, the golden ratio or a `polynomialRoot`; sums, products, integer powers
+and quotients of it are read. A radical is taken as the engine takes it
+everywhere: `root(-2, 3)` is the real cube root and `root(-2, 6)` the
+principal sixth root. Several numbered roots of one irreducible polynomial
+are read in its splitting field.
+
+Anything else stays unevaluated, with its argument as written: two radicals
+of different bases (`sqrt(2) + sqrt(3)`), a transcendental number, a float,
+a field of degree above 12, or a polynomial whose irreducibility the
+factorization does not prove.
+
+```epsil
+minimalPolynomial(sqrt(2) + sqrt(3), x)
+// ➔ MinimalPolynomial(sqrt(2) + sqrt(3), x)
+minimalPolynomial(pi, x)
+// ➔ MinimalPolynomial(pi, x)
+```
+
+The field functions answer for the field ℚ(a) that the argument `a`
+generates, which can be a proper subfield of the field of its generator.
+Under `N`, the argument is still read exactly, and only the answer is
+approximated.
+
+## PolynomialRoot
+
+`polynomialRoot(p, x, k)` is the `k`-th root of the polynomial `p` in the
+variable `x`, Mathematica's `Root[Function[x, p], k]`. The variable is
+bound: a value of `x` does not change the root. The real roots come first, in
+increasing order, then the complex roots by increasing real part, each
+conjugate pair together with the lower one first, as in Mathematica. Pairs
+that share a real part come by increasing size of the imaginary part: the roots
+of `(x^2 - 2x + 2)(x^2 - 2x + 5)` are `1 - i`, `1 + i`, `1 - 2i`, `1 + 2i`.
+
+The root of a polynomial of degree 1 or 2 is a rational or a radical. A root
+of a polynomial of higher degree keeps its name, and `N` gives its value. A
+root is numbered only when disks around the roots prove that they are
+separated and in that order; otherwise, and for an index out of range, the
+call stays unevaluated.
+
+```epsil
+polynomialRoot(x^2 + x + 1, x, 1)
+// ➔ 1/2 * (-1 - sqrt(3) * i)
+polynomialRoot(x^3 - 2, x, 1)
+// ➔ PolynomialRoot(x^3 - 2, x, 1)
+N(polynomialRoot(x^3 - 2, x, 2))
+// ➔ (-0.629960524947436582384 - 1.09112363597172140356i)
+polynomialRoot(x^3 - 2, x, 4)
+// ➔ PolynomialRoot(x^3 - 2, x, 4)
+```
+
+Without an index, `polynomialRoot(p, t)` is an abstract root of the
+irreducible polynomial `p`: no complex embedding is chosen, so it has no
+numeric value, and the other roots of `p` cannot be told apart from it. It is
+the generator that `factor` takes as its third argument (see
+[`factor`](/reference/polynomials/#factor)). A power at or above the degree
+of `p` is reduced modulo `p`. A reducible `p` is an error.
+
+```epsil
+polynomialRoot(t^3 - t - 1, t)^3
+// ➔ PolynomialRoot(t^3 - t - 1, t) + 1
+N(polynomialRoot(t^2 - 2, t))
+// ➔ PolynomialRoot(t^2 - 2, t)
+polynomialRoot(t^2 - 1, t)
+// ➔ error: Runtime error: invalid algebraic generator
+```
+
+### MathJSON
+
+`["PolynomialRoot", p, x, k]` and `["PolynomialRoot", p, x]`.
+
+```json example
+["PolynomialRoot", ["Add", ["Power", "x", 2], -2], "x", 2]
+// ➔ ["Sqrt", 2]
+```
+
+## MinimalPolynomial
+
+`minimalPolynomial(a, x)` is the minimal polynomial of the algebraic number
+`a` over ℚ, in the variable `x`: irreducible, with integer coefficients
+whose greatest common divisor is 1, and a positive leading coefficient.
+
+```epsil
+minimalPolynomial(1 + root(2, 3), x)
+// ➔ x^3 - 3x^2 + 3x - 3
+minimalPolynomial(1 / (1 + sqrt(2)), x)
+// ➔ x^2 + 2x - 1
+minimalPolynomial(polynomialRoot(x^3 - 2, x, 1) + polynomialRoot(x^3 - 2, x, 2), x)
+// ➔ x^3 + 2
+```
+
+### MathJSON
+
+`["MinimalPolynomial", a, x]`.
+
+## IsAlgebraicInteger
+
+`True` when `a` is a root of a monic polynomial with integer coefficients.
+
+```epsil
+isAlgebraicInteger((1 + sqrt(5)) / 2)
+// ➔ true
+isAlgebraicInteger((1 + sqrt(-5)) / 2)
+// ➔ false
+```
+
+### MathJSON
+
+`["IsAlgebraicInteger", a]`.
+
+## AlgebraicNumberNorm
+
+The norm of `a` from ℚ(a) to ℚ: the product of the conjugates of `a`.
+
+```epsil
+algebraicNumberNorm(1 + sqrt(2))
+// ➔ -1
+algebraicNumberNorm(1/2 + root(2, 3))
+// ➔ 17/8
+N(algebraicNumberNorm(1/2 + root(2, 3)))
+// ➔ 2.125
+```
+
+### MathJSON
+
+`["AlgebraicNumberNorm", a]`.
+
+## AlgebraicNumberTrace
+
+The trace of `a` from ℚ(a) to ℚ: the sum of the conjugates of `a`.
+
+```epsil
+algebraicNumberTrace(1 + sqrt(2))
+// ➔ 2
+```
+
+### MathJSON
+
+`["AlgebraicNumberTrace", a]`.
+
+## NumberFieldDiscriminant
+
+The discriminant of the ring of integers of ℚ(a). A rational generates ℚ,
+whose discriminant is 1.
+
+```epsil
+numberFieldDiscriminant(root(19, 3))
+// ➔ -1083
+numberFieldDiscriminant(polynomialRoot(x^4 + x^3 + x^2 + x + 1, x, 1))
+// ➔ 125
+numberFieldDiscriminant(polynomialRoot(x^4 - 2, x, 1)^2)
+// ➔ 8
+```
+
+### MathJSON
+
+`["NumberFieldDiscriminant", a]`.
+
+## NumberFieldIntegralBasis
+
+A basis of the ring of integers of ℚ(a) over ℤ, in Mathematica's form, and
+written in the generator that `a` is read in.
+
+```epsil
+numberFieldIntegralBasis(sqrt(5))
+// ➔ [1,1/2 + sqrt(5)/2]
+numberFieldIntegralBasis(root(19, 3))
+// ➔ [1,root(19, 3),1/3 + 1/3 * root(19, 3) + 1/3 * 19^(2/3)]
+```
+
+### MathJSON
+
+`["NumberFieldIntegralBasis", a]`.
+
+## NumberFieldSignature
+
+The signature `[r1, r2]` of ℚ(a): the number of its real embeddings and of
+its pairs of complex embeddings.
+
+```epsil
+numberFieldSignature(root(2, 3))
+// ➔ [1,1]
+numberFieldSignature(polynomialRoot(x^4 + x^3 + x^2 + x + 1, x, 1))
+// ➔ [0,2]
+```
+
+### MathJSON
+
+`["NumberFieldSignature", a]`.

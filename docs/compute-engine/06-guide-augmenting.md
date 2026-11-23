@@ -1823,8 +1823,9 @@ ce.declare("Twice", {
 
 For a function defined by a body rather than a JavaScript handler, effects are
 **inferred** from the body unless you state them. Stating them makes them a
-contract: every body later assigned to that symbol must stay within the
-declared set, or the assignment fails with an `incompatible-type` error. See
+contract: every body later assigned to that symbol, or to a function that it
+calls, must stay within the declared set, or the assignment fails with an
+`incompatible-type` error. See
 [Inferred and Declared Effects](/compute-engine/guides/types/#inferred-and-declared-effects).
 
 **To require an effect-free argument**, give the parameter a function signature

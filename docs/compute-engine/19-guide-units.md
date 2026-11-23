@@ -111,6 +111,26 @@ console.log(parse('9.8\\,\\mathrm{m/s^{2}}'));
 console.log(parse('3\\,\\text{kg}'));
 ```
 
+A `\text{...}` is a unit only after a number, or as an operand of a product, a
+quotient, a power or a root, as in `2\text{ USD}/\text{lb}` or
+`\text{V}/\sqrt{\text{Hz}}`. Everywhere else it is a string, even when it names
+a unit. To write a unit by itself, use `\mathrm{...}`:
+
+```js example
+ce.parse('\\{\\text{A}, \\text{B}, \\text{C}\\}').json;
+// ➔ ["Set", "'C'", "'B'", "'A'"]
+
+ce.parse('m = \\text{A}').json;
+// ➔ ["Equal", "m", "'A'"]
+
+ce.parse('\\mathrm{m}').json;
+// ➔ "m"
+```
+
+So `\operatorname{QuantityUnit}(5\,\text{m}) = \mathrm{m}` is true, while
+`\operatorname{QuantityUnit}(5\,\text{m}) = \text{m}` compares the unit with
+the string `"m"`.
+
 ### siunitx Commands
 
 The `siunitx` LaTeX package commands are also supported:
