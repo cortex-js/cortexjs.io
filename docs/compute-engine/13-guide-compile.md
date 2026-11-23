@@ -263,8 +263,20 @@ from `createKernelPool()`: another value throws a `TypeError`. The stored
 fields are copied when the code is loaded, so load it again after a change.
 
 The runtime exposes `load`, `frame`, `setFrame`, `iterationLimit`, `deadline`
-and `runtimeVersion`. The other helpers are internal and can change in any
-release. The options give the runtime the state it cannot read from an engine:
+and `runtimeVersion`. The module also exports `sysHelpers`, the stateless
+helpers that compiled code calls as `_SYS.<name>`, which a runtime inherits.
+A host that lowers its own operators the same way calls them from there:
+
+```js
+import { sysHelpers } from '@cortex-js/compute-engine/runtime';
+
+sysHelpers.binomial(8, 3); // 56
+```
+
+The names and signatures of these helpers follow the code of a compilation
+and can change in any release: compare `runtimeVersion`. The engine-bound
+helpers (the random draws, `integrate`, `tick`) are members of a runtime,
+not of `sysHelpers`. The options give the runtime the state it cannot read from an engine:
 
 - `random`: the source of random draws outside a `WithRandomSeed` frame, and
   of the Monte-Carlo samples of the integrals. `null` denies draws; a draw
@@ -1127,13 +1139,15 @@ different lengths. On the `javascript` target, an input or a parameter of
 one of these types is the host's array of arrays. So is such a list read by a
 user function as a free input, a part of a tuple input
 (`tuple<integer, list<list<integer>>>`) and a typed parameter of `Apply`.
-Compiled code reads it in four ways: the element `g[i][j]`
+Compiled code reads it in five ways: the element `g[i][j]`
 (`At(At(g, i), j)`), which is `NaN` where an index is out of range; row by
 row, by `Length(g)`, `Count(g)`, `IsEmpty(g)`, `IndexWhere`, `Fold` and
 `Reduce` over `g`, and a `Map` over `g` whose value for each row is a number;
 the row `g[i]` at an index known at run time (negative from the end), read
-by a reader of a list; and an argument of a user function at a parameter of
-the same type, which takes it whole. Out of range the interpreter's row is
+by a reader of a list; `Flatten(g)`, a new list of the elements of the rows
+in order, which every reader of a list reads; and an argument of a user function at a parameter of
+the same type or of type `list`, which takes it whole. An
+element type `number` is read as `real`, except in the `complex` mode. Out of range the interpreter's row is
 `Missing`: compiled, `Length(g[i])` and `First(g[i])` are `NaN`,
 `IsMissing(g[i])` is `True`, and a sum of the row is unspecified. Every other
 read declines: the row `g[i]` as the result, `AssertPresent(g[i])`, a `Map`
@@ -1152,6 +1166,9 @@ const sums = compile(
   ce.box(["Map", ["Function", ["Reduce", "r", "Add", 0], "r"], "g"])
 );
 sums.run({ g: [[1, 2, 3], [4]] });                     // ➔ [6, 4]
+
+const flat = compile(ce.box(["Flatten", "g"]));
+flat.run({ g: [[1, 2, 3], [4]] });                     // ➔ [1, 2, 3, 4]
 
 const row = compile(ce.box(["Sum", ["At", "g", "i"]]));
 row.run({ g: [[1, 2, 3], [4]], i: -1 });               // ➔ 4
@@ -1499,9 +1516,32 @@ the call does: after three calls of `advance.run(16)`, `s` is `0.548`. The
 `code` reads no engine: it takes the value of each variable after the
 arguments, and returns the value of the function followed by the new value
 of each variable (`[NaN, 0.516]` for the call above). Such a result is not
-`shippable`. These decline, and fall back to the interpreter: another
+`shippable`.
+
+A variable that holds a list of reals, integers or booleans is an array of
+its elements in the `code`, and its length can change at each call. A
+variable that holds a list of lists of integers or reals
+(`list<list<integer>>`, or `list<list<number>>` outside the `complex` mode),
+such as the grid of the Game of Life, is an array of arrays: the body reads
+it as an input of that type and writes it with an `Assign` that is a
+statement of the body, not in a branch or a loop:
+
+```js
+ce.declare("g", "list<list<integer>>");
+ce.assign("g", ce.box(["List", ["List", 1, 0], ["List", 0, 0]]));
+const flip = compile(ce.box(["Function",
+  ["Assign", "g", ["Map", ["Function",
+    ["Map", ["Function", ["Subtract", 1, ["At", ["At", "g", "i"], "j"]], "j"],
+      ["Range", 1, 2]], "i"], ["Range", 1, 2]]],
+  ["Typed", "t", "'real'"]]));
+
+flip.run(16);                 // ➔ NaN
+ce.box("g").evaluate().json;  // ➔ ["List", ["List", 0, 1], ["List", 1, 1]]
+```
+
+These decline, and fall back to the interpreter: another
 target, a variable whose type is only inferred from its value, a constant, a
-list, a string or a complex variable, a variable with no value, a user
+string or a complex variable, a variable with no value, a user
 function called by the body that reads or assigns the variable, a callback
 in the body (of a `Map`, for example) that assigns it, and an expression that
 is not a function literal, such as `Block(Assign(s, s + 1))`.
@@ -1550,7 +1590,8 @@ expressions compile to arrays.
 
 On JavaScript, an input can be a tuple whose parts are strings and numbers,
 such as `tuple<string, integer>`. The host passes an array, and the compiled
-code reads each part at a constant index:
+code reads each part at a constant index: `At(T, 1)`, `At(T, -1)`, or
+`First(T)`, `Second(T)`, `Third(T)` and `Last(T)`:
 
 ```javascript
 ce.declare('T', 'tuple<string, integer>');
