@@ -1402,7 +1402,8 @@ currying, partial application and function values.
 
 A function literal that you compile to JavaScript can assign a variable of
 the engine that it closes over, such as the state of an animation. The
-variable must have a declared type of real, integer or boolean values:
+variable must have a declared type of real, integer or boolean values, or of
+a list of such values:
 
 ```js
 ce.declare("s", "real");
@@ -1422,9 +1423,26 @@ the call does: after three calls of `advance.run(16)`, `s` is `0.548`. The
 `code` reads no engine: it takes the value of each variable after the
 arguments, and returns the value of the function followed by the new value
 of each variable (`[NaN, 0.516]` for the call above). Such a result is not
-`shippable`. These decline, and fall back to the interpreter: another
+`shippable`.
+
+A list variable can change its length at each call. The `code` takes it as
+an array and returns its new value as an array:
+
+```js
+ce.declare("L", "list<real>");
+ce.assign("L", ce.box(["List", 1, 2]));
+const grow = compile(ce.box(["Function",
+  ["Assign", "L", ["Append", "L", "t"]],
+  ["Typed", "t", "'real'"]]));
+
+grow.run(3);
+grow.run(4);
+ce.box("L").evaluate().json;  // ➔ ["List", 1, 2, 3, 4]
+```
+
+These decline, and fall back to the interpreter: another
 target, a variable whose type is only inferred from its value, a constant, a
-list, a string or a complex variable, a variable with no value, a user
+list of lists, a list of a stated length, a string or a complex variable, a variable with no value, a user
 function called by the body that reads or assigns the variable, a callback
 in the body (of a `Map`, for example) that assigns it, and an expression that
 is not a function literal, such as `Block(Assign(s, s + 1))`.
@@ -1576,6 +1594,47 @@ shorter of the two lists, as the interpreter does.
 An `If` whose branch is a statement — an
 assignment, a loop — is a guard statement, not a value, and keeps its own
 rules (see the statement sections below).
+
+#### `Match`, `x is T` and `N`
+
+A `Match` (the Epsil `match`) compiles when each case is a string or a real
+number constant (`== "rect"`, `== 3`), `_`, or a `Tuple` of names. The
+subject is evaluated once; a case of a constant is a clause of a `Which` on
+the subject, and `_` takes every value. A `Tuple` pattern is chosen at
+compile time from the shape of the subject: it is taken by a tuple of its
+length, and binds each name to an element. When the subject is a constant,
+one case remains, and the other cases need not have its shape.
+
+```javascript
+ce.declare('k', 'string');
+ce.declare('x', 'real');
+ce.declare('P', 'tuple<real, real>');
+const area = compile(ce.box(['Match', 'k',
+  ['MatchCase', { str: 'square' }, ['Power', 'x', 2]],
+  ['MatchCase', { str: 'circle' }, ['Multiply', 'Pi', ['Power', 'x', 2]]],
+  ['MatchCase', '_', 0]]));
+area.run({ k: 'square', x: 3 });   // ➔ 9
+area.run({ k: 'hexagon', x: 1 });  // ➔ 0
+compile(ce.box(['Match', 'P',
+  ['MatchCase', ['Tuple', '_a', '_b'], ['Add', 'a', 'b']],
+  ['MatchCase', '_', 0]])).run({ P: [1, 2] });
+// ➔ 3
+```
+
+A case with a guard, a pattern of another kind (a name, a list, a range), a
+`Match` with no `_` case, and cases whose values have different shapes (a
+number and a list) do not compile.
+
+`MatchesType(x, T)` (the Epsil `x is T`) compiles to `true` when the
+declared or inferred type of `x` is a subtype of `T`, and to `false` when
+the two types have no value in common; the compiled code has no test of a
+type. With `x: real`, `x is real` is `true` and `x is string` is `false`,
+and `x is integer` does not compile.
+
+`N(x)` and `N(x, p)` of a number, a string or a boolean compile to `x`, for a
+precision `p` of at least 15 digits; a smaller precision does not compile,
+because the interpreter rounds to `p` digits. On `interval-js`, `N` of a
+number does not compile.
 
 ### Values That Are Absent
 
@@ -1824,12 +1883,15 @@ The serializer writes such a `Block`, and every single-branch `If`, with
 `where`: `ce.parse("x^2\\{x>0\\}+1").latex` is
 `x^2+1\text{ where }0\lt x`.
 
-A local has a value from its declaration: `Declare(x, type, v)`, or, in
-LaTeX, the first assignment of the name at the level of the block, which
-parses as a `Declare`. A `Declare` with no value, a `Declare` in a branch or in
+A compiled local has a value from its declaration: `Declare(x, type, v)`, or,
+in LaTeX, the first assignment of the name at the level of the block, which
+parses as a `Declare`. A `Declare` with no value is valid in a block, and the
+interpreter gives the local its value at the first assignment, but the
+compilation declines it: `Block(Declare(x, "integer"), Assign(x, 1), x + 1)`
+is `2` in the interpreter and is not compiled. A `Declare` in a branch or in
 a loop body, an `Assign` to a name that no scope declares, and a read of a
-local before its declaration are static errors (`declaration-without-value`,
-`declaration-below-statement`, `assignment-to-undeclared-variable`,
+local before its declaration are static errors
+(`declaration-below-statement`, `assignment-to-undeclared-variable`,
 `read-before-declaration`), so the compilation declines. An assignment is a statement, never an operand: `f(a \coloneq 2)` is
 the error `assignment-in-operand`. A later assignment must keep the type of the
 local, or it is the error `assignment-type-mismatch`.
@@ -2187,7 +2249,7 @@ the elliptic integrals), so under `mode: 'complex'` compiled `LambertW(x)` at
 `x = −1` is `{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled
 `LerchPhi(3, 2, 1)` is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The
 GLSL target has a complex lane for `HurwitzZeta`, `PolyGamma` (of an integer
-order) and `Gamma`, and declines a provably complex value of the other
+order), `Gamma`, `LerchPhi` and `PolyLog`, and declines a provably complex value of the other
 heads. `Zeta` of a complex operand, such as `|ζ(1/2 + it)|` with `t`
 declared `real`, compiles on JavaScript under `strict` and `complex`, with
 the interpreter's kernel. On GLSL, `Zeta`, `HurwitzZeta`, `PolyGamma` and
@@ -2197,8 +2259,11 @@ the interpreter's kernel. On GLSL, `Zeta`, `HurwitzZeta`, `PolyGamma` and
 the error of `Zeta`, `HurwitzZeta` and `PolyGamma` of an order of 1 or more
 is about 1e-5 of the size of the terms of their sum, so it is absolute next
 to a zero of ζ, and for `HurwitzZeta` with `Re(s) < 0` it can be a few
-percent of the value. `LerchPhi` and `PolyLog` of a complex operand
-decline on GLSL. `Arcsec` and `Arccsc` of a real operand of unknown
+percent of the value. `PolyLog` and `LerchPhi` of a complex operand
+compile on GLSL too (`compile(ce.box(['PolyLog', 2, 'z']), { to: 'glsl' }).code`
+is `"_gpu_ir_cpolylog(vec2(2.0, 0.0), z)"`): within about 3e-5 of the value,
+or `NaN` where no method of the kernel holds its error budget, such as
+`LerchPhi(z, s, a)` past the unit circle for `a ≠ 1`. `Arcsec` and `Arccsc` of a real operand of unknown
 magnitude are typed `complex | infinity | nan`, so with `x` declared `real`
 the compiled `Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }` under
 `mode: 'complex'`.
@@ -2882,7 +2947,8 @@ derivative that `.N()` computes.
 compiles to GLSL or interval-js. The interval-js target covers the
 arithmetic, the elementary functions (roots, exponentials, logarithms,
 trigonometric and hyperbolic functions and their inverses), `Abs`, `Floor`,
-`Factorial`, `Gamma`, `Erf`, `Erfc`, `Sinc`, `FresnelS`, `FresnelC`, `Chop`
+`Factorial`, `Gamma`, `Erf`, `Erfc`, `Sinc`, `FresnelS`, `FresnelC`,
+`LambertW` of one operand (the principal branch), `Chop`
 (with a constant tolerance: `Chop(x)` takes the engine's tolerance at compile
 time), `Argument` of a real and `EvaluateAt` of a function literal, and of the
 list operators `First`, `Second`, `Third`, `Last`, `Count`,
@@ -2892,7 +2958,7 @@ need an input of a stated length (`list<real^3>`) and a constant count;
 `Reverse`, the rotations and `Mean` also take a list of any length; `Median`,
 `Sort`, `Ordering`, `Unique`, `ArgMax`, `ArgMin`, `MaxBy` and `MinBy` decline there. An input with no declared type is read as a real, so `\Gamma(x)`
 compiles with `x` undeclared; an input declared `complex` declines. `Zeta`,
-`LambertW`, `BesselJ`, `Digamma` and complex values decline. On each target,
+`BesselJ`, `Digamma` and complex values decline. On each target,
 `canCompile()` tells whether an expression compiles; see
 [What the GLSL Target Compiles](#what-the-glsl-target-compiles-cancompile)
 for the GLSL target.

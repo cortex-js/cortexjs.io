@@ -2755,6 +2755,13 @@ Inference writes happen at these moments:
    `h(v) = v[1] + v[2]`, `h([(1, 2), (3, 4)])` is `(4, 6)`, the first
    point plus the second. To apply `h` to each point, declare the
    parameter: `h(v: tuple<number, number>) = v[1] + v[2]` gives `[3, 7]`.
+   A parameter that the body assigns gets no collection type in the
+   signature from any of its uses: they do not describe the argument. So a
+   list argument is applied to each element, unless the function calls
+   itself with a collection at that position (item 2). With
+   `g(n) := Block(Assign(n, Range(1, n)), Sum(n))`, the signature is
+   `(n: unknown) -> number` and `g([3, 4])` is `[6, 10]`. Declare the
+   parameter (`n: list`) to take a list whole.
 4. **Uses of an element**: a use of an element taken out of a collection
    refines the collection's *element* type, in the expression that holds
    the use. `xs[1] + 1` makes an undeclared

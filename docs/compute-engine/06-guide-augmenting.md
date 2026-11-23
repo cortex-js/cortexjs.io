@@ -1722,6 +1722,25 @@ protocol of a hierarchy: a protocol cannot declare a function that a parent
 declares, and it cannot extend two parents that both declare a function of the
 same name. A protocol never loses a parent once declared.
 
+The options `description` and `memberDescriptions` document a protocol and
+its members (markdown). An editor that uses `epsilHover()`,
+`epsilSignatureHelp()` and `epsilCompletions()` shows them, as it shows the
+`///` comments of a protocol declared in Epsil:
+
+```js
+ce.declareProtocol(
+  "Sized",
+  { functions: { size: "(self: Self) -> integer" } },
+  {
+    description: "A value with a size.",
+    memberDescriptions: { size: "The number of elements." },
+  },
+);
+epsilHover(ce, "Sized", 1);
+// ➔ { kind: "type", detail: "protocol Sized",
+//     description: ["A value with a size."], … }
+```
+
 <ReadMore path="https://epsil.dev/protocols/" >
 Protocols are also declared in **Epsil**, with `protocol … { … }`,
 `type … is …` and `protocol A extends B, C`. The Epsil page describes the
