@@ -2180,17 +2180,25 @@ gave.
 
 The special functions whose value is complex for some real operands —
 `HurwitzZeta`, `LerchPhi`, `PolyLog`, `EllipticK`, the complete `EllipticE`,
-`Hypergeometric2F1`, `LambertW` and `Gamma` — promote under `complex` the
-same way. The complex kernel is used where the operand facts do not prove
+`Hypergeometric2F1`, `LambertW`, `PolyGamma` and `Gamma` — promote under
+`complex` the same way. The complex kernel is used where the operand facts do not prove
 the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`, `m ≤ 1` for
 the elliptic integrals), so under `mode: 'complex'` compiled `LambertW(x)` at
 `x = −1` is `{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled
 `LerchPhi(3, 2, 1)` is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The
-GLSL target has no complex lane for these heads and decline a
-provably complex value. `Zeta` of a complex operand, such as
-`|ζ(1/2 + it)|` with `t` declared `real`, compiles on JavaScript under
-`strict` and `complex`, with the interpreter's kernel; the GLSL target
-declines it. `Arcsec` and `Arccsc` of a real operand of unknown
+GLSL target has a complex lane for `HurwitzZeta`, `PolyGamma` (of an integer
+order) and `Gamma`, and declines a provably complex value of the other
+heads. `Zeta` of a complex operand, such as `|ζ(1/2 + it)|` with `t`
+declared `real`, compiles on JavaScript under `strict` and `complex`, with
+the interpreter's kernel. On GLSL, `Zeta`, `HurwitzZeta`, `PolyGamma` and
+`Gamma` of a complex operand compile to single-float kernels
+(`compile(ce.parse('\\zeta(z)'), { to: 'glsl' }).code` is
+`"_gpu_ir_czeta(z)"` with `z` declared `complex`), for a domain coloring:
+the error of `Zeta`, `HurwitzZeta` and `PolyGamma` of an order of 1 or more
+is about 1e-5 of the size of the terms of their sum, so it is absolute next
+to a zero of ζ, and for `HurwitzZeta` with `Re(s) < 0` it can be a few
+percent of the value. `LerchPhi` and `PolyLog` of a complex operand
+decline on GLSL. `Arcsec` and `Arccsc` of a real operand of unknown
 magnitude are typed `complex | infinity | nan`, so with `x` declared `real`
 the compiled `Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }` under
 `mode: 'complex'`.
