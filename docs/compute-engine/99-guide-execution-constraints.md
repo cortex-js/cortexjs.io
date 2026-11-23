@@ -228,6 +228,10 @@ with cause `"recursion-depth-exceeded"` is thrown instead.
 Setting `ce.iterationLimit` to `0` or a negative value disables the iteration
 limit; a span (if any) still applies.
 
+The iteration limit applies to the interpreter only. Compiled code does not
+read it: a compiled loop is bounded by the compile option `iterationBudget`
+(see the compilation guide), and has no bound without it.
+
 The built-in symbolic integrator and the variation-of-parameters step of
 `DSolve` each have a fixed budget of 100,000 steps. The budget counts each
 step of the search, the simplification rules tried included, so the result is

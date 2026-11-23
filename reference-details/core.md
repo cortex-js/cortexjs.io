@@ -447,14 +447,28 @@ tags of the MathJSON format, with no value other than themselves.
 ## Declare
 
 In Epsil, `let x = v` declares a variable and `const c = v` a constant:
-[Declarations](/declarations/) gives the rules. A declaration has a value:
-`let x` and `let x: integer` with no value are errors. A second declaration
-of a name that the program or the block already declares is an error, also at
-the top level of a program. A constant cannot be assigned.
+[Declarations](/declarations/) gives the rules. A `let` without a value,
+`let x` or `let x: integer`, declares a variable that is given its value
+later by an assignment. Its type is the annotation. Without one, the type is
+inferred from a single later assignment in the same sequence of statements,
+before any use, that is not in a branch or a loop and calls no function:
+after `let x; x = 1`, `x` is a `number`. Otherwise the type is `unknown`. A
+read of the variable before it has a value is an error when the program
+runs. A second declaration of a name that the program or the block already
+declares is an error, also at the top level of a program. A constant cannot
+be assigned.
 
 ```epsil
 let x: integer
-// ➔ error: Static error: `x` is declared without a value: write `let x = …` in `let x: integer`
+x = 4
+x + 1
+// ➔ 5
+let x: integer
+x = 2.5
+// ➔ error: Static error: `x` has the type `integer`, and the value has the type `2.5` in `x := 2.5`
+let x
+x
+// ➔ error: Runtime error: `x` is read before it has been given a value
 const c = 299792458
 c = 3
 // ➔ error: Static error: cannot assign a value to the constant `c` in `c := 3`
@@ -660,7 +674,7 @@ symbol stays symbolic through it:
 ```epsil
 let w = 5
 [simplify(abs(w)), HoldValues(simplify(abs(w)), w)]
-// ➔ [5,|w|]
+// ➔ [5,abs(w)]
 ```
 
 ### MathJSON
@@ -862,7 +876,7 @@ and no type, counts as real.
 
 ```epsil
 [solve(x^2 + 1 == 0, x), solve(x^3 == 8, x)]
-// ➔ [[i,-i],[2,-1 + sqrt(3)i,-1 - sqrt(3)i]]
+// ➔ [[i,-i],[2,-1 + sqrt(3) * i,-1 - sqrt(3) * i]]
 [solve(e^x == -1, x), solve(abs(x - 1) == 3, x), solve(abs(x - a) == 2, x)]
 // ➔ [[],[-2,4],[a - 2,a + 2]]
 ```
@@ -2432,13 +2446,19 @@ See also [`digitsFrom`](#digitsfrom) and [`baseForm`](#baseform).
 ## DigitsFrom
 
 The base is from 2 to 36, 10 by default. Whitespace before and after the
-digits is ignored, and a sign is read. A `0x` or `0b` prefix selects base 16
-or 2, whatever the base argument. An integer greater than $2^{53}$ stays
-exact.
+digits is ignored, and a sign is read, also before a prefix. With no base,
+a `0x` or `0b` prefix selects base 16 or 2. With a base, a prefix is read
+only when it is the prefix of that base: in base 10, `0b101` is an
+`unexpected-digit` error, and in base 16, `0b1` is the hexadecimal number
+`b1`. An integer greater than $2^{53}$ stays exact.
 
 ```epsil
-[digitsFrom(" -42 "), digitsFrom("0xff"), digitsFrom("0b101", 10)]
-// ➔ [-42,255,5]
+[digitsFrom(" -42 "), digitsFrom("0xff"), digitsFrom("-0x1F"), digitsFrom("0b101", 2)]
+// ➔ [-42,255,-31,5]
+[digitsFrom("0b1", 16), digitsFrom("0x1F", 16)]
+// ➔ [177,31]
+digitsFrom("0b101", 10)
+// ➔ error: Runtime error: unexpected digit: b at `b101`
 digitsFrom("z", 36)
 // ➔ 35
 digitsFrom("123456789012345678901234567890")
@@ -2622,7 +2642,11 @@ With no second argument, the delimiters depend on `expr`: `(,)` for a
 `["Delimiter", expr]`, `["Delimiter", expr, delim]`. In LaTeX, `expr` is
 written between the delimiters, with the separator between its elements:
 `["Delimiter", ["Sequence", 1, 2, 3], "'{;}'"]` is
-`\lbrace1;2;3\rbrace`.
+`\lbrace1;2;3\rbrace`. The angle brackets `<>` and `⟨⟩` are written
+`\langle` and `\rangle`, and `‖`, `⌈⌉` and `⌊⌋` as `\Vert`, `\lceil \rceil`
+and `\lfloor \rfloor`. Square brackets are written as parentheses:
+`["Delimiter", ["Sequence", 1, 2, 3], "'[,]'"]` is `(1,2,3)`, because a group
+in square brackets is read back as a `List`, not as the sequence.
 
 ## Annotated
 
@@ -2805,11 +2829,17 @@ do { c = 5; c * 2 }
 // ➔ 10
 ```
 
-A `let` gives its variable a value. A `let` without a value is an error.
+A `let` without a value declares a local that an assignment gives its value
+later. A read of the local before an assignment has run is an error when the
+block runs, also when the assignment is in a branch that is not taken:
 
 ```epsil
+do { let x; x = 3; x * 2 }
+// ➔ 6
 do { let x; x }
-// ➔ error: Static error: `x` is declared without a value: write `let x = …` in `do {let x; x}`
+// ➔ error: Runtime error: `x` is read before it has been given a value
+do { let t; if false { t = 1 }; t }
+// ➔ error: Runtime error: `t` is read before it has been given a value
 ```
 
 A local is not read before its declaration. The initial value of a
@@ -2933,10 +2963,10 @@ do { let na = 1; let nb = a + 1; a = na; b = nb }
 
 The error codes of the rules above are `assignment-to-undeclared-variable`,
 `read-before-declaration`, `variable-redeclaration`,
-`assignment-in-operand` and `assignment-type-mismatch`. A `["Declare"]`
-without a value is the error `declaration-without-value`, except for the
-signature of a function that a `["DefineFunction"]` of the same statement
-list defines. A `["Declare"]` is a statement of the block itself: one that
+`assignment-in-operand`, `assignment-type-mismatch` and
+`read-before-initialization`. A `["Declare"]` without a value reserves a
+local that an `["Assign"]` initializes later, as described under
+[`Declare`](#declare). A `["Declare"]` is a statement of the block itself: one that
 is directly a branch of an `["If"]` or a `["Which"]`, the body of a
 `["Loop"]` or a case of a `["Match"]` is the error
 `declaration-below-statement`. An assignment in an operand,

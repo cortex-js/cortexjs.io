@@ -12,7 +12,30 @@ date: Last Modified
 ---
 # Units
 
-The 7 definitions of the units library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
+The **units** library holds quantities (a value with a physical unit) and
+the functions that convert, compare and inspect units. This introduction
+gives the concepts you need before you read the entries.
+
+## Writing a unit
+
+A unit is a name such as `m`, `km` or `h`, or a product, quotient or power
+of names. Each unit operand of `quantity`, `unitConvert`, `isCompatibleUnit`
+and `unitDimension` also accepts a string, which is read as a unit:
+`"km/h"`, `"m/s^2"`, `"kg*m"`.
+
+```epsil
+unitConvert(quantity(36, "km/h"), "m/s")
+// ➔ 10 m/s
+```
+
+Write a unit as a string when its name is also the name of a function, such
+as `min` (minute) or `lb` (pound): a bare `min` is the function `min`, not
+the unit.
+
+```epsil
+unitConvert(quantity(2, h), "min")
+// ➔ 120 min
+```
 
 ## Supported units
 
@@ -22,18 +45,15 @@ In Epsil, write a unit as a name or as a string: `quantity(3, m)`,
 name is not a variable: it is not declared, and it does not need a value.
 
 The unit arguments of `unitConvert`, `isCompatibleUnit` and
-`unitDimension` are names, not strings: a string there leaves the call
-unevaluated. Four unit symbols cannot be written as a name: `in` is a
-reserved word, and `min`, `lb` and `arcsec` are the names of library
-functions. Write them as a string in `quantity`, and as a
-[LaTeX island](/literals/#latex-islands) (`$\mathrm{min}$`) in a unit
-argument.
+`unitDimension` are names or strings too. Four unit symbols cannot be
+written as a name: `in` is a reserved word, and `min`, `lb` and `arcsec` are
+the names of library functions. Write them as a string:
 
 ```epsil
-unitConvert(quantity(2, "h"), $\mathrm{min}$)
+unitConvert(quantity(2, "h"), "min")
 // ➔ 120 min
-unitConvert(quantity(1, "lb"), oz)
-// ➔ 16 oz
+[isCompatibleUnit("min", s), unitConvert(quantity(1, "lb"), oz)]
+// ➔ [true,16 oz]
 quantity(1, lb)
 // ➔ 1 Lb
 ```
@@ -219,8 +239,8 @@ Angular units are dimensionless. The trigonometric functions (`sin`,
 | :-------- | :----------- |
 | `percent` | 0.01         |
 | `ppm`     | 10^-6        |
-| `dB`      | 1 (nominal)  |
-| `Np`      | 1 (nominal)  |
+| `Np`      | 1            |
+| `dB`      | ln(10)/20 Np |
 
 </div>
 
@@ -229,9 +249,16 @@ unitConvert(quantity(25, percent), ppm)
 // ➔ 250000 ppm
 ```
 
-The logarithmic units `dB` and `Np` are read and kept, but they have the
-nominal scale 1: a conversion between them, or to a linear ratio,
-multiplies by 1, which is not the relation between these units.
+The logarithmic units `dB` and `Np` convert to each other: 1 dB is
+ln(10)/20 Np, about 0.1151 Np. A level does not convert to a linear unit
+such as `percent`:
+
+```epsil
+[unitConvert(quantity(10, dB), Np), unitConvert(quantity(20, dB), Np)]
+// ➔ [1.151292546497023 Np,2.302585092994046 Np]
+unitConvert(quantity(10, dB), percent)
+// ➔ error: Runtime error: expected `percent`, got `dB`
+```
 
 ## Physics constants
 
@@ -337,11 +364,11 @@ category.
 
 `(value, value) -> value`
 
-Check if two units have the same dimension
+Check if two units have the same dimension and convert into each other (`dB` and `Np` do, `dB` and `percent` do not)
 
 Two units are compatible when they have the same dimension vector (see
 [`unitDimension`](#unitdimension)). The units are unit symbols or compound
-units, written as names.
+units, written as names or as strings.
 
 ```epsil
 [isCompatibleUnit(m, km), isCompatibleUnit(m, s), isCompatibleUnit(J, eV)]
@@ -381,8 +408,8 @@ quantity(1, "kg/(m*s^2)")
 #### Arithmetic on quantities
 
 A sum or a difference of quantities of the same dimension is expressed in
-the unit with the largest scale factor. A sum of quantities of different
-dimensions stays a sum.
+the unit with the largest scale factor. A sum or a difference of quantities
+of different dimensions is an `incompatible-type` error.
 
 ```epsil
 quantity(12, cm) + quantity(1, m)
@@ -390,7 +417,7 @@ quantity(12, cm) + quantity(1, m)
 quantity(1, km) - quantity(1, m)
 // ➔ 0.999 km
 quantity(5, m) + quantity(3, s)
-// ➔ 5 m + 3 s
+// ➔ error: Runtime error: expected `m`, got `s`
 ```
 
 A product or a quotient combines the units. A unit symbol that appears in
@@ -518,8 +545,8 @@ quantityUnit(quantity(9.8, m/s^2))
 
 Convert a quantity to a different compatible unit
 
-The target unit is a unit symbol or a compound unit, written as a name
-(see [Supported units](#supported-units)). A conversion to a unit of
+The target unit is a unit symbol or a compound unit, written as a name or
+as a string (see [Supported units](#supported-units)). A conversion to a unit of
 another dimension is an `incompatible-type` error. The temperature units
 `degC`, `degF` and `K` convert with an offset.
 
@@ -535,13 +562,17 @@ isError(unitConvert(quantity(5, m), s))
 ```
 
 An exact magnitude stays exact when the conversion multiplies it by an
-integer. Otherwise the magnitude of the result is a float:
+integer. Otherwise the magnitude of the result is a float. A unit with an
+exact scale converts by its exact factor, so 12 in is exactly 1 ft. A
+complex magnitude keeps its imaginary part:
 
 ```epsil
 unitConvert(quantity(pi, m), cm)
 // ➔ 100pi cm
 unitConvert(quantity(180, deg), rad)
 // ➔ 3.141592653589793 rad
+[unitConvert(quantity(12, "in"), ft), unitConvert(quantity(3 + 4i, m), cm)]
+// ➔ [1 ft,(300 + 400i) cm]
 ```
 
 <MathJson name="UnitConvert">
@@ -568,7 +599,7 @@ Return the dimension vector of a unit
 The dimension vector has eight exponents:
 `[length, mass, time, current, temperature, amount, luminosity, currency]`.
 The first seven are the SI base dimensions. The unit is a unit symbol or a
-compound unit, written as a name.
+compound unit, written as a name or as a string.
 
 ```epsil
 [unitDimension(m), unitDimension(N), unitDimension(V)]

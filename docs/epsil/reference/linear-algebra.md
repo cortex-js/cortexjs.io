@@ -1614,13 +1614,15 @@ matrixPower([[1, 2], [3, 4]], 1/2)
 ```
 
 `A ^ n` with an integer `n` is `matrixPower(A, n)`. With an exponent that is
-not an integer, `^` applies to each element, as does `map`. For a symbolic
-exponent, write `matrixPower(A, n)`, which stays unevaluated until `n` has a
-value:
+not an integer, `^` applies to each element, as does `map`. With a symbolic
+exponent, `A ^ n` stays a power, and `matrixPower(A, n)` stays unevaluated,
+until `n` has a value:
 
 ```epsil
 [[1, 2], [3, 4]] ^ (1/2)
 // ➔ [[1,sqrt(2)],[sqrt(3),2]]
+[[1, 2], [3, 4]] ^ n
+// ➔ [[1,2],[3,4]]^n
 matrixPower([[1, 2], [3, 4]], n)
 // ➔ MatrixPower([[1,2],[3,4]], n)
 map(x => x^2, [[1, 2], [3, 4]])
@@ -2083,12 +2085,20 @@ let (U, S, V) = N(svd([[1, 2, 3], [4, 5, 6]]))
 // ➔ [(2, 2),(2, 3),(3, 3)]
 ```
 
-To multiply the factors back together, use `matrixMultiply`:
+A destructuring of an `svd` that stays unevaluated is an error, which says
+to write `N`:
+
+```epsil
+let (U, S, V) = svd([[4, 0], [3, -5]])
+// ➔ error: Runtime error: `SVD([[4,0],[3,-5]])` did not evaluate to a tuple, so it cannot be destructured; if `SVD` needs numeric input, write `N(…)`
+```
+
+Multiply the factors to get the matrix back:
 
 ```epsil
 let A = [[4, 0], [3, -5]]
 let (U, S, V) = N(svd(A))
-round(matrixMultiply(matrixMultiply(U, S), transpose(V)))
+round(U * S * transpose(V))
 // ➔ [[4,0],[3,-5]]
 ```
 

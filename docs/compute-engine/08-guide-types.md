@@ -361,8 +361,6 @@ A ranged type can appear in four ways:
 
 - **You declare it**: `ce.declare("x", "real<-1..1>")` makes the range a
   contract on `x`.
-- **An assumption refines it**: after `ce.assume(ce.parse("y > 0"))`, the
-  type of `y` is `(real<0..>) & !0`.
 - **An operator derives it**: some operations produce a result that is
   provably sign-constrained, and their type says so — `|x|` for a real `x`
   has type `real<0..>`, and `e^x` has type `(real<0..>) & !0`.
@@ -381,6 +379,10 @@ A ranged type can appear in four ways:
   there, so `[√((k − 0.5)/16) for k in 1..16]` is a `list<real>` — but a
   comprehension's list keeps the element type without the range:
   `[k for k in 1..16]` is a `list<integer>`.
+
+A bound recorded by `ce.assume()` is available to reasoning. For example,
+if `q` is declared `real`, after `ce.assume("q > 4")` its type is still
+`real` and `ce.verify("q > 0")` returns `true`.
 
 Ranges are deliberately **not** propagated through arithmetic: the sum of
 two values in `real<-1..>` is not itself in `real<-1..>`, so `x + y` falls
@@ -2726,7 +2728,10 @@ Inference writes happen at these moments:
    list literal, a range, a set, a comprehension, a `filter` result) at a
    parameter's position, that parameter takes a whole collection. With
    `f(n, s) = s if n == 0 else f(n - 1, [1, 2])`, `f(1, [0])` is `[1, 2]`
-   and the inferred signature is `(unknown, list<any>) -> unknown`. A
+   and the inferred signature is `(unknown, list<any>) -> unknown`. The
+   parameter with no type still maps a list, one call per element, with the
+   whole collection passed to each call: `f([0, 1], [9])` is
+   `[[9], [1, 2]]`. A
    self-call that forwards a parameter unchanged, or passes a scalar, is no
    evidence, so `f(x) = x * 2` still broadcasts: `f([1, 2, 3])` is
    `[2, 4, 6]`. A type inferred as
@@ -2750,6 +2755,13 @@ Inference writes happen at these moments:
    `h(v) = v[1] + v[2]`, `h([(1, 2), (3, 4)])` is `(4, 6)`, the first
    point plus the second. To apply `h` to each point, declare the
    parameter: `h(v: tuple<number, number>) = v[1] + v[2]` gives `[3, 7]`.
+   A parameter that the body assigns gets no collection type in the
+   signature from any of its uses: they do not describe the argument. So a
+   list argument is applied to each element, unless the function calls
+   itself with a collection at that position (item 2). With
+   `g(n) := Block(Assign(n, Range(1, n)), Sum(n))`, the signature is
+   `(n: unknown) -> number` and `g([3, 4])` is `[6, 10]`. Declare the
+   parameter (`n: list`) to take a list whole.
 4. **Uses of an element**: a use of an element taken out of a collection
    refines the collection's *element* type, in the expression that holds
    the use. `xs[1] + 1` makes an undeclared

@@ -242,7 +242,7 @@ Dictionaries (string keys; dot access is shorthand for identifier-shaped
 keys):
 
 ```epsil
-let d = {one -> 1, two -> 2}
+let d: dictionary<number> = {one -> 1, two -> 2}
 (d.two, d["two"], isMissing(d.missing), Coalesce(d.missing, 0))
 // ➔ (2, 2, true, 0)
 ```
@@ -326,6 +326,11 @@ sort([3, 1, 4, 1, 5], (a, b) => a > b)
   treat `x` symbolically even if `x` has an assigned value; the *result*
   then evaluates with the value. So `let x = 2` followed by
   `N(D(x^3 + x, x))` is `13` — the derivative is taken first.
+- **A variable that holds a formula is read by `D`, `integrate` and
+  `series`**: `let G = sin(x); D(G, x)` is `cos(x)`, and
+  `let G = sin(x); integrate(G, x)` is `-cos(x)`. The `x` in the value is
+  the variable of `D`. A sum or a product does not read it: its index does
+  not reach into the value of another variable.
 - **Interpolating a collection broadcasts**: `"\(expr)"` with a list-valued
   `expr` maps the string over the elements, yielding a *list of strings*
   (`"n = \([1, 2])"` → `["n = 1", "n = 2"]`), not one string containing the

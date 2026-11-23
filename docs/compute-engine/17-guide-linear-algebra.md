@@ -110,6 +110,25 @@ ce.expr(['MatrixMultiply', 'q', 'p']).evaluate();
 The same holds for the parameters of a function: `(A, B) ↦ A * B - B * A`
 with no parameter types is a function of two numbers, and gives the zero
 matrix for two matrices. Write `(A: matrix, B: matrix) ↦ A * B - B * A`.
+The order is also kept for a parameter annotated `expression`, for a
+function declared with `matrix` or `expression` parameters before its
+untyped literal is assigned, and for a parameter that another use in the
+body makes a matrix. A parameter declared `any` is read as an untyped one:
+
+```js example
+const A = ['List', ['List', 1, 2], ['List', 3, 4]];
+const B = ['List', ['List', 0, 1], ['List', 1, 0]];
+
+ce.declare('comm', '(matrix, matrix) -> matrix');
+ce.assign('comm', ce.parse('(A, B) \\mapsto A B - B A'));
+ce.expr(['comm', A, B]).evaluate();
+// → [[-1,-3],[3,1]]
+
+// `\det(A)` makes A and B matrices
+const g = ce.parse('(A, B) \\mapsto (A B - B A, \\det(A), \\det(B))');
+ce.expr(['Apply', g, A, B]).evaluate();
+// → ([[-1,-3],[3,1]], -2, -1)
+```
 
 ## LaTeX Matrix Notation
 

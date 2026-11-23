@@ -74,9 +74,13 @@ Arithmetic-geometric mean. AGM(z) is shorthand for AGM(1, z) (Fungrim convention
 
 The arithmetic-geometric mean of `a` and `b` is the common limit of the
 sequences $a_{n+1} = \frac{a_n + b_n}{2}$ and $b_{n+1} = \sqrt{a_n b_n}$.
-`agm(z)` is `agm(1, z)`. The value is numeric: use `N`.
+`agm(z)` is `agm(1, z)`. The value is exact when the two arguments are equal,
+$\operatorname{agm}(a, a) = a$, or one of them is 0,
+$\operatorname{agm}(a, 0) = 0$. Otherwise it is numeric: use `N`.
 
 ```epsil
+[agm(a, a), agm(a, 0), agm(1)]
+// ➔ [a,0,1]
 [agm(2), N(agm(2)), N(agm(1, 2))]
 // ➔ [AGM(2),1.45679103104690686918,1.45679103104690686918]
 N(agm(1, i))
@@ -169,6 +173,8 @@ Some values at special points are exact:
 ```epsil
 [clausenCl(2, pi/2), clausenCl(2, pi), clausenCl(4, pi/2)]
 // ➔ [catalanConstant,0,DirichletBeta(4)]
+[clausenCl(1, pi/2), clausenCl(1, pi), clausenCl(3, pi)]
+// ➔ [-1/2 * ln(2),-ln(2),-3/4 * Zeta(3)]
 ```
 
 A real θ is computed to the engine precision for an order up to 40. An
@@ -182,14 +188,17 @@ clausenCl(1/2, 1)
 // ➔ error: Type error: expected `integer`, got `rational<0.5..0.5>` at `1 / 2` in `clausenCl(1 / 2, 1)`
 ```
 
-A value is given only when all its digits reach the engine precision. At a
-zero of the function, such as θ = π/3 and θ = 5π/3 for `clausenCl(1, θ)`, they
-cannot, and the call stays unevaluated, also with `N`. Close to a zero, the
-value is given:
+At the zeros θ = π/3 and θ = 5π/3 of `clausenCl(1, θ)`, the value is an
+exact 0, also with `N`. A numeric value is given only when all its digits
+reach the engine precision. At a float that is a zero to machine precision,
+they cannot, and the call stays unevaluated. Close to a zero, the value is
+given:
 
 ```epsil
-[clausenCl(1, 1.05), N(clausenCl(1, pi/3))]
-// ➔ [-0.00242307133771859470069,ClausenCl(1, 1.04719755119659774615)]
+[clausenCl(1, pi/3), clausenCl(1, 5pi/3), N(clausenCl(1, pi/3))]
+// ➔ [0,0,0]
+[clausenCl(1, 1.05), clausenCl(1, 1.0471975511965976)]
+// ➔ [-0.00242307133771859470069,ClausenCl(1, 1.0471975511965976)]
 ```
 
 <MathJson name="ClausenCl">

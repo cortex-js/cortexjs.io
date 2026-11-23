@@ -115,10 +115,18 @@ r                  // Error(ErrorCode("incompatible-type", "integer", "1.5"), �
 At a parameter typed `real` or `number`, the body is applied to a name with no
 type and no value: with `function f(x: real) { x^2 }`, `f(x)` gives `x^2`.
 
-A **return** annotation (`-> real`) is a different kind of thing: it is
-recorded in the function's signature and shown by `about`, but the current
-runtime does not reject a returned value for disagreeing with it. Write it for
-the reader; don't rely on it as a check.
+A **return** annotation (`-> integer`) is recorded in the function's
+signature and shown by `about`. The value that a call returns is checked
+against it, and a value of another type is an `incompatible-type` error:
+
+```epsil
+function half(n: integer) -> integer { n / 2 }
+half(4)   // 2
+half(5)   // Error(ErrorCode("incompatible-type", "integer", "rational<2.5..2.5>"), 5/2)
+```
+
+A returned value whose type could still be the return type passes: with
+`function h(n) -> integer { n / 2 }`, `h(x)` gives `1/2 * x`.
 
 ### 2. To choose between clauses
 
@@ -152,13 +160,13 @@ binding to a real — inference follows the values, and asks no questions.
 
 ### 4. When there is nothing to infer from
 
-An empty collection says nothing about what will go into it, so inference
-starts at the bottom of the lattice:
+An empty initializer establishes `list<unknown>` for a mutable binding.
+Later assignments do not refine its element contract:
 
 ```epsil-live
 let xs = []
 type(xs)
-// ➔ TypeFrom("list<never>")
+// ➔ TypeFrom("list<unknown>")
 ```
 
 Say what you mean instead:
@@ -169,16 +177,17 @@ type(xs)
 // ➔ TypeFrom("list<integer>")
 ```
 
-The same applies to a name declared without an initializer (`let x: real`) and
-to a function parameter that the body never constrains.
+An annotation also fixes a contract before a runtime value is available
+(`let x: real`). An unannotated declaration without an identifiable straight-line
+initialization remains `unknown`. A read before initialization is an error.
 
 ### 5. When the inferred type is not what you meant
 
-Inference is a guess from evidence, and a guess can be narrower or wider than
-your intent — a variable that happens to start at `0` but will hold a fraction,
-a parameter you intend as `complex` though the body only ever adds. An
-annotation is a commitment: it is never silently revised, so it pins the type
-where the guess would have drifted.
+Mutable bindings keep the contract inferred from their initialization. Numeric
+initializers establish `number`; lists erase fixed lengths and widen their
+elements. An annotation supplies a different contract, such as `real` or
+`list<integer>`. Later assignments validate against that contract without
+changing it.
 
 ## Where an annotation goes
 

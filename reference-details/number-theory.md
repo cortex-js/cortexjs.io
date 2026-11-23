@@ -1380,8 +1380,10 @@ The `k`th centered square number is `k² + (k+1)²`: a dot in the center and
 the square layers of dots around it.
 
 ```epsil
-[isCenteredSquare(5), isCenteredSquare(6)]
-// ➔ [true,false]
+[isCenteredSquare(5), isCenteredSquare(6), isCenteredSquare(25)]
+// ➔ [true,false,true]
+filter(1..100, isCenteredSquare)
+// ➔ [1,5,13,25,41,61,85]
 ```
 
 See also: [Centered square numbers, OEIS A001844](https://oeis.org/A001844).

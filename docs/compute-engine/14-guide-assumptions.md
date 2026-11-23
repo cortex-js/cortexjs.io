@@ -145,55 +145,59 @@ ce.parse("x").isGreater(0);
 // ➔ true
 ```
 
-## Type Inference from Assumptions
+## Assumptions and Static Types
 
-The type of a symbol is automatically inferred from assumptions.
-`ce.assume()` declares the symbols that it constrains:
+Use `ce.declare()` to give a variable a static type and `ce.verify()` to
+ask what follows from the current assumptions. Here an expression prepared
+before the assumption keeps its declared type throughout:
 
 ```js
-ce.assume(ce.parse("x > 4"));
-ce.expr("x").type.toString();
-// ➔ 'real<4<..>'
+ce.declare("x", "real");
+const x = ce.expr("x");
+const sum = ce.parse("x+1");
+const integer = ["Element", "x", "Integers"];
 
-ce.assume(ce.parse("n = 42"));
-ce.expr("n").type.toString();
-// ➔ 'integer'
+ce.assume(integer);
+ce.verify(integer);       // true
+x.isInteger;              // true
+x.type.toString();        // "real"
+sum.type.toString();      // "real"
 
-ce.assume(ce.parse("z = 3.14"));
-ce.expr("z").type.toString();
-// ➔ 'real'
+ce.forget("x");
+ce.verify(integer);       // undefined
+x.type.toString();        // "real"
 ```
 
-Inequality assumptions (`>`, `<`, `>=`, `<=`) set the symbol's type to `real`,
-carrying the bound along when there is one. Equality assumptions infer the type
-from the value.
+The same distinction applies to bounds. After assuming `q > 4`, use
+`ce.verify("q > 0")` to test the consequence. Use a declared ranged type
+when a bound is part of the variable's contract.
+
+An equality assumption supplies a value for evaluation in its scope:
+
+```js
+ce.declare("n", "real");
+const n = ce.expr("n");
+ce.assume("n = 42");
+n.evaluate().json;       // 42
+n.type.toString();       // "real"
+ce.forget("n");
+n.evaluate().json;       // "n"
+```
 
 ### Assumptions and the Infinities
 
-`real` names the **finite** reals, so an inequality assumption rules the
-infinities out even when it leaves one side unbounded. A symbol assumed greater
-than 4 has an open upper end, but $+\infty$ is not a value it can take:
+Inequality assumptions constrain a symbol to finite real values. With an
+otherwise undeclared `x`, the finiteness query can use the assumption:
 
 ```js
-ce.assume(ce.parse("x > 4"));
-ce.expr("x").isFinite;
-// ➔ true
-
-ce.expr("x").type.matches("infinity");
-// ➔ false
+ce.assume("x > 4");
+ce.expr("x").isFinite;        // true
+ce.expr("x").type.toString(); // "unknown"
 ```
 
-An equality assumption against an infinite value, on the other hand, infers one
-of the non-finite types — `infinity` for an infinity of any direction, `nan` for
-`NaN`. Neither is a subtype of `real`:
-
-```js
-ce.assume(ce.parse("m = \\infty"));
-ce.expr("m").type.toString();
-// ➔ 'infinity'
-```
-
-Assigning such a value directly declares the same type:
+An equality assumption such as `m = +∞` supplies the infinite value for
+evaluation. Assigning that value to a new variable instead infers its
+static type from the assignment:
 
 ```js
 ce.assign("p", ce.parse("\\infty"));
@@ -205,9 +209,8 @@ ce.expr("r").type.toString();
 // ➔ 'nan'
 ```
 
-Because the two are disjoint, claiming a symbol already known to be infinite is
-a real number is not a narrowing — it is a **contradiction**, and `assume()`
-reports it as one rather than silently discarding either fact:
+The types `infinity` and `real` are disjoint. A real-membership assumption
+about a symbol already assigned an infinite value gives a contradiction:
 
 ```js
 ce.assign("a", ce.parse("\\infty"));
@@ -268,7 +271,7 @@ ce.verify(ce.parse("x > 2"));
 
 ce.pushScope();
 
-ce.assume(ce.parse("x > 0"));
+ce.assume(ce.parse("x > 4"));
 ce.verify(ce.parse("x > 2"));
 // ➔ true
 
@@ -329,13 +332,15 @@ ce.assume(ce.parse("\\Im(\\tau) > 0")); // imaginary part of τ (upper half-plan
 ce.assume(["Less", ["Abs", "q"], 1]);   // |q| < 1 (inside the unit disk)
 ```
 
-A bound on the magnitude says the symbol is finite without saying it is real, so
-it infers the type `complex` — the finite complex numbers:
+A bound on the magnitude proves that the value is finite. The symbol can
+still have an unknown static type:
 
 ```js
-ce.assume(["Less", ["Abs", "q"], 1]);
-ce.expr("q").type.toString();
-// ➔ 'complex'
+const within = ["Less", ["Abs", "q"], 1];
+ce.assume(within);
+ce.verify(within);            // true
+ce.expr("q").isFinite;        // true
+ce.expr("q").type.toString(); // "unknown"
 ```
 
 The open upper half-plane has a LaTeX shorthand: `\mathbb{C}^+`. In a
@@ -362,9 +367,7 @@ and theta functions are guarded by `Im(τ) > 0`, so a symbol assumed to satisfy
 
 ### Conjunctions
 
-Use `And` to make several assumptions about a symbol in a single call. (Unlike
-separate `ce.assume()` calls, the parts are added together rather than each
-replacing the previous.)
+Use `And` to add several compatible assumptions in a single call.
 
 ```js example
 ce.assume(["And", ["Greater", "x", 0], ["Less", "x", 1]]); // 0 < x < 1

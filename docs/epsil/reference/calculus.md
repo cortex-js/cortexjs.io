@@ -48,6 +48,16 @@ D(a * x^2, x)
 // ➔ 6x
 ```
 
+A symbol whose value is a formula in the variable is replaced by that
+formula too, so `D`, `integrate`, `limit` and `series` apply to a formula
+stored in a variable:
+
+```epsil
+let G = sin(x)
+[D(G, x), integrate(G, x), limit(G / x, x, 0), series(G, x, 0, 3)]
+// ➔ [cos(x),-cos(x),1,x - 1/6 * x^3 + BigO(x^5)]
+```
+
 To evaluate a result at the value of the variable, evaluate it again, or
 substitute the value.
 
@@ -548,7 +558,7 @@ functions and their compositions. Some of the patterns:
 
 ```epsil
 [integrate(1/(x * ln(x)), x), integrate(3/(x * ln(x)), x)]
-// ➔ [ln(|ln(x)|),3ln(|ln(x)|)]
+// ➔ [ln(abs(ln(x))),3ln(abs(ln(x)))]
 integrate(e^x * sin(x), x)
 // ➔ 1/2 * (-cos(x) + sin(x)) * e^x
 integrate(e^x * cos(2x), x)
@@ -603,7 +613,7 @@ integrate(sin(x)/x, (x, -oo, oo))
 integrate(1/(1 + x^2), (x, -oo, oo))
 // ➔ pi
 [integrate(1/(2 + cos(x)), (x, 0, 2pi)), integrate(1/x^2, (x, -oo, oo))]
-// ➔ [2/3sqrt(3) * pi,+oo]
+// ➔ [2/3 * sqrt(3) * pi,+oo]
 ```
 
 To ask for a principal value, integrate over the real line with
@@ -748,13 +758,15 @@ Limits of a function
 
 Numerical derivative evaluated at a point.
 
+The function is an expression (ND(Sin(x), 1)), a function literal or the name of a function (ND(Sin, 1)): each gives cos(1).
+
 `nd(f, x0)` is a numerical approximation of the derivative of the expression
-`f` at `x0`. The expression is written with its variable, `nd(sin(x), 1)`; a
-bare function name, `nd(sin, 1)`, stays unevaluated.
+`f` at `x0`. The expression is written with its variable, `nd(sin(x), 1)`, or
+as the name of a function of one argument, `nd(sin, 1)`.
 
 ```epsil
-nd(sin(x), 1)
-// ➔ 0.5403023058595877
+[nd(sin(x), 1), nd(sin, 1)]
+// ➔ [0.5403023058595877,0.5403023058595877]
 ```
 
 <MathJson name="ND">
@@ -787,6 +799,17 @@ control cannot resolve, such as `y' = y^2` integrated past its singularity,
 stays unevaluated rather than giving inaccurate samples. For the solution at
 any point, use `ndSolveFunction`.
 
+```epsil
+let sol = ndSolve(D(y(x), x) == y(x), y, (x, 0, 1), 1, 10)
+[count(sol), sol[1], last(sol)[1], abs(last(sol)[2] - e) < 10^(-6)]
+// ➔ [11,[0,1],1,true]
+let sol = ndSolve(D(y(x), x, x) == -y(x), y, (x, 0, 1), [0, 1], 4)
+[count(sol), abs(last(sol)[2] - sin(1)) < 10^(-6)]
+// ➔ [5,true]
+ndSolve(D(y(x), x) == y(x)^2, y, (x, 0, 2), 1)
+// ➔ NDSolve(D(y(x), x) == y(x)^2, y, Limits(x, 0, 2), 1)
+```
+
 <MathJson name="NDSolve">
 
 `["NDSolve", equation, y, limits, y0, steps]`, where `limits` is a `Limits`
@@ -814,6 +837,12 @@ interval, with the accuracy of the solver. Outside the interval, it gives the
 value at the nearest end, and applied to an argument that is not a number it
 stays symbolic. It can be compiled to JavaScript for fast evaluation, as for
 plotting. A system of equations is not supported, and stays unevaluated.
+
+```epsil
+let f = ndSolveFunction(D(y(x), x) == y(x), y, (x, 0, 1), 1)
+[abs(f(0.5) - sqrt(e)) < 10^(-6), f(2) == f(1), f(t)]
+// ➔ [true,true,InterpolatingFunction_[0, 1](t)]
+```
 
 <MathJson name="NDSolveFunction">
 
@@ -1025,11 +1054,13 @@ series(ln(sin(x)), x, 0, 4)
 // ➔ ln(x) - 1/6 * x^2 - 1/180 * x^4 + BigO(x^6)
 ```
 
-At `+oo`, `gammaLn` expands to Stirling's asymptotic series. It diverges, so
-the remainder is at the first omitted term.
+At `+oo`, `gammaLn` and `logGamma` expand to Stirling's asymptotic series.
+It diverges, so the remainder is at the first omitted term.
 
 ```epsil
 series(gammaLn(x), x, oo)
+// ➔ x * (ln(x) - 1) - 1/2 * ln(x) + 1/2 * ln(2pi) + 1/12 * 1 / x - 1/360 * x^(-3) + BigO(x^(-5))
+series(logGamma(x), x, oo)
 // ➔ x * (ln(x) - 1) - 1/2 * ln(x) + 1/2 * ln(2pi) + 1/12 * 1 / x - 1/360 * x^(-3) + BigO(x^(-5))
 ```
 

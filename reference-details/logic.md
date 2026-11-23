@@ -93,12 +93,11 @@ the range, when they decide it, and otherwise stays unevaluated.
 
 An `interval(a, b)` is a set of real numbers, with bounds that are open or
 closed, so its elements cannot be tried. For the integers from `a` to `b`,
-write the range `a..b`. The engine still tries the integers of an interval
-with integer bounds, which gives a wrong answer when the condition holds only
-for a value that is not an integer: `exists(x in interval(1, 2), x == 1.5)`
-is False.
+write the range `a..b`. A quantifier over an interval stays unevaluated.
 
 ```epsil
+[exists(x in interval(1, 2), x == 1), exists(n in 1..2, n == 1)]
+// ➔ [Exists(Element(x, Interval(1, 2)), x == 1),true]
 [forAll(x in {1, 2, 3}, x > 0), exists(x in [1, 2, 3], x > 2)]
 // ➔ [true,true]
 forAll(n in 1..10, n < 10)

@@ -568,7 +568,7 @@ value at 0 is exact:
 
 ```epsil
 [airyAiPrime(0), D(airyAiPrime(x), x)]
-// ➔ [-1 / (Gamma(1/3) * root(3)(3)),x * AiryAi(x)]
+// ➔ [-1 / (Gamma(1/3) * root(3, 3)),x * AiryAi(x)]
 ```
 
 See also: [Airy function](https://en.wikipedia.org/wiki/Airy_function),
@@ -602,7 +602,7 @@ value at 0 is exact:
 
 ```epsil
 airyBi(0)
-// ➔ 1 / (Gamma(2/3) * root(6)(3))
+// ➔ 1 / (Gamma(2/3) * root(3, 6))
 [N(airyBi(-2)), airyBi(+oo)]
 // ➔ [-0.412302587956398488083,+oo]
 ```
@@ -640,7 +640,7 @@ Its value at 0 is exact:
 
 ```epsil
 [airyBiPrime(0), D(airyBiPrime(x), x)]
-// ➔ [root(6)(3) / Gamma(1/3),x * AiryBi(x)]
+// ➔ [root(3, 6) / Gamma(1/3),x * AiryBi(x)]
 ```
 
 See also: [Airy function](https://en.wikipedia.org/wiki/Airy_function),
@@ -794,6 +794,14 @@ the argument is a float:
 // ➔ [BesselJ(0, 1),0.76519768655796655145]
 N(besselJ(3, 0.7i))
 // ➔ -0.007367373607628006i
+```
+
+At 0, the value of an integer order is exact: $J_0(0) = I_0(0) = 1$, and
+$J_n(0) = I_n(0) = 0$ for an integer $n \ne 0$.
+
+```epsil
+[besselJ(0, 0), besselJ(3, 0), besselI(0, 0), besselI(2, 0)]
+// ➔ [1,0,1,0]
 ```
 
 The negative real axis is their branch cut. There, `besselY` and `besselK`
@@ -1109,7 +1117,7 @@ complexRoots(1, 4)
 
 ```epsil
 complexRoots(8, 3)
-// ➔ [2,-1 + sqrt(3)i,-1 - sqrt(3)i]
+// ➔ [2,-1 + sqrt(3) * i,-1 - sqrt(3) * i]
 ```
 
 The `n` roots of `z` are the `n` solutions `w` of $w^n = z$. The first one
@@ -1119,11 +1127,11 @@ a regular polygon with `n` sides.
 
 ```epsil
 complexRoots(1, 3)
-// ➔ [1,-1/2 + sqrt(3)/2i,-1/2 - sqrt(3)/2i]
+// ➔ [1,-1/2 + sqrt(3)/2 * i,-1/2 - sqrt(3)/2 * i]
 [complexRoots(16, 4), complexRoots(-4, 2)]
 // ➔ [[2,2i,-2,-2i],[2i,-2i]]
 complexRoots(-8, 3)
-// ➔ [1 + sqrt(3)i,-2,1 - sqrt(3)i]
+// ➔ [1 + sqrt(3) * i,-2,1 - sqrt(3) * i]
 ```
 
 `n` must be a positive integer. When `z` is a complex number that is not
@@ -2063,12 +2071,15 @@ N(lambertW(-0.3, 1))
 // ➔ (-3.3002378364383755 + 7.436294411632747i)
 ```
 
-`lambertW(-1/e)` is exact. Other values with a simple closed form, such as
-W(0) = 0 and W(e) = 1, are given by `N`:
+The values with a simple closed form on the principal branch are exact:
+$W(-1/e) = -1$, $W(0) = 0$ and $W(e) = 1$. On the branch $-1$,
+$W_{-1}(-1/e) = -1$ and $W_{-1}(0) = -\infty$:
 
 ```epsil
-[lambertW(0), N(lambertW(0)), N(lambertW(e))]
-// ➔ [LambertW(0),0,1]
+[lambertW(-1/e), lambertW(0), lambertW(e)]
+// ➔ [-1,0,1]
+[lambertW(-1/e, -1), lambertW(0, -1)]
+// ➔ [-1,-oo]
 ```
 
 #### Argument order
@@ -2891,7 +2902,7 @@ Sign of a number: -1, 0, or 1 for a real; `z/|z|`, the point of the unit circle 
 
 ```epsil
 [sign(-3), sign(0), sign(3 + 4i)]
-// ➔ [-1,0,(3/5 + 4/5i)]
+// ➔ [-1,0,(3/5 + 4/5 * i)]
 ```
 
 <MathJson name="Sign" latex={["sgn"]} />
@@ -3146,7 +3157,7 @@ records the region:
 
 ```epsil
 sum(k * x^k, (k, 1, oo))
-// ➔ If(|x| < 1, x / (1 - x)^2)
+// ➔ If(abs(x) < 1, x / (1 - x)^2)
 ```
 
 A series that the engine can prove divergent evaluates to its infinity. The

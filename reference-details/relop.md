@@ -81,9 +81,11 @@ function, compare their `canonicalForm(…, "Order")`.
 `a === b`, also written `≣`, is `True` when the canonical forms of the
 operands are the same expression. It always answers, with no tolerance and
 no numeric approximation of an exact value. It never reads the value of a
-symbol: with `x` assigned `5`, `x === 5` is `False` and `x == 5` is `True`.
-Numbers compare by exact value, not by notation. With more operands it is a
-chain: `a === b === c`.
+variable: with `x` assigned `5`, `x === 5` is `False` and `x == 5` is `True`.
+A parameter of a function is different: it stands for its argument, so in
+the predicate of `any`, `filter` or `find`, `x => x === 2` compares each
+element with `2`. Numbers compare by exact value, not by notation. With more
+operands it is a chain: `a === b === c`.
 
 ```epsil
 [sqrt(2) === 1.4142135623730951, sqrt(2) == 1.4142135623730951, 0.5 === 1/2]
@@ -91,6 +93,8 @@ chain: `a === b === c`.
 let x = 5
 [x === 5, x == 5]
 // ➔ [false,true]
+[any([1, 2, 3], x => x === 2), filter([1, 2, 3, 2], x => x === 2), find([1, 2, 3], x => isSame(x, 3))]
+// ➔ [true,[2,2],3]
 ```
 
 `==` is the comparison of values: it can stay unevaluated when the answer is

@@ -191,6 +191,8 @@ Some values at special points are exact:
 ```epsil
 [clausenCl(2, pi/2), clausenCl(2, pi), clausenCl(4, pi/2)]
 // ➔ [catalanConstant,0,DirichletBeta(4)]
+[clausenCl(1, pi/2), clausenCl(1, pi), clausenCl(3, pi)]
+// ➔ [-1/2 * ln(2),-ln(2),-3/4 * Zeta(3)]
 ```
 
 A real θ is computed to the engine precision for an order up to 40. An
@@ -204,14 +206,17 @@ clausenCl(1/2, 1)
 // ➔ error: Type error: expected `integer`, got `rational<0.5..0.5>` at `1 / 2` in `clausenCl(1 / 2, 1)`
 ```
 
-A value is given only when all its digits reach the engine precision. At a
-zero of the function, such as θ = π/3 and θ = 5π/3 for `clausenCl(1, θ)`, they
-cannot, and the call stays unevaluated, also with `N`. Close to a zero, the
-value is given:
+At the zeros θ = π/3 and θ = 5π/3 of `clausenCl(1, θ)`, the value is an
+exact 0, also with `N`. A numeric value is given only when all its digits
+reach the engine precision. At a float that is a zero to machine precision,
+they cannot, and the call stays unevaluated. Close to a zero, the value is
+given:
 
 ```epsil
-[clausenCl(1, 1.05), N(clausenCl(1, pi/3))]
-// ➔ [-0.00242307133771859470069,ClausenCl(1, 1.04719755119659774615)]
+[clausenCl(1, pi/3), clausenCl(1, 5pi/3), N(clausenCl(1, pi/3))]
+// ➔ [0,0,0]
+[clausenCl(1, 1.05), clausenCl(1, 1.0471975511965976)]
+// ➔ [-0.00242307133771859470069,ClausenCl(1, 1.0471975511965976)]
 ```
 
 ### MathJSON
@@ -305,9 +310,13 @@ See also: [Complete elliptic integral of the second kind](https://en.wikipedia.o
 
 The arithmetic-geometric mean of `a` and `b` is the common limit of the
 sequences $a_{n+1} = \frac{a_n + b_n}{2}$ and $b_{n+1} = \sqrt{a_n b_n}$.
-`agm(z)` is `agm(1, z)`. The value is numeric: use `N`.
+`agm(z)` is `agm(1, z)`. The value is exact when the two arguments are equal,
+$\operatorname{agm}(a, a) = a$, or one of them is 0,
+$\operatorname{agm}(a, 0) = 0$. Otherwise it is numeric: use `N`.
 
 ```epsil
+[agm(a, a), agm(a, 0), agm(1)]
+// ➔ [a,0,1]
 [agm(2), N(agm(2)), N(agm(1, 2))]
 // ➔ [AGM(2),1.45679103104690686918,1.45679103104690686918]
 N(agm(1, i))
@@ -412,6 +421,136 @@ See also: [Confluent hypergeometric function](https://en.wikipedia.org/wiki/Conf
 ```json example
 ["N", ["Hypergeometric1F1", 1, 2, 2]]
 // ➔ 3.19452804946532511362
+```
+
+## ChebyshevT
+
+The degree `n` is an integer. With a literal degree, a symbolic `x` gives
+the polynomial, an exact rational `x` gives an exact value, and a float `x`
+or `N` gives the value of the recurrence $T_{n+1} = 2x T_n - T_{n-1}$. A
+negative degree gives $T_{-n} = T_n$. A degree that is not a literal stays
+unevaluated.
+
+```epsil
+chebyshevT(3, x)
+// ➔ 4x^3 - 3x
+chebyshevT(3, 1/2)
+// ➔ -1
+N(chebyshevT(50, 0.3))
+// ➔ 0.890054977850745358766
+chebyshevT(n, x)
+// ➔ ChebyshevT(n, x)
+```
+
+`chebyshevT` compiles to JavaScript and GLSL for an integer degree and a
+real `x`.
+
+See also: [Chebyshev polynomials](https://en.wikipedia.org/wiki/Chebyshev_polynomials),
+[DLMF 18.3](http://dlmf.nist.gov/18.3).
+
+### MathJSON
+
+`["ChebyshevT", n, x]`. In LaTeX: `\operatorname{ChebyshevT}(n, x)`.
+
+```json example
+["N", ["ChebyshevT", 3, ["Rational", 1, 2]]]
+// ➔ -1
+```
+
+## ChebyshevU
+
+The Chebyshev polynomial of the second kind, with the same rules as
+`chebyshevT`. A negative degree gives $U_{-1} = 0$ and
+$U_{-n} = -U_{n-2}$.
+
+```epsil
+chebyshevU(3, x)
+// ➔ 8x^3 - 4x
+chebyshevU(-1, x)
+// ➔ 0
+```
+
+### MathJSON
+
+`["ChebyshevU", n, x]`. In LaTeX: `\operatorname{ChebyshevU}(n, x)`.
+
+```json example
+["ChebyshevU", 3, "x"]
+// ➔ ["Add", ["Multiply", 8, ["Power", "x", 3]], ["Multiply", -4, "x"]]
+```
+
+## LegendreP
+
+The Legendre polynomial, with the same rules as `chebyshevT`. A negative
+degree gives $P_{-n} = P_{n-1}$.
+
+```epsil
+legendreP(3, x)
+// ➔ 5/2 * x^3 - 3/2 * x
+legendreP(3, 1/3)
+// ➔ -11/27
+N(legendreP(2, x))
+// ➔ 1.5 * x^2 - 0.5
+```
+
+See also: [Legendre polynomials](https://en.wikipedia.org/wiki/Legendre_polynomials),
+[DLMF 18.3](http://dlmf.nist.gov/18.3).
+
+### MathJSON
+
+`["LegendreP", n, x]`. In LaTeX: `\operatorname{LegendreP}(n, x)`.
+
+```json example
+["LegendreP", 3, "x"]
+// ➔ ["Add", ["Multiply", ["Rational", 5, 2], ["Power", "x", 3]], ["Multiply", ["Rational", -3, 2], "x"]]
+```
+
+## HermiteH
+
+The Hermite polynomial of the physicists' convention, $H_1 = 2x$, with the
+same rules as `chebyshevT`. A negative degree stays unevaluated.
+
+```epsil
+hermiteH(4, x)
+// ➔ 16x^4 - 48x^2 + 12
+hermiteH(-1, x)
+// ➔ HermiteH(-1, x)
+```
+
+See also: [Hermite polynomials](https://en.wikipedia.org/wiki/Hermite_polynomials),
+[DLMF 18.3](http://dlmf.nist.gov/18.3).
+
+### MathJSON
+
+`["HermiteH", n, x]`. In LaTeX: `\operatorname{HermiteH}(n, x)`.
+
+```json example
+["HermiteH", 4, "x"]
+// ➔ ["Add", ["Multiply", 16, ["Power", "x", 4]], ["Multiply", -48, ["Power", "x", 2]], 12]
+```
+
+## LaguerreL
+
+The Laguerre polynomial $L_n(x) = \sum_{k=0}^{n} (-1)^k \binom{n}{k} x^k/k!$,
+with the same rules as `chebyshevT`. A negative degree stays unevaluated.
+
+```epsil
+laguerreL(3, x)
+// ➔ -1/6 * x^3 + 3/2 * x^2 - 3x + 1
+laguerreL(3, 2)
+// ➔ -1/3
+```
+
+See also: [Laguerre polynomials](https://en.wikipedia.org/wiki/Laguerre_polynomials),
+[DLMF 18.3](http://dlmf.nist.gov/18.3).
+
+### MathJSON
+
+`["LaguerreL", n, x]`. In LaTeX: `\operatorname{LaguerreL}(n, x)`.
+
+```json example
+["LaguerreL", 3, "x"]
+// ➔ ["Add", ["Multiply", ["Rational", -1, 6], ["Power", "x", 3]], ["Multiply", ["Rational", 3, 2], ["Power", "x", 2]], ["Multiply", -3, "x"], 1]
 ```
 
 ## JacobiTheta
