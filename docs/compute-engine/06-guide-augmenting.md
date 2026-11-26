@@ -373,13 +373,11 @@ The signature of the `evaluate` handler is `(args[], options)`, where:
 
 **An argument that is a finite lazy collection arrives as a list.** When the
 function is not `lazy`, an argument that evaluates to a finite `Range`,
-`Linspace`, `Reverse`, `Map`, `Filter`, `Take` or comprehension is replaced by
+`Linspace`, `Reverse`, `Map`, `Filter`, `Take`, `Tabulate` or comprehension is replaced by
 the `List` of its elements before the handler runs, up to
 `ce.maxCollectionSize` elements (10,000 by default). A `Map` callback runs once
 for each element, in order, before the handler. Compiled code passes the same
-`List`. An endless collection, a set, a dictionary and a `Tabulate` whose
-callback has an effect (a draw, a call that changes a variable) arrive as they
-are.
+`List`. An endless collection, a set and a dictionary arrive as they are.
 
 ```js
 ce.declare("hostSum", {

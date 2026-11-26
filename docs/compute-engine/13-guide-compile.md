@@ -1032,6 +1032,32 @@ r.run({ b: [1, 2] });  // ➔ [3, 5]
 Declare one shape (`real` or `list<real>`), or a union of shapes
 (`real | list<real>`), to compile it.
 
+### Two Lists of Run-Time Length
+
+On the `javascript` target, an operation that reads two lists index by
+index compares their lengths once, before its loop, when the compiler cannot
+prove them equal: an element-wise operation (`L + K`, `L < K`), `Dot(L, K)`,
+and a user function of scalar parameters called with two lists. Where the
+lengths differ it throws a `RangeError`, where `evaluate()` gives the error
+`incompatible-dimensions`:
+
+```js
+ce.declare("L", "list<real>");
+ce.declare("K", "list<real>");
+
+const sum = compile(ce.box(["Add", "L", "K"]));
+sum.run({ L: [1, 2], K: [3, 4] });     // ➔ [4, 6]
+sum.run({ L: [1, 2], K: [1, 2, 3] });
+// throws RangeError: incompatible-dimensions: lists of lengths 2 and 3
+
+const dot = compile(ce.box(["Dot", "L", "K"]));
+dot.run({ L: [1, 2], K: [3, 4] });     // ➔ 11
+```
+
+Lists whose lengths the compiler proves equal (the same input, two stated
+lengths) are not compared. The GLSL and interval targets compare no length:
+there, the result for lists of two lengths is unspecified.
+
 ### Lists of Lists
 
 The rows of a `list<list<integer>>` or a `list<list<real>>` can have
@@ -1180,8 +1206,7 @@ square:
 const product = compile(ce.box(["MatrixMultiply", "M", "A"]));
 product.run({ M, A: [[1], [0], [2]] });                // ➔ [[7], [16]]
 product.run({ M, A: [[1, 0], [0, 1]] });
-// throws RangeError: incompatible-dimensions: MatrixMultiply of operands
-// whose inner lengths differ (3 and 2)
+// throws RangeError: incompatible-dimensions: lists of lengths 3 and 2
 
 const trace = compile(ce.box(["Trace", "M"]));
 trace.run({ M: [[1, 2], [3, 4]] });                    // ➔ 5
@@ -1771,7 +1796,10 @@ A read of a key, `d.x` or `d["x"]` in Epsil (`["At", d, "'x'"]`), compiles.
 A key that the dictionary does not have, an index that is not a key
 (`d[1]`), and other operations on a dictionary (`Length`, `Keys`,
 arithmetic) do not compile, and the interpreter computes them. A function
-declared by the host with `evaluate` receives the dictionary of the engine.
+declared by the host with `evaluate` receives the dictionary of the engine,
+with each value that is a `List` or a `Tuple` literal
+(`{"p" -> (t, 1)}`); a value that can be a lazy collection, such as a
+`Range`, does not compile there.
 A dictionary does not compile to `glsl`, to `interval-js` or in the `bigint`
 mode.
 
