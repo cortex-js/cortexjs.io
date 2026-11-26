@@ -161,6 +161,24 @@ an initial parse, it should reparse the authored source under the final
 declarations. Reboxing an already chosen MathJSON structure cannot recover the
 original ambiguity.
 
+The same rule applies when a name changes from a function to a number. A
+function body that was parsed while `a` was a function keeps the call `a(t+1)`.
+After `a` gets a number, that call is an error. Parse the definition again to
+get the product:
+
+```js
+ce.parse('a(x) := x^2').evaluate();
+ce.parse('h(t) := a(t+1)').evaluate();
+ce.parse('h(1)').evaluate().json;  // 4
+
+ce.assign('a', 3);
+ce.parse('h(1)').evaluate().json;
+// ["Error", ["ErrorCode", "'incompatible-type'", "'function'", "'3'"], "'3'"]
+
+ce.parse('h(t) := a(t+1)').evaluate();  // parsed again: a(t+1) is a product
+ce.parse('h(1)').evaluate().json;  // 6
+```
+
 Use `resolveSymbol(name)` to supply facts held outside the engine:
 
 ```js
@@ -706,7 +724,7 @@ heads at parse time (no generic accessor head is introduced).
 
 ```live
 console.log(ce.parse("p.x").json);
-// ➔ ["First", "p"]
+// ➔ ["PointX", "p"]
 
 console.log(ce.parse("L.\\operatorname{count}").json);
 // ➔ ["Length", "L"]
@@ -715,9 +733,18 @@ console.log(ce.parse("z.\\operatorname{re}").json);
 // ➔ ["Real", "z"]
 ```
 
-Recognized members: `x`, `y`, `z` (→ `First`, `Second`, `Third`); `real`,
-`re` (→ `Real`); `imag`, `im` (→ `Imaginary`); `count` (→ `Length`);
-`total` (→ `Sum`); `max` (→ `Max`); `min` (→ `Min`).
+Recognized members: `x`, `y`, `z` (→ `PointX`, `PointY`, `PointZ`); `real`,
+`re` (→ `Real`); `imag`, `im` (→ `Imaginary`); `count`, `length`
+(→ `Length`); `total` (→ `Sum`); `max` (→ `Max`); `min` (→ `Min`); `mean`
+(→ `Mean`); `median` (→ `Median`); `stdev` (→ `StandardDeviation`, the sample
+standard deviation); `sort` (→ `Sort`); `unique` (→ `Unique`). `PointX`,
+`PointY` and `PointZ` take a coordinate of a point, and of each point of a list
+of points.
+
+```live
+console.log(ce.parse("\\left[3,1,2,1\\right].\\operatorname{mean}").evaluate().json);
+// ➔ ["Rational", 7, 4]
+```
 
 Two surface forms are accepted: bare-letter (`p.x`) and operator-name
 (`L.\operatorname{count}` or `L.\max`). `\mathrm{...}` is not accepted as
@@ -728,7 +755,7 @@ postfix operators:
 
 ```live
 console.log(ce.parse("p.x.\\operatorname{real}").json);
-// ➔ ["Real", ["First", "p"]]
+// ➔ ["Real", ["PointX", "p"]]
 ```
 
 **Disambiguation from decimal points.** After an integer or a complete
@@ -736,20 +763,20 @@ decimal, a `.` followed by a letter or `\operatorname{...}` is component
 access, not a decimal continuation:
 
 ```live
-console.log(ce.parse("1.x").json);
-// ➔ ["First", 1]
+console.log(ce.parse("1.x", { form: "raw" }).json);
+// ➔ ["PointX", 1]
 
-console.log(ce.parse("1.5.x").json);
-// ➔ ["First", 1.5]
+console.log(ce.parse("1.5.x", { form: "raw" }).json);
+// ➔ ["PointX", 1.5]
 ```
 
-`First(1)` is a legal AST shape — evaluation produces an `Error` expression
-since `1` is not a collection.
+`PointX(1)` is a legal raw parse. The canonical form holds an `Error`
+expression, since `1` is not a collection.
 
 #### Round-tripping with `dotNotation`
 
 By default the serializer emits the standard function-call form
-(`\operatorname{First}(p)`). To preserve the dot-notation form in output —
+(`\mathrm{PointX}(p)`). To preserve the dot-notation form in output —
 useful when the source was authored with dot notation — enable the `dotNotation`
 serialization option:
 
@@ -764,7 +791,8 @@ ce.parse('L.\\operatorname{count}').toLatex(); // ➔ "L.\\operatorname{count}"
 Per-call override is also supported:
 
 ```ts
-ce.expr(['First', 'p']).toLatex({ dotNotation: true }); // ➔ "p.x"
+ce.expr(['PointX', 'p']).toLatex({ dotNotation: true }); // ➔ "p.x"
+ce.expr(['Mean', 'L']).toLatex({ dotNotation: true }); // ➔ "L.\\operatorname{mean}"
 ```
 
 Multi-operand forms (e.g. `Sum` with an index range) are never emitted as dot

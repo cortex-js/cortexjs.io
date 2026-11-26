@@ -335,6 +335,12 @@ ce.expr(['Shape', ['List',
   ['List', ['List', 1, 2, 3, 4], ['List', 5, 6, 7, 8], ['List', 9, 10, 11, 12]],
   ['List', ['List', 13, 14, 15, 16], ['List', 17, 18, 19, 20], ['List', 21, 22, 23, 24]]
 ]]).evaluate();  // → (2, 3, 4)
+
+// Ragged list: the axes that the items have in common
+ce.expr(['Shape', ['List',
+  ['List', 5, 2, 10, 18],
+  ['List', 1, 2, 3]
+]]).evaluate();  // → (2)
 ```
 
 ### Rank

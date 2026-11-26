@@ -811,7 +811,8 @@ declines, and compiles after `ce.declare('N', 'real')`.
   `Block(p ≔ 0; Filter(L, u ↦ Block(p ≔ 5, u > 1)); p)` declines. The root of
   the compilation, and a function that `Apply` applies where it is written to
   scalar arguments, still compile. A function literal at the root that assigns
-  a variable of the engine compiles to JavaScript (see
+  a variable of the engine compiles to JavaScript, and so does a user function
+  that it calls and that assigns such a variable (see
   [Variables That a Function Assigns](#variables-that-a-function-assigns)).
 - A list whose element type is a union of shapes. With
   `CS: list<real | tuple<real, real>>` and `f := t ↦ 2t`, `Map(f, CS)`
@@ -952,6 +953,14 @@ compile(power, { inputs: { k: "real" } }).run({ x: -3, k: 0.5 });
 For a wider type, parse the expression in a scope that declares the name
 with that type.
 
+A function of the expression that reads the name, such as a Document row
+`X(x, y) = kx/y` that reads the row `k = \max(y_w, 0.01)`, reads the input
+too, and its body is typed with the given type for that compilation: with
+`inputs: { k: "real" }`, `k` is a `real` there, not a `real<0.01..>`. The
+same rule applies to the canonical form of the body. For a row read through a
+function, a given type of another shape than the type of the row
+(`list<real>` for a `real` row) makes the compilation decline.
+
 A name of `inputs` that a function of the expression reads as a constant is
 not an input: the compilation declines, and `diagnostic.binding` is the name.
 Compile again without the name to read the constant.
@@ -1040,9 +1049,8 @@ in order, which every reader of a list reads; and an argument of a user function
 the same type or of type `list`, which takes it whole. An
 element type `number` is read as `real`, except in the `complex` mode. Out of range the interpreter's row is
 `Missing`: compiled, `Length(g[i])` and `First(g[i])` are `NaN`,
-`IsMissing(g[i])` is `True`, and a sum of the row is unspecified. Every other
-read declines: the row `g[i]` as the result, `AssertPresent(g[i])`, a `Map`
-or a `Filter` that gives a list of rows, `g` as a value:
+`IsMissing(g[i])` is `True`, and a sum of the row is unspecified. The row
+`g[i]` as the result and `AssertPresent(g[i])` decline:
 
 ```js
 ce.declare("g", "list<list<integer>>");
@@ -1070,9 +1078,149 @@ len.run({ g: [[1, 2, 3], [4]], i: 3 });                // ➔ -1
 compile(ce.box(["At", "g", "i"])).success;             // ➔ false
 ```
 
-A user function whose result has such a type compiles when its body is a
-list of lists whose lengths the body settles, such as a `Map` of a `Map`
-over a `Range` of constant bounds. One step of the Game of Life compiles
+A program can also build such a list. A `Map` or a `Filter` whose value for
+each element is a list of integers or reals, of a length known only at run
+time, gives an array of arrays. Every reader above reads it, a local, an
+`If` or a `Coalesce` can hold it, a user function can return it, a `Loop`, a
+`Fold` or a `Reduce` can carry it, and as the result `run()` returns the
+arrays:
+
+```js
+ce.declare("n", "integer");
+
+const double = compile(ce.box(
+  ["Map", ["Function",
+    ["Map", ["Function", ["Multiply", 2, "x"], "x"], "r"], "r"], "g"]
+));
+double.run({ g: [[1, 2, 3], [4]] });                   // ➔ [[2, 4, 6], [8]]
+
+const long = compile(ce.box(
+  ["Filter", "g", ["Function", ["Greater", ["Length", "r"], 1], "r"]]
+));
+long.run({ g: [[1, 2, 3], [4]] });                     // ➔ [[1, 2, 3]]
+
+const triangle = compile(ce.box(
+  ["Map", ["Function", ["Range", 1, "k"], "k"], ["Range", 1, "n"]]
+));
+triangle.run({ n: 3 });                                // ➔ [[1], [1, 2], [1, 2, 3]]
+
+const twice = compile(ce.box(
+  ["Fold", ["Function",
+    ["Map", ["Function",
+      ["Map", ["Function", ["Add", "x", 1], "x"], "r"], "r"], "a"],
+    "a", "k"], "g", ["Range", 1, "n"]]
+));
+twice.run({ g: [[1, 2, 3], [4]], n: 2 });              // ➔ [[3, 4, 5], [6]]
+```
+
+A list literal of such rows, `Join`, `ListJoin` and `Append` make such a list
+too, and so does a `Fold` or a `Reduce` that starts from an empty list:
+
+```js
+const prefixes = compile(ce.box(
+  ["Fold", ["Function", ["Join", "a", ["List", ["Range", 1, "k"]]], "a", "k"],
+    ["List"], ["Range", 1, "n"]]
+));
+prefixes.run({ n: 3 });                                // ➔ [[1], [1, 2], [1, 2, 3]]
+
+const more = compile(ce.box(["Append", "g", ["Range", 1, "n"]]));
+more.run({ g: [[1, 2, 3], [4]], n: 2 });               // ➔ [[1, 2, 3], [4], [1, 2]]
+```
+
+`Transpose`, `MatrixMultiply` and `Trace` read a list that the program
+builds when the program settles that its rows have one length: a `Map` whose
+row length does not depend on the element. An input of type `list<list<…>>`
+declines there, since its rows can have different lengths:
+
+```js
+ce.declare("m", "integer");
+
+const table = ["Map", ["Function",
+  ["Map", ["Function", ["Add", "i", ["Multiply", 10, "j"]], "j"],
+    ["Range", 1, "m"]], "i"], ["Range", 1, "n"]];
+compile(ce.box(["Transpose", table])).run({ n: 2, m: 3 });
+// ➔ [[11, 12], [21, 22], [31, 32]]
+
+const square = ["Map", ["Function",
+  ["Map", ["Function", ["Add", "i", "j"], "j"], ["Range", 1, "n"]], "i"],
+  ["Range", 1, "n"]];
+compile(ce.box(["MatrixMultiply", square, square])).run({ n: 2 });
+// ➔ [[13, 18], [18, 25]]
+
+compile(ce.box(["Transpose", "g"])).success;           // ➔ false
+```
+
+To pass a matrix whose size is known only at run time, declare the input
+with a matrix type without dimensions: `matrix`, `matrix<real>` or
+`matrix<integer>`. The host passes an array of arrays. The type says that the
+rows have one length, so the compiled code takes the length of the first row
+as the length of every row and does not test the others: a value whose rows
+have different lengths is outside its type, and the result is then
+undefined.
+
+```js
+ce.declare("M", "matrix<real>");
+ce.declare("A", "matrix<real>");
+const M = [[1, 2, 3], [4, 5, 6]];
+
+compile(ce.box(["Transpose", "M"])).run({ M });
+// ➔ [[1, 4], [2, 5], [3, 6]]
+
+compile(ce.box(["MatrixMultiply", "M", ["Transpose", "M"]])).run({ M });
+// ➔ [[14, 32], [32, 77]]
+```
+
+Where `MatrixMultiply` reads two lengths that the compiler cannot prove
+equal, the compiled code compares them once at run time and throws a
+`RangeError` when they differ, where `evaluate()` gives the error
+`incompatible-dimensions`. `Trace` does the same for a matrix that is not
+square:
+
+```js
+const product = compile(ce.box(["MatrixMultiply", "M", "A"]));
+product.run({ M, A: [[1], [0], [2]] });                // ➔ [[7], [16]]
+product.run({ M, A: [[1, 0], [0, 1]] });
+// throws RangeError: incompatible-dimensions: MatrixMultiply of operands
+// whose inner lengths differ (3 and 2)
+
+const trace = compile(ce.box(["Trace", "M"]));
+trace.run({ M: [[1, 2], [3, 4]] });                    // ➔ 5
+trace.run({ M });
+// throws RangeError: expected-square-matrix: Trace of a matrix of 2 rows
+// and 3 columns
+```
+
+`Determinant`, `Inverse` and `MatrixPower` compare the number of rows with
+the number of columns once, and throw a `RangeError` for a matrix that is not
+square. `Shape` and `Rank` compile too. `RowReduce` of a matrix whose size is
+known only at run time declines:
+
+```js
+const Q = [[1, 2], [3, 4]];
+
+compile(ce.box(["Determinant", "M"])).run({ M: Q });       // ➔ -2
+compile(ce.box(["Inverse", "M"])).run({ M: Q });
+// ➔ [[-2, 1], [1.5, -0.5]]
+compile(ce.box(["MatrixPower", "M", 2])).run({ M: Q });    // ➔ [[7, 10], [15, 22]]
+compile(ce.box(["Shape", "M"])).run({ M });                // ➔ [2, 3]
+
+compile(ce.box(["Determinant", "M"])).run({ M });
+// throws RangeError: expected-square-matrix: a matrix of 2 rows and 3 columns
+
+compile(ce.box(["RowReduce", "M"])).success;               // ➔ false
+```
+
+A matrix of a stated size, such as `matrix<real^2x3>`, compiles as before:
+its sums are written out, and a length is compared only beside an operand
+whose length is known at run time. A matrix with one stated dimension, and a
+matrix of complex numbers or of booleans without stated dimensions, decline.
+
+A list of lists of booleans, of points or of complex numbers, GLSL, the
+interval target and the `bigint` mode decline.
+
+A user function whose body is a list of lists whose lengths the body
+settles, such as a `Map` of a `Map` over a `Range` of constant bounds, gives
+a list of lists of those lengths. One step of the Game of Life compiles
 this way, and `run()` returns an array of arrays:
 
 ```js
@@ -1476,13 +1624,52 @@ flip.run(16);                 // ➔ NaN
 ce.box("g").evaluate().json;  // ➔ ["List", ["List", 0, 1], ["List", 1, 1]]
 ```
 
+A user function that the body calls can read and assign a variable of a
+real, integer or boolean type, itself or through the functions that it
+calls. The function receives the current value at each call, and the call
+writes back the new value in the order of the program:
+
+```js
+ce.declare("x", "real");
+ce.assign("x", 0.5);
+ce.declare("move", "(real) scope -> real");
+ce.assign("move", ce.box(["Function",
+  ["Block", ["Assign", "x", ["Add", "x", "dt"]], "x"],
+  ["Typed", "dt", "'real'"]]));
+const tick = compile(ce.box(["Function", ["move", "dt"],
+  ["Typed", "dt", "'real'"]]));
+
+tick.assigns;               // ➔ ["x"]
+tick.run(2);                // ➔ 2.5
+tick.run(3);                // ➔ 5.5
+ce.box("x").evaluate().re;  // ➔ 5.5
+```
+
+A user function that reads the variable can also be given by name to `Map`,
+`Filter` or `Reduce`. Each application reads the value at that point:
+
+```js
+ce.declare("getX", "(real) scope -> real");
+ce.assign("getX", ce.box(["Function", ["Add", "x", "d"],
+  ["Typed", "d", "'real'"]]));
+// With x = 0.5
+const shift = compile(ce.box(["Function",
+  ["Block", ["Assign", "x", ["Add", "x", 1]], ["Map", "getX", ["List", "t", 10]]],
+  ["Typed", "t", "'real'"]]));
+
+shift.run(2);               // ➔ [3.5, 11.5]
+ce.box("x").evaluate().re;  // ➔ 1.5
+```
+
 These decline, and fall back to the interpreter: another
 target, a variable whose type is only inferred from its value, a constant, a
 list of a stated length, a string or a complex variable, a variable with
-no value, a user
-function called by the body that reads or assigns the variable, a callback
-in the body (of a `Map`, for example) that assigns it, and an expression that
-is not a function literal, such as `Block(Assign(s, s + 1))`.
+no value, a call of a user function that assigns the variable in a `Sum` or
+in a callback of a `Map` (a call in a `Loop` compiles), or over a list (`move(["List", 1, 2])`), a recursive user
+function that assigns it, a user function that assigns a list variable, a
+user function that reads it and is given as a value rather than by name, a
+callback in the body (of a `Map`, for example) that assigns it, and an
+expression that is not a function literal, such as `Block(Assign(s, s + 1))`.
 
 ### Functions of the Host
 
@@ -1504,9 +1691,23 @@ tick.run(16);    // ➔ NaN: the value Nothing
 log;             // ➔ [0.016]
 ```
 
-The arguments must be real numbers, integers, booleans or strings (at most
-four), and the result type `real`, `integer`, `boolean` or `nothing`: with
-the signature `(real) -> any`, the call declines. The code calls the engine,
+The arguments must be real numbers, integers, booleans, strings, `Nothing`,
+values of a named tuple type, or tuples and lists whose elements are of
+several kinds (at most four arguments). The function receives the value that
+the interpreter gives it: a value of a named tuple type `Figure` is
+`["Figure", …]`. An argument that is a finite lazy collection, such as
+`["Range", 1, 3]` or a `Map` over a list, reaches the function as the `List`
+of its elements in the interpreter, and the compiled code passes the same
+`List`; such a list compiles when its length is known when the code is
+compiled. A color, a value that holds a color, a collection inside a list
+(`[1..3]`, which the interpreter passes as `["List", ["Range", 1, 3, 1]]`),
+a list of a length known only at run time (`Range(1, n)`, a `Filter`)
+and a list whose elements have an effect (a `Map` whose function draws a
+random number or calls a function of the host) as an argument decline. The result type must be `real`, `integer`,
+`boolean` or `nothing`: with the signature `(real) -> any`, the call
+declines. A value `nothing` can only be the value of the compiled function,
+also through a function of the program that returns it, such as
+`function draw(...args) { figureDraw(listFrom(args)) }`. The code calls the engine,
 so the result is not `shippable` and cannot be loaded without the engine. A
 call in a function that assigns a variable of the engine declines.
 
@@ -1551,9 +1752,8 @@ input on GLSL, in the interval mode and in the `bigint` mode.
 
 ### Dictionary Expressions
 
-A dictionary does not compile in 0.194.0, on any target. With the default
-fallback, `run()` evaluates it with the interpreter, and returns the entries
-as a list of key-value pairs:
+On JavaScript a dictionary literal compiles, and `run()` returns an object
+of its keys:
 
 ```js
 const f = compile(ce.box([
@@ -1562,10 +1762,18 @@ const f = compile(ce.box([
   ["Tuple", "'y'", ["Sin", "t"]],
 ]));
 console.log(f.success);
-// ➔ false
+// ➔ true
 console.log(f.run({ t: 0 }));
-// ➔ [["x", 1], ["y", 0]]
+// ➔ { x: 1, y: 0 }
 ```
+
+A read of a key, `d.x` or `d["x"]` in Epsil (`["At", d, "'x'"]`), compiles.
+A key that the dictionary does not have, an index that is not a key
+(`d[1]`), and other operations on a dictionary (`Length`, `Keys`,
+arithmetic) do not compile, and the interpreter computes them. A function
+declared by the host with `evaluate` receives the dictionary of the engine.
+A dictionary does not compile to `glsl`, to `interval-js` or in the `bigint`
+mode.
 
 ### Control Structures
 
@@ -1667,7 +1875,9 @@ number and a list) do not compile.
 declared or inferred type of `x` is a subtype of `T`, and to `false` when
 the two types have no value in common; the compiled code has no test of a
 type. With `x: real`, `x is real` is `true` and `x is string` is `false`,
-and `x is integer` does not compile.
+and `x is integer` does not compile. The type of a `Match` is the type of
+its case values only when each value is a literal and a case takes every value
+(`_`). Otherwise it is `unknown`, and `x is T` of that `Match` does not compile.
 
 `N(x)` and `N(x, p)` of a number, a string or a boolean compile to `x`, for a
 precision `p` of at least 15 digits; a smaller precision does not compile,
@@ -1702,7 +1912,10 @@ of places in compiled code:
   out of range; a `Coalesce` or `AssertPresent` of a colour that is present
   compiles. A string read out of range (`S[n]` with `S: list<string>`) is
   `undefined` on JavaScript, and its discharges compile (`IsMissing(S[n])`
-  is `true` for `n` past the end). They
+  is `true` for `n` past the end). A row of a list of fixed-length rows read
+  out of range (`P[i]` with `P: list<list<real^2>>`) is `undefined` on
+  JavaScript; it compiles only as the whole program (`P[i]`, or the body of a
+  function literal), so every discharge of it is refused. The discharges
   are refused in the `bigint` mode,
   and for an operand computed as a real number that can have a complex value
   (`Coalesce(Sqrt(x), 0)` with `x: real`; with `mode: 'complex'` it
@@ -2290,7 +2503,14 @@ GLSL target has a complex lane for `HurwitzZeta`, `PolyGamma` (of an integer
 order), `Gamma`, `LerchPhi` and `PolyLog`, and declines a provably complex value of the other
 heads. `Zeta` of a complex operand, such as `|ζ(1/2 + it)|` with `t`
 declared `real`, compiles on JavaScript under `strict` and `complex`, with
-the interpreter's kernel. On GLSL, `Zeta`, `HurwitzZeta`, `PolyGamma` and
+the interpreter's kernel. So do `Zeta(z, a)` of a real `a` and `Digamma(z)`,
+on JavaScript and GLSL: with `a` declared `real`,
+`compile(ce.parse('\\zeta(z, a)'), { to: 'glsl' }).code` is
+`"_gpu_ir_czeta_generalized(z, a)"`, and `Digamma(z)` is
+`"_gpu_ir_cpolygamma(0.0, z)"`. For `a < 0` the GLSL kernel adds the terms
+`|a + k|^(-z)` left of 0, with the same error as `HurwitzZeta` below, at the
+scale of the sizes of its terms; a complex `a` declines.
+On GLSL, `Zeta`, `HurwitzZeta`, `PolyGamma` and
 `Gamma` of a complex operand compile to single-float kernels
 (`compile(ce.parse('\\zeta(z)'), { to: 'glsl' }).code` is
 `"_gpu_ir_czeta(z)"` with `z` declared `complex`), for a domain coloring:
