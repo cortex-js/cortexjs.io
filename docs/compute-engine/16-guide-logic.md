@@ -561,6 +561,19 @@ ce.expr(['IsSatisfiable', ['Or', 'A', ['Not', 'A']]]).evaluate();
 // → True
 ```
 
+`IsSatisfiable`, `IsTautology`, `TruthTable`, `PrimeImplicants`,
+`PrimeImplicates`, `MinimalDNF` and `MinimalCNF` analyze a propositional
+formula: `True`, `False`, symbols, and the connectives `And`, `Or`, `Not`,
+`Implies`, `Equivalent`, `Xor`, `Nand` and `Nor`. Each symbol stands for a
+truth value. A formula with another operand, such as a comparison or a
+quantifier, stays unevaluated, because the symbols of that operand are not
+truth values:
+
+```js example
+ce.expr(['IsSatisfiable', ['Greater', 'x', 0]]).evaluate();
+// → ["IsSatisfiable", ["Less", 0, "x"]]
+```
+
 ### Tautology Checking
 
 Use `IsTautology` to check if an expression is true for all possible assignments:

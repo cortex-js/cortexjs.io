@@ -2983,6 +2983,13 @@ Inference writes happen at these moments:
    `any`. A declared scalar or collection parameter type IS stamped on the
    parameter before the body is read: `(real | nan) -> unknown` assigned
    `t \mapsto t + 1` reads `-> nan | real`, not `-> number`.
+   Functions with such placeholders that call one another in a cycle get
+   their results together, whichever is assigned or read first: with `f`
+   and `g` declared `(unknown) -> unknown`, `f` assigned
+   `["Function", ["If", ["Equal", "n", 0], "'a'", ["g", ["Subtract", "n", 1]]], "n"]`
+   and `g` assigned
+   `["Function", ["If", ["Equal", "n", 0], 2, ["f", ["Subtract", "n", 1]]], "n"]`,
+   both read `(unknown) -> integer | string`, and `g(1)` is `"a"`.
 
 ### `unknown` vs `any`, and What a Bare Type Means
 

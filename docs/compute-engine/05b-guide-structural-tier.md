@@ -211,6 +211,14 @@ a promise that it never changes.
    ce.parse('1^x').json;                                // ➔ 1
    ```
 
+   An exponent that is a collection by its type is not generic: the power is
+   element-wise, so `1^M` stays a power and evaluates to a matrix of ones.
+
+   ```ts
+   ce.declare('M', 'matrix<2x2>');
+   ce.parse('1^M').json;                                // ➔ ["Power", 1, "M"]
+   ```
+
 6. **Literal normalization.** `Negate(2)` becomes `-2`; a literal
    a literal `a + bi` becomes `Complex(a, b)`. The `Complex` fold
    requires **both** parts to be literal — a symbolic imaginary term stays a

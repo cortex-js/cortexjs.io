@@ -382,8 +382,10 @@ the free `a` resolves, the bound `x` does not.
 `D`, `Integrate`, `Limit` and `Series` work on a formula, and their variable is
 a variable of that formula. When a free symbol holds a formula in that
 variable, they work on its value, and the variable's name in the value denotes
-their variable. `Sum`, `Product` and the other operators that iterate over an
-index do not: their index does not reach into the value of another symbol.
+their variable. `ND`, `NIntegrate` and `NLimit` read the body of their function
+argument in the same way. `Sum`, `Product` and the other operators that iterate
+over an index do not: their index does not reach into the value of another
+symbol.
 
 ```js
 ce.assign('G', ce.parse('\\sin(x)'));
@@ -396,8 +398,51 @@ ce.parse('\\int G \\,dx').evaluate().print();
 ce.parse('\\lim_{x \\to 0} G').evaluate().print();
 // ➔ 0
 
+ce.box(['ND', ['Function', 'G', 'x'], 1]).N().print();
+// ➔ 0.5403023058595877
+
+ce.box(['NIntegrate', ['Function', 'G', 'x'], 0, 1]).N().print();
+// ➔ 0.45969769413186035
+
 ce.parse('\\sum_{x=1}^{3} G').evaluate().print();
 // ➔ 3sin(x)
+```
+
+A symbol that holds a formula can also be the whole operand, with no variable
+written. The operand is then read as the formula, and the variable is chosen
+from the symbols of the formula, as for a formula written in place. A symbol
+that names a function (`Sin`, or `g` after `g(t) := t^2`) keeps its meaning:
+its parameter is the variable.
+
+```js
+ce.parse('\\int_0^1 G').N().print();
+// ➔ 0.45969769413186035 ± 0.00000000000000041
+
+ce.parse('\\int G').evaluate().print();
+// ➔ -cos(x)
+
+ce.box(['Limit', 'G', 0]).evaluate().print();
+// ➔ 0
+
+ce.box(['ND', 'G', 1]).N().print();
+// ➔ 0.5403023058595877
+
+ce.box(['NIntegrate', 'G', 0, 1]).N().print();
+// ➔ 0.45969769413186035
+```
+
+The same applies when the symbol is a part of the operand. A symbol that holds
+a formula is not chosen as the variable: the variable is chosen from the
+symbols of its formula and the other symbols of the operand. Assign the
+formula before you parse or box the expression, because the variable is
+chosen at that time.
+
+```js
+ce.parse('\\int_0^1 G + x').evaluate().print();
+// ➔ 3/2 - cos(1)
+
+ce.box(['ND', ['Multiply', 2, 'G'], 1]).N().print();
+// ➔ 1.0806046117191754
 ```
 
 To use an assumption instead of a value (which *does* inform simplification and

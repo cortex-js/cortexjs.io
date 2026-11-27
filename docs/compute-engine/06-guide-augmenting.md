@@ -371,6 +371,32 @@ The signature of the `evaluate` handler is `(args[], options)`, where:
 - `options`: an object literal which includes an `engine` property that is the
   Compute Engine instance that is evaluating the expression, a `numericApproximation` property that is true if the result should be a numeric approximation, an `expression` property that is the expression being evaluated, and a `precision` property with the number of significant digits requested: inside `N(x, p)` it is `p`, also when `p` is lower than `ce.precision`; under `.N()` it is `ce.precision`; in an exact evaluation it is `undefined`.
 
+**An argument that is a finite lazy collection arrives as a list.** When the
+function is not `lazy`, an argument that evaluates to a finite `Range`,
+`Linspace`, `Reverse`, `Map`, `Filter`, `Take`, `Tabulate` or comprehension is replaced by
+the `List` of its elements before the handler runs, up to
+`ce.maxCollectionSize` elements (10,000 by default). A `Map` callback runs once
+for each element, in order, before the handler. Compiled code passes the same
+`List`. An endless collection, a set and a dictionary arrive as they are.
+
+```js
+ce.declare("hostSum", {
+  signature: "(indexed_collection<real>) -> real",
+  evaluate: ([xs]) => { console.log(xs.json); return ce.number(0); },
+});
+ce.box(["hostSum", ["Range", 1, 3]]).evaluate();
+// ➔ logs ["List", 1, 2, 3]
+ce.box(["hostSum", ["Reverse", ["List", 1, 2]]]).evaluate();
+// ➔ logs ["List", 2, 1]
+```
+
+An endless collection (`Range(1, +∞)`), one whose count is not known, a
+larger one, a set and a dictionary are passed as they are, and so is a
+collection inside a list argument (`[1..3]` passes `["List", ["Range", 1, 3,
+1]]`). A handler that needs the collection as written, to read the bounds of
+a `Range` or only some of its elements, declares the function `lazy: true`:
+it then receives its arguments unevaluated and evaluates them itself.
+
 Since `args` is an array, you can use destructuring to get the arguments:
 
 ```js
@@ -2116,7 +2142,7 @@ order. A position that the returned array leaves out has the default role:
 | `{ kind: "raw" }` | kept as written, not canonicalized and not evaluated. Valid only on a `lazy` operator. |
 | `{ kind: "opaque" }` | kept as written, and an `Assign` or a `Declare` in it is valid (the expression of `Hold`). Valid only on a `lazy` operator. |
 | `{ kind: "bound", type? }` | a symbol that is a bound variable of the operator (the variable of `D`). See [Declaring an Operator that Binds a Variable](#declaring-an-operator-that-binds-a-variable). |
-| `{ kind: "clause", type? }` | an indexing set, such as `Limits(k, 1, 10)` or `Element(k, S)`, whose index is a bound variable of the operator (the clauses of `Sum`). See [Declaring an Operator that Binds a Variable](#declaring-an-operator-that-binds-a-variable). |
+| `{ kind: "clause", type?, unordered? }` | an indexing set, such as `Limits(k, 1, 10)` or `Element(k, S)`, whose index is a bound variable of the operator (the clauses of `Sum`). See [Declaring an Operator that Binds a Variable](#declaring-an-operator-that-binds-a-variable). |
 
 An `Assign` or a `Declare` operand at a `value`, `held`, `raw`, `bound`
 or `clause` position is the error `assignment-in-operand`: an assignment is a
@@ -2209,7 +2235,7 @@ MathJSON, and `ce.function()` routes.
   `Series`). An operand that is not a symbol declares nothing. As for `D`,
   the variable stays a free variable of the expression: the value of
   `D(x^2, x)` is a function of `x`.
-- `{ kind: "clause", type? }` — the operand is an indexing set whose index is
+- `{ kind: "clause", type?, unordered? }` — the operand is an indexing set whose index is
   a bound variable: `["Limits", "k", 1, 10]`, `["Element", "k", collection]`
   (`["Element", ["Tuple", "p", "q"], pairs]` binds both `p` and `q`), a tuple
   `["Tuple", "k", 1, 10]`, or a symbol (like the clauses of `Sum`,
@@ -2293,7 +2319,13 @@ A few notes:
 - With multiple indexing clauses, **later clauses see earlier bindings**: a
   collection expression in clause 2 may reference the index of clause 1, and a
   collection in clause 1 that mentions the *name* of clause 2's index refers
-  to the enclosing scope, not the later clause.
+  to the enclosing scope, not the later clause. With `unordered: true` on the
+  `clause` role, each clause also sees the index of a later clause. Use it
+  for an operator that evaluates its clauses in the order of their
+  dependencies, not in the written order. `Sum` and `Product` do this: in
+  `["Sum", ["Multiply", "i", "j"], ["Element", "j", ["Range", 1, "i"]], ["Limits", "i", 1, 3]]`
+  the `i` of the first clause is the index of the second clause, and the sum
+  is 25. The bounds of a clause still do not see the index of that clause.
 - A parameter or index named after a library constant (`Pi`, `e`, `i`) is
   bound like any other variable inside the operator; the constant is
   unaffected outside it.
