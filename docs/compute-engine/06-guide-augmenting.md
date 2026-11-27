@@ -551,6 +551,52 @@ The optional `limit` setting limits the number of results and defaults to `10`.
 Pass a returned `id` to `ce.lookupDefinition(id)` to inspect the complete
 definition.
 
+The optional `parameters` property documents the parameters, keyed by the
+parameter names of the signature, and `examples` gives one line of Epsil per
+example. The Epsil editor functions show them: `epsilSignatureHelp()` gives
+each parameter its documentation and sample, and the examples of the callee
+in the Epsil spelling. A string is the description of a parameter alone; a
+parameter that takes a dictionary of options documents its keys with `keys`,
+each with an optional `type`, `description`, `sample` and `default`.
+
+A list documents the parameters by position instead, for a signature whose
+parameters have no name: the entry `i` documents the parameter `i` of each arm
+of the signature, and an empty string leaves a parameter undocumented. Either
+form documents the parameter, so a positional argument and a named argument
+show the same text.
+
+```js
+ce.declare("haversine", {
+  signature: "(real) -> real",
+  description: "The haversine of an angle",
+  parameters: [{ description: "The angle, in radians.", sample: "pi / 4" }],
+  evaluate: ([x]) => x.cos().neg().add(1).div(2),
+});
+
+epsilSignatureHelp(ce, "haversine(", 10).signatures[0].parameters[0];
+// ➔ { type: "real", range: [10, 14],
+//     documentation: "The angle, in radians.", sample: "pi / 4" }
+```
+
+```js
+ce.declare("double", {
+  signature: "(x: number, factor: number) -> number",
+  description: "Multiply a number by a factor",
+  parameters: {
+    x: "The number.",
+    factor: { description: "The factor.", sample: "2" },
+  },
+  examples: ["double(3, 2)"],
+  evaluate: ([x, factor]) => x.mul(factor),
+});
+
+const help = epsilSignatureHelp(ce, "double(3, ", 10);
+help.signatures[0].parameters[1];
+// ➔ { name: "factor", type: "number", range: [18, 32],
+//     documentation: "The factor.", sample: "2" }
+help.examples; // ➔ ["double(3, 2)"]
+```
+
 A definition can give its own derivative with the `derivative` key. The value
 is an array with one function literal for each argument (each literal takes all
 the arguments as parameters), or a handler

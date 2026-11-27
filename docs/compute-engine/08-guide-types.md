@@ -93,7 +93,7 @@ types (see [Kind Types](#kind-types)):
 
 ```mermaid
 flowchart LR
-  value --> color & regexp & residue & measurement & quantity & type & object & scalar & collection
+  value --> color & regexp & residue & measurement & quantity & type & object & array & scalar & collection
 ```
 
 The `scalar` branch:
@@ -247,6 +247,7 @@ The Compute Engine supports the following primitive types:
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
 | `value`        | A data value: a scalar, collection, object, color, regular expression, or reified type. Excludes functions and symbolic expressions typed as `symbol` or `expression`. |
 | `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `string`, a `dictionary` or a `record` |
+| `array`    | The type of a **mutable array** of any cell type: a sequence of cells that a program writes in place. Not a collection (see [Mutable Arrays](#mutable-arrays)) |
 | `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `tuple`, a `range`, a `string`, a `list`, a `vector`, a `matrix` or a `tensor` |
 | `range`        | The type of an **index span**: a contiguous, ascending run of 1-based collection indexes, such as `["Range", 2, 5]`. A `Range` has this type only when its bounds are integers, at least 1, ascending and one apart — so `["Range", 1, 10, 2]` (stepped) and `["Range", 5, 2]` (descending) are `indexed_collection<integer>` instead. Not a mathematical interval (see `Interval`) |
 | `scalar`        | The type of a single value: a `boolean`, a `character`, or a `number`. A `string` is **not** a scalar — it is an indexed collection of characters |
@@ -819,6 +820,165 @@ Only expressions whose collection-ness genuinely cannot be resolved
 statically (function calls with top-typed results, or values declared
 `broadcastable`) carry the type.
 
+## Mutable Arrays
+
+A **mutable array** is a sequence of cells that a program reads and writes in
+place. A `list` is a value: `xs[2] = 9` gives the variable `xs` a new list.
+An array has an identity: two names can hold the same array, a store through
+one name shows through the other, and a store costs the same for every
+length.
+
+The type `array<T>` is an array whose cells hold values of type `T`. The type
+`array` is an array of any cell type.
+
+`["ArrayFrom", xs, type]` makes an array from a finite collection, or from
+another array. `type` is a string that names the cell type.
+
+```js example
+const a = ce.box(
+  ['ArrayFrom', ['List', 10, 20, 30], { str: 'integer<0..255>' }]
+).evaluate();
+ce.assign('a', a);
+
+a.type.toString();                                    // ➔ "array<integer<0..255>>"
+ce.box(['At', 'a', 2]).evaluate().json;               // ➔ 20
+ce.box(['At', 'a', -1]).evaluate().json;              // ➔ 30
+ce.box(['At', 'a', 5]).evaluate().json;               // ➔ "NaN"
+ce.box(['Assign', ['At', 'a', 2], 99]).evaluate();    // stores 99 in the second cell
+ce.box(['AddTo', ['At', 'a', 1], 5]).evaluate();      // the first cell is 15
+ce.box(['ListFrom', 'a']).evaluate().json;            // ➔ ["List", 15, 99, 30]
+ce.box(['At', 'a', ['Range', 1, 2]]).evaluate().json; // ➔ ["List", 15, 99]
+ce.box(['Length', 'a']).evaluate().json;              // ➔ 3
+```
+
+The index is that of a list: it starts at 1, and a negative index counts from
+the end. A read at an index that is 0, not an integer or out of range gives
+`NaN`. A store there is the error `out-of-range`, and a store of a value
+outside the cell type is the error `incompatible-type`:
+
+```js example
+ce.box(['Assign', ['At', 'a', 2], 300]).evaluate().json;
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'integer<0..255>'", "'300'"], 300]
+ce.box(['Assign', ['At', 'a', 7], 1]).evaluate().json;
+// ➔ ["Error", ["ErrorCode", "'out-of-range'", "'an index in 1..3 or -3..-1'", "'7'"]]
+```
+
+### The Cell Type and the Storage
+
+The cell type selects how the cells are stored.
+
+<div className="symbols-table first-column-header" style={{"--first-col-width":"30ch"}}>
+
+| Cell type | Storage |
+| :--- | :--- |
+| An integer type with a range within 0 to 255, such as `integer<0..255>` | A `Uint8Array` |
+| within −128 to 127 | An `Int8Array` |
+| within 0 to 65,535 | A `Uint16Array` |
+| within −32,768 to 32,767 | An `Int16Array` |
+| within 0 to 4,294,967,295 | A `Uint32Array` |
+| within −2,147,483,648 to 2,147,483,647 | An `Int32Array` |
+| `real`, with or without a range | A `Float64Array` |
+| A tuple of four elements, each an integer type within 0 to 255 | A `Uint8Array`, four bytes for each cell |
+| Every other type | The evaluated expressions |
+
+</div>
+
+A `real` cell holds a machine number, so a value such as `1/3` is stored as
+`0.3333333333333333`. An array of `rational` or `number` cells keeps the
+exact value:
+
+```js example
+ce.box(['At', ['ArrayFrom', ['List', ['Rational', 1, 3]], { str: 'real' }], 1])
+  .evaluate().json;
+// ➔ 0.3333333333333333
+ce.box(['At', ['ArrayFrom', ['List', ['Rational', 1, 3]], { str: 'rational' }], 1])
+  .evaluate().json;
+// ➔ ["Rational", 1, 3]
+```
+
+Without `type`, the cells hold expressions: `["ArrayFrom", ["List", 0, 0]]`
+is an `array<number>`. Name the cell type to get a typed array.
+
+### An Array Is Not a Collection
+
+The cell type is **invariant**: an `array<integer>` is not an `array<number>`,
+because a store of `1.5` through the second type would break the first. An
+array type is not a subtype of `list`, `collection` or `indexed_collection`,
+and an array is never broadcast over. The operators that take an array are
+`At`, `Length`, `ListFrom`, `ArrayFrom`, `Swap`, and `Assign` and `AddTo`
+with an `At` target. `ListFrom` gives a list of the cells, which every
+collection operator takes:
+
+```js example
+ce.box(['Sum', 'a']).evaluate().json;
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'collection'", "'array<integer<0..255>>'"], ...]
+ce.box(['Sum', ['ListFrom', 'a']]).evaluate().json;
+// ➔ 144
+```
+
+Two arrays are equal only when they are the same array:
+
+```js example
+ce.box(['Equal', 'a', 'a']).evaluate().json;                // ➔ "True"
+ce.box(['Equal', 'a', ['ArrayFrom', 'a']]).evaluate().json; // ➔ "False"
+```
+
+`["Swap", a, b]` exchanges the cells of two arrays of one cell type, with no
+copy.
+
+### Arrays and JavaScript
+
+A JavaScript program reads and writes the cells of an array with no copy.
+`ce.array()` makes an array from a typed array, which becomes the cells of
+the array. `isMutableArray()` tests for an array value.
+
+```js example
+const pixels = ce.array(new Uint8Array([1, 2, 3, 4]));
+ce.assign('p', pixels);
+pixels.type.toString();                            // ➔ "array<integer<0..255>>"
+
+ce.box(['Assign', ['At', 'p', 1], 200]).evaluate();
+pixels.cells;                                      // ➔ Uint8Array [200, 2, 3, 4]
+pixels.version;                                    // ➔ 1
+
+pixels.cells[1] = 77;                              // a write by the host
+pixels.noteStore();                                // tell the engine
+ce.box(['At', 'p', 2]).evaluate().json;            // ➔ 77
+pixels.version;                                    // ➔ 2
+```
+
+- `cells` is the storage, by reference. Read it at each use: `swapCells()`
+  and `Swap` replace it.
+- `count` is the number of cells, and `cellType` the cell type.
+- `version` increases at each store. A program that shows the array compares
+  it with the version that it showed last.
+- `noteStore()` tells the engine that the host wrote to `cells`.
+- `swapCells(storage)` gives the array another typed array of the same kind
+  and length as its cells, and returns the one it had. A program that
+  computes a frame in a second buffer exchanges the two with no copy.
+
+```js example
+const back = pixels.swapCells(new Uint8Array([9, 9, 9, 9]));
+back;                                              // ➔ Uint8Array [200, 77, 3, 4]
+ce.box(['ListFrom', 'p']).evaluate().json;         // ➔ ["List", 9, 9, 9, 9]
+```
+
+`ce.array(storage, cellType)` takes a cell type that selects the kind of
+`storage`. It does not take a `Uint8ClampedArray`: for the bytes of an
+`ImageData`, pass `new Uint8Array(data.buffer, data.byteOffset,
+data.byteLength)`, which shares them.
+
+`ce.arrayAllocation` is a function `(count, bytesPerCell) => boolean` that
+the engine calls before it allocates the cells of a new array. When it
+returns `false`, the construction is the error `array-allocation-refused`.
+With no function, the engine refuses more than 2 GiB for one array.
+
+`expr.toMathJson({ objects })` takes a function from an array (or an object)
+to the MathJSON written in its place, so that a program which sends a value
+to another thread writes a reference of its own and reads no cell. By
+default, the MathJSON of an array is `["Object", ["List", ...cells],
+"'array<T>'"]`.
+
 ## Function Signature
 
 A **function signature** is the type of functions literals.
@@ -1204,6 +1364,35 @@ An **anonymous** literal is not gated — it has no annotation surface, and its
 arrow carries the inferred `scope` honestly — so a factory that returns a
 writing closure still installs under a bare arrow; the `scope` lives on the
 inner arrow.
+
+A callback given to another function is a proven write only when that function
+is known to call it. A library operator such as `Map` calls its callback. A
+function that you define calls it only when its body visibly does: it applies
+the parameter, or passes it to a function that calls it. A function that keeps
+the callback (in a list, or in a host function that calls it later) does not,
+so the function that creates the callback needs no `scope` declaration. Its
+inferred effects still include the `scope` of the callback.
+
+```js
+const bump = ["Function", ["Assign", "counter", ["Add", "counter", "t"]], "t"];
+
+// `later` keeps its argument and does not call it.
+ce.assign("later", ce.box(["Function", ["List", "h"], "h"]));
+
+// Accepted: `scene` creates the callback, and nothing calls it yet.
+ce.assign("scene", ce.box(["Function", ["later", bump]]));
+
+// `callIt` applies its argument.
+ce.assign("callIt", ce.box(["Function", ["Apply", "h", 1], "h"]));
+
+// Refused: calling `f` calls the callback, which assigns to `counter`.
+ce.assign("f", ce.box(["Function", ["callIt", bump]]));
+// ➔ throws: the body writes outside the function ...
+
+// Refused: `Map` calls its callback.
+ce.assign("m", ce.box(["Function", ["Map", bump, ["List", 1, 2]]]));
+// ➔ throws: the body writes outside the function ...
+```
 
 Stating the effects explicitly — a non-empty specifier, or the `pure` keyword —
 turns them into a **contract** instead. Every body assigned to the symbol must

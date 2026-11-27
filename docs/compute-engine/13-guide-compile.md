@@ -740,9 +740,24 @@ inputs with no type too, after the cause of the decline: with `x` declared
 `real` and `u` undeclared, `compile(ce.box(['Assign', 'u', ['If', ['Less',
 'x', 0], 'u', 0]])).unsupported` is `['Assign', 'u']`.
 
-Declare the input (`ce.declare('M', 'real')`). When the host can pass both
-shapes, declare a union such as `real | list<real>`: a union compiles. A
+Declare the input (`ce.declare('M', 'real')`). A declared union of shapes
+such as `real | list<real>` declines too (`outside-profile`): when the host
+can pass both shapes, compile one function per shape. A
 parameter of a function is not an input, so `t ↦ 2t` compiles.
+
+An untyped parameter of a compiled function literal is read as a number. If
+a use in the body gives it a type that admits a list, the compilation
+declines instead, and the name of the parameter is in `unsupported`:
+
+```javascript
+const r = compile(ce.box(['Function', ['Norm', 'v'], 'v']));
+r.success          // ➔ false
+r.unsupported      // ➔ ['v']
+r.run([3, 4])      // ➔ [3, 4], from the interpreter, which applies the function to each element
+```
+
+Declare the parameter to compile the function: `(v: list<real>) ↦ Norm(v)`
+compiles and gives `5` for `[3, 4]`.
 
 An input with no declared type has the type that the compiled expression
 requires of it: in `x + 1`, `x` is a `number`, and `freeSymbolTypes` reports
@@ -1469,9 +1484,131 @@ log;             // ➔ [0.016]
 
 The arguments must be real numbers, integers, booleans or strings (at most
 four), and the result type `real`, `integer`, `boolean` or `nothing`: with
-the signature `(real) -> any`, the call declines. The code calls the engine,
-so the result is not `shippable` and cannot be loaded without the engine. A
-call in a function that assigns a variable of the engine declines.
+the signature `(real) -> any`, the call declines.
+
+In JavaScript, an argument can also be a `List` or `Tuple` literal of such
+values, or a value of a named tuple type of the program (a record). The code
+passes the engine's value, the one the interpreter would pass:
+
+```js
+const log = [];
+ce.declare("hostPlot", {
+  signature: "(any) -> nothing",
+  evaluate: (ops) => { log.push(ops[0].json); return ce.symbol("Nothing"); },
+});
+const plot = compile(ce.box(["Function",
+  ["hostPlot", ["List", ["Cos", "t"], ["Sin", "t"]]], ["Typed", "t", "'real'"]]));
+
+plot.run(0);  // ➔ NaN: the value Nothing
+log;          // ➔ [["List", 1, 0]]
+```
+
+A list that the interpreter holds as a lazy collection (`Range`, `Reverse`,
+`Linspace`) and a color decline as arguments, and the code runs in the
+interpreter. The code calls the engine,
+so the result is not `shippable` and cannot be loaded without the engine.
+
+A function that [assigns a variable](#variables-that-a-function-assigns) can
+call the host when the variable is a number, a boolean or a
+[mutable array](#mutable-arrays). The code writes the value of each assigned
+variable to the engine before the call and reads it again after the call, so
+the host function sees the new value and can assign another one:
+
+```js
+const seen = [];
+ce.declare("hostDraw", {
+  signature: "(real) -> nothing",
+  evaluate: (ops) => {
+    seen.push(ce.box("s").evaluate().re);
+    return ce.symbol("Nothing");
+  },
+});
+executeEpsil(ce, `let s = 0
+let f = (t: real) => do { s = s + t; hostDraw(s) }`);
+const result = compile(ce.box("f").evaluate());
+
+result.assigns;  // ➔ ["s"]
+result.run(1);
+result.run(2);
+seen;            // ➔ [1, 3]
+```
+
+In such a function a list variable declines, and so does a call of the host
+in the body of a `Sum` or in a callback of `Map` or `Filter`, and a recursive
+function that calls the host.
+
+### Mutable Arrays
+
+A [mutable array](/compute-engine/guides/types/#mutable-arrays) whose cells
+are stored in a typed array compiles to JavaScript: the cell type is a
+bounded integer type such as `integer<0..255>`, `real`, or a tuple of four
+bytes. The compiled code reads and writes the cells of the engine's array,
+with no copy when `run()` starts or returns. The interpreter, the compiled
+code and the host program share one typed array.
+
+```js
+const pixels = ce.array(new Uint8Array(4));
+ce.assign("screen", pixels);
+
+const read = compile(ce.box(["Function",
+  ["At", "screen", "k"], ["Typed", "k", "'integer'"]]));
+
+read.arrays;       // ➔ ["screen"]
+pixels.cells[1] = 200;
+pixels.noteStore();
+read.run(2);       // ➔ 200
+read.run(-1);      // ➔ 0, the last cell
+read.run(9);       // ➔ NaN: out of range
+```
+
+`arrays` lists the names that hold an array. The code reads the array of
+each name at each call of `run()`, so assigning another array to the name
+needs no new compilation:
+
+```js
+ce.assign("screen", ce.array(new Uint8Array([5, 6, 7, 8])));
+read.run(2);       // ➔ 6
+```
+
+An array can also be a parameter. The caller passes the engine's array:
+
+```js
+const sum = compile(ce.box(["Function",
+  ["Add", ["At", "a", 1], ["At", "a", 2]],
+  ["Typed", "a", "'array<integer<0..255>>'"]]));
+
+sum.run(pixels);   // ➔ 200
+sum.run([1, 2]);   // throws a TypeError: not an array of the engine
+```
+
+A store compiles too: `["Assign", ["At", "screen", "k"], "v"]`, `a[i] = v`
+in Epsil. A function that only stores gives `NaN` (the value `Nothing`):
+
+```js
+const fill = compile(ce.box(["Function",
+  ["Block", ["Assign", ["At", "screen", "k"], "v"]],
+  ["Typed", "k", "'integer'"], ["Typed", "v", "'integer'"]]));
+
+fill.run(1, 9);    // ➔ NaN
+ce.box("screen").evaluate().cells;  // ➔ Uint8Array [9, 6, 7, 8]
+```
+
+Compiled code and the interpreter differ in two cases, which the
+interpreter reports as errors:
+
+- A compiled store at an index that is 0, not an integer or out of range
+  writes nothing. The interpreter gives the error `out-of-range`.
+- A compiled store of a value outside the cell type writes what JavaScript
+  writes in the typed array (a `Uint8Array` cell keeps the low 8 bits of
+  300). The interpreter gives the error `incompatible-type`.
+
+These decline, and run in the interpreter: an array whose cells are
+expressions (`array<number>`, `array<rational>`), an array as the result of
+the function, a read or a store in a callback
+(`["Map", ["Range", 1, "n"], ["Function", ["At", "a", "k"], "k"]]`: write a
+loop, or take `["ListFrom", "a"]`), and the interval target. A GLSL program
+[reads an array input](#mutable-arrays-in-a-shader) and declines a store. The
+code is not `shippable`.
 
 ### Tuple Expressions
 
@@ -2707,6 +2844,100 @@ const r = compile(ce.box(['g', 'H', 'x']), {
 //   return (v3 * _gpu_ir_texel(v2, int(1599.0)));
 // }
 ```
+
+### Mutable Arrays in a Shader
+
+A GLSL program reads a [mutable array](/compute-engine/guides/types/#mutable-arrays)
+that is an input: a symbol declared with an array type and no value, or a
+name of the `inputs` option. `["At", "A", "i"]` and `["Length", "A"]`
+compile. A fragment shader cannot store to a cell, so a store declines.
+
+```javascript
+ce.declare('A', 'array<integer<0..255>>');
+ce.declare('i', 'integer');
+const r = compile(ce.box(['At', 'A', 'i']), { to: 'glsl' });
+
+r.code;
+// ➔ "float v2 = (i == floor(i) && i != 0.0 && abs(i) <= float(A_count) ? _gpu_ir_cell_u(A, i > 0.0 ? int(i) - 1 : A_count + int(i)) : uintBitsToFloat(0x7fc00000u));\nreturn v2;"
+r.freeSymbolTypes.A.lowered;  // ➔ "highp usampler2D"
+r.freeSymbolTypes.A.count;    // ➔ "A_count"
+```
+
+The host program binds two uniforms for the array `A`:
+
+- A sampler named `A`. Its texture holds one cell in each texel, row by row
+  from texel (0, 0), with no filtering. The shader reads the width of the
+  texture, so the host chooses it and pads the last row.
+- An `int` named `A_count`, the number of cells.
+
+The sampler type and the texture format follow the cell type:
+
+| Cells | Sampler (`lowered`) | Texture format |
+| :--- | :--- | :--- |
+| Unsigned integers (`integer<0..255>`, `integer<0..65535>`) | `highp usampler2D` | `R8UI`, `R16UI`, `R32UI` |
+| Signed integers (`integer<-128..127>`) | `highp isampler2D` | `R8I`, `R16I`, `R32I` |
+| `real` | `highp sampler2D` | `R32F` (upload a `Float32Array`) |
+| A tuple of four bytes | `highp usampler2D` | `RGBA8UI` |
+
+A value of a named pixel type (a declared tuple of four bytes) is a `vec4`
+in the shader: a cell that the program reads, the constructor, a parameter
+and the result of a user function. So one pixel function compiles to
+JavaScript and to GLSL:
+
+```javascript
+executeEpsil(ce, `type alias Byte = integer<0..255>
+type Pixel = tuple<r: Byte, g: Byte, b: Byte, a: Byte>
+function dim(p: Pixel) -> Pixel { Pixel(p.r, p.g, p.b, 128) }`);
+ce.declare('src', 'array<Pixel>');
+ce.declare('i', 'integer');
+
+const r = compile(ce.box(['dim', ['At', 'src', 'i']]), { to: 'glsl' });
+r.preamble;  // holds: vec4 _fn_ir_u0_dim(vec4 v3) { return vec4(v3[int(0.0)], v3[int(1.0)], v3[int(2.0)], 128.0); }
+r.code;
+// ➔ "vec4 v2 = (i == floor(i) && i != 0.0 && abs(i) <= float(src_count) ? _gpu_ir_cell4_u(src, i > 0.0 ? int(i) - 1 : src_count + int(i)) : vec4(uintBitsToFloat(0x7fc00000u)));\nvec4 v12 = _fn_ir_u0_dim(v2);\nreturn v12;"
+```
+
+Two pixels of the same type compare with `==`
+(`["Equal", ["At", "src", "i"], ["Pixel", 255, 255, 255, 255]]`). A pixel
+and a plain tuple are never equal, so `src[i] == (255, 255, 255, 255)`
+declines.
+
+The same holds for every named tuple type of two to four `real` or `integer`
+fields, with no array involved: a value of the type is a `vec2`, a `vec3` or
+a `vec4`.
+
+```javascript
+executeEpsil(ce, `type Point = tuple<x: real, y: real>
+function mid(a: Point, b: Point) -> Point {
+  Point((a.x + b.x) / 2, (a.y + b.y) / 2)
+}`);
+ce.declare('x', 'real');
+ce.declare('y', 'real');
+
+const m = compile(
+  ce.box(['Field', ['mid', ['Point', 'x', 'y'], ['Point', 'y', 'x']], "'x'"]),
+  { to: 'glsl' });
+m.preamble;  // holds: vec2 _fn_ir_u0_mid(vec2 v4, vec2 v5) { … }
+m.code;
+// ➔ "vec2 v18 = _fn_ir_u0_mid(vec2(x, y), vec2(y, x));\nreturn v18[int(0.0)];"
+```
+
+A named type with a field that is not a number, with one field or with more
+than four, and an input declared with a named tuple type, are not compiled
+to GLSL.
+
+A read of a tuple cell is one texel fetch and gives a `vec4`. With
+`storage: { A: 'sampler2D' }`, cells stored in a `Uint8Array` (bytes, or a
+tuple of four bytes) are read from a normalized texture (`R8` or `RGBA8`)
+instead; the values are still 0 to 255.
+
+A read follows the rule of `At`: the first cell is 1, a negative index counts
+from the end, and an index that is 0, not an integer or out of range gives
+`NaN`.
+
+On GLSL a number is a 32-bit float, so integer cells must have a declared
+range within -16,777,216 to 16,777,216 (`array<integer<0..4294967295>>`
+declines), and an array can have at most 16,777,216 cells.
 
 ### Inputs That a User Function Reads
 
